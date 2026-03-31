@@ -1,0 +1,64 @@
+{
+  "title": "Faturamento",
+  "newInvoice": "Nova Nota Fiscal",
+  "listTitle": "Listagem de Notas Fiscais",
+  "form": {
+    "tipo": "Tipo",
+    "prefijo": "Prefixo",
+    "numero": "Número",
+    "fecha": "Data",
+    "cliente": "Cliente",
+    "formaPago": "Forma de Pagamento",
+    "tipoOptions": {
+      "A": "NF-e Tipo A",
+      "B": "NF-e Tipo B"
+    },
+    "selectCliente": "Selecionar...",
+    "selectFormaPago": "Selecionar..."
+  },
+  "items": {
+    "articulo": "Produto",
+    "cantidad": "Qtd.",
+    "precio": "Preço",
+    "descuento": "Desc %",
+    "subtotal": "Subtotal",
+    "empty": "Sem itens. Pressione Ins para adicionar.",
+    "addItem": "➕ Adicionar Item (Ins)",
+    "selectArticulo": "Selecionar..."
+  },
+  "totals": {
+    "neto21": "Base 21%",
+    "neto105": "Base 10,5%",
+    "netoExento": "Base Isenta",
+    "iva": "Impostos",
+    "total": "TOTAL"
+  },
+  "errors": {
+    "noCliente": "Selecione um cliente",
+    "noItems": "Adicione pelo menos um produto",
+    "generic": "Erro ao salvar nota fiscal"
+  },
+  "list": {
+    "numero": "Nº",
+    "fecha": "Data",
+    "tipo": "Tipo",
+    "cliente": "Cliente",
+    "neto": "Base",
+    "iva": "Impostos",
+    "total": "Total",
+    "estado": "Situação",
+    "activa": "Ativa",
+    "anulada": "Cancelada",
+    "empty": "Nenhuma nota fiscal cadastrada.",
+    "items": "itens"
+  },
+  "detail": {
+    "title": "NF {{tipo}} {{prefijo}} {{numero}}",
+    "items": "Detalhes:",
+    "close": "Fechar",
+    "iva21": "Imposto 21%",
+    "iva105": "Imposto 10,5%"
+  },
+  "save": "✓ Salvar NF (F5)",
+  "cancel": "Cancelar (Esc)"
+}

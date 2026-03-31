@@ -1,0 +1,42 @@
+{
+  "title": "Clientes",
+  "search": {
+    "placeholder": "Buscar por código, razão social ou CNPJ... (F2)"
+  },
+  "table": {
+    "codigo": "Código",
+    "rsocial": "Razão Social",
+    "cuit": "CNPJ/CPF",
+    "condIva": "Regime Fiscal",
+    "telef": "Telefone",
+    "activo": "Ativo"
+  },
+  "empty": "Nenhum cliente encontrado. Crie um com F3.",
+  "form": {
+    "titleNew": "Novo Cliente",
+    "titleEdit": "Editar Cliente #{{codigo}}",
+    "hint": "F5=salvar, Esc=cancelar",
+    "codigo": "Código",
+    "rsocial": "Razão Social",
+    "fantasia": "Nome Fantasia",
+    "cuit": "CNPJ/CPF",
+    "condIva": "Regime Fiscal",
+    "domicilio": "Endereço",
+    "localidad": "Cidade",
+    "cpost": "CEP",
+    "telef": "Telefone",
+    "email": "E-mail",
+    "activo": "Ativo",
+    "condIvaOptions": {
+      "RI": "RI - Contribuinte ICMS",
+      "Mono": "MEI / Simples",
+      "CF": "CF - Consumidor Final",
+      "Exento": "Isento"
+    },
+    "errors": {
+      "cuit": "CNPJ/CPF inválido",
+      "rsocial": "Razão social deve ter pelo menos 3 caracteres",
+      "generic": "Erro ao salvar cliente"
+    }
+  }
+}

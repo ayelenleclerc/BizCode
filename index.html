@@ -5,8 +5,19 @@
     <link rel="icon" type="image/svg+xml" href="/src/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>BizCode - Gestión Comercial</title>
+    <!-- Tema antes del primer paint: debe coincidir con Layout (localStorage theme, default oscuro) -->
+    <script>
+      (function () {
+        try {
+          var t = localStorage.getItem('theme')
+          var isDark = t ? t === 'dark' : true
+          document.documentElement.classList.toggle('dark', isDark)
+          document.documentElement.classList.toggle('light', !isDark)
+        } catch (_) {}
+      })()
+    </script>
   </head>
-  <body class="dark">
+  <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

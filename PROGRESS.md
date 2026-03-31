@@ -1,5 +1,7 @@
 # BizCode - Progreso de Desarrollo
 
+La documentación normativa, de calidad y de usuario vive en **[docs/README.md](docs/README.md)**. Este archivo es una bitácora de hitos de implementación.
+
 ## MVP Objetivo
 Sistema de gestión comercial con facturación A/B, gestión de clientes y artículos.
 

@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useHotkeys } from 'react-hotkeys-hook'
+import { useTranslation } from 'react-i18next'
 import { clientesAPI } from '@/lib/api'
 import { validateCUIT, formatCUIT } from '@/lib/validators'
 import { Cliente } from '@/types'
@@ -21,7 +22,7 @@ const clienteSchema = z.object({
   cpost: z.string().max(8).optional(),
   telef: z.string().max(25).optional(),
   email: z.string().email('Email inválido').max(50).optional().or(z.literal('')),
-  activo: z.boolean().default(true),
+  activo: z.boolean(),
 })
 
 type ClienteFormData = z.infer<typeof clienteSchema>
@@ -33,6 +34,8 @@ interface ClienteFormProps {
 }
 
 export default function ClienteForm({ cliente, onClose, onGuardado }: ClienteFormProps) {
+  const { t } = useTranslation('clientes')
+  const { t: tc } = useTranslation('common')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -41,13 +44,13 @@ export default function ClienteForm({ cliente, onClose, onGuardado }: ClienteFor
     handleSubmit,
     formState: { errors },
     setValue,
-    getValues,
   } = useForm<ClienteFormData>({
-    resolver: zodResolver(clienteSchema),
-    defaultValues: cliente || {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    resolver: zodResolver(clienteSchema) as any,
+    defaultValues: (cliente || {
       condIva: 'RI',
       activo: true,
-    },
+    }) as ClienteFormData,
   })
 
   useEffect(() => {
@@ -56,7 +59,7 @@ export default function ClienteForm({ cliente, onClose, onGuardado }: ClienteFor
       setValue('rsocial', cliente.rsocial)
       setValue('fantasia', cliente.fantasia)
       setValue('cuit', cliente.cuit)
-      setValue('condIva', cliente.condIva as any)
+      setValue('condIva', cliente.condIva as ClienteFormData['condIva'])
       setValue('domicilio', cliente.domicilio)
       setValue('localidad', cliente.localidad)
       setValue('cpost', cliente.cpost)
@@ -66,7 +69,6 @@ export default function ClienteForm({ cliente, onClose, onGuardado }: ClienteFor
     }
   }, [cliente, setValue])
 
-  // Hotkeys
   useHotkeys('f5', () => {
     const form = document.querySelector('form') as HTMLFormElement
     form?.dispatchEvent(new Event('submit', { bubbles: true }))
@@ -79,7 +81,6 @@ export default function ClienteForm({ cliente, onClose, onGuardado }: ClienteFor
     setError(null)
 
     try {
-      // Formatear CUIT si existe
       if (data.cuit) {
         data.cuit = formatCUIT(data.cuit)
       }
@@ -92,182 +93,220 @@ export default function ClienteForm({ cliente, onClose, onGuardado }: ClienteFor
       }
 
       onGuardado(result)
-    } catch (err: any) {
-      setError(err.message || 'Error al guardar cliente')
+    } catch (err: unknown) {
+      setError((err as Error).message || t('form.errors.generic'))
     } finally {
       setLoading(false)
     }
   }
 
+  const dialogTitle = cliente
+    ? t('form.titleEdit', { codigo: cliente.codigo })
+    : t('form.titleNew')
+
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-slate-800 rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-        {/* Header */}
-        <div className="bg-slate-700 px-6 py-4 border-b border-slate-600">
-          <h2 className="text-xl font-bold text-slate-100">
-            {cliente ? `Editar Cliente #${cliente.codigo}` : 'Nuevo Cliente'}
+    <div
+      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="dialog-cliente-title"
+    >
+      <div className="bg-white dark:bg-slate-800 rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+        <div className="bg-slate-200 dark:bg-slate-700 px-6 py-4 border-b border-slate-300 dark:border-slate-600">
+          <h2 id="dialog-cliente-title" className="text-xl font-bold text-slate-900 dark:text-slate-100">
+            {dialogTitle}
           </h2>
-          <p className="text-sm text-slate-400 mt-1">F5=guardar, Esc=cancelar</p>
+          <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">{t('form.hint')}</p>
         </div>
 
-        {/* Form */}
         <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-4">
           {error && (
-            <div className="p-3 bg-red-900 text-red-100 rounded border border-red-700">
+            <div role="alert" className="p-3 bg-red-100 dark:bg-red-900 text-red-900 dark:text-red-100 rounded border border-red-300 dark:border-red-700">
               {error}
             </div>
           )}
 
-          {/* Código */}
           <div>
-            <label className="block text-slate-300 font-semibold mb-1">Código *</label>
+            <label htmlFor="cliente-codigo" className="block text-slate-700 dark:text-slate-300 font-semibold mb-1">
+              {t('form.codigo')} *
+            </label>
             <input
+              id="cliente-codigo"
               type="number"
               {...register('codigo')}
-              className="w-full px-3 py-2 bg-slate-700 text-slate-100 rounded border border-slate-600 focus:border-blue-500 focus:outline-none"
+              aria-required="true"
+              aria-describedby={errors.codigo ? 'cliente-codigo-error' : undefined}
+              className="w-full px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 rounded border border-slate-300 dark:border-slate-600 focus:border-blue-500 focus:outline-none"
               disabled={!!cliente}
             />
             {errors.codigo && (
-              <p className="text-red-400 text-sm mt-1">{errors.codigo.message}</p>
+              <p id="cliente-codigo-error" className="text-red-400 text-sm mt-1">{errors.codigo.message}</p>
             )}
           </div>
 
-          {/* Razón Social */}
           <div>
-            <label className="block text-slate-300 font-semibold mb-1">Razón Social *</label>
+            <label htmlFor="cliente-rsocial" className="block text-slate-700 dark:text-slate-300 font-semibold mb-1">
+              {t('form.rsocial')} *
+            </label>
             <input
+              id="cliente-rsocial"
               type="text"
               {...register('rsocial')}
               maxLength={30}
-              className="w-full px-3 py-2 bg-slate-700 text-slate-100 rounded border border-slate-600 focus:border-blue-500 focus:outline-none"
+              aria-required="true"
+              aria-describedby={errors.rsocial ? 'cliente-rsocial-error' : undefined}
+              className="w-full px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 rounded border border-slate-300 dark:border-slate-600 focus:border-blue-500 focus:outline-none"
             />
             {errors.rsocial && (
-              <p className="text-red-400 text-sm mt-1">{errors.rsocial.message}</p>
+              <p id="cliente-rsocial-error" className="text-red-400 text-sm mt-1">{errors.rsocial.message}</p>
             )}
           </div>
 
-          {/* Fantasía */}
           <div>
-            <label className="block text-slate-300 font-semibold mb-1">Nombre Fantasía</label>
+            <label htmlFor="cliente-fantasia" className="block text-slate-700 dark:text-slate-300 font-semibold mb-1">
+              {t('form.fantasia')}
+            </label>
             <input
+              id="cliente-fantasia"
               type="text"
               {...register('fantasia')}
               maxLength={30}
-              className="w-full px-3 py-2 bg-slate-700 text-slate-100 rounded border border-slate-600 focus:border-blue-500 focus:outline-none"
+              className="w-full px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 rounded border border-slate-300 dark:border-slate-600 focus:border-blue-500 focus:outline-none"
             />
           </div>
 
-          {/* CUIT */}
           <div>
-            <label className="block text-slate-300 font-semibold mb-1">CUIT</label>
+            <label htmlFor="cliente-cuit" className="block text-slate-700 dark:text-slate-300 font-semibold mb-1">
+              {t('form.cuit')}
+            </label>
             <input
+              id="cliente-cuit"
               type="text"
               {...register('cuit')}
               placeholder="20-12345678-9"
-              className="w-full px-3 py-2 bg-slate-700 text-slate-100 rounded border border-slate-600 focus:border-blue-500 focus:outline-none font-mono"
+              aria-describedby={errors.cuit ? 'cliente-cuit-error' : undefined}
+              className="w-full px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 rounded border border-slate-300 dark:border-slate-600 focus:border-blue-500 focus:outline-none font-mono"
             />
             {errors.cuit && (
-              <p className="text-red-400 text-sm mt-1">{errors.cuit.message}</p>
+              <p id="cliente-cuit-error" className="text-red-400 text-sm mt-1">{errors.cuit.message}</p>
             )}
           </div>
 
-          {/* Condición IVA */}
           <div>
-            <label className="block text-slate-300 font-semibold mb-1">Condición IVA *</label>
+            <label htmlFor="cliente-condIva" className="block text-slate-700 dark:text-slate-300 font-semibold mb-1">
+              {t('form.condIva')} *
+            </label>
             <select
+              id="cliente-condIva"
               {...register('condIva')}
-              className="w-full px-3 py-2 bg-slate-700 text-slate-100 rounded border border-slate-600 focus:border-blue-500 focus:outline-none"
+              aria-required="true"
+              className="w-full px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 rounded border border-slate-300 dark:border-slate-600 focus:border-blue-500 focus:outline-none"
             >
-              <option value="RI">RI - Responsable Inscrito</option>
-              <option value="Mono">Monotributista</option>
-              <option value="CF">CF - Consumidor Final</option>
-              <option value="Exento">Exento</option>
+              <option value="RI">{t('form.condIvaOptions.RI')}</option>
+              <option value="Mono">{t('form.condIvaOptions.Mono')}</option>
+              <option value="CF">{t('form.condIvaOptions.CF')}</option>
+              <option value="Exento">{t('form.condIvaOptions.Exento')}</option>
             </select>
           </div>
 
-          {/* Domicilio */}
           <div>
-            <label className="block text-slate-300 font-semibold mb-1">Domicilio</label>
+            <label htmlFor="cliente-domicilio" className="block text-slate-700 dark:text-slate-300 font-semibold mb-1">
+              {t('form.domicilio')}
+            </label>
             <input
+              id="cliente-domicilio"
               type="text"
               {...register('domicilio')}
               maxLength={40}
-              className="w-full px-3 py-2 bg-slate-700 text-slate-100 rounded border border-slate-600 focus:border-blue-500 focus:outline-none"
+              className="w-full px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 rounded border border-slate-300 dark:border-slate-600 focus:border-blue-500 focus:outline-none"
             />
           </div>
 
-          {/* Localidad y Código Postal */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-slate-300 font-semibold mb-1">Localidad</label>
+              <label htmlFor="cliente-localidad" className="block text-slate-700 dark:text-slate-300 font-semibold mb-1">
+                {t('form.localidad')}
+              </label>
               <input
+                id="cliente-localidad"
                 type="text"
                 {...register('localidad')}
                 maxLength={25}
-                className="w-full px-3 py-2 bg-slate-700 text-slate-100 rounded border border-slate-600 focus:border-blue-500 focus:outline-none"
+                className="w-full px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 rounded border border-slate-300 dark:border-slate-600 focus:border-blue-500 focus:outline-none"
               />
             </div>
             <div>
-              <label className="block text-slate-300 font-semibold mb-1">Código Postal</label>
+              <label htmlFor="cliente-cpost" className="block text-slate-700 dark:text-slate-300 font-semibold mb-1">
+                {t('form.cpost')}
+              </label>
               <input
+                id="cliente-cpost"
                 type="text"
                 {...register('cpost')}
                 maxLength={8}
-                className="w-full px-3 py-2 bg-slate-700 text-slate-100 rounded border border-slate-600 focus:border-blue-500 focus:outline-none"
+                className="w-full px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 rounded border border-slate-300 dark:border-slate-600 focus:border-blue-500 focus:outline-none"
               />
             </div>
           </div>
 
-          {/* Teléfono y Email */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-slate-300 font-semibold mb-1">Teléfono</label>
+              <label htmlFor="cliente-telef" className="block text-slate-700 dark:text-slate-300 font-semibold mb-1">
+                {t('form.telef')}
+              </label>
               <input
+                id="cliente-telef"
                 type="text"
                 {...register('telef')}
                 maxLength={25}
-                className="w-full px-3 py-2 bg-slate-700 text-slate-100 rounded border border-slate-600 focus:border-blue-500 focus:outline-none"
+                className="w-full px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 rounded border border-slate-300 dark:border-slate-600 focus:border-blue-500 focus:outline-none"
               />
             </div>
             <div>
-              <label className="block text-slate-300 font-semibold mb-1">Email</label>
+              <label htmlFor="cliente-email" className="block text-slate-700 dark:text-slate-300 font-semibold mb-1">
+                {t('form.email')}
+              </label>
               <input
+                id="cliente-email"
                 type="email"
                 {...register('email')}
                 maxLength={50}
-                className="w-full px-3 py-2 bg-slate-700 text-slate-100 rounded border border-slate-600 focus:border-blue-500 focus:outline-none"
+                aria-describedby={errors.email ? 'cliente-email-error' : undefined}
+                className="w-full px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 rounded border border-slate-300 dark:border-slate-600 focus:border-blue-500 focus:outline-none"
               />
               {errors.email && (
-                <p className="text-red-400 text-sm mt-1">{errors.email.message}</p>
+                <p id="cliente-email-error" className="text-red-400 text-sm mt-1">{errors.email.message}</p>
               )}
             </div>
           </div>
 
-          {/* Activo */}
           <div className="flex items-center gap-3 pt-4">
             <input
+              id="cliente-activo"
               type="checkbox"
               {...register('activo')}
-              className="w-4 h-4 rounded bg-slate-700 border border-slate-600 cursor-pointer"
+              className="w-4 h-4 rounded bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 cursor-pointer"
             />
-            <label className="text-slate-300 font-semibold cursor-pointer">Activo</label>
+            <label htmlFor="cliente-activo" className="text-slate-700 dark:text-slate-300 font-semibold cursor-pointer">
+              {t('form.activo')}
+            </label>
           </div>
 
-          {/* Buttons */}
-          <div className="flex gap-3 pt-6 border-t border-slate-600">
+          <div className="flex gap-3 pt-6 border-t border-slate-200 dark:border-slate-600">
             <button
               type="submit"
+              data-testid="btn-save-cliente"
               disabled={loading}
-              className="flex-1 px-4 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-600 text-white font-semibold rounded transition"
+              className="flex-1 px-4 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-400 dark:disabled:bg-slate-600 text-white font-semibold rounded transition"
             >
-              {loading ? 'Guardando...' : 'Guardar (F5)'}
+              {loading ? tc('actions.saving') : `${tc('actions.save')} (F5)`}
             </button>
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-3 bg-slate-700 hover:bg-slate-600 text-slate-100 font-semibold rounded transition"
+              className="flex-1 px-4 py-3 bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-900 dark:text-slate-100 font-semibold rounded transition"
             >
-              Cancelar (Esc)
+              {tc('actions.cancel')} (Esc)
             </button>
           </div>
         </form>

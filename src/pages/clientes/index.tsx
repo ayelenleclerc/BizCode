@@ -1,11 +1,13 @@
 import { useState, useEffect, useRef } from 'react'
 import { useHotkeys } from 'react-hotkeys-hook'
+import { useTranslation } from 'react-i18next'
 import { clientesAPI } from '@/lib/api'
 import { Cliente } from '@/types'
 import ClienteForm from './ClienteForm'
-import KeyboardHint, { TABLE_SHORTCUTS } from '@/components/shared/KeyboardHint'
 
 export default function ClientesPage() {
+  const { t } = useTranslation('clientes')
+  const { t: tc } = useTranslation('common')
   const [clientes, setClientes] = useState<Cliente[]>([])
   const [filtro, setFiltro] = useState('')
   const [loading, setLoading] = useState(false)
@@ -14,7 +16,6 @@ export default function ClientesPage() {
   const [selectedRow, setSelectedRow] = useState(0)
   const tableRef = useRef<HTMLTableElement>(null)
 
-  // Cargar clientes
   const loadClientes = async (search?: string) => {
     setLoading(true)
     try {
@@ -32,7 +33,6 @@ export default function ClientesPage() {
     loadClientes()
   }, [])
 
-  // Hotkeys
   useHotkeys('f2', () => {
     const input = document.getElementById('search-clientes') as HTMLInputElement
     input?.focus()
@@ -47,7 +47,6 @@ export default function ClientesPage() {
     if (showForm) setShowForm(false)
   })
 
-  // Búsqueda
   const handleSearch = (value: string) => {
     setFiltro(value)
     if (value.length > 0) {
@@ -57,7 +56,6 @@ export default function ClientesPage() {
     }
   }
 
-  // Seleccionar fila y abrir edición con Enter
   const handleKeyDown = (e: React.KeyboardEvent, index: number) => {
     if (e.key === 'ArrowDown') {
       e.preventDefault()
@@ -72,77 +70,72 @@ export default function ClientesPage() {
     }
   }
 
-  // Al guardar cliente
-  const handleClienteGuardado = async (cliente: Cliente) => {
+  const handleClienteGuardado = async (_cliente: Cliente) => {
     setShowForm(false)
     await loadClientes(filtro)
   }
 
   return (
     <div className="p-8 h-full flex flex-col">
-      {/* Header */}
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-slate-100">Clientes</h1>
+        <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100">{t('title')}</h1>
       </div>
 
-      {/* Keyboard Hint */}
-      <KeyboardHint shortcuts={TABLE_SHORTCUTS} className="mb-6" />
-
-      {/* Search Bar */}
       <div className="mb-6 flex gap-4">
         <input
           id="search-clientes"
           type="text"
-          placeholder="Buscar por código, razón social o CUIT... (F2)"
+          placeholder={t('search.placeholder')}
           value={filtro}
           onChange={(e) => handleSearch(e.target.value)}
-          className="flex-1 px-4 py-2 bg-slate-700 text-slate-100 rounded border border-slate-600 focus:border-blue-500 focus:outline-none"
+          className="flex-1 px-4 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 rounded border border-slate-300 dark:border-slate-600 focus:border-blue-500 focus:outline-none"
         />
         <button
+          data-testid="btn-nuevo-cliente"
           onClick={() => {
             setSelectedCliente(null)
             setShowForm(true)
           }}
           className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded transition"
         >
-          ➕ Nuevo (F3)
+          ➕ {tc('actions.new')} (F3)
         </button>
       </div>
 
-      {/* Table */}
       <div className="flex-1 overflow-auto">
         {loading ? (
-          <div className="text-center py-12 text-slate-400">Cargando...</div>
+          <div className="text-center py-12 text-slate-500 dark:text-slate-400">{tc('status.loading')}</div>
         ) : clientes.length === 0 ? (
-          <div className="text-center py-12 text-slate-400">
-            No hay clientes. Crea uno con F3.
-          </div>
+          <div className="text-center py-12 text-slate-500 dark:text-slate-400">{t('empty')}</div>
         ) : (
           <table
             ref={tableRef}
-            className="w-full border-collapse bg-slate-800 rounded overflow-hidden"
+            aria-label={t('title')}
+            className="w-full border-collapse bg-white dark:bg-slate-800 rounded overflow-hidden border border-slate-200 dark:border-slate-700"
           >
-            <thead className="bg-slate-700 sticky top-0">
-              <tr className="border-b border-slate-600">
-                <th className="px-4 py-3 text-left text-slate-300 font-semibold">Código</th>
-                <th className="px-4 py-3 text-left text-slate-300 font-semibold">Razón Social</th>
-                <th className="px-4 py-3 text-left text-slate-300 font-semibold">CUIT</th>
-                <th className="px-4 py-3 text-left text-slate-300 font-semibold">Cond. IVA</th>
-                <th className="px-4 py-3 text-left text-slate-300 font-semibold">Teléfono</th>
-                <th className="px-4 py-3 text-center text-slate-300 font-semibold">Activo</th>
+            <thead className="bg-slate-100 dark:bg-slate-700 sticky top-0">
+              <tr className="border-b border-slate-200 dark:border-slate-600">
+                <th className="px-4 py-3 text-left text-slate-700 dark:text-slate-300 font-semibold">{t('table.codigo')}</th>
+                <th className="px-4 py-3 text-left text-slate-700 dark:text-slate-300 font-semibold">{t('table.rsocial')}</th>
+                <th className="px-4 py-3 text-left text-slate-700 dark:text-slate-300 font-semibold">{t('table.cuit')}</th>
+                <th className="px-4 py-3 text-left text-slate-700 dark:text-slate-300 font-semibold">{t('table.condIva')}</th>
+                <th className="px-4 py-3 text-left text-slate-700 dark:text-slate-300 font-semibold">{t('table.telef')}</th>
+                <th className="px-4 py-3 text-center text-slate-700 dark:text-slate-300 font-semibold">{t('table.activo')}</th>
               </tr>
             </thead>
             <tbody>
               {clientes.map((cliente, idx) => (
                 <tr
                   key={cliente.id}
+                  role="row"
+                  aria-selected={selectedRow === idx}
                   onClick={() => setSelectedRow(idx)}
                   onKeyDown={(e) => handleKeyDown(e, idx)}
                   tabIndex={0}
-                  className={`border-b border-slate-700 cursor-pointer transition ${
+                  className={`border-b border-slate-200 dark:border-slate-700 cursor-pointer transition ${
                     selectedRow === idx
                       ? 'bg-blue-600 text-white'
-                      : 'hover:bg-slate-700 text-slate-100'
+                      : 'hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-900 dark:text-slate-100'
                   }`}
                 >
                   <td className="px-4 py-3 font-semibold">{cliente.codigo}</td>
@@ -160,7 +153,6 @@ export default function ClientesPage() {
         )}
       </div>
 
-      {/* Form Modal */}
       {showForm && (
         <ClienteForm
           cliente={selectedCliente}

@@ -1,0 +1,42 @@
+{
+  "title": "Clientes",
+  "search": {
+    "placeholder": "Buscar por código, razón social o CUIT... (F2)"
+  },
+  "table": {
+    "codigo": "Código",
+    "rsocial": "Razón Social",
+    "cuit": "CUIT",
+    "condIva": "Cond. IVA",
+    "telef": "Teléfono",
+    "activo": "Activo"
+  },
+  "empty": "No hay clientes. Crea uno con F3.",
+  "form": {
+    "titleNew": "Nuevo Cliente",
+    "titleEdit": "Editar Cliente #{{codigo}}",
+    "hint": "F5=guardar, Esc=cancelar",
+    "codigo": "Código",
+    "rsocial": "Razón Social",
+    "fantasia": "Nombre Fantasía",
+    "cuit": "CUIT",
+    "condIva": "Condición IVA",
+    "domicilio": "Domicilio",
+    "localidad": "Localidad",
+    "cpost": "Código Postal",
+    "telef": "Teléfono",
+    "email": "Email",
+    "activo": "Activo",
+    "condIvaOptions": {
+      "RI": "RI - Responsable Inscrito",
+      "Mono": "Monotributista",
+      "CF": "CF - Consumidor Final",
+      "Exento": "Exento"
+    },
+    "errors": {
+      "cuit": "CUIT inválido",
+      "rsocial": "Razón social mínimo 3 caracteres",
+      "generic": "Error al guardar cliente"
+    }
+  }
+}

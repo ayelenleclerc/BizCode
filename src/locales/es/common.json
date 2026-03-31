@@ -1,0 +1,39 @@
+{
+  "app": {
+    "name": "BizCode",
+    "version": "v0.1.0 MVP",
+    "tagline": "Sistema de Gestión Comercial"
+  },
+  "nav": {
+    "clientes": "Clientes",
+    "articulos": "Artículos",
+    "facturacion": "Facturación"
+  },
+  "shortcuts": {
+    "title": "Atajos globales",
+    "search": "Buscar",
+    "new": "Nuevo",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "navigate": "Navegar"
+  },
+  "theme": {
+    "switchToLight": "☀️ Claro",
+    "switchToDark": "🌙 Oscuro"
+  },
+  "actions": {
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "saving": "Guardando...",
+    "new": "Nuevo"
+  },
+  "status": {
+    "loading": "Cargando...",
+    "active": "Activo",
+    "inactive": "Inactivo"
+  },
+  "errors": {
+    "generic": "Error al guardar",
+    "required": "Campo requerido"
+  }
+}

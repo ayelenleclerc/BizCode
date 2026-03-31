@@ -1,96 +1,92 @@
 import { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 
 interface LayoutProps {
   children: React.ReactNode
 }
 
 export default function Layout({ children }: LayoutProps) {
-  const [isDark, setIsDark] = useState(true)
+  const { t } = useTranslation('common')
+  const [isDark, setIsDark] = useState(() => {
+    // Lazy initializer: reads localStorage once at mount, no extra render
+    const saved = localStorage.getItem('theme')
+    return saved ? saved === 'dark' : true
+  })
   const location = useLocation()
 
   useEffect(() => {
-    // Cargar preferencia de tema
-    const saved = localStorage.getItem('theme')
-    if (saved) {
-      const dark = saved === 'dark'
-      setIsDark(dark)
-      if (dark) {
-        document.documentElement.classList.add('dark')
-      } else {
-        document.documentElement.classList.remove('dark')
-      }
+    const root = document.documentElement
+    if (isDark) {
+      root.classList.add('dark')
+      root.classList.remove('light')
     } else {
-      // Default dark
-      document.documentElement.classList.add('dark')
+      root.classList.remove('dark')
+      root.classList.add('light')
     }
-  }, [])
+  }, [isDark])
 
   const toggleTheme = () => {
     const newDark = !isDark
     setIsDark(newDark)
     localStorage.setItem('theme', newDark ? 'dark' : 'light')
-    if (newDark) {
-      document.documentElement.classList.add('dark')
-    } else {
-      document.documentElement.classList.remove('dark')
-    }
   }
 
   const isActive = (path: string) => location.pathname === path
 
   return (
-    <div className="flex h-screen bg-slate-900 dark:bg-slate-900 text-slate-100">
+    <div className="flex h-screen bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100">
       {/* Sidebar */}
-      <aside className="w-64 bg-slate-800 dark:bg-slate-800 border-r border-slate-700 flex flex-col">
+      <aside className="w-64 bg-white dark:bg-slate-800 border-r border-slate-200 dark:border-slate-700 flex flex-col" aria-label={t('nav.clientes') + ' / ' + t('nav.articulos') + ' / ' + t('nav.facturacion')}>
         {/* Logo / Header */}
-        <div className="p-6 border-b border-slate-700">
-          <h1 className="text-2xl font-bold text-blue-400">BizCode</h1>
-          <p className="text-sm text-slate-400 mt-1">v0.1.0 MVP</p>
+        <div className="p-6 border-b border-slate-200 dark:border-slate-700">
+          <h1 className="text-2xl font-bold text-blue-600 dark:text-blue-400">{t('app.name')}</h1>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">{t('app.version')}</p>
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 p-4 space-y-2">
+        <nav className="flex-1 p-4 space-y-2" aria-label="Navegación principal">
           <Link
             to="/clientes"
             className={`block px-4 py-3 rounded transition ${
               isActive('/clientes')
                 ? 'bg-blue-600 text-white'
-                : 'text-slate-300 hover:bg-slate-700'
+                : 'text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-700'
             }`}
           >
-            📋 Clientes
+            📋 {t('nav.clientes')}
           </Link>
           <Link
             to="/articulos"
             className={`block px-4 py-3 rounded transition ${
               isActive('/articulos')
                 ? 'bg-blue-600 text-white'
-                : 'text-slate-300 hover:bg-slate-700'
+                : 'text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-700'
             }`}
           >
-            📦 Artículos
+            📦 {t('nav.articulos')}
           </Link>
           <Link
             to="/facturacion"
             className={`block px-4 py-3 rounded transition ${
               isActive('/facturacion')
                 ? 'bg-blue-600 text-white'
-                : 'text-slate-300 hover:bg-slate-700'
+                : 'text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-700'
             }`}
           >
-            🧾 Facturación
+            🧾 {t('nav.facturacion')}
           </Link>
         </nav>
 
         {/* Theme Toggle */}
-        <div className="p-4 border-t border-slate-700">
+        <div className="p-4 border-t border-slate-200 dark:border-slate-700">
           <button
+            type="button"
             onClick={toggleTheme}
-            className="w-full px-4 py-2 rounded bg-slate-700 hover:bg-slate-600 transition text-slate-200"
+            className="w-full px-4 py-2 rounded bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 transition text-slate-800 dark:text-slate-200"
             title="Alternar tema claro/oscuro"
           >
-            {isDark ? '☀️ Claro' : '🌙 Oscuro'}
+            {isDark ? t('theme.switchToLight') : t('theme.switchToDark')}
           </button>
         </div>
       </aside>
@@ -98,21 +94,21 @@ export default function Layout({ children }: LayoutProps) {
       {/* Main Content */}
       <main className="flex-1 flex flex-col overflow-hidden">
         {/* Header */}
-        <header className="bg-slate-800 dark:bg-slate-800 border-b border-slate-700 px-8 py-3">
-          <h2 className="text-xl font-semibold text-slate-100">
-            Sistema de Gestión Comercial
+        <header className="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-8 py-3">
+          <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100">
+            {t('app.tagline')}
           </h2>
-          <p className="text-xs text-slate-400 mt-1">
-            💡 Atajos globales: <kbd className="px-1 py-0.5 bg-slate-700 rounded text-xs">F2</kbd> Buscar •
-            <kbd className="px-1 py-0.5 bg-slate-700 rounded text-xs ml-1">F3</kbd> Nuevo •
-            <kbd className="px-1 py-0.5 bg-slate-700 rounded text-xs ml-1">F5</kbd> Guardar •
-            <kbd className="px-1 py-0.5 bg-slate-700 rounded text-xs ml-1">Esc</kbd> Cancelar •
-            <kbd className="px-1 py-0.5 bg-slate-700 rounded text-xs ml-1">↑↓</kbd> Navegar
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+            💡 {t('shortcuts.title')}: <kbd className="px-1 py-0.5 bg-slate-200 dark:bg-slate-700 rounded text-xs">F2</kbd> {t('shortcuts.search')} •
+            <kbd className="px-1 py-0.5 bg-slate-200 dark:bg-slate-700 rounded text-xs ml-1">F3</kbd> {t('shortcuts.new')} •
+            <kbd className="px-1 py-0.5 bg-slate-200 dark:bg-slate-700 rounded text-xs ml-1">F5</kbd> {t('shortcuts.save')} •
+            <kbd className="px-1 py-0.5 bg-slate-200 dark:bg-slate-700 rounded text-xs ml-1">Esc</kbd> {t('shortcuts.cancel')} •
+            <kbd className="px-1 py-0.5 bg-slate-200 dark:bg-slate-700 rounded text-xs ml-1">↑↓</kbd> {t('shortcuts.navigate')}
           </p>
         </header>
 
         {/* Content Area */}
-        <div className="flex-1 overflow-auto bg-slate-900 dark:bg-slate-900">
+        <div className="flex-1 overflow-auto bg-slate-50 dark:bg-slate-900">
           {children}
         </div>
       </main>

@@ -1,7 +1,5 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-use tauri::Command;
-
 #[derive(serde::Serialize)]
 pub struct Response<T> {
   success: bool,

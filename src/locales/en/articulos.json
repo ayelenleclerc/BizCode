@@ -1,0 +1,48 @@
+{
+  "title": "Products",
+  "search": {
+    "placeholder": "Search by code or description... (F2)"
+  },
+  "table": {
+    "codigo": "Code",
+    "descripcion": "Description",
+    "rubro": "Category",
+    "iva": "VAT",
+    "precioLista1": "Price L1",
+    "precioLista2": "Price L2",
+    "stock": "Stock",
+    "activo": "Active"
+  },
+  "empty": "No products found. Create one with F3.",
+  "iva": {
+    "1": "21%",
+    "2": "10.5%",
+    "3": "Exempt"
+  },
+  "form": {
+    "titleNew": "New Product",
+    "titleEdit": "Edit Product #{{codigo}}",
+    "hint": "F5=save, Esc=cancel",
+    "codigo": "Code",
+    "descripcion": "Description",
+    "rubro": "Category",
+    "condIva": "VAT Rate",
+    "umedida": "Unit",
+    "umedidaPlaceholder": "U, kg, l, etc.",
+    "precioLista1": "Price List 1",
+    "precioLista2": "Price List 2",
+    "costo": "Cost",
+    "stock": "Stock",
+    "minimo": "Minimum",
+    "activo": "Active",
+    "selectRubro": "Select...",
+    "condIvaOptions": {
+      "1": "21%",
+      "2": "10.5%",
+      "3": "Exempt"
+    },
+    "errors": {
+      "generic": "Error saving product"
+    }
+  }
+}

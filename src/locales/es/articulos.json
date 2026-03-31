@@ -1,0 +1,48 @@
+{
+  "title": "Artículos",
+  "search": {
+    "placeholder": "Buscar por código o descripción... (F2)"
+  },
+  "table": {
+    "codigo": "Código",
+    "descripcion": "Descripción",
+    "rubro": "Rubro",
+    "iva": "IVA",
+    "precioLista1": "Precio L1",
+    "precioLista2": "Precio L2",
+    "stock": "Stock",
+    "activo": "Activo"
+  },
+  "empty": "No hay artículos. Crea uno con F3.",
+  "iva": {
+    "1": "21%",
+    "2": "10.5%",
+    "3": "Exento"
+  },
+  "form": {
+    "titleNew": "Nuevo Artículo",
+    "titleEdit": "Editar Artículo #{{codigo}}",
+    "hint": "F5=guardar, Esc=cancelar",
+    "codigo": "Código",
+    "descripcion": "Descripción",
+    "rubro": "Rubro",
+    "condIva": "Condición IVA",
+    "umedida": "U. Medida",
+    "umedidaPlaceholder": "U, kg, l, etc.",
+    "precioLista1": "P. Lista 1",
+    "precioLista2": "P. Lista 2",
+    "costo": "Costo",
+    "stock": "Stock",
+    "minimo": "Mínimo",
+    "activo": "Activo",
+    "selectRubro": "Seleccionar...",
+    "condIvaOptions": {
+      "1": "21%",
+      "2": "10.5%",
+      "3": "Exento"
+    },
+    "errors": {
+      "generic": "Error al guardar artículo"
+    }
+  }
+}

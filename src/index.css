@@ -9,15 +9,13 @@
 }
 
 body {
-  @apply bg-slate-900 text-slate-100;
+  @apply bg-slate-50 text-slate-900 dark:bg-slate-900 dark:text-slate-100;
 }
 
 html.dark {
-  @apply bg-slate-900;
   color-scheme: dark;
 }
 
 html.light {
-  @apply bg-white;
   color-scheme: light;
 }

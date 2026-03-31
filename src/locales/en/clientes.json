@@ -1,0 +1,42 @@
+{
+  "title": "Customers",
+  "search": {
+    "placeholder": "Search by code, company name or Tax ID... (F2)"
+  },
+  "table": {
+    "codigo": "Code",
+    "rsocial": "Company Name",
+    "cuit": "Tax ID",
+    "condIva": "VAT Status",
+    "telef": "Phone",
+    "activo": "Active"
+  },
+  "empty": "No customers found. Create one with F3.",
+  "form": {
+    "titleNew": "New Customer",
+    "titleEdit": "Edit Customer #{{codigo}}",
+    "hint": "F5=save, Esc=cancel",
+    "codigo": "Code",
+    "rsocial": "Company Name",
+    "fantasia": "Trade Name",
+    "cuit": "Tax ID",
+    "condIva": "VAT Status",
+    "domicilio": "Address",
+    "localidad": "City",
+    "cpost": "Postal Code",
+    "telef": "Phone",
+    "email": "Email",
+    "activo": "Active",
+    "condIvaOptions": {
+      "RI": "RI - VAT Registered",
+      "Mono": "Small Taxpayer",
+      "CF": "CF - End Consumer",
+      "Exento": "Exempt"
+    },
+    "errors": {
+      "cuit": "Invalid Tax ID",
+      "rsocial": "Company name must be at least 3 characters",
+      "generic": "Error saving customer"
+    }
+  }
+}

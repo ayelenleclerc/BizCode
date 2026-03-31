@@ -1,0 +1,64 @@
+{
+  "title": "Invoicing",
+  "newInvoice": "New Invoice",
+  "listTitle": "Invoice List",
+  "form": {
+    "tipo": "Type",
+    "prefijo": "Prefix",
+    "numero": "Number",
+    "fecha": "Date",
+    "cliente": "Customer",
+    "formaPago": "Payment Method",
+    "tipoOptions": {
+      "A": "Invoice A",
+      "B": "Invoice B"
+    },
+    "selectCliente": "Select...",
+    "selectFormaPago": "Select..."
+  },
+  "items": {
+    "articulo": "Product",
+    "cantidad": "Qty",
+    "precio": "Price",
+    "descuento": "Disc %",
+    "subtotal": "Subtotal",
+    "empty": "No items. Press Ins to add.",
+    "addItem": "➕ Add Item (Ins)",
+    "selectArticulo": "Select..."
+  },
+  "totals": {
+    "neto21": "Net 21%",
+    "neto105": "Net 10.5%",
+    "netoExento": "Net Exempt",
+    "iva": "VAT",
+    "total": "TOTAL"
+  },
+  "errors": {
+    "noCliente": "Please select a customer",
+    "noItems": "Please add at least one item",
+    "generic": "Error saving invoice"
+  },
+  "list": {
+    "numero": "No.",
+    "fecha": "Date",
+    "tipo": "Type",
+    "cliente": "Customer",
+    "neto": "Net",
+    "iva": "VAT",
+    "total": "Total",
+    "estado": "Status",
+    "activa": "Active",
+    "anulada": "Voided",
+    "empty": "No invoices found.",
+    "items": "items"
+  },
+  "detail": {
+    "title": "Invoice {{tipo}} {{prefijo}} {{numero}}",
+    "items": "Details:",
+    "close": "Close",
+    "iva21": "VAT 21%",
+    "iva105": "VAT 10.5%"
+  },
+  "save": "✓ Save Invoice (F5)",
+  "cancel": "Cancel (Esc)"
+}

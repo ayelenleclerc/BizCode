@@ -1,0 +1,64 @@
+{
+  "title": "Facturación",
+  "newInvoice": "Nueva Factura",
+  "listTitle": "Listado de Facturas",
+  "form": {
+    "tipo": "Tipo",
+    "prefijo": "Prefijo",
+    "numero": "Número",
+    "fecha": "Fecha",
+    "cliente": "Cliente",
+    "formaPago": "Forma de Pago",
+    "tipoOptions": {
+      "A": "Factura A",
+      "B": "Factura B"
+    },
+    "selectCliente": "Seleccionar...",
+    "selectFormaPago": "Seleccionar..."
+  },
+  "items": {
+    "articulo": "Artículo",
+    "cantidad": "Cant.",
+    "precio": "Precio",
+    "descuento": "Dscto %",
+    "subtotal": "Subtotal",
+    "empty": "Sin ítems. Presione Ins para agregar.",
+    "addItem": "➕ Agregar Ítem (Ins)",
+    "selectArticulo": "Seleccionar..."
+  },
+  "totals": {
+    "neto21": "Neto 21%",
+    "neto105": "Neto 10.5%",
+    "netoExento": "Neto Exento",
+    "iva": "IVA",
+    "total": "TOTAL"
+  },
+  "errors": {
+    "noCliente": "Seleccione un cliente",
+    "noItems": "Agregue al menos un artículo",
+    "generic": "Error al guardar factura"
+  },
+  "list": {
+    "numero": "Nro",
+    "fecha": "Fecha",
+    "tipo": "Tipo",
+    "cliente": "Cliente",
+    "neto": "Neto",
+    "iva": "IVA",
+    "total": "Total",
+    "estado": "Estado",
+    "activa": "Activa",
+    "anulada": "Anulada",
+    "empty": "No hay facturas registradas.",
+    "items": "ítems"
+  },
+  "detail": {
+    "title": "Factura {{tipo}} {{prefijo}} {{numero}}",
+    "items": "Detalles:",
+    "close": "Cerrar",
+    "iva21": "IVA 21%",
+    "iva105": "IVA 10.5%"
+  },
+  "save": "✓ Guardar Factura (F5)",
+  "cancel": "Cancelar (Esc)"
+}

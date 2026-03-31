@@ -1,0 +1,72 @@
+name: CI Quality Gate
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  quality:
+    name: Quality Gate
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: bizcode
+          POSTGRES_PASSWORD: bizcode
+          POSTGRES_DB: bizcode_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgresql://bizcode:bizcode@localhost:5432/bizcode_test
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps
+
+      - name: Generate Prisma client
+        run: npx prisma generate
+
+      - name: TypeScript type-check
+        run: npm run type-check
+
+      - name: ESLint (jsx-a11y y TypeScript — cero advertencias)
+        run: npm run lint
+
+      - name: Unit tests with coverage
+        run: npm run test:coverage
+
+      - name: i18n parity check
+        run: npm run check:i18n
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage/
+          retention-days: 14
+
+  # NOTE: Tauri desktop build is NOT included in CI.
+  # It requires platform-native WebKit (libwebkit2gtk on Linux, WebView2 on Windows)
+  # and a display server for rendering. This is documented in docs/quality/CI_CD.md.
+  # Desktop builds should be triggered manually or via a separate workflow
+  # with a self-hosted runner that has the required dependencies installed.

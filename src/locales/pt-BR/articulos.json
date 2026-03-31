@@ -1,0 +1,48 @@
+{
+  "title": "Produtos",
+  "search": {
+    "placeholder": "Buscar por código ou descrição... (F2)"
+  },
+  "table": {
+    "codigo": "Código",
+    "descripcion": "Descrição",
+    "rubro": "Categoria",
+    "iva": "IPI/ICMS",
+    "precioLista1": "Preço L1",
+    "precioLista2": "Preço L2",
+    "stock": "Estoque",
+    "activo": "Ativo"
+  },
+  "empty": "Nenhum produto encontrado. Crie um com F3.",
+  "iva": {
+    "1": "21%",
+    "2": "10,5%",
+    "3": "Isento"
+  },
+  "form": {
+    "titleNew": "Novo Produto",
+    "titleEdit": "Editar Produto #{{codigo}}",
+    "hint": "F5=salvar, Esc=cancelar",
+    "codigo": "Código",
+    "descripcion": "Descrição",
+    "rubro": "Categoria",
+    "condIva": "Alíquota",
+    "umedida": "Unidade",
+    "umedidaPlaceholder": "Un, kg, l, etc.",
+    "precioLista1": "Preço Lista 1",
+    "precioLista2": "Preço Lista 2",
+    "costo": "Custo",
+    "stock": "Estoque",
+    "minimo": "Mínimo",
+    "activo": "Ativo",
+    "selectRubro": "Selecionar...",
+    "condIvaOptions": {
+      "1": "21%",
+      "2": "10,5%",
+      "3": "Isento"
+    },
+    "errors": {
+      "generic": "Erro ao salvar produto"
+    }
+  }
+}

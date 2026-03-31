@@ -1,0 +1,39 @@
+{
+  "app": {
+    "name": "BizCode",
+    "version": "v0.1.0 MVP",
+    "tagline": "Commercial Management System"
+  },
+  "nav": {
+    "clientes": "Customers",
+    "articulos": "Products",
+    "facturacion": "Invoicing"
+  },
+  "shortcuts": {
+    "title": "Global shortcuts",
+    "search": "Search",
+    "new": "New",
+    "save": "Save",
+    "cancel": "Cancel",
+    "navigate": "Navigate"
+  },
+  "theme": {
+    "switchToLight": "☀️ Light",
+    "switchToDark": "🌙 Dark"
+  },
+  "actions": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "saving": "Saving...",
+    "new": "New"
+  },
+  "status": {
+    "loading": "Loading...",
+    "active": "Active",
+    "inactive": "Inactive"
+  },
+  "errors": {
+    "generic": "Error saving",
+    "required": "Required field"
+  }
+}
