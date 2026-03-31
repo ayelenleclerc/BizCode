@@ -1,0 +1,115 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Cliente {
+  id        Int       @id @default(autoincrement())
+  codigo    Int       @unique
+  rsocial   String    @db.VarChar(30)
+  fantasia  String?   @db.VarChar(30)
+  cuit      String?   @db.VarChar(14)
+  condIva   String    @db.VarChar(1) // RI, Mono, CF, Exento
+  domicilio String?   @db.VarChar(40)
+  localidad String?   @db.VarChar(25)
+  cpost     String?   @db.VarChar(8)
+  telef     String?   @db.VarChar(25)
+  email     String?   @db.VarChar(50)
+  formaPago Int?      // FK a FormaPago.id
+  activo    Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  facturas Factura[]
+}
+
+model Rubro {
+  id    Int    @id @default(autoincrement())
+  codigo Int   @unique
+  nombre String @db.VarChar(20)
+
+  articulos Articulo[]
+}
+
+model Articulo {
+  id           Int    @id @default(autoincrement())
+  codigo       Int    @unique
+  descripcion  String @db.VarChar(30)
+  rubroId      Int
+  rubro        Rubro  @relation(fields: [rubroId], references: [id])
+  condIva      String @db.VarChar(1) // IVA %: 1=21%, 2=10.5%, 3=Exento
+  umedida      String @db.VarChar(6)
+  precioLista1 Decimal @db.Decimal(14, 2)
+  precioLista2 Decimal @db.Decimal(14, 2)
+  costo        Decimal @db.Decimal(13, 2)
+  stock        Int    @default(0)
+  minimo       Int    @default(0)
+  activo       Boolean @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  facturaItems FacturaItem[]
+}
+
+model FormaPago {
+  id    Int    @id @default(autoincrement())
+  codigo Int   @unique
+  descripcion String @db.VarChar(25)
+  vto_dias Int  @default(0)
+}
+
+model Factura {
+  id        Int       @id @default(autoincrement())
+  fecha     DateTime
+  tipo      String    @db.VarChar(1) // A, B, C, X
+  prefijo   String    @db.VarChar(4)
+  numero    Int
+  clienteId Int
+  cliente   Cliente   @relation(fields: [clienteId], references: [id])
+
+  neto1     Decimal   @db.Decimal(14, 2) @default(0)  // Neto IVA 21%
+  neto2     Decimal   @db.Decimal(14, 2) @default(0)  // Neto IVA 10.5%
+  neto3     Decimal   @db.Decimal(14, 2) @default(0)  // Neto exento
+  iva1      Decimal   @db.Decimal(14, 2) @default(0)  // IVA 21%
+  iva2      Decimal   @db.Decimal(14, 2) @default(0)  // IVA 10.5%
+  total     Decimal   @db.Decimal(14, 2) @default(0)
+
+  formaPagoId Int?
+  estado    String    @db.VarChar(1) @default("A") // A=activa, A=anulada
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  items FacturaItem[]
+
+  @@unique([tipo, prefijo, numero])
+}
+
+model FacturaItem {
+  id        Int     @id @default(autoincrement())
+  facturaId Int
+  factura   Factura @relation(fields: [facturaId], references: [id], onDelete: Cascade)
+
+  articuloId Int
+  articulo   Articulo @relation(fields: [articuloId], references: [id])
+
+  cantidad  Int       @default(1)
+  precio    Decimal   @db.Decimal(14, 2)
+  dscto     Decimal   @db.Decimal(5, 2) @default(0)
+  subtotal  Decimal   @db.Decimal(14, 2)
+
+  createdAt DateTime  @default(now())
+}
+
+model ParamEmpresa {
+  id        Int     @id @default(autoincrement())
+  nombre    String  @db.VarChar(40)
+  cuit      String  @db.VarChar(14)
+  domicilio String? @db.VarChar(40)
+}

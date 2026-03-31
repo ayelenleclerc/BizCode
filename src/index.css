@@ -1,0 +1,23 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  @apply bg-slate-900 text-slate-100;
+}
+
+html.dark {
+  @apply bg-slate-900;
+  color-scheme: dark;
+}
+
+html.light {
+  @apply bg-white;
+  color-scheme: light;
+}
