@@ -1,0 +1,12 @@
+---
+description: Rules for editing BizCode product and quality Markdown under docs/
+globs: docs/**/*.md
+alwaysApply: false
+---
+
+# Documentación (`docs/`)
+
+- Mantener **paridad de contenido** entre `docs/en/`, `docs/es/` y `docs/pt-br/` para el mismo documento lógico; rutas según [docs/DOCUMENT_LOCALE_MAP.md](docs/DOCUMENT_LOCALE_MAP.md) (nombres localizados; ADR con el mismo slug en los tres árboles).
+- No afirmar certificación ISO; el repositorio es **ISO-ready** (auditable) mediante manuales y matrices existentes.
+- Changelog del producto: si el cambio es visible para el usuario, actualizar **[Unreleased]** en `docs/en/changelog.md`, `docs/es/historial-de-cambios.md` y `docs/pt-br/historico-de-alteracoes.md`.
+- Enlaces relativos correctos; los stubs en la raíz de `docs/` deben listar las tres rutas locales cuando apliquen.
