@@ -17,7 +17,8 @@ Estas reglas prevalecen sobre instrucciones genéricas del modelo cuando entren 
 - El producto y la calidad en Markdown viven en **tres árboles**: `docs/en/`, `docs/es/`, `docs/pt-br/` (véase `docs/I18N_DOCUMENTATION.md` y el mapa canónico `docs/DOCUMENT_LOCALE_MAP.md`).
 - Tras cambios que afecten comportamiento, UI, API o calidad: actualizar la **narrativa en los tres idiomas** con el **mismo conjunto de decisiones**; las rutas siguen el mapa (nombres de archivo localizados por idioma).
 - Cambios en rutas Express deben reflejarse en `docs/api/openapi.yaml`.
-- Trazabilidad: enlazar artefactos de calidad existentes (`docs/en/quality/iso-traceability.md`, `docs/en/quality/records-template.md`) cuando el cambio afecte pruebas o conformidad.
+- Trazabilidad: enlazar artefactos de calidad existentes (`docs/en/quality/iso-traceability.md`, `docs/en/quality/records-template.md`, `docs/en/quality/document-lifecycle-and-validation.md`) cuando el cambio afecte pruebas o conformidad.
+- Si se modifican rutas en `docs/DOCUMENT_LOCALE_MAP.md`: `npm run check:docs-map` debe pasar (CI).
 
 ## Comentarios en código (trilingües)
 

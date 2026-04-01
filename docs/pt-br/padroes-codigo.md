@@ -51,6 +51,8 @@ Ver [acessibilidade.md](acessibilidade.md). ESLint `jsx-a11y` em CI com `--max-w
 
 Para lógica não óbvia, use JSDoc com as três etiquetas obrigatórias `@en`, `@es`, `@pt-BR`. Exemplo completo em [inglês](../en/padroes-codigo.md#code-comments-trilingual). Não documentar comportamento sem evidência no código.
 
+Exemplo no código: `validateCUIT` em [`src/lib/validators.ts`](../../../src/lib/validators.ts).
+
 ## Idiomas da documentação (Markdown)
 
 Documentação de produto e qualidade em `docs/` nos diretórios `docs/en/`, `docs/es/`, `docs/pt-br/`. Ver [I18N_DOCUMENTATION.md](../I18N_DOCUMENTATION.md).

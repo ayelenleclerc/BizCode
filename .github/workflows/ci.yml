@@ -57,6 +57,9 @@ jobs:
       - name: i18n parity check
         run: npm run check:i18n
 
+      - name: Documentation locale map check
+        run: npm run check:docs-map
+
       - name: Upload coverage report
         if: always()
         uses: actions/upload-artifact@v4

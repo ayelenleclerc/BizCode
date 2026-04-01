@@ -10,7 +10,7 @@
 - **Accesibilidad:** [docs/ACCESSIBILITY.md](docs/ACCESSIBILITY.md) (WCAG 2.2 AA como mínimo; ESLint `jsx-a11y` con cero advertencias)
 - **i18n:** [docs/en/i18n-strategy.md](docs/en/i18n-strategy.md) · [es](docs/es/estrategia-i18n.md) · [pt-BR](docs/pt-br/estrategia-i18n.md); no introducir literales de usuario en JSX sin `t()`
 - **Pruebas y cobertura:** [docs/en/quality/testing-strategy.md](docs/en/quality/testing-strategy.md) — cobertura 100% en el alcance definido (`src/lib/**`, `server/createApp.ts`); [es](docs/es/quality/estrategia-pruebas.md) · [pt-BR](docs/pt-br/quality/estrategia-testes.md)
-- **Política de idiomas de documentación:** [docs/I18N_DOCUMENTATION.md](docs/I18N_DOCUMENTATION.md)
+- **Política de idiomas de documentación:** [docs/I18N_DOCUMENTATION.md](docs/I18N_DOCUMENTATION.md) · mapa canónico [docs/DOCUMENT_LOCALE_MAP.md](docs/DOCUMENT_LOCALE_MAP.md); si cambian rutas documentales, `npm run check:docs-map` debe pasar (véase [docs/en/quality/document-lifecycle-and-validation.md](docs/en/quality/document-lifecycle-and-validation.md))
 - **API:** cambios en rutas Express deben reflejarse en [docs/api/openapi.yaml](docs/api/openapi.yaml)
 
 No duplicar reglas largas aquí; enlazar a `docs/` y a `.cursor/rules/` cuando haga falta detalle.

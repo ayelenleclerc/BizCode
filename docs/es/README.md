@@ -23,6 +23,7 @@
 | [quality/estrategia-pruebas.md](quality/estrategia-pruebas.md) | Pirámide de pruebas, política de cobertura |
 | [quality/ciclo-ci-cd.md](quality/ciclo-ci-cd.md) | Pipeline GitHub Actions |
 | [quality/plantillas-registros.md](quality/plantillas-registros.md) | Plantillas de no conformidad y sesión de prueba |
+| [quality/ciclo-vida-y-validacion-documental.md](quality/ciclo-vida-y-validacion-documental.md) | SemVer, historial de cambios, lista de validación / verificación |
 
 ## API y decisiones
 

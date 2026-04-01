@@ -10,6 +10,8 @@ Versionamento: [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **Ciclo de vida documental e validação** (qualidade): [ciclo-vida-e-validacao-documental.md](quality/ciclo-vida-e-validacao-documental.md); `npm run check:docs-map` verifica caminhos no [DOCUMENT_LOCALE_MAP.md](../DOCUMENT_LOCALE_MAP.md); CI executa após paridade i18n
+- **JSDoc trilíngue** de exemplo em `validateCUIT` em [`src/lib/validators.ts`](../../src/lib/validators.ts) (ver [padroes-codigo.md](padroes-codigo.md))
 - **Nomes de arquivo localizados por idioma (fase 3):** a documentação em `docs/en/`, `docs/es/` e `docs/pt-br/` usa **nomes distintos por árvore**; mapa canônico em [DOCUMENT_LOCALE_MAP.md](../DOCUMENT_LOCALE_MAP.md); ADRs mantêm o **mesmo slug técnico** em cada idioma
 - **Especificações MVP ISO-ready** em [`specs/`](specs/indice.md): manual técnico (índice), RF/RNF, casos de uso, histórias e critérios, casos de teste manual (TC-001–TC-010), matriz de rastreabilidade — apenas **evidência** do repositório; espelhos em [inglês](../en/specs/index.md) e [espanhol](../es/specs/indice.md); [rastreabilidade-iso.md](quality/rastreabilidade-iso.md) atualizado
 - Regras do projeto no Cursor: [`.cursor/rules/bizcode.mdc`](../../.cursor/rules/bizcode.mdc), [`.cursor/rules/bizcode-documentation.mdc`](../../.cursor/rules/bizcode-documentation.mdc); [AGENTS.md](../../AGENTS.md) e [CONTRIBUTING.md](../../CONTRIBUTING.md) exigem conformidade; convenção JSDoc trilíngue em [padroes-codigo.md](padroes-codigo.md)

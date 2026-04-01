@@ -23,6 +23,7 @@
 | [quality/testing-strategy.md](quality/testing-strategy.md) | Test pyramid, coverage policy |
 | [quality/ci-cd.md](quality/ci-cd.md) | GitHub Actions pipeline |
 | [quality/records-template.md](quality/records-template.md) | Nonconformity and test session templates |
+| [quality/document-lifecycle-and-validation.md](quality/document-lifecycle-and-validation.md) | SemVer, changelogs, validation / verification checklist |
 
 ## API and decisions
 

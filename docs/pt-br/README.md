@@ -23,6 +23,7 @@
 | [quality/estrategia-testes.md](quality/estrategia-testes.md) | Pirâmide de testes, política de cobertura |
 | [quality/ciclo-ci-cd.md](quality/ciclo-ci-cd.md) | Pipeline GitHub Actions |
 | [quality/modelos-registros.md](quality/modelos-registros.md) | Modelos de não conformidade e sessão de teste |
+| [quality/ciclo-vida-e-validacao-documental.md](quality/ciclo-vida-e-validacao-documental.md) | SemVer, changelogs, lista de validação / verificação |
 
 ## API e decisões
 

@@ -48,6 +48,7 @@ Documents are updated when the described process changes. Outdated documents mus
 - accessibility.md (per locale)
 - i18n-strategy.md (per locale)
 - security.md (per locale)
+- document-lifecycle-and-validation.md (per locale) — SemVer, changelogs, validation checklist
 - All ADRs (per locale)
 
 ## 5. Nonconformity and Corrective Action

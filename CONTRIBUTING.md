@@ -64,7 +64,7 @@ A task is **Done** only when ALL of the following are true:
 - [ ] CI pipeline is green on the PR branch
 - [ ] At least one reviewer has approved (for non-trivial changes)
 - [ ] `docs/en/changelog.md` (and matching `docs/es/`, `docs/pt-br/` entries) updated under `[Unreleased]` if the change is user-visible
-- [ ] Documentation updated in **all three locales** (`docs/en/`, `docs/es/`, `docs/pt-br/`) when the change affects narrative docs — see [I18N_DOCUMENTATION.md](docs/I18N_DOCUMENTATION.md) and the canonical map [DOCUMENT_LOCALE_MAP.md](docs/DOCUMENT_LOCALE_MAP.md) (e.g. [theming](docs/en/theming.md); [architecture](docs/en/architecture.md))
+- [ ] Documentation updated in **all three locales** (`docs/en/`, `docs/es/`, `docs/pt-br/`) when the change affects narrative docs — see [I18N_DOCUMENTATION.md](docs/I18N_DOCUMENTATION.md) and the canonical map [DOCUMENT_LOCALE_MAP.md](docs/DOCUMENT_LOCALE_MAP.md) (e.g. [theming](docs/en/theming.md); [architecture](docs/en/architecture.md)); if paths in the map or tree changed, `npm run check:docs-map` must pass
 
 ## Running the Quality Gate Locally
 
@@ -73,6 +73,7 @@ npm run type-check    # TypeScript
 npm run lint          # ESLint
 npm run test:coverage # Tests + coverage report
 npm run check:i18n   # i18n parity
+npm run check:docs-map  # DOCUMENT_LOCALE_MAP.md paths exist
 ```
 
-All four must exit 0 before opening a PR.
+All must exit 0 before opening a PR.

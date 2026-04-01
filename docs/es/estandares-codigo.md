@@ -56,4 +56,6 @@ Ver [accesibilidad.md](accesibilidad.md). ESLint `jsx-a11y` en CI con `--max-war
 
 Para lógica no obvia, use JSDoc con las tres etiquetas **obligatorias** `@en`, `@es`, `@pt-BR` (una frase cada una). Véase el ejemplo en [inglés](../en/estandares-codigo.md#code-comments-trilingual). No documentar comportamiento no evidenciado en el código.
 
-**Otros idiomas:** [English](../en/estandares-codigo.md) · [Português](../pt-br/estandares-codigo.md)
+Ejemplo en código: `validateCUIT` en [`src/lib/validators.ts`](../../../src/lib/validators.ts).
+
+**Otros idiomas:** [English](../en/estandares-codigo.md) · [Português](../pt-br/padroes-codigo.md)

@@ -1,21 +1,21 @@
 /**
- * Validadores para el sistema de facturación
+ * @en Pure validation helpers for invoicing (CUIT, codes, prices, VAT).
+ * @es Funciones puras de validación para facturación (CUIT, códigos, precios, IVA).
+ * @pt-BR Funções puras de validação para faturamento (CUIT, códigos, preços, IVA).
  */
 
 /**
- * Valida un CUIT argentino según el algoritmo oficial
- * Formato: XX-XXXXXXXX-X (con guiones) o XXXXXXXXXXX (sin guiones)
+ * @en Validates an Argentine CUIT check digit (modulo 11). Accepts digits with or without hyphens/spaces.
+ * @es Valida el dígito verificador de un CUIT argentino (módulo 11). Acepta dígitos con o sin guiones.
+ * @pt-BR Valida o dígito verificador de um CUIT argentino (módulo 11). Aceita dígitos com ou sem hífens.
  */
 export function validateCUIT(cuit: string): boolean {
   if (!cuit) return false
 
-  // Remover guiones y espacios
   const cleaned = cuit.replace(/[-\s]/g, '')
 
-  // Debe tener exactamente 11 dígitos
   if (!/^\d{11}$/.test(cleaned)) return false
 
-  // Algoritmo de validación CUIT
   const digits = cleaned.split('').map(Number)
   const mult = [5, 4, 3, 2, 7, 6, 5, 4, 3, 2]
   let sum = 0
@@ -62,7 +62,6 @@ export function validateCode(code: string | number): boolean {
 export function validatePrice(price: string | number): boolean {
   const num = typeof price === 'string' ? parseFloat(price) : price
   if (isNaN(num) || num < 0) return false
-  // Verificar máximo 2 decimales
   const str = String(num)
   const parts = str.split('.')
   return !parts[1] || parts[1].length <= 2

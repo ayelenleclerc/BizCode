@@ -36,7 +36,7 @@ BizCode se desarrolla para ser **fiable, usable y auditable**:
 
 Los documentos controlados bajo `docs/` existen en **tres idiomas** con **nombres de archivo localizados** por árbol (mapa canónico en [DOCUMENT_LOCALE_MAP.md](../../DOCUMENT_LOCALE_MAP.md)). El historial lo mantiene git; la rama `main` es la fuente autoritativa.
 
-**Documentos incluidos:** este manual, estrategia de pruebas, ciclo CI/CD, trazabilidad ISO, estándares de código, accesibilidad, estrategia i18n, seguridad y todos los ADR.
+**Documentos incluidos:** este manual, estrategia de pruebas, ciclo CI/CD, trazabilidad ISO, estándares de código, accesibilidad, estrategia i18n, seguridad, [ciclo-vida-y-validacion-documental.md](ciclo-vida-y-validacion-documental.md) (SemVer, historial, validación) y todos los ADR.
 
 ## 5. No conformidad y acción correctiva
 

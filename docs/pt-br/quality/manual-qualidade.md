@@ -16,7 +16,7 @@ Desenvolvedor, revisor, pipeline CI, product owner — conforme tabela na versã
 
 ## Documentos controlados
 
-Mesmos nomes de arquivo nos três idiomas; histórico em git.
+Documentação em três árvores com **nomes localizados** (ver [DOCUMENT_LOCALE_MAP.md](../../DOCUMENT_LOCALE_MAP.md)); histórico em git. Inclui [ciclo-vida-e-validacao-documental.md](ciclo-vida-e-validacao-documental.md) (SemVer, changelogs, validação).
 
 ## Não conformidade
 

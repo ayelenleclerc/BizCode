@@ -10,6 +10,8 @@ Versioning: [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **Document lifecycle & validation** (quality): [document-lifecycle-and-validation.md](quality/document-lifecycle-and-validation.md); `npm run check:docs-map` validates paths in [DOCUMENT_LOCALE_MAP.md](../DOCUMENT_LOCALE_MAP.md); CI runs the check after i18n parity
+- **Trilingual JSDoc** example on `validateCUIT` in [`src/lib/validators.ts`](../../src/lib/validators.ts) (see [coding-standards.md](coding-standards.md))
 - **Documentation locale filenames (phase 3):** product/quality Markdown under `docs/en/`, `docs/es/`, and `docs/pt-br/` use **localized file names** per tree; canonical mapping in [DOCUMENT_LOCALE_MAP.md](../DOCUMENT_LOCALE_MAP.md); ADR files keep the **same technical slug** in each locale
 - **ISO-ready MVP specs** under [`specs/`](specs/index.md): technical manual index, functional/non-functional requirements, use cases, user stories and acceptance criteria, manual test cases (TC-001–TC-010), traceability matrix — content **evidence-based only**; mirrored in [`../es/specs/`](../es/specs/indice.md) and [`../pt-br/specs/`](../pt-br/specs/indice.md); [`iso-traceability.md`](quality/iso-traceability.md) updated
 - Cursor project rules: [`.cursor/rules/bizcode.mdc`](../../.cursor/rules/bizcode.mdc) (always-on), [`.cursor/rules/bizcode-documentation.mdc`](../../.cursor/rules/bizcode-documentation.mdc) (`docs/**`); [AGENTS.md](../../AGENTS.md) and [CONTRIBUTING.md](../../CONTRIBUTING.md) require compliance; trilingual JSDoc convention in [coding-standards.md](coding-standards.md)

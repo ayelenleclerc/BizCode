@@ -71,6 +71,8 @@ For non-obvious logic (algorithms, workarounds, invariants), use a JSDoc block o
 
 Trivial comments (e.g. `// increment counter`) do not need trilingual text. **Do not** state behaviour that is not evidenced in code.
 
+Live example: `validateCUIT` in [`src/lib/validators.ts`](../../../src/lib/validators.ts).
+
 ## Repository documentation languages
 
 Product and quality Markdown under `docs/` is maintained in **English** (`docs/en/`), **Spanish** (`docs/es/`), and **Brazilian Portuguese** (`docs/pt-br/`). See [I18N_DOCUMENTATION.md](../I18N_DOCUMENTATION.md).
