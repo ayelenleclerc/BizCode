@@ -24,6 +24,7 @@
     "lint:fix": "eslint src server tests e2e --ext .ts,.tsx --fix --max-warnings 0",
     "check:i18n": "tsx scripts/check-i18n.ts",
     "check:docs-map": "tsx scripts/check-docs-locale-map.ts",
+    "docs:generate-iso-stubs": "node scripts/generate-iso-controlled-docs.mjs",
     "sbom:generate": "cyclonedx-npm --output-file docs/evidence/sbom-cyclonedx.json --package-lock-only --ignore-npm-errors --omit dev",
     "sbom:generate:full": "cyclonedx-npm --output-file docs/evidence/sbom-cyclonedx-full.json --package-lock-only --ignore-npm-errors",
     "docs:extract-schemas": "tsx scripts/extract-openapi-schemas.ts",

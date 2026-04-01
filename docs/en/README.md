@@ -19,7 +19,10 @@
 | Document | Description |
 |----------|-------------|
 | [Certificación-ISO (repo root)](../../Certificación-ISO/README.md) | Entry point to the ISO certification package (no duplicate bodies) |
-| [certificacion-iso/iso-package-index.md](certificacion-iso/iso-package-index.md) | ISO certification package master register (ISO-PKG-001) |
+| [certificacion-iso/iso-package-index.md](certificacion-iso/iso-package-index.md) | ISO certification package master register (ISO-PKG-001); **closed catalog** GOV…PROC-MAN (108 codes) |
+| [certificacion-iso/controlled-document-convention.md](certificacion-iso/controlled-document-convention.md) | Naming and metadata for controlled stubs |
+| [certificacion-iso/document-register-traceability.md](certificacion-iso/document-register-traceability.md) | Code → indicative clauses (QMS-DR-001) |
+| [certificacion-iso/traceability-between-documents.md](certificacion-iso/traceability-between-documents.md) | Document-to-document graph (QMS-D2D-001) |
 | [certificacion-iso/quality-manual.md](certificacion-iso/quality-manual.md) | QMS scope |
 | [certificacion-iso/iso-traceability.md](certificacion-iso/iso-traceability.md) | Standard → repository evidence |
 | [quality/testing-strategy.md](quality/testing-strategy.md) | Test pyramid, coverage policy |
@@ -28,6 +31,13 @@
 | [certificacion-iso/document-lifecycle-and-validation.md](certificacion-iso/document-lifecycle-and-validation.md) | SemVer, changelogs, validation / verification checklist |
 | [quality/swagger-openapi-ui-plan.md](quality/swagger-openapi-ui-plan.md) | Swagger UI + OpenAPI implementation reference (versioned); agent policy |
 | [quality/generated-documentation.md](quality/generated-documentation.md) | TypeDoc, OpenAPI→Markdown, JSON Schema docs, SBOM — commit outputs with code changes |
+| [quality/product-vision-and-deployment.md](quality/product-vision-and-deployment.md) | Desktop + SaaS direction, fiscal modules by country, governance (PROD-VISION-001) |
+
+## Process manuals (ISO-ready)
+
+| Document | Description |
+|----------|-------------|
+| [processes/index.md](processes/index.md) | PROC-MAN-001…010 — process descriptions (stubs + canonical links) |
 
 ## API and decisions
 

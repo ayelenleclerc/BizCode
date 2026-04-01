@@ -67,6 +67,10 @@ User action (keyboard/click)
 - **Reference:** [theming.md](theming.md) (classes on `<html>`, script in `index.html`, persistence, rules to avoid breaking the toggle).
 - **Avoided risk:** do not set `class="dark"` on `<body>`; with `dark:` matching any ancestor, the theme would stay dark even when React updates `<html>`.
 
+## Strategic direction (product)
+
+The **same business domain** is intended to support **desktop** (this document) and, when implemented, **hosted SaaS**, with **fiscal behavior** isolated in **country/jurisdiction modules**. See [product-vision-and-deployment.md](quality/product-vision-and-deployment.md) (PROD-VISION-001) and [ADR-0007](adr/ADR-0007-dual-deployment-and-fiscal-modularity.md).
+
 ## Risks and Known Constraints
 
 - **API routes in a single module:** HTTP logic lives in `server/createApp.ts` (one file); `server.ts` exposes bootstrap helpers; `server/main.ts` is the process entry for `npm run server`. Recommended evolution: domain routers (see future ADR if refactored).

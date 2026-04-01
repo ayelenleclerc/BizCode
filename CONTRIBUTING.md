@@ -6,6 +6,7 @@ Before opening or updating a PR, read and comply with:
 
 - [`.cursor/rules/bizcode.mdc`](.cursor/rules/bizcode.mdc) — always-on rules (documentation in three locales, trilingual comments where required, accessibility, tests, no speculation).
 - [`.cursor/rules/bizcode-documentation.mdc`](.cursor/rules/bizcode-documentation.mdc) — when editing files under `docs/`.
+- **ISO controlled stubs:** the closed catalog (GOV…PROC-MAN) is driven by [scripts/iso-doc-registry.mjs](scripts/iso-doc-registry.mjs). Regenerate all trilingual stubs after registry edits with `npm run docs:generate-iso-stubs`, then update [docs/DOCUMENT_LOCALE_MAP.md](docs/DOCUMENT_LOCALE_MAP.md) (use `scripts/emit-full-locale-map-rows.mjs` as a helper) and the three [iso-package-index](docs/en/certificacion-iso/iso-package-index.md) files; see [`.cursor/rules/certificacion-iso.mdc`](.cursor/rules/certificacion-iso.mdc).
 
 See also [AGENTS.md](AGENTS.md) for the short index.
 
@@ -66,6 +67,7 @@ A task is **Done** only when ALL of the following are true:
 - [ ] `npm run check:i18n` passes (en and pt-BR keys are in sync with es)
 - [ ] API contract tests pass (`tests/api/contract.test.ts`) and OpenAPI remains aligned with `server/createApp.ts` (see [docs/api/openapi.yaml](docs/api/openapi.yaml)); follow the trilingual Swagger/OpenAPI plan [en](docs/en/quality/swagger-openapi-ui-plan.md) · [es](docs/es/quality/plan-swagger-openapi-ui.md) · [pt-BR](docs/pt-br/quality/plano-swagger-openapi-ui.md) for UI tooling and agent policy
 - [ ] **`npm run docs:generate`** run and outputs committed when the change affects generated docs (TypeScript surface, OpenAPI contract, or production dependency set for SBOM): no uncommitted drift under `docs/generated/`, `docs/api/openapi-reference.generated.md`, or `docs/evidence/sbom-cyclonedx.json` (see [en](docs/en/quality/generated-documentation.md) · [es](docs/es/quality/documentacion-generada.md) · [pt-BR](docs/pt-br/quality/documentacao-gerada.md))
+- [ ] **Product vision / fiscal deployment:** if the PR changes fiscal logic by jurisdiction or deployment assumptions (desktop vs SaaS), update the trilingual [product vision](docs/en/quality/product-vision-and-deployment.md) or [ADR-0007](docs/en/adr/ADR-0007-dual-deployment-and-fiscal-modularity.md) as appropriate (same decisions in `docs/en/`, `docs/es/`, `docs/pt-br/`)
 - [ ] Accessibility: dialogs have `role="dialog" aria-modal aria-labelledby`; inputs have `htmlFor`/`id` pairs; errors have `role="alert"`; required fields have `aria-required="true"`
 - [ ] Primary action buttons have `data-testid` attributes
 - [ ] CI pipeline is green on the PR branch

@@ -1,0 +1,28 @@
+# Catálogo de critérios de aceitação
+
+| Código do documento | REQ-006 |
+| Versão | 0.1 |
+| Data | 2026-04-01 |
+| Autor | BizCode |
+| Nível de requisito | Muito recomendado |
+| Aplicabilidade normativa | ISO 9001:2015 |
+| Estado de evidência | Parcial — ver links canônicos |
+
+## Declaração fora do escopo
+
+Preencher quando o escopo do produto ou organização estiver definido. Não afirmar certificação.
+
+
+## Corpo canônico (fonte única de verdade)
+
+- [user-stories-and-acceptance.md](../../specs/user-stories-and-acceptance.md)
+
+## Propósito
+
+<!-- Content to be completed -->
+
+## Histórico de revisões
+
+| Versão | Data | Autor | Resumo das alterações |
+|--------------|-----------|-------------|----------------|
+| 0.1 | 2026-04-01 | BizCode | Stub inicial |

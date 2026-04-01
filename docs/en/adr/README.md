@@ -15,5 +15,6 @@ Format: lightweight [Nygard](https://cognitect.com/blog/2011/11/15/documenting-a
 | [ADR-0004](ADR-0004-e2e-playwright-integration-roadmap.md) | E2E automation (Playwright) and integration-test roadmap | Accepted | 2026-03-31 |
 | [ADR-0005](ADR-0005-vitest-coverage-server-bootstrap.md) | Vitest coverage scope — `server.ts` bootstrap | Accepted | 2026-03-31 |
 | [ADR-0006](ADR-0006-release-and-tauri-ci-workflows.md) | Optional CI — semantic-release and Tauri self-hosted | Accepted | 2026-03-31 |
+| [ADR-0007](ADR-0007-dual-deployment-and-fiscal-modularity.md) | Dual deployment (desktop / SaaS) and fiscal modularity | Accepted | 2026-04-01 |
 
 **Other languages:** [Español](../es/adr/README.md) · [Português (Brasil)](../pt-br/adr/README.md)

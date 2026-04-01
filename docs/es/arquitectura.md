@@ -67,6 +67,10 @@ Acción del usuario (teclado/clic)
 - **Documento de referencia:** [temas-interfaz.md](temas-interfaz.md) (clases en `<html>`, script en `index.html`, persistencia, reglas para no romper el conmutador).
 - **Riesgo evitado:** no fijar `class="dark"` en `<body>`; con `dark:` activo por cualquier ancestro, el tema quedaría siempre oscuro aunque React actualice `<html>`.
 
+## Dirección estratégica (producto)
+
+El **mismo dominio de negocio** debe poder soportar **escritorio** (este documento) y, cuando se implemente, **SaaS alojado**, con la **lógica fiscal** aislada en **módulos por país/jurisdicción**. Ver [vision-producto-y-despliegue.md](quality/vision-producto-y-despliegue.md) (PROD-VISION-001) y [ADR-0007](adr/ADR-0007-dual-deployment-and-fiscal-modularity.md).
+
 ## Riesgos y restricciones conocidas
 
 - **Rutas API en un solo módulo:** La lógica HTTP está en `server/createApp.ts` (un archivo); `server.ts` expone el arranque; `server/main.ts` es la entrada de proceso para `npm run server`. Evolución recomendada: routers por dominio (véase ADR futuro si se refactoriza).

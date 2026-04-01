@@ -19,7 +19,10 @@
 | Documento | Contenido |
 |-----------|-----------|
 | [Certificación-ISO (raíz)](../../Certificación-ISO/README.md) | Punto de entrada al paquete ISO (sin duplicar cuerpos) |
-| [certificacion-iso/indice-paquete-iso.md](certificacion-iso/indice-paquete-iso.md) | Registro maestro del paquete (ISO-PKG-001) |
+| [certificacion-iso/indice-paquete-iso.md](certificacion-iso/indice-paquete-iso.md) | Registro maestro (ISO-PKG-001); **catálogo cerrado** GOV…PROC-MAN (108 códigos) |
+| [certificacion-iso/convencion-documentos-controlados.md](certificacion-iso/convencion-documentos-controlados.md) | Convención de nombres y metadatos de stubs |
+| [certificacion-iso/registro-trazabilidad-documentos-normas.md](certificacion-iso/registro-trazabilidad-documentos-normas.md) | Código → cláusulas indicativas (QMS-DR-001) |
+| [certificacion-iso/trazabilidad-entre-documentos.md](certificacion-iso/trazabilidad-entre-documentos.md) | Trazabilidad entre documentos (QMS-D2D-001) |
 | [certificacion-iso/manual-calidad.md](certificacion-iso/manual-calidad.md) | Alcance del QMS |
 | [certificacion-iso/trazabilidad-iso.md](certificacion-iso/trazabilidad-iso.md) | Matriz norma → evidencia en repo |
 | [quality/estrategia-pruebas.md](quality/estrategia-pruebas.md) | Pirámide de pruebas, política de cobertura |
@@ -28,6 +31,13 @@
 | [certificacion-iso/ciclo-vida-y-validacion-documental.md](certificacion-iso/ciclo-vida-y-validacion-documental.md) | SemVer, historial de cambios, lista de validación / verificación |
 | [quality/plan-swagger-openapi-ui.md](quality/plan-swagger-openapi-ui.md) | Referencia versionada Swagger UI + OpenAPI; política para agentes |
 | [quality/documentacion-generada.md](quality/documentacion-generada.md) | TypeDoc, OpenAPI→Markdown, esquemas JSON, SBOM — versionar salidas con los cambios de código |
+| [quality/vision-producto-y-despliegue.md](quality/vision-producto-y-despliegue.md) | Dirección escritorio + SaaS, módulos fiscales por país, gobernanza (PROD-VISION-001) |
+
+## Manuales de proceso (ISO-ready)
+
+| Documento | Contenido |
+|-----------|-----------|
+| [processes/indice.md](processes/indice.md) | PROC-MAN-001…010 — descripciones de proceso (stubs + enlaces canónicos) |
 
 ## API y decisiones
 

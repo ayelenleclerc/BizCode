@@ -1,0 +1,17 @@
+---
+description: Visión de producto — escritorio + SaaS, módulos fiscales por país; enlaza PROD-VISION-001 y ADR-0007
+globs: server/**,src/lib/**,src/pages/**,docs/**/quality/*vision*,docs/**/quality/*producto*,docs/**/quality/*produto*
+alwaysApply: false
+---
+
+# Visión de producto y despliegue
+
+Antes de **duplicar lógica fiscal por país** o **asumir un solo canal** (solo escritorio o solo nube), leer la fuente canónica trilingüe:
+
+- **Inglés:** [docs/en/quality/product-vision-and-deployment.md](docs/en/quality/product-vision-and-deployment.md) (PROD-VISION-001)
+- **Español:** [docs/es/quality/vision-producto-y-despliegue.md](docs/es/quality/vision-producto-y-despliegue.md)
+- **Português:** [docs/pt-br/quality/visao-produto-e-implantacao.md](docs/pt-br/quality/visao-produto-e-implantacao.md)
+
+**ADR:** [ADR-0007](docs/en/adr/ADR-0007-dual-deployment-and-fiscal-modularity.md) (mismo slug en `docs/es/adr/` y `docs/pt-br/adr/`).
+
+**Principio:** un núcleo compartido; módulos fiscales enchufables; canal (desktop/SaaS) y jurisdicción fiscal son dimensiones distintas. Los PR que cambien esas premisas deben actualizar el documento de visión o el ADR.

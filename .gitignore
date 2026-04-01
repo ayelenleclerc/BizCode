@@ -20,3 +20,7 @@ blob-report/
 
 # Optional full SBOM (large); default committed file is sbom-cyclonedx.json
 docs/evidence/sbom-cyclonedx-full.json
+
+# Scratch outputs from ISO map / package-index helpers (regenerate via scripts)
+scripts/_*.md
+scripts/_*.txt

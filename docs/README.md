@@ -14,6 +14,7 @@ Product, quality, and user documentation is maintained in **three language trees
 | **ISO certification package (entry + trilingual index)** | [Certificación-ISO/README.md](../Certificación-ISO/README.md) · [en](en/certificacion-iso/iso-package-index.md) · [es](es/certificacion-iso/indice-paquete-iso.md) · [pt-BR](pt-br/certificacion-iso/indice-pacote-iso.md) |
 | **SBOM (CycloneDX) evidence** | [evidence/README.md](evidence/README.md) · `npm run sbom:generate` |
 | **Generated documentation** (`npm run docs:generate`) | [en/quality/generated-documentation.md](en/quality/generated-documentation.md) · [es](es/quality/documentacion-generada.md) · [pt-BR](pt-br/quality/documentacao-gerada.md) · [`generated/` README](generated/README.md) |
+| **Product vision** (desktop + SaaS, fiscal modules, PROD-VISION-001) | [en/quality/product-vision-and-deployment.md](en/quality/product-vision-and-deployment.md) · [es](es/quality/vision-producto-y-despliegue.md) · [pt-BR](pt-br/quality/visao-produto-e-implantacao.md) |
 
 ---
 

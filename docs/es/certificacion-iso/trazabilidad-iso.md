@@ -13,6 +13,8 @@ Esta matriz relaciona los artefactos de calidad de BizCode con cláusulas de nor
 | **docs/api/openapi.yaml** + `tests/api/contract.test.ts` | §8.3 | §6.3.2 | — | Idoneidad funcional §4.2.1 | 29119-2 |
 | **plan-swagger-openapi-ui.md** (espejos EN/PT) — checklist Swagger UI, política OpenAPI agentes | §7.5, §8.3 | §6.3.2, §6.4.12 | — | Idoneidad funcional §4.2.1 | 29119-2 |
 | **ADR-0003** | §8.3.3 | §6.3.6 | — | Mantenibilidad §4.2.7 | — |
+| **vision-producto-y-despliegue.md** (espejos EN/PT, **PROD-VISION-001**) — dirección escritorio/SaaS, modularidad fiscal | §7.5, §8.3 | §6.3.2 | — | Portabilidad §4.2.8 | — |
+| **ADR-0007** (despliegue dual / modularidad fiscal) | §8.3.3 | §6.3.2 | — | Mantenibilidad §4.2.7 | — |
 | **ciclo-ci-cd.md** + `.github/workflows/ci.yml` | §8.5 | §6.3.6 | A.8.25 | — | — |
 | **manual-calidad.md** | §4.4, §10.2 | §6.1 | — | — | — |
 | **ADR-0001**, **ADR-0002** | §8.3.3 | §6.3.2 | — | — | — |
@@ -28,5 +30,9 @@ Esta matriz relaciona los artefactos de calidad de BizCode con cláusulas de nor
 
 - La aplicabilidad de ISO/IEC 27001 es limitada (app desktop monousuario sin exposición de red operativa).
 - ISO 29119: partes 2 y 4 cubiertas por la estrategia de pruebas; la parte 3 (documentación de pruebas) tiene soporte MVP en `docs/*/specs/manual-test-cases.md` y registros con [plantillas-registros.md](plantillas-registros.md).
+
+## Registro de documentos controlados (códigos GOV–PROC-MAN)
+
+El **catálogo cerrado** de stubs controlados figura en [indice-paquete-iso.md](indice-paquete-iso.md). Cruce **código → cláusula** indicativo: [registro-trazabilidad-documentos-normas.md](registro-trazabilidad-documentos-normas.md). **Trazabilidad entre documentos:** [trazabilidad-entre-documentos.md](trazabilidad-entre-documentos.md). Índice de manuales de proceso: [../processes/indice.md](../processes/indice.md).
 
 **Otros idiomas:** [English](../../en/certificacion-iso/iso-traceability.md) · [Português](../../pt-br/certificacion-iso/rastreabilidade-iso.md)

@@ -1,15 +1,17 @@
 ---
-description: ISO certification package — incremental docs, evidence, no claimed certification
-globs: docs/**/certificacion-iso/**/*.md,Certificación-ISO/**/*.md
+description: ISO certification package — closed catalog of controlled stubs, evidence, no claimed certification
+globs: docs/**/certificacion-iso/**/*.md,docs/**/processes/**/*.md,Certificación-ISO/**/*.md
 alwaysApply: false
 ---
 
-# Certificación-ISO / `docs/*/certificacion-iso/`
+# Certificación-ISO / `docs/*/certificacion-iso/` y `docs/*/processes/`
 
-- Cumplir [`.cursor/rules/bizcode-documentation.mdc`](bizcode-documentation.mdc): paridad **en / es / pt-br** para cada documento lógico; rutas en [docs/DOCUMENT_LOCALE_MAP.md](../../docs/DOCUMENT_LOCALE_MAP.md) (`npm run check:docs-map`).
+- Cumplir [`.cursor/rules/bizcode-documentation.mdc`](bizcode-documentation.mdc): paridad **en / es / pt-br** para cada documento lógico; rutas en [docs/DOCUMENT_LOCALE_MAP.md](docs/DOCUMENT_LOCALE_MAP.md) (`npm run check:docs-map`).
 - **No afirmar certificación ISO**; usar formulaciones **ISO-ready**, evidencia en repo, preparación para auditoría.
-- **Una sola fuente de verdad:** no duplicar cuerpos de texto fuera de `docs/*/certificacion-iso/` salvo stubs en [`docs/quality/`](../../docs/quality/) que apunten aquí.
-- **Registro maestro:** [iso-package-index.md](../../docs/en/certificacion-iso/iso-package-index.md) (ISO-PKG-001); nuevos códigos de documento añaden fila en los **tres** índices localizados.
-- **Evidencia:** toda afirmación de proceso debe enlazar a archivo, CI, prueba o registro; si no existe, marcar explícitamente como pendiente.
-- **Incremental:** versionar documentos con identificador (p. ej. QM-001, ISO-PKG-001); ampliar en el mismo cambio que la evidencia o el proceso descrito.
-- **Punto de entrada raíz:** [Certificación-ISO/README.md](../../Certificación-ISO/README.md).
+- **Catálogo cerrado:** los códigos **GOV-001…GOV-012, RSK-001…006, SEC-001…015, QLT-001…010, REQ-001…008, TST-001…010, ARC-001…008, SRV-001…010, HR-001…006, PRV-001…005, AI-001…008, PROC-MAN-001…010** están registrados en [iso-package-index.md](docs/en/certificacion-iso/iso-package-index.md) (ISO-PKG-001). Añadir un código nuevo implica fila en los **tres** índices localizados, fila en [DOCUMENT_LOCALE_MAP.md](docs/DOCUMENT_LOCALE_MAP.md), y entrada en [scripts/iso-doc-registry.mjs](scripts/iso-doc-registry.mjs) + regenerar stubs con `npm run docs:generate-iso-stubs` (o crear los tres archivos a mano con la misma plantilla).
+- **Una sola fuente de verdad:** los stubs enlazan a narrativa canónica existente (`docs/*/specs/`, `docs/*/quality/`, etc.); no duplicar cuerpos largos fuera del archivo canónico.
+- **Registro maestro:** [iso-package-index.md](docs/en/certificacion-iso/iso-package-index.md) (ISO-PKG-001); registros de apoyo: [document-register-traceability.md](docs/en/certificacion-iso/document-register-traceability.md), [traceability-between-documents.md](docs/en/certificacion-iso/traceability-between-documents.md), [controlled-document-convention.md](docs/en/certificacion-iso/controlled-document-convention.md).
+- **Manuales de proceso:** índice [processes/index.md](docs/en/processes/index.md) (PROC-MAN-001…010).
+- **Evidencia:** toda afirmación de proceso debe enlazar a archivo, CI, prueba o registro; si no existe, marcar explícitamente como pendiente en el stub.
+- **Incremental:** versionar documentos con identificador y **Revision history** append-only en cada stub (véase convención META-CONVENTION-001).
+- **Punto de entrada raíz:** [Certificación-ISO/README.md](Certificación-ISO/README.md).

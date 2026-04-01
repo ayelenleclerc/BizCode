@@ -15,6 +15,8 @@ This matrix maps BizCode's quality artefacts to clauses of the applicable ISO st
 | **ADR-0003** (API contract) | §8.3.3 Design outputs | §6.3.6 Software Integration | — | Maintainability §4.2.7 | — |
 | **ADR-0005** (Vitest coverage — `server.ts`) | §8.7 | §6.4.9 | — | Maintainability §4.2.7 | 29119-2 |
 | **ADR-0006** (optional release / Tauri workflows) | §8.5 | §6.4.9 | A.8.25 | — | — |
+| **product-vision-and-deployment.md** (+ localized mirrors, **PROD-VISION-001**) — desktop/SaaS direction, fiscal modularity | §7.5, §8.3 | §6.3.2 Software Design | — | Portability §4.2.8 (Adaptability) | — |
+| **ADR-0007** (dual deployment / fiscal modularity) | §8.3.3 Design outputs | §6.3.2 Software Design | — | Maintainability §4.2.7 | — |
 | **ci-cd.md** + `.github/workflows/ci.yml` | §8.5 Production and service provision | §6.3.6 Software Integration | A.8.25 Secure development lifecycle | — | — |
 | **quality-manual.md** + nonconformity process | §4.4 QMS processes, §10.2 Nonconformity | §6.1 Project planning | — | — | — |
 | **ADR-0001** (REST/Prisma decision) | §8.3.3 Design outputs | §6.3.2 Software Design | — | Maintainability §4.2.7 | — |
@@ -32,5 +34,9 @@ This matrix maps BizCode's quality artefacts to clauses of the applicable ISO st
 - ISO/IEC 27001 applicability is limited: BizCode is a single-user desktop app with no network exposure. Controls apply to development practices (source code, secrets management), not to operational infrastructure.
 - ISO 29119: Parts 2 and 4 are covered by the testing strategy; Part 3 (test documentation) is supported at MVP level by `docs/*/specs/manual-test-cases.md` and session records using [records-template.md](records-template.md).
 - ISO/IEC 25010:2023 quality characteristics are addressed at design level; formal measurement and scoring are outside the current scope.
+
+## Controlled document register (codes GOV–PROC-MAN)
+
+The **closed catalog** of controlled stubs (GOV, RSK, SEC, QLT, REQ, TST, ARC, SRV, HR, PRV, AI, PROC-MAN) is listed in [iso-package-index.md](iso-package-index.md). Indicative **code → clause** mapping: [document-register-traceability.md](document-register-traceability.md). **Document-to-document** links: [traceability-between-documents.md](traceability-between-documents.md). Process manuals index: [../processes/index.md](../processes/index.md).
 
 **Other languages:** [Español](../../es/certificacion-iso/trazabilidad-iso.md) · [Português](../../pt-br/certificacion-iso/rastreabilidade-iso.md)

@@ -13,6 +13,8 @@ Mapa dos artefactos de qualidade do BizCode para cláusulas ISO. Documentação 
 | openapi.yaml + contract tests | §8.3 | §6.3.2 | — | Adequação funcional | 29119-2 |
 | plano-swagger-openapi-ui.md (espelhos EN/ES) — checklist Swagger UI, política OpenAPI agentes | §7.5, §8.3 | §6.3.2, §6.4.12 | — | Adequação funcional | 29119-2 |
 | ADR-0003 (contrato API) | §8.3.3 | §6.3.6 | — | Manutenibilidade | — |
+| **visao-produto-e-implantacao.md** (espelhos EN/ES, **PROD-VISION-001**) — direção desktop/SaaS, modularidade fiscal | §7.5, §8.3 | §6.3.2 | — | Portabilidade §4.2.8 | — |
+| **ADR-0007** (implantação dual / modularidade fiscal) | §8.3.3 | §6.3.2 | — | Manutenibilidade §4.2.7 | — |
 | CI_CD + workflow | §8.5 | §6.3.6 | A.8.25 | — | — |
 | QUALITY_MANUAL | §4.4, §10.2 | §6.1 | — | — | — |
 | ADR-0001, ADR-0002 | §8.3.3 | §6.3.2 | — | — | — |
@@ -27,5 +29,9 @@ Mapa dos artefactos de qualidade do BizCode para cláusulas ISO. Documentação 
 ## Notas
 
 - ISO 29119: partes 2 e 4 cobertas pela estratégia; parte 3 (documentação de testes) com suporte MVP em `docs/*/specs/manual-test-cases.md` e registros em [modelos-registros.md](modelos-registros.md).
+
+## Registro de documentos controlados (códigos GOV–PROC-MAN)
+
+O **catálogo fechado** de stubs controlados está em [indice-pacote-iso.md](indice-pacote-iso.md). Cruzamento **código → cláusula** indicativo: [registro-rastreabilidade-documentos-normas.md](registro-rastreabilidade-documentos-normas.md). **Rastreabilidade entre documentos:** [rastreabilidade-entre-documentos.md](rastreabilidade-entre-documentos.md). Índice de manuais de processo: [../processes/indice.md](../processes/indice.md).
 
 **Outros idiomas:** [English](../../en/certificacion-iso/iso-traceability.md) · [Español](../../es/certificacion-iso/trazabilidad-iso.md)

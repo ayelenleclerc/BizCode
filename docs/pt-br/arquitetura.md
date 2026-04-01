@@ -67,6 +67,10 @@ Ação do usuário (teclado/clique)
 - **Referência:** [temas-interface.md](temas-interface.md) (classes em `<html>`, script em `index.html`, persistência).
 - **Risco evitado:** não fixar `class="dark"` em `<body>`; com `dark:` em qualquer ancestral, o tema permanece escuro mesmo se o React atualizar `<html>`.
 
+## Direção estratégica (produto)
+
+O **mesmo domínio de negócio** deve suportar **desktop** (este documento) e, quando implementado, **SaaS hospedado**, com **comportamento fiscal** isolado em **módulos por país/jurisdição**. Ver [visao-produto-e-implantacao.md](quality/visao-produto-e-implantacao.md) (PROD-VISION-001) e [ADR-0007](adr/ADR-0007-dual-deployment-and-fiscal-modularity.md).
+
 ## Riscos e restrições
 
 - **Rotas da API em um único módulo:** a lógica HTTP está em `server/createApp.ts`; `server.ts` expõe o bootstrap; `server/main.ts` é a entrada de processo para `npm run server`. Evolução: routers por domínio.
