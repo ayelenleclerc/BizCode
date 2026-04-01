@@ -9,6 +9,12 @@ Before opening or updating a PR, read and comply with:
 
 See also [AGENTS.md](AGENTS.md) for the short index.
 
+## Node.js and dependencies
+
+- **Node.js:** use **22 LTS** locally (see [`.nvmrc`](.nvmrc)). The minimum version is declared in [`package.json`](package.json) under `engines`.
+- **Install:** run `npm ci` after cloning (respects [`.npmrc`](.npmrc) `legacy-peer-deps`, required for `eslint-plugin-jsx-a11y` with ESLint 10 until upstream peers align).
+- **Lockfile:** commit `package-lock.json` with every dependency change; bump packages in focused steps and run the quality gate locally.
+
 ## Branch Workflow
 
 ```
@@ -55,7 +61,7 @@ A task is **Done** only when ALL of the following are true:
 - [ ] Code compiles without errors (`npm run type-check` → exit 0)
 - [ ] No new ESLint errors (`npm run lint` → exit 0)
 - [ ] All unit tests pass (`npm run test` → exit 0)
-- [ ] Coverage thresholds met: **100%** en `src/lib/**` y `server/createApp.ts` (véase `vitest.config.ts` y [testing-strategy](docs/en/quality/testing-strategy.md)); ampliar alcance solo con **ADR** explícito
+- [ ] Coverage thresholds met: **100%** en `src/lib/**`, `server/createApp.ts` y `server.ts` (véase `vitest.config.ts` y [testing-strategy](docs/en/quality/testing-strategy.md)); ampliar alcance solo con **ADR** explícito
 - [ ] New user-visible strings use `t()` — no hardcoded text in components
 - [ ] `npm run check:i18n` passes (en and pt-BR keys are in sync with es)
 - [ ] API contract tests pass (`tests/api/contract.test.ts`) and OpenAPI remains aligned with `server/createApp.ts` (see [docs/api/openapi.yaml](docs/api/openapi.yaml))
@@ -75,6 +81,10 @@ npm run test:coverage # Tests + coverage report
 npm run check:i18n   # i18n parity
 npm run check:docs-map  # DOCUMENT_LOCALE_MAP.md paths exist
 npm run test:e2e        # Playwright smoke (vite preview); see docs/en/adr/ADR-0004-e2e-playwright-integration-roadmap.md
+npx prisma migrate deploy   # Apply schema (needed before integration tests)
+npm run test:integration    # HTTP + real Prisma vs PostgreSQL; requires DATABASE_URL (e.g. .env)
 ```
 
-All must exit 0 before opening a PR.
+All must exit 0 before opening a PR. If you do not run PostgreSQL locally, rely on CI for `test:integration`; contract + unit coverage do not require a database.
+
+`npm run server` executes `tsx server/main.ts` (API bootstrap is in `server.ts`; see [ADR-0005](docs/en/adr/ADR-0005-vitest-coverage-server-bootstrap.md)). Optional release workflows: [ADR-0006](docs/en/adr/ADR-0006-release-and-tauri-ci-workflows.md).

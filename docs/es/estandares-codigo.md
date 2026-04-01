@@ -49,7 +49,7 @@ Ver [accesibilidad.md](accesibilidad.md). ESLint `jsx-a11y` en CI con `--max-war
 ## Pruebas
 
 - Tests en `src/lib/*.test.ts` y smoke a11y en `src/App.a11y.test.tsx`.
-- **100%** de cobertura en `src/lib/**/*.ts` y `server/createApp.ts` (véase [TESTING_STRATEGY](quality/estrategia-pruebas.md) y [ADR-0003](adr/ADR-0003-api-contract-testing.md)).
+- **100%** de cobertura en `src/lib/**/*.ts`, `server/createApp.ts` y `server.ts` (véase [TESTING_STRATEGY](quality/estrategia-pruebas.md), [ADR-0003](adr/ADR-0003-api-contract-testing.md) y [ADR-0005](adr/ADR-0005-vitest-coverage-server-bootstrap.md)).
 - Mock de HTTP con `vi.mock('axios')`; botones principales con `data-testid`.
 
 ## Comentarios en código (trilingües)

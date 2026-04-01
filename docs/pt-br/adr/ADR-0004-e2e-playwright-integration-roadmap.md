@@ -15,8 +15,8 @@
 ## Decisão
 
 1. **E2E automatizado (fase A — implementada):** usar **Playwright** contra **`vite preview`** após `vite build`. Testes em `e2e/`; o CI instala apenas **Chromium** e executa `npm run test:e2e`. Escopo inicial: **smoke** (rota raiz carrega, `#root` visível, título do documento). Valida o invólucro da SPA; **não** substitui testes manuais do shell Tauri nem integrações nativas.
-2. **Integração com PostgreSQL (fase B — não implementada aqui):** o workflow do GitHub Actions já fornece serviço **PostgreSQL 16**. Adicionar testes **automatizados** com migrações, seed e asserções HTTP sobre DB real fica **adiado** até item de backlog: novo ADR se mudarem thresholds ou CI de forma relevante, e layout explícito em `tests/integration/` (ou similar).
-3. **Escopo de cobertura Vitest:** qualquer expansão de `coverage.include` em `vitest.config.ts` além de `src/lib/**/*.ts` e `server/createApp.ts` exige **novo ADR** e thresholds explícitos (sem expansão silenciosa).
+2. **Integração com PostgreSQL (fase B — implementada):** o workflow do GitHub Actions fornece **PostgreSQL 16** e executa `npx prisma migrate deploy` antes das etapas de teste. Testes **automatizados** em `tests/integration/` (`npm run test:integration`, `vitest.integration.config.ts`): `PrismaClient` real, HTTP via supertest, tabelas limpas com `TRUNCATE … CASCADE` entre casos. Complementam (não substituem) os testes de contrato com Prisma mockado. Mudanças relevantes de cobertura ou CI continuam documentadas em ADR.
+3. **Escopo de cobertura Vitest:** qualquer expansão de `coverage.include` em `vitest.config.ts` além de `src/lib/**/*.ts`, `server/createApp.ts` e `server.ts` exige **novo ADR** e thresholds explícitos (sem expansão silenciosa). O bootstrap de `server.ts` está em [ADR-0005](ADR-0005-vitest-coverage-server-bootstrap.md).
 
 ## Consequências
 
@@ -28,4 +28,5 @@
 
 - [estrategia-testes.md](../quality/estrategia-testes.md)
 - `playwright.config.ts`, `e2e/smoke.spec.ts`
+- `vitest.integration.config.ts`, `tests/integration/`
 - `.github/workflows/ci.yml`

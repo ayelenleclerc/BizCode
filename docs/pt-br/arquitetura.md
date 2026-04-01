@@ -57,7 +57,8 @@ Ação do usuário (teclado/clique)
 | `src/pages/clientes/` | CRUD de clientes |
 | `src/pages/articulos/` | CRUD de produtos |
 | `src/pages/facturacion/` | Emissão e listagem de faturas |
-| `server.ts` (raiz) | Entrada: `createApp(prisma)` de `server/createApp.ts`, listen e `PrismaClient` |
+| `server/main.ts` | Entrada CLI (`npm run server`): chama `startServer()` em `server.ts` |
+| `server.ts` (raiz) | Bootstrap: `createServerInstance`, `bindHttpServer`, `startServer`; usa `createApp` de `server/createApp.ts` |
 | `server/createApp.ts` | Fábrica Express reutilizável em testes de contrato OpenAPI |
 
 ## Temas (Tailwind modo escuro)
@@ -68,7 +69,7 @@ Ação do usuário (teclado/clique)
 
 ## Riscos e restrições
 
-- **Rotas da API em um único módulo:** a lógica HTTP está em `server/createApp.ts`; `server.ts` apenas inicia o processo. Evolução: routers por domínio.
+- **Rotas da API em um único módulo:** a lógica HTTP está em `server/createApp.ts`; `server.ts` expõe o bootstrap; `server/main.ts` é a entrada de processo para `npm run server`. Evolução: routers por domínio.
 - **Sem autenticação:** a API não tem camada de auth; uso local (loopback). Se exposta à rede, é necessário autenticação.
 - **Build Tauri fora do CI:** ver [quality/ciclo-ci-cd.md](quality/ciclo-ci-cd.md).
 - **Sem modo offline:** o SPA exige o sidecar Express em execução.

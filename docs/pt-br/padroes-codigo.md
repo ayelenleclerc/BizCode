@@ -44,7 +44,7 @@ Ver [acessibilidade.md](acessibilidade.md). ESLint `jsx-a11y` em CI com `--max-w
 ## Testes
 
 - Testes unitários em `src/lib/*.test.ts` e smoke a11y em `src/App.a11y.test.tsx`.
-- **100%** de cobertura no escopo acordado: `src/lib/**/*.ts` e `server/createApp.ts` (ver [TESTING_STRATEGY](quality/estrategia-testes.md) e [ADR-0003](adr/ADR-0003-api-contract-testing.md)).
+- **100%** de cobertura no escopo acordado: `src/lib/**/*.ts`, `server/createApp.ts` e `server.ts` (ver [TESTING_STRATEGY](quality/estrategia-testes.md), [ADR-0003](adr/ADR-0003-api-contract-testing.md) e [ADR-0005](adr/ADR-0005-vitest-coverage-server-bootstrap.md)).
 - Mock de HTTP com `vi.mock('axios')`; botões principais com `data-testid`.
 
 ## Comentários no código (trilíngue)

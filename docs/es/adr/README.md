@@ -12,5 +12,7 @@ Formato: estilo [Nygard](https://cognitect.com/blog/2011/11/15/documenting-archi
 | [ADR-0002](ADR-0002-i18n-library.md) | Biblioteca i18n: react-i18next | Aceptada | 2026-01-15 |
 | [ADR-0003](ADR-0003-api-contract-testing.md) | Pruebas de contrato HTTP frente a OpenAPI | Aceptada | 2026-03-31 |
 | [ADR-0004](ADR-0004-e2e-playwright-integration-roadmap.md) | Automatización E2E (Playwright) y hoja de ruta de integración | Aceptada | 2026-03-31 |
+| [ADR-0005](ADR-0005-vitest-coverage-server-bootstrap.md) | Alcance de cobertura Vitest — arranque `server.ts` | Aceptada | 2026-03-31 |
+| [ADR-0006](ADR-0006-release-and-tauri-ci-workflows.md) | CI opcional — semantic-release y build Tauri self-hosted | Aceptada | 2026-03-31 |
 
 **Otros idiomas:** [English](../../en/adr/README.md) · [Português](../../pt-br/adr/README.md)

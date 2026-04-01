@@ -15,8 +15,8 @@
 ## Decision
 
 1. **Automated E2E (Phase A — implemented):** use **Playwright** against **`vite preview`** after `vite build` (production bundle). Tests live under `e2e/`; CI installs **Chromium** only and runs `npm run test:e2e`. Initial scope: **smoke** (root route loads, `#root` visible, document title). This validates the SPA shell; it does **not** replace manual testing of the Tauri desktop wrapper or native integrations.
-2. **PostgreSQL integration tests (Phase B — not implemented here):** the GitHub Actions workflow already provides a **PostgreSQL 16** service. Adding **automated** tests that run migrations, seed data, and assert HTTP behaviour against a real DB is **deferred** until a dedicated backlog item: new ADR if thresholds or CI time change materially, plus `vitest` or `node:test` layout under `tests/integration/` (or similar).
-3. **Vitest coverage scope:** any expansion of `coverage.include` in `vitest.config.ts` beyond `src/lib/**/*.ts` and `server/createApp.ts` requires a **new ADR** and explicit threshold updates (no silent widening).
+2. **PostgreSQL integration tests (Phase B — implemented):** the GitHub Actions workflow provides a **PostgreSQL 16** service and runs `npx prisma migrate deploy` before the main test steps. **Automated** integration tests live under `tests/integration/` (`npm run test:integration`, `vitest.integration.config.ts`): real `PrismaClient`, HTTP via supertest, tables reset with `TRUNCATE … CASCADE` between cases. They complement (do not replace) contract tests with mocked Prisma. Any material change to coverage scope or CI layout still warrants an ADR update.
+3. **Vitest coverage scope:** any expansion of `coverage.include` in `vitest.config.ts` beyond `src/lib/**/*.ts`, `server/createApp.ts`, and `server.ts` requires a **new ADR** and explicit threshold updates (no silent widening). `server.ts` bootstrap is covered by [ADR-0005](ADR-0005-vitest-coverage-server-bootstrap.md).
 
 ## Consequences
 
@@ -28,4 +28,5 @@
 
 - [quality/testing-strategy.md](../quality/testing-strategy.md)
 - `playwright.config.ts`, `e2e/smoke.spec.ts`
+- `vitest.integration.config.ts`, `tests/integration/`
 - `.github/workflows/ci.yml`

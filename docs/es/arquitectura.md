@@ -57,7 +57,8 @@ Acción del usuario (teclado/clic)
 | `src/pages/clientes/` | ABMC clientes |
 | `src/pages/articulos/` | ABMC artículos |
 | `src/pages/facturacion/` | Emisión y listado de facturas |
-| `server.ts` (raíz) | Entrada: `createApp(prisma)` desde `server/createApp.ts`, listen y `PrismaClient` |
+| `server/main.ts` | Entrada CLI (`npm run server`): llama a `startServer()` en `server.ts` |
+| `server.ts` (raíz) | Arranque: `createServerInstance`, `bindHttpServer`, `startServer`; usa `createApp` de `server/createApp.ts` |
 | `server/createApp.ts` | Fábrica Express reutilizable en tests de contrato OpenAPI |
 
 ## Tematización (Tailwind modo oscuro)
@@ -68,7 +69,7 @@ Acción del usuario (teclado/clic)
 
 ## Riesgos y restricciones conocidas
 
-- **Rutas API en un solo módulo:** La lógica HTTP está en `server/createApp.ts` (un archivo); `server.ts` solo arranca el proceso. Evolución recomendada: routers por dominio (véase ADR futuro si se refactoriza).
+- **Rutas API en un solo módulo:** La lógica HTTP está en `server/createApp.ts` (un archivo); `server.ts` expone el arranque; `server/main.ts` es la entrada de proceso para `npm run server`. Evolución recomendada: routers por dominio (véase ADR futuro si se refactoriza).
 - **Sin autenticación:** La API no tiene capa de autenticación. Está pensada para ejecutarse en local en la máquina del usuario (sidecar Tauri en loopback). Si la aplicación se expone a red, debe añadirse autenticación.
 - **Build Tauri no en CI:** Requiere WebKit nativo por plataforma. Ver [quality/ciclo-ci-cd.md](quality/ciclo-ci-cd.md).
 - **Sin modo offline:** El SPA React requiere el sidecar Express en ejecución. El ciclo de vida de Tauri lo garantiza en producción.

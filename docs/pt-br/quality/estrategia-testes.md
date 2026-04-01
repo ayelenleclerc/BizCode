@@ -12,7 +12,7 @@
           ├──────────────────────────────┤
           │   E2E (manual / Tauri)       │   Desktop fora do harness Playwright
           ├──────────────────────────────┤
-          │   Integração (futuro)        │   CI: serviço PostgreSQL disponível; testes ainda não adicionados (ADR-0004)
+          │   Integração (PostgreSQL)  │   tests/integration/ — Prisma real, supertest (ADR-0004 fase B)
           ├──────────────────────────────┤
           │   Unitários + a11y           │   CI: 100% linhas/funções/ramos em src/lib/** e server/createApp.ts
           │   (Vitest+axe)               │       Smoke axe em App (src/App.a11y.test.tsx)
@@ -27,8 +27,9 @@
 |---|---|---|---|---|
 | **`src/lib/**/*.ts`** (exceto `*.test.ts`) | **100%** | **100%** | **100%** | **100%** |
 | **`server/createApp.ts`** | **100%** | **100%** | **100%** | **100%** |
+| **`server.ts`** (bootstrap: `createServerInstance`, `bindHttpServer`, `startServer`; entrada `server/main.ts`) | **100%** | **100%** | **100%** | **100%** |
 
-Exclusões adicionais só com **ADR** e alteração explícita em `vitest.config.ts` — ver [ADR-0003](../adr/ADR-0003-api-contract-testing.md) e [ADR-0004](../adr/ADR-0004-e2e-playwright-integration-roadmap.md).
+Exclusões adicionais só com **ADR** e alteração explícita em `vitest.config.ts` — ver [ADR-0003](../adr/ADR-0003-api-contract-testing.md), [ADR-0004](../adr/ADR-0004-e2e-playwright-integration-roadmap.md) e [ADR-0005](../adr/ADR-0005-vitest-coverage-server-bootstrap.md).
 
 Os limiares são aplicados pelo Vitest (`coverage.thresholds`). O CI falha se não forem atingidos.
 
@@ -55,21 +56,23 @@ src/lib/*.test.ts
 src/test/setup.ts
 App.a11y.test.tsx
 tests/api/contract.test.ts, validate-openapi-response.ts
+tests/server/server.test.ts  ← bootstrap `server.ts` (mock Prisma; ADR-0005)
 e2e/smoke.spec.ts
+tests/integration/api.integration.test.ts  ← HTTP + Prisma real (`npm run test:integration`; excluído do Vitest padrão)
 ```
 
-O Vitest **exclui** `e2e/**` (`vitest.config.ts`) para que apenas o Playwright execute esses arquivos.
+O Vitest **exclui** `e2e/**` (`vitest.config.ts`) para que apenas o Playwright execute esses arquivos. **`tests/integration/**`** fica fora do `npm run test:coverage` (não exige `DATABASE_URL`); integração usa `vitest.integration.config.ts`.
 
 ## Mocks
 
 - **Axios:** `vi.mock('axios')` com `vi.hoisted()`.
-- **Prisma:** mockado nos testes de contrato; **integração** com PostgreSQL real é fase B em [ADR-0004](../adr/ADR-0004-e2e-playwright-integration-roadmap.md).
+- **Prisma:** mockado nos testes de contrato; em **`tests/integration/`** usa-se `PrismaClient` real com PostgreSQL ([ADR-0004](../adr/ADR-0004-e2e-playwright-integration-roadmap.md) fase B), complementando o contrato.
 
 ## Critérios de entrada e saída
 
 **Entrada:** `tsc` e ESLint sem erros.
 
-**Saída:** testes unitários/API passam; smoke E2E (`npm run test:e2e`) passa; cobertura OK; artefato publicado.
+**Saída:** testes unitários/API passam; smoke E2E (`npm run test:e2e`) passa; integração (`npm run test:integration`, com migrações no CI) passa; cobertura OK; artefato publicado.
 
 ## Regressões
 

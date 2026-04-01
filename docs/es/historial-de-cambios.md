@@ -10,7 +10,13 @@ Versionado: [Semantic Versioning](https://semver.org/lang/es/).
 
 ### Added
 
-- **ADR-0004** — [smoke E2E Playwright y hoja de ruta de integración](adr/ADR-0004-e2e-playwright-integration-roadmap.md): `e2e/smoke.spec.ts`, `playwright.config.ts`, CI instala Chromium y ejecuta `npm run test:e2e`; Vitest excluye `e2e/**`; pruebas de integración con PostgreSQL siguen en fase B
+- **Toolchain:** Node **22 LTS** en CI, [`.nvmrc`](../../.nvmrc), `engines` en [`package.json`](../../package.json); [`.npmrc`](../../.npmrc) `legacy-peer-deps` para `npm ci` con ESLint 10 + jsx-a11y
+- **Dependencias:** **Vite 6**, `@vitejs/plugin-react` 5.x, **Prisma 5.22**; `@types/node` 22; avisos de audit restantes ligados al CLI `npm` empaquetado (solo herramientas de desarrollo)
+- **ADR-0005** — [Cobertura Vitest para `server.ts`](adr/ADR-0005-vitest-coverage-server-bootstrap.md): refactor de arranque, entrada `server/main.ts`, `tests/server/server.test.ts`
+- **ADR-0006** — [CI opcional: semantic-release y Tauri self-hosted](adr/ADR-0006-release-and-tauri-ci-workflows.md): `npm audit` informativo en CI; `release.config.cjs`, `release.yml`, `tauri-selfhosted.yml`
+- **CI:** `npm audit --audit-level=high` no bloqueante tras `npm ci`
+- **JSDoc trilingüe** en `calculateInvoice`, `calculateItemSubtotal` y cabecera de módulo en [`src/lib/invoice.ts`](../../src/lib/invoice.ts); `createApp` en [`server/createApp.ts`](../../server/createApp.ts)
+- **ADR-0004** — [smoke E2E Playwright y hoja de ruta de integración](adr/ADR-0004-e2e-playwright-integration-roadmap.md): `e2e/smoke.spec.ts`, `playwright.config.ts`, CI instala Chromium y ejecuta `npm run test:e2e`; Vitest excluye `e2e/**`; **fase B:** `tests/integration/`, `npm run test:integration`, `vitest.integration.config.ts`; CI ejecuta `prisma migrate deploy` y luego integración (Prisma real; el contrato API sigue con mock)
 - **Ciclo de vida documental y validación** (calidad): [ciclo-vida-y-validacion-documental.md](quality/ciclo-vida-y-validacion-documental.md); `npm run check:docs-map` comprueba rutas del [DOCUMENT_LOCALE_MAP.md](../DOCUMENT_LOCALE_MAP.md); CI ejecuta la comprobación tras la paridad i18n
 - **JSDoc trilingüe** de ejemplo en `validateCUIT` en [`src/lib/validators.ts`](../../src/lib/validators.ts) (véase [estandares-codigo.md](estandares-codigo.md))
 - **Nombres de archivo localizados por idioma (fase 3):** la documentación de producto y calidad en `docs/en/`, `docs/es/` y `docs/pt-br/` usa **nombres distintos por árbol**; mapa canónico en [DOCUMENT_LOCALE_MAP.md](../DOCUMENT_LOCALE_MAP.md); los ADR conservan el **mismo slug técnico** en cada idioma

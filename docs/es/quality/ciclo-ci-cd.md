@@ -8,9 +8,9 @@ BizCode usa GitHub Actions para integración continua. El pipeline está definid
 
 ```
 push / pull_request → job quality (ubuntu-latest):
-  checkout → Node 20 → npm ci → prisma generate →
+  checkout → Node 22 → npm ci → npm audit (informativo) → prisma generate → prisma migrate deploy →
   type-check → lint → test:coverage → check:i18n →
-  playwright install chromium → test:e2e → check:docs-map →
+  playwright install chromium → test:e2e → test:integration → check:docs-map →
   artefacto de cobertura
 ```
 
@@ -32,11 +32,12 @@ Un paso bloquea el pipeline (código de salida ≠ 0) cuando:
 | test:coverage | Fallo de test O umbral de cobertura no cumplido |
 | check:i18n | Claves faltantes o sobrantes vs. fuente `es` |
 | test:e2e | Fallo de Playwright (incluye `vite build` + preview; ver [ADR-0004](../adr/ADR-0004-e2e-playwright-integration-roadmap.md)) |
+| test:integration | Fallo en pruebas `tests/integration/` (Prisma real sobre PostgreSQL) |
 | check:docs-map | Ruta del mapa documental inexistente en disco |
 
 ## Servicios
 
-El job inicia **PostgreSQL 16** (`DATABASE_URL` configurada). Los tests automatizados actuales **mockean Prisma** en el contrato API; el servicio queda disponible para integración **futura** (fase B en [ADR-0004](../adr/ADR-0004-e2e-playwright-integration-roadmap.md)).
+El job inicia **PostgreSQL 16** (`DATABASE_URL` configurada). Tras `prisma migrate deploy`, **`npm run test:integration`** ejecuta HTTP + Prisma real en `tests/integration/`. El **contrato** API (`tests/api/`) sigue **mockeando** Prisma para validar OpenAPI ([ADR-0004](../adr/ADR-0004-e2e-playwright-integration-roadmap.md)).
 
 ## Artefactos
 
@@ -54,11 +55,11 @@ El job inicia **PostgreSQL 16** (`DATABASE_URL` configurada). Los tests automati
 
 **Alternativa:** build local con `npm run tauri build` o `npm run tauri dev`.
 
-## Mejoras futuras
+## Automatización opcional / seguimiento
 
-- [ ] Paso `npm audit --audit-level=high` (advertencia no bloqueante al inicio)
-- [ ] Tests de integración con PostgreSQL real (fase B, ADR-0004)
-- [ ] Build Tauri en runner Windows self-hosted para releases
-- [ ] semantic-release al fusionar en `main`
+- [x] Paso `npm audit --audit-level=high` tras `npm ci` con `continue-on-error: true` — [ADR-0006](../adr/ADR-0006-release-and-tauri-ci-workflows.md)
+- [x] Tests de integración con PostgreSQL real (fase B, ADR-0004) — `tests/integration/`, `npm run test:integration`
+- [x] Build Tauri en runner self-hosted — `.github/workflows/tauri-selfhosted.yml` (`workflow_dispatch`) — [ADR-0006](../adr/ADR-0006-release-and-tauri-ci-workflows.md)
+- [x] semantic-release — `release.config.cjs`, `.github/workflows/release.yml` — [ADR-0006](../adr/ADR-0006-release-and-tauri-ci-workflows.md)
 
 **Otros idiomas:** [English](../../en/quality/ci-cd.md) · [Português](../../pt-br/quality/ciclo-ci-cd.md)

@@ -10,7 +10,13 @@ Versioning: [Semantic Versioning](https://semver.org/).
 
 ### Added
 
-- **ADR-0004** — [Playwright E2E smoke + integration roadmap](adr/ADR-0004-e2e-playwright-integration-roadmap.md): `e2e/smoke.spec.ts`, `playwright.config.ts`, CI installs Chromium and runs `npm run test:e2e`; Vitest excludes `e2e/**`; PostgreSQL integration tests remain Phase B
+- **Toolchain:** Node **22 LTS** in CI (`.github/workflows/*.yml`), [`.nvmrc`](../../.nvmrc), `engines` in [`package.json`](../../package.json); [`.npmrc`](../../.npmrc) `legacy-peer-deps` so `npm ci` matches ESLint 10 + jsx-a11y
+- **Dependencies:** **Vite 6**, `@vitejs/plugin-react` 5.x, **Prisma 5.22**; `@types/node` 22; remaining npm audit noise limited to packages bundled inside the `npm` CLI (development tooling only)
+- **ADR-0005** — [Vitest coverage for `server.ts`](adr/ADR-0005-vitest-coverage-server-bootstrap.md): refactor bootstrap (`createServerInstance`, `bindHttpServer`, `startServer`), entry `server/main.ts`, `tests/server/server.test.ts`; `coverage.include` updated
+- **ADR-0006** — [Optional CI: semantic-release + Tauri self-hosted](adr/ADR-0006-release-and-tauri-ci-workflows.md): `npm audit` informational in CI; `release.config.cjs` + `release.yml`; `tauri-selfhosted.yml` (`workflow_dispatch`)
+- **CI:** non-blocking `npm audit --audit-level=high` after `npm ci`
+- **Trilingual JSDoc** on `calculateInvoice`, `calculateItemSubtotal`, and module header in [`src/lib/invoice.ts`](../../src/lib/invoice.ts); `createApp` in [`server/createApp.ts`](../../server/createApp.ts)
+- **ADR-0004** — [Playwright E2E smoke + integration roadmap](adr/ADR-0004-e2e-playwright-integration-roadmap.md): `e2e/smoke.spec.ts`, `playwright.config.ts`, CI installs Chromium and runs `npm run test:e2e`; Vitest excludes `e2e/**`; **Phase B:** `tests/integration/`, `npm run test:integration`, `vitest.integration.config.ts`; CI runs `prisma migrate deploy` then integration tests (real Prisma; contract tests still mock Prisma)
 - **Document lifecycle & validation** (quality): [document-lifecycle-and-validation.md](quality/document-lifecycle-and-validation.md); `npm run check:docs-map` validates paths in [DOCUMENT_LOCALE_MAP.md](../DOCUMENT_LOCALE_MAP.md); CI runs the check after i18n parity
 - **Trilingual JSDoc** example on `validateCUIT` in [`src/lib/validators.ts`](../../src/lib/validators.ts) (see [coding-standards.md](coding-standards.md))
 - **Documentation locale filenames (phase 3):** product/quality Markdown under `docs/en/`, `docs/es/`, and `docs/pt-br/` use **localized file names** per tree; canonical mapping in [DOCUMENT_LOCALE_MAP.md](../DOCUMENT_LOCALE_MAP.md); ADR files keep the **same technical slug** in each locale

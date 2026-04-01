@@ -53,7 +53,7 @@ Minimum requirements enforced by ESLint (`jsx-a11y`):
 ## Testing
 
 - Unit tests live in `src/lib/*.test.ts` (and a11y smoke in `src/App.a11y.test.tsx`).
-- **100%** coverage (lines, functions, branches, statements) in the agreed scope: `src/lib/**/*.ts` and `server/createApp.ts` (see [quality/testing-strategy.md](quality/testing-strategy.md) and [adr/ADR-0003-api-contract-testing.md](adr/ADR-0003-api-contract-testing.md)). Extending scope requires new thresholds and, if applicable, an **ADR**.
+- **100%** coverage (lines, functions, branches, statements) in the agreed scope: `src/lib/**/*.ts`, `server/createApp.ts`, and `server.ts` (see [quality/testing-strategy.md](quality/testing-strategy.md), [adr/ADR-0003-api-contract-testing.md](adr/ADR-0003-api-contract-testing.md), and [adr/ADR-0005-vitest-coverage-server-bootstrap.md](adr/ADR-0005-vitest-coverage-server-bootstrap.md)). Extending scope requires new thresholds and, if applicable, an **ADR**.
 - Tests must not mock the database; use `vi.mock('axios')` to isolate the HTTP layer.
 - Every primary action button must have a `data-testid` for future E2E use.
 

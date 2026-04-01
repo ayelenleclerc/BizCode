@@ -19,7 +19,7 @@ Este documento **não duplica** a arquitetura; aponta para evidências no reposi
 | Tema claro/escuro | [temas-interface.md](../temas-interface.md), [`index.html`](../../../index.html), [`Layout.tsx`](../../../src/components/layout/Layout.tsx) |
 | Contrato REST | [`openapi.yaml`](../../api/openapi.yaml) |
 | Fábrica Express | [`server/createApp.ts`](../../../server/createApp.ts) |
-| Entrada | [`server.ts`](../../../server.ts) |
+| Entrada | [`server/main.ts`](../../../server/main.ts) → [`server.ts`](../../../server.ts) (`startServer`) |
 | Cliente HTTP | [`src/lib/api.ts`](../../../src/lib/api.ts) |
 | Prisma | [`prisma/schema.prisma`](../../../prisma/schema.prisma) |
 | i18n | [`src/i18n/config.ts`](../../../src/i18n/config.ts), [estrategia-i18n.md](../estrategia-i18n.md) |

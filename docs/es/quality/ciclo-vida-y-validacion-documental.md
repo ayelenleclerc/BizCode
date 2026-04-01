@@ -24,7 +24,7 @@ Si cambias documentación narrativa:
 
 ## Verificación
 
-- **Automatizada:** CI ejecuta type-check, lint, pruebas unitarias/API, umbrales de cobertura, paridad i18n, **smoke E2E Playwright** (`npm run test:e2e` — ver [ADR-0004](../../adr/ADR-0004-e2e-playwright-integration-roadmap.md)) y comprobación del mapa documental.
+- **Automatizada:** CI ejecuta type-check, lint, pruebas unitarias/API, umbrales de cobertura, paridad i18n, **smoke E2E Playwright** (`npm run test:e2e`), **pruebas de integración PostgreSQL** (`npm run test:integration` tras `prisma migrate deploy` — ver [ADR-0004](../../adr/ADR-0004-e2e-playwright-integration-roadmap.md)) y comprobación del mapa documental.
 - **Humana:** revisión por pares; el texto debe coincidir con **evidencia** en el repositorio (sin especular).
 
 **Relacionado:** [trazabilidad-iso.md](trazabilidad-iso.md) · [plantillas-registros.md](plantillas-registros.md)

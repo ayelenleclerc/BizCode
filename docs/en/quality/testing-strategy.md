@@ -12,7 +12,7 @@
           ├──────────────────────────┤
           │   E2E (manual / Tauri)   │   Desktop shell not covered by Playwright harness
           ├──────────────────────────┤
-          │   Integration (future)   │   CI: PostgreSQL service available; tests not yet added (ADR-0004)
+          │   Integration (PostgreSQL) │   tests/integration/ — Prisma real, supertest (ADR-0004 phase B)
           ├──────────────────────────┤
           │   Unit + a11y            │   CI: 100% lines/functions/branches on src/lib/** and server/createApp.ts
           │   (Vitest+axe)           │       axe smoke on App (src/App.a11y.test.tsx)
@@ -27,8 +27,9 @@
 |---|---|---|---|---|
 | **`src/lib/**/*.ts`** (excludes `*.test.ts`) | **100%** | **100%** | **100%** | **100%** |
 | **`server/createApp.ts`** (Express API; injected Prisma) | **100%** | **100%** | **100%** | **100%** |
+| **`server.ts`** (bootstrap: `createServerInstance`, `bindHttpServer`, `startServer`; entry `server/main.ts`) | **100%** | **100%** | **100%** | **100%** |
 
-Additional coverage exclusions (bundler entries, `server.ts` bootstrap, React pages, etc.) only with an **ADR** and explicit `vitest.config.ts` change — see [ADR-0003](../adr/ADR-0003-api-contract-testing.md) and [ADR-0004](../adr/ADR-0004-e2e-playwright-integration-roadmap.md).
+Additional coverage exclusions (bundler entries, `server/main.ts` thin entry, React pages, etc.) only with an **ADR** and explicit `vitest.config.ts` change — see [ADR-0003](../adr/ADR-0003-api-contract-testing.md), [ADR-0004](../adr/ADR-0004-e2e-playwright-integration-roadmap.md), and [ADR-0005](../adr/ADR-0005-vitest-coverage-server-bootstrap.md).
 
 Thresholds are enforced by Vitest's `coverage.thresholds` configuration. The CI pipeline fails if any threshold is not met.
 
@@ -61,17 +62,21 @@ App.a11y.test.tsx       ← axe smoke on initial route (API mocked)
 tests/api/
   contract.test.ts      ← HTTP contract + 500 responses (Prisma mocked)
   validate-openapi-response.ts  ← Ajv against docs/api/openapi.yaml
+tests/server/
+  server.test.ts        ← `server.ts` bootstrap (Prisma mocked; see ADR-0005)
 e2e/
   smoke.spec.ts         ← Playwright smoke (production bundle via vite preview)
+tests/integration/
+  api.integration.test.ts  ← HTTP + real Prisma against PostgreSQL (`npm run test:integration`; excluded from default Vitest)
 ```
 
-Vitest **excludes** `e2e/**` (`vitest.config.ts`) so files under `e2e/` are only executed by Playwright.
+Vitest **excludes** `e2e/**` (`vitest.config.ts`) so files under `e2e/` are only executed by Playwright. **`tests/integration/**`** is excluded from the default Vitest run (no `DATABASE_URL` required for `npm run test:coverage`); integration tests use `vitest.integration.config.ts`.
 
 ## Mocking Strategy
 
 - **HTTP (Axios)**: Mocked via `vi.mock('axios')` using `vi.hoisted()` to create mock refs accessible in the factory function. This isolates tests from the network entirely.
 - **Browser APIs**: `localStorage`, `console.*` are mocked via `vi.spyOn` where needed (e.g., silencing `console.assert` from in-library self-tests).
-- **Database (Prisma)**: `api.test.ts` mocks Axios (HTTP client). **API contract** tests (`tests/api/contract.test.ts`) mock `PrismaClient` and validate responses against OpenAPI; they do not replace **integration** tests against real PostgreSQL (Phase B in [ADR-0004](../adr/ADR-0004-e2e-playwright-integration-roadmap.md)).
+- **Database (Prisma)**: `api.test.ts` mocks Axios (HTTP client). **API contract** tests (`tests/api/contract.test.ts`) mock `PrismaClient` and validate responses against OpenAPI. **Integration** tests (`tests/integration/`) use a real `PrismaClient` and PostgreSQL ([ADR-0004](../adr/ADR-0004-e2e-playwright-integration-roadmap.md) phase B); they complement contract tests and do not duplicate OpenAPI validation in the same file.
 
 ## Entry and Exit Criteria
 
@@ -82,6 +87,7 @@ Vitest **excludes** `e2e/**` (`vitest.config.ts`) so files under `e2e/` are only
 **Exit (CI passes):**
 - All unit/API tests pass (0 failures).
 - E2E smoke passes (`npm run test:e2e` — Playwright + Chromium).
+- Integration tests pass (`npm run test:integration` — requires migrated schema; CI runs `prisma migrate deploy` first).
 - All coverage thresholds are met.
 - Coverage report artifact is uploaded.
 

@@ -4,12 +4,14 @@ This matrix maps BizCode's quality artefacts to clauses of the applicable ISO st
 
 | Deliverable / Artefact | ISO 9001:2015 | ISO/IEC 12207:2017 | ISO/IEC 27001:2022 | ISO/IEC 25010:2023 | ISO/IEC 29119 |
 |---|---|---|---|---|---|
-| **testing-strategy.md** + Vitest (100% on `src/lib/**` and `server/createApp.ts`) | §8.7 Control of nonconforming outputs | §6.4.9 Software Qualification Testing | — | Reliability (§4.2.2) | 29119-2 (Test planning), 29119-4 (Test techniques) |
+| **testing-strategy.md** + Vitest (100% on `src/lib/**`, `server/createApp.ts`, `server.ts`) | §8.7 Control of nonconforming outputs | §6.4.9 Software Qualification Testing | — | Reliability (§4.2.2) | 29119-2 (Test planning), 29119-4 (Test techniques) |
 | **accessibility.md** + jsx-a11y (`--max-warnings 0`) + `App.a11y.test.tsx` (jest-axe) | §8.1 Operational planning | — | — | Usability §4.2.4 (Accessibility) | — |
 | **i18n-strategy.md** + check-i18n in CI | §8.1 Operational planning | — | — | Portability §4.2.8 (Adaptability) | — |
 | **security.md** (STRIDE model, OWASP mapping) | §8.1 Operational planning | §6.3.8 Software Construction | A.8.1–A.8.34 Technological controls | Security §4.2.6 | — |
 | **docs/api/openapi.yaml** + `tests/api/contract.test.ts` (Ajv) | §8.3 Design and development | §6.3.2 Software Design | — | Functional suitability §4.2.1 | 29119-2 (test design) |
 | **ADR-0003** (API contract) | §8.3.3 Design outputs | §6.3.6 Software Integration | — | Maintainability §4.2.7 | — |
+| **ADR-0005** (Vitest coverage — `server.ts`) | §8.7 | §6.4.9 | — | Maintainability §4.2.7 | 29119-2 |
+| **ADR-0006** (optional release / Tauri workflows) | §8.5 | §6.4.9 | A.8.25 | — | — |
 | **ci-cd.md** + `.github/workflows/ci.yml` | §8.5 Production and service provision | §6.3.6 Software Integration | A.8.25 Secure development lifecycle | — | — |
 | **quality-manual.md** + nonconformity process | §4.4 QMS processes, §10.2 Nonconformity | §6.1 Project planning | — | — | — |
 | **ADR-0001** (REST/Prisma decision) | §8.3.3 Design outputs | §6.3.2 Software Design | — | Maintainability §4.2.7 | — |

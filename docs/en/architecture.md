@@ -57,7 +57,8 @@ User action (keyboard/click)
 | `src/pages/clientes/` | Customer CRUD |
 | `src/pages/articulos/` | Product CRUD |
 | `src/pages/facturacion/` | Invoice creation and listing |
-| `server.ts` (root) | Entry: `createApp(prisma)` from `server/createApp.ts`, listen, and `PrismaClient` |
+| `server/main.ts` | CLI entry (`npm run server`): calls `startServer()` from `server.ts` |
+| `server.ts` (root) | Bootstrap: `createServerInstance`, `bindHttpServer`, `startServer`; uses `createApp` from `server/createApp.ts` |
 | `server/createApp.ts` | Reusable Express factory for OpenAPI contract tests |
 
 ## Theming (Tailwind dark mode)
@@ -68,7 +69,7 @@ User action (keyboard/click)
 
 ## Risks and Known Constraints
 
-- **API routes in a single module:** HTTP logic lives in `server/createApp.ts` (one file); `server.ts` only starts the process. Recommended evolution: domain routers (see future ADR if refactored).
+- **API routes in a single module:** HTTP logic lives in `server/createApp.ts` (one file); `server.ts` exposes bootstrap helpers; `server/main.ts` is the process entry for `npm run server`. Recommended evolution: domain routers (see future ADR if refactored).
 - **No authentication:** The API has no auth layer. It is intended to run locally on the user's machine (Tauri sidecar on loopback). If the app is ever exposed to a network, authentication must be added.
 - **Tauri build not in CI:** Requires platform-native WebKit. See [quality/ci-cd.md](quality/ci-cd.md).
 - **No offline mode:** The React SPA requires the Express sidecar to be running. Tauri lifecycle management ensures this in production.

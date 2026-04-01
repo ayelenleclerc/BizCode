@@ -19,7 +19,7 @@ This document **does not duplicate** architecture text. It points to **authorita
 | Light/dark theme (`darkMode: 'class'`, `<html>`, `localStorage`) | [theming.md](../theming.md), [`index.html`](../../../index.html), [`src/components/layout/Layout.tsx`](../../../src/components/layout/Layout.tsx) |
 | REST API contract | [`docs/api/openapi.yaml`](../../api/openapi.yaml) |
 | Express application factory | [`server/createApp.ts`](../../../server/createApp.ts) |
-| Process entry | [`server.ts`](../../../server.ts) |
+| Process entry | [`server/main.ts`](../../../server/main.ts) → [`server.ts`](../../../server.ts) (`startServer`) |
 | HTTP client and namespaces | [`src/lib/api.ts`](../../../src/lib/api.ts) |
 | Prisma schema | [`prisma/schema.prisma`](../../../prisma/schema.prisma) |
 | i18n configuration | [`src/i18n/config.ts`](../../../src/i18n/config.ts), [i18n-strategy.md](../i18n-strategy.md) |
