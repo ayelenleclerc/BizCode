@@ -24,7 +24,7 @@ Ao alterar documentação narrativa:
 
 ## Verificação
 
-- **Automatizada:** CI executa type-check, lint, testes, cobertura, paridade i18n e verificação do mapa documental.
+- **Automatizada:** CI executa type-check, lint, testes unitários/API, cobertura, paridade i18n, **smoke E2E Playwright** (`npm run test:e2e` — ver [ADR-0004](../../adr/ADR-0004-e2e-playwright-integration-roadmap.md)) e verificação do mapa documental.
 - **Humana:** revisão por pares; o texto deve refletir **evidência** no repositório (sem especular).
 
 **Relacionado:** [rastreabilidade-iso.md](rastreabilidade-iso.md) · [modelos-registros.md](modelos-registros.md)

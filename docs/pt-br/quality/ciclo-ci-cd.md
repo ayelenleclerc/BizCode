@@ -2,14 +2,16 @@
 
 ## Visão geral
 
-BizCode usa GitHub Actions para integração contínua. O pipeline está em `.github/workflows/ci.yml`.
+BizCode usa GitHub Actions. Definição: `.github/workflows/ci.yml`.
 
 ## Estágios
 
 ```
 push / pull_request → job quality (ubuntu-latest):
   checkout → Node 20 → npm ci → prisma generate →
-  type-check → lint → test:coverage → check:i18n → artefato de cobertura
+  type-check → lint → test:coverage → check:i18n →
+  playwright install chromium → test:e2e → check:docs-map →
+  artefato de cobertura
 ```
 
 ## Gatilhos
@@ -27,10 +29,12 @@ push / pull_request → job quality (ubuntu-latest):
 | lint | Erro ou **warning** ESLint (`--max-warnings 0`) |
 | test:coverage | Falha de teste ou cobertura abaixo do limite |
 | check:i18n | Chaves divergentes da fonte `es` |
+| test:e2e | Falha Playwright (build + `vite preview`; ver [ADR-0004](../adr/ADR-0004-e2e-playwright-integration-roadmap.md)) |
+| check:docs-map | Caminho do mapa documental ausente no disco |
 
 ## Serviços
 
-PostgreSQL 16 em container para testes; connection string `postgresql://bizcode:bizcode@localhost:5432/bizcode_test`.
+**PostgreSQL 16** em container (`DATABASE_URL`). Os testes atuais **mocam Prisma** no contrato API; o serviço prepara integração **futura** (fase B em [ADR-0004](../adr/ADR-0004-e2e-playwright-integration-roadmap.md)).
 
 ## Artefatos
 
@@ -38,6 +42,12 @@ PostgreSQL 16 em container para testes; connection string `postgresql://bizcode:
 
 ## Fora do CI
 
-Build Tauri desktop (WebKit nativo, display, toolchain Rust). Build local: `npm run tauri build`.
+Build desktop Tauri (WebKit nativo, display, Rust). Build local: `npm run tauri build`.
+
+## Melhorias futuras
+
+- [ ] `npm audit` (não bloqueante no início)
+- [ ] Testes de integração com PostgreSQL (fase B, ADR-0004)
+- [ ] Build Tauri em runner self-hosted
 
 **Outros idiomas:** [English](../../en/quality/ci-cd.md) · [Español](../../es/quality/ciclo-ci-cd.md)

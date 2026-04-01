@@ -24,7 +24,7 @@ When you change narrative documentation:
 
 ## Verification
 
-- **Automated:** CI runs type-check, lint, tests, coverage thresholds, i18n parity, and the documentation map check.
+- **Automated:** CI runs type-check, lint, unit/API tests, coverage thresholds, i18n parity, **Playwright E2E smoke** (`npm run test:e2e` — see [ADR-0004](../../adr/ADR-0004-e2e-playwright-integration-roadmap.md)), and the documentation map check.
 - **Human:** Peer review confirms wording matches **evidence** in the repository (no speculative behaviour).
 
 **Related:** [iso-traceability.md](iso-traceability.md) · [records-template.md](records-template.md)

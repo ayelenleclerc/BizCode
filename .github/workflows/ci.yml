@@ -57,6 +57,12 @@ jobs:
       - name: i18n parity check
         run: npm run check:i18n
 
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: E2E smoke (Playwright)
+        run: npm run test:e2e
+
       - name: Documentation locale map check
         run: npm run check:docs-map
 

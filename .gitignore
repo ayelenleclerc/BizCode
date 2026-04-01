@@ -10,3 +10,7 @@ build/
 src-tauri/target/
 migrations/
 coverage/
+
+playwright-report/
+test-results/
+blob-report/

@@ -65,7 +65,9 @@ npm run dev:full
 | `npm run test` | Run unit tests + API contract tests (OpenAPI + supertest) |
 | `npm run test:watch` | Run tests in watch mode |
 | `npm run test:coverage` | Run tests with V8 coverage report |
+| `npm run test:e2e` | Playwright smoke against Vite preview (`e2e/`; see ADR-0004) |
 | `npm run check:i18n` | Verify i18n key parity across locales |
+| `npm run check:docs-map` | Verify paths in `docs/DOCUMENT_LOCALE_MAP.md` exist |
 | `npm run migrate:dbf` | Migración desde DBF (script `scripts/migrate-from-dbf.ts`) |
 
 ### Environment Variables

@@ -7,17 +7,18 @@
 ## Testing Pyramid
 
 ```
-          ┌─────────────────┐
-          │   E2E (Manual)  │   Smoke test per release
-          ├─────────────────┤
-          │  Integration    │   CI: PostgreSQL service (ready; current tests mock HTTP)
-          │  (future)       │
-          ├─────────────────┤
-          │  Unit + a11y    │   CI: 100% lines/functions/branches on src/lib/** and server/createApp.ts
-          │  (Vitest+axe)   │       axe smoke on App (src/App.a11y.test.tsx)
-          ├─────────────────┤
-          │  API contract   │   tests/api/contract.test.ts (supertest + Ajv vs openapi.yaml)
-          └─────────────────┘
+          ┌──────────────────────────┐
+          │   E2E (Playwright smoke) │   CI: Chromium, vite preview (see ADR-0004)
+          ├──────────────────────────┤
+          │   E2E (manual / Tauri)   │   Desktop shell not covered by Playwright harness
+          ├──────────────────────────┤
+          │   Integration (future)   │   CI: PostgreSQL service available; tests not yet added (ADR-0004)
+          ├──────────────────────────┤
+          │   Unit + a11y            │   CI: 100% lines/functions/branches on src/lib/** and server/createApp.ts
+          │   (Vitest+axe)           │       axe smoke on App (src/App.a11y.test.tsx)
+          ├──────────────────────────┤
+          │   API contract           │   tests/api/contract.test.ts (supertest + Ajv vs openapi.yaml)
+          └──────────────────────────┘
 ```
 
 ## Coverage Policy
@@ -27,7 +28,7 @@
 | **`src/lib/**/*.ts`** (excludes `*.test.ts`) | **100%** | **100%** | **100%** | **100%** |
 | **`server/createApp.ts`** (Express API; injected Prisma) | **100%** | **100%** | **100%** | **100%** |
 
-Additional coverage exclusions (bundler entries, `server.ts` bootstrap, etc.) only with an **ADR** or approval in this strategy, named in `vitest.config.ts`. See [ADR-0003](../adr/ADR-0003-api-contract-testing.md).
+Additional coverage exclusions (bundler entries, `server.ts` bootstrap, React pages, etc.) only with an **ADR** and explicit `vitest.config.ts` change — see [ADR-0003](../adr/ADR-0003-api-contract-testing.md) and [ADR-0004](../adr/ADR-0004-e2e-playwright-integration-roadmap.md).
 
 Thresholds are enforced by Vitest's `coverage.thresholds` configuration. The CI pipeline fails if any threshold is not met.
 
@@ -45,6 +46,7 @@ Thresholds are enforced by Vitest's `coverage.thresholds` configuration. The CI 
 | yaml | latest | Local parse of `docs/api/openapi.yaml` (avoids fetch in Vitest) |
 | ajv + ajv-formats | latest | JSON Schema validation of response bodies |
 | jsdom | latest | DOM simulation for non-browser test environment |
+| @playwright/test | 1.x | E2E smoke against Vite preview (`e2e/`) — see ADR-0004 |
 
 ## Test File Locations
 
@@ -59,13 +61,17 @@ App.a11y.test.tsx       ← axe smoke on initial route (API mocked)
 tests/api/
   contract.test.ts      ← HTTP contract + 500 responses (Prisma mocked)
   validate-openapi-response.ts  ← Ajv against docs/api/openapi.yaml
+e2e/
+  smoke.spec.ts         ← Playwright smoke (production bundle via vite preview)
 ```
+
+Vitest **excludes** `e2e/**` (`vitest.config.ts`) so files under `e2e/` are only executed by Playwright.
 
 ## Mocking Strategy
 
 - **HTTP (Axios)**: Mocked via `vi.mock('axios')` using `vi.hoisted()` to create mock refs accessible in the factory function. This isolates tests from the network entirely.
 - **Browser APIs**: `localStorage`, `console.*` are mocked via `vi.spyOn` where needed (e.g., silencing `console.assert` from in-library self-tests).
-- **Database (Prisma)**: `api.test.ts` mocks Axios (HTTP client). **API contract** tests (`tests/api/contract.test.ts`) mock `PrismaClient` and validate responses against OpenAPI; they do not replace a future integration test against real PostgreSQL in CI (service is already available in the workflow for evolution).
+- **Database (Prisma)**: `api.test.ts` mocks Axios (HTTP client). **API contract** tests (`tests/api/contract.test.ts`) mock `PrismaClient` and validate responses against OpenAPI; they do not replace **integration** tests against real PostgreSQL (Phase B in [ADR-0004](../adr/ADR-0004-e2e-playwright-integration-roadmap.md)).
 
 ## Entry and Exit Criteria
 
@@ -74,7 +80,8 @@ tests/api/
 - ESLint reports zero errors.
 
 **Exit (CI passes):**
-- All test cases pass (0 failures).
+- All unit/API tests pass (0 failures).
+- E2E smoke passes (`npm run test:e2e` — Playwright + Chromium).
 - All coverage thresholds are met.
 - Coverage report artifact is uploaded.
 

@@ -10,6 +10,7 @@ Versionamento: [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **ADR-0004** — [smoke E2E Playwright e roteiro de integração](adr/ADR-0004-e2e-playwright-integration-roadmap.md): `e2e/smoke.spec.ts`, `playwright.config.ts`, CI instala Chromium e executa `npm run test:e2e`; Vitest exclui `e2e/**`; testes de integração com PostgreSQL permanecem na fase B
 - **Ciclo de vida documental e validação** (qualidade): [ciclo-vida-e-validacao-documental.md](quality/ciclo-vida-e-validacao-documental.md); `npm run check:docs-map` verifica caminhos no [DOCUMENT_LOCALE_MAP.md](../DOCUMENT_LOCALE_MAP.md); CI executa após paridade i18n
 - **JSDoc trilíngue** de exemplo em `validateCUIT` em [`src/lib/validators.ts`](../../src/lib/validators.ts) (ver [padroes-codigo.md](padroes-codigo.md))
 - **Nomes de arquivo localizados por idioma (fase 3):** a documentação em `docs/en/`, `docs/es/` e `docs/pt-br/` usa **nomes distintos por árvore**; mapa canônico em [DOCUMENT_LOCALE_MAP.md](../DOCUMENT_LOCALE_MAP.md); ADRs mantêm o **mesmo slug técnico** em cada idioma

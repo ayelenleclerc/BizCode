@@ -55,7 +55,7 @@ A task is **Done** only when ALL of the following are true:
 - [ ] Code compiles without errors (`npm run type-check` → exit 0)
 - [ ] No new ESLint errors (`npm run lint` → exit 0)
 - [ ] All unit tests pass (`npm run test` → exit 0)
-- [ ] Coverage thresholds met: **100%** en `src/lib/**` (líneas/funciones/ramas según `vitest.config.ts` y [TESTING_STRATEGY](docs/en/quality/testing-strategy.md))
+- [ ] Coverage thresholds met: **100%** en `src/lib/**` y `server/createApp.ts` (véase `vitest.config.ts` y [testing-strategy](docs/en/quality/testing-strategy.md)); ampliar alcance solo con **ADR** explícito
 - [ ] New user-visible strings use `t()` — no hardcoded text in components
 - [ ] `npm run check:i18n` passes (en and pt-BR keys are in sync with es)
 - [ ] API contract tests pass (`tests/api/contract.test.ts`) and OpenAPI remains aligned with `server/createApp.ts` (see [docs/api/openapi.yaml](docs/api/openapi.yaml))
@@ -74,6 +74,7 @@ npm run lint          # ESLint
 npm run test:coverage # Tests + coverage report
 npm run check:i18n   # i18n parity
 npm run check:docs-map  # DOCUMENT_LOCALE_MAP.md paths exist
+npm run test:e2e        # Playwright smoke (vite preview); see docs/en/adr/ADR-0004-e2e-playwright-integration-roadmap.md
 ```
 
 All must exit 0 before opening a PR.

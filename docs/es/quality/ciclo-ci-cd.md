@@ -7,22 +7,11 @@ BizCode usa GitHub Actions para integración continua. El pipeline está definid
 ## Etapas del pipeline
 
 ```
-push / pull_request
-      │
-      ▼
-┌─────────────────────────────────────────────┐
-│  Job: quality (ubuntu-latest)               │
-│                                             │
-│  1. Checkout                                │
-│  2. Setup Node.js 20 (cache: npm)           │
-│  3. npm ci --legacy-peer-deps               │
-│  4. npx prisma generate                     │
-│  5. npm run type-check        ← bloquea      │
-│  6. npm run lint              ← bloquea      │
-│  7. npm run test:coverage     ← bloquea (Vitest + cobertura + contrato OpenAPI + smoke axe) │
-│  8. npm run check:i18n        ← bloquea      │
-│  9. Subida de artefacto de cobertura (siempre) │
-└─────────────────────────────────────────────┘
+push / pull_request → job quality (ubuntu-latest):
+  checkout → Node 20 → npm ci → prisma generate →
+  type-check → lint → test:coverage → check:i18n →
+  playwright install chromium → test:e2e → check:docs-map →
+  artefacto de cobertura
 ```
 
 ## Disparadores
@@ -42,10 +31,12 @@ Un paso bloquea el pipeline (código de salida ≠ 0) cuando:
 | lint | Cualquier error o **advertencia** de ESLint (`npm run lint` usa `--max-warnings 0`) |
 | test:coverage | Fallo de test O umbral de cobertura no cumplido |
 | check:i18n | Claves faltantes o sobrantes vs. fuente `es` |
+| test:e2e | Fallo de Playwright (incluye `vite build` + preview; ver [ADR-0004](../adr/ADR-0004-e2e-playwright-integration-roadmap.md)) |
+| check:docs-map | Ruta del mapa documental inexistente en disco |
 
 ## Servicios
 
-El job de CI inicia un contenedor de servicio PostgreSQL 16 para tests de integración `api.test.ts`. Cadena: `postgresql://bizcode:bizcode@localhost:5432/bizcode_test`.
+El job inicia **PostgreSQL 16** (`DATABASE_URL` configurada). Los tests automatizados actuales **mockean Prisma** en el contrato API; el servicio queda disponible para integración **futura** (fase B en [ADR-0004](../adr/ADR-0004-e2e-playwright-integration-roadmap.md)).
 
 ## Artefactos
 
@@ -66,7 +57,7 @@ El job de CI inicia un contenedor de servicio PostgreSQL 16 para tests de integr
 ## Mejoras futuras
 
 - [ ] Paso `npm audit --audit-level=high` (advertencia no bloqueante al inicio)
-- [ ] E2E con Playwright (Xvfb en CI)
+- [ ] Tests de integración con PostgreSQL real (fase B, ADR-0004)
 - [ ] Build Tauri en runner Windows self-hosted para releases
 - [ ] semantic-release al fusionar en `main`
 

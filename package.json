@@ -15,8 +15,9 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
-    "lint": "eslint src server tests --ext .ts,.tsx --max-warnings 0",
-    "lint:fix": "eslint src server tests --ext .ts,.tsx --fix --max-warnings 0",
+    "test:e2e": "playwright test",
+    "lint": "eslint src server tests e2e --ext .ts,.tsx --max-warnings 0",
+    "lint:fix": "eslint src server tests e2e --ext .ts,.tsx --fix --max-warnings 0",
     "check:i18n": "tsx scripts/check-i18n.ts",
     "check:docs-map": "tsx scripts/check-docs-locale-map.ts",
     "migrate:dbf": "tsx scripts/migrate-from-dbf.ts"
@@ -41,6 +42,7 @@
   "devDependencies": {
     "@apidevtools/swagger-parser": "^12.1.0",
     "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.59.0",
     "@prisma/client": "^5.11.0",
     "@tauri-apps/cli": "~1.5.14",
     "@testing-library/dom": "^10.4.1",

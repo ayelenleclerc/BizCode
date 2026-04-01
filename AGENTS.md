@@ -9,7 +9,7 @@
 - **Convenciones de código y comentarios trilingües:** [docs/en/coding-standards.md](docs/en/coding-standards.md) · [es](docs/es/estandares-codigo.md) · [pt-BR](docs/pt-br/padroes-codigo.md)
 - **Accesibilidad:** [docs/ACCESSIBILITY.md](docs/ACCESSIBILITY.md) (WCAG 2.2 AA como mínimo; ESLint `jsx-a11y` con cero advertencias)
 - **i18n:** [docs/en/i18n-strategy.md](docs/en/i18n-strategy.md) · [es](docs/es/estrategia-i18n.md) · [pt-BR](docs/pt-br/estrategia-i18n.md); no introducir literales de usuario en JSX sin `t()`
-- **Pruebas y cobertura:** [docs/en/quality/testing-strategy.md](docs/en/quality/testing-strategy.md) — cobertura 100% en el alcance definido (`src/lib/**`, `server/createApp.ts`); [es](docs/es/quality/estrategia-pruebas.md) · [pt-BR](docs/pt-br/quality/estrategia-testes.md)
+- **Pruebas y cobertura:** [docs/en/quality/testing-strategy.md](docs/en/quality/testing-strategy.md) — cobertura 100% en el alcance definido (`src/lib/**`, `server/createApp.ts`); E2E smoke Playwright y hoja de ruta en [ADR-0004](docs/en/adr/ADR-0004-e2e-playwright-integration-roadmap.md); [es](docs/es/quality/estrategia-pruebas.md) · [pt-BR](docs/pt-br/quality/estrategia-testes.md)
 - **Política de idiomas de documentación:** [docs/I18N_DOCUMENTATION.md](docs/I18N_DOCUMENTATION.md) · mapa canónico [docs/DOCUMENT_LOCALE_MAP.md](docs/DOCUMENT_LOCALE_MAP.md); si cambian rutas documentales, `npm run check:docs-map` debe pasar (véase [docs/en/quality/document-lifecycle-and-validation.md](docs/en/quality/document-lifecycle-and-validation.md))
 - **API:** cambios en rutas Express deben reflejarse en [docs/api/openapi.yaml](docs/api/openapi.yaml)
 
