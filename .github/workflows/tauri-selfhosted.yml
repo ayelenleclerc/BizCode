@@ -1,0 +1,31 @@
+# Build desktop Tauri en un runner self-hosted (Linux/Windows con dependencias nativas).
+# No se ejecuta en push/PR por defecto; solo manual. Ver ADR-0006.
+name: Tauri build (self-hosted)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  tauri:
+    runs-on: self-hosted
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Web build (Vite)
+        run: npm run build:web
+
+      - name: Tauri build
+        run: npm run build
