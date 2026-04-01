@@ -1,5 +1,7 @@
 /**
- * Lógica de cálculo de facturas según IVA argentino
+ * @en Argentine VAT invoice line aggregation (net, IVA buckets, total).
+ * @es Agregación de líneas de factura con IVA argentino (netos, IVA, total).
+ * @pt-BR Agregação de linhas de fatura com IVA argentino (netos, IVA, total).
  */
 
 export interface InvoiceItem {
@@ -19,9 +21,9 @@ export interface InvoiceTotals {
 }
 
 /**
- * Calcula los totales de una factura según IVA de cliente y artículos
- * clienteIva: RI, Mono, CF, Exento
- * items: con datos de cantidad, precio, descuento e iva del articulo (1=21%, 2=10.5%, 3=exento)
+ * @en Computes invoice totals from line items and customer VAT category (`clienteIva`: RI, Mono, CF, Exento). Article VAT codes: `1` 21%, `2` 10.5%, `3` exempt.
+ * @es Calcula totales según ítems y condición IVA del cliente; `articuloIva` 1/2/3 según alícuota del artículo.
+ * @pt-BR Calcula totais a partir dos itens e da condição de IVA do cliente; `articuloIva` 1/2/3 conforme alíquota.
  */
 export function calculateInvoice(
   items: Array<{
@@ -78,7 +80,9 @@ export function calculateInvoice(
 }
 
 /**
- * Calcula subtotal de un item
+ * @en Line subtotal after discount percentage.
+ * @es Subtotal de línea tras descuento porcentual.
+ * @pt-BR Subtotal da linha após desconto percentual.
  */
 export function calculateItemSubtotal(cantidad: number, precio: number, dscto: number): number {
   const subtotal = cantidad * precio

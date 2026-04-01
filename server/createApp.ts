@@ -8,7 +8,9 @@ function errorMessage(err: unknown): string {
 }
 
 /**
- * Aplicación Express reutilizable en tests (supertest) y en `server.ts`.
+ * @en Express application factory for the REST API (tests via supertest, runtime via `server.ts`).
+ * @es Fábrica de la aplicación Express para la API REST (pruebas con supertest, ejecución vía `server.ts`).
+ * @pt-BR Fábrica do app Express para a API REST (testes com supertest, execução via `server.ts`).
  */
 export function createApp(prisma: PrismaClient): Application {
   const app = express()

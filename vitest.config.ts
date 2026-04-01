@@ -8,7 +8,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 export default defineConfig({
   plugins: [react()],
   test: {
-    exclude: [...configDefaults.exclude, 'e2e/**'],
+    exclude: [...configDefaults.exclude, 'e2e/**', 'tests/integration/**'],
     environment: 'jsdom',
     environmentMatchGlobs: [['tests/api/**', 'node']],
     globals: true,
@@ -23,8 +23,8 @@ export default defineConfig({
         branches: 100,
         statements: 100,
       },
-      include: ['src/lib/**/*.ts', 'server/createApp.ts'],
-      exclude: ['src/lib/**/*.test.ts', '**/*.d.ts'],
+      include: ['src/lib/**/*.ts', 'server/createApp.ts', 'server.ts'],
+      exclude: ['src/lib/**/*.test.ts', '**/*.d.ts', 'server/main.ts'],
     },
   },
   resolve: {
