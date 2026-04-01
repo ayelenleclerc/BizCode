@@ -1,6 +1,11 @@
 node_modules/
 dist/
 build/
+
+# Local legacy / reference copy (not part of the repo tree; match casing on disk / Git)
+Programa_Viejo/
+programa_viejo/
+
 .env
 .env.local
 *.log
