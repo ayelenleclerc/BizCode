@@ -56,8 +56,20 @@ El job inicia **PostgreSQL 16** (`DATABASE_URL` configurada). Tras `prisma migra
 
 **Alternativa:** build local con `npm run tauri build` o `npm run tauri dev`.
 
+## Rama huérfana `documentacion`
+
+La rama **huérfana** `documentacion` **no** contiene código de aplicación: solo una instantánea documental para publicación estática (p. ej. GitHub Pages).
+
+| Elemento | Detalle |
+|---|---|
+| Workflow | `.github/workflows/sync-documentacion.yml` |
+| Cuándo corre | `push` a **`main`** que modifique `docs/**`, `Certificación-ISO/**`, `README.md`, `AGENTS.md` o `CONTRIBUTING.md` en la raíz; o **`workflow_dispatch`** (Actions → *Sync documentacion branch*) |
+| Ref manual | Entrada opcional `source_ref` (por defecto `main`) para copiar desde otra rama o SHA |
+| Ramas de código | Sin cambios: trabajo en `develop` / `feature/*` / `fix/*`, integración en `main` según [CONTRIBUTING](../../../CONTRIBUTING.md); este job **no** sube código de app a `documentacion` |
+
 ## Automatización opcional / seguimiento
 
+- [x] Sincronización de la rama huérfana `documentacion` desde `main` — `.github/workflows/sync-documentacion.yml` (véase *Rama huérfana documentacion* arriba)
 - [x] Paso `npm audit --audit-level=high` tras `npm ci` con `continue-on-error: true` — [ADR-0006](../adr/ADR-0006-release-and-tauri-ci-workflows.md)
 - [x] Tests de integración con PostgreSQL real (fase B, ADR-0004) — `tests/integration/`, `npm run test:integration`
 - [x] Build Tauri en runner self-hosted — `.github/workflows/tauri-selfhosted.yml` (`workflow_dispatch`) — [ADR-0006](../adr/ADR-0006-release-and-tauri-ci-workflows.md)

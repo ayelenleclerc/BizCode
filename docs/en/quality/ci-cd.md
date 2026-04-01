@@ -67,8 +67,20 @@ The job starts a **PostgreSQL 16** service container (`DATABASE_URL` is set). Af
 
 **Tauri desktop build** is excluded from CI (native WebKit/WebView2, display server, Rust toolchain). See workflow comments in `.github/workflows/ci.yml`.
 
+## Documentation branch (`documentacion`)
+
+The **orphan** branch `documentacion` contains **no application source** — only a snapshot of documentation suitable for static hosting (e.g. GitHub Pages).
+
+| Item | Detail |
+|---|---|
+| Workflow | `.github/workflows/sync-documentacion.yml` |
+| When it runs | `push` to **`main`** that touches `docs/**`, `Certificación-ISO/**`, root `README.md`, `AGENTS.md`, or `CONTRIBUTING.md`; or **`workflow_dispatch`** (Actions → *Sync documentacion branch*) |
+| Manual ref | Optional input `source_ref` (default `main`) to copy from another branch or SHA |
+| Code branches | Unchanged: work on `develop` / `feature/*` / `fix/*`, merge to `main` per [CONTRIBUTING](../../../CONTRIBUTING.md); this job **does not** land app code on `documentacion` |
+
 ## Optional / follow-up automation
 
+- [x] **Sync `documentacion` orphan branch** from `main` — `.github/workflows/sync-documentacion.yml` (see *Documentation branch* above)
 - [x] **`npm audit --audit-level=high`** after `npm ci` with `continue-on-error: true` (visibility without blocking the gate) — see [ADR-0006](../adr/ADR-0006-release-and-tauri-ci-workflows.md)
 - [x] PostgreSQL-backed integration tests (Phase B, ADR-0004) — `tests/integration/`, `npm run test:integration`
 - [x] **Tauri build on self-hosted runner** — `.github/workflows/tauri-selfhosted.yml` (`workflow_dispatch` only) — [ADR-0006](../adr/ADR-0006-release-and-tauri-ci-workflows.md)

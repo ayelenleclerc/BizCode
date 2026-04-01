@@ -46,8 +46,20 @@ push / pull_request → job quality (ubuntu-latest):
 
 Build desktop Tauri (WebKit nativo, display, Rust). Build local: `npm run tauri build`.
 
+## Branch órfão `documentacion`
+
+O branch **órfão** `documentacion` **não** contém código da aplicação — apenas um snapshot de documentação para hospedagem estática (ex.: GitHub Pages).
+
+| Item | Detalhe |
+|---|---|
+| Workflow | `.github/workflows/sync-documentacion.yml` |
+| Quando executa | `push` em **`main`** que altere `docs/**`, `Certificación-ISO/**`, `README.md`, `AGENTS.md` ou `CONTRIBUTING.md` na raiz; ou **`workflow_dispatch`** (Actions → *Sync documentacion branch*) |
+| Ref manual | Entrada opcional `source_ref` (padrão `main`) para copiar de outro branch ou SHA |
+| Branches de código | Inalterado: trabalho em `develop` / `feature/*` / `fix/*`, merge em `main` conforme [CONTRIBUTING](../../../CONTRIBUTING.md); este job **não** envia código de app para `documentacion` |
+
 ## Automação opcional
 
+- [x] Sincronização do branch órfão `documentacion` a partir de `main` — `.github/workflows/sync-documentacion.yml` (ver *Branch órfão documentacion* acima)
 - [x] `npm audit --audit-level=high` após `npm ci` com `continue-on-error: true` — [ADR-0006](../adr/ADR-0006-release-and-tauri-ci-workflows.md)
 - [x] Testes de integração com PostgreSQL (fase B, ADR-0004) — `tests/integration/`, `npm run test:integration`
 - [x] Build Tauri em runner self-hosted — `.github/workflows/tauri-selfhosted.yml` (`workflow_dispatch`) — [ADR-0006](../adr/ADR-0006-release-and-tauri-ci-workflows.md)

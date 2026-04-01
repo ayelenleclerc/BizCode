@@ -18,6 +18,8 @@ See also [AGENTS.md](AGENTS.md) for the short index.
 
 ## Branch Workflow
 
+### Application code
+
 ```
 main          ← stable, protected, CI must be green
   └── develop ← integration branch
@@ -30,6 +32,14 @@ main          ← stable, protected, CI must be green
 - Open a Pull Request targeting `develop`.
 - `main` is updated via merge from `develop` after a release.
 - Direct pushes to `main` are prohibited.
+
+### Published documentation (`documentacion`)
+
+The **orphan** branch `documentacion` contains **no application source** — only files copied from `main` for static hosting (e.g. GitHub Pages).
+
+- **Automation:** GitHub Actions **`.github/workflows/sync-documentacion.yml`** runs on pushes to **`main`** when `docs/**`, `Certificación-ISO/**`, or root `README.md`, `AGENTS.md`, or `CONTRIBUTING.md` change. It replaces the tip of `documentacion` with a snapshot of those paths. **Manual run:** Actions → *Sync documentacion branch* → *Run workflow* (optional `source_ref`, default `main`).
+- **Policy:** You still author and review documentation in normal branches; the workflow publishes **after** changes reach `main`. It does **not** merge code into `documentacion`.
+- **Details:** [docs/en/quality/ci-cd.md](docs/en/quality/ci-cd.md) · [es](docs/es/quality/ciclo-ci-cd.md) · [pt-BR](docs/pt-br/quality/ciclo-ci-cd.md) (section *Documentation branch* / *Rama huérfana* / *Branch huérfã*).
 
 ## Commit Convention
 

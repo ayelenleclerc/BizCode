@@ -1,0 +1,77 @@
+# Syncs documentation-only content from main to the orphan branch `documentacion`.
+# Code stays on main / develop / feature branches; this job publishes a doc snapshot for GitHub Pages or static hosting.
+
+name: Sync documentacion branch
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/**'
+      - 'Certificación-ISO/**'
+      - 'CONTRIBUTING.md'
+      - 'AGENTS.md'
+      - 'README.md'
+      - '.github/workflows/sync-documentacion.yml'
+  workflow_dispatch:
+    inputs:
+      source_ref:
+        description: 'Git ref to copy from (branch or SHA; default main)'
+        required: false
+        default: 'main'
+
+concurrency:
+  group: sync-documentacion
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source tree
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event_name == 'workflow_dispatch' && (github.event.inputs.source_ref || 'main') || github.sha }}
+
+      - name: Push docs snapshot to documentacion
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git fetch origin
+
+          SOURCE_COMMIT="$(git rev-parse HEAD)"
+          echo "Source commit: ${SOURCE_COMMIT}"
+
+          git fetch origin documentacion 2>/dev/null || true
+
+          if git rev-parse --verify origin/documentacion >/dev/null 2>&1; then
+            git checkout -B documentacion origin/documentacion
+          else
+            git checkout --orphan documentacion
+          fi
+
+          git rm -rf . >/dev/null 2>&1 || true
+          find . -mindepth 1 -maxdepth 1 ! -name '.git' -exec rm -rf {} +
+
+          git checkout "${SOURCE_COMMIT}" -- \
+            docs \
+            "Certificación-ISO" \
+            README.md \
+            AGENTS.md \
+            CONTRIBUTING.md
+
+          git add -A
+          if git diff --staged --quiet; then
+            echo "No changes to publish on documentacion (tree already matches)."
+            exit 0
+          fi
+
+          SHORT="${SOURCE_COMMIT:0:7}"
+          git commit -m "sync: documentación (${SHORT})"
+          git push origin HEAD:documentacion
