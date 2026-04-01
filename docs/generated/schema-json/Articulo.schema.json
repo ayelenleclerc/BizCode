@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "properties": {
+    "activo": {
+      "type": "boolean"
+    },
+    "codigo": {
+      "type": "integer"
+    },
+    "condIva": {
+      "type": "string"
+    },
+    "costo": {
+      "type": "number"
+    },
+    "descripcion": {
+      "type": "string"
+    },
+    "id": {
+      "type": "integer"
+    },
+    "minimo": {
+      "type": "integer"
+    },
+    "precioLista1": {
+      "type": "number"
+    },
+    "precioLista2": {
+      "type": "number"
+    },
+    "rubro": {
+      "$ref": "./Rubro.schema.json"
+    },
+    "rubroId": {
+      "type": "integer"
+    },
+    "stock": {
+      "type": "integer"
+    },
+    "umedida": {
+      "type": "string"
+    }
+  },
+  "title": "Articulo",
+  "type": "object"
+}

@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "properties": {
+    "articulo": {
+      "$ref": "./Articulo.schema.json"
+    },
+    "articuloId": {
+      "type": "integer"
+    },
+    "cantidad": {
+      "type": "number"
+    },
+    "dscto": {
+      "type": "number"
+    },
+    "id": {
+      "type": "integer"
+    },
+    "precio": {
+      "type": "number"
+    },
+    "subtotal": {
+      "type": "number"
+    }
+  },
+  "title": "FacturaItem",
+  "type": "object"
+}

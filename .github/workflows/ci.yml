@@ -55,6 +55,12 @@ jobs:
       - name: TypeScript type-check
         run: npm run type-check
 
+      - name: Generate documentation (TypeDoc, OpenAPI MD, schemas, SBOM)
+        run: npm run docs:generate
+
+      - name: Verify generated docs match committed files
+        run: git diff --exit-code -- docs/generated docs/api/openapi-reference.generated.md docs/evidence/sbom-cyclonedx.json
+
       - name: ESLint (jsx-a11y y TypeScript — cero advertencias)
         run: npm run lint
 

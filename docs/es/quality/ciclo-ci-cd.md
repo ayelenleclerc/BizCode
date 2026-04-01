@@ -9,7 +9,7 @@ BizCode usa GitHub Actions para integración continua. El pipeline está definid
 ```
 push / pull_request → job quality (ubuntu-latest):
   checkout → Node 22 → npm ci → npm audit (informativo) → prisma generate → prisma migrate deploy →
-  type-check → lint → test:coverage → check:i18n →
+  type-check → docs:generate → git diff (docs generados) → lint → test:coverage → check:i18n →
   playwright install chromium → test:e2e → test:integration → check:docs-map →
   artefacto de cobertura
 ```
@@ -28,6 +28,7 @@ Un paso bloquea el pipeline (código de salida ≠ 0) cuando:
 | Paso | Condición |
 |---|---|
 | type-check | Cualquier error de compilación TypeScript |
+| docs:generate + git diff | Desalineación entre lo commitado y la documentación regenerada (`docs/generated/`, `docs/api/openapi-reference.generated.md`, `docs/evidence/sbom-cyclonedx.json`) |
 | lint | Cualquier error o **advertencia** de ESLint (`npm run lint` usa `--max-warnings 0`) |
 | test:coverage | Fallo de test O umbral de cobertura no cumplido |
 | check:i18n | Claves faltantes o sobrantes vs. fuente `es` |

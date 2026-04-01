@@ -1,0 +1,37 @@
+# Revisión periódica de dependencias: audit + listado outdated (no modifica lockfile).
+# Las reglas de Cursor no ejecutan cron; este workflow sí.
+name: Dependency maintenance
+
+on:
+  schedule:
+    # Lunes 06:00 UTC — semanal; ajustar si se prefiere quincenal/mensual
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: npm audit & outdated
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: npm audit (informational)
+        continue-on-error: true
+        run: npm audit --audit-level=high
+
+      - name: npm outdated (informational)
+        continue-on-error: true
+        run: npm outdated || true

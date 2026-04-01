@@ -1,0 +1,23 @@
+---
+description: Cadencia y checklist de mantenimiento de dependencias (npm); enlaza con CI programada
+globs: package.json
+alwaysApply: false
+---
+
+# Mantenimiento de dependencias (npm)
+
+## Límite de las reglas de Cursor
+
+Una **regla** no ejecuta tareas por sí sola ni en fechas concretas. La **revisión periódica automática** del repo está en **GitHub Actions**: `.github/workflows/dependency-maintenance.yml` (cron semanal + ejecución manual).
+
+## Cadencia recomendada (experto)
+
+- **Semanal** (la del workflow): equilibrio razonable entre **seguridad** (CVEs, `npm audit`) y **ruido** (menos PRs/cambios que un barrido diario).
+- Proyectos con bajo ritmo de releases: se puede pasar a **quincenal o mensual** editando el `cron` del workflow; no recomendar **diario** salvo política de seguridad explícita.
+
+## Al tocar `package.json` o el lockfile
+
+1. Preferir **actualizaciones incrementales** (menor riesgo) y leer notas de versión en paquetes mayores.
+2. Tras cambios: `npm ci`, `npm run build` / pruebas según `package.json`, y comprobar que CI sigue verde.
+3. `npm audit`: revisar hallazgos; no asumir que `npm audit fix` es siempre seguro sin pruebas.
+4. Node del proyecto: `.nvmrc` y `engines` en `package.json` deben mantenerse alineados con CI (Node 22 en `.github/workflows/`).

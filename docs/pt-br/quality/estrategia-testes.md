@@ -67,6 +67,7 @@ O Vitest **exclui** `e2e/**` (`vitest.config.ts`) para que apenas o Playwright e
 
 - **Axios:** `vi.mock('axios')` com `vi.hoisted()`.
 - **Prisma:** mockado nos testes de contrato; em **`tests/integration/`** usa-se `PrismaClient` real com PostgreSQL ([ADR-0004](../adr/ADR-0004-e2e-playwright-integration-roadmap.md) fase B), complementando o contrato.
+- **Explorador interativo (Swagger UI):** servido em `/api-docs` com a API em execução (`npm run server`). Referência e política: [plano-swagger-openapi-ui.md](plano-swagger-openapi-ui.md) (equivalentes EN/ES no [DOCUMENT_LOCALE_MAP.md](../../DOCUMENT_LOCALE_MAP.md)). Não substitui o contrato nem `docs/api/openapi.yaml`.
 
 ## Critérios de entrada e saída
 

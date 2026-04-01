@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "properties": {
+    "codigo": {
+      "type": "integer"
+    },
+    "descripcion": {
+      "type": "string"
+    },
+    "id": {
+      "type": "integer"
+    },
+    "vto_dias": {
+      "type": "integer"
+    }
+  },
+  "title": "FormaPago",
+  "type": "object"
+}

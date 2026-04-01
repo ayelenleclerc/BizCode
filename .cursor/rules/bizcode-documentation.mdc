@@ -7,7 +7,9 @@ alwaysApply: false
 # Documentación (`docs/`)
 
 - Mantener **paridad de contenido** entre `docs/en/`, `docs/es/` y `docs/pt-br/` para el mismo documento lógico; rutas según [docs/DOCUMENT_LOCALE_MAP.md](docs/DOCUMENT_LOCALE_MAP.md) (nombres localizados; ADR con el mismo slug en los tres árboles).
+- Documentación del **paquete ISO** (manual de calidad, trazabilidad, plantillas de registros, ciclo de vida): bajo `docs/*/certificacion-iso/`; punto de entrada en la raíz: `Certificación-ISO/README.md`; regla dedicada [certificacion-iso.mdc](certificacion-iso.mdc).
 - No afirmar certificación ISO; el repositorio es **ISO-ready** (auditable) mediante manuales y matrices existentes.
 - Changelog del producto: si el cambio es visible para el usuario, actualizar **[Unreleased]** en `docs/en/changelog.md`, `docs/es/historial-de-cambios.md` y `docs/pt-br/historico-de-alteracoes.md`.
 - Si cambian rutas en `docs/DOCUMENT_LOCALE_MAP.md`, ejecutar `npm run check:docs-map` antes del merge (también en CI).
 - Enlaces relativos correctos; los stubs en la raíz de `docs/` deben listar las tres rutas locales cuando apliquen.
+- **Artefactos generados** (`docs/generated/`, `docs/api/openapi-reference.generated.md`, parte de la evidencia en `docs/evidence/`): no editarlos a mano; regenerar con `npm run docs:generate` y commitear. La narrativa sobre ellos vive en los tres idiomas según el mapa (p. ej. [docs/en/quality/generated-documentation.md](docs/en/quality/generated-documentation.md)). Regla detallada: [doc-generation.mdc](doc-generation.mdc).

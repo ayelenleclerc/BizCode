@@ -1,10 +1,31 @@
+import path from 'node:path'
+import { readFileSync } from 'node:fs'
+import { fileURLToPath } from 'node:url'
 import express from 'express'
 import type { Application, Request, Response } from 'express'
 import cors from 'cors'
 import type { PrismaClient } from '@prisma/client'
+import { parse as parseYaml } from 'yaml'
+import swaggerUi from 'swagger-ui-express'
 
 function errorMessage(err: unknown): string {
   return err instanceof Error ? err.message : String(err)
+}
+
+let cachedOpenApiDocument: Record<string, unknown> | undefined
+
+/**
+ * @en Loads and caches `docs/api/openapi.yaml` for Swagger UI (same spec as contract tests).
+ * @es Carga y cachea `docs/api/openapi.yaml` para Swagger UI (el mismo spec que el contrato).
+ * @pt-BR Carrega e armazena em cache `docs/api/openapi.yaml` para o Swagger UI (o mesmo spec do contrato).
+ */
+function getOpenApiDocument(): Record<string, unknown> {
+  if (cachedOpenApiDocument === undefined) {
+    const dir = path.dirname(fileURLToPath(import.meta.url))
+    const specPath = path.resolve(dir, '../docs/api/openapi.yaml')
+    cachedOpenApiDocument = parseYaml(readFileSync(specPath, 'utf8')) as Record<string, unknown>
+  }
+  return cachedOpenApiDocument
 }
 
 /**
@@ -17,6 +38,8 @@ export function createApp(prisma: PrismaClient): Application {
 
   app.use(cors())
   app.use(express.json())
+
+  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(getOpenApiDocument()))
 
   // ============ CLIENTES ============
 

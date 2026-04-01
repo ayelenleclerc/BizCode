@@ -7,7 +7,7 @@
 | Date | 2026-03-31 |
 | Product reference | BizCode 0.1.0 MVP |
 
-Execute in a session record using [quality/records-template.md](../quality/records-template.md) (manual test session template).
+Execute in a session record using [certificacion-iso/records-template.md](../certificacion-iso/records-template.md) (manual test session template).
 
 | TC ID | Objective | Preconditions | Steps (summary) | Expected result | Evidence |
 |-------|-------------|----------------|-----------------|-----------------|----------|

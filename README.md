@@ -22,7 +22,7 @@
 
 ## Prerequisites
 
-- **Node.js** ≥ 20 LTS
+- **Node.js** ≥ 22 LTS (see `package.json` `engines` and `.nvmrc`)
 - **Rust** ≥ 1.77 (stable toolchain) — for Tauri builds
 - **Docker** (optional) — easiest way to run PostgreSQL
 - **PostgreSQL** 15 or 16
@@ -95,6 +95,8 @@ All product and quality Markdown is maintained in **English**, **Spanish**, and 
 | [CONTRIBUTING.md](CONTRIBUTING.md) | Branch workflow, commit convention, Definition of Done |
 | [`.cursor/rules/bizcode.mdc`](.cursor/rules/bizcode.mdc) | Mandatory Cursor/AI rules (always on); see also [`bizcode-documentation.mdc`](.cursor/rules/bizcode-documentation.mdc) for `docs/**` |
 | [docs/api/openapi.yaml](docs/api/openapi.yaml) | OpenAPI 3.1 API specification (single file, not translated) |
+| Swagger UI | `http://localhost:3001/api-docs/` when the API server is running (`npm run server`; same spec as OpenAPI) |
+| [docs/en/quality/swagger-openapi-ui-plan.md](docs/en/quality/swagger-openapi-ui-plan.md) | Swagger UI + OpenAPI implementation plan (mirrored in [es](docs/es/quality/plan-swagger-openapi-ui.md) / [pt-BR](docs/pt-br/quality/plano-swagger-openapi-ui.md); versioned; see [DOCUMENT_LOCALE_MAP.md](docs/DOCUMENT_LOCALE_MAP.md)) |
 
 Root-level files under `docs/*.md` (except the hub above) are **redirect stubs** to the three locale copies — use the language you need from [docs/README.md](docs/README.md).
 

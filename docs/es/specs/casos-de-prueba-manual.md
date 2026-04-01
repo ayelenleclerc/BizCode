@@ -7,7 +7,7 @@
 | Fecha | 2026-03-31 |
 | Referencia al producto | BizCode 0.1.0 MVP |
 
-Registrar la sesión con [quality/plantillas-registros.md](../quality/plantillas-registros.md).
+Registrar la sesión con [certificacion-iso/plantillas-registros.md](../certificacion-iso/plantillas-registros.md).
 
 | ID | Objetivo | Pasos (resumen) | Resultado esperado | Evidencia |
 |----|----------|-----------------|---------------------|-----------|

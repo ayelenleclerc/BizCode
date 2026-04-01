@@ -14,3 +14,9 @@ coverage/
 playwright-report/
 test-results/
 blob-report/
+
+# Local Cursor plan copies (canonical plan lives under docs/*/quality/ per DOCUMENT_LOCALE_MAP.md)
+.cursor/plans/
+
+# Optional full SBOM (large); default committed file is sbom-cyclonedx.json
+docs/evidence/sbom-cyclonedx-full.json

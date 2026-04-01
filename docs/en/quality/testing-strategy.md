@@ -77,6 +77,7 @@ Vitest **excludes** `e2e/**` (`vitest.config.ts`) so files under `e2e/` are only
 - **HTTP (Axios)**: Mocked via `vi.mock('axios')` using `vi.hoisted()` to create mock refs accessible in the factory function. This isolates tests from the network entirely.
 - **Browser APIs**: `localStorage`, `console.*` are mocked via `vi.spyOn` where needed (e.g., silencing `console.assert` from in-library self-tests).
 - **Database (Prisma)**: `api.test.ts` mocks Axios (HTTP client). **API contract** tests (`tests/api/contract.test.ts`) mock `PrismaClient` and validate responses against OpenAPI. **Integration** tests (`tests/integration/`) use a real `PrismaClient` and PostgreSQL ([ADR-0004](../adr/ADR-0004-e2e-playwright-integration-roadmap.md) phase B); they complement contract tests and do not duplicate OpenAPI validation in the same file.
+- **Interactive API explorer (Swagger UI):** Served at `/api-docs` when the API runs (`npm run server`). Reference and agent policy: [swagger-openapi-ui-plan.md](swagger-openapi-ui-plan.md) (mirrored in ES/PT-BR per [DOCUMENT_LOCALE_MAP.md](../../DOCUMENT_LOCALE_MAP.md)). Does not replace contract tests or `docs/api/openapi.yaml`.
 
 ## Entry and Exit Criteria
 

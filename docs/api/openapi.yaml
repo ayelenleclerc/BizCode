@@ -7,6 +7,7 @@ info:
     Runs as an Express 5 sidecar on localhost:3001.
     Responses use a JSON envelope `{ success: true, data: ... }` except `/api/health`.
     No authentication is required (loopback-only access).
+    Interactive documentation (Swagger UI): http://localhost:3001/api-docs/ (same contract as this file).
   contact:
     name: BizCode Team
 

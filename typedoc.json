@@ -1,0 +1,19 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "name": "BizCode",
+  "entryPoints": ["src", "server", "server.ts"],
+  "entryPointStrategy": "expand",
+  "out": "docs/generated/typedoc",
+  "exclude": [
+    "**/node_modules/**",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "**/tests/**",
+    "**/e2e/**"
+  ],
+  "skipErrorChecking": true,
+  "blockTags": ["@en", "@es", "@pt-BR", "@deprecated"],
+  "disableSources": true,
+  "readme": "none",
+  "cleanOutputDir": true
+}

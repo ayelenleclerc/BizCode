@@ -14,12 +14,15 @@ This table maps each **logical document** to its path in `docs/en/`, `docs/es/`,
 | Privacy / personal data map | [privacy-data-map.md](en/privacy-data-map.md) | [mapa-datos-personales.md](es/mapa-datos-personales.md) | [mapa-dados-pessoais.md](pt-br/mapa-dados-pessoais.md) |
 | Glossary | [glossary.md](en/glossary.md) | [glosario.md](es/glosario.md) | [glossario.md](pt-br/glossario.md) |
 | Changelog | [changelog.md](en/changelog.md) | [historial-de-cambios.md](es/historial-de-cambios.md) | [historico-de-alteracoes.md](pt-br/historico-de-alteracoes.md) |
-| Quality manual | [quality/quality-manual.md](en/quality/quality-manual.md) | [quality/manual-calidad.md](es/quality/manual-calidad.md) | [quality/manual-qualidade.md](pt-br/quality/manual-qualidade.md) |
-| ISO traceability matrix | [quality/iso-traceability.md](en/quality/iso-traceability.md) | [quality/trazabilidad-iso.md](es/quality/trazabilidad-iso.md) | [quality/rastreabilidade-iso.md](pt-br/quality/rastreabilidade-iso.md) |
+| ISO certification package index | [certificacion-iso/iso-package-index.md](en/certificacion-iso/iso-package-index.md) | [certificacion-iso/indice-paquete-iso.md](es/certificacion-iso/indice-paquete-iso.md) | [certificacion-iso/indice-pacote-iso.md](pt-br/certificacion-iso/indice-pacote-iso.md) |
+| Quality manual | [certificacion-iso/quality-manual.md](en/certificacion-iso/quality-manual.md) | [certificacion-iso/manual-calidad.md](es/certificacion-iso/manual-calidad.md) | [certificacion-iso/manual-qualidade.md](pt-br/certificacion-iso/manual-qualidade.md) |
+| ISO traceability matrix | [certificacion-iso/iso-traceability.md](en/certificacion-iso/iso-traceability.md) | [certificacion-iso/trazabilidad-iso.md](es/certificacion-iso/trazabilidad-iso.md) | [certificacion-iso/rastreabilidade-iso.md](pt-br/certificacion-iso/rastreabilidade-iso.md) |
 | Testing strategy | [quality/testing-strategy.md](en/quality/testing-strategy.md) | [quality/estrategia-pruebas.md](es/quality/estrategia-pruebas.md) | [quality/estrategia-testes.md](pt-br/quality/estrategia-testes.md) |
 | CI/CD | [quality/ci-cd.md](en/quality/ci-cd.md) | [quality/ciclo-ci-cd.md](es/quality/ciclo-ci-cd.md) | [quality/ciclo-ci-cd.md](pt-br/quality/ciclo-ci-cd.md) |
-| Records templates | [quality/records-template.md](en/quality/records-template.md) | [quality/plantillas-registros.md](es/quality/plantillas-registros.md) | [quality/modelos-registros.md](pt-br/quality/modelos-registros.md) |
-| Document lifecycle & validation | [quality/document-lifecycle-and-validation.md](en/quality/document-lifecycle-and-validation.md) | [quality/ciclo-vida-y-validacion-documental.md](es/quality/ciclo-vida-y-validacion-documental.md) | [quality/ciclo-vida-e-validacao-documental.md](pt-br/quality/ciclo-vida-e-validacao-documental.md) |
+| Records templates | [certificacion-iso/records-template.md](en/certificacion-iso/records-template.md) | [certificacion-iso/plantillas-registros.md](es/certificacion-iso/plantillas-registros.md) | [certificacion-iso/modelos-registros.md](pt-br/certificacion-iso/modelos-registros.md) |
+| Document lifecycle & validation | [certificacion-iso/document-lifecycle-and-validation.md](en/certificacion-iso/document-lifecycle-and-validation.md) | [certificacion-iso/ciclo-vida-y-validacion-documental.md](es/certificacion-iso/ciclo-vida-y-validacion-documental.md) | [certificacion-iso/ciclo-vida-e-validacao-documental.md](pt-br/certificacion-iso/ciclo-vida-e-validacao-documental.md) |
+| Swagger / OpenAPI UI implementation plan | [quality/swagger-openapi-ui-plan.md](en/quality/swagger-openapi-ui-plan.md) | [quality/plan-swagger-openapi-ui.md](es/quality/plan-swagger-openapi-ui.md) | [quality/plano-swagger-openapi-ui.md](pt-br/quality/plano-swagger-openapi-ui.md) |
+| Generated documentation (TypeDoc, OpenAPI MD, schemas, SBOM) | [quality/generated-documentation.md](en/quality/generated-documentation.md) | [quality/documentacion-generada.md](es/quality/documentacion-generada.md) | [quality/documentacao-gerada.md](pt-br/quality/documentacao-gerada.md) |
 | Specs index | [specs/index.md](en/specs/index.md) | [specs/indice.md](es/specs/indice.md) | [specs/indice.md](pt-br/specs/indice.md) |
 | Technical manual | [specs/technical-manual.md](en/specs/technical-manual.md) | [specs/manual-tecnico.md](es/specs/manual-tecnico.md) | [specs/manual-tecnico.md](pt-br/specs/manual-tecnico.md) |
 | Functional requirements | [specs/functional-requirements.md](en/specs/functional-requirements.md) | [specs/requisitos-funcionales.md](es/specs/requisitos-funcionales.md) | [specs/requisitos-funcionais.md](pt-br/specs/requisitos-funcionais.md) |
@@ -37,6 +40,7 @@ This table maps each **logical document** to its path in `docs/en/`, `docs/es/`,
 
 - **Architecture Decision Records:** under `docs/{en,es,pt-br}/adr/`, files share the **same technical slug** (e.g. `ADR-0001-rest-prisma.md`) in every locale.
 - **OpenAPI:** single file [api/openapi.yaml](api/openapi.yaml) (not translated).
+- **Generated API Markdown:** [api/openapi-reference.generated.md](api/openapi-reference.generated.md) — produced from `openapi.yaml` by `npm run docs:generate`; do not edit by hand.
 
 Policy: [I18N_DOCUMENTATION.md](I18N_DOCUMENTATION.md).
 

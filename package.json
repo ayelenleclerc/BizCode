@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "type": "module",
   "engines": {
-    "node": ">=20.18.0"
+    "node": ">=22.0.0"
   },
   "scripts": {
     "server": "tsx server/main.ts",
@@ -24,6 +24,14 @@
     "lint:fix": "eslint src server tests e2e --ext .ts,.tsx --fix --max-warnings 0",
     "check:i18n": "tsx scripts/check-i18n.ts",
     "check:docs-map": "tsx scripts/check-docs-locale-map.ts",
+    "sbom:generate": "cyclonedx-npm --output-file docs/evidence/sbom-cyclonedx.json --package-lock-only --ignore-npm-errors --omit dev",
+    "sbom:generate:full": "cyclonedx-npm --output-file docs/evidence/sbom-cyclonedx-full.json --package-lock-only --ignore-npm-errors",
+    "docs:extract-schemas": "tsx scripts/extract-openapi-schemas.ts",
+    "docs:schemas-md": "jsonschema2md -d docs/generated/schema-json -o docs/generated/schema-md -x -",
+    "docs:openapi-md": "tsx scripts/generate-openapi-markdown.ts",
+    "docs:typedoc": "typedoc --options typedoc.json",
+    "docs:sbom": "npm run sbom:generate",
+    "docs:generate": "npm run docs:extract-schemas && npm run docs:schemas-md && npm run docs:openapi-md && npm run docs:typedoc && npm run docs:sbom",
     "migrate:dbf": "tsx scripts/migrate-from-dbf.ts",
     "release": "semantic-release"
   },
@@ -41,14 +49,19 @@
     "react-hotkeys-hook": "^4.5.0",
     "react-i18next": "^17.0.2",
     "react-router-dom": "^6.22.3",
+    "swagger-ui-express": "^5.0.1",
+    "yaml": "^2.8.3",
     "zod": "^3.22.4",
     "zustand": "^4.4.7"
   },
   "devDependencies": {
+    "@adobe/jsonschema2md": "^8.0.11",
     "@apidevtools/swagger-parser": "^12.1.0",
+    "@cyclonedx/cyclonedx-npm": "^4.2.1",
     "@eslint/js": "^10.0.1",
     "@playwright/test": "^1.59.0",
     "@prisma/client": "^5.22.0",
+    "@scalar/openapi-to-markdown": "^0.4.16",
     "@semantic-release/commit-analyzer": "^13.0.0",
     "@semantic-release/github": "^11.0.0",
     "@semantic-release/release-notes-generator": "^14.0.1",
@@ -64,6 +77,7 @@
     "@types/react": "^18.2.48",
     "@types/react-dom": "^18.2.18",
     "@types/supertest": "^7.2.0",
+    "@types/swagger-ui-express": "^4.1.8",
     "@vitejs/plugin-react": "^5.2.0",
     "@vitest/coverage-v8": "^4.1.2",
     "ajv": "^8.18.0",
@@ -83,10 +97,10 @@
     "supertest": "^7.2.2",
     "tailwindcss": "^3.4.1",
     "tsx": "^4.21.0",
+    "typedoc": "^0.28.18",
     "typescript": "^5.3.3",
     "typescript-eslint": "^8.58.0",
     "vite": "^6.4.1",
-    "vitest": "^4.1.2",
-    "yaml": "^2.8.3"
+    "vitest": "^4.1.2"
   }
 }

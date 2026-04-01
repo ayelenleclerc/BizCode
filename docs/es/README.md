@@ -18,18 +18,23 @@
 
 | Documento | Contenido |
 |-----------|-----------|
-| [quality/manual-calidad.md](quality/manual-calidad.md) | Alcance del QMS |
-| [quality/trazabilidad-iso.md](quality/trazabilidad-iso.md) | Matriz norma → evidencia en repo |
+| [Certificación-ISO (raíz)](../../Certificación-ISO/README.md) | Punto de entrada al paquete ISO (sin duplicar cuerpos) |
+| [certificacion-iso/indice-paquete-iso.md](certificacion-iso/indice-paquete-iso.md) | Registro maestro del paquete (ISO-PKG-001) |
+| [certificacion-iso/manual-calidad.md](certificacion-iso/manual-calidad.md) | Alcance del QMS |
+| [certificacion-iso/trazabilidad-iso.md](certificacion-iso/trazabilidad-iso.md) | Matriz norma → evidencia en repo |
 | [quality/estrategia-pruebas.md](quality/estrategia-pruebas.md) | Pirámide de pruebas, política de cobertura |
 | [quality/ciclo-ci-cd.md](quality/ciclo-ci-cd.md) | Pipeline GitHub Actions |
-| [quality/plantillas-registros.md](quality/plantillas-registros.md) | Plantillas de no conformidad y sesión de prueba |
-| [quality/ciclo-vida-y-validacion-documental.md](quality/ciclo-vida-y-validacion-documental.md) | SemVer, historial de cambios, lista de validación / verificación |
+| [certificacion-iso/plantillas-registros.md](certificacion-iso/plantillas-registros.md) | Plantillas de no conformidad y sesión de prueba |
+| [certificacion-iso/ciclo-vida-y-validacion-documental.md](certificacion-iso/ciclo-vida-y-validacion-documental.md) | SemVer, historial de cambios, lista de validación / verificación |
+| [quality/plan-swagger-openapi-ui.md](quality/plan-swagger-openapi-ui.md) | Referencia versionada Swagger UI + OpenAPI; política para agentes |
+| [quality/documentacion-generada.md](quality/documentacion-generada.md) | TypeDoc, OpenAPI→Markdown, esquemas JSON, SBOM — versionar salidas con los cambios de código |
 
 ## API y decisiones
 
 | Documento | Contenido |
 |-----------|-----------|
 | [../api/openapi.yaml](../api/openapi.yaml) | Contrato OpenAPI 3 (único archivo, no traducido) |
+| Swagger UI | `http://localhost:3001/api-docs/` con [`npm run server`](../../package.json) en ejecución (mismo spec que `openapi.yaml`) |
 | [adr/README.md](adr/README.md) | Índice de Architecture Decision Records |
 
 ## Manuales de usuario

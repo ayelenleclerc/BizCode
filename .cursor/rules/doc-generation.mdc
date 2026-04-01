@@ -1,0 +1,18 @@
+---
+description: Comandos y rutas de documentación generada (TypeDoc, OpenAPI MD, JSON Schema MD, SBOM)
+globs: docs/generated/**,docs/api/openapi-reference.generated.md,docs/evidence/sbom-cyclonedx.json,scripts/extract-openapi-schemas.ts,scripts/generate-openapi-markdown.ts,typedoc.json
+alwaysApply: false
+---
+
+# Documentación generada (`npm run docs:generate`)
+
+Orden efectivo (ver `package.json`):
+
+1. `docs:extract-schemas` → `docs/generated/schema-json/*.schema.json` (desde `docs/api/openapi.yaml`)
+2. `docs:schemas-md` → `docs/generated/schema-md/` (`@adobe/jsonschema2md`)
+3. `docs:openapi-md` → `docs/api/openapi-reference.generated.md` (`@scalar/openapi-to-markdown`)
+4. `docs:typedoc` → `docs/generated/typedoc/` (TypeDoc, `typedoc.json`)
+5. `docs:sbom` → `docs/evidence/sbom-cyclonedx.json` (`@cyclonedx/cyclonedx-npm`)
+
+- **Node:** `package.json` exige **Node ≥ 22** (alineado con CI y con `@scalar/openapi-to-markdown`).
+- **Mapa canónico:** fila *Generated documentation* en [docs/DOCUMENT_LOCALE_MAP.md](docs/DOCUMENT_LOCALE_MAP.md).

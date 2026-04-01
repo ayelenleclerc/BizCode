@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "codigo": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "nombre": {
+      "maxLength": 20,
+      "type": "string"
+    }
+  },
+  "required": [
+    "codigo",
+    "nombre"
+  ],
+  "title": "RubroInput",
+  "type": "object"
+}

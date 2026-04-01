@@ -64,7 +64,8 @@ A task is **Done** only when ALL of the following are true:
 - [ ] Coverage thresholds met: **100%** en `src/lib/**`, `server/createApp.ts` y `server.ts` (véase `vitest.config.ts` y [testing-strategy](docs/en/quality/testing-strategy.md)); ampliar alcance solo con **ADR** explícito
 - [ ] New user-visible strings use `t()` — no hardcoded text in components
 - [ ] `npm run check:i18n` passes (en and pt-BR keys are in sync with es)
-- [ ] API contract tests pass (`tests/api/contract.test.ts`) and OpenAPI remains aligned with `server/createApp.ts` (see [docs/api/openapi.yaml](docs/api/openapi.yaml))
+- [ ] API contract tests pass (`tests/api/contract.test.ts`) and OpenAPI remains aligned with `server/createApp.ts` (see [docs/api/openapi.yaml](docs/api/openapi.yaml)); follow the trilingual Swagger/OpenAPI plan [en](docs/en/quality/swagger-openapi-ui-plan.md) · [es](docs/es/quality/plan-swagger-openapi-ui.md) · [pt-BR](docs/pt-br/quality/plano-swagger-openapi-ui.md) for UI tooling and agent policy
+- [ ] **`npm run docs:generate`** run and outputs committed when the change affects generated docs (TypeScript surface, OpenAPI contract, or production dependency set for SBOM): no uncommitted drift under `docs/generated/`, `docs/api/openapi-reference.generated.md`, or `docs/evidence/sbom-cyclonedx.json` (see [en](docs/en/quality/generated-documentation.md) · [es](docs/es/quality/documentacion-generada.md) · [pt-BR](docs/pt-br/quality/documentacao-gerada.md))
 - [ ] Accessibility: dialogs have `role="dialog" aria-modal aria-labelledby`; inputs have `htmlFor`/`id` pairs; errors have `role="alert"`; required fields have `aria-required="true"`
 - [ ] Primary action buttons have `data-testid` attributes
 - [ ] CI pipeline is green on the PR branch
@@ -80,6 +81,7 @@ npm run lint          # ESLint
 npm run test:coverage # Tests + coverage report
 npm run check:i18n   # i18n parity
 npm run check:docs-map  # DOCUMENT_LOCALE_MAP.md paths exist
+npm run docs:generate   # TypeDoc, OpenAPI MD, schema MD, SBOM — commit outputs; CI checks git diff
 npm run test:e2e        # Playwright smoke (vite preview); see docs/en/adr/ADR-0004-e2e-playwright-integration-roadmap.md
 npx prisma migrate deploy   # Apply schema (needed before integration tests)
 npm run test:integration    # HTTP + real Prisma vs PostgreSQL; requires DATABASE_URL (e.g. .env)

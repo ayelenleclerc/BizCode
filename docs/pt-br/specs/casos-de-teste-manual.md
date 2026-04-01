@@ -7,7 +7,7 @@
 | Data | 2026-03-31 |
 | Referência ao produto | BizCode 0.1.0 MVP |
 
-Registrar sessão com [quality/modelos-registros.md](../quality/modelos-registros.md).
+Registrar sessão com [certificacion-iso/modelos-registros.md](../certificacion-iso/modelos-registros.md).
 
 | ID | Objetivo | Passos (resumo) | Resultado esperado | Evidência |
 |----|----------|-----------------|---------------------|-----------|

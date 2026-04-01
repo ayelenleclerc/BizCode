@@ -18,18 +18,23 @@
 
 | Document | Description |
 |----------|-------------|
-| [quality/quality-manual.md](quality/quality-manual.md) | QMS scope |
-| [quality/iso-traceability.md](quality/iso-traceability.md) | Standard → repository evidence |
+| [Certificación-ISO (repo root)](../../Certificación-ISO/README.md) | Entry point to the ISO certification package (no duplicate bodies) |
+| [certificacion-iso/iso-package-index.md](certificacion-iso/iso-package-index.md) | ISO certification package master register (ISO-PKG-001) |
+| [certificacion-iso/quality-manual.md](certificacion-iso/quality-manual.md) | QMS scope |
+| [certificacion-iso/iso-traceability.md](certificacion-iso/iso-traceability.md) | Standard → repository evidence |
 | [quality/testing-strategy.md](quality/testing-strategy.md) | Test pyramid, coverage policy |
 | [quality/ci-cd.md](quality/ci-cd.md) | GitHub Actions pipeline |
-| [quality/records-template.md](quality/records-template.md) | Nonconformity and test session templates |
-| [quality/document-lifecycle-and-validation.md](quality/document-lifecycle-and-validation.md) | SemVer, changelogs, validation / verification checklist |
+| [certificacion-iso/records-template.md](certificacion-iso/records-template.md) | Nonconformity and test session templates |
+| [certificacion-iso/document-lifecycle-and-validation.md](certificacion-iso/document-lifecycle-and-validation.md) | SemVer, changelogs, validation / verification checklist |
+| [quality/swagger-openapi-ui-plan.md](quality/swagger-openapi-ui-plan.md) | Swagger UI + OpenAPI implementation reference (versioned); agent policy |
+| [quality/generated-documentation.md](quality/generated-documentation.md) | TypeDoc, OpenAPI→Markdown, JSON Schema docs, SBOM — commit outputs with code changes |
 
 ## API and decisions
 
 | Document | Description |
 |----------|-------------|
 | [../api/openapi.yaml](../api/openapi.yaml) | OpenAPI 3 contract (single file, not translated) |
+| Swagger UI | `http://localhost:3001/api-docs/` when [`npm run server`](../../package.json) is running (same spec as `openapi.yaml`) |
 | [adr/README.md](adr/README.md) | Architecture Decision Records index |
 
 ## End-user manuals

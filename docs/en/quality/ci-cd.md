@@ -20,6 +20,8 @@ push / pull_request
 │  4. npx prisma generate                                     │
 │  5. npx prisma migrate deploy  ← schema on PostgreSQL       │
 │  6. npm run type-check           ← blocks                   │
+│  6b. npm run docs:generate       ← blocks                   │
+│  6c. git diff (generated docs)   ← blocks                   │
 │  7. npm run lint                 ← blocks                   │
 │  8. npm run test:coverage        ← blocks (Vitest + coverage + API contract + a11y) │
 │  9. npm run check:i18n           ← blocks                   │
@@ -43,6 +45,7 @@ push / pull_request
 | Step | Blocking condition |
 |---|---|
 | type-check | Any TypeScript compilation error |
+| docs:generate + git diff | Drift between committed files and regenerated docs under `docs/generated/`, `docs/api/openapi-reference.generated.md`, `docs/evidence/sbom-cyclonedx.json` |
 | lint | Any ESLint error or **warning** (`npm run lint` uses `--max-warnings 0`) |
 | test:coverage | Any test failure OR any coverage threshold not met |
 | check:i18n | Any locale namespace has missing or extra keys vs. `es` source |

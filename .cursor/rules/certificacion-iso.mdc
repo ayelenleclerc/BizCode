@@ -1,0 +1,15 @@
+---
+description: ISO certification package — incremental docs, evidence, no claimed certification
+globs: docs/**/certificacion-iso/**/*.md,Certificación-ISO/**/*.md
+alwaysApply: false
+---
+
+# Certificación-ISO / `docs/*/certificacion-iso/`
+
+- Cumplir [`.cursor/rules/bizcode-documentation.mdc`](bizcode-documentation.mdc): paridad **en / es / pt-br** para cada documento lógico; rutas en [docs/DOCUMENT_LOCALE_MAP.md](../../docs/DOCUMENT_LOCALE_MAP.md) (`npm run check:docs-map`).
+- **No afirmar certificación ISO**; usar formulaciones **ISO-ready**, evidencia en repo, preparación para auditoría.
+- **Una sola fuente de verdad:** no duplicar cuerpos de texto fuera de `docs/*/certificacion-iso/` salvo stubs en [`docs/quality/`](../../docs/quality/) que apunten aquí.
+- **Registro maestro:** [iso-package-index.md](../../docs/en/certificacion-iso/iso-package-index.md) (ISO-PKG-001); nuevos códigos de documento añaden fila en los **tres** índices localizados.
+- **Evidencia:** toda afirmación de proceso debe enlazar a archivo, CI, prueba o registro; si no existe, marcar explícitamente como pendiente.
+- **Incremental:** versionar documentos con identificador (p. ej. QM-001, ISO-PKG-001); ampliar en el mismo cambio que la evidencia o el proceso descrito.
+- **Punto de entrada raíz:** [Certificación-ISO/README.md](../../Certificación-ISO/README.md).
