@@ -1,0 +1,92 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "clienteId": {
+      "type": "integer"
+    },
+    "fecha": {
+      "format": "date",
+      "type": "string"
+    },
+    "formaPagoId": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "items": {
+      "items": {
+        "properties": {
+          "articuloId": {
+            "type": "integer"
+          },
+          "cantidad": {
+            "type": "number"
+          },
+          "dscto": {
+            "type": "number"
+          },
+          "precio": {
+            "type": "number"
+          },
+          "subtotal": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "articuloId",
+          "cantidad",
+          "precio",
+          "dscto",
+          "subtotal"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "iva1": {
+      "type": "number"
+    },
+    "iva2": {
+      "type": "number"
+    },
+    "neto1": {
+      "type": "number"
+    },
+    "neto2": {
+      "type": "number"
+    },
+    "neto3": {
+      "type": "number"
+    },
+    "numero": {
+      "type": "integer"
+    },
+    "prefijo": {
+      "type": "string"
+    },
+    "tipo": {
+      "enum": [
+        "A",
+        "B"
+      ],
+      "type": "string"
+    },
+    "total": {
+      "type": "number"
+    }
+  },
+  "required": [
+    "fecha",
+    "tipo",
+    "numero",
+    "clienteId",
+    "neto1",
+    "neto2",
+    "neto3",
+    "iva1",
+    "iva2",
+    "total",
+    "items"
+  ],
+  "title": "FacturaInput",
+  "type": "object"
+}

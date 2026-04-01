@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "properties": {
+    "clienteId": {
+      "type": "integer"
+    },
+    "estado": {
+      "type": "string"
+    },
+    "fecha": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "formaPagoId": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "id": {
+      "type": "integer"
+    },
+    "items": {
+      "items": {
+        "$ref": "./FacturaItem.schema.json"
+      },
+      "type": "array"
+    },
+    "iva1": {
+      "type": "number"
+    },
+    "iva2": {
+      "type": "number"
+    },
+    "neto1": {
+      "type": "number"
+    },
+    "neto2": {
+      "type": "number"
+    },
+    "neto3": {
+      "type": "number"
+    },
+    "numero": {
+      "type": "integer"
+    },
+    "prefijo": {
+      "type": "string"
+    },
+    "tipo": {
+      "type": "string"
+    },
+    "total": {
+      "type": "number"
+    }
+  },
+  "title": "Factura",
+  "type": "object"
+}

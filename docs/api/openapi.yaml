@@ -1,0 +1,723 @@
+openapi: 3.1.0
+info:
+  title: BizCode API
+  version: 0.1.0
+  description: |
+    REST API for BizCode commercial management system.
+    Runs as an Express 5 sidecar on localhost:3001.
+    Responses use a JSON envelope `{ success: true, data: ... }` except `/api/health`.
+    No authentication is required (loopback-only access).
+    Interactive documentation (Swagger UI): http://localhost:3001/api-docs/ (same contract as this file).
+  contact:
+    name: BizCode Team
+
+servers:
+  - url: http://localhost:3001
+    description: Local development / Tauri sidecar
+
+tags:
+  - name: health
+    description: Health check
+  - name: clientes
+    description: Customer management
+  - name: articulos
+    description: Product management
+  - name: rubros
+    description: Product categories
+  - name: facturas
+    description: Invoice management
+  - name: formasPago
+    description: Payment methods
+
+paths:
+  /api/health:
+    get:
+      tags: [health]
+      summary: Health check
+      responses:
+        '200':
+          description: API is running
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+
+  /api/clientes:
+    get:
+      tags: [clientes]
+      summary: List customers
+      parameters:
+        - name: q
+          in: query
+          schema:
+            type: string
+          description: Filter by código, razón social or CUIT (Express query param)
+      responses:
+        '200':
+          description: List of customers
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClienteListEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    post:
+      tags: [clientes]
+      summary: Create a customer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClienteInput'
+      responses:
+        '200':
+          description: Customer created (Express returns 200 with body)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClienteEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/clientes/{id}:
+    get:
+      tags: [clientes]
+      summary: Get customer by id
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Customer or null if not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClienteNullableEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    put:
+      tags: [clientes]
+      summary: Update a customer
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClienteInput'
+      responses:
+        '200':
+          description: Customer updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClienteEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/articulos:
+    get:
+      tags: [articulos]
+      summary: List products
+      parameters:
+        - name: q
+          in: query
+          schema:
+            type: string
+          description: Filter by code or description
+      responses:
+        '200':
+          description: List of products
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArticuloListEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    post:
+      tags: [articulos]
+      summary: Create a product
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ArticuloInput'
+      responses:
+        '200':
+          description: Product created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArticuloEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/articulos/{id}:
+    get:
+      tags: [articulos]
+      summary: Get product by id
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Product or null
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArticuloNullableEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    put:
+      tags: [articulos]
+      summary: Update a product
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ArticuloInput'
+      responses:
+        '200':
+          description: Product updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArticuloEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/rubros:
+    get:
+      tags: [rubros]
+      summary: List product categories
+      responses:
+        '200':
+          description: List of categories
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RubroListEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    post:
+      tags: [rubros]
+      summary: Create a category
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RubroInput'
+      responses:
+        '200':
+          description: Category created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RubroEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/facturas:
+    get:
+      tags: [facturas]
+      summary: List invoices
+      responses:
+        '200':
+          description: List of invoices with items
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FacturaListEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    post:
+      tags: [facturas]
+      summary: Create an invoice
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FacturaInput'
+      responses:
+        '200':
+          description: Invoice created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FacturaEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/formas-pago:
+    get:
+      tags: [formasPago]
+      summary: List payment methods
+      responses:
+        '200':
+          description: List of payment methods
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FormaPagoListEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+components:
+  schemas:
+    HealthResponse:
+      type: object
+      required: [status, timestamp]
+      properties:
+        status:
+          type: string
+          example: ok
+        timestamp:
+          type: string
+          format: date-time
+
+    ApiErrorEnvelope:
+      type: object
+      required: [success, error]
+      properties:
+        success:
+          type: boolean
+          const: false
+        error:
+          type: string
+
+    Cliente:
+      type: object
+      additionalProperties: true
+      properties:
+        id:
+          type: integer
+        codigo:
+          type: integer
+        rsocial:
+          type: string
+        fantasia:
+          type: string
+          nullable: true
+        cuit:
+          type: string
+          nullable: true
+        condIva:
+          type: string
+        domicilio:
+          type: string
+          nullable: true
+        localidad:
+          type: string
+          nullable: true
+        cpost:
+          type: string
+          nullable: true
+        telef:
+          type: string
+          nullable: true
+        email:
+          type: string
+          nullable: true
+        activo:
+          type: boolean
+
+    ClienteInput:
+      type: object
+      required: [codigo, rsocial, condIva, activo]
+      properties:
+        codigo:
+          type: integer
+          minimum: 1
+        rsocial:
+          type: string
+          minLength: 3
+          maxLength: 30
+        fantasia:
+          type: string
+          maxLength: 30
+        cuit:
+          type: string
+        condIva:
+          type: string
+          enum: [RI, Mono, CF, Exento]
+        domicilio:
+          type: string
+          maxLength: 40
+        localidad:
+          type: string
+          maxLength: 25
+        cpost:
+          type: string
+          maxLength: 8
+        telef:
+          type: string
+          maxLength: 25
+        email:
+          type: string
+          format: email
+        activo:
+          type: boolean
+
+    ClienteListEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Cliente'
+
+    ClienteEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/Cliente'
+
+    ClienteNullableEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          anyOf:
+            - $ref: '#/components/schemas/Cliente'
+            - type: 'null'
+
+    Articulo:
+      type: object
+      additionalProperties: true
+      properties:
+        id:
+          type: integer
+        codigo:
+          type: integer
+        descripcion:
+          type: string
+        rubroId:
+          type: integer
+        rubro:
+          $ref: '#/components/schemas/Rubro'
+        condIva:
+          type: string
+        umedida:
+          type: string
+        precioLista1:
+          type: number
+        precioLista2:
+          type: number
+        costo:
+          type: number
+        stock:
+          type: integer
+        minimo:
+          type: integer
+        activo:
+          type: boolean
+
+    ArticuloInput:
+      type: object
+      required: [codigo, descripcion, rubroId, condIva, umedida, precioLista1, precioLista2, costo, stock, minimo, activo]
+      properties:
+        codigo:
+          type: integer
+          minimum: 1
+        descripcion:
+          type: string
+          minLength: 3
+          maxLength: 30
+        rubroId:
+          type: integer
+        condIva:
+          type: string
+          enum: ['1', '2', '3']
+        umedida:
+          type: string
+          minLength: 2
+          maxLength: 6
+        precioLista1:
+          type: number
+          minimum: 0.01
+        precioLista2:
+          type: number
+          minimum: 0.01
+        costo:
+          type: number
+          minimum: 0.01
+        stock:
+          type: integer
+          minimum: 0
+        minimo:
+          type: integer
+          minimum: 0
+        activo:
+          type: boolean
+
+    ArticuloListEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Articulo'
+
+    ArticuloEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/Articulo'
+
+    ArticuloNullableEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          anyOf:
+            - $ref: '#/components/schemas/Articulo'
+            - type: 'null'
+
+    Rubro:
+      type: object
+      additionalProperties: true
+      properties:
+        id:
+          type: integer
+        codigo:
+          type: integer
+        nombre:
+          type: string
+
+    RubroInput:
+      type: object
+      required: [codigo, nombre]
+      properties:
+        codigo:
+          type: integer
+          minimum: 1
+        nombre:
+          type: string
+          maxLength: 20
+
+    RubroListEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Rubro'
+
+    RubroEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/Rubro'
+
+    Factura:
+      type: object
+      additionalProperties: true
+      properties:
+        id:
+          type: integer
+        fecha:
+          type: string
+          format: date-time
+        tipo:
+          type: string
+        prefijo:
+          type: string
+        numero:
+          type: integer
+        clienteId:
+          type: integer
+        formaPagoId:
+          type: integer
+          nullable: true
+        neto1:
+          type: number
+        neto2:
+          type: number
+        neto3:
+          type: number
+        iva1:
+          type: number
+        iva2:
+          type: number
+        total:
+          type: number
+        estado:
+          type: string
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/FacturaItem'
+
+    FacturaItem:
+      type: object
+      additionalProperties: true
+      properties:
+        id:
+          type: integer
+        articuloId:
+          type: integer
+        articulo:
+          $ref: '#/components/schemas/Articulo'
+        cantidad:
+          type: number
+        precio:
+          type: number
+        dscto:
+          type: number
+        subtotal:
+          type: number
+
+    FacturaInput:
+      type: object
+      required: [fecha, tipo, numero, clienteId, neto1, neto2, neto3, iva1, iva2, total, items]
+      properties:
+        fecha:
+          type: string
+          format: date
+        tipo:
+          type: string
+          enum: [A, B]
+        prefijo:
+          type: string
+        numero:
+          type: integer
+        clienteId:
+          type: integer
+        formaPagoId:
+          type: integer
+          nullable: true
+        neto1:
+          type: number
+        neto2:
+          type: number
+        neto3:
+          type: number
+        iva1:
+          type: number
+        iva2:
+          type: number
+        total:
+          type: number
+        items:
+          type: array
+          items:
+            type: object
+            required: [articuloId, cantidad, precio, dscto, subtotal]
+            properties:
+              articuloId:
+                type: integer
+              cantidad:
+                type: number
+              precio:
+                type: number
+              dscto:
+                type: number
+              subtotal:
+                type: number
+
+    FacturaListEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Factura'
+
+    FacturaEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/Factura'
+
+    FormaPago:
+      type: object
+      additionalProperties: true
+      properties:
+        id:
+          type: integer
+        codigo:
+          type: integer
+        descripcion:
+          type: string
+        vto_dias:
+          type: integer
+
+    FormaPagoListEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/FormaPago'
+
+  responses:
+    ServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiErrorEnvelope'

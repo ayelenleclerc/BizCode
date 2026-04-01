@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "properties": {
+    "activo": {
+      "type": "boolean"
+    },
+    "codigo": {
+      "type": "integer"
+    },
+    "condIva": {
+      "type": "string"
+    },
+    "cpost": {
+      "nullable": true,
+      "type": "string"
+    },
+    "cuit": {
+      "nullable": true,
+      "type": "string"
+    },
+    "domicilio": {
+      "nullable": true,
+      "type": "string"
+    },
+    "email": {
+      "nullable": true,
+      "type": "string"
+    },
+    "fantasia": {
+      "nullable": true,
+      "type": "string"
+    },
+    "id": {
+      "type": "integer"
+    },
+    "localidad": {
+      "nullable": true,
+      "type": "string"
+    },
+    "rsocial": {
+      "type": "string"
+    },
+    "telef": {
+      "nullable": true,
+      "type": "string"
+    }
+  },
+  "title": "Cliente",
+  "type": "object"
+}

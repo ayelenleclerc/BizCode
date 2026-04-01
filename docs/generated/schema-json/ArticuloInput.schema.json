@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "activo": {
+      "type": "boolean"
+    },
+    "codigo": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "condIva": {
+      "enum": [
+        "1",
+        "2",
+        "3"
+      ],
+      "type": "string"
+    },
+    "costo": {
+      "minimum": 0.01,
+      "type": "number"
+    },
+    "descripcion": {
+      "maxLength": 30,
+      "minLength": 3,
+      "type": "string"
+    },
+    "minimo": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "precioLista1": {
+      "minimum": 0.01,
+      "type": "number"
+    },
+    "precioLista2": {
+      "minimum": 0.01,
+      "type": "number"
+    },
+    "rubroId": {
+      "type": "integer"
+    },
+    "stock": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "umedida": {
+      "maxLength": 6,
+      "minLength": 2,
+      "type": "string"
+    }
+  },
+  "required": [
+    "codigo",
+    "descripcion",
+    "rubroId",
+    "condIva",
+    "umedida",
+    "precioLista1",
+    "precioLista2",
+    "costo",
+    "stock",
+    "minimo",
+    "activo"
+  ],
+  "title": "ArticuloInput",
+  "type": "object"
+}
