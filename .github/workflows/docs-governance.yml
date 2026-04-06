@@ -1,0 +1,106 @@
+name: Docs governance guard
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  docs-governance:
+    name: Docs governance
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Evaluate controlled docs policy
+        run: |
+          python - <<'PY'
+          import os
+          import re
+          import subprocess
+          import sys
+
+          base = os.environ.get("GITHUB_BASE_REF", "main")
+          head = os.environ.get("GITHUB_HEAD_REF", "")
+
+          subprocess.run(["git", "fetch", "origin", base, "--depth", "1"], check=False)
+          if head:
+            subprocess.run(["git", "fetch", "origin", head, "--depth", "1"], check=False)
+
+          diff_target = f"origin/{base}...HEAD"
+          result = subprocess.run(
+            ["git", "diff", "--name-only", diff_target],
+            check=True,
+            capture_output=True,
+            text=True,
+          )
+          changed = [line.strip() for line in result.stdout.splitlines() if line.strip()]
+
+          controlled_roots = (
+            "docs/en/quality/",
+            "docs/es/quality/",
+            "docs/pt-br/quality/",
+            "docs/en/certificacion-iso/",
+            "docs/es/certificacion-iso/",
+            "docs/pt-br/certificacion-iso/",
+            "docs/en/processes/",
+            "docs/es/processes/",
+            "docs/pt-br/processes/",
+            "docs/en/specs/",
+            "docs/es/specs/",
+            "docs/pt-br/specs/",
+            "docs/en/adr/",
+            "docs/es/adr/",
+            "docs/pt-br/adr/",
+            "docs/api/openapi.yaml",
+            "Certificación-ISO/",
+          )
+
+          controlled_changed = [
+            path for path in changed
+            if path.startswith(controlled_roots)
+          ]
+
+          if not controlled_changed:
+            print("No controlled docs changed. Governance check passed.")
+            sys.exit(0)
+
+          en_changed = any(p.startswith("docs/en/") for p in controlled_changed)
+          es_changed = any(p.startswith("docs/es/") for p in controlled_changed)
+          pt_changed = any(p.startswith("docs/pt-br/") for p in controlled_changed)
+
+          localized_area_pattern = re.compile(
+            r"^docs/(en|es|pt-br)/(quality|certificacion-iso|processes|specs|adr)/"
+          )
+          localized_changes = [p for p in controlled_changed if localized_area_pattern.match(p)]
+
+          missing = []
+          if localized_changes:
+            if not en_changed:
+              missing.append("docs/en")
+            if not es_changed:
+              missing.append("docs/es")
+            if not pt_changed:
+              missing.append("docs/pt-br")
+
+          print("Controlled docs touched:")
+          for path in controlled_changed:
+            print(f"- {path}")
+
+          if missing:
+            print("")
+            print("ERROR: Controlled localized docs changed without trilingual coverage.")
+            print("Missing locale trees in this PR:")
+            for loc in missing:
+              print(f"- {loc}")
+            print("")
+            print("Policy:")
+            print("- Controlled/auditable docs must be in repository docs/, not only GitHub Wiki.")
+            print("- For localized quality/process/spec/ADR/ISO docs, update EN/ES/PT-BR narratives consistently.")
+            sys.exit(1)
+
+          print("")
+          print("Docs governance check passed.")
+          PY
