@@ -10,17 +10,16 @@ import { PrismaClient } from '@prisma/client'
 import { createApp } from '../../server/createApp'
 
 async function truncateAll(prisma: PrismaClient): Promise<void> {
-  await prisma.$executeRawUnsafe(`
-    TRUNCATE TABLE
-      "FacturaItem",
-      "Factura",
-      "Articulo",
-      "Cliente",
-      "Rubro",
-      "FormaPago",
-      "ParamEmpresa"
-    RESTART IDENTITY CASCADE;
-  `)
+  // Use Prisma model operations to avoid coupling tests to physical table naming/casing.
+  await prisma.$transaction([
+    prisma.facturaItem.deleteMany(),
+    prisma.factura.deleteMany(),
+    prisma.articulo.deleteMany(),
+    prisma.cliente.deleteMany(),
+    prisma.rubro.deleteMany(),
+    prisma.formaPago.deleteMany(),
+    prisma.paramEmpresa.deleteMany(),
+  ])
 }
 
 describe('API — integración PostgreSQL (Prisma real)', () => {

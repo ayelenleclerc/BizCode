@@ -1,0 +1,28 @@
+[
+  { "name": "priority:P0", "color": "B60205", "description": "Critical priority" },
+  { "name": "priority:P1", "color": "D93F0B", "description": "High priority" },
+  { "name": "priority:P2", "color": "FBCA04", "description": "Normal priority" },
+
+  { "name": "type:feature", "color": "1D76DB", "description": "New capability" },
+  { "name": "type:bug", "color": "D73A4A", "description": "Defect fix" },
+  { "name": "type:security", "color": "B60205", "description": "Security-related change" },
+  { "name": "type:docs", "color": "0E8A16", "description": "Documentation change" },
+  { "name": "type:chore", "color": "5319E7", "description": "Maintenance task" },
+  { "name": "type:tech-debt", "color": "6F42C1", "description": "Technical debt reduction" },
+
+  { "name": "area:iam", "color": "0052CC", "description": "Identity and access management" },
+  { "name": "area:sales", "color": "0E8A16", "description": "Sales workflows" },
+  { "name": "area:billing", "color": "1D76DB", "description": "Billing and invoicing" },
+  { "name": "area:inventory", "color": "FBCA04", "description": "Products and stock" },
+  { "name": "area:orders", "color": "C2E0C6", "description": "Order lifecycle" },
+  { "name": "area:logistics", "color": "006B75", "description": "Logistics and delivery" },
+  { "name": "area:finance", "color": "5319E7", "description": "Finance and collections" },
+  { "name": "area:platform", "color": "BFDADC", "description": "Platform and infrastructure" },
+  { "name": "area:quality", "color": "C5DEF5", "description": "Quality assurance and tests" },
+  { "name": "area:iso", "color": "D4C5F9", "description": "ISO evidence and compliance docs" },
+
+  { "name": "blocked", "color": "000000", "description": "Blocked by dependency or decision" },
+  { "name": "needs-spec", "color": "F9D0C4", "description": "Needs additional specification" },
+  { "name": "needs-docs", "color": "C5DEF5", "description": "Documentation update required" },
+  { "name": "needs-tests", "color": "FEF2C0", "description": "Test coverage update required" }
+]

@@ -1,0 +1,131 @@
+name: Project status automation
+
+on:
+  pull_request_target:
+    types: [opened, reopened, closed, labeled, unlabeled]
+
+permissions:
+  contents: read
+  pull-requests: read
+  issues: read
+
+jobs:
+  update-status:
+    runs-on: ubuntu-latest
+    if: >-
+      ${{
+        vars.PROJECT_V2_ID != '' &&
+        vars.PROJECT_STATUS_FIELD_ID != '' &&
+        vars.PROJECT_STATUS_OPTION_BACKLOG != '' &&
+        vars.PROJECT_STATUS_OPTION_IN_PROGRESS != '' &&
+        vars.PROJECT_STATUS_OPTION_DONE != ''
+      }}
+    steps:
+      - name: Update linked issue project status
+        uses: actions/github-script@v7
+        env:
+          PROJECT_V2_ID: ${{ vars.PROJECT_V2_ID }}
+          PROJECT_STATUS_FIELD_ID: ${{ vars.PROJECT_STATUS_FIELD_ID }}
+          STATUS_BACKLOG: ${{ vars.PROJECT_STATUS_OPTION_BACKLOG }}
+          STATUS_IN_PROGRESS: ${{ vars.PROJECT_STATUS_OPTION_IN_PROGRESS }}
+          STATUS_DONE: ${{ vars.PROJECT_STATUS_OPTION_DONE }}
+          STATUS_BLOCKED: ${{ vars.PROJECT_STATUS_OPTION_BLOCKED }}
+        with:
+          script: |
+            const projectId = process.env.PROJECT_V2_ID;
+            const statusFieldId = process.env.PROJECT_STATUS_FIELD_ID;
+            const statusMap = {
+              backlog: process.env.STATUS_BACKLOG,
+              inProgress: process.env.STATUS_IN_PROGRESS,
+              done: process.env.STATUS_DONE,
+              blocked: process.env.STATUS_BLOCKED
+            };
+
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const prNumber = context.payload.pull_request.number;
+
+            const prData = await github.graphql(
+              `query($owner:String!, $repo:String!, $number:Int!) {
+                repository(owner:$owner, name:$repo) {
+                  pullRequest(number:$number) {
+                    closingIssuesReferences(first: 20) {
+                      nodes { number }
+                    }
+                    labels(first: 50) {
+                      nodes { name }
+                    }
+                  }
+                }
+              }`,
+              { owner, repo, number: prNumber }
+            );
+
+            const issueNumbers = prData.repository.pullRequest.closingIssuesReferences.nodes.map((i) => i.number);
+            if (issueNumbers.length === 0) {
+              core.info('No linked closing issues found on this PR.');
+              return;
+            }
+
+            const prLabels = new Set(
+              prData.repository.pullRequest.labels.nodes.map((l) => l.name.toLowerCase())
+            );
+
+            let targetStatus = statusMap.inProgress;
+            if (context.payload.action === 'closed') {
+              targetStatus = context.payload.pull_request.merged ? statusMap.done : statusMap.backlog;
+            } else if (prLabels.has('blocked') && statusMap.blocked) {
+              targetStatus = statusMap.blocked;
+            }
+
+            for (const issueNumber of issueNumbers) {
+              const issueData = await github.graphql(
+                `query($owner:String!, $repo:String!, $number:Int!) {
+                  repository(owner:$owner, name:$repo) {
+                    issue(number:$number) {
+                      projectItems(first: 50) {
+                        nodes {
+                          id
+                          project {
+                            ... on ProjectV2 {
+                              id
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }`,
+                { owner, repo, number: issueNumber }
+              );
+
+              const item = issueData.repository.issue.projectItems.nodes.find(
+                (node) => node.project?.id === projectId
+              );
+
+              if (!item) {
+                core.info(`Issue #${issueNumber} is not in project ${projectId}; skipping.`);
+                continue;
+              }
+
+              await github.graphql(
+                `mutation($projectId:ID!, $itemId:ID!, $fieldId:ID!, $optionId:String!) {
+                  updateProjectV2ItemFieldValue(input: {
+                    projectId: $projectId,
+                    itemId: $itemId,
+                    fieldId: $fieldId,
+                    value: { singleSelectOptionId: $optionId }
+                  }) {
+                    projectV2Item { id }
+                  }
+                }`,
+                {
+                  projectId,
+                  itemId: item.id,
+                  fieldId: statusFieldId,
+                  optionId: targetStatus
+                }
+              );
+
+              core.info(`Updated issue #${issueNumber} status in project.`);
+            }

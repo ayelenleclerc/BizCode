@@ -1,0 +1,72 @@
+name: Task
+description: Standard implementation task with acceptance and evidence
+title: "[TASK] "
+labels:
+  - "type:feature"
+body:
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: Business and technical context for this task.
+      placeholder: What problem are we solving and why now?
+    validations:
+      required: true
+
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope
+      description: Define in-scope and out-of-scope clearly.
+      placeholder: |
+        In scope:
+        - ...
+        Out of scope:
+        - ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: Acceptance Criteria (Given/When/Then)
+      description: Add verifiable acceptance criteria.
+      placeholder: |
+        - Given ..., when ..., then ...
+        - Given ..., when ..., then ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: test-plan
+    attributes:
+      label: Test Plan
+      description: Unit/integration/e2e test plan and manual checks.
+      placeholder: |
+        - Unit:
+        - Integration:
+        - E2E:
+        - Manual:
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: docs-impact
+    attributes:
+      label: Documentation Impact
+      description: Mark all documentation updates required by this task.
+      options:
+        - label: docs/es update required
+        - label: docs/en update required
+        - label: docs/pt-br update required
+        - label: OpenAPI update required (docs/api/openapi.yaml)
+        - label: Generated docs update required (npm run docs:generate)
+
+  - type: textarea
+    id: iso-evidence
+    attributes:
+      label: ISO Evidence Target
+      description: Evidence document path(s) or records to update.
+      placeholder: docs/*/certificacion-iso/... or evidence references
+    validations:
+      required: true
