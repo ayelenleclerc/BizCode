@@ -59,7 +59,41 @@ jobs:
         run: npm run docs:generate
 
       - name: Verify generated docs match committed files
-        run: git diff --exit-code -- docs/generated docs/api/openapi-reference.generated.md docs/evidence/sbom-cyclonedx.json
+        run: |
+          set -euo pipefail
+
+          # Deterministic drift check for generated docs and OpenAPI markdown.
+          git diff --exit-code -- docs/generated docs/api/openapi-reference.generated.md
+
+          # SBOM includes volatile fields (serialNumber/timestamp) that change every run.
+          node - <<'NODE'
+          const { execSync } = require('node:child_process')
+          const { readFileSync } = require('node:fs')
+
+          function normalizeSbom(raw) {
+            const json = JSON.parse(raw)
+            delete json.serialNumber
+            if (json.metadata && typeof json.metadata === 'object') {
+              delete json.metadata.timestamp
+            }
+            return JSON.stringify(json, null, 2)
+          }
+
+          const generatedRaw = readFileSync('docs/evidence/sbom-cyclonedx.json', 'utf8')
+          const committedRaw = execSync('git show HEAD:docs/evidence/sbom-cyclonedx.json', {
+            encoding: 'utf8',
+          })
+
+          const generated = normalizeSbom(generatedRaw)
+          const committed = normalizeSbom(committedRaw)
+
+          if (generated !== committed) {
+            console.error(
+              'SBOM drift detected (excluding volatile fields: serialNumber, metadata.timestamp).'
+            )
+            process.exit(1)
+          }
+          NODE
 
       - name: ESLint (jsx-a11y y TypeScript — cero advertencias)
         run: npm run lint
