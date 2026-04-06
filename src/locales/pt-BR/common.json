@@ -5,9 +5,40 @@
     "tagline": "Sistema de Gestão Comercial"
   },
   "nav": {
+    "main": "Navegação principal",
     "clientes": "Clientes",
     "articulos": "Produtos",
     "facturacion": "Faturamento"
+  },
+  "language": {
+    "legend": "Idioma da interface",
+    "selectAria": "Escolher idioma da interface",
+    "optionEs": "Espanhol",
+    "optionEn": "Inglês",
+    "optionPtBr": "Português (Brasil)"
+  },
+  "auth": {
+    "subtitle": "Entre para continuar",
+    "formTitle": "Entrar",
+    "fields": {
+      "tenantSlug": "Empresa (slug)",
+      "username": "Usuário",
+      "password": "Senha"
+    },
+    "submit": "Entrar",
+    "submitting": "Entrando…",
+    "validation": {
+      "tenantRequired": "Informe o identificador da empresa",
+      "usernameRequired": "Informe o usuário",
+      "passwordRequired": "Informe a senha"
+    },
+    "errors": {
+      "invalidCredentials": "Usuário ou senha incorretos",
+      "generic": "Não foi possível entrar"
+    }
+  },
+  "session": {
+    "logout": "Sair"
   },
   "shortcuts": {
     "title": "Atalhos globais",
@@ -18,6 +49,7 @@
     "navigate": "Navegar"
   },
   "theme": {
+    "toggleTitle": "Alternar tema claro ou escuro",
     "switchToLight": "☀️ Claro",
     "switchToDark": "🌙 Escuro"
   },

@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import LanguageSelect from '@/components/LanguageSelect'
+import { useAuth } from '@/contexts/AuthContext'
 
 interface LayoutProps {
   children: React.ReactNode
@@ -8,6 +10,8 @@ interface LayoutProps {
 
 export default function Layout({ children }: LayoutProps) {
   const { t } = useTranslation('common')
+  const { logout } = useAuth()
+  const navigate = useNavigate()
   const [isDark, setIsDark] = useState(() => {
     // Lazy initializer: reads localStorage once at mount, no extra render
     const saved = localStorage.getItem('theme')
@@ -45,7 +49,7 @@ export default function Layout({ children }: LayoutProps) {
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 p-4 space-y-2" aria-label="Navegación principal">
+        <nav className="flex-1 p-4 space-y-2" aria-label={t('nav.main')}>
           <Link
             to="/clientes"
             className={`block px-4 py-3 rounded transition ${
@@ -78,15 +82,32 @@ export default function Layout({ children }: LayoutProps) {
           </Link>
         </nav>
 
-        {/* Theme Toggle */}
-        <div className="p-4 border-t border-slate-200 dark:border-slate-700">
+        {/* Language, theme, session */}
+        <div className="p-4 border-t border-slate-200 dark:border-slate-700 space-y-2">
+          <LanguageSelect
+            data-testid="layout-language"
+            id="layout-language-select"
+            className="w-full"
+            selectClassName="w-full"
+          />
           <button
             type="button"
             onClick={toggleTheme}
             className="w-full px-4 py-2 rounded bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 transition text-slate-800 dark:text-slate-200"
-            title="Alternar tema claro/oscuro"
+            title={t('theme.toggleTitle')}
           >
             {isDark ? t('theme.switchToLight') : t('theme.switchToDark')}
+          </button>
+          <button
+            type="button"
+            data-testid="layout-logout"
+            className="w-full px-4 py-2 rounded border border-slate-300 bg-white hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-800 dark:hover:bg-slate-700 transition text-slate-800 dark:text-slate-200"
+            onClick={async () => {
+              await logout()
+              navigate('/login', { replace: true })
+            }}
+          >
+            {t('session.logout')}
           </button>
         </div>
       </aside>

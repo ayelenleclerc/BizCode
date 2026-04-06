@@ -107,18 +107,23 @@ function buildClaims(input: {
   }
 }
 
+/**
+ * @en Session cookies use SameSite=None so the SPA on another origin (e.g. Vite :5173) can send them with credentialed XHR.
+ * @es Las cookies de sesión usan SameSite=None para que el SPA en otro origen (p. ej. Vite :5173) las envíe con XHR con credenciales.
+ * @pt-BR Cookies de sessão com SameSite=None para o SPA em outra origem (ex.: Vite :5173) enviá-las em XHR com credenciais.
+ */
 function setSessionCookie(res: Response, token: string): void {
   const maxAge = SESSION_DURATION_MS / 1000
   res.setHeader(
     'Set-Cookie',
-    `${SESSION_COOKIE_NAME}=${encodeURIComponent(token)}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${maxAge}`,
+    `${SESSION_COOKIE_NAME}=${encodeURIComponent(token)}; Path=/; HttpOnly; SameSite=None; Secure; Max-Age=${maxAge}`,
   )
 }
 
 function clearSessionCookie(res: Response): void {
   res.setHeader(
     'Set-Cookie',
-    `${SESSION_COOKIE_NAME}=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0`,
+    `${SESSION_COOKIE_NAME}=; Path=/; HttpOnly; SameSite=None; Secure; Max-Age=0`,
   )
 }
 

@@ -9,6 +9,33 @@ import { parse as parseYaml } from 'yaml'
 import swaggerUi from 'swagger-ui-express'
 import { registerAuthRoutes, requirePermission, resolveSession, type AuthenticatedRequest } from './auth'
 
+const DEFAULT_CORS_ORIGINS = ['http://localhost:5173', 'http://127.0.0.1:5173'] as const
+
+/**
+ * @en Parses comma-separated extra origins from `CORS_ORIGINS` (trimmed, empty entries dropped).
+ * @es Parsea orígenes extra separados por comas desde `CORS_ORIGINS` (recortados, sin vacíos).
+ * @pt-BR Faz parse de origens extras em `CORS_ORIGINS` separadas por vírgula (trim, sem vazios).
+ */
+export function parseCorsOriginsFromEnv(): string[] {
+  const raw = process.env.CORS_ORIGINS?.trim()
+  if (!raw) {
+    return []
+  }
+  return raw
+    .split(',')
+    .map((s) => s.trim())
+    .filter((s) => s.length > 0)
+}
+
+/**
+ * @en Allowed browser origins for credentialed CORS (defaults + `CORS_ORIGINS`).
+ * @es Orígenes de navegador permitidos para CORS con credenciales (por defecto + `CORS_ORIGINS`).
+ * @pt-BR Origens de navegador permitidos para CORS com credenciais (padrão + `CORS_ORIGINS`).
+ */
+export function getCorsAllowedOrigins(): Set<string> {
+  return new Set<string>([...DEFAULT_CORS_ORIGINS, ...parseCorsOriginsFromEnv()])
+}
+
 function errorMessage(err: unknown): string {
   return err instanceof Error ? err.message : String(err)
 }
@@ -37,7 +64,19 @@ function getOpenApiDocument(): Record<string, unknown> {
 export function createApp(prisma: PrismaClient): Application {
   const app = express()
 
-  app.use(cors())
+  const allowedOrigins = getCorsAllowedOrigins()
+  app.use(
+    cors({
+      credentials: true,
+      origin(origin, callback): void {
+        if (!origin || allowedOrigins.has(origin)) {
+          callback(null, true)
+          return
+        }
+        callback(null, false)
+      },
+    }),
+  )
   app.use(express.json())
   app.use(resolveSession(prisma))
 

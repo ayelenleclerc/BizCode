@@ -1,16 +1,18 @@
 import axios, { AxiosError } from 'axios'
+import type { AuthClaims } from '@/lib/rbac'
 
 const API_BASE = 'http://localhost:3001/api'
 
 const api = axios.create({
   baseURL: API_BASE,
   timeout: 10000,
+  withCredentials: true,
 })
 
 type ApiErrorPayload = { error?: string }
 
 // Error handler
-const handleError = (error: AxiosError<ApiErrorPayload>) => {
+const handleError = (error: AxiosError<ApiErrorPayload>): never => {
   const data = error.response?.data
   if (data && typeof data === 'object' && 'error' in data && typeof data.error === 'string') {
     throw new Error(data.error)
@@ -20,6 +22,50 @@ const handleError = (error: AxiosError<ApiErrorPayload>) => {
 
 /** Payload genérico para creación/actualización vía API REST (cuerpo JSON). */
 export type JsonRecord = Record<string, unknown>
+
+export type LoginBody = {
+  tenantSlug: string
+  username: string
+  password: string
+}
+
+export type LoginResponseData = {
+  userId: number
+  tenantId: number
+  username: string
+  role: string
+}
+
+// ============ AUTH ============
+
+export const authAPI = {
+  login: async (body: LoginBody): Promise<LoginResponseData> => {
+    try {
+      const response = await api.post<{ success: boolean; data: LoginResponseData }>('/auth/login', body)
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  logout: async (): Promise<{ loggedOut: boolean }> => {
+    try {
+      const response = await api.post<{ success: boolean; data: { loggedOut: boolean } }>('/auth/logout')
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  me: async (): Promise<AuthClaims> => {
+    try {
+      const response = await api.get<{ success: boolean; data: AuthClaims }>('/auth/me')
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+}
 
 // ============ CLIENTES ============
 

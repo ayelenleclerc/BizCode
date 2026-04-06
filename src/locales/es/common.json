@@ -5,9 +5,40 @@
     "tagline": "Sistema de Gestión Comercial"
   },
   "nav": {
+    "main": "Navegación principal",
     "clientes": "Clientes",
     "articulos": "Artículos",
     "facturacion": "Facturación"
+  },
+  "language": {
+    "legend": "Idioma de la interfaz",
+    "selectAria": "Elegir idioma de la interfaz",
+    "optionEs": "Español",
+    "optionEn": "Inglés",
+    "optionPtBr": "Português (Brasil)"
+  },
+  "auth": {
+    "subtitle": "Inicie sesión para continuar",
+    "formTitle": "Iniciar sesión",
+    "fields": {
+      "tenantSlug": "Empresa (slug)",
+      "username": "Usuario",
+      "password": "Contraseña"
+    },
+    "submit": "Entrar",
+    "submitting": "Entrando…",
+    "validation": {
+      "tenantRequired": "Indique el identificador de la empresa",
+      "usernameRequired": "Indique el usuario",
+      "passwordRequired": "Indique la contraseña"
+    },
+    "errors": {
+      "invalidCredentials": "Usuario o contraseña incorrectos",
+      "generic": "No se pudo iniciar sesión"
+    }
+  },
+  "session": {
+    "logout": "Cerrar sesión"
   },
   "shortcuts": {
     "title": "Atajos globales",
@@ -18,6 +49,7 @@
     "navigate": "Navegar"
   },
   "theme": {
+    "toggleTitle": "Alternar tema claro u oscuro",
     "switchToLight": "☀️ Claro",
     "switchToDark": "🌙 Oscuro"
   },

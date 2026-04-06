@@ -10,7 +10,10 @@ export default defineConfig({
   test: {
     exclude: [...configDefaults.exclude, 'e2e/**', 'tests/integration/**'],
     environment: 'jsdom',
-    environmentMatchGlobs: [['tests/api/**', 'node']],
+    environmentMatchGlobs: [
+      ['tests/api/**', 'node'],
+      ['tests/server/**', 'node'],
+    ],
     globals: true,
     setupFiles: ['./src/test/setup.ts'],
     coverage: {

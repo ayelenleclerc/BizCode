@@ -5,9 +5,40 @@
     "tagline": "Commercial Management System"
   },
   "nav": {
+    "main": "Main navigation",
     "clientes": "Customers",
     "articulos": "Products",
     "facturacion": "Invoicing"
+  },
+  "language": {
+    "legend": "Interface language",
+    "selectAria": "Choose interface language",
+    "optionEs": "Spanish",
+    "optionEn": "English",
+    "optionPtBr": "Portuguese (Brazil)"
+  },
+  "auth": {
+    "subtitle": "Sign in to continue",
+    "formTitle": "Sign in",
+    "fields": {
+      "tenantSlug": "Company (slug)",
+      "username": "Username",
+      "password": "Password"
+    },
+    "submit": "Sign in",
+    "submitting": "Signing in…",
+    "validation": {
+      "tenantRequired": "Company slug is required",
+      "usernameRequired": "Username is required",
+      "passwordRequired": "Password is required"
+    },
+    "errors": {
+      "invalidCredentials": "Invalid username or password",
+      "generic": "Could not sign in"
+    }
+  },
+  "session": {
+    "logout": "Sign out"
   },
   "shortcuts": {
     "title": "Global shortcuts",
@@ -18,6 +49,7 @@
     "navigate": "Navigate"
   },
   "theme": {
+    "toggleTitle": "Toggle light or dark theme",
     "switchToLight": "☀️ Light",
     "switchToDark": "🌙 Dark"
   },
