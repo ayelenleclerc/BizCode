@@ -51,14 +51,11 @@ export function createApp(prisma: PrismaClient): Application {
     resource: string,
     resourceId?: string,
   ): Promise<void> {
-    if (!req.auth) {
-      return
-    }
     try {
       await prisma.auditEvent.create({
         data: {
-          tenantId: req.auth.claims.tenantId,
-          userId: req.auth.claims.userId,
+          tenantId: req.auth!.claims.tenantId,
+          userId: req.auth!.claims.userId,
           action,
           resource,
           resourceId,
