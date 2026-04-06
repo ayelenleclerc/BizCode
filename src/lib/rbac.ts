@@ -1,0 +1,117 @@
+export const USER_CHANNELS = ['counter', 'field', 'backoffice', 'warehouse', 'delivery'] as const
+
+export type UserChannel = (typeof USER_CHANNELS)[number]
+
+export const USER_ROLES = [
+  'super_admin',
+  'owner',
+  'manager',
+  'seller',
+  'backoffice',
+  'warehouse_op',
+  'warehouse_lead',
+  'logistics_planner',
+  'driver',
+  'billing',
+  'cashier',
+  'collections',
+  'finance',
+  'auditor',
+] as const
+
+export type UserRole = (typeof USER_ROLES)[number]
+
+export const PERMISSIONS = [
+  'users.manage',
+  'roles.assign',
+  'sales.create',
+  'sales.cancel',
+  'customers.read',
+  'customers.manage',
+  'products.read',
+  'products.manage',
+  'inventory.adjust',
+  'orders.create',
+  'orders.pick',
+  'orders.dispatch',
+  'orders.deliver.confirm',
+  'reports.operational.read',
+  'reports.financial.read',
+  'settings.business.manage',
+  'settings.fiscal.manage',
+  'audit.read',
+  'platform.tenants.manage',
+  'platform.support.impersonate',
+] as const
+
+export type Permission = (typeof PERMISSIONS)[number]
+
+export type AuthScope = {
+  tenantId: number
+  branchIds: number[]
+  warehouseIds: number[]
+  routeIds: number[]
+  channels: UserChannel[]
+}
+
+export type AuthClaims = {
+  userId: number
+  tenantId: number
+  username: string
+  role: UserRole
+  permissions: Permission[]
+  scope: AuthScope
+}
+
+export const ROLE_PERMISSIONS: Record<UserRole, readonly Permission[]> = {
+  super_admin: ['platform.tenants.manage', 'platform.support.impersonate', 'audit.read'],
+  owner: [
+    'users.manage',
+    'roles.assign',
+    'sales.create',
+    'sales.cancel',
+    'customers.read',
+    'customers.manage',
+    'products.read',
+    'products.manage',
+    'inventory.adjust',
+    'orders.create',
+    'orders.pick',
+    'orders.dispatch',
+    'orders.deliver.confirm',
+    'reports.operational.read',
+    'reports.financial.read',
+    'settings.business.manage',
+    'settings.fiscal.manage',
+    'audit.read',
+  ],
+  manager: [
+    'sales.create',
+    'sales.cancel',
+    'customers.read',
+    'customers.manage',
+    'products.read',
+    'products.manage',
+    'inventory.adjust',
+    'orders.create',
+    'orders.pick',
+    'orders.dispatch',
+    'reports.operational.read',
+    'audit.read',
+  ],
+  seller: ['sales.create', 'customers.read', 'customers.manage', 'orders.create', 'products.read'],
+  backoffice: ['customers.read', 'customers.manage', 'products.read', 'reports.operational.read'],
+  warehouse_op: ['orders.pick', 'products.read'],
+  warehouse_lead: ['orders.pick', 'orders.dispatch', 'inventory.adjust', 'reports.operational.read'],
+  logistics_planner: ['orders.dispatch', 'reports.operational.read'],
+  driver: ['orders.deliver.confirm'],
+  billing: ['sales.create', 'sales.cancel', 'reports.operational.read'],
+  cashier: ['sales.create', 'reports.operational.read'],
+  collections: ['reports.operational.read', 'reports.financial.read'],
+  finance: ['reports.financial.read', 'audit.read'],
+  auditor: ['reports.operational.read', 'reports.financial.read', 'audit.read'],
+}
+
+export function hasPermission(role: UserRole, permission: Permission): boolean {
+  return ROLE_PERMISSIONS[role].includes(permission)
+}

@@ -15,6 +15,7 @@ Product, quality, and user documentation is maintained in **three language trees
 | **SBOM (CycloneDX) evidence** | [evidence/README.md](evidence/README.md) · `npm run sbom:generate` |
 | **Generated documentation** (`npm run docs:generate`) | [en/quality/generated-documentation.md](en/quality/generated-documentation.md) · [es](es/quality/documentacion-generada.md) · [pt-BR](pt-br/quality/documentacao-gerada.md) · [`generated/` README](generated/README.md) |
 | **Product vision** (desktop + SaaS, fiscal modules, PROD-VISION-001) | [en/quality/product-vision-and-deployment.md](en/quality/product-vision-and-deployment.md) · [es](es/quality/vision-producto-y-despliegue.md) · [pt-BR](pt-br/quality/visao-produto-e-implantacao.md) |
+| **Referencia interna — legado (español, no oficial)** | [referencias/README.md](referencias/README.md) |
 
 ---
 

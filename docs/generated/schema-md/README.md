@@ -14,6 +14,12 @@
 
 * [ArticuloNullableEnvelope](./articulonullableenvelope.md) – `-`
 
+* [AuthClaims](./authclaims.md) – `-`
+
+* [AuthClaimsEnvelope](./authclaimsenvelope.md) – `-`
+
+* [AuthScope](./authscope.md) – `-`
+
 * [Cliente](./cliente.md) – `-`
 
 * [ClienteEnvelope](./clienteenvelope.md) – `-`
@@ -40,6 +46,16 @@
 
 * [HealthResponse](./healthresponse.md) – `-`
 
+* [LoginEnvelope](./loginenvelope.md) – `-`
+
+* [LoginInput](./logininput.md) – `-`
+
+* [LoginResult](./loginresult.md) – `-`
+
+* [LogoutEnvelope](./logoutenvelope.md) – `-`
+
+* [LogoutResult](./logoutresult.md) – `-`
+
 * [Rubro](./rubro.md) – `-`
 
 * [RubroEnvelope](./rubroenvelope.md) – `-`
@@ -47,6 +63,12 @@
 * [RubroInput](./rubroinput.md) – `-`
 
 * [RubroListEnvelope](./rubrolistenvelope.md) – `-`
+
+* [SetupOwnerEnvelope](./setupownerenvelope.md) – `-`
+
+* [SetupOwnerInput](./setupownerinput.md) – `-`
+
+* [SetupOwnerResult](./setupownerresult.md) – `-`
 
 ## Other Schemas
 
@@ -57,6 +79,16 @@
 ### Arrays
 
 * [Untitled array in ArticuloListEnvelope](./articulolistenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled array in AuthClaims](./authclaims-properties-permissions.md) – `undefined#/properties/permissions`
+
+* [Untitled array in AuthScope](./authscope-properties-branchids.md) – `undefined#/properties/branchIds`
+
+* [Untitled array in AuthScope](./authscope-properties-channels.md) – `undefined#/properties/channels`
+
+* [Untitled array in AuthScope](./authscope-properties-routeids.md) – `undefined#/properties/routeIds`
+
+* [Untitled array in AuthScope](./authscope-properties-warehouseids.md) – `undefined#/properties/warehouseIds`
 
 * [Untitled array in ClienteListEnvelope](./clientelistenvelope-properties-data.md) – `undefined#/properties/data`
 

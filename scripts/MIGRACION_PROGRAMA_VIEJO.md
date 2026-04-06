@@ -1,6 +1,12 @@
 # Migración desde `Programa_Viejo` (DBF)
 
-## Archivos en esta copia (`Programa_Viejo/16-07-2025 completa/sistema/`)
+## Ubicación de la copia
+
+Por defecto los scripts buscan `Programa_Viejo/16-07-2025 completa/sistema/` **en la raíz del proyecto**. Si la copia está en otro disco o carpeta (recomendado: fuera del repo), define en `.env`:
+
+`PROGRAMA_VIEJO_ROOT` — ruta absoluta o relativa al directorio desde el que ejecutas `npm` (p. ej. `../Programa_Viejo`).
+
+## Archivos en esta copia (`…/16-07-2025 completa/sistema/`)
 
 | Archivo        | Contenido real (verificado con `npx tsx scripts/inspect-dbf.ts`) |
 |----------------|-------------------------------------------------------------------|
@@ -39,7 +45,7 @@ Si en el futuro agregas un `CLIENTES.DBF` (o similar) con datos reales, habría 
 
 Desde la raíz del proyecto:
 
-1. Variables: archivo `.env` con `DATABASE_URL` apuntando a PostgreSQL (misma cadena que usa el servidor Express / Prisma).
+1. Variables: archivo `.env` con `DATABASE_URL` apuntando a PostgreSQL (misma cadena que usa el servidor Express / Prisma). Si `Programa_Viejo` no está en la raíz del repo, añade `PROGRAMA_VIEJO_ROOT` (véase arriba).
 2. Esquema aplicado: `npx prisma migrate deploy` (o `npx prisma migrate dev` en desarrollo).
 3. Cliente generado: `npx prisma generate`.
 4. Importar: `npm run migrate:dbf`.

@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "role": {
+      "type": "string"
+    },
+    "tenantId": {
+      "type": "integer"
+    },
+    "userId": {
+      "type": "integer"
+    },
+    "username": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "userId",
+    "tenantId",
+    "username",
+    "role"
+  ],
+  "title": "LoginResult",
+  "type": "object"
+}

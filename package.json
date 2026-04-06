@@ -34,6 +34,7 @@
     "docs:sbom": "npm run sbom:generate",
     "docs:generate": "npm run docs:extract-schemas && npm run docs:schemas-md && npm run docs:openapi-md && npm run docs:typedoc && npm run docs:sbom",
     "migrate:dbf": "tsx scripts/migrate-from-dbf.ts",
+    "inspect:dbf-all": "tsx scripts/inspect-dbf-all.ts",
     "release": "semantic-release"
   },
   "dependencies": {

@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "password": {
+      "type": "string"
+    },
+    "tenantSlug": {
+      "type": "string"
+    },
+    "username": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "tenantSlug",
+    "username",
+    "password"
+  ],
+  "title": "LoginInput",
+  "type": "object"
+}
