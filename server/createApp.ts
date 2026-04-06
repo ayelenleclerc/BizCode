@@ -7,6 +7,7 @@ import cors from 'cors'
 import type { PrismaClient } from '@prisma/client'
 import { parse as parseYaml } from 'yaml'
 import swaggerUi from 'swagger-ui-express'
+import { registerAuthRoutes, requirePermission, resolveSession, type AuthenticatedRequest } from './auth'
 
 function errorMessage(err: unknown): string {
   return err instanceof Error ? err.message : String(err)
@@ -38,12 +39,40 @@ export function createApp(prisma: PrismaClient): Application {
 
   app.use(cors())
   app.use(express.json())
+  app.use(resolveSession(prisma))
+
+  registerAuthRoutes(app, prisma)
 
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(getOpenApiDocument()))
 
+  async function writeAudit(
+    req: AuthenticatedRequest,
+    action: string,
+    resource: string,
+    resourceId?: string,
+  ): Promise<void> {
+    if (!req.auth) {
+      return
+    }
+    try {
+      await prisma.auditEvent.create({
+        data: {
+          tenantId: req.auth.claims.tenantId,
+          userId: req.auth.claims.userId,
+          action,
+          resource,
+          resourceId,
+          ipAddress: req.ip,
+        },
+      })
+    } catch (_error) {
+      // Audit failures should not block core business operations.
+    }
+  }
+
   // ============ CLIENTES ============
 
-  app.get('/api/clientes', async (req: Request, res: Response) => {
+  app.get('/api/clientes', requirePermission('customers.read'), async (req: Request, res: Response) => {
     try {
       const filtro = (req.query.q as string) || ''
       const clientes = await prisma.cliente.findMany({
@@ -62,7 +91,7 @@ export function createApp(prisma: PrismaClient): Application {
     }
   })
 
-  app.get('/api/clientes/:id', async (req: Request, res: Response) => {
+  app.get('/api/clientes/:id', requirePermission('customers.read'), async (req: Request, res: Response) => {
     try {
       const cliente = await prisma.cliente.findUnique({
         where: { id: parseInt(String(req.params.id), 10) },
@@ -73,23 +102,25 @@ export function createApp(prisma: PrismaClient): Application {
     }
   })
 
-  app.post('/api/clientes', async (req: Request, res: Response) => {
+  app.post('/api/clientes', requirePermission('customers.manage'), async (req: Request, res: Response) => {
     try {
       const cliente = await prisma.cliente.create({
         data: req.body,
       })
+      await writeAudit(req as AuthenticatedRequest, 'cliente_create', 'cliente', String(cliente.id))
       res.json({ success: true, data: cliente })
     } catch (err: unknown) {
       res.status(500).json({ success: false, error: errorMessage(err) })
     }
   })
 
-  app.put('/api/clientes/:id', async (req: Request, res: Response) => {
+  app.put('/api/clientes/:id', requirePermission('customers.manage'), async (req: Request, res: Response) => {
     try {
       const cliente = await prisma.cliente.update({
         where: { id: parseInt(String(req.params.id), 10) },
         data: req.body,
       })
+      await writeAudit(req as AuthenticatedRequest, 'cliente_update', 'cliente', String(cliente.id))
       res.json({ success: true, data: cliente })
     } catch (err: unknown) {
       res.status(500).json({ success: false, error: errorMessage(err) })
@@ -98,7 +129,7 @@ export function createApp(prisma: PrismaClient): Application {
 
   // ============ ARTICULOS ============
 
-  app.get('/api/articulos', async (req: Request, res: Response) => {
+  app.get('/api/articulos', requirePermission('products.read'), async (req: Request, res: Response) => {
     try {
       const filtro = (req.query.q as string) || ''
       const articulos = await prisma.articulo.findMany({
@@ -117,7 +148,7 @@ export function createApp(prisma: PrismaClient): Application {
     }
   })
 
-  app.get('/api/articulos/:id', async (req: Request, res: Response) => {
+  app.get('/api/articulos/:id', requirePermission('products.read'), async (req: Request, res: Response) => {
     try {
       const articulo = await prisma.articulo.findUnique({
         where: { id: parseInt(String(req.params.id), 10) },
@@ -129,23 +160,25 @@ export function createApp(prisma: PrismaClient): Application {
     }
   })
 
-  app.post('/api/articulos', async (req: Request, res: Response) => {
+  app.post('/api/articulos', requirePermission('products.manage'), async (req: Request, res: Response) => {
     try {
       const articulo = await prisma.articulo.create({
         data: req.body,
       })
+      await writeAudit(req as AuthenticatedRequest, 'articulo_create', 'articulo', String(articulo.id))
       res.json({ success: true, data: articulo })
     } catch (err: unknown) {
       res.status(500).json({ success: false, error: errorMessage(err) })
     }
   })
 
-  app.put('/api/articulos/:id', async (req: Request, res: Response) => {
+  app.put('/api/articulos/:id', requirePermission('products.manage'), async (req: Request, res: Response) => {
     try {
       const articulo = await prisma.articulo.update({
         where: { id: parseInt(String(req.params.id), 10) },
         data: req.body,
       })
+      await writeAudit(req as AuthenticatedRequest, 'articulo_update', 'articulo', String(articulo.id))
       res.json({ success: true, data: articulo })
     } catch (err: unknown) {
       res.status(500).json({ success: false, error: errorMessage(err) })
@@ -154,7 +187,7 @@ export function createApp(prisma: PrismaClient): Application {
 
   // ============ RUBROS ============
 
-  app.get('/api/rubros', async (_req: Request, res: Response) => {
+  app.get('/api/rubros', requirePermission('products.read'), async (_req: Request, res: Response) => {
     try {
       const rubros = await prisma.rubro.findMany({
         orderBy: { codigo: 'asc' },
@@ -165,9 +198,10 @@ export function createApp(prisma: PrismaClient): Application {
     }
   })
 
-  app.post('/api/rubros', async (req: Request, res: Response) => {
+  app.post('/api/rubros', requirePermission('products.manage'), async (req: Request, res: Response) => {
     try {
       const rubro = await prisma.rubro.create({ data: req.body })
+      await writeAudit(req as AuthenticatedRequest, 'rubro_create', 'rubro', String(rubro.id))
       res.json({ success: true, data: rubro })
     } catch (err: unknown) {
       res.status(500).json({ success: false, error: errorMessage(err) })
@@ -176,7 +210,7 @@ export function createApp(prisma: PrismaClient): Application {
 
   // ============ FORMAS DE PAGO ============
 
-  app.get('/api/formas-pago', async (_req: Request, res: Response) => {
+  app.get('/api/formas-pago', requirePermission('sales.create'), async (_req: Request, res: Response) => {
     try {
       const formas = await prisma.formaPago.findMany({
         orderBy: { codigo: 'asc' },
@@ -189,7 +223,7 @@ export function createApp(prisma: PrismaClient): Application {
 
   // ============ FACTURAS ============
 
-  app.get('/api/facturas', async (_req: Request, res: Response) => {
+  app.get('/api/facturas', requirePermission('reports.operational.read'), async (_req: Request, res: Response) => {
     try {
       const facturas = await prisma.factura.findMany({
         include: { cliente: true, items: true },
@@ -201,7 +235,7 @@ export function createApp(prisma: PrismaClient): Application {
     }
   })
 
-  app.post('/api/facturas', async (req: Request, res: Response) => {
+  app.post('/api/facturas', requirePermission('sales.create'), async (req: Request, res: Response) => {
     try {
       const { items, ...factura } = req.body as { items: Record<string, unknown>[] } & Record<
         string,
@@ -216,6 +250,7 @@ export function createApp(prisma: PrismaClient): Application {
         } as Parameters<typeof prisma.factura.create>[0]['data'],
         include: { items: true },
       })
+      await writeAudit(req as AuthenticatedRequest, 'factura_create', 'factura', String(result.id))
       res.json({ success: true, data: result })
     } catch (err: unknown) {
       res.status(500).json({ success: false, error: errorMessage(err) })

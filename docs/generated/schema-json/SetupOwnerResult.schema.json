@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "role": {
+      "type": "string"
+    },
+    "tenantId": {
+      "type": "integer"
+    },
+    "userId": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "tenantId",
+    "userId",
+    "role"
+  ],
+  "title": "SetupOwnerResult",
+  "type": "object"
+}

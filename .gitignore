@@ -29,3 +29,4 @@ docs/evidence/sbom-cyclonedx-full.json
 # Scratch outputs from ISO map / package-index helpers (regenerate via scripts)
 scripts/_*.md
 scripts/_*.txt
+node_modules

@@ -12,10 +12,21 @@ import { PrismaClient } from '@prisma/client'
 import { DBFFile } from 'dbffile'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
+
+/**
+ * @en Root folder of the legacy Programa_Viejo copy; override with `PROGRAMA_VIEJO_ROOT` if it lives outside the repo.
+ * @es Raíz de la copia legacy de Programa_Viejo; usar `PROGRAMA_VIEJO_ROOT` si está fuera del repo.
+ * @pt-BR Raiz da cópia legada Programa_Viejo; use `PROGRAMA_VIEJO_ROOT` se estiver fora do repositório.
+ */
+function programaViejoRoot(): string {
+  const fallback = path.join(__dirname, '..', 'Programa_Viejo')
+  const fromEnv = process.env.PROGRAMA_VIEJO_ROOT?.trim()
+  if (!fromEnv) return fallback
+  return path.isAbsolute(fromEnv) ? fromEnv : path.resolve(process.cwd(), fromEnv)
+}
+
 const SISTEMA = path.join(
-  __dirname,
-  '..',
-  'Programa_Viejo',
+  programaViejoRoot(),
   '16-07-2025 completa',
   'sistema'
 )

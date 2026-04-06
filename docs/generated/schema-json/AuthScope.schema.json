@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "branchIds": {
+      "items": {
+        "type": "integer"
+      },
+      "type": "array"
+    },
+    "channels": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "routeIds": {
+      "items": {
+        "type": "integer"
+      },
+      "type": "array"
+    },
+    "tenantId": {
+      "type": "integer"
+    },
+    "warehouseIds": {
+      "items": {
+        "type": "integer"
+      },
+      "type": "array"
+    }
+  },
+  "required": [
+    "tenantId",
+    "branchIds",
+    "warehouseIds",
+    "routeIds",
+    "channels"
+  ],
+  "title": "AuthScope",
+  "type": "object"
+}

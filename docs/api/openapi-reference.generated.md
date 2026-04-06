@@ -5,7 +5,7 @@
 - **OpenAPI Version:** `3.1.0`
 - **API Version:** `0.1.0`
 
-REST API for BizCode commercial management system. Runs as an Express 5 sidecar on localhost:3001. Responses use a JSON envelope `{ success: true, data: ... }` except `/api/health`. No authentication is required (loopback-only access). Interactive documentation (Swagger UI): <http://localhost:3001/api-docs/> (same contract as this file).
+REST API for BizCode commercial management system. Runs as an Express 5 sidecar on localhost:3001. Responses use a JSON envelope `{ success: true, data: ... }` except `/api/health`. Session authentication is required for protected resources. Interactive documentation (Swagger UI): <http://localhost:3001/api-docs/> (same contract as this file).
 
 ## Servers
 
@@ -13,6 +13,416 @@ REST API for BizCode commercial management system. Runs as an Express 5 sidecar 
   - **Description:** Local development / Tauri sidecar
 
 ## Operations
+
+### Bootstrap first owner account
+
+- **Method:** `POST`
+- **Path:** `/api/auth/setup-owner`
+- **Tags:** auth
+
+One-time endpoint to create initial tenant and owner user.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`password` (required)**
+
+  `string`
+
+- **`tenantName` (required)**
+
+  `string`
+
+- **`tenantSlug` (required)**
+
+  `string`
+
+- **`username` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "tenantName": "",
+  "tenantSlug": "",
+  "username": "",
+  "password": ""
+}
+```
+
+#### Responses
+
+##### Status: 201 Owner created
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`role` (required)**
+
+    `string`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`userId` (required)**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "tenantId": 1,
+    "userId": 1,
+    "role": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 409 Resource conflict
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Create authenticated session
+
+- **Method:** `POST`
+- **Path:** `/api/auth/login`
+- **Tags:** auth
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`password` (required)**
+
+  `string`
+
+- **`tenantSlug` (required)**
+
+  `string`
+
+- **`username` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "tenantSlug": "",
+  "username": "",
+  "password": ""
+}
+```
+
+#### Responses
+
+##### Status: 200 Session created
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`role` (required)**
+
+    `string`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`userId` (required)**
+
+    `integer`
+
+  - **`username` (required)**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "userId": 1,
+    "tenantId": 1,
+    "username": "",
+    "role": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Revoke current session
+
+- **Method:** `POST`
+- **Path:** `/api/auth/logout`
+- **Tags:** auth
+
+#### Responses
+
+##### Status: 200 Session revoked (or already missing)
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`loggedOut` (required)**
+
+    `boolean`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "loggedOut": true
+  }
+}
+```
+
+### Get authenticated claims
+
+- **Method:** `GET`
+- **Path:** `/api/auth/me`
+- **Tags:** auth
+
+#### Responses
+
+##### Status: 200 Current authenticated claims
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`permissions` (required)**
+
+    `array`
+
+    **Items:**
+
+    `string`
+
+  - **`role` (required)**
+
+    `string`
+
+  - **`scope` (required)**
+
+    `object`
+
+    - **`branchIds` (required)**
+
+      `array`
+
+      **Items:**
+
+      `integer`
+
+    - **`channels` (required)**
+
+      `array`
+
+      **Items:**
+
+      `string`
+
+    - **`routeIds` (required)**
+
+      `array`
+
+      **Items:**
+
+      `integer`
+
+    - **`tenantId` (required)**
+
+      `integer`
+
+    - **`warehouseIds` (required)**
+
+      `array`
+
+      **Items:**
+
+      `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`userId` (required)**
+
+    `integer`
+
+  - **`username` (required)**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "userId": 1,
+    "tenantId": 1,
+    "username": "",
+    "role": "",
+    "permissions": [
+      ""
+    ],
+    "scope": {
+      "tenantId": 1,
+      "branchIds": [
+        1
+      ],
+      "warehouseIds": [
+        1
+      ],
+      "routeIds": [
+        1
+      ],
+      "channels": [
+        ""
+      ]
+    }
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
 
 ### Health check
 
@@ -135,6 +545,48 @@ REST API for BizCode commercial management system. Runs as an Express 5 sidecar 
       "additionalProperty": "anything"
     }
   ]
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
 }
 ```
 
@@ -316,6 +768,48 @@ REST API for BizCode commercial management system. Runs as an Express 5 sidecar 
 }
 ```
 
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ##### Status: 500 Internal server error
 
 ###### Content-Type: application/json
@@ -377,6 +871,48 @@ REST API for BizCode commercial management system. Runs as an Express 5 sidecar 
     "activo": true,
     "additionalProperty": "anything"
   }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
 }
 ```
 
@@ -558,6 +1094,48 @@ REST API for BizCode commercial management system. Runs as an Express 5 sidecar 
 }
 ```
 
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ##### Status: 500 Internal server error
 
 ###### Content-Type: application/json
@@ -693,6 +1271,48 @@ REST API for BizCode commercial management system. Runs as an Express 5 sidecar 
       "additionalProperty": "anything"
     }
   ]
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
 }
 ```
 
@@ -896,6 +1516,48 @@ REST API for BizCode commercial management system. Runs as an Express 5 sidecar 
 }
 ```
 
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ##### Status: 500 Internal server error
 
 ###### Content-Type: application/json
@@ -963,6 +1625,48 @@ REST API for BizCode commercial management system. Runs as an Express 5 sidecar 
     "activo": true,
     "additionalProperty": "anything"
   }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
 }
 ```
 
@@ -1166,6 +1870,48 @@ REST API for BizCode commercial management system. Runs as an Express 5 sidecar 
 }
 ```
 
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ##### Status: 500 Internal server error
 
 ###### Content-Type: application/json
@@ -1234,6 +1980,48 @@ REST API for BizCode commercial management system. Runs as an Express 5 sidecar 
       "additionalProperty": "anything"
     }
   ]
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
 }
 ```
 
@@ -1322,6 +2110,48 @@ REST API for BizCode commercial management system. Runs as an Express 5 sidecar 
     "nombre": "",
     "additionalProperty": "anything"
   }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
 }
 ```
 
@@ -1578,6 +2408,48 @@ REST API for BizCode commercial management system. Runs as an Express 5 sidecar 
       "additionalProperty": "anything"
     }
   ]
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
 }
 ```
 
@@ -1939,6 +2811,48 @@ REST API for BizCode commercial management system. Runs as an Express 5 sidecar 
 }
 ```
 
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ##### Status: 500 Internal server error
 
 ###### Content-Type: application/json
@@ -2077,6 +2991,507 @@ REST API for BizCode commercial management system. Runs as an Express 5 sidecar 
 {
   "success": false,
   "error": ""
+}
+```
+
+### SetupOwnerInput
+
+- **Type:**`object`
+
+* **`password` (required)**
+
+  `string`
+
+* **`tenantName` (required)**
+
+  `string`
+
+* **`tenantSlug` (required)**
+
+  `string`
+
+* **`username` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "tenantName": "",
+  "tenantSlug": "",
+  "username": "",
+  "password": ""
+}
+```
+
+### SetupOwnerResult
+
+- **Type:**`object`
+
+* **`role` (required)**
+
+  `string`
+
+* **`tenantId` (required)**
+
+  `integer`
+
+* **`userId` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "tenantId": 1,
+  "userId": 1,
+  "role": ""
+}
+```
+
+### SetupOwnerEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`role` (required)**
+
+    `string`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`userId` (required)**
+
+    `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "tenantId": 1,
+    "userId": 1,
+    "role": ""
+  }
+}
+```
+
+### LoginInput
+
+- **Type:**`object`
+
+* **`password` (required)**
+
+  `string`
+
+* **`tenantSlug` (required)**
+
+  `string`
+
+* **`username` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "tenantSlug": "",
+  "username": "",
+  "password": ""
+}
+```
+
+### LoginResult
+
+- **Type:**`object`
+
+* **`role` (required)**
+
+  `string`
+
+* **`tenantId` (required)**
+
+  `integer`
+
+* **`userId` (required)**
+
+  `integer`
+
+* **`username` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "userId": 1,
+  "tenantId": 1,
+  "username": "",
+  "role": ""
+}
+```
+
+### LoginEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`role` (required)**
+
+    `string`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`userId` (required)**
+
+    `integer`
+
+  - **`username` (required)**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "userId": 1,
+    "tenantId": 1,
+    "username": "",
+    "role": ""
+  }
+}
+```
+
+### LogoutResult
+
+- **Type:**`object`
+
+* **`loggedOut` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "loggedOut": true
+}
+```
+
+### LogoutEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`loggedOut` (required)**
+
+    `boolean`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "loggedOut": true
+  }
+}
+```
+
+### AuthScope
+
+- **Type:**`object`
+
+* **`branchIds` (required)**
+
+  `array`
+
+  **Items:**
+
+  `integer`
+
+* **`channels` (required)**
+
+  `array`
+
+  **Items:**
+
+  `string`
+
+* **`routeIds` (required)**
+
+  `array`
+
+  **Items:**
+
+  `integer`
+
+* **`tenantId` (required)**
+
+  `integer`
+
+* **`warehouseIds` (required)**
+
+  `array`
+
+  **Items:**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "tenantId": 1,
+  "branchIds": [
+    1
+  ],
+  "warehouseIds": [
+    1
+  ],
+  "routeIds": [
+    1
+  ],
+  "channels": [
+    ""
+  ]
+}
+```
+
+### AuthClaims
+
+- **Type:**`object`
+
+* **`permissions` (required)**
+
+  `array`
+
+  **Items:**
+
+  `string`
+
+* **`role` (required)**
+
+  `string`
+
+* **`scope` (required)**
+
+  `object`
+
+  - **`branchIds` (required)**
+
+    `array`
+
+    **Items:**
+
+    `integer`
+
+  - **`channels` (required)**
+
+    `array`
+
+    **Items:**
+
+    `string`
+
+  - **`routeIds` (required)**
+
+    `array`
+
+    **Items:**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`warehouseIds` (required)**
+
+    `array`
+
+    **Items:**
+
+    `integer`
+
+* **`tenantId` (required)**
+
+  `integer`
+
+* **`userId` (required)**
+
+  `integer`
+
+* **`username` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "userId": 1,
+  "tenantId": 1,
+  "username": "",
+  "role": "",
+  "permissions": [
+    ""
+  ],
+  "scope": {
+    "tenantId": 1,
+    "branchIds": [
+      1
+    ],
+    "warehouseIds": [
+      1
+    ],
+    "routeIds": [
+      1
+    ],
+    "channels": [
+      ""
+    ]
+  }
+}
+```
+
+### AuthClaimsEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`permissions` (required)**
+
+    `array`
+
+    **Items:**
+
+    `string`
+
+  - **`role` (required)**
+
+    `string`
+
+  - **`scope` (required)**
+
+    `object`
+
+    - **`branchIds` (required)**
+
+      `array`
+
+      **Items:**
+
+      `integer`
+
+    - **`channels` (required)**
+
+      `array`
+
+      **Items:**
+
+      `string`
+
+    - **`routeIds` (required)**
+
+      `array`
+
+      **Items:**
+
+      `integer`
+
+    - **`tenantId` (required)**
+
+      `integer`
+
+    - **`warehouseIds` (required)**
+
+      `array`
+
+      **Items:**
+
+      `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`userId` (required)**
+
+    `integer`
+
+  - **`username` (required)**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "userId": 1,
+    "tenantId": 1,
+    "username": "",
+    "role": "",
+    "permissions": [
+      ""
+    ],
+    "scope": {
+      "tenantId": 1,
+      "branchIds": [
+        1
+      ],
+      "warehouseIds": [
+        1
+      ],
+      "routeIds": [
+        1
+      ],
+      "channels": [
+        ""
+      ]
+    }
+  }
 }
 ```
 
