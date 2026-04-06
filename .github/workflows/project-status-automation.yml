@@ -2,7 +2,7 @@ name: Project status automation
 
 on:
   pull_request_target:
-    types: [opened, reopened, closed, labeled, unlabeled]
+    types: [opened, reopened, synchronize, closed, labeled, unlabeled]
 
 permissions:
   contents: read
@@ -79,29 +79,44 @@ jobs:
             }
 
             for (const issueNumber of issueNumbers) {
-              const issueData = await github.graphql(
-                `query($owner:String!, $repo:String!, $number:Int!) {
-                  repository(owner:$owner, name:$repo) {
-                    issue(number:$number) {
-                      projectItems(first: 50) {
-                        nodes {
-                          id
-                          project {
-                            ... on ProjectV2 {
-                              id
+              let item;
+              // Project item association can lag a few seconds right after issue/PR creation.
+              for (let attempt = 1; attempt <= 6; attempt += 1) {
+                const issueData = await github.graphql(
+                  `query($owner:String!, $repo:String!, $number:Int!) {
+                    repository(owner:$owner, name:$repo) {
+                      issue(number:$number) {
+                        projectItems(first: 50) {
+                          nodes {
+                            id
+                            project {
+                              ... on ProjectV2 {
+                                id
+                              }
                             }
                           }
                         }
                       }
                     }
-                  }
-                }`,
-                { owner, repo, number: issueNumber }
-              );
+                  }`,
+                  { owner, repo, number: issueNumber }
+                );
 
-              const item = issueData.repository.issue.projectItems.nodes.find(
-                (node) => node.project?.id === projectId
-              );
+                item = issueData.repository.issue.projectItems.nodes.find(
+                  (node) => node.project?.id === projectId
+                );
+
+                if (item) {
+                  break;
+                }
+
+                if (attempt < 6) {
+                  core.info(
+                    `Issue #${issueNumber} not yet attached to project ${projectId}; retrying (${attempt}/6)...`
+                  );
+                  await new Promise((resolve) => setTimeout(resolve, 5000));
+                }
+              }
 
               if (!item) {
                 core.info(`Issue #${issueNumber} is not in project ${projectId}; skipping.`);
