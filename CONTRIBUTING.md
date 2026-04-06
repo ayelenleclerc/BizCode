@@ -16,6 +16,13 @@ See also [AGENTS.md](AGENTS.md) for the short index.
 - **Install:** run `npm ci` after cloning (respects [`.npmrc`](.npmrc) `legacy-peer-deps`, required for `eslint-plugin-jsx-a11y` with ESLint 10 until upstream peers align).
 - **Lockfile:** commit `package-lock.json` with every dependency change; bump packages in focused steps and run the quality gate locally.
 
+### Windows: PowerShell and `npm`
+
+If `npm run …` fails with **script execution disabled** / `npm.ps1` / `PSSecurityException`, the `package.json` scripts are fine: **PowerShell is blocking the `npm` shim**, not your project.
+
+- **Recommended:** use **Command Prompt** or **Git Bash** for the integrated terminal. This repo sets the default on Windows to Command Prompt via [`.vscode/settings.json`](.vscode/settings.json) (and [BizCode.code-workspace](BizCode.code-workspace) when you open the workspace).
+- **Alternatives:** run `npm.cmd run dev:full`, or allow scripts for your user: `Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser` (PowerShell).
+
 ## Branch Workflow
 
 ### Application code
