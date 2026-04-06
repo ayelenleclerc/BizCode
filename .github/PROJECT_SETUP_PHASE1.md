@@ -35,9 +35,16 @@ This repository includes automated assets for the Phase 1 governance blueprint.
    - `PROJECT_STATUS_OPTION_IN_PROGRESS`
    - `PROJECT_STATUS_OPTION_DONE`
    - `PROJECT_STATUS_OPTION_BLOCKED` (optional)
+5. (Recommended for user-owned Projects) add repository secret:
+   - `PROJECT_AUTOMATION_TOKEN` = GitHub PAT with scopes:
+     - `repo`
+     - `project`
+     - `read:project`
 
 ## Notes
 
 - Project status automation only runs when all required variables are present.
+- For user-owned Project V2 boards, default `GITHUB_TOKEN` can fail to read/update issue project items.
+  Use `PROJECT_AUTOMATION_TOKEN` secret to ensure reliable status transitions.
 - Branch protection step in the script expects CI check named `Quality Gate`.
 - On GitHub Free private repositories, branch protection/rulesets can be unavailable. In that case, upgrade plan or make repository public to enforce required checks at merge time.
