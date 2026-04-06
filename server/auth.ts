@@ -1,4 +1,4 @@
-import { createHash, randomBytes, scryptSync, timingSafeEqual } from 'node:crypto'
+import { createHash, randomBytes } from 'node:crypto'
 import type { NextFunction, Request, Response } from 'express'
 import { Prisma, type PrismaClient } from '@prisma/client'
 import {
@@ -12,6 +12,7 @@ import {
   type UserChannel,
   type UserRole,
 } from '../src/lib/rbac'
+import { hashPassword, verifyPassword } from './passwordHash'
 
 const SESSION_COOKIE_NAME = 'bizcode_session'
 const SESSION_DURATION_MS = 1000 * 60 * 60 * 8
@@ -43,21 +44,6 @@ function createSessionToken(): string {
 
 function hashToken(token: string): string {
   return createHash('sha256').update(token).digest('hex')
-}
-
-function hashPassword(password: string): string {
-  const salt = randomBytes(16).toString('hex')
-  const hash = scryptSync(password, salt, 64).toString('hex')
-  return `${salt}:${hash}`
-}
-
-function verifyPassword(password: string, encoded: string): boolean {
-  const [salt, storedHash] = encoded.split(':')
-  if (!salt || !storedHash) {
-    return false
-  }
-  const computed = scryptSync(password, salt, 64).toString('hex')
-  return timingSafeEqual(Buffer.from(storedHash, 'hex'), Buffer.from(computed, 'hex'))
 }
 
 function normalizeRole(value: string): UserRole | null {

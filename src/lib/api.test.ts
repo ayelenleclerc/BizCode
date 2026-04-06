@@ -17,19 +17,92 @@ vi.mock('axios', () => ({
 
 // Importar después del mock
 import {
+  ApiRequestFailedError,
   authAPI,
-  clientesAPI,
   articulosAPI,
-  rubrosAPI,
-  formasPagoAPI,
-  facturasAPI,
   checkAPI,
+  clientesAPI,
+  facturasAPI,
+  formasPagoAPI,
+  getAuthErrorI18nKey,
+  rubrosAPI,
 } from './api'
 
 beforeEach(() => {
   mockGet.mockClear()
   mockPost.mockClear()
   mockPut.mockClear()
+})
+
+describe('getAuthErrorI18nKey', () => {
+  it('mapea Invalid credentials', () => {
+    expect(
+      getAuthErrorI18nKey(new ApiRequestFailedError('Invalid credentials', { hasResponse: true })),
+    ).toBe('auth.errors.invalidCredentials')
+  })
+
+  it('mapea Error genérico con mensaje Invalid credentials (legacy)', () => {
+    expect(getAuthErrorI18nKey(new Error('Invalid credentials'))).toBe('auth.errors.invalidCredentials')
+  })
+
+  it('mapea ERR_NETWORK sin respuesta', () => {
+    expect(
+      getAuthErrorI18nKey(
+        new ApiRequestFailedError('Network Error', { axiosCode: 'ERR_NETWORK', hasResponse: false }),
+      ),
+    ).toBe('auth.errors.network')
+  })
+
+  it('mapea mensaje Network Error sin código', () => {
+    expect(getAuthErrorI18nKey(new ApiRequestFailedError('Network Error', { hasResponse: false }))).toBe(
+      'auth.errors.network',
+    )
+  })
+
+  it('mapea Failed to fetch sin respuesta', () => {
+    expect(getAuthErrorI18nKey(new ApiRequestFailedError('Failed to fetch', { hasResponse: false }))).toBe(
+      'auth.errors.network',
+    )
+  })
+
+  it('mapea sin respuesta y mensaje no reconocido a red (fallback)', () => {
+    expect(getAuthErrorI18nKey(new ApiRequestFailedError('Unknown error', { hasResponse: false }))).toBe(
+      'auth.errors.network',
+    )
+  })
+
+  it('mapea timeout por texto en el mensaje', () => {
+    expect(getAuthErrorI18nKey(new ApiRequestFailedError('timeout exceeded', { hasResponse: false }))).toBe(
+      'auth.errors.timeout',
+    )
+  })
+
+  it('mapea ECONNABORTED a timeout', () => {
+    expect(
+      getAuthErrorI18nKey(
+        new ApiRequestFailedError('timeout of 10000ms exceeded', {
+          axiosCode: 'ECONNABORTED',
+          hasResponse: false,
+        }),
+      ),
+    ).toBe('auth.errors.timeout')
+  })
+
+  it('mapea ETIMEDOUT a timeout', () => {
+    expect(
+      getAuthErrorI18nKey(new ApiRequestFailedError('socket hang up', { axiosCode: 'ETIMEDOUT', hasResponse: false })),
+    ).toBe('auth.errors.timeout')
+  })
+
+  it('mapea respuesta HTTP con cuerpo de error a genérico salvo Invalid credentials', () => {
+    expect(
+      getAuthErrorI18nKey(new ApiRequestFailedError('Something broke', { axiosCode: 'ERR_BAD_RESPONSE', hasResponse: true })),
+    ).toBe('auth.errors.generic')
+  })
+
+  it('mapea desconocido a genérico', () => {
+    expect(getAuthErrorI18nKey('string')).toBe('auth.errors.generic')
+  })
 })
 
 describe('API client (axios)', () => {
@@ -66,6 +139,19 @@ describe('authAPI', () => {
       await expect(authAPI.login({ tenantSlug: 'd', username: 'u', password: 'p' })).rejects.toThrow(
         'Invalid credentials',
       )
+    })
+
+    it('lanza ApiRequestFailedError en fallo de red', async () => {
+      const err = Object.assign(new Error('Network Error'), {
+        code: 'ERR_NETWORK' as const,
+      })
+      mockPost.mockRejectedValueOnce(err)
+      await expect(authAPI.login({ tenantSlug: 'd', username: 'u', password: 'p' })).rejects.toMatchObject({
+        name: 'ApiRequestFailedError',
+        message: 'Network Error',
+        axiosCode: 'ERR_NETWORK',
+        hasResponse: false,
+      })
     })
   })
 

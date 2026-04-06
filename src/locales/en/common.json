@@ -34,7 +34,9 @@
     },
     "errors": {
       "invalidCredentials": "Invalid username or password",
-      "generic": "Could not sign in"
+      "generic": "Could not sign in",
+      "network": "Cannot reach the server. Make sure the API is running (e.g. port 3001) and try again.",
+      "timeout": "The request took too long. Please try again."
     }
   },
   "session": {
