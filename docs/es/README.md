@@ -4,6 +4,7 @@
 
 | Documento | Contenido |
 |-----------|-----------|
+| [../referencias/README.md](../referencias/README.md) | Material interno: relevamiento sistema legado (DBF), sin valor documental oficial |
 | [arquitectura.md](arquitectura.md) | Tauri, React, Express, Prisma, PostgreSQL |
 | [temas-interfaz.md](temas-interfaz.md) | Tema claro/oscuro: Tailwind `dark:`, `<html>`, `localStorage`, `index.html` |
 | [estandares-codigo.md](estandares-codigo.md) | TypeScript, React, pruebas, i18n, `data-testid` |

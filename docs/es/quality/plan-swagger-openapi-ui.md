@@ -2,8 +2,8 @@
 
 | | |
 |---|---|
-| **Versión del documento** | 1.1.0 |
-| **Última actualización** | 2026-04-01 |
+| **Versión del documento** | 1.2.0 |
+| **Última actualización** | 2026-04-06 |
 | **Versionado semántico** | Este documento sigue la política de producto [SemVer / changelog](../certificacion-iso/ciclo-vida-y-validacion-documental.md); incrementar **minor** si se añaden secciones, **patch** si solo hay aclaraciones. |
 | **Estado** | **Implementado** — Swagger UI en `/api-docs` desde [`server/createApp.ts`](../../../server/createApp.ts) (`swagger-ui-express` + [`docs/api/openapi.yaml`](../../api/openapi.yaml)); pruebas en [`tests/api/swagger-ui.test.ts`](../../../tests/api/swagger-ui.test.ts). |
 
@@ -41,7 +41,7 @@
 
 ## Nota de seguridad
 
-El OpenAPI describe **loopback / sin auth** para el modelo actual de sidecar; reevaluar si la API se expone más allá de localhost.
+Desde Fase 1 IAM/RBAC, los endpoints operativos (`clientes`, `articulos`, `rubros`, `formas-pago`, `facturas`) requieren sesión por cookie `HttpOnly` y permisos por rol. Solo `/api/health` y los endpoints de bootstrap/autenticación (`/api/auth/setup-owner`, `/api/auth/login`, `/api/auth/logout`, `/api/auth/me`) quedan fuera del mismo nivel de protección para permitir el inicio de sesión.
 
 ## Verificación
 

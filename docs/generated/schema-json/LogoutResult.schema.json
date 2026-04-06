@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "loggedOut": {
+      "const": true,
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "loggedOut"
+  ],
+  "title": "LogoutResult",
+  "type": "object"
+}
