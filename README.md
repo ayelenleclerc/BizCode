@@ -43,8 +43,8 @@ npm install --legacy-peer-deps
 cp .env.example .env
 # Edit .env and set DATABASE_URL
 
-# 4. Initialize the database
-npx prisma migrate dev --name init
+# 4. Initialize the database (SQL history is versioned under prisma/migrations/)
+npx prisma migrate dev
 npx prisma db seed   # creates tenant `platform` + SuperAdmin `ayelen` (password: `BIZCODE_SEED_SUPERADMIN_PASSWORD` in `.env`, default see `.env.example`)
 
 # 5. Start the full-stack dev server (API + Vite)
