@@ -21,6 +21,11 @@ Resumido en la versión en inglés; en el alcance actual muchos riesgos son N/A 
 - `.env.example` solo placeholders.
 - Sin secretos en el código.
 
+## Seed de Prisma (arranque en desarrollo)
+
+- `npx prisma db seed` crea o actualiza el tenant `platform` y el usuario `ayelen` (SuperAdmin). La contraseña se toma de `BIZCODE_SEED_SUPERADMIN_PASSWORD`; [`.env.example`](../../.env.example) documenta un valor de ejemplo **solo para desarrollo local**.
+- **No** reutilices esa contraseña de ejemplo en preproducción, producción ni bases compartidas. Usa un secreto fuerte por entorno; volver a ejecutar el seed sobrescribe el hash almacenado de ese usuario.
+
 ## CORS
 
 No configurado (solo WebView local). Si la API se expone a red, añadir `cors` con lista blanca explícita.

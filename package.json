@@ -6,6 +6,9 @@
   "engines": {
     "node": ">=22.0.0"
   },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  },
   "scripts": {
     "server": "tsx server/main.ts",
     "dev:vite": "vite",

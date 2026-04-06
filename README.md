@@ -45,11 +45,13 @@ cp .env.example .env
 
 # 4. Initialize the database
 npx prisma migrate dev --name init
-npx prisma db seed   # optional sample data
+npx prisma db seed   # creates tenant `platform` + SuperAdmin `ayelen` (password: `BIZCODE_SEED_SUPERADMIN_PASSWORD` in `.env`, default see `.env.example`)
 
 # 5. Start the full-stack dev server (API + Vite)
 npm run dev:full
 ```
+
+**Login (after seed):** tenant slug `platform`, username `ayelen`, password from `BIZCODE_SEED_SUPERADMIN_PASSWORD` (default `Yuskia13` in `.env.example` only for local dev). Re-running the seed resets that user’s password hash to match the current env value. The `super_admin` role includes all ERP permissions plus platform permissions ([`src/lib/rbac.ts`](src/lib/rbac.ts)).
 
 ### Available Scripts
 
@@ -77,6 +79,7 @@ npm run dev:full
 | `DATABASE_URL` | Yes | PostgreSQL connection string |
 | `PORT` | No | Express API port (default: 3001) |
 | `VITE_API_URL` | No | API base URL seen by the frontend (default: http://localhost:3001) |
+| `BIZCODE_SEED_SUPERADMIN_PASSWORD` | No | Password for seeded SuperAdmin (`ayelen` / tenant `platform`); see `.env.example`. Override outside local dev. |
 
 ---
 

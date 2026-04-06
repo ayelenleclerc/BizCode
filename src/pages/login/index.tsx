@@ -6,6 +6,9 @@ import { useTranslation } from 'react-i18next'
 import LanguageSelect from '@/components/LanguageSelect'
 import { useAuth } from '@/contexts/AuthContext'
 
+const loginInputClassName =
+  'w-full rounded border border-slate-300 px-3 py-2 text-slate-900 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100'
+
 /**
  * @en Login form (tenant, user, password) with i18n and cookie session via AuthProvider.
  * @es Formulario de inicio de sesión (tenant, usuario, contraseña) con i18n y sesión por cookie.
@@ -78,16 +81,27 @@ export default function LoginPage() {
               <label htmlFor="login-tenant-slug" className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">
                 {t('auth.fields.tenantSlug')}
               </label>
-              <input
-                id="login-tenant-slug"
-                data-testid="login-tenant-slug"
-                type="text"
-                autoComplete="organization"
-                aria-invalid={errors.tenantSlug ? 'true' : 'false'}
-                aria-describedby={errors.tenantSlug ? 'login-tenant-slug-error' : undefined}
-                className="w-full rounded border border-slate-300 px-3 py-2 text-slate-900 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
-                {...register('tenantSlug')}
-              />
+              {errors.tenantSlug ? (
+                <input
+                  id="login-tenant-slug"
+                  data-testid="login-tenant-slug"
+                  type="text"
+                  autoComplete="organization"
+                  className={loginInputClassName}
+                  {...register('tenantSlug')}
+                  aria-invalid="true"
+                  aria-describedby="login-tenant-slug-error"
+                />
+              ) : (
+                <input
+                  id="login-tenant-slug"
+                  data-testid="login-tenant-slug"
+                  type="text"
+                  autoComplete="organization"
+                  className={loginInputClassName}
+                  {...register('tenantSlug')}
+                />
+              )}
               {errors.tenantSlug && (
                 <p id="login-tenant-slug-error" className="mt-1 text-sm text-red-600 dark:text-red-400" role="alert">
                   {errors.tenantSlug.message}
@@ -99,16 +113,27 @@ export default function LoginPage() {
               <label htmlFor="login-username" className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">
                 {t('auth.fields.username')}
               </label>
-              <input
-                id="login-username"
-                data-testid="login-username"
-                type="text"
-                autoComplete="username"
-                aria-invalid={errors.username ? 'true' : 'false'}
-                aria-describedby={errors.username ? 'login-username-error' : undefined}
-                className="w-full rounded border border-slate-300 px-3 py-2 text-slate-900 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
-                {...register('username')}
-              />
+              {errors.username ? (
+                <input
+                  id="login-username"
+                  data-testid="login-username"
+                  type="text"
+                  autoComplete="username"
+                  className={loginInputClassName}
+                  {...register('username')}
+                  aria-invalid="true"
+                  aria-describedby="login-username-error"
+                />
+              ) : (
+                <input
+                  id="login-username"
+                  data-testid="login-username"
+                  type="text"
+                  autoComplete="username"
+                  className={loginInputClassName}
+                  {...register('username')}
+                />
+              )}
               {errors.username && (
                 <p id="login-username-error" className="mt-1 text-sm text-red-600 dark:text-red-400" role="alert">
                   {errors.username.message}
@@ -120,16 +145,27 @@ export default function LoginPage() {
               <label htmlFor="login-password" className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">
                 {t('auth.fields.password')}
               </label>
-              <input
-                id="login-password"
-                data-testid="login-password"
-                type="password"
-                autoComplete="current-password"
-                aria-invalid={errors.password ? 'true' : 'false'}
-                aria-describedby={errors.password ? 'login-password-error' : undefined}
-                className="w-full rounded border border-slate-300 px-3 py-2 text-slate-900 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
-                {...register('password')}
-              />
+              {errors.password ? (
+                <input
+                  id="login-password"
+                  data-testid="login-password"
+                  type="password"
+                  autoComplete="current-password"
+                  className={loginInputClassName}
+                  {...register('password')}
+                  aria-invalid="true"
+                  aria-describedby="login-password-error"
+                />
+              ) : (
+                <input
+                  id="login-password"
+                  data-testid="login-password"
+                  type="password"
+                  autoComplete="current-password"
+                  className={loginInputClassName}
+                  {...register('password')}
+                />
+              )}
               {errors.password && (
                 <p id="login-password-error" className="mt-1 text-sm text-red-600 dark:text-red-400" role="alert">
                   {errors.password.message}
