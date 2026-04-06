@@ -75,4 +75,39 @@ La rama **huérfana** `documentacion` **no** contiene código de aplicación: so
 - [x] Build Tauri en runner self-hosted — `.github/workflows/tauri-selfhosted.yml` (`workflow_dispatch`) — [ADR-0006](../adr/ADR-0006-release-and-tauri-ci-workflows.md)
 - [x] semantic-release — `release.config.cjs`, `.github/workflows/release.yml` — [ADR-0006](../adr/ADR-0006-release-and-tauri-ci-workflows.md)
 
+## Flujo automático de Project (GitHub)
+
+Estado operativo validado para el board `BizCode Delivery`:
+
+- Abrir PR con referencia `Closes #<issue>` -> estado `In Progress`.
+- Cerrar PR sin merge -> estado `Backlog`.
+- Merge de PR -> estado `Done`.
+
+Implementación:
+
+- Workflow: `.github/workflows/project-status-automation.yml`
+- Variables requeridas en repo:
+  - `PROJECT_V2_ID`
+  - `PROJECT_STATUS_FIELD_ID`
+  - `PROJECT_STATUS_OPTION_BACKLOG`
+  - `PROJECT_STATUS_OPTION_IN_PROGRESS`
+  - `PROJECT_STATUS_OPTION_DONE`
+  - `PROJECT_STATUS_OPTION_BLOCKED` (opcional)
+- Secreto recomendado para tableros de usuario (Project V2):
+  - `PROJECT_AUTOMATION_TOKEN` (`repo`, `project`, `read:project`)
+
+Checklist de uso diario:
+
+1. Crear issue con template `Task`.
+2. Agregar issue al Project.
+3. Abrir PR con `Closes #<issue>`.
+4. Verificar checks (`Quality Gate`, `Docs governance`, seguridad).
+5. Mergear cuando CI esté verde.
+
+Política de documentación (Wiki vs controlada):
+
+- Operativo/rápido en Wiki.
+- Auditable/controlado en repo (`docs/` y `Certificación-ISO/`).
+- Referencia: [política Wiki vs documentación controlada](politica-wiki-vs-documentacion-controlada.md).
+
 **Otros idiomas:** [English](../../en/quality/ci-cd.md) · [Português](../../pt-br/quality/ciclo-ci-cd.md)
