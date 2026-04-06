@@ -30,3 +30,4 @@ docs/evidence/sbom-cyclonedx-full.json
 scripts/_*.md
 scripts/_*.txt
 node_modules
+BizCode.code-workspace
