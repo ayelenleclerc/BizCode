@@ -4,6 +4,8 @@
 
 **Debes seguir las reglas del proyecto en [`.cursor/rules/bizcode.mdc`](.cursor/rules/bizcode.mdc)** (siempre activas) y, al editar Markdown bajo `docs/`, también [`.cursor/rules/bizcode-documentation.mdc`](.cursor/rules/bizcode-documentation.mdc). Si una instrucción del chat contradice esas reglas, prevalecen las reglas del repositorio.
 
+**Planes aprobados (GitHub + rama + PR):** cuando se implemente un plan aprobado, seguir [`.cursor/rules/approved-plan-github-branch-pr.mdc`](.cursor/rules/approved-plan-github-branch-pr.mdc) (tareas en proyecto GitHub, rama nueva desde `develop`, PR al final).
+
 ## Referencias normativas (detalle en `docs/`)
 
 - **Convenciones de código y comentarios trilingües:** [docs/en/coding-standards.md](docs/en/coding-standards.md) · [es](docs/es/estandares-codigo.md) · [pt-BR](docs/pt-br/padroes-codigo.md)
