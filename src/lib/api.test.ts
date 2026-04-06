@@ -1,20 +1,23 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 // Crear los mocks hoisted para que estén disponibles en la factory de vi.mock
-const { mockGet, mockPost, mockPut } = vi.hoisted(() => ({
-  mockGet: vi.fn(),
-  mockPost: vi.fn(),
-  mockPut: vi.fn(),
-}))
+const { mockGet, mockPost, mockPut, mockCreate } = vi.hoisted(() => {
+  const mockGet = vi.fn()
+  const mockPost = vi.fn()
+  const mockPut = vi.fn()
+  const mockCreate = vi.fn(() => ({ get: mockGet, post: mockPost, put: mockPut }))
+  return { mockGet, mockPost, mockPut, mockCreate }
+})
 
 vi.mock('axios', () => ({
   default: {
-    create: vi.fn(() => ({ get: mockGet, post: mockPost, put: mockPut })),
+    create: mockCreate,
   },
 }))
 
 // Importar después del mock
 import {
+  authAPI,
   clientesAPI,
   articulosAPI,
   rubrosAPI,
@@ -24,7 +27,87 @@ import {
 } from './api'
 
 beforeEach(() => {
-  vi.clearAllMocks()
+  mockGet.mockClear()
+  mockPost.mockClear()
+  mockPut.mockClear()
+})
+
+describe('API client (axios)', () => {
+  it('crea la instancia con withCredentials y baseURL del API', () => {
+    expect(mockCreate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        baseURL: 'http://localhost:3001/api',
+        timeout: 10000,
+        withCredentials: true,
+      }),
+    )
+  })
+})
+
+// ════════════════════════════════════════════════════════════
+// authAPI
+// ════════════════════════════════════════════════════════════
+describe('authAPI', () => {
+  describe('login', () => {
+    it('retorna data en el happy path', async () => {
+      const payload = { userId: 1, tenantId: 2, username: 'a', role: 'owner' }
+      mockPost.mockResolvedValueOnce({ data: { data: payload } })
+      const result = await authAPI.login({ tenantSlug: 'demo', username: 'a', password: 'x' })
+      expect(result).toEqual(payload)
+      expect(mockPost).toHaveBeenCalledWith('/auth/login', {
+        tenantSlug: 'demo',
+        username: 'a',
+        password: 'x',
+      })
+    })
+
+    it('lanza error del servidor', async () => {
+      mockPost.mockRejectedValueOnce(axiosErrorWithResponse('Invalid credentials'))
+      await expect(authAPI.login({ tenantSlug: 'd', username: 'u', password: 'p' })).rejects.toThrow(
+        'Invalid credentials',
+      )
+    })
+  })
+
+  describe('logout', () => {
+    it('retorna loggedOut', async () => {
+      mockPost.mockResolvedValueOnce({ data: { data: { loggedOut: true } } })
+      expect(await authAPI.logout()).toEqual({ loggedOut: true })
+      expect(mockPost).toHaveBeenCalledWith('/auth/logout')
+    })
+
+    it('lanza error del servidor', async () => {
+      mockPost.mockRejectedValueOnce(axiosErrorWithResponse('fail'))
+      await expect(authAPI.logout()).rejects.toThrow('fail')
+    })
+  })
+
+  describe('me', () => {
+    it('retorna claims', async () => {
+      const claims = {
+        userId: 1,
+        tenantId: 1,
+        username: 'u',
+        role: 'owner',
+        permissions: ['customers.read'],
+        scope: {
+          tenantId: 1,
+          branchIds: [],
+          warehouseIds: [],
+          routeIds: [],
+          channels: ['counter'],
+        },
+      }
+      mockGet.mockResolvedValueOnce({ data: { data: claims } })
+      expect(await authAPI.me()).toEqual(claims)
+      expect(mockGet).toHaveBeenCalledWith('/auth/me')
+    })
+
+    it('lanza error cuando no hay sesión', async () => {
+      mockGet.mockRejectedValueOnce(axiosErrorWithResponse('Authentication required'))
+      await expect(authAPI.me()).rejects.toThrow('Authentication required')
+    })
+  })
 })
 
 // ────────────────────────────────────────────────────────────

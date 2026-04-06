@@ -1,0 +1,34 @@
+---
+description: Tras aprobar un plan Cursor — sincronizar tareas en GitHub, trabajar en rama nueva y cerrar con PR.
+alwaysApply: true
+---
+
+# Plan aprobado → GitHub → rama → PR
+
+Cuando el usuario **apruebe un plan** de implementación (Cursor plan / backlog acordado), el asistente debe seguir este flujo **antes y durante** el trabajo de código:
+
+## 1. Tareas en GitHub
+
+- **Añadir o sincronizar** las tareas del plan en el **proyecto de GitHub** (Issues / Project v2) según el procedimiento del equipo (automation, `gh`, UI, o scripts del repo si existen).
+- Las tareas deben reflejar los ítems ejecutables del plan (checklist / todos), con criterios de aceptación cuando el plan los defina.
+
+## 2. Rama de trabajo
+
+- **No** implementar en `main` ni directamente en `develop` sin acuerdo explícito.
+- Crear una **rama nueva** desde la rama de integración del proyecto (por defecto **`develop`**, según [CONTRIBUTING.md](CONTRIBUTING.md)): `git fetch`, `git checkout develop`, `git pull`, luego `git checkout -b feature/<slug-corto>` o `fix/<slug-corto>`.
+- El nombre de la rama debe ser **descriptivo** y alineado con el plan (p. ej. `feature/login-page`, `fix/cors-credentials`).
+
+## 3. Implementación
+
+- Commits atómicos y mensajes alineados con [Conventional Commits](CONTRIBUTING.md) cuando aplique.
+- Cumplir [`.cursor/rules/bizcode.mdc`](.cursor/rules/bizcode.mdc) y el resto de reglas del repositorio.
+
+## 4. Cierre: pull request
+
+- Al terminar (o por hitos acordados), **subir la rama** y abrir un **PR** hacia **`develop`** (o el target que indique el usuario).
+- El PR debe enlazar el plan / issues del proyecto, resumir cambios y citar verificación local (`npm run test`, lint, etc.) según el DoD del repo.
+
+## Excepciones
+
+- **Solo documentación** u otro flujo que el usuario acote explícitamente puede omitir rama dedicada o PR, si lo indica por escrito.
+- Si faltan permisos `git`/GitHub en el entorno, el asistente debe **dejar instrucciones mínimas** para que el usuario ejecute fetch/branch/push/PR, sin inventar URLs o nombres de remoto.
