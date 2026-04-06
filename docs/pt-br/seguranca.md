@@ -26,8 +26,8 @@
 
 ## Seed Prisma (bootstrap em desenvolvimento)
 
-- `npx prisma db seed` cria ou atualiza o tenant `platform` e o usuário `ayelen` (SuperAdmin). A senha vem de `BIZCODE_SEED_SUPERADMIN_PASSWORD`; o [`.env.example`](../../.env.example) documenta um valor de exemplo **apenas para desenvolvimento local**.
-- **Não** reutilize essa senha de exemplo em homologação, produção ou bases compartilhadas. Use um segredo forte por ambiente; rodar o seed de novo sobrescreve o hash armazenado desse usuário.
+- `npx prisma db seed` cria ou atualiza o tenant `platform` e o usuário `ayelen` (SuperAdmin). **`BIZCODE_SEED_SUPERADMIN_PASSWORD` deve estar definida** no `.env` antes de rodar o seed (mínimo 8 caracteres). O [`.env.example`](../../.env.example) declara a variável **sem** valor padrão versionado.
+- **Não** reutilize a mesma senha de desenvolvimento em homologação, produção ou bases compartilhadas. Use um segredo forte por ambiente; rodar o seed de novo sobrescreve o hash armazenado desse usuário.
 
 ## CORS
 

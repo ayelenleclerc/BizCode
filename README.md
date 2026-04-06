@@ -45,13 +45,13 @@ cp .env.example .env
 
 # 4. Initialize the database (SQL history is versioned under prisma/migrations/)
 npx prisma migrate dev
-npx prisma db seed   # creates tenant `platform` + SuperAdmin `ayelen` (password: `BIZCODE_SEED_SUPERADMIN_PASSWORD` in `.env`, default see `.env.example`)
+npx prisma db seed   # creates tenant `platform` + SuperAdmin `ayelen` — set `BIZCODE_SEED_SUPERADMIN_PASSWORD` in `.env` first (≥ 8 chars; see `.env.example`)
 
 # 5. Start the full-stack dev server (API + Vite)
 npm run dev:full
 ```
 
-**Login (after seed):** tenant slug `platform`, username `ayelen`, password from `BIZCODE_SEED_SUPERADMIN_PASSWORD` (default `Yuskia13` in `.env.example` only for local dev). Re-running the seed resets that user’s password hash to match the current env value. The `super_admin` role includes all ERP permissions plus platform permissions ([`src/lib/rbac.ts`](src/lib/rbac.ts)).
+**Login (after seed):** tenant slug `platform`, username `ayelen`, password is the value you set in `BIZCODE_SEED_SUPERADMIN_PASSWORD` (local `.env` only; never commit). Re-running the seed resets that user’s password hash to match the current env value. The `super_admin` role includes all ERP permissions plus platform permissions ([`src/lib/rbac.ts`](src/lib/rbac.ts)).
 
 **Troubleshooting (web login):** If login fails with a “cannot reach the server” style message (localized in the UI), start the API on port 3001 (`npm run server` or `npm run dev:full`) and inspect the browser **Network** tab for `POST …/api/auth/login`.
 
@@ -81,7 +81,7 @@ npm run dev:full
 | `DATABASE_URL` | Yes | PostgreSQL connection string |
 | `PORT` | No | Express API port (default: 3001) |
 | `VITE_API_URL` | No | API base URL seen by the frontend (default: http://localhost:3001) |
-| `BIZCODE_SEED_SUPERADMIN_PASSWORD` | No | Password for seeded SuperAdmin (`ayelen` / tenant `platform`); see `.env.example`. Override outside local dev. |
+| `BIZCODE_SEED_SUPERADMIN_PASSWORD` | Yes (to run seed) | SuperAdmin (`ayelen` / tenant `platform`); define only in local `.env` (≥ 8 characters). See `.env.example`. |
 
 ---
 

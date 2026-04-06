@@ -12,14 +12,20 @@ const TENANT_NAME = 'Platform'
 const SUPERADMIN_USERNAME = 'ayelen'
 
 /**
- * @en Idempotent seed: platform tenant + SuperAdmin (`ayelen`) for local/dev login. Password from `BIZCODE_SEED_SUPERADMIN_PASSWORD` (see `.env.example`).
- * @es Seed idempotente: tenant platform + SuperAdmin (`ayelen`) para login local/dev. Contraseña vía `BIZCODE_SEED_SUPERADMIN_PASSWORD` (véase `.env.example`).
- * @pt-BR Seed idempotente: tenant platform + SuperAdmin (`ayelen`) para login local/dev. Senha via `BIZCODE_SEED_SUPERADMIN_PASSWORD` (ver `.env.example`).
+ * @en Idempotent seed: platform tenant + SuperAdmin (`ayelen`) for local/dev login. Requires `BIZCODE_SEED_SUPERADMIN_PASSWORD` in `.env` (min 8 chars; see `.env.example`).
+ * @es Seed idempotente: tenant platform + SuperAdmin (`ayelen`) para login local/dev. Exige `BIZCODE_SEED_SUPERADMIN_PASSWORD` en `.env` (mín. 8 caracteres; véase `.env.example`).
+ * @pt-BR Seed idempotente: tenant platform + SuperAdmin (`ayelen`) para login local/dev. Exige `BIZCODE_SEED_SUPERADMIN_PASSWORD` no `.env` (mín. 8 caracteres; ver `.env.example`).
  */
 async function main(): Promise<void> {
-  const rawPassword = process.env.BIZCODE_SEED_SUPERADMIN_PASSWORD ?? 'Yuskia13'
-  if (!rawPassword.trim()) {
-    throw new Error('BIZCODE_SEED_SUPERADMIN_PASSWORD is set but empty')
+  const raw = process.env.BIZCODE_SEED_SUPERADMIN_PASSWORD
+  if (raw === undefined || !raw.trim()) {
+    throw new Error(
+      'BIZCODE_SEED_SUPERADMIN_PASSWORD must be set in .env before seeding (minimum 8 characters). See .env.example.',
+    )
+  }
+  const rawPassword = raw.trim()
+  if (rawPassword.length < 8) {
+    throw new Error('BIZCODE_SEED_SUPERADMIN_PASSWORD must be at least 8 characters.')
   }
 
   const tenant = await prisma.tenant.upsert({

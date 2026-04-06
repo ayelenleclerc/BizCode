@@ -33,8 +33,8 @@
 
 ## Prisma seed (development bootstrap)
 
-- `npx prisma db seed` creates or updates tenant `platform` and user `ayelen` (SuperAdmin). The password is read from `BIZCODE_SEED_SUPERADMIN_PASSWORD`; [`.env.example`](../../.env.example) documents a sample value for **local development only**.
-- **Do not** reuse that sample password in staging, production, or shared databases. Use a strong secret per environment; re-running the seed overwrites the stored password hash for that user.
+- `npx prisma db seed` creates or updates tenant `platform` and user `ayelen` (SuperAdmin). **`BIZCODE_SEED_SUPERADMIN_PASSWORD` must be set** in `.env` before running the seed (minimum 8 characters). [`.env.example`](../../.env.example) lists the variable without a committed default.
+- **Do not** reuse the same development password in staging, production, or shared databases. Use a strong secret per environment; re-running the seed overwrites the stored password hash for that user.
 
 ## CORS
 

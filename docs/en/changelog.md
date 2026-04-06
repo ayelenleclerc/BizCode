@@ -39,6 +39,7 @@ Versioning: [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- **Security / developer setup:** [`.env.example`](../../.env.example) no longer ships sample database credentials or a default seed password literal; `npx prisma db seed` **requires** `BIZCODE_SEED_SUPERADMIN_PASSWORD` in `.env` (≥ 8 characters). See [security.md](security.md), [superadmin-bootstrap-and-rbac.md](quality/superadmin-bootstrap-and-rbac.md), and [README.md](../../README.md).
 - Documentation: Brazilian Portuguese (`docs/pt-br/`) user manuals expanded to match English; full `certificacion-iso/records-template.md` (including manual test session table); expanded `glossary.md`; localized ADR index title
 - Glossary and [privacy-data-map.md](privacy-data-map.md): Argentina’s tax authority referred to as **ARCA** (with former AFIP noted where relevant); [I18N_DOCUMENTATION.md](../I18N_DOCUMENTATION.md) and [DOCUMENT_LOCALE_MAP.md](../DOCUMENT_LOCALE_MAP.md) describe **localized filenames** per locale tree (ADR slugs stay aligned across trees)
 
