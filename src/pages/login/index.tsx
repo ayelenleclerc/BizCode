@@ -5,6 +5,7 @@ import { z } from 'zod'
 import { useTranslation } from 'react-i18next'
 import LanguageSelect from '@/components/LanguageSelect'
 import { useAuth } from '@/contexts/AuthContext'
+import { getAuthErrorI18nKey } from '@/lib/api'
 
 const loginInputClassName =
   'w-full rounded border border-slate-300 px-3 py-2 text-slate-900 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100'
@@ -50,12 +51,7 @@ export default function LoginPage() {
         password: data.password,
       })
     } catch (err) {
-      const message = err instanceof Error ? err.message : ''
-      if (message === 'Invalid credentials') {
-        setSubmitError(t('auth.errors.invalidCredentials'))
-      } else {
-        setSubmitError(message || t('auth.errors.generic'))
-      }
+      setSubmitError(t(getAuthErrorI18nKey(err)))
     }
   }
 

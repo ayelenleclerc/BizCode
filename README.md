@@ -53,6 +53,8 @@ npm run dev:full
 
 **Login (after seed):** tenant slug `platform`, username `ayelen`, password from `BIZCODE_SEED_SUPERADMIN_PASSWORD` (default `Yuskia13` in `.env.example` only for local dev). Re-running the seed resets that user’s password hash to match the current env value. The `super_admin` role includes all ERP permissions plus platform permissions ([`src/lib/rbac.ts`](src/lib/rbac.ts)).
 
+**Troubleshooting (web login):** If login fails with a “cannot reach the server” style message (localized in the UI), start the API on port 3001 (`npm run server` or `npm run dev:full`) and inspect the browser **Network** tab for `POST …/api/auth/login`.
+
 ### Available Scripts
 
 | Script | Purpose |

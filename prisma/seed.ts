@@ -1,5 +1,5 @@
 import { config } from 'dotenv'
-import { PrismaClient } from '@prisma/client'
+import { Prisma, PrismaClient } from '@prisma/client'
 import { hashPassword } from '../server/passwordHash'
 import { USER_CHANNELS } from '../src/lib/rbac'
 
@@ -57,7 +57,17 @@ async function main(): Promise<void> {
 
 main()
   .catch((e: unknown) => {
-    console.error(e)
+    if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === 'P2021') {
+      // eslint-disable-next-line no-console -- seed diagnostics
+      console.error(
+        '\n[seed] La base no tiene tablas de Prisma (P2021). Aplica el esquema antes del seed:\n' +
+          '  npx prisma migrate dev --name init\n' +
+          '  (solo dev, sin historial de migraciones: npx prisma db push)\n' +
+          'Luego: npx prisma db seed\n',
+      )
+    } else {
+      console.error(e)
+    }
     process.exit(1)
   })
   .finally(async () => {
