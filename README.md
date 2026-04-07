@@ -53,6 +53,19 @@ npm run dev:full
 
 **Login (after seed):** tenant slug `platform`, username `ayelen`, password is the value you set in `BIZCODE_SEED_SUPERADMIN_PASSWORD` (local `.env` only; never commit). Re-running the seed resets that user’s password hash to match the current env value. The `super_admin` role includes all ERP permissions plus platform permissions ([`src/lib/rbac.ts`](src/lib/rbac.ts)).
 
+#### SuperAdmin: `npx prisma db seed` vs `npm run bootstrap:superadmin`
+
+Use **one** path per environment; for day-to-day local setup, prefer **`npx prisma db seed`** after migrations.
+
+| | `npx prisma db seed` | `npm run bootstrap:superadmin` |
+|---|---|---|
+| Entry | [`prisma/seed.ts`](prisma/seed.ts) (logic in [`prisma/seedSuperAdmin.ts`](prisma/seedSuperAdmin.ts)) | [`scripts/bootstrap-superadmin.ts`](scripts/bootstrap-superadmin.ts) |
+| Password env | `BIZCODE_SEED_SUPERADMIN_PASSWORD` (required; ≥ 8 characters) | `BIZCODE_BOOTSTRAP_SUPERADMIN_PASSWORD` (required) |
+| Username | Fixed `ayelen` | Optional `BIZCODE_BOOTSTRAP_SUPERADMIN_USERNAME` (default `Ayelen`, normalized to lowercase on save) |
+| On repeat run | Upserts tenant + user; **always refreshes** the stored password hash from the current env | If the user already exists: **no database changes** (hash unchanged). If missing: creates user and an audit event. |
+
+Automated tests cover the seed logic via [`tests/scripts/seed-superadmin.test.ts`](tests/scripts/seed-superadmin.test.ts) (`runSuperAdminSeed`).
+
 **Troubleshooting (web login):** If login fails with a “cannot reach the server” style message (localized in the UI), start the API on port 3001 (`npm run server` or `npm run dev:full`) and inspect the browser **Network** tab for `POST …/api/auth/login`.
 
 ### Available Scripts
@@ -72,6 +85,7 @@ npm run dev:full
 | `npm run test:e2e` | Playwright smoke against Vite preview (`e2e/`; see ADR-0004) |
 | `npm run check:i18n` | Verify i18n key parity across locales |
 | `npm run check:docs-map` | Verify paths in `docs/DOCUMENT_LOCALE_MAP.md` exist |
+| `npm run bootstrap:superadmin` | Optional one-off SuperAdmin creation (see table above; uses `BIZCODE_BOOTSTRAP_*` env vars) |
 | `npm run migrate:dbf` | Migración desde DBF (script `scripts/migrate-from-dbf.ts`) |
 
 ### Environment Variables
@@ -82,6 +96,8 @@ npm run dev:full
 | `PORT` | No | Express API port (default: 3001) |
 | `VITE_API_URL` | No | API base URL seen by the frontend (default: http://localhost:3001) |
 | `BIZCODE_SEED_SUPERADMIN_PASSWORD` | Yes (to run seed) | SuperAdmin (`ayelen` / tenant `platform`); define only in local `.env` (≥ 8 characters). See `.env.example`. |
+| `BIZCODE_BOOTSTRAP_SUPERADMIN_PASSWORD` | Yes (to run `bootstrap:superadmin`) | Password for the optional bootstrap script; local `.env` only. |
+| `BIZCODE_BOOTSTRAP_SUPERADMIN_USERNAME` | No | Display username for bootstrap (default `Ayelen`); stored lowercase. |
 
 ---
 
