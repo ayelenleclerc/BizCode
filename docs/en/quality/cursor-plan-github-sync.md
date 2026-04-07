@@ -9,13 +9,13 @@ The `npm run plan:approve` command is the operator entrypoint to process an appr
 - `completed` → Done
 - `cancelled` → Backlog + `type:chore` + explanatory comment
 
-Todos removed from the plan but still present in the last run’s state file are treated as **orphans**: the issue is kept, a comment is added, labels are set to `type:chore`, `priority:P2`, `area:platform` (must exist in `.github/labels.json`), and Status returns to Backlog when the project item exists.
+Todos removed from the plan but still present in the last run’s state file are treated as **orphans**: the issue is kept, a comment is added, **`type:chore` is merged** with the issue’s existing labels (other labels are preserved), and Status returns to Backlog when the project item exists.
 
 **Completed todos (`status: completed`):** the sync creates or updates the issue the same way as other statuses and sets Project **Status** to **Done** (retroactive backfill when a todo was already done before the first sync).
 
 ## Plan contract
 
-See TypeScript schemas in `scripts/github/plan-sync/types.ts`: required frontmatter fields `name`, `overview`, `todos[]` with `id`, `content`, `status` (`pending` \| `in_progress` \| `completed` \| `cancelled`), optional `meta` (`type`, `priority`, `area`) with defaults `feature`, `P1`, `platform`.
+See Zod schemas in `src/lib/plan-sync/schemas.ts` (and parsing helpers in `src/lib/plan-sync/parse.ts`): required frontmatter fields `name`, `overview`, `todos[]` with `id`, `content`, `status` (`pending` \| `in_progress` \| `completed` \| `cancelled`), optional `meta` (`type`, `priority`, `area`) with defaults `feature`, `P1`, `platform`. Extra frontmatter keys (for example `isProject`) are allowed. On-disk sync state types live in `scripts/github/plan-sync/types.ts`.
 
 ## Heuristic labels
 
@@ -44,9 +44,14 @@ npm run plan:sync -- --plan path/to/plan.plan.md
 
 Options:
 
+- `--repo owner/repo` — only for `plan:sync`; overrides `GITHUB_REPOSITORY` for this run.
 - `--repo-root <dir>` — repository root (defaults to current working directory).
 - `--dry-run` — parse and log intended actions; **no** GitHub API calls and **no** state/report writes.
 - `--archive-dir <dir>` — only for `plan:approve`; relative directory used for archive copies (defaults to `.cursor/plans`).
+
+## CI validation (`plan:validate`)
+
+`npm run plan:validate` checks **only** `tests/plan-sync/fixtures/valid-*.plan.md` by default (contract + `.github/labels.json`). Use `npm run plan:validate -- --with-cursor-plans` to include `.cursor/plans/*.plan.md` locally. **No token** is required. Workflow: `.github/workflows/plan-md-validate.yml` (runs on pull requests and on pushes to `main` / `develop`).
 
 ## Build button hook
 
@@ -57,7 +62,7 @@ Use `npm run plan:approve -- --plan ...` as the explicit approval/archive workfl
 
 - `GH_TOKEN` or `GITHUB_TOKEN` (required): PAT with `repo` and project scopes as needed.
 - `GITHUB_REPOSITORY` (required*): `owner/repo`.
-- `GITHUB_OWNER` + `GITHUB_REPO` (required*): alternative to `GITHUB_REPOSITORY`.
+- `GITHUB_OWNER` + `GITHUB_REPO` (required*): alternative to `GITHUB_REPOSITORY` (or pass `--repo owner/repo` to `plan:sync`).
 - `PROJECT_V2_ID` (required): Project node id.
 - `PROJECT_STATUS_FIELD_ID` (required): single-select Status field id.
 - `PROJECT_STATUS_OPTION_BACKLOG` (required): option id for Backlog.
@@ -70,11 +75,11 @@ Use `npm run plan:approve -- --plan ...` as the explicit approval/archive workfl
 After a successful non–dry-run sync:
 
 - **State:** `.github/plan-sync/state/{slug}.json` — maps todo `id` → `issueNumber`, content hash, optional `projectItemId` (idempotent reruns; omitted until Project link succeeds).
-- **Reports:** `.github/plan-sync/reports/{timestamp}-{slug}.md` — human-readable log including **`syncDurationMs`** and **`projectLinkFailures`** counts.
+- **Reports:** `.github/plan-sync/reports/{timestamp}-{slug}.md` — human-readable log including **`syncDurationMs`** and **`projectLinkFailures`** counts. **Reports are listed in `.gitignore`** (not committed by default).
 
-Commit these files if the team wants shared sync state; otherwise treat as local (not documented as ignored by default).
+Commit **state** if the team wants shared sync idempotency across machines; reports stay local unless you change ignore rules.
 
 ## Related
 
 - [Generated documentation](generated-documentation.md) — docs generation policy.
-- [CI/CD](ci-cd.md) — pipeline does not run `plan:sync` by default; it is an operator workflow.
+- [CI/CD](ci-cd.md) — `plan:sync` remains operator-only; **`plan:validate`** runs in CI via `plan-md-validate.yml`.
