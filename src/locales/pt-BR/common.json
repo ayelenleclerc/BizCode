@@ -18,6 +18,7 @@
     "optionPtBr": "Português (Brasil)"
   },
   "auth": {
+    "title": "Entrar",
     "subtitle": "Entre para continuar",
     "formTitle": "Entrar",
     "fields": {
@@ -25,8 +26,16 @@
       "username": "Usuário",
       "password": "Senha"
     },
+    "tenantSlug": "Tenant",
+    "username": "Usuário",
+    "password": "Senha",
     "submit": "Entrar",
     "submitting": "Entrando…",
+    "signIn": "Entrar",
+    "signingIn": "Entrando…",
+    "logout": "Sair",
+    "loadingSession": "Carregando sessão…",
+    "userLabel": "Usuário: {{username}} (perfil: {{role}})",
     "validation": {
       "tenantRequired": "Informe o identificador da empresa",
       "usernameRequired": "Informe o usuário",
@@ -36,7 +45,8 @@
       "invalidCredentials": "Usuário ou senha incorretos",
       "generic": "Não foi possível entrar",
       "network": "Não foi possível conectar ao servidor. Verifique se a API está em execução (ex.: porta 3001) e tente novamente.",
-      "timeout": "A requisição demorou demais. Tente novamente."
+      "timeout": "A requisição demorou demais. Tente novamente.",
+      "offline": "Sem conexão. Verifique a rede e tente novamente."
     }
   },
   "session": {
@@ -69,23 +79,5 @@
   "errors": {
     "generic": "Erro ao salvar",
     "required": "Campo obrigatório"
-  },
-  "auth": {
-    "title": "Entrar",
-    "subtitle": "Acesse com seu tenant, usuario e senha.",
-    "tenantSlug": "Tenant",
-    "username": "Usuario",
-    "password": "Senha",
-    "signIn": "Entrar",
-    "signingIn": "Entrando...",
-    "logout": "Sair",
-    "loadingSession": "Carregando sessao...",
-    "userLabel": "Usuario: {{username}} (perfil: {{role}})",
-    "errors": {
-      "invalidCredentials": "Credenciais invalidas.",
-      "timeout": "A requisicao excedeu o tempo limite. Tente novamente.",
-      "offline": "Sem conexao. Verifique a rede e tente novamente.",
-      "generic": "Nao foi possivel entrar."
-    }
   }
 }

@@ -18,6 +18,7 @@
     "optionPtBr": "Portuguese (Brazil)"
   },
   "auth": {
+    "title": "Sign in",
     "subtitle": "Sign in to continue",
     "formTitle": "Sign in",
     "fields": {
@@ -25,8 +26,16 @@
       "username": "Username",
       "password": "Password"
     },
+    "tenantSlug": "Tenant",
+    "username": "Username",
+    "password": "Password",
     "submit": "Sign in",
     "submitting": "Signing in…",
+    "signIn": "Sign in",
+    "signingIn": "Signing in…",
+    "logout": "Sign out",
+    "loadingSession": "Loading session…",
+    "userLabel": "User: {{username}} (role: {{role}})",
     "validation": {
       "tenantRequired": "Company slug is required",
       "usernameRequired": "Username is required",
@@ -36,7 +45,8 @@
       "invalidCredentials": "Invalid username or password",
       "generic": "Could not sign in",
       "network": "Cannot reach the server. Make sure the API is running (e.g. port 3001) and try again.",
-      "timeout": "The request took too long. Please try again."
+      "timeout": "The request took too long. Please try again.",
+      "offline": "You are offline. Check your network and try again."
     }
   },
   "session": {
@@ -69,23 +79,5 @@
   "errors": {
     "generic": "Error saving",
     "required": "Required field"
-  },
-  "auth": {
-    "title": "Sign in",
-    "subtitle": "Access with your tenant, username and password.",
-    "tenantSlug": "Tenant",
-    "username": "Username",
-    "password": "Password",
-    "signIn": "Sign in",
-    "signingIn": "Signing in...",
-    "logout": "Sign out",
-    "loadingSession": "Loading session...",
-    "userLabel": "User: {{username}} (role: {{role}})",
-    "errors": {
-      "invalidCredentials": "Invalid credentials.",
-      "timeout": "The request timed out. Please try again.",
-      "offline": "You are offline. Check your network and try again.",
-      "generic": "Unable to sign in."
-    }
   }
 }
