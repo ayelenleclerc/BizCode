@@ -69,7 +69,14 @@ function main(): void {
 
   fs.mkdirSync(OUT_DIR, { recursive: true })
   for (const f of fs.readdirSync(OUT_DIR)) {
-    fs.unlinkSync(path.join(OUT_DIR, f))
+    try {
+      fs.unlinkSync(path.join(OUT_DIR, f))
+    } catch (e: unknown) {
+      if (e instanceof Error && 'code' in e && (e as NodeJS.ErrnoException).code === 'ENOENT') {
+        continue
+      }
+      throw e
+    }
   }
 
   const names = Object.keys(schemas).sort()

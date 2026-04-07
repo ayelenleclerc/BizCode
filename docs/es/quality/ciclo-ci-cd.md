@@ -96,6 +96,13 @@ Implementación:
 - Secreto recomendado para tableros de usuario (Project V2):
   - `PROJECT_AUTOMATION_TOKEN` (`repo`, `project`, `read:project`)
 
+## Plan Cursor → Issues de GitHub + Project (herramienta local)
+
+- **Validación en CI (sin token):** `.github/workflows/plan-md-validate.yml` ejecuta `npm run plan:validate` en PR y en push a `main` / `develop`. Por defecto solo valida `tests/plan-sync/fixtures/valid-*.plan.md` (contrato + etiquetas). En local, `npm run plan:validate -- --with-cursor-plans` también revisa `.cursor/plans/*.plan.md` si existe esa carpeta.
+- **Sincronización local:** `npm run plan:sync -- --plan <ruta.plan.md> [--repo propietario/repo] [--repo-root <dir>] [--dry-run]` crea o actualiza un issue por todo del plan, enlaza al Project v2, ajusta el estado del tablero según el todo y guarda el mapeo en `.github/plan-sync/state/`. Fuera de `--dry-run` hace falta `GH_TOKEN` o `GITHUB_TOKEN`, `GITHUB_REPOSITORY` (o `GITHUB_OWNER` + `GITHUB_REPO`, o `--repo`) y las mismas variables de Project que arriba. Los informes van a `.github/plan-sync/reports/` (ignorados por git).
+- **Flujo opcional de aprobación:** `npm run plan:approve -- --plan <ruta>` archiva una copia en `.cursor/plans/` y ejecuta `plan:sync` (véase `scripts/github/plan-approve-main.ts`).
+- **Relación con la automatización por PR:** Con los ítems en el tablero, `.github/workflows/project-status-automation.yml` sigue actualizando el estado al abrir/cerrar/mergear PR cuando el issue está enlazado con `Closes #<issue>`.
+
 Checklist de uso diario:
 
 1. Crear issue con template `Task`.
