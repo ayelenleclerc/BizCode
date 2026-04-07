@@ -69,5 +69,23 @@
   "errors": {
     "generic": "Error al guardar",
     "required": "Campo requerido"
+  },
+  "auth": {
+    "title": "Iniciar sesion",
+    "subtitle": "Accede con tu tenant, usuario y contrasena.",
+    "tenantSlug": "Tenant",
+    "username": "Usuario",
+    "password": "Contrasena",
+    "signIn": "Ingresar",
+    "signingIn": "Ingresando...",
+    "logout": "Cerrar sesion",
+    "loadingSession": "Cargando sesion...",
+    "userLabel": "Usuario: {{username}} (rol: {{role}})",
+    "errors": {
+      "invalidCredentials": "Credenciales invalidas.",
+      "timeout": "La solicitud excedio el tiempo de espera. Intenta nuevamente.",
+      "offline": "Sin conexion. Verifica tu red e intenta nuevamente.",
+      "generic": "No fue posible iniciar sesion."
+    }
   }
 }
