@@ -69,5 +69,23 @@
   "errors": {
     "generic": "Error saving",
     "required": "Required field"
+  },
+  "auth": {
+    "title": "Sign in",
+    "subtitle": "Access with your tenant, username and password.",
+    "tenantSlug": "Tenant",
+    "username": "Username",
+    "password": "Password",
+    "signIn": "Sign in",
+    "signingIn": "Signing in...",
+    "logout": "Sign out",
+    "loadingSession": "Loading session...",
+    "userLabel": "User: {{username}} (role: {{role}})",
+    "errors": {
+      "invalidCredentials": "Invalid credentials.",
+      "timeout": "The request timed out. Please try again.",
+      "offline": "You are offline. Check your network and try again.",
+      "generic": "Unable to sign in."
+    }
   }
 }

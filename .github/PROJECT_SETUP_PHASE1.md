@@ -41,6 +41,22 @@ This repository includes automated assets for the Phase 1 governance blueprint.
      - `project`
      - `read:project`
 
+## Cursor plan → GitHub (`plan:sync`)
+
+After labels and project variables exist, you can sync a Cursor `.plan.md` file to Issues and Project v2:
+
+```bash
+npm run plan:sync -- --plan path/to/your.plan.md
+```
+
+Dry run (no API calls):
+
+```bash
+npm run plan:sync -- --plan path/to/your.plan.md --dry-run
+```
+
+Required env for a live sync: `GH_TOKEN` or `GITHUB_TOKEN`, `GITHUB_REPOSITORY` (or `GITHUB_OWNER` + `GITHUB_REPO`), plus the same `PROJECT_*` variables as the project automation workflow. User documentation (three locales) is under `docs/*/quality/` — see [DOCUMENT_LOCALE_MAP.md](../docs/DOCUMENT_LOCALE_MAP.md) (row *Cursor plan → GitHub*).
+
 ## Notes
 
 - Project status automation only runs when all required variables are present.

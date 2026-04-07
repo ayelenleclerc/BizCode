@@ -1,10 +1,23 @@
 {
   "name": "bizcode",
-  "private": true,
   "version": "0.1.0",
+  "private": true,
+  "description": "**BizCode** is a cross-platform desktop application for commercial management (customers, products, invoicing). It is built with Tauri 1.5 + React 18 + Express 5 + Prisma 5 + PostgreSQL, and developed to meet ISO 9001:2015, ISO/IEC 12207, and ISO/IEC 25010 quality standards.",
+  "homepage": "https://github.com/ayelenleclerc/BizCode#readme",
+  "bugs": {
+    "url": "https://github.com/ayelenleclerc/BizCode/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ayelenleclerc/BizCode.git"
+  },
+  "license": "ISC",
+  "author": "",
   "type": "module",
-  "engines": {
-    "node": ">=22.0.0"
+  "main": "postcss.config.js",
+  "directories": {
+    "doc": "docs",
+    "test": "tests"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
@@ -23,8 +36,10 @@
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
     "test:integration": "vitest run --config vitest.integration.config.ts",
-    "lint": "eslint src server tests e2e --ext .ts,.tsx --max-warnings 0",
-    "lint:fix": "eslint src server tests e2e --ext .ts,.tsx --fix --max-warnings 0",
+    "lint": "eslint src server tests e2e scripts/github/plan-sync scripts/github/plan-sync-main.ts --ext .ts,.tsx --max-warnings 0",
+    "lint:fix": "eslint src server tests e2e scripts/github/plan-sync scripts/github/plan-sync-main.ts --ext .ts,.tsx --fix --max-warnings 0",
+    "plan:sync": "tsx scripts/github/plan-sync-main.ts",
+    "plan:approve": "tsx scripts/github/plan-approve-main.ts",
     "check:i18n": "tsx scripts/check-i18n.ts",
     "check:docs-map": "tsx scripts/check-docs-locale-map.ts",
     "docs:generate-iso-stubs": "node scripts/generate-iso-controlled-docs.mjs",
@@ -36,6 +51,7 @@
     "docs:typedoc": "typedoc --options typedoc.json",
     "docs:sbom": "npm run sbom:generate",
     "docs:generate": "npm run docs:extract-schemas && npm run docs:schemas-md && npm run docs:openapi-md && npm run docs:typedoc && npm run docs:sbom",
+    "bootstrap:superadmin": "tsx scripts/bootstrap-superadmin.ts",
     "migrate:dbf": "tsx scripts/migrate-from-dbf.ts",
     "inspect:dbf-all": "tsx scripts/inspect-dbf-all.ts",
     "release": "semantic-release"
@@ -107,5 +123,8 @@
     "typescript-eslint": "^8.58.0",
     "vite": "^6.4.1",
     "vitest": "^4.1.2"
+  },
+  "engines": {
+    "node": ">=22.0.0"
   }
 }

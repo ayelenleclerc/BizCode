@@ -46,6 +46,11 @@ export default function Layout({ children }: LayoutProps) {
         <div className="p-6 border-b border-slate-200 dark:border-slate-700">
           <h1 className="text-2xl font-bold text-blue-600 dark:text-blue-400">{t('app.name')}</h1>
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">{t('app.version')}</p>
+          {status === 'authenticated' && claims ? (
+            <p className="mt-3 text-xs text-slate-500 dark:text-slate-400" data-testid="auth-user-label">
+              {t('auth.userLabel', { username: claims.username, role: claims.role })}
+            </p>
+          ) : null}
         </div>
 
         {/* Navigation */}
@@ -90,6 +95,16 @@ export default function Layout({ children }: LayoutProps) {
             className="w-full"
             selectClassName="w-full"
           />
+          <button
+            type="button"
+            onClick={() => {
+              void logout()
+            }}
+            className="w-full mb-2 px-4 py-2 rounded bg-red-600 hover:bg-red-700 transition text-white"
+            data-testid="logout-button"
+          >
+            {t('auth.logout')}
+          </button>
           <button
             type="button"
             onClick={toggleTheme}
