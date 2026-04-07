@@ -34,7 +34,9 @@
     },
     "errors": {
       "invalidCredentials": "Usuario o contraseña incorrectos",
-      "generic": "No se pudo iniciar sesión"
+      "generic": "No se pudo iniciar sesión",
+      "network": "No hay conexión con el servidor. Compruebe que el API está en marcha (p. ej. puerto 3001) y vuelva a intentarlo.",
+      "timeout": "La petición tardó demasiado. Inténtelo de nuevo."
     }
   },
   "session": {

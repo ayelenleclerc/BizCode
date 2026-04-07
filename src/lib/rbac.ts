@@ -63,28 +63,34 @@ export type AuthClaims = {
   scope: AuthScope
 }
 
+/** ERP-wide permissions for tenant owner (single source of truth for owner / super_admin ERP slice). */
+export const OWNER_PERMISSIONS = [
+  'users.manage',
+  'roles.assign',
+  'sales.create',
+  'sales.cancel',
+  'customers.read',
+  'customers.manage',
+  'products.read',
+  'products.manage',
+  'inventory.adjust',
+  'orders.create',
+  'orders.pick',
+  'orders.dispatch',
+  'orders.deliver.confirm',
+  'reports.operational.read',
+  'reports.financial.read',
+  'settings.business.manage',
+  'settings.fiscal.manage',
+  'audit.read',
+] as const satisfies readonly Permission[]
+
+/** Platform-only permissions (not included in owner). */
+const PLATFORM_SUPER_ADMIN_PERMISSIONS = ['platform.tenants.manage', 'platform.support.impersonate'] as const satisfies readonly Permission[]
+
 export const ROLE_PERMISSIONS: Record<UserRole, readonly Permission[]> = {
-  super_admin: ['platform.tenants.manage', 'platform.support.impersonate', 'audit.read'],
-  owner: [
-    'users.manage',
-    'roles.assign',
-    'sales.create',
-    'sales.cancel',
-    'customers.read',
-    'customers.manage',
-    'products.read',
-    'products.manage',
-    'inventory.adjust',
-    'orders.create',
-    'orders.pick',
-    'orders.dispatch',
-    'orders.deliver.confirm',
-    'reports.operational.read',
-    'reports.financial.read',
-    'settings.business.manage',
-    'settings.fiscal.manage',
-    'audit.read',
-  ],
+  super_admin: [...OWNER_PERMISSIONS, ...PLATFORM_SUPER_ADMIN_PERMISSIONS],
+  owner: [...OWNER_PERMISSIONS],
   manager: [
     'sales.create',
     'sales.cancel',

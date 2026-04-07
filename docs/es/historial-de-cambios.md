@@ -39,6 +39,7 @@ Versionado: [Semantic Versioning](https://semver.org/lang/es/).
 
 ### Changed
 
+- **Seguridad / puesta en marcha:** [`.env.example`](../../.env.example) ya no incluye credenciales de ejemplo para la base ni un literal de contraseña de seed por defecto; `npx prisma db seed` **exige** `BIZCODE_SEED_SUPERADMIN_PASSWORD` en `.env` (≥ 8 caracteres). Ver [seguridad.md](seguridad.md), [superadmin-bootstrap-y-rbac.md](quality/superadmin-bootstrap-y-rbac.md) y [README.md](../../README.md).
 - Documentación: manuales de usuario en portugués brasileño (`docs/pt-br/user/`) ampliados al nivel del inglés; `certificacion-iso/plantillas-registros.md` completo (incl. tabla de prueba manual); `glosario.md` ampliado; título del índice ADR localizado
 - Glosario y [mapa-datos-personales.md](mapa-datos-personales.md): organismo fiscal argentino como **ARCA** (con mención a la ex AFIP); [I18N_DOCUMENTATION.md](../I18N_DOCUMENTATION.md) y [DOCUMENT_LOCALE_MAP.md](../DOCUMENT_LOCALE_MAP.md) describen **nombres de archivo localizados** por árbol (los ADR mantienen el mismo slug en los tres idiomas)
 

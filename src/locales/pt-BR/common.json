@@ -34,7 +34,9 @@
     },
     "errors": {
       "invalidCredentials": "Usuário ou senha incorretos",
-      "generic": "Não foi possível entrar"
+      "generic": "Não foi possível entrar",
+      "network": "Não foi possível conectar ao servidor. Verifique se a API está em execução (ex.: porta 3001) e tente novamente.",
+      "timeout": "A requisição demorou demais. Tente novamente."
     }
   },
   "session": {

@@ -13,7 +13,8 @@ programa_viejo/
 .claude/
 .vite/
 src-tauri/target/
-migrations/
+# Legacy / local SQL at repo root only — Prisma history lives in prisma/migrations/
+/migrations/
 coverage/
 
 playwright-report/
