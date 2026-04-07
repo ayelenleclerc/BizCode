@@ -33,6 +33,7 @@ export type RestIssue = {
   number: number
   title: string
   body: string | null
+  labels?: { name: string }[]
 }
 
 export async function restCreateIssue(args: {

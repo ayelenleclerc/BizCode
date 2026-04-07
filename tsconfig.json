@@ -26,6 +26,14 @@
       "@store/*": ["src/store/*"]
     }
   },
-  "include": ["src", "server", "tests", "e2e", "server.ts", "playwright.config.ts"],
+  "include": [
+    "src",
+    "server",
+    "tests",
+    "e2e",
+    "server.ts",
+    "playwright.config.ts",
+    "scripts/github/**/*.ts"
+  ],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

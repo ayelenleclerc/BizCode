@@ -1,6 +1,7 @@
 import path from 'node:path'
-import type { PlanDocument, PlanSyncStateFile, PlanTodo, SyncStateTodo } from './types'
+import type { PlanDocument, PlanTodo } from '../../../src/lib/plan-sync'
 import { allLabelsForTodo, todoContentHash } from './parse'
+import type { PlanSyncStateFile, SyncStateTodo } from './types'
 import {
   getToken,
   gqlAddProjectItem,
@@ -37,7 +38,10 @@ function issueBody(args: {
   todo: PlanTodo
   bodySnippet: string
 }): string {
+  const marker = `<!-- plan-sync:todo-id:${args.todo.id} -->`
   const lines = [
+    marker,
+    '',
     `## Plan`,
     `- **Plan name:** ${args.planName}`,
     `- **Todo id:** \`${args.todo.id}\``,
@@ -308,15 +312,17 @@ export async function syncPlanToGitHub(opts: SyncOptions): Promise<SyncResult> {
         repo: ref.repo,
         issueNumber: st.issueNumber,
         body:
-          '`cancelled-by-plan-sync`: This todo was removed from the plan file. Per policy the issue is kept; labels updated to `type:chore` and Project status reset to Backlog.',
+          '`cancelled-by-plan-sync`: This todo was removed from the plan file. Per policy the issue is kept; label `type:chore` merged and Project status reset to Backlog.',
       })
+      const prior = (current.labels ?? []).map((l) => l.name)
+      const merged = [...new Set([...prior, 'type:chore'])]
       await restUpdateIssue({
         owner: ref.owner,
         repo: ref.repo,
         issueNumber: st.issueNumber,
         title: current.title,
         body: current.body ?? '',
-        labels: ['type:chore', 'priority:P2', 'area:platform'],
+        labels: merged,
       })
       const itemId =
         st.projectItemId ??

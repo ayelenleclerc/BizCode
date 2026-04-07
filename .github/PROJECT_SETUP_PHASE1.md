@@ -7,6 +7,7 @@ This repository includes automated assets for the Phase 1 governance blueprint.
 - Labels source: `.github/labels.json`
 - Label sync workflow: `.github/workflows/sync-labels.yml`
 - PR status to Project automation: `.github/workflows/project-status-automation.yml`
+- Cursor plan contract validation in CI: `.github/workflows/plan-md-validate.yml` (`npm run plan:validate`)
 - Issue template: `.github/ISSUE_TEMPLATE/task.yml`
 - PR template: `.github/pull_request_template.md`
 - Bootstrap script: `scripts/github/setup-phase1.ps1`
@@ -55,7 +56,13 @@ Dry run (no API calls):
 npm run plan:sync -- --plan path/to/your.plan.md --dry-run
 ```
 
-Required env for a live sync: `GH_TOKEN` or `GITHUB_TOKEN`, `GITHUB_REPOSITORY` (or `GITHUB_OWNER` + `GITHUB_REPO`), plus the same `PROJECT_*` variables as the project automation workflow. User documentation (three locales) is under `docs/*/quality/` — see [DOCUMENT_LOCALE_MAP.md](../docs/DOCUMENT_LOCALE_MAP.md) (row *Cursor plan → GitHub*).
+Validate plan fixtures locally (no token; same checks as CI):
+
+```bash
+npm run plan:validate
+```
+
+Required env for a live sync: `GH_TOKEN` or `GITHUB_TOKEN`, `GITHUB_REPOSITORY` (or `GITHUB_OWNER` + `GITHUB_REPO`, or `plan:sync --repo owner/repo`), plus the same `PROJECT_*` variables as the project automation workflow. Sync state lives under `.github/plan-sync/state/`; reports under `.github/plan-sync/reports/` are gitignored. User documentation (three locales) is under `docs/*/quality/` — see [DOCUMENT_LOCALE_MAP.md](../docs/DOCUMENT_LOCALE_MAP.md) (row *Cursor plan → GitHub*).
 
 ## Notes
 

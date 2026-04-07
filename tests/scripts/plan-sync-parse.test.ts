@@ -2,16 +2,18 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
 import { afterEach, describe, expect, it } from 'vitest'
+import type { PlanTodo } from '@/lib/plan-sync'
 import {
   allLabelsForTodo,
-  assertLabelsExist,
   heuristicExtraLabels,
   labelsForTodo,
+  splitPlanFrontmatter,
+} from '@/lib/plan-sync'
+import {
+  assertLabelsExist,
   loadLabelCatalog,
   parsePlanFile,
-  splitPlanFrontmatter,
 } from '../../scripts/github/plan-sync/parse'
-import type { PlanTodo } from '../../scripts/github/plan-sync/types'
 
 const minimalFrontmatter = `name: Test plan
 overview: Test overview
@@ -136,7 +138,7 @@ describe('parsePlanFile', () => {
       planFile,
       `---
 name: Dup
-overview: ''
+overview: Duplicate ids fixture
 todos:
   - id: same
     content: One

@@ -9,13 +9,13 @@ El comando `npm run plan:approve` es el punto de entrada operativo para procesar
 - `completed` → Done
 - `cancelled` → Backlog + `type:chore` + comentario explicativo
 
-Los todos eliminados del plan pero aún presentes en el archivo de estado de la última ejecución se tratan como **huérfanos**: el issue se conserva, se añade un comentario, las etiquetas pasan a `type:chore`, `priority:P2`, `area:platform` (deben existir en `.github/labels.json`) y el estado vuelve a Backlog si existe el ítem en el proyecto.
+Los todos eliminados del plan pero aún presentes en el archivo de estado de la última ejecución se tratan como **huérfanos**: el issue se conserva, se añade un comentario, se **fusiona `type:chore`** con las etiquetas ya existentes del issue (se conservan el resto) y el estado vuelve a Backlog si existe el ítem en el proyecto.
 
 **Todos completados (`status: completed`):** se crea o actualiza el issue como el resto y el **Status** del proyecto queda en **Done** (carga retroactiva si el todo ya estaba hecho antes del primer sync).
 
 ## Contrato del plan
 
-Esquemas TypeScript en `scripts/github/plan-sync/types.ts`: frontmatter obligatorio `name`, `overview`, `todos[]` con `id`, `content`, `status` (`pending` \| `in_progress` \| `completed` \| `cancelled`), `meta` opcional (`type`, `priority`, `area`) con valores por defecto `feature`, `P1`, `platform`.
+Esquemas Zod en `src/lib/plan-sync/schemas.ts` (y parseo en `src/lib/plan-sync/parse.ts`): frontmatter obligatorio `name`, `overview`, `todos[]` con `id`, `content`, `status` (`pending` \| `in_progress` \| `completed` \| `cancelled`), `meta` opcional (`type`, `priority`, `area`) con valores por defecto `feature`, `P1`, `platform`. Se permiten claves extra en el frontmatter (p. ej. `isProject`). Los tipos de estado en disco están en `scripts/github/plan-sync/types.ts`.
 
 ## Etiquetas heurísticas
 
@@ -44,9 +44,14 @@ npm run plan:sync -- --plan ruta/al/plan.plan.md
 
 Opciones:
 
+- `--repo propietario/repo` — solo para `plan:sync`; sustituye `GITHUB_REPOSITORY` en esa ejecución.
 - `--repo-root <dir>` — raíz del repositorio (por defecto el directorio de trabajo actual).
 - `--dry-run` — analiza y registra acciones previstas; **sin** llamadas a la API de GitHub ni escritura de estado/informes.
 - `--archive-dir <dir>` — solo para `plan:approve`; directorio relativo para copias archivadas (por defecto `.cursor/plans`).
+
+## Validación en CI (`plan:validate`)
+
+`npm run plan:validate` comprueba **solo** `tests/plan-sync/fixtures/valid-*.plan.md` por defecto (contrato + `.github/labels.json`). Para incluir `.cursor/plans/*.plan.md` en local: `npm run plan:validate -- --with-cursor-plans`. **No requiere token**. Workflow: `.github/workflows/plan-md-validate.yml` (PR y push a `main` / `develop`).
 
 ## Hook del botón Build
 
@@ -57,7 +62,7 @@ Usar `npm run plan:approve -- --plan ...` como flujo explícito de aprobación/a
 
 - `GH_TOKEN` o `GITHUB_TOKEN` (obligatoria): PAT con alcances `repo` y de proyecto según necesidad.
 - `GITHUB_REPOSITORY` (obligatoria*): `owner/repo`.
-- `GITHUB_OWNER` + `GITHUB_REPO` (obligatoria*): alternativa a `GITHUB_REPOSITORY`.
+- `GITHUB_OWNER` + `GITHUB_REPO` (obligatoria*): alternativa a `GITHUB_REPOSITORY` (o `--repo propietario/repo` en `plan:sync`).
 - `PROJECT_V2_ID` (obligatoria): id del nodo del proyecto.
 - `PROJECT_STATUS_FIELD_ID` (obligatoria): id del campo Status (selección única).
 - `PROJECT_STATUS_OPTION_BACKLOG` (obligatoria): id de opción Backlog.
@@ -70,11 +75,11 @@ Usar `npm run plan:approve -- --plan ...` como flujo explícito de aprobación/a
 Tras un sync exitoso que no sea `--dry-run`:
 
 - **Estado:** `.github/plan-sync/state/{slug}.json` — mapea `id` del todo → `issueNumber`, hash del contenido, `projectItemId` opcional (re-ejecuciones idempotentes; ausente hasta que el enlace al proyecto tenga éxito).
-- **Informes:** `.github/plan-sync/reports/{marca-de-tiempo}-{slug}.md` — registro legible con **`syncDurationMs`** y **`projectLinkFailures`**.
+- **Informes:** `.github/plan-sync/reports/{marca-de-tiempo}-{slug}.md` — registro legible con **`syncDurationMs`** y **`projectLinkFailures`**. **Los informes están en `.gitignore`** (no se versionan por defecto).
 
-Puede confirmarse en git el estado compartido del equipo; si no, tratarse como artefacto local (el repositorio no lo ignora por defecto).
+Puede confirmarse en git el **estado** para idempotencia compartida; los informes quedan locales salvo que se cambie el ignore.
 
 ## Referencias
 
 - [Documentación generada](documentacion-generada.md).
-- [Ciclo CI/CD](ciclo-ci-cd.md) — el pipeline no ejecuta `plan:sync` por defecto; es un flujo manual.
+- [Ciclo CI/CD](ciclo-ci-cd.md) — `plan:sync` sigue siendo manual; **`plan:validate`** corre en CI (`plan-md-validate.yml`).
