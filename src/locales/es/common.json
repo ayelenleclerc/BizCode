@@ -18,6 +18,7 @@
     "optionPtBr": "Português (Brasil)"
   },
   "auth": {
+    "title": "Iniciar sesión",
     "subtitle": "Inicie sesión para continuar",
     "formTitle": "Iniciar sesión",
     "fields": {
@@ -25,8 +26,16 @@
       "username": "Usuario",
       "password": "Contraseña"
     },
+    "tenantSlug": "Tenant",
+    "username": "Usuario",
+    "password": "Contraseña",
     "submit": "Entrar",
     "submitting": "Entrando…",
+    "signIn": "Ingresar",
+    "signingIn": "Ingresando…",
+    "logout": "Cerrar sesión",
+    "loadingSession": "Cargando sesión…",
+    "userLabel": "Usuario: {{username}} (rol: {{role}})",
     "validation": {
       "tenantRequired": "Indique el identificador de la empresa",
       "usernameRequired": "Indique el usuario",
@@ -36,7 +45,8 @@
       "invalidCredentials": "Usuario o contraseña incorrectos",
       "generic": "No se pudo iniciar sesión",
       "network": "No hay conexión con el servidor. Compruebe que el API está en marcha (p. ej. puerto 3001) y vuelva a intentarlo.",
-      "timeout": "La petición tardó demasiado. Inténtelo de nuevo."
+      "timeout": "La petición tardó demasiado. Inténtelo de nuevo.",
+      "offline": "Sin conexión. Compruebe su red e inténtelo de nuevo."
     }
   },
   "session": {
@@ -69,23 +79,5 @@
   "errors": {
     "generic": "Error al guardar",
     "required": "Campo requerido"
-  },
-  "auth": {
-    "title": "Iniciar sesion",
-    "subtitle": "Accede con tu tenant, usuario y contrasena.",
-    "tenantSlug": "Tenant",
-    "username": "Usuario",
-    "password": "Contrasena",
-    "signIn": "Ingresar",
-    "signingIn": "Ingresando...",
-    "logout": "Cerrar sesion",
-    "loadingSession": "Cargando sesion...",
-    "userLabel": "Usuario: {{username}} (rol: {{role}})",
-    "errors": {
-      "invalidCredentials": "Credenciales invalidas.",
-      "timeout": "La solicitud excedio el tiempo de espera. Intenta nuevamente.",
-      "offline": "Sin conexion. Verifica tu red e intenta nuevamente.",
-      "generic": "No fue posible iniciar sesion."
-    }
   }
 }
