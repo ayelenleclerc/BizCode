@@ -1,0 +1,43 @@
+{
+  "planSlug": "plan_maestro_bizcode_19ee7c51_plan",
+  "planPath": ".cursor/plans/plan_maestro_bizcode_19ee7c51.plan.md",
+  "planHash": "85705b70dc0af7c2",
+  "syncedAt": "2026-04-07T01:03:13.409Z",
+  "todos": [
+    {
+      "id": "definir-paquete-planificacion",
+      "issueNumber": 16,
+      "issueNodeId": "I_kwDOR2qBe877OVM0",
+      "projectItemId": "PVTI_lAHOBQCjWM4BT2qAzgpP2BE",
+      "lastContentHash": "f11e6b6d3935e2a9"
+    },
+    {
+      "id": "cerrar-rbac-inicial",
+      "issueNumber": 17,
+      "issueNodeId": "I_kwDOR2qBe877OVN8",
+      "projectItemId": "PVTI_lAHOBQCjWM4BT2qAzgpP2Bc",
+      "lastContentHash": "6c9c3984dd08efde"
+    },
+    {
+      "id": "disenar-modelo-iam",
+      "issueNumber": 18,
+      "issueNodeId": "I_kwDOR2qBe877OVPG",
+      "projectItemId": "PVTI_lAHOBQCjWM4BT2qAzgpP2CE",
+      "lastContentHash": "4aad48b98e9653ab"
+    },
+    {
+      "id": "priorizar-backlog-90d",
+      "issueNumber": 19,
+      "issueNodeId": "I_kwDOR2qBe877OVP4",
+      "projectItemId": "PVTI_lAHOBQCjWM4BT2qAzgpP2Co",
+      "lastContentHash": "5405ff6c81ab75f1"
+    },
+    {
+      "id": "planear-flujo-pedido-logistica",
+      "issueNumber": 20,
+      "issueNodeId": "I_kwDOR2qBe877OVQ7",
+      "projectItemId": "PVTI_lAHOBQCjWM4BT2qAzgpP2DM",
+      "lastContentHash": "3a66075785c94c5f"
+    }
+  ]
+}
