@@ -10,9 +10,10 @@ import { resolveRepoRoot, syncPlanToGitHub } from './plan-sync/sync'
 
 function usage(): string {
   return [
-    'Usage: npm run plan:sync -- --plan <path-to.plan.md> [--repo-root <dir>] [--dry-run]',
+    'Usage: npm run plan:sync -- --plan <path-to.plan.md> [--repo owner/repo] [--repo-root <dir>] [--dry-run]',
     '',
     'Environment (non-dry-run): GH_TOKEN or GITHUB_TOKEN; GITHUB_REPOSITORY or GITHUB_OWNER+GITHUB_REPO;',
+    '  (or pass --repo owner/repo to override for this run)',
     'PROJECT_V2_ID; PROJECT_STATUS_FIELD_ID; PROJECT_STATUS_OPTION_BACKLOG;',
     'PROJECT_STATUS_OPTION_IN_PROGRESS; PROJECT_STATUS_OPTION_DONE',
     '',
@@ -22,10 +23,12 @@ function usage(): string {
 
 function parseArgs(argv: string[]): {
   plan?: string
+  repo?: string
   repoRoot?: string
   dryRun: boolean
 } {
   let plan: string | undefined
+  let repo: string | undefined
   let repoRoot: string | undefined
   let dryRun = false
   for (let i = 0; i < argv.length; i += 1) {
@@ -43,17 +46,25 @@ function parseArgs(argv: string[]): {
       i += 1
       continue
     }
+    if (a === '--repo') {
+      repo = argv[i + 1]
+      i += 1
+      continue
+    }
     if (a === '--repo-root') {
       repoRoot = argv[i + 1]
       i += 1
       continue
     }
   }
-  return { plan, repoRoot, dryRun }
+  return { plan, repo, repoRoot, dryRun }
 }
 
 async function main(): Promise<void> {
-  const { plan, repoRoot: rootArg, dryRun } = parseArgs(process.argv.slice(2))
+  const { plan, repo: repoArg, repoRoot: rootArg, dryRun } = parseArgs(process.argv.slice(2))
+  if (repoArg?.trim()) {
+    process.env.GITHUB_REPOSITORY = repoArg.trim()
+  }
   if (!plan?.trim()) {
     console.error('Missing --plan <path>\n\n' + usage())
     process.exit(1)

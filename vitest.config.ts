@@ -13,6 +13,7 @@ export default defineConfig({
     environmentMatchGlobs: [
       ['tests/api/**', 'node'],
       ['tests/server/**', 'node'],
+      ['tests/plan-sync/**', 'node'],
     ],
     globals: true,
     setupFiles: ['./src/test/setup.ts'],
