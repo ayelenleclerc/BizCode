@@ -10,7 +10,7 @@ interface LayoutProps {
 
 export default function Layout({ children }: LayoutProps) {
   const { t } = useTranslation('common')
-  const { logout } = useAuth()
+  const { logout, status, claims } = useAuth()
   const navigate = useNavigate()
   const [isDark, setIsDark] = useState(() => {
     // Lazy initializer: reads localStorage once at mount, no extra render
