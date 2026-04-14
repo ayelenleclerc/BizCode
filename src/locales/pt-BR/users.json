@@ -1,0 +1,68 @@
+{
+  "title": "Usuários",
+  "search": {
+    "placeholder": "Buscar por usuário... (F2)"
+  },
+  "table": {
+    "username": "Usuário",
+    "role": "Perfil",
+    "channels": "Canais",
+    "active": "Ativo"
+  },
+  "empty": "Nenhum usuário encontrado. Crie um com F3.",
+  "form": {
+    "titleNew": "Novo Usuário",
+    "titleEdit": "Editar Usuário — {{username}}",
+    "hint": "F5=salvar, Esc=cancelar",
+    "username": "Usuário",
+    "password": "Senha",
+    "passwordPlaceholder": "Mín. 8 caracteres",
+    "role": "Perfil",
+    "channels": "Canais",
+    "active": "Ativo",
+    "channelOptions": {
+      "counter": "Balcão",
+      "field": "Campo",
+      "backoffice": "Back Office",
+      "warehouse": "Depósito",
+      "delivery": "Entrega"
+    },
+    "roleOptions": {
+      "super_admin": "Super Admin",
+      "owner": "Proprietário",
+      "manager": "Gerente",
+      "seller": "Vendedor",
+      "backoffice": "Back Office",
+      "warehouse_op": "Operador de Depósito",
+      "warehouse_lead": "Chefe de Depósito",
+      "logistics_planner": "Planejador Logístico",
+      "driver": "Motorista",
+      "billing": "Faturamento",
+      "cashier": "Caixa",
+      "collections": "Cobranças",
+      "finance": "Finanças",
+      "auditor": "Auditor"
+    },
+    "errors": {
+      "username": "O usuário deve ter pelo menos 3 caracteres",
+      "password": "A senha deve ter pelo menos 8 caracteres",
+      "role": "O perfil é obrigatório",
+      "duplicate": "Nome de usuário já existe",
+      "generic": "Erro ao salvar usuário"
+    }
+  },
+  "changePassword": {
+    "title": "Alterar Senha",
+    "currentPassword": "Senha Atual",
+    "newPassword": "Nova Senha",
+    "newPasswordPlaceholder": "Mín. 8 caracteres",
+    "hint": "F5=salvar, Esc=cancelar",
+    "errors": {
+      "currentPassword": "A senha atual é obrigatória",
+      "newPassword": "A nova senha deve ter pelo menos 8 caracteres",
+      "incorrect": "Senha atual incorreta",
+      "generic": "Erro ao alterar senha"
+    },
+    "success": "Senha alterada com sucesso"
+  }
+}

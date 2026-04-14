@@ -26,6 +26,7 @@ import {
   formasPagoAPI,
   getAuthErrorI18nKey,
   rubrosAPI,
+  usersAPI,
 } from './api'
 
 beforeEach(() => {
@@ -420,6 +421,76 @@ describe('facturasAPI', () => {
     it('lanza error del servidor', async () => {
       mockPost.mockRejectedValueOnce(axiosErrorWithResponse('Número duplicado'))
       await expect(facturasAPI.create({})).rejects.toThrow('Número duplicado')
+    })
+  })
+})
+
+// ════════════════════════════════════════════════════════════
+// usersAPI
+// ════════════════════════════════════════════════════════════
+describe('usersAPI', () => {
+  describe('list', () => {
+    it('retorna lista de usuarios en el happy path', async () => {
+      const users = [{ id: 1, username: 'alice', role: 'seller' }]
+      mockGet.mockResolvedValueOnce({ data: { data: users } })
+      const result = await usersAPI.list()
+      expect(result).toEqual(users)
+      expect(mockGet).toHaveBeenCalledWith('/users')
+    })
+
+    it('lanza error del servidor', async () => {
+      mockGet.mockRejectedValueOnce(axiosErrorWithResponse('Authentication required'))
+      await expect(usersAPI.list()).rejects.toThrow('Authentication required')
+    })
+  })
+
+  describe('create', () => {
+    it('retorna el usuario creado en el happy path', async () => {
+      const newUser = { id: 2, username: 'bob', role: 'seller' }
+      mockPost.mockResolvedValueOnce({ data: { data: newUser } })
+      const result = await usersAPI.create({ username: 'bob', role: 'seller', password: 'x' })
+      expect(result).toEqual(newUser)
+      expect(mockPost).toHaveBeenCalledWith('/users', { username: 'bob', role: 'seller', password: 'x' })
+    })
+
+    it('lanza error del servidor', async () => {
+      mockPost.mockRejectedValueOnce(axiosErrorWithResponse('Username already exists'))
+      await expect(usersAPI.create({ username: 'bob', role: 'seller', password: 'x' })).rejects.toThrow(
+        'Username already exists',
+      )
+    })
+  })
+
+  describe('update', () => {
+    it('retorna el usuario actualizado en el happy path', async () => {
+      const updated = { id: 1, username: 'alice', role: 'manager', active: true }
+      mockPut.mockResolvedValueOnce({ data: { data: updated } })
+      const result = await usersAPI.update(1, { role: 'manager' })
+      expect(result).toEqual(updated)
+      expect(mockPut).toHaveBeenCalledWith('/users/1', { role: 'manager' })
+    })
+
+    it('lanza error del servidor', async () => {
+      mockPut.mockRejectedValueOnce(axiosErrorWithResponse('User not found'))
+      await expect(usersAPI.update(99, { active: false })).rejects.toThrow('User not found')
+    })
+  })
+
+  describe('changePassword', () => {
+    it('resuelve sin error en el happy path', async () => {
+      mockPost.mockResolvedValueOnce({ data: { data: { changed: true } } })
+      await expect(usersAPI.changePassword('old', 'new')).resolves.toBeUndefined()
+      expect(mockPost).toHaveBeenCalledWith('/auth/change-password', {
+        currentPassword: 'old',
+        newPassword: 'new',
+      })
+    })
+
+    it('lanza error del servidor', async () => {
+      mockPost.mockRejectedValueOnce(axiosErrorWithResponse('Current password is incorrect'))
+      await expect(usersAPI.changePassword('wrong', 'new')).rejects.toThrow(
+        'Current password is incorrect',
+      )
     })
   })
 })

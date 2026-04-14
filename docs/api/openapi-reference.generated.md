@@ -2950,6 +2950,862 @@ One-time endpoint to create initial tenant and owner user.
 }
 ```
 
+### List users for the current tenant
+
+- **Method:** `GET`
+- **Path:** `/api/users`
+- **Tags:** users
+
+Returns all users belonging to the authenticated user's tenant. Requires `users.manage` permission.
+
+#### Responses
+
+##### Status: 200 List of users
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`active`**
+
+    `boolean`
+
+  - **`createdAt`**
+
+    `string`, format: `date-time`
+
+  - **`id`**
+
+    `integer`
+
+  - **`role`**
+
+    `string`, possible values: `"super_admin", "owner", "manager", "seller", "backoffice", "warehouse_op", "warehouse_lead", "logistics_planner", "driver", "billing", "cashier", "collections", "finance", "auditor"`
+
+  - **`scopeBranchIds`**
+
+    `array`
+
+    **Items:**
+
+    `integer`
+
+  - **`scopeChannels`**
+
+    `array`
+
+    **Items:**
+
+    `string`, possible values: `"counter", "field", "backoffice", "warehouse", "delivery"`
+
+  - **`scopeRouteIds`**
+
+    `array`
+
+    **Items:**
+
+    `integer`
+
+  - **`scopeWarehouseIds`**
+
+    `array`
+
+    **Items:**
+
+    `integer`
+
+  - **`updatedAt`**
+
+    `string`, format: `date-time`
+
+  - **`username`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "username": "",
+      "role": "super_admin",
+      "active": true,
+      "scopeChannels": [
+        "counter"
+      ],
+      "scopeBranchIds": [
+        1
+      ],
+      "scopeWarehouseIds": [
+        1
+      ],
+      "scopeRouteIds": [
+        1
+      ],
+      "createdAt": "",
+      "updatedAt": ""
+    }
+  ]
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Create a new user
+
+- **Method:** `POST`
+- **Path:** `/api/users`
+- **Tags:** users
+
+Creates a new user in the current tenant. Requires `users.manage` and `roles.assign` permissions.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`password` (required)**
+
+  `string`
+
+- **`role` (required)**
+
+  `string`, possible values: `"super_admin", "owner", "manager", "seller", "backoffice", "warehouse_op", "warehouse_lead", "logistics_planner", "driver", "billing", "cashier", "collections", "finance", "auditor"`
+
+- **`username` (required)**
+
+  `string`
+
+- **`active`**
+
+  `boolean`, default: `true`
+
+- **`scopeBranchIds`**
+
+  `array`
+
+  **Items:**
+
+  `integer`
+
+- **`scopeChannels`**
+
+  `array`
+
+  **Items:**
+
+  `string`, possible values: `"counter", "field", "backoffice", "warehouse", "delivery"`
+
+- **`scopeRouteIds`**
+
+  `array`
+
+  **Items:**
+
+  `integer`
+
+- **`scopeWarehouseIds`**
+
+  `array`
+
+  **Items:**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "username": "",
+  "password": "",
+  "role": "super_admin",
+  "active": true,
+  "scopeChannels": [
+    "counter"
+  ],
+  "scopeBranchIds": [
+    1
+  ],
+  "scopeWarehouseIds": [
+    1
+  ],
+  "scopeRouteIds": [
+    1
+  ]
+}
+```
+
+#### Responses
+
+##### Status: 201 User created
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`active`**
+
+    `boolean`
+
+  - **`createdAt`**
+
+    `string`, format: `date-time`
+
+  - **`id`**
+
+    `integer`
+
+  - **`role`**
+
+    `string`, possible values: `"super_admin", "owner", "manager", "seller", "backoffice", "warehouse_op", "warehouse_lead", "logistics_planner", "driver", "billing", "cashier", "collections", "finance", "auditor"`
+
+  - **`scopeBranchIds`**
+
+    `array`
+
+    **Items:**
+
+    `integer`
+
+  - **`scopeChannels`**
+
+    `array`
+
+    **Items:**
+
+    `string`, possible values: `"counter", "field", "backoffice", "warehouse", "delivery"`
+
+  - **`scopeRouteIds`**
+
+    `array`
+
+    **Items:**
+
+    `integer`
+
+  - **`scopeWarehouseIds`**
+
+    `array`
+
+    **Items:**
+
+    `integer`
+
+  - **`updatedAt`**
+
+    `string`, format: `date-time`
+
+  - **`username`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "username": "",
+    "role": "super_admin",
+    "active": true,
+    "scopeChannels": [
+      "counter"
+    ],
+    "scopeBranchIds": [
+      1
+    ],
+    "scopeWarehouseIds": [
+      1
+    ],
+    "scopeRouteIds": [
+      1
+    ],
+    "createdAt": "",
+    "updatedAt": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 409 Resource conflict
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Update a user
+
+- **Method:** `PUT`
+- **Path:** `/api/users/{id}`
+- **Tags:** users
+
+Updates role, active flag, or scope for a user in the current tenant. Requires `users.manage`.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`active`**
+
+  `boolean`
+
+- **`role`**
+
+  `string`, possible values: `"super_admin", "owner", "manager", "seller", "backoffice", "warehouse_op", "warehouse_lead", "logistics_planner", "driver", "billing", "cashier", "collections", "finance", "auditor"`
+
+- **`scopeBranchIds`**
+
+  `array`
+
+  **Items:**
+
+  `integer`
+
+- **`scopeChannels`**
+
+  `array`
+
+  **Items:**
+
+  `string`, possible values: `"counter", "field", "backoffice", "warehouse", "delivery"`
+
+- **`scopeRouteIds`**
+
+  `array`
+
+  **Items:**
+
+  `integer`
+
+- **`scopeWarehouseIds`**
+
+  `array`
+
+  **Items:**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "role": "super_admin",
+  "active": true,
+  "scopeChannels": [
+    "counter"
+  ],
+  "scopeBranchIds": [
+    1
+  ],
+  "scopeWarehouseIds": [
+    1
+  ],
+  "scopeRouteIds": [
+    1
+  ]
+}
+```
+
+#### Responses
+
+##### Status: 200 User updated
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`active`**
+
+    `boolean`
+
+  - **`createdAt`**
+
+    `string`, format: `date-time`
+
+  - **`id`**
+
+    `integer`
+
+  - **`role`**
+
+    `string`, possible values: `"super_admin", "owner", "manager", "seller", "backoffice", "warehouse_op", "warehouse_lead", "logistics_planner", "driver", "billing", "cashier", "collections", "finance", "auditor"`
+
+  - **`scopeBranchIds`**
+
+    `array`
+
+    **Items:**
+
+    `integer`
+
+  - **`scopeChannels`**
+
+    `array`
+
+    **Items:**
+
+    `string`, possible values: `"counter", "field", "backoffice", "warehouse", "delivery"`
+
+  - **`scopeRouteIds`**
+
+    `array`
+
+    **Items:**
+
+    `integer`
+
+  - **`scopeWarehouseIds`**
+
+    `array`
+
+    **Items:**
+
+    `integer`
+
+  - **`updatedAt`**
+
+    `string`, format: `date-time`
+
+  - **`username`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "username": "",
+    "role": "super_admin",
+    "active": true,
+    "scopeChannels": [
+      "counter"
+    ],
+    "scopeBranchIds": [
+      1
+    ],
+    "scopeWarehouseIds": [
+      1
+    ],
+    "scopeRouteIds": [
+      1
+    ],
+    "createdAt": "",
+    "updatedAt": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 User not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Change own password
+
+- **Method:** `POST`
+- **Path:** `/api/auth/change-password`
+- **Tags:** auth
+
+Allows the authenticated user to change their password by supplying the current password.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`currentPassword` (required)**
+
+  `string`
+
+- **`newPassword` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "currentPassword": "",
+  "newPassword": ""
+}
+```
+
+#### Responses
+
+##### Status: 200 Password changed
+
+###### Content-Type: application/json
+
+- **`data`**
+
+  `object`
+
+  - **`changed`**
+
+    `boolean`
+
+- **`success`**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "changed": true
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ## Schemas
 
 ### HealthResponse
@@ -5356,5 +6212,447 @@ One-time endpoint to create initial tenant and owner user.
       "additionalProperty": "anything"
     }
   ]
+}
+```
+
+### AppUser
+
+- **Type:**`object`
+
+* **`active`**
+
+  `boolean`
+
+* **`createdAt`**
+
+  `string`, format: `date-time`
+
+* **`id`**
+
+  `integer`
+
+* **`role`**
+
+  `string`, possible values: `"super_admin", "owner", "manager", "seller", "backoffice", "warehouse_op", "warehouse_lead", "logistics_planner", "driver", "billing", "cashier", "collections", "finance", "auditor"`
+
+* **`scopeBranchIds`**
+
+  `array`
+
+  **Items:**
+
+  `integer`
+
+* **`scopeChannels`**
+
+  `array`
+
+  **Items:**
+
+  `string`, possible values: `"counter", "field", "backoffice", "warehouse", "delivery"`
+
+* **`scopeRouteIds`**
+
+  `array`
+
+  **Items:**
+
+  `integer`
+
+* **`scopeWarehouseIds`**
+
+  `array`
+
+  **Items:**
+
+  `integer`
+
+* **`updatedAt`**
+
+  `string`, format: `date-time`
+
+* **`username`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "username": "",
+  "role": "super_admin",
+  "active": true,
+  "scopeChannels": [
+    "counter"
+  ],
+  "scopeBranchIds": [
+    1
+  ],
+  "scopeWarehouseIds": [
+    1
+  ],
+  "scopeRouteIds": [
+    1
+  ],
+  "createdAt": "",
+  "updatedAt": ""
+}
+```
+
+### AppUserInput
+
+- **Type:**`object`
+
+* **`password` (required)**
+
+  `string`
+
+* **`role` (required)**
+
+  `string`, possible values: `"super_admin", "owner", "manager", "seller", "backoffice", "warehouse_op", "warehouse_lead", "logistics_planner", "driver", "billing", "cashier", "collections", "finance", "auditor"`
+
+* **`username` (required)**
+
+  `string`
+
+* **`active`**
+
+  `boolean`, default: `true`
+
+* **`scopeBranchIds`**
+
+  `array`
+
+  **Items:**
+
+  `integer`
+
+* **`scopeChannels`**
+
+  `array`
+
+  **Items:**
+
+  `string`, possible values: `"counter", "field", "backoffice", "warehouse", "delivery"`
+
+* **`scopeRouteIds`**
+
+  `array`
+
+  **Items:**
+
+  `integer`
+
+* **`scopeWarehouseIds`**
+
+  `array`
+
+  **Items:**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "username": "",
+  "password": "",
+  "role": "super_admin",
+  "active": true,
+  "scopeChannels": [
+    "counter"
+  ],
+  "scopeBranchIds": [
+    1
+  ],
+  "scopeWarehouseIds": [
+    1
+  ],
+  "scopeRouteIds": [
+    1
+  ]
+}
+```
+
+### AppUserUpdateInput
+
+- **Type:**`object`
+
+* **`active`**
+
+  `boolean`
+
+* **`role`**
+
+  `string`, possible values: `"super_admin", "owner", "manager", "seller", "backoffice", "warehouse_op", "warehouse_lead", "logistics_planner", "driver", "billing", "cashier", "collections", "finance", "auditor"`
+
+* **`scopeBranchIds`**
+
+  `array`
+
+  **Items:**
+
+  `integer`
+
+* **`scopeChannels`**
+
+  `array`
+
+  **Items:**
+
+  `string`, possible values: `"counter", "field", "backoffice", "warehouse", "delivery"`
+
+* **`scopeRouteIds`**
+
+  `array`
+
+  **Items:**
+
+  `integer`
+
+* **`scopeWarehouseIds`**
+
+  `array`
+
+  **Items:**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "role": "super_admin",
+  "active": true,
+  "scopeChannels": [
+    "counter"
+  ],
+  "scopeBranchIds": [
+    1
+  ],
+  "scopeWarehouseIds": [
+    1
+  ],
+  "scopeRouteIds": [
+    1
+  ]
+}
+```
+
+### AppUserListEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`active`**
+
+    `boolean`
+
+  - **`createdAt`**
+
+    `string`, format: `date-time`
+
+  - **`id`**
+
+    `integer`
+
+  - **`role`**
+
+    `string`, possible values: `"super_admin", "owner", "manager", "seller", "backoffice", "warehouse_op", "warehouse_lead", "logistics_planner", "driver", "billing", "cashier", "collections", "finance", "auditor"`
+
+  - **`scopeBranchIds`**
+
+    `array`
+
+    **Items:**
+
+    `integer`
+
+  - **`scopeChannels`**
+
+    `array`
+
+    **Items:**
+
+    `string`, possible values: `"counter", "field", "backoffice", "warehouse", "delivery"`
+
+  - **`scopeRouteIds`**
+
+    `array`
+
+    **Items:**
+
+    `integer`
+
+  - **`scopeWarehouseIds`**
+
+    `array`
+
+    **Items:**
+
+    `integer`
+
+  - **`updatedAt`**
+
+    `string`, format: `date-time`
+
+  - **`username`**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "username": "",
+      "role": "super_admin",
+      "active": true,
+      "scopeChannels": [
+        "counter"
+      ],
+      "scopeBranchIds": [
+        1
+      ],
+      "scopeWarehouseIds": [
+        1
+      ],
+      "scopeRouteIds": [
+        1
+      ],
+      "createdAt": "",
+      "updatedAt": ""
+    }
+  ]
+}
+```
+
+### AppUserEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`active`**
+
+    `boolean`
+
+  - **`createdAt`**
+
+    `string`, format: `date-time`
+
+  - **`id`**
+
+    `integer`
+
+  - **`role`**
+
+    `string`, possible values: `"super_admin", "owner", "manager", "seller", "backoffice", "warehouse_op", "warehouse_lead", "logistics_planner", "driver", "billing", "cashier", "collections", "finance", "auditor"`
+
+  - **`scopeBranchIds`**
+
+    `array`
+
+    **Items:**
+
+    `integer`
+
+  - **`scopeChannels`**
+
+    `array`
+
+    **Items:**
+
+    `string`, possible values: `"counter", "field", "backoffice", "warehouse", "delivery"`
+
+  - **`scopeRouteIds`**
+
+    `array`
+
+    **Items:**
+
+    `integer`
+
+  - **`scopeWarehouseIds`**
+
+    `array`
+
+    **Items:**
+
+    `integer`
+
+  - **`updatedAt`**
+
+    `string`, format: `date-time`
+
+  - **`username`**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "username": "",
+    "role": "super_admin",
+    "active": true,
+    "scopeChannels": [
+      "counter"
+    ],
+    "scopeBranchIds": [
+      1
+    ],
+    "scopeWarehouseIds": [
+      1
+    ],
+    "scopeRouteIds": [
+      1
+    ],
+    "createdAt": "",
+    "updatedAt": ""
+  }
+}
+```
+
+### ChangePasswordInput
+
+- **Type:**`object`
+
+* **`currentPassword` (required)**
+
+  `string`
+
+* **`newPassword` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "currentPassword": "",
+  "newPassword": ""
 }
 ```

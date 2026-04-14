@@ -1,0 +1,7 @@
+version: 2
+
+# False-positive allowlist for GitGuardian Generic Password detector.
+# The pattern below matches a Zod schema field declaration, not a real credential.
+matches-ignore:
+  - name: "Zod schema: password field validator (not a credential)"
+    regex: "password: isNew \\? z\\.string"
