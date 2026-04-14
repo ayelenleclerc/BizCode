@@ -7,8 +7,8 @@ import { PrismaClient as PrismaClientImpl } from '@prisma/client'
 import { USER_CHANNELS } from '../src/lib/rbac'
 
 const prisma = new PrismaClientImpl()
-const TENANT_SLUG = 'platform'
-const TENANT_NAME = 'BizCode Platform'
+const TENANT_SLUG = process.env.BIZCODE_TENANT_SLUG?.trim() || 'bizcode'
+const TENANT_NAME = process.env.BIZCODE_TENANT_NAME?.trim() || 'BizCode'
 
 function hashPassword(password: string): string {
   const salt = randomBytes(16).toString('hex')

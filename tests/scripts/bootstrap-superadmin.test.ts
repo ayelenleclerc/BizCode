@@ -6,7 +6,7 @@ import { bootstrapSuperAdmin } from '../../scripts/bootstrap-superadmin'
 function buildPrismaMock(existingUser: boolean, adminUsername: string): PrismaClient {
   return {
     tenant: {
-      upsert: vi.fn().mockResolvedValue({ id: 22, slug: 'platform', name: 'BizCode Platform', active: true }),
+      upsert: vi.fn().mockResolvedValue({ id: 22, slug: 'bizcode', name: 'BizCode', active: true }),
     },
     appUser: {
       findUnique: vi.fn().mockResolvedValue(
