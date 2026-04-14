@@ -30,6 +30,8 @@ tags:
     description: Invoice management
   - name: formasPago
     description: Payment methods
+  - name: users
+    description: User management (requires users.manage permission)
 
 paths:
   /api/auth/setup-owner:
@@ -402,6 +404,134 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/FormaPagoListEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/users:
+    get:
+      tags: [users]
+      summary: List users for the current tenant
+      description: Returns all users belonging to the authenticated user's tenant. Requires `users.manage` permission.
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: List of users
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppUserListEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    post:
+      tags: [users]
+      summary: Create a new user
+      description: Creates a new user in the current tenant. Requires `users.manage` and `roles.assign` permissions.
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AppUserInput'
+      responses:
+        '201':
+          description: User created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppUserEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '409':
+          $ref: '#/components/responses/ConflictError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/users/{id}:
+    put:
+      tags: [users]
+      summary: Update a user
+      description: Updates role, active flag, or scope for a user in the current tenant. Requires `users.manage`.
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AppUserUpdateInput'
+      responses:
+        '200':
+          description: User updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppUserEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/auth/change-password:
+    post:
+      tags: [auth]
+      summary: Change own password
+      description: Allows the authenticated user to change their password by supplying the current password.
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangePasswordInput'
+      responses:
+        '200':
+          description: Password changed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    const: true
+                  data:
+                    type: object
+                    properties:
+                      changed:
+                        type: boolean
+                        const: true
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
         '500':
           $ref: '#/components/responses/ServerError'
 
@@ -982,6 +1112,135 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/FormaPago'
+
+    AppUser:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          type: integer
+        username:
+          type: string
+        role:
+          type: string
+          enum: [super_admin, owner, manager, seller, backoffice, warehouse_op, warehouse_lead, logistics_planner, driver, billing, cashier, collections, finance, auditor]
+        active:
+          type: boolean
+        scopeChannels:
+          type: array
+          items:
+            type: string
+            enum: [counter, field, backoffice, warehouse, delivery]
+        scopeBranchIds:
+          type: array
+          items:
+            type: integer
+        scopeWarehouseIds:
+          type: array
+          items:
+            type: integer
+        scopeRouteIds:
+          type: array
+          items:
+            type: integer
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    AppUserInput:
+      type: object
+      required: [username, password, role]
+      properties:
+        username:
+          type: string
+          minLength: 3
+        password:
+          type: string
+          minLength: 8
+        role:
+          type: string
+          enum: [super_admin, owner, manager, seller, backoffice, warehouse_op, warehouse_lead, logistics_planner, driver, billing, cashier, collections, finance, auditor]
+        active:
+          type: boolean
+          default: true
+        scopeChannels:
+          type: array
+          items:
+            type: string
+            enum: [counter, field, backoffice, warehouse, delivery]
+        scopeBranchIds:
+          type: array
+          items:
+            type: integer
+        scopeWarehouseIds:
+          type: array
+          items:
+            type: integer
+        scopeRouteIds:
+          type: array
+          items:
+            type: integer
+
+    AppUserUpdateInput:
+      type: object
+      properties:
+        role:
+          type: string
+          enum: [super_admin, owner, manager, seller, backoffice, warehouse_op, warehouse_lead, logistics_planner, driver, billing, cashier, collections, finance, auditor]
+        active:
+          type: boolean
+        scopeChannels:
+          type: array
+          items:
+            type: string
+            enum: [counter, field, backoffice, warehouse, delivery]
+        scopeBranchIds:
+          type: array
+          items:
+            type: integer
+        scopeWarehouseIds:
+          type: array
+          items:
+            type: integer
+        scopeRouteIds:
+          type: array
+          items:
+            type: integer
+
+    AppUserListEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/AppUser'
+
+    AppUserEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/AppUser'
+
+    ChangePasswordInput:
+      type: object
+      required: [currentPassword, newPassword]
+      properties:
+        currentPassword:
+          type: string
+        newPassword:
+          type: string
+          minLength: 8
 
   responses:
     BadRequest:

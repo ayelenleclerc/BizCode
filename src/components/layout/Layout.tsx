@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import LanguageSelect from '@/components/LanguageSelect'
+import { CanAccess } from '@/components/CanAccess'
 import { useAuth } from '@/contexts/AuthContext'
 
 interface LayoutProps {
@@ -85,6 +86,18 @@ export default function Layout({ children }: LayoutProps) {
           >
             🧾 {t('nav.facturacion')}
           </Link>
+          <CanAccess permission="users.manage">
+            <Link
+              to="/users"
+              className={`block px-4 py-3 rounded transition ${
+                isActive('/users')
+                  ? 'bg-blue-600 text-white'
+                  : 'text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-700'
+              }`}
+            >
+              👤 {t('nav.users')}
+            </Link>
+          </CanAccess>
         </nav>
 
         {/* Language, theme, session */}

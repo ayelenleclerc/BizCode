@@ -8,7 +8,8 @@
     "main": "Navegação principal",
     "clientes": "Clientes",
     "articulos": "Produtos",
-    "facturacion": "Faturamento"
+    "facturacion": "Faturamento",
+    "users": "Usuários"
   },
   "language": {
     "legend": "Idioma da interface",

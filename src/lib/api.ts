@@ -266,6 +266,78 @@ export const facturasAPI = {
   },
 }
 
+// ============ USERS ============
+
+export type AppUserDTO = {
+  id: number
+  username: string
+  role: string
+  active: boolean
+  scopeChannels: string[]
+  scopeBranchIds: number[]
+  scopeWarehouseIds: number[]
+  scopeRouteIds: number[]
+  createdAt: string
+  updatedAt?: string
+}
+
+export type CreateUserBody = {
+  username: string
+  password: string
+  role: string
+  active?: boolean
+  scopeChannels?: string[]
+  scopeBranchIds?: number[]
+  scopeWarehouseIds?: number[]
+  scopeRouteIds?: number[]
+}
+
+export type UpdateUserBody = {
+  role?: string
+  active?: boolean
+  scopeChannels?: string[]
+  scopeBranchIds?: number[]
+  scopeWarehouseIds?: number[]
+  scopeRouteIds?: number[]
+}
+
+export const usersAPI = {
+  list: async (): Promise<AppUserDTO[]> => {
+    try {
+      const response = await api.get<{ success: boolean; data: AppUserDTO[] }>('/users')
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  create: async (body: CreateUserBody): Promise<AppUserDTO> => {
+    try {
+      const response = await api.post<{ success: boolean; data: AppUserDTO }>('/users', body)
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  update: async (id: number, body: UpdateUserBody): Promise<AppUserDTO> => {
+    try {
+      const response = await api.put<{ success: boolean; data: AppUserDTO }>(`/users/${id}`, body)
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  changePassword: async (currentPassword: string, newPassword: string): Promise<void> => {
+    try {
+      await api.post('/auth/change-password', { currentPassword, newPassword })
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+}
+
 // ============ HEALTH CHECK ============
 
 export const checkAPI = async () => {

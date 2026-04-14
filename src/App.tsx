@@ -5,6 +5,7 @@ import ClientesPage from './pages/clientes'
 import ArticulosPage from './pages/articulos'
 import FacturacionPage from './pages/facturacion'
 import LoginPage from './pages/login'
+import UsersPage from './pages/users'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
 
 function ProtectedRoute() {
@@ -74,6 +75,7 @@ function AppRoutes() {
           <Route path="clientes" element={<ClientesPage />} />
           <Route path="articulos" element={<ArticulosPage />} />
           <Route path="facturacion" element={<FacturacionPage />} />
+          <Route path="users" element={<UsersPage />} />
         </Route>
       </Route>
       <Route path="/" element={<RootRedirect />} />

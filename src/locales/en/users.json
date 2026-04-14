@@ -1,0 +1,68 @@
+{
+  "title": "Users",
+  "search": {
+    "placeholder": "Search by username... (F2)"
+  },
+  "table": {
+    "username": "Username",
+    "role": "Role",
+    "channels": "Channels",
+    "active": "Active"
+  },
+  "empty": "No users found. Create one with F3.",
+  "form": {
+    "titleNew": "New User",
+    "titleEdit": "Edit User — {{username}}",
+    "hint": "F5=save, Esc=cancel",
+    "username": "Username",
+    "password": "Password",
+    "passwordPlaceholder": "Min. 8 characters",
+    "role": "Role",
+    "channels": "Channels",
+    "active": "Active",
+    "channelOptions": {
+      "counter": "Counter",
+      "field": "Field",
+      "backoffice": "Back Office",
+      "warehouse": "Warehouse",
+      "delivery": "Delivery"
+    },
+    "roleOptions": {
+      "super_admin": "Super Admin",
+      "owner": "Owner",
+      "manager": "Manager",
+      "seller": "Seller",
+      "backoffice": "Back Office",
+      "warehouse_op": "Warehouse Operator",
+      "warehouse_lead": "Warehouse Lead",
+      "logistics_planner": "Logistics Planner",
+      "driver": "Driver",
+      "billing": "Billing",
+      "cashier": "Cashier",
+      "collections": "Collections",
+      "finance": "Finance",
+      "auditor": "Auditor"
+    },
+    "errors": {
+      "username": "Username must be at least 3 characters",
+      "password": "Password must be at least 8 characters",
+      "role": "Role is required",
+      "duplicate": "Username already exists",
+      "generic": "Error saving user"
+    }
+  },
+  "changePassword": {
+    "title": "Change Password",
+    "currentPassword": "Current Password",
+    "newPassword": "New Password",
+    "newPasswordPlaceholder": "Min. 8 characters",
+    "hint": "F5=save, Esc=cancel",
+    "errors": {
+      "currentPassword": "Current password is required",
+      "newPassword": "New password must be at least 8 characters",
+      "incorrect": "Current password is incorrect",
+      "generic": "Error changing password"
+    },
+    "success": "Password changed successfully"
+  }
+}
