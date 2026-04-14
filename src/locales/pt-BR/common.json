@@ -32,6 +32,8 @@
     "password": "Senha",
     "submit": "Entrar",
     "submitting": "Entrando…",
+    "showPassword": "Mostrar senha",
+    "hidePassword": "Ocultar senha",
     "signIn": "Entrar",
     "signingIn": "Entrando…",
     "logout": "Sair",

@@ -32,6 +32,8 @@
     "password": "Contraseña",
     "submit": "Entrar",
     "submitting": "Entrando…",
+    "showPassword": "Mostrar contraseña",
+    "hidePassword": "Ocultar contraseña",
     "signIn": "Ingresar",
     "signingIn": "Ingresando…",
     "logout": "Cerrar sesión",
