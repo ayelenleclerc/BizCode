@@ -12,6 +12,10 @@ Versionamento: [Semantic Versioning](https://semver.org/).
 
 - **CORS + cookie de sessão:** `cors` no Express usa `credentials: true` e allowlist de origens (`http://localhost:5173`, `http://127.0.0.1:5173`, mais `CORS_ORIGINS` em CSV) para o SPA (Axios `withCredentials`) receber e enviar cookies de sessão entre origens; [`server/createApp.ts`](../../server/createApp.ts), [`.env.example`](../../.env.example), [`tests/server/cors.test.ts`](../../tests/server/cors.test.ts); [seguranca.md](seguranca.md) atualizado.
 
+### Adicionado
+
+- **Gestão de usuários (issue #25):** `GET/POST /api/users`, `PUT /api/users/:id`, `POST /api/auth/change-password`; página Usuários (`src/pages/users/`) com DataTable + modal criação/edição, atalhos de teclado (F2/F3/F5/Esc), restrição de hierarquia de perfis; componente `<CanAccess permission="..." />` para renderização condicional por permissão; link na sidebar visível somente para titulares de `users.manage`; i18n em EN/ES/PT-BR; 17 novos testes de integração; OpenAPI atualizado; docs trilingues em `docs/*/quality/`.
+
 ### Added
 
 - **Fluxo de arquivamento na aprovação de planos:** novo comando `npm run plan:approve -- --plan <arquivo>` que salva planos aprovados em `.cursor/plans/{timestamp}-{slug}.plan.md` e depois executa o fluxo existente `plan:sync` (Issues/Project v2 no GitHub); `plan:sync` continua disponível para sincronização manual/direta.

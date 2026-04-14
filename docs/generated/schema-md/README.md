@@ -4,6 +4,16 @@
 
 * [ApiErrorEnvelope](./apierrorenvelope.md) – `-`
 
+* [AppUser](./appuser.md) – `-`
+
+* [AppUserEnvelope](./appuserenvelope.md) – `-`
+
+* [AppUserInput](./appuserinput.md) – `-`
+
+* [AppUserListEnvelope](./appuserlistenvelope.md) – `-`
+
+* [AppUserUpdateInput](./appuserupdateinput.md) – `-`
+
 * [Articulo](./articulo.md) – `-`
 
 * [ArticuloEnvelope](./articuloenvelope.md) – `-`
@@ -19,6 +29,8 @@
 * [AuthClaimsEnvelope](./authclaimsenvelope.md) – `-`
 
 * [AuthScope](./authscope.md) – `-`
+
+* [ChangePasswordInput](./changepasswordinput.md) – `-`
 
 * [Cliente](./cliente.md) – `-`
 
@@ -77,6 +89,32 @@
 * [Untitled object in FacturaInput](./facturainput-properties-items-items.md) – `undefined#/properties/items/items`
 
 ### Arrays
+
+* [Untitled array in AppUser](./appuser-properties-scopebranchids.md) – `undefined#/properties/scopeBranchIds`
+
+* [Untitled array in AppUser](./appuser-properties-scopechannels.md) – `undefined#/properties/scopeChannels`
+
+* [Untitled array in AppUser](./appuser-properties-scoperouteids.md) – `undefined#/properties/scopeRouteIds`
+
+* [Untitled array in AppUser](./appuser-properties-scopewarehouseids.md) – `undefined#/properties/scopeWarehouseIds`
+
+* [Untitled array in AppUserInput](./appuserinput-properties-scopebranchids.md) – `undefined#/properties/scopeBranchIds`
+
+* [Untitled array in AppUserInput](./appuserinput-properties-scopechannels.md) – `undefined#/properties/scopeChannels`
+
+* [Untitled array in AppUserInput](./appuserinput-properties-scoperouteids.md) – `undefined#/properties/scopeRouteIds`
+
+* [Untitled array in AppUserInput](./appuserinput-properties-scopewarehouseids.md) – `undefined#/properties/scopeWarehouseIds`
+
+* [Untitled array in AppUserListEnvelope](./appuserlistenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled array in AppUserUpdateInput](./appuserupdateinput-properties-scopebranchids.md) – `undefined#/properties/scopeBranchIds`
+
+* [Untitled array in AppUserUpdateInput](./appuserupdateinput-properties-scopechannels.md) – `undefined#/properties/scopeChannels`
+
+* [Untitled array in AppUserUpdateInput](./appuserupdateinput-properties-scoperouteids.md) – `undefined#/properties/scopeRouteIds`
+
+* [Untitled array in AppUserUpdateInput](./appuserupdateinput-properties-scopewarehouseids.md) – `undefined#/properties/scopeWarehouseIds`
 
 * [Untitled array in ArticuloListEnvelope](./articulolistenvelope-properties-data.md) – `undefined#/properties/data`
 
