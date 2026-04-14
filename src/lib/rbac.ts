@@ -21,6 +21,21 @@ export const USER_ROLES = [
 
 export type UserRole = (typeof USER_ROLES)[number]
 
+/**
+ * @en Roles visible and assignable to tenant users. `super_admin` is a
+ *     platform-internal role and must never appear in tenant UI or be
+ *     assignable via the API — it can only be created via the bootstrap CLI.
+ * @es Roles visibles y asignables para usuarios de un tenant. `super_admin`
+ *     es un rol interno de la plataforma y nunca debe aparecer en el UI de
+ *     clientes ni ser asignable por API — solo se crea via CLI de bootstrap.
+ * @pt-BR Roles visíveis e atribuíveis para usuários de um tenant. `super_admin`
+ *     é um role interno da plataforma e nunca deve aparecer no UI de clientes
+ *     nem ser atribuível via API — só pode ser criado pelo CLI de bootstrap.
+ */
+export const TENANT_ROLES = USER_ROLES.filter((r) => r !== 'super_admin')
+
+export type TenantRole = (typeof TENANT_ROLES)[number]
+
 export const PERMISSIONS = [
   'users.manage',
   'roles.assign',

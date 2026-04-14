@@ -5,7 +5,7 @@ import { z } from 'zod'
 import { useHotkeys } from 'react-hotkeys-hook'
 import { useTranslation } from 'react-i18next'
 import { usersAPI, type AppUserDTO, type CreateUserBody, type UpdateUserBody } from '@/lib/api'
-import { USER_ROLES, USER_CHANNELS, type UserRole, type UserChannel } from '@/lib/rbac'
+import { TENANT_ROLES, USER_CHANNELS, type UserRole, type TenantRole, type UserChannel } from '@/lib/rbac'
 import { useAuth } from '@/contexts/AuthContext'
 
 type Props = {
@@ -39,7 +39,7 @@ const createSchema = (isNew: boolean) =>
   z.object({
     username: z.string().min(3),
     newPass: isNew ? minLen : minLen.optional(),
-    role: z.enum(USER_ROLES),
+    role: z.enum(TENANT_ROLES as unknown as [TenantRole, ...TenantRole[]]),
     active: z.boolean(),
     scopeChannels: z.array(z.enum(USER_CHANNELS)),
   })
@@ -47,7 +47,7 @@ const createSchema = (isNew: boolean) =>
 type FormValues = {
   username: string
   newPass?: string
-  role: UserRole
+  role: TenantRole
   active: boolean
   scopeChannels: UserChannel[]
 }
@@ -71,7 +71,7 @@ export default function UserForm({ user, onClose, onSaved }: Props) {
     defaultValues: {
       username: user?.username ?? '',
       // newPass intentionally omitted — starts empty, required only on create
-      role: (user?.role as UserRole) ?? 'seller',
+      role: (user?.role as TenantRole) ?? 'seller',
       active: user?.active ?? true,
       scopeChannels: (user?.scopeChannels as UserChannel[]) ?? [],
     },
@@ -91,7 +91,7 @@ export default function UserForm({ user, onClose, onSaved }: Props) {
     }
   }
 
-  const assignableRoles = USER_ROLES.filter((r) => {
+  const assignableRoles = TENANT_ROLES.filter((r) => {
     if (!claims) return false
     return ROLE_RANK[claims.role] <= ROLE_RANK[r]
   })

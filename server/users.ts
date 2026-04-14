@@ -1,6 +1,6 @@
 import type { Application, Request, Response } from 'express'
 import type { PrismaClient } from '@prisma/client'
-import { USER_ROLES, USER_CHANNELS, hasPermission, type UserRole, type UserChannel } from '../src/lib/rbac'
+import { TENANT_ROLES, USER_CHANNELS, hasPermission, type UserRole, type UserChannel } from '../src/lib/rbac'
 import { hashPassword, verifyPassword } from './passwordHash'
 import { requirePermission, type AuthenticatedRequest } from './auth'
 
@@ -31,7 +31,9 @@ function canAssignRole(callerRole: UserRole, targetRole: UserRole): boolean {
 }
 
 function isValidRole(value: unknown): value is UserRole {
-  return typeof value === 'string' && USER_ROLES.includes(value as UserRole)
+  // Only TENANT_ROLES are assignable via the API.
+  // super_admin is platform-internal and can only be created via the bootstrap CLI.
+  return typeof value === 'string' && (TENANT_ROLES as readonly string[]).includes(value)
 }
 
 function sanitizeChannels(raw: unknown): UserChannel[] {
@@ -82,7 +84,7 @@ export function registerUserRoutes(app: Application, prisma: PrismaClient): void
     const authReq = req as AuthenticatedRequest
     try {
       const users = await prisma.appUser.findMany({
-        where: { tenantId: authReq.auth!.claims.tenantId },
+        where: { tenantId: authReq.auth!.claims.tenantId, NOT: { role: 'super_admin' } },
         select: {
           id: true,
           username: true,
@@ -118,7 +120,7 @@ export function registerUserRoutes(app: Application, prisma: PrismaClient): void
       return
     }
     if (!isValidRole(body.role)) {
-      res.status(400).json({ success: false, error: `role must be one of: ${USER_ROLES.join(', ')}` })
+      res.status(400).json({ success: false, error: `role must be one of: ${TENANT_ROLES.join(', ')}` })
       return
     }
 
@@ -205,7 +207,7 @@ export function registerUserRoutes(app: Application, prisma: PrismaClient): void
 
     if (body.role !== undefined) {
       if (!isValidRole(body.role)) {
-        res.status(400).json({ success: false, error: `role must be one of: ${USER_ROLES.join(', ')}` })
+        res.status(400).json({ success: false, error: `role must be one of: ${TENANT_ROLES.join(', ')}` })
         return
       }
       if (!canAssignRole(callerRole, body.role)) {

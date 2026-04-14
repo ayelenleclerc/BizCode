@@ -103,6 +103,21 @@ describe('GET /api/users', () => {
     expect(res.body.success).toBe(true)
     expect(Array.isArray(res.body.data)).toBe(true)
   })
+
+  it('excludes super_admin users from the list', async () => {
+    process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
+    process.env.BIZCODE_TEST_ROLE = 'owner'
+    const prisma = buildPrismaMock()
+    ;(prisma.appUser.findMany as ReturnType<typeof vi.fn>).mockResolvedValueOnce([BASE_USER])
+    const app = createApp(prisma)
+    const res = await request(app).get('/api/users').expect(200)
+    expect(res.body.data.every((u: { role: string }) => u.role !== 'super_admin')).toBe(true)
+    expect(prisma.appUser.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.objectContaining({ NOT: { role: 'super_admin' } }),
+      }),
+    )
+  })
 })
 
 describe('POST /api/users', () => {
@@ -138,6 +153,16 @@ describe('POST /api/users', () => {
     const res = await request(app)
       .post('/api/users')
       .send({ username: rndUser(), password: rndPass(), role: 'nonexistent' })
+      .expect(400)
+    expect(res.body.success).toBe(false)
+    expect(res.body.error).toContain('role')
+  })
+
+  it('returns 400 when role is super_admin (platform-internal, not tenant-assignable)', async () => {
+    const app = createApp(buildPrismaMock())
+    const res = await request(app)
+      .post('/api/users')
+      .send({ username: rndUser(), password: rndPass(), role: 'super_admin' })
       .expect(400)
     expect(res.body.success).toBe(false)
     expect(res.body.error).toContain('role')
@@ -213,6 +238,16 @@ describe('PUT /api/users/:id', () => {
     const app = createApp(buildPrismaMock())
     const res = await request(app).put('/api/users/2').send({ active: false }).expect(403)
     expect(res.body.success).toBe(false)
+  })
+
+  it('returns 400 when trying to assign super_admin role', async () => {
+    const app = createApp(buildPrismaMock())
+    const res = await request(app)
+      .put('/api/users/2')
+      .send({ role: 'super_admin' })
+      .expect(400)
+    expect(res.body.success).toBe(false)
+    expect(res.body.error).toContain('role')
   })
 })
 
