@@ -86,5 +86,17 @@
   "errors": {
     "generic": "Error saving",
     "required": "Required field"
+  },
+  "dashboard": {
+    "title": "Today's summary",
+    "ventasHoy": "Today's sales",
+    "facturasVencidas": "Overdue invoices",
+    "cobrosHoy": "Today's collections",
+    "alertasActivas": "Active alerts",
+    "invoices": "{{count}} invoice",
+    "invoices_other": "{{count}} invoices",
+    "noData": "No data",
+    "overdueNote": "Estimated — real credit terms available in next version",
+    "pendingFeature": "Available in v0.2.0"
   }
 }

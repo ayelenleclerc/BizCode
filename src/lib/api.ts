@@ -338,6 +338,30 @@ export const usersAPI = {
   },
 }
 
+// ============ DASHBOARD ============
+
+export type DashboardWidget = { count: number; total: string }
+
+export type DashboardSummaryDTO = {
+  ventasHoy: DashboardWidget
+  facturasVencidas: DashboardWidget
+  cobrosHoy: DashboardWidget
+  alertasActivas: number
+}
+
+export const dashboardAPI = {
+  summary: async (): Promise<DashboardSummaryDTO> => {
+    try {
+      const response = await api.get<{ success: boolean; data: DashboardSummaryDTO }>(
+        '/dashboard/summary',
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+}
+
 // ============ HEALTH CHECK ============
 
 export const checkAPI = async () => {
