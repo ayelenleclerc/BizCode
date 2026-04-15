@@ -6,6 +6,9 @@ import ArticulosPage from './pages/articulos'
 import FacturacionPage from './pages/facturacion'
 import LoginPage from './pages/login'
 import UsersPage from './pages/users'
+import InicioPage from './pages/inicio'
+import LogisticaPage from './pages/logistica'
+import FinanzasPage from './pages/finanzas'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
 
 function ProtectedRoute() {
@@ -38,7 +41,7 @@ function LoginRoute() {
     )
   }
   if (status === 'authenticated') {
-    return <Navigate to="/clientes" replace />
+    return <Navigate to="/inicio" replace />
   }
   return <LoginPage />
 }
@@ -55,7 +58,7 @@ function RootRedirect() {
     )
   }
   if (status === 'authenticated') {
-    return <Navigate to="/clientes" replace />
+    return <Navigate to="/inicio" replace />
   }
   return <Navigate to="/login" replace />
 }
@@ -72,10 +75,16 @@ function AppRoutes() {
             </Layout>
           }
         >
+          {/* Home */}
+          <Route path="inicio" element={<InicioPage />} />
+          {/* Existing modules — keep original URLs bookmark-safe */}
           <Route path="clientes" element={<ClientesPage />} />
           <Route path="articulos" element={<ArticulosPage />} />
           <Route path="facturacion" element={<FacturacionPage />} />
           <Route path="users" element={<UsersPage />} />
+          {/* New section stubs — real pages delivered in Sprint 2 */}
+          <Route path="logistica" element={<LogisticaPage />} />
+          <Route path="finanzas" element={<FinanzasPage />} />
         </Route>
       </Route>
       <Route path="/" element={<RootRedirect />} />
