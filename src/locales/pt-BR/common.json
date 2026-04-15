@@ -87,6 +87,19 @@
     "generic": "Erro ao salvar",
     "required": "Campo obrigatório"
   },
+  "notifications": {
+    "title": "Notificações",
+    "bell": "{{count}} notificação não lida",
+    "bell_other": "{{count}} notificações não lidas",
+    "empty": "Sem notificações",
+    "markRead": "Marcar como lida",
+    "markAllRead": "Marcar todas como lidas",
+    "types": {
+      "credit_limit_exceeded": "Limite de crédito excedido",
+      "invoice_overdue": "Fatura vencida",
+      "invoice_due_soon": "Fatura a vencer"
+    }
+  },
   "dashboard": {
     "title": "Resumo do dia",
     "ventasHoy": "Vendas de hoje",

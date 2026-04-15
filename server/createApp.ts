@@ -10,6 +10,7 @@ import swaggerUi from 'swagger-ui-express'
 import { registerAuthRoutes, requirePermission, resolveSession, type AuthenticatedRequest } from './auth'
 import { registerUserRoutes } from './users'
 import { registerDashboardRoutes } from './dashboard'
+import { registerNotificationRoutes } from './notifications'
 
 const DEFAULT_CORS_ORIGINS = ['http://localhost:5173', 'http://127.0.0.1:5173'] as const
 
@@ -85,6 +86,7 @@ export function createApp(prisma: PrismaClient): Application {
   registerAuthRoutes(app, prisma)
   registerUserRoutes(app, prisma)
   registerDashboardRoutes(app, prisma)
+  registerNotificationRoutes(app, prisma)
 
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(getOpenApiDocument()))
 

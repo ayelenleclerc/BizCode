@@ -362,6 +362,51 @@ export const dashboardAPI = {
   },
 }
 
+// ============ NOTIFICATIONS ============
+
+export type AppNotification = {
+  id: number
+  tenantId: number
+  userId: number
+  type: string
+  payload: Record<string, unknown>
+  readAt: string | null
+  createdAt: string
+}
+
+export const notificationsAPI = {
+  list: async (): Promise<AppNotification[]> => {
+    try {
+      const response = await api.get<{ success: boolean; data: AppNotification[] }>('/notifications')
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  markRead: async (id: number): Promise<AppNotification> => {
+    try {
+      const response = await api.put<{ success: boolean; data: AppNotification }>(
+        `/notifications/${id}/read`,
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  markAllRead: async (): Promise<{ updated: number }> => {
+    try {
+      const response = await api.put<{ success: boolean; data: { updated: number } }>(
+        '/notifications/read-all',
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+}
+
 // ============ HEALTH CHECK ============
 
 export const checkAPI = async () => {

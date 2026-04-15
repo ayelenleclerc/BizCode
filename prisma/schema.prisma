@@ -139,8 +139,9 @@ model Tenant {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 
-  users       AppUser[]
-  auditEvents AuditEvent[]
+  users         AppUser[]
+  auditEvents   AuditEvent[]
+  notifications Notification[]
 }
 
 model AppUser {
@@ -158,8 +159,9 @@ model AppUser {
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
 
-  sessions    AppSession[]
-  auditEvents AuditEvent[]
+  sessions      AppSession[]
+  auditEvents   AuditEvent[]
+  notifications Notification[]
 
   @@unique([tenantId, username])
 }
@@ -189,4 +191,21 @@ model AuditEvent {
   ipAddress  String?  @db.VarChar(64)
   metadata   Json?
   createdAt  DateTime @default(now())
+}
+
+model Notification {
+  id        Int       @id @default(autoincrement())
+  tenantId  Int
+  tenant    Tenant    @relation(fields: [tenantId], references: [id])
+  userId    Int       // recipient AppUser
+  user      AppUser   @relation(fields: [userId], references: [id])
+  /// credit_limit_exceeded | invoice_overdue | invoice_due_soon
+  type      String    @db.VarChar(60)
+  /// JSON payload: { clienteId?, facturaId?, amount?, limit?, rsocial? }
+  payload   Json      @default("{}")
+  readAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId, readAt])
+  @@index([tenantId, createdAt])
 }
