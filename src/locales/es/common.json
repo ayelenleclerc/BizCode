@@ -86,5 +86,17 @@
   "errors": {
     "generic": "Error al guardar",
     "required": "Campo requerido"
+  },
+  "dashboard": {
+    "title": "Resumen del día",
+    "ventasHoy": "Ventas del día",
+    "facturasVencidas": "Facturas vencidas",
+    "cobrosHoy": "Cobros del día",
+    "alertasActivas": "Alertas activas",
+    "invoices": "{{count}} factura",
+    "invoices_other": "{{count}} facturas",
+    "noData": "Sin datos",
+    "overdueNote": "Estimado — plazos reales disponibles en próxima versión",
+    "pendingFeature": "Disponible en v0.2.0"
   }
 }
