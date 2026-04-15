@@ -1,12 +1,17 @@
 {
   "app": {
     "name": "BizCode",
-    "version": "v0.1.0 MVP",
     "tagline": "Sistema de Gestión Comercial"
   },
   "nav": {
     "main": "Navegación principal",
+    "inicio": "Inicio",
+    "ventas": "Ventas",
     "clientes": "Clientes",
+    "catalogo": "Catálogo",
+    "logistica": "Logística",
+    "finanzas": "Finanzas",
+    "configuracion": "Configuración",
     "articulos": "Artículos",
     "facturacion": "Facturación",
     "users": "Usuarios"
@@ -75,7 +80,8 @@
   "status": {
     "loading": "Cargando...",
     "active": "Activo",
-    "inactive": "Inactivo"
+    "inactive": "Inactivo",
+    "comingSoon": "Próximamente disponible en v0.2.0"
   },
   "errors": {
     "generic": "Error al guardar",
