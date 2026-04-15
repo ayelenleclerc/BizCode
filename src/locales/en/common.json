@@ -87,6 +87,19 @@
     "generic": "Error saving",
     "required": "Required field"
   },
+  "notifications": {
+    "title": "Notifications",
+    "bell": "{{count}} unread notification",
+    "bell_other": "{{count}} unread notifications",
+    "empty": "No notifications",
+    "markRead": "Mark as read",
+    "markAllRead": "Mark all as read",
+    "types": {
+      "credit_limit_exceeded": "Credit limit exceeded",
+      "invoice_overdue": "Invoice overdue",
+      "invoice_due_soon": "Invoice due soon"
+    }
+  },
   "dashboard": {
     "title": "Today's summary",
     "ventasHoy": "Today's sales",

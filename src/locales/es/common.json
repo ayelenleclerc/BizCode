@@ -87,6 +87,19 @@
     "generic": "Error al guardar",
     "required": "Campo requerido"
   },
+  "notifications": {
+    "title": "Notificaciones",
+    "bell": "{{count}} notificación no leída",
+    "bell_other": "{{count}} notificaciones no leídas",
+    "empty": "No hay notificaciones",
+    "markRead": "Marcar como leída",
+    "markAllRead": "Marcar todas como leídas",
+    "types": {
+      "credit_limit_exceeded": "Límite de crédito superado",
+      "invoice_overdue": "Factura vencida",
+      "invoice_due_soon": "Factura por vencer"
+    }
+  },
   "dashboard": {
     "title": "Resumen del día",
     "ventasHoy": "Ventas del día",
