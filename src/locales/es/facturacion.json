@@ -64,6 +64,17 @@
     "iva21": "IVA 21%",
     "iva105": "IVA 10.5%"
   },
+  "void": {
+    "button": "Anular factura",
+    "confirmTitle": "¿Confirmar anulación?",
+    "motivoLabel": "Motivo de anulación",
+    "motivoPlaceholder": "Ej.: Error en precio, devuelto por el cliente…",
+    "motivoRequired": "El motivo es obligatorio",
+    "confirm": "Confirmar anulación",
+    "cancel": "Cancelar",
+    "loading": "Anulando…",
+    "error": "No se pudo anular la factura"
+  },
   "save": "✓ Guardar Factura (F5)",
   "cancel": "Cancelar (Esc)"
 }

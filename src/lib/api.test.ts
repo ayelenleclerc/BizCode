@@ -425,6 +425,20 @@ describe('facturasAPI', () => {
       await expect(facturasAPI.create({})).rejects.toThrow('Número duplicado')
     })
   })
+
+  describe('void', () => {
+    it('retorna factura anulada en el happy path', async () => {
+      const voided = { id: 1, estado: 'N', total: 5000 }
+      mockPut.mockResolvedValueOnce({ data: { success: true, data: voided } })
+      expect(await facturasAPI.void(1, 'Error en precio')).toEqual(voided)
+      expect(mockPut).toHaveBeenCalledWith('/facturas/1/void', { motivo: 'Error en precio' })
+    })
+
+    it('lanza ApiRequestFailedError en fallo', async () => {
+      mockPut.mockRejectedValueOnce(axiosErrorWithResponse('Already voided'))
+      await expect(facturasAPI.void(1, 'Test')).rejects.toThrow('Already voided')
+    })
+  })
 })
 
 // ════════════════════════════════════════════════════════════

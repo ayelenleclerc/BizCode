@@ -3026,6 +3026,343 @@ One-time endpoint to create initial tenant and owner user.
 }
 ```
 
+### Void an invoice
+
+- **Method:** `PUT`
+- **Path:** `/api/facturas/{id}/void`
+- **Tags:** facturas
+
+Sets `estado` to `N` (anulada), reverses the customer balance by the invoice total, and records an AuditEvent with the provided motivo. Requires `sales.cancel` permission.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`motivo` (required)**
+
+  `string` — Reason for voiding the invoice. Stored in AuditEvent metadata.
+
+**Example:**
+
+```json
+{
+  "motivo": ""
+}
+```
+
+#### Responses
+
+##### Status: 200 Invoice voided
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`estado`**
+
+    `string`
+
+  - **`fecha`**
+
+    `string`, format: `date-time`
+
+  - **`formaPagoId`**
+
+    `integer`
+
+  - **`id`**
+
+    `integer`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+    - **`articulo`**
+
+      `object`
+
+      - **`activo`**
+
+        `boolean`
+
+      - **`codigo`**
+
+        `integer`
+
+      - **`condIva`**
+
+        `string`
+
+      - **`costo`**
+
+        `number`
+
+      - **`descripcion`**
+
+        `string`
+
+      - **`id`**
+
+        `integer`
+
+      - **`minimo`**
+
+        `integer`
+
+      - **`precioLista1`**
+
+        `number`
+
+      - **`precioLista2`**
+
+        `number`
+
+      - **`rubro`**
+
+        `object`
+
+        - **`codigo`**
+
+          `integer`
+
+        - **`id`**
+
+          `integer`
+
+        - **`nombre`**
+
+          `string`
+
+      - **`rubroId`**
+
+        `integer`
+
+      - **`stock`**
+
+        `integer`
+
+      - **`umedida`**
+
+        `string`
+
+    - **`articuloId`**
+
+      `integer`
+
+    - **`cantidad`**
+
+      `number`
+
+    - **`dscto`**
+
+      `number`
+
+    - **`id`**
+
+      `integer`
+
+    - **`precio`**
+
+      `number`
+
+    - **`subtotal`**
+
+      `number`
+
+  - **`iva1`**
+
+    `number`
+
+  - **`iva2`**
+
+    `number`
+
+  - **`neto1`**
+
+    `number`
+
+  - **`neto2`**
+
+    `number`
+
+  - **`neto3`**
+
+    `number`
+
+  - **`numero`**
+
+    `integer`
+
+  - **`prefijo`**
+
+    `string`
+
+  - **`tipo`**
+
+    `string`
+
+  - **`total`**
+
+    `number`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "fecha": "",
+    "tipo": "",
+    "prefijo": "",
+    "numero": 1,
+    "clienteId": 1,
+    "formaPagoId": 1,
+    "neto1": 1,
+    "neto2": 1,
+    "neto3": 1,
+    "iva1": 1,
+    "iva2": 1,
+    "total": 1,
+    "estado": "",
+    "items": [
+      {
+        "id": 1,
+        "articuloId": 1,
+        "articulo": {
+          "id": 1,
+          "codigo": 1,
+          "descripcion": "",
+          "rubroId": 1,
+          "rubro": {
+            "id": 1,
+            "codigo": 1,
+            "nombre": "",
+            "additionalProperty": "anything"
+          },
+          "condIva": "",
+          "umedida": "",
+          "precioLista1": 1,
+          "precioLista2": 1,
+          "costo": 1,
+          "stock": 1,
+          "minimo": 1,
+          "activo": true,
+          "additionalProperty": "anything"
+        },
+        "cantidad": 1,
+        "precio": 1,
+        "dscto": 1,
+        "subtotal": 1,
+        "additionalProperty": "anything"
+      }
+    ],
+    "additionalProperty": "anything"
+  }
+}
+```
+
+##### Status: 400
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404
+
+##### Status: 409 Invoice already voided
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ### List payment methods
 
 - **Method:** `GET`
@@ -6480,6 +6817,22 @@ Returns boolean flags for each channel. No sensitive values are exposed.
   "dscto": 1,
   "subtotal": 1,
   "additionalProperty": "anything"
+}
+```
+
+### VoidInput
+
+- **Type:**`object`
+
+* **`motivo` (required)**
+
+  `string` — Reason for voiding the invoice. Stored in AuditEvent metadata.
+
+**Example:**
+
+```json
+{
+  "motivo": ""
 }
 ```
 

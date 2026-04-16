@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url'
 import express from 'express'
 import type { Application, Request, Response } from 'express'
 import cors from 'cors'
-import type { PrismaClient } from '@prisma/client'
+import type { PrismaClient, Prisma } from '@prisma/client'
 import { parse as parseYaml } from 'yaml'
 import swaggerUi from 'swagger-ui-express'
 import { registerAuthRoutes, requirePermission, resolveSession, type AuthenticatedRequest } from './auth'
@@ -118,6 +118,7 @@ export function createApp(prisma: PrismaClient): Application {
     action: string,
     resource: string,
     resourceId?: string,
+    metadata?: Prisma.InputJsonValue,
   ): Promise<void> {
     try {
       await prisma.auditEvent.create({
@@ -128,6 +129,7 @@ export function createApp(prisma: PrismaClient): Application {
           resource,
           resourceId,
           ipAddress: req.ip,
+          metadata,
         },
       })
     } catch (_error) {
@@ -363,6 +365,54 @@ export function createApp(prisma: PrismaClient): Application {
 
       await writeAudit(req as AuthenticatedRequest, 'factura_create', 'factura', String(result.id))
       res.json({ success: true, data: result })
+    } catch (err: unknown) {
+      res.status(500).json({ success: false, error: errorMessage(err) })
+    }
+  })
+
+  // ============ ANULACIÓN DE FACTURAS ============
+
+  app.put('/api/facturas/:id/void', requirePermission('sales.cancel'), async (req: Request, res: Response) => {
+    try {
+      const authReq = req as AuthenticatedRequest
+      const id = parseInt(String(req.params.id), 10)
+      const { motivo } = req.body as { motivo?: string }
+
+      if (!motivo?.trim()) {
+        res.status(400).json({ success: false, error: 'motivo is required' })
+        return
+      }
+
+      const factura = await prisma.factura.findFirst({
+        where: { id },
+        select: { id: true, estado: true, total: true, clienteId: true },
+      })
+
+      if (!factura) {
+        res.status(404).json({ success: false, error: 'Factura not found' })
+        return
+      }
+
+      if (factura.estado === 'N') {
+        res.status(409).json({ success: false, error: 'Factura already voided' })
+        return
+      }
+
+      // Void atomically: set estado='N', reverse customer balance
+      const updated = await prisma.$transaction(async (tx) => {
+        const voided = await tx.factura.update({
+          where: { id },
+          data: { estado: 'N' },
+        })
+        await tx.cliente.update({
+          where: { id: factura.clienteId },
+          data: { balance: { decrement: factura.total } },
+        })
+        return voided
+      })
+
+      await writeAudit(authReq, 'factura_void', 'factura', String(id), { motivo: motivo.trim() })
+      res.json({ success: true, data: updated })
     } catch (err: unknown) {
       res.status(500).json({ success: false, error: errorMessage(err) })
     }

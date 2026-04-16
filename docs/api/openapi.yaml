@@ -393,6 +393,49 @@ paths:
         '403':
           $ref: '#/components/responses/ForbiddenError'
 
+  /api/facturas/{id}/void:
+    put:
+      tags: [facturas]
+      summary: Void an invoice
+      description: |
+        Sets `estado` to `N` (anulada), reverses the customer balance by the invoice total,
+        and records an AuditEvent with the provided motivo. Requires `sales.cancel` permission.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VoidInput'
+      responses:
+        '200':
+          description: Invoice voided
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FacturaEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '409':
+          description: Invoice already voided
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
   /api/formas-pago:
     get:
       tags: [formasPago]
@@ -1176,6 +1219,15 @@ components:
           type: number
         subtotal:
           type: number
+
+    VoidInput:
+      type: object
+      required: [motivo]
+      properties:
+        motivo:
+          type: string
+          minLength: 1
+          description: Reason for voiding the invoice. Stored in AuditEvent metadata.
 
     FacturaInput:
       type: object
