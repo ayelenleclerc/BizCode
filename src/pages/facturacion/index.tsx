@@ -65,7 +65,11 @@ export default function FacturacionPage() {
               ➕ {t('newInvoice')} (F3)
             </button>
           </div>
-          <ListadoFacturas facturas={facturas} clientes={clientes} />
+          <ListadoFacturas
+            facturas={facturas}
+            clientes={clientes}
+            onFacturaVoided={handleFacturaGuardada}
+          />
         </>
       ) : (
         <NuevaFacturaForm

@@ -59,6 +59,17 @@
     "iva21": "Imposto 21%",
     "iva105": "Imposto 10,5%"
   },
+  "void": {
+    "button": "Cancelar nota fiscal",
+    "confirmTitle": "Confirmar cancelamento?",
+    "motivoLabel": "Motivo do cancelamento",
+    "motivoPlaceholder": "Ex.: Preço incorreto, devolvido pelo cliente…",
+    "motivoRequired": "O motivo é obrigatório",
+    "confirm": "Confirmar cancelamento",
+    "cancel": "Cancelar",
+    "loading": "Cancelando…",
+    "error": "Não foi possível cancelar a nota fiscal"
+  },
   "save": "✓ Salvar NF (F5)",
   "cancel": "Cancelar (Esc)"
 }

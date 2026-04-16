@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "motivo": {
+      "description": "Reason for voiding the invoice. Stored in AuditEvent metadata.",
+      "minLength": 1,
+      "type": "string"
+    }
+  },
+  "required": [
+    "motivo"
+  ],
+  "title": "VoidInput",
+  "type": "object"
+}

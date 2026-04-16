@@ -264,6 +264,15 @@ export const facturasAPI = {
       handleError(error as AxiosError<ApiErrorPayload>)
     }
   },
+
+  void: async (id: number, motivo: string) => {
+    try {
+      const response = await api.put(`/facturas/${id}/void`, { motivo })
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
 }
 
 // ============ USERS ============

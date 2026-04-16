@@ -59,6 +59,17 @@
     "iva21": "VAT 21%",
     "iva105": "VAT 10.5%"
   },
+  "void": {
+    "button": "Void invoice",
+    "confirmTitle": "Confirm void?",
+    "motivoLabel": "Reason for voiding",
+    "motivoPlaceholder": "E.g.: Wrong price, returned by customer…",
+    "motivoRequired": "Reason is required",
+    "confirm": "Confirm void",
+    "cancel": "Cancel",
+    "loading": "Voiding…",
+    "error": "Could not void the invoice"
+  },
   "save": "✓ Save Invoice (F5)",
   "cancel": "Cancel (Esc)"
 }

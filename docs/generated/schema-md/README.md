@@ -92,6 +92,8 @@
 
 * [SetupOwnerResult](./setupownerresult.md) – `-`
 
+* [VoidInput](./voidinput.md) – `-`
+
 ## Other Schemas
 
 ### Objects
