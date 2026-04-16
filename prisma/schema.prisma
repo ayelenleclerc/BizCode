@@ -28,21 +28,30 @@ enum UserRole {
 }
 
 model Cliente {
-  id        Int       @id @default(autoincrement())
-  codigo    Int       @unique
-  rsocial   String    @db.VarChar(30)
-  fantasia  String?   @db.VarChar(30)
-  cuit      String?   @db.VarChar(14)
-  condIva   String    @db.VarChar(1) // RI, Mono, CF, Exento
-  domicilio String?   @db.VarChar(40)
-  localidad String?   @db.VarChar(25)
-  cpost     String?   @db.VarChar(8)
-  telef     String?   @db.VarChar(25)
-  email     String?   @db.VarChar(50)
-  formaPago Int?      // FK a FormaPago.id
-  activo    Boolean   @default(true)
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  id             Int      @id @default(autoincrement())
+  codigo         Int      @unique
+  rsocial        String   @db.VarChar(30)
+  fantasia       String?  @db.VarChar(30)
+  cuit           String?  @db.VarChar(14)
+  condIva        String   @db.VarChar(1) // RI, Mono, CF, Exento
+  domicilio      String?  @db.VarChar(40)
+  localidad      String?  @db.VarChar(25)
+  cpost          String?  @db.VarChar(8)
+  telef          String?  @db.VarChar(25)
+  email          String?  @db.VarChar(50)
+  formaPago      Int?     // FK a FormaPago.id
+  activo         Boolean  @default(true)
+  // ── Financial fields (Issue #31) ──────────────────────────────────────────
+  creditLimit    Decimal? @db.Decimal(14, 2)         // null = sin límite
+  creditDays     Int      @default(0)                 // días de plazo habituales
+  balance        Decimal  @db.Decimal(14, 2) @default(0)  // saldo acumulado
+  balanceInicial Decimal  @db.Decimal(14, 2) @default(0)  // saldo al migrar datos
+  score          Int      @default(50)               // score de pago 0-100
+  suspended      Boolean  @default(false)            // bloquea nuevas ventas
+  deliveryZoneId Int?     // FK diferida — relación en Issue #32
+  // ──────────────────────────────────────────────────────────────────────────
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
   facturas Factura[]
 }

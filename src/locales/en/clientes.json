@@ -37,6 +37,22 @@
       "cuit": "Invalid Tax ID",
       "rsocial": "Company name must be at least 3 characters",
       "generic": "Error saving customer"
+    },
+    "financial": {
+      "section": "Financial status",
+      "creditLimit": "Credit limit",
+      "creditLimitHint": "Empty = no limit",
+      "creditDays": "Credit days",
+      "balance": "Accumulated balance",
+      "balanceInicial": "Opening balance",
+      "score": "Payment score",
+      "suspended": "Suspended (blocks new sales)",
+      "scoreLabel": "Score",
+      "scoreLow": "High risk",
+      "scoreMid": "Medium risk",
+      "scoreHigh": "Good payer",
+      "suspendedBadge": "SUSPENDED",
+      "readOnly": "Read-only — your role cannot modify financial data"
     }
   }
 }

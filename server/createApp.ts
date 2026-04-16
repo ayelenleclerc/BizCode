@@ -10,7 +10,7 @@ import swaggerUi from 'swagger-ui-express'
 import { registerAuthRoutes, requirePermission, resolveSession, type AuthenticatedRequest } from './auth'
 import { registerUserRoutes } from './users'
 import { registerDashboardRoutes } from './dashboard'
-import { registerNotificationRoutes } from './notifications'
+import { registerNotificationRoutes, notifyManagers } from './notifications'
 
 const DEFAULT_CORS_ORIGINS = ['http://localhost:5173', 'http://127.0.0.1:5173'] as const
 
@@ -158,11 +158,21 @@ export function createApp(prisma: PrismaClient): Application {
 
   app.put('/api/clientes/:id', requirePermission('customers.manage'), async (req: Request, res: Response) => {
     try {
+      const authReq = req as AuthenticatedRequest
+      const role = authReq.auth?.claims.role
+      const canManageFinancials = role === 'owner' || role === 'manager'
+
+      // Strip financial management fields for roles without the right
+      const { creditLimit, creditDays, suspended, ...baseBody } = req.body as Record<string, unknown>
+      const data = canManageFinancials
+        ? { ...baseBody, creditLimit, creditDays, suspended }
+        : baseBody
+
       const cliente = await prisma.cliente.update({
         where: { id: parseInt(String(req.params.id), 10) },
-        data: req.body,
+        data,
       })
-      await writeAudit(req as AuthenticatedRequest, 'cliente_update', 'cliente', String(cliente.id))
+      await writeAudit(authReq, 'cliente_update', 'cliente', String(cliente.id))
       res.json({ success: true, data: cliente })
     } catch (err: unknown) {
       res.status(500).json({ success: false, error: errorMessage(err) })
@@ -283,15 +293,51 @@ export function createApp(prisma: PrismaClient): Application {
         string,
         unknown
       >
-      const result = await prisma.factura.create({
-        data: {
-          ...factura,
-          items: {
-            create: items,
-          },
-        } as Parameters<typeof prisma.factura.create>[0]['data'],
-        include: { items: true },
+      const clienteId = parseInt(String(factura.clienteId), 10)
+
+      // Check suspension before creating the factura
+      const clienteCheck = await prisma.cliente.findUnique({
+        where: { id: clienteId },
+        select: { suspended: true },
       })
+      if (clienteCheck?.suspended) {
+        res.status(422).json({ success: false, error: 'CLIENT_SUSPENDED' })
+        return
+      }
+
+      // Create factura and update customer balance atomically
+      const [result, updatedCliente] = await prisma.$transaction(async (tx) => {
+        const newFactura = await tx.factura.create({
+          data: {
+            ...factura,
+            items: { create: items },
+          } as Parameters<typeof prisma.factura.create>[0]['data'],
+          include: { items: true },
+        })
+
+        const updated = await tx.cliente.update({
+          where: { id: clienteId },
+          data: { balance: { increment: newFactura.total } },
+          select: { id: true, rsocial: true, balance: true, creditLimit: true },
+        })
+
+        return [newFactura, updated] as const
+      })
+
+      // Notify managers if balance exceeds credit limit (non-blocking)
+      if (
+        updatedCliente.creditLimit !== null &&
+        Number(updatedCliente.balance) > Number(updatedCliente.creditLimit)
+      ) {
+        const authReq = req as AuthenticatedRequest
+        notifyManagers(prisma, authReq.auth!.claims.tenantId, 'credit_limit_exceeded', {
+          clienteId: updatedCliente.id,
+          rsocial: updatedCliente.rsocial,
+          amount: String(updatedCliente.balance),
+          limit: String(updatedCliente.creditLimit),
+        }).catch(() => { /* notification failure must not block the sale */ })
+      }
+
       await writeAudit(req as AuthenticatedRequest, 'factura_create', 'factura', String(result.id))
       res.json({ success: true, data: result })
     } catch (err: unknown) {

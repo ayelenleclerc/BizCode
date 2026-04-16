@@ -741,6 +741,36 @@ components:
           nullable: true
         activo:
           type: boolean
+        creditLimit:
+          type: number
+          nullable: true
+          description: Credit limit in ARS. null = no limit.
+        creditDays:
+          type: integer
+          default: 0
+          description: Usual credit days for this customer.
+        balance:
+          type: number
+          default: 0
+          description: Accumulated balance (incremented on each new factura).
+        balanceInicial:
+          type: number
+          default: 0
+          description: Opening balance at migration time.
+        score:
+          type: integer
+          minimum: 0
+          maximum: 100
+          default: 50
+          description: Payment score 0-100 (50=neutral, 0=high risk, 100=perfect).
+        suspended:
+          type: boolean
+          default: false
+          description: When true, POST /api/facturas returns 422 CLIENT_SUSPENDED.
+        deliveryZoneId:
+          type: integer
+          nullable: true
+          description: FK to DeliveryZone (deferred — Issue #32).
 
     ClienteInput:
       type: object
@@ -777,6 +807,14 @@ components:
           type: string
           format: email
         activo:
+          type: boolean
+        creditLimit:
+          type: number
+          nullable: true
+        creditDays:
+          type: integer
+          minimum: 0
+        suspended:
           type: boolean
 
     ClienteListEnvelope:

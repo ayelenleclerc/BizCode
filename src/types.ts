@@ -12,6 +12,14 @@ export interface Cliente {
   email?: string
   formaPago?: number
   activo: boolean
+  // Financial fields (Issue #31)
+  creditLimit?: number | string | null
+  creditDays?: number
+  balance?: number | string
+  balanceInicial?: number | string
+  score?: number
+  suspended?: boolean
+  deliveryZoneId?: number | null
   createdAt: Date
   updatedAt: Date
 }
