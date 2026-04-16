@@ -10,7 +10,8 @@ import swaggerUi from 'swagger-ui-express'
 import { registerAuthRoutes, requirePermission, resolveSession, type AuthenticatedRequest } from './auth'
 import { registerUserRoutes } from './users'
 import { registerDashboardRoutes } from './dashboard'
-import { registerNotificationRoutes, notifyManagers } from './notifications'
+import { registerNotificationRoutes } from './notifications'
+import { dispatchNotification, isSmtpConfigured, isTwilioConfigured } from './channels'
 
 const DEFAULT_CORS_ORIGINS = ['http://localhost:5173', 'http://127.0.0.1:5173'] as const
 
@@ -87,6 +88,28 @@ export function createApp(prisma: PrismaClient): Application {
   registerUserRoutes(app, prisma)
   registerDashboardRoutes(app, prisma)
   registerNotificationRoutes(app, prisma)
+
+  /**
+   * @en Reports which external notification channels are configured (reads env vars server-side).
+   *     No sensitive values are exposed — only boolean flags.
+   * @es Informa qué canales de notificación externos están configurados (lee env vars en servidor).
+   *     No se exponen valores sensibles — solo flags booleanos.
+   */
+  app.get('/api/notifications/channels', (req: Request, res: Response) => {
+    const authReq = req as AuthenticatedRequest
+    if (!authReq.auth) {
+      res.status(401).json({ success: false, error: 'Authentication required' })
+      return
+    }
+    res.json({
+      success: true,
+      data: {
+        inApp: true,
+        email: isSmtpConfigured(),
+        whatsapp: isTwilioConfigured(),
+      },
+    })
+  })
 
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(getOpenApiDocument()))
 
@@ -324,13 +347,13 @@ export function createApp(prisma: PrismaClient): Application {
         return [newFactura, updated] as const
       })
 
-      // Notify managers if balance exceeds credit limit (non-blocking)
+      // Dispatch to all configured channels if balance exceeds credit limit (non-blocking)
       if (
         updatedCliente.creditLimit !== null &&
         Number(updatedCliente.balance) > Number(updatedCliente.creditLimit)
       ) {
         const authReq = req as AuthenticatedRequest
-        notifyManagers(prisma, authReq.auth!.claims.tenantId, 'credit_limit_exceeded', {
+        dispatchNotification(prisma, authReq.auth!.claims.tenantId, 'credit_limit_exceeded', {
           clienteId: updatedCliente.id,
           rsocial: updatedCliente.rsocial,
           amount: String(updatedCliente.balance),

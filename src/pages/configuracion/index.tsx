@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import NotifChannelsPanel from './NotifChannelsPanel'
 
 const TILES = [
   { key: 'users', path: '/users', icon: '👥' },
@@ -10,10 +11,12 @@ export default function ConfiguracionPage() {
   const { t } = useTranslation('common')
 
   return (
-    <div className="p-8 max-w-4xl mx-auto">
-      <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-6">
+    <div className="p-8 max-w-4xl mx-auto space-y-8">
+      <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
         {t('nav.configuracion')}
       </h1>
+
+      {/* Section tiles */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
         {TILES.map((tile) => (
           <Link
@@ -28,6 +31,9 @@ export default function ConfiguracionPage() {
           </Link>
         ))}
       </div>
+
+      {/* Notification channels status */}
+      <NotifChannelsPanel />
     </div>
   )
 }

@@ -103,6 +103,16 @@
       "invoice_due_soon": "Factura por vencer"
     }
   },
+  "notifChannels": {
+    "title": "Canales de notificación",
+    "subtitle": "Canales configurados para este tenant (solo lectura en esta versión)",
+    "inApp": "In-app",
+    "email": "Email (SMTP)",
+    "whatsapp": "WhatsApp (Twilio)",
+    "active": "Activo",
+    "inactive": "No configurado",
+    "loadError": "No se pudo cargar el estado de los canales"
+  },
   "dashboard": {
     "title": "Resumen del día",
     "ventasHoy": "Ventas del día",
