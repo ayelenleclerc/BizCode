@@ -50,6 +50,7 @@ As prioridades abaixo são itens de **planejamento**; a verificação é contra 
 | BP1-1 | P1 | Domínio pedido (`pedido`) | **Futuro:** modelo Prisma + migração + rotas apenas quando constarem no OpenAPI e em `server/` |
 | BP1-2 | P1 | Cobertura E2E / integração de fluxos críticos | Alinhado a [estrategia-testes.md](estrategia-testes.md) e ferramentas Playwright/Postgres existentes |
 | BP1-3 | P1 | Enforcement de escopo por canal | **Não evidenciado no código atual:** não há tratamento de `x-bizcode-channel` em `server/auth.ts` ou `server/createApp.ts`; **não existe** `tests/server/scope-channel.test.ts`. Aceitação quando houver implementação: middleware ou equivalente use `AuthScope.channels` de [`src/lib/rbac.ts`](../../../src/lib/rbac.ts) e testes provem |
+| BP1-4 | P1 | Preparação ETL de clientes DBF (#51) | Levantamento documentado em `scripts/MIGRACION_PROGRAMA_VIEJO.md` (mapeamento explícito `COND`/`BAJA`/`CREDITO` e política de rejeição); sem implementação produtiva do ETL de clientes nesta fase |
 
 ## Estado do repositório vs este pacote
 

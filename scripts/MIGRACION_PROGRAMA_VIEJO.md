@@ -51,3 +51,15 @@ Desde la raíz del proyecto:
 4. Importar: `npm run migrate:dbf`.
 
 Inspección opcional de DBF (campos y muestras): `npx tsx scripts/inspect-dbf.ts`.
+
+## Relevamiento issue #51 (preparación ETL clientes)
+
+Estado: **preparación documental/técnica**, sin ETL productivo de clientes en esta rama.
+
+- Evidencia disponible: existe `CLIENTES.DBF` en la copia legacy fuera del repo (fuente externa).
+- Reglas de mapeo acordadas para implementación posterior:
+  - `CREDITO` legacy -> `creditLimit`.
+  - `BAJA=true` -> `activo=false`; `BAJA=false` -> `activo=true`.
+  - `COND` -> `condIva` con catálogo explícito: `I->R`, `M->M`, `E->E`, `N->N`, `C->C`, `X->X`.
+  - Política de rechazo para `COND` desconocido/vacío: no migrar ese cliente, registrar error crítico y continuar el lote.
+- Pendiente para ETL real: formalizar parser de `CLIENTES.DBF` en `scripts/migrate-from-dbf.ts` con evidencia de rechazos y trazabilidad de remediación.
