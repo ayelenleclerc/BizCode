@@ -9,13 +9,15 @@ import { CanAccess } from '@/components/CanAccess'
 
 const schema = z.object({
   nombre: z.string().min(1),
-  tipo: z.enum(['barrio', 'manual', 'predefinida']).default('barrio'),
+  tipo: z.enum(['barrio', 'manual', 'predefinida']),
   diasEntrega: z.string().optional(),
   horario: z.string().optional(),
-  activo: z.boolean().default(true),
+  activo: z.boolean(),
 })
 
 type FormData = z.infer<typeof schema>
+
+const DEFAULT_VALUES: FormData = { nombre: '', tipo: 'barrio', diasEntrega: '', horario: '', activo: true }
 
 export default function ZonasEntregaPage() {
   const { t } = useTranslation('zonasEntrega')
@@ -31,7 +33,7 @@ export default function ZonasEntregaPage() {
     handleSubmit,
     reset,
     formState: { errors, isSubmitting },
-  } = useForm<FormData>({ resolver: zodResolver(schema) })
+  } = useForm<FormData>({ resolver: zodResolver(schema), defaultValues: DEFAULT_VALUES })
 
   const loadZones = async () => {
     setLoading(true)
@@ -49,7 +51,7 @@ export default function ZonasEntregaPage() {
 
   const openNew = () => {
     setSelected(null)
-    reset({ nombre: '', tipo: 'barrio', diasEntrega: '', horario: '', activo: true })
+    reset(DEFAULT_VALUES)
     setSaveError(null)
     setShowForm(true)
   }
