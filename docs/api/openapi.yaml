@@ -437,9 +437,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/FacturaEnvelope'
         '400':
-          $ref: '#/components/responses/BadRequestError'
+          $ref: '#/components/responses/BadRequest'
         '404':
-          $ref: '#/components/responses/NotFoundError'
+          description: Invoice not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
         '409':
           description: Invoice already voided
           content:
