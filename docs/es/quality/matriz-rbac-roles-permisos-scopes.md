@@ -25,7 +25,7 @@ Los literales completos de permisos están en `PERMISSIONS` en el mismo archivo.
 
 ## Canales (`USER_CHANNELS`)
 
-Definidos en código: `counter`, `field`, `backoffice`, `warehouse`, `delivery`. Forman parte de `AuthScope.channels` y persisten en `AppUser.scopeChannels` (esquema Prisma). El **refuerzo** del “canal actual” en cada petición HTTP **no está evidenciado** en `server/auth.ts` ni `server/createApp.ts` en el momento de redactar esto; el alcance se carga en `AuthClaims` para uso futuro.
+Definidos en código: `counter`, `field`, `backoffice`, `warehouse`, `delivery`. Forman parte de `AuthScope.channels` y persisten en `AppUser.scopeChannels` (esquema Prisma). El refuerzo está activo mediante `requirePermission` en [`server/auth.ts`](../../../server/auth.ts), validando `x-bizcode-channel` opcional contra el scope de `AuthClaims`.
 
 ## Local frente a SaaS
 

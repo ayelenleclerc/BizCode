@@ -65,6 +65,23 @@ function normalizeChannels(values: string[]): UserChannel[] {
   return [...unique]
 }
 
+function normalizeChannel(value: string): UserChannel | null {
+  return USER_CHANNELS.includes(value as UserChannel) ? (value as UserChannel) : null
+}
+
+function getRequestedChannel(req: Request): UserChannel | null | 'invalid' {
+  const rawHeader = req.headers['x-bizcode-channel']
+  if (!rawHeader) {
+    return null
+  }
+  const rawValue = Array.isArray(rawHeader) ? rawHeader[0] : rawHeader
+  const trimmed = rawValue.trim().toLowerCase()
+  if (!trimmed) {
+    return null
+  }
+  return normalizeChannel(trimmed) ?? 'invalid'
+}
+
 function createScope(raw: {
   tenantId: number
   branchIds: number[]
@@ -221,6 +238,18 @@ export function requirePermission(permission: Permission) {
     }
     if (!hasPermission(req.auth.claims.role, permission)) {
       res.status(403).json({ success: false, error: `Missing permission: ${permission}` })
+      return
+    }
+    const requestedChannel = getRequestedChannel(req)
+    if (requestedChannel === 'invalid') {
+      res.status(400).json({
+        success: false,
+        error: `Invalid x-bizcode-channel header. Allowed values: ${USER_CHANNELS.join(', ')}`,
+      })
+      return
+    }
+    if (requestedChannel !== null && !req.auth.claims.scope.channels.includes(requestedChannel)) {
+      res.status(403).json({ success: false, error: `Missing channel scope: ${requestedChannel}` })
       return
     }
     next()
