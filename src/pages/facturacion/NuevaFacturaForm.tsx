@@ -190,7 +190,12 @@ export default function NuevaFacturaForm({
       )}
 
       {creditLimitWarning && (
-        <div role="alert" aria-live="polite" className="p-4 bg-amber-50 dark:bg-amber-900/30 border border-amber-300 dark:border-amber-600 rounded mb-4 flex items-start gap-3">
+        <div
+          data-testid="credit-limit-warning"
+          role="alert"
+          aria-live="polite"
+          className="p-4 bg-amber-50 dark:bg-amber-900/30 border border-amber-300 dark:border-amber-600 rounded mb-4 flex items-start gap-3"
+        >
           <span className="text-amber-600 dark:text-amber-400 text-xl leading-none" aria-hidden="true">⚠</span>
           <div className="flex-1">
             <p className="font-semibold text-amber-800 dark:text-amber-300 text-sm">

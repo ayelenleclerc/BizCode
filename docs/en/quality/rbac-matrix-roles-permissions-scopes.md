@@ -25,7 +25,7 @@ Full permission literals are defined in `PERMISSIONS` in the same file.
 
 ## Channels (`USER_CHANNELS`)
 
-Declared in code: `counter`, `field`, `backoffice`, `warehouse`, `delivery`. They are part of `AuthScope.channels` and persisted on `AppUser.scopeChannels` (see Prisma schema). **Enforcement** of “current channel” on each HTTP request is **not evidenced** in `server/auth.ts` or `server/createApp.ts` at the time of writing; scope is loaded into `AuthClaims` for future use.
+Declared in code: `counter`, `field`, `backoffice`, `warehouse`, `delivery`. They are part of `AuthScope.channels` and persisted on `AppUser.scopeChannels` (see Prisma schema). Enforcement is active via `requirePermission` in [`server/auth.ts`](../../../server/auth.ts), which validates optional `x-bizcode-channel` against the authenticated claims scope.
 
 ## Local vs SaaS
 

@@ -7,6 +7,7 @@ info:
     Runs as an Express 5 sidecar on localhost:3001.
     Responses use a JSON envelope `{ success: true, data: ... }` except `/api/health`.
     Session authentication is required for protected resources.
+    Protected endpoints can optionally receive `x-bizcode-channel` to enforce channel scope authorization.
     Interactive documentation (Swagger UI): http://localhost:3001/api-docs/ (same contract as this file).
   contact:
     name: BizCode Team
@@ -120,6 +121,8 @@ paths:
                 $ref: '#/components/schemas/HealthResponse'
 
   /api/clientes:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
     get:
       tags: [clientes]
       summary: List customers
@@ -158,6 +161,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ClienteEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
         '500':
           $ref: '#/components/responses/ServerError'
         '401':
@@ -166,6 +171,8 @@ paths:
           $ref: '#/components/responses/ForbiddenError'
 
   /api/clientes/{id}:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
     get:
       tags: [clientes]
       summary: Get customer by id
@@ -192,6 +199,7 @@ paths:
       tags: [clientes]
       summary: Update a customer
       parameters:
+        - $ref: '#/components/parameters/BizcodeChannelHeader'
         - name: id
           in: path
           required: true
@@ -210,6 +218,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ClienteEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
         '500':
           $ref: '#/components/responses/ServerError'
         '401':
@@ -218,6 +228,8 @@ paths:
           $ref: '#/components/responses/ForbiddenError'
 
   /api/articulos:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
     get:
       tags: [articulos]
       summary: List products
@@ -256,6 +268,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ArticuloEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
         '500':
           $ref: '#/components/responses/ServerError'
         '401':
@@ -264,6 +278,8 @@ paths:
           $ref: '#/components/responses/ForbiddenError'
 
   /api/articulos/{id}:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
     get:
       tags: [articulos]
       summary: Get product by id
@@ -290,6 +306,7 @@ paths:
       tags: [articulos]
       summary: Update a product
       parameters:
+        - $ref: '#/components/parameters/BizcodeChannelHeader'
         - name: id
           in: path
           required: true
@@ -308,6 +325,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ArticuloEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
         '500':
           $ref: '#/components/responses/ServerError'
         '401':
@@ -316,6 +335,8 @@ paths:
           $ref: '#/components/responses/ForbiddenError'
 
   /api/rubros:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
     get:
       tags: [rubros]
       summary: List product categories
@@ -348,6 +369,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RubroEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
         '500':
           $ref: '#/components/responses/ServerError'
         '401':
@@ -356,6 +379,8 @@ paths:
           $ref: '#/components/responses/ForbiddenError'
 
   /api/facturas:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
     get:
       tags: [facturas]
       summary: List invoices
@@ -388,6 +413,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/FacturaEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
         '500':
           $ref: '#/components/responses/ServerError'
         '401':
@@ -396,6 +423,8 @@ paths:
           $ref: '#/components/responses/ForbiddenError'
 
   /api/facturas/{id}/void:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
     put:
       tags: [facturas]
       summary: Void an invoice
@@ -443,6 +472,8 @@ paths:
           $ref: '#/components/responses/ForbiddenError'
 
   /api/formas-pago:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
     get:
       tags: [formasPago]
       summary: List payment methods
@@ -457,6 +488,8 @@ paths:
           $ref: '#/components/responses/ServerError'
 
   /api/users:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
     get:
       tags: [users]
       summary: List users for the current tenant
@@ -507,6 +540,8 @@ paths:
           $ref: '#/components/responses/ServerError'
 
   /api/users/{id}:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
     put:
       tags: [users]
       summary: Update a user
@@ -514,6 +549,7 @@ paths:
       security:
         - cookieAuth: []
       parameters:
+        - $ref: '#/components/parameters/BizcodeChannelHeader'
         - name: id
           in: path
           required: true
@@ -548,6 +584,8 @@ paths:
           $ref: '#/components/responses/ServerError'
 
   /api/auth/change-password:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
     post:
       tags: [auth]
       summary: Change own password
@@ -585,6 +623,8 @@ paths:
           $ref: '#/components/responses/ServerError'
 
   /api/notifications/channels:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
     get:
       tags: [notifications]
       summary: Report which external notification channels are configured
@@ -706,6 +746,8 @@ paths:
           $ref: '#/components/responses/ServerError'
 
   /api/zonas-entrega:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
     get:
       tags: [logistics]
       summary: List delivery zones for the authenticated tenant
@@ -752,6 +794,8 @@ paths:
           $ref: '#/components/responses/ServerError'
 
   /api/zonas-entrega/{id}:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
     put:
       tags: [logistics]
       summary: Update a delivery zone
@@ -797,6 +841,16 @@ components:
       type: apiKey
       in: cookie
       name: bizcode_session
+
+  parameters:
+    BizcodeChannelHeader:
+      name: x-bizcode-channel
+      in: header
+      required: false
+      description: Optional channel scope selector. When provided, it must be allowed by the authenticated user's `claims.scope.channels`.
+      schema:
+        type: string
+        enum: [counter, field, backoffice, warehouse, delivery]
 
   schemas:
     HealthResponse:

@@ -49,7 +49,7 @@ Las prioridades siguientes son ítems de **planificación**; la verificación es
 | BP0-4 | P0 | Auth en API de dominio | Rutas bajo `/api/clientes`, `/api/articulos`, `/api/rubros`, `/api/facturas`, `/api/formas-pago` usan `requirePermission` en [`server/createApp.ts`](../../../server/createApp.ts); contrato en [`docs/api/openapi.yaml`](../../api/openapi.yaml) |
 | BP1-1 | P1 | Dominio pedido (`pedido`) | **Futuro:** modelo Prisma + migración + rutas solo cuando consten en OpenAPI y en `server/` |
 | BP1-2 | P1 | Cobertura E2E / integración de caminos críticos | Alineado con [estrategia-pruebas.md](estrategia-pruebas.md) y herramientas Playwright/Postgres existentes |
-| BP1-3 | P1 | Refuerzo de alcance por canal | **No evidenciado en el código actual:** no hay manejo de `x-bizcode-channel` en `server/auth.ts` ni `server/createApp.ts`; **no existe** `tests/server/scope-channel.test.ts`. Aceptación cuando exista implementación: middleware o equivalente use `AuthScope.channels` de [`src/lib/rbac.ts`](../../../src/lib/rbac.ts) y pruebas lo demuestren |
+| BP1-3 | P1 | Refuerzo de alcance por canal | **Implementado en el código actual:** `requirePermission` en [`server/auth.ts`](../../../server/auth.ts) valida `x-bizcode-channel` opcional contra `AuthScope.channels`; cabecera inválida devuelve `400` y canal fuera de alcance devuelve `403`. Cubierto por [`tests/server/scope-channel.test.ts`](../../../tests/server/scope-channel.test.ts) |
 | BP1-4 | P1 | Chat interno (alcance mínimo) | Implementado con `/api/chat/conversations`, `/api/chat/messages`, contador de no leídos vía `Notification` (`chat_message`), historial paginado y ruta UI `/chat` en `src/pages/chat/index.tsx` |
 
 ## Estado del repositorio vs este paquete

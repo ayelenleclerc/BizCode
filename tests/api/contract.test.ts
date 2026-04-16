@@ -58,6 +58,27 @@ const facturaRow = {
   items: [] as unknown[],
 }
 
+const clienteInput = {
+  codigo: 1,
+  rsocial: 'ACME SA',
+  condIva: 'RI',
+  activo: true,
+}
+
+const articuloInput = {
+  codigo: 1,
+  descripcion: 'Producto',
+  rubroId: 1,
+  condIva: '1',
+  umedida: 'UN',
+  precioLista1: 10,
+  precioLista2: 10,
+  costo: 5,
+  stock: 0,
+  minimo: 0,
+  activo: true,
+}
+
 function buildPrisma(): PrismaClient {
   const facturaCreate = vi.fn().mockResolvedValue(facturaRow)
   // tx-level cliente.update: returns the financial summary the route uses for the credit check
@@ -137,13 +158,13 @@ describe('API — contrato OpenAPI', () => {
 
   it('POST /api/clientes', async () => {
     const app = createApp(prisma)
-    const res = await request(app).post('/api/clientes').send({}).expect(200)
+    const res = await request(app).post('/api/clientes').send(clienteInput).expect(200)
     await assertMatchesOpenApi('/api/clientes', 'post', '200', res.body)
   })
 
   it('PUT /api/clientes/:id', async () => {
     const app = createApp(prisma)
-    const res = await request(app).put('/api/clientes/1').send({}).expect(200)
+    const res = await request(app).put('/api/clientes/1').send(clienteInput).expect(200)
     await assertMatchesOpenApi('/api/clientes/{id}', 'put', '200', res.body)
   })
 
@@ -167,13 +188,13 @@ describe('API — contrato OpenAPI', () => {
 
   it('POST /api/articulos', async () => {
     const app = createApp(prisma)
-    const res = await request(app).post('/api/articulos').send({}).expect(200)
+    const res = await request(app).post('/api/articulos').send(articuloInput).expect(200)
     await assertMatchesOpenApi('/api/articulos', 'post', '200', res.body)
   })
 
   it('PUT /api/articulos/:id', async () => {
     const app = createApp(prisma)
-    const res = await request(app).put('/api/articulos/1').send({}).expect(200)
+    const res = await request(app).put('/api/articulos/1').send(articuloInput).expect(200)
     await assertMatchesOpenApi('/api/articulos/{id}', 'put', '200', res.body)
   })
 
@@ -261,14 +282,14 @@ describe('API — errores 500 (cobertura de ramas catch)', () => {
   it('POST /api/clientes', async () => {
     const p = buildPrisma()
     vi.mocked(p.cliente.create).mockRejectedValueOnce(err)
-    const res = await request(createApp(p)).post('/api/clientes').send({}).expect(500)
+    const res = await request(createApp(p)).post('/api/clientes').send(clienteInput).expect(500)
     await assertMatchesOpenApi('/api/clientes', 'post', '500', res.body)
   })
 
   it('PUT /api/clientes/:id', async () => {
     const p = buildPrisma()
     vi.mocked(p.cliente.update).mockRejectedValueOnce(err)
-    const res = await request(createApp(p)).put('/api/clientes/1').send({}).expect(500)
+    const res = await request(createApp(p)).put('/api/clientes/1').send(clienteInput).expect(500)
     await assertMatchesOpenApi('/api/clientes/{id}', 'put', '500', res.body)
   })
 
@@ -289,14 +310,14 @@ describe('API — errores 500 (cobertura de ramas catch)', () => {
   it('POST /api/articulos', async () => {
     const p = buildPrisma()
     vi.mocked(p.articulo.create).mockRejectedValueOnce(err)
-    const res = await request(createApp(p)).post('/api/articulos').send({}).expect(500)
+    const res = await request(createApp(p)).post('/api/articulos').send(articuloInput).expect(500)
     await assertMatchesOpenApi('/api/articulos', 'post', '500', res.body)
   })
 
   it('PUT /api/articulos/:id', async () => {
     const p = buildPrisma()
     vi.mocked(p.articulo.update).mockRejectedValueOnce(err)
-    const res = await request(createApp(p)).put('/api/articulos/1').send({}).expect(500)
+    const res = await request(createApp(p)).put('/api/articulos/1').send(articuloInput).expect(500)
     await assertMatchesOpenApi('/api/articulos/{id}', 'put', '500', res.body)
   })
 
