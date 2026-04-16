@@ -226,4 +226,81 @@ describe('PUT /api/zonas-entrega/:id', () => {
       .send({ nombre: 'X' })
       .expect(403)
   })
+
+  it('updates tipo, diasEntrega and horario fields', async () => {
+    const updated = { ...ZONE_BASE, tipo: 'manual', diasEntrega: '2,4', horario: '09:00-13:00' }
+    const prisma = buildPrismaMock({
+      deliveryZone: {
+        findMany: vi.fn().mockResolvedValue([]),
+        findFirst: vi.fn().mockResolvedValue(ZONE_BASE),
+        create: vi.fn().mockResolvedValue(null),
+        update: vi.fn().mockResolvedValue(updated),
+      },
+    })
+    const app = createApp(prisma)
+
+    const res = await request(app)
+      .put('/api/zonas-entrega/10')
+      .send({ tipo: 'manual', diasEntrega: '2,4', horario: '09:00-13:00' })
+      .expect(200)
+
+    expect(res.body.data.tipo).toBe('manual')
+    expect(res.body.data.diasEntrega).toBe('2,4')
+    expect(res.body.data.horario).toBe('09:00-13:00')
+  })
+})
+
+// ─── 500 error branches ───────────────────────────────────────────────────────
+
+describe('zonas-entrega 500 error branches', () => {
+  beforeEach(() => {
+    process.env.NODE_ENV = 'test'
+    process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
+    process.env.BIZCODE_TEST_ROLE = 'manager'
+  })
+
+  it('GET returns 500 when prisma throws', async () => {
+    const prisma = buildPrismaMock({
+      deliveryZone: {
+        findMany: vi.fn().mockRejectedValue(new Error('DB error')),
+        findFirst: vi.fn(),
+        create: vi.fn(),
+        update: vi.fn(),
+      },
+    })
+    const res = await request(createApp(prisma)).get('/api/zonas-entrega').expect(500)
+    expect(res.body.success).toBe(false)
+  })
+
+  it('POST returns 500 when prisma.create throws', async () => {
+    const prisma = buildPrismaMock({
+      deliveryZone: {
+        findMany: vi.fn().mockResolvedValue([]),
+        findFirst: vi.fn().mockResolvedValue(null),
+        create: vi.fn().mockRejectedValue(new Error('DB error')),
+        update: vi.fn(),
+      },
+    })
+    const res = await request(createApp(prisma))
+      .post('/api/zonas-entrega')
+      .send({ nombre: 'Zone A' })
+      .expect(500)
+    expect(res.body.success).toBe(false)
+  })
+
+  it('PUT returns 500 when prisma.update throws', async () => {
+    const prisma = buildPrismaMock({
+      deliveryZone: {
+        findMany: vi.fn().mockResolvedValue([]),
+        findFirst: vi.fn().mockResolvedValue(ZONE_BASE),
+        create: vi.fn(),
+        update: vi.fn().mockRejectedValue(new Error('DB error')),
+      },
+    })
+    const res = await request(createApp(prisma))
+      .put('/api/zonas-entrega/10')
+      .send({ nombre: 'Zone A' })
+      .expect(500)
+    expect(res.body.success).toBe(false)
+  })
 })

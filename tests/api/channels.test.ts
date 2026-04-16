@@ -223,3 +223,76 @@ describe('dispatchNotification — silent fallback when SMTP unconfigured', () =
     ).resolves.toBeUndefined()
   })
 })
+
+// ─── POST /api/facturas — .catch() branch when dispatchNotification throws ────
+
+describe('POST /api/facturas — dispatchNotification failure is swallowed', () => {
+  beforeEach(() => {
+    process.env.NODE_ENV = 'test'
+    process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
+    process.env.BIZCODE_TEST_ROLE = 'seller'
+    delete process.env.SMTP_HOST
+    vi.clearAllMocks()
+  })
+
+  it('returns 200 even when dispatchNotification rejects (sale must not fail)', async () => {
+    const updatedCliente = { id: 1, rsocial: 'Test SA', balance: 20000, creditLimit: 5000 }
+
+    const prisma = buildPrismaMock({
+      cliente: {
+        findMany: vi.fn().mockResolvedValue([]),
+        // findFirst is used for suspension check
+        findFirst: vi.fn().mockResolvedValue({ id: 1, suspended: false }),
+        findUnique: vi.fn().mockResolvedValue({ email: null, telef: null }),
+        create: vi.fn().mockResolvedValue(null),
+        update: vi.fn().mockResolvedValue(updatedCliente),
+      },
+      notification: {
+        findMany: vi.fn().mockResolvedValue([]),
+        findFirst: vi.fn().mockResolvedValue(null),
+        create: vi.fn().mockResolvedValue({ id: 1 }),
+        // createMany throws to make dispatchNotification reject → exercises .catch()
+        createMany: vi.fn().mockRejectedValue(new Error('DB connection lost')),
+        update: vi.fn().mockResolvedValue(null),
+        updateMany: vi.fn().mockResolvedValue({ count: 0 }),
+      },
+      $transaction: vi.fn(async (fn: unknown) => {
+        if (typeof fn === 'function') {
+          const inner = buildPrismaMock({
+            cliente: {
+              findMany: vi.fn().mockResolvedValue([]),
+              findFirst: vi.fn().mockResolvedValue(null),
+              findUnique: vi.fn().mockResolvedValue(null),
+              create: vi.fn().mockResolvedValue(null),
+              update: vi.fn().mockResolvedValue(updatedCliente),
+            },
+            factura: {
+              findMany: vi.fn().mockResolvedValue([]),
+              create: vi.fn().mockResolvedValue({ id: 99, total: 20000, items: [] }),
+              aggregate: vi.fn().mockResolvedValue({ _count: { id: 0 }, _sum: { total: null } }),
+            },
+          })
+          return fn(inner)
+        }
+        return fn
+      }),
+    })
+
+    const app = createApp(prisma)
+
+    const res = await request(app)
+      .post('/api/facturas')
+      .send({
+        clienteId: 1,
+        formaPagoId: 1,
+        items: [{ articuloId: 1, qty: 1, precioUnitario: 20000, subtotal: 20000 }],
+        subtotal: 20000,
+        total: 20000,
+      })
+      .expect(200)
+
+    expect(res.body.success).toBe(true)
+    // Allow the void .catch() to settle
+    await new Promise((r) => setTimeout(r, 20))
+  })
+})
