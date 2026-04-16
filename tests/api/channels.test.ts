@@ -241,9 +241,8 @@ describe('POST /api/facturas — dispatchNotification failure is swallowed', () 
     const prisma = buildPrismaMock({
       cliente: {
         findMany: vi.fn().mockResolvedValue([]),
-        // findFirst is used for suspension check
         findFirst: vi.fn().mockResolvedValue({ id: 1, suspended: false }),
-        findUnique: vi.fn().mockResolvedValue({ email: null, telef: null }),
+        findUnique: vi.fn().mockResolvedValue({ suspended: false }),
         create: vi.fn().mockResolvedValue(null),
         update: vi.fn().mockResolvedValue(updatedCliente),
       },
@@ -283,11 +282,19 @@ describe('POST /api/facturas — dispatchNotification failure is swallowed', () 
     const res = await request(app)
       .post('/api/facturas')
       .send({
+        fecha: new Date().toISOString(),
+        tipo: 'B',
+        prefijo: '0001',
+        numero: 1,
         clienteId: 1,
         formaPagoId: 1,
-        items: [{ articuloId: 1, qty: 1, precioUnitario: 20000, subtotal: 20000 }],
-        subtotal: 20000,
+        neto1: 16528.93,
+        neto2: 0,
+        neto3: 0,
+        iva1: 3471.07,
+        iva2: 0,
         total: 20000,
+        items: [{ articuloId: 1, cantidad: 1, precio: 20000, dscto: 0, subtotal: 20000 }],
       })
       .expect(200)
 

@@ -32,6 +32,18 @@
 
 * [ChangePasswordInput](./changepasswordinput.md) – `-`
 
+* [ChatConversation](./chatconversation.md) – `-`
+
+* [ChatConversationListEnvelope](./chatconversationlistenvelope.md) – `-`
+
+* [ChatMessage](./chatmessage.md) – `-`
+
+* [ChatMessageCreateInput](./chatmessagecreateinput.md) – `-`
+
+* [ChatMessageEnvelope](./chatmessageenvelope.md) – `-`
+
+* [ChatMessageListEnvelope](./chatmessagelistenvelope.md) – `-`
+
 * [Cliente](./cliente.md) – `-`
 
 * [ClienteEnvelope](./clienteenvelope.md) – `-`
@@ -98,6 +110,10 @@
 
 ### Objects
 
+* [Untitled object in ChatConversation](./chatconversation-properties-lastmessage-anyof-1.md) – `undefined#/properties/lastMessage/anyOf/1`
+
+* [Untitled object in ChatConversation](./chatconversation-properties-user.md) – `undefined#/properties/user`
+
 * [Untitled object in FacturaInput](./facturainput-properties-items-items.md) – `undefined#/properties/items/items`
 
 ### Arrays
@@ -139,6 +155,10 @@
 * [Untitled array in AuthScope](./authscope-properties-routeids.md) – `undefined#/properties/routeIds`
 
 * [Untitled array in AuthScope](./authscope-properties-warehouseids.md) – `undefined#/properties/warehouseIds`
+
+* [Untitled array in ChatConversationListEnvelope](./chatconversationlistenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled array in ChatMessageListEnvelope](./chatmessagelistenvelope-properties-data.md) – `undefined#/properties/data`
 
 * [Untitled array in ClienteListEnvelope](./clientelistenvelope-properties-data.md) – `undefined#/properties/data`
 

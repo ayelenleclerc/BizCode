@@ -11,6 +11,7 @@
     "catalogo": "Catalog",
     "logistica": "Logistics",
     "finanzas": "Finance",
+    "chat": "Chat",
     "configuracion": "Settings",
     "articulos": "Products",
     "facturacion": "Invoicing",
@@ -100,7 +101,8 @@
     "types": {
       "credit_limit_exceeded": "Credit limit exceeded",
       "invoice_overdue": "Invoice overdue",
-      "invoice_due_soon": "Invoice due soon"
+      "invoice_due_soon": "Invoice due soon",
+      "chat_message": "New message"
     }
   },
   "notifChannels": {
