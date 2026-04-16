@@ -33,6 +33,8 @@ tags:
     description: Payment methods
   - name: users
     description: User management (requires users.manage permission)
+  - name: chat
+    description: Internal chat conversations and messages
 
 paths:
   /api/auth/setup-owner:
@@ -653,6 +655,95 @@ paths:
                         type: boolean
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+
+  /api/chat/conversations:
+    get:
+      tags: [chat]
+      summary: List chat conversations for authenticated user
+      security:
+        - cookieSession: []
+      responses:
+        '200':
+          description: Conversations with unread counts
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatConversationListEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/chat/messages:
+    post:
+      tags: [chat]
+      summary: Send a chat message to another user
+      security:
+        - cookieSession: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChatMessageCreateInput'
+      responses:
+        '201':
+          description: Message created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatMessageEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          description: Recipient not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/chat/messages/{userId}:
+    get:
+      tags: [chat]
+      summary: Get paginated message history with a user
+      security:
+        - cookieSession: []
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema: { type: integer }
+        - in: query
+          name: limit
+          required: false
+          schema: { type: integer, minimum: 1, maximum: 100 }
+        - in: query
+          name: before
+          required: false
+          schema: { type: integer, minimum: 1 }
+      responses:
+        '200':
+          description: Conversation history
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatMessageListEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
 
   /api/zonas-entrega:
     parameters:
@@ -1510,6 +1601,101 @@ components:
         newPassword:
           type: string
           minLength: 8
+
+    ChatMessage:
+      type: object
+      properties:
+        id:
+          type: integer
+        tenantId:
+          type: integer
+        fromUserId:
+          type: integer
+        toUserId:
+          type: integer
+        content:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+
+    ChatMessageCreateInput:
+      type: object
+      required: [toUserId, content]
+      properties:
+        toUserId:
+          type: integer
+          minimum: 1
+        content:
+          type: string
+          minLength: 1
+          maxLength: 1000
+
+    ChatConversation:
+      type: object
+      properties:
+        user:
+          type: object
+          properties:
+            id:
+              type: integer
+            username:
+              type: string
+            role:
+              type: string
+        unreadCount:
+          type: integer
+          minimum: 0
+        lastMessage:
+          anyOf:
+            - type: 'null'
+            - type: object
+              properties:
+                id:
+                  type: integer
+                fromUserId:
+                  type: integer
+                toUserId:
+                  type: integer
+                preview:
+                  type: string
+                createdAt:
+                  type: string
+                  format: date-time
+
+    ChatConversationListEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ChatConversation'
+
+    ChatMessageListEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ChatMessage'
+
+    ChatMessageEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/ChatMessage'
 
     DeliveryZone:
       type: object

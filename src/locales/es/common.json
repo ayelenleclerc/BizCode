@@ -11,6 +11,7 @@
     "catalogo": "Catálogo",
     "logistica": "Logística",
     "finanzas": "Finanzas",
+    "chat": "Chat",
     "configuracion": "Configuración",
     "articulos": "Artículos",
     "facturacion": "Facturación",
@@ -100,7 +101,8 @@
     "types": {
       "credit_limit_exceeded": "Límite de crédito superado",
       "invoice_overdue": "Factura vencida",
-      "invoice_due_soon": "Factura por vencer"
+      "invoice_due_soon": "Factura por vencer",
+      "chat_message": "Mensaje nuevo"
     }
   },
   "notifChannels": {

@@ -4587,6 +4587,432 @@ Returns boolean flags for each channel. No sensitive values are exposed.
 }
 ```
 
+### List chat conversations for authenticated user
+
+- **Method:** `GET`
+- **Path:** `/api/chat/conversations`
+- **Tags:** chat
+
+#### Responses
+
+##### Status: 200 Conversations with unread counts
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`lastMessage`**
+
+    `object`
+
+  - **`unreadCount`**
+
+    `integer`
+
+  - **`user`**
+
+    `object`
+
+    - **`id`**
+
+      `integer`
+
+    - **`role`**
+
+      `string`
+
+    - **`username`**
+
+      `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "user": {
+        "id": 1,
+        "username": "",
+        "role": ""
+      },
+      "unreadCount": 0,
+      "lastMessage": {
+        "id": 1,
+        "fromUserId": 1,
+        "toUserId": 1,
+        "preview": "",
+        "createdAt": ""
+      }
+    }
+  ]
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Send a chat message to another user
+
+- **Method:** `POST`
+- **Path:** `/api/chat/messages`
+- **Tags:** chat
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`content` (required)**
+
+  `string`
+
+- **`toUserId` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "toUserId": 1,
+  "content": ""
+}
+```
+
+#### Responses
+
+##### Status: 201 Message created
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`content`**
+
+    `string`
+
+  - **`createdAt`**
+
+    `string`, format: `date-time`
+
+  - **`fromUserId`**
+
+    `integer`
+
+  - **`id`**
+
+    `integer`
+
+  - **`tenantId`**
+
+    `integer`
+
+  - **`toUserId`**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "fromUserId": 1,
+    "toUserId": 1,
+    "content": "",
+    "createdAt": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Recipient not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Get paginated message history with a user
+
+- **Method:** `GET`
+- **Path:** `/api/chat/messages/{userId}`
+- **Tags:** chat
+
+#### Responses
+
+##### Status: 200 Conversation history
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`content`**
+
+    `string`
+
+  - **`createdAt`**
+
+    `string`, format: `date-time`
+
+  - **`fromUserId`**
+
+    `integer`
+
+  - **`id`**
+
+    `integer`
+
+  - **`tenantId`**
+
+    `integer`
+
+  - **`toUserId`**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "fromUserId": 1,
+      "toUserId": 1,
+      "content": "",
+      "createdAt": ""
+    }
+  ]
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 User not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ### PARAMETERS /api/zonas-entrega
 
 - **Method:** `PARAMETERS`
@@ -8144,6 +8570,287 @@ Returns boolean flags for each channel. No sensitive values are exposed.
 {
   "currentPassword": "",
   "newPassword": ""
+}
+```
+
+### ChatMessage
+
+- **Type:**`object`
+
+* **`content`**
+
+  `string`
+
+* **`createdAt`**
+
+  `string`, format: `date-time`
+
+* **`fromUserId`**
+
+  `integer`
+
+* **`id`**
+
+  `integer`
+
+* **`tenantId`**
+
+  `integer`
+
+* **`toUserId`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "tenantId": 1,
+  "fromUserId": 1,
+  "toUserId": 1,
+  "content": "",
+  "createdAt": ""
+}
+```
+
+### ChatMessageCreateInput
+
+- **Type:**`object`
+
+* **`content` (required)**
+
+  `string`
+
+* **`toUserId` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "toUserId": 1,
+  "content": ""
+}
+```
+
+### ChatConversation
+
+- **Type:**`object`
+
+* **`lastMessage`**
+
+  `object`
+
+* **`unreadCount`**
+
+  `integer`
+
+* **`user`**
+
+  `object`
+
+  - **`id`**
+
+    `integer`
+
+  - **`role`**
+
+    `string`
+
+  - **`username`**
+
+    `string`
+
+**Example:**
+
+```json
+{
+  "user": {
+    "id": 1,
+    "username": "",
+    "role": ""
+  },
+  "unreadCount": 0,
+  "lastMessage": {
+    "id": 1,
+    "fromUserId": 1,
+    "toUserId": 1,
+    "preview": "",
+    "createdAt": ""
+  }
+}
+```
+
+### ChatConversationListEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`lastMessage`**
+
+    `object`
+
+  - **`unreadCount`**
+
+    `integer`
+
+  - **`user`**
+
+    `object`
+
+    - **`id`**
+
+      `integer`
+
+    - **`role`**
+
+      `string`
+
+    - **`username`**
+
+      `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "user": {
+        "id": 1,
+        "username": "",
+        "role": ""
+      },
+      "unreadCount": 0,
+      "lastMessage": {
+        "id": 1,
+        "fromUserId": 1,
+        "toUserId": 1,
+        "preview": "",
+        "createdAt": ""
+      }
+    }
+  ]
+}
+```
+
+### ChatMessageListEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`content`**
+
+    `string`
+
+  - **`createdAt`**
+
+    `string`, format: `date-time`
+
+  - **`fromUserId`**
+
+    `integer`
+
+  - **`id`**
+
+    `integer`
+
+  - **`tenantId`**
+
+    `integer`
+
+  - **`toUserId`**
+
+    `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "fromUserId": 1,
+      "toUserId": 1,
+      "content": "",
+      "createdAt": ""
+    }
+  ]
+}
+```
+
+### ChatMessageEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`content`**
+
+    `string`
+
+  - **`createdAt`**
+
+    `string`, format: `date-time`
+
+  - **`fromUserId`**
+
+    `integer`
+
+  - **`id`**
+
+    `integer`
+
+  - **`tenantId`**
+
+    `integer`
+
+  - **`toUserId`**
+
+    `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "fromUserId": 1,
+    "toUserId": 1,
+    "content": "",
+    "createdAt": ""
+  }
 }
 ```
 

@@ -43,6 +43,11 @@ function buildMessage(type: NotificationType, payload: NotificationPayload): Mes
         subject: `[BizCode] Factura próxima a vencer — ${rsocial}`,
         text: `Una factura de ${rsocial} está próxima a vencer. Coordine el cobro con anticipación.`,
       }
+    case 'chat_message':
+      return {
+        subject: '[BizCode] Nuevo mensaje interno',
+        text: payload.preview ? `Nuevo mensaje: ${payload.preview}` : 'Tiene un nuevo mensaje interno.',
+      }
   }
 }
 

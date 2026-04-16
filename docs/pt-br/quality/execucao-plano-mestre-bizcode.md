@@ -50,6 +50,7 @@ As prioridades abaixo são itens de **planejamento**; a verificação é contra 
 | BP1-1 | P1 | Domínio pedido (`pedido`) | **Futuro:** modelo Prisma + migração + rotas apenas quando constarem no OpenAPI e em `server/` |
 | BP1-2 | P1 | Cobertura E2E / integração de fluxos críticos | Alinhado a [estrategia-testes.md](estrategia-testes.md) e ferramentas Playwright/Postgres existentes |
 | BP1-3 | P1 | Enforcement de escopo por canal | **Implementado no código atual:** `requirePermission` em [`server/auth.ts`](../../../server/auth.ts) valida `x-bizcode-channel` opcional contra `AuthScope.channels`; cabeçalho inválido retorna `400` e canal fora do escopo retorna `403`. Coberto por [`tests/server/scope-channel.test.ts`](../../../tests/server/scope-channel.test.ts) |
+| BP1-4 | P1 | Chat interno (escopo mínimo) | Implementado com `/api/chat/conversations`, `/api/chat/messages`, contador de não lidas via `Notification` (`chat_message`), histórico paginado e rota de UI `/chat` em `src/pages/chat/index.tsx` |
 
 ## Estado do repositório vs este pacote
 

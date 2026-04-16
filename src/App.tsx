@@ -11,6 +11,7 @@ import LogisticaPage from './pages/logistica'
 import FinanzasPage from './pages/finanzas'
 import ConfiguracionPage from './pages/configuracion'
 import ZonasEntregaPage from './pages/configuracion/ZonasEntregaPage'
+import ChatPage from './pages/chat'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
 
 function ProtectedRoute() {
@@ -90,6 +91,7 @@ function AppRoutes() {
           {/* Configuración */}
           <Route path="configuracion" element={<ConfiguracionPage />} />
           <Route path="configuracion/zonas-entrega" element={<ZonasEntregaPage />} />
+          <Route path="chat" element={<ChatPage />} />
         </Route>
       </Route>
       <Route path="/" element={<RootRedirect />} />

@@ -12,6 +12,7 @@ import { registerUserRoutes } from './users'
 import { registerDashboardRoutes } from './dashboard'
 import { registerNotificationRoutes } from './notifications'
 import { dispatchNotification, isSmtpConfigured, isTwilioConfigured } from './channels'
+import { registerChatRoutes } from './chat'
 import { validateCUIT } from '../src/lib/validators'
 
 const DEFAULT_CORS_ORIGINS = ['http://localhost:5173', 'http://127.0.0.1:5173'] as const
@@ -381,6 +382,7 @@ export function createApp(prisma: PrismaClient): Application {
   registerUserRoutes(app, prisma)
   registerDashboardRoutes(app, prisma)
   registerNotificationRoutes(app, prisma)
+  registerChatRoutes(app, prisma)
 
   /**
    * @en Reports which external notification channels are configured (reads env vars server-side).

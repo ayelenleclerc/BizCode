@@ -429,6 +429,67 @@ export const notifChannelsAPI = {
   },
 }
 
+// ============ CHAT ============
+
+export type ChatConversation = {
+  user: {
+    id: number
+    username: string
+    role: string
+  }
+  unreadCount: number
+  lastMessage: {
+    id: number
+    fromUserId: number
+    toUserId: number
+    preview: string
+    createdAt: string
+  } | null
+}
+
+export type ChatMessageDTO = {
+  id: number
+  tenantId: number
+  fromUserId: number
+  toUserId: number
+  content: string
+  createdAt: string
+}
+
+export const chatAPI = {
+  conversations: async (limit = 20): Promise<ChatConversation[]> => {
+    try {
+      const response = await api.get<{ success: boolean; data: ChatConversation[] }>('/chat/conversations', {
+        params: { limit },
+      })
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+  messages: async (userId: number, params?: { limit?: number; before?: number }): Promise<ChatMessageDTO[]> => {
+    try {
+      const response = await api.get<{ success: boolean; data: ChatMessageDTO[] }>(`/chat/messages/${userId}`, {
+        params,
+      })
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+  send: async (toUserId: number, content: string): Promise<ChatMessageDTO> => {
+    try {
+      const response = await api.post<{ success: boolean; data: ChatMessageDTO }>('/chat/messages', {
+        toUserId,
+        content,
+      })
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+}
+
 // ============ ZONAS DE ENTREGA ============
 
 export const zonasEntregaAPI = {
