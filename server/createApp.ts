@@ -12,6 +12,7 @@ import { registerUserRoutes } from './users'
 import { registerDashboardRoutes } from './dashboard'
 import { registerNotificationRoutes } from './notifications'
 import { dispatchNotification, isSmtpConfigured, isTwilioConfigured } from './channels'
+import { validateCUIT } from '../src/lib/validators'
 
 const DEFAULT_CORS_ORIGINS = ['http://localhost:5173', 'http://127.0.0.1:5173'] as const
 
@@ -42,6 +43,298 @@ export function getCorsAllowedOrigins(): Set<string> {
 
 function errorMessage(err: unknown): string {
   return err instanceof Error ? err.message : String(err)
+}
+
+type ValidationSuccess<T> = { ok: true; value: T }
+type ValidationFailure = { ok: false; error: string }
+type ValidationResult<T> = ValidationSuccess<T> | ValidationFailure
+
+type ClienteInput = {
+  codigo: number
+  rsocial: string
+  condIva: 'RI' | 'Mono' | 'CF' | 'Exento'
+  activo: boolean
+  fantasia?: string | null
+  cuit?: string | null
+  domicilio?: string | null
+  localidad?: string | null
+  cpost?: string | null
+  telef?: string | null
+  email?: string | null
+  creditLimit?: number | null
+  creditDays?: number
+  suspended?: boolean
+  deliveryZoneId?: number | null
+}
+
+type ArticuloInput = {
+  codigo: number
+  descripcion: string
+  rubroId: number
+  condIva: '1' | '2' | '3'
+  umedida: string
+  precioLista1: number
+  precioLista2: number
+  costo: number
+  stock: number
+  minimo: number
+  activo: boolean
+}
+
+type RubroInput = {
+  codigo: number
+  nombre: string
+}
+
+type FacturaItemInput = {
+  articuloId: number
+  cantidad: number
+  precio: number
+  dscto: number
+  subtotal: number
+}
+
+type FacturaInput = {
+  fecha: string
+  tipo: 'A' | 'B'
+  prefijo?: string
+  numero: number
+  clienteId: number
+  formaPagoId?: number | null
+  neto1: number
+  neto2: number
+  neto3: number
+  iva1: number
+  iva2: number
+  total: number
+  items: FacturaItemInput[]
+}
+
+function isObjectRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
+}
+
+function parseOptionalString(value: unknown, maxLength: number, field: string): ValidationResult<string | null | undefined> {
+  if (value === undefined) return { ok: true, value: undefined }
+  if (value === null) return { ok: true, value: null }
+  if (typeof value !== 'string') return { ok: false, error: `${field} must be a string` }
+  const trimmed = value.trim()
+  if (trimmed.length === 0) return { ok: true, value: null }
+  if (trimmed.length > maxLength) return { ok: false, error: `${field} must be at most ${maxLength} characters` }
+  return { ok: true, value: trimmed }
+}
+
+function parseOptionalNumber(value: unknown, field: string, min?: number): ValidationResult<number | null | undefined> {
+  if (value === undefined) return { ok: true, value: undefined }
+  if (value === null) return { ok: true, value: null }
+  if (typeof value !== 'number' || Number.isNaN(value)) return { ok: false, error: `${field} must be a number` }
+  if (min !== undefined && value < min) return { ok: false, error: `${field} must be >= ${min}` }
+  return { ok: true, value }
+}
+
+function parseRequiredNumber(value: unknown, field: string, min?: number): ValidationResult<number> {
+  if (typeof value !== 'number' || Number.isNaN(value)) return { ok: false, error: `${field} must be a number` }
+  if (min !== undefined && value < min) return { ok: false, error: `${field} must be >= ${min}` }
+  return { ok: true, value }
+}
+
+function parseRequiredInteger(value: unknown, field: string, min?: number): ValidationResult<number> {
+  if (typeof value !== 'number' || !Number.isInteger(value)) return { ok: false, error: `${field} must be an integer` }
+  if (min !== undefined && value < min) return { ok: false, error: `${field} must be >= ${min}` }
+  return { ok: true, value }
+}
+
+function validateClienteInput(raw: unknown): ValidationResult<ClienteInput> {
+  if (!isObjectRecord(raw)) return { ok: false, error: 'Request body must be an object' }
+  const codigo = parseRequiredInteger(raw.codigo, 'codigo', 1)
+  if (!codigo.ok) return codigo
+  if (typeof raw.rsocial !== 'string' || raw.rsocial.trim().length < 3 || raw.rsocial.trim().length > 30) {
+    return { ok: false, error: 'rsocial must be a string between 3 and 30 characters' }
+  }
+  if (typeof raw.condIva !== 'string' || !['RI', 'Mono', 'CF', 'Exento'].includes(raw.condIva)) {
+    return { ok: false, error: 'condIva must be one of: RI, Mono, CF, Exento' }
+  }
+  if (typeof raw.activo !== 'boolean') return { ok: false, error: 'activo must be a boolean' }
+
+  const fantasia = parseOptionalString(raw.fantasia, 30, 'fantasia')
+  if (!fantasia.ok) return fantasia
+  const domicilio = parseOptionalString(raw.domicilio, 40, 'domicilio')
+  if (!domicilio.ok) return domicilio
+  const localidad = parseOptionalString(raw.localidad, 25, 'localidad')
+  if (!localidad.ok) return localidad
+  const cpost = parseOptionalString(raw.cpost, 8, 'cpost')
+  if (!cpost.ok) return cpost
+  const telef = parseOptionalString(raw.telef, 25, 'telef')
+  if (!telef.ok) return telef
+  const email = parseOptionalString(raw.email, 50, 'email')
+  if (!email.ok) return email
+
+  const cuit = parseOptionalString(raw.cuit, 14, 'cuit')
+  if (!cuit.ok) return cuit
+  if (cuit.value && !validateCUIT(cuit.value)) return { ok: false, error: 'cuit must be a valid Argentine CUIT' }
+
+  const creditLimit = parseOptionalNumber(raw.creditLimit, 'creditLimit', 0)
+  if (!creditLimit.ok) return creditLimit
+  const creditDays = parseOptionalNumber(raw.creditDays, 'creditDays', 0)
+  if (!creditDays.ok) return creditDays
+  if (creditDays.value !== undefined && creditDays.value !== null && !Number.isInteger(creditDays.value)) {
+    return { ok: false, error: 'creditDays must be an integer' }
+  }
+  if (raw.suspended !== undefined && typeof raw.suspended !== 'boolean') {
+    return { ok: false, error: 'suspended must be a boolean' }
+  }
+  const deliveryZoneId = parseOptionalNumber(raw.deliveryZoneId, 'deliveryZoneId', 1)
+  if (!deliveryZoneId.ok) return deliveryZoneId
+  if (deliveryZoneId.value !== undefined && deliveryZoneId.value !== null && !Number.isInteger(deliveryZoneId.value)) {
+    return { ok: false, error: 'deliveryZoneId must be an integer' }
+  }
+
+  return {
+    ok: true,
+    value: {
+      codigo: codigo.value,
+      rsocial: raw.rsocial.trim(),
+      condIva: raw.condIva as ClienteInput['condIva'],
+      activo: raw.activo,
+      ...(fantasia.value !== undefined && { fantasia: fantasia.value }),
+      ...(cuit.value !== undefined && { cuit: cuit.value }),
+      ...(domicilio.value !== undefined && { domicilio: domicilio.value }),
+      ...(localidad.value !== undefined && { localidad: localidad.value }),
+      ...(cpost.value !== undefined && { cpost: cpost.value }),
+      ...(telef.value !== undefined && { telef: telef.value }),
+      ...(email.value !== undefined && { email: email.value }),
+      ...(creditLimit.value !== undefined && { creditLimit: creditLimit.value }),
+      ...(creditDays.value !== undefined && { creditDays: creditDays.value ?? 0 }),
+      ...(raw.suspended !== undefined && { suspended: raw.suspended }),
+      ...(deliveryZoneId.value !== undefined && { deliveryZoneId: deliveryZoneId.value }),
+    },
+  }
+}
+
+function validateArticuloInput(raw: unknown): ValidationResult<ArticuloInput> {
+  if (!isObjectRecord(raw)) return { ok: false, error: 'Request body must be an object' }
+  const codigo = parseRequiredInteger(raw.codigo, 'codigo', 1)
+  if (!codigo.ok) return codigo
+  if (typeof raw.descripcion !== 'string' || raw.descripcion.trim().length < 3 || raw.descripcion.trim().length > 30) {
+    return { ok: false, error: 'descripcion must be a string between 3 and 30 characters' }
+  }
+  const rubroId = parseRequiredInteger(raw.rubroId, 'rubroId', 1)
+  if (!rubroId.ok) return rubroId
+  if (typeof raw.condIva !== 'string' || !['1', '2', '3'].includes(raw.condIva)) {
+    return { ok: false, error: 'condIva must be one of: 1, 2, 3' }
+  }
+  if (typeof raw.umedida !== 'string' || raw.umedida.trim().length < 2 || raw.umedida.trim().length > 6) {
+    return { ok: false, error: 'umedida must be a string between 2 and 6 characters' }
+  }
+  const precioLista1 = parseRequiredNumber(raw.precioLista1, 'precioLista1', 0.01)
+  if (!precioLista1.ok) return precioLista1
+  const precioLista2 = parseRequiredNumber(raw.precioLista2, 'precioLista2', 0.01)
+  if (!precioLista2.ok) return precioLista2
+  const costo = parseRequiredNumber(raw.costo, 'costo', 0.01)
+  if (!costo.ok) return costo
+  const stock = parseRequiredInteger(raw.stock, 'stock', 0)
+  if (!stock.ok) return stock
+  const minimo = parseRequiredInteger(raw.minimo, 'minimo', 0)
+  if (!minimo.ok) return minimo
+  if (typeof raw.activo !== 'boolean') return { ok: false, error: 'activo must be a boolean' }
+
+  return {
+    ok: true,
+    value: {
+      codigo: codigo.value,
+      descripcion: raw.descripcion.trim(),
+      rubroId: rubroId.value,
+      condIva: raw.condIva as ArticuloInput['condIva'],
+      umedida: raw.umedida.trim(),
+      precioLista1: precioLista1.value,
+      precioLista2: precioLista2.value,
+      costo: costo.value,
+      stock: stock.value,
+      minimo: minimo.value,
+      activo: raw.activo,
+    },
+  }
+}
+
+function validateRubroInput(raw: unknown): ValidationResult<RubroInput> {
+  if (!isObjectRecord(raw)) return { ok: false, error: 'Request body must be an object' }
+  const codigo = parseRequiredInteger(raw.codigo, 'codigo', 1)
+  if (!codigo.ok) return codigo
+  if (typeof raw.nombre !== 'string' || raw.nombre.trim().length === 0 || raw.nombre.trim().length > 20) {
+    return { ok: false, error: 'nombre must be a string between 1 and 20 characters' }
+  }
+  return { ok: true, value: { codigo: codigo.value, nombre: raw.nombre.trim() } }
+}
+
+function validateFacturaInput(raw: unknown): ValidationResult<FacturaInput> {
+  if (!isObjectRecord(raw)) return { ok: false, error: 'Request body must be an object' }
+  if (typeof raw.fecha !== 'string' || raw.fecha.trim().length === 0) return { ok: false, error: 'fecha is required' }
+  if (typeof raw.tipo !== 'string' || !['A', 'B'].includes(raw.tipo)) return { ok: false, error: 'tipo must be A or B' }
+  const numero = parseRequiredInteger(raw.numero, 'numero', 1)
+  if (!numero.ok) return numero
+  const clienteId = parseRequiredInteger(raw.clienteId, 'clienteId', 1)
+  if (!clienteId.ok) return clienteId
+  if (raw.prefijo !== undefined && typeof raw.prefijo !== 'string') return { ok: false, error: 'prefijo must be a string' }
+  const formaPagoId = raw.formaPagoId
+  if (
+    formaPagoId !== undefined &&
+    formaPagoId !== null &&
+    (typeof formaPagoId !== 'number' || !Number.isInteger(formaPagoId) || formaPagoId < 1)
+  ) {
+    return { ok: false, error: 'formaPagoId must be a positive integer or null' }
+  }
+  const neto1 = parseRequiredNumber(raw.neto1, 'neto1', 0)
+  if (!neto1.ok) return neto1
+  const neto2 = parseRequiredNumber(raw.neto2, 'neto2', 0)
+  if (!neto2.ok) return neto2
+  const neto3 = parseRequiredNumber(raw.neto3, 'neto3', 0)
+  if (!neto3.ok) return neto3
+  const iva1 = parseRequiredNumber(raw.iva1, 'iva1', 0)
+  if (!iva1.ok) return iva1
+  const iva2 = parseRequiredNumber(raw.iva2, 'iva2', 0)
+  if (!iva2.ok) return iva2
+  const total = parseRequiredNumber(raw.total, 'total', 0)
+  if (!total.ok) return total
+  if (!Array.isArray(raw.items)) return { ok: false, error: 'items must be an array' }
+  const parsedItems: FacturaItemInput[] = []
+  for (const [index, entry] of raw.items.entries()) {
+    if (!isObjectRecord(entry)) return { ok: false, error: `items[${index}] must be an object` }
+    const articuloId = parseRequiredInteger(entry.articuloId, `items[${index}].articuloId`, 1)
+    if (!articuloId.ok) return articuloId
+    const cantidad = parseRequiredNumber(entry.cantidad, `items[${index}].cantidad`, 0)
+    if (!cantidad.ok) return cantidad
+    const precio = parseRequiredNumber(entry.precio, `items[${index}].precio`, 0)
+    if (!precio.ok) return precio
+    const dscto = parseRequiredNumber(entry.dscto, `items[${index}].dscto`, 0)
+    if (!dscto.ok) return dscto
+    const subtotal = parseRequiredNumber(entry.subtotal, `items[${index}].subtotal`, 0)
+    if (!subtotal.ok) return subtotal
+    parsedItems.push({
+      articuloId: articuloId.value,
+      cantidad: cantidad.value,
+      precio: precio.value,
+      dscto: dscto.value,
+      subtotal: subtotal.value,
+    })
+  }
+  return {
+    ok: true,
+    value: {
+      fecha: raw.fecha.trim(),
+      tipo: raw.tipo as 'A' | 'B',
+      ...(typeof raw.prefijo === 'string' && { prefijo: raw.prefijo }),
+      numero: numero.value,
+      clienteId: clienteId.value,
+      ...(formaPagoId !== undefined && { formaPagoId: formaPagoId as number | null }),
+      neto1: neto1.value,
+      neto2: neto2.value,
+      neto3: neto3.value,
+      iva1: iva1.value,
+      iva2: iva2.value,
+      total: total.value,
+      items: parsedItems,
+    },
+  }
 }
 
 let cachedOpenApiDocument: Record<string, unknown> | undefined
@@ -171,8 +464,13 @@ export function createApp(prisma: PrismaClient): Application {
 
   app.post('/api/clientes', requirePermission('customers.manage'), async (req: Request, res: Response) => {
     try {
+      const parsed = validateClienteInput(req.body)
+      if (!parsed.ok) {
+        res.status(400).json({ success: false, error: parsed.error })
+        return
+      }
       const cliente = await prisma.cliente.create({
-        data: req.body,
+        data: parsed.value,
       })
       await writeAudit(req as AuthenticatedRequest, 'cliente_create', 'cliente', String(cliente.id))
       res.json({ success: true, data: cliente })
@@ -183,12 +481,17 @@ export function createApp(prisma: PrismaClient): Application {
 
   app.put('/api/clientes/:id', requirePermission('customers.manage'), async (req: Request, res: Response) => {
     try {
+      const parsed = validateClienteInput(req.body)
+      if (!parsed.ok) {
+        res.status(400).json({ success: false, error: parsed.error })
+        return
+      }
       const authReq = req as AuthenticatedRequest
       const role = authReq.auth?.claims.role
       const canManageFinancials = role === 'owner' || role === 'manager'
 
       // Strip financial management fields for roles without the right
-      const { creditLimit, creditDays, suspended, ...baseBody } = req.body as Record<string, unknown>
+      const { creditLimit, creditDays, suspended, ...baseBody } = parsed.value
       const data = canManageFinancials
         ? { ...baseBody, creditLimit, creditDays, suspended }
         : baseBody
@@ -239,8 +542,13 @@ export function createApp(prisma: PrismaClient): Application {
 
   app.post('/api/articulos', requirePermission('products.manage'), async (req: Request, res: Response) => {
     try {
+      const parsed = validateArticuloInput(req.body)
+      if (!parsed.ok) {
+        res.status(400).json({ success: false, error: parsed.error })
+        return
+      }
       const articulo = await prisma.articulo.create({
-        data: req.body,
+        data: parsed.value,
       })
       await writeAudit(req as AuthenticatedRequest, 'articulo_create', 'articulo', String(articulo.id))
       res.json({ success: true, data: articulo })
@@ -251,9 +559,14 @@ export function createApp(prisma: PrismaClient): Application {
 
   app.put('/api/articulos/:id', requirePermission('products.manage'), async (req: Request, res: Response) => {
     try {
+      const parsed = validateArticuloInput(req.body)
+      if (!parsed.ok) {
+        res.status(400).json({ success: false, error: parsed.error })
+        return
+      }
       const articulo = await prisma.articulo.update({
         where: { id: parseInt(String(req.params.id), 10) },
-        data: req.body,
+        data: parsed.value,
       })
       await writeAudit(req as AuthenticatedRequest, 'articulo_update', 'articulo', String(articulo.id))
       res.json({ success: true, data: articulo })
@@ -277,7 +590,12 @@ export function createApp(prisma: PrismaClient): Application {
 
   app.post('/api/rubros', requirePermission('products.manage'), async (req: Request, res: Response) => {
     try {
-      const rubro = await prisma.rubro.create({ data: req.body })
+      const parsed = validateRubroInput(req.body)
+      if (!parsed.ok) {
+        res.status(400).json({ success: false, error: parsed.error })
+        return
+      }
+      const rubro = await prisma.rubro.create({ data: parsed.value })
       await writeAudit(req as AuthenticatedRequest, 'rubro_create', 'rubro', String(rubro.id))
       res.json({ success: true, data: rubro })
     } catch (err: unknown) {
@@ -314,11 +632,13 @@ export function createApp(prisma: PrismaClient): Application {
 
   app.post('/api/facturas', requirePermission('sales.create'), async (req: Request, res: Response) => {
     try {
-      const { items, ...factura } = req.body as { items: Record<string, unknown>[] } & Record<
-        string,
-        unknown
-      >
-      const clienteId = parseInt(String(factura.clienteId), 10)
+      const parsed = validateFacturaInput(req.body)
+      if (!parsed.ok) {
+        res.status(400).json({ success: false, error: parsed.error })
+        return
+      }
+      const { items, ...factura } = parsed.value
+      const clienteId = factura.clienteId
 
       // Check suspension before creating the factura
       const clienteCheck = await prisma.cliente.findUnique({

@@ -159,6 +159,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ClienteEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
         '500':
           $ref: '#/components/responses/ServerError'
         '401':
@@ -214,6 +216,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ClienteEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
         '500':
           $ref: '#/components/responses/ServerError'
         '401':
@@ -262,6 +266,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ArticuloEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
         '500':
           $ref: '#/components/responses/ServerError'
         '401':
@@ -317,6 +323,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ArticuloEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
         '500':
           $ref: '#/components/responses/ServerError'
         '401':
@@ -359,6 +367,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RubroEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
         '500':
           $ref: '#/components/responses/ServerError'
         '401':
@@ -401,6 +411,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/FacturaEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
         '500':
           $ref: '#/components/responses/ServerError'
         '401':

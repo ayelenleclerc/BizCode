@@ -863,6 +863,27 @@ One-time endpoint to create initial tenant and owner user.
 }
 ```
 
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ##### Status: 401 Authentication required or invalid credentials
 
 ###### Content-Type: application/json
@@ -1253,6 +1274,27 @@ One-time endpoint to create initial tenant and owner user.
     "deliveryZoneId": 1,
     "additionalProperty": "anything"
   }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
 }
 ```
 
@@ -1683,6 +1725,27 @@ One-time endpoint to create initial tenant and owner user.
 }
 ```
 
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ##### Status: 401 Authentication required or invalid credentials
 
 ###### Content-Type: application/json
@@ -2042,6 +2105,27 @@ One-time endpoint to create initial tenant and owner user.
 }
 ```
 
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ##### Status: 401 Authentication required or invalid credentials
 
 ###### Content-Type: application/json
@@ -2287,6 +2371,27 @@ One-time endpoint to create initial tenant and owner user.
     "nombre": "",
     "additionalProperty": "anything"
   }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
 }
 ```
 
@@ -2990,6 +3095,27 @@ One-time endpoint to create initial tenant and owner user.
     ],
     "additionalProperty": "anything"
   }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
 }
 ```
 
