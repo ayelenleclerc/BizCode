@@ -38,6 +38,8 @@
       "rsocial": "Razón social mínimo 3 caracteres",
       "generic": "Error al guardar cliente"
     },
+    "deliveryZone": "Zona de entrega",
+    "deliveryZoneNone": "Sin zona asignada",
     "financial": {
       "section": "Estado financiero",
       "creditLimit": "Límite de crédito",

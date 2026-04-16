@@ -14,7 +14,8 @@
     "configuracion": "Configurações",
     "articulos": "Produtos",
     "facturacion": "Faturamento",
-    "users": "Usuários"
+    "users": "Usuários",
+    "zonasEntrega": "Zonas de entrega"
   },
   "language": {
     "legend": "Idioma da interface",

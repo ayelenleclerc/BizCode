@@ -27,6 +27,26 @@ enum UserRole {
   auditor
 }
 
+model DeliveryZone {
+  id          Int      @id @default(autoincrement())
+  tenantId    Int
+  tenant      Tenant   @relation(fields: [tenantId], references: [id])
+  nombre      String   @db.VarChar(60)
+  /// barrio | manual | predefinida
+  tipo        String   @db.VarChar(20) @default("barrio")
+  /// días de entrega separados por coma, e.g. "1,3,5"
+  diasEntrega String?  @db.VarChar(20)
+  /// horario preferido, e.g. "08:00-12:00"
+  horario     String?  @db.VarChar(30)
+  activo      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  clientes Cliente[]
+
+  @@index([tenantId])
+}
+
 model Cliente {
   id             Int      @id @default(autoincrement())
   codigo         Int      @unique
@@ -48,7 +68,9 @@ model Cliente {
   balanceInicial Decimal  @db.Decimal(14, 2) @default(0)  // saldo al migrar datos
   score          Int      @default(50)               // score de pago 0-100
   suspended      Boolean  @default(false)            // bloquea nuevas ventas
-  deliveryZoneId Int?     // FK diferida — relación en Issue #32
+  // ── Logistics (Issue #32) ─────────────────────────────────────────────────
+  deliveryZoneId Int?
+  deliveryZone   DeliveryZone? @relation(fields: [deliveryZoneId], references: [id])
   // ──────────────────────────────────────────────────────────────────────────
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
@@ -148,9 +170,10 @@ model Tenant {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 
-  users         AppUser[]
-  auditEvents   AuditEvent[]
-  notifications Notification[]
+  users          AppUser[]
+  auditEvents    AuditEvent[]
+  notifications  Notification[]
+  deliveryZones  DeliveryZone[]
 }
 
 model AppUser {

@@ -4,10 +4,10 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useHotkeys } from 'react-hotkeys-hook'
 import { useTranslation } from 'react-i18next'
-import { clientesAPI } from '@/lib/api'
+import { clientesAPI, zonasEntregaAPI } from '@/lib/api'
 import { validateCUIT, formatCUIT } from '@/lib/validators'
 import { useAuth } from '@/contexts/AuthContext'
-import { Cliente } from '@/types'
+import { Cliente, DeliveryZone } from '@/types'
 
 const clienteSchema = z.object({
   codigo: z.coerce.number().int().positive('Código debe ser positivo'),
@@ -28,6 +28,8 @@ const clienteSchema = z.object({
   creditLimit: z.coerce.number().positive().optional().nullable(),
   creditDays: z.coerce.number().int().min(0).optional(),
   suspended: z.boolean().optional(),
+  // Logistics (Issue #32)
+  deliveryZoneId: z.coerce.number().int().positive().optional().nullable(),
 })
 
 type ClienteFormData = z.infer<typeof clienteSchema>
@@ -45,6 +47,7 @@ export default function ClienteForm({ cliente, onClose, onGuardado }: ClienteFor
   const canManageFinancials = claims?.role === 'owner' || claims?.role === 'manager'
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [zones, setZones] = useState<DeliveryZone[]>([])
 
   const {
     register,
@@ -59,6 +62,10 @@ export default function ClienteForm({ cliente, onClose, onGuardado }: ClienteFor
       activo: true,
     }) as ClienteFormData,
   })
+
+  useEffect(() => {
+    zonasEntregaAPI.list().then((data) => setZones(data ?? [])).catch(() => {})
+  }, [])
 
   useEffect(() => {
     if (cliente) {
@@ -76,6 +83,7 @@ export default function ClienteForm({ cliente, onClose, onGuardado }: ClienteFor
       setValue('creditLimit', cliente.creditLimit != null ? Number(cliente.creditLimit) : null)
       setValue('creditDays', cliente.creditDays ?? 0)
       setValue('suspended', cliente.suspended ?? false)
+      setValue('deliveryZoneId', cliente.deliveryZoneId ?? null)
     }
   }, [cliente, setValue])
 
@@ -300,6 +308,23 @@ export default function ClienteForm({ cliente, onClose, onGuardado }: ClienteFor
             <label htmlFor="cliente-activo" className="text-slate-700 dark:text-slate-300 font-semibold cursor-pointer">
               {t('form.activo')}
             </label>
+          </div>
+
+          {/* ── Delivery zone ─────────────────────────────────────────────── */}
+          <div>
+            <label htmlFor="cliente-deliveryZoneId" className="block text-slate-700 dark:text-slate-300 font-semibold mb-1">
+              {t('form.deliveryZone')}
+            </label>
+            <select
+              id="cliente-deliveryZoneId"
+              {...register('deliveryZoneId')}
+              className="w-full px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 rounded border border-slate-300 dark:border-slate-600 focus:border-blue-500 focus:outline-none"
+            >
+              <option value="">{t('form.deliveryZoneNone')}</option>
+              {zones.filter((z) => z.activo).map((z) => (
+                <option key={z.id} value={z.id}>{z.nombre}</option>
+              ))}
+            </select>
           </div>
 
           {/* ── Financial section ─────────────────────────────────────────── */}

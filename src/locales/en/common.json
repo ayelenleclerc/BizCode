@@ -14,7 +14,8 @@
     "configuracion": "Settings",
     "articulos": "Products",
     "facturacion": "Invoicing",
-    "users": "Users"
+    "users": "Users",
+    "zonasEntrega": "Delivery zones"
   },
   "language": {
     "legend": "Interface language",

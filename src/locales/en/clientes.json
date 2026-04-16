@@ -38,6 +38,8 @@
       "rsocial": "Company name must be at least 3 characters",
       "generic": "Error saving customer"
     },
+    "deliveryZone": "Delivery zone",
+    "deliveryZoneNone": "No zone assigned",
     "financial": {
       "section": "Financial status",
       "creditLimit": "Credit limit",

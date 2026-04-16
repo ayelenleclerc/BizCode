@@ -407,6 +407,35 @@ export const notificationsAPI = {
   },
 }
 
+// ============ ZONAS DE ENTREGA ============
+
+export const zonasEntregaAPI = {
+  list: async () => {
+    try {
+      const response = await api.get<{ success: boolean; data: import('@/types').DeliveryZone[] }>('/zonas-entrega')
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+  create: async (body: { nombre: string; tipo?: string; diasEntrega?: string; horario?: string }) => {
+    try {
+      const response = await api.post<{ success: boolean; data: import('@/types').DeliveryZone }>('/zonas-entrega', body)
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+  update: async (id: number, body: Partial<{ nombre: string; tipo: string; diasEntrega: string; horario: string; activo: boolean }>) => {
+    try {
+      const response = await api.put<{ success: boolean; data: import('@/types').DeliveryZone }>(`/zonas-entrega/${id}`, body)
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+}
+
 // ============ HEALTH CHECK ============
 
 export const checkAPI = async () => {
