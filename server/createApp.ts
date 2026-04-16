@@ -345,6 +345,83 @@ export function createApp(prisma: PrismaClient): Application {
     }
   })
 
+  // ============ ZONAS DE ENTREGA ============
+
+  app.get('/api/zonas-entrega', requirePermission('logistics.read'), async (req: Request, res: Response) => {
+    try {
+      const authReq = req as AuthenticatedRequest
+      const tenantId = authReq.auth!.claims.tenantId
+      const zones = await prisma.deliveryZone.findMany({
+        where: { tenantId },
+        orderBy: { nombre: 'asc' },
+      })
+      res.json({ success: true, data: zones })
+    } catch (err: unknown) {
+      res.status(500).json({ success: false, error: errorMessage(err) })
+    }
+  })
+
+  app.post('/api/zonas-entrega', requirePermission('logistics.manage'), async (req: Request, res: Response) => {
+    try {
+      const authReq = req as AuthenticatedRequest
+      const tenantId = authReq.auth!.claims.tenantId
+      const { nombre, tipo, diasEntrega, horario } = req.body as {
+        nombre?: string
+        tipo?: string
+        diasEntrega?: string
+        horario?: string
+      }
+      if (!nombre?.trim()) {
+        res.status(400).json({ success: false, error: 'nombre is required' })
+        return
+      }
+      const zone = await prisma.deliveryZone.create({
+        data: { tenantId, nombre: nombre.trim(), tipo: tipo ?? 'barrio', diasEntrega, horario },
+      })
+      await writeAudit(authReq, 'delivery_zone_create', 'delivery_zone', String(zone.id))
+      res.status(201).json({ success: true, data: zone })
+    } catch (err: unknown) {
+      res.status(500).json({ success: false, error: errorMessage(err) })
+    }
+  })
+
+  app.put('/api/zonas-entrega/:id', requirePermission('logistics.manage'), async (req: Request, res: Response) => {
+    try {
+      const authReq = req as AuthenticatedRequest
+      const tenantId = authReq.auth!.claims.tenantId
+      const id = parseInt(String(req.params.id), 10)
+
+      // Verify the zone belongs to the tenant before updating
+      const existing = await prisma.deliveryZone.findFirst({ where: { id, tenantId } })
+      if (!existing) {
+        res.status(404).json({ success: false, error: 'Delivery zone not found' })
+        return
+      }
+
+      const { nombre, tipo, diasEntrega, horario, activo } = req.body as {
+        nombre?: string
+        tipo?: string
+        diasEntrega?: string
+        horario?: string
+        activo?: boolean
+      }
+      const zone = await prisma.deliveryZone.update({
+        where: { id },
+        data: {
+          ...(nombre !== undefined && { nombre: nombre.trim() }),
+          ...(tipo !== undefined && { tipo }),
+          ...(diasEntrega !== undefined && { diasEntrega }),
+          ...(horario !== undefined && { horario }),
+          ...(activo !== undefined && { activo }),
+        },
+      })
+      await writeAudit(authReq, 'delivery_zone_update', 'delivery_zone', String(zone.id))
+      res.json({ success: true, data: zone })
+    } catch (err: unknown) {
+      res.status(500).json({ success: false, error: errorMessage(err) })
+    }
+  })
+
   app.get('/api/health', (_req: Request, res: Response) => {
     res.json({ status: 'ok', timestamp: new Date().toISOString() })
   })

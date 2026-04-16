@@ -62,7 +62,7 @@ const NAV_SECTIONS: {
   },
   {
     key: 'configuracion',
-    path: '/users',
+    path: '/configuracion',
     icon: '⚙️',
     roles: ['owner', 'manager'],
   },
@@ -234,7 +234,8 @@ export default function Layout({ children }: LayoutProps) {
     localStorage.setItem('theme', newDark ? 'dark' : 'light')
   }
 
-  const isActive = (path: string) => location.pathname === path
+  const isActive = (path: string) =>
+    location.pathname === path || location.pathname.startsWith(path + '/')
 
   const userRole = claims?.role ?? null
   const visibleSections = NAV_SECTIONS.filter(

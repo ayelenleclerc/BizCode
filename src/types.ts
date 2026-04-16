@@ -88,6 +88,19 @@ export interface FacturaItem {
   createdAt?: Date
 }
 
+export interface DeliveryZone {
+  id: number
+  tenantId: number
+  nombre: string
+  /** barrio | manual | predefinida */
+  tipo: string
+  diasEntrega?: string | null
+  horario?: string | null
+  activo: boolean
+  createdAt?: Date
+  updatedAt?: Date
+}
+
 export interface ParamEmpresa {
   id: number
   nombre: string

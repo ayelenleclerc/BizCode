@@ -535,6 +535,92 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
 
+  /api/zonas-entrega:
+    get:
+      tags: [logistics]
+      summary: List delivery zones for the authenticated tenant
+      security:
+        - cookieSession: []
+      responses:
+        '200':
+          description: List of delivery zones
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeliveryZoneListEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    post:
+      tags: [logistics]
+      summary: Create a delivery zone
+      security:
+        - cookieSession: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeliveryZoneInput'
+      responses:
+        '201':
+          description: Zone created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeliveryZoneEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/zonas-entrega/{id}:
+    put:
+      tags: [logistics]
+      summary: Update a delivery zone
+      security:
+        - cookieSession: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeliveryZoneUpdateInput'
+      responses:
+        '200':
+          description: Zone updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeliveryZoneEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Zone not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
 components:
   securitySchemes:
     cookieSession:
@@ -770,7 +856,7 @@ components:
         deliveryZoneId:
           type: integer
           nullable: true
-          description: FK to DeliveryZone (deferred — Issue #32).
+          description: FK to DeliveryZone. Assign a delivery zone to this customer.
 
     ClienteInput:
       type: object
@@ -816,6 +902,9 @@ components:
           minimum: 0
         suspended:
           type: boolean
+        deliveryZoneId:
+          type: integer
+          nullable: true
 
     ClienteListEnvelope:
       type: object
@@ -1279,6 +1368,98 @@ components:
         newPassword:
           type: string
           minLength: 8
+
+    DeliveryZone:
+      type: object
+      additionalProperties: true
+      properties:
+        id:
+          type: integer
+        tenantId:
+          type: integer
+        nombre:
+          type: string
+        tipo:
+          type: string
+          enum: [barrio, manual, predefinida]
+          default: barrio
+        diasEntrega:
+          type: string
+          nullable: true
+          description: Comma-separated delivery day numbers, e.g. "1,3,5"
+        horario:
+          type: string
+          nullable: true
+          description: Preferred time window, e.g. "08:00-12:00"
+        activo:
+          type: boolean
+          default: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    DeliveryZoneInput:
+      type: object
+      required: [nombre]
+      properties:
+        nombre:
+          type: string
+          minLength: 1
+          maxLength: 60
+        tipo:
+          type: string
+          enum: [barrio, manual, predefinida]
+          default: barrio
+        diasEntrega:
+          type: string
+          maxLength: 20
+        horario:
+          type: string
+          maxLength: 30
+
+    DeliveryZoneUpdateInput:
+      type: object
+      properties:
+        nombre:
+          type: string
+          minLength: 1
+          maxLength: 60
+        tipo:
+          type: string
+          enum: [barrio, manual, predefinida]
+        diasEntrega:
+          type: string
+          maxLength: 20
+        horario:
+          type: string
+          maxLength: 30
+        activo:
+          type: boolean
+
+    DeliveryZoneListEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/DeliveryZone'
+
+    DeliveryZoneEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/DeliveryZone'
 
   responses:
     BadRequest:

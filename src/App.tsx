@@ -9,6 +9,8 @@ import UsersPage from './pages/users'
 import InicioPage from './pages/inicio'
 import LogisticaPage from './pages/logistica'
 import FinanzasPage from './pages/finanzas'
+import ConfiguracionPage from './pages/configuracion'
+import ZonasEntregaPage from './pages/configuracion/ZonasEntregaPage'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
 
 function ProtectedRoute() {
@@ -85,6 +87,9 @@ function AppRoutes() {
           {/* New section stubs — real pages delivered in Sprint 2 */}
           <Route path="logistica" element={<LogisticaPage />} />
           <Route path="finanzas" element={<FinanzasPage />} />
+          {/* Configuración */}
+          <Route path="configuracion" element={<ConfiguracionPage />} />
+          <Route path="configuracion/zonas-entrega" element={<ZonasEntregaPage />} />
         </Route>
       </Route>
       <Route path="/" element={<RootRedirect />} />
