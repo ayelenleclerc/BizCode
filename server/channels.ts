@@ -179,8 +179,8 @@ export async function dispatchNotification(
   if (managers.length === 0) return
 
   // Fetch Cliente details for email/phone if available in payload
-  let emailRecipients: string[] = []
-  let phoneRecipients: string[] = []
+  const emailRecipients: string[] = []
+  const phoneRecipients: string[] = []
 
   if (payload.clienteId) {
     try {
