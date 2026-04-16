@@ -174,6 +174,7 @@ model Tenant {
   auditEvents    AuditEvent[]
   notifications  Notification[]
   deliveryZones  DeliveryZone[]
+  chatMessages   ChatMessage[]
 }
 
 model AppUser {
@@ -194,6 +195,7 @@ model AppUser {
   sessions      AppSession[]
   auditEvents   AuditEvent[]
   notifications Notification[]
+  chatMessages  ChatMessage[]
 
   @@unique([tenantId, username])
 }
@@ -239,6 +241,18 @@ model Notification {
   createdAt DateTime  @default(now())
 
   @@index([userId, readAt])
+  @@index([tenantId, createdAt])
+}
+
+model ChatMessage {
+  id           Int      @id @default(autoincrement())
+  tenantId     Int
+  tenant       Tenant   @relation(fields: [tenantId], references: [id])
+  fromUserId   Int
+  fromUser     AppUser  @relation(fields: [fromUserId], references: [id])
+  content      String   @db.VarChar(1000)
+  createdAt    DateTime @default(now())
+
   @@index([tenantId, createdAt])
 }
 
