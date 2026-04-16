@@ -338,6 +338,117 @@ export const usersAPI = {
   },
 }
 
+// ============ DASHBOARD ============
+
+export type DashboardWidget = { count: number; total: string }
+
+export type DashboardSummaryDTO = {
+  ventasHoy: DashboardWidget
+  facturasVencidas: DashboardWidget
+  cobrosHoy: DashboardWidget
+  alertasActivas: number
+}
+
+export const dashboardAPI = {
+  summary: async (): Promise<DashboardSummaryDTO> => {
+    try {
+      const response = await api.get<{ success: boolean; data: DashboardSummaryDTO }>(
+        '/dashboard/summary',
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+}
+
+// ============ NOTIFICATIONS ============
+
+export type AppNotification = {
+  id: number
+  tenantId: number
+  userId: number
+  type: string
+  payload: Record<string, unknown>
+  readAt: string | null
+  createdAt: string
+}
+
+export const notificationsAPI = {
+  list: async (): Promise<AppNotification[]> => {
+    try {
+      const response = await api.get<{ success: boolean; data: AppNotification[] }>('/notifications')
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  markRead: async (id: number): Promise<AppNotification> => {
+    try {
+      const response = await api.put<{ success: boolean; data: AppNotification }>(
+        `/notifications/${id}/read`,
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  markAllRead: async (): Promise<{ updated: number }> => {
+    try {
+      const response = await api.put<{ success: boolean; data: { updated: number } }>(
+        '/notifications/read-all',
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+}
+
+// ============ NOTIFICATION CHANNELS ============
+
+export const notifChannelsAPI = {
+  status: async (): Promise<{ inApp: boolean; email: boolean; whatsapp: boolean }> => {
+    try {
+      const response = await api.get<{ success: boolean; data: { inApp: boolean; email: boolean; whatsapp: boolean } }>('/notifications/channels')
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+}
+
+// ============ ZONAS DE ENTREGA ============
+
+export const zonasEntregaAPI = {
+  list: async () => {
+    try {
+      const response = await api.get<{ success: boolean; data: import('@/types').DeliveryZone[] }>('/zonas-entrega')
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+  create: async (body: { nombre: string; tipo?: string; diasEntrega?: string; horario?: string }) => {
+    try {
+      const response = await api.post<{ success: boolean; data: import('@/types').DeliveryZone }>('/zonas-entrega', body)
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+  update: async (id: number, body: Partial<{ nombre: string; tipo: string; diasEntrega: string; horario: string; activo: boolean }>) => {
+    try {
+      const response = await api.put<{ success: boolean; data: import('@/types').DeliveryZone }>(`/zonas-entrega/${id}`, body)
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+}
+
 // ============ HEALTH CHECK ============
 
 export const checkAPI = async () => {

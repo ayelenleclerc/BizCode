@@ -12,6 +12,14 @@ export interface Cliente {
   email?: string
   formaPago?: number
   activo: boolean
+  // Financial fields (Issue #31)
+  creditLimit?: number | string | null
+  creditDays?: number
+  balance?: number | string
+  balanceInicial?: number | string
+  score?: number
+  suspended?: boolean
+  deliveryZoneId?: number | null
   createdAt: Date
   updatedAt: Date
 }
@@ -78,6 +86,19 @@ export interface FacturaItem {
   dscto: number | string
   subtotal: number | string
   createdAt?: Date
+}
+
+export interface DeliveryZone {
+  id: number
+  tenantId: number
+  nombre: string
+  /** barrio | manual | predefinida */
+  tipo: string
+  diasEntrega?: string | null
+  horario?: string | null
+  activo: boolean
+  createdAt?: Date
+  updatedAt?: Date
 }
 
 export interface ParamEmpresa {

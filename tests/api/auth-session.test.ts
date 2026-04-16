@@ -85,6 +85,10 @@ function buildPrismaMock(loginName: string, loginSecret: string): PrismaClient {
       updateMany: vi.fn().mockResolvedValue({ count: 1 }),
       update: vi.fn().mockResolvedValue({ id: 100 }),
     },
+    loginAttempt: {
+      create: vi.fn().mockResolvedValue({ id: 1 }),
+      findMany: vi.fn().mockResolvedValue([]), // no prior failures
+    },
     $transaction: vi.fn(),
   } as unknown as PrismaClient
 }

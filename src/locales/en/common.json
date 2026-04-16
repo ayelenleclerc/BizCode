@@ -1,15 +1,21 @@
 {
   "app": {
     "name": "BizCode",
-    "version": "v0.1.0 MVP",
     "tagline": "Commercial Management System"
   },
   "nav": {
     "main": "Main navigation",
+    "inicio": "Home",
+    "ventas": "Sales",
     "clientes": "Customers",
+    "catalogo": "Catalog",
+    "logistica": "Logistics",
+    "finanzas": "Finance",
+    "configuracion": "Settings",
     "articulos": "Products",
     "facturacion": "Invoicing",
-    "users": "Users"
+    "users": "Users",
+    "zonasEntrega": "Delivery zones"
   },
   "language": {
     "legend": "Interface language",
@@ -44,6 +50,8 @@
     },
     "errors": {
       "invalidCredentials": "Invalid username or password",
+      "accountLocked": "Account locked due to too many failed attempts. Contact your administrator.",
+      "tooManyRequests": "Too many attempts. Please wait 15 minutes and try again.",
       "generic": "Could not sign in",
       "network": "Cannot reach the server. Make sure the API is running (e.g. port 3001) and try again.",
       "timeout": "The request took too long. Please try again.",
@@ -75,10 +83,46 @@
   "status": {
     "loading": "Loading...",
     "active": "Active",
-    "inactive": "Inactive"
+    "inactive": "Inactive",
+    "comingSoon": "Coming soon in v0.2.0"
   },
   "errors": {
     "generic": "Error saving",
     "required": "Required field"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "bell": "{{count}} unread notification",
+    "bell_other": "{{count}} unread notifications",
+    "empty": "No notifications",
+    "markRead": "Mark as read",
+    "markAllRead": "Mark all as read",
+    "types": {
+      "credit_limit_exceeded": "Credit limit exceeded",
+      "invoice_overdue": "Invoice overdue",
+      "invoice_due_soon": "Invoice due soon"
+    }
+  },
+  "notifChannels": {
+    "title": "Notification channels",
+    "subtitle": "Channels configured for this tenant (read-only in this version)",
+    "inApp": "In-app",
+    "email": "Email (SMTP)",
+    "whatsapp": "WhatsApp (Twilio)",
+    "active": "Active",
+    "inactive": "Not configured",
+    "loadError": "Could not load channel status"
+  },
+  "dashboard": {
+    "title": "Today's summary",
+    "ventasHoy": "Today's sales",
+    "facturasVencidas": "Overdue invoices",
+    "cobrosHoy": "Today's collections",
+    "alertasActivas": "Active alerts",
+    "invoices": "{{count}} invoice",
+    "invoices_other": "{{count}} invoices",
+    "noData": "No data",
+    "overdueNote": "Estimated — real credit terms available in next version",
+    "pendingFeature": "Available in v0.2.0"
   }
 }

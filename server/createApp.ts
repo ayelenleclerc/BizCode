@@ -9,6 +9,9 @@ import { parse as parseYaml } from 'yaml'
 import swaggerUi from 'swagger-ui-express'
 import { registerAuthRoutes, requirePermission, resolveSession, type AuthenticatedRequest } from './auth'
 import { registerUserRoutes } from './users'
+import { registerDashboardRoutes } from './dashboard'
+import { registerNotificationRoutes } from './notifications'
+import { dispatchNotification, isSmtpConfigured, isTwilioConfigured } from './channels'
 
 const DEFAULT_CORS_ORIGINS = ['http://localhost:5173', 'http://127.0.0.1:5173'] as const
 
@@ -83,6 +86,30 @@ export function createApp(prisma: PrismaClient): Application {
 
   registerAuthRoutes(app, prisma)
   registerUserRoutes(app, prisma)
+  registerDashboardRoutes(app, prisma)
+  registerNotificationRoutes(app, prisma)
+
+  /**
+   * @en Reports which external notification channels are configured (reads env vars server-side).
+   *     No sensitive values are exposed — only boolean flags.
+   * @es Informa qué canales de notificación externos están configurados (lee env vars en servidor).
+   *     No se exponen valores sensibles — solo flags booleanos.
+   */
+  app.get('/api/notifications/channels', (req: Request, res: Response) => {
+    const authReq = req as AuthenticatedRequest
+    if (!authReq.auth) {
+      res.status(401).json({ success: false, error: 'Authentication required' })
+      return
+    }
+    res.json({
+      success: true,
+      data: {
+        inApp: true,
+        email: isSmtpConfigured(),
+        whatsapp: isTwilioConfigured(),
+      },
+    })
+  })
 
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(getOpenApiDocument()))
 
@@ -154,11 +181,21 @@ export function createApp(prisma: PrismaClient): Application {
 
   app.put('/api/clientes/:id', requirePermission('customers.manage'), async (req: Request, res: Response) => {
     try {
+      const authReq = req as AuthenticatedRequest
+      const role = authReq.auth?.claims.role
+      const canManageFinancials = role === 'owner' || role === 'manager'
+
+      // Strip financial management fields for roles without the right
+      const { creditLimit, creditDays, suspended, ...baseBody } = req.body as Record<string, unknown>
+      const data = canManageFinancials
+        ? { ...baseBody, creditLimit, creditDays, suspended }
+        : baseBody
+
       const cliente = await prisma.cliente.update({
         where: { id: parseInt(String(req.params.id), 10) },
-        data: req.body,
+        data,
       })
-      await writeAudit(req as AuthenticatedRequest, 'cliente_update', 'cliente', String(cliente.id))
+      await writeAudit(authReq, 'cliente_update', 'cliente', String(cliente.id))
       res.json({ success: true, data: cliente })
     } catch (err: unknown) {
       res.status(500).json({ success: false, error: errorMessage(err) })
@@ -279,17 +316,130 @@ export function createApp(prisma: PrismaClient): Application {
         string,
         unknown
       >
-      const result = await prisma.factura.create({
-        data: {
-          ...factura,
-          items: {
-            create: items,
-          },
-        } as Parameters<typeof prisma.factura.create>[0]['data'],
-        include: { items: true },
+      const clienteId = parseInt(String(factura.clienteId), 10)
+
+      // Check suspension before creating the factura
+      const clienteCheck = await prisma.cliente.findUnique({
+        where: { id: clienteId },
+        select: { suspended: true },
       })
+      if (clienteCheck?.suspended) {
+        res.status(422).json({ success: false, error: 'CLIENT_SUSPENDED' })
+        return
+      }
+
+      // Create factura and update customer balance atomically
+      const [result, updatedCliente] = await prisma.$transaction(async (tx) => {
+        const newFactura = await tx.factura.create({
+          data: {
+            ...factura,
+            items: { create: items },
+          } as Parameters<typeof prisma.factura.create>[0]['data'],
+          include: { items: true },
+        })
+
+        const updated = await tx.cliente.update({
+          where: { id: clienteId },
+          data: { balance: { increment: newFactura.total } },
+          select: { id: true, rsocial: true, balance: true, creditLimit: true },
+        })
+
+        return [newFactura, updated] as const
+      })
+
+      // Dispatch to all configured channels if balance exceeds credit limit (non-blocking)
+      if (
+        updatedCliente.creditLimit !== null &&
+        Number(updatedCliente.balance) > Number(updatedCliente.creditLimit)
+      ) {
+        const authReq = req as AuthenticatedRequest
+        dispatchNotification(prisma, authReq.auth!.claims.tenantId, 'credit_limit_exceeded', {
+          clienteId: updatedCliente.id,
+          rsocial: updatedCliente.rsocial,
+          amount: String(updatedCliente.balance),
+          limit: String(updatedCliente.creditLimit),
+        }).catch(() => { /* notification failure must not block the sale */ })
+      }
+
       await writeAudit(req as AuthenticatedRequest, 'factura_create', 'factura', String(result.id))
       res.json({ success: true, data: result })
+    } catch (err: unknown) {
+      res.status(500).json({ success: false, error: errorMessage(err) })
+    }
+  })
+
+  // ============ ZONAS DE ENTREGA ============
+
+  app.get('/api/zonas-entrega', requirePermission('logistics.read'), async (req: Request, res: Response) => {
+    try {
+      const authReq = req as AuthenticatedRequest
+      const tenantId = authReq.auth!.claims.tenantId
+      const zones = await prisma.deliveryZone.findMany({
+        where: { tenantId },
+        orderBy: { nombre: 'asc' },
+      })
+      res.json({ success: true, data: zones })
+    } catch (err: unknown) {
+      res.status(500).json({ success: false, error: errorMessage(err) })
+    }
+  })
+
+  app.post('/api/zonas-entrega', requirePermission('logistics.manage'), async (req: Request, res: Response) => {
+    try {
+      const authReq = req as AuthenticatedRequest
+      const tenantId = authReq.auth!.claims.tenantId
+      const { nombre, tipo, diasEntrega, horario } = req.body as {
+        nombre?: string
+        tipo?: string
+        diasEntrega?: string
+        horario?: string
+      }
+      if (!nombre?.trim()) {
+        res.status(400).json({ success: false, error: 'nombre is required' })
+        return
+      }
+      const zone = await prisma.deliveryZone.create({
+        data: { tenantId, nombre: nombre.trim(), tipo: tipo ?? 'barrio', diasEntrega, horario },
+      })
+      await writeAudit(authReq, 'delivery_zone_create', 'delivery_zone', String(zone.id))
+      res.status(201).json({ success: true, data: zone })
+    } catch (err: unknown) {
+      res.status(500).json({ success: false, error: errorMessage(err) })
+    }
+  })
+
+  app.put('/api/zonas-entrega/:id', requirePermission('logistics.manage'), async (req: Request, res: Response) => {
+    try {
+      const authReq = req as AuthenticatedRequest
+      const tenantId = authReq.auth!.claims.tenantId
+      const id = parseInt(String(req.params.id), 10)
+
+      // Verify the zone belongs to the tenant before updating
+      const existing = await prisma.deliveryZone.findFirst({ where: { id, tenantId } })
+      if (!existing) {
+        res.status(404).json({ success: false, error: 'Delivery zone not found' })
+        return
+      }
+
+      const { nombre, tipo, diasEntrega, horario, activo } = req.body as {
+        nombre?: string
+        tipo?: string
+        diasEntrega?: string
+        horario?: string
+        activo?: boolean
+      }
+      const zone = await prisma.deliveryZone.update({
+        where: { id },
+        data: {
+          ...(nombre !== undefined && { nombre: nombre.trim() }),
+          ...(tipo !== undefined && { tipo }),
+          ...(diasEntrega !== undefined && { diasEntrega }),
+          ...(horario !== undefined && { horario }),
+          ...(activo !== undefined && { activo }),
+        },
+      })
+      await writeAudit(authReq, 'delivery_zone_update', 'delivery_zone', String(zone.id))
+      res.json({ success: true, data: zone })
     } catch (err: unknown) {
       res.status(500).json({ success: false, error: errorMessage(err) })
     }

@@ -4,9 +4,10 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useHotkeys } from 'react-hotkeys-hook'
 import { useTranslation } from 'react-i18next'
-import { clientesAPI } from '@/lib/api'
+import { clientesAPI, zonasEntregaAPI } from '@/lib/api'
 import { validateCUIT, formatCUIT } from '@/lib/validators'
-import { Cliente } from '@/types'
+import { useAuth } from '@/contexts/AuthContext'
+import { Cliente, DeliveryZone } from '@/types'
 
 const clienteSchema = z.object({
   codigo: z.coerce.number().int().positive('Código debe ser positivo'),
@@ -23,6 +24,12 @@ const clienteSchema = z.object({
   telef: z.string().max(25).optional(),
   email: z.string().email('Email inválido').max(50).optional().or(z.literal('')),
   activo: z.boolean(),
+  // Financial fields — only sent when the user has manager/owner role
+  creditLimit: z.coerce.number().positive().optional().nullable(),
+  creditDays: z.coerce.number().int().min(0).optional(),
+  suspended: z.boolean().optional(),
+  // Logistics (Issue #32)
+  deliveryZoneId: z.coerce.number().int().positive().optional().nullable(),
 })
 
 type ClienteFormData = z.infer<typeof clienteSchema>
@@ -36,8 +43,11 @@ interface ClienteFormProps {
 export default function ClienteForm({ cliente, onClose, onGuardado }: ClienteFormProps) {
   const { t } = useTranslation('clientes')
   const { t: tc } = useTranslation('common')
+  const { claims } = useAuth()
+  const canManageFinancials = claims?.role === 'owner' || claims?.role === 'manager'
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [zones, setZones] = useState<DeliveryZone[]>([])
 
   const {
     register,
@@ -54,6 +64,10 @@ export default function ClienteForm({ cliente, onClose, onGuardado }: ClienteFor
   })
 
   useEffect(() => {
+    zonasEntregaAPI.list().then((data) => setZones(data ?? [])).catch(() => {})
+  }, [])
+
+  useEffect(() => {
     if (cliente) {
       setValue('codigo', cliente.codigo)
       setValue('rsocial', cliente.rsocial)
@@ -66,6 +80,10 @@ export default function ClienteForm({ cliente, onClose, onGuardado }: ClienteFor
       setValue('telef', cliente.telef)
       setValue('email', cliente.email)
       setValue('activo', cliente.activo)
+      setValue('creditLimit', cliente.creditLimit != null ? Number(cliente.creditLimit) : null)
+      setValue('creditDays', cliente.creditDays ?? 0)
+      setValue('suspended', cliente.suspended ?? false)
+      setValue('deliveryZoneId', cliente.deliveryZoneId ?? null)
     }
   }, [cliente, setValue])
 
@@ -291,6 +309,141 @@ export default function ClienteForm({ cliente, onClose, onGuardado }: ClienteFor
               {t('form.activo')}
             </label>
           </div>
+
+          {/* ── Delivery zone ─────────────────────────────────────────────── */}
+          <div>
+            <label htmlFor="cliente-deliveryZoneId" className="block text-slate-700 dark:text-slate-300 font-semibold mb-1">
+              {t('form.deliveryZone')}
+            </label>
+            <select
+              id="cliente-deliveryZoneId"
+              {...register('deliveryZoneId')}
+              className="w-full px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 rounded border border-slate-300 dark:border-slate-600 focus:border-blue-500 focus:outline-none"
+            >
+              <option value="">{t('form.deliveryZoneNone')}</option>
+              {zones.filter((z) => z.activo).map((z) => (
+                <option key={z.id} value={z.id}>{z.nombre}</option>
+              ))}
+            </select>
+          </div>
+
+          {/* ── Financial section ─────────────────────────────────────────── */}
+          {cliente && (
+            <div className="border border-slate-200 dark:border-slate-600 rounded-lg p-4 space-y-4 mt-2">
+              <div className="flex items-center justify-between">
+                <h3 className="font-semibold text-slate-700 dark:text-slate-300">
+                  {t('form.financial.section')}
+                </h3>
+                {/* Score badge */}
+                {cliente.score != null && (
+                  <span
+                    className={`text-xs font-bold px-2 py-1 rounded-full ${
+                      (cliente.score ?? 50) >= 71
+                        ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+                        : (cliente.score ?? 50) >= 41
+                          ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
+                          : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+                    }`}
+                  >
+                    {t('form.financial.scoreLabel')}: {cliente.score}{' '}
+                    {(cliente.score ?? 50) >= 71
+                      ? `— ${t('form.financial.scoreHigh')}`
+                      : (cliente.score ?? 50) >= 41
+                        ? `— ${t('form.financial.scoreMid')}`
+                        : `— ${t('form.financial.scoreLow')}`}
+                  </span>
+                )}
+                {/* Suspended badge */}
+                {cliente.suspended && (
+                  <span className="text-xs font-bold px-2 py-1 rounded-full bg-red-600 text-white">
+                    {t('form.financial.suspendedBadge')}
+                  </span>
+                )}
+              </div>
+
+              {/* Balance display (read-only for all) */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">{t('form.financial.balance')}</p>
+                  <p className="font-mono text-slate-900 dark:text-slate-100">
+                    {Number(cliente.balance ?? 0).toLocaleString('es-AR', { style: 'currency', currency: 'ARS' })}
+                  </p>
+                </div>
+                {cliente.creditLimit != null && (
+                  <div>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">{t('form.financial.creditLimit')}</p>
+                    <p className="font-mono text-slate-900 dark:text-slate-100">
+                      {Number(cliente.creditLimit).toLocaleString('es-AR', { style: 'currency', currency: 'ARS' })}
+                    </p>
+                    {/* Credit usage bar */}
+                    {cliente.creditLimit != null && Number(cliente.creditLimit) > 0 && (
+                      <div className="mt-1 h-2 rounded-full bg-slate-200 dark:bg-slate-600 overflow-hidden">
+                        <div
+                          className={`h-2 rounded-full transition-all ${
+                            Number(cliente.balance) > Number(cliente.creditLimit)
+                              ? 'bg-red-500'
+                              : Number(cliente.balance) / Number(cliente.creditLimit) > 0.8
+                                ? 'bg-yellow-500'
+                                : 'bg-green-500'
+                          }`}
+                          style={{
+                            width: `${Math.min(100, (Number(cliente.balance) / Number(cliente.creditLimit)) * 100)}%`,
+                          }}
+                        />
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Editable financial fields — manager/owner only */}
+              {canManageFinancials ? (
+                <div className="space-y-3 pt-2 border-t border-slate-200 dark:border-slate-600">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label htmlFor="cliente-creditLimit" className="block text-slate-700 dark:text-slate-300 font-semibold mb-1 text-sm">
+                        {t('form.financial.creditLimit')}
+                        <span className="ml-1 text-xs text-slate-400">({t('form.financial.creditLimitHint')})</span>
+                      </label>
+                      <input
+                        id="cliente-creditLimit"
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        {...register('creditLimit')}
+                        className="w-full px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 rounded border border-slate-300 dark:border-slate-600 focus:border-blue-500 focus:outline-none font-mono"
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="cliente-creditDays" className="block text-slate-700 dark:text-slate-300 font-semibold mb-1 text-sm">
+                        {t('form.financial.creditDays')}
+                      </label>
+                      <input
+                        id="cliente-creditDays"
+                        type="number"
+                        min="0"
+                        {...register('creditDays')}
+                        className="w-full px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 rounded border border-slate-300 dark:border-slate-600 focus:border-blue-500 focus:outline-none"
+                      />
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <input
+                      id="cliente-suspended"
+                      type="checkbox"
+                      {...register('suspended')}
+                      className="w-4 h-4 rounded bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 cursor-pointer accent-red-600"
+                    />
+                    <label htmlFor="cliente-suspended" className="text-slate-700 dark:text-slate-300 font-semibold cursor-pointer text-sm">
+                      {t('form.financial.suspended')}
+                    </label>
+                  </div>
+                </div>
+              ) : (
+                <p className="text-xs text-slate-400 italic">{t('form.financial.readOnly')}</p>
+              )}
+            </div>
+          )}
 
           <div className="flex gap-3 pt-6 border-t border-slate-200 dark:border-slate-600">
             <button

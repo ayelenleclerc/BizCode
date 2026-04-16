@@ -3,15 +3,15 @@
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
   "version": 1,
-  "serialNumber": "urn:uuid:9e1d41c7-1ea7-4930-8b8a-b6ef658c45d7",
+  "serialNumber": "urn:uuid:fb7afb4e-f3b2-44ea-b1ad-65f0739a5f99",
   "metadata": {
-    "timestamp": "2026-04-14T12:16:33.608Z",
+    "timestamp": "2026-04-16T02:50:36.098Z",
     "tools": {
       "components": [
         {
           "type": "application",
           "name": "npm",
-          "version": "10.9.8"
+          "version": "10.9.7"
         },
         {
           "type": "application",
@@ -296,6 +296,40 @@
     },
     {
       "type": "library",
+      "name": "express-rate-limit",
+      "version": "8.3.2",
+      "bom-ref": "bizcode@0.1.0|express-rate-limit@8.3.2",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/express-rate-limit@8.3.2",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/express-rate-limit/-/express-rate-limit-8.3.2.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "efb56615e2643b4febbe29840ee502e47df4a2a502e04c8e87219c71faa82de6c1d2888461f33b9f03ebb03b012f582c4e9c1fcd7f12172d8c4f74c3c91abe6e"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/express-rate-limit"
+        }
+      ]
+    },
+    {
+      "type": "library",
       "name": "express",
       "version": "5.2.1",
       "bom-ref": "bizcode@0.1.0|express@5.2.1",
@@ -359,6 +393,40 @@
         {
           "name": "cdx:npm:package:path",
           "value": "node_modules/i18next"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "nodemailer",
+      "version": "8.0.5",
+      "bom-ref": "bizcode@0.1.0|nodemailer@8.0.5",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT-0",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/nodemailer@8.0.5",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/nodemailer/-/nodemailer-8.0.5.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "d0f17c61bd7266e41f41babee7fa5926bb45e9641c8d3779fd2e09387b3d3c6171b93aa807f89cc2e078e2939d5111c96d1297d4f3e8259b58ed1e15528082f3"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/nodemailer"
         }
       ]
     },
@@ -597,6 +665,110 @@
         {
           "name": "cdx:npm:package:path",
           "value": "node_modules/swagger-ui-express"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "twilio",
+      "version": "5.13.1",
+      "bom-ref": "bizcode@0.1.0|twilio@5.13.1",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/twilio@5.13.1",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/twilio/-/twilio-5.13.1.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "b13f8f921a6d17831feedf1e5c516f3d0c78c395479c120f5db96d18f30545ef91d86c5f45d32e15bb8d03f7049b469047a2c540e9f7dfe7e10a583e4e3455a9"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/twilio"
+        }
+      ],
+      "components": [
+        {
+          "type": "library",
+          "name": "https-proxy-agent",
+          "version": "5.0.1",
+          "bom-ref": "bizcode@0.1.0|twilio@5.13.1|https-proxy-agent@5.0.1",
+          "licenses": [
+            {
+              "license": {
+                "id": "MIT",
+                "acknowledgement": "declared"
+              }
+            }
+          ],
+          "purl": "pkg:npm/https-proxy-agent@5.0.1",
+          "externalReferences": [
+            {
+              "url": "https://registry.npmjs.org/https-proxy-agent/-/https-proxy-agent-5.0.1.tgz",
+              "type": "distribution",
+              "hashes": [
+                {
+                  "alg": "SHA-512",
+                  "content": "7457008e94d0160a0b3330b657053e0bf09b4bbb912f49569b10c84e6aa6ec2fbb17439d9a3eacf65e9a95973a0042d786b9e080cd827964971c639d5f662dc0"
+                }
+              ],
+              "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+            }
+          ],
+          "properties": [
+            {
+              "name": "cdx:npm:package:path",
+              "value": "node_modules/twilio/node_modules/https-proxy-agent"
+            }
+          ]
+        },
+        {
+          "type": "library",
+          "name": "agent-base",
+          "version": "6.0.2",
+          "bom-ref": "bizcode@0.1.0|twilio@5.13.1|agent-base@6.0.2",
+          "licenses": [
+            {
+              "license": {
+                "id": "MIT",
+                "acknowledgement": "declared"
+              }
+            }
+          ],
+          "purl": "pkg:npm/agent-base@6.0.2",
+          "externalReferences": [
+            {
+              "url": "https://registry.npmjs.org/agent-base/-/agent-base-6.0.2.tgz",
+              "type": "distribution",
+              "hashes": [
+                {
+                  "alg": "SHA-512",
+                  "content": "45937035c945efe312ffc6c383bd1a9a0df6772799199c620ee42667128b025423af78c6c8bc7ee0a924e7c50eec3d90760148402a2fb92b991129dee911ba5d"
+                }
+              ],
+              "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+            }
+          ],
+          "properties": [
+            {
+              "name": "cdx:npm:package:path",
+              "value": "node_modules/twilio/node_modules/agent-base"
+            }
+          ]
         }
       ]
     },
@@ -974,6 +1146,40 @@
         {
           "name": "cdx:npm:package:path",
           "value": "node_modules/vary"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "ip-address",
+      "version": "10.1.0",
+      "bom-ref": "bizcode@0.1.0|ip-address@10.1.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/ip-address@10.1.0",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/ip-address/-/ip-address-10.1.0.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "5d70031f15e6bd3f7e091c615e0e7a2c9a2f13e6e65a711607bf0b07cdd5653a6b29399a0b941faee5e8731cd36762a5d033702ae05d9488632fc2de63c49ff1"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/ip-address"
         }
       ]
     },
@@ -2209,6 +2415,142 @@
     },
     {
       "type": "library",
+      "name": "dayjs",
+      "version": "1.11.20",
+      "bom-ref": "bizcode@0.1.0|dayjs@1.11.20",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/dayjs@1.11.20",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/dayjs/-/dayjs-1.11.20.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "61bc30a91fee6297a83f8a6ed38deaf8b4c32c504b02950fe95c518a175f353aaee2e6ea3251832dde84ad784482ccaf6342ba9c2b3b9e0818ba600dfbdb84b9"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/dayjs"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "jsonwebtoken",
+      "version": "9.0.3",
+      "bom-ref": "bizcode@0.1.0|jsonwebtoken@9.0.3",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/jsonwebtoken@9.0.3",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/jsonwebtoken/-/jsonwebtoken-9.0.3.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "313ff13f40abb9b15134b34abf12760587f2e776649befb96d7f5db6e3dba80790a5355ed0c4131616a8f3e0a9fff126269db8e31b7a0ebc3f1951060948f8d2"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/jsonwebtoken"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "scmp",
+      "version": "2.1.0",
+      "bom-ref": "bizcode@0.1.0|scmp@2.1.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "BSD-3-Clause",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/scmp@2.1.0",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/scmp/-/scmp-2.1.0.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "a3f99140693d45c7abfe3104c3fcb0e26c28dc453f36f62fa79efbfc1b6aaf29bd432e7f31d58606a8a96c02e077696b7564c9e7f82a0eeb317e7401c4ec53d9"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/scmp"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "xmlbuilder",
+      "version": "13.0.2",
+      "bom-ref": "bizcode@0.1.0|xmlbuilder@13.0.2",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/xmlbuilder@13.0.2",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/xmlbuilder/-/xmlbuilder-13.0.2.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "12ec748b641d0d829b75b03a00ceb11389ba65366be06e3117d91a848dae91210c0b3c1c7b6797f56953239277b3e354ee1a5ab05b2bf2158838d69eecb96e01"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/xmlbuilder"
+        }
+      ]
+    },
+    {
+      "type": "library",
       "name": "react",
       "group": "@types",
       "version": "18.3.28",
@@ -3065,6 +3407,312 @@
     },
     {
       "type": "library",
+      "name": "jws",
+      "version": "4.0.1",
+      "bom-ref": "bizcode@0.1.0|jws@4.0.1",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/jws@4.0.1",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/jws/-/jws-4.0.1.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "10a23f33fcaa3e7706514878e31cf43f14a275716bffeaf4a40ef4fa0218863bfe7adef2c4cfacdbd63e5460e4a2f4687d07a6d1fb3b52f7f8f9898077245db8"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/jws"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "lodash.includes",
+      "version": "4.3.0",
+      "bom-ref": "bizcode@0.1.0|lodash.includes@4.3.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/lodash.includes@4.3.0",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/lodash.includes/-/lodash.includes-4.3.0.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "5b7071ea67644531ad9492123af543fe56ea8d394f3d40d33279576459d5c22f4d289ead88093a2d5765859326d7b5598acaa129c833a4ee56cfdd4f0ade5bd3"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/lodash.includes"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "lodash.isboolean",
+      "version": "3.0.3",
+      "bom-ref": "bizcode@0.1.0|lodash.isboolean@3.0.3",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/lodash.isboolean@3.0.3",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/lodash.isboolean/-/lodash.isboolean-3.0.3.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "073e66ba9cb64956cf1d4441f7c540730f9a1e1e2f455e483cd8482d40ac3b3466b13992435ee322eaa8a407a7b56a1e864b7119df5efe16c85eaf7cd3fd5026"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/lodash.isboolean"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "lodash.isinteger",
+      "version": "4.0.4",
+      "bom-ref": "bizcode@0.1.0|lodash.isinteger@4.0.4",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/lodash.isinteger@4.0.4",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/lodash.isinteger/-/lodash.isinteger-4.0.4.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "0c1c2d11637671a1d0f7f8a688d784039cacd49a11b517d8ddded5f7092ab5bc9c9c0993bd14666c72835786b411873aefcfdd89ad23aed7b8b6363054169950"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/lodash.isinteger"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "lodash.isnumber",
+      "version": "3.0.3",
+      "bom-ref": "bizcode@0.1.0|lodash.isnumber@3.0.3",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/lodash.isnumber@3.0.3",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/lodash.isnumber/-/lodash.isnumber-3.0.3.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "418ab3a5fc0edff0967f75cff99fad910b1f68b2ff1275255d6564224e4550f738b017537a112a64e36ec91b763faecf5c093e35799305c73def3c3db75150af"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/lodash.isnumber"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "lodash.isplainobject",
+      "version": "4.0.6",
+      "bom-ref": "bizcode@0.1.0|lodash.isplainobject@4.0.6",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/lodash.isplainobject@4.0.6",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/lodash.isplainobject/-/lodash.isplainobject-4.0.6.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "a125f3696ca908c1e43c2dcdbc111a3c77f42ac0399af3eb38f810583b1b83c9fba2b676f743340660bf8e0459e2f709e834c0863aec49881db16fc5f8c14e04"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/lodash.isplainobject"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "lodash.isstring",
+      "version": "4.0.1",
+      "bom-ref": "bizcode@0.1.0|lodash.isstring@4.0.1",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/lodash.isstring@4.0.1",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/lodash.isstring/-/lodash.isstring-4.0.1.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "d302717f11f5c203b71ab6ee3fe7534e4ee8a7ee8be354025db188344983fa7cbf1bf782a86cf1c82b21ef5e7d4be9a00c37286ab9c1c3a3c2d4f4b9fb050683"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/lodash.isstring"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "lodash.once",
+      "version": "4.1.1",
+      "bom-ref": "bizcode@0.1.0|lodash.once@4.1.1",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/lodash.once@4.1.1",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/lodash.once/-/lodash.once-4.1.1.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "49be3ceda4ce0abf5dad054bf292313b356169f3a364df54539e2188df0f537b8089257b971d7260da5b3667b1d8f2ba752268353489514b304fae75cb0c3732"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/lodash.once"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "semver",
+      "version": "7.7.4",
+      "bom-ref": "bizcode@0.1.0|semver@7.7.4",
+      "licenses": [
+        {
+          "license": {
+            "id": "ISC",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/semver@7.7.4",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/semver/-/semver-7.7.4.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "bc5282d8812d427561a53efc875629f30cf0adff0233e33328c1c62597c1b738593727111675ec1e4e84e53c4892432c80d4bb99d5f700607bc7640cd9d8b894"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/semver"
+        }
+      ]
+    },
+    {
+      "type": "library",
       "name": "prop-types",
       "group": "@types",
       "version": "15.7.15",
@@ -3516,6 +4164,74 @@
     },
     {
       "type": "library",
+      "name": "jwa",
+      "version": "2.0.1",
+      "bom-ref": "bizcode@0.1.0|jwa@2.0.1",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/jwa@2.0.1",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/jwa/-/jwa-2.0.1.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "851174e1fa8920ff006db92ae4d28637405baf7271950faa859b9f5d5af40efba32b2f776426d764c1c32f810eb687526c25b13aa47c312d6d5c0e61c2a0970e"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/jwa"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "safe-buffer",
+      "version": "5.1.2",
+      "bom-ref": "bizcode@0.1.0|safe-buffer@5.1.2",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/safe-buffer@5.1.2",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/safe-buffer/-/safe-buffer-5.1.2.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "19dd94641243917958ec66c9c5fb04f3f9ef2a45045351b7f1cd6c88de903fa6bd3d3f4c98707c1a7a6c71298c252a05f0b388aedf2e77fc0fb688f2b381bafa"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/safe-buffer"
+        }
+      ]
+    },
+    {
+      "type": "library",
       "name": "call-bind-apply-helpers",
       "version": "1.0.2",
       "bom-ref": "bizcode@0.1.0|call-bind-apply-helpers@1.0.2",
@@ -3788,6 +4504,74 @@
     },
     {
       "type": "library",
+      "name": "buffer-equal-constant-time",
+      "version": "1.0.1",
+      "bom-ref": "bizcode@0.1.0|buffer-equal-constant-time@1.0.1",
+      "licenses": [
+        {
+          "license": {
+            "id": "BSD-3-Clause",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/buffer-equal-constant-time@1.0.1",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/buffer-equal-constant-time/-/buffer-equal-constant-time-1.0.1.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "cd1a54883c1dff193a003a8f3004c6f2f73d54fae4724ed3d3b388c748278e62409c79d35573501b7bdfbd636e899224c2ef4aaca740d6224a7ec7d357113a34"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/buffer-equal-constant-time"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "ecdsa-sig-formatter",
+      "version": "1.0.11",
+      "bom-ref": "bizcode@0.1.0|ecdsa-sig-formatter@1.0.11",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/ecdsa-sig-formatter@1.0.11",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/ecdsa-sig-formatter/-/ecdsa-sig-formatter-1.0.11.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "9da825dd162b6cdbfa91091e248a6de8d259cbcb702c1ff6bedcfac8df59e2f44a1cde3f41924811baa88402d283029d9e4b2e63793901d769e6583cb15a1571"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/ecdsa-sig-formatter"
+        }
+      ]
+    },
+    {
+      "type": "library",
       "name": "dunder-proto",
       "version": "1.0.1",
       "bom-ref": "bizcode@0.1.0|dunder-proto@1.0.1",
@@ -3830,8 +4614,10 @@
         "bizcode@0.1.0|axios@1.14.0",
         "bizcode@0.1.0|cors@2.8.6",
         "bizcode@0.1.0|dotenv@17.3.1",
+        "bizcode@0.1.0|express-rate-limit@8.3.2",
         "bizcode@0.1.0|express@5.2.1",
         "bizcode@0.1.0|i18next@26.0.3",
+        "bizcode@0.1.0|nodemailer@8.0.5",
         "bizcode@0.1.0|react-dom@18.3.1",
         "bizcode@0.1.0|react-hook-form@7.72.0",
         "bizcode@0.1.0|react-hotkeys-hook@4.6.2",
@@ -3839,6 +4625,7 @@
         "bizcode@0.1.0|react-router-dom@6.30.3",
         "bizcode@0.1.0|react@18.3.1",
         "bizcode@0.1.0|swagger-ui-express@5.0.1",
+        "bizcode@0.1.0|twilio@5.13.1",
         "bizcode@0.1.0|yaml@2.8.3",
         "bizcode@0.1.0|zod@3.25.76",
         "bizcode@0.1.0|zustand@4.5.7"
@@ -3871,6 +4658,13 @@
     },
     {
       "ref": "bizcode@0.1.0|dotenv@17.3.1"
+    },
+    {
+      "ref": "bizcode@0.1.0|express-rate-limit@8.3.2",
+      "dependsOn": [
+        "bizcode@0.1.0|express@5.2.1",
+        "bizcode@0.1.0|ip-address@10.1.0"
+      ]
     },
     {
       "ref": "bizcode@0.1.0|express@5.2.1",
@@ -3911,6 +4705,9 @@
         "bizcode@0.1.0|@babel/runtime@7.29.2",
         "bizcode@0.1.0|typescript@5.9.3"
       ]
+    },
+    {
+      "ref": "bizcode@0.1.0|nodemailer@8.0.5"
     },
     {
       "ref": "bizcode@0.1.0|react-dom@18.3.1",
@@ -3967,6 +4764,31 @@
       ]
     },
     {
+      "ref": "bizcode@0.1.0|twilio@5.13.1",
+      "dependsOn": [
+        "bizcode@0.1.0|axios@1.14.0",
+        "bizcode@0.1.0|dayjs@1.11.20",
+        "bizcode@0.1.0|twilio@5.13.1|https-proxy-agent@5.0.1",
+        "bizcode@0.1.0|jsonwebtoken@9.0.3",
+        "bizcode@0.1.0|qs@6.15.0",
+        "bizcode@0.1.0|scmp@2.1.0",
+        "bizcode@0.1.0|xmlbuilder@13.0.2"
+      ]
+    },
+    {
+      "ref": "bizcode@0.1.0|twilio@5.13.1|https-proxy-agent@5.0.1",
+      "dependsOn": [
+        "bizcode@0.1.0|twilio@5.13.1|agent-base@6.0.2",
+        "bizcode@0.1.0|debug@4.4.3"
+      ]
+    },
+    {
+      "ref": "bizcode@0.1.0|twilio@5.13.1|agent-base@6.0.2",
+      "dependsOn": [
+        "bizcode@0.1.0|debug@4.4.3"
+      ]
+    },
+    {
       "ref": "bizcode@0.1.0|yaml@2.8.3"
     },
     {
@@ -4013,6 +4835,9 @@
     },
     {
       "ref": "bizcode@0.1.0|vary@1.1.2"
+    },
+    {
+      "ref": "bizcode@0.1.0|ip-address@10.1.0"
     },
     {
       "ref": "bizcode@0.1.0|accepts@2.0.0",
@@ -4222,6 +5047,30 @@
       ]
     },
     {
+      "ref": "bizcode@0.1.0|dayjs@1.11.20"
+    },
+    {
+      "ref": "bizcode@0.1.0|jsonwebtoken@9.0.3",
+      "dependsOn": [
+        "bizcode@0.1.0|jws@4.0.1",
+        "bizcode@0.1.0|lodash.includes@4.3.0",
+        "bizcode@0.1.0|lodash.isboolean@3.0.3",
+        "bizcode@0.1.0|lodash.isinteger@4.0.4",
+        "bizcode@0.1.0|lodash.isnumber@3.0.3",
+        "bizcode@0.1.0|lodash.isplainobject@4.0.6",
+        "bizcode@0.1.0|lodash.isstring@4.0.1",
+        "bizcode@0.1.0|lodash.once@4.1.1",
+        "bizcode@0.1.0|ms@2.1.3",
+        "bizcode@0.1.0|semver@7.7.4"
+      ]
+    },
+    {
+      "ref": "bizcode@0.1.0|scmp@2.1.0"
+    },
+    {
+      "ref": "bizcode@0.1.0|xmlbuilder@13.0.2"
+    },
+    {
       "ref": "bizcode@0.1.0|@types/react@18.3.28",
       "dependsOn": [
         "bizcode@0.1.0|@types/prop-types@15.7.15",
@@ -4329,6 +5178,37 @@
       "ref": "bizcode@0.1.0|@scarf/scarf@1.4.0"
     },
     {
+      "ref": "bizcode@0.1.0|jws@4.0.1",
+      "dependsOn": [
+        "bizcode@0.1.0|jwa@2.0.1",
+        "bizcode@0.1.0|safe-buffer@5.1.2"
+      ]
+    },
+    {
+      "ref": "bizcode@0.1.0|lodash.includes@4.3.0"
+    },
+    {
+      "ref": "bizcode@0.1.0|lodash.isboolean@3.0.3"
+    },
+    {
+      "ref": "bizcode@0.1.0|lodash.isinteger@4.0.4"
+    },
+    {
+      "ref": "bizcode@0.1.0|lodash.isnumber@3.0.3"
+    },
+    {
+      "ref": "bizcode@0.1.0|lodash.isplainobject@4.0.6"
+    },
+    {
+      "ref": "bizcode@0.1.0|lodash.isstring@4.0.1"
+    },
+    {
+      "ref": "bizcode@0.1.0|lodash.once@4.1.1"
+    },
+    {
+      "ref": "bizcode@0.1.0|semver@7.7.4"
+    },
+    {
       "ref": "bizcode@0.1.0|@types/prop-types@15.7.15"
     },
     {
@@ -4400,6 +5280,17 @@
       ]
     },
     {
+      "ref": "bizcode@0.1.0|jwa@2.0.1",
+      "dependsOn": [
+        "bizcode@0.1.0|buffer-equal-constant-time@1.0.1",
+        "bizcode@0.1.0|ecdsa-sig-formatter@1.0.11",
+        "bizcode@0.1.0|safe-buffer@5.1.2"
+      ]
+    },
+    {
+      "ref": "bizcode@0.1.0|safe-buffer@5.1.2"
+    },
+    {
       "ref": "bizcode@0.1.0|call-bind-apply-helpers@1.0.2",
       "dependsOn": [
         "bizcode@0.1.0|es-errors@1.3.0",
@@ -4436,6 +5327,15 @@
       "dependsOn": [
         "bizcode@0.1.0|call-bind-apply-helpers@1.0.2",
         "bizcode@0.1.0|get-intrinsic@1.3.0"
+      ]
+    },
+    {
+      "ref": "bizcode@0.1.0|buffer-equal-constant-time@1.0.1"
+    },
+    {
+      "ref": "bizcode@0.1.0|ecdsa-sig-formatter@1.0.11",
+      "dependsOn": [
+        "bizcode@0.1.0|safe-buffer@5.1.2"
       ]
     },
     {
