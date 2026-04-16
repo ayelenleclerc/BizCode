@@ -36,15 +36,15 @@ const FACTURA_BODY = {
   prefijo: '0001',
   numero: 1,
   clienteId: 1,
-  neto1: '826.45',
-  neto2: '0',
-  neto3: '0',
-  iva1: '173.55',
-  iva2: '0',
-  total: '1000.00',
+  neto1: 826.45,
+  neto2: 0,
+  neto3: 0,
+  iva1: 173.55,
+  iva2: 0,
+  total: 1000.0,
   formaPagoId: null,
   estado: 'A',
-  items: [{ articuloId: 1, cantidad: 2, precio: '500.00', dscto: '0', subtotal: '1000.00' }],
+  items: [{ articuloId: 1, cantidad: 2, precio: 500.0, dscto: 0, subtotal: 1000.0 }],
 }
 
 const FACTURA_RESULT = {
@@ -396,7 +396,14 @@ describe('PUT /api/clientes/:id — financial field access', () => {
     const app = createApp(prisma)
     const res = await request(app)
       .put('/api/clientes/1')
-      .send({ rsocial: 'ACME SA', creditLimit: 5000, suspended: true })
+      .send({
+        codigo: CLIENTE_BASE.codigo,
+        rsocial: 'ACME SA',
+        condIva: 'RI',
+        activo: true,
+        creditLimit: 5000,
+        suspended: true,
+      })
       .expect(200)
 
     expect(res.body.success).toBe(true)
@@ -422,7 +429,14 @@ describe('PUT /api/clientes/:id — financial field access', () => {
     const app = createApp(prisma)
     await request(app)
       .put('/api/clientes/1')
-      .send({ rsocial: 'ACME SA', creditLimit: 5000, suspended: true })
+      .send({
+        codigo: CLIENTE_BASE.codigo,
+        rsocial: 'ACME SA',
+        condIva: 'RI',
+        activo: true,
+        creditLimit: 5000,
+        suspended: true,
+      })
       .expect(200)
 
     const callArg = clienteUpdate.mock.calls[0][0] as { data: Record<string, unknown> }
