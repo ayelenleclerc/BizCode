@@ -535,6 +535,38 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
 
+  /api/notifications/channels:
+    get:
+      tags: [notifications]
+      summary: Report which external notification channels are configured
+      description: Returns boolean flags for each channel. No sensitive values are exposed.
+      security:
+        - cookieSession: []
+      responses:
+        '200':
+          description: Channel status
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [success, data]
+                properties:
+                  success:
+                    type: boolean
+                    const: true
+                  data:
+                    type: object
+                    required: [inApp, email, whatsapp]
+                    properties:
+                      inApp:
+                        type: boolean
+                      email:
+                        type: boolean
+                      whatsapp:
+                        type: boolean
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
   /api/zonas-entrega:
     get:
       tags: [logistics]

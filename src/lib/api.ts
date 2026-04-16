@@ -407,6 +407,19 @@ export const notificationsAPI = {
   },
 }
 
+// ============ NOTIFICATION CHANNELS ============
+
+export const notifChannelsAPI = {
+  status: async (): Promise<{ inApp: boolean; email: boolean; whatsapp: boolean }> => {
+    try {
+      const response = await api.get<{ success: boolean; data: { inApp: boolean; email: boolean; whatsapp: boolean } }>('/notifications/channels')
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+}
+
 // ============ ZONAS DE ENTREGA ============
 
 export const zonasEntregaAPI = {

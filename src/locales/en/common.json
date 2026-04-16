@@ -103,6 +103,16 @@
       "invoice_due_soon": "Invoice due soon"
     }
   },
+  "notifChannels": {
+    "title": "Notification channels",
+    "subtitle": "Channels configured for this tenant (read-only in this version)",
+    "inApp": "In-app",
+    "email": "Email (SMTP)",
+    "whatsapp": "WhatsApp (Twilio)",
+    "active": "Active",
+    "inactive": "Not configured",
+    "loadError": "Could not load channel status"
+  },
   "dashboard": {
     "title": "Today's summary",
     "ventasHoy": "Today's sales",
