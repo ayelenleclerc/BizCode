@@ -48,6 +48,12 @@
 
 * [ClienteEnvelope](./clienteenvelope.md) – `-`
 
+* [ClienteImportEnvelope](./clienteimportenvelope.md) – `-`
+
+* [ClienteImportResult](./clienteimportresult.md) – `-`
+
+* [ClienteImportRowError](./clienteimportrowerror.md) – `-`
+
 * [ClienteInput](./clienteinput.md) – `-`
 
 * [ClienteListEnvelope](./clientelistenvelope.md) – `-`
@@ -159,6 +165,8 @@
 * [Untitled array in ChatConversationListEnvelope](./chatconversationlistenvelope-properties-data.md) – `undefined#/properties/data`
 
 * [Untitled array in ChatMessageListEnvelope](./chatmessagelistenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled array in ClienteImportResult](./clienteimportresult-properties-errors.md) – `undefined#/properties/errors`
 
 * [Untitled array in ClienteListEnvelope](./clientelistenvelope-properties-data.md) – `undefined#/properties/data`
 

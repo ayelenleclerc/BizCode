@@ -170,6 +170,59 @@ paths:
         '403':
           $ref: '#/components/responses/ForbiddenError'
 
+  /api/clientes/import/template:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [clientes]
+      summary: Download UTF-8 CSV template for bulk customer import
+      responses:
+        '200':
+          description: CSV with fixed header row and one example data row (UTF-8 BOM)
+          content:
+            text/csv:
+              schema:
+                type: string
+                format: binary
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /api/clientes/import:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    post:
+      tags: [clientes]
+      summary: Import customers from a CSV file
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: UTF-8 CSV; first row must match the template headers exactly
+      responses:
+        '200':
+          description: Import summary (rows created vs skipped with per-row errors)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClienteImportEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/ServerError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
   /api/clientes/{id}:
     parameters:
       - $ref: '#/components/parameters/BizcodeChannelHeader'
@@ -1129,6 +1182,42 @@ components:
         deliveryZoneId:
           type: integer
           nullable: true
+
+    ClienteImportRowError:
+      type: object
+      required: [row, message]
+      properties:
+        row:
+          type: integer
+          minimum: 2
+          description: Data row number in the file (row 1 is the header)
+        message:
+          type: string
+
+    ClienteImportResult:
+      type: object
+      required: [created, skipped, errors]
+      properties:
+        created:
+          type: integer
+          minimum: 0
+        skipped:
+          type: integer
+          minimum: 0
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ClienteImportRowError'
+
+    ClienteImportEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/ClienteImportResult'
 
     ClienteListEnvelope:
       type: object

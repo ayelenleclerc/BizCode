@@ -947,6 +947,238 @@ One-time endpoint to create initial tenant and owner user.
 }
 ```
 
+### PARAMETERS /api/clientes/import/template
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/clientes/import/template`
+
+### Download UTF-8 CSV template for bulk customer import
+
+- **Method:** `GET`
+- **Path:** `/api/clientes/import/template`
+- **Tags:** clientes
+
+#### Responses
+
+##### Status: 200 CSV with fixed header row and one example data row (UTF-8 BOM)
+
+###### Content-Type: text/csv
+
+`string`, format: `binary`
+
+**Example:**
+
+```json
+{}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/clientes/import
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/clientes/import`
+
+### Import customers from a CSV file
+
+- **Method:** `POST`
+- **Path:** `/api/clientes/import`
+- **Tags:** clientes
+
+#### Request Body
+
+##### Content-Type: multipart/form-data
+
+- **`file` (required)**
+
+  `string`, format: `binary` — UTF-8 CSV; first row must match the template headers exactly
+
+**Example:**
+
+```json
+{
+  "file": {}
+}
+```
+
+#### Responses
+
+##### Status: 200 Import summary (rows created vs skipped with per-row errors)
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`created` (required)**
+
+    `integer`
+
+  - **`errors` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`message` (required)**
+
+      `string`
+
+    - **`row` (required)**
+
+      `integer` — Data row number in the file (row 1 is the header)
+
+  - **`skipped` (required)**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "created": 0,
+    "skipped": 0,
+    "errors": [
+      {
+        "row": 2,
+        "message": ""
+      }
+    ]
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ### PARAMETERS /api/clientes/{id}
 
 - **Method:** `PARAMETERS`
@@ -6309,6 +6541,120 @@ Returns boolean flags for each channel. No sensitive values are exposed.
   "creditDays": 0,
   "suspended": true,
   "deliveryZoneId": 1
+}
+```
+
+### ClienteImportRowError
+
+- **Type:**`object`
+
+* **`message` (required)**
+
+  `string`
+
+* **`row` (required)**
+
+  `integer` — Data row number in the file (row 1 is the header)
+
+**Example:**
+
+```json
+{
+  "row": 2,
+  "message": ""
+}
+```
+
+### ClienteImportResult
+
+- **Type:**`object`
+
+* **`created` (required)**
+
+  `integer`
+
+* **`errors` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`message` (required)**
+
+    `string`
+
+  - **`row` (required)**
+
+    `integer` — Data row number in the file (row 1 is the header)
+
+* **`skipped` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "created": 0,
+  "skipped": 0,
+  "errors": [
+    {
+      "row": 2,
+      "message": ""
+    }
+  ]
+}
+```
+
+### ClienteImportEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`created` (required)**
+
+    `integer`
+
+  - **`errors` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`message` (required)**
+
+      `string`
+
+    - **`row` (required)**
+
+      `integer` — Data row number in the file (row 1 is the header)
+
+  - **`skipped` (required)**
+
+    `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "created": 0,
+    "skipped": 0,
+    "errors": [
+      {
+        "row": 2,
+        "message": ""
+      }
+    ]
+  }
 }
 ```
 

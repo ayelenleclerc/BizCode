@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "created": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "errors": {
+      "items": {
+        "$ref": "./ClienteImportRowError.schema.json"
+      },
+      "type": "array"
+    },
+    "skipped": {
+      "minimum": 0,
+      "type": "integer"
+    }
+  },
+  "required": [
+    "created",
+    "skipped",
+    "errors"
+  ],
+  "title": "ClienteImportResult",
+  "type": "object"
+}

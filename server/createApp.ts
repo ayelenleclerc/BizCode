@@ -3,6 +3,8 @@ import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import express from 'express'
 import type { Application, Request, Response } from 'express'
+import multer from 'multer'
+import { parse } from 'csv-parse/sync'
 import cors from 'cors'
 import type { PrismaClient, Prisma } from '@prisma/client'
 import { parse as parseYaml } from 'yaml'
@@ -338,6 +340,167 @@ function validateFacturaInput(raw: unknown): ValidationResult<FacturaInput> {
   }
 }
 
+const CLIENTE_IMPORT_CSV_HEADERS = [
+  'codigo',
+  'rsocial',
+  'condIva',
+  'activo',
+  'fantasia',
+  'cuit',
+  'domicilio',
+  'localidad',
+  'cpost',
+  'telef',
+  'email',
+  'creditLimit',
+  'creditDays',
+  'suspended',
+  'deliveryZoneId',
+] as const
+
+const CLIENTE_IMPORT_MAX_FILE_BYTES = 1024 * 1024
+const CLIENTE_IMPORT_MAX_ROWS = 2000
+
+const clienteImportUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: CLIENTE_IMPORT_MAX_FILE_BYTES },
+  fileFilter: (_req, file, cb) => {
+    if (file.originalname.toLowerCase().endsWith('.csv')) {
+      cb(null, true)
+      return
+    }
+    cb(null, false)
+  },
+}).single('file')
+
+function buildClienteImportTemplateCsv(): string {
+  const header = CLIENTE_IMPORT_CSV_HEADERS.join(',')
+  const example = [
+    '1001',
+    'Ejemplo SA',
+    'RI',
+    'true',
+    '',
+    '20-12345678-9',
+    'Calle 123',
+    'Córdoba',
+    '5000',
+    '351-5550100',
+    'contacto@example.com',
+    '',
+    '0',
+    'false',
+    '',
+  ].join(',')
+  return `\uFEFF${header}\n${example}\n`
+}
+
+function optionalTrimmedCsv(value: string | undefined): string | undefined {
+  const t = (value ?? '').trim()
+  return t === '' ? undefined : t
+}
+
+/** `null` = invalid cell; `undefined` = empty (caller decides if allowed). */
+function parseCsvBooleanCell(value: string): boolean | null | undefined {
+  const v = value.trim().toLowerCase()
+  if (v === '') return undefined
+  if (['true', '1', 'yes', 'sí', 'si'].includes(v)) return true
+  if (['false', '0', 'no'].includes(v)) return false
+  return null
+}
+
+function csvRowToRawCliente(row: Record<string, string>): Record<string, unknown> {
+  const raw: Record<string, unknown> = {}
+  const codigoStr = (row.codigo ?? '').trim()
+  if (codigoStr === '') {
+    raw.codigo = undefined
+  } else {
+    const n = Number.parseInt(codigoStr, 10)
+    raw.codigo = Number.isNaN(n) ? Number.NaN : n
+  }
+  const rs = (row.rsocial ?? '').trim()
+  raw.rsocial = rs === '' ? undefined : rs
+  const ci = (row.condIva ?? '').trim()
+  raw.condIva = ci === '' ? undefined : ci
+  const activoCell = (row.activo ?? '').trim()
+  if (activoCell === '') {
+    raw.activo = undefined
+  } else {
+    const b = parseCsvBooleanCell(activoCell)
+    raw.activo = b === null ? null : b
+  }
+  const fantasia = optionalTrimmedCsv(row.fantasia)
+  if (fantasia !== undefined) raw.fantasia = fantasia
+  const cuit = optionalTrimmedCsv(row.cuit)
+  if (cuit !== undefined) raw.cuit = cuit
+  const domicilio = optionalTrimmedCsv(row.domicilio)
+  if (domicilio !== undefined) raw.domicilio = domicilio
+  const localidad = optionalTrimmedCsv(row.localidad)
+  if (localidad !== undefined) raw.localidad = localidad
+  const cpost = optionalTrimmedCsv(row.cpost)
+  if (cpost !== undefined) raw.cpost = cpost
+  const telef = optionalTrimmedCsv(row.telef)
+  if (telef !== undefined) raw.telef = telef
+  const email = optionalTrimmedCsv(row.email)
+  if (email !== undefined) raw.email = email
+  const cl = (row.creditLimit ?? '').trim()
+  if (cl !== '') {
+    const n = Number.parseFloat(cl)
+    raw.creditLimit = Number.isNaN(n) ? Number.NaN : n
+  }
+  const cd = (row.creditDays ?? '').trim()
+  if (cd !== '') {
+    const n = Number.parseInt(cd, 10)
+    raw.creditDays = Number.isNaN(n) ? Number.NaN : n
+  }
+  const sus = (row.suspended ?? '').trim()
+  if (sus !== '') {
+    const b = parseCsvBooleanCell(sus)
+    raw.suspended = b === null ? null : b
+  }
+  const dz = (row.deliveryZoneId ?? '').trim()
+  if (dz !== '') {
+    const n = Number.parseInt(dz, 10)
+    raw.deliveryZoneId = Number.isNaN(n) ? Number.NaN : n
+  }
+  return raw
+}
+
+function parseClienteImportCsv(
+  buffer: Buffer,
+): { ok: true; records: Record<string, string>[] } | { ok: false; error: string } {
+  try {
+    const records = parse(buffer, {
+      columns: (header: string[]) => {
+        const trimmed = header.map((h) => String(h).trim())
+        if (
+          trimmed.length !== CLIENTE_IMPORT_CSV_HEADERS.length ||
+          !CLIENTE_IMPORT_CSV_HEADERS.every((h, i) => trimmed[i] === h)
+        ) {
+          throw new Error('INVALID_CSV_HEADERS')
+        }
+        return CLIENTE_IMPORT_CSV_HEADERS.map((name) => ({ name }))
+      },
+      skip_empty_lines: true,
+      trim: true,
+      bom: true,
+      relax_column_count: true,
+    }) as Record<string, string>[]
+    if (records.length > CLIENTE_IMPORT_MAX_ROWS) {
+      return { ok: false, error: `Too many data rows (max ${CLIENTE_IMPORT_MAX_ROWS})` }
+    }
+    return { ok: true, records }
+  } catch (e: unknown) {
+    if (e instanceof Error && e.message === 'INVALID_CSV_HEADERS') {
+      return {
+        ok: false,
+        error: 'Invalid CSV headers. Download the template and keep the header row unchanged.',
+      }
+    }
+    return { ok: false, error: errorMessage(e) }
+  }
+}
+
 let cachedOpenApiDocument: Record<string, unknown> | undefined
 
 /**
@@ -451,6 +614,105 @@ export function createApp(prisma: PrismaClient): Application {
     } catch (err: unknown) {
       res.status(500).json({ success: false, error: errorMessage(err) })
     }
+  })
+
+  app.get('/api/clientes/import/template', requirePermission('customers.manage'), (_req: Request, res: Response) => {
+    const body = buildClienteImportTemplateCsv()
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8')
+    res.setHeader('Content-Disposition', 'attachment; filename="clientes_import_template.csv"')
+    res.send(body)
+  })
+
+  app.post('/api/clientes/import', requirePermission('customers.manage'), (req: Request, res: Response) => {
+    clienteImportUpload(req, res, (multerErr: unknown) => {
+      void (async () => {
+        if (multerErr) {
+          const code =
+            typeof multerErr === 'object' &&
+            multerErr !== null &&
+            'code' in multerErr &&
+            typeof (multerErr as { code: unknown }).code === 'string'
+              ? (multerErr as { code: string }).code
+              : ''
+          if (code === 'LIMIT_FILE_SIZE') {
+            res.status(400).json({ success: false, error: 'File too large' })
+            return
+          }
+          res.status(400).json({ success: false, error: errorMessage(multerErr) })
+          return
+        }
+        const file = (req as Request & { file?: Express.Multer.File }).file
+        if (!file?.buffer) {
+          res.status(400).json({ success: false, error: 'Expected multipart field "file" with a .csv file' })
+          return
+        }
+        try {
+          const parsedCsv = parseClienteImportCsv(file.buffer)
+          if (!parsedCsv.ok) {
+            res.status(400).json({ success: false, error: parsedCsv.error })
+            return
+          }
+          const errors: { row: number; message: string }[] = []
+          const seenCodigos = new Map<number, number>()
+          const validatedRows: { row: number; input: ClienteInput }[] = []
+          for (const [i, row] of parsedCsv.records.entries()) {
+            const rowNum = i + 2
+            const raw = csvRowToRawCliente(row)
+            const parsed = validateClienteInput(raw)
+            if (!parsed.ok) {
+              errors.push({ row: rowNum, message: parsed.error })
+              continue
+            }
+            const codigo = parsed.value.codigo
+            const firstRow = seenCodigos.get(codigo)
+            if (firstRow !== undefined) {
+              errors.push({
+                row: rowNum,
+                message: `Duplicate codigo ${codigo} (first occurrence on row ${firstRow})`,
+              })
+              continue
+            }
+            seenCodigos.set(codigo, rowNum)
+            validatedRows.push({ row: rowNum, input: parsed.value })
+          }
+          const codigos = validatedRows.map((r) => r.input.codigo)
+          const existing =
+            codigos.length === 0
+              ? []
+              : await prisma.cliente.findMany({
+                  where: { codigo: { in: codigos } },
+                  select: { codigo: true },
+                })
+          const existingSet = new Set(existing.map((e) => e.codigo))
+          const toInsert: ClienteInput[] = []
+          for (const vr of validatedRows) {
+            if (existingSet.has(vr.input.codigo)) {
+              errors.push({ row: vr.row, message: `codigo ${vr.input.codigo} already exists` })
+              continue
+            }
+            toInsert.push(vr.input)
+          }
+          let created = 0
+          await prisma.$transaction(async (tx) => {
+            for (const data of toInsert) {
+              await tx.cliente.create({ data })
+              created += 1
+            }
+          })
+          const authReq = req as AuthenticatedRequest
+          await writeAudit(authReq, 'cliente_import', 'cliente', undefined, {
+            createdCount: created,
+            errorCount: errors.length,
+          })
+          res.json({
+            success: true,
+            data: { created, skipped: errors.length, errors },
+          })
+        } catch (err: unknown) {
+          res.status(500).json({ success: false, error: errorMessage(err) })
+        }
+      })()
+    })
   })
 
   app.get('/api/clientes/:id', requirePermission('customers.read'), async (req: Request, res: Response) => {

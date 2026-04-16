@@ -83,10 +83,20 @@ function buildPrisma(): PrismaClient {
   const facturaCreate = vi.fn().mockResolvedValue(facturaRow)
   // tx-level cliente.update: returns the financial summary the route uses for the credit check
   const txClienteUpdate = vi.fn().mockResolvedValue({ id: 1, rsocial: 'ACME SA', balance: 121, creditLimit: null })
+  const clienteTxCreate = vi.fn().mockResolvedValue(clienteRow)
 
   const p = {
     cliente: {
-      findMany: vi.fn().mockResolvedValue([clienteRow]),
+      findMany: vi.fn((args?: unknown) => {
+        const w =
+          args && typeof args === 'object' && args !== null && 'where' in args
+            ? (args as { where?: { codigo?: { in?: number[] } } }).where
+            : undefined
+        if (w?.codigo && typeof w.codigo === 'object' && Array.isArray(w.codigo.in)) {
+          return Promise.resolve([])
+        }
+        return Promise.resolve([clienteRow])
+      }),
       findUnique: vi.fn().mockResolvedValue(clienteRow),
       create: vi.fn().mockResolvedValue(clienteRow),
       update: vi.fn().mockResolvedValue(clienteRow), // PUT /api/clientes/:id returns full row
@@ -114,7 +124,7 @@ function buildPrisma(): PrismaClient {
       if (typeof arg === 'function') {
         const tx = {
           factura: { create: facturaCreate },
-          cliente: { update: txClienteUpdate },
+          cliente: { update: txClienteUpdate, create: clienteTxCreate },
         }
         return arg(tx)
       }
@@ -160,6 +170,21 @@ describe('API — contrato OpenAPI', () => {
     const app = createApp(prisma)
     const res = await request(app).post('/api/clientes').send(clienteInput).expect(200)
     await assertMatchesOpenApi('/api/clientes', 'post', '200', res.body)
+  })
+
+  it('POST /api/clientes/import', async () => {
+    const app = createApp(prisma)
+    const header =
+      'codigo,rsocial,condIva,activo,fantasia,cuit,domicilio,localidad,cpost,telef,email,creditLimit,creditDays,suspended,deliveryZoneId'
+    const row = '2001,Import Co SA,RI,true,,,,,,,,,0,false,'
+    const res = await request(app)
+      .post('/api/clientes/import')
+      .attach('file', Buffer.from(`${header}\n${row}\n`, 'utf8'), 'clientes.csv')
+      .expect(200)
+    await assertMatchesOpenApi('/api/clientes/import', 'post', '200', res.body)
+    expect(res.body.data.created).toBe(1)
+    expect(res.body.data.skipped).toBe(0)
+    expect(res.body.data.errors).toEqual([])
   })
 
   it('PUT /api/clientes/:id', async () => {

@@ -12,6 +12,23 @@
     "activo": "Active"
   },
   "empty": "No customers found. Create one with F3.",
+  "import": {
+    "button": "Import CSV",
+    "title": "Import customers from CSV",
+    "description": "Download the template, fill rows in Excel or similar, and export as UTF-8 CSV. The header row must match the template exactly.",
+    "downloadTemplate": "Download CSV template",
+    "chooseFile": "Choose .csv file",
+    "submit": "Import",
+    "close": "Close",
+    "loading": "Importing…",
+    "successSummary": "Import finished: {{created}} created, {{skipped}} skipped.",
+    "errorsHeading": "Rows with errors",
+    "row": "Row",
+    "message": "Message",
+    "errorNetwork": "Import could not be completed. Check your connection and try again.",
+    "errorGeneric": "Import failed. Check the file and try again.",
+    "hintFormat": "Only .csv files. Max size 1 MB and up to 2000 data rows."
+  },
   "form": {
     "titleNew": "New Customer",
     "titleEdit": "Edit Customer #{{codigo}}",

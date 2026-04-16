@@ -12,6 +12,23 @@
     "activo": "Ativo"
   },
   "empty": "Nenhum cliente encontrado. Crie um com F3.",
+  "import": {
+    "button": "Importar CSV",
+    "title": "Importar clientes via CSV",
+    "description": "Baixe o modelo, preencha as linhas no Excel ou similar e exporte como CSV UTF-8. A primeira linha deve coincidir exatamente com o modelo.",
+    "downloadTemplate": "Baixar modelo CSV",
+    "chooseFile": "Escolher arquivo .csv",
+    "submit": "Importar",
+    "close": "Fechar",
+    "loading": "Importando…",
+    "successSummary": "Importação concluída: {{created}} criados, {{skipped}} ignorados.",
+    "errorsHeading": "Linhas com erro",
+    "row": "Linha",
+    "message": "Mensagem",
+    "errorNetwork": "Não foi possível concluir a importação. Verifique a conexão e tente novamente.",
+    "errorGeneric": "Falha na importação. Verifique o arquivo e tente novamente.",
+    "hintFormat": "Somente arquivos .csv. Tamanho máximo 1 MB e até 2000 linhas de dados."
+  },
   "form": {
     "titleNew": "Novo Cliente",
     "titleEdit": "Editar Cliente #{{codigo}}",
