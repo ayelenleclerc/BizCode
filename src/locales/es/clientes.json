@@ -37,6 +37,22 @@
       "cuit": "CUIT inválido",
       "rsocial": "Razón social mínimo 3 caracteres",
       "generic": "Error al guardar cliente"
+    },
+    "financial": {
+      "section": "Estado financiero",
+      "creditLimit": "Límite de crédito",
+      "creditLimitHint": "Vacío = sin límite",
+      "creditDays": "Días de plazo",
+      "balance": "Saldo acumulado",
+      "balanceInicial": "Saldo inicial",
+      "score": "Score de pago",
+      "suspended": "Suspendido (bloquea nuevas ventas)",
+      "scoreLabel": "Score",
+      "scoreLow": "Riesgo alto",
+      "scoreMid": "Riesgo medio",
+      "scoreHigh": "Buen pagador",
+      "suspendedBadge": "SUSPENDIDO",
+      "readOnly": "Solo lectura — tu rol no puede modificar datos financieros"
     }
   }
 }

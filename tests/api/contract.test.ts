@@ -59,12 +59,16 @@ const facturaRow = {
 }
 
 function buildPrisma(): PrismaClient {
-  return {
+  const facturaCreate = vi.fn().mockResolvedValue(facturaRow)
+  // tx-level cliente.update: returns the financial summary the route uses for the credit check
+  const txClienteUpdate = vi.fn().mockResolvedValue({ id: 1, rsocial: 'ACME SA', balance: 121, creditLimit: null })
+
+  const p = {
     cliente: {
       findMany: vi.fn().mockResolvedValue([clienteRow]),
       findUnique: vi.fn().mockResolvedValue(clienteRow),
       create: vi.fn().mockResolvedValue(clienteRow),
-      update: vi.fn().mockResolvedValue(clienteRow),
+      update: vi.fn().mockResolvedValue(clienteRow), // PUT /api/clientes/:id returns full row
     },
     articulo: {
       findMany: vi.fn().mockResolvedValue([articuloRow]),
@@ -81,9 +85,23 @@ function buildPrisma(): PrismaClient {
     },
     factura: {
       findMany: vi.fn().mockResolvedValue([]),
-      create: vi.fn().mockResolvedValue(facturaRow),
+      create: facturaCreate,
+      aggregate: vi.fn().mockResolvedValue({ _count: { id: 0 }, _sum: { total: null } }),
     },
+    // $transaction: shares facturaCreate so mockRejectedValueOnce propagates for 500 tests
+    $transaction: vi.fn(async (arg: unknown) => {
+      if (typeof arg === 'function') {
+        const tx = {
+          factura: { create: facturaCreate },
+          cliente: { update: txClienteUpdate },
+        }
+        return arg(tx)
+      }
+      return arg
+    }),
   } as unknown as PrismaClient
+
+  return p
 }
 
 describe('API — contrato OpenAPI', () => {
