@@ -22,7 +22,7 @@ Defined in [`prisma/schema.prisma`](../../../prisma/schema.prisma):
 5. **Logout:** `POST /api/auth/logout` revokes matching sessions by cookie hash, clears the cookie, and may write `logout` to `AuditEvent` when `req.auth` is present.
 6. **Current user:** `GET /api/auth/me` returns `req.auth.claims` or `401` if not authenticated.
 
-**Not evidenced in current codebase:** HTTP header `x-bizcode-channel` is not read in `server/auth.ts` or `server/createApp.ts`; channel data comes from persisted `AppUser.scopeChannels` only.
+`x-bizcode-channel` is read in `requirePermission` (`server/auth.ts`) and validated against the authenticated `claims.scope.channels`. Invalid header values return `400`; out-of-scope channels return `403`.
 
 ## Application audit (mutations)
 
@@ -59,7 +59,7 @@ Defined in [`prisma/schema.prisma`](../../../prisma/schema.prisma):
 
 - Session and auth flows: [`tests/api/auth-session.test.ts`](../../../tests/api/auth-session.test.ts)
 - Authorization (permission checks): [`tests/api/authz.test.ts`](../../../tests/api/authz.test.ts)
-- **`tests/server/scope-channel.test.ts`:** not present in the repository at the time of writing.
+- Channel scope enforcement tests: [`tests/server/scope-channel.test.ts`](../../../tests/server/scope-channel.test.ts)
 
 ## Related documents
 
