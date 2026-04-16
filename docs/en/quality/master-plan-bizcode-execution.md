@@ -51,6 +51,7 @@ Priorities below are **planning** items; verification is against the repository 
 | BP1-2 | P1 | E2E / integration coverage for critical paths | Align with [testing-strategy.md](testing-strategy.md) and existing Playwright/Postgres tooling |
 | BP1-3 | P1 | Channel scope enforcement | **Implemented in current codebase:** `requirePermission` in [`server/auth.ts`](../../../server/auth.ts) validates optional `x-bizcode-channel` against `AuthScope.channels`; invalid header returns `400`, out-of-scope returns `403`. Covered by [`tests/server/scope-channel.test.ts`](../../../tests/server/scope-channel.test.ts) |
 | BP1-4 | P1 | Internal chat (minimum scope) | Implemented with `/api/chat/conversations`, `/api/chat/messages`, unread counters via `Notification` (`chat_message`), paginated message history, and UI route `/chat` in `src/pages/chat/index.tsx` |
+| BP1-5 | P1 | DBF customer ETL readiness (#51) | Discovery documented in `scripts/MIGRACION_PROGRAMA_VIEJO.md` (explicit `COND`/`BAJA`/`CREDITO` mapping and rejection policy); no production customer ETL implementation in this phase |
 
 ## Repository status vs this package
 
