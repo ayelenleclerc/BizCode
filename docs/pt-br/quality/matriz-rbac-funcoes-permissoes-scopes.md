@@ -25,7 +25,7 @@ Os literais completos estão em `PERMISSIONS` no mesmo arquivo.
 
 ## Canais (`USER_CHANNELS`)
 
-Definidos no código: `counter`, `field`, `backoffice`, `warehouse`, `delivery`. Fazem parte de `AuthScope.channels` e persistem em `AppUser.scopeChannels` (schema Prisma). O **enforcement** do “canal atual” em cada requisição HTTP **não está evidenciado** em `server/auth.ts` ou `server/createApp.ts` na data deste texto; o escopo é carregado em `AuthClaims` para uso futuro.
+Definidos no código: `counter`, `field`, `backoffice`, `warehouse`, `delivery`. Fazem parte de `AuthScope.channels` e persistem em `AppUser.scopeChannels` (schema Prisma). O enforcement está ativo via `requirePermission` em [`server/auth.ts`](../../../server/auth.ts), validando `x-bizcode-channel` opcional contra o escopo de `AuthClaims`.
 
 ## Local vs SaaS
 

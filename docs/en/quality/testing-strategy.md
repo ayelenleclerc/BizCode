@@ -68,6 +68,7 @@ e2e/
   smoke.spec.ts         ← Playwright smoke (production bundle via vite preview)
 tests/integration/
   api.integration.test.ts  ← HTTP + real Prisma against PostgreSQL (`npm run test:integration`; excluded from default Vitest)
+  dbf-migration.integration.test.ts ← Generates minimal DBF fixtures at runtime and validates `scripts/migrate-from-dbf.ts` against PostgreSQL
 ```
 
 Vitest **excludes** `e2e/**` (`vitest.config.ts`) so files under `e2e/` are only executed by Playwright. **`tests/integration/**`** is excluded from the default Vitest run (no `DATABASE_URL` required for `npm run test:coverage`); integration tests use `vitest.integration.config.ts`.

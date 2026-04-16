@@ -49,8 +49,9 @@ Priorities below are **planning** items; verification is against the repository 
 | BP0-4 | P0 | Auth on domain API | Routes under `/api/clientes`, `/api/articulos`, `/api/rubros`, `/api/facturas`, `/api/formas-pago` use `requirePermission` in [`server/createApp.ts`](../../../server/createApp.ts); contract in [`docs/api/openapi.yaml`](../../api/openapi.yaml) |
 | BP1-1 | P1 | Order (`pedido`) domain | **Future:** Prisma model + migration + routes only when specified in OpenAPI and implemented in `server/` |
 | BP1-2 | P1 | E2E / integration coverage for critical paths | Align with [testing-strategy.md](testing-strategy.md) and existing Playwright/Postgres tooling |
-| BP1-3 | P1 | Channel scope enforcement | **Not evidenced in current codebase:** no `x-bizcode-channel` handling in `server/auth.ts` or `server/createApp.ts`; `tests/server/scope-channel.test.ts` is **not present**. Acceptance when implemented: middleware or equivalent uses `AuthScope.channels` from [`src/lib/rbac.ts`](../../../src/lib/rbac.ts) and tests prove it |
-| BP1-4 | P1 | DBF customer ETL readiness (#51) | Discovery documented in `scripts/MIGRACION_PROGRAMA_VIEJO.md` (explicit `COND`/`BAJA`/`CREDITO` mapping and rejection policy); no production customer ETL implementation in this phase |
+| BP1-3 | P1 | Channel scope enforcement | **Implemented in current codebase:** `requirePermission` in [`server/auth.ts`](../../../server/auth.ts) validates optional `x-bizcode-channel` against `AuthScope.channels`; invalid header returns `400`, out-of-scope returns `403`. Covered by [`tests/server/scope-channel.test.ts`](../../../tests/server/scope-channel.test.ts) |
+| BP1-4 | P1 | Internal chat (minimum scope) | Implemented with `/api/chat/conversations`, `/api/chat/messages`, unread counters via `Notification` (`chat_message`), paginated message history, and UI route `/chat` in `src/pages/chat/index.tsx` |
+| BP1-5 | P1 | DBF customer ETL readiness (#51) | Discovery documented in `scripts/MIGRACION_PROGRAMA_VIEJO.md` (explicit `COND`/`BAJA`/`CREDITO` mapping and rejection policy); no production customer ETL implementation in this phase |
 
 ## Repository status vs this package
 

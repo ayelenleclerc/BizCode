@@ -5,7 +5,7 @@
 - **OpenAPI Version:** `3.1.0`
 - **API Version:** `0.1.0`
 
-REST API for BizCode commercial management system. Runs as an Express 5 sidecar on localhost:3001. Responses use a JSON envelope `{ success: true, data: ... }` except `/api/health`. Session authentication is required for protected resources. Interactive documentation (Swagger UI): <http://localhost:3001/api-docs/> (same contract as this file).
+REST API for BizCode commercial management system. Runs as an Express 5 sidecar on localhost:3001. Responses use a JSON envelope `{ success: true, data: ... }` except `/api/health`. Session authentication is required for protected resources. Protected endpoints can optionally receive `x-bizcode-channel` to enforce channel scope authorization. Interactive documentation (Swagger UI): <http://localhost:3001/api-docs/> (same contract as this file).
 
 ## Servers
 
@@ -453,6 +453,11 @@ One-time endpoint to create initial tenant and owner user.
 }
 ```
 
+### PARAMETERS /api/clientes
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/clientes`
+
 ### List customers
 
 - **Method:** `GET`
@@ -858,6 +863,27 @@ One-time endpoint to create initial tenant and owner user.
 }
 ```
 
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ##### Status: 401 Authentication required or invalid credentials
 
 ###### Content-Type: application/json
@@ -920,6 +946,11 @@ One-time endpoint to create initial tenant and owner user.
   "error": ""
 }
 ```
+
+### PARAMETERS /api/clientes/{id}
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/clientes/{id}`
 
 ### Get customer by id
 
@@ -1246,6 +1277,27 @@ One-time endpoint to create initial tenant and owner user.
 }
 ```
 
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ##### Status: 401 Authentication required or invalid credentials
 
 ###### Content-Type: application/json
@@ -1308,6 +1360,11 @@ One-time endpoint to create initial tenant and owner user.
   "error": ""
 }
 ```
+
+### PARAMETERS /api/articulos
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/articulos`
 
 ### List products
 
@@ -1668,6 +1725,27 @@ One-time endpoint to create initial tenant and owner user.
 }
 ```
 
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ##### Status: 401 Authentication required or invalid credentials
 
 ###### Content-Type: application/json
@@ -1730,6 +1808,11 @@ One-time endpoint to create initial tenant and owner user.
   "error": ""
 }
 ```
+
+### PARAMETERS /api/articulos/{id}
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/articulos/{id}`
 
 ### Get product by id
 
@@ -2022,6 +2105,27 @@ One-time endpoint to create initial tenant and owner user.
 }
 ```
 
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ##### Status: 401 Authentication required or invalid credentials
 
 ###### Content-Type: application/json
@@ -2084,6 +2188,11 @@ One-time endpoint to create initial tenant and owner user.
   "error": ""
 }
 ```
+
+### PARAMETERS /api/rubros
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/rubros`
 
 ### List product categories
 
@@ -2265,6 +2374,27 @@ One-time endpoint to create initial tenant and owner user.
 }
 ```
 
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ##### Status: 401 Authentication required or invalid credentials
 
 ###### Content-Type: application/json
@@ -2327,6 +2457,11 @@ One-time endpoint to create initial tenant and owner user.
   "error": ""
 }
 ```
+
+### PARAMETERS /api/facturas
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/facturas`
 
 ### List invoices
 
@@ -2963,6 +3098,27 @@ One-time endpoint to create initial tenant and owner user.
 }
 ```
 
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ##### Status: 401 Authentication required or invalid credentials
 
 ###### Content-Type: application/json
@@ -3025,6 +3181,11 @@ One-time endpoint to create initial tenant and owner user.
   "error": ""
 }
 ```
+
+### PARAMETERS /api/facturas/{id}/void
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/facturas/{id}/void`
 
 ### Void an invoice
 
@@ -3275,7 +3436,26 @@ Sets `estado` to `N` (anulada), reverses the customer balance by the invoice tot
 }
 ```
 
-##### Status: 400
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
 
 ##### Status: 401 Authentication required or invalid credentials
 
@@ -3319,7 +3499,26 @@ Sets `estado` to `N` (anulada), reverses the customer balance by the invoice tot
 }
 ```
 
-##### Status: 404
+##### Status: 404 Invoice not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
 
 ##### Status: 409 Invoice already voided
 
@@ -3362,6 +3561,11 @@ Sets `estado` to `N` (anulada), reverses the customer balance by the invoice tot
   "error": ""
 }
 ```
+
+### PARAMETERS /api/formas-pago
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/formas-pago`
 
 ### List payment methods
 
@@ -3438,6 +3642,11 @@ Sets `estado` to `N` (anulada), reverses the customer balance by the invoice tot
   "error": ""
 }
 ```
+
+### PARAMETERS /api/users
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/users`
 
 ### List users for the current tenant
 
@@ -3898,6 +4107,11 @@ Creates a new user in the current tenant. Requires `users.manage` and `roles.ass
 }
 ```
 
+### PARAMETERS /api/users/{id}
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/users/{id}`
+
 ### Update a user
 
 - **Method:** `PUT`
@@ -4174,6 +4388,11 @@ Updates role, active flag, or scope for a user in the current tenant. Requires `
 }
 ```
 
+### PARAMETERS /api/auth/change-password
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/auth/change-password`
+
 ### Change own password
 
 - **Method:** `POST`
@@ -4295,6 +4514,11 @@ Allows the authenticated user to change their password by supplying the current 
 }
 ```
 
+### PARAMETERS /api/notifications/channels
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/notifications/channels`
+
 ### Report which external notification channels are configured
 
 - **Method:** `GET`
@@ -4362,6 +4586,437 @@ Returns boolean flags for each channel. No sensitive values are exposed.
   "error": ""
 }
 ```
+
+### List chat conversations for authenticated user
+
+- **Method:** `GET`
+- **Path:** `/api/chat/conversations`
+- **Tags:** chat
+
+#### Responses
+
+##### Status: 200 Conversations with unread counts
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`lastMessage`**
+
+    `object`
+
+  - **`unreadCount`**
+
+    `integer`
+
+  - **`user`**
+
+    `object`
+
+    - **`id`**
+
+      `integer`
+
+    - **`role`**
+
+      `string`
+
+    - **`username`**
+
+      `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "user": {
+        "id": 1,
+        "username": "",
+        "role": ""
+      },
+      "unreadCount": 0,
+      "lastMessage": {
+        "id": 1,
+        "fromUserId": 1,
+        "toUserId": 1,
+        "preview": "",
+        "createdAt": ""
+      }
+    }
+  ]
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Send a chat message to another user
+
+- **Method:** `POST`
+- **Path:** `/api/chat/messages`
+- **Tags:** chat
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`content` (required)**
+
+  `string`
+
+- **`toUserId` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "toUserId": 1,
+  "content": ""
+}
+```
+
+#### Responses
+
+##### Status: 201 Message created
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`content`**
+
+    `string`
+
+  - **`createdAt`**
+
+    `string`, format: `date-time`
+
+  - **`fromUserId`**
+
+    `integer`
+
+  - **`id`**
+
+    `integer`
+
+  - **`tenantId`**
+
+    `integer`
+
+  - **`toUserId`**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "fromUserId": 1,
+    "toUserId": 1,
+    "content": "",
+    "createdAt": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Recipient not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Get paginated message history with a user
+
+- **Method:** `GET`
+- **Path:** `/api/chat/messages/{userId}`
+- **Tags:** chat
+
+#### Responses
+
+##### Status: 200 Conversation history
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`content`**
+
+    `string`
+
+  - **`createdAt`**
+
+    `string`, format: `date-time`
+
+  - **`fromUserId`**
+
+    `integer`
+
+  - **`id`**
+
+    `integer`
+
+  - **`tenantId`**
+
+    `integer`
+
+  - **`toUserId`**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "fromUserId": 1,
+      "toUserId": 1,
+      "content": "",
+      "createdAt": ""
+    }
+  ]
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 User not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/zonas-entrega
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/zonas-entrega`
 
 ### List delivery zones for the authenticated tenant
 
@@ -4696,6 +5351,11 @@ Returns boolean flags for each channel. No sensitive values are exposed.
   "error": ""
 }
 ```
+
+### PARAMETERS /api/zonas-entrega/{id}
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/zonas-entrega/{id}`
 
 ### Update a delivery zone
 
@@ -7910,6 +8570,287 @@ Returns boolean flags for each channel. No sensitive values are exposed.
 {
   "currentPassword": "",
   "newPassword": ""
+}
+```
+
+### ChatMessage
+
+- **Type:**`object`
+
+* **`content`**
+
+  `string`
+
+* **`createdAt`**
+
+  `string`, format: `date-time`
+
+* **`fromUserId`**
+
+  `integer`
+
+* **`id`**
+
+  `integer`
+
+* **`tenantId`**
+
+  `integer`
+
+* **`toUserId`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "tenantId": 1,
+  "fromUserId": 1,
+  "toUserId": 1,
+  "content": "",
+  "createdAt": ""
+}
+```
+
+### ChatMessageCreateInput
+
+- **Type:**`object`
+
+* **`content` (required)**
+
+  `string`
+
+* **`toUserId` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "toUserId": 1,
+  "content": ""
+}
+```
+
+### ChatConversation
+
+- **Type:**`object`
+
+* **`lastMessage`**
+
+  `object`
+
+* **`unreadCount`**
+
+  `integer`
+
+* **`user`**
+
+  `object`
+
+  - **`id`**
+
+    `integer`
+
+  - **`role`**
+
+    `string`
+
+  - **`username`**
+
+    `string`
+
+**Example:**
+
+```json
+{
+  "user": {
+    "id": 1,
+    "username": "",
+    "role": ""
+  },
+  "unreadCount": 0,
+  "lastMessage": {
+    "id": 1,
+    "fromUserId": 1,
+    "toUserId": 1,
+    "preview": "",
+    "createdAt": ""
+  }
+}
+```
+
+### ChatConversationListEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`lastMessage`**
+
+    `object`
+
+  - **`unreadCount`**
+
+    `integer`
+
+  - **`user`**
+
+    `object`
+
+    - **`id`**
+
+      `integer`
+
+    - **`role`**
+
+      `string`
+
+    - **`username`**
+
+      `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "user": {
+        "id": 1,
+        "username": "",
+        "role": ""
+      },
+      "unreadCount": 0,
+      "lastMessage": {
+        "id": 1,
+        "fromUserId": 1,
+        "toUserId": 1,
+        "preview": "",
+        "createdAt": ""
+      }
+    }
+  ]
+}
+```
+
+### ChatMessageListEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`content`**
+
+    `string`
+
+  - **`createdAt`**
+
+    `string`, format: `date-time`
+
+  - **`fromUserId`**
+
+    `integer`
+
+  - **`id`**
+
+    `integer`
+
+  - **`tenantId`**
+
+    `integer`
+
+  - **`toUserId`**
+
+    `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "fromUserId": 1,
+      "toUserId": 1,
+      "content": "",
+      "createdAt": ""
+    }
+  ]
+}
+```
+
+### ChatMessageEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`content`**
+
+    `string`
+
+  - **`createdAt`**
+
+    `string`, format: `date-time`
+
+  - **`fromUserId`**
+
+    `integer`
+
+  - **`id`**
+
+    `integer`
+
+  - **`tenantId`**
+
+    `integer`
+
+  - **`toUserId`**
+
+    `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "fromUserId": 1,
+    "toUserId": 1,
+    "content": "",
+    "createdAt": ""
+  }
 }
 ```
 

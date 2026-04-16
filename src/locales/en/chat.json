@@ -1,0 +1,20 @@
+{
+  "title": "Internal chat",
+  "conversations": "Conversations",
+  "emptyConversations": "No conversations available.",
+  "noMessages": "No messages yet",
+  "unread": "{{count}} unread",
+  "withUser": "Chat with {{username}}",
+  "selectConversation": "Select a conversation",
+  "loading": "Loading messages...",
+  "emptyMessages": "No messages yet.",
+  "messagePlaceholder": "Write a message...",
+  "send": "Send",
+  "sending": "Sending...",
+  "errors": {
+    "loadConversations": "Could not load conversations.",
+    "loadMessages": "Could not load messages.",
+    "send": "Could not send message."
+  }
+}
+

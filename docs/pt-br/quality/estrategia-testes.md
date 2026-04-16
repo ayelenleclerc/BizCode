@@ -59,6 +59,7 @@ tests/api/contract.test.ts, validate-openapi-response.ts
 tests/server/server.test.ts  ← bootstrap `server.ts` (mock Prisma; ADR-0005)
 e2e/smoke.spec.ts
 tests/integration/api.integration.test.ts  ← HTTP + Prisma real (`npm run test:integration`; excluído do Vitest padrão)
+tests/integration/dbf-migration.integration.test.ts  ← gera fixtures DBF mínimos em runtime e valida `scripts/migrate-from-dbf.ts` no PostgreSQL
 ```
 
 O Vitest **exclui** `e2e/**` (`vitest.config.ts`) para que apenas o Playwright execute esses arquivos. **`tests/integration/**`** fica fora do `npm run test:coverage` (não exige `DATABASE_URL`); integração usa `vitest.integration.config.ts`.

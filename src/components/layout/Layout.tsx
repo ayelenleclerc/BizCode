@@ -61,6 +61,12 @@ const NAV_SECTIONS: {
     roles: ['owner', 'manager', 'billing', 'cashier', 'collections', 'finance', 'auditor'],
   },
   {
+    key: 'chat',
+    path: '/chat',
+    icon: '💬',
+    roles: null,
+  },
+  {
     key: 'configuracion',
     path: '/configuracion',
     icon: '⚙️',

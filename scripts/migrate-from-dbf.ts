@@ -203,7 +203,7 @@ async function migrateClientesPlaceholder() {
   console.log(`[migrate-from-dbf] Clientes insertados: ${result.count}`)
 }
 
-async function main() {
+export async function runDbfMigration() {
   if (!process.env.DATABASE_URL) {
     console.error('DATABASE_URL no está definida. Configura .env en la raíz del proyecto.')
     process.exit(1)
@@ -215,11 +215,13 @@ async function main() {
   console.log('[migrate-from-dbf] Listo.')
 }
 
-main()
-  .catch((e) => {
-    console.error(e)
-    process.exit(1)
-  })
-  .finally(async () => {
-    await prisma.$disconnect()
-  })
+if (import.meta.url === `file://${process.argv[1]}`) {
+  runDbfMigration()
+    .catch((e) => {
+      console.error(e)
+      process.exit(1)
+    })
+    .finally(async () => {
+      await prisma.$disconnect()
+    })
+}

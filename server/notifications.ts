@@ -6,6 +6,7 @@ export const NOTIFICATION_TYPES = [
   'credit_limit_exceeded',
   'invoice_overdue',
   'invoice_due_soon',
+  'chat_message',
 ] as const
 
 export type NotificationType = (typeof NOTIFICATION_TYPES)[number]
@@ -16,6 +17,9 @@ export type NotificationPayload = {
   rsocial?: string
   amount?: string
   limit?: string
+  messageId?: number
+  fromUserId?: number
+  preview?: string
 }
 
 /**

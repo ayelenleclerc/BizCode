@@ -195,7 +195,8 @@ model AppUser {
   sessions      AppSession[]
   auditEvents   AuditEvent[]
   notifications Notification[]
-  chatMessages  ChatMessage[]
+  chatMessagesSent     ChatMessage[] @relation("ChatMessageSender")
+  chatMessagesReceived ChatMessage[] @relation("ChatMessageRecipient")
 
   @@unique([tenantId, username])
 }
@@ -249,11 +250,14 @@ model ChatMessage {
   tenantId     Int
   tenant       Tenant   @relation(fields: [tenantId], references: [id])
   fromUserId   Int
-  fromUser     AppUser  @relation(fields: [fromUserId], references: [id])
+  fromUser     AppUser  @relation("ChatMessageSender", fields: [fromUserId], references: [id])
+  toUserId     Int
+  toUser       AppUser  @relation("ChatMessageRecipient", fields: [toUserId], references: [id])
   content      String   @db.VarChar(1000)
   createdAt    DateTime @default(now())
 
   @@index([tenantId, createdAt])
+  @@index([tenantId, fromUserId, toUserId, id])
 }
 
 model LoginAttempt {
