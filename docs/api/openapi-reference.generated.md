@@ -5,7 +5,7 @@
 - **OpenAPI Version:** `3.1.0`
 - **API Version:** `0.1.0`
 
-REST API for BizCode commercial management system. Runs as an Express 5 sidecar on localhost:3001. Responses use a JSON envelope `{ success: true, data: ... }` except `/api/health`. Session authentication is required for protected resources. Interactive documentation (Swagger UI): <http://localhost:3001/api-docs/> (same contract as this file).
+REST API for BizCode commercial management system. Runs as an Express 5 sidecar on localhost:3001. Responses use a JSON envelope `{ success: true, data: ... }` except `/api/health`. Session authentication is required for protected resources. Protected endpoints can optionally receive `x-bizcode-channel` to enforce channel scope authorization. Interactive documentation (Swagger UI): <http://localhost:3001/api-docs/> (same contract as this file).
 
 ## Servers
 
@@ -452,6 +452,11 @@ One-time endpoint to create initial tenant and owner user.
   "timestamp": ""
 }
 ```
+
+### PARAMETERS /api/clientes
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/clientes`
 
 ### List customers
 
@@ -942,6 +947,11 @@ One-time endpoint to create initial tenant and owner user.
 }
 ```
 
+### PARAMETERS /api/clientes/{id}
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/clientes/{id}`
+
 ### Get customer by id
 
 - **Method:** `GET`
@@ -1350,6 +1360,11 @@ One-time endpoint to create initial tenant and owner user.
   "error": ""
 }
 ```
+
+### PARAMETERS /api/articulos
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/articulos`
 
 ### List products
 
@@ -1794,6 +1809,11 @@ One-time endpoint to create initial tenant and owner user.
 }
 ```
 
+### PARAMETERS /api/articulos/{id}
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/articulos/{id}`
+
 ### Get product by id
 
 - **Method:** `GET`
@@ -2169,6 +2189,11 @@ One-time endpoint to create initial tenant and owner user.
 }
 ```
 
+### PARAMETERS /api/rubros
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/rubros`
+
 ### List product categories
 
 - **Method:** `GET`
@@ -2432,6 +2457,11 @@ One-time endpoint to create initial tenant and owner user.
   "error": ""
 }
 ```
+
+### PARAMETERS /api/facturas
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/facturas`
 
 ### List invoices
 
@@ -3152,6 +3182,11 @@ One-time endpoint to create initial tenant and owner user.
 }
 ```
 
+### PARAMETERS /api/facturas/{id}/void
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/facturas/{id}/void`
+
 ### Void an invoice
 
 - **Method:** `PUT`
@@ -3527,6 +3562,11 @@ Sets `estado` to `N` (anulada), reverses the customer balance by the invoice tot
 }
 ```
 
+### PARAMETERS /api/formas-pago
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/formas-pago`
+
 ### List payment methods
 
 - **Method:** `GET`
@@ -3602,6 +3642,11 @@ Sets `estado` to `N` (anulada), reverses the customer balance by the invoice tot
   "error": ""
 }
 ```
+
+### PARAMETERS /api/users
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/users`
 
 ### List users for the current tenant
 
@@ -4062,6 +4107,11 @@ Creates a new user in the current tenant. Requires `users.manage` and `roles.ass
 }
 ```
 
+### PARAMETERS /api/users/{id}
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/users/{id}`
+
 ### Update a user
 
 - **Method:** `PUT`
@@ -4338,6 +4388,11 @@ Updates role, active flag, or scope for a user in the current tenant. Requires `
 }
 ```
 
+### PARAMETERS /api/auth/change-password
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/auth/change-password`
+
 ### Change own password
 
 - **Method:** `POST`
@@ -4459,6 +4514,11 @@ Allows the authenticated user to change their password by supplying the current 
 }
 ```
 
+### PARAMETERS /api/notifications/channels
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/notifications/channels`
+
 ### Report which external notification channels are configured
 
 - **Method:** `GET`
@@ -4526,6 +4586,11 @@ Returns boolean flags for each channel. No sensitive values are exposed.
   "error": ""
 }
 ```
+
+### PARAMETERS /api/zonas-entrega
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/zonas-entrega`
 
 ### List delivery zones for the authenticated tenant
 
@@ -4860,6 +4925,11 @@ Returns boolean flags for each channel. No sensitive values are exposed.
   "error": ""
 }
 ```
+
+### PARAMETERS /api/zonas-entrega/{id}
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/zonas-entrega/{id}`
 
 ### Update a delivery zone
 
