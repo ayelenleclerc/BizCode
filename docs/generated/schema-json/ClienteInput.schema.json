@@ -21,8 +21,20 @@
       "maxLength": 8,
       "type": "string"
     },
+    "creditDays": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "creditLimit": {
+      "nullable": true,
+      "type": "number"
+    },
     "cuit": {
       "type": "string"
+    },
+    "deliveryZoneId": {
+      "nullable": true,
+      "type": "integer"
     },
     "domicilio": {
       "maxLength": 40,
@@ -44,6 +56,9 @@
       "maxLength": 30,
       "minLength": 3,
       "type": "string"
+    },
+    "suspended": {
+      "type": "boolean"
     },
     "telef": {
       "maxLength": 25,

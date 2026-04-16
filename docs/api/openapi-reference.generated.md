@@ -475,6 +475,14 @@ One-time endpoint to create initial tenant and owner user.
 
     `boolean`
 
+  - **`balance`**
+
+    `number`, default: `0` — Accumulated balance (incremented on each new factura).
+
+  - **`balanceInicial`**
+
+    `number`, default: `0` — Opening balance at migration time.
+
   - **`codigo`**
 
     `integer`
@@ -487,9 +495,21 @@ One-time endpoint to create initial tenant and owner user.
 
     `string`
 
+  - **`creditDays`**
+
+    `integer`, default: `0` — Usual credit days for this customer.
+
+  - **`creditLimit`**
+
+    `number` — Credit limit in ARS. null = no limit.
+
   - **`cuit`**
 
     `string`
+
+  - **`deliveryZoneId`**
+
+    `integer` — FK to DeliveryZone. Assign a delivery zone to this customer.
 
   - **`domicilio`**
 
@@ -514,6 +534,14 @@ One-time endpoint to create initial tenant and owner user.
   - **`rsocial`**
 
     `string`
+
+  - **`score`**
+
+    `integer`, default: `50` — Payment score 0-100 (50=neutral, 0=high risk, 100=perfect).
+
+  - **`suspended`**
+
+    `boolean`, default: `false` — When true, POST /api/facturas returns 422 CLIENT\_SUSPENDED.
 
   - **`telef`**
 
@@ -542,6 +570,13 @@ One-time endpoint to create initial tenant and owner user.
       "telef": "",
       "email": "",
       "activo": true,
+      "creditLimit": 1,
+      "creditDays": 0,
+      "balance": 0,
+      "balanceInicial": 0,
+      "score": 50,
+      "suspended": false,
+      "deliveryZoneId": 1,
       "additionalProperty": "anything"
     }
   ]
@@ -641,9 +676,21 @@ One-time endpoint to create initial tenant and owner user.
 
   `string`
 
+- **`creditDays`**
+
+  `integer`
+
+- **`creditLimit`**
+
+  `number`
+
 - **`cuit`**
 
   `string`
+
+- **`deliveryZoneId`**
+
+  `integer`
 
 - **`domicilio`**
 
@@ -660,6 +707,10 @@ One-time endpoint to create initial tenant and owner user.
 - **`localidad`**
 
   `string`
+
+- **`suspended`**
+
+  `boolean`
 
 - **`telef`**
 
@@ -679,7 +730,11 @@ One-time endpoint to create initial tenant and owner user.
   "cpost": "",
   "telef": "",
   "email": "",
-  "activo": true
+  "activo": true,
+  "creditLimit": 1,
+  "creditDays": 0,
+  "suspended": true,
+  "deliveryZoneId": 1
 }
 ```
 
@@ -697,6 +752,14 @@ One-time endpoint to create initial tenant and owner user.
 
     `boolean`
 
+  - **`balance`**
+
+    `number`, default: `0` — Accumulated balance (incremented on each new factura).
+
+  - **`balanceInicial`**
+
+    `number`, default: `0` — Opening balance at migration time.
+
   - **`codigo`**
 
     `integer`
@@ -709,9 +772,21 @@ One-time endpoint to create initial tenant and owner user.
 
     `string`
 
+  - **`creditDays`**
+
+    `integer`, default: `0` — Usual credit days for this customer.
+
+  - **`creditLimit`**
+
+    `number` — Credit limit in ARS. null = no limit.
+
   - **`cuit`**
 
     `string`
+
+  - **`deliveryZoneId`**
+
+    `integer` — FK to DeliveryZone. Assign a delivery zone to this customer.
 
   - **`domicilio`**
 
@@ -736,6 +811,14 @@ One-time endpoint to create initial tenant and owner user.
   - **`rsocial`**
 
     `string`
+
+  - **`score`**
+
+    `integer`, default: `50` — Payment score 0-100 (50=neutral, 0=high risk, 100=perfect).
+
+  - **`suspended`**
+
+    `boolean`, default: `false` — When true, POST /api/facturas returns 422 CLIENT\_SUSPENDED.
 
   - **`telef`**
 
@@ -763,6 +846,13 @@ One-time endpoint to create initial tenant and owner user.
     "telef": "",
     "email": "",
     "activo": true,
+    "creditLimit": 1,
+    "creditDays": 0,
+    "balance": 0,
+    "balanceInicial": 0,
+    "score": 50,
+    "suspended": false,
+    "deliveryZoneId": 1,
     "additionalProperty": "anything"
   }
 }
@@ -869,6 +959,13 @@ One-time endpoint to create initial tenant and owner user.
     "telef": "",
     "email": "",
     "activo": true,
+    "creditLimit": 1,
+    "creditDays": 0,
+    "balance": 0,
+    "balanceInicial": 0,
+    "score": 50,
+    "suspended": false,
+    "deliveryZoneId": 1,
     "additionalProperty": "anything"
   }
 }
@@ -967,9 +1064,21 @@ One-time endpoint to create initial tenant and owner user.
 
   `string`
 
+- **`creditDays`**
+
+  `integer`
+
+- **`creditLimit`**
+
+  `number`
+
 - **`cuit`**
 
   `string`
+
+- **`deliveryZoneId`**
+
+  `integer`
 
 - **`domicilio`**
 
@@ -986,6 +1095,10 @@ One-time endpoint to create initial tenant and owner user.
 - **`localidad`**
 
   `string`
+
+- **`suspended`**
+
+  `boolean`
 
 - **`telef`**
 
@@ -1005,7 +1118,11 @@ One-time endpoint to create initial tenant and owner user.
   "cpost": "",
   "telef": "",
   "email": "",
-  "activo": true
+  "activo": true,
+  "creditLimit": 1,
+  "creditDays": 0,
+  "suspended": true,
+  "deliveryZoneId": 1
 }
 ```
 
@@ -1023,6 +1140,14 @@ One-time endpoint to create initial tenant and owner user.
 
     `boolean`
 
+  - **`balance`**
+
+    `number`, default: `0` — Accumulated balance (incremented on each new factura).
+
+  - **`balanceInicial`**
+
+    `number`, default: `0` — Opening balance at migration time.
+
   - **`codigo`**
 
     `integer`
@@ -1035,9 +1160,21 @@ One-time endpoint to create initial tenant and owner user.
 
     `string`
 
+  - **`creditDays`**
+
+    `integer`, default: `0` — Usual credit days for this customer.
+
+  - **`creditLimit`**
+
+    `number` — Credit limit in ARS. null = no limit.
+
   - **`cuit`**
 
     `string`
+
+  - **`deliveryZoneId`**
+
+    `integer` — FK to DeliveryZone. Assign a delivery zone to this customer.
 
   - **`domicilio`**
 
@@ -1062,6 +1199,14 @@ One-time endpoint to create initial tenant and owner user.
   - **`rsocial`**
 
     `string`
+
+  - **`score`**
+
+    `integer`, default: `50` — Payment score 0-100 (50=neutral, 0=high risk, 100=perfect).
+
+  - **`suspended`**
+
+    `boolean`, default: `false` — When true, POST /api/facturas returns 422 CLIENT\_SUSPENDED.
 
   - **`telef`**
 
@@ -1089,6 +1234,13 @@ One-time endpoint to create initial tenant and owner user.
     "telef": "",
     "email": "",
     "activo": true,
+    "creditLimit": 1,
+    "creditDays": 0,
+    "balance": 0,
+    "balanceInicial": 0,
+    "score": 50,
+    "suspended": false,
+    "deliveryZoneId": 1,
     "additionalProperty": "anything"
   }
 }
@@ -3806,6 +3958,625 @@ Allows the authenticated user to change their password by supplying the current 
 }
 ```
 
+### Report which external notification channels are configured
+
+- **Method:** `GET`
+- **Path:** `/api/notifications/channels`
+- **Tags:** notifications
+
+Returns boolean flags for each channel. No sensitive values are exposed.
+
+#### Responses
+
+##### Status: 200 Channel status
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`email` (required)**
+
+    `boolean`
+
+  - **`inApp` (required)**
+
+    `boolean`
+
+  - **`whatsapp` (required)**
+
+    `boolean`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "inApp": true,
+    "email": true,
+    "whatsapp": true
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### List delivery zones for the authenticated tenant
+
+- **Method:** `GET`
+- **Path:** `/api/zonas-entrega`
+- **Tags:** logistics
+
+#### Responses
+
+##### Status: 200 List of delivery zones
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`activo`**
+
+    `boolean`, default: `true`
+
+  - **`createdAt`**
+
+    `string`, format: `date-time`
+
+  - **`diasEntrega`**
+
+    `string` — Comma-separated delivery day numbers, e.g. "1,3,5"
+
+  - **`horario`**
+
+    `string` — Preferred time window, e.g. "08:00-12:00"
+
+  - **`id`**
+
+    `integer`
+
+  - **`nombre`**
+
+    `string`
+
+  - **`tenantId`**
+
+    `integer`
+
+  - **`tipo`**
+
+    `string`, possible values: `"barrio", "manual", "predefinida"`, default: `"barrio"`
+
+  - **`updatedAt`**
+
+    `string`, format: `date-time`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "nombre": "",
+      "tipo": "barrio",
+      "diasEntrega": "",
+      "horario": "",
+      "activo": true,
+      "createdAt": "",
+      "updatedAt": "",
+      "additionalProperty": "anything"
+    }
+  ]
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Create a delivery zone
+
+- **Method:** `POST`
+- **Path:** `/api/zonas-entrega`
+- **Tags:** logistics
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`nombre` (required)**
+
+  `string`
+
+- **`diasEntrega`**
+
+  `string`
+
+- **`horario`**
+
+  `string`
+
+- **`tipo`**
+
+  `string`, possible values: `"barrio", "manual", "predefinida"`, default: `"barrio"`
+
+**Example:**
+
+```json
+{
+  "nombre": "",
+  "tipo": "barrio",
+  "diasEntrega": "",
+  "horario": ""
+}
+```
+
+#### Responses
+
+##### Status: 201 Zone created
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`activo`**
+
+    `boolean`, default: `true`
+
+  - **`createdAt`**
+
+    `string`, format: `date-time`
+
+  - **`diasEntrega`**
+
+    `string` — Comma-separated delivery day numbers, e.g. "1,3,5"
+
+  - **`horario`**
+
+    `string` — Preferred time window, e.g. "08:00-12:00"
+
+  - **`id`**
+
+    `integer`
+
+  - **`nombre`**
+
+    `string`
+
+  - **`tenantId`**
+
+    `integer`
+
+  - **`tipo`**
+
+    `string`, possible values: `"barrio", "manual", "predefinida"`, default: `"barrio"`
+
+  - **`updatedAt`**
+
+    `string`, format: `date-time`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "nombre": "",
+    "tipo": "barrio",
+    "diasEntrega": "",
+    "horario": "",
+    "activo": true,
+    "createdAt": "",
+    "updatedAt": "",
+    "additionalProperty": "anything"
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Update a delivery zone
+
+- **Method:** `PUT`
+- **Path:** `/api/zonas-entrega/{id}`
+- **Tags:** logistics
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`activo`**
+
+  `boolean`
+
+- **`diasEntrega`**
+
+  `string`
+
+- **`horario`**
+
+  `string`
+
+- **`nombre`**
+
+  `string`
+
+- **`tipo`**
+
+  `string`, possible values: `"barrio", "manual", "predefinida"`
+
+**Example:**
+
+```json
+{
+  "nombre": "",
+  "tipo": "barrio",
+  "diasEntrega": "",
+  "horario": "",
+  "activo": true
+}
+```
+
+#### Responses
+
+##### Status: 200 Zone updated
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`activo`**
+
+    `boolean`, default: `true`
+
+  - **`createdAt`**
+
+    `string`, format: `date-time`
+
+  - **`diasEntrega`**
+
+    `string` — Comma-separated delivery day numbers, e.g. "1,3,5"
+
+  - **`horario`**
+
+    `string` — Preferred time window, e.g. "08:00-12:00"
+
+  - **`id`**
+
+    `integer`
+
+  - **`nombre`**
+
+    `string`
+
+  - **`tenantId`**
+
+    `integer`
+
+  - **`tipo`**
+
+    `string`, possible values: `"barrio", "manual", "predefinida"`, default: `"barrio"`
+
+  - **`updatedAt`**
+
+    `string`, format: `date-time`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "nombre": "",
+    "tipo": "barrio",
+    "diasEntrega": "",
+    "horario": "",
+    "activo": true,
+    "createdAt": "",
+    "updatedAt": "",
+    "additionalProperty": "anything"
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Zone not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ## Schemas
 
 ### HealthResponse
@@ -4359,6 +5130,14 @@ Allows the authenticated user to change their password by supplying the current 
 
   `boolean`
 
+* **`balance`**
+
+  `number`, default: `0` — Accumulated balance (incremented on each new factura).
+
+* **`balanceInicial`**
+
+  `number`, default: `0` — Opening balance at migration time.
+
 * **`codigo`**
 
   `integer`
@@ -4371,9 +5150,21 @@ Allows the authenticated user to change their password by supplying the current 
 
   `string`
 
+* **`creditDays`**
+
+  `integer`, default: `0` — Usual credit days for this customer.
+
+* **`creditLimit`**
+
+  `number` — Credit limit in ARS. null = no limit.
+
 * **`cuit`**
 
   `string`
+
+* **`deliveryZoneId`**
+
+  `integer` — FK to DeliveryZone. Assign a delivery zone to this customer.
 
 * **`domicilio`**
 
@@ -4399,6 +5190,14 @@ Allows the authenticated user to change their password by supplying the current 
 
   `string`
 
+* **`score`**
+
+  `integer`, default: `50` — Payment score 0-100 (50=neutral, 0=high risk, 100=perfect).
+
+* **`suspended`**
+
+  `boolean`, default: `false` — When true, POST /api/facturas returns 422 CLIENT\_SUSPENDED.
+
 * **`telef`**
 
   `string`
@@ -4419,6 +5218,13 @@ Allows the authenticated user to change their password by supplying the current 
   "telef": "",
   "email": "",
   "activo": true,
+  "creditLimit": 1,
+  "creditDays": 0,
+  "balance": 0,
+  "balanceInicial": 0,
+  "score": 50,
+  "suspended": false,
+  "deliveryZoneId": 1,
   "additionalProperty": "anything"
 }
 ```
@@ -4447,9 +5253,21 @@ Allows the authenticated user to change their password by supplying the current 
 
   `string`
 
+* **`creditDays`**
+
+  `integer`
+
+* **`creditLimit`**
+
+  `number`
+
 * **`cuit`**
 
   `string`
+
+* **`deliveryZoneId`**
+
+  `integer`
 
 * **`domicilio`**
 
@@ -4466,6 +5284,10 @@ Allows the authenticated user to change their password by supplying the current 
 * **`localidad`**
 
   `string`
+
+* **`suspended`**
+
+  `boolean`
 
 * **`telef`**
 
@@ -4485,7 +5307,11 @@ Allows the authenticated user to change their password by supplying the current 
   "cpost": "",
   "telef": "",
   "email": "",
-  "activo": true
+  "activo": true,
+  "creditLimit": 1,
+  "creditDays": 0,
+  "suspended": true,
+  "deliveryZoneId": 1
 }
 ```
 
@@ -4503,6 +5329,14 @@ Allows the authenticated user to change their password by supplying the current 
 
     `boolean`
 
+  - **`balance`**
+
+    `number`, default: `0` — Accumulated balance (incremented on each new factura).
+
+  - **`balanceInicial`**
+
+    `number`, default: `0` — Opening balance at migration time.
+
   - **`codigo`**
 
     `integer`
@@ -4515,9 +5349,21 @@ Allows the authenticated user to change their password by supplying the current 
 
     `string`
 
+  - **`creditDays`**
+
+    `integer`, default: `0` — Usual credit days for this customer.
+
+  - **`creditLimit`**
+
+    `number` — Credit limit in ARS. null = no limit.
+
   - **`cuit`**
 
     `string`
+
+  - **`deliveryZoneId`**
+
+    `integer` — FK to DeliveryZone. Assign a delivery zone to this customer.
 
   - **`domicilio`**
 
@@ -4542,6 +5388,14 @@ Allows the authenticated user to change their password by supplying the current 
   - **`rsocial`**
 
     `string`
+
+  - **`score`**
+
+    `integer`, default: `50` — Payment score 0-100 (50=neutral, 0=high risk, 100=perfect).
+
+  - **`suspended`**
+
+    `boolean`, default: `false` — When true, POST /api/facturas returns 422 CLIENT\_SUSPENDED.
 
   - **`telef`**
 
@@ -4570,6 +5424,13 @@ Allows the authenticated user to change their password by supplying the current 
       "telef": "",
       "email": "",
       "activo": true,
+      "creditLimit": 1,
+      "creditDays": 0,
+      "balance": 0,
+      "balanceInicial": 0,
+      "score": 50,
+      "suspended": false,
+      "deliveryZoneId": 1,
       "additionalProperty": "anything"
     }
   ]
@@ -4588,6 +5449,14 @@ Allows the authenticated user to change their password by supplying the current 
 
     `boolean`
 
+  - **`balance`**
+
+    `number`, default: `0` — Accumulated balance (incremented on each new factura).
+
+  - **`balanceInicial`**
+
+    `number`, default: `0` — Opening balance at migration time.
+
   - **`codigo`**
 
     `integer`
@@ -4600,9 +5469,21 @@ Allows the authenticated user to change their password by supplying the current 
 
     `string`
 
+  - **`creditDays`**
+
+    `integer`, default: `0` — Usual credit days for this customer.
+
+  - **`creditLimit`**
+
+    `number` — Credit limit in ARS. null = no limit.
+
   - **`cuit`**
 
     `string`
+
+  - **`deliveryZoneId`**
+
+    `integer` — FK to DeliveryZone. Assign a delivery zone to this customer.
 
   - **`domicilio`**
 
@@ -4627,6 +5508,14 @@ Allows the authenticated user to change their password by supplying the current 
   - **`rsocial`**
 
     `string`
+
+  - **`score`**
+
+    `integer`, default: `50` — Payment score 0-100 (50=neutral, 0=high risk, 100=perfect).
+
+  - **`suspended`**
+
+    `boolean`, default: `false` — When true, POST /api/facturas returns 422 CLIENT\_SUSPENDED.
 
   - **`telef`**
 
@@ -4654,6 +5543,13 @@ Allows the authenticated user to change their password by supplying the current 
     "telef": "",
     "email": "",
     "activo": true,
+    "creditLimit": 1,
+    "creditDays": 0,
+    "balance": 0,
+    "balanceInicial": 0,
+    "score": 50,
+    "suspended": false,
+    "deliveryZoneId": 1,
     "additionalProperty": "anything"
   }
 }
@@ -4689,6 +5585,13 @@ Allows the authenticated user to change their password by supplying the current 
     "telef": "",
     "email": "",
     "activo": true,
+    "creditLimit": 1,
+    "creditDays": 0,
+    "balance": 0,
+    "balanceInicial": 0,
+    "score": 50,
+    "suspended": false,
+    "deliveryZoneId": 1,
     "additionalProperty": "anything"
   }
 }
@@ -6654,5 +7557,269 @@ Allows the authenticated user to change their password by supplying the current 
 {
   "currentPassword": "",
   "newPassword": ""
+}
+```
+
+### DeliveryZone
+
+- **Type:**`object`
+
+* **`activo`**
+
+  `boolean`, default: `true`
+
+* **`createdAt`**
+
+  `string`, format: `date-time`
+
+* **`diasEntrega`**
+
+  `string` — Comma-separated delivery day numbers, e.g. "1,3,5"
+
+* **`horario`**
+
+  `string` — Preferred time window, e.g. "08:00-12:00"
+
+* **`id`**
+
+  `integer`
+
+* **`nombre`**
+
+  `string`
+
+* **`tenantId`**
+
+  `integer`
+
+* **`tipo`**
+
+  `string`, possible values: `"barrio", "manual", "predefinida"`, default: `"barrio"`
+
+* **`updatedAt`**
+
+  `string`, format: `date-time`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "tenantId": 1,
+  "nombre": "",
+  "tipo": "barrio",
+  "diasEntrega": "",
+  "horario": "",
+  "activo": true,
+  "createdAt": "",
+  "updatedAt": "",
+  "additionalProperty": "anything"
+}
+```
+
+### DeliveryZoneInput
+
+- **Type:**`object`
+
+* **`nombre` (required)**
+
+  `string`
+
+* **`diasEntrega`**
+
+  `string`
+
+* **`horario`**
+
+  `string`
+
+* **`tipo`**
+
+  `string`, possible values: `"barrio", "manual", "predefinida"`, default: `"barrio"`
+
+**Example:**
+
+```json
+{
+  "nombre": "",
+  "tipo": "barrio",
+  "diasEntrega": "",
+  "horario": ""
+}
+```
+
+### DeliveryZoneUpdateInput
+
+- **Type:**`object`
+
+* **`activo`**
+
+  `boolean`
+
+* **`diasEntrega`**
+
+  `string`
+
+* **`horario`**
+
+  `string`
+
+* **`nombre`**
+
+  `string`
+
+* **`tipo`**
+
+  `string`, possible values: `"barrio", "manual", "predefinida"`
+
+**Example:**
+
+```json
+{
+  "nombre": "",
+  "tipo": "barrio",
+  "diasEntrega": "",
+  "horario": "",
+  "activo": true
+}
+```
+
+### DeliveryZoneListEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`activo`**
+
+    `boolean`, default: `true`
+
+  - **`createdAt`**
+
+    `string`, format: `date-time`
+
+  - **`diasEntrega`**
+
+    `string` — Comma-separated delivery day numbers, e.g. "1,3,5"
+
+  - **`horario`**
+
+    `string` — Preferred time window, e.g. "08:00-12:00"
+
+  - **`id`**
+
+    `integer`
+
+  - **`nombre`**
+
+    `string`
+
+  - **`tenantId`**
+
+    `integer`
+
+  - **`tipo`**
+
+    `string`, possible values: `"barrio", "manual", "predefinida"`, default: `"barrio"`
+
+  - **`updatedAt`**
+
+    `string`, format: `date-time`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "nombre": "",
+      "tipo": "barrio",
+      "diasEntrega": "",
+      "horario": "",
+      "activo": true,
+      "createdAt": "",
+      "updatedAt": "",
+      "additionalProperty": "anything"
+    }
+  ]
+}
+```
+
+### DeliveryZoneEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`activo`**
+
+    `boolean`, default: `true`
+
+  - **`createdAt`**
+
+    `string`, format: `date-time`
+
+  - **`diasEntrega`**
+
+    `string` — Comma-separated delivery day numbers, e.g. "1,3,5"
+
+  - **`horario`**
+
+    `string` — Preferred time window, e.g. "08:00-12:00"
+
+  - **`id`**
+
+    `integer`
+
+  - **`nombre`**
+
+    `string`
+
+  - **`tenantId`**
+
+    `integer`
+
+  - **`tipo`**
+
+    `string`, possible values: `"barrio", "manual", "predefinida"`, default: `"barrio"`
+
+  - **`updatedAt`**
+
+    `string`, format: `date-time`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "nombre": "",
+    "tipo": "barrio",
+    "diasEntrega": "",
+    "horario": "",
+    "activo": true,
+    "createdAt": "",
+    "updatedAt": "",
+    "additionalProperty": "anything"
+  }
 }
 ```

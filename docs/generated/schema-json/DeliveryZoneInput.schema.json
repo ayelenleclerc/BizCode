@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "diasEntrega": {
+      "maxLength": 20,
+      "type": "string"
+    },
+    "horario": {
+      "maxLength": 30,
+      "type": "string"
+    },
+    "nombre": {
+      "maxLength": 60,
+      "minLength": 1,
+      "type": "string"
+    },
+    "tipo": {
+      "default": "barrio",
+      "enum": [
+        "barrio",
+        "manual",
+        "predefinida"
+      ],
+      "type": "string"
+    }
+  },
+  "required": [
+    "nombre"
+  ],
+  "title": "DeliveryZoneInput",
+  "type": "object"
+}

@@ -16,19 +16,23 @@ undefined
 
 # ClienteInput Properties
 
-| Property                | Type      | Required | Nullable       | Defined by                                                                             |
-| :---------------------- | :-------- | :------- | :------------- | :------------------------------------------------------------------------------------- |
-| [activo](#activo)       | `boolean` | Required | cannot be null | [ClienteInput](clienteinput-properties-activo.md "undefined#/properties/activo")       |
-| [codigo](#codigo)       | `integer` | Required | cannot be null | [ClienteInput](clienteinput-properties-codigo.md "undefined#/properties/codigo")       |
-| [condIva](#condiva)     | `string`  | Required | cannot be null | [ClienteInput](clienteinput-properties-condiva.md "undefined#/properties/condIva")     |
-| [cpost](#cpost)         | `string`  | Optional | cannot be null | [ClienteInput](clienteinput-properties-cpost.md "undefined#/properties/cpost")         |
-| [cuit](#cuit)           | `string`  | Optional | cannot be null | [ClienteInput](clienteinput-properties-cuit.md "undefined#/properties/cuit")           |
-| [domicilio](#domicilio) | `string`  | Optional | cannot be null | [ClienteInput](clienteinput-properties-domicilio.md "undefined#/properties/domicilio") |
-| [email](#email)         | `string`  | Optional | cannot be null | [ClienteInput](clienteinput-properties-email.md "undefined#/properties/email")         |
-| [fantasia](#fantasia)   | `string`  | Optional | cannot be null | [ClienteInput](clienteinput-properties-fantasia.md "undefined#/properties/fantasia")   |
-| [localidad](#localidad) | `string`  | Optional | cannot be null | [ClienteInput](clienteinput-properties-localidad.md "undefined#/properties/localidad") |
-| [rsocial](#rsocial)     | `string`  | Required | cannot be null | [ClienteInput](clienteinput-properties-rsocial.md "undefined#/properties/rsocial")     |
-| [telef](#telef)         | `string`  | Optional | cannot be null | [ClienteInput](clienteinput-properties-telef.md "undefined#/properties/telef")         |
+| Property                          | Type      | Required | Nullable       | Defined by                                                                                       |
+| :-------------------------------- | :-------- | :------- | :------------- | :----------------------------------------------------------------------------------------------- |
+| [activo](#activo)                 | `boolean` | Required | cannot be null | [ClienteInput](clienteinput-properties-activo.md "undefined#/properties/activo")                 |
+| [codigo](#codigo)                 | `integer` | Required | cannot be null | [ClienteInput](clienteinput-properties-codigo.md "undefined#/properties/codigo")                 |
+| [condIva](#condiva)               | `string`  | Required | cannot be null | [ClienteInput](clienteinput-properties-condiva.md "undefined#/properties/condIva")               |
+| [cpost](#cpost)                   | `string`  | Optional | cannot be null | [ClienteInput](clienteinput-properties-cpost.md "undefined#/properties/cpost")                   |
+| [creditDays](#creditdays)         | `integer` | Optional | cannot be null | [ClienteInput](clienteinput-properties-creditdays.md "undefined#/properties/creditDays")         |
+| [creditLimit](#creditlimit)       | `number`  | Optional | cannot be null | [ClienteInput](clienteinput-properties-creditlimit.md "undefined#/properties/creditLimit")       |
+| [cuit](#cuit)                     | `string`  | Optional | cannot be null | [ClienteInput](clienteinput-properties-cuit.md "undefined#/properties/cuit")                     |
+| [deliveryZoneId](#deliveryzoneid) | `integer` | Optional | cannot be null | [ClienteInput](clienteinput-properties-deliveryzoneid.md "undefined#/properties/deliveryZoneId") |
+| [domicilio](#domicilio)           | `string`  | Optional | cannot be null | [ClienteInput](clienteinput-properties-domicilio.md "undefined#/properties/domicilio")           |
+| [email](#email)                   | `string`  | Optional | cannot be null | [ClienteInput](clienteinput-properties-email.md "undefined#/properties/email")                   |
+| [fantasia](#fantasia)             | `string`  | Optional | cannot be null | [ClienteInput](clienteinput-properties-fantasia.md "undefined#/properties/fantasia")             |
+| [localidad](#localidad)           | `string`  | Optional | cannot be null | [ClienteInput](clienteinput-properties-localidad.md "undefined#/properties/localidad")           |
+| [rsocial](#rsocial)               | `string`  | Required | cannot be null | [ClienteInput](clienteinput-properties-rsocial.md "undefined#/properties/rsocial")               |
+| [suspended](#suspended)           | `boolean` | Optional | cannot be null | [ClienteInput](clienteinput-properties-suspended.md "undefined#/properties/suspended")           |
+| [telef](#telef)                   | `string`  | Optional | cannot be null | [ClienteInput](clienteinput-properties-telef.md "undefined#/properties/telef")                   |
 
 ## activo
 
@@ -121,6 +125,46 @@ undefined
 
 **maximum length**: the maximum number of characters for this string is: `8`
 
+## creditDays
+
+
+
+`creditDays`
+
+* is optional
+
+* Type: `integer`
+
+* cannot be null
+
+* defined in: [ClienteInput](clienteinput-properties-creditdays.md "undefined#/properties/creditDays")
+
+### creditDays Type
+
+`integer`
+
+### creditDays Constraints
+
+**minimum**: the value of this number must greater than or equal to: `0`
+
+## creditLimit
+
+
+
+`creditLimit`
+
+* is optional
+
+* Type: `number`
+
+* cannot be null
+
+* defined in: [ClienteInput](clienteinput-properties-creditlimit.md "undefined#/properties/creditLimit")
+
+### creditLimit Type
+
+`number`
+
 ## cuit
 
 
@@ -138,6 +182,24 @@ undefined
 ### cuit Type
 
 `string`
+
+## deliveryZoneId
+
+
+
+`deliveryZoneId`
+
+* is optional
+
+* Type: `integer`
+
+* cannot be null
+
+* defined in: [ClienteInput](clienteinput-properties-deliveryzoneid.md "undefined#/properties/deliveryZoneId")
+
+### deliveryZoneId Type
+
+`integer`
 
 ## domicilio
 
@@ -250,6 +312,24 @@ undefined
 **maximum length**: the maximum number of characters for this string is: `30`
 
 **minimum length**: the minimum number of characters for this string is: `3`
+
+## suspended
+
+
+
+`suspended`
+
+* is optional
+
+* Type: `boolean`
+
+* cannot be null
+
+* defined in: [ClienteInput](clienteinput-properties-suspended.md "undefined#/properties/suspended")
+
+### suspended Type
+
+`boolean`
 
 ## telef
 
