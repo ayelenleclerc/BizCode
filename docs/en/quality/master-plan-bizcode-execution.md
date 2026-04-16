@@ -50,6 +50,7 @@ Priorities below are **planning** items; verification is against the repository 
 | BP1-1 | P1 | Order (`pedido`) domain | **Future:** Prisma model + migration + routes only when specified in OpenAPI and implemented in `server/` |
 | BP1-2 | P1 | E2E / integration coverage for critical paths | Align with [testing-strategy.md](testing-strategy.md) and existing Playwright/Postgres tooling |
 | BP1-3 | P1 | Channel scope enforcement | **Not evidenced in current codebase:** no `x-bizcode-channel` handling in `server/auth.ts` or `server/createApp.ts`; `tests/server/scope-channel.test.ts` is **not present**. Acceptance when implemented: middleware or equivalent uses `AuthScope.channels` from [`src/lib/rbac.ts`](../../../src/lib/rbac.ts) and tests prove it |
+| BP1-4 | P1 | Internal chat (minimum scope) | Implemented with `/api/chat/conversations`, `/api/chat/messages`, unread counters via `Notification` (`chat_message`), paginated message history, and UI route `/chat` in `src/pages/chat/index.tsx` |
 
 ## Repository status vs this package
 
