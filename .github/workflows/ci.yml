@@ -83,6 +83,8 @@ jobs:
             delete json.serialNumber
             if (json.metadata && typeof json.metadata === 'object') {
               delete json.metadata.timestamp
+              // npm version embedded in tools.components varies across environments.
+              delete json.metadata.tools
             }
             return JSON.stringify(json, null, 2)
           }
