@@ -141,10 +141,35 @@ jobs:
               );
 
               core.info(`Updated issue #${issueNumber} status in project.`);
+
+              const prAssociatedFieldId = process.env.PROJECT_PR_ASSOCIATED_FIELD_ID?.trim();
+              if (prAssociatedFieldId) {
+                const prUrl = `${context.payload.pull_request.html_url}`;
+                await github.graphql(
+                  `mutation($projectId:ID!, $itemId:ID!, $fieldId:ID!, $text:String!) {
+                    updateProjectV2ItemFieldValue(input: {
+                      projectId: $projectId,
+                      itemId: $itemId,
+                      fieldId: $fieldId,
+                      value: { text: $text }
+                    }) {
+                      projectV2Item { id }
+                    }
+                  }`,
+                  {
+                    projectId,
+                    itemId: item.id,
+                    fieldId: prAssociatedFieldId,
+                    text: prUrl
+                  }
+                );
+                core.info(`Updated issue #${issueNumber} PR asociado field.`);
+              }
             }
         env:
           PROJECT_V2_ID: ${{ vars.PROJECT_V2_ID }}
           PROJECT_STATUS_FIELD_ID: ${{ vars.PROJECT_STATUS_FIELD_ID }}
+          PROJECT_PR_ASSOCIATED_FIELD_ID: ${{ vars.PROJECT_PR_ASSOCIATED_FIELD_ID }}
           STATUS_BACKLOG: ${{ vars.PROJECT_STATUS_OPTION_BACKLOG }}
           STATUS_IN_PROGRESS: ${{ vars.PROJECT_STATUS_OPTION_IN_PROGRESS }}
           STATUS_DONE: ${{ vars.PROJECT_STATUS_OPTION_DONE }}

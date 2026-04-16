@@ -2,7 +2,9 @@
 
 ## Linked Issue
 
-- Closes #
+**Required** for any work tracked on the GitHub Project **BizCode Delivery**: replace the placeholder with the real issue number so the project links the PR and automation can update **Status** (In Progress / Done).
+
+- Closes #<!-- e.g. 48 — must match an issue on the board -->
 
 ## What Changed / Why
 
