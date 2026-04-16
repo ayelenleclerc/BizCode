@@ -42,6 +42,16 @@
 
 * [ClienteNullableEnvelope](./clientenullableenvelope.md) – `-`
 
+* [DeliveryZone](./deliveryzone.md) – `-`
+
+* [DeliveryZoneEnvelope](./deliveryzoneenvelope.md) – `-`
+
+* [DeliveryZoneInput](./deliveryzoneinput.md) – `-`
+
+* [DeliveryZoneListEnvelope](./deliveryzonelistenvelope.md) – `-`
+
+* [DeliveryZoneUpdateInput](./deliveryzoneupdateinput.md) – `-`
+
 * [Factura](./factura.md) – `-`
 
 * [FacturaEnvelope](./facturaenvelope.md) – `-`
@@ -129,6 +139,8 @@
 * [Untitled array in AuthScope](./authscope-properties-warehouseids.md) – `undefined#/properties/warehouseIds`
 
 * [Untitled array in ClienteListEnvelope](./clientelistenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled array in DeliveryZoneListEnvelope](./deliveryzonelistenvelope-properties-data.md) – `undefined#/properties/data`
 
 * [Untitled array in Factura](./factura-properties-items.md) – `undefined#/properties/items`
 
