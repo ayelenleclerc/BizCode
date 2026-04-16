@@ -48,6 +48,18 @@ export default function NuevaFacturaForm({
 
   const cliente = clientes.find((c) => c.id === clienteId)
 
+  // Credit limit warning: shown when balance + this invoice total would exceed the limit
+  const creditLimitWarning = (() => {
+    if (!cliente || cliente.creditLimit === null || cliente.creditLimit === undefined) return null
+    const limit = Number(cliente.creditLimit)
+    if (limit <= 0) return null
+    const balance = Number(cliente.balance ?? 0)
+    if (balance + totales.total > limit) {
+      return { balance, limit, projected: balance + totales.total }
+    }
+    return null
+  })()
+
   useEffect(() => {
     if (lineas.length === 0) {
       setTotales({ neto1: 0, neto2: 0, neto3: 0, iva1: 0, iva2: 0, total: 0 })
@@ -174,6 +186,27 @@ export default function NuevaFacturaForm({
       {error && (
         <div role="alert" className="p-4 bg-red-100 dark:bg-red-900 text-red-900 dark:text-red-100 rounded border border-red-300 dark:border-red-700 mb-4">
           {error}
+        </div>
+      )}
+
+      {creditLimitWarning && (
+        <div role="alert" aria-live="polite" className="p-4 bg-amber-50 dark:bg-amber-900/30 border border-amber-300 dark:border-amber-600 rounded mb-4 flex items-start gap-3">
+          <span className="text-amber-600 dark:text-amber-400 text-xl leading-none" aria-hidden="true">⚠</span>
+          <div className="flex-1">
+            <p className="font-semibold text-amber-800 dark:text-amber-300 text-sm">
+              {t('creditLimitWarning.title')}
+            </p>
+            <p className="text-amber-700 dark:text-amber-400 text-sm mt-0.5">
+              {t('creditLimitWarning.detail', {
+                balance: creditLimitWarning.balance.toFixed(2),
+                limit: creditLimitWarning.limit.toFixed(2),
+                projected: creditLimitWarning.projected.toFixed(2),
+              })}
+            </p>
+            <p className="text-amber-600 dark:text-amber-500 text-xs mt-1">
+              {t('creditLimitWarning.hint')}
+            </p>
+          </div>
         </div>
       )}
 
