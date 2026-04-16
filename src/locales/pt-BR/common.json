@@ -49,6 +49,8 @@
     },
     "errors": {
       "invalidCredentials": "Usuário ou senha incorretos",
+      "accountLocked": "Conta bloqueada por excesso de tentativas. Entre em contato com o administrador.",
+      "tooManyRequests": "Muitas tentativas. Aguarde 15 minutos e tente novamente.",
       "generic": "Não foi possível entrar",
       "network": "Não foi possível conectar ao servidor. Verifique se a API está em execução (ex.: porta 3001) e tente novamente.",
       "timeout": "A requisição demorou demais. Tente novamente.",

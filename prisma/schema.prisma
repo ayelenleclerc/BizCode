@@ -209,3 +209,14 @@ model Notification {
   @@index([userId, readAt])
   @@index([tenantId, createdAt])
 }
+
+model LoginAttempt {
+  id        Int      @id @default(autoincrement())
+  tenantId  Int
+  username  String   @db.VarChar(60)
+  ipAddress String?  @db.VarChar(64)
+  success   Boolean
+  createdAt DateTime @default(now())
+
+  @@index([tenantId, username, createdAt])
+}

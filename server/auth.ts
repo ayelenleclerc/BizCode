@@ -1,5 +1,6 @@
 import { createHash, randomBytes } from 'node:crypto'
 import type { NextFunction, Request, Response } from 'express'
+import rateLimit from 'express-rate-limit'
 import { Prisma, type PrismaClient } from '@prisma/client'
 import {
   ROLE_PERMISSIONS,
@@ -16,6 +17,10 @@ import { hashPassword, verifyPassword } from './passwordHash'
 
 const SESSION_COOKIE_NAME = 'bizcode_session'
 const SESSION_DURATION_MS = 1000 * 60 * 60 * 8
+
+const LOGIN_WINDOW_MS = 15 * 60 * 1000 // 15 minutes
+const LOGIN_MAX_FAILURES = 5            // consecutive failures before lockout
+const LOGIN_RATE_LIMIT = 20             // requests per window per IP
 
 export type RequestAuthContext = {
   claims: AuthClaims
@@ -239,6 +244,58 @@ function isNonEmptyString(value: unknown): value is string {
   return typeof value === 'string' && value.trim().length > 0
 }
 
+/**
+ * @en Counts consecutive failed login attempts for a tenant+username pair within the lockout window.
+ *     Stops counting at the first successful attempt (resets streak).
+ * @es Cuenta intentos fallidos consecutivos para un par tenant+usuario dentro de la ventana de bloqueo.
+ *     Se detiene al primer intento exitoso (resetea la racha).
+ */
+async function countConsecutiveFailures(
+  prisma: PrismaClient,
+  tenantId: number,
+  username: string,
+): Promise<number> {
+  const windowStart = new Date(Date.now() - LOGIN_WINDOW_MS)
+  const attempts = await prisma.loginAttempt.findMany({
+    where: { tenantId, username, createdAt: { gte: windowStart } },
+    orderBy: { createdAt: 'desc' },
+    select: { success: true },
+  })
+  let count = 0
+  for (const attempt of attempts) {
+    if (attempt.success) break
+    count++
+  }
+  return count
+}
+
+/**
+ * @en Records a login attempt and, when failures reach the threshold, locks the user account.
+ * @es Registra un intento de login y, cuando las fallas alcanzan el umbral, bloquea la cuenta.
+ */
+async function recordLoginAttempt(
+  prisma: PrismaClient,
+  tenantId: number,
+  username: string,
+  success: boolean,
+  ipAddress: string | undefined,
+): Promise<void> {
+  await prisma.loginAttempt.create({
+    data: { tenantId, username, success, ipAddress },
+  })
+
+  if (!success) {
+    const failures = await countConsecutiveFailures(prisma, tenantId, username)
+    if (failures >= LOGIN_MAX_FAILURES) {
+      // Lock the account — same message for existing and non-existing users (no enumeration).
+      await prisma.appUser.updateMany({
+        where: { tenantId, username, active: true },
+        data: { active: false },
+      })
+    }
+  }
+}
+
 export function registerAuthRoutes(app: import('express').Application, prisma: PrismaClient): void {
   app.post('/api/auth/setup-owner', async (req: Request, res: Response) => {
     const body = (req.body ?? {}) as SetupOwnerBody
@@ -301,31 +358,62 @@ export function registerAuthRoutes(app: import('express').Application, prisma: P
     })
   })
 
-  app.post('/api/auth/login', async (req: Request, res: Response) => {
+  const loginRateLimiter = rateLimit({
+    windowMs: LOGIN_WINDOW_MS,
+    max: LOGIN_RATE_LIMIT,
+    standardHeaders: true,
+    legacyHeaders: false,
+    skip: () => process.env.NODE_ENV === 'test',
+    handler: (_req: Request, res: Response) => {
+      res.status(429).json({ success: false, error: 'TOO_MANY_REQUESTS' })
+    },
+  })
+
+  app.post('/api/auth/login', loginRateLimiter, async (req: Request, res: Response) => {
     const body = (req.body ?? {}) as LoginBody
     if (!isNonEmptyString(body.tenantSlug) || !isNonEmptyString(body.username) || !isNonEmptyString(body.password)) {
       res.status(400).json({ success: false, error: 'tenantSlug, username and password are required' })
       return
     }
-    const tenant = await prisma.tenant.findUnique({
-      where: { slug: body.tenantSlug.trim().toLowerCase() },
-    })
+
+    const tenantSlug = body.tenantSlug.trim().toLowerCase()
+    const username = body.username.trim().toLowerCase()
+
+    const tenant = await prisma.tenant.findUnique({ where: { slug: tenantSlug } })
     if (!tenant || !tenant.active) {
       res.status(401).json({ success: false, error: 'Invalid credentials' })
       return
     }
-    const user = await prisma.appUser.findUnique({
-      where: {
-        tenantId_username: {
-          tenantId: tenant.id,
-          username: body.username.trim().toLowerCase(),
-        },
-      },
-    })
-    if (!user || !user.active || !verifyPassword(body.password, user.passwordHash)) {
-      res.status(401).json({ success: false, error: 'Invalid credentials' })
+
+    // Check consecutive failures BEFORE looking up the user (no enumeration).
+    const priorFailures = await countConsecutiveFailures(prisma, tenant.id, username)
+    if (priorFailures >= LOGIN_MAX_FAILURES) {
+      res.status(401).json({ success: false, error: 'ACCOUNT_LOCKED' })
       return
     }
+
+    const user = await prisma.appUser.findUnique({
+      where: { tenantId_username: { tenantId: tenant.id, username } },
+    })
+
+    // Treat an already-inactive account the same as a failed attempt.
+    const passwordOk = user !== null && user.active && verifyPassword(body.password, user.passwordHash)
+
+    if (!passwordOk) {
+      await recordLoginAttempt(prisma, tenant.id, username, false, req.ip)
+      // Re-count so we return ACCOUNT_LOCKED on the exact threshold attempt.
+      const newFailures = await countConsecutiveFailures(prisma, tenant.id, username)
+      if (newFailures >= LOGIN_MAX_FAILURES) {
+        res.status(401).json({ success: false, error: 'ACCOUNT_LOCKED' })
+      } else {
+        res.status(401).json({ success: false, error: 'Invalid credentials' })
+      }
+      return
+    }
+
+    // Successful login — record it and clear the failure streak.
+    await recordLoginAttempt(prisma, tenant.id, username, true, req.ip)
+
     const token = createSessionToken()
     const tokenHash = hashToken(token)
     const session = await prisma.appSession.create({

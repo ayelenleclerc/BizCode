@@ -49,6 +49,8 @@
     },
     "errors": {
       "invalidCredentials": "Invalid username or password",
+      "accountLocked": "Account locked due to too many failed attempts. Contact your administrator.",
+      "tooManyRequests": "Too many attempts. Please wait 15 minutes and try again.",
       "generic": "Could not sign in",
       "network": "Cannot reach the server. Make sure the API is running (e.g. port 3001) and try again.",
       "timeout": "The request took too long. Please try again.",
