@@ -33,6 +33,11 @@
     "iva": "Impostos",
     "total": "TOTAL"
   },
+  "creditLimitWarning": {
+    "title": "Aviso: limite de crédito excedido",
+    "detail": "Saldo atual: ${{balance}} + esta NF = ${{projected}} (limite: ${{limit}})",
+    "hint": "Você pode continuar registrando a venda ou cancelá-la."
+  },
   "errors": {
     "noCliente": "Selecione um cliente",
     "noItems": "Adicione pelo menos um produto",

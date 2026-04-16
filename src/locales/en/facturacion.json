@@ -33,6 +33,11 @@
     "iva": "VAT",
     "total": "TOTAL"
   },
+  "creditLimitWarning": {
+    "title": "Warning: credit limit exceeded",
+    "detail": "Current balance: ${{balance}} + this invoice = ${{projected}} (limit: ${{limit}})",
+    "hint": "You may continue recording the sale or cancel it."
+  },
   "errors": {
     "noCliente": "Please select a customer",
     "noItems": "Please add at least one item",

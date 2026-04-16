@@ -33,6 +33,11 @@
     "iva": "IVA",
     "total": "TOTAL"
   },
+  "creditLimitWarning": {
+    "title": "Advertencia: límite de crédito superado",
+    "detail": "Balance actual: ${{balance}} + esta factura = ${{projected}} (límite: ${{limit}})",
+    "hint": "Puede continuar registrando la venta o cancelarla."
+  },
   "errors": {
     "noCliente": "Seleccione un cliente",
     "noItems": "Agregue al menos un artículo",
