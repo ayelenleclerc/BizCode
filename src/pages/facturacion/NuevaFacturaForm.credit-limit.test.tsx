@@ -10,6 +10,8 @@ vi.mock('@/lib/api', () => ({
   },
 }))
 
+const now = new Date()
+
 const clientes: Cliente[] = [
   {
     id: 1,
@@ -19,6 +21,8 @@ const clientes: Cliente[] = [
     activo: true,
     creditLimit: 100,
     balance: 90,
+    createdAt: now,
+    updatedAt: now,
   },
 ]
 
