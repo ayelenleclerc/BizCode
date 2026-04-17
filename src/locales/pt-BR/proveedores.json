@@ -1,0 +1,55 @@
+{
+  "title": "Fornecedores",
+  "noAccess": "Você não tem permissão para ver fornecedores.",
+  "search": {
+    "placeholder": "Buscar por código ou razão social... (F2)"
+  },
+  "table": {
+    "codigo": "Código",
+    "rsocial": "Razão social",
+    "cuit": "CNPJ/CPF",
+    "condIva": "Regime fiscal",
+    "telef": "Telefone",
+    "activo": "Ativo"
+  },
+  "empty": "Nenhum fornecedor. Crie um com F3.",
+  "import": {
+    "button": "Importar CSV",
+    "title": "Importar fornecedores via CSV",
+    "description": "Baixe o modelo, preencha as linhas e exporte como CSV UTF-8. A primeira linha deve coincidir com o modelo.",
+    "downloadTemplate": "Baixar modelo CSV",
+    "chooseFile": "Escolher arquivo .csv",
+    "submit": "Importar",
+    "close": "Fechar",
+    "loading": "Importando…",
+    "successSummary": "Importação concluída: {{created}} criados, {{skipped}} ignorados.",
+    "errorsHeading": "Linhas com erro",
+    "row": "Linha",
+    "message": "Mensagem",
+    "errorNetwork": "Não foi possível concluir a importação. Verifique a conexão.",
+    "errorGeneric": "Falha na importação. Verifique o arquivo.",
+    "hintFormat": "Apenas .csv. Máx. 1 MB e até 2000 linhas de dados."
+  },
+  "form": {
+    "titleNew": "Novo fornecedor",
+    "titleEdit": "Editar fornecedor #{{codigo}}",
+    "hint": "F5=salvar, Esc=cancelar",
+    "codigo": "Código",
+    "rsocial": "Razão social",
+    "fantasia": "Nome fantasia",
+    "cuit": "CNPJ/CPF",
+    "condIva": "Regime fiscal",
+    "telef": "Telefone",
+    "email": "E-mail",
+    "activo": "Ativo",
+    "condIvaOptions": {
+      "RI": "RI",
+      "Mono": "Simples/MEI",
+      "CF": "Consumidor final",
+      "Exento": "Isento"
+    },
+    "errors": {
+      "generic": "Erro ao salvar fornecedor"
+    }
+  }
+}

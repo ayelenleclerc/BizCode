@@ -9,6 +9,7 @@
     "ventas": "Sales",
     "clientes": "Customers",
     "catalogo": "Products",
+    "proveedores": "Suppliers",
     "logistica": "Logistics",
     "finanzas": "Finance",
     "chat": "Chat",

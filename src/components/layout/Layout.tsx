@@ -52,6 +52,12 @@ const NAV_SECTIONS: {
     roles: ['owner', 'manager', 'seller', 'backoffice', 'warehouse_op', 'warehouse_lead', 'logistics_planner'],
   },
   {
+    key: 'proveedores',
+    path: '/proveedores',
+    icon: '\u{1F3ED}',
+    roles: ['owner', 'manager', 'seller', 'backoffice', 'warehouse_op', 'warehouse_lead', 'logistics_planner'],
+  },
+  {
     key: 'logistica',
     path: '/logistica',
     icon: '🚚',
