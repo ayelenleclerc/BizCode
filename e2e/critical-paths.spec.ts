@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test'
+import { loginAsTestUser } from './helpers/auth'
 
 /**
  * E2E Critical Paths Tests
@@ -11,7 +12,11 @@ import { test, expect } from '@playwright/test'
  *
  * These tests validate the core business processes of BizCode.
  * They run against http://127.0.0.1:4173 (Vite production preview).
+ *
+ * Auth: Login uses credentials from BIZCODE_SEED_SUPERADMIN_PASSWORD env var.
  */
+
+const TEST_PASSWORD = process.env.BIZCODE_SEED_SUPERADMIN_PASSWORD || 'test-password'
 
 test.describe('Critical Paths — Core Business Workflows', () => {
   // Helper to generate unique values for each test run
@@ -30,22 +35,18 @@ test.describe('Critical Paths — Core Business Workflows', () => {
 
   // Test 2: Navigate to Clientes page
   test('Navigate to Clientes page', async ({ page }) => {
-    await page.goto('/')
+    await loginAsTestUser(page, TEST_PASSWORD)
 
-    // Wait for navigation to settle (may redirect to login or home)
-    await page.waitForLoadState('networkidle')
-
-    // Try to navigate to clientes
+    // Navigate to clientes
     await page.goto('/clientes', { waitUntil: 'networkidle' })
 
-    // Page should load (either show clientes or redirect to login)
+    // Page should load
     await expect(page.locator('#root')).toBeVisible()
   })
 
   // Test 3: Navigate to Artículos page
   test('Navigate to Artículos page', async ({ page }) => {
-    await page.goto('/')
-    await page.waitForLoadState('networkidle')
+    await loginAsTestUser(page, TEST_PASSWORD)
     await page.goto('/articulos', { waitUntil: 'networkidle' })
 
     await expect(page.locator('#root')).toBeVisible()
@@ -53,8 +54,7 @@ test.describe('Critical Paths — Core Business Workflows', () => {
 
   // Test 4: Navigate to Facturación page
   test('Navigate to Facturación page', async ({ page }) => {
-    await page.goto('/')
-    await page.waitForLoadState('networkidle')
+    await loginAsTestUser(page, TEST_PASSWORD)
     await page.goto('/facturacion', { waitUntil: 'networkidle' })
 
     await expect(page.locator('#root')).toBeVisible()
@@ -62,6 +62,8 @@ test.describe('Critical Paths — Core Business Workflows', () => {
 
   // Test 5: Full workflow — Create cliente
   test('Create a new cliente (customer)', async ({ page }) => {
+    await loginAsTestUser(page, TEST_PASSWORD)
+
     const id = generateId()
     const testCliente = {
       codigo: `TEST-${id}`,
