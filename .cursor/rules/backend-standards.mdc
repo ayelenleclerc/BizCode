@@ -1,0 +1,162 @@
+# BizCode Backend Development Standards
+
+## 1. ARCHITECTURE & CODE ORGANIZATION
+
+### Domain Module Structure (Issue #77)
+
+Organize by domain, not HTTP method. Break apart createApp.ts (1521 lines).
+
+**Required structure:**
+- server/routes/clientes/ (handlers, validation, service, repository)
+- server/routes/articulos/
+- server/routes/facturas/
+- server/routes/rubros/
+- server/routes/proveedores/
+- server/middleware/ (errorHandler, logger, validateRequest, multiTenant)
+- server/lib/ (errors, logger, validators)
+- server/createApp.ts (<100 lines, bootstrap only)
+
+**Three-layer architecture:**
+1. Route Handler (HTTP concerns) → Service (business logic) → Repository (database)
+
+---
+
+## 2. ERROR HANDLING (Issue #78)
+
+Use AppError class hierarchy:
+- ValidationError (400)
+- AuthenticationError (401)
+- AuthorizationError (403)
+- NotFoundError (404)
+- ConflictError (409)
+- DatabaseError (500)
+
+Always delegate errors to centralized errorHandler middleware via next(err).
+
+HTTP Status Codes:
+- 200: GET successful
+- 201: POST created
+- 204: DELETE successful
+- 400: Validation error
+- 401: Authentication failed
+- 403: Authorization denied
+- 404: Not found
+- 409: Conflict/duplicate
+- 500: Server error
+
+---
+
+## 3. LOGGING & OBSERVABILITY (Issue #78)
+
+Use Pino for structured logging. NO console.log().
+
+Every request gets unique X-Request-ID for tracing.
+
+Every mutation (POST/PUT/DELETE) logs AuditEvent to database.
+
+---
+
+## 4. REQUEST VALIDATION (Issue #79)
+
+Use Zod schemas, not manual ValidationResult pattern.
+
+Define schemas in routes/<domain>/validation.ts.
+
+Use validateRequest() middleware to parse & validate.
+
+Single schema covers both POST and PUT with .partial().
+
+---
+
+## 5. MULTI-TENANT SECURITY (Issue #83)
+
+EVERY route accessing data must validate tenantId:
+- Route handler: Check cliente.tenantId === req.user.tenantId
+- Service layer: Always query with { where: { id, tenantId } }
+- Bulk operations: Validate every imported record's tenantId scope
+
+---
+
+## 6. TESTING (Issue #86)
+
+Before every commit:
+```
+npm run lint
+npm run type-check
+npm run test
+npm run test:integration
+npm run check:i18n
+```
+
+Coverage targets:
+- Validation: 100%
+- Services: >=90%
+- API: >=75%
+- Critical paths E2E: 100%
+
+---
+
+## 7. API DOCUMENTATION (Issue #76)
+
+OpenAPI spec is source-of-truth. Document BEFORE implementation.
+
+Every endpoint documents request/response schemas, security, permissions.
+
+---
+
+## 8. DATABASE & MIGRATIONS
+
+Every schema change needs npx prisma migrate dev --name <name>.
+
+Add indexes on frequently queried fields (tenantId, codigo, cuit).
+
+---
+
+## 9. AUTHENTICATION & AUTHORIZATION
+
+Check permissions in MIDDLEWARE before route handler using requirePermission().
+
+Session: 2-hour expiration, rate limit: 5 failures = 15 min lockout.
+
+---
+
+## 10. CODE QUALITY
+
+Commit message format: <type>(<scope>): <description>
+Types: feat, fix, docs, test, refactor, chore, perf
+
+PR checklist:
+- Lint, type-check, tests pass
+- OpenAPI spec updated
+- Error paths return correct HTTP status
+- Multi-tenant validation enforced
+- Logging added
+- Audit events logged (if mutation)
+- i18n updated (if UI changes)
+- Migrations created (if schema changes)
+
+---
+
+## ANTI-PATTERNS TO AVOID
+
+❌ Mix HTTP concerns in service layer
+❌ Throw database errors without wrapping
+❌ Validate tenantId only in service layer
+❌ Log sensitive data (passwords, tokens, CUIT, PII)
+❌ Ignore errors in bulk operations
+❌ Use dynamic OpenAPI generation as source-of-truth
+
+---
+
+## CRITICAL ISSUES
+
+#77 - Refactor createApp.ts monolith
+#78 - Centralized error handling + logging
+#79 - Request validation refactor (Zod)
+#83 - Multi-tenant validation enforcement
+#84 - Audit event logging
+#85 - Health check endpoint
+#86 - Unit tests for middleware
+#87 - Global rate limiting
+
+Status: Active | Last Updated: 2026-04-17

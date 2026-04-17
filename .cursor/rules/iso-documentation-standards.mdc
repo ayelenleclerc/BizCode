@@ -1,0 +1,841 @@
+# ISO Compliance & Technical Documentation Standards for BizCode
+
+**Purpose:** Establish documentation standards, ISO 27001/9001 compliance framework, and technical writing guidelines for BizCode production deployment.
+**Scope:** All technical documentation, process documentation, compliance documentation, and information security management.
+**Status:** Production-ready standards for 8-12 week implementation.
+
+---
+
+## 1. DOCUMENTATION STRATEGY
+
+### Standard: Comprehensive, version-controlled, audience-specific documentation
+
+**Documentation Levels:**
+
+1. **Executive Documentation** (for leaders & stakeholders)
+   - Business impact
+   - ROI/compliance benefits
+   - High-level architecture
+   - Risk summary
+
+2. **Technical Documentation** (for developers)
+   - API references
+   - Architecture details
+   - Code examples
+   - Database schema
+   - Integration guides
+
+3. **Operations Documentation** (for DevOps/Support)
+   - Runbooks
+   - Deployment procedures
+   - Troubleshooting guides
+   - Monitoring/alerting setup
+   - Incident response
+
+4. **Compliance Documentation** (for auditors)
+   - Policy documents
+   - Procedure documentation
+   - Risk register
+   - Control implementation evidence
+   - Audit findings tracking
+
+**Documentation Repository Structure:**
+```
+docs/
+├── README.md                          # Entry point
+├── api/
+│   ├── openapi.yaml                  # API specification
+│   ├── getting-started.md            # API quick start
+│   ├── authentication.md             # Auth guide
+│   ├── error-handling.md             # Error codes + handling
+│   └── rate-limiting.md              # Rate limit details
+├── architecture/
+│   ├── overview.md                   # System overview
+│   ├── C4-context-diagram.md         # C4 model
+│   ├── technology-stack.md           # Tech choices & rationale
+│   └── adr/                          # Architecture Decision Records
+├── database/
+│   ├── schema.md                     # Database schema
+│   ├── migrations.md                 # Migration guide
+│   ├── backup-recovery.md            # Backup procedures
+│   └── performance-tuning.md         # Performance guide
+├── deployment/
+│   ├── environments.md               # Environment setup
+│   ├── deploying.md                  # Deployment procedure
+│   ├── rollback.md                   # Rollback procedure
+│   └── health-checks.md              # Health check guide
+├── operations/
+│   ├── runbooks/
+│   │   ├── deploy-to-staging.md
+│   │   ├── deploy-to-production.md
+│   │   ├── rollback-deployment.md
+│   │   ├── handle-alerts.md
+│   │   ├── scale-infrastructure.md
+│   │   └── debug-production-issues.md
+│   ├── monitoring.md                 # Monitoring setup
+│   ├── incident-response.md          # Incident procedure
+│   └── troubleshooting.md            # Troubleshooting guide
+├── compliance/
+│   ├── iso-27001/
+│   │   ├── information-security-policy.md
+│   │   ├── access-control-policy.md
+│   │   ├── incident-response-procedure.md
+│   │   └── audit-plan.md
+│   ├── iso-9001/
+│   │   ├── quality-policy.md
+│   │   ├── process-definitions.md
+│   │   └── quality-objectives.md
+│   ├── risk-register.md              # Risk management
+│   ├── compliance-matrix.md          # Regulatory mapping
+│   └── audit-findings.md             # Audit tracking
+├── data-management/
+│   ├── data-classification.md        # Data classification
+│   ├── retention-policy.md           # Data retention
+│   └── gdpr-compliance.md            # Privacy compliance
+├── processes/
+│   ├── change-management.md          # Change control
+│   ├── release-management.md         # Release procedure
+│   ├── incident-management.md        # Incident handling
+│   └── training-competence.md        # Training matrix
+└── getting-started/
+    ├── installation.md               # Installation guide
+    ├── setup.md                      # Initial setup
+    ├── configuration.md              # Configuration guide
+    └── troubleshooting.md            # Common issues
+```
+
+---
+
+## 2. ARCHITECTURE DECISION RECORDS (ADRs)
+
+### Standard: Document all significant architecture decisions
+
+**ADR Template (MADR format):**
+
+```markdown
+# ADR-XXXX: [Decision Title]
+
+## Status
+Proposed | Accepted | Deprecated | Superseded by ADR-XXXX
+
+## Context
+Explain the problem that is the motivation for this decision.
+
+## Decision
+Describe the decision approach and the option chosen.
+
+## Consequences
+Describe the resulting context after applying the decision.
+
+### Positive
+- Benefit A
+- Benefit B
+
+### Negative
+- Drawback A
+- Drawback B
+
+## Alternatives Considered
+1. **Alternative A**
+   - Pros: ...
+   - Cons: ...
+
+2. **Alternative B**
+   - Pros: ...
+   - Cons: ...
+
+## References
+- [Related ADR](adr-XXXX.md)
+- [External Resource](https://example.com)
+```
+
+**Required ADRs:**
+```
+adr/
+├── 0001-record-architecture-decisions.md
+├── 0002-tauri-for-desktop-application.md
+├── 0003-react-for-frontend.md
+├── 0004-express-for-backend.md
+├── 0005-postgresql-for-database.md
+├── 0006-prisma-for-orm.md
+├── 0007-multi-tenant-isolation-strategy.md
+├── 0008-authentication-method-sessions-vs-jwt.md
+├── 0009-api-versioning-strategy.md
+├── 0010-error-handling-and-http-status-codes.md
+├── 0011-structured-logging-strategy.md
+├── 0012-testing-strategy-unit-integration-e2e.md
+├── 0013-deployment-strategy-aws-terraform.md
+├── 0014-monitoring-strategy-cloudwatch-prometheus.md
+├── 0015-disaster-recovery-rto-rpo-targets.md
+└── 0016-compliance-framework-iso-27001-9001.md
+```
+
+---
+
+## 3. API DOCUMENTATION
+
+### Standard: Comprehensive API documentation with examples and error codes
+
+**OpenAPI Specification:**
+```yaml
+openapi: 3.1.0
+info:
+  title: BizCode API
+  version: 1.0.0
+  description: |
+    # Getting Started
+    - Base URL: https://api.bizcode.com/v1
+    - Authentication: Bearer tokens (JWT or session)
+    - Rate Limit: 100 requests/minute per IP
+
+servers:
+  - url: https://api.bizcode.com/v1
+    description: Production
+
+paths:
+  /clientes:
+    post:
+      summary: Create new client
+      operationId: createCliente
+      tags:
+        - Clientes
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClienteInput'
+      responses:
+        '201':
+          description: Client created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClienteOutput'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: CUIT already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  schemas:
+    ClienteInput:
+      type: object
+      properties:
+        nombre:
+          type: string
+          minLength: 1
+          maxLength: 255
+        cuit:
+          type: string
+          pattern: '^\d{11}$'
+      required:
+        - nombre
+        - cuit
+    
+    ClienteOutput:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        nombre:
+          type: string
+        cuit:
+          type: string
+      required:
+        - id
+        - nombre
+        - cuit
+    
+    Error:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+            message:
+              type: string
+            details:
+              type: object
+```
+
+**API Documentation Best Practices:**
+- ✅ Complete OpenAPI specification (kept up-to-date)
+- ✅ Getting started guide with examples
+- ✅ Authentication guide with step-by-step instructions
+- ✅ Error code reference with solutions
+- ✅ Rate limiting documentation
+- ✅ Example requests and responses (curl, JavaScript, Python)
+- ✅ Webhook documentation (if applicable)
+- ✅ Deprecation policy (how old versions are handled)
+- ✅ Versioning strategy (v1, v2, backwards compatibility)
+- ✅ Changelog (what changed, when, why)
+
+---
+
+## 4. CODE DOCUMENTATION
+
+### Standard: JSDoc/TSDoc for all public APIs
+
+**Documentation Requirements:**
+
+```typescript
+/**
+ * Validates a Brazilian tax ID (CUIT)
+ * 
+ * Checks format and calculates check digit using the official algorithm.
+ * Accepts both formatted (20.123.456.789-XX) and unformatted (20123456789XX) input.
+ * 
+ * @param cuit - The CUIT to validate (string or number with 11 digits)
+ * @returns true if the CUIT is valid, false otherwise
+ * @throws {TypeError} If input is not a string or number
+ * 
+ * @example
+ * // Valid CUIT returns true
+ * validateCUIT('20123456789') // => true
+ * validateCUIT('20.123.456.789') // => true
+ * 
+ * @example
+ * // Invalid CUIT returns false
+ * validateCUIT('20123456780') // => false (bad check digit)
+ * validateCUIT('ABC') // => false (invalid format)
+ * 
+ * @see {@link https://www.afip.gob.ar AFIP} for CUIT rules
+ */
+export function validateCUIT(cuit: string | number): boolean {
+  // Implementation
+}
+
+/**
+ * Service for managing clients
+ * 
+ * Provides methods to create, read, update, and delete clients.
+ * All operations are tenant-aware and validate multi-tenant isolation.
+ * 
+ * @example
+ * ```typescript
+ * const service = new ClientService(prisma)
+ * const client = await service.create(tenantId, {
+ *   nombre: 'Acme Corp',
+ *   cuit: '20123456789'
+ * })
+ * ```
+ */
+export class ClientService {
+  /**
+   * Creates a new client
+   * 
+   * @param tenantId - The tenant ID
+   * @param data - Client creation data
+   * @returns The created client
+   * @throws {PrismaClientKnownRequestError} If CUIT already exists
+   * 
+   * @example
+   * ```typescript
+   * const client = await service.create('tenant-1', {
+   *   nombre: 'Test Client',
+   *   cuit: '20123456789'
+   * })
+   * ```
+   */
+  async create(tenantId: string, data: ClientCreateInput): Promise<Cliente> {
+    // Implementation
+  }
+}
+```
+
+**Documentation Standards:**
+- ✅ JSDoc on all public functions/classes
+- ✅ @param descriptions with types
+- ✅ @returns description
+- ✅ @throws for exceptions
+- ✅ @example with realistic usage
+- ✅ @deprecated for old APIs
+- ✅ Module-level comments for files
+- ❌ No obvious comments ("this variable stores x")
+- ✅ Complex algorithm comments explaining logic
+
+---
+
+## 5. ISO 27001 COMPLIANCE FRAMEWORK
+
+### Standard: Information Security Management System (ISMS)
+
+**Required Policies & Procedures:**
+
+1. **Information Security Policy (High-Level)**
+   - Objectives & commitment
+   - Scope & applicability
+   - Key principles (confidentiality, integrity, availability)
+   - Responsibility assignment
+   - Review schedule
+
+2. **Access Control Policy**
+   - User provisioning procedure
+   - User de-provisioning procedure
+   - Password requirements (minimum 12 chars, complexity)
+   - MFA requirements
+   - Privilege elevation controls
+   - Review schedule (quarterly)
+
+3. **Encryption Policy**
+   - Encryption at-rest: AES-256 for sensitive data
+   - Encryption in-transit: TLS 1.2+
+   - Key management procedures
+   - Key rotation schedule (90 days)
+   - Certificate management (auto-renewal, monitoring)
+
+4. **Incident Response Procedure**
+   - Detection & reporting
+   - Severity classification
+   - Escalation process
+   - Investigation & remediation
+   - Communication plan
+   - Post-incident review
+
+5. **Asset Management**
+   - Asset register (hardware, software, data)
+   - Asset classification by sensitivity
+   - Asset lifecycle management
+   - Disposal procedures
+
+6. **Supplier Management**
+   - Risk assessment for suppliers
+   - Data Processing Agreement (DPA)
+   - Security requirements in contracts
+   - Audit procedures
+
+7. **Backup & Recovery**
+   - Backup frequency (daily)
+   - Backup location (cross-region)
+   - Recovery procedure & RTO/RPO targets
+   - Recovery testing (quarterly)
+   - Retention policy (35 days)
+
+8. **Audit & Monitoring**
+   - Security monitoring 24/7
+   - Log retention (90 days)
+   - Access logging
+   - Audit trail (who did what, when, why)
+   - Alert procedures
+
+**ISO 27001 Control Mapping:**
+```
+Control | Policy                    | Evidence                    | Status
+────────┼──────────────────────────┼─────────────────────────────┼────────
+A.5.1  | Information security     | Information security policy | Pending
+A.6.1  | Internal organization    | Org chart + responsibilities| Pending
+A.7.1  | Prior to employment      | Background check procedure  | Pending
+A.7.2  | During employment        | Security awareness training | Pending
+A.8.1  | Asset responsibility     | Asset register              | Pending
+A.9.1  | Access control policy    | Access control procedure    | Pending
+A.10.1 | Cryptography             | Encryption policy           | Pending
+A.11.1 | Physical security        | Data center requirements    | Pending
+A.12.1 | Operations security      | Change management procedure | Pending
+A.13.1 | Secure communications    | TLS policy                  | Pending
+A.14.1 | Secure development       | SDLC security requirements  | Pending
+A.15.1 | Supplier relationships   | Supplier agreement template | Pending
+A.16.1 | Incident management      | Incident response procedure | Pending
+A.17.1 | Business continuity      | DR procedure, RTO/RPO       | Pending
+A.18.1 | Regulatory compliance    | Compliance matrix           | Pending
+```
+
+---
+
+## 6. ISO 9001 QUALITY MANAGEMENT SYSTEM (QMS)
+
+### Standard: Document all quality processes and continuous improvement
+
+**Required Quality Documents:**
+
+1. **Quality Policy**
+   - Commitment to quality
+   - Customer focus
+   - Regulatory compliance
+   - Improvement culture
+   - Management commitment
+
+2. **Process Architecture**
+   - All processes mapped
+   - Input/output definitions
+   - Process owner assigned
+   - Metrics defined
+   - Success criteria documented
+
+3. **Control Procedures**
+   - Document control
+   - Change control
+   - Configuration management
+   - Non-conformance tracking
+   - Corrective action procedure
+
+4. **Operational Procedures**
+   - Development process
+   - Testing procedure
+   - Deployment procedure
+   - Support process
+   - Maintenance process
+
+5. **Management Review**
+   - Quarterly reviews scheduled
+   - Agenda template
+   - Performance metrics reviewed
+   - Process effectiveness assessed
+   - Improvement areas identified
+   - Minutes documented
+
+6. **Internal Audit**
+   - Annual audit schedule
+   - Audit checklist (40+ items)
+   - Auditor training & qualifications
+   - Audit evidence documented
+   - Non-conformances tracked
+   - Corrective actions verified
+
+7. **Competence & Training**
+   - Competency matrix (required skills per role)
+   - Training needs analysis
+   - Training plan & schedule
+   - Training completion records
+   - Competency verification
+
+**QMS Documentation Requirements:**
+- ✅ All processes documented in process flow diagrams
+- ✅ Work instructions for critical activities
+- ✅ Procedure documents (template + examples)
+- ✅ Records (evidence of compliance)
+- ✅ Performance metrics & dashboards
+- ✅ Non-conformance tracking
+- ✅ Corrective action tracking
+- ✅ Management review minutes
+- ✅ Audit schedule & reports
+
+---
+
+## 7. CHANGE MANAGEMENT PROCEDURE
+
+### Standard: Formal process for all changes to systems, code, and infrastructure
+
+**Change Request Workflow:**
+```
+1. Request Phase
+   ├── Create change request
+   ├── Define business justification
+   ├── Assess impact & risk
+   └── Estimate effort & timeline
+
+2. Approval Phase
+   ├── Route to change advisory board (CAB)
+   ├── CAB reviews impact & risk
+   ├── CAB approves/rejects
+   └── Schedule change window
+
+3. Implementation Phase
+   ├── Prepare change
+   ├── Execute change
+   ├── Verify success
+   └── Notify stakeholders
+
+4. Post-Implementation Phase
+   ├── Monitor for issues
+   ├── Document lessons learned
+   ├── Update configuration management DB
+   └── Archive change request
+
+Change Request Template:
+─────────────────────────
+Change ID: CHG-2026-001
+Title: Add 2FA to user authentication
+Type: Enhancement | Bug Fix | Security Patch | Hotfix
+Priority: Critical | High | Medium | Low
+Complexity: High | Medium | Low
+Risk Level: High | Medium | Low
+
+Business Justification:
+[Why this change is needed]
+
+Technical Details:
+[Technical approach, architecture impact]
+
+Testing Plan:
+[Unit tests, integration tests, E2E tests, UAT]
+
+Rollback Plan:
+[How to rollback, time estimate, impact]
+
+Communication Plan:
+[Who to notify: customers, support, ops, etc.]
+
+Resource Requirements:
+[Team members, infrastructure, access]
+
+Change Window:
+[Proposed date, start time, expected duration]
+
+Approval:
+Change Manager: _______________
+CAB Representative: _______________
+Business Owner: _______________
+─────────────────────────
+```
+
+---
+
+## 8. INCIDENT MANAGEMENT & POST-MORTEMS
+
+### Standard: Formal process for detecting, responding, and learning from incidents
+
+**Incident Severity Levels:**
+```
+Critical (P1):
+├── Complete service outage
+├── Data loss or security breach
+├── All customers affected
+└── SLA: Respond in 15 min, resolve in 4 hours
+
+High (P2):
+├── Partial service degradation
+├── Some customers affected
+├── Workaround available
+└── SLA: Respond in 1 hour, resolve in 8 hours
+
+Medium (P3):
+├── Minor functionality issue
+├── Single user or subset affected
+├── No workaround required
+└── SLA: Respond in 4 hours, resolve in 24 hours
+
+Low (P4):
+├── Cosmetic issues
+├── No business impact
+└── SLA: Respond in 24 hours
+```
+
+**Incident Response Workflow:**
+```
+1. Detection & Alerting
+   ├── Alert triggered (monitoring)
+   └── Acknowledged by on-call engineer
+
+2. Initial Response
+   ├── Severity assessed
+   ├── On-call team assembled
+   ├── War room/Slack channel created
+   └── Customers notified (if high severity)
+
+3. Investigation & Mitigation
+   ├── Logs analyzed
+   ├── Metrics reviewed
+   ├── Hypothesis developed
+   ├── Root cause identified
+   └── Temporary fix/workaround deployed
+
+4. Resolution
+   ├── Permanent fix implemented
+   ├── Testing completed
+   ├── Deployment to production
+   ├── Monitoring verified
+   └── Status updates cease
+
+5. Post-Incident Review (24 hours after)
+   ├── Timeline documented
+   ├── Root cause analysis (5 Whys)
+   ├── Contributing factors identified
+   ├── Action items for prevention
+   ├── Lessons learned documented
+   └── Report published & shared
+
+Post-Mortem Template:
+─────────────────────
+Incident ID: INC-2026-001
+Date & Time: 2026-04-15 14:00-16:30 UTC
+Duration: 2 hours 30 minutes
+Severity: High
+Status: Resolved + Reviewed
+
+Timeline:
+14:00 - Alert: Database CPU > 80%
+14:05 - On-call engineer paged
+14:10 - Investigation started
+14:35 - Root cause identified: Missing index
+14:50 - Fix deployed to staging
+15:00 - Fix deployed to production
+15:30 - Monitoring confirmed healthy
+
+Root Cause:
+Missing index on client_id column in invoices table
+Query plan: Full table scan (150M rows)
+Performance: 0.5s → 45s query time
+
+Contributing Factors:
+- Index strategy not documented
+- Code review didn't catch N+1 pattern
+- No query performance monitoring alerting
+
+Impact:
+- 500+ customers affected
+- 2.5 hours downtime
+- Estimated $50k revenue impact
+
+Timeline (Detailed):
+- 14:00: Alert triggered (CPU > 80%)
+- 14:03: Engineering team paged
+- 14:10: On-call engineer logs in
+- 14:15: Identifies slow query in logs
+- 14:25: Traces to missing index
+- 14:35: Creates index
+- 14:50: Verifies fix in staging, deploys
+- 15:00: Monitors production metrics
+
+Action Items (Prevention):
+1. Add missing indexes (3 items) - Owner: DBA - Due: 2026-04-17
+2. Implement query monitoring - Owner: Backend Lead - Due: 2026-04-24
+3. Database review checklist for PRs - Owner: Tech Lead - Due: 2026-04-20
+4. Document index strategy - Owner: Architect - Due: 2026-04-22
+
+Lessons Learned:
+- Monitoring was insufficient for database query performance
+- Index strategy not documented
+- Code review should catch N+1 patterns
+- Need for database load testing before production
+
+Follow-up Actions:
+☐ Implement action items by due dates
+☐ Update index strategy documentation
+☐ Add database load testing to CI/CD
+☐ Share learning in team meeting
+☐ Update postmortem procedure based on feedback
+─────────────────────
+```
+
+---
+
+## 9. DATA MANAGEMENT & RETENTION
+
+### Standard: Document data classification, retention, and protection
+
+**Data Classification Levels:**
+```
+Public:
+├── No sensitivity
+├── Marketing materials
+├── Public documentation
+└── No special protection required
+
+Internal:
+├── Company use only
+├── Business processes
+├── Performance metrics
+└── Standard protection (access control)
+
+Confidential:
+├── Customer data (PII)
+├── Financial data
+├── Contracts
+├── Restricted to authorized users
+└── Encryption + access logging required
+
+Secret:
+├── Passwords
+├── API keys
+├── Tax IDs (CUIT)
+├── Highly restricted
+└── Encryption + strict access control + audit
+
+Data Inventory:
+─────────────────────
+Data Type          | Classification | Retention | Protection
+───────────────────┼────────────────┼───────────┼──────────────
+Client Name        | Confidential    | 7 years*  | Encrypted
+Client Email       | Confidential    | 7 years*  | Encrypted
+Client CUIT        | Secret         | 7 years*  | Encrypted
+Credit Limit       | Confidential    | 7 years*  | Encrypted
+Invoice Amounts    | Internal       | 7 years*  | Access control
+Audit Logs         | Confidential    | 3 years   | Immutable, encrypted
+Backups            | Secret         | 35 days   | Encrypted, cross-region
+User Passwords     | Secret         | N/A       | Hashed (bcrypt)
+User Sessions      | Confidential    | 24 hours  | Encrypted
+Website Logs       | Internal       | 30 days   | Access control
+
+*Tax requirement (Argentina)
+─────────────────────
+```
+
+---
+
+## 10. COMPLIANCE MATRIX
+
+### Standard: Map all regulatory requirements to implemented controls
+
+**Compliance Matrix Template:**
+
+```
+Regulation/Standard | Requirement | Control | Status | Evidence | Notes
+────────────────────┼─────────────┼─────────┼────────┼──────────┼──────
+ISO 27001 A.5.1     | Information | Security | Pending| Policy   | In draft
+                    | security    | policy   |        | doc      |
+                    | policy      |          |        |          |
+────────────────────┼─────────────┼─────────┼────────┼──────────┼──────
+GDPR Article 32     | Security of | TLS 1.2 | Done   | Config   | All
+                    | processing  | + AES   |        | verified | data
+                    |             | at-rest |        |          |
+────────────────────┼─────────────┼─────────┼────────┼──────────┼──────
+Argentina Tax Law   | Invoice    | Invoice | Done   | Invoice  | Schema
+                    | retention  | archival|        | archival | docs
+                    | 7 years    | in S3   |        | procedure|
+```
+
+---
+
+## 11. VALIDATION CRITERIA
+
+**Documentation Completeness Checklist:**
+
+| Section | Required | Status | Evidence |
+|---------|----------|--------|----------|
+| API Documentation | OpenAPI + guides | ☐ | openapi.yaml + docs/api/*.md |
+| Architecture | C4 + ADRs | ☐ | docs/architecture/* |
+| Database | Schema + procedures | ☐ | docs/database/* |
+| Deployment | Procedures + runbooks | ☐ | docs/deployment/* |
+| Operations | Runbooks | ☐ | docs/operations/runbooks/*.md |
+| ISO 27001 | Policies + procedures | ☐ | docs/compliance/iso-27001/* |
+| ISO 9001 | Quality documents | ☐ | docs/compliance/iso-9001/* |
+| Change Mgmt | Procedure + template | ☐ | docs/processes/change-management.md |
+| Incident Mgmt | Procedure + template | ☐ | docs/processes/incident-management.md |
+| Risk Register | Identified & tracked | ☐ | docs/compliance/risk-register.md |
+| Data Policy | Classification + retention | ☐ | docs/data-management/* |
+| Training | Matrix + records | ☐ | docs/processes/training-competence.md |
+| Compliance Matrix | All mapped | ☐ | docs/compliance/compliance-matrix.md |
+
+---
+
+## 12. ANTI-PATTERNS TO AVOID
+
+- ❌ No documentation (assume people remember)
+- ❌ Outdated documentation (worse than no docs)
+- ❌ Scattered documentation (in multiple places)
+- ❌ Unclear ownership (who maintains docs?)
+- ❌ No examples in documentation (theory only)
+- ❌ Overly technical for business users
+- ❌ Overly simple for technical users (condescending)
+- ❌ No version control for docs
+- ❌ No review process for docs
+- ❌ Compliance docs stored separately from code
+- ❌ Risk register never reviewed
+- ❌ Post-mortems without action items
+- ❌ Action items without owners & deadlines
+
+---
+
+**This document is the source of truth for documentation and ISO compliance standards. All deviations require documentation plan documentation.**

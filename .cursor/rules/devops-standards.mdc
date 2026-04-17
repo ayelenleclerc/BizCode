@@ -1,0 +1,431 @@
+# BizCode DevOps Standards
+# Senior DevOps Engineer Rules & Best Practices
+# Date: 2026-04-17
+
+## 1. CONTAINERIZATION (Issue #201, #202)
+
+### Docker for Express API
+
+```dockerfile
+FROM node:22-alpine AS builder
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+RUN npm run type-check && npm run lint && npm run test
+
+FROM node:22-alpine AS runtime
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --omit=dev
+COPY server ./server
+COPY prisma ./prisma
+EXPOSE 3001
+HEALTHCHECK --interval=10s CMD node -e "require('http').get('http://localhost:3001/health', (r) => { if (r.statusCode!==200) throw new Error(r.statusCode); })"
+CMD ["npm", "run", "server"]
+```
+
+### Docker Compose for Local Dev
+
+```yaml
+version: '3.8'
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: bizcode
+      POSTGRES_PASSWORD: bizcode
+      POSTGRES_DB: bizcode_dev
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bizcode"]
+      interval: 10s
+
+  api:
+    build: .
+    environment:
+      DATABASE_URL: postgresql://bizcode:bizcode@postgres:5432/bizcode_dev
+    ports:
+      - "3001:3001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - .:/app
+```
+
+**Never hardcode secrets in Dockerfile or compose file.**
+
+---
+
+## 2. ENVIRONMENT MANAGEMENT (Issue #203)
+
+### Environment Validation Schema
+
+**Rule:** Validate all required env vars on startup. Fail fast.
+
+```typescript
+// server/lib/env.ts
+import { z } from 'zod'
+
+const envSchema = z.object({
+  DATABASE_URL: z.string().url(),
+  JWT_SECRET: z.string().min(32),
+  NODE_ENV: z.enum(['development', 'staging', 'production']),
+  PORT: z.coerce.number().default(3001),
+  LOG_LEVEL: z.enum(['debug', 'info', 'warn', 'error']).default('info'),
+  CORS_ORIGIN: z.string().url().optional(),
+})
+
+export const env = envSchema.parse(process.env)
+```
+
+**Usage in main.ts:**
+```typescript
+import { env } from './lib/env'
+
+// env is validated and typed
+const port = env.PORT
+```
+
+### Environment Files
+
+**Never commit:**
+- .env (contains secrets)
+- .env.production (production secrets)
+
+**Always commit:**
+- .env.example (template with no secrets)
+- .env.staging.example (staging template)
+
+---
+
+## 3. HEALTH CHECKS (Issue #204)
+
+### GET /health Endpoint
+
+**Rule:** Every deployable service has /health.
+
+```typescript
+// server/routes/health/index.ts
+app.get('/health', async (req, res) => {
+  const startTime = Date.now()
+  
+  try {
+    // Check database
+    await prisma.$queryRaw`SELECT 1`
+    
+    res.json({
+      status: 'healthy',
+      timestamp: new Date().toISOString(),
+      checks: {
+        database: {
+          status: 'ok',
+          response_time_ms: Date.now() - startTime
+        },
+        memory: {
+          status: 'ok',
+          used_mb: Math.round(process.memoryUsage().heapUsed / 1024 / 1024),
+          total_mb: Math.round(process.memoryUsage().heapTotal / 1024 / 1024)
+        },
+        uptime_seconds: Math.floor(process.uptime())
+      }
+    })
+  } catch (err) {
+    res.status(503).json({
+      status: 'unhealthy',
+      error: err instanceof Error ? err.message : 'Unknown error'
+    })
+  }
+})
+```
+
+**Load balancer behavior:**
+- Poll every 10 seconds
+- If healthy: route traffic
+- If 3 consecutive failures: remove from pool
+- If all instances fail: failover to backup
+
+---
+
+## 4. LOGGING (Issue #209)
+
+### Structured Logging Format
+
+**Rule:** Every log entry has: timestamp, level, service, requestId, message.
+
+```json
+{
+  "timestamp": "2026-04-17T10:30:00Z",
+  "level": "info",
+  "service": "bizcode-api",
+  "requestId": "req_123abc",
+  "userId": "user_456",
+  "tenantId": "tenant_789",
+  "message": "Invoice created",
+  "duration_ms": 245,
+  "data": { "invoiceId": "inv_123", "total": 5000 }
+}
+```
+
+**When to log:**
+- Request arrival (INFO)
+- Request completion (INFO with duration)
+- Database errors (ERROR with query)
+- Business events (INFO: "cliente created", "invoice paid")
+- Validation failures (WARN)
+- Unexpected errors (ERROR with stack trace)
+
+**Never log:**
+- Passwords
+- API keys / tokens
+- Full credit cards (log last 4 digits only)
+- SSN / CUIT / PII
+- Full email addresses (log hash)
+
+---
+
+## 5. SECRETS MANAGEMENT (Issue #206)
+
+### Environment Variables (Production)
+
+**Rule:** All secrets in GitHub Secrets or Vault, never in .env.
+
+**For GitHub Actions:**
+```yaml
+- name: Deploy
+  env:
+    DATABASE_URL: ${{ secrets.PROD_DATABASE_URL }}
+    JWT_SECRET: ${{ secrets.PROD_JWT_SECRET }}
+  run: npm run deploy
+```
+
+**Secret rotation:**
+- Rotate every 90 days
+- Different secrets per environment
+- Use strong random values (32+ chars)
+- Never share in Slack, email, or Git
+
+---
+
+## 6. BACKUP & DISASTER RECOVERY (Issue #205)
+
+### Backup Strategy
+
+**Daily:**
+```bash
+pg_dump $DATABASE_URL > /backups/bizcode_$(date +%Y%m%d).sql.gz
+```
+
+**Retention:**
+- Daily: kept for 7 days
+- Weekly: kept for 4 weeks
+- Monthly: kept for 1 year
+- Off-site: replicate to S3 or different region
+
+**Recovery testing:**
+- Test restore monthly
+- Document recovery time (RTO)
+- Document acceptable data loss (RPO)
+- Test in staging, not production
+
+### Runbooks
+
+**Create runbooks for:**
+- Database recovery from backup
+- Deployment rollback (previous version)
+- Scaling under load
+- Security incident response
+- Service outage response
+
+---
+
+## 7. DEPLOYMENT PIPELINE (Issue #207)
+
+### Automated Deployments
+
+**On Push to develop:**
+1. Run tests
+2. Build Docker image (tag: develop-<commit>)
+3. Push to registry
+4. Deploy to staging
+
+**On Release (main):**
+1. Run full test suite
+2. Build Docker image (tag: latest, <version>)
+3. Push to registry
+4. Deploy to production (canary: 10% → 50% → 100%)
+5. Build Tauri desktop binaries
+6. Attach to GitHub Release
+
+**Manual Workflow (if needed):**
+```yaml
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        type: choice
+        options: [staging, production]
+```
+
+---
+
+## 8. ERROR TRACKING (Issue #208)
+
+### Sentry Integration
+
+```typescript
+import * as Sentry from "@sentry/node"
+
+Sentry.init({
+  dsn: process.env.SENTRY_DSN,
+  environment: process.env.NODE_ENV,
+  tracesSampleRate: 0.1,
+})
+
+app.use(Sentry.Handlers.requestHandler())
+app.use(Sentry.Handlers.errorHandler())
+
+// Capture errors
+try {
+  await riskyOperation()
+} catch (err) {
+  Sentry.captureException(err, {
+    tags: { operation: 'riskyOperation' },
+    contexts: { userId: req.user?.id }
+  })
+}
+```
+
+**Alerting rules:**
+- Error rate > 1% for 5 minutes: page on-call
+- Specific error type spike: notify team
+- New error signature: log for review
+
+---
+
+## 9. MONITORING & ALERTING (Issue #212)
+
+### Prometheus Metrics
+
+**What to measure:**
+- Request count (per endpoint)
+- Request latency (p50, p95, p99)
+- Error rate (per endpoint)
+- Database connection pool usage
+- Memory usage
+- CPU usage
+
+**Alert thresholds:**
+```
+request_latency_p95 > 5000ms    → WARN
+request_latency_p95 > 10000ms   → ALERT
+error_rate > 1%                 → ALERT
+memory_usage > 90%              → WARN
+database_connections > 80%      → ALERT
+health_check_failures >= 3      → ALERT
+```
+
+---
+
+## 10. REQUEST TRACING (Issue #211)
+
+### Correlation IDs
+
+**Rule:** Every request gets unique ID for tracing across services.
+
+```typescript
+// Middleware
+import { randomUUID } from 'crypto'
+
+app.use((req, res, next) => {
+  const requestId = req.headers['x-request-id'] || randomUUID()
+  res.setHeader('X-Request-ID', requestId)
+  res.locals.requestId = requestId
+  
+  logger.info({ requestId, method: req.method, path: req.path }, 'request')
+  next()
+})
+```
+
+**Benefits:**
+- Follow request through logs
+- Debug multi-service issues
+- Calculate latency
+- Track user sessions
+
+---
+
+## 11. CODE QUALITY & SECURITY
+
+### Pre-deployment Checks
+
+```bash
+npm run lint              # Code quality
+npm run type-check       # TypeScript errors
+npm run test             # Unit tests
+npm run test:integration # Integration tests
+npm run test:e2e         # End-to-end tests
+npm audit               # Dependency vulnerabilities
+```
+
+### Security Scanning
+
+**SAST (Static Analysis):**
+```bash
+npm install --save-dev eslint-plugin-security
+```
+
+**DAST (Dynamic Analysis):**
+- Run security tests against staging
+- Check for OWASP Top 10
+
+**Dependency Scanning:**
+- npm audit on every PR
+- Renovate/Dependabot for auto-updates
+
+---
+
+## 12. ANTI-PATTERNS
+
+❌ Hardcoded secrets in code or Dockerfile
+❌ Logging passwords, tokens, PII
+❌ No health check endpoint
+❌ Manual deployments (no CI/CD)
+❌ Same secrets across environments
+❌ No backups
+❌ No monitoring (blind in production)
+❌ No correlation IDs (can't trace requests)
+❌ No environment validation
+❌ Breaking changes without runbooks
+❌ Deploying without tests
+❌ No log aggregation
+
+---
+
+## CRITICAL ISSUES
+
+P0:
+- #201: Docker containerization
+- #202: Docker Compose
+- #203: Environment validation
+- #204: Health check endpoint
+- #205: Backup strategy
+- #206: Secrets management
+- #207: Deployment automation
+- #208: Error tracking
+- #209: Structured logging
+- #210: Database connection pooling
+
+P1:
+- #211: Request tracing
+- #212: Monitoring & alerting
+- #213: API rate limiting
+- #214: Security scanning
+- #215: Load testing
+- #216: Runbooks
+
+Status: Active | Last Updated: 2026-04-17

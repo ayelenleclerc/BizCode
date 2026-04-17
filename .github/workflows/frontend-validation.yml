@@ -1,0 +1,119 @@
+name: Frontend Quality Validation
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'src/**'
+      - 'tests/**'
+      - 'e2e/**'
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - 'src/**'
+      - 'tests/**'
+      - 'e2e/**'
+
+jobs:
+  frontend-quality:
+    name: Frontend Code Quality
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: TypeScript type-check
+        run: npm run type-check
+
+      - name: ESLint with jsx-a11y
+        run: npm run lint
+
+      - name: Unit tests with coverage
+        run: npm run test:coverage
+
+      - name: Check component sizes (Issue #102)
+        run: |
+          LARGE=$(find src/pages -name "*.tsx" -exec wc -l {} + | awk '$1 > 200 {print $2 " (" $1 " lines)"}')
+          if [ ! -z "$LARGE" ]; then
+            echo "⚠️ Large page components found (Issue #102):"
+            echo "$LARGE"
+          fi
+
+      - name: Check for error boundaries (Issue #101)
+        run: |
+          if grep -r "ErrorBoundary" src/App.tsx > /dev/null; then
+            echo "✅ ErrorBoundary found in App"
+          else
+            echo "⚠️ ErrorBoundary not implemented (Issue #101)"
+          fi
+
+      - name: Check for custom hooks (Issue #103)
+        run: |
+          HOOKS=$(find src/hooks -name "*.ts" 2>/dev/null | wc -l)
+          echo "✅ Found $HOOKS custom hooks"
+          if [ $HOOKS -lt 3 ]; then
+            echo "⚠️ Low number of custom hooks (Issue #103)"
+          fi
+
+      - name: Check for UI components (Issue #102)
+        run: |
+          COMPONENTS=$(find src/components/ui -name "*.tsx" 2>/dev/null | wc -l)
+          echo "✅ Found $COMPONENTS UI components"
+          if [ $COMPONENTS -lt 8 ]; then
+            echo "⚠️ Component library incomplete (Issue #102)"
+          fi
+
+      - name: Check for loading states (Issue #105)
+        run: |
+          SKELETONS=$(grep -r "Skeleton\|LoadingSpinner" src/pages --include="*.tsx" 2>/dev/null | wc -l)
+          echo "✅ Found $SKELETONS loading state implementations"
+          if [ $SKELETONS -lt 5 ]; then
+            echo "⚠️ Low loading state coverage (Issue #105)"
+          fi
+
+      - name: Check for error handling (Issue #101)
+        run: |
+          HANDLERS=$(grep -r "catch.*error\|try.*{" src/pages --include="*.tsx" 2>/dev/null | wc -l)
+          echo "✅ Found $HANDLERS error handling blocks"
+
+      - name: Verify i18n coverage
+        run: npm run check:i18n
+
+      - name: Install Playwright
+        run: npx playwright install --with-deps chromium
+
+      - name: E2E smoke test
+        run: npm run test:e2e
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-coverage
+          path: coverage/
+          retention-days: 14
+
+      - name: Report Frontend Status
+        if: always()
+        run: |
+          echo "## Frontend Quality Report" >> $GITHUB_STEP_SUMMARY
+          echo "- Error boundaries: Issue #101" >> $GITHUB_STEP_SUMMARY
+          echo "- UI components: Issue #102" >> $GITHUB_STEP_SUMMARY
+          echo "- Custom hooks: Issue #103" >> $GITHUB_STEP_SUMMARY
+          echo "- E2E tests: Issue #104" >> $GITHUB_STEP_SUMMARY
+          echo "- Loading states: Issue #105" >> $GITHUB_STEP_SUMMARY
+          echo "- Form validation: Issue #106" >> $GITHUB_STEP_SUMMARY
+          echo "- Page refactoring: Issue #107" >> $GITHUB_STEP_SUMMARY
+          echo "- Storybook: Issue #108" >> $GITHUB_STEP_SUMMARY
+          echo "- a11y testing: Issue #109" >> $GITHUB_STEP_SUMMARY
+          echo "- Performance: Issue #110" >> $GITHUB_STEP_SUMMARY
