@@ -1,0 +1,392 @@
+# Infrastructure Standards for BizCode
+
+**Purpose:** Establish cloud architecture, Infrastructure as Code, and operational standards for BizCode production deployment.
+**Scope:** AWS cloud infrastructure, Terraform IaC, monitoring, disaster recovery, cost management.
+**Status:** Production-ready standards for 8-12 week implementation.
+
+---
+
+## 1. CLOUD PROVIDER & DEPLOYMENT STRATEGY
+
+### Standard: AWS-first with Terraform Infrastructure as Code
+
+All infrastructure deployed on AWS with full IaC implementation.
+
+**AWS Regions:**
+- **Primary:** us-east-1 (N. Virginia)
+- **Secondary:** us-west-2 (Oregon) for disaster recovery
+- **Decision:** Chosen for low latency, managed services, cost-effectiveness
+
+**Infrastructure as Code:**
+- **Tool:** Terraform 1.7+
+- **State Storage:** S3 backend with DynamoDB locking
+- **Repository:** Version-controlled, PR-based deployment
+- **Validation:** `terraform validate`, `terraform fmt`, `terraform plan` review
+
+**Project Structure:**
+```
+terraform/
+├── main.tf                 # Provider, backend, globals
+├── variables.tf            # Input variables
+├── outputs.tf              # Exported values
+├── terraform.tfvars        # Environment-specific values
+├── .terraform.lock.hcl    # Locked dependency versions
+├── modules/
+│   ├── networking/        # VPC, subnets, security groups
+│   ├── database/          # RDS PostgreSQL
+│   ├── compute/           # ECS, ALB, auto-scaling
+│   ├── storage/           # S3, CloudFront
+│   ├── monitoring/        # CloudWatch, alarms
+│   └── secrets/           # Secrets Manager
+├── environments/
+│   ├── development/
+│   ├── staging/
+│   └── production/
+└── README.md              # Documentation
+```
+
+**Validation in Terraform:**
+```hcl
+# No hardcoded secrets
+# Use AWS Secrets Manager or environment variables
+
+# All resources must be tagged
+tags = {
+  Environment = var.environment
+  Project     = "bizcode"
+  ManagedBy   = "terraform"
+  CreatedDate = timestamp()
+}
+```
+
+---
+
+## 2. DATABASE ARCHITECTURE
+
+### Standard: AWS RDS PostgreSQL with Multi-AZ and Automated Backups
+
+**RDS Configuration:**
+- **Engine:** PostgreSQL 15+
+- **Instance Class:** db.r5.large (production) or smaller for staging
+- **Multi-AZ:** Required for production, optional for staging
+- **Storage:** GP3 (general purpose), encrypted with KMS
+- **Backup:** Automated daily, 35-day retention
+- **PITR:** Enabled (Point-In-Time Recovery)
+- **Read Replicas:** One in same region (read scaling), one in secondary region (DR)
+
+**Replication:**
+```
+Primary (us-east-1):
+├── Multi-AZ failover (automatic, <2 min)
+├── Read replica (same region, for reporting)
+└── Read replica (us-west-2, cross-region disaster recovery)
+```
+
+**Connection Management:**
+- **Connection Pooling:** PgBouncer or AWS RDS Proxy
+- **Max Connections:** 50 (adjust based on load testing)
+- **Connection Timeout:** 30 seconds
+- **Queue Wait:** 5 seconds maximum
+- **Idle Connection:** Timeout after 5 minutes
+
+**Encryption:**
+- **At-Rest:** KMS encryption required
+- **In-Transit:** SSL/TLS required (sslmode=require in connection string)
+- **Key Rotation:** 90-day rotation policy (AWS managed)
+
+**Monitoring:**
+- **Enhanced Monitoring:** Every 60 seconds
+- **Metrics Tracked:** CPU, disk I/O, connections, replication lag
+- **Performance Insights:** Enabled for query analysis
+- **CloudWatch Alarms:**
+  - CPU > 80% for 5 minutes
+  - Disk space < 20%
+  - Database connections > 40
+  - Replication lag > 1 second
+
+**Indexing Strategy:**
+- Index on frequently queried columns: `tenantId`, `userId`, `createdAt`
+- Composite indexes for common filters: `(tenantId, status)`
+- Regular maintenance: `VACUUM` and `ANALYZE` weekly
+- Query plans reviewed quarterly
+
+**Validation Checklist:**
+```
+✓ RDS instance in private subnet
+✓ Multi-AZ enabled (production)
+✓ Automated backups configured
+✓ PITR enabled for 35 days
+✓ Encryption with KMS key
+✓ Read replicas created
+✓ CloudWatch monitoring enabled
+✓ Connection pooling configured
+✓ SSL/TLS enforced
+```
+
+---
+
+## 3. APPLICATION DEPLOYMENT
+
+### Standard: Containerized API in ECS Fargate with CloudFront Frontend
+
+**Express API:**
+
+**Docker Image (Multi-stage build):**
+```dockerfile
+# Stage 1: Build
+FROM node:20-alpine AS builder
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+RUN npm run build
+
+# Stage 2: Runtime
+FROM node:20-alpine
+WORKDIR /app
+RUN apk add --no-cache dumb-init
+COPY --from=builder /app/package*.json ./
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/dist ./dist
+ENV NODE_ENV=production
+EXPOSE 3000
+HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
+  CMD node -e "require('http').get('http://localhost:3000/health', (r) => {if (r.statusCode !== 200) throw new Error(r.statusCode)})"
+ENTRYPOINT ["/usr/sbin/dumb-init", "--"]
+CMD ["node", "dist/index.js"]
+```
+
+**ECS Task Definition:**
+- **CPU:** 256 (production) or 512 for high-load
+- **Memory:** 512 MB (production) or 1024 for high-load
+- **Port:** 3000 (internal), 80/443 via ALB
+- **Environment Variables:** Via AWS Systems Manager Parameter Store
+- **Secrets:** Via AWS Secrets Manager
+- **Logging:** CloudWatch Logs group `/ecs/bizcode-api`
+- **Task Role:** Minimal IAM permissions (principle of least privilege)
+- **Health Check:** GET /health every 30 seconds
+
+**Graceful Shutdown:**
+```typescript
+// Listen for SIGTERM and close connections
+process.on('SIGTERM', async () => {
+  console.log('SIGTERM received, closing server')
+  server.close(async () => {
+    await closeDatabaseConnections()
+    process.exit(0)
+  })
+  // Force shutdown after 30 seconds
+  setTimeout(() => process.exit(1), 30000)
+})
+```
+
+**Frontend Deployment:**
+
+**S3 Configuration:**
+- Static assets with versioned filenames
+- CloudFront CDN with 1-year cache for assets
+- No-cache for index.html
+
+**CloudFront Distribution:**
+- Origin: S3 bucket
+- SSL/TLS: ACM certificate
+- Cache behaviors: /assets/* (1 year), /api/* (no cache), /* (serve index.html)
+
+---
+
+## 4. NETWORKING & SECURITY
+
+### Standard: AWS VPC with Public/Private Subnets and Security Groups
+
+**VPC Architecture:**
+```
+VPC: 10.0.0.0/16
+├── Public Subnets (ALB, NAT Gateway)
+├── Private Subnets (ECS tasks)
+└── Database Subnets (RDS PostgreSQL)
+```
+
+**Security Groups:**
+- ALB: 80/443 from internet → ECS on 3000
+- ECS: 3000 from ALB only → RDS on 5432
+- RDS: 5432 from ECS only
+
+**TLS/SSL:**
+- ACM certificate, TLS 1.2+ only
+- HSTS header enabled
+- No HTTP (always redirect to HTTPS)
+
+**WAF Rules:**
+- Rate limiting: 2000 requests/5 min per IP
+- SQL injection protection
+- XSS protection
+- Bot control
+
+---
+
+## 5. AUTO-SCALING & LOAD BALANCING
+
+### Standard: ALB with ECS Service Auto-Scaling (2-10 tasks)
+
+**Load Balancer Configuration:**
+- Targets: ECS tasks on port 3000
+- Health checks: GET /health every 30 seconds
+- Sticky sessions: Disabled (stateless API)
+- Connection draining: 30 seconds
+
+**Auto-Scaling Policy:**
+- Minimum: 2 tasks (high availability)
+- Maximum: 10 tasks (cost constraint)
+- Target CPU: 70%
+- Target Memory: 80%
+- Scale-up: < 1 minute
+- Scale-down: 5-minute cooldown
+
+---
+
+## 6. MONITORING & OBSERVABILITY
+
+### Standard: CloudWatch + Prometheus Metrics with Structured Logging
+
+**Metrics:**
+- CloudWatch: ECS, RDS, ALB native metrics
+- Prometheus: Custom application metrics (response time, errors, throughput)
+- Application instrumentation: OpenTelemetry
+
+**Dashboards:**
+- System health (latency, errors, throughput)
+- Infrastructure (CPU, memory, disk, network)
+- Business metrics (users, invoices, revenue)
+
+**Alerting:**
+- API latency (p95 > 500ms) → Page on-call
+- Error rate (> 1%) → Page on-call
+- Database CPU (> 80%) → Slack warning
+- Disk space (< 20%) → Email ops
+
+**Structured Logging:**
+- Pino JSON format
+- CloudWatch Logs aggregation
+- No PII in logs
+- 30-day retention
+
+---
+
+## 7. DISASTER RECOVERY & BACKUPS
+
+### Standard: Automated Daily Backups with Cross-Region Failover
+
+**Recovery Targets:**
+- RTO: 2 hours
+- RPO: 1 hour
+
+**Backups:**
+- Database: Daily automated, 35-day retention
+- Cross-region: Copied to us-west-2
+- S3: Versioning enabled
+- Configuration: Terraform state in S3, Secrets Manager versioned
+
+**DR Testing:**
+- Quarterly full failover test
+- Document recovery time
+- Update runbooks based on findings
+
+---
+
+## 8. COST MANAGEMENT
+
+### Standard: Right-Sizing, Reserved Instances, Automated Scaling, Cost Tracking
+
+**Estimated Costs:**
+- RDS: ~$300/month
+- ECS Fargate: ~$200/month
+- ALB: ~$50/month
+- CloudFront: ~$100/month
+- S3: ~$50/month
+- Monitoring & other: ~$140/month
+- **Total:** ~$940/month (~$11.3k/year)
+
+**Optimization:**
+- Reserved instances: 30-40% discount
+- Scheduled scaling: Reduce off-hours
+- Right-sizing: Quarterly review
+- Cost tracking: AWS Cost Explorer + Infracost
+
+---
+
+## 9. CONFIGURATION MANAGEMENT
+
+### Standard: Feature Flags, Environment Parity, GitOps
+
+**Feature Flags:**
+- LaunchDarkly or AWS AppConfig
+- Gradual rollout capability
+- A/B testing support
+
+**Environment Strategy:**
+- Infrastructure parity: Same Terraform, different values
+- Configuration: Parameter Store + Secrets Manager
+- GitOps: GitHub as source of truth
+
+**Deployment Strategy:**
+- Canary: Deploy to 1 task, monitor
+- Rolling: Gradual replacement of tasks
+- Blue-green: For critical updates
+- Approval: Manual for production
+
+---
+
+## 10. INFRASTRUCTURE TESTING
+
+### Standard: Terraform Validation, Security Scanning, Load Testing, DR Drills
+
+**Pre-Deployment Checks:**
+- `terraform validate` and `terraform fmt`
+- `tfsec` security scanning
+- Application health checks
+- Smoke tests
+- Load tests (1000 req/sec, 5 min)
+
+**Disaster Recovery:**
+- Quarterly failover drills
+- Recovery time measurement
+- Runbook updates
+- Team participation
+
+---
+
+## 11. ANTI-PATTERNS TO AVOID
+
+- ❌ Manual infrastructure changes (use Terraform)
+- ❌ Hardcoded secrets
+- ❌ Single instance (use Multi-AZ)
+- ❌ No monitoring or logging
+- ❌ No backups
+- ❌ No disaster recovery plan
+- ❌ Over-provisioned resources
+- ❌ No cost tracking
+- ❌ No auto-scaling
+- ❌ Manual deployments
+
+---
+
+## 12. PRODUCTION READINESS CHECKLIST
+
+| Item | Target | Validation |
+|------|--------|-----------|
+| Cloud Provider | AWS | In Terraform |
+| Database HA | Multi-AZ RDS | CloudWatch confirms |
+| Application HA | 2+ ECS tasks | ALB health checks |
+| Load Balancing | ALB present | Health checks passing |
+| Auto-Scaling | 2-10 task range | Scale test triggers |
+| Monitoring | CloudWatch + Prometheus | Dashboards created |
+| Logging | Structured JSON | CloudWatch Logs |
+| Backups | Daily automated | Restore tested |
+| Encryption | KMS + TLS | Terraform verified |
+| Secrets | Secrets Manager | No hardcoded values |
+| DR Tested | Quarterly | Test documented |
+| Cost Tracked | Monthly review | Budget alerts active |
+
+---
+
+**This document is the source of truth for infrastructure standards. All deviations require Architecture Decision Record (ADR) documentation.**
