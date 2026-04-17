@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "activo": {
+      "type": "boolean"
+    },
+    "codigo": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "condIva": {
+      "enum": [
+        "RI",
+        "Mono",
+        "CF",
+        "Exento"
+      ],
+      "type": "string"
+    },
+    "cuit": {
+      "nullable": true,
+      "type": "string"
+    },
+    "email": {
+      "nullable": true,
+      "type": "string"
+    },
+    "fantasia": {
+      "nullable": true,
+      "type": "string"
+    },
+    "rsocial": {
+      "maxLength": 30,
+      "minLength": 3,
+      "type": "string"
+    },
+    "telef": {
+      "nullable": true,
+      "type": "string"
+    }
+  },
+  "required": [
+    "codigo",
+    "rsocial",
+    "condIva",
+    "activo"
+  ],
+  "title": "ProveedorInput",
+  "type": "object"
+}

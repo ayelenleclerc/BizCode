@@ -54,7 +54,9 @@ Inspección opcional de DBF (campos y muestras): `npx tsx scripts/inspect-dbf.ts
 
 ## Relevamiento issue #51 (preparación ETL clientes)
 
-Estado: **preparación documental/técnica**, sin ETL productivo de clientes en esta rama.
+Estado: **bloqueado** hasta contar con una **fuente DBF real** acordada (tabla y ruta verificables en el entorno de migración). No sustituir placeholders del script hasta esa evidencia. Mientras tanto: CSV de clientes en aplicación (issue #58) es la vía soportada para altas masivas auditables.
+
+Estado previo: **preparación documental/técnica**, sin ETL productivo de clientes en esta rama.
 
 - Evidencia disponible: existe `CLIENTES.DBF` en la copia legacy fuera del repo (fuente externa).
 - Reglas de mapeo acordadas para implementación posterior:

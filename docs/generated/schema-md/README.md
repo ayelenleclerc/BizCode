@@ -96,6 +96,16 @@
 
 * [LogoutResult](./logoutresult.md) – `-`
 
+* [Proveedor](./proveedor.md) – `-`
+
+* [ProveedorEnvelope](./proveedorenvelope.md) – `-`
+
+* [ProveedorInput](./proveedorinput.md) – `-`
+
+* [ProveedorListEnvelope](./proveedorlistenvelope.md) – `-`
+
+* [ProveedorNullableEnvelope](./proveedornullableenvelope.md) – `-`
+
 * [Rubro](./rubro.md) – `-`
 
 * [RubroEnvelope](./rubroenvelope.md) – `-`
@@ -179,6 +189,8 @@
 * [Untitled array in FacturaListEnvelope](./facturalistenvelope-properties-data.md) – `undefined#/properties/data`
 
 * [Untitled array in FormaPagoListEnvelope](./formapagolistenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled array in ProveedorListEnvelope](./proveedorlistenvelope-properties-data.md) – `undefined#/properties/data`
 
 * [Untitled array in RubroListEnvelope](./rubrolistenvelope-properties-data.md) – `undefined#/properties/data`
 
