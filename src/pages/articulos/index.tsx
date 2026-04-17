@@ -230,8 +230,7 @@ export default function ArticulosPage() {
               {articulos.map((articulo, idx) => (
                 <tr
                   key={articulo.id}
-                  role="row"
-                  aria-selected={selectedRow === idx ? 'true' : 'false'}
+                  data-selected={selectedRow === idx ? 'true' : 'false'}
                   onClick={() => setSelectedRow(idx)}
                   onKeyDown={(e) => handleKeyDown(e, idx)}
                   tabIndex={0}
