@@ -48,6 +48,20 @@ export interface Rubro {
   nombre: string
 }
 
+export interface Proveedor {
+  id: number
+  codigo: number
+  rsocial: string
+  fantasia?: string | null
+  cuit?: string | null
+  condIva: string
+  telef?: string | null
+  email?: string | null
+  activo: boolean
+  createdAt?: Date
+  updatedAt?: Date
+}
+
 export interface FormaPago {
   id: number
   codigo: number
