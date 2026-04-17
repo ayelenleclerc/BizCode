@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useLayoutEffect, useRef, useId } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import LanguageSelect from '@/components/LanguageSelect'
@@ -13,10 +13,13 @@ interface LayoutProps {
 /**
  * @en Nav sections and the roles that can see each one.
  *     `null` means visible to every authenticated user.
+ *     Role `super_admin` sees every section (platform support).
  * @es Secciones del nav y los roles que pueden verlas.
  *     `null` significa visible para todo usuario autenticado.
+ *     El rol `super_admin` ve todas las secciones (plataforma / soporte).
  * @pt-BR Seções do nav e os papéis que podem visualizá-las.
  *     `null` significa visível para todo usuário autenticado.
+ *     O papel `super_admin` vê todas as seções (plataforma / suporte).
  */
 const NAV_SECTIONS: {
   key: string
@@ -86,6 +89,14 @@ function NotificationBell() {
   const [notifications, setNotifications] = useState<AppNotification[]>([])
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
+  const buttonRef = useRef<HTMLButtonElement>(null)
+  const panelId = useId()
+  const panelTitleId = useId()
+
+  // Microsoft Edge Tools (webhint) flags dynamic `aria-expanded` in JSX; sync the token in the DOM instead.
+  useLayoutEffect(() => {
+    buttonRef.current?.setAttribute('aria-expanded', open ? 'true' : 'false')
+  }, [open])
 
   useEffect(() => {
     let cancelled = false
@@ -130,9 +141,11 @@ function NotificationBell() {
   return (
     <div ref={ref} className="relative" data-testid="notification-bell">
       <button
+        ref={buttonRef}
         type="button"
         aria-label={t('notifications.bell', { count: unread })}
-        aria-expanded={open}
+        aria-controls={panelId}
+        aria-haspopup="true"
         onClick={() => setOpen((o) => !o)}
         className="relative p-2 rounded hover:bg-slate-100 dark:hover:bg-slate-700 transition"
       >
@@ -147,13 +160,15 @@ function NotificationBell() {
         )}
       </button>
 
-      {open && (
-        <div
-          role="menu"
-          className="absolute right-0 mt-1 w-80 max-h-96 overflow-y-auto rounded-lg shadow-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 z-50"
-        >
+      <div
+        id={panelId}
+        role="region"
+        aria-labelledby={panelTitleId}
+        hidden={!open}
+        className="absolute right-0 mt-1 w-80 max-h-96 overflow-y-auto rounded-lg shadow-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 z-50"
+      >
           <div className="flex items-center justify-between px-4 py-2 border-b border-slate-200 dark:border-slate-700">
-            <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+            <span id={panelTitleId} className="text-sm font-semibold text-slate-700 dark:text-slate-300">
               {t('notifications.title')}
             </span>
             {unread > 0 && (
@@ -205,8 +220,7 @@ function NotificationBell() {
               ))}
             </ul>
           )}
-        </div>
-      )}
+      </div>
     </div>
   )
 }
@@ -244,9 +258,12 @@ export default function Layout({ children }: LayoutProps) {
     location.pathname === path || location.pathname.startsWith(path + '/')
 
   const userRole = claims?.role ?? null
-  const visibleSections = NAV_SECTIONS.filter(
-    (s) => s.roles === null || (userRole !== null && s.roles.includes(userRole)),
-  )
+  const visibleSections = NAV_SECTIONS.filter((s) => {
+    if (s.roles === null) return true
+    if (userRole === null) return false
+    if (userRole === 'super_admin') return true
+    return s.roles.includes(userRole)
+  })
 
   return (
     <div className="flex h-screen bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100">

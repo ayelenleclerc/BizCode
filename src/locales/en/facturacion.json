@@ -24,7 +24,9 @@
     "subtotal": "Subtotal",
     "empty": "No items. Press Ins to add.",
     "addItem": "➕ Add Item (Ins)",
-    "selectArticulo": "Select..."
+    "selectArticulo": "Select...",
+    "rowAria": "Item {{n}}, click to select this row",
+    "rowAriaSelected": "Item {{n}}, row selected"
   },
   "totals": {
     "neto21": "Net 21%",

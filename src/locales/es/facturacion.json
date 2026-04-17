@@ -24,7 +24,9 @@
     "subtotal": "Subtotal",
     "empty": "Sin ítems. Presione Ins para agregar.",
     "addItem": "➕ Agregar Ítem (Ins)",
-    "selectArticulo": "Seleccionar..."
+    "selectArticulo": "Seleccionar...",
+    "rowAria": "Ítem {{n}}, pulse para seleccionar la fila",
+    "rowAriaSelected": "Ítem {{n}}, fila seleccionada"
   },
   "totals": {
     "neto21": "Neto 21%",
