@@ -947,6 +947,238 @@ One-time endpoint to create initial tenant and owner user.
 }
 ```
 
+### PARAMETERS /api/clientes/import/template
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/clientes/import/template`
+
+### Download UTF-8 CSV template for bulk customer import
+
+- **Method:** `GET`
+- **Path:** `/api/clientes/import/template`
+- **Tags:** clientes
+
+#### Responses
+
+##### Status: 200 CSV with fixed header row and one example data row (UTF-8 BOM)
+
+###### Content-Type: text/csv
+
+`string`, format: `binary`
+
+**Example:**
+
+```json
+{}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/clientes/import
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/clientes/import`
+
+### Import customers from a CSV file
+
+- **Method:** `POST`
+- **Path:** `/api/clientes/import`
+- **Tags:** clientes
+
+#### Request Body
+
+##### Content-Type: multipart/form-data
+
+- **`file` (required)**
+
+  `string`, format: `binary` — UTF-8 CSV; first row must match the template headers exactly
+
+**Example:**
+
+```json
+{
+  "file": {}
+}
+```
+
+#### Responses
+
+##### Status: 200 Import summary (rows created vs skipped with per-row errors)
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`created` (required)**
+
+    `integer`
+
+  - **`errors` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`message` (required)**
+
+      `string`
+
+    - **`row` (required)**
+
+      `integer` — Data row number in the file (row 1 is the header)
+
+  - **`skipped` (required)**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "created": 0,
+    "skipped": 0,
+    "errors": [
+      {
+        "row": 2,
+        "message": ""
+      }
+    ]
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ### PARAMETERS /api/clientes/{id}
 
 - **Method:** `PARAMETERS`
@@ -2189,6 +2421,238 @@ One-time endpoint to create initial tenant and owner user.
 }
 ```
 
+### PARAMETERS /api/articulos/import/template
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/articulos/import/template`
+
+### Download UTF-8 CSV template for bulk product import
+
+- **Method:** `GET`
+- **Path:** `/api/articulos/import/template`
+- **Tags:** articulos
+
+#### Responses
+
+##### Status: 200 CSV with fixed header row and one example row (UTF-8 BOM)
+
+###### Content-Type: text/csv
+
+`string`, format: `binary`
+
+**Example:**
+
+```json
+{}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/articulos/import
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/articulos/import`
+
+### Import products from CSV (rubroCodigo must match an existing Rubro.codigo)
+
+- **Method:** `POST`
+- **Path:** `/api/articulos/import`
+- **Tags:** articulos
+
+#### Request Body
+
+##### Content-Type: multipart/form-data
+
+- **`file` (required)**
+
+  `string`, format: `binary` — UTF-8 CSV; first row must match the template headers exactly
+
+**Example:**
+
+```json
+{
+  "file": {}
+}
+```
+
+#### Responses
+
+##### Status: 200 Import summary
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`created` (required)**
+
+    `integer`
+
+  - **`errors` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`message` (required)**
+
+      `string`
+
+    - **`row` (required)**
+
+      `integer` — Data row number in the file (row 1 is the header)
+
+  - **`skipped` (required)**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "created": 0,
+    "skipped": 0,
+    "errors": [
+      {
+        "row": 2,
+        "message": ""
+      }
+    ]
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ### PARAMETERS /api/rubros
 
 - **Method:** `PARAMETERS`
@@ -2369,6 +2833,1148 @@ One-time endpoint to create initial tenant and owner user.
     "id": 1,
     "codigo": 1,
     "nombre": "",
+    "additionalProperty": "anything"
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/rubros/import/template
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/rubros/import/template`
+
+### Download UTF-8 CSV template for bulk category import
+
+- **Method:** `GET`
+- **Path:** `/api/rubros/import/template`
+- **Tags:** rubros
+
+#### Responses
+
+##### Status: 200 CSV with fixed header row and one example row (UTF-8 BOM)
+
+###### Content-Type: text/csv
+
+`string`, format: `binary`
+
+**Example:**
+
+```json
+{}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/rubros/import
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/rubros/import`
+
+### Import product categories from CSV
+
+- **Method:** `POST`
+- **Path:** `/api/rubros/import`
+- **Tags:** rubros
+
+#### Request Body
+
+##### Content-Type: multipart/form-data
+
+- **`file` (required)**
+
+  `string`, format: `binary`
+
+**Example:**
+
+```json
+{
+  "file": {}
+}
+```
+
+#### Responses
+
+##### Status: 200 Import summary
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`created` (required)**
+
+    `integer`
+
+  - **`errors` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`message` (required)**
+
+      `string`
+
+    - **`row` (required)**
+
+      `integer` — Data row number in the file (row 1 is the header)
+
+  - **`skipped` (required)**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "created": 0,
+    "skipped": 0,
+    "errors": [
+      {
+        "row": 2,
+        "message": ""
+      }
+    ]
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/proveedores
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/proveedores`
+
+### List suppliers
+
+- **Method:** `GET`
+- **Path:** `/api/proveedores`
+- **Tags:** proveedores
+
+#### Responses
+
+##### Status: 200 Supplier list
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`activo`**
+
+    `boolean`
+
+  - **`codigo`**
+
+    `integer`
+
+  - **`condIva`**
+
+    `string`
+
+  - **`cuit`**
+
+    `string`
+
+  - **`email`**
+
+    `string`
+
+  - **`fantasia`**
+
+    `string`
+
+  - **`id`**
+
+    `integer`
+
+  - **`rsocial`**
+
+    `string`
+
+  - **`telef`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "codigo": 1,
+      "rsocial": "",
+      "fantasia": "",
+      "cuit": "",
+      "condIva": "",
+      "telef": "",
+      "email": "",
+      "activo": true,
+      "additionalProperty": "anything"
+    }
+  ]
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Create supplier
+
+- **Method:** `POST`
+- **Path:** `/api/proveedores`
+- **Tags:** proveedores
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`activo` (required)**
+
+  `boolean`
+
+- **`codigo` (required)**
+
+  `integer`
+
+- **`condIva` (required)**
+
+  `string`, possible values: `"RI", "Mono", "CF", "Exento"`
+
+- **`rsocial` (required)**
+
+  `string`
+
+- **`cuit`**
+
+  `string`
+
+- **`email`**
+
+  `string`
+
+- **`fantasia`**
+
+  `string`
+
+- **`telef`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "codigo": 1,
+  "rsocial": "",
+  "fantasia": "",
+  "cuit": "",
+  "condIva": "RI",
+  "telef": "",
+  "email": "",
+  "activo": true
+}
+```
+
+#### Responses
+
+##### Status: 200 Supplier created
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`activo`**
+
+    `boolean`
+
+  - **`codigo`**
+
+    `integer`
+
+  - **`condIva`**
+
+    `string`
+
+  - **`cuit`**
+
+    `string`
+
+  - **`email`**
+
+    `string`
+
+  - **`fantasia`**
+
+    `string`
+
+  - **`id`**
+
+    `integer`
+
+  - **`rsocial`**
+
+    `string`
+
+  - **`telef`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "codigo": 1,
+    "rsocial": "",
+    "fantasia": "",
+    "cuit": "",
+    "condIva": "",
+    "telef": "",
+    "email": "",
+    "activo": true,
+    "additionalProperty": "anything"
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/proveedores/import/template
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/proveedores/import/template`
+
+### Download UTF-8 CSV template for bulk supplier import
+
+- **Method:** `GET`
+- **Path:** `/api/proveedores/import/template`
+- **Tags:** proveedores
+
+#### Responses
+
+##### Status: 200 CSV with fixed header row and one example row (UTF-8 BOM)
+
+###### Content-Type: text/csv
+
+`string`, format: `binary`
+
+**Example:**
+
+```json
+{}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/proveedores/import
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/proveedores/import`
+
+### Import suppliers from CSV
+
+- **Method:** `POST`
+- **Path:** `/api/proveedores/import`
+- **Tags:** proveedores
+
+#### Request Body
+
+##### Content-Type: multipart/form-data
+
+- **`file` (required)**
+
+  `string`, format: `binary`
+
+**Example:**
+
+```json
+{
+  "file": {}
+}
+```
+
+#### Responses
+
+##### Status: 200 Import summary
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`created` (required)**
+
+    `integer`
+
+  - **`errors` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`message` (required)**
+
+      `string`
+
+    - **`row` (required)**
+
+      `integer` — Data row number in the file (row 1 is the header)
+
+  - **`skipped` (required)**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "created": 0,
+    "skipped": 0,
+    "errors": [
+      {
+        "row": 2,
+        "message": ""
+      }
+    ]
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/proveedores/{id}
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/proveedores/{id}`
+
+### Get supplier by id
+
+- **Method:** `GET`
+- **Path:** `/api/proveedores/{id}`
+- **Tags:** proveedores
+
+#### Responses
+
+##### Status: 200 Supplier or null
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "codigo": 1,
+    "rsocial": "",
+    "fantasia": "",
+    "cuit": "",
+    "condIva": "",
+    "telef": "",
+    "email": "",
+    "activo": true,
+    "additionalProperty": "anything"
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Update supplier
+
+- **Method:** `PUT`
+- **Path:** `/api/proveedores/{id}`
+- **Tags:** proveedores
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`activo` (required)**
+
+  `boolean`
+
+- **`codigo` (required)**
+
+  `integer`
+
+- **`condIva` (required)**
+
+  `string`, possible values: `"RI", "Mono", "CF", "Exento"`
+
+- **`rsocial` (required)**
+
+  `string`
+
+- **`cuit`**
+
+  `string`
+
+- **`email`**
+
+  `string`
+
+- **`fantasia`**
+
+  `string`
+
+- **`telef`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "codigo": 1,
+  "rsocial": "",
+  "fantasia": "",
+  "cuit": "",
+  "condIva": "RI",
+  "telef": "",
+  "email": "",
+  "activo": true
+}
+```
+
+#### Responses
+
+##### Status: 200 Supplier updated
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`activo`**
+
+    `boolean`
+
+  - **`codigo`**
+
+    `integer`
+
+  - **`condIva`**
+
+    `string`
+
+  - **`cuit`**
+
+    `string`
+
+  - **`email`**
+
+    `string`
+
+  - **`fantasia`**
+
+    `string`
+
+  - **`id`**
+
+    `integer`
+
+  - **`rsocial`**
+
+    `string`
+
+  - **`telef`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "codigo": 1,
+    "rsocial": "",
+    "fantasia": "",
+    "cuit": "",
+    "condIva": "",
+    "telef": "",
+    "email": "",
+    "activo": true,
     "additionalProperty": "anything"
   }
 }
@@ -6312,6 +7918,120 @@ Returns boolean flags for each channel. No sensitive values are exposed.
 }
 ```
 
+### ClienteImportRowError
+
+- **Type:**`object`
+
+* **`message` (required)**
+
+  `string`
+
+* **`row` (required)**
+
+  `integer` — Data row number in the file (row 1 is the header)
+
+**Example:**
+
+```json
+{
+  "row": 2,
+  "message": ""
+}
+```
+
+### ClienteImportResult
+
+- **Type:**`object`
+
+* **`created` (required)**
+
+  `integer`
+
+* **`errors` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`message` (required)**
+
+    `string`
+
+  - **`row` (required)**
+
+    `integer` — Data row number in the file (row 1 is the header)
+
+* **`skipped` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "created": 0,
+  "skipped": 0,
+  "errors": [
+    {
+      "row": 2,
+      "message": ""
+    }
+  ]
+}
+```
+
+### ClienteImportEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`created` (required)**
+
+    `integer`
+
+  - **`errors` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`message` (required)**
+
+      `string`
+
+    - **`row` (required)**
+
+      `integer` — Data row number in the file (row 1 is the header)
+
+  - **`skipped` (required)**
+
+    `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "created": 0,
+    "skipped": 0,
+    "errors": [
+      {
+        "row": 2,
+        "message": ""
+      }
+    ]
+  }
+}
+```
+
 ### ClienteListEnvelope
 
 - **Type:**`object`
@@ -7132,6 +8852,286 @@ Returns boolean flags for each channel. No sensitive values are exposed.
     "id": 1,
     "codigo": 1,
     "nombre": "",
+    "additionalProperty": "anything"
+  }
+}
+```
+
+### ProveedorInput
+
+- **Type:**`object`
+
+* **`activo` (required)**
+
+  `boolean`
+
+* **`codigo` (required)**
+
+  `integer`
+
+* **`condIva` (required)**
+
+  `string`, possible values: `"RI", "Mono", "CF", "Exento"`
+
+* **`rsocial` (required)**
+
+  `string`
+
+* **`cuit`**
+
+  `string`
+
+* **`email`**
+
+  `string`
+
+* **`fantasia`**
+
+  `string`
+
+* **`telef`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "codigo": 1,
+  "rsocial": "",
+  "fantasia": "",
+  "cuit": "",
+  "condIva": "RI",
+  "telef": "",
+  "email": "",
+  "activo": true
+}
+```
+
+### Proveedor
+
+- **Type:**`object`
+
+* **`activo`**
+
+  `boolean`
+
+* **`codigo`**
+
+  `integer`
+
+* **`condIva`**
+
+  `string`
+
+* **`cuit`**
+
+  `string`
+
+* **`email`**
+
+  `string`
+
+* **`fantasia`**
+
+  `string`
+
+* **`id`**
+
+  `integer`
+
+* **`rsocial`**
+
+  `string`
+
+* **`telef`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "codigo": 1,
+  "rsocial": "",
+  "fantasia": "",
+  "cuit": "",
+  "condIva": "",
+  "telef": "",
+  "email": "",
+  "activo": true,
+  "additionalProperty": "anything"
+}
+```
+
+### ProveedorListEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`activo`**
+
+    `boolean`
+
+  - **`codigo`**
+
+    `integer`
+
+  - **`condIva`**
+
+    `string`
+
+  - **`cuit`**
+
+    `string`
+
+  - **`email`**
+
+    `string`
+
+  - **`fantasia`**
+
+    `string`
+
+  - **`id`**
+
+    `integer`
+
+  - **`rsocial`**
+
+    `string`
+
+  - **`telef`**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "codigo": 1,
+      "rsocial": "",
+      "fantasia": "",
+      "cuit": "",
+      "condIva": "",
+      "telef": "",
+      "email": "",
+      "activo": true,
+      "additionalProperty": "anything"
+    }
+  ]
+}
+```
+
+### ProveedorEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`activo`**
+
+    `boolean`
+
+  - **`codigo`**
+
+    `integer`
+
+  - **`condIva`**
+
+    `string`
+
+  - **`cuit`**
+
+    `string`
+
+  - **`email`**
+
+    `string`
+
+  - **`fantasia`**
+
+    `string`
+
+  - **`id`**
+
+    `integer`
+
+  - **`rsocial`**
+
+    `string`
+
+  - **`telef`**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "codigo": 1,
+    "rsocial": "",
+    "fantasia": "",
+    "cuit": "",
+    "condIva": "",
+    "telef": "",
+    "email": "",
+    "activo": true,
+    "additionalProperty": "anything"
+  }
+}
+```
+
+### ProveedorNullableEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "codigo": 1,
+    "rsocial": "",
+    "fantasia": "",
+    "cuit": "",
+    "condIva": "",
+    "telef": "",
+    "email": "",
+    "activo": true,
     "additionalProperty": "anything"
   }
 }

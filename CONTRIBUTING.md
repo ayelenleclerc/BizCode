@@ -37,6 +37,7 @@ main          ← stable, protected, CI must be green
 
 - Branch from `develop`.
 - Open a Pull Request targeting `develop`.
+- **GitHub Project `BizCode Delivery`:** if the change tracks an issue on that board, the PR description **must** include `Closes #<issue>` (see [pull_request_template.md](.github/pull_request_template.md)) so **Linked pull requests** and board **Status** stay in sync. Optional: set repository variable `PROJECT_PR_ASSOCIATED_FIELD_ID` so CI also fills the custom **PR asociado** field (see [.github/PROJECT_SETUP_PHASE1.md](.github/PROJECT_SETUP_PHASE1.md)).
 - `main` is updated via merge from `develop` after a release.
 - Direct pushes to `main` are prohibited.
 

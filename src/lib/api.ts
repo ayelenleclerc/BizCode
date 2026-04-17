@@ -131,6 +131,17 @@ export const authAPI = {
 
 // ============ CLIENTES ============
 
+export type ClienteImportRowError = { row: number; message: string }
+
+export type ClienteImportResult = {
+  created: number
+  skipped: number
+  errors: ClienteImportRowError[]
+}
+
+/** Same shape as customer CSV import summary (reused for rubros, artículos, proveedores). */
+export type CsvBulkImportResult = ClienteImportResult
+
 export const clientesAPI = {
   list: async (filtro?: string) => {
     try {
@@ -167,11 +178,59 @@ export const clientesAPI = {
       handleError(error as AxiosError<ApiErrorPayload>)
     }
   },
+
+  downloadImportTemplate: async (): Promise<Blob> => {
+    try {
+      const response = await api.get<Blob>('/clientes/import/template', { responseType: 'blob' })
+      return response.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  importFromCsv: async (file: File): Promise<ClienteImportResult> => {
+    try {
+      const body = new FormData()
+      body.append('file', file)
+      const response = await api.post<{ success: boolean; data: ClienteImportResult }>(
+        '/clientes/import',
+        body,
+        { timeout: 120000 },
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
 }
 
 // ============ ARTICULOS ============
 
 export const articulosAPI = {
+  downloadImportTemplate: async (): Promise<Blob> => {
+    try {
+      const response = await api.get<Blob>('/articulos/import/template', { responseType: 'blob' })
+      return response.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  importFromCsv: async (file: File): Promise<CsvBulkImportResult> => {
+    try {
+      const body = new FormData()
+      body.append('file', file)
+      const response = await api.post<{ success: boolean; data: CsvBulkImportResult }>(
+        '/articulos/import',
+        body,
+        { timeout: 120000 },
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
   list: async (filtro?: string) => {
     try {
       const response = await api.get('/articulos', { params: { q: filtro } })
@@ -212,6 +271,30 @@ export const articulosAPI = {
 // ============ RUBROS ============
 
 export const rubrosAPI = {
+  downloadImportTemplate: async (): Promise<Blob> => {
+    try {
+      const response = await api.get<Blob>('/rubros/import/template', { responseType: 'blob' })
+      return response.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  importFromCsv: async (file: File): Promise<CsvBulkImportResult> => {
+    try {
+      const body = new FormData()
+      body.append('file', file)
+      const response = await api.post<{ success: boolean; data: CsvBulkImportResult }>(
+        '/rubros/import',
+        body,
+        { timeout: 120000 },
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
   list: async () => {
     try {
       const response = await api.get('/rubros')
@@ -227,6 +310,70 @@ export const rubrosAPI = {
       return response.data.data
     } catch (error) {
       handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+}
+
+// ============ PROVEEDORES ============
+
+export const proveedoresAPI = {
+  list: async (filtro?: string) => {
+    try {
+      const response = await api.get('/proveedores', { params: { q: filtro } })
+      return response.data.data
+    } catch (error) {
+      handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  get: async (id: number) => {
+    try {
+      const response = await api.get(`/proveedores/${id}`)
+      return response.data.data
+    } catch (error) {
+      handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  create: async (data: JsonRecord) => {
+    try {
+      const response = await api.post('/proveedores', data)
+      return response.data.data
+    } catch (error) {
+      handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  update: async (id: number, data: JsonRecord) => {
+    try {
+      const response = await api.put(`/proveedores/${id}`, data)
+      return response.data.data
+    } catch (error) {
+      handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  downloadImportTemplate: async (): Promise<Blob> => {
+    try {
+      const response = await api.get<Blob>('/proveedores/import/template', { responseType: 'blob' })
+      return response.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  importFromCsv: async (file: File): Promise<CsvBulkImportResult> => {
+    try {
+      const body = new FormData()
+      body.append('file', file)
+      const response = await api.post<{ success: boolean; data: CsvBulkImportResult }>(
+        '/proveedores/import',
+        body,
+        { timeout: 120000 },
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
     }
   },
 }

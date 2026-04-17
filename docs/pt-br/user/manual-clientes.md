@@ -60,6 +60,19 @@ O sistema valida o dígito verificador. Em caso de erro, a mensagem é **«CNPJ/
 
 Edite o cliente e desmarque **Ativo**. O registro permanece para histórico de faturas.
 
+## Importação em massa (CSV)
+
+Usuários com permissão de gestão de clientes podem carregar muitos registros a partir de um arquivo **CSV em UTF-8**.
+
+1. Na lista, abra **Importar CSV** (ou o controle equivalente).
+2. **Baixe o modelo** no mesmo diálogo: inclui a linha de cabeçalhos obrigatória e um exemplo.
+3. Não altere os nomes nem a ordem das colunas da primeira linha. Salve como `.csv` (UTF-8).
+4. Anexe o arquivo e confirme. O sistema informa quantas linhas foram criadas e, se houver erros de validação ou duplicados, o detalhe **por linha** (a numeração das linhas de dados começa após o cabeçalho; a linha 1 é o cabeçalho).
+
+**Política de duplicados:** se o **código** do cliente já existir na base ou estiver repetido no mesmo arquivo, a linha é rejeitada.
+
+**Limites:** tamanho máximo do arquivo e quantidade máxima de linhas são aplicados pela API (veja OpenAPI em `/api-docs`).
+
 ## Atalhos de teclado
 
 | Tecla | Ação |
@@ -69,6 +82,6 @@ Edite o cliente e desmarque **Ativo**. O registro permanece para histórico de f
 | F5 | Salvar formulário |
 | ↑ / ↓ | Navegar linhas |
 | Enter | Abrir cliente selecionado |
-| Esc | Fechar sem salvar |
+| Esc | Fechar formulário ou diálogo de importação sem salvar |
 
 **Outros idiomas:** [English](../../en/user/manual-customers.md) · [Español](../../es/user/manual-clientes.md)

@@ -3,15 +3,15 @@
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
   "version": 1,
-  "serialNumber": "urn:uuid:d946ab92-e841-42ee-a74a-e13578416d01",
+  "serialNumber": "urn:uuid:2fdd246e-2ddc-45f3-a3b9-e0640008513a",
   "metadata": {
-    "timestamp": "2026-04-16T20:25:53.703Z",
+    "timestamp": "2026-04-17T18:55:19.337Z",
     "tools": {
       "components": [
         {
           "type": "application",
           "name": "npm",
-          "version": "10.9.7"
+          "version": "10.9.8"
         },
         {
           "type": "application",
@@ -262,6 +262,40 @@
     },
     {
       "type": "library",
+      "name": "csv-parse",
+      "version": "6.2.1",
+      "bom-ref": "bizcode@0.1.0|csv-parse@6.2.1",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/csv-parse@6.2.1",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/csv-parse/-/csv-parse-6.2.1.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "2d12cc57e502c9f328929f166f8d7576e05fd606812897ce7c1594f5e1cc27e6fe709619b0dbb70059a325fdfec8f19de7d131cf54ec323692172c67601f7e21"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/csv-parse"
+        }
+      ]
+    },
+    {
+      "type": "library",
       "name": "dotenv",
       "version": "17.3.1",
       "bom-ref": "bizcode@0.1.0|dotenv@17.3.1",
@@ -393,6 +427,178 @@
         {
           "name": "cdx:npm:package:path",
           "value": "node_modules/i18next"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "multer",
+      "version": "2.1.1",
+      "bom-ref": "bizcode@0.1.0|multer@2.1.1",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/multer@2.1.1",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/multer/-/multer-2.1.1.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "9a8f904f32a5c7c47b139ca5497c56cc6a17a196ceb11329ca2b5c86df01cb6287bcc6dfded8f0a2c67f32efd7614e94b89dd566738322b6a4e59acf88fc81e8"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/multer"
+        }
+      ],
+      "components": [
+        {
+          "type": "library",
+          "name": "type-is",
+          "version": "1.6.18",
+          "bom-ref": "bizcode@0.1.0|multer@2.1.1|type-is@1.6.18",
+          "licenses": [
+            {
+              "license": {
+                "id": "MIT",
+                "acknowledgement": "declared"
+              }
+            }
+          ],
+          "purl": "pkg:npm/type-is@1.6.18",
+          "externalReferences": [
+            {
+              "url": "https://registry.npmjs.org/type-is/-/type-is-1.6.18.tgz",
+              "type": "distribution",
+              "hashes": [
+                {
+                  "alg": "SHA-512",
+                  "content": "4e444aafdb144f1107f0c75fb8248fed58b3272cd134c8e3d89d9da3626bdcaca6e7df0955d124b2eccf4029e514f5b8932f50fa203e99af411a6d3a5d0072f2"
+                }
+              ],
+              "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+            }
+          ],
+          "properties": [
+            {
+              "name": "cdx:npm:package:path",
+              "value": "node_modules/multer/node_modules/type-is"
+            }
+          ]
+        },
+        {
+          "type": "library",
+          "name": "media-typer",
+          "version": "0.3.0",
+          "bom-ref": "bizcode@0.1.0|multer@2.1.1|media-typer@0.3.0",
+          "licenses": [
+            {
+              "license": {
+                "id": "MIT",
+                "acknowledgement": "declared"
+              }
+            }
+          ],
+          "purl": "pkg:npm/media-typer@0.3.0",
+          "externalReferences": [
+            {
+              "url": "https://registry.npmjs.org/media-typer/-/media-typer-0.3.0.tgz",
+              "type": "distribution",
+              "hashes": [
+                {
+                  "alg": "SHA-512",
+                  "content": "76afaa7a543d6a41e970e97f8145514f15483a4009d70477400bdbe11b158d2f285681630c64dcebbf702589949a49d41791f030b3a06f93be6b72b17d66a93d"
+                }
+              ],
+              "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+            }
+          ],
+          "properties": [
+            {
+              "name": "cdx:npm:package:path",
+              "value": "node_modules/multer/node_modules/media-typer"
+            }
+          ]
+        },
+        {
+          "type": "library",
+          "name": "mime-types",
+          "version": "2.1.35",
+          "bom-ref": "bizcode@0.1.0|multer@2.1.1|mime-types@2.1.35",
+          "licenses": [
+            {
+              "license": {
+                "id": "MIT",
+                "acknowledgement": "declared"
+              }
+            }
+          ],
+          "purl": "pkg:npm/mime-types@2.1.35",
+          "externalReferences": [
+            {
+              "url": "https://registry.npmjs.org/mime-types/-/mime-types-2.1.35.tgz",
+              "type": "distribution",
+              "hashes": [
+                {
+                  "alg": "SHA-512",
+                  "content": "64363e6cf9b9cd34c5f98a42ac053d9cad148080983d3d10b53d4d65616fe2cfbe4cd91c815693d20ebee11dae238323423cf2b07075cf1b962f9d21cda7978b"
+                }
+              ],
+              "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+            }
+          ],
+          "properties": [
+            {
+              "name": "cdx:npm:package:path",
+              "value": "node_modules/multer/node_modules/mime-types"
+            }
+          ]
+        },
+        {
+          "type": "library",
+          "name": "mime-db",
+          "version": "1.52.0",
+          "bom-ref": "bizcode@0.1.0|multer@2.1.1|mime-db@1.52.0",
+          "licenses": [
+            {
+              "license": {
+                "id": "MIT",
+                "acknowledgement": "declared"
+              }
+            }
+          ],
+          "purl": "pkg:npm/mime-db@1.52.0",
+          "externalReferences": [
+            {
+              "url": "https://registry.npmjs.org/mime-db/-/mime-db-1.52.0.tgz",
+              "type": "distribution",
+              "hashes": [
+                {
+                  "alg": "SHA-512",
+                  "content": "b0f538b95edd625bed589c70c311c3d0fba285536213b4f201b439496c43081f66518bce82ba103b061040e28f27c0886c4fb51135653a82b5502da7537818be"
+                }
+              ],
+              "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+            }
+          ],
+          "properties": [
+            {
+              "name": "cdx:npm:package:path",
+              "value": "node_modules/multer/node_modules/mime-db"
+            }
+          ]
         }
       ]
     },
@@ -2176,6 +2382,136 @@
     },
     {
       "type": "library",
+      "name": "append-field",
+      "version": "1.0.0",
+      "bom-ref": "bizcode@0.1.0|append-field@1.0.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/append-field@1.0.0",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/append-field/-/append-field-1.0.0.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "925a6015258b5b5644b3cb2f8df6fb838a96634612e62988f3675383e41a854bc9f18a806343f5d1493cb53ca1f591ae60464431a789602179045b97e79da1b3"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/append-field"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "busboy",
+      "version": "1.6.0",
+      "bom-ref": "bizcode@0.1.0|busboy@1.6.0",
+      "purl": "pkg:npm/busboy@1.6.0",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/busboy/-/busboy-1.6.0.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "f121506e0ff4850f71cb750d4c1d18127b0d05b59f85fed1b67ce92fb4e40624c145fad0f45c5c9f3ed526c95e269ca9eab54bbd78ae391aa39478b9abe3d8b8"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/busboy"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "concat-stream",
+      "version": "2.0.0",
+      "bom-ref": "bizcode@0.1.0|concat-stream@2.0.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/concat-stream@2.0.0",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/concat-stream/-/concat-stream-2.0.0.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "316b9f61d170e7771c1a3080f8e97b5c96290255bafe9ad2333b8f393467246706cee84b9f849caf3eea7faa3c6d1399e75e25b5acdc2052597af71f6e8d31ec"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/concat-stream"
+        }
+      ],
+      "components": [
+        {
+          "type": "library",
+          "name": "readable-stream",
+          "version": "3.6.2",
+          "bom-ref": "bizcode@0.1.0|concat-stream@2.0.0|readable-stream@3.6.2",
+          "licenses": [
+            {
+              "license": {
+                "id": "MIT",
+                "acknowledgement": "declared"
+              }
+            }
+          ],
+          "purl": "pkg:npm/readable-stream@3.6.2",
+          "externalReferences": [
+            {
+              "url": "https://registry.npmjs.org/readable-stream/-/readable-stream-3.6.2.tgz",
+              "type": "distribution",
+              "hashes": [
+                {
+                  "alg": "SHA-512",
+                  "content": "f6efec9e20ab6370f959db04447cc71381b66025eaa06e454c7522082e1221bafa5dc2d9058d39c9af442a361e93d3b9c4e0308c6abed497460404bb43d49ca0"
+                }
+              ],
+              "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+            }
+          ],
+          "properties": [
+            {
+              "name": "cdx:npm:package:path",
+              "value": "node_modules/concat-stream/node_modules/readable-stream"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "library",
       "name": "loose-envify",
       "version": "1.4.0",
       "bom-ref": "bizcode@0.1.0|loose-envify@1.4.0",
@@ -3304,6 +3640,100 @@
     },
     {
       "type": "library",
+      "name": "streamsearch",
+      "version": "1.1.0",
+      "bom-ref": "bizcode@0.1.0|streamsearch@1.1.0",
+      "purl": "pkg:npm/streamsearch@1.1.0",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/streamsearch/-/streamsearch-1.1.0.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "31c739c077a1a7d697cf56b1e9b654c98e5a7e0f6edabbf972a408de646b624182f2b5b684cd368d6bb08ed2fef8b4b9aa29d2ca18f641f2f236cb9cf95b04c6"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/streamsearch"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "buffer-from",
+      "version": "1.1.2",
+      "bom-ref": "bizcode@0.1.0|buffer-from@1.1.2",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/buffer-from@1.1.2",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/buffer-from/-/buffer-from-1.1.2.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "13e5d0091c126da6a20a1b6fea4e83c2073e6f1f81b3abee2891c7979928c7f05a29b8625f3a903b02b870edb6c84946a763829a3c15853dc79b18323c69c97d"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/buffer-from"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "typedarray",
+      "version": "0.0.6",
+      "bom-ref": "bizcode@0.1.0|typedarray@0.0.6",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/typedarray@0.0.6",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/typedarray/-/typedarray-0.0.6.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "fda0831066ad1af67604893e1e62dfe227c2245c2f28535bf7f25e64f32e95f805ada727f5015c01fe463bc07f9b07948d2a1b952e489f471686aa5fb3fe4f40"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/typedarray"
+        }
+      ]
+    },
+    {
+      "type": "library",
       "name": "js-tokens",
       "version": "4.0.0",
       "bom-ref": "bizcode@0.1.0|js-tokens@4.0.0",
@@ -4164,6 +4594,74 @@
     },
     {
       "type": "library",
+      "name": "string_decoder",
+      "version": "1.1.1",
+      "bom-ref": "bizcode@0.1.0|string_decoder@1.1.1",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/string_decoder@1.1.1",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/string_decoder/-/string_decoder-1.1.1.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "9ff4a19ef0e2e851db6d57ef8aba3e5a88e2173bfeb3c30f30705ccd578f7d4a4324bc282d3d21b759786300426e2f29240bde104767907c8fc933ff9b345fc2"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/string_decoder"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "util-deprecate",
+      "version": "1.0.2",
+      "bom-ref": "bizcode@0.1.0|util-deprecate@1.0.2",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/util-deprecate@1.0.2",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/util-deprecate/-/util-deprecate-1.0.2.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "10f0f9ab5b97c85c49a42acb9c27359c79eade039ae83641a1c008888d93692080ed5089d5424331a802cc891736c5187c3d5d68afff2d3110f318886eb1ed73"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/util-deprecate"
+        }
+      ]
+    },
+    {
+      "type": "library",
       "name": "jwa",
       "version": "2.0.1",
       "bom-ref": "bizcode@0.1.0|jwa@2.0.1",
@@ -4613,10 +5111,12 @@
         "bizcode@0.1.0|@tauri-apps/api@1.5.6",
         "bizcode@0.1.0|axios@1.14.0",
         "bizcode@0.1.0|cors@2.8.6",
+        "bizcode@0.1.0|csv-parse@6.2.1",
         "bizcode@0.1.0|dotenv@17.3.1",
         "bizcode@0.1.0|express-rate-limit@8.3.2",
         "bizcode@0.1.0|express@5.2.1",
         "bizcode@0.1.0|i18next@26.0.3",
+        "bizcode@0.1.0|multer@2.1.1",
         "bizcode@0.1.0|nodemailer@8.0.5",
         "bizcode@0.1.0|react-dom@18.3.1",
         "bizcode@0.1.0|react-hook-form@7.72.0",
@@ -4655,6 +5155,9 @@
         "bizcode@0.1.0|object-assign@4.1.1",
         "bizcode@0.1.0|vary@1.1.2"
       ]
+    },
+    {
+      "ref": "bizcode@0.1.0|csv-parse@6.2.1"
     },
     {
       "ref": "bizcode@0.1.0|dotenv@17.3.1"
@@ -4705,6 +5208,34 @@
         "bizcode@0.1.0|@babel/runtime@7.29.2",
         "bizcode@0.1.0|typescript@5.9.3"
       ]
+    },
+    {
+      "ref": "bizcode@0.1.0|multer@2.1.1",
+      "dependsOn": [
+        "bizcode@0.1.0|append-field@1.0.0",
+        "bizcode@0.1.0|busboy@1.6.0",
+        "bizcode@0.1.0|concat-stream@2.0.0",
+        "bizcode@0.1.0|multer@2.1.1|type-is@1.6.18"
+      ]
+    },
+    {
+      "ref": "bizcode@0.1.0|multer@2.1.1|type-is@1.6.18",
+      "dependsOn": [
+        "bizcode@0.1.0|multer@2.1.1|media-typer@0.3.0",
+        "bizcode@0.1.0|multer@2.1.1|mime-types@2.1.35"
+      ]
+    },
+    {
+      "ref": "bizcode@0.1.0|multer@2.1.1|media-typer@0.3.0"
+    },
+    {
+      "ref": "bizcode@0.1.0|multer@2.1.1|mime-types@2.1.35",
+      "dependsOn": [
+        "bizcode@0.1.0|multer@2.1.1|mime-db@1.52.0"
+      ]
+    },
+    {
+      "ref": "bizcode@0.1.0|multer@2.1.1|mime-db@1.52.0"
     },
     {
       "ref": "bizcode@0.1.0|nodemailer@8.0.5"
@@ -5007,6 +5538,32 @@
       "ref": "bizcode@0.1.0|typescript@5.9.3"
     },
     {
+      "ref": "bizcode@0.1.0|append-field@1.0.0"
+    },
+    {
+      "ref": "bizcode@0.1.0|busboy@1.6.0",
+      "dependsOn": [
+        "bizcode@0.1.0|streamsearch@1.1.0"
+      ]
+    },
+    {
+      "ref": "bizcode@0.1.0|concat-stream@2.0.0",
+      "dependsOn": [
+        "bizcode@0.1.0|buffer-from@1.1.2",
+        "bizcode@0.1.0|inherits@2.0.4",
+        "bizcode@0.1.0|concat-stream@2.0.0|readable-stream@3.6.2",
+        "bizcode@0.1.0|typedarray@0.0.6"
+      ]
+    },
+    {
+      "ref": "bizcode@0.1.0|concat-stream@2.0.0|readable-stream@3.6.2",
+      "dependsOn": [
+        "bizcode@0.1.0|inherits@2.0.4",
+        "bizcode@0.1.0|string_decoder@1.1.1",
+        "bizcode@0.1.0|util-deprecate@1.0.2"
+      ]
+    },
+    {
       "ref": "bizcode@0.1.0|loose-envify@1.4.0",
       "dependsOn": [
         "bizcode@0.1.0|js-tokens@4.0.0"
@@ -5169,6 +5726,15 @@
       "ref": "bizcode@0.1.0|media-typer@1.1.0"
     },
     {
+      "ref": "bizcode@0.1.0|streamsearch@1.1.0"
+    },
+    {
+      "ref": "bizcode@0.1.0|buffer-from@1.1.2"
+    },
+    {
+      "ref": "bizcode@0.1.0|typedarray@0.0.6"
+    },
+    {
       "ref": "bizcode@0.1.0|js-tokens@4.0.0"
     },
     {
@@ -5278,6 +5844,15 @@
         "bizcode@0.1.0|object-inspect@1.13.4",
         "bizcode@0.1.0|side-channel-map@1.0.1"
       ]
+    },
+    {
+      "ref": "bizcode@0.1.0|string_decoder@1.1.1",
+      "dependsOn": [
+        "bizcode@0.1.0|safe-buffer@5.1.2"
+      ]
+    },
+    {
+      "ref": "bizcode@0.1.0|util-deprecate@1.0.2"
     },
     {
       "ref": "bizcode@0.1.0|jwa@2.0.1",

@@ -52,7 +52,16 @@ The product’s VAT condition determines the applicable rate. The customer’s V
 
 ## Categories (Rubros)
 
-Rubros classify products (e.g. "Tools", "Electronics"). To add rubros, contact the system administrator (currently managed directly in the database).
+Rubros classify products (e.g. "Tools", "Electronics"). Users with **product management** permission can **import rubros from CSV** on this screen (“Import rubros CSV”): download the template, keep the header row unchanged, use UTF-8, and review the summary of rows created or skipped.
+
+## CSV import (rubros and products)
+
+With **products.manage**:
+
+- **Rubros:** fixed columns `codigo`, `nombre`. `.csv` file; max file size and row count are shown in the import dialog. Rows are skipped if the category code already exists in the database or is duplicated in the same file.
+- **Products:** columns as in the template; **`rubroCodigo`** must match the **numeric code** of an existing rubro. The same duplicate policy applies to the product `codigo` (within the file and in the database).
+
+**Esc** closes the import dialog when it is open; otherwise it closes the product form.
 
 ## Keyboard Shortcuts
 
@@ -63,4 +72,4 @@ Rubros classify products (e.g. "Tools", "Electronics"). To add rubros, contact t
 | F5 | Save form |
 | ↑ / ↓ | Navigate table rows |
 | Enter | Open selected product |
-| Esc | Close form without saving |
+| Esc | Close CSV import dialog, or close form without saving |

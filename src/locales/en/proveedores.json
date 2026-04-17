@@ -1,0 +1,55 @@
+{
+  "title": "Suppliers",
+  "noAccess": "You do not have permission to view suppliers.",
+  "search": {
+    "placeholder": "Search by code or business name... (F2)"
+  },
+  "table": {
+    "codigo": "Code",
+    "rsocial": "Business name",
+    "cuit": "Tax ID",
+    "condIva": "VAT status",
+    "telef": "Phone",
+    "activo": "Active"
+  },
+  "empty": "No suppliers yet. Create one with F3.",
+  "import": {
+    "button": "Import CSV",
+    "title": "Import suppliers from CSV",
+    "description": "Download the template, fill rows, and export as UTF-8 CSV. Keep the header row exactly as provided.",
+    "downloadTemplate": "Download CSV template",
+    "chooseFile": "Choose .csv file",
+    "submit": "Import",
+    "close": "Close",
+    "loading": "Importing…",
+    "successSummary": "Import finished: {{created}} created, {{skipped}} skipped.",
+    "errorsHeading": "Rows with errors",
+    "row": "Row",
+    "message": "Message",
+    "errorNetwork": "Import could not complete. Check your connection.",
+    "errorGeneric": "Import failed. Check the file.",
+    "hintFormat": ".csv only. Max 1 MB and up to 2000 data rows."
+  },
+  "form": {
+    "titleNew": "New supplier",
+    "titleEdit": "Edit supplier #{{codigo}}",
+    "hint": "F5=save, Esc=cancel",
+    "codigo": "Code",
+    "rsocial": "Business name",
+    "fantasia": "Trade name",
+    "cuit": "Tax ID",
+    "condIva": "VAT condition",
+    "telef": "Phone",
+    "email": "Email",
+    "activo": "Active",
+    "condIvaOptions": {
+      "RI": "RI",
+      "Mono": "Monotributo",
+      "CF": "End consumer",
+      "Exento": "Exempt"
+    },
+    "errors": {
+      "generic": "Could not save supplier"
+    }
+  }
+}

@@ -83,6 +83,8 @@ Implementação:
   - `PROJECT_STATUS_OPTION_IN_PROGRESS`
   - `PROJECT_STATUS_OPTION_DONE`
   - `PROJECT_STATUS_OPTION_BLOCKED` (opcional)
+- Variável opcional no repositório:
+  - `PROJECT_PR_ASSOCIATED_FIELD_ID`: id GraphQL do campo de texto **PR asociado** do Project. Quando definida, o workflow grava a URL do PR ao atualizar o status de cada issue vinculada.
 - Segredo recomendado para Projects V2 de usuário:
   - `PROJECT_AUTOMATION_TOKEN` (`repo`, `project`, `read:project`)
 
@@ -92,6 +94,7 @@ Implementação:
 - **Sincronização local:** `npm run plan:sync -- --plan <caminho.plan.md> [--repo dono/repo] [--repo-root <dir>] [--dry-run]` faz upsert de um issue por todo do plano, vincula ao Project v2, define o status do quadro conforme o todo e persiste o mapeamento em `.github/plan-sync/state/`. Fora de `--dry-run` são necessários `GH_TOKEN` ou `GITHUB_TOKEN`, `GITHUB_REPOSITORY` (ou `GITHUB_OWNER` + `GITHUB_REPO`, ou `--repo`) e as mesmas variáveis de Project indicadas acima. Relatórios em `.github/plan-sync/reports/` (ignorados pelo git).
 - **Fluxo opcional de aprovação:** `npm run plan:approve -- --plan <caminho>` arquiva uma cópia em `.cursor/plans/` e executa `plan:sync` (ver `scripts/github/plan-approve-main.ts`).
 - **Interação com a automação por PR:** Com itens no quadro, `.github/workflows/project-status-automation.yml` continua atualizando o status na abertura/fechamento/merge do PR quando o issue está ligado com `Closes #<issue>`.
+- **Higiene do quadro:** mantenha **Backlog** para trabalho que não está em andamento (sem PR aberto). Use **Ready** quando comprometido mas ainda sem PR; **In Progress** quando há PR aberto vinculado. Evite **In Progress** sem PR.
 
 Checklist diário de uso:
 

@@ -315,8 +315,11 @@ export default function NuevaFacturaForm({
               lineas.map((linea, idx) => (
                 <tr
                   key={linea.id}
-                  role="row"
-                  aria-selected={selectedLineIdx === idx}
+                  aria-label={
+                    selectedLineIdx === idx
+                      ? t('items.rowAriaSelected', { n: idx + 1 })
+                      : t('items.rowAria', { n: idx + 1 })
+                  }
                   onClick={() => setSelectedLineIdx(idx)}
                   className={`border-b border-slate-200 dark:border-slate-700 transition ${
                     selectedLineIdx === idx
@@ -330,6 +333,7 @@ export default function NuevaFacturaForm({
                       onChange={(e) =>
                         updateLinea(idx, 'articuloId', parseInt(e.target.value))
                       }
+                      aria-label={`${t('items.articulo')} ${idx + 1}`}
                       className="w-full bg-white dark:bg-slate-600 text-slate-900 dark:text-slate-100 rounded border border-slate-300 dark:border-slate-500 px-2 py-1 text-sm"
                     >
                       <option value={0}>{t('items.selectArticulo')}</option>
@@ -347,6 +351,7 @@ export default function NuevaFacturaForm({
                       onChange={(e) =>
                         updateLinea(idx, 'cantidad', parseInt(e.target.value) || 0)
                       }
+                      aria-label={`${t('items.cantidad')} ${idx + 1}`}
                       className="w-full bg-white dark:bg-slate-600 text-slate-900 dark:text-slate-100 rounded border border-slate-300 dark:border-slate-500 px-2 py-1 text-sm text-center"
                     />
                   </td>
@@ -358,6 +363,7 @@ export default function NuevaFacturaForm({
                       onChange={(e) =>
                         updateLinea(idx, 'precio', parseFloat(e.target.value) || 0)
                       }
+                      aria-label={`${t('items.precio')} ${idx + 1}`}
                       className="w-full bg-white dark:bg-slate-600 text-slate-900 dark:text-slate-100 rounded border border-slate-300 dark:border-slate-500 px-2 py-1 text-sm text-right"
                     />
                   </td>
@@ -368,6 +374,7 @@ export default function NuevaFacturaForm({
                       onChange={(e) =>
                         updateLinea(idx, 'dscto', parseFloat(e.target.value) || 0)
                       }
+                      aria-label={`${t('items.descuento')} ${idx + 1}`}
                       className="w-full bg-white dark:bg-slate-600 text-slate-900 dark:text-slate-100 rounded border border-slate-300 dark:border-slate-500 px-2 py-1 text-sm text-center"
                     />
                   </td>

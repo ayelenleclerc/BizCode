@@ -36,6 +36,7 @@ This repository includes automated assets for the Phase 1 governance blueprint.
    - `PROJECT_STATUS_OPTION_IN_PROGRESS`
    - `PROJECT_STATUS_OPTION_DONE`
    - `PROJECT_STATUS_OPTION_BLOCKED` (optional)
+   - `PROJECT_PR_ASSOCIATED_FIELD_ID` (optional): GraphQL field id of the Project text field **PR asociado** (from `gh project field-list <n> --owner <user>`). When set, `.github/workflows/project-status-automation.yml` writes the PR URL into that field whenever it updates status for a linked issue (`Closes #<issue>`).
 5. (Recommended for user-owned Projects) add repository secret:
    - `PROJECT_AUTOMATION_TOKEN` = GitHub PAT with scopes:
      - `repo`

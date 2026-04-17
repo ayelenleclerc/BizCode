@@ -14,6 +14,7 @@ import { registerNotificationRoutes } from './notifications'
 import { dispatchNotification, isSmtpConfigured, isTwilioConfigured } from './channels'
 import { registerChatRoutes } from './chat'
 import { validateCUIT } from '../src/lib/validators'
+import { csvImportUploadSingle, parseCsvWithFixedHeaders, CSV_IMPORT_MAX_ROWS } from './csvImport'
 
 const DEFAULT_CORS_ORIGINS = ['http://localhost:5173', 'http://127.0.0.1:5173'] as const
 
@@ -85,6 +86,17 @@ type ArticuloInput = {
 type RubroInput = {
   codigo: number
   nombre: string
+}
+
+type ProveedorInput = {
+  codigo: number
+  rsocial: string
+  condIva: ClienteInput['condIva']
+  activo: boolean
+  fantasia?: string | null
+  cuit?: string | null
+  telef?: string | null
+  email?: string | null
 }
 
 type FacturaItemInput = {
@@ -267,6 +279,41 @@ function validateRubroInput(raw: unknown): ValidationResult<RubroInput> {
   return { ok: true, value: { codigo: codigo.value, nombre: raw.nombre.trim() } }
 }
 
+function validateProveedorInput(raw: unknown): ValidationResult<ProveedorInput> {
+  if (!isObjectRecord(raw)) return { ok: false, error: 'Request body must be an object' }
+  const codigo = parseRequiredInteger(raw.codigo, 'codigo', 1)
+  if (!codigo.ok) return codigo
+  if (typeof raw.rsocial !== 'string' || raw.rsocial.trim().length < 3 || raw.rsocial.trim().length > 30) {
+    return { ok: false, error: 'rsocial must be a string between 3 and 30 characters' }
+  }
+  if (typeof raw.condIva !== 'string' || !['RI', 'Mono', 'CF', 'Exento'].includes(raw.condIva)) {
+    return { ok: false, error: 'condIva must be one of: RI, Mono, CF, Exento' }
+  }
+  if (typeof raw.activo !== 'boolean') return { ok: false, error: 'activo must be a boolean' }
+  const fantasia = parseOptionalString(raw.fantasia, 30, 'fantasia')
+  if (!fantasia.ok) return fantasia
+  const telef = parseOptionalString(raw.telef, 25, 'telef')
+  if (!telef.ok) return telef
+  const email = parseOptionalString(raw.email, 50, 'email')
+  if (!email.ok) return email
+  const cuit = parseOptionalString(raw.cuit, 14, 'cuit')
+  if (!cuit.ok) return cuit
+  if (cuit.value && !validateCUIT(cuit.value)) return { ok: false, error: 'cuit must be a valid Argentine CUIT' }
+  return {
+    ok: true,
+    value: {
+      codigo: codigo.value,
+      rsocial: raw.rsocial.trim(),
+      condIva: raw.condIva as ProveedorInput['condIva'],
+      activo: raw.activo,
+      ...(fantasia.value !== undefined && { fantasia: fantasia.value }),
+      ...(cuit.value !== undefined && { cuit: cuit.value }),
+      ...(telef.value !== undefined && { telef: telef.value }),
+      ...(email.value !== undefined && { email: email.value }),
+    },
+  }
+}
+
 function validateFacturaInput(raw: unknown): ValidationResult<FacturaInput> {
   if (!isObjectRecord(raw)) return { ok: false, error: 'Request body must be an object' }
   if (typeof raw.fecha !== 'string' || raw.fecha.trim().length === 0) return { ok: false, error: 'fecha is required' }
@@ -336,6 +383,249 @@ function validateFacturaInput(raw: unknown): ValidationResult<FacturaInput> {
       items: parsedItems,
     },
   }
+}
+
+const CLIENTE_IMPORT_CSV_HEADERS = [
+  'codigo',
+  'rsocial',
+  'condIva',
+  'activo',
+  'fantasia',
+  'cuit',
+  'domicilio',
+  'localidad',
+  'cpost',
+  'telef',
+  'email',
+  'creditLimit',
+  'creditDays',
+  'suspended',
+  'deliveryZoneId',
+] as const
+
+const singleCsvUpload = csvImportUploadSingle()
+
+const RUBRO_IMPORT_CSV_HEADERS = ['codigo', 'nombre'] as const
+
+const ARTICULO_IMPORT_CSV_HEADERS = [
+  'codigo',
+  'descripcion',
+  'rubroCodigo',
+  'condIva',
+  'umedida',
+  'precioLista1',
+  'precioLista2',
+  'costo',
+  'stock',
+  'minimo',
+  'activo',
+] as const
+
+const PROVEEDOR_IMPORT_CSV_HEADERS = [
+  'codigo',
+  'rsocial',
+  'condIva',
+  'activo',
+  'fantasia',
+  'cuit',
+  'telef',
+  'email',
+] as const
+
+function buildClienteImportTemplateCsv(): string {
+  const header = CLIENTE_IMPORT_CSV_HEADERS.join(',')
+  const example = [
+    '1001',
+    'Ejemplo SA',
+    'RI',
+    'true',
+    '',
+    '20-12345678-9',
+    'Calle 123',
+    'Córdoba',
+    '5000',
+    '351-5550100',
+    'contacto@example.com',
+    '',
+    '0',
+    'false',
+    '',
+  ].join(',')
+  return `\uFEFF${header}\n${example}\n`
+}
+
+function optionalTrimmedCsv(value: string | undefined): string | undefined {
+  const t = (value ?? '').trim()
+  return t === '' ? undefined : t
+}
+
+/** `null` = invalid cell; `undefined` = empty (caller decides if allowed). */
+function parseCsvBooleanCell(value: string): boolean | null | undefined {
+  const v = value.trim().toLowerCase()
+  if (v === '') return undefined
+  if (['true', '1', 'yes', 'sí', 'si'].includes(v)) return true
+  if (['false', '0', 'no'].includes(v)) return false
+  return null
+}
+
+function csvRowToRawCliente(row: Record<string, string>): Record<string, unknown> {
+  const raw: Record<string, unknown> = {}
+  const codigoStr = (row.codigo ?? '').trim()
+  if (codigoStr === '') {
+    raw.codigo = undefined
+  } else {
+    const n = Number.parseInt(codigoStr, 10)
+    raw.codigo = Number.isNaN(n) ? Number.NaN : n
+  }
+  const rs = (row.rsocial ?? '').trim()
+  raw.rsocial = rs === '' ? undefined : rs
+  const ci = (row.condIva ?? '').trim()
+  raw.condIva = ci === '' ? undefined : ci
+  const activoCell = (row.activo ?? '').trim()
+  if (activoCell === '') {
+    raw.activo = undefined
+  } else {
+    const b = parseCsvBooleanCell(activoCell)
+    raw.activo = b === null ? null : b
+  }
+  const fantasia = optionalTrimmedCsv(row.fantasia)
+  if (fantasia !== undefined) raw.fantasia = fantasia
+  const cuit = optionalTrimmedCsv(row.cuit)
+  if (cuit !== undefined) raw.cuit = cuit
+  const domicilio = optionalTrimmedCsv(row.domicilio)
+  if (domicilio !== undefined) raw.domicilio = domicilio
+  const localidad = optionalTrimmedCsv(row.localidad)
+  if (localidad !== undefined) raw.localidad = localidad
+  const cpost = optionalTrimmedCsv(row.cpost)
+  if (cpost !== undefined) raw.cpost = cpost
+  const telef = optionalTrimmedCsv(row.telef)
+  if (telef !== undefined) raw.telef = telef
+  const email = optionalTrimmedCsv(row.email)
+  if (email !== undefined) raw.email = email
+  const cl = (row.creditLimit ?? '').trim()
+  if (cl !== '') {
+    const n = Number.parseFloat(cl)
+    raw.creditLimit = Number.isNaN(n) ? Number.NaN : n
+  }
+  const cd = (row.creditDays ?? '').trim()
+  if (cd !== '') {
+    const n = Number.parseInt(cd, 10)
+    raw.creditDays = Number.isNaN(n) ? Number.NaN : n
+  }
+  const sus = (row.suspended ?? '').trim()
+  if (sus !== '') {
+    const b = parseCsvBooleanCell(sus)
+    raw.suspended = b === null ? null : b
+  }
+  const dz = (row.deliveryZoneId ?? '').trim()
+  if (dz !== '') {
+    const n = Number.parseInt(dz, 10)
+    raw.deliveryZoneId = Number.isNaN(n) ? Number.NaN : n
+  }
+  return raw
+}
+
+function buildRubroImportTemplateCsv(): string {
+  const header = RUBRO_IMPORT_CSV_HEADERS.join(',')
+  const example = ['10', 'Ejemplo'].join(',')
+  return `\uFEFF${header}\n${example}\n`
+}
+
+function csvRowToRawRubro(row: Record<string, string>): Record<string, unknown> {
+  const raw: Record<string, unknown> = {}
+  const codigoStr = (row.codigo ?? '').trim()
+  if (codigoStr === '') raw.codigo = undefined
+  else {
+    const n = Number.parseInt(codigoStr, 10)
+    raw.codigo = Number.isNaN(n) ? Number.NaN : n
+  }
+  const nombre = (row.nombre ?? '').trim()
+  raw.nombre = nombre === '' ? undefined : nombre
+  return raw
+}
+
+function buildArticuloImportTemplateCsv(): string {
+  const header = ARTICULO_IMPORT_CSV_HEADERS.join(',')
+  const example = ['100', 'Producto demo', '10', '1', 'UN', '100.50', '95.00', '50.00', '0', '0', 'true'].join(',')
+  return `\uFEFF${header}\n${example}\n`
+}
+
+function csvRowToRawArticulo(row: Record<string, string>): Record<string, unknown> {
+  const raw: Record<string, unknown> = {}
+  const codigoStr = (row.codigo ?? '').trim()
+  if (codigoStr === '') raw.codigo = undefined
+  else {
+    const n = Number.parseInt(codigoStr, 10)
+    raw.codigo = Number.isNaN(n) ? Number.NaN : n
+  }
+  const desc = (row.descripcion ?? '').trim()
+  raw.descripcion = desc === '' ? undefined : desc
+  const rc = (row.rubroCodigo ?? '').trim()
+  if (rc === '') raw.rubroCodigo = undefined
+  else {
+    const n = Number.parseInt(rc, 10)
+    raw.rubroCodigo = Number.isNaN(n) ? Number.NaN : n
+  }
+  const ci = (row.condIva ?? '').trim()
+  raw.condIva = ci === '' ? undefined : ci
+  const um = (row.umedida ?? '').trim()
+  raw.umedida = um === '' ? undefined : um
+  for (const key of ['precioLista1', 'precioLista2', 'costo'] as const) {
+    const s = (row[key] ?? '').trim()
+    if (s !== '') {
+      const n = Number.parseFloat(s)
+      raw[key] = Number.isNaN(n) ? Number.NaN : n
+    }
+  }
+  for (const key of ['stock', 'minimo'] as const) {
+    const s = (row[key] ?? '').trim()
+    if (s !== '') {
+      const n = Number.parseInt(s, 10)
+      raw[key] = Number.isNaN(n) ? Number.NaN : n
+    }
+  }
+  const act = (row.activo ?? '').trim()
+  if (act === '') raw.activo = undefined
+  else {
+    const b = parseCsvBooleanCell(act)
+    raw.activo = b === null ? null : b
+  }
+  return raw
+}
+
+function buildProveedorImportTemplateCsv(): string {
+  const header = PROVEEDOR_IMPORT_CSV_HEADERS.join(',')
+  const example = ['2001', 'Proveedor Demo SA', 'RI', 'true', '', '', '', ''].join(',')
+  return `\uFEFF${header}\n${example}\n`
+}
+
+function csvRowToRawProveedor(row: Record<string, string>): Record<string, unknown> {
+  const raw: Record<string, unknown> = {}
+  const codigoStr = (row.codigo ?? '').trim()
+  if (codigoStr === '') raw.codigo = undefined
+  else {
+    const n = Number.parseInt(codigoStr, 10)
+    raw.codigo = Number.isNaN(n) ? Number.NaN : n
+  }
+  const rs = (row.rsocial ?? '').trim()
+  raw.rsocial = rs === '' ? undefined : rs
+  const ci = (row.condIva ?? '').trim()
+  raw.condIva = ci === '' ? undefined : ci
+  const act = (row.activo ?? '').trim()
+  if (act === '') raw.activo = undefined
+  else {
+    const b = parseCsvBooleanCell(act)
+    raw.activo = b === null ? null : b
+  }
+  const fantasia = optionalTrimmedCsv(row.fantasia)
+  if (fantasia !== undefined) raw.fantasia = fantasia
+  const cuit = optionalTrimmedCsv(row.cuit)
+  if (cuit !== undefined) raw.cuit = cuit
+  const telef = optionalTrimmedCsv(row.telef)
+  if (telef !== undefined) raw.telef = telef
+  const email = optionalTrimmedCsv(row.email)
+  if (email !== undefined) raw.email = email
+  return raw
 }
 
 let cachedOpenApiDocument: Record<string, unknown> | undefined
@@ -451,6 +741,88 @@ export function createApp(prisma: PrismaClient): Application {
     } catch (err: unknown) {
       res.status(500).json({ success: false, error: errorMessage(err) })
     }
+  })
+
+  app.get('/api/clientes/import/template', requirePermission('customers.manage'), (_req: Request, res: Response) => {
+    const body = buildClienteImportTemplateCsv()
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8')
+    res.setHeader('Content-Disposition', 'attachment; filename="clientes_import_template.csv"')
+    res.send(body)
+  })
+
+  app.post('/api/clientes/import', requirePermission('customers.manage'), singleCsvUpload, (req: Request, res: Response) => {
+    void (async () => {
+    const file = (req as Request & { file?: Express.Multer.File }).file
+    if (!file?.buffer) {
+      res.status(400).json({ success: false, error: 'Expected multipart field "file" with a .csv file' })
+      return
+    }
+    try {
+          const parsedCsv = parseCsvWithFixedHeaders(file.buffer, CLIENTE_IMPORT_CSV_HEADERS, CSV_IMPORT_MAX_ROWS)
+          if (!parsedCsv.ok) {
+            res.status(400).json({ success: false, error: parsedCsv.error })
+            return
+          }
+          const errors: { row: number; message: string }[] = []
+          const seenCodigos = new Map<number, number>()
+          const validatedRows: { row: number; input: ClienteInput }[] = []
+          for (const [i, row] of parsedCsv.records.entries()) {
+            const rowNum = i + 2
+            const raw = csvRowToRawCliente(row)
+            const parsed = validateClienteInput(raw)
+            if (!parsed.ok) {
+              errors.push({ row: rowNum, message: parsed.error })
+              continue
+            }
+            const codigo = parsed.value.codigo
+            const firstRow = seenCodigos.get(codigo)
+            if (firstRow !== undefined) {
+              errors.push({
+                row: rowNum,
+                message: `Duplicate codigo ${codigo} (first occurrence on row ${firstRow})`,
+              })
+              continue
+            }
+            seenCodigos.set(codigo, rowNum)
+            validatedRows.push({ row: rowNum, input: parsed.value })
+          }
+          const codigos = validatedRows.map((r) => r.input.codigo)
+          const existing =
+            codigos.length === 0
+              ? []
+              : await prisma.cliente.findMany({
+                  where: { codigo: { in: codigos } },
+                  select: { codigo: true },
+                })
+          const existingSet = new Set(existing.map((e) => e.codigo))
+          const toInsert: ClienteInput[] = []
+          for (const vr of validatedRows) {
+            if (existingSet.has(vr.input.codigo)) {
+              errors.push({ row: vr.row, message: `codigo ${vr.input.codigo} already exists` })
+              continue
+            }
+            toInsert.push(vr.input)
+          }
+          let created = 0
+          await prisma.$transaction(async (tx) => {
+            for (const data of toInsert) {
+              await tx.cliente.create({ data })
+              created += 1
+            }
+          })
+          const authReq = req as AuthenticatedRequest
+          await writeAudit(authReq, 'cliente_import', 'cliente', undefined, {
+            createdCount: created,
+            errorCount: errors.length,
+          })
+          res.json({
+            success: true,
+            data: { created, skipped: errors.length, errors },
+          })
+ } catch (err: unknown) {
+          res.status(500).json({ success: false, error: errorMessage(err) })
+        }
+    })()
   })
 
   app.get('/api/clientes/:id', requirePermission('customers.read'), async (req: Request, res: Response) => {
@@ -577,6 +949,102 @@ export function createApp(prisma: PrismaClient): Application {
     }
   })
 
+  app.get('/api/articulos/import/template', requirePermission('products.manage'), (_req: Request, res: Response) => {
+    const body = buildArticuloImportTemplateCsv()
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8')
+    res.setHeader('Content-Disposition', 'attachment; filename="articulos_import_template.csv"')
+    res.send(body)
+  })
+
+  app.post('/api/articulos/import', requirePermission('products.manage'), singleCsvUpload, (req: Request, res: Response) => {
+    void (async () => {
+    const file = (req as Request & { file?: Express.Multer.File }).file
+    if (!file?.buffer) {
+      res.status(400).json({ success: false, error: 'Expected multipart field "file" with a .csv file' })
+      return
+    }
+    try {
+          const parsedCsv = parseCsvWithFixedHeaders(file.buffer, ARTICULO_IMPORT_CSV_HEADERS, CSV_IMPORT_MAX_ROWS)
+          if (!parsedCsv.ok) {
+            res.status(400).json({ success: false, error: parsedCsv.error })
+            return
+          }
+          const rubrosDb = await prisma.rubro.findMany({ select: { id: true, codigo: true } })
+          const rubroByCodigo = new Map(rubrosDb.map((r) => [r.codigo, r.id]))
+          const errors: { row: number; message: string }[] = []
+          const seenCodigos = new Map<number, number>()
+          const validatedRows: { row: number; input: ArticuloInput }[] = []
+          for (const [i, row] of parsedCsv.records.entries()) {
+            const rowNum = i + 2
+            const raw = csvRowToRawArticulo(row)
+            const rubroCodigo = raw.rubroCodigo
+            if (typeof rubroCodigo !== 'number' || !Number.isInteger(rubroCodigo)) {
+              errors.push({ row: rowNum, message: 'rubroCodigo must be a valid integer' })
+              continue
+            }
+            const rubroId = rubroByCodigo.get(rubroCodigo)
+            if (rubroId === undefined) {
+              errors.push({ row: rowNum, message: `Unknown rubroCodigo ${rubroCodigo}` })
+              continue
+            }
+            const { rubroCodigo: _rc, ...rest } = raw
+            const forValidate = { ...rest, rubroId }
+            const parsed = validateArticuloInput(forValidate)
+            if (!parsed.ok) {
+              errors.push({ row: rowNum, message: parsed.error })
+              continue
+            }
+            const codigo = parsed.value.codigo
+            const firstRow = seenCodigos.get(codigo)
+            if (firstRow !== undefined) {
+              errors.push({
+                row: rowNum,
+                message: `Duplicate codigo ${codigo} (first occurrence on row ${firstRow})`,
+              })
+              continue
+            }
+            seenCodigos.set(codigo, rowNum)
+            validatedRows.push({ row: rowNum, input: parsed.value })
+          }
+          const codigos = validatedRows.map((r) => r.input.codigo)
+          const existing =
+            codigos.length === 0
+              ? []
+              : await prisma.articulo.findMany({
+                  where: { codigo: { in: codigos } },
+                  select: { codigo: true },
+                })
+          const existingSet = new Set(existing.map((e) => e.codigo))
+          const toInsert: ArticuloInput[] = []
+          for (const vr of validatedRows) {
+            if (existingSet.has(vr.input.codigo)) {
+              errors.push({ row: vr.row, message: `codigo ${vr.input.codigo} already exists` })
+              continue
+            }
+            toInsert.push(vr.input)
+          }
+          let created = 0
+          await prisma.$transaction(async (tx) => {
+            for (const data of toInsert) {
+              await tx.articulo.create({ data })
+              created += 1
+            }
+          })
+          const authReq = req as AuthenticatedRequest
+          await writeAudit(authReq, 'articulo_import', 'articulo', undefined, {
+            createdCount: created,
+            errorCount: errors.length,
+          })
+          res.json({
+            success: true,
+            data: { created, skipped: errors.length, errors },
+          })
+    } catch (err: unknown) {
+      res.status(500).json({ success: false, error: errorMessage(err) })
+    }
+    })()
+  })
+
   // ============ RUBROS ============
 
   app.get('/api/rubros', requirePermission('products.read'), async (_req: Request, res: Response) => {
@@ -600,6 +1068,234 @@ export function createApp(prisma: PrismaClient): Application {
       const rubro = await prisma.rubro.create({ data: parsed.value })
       await writeAudit(req as AuthenticatedRequest, 'rubro_create', 'rubro', String(rubro.id))
       res.json({ success: true, data: rubro })
+    } catch (err: unknown) {
+      res.status(500).json({ success: false, error: errorMessage(err) })
+    }
+  })
+
+  app.get('/api/rubros/import/template', requirePermission('products.manage'), (_req: Request, res: Response) => {
+    const body = buildRubroImportTemplateCsv()
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8')
+    res.setHeader('Content-Disposition', 'attachment; filename="rubros_import_template.csv"')
+    res.send(body)
+  })
+
+  app.post('/api/rubros/import', requirePermission('products.manage'), singleCsvUpload, (req: Request, res: Response) => {
+    void (async () => {
+    const file = (req as Request & { file?: Express.Multer.File }).file
+    if (!file?.buffer) {
+      res.status(400).json({ success: false, error: 'Expected multipart field "file" with a .csv file' })
+      return
+    }
+    try {
+          const parsedCsv = parseCsvWithFixedHeaders(file.buffer, RUBRO_IMPORT_CSV_HEADERS, CSV_IMPORT_MAX_ROWS)
+          if (!parsedCsv.ok) {
+            res.status(400).json({ success: false, error: parsedCsv.error })
+            return
+          }
+          const errors: { row: number; message: string }[] = []
+          const seenCodigos = new Map<number, number>()
+          const validatedRows: { row: number; input: RubroInput }[] = []
+          for (const [i, row] of parsedCsv.records.entries()) {
+            const rowNum = i + 2
+            const raw = csvRowToRawRubro(row)
+            const parsed = validateRubroInput(raw)
+            if (!parsed.ok) {
+              errors.push({ row: rowNum, message: parsed.error })
+              continue
+            }
+            const codigo = parsed.value.codigo
+            const firstRow = seenCodigos.get(codigo)
+            if (firstRow !== undefined) {
+              errors.push({
+                row: rowNum,
+                message: `Duplicate codigo ${codigo} (first occurrence on row ${firstRow})`,
+              })
+              continue
+            }
+            seenCodigos.set(codigo, rowNum)
+            validatedRows.push({ row: rowNum, input: parsed.value })
+          }
+          const codigos = validatedRows.map((r) => r.input.codigo)
+          const existing =
+            codigos.length === 0
+              ? []
+              : await prisma.rubro.findMany({
+                  where: { codigo: { in: codigos } },
+                  select: { codigo: true },
+                })
+          const existingSet = new Set(existing.map((e) => e.codigo))
+          const toInsert: RubroInput[] = []
+          for (const vr of validatedRows) {
+            if (existingSet.has(vr.input.codigo)) {
+              errors.push({ row: vr.row, message: `codigo ${vr.input.codigo} already exists` })
+              continue
+            }
+            toInsert.push(vr.input)
+          }
+          let created = 0
+          await prisma.$transaction(async (tx) => {
+            for (const data of toInsert) {
+              await tx.rubro.create({ data })
+              created += 1
+            }
+          })
+          const authReq = req as AuthenticatedRequest
+          await writeAudit(authReq, 'rubro_import', 'rubro', undefined, {
+            createdCount: created,
+            errorCount: errors.length,
+          })
+          res.json({
+            success: true,
+            data: { created, skipped: errors.length, errors },
+          })
+    } catch (err: unknown) {
+      res.status(500).json({ success: false, error: errorMessage(err) })
+    }
+    })()
+  })
+
+  // ============ PROVEEDORES ============
+
+  app.get('/api/proveedores', requirePermission('suppliers.read'), async (req: Request, res: Response) => {
+    try {
+      const filtro = (req.query.q as string) || ''
+      const proveedores = await prisma.proveedor.findMany({
+        where: {
+          OR: [
+            { rsocial: { contains: filtro, mode: 'insensitive' } },
+            { codigo: { equals: filtro ? parseInt(filtro, 10) : undefined } },
+          ],
+        },
+        orderBy: { codigo: 'asc' },
+      })
+      res.json({ success: true, data: proveedores })
+    } catch (err: unknown) {
+      res.status(500).json({ success: false, error: errorMessage(err) })
+    }
+  })
+
+  app.get('/api/proveedores/import/template', requirePermission('suppliers.manage'), (_req: Request, res: Response) => {
+    const body = buildProveedorImportTemplateCsv()
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8')
+    res.setHeader('Content-Disposition', 'attachment; filename="proveedores_import_template.csv"')
+    res.send(body)
+  })
+
+  app.post('/api/proveedores/import', requirePermission('suppliers.manage'), singleCsvUpload, (req: Request, res: Response) => {
+    void (async () => {
+    const file = (req as Request & { file?: Express.Multer.File }).file
+    if (!file?.buffer) {
+      res.status(400).json({ success: false, error: 'Expected multipart field "file" with a .csv file' })
+      return
+    }
+    try {
+          const parsedCsv = parseCsvWithFixedHeaders(file.buffer, PROVEEDOR_IMPORT_CSV_HEADERS, CSV_IMPORT_MAX_ROWS)
+          if (!parsedCsv.ok) {
+            res.status(400).json({ success: false, error: parsedCsv.error })
+            return
+          }
+          const errors: { row: number; message: string }[] = []
+          const seenCodigos = new Map<number, number>()
+          const validatedRows: { row: number; input: ProveedorInput }[] = []
+          for (const [i, row] of parsedCsv.records.entries()) {
+            const rowNum = i + 2
+            const raw = csvRowToRawProveedor(row)
+            const parsed = validateProveedorInput(raw)
+            if (!parsed.ok) {
+              errors.push({ row: rowNum, message: parsed.error })
+              continue
+            }
+            const codigo = parsed.value.codigo
+            const firstRow = seenCodigos.get(codigo)
+            if (firstRow !== undefined) {
+              errors.push({
+                row: rowNum,
+                message: `Duplicate codigo ${codigo} (first occurrence on row ${firstRow})`,
+              })
+              continue
+            }
+            seenCodigos.set(codigo, rowNum)
+            validatedRows.push({ row: rowNum, input: parsed.value })
+          }
+          const codigos = validatedRows.map((r) => r.input.codigo)
+          const existing =
+            codigos.length === 0
+              ? []
+              : await prisma.proveedor.findMany({
+                  where: { codigo: { in: codigos } },
+                  select: { codigo: true },
+                })
+          const existingSet = new Set(existing.map((e) => e.codigo))
+          const toInsert: ProveedorInput[] = []
+          for (const vr of validatedRows) {
+            if (existingSet.has(vr.input.codigo)) {
+              errors.push({ row: vr.row, message: `codigo ${vr.input.codigo} already exists` })
+              continue
+            }
+            toInsert.push(vr.input)
+          }
+          let created = 0
+          await prisma.$transaction(async (tx) => {
+            for (const data of toInsert) {
+              await tx.proveedor.create({ data })
+              created += 1
+            }
+          })
+          const authReq = req as AuthenticatedRequest
+          await writeAudit(authReq, 'proveedor_import', 'proveedor', undefined, {
+            createdCount: created,
+            errorCount: errors.length,
+          })
+          res.json({
+            success: true,
+            data: { created, skipped: errors.length, errors },
+          })
+    } catch (err: unknown) {
+      res.status(500).json({ success: false, error: errorMessage(err) })
+    }
+    })()
+  })
+
+  app.get('/api/proveedores/:id', requirePermission('suppliers.read'), async (req: Request, res: Response) => {
+    try {
+      const proveedor = await prisma.proveedor.findUnique({
+        where: { id: parseInt(String(req.params.id), 10) },
+      })
+      res.json({ success: true, data: proveedor })
+    } catch (err: unknown) {
+      res.status(500).json({ success: false, error: errorMessage(err) })
+    }
+  })
+
+  app.post('/api/proveedores', requirePermission('suppliers.manage'), async (req: Request, res: Response) => {
+    try {
+      const parsed = validateProveedorInput(req.body)
+      if (!parsed.ok) {
+        res.status(400).json({ success: false, error: parsed.error })
+        return
+      }
+      const proveedor = await prisma.proveedor.create({ data: parsed.value })
+      await writeAudit(req as AuthenticatedRequest, 'proveedor_create', 'proveedor', String(proveedor.id))
+      res.json({ success: true, data: proveedor })
+    } catch (err: unknown) {
+      res.status(500).json({ success: false, error: errorMessage(err) })
+    }
+  })
+
+  app.put('/api/proveedores/:id', requirePermission('suppliers.manage'), async (req: Request, res: Response) => {
+    try {
+      const parsed = validateProveedorInput(req.body)
+      if (!parsed.ok) {
+        res.status(400).json({ success: false, error: parsed.error })
+        return
+      }
+      const proveedor = await prisma.proveedor.update({
+        where: { id: parseInt(String(req.params.id), 10) },
+        data: parsed.value,
+      })
+      await writeAudit(req as AuthenticatedRequest, 'proveedor_update', 'proveedor', String(proveedor.id))
+      res.json({ success: true, data: proveedor })
     } catch (err: unknown) {
       res.status(500).json({ success: false, error: errorMessage(err) })
     }

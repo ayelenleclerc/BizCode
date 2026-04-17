@@ -48,6 +48,12 @@
 
 * [ClienteEnvelope](./clienteenvelope.md) – `-`
 
+* [ClienteImportEnvelope](./clienteimportenvelope.md) – `-`
+
+* [ClienteImportResult](./clienteimportresult.md) – `-`
+
+* [ClienteImportRowError](./clienteimportrowerror.md) – `-`
+
 * [ClienteInput](./clienteinput.md) – `-`
 
 * [ClienteListEnvelope](./clientelistenvelope.md) – `-`
@@ -89,6 +95,16 @@
 * [LogoutEnvelope](./logoutenvelope.md) – `-`
 
 * [LogoutResult](./logoutresult.md) – `-`
+
+* [Proveedor](./proveedor.md) – `-`
+
+* [ProveedorEnvelope](./proveedorenvelope.md) – `-`
+
+* [ProveedorInput](./proveedorinput.md) – `-`
+
+* [ProveedorListEnvelope](./proveedorlistenvelope.md) – `-`
+
+* [ProveedorNullableEnvelope](./proveedornullableenvelope.md) – `-`
 
 * [Rubro](./rubro.md) – `-`
 
@@ -160,6 +176,8 @@
 
 * [Untitled array in ChatMessageListEnvelope](./chatmessagelistenvelope-properties-data.md) – `undefined#/properties/data`
 
+* [Untitled array in ClienteImportResult](./clienteimportresult-properties-errors.md) – `undefined#/properties/errors`
+
 * [Untitled array in ClienteListEnvelope](./clientelistenvelope-properties-data.md) – `undefined#/properties/data`
 
 * [Untitled array in DeliveryZoneListEnvelope](./deliveryzonelistenvelope-properties-data.md) – `undefined#/properties/data`
@@ -171,6 +189,8 @@
 * [Untitled array in FacturaListEnvelope](./facturalistenvelope-properties-data.md) – `undefined#/properties/data`
 
 * [Untitled array in FormaPagoListEnvelope](./formapagolistenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled array in ProveedorListEnvelope](./proveedorlistenvelope-properties-data.md) – `undefined#/properties/data`
 
 * [Untitled array in RubroListEnvelope](./rubrolistenvelope-properties-data.md) – `undefined#/properties/data`
 

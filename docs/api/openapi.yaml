@@ -27,6 +27,8 @@ tags:
     description: Product management
   - name: rubros
     description: Product categories
+  - name: proveedores
+    description: Suppliers (master data and CSV import)
   - name: facturas
     description: Invoice management
   - name: formasPago
@@ -161,6 +163,59 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ClienteEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/ServerError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /api/clientes/import/template:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [clientes]
+      summary: Download UTF-8 CSV template for bulk customer import
+      responses:
+        '200':
+          description: CSV with fixed header row and one example data row (UTF-8 BOM)
+          content:
+            text/csv:
+              schema:
+                type: string
+                format: binary
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /api/clientes/import:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    post:
+      tags: [clientes]
+      summary: Import customers from a CSV file
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: UTF-8 CSV; first row must match the template headers exactly
+      responses:
+        '200':
+          description: Import summary (rows created vs skipped with per-row errors)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClienteImportEnvelope'
         '400':
           $ref: '#/components/responses/BadRequest'
         '500':
@@ -334,6 +389,59 @@ paths:
         '403':
           $ref: '#/components/responses/ForbiddenError'
 
+  /api/articulos/import/template:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [articulos]
+      summary: Download UTF-8 CSV template for bulk product import
+      responses:
+        '200':
+          description: CSV with fixed header row and one example row (UTF-8 BOM)
+          content:
+            text/csv:
+              schema:
+                type: string
+                format: binary
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /api/articulos/import:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    post:
+      tags: [articulos]
+      summary: Import products from CSV (rubroCodigo must match an existing Rubro.codigo)
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: UTF-8 CSV; first row must match the template headers exactly
+      responses:
+        '200':
+          description: Import summary
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClienteImportEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/ServerError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
   /api/rubros:
     parameters:
       - $ref: '#/components/parameters/BizcodeChannelHeader'
@@ -369,6 +477,216 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RubroEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/ServerError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /api/rubros/import/template:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [rubros]
+      summary: Download UTF-8 CSV template for bulk category import
+      responses:
+        '200':
+          description: CSV with fixed header row and one example row (UTF-8 BOM)
+          content:
+            text/csv:
+              schema:
+                type: string
+                format: binary
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /api/rubros/import:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    post:
+      tags: [rubros]
+      summary: Import product categories from CSV
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Import summary
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClienteImportEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/ServerError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /api/proveedores:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [proveedores]
+      summary: List suppliers
+      parameters:
+        - name: q
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Supplier list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProveedorListEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+    post:
+      tags: [proveedores]
+      summary: Create supplier
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProveedorInput'
+      responses:
+        '200':
+          description: Supplier created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProveedorEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/ServerError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /api/proveedores/import/template:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [proveedores]
+      summary: Download UTF-8 CSV template for bulk supplier import
+      responses:
+        '200':
+          description: CSV with fixed header row and one example row (UTF-8 BOM)
+          content:
+            text/csv:
+              schema:
+                type: string
+                format: binary
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /api/proveedores/import:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    post:
+      tags: [proveedores]
+      summary: Import suppliers from CSV
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Import summary
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClienteImportEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/ServerError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /api/proveedores/{id}:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [proveedores]
+      summary: Get supplier by id
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Supplier or null
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProveedorNullableEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+    put:
+      tags: [proveedores]
+      summary: Update supplier
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProveedorInput'
+      responses:
+        '200':
+          description: Supplier updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProveedorEnvelope'
         '400':
           $ref: '#/components/responses/BadRequest'
         '500':
@@ -1130,6 +1448,42 @@ components:
           type: integer
           nullable: true
 
+    ClienteImportRowError:
+      type: object
+      required: [row, message]
+      properties:
+        row:
+          type: integer
+          minimum: 2
+          description: Data row number in the file (row 1 is the header)
+        message:
+          type: string
+
+    ClienteImportResult:
+      type: object
+      required: [created, skipped, errors]
+      properties:
+        created:
+          type: integer
+          minimum: 0
+        skipped:
+          type: integer
+          minimum: 0
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ClienteImportRowError'
+
+    ClienteImportEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/ClienteImportResult'
+
     ClienteListEnvelope:
       type: object
       required: [success, data]
@@ -1310,6 +1664,96 @@ components:
           const: true
         data:
           $ref: '#/components/schemas/Rubro'
+
+    ProveedorInput:
+      type: object
+      required: [codigo, rsocial, condIva, activo]
+      properties:
+        codigo:
+          type: integer
+          minimum: 1
+        rsocial:
+          type: string
+          minLength: 3
+          maxLength: 30
+        fantasia:
+          type: string
+          nullable: true
+        cuit:
+          type: string
+          nullable: true
+        condIva:
+          type: string
+          enum: [RI, Mono, CF, Exento]
+        telef:
+          type: string
+          nullable: true
+        email:
+          type: string
+          nullable: true
+        activo:
+          type: boolean
+
+    Proveedor:
+      type: object
+      additionalProperties: true
+      properties:
+        id:
+          type: integer
+        codigo:
+          type: integer
+        rsocial:
+          type: string
+        fantasia:
+          type: string
+          nullable: true
+        cuit:
+          type: string
+          nullable: true
+        condIva:
+          type: string
+        telef:
+          type: string
+          nullable: true
+        email:
+          type: string
+          nullable: true
+        activo:
+          type: boolean
+
+    ProveedorListEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Proveedor'
+
+    ProveedorEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/Proveedor'
+
+    ProveedorNullableEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          anyOf:
+            - $ref: '#/components/schemas/Proveedor'
+            - type: 'null'
 
     Factura:
       type: object

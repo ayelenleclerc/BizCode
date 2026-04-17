@@ -52,7 +52,16 @@ Selecione o produto → **Enter** ou duplo clique → altere → **F5**.
 
 ## Categorias (rubros)
 
-As categorias classificam produtos. Inclusão ou alteração de rubros: administrador (hoje pode estar direto no banco).
+As categorias classificam produtos. Quem tiver permissão de **gestão de produtos** pode **importar rubros por CSV** nesta tela («Importar rubros CSV»): baixe o modelo, não altere a linha de cabeçalho, use UTF-8 e confira o resumo de linhas criadas ou ignoradas.
+
+## Importação CSV (rubros e produtos)
+
+Com **products.manage**:
+
+- **Rubros:** colunas fixas `codigo`, `nombre` (como na plantilla). Arquivo `.csv`; limites aparecem no diálogo. Códigos já existentes no banco ou duplicados no arquivo são ignorados com mensagem.
+- **Produtos:** colunas conforme o modelo; **`rubroCodigo`** deve ser o **código numérico** de um rubro existente. Mesma política de duplicados pelo `codigo` do produto (arquivo e banco).
+
+**Esc** fecha o diálogo de importação se estiver aberto; caso contrário, fecha o formulário.
 
 ## Atalhos de teclado
 
@@ -63,6 +72,6 @@ As categorias classificam produtos. Inclusão ou alteração de rubros: administ
 | F5 | Salvar |
 | ↑ / ↓ | Navegar |
 | Enter | Abrir produto |
-| Esc | Fechar sem salvar |
+| Esc | Fechar importação CSV, ou fechar sem salvar |
 
 **Outros idiomas:** [English](../../en/user/manual-products.md) · [Español](../../es/user/manual-articulos.md)

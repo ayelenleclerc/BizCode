@@ -60,6 +60,19 @@ The system automatically verifies the CUIT. If the check digit does not match, y
 
 Edit the customer and uncheck **Activo**. The customer becomes inactive but historical invoices are kept.
 
+## Bulk import (CSV)
+
+Users with customer management permission can load many records from a **UTF-8 CSV** file.
+
+1. On the list screen, open **Import CSV** (or the equivalent control).
+2. **Download the template** from the same dialog: it includes the required header row and one example row.
+3. Do not change the header row column names or order. Save the file as `.csv` (UTF-8).
+4. Attach the file and confirm. The system reports how many rows were created and, if any rows failed validation or duplicates, **per-row** errors (data row numbers start after the header; row 1 is the header).
+
+**Duplicate policy:** if a customer **code** already exists in the database, or is repeated within the same file, that row is rejected and not inserted.
+
+**Limits:** maximum file size and maximum number of data rows are enforced by the API (see OpenAPI at `/api-docs`). Oversized uploads return an error.
+
 ## Keyboard Shortcuts
 
 | Key | Action |
@@ -69,4 +82,4 @@ Edit the customer and uncheck **Activo**. The customer becomes inactive but hist
 | F5 | Save form |
 | ↑ / ↓ | Navigate table rows |
 | Enter | Open selected customer |
-| Esc | Close form without saving |
+| Esc | Close form or import dialog without saving |

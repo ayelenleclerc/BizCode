@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import Layout from './components/layout/Layout'
 import ClientesPage from './pages/clientes'
 import ArticulosPage from './pages/articulos'
+import ProveedoresPage from './pages/proveedores'
 import FacturacionPage from './pages/facturacion'
 import LoginPage from './pages/login'
 import UsersPage from './pages/users'
@@ -83,6 +84,7 @@ function AppRoutes() {
           {/* Existing modules — keep original URLs bookmark-safe */}
           <Route path="clientes" element={<ClientesPage />} />
           <Route path="articulos" element={<ArticulosPage />} />
+          <Route path="proveedores" element={<ProveedoresPage />} />
           <Route path="facturacion" element={<FacturacionPage />} />
           <Route path="users" element={<UsersPage />} />
           {/* New section stubs — real pages delivered in Sprint 2 */}
