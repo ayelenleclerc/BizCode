@@ -62,6 +62,12 @@ describe('DBF migration integration', () => {
     process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
     prisma = new PrismaClient()
     await prisma.$connect()
+    const t = await prisma.tenant.upsert({
+      where: { slug: 'dbf-migration-test' },
+      create: { name: 'DBF migration test', slug: 'dbf-migration-test', active: true },
+      update: {},
+    })
+    process.env.BIZCODE_MIGRATION_TENANT_ID = String(t.id)
     fixtureRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'bizcode-dbf-'))
     await createFixtureDbfTree(fixtureRoot)
   })
@@ -79,12 +85,13 @@ describe('DBF migration integration', () => {
     process.env.PROGRAMA_VIEJO_ROOT = fixtureRoot
     await runDbfMigration()
 
+    const tenantId = parseInt(process.env.BIZCODE_MIGRATION_TENANT_ID ?? '0', 10)
     const placeholders = await prisma.cliente.findMany({
-      where: { codigo: { gte: 91001, lte: 91010 } },
+      where: { tenantId, codigo: { gte: 91001, lte: 91010 } },
     })
     expect(placeholders).toHaveLength(10)
 
-    const importedProducts = await prisma.articulo.findMany()
+    const importedProducts = await prisma.articulo.findMany({ where: { tenantId } })
     expect(importedProducts.length).toBeGreaterThan(0)
   })
 })

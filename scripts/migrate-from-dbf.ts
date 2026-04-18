@@ -37,6 +37,21 @@ const ARTICULOS_A_IMPORTAR = 10
 
 const prisma = new PrismaClient()
 
+async function resolveMigrationTenantId(): Promise<number> {
+  const raw = process.env.BIZCODE_MIGRATION_TENANT_ID?.trim()
+  if (raw) {
+    const id = parseInt(raw, 10)
+    if (!Number.isNaN(id) && id > 0) return id
+  }
+  const first = await prisma.tenant.findFirst({ orderBy: { id: 'asc' } })
+  if (!first) {
+    throw new Error(
+      'migrate-from-dbf: no Tenant row found. Run `npx prisma db seed` or set BIZCODE_MIGRATION_TENANT_ID.',
+    )
+  }
+  return first.id
+}
+
 type Pvar2Agg = {
   importe: number
   costoN: number
@@ -108,16 +123,16 @@ async function listCliIsMetadataOnly(): Promise<boolean> {
   return r != null && Object.prototype.hasOwnProperty.call(r, 'FIELD_NAME')
 }
 
-async function ensureRubroGeneral(): Promise<number> {
+async function ensureRubroGeneral(tenantId: number): Promise<number> {
   const rubro = await prisma.rubro.upsert({
-    where: { codigo: 1 },
-    create: { codigo: 1, nombre: 'General' },
+    where: { tenantId_codigo: { tenantId, codigo: 1 } },
+    create: { tenantId, codigo: 1, nombre: 'General' },
     update: { nombre: 'General' },
   })
   return rubro.id
 }
 
-async function migrateArticulos(rubroId: number, descrFromPvar: Map<number, string>) {
+async function migrateArticulos(tenantId: number, rubroId: number, descrFromPvar: Map<number, string>) {
   const agg = await aggregatePvar2ByArtic()
   const codes = [...agg.keys()].sort((a, b) => a - b).slice(0, ARTICULOS_A_IMPORTAR)
   if (codes.length < ARTICULOS_A_IMPORTAR) {
@@ -128,7 +143,7 @@ async function migrateArticulos(rubroId: number, descrFromPvar: Map<number, stri
   const existing = new Set(
     (
       await prisma.articulo.findMany({
-        where: { codigo: { in: codes } },
+        where: { tenantId, codigo: { in: codes } },
         select: { codigo: true },
       })
     ).map((a) => a.codigo)
@@ -142,6 +157,7 @@ async function migrateArticulos(rubroId: number, descrFromPvar: Map<number, stri
       const precio = dec2(row.importe)
       const costo = dec2(row.costoN)
       return {
+        tenantId,
         codigo,
         descripcion,
         rubroId,
@@ -163,7 +179,7 @@ async function migrateArticulos(rubroId: number, descrFromPvar: Map<number, stri
   console.log(`[migrate-from-dbf] Artículos insertados: ${result.count}`)
 }
 
-async function migrateClientesPlaceholder() {
+async function migrateClientesPlaceholder(tenantId: number) {
   const meta = await listCliIsMetadataOnly()
   if (meta) {
     console.log(
@@ -178,6 +194,7 @@ async function migrateClientesPlaceholder() {
     const n = String(i + 1).padStart(2, '0')
     const rsocial = `Cliente legado ${n}`.slice(0, 30)
     return {
+      tenantId,
       codigo,
       rsocial,
       condIva: 'RI',
@@ -188,7 +205,7 @@ async function migrateClientesPlaceholder() {
   const existing = new Set(
     (
       await prisma.cliente.findMany({
-        where: { codigo: { in: codes } },
+        where: { tenantId, codigo: { in: codes } },
         select: { codigo: true },
       })
     ).map((c) => c.codigo)
@@ -207,10 +224,11 @@ export async function runDbfMigration() {
     console.error('DATABASE_URL no está definida. Configura .env en la raíz del proyecto.')
     process.exit(1)
   }
-  const rubroId = await ensureRubroGeneral()
+  const tenantId = await resolveMigrationTenantId()
+  const rubroId = await ensureRubroGeneral(tenantId)
   const descrFromPvar = await loadPvarDescriptions()
-  await migrateClientesPlaceholder()
-  await migrateArticulos(rubroId, descrFromPvar)
+  await migrateClientesPlaceholder(tenantId)
+  await migrateArticulos(tenantId, rubroId, descrFromPvar)
   console.log('[migrate-from-dbf] Listo.')
 }
 

@@ -108,6 +108,7 @@ function buildPrisma(): PrismaClient {
   const proveedorTxCreate = vi.fn().mockResolvedValue(proveedorRow)
 
   const p = {
+    deliveryZone: { findFirst: vi.fn().mockResolvedValue(null) },
     cliente: {
       findMany: vi.fn((args?: unknown) => {
         const w =
@@ -119,6 +120,7 @@ function buildPrisma(): PrismaClient {
         }
         return Promise.resolve([clienteRow])
       }),
+      findFirst: vi.fn().mockResolvedValue(clienteRow),
       findUnique: vi.fn().mockResolvedValue(clienteRow),
       create: vi.fn().mockResolvedValue(clienteRow),
       update: vi.fn().mockResolvedValue(clienteRow), // PUT /api/clientes/:id returns full row
@@ -127,18 +129,26 @@ function buildPrisma(): PrismaClient {
       findMany: vi.fn((args?: unknown) => {
         const w =
           args && typeof args === 'object' && args !== null && 'where' in args
-            ? (args as { where?: { codigo?: { in?: number[] } } }).where
+            ? (args as {
+                where?: { codigo?: { in?: number[] }; id?: { in?: number[] } }
+              }).where
             : undefined
+        if (w?.id && typeof w.id === 'object' && Array.isArray(w.id.in)) {
+          if (w.id.in.length === 0) return Promise.resolve([])
+          return Promise.resolve(w.id.in.map((id: number) => ({ id })))
+        }
         if (w?.codigo && typeof w.codigo === 'object' && Array.isArray(w.codigo.in)) {
           return Promise.resolve([])
         }
         return Promise.resolve([articuloRow])
       }),
+      findFirst: vi.fn().mockResolvedValue(articuloRow),
       findUnique: vi.fn().mockResolvedValue(articuloRow),
       create: vi.fn().mockResolvedValue(articuloRow),
       update: vi.fn().mockResolvedValue(articuloRow),
     },
     rubro: {
+      findFirst: vi.fn().mockResolvedValue(rubroRow),
       findMany: vi.fn().mockImplementation((args?: unknown) => {
         const a =
           args && typeof args === 'object' && args !== null
@@ -174,6 +184,7 @@ function buildPrisma(): PrismaClient {
         }
         return Promise.resolve([proveedorRow])
       }),
+      findFirst: vi.fn().mockResolvedValue(proveedorRow),
       findUnique: vi.fn().mockResolvedValue(proveedorRow),
       create: vi.fn().mockResolvedValue(proveedorRow),
       update: vi.fn().mockResolvedValue(proveedorRow),
@@ -422,7 +433,7 @@ describe('API — errores 500 (cobertura de ramas catch)', () => {
 
   it('GET /api/clientes/:id', async () => {
     const p = buildPrisma()
-    vi.mocked(p.cliente.findUnique).mockRejectedValueOnce(err)
+    vi.mocked(p.cliente.findFirst).mockRejectedValueOnce(err)
     const res = await request(createApp(p)).get('/api/clientes/1').expect(500)
     await assertMatchesOpenApi('/api/clientes/{id}', 'get', '500', res.body)
   })
@@ -436,6 +447,7 @@ describe('API — errores 500 (cobertura de ramas catch)', () => {
 
   it('PUT /api/clientes/:id', async () => {
     const p = buildPrisma()
+    vi.mocked(p.cliente.findFirst).mockResolvedValueOnce(clienteRow as never)
     vi.mocked(p.cliente.update).mockRejectedValueOnce(err)
     const res = await request(createApp(p)).put('/api/clientes/1').send(clienteInput).expect(500)
     await assertMatchesOpenApi('/api/clientes/{id}', 'put', '500', res.body)
@@ -450,13 +462,14 @@ describe('API — errores 500 (cobertura de ramas catch)', () => {
 
   it('GET /api/articulos/:id', async () => {
     const p = buildPrisma()
-    vi.mocked(p.articulo.findUnique).mockRejectedValueOnce(err)
+    vi.mocked(p.articulo.findFirst).mockRejectedValueOnce(err)
     const res = await request(createApp(p)).get('/api/articulos/1').expect(500)
     await assertMatchesOpenApi('/api/articulos/{id}', 'get', '500', res.body)
   })
 
   it('POST /api/articulos', async () => {
     const p = buildPrisma()
+    vi.mocked(p.rubro.findFirst).mockResolvedValueOnce(rubroRow as never)
     vi.mocked(p.articulo.create).mockRejectedValueOnce(err)
     const res = await request(createApp(p)).post('/api/articulos').send(articuloInput).expect(500)
     await assertMatchesOpenApi('/api/articulos', 'post', '500', res.body)
@@ -464,6 +477,8 @@ describe('API — errores 500 (cobertura de ramas catch)', () => {
 
   it('PUT /api/articulos/:id', async () => {
     const p = buildPrisma()
+    vi.mocked(p.articulo.findFirst).mockResolvedValueOnce(articuloRow as never)
+    vi.mocked(p.rubro.findFirst).mockResolvedValueOnce(rubroRow as never)
     vi.mocked(p.articulo.update).mockRejectedValueOnce(err)
     const res = await request(createApp(p)).put('/api/articulos/1').send(articuloInput).expect(500)
     await assertMatchesOpenApi('/api/articulos/{id}', 'put', '500', res.body)

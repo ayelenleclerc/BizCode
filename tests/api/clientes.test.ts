@@ -57,13 +57,15 @@ const FACTURA_RESULT = {
 
 function buildPrismaMock(overrides: Partial<Record<string, unknown>> = {}): PrismaClient {
   return {
+    deliveryZone: { findFirst: vi.fn().mockResolvedValue({ id: 1, tenantId: 1 }) },
     cliente: {
       findMany: vi.fn().mockResolvedValue([CLIENTE_BASE]),
+      findFirst: vi.fn().mockResolvedValue(CLIENTE_BASE),
       findUnique: vi.fn().mockResolvedValue(CLIENTE_BASE),
       create: vi.fn().mockResolvedValue(CLIENTE_BASE),
       update: vi.fn().mockResolvedValue(CLIENTE_BASE),
     },
-    articulo: { findMany: vi.fn().mockResolvedValue([]) },
+    articulo: { findMany: vi.fn().mockResolvedValue([{ id: 1 }]) },
     rubro: { findMany: vi.fn().mockResolvedValue([]) },
     formaPago: { findMany: vi.fn().mockResolvedValue([]) },
     factura: {
@@ -119,6 +121,7 @@ describe('POST /api/facturas — cliente suspended', () => {
     const prisma = buildPrismaMock({
       cliente: {
         findMany: vi.fn().mockResolvedValue([]),
+        findFirst: vi.fn().mockResolvedValue(suspendedCliente),
         findUnique: vi.fn().mockResolvedValue(suspendedCliente),
         create: vi.fn(),
         update: vi.fn(),
@@ -141,6 +144,7 @@ describe('POST /api/facturas — cliente suspended', () => {
     const txPrisma = buildPrismaMock({
       cliente: {
         findMany: vi.fn().mockResolvedValue([]),
+        findFirst: vi.fn().mockResolvedValue(activeCliente),
         findUnique: vi.fn().mockResolvedValue(activeCliente),
         create: vi.fn(),
         update: vi.fn().mockResolvedValue({ id: 1, rsocial: 'ACME SA', balance: '1000.00', creditLimit: null }),
@@ -154,6 +158,7 @@ describe('POST /api/facturas — cliente suspended', () => {
     const prisma = buildPrismaMock({
       cliente: {
         findMany: vi.fn().mockResolvedValue([]),
+        findFirst: vi.fn().mockResolvedValue(activeCliente),
         findUnique: vi.fn().mockResolvedValue(activeCliente),
         create: vi.fn(),
         update: vi.fn().mockResolvedValue({ id: 1, rsocial: 'ACME SA', balance: '1000.00', creditLimit: null }),
@@ -202,6 +207,7 @@ describe('POST /api/facturas — balance update', () => {
     const prisma = buildPrismaMock({
       cliente: {
         findMany: vi.fn().mockResolvedValue([]),
+        findFirst: vi.fn().mockResolvedValue({ ...CLIENTE_BASE, suspended: false }),
         findUnique: vi.fn().mockResolvedValue({ ...CLIENTE_BASE, suspended: false }),
         create: vi.fn(),
         update: clienteUpdate,
@@ -251,6 +257,7 @@ describe('POST /api/facturas — credit limit notification', () => {
     const prisma = buildPrismaMock({
       cliente: {
         findMany: vi.fn().mockResolvedValue([]),
+        findFirst: vi.fn().mockResolvedValue({ ...CLIENTE_BASE, suspended: false }),
         findUnique: vi.fn().mockResolvedValue({ ...CLIENTE_BASE, suspended: false }),
         create: vi.fn(),
         update: clienteUpdate,
@@ -308,6 +315,7 @@ describe('POST /api/facturas — credit limit notification', () => {
     const prisma = buildPrismaMock({
       cliente: {
         findMany: vi.fn().mockResolvedValue([]),
+        findFirst: vi.fn().mockResolvedValue({ ...CLIENTE_BASE, suspended: false }),
         findUnique: vi.fn().mockResolvedValue({ ...CLIENTE_BASE, suspended: false }),
         create: vi.fn(),
         update: clienteUpdate,
@@ -347,6 +355,7 @@ describe('POST /api/facturas — credit limit notification', () => {
     const prisma = buildPrismaMock({
       cliente: {
         findMany: vi.fn().mockResolvedValue([]),
+        findFirst: vi.fn().mockResolvedValue({ ...CLIENTE_BASE, suspended: false }),
         findUnique: vi.fn().mockResolvedValue({ ...CLIENTE_BASE, suspended: false }),
         create: vi.fn(),
         update: clienteUpdate,
@@ -387,6 +396,7 @@ describe('PUT /api/clientes/:id — financial field access', () => {
     const prisma = buildPrismaMock({
       cliente: {
         findMany: vi.fn().mockResolvedValue([]),
+        findFirst: vi.fn().mockResolvedValue(CLIENTE_BASE),
         findUnique: vi.fn().mockResolvedValue(CLIENTE_BASE),
         create: vi.fn(),
         update: clienteUpdate,
@@ -420,6 +430,7 @@ describe('PUT /api/clientes/:id — financial field access', () => {
     const prisma = buildPrismaMock({
       cliente: {
         findMany: vi.fn().mockResolvedValue([]),
+        findFirst: vi.fn().mockResolvedValue(CLIENTE_BASE),
         findUnique: vi.fn().mockResolvedValue(CLIENTE_BASE),
         create: vi.fn(),
         update: clienteUpdate,

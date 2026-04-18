@@ -49,16 +49,18 @@ export function registerDashboardRoutes(app: Application, prisma: PrismaClient):
       const thirtyDaysAgo = new Date(now)
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
 
+      const tenantId = authReq.auth.claims.tenantId
+
       const [ventasResult, vencidasResult] = await Promise.all([
         // Active invoices created today
         prisma.factura.aggregate({
-          where: { estado: 'A', fecha: { gte: todayStart, lte: todayEnd } },
+          where: { tenantId, estado: 'A', fecha: { gte: todayStart, lte: todayEnd } },
           _count: { id: true },
           _sum: { total: true },
         }),
         // Active invoices older than 30 days (overdue approximation)
         prisma.factura.aggregate({
-          where: { estado: 'A', fecha: { lt: thirtyDaysAgo } },
+          where: { tenantId, estado: 'A', fecha: { lt: thirtyDaysAgo } },
           _count: { id: true },
           _sum: { total: true },
         }),
