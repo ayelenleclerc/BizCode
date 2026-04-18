@@ -22,6 +22,9 @@ test.describe('Critical Paths — Core Business Workflows', () => {
   // Helper to generate unique values for each test run
   const generateId = () => Math.random().toString(36).substring(7).toUpperCase()
 
+  /** Positive integer for `codigo` fields (`input type="number"` + z.coerce.number() in forms). */
+  const generateNumericCodigo = () => Math.floor(10_000_000 + Math.random() * 89_999_999)
+
   // Test 1: App loads and shows home page
   test('App loads and displays home page', async ({ page }) => {
     await page.goto('/')
@@ -66,7 +69,7 @@ test.describe('Critical Paths — Core Business Workflows', () => {
 
     const id = generateId()
     const testCliente = {
-      codigo: `TEST-${id}`,
+      codigo: generateNumericCodigo(),
       razonSocial: `Test Cliente ${id}`,
       cuit: '20123456789', // Valid CUIT format (fake)
       email: `test-${id}@example.com`,
@@ -98,7 +101,7 @@ test.describe('Critical Paths — Core Business Workflows', () => {
     const nombreInput = page.locator('input[placeholder*="Razón Social"], input[name="razonSocial"]').first()
 
     if (await codigoInput.isVisible()) {
-      await codigoInput.fill(testCliente.codigo)
+      await codigoInput.fill(String(testCliente.codigo))
     }
 
     if (await nombreInput.isVisible()) {
@@ -122,7 +125,7 @@ test.describe('Critical Paths — Core Business Workflows', () => {
     await loginAsTestUser(page, TEST_PASSWORD)
     const id = generateId()
     const testArticulo = {
-      codigo: `ART-${id}`,
+      codigo: generateNumericCodigo(),
       descripcion: `Test Articulo ${id}`,
       precioLista: '100.00',
       costo: '50.00',
@@ -147,7 +150,7 @@ test.describe('Critical Paths — Core Business Workflows', () => {
     const descripcionInput = page.locator('input[placeholder*="Descripción"], input[name="descripcion"]').first()
 
     if (await codigoInput.isVisible()) {
-      await codigoInput.fill(testArticulo.codigo)
+      await codigoInput.fill(String(testArticulo.codigo))
     }
 
     if (await descripcionInput.isVisible()) {
