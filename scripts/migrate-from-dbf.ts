@@ -25,11 +25,10 @@ function programaViejoRoot(): string {
   return path.isAbsolute(fromEnv) ? fromEnv : path.resolve(process.cwd(), fromEnv)
 }
 
-const SISTEMA = path.join(
-  programaViejoRoot(),
-  '16-07-2025 completa',
-  'sistema'
-)
+/** Resuelve en tiempo de ejecución para que tests/CI puedan fijar `PROGRAMA_VIEJO_ROOT` antes de importar o entre llamadas. */
+function sistemaDir(): string {
+  return path.join(programaViejoRoot(), '16-07-2025 completa', 'sistema')
+}
 
 const ENCODING = 'cp437' as const
 const PLACEHOLDER_CLIENT_BASE = 91001
@@ -58,7 +57,7 @@ function dec2(n: number): string {
 
 async function loadPvarDescriptions(): Promise<Map<number, string>> {
   const map = new Map<number, string>()
-  const filePath = path.join(SISTEMA, 'PVAR.DBF')
+  const filePath = path.join(sistemaDir(), 'PVAR.DBF')
   const dbf = await DBFFile.open(filePath, { readMode: 'loose', encoding: ENCODING })
   if (dbf.recordCount === 0) return map
   for await (const raw of dbf) {
@@ -74,7 +73,7 @@ async function loadPvarDescriptions(): Promise<Map<number, string>> {
 
 async function aggregatePvar2ByArtic(): Promise<Map<number, Pvar2Agg>> {
   const byArtic = new Map<number, Pvar2Agg>()
-  const filePath = path.join(SISTEMA, 'PVAR2.DBF')
+  const filePath = path.join(sistemaDir(), 'PVAR2.DBF')
   const dbf = await DBFFile.open(filePath, { readMode: 'loose', encoding: ENCODING })
   for await (const raw of dbf) {
     const r = raw as Record<string, unknown>
@@ -102,7 +101,7 @@ async function aggregatePvar2ByArtic(): Promise<Map<number, Pvar2Agg>> {
 }
 
 async function listCliIsMetadataOnly(): Promise<boolean> {
-  const filePath = path.join(SISTEMA, 'LIST_CLI.DBF')
+  const filePath = path.join(sistemaDir(), 'LIST_CLI.DBF')
   const dbf = await DBFFile.open(filePath, { readMode: 'loose', encoding: ENCODING })
   const rows = await dbf.readRecords(1)
   const r = rows[0] as Record<string, unknown> | undefined
@@ -181,7 +180,7 @@ async function migrateClientesPlaceholder() {
     return {
       codigo,
       rsocial,
-      condIva: 'R',
+      condIva: 'RI',
       activo: true,
     }
   })
