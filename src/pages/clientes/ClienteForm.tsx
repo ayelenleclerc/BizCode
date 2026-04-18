@@ -128,6 +128,7 @@ export default function ClienteForm({ cliente, onClose, onGuardado }: ClienteFor
       role="dialog"
       aria-modal="true"
       aria-labelledby="dialog-cliente-title"
+      data-testid="cliente-form-dialog"
     >
       <div className="bg-white dark:bg-slate-800 rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         <div className="bg-slate-200 dark:bg-slate-700 px-6 py-4 border-b border-slate-300 dark:border-slate-600">
@@ -137,7 +138,7 @@ export default function ClienteForm({ cliente, onClose, onGuardado }: ClienteFor
           <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">{t('form.hint')}</p>
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-4" data-testid="cliente-form">
           {error && (
             <div role="alert" className="p-3 bg-red-100 dark:bg-red-900 text-red-900 dark:text-red-100 rounded border border-red-300 dark:border-red-700">
               {error}
@@ -151,6 +152,7 @@ export default function ClienteForm({ cliente, onClose, onGuardado }: ClienteFor
             <input
               id="cliente-codigo"
               type="number"
+              data-testid="cliente-form-codigo"
               {...register('codigo')}
               aria-required="true"
               aria-describedby={errors.codigo ? 'cliente-codigo-error' : undefined}
@@ -169,6 +171,7 @@ export default function ClienteForm({ cliente, onClose, onGuardado }: ClienteFor
             <input
               id="cliente-rsocial"
               type="text"
+              data-testid="cliente-form-rsocial"
               {...register('rsocial')}
               maxLength={30}
               aria-required="true"

@@ -177,6 +177,7 @@ export default function ClientesPage() {
         ) : (
           <table
             ref={tableRef}
+            data-testid="clientes-table"
             aria-label={t('title')}
             className="w-full border-collapse bg-white dark:bg-slate-800 rounded overflow-hidden border border-slate-200 dark:border-slate-700"
           >
