@@ -1,0 +1,246 @@
+# BizCode Frontend Development Standards
+# Senior Frontend Engineer Rules & Patterns
+# Date: 2026-04-17
+
+## 1. COMPONENT ARCHITECTURE (Issue #102)
+
+### Component Structure
+
+Extract reusable UI components. Never duplicate HTML/CSS/logic.
+
+**Required UI Components:**
+- Button (variants: primary, secondary, danger, disabled)
+- Input (text, password, email, number)
+- Dialog/Modal
+- Table (headers, rows, sortable, pagination)
+- Form (wrapper with validation)
+- Card/Panel
+- Select/Dropdown
+- Checkbox/Radio
+- Label
+- ErrorMessage
+- LoadingSpinner
+- Skeleton (placeholder)
+- Toast/Alert
+
+**Organization:**
+```
+src/components/
+├── ui/ (Button, Input, Dialog, Table, Form, etc.)
+├── layout/ (Layout.tsx)
+├── shared/ (KeyboardHint.tsx)
+└── ErrorBoundary.tsx
+```
+
+### Page Component Pattern
+
+**Rule:** Max 100 lines per page - orchestration only.
+
+Page fetches data via custom hooks and renders composed components.
+
+---
+
+## 2. CUSTOM HOOKS (Issue #103)
+
+### useFetch Hook
+
+Never fetch directly in components.
+
+```typescript
+const { data, loading, error, refetch } = useFetch(
+  () => clientesAPI.list(),
+  []
+)
+```
+
+### useForm Hook
+
+All forms use useForm. Never manage form state manually.
+
+- Handles values, errors, touched, loading
+- Built-in validation support
+- Submit handler with error catching
+- Reset capability
+
+### useAsync Hook
+
+General async operation handler.
+
+---
+
+## 3. ERROR HANDLING (Issue #101)
+
+### Error Boundary Component
+
+Wrap page routes with ErrorBoundary to catch crashes.
+
+Shows user-friendly error message + "Try again" button.
+
+### API Error Handler
+
+Never console.error without user feedback.
+
+All API errors show toast/notification to user.
+
+---
+
+## 4. LOADING STATES (Issue #105)
+
+### Rule: Always Show Loading UI
+
+Show Skeleton components while fetching.
+
+Never let data suddenly appear.
+
+### Skeleton Component
+
+Use for table rows, list items, form placeholders.
+
+---
+
+## 5. FORM VALIDATION (Issue #106)
+
+### Use Zod Schemas
+
+Same as backend - Zod for all validation.
+
+```typescript
+const ClienteFormSchema = z.object({
+  codigo: z.string().min(1).max(50),
+  rsocial: z.string().min(1).max(255),
+  cuit: z.string().regex(/^\d{11}$/),
+  creditLimit: z.number().int().min(0),
+  condIva: z.enum(['RI', 'RNI', 'EX']),
+  formasPago: z.array(z.string().uuid()).min(1)
+})
+```
+
+Validation happens in useForm hook, errors display in Form.
+
+---
+
+## 6. TESTING (Issue #104, #109)
+
+### E2E Critical Paths
+
+Required tests:
+- Login flow
+- Create Cliente → Edit → Delete
+- Create Factura → Save → List
+- CSV Import → Verify
+
+### Component Testing
+
+Every interactive component has tests:
+- Renders correctly
+- Handles user interactions
+- Shows error states
+- Accessibility checks
+
+### a11y Testing
+
+Use axe-core automated testing:
+- No a11y violations in components
+- Keyboard navigation works
+- ARIA labels present
+
+---
+
+## 7. CODE QUALITY
+
+### Before Every Commit
+
+```bash
+npm run lint              # ✅ Zero warnings
+npm run type-check       # ✅ Zero errors
+npm run test             # ✅ All tests pass
+npm run test:e2e         # ✅ Critical paths pass
+npm run check:i18n       # ✅ All 3 locales complete
+```
+
+### Commit Convention
+
+```
+feat(clientes): add bulk import dialog
+fix(forms): validate CUIT on blur
+docs(ui): add Button component story
+test(critical-paths): add login flow
+```
+
+### Component Checklist
+
+- [ ] Types for all props (TypeScript)
+- [ ] No prop drilling > 2 levels
+- [ ] Loading state handled
+- [ ] Error state handled
+- [ ] Mobile responsive
+- [ ] Dark mode compatible
+- [ ] Tests included
+- [ ] i18n strings added
+- [ ] Accessible (a11y)
+- [ ] JSDoc comments
+
+---
+
+## 8. DOCUMENTATION (Issue #108)
+
+### Storybook
+
+Component stories showing all variants:
+- Primary, secondary, disabled states
+- Error/loading states
+- Interactive examples
+- Props documentation
+
+---
+
+## 9. PERFORMANCE (Issue #110)
+
+### Code Splitting
+
+Use React.lazy for large page components.
+
+### Bundle Analysis
+
+Track bundle size - no surprises.
+
+### Web Vitals
+
+Monitor LCP, FID, CLS.
+
+---
+
+## ANTI-PATTERNS
+
+❌ useState in components > 5 times (extract hook)
+❌ useEffect without dependency array
+❌ Prop drilling > 2 levels
+❌ console.error without user feedback
+❌ Direct API calls in components
+❌ No loading state
+❌ No error handling
+❌ Components > 200 lines
+❌ Hardcoded values
+❌ No tests for interactive components
+
+---
+
+## CRITICAL ISSUES
+
+P0:
+- #101: Error boundaries + error handler
+- #102: Extract UI components
+- #103: Custom hooks (useFetch, useForm)
+- #104: E2E critical path tests
+- #105: Loading states & skeleton UI
+- #106: Form validation abstraction
+
+P1:
+- #107: Refactor large page components
+- #108: Storybook setup
+- #109: axe-core a11y testing
+- #110: Performance monitoring
+- #111: State management (Zustand)
+- #112: Utility hooks
+
+Status: Active | Last Updated: 2026-04-17

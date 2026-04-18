@@ -16,7 +16,12 @@ import { registerChatRoutes } from './chat'
 import { validateCUIT } from '../src/lib/validators'
 import { csvImportUploadSingle, parseCsvWithFixedHeaders, CSV_IMPORT_MAX_ROWS } from './csvImport'
 
-const DEFAULT_CORS_ORIGINS = ['http://localhost:5173', 'http://127.0.0.1:5173'] as const
+const DEFAULT_CORS_ORIGINS = [
+  'http://localhost:5173',
+  'http://127.0.0.1:5173',
+  'http://localhost:4173',
+  'http://127.0.0.1:4173',
+] as const
 
 /**
  * @en Parses comma-separated extra origins from `CORS_ORIGINS` (trimmed, empty entries dropped).

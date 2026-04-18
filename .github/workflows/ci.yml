@@ -16,8 +16,8 @@ jobs:
         image: postgres:16-alpine
         env:
           POSTGRES_USER: bizcode
-          POSTGRES_PASSWORD: bizcode
           POSTGRES_DB: bizcode_test
+          POSTGRES_HOST_AUTH_METHOD: trust
         ports:
           - 5432:5432
         options: >-
@@ -27,7 +27,7 @@ jobs:
           --health-retries 5
 
     env:
-      DATABASE_URL: postgresql://bizcode:bizcode@localhost:5432/bizcode_test
+      DATABASE_URL: postgresql://bizcode@localhost:5432/bizcode_test?sslmode=disable
 
     steps:
       - name: Checkout

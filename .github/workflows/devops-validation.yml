@@ -1,0 +1,155 @@
+name: DevOps Infrastructure Validation
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'server/**'
+      - 'Dockerfile*'
+      - 'docker-compose*'
+      - '.env*'
+      - 'prisma/migrations/**'
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - 'server/**'
+      - 'Dockerfile*'
+      - 'docker-compose*'
+      - '.env*'
+      - 'prisma/migrations/**'
+
+jobs:
+  devops-checks:
+    name: DevOps Validation
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Check for Dockerfile (Issue #201)
+        run: |
+          if [ -f "Dockerfile" ]; then
+            echo "✅ Dockerfile found"
+          else
+            echo "⚠️ Dockerfile not found (Issue #201)"
+          fi
+
+      - name: Check for Docker Compose (Issue #202)
+        run: |
+          if [ -f "docker-compose.yml" ] || [ -f "docker-compose.yaml" ]; then
+            echo "✅ Docker Compose found"
+          else
+            echo "⚠️ Docker Compose not found (Issue #202)"
+          fi
+
+      - name: Check environment validation (Issue #203)
+        run: |
+          if grep -r "zod\|joi\|joi-schema" server/ 2>/dev/null | grep -q env; then
+            echo "✅ Environment validation found"
+          else
+            echo "⚠️ Environment validation not implemented (Issue #203)"
+          fi
+
+      - name: Check health endpoint (Issue #204)
+        run: |
+          if grep -r "GET.*health\|/health" server/ --include="*.ts" 2>/dev/null | grep -q health; then
+            echo "✅ Health endpoint exists"
+          else
+            echo "⚠️ Health endpoint not found (Issue #204)"
+          fi
+
+      - name: Check secrets in .env files
+        run: |
+          if [ -f ".env" ] && grep -q -E "SECRET|PASSWORD|KEY|TOKEN" .env 2>/dev/null; then
+            echo "⚠️ WARNING: Secrets found in .env file"
+            echo "   These should be in GitHub Secrets or Vault, not in .env"
+          fi
+
+      - name: Check .env.example
+        run: |
+          if [ -f ".env.example" ]; then
+            echo "✅ .env.example found (good for documentation)"
+          else
+            echo "⚠️ .env.example missing"
+          fi
+
+      - name: Check for logging (Issue #209)
+        run: |
+          PINO=$(grep -r "import.*pino" server/lib/logger.ts 2>/dev/null | wc -l)
+          if [ $PINO -gt 0 ]; then
+            echo "✅ Structured logging (Pino) configured"
+          else
+            echo "⚠️ Structured logging not found (Issue #209)"
+          fi
+
+      - name: Check for request tracing (Issue #211)
+        run: |
+          TRACING=$(grep -r "requestId\|correlation" server/middleware 2>/dev/null | wc -l)
+          if [ $TRACING -gt 0 ]; then
+            echo "✅ Request tracing middleware found"
+          else
+            echo "⚠️ Request tracing not implemented (Issue #211)"
+          fi
+
+      - name: Check for error handler (Issue #208)
+        run: |
+          if grep -r "errorHandler\|Sentry" server/ --include="*.ts" 2>/dev/null | grep -q error; then
+            echo "✅ Error handler/tracking found"
+          else
+            echo "⚠️ Centralized error handler not found (Issue #208)"
+          fi
+
+      - name: Check database connection pooling (Issue #210)
+        run: |
+          if grep -r "connection.*pool\|PgBouncer\|pooling" prisma/ server/ 2>/dev/null | grep -q pool; then
+            echo "✅ Connection pooling configured"
+          else
+            echo "⚠️ Connection pooling not configured (Issue #210)"
+          fi
+
+      - name: Validate Prisma migrations
+        run: |
+          MIGRATIONS=$(ls prisma/migrations/ 2>/dev/null | wc -l)
+          echo "✅ Found $MIGRATIONS Prisma migrations"
+          if [ $MIGRATIONS -lt 5 ]; then
+            echo "⚠️ Low number of migrations"
+          fi
+
+      - name: Check deployment config
+        run: |
+          if [ -f ".github/workflows/deploy*.yml" ] || [ -f ".github/workflows/deployment*.yml" ]; then
+            echo "✅ Deployment workflow found"
+          else
+            echo "⚠️ Deployment workflow not found (Issue #207)"
+          fi
+
+      - name: Check .gitignore for secrets
+        run: |
+          if grep -q "\.env$" .gitignore; then
+            echo "✅ .env properly gitignored"
+          else
+            echo "⚠️ .env not in .gitignore (security risk)"
+          fi
+
+      - name: Report DevOps Status
+        if: always()
+        run: |
+          echo "## DevOps Validation Report" >> $GITHUB_STEP_SUMMARY
+          echo "- Containerization: Issue #201, #202" >> $GITHUB_STEP_SUMMARY
+          echo "- Environment validation: Issue #203" >> $GITHUB_STEP_SUMMARY
+          echo "- Health checks: Issue #204" >> $GITHUB_STEP_SUMMARY
+          echo "- Backup strategy: Issue #205" >> $GITHUB_STEP_SUMMARY
+          echo "- Secrets management: Issue #206" >> $GITHUB_STEP_SUMMARY
+          echo "- Deployment automation: Issue #207" >> $GITHUB_STEP_SUMMARY
+          echo "- Error tracking: Issue #208" >> $GITHUB_STEP_SUMMARY
+          echo "- Structured logging: Issue #209" >> $GITHUB_STEP_SUMMARY
+          echo "- Connection pooling: Issue #210" >> $GITHUB_STEP_SUMMARY
+          echo "- Request tracing: Issue #211" >> $GITHUB_STEP_SUMMARY
+          echo "- Monitoring: Issue #212" >> $GITHUB_STEP_SUMMARY

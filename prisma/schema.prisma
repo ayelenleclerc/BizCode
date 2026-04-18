@@ -53,7 +53,7 @@ model Cliente {
   rsocial        String   @db.VarChar(30)
   fantasia       String?  @db.VarChar(30)
   cuit           String?  @db.VarChar(14)
-  condIva        String   @db.VarChar(1) // RI, Mono, CF, Exento
+  condIva        String   @db.VarChar(10) // RI, Mono, CF, Exento (aligned with validateClienteInput)
   domicilio      String?  @db.VarChar(40)
   localidad      String?  @db.VarChar(25)
   cpost          String?  @db.VarChar(8)
