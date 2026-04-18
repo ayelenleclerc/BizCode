@@ -10,3 +10,5 @@ paths-ignore:
 matches-ignore:
   - name: "Zod schema: password field validator (not a credential)"
     regex: "password: isNew \\? z\\.string"
+  - name: "GitHub Actions secret reference (value not in repository)"
+    regex: "\\$\\{\\{\\s*secrets\\.[^}]+\\}\\}"

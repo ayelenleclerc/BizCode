@@ -936,8 +936,7 @@ NODE_ENV=test
 LOG_LEVEL=error
 API_URL=http://localhost:3000
 
-# GitHub Actions
-# secrets.TEST_DATABASE_URL=postgresql://...@staging-rds...
+# GitHub Actions: usar un secret cifrado para la URL de base de datos de staging (sin pegar credenciales en el repositorio).
 ```
 
 ---

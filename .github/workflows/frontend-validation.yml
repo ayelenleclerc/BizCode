@@ -92,7 +92,10 @@ jobs:
 
       - name: Check for custom hooks (Issue #103)
         run: |
-          HOOKS=$(find src/hooks -name "*.ts" 2>/dev/null | wc -l)
+          HOOKS=0
+          if [ -d src/hooks ]; then
+            HOOKS=$(find src/hooks -name "*.ts" -print | wc -l)
+          fi
           echo "✅ Found $HOOKS custom hooks"
           if [ $HOOKS -lt 3 ]; then
             echo "⚠️ Low number of custom hooks (Issue #103)"
@@ -100,7 +103,10 @@ jobs:
 
       - name: Check for UI components (Issue #102)
         run: |
-          COMPONENTS=$(find src/components/ui -name "*.tsx" 2>/dev/null | wc -l)
+          COMPONENTS=0
+          if [ -d src/components/ui ]; then
+            COMPONENTS=$(find src/components/ui -name "*.tsx" -print | wc -l)
+          fi
           echo "✅ Found $COMPONENTS UI components"
           if [ $COMPONENTS -lt 8 ]; then
             echo "⚠️ Component library incomplete (Issue #102)"
@@ -108,7 +114,7 @@ jobs:
 
       - name: Check for loading states (Issue #105)
         run: |
-          SKELETONS=$(grep -r "Skeleton\|LoadingSpinner" src/pages --include="*.tsx" 2>/dev/null | wc -l)
+          SKELETONS=$( { grep -r "Skeleton\|LoadingSpinner" src/pages --include="*.tsx" 2>/dev/null || true; } | wc -l )
           echo "✅ Found $SKELETONS loading state implementations"
           if [ $SKELETONS -lt 5 ]; then
             echo "⚠️ Low loading state coverage (Issue #105)"
@@ -116,7 +122,7 @@ jobs:
 
       - name: Check for error handling (Issue #101)
         run: |
-          HANDLERS=$(grep -r "catch.*error\|try.*{" src/pages --include="*.tsx" 2>/dev/null | wc -l)
+          HANDLERS=$( { grep -r "catch.*error\|try.*{" src/pages --include="*.tsx" 2>/dev/null || true; } | wc -l )
           echo "✅ Found $HANDLERS error handling blocks"
 
       - name: Verify i18n coverage

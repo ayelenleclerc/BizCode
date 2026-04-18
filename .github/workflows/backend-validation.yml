@@ -83,7 +83,8 @@ jobs:
 
       - name: Validate multi-tenant enforcement (Issue #83)
         run: |
-          TENANT_CHECKS=$(grep -r "tenantId.*req.user.tenantId" server/ 2>/dev/null | wc -l)
+          # grep exits 1 when there are no matches; with `set -e` + `pipefail` that must not fail the step.
+          TENANT_CHECKS=$( { grep -r "tenantId.*req.user.tenantId" server/ 2>/dev/null || true; } | wc -l )
           echo "✅ Found $TENANT_CHECKS tenantId validation checks"
           if [ $TENANT_CHECKS -lt 5 ]; then
             echo "⚠️ Low number of tenantId checks - see Issue #83"
@@ -115,12 +116,22 @@ jobs:
 
       - name: Validate Zod schemas (Issue #79)
         run: |
-          ZODE_SCHEMAS=$(find server/routes -name "validation.ts" 2>/dev/null | wc -l)
+          ZODE_SCHEMAS=0
+          if [ -d server/routes ]; then
+            ZODE_SCHEMAS=$(find server/routes -name "validation.ts" -print | wc -l)
+          fi
           echo "✅ Found $ZODE_SCHEMAS validation schema files"
-          if grep -q "z.object\|z.ZodSchema" server/routes/*/validation.ts 2>/dev/null; then
-            echo "✅ Zod schemas are in use"
+          if [ -d server/routes ]; then
+            shopt -s nullglob
+            paths=(server/routes/*/validation.ts)
+            if [ ${#paths[@]} -gt 0 ] && grep -q "z.object\|z.ZodSchema" "${paths[@]}" 2>/dev/null; then
+              echo "✅ Zod schemas are in use"
+            else
+              echo "⚠️ Manual validation patterns may still exist (Issue #79)"
+            fi
+            shopt -u nullglob
           else
-            echo "⚠️ Manual validation patterns may still exist (Issue #79)"
+            echo "⚠️ No server/routes directory (Issue #79)"
           fi
 
       - name: Server unit tests

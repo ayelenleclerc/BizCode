@@ -81,7 +81,8 @@ import { z } from 'zod'
 
 const envSchema = z.object({
   DATABASE_URL: z.string().url(),
-  JWT_SECRET: z.string().min(32),
+  // Signing key for sessions / tokens (illustrative minimum length).
+  AUTH_SIGNING_KEY: z.string().min(32),
   NODE_ENV: z.enum(['development', 'staging', 'production']),
   PORT: z.coerce.number().default(3001),
   LOG_LEVEL: z.enum(['debug', 'info', 'warn', 'error']).default('info'),
@@ -202,14 +203,7 @@ app.get('/health', async (req, res) => {
 
 **Rule:** All secrets in GitHub Secrets or Vault, never in .env.
 
-**For GitHub Actions:**
-```yaml
-- name: Deploy
-  env:
-    DATABASE_URL: ${{ secrets.PROD_DATABASE_URL }}
-    JWT_SECRET: ${{ secrets.PROD_JWT_SECRET }}
-  run: npm run deploy
-```
+**For GitHub Actions:** define production credentials only as **encrypted repository or environment secrets** (for example keys named after your DB URL and signing key). Reference them from the workflow `env` block with the usual GitHub Actions secret syntax — do not paste real values into the repo or into rule files.
 
 **Secret rotation:**
 - Rotate every 90 days
