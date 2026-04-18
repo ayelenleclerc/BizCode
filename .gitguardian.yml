@@ -1,5 +1,10 @@
 version: 2
 
+# Cursor rules contain illustrative Docker/compose snippets (e.g. ${POSTGRES_PASSWORD} in URLs).
+# They are not deployed secrets; scanning them creates noisy false positives vs real leaks in app code.
+paths-ignore:
+  - ".cursor/rules/**"
+
 # False-positive allowlist for GitGuardian Generic Password detector.
 # The pattern below matches a Zod schema field declaration, not a real credential.
 matches-ignore:

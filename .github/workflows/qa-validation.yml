@@ -22,6 +22,10 @@ on:
       - 'src/**'
       - 'tests/**'
       - 'server/**'
+      - 'prisma/**'
+      - 'vitest.config.ts'
+      - 'playwright.config.ts'
+      - '.github/workflows/qa-validation.yml'
 
 jobs:
   unit_tests:
@@ -32,7 +36,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'npm'
 
       - name: Install dependencies
@@ -45,7 +49,7 @@ jobs:
         run: npm run test:coverage 2>&1
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
         with:
           files: ./coverage/coverage-final.json
           flags: unittests
@@ -63,7 +67,7 @@ jobs:
 
       - name: Upload test results
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: test-results
           path: test-results.log
@@ -91,7 +95,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'npm'
 
       - name: Install dependencies
@@ -99,12 +103,12 @@ jobs:
 
       - name: Run database migrations
         env:
-          DATABASE_URL: postgresql://test@localhost:5432/bizcode_test
-        run: npx prisma migrate deploy || npx prisma migrate dev --skip-generate
+          DATABASE_URL: postgresql://test@localhost:5432/bizcode_test?sslmode=disable
+        run: npx prisma migrate deploy
 
       - name: Run integration tests
         env:
-          DATABASE_URL: postgresql://test@localhost:5432/bizcode_test
+          DATABASE_URL: postgresql://test@localhost:5432/bizcode_test?sslmode=disable
           NODE_ENV: test
         run: npm run test:integration
 
@@ -131,7 +135,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'npm'
 
       - name: Install dependencies
@@ -140,7 +144,7 @@ jobs:
       - name: Install Playwright (Chromium + OS deps)
         run: npx playwright install --with-deps chromium
 
-      - name: Ephemeral SuperAdmin password for E2E (not stored in repo)
+      - name: Ephemeral SuperAdmin seed credential for E2E (generated in runner only)
         run: |
           E2E_PW="ci$(openssl rand -hex 16)"
           echo "BIZCODE_SEED_SUPERADMIN_PASSWORD=$E2E_PW" >> $GITHUB_ENV
@@ -148,7 +152,7 @@ jobs:
 
       - name: Prisma generate, migrate, seed
         env:
-          DATABASE_URL: postgresql://test@localhost:5432/bizcode_test
+          DATABASE_URL: postgresql://test@localhost:5432/bizcode_test?sslmode=disable
         run: |
           npx prisma generate
           npx prisma migrate deploy
@@ -156,7 +160,7 @@ jobs:
 
       - name: Start API for E2E (background)
         env:
-          DATABASE_URL: postgresql://test@localhost:5432/bizcode_test
+          DATABASE_URL: postgresql://test@localhost:5432/bizcode_test?sslmode=disable
         run: |
           npm run server &
           for i in $(seq 1 45); do
@@ -171,12 +175,12 @@ jobs:
 
       - name: Run E2E tests (critical paths only)
         env:
-          DATABASE_URL: postgresql://test@localhost:5432/bizcode_test
+          DATABASE_URL: postgresql://test@localhost:5432/bizcode_test?sslmode=disable
         run: npm run test:e2e
 
       - name: Upload Playwright report
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: playwright-report
           path: playwright-report/
@@ -190,7 +194,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'npm'
 
       - name: Install dependencies
@@ -221,7 +225,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'npm'
 
       - name: Install dependencies

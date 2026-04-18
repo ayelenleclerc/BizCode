@@ -47,7 +47,7 @@ jobs:
           --health-retries 5
 
     env:
-      DATABASE_URL: postgresql://bizcode@localhost:5432/bizcode_test
+      DATABASE_URL: postgresql://bizcode@localhost:5432/bizcode_test?sslmode=disable
 
     steps:
       - name: Checkout
@@ -122,7 +122,7 @@ jobs:
       - name: Install Playwright
         run: npx playwright install --with-deps chromium
 
-      - name: Ephemeral SuperAdmin password for E2E (not stored in repo)
+      - name: Ephemeral SuperAdmin seed credential for E2E (generated in runner only)
         run: |
           E2E_PW="ci$(openssl rand -hex 16)"
           echo "BIZCODE_SEED_SUPERADMIN_PASSWORD=$E2E_PW" >> $GITHUB_ENV

@@ -37,7 +37,7 @@ jobs:
           --health-retries 5
 
     env:
-      DATABASE_URL: postgresql://bizcode@localhost:5432/bizcode_test
+      DATABASE_URL: postgresql://bizcode@localhost:5432/bizcode_test?sslmode=disable
 
     steps:
       - name: Checkout
