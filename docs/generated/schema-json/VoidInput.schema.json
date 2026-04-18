@@ -3,6 +3,7 @@
   "properties": {
     "motivo": {
       "description": "Reason for voiding the invoice. Stored in AuditEvent metadata.",
+      "maxLength": 500,
       "minLength": 1,
       "type": "string"
     }

@@ -16,4 +16,6 @@ Reason for voiding the invoice. Stored in AuditEvent metadata.
 
 ## motivo Constraints
 
+**maximum length**: the maximum number of characters for this string is: `500`
+
 **minimum length**: the minimum number of characters for this string is: `1`

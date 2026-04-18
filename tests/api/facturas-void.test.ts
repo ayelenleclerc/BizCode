@@ -139,6 +139,32 @@ describe('PUT /api/facturas/:id/void', () => {
     expect(res.body.success).toBe(false)
   })
 
+  it('returns 400 when motivo is not a string', async () => {
+    const prisma = buildPrismaMock()
+    const app = createApp(prisma)
+
+    const res = await request(app)
+      .put('/api/facturas/1/void')
+      .send({ motivo: 123 })
+      .expect(400)
+
+    expect(res.body.success).toBe(false)
+    expect(String(res.body.error)).toMatch(/motivo/)
+  })
+
+  it('returns 400 when motivo exceeds max length', async () => {
+    const prisma = buildPrismaMock()
+    const app = createApp(prisma)
+
+    const res = await request(app)
+      .put('/api/facturas/1/void')
+      .send({ motivo: 'x'.repeat(501) })
+      .expect(400)
+
+    expect(res.body.success).toBe(false)
+    expect(String(res.body.error)).toMatch(/at most 500/)
+  })
+
   it('returns 404 when factura does not belong to tenant', async () => {
     const prisma = buildPrismaMock({
       factura: {
