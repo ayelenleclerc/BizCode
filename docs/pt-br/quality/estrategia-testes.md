@@ -33,6 +33,34 @@ Exclusões adicionais só com **ADR** e alteração explícita em `vitest.config
 
 Os limiares são aplicados pelo Vitest (`coverage.thresholds`). O CI falha se não forem atingidos.
 
+## Metas de cobertura (KPI)
+
+| KPI | Meta | Onde é aplicado |
+|-----|------|-----------------|
+| Linhas / funções / ramos / sentenças no escopo (`src/lib/**/*.ts`, `server/createApp.ts`, `server.ts`) | **100%** cada (política) | Documentado aqui e em ADR-0003/4/5; o **piso** atual está em `vitest.config.ts` → `coverage.thresholds` |
+| Contrato API vs OpenAPI | Rotas em `tests/api/contract.test.ts` passam | `npm run test` |
+| E2E (Playwright) | Smoke + caminhos críticos em `e2e/` no Chromium | `npm run test:e2e` |
+| Integração (PostgreSQL) | `tests/integration/**` | `npm run test:integration` |
+| Acessibilidade | Smoke `jest-axe` + `@axe-core/playwright` + ESLint `jsx-a11y` | `npm run test:a11y`, specs Playwright, `npm run lint` |
+
+## Onde cada suite roda (local vs CI)
+
+| Suite | Comando local | Workflow CI (evidência) |
+|-------|---------------|-------------------------|
+| Type-check | `npm run type-check` | `.github/workflows/ci.yml` |
+| Lint (incl. jsx-a11y) | `npm run lint` | `ci.yml`, `frontend-validation.yml` |
+| Unitários + cobertura | `npm run test`, `npm run test:coverage` | `ci.yml`, `qa-validation.yml` (`unit_tests`) |
+| Contrato API | parte de `npm run test` | `ci.yml` |
+| Integração | `npm run test:integration` (precisa `DATABASE_URL`) | `ci.yml`, `qa-validation.yml` |
+| E2E Playwright | `npm run test:e2e` | `ci.yml`, `qa-validation.yml` |
+| A11y unitário | `npm run test:a11y` | `qa-validation.yml` (`accessibility_tests`) |
+| Flakes (opcional) | `npm run test:e2e:repeat` | Resumo no job QA |
+| Carga smoke (opcional) | `npm run perf:smoke` (CLI [k6](https://k6.io/docs/get-started/installation/)) | Fora do CI padrão |
+
+**Regressão visual (Playwright):** usar `expect(page).toHaveScreenshot()` num spec dedicado; versionar baselines numa única plataforma (ex.: Chromium Linux no CI) com `snapshotPathTemplate` em `playwright.config.ts`. Ainda não há baselines no repositório; adicionar num PR quando houver captura estável em Linux.
+
+**Paridade de ambientes e checklist manual:** [paridade-ambientes-testes.md](paridade-ambientes-testes.md) · [lista-verificacao-qa-manual.md](lista-verificacao-qa-manual.md)
+
 ## Ferramentas
 
 | Ferramenta | Versão | Uso |

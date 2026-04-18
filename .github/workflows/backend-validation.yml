@@ -135,13 +135,14 @@ jobs:
           fi
 
       - name: Server unit tests
-        run: npm run test -- server/ --reporter=verbose 2>/dev/null || echo "⚠️ No server-specific tests found (Issue #86)"
+        run: |
+          npm run test -- server/ --reporter=verbose 2>/dev/null || echo 'No server-specific tests matched filter (Issue 86)'
 
       - name: Migration validation
         run: |
           if [ -d prisma/migrations ] && [ -n "$(ls -A prisma/migrations 2>/dev/null)" ]; then
             echo "✅ Database migrations present"
-            npx prisma migrate deploy --skip-generate
+            npx prisma migrate deploy
           fi
 
       - name: Report Backend Status
