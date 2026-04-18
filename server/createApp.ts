@@ -52,6 +52,10 @@ function errorMessage(err: unknown): string {
   return err instanceof Error ? err.message : String(err)
 }
 
+function getTenantId(req: Request): number {
+  return (req as AuthenticatedRequest).auth!.claims.tenantId
+}
+
 type ValidationSuccess<T> = { ok: true; value: T }
 type ValidationFailure = { ok: false; error: string }
 type ValidationResult<T> = ValidationSuccess<T> | ValidationFailure
@@ -731,9 +735,11 @@ export function createApp(prisma: PrismaClient): Application {
 
   app.get('/api/clientes', requirePermission('customers.read'), async (req: Request, res: Response) => {
     try {
+      const tenantId = getTenantId(req)
       const filtro = (req.query.q as string) || ''
       const clientes = await prisma.cliente.findMany({
         where: {
+          tenantId,
           OR: [
             { rsocial: { contains: filtro, mode: 'insensitive' } },
             { cuit: { contains: filtro, mode: 'insensitive' } },
@@ -763,6 +769,7 @@ export function createApp(prisma: PrismaClient): Application {
       return
     }
     try {
+          const tenantId = getTenantId(req)
           const parsedCsv = parseCsvWithFixedHeaders(file.buffer, CLIENTE_IMPORT_CSV_HEADERS, CSV_IMPORT_MAX_ROWS)
           if (!parsedCsv.ok) {
             res.status(400).json({ success: false, error: parsedCsv.error })
@@ -796,7 +803,7 @@ export function createApp(prisma: PrismaClient): Application {
             codigos.length === 0
               ? []
               : await prisma.cliente.findMany({
-                  where: { codigo: { in: codigos } },
+                  where: { tenantId, codigo: { in: codigos } },
                   select: { codigo: true },
                 })
           const existingSet = new Set(existing.map((e) => e.codigo))
@@ -811,7 +818,7 @@ export function createApp(prisma: PrismaClient): Application {
           let created = 0
           await prisma.$transaction(async (tx) => {
             for (const data of toInsert) {
-              await tx.cliente.create({ data })
+              await tx.cliente.create({ data: { ...data, tenantId } })
               created += 1
             }
           })
@@ -832,8 +839,9 @@ export function createApp(prisma: PrismaClient): Application {
 
   app.get('/api/clientes/:id', requirePermission('customers.read'), async (req: Request, res: Response) => {
     try {
-      const cliente = await prisma.cliente.findUnique({
-        where: { id: parseInt(String(req.params.id), 10) },
+      const tenantId = getTenantId(req)
+      const cliente = await prisma.cliente.findFirst({
+        where: { id: parseInt(String(req.params.id), 10), tenantId },
       })
       res.json({ success: true, data: cliente })
     } catch (err: unknown) {
@@ -843,13 +851,23 @@ export function createApp(prisma: PrismaClient): Application {
 
   app.post('/api/clientes', requirePermission('customers.manage'), async (req: Request, res: Response) => {
     try {
+      const tenantId = getTenantId(req)
       const parsed = validateClienteInput(req.body)
       if (!parsed.ok) {
         res.status(400).json({ success: false, error: parsed.error })
         return
       }
+      if (parsed.value.deliveryZoneId != null) {
+        const zone = await prisma.deliveryZone.findFirst({
+          where: { id: parsed.value.deliveryZoneId, tenantId },
+        })
+        if (!zone) {
+          res.status(400).json({ success: false, error: 'deliveryZoneId does not belong to this tenant' })
+          return
+        }
+      }
       const cliente = await prisma.cliente.create({
-        data: parsed.value,
+        data: { ...parsed.value, tenantId },
       })
       await writeAudit(req as AuthenticatedRequest, 'cliente_create', 'cliente', String(cliente.id))
       res.json({ success: true, data: cliente })
@@ -860,6 +878,7 @@ export function createApp(prisma: PrismaClient): Application {
 
   app.put('/api/clientes/:id', requirePermission('customers.manage'), async (req: Request, res: Response) => {
     try {
+      const tenantId = getTenantId(req)
       const parsed = validateClienteInput(req.body)
       if (!parsed.ok) {
         res.status(400).json({ success: false, error: parsed.error })
@@ -875,8 +894,25 @@ export function createApp(prisma: PrismaClient): Application {
         ? { ...baseBody, creditLimit, creditDays, suspended }
         : baseBody
 
+      if (data.deliveryZoneId != null) {
+        const zone = await prisma.deliveryZone.findFirst({
+          where: { id: data.deliveryZoneId, tenantId },
+        })
+        if (!zone) {
+          res.status(400).json({ success: false, error: 'deliveryZoneId does not belong to this tenant' })
+          return
+        }
+      }
+
+      const id = parseInt(String(req.params.id), 10)
+      const existingCliente = await prisma.cliente.findFirst({ where: { id, tenantId } })
+      if (!existingCliente) {
+        res.status(404).json({ success: false, error: 'Cliente not found' })
+        return
+      }
+
       const cliente = await prisma.cliente.update({
-        where: { id: parseInt(String(req.params.id), 10) },
+        where: { id },
         data,
       })
       await writeAudit(authReq, 'cliente_update', 'cliente', String(cliente.id))
@@ -890,9 +926,11 @@ export function createApp(prisma: PrismaClient): Application {
 
   app.get('/api/articulos', requirePermission('products.read'), async (req: Request, res: Response) => {
     try {
+      const tenantId = getTenantId(req)
       const filtro = (req.query.q as string) || ''
       const articulos = await prisma.articulo.findMany({
         where: {
+          tenantId,
           OR: [
             { descripcion: { contains: filtro, mode: 'insensitive' } },
             { codigo: { equals: filtro ? parseInt(filtro, 10) : undefined } },
@@ -909,8 +947,9 @@ export function createApp(prisma: PrismaClient): Application {
 
   app.get('/api/articulos/:id', requirePermission('products.read'), async (req: Request, res: Response) => {
     try {
-      const articulo = await prisma.articulo.findUnique({
-        where: { id: parseInt(String(req.params.id), 10) },
+      const tenantId = getTenantId(req)
+      const articulo = await prisma.articulo.findFirst({
+        where: { id: parseInt(String(req.params.id), 10), tenantId },
         include: { rubro: true },
       })
       res.json({ success: true, data: articulo })
@@ -921,13 +960,21 @@ export function createApp(prisma: PrismaClient): Application {
 
   app.post('/api/articulos', requirePermission('products.manage'), async (req: Request, res: Response) => {
     try {
+      const tenantId = getTenantId(req)
       const parsed = validateArticuloInput(req.body)
       if (!parsed.ok) {
         res.status(400).json({ success: false, error: parsed.error })
         return
       }
+      const rubro = await prisma.rubro.findFirst({
+        where: { id: parsed.value.rubroId, tenantId },
+      })
+      if (!rubro) {
+        res.status(400).json({ success: false, error: 'rubroId is not valid for this tenant' })
+        return
+      }
       const articulo = await prisma.articulo.create({
-        data: parsed.value,
+        data: { ...parsed.value, tenantId },
       })
       await writeAudit(req as AuthenticatedRequest, 'articulo_create', 'articulo', String(articulo.id))
       res.json({ success: true, data: articulo })
@@ -938,13 +985,27 @@ export function createApp(prisma: PrismaClient): Application {
 
   app.put('/api/articulos/:id', requirePermission('products.manage'), async (req: Request, res: Response) => {
     try {
+      const tenantId = getTenantId(req)
       const parsed = validateArticuloInput(req.body)
       if (!parsed.ok) {
         res.status(400).json({ success: false, error: parsed.error })
         return
       }
+      const rubro = await prisma.rubro.findFirst({
+        where: { id: parsed.value.rubroId, tenantId },
+      })
+      if (!rubro) {
+        res.status(400).json({ success: false, error: 'rubroId is not valid for this tenant' })
+        return
+      }
+      const id = parseInt(String(req.params.id), 10)
+      const existing = await prisma.articulo.findFirst({ where: { id, tenantId } })
+      if (!existing) {
+        res.status(404).json({ success: false, error: 'Articulo not found' })
+        return
+      }
       const articulo = await prisma.articulo.update({
-        where: { id: parseInt(String(req.params.id), 10) },
+        where: { id },
         data: parsed.value,
       })
       await writeAudit(req as AuthenticatedRequest, 'articulo_update', 'articulo', String(articulo.id))
@@ -969,12 +1030,16 @@ export function createApp(prisma: PrismaClient): Application {
       return
     }
     try {
+          const tenantId = getTenantId(req)
           const parsedCsv = parseCsvWithFixedHeaders(file.buffer, ARTICULO_IMPORT_CSV_HEADERS, CSV_IMPORT_MAX_ROWS)
           if (!parsedCsv.ok) {
             res.status(400).json({ success: false, error: parsedCsv.error })
             return
           }
-          const rubrosDb = await prisma.rubro.findMany({ select: { id: true, codigo: true } })
+          const rubrosDb = await prisma.rubro.findMany({
+            where: { tenantId },
+            select: { id: true, codigo: true },
+          })
           const rubroByCodigo = new Map(rubrosDb.map((r) => [r.codigo, r.id]))
           const errors: { row: number; message: string }[] = []
           const seenCodigos = new Map<number, number>()
@@ -1016,7 +1081,7 @@ export function createApp(prisma: PrismaClient): Application {
             codigos.length === 0
               ? []
               : await prisma.articulo.findMany({
-                  where: { codigo: { in: codigos } },
+                  where: { tenantId, codigo: { in: codigos } },
                   select: { codigo: true },
                 })
           const existingSet = new Set(existing.map((e) => e.codigo))
@@ -1031,7 +1096,7 @@ export function createApp(prisma: PrismaClient): Application {
           let created = 0
           await prisma.$transaction(async (tx) => {
             for (const data of toInsert) {
-              await tx.articulo.create({ data })
+              await tx.articulo.create({ data: { ...data, tenantId } })
               created += 1
             }
           })
@@ -1052,9 +1117,11 @@ export function createApp(prisma: PrismaClient): Application {
 
   // ============ RUBROS ============
 
-  app.get('/api/rubros', requirePermission('products.read'), async (_req: Request, res: Response) => {
+  app.get('/api/rubros', requirePermission('products.read'), async (req: Request, res: Response) => {
     try {
+      const tenantId = getTenantId(req)
       const rubros = await prisma.rubro.findMany({
+        where: { tenantId },
         orderBy: { codigo: 'asc' },
       })
       res.json({ success: true, data: rubros })
@@ -1065,12 +1132,13 @@ export function createApp(prisma: PrismaClient): Application {
 
   app.post('/api/rubros', requirePermission('products.manage'), async (req: Request, res: Response) => {
     try {
+      const tenantId = getTenantId(req)
       const parsed = validateRubroInput(req.body)
       if (!parsed.ok) {
         res.status(400).json({ success: false, error: parsed.error })
         return
       }
-      const rubro = await prisma.rubro.create({ data: parsed.value })
+      const rubro = await prisma.rubro.create({ data: { ...parsed.value, tenantId } })
       await writeAudit(req as AuthenticatedRequest, 'rubro_create', 'rubro', String(rubro.id))
       res.json({ success: true, data: rubro })
     } catch (err: unknown) {
@@ -1093,6 +1161,7 @@ export function createApp(prisma: PrismaClient): Application {
       return
     }
     try {
+          const tenantId = getTenantId(req)
           const parsedCsv = parseCsvWithFixedHeaders(file.buffer, RUBRO_IMPORT_CSV_HEADERS, CSV_IMPORT_MAX_ROWS)
           if (!parsedCsv.ok) {
             res.status(400).json({ success: false, error: parsedCsv.error })
@@ -1126,7 +1195,7 @@ export function createApp(prisma: PrismaClient): Application {
             codigos.length === 0
               ? []
               : await prisma.rubro.findMany({
-                  where: { codigo: { in: codigos } },
+                  where: { tenantId, codigo: { in: codigos } },
                   select: { codigo: true },
                 })
           const existingSet = new Set(existing.map((e) => e.codigo))
@@ -1141,7 +1210,7 @@ export function createApp(prisma: PrismaClient): Application {
           let created = 0
           await prisma.$transaction(async (tx) => {
             for (const data of toInsert) {
-              await tx.rubro.create({ data })
+              await tx.rubro.create({ data: { ...data, tenantId } })
               created += 1
             }
           })
@@ -1164,9 +1233,11 @@ export function createApp(prisma: PrismaClient): Application {
 
   app.get('/api/proveedores', requirePermission('suppliers.read'), async (req: Request, res: Response) => {
     try {
+      const tenantId = getTenantId(req)
       const filtro = (req.query.q as string) || ''
       const proveedores = await prisma.proveedor.findMany({
         where: {
+          tenantId,
           OR: [
             { rsocial: { contains: filtro, mode: 'insensitive' } },
             { codigo: { equals: filtro ? parseInt(filtro, 10) : undefined } },
@@ -1195,6 +1266,7 @@ export function createApp(prisma: PrismaClient): Application {
       return
     }
     try {
+          const tenantId = getTenantId(req)
           const parsedCsv = parseCsvWithFixedHeaders(file.buffer, PROVEEDOR_IMPORT_CSV_HEADERS, CSV_IMPORT_MAX_ROWS)
           if (!parsedCsv.ok) {
             res.status(400).json({ success: false, error: parsedCsv.error })
@@ -1228,7 +1300,7 @@ export function createApp(prisma: PrismaClient): Application {
             codigos.length === 0
               ? []
               : await prisma.proveedor.findMany({
-                  where: { codigo: { in: codigos } },
+                  where: { tenantId, codigo: { in: codigos } },
                   select: { codigo: true },
                 })
           const existingSet = new Set(existing.map((e) => e.codigo))
@@ -1243,7 +1315,7 @@ export function createApp(prisma: PrismaClient): Application {
           let created = 0
           await prisma.$transaction(async (tx) => {
             for (const data of toInsert) {
-              await tx.proveedor.create({ data })
+              await tx.proveedor.create({ data: { ...data, tenantId } })
               created += 1
             }
           })
@@ -1264,8 +1336,9 @@ export function createApp(prisma: PrismaClient): Application {
 
   app.get('/api/proveedores/:id', requirePermission('suppliers.read'), async (req: Request, res: Response) => {
     try {
-      const proveedor = await prisma.proveedor.findUnique({
-        where: { id: parseInt(String(req.params.id), 10) },
+      const tenantId = getTenantId(req)
+      const proveedor = await prisma.proveedor.findFirst({
+        where: { id: parseInt(String(req.params.id), 10), tenantId },
       })
       res.json({ success: true, data: proveedor })
     } catch (err: unknown) {
@@ -1275,12 +1348,13 @@ export function createApp(prisma: PrismaClient): Application {
 
   app.post('/api/proveedores', requirePermission('suppliers.manage'), async (req: Request, res: Response) => {
     try {
+      const tenantId = getTenantId(req)
       const parsed = validateProveedorInput(req.body)
       if (!parsed.ok) {
         res.status(400).json({ success: false, error: parsed.error })
         return
       }
-      const proveedor = await prisma.proveedor.create({ data: parsed.value })
+      const proveedor = await prisma.proveedor.create({ data: { ...parsed.value, tenantId } })
       await writeAudit(req as AuthenticatedRequest, 'proveedor_create', 'proveedor', String(proveedor.id))
       res.json({ success: true, data: proveedor })
     } catch (err: unknown) {
@@ -1290,13 +1364,20 @@ export function createApp(prisma: PrismaClient): Application {
 
   app.put('/api/proveedores/:id', requirePermission('suppliers.manage'), async (req: Request, res: Response) => {
     try {
+      const tenantId = getTenantId(req)
       const parsed = validateProveedorInput(req.body)
       if (!parsed.ok) {
         res.status(400).json({ success: false, error: parsed.error })
         return
       }
+      const id = parseInt(String(req.params.id), 10)
+      const existing = await prisma.proveedor.findFirst({ where: { id, tenantId } })
+      if (!existing) {
+        res.status(404).json({ success: false, error: 'Proveedor not found' })
+        return
+      }
       const proveedor = await prisma.proveedor.update({
-        where: { id: parseInt(String(req.params.id), 10) },
+        where: { id },
         data: parsed.value,
       })
       await writeAudit(req as AuthenticatedRequest, 'proveedor_update', 'proveedor', String(proveedor.id))
@@ -1321,9 +1402,11 @@ export function createApp(prisma: PrismaClient): Application {
 
   // ============ FACTURAS ============
 
-  app.get('/api/facturas', requirePermission('reports.operational.read'), async (_req: Request, res: Response) => {
+  app.get('/api/facturas', requirePermission('reports.operational.read'), async (req: Request, res: Response) => {
     try {
+      const tenantId = getTenantId(req)
       const facturas = await prisma.factura.findMany({
+        where: { tenantId },
         include: { cliente: true, items: true },
         orderBy: { fecha: 'desc' },
       })
@@ -1335,6 +1418,7 @@ export function createApp(prisma: PrismaClient): Application {
 
   app.post('/api/facturas', requirePermission('sales.create'), async (req: Request, res: Response) => {
     try {
+      const tenantId = getTenantId(req)
       const parsed = validateFacturaInput(req.body)
       if (!parsed.ok) {
         res.status(400).json({ success: false, error: parsed.error })
@@ -1343,12 +1427,26 @@ export function createApp(prisma: PrismaClient): Application {
       const { items, ...factura } = parsed.value
       const clienteId = factura.clienteId
 
+      const articuloIds = [...new Set(items.map((it) => it.articuloId))]
+      const articulosOk = await prisma.articulo.findMany({
+        where: { tenantId, id: { in: articuloIds } },
+        select: { id: true },
+      })
+      if (articulosOk.length !== articuloIds.length) {
+        res.status(400).json({ success: false, error: 'One or more articuloId values are not valid for this tenant' })
+        return
+      }
+
       // Check suspension before creating the factura
-      const clienteCheck = await prisma.cliente.findUnique({
-        where: { id: clienteId },
+      const clienteCheck = await prisma.cliente.findFirst({
+        where: { id: clienteId, tenantId },
         select: { suspended: true },
       })
-      if (clienteCheck?.suspended) {
+      if (!clienteCheck) {
+        res.status(400).json({ success: false, error: 'clienteId is not valid for this tenant' })
+        return
+      }
+      if (clienteCheck.suspended) {
         res.status(422).json({ success: false, error: 'CLIENT_SUSPENDED' })
         return
       }
@@ -1358,6 +1456,7 @@ export function createApp(prisma: PrismaClient): Application {
         const newFactura = await tx.factura.create({
           data: {
             ...factura,
+            tenantId,
             items: { create: items },
           } as Parameters<typeof prisma.factura.create>[0]['data'],
           include: { items: true },
@@ -1398,6 +1497,7 @@ export function createApp(prisma: PrismaClient): Application {
   app.put('/api/facturas/:id/void', requirePermission('sales.cancel'), async (req: Request, res: Response) => {
     try {
       const authReq = req as AuthenticatedRequest
+      const tenantId = getTenantId(req)
       const id = parseInt(String(req.params.id), 10)
       const { motivo } = req.body as { motivo?: string }
 
@@ -1407,7 +1507,7 @@ export function createApp(prisma: PrismaClient): Application {
       }
 
       const factura = await prisma.factura.findFirst({
-        where: { id },
+        where: { id, tenantId },
         select: { id: true, estado: true, total: true, clienteId: true },
       })
 

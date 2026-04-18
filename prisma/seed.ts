@@ -17,9 +17,10 @@ const prisma = new PrismaClient()
  */
 async function seedOptionalCatalogFixtures(): Promise<void> {
   if (process.env.BIZCODE_SEED_FIXTURE_CATALOG !== 'true') return
+  const tenant = await prisma.tenant.findUniqueOrThrow({ where: { slug: SUPERADMIN_SEED_TENANT_SLUG } })
   await prisma.rubro.upsert({
-    where: { codigo: 1 },
-    create: { codigo: 1, nombre: 'General' },
+    where: { tenantId_codigo: { tenantId: tenant.id, codigo: 1 } },
+    create: { tenantId: tenant.id, codigo: 1, nombre: 'General' },
     update: { nombre: 'General' },
   })
   console.info('[seed] Catalog fixture: rubro codigo=1 (BIZCODE_SEED_FIXTURE_CATALOG=true).')

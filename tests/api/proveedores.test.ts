@@ -50,6 +50,7 @@ function buildPrisma(overrides: Partial<Record<string, unknown>> = {}): PrismaCl
     rubro: { findMany: vi.fn().mockResolvedValue([]), create: vi.fn() },
     proveedor: {
       findMany: proveedorFindMany,
+      findFirst: vi.fn().mockResolvedValue(proveedorRow),
       findUnique: vi.fn().mockResolvedValue(proveedorRow),
       create: vi.fn().mockResolvedValue(proveedorRow),
       update: vi.fn().mockResolvedValue(proveedorRow),

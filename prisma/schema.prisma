@@ -49,7 +49,9 @@ model DeliveryZone {
 
 model Cliente {
   id             Int      @id @default(autoincrement())
-  codigo         Int      @unique
+  tenantId       Int
+  tenant         Tenant   @relation(fields: [tenantId], references: [id])
+  codigo         Int
   rsocial        String   @db.VarChar(30)
   fantasia       String?  @db.VarChar(30)
   cuit           String?  @db.VarChar(14)
@@ -76,19 +78,29 @@ model Cliente {
   updatedAt      DateTime @updatedAt
 
   facturas Factura[]
+
+  @@unique([tenantId, codigo])
+  @@index([tenantId])
 }
 
 model Rubro {
-  id    Int    @id @default(autoincrement())
-  codigo Int   @unique
-  nombre String @db.VarChar(20)
+  id       Int    @id @default(autoincrement())
+  tenantId Int
+  tenant   Tenant @relation(fields: [tenantId], references: [id])
+  codigo   Int
+  nombre   String @db.VarChar(20)
 
   articulos Articulo[]
+
+  @@unique([tenantId, codigo])
+  @@index([tenantId])
 }
 
 model Articulo {
   id           Int    @id @default(autoincrement())
-  codigo       Int    @unique
+  tenantId     Int
+  tenant       Tenant @relation(fields: [tenantId], references: [id])
+  codigo       Int
   descripcion  String @db.VarChar(30)
   rubroId      Int
   rubro        Rubro  @relation(fields: [rubroId], references: [id])
@@ -104,11 +116,16 @@ model Articulo {
   updatedAt    DateTime @updatedAt
 
   facturaItems FacturaItem[]
+
+  @@unique([tenantId, codigo])
+  @@index([tenantId])
 }
 
 model Proveedor {
   id        Int      @id @default(autoincrement())
-  codigo    Int      @unique
+  tenantId  Int
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+  codigo    Int
   rsocial   String   @db.VarChar(30)
   fantasia  String?  @db.VarChar(30)
   cuit      String?  @db.VarChar(14)
@@ -118,6 +135,9 @@ model Proveedor {
   activo    Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@unique([tenantId, codigo])
+  @@index([tenantId])
 }
 
 model FormaPago {
@@ -129,6 +149,8 @@ model FormaPago {
 
 model Factura {
   id        Int       @id @default(autoincrement())
+  tenantId  Int
+  tenant    Tenant    @relation(fields: [tenantId], references: [id])
   fecha     DateTime
   tipo      String    @db.VarChar(1) // A, B, C, X
   prefijo   String    @db.VarChar(4)
@@ -150,7 +172,8 @@ model Factura {
 
   items FacturaItem[]
 
-  @@unique([tipo, prefijo, numero])
+  @@unique([tenantId, tipo, prefijo, numero])
+  @@index([tenantId])
 }
 
 model FacturaItem {
@@ -189,6 +212,11 @@ model Tenant {
   notifications  Notification[]
   deliveryZones  DeliveryZone[]
   chatMessages   ChatMessage[]
+  clientes       Cliente[]
+  rubros         Rubro[]
+  articulos      Articulo[]
+  proveedores    Proveedor[]
+  facturas       Factura[]
 }
 
 model AppUser {

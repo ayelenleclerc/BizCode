@@ -8,12 +8,13 @@ import type { PrismaClient } from '@prisma/client'
 /** Creates a rubro row; use before creating articulos that require rubroId. */
 export async function createIntegrationRubro(
   prisma: PrismaClient,
-  overrides: Partial<{ codigo: number; nombre: string }> = {},
+  overrides: Partial<{ codigo: number; nombre: string; tenantId: number }> = {},
 ) {
+  const tenantId = overrides.tenantId ?? 1
   const codigo = overrides.codigo ?? 9001
   const nombre = (overrides.nombre ?? 'Rubro int test').slice(0, 20)
   return prisma.rubro.create({
-    data: { codigo, nombre },
+    data: { tenantId, codigo, nombre },
   })
 }
 

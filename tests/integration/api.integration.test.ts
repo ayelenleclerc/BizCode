@@ -18,9 +18,19 @@ async function truncateAll(prisma: PrismaClient): Promise<void> {
     prisma.articulo.deleteMany(),
     prisma.cliente.deleteMany(),
     prisma.rubro.deleteMany(),
+    prisma.proveedor.deleteMany(),
     prisma.formaPago.deleteMany(),
     prisma.paramEmpresa.deleteMany(),
   ])
+}
+
+/** Ensures row id=1 exists for BIZCODE_TEST_AUTH_BYPASS (see server/auth.ts). */
+async function ensureBypassTenant(prisma: PrismaClient): Promise<void> {
+  await prisma.tenant.upsert({
+    where: { id: 1 },
+    create: { id: 1, name: 'Integration tenant', slug: 'integration-tenant-1', active: true },
+    update: { active: true },
+  })
 }
 
 describe('API — integración PostgreSQL (Prisma real)', () => {
@@ -39,6 +49,7 @@ describe('API — integración PostgreSQL (Prisma real)', () => {
     prisma = new PrismaClient()
     app = createApp(prisma)
     await prisma.$connect()
+    await ensureBypassTenant(prisma)
   })
 
   afterAll(async () => {
@@ -119,5 +130,28 @@ describe('API — integración PostgreSQL (Prisma real)', () => {
     expect(Array.isArray(res.body.data)).toBe(true)
     const codes = (res.body.data as { codigo: number }[]).map((r) => r.codigo)
     expect(codes).toContain(9202)
+  })
+
+  it('no expone entidades de otro tenant en listados y lecturas por id', async () => {
+    const other = await prisma.tenant.create({
+      data: { name: 'Tenant B', slug: `tenant-b-${Date.now()}`, active: true },
+    })
+    const otherCliente = await prisma.cliente.create({
+      data: {
+        tenantId: other.id,
+        codigo: 66001,
+        rsocial: 'Cliente otro tenant SA'.slice(0, 30),
+        condIva: 'RI',
+        activo: true,
+      },
+    })
+
+    const listRes = await request(app).get('/api/clientes').expect(200)
+    expect(listRes.body.success).toBe(true)
+    expect((listRes.body.data as { id: number }[]).some((c) => c.id === otherCliente.id)).toBe(false)
+
+    const getRes = await request(app).get(`/api/clientes/${otherCliente.id}`).expect(200)
+    expect(getRes.body.success).toBe(true)
+    expect(getRes.body.data).toBeNull()
   })
 })

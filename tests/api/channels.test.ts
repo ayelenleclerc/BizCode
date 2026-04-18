@@ -37,11 +37,12 @@ function buildPrismaMock(overrides: Partial<Record<string, unknown>> = {}): Pris
     deliveryZone: { findMany: vi.fn().mockResolvedValue([]), findFirst: vi.fn().mockResolvedValue(null), create: vi.fn().mockResolvedValue(null), update: vi.fn().mockResolvedValue(null) },
     cliente: {
       findMany: vi.fn().mockResolvedValue([]),
+      findFirst: vi.fn().mockResolvedValue({ id: 1, suspended: false }),
       findUnique: vi.fn().mockResolvedValue({ email: 'mgr@example.com', telef: '+5491155550000' }),
       create: vi.fn().mockResolvedValue(null),
       update: vi.fn().mockResolvedValue(null),
     },
-    articulo: { findMany: vi.fn().mockResolvedValue([]) },
+    articulo: { findMany: vi.fn().mockResolvedValue([{ id: 1 }]) },
     rubro: { findMany: vi.fn().mockResolvedValue([]) },
     formaPago: { findMany: vi.fn().mockResolvedValue([]) },
     factura: {
@@ -260,11 +261,12 @@ describe('POST /api/facturas — dispatchNotification failure is swallowed', () 
           const inner = buildPrismaMock({
             cliente: {
               findMany: vi.fn().mockResolvedValue([]),
-              findFirst: vi.fn().mockResolvedValue(null),
+              findFirst: vi.fn().mockResolvedValue({ id: 1, suspended: false }),
               findUnique: vi.fn().mockResolvedValue(null),
               create: vi.fn().mockResolvedValue(null),
               update: vi.fn().mockResolvedValue(updatedCliente),
             },
+            articulo: { findMany: vi.fn().mockResolvedValue([{ id: 1 }]) },
             factura: {
               findMany: vi.fn().mockResolvedValue([]),
               create: vi.fn().mockResolvedValue({ id: 99, total: 20000, items: [] }),
