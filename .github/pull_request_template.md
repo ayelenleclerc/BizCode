@@ -4,6 +4,8 @@
 
 **Required** for any work tracked on the GitHub Project **BizCode Delivery**: replace the placeholder with the real issue number so the project links the PR and automation can update **Status** (In Progress / Done).
 
+**GitHub keyword:** put `Closes #<number>` on its **own line** (not concatenated with a heading, e.g. avoid `## Linked IssueCloses #48` — GitHub will not auto-close the issue).
+
 - Closes #<!-- e.g. 48 — must match an issue on the board -->
 
 ## What Changed / Why
