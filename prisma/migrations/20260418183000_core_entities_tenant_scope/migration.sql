@@ -1,5 +1,12 @@
 -- Multi-tenant scope for core ERP entities (Issue #83).
 -- Backfill: assign all existing rows to the first Tenant by id (typically `platform` from seed).
+--
+-- Fresh databases (e.g. CI `prisma migrate deploy` without seed) have zero Tenant rows.
+-- Without a row, MIN(id) is NULL and NOT NULL on ERP tables fails. Insert a bootstrap tenant.
+
+INSERT INTO "Tenant" ("name", "slug", "active", "createdAt", "updatedAt")
+SELECT 'Bootstrap', 'bootstrap-default-tenant', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+WHERE NOT EXISTS (SELECT 1 FROM "Tenant" LIMIT 1);
 
 ALTER TABLE "Cliente" ADD COLUMN "tenantId" INTEGER;
 ALTER TABLE "Rubro" ADD COLUMN "tenantId" INTEGER;
