@@ -162,6 +162,15 @@ describe('PUT /api/notifications/read-all', () => {
     const res = await request(app).put('/api/notifications/read-all').expect(200)
     expect(res.body.success).toBe(true)
     expect(res.body.data.updated).toBe(5)
+    expect(vi.mocked(prisma.auditEvent.create)).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          action: 'notification_read_all',
+          resource: 'notification',
+          metadata: { updated: 5 },
+        }),
+      }),
+    )
   })
 
   it('returns updated 0 when nothing was unread', async () => {
@@ -235,6 +244,15 @@ describe('PUT /api/notifications/:id/read', () => {
     expect(res.body.success).toBe(true)
     expect(res.body.data.id).toBe(1)
     expect(res.body.data.readAt).toBeTruthy()
+    expect(vi.mocked(prisma.auditEvent.create)).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          action: 'notification_read',
+          resource: 'notification',
+          resourceId: '1',
+        }),
+      }),
+    )
   })
 
   it('calls update with where: { id } only (not tenant/user)', async () => {

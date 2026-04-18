@@ -1,7 +1,7 @@
 import { createHash, randomBytes } from 'node:crypto'
 import type { NextFunction, Request, Response } from 'express'
 import rateLimit from 'express-rate-limit'
-import { Prisma, type PrismaClient } from '@prisma/client'
+import type { PrismaClient } from '@prisma/client'
 import {
   ROLE_PERMISSIONS,
   USER_CHANNELS,
@@ -14,6 +14,7 @@ import {
   type UserRole,
 } from '../src/lib/rbac'
 import { hashPassword, verifyPassword } from './passwordHash'
+import { writeAuditEvent } from './audit'
 
 const SESSION_COOKIE_NAME = 'bizcode_session'
 const SESSION_DURATION_MS = 1000 * 60 * 60 * 8
@@ -133,29 +134,6 @@ function clearSessionCookie(res: Response): void {
     'Set-Cookie',
     `${SESSION_COOKIE_NAME}=; Path=/; HttpOnly; SameSite=None; Secure; Max-Age=0`,
   )
-}
-
-async function writeAuditEvent(args: {
-  prisma: PrismaClient
-  tenantId: number
-  userId?: number
-  action: string
-  resource: string
-  resourceId?: string
-  ipAddress?: string
-  metadata?: Prisma.InputJsonValue
-}): Promise<void> {
-  await args.prisma.auditEvent.create({
-    data: {
-      tenantId: args.tenantId,
-      userId: args.userId,
-      action: args.action,
-      resource: args.resource,
-      resourceId: args.resourceId,
-      ipAddress: args.ipAddress,
-      metadata: args.metadata,
-    },
-  })
 }
 
 export function resolveSession(prisma: PrismaClient) {
