@@ -27,16 +27,17 @@ CMD ["npm", "run", "server"]
 
 ### Docker Compose for Local Dev
 
-Definir `POSTGRES_PASSWORD` en un `.env` junto al compose (gitignored); no commitear contraseñas en este archivo.
+Definir credenciales y `DATABASE_URL` solo en un `.env` junto al compose (gitignored). No incrustar contraseñas ni DSN completos en el YAML versionado.
 
 ```yaml
 version: '3.8'
 services:
   postgres:
     image: postgres:16-alpine
+    env_file:
+      - .env
     environment:
       POSTGRES_USER: bizcode
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: bizcode_dev
     volumes:
       - postgres_data:/var/lib/postgresql/data
@@ -48,8 +49,10 @@ services:
 
   api:
     build: .
+    env_file:
+      - .env
     environment:
-      DATABASE_URL: postgresql://bizcode:${POSTGRES_PASSWORD}@postgres:5432/bizcode_dev
+      DATABASE_URL: ${DATABASE_URL}
     ports:
       - "3001:3001"
     depends_on:
@@ -57,6 +60,9 @@ services:
         condition: service_healthy
     volumes:
       - .:/app
+
+volumes:
+  postgres_data:
 ```
 
 **Never hardcode secrets in Dockerfile or compose file.**
