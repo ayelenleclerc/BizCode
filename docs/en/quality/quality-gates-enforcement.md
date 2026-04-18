@@ -67,6 +67,8 @@ husky - pre-commit hook triggered
 npx lint-staged
 ├─ Run ESLint --fix on changed *.{ts,tsx}
 └─ If any file fails → commit BLOCKED
+npm run type-check
+└─ TypeScript project check (tsc --noEmit) → commit BLOCKED if it fails
 ```
 
 ### Configuration
@@ -77,6 +79,7 @@ npx lint-staged
 . "$(dirname "$0")/_/husky.sh"
 
 npx lint-staged
+npm run type-check
 ```
 
 **File:** `package.json`

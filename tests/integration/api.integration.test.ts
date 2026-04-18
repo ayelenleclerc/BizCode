@@ -8,6 +8,7 @@ import request from 'supertest'
 import type { Application } from 'express'
 import { PrismaClient } from '@prisma/client'
 import { createApp } from '../../server/createApp'
+import { buildArticuloCreateBody, createIntegrationRubro } from '../fixtures/catalogFactories'
 
 async function truncateAll(prisma: PrismaClient): Promise<void> {
   // Use Prisma model operations to avoid coupling tests to physical table naming/casing.
@@ -84,5 +85,39 @@ describe('API — integración PostgreSQL (Prisma real)', () => {
       rsocial: 'Cliente integración SA',
       condIva: 'RI',
     })
+  })
+
+  it('GET /api/articulos con tabla vacía devuelve lista vacía', async () => {
+    const res = await request(app).get('/api/articulos').expect(200)
+    expect(res.body.success).toBe(true)
+    expect(res.body.data).toEqual([])
+  })
+
+  it('POST /api/articulos persiste y GET /api/articulos/:id lee desde PostgreSQL', async () => {
+    const rubro = await createIntegrationRubro(prisma, { codigo: 9101, nombre: 'Rubro E2E int' })
+    const body = buildArticuloCreateBody(rubro.id, 4301)
+
+    const createRes = await request(app).post('/api/articulos').send(body).expect(200)
+    expect(createRes.body.success).toBe(true)
+    const id = createRes.body.data.id as number
+    expect(id).toBeGreaterThan(0)
+
+    const getRes = await request(app).get(`/api/articulos/${id}`).expect(200)
+    expect(getRes.body.success).toBe(true)
+    expect(getRes.body.data).toMatchObject({
+      id,
+      codigo: 4301,
+      descripcion: 'Artículo integración',
+      rubroId: rubro.id,
+    })
+  })
+
+  it('GET /api/rubros incluye rubros creados en la misma transacción de prueba', async () => {
+    await createIntegrationRubro(prisma, { codigo: 9202, nombre: 'Rubro list int' })
+    const res = await request(app).get('/api/rubros').expect(200)
+    expect(res.body.success).toBe(true)
+    expect(Array.isArray(res.body.data)).toBe(true)
+    const codes = (res.body.data as { codigo: number }[]).map((r) => r.codigo)
+    expect(codes).toContain(9202)
   })
 })

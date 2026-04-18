@@ -12,7 +12,11 @@ on:
     paths:
       - 'src/**'
       - 'tests/**'
+      - 'e2e/**'
       - 'server/**'
+      - 'perf/**'
+      - 'prisma/**'
+      - 'docker-compose.postgres.yml'
       - 'vitest.config.ts'
       - 'playwright.config.ts'
       - '.github/workflows/qa-validation.yml'
@@ -21,8 +25,11 @@ on:
     paths:
       - 'src/**'
       - 'tests/**'
+      - 'e2e/**'
       - 'server/**'
+      - 'perf/**'
       - 'prisma/**'
+      - 'docker-compose.postgres.yml'
       - 'vitest.config.ts'
       - 'playwright.config.ts'
       - '.github/workflows/qa-validation.yml'
@@ -181,6 +188,15 @@ jobs:
           DATABASE_URL: postgresql://test@localhost:5432/bizcode_test?sslmode=disable
         run: npm run test:e2e
 
+      - name: Flaky test detection hint
+        if: always()
+        run: |
+          {
+            echo "### Flaky tests"
+            echo "Locally run npm run test:e2e:repeat to execute each Playwright spec three times."
+            echo "CI uses retries on Chromium when CI is set (see playwright.config.ts)."
+          } >> "$GITHUB_STEP_SUMMARY"
+
       - name: Upload Playwright report
         if: always()
         uses: actions/upload-artifact@v4
@@ -206,8 +222,8 @@ jobs:
       - name: Install Playwright (Chromium + OS deps)
         run: npx playwright install --with-deps chromium
 
-      - name: Run accessibility tests
-        run: npm run test:a11y 2>&1 || true
+      - name: Run accessibility tests (Vitest + jest-axe)
+        run: npm run test:a11y
 
       - name: Check ESLint a11y rules
         run: |
@@ -296,12 +312,18 @@ jobs:
           if [ "${{ needs.integration_tests.result }}" == "failure" ]; then
             FAILED=$((FAILED+1))
           fi
+          if [ "${{ needs.e2e_tests.result }}" == "failure" ]; then
+            FAILED=$((FAILED+1))
+          fi
+          if [ "${{ needs.accessibility_tests.result }}" == "failure" ]; then
+            FAILED=$((FAILED+1))
+          fi
           
           if [ "$FAILED" -gt 0 ]; then
-            echo "❌ $FAILED critical test suite(s) failed"
+            echo "FAIL: $FAILED test suite(s) failed (unit, integration, E2E, or a11y)"
             exit 1
           else
-            echo "✅ All critical test suites passed"
+            echo "OK: All QA test suites passed"
           fi
 
       - name: Comment PR with QA Status
@@ -348,5 +370,5 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: `### QA Implementation Roadmap\n\n**Related Issues (P0 Critical):**\n- #250: Test strategy & coverage targets\n- #251: E2E critical path tests (Playwright)\n- #252: Integration API tests\n- #253: Accessibility automation (axe-core)\n- #254: Visual regression testing\n- #255: Performance testing (load/stress)\n- #256: Test environment setup (dev/staging/prod parity)\n- #257: Test data fixtures & database seeding\n- #258: Coverage reporting & metrics dashboard\n- #259: Manual testing procedures & checklist\n- #260: Flaky test detection & quarantine\n- #261: Security testing (SAST/DAST)\n- #262: Pre-commit test hooks\n- #263: CI/CD test gates\n- #264: Automated a11y testing\n\nSee [QA Audit Summary](../memory/QA_AUDIT_SUMMARY.md) for full details.`
+              body: `### QA Implementation Roadmap\n\n**Related Issues (P0 Critical):**\n- #250: Test strategy & coverage targets\n- #251: E2E critical path tests (Playwright)\n- #252: Integration API tests\n- #253: Accessibility automation (axe-core)\n- #254: Visual regression testing\n- #255: Performance testing (load/stress)\n- #256: Test environment setup (dev/staging/prod parity)\n- #257: Test data fixtures & database seeding\n- #258: Coverage reporting & metrics dashboard\n- #259: Manual testing procedures & checklist\n- #260: Flaky test detection & quarantine\n- #261: Security testing (SAST/DAST)\n- #262: Pre-commit test hooks\n- #263: CI/CD test gates\n- #264: Automated a11y testing\n\nDocs: docs/en/quality/testing-strategy.md, docs/en/quality/test-environments-parity.md`
             })

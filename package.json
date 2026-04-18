@@ -35,7 +35,10 @@
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
+    "test:e2e:repeat": "playwright test --repeat-each=3",
+    "test:a11y": "vitest run src/App.a11y.test.tsx",
     "test:integration": "vitest run --config vitest.integration.config.ts",
+    "perf:smoke": "k6 run perf/k6-smoke.js",
     "lint": "eslint src server tests e2e scripts/github/plan-sync scripts/github/plan-sync-main.ts scripts/github/plan-validate-main.ts scripts/github/plan-approve-main.ts --ext .ts,.tsx --max-warnings 0",
     "lint:fix": "eslint src server tests e2e scripts/github/plan-sync scripts/github/plan-sync-main.ts scripts/github/plan-validate-main.ts scripts/github/plan-approve-main.ts --ext .ts,.tsx --fix --max-warnings 0",
     "plan:sync": "tsx scripts/github/plan-sync-main.ts",
@@ -84,6 +87,7 @@
   "devDependencies": {
     "@adobe/jsonschema2md": "^8.0.11",
     "@apidevtools/swagger-parser": "^12.1.0",
+    "@axe-core/playwright": "^4.11.2",
     "@cyclonedx/cyclonedx-npm": "^4.2.1",
     "@eslint/js": "^10.0.1",
     "@playwright/test": "^1.59.0",

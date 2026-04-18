@@ -15,8 +15,19 @@ const prisma = new PrismaClient()
  * @es Seed idempotente: tenant platform + SuperAdmin (`ayelen`) para login local/dev. Exige `BIZCODE_SEED_SUPERADMIN_PASSWORD` en `.env` (mín. 8 caracteres; véase `.env.example`).
  * @pt-BR Seed idempotente: tenant platform + SuperAdmin (`ayelen`) para login local/dev. Exige `BIZCODE_SEED_SUPERADMIN_PASSWORD` no `.env` (mín. 8 caracteres; ver `.env.example`).
  */
+async function seedOptionalCatalogFixtures(): Promise<void> {
+  if (process.env.BIZCODE_SEED_FIXTURE_CATALOG !== 'true') return
+  await prisma.rubro.upsert({
+    where: { codigo: 1 },
+    create: { codigo: 1, nombre: 'General' },
+    update: { nombre: 'General' },
+  })
+  console.info('[seed] Catalog fixture: rubro codigo=1 (BIZCODE_SEED_FIXTURE_CATALOG=true).')
+}
+
 async function main(): Promise<void> {
   await runSuperAdminSeed({ prisma, env: process.env })
+  await seedOptionalCatalogFixtures()
 
   console.info(`[seed] Tenant "${SUPERADMIN_SEED_TENANT_SLUG}" and SuperAdmin "${SUPERADMIN_SEED_USERNAME}" are ready.`)
 }

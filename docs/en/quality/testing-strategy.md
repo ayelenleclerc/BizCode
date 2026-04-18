@@ -33,6 +33,34 @@ Additional coverage exclusions (bundler entries, `server/main.ts` thin entry, Re
 
 Thresholds are enforced by Vitest's `coverage.thresholds` configuration. The CI pipeline fails if any threshold is not met.
 
+## Coverage targets (KPI summary)
+
+| KPI | Target | Where enforced |
+|-----|--------|----------------|
+| Lines / functions / branches / statements on policy scope (`src/lib/**/*.ts`, `server/createApp.ts`, `server.ts`) | **100%** each (policy) | Documented here and in ADR-0003/4/5; ratchet in `vitest.config.ts` may be lower until the suite reaches 100% — see `coverage.thresholds` for the **current** failing floor |
+| API contract vs OpenAPI | All paths in `tests/api/contract.test.ts` pass | `npm run test` |
+| E2E (Playwright) | Smoke + critical paths in `e2e/` pass on Chromium | `npm run test:e2e` |
+| Integration (PostgreSQL) | `tests/integration/**` pass | `npm run test:integration` |
+| Accessibility | `jest-axe` smoke + `@axe-core/playwright` on critical surfaces + ESLint `jsx-a11y` | `npm run test:a11y`, Playwright specs, `npm run lint` |
+
+## Where suites run (local vs CI)
+
+| Suite | Local command | CI workflow (evidence) |
+|-------|---------------|-------------------------|
+| Type-check | `npm run type-check` | `.github/workflows/ci.yml` |
+| Lint (incl. jsx-a11y) | `npm run lint` | `ci.yml`, `frontend-validation.yml` |
+| Unit + coverage | `npm run test`, `npm run test:coverage` | `ci.yml`, `qa-validation.yml` (`unit_tests`) |
+| API contract | part of `npm run test` | `ci.yml` |
+| Integration | `npm run test:integration` (needs `DATABASE_URL`) | `ci.yml`, `qa-validation.yml` (`integration_tests`) |
+| E2E Playwright | `npm run test:e2e` (uses `playwright.config.ts` webServer) | `ci.yml`, `qa-validation.yml` (`e2e_tests`) |
+| A11y unit smoke | `npm run test:a11y` | `qa-validation.yml` (`accessibility_tests`) |
+| Flake hunt (optional) | `npm run test:e2e:repeat` | Documented in QA job summary |
+| Load smoke (optional) | `npm run perf:smoke` (requires [k6](https://k6.io/docs/get-started/installation/) CLI) | Not in default CI |
+
+**Visual regression (Playwright):** use `expect(page).toHaveScreenshot()` in a dedicated spec; store baselines under revision control using **one** platform (typically Linux Chromium in CI) via `snapshotPathTemplate` in `playwright.config.ts` so paths do not vary by OS. This repository does not commit screenshot baselines yet; add them in a focused PR once a stable Linux baseline is generated in CI or a Linux runner.
+
+**Environment parity (ports, Postgres, seed):** [test-environments-parity.md](test-environments-parity.md) · [Manual QA checklist](manual-qa-checklist.md)
+
 ## Tools
 
 | Tool | Version | Purpose |
