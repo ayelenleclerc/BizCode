@@ -110,5 +110,13 @@ describe('API payload validation on POST/PUT business routes', () => {
     expect(res.body.success).toBe(false)
     expect(vi.mocked(prisma.factura.create)).not.toHaveBeenCalled()
   })
+
+  it('returns 400 for invalid POST /api/zonas-entrega payload', async () => {
+    const prisma = buildPrismaMock()
+    const app = createApp(prisma)
+    const res = await request(app).post('/api/zonas-entrega').send({ nombre: '', tipo: 'barrio' }).expect(400)
+    expect(res.body.success).toBe(false)
+    expect(vi.mocked(prisma.deliveryZone.create)).not.toHaveBeenCalled()
+  })
 })
 

@@ -394,6 +394,112 @@ function validateFacturaInput(raw: unknown): ValidationResult<FacturaInput> {
   }
 }
 
+/** @en Max length for invoice void reason (audit metadata). @es Máx. motivo anulación. @pt-BR Máx. motivo anulação. */
+const FACTURA_VOID_MOTIVO_MAX_LEN = 500
+
+type FacturaVoidBody = { motivo: string }
+
+function validateFacturaVoidBody(raw: unknown): ValidationResult<FacturaVoidBody> {
+  if (!isObjectRecord(raw)) return { ok: false, error: 'Request body must be an object' }
+  if (typeof raw.motivo !== 'string') return { ok: false, error: 'motivo must be a string' }
+  const motivo = raw.motivo.trim()
+  if (motivo.length < 1) return { ok: false, error: 'motivo is required' }
+  if (motivo.length > FACTURA_VOID_MOTIVO_MAX_LEN) {
+    return { ok: false, error: `motivo must be at most ${FACTURA_VOID_MOTIVO_MAX_LEN} characters` }
+  }
+  return { ok: true, value: { motivo } }
+}
+
+type DeliveryZoneCreateBody = {
+  nombre: string
+  tipo: 'barrio' | 'manual' | 'predefinida'
+  diasEntrega: string | null
+  horario: string | null
+}
+
+function validateDeliveryZoneCreateBody(raw: unknown): ValidationResult<DeliveryZoneCreateBody> {
+  if (!isObjectRecord(raw)) return { ok: false, error: 'Request body must be an object' }
+  if (typeof raw.nombre !== 'string') return { ok: false, error: 'nombre must be a string' }
+  const nombre = raw.nombre.trim()
+  if (nombre.length < 1 || nombre.length > 60) {
+    return { ok: false, error: 'nombre must be between 1 and 60 characters' }
+  }
+  let tipo: DeliveryZoneCreateBody['tipo'] = 'barrio'
+  if (raw.tipo !== undefined) {
+    if (typeof raw.tipo !== 'string' || !['barrio', 'manual', 'predefinida'].includes(raw.tipo)) {
+      return { ok: false, error: 'tipo must be one of: barrio, manual, predefinida' }
+    }
+    tipo = raw.tipo as DeliveryZoneCreateBody['tipo']
+  }
+  const diasEntrega = parseOptionalString(raw.diasEntrega, 20, 'diasEntrega')
+  if (!diasEntrega.ok) return diasEntrega
+  const horario = parseOptionalString(raw.horario, 30, 'horario')
+  if (!horario.ok) return horario
+  return {
+    ok: true,
+    value: {
+      nombre,
+      tipo,
+      diasEntrega: diasEntrega.value === undefined ? null : diasEntrega.value,
+      horario: horario.value === undefined ? null : horario.value,
+    },
+  }
+}
+
+type DeliveryZoneUpdateBody = {
+  nombre?: string
+  tipo?: 'barrio' | 'manual' | 'predefinida'
+  diasEntrega?: string | null
+  horario?: string | null
+  activo?: boolean
+}
+
+function validateDeliveryZoneUpdateBody(raw: unknown): ValidationResult<DeliveryZoneUpdateBody> {
+  if (!isObjectRecord(raw)) return { ok: false, error: 'Request body must be an object' }
+  const out: DeliveryZoneUpdateBody = {}
+  if (raw.nombre !== undefined) {
+    if (typeof raw.nombre !== 'string') return { ok: false, error: 'nombre must be a string' }
+    const n = raw.nombre.trim()
+    if (n.length < 1 || n.length > 60) {
+      return { ok: false, error: 'nombre must be between 1 and 60 characters' }
+    }
+    out.nombre = n
+  }
+  if (raw.tipo !== undefined) {
+    if (typeof raw.tipo !== 'string' || !['barrio', 'manual', 'predefinida'].includes(raw.tipo)) {
+      return { ok: false, error: 'tipo must be one of: barrio, manual, predefinida' }
+    }
+    out.tipo = raw.tipo as DeliveryZoneUpdateBody['tipo']
+  }
+  if (raw.diasEntrega !== undefined) {
+    if (raw.diasEntrega === null) {
+      out.diasEntrega = null
+    } else if (typeof raw.diasEntrega !== 'string') {
+      return { ok: false, error: 'diasEntrega must be a string or null' }
+    } else {
+      const t = raw.diasEntrega.trim()
+      if (t.length > 20) return { ok: false, error: 'diasEntrega must be at most 20 characters' }
+      out.diasEntrega = t.length === 0 ? null : t
+    }
+  }
+  if (raw.horario !== undefined) {
+    if (raw.horario === null) {
+      out.horario = null
+    } else if (typeof raw.horario !== 'string') {
+      return { ok: false, error: 'horario must be a string or null' }
+    } else {
+      const t = raw.horario.trim()
+      if (t.length > 30) return { ok: false, error: 'horario must be at most 30 characters' }
+      out.horario = t.length === 0 ? null : t
+    }
+  }
+  if (raw.activo !== undefined) {
+    if (typeof raw.activo !== 'boolean') return { ok: false, error: 'activo must be a boolean' }
+    out.activo = raw.activo
+  }
+  return { ok: true, value: out }
+}
+
 const CLIENTE_IMPORT_CSV_HEADERS = [
   'codigo',
   'rsocial',
@@ -1499,12 +1605,12 @@ export function createApp(prisma: PrismaClient): Application {
       const authReq = req as AuthenticatedRequest
       const tenantId = getTenantId(req)
       const id = parseInt(String(req.params.id), 10)
-      const { motivo } = req.body as { motivo?: string }
-
-      if (!motivo?.trim()) {
-        res.status(400).json({ success: false, error: 'motivo is required' })
+      const voidParsed = validateFacturaVoidBody(req.body)
+      if (!voidParsed.ok) {
+        res.status(400).json({ success: false, error: voidParsed.error })
         return
       }
+      const { motivo } = voidParsed.value
 
       const factura = await prisma.factura.findFirst({
         where: { id, tenantId },
@@ -1534,7 +1640,7 @@ export function createApp(prisma: PrismaClient): Application {
         return voided
       })
 
-      await writeAudit(authReq, 'factura_void', 'factura', String(id), { motivo: motivo.trim() })
+      await writeAudit(authReq, 'factura_void', 'factura', String(id), { motivo })
       res.json({ success: true, data: updated })
     } catch (err: unknown) {
       res.status(500).json({ success: false, error: errorMessage(err) })
@@ -1561,18 +1667,14 @@ export function createApp(prisma: PrismaClient): Application {
     try {
       const authReq = req as AuthenticatedRequest
       const tenantId = authReq.auth!.claims.tenantId
-      const { nombre, tipo, diasEntrega, horario } = req.body as {
-        nombre?: string
-        tipo?: string
-        diasEntrega?: string
-        horario?: string
-      }
-      if (!nombre?.trim()) {
-        res.status(400).json({ success: false, error: 'nombre is required' })
+      const parsed = validateDeliveryZoneCreateBody(req.body)
+      if (!parsed.ok) {
+        res.status(400).json({ success: false, error: parsed.error })
         return
       }
+      const { nombre, tipo, diasEntrega, horario } = parsed.value
       const zone = await prisma.deliveryZone.create({
-        data: { tenantId, nombre: nombre.trim(), tipo: tipo ?? 'barrio', diasEntrega, horario },
+        data: { tenantId, nombre, tipo, diasEntrega, horario },
       })
       await writeAudit(authReq, 'delivery_zone_create', 'delivery_zone', String(zone.id))
       res.status(201).json({ success: true, data: zone })
@@ -1594,17 +1696,16 @@ export function createApp(prisma: PrismaClient): Application {
         return
       }
 
-      const { nombre, tipo, diasEntrega, horario, activo } = req.body as {
-        nombre?: string
-        tipo?: string
-        diasEntrega?: string
-        horario?: string
-        activo?: boolean
+      const parsed = validateDeliveryZoneUpdateBody(req.body)
+      if (!parsed.ok) {
+        res.status(400).json({ success: false, error: parsed.error })
+        return
       }
+      const { nombre, tipo, diasEntrega, horario, activo } = parsed.value
       const zone = await prisma.deliveryZone.update({
         where: { id },
         data: {
-          ...(nombre !== undefined && { nombre: nombre.trim() }),
+          ...(nombre !== undefined && { nombre }),
           ...(tipo !== undefined && { tipo }),
           ...(diasEntrega !== undefined && { diasEntrega }),
           ...(horario !== undefined && { horario }),

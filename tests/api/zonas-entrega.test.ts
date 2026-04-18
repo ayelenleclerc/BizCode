@@ -151,6 +151,33 @@ describe('POST /api/zonas-entrega', () => {
     expect(res.body.error).toMatch(/nombre/)
   })
 
+  it('returns 400 when tipo is invalid on create', async () => {
+    const prisma = buildPrismaMock()
+    const app = createApp(prisma)
+
+    const res = await request(app)
+      .post('/api/zonas-entrega')
+      .send({ nombre: 'Zona', tipo: 'invalid' })
+      .expect(400)
+
+    expect(res.body.success).toBe(false)
+    expect(String(res.body.error)).toMatch(/tipo/)
+    expect(vi.mocked(prisma.deliveryZone.create)).not.toHaveBeenCalled()
+  })
+
+  it('returns 400 when nombre exceeds max length on create', async () => {
+    const prisma = buildPrismaMock()
+    const app = createApp(prisma)
+
+    const res = await request(app)
+      .post('/api/zonas-entrega')
+      .send({ nombre: 'n'.repeat(61) })
+      .expect(400)
+
+    expect(res.body.success).toBe(false)
+    expect(vi.mocked(prisma.deliveryZone.create)).not.toHaveBeenCalled()
+  })
+
   it('returns 403 for logistics_planner (has logistics.manage)', async () => {
     // logistics_planner has logistics.manage — should succeed
     process.env.BIZCODE_TEST_ROLE = 'logistics_planner'
@@ -195,6 +222,33 @@ describe('PUT /api/zonas-entrega/:id', () => {
     expect(res.body.success).toBe(true)
     expect(res.body.data.nombre).toBe('Barrio Norte Actualizado')
     expect(res.body.data.activo).toBe(false)
+  })
+
+  it('returns 400 when tipo is invalid on update', async () => {
+    const prisma = buildPrismaMock()
+    const app = createApp(prisma)
+
+    const res = await request(app)
+      .put('/api/zonas-entrega/10')
+      .send({ tipo: 'not-an-enum' })
+      .expect(400)
+
+    expect(res.body.success).toBe(false)
+    expect(String(res.body.error)).toMatch(/tipo/)
+    expect(vi.mocked(prisma.deliveryZone.update)).not.toHaveBeenCalled()
+  })
+
+  it('returns 400 when nombre is empty string on update', async () => {
+    const prisma = buildPrismaMock()
+    const app = createApp(prisma)
+
+    const res = await request(app)
+      .put('/api/zonas-entrega/10')
+      .send({ nombre: '  ' })
+      .expect(400)
+
+    expect(res.body.success).toBe(false)
+    expect(vi.mocked(prisma.deliveryZone.update)).not.toHaveBeenCalled()
   })
 
   it('returns 404 when zone does not belong to the tenant', async () => {
