@@ -225,14 +225,8 @@ jobs:
       - name: Run accessibility tests (Vitest + jest-axe)
         run: npm run test:a11y
 
-      - name: Check ESLint a11y rules
-        run: |
-          if npx eslint src/ --ext .tsx --plugin jsx-a11y 2>/dev/null | grep -q "error"; then
-            echo "❌ Accessibility violations found"
-            npx eslint src/ --ext .tsx --plugin jsx-a11y
-            exit 1
-          fi
-          echo "✅ No ESLint a11y violations"
+      - name: Check ESLint (same as CI, jsx-a11y + TS, zero warnings)
+        run: npm run lint
 
   test_coverage:
     name: Coverage Report

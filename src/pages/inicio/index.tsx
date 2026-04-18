@@ -38,9 +38,9 @@ function KpiCard({ title, count, total, icon, color, note, pending }: KpiCardPro
     <div className={`rounded-lg border-l-4 p-5 shadow-sm ${colorMap[color]}`}>
       <div className="flex items-start justify-between">
         <div>
-          <p className="text-xs font-medium uppercase tracking-wide opacity-70">{title}</p>
+          <p className="text-xs font-medium uppercase tracking-wide text-inherit opacity-90">{title}</p>
           {pending ? (
-            <p className="mt-2 text-sm opacity-60">{t('dashboard.pendingFeature')}</p>
+            <p className="mt-2 text-sm text-green-900 dark:text-green-100">{t('dashboard.pendingFeature')}</p>
           ) : (
             <>
               <p className="mt-1 text-3xl font-bold">
@@ -52,7 +52,7 @@ function KpiCard({ title, count, total, icon, color, note, pending }: KpiCardPro
             </>
           )}
           {note && !pending && (
-            <p className="mt-2 text-xs opacity-50 italic">{note}</p>
+            <p className="mt-2 text-xs italic text-red-900 dark:text-red-100">{note}</p>
           )}
         </div>
         <span className="text-3xl" aria-hidden="true">{icon}</span>
@@ -70,11 +70,11 @@ function AlertCard({ count, pending }: { count: number; pending: boolean }) {
     <div className="rounded-lg border-l-4 border-orange-500 bg-orange-50 dark:bg-orange-950 text-orange-700 dark:text-orange-300 p-5 shadow-sm">
       <div className="flex items-start justify-between">
         <div>
-          <p className="text-xs font-medium uppercase tracking-wide opacity-70">
+          <p className="text-xs font-medium uppercase tracking-wide text-inherit opacity-90">
             {t('dashboard.alertasActivas')}
           </p>
           {pending ? (
-            <p className="mt-2 text-sm opacity-60">{t('dashboard.pendingFeature')}</p>
+            <p className="mt-2 text-sm text-orange-900 dark:text-orange-100">{t('dashboard.pendingFeature')}</p>
           ) : (
             <p className="mt-1 text-3xl font-bold">{count}</p>
           )}

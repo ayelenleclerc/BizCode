@@ -142,7 +142,7 @@ jobs:
         run: |
           if [ -d prisma/migrations ] && [ -n "$(ls -A prisma/migrations 2>/dev/null)" ]; then
             echo "✅ Database migrations present"
-            npx prisma migrate deploy --skip-generate
+            npx prisma migrate deploy
           fi
 
       - name: Report Backend Status
