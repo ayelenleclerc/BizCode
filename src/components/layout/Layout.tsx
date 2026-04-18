@@ -346,15 +346,25 @@ export default function Layout({ children }: LayoutProps) {
             </h2>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
               💡 {t('shortcuts.title')}:{' '}
-              <kbd className="px-1 py-0.5 bg-slate-200 dark:bg-slate-700 rounded text-xs">F2</kbd>{' '}
+              <kbd className="px-1 py-0.5 rounded text-xs font-mono font-medium text-slate-900 bg-slate-200 dark:bg-slate-600 dark:text-slate-100">
+                F2
+              </kbd>{' '}
               {t('shortcuts.search')} •{' '}
-              <kbd className="px-1 py-0.5 bg-slate-200 dark:bg-slate-700 rounded text-xs">F3</kbd>{' '}
+              <kbd className="px-1 py-0.5 rounded text-xs font-mono font-medium text-slate-900 bg-slate-200 dark:bg-slate-600 dark:text-slate-100">
+                F3
+              </kbd>{' '}
               {t('shortcuts.new')} •{' '}
-              <kbd className="px-1 py-0.5 bg-slate-200 dark:bg-slate-700 rounded text-xs">F5</kbd>{' '}
+              <kbd className="px-1 py-0.5 rounded text-xs font-mono font-medium text-slate-900 bg-slate-200 dark:bg-slate-600 dark:text-slate-100">
+                F5
+              </kbd>{' '}
               {t('shortcuts.save')} •{' '}
-              <kbd className="px-1 py-0.5 bg-slate-200 dark:bg-slate-700 rounded text-xs">Esc</kbd>{' '}
+              <kbd className="px-1 py-0.5 rounded text-xs font-mono font-medium text-slate-900 bg-slate-200 dark:bg-slate-600 dark:text-slate-100">
+                Esc
+              </kbd>{' '}
               {t('shortcuts.cancel')} •{' '}
-              <kbd className="px-1 py-0.5 bg-slate-200 dark:bg-slate-700 rounded text-xs">↑↓</kbd>{' '}
+              <kbd className="px-1 py-0.5 rounded text-xs font-mono font-medium text-slate-900 bg-slate-200 dark:bg-slate-600 dark:text-slate-100">
+                ↑↓
+              </kbd>{' '}
               {t('shortcuts.navigate')}
             </p>
           </div>

@@ -117,6 +117,28 @@ jobs:
       - name: Install Playwright Chromium
         run: npx playwright install --with-deps chromium
 
+      - name: Ephemeral SuperAdmin password for E2E
+        run: |
+          E2E_PW="ci$(openssl rand -hex 16)"
+          echo "BIZCODE_SEED_SUPERADMIN_PASSWORD=$E2E_PW" >> $GITHUB_ENV
+          echo "::add-mask::$E2E_PW"
+
+      - name: Seed database for E2E (SuperAdmin login)
+        run: npx prisma db seed
+
+      - name: Start API for E2E (background)
+        run: |
+          npm run server &
+          for i in $(seq 1 45); do
+            if curl -sf http://127.0.0.1:3001/api/health >/dev/null; then
+              echo "API healthy"
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "::error::API did not become healthy in time"
+          exit 1
+
       - name: E2E smoke (Playwright)
         run: npm run test:e2e
 

@@ -135,7 +135,8 @@ jobs:
           fi
 
       - name: Server unit tests
-        run: npm run test -- server/ --reporter=verbose 2>/dev/null || echo "⚠️ No server-specific tests found (Issue #86)"
+        run: |
+          npm run test -- server/ --reporter=verbose 2>/dev/null || echo 'No server-specific tests matched filter (Issue 86)'
 
       - name: Migration validation
         run: |
