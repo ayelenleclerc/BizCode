@@ -11,10 +11,10 @@ export default defineConfig({
   retries: process.env.CI ? 1 : 0,
   workers: process.env.CI ? 1 : undefined,
   reporter: process.env.CI ? 'line' : 'list',
+  // Login password: set BIZCODE_SEED_SUPERADMIN_PASSWORD in CI/env (see e2e/helpers and critical-paths.spec.ts).
   use: {
     baseURL: 'http://127.0.0.1:4173',
     trace: 'on-first-retry',
-    testPassword: process.env.BIZCODE_SEED_SUPERADMIN_PASSWORD || 'test-password',
   },
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
   webServer: {
