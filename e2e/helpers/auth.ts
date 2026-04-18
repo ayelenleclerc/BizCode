@@ -6,6 +6,11 @@ import type { Page } from '@playwright/test'
  * @pt-BR Fazer login como superadmin (platform/ayelen) para testes E2E
  */
 export async function loginAsTestUser(page: Page, password: string) {
+  if (!password.trim()) {
+    throw new Error(
+      'E2E login password missing: set BIZCODE_SEED_SUPERADMIN_PASSWORD (GitHub secret or local .env), same as prisma seed for superadmin.'
+    )
+  }
   await page.goto('/login')
 
   // Fill in login form with test credentials

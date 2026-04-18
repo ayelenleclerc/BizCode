@@ -13,10 +13,10 @@ import { loginAsTestUser } from './helpers/auth'
  * These tests validate the core business processes of BizCode.
  * They run against http://127.0.0.1:4173 (Vite production preview).
  *
- * Auth: Login uses credentials from BIZCODE_SEED_SUPERADMIN_PASSWORD env var.
+ * Auth: Login uses credentials from BIZCODE_SEED_SUPERADMIN_PASSWORD env var (no fallback in repo; set in CI secrets or local .env).
  */
 
-const TEST_PASSWORD = process.env.BIZCODE_SEED_SUPERADMIN_PASSWORD || 'test-password'
+const TEST_PASSWORD = (process.env.BIZCODE_SEED_SUPERADMIN_PASSWORD ?? '').trim()
 
 test.describe('Critical Paths — Core Business Workflows', () => {
   // Helper to generate unique values for each test run

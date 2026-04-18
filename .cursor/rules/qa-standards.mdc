@@ -215,7 +215,7 @@ describe('POST /api/clientes', () => {
       data: {
         tenantId: testTenantId,
         email: 'test@test.com',
-        passwordHash: 'hashed_password',
+        passwordHash: '<bcrypt-fixture-use-hashPassword-in-real-tests>',
         role: 'ADMIN'
       }
     })
@@ -360,7 +360,7 @@ test.describe('Critical User Paths', () => {
   test('Login → Create Client → Create Invoice', async ({ page }) => {
     // Step 1: Login
     await page.fill('input[name="email"]', 'user@test.com')
-    await page.fill('input[name="password"]', 'password123')
+    await page.fill('input[name="password"]', process.env.E2E_LOGIN_PASSWORD ?? '')
     await page.click('button[type="submit"]')
     
     // Verify redirect
@@ -406,7 +406,7 @@ test.describe('Critical User Paths', () => {
   test('RBAC: Regular user cannot access admin panel', async ({ page }) => {
     // Login as regular user
     await page.fill('input[name="email"]', 'user@test.com')
-    await page.fill('input[name="password"]', 'password123')
+    await page.fill('input[name="password"]', process.env.E2E_LOGIN_PASSWORD ?? '')
     await page.click('button[type="submit"]')
 
     // Try to access admin panel
@@ -419,7 +419,7 @@ test.describe('Critical User Paths', () => {
 
   test('Error handling: Validation error shows message', async ({ page }) => {
     await page.fill('input[name="email"]', 'user@test.com')
-    await page.fill('input[name="password"]', 'password123')
+    await page.fill('input[name="password"]', process.env.E2E_LOGIN_PASSWORD ?? '')
     await page.click('button[type="submit"]')
 
     // Create client with invalid CUIT
@@ -930,7 +930,8 @@ afterEach(async () => {
 **Environment Configuration:**
 ```bash
 # .env.test
-DATABASE_URL=postgresql://test:test@localhost:5432/bizcode_test
+# Postgres local de prueba con trust o contraseña en variable de entorno (no user:pass en texto fijo).
+DATABASE_URL=postgresql://test@localhost:5432/bizcode_test
 NODE_ENV=test
 LOG_LEVEL=error
 API_URL=http://localhost:3000

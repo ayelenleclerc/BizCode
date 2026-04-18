@@ -93,6 +93,8 @@ jobs:
         run: npx playwright install --with-deps chromium
 
       - name: E2E smoke test
+        env:
+          BIZCODE_SEED_SUPERADMIN_PASSWORD: ${{ secrets.BIZCODE_SEED_SUPERADMIN_PASSWORD }}
         run: npm run test:e2e
 
       - name: Upload coverage report
