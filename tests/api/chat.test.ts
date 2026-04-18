@@ -157,6 +157,16 @@ describe('chat API', () => {
     expect(res.body.success).toBe(true)
     expect(vi.mocked(prisma.chatMessage.create)).toHaveBeenCalled()
     expect(vi.mocked(prisma.notification.create)).toHaveBeenCalled()
+    expect(vi.mocked(prisma.auditEvent.create)).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          action: 'chat_message_create',
+          resource: 'chat_message',
+          resourceId: '12',
+          metadata: { toUserId: 2 },
+        }),
+      }),
+    )
   })
 })
 

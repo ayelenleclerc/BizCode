@@ -1,6 +1,7 @@
 import type { Application, Request, Response } from 'express'
-import type { PrismaClient } from '@prisma/client'
+import type { PrismaClient, Prisma } from '@prisma/client'
 import type { AuthenticatedRequest } from './auth'
+import { writeAuditEvent } from './audit'
 
 const CHAT_PAGE_SIZE_DEFAULT = 50
 const CHAT_PAGE_SIZE_MAX = 100
@@ -217,6 +218,17 @@ export function registerChatRoutes(app: Application, prisma: PrismaClient): void
             preview: toPreview(content),
           },
         },
+      })
+
+      await writeAuditEvent({
+        prisma,
+        tenantId: me.tenantId,
+        userId: me.userId,
+        action: 'chat_message_create',
+        resource: 'chat_message',
+        resourceId: String(message.id),
+        ipAddress: req.ip,
+        metadata: { toUserId } as Prisma.InputJsonValue,
       })
 
       res.status(201).json({ success: true, data: message })

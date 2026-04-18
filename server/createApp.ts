@@ -13,6 +13,7 @@ import { registerDashboardRoutes } from './dashboard'
 import { registerNotificationRoutes } from './notifications'
 import { dispatchNotification, isSmtpConfigured, isTwilioConfigured } from './channels'
 import { registerChatRoutes } from './chat'
+import { writeAuditEvent } from './audit'
 import { validateCUIT } from '../src/lib/validators'
 import { csvImportUploadSingle, parseCsvWithFixedHeaders, CSV_IMPORT_MAX_ROWS } from './csvImport'
 
@@ -813,28 +814,23 @@ export function createApp(prisma: PrismaClient): Application {
 
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(getOpenApiDocument()))
 
-  async function writeAudit(
+  function writeAudit(
     req: AuthenticatedRequest,
     action: string,
     resource: string,
     resourceId?: string,
     metadata?: Prisma.InputJsonValue,
   ): Promise<void> {
-    try {
-      await prisma.auditEvent.create({
-        data: {
-          tenantId: req.auth!.claims.tenantId,
-          userId: req.auth!.claims.userId,
-          action,
-          resource,
-          resourceId,
-          ipAddress: req.ip,
-          metadata,
-        },
-      })
-    } catch (_error) {
-      // Audit failures should not block core business operations.
-    }
+    return writeAuditEvent({
+      prisma,
+      tenantId: req.auth!.claims.tenantId,
+      userId: req.auth!.claims.userId,
+      action,
+      resource,
+      resourceId: resourceId ?? null,
+      ipAddress: req.ip,
+      metadata,
+    })
   }
 
   // ============ CLIENTES ============

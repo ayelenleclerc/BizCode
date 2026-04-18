@@ -3,6 +3,7 @@ import type { PrismaClient } from '@prisma/client'
 import { USER_ROLES, USER_CHANNELS, hasPermission, type UserRole, type UserChannel } from '../src/lib/rbac'
 import { hashPassword, verifyPassword } from './passwordHash'
 import { requirePermission, type AuthenticatedRequest } from './auth'
+import { writeAuditEvent } from './audit'
 
 /**
  * @en Role hierarchy index — a user may only assign roles with an equal or lower index than their own.
@@ -46,28 +47,6 @@ function sanitizeIntArray(raw: unknown): number[] {
 
 function isNonEmptyString(v: unknown): v is string {
   return typeof v === 'string' && v.trim().length > 0
-}
-
-async function writeAudit(
-  prisma: PrismaClient,
-  req: AuthenticatedRequest,
-  action: string,
-  resourceId?: string,
-): Promise<void> {
-  try {
-    await prisma.auditEvent.create({
-      data: {
-        tenantId: req.auth!.claims.tenantId,
-        userId: req.auth!.claims.userId,
-        action,
-        resource: 'user',
-        resourceId,
-        ipAddress: req.ip,
-      },
-    })
-  } catch {
-    // Audit failures must not block operations.
-  }
 }
 
 /**
@@ -159,7 +138,15 @@ export function registerUserRoutes(app: Application, prisma: PrismaClient): void
           createdAt: true,
         },
       })
-      await writeAudit(prisma, authReq, 'user_create', String(user.id))
+      await writeAuditEvent({
+        prisma,
+        tenantId: authReq.auth!.claims.tenantId,
+        userId: authReq.auth!.claims.userId,
+        action: 'user_create',
+        resource: 'user',
+        resourceId: String(user.id),
+        ipAddress: authReq.ip,
+      })
       res.status(201).json({ success: true, data: user })
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err)
@@ -236,7 +223,15 @@ export function registerUserRoutes(app: Application, prisma: PrismaClient): void
           updatedAt: true,
         },
       })
-      await writeAudit(prisma, authReq, 'user_update', String(user.id))
+      await writeAuditEvent({
+        prisma,
+        tenantId: authReq.auth!.claims.tenantId,
+        userId: authReq.auth!.claims.userId,
+        action: 'user_update',
+        resource: 'user',
+        resourceId: String(user.id),
+        ipAddress: authReq.ip,
+      })
       res.json({ success: true, data: user })
     } catch (err: unknown) {
       res.status(500).json({ success: false, error: err instanceof Error ? err.message : String(err) })
@@ -273,7 +268,15 @@ export function registerUserRoutes(app: Application, prisma: PrismaClient): void
         where: { id: user.id },
         data: { passwordHash: hashPassword(body.newPassword as string) },
       })
-      await writeAudit(prisma, authReq, 'user_change_password', String(user.id))
+      await writeAuditEvent({
+        prisma,
+        tenantId: authReq.auth!.claims.tenantId,
+        userId: authReq.auth!.claims.userId,
+        action: 'user_change_password',
+        resource: 'user',
+        resourceId: String(user.id),
+        ipAddress: authReq.ip,
+      })
       res.json({ success: true, data: { changed: true } })
     } catch (err: unknown) {
       res.status(500).json({ success: false, error: err instanceof Error ? err.message : String(err) })

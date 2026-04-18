@@ -1,6 +1,7 @@
 import type { Application, Request, Response } from 'express'
-import type { PrismaClient } from '@prisma/client'
+import type { PrismaClient, Prisma } from '@prisma/client'
 import { type AuthenticatedRequest } from './auth'
+import { writeAuditEvent } from './audit'
 
 export const NOTIFICATION_TYPES = [
   'credit_limit_exceeded',
@@ -119,6 +120,15 @@ export function registerNotificationRoutes(app: Application, prisma: PrismaClien
         },
         data: { readAt: now },
       })
+      await writeAuditEvent({
+        prisma,
+        tenantId: authReq.auth.claims.tenantId,
+        userId: authReq.auth.claims.userId,
+        action: 'notification_read_all',
+        resource: 'notification',
+        ipAddress: req.ip,
+        metadata: { updated: result.count } as Prisma.InputJsonValue,
+      })
       res.json({ success: true, data: { updated: result.count } })
     } catch (err: unknown) {
       res.status(500).json({ success: false, error: err instanceof Error ? err.message : String(err) })
@@ -154,6 +164,15 @@ export function registerNotificationRoutes(app: Application, prisma: PrismaClien
       const updated = await prisma.notification.update({
         where: { id },
         data: { readAt: new Date() },
+      })
+      await writeAuditEvent({
+        prisma,
+        tenantId: authReq.auth.claims.tenantId,
+        userId: authReq.auth.claims.userId,
+        action: 'notification_read',
+        resource: 'notification',
+        resourceId: String(id),
+        ipAddress: req.ip,
       })
       res.json({ success: true, data: updated })
     } catch (err: unknown) {
