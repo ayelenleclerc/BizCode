@@ -63,12 +63,13 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Run tfsec (Terraform Security Scan)
-        uses: aquasecurity/tfsec-action@v1
+        uses: aquasecurity/tfsec-action@v1.0.3
         continue-on-error: true
         with:
           working_directory: terraform
           format: json
-          out_dir: .
+          additional_args: -O tfsec.json
+          github_token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Check tfsec Results
         run: |

@@ -1,5 +1,11 @@
 name: QA Validation
 
+permissions:
+  contents: read
+  actions: write
+  issues: write
+  pull-requests: write
+
 on:
   push:
     branches: [main, develop]
@@ -100,15 +106,7 @@ jobs:
         env:
           DATABASE_URL: postgresql://test@localhost:5432/bizcode_test
           NODE_ENV: test
-        run: npm run test:integration 2>&1
-
-      - name: Verify API tests passed
-        run: |
-          if grep -q "FAILED\|Error" test-results.log; then
-            echo "❌ Integration tests failed"
-            exit 1
-          fi
-          echo "✅ Integration tests passed"
+        run: npm run test:integration
 
   e2e_tests:
     name: E2E Tests (Subset)
@@ -137,7 +135,10 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci && npx playwright install
+        run: npm ci
+
+      - name: Install Playwright (Chromium + OS deps)
+        run: npx playwright install --with-deps chromium
 
       - name: Ephemeral SuperAdmin password for E2E (not stored in repo)
         run: |
@@ -171,7 +172,7 @@ jobs:
       - name: Run E2E tests (critical paths only)
         env:
           DATABASE_URL: postgresql://test@localhost:5432/bizcode_test
-        run: npm run test:e2e 2>&1
+        run: npm run test:e2e
 
       - name: Upload Playwright report
         if: always()
@@ -180,14 +181,6 @@ jobs:
           name: playwright-report
           path: playwright-report/
           retention-days: 30
-
-      - name: Verify E2E tests passed
-        run: |
-          if grep -q "failed\|error" test-results.log 2>/dev/null; then
-            echo "⚠️ Some E2E tests failed (expected for initial setup)"
-          else
-            echo "✅ E2E critical paths passed"
-          fi
 
   accessibility_tests:
     name: Accessibility Tests
@@ -201,7 +194,10 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci && npx playwright install
+        run: npm ci
+
+      - name: Install Playwright (Chromium + OS deps)
+        run: npx playwright install --with-deps chromium
 
       - name: Run accessibility tests
         run: npm run test:a11y 2>&1 || true
@@ -242,7 +238,7 @@ jobs:
           fi
 
       - name: Comment PR with coverage
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
         uses: actions/github-script@v7
         with:
           script: |
@@ -299,7 +295,7 @@ jobs:
           fi
 
       - name: Comment PR with QA Status
-        if: github.event_name == 'pull_request' && always()
+        if: github.event_name == 'pull_request' && always() && github.event.pull_request.head.repo.full_name == github.repository
         uses: actions/github-script@v7
         with:
           script: |
@@ -332,7 +328,7 @@ jobs:
   reference_issues:
     name: Reference QA GitHub Issues
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
+    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
     steps:
       - name: Comment with QA Issues
         uses: actions/github-script@v7

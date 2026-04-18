@@ -58,6 +58,8 @@ describe('DBF migration integration', () => {
     if (!process.env.DATABASE_URL?.trim()) {
       throw new Error('DATABASE_URL is required for DBF integration tests')
     }
+    process.env.NODE_ENV = 'test'
+    process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
     prisma = new PrismaClient()
     await prisma.$connect()
     fixtureRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'bizcode-dbf-'))

@@ -32,6 +32,9 @@ describe('API — integración PostgreSQL (Prisma real)', () => {
         'DATABASE_URL no está definida. Para pruebas locales: configura .env o exporta DATABASE_URL apuntando a tu PostgreSQL (p. ej. Docker).',
       )
     }
+    // Tras `dotenv/config`, un .env local puede fijar NODE_ENV=development y desactivar el bypass de auth en tests.
+    process.env.NODE_ENV = 'test'
+    process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
     prisma = new PrismaClient()
     app = createApp(prisma)
     await prisma.$connect()
@@ -64,7 +67,7 @@ describe('API — integración PostgreSQL (Prisma real)', () => {
       .send({
         codigo: 42,
         rsocial: 'Cliente integración SA',
-        condIva: 'R',
+        condIva: 'RI',
         activo: true,
       })
       .expect(200)
@@ -79,7 +82,7 @@ describe('API — integración PostgreSQL (Prisma real)', () => {
       id,
       codigo: 42,
       rsocial: 'Cliente integración SA',
-      condIva: 'R',
+      condIva: 'RI',
     })
   })
 })
