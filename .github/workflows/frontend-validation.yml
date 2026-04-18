@@ -5,19 +5,45 @@ on:
     branches: [main, develop]
     paths:
       - 'src/**'
+      - 'server/**'
+      - 'prisma/**'
       - 'tests/**'
       - 'e2e/**'
+      - 'playwright.config.ts'
+      - '.github/workflows/frontend-validation.yml'
   pull_request:
     branches: [main, develop]
     paths:
       - 'src/**'
+      - 'server/**'
+      - 'prisma/**'
       - 'tests/**'
       - 'e2e/**'
+      - 'playwright.config.ts'
+      - '.github/workflows/frontend-validation.yml'
 
 jobs:
   frontend-quality:
     name: Frontend Code Quality
     runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: bizcode
+          POSTGRES_DB: bizcode_test
+          POSTGRES_HOST_AUTH_METHOD: trust
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgresql://bizcode@localhost:5432/bizcode_test
 
     steps:
       - name: Checkout
@@ -92,9 +118,32 @@ jobs:
       - name: Install Playwright
         run: npx playwright install --with-deps chromium
 
-      - name: E2E smoke test
-        env:
-          BIZCODE_SEED_SUPERADMIN_PASSWORD: ${{ secrets.BIZCODE_SEED_SUPERADMIN_PASSWORD }}
+      - name: Ephemeral SuperAdmin password for E2E (not stored in repo)
+        run: |
+          E2E_PW="ci$(openssl rand -hex 16)"
+          echo "BIZCODE_SEED_SUPERADMIN_PASSWORD=$E2E_PW" >> $GITHUB_ENV
+          echo "::add-mask::$E2E_PW"
+
+      - name: Prisma migrate and seed (E2E needs API + SuperAdmin)
+        run: |
+          npx prisma generate
+          npx prisma migrate deploy
+          npx prisma db seed
+
+      - name: Start API for E2E (background)
+        run: |
+          npm run server &
+          for i in $(seq 1 45); do
+            if curl -sf http://127.0.0.1:3001/api/health >/dev/null; then
+              echo "API healthy"
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "::error::API did not become healthy in time"
+          exit 1
+
+      - name: E2E tests
         run: npm run test:e2e
 
       - name: Upload coverage report

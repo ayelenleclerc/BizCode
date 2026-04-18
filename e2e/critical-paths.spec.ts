@@ -119,6 +119,7 @@ test.describe('Critical Paths — Core Business Workflows', () => {
 
   // Test 6: Full workflow — Create artículo
   test('Create a new artículo (product)', async ({ page }) => {
+    await loginAsTestUser(page, TEST_PASSWORD)
     const id = generateId()
     const testArticulo = {
       codigo: `ART-${id}`,
@@ -164,6 +165,7 @@ test.describe('Critical Paths — Core Business Workflows', () => {
 
   // Test 7: Full workflow — Create factura
   test('Create a new factura (invoice)', async ({ page }) => {
+    await loginAsTestUser(page, TEST_PASSWORD)
     await page.goto('/facturacion', { waitUntil: 'networkidle' })
     await page.waitForTimeout(500)
 
@@ -186,6 +188,7 @@ test.describe('Critical Paths — Core Business Workflows', () => {
 
   // Test 8: Navigation between all main modules
   test('Navigate through all main modules', async ({ page }) => {
+    await loginAsTestUser(page, TEST_PASSWORD)
     const modules = [
       { path: '/inicio', name: 'Inicio' },
       { path: '/clientes', name: 'Clientes' },
@@ -205,6 +208,7 @@ test.describe('Critical Paths — Core Business Workflows', () => {
 
   // Test 9: Keyboard shortcuts work (F3 = New, F5 = Save)
   test('Keyboard shortcuts (F3=New, F5=Save, Esc=Cancel)', async ({ page }) => {
+    await loginAsTestUser(page, TEST_PASSWORD)
     await page.goto('/clientes', { waitUntil: 'networkidle' })
     await page.waitForTimeout(300)
 
@@ -227,6 +231,7 @@ test.describe('Critical Paths — Core Business Workflows', () => {
 
   // Test 10: Responsive — App works on mobile viewport
   test('App is responsive on mobile viewport', async ({ page }) => {
+    await loginAsTestUser(page, TEST_PASSWORD)
     // Set mobile viewport
     await page.setViewportSize({ width: 375, height: 812 })
 
@@ -250,6 +255,7 @@ test.describe('Critical Paths — Core Business Workflows', () => {
 test.describe('Critical Paths — Data Validation', () => {
   // Test: CUIT validation (Argentine tax ID)
   test('Cliente creation validates CUIT format', async ({ page }) => {
+    await loginAsTestUser(page, TEST_PASSWORD)
     await page.goto('/clientes', { waitUntil: 'networkidle' })
     await page.waitForTimeout(500)
 
@@ -283,6 +289,7 @@ test.describe('Critical Paths — Data Validation', () => {
 
   // Test: Precio validation (must be positive)
   test('Artículo creation validates prices', async ({ page }) => {
+    await loginAsTestUser(page, TEST_PASSWORD)
     await page.goto('/articulos', { waitUntil: 'networkidle' })
     await page.waitForTimeout(500)
 
