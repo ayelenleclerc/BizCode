@@ -124,6 +124,8 @@ jobs:
           echo "::add-mask::$E2E_PW"
 
       - name: Seed database for E2E (SuperAdmin login)
+        env:
+          BIZCODE_SEED_FIXTURE_CATALOG: 'true'
         run: npx prisma db seed
 
       - name: Start API for E2E (background)

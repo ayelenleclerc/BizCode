@@ -138,6 +138,8 @@ jobs:
           echo "::add-mask::$E2E_PW"
 
       - name: Prisma migrate and seed (E2E needs API + SuperAdmin)
+        env:
+          BIZCODE_SEED_FIXTURE_CATALOG: 'true'
         run: |
           npx prisma generate
           npx prisma migrate deploy
