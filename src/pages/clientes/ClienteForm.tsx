@@ -28,8 +28,13 @@ const clienteSchema = z.object({
   creditLimit: z.coerce.number().positive().optional().nullable(),
   creditDays: z.coerce.number().int().min(0).optional(),
   suspended: z.boolean().optional(),
-  // Logistics (Issue #32)
-  deliveryZoneId: z.coerce.number().int().positive().optional().nullable(),
+  // Logistics (Issue #32) — HTML <select value=""> must not coerce to 0 (would fail .positive() and block submit silently).
+  deliveryZoneId: z.preprocess((val) => {
+    if (val === '' || val === null || val === undefined) return undefined
+    const n = typeof val === 'number' ? val : Number(val)
+    if (!Number.isFinite(n) || n <= 0) return undefined
+    return Math.trunc(n)
+  }, z.number().int().positive().optional().nullable()),
 })
 
 type ClienteFormData = z.infer<typeof clienteSchema>
