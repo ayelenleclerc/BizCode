@@ -10,7 +10,13 @@ import { Articulo, Rubro } from '@/types'
 const articuloSchema = z.object({
   codigo: z.coerce.number().int().positive('Código debe ser positivo'),
   descripcion: z.string().min(3, 'Mínimo 3 caracteres').max(30),
-  rubroId: z.coerce.number().int().positive('Seleccione un rubro'),
+  // Rubro — HTML <select value=""> must not coerce to 0 (would fail .positive() and block submit).
+  rubroId: z.preprocess((val) => {
+    if (val === '' || val === null || val === undefined) return undefined
+    const n = typeof val === 'number' ? val : Number(val)
+    if (!Number.isFinite(n) || n <= 0) return undefined
+    return Math.trunc(n)
+  }, z.number().int().positive('Seleccione un rubro')),
   condIva: z.enum(['1', '2', '3']), // 1=21%, 2=10.5%, 3=Exento
   umedida: z.string().min(2).max(6),
   precioLista1: z.coerce.number().positive('Precio debe ser positivo'),
@@ -46,7 +52,8 @@ export default function ArticuloForm({ articulo, rubros, onClose, onGuardado }: 
     resolver: zodResolver(articuloSchema) as any,
     defaultValues: (articulo || {
       condIva: '1',
-      umedida: 'U',
+      // Must be length ≥2 (zod + server/createApp.ts); single "U" blocked submit without surfacing umedida in E2E.
+      umedida: 'UN',
       minimo: 0,
       activo: true,
     }) as ArticuloFormData,
@@ -105,6 +112,7 @@ export default function ArticuloForm({ articulo, rubros, onClose, onGuardado }: 
       role="dialog"
       aria-modal="true"
       aria-labelledby="dialog-articulo-title"
+      data-testid="articulo-form-dialog"
     >
       <div className="bg-white dark:bg-slate-800 rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         <div className="bg-slate-200 dark:bg-slate-700 px-6 py-4 border-b border-slate-300 dark:border-slate-600">
@@ -114,7 +122,7 @@ export default function ArticuloForm({ articulo, rubros, onClose, onGuardado }: 
           <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">{t('form.hint')}</p>
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-4" data-testid="articulo-form">
           {error && (
             <div role="alert" className="p-3 bg-red-100 dark:bg-red-900 text-red-900 dark:text-red-100 rounded border border-red-300 dark:border-red-700">
               {error}
@@ -128,6 +136,7 @@ export default function ArticuloForm({ articulo, rubros, onClose, onGuardado }: 
             <input
               id="articulo-codigo"
               type="number"
+              data-testid="articulo-form-codigo"
               {...register('codigo')}
               aria-required="true"
               aria-describedby={errors.codigo ? 'articulo-codigo-error' : undefined}
@@ -146,6 +155,7 @@ export default function ArticuloForm({ articulo, rubros, onClose, onGuardado }: 
             <input
               id="articulo-descripcion"
               type="text"
+              data-testid="articulo-form-descripcion"
               {...register('descripcion')}
               maxLength={30}
               aria-required="true"
@@ -164,6 +174,7 @@ export default function ArticuloForm({ articulo, rubros, onClose, onGuardado }: 
               </label>
               <select
                 id="articulo-rubroId"
+                data-testid="articulo-form-rubroId"
                 {...register('rubroId')}
                 aria-required="true"
                 aria-describedby={errors.rubroId ? 'articulo-rubroId-error' : undefined}
@@ -225,6 +236,7 @@ export default function ArticuloForm({ articulo, rubros, onClose, onGuardado }: 
                 id="articulo-precioLista1"
                 type="number"
                 step="0.01"
+                data-testid="articulo-form-precioLista1"
                 {...register('precioLista1')}
                 aria-required="true"
                 aria-describedby={errors.precioLista1 ? 'articulo-precioLista1-error' : undefined}
@@ -242,6 +254,7 @@ export default function ArticuloForm({ articulo, rubros, onClose, onGuardado }: 
                 id="articulo-precioLista2"
                 type="number"
                 step="0.01"
+                data-testid="articulo-form-precioLista2"
                 {...register('precioLista2')}
                 aria-required="true"
                 aria-describedby={errors.precioLista2 ? 'articulo-precioLista2-error' : undefined}
@@ -259,6 +272,7 @@ export default function ArticuloForm({ articulo, rubros, onClose, onGuardado }: 
                 id="articulo-costo"
                 type="number"
                 step="0.01"
+                data-testid="articulo-form-costo"
                 {...register('costo')}
                 aria-required="true"
                 aria-describedby={errors.costo ? 'articulo-costo-error' : undefined}
@@ -278,6 +292,7 @@ export default function ArticuloForm({ articulo, rubros, onClose, onGuardado }: 
               <input
                 id="articulo-stock"
                 type="number"
+                data-testid="articulo-form-stock"
                 {...register('stock')}
                 aria-required="true"
                 aria-describedby={errors.stock ? 'articulo-stock-error' : undefined}

@@ -86,50 +86,36 @@ test.describe('Critical Paths — Core Business Workflows', () => {
     await expect(page.locator('[data-testid="clientes-table"] tbody tr').filter({ hasText: razonSocial })).toBeVisible()
   })
 
-  // Test 6: Full workflow — Create artículo
+  // Test 6: Full workflow — Create artículo (stable data-testid selectors, BP1-2 / #66)
   test('Create a new artículo (product)', async ({ page }) => {
     await loginAsTestUser(page, TEST_PASSWORD)
     const id = generateId()
-    const testArticulo = {
-      codigo: generateNumericCodigo(),
-      descripcion: `Test Articulo ${id}`,
-      precioLista: '100.00',
-      costo: '50.00',
-      stock: '10',
-    }
+    const codigo = generateNumericCodigo()
+    const descripcion = `E2E Artículo ${id}`
 
     await page.goto('/articulos', { waitUntil: 'networkidle' })
-    await page.waitForTimeout(500)
 
-    // Try to create new articulo
-    const createButton = page.locator('button:has-text("Nuevo"), button:has-text("Nueva")').first()
-    if (await createButton.isVisible()) {
-      await createButton.click()
-    } else {
-      await page.keyboard.press('F3')
-    }
+    await page.getByTestId('btn-nuevo-articulo').click()
+    await expect(page.getByTestId('articulo-form-dialog')).toBeVisible()
+    await expect(page.getByTestId('articulo-form')).toBeVisible()
 
-    await page.waitForTimeout(300)
+    await page.getByTestId('articulo-form-codigo').fill(String(codigo))
+    await page.getByTestId('articulo-form-descripcion').fill(descripcion)
 
-    // Fill form fields
-    const codigoInput = page.locator('input[placeholder*="Código"], input[name="codigo"]').first()
-    const descripcionInput = page.locator('input[placeholder*="Descripción"], input[name="descripcion"]').first()
+    const rubroSelect = page.getByTestId('articulo-form-rubroId')
+    await expect(rubroSelect.locator('option')).not.toHaveCount(1)
+    await rubroSelect.selectOption({ index: 1 })
 
-    if (await codigoInput.isVisible()) {
-      await codigoInput.fill(String(testArticulo.codigo))
-    }
+    await page.getByTestId('articulo-form-precioLista1').fill('100.00')
+    await page.getByTestId('articulo-form-precioLista2').fill('95.00')
+    await page.getByTestId('articulo-form-costo').fill('50.00')
+    await page.getByTestId('articulo-form-stock').fill('10')
 
-    if (await descripcionInput.isVisible()) {
-      await descripcionInput.fill(testArticulo.descripcion)
-    }
+    await page.getByTestId('btn-save-articulo').click()
 
-    // Save
-    await page.keyboard.press('F5')
-    await page.waitForTimeout(500)
-
-    // Verify no errors
-    const errorMessage = page.locator('[role="alert"]').filter({ hasText: 'Error' })
-    expect(await errorMessage.isVisible()).toBe(false)
+    await expect(page.getByTestId('articulo-form-dialog')).toBeHidden({ timeout: 20_000 })
+    await expect(page.getByTestId('articulos-table')).toBeVisible()
+    await expect(page.locator('[data-testid="articulos-table"] tbody tr').filter({ hasText: descripcion })).toBeVisible()
   })
 
   // Test 7: Full workflow — Create factura
@@ -266,7 +252,7 @@ test.describe('Critical Paths — Data Validation', () => {
     await page.keyboard.press('F3')
     await page.waitForTimeout(300)
 
-    const precioInput = page.locator('input[placeholder*="Precio"], input[name="precio"]').first()
+    const precioInput = page.getByTestId('articulo-form-precioLista1')
 
     if (await precioInput.isVisible()) {
       // Try negative price

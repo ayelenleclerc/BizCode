@@ -166,6 +166,7 @@ jobs:
       - name: Prisma generate, migrate, seed
         env:
           DATABASE_URL: postgresql://test@localhost:5432/bizcode_test?sslmode=disable
+          BIZCODE_SEED_FIXTURE_CATALOG: 'true'
         run: |
           npx prisma generate
           npx prisma migrate deploy
