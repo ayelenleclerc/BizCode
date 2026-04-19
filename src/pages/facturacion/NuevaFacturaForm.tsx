@@ -21,7 +21,7 @@ interface NuevaFacturaFormProps {
   articulos: Articulo[]
   formasPago: FormaPago[]
   onCancel: () => void
-  onGuardada: () => void
+  onGuardada: () => void | Promise<void>
 }
 
 export default function NuevaFacturaForm({
@@ -167,7 +167,7 @@ export default function NuevaFacturaForm({
       }
 
       await facturasAPI.create(facturaData)
-      onGuardada()
+      await Promise.resolve(onGuardada())
     } catch (err: unknown) {
       setError((err as Error).message || t('errors.generic'))
     } finally {

@@ -131,21 +131,35 @@ test.describe('Critical Paths — Core Business Workflows', () => {
     await page.getByTestId('btn-nueva-factura').click()
     await expect(page.getByTestId('nueva-factura-form')).toBeVisible()
 
-    await page.getByTestId('factura-form-numero').fill(String(invoiceNum))
+    const numeroInput = page.getByTestId('factura-form-numero')
+    await numeroInput.clear()
+    await numeroInput.fill(String(invoiceNum))
 
     const clienteSelect = page.getByTestId('factura-form-clienteId')
-    await expect(clienteSelect.locator('option')).not.toHaveCount(1)
+    await expect(clienteSelect.locator('option')).not.toHaveCount(1, { timeout: 15_000 })
     const clienteValue = await clienteSelect.locator('option').filter({ hasText: 'E2E Cliente' }).first().getAttribute('value')
     expect(clienteValue, 'Se espera un cliente creado en el test anterior (E2E Cliente…)').toBeTruthy()
     await clienteSelect.selectOption(clienteValue!)
 
     await page.getByTestId('btn-agregar-linea-factura').click()
     const lineArticulo = page.getByTestId('factura-line-0-articulo')
+    await expect(lineArticulo.locator('option')).not.toHaveCount(1, { timeout: 15_000 })
     const articuloValue = await lineArticulo.locator('option').filter({ hasText: 'E2E Artículo' }).first().getAttribute('value')
     expect(articuloValue, 'Se espera un artículo creado en el test anterior (E2E Artículo…)').toBeTruthy()
     await lineArticulo.selectOption(articuloValue!)
 
+    await expect(page.getByTestId('btn-save-factura')).toBeEnabled({ timeout: 10_000 })
+
+    const postFactura = page.waitForResponse((r) => {
+      const u = r.url()
+      return u.includes('/api/facturas') && r.request().method() === 'POST'
+    })
     await page.getByTestId('btn-save-factura').click()
+    const postResp = await postFactura
+    expect(
+      postResp.ok(),
+      `POST /api/facturas → ${postResp.status()} ${(await postResp.text()).slice(0, 500)}`,
+    ).toBeTruthy()
 
     await expect(page.getByTestId('btn-nueva-factura')).toBeVisible({ timeout: 20_000 })
     await expect(page.getByTestId('nueva-factura-form')).toHaveCount(0)

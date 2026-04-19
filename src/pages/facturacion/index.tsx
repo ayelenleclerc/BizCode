@@ -44,8 +44,12 @@ export default function FacturacionPage() {
 
   const handleFacturaGuardada = async () => {
     setView('lista')
-    const data = await facturasAPI.list()
-    setFacturas(data || [])
+    try {
+      const data = await facturasAPI.list()
+      setFacturas(data || [])
+    } catch (error) {
+      console.error('Error refreshing facturas after save:', error)
+    }
   }
 
   return (
