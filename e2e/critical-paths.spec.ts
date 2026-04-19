@@ -63,61 +63,27 @@ test.describe('Critical Paths — Core Business Workflows', () => {
     await expect(page.locator('#root')).toBeVisible()
   })
 
-  // Test 5: Full workflow — Create cliente
+  // Test 5: Full workflow — Create cliente (stable data-testid selectors, BP1-2 / #66)
   test('Create a new cliente (customer)', async ({ page }) => {
     await loginAsTestUser(page, TEST_PASSWORD)
 
-    const id = generateId()
-    const testCliente = {
-      codigo: generateNumericCodigo(),
-      razonSocial: `Test Cliente ${id}`,
-      cuit: '20123456789', // Valid CUIT format (fake)
-      email: `test-${id}@example.com`,
-      telefono: '+5491123456789',
-      domicilio: 'Calle Falsa 123',
-    }
+    const codigo = generateNumericCodigo()
+    const razonSocial = `E2E Cliente ${generateId()}`
 
     await page.goto('/clientes', { waitUntil: 'networkidle' })
 
-    // Wait for page to load
-    await page.waitForTimeout(500)
+    await page.getByTestId('btn-nuevo-cliente').click()
+    await expect(page.getByTestId('cliente-form-dialog')).toBeVisible()
+    await expect(page.getByTestId('cliente-form')).toBeVisible()
 
-    // Try to find create button or form trigger
-    // Button might be F3 keyboard shortcut or a visible button
-    const createButton = page.locator('button:has-text("Nuevo"), button:has-text("Nueva"), [aria-label*="Nuevo"]').first()
+    await page.getByTestId('cliente-form-codigo').fill(String(codigo))
+    await page.getByTestId('cliente-form-rsocial').fill(razonSocial)
 
-    if (await createButton.isVisible()) {
-      await createButton.click()
-    } else {
-      // Try keyboard shortcut F3
-      await page.keyboard.press('F3')
-    }
+    await page.getByTestId('btn-save-cliente').click()
 
-    // Wait for form to appear
-    await page.waitForTimeout(300)
-
-    // Fill in form fields (adjust selectors based on actual HTML)
-    const codigoInput = page.locator('input[placeholder*="Código"], input[name="codigo"]').first()
-    const nombreInput = page.locator('input[placeholder*="Razón Social"], input[name="razonSocial"]').first()
-
-    if (await codigoInput.isVisible()) {
-      await codigoInput.fill(String(testCliente.codigo))
-    }
-
-    if (await nombreInput.isVisible()) {
-      await nombreInput.fill(testCliente.razonSocial)
-    }
-
-    // Try to save with F5 or button click
-    await page.keyboard.press('F5')
-
-    // Wait for save to complete
-    await page.waitForTimeout(500)
-
-    // Verify success (check for toast/notification or data in table)
-    // This is a basic check — adjust based on actual success indicators
-    const errorMessage = page.locator('[role="alert"]').filter({ hasText: 'Error' })
-    expect(await errorMessage.isVisible()).toBe(false)
+    await expect(page.getByTestId('cliente-form-dialog')).toBeHidden({ timeout: 20_000 })
+    await expect(page.getByTestId('clientes-table')).toBeVisible()
+    await expect(page.locator('[data-testid="clientes-table"] tbody tr').filter({ hasText: razonSocial })).toBeVisible()
   })
 
   // Test 6: Full workflow — Create artículo
