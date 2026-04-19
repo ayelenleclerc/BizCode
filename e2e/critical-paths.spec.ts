@@ -19,6 +19,9 @@ import { loginAsTestUser } from './helpers/auth'
 const TEST_PASSWORD = (process.env.BIZCODE_SEED_SUPERADMIN_PASSWORD ?? '').trim()
 
 test.describe('Critical Paths — Core Business Workflows', () => {
+  /** Invoice test needs cliente + artículo from prior tests in this block (fullyParallel can reorder without this). */
+  test.describe.configure({ mode: 'serial' })
+
   // Helper to generate unique values for each test run
   const generateId = () => Math.random().toString(36).substring(7).toUpperCase()
 
@@ -118,27 +121,51 @@ test.describe('Critical Paths — Core Business Workflows', () => {
     await expect(page.locator('[data-testid="articulos-table"] tbody tr').filter({ hasText: descripcion })).toBeVisible()
   })
 
-  // Test 7: Full workflow — Create factura
+  // Test 7: Full workflow — Create factura (depends on cliente + artículo above; BP1-2 / #66)
   test('Create a new factura (invoice)', async ({ page }) => {
     await loginAsTestUser(page, TEST_PASSWORD)
+    const invoiceNum = Math.floor(100_000 + Math.random() * 899_999)
+
     await page.goto('/facturacion', { waitUntil: 'networkidle' })
-    await page.waitForTimeout(500)
 
-    // Verify page loads
-    await expect(page.locator('#root')).toBeVisible()
+    await page.getByTestId('btn-nueva-factura').click()
+    await expect(page.getByTestId('nueva-factura-form')).toBeVisible()
 
-    // Look for "Nueva Factura" button or trigger
-    const newInvoiceButton = page.locator('button:has-text("Nueva"), button:has-text("Nueva Factura")').first()
+    const numeroInput = page.getByTestId('factura-form-numero')
+    await numeroInput.clear()
+    await numeroInput.fill(String(invoiceNum))
 
-    if (await newInvoiceButton.isVisible()) {
-      await newInvoiceButton.click()
-      await page.waitForTimeout(300)
-      // Form should appear for creating new invoice
-    }
+    const clienteSelect = page.getByTestId('factura-form-clienteId')
+    await expect(clienteSelect.locator('option')).not.toHaveCount(1, { timeout: 15_000 })
+    const clienteValue = await clienteSelect.locator('option').filter({ hasText: 'E2E Cliente' }).first().getAttribute('value')
+    expect(clienteValue, 'Se espera un cliente creado en el test anterior (E2E Cliente…)').toBeTruthy()
+    await clienteSelect.selectOption(clienteValue!)
 
-    // Verify form or page structure
-    // This is a simplified check — full invoice creation requires more interactions
-    await expect(page.locator('#root')).toBeVisible()
+    await page.getByTestId('btn-agregar-linea-factura').click()
+    const lineArticulo = page.getByTestId('factura-line-0-articulo')
+    await expect(lineArticulo.locator('option')).not.toHaveCount(1, { timeout: 15_000 })
+    const articuloValue = await lineArticulo.locator('option').filter({ hasText: 'E2E Artículo' }).first().getAttribute('value')
+    expect(articuloValue, 'Se espera un artículo creado en el test anterior (E2E Artículo…)').toBeTruthy()
+    await lineArticulo.selectOption(articuloValue!)
+
+    await expect(page.getByTestId('btn-save-factura')).toBeEnabled({ timeout: 10_000 })
+
+    const postFactura = page.waitForResponse((r) => {
+      const u = r.url()
+      return u.includes('/api/facturas') && r.request().method() === 'POST'
+    })
+    await page.getByTestId('btn-save-factura').click()
+    const postResp = await postFactura
+    expect(
+      postResp.ok(),
+      `POST /api/facturas → ${postResp.status()} ${(await postResp.text()).slice(0, 500)}`,
+    ).toBeTruthy()
+
+    await expect(page.getByTestId('btn-nueva-factura')).toBeVisible({ timeout: 20_000 })
+    await expect(page.getByTestId('nueva-factura-form')).toHaveCount(0)
+    await expect(page.getByTestId('facturas-table')).toBeVisible()
+    const paddedNum = String(invoiceNum).padStart(8, '0')
+    await expect(page.locator('[data-testid="facturas-table"] tbody tr').filter({ hasText: paddedNum })).toBeVisible()
   })
 
   // Test 8: Navigation between all main modules

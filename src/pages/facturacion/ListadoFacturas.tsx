@@ -50,6 +50,7 @@ export default function ListadoFacturas({ facturas, clientes, onFacturaVoided }:
         </div>
       ) : (
         <table
+          data-testid="facturas-table"
           className="w-full border-collapse bg-white dark:bg-slate-800 rounded border border-slate-200 dark:border-slate-700"
           aria-label={t('listTitle')}
         >
