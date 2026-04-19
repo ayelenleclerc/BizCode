@@ -52,7 +52,8 @@ export default function ArticuloForm({ articulo, rubros, onClose, onGuardado }: 
     resolver: zodResolver(articuloSchema) as any,
     defaultValues: (articulo || {
       condIva: '1',
-      umedida: 'U',
+      // Must be length ≥2 (zod + server/createApp.ts); single "U" blocked submit without surfacing umedida in E2E.
+      umedida: 'UN',
       minimo: 0,
       activo: true,
     }) as ArticuloFormData,
