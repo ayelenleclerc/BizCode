@@ -44,7 +44,7 @@ test.describe('Critical Paths — Core Business Workflows', () => {
     await loginAsTestUser(page, TEST_PASSWORD)
 
     // Navigate to clientes
-    await page.goto('/clientes', { waitUntil: 'networkidle' })
+    await page.goto('/clientes', { waitUntil: 'load' })
 
     // Page should load
     await expect(page.locator('#root')).toBeVisible()
@@ -53,7 +53,7 @@ test.describe('Critical Paths — Core Business Workflows', () => {
   // Test 3: Navigate to Artículos page
   test('Navigate to Artículos page', async ({ page }) => {
     await loginAsTestUser(page, TEST_PASSWORD)
-    await page.goto('/articulos', { waitUntil: 'networkidle' })
+    await page.goto('/articulos', { waitUntil: 'load' })
 
     await expect(page.locator('#root')).toBeVisible()
   })
@@ -61,7 +61,7 @@ test.describe('Critical Paths — Core Business Workflows', () => {
   // Test 4: Navigate to Facturación page
   test('Navigate to Facturación page', async ({ page }) => {
     await loginAsTestUser(page, TEST_PASSWORD)
-    await page.goto('/facturacion', { waitUntil: 'networkidle' })
+    await page.goto('/facturacion', { waitUntil: 'load' })
 
     await expect(page.locator('#root')).toBeVisible()
   })
@@ -73,7 +73,7 @@ test.describe('Critical Paths — Core Business Workflows', () => {
     const codigo = generateNumericCodigo()
     const razonSocial = `E2E Cliente ${generateId()}`
 
-    await page.goto('/clientes', { waitUntil: 'networkidle' })
+    await page.goto('/clientes', { waitUntil: 'load' })
 
     await page.getByTestId('btn-nuevo-cliente').click()
     await expect(page.getByTestId('cliente-form-dialog')).toBeVisible()
@@ -96,7 +96,7 @@ test.describe('Critical Paths — Core Business Workflows', () => {
     const codigo = generateNumericCodigo()
     const descripcion = `E2E Artículo ${id}`
 
-    await page.goto('/articulos', { waitUntil: 'networkidle' })
+    await page.goto('/articulos', { waitUntil: 'load' })
 
     await page.getByTestId('btn-nuevo-articulo').click()
     await expect(page.getByTestId('articulo-form-dialog')).toBeVisible()
@@ -126,7 +126,7 @@ test.describe('Critical Paths — Core Business Workflows', () => {
     await loginAsTestUser(page, TEST_PASSWORD)
     const invoiceNum = Math.floor(100_000 + Math.random() * 899_999)
 
-    await page.goto('/facturacion', { waitUntil: 'networkidle' })
+    await page.goto('/facturacion', { waitUntil: 'load' })
 
     await page.getByTestId('btn-nueva-factura').click()
     await expect(page.getByTestId('nueva-factura-form')).toBeVisible()
@@ -179,7 +179,7 @@ test.describe('Critical Paths — Core Business Workflows', () => {
     ]
 
     for (const module of modules) {
-      await page.goto(module.path, { waitUntil: 'networkidle' })
+      await page.goto(module.path, { waitUntil: 'load' })
       await expect(page.locator('#root')).toBeVisible()
 
       // Verify page title or content
@@ -191,7 +191,7 @@ test.describe('Critical Paths — Core Business Workflows', () => {
   // Test 9: Keyboard shortcuts work (F3 = New, F5 = Save)
   test('Keyboard shortcuts (F3=New, F5=Save, Esc=Cancel)', async ({ page }) => {
     await loginAsTestUser(page, TEST_PASSWORD)
-    await page.goto('/clientes', { waitUntil: 'networkidle' })
+    await page.goto('/clientes', { waitUntil: 'load' })
     await page.waitForTimeout(300)
 
     // F3 should trigger new
@@ -217,11 +217,11 @@ test.describe('Critical Paths — Core Business Workflows', () => {
     // Set mobile viewport
     await page.setViewportSize({ width: 375, height: 812 })
 
-    await page.goto('/', { waitUntil: 'networkidle' })
+    await page.goto('/', { waitUntil: 'load' })
     await expect(page.locator('#root')).toBeVisible()
 
     // Should still be navigable
-    await page.goto('/clientes', { waitUntil: 'networkidle' })
+    await page.goto('/clientes', { waitUntil: 'load' })
     await expect(page.locator('#root')).toBeVisible()
 
     // Reset to desktop
@@ -238,7 +238,7 @@ test.describe('Critical Paths — Data Validation', () => {
   // Test: CUIT validation (Argentine tax ID)
   test('Cliente creation validates CUIT format', async ({ page }) => {
     await loginAsTestUser(page, TEST_PASSWORD)
-    await page.goto('/clientes', { waitUntil: 'networkidle' })
+    await page.goto('/clientes', { waitUntil: 'load' })
     await page.waitForTimeout(500)
 
     // Trigger new cliente form
@@ -272,7 +272,7 @@ test.describe('Critical Paths — Data Validation', () => {
   // Test: Precio validation (must be positive)
   test('Artículo creation validates prices', async ({ page }) => {
     await loginAsTestUser(page, TEST_PASSWORD)
-    await page.goto('/articulos', { waitUntil: 'networkidle' })
+    await page.goto('/articulos', { waitUntil: 'load' })
     await page.waitForTimeout(500)
 
     // Trigger new artículo form

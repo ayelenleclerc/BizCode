@@ -14,7 +14,7 @@ test.describe('Accessibility — axe (critical surfaces)', () => {
 
   test('inicio after login has no axe violations', async ({ page }) => {
     await loginAsTestUser(page, TEST_PASSWORD)
-    await page.goto('/inicio', { waitUntil: 'networkidle' })
+    await page.goto('/inicio', { waitUntil: 'load' })
     const { violations } = await new AxeBuilder({ page }).analyze()
     expect(violations, JSON.stringify(violations, null, 2)).toHaveLength(0)
   })

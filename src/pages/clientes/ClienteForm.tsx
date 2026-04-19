@@ -45,6 +45,44 @@ interface ClienteFormProps {
   onGuardado: (cliente: Cliente) => void
 }
 
+/** Uso de crédito sin `style` inline (SVG + viewBox). Texto oculto para AT. */
+function ClienteCreditUsageBar({
+  balance,
+  creditLimit,
+  label,
+}: {
+  balance: number
+  creditLimit: number
+  label: string
+}) {
+  const usagePct = Math.min(100, (balance / creditLimit) * 100)
+  const pctRounded = Math.round(usagePct)
+  const fillClass =
+    balance > creditLimit
+      ? 'fill-red-500'
+      : balance / creditLimit > 0.8
+        ? 'fill-yellow-500'
+        : 'fill-green-500'
+
+  return (
+    <div className="mt-1 h-2 w-full overflow-hidden rounded-full" data-testid="cliente-credit-usage-bar">
+      <span className="sr-only">
+        {label}: {pctRounded}%
+      </span>
+      <svg
+        className="block h-2 w-full text-slate-200 dark:text-slate-600"
+        viewBox="0 0 100 2"
+        preserveAspectRatio="none"
+        aria-hidden
+        focusable="false"
+      >
+        <rect x={0} y={0} width={100} height={2} rx={1} className="fill-current" />
+        <rect x={0} y={0} width={usagePct} height={2} rx={1} className={fillClass} />
+      </svg>
+    </div>
+  )
+}
+
 export default function ClienteForm({ cliente, onClose, onGuardado }: ClienteFormProps) {
   const { t } = useTranslation('clientes')
   const { t: tc } = useTranslation('common')
@@ -385,20 +423,11 @@ export default function ClienteForm({ cliente, onClose, onGuardado }: ClienteFor
                     </p>
                     {/* Credit usage bar */}
                     {cliente.creditLimit != null && Number(cliente.creditLimit) > 0 && (
-                      <div className="mt-1 h-2 rounded-full bg-slate-200 dark:bg-slate-600 overflow-hidden">
-                        <div
-                          className={`h-2 rounded-full transition-all ${
-                            Number(cliente.balance) > Number(cliente.creditLimit)
-                              ? 'bg-red-500'
-                              : Number(cliente.balance) / Number(cliente.creditLimit) > 0.8
-                                ? 'bg-yellow-500'
-                                : 'bg-green-500'
-                          }`}
-                          style={{
-                            width: `${Math.min(100, (Number(cliente.balance) / Number(cliente.creditLimit)) * 100)}%`,
-                          }}
-                        />
-                      </div>
+                      <ClienteCreditUsageBar
+                        balance={Number(cliente.balance ?? 0)}
+                        creditLimit={Number(cliente.creditLimit)}
+                        label={t('form.financial.creditLimit')}
+                      />
                     )}
                   </div>
                 )}
