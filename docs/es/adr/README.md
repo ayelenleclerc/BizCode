@@ -15,5 +15,7 @@ Formato: estilo [Nygard](https://cognitect.com/blog/2011/11/15/documenting-archi
 | [ADR-0005](ADR-0005-vitest-coverage-server-bootstrap.md) | Alcance de cobertura Vitest — arranque `server.ts` | Aceptada | 2026-03-31 |
 | [ADR-0006](ADR-0006-release-and-tauri-ci-workflows.md) | CI opcional — semantic-release y build Tauri self-hosted | Aceptada | 2026-03-31 |
 | [ADR-0007](ADR-0007-dual-deployment-and-fiscal-modularity.md) | Despliegue dual (escritorio / SaaS) y modularidad fiscal | Aceptada | 2026-04-01 |
+| [ADR-0008](ADR-0008-suppliers-rbac.md) | RBAC para proveedores (`Proveedor`) | Aceptada | 2026-04-17 |
+| [ADR-0009](ADR-0009-entidad-pedido-diseno-previo-a-bp1-1.md) | Entidad pedido — solo diseño hasta BP1-1 | Aceptada | 2026-05-03 |
 
 **Otros idiomas:** [English](../../en/adr/README.md) · [Português](../../pt-br/adr/README.md)

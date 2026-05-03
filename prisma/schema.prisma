@@ -81,6 +81,7 @@ model Cliente {
 
   @@unique([tenantId, codigo])
   @@index([tenantId])
+  @@index([tenantId, codigo])
 }
 
 model Rubro {
@@ -94,6 +95,7 @@ model Rubro {
 
   @@unique([tenantId, codigo])
   @@index([tenantId])
+  @@index([tenantId, codigo])
 }
 
 model Articulo {
@@ -119,6 +121,7 @@ model Articulo {
 
   @@unique([tenantId, codigo])
   @@index([tenantId])
+  @@index([tenantId, codigo])
 }
 
 model Proveedor {
@@ -138,6 +141,7 @@ model Proveedor {
 
   @@unique([tenantId, codigo])
   @@index([tenantId])
+  @@index([tenantId, codigo])
 }
 
 model FormaPago {
@@ -174,6 +178,7 @@ model Factura {
 
   @@unique([tenantId, tipo, prefijo, numero])
   @@index([tenantId])
+  @@index([tenantId, fecha])
 }
 
 model FacturaItem {

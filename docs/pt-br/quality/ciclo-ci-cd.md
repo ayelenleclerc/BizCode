@@ -9,7 +9,7 @@ BizCode usa GitHub Actions. Definição: `.github/workflows/ci.yml`.
 ```
 push / pull_request → job quality (ubuntu-latest):
   checkout → Node 22 → npm ci → npm audit (informativo) → prisma generate → prisma migrate deploy →
-  type-check → docs:generate → git diff (docs gerados) → lint → test:coverage → check:i18n →
+  type-check → check:openapi → docs:generate → git diff (docs gerados / SBOM) → lint → test:coverage → check:i18n →
   playwright install chromium → test:e2e → test:integration → check:docs-map →
   artefato de cobertura
 ```
@@ -19,13 +19,14 @@ push / pull_request → job quality (ubuntu-latest):
 | Evento | Ramos |
 |---|---|
 | `push` | `main`, `develop` |
-| `pull_request` | para `main` |
+| `pull_request` | para `main` ou `develop` |
 
 ## Bloqueios
 
 | Etapa | Condição |
 |---|---|
 | type-check | Erro TypeScript |
+| check:openapi | Falha na validação OpenAPI 3.x de `docs/api/openapi.yaml` (`npm run check:openapi`) |
 | docs:generate + git diff | Divergência entre arquivos commitados e documentação regenerada (`docs/generated/`, `docs/api/openapi-reference.generated.md`, `docs/evidence/sbom-cyclonedx.json`) |
 | lint | Erro ou **warning** ESLint (`--max-warnings 0`) |
 | test:coverage | Falha de teste ou cobertura abaixo do limite |
@@ -95,6 +96,8 @@ Implementação:
 - **Fluxo opcional de aprovação:** `npm run plan:approve -- --plan <caminho>` arquiva uma cópia em `.cursor/plans/` e executa `plan:sync` (ver `scripts/github/plan-approve-main.ts`).
 - **Interação com a automação por PR:** Com itens no quadro, `.github/workflows/project-status-automation.yml` continua atualizando o status na abertura/fechamento/merge do PR quando o issue está ligado com `Closes #<issue>`.
 - **Higiene do quadro:** mantenha **Backlog** para trabalho que não está em andamento (sem PR aberto). Use **Ready** quando comprometido mas ainda sem PR; **In Progress** quando há PR aberto vinculado. Evite **In Progress** sem PR.
+
+**Pós-merge (mantenedor):** após merge do PR vinculado com `Closes #…`, verificar os issues encerrados no GitHub e confirmar que o projeto **BizCode Delivery** atualiza para **Done** quando aplicável (workflow `.github/workflows/project-status-automation.yml` com variáveis do repositório descritas acima).
 
 Checklist diário de uso:
 

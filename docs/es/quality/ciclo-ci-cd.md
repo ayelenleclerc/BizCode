@@ -9,7 +9,7 @@ BizCode usa GitHub Actions para integración continua. El pipeline está definid
 ```
 push / pull_request → job quality (ubuntu-latest):
   checkout → Node 22 → npm ci → npm audit (informativo) → prisma generate → prisma migrate deploy →
-  type-check → docs:generate → git diff (docs generados) → lint → test:coverage → check:i18n →
+  type-check → check:openapi → docs:generate → git diff (docs generados / SBOM) → lint → test:coverage → check:i18n →
   playwright install chromium → test:e2e → test:integration → check:docs-map →
   artefacto de cobertura
 ```
@@ -19,7 +19,7 @@ push / pull_request → job quality (ubuntu-latest):
 | Evento | Ramas |
 |---|---|
 | `push` | `main`, `develop` |
-| `pull_request` | hacia `main` |
+| `pull_request` | hacia `main` o `develop` |
 
 ## Condiciones de bloqueo
 
@@ -28,6 +28,7 @@ Un paso bloquea el pipeline (código de salida ≠ 0) cuando:
 | Paso | Condición |
 |---|---|
 | type-check | Cualquier error de compilación TypeScript |
+| check:openapi | Fallo de validación OpenAPI 3.x sobre `docs/api/openapi.yaml` (`npm run check:openapi`) |
 | docs:generate + git diff | Desalineación entre lo commitado y la documentación regenerada (`docs/generated/`, `docs/api/openapi-reference.generated.md`, `docs/evidence/sbom-cyclonedx.json`) |
 | lint | Cualquier error o **advertencia** de ESLint (`npm run lint` usa `--max-warnings 0`) |
 | test:coverage | Fallo de test O umbral de cobertura no cumplido |
@@ -105,6 +106,8 @@ Implementación:
 - **Flujo opcional de aprobación:** `npm run plan:approve -- --plan <ruta>` archiva una copia en `.cursor/plans/` y ejecuta `plan:sync` (véase `scripts/github/plan-approve-main.ts`).
 - **Relación con la automatización por PR:** Con los ítems en el tablero, `.github/workflows/project-status-automation.yml` sigue actualizando el estado al abrir/cerrar/mergear PR cuando el issue está enlazado con `Closes #<issue>`.
 - **Higiene del tablero:** deja **Backlog** para trabajo que no esté en curso (sin PR abierto). Usa **Ready** si está comprometido pero aún sin PR; **In Progress** cuando hay un PR abierto enlazado. Evita **In Progress** sin PR.
+
+**Post-merge (mantenedor):** tras merge del PR enlazado con `Closes #…`, revisar que los issues se cerraron en GitHub y confirmar que el proyecto **BizCode Delivery** mueve los ítems a **Done** cuando corresponde (workflow `.github/workflows/project-status-automation.yml` y variables del repositorio documentadas más arriba).
 
 Checklist de uso diario:
 
