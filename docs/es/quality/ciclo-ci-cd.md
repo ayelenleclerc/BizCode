@@ -51,7 +51,7 @@ Un paso bloquea el pipeline (código de salida ≠ 0) cuando:
 | Paridad i18n | Claves coherentes entre locales respecto de `es` | `npm run check:i18n` |
 | Estructura docs humanos | Existencia de rutas del mapa (`DOCUMENT_LOCALE_MAP.md`) | `check:docs-map` |
 | Política de localización docs | Áreas controladas trilingües EN/ES/PT-BR | `docs-governance.yml` (**PR a `main` y `develop`**) |
-| Enlaces externos en Markdown (`docs/**`) | HTTP(S) rotos (`mlc_config.json` ignora localhost) | `docs-links.yml` (filtro de rutas) |
+| Enlaces externos en Markdown (`docs/**`) | Destinos HTTP(S) vivos (**Lychee**; loopback en `.lycheeignore`). Los enlaces relativos entre `.md` no entran en este job. | `docs-links.yml` |
 
 ## Servicios
 
@@ -93,7 +93,7 @@ La rama **huérfana** `documentacion` **no** contiene código de aplicación: so
 - [x] Tests de integración con PostgreSQL real (fase B, ADR-0004) — `tests/integration/`, `npm run test:integration`
 - [x] Build Tauri en runner self-hosted — `.github/workflows/tauri-selfhosted.yml` (`workflow_dispatch`) — [ADR-0006](../adr/ADR-0006-release-and-tauri-ci-workflows.md)
 - [x] semantic-release — `release.config.cjs`, `.github/workflows/release.yml` — [ADR-0006](../adr/ADR-0006-release-and-tauri-ci-workflows.md)
-- [x] Enlaces Markdown (`docs/**`) — `docs-links.yml` + `mlc_config.json`
+- [x] Enlaces HTTP(S) en `docs/` — `docs-links.yml` + `.lycheeignore` (Lychee; no enlaces relativos `.md`)
 
 ## Flujo automático de Project (GitHub)
 

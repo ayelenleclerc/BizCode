@@ -1,0 +1,6 @@
+# Excluye destinos locales / no externos en el chequeo automatizado HTTP(S).
+# Enlaces relativos entre .md siguen cubiertos por check:docs-map y revisión editorial.
+http://localhost
+http://127.0.0.1
+https://localhost
+https://127.0.0.1

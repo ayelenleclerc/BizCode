@@ -49,7 +49,7 @@ push / pull_request → job quality (ubuntu-latest):
 | i18n | Paridade de namespaces vs. fonte `es` | `check:i18n` |
 | Estrutura de docs humanos | Paths do mapa (`DOCUMENT_LOCALE_MAP.md`) | `check:docs-map` |
 | Política de localização docs | Roots controlados trilingues EN/ES/PT-BR | `docs-governance.yml` (**PR para `main` e `develop`**) |
-| Links externos em Markdown (`docs/**`) | URLs HTTP(S) mortas (`mlc_config.json`) | `docs-links.yml` |
+| Links externos em Markdown (`docs/**`) | Destinos HTTP(S) ativos (**Lychee**; loopback em `.lycheeignore`). Links relativos entre `.md` ficam fora deste job. | `docs-links.yml` |
 
 ## Serviços
 
@@ -83,7 +83,7 @@ O branch **órfão** `documentacion` **não** contém código da aplicação —
 - [x] Testes de integração com PostgreSQL (fase B, ADR-0004) — `tests/integration/`, `npm run test:integration`
 - [x] Build Tauri em runner self-hosted — `.github/workflows/tauri-selfhosted.yml` (`workflow_dispatch`) — [ADR-0006](../adr/ADR-0006-release-and-tauri-ci-workflows.md)
 - [x] semantic-release — `release.config.cjs`, `.github/workflows/release.yml` — [ADR-0006](../adr/ADR-0006-release-and-tauri-ci-workflows.md)
-- [x] Links Markdown em `docs/` — `docs-links.yml` + `mlc_config.json`
+- [x] Links HTTP(S) em `docs/` — `docs-links.yml` + `.lycheeignore` (Lychee; sem checagem de links relativos `.md`)
 
 ## Automação de status do Project (GitHub)
 

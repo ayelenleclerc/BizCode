@@ -70,7 +70,7 @@ push / pull_request
 | i18n key parity | All locales aligned to source `es` | `npm run check:i18n` |
 | Human docs structure | Locale map completeness | `check:docs-map` |
 | Human docs localization policy | Controlled roots must stay trilingual EN/ES/PT-BR | `docs-governance.yml` (**PR to `main` and `develop`**) |
-| External links in Markdown (under `docs/`) | Broken HTTP(S) URLs (excluding localhost patterns in `mlc_config.json`) | `docs-links.yml` (paths filter) |
+| External links in Markdown (under `docs/`) | HTTP(S) targets alive (**Lychee**; loopback en `.lycheeignore`). Enlaces relativos entre `.md` no se validan aquí (mapa + revisión). | `docs-links.yml` |
 
 ## Services
 
@@ -106,7 +106,7 @@ The **orphan** branch `documentacion` contains **no application source** — onl
 - [x] PostgreSQL-backed integration tests (Phase B, ADR-0004) — `tests/integration/`, `npm run test:integration`
 - [x] **Tauri build on self-hosted runner** — `.github/workflows/tauri-selfhosted.yml` (`workflow_dispatch` only) — [ADR-0006](../adr/ADR-0006-release-and-tauri-ci-workflows.md)
 - [x] **semantic-release** — `release.config.cjs`, `.github/workflows/release.yml` (`workflow_dispatch` on `main`) — [ADR-0006](../adr/ADR-0006-release-and-tauri-ci-workflows.md)
-- [x] **Markdown links (under `docs/`)** — `.github/workflows/docs-links.yml`, `mlc_config.json`
+- [x] **External HTTP(S) links in `docs/`** — `.github/workflows/docs-links.yml`, `.lycheeignore` (Lychee; not relative `.md` cross-links)
 
 ## Project status automation (GitHub)
 

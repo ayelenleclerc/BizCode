@@ -1,5 +1,5 @@
-# Verificación de enlaces externos en Markdown bajo docs/ (bloqueante en PR).
-# Relativo a ISO/IEC 12207 evidencia documental cuando corresponda.
+# Comprueba sólo enlaces HTTP(S) en Markdown bajo docs/ (Lychee).
+# Evita usar markdown-link-check con rutas relativas a .md, que este runner trata como URLs y marca 400.
 name: Documentation links check
 
 on:
@@ -7,23 +7,31 @@ on:
     branches: [main, develop]
     paths:
       - 'docs/**'
-      - 'mlc_config.json'
       - '.github/workflows/docs-links.yml'
+      - '.lycheeignore'
   workflow_dispatch:
 
 permissions:
   contents: read
 
 jobs:
-  markdown-links:
-    name: Markdown link check (docs)
+  lychee-docs:
+    name: External HTTP(S) link check (docs)
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - uses: gaurav-nelson/github-action-markdown-link-check@v1
+      - name: Run Lychee (https + http sólo)
+        uses: lycheeverse/lychee-action@v2
         with:
-          use-quiet-mode: 'yes'
-          folder-path: 'docs'
-          config-file: 'mlc_config.json'
+          args: >-
+            --no-progress
+            --verbose
+            --scheme https
+            --scheme http
+            --exclude-mail
+            --max-concurrency 8
+            './docs/**/*.md'
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fail: true
