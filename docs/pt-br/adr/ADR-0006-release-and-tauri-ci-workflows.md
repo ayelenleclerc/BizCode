@@ -21,6 +21,12 @@ O pipeline padrão ([ciclo-ci-cd.md](../quality/ciclo-ci-cd.md)) não publica re
 - **Positivo:** automação opcional documentada; o gate de qualidade padrão não muda.
 - **Negativo:** semantic-release e Tauri exigem disparo manual e runner adequado.
 
+## Gate de release (operador / desktop)
+
+1. **`main`** precisa estar verde no **Quality Gate** (`ci.yml`): API, documentação gerada consistente, ESLint, thresholds Vitest em `vitest.config.ts`, Playwright (`vite build` + preview) e PostgreSQL nos testes de integração.
+2. Antes de publicar instaladores desktop, rode **Actions → Tauri self-hosted** (`tauri-selfhosted.yml`) em runner próprio com Rust + WebView. **Não roda em todo PR** e não substitui o gate web descrito como *Fora do CI* em [ciclo-ci-cd.md](../quality/ciclo-ci-cd.md).
+3. Com semantic-release/tag, dispare **`release.yml`** (`workflow_dispatch` na `main`) após confirmar (2).
+
 ## Referências
 
 - [ciclo-ci-cd.md](../quality/ciclo-ci-cd.md)

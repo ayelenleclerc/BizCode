@@ -1,0 +1,29 @@
+# Verificación de enlaces externos en Markdown bajo docs/ (bloqueante en PR).
+# Relativo a ISO/IEC 12207 evidencia documental cuando corresponda.
+name: Documentation links check
+
+on:
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - 'docs/**'
+      - 'mlc_config.json'
+      - '.github/workflows/docs-links.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  markdown-links:
+    name: Markdown link check (docs)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - uses: gaurav-nelson/github-action-markdown-link-check@v1
+        with:
+          use-quiet-mode: 'yes'
+          folder-path: 'docs'
+          config-file: 'mlc_config.json'

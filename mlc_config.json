@@ -1,0 +1,8 @@
+{
+  "aliveStatusCodes": [200, 206, 403, 408, 429],
+  "ignorePatterns": [
+    { "pattern": "^mailto:" },
+    { "pattern": "^http://127\\.0\\.0\\.1" },
+    { "pattern": "^http://localhost" }
+  ]
+}

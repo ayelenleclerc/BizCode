@@ -2,7 +2,7 @@ name: Docs governance guard
 
 on:
   pull_request:
-    branches: [main]
+    branches: [main, develop]
 
 jobs:
   docs-governance:

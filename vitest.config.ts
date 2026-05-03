@@ -21,19 +21,21 @@ export default defineConfig({
       provider: 'v8',
       reporter: ['text', 'lcov', 'html'],
       reportsDirectory: './coverage',
-      // Ratchet hacia 100% conforme crezca la suite; evita bloquear CI con objetivo irreal hoy.
+      // Umbrales globales tras ampliar `include` a `server/**` y `src/**` (antes ~88% sólo sobre `src/lib` + entry server). Ratchet ascendente cuando suba la cobertura de páginas React.
       thresholds: {
-        lines: 88,
-        functions: 88,
-        branches: 70,
-        statements: 82,
+        lines: 66,
+        functions: 55,
+        branches: 44,
+        statements: 64,
       },
-      include: ['src/lib/**/*.ts', 'server/createApp.ts', 'server.ts'],
+      include: ['server/**/*.ts', 'server.ts', 'src/**/*.{ts,tsx}'],
       exclude: [
-        'src/lib/**/*.test.ts',
+        '**/*.test.ts',
+        '**/*.test.tsx',
         '**/*.d.ts',
         'server/main.ts',
-        // Barrel de re-export sin lógica; no aporta a la métrica y arrastra líneas sin ejecutar.
+        'server/createApp.types.ts',
+        'src/types.ts',
         'src/lib/plan-sync/index.ts',
       ],
     },

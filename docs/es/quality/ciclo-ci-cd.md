@@ -8,7 +8,7 @@ BizCode usa GitHub Actions para integración continua. El pipeline está definid
 
 ```
 push / pull_request → job quality (ubuntu-latest):
-  checkout → Node 22 → npm ci → npm audit (informativo) → prisma generate → prisma migrate deploy →
+  checkout → Node 22 → npm ci → npm audit (informativo) → prisma generate → prisma validate → prisma migrate deploy →
   type-check → check:openapi → docs:generate → git diff (docs generados / SBOM) → lint → test:coverage → check:i18n →
   playwright install chromium → test:e2e → test:integration → check:docs-map →
   artefacto de cobertura
@@ -27,6 +27,7 @@ Un paso bloquea el pipeline (código de salida ≠ 0) cuando:
 
 | Paso | Condición |
 |---|---|
+| prisma validate | `schema.prisma` inválido según Prisma (sin mutar PostgreSQL) |
 | type-check | Cualquier error de compilación TypeScript |
 | check:openapi | Fallo de validación OpenAPI 3.x sobre `docs/api/openapi.yaml` (`npm run check:openapi`) |
 | docs:generate + git diff | Desalineación entre lo commitado y la documentación regenerada (`docs/generated/`, `docs/api/openapi-reference.generated.md`, `docs/evidence/sbom-cyclonedx.json`) |
@@ -36,6 +37,21 @@ Un paso bloquea el pipeline (código de salida ≠ 0) cuando:
 | test:e2e | Fallo de Playwright (incluye `vite build` + preview; ver [ADR-0004](../adr/ADR-0004-e2e-playwright-integration-roadmap.md)) |
 | test:integration | Fallo en pruebas `tests/integration/` (Prisma real sobre PostgreSQL) |
 | check:docs-map | Ruta del mapa documental inexistente en disco |
+
+## Matriz de trazabilidad (PR → `develop` / `main`)
+
+| Superficie | Qué se verifica | Workflow(s) típico(s) |
+|---|---|---|
+| Compilación TypeScript | Árbol completo del `tsconfig` (`src`, `server`, `tests`, `e2e`, …) | `ci.yml` → `npm run type-check` |
+| API vs contrato | OpenAPI + drift de esquemas / MD generados | `ci.yml` → `check:openapi`, `docs:generate`, `git diff` |
+| Ciclo de vida del esquema BD | `prisma generate`, `prisma validate`, migraciones o `db push`, seed usado en pruebas | `ci.yml`; `backend-validation.yml` (rutas) refuerzo de migraciones |
+| Cobertura de líneas/ramas (Vitest/v8) | Umbrales sobre **`server/**/*.ts`**, `server.ts` y **`src/**/*.{ts,tsx}`**, excluyendo tests, barrels solo re-export y tipados (`coverage.exclude` en `vitest.config.ts`). **No todo el repo** (scripts auxiliares, seed aislado, etc.) no entra | `ci.yml`, `frontend-validation.yml`, `qa-validation.yml` → `test:coverage` |
+| Integración PostgreSQL | `tests/integration/**` **sin instrumentación de cobertura de líneas** (`vitest.integration.config.ts`) | `ci.yml`, `backend-validation.yml` |
+| Bundle web producción | `vite build` vía `webServer` de Playwright antes del smoke UI | `ci.yml`, `frontend-validation.yml` → `test:e2e` |
+| Paridad i18n | Claves coherentes entre locales respecto de `es` | `npm run check:i18n` |
+| Estructura docs humanos | Existencia de rutas del mapa (`DOCUMENT_LOCALE_MAP.md`) | `check:docs-map` |
+| Política de localización docs | Áreas controladas trilingües EN/ES/PT-BR | `docs-governance.yml` (**PR a `main` y `develop`**) |
+| Enlaces externos en Markdown (`docs/**`) | HTTP(S) rotos (`mlc_config.json` ignora localhost) | `docs-links.yml` (filtro de rutas) |
 
 ## Servicios
 
@@ -57,6 +73,8 @@ El job inicia **PostgreSQL 16** (`DATABASE_URL` configurada). Tras `prisma migra
 
 **Alternativa:** build local con `npm run tauri build` o `npm run tauri dev`.
 
+**Gate manual de escritorio:** una vez **`main`** verde, ejecutar **Actions → build Tauri self-hosted** (`tauri-selfhosted.yml`) antes de publicar instaladores; el tagging con semantic-release permanece aparte (`release.yml`). Detalle: [ADR-0006](../adr/ADR-0006-release-and-tauri-ci-workflows.md).
+
 ## Rama huérfana `documentacion`
 
 La rama **huérfana** `documentacion` **no** contiene código de aplicación: solo una instantánea documental para publicación estática (p. ej. GitHub Pages).
@@ -75,6 +93,7 @@ La rama **huérfana** `documentacion` **no** contiene código de aplicación: so
 - [x] Tests de integración con PostgreSQL real (fase B, ADR-0004) — `tests/integration/`, `npm run test:integration`
 - [x] Build Tauri en runner self-hosted — `.github/workflows/tauri-selfhosted.yml` (`workflow_dispatch`) — [ADR-0006](../adr/ADR-0006-release-and-tauri-ci-workflows.md)
 - [x] semantic-release — `release.config.cjs`, `.github/workflows/release.yml` — [ADR-0006](../adr/ADR-0006-release-and-tauri-ci-workflows.md)
+- [x] Enlaces Markdown (`docs/**`) — `docs-links.yml` + `mlc_config.json`
 
 ## Flujo automático de Project (GitHub)
 
@@ -114,7 +133,7 @@ Checklist de uso diario:
 1. Crear issue con template `Task`.
 2. Agregar issue al Project.
 3. Abrir PR con `Closes #<issue>`.
-4. Verificar checks (`Quality Gate`, `Docs governance`, seguridad).
+4. Verificar checks (`Quality Gate`, `Docs governance`, enlaces Markdown en `docs/`, seguridad/CodeQL si aplica).
 5. Mergear cuando CI esté verde.
 
 Política de documentación (Wiki vs controlada):
