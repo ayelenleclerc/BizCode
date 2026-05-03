@@ -1,0 +1,37 @@
+{
+  "title": "Zonas de entrega",
+  "new": "Nova zona",
+  "edit": "Editar zona",
+  "empty": "Nenhuma zona de entrega cadastrada",
+  "table": {
+    "nombre": "Nome",
+    "tipo": "Tipo",
+    "diasEntrega": "Dias",
+    "horario": "Horário",
+    "activo": "Ativo"
+  },
+  "form": {
+    "nombre": "Nome",
+    "nombrePlaceholder": "Ex.: Bairro Centro",
+    "tipo": "Tipo",
+    "diasEntrega": "Dias de entrega",
+    "diasEntregaHint": "Números separados por vírgula, ex.: 1,3,5 (segunda, quarta, sexta)",
+    "horario": "Horário",
+    "horarioPlaceholder": "Ex.: 08:00-12:00",
+    "activo": "Ativo"
+  },
+  "tipos": {
+    "barrio": "Bairro",
+    "manual": "Manual",
+    "predefinida": "Predefinida"
+  },
+  "errors": {
+    "nombreRequired": "O nome da zona é obrigatório",
+    "loadFailed": "Não foi possível carregar as zonas de entrega",
+    "saveFailed": "Não foi possível salvar a zona de entrega"
+  },
+  "cliente": {
+    "label": "Zona de entrega",
+    "none": "Sem zona atribuída"
+  }
+}

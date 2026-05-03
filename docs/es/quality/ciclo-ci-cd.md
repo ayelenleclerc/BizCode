@@ -75,4 +75,46 @@ La rama **huérfana** `documentacion` **no** contiene código de aplicación: so
 - [x] Build Tauri en runner self-hosted — `.github/workflows/tauri-selfhosted.yml` (`workflow_dispatch`) — [ADR-0006](../adr/ADR-0006-release-and-tauri-ci-workflows.md)
 - [x] semantic-release — `release.config.cjs`, `.github/workflows/release.yml` — [ADR-0006](../adr/ADR-0006-release-and-tauri-ci-workflows.md)
 
+## Flujo automático de Project (GitHub)
+
+Estado operativo validado para el board `BizCode Delivery`:
+
+- Abrir PR con referencia `Closes #<issue>` -> estado `In Progress`.
+- Cerrar PR sin merge -> estado `Backlog`.
+- Merge de PR -> estado `Done`.
+
+Implementación:
+
+- Workflow: `.github/workflows/project-status-automation.yml`
+- Variables requeridas en repo:
+  - `PROJECT_V2_ID`
+  - `PROJECT_STATUS_FIELD_ID`
+  - `PROJECT_STATUS_OPTION_BACKLOG`
+  - `PROJECT_STATUS_OPTION_IN_PROGRESS`
+  - `PROJECT_STATUS_OPTION_DONE`
+  - `PROJECT_STATUS_OPTION_BLOCKED` (opcional)
+- Secreto recomendado para tableros de usuario (Project V2):
+  - `PROJECT_AUTOMATION_TOKEN` (`repo`, `project`, `read:project`)
+
+## Plan Cursor → Issues de GitHub + Project (herramienta local)
+
+- **Validación en CI (sin token):** `.github/workflows/plan-md-validate.yml` ejecuta `npm run plan:validate` en PR y en push a `main` / `develop`. Por defecto solo valida `tests/plan-sync/fixtures/valid-*.plan.md` (contrato + etiquetas). En local, `npm run plan:validate -- --with-cursor-plans` también revisa `.cursor/plans/*.plan.md` si existe esa carpeta.
+- **Sincronización local:** `npm run plan:sync -- --plan <ruta.plan.md> [--repo propietario/repo] [--repo-root <dir>] [--dry-run]` crea o actualiza un issue por todo del plan, enlaza al Project v2, ajusta el estado del tablero según el todo y guarda el mapeo en `.github/plan-sync/state/`. Fuera de `--dry-run` hace falta `GH_TOKEN` o `GITHUB_TOKEN`, `GITHUB_REPOSITORY` (o `GITHUB_OWNER` + `GITHUB_REPO`, o `--repo`) y las mismas variables de Project que arriba. Los informes van a `.github/plan-sync/reports/` (ignorados por git).
+- **Flujo opcional de aprobación:** `npm run plan:approve -- --plan <ruta>` archiva una copia en `.cursor/plans/` y ejecuta `plan:sync` (véase `scripts/github/plan-approve-main.ts`).
+- **Relación con la automatización por PR:** Con los ítems en el tablero, `.github/workflows/project-status-automation.yml` sigue actualizando el estado al abrir/cerrar/mergear PR cuando el issue está enlazado con `Closes #<issue>`.
+
+Checklist de uso diario:
+
+1. Crear issue con template `Task`.
+2. Agregar issue al Project.
+3. Abrir PR con `Closes #<issue>`.
+4. Verificar checks (`Quality Gate`, `Docs governance`, seguridad).
+5. Mergear cuando CI esté verde.
+
+Política de documentación (Wiki vs controlada):
+
+- Operativo/rápido en Wiki.
+- Auditable/controlado en repo (`docs/` y `Certificación-ISO/`).
+- Referencia: [política Wiki vs documentación controlada](politica-wiki-vs-documentacion-controlada.md).
+
 **Otros idiomas:** [English](../../en/quality/ci-cd.md) · [Português](../../pt-br/quality/ciclo-ci-cd.md)

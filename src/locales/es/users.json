@@ -1,0 +1,68 @@
+{
+  "title": "Usuarios",
+  "search": {
+    "placeholder": "Buscar por usuario... (F2)"
+  },
+  "table": {
+    "username": "Usuario",
+    "role": "Rol",
+    "channels": "Canales",
+    "active": "Activo"
+  },
+  "empty": "No hay usuarios. Creá uno con F3.",
+  "form": {
+    "titleNew": "Nuevo Usuario",
+    "titleEdit": "Editar Usuario — {{username}}",
+    "hint": "F5=guardar, Esc=cancelar",
+    "username": "Usuario",
+    "password": "Contraseña",
+    "passwordPlaceholder": "Mín. 8 caracteres",
+    "role": "Rol",
+    "channels": "Canales",
+    "active": "Activo",
+    "channelOptions": {
+      "counter": "Mostrador",
+      "field": "Campo",
+      "backoffice": "Back Office",
+      "warehouse": "Depósito",
+      "delivery": "Reparto"
+    },
+    "roleOptions": {
+      "super_admin": "Super Admin",
+      "owner": "Propietario",
+      "manager": "Gerente",
+      "seller": "Vendedor",
+      "backoffice": "Back Office",
+      "warehouse_op": "Operador de Depósito",
+      "warehouse_lead": "Jefe de Depósito",
+      "logistics_planner": "Planificador Logístico",
+      "driver": "Chofer",
+      "billing": "Facturación",
+      "cashier": "Cajero",
+      "collections": "Cobranzas",
+      "finance": "Finanzas",
+      "auditor": "Auditor"
+    },
+    "errors": {
+      "username": "El usuario debe tener al menos 3 caracteres",
+      "password": "La contraseña debe tener al menos 8 caracteres",
+      "role": "El rol es requerido",
+      "duplicate": "El nombre de usuario ya existe",
+      "generic": "Error al guardar usuario"
+    }
+  },
+  "changePassword": {
+    "title": "Cambiar Contraseña",
+    "currentPassword": "Contraseña Actual",
+    "newPassword": "Nueva Contraseña",
+    "newPasswordPlaceholder": "Mín. 8 caracteres",
+    "hint": "F5=guardar, Esc=cancelar",
+    "errors": {
+      "currentPassword": "La contraseña actual es requerida",
+      "newPassword": "La nueva contraseña debe tener al menos 8 caracteres",
+      "incorrect": "La contraseña actual es incorrecta",
+      "generic": "Error al cambiar la contraseña"
+    },
+    "success": "Contraseña cambiada correctamente"
+  }
+}

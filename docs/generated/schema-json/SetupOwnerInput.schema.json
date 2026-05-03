@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "password": {
+      "minLength": 8,
+      "type": "string"
+    },
+    "tenantName": {
+      "minLength": 2,
+      "type": "string"
+    },
+    "tenantSlug": {
+      "minLength": 2,
+      "type": "string"
+    },
+    "username": {
+      "minLength": 3,
+      "type": "string"
+    }
+  },
+  "required": [
+    "tenantName",
+    "tenantSlug",
+    "username",
+    "password"
+  ],
+  "title": "SetupOwnerInput",
+  "type": "object"
+}

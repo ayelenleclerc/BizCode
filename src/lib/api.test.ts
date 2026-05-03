@@ -1,30 +1,202 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 // Crear los mocks hoisted para que estén disponibles en la factory de vi.mock
-const { mockGet, mockPost, mockPut } = vi.hoisted(() => ({
-  mockGet: vi.fn(),
-  mockPost: vi.fn(),
-  mockPut: vi.fn(),
-}))
+const { mockGet, mockPost, mockPut, mockCreate } = vi.hoisted(() => {
+  const mockGet = vi.fn()
+  const mockPost = vi.fn()
+  const mockPut = vi.fn()
+  const mockCreate = vi.fn(() => ({ get: mockGet, post: mockPost, put: mockPut }))
+  return { mockGet, mockPost, mockPut, mockCreate }
+})
 
 vi.mock('axios', () => ({
   default: {
-    create: vi.fn(() => ({ get: mockGet, post: mockPost, put: mockPut })),
+    create: mockCreate,
   },
 }))
 
 // Importar después del mock
 import {
-  clientesAPI,
+  ApiRequestFailedError,
+  authAPI,
   articulosAPI,
-  rubrosAPI,
-  formasPagoAPI,
-  facturasAPI,
   checkAPI,
+  clientesAPI,
+  facturasAPI,
+  formasPagoAPI,
+  getAuthErrorI18nKey,
+  notifChannelsAPI,
+  rubrosAPI,
+  usersAPI,
+  zonasEntregaAPI,
 } from './api'
 
 beforeEach(() => {
-  vi.clearAllMocks()
+  mockGet.mockClear()
+  mockPost.mockClear()
+  mockPut.mockClear()
+})
+
+describe('getAuthErrorI18nKey', () => {
+  it('mapea Invalid credentials', () => {
+    expect(
+      getAuthErrorI18nKey(new ApiRequestFailedError('Invalid credentials', { hasResponse: true })),
+    ).toBe('auth.errors.invalidCredentials')
+  })
+
+  it('mapea Error genérico con mensaje Invalid credentials (legacy)', () => {
+    expect(getAuthErrorI18nKey(new Error('Invalid credentials'))).toBe('auth.errors.invalidCredentials')
+  })
+
+  it('mapea ERR_NETWORK sin respuesta', () => {
+    expect(
+      getAuthErrorI18nKey(
+        new ApiRequestFailedError('Network Error', { axiosCode: 'ERR_NETWORK', hasResponse: false }),
+      ),
+    ).toBe('auth.errors.network')
+  })
+
+  it('mapea mensaje Network Error sin código', () => {
+    expect(getAuthErrorI18nKey(new ApiRequestFailedError('Network Error', { hasResponse: false }))).toBe(
+      'auth.errors.network',
+    )
+  })
+
+  it('mapea Failed to fetch sin respuesta', () => {
+    expect(getAuthErrorI18nKey(new ApiRequestFailedError('Failed to fetch', { hasResponse: false }))).toBe(
+      'auth.errors.network',
+    )
+  })
+
+  it('mapea sin respuesta y mensaje no reconocido a red (fallback)', () => {
+    expect(getAuthErrorI18nKey(new ApiRequestFailedError('Unknown error', { hasResponse: false }))).toBe(
+      'auth.errors.network',
+    )
+  })
+
+  it('mapea timeout por texto en el mensaje', () => {
+    expect(getAuthErrorI18nKey(new ApiRequestFailedError('timeout exceeded', { hasResponse: false }))).toBe(
+      'auth.errors.timeout',
+    )
+  })
+
+  it('mapea ECONNABORTED a timeout', () => {
+    expect(
+      getAuthErrorI18nKey(
+        new ApiRequestFailedError('timeout of 10000ms exceeded', {
+          axiosCode: 'ECONNABORTED',
+          hasResponse: false,
+        }),
+      ),
+    ).toBe('auth.errors.timeout')
+  })
+
+  it('mapea ETIMEDOUT a timeout', () => {
+    expect(
+      getAuthErrorI18nKey(new ApiRequestFailedError('socket hang up', { axiosCode: 'ETIMEDOUT', hasResponse: false })),
+    ).toBe('auth.errors.timeout')
+  })
+
+  it('mapea respuesta HTTP con cuerpo de error a genérico salvo Invalid credentials', () => {
+    expect(
+      getAuthErrorI18nKey(new ApiRequestFailedError('Something broke', { axiosCode: 'ERR_BAD_RESPONSE', hasResponse: true })),
+    ).toBe('auth.errors.generic')
+  })
+
+  it('mapea desconocido a genérico', () => {
+    expect(getAuthErrorI18nKey('string')).toBe('auth.errors.generic')
+  })
+})
+
+describe('API client (axios)', () => {
+  it('crea la instancia con withCredentials y baseURL del API', () => {
+    expect(mockCreate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        baseURL: 'http://localhost:3001/api',
+        timeout: 10000,
+        withCredentials: true,
+      }),
+    )
+  })
+})
+
+// ════════════════════════════════════════════════════════════
+// authAPI
+// ════════════════════════════════════════════════════════════
+describe('authAPI', () => {
+  describe('login', () => {
+    it('retorna data en el happy path', async () => {
+      const payload = { userId: 1, tenantId: 2, username: 'a', role: 'owner' }
+      mockPost.mockResolvedValueOnce({ data: { data: payload } })
+      const result = await authAPI.login({ tenantSlug: 'demo', username: 'a', password: 'x' })
+      expect(result).toEqual(payload)
+      expect(mockPost).toHaveBeenCalledWith('/auth/login', {
+        tenantSlug: 'demo',
+        username: 'a',
+        password: 'x',
+      })
+    })
+
+    it('lanza error del servidor', async () => {
+      mockPost.mockRejectedValueOnce(axiosErrorWithResponse('Invalid credentials'))
+      await expect(authAPI.login({ tenantSlug: 'd', username: 'u', password: 'p' })).rejects.toThrow(
+        'Invalid credentials',
+      )
+    })
+
+    it('lanza ApiRequestFailedError en fallo de red', async () => {
+      const err = Object.assign(new Error('Network Error'), {
+        code: 'ERR_NETWORK' as const,
+      })
+      mockPost.mockRejectedValueOnce(err)
+      await expect(authAPI.login({ tenantSlug: 'd', username: 'u', password: 'p' })).rejects.toMatchObject({
+        name: 'ApiRequestFailedError',
+        message: 'Network Error',
+        axiosCode: 'ERR_NETWORK',
+        hasResponse: false,
+      })
+    })
+  })
+
+  describe('logout', () => {
+    it('retorna loggedOut', async () => {
+      mockPost.mockResolvedValueOnce({ data: { data: { loggedOut: true } } })
+      expect(await authAPI.logout()).toEqual({ loggedOut: true })
+      expect(mockPost).toHaveBeenCalledWith('/auth/logout')
+    })
+
+    it('lanza error del servidor', async () => {
+      mockPost.mockRejectedValueOnce(axiosErrorWithResponse('fail'))
+      await expect(authAPI.logout()).rejects.toThrow('fail')
+    })
+  })
+
+  describe('me', () => {
+    it('retorna claims', async () => {
+      const claims = {
+        userId: 1,
+        tenantId: 1,
+        username: 'u',
+        role: 'owner',
+        permissions: ['customers.read'],
+        scope: {
+          tenantId: 1,
+          branchIds: [],
+          warehouseIds: [],
+          routeIds: [],
+          channels: ['counter'],
+        },
+      }
+      mockGet.mockResolvedValueOnce({ data: { data: claims } })
+      expect(await authAPI.me()).toEqual(claims)
+      expect(mockGet).toHaveBeenCalledWith('/auth/me')
+    })
+
+    it('lanza error cuando no hay sesión', async () => {
+      mockGet.mockRejectedValueOnce(axiosErrorWithResponse('Authentication required'))
+      await expect(authAPI.me()).rejects.toThrow('Authentication required')
+    })
+  })
 })
 
 // ────────────────────────────────────────────────────────────
@@ -251,6 +423,220 @@ describe('facturasAPI', () => {
     it('lanza error del servidor', async () => {
       mockPost.mockRejectedValueOnce(axiosErrorWithResponse('Número duplicado'))
       await expect(facturasAPI.create({})).rejects.toThrow('Número duplicado')
+    })
+  })
+})
+
+// ════════════════════════════════════════════════════════════
+// usersAPI
+// ════════════════════════════════════════════════════════════
+describe('usersAPI', () => {
+  describe('list', () => {
+    it('retorna lista de usuarios en el happy path', async () => {
+      const users = [{ id: 1, username: 'alice', role: 'seller' }]
+      mockGet.mockResolvedValueOnce({ data: { data: users } })
+      const result = await usersAPI.list()
+      expect(result).toEqual(users)
+      expect(mockGet).toHaveBeenCalledWith('/users')
+    })
+
+    it('lanza error del servidor', async () => {
+      mockGet.mockRejectedValueOnce(axiosErrorWithResponse('Authentication required'))
+      await expect(usersAPI.list()).rejects.toThrow('Authentication required')
+    })
+  })
+
+  describe('create', () => {
+    it('retorna el usuario creado en el happy path', async () => {
+      const newUser = { id: 2, username: 'bob', role: 'seller' }
+      mockPost.mockResolvedValueOnce({ data: { data: newUser } })
+      const result = await usersAPI.create({ username: 'bob', role: 'seller', password: 'x' })
+      expect(result).toEqual(newUser)
+      expect(mockPost).toHaveBeenCalledWith('/users', { username: 'bob', role: 'seller', password: 'x' })
+    })
+
+    it('lanza error del servidor', async () => {
+      mockPost.mockRejectedValueOnce(axiosErrorWithResponse('Username already exists'))
+      await expect(usersAPI.create({ username: 'bob', role: 'seller', password: 'x' })).rejects.toThrow(
+        'Username already exists',
+      )
+    })
+  })
+
+  describe('update', () => {
+    it('retorna el usuario actualizado en el happy path', async () => {
+      const updated = { id: 1, username: 'alice', role: 'manager', active: true }
+      mockPut.mockResolvedValueOnce({ data: { data: updated } })
+      const result = await usersAPI.update(1, { role: 'manager' })
+      expect(result).toEqual(updated)
+      expect(mockPut).toHaveBeenCalledWith('/users/1', { role: 'manager' })
+    })
+
+    it('lanza error del servidor', async () => {
+      mockPut.mockRejectedValueOnce(axiosErrorWithResponse('User not found'))
+      await expect(usersAPI.update(99, { active: false })).rejects.toThrow('User not found')
+    })
+  })
+
+  describe('changePassword', () => {
+    it('resuelve sin error en el happy path', async () => {
+      mockPost.mockResolvedValueOnce({ data: { data: { changed: true } } })
+      await expect(usersAPI.changePassword('old', 'new')).resolves.toBeUndefined()
+      expect(mockPost).toHaveBeenCalledWith('/auth/change-password', {
+        currentPassword: 'old',
+        newPassword: 'new',
+      })
+    })
+
+    it('lanza error del servidor', async () => {
+      mockPost.mockRejectedValueOnce(axiosErrorWithResponse('Current password is incorrect'))
+      await expect(usersAPI.changePassword('wrong', 'new')).rejects.toThrow(
+        'Current password is incorrect',
+      )
+    })
+  })
+})
+
+// ════════════════════════════════════════════════════════════
+// dashboardAPI
+// ════════════════════════════════════════════════════════════
+describe('dashboardAPI', () => {
+  it('retorna el resumen del dashboard en el happy path', async () => {
+    const summary = { ventasHoy: { count: 1, total: '100' }, facturasVencidas: { count: 0, total: '0' }, cobrosHoy: { count: 0, total: '0' }, alertasActivas: 0 }
+    mockGet.mockResolvedValueOnce({ data: { success: true, data: summary } })
+    const { dashboardAPI } = await import('./api')
+    expect(await dashboardAPI.summary()).toEqual(summary)
+    expect(mockGet).toHaveBeenCalledWith('/dashboard/summary')
+  })
+
+  it('lanza ApiRequestFailedError en fallo', async () => {
+    mockGet.mockRejectedValueOnce(
+      Object.assign(new Error('fail'), { response: { data: { error: 'Server Error' } }, isAxiosError: true }),
+    )
+    const { dashboardAPI } = await import('./api')
+    await expect(dashboardAPI.summary()).rejects.toThrow('Server Error')
+  })
+})
+
+// ════════════════════════════════════════════════════════════
+// notificationsAPI
+// ════════════════════════════════════════════════════════════
+describe('notificationsAPI', () => {
+  it('list retorna notificaciones en el happy path', async () => {
+    mockGet.mockResolvedValueOnce({ data: { success: true, data: [] } })
+    const { notificationsAPI } = await import('./api')
+    expect(await notificationsAPI.list()).toEqual([])
+    expect(mockGet).toHaveBeenCalledWith('/notifications')
+  })
+
+  it('list lanza ApiRequestFailedError en fallo', async () => {
+    mockGet.mockRejectedValueOnce(
+      Object.assign(new Error('fail'), { response: { data: { error: 'Unauthorized' } }, isAxiosError: true }),
+    )
+    const { notificationsAPI } = await import('./api')
+    await expect(notificationsAPI.list()).rejects.toThrow('Unauthorized')
+  })
+
+  it('markRead retorna la notificación marcada en el happy path', async () => {
+    const notif = { id: 1, tenantId: 1, userId: 1, type: 'test', payload: {}, readAt: 'now', createdAt: 'now' }
+    mockPut.mockResolvedValueOnce({ data: { success: true, data: notif } })
+    const { notificationsAPI } = await import('./api')
+    expect(await notificationsAPI.markRead(1)).toEqual(notif)
+    expect(mockPut).toHaveBeenCalledWith('/notifications/1/read')
+  })
+
+  it('markRead lanza ApiRequestFailedError en fallo', async () => {
+    mockPut.mockRejectedValueOnce(
+      Object.assign(new Error('fail'), { response: { data: { error: 'Not Found' } }, isAxiosError: true }),
+    )
+    const { notificationsAPI } = await import('./api')
+    await expect(notificationsAPI.markRead(99)).rejects.toThrow('Not Found')
+  })
+
+  it('markAllRead retorna el conteo en el happy path', async () => {
+    mockPut.mockResolvedValueOnce({ data: { success: true, data: { updated: 3 } } })
+    const { notificationsAPI } = await import('./api')
+    expect(await notificationsAPI.markAllRead()).toEqual({ updated: 3 })
+    expect(mockPut).toHaveBeenCalledWith('/notifications/read-all')
+  })
+
+  it('markAllRead lanza ApiRequestFailedError en fallo', async () => {
+    mockPut.mockRejectedValueOnce(
+      Object.assign(new Error('fail'), { response: { data: { error: 'Forbidden' } }, isAxiosError: true }),
+    )
+    const { notificationsAPI } = await import('./api')
+    await expect(notificationsAPI.markAllRead()).rejects.toThrow('Forbidden')
+  })
+})
+
+// ════════════════════════════════════════════════════════════
+// notifChannelsAPI
+// ════════════════════════════════════════════════════════════
+describe('notifChannelsAPI', () => {
+  it('retorna el estado de los canales en el happy path', async () => {
+    const status = { inApp: true, email: false, whatsapp: false }
+    mockGet.mockResolvedValueOnce({ data: { success: true, data: status } })
+    expect(await notifChannelsAPI.status()).toEqual(status)
+    expect(mockGet).toHaveBeenCalledWith('/notifications/channels')
+  })
+
+  it('lanza ApiRequestFailedError en fallo', async () => {
+    mockGet.mockRejectedValueOnce(
+      Object.assign(new Error('fail'), { response: { data: { error: 'Unauthorized' } }, isAxiosError: true }),
+    )
+    await expect(notifChannelsAPI.status()).rejects.toThrow('Unauthorized')
+  })
+})
+
+// ════════════════════════════════════════════════════════════
+// zonasEntregaAPI
+// ════════════════════════════════════════════════════════════
+describe('zonasEntregaAPI', () => {
+  const ZONE = { id: 1, tenantId: 1, nombre: 'Z', tipo: 'barrio', activo: true }
+
+  describe('list', () => {
+    it('retorna la lista de zonas en el happy path', async () => {
+      mockGet.mockResolvedValueOnce({ data: { success: true, data: [ZONE] } })
+      expect(await zonasEntregaAPI.list()).toEqual([ZONE])
+      expect(mockGet).toHaveBeenCalledWith('/zonas-entrega')
+    })
+
+    it('lanza ApiRequestFailedError en fallo', async () => {
+      mockGet.mockRejectedValueOnce(
+        Object.assign(new Error('fail'), { response: { data: { error: 'Forbidden' } }, isAxiosError: true }),
+      )
+      await expect(zonasEntregaAPI.list()).rejects.toThrow('Forbidden')
+    })
+  })
+
+  describe('create', () => {
+    it('retorna la zona creada en el happy path', async () => {
+      mockPost.mockResolvedValueOnce({ data: { success: true, data: ZONE } })
+      expect(await zonasEntregaAPI.create({ nombre: 'Z' })).toEqual(ZONE)
+      expect(mockPost).toHaveBeenCalledWith('/zonas-entrega', { nombre: 'Z' })
+    })
+
+    it('lanza ApiRequestFailedError en fallo', async () => {
+      mockPost.mockRejectedValueOnce(
+        Object.assign(new Error('fail'), { response: { data: { error: 'Bad Request' } }, isAxiosError: true }),
+      )
+      await expect(zonasEntregaAPI.create({ nombre: 'Z' })).rejects.toThrow('Bad Request')
+    })
+  })
+
+  describe('update', () => {
+    it('retorna la zona actualizada en el happy path', async () => {
+      const updated = { ...ZONE, activo: false }
+      mockPut.mockResolvedValueOnce({ data: { success: true, data: updated } })
+      expect(await zonasEntregaAPI.update(1, { activo: false })).toEqual(updated)
+      expect(mockPut).toHaveBeenCalledWith('/zonas-entrega/1', { activo: false })
+    })
+
+    it('lanza ApiRequestFailedError en fallo', async () => {
+      mockPut.mockRejectedValueOnce(
+        Object.assign(new Error('fail'), { response: { data: { error: 'Not Found' } }, isAxiosError: true }),
+      )
+      await expect(zonasEntregaAPI.update(99, {})).rejects.toThrow('Not Found')
     })
   })
 })

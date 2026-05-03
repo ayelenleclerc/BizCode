@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "active": {
+      "type": "boolean"
+    },
+    "createdAt": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "id": {
+      "type": "integer"
+    },
+    "role": {
+      "enum": [
+        "super_admin",
+        "owner",
+        "manager",
+        "seller",
+        "backoffice",
+        "warehouse_op",
+        "warehouse_lead",
+        "logistics_planner",
+        "driver",
+        "billing",
+        "cashier",
+        "collections",
+        "finance",
+        "auditor"
+      ],
+      "type": "string"
+    },
+    "scopeBranchIds": {
+      "items": {
+        "type": "integer"
+      },
+      "type": "array"
+    },
+    "scopeChannels": {
+      "items": {
+        "enum": [
+          "counter",
+          "field",
+          "backoffice",
+          "warehouse",
+          "delivery"
+        ],
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "scopeRouteIds": {
+      "items": {
+        "type": "integer"
+      },
+      "type": "array"
+    },
+    "scopeWarehouseIds": {
+      "items": {
+        "type": "integer"
+      },
+      "type": "array"
+    },
+    "updatedAt": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "username": {
+      "type": "string"
+    }
+  },
+  "title": "AppUser",
+  "type": "object"
+}

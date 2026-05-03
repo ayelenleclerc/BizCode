@@ -13,7 +13,8 @@ programa_viejo/
 .claude/
 .vite/
 src-tauri/target/
-migrations/
+# Legacy / local SQL at repo root only — Prisma history lives in prisma/migrations/
+/migrations/
 coverage/
 
 playwright-report/
@@ -29,3 +30,8 @@ docs/evidence/sbom-cyclonedx-full.json
 # Scratch outputs from ISO map / package-index helpers (regenerate via scripts)
 scripts/_*.md
 scripts/_*.txt
+node_modules
+BizCode.code-workspace
+
+# plan:sync local reports (state under .github/plan-sync/state/ is versioned)
+.github/plan-sync/reports/

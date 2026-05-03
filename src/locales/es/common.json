@@ -1,13 +1,65 @@
 {
   "app": {
     "name": "BizCode",
-    "version": "v0.1.0 MVP",
     "tagline": "Sistema de Gestión Comercial"
   },
   "nav": {
+    "main": "Navegación principal",
+    "inicio": "Inicio",
+    "ventas": "Ventas",
     "clientes": "Clientes",
+    "catalogo": "Catálogo",
+    "logistica": "Logística",
+    "finanzas": "Finanzas",
+    "configuracion": "Configuración",
     "articulos": "Artículos",
-    "facturacion": "Facturación"
+    "facturacion": "Facturación",
+    "users": "Usuarios",
+    "zonasEntrega": "Zonas de entrega"
+  },
+  "language": {
+    "legend": "Idioma de la interfaz",
+    "selectAria": "Elegir idioma de la interfaz",
+    "optionEs": "Español",
+    "optionEn": "Inglés",
+    "optionPtBr": "Português (Brasil)"
+  },
+  "auth": {
+    "title": "Iniciar sesión",
+    "subtitle": "Inicie sesión para continuar",
+    "formTitle": "Iniciar sesión",
+    "fields": {
+      "tenantSlug": "Empresa (slug)",
+      "username": "Usuario",
+      "password": "Contraseña"
+    },
+    "tenantSlug": "Tenant",
+    "username": "Usuario",
+    "password": "Contraseña",
+    "submit": "Entrar",
+    "submitting": "Entrando…",
+    "signIn": "Ingresar",
+    "signingIn": "Ingresando…",
+    "logout": "Cerrar sesión",
+    "loadingSession": "Cargando sesión…",
+    "userLabel": "Usuario: {{username}} (rol: {{role}})",
+    "validation": {
+      "tenantRequired": "Indique el identificador de la empresa",
+      "usernameRequired": "Indique el usuario",
+      "passwordRequired": "Indique la contraseña"
+    },
+    "errors": {
+      "invalidCredentials": "Usuario o contraseña incorrectos",
+      "accountLocked": "Cuenta bloqueada por demasiados intentos fallidos. Contacte al administrador.",
+      "tooManyRequests": "Demasiados intentos. Espere 15 minutos e inténtelo de nuevo.",
+      "generic": "No se pudo iniciar sesión",
+      "network": "No hay conexión con el servidor. Compruebe que el API está en marcha (p. ej. puerto 3001) y vuelva a intentarlo.",
+      "timeout": "La petición tardó demasiado. Inténtelo de nuevo.",
+      "offline": "Sin conexión. Compruebe su red e inténtelo de nuevo."
+    }
+  },
+  "session": {
+    "logout": "Cerrar sesión"
   },
   "shortcuts": {
     "title": "Atajos globales",
@@ -18,6 +70,7 @@
     "navigate": "Navegar"
   },
   "theme": {
+    "toggleTitle": "Alternar tema claro u oscuro",
     "switchToLight": "☀️ Claro",
     "switchToDark": "🌙 Oscuro"
   },
@@ -30,10 +83,46 @@
   "status": {
     "loading": "Cargando...",
     "active": "Activo",
-    "inactive": "Inactivo"
+    "inactive": "Inactivo",
+    "comingSoon": "Próximamente disponible en v0.2.0"
   },
   "errors": {
     "generic": "Error al guardar",
     "required": "Campo requerido"
+  },
+  "notifications": {
+    "title": "Notificaciones",
+    "bell": "{{count}} notificación no leída",
+    "bell_other": "{{count}} notificaciones no leídas",
+    "empty": "No hay notificaciones",
+    "markRead": "Marcar como leída",
+    "markAllRead": "Marcar todas como leídas",
+    "types": {
+      "credit_limit_exceeded": "Límite de crédito superado",
+      "invoice_overdue": "Factura vencida",
+      "invoice_due_soon": "Factura por vencer"
+    }
+  },
+  "notifChannels": {
+    "title": "Canales de notificación",
+    "subtitle": "Canales configurados para este tenant (solo lectura en esta versión)",
+    "inApp": "In-app",
+    "email": "Email (SMTP)",
+    "whatsapp": "WhatsApp (Twilio)",
+    "active": "Activo",
+    "inactive": "No configurado",
+    "loadError": "No se pudo cargar el estado de los canales"
+  },
+  "dashboard": {
+    "title": "Resumen del día",
+    "ventasHoy": "Ventas del día",
+    "facturasVencidas": "Facturas vencidas",
+    "cobrosHoy": "Cobros del día",
+    "alertasActivas": "Alertas activas",
+    "invoices": "{{count}} factura",
+    "invoices_other": "{{count}} facturas",
+    "noData": "Sin datos",
+    "overdueNote": "Estimado — plazos reales disponibles en próxima versión",
+    "pendingFeature": "Disponible en v0.2.0"
   }
 }

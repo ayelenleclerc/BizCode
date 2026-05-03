@@ -1,0 +1,8 @@
+-- AlterTable
+ALTER TABLE "Cliente" ADD COLUMN     "balance" DECIMAL(14,2) NOT NULL DEFAULT 0,
+ADD COLUMN     "balanceInicial" DECIMAL(14,2) NOT NULL DEFAULT 0,
+ADD COLUMN     "creditDays" INTEGER NOT NULL DEFAULT 0,
+ADD COLUMN     "creditLimit" DECIMAL(14,2),
+ADD COLUMN     "deliveryZoneId" INTEGER,
+ADD COLUMN     "score" INTEGER NOT NULL DEFAULT 50,
+ADD COLUMN     "suspended" BOOLEAN NOT NULL DEFAULT false;

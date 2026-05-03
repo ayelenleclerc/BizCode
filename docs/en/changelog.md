@@ -8,8 +8,15 @@ Versioning: [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+
+- **CORS + session cookie:** Express `cors` now uses `credentials: true` and an origin allowlist (`http://localhost:5173`, `http://127.0.0.1:5173`, plus comma-separated `CORS_ORIGINS`) so the SPA (Axios `withCredentials`) can receive and send session cookies across origins; [`server/createApp.ts`](../../server/createApp.ts), [`.env.example`](../../.env.example), [`tests/server/cors.test.ts`](../../tests/server/cors.test.ts); [security.md](security.md) updated.
+
 ### Added
 
+- **User management (issue #25):** `GET/POST /api/users`, `PUT /api/users/:id`, `POST /api/auth/change-password`; Users page (`src/pages/users/`) with DataTable + create/edit modal, keyboard shortcuts (F2/F3/F5/Esc), role hierarchy enforcement; `<CanAccess permission="..." />` utility component for permission-aware rendering; sidebar link visible only to `users.manage` holders; i18n in EN/ES/PT-BR; 17 new integration tests; OpenAPI paths and schemas updated; trilingual docs in `docs/*/quality/`.
+- **Plan approval archival workflow:** new `npm run plan:approve -- --plan <file>` command archives approved plans into `.cursor/plans/{timestamp}-{slug}.plan.md` and then executes the existing `plan:sync` GitHub Issues/Project v2 flow; `plan:sync` remains available for direct/manual sync.
+- **Authentication UX + secure bootstrap:** login screen with route guard/logout wired to `/api/auth/login|me|logout`, cookie session support in [`src/lib/api.ts`](../../src/lib/api.ts), auth provider in [`src/auth/AuthProvider.tsx`](../../src/auth/AuthProvider.tsx), and super-admin bootstrap command `npm run bootstrap:superadmin` (password from `BIZCODE_BOOTSTRAP_SUPERADMIN_PASSWORD`, no hardcoded credential) via [`scripts/bootstrap-superadmin.ts`](../../scripts/bootstrap-superadmin.ts).
 - **Product vision & governance:** trilingual [product-vision-and-deployment.md](quality/product-vision-and-deployment.md) (PROD-VISION-001) · [es](../es/quality/vision-producto-y-despliegue.md) · [pt-BR](../pt-br/quality/visao-produto-e-implantacao.md); [ADR-0007](adr/ADR-0007-dual-deployment-and-fiscal-modularity.md) (desktop/SaaS + fiscal modularity); [DOCUMENT_LOCALE_MAP.md](../DOCUMENT_LOCALE_MAP.md) row; [AGENTS.md](../../AGENTS.md) and [`.cursor/rules/product-vision.mdc`](../../.cursor/rules/product-vision.mdc); [iso-traceability.md](certificacion-iso/iso-traceability.md) matrix; architecture cross-links
 - **Documentation (ISO package):** [Certificación-ISO/README.md](../../Certificación-ISO/README.md) as repository entry point; QMS manual, ISO traceability matrix, records templates, and document lifecycle under `docs/{en,es,pt-br}/certificacion-iso/` (single source of truth); [iso-package-index.md](certificacion-iso/iso-package-index.md) (ISO-PKG-001); stubs in [`docs/quality/`](../quality/); testing strategy / CI/CD / Swagger plan remain under `docs/*/quality/`; **SBOM:** `@cyclonedx/cyclonedx-npm`, `npm run sbom:generate` → [`docs/evidence/sbom-cyclonedx.json`](../evidence/sbom-cyclonedx.json) (SBOM-001), [`docs/evidence/README.md`](../evidence/README.md)
 - **API:** **Swagger UI** at `http://localhost:3001/api-docs/` (`swagger-ui-express`, [`server/createApp.ts`](../../server/createApp.ts), OpenAPI from [`openapi.yaml`](../api/openapi.yaml)); [`tests/api/swagger-ui.test.ts`](../../tests/api/swagger-ui.test.ts); `yaml` runtime dependency; `info.description` in OpenAPI updated for `/api-docs`
@@ -39,6 +46,7 @@ Versioning: [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- **Security / developer setup:** [`.env.example`](../../.env.example) no longer ships sample database credentials or a default seed password literal; `npx prisma db seed` **requires** `BIZCODE_SEED_SUPERADMIN_PASSWORD` in `.env` (≥ 8 characters). See [security.md](security.md), [superadmin-bootstrap-and-rbac.md](quality/superadmin-bootstrap-and-rbac.md), and [README.md](../../README.md).
 - Documentation: Brazilian Portuguese (`docs/pt-br/`) user manuals expanded to match English; full `certificacion-iso/records-template.md` (including manual test session table); expanded `glossary.md`; localized ADR index title
 - Glossary and [privacy-data-map.md](privacy-data-map.md): Argentina’s tax authority referred to as **ARCA** (with former AFIP noted where relevant); [I18N_DOCUMENTATION.md](../I18N_DOCUMENTATION.md) and [DOCUMENT_LOCALE_MAP.md](../DOCUMENT_LOCALE_MAP.md) describe **localized filenames** per locale tree (ADR slugs stay aligned across trees)
 

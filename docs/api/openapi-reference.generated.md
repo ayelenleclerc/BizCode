@@ -5,7 +5,7 @@
 - **OpenAPI Version:** `3.1.0`
 - **API Version:** `0.1.0`
 
-REST API for BizCode commercial management system. Runs as an Express 5 sidecar on localhost:3001. Responses use a JSON envelope `{ success: true, data: ... }` except `/api/health`. No authentication is required (loopback-only access). Interactive documentation (Swagger UI): <http://localhost:3001/api-docs/> (same contract as this file).
+REST API for BizCode commercial management system. Runs as an Express 5 sidecar on localhost:3001. Responses use a JSON envelope `{ success: true, data: ... }` except `/api/health`. Session authentication is required for protected resources. Interactive documentation (Swagger UI): <http://localhost:3001/api-docs/> (same contract as this file).
 
 ## Servers
 
@@ -13,6 +13,416 @@ REST API for BizCode commercial management system. Runs as an Express 5 sidecar 
   - **Description:** Local development / Tauri sidecar
 
 ## Operations
+
+### Bootstrap first owner account
+
+- **Method:** `POST`
+- **Path:** `/api/auth/setup-owner`
+- **Tags:** auth
+
+One-time endpoint to create initial tenant and owner user.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`password` (required)**
+
+  `string`
+
+- **`tenantName` (required)**
+
+  `string`
+
+- **`tenantSlug` (required)**
+
+  `string`
+
+- **`username` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "tenantName": "",
+  "tenantSlug": "",
+  "username": "",
+  "password": ""
+}
+```
+
+#### Responses
+
+##### Status: 201 Owner created
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`role` (required)**
+
+    `string`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`userId` (required)**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "tenantId": 1,
+    "userId": 1,
+    "role": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 409 Resource conflict
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Create authenticated session
+
+- **Method:** `POST`
+- **Path:** `/api/auth/login`
+- **Tags:** auth
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`password` (required)**
+
+  `string`
+
+- **`tenantSlug` (required)**
+
+  `string`
+
+- **`username` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "tenantSlug": "",
+  "username": "",
+  "password": ""
+}
+```
+
+#### Responses
+
+##### Status: 200 Session created
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`role` (required)**
+
+    `string`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`userId` (required)**
+
+    `integer`
+
+  - **`username` (required)**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "userId": 1,
+    "tenantId": 1,
+    "username": "",
+    "role": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Revoke current session
+
+- **Method:** `POST`
+- **Path:** `/api/auth/logout`
+- **Tags:** auth
+
+#### Responses
+
+##### Status: 200 Session revoked (or already missing)
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`loggedOut` (required)**
+
+    `boolean`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "loggedOut": true
+  }
+}
+```
+
+### Get authenticated claims
+
+- **Method:** `GET`
+- **Path:** `/api/auth/me`
+- **Tags:** auth
+
+#### Responses
+
+##### Status: 200 Current authenticated claims
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`permissions` (required)**
+
+    `array`
+
+    **Items:**
+
+    `string`
+
+  - **`role` (required)**
+
+    `string`
+
+  - **`scope` (required)**
+
+    `object`
+
+    - **`branchIds` (required)**
+
+      `array`
+
+      **Items:**
+
+      `integer`
+
+    - **`channels` (required)**
+
+      `array`
+
+      **Items:**
+
+      `string`
+
+    - **`routeIds` (required)**
+
+      `array`
+
+      **Items:**
+
+      `integer`
+
+    - **`tenantId` (required)**
+
+      `integer`
+
+    - **`warehouseIds` (required)**
+
+      `array`
+
+      **Items:**
+
+      `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`userId` (required)**
+
+    `integer`
+
+  - **`username` (required)**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "userId": 1,
+    "tenantId": 1,
+    "username": "",
+    "role": "",
+    "permissions": [
+      ""
+    ],
+    "scope": {
+      "tenantId": 1,
+      "branchIds": [
+        1
+      ],
+      "warehouseIds": [
+        1
+      ],
+      "routeIds": [
+        1
+      ],
+      "channels": [
+        ""
+      ]
+    }
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
 
 ### Health check
 
@@ -65,6 +475,14 @@ REST API for BizCode commercial management system. Runs as an Express 5 sidecar 
 
     `boolean`
 
+  - **`balance`**
+
+    `number`, default: `0` — Accumulated balance (incremented on each new factura).
+
+  - **`balanceInicial`**
+
+    `number`, default: `0` — Opening balance at migration time.
+
   - **`codigo`**
 
     `integer`
@@ -77,9 +495,21 @@ REST API for BizCode commercial management system. Runs as an Express 5 sidecar 
 
     `string`
 
+  - **`creditDays`**
+
+    `integer`, default: `0` — Usual credit days for this customer.
+
+  - **`creditLimit`**
+
+    `number` — Credit limit in ARS. null = no limit.
+
   - **`cuit`**
 
     `string`
+
+  - **`deliveryZoneId`**
+
+    `integer` — FK to DeliveryZone. Assign a delivery zone to this customer.
 
   - **`domicilio`**
 
@@ -104,6 +534,14 @@ REST API for BizCode commercial management system. Runs as an Express 5 sidecar 
   - **`rsocial`**
 
     `string`
+
+  - **`score`**
+
+    `integer`, default: `50` — Payment score 0-100 (50=neutral, 0=high risk, 100=perfect).
+
+  - **`suspended`**
+
+    `boolean`, default: `false` — When true, POST /api/facturas returns 422 CLIENT\_SUSPENDED.
 
   - **`telef`**
 
@@ -132,9 +570,58 @@ REST API for BizCode commercial management system. Runs as an Express 5 sidecar 
       "telef": "",
       "email": "",
       "activo": true,
+      "creditLimit": 1,
+      "creditDays": 0,
+      "balance": 0,
+      "balanceInicial": 0,
+      "score": 50,
+      "suspended": false,
+      "deliveryZoneId": 1,
       "additionalProperty": "anything"
     }
   ]
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
 }
 ```
 
@@ -189,9 +676,21 @@ REST API for BizCode commercial management system. Runs as an Express 5 sidecar 
 
   `string`
 
+- **`creditDays`**
+
+  `integer`
+
+- **`creditLimit`**
+
+  `number`
+
 - **`cuit`**
 
   `string`
+
+- **`deliveryZoneId`**
+
+  `integer`
 
 - **`domicilio`**
 
@@ -208,6 +707,10 @@ REST API for BizCode commercial management system. Runs as an Express 5 sidecar 
 - **`localidad`**
 
   `string`
+
+- **`suspended`**
+
+  `boolean`
 
 - **`telef`**
 
@@ -227,7 +730,11 @@ REST API for BizCode commercial management system. Runs as an Express 5 sidecar 
   "cpost": "",
   "telef": "",
   "email": "",
-  "activo": true
+  "activo": true,
+  "creditLimit": 1,
+  "creditDays": 0,
+  "suspended": true,
+  "deliveryZoneId": 1
 }
 ```
 
@@ -245,6 +752,14 @@ REST API for BizCode commercial management system. Runs as an Express 5 sidecar 
 
     `boolean`
 
+  - **`balance`**
+
+    `number`, default: `0` — Accumulated balance (incremented on each new factura).
+
+  - **`balanceInicial`**
+
+    `number`, default: `0` — Opening balance at migration time.
+
   - **`codigo`**
 
     `integer`
@@ -257,9 +772,21 @@ REST API for BizCode commercial management system. Runs as an Express 5 sidecar 
 
     `string`
 
+  - **`creditDays`**
+
+    `integer`, default: `0` — Usual credit days for this customer.
+
+  - **`creditLimit`**
+
+    `number` — Credit limit in ARS. null = no limit.
+
   - **`cuit`**
 
     `string`
+
+  - **`deliveryZoneId`**
+
+    `integer` — FK to DeliveryZone. Assign a delivery zone to this customer.
 
   - **`domicilio`**
 
@@ -284,6 +811,14 @@ REST API for BizCode commercial management system. Runs as an Express 5 sidecar 
   - **`rsocial`**
 
     `string`
+
+  - **`score`**
+
+    `integer`, default: `50` — Payment score 0-100 (50=neutral, 0=high risk, 100=perfect).
+
+  - **`suspended`**
+
+    `boolean`, default: `false` — When true, POST /api/facturas returns 422 CLIENT\_SUSPENDED.
 
   - **`telef`**
 
@@ -311,8 +846,57 @@ REST API for BizCode commercial management system. Runs as an Express 5 sidecar 
     "telef": "",
     "email": "",
     "activo": true,
+    "creditLimit": 1,
+    "creditDays": 0,
+    "balance": 0,
+    "balanceInicial": 0,
+    "score": 50,
+    "suspended": false,
+    "deliveryZoneId": 1,
     "additionalProperty": "anything"
   }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
 }
 ```
 
@@ -375,8 +959,57 @@ REST API for BizCode commercial management system. Runs as an Express 5 sidecar 
     "telef": "",
     "email": "",
     "activo": true,
+    "creditLimit": 1,
+    "creditDays": 0,
+    "balance": 0,
+    "balanceInicial": 0,
+    "score": 50,
+    "suspended": false,
+    "deliveryZoneId": 1,
     "additionalProperty": "anything"
   }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
 }
 ```
 
@@ -431,9 +1064,21 @@ REST API for BizCode commercial management system. Runs as an Express 5 sidecar 
 
   `string`
 
+- **`creditDays`**
+
+  `integer`
+
+- **`creditLimit`**
+
+  `number`
+
 - **`cuit`**
 
   `string`
+
+- **`deliveryZoneId`**
+
+  `integer`
 
 - **`domicilio`**
 
@@ -450,6 +1095,10 @@ REST API for BizCode commercial management system. Runs as an Express 5 sidecar 
 - **`localidad`**
 
   `string`
+
+- **`suspended`**
+
+  `boolean`
 
 - **`telef`**
 
@@ -469,7 +1118,11 @@ REST API for BizCode commercial management system. Runs as an Express 5 sidecar 
   "cpost": "",
   "telef": "",
   "email": "",
-  "activo": true
+  "activo": true,
+  "creditLimit": 1,
+  "creditDays": 0,
+  "suspended": true,
+  "deliveryZoneId": 1
 }
 ```
 
@@ -487,6 +1140,14 @@ REST API for BizCode commercial management system. Runs as an Express 5 sidecar 
 
     `boolean`
 
+  - **`balance`**
+
+    `number`, default: `0` — Accumulated balance (incremented on each new factura).
+
+  - **`balanceInicial`**
+
+    `number`, default: `0` — Opening balance at migration time.
+
   - **`codigo`**
 
     `integer`
@@ -499,9 +1160,21 @@ REST API for BizCode commercial management system. Runs as an Express 5 sidecar 
 
     `string`
 
+  - **`creditDays`**
+
+    `integer`, default: `0` — Usual credit days for this customer.
+
+  - **`creditLimit`**
+
+    `number` — Credit limit in ARS. null = no limit.
+
   - **`cuit`**
 
     `string`
+
+  - **`deliveryZoneId`**
+
+    `integer` — FK to DeliveryZone. Assign a delivery zone to this customer.
 
   - **`domicilio`**
 
@@ -526,6 +1199,14 @@ REST API for BizCode commercial management system. Runs as an Express 5 sidecar 
   - **`rsocial`**
 
     `string`
+
+  - **`score`**
+
+    `integer`, default: `50` — Payment score 0-100 (50=neutral, 0=high risk, 100=perfect).
+
+  - **`suspended`**
+
+    `boolean`, default: `false` — When true, POST /api/facturas returns 422 CLIENT\_SUSPENDED.
 
   - **`telef`**
 
@@ -553,8 +1234,57 @@ REST API for BizCode commercial management system. Runs as an Express 5 sidecar 
     "telef": "",
     "email": "",
     "activo": true,
+    "creditLimit": 1,
+    "creditDays": 0,
+    "balance": 0,
+    "balanceInicial": 0,
+    "score": 50,
+    "suspended": false,
+    "deliveryZoneId": 1,
     "additionalProperty": "anything"
   }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
 }
 ```
 
@@ -693,6 +1423,48 @@ REST API for BizCode commercial management system. Runs as an Express 5 sidecar 
       "additionalProperty": "anything"
     }
   ]
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
 }
 ```
 
@@ -896,6 +1668,48 @@ REST API for BizCode commercial management system. Runs as an Express 5 sidecar 
 }
 ```
 
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ##### Status: 500 Internal server error
 
 ###### Content-Type: application/json
@@ -963,6 +1777,48 @@ REST API for BizCode commercial management system. Runs as an Express 5 sidecar 
     "activo": true,
     "additionalProperty": "anything"
   }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
 }
 ```
 
@@ -1166,6 +2022,48 @@ REST API for BizCode commercial management system. Runs as an Express 5 sidecar 
 }
 ```
 
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ##### Status: 500 Internal server error
 
 ###### Content-Type: application/json
@@ -1234,6 +2132,48 @@ REST API for BizCode commercial management system. Runs as an Express 5 sidecar 
       "additionalProperty": "anything"
     }
   ]
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
 }
 ```
 
@@ -1322,6 +2262,48 @@ REST API for BizCode commercial management system. Runs as an Express 5 sidecar 
     "nombre": "",
     "additionalProperty": "anything"
   }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
 }
 ```
 
@@ -1578,6 +2560,48 @@ REST API for BizCode commercial management system. Runs as an Express 5 sidecar 
       "additionalProperty": "anything"
     }
   ]
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
 }
 ```
 
@@ -1939,6 +2963,48 @@ REST API for BizCode commercial management system. Runs as an Express 5 sidecar 
 }
 ```
 
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ##### Status: 500 Internal server error
 
 ###### Content-Type: application/json
@@ -2036,6 +3102,1481 @@ REST API for BizCode commercial management system. Runs as an Express 5 sidecar 
 }
 ```
 
+### List users for the current tenant
+
+- **Method:** `GET`
+- **Path:** `/api/users`
+- **Tags:** users
+
+Returns all users belonging to the authenticated user's tenant. Requires `users.manage` permission.
+
+#### Responses
+
+##### Status: 200 List of users
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`active`**
+
+    `boolean`
+
+  - **`createdAt`**
+
+    `string`, format: `date-time`
+
+  - **`id`**
+
+    `integer`
+
+  - **`role`**
+
+    `string`, possible values: `"super_admin", "owner", "manager", "seller", "backoffice", "warehouse_op", "warehouse_lead", "logistics_planner", "driver", "billing", "cashier", "collections", "finance", "auditor"`
+
+  - **`scopeBranchIds`**
+
+    `array`
+
+    **Items:**
+
+    `integer`
+
+  - **`scopeChannels`**
+
+    `array`
+
+    **Items:**
+
+    `string`, possible values: `"counter", "field", "backoffice", "warehouse", "delivery"`
+
+  - **`scopeRouteIds`**
+
+    `array`
+
+    **Items:**
+
+    `integer`
+
+  - **`scopeWarehouseIds`**
+
+    `array`
+
+    **Items:**
+
+    `integer`
+
+  - **`updatedAt`**
+
+    `string`, format: `date-time`
+
+  - **`username`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "username": "",
+      "role": "super_admin",
+      "active": true,
+      "scopeChannels": [
+        "counter"
+      ],
+      "scopeBranchIds": [
+        1
+      ],
+      "scopeWarehouseIds": [
+        1
+      ],
+      "scopeRouteIds": [
+        1
+      ],
+      "createdAt": "",
+      "updatedAt": ""
+    }
+  ]
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Create a new user
+
+- **Method:** `POST`
+- **Path:** `/api/users`
+- **Tags:** users
+
+Creates a new user in the current tenant. Requires `users.manage` and `roles.assign` permissions.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`password` (required)**
+
+  `string`
+
+- **`role` (required)**
+
+  `string`, possible values: `"super_admin", "owner", "manager", "seller", "backoffice", "warehouse_op", "warehouse_lead", "logistics_planner", "driver", "billing", "cashier", "collections", "finance", "auditor"`
+
+- **`username` (required)**
+
+  `string`
+
+- **`active`**
+
+  `boolean`, default: `true`
+
+- **`scopeBranchIds`**
+
+  `array`
+
+  **Items:**
+
+  `integer`
+
+- **`scopeChannels`**
+
+  `array`
+
+  **Items:**
+
+  `string`, possible values: `"counter", "field", "backoffice", "warehouse", "delivery"`
+
+- **`scopeRouteIds`**
+
+  `array`
+
+  **Items:**
+
+  `integer`
+
+- **`scopeWarehouseIds`**
+
+  `array`
+
+  **Items:**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "username": "",
+  "password": "",
+  "role": "super_admin",
+  "active": true,
+  "scopeChannels": [
+    "counter"
+  ],
+  "scopeBranchIds": [
+    1
+  ],
+  "scopeWarehouseIds": [
+    1
+  ],
+  "scopeRouteIds": [
+    1
+  ]
+}
+```
+
+#### Responses
+
+##### Status: 201 User created
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`active`**
+
+    `boolean`
+
+  - **`createdAt`**
+
+    `string`, format: `date-time`
+
+  - **`id`**
+
+    `integer`
+
+  - **`role`**
+
+    `string`, possible values: `"super_admin", "owner", "manager", "seller", "backoffice", "warehouse_op", "warehouse_lead", "logistics_planner", "driver", "billing", "cashier", "collections", "finance", "auditor"`
+
+  - **`scopeBranchIds`**
+
+    `array`
+
+    **Items:**
+
+    `integer`
+
+  - **`scopeChannels`**
+
+    `array`
+
+    **Items:**
+
+    `string`, possible values: `"counter", "field", "backoffice", "warehouse", "delivery"`
+
+  - **`scopeRouteIds`**
+
+    `array`
+
+    **Items:**
+
+    `integer`
+
+  - **`scopeWarehouseIds`**
+
+    `array`
+
+    **Items:**
+
+    `integer`
+
+  - **`updatedAt`**
+
+    `string`, format: `date-time`
+
+  - **`username`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "username": "",
+    "role": "super_admin",
+    "active": true,
+    "scopeChannels": [
+      "counter"
+    ],
+    "scopeBranchIds": [
+      1
+    ],
+    "scopeWarehouseIds": [
+      1
+    ],
+    "scopeRouteIds": [
+      1
+    ],
+    "createdAt": "",
+    "updatedAt": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 409 Resource conflict
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Update a user
+
+- **Method:** `PUT`
+- **Path:** `/api/users/{id}`
+- **Tags:** users
+
+Updates role, active flag, or scope for a user in the current tenant. Requires `users.manage`.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`active`**
+
+  `boolean`
+
+- **`role`**
+
+  `string`, possible values: `"super_admin", "owner", "manager", "seller", "backoffice", "warehouse_op", "warehouse_lead", "logistics_planner", "driver", "billing", "cashier", "collections", "finance", "auditor"`
+
+- **`scopeBranchIds`**
+
+  `array`
+
+  **Items:**
+
+  `integer`
+
+- **`scopeChannels`**
+
+  `array`
+
+  **Items:**
+
+  `string`, possible values: `"counter", "field", "backoffice", "warehouse", "delivery"`
+
+- **`scopeRouteIds`**
+
+  `array`
+
+  **Items:**
+
+  `integer`
+
+- **`scopeWarehouseIds`**
+
+  `array`
+
+  **Items:**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "role": "super_admin",
+  "active": true,
+  "scopeChannels": [
+    "counter"
+  ],
+  "scopeBranchIds": [
+    1
+  ],
+  "scopeWarehouseIds": [
+    1
+  ],
+  "scopeRouteIds": [
+    1
+  ]
+}
+```
+
+#### Responses
+
+##### Status: 200 User updated
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`active`**
+
+    `boolean`
+
+  - **`createdAt`**
+
+    `string`, format: `date-time`
+
+  - **`id`**
+
+    `integer`
+
+  - **`role`**
+
+    `string`, possible values: `"super_admin", "owner", "manager", "seller", "backoffice", "warehouse_op", "warehouse_lead", "logistics_planner", "driver", "billing", "cashier", "collections", "finance", "auditor"`
+
+  - **`scopeBranchIds`**
+
+    `array`
+
+    **Items:**
+
+    `integer`
+
+  - **`scopeChannels`**
+
+    `array`
+
+    **Items:**
+
+    `string`, possible values: `"counter", "field", "backoffice", "warehouse", "delivery"`
+
+  - **`scopeRouteIds`**
+
+    `array`
+
+    **Items:**
+
+    `integer`
+
+  - **`scopeWarehouseIds`**
+
+    `array`
+
+    **Items:**
+
+    `integer`
+
+  - **`updatedAt`**
+
+    `string`, format: `date-time`
+
+  - **`username`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "username": "",
+    "role": "super_admin",
+    "active": true,
+    "scopeChannels": [
+      "counter"
+    ],
+    "scopeBranchIds": [
+      1
+    ],
+    "scopeWarehouseIds": [
+      1
+    ],
+    "scopeRouteIds": [
+      1
+    ],
+    "createdAt": "",
+    "updatedAt": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 User not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Change own password
+
+- **Method:** `POST`
+- **Path:** `/api/auth/change-password`
+- **Tags:** auth
+
+Allows the authenticated user to change their password by supplying the current password.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`currentPassword` (required)**
+
+  `string`
+
+- **`newPassword` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "currentPassword": "",
+  "newPassword": ""
+}
+```
+
+#### Responses
+
+##### Status: 200 Password changed
+
+###### Content-Type: application/json
+
+- **`data`**
+
+  `object`
+
+  - **`changed`**
+
+    `boolean`
+
+- **`success`**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "changed": true
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Report which external notification channels are configured
+
+- **Method:** `GET`
+- **Path:** `/api/notifications/channels`
+- **Tags:** notifications
+
+Returns boolean flags for each channel. No sensitive values are exposed.
+
+#### Responses
+
+##### Status: 200 Channel status
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`email` (required)**
+
+    `boolean`
+
+  - **`inApp` (required)**
+
+    `boolean`
+
+  - **`whatsapp` (required)**
+
+    `boolean`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "inApp": true,
+    "email": true,
+    "whatsapp": true
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### List delivery zones for the authenticated tenant
+
+- **Method:** `GET`
+- **Path:** `/api/zonas-entrega`
+- **Tags:** logistics
+
+#### Responses
+
+##### Status: 200 List of delivery zones
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`activo`**
+
+    `boolean`, default: `true`
+
+  - **`createdAt`**
+
+    `string`, format: `date-time`
+
+  - **`diasEntrega`**
+
+    `string` — Comma-separated delivery day numbers, e.g. "1,3,5"
+
+  - **`horario`**
+
+    `string` — Preferred time window, e.g. "08:00-12:00"
+
+  - **`id`**
+
+    `integer`
+
+  - **`nombre`**
+
+    `string`
+
+  - **`tenantId`**
+
+    `integer`
+
+  - **`tipo`**
+
+    `string`, possible values: `"barrio", "manual", "predefinida"`, default: `"barrio"`
+
+  - **`updatedAt`**
+
+    `string`, format: `date-time`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "nombre": "",
+      "tipo": "barrio",
+      "diasEntrega": "",
+      "horario": "",
+      "activo": true,
+      "createdAt": "",
+      "updatedAt": "",
+      "additionalProperty": "anything"
+    }
+  ]
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Create a delivery zone
+
+- **Method:** `POST`
+- **Path:** `/api/zonas-entrega`
+- **Tags:** logistics
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`nombre` (required)**
+
+  `string`
+
+- **`diasEntrega`**
+
+  `string`
+
+- **`horario`**
+
+  `string`
+
+- **`tipo`**
+
+  `string`, possible values: `"barrio", "manual", "predefinida"`, default: `"barrio"`
+
+**Example:**
+
+```json
+{
+  "nombre": "",
+  "tipo": "barrio",
+  "diasEntrega": "",
+  "horario": ""
+}
+```
+
+#### Responses
+
+##### Status: 201 Zone created
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`activo`**
+
+    `boolean`, default: `true`
+
+  - **`createdAt`**
+
+    `string`, format: `date-time`
+
+  - **`diasEntrega`**
+
+    `string` — Comma-separated delivery day numbers, e.g. "1,3,5"
+
+  - **`horario`**
+
+    `string` — Preferred time window, e.g. "08:00-12:00"
+
+  - **`id`**
+
+    `integer`
+
+  - **`nombre`**
+
+    `string`
+
+  - **`tenantId`**
+
+    `integer`
+
+  - **`tipo`**
+
+    `string`, possible values: `"barrio", "manual", "predefinida"`, default: `"barrio"`
+
+  - **`updatedAt`**
+
+    `string`, format: `date-time`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "nombre": "",
+    "tipo": "barrio",
+    "diasEntrega": "",
+    "horario": "",
+    "activo": true,
+    "createdAt": "",
+    "updatedAt": "",
+    "additionalProperty": "anything"
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Update a delivery zone
+
+- **Method:** `PUT`
+- **Path:** `/api/zonas-entrega/{id}`
+- **Tags:** logistics
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`activo`**
+
+  `boolean`
+
+- **`diasEntrega`**
+
+  `string`
+
+- **`horario`**
+
+  `string`
+
+- **`nombre`**
+
+  `string`
+
+- **`tipo`**
+
+  `string`, possible values: `"barrio", "manual", "predefinida"`
+
+**Example:**
+
+```json
+{
+  "nombre": "",
+  "tipo": "barrio",
+  "diasEntrega": "",
+  "horario": "",
+  "activo": true
+}
+```
+
+#### Responses
+
+##### Status: 200 Zone updated
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`activo`**
+
+    `boolean`, default: `true`
+
+  - **`createdAt`**
+
+    `string`, format: `date-time`
+
+  - **`diasEntrega`**
+
+    `string` — Comma-separated delivery day numbers, e.g. "1,3,5"
+
+  - **`horario`**
+
+    `string` — Preferred time window, e.g. "08:00-12:00"
+
+  - **`id`**
+
+    `integer`
+
+  - **`nombre`**
+
+    `string`
+
+  - **`tenantId`**
+
+    `integer`
+
+  - **`tipo`**
+
+    `string`, possible values: `"barrio", "manual", "predefinida"`, default: `"barrio"`
+
+  - **`updatedAt`**
+
+    `string`, format: `date-time`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "nombre": "",
+    "tipo": "barrio",
+    "diasEntrega": "",
+    "horario": "",
+    "activo": true,
+    "createdAt": "",
+    "updatedAt": "",
+    "additionalProperty": "anything"
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Zone not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ## Schemas
 
 ### HealthResponse
@@ -2080,6 +4621,507 @@ REST API for BizCode commercial management system. Runs as an Express 5 sidecar 
 }
 ```
 
+### SetupOwnerInput
+
+- **Type:**`object`
+
+* **`password` (required)**
+
+  `string`
+
+* **`tenantName` (required)**
+
+  `string`
+
+* **`tenantSlug` (required)**
+
+  `string`
+
+* **`username` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "tenantName": "",
+  "tenantSlug": "",
+  "username": "",
+  "password": ""
+}
+```
+
+### SetupOwnerResult
+
+- **Type:**`object`
+
+* **`role` (required)**
+
+  `string`
+
+* **`tenantId` (required)**
+
+  `integer`
+
+* **`userId` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "tenantId": 1,
+  "userId": 1,
+  "role": ""
+}
+```
+
+### SetupOwnerEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`role` (required)**
+
+    `string`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`userId` (required)**
+
+    `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "tenantId": 1,
+    "userId": 1,
+    "role": ""
+  }
+}
+```
+
+### LoginInput
+
+- **Type:**`object`
+
+* **`password` (required)**
+
+  `string`
+
+* **`tenantSlug` (required)**
+
+  `string`
+
+* **`username` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "tenantSlug": "",
+  "username": "",
+  "password": ""
+}
+```
+
+### LoginResult
+
+- **Type:**`object`
+
+* **`role` (required)**
+
+  `string`
+
+* **`tenantId` (required)**
+
+  `integer`
+
+* **`userId` (required)**
+
+  `integer`
+
+* **`username` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "userId": 1,
+  "tenantId": 1,
+  "username": "",
+  "role": ""
+}
+```
+
+### LoginEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`role` (required)**
+
+    `string`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`userId` (required)**
+
+    `integer`
+
+  - **`username` (required)**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "userId": 1,
+    "tenantId": 1,
+    "username": "",
+    "role": ""
+  }
+}
+```
+
+### LogoutResult
+
+- **Type:**`object`
+
+* **`loggedOut` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "loggedOut": true
+}
+```
+
+### LogoutEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`loggedOut` (required)**
+
+    `boolean`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "loggedOut": true
+  }
+}
+```
+
+### AuthScope
+
+- **Type:**`object`
+
+* **`branchIds` (required)**
+
+  `array`
+
+  **Items:**
+
+  `integer`
+
+* **`channels` (required)**
+
+  `array`
+
+  **Items:**
+
+  `string`
+
+* **`routeIds` (required)**
+
+  `array`
+
+  **Items:**
+
+  `integer`
+
+* **`tenantId` (required)**
+
+  `integer`
+
+* **`warehouseIds` (required)**
+
+  `array`
+
+  **Items:**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "tenantId": 1,
+  "branchIds": [
+    1
+  ],
+  "warehouseIds": [
+    1
+  ],
+  "routeIds": [
+    1
+  ],
+  "channels": [
+    ""
+  ]
+}
+```
+
+### AuthClaims
+
+- **Type:**`object`
+
+* **`permissions` (required)**
+
+  `array`
+
+  **Items:**
+
+  `string`
+
+* **`role` (required)**
+
+  `string`
+
+* **`scope` (required)**
+
+  `object`
+
+  - **`branchIds` (required)**
+
+    `array`
+
+    **Items:**
+
+    `integer`
+
+  - **`channels` (required)**
+
+    `array`
+
+    **Items:**
+
+    `string`
+
+  - **`routeIds` (required)**
+
+    `array`
+
+    **Items:**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`warehouseIds` (required)**
+
+    `array`
+
+    **Items:**
+
+    `integer`
+
+* **`tenantId` (required)**
+
+  `integer`
+
+* **`userId` (required)**
+
+  `integer`
+
+* **`username` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "userId": 1,
+  "tenantId": 1,
+  "username": "",
+  "role": "",
+  "permissions": [
+    ""
+  ],
+  "scope": {
+    "tenantId": 1,
+    "branchIds": [
+      1
+    ],
+    "warehouseIds": [
+      1
+    ],
+    "routeIds": [
+      1
+    ],
+    "channels": [
+      ""
+    ]
+  }
+}
+```
+
+### AuthClaimsEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`permissions` (required)**
+
+    `array`
+
+    **Items:**
+
+    `string`
+
+  - **`role` (required)**
+
+    `string`
+
+  - **`scope` (required)**
+
+    `object`
+
+    - **`branchIds` (required)**
+
+      `array`
+
+      **Items:**
+
+      `integer`
+
+    - **`channels` (required)**
+
+      `array`
+
+      **Items:**
+
+      `string`
+
+    - **`routeIds` (required)**
+
+      `array`
+
+      **Items:**
+
+      `integer`
+
+    - **`tenantId` (required)**
+
+      `integer`
+
+    - **`warehouseIds` (required)**
+
+      `array`
+
+      **Items:**
+
+      `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`userId` (required)**
+
+    `integer`
+
+  - **`username` (required)**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "userId": 1,
+    "tenantId": 1,
+    "username": "",
+    "role": "",
+    "permissions": [
+      ""
+    ],
+    "scope": {
+      "tenantId": 1,
+      "branchIds": [
+        1
+      ],
+      "warehouseIds": [
+        1
+      ],
+      "routeIds": [
+        1
+      ],
+      "channels": [
+        ""
+      ]
+    }
+  }
+}
+```
+
 ### Cliente
 
 - **Type:**`object`
@@ -2087,6 +5129,14 @@ REST API for BizCode commercial management system. Runs as an Express 5 sidecar 
 * **`activo`**
 
   `boolean`
+
+* **`balance`**
+
+  `number`, default: `0` — Accumulated balance (incremented on each new factura).
+
+* **`balanceInicial`**
+
+  `number`, default: `0` — Opening balance at migration time.
 
 * **`codigo`**
 
@@ -2100,9 +5150,21 @@ REST API for BizCode commercial management system. Runs as an Express 5 sidecar 
 
   `string`
 
+* **`creditDays`**
+
+  `integer`, default: `0` — Usual credit days for this customer.
+
+* **`creditLimit`**
+
+  `number` — Credit limit in ARS. null = no limit.
+
 * **`cuit`**
 
   `string`
+
+* **`deliveryZoneId`**
+
+  `integer` — FK to DeliveryZone. Assign a delivery zone to this customer.
 
 * **`domicilio`**
 
@@ -2128,6 +5190,14 @@ REST API for BizCode commercial management system. Runs as an Express 5 sidecar 
 
   `string`
 
+* **`score`**
+
+  `integer`, default: `50` — Payment score 0-100 (50=neutral, 0=high risk, 100=perfect).
+
+* **`suspended`**
+
+  `boolean`, default: `false` — When true, POST /api/facturas returns 422 CLIENT\_SUSPENDED.
+
 * **`telef`**
 
   `string`
@@ -2148,6 +5218,13 @@ REST API for BizCode commercial management system. Runs as an Express 5 sidecar 
   "telef": "",
   "email": "",
   "activo": true,
+  "creditLimit": 1,
+  "creditDays": 0,
+  "balance": 0,
+  "balanceInicial": 0,
+  "score": 50,
+  "suspended": false,
+  "deliveryZoneId": 1,
   "additionalProperty": "anything"
 }
 ```
@@ -2176,9 +5253,21 @@ REST API for BizCode commercial management system. Runs as an Express 5 sidecar 
 
   `string`
 
+* **`creditDays`**
+
+  `integer`
+
+* **`creditLimit`**
+
+  `number`
+
 * **`cuit`**
 
   `string`
+
+* **`deliveryZoneId`**
+
+  `integer`
 
 * **`domicilio`**
 
@@ -2195,6 +5284,10 @@ REST API for BizCode commercial management system. Runs as an Express 5 sidecar 
 * **`localidad`**
 
   `string`
+
+* **`suspended`**
+
+  `boolean`
 
 * **`telef`**
 
@@ -2214,7 +5307,11 @@ REST API for BizCode commercial management system. Runs as an Express 5 sidecar 
   "cpost": "",
   "telef": "",
   "email": "",
-  "activo": true
+  "activo": true,
+  "creditLimit": 1,
+  "creditDays": 0,
+  "suspended": true,
+  "deliveryZoneId": 1
 }
 ```
 
@@ -2232,6 +5329,14 @@ REST API for BizCode commercial management system. Runs as an Express 5 sidecar 
 
     `boolean`
 
+  - **`balance`**
+
+    `number`, default: `0` — Accumulated balance (incremented on each new factura).
+
+  - **`balanceInicial`**
+
+    `number`, default: `0` — Opening balance at migration time.
+
   - **`codigo`**
 
     `integer`
@@ -2244,9 +5349,21 @@ REST API for BizCode commercial management system. Runs as an Express 5 sidecar 
 
     `string`
 
+  - **`creditDays`**
+
+    `integer`, default: `0` — Usual credit days for this customer.
+
+  - **`creditLimit`**
+
+    `number` — Credit limit in ARS. null = no limit.
+
   - **`cuit`**
 
     `string`
+
+  - **`deliveryZoneId`**
+
+    `integer` — FK to DeliveryZone. Assign a delivery zone to this customer.
 
   - **`domicilio`**
 
@@ -2271,6 +5388,14 @@ REST API for BizCode commercial management system. Runs as an Express 5 sidecar 
   - **`rsocial`**
 
     `string`
+
+  - **`score`**
+
+    `integer`, default: `50` — Payment score 0-100 (50=neutral, 0=high risk, 100=perfect).
+
+  - **`suspended`**
+
+    `boolean`, default: `false` — When true, POST /api/facturas returns 422 CLIENT\_SUSPENDED.
 
   - **`telef`**
 
@@ -2299,6 +5424,13 @@ REST API for BizCode commercial management system. Runs as an Express 5 sidecar 
       "telef": "",
       "email": "",
       "activo": true,
+      "creditLimit": 1,
+      "creditDays": 0,
+      "balance": 0,
+      "balanceInicial": 0,
+      "score": 50,
+      "suspended": false,
+      "deliveryZoneId": 1,
       "additionalProperty": "anything"
     }
   ]
@@ -2317,6 +5449,14 @@ REST API for BizCode commercial management system. Runs as an Express 5 sidecar 
 
     `boolean`
 
+  - **`balance`**
+
+    `number`, default: `0` — Accumulated balance (incremented on each new factura).
+
+  - **`balanceInicial`**
+
+    `number`, default: `0` — Opening balance at migration time.
+
   - **`codigo`**
 
     `integer`
@@ -2329,9 +5469,21 @@ REST API for BizCode commercial management system. Runs as an Express 5 sidecar 
 
     `string`
 
+  - **`creditDays`**
+
+    `integer`, default: `0` — Usual credit days for this customer.
+
+  - **`creditLimit`**
+
+    `number` — Credit limit in ARS. null = no limit.
+
   - **`cuit`**
 
     `string`
+
+  - **`deliveryZoneId`**
+
+    `integer` — FK to DeliveryZone. Assign a delivery zone to this customer.
 
   - **`domicilio`**
 
@@ -2356,6 +5508,14 @@ REST API for BizCode commercial management system. Runs as an Express 5 sidecar 
   - **`rsocial`**
 
     `string`
+
+  - **`score`**
+
+    `integer`, default: `50` — Payment score 0-100 (50=neutral, 0=high risk, 100=perfect).
+
+  - **`suspended`**
+
+    `boolean`, default: `false` — When true, POST /api/facturas returns 422 CLIENT\_SUSPENDED.
 
   - **`telef`**
 
@@ -2383,6 +5543,13 @@ REST API for BizCode commercial management system. Runs as an Express 5 sidecar 
     "telef": "",
     "email": "",
     "activo": true,
+    "creditLimit": 1,
+    "creditDays": 0,
+    "balance": 0,
+    "balanceInicial": 0,
+    "score": 50,
+    "suspended": false,
+    "deliveryZoneId": 1,
     "additionalProperty": "anything"
   }
 }
@@ -2418,6 +5585,13 @@ REST API for BizCode commercial management system. Runs as an Express 5 sidecar 
     "telef": "",
     "email": "",
     "activo": true,
+    "creditLimit": 1,
+    "creditDays": 0,
+    "balance": 0,
+    "balanceInicial": 0,
+    "score": 50,
+    "suspended": false,
+    "deliveryZoneId": 1,
     "additionalProperty": "anything"
   }
 }
@@ -3941,5 +7115,711 @@ REST API for BizCode commercial management system. Runs as an Express 5 sidecar 
       "additionalProperty": "anything"
     }
   ]
+}
+```
+
+### AppUser
+
+- **Type:**`object`
+
+* **`active`**
+
+  `boolean`
+
+* **`createdAt`**
+
+  `string`, format: `date-time`
+
+* **`id`**
+
+  `integer`
+
+* **`role`**
+
+  `string`, possible values: `"super_admin", "owner", "manager", "seller", "backoffice", "warehouse_op", "warehouse_lead", "logistics_planner", "driver", "billing", "cashier", "collections", "finance", "auditor"`
+
+* **`scopeBranchIds`**
+
+  `array`
+
+  **Items:**
+
+  `integer`
+
+* **`scopeChannels`**
+
+  `array`
+
+  **Items:**
+
+  `string`, possible values: `"counter", "field", "backoffice", "warehouse", "delivery"`
+
+* **`scopeRouteIds`**
+
+  `array`
+
+  **Items:**
+
+  `integer`
+
+* **`scopeWarehouseIds`**
+
+  `array`
+
+  **Items:**
+
+  `integer`
+
+* **`updatedAt`**
+
+  `string`, format: `date-time`
+
+* **`username`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "username": "",
+  "role": "super_admin",
+  "active": true,
+  "scopeChannels": [
+    "counter"
+  ],
+  "scopeBranchIds": [
+    1
+  ],
+  "scopeWarehouseIds": [
+    1
+  ],
+  "scopeRouteIds": [
+    1
+  ],
+  "createdAt": "",
+  "updatedAt": ""
+}
+```
+
+### AppUserInput
+
+- **Type:**`object`
+
+* **`password` (required)**
+
+  `string`
+
+* **`role` (required)**
+
+  `string`, possible values: `"super_admin", "owner", "manager", "seller", "backoffice", "warehouse_op", "warehouse_lead", "logistics_planner", "driver", "billing", "cashier", "collections", "finance", "auditor"`
+
+* **`username` (required)**
+
+  `string`
+
+* **`active`**
+
+  `boolean`, default: `true`
+
+* **`scopeBranchIds`**
+
+  `array`
+
+  **Items:**
+
+  `integer`
+
+* **`scopeChannels`**
+
+  `array`
+
+  **Items:**
+
+  `string`, possible values: `"counter", "field", "backoffice", "warehouse", "delivery"`
+
+* **`scopeRouteIds`**
+
+  `array`
+
+  **Items:**
+
+  `integer`
+
+* **`scopeWarehouseIds`**
+
+  `array`
+
+  **Items:**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "username": "",
+  "password": "",
+  "role": "super_admin",
+  "active": true,
+  "scopeChannels": [
+    "counter"
+  ],
+  "scopeBranchIds": [
+    1
+  ],
+  "scopeWarehouseIds": [
+    1
+  ],
+  "scopeRouteIds": [
+    1
+  ]
+}
+```
+
+### AppUserUpdateInput
+
+- **Type:**`object`
+
+* **`active`**
+
+  `boolean`
+
+* **`role`**
+
+  `string`, possible values: `"super_admin", "owner", "manager", "seller", "backoffice", "warehouse_op", "warehouse_lead", "logistics_planner", "driver", "billing", "cashier", "collections", "finance", "auditor"`
+
+* **`scopeBranchIds`**
+
+  `array`
+
+  **Items:**
+
+  `integer`
+
+* **`scopeChannels`**
+
+  `array`
+
+  **Items:**
+
+  `string`, possible values: `"counter", "field", "backoffice", "warehouse", "delivery"`
+
+* **`scopeRouteIds`**
+
+  `array`
+
+  **Items:**
+
+  `integer`
+
+* **`scopeWarehouseIds`**
+
+  `array`
+
+  **Items:**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "role": "super_admin",
+  "active": true,
+  "scopeChannels": [
+    "counter"
+  ],
+  "scopeBranchIds": [
+    1
+  ],
+  "scopeWarehouseIds": [
+    1
+  ],
+  "scopeRouteIds": [
+    1
+  ]
+}
+```
+
+### AppUserListEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`active`**
+
+    `boolean`
+
+  - **`createdAt`**
+
+    `string`, format: `date-time`
+
+  - **`id`**
+
+    `integer`
+
+  - **`role`**
+
+    `string`, possible values: `"super_admin", "owner", "manager", "seller", "backoffice", "warehouse_op", "warehouse_lead", "logistics_planner", "driver", "billing", "cashier", "collections", "finance", "auditor"`
+
+  - **`scopeBranchIds`**
+
+    `array`
+
+    **Items:**
+
+    `integer`
+
+  - **`scopeChannels`**
+
+    `array`
+
+    **Items:**
+
+    `string`, possible values: `"counter", "field", "backoffice", "warehouse", "delivery"`
+
+  - **`scopeRouteIds`**
+
+    `array`
+
+    **Items:**
+
+    `integer`
+
+  - **`scopeWarehouseIds`**
+
+    `array`
+
+    **Items:**
+
+    `integer`
+
+  - **`updatedAt`**
+
+    `string`, format: `date-time`
+
+  - **`username`**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "username": "",
+      "role": "super_admin",
+      "active": true,
+      "scopeChannels": [
+        "counter"
+      ],
+      "scopeBranchIds": [
+        1
+      ],
+      "scopeWarehouseIds": [
+        1
+      ],
+      "scopeRouteIds": [
+        1
+      ],
+      "createdAt": "",
+      "updatedAt": ""
+    }
+  ]
+}
+```
+
+### AppUserEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`active`**
+
+    `boolean`
+
+  - **`createdAt`**
+
+    `string`, format: `date-time`
+
+  - **`id`**
+
+    `integer`
+
+  - **`role`**
+
+    `string`, possible values: `"super_admin", "owner", "manager", "seller", "backoffice", "warehouse_op", "warehouse_lead", "logistics_planner", "driver", "billing", "cashier", "collections", "finance", "auditor"`
+
+  - **`scopeBranchIds`**
+
+    `array`
+
+    **Items:**
+
+    `integer`
+
+  - **`scopeChannels`**
+
+    `array`
+
+    **Items:**
+
+    `string`, possible values: `"counter", "field", "backoffice", "warehouse", "delivery"`
+
+  - **`scopeRouteIds`**
+
+    `array`
+
+    **Items:**
+
+    `integer`
+
+  - **`scopeWarehouseIds`**
+
+    `array`
+
+    **Items:**
+
+    `integer`
+
+  - **`updatedAt`**
+
+    `string`, format: `date-time`
+
+  - **`username`**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "username": "",
+    "role": "super_admin",
+    "active": true,
+    "scopeChannels": [
+      "counter"
+    ],
+    "scopeBranchIds": [
+      1
+    ],
+    "scopeWarehouseIds": [
+      1
+    ],
+    "scopeRouteIds": [
+      1
+    ],
+    "createdAt": "",
+    "updatedAt": ""
+  }
+}
+```
+
+### ChangePasswordInput
+
+- **Type:**`object`
+
+* **`currentPassword` (required)**
+
+  `string`
+
+* **`newPassword` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "currentPassword": "",
+  "newPassword": ""
+}
+```
+
+### DeliveryZone
+
+- **Type:**`object`
+
+* **`activo`**
+
+  `boolean`, default: `true`
+
+* **`createdAt`**
+
+  `string`, format: `date-time`
+
+* **`diasEntrega`**
+
+  `string` — Comma-separated delivery day numbers, e.g. "1,3,5"
+
+* **`horario`**
+
+  `string` — Preferred time window, e.g. "08:00-12:00"
+
+* **`id`**
+
+  `integer`
+
+* **`nombre`**
+
+  `string`
+
+* **`tenantId`**
+
+  `integer`
+
+* **`tipo`**
+
+  `string`, possible values: `"barrio", "manual", "predefinida"`, default: `"barrio"`
+
+* **`updatedAt`**
+
+  `string`, format: `date-time`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "tenantId": 1,
+  "nombre": "",
+  "tipo": "barrio",
+  "diasEntrega": "",
+  "horario": "",
+  "activo": true,
+  "createdAt": "",
+  "updatedAt": "",
+  "additionalProperty": "anything"
+}
+```
+
+### DeliveryZoneInput
+
+- **Type:**`object`
+
+* **`nombre` (required)**
+
+  `string`
+
+* **`diasEntrega`**
+
+  `string`
+
+* **`horario`**
+
+  `string`
+
+* **`tipo`**
+
+  `string`, possible values: `"barrio", "manual", "predefinida"`, default: `"barrio"`
+
+**Example:**
+
+```json
+{
+  "nombre": "",
+  "tipo": "barrio",
+  "diasEntrega": "",
+  "horario": ""
+}
+```
+
+### DeliveryZoneUpdateInput
+
+- **Type:**`object`
+
+* **`activo`**
+
+  `boolean`
+
+* **`diasEntrega`**
+
+  `string`
+
+* **`horario`**
+
+  `string`
+
+* **`nombre`**
+
+  `string`
+
+* **`tipo`**
+
+  `string`, possible values: `"barrio", "manual", "predefinida"`
+
+**Example:**
+
+```json
+{
+  "nombre": "",
+  "tipo": "barrio",
+  "diasEntrega": "",
+  "horario": "",
+  "activo": true
+}
+```
+
+### DeliveryZoneListEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`activo`**
+
+    `boolean`, default: `true`
+
+  - **`createdAt`**
+
+    `string`, format: `date-time`
+
+  - **`diasEntrega`**
+
+    `string` — Comma-separated delivery day numbers, e.g. "1,3,5"
+
+  - **`horario`**
+
+    `string` — Preferred time window, e.g. "08:00-12:00"
+
+  - **`id`**
+
+    `integer`
+
+  - **`nombre`**
+
+    `string`
+
+  - **`tenantId`**
+
+    `integer`
+
+  - **`tipo`**
+
+    `string`, possible values: `"barrio", "manual", "predefinida"`, default: `"barrio"`
+
+  - **`updatedAt`**
+
+    `string`, format: `date-time`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "nombre": "",
+      "tipo": "barrio",
+      "diasEntrega": "",
+      "horario": "",
+      "activo": true,
+      "createdAt": "",
+      "updatedAt": "",
+      "additionalProperty": "anything"
+    }
+  ]
+}
+```
+
+### DeliveryZoneEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`activo`**
+
+    `boolean`, default: `true`
+
+  - **`createdAt`**
+
+    `string`, format: `date-time`
+
+  - **`diasEntrega`**
+
+    `string` — Comma-separated delivery day numbers, e.g. "1,3,5"
+
+  - **`horario`**
+
+    `string` — Preferred time window, e.g. "08:00-12:00"
+
+  - **`id`**
+
+    `integer`
+
+  - **`nombre`**
+
+    `string`
+
+  - **`tenantId`**
+
+    `integer`
+
+  - **`tipo`**
+
+    `string`, possible values: `"barrio", "manual", "predefinida"`, default: `"barrio"`
+
+  - **`updatedAt`**
+
+    `string`, format: `date-time`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "nombre": "",
+    "tipo": "barrio",
+    "diasEntrega": "",
+    "horario": "",
+    "activo": true,
+    "createdAt": "",
+    "updatedAt": "",
+    "additionalProperty": "anything"
+  }
 }
 ```

@@ -85,3 +85,45 @@ The **orphan** branch `documentacion` contains **no application source** — onl
 - [x] PostgreSQL-backed integration tests (Phase B, ADR-0004) — `tests/integration/`, `npm run test:integration`
 - [x] **Tauri build on self-hosted runner** — `.github/workflows/tauri-selfhosted.yml` (`workflow_dispatch` only) — [ADR-0006](../adr/ADR-0006-release-and-tauri-ci-workflows.md)
 - [x] **semantic-release** — `release.config.cjs`, `.github/workflows/release.yml` (`workflow_dispatch` on `main`) — [ADR-0006](../adr/ADR-0006-release-and-tauri-ci-workflows.md)
+
+## Project status automation (GitHub)
+
+Validated operating behavior for board `BizCode Delivery`:
+
+- Open PR with `Closes #<issue>` -> `In Progress`.
+- Close PR without merge -> `Backlog`.
+- Merge PR -> `Done`.
+
+Implementation:
+
+- Workflow: `.github/workflows/project-status-automation.yml`
+- Required repository variables:
+  - `PROJECT_V2_ID`
+  - `PROJECT_STATUS_FIELD_ID`
+  - `PROJECT_STATUS_OPTION_BACKLOG`
+  - `PROJECT_STATUS_OPTION_IN_PROGRESS`
+  - `PROJECT_STATUS_OPTION_DONE`
+  - `PROJECT_STATUS_OPTION_BLOCKED` (optional)
+- Recommended secret for user-owned Project V2 boards:
+  - `PROJECT_AUTOMATION_TOKEN` (`repo`, `project`, `read:project`)
+
+## Cursor plan → GitHub Issues + Project (local tooling)
+
+- **CI validation (no token):** `.github/workflows/plan-md-validate.yml` runs `npm run plan:validate` on pull requests and on pushes to `main` / `develop`. By default it validates only `tests/plan-sync/fixtures/valid-*.plan.md` (contract + labels). Locally, `npm run plan:validate -- --with-cursor-plans` also checks `.cursor/plans/*.plan.md` if that directory exists.
+- **Local sync:** `npm run plan:sync -- --plan <path-to.plan.md> [--repo owner/repo] [--repo-root <dir>] [--dry-run]` upserts one issue per plan todo, links issues to Project v2, sets board status from todo state, and persists mapping under `.github/plan-sync/state/`. Non-dry-run requires `GH_TOKEN` or `GITHUB_TOKEN`, `GITHUB_REPOSITORY` (or `GITHUB_OWNER` + `GITHUB_REPO`, or `--repo`), and the same Project variables as above (`PROJECT_V2_ID`, `PROJECT_STATUS_FIELD_ID`, and the `PROJECT_STATUS_OPTION_*` option IDs). Sync reports are written under `.github/plan-sync/reports/` (gitignored).
+- **Optional approve flow:** `npm run plan:approve -- --plan <path>` archives a copy under `.cursor/plans/` and runs `plan:sync` (see `scripts/github/plan-approve-main.ts`).
+- **Interaction with PR automation:** Once items are on the board, `.github/workflows/project-status-automation.yml` still updates status from PR open/close/merge when issues are linked with `Closes #<issue>`.
+
+Daily usage checklist:
+
+1. Create issue from `Task` template.
+2. Add issue to Project.
+3. Open PR with `Closes #<issue>`.
+4. Verify required checks (`Quality Gate`, `Docs governance`, security checks).
+5. Merge only when CI is green.
+
+Documentation governance (Wiki vs controlled docs):
+
+- Fast-changing operational notes can live in Wiki.
+- Auditable/release-gated documentation must remain in repository docs.
+- Reference: [Wiki vs controlled documentation policy](wiki-vs-controlled-docs-policy.md).

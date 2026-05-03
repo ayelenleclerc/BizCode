@@ -5,6 +5,16 @@
     "activo": {
       "type": "boolean"
     },
+    "balance": {
+      "default": 0,
+      "description": "Accumulated balance (incremented on each new factura).",
+      "type": "number"
+    },
+    "balanceInicial": {
+      "default": 0,
+      "description": "Opening balance at migration time.",
+      "type": "number"
+    },
     "codigo": {
       "type": "integer"
     },
@@ -15,9 +25,24 @@
       "nullable": true,
       "type": "string"
     },
+    "creditDays": {
+      "default": 0,
+      "description": "Usual credit days for this customer.",
+      "type": "integer"
+    },
+    "creditLimit": {
+      "description": "Credit limit in ARS. null = no limit.",
+      "nullable": true,
+      "type": "number"
+    },
     "cuit": {
       "nullable": true,
       "type": "string"
+    },
+    "deliveryZoneId": {
+      "description": "FK to DeliveryZone. Assign a delivery zone to this customer.",
+      "nullable": true,
+      "type": "integer"
     },
     "domicilio": {
       "nullable": true,
@@ -40,6 +65,18 @@
     },
     "rsocial": {
       "type": "string"
+    },
+    "score": {
+      "default": 50,
+      "description": "Payment score 0-100 (50=neutral, 0=high risk, 100=perfect).",
+      "maximum": 100,
+      "minimum": 0,
+      "type": "integer"
+    },
+    "suspended": {
+      "default": false,
+      "description": "When true, POST /api/facturas returns 422 CLIENT_SUSPENDED.",
+      "type": "boolean"
     },
     "telef": {
       "nullable": true,

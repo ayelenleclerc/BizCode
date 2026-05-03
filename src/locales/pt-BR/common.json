@@ -1,13 +1,65 @@
 {
   "app": {
     "name": "BizCode",
-    "version": "v0.1.0 MVP",
     "tagline": "Sistema de Gestão Comercial"
   },
   "nav": {
+    "main": "Navegação principal",
+    "inicio": "Início",
+    "ventas": "Vendas",
     "clientes": "Clientes",
+    "catalogo": "Catálogo",
+    "logistica": "Logística",
+    "finanzas": "Finanças",
+    "configuracion": "Configurações",
     "articulos": "Produtos",
-    "facturacion": "Faturamento"
+    "facturacion": "Faturamento",
+    "users": "Usuários",
+    "zonasEntrega": "Zonas de entrega"
+  },
+  "language": {
+    "legend": "Idioma da interface",
+    "selectAria": "Escolher idioma da interface",
+    "optionEs": "Espanhol",
+    "optionEn": "Inglês",
+    "optionPtBr": "Português (Brasil)"
+  },
+  "auth": {
+    "title": "Entrar",
+    "subtitle": "Entre para continuar",
+    "formTitle": "Entrar",
+    "fields": {
+      "tenantSlug": "Empresa (slug)",
+      "username": "Usuário",
+      "password": "Senha"
+    },
+    "tenantSlug": "Tenant",
+    "username": "Usuário",
+    "password": "Senha",
+    "submit": "Entrar",
+    "submitting": "Entrando…",
+    "signIn": "Entrar",
+    "signingIn": "Entrando…",
+    "logout": "Sair",
+    "loadingSession": "Carregando sessão…",
+    "userLabel": "Usuário: {{username}} (perfil: {{role}})",
+    "validation": {
+      "tenantRequired": "Informe o identificador da empresa",
+      "usernameRequired": "Informe o usuário",
+      "passwordRequired": "Informe a senha"
+    },
+    "errors": {
+      "invalidCredentials": "Usuário ou senha incorretos",
+      "accountLocked": "Conta bloqueada por excesso de tentativas. Entre em contato com o administrador.",
+      "tooManyRequests": "Muitas tentativas. Aguarde 15 minutos e tente novamente.",
+      "generic": "Não foi possível entrar",
+      "network": "Não foi possível conectar ao servidor. Verifique se a API está em execução (ex.: porta 3001) e tente novamente.",
+      "timeout": "A requisição demorou demais. Tente novamente.",
+      "offline": "Sem conexão. Verifique a rede e tente novamente."
+    }
+  },
+  "session": {
+    "logout": "Sair"
   },
   "shortcuts": {
     "title": "Atalhos globais",
@@ -18,6 +70,7 @@
     "navigate": "Navegar"
   },
   "theme": {
+    "toggleTitle": "Alternar tema claro ou escuro",
     "switchToLight": "☀️ Claro",
     "switchToDark": "🌙 Escuro"
   },
@@ -30,10 +83,46 @@
   "status": {
     "loading": "Carregando...",
     "active": "Ativo",
-    "inactive": "Inativo"
+    "inactive": "Inativo",
+    "comingSoon": "Em breve disponível em v0.2.0"
   },
   "errors": {
     "generic": "Erro ao salvar",
     "required": "Campo obrigatório"
+  },
+  "notifications": {
+    "title": "Notificações",
+    "bell": "{{count}} notificação não lida",
+    "bell_other": "{{count}} notificações não lidas",
+    "empty": "Sem notificações",
+    "markRead": "Marcar como lida",
+    "markAllRead": "Marcar todas como lidas",
+    "types": {
+      "credit_limit_exceeded": "Limite de crédito excedido",
+      "invoice_overdue": "Fatura vencida",
+      "invoice_due_soon": "Fatura a vencer"
+    }
+  },
+  "notifChannels": {
+    "title": "Canais de notificação",
+    "subtitle": "Canais configurados para este tenant (somente leitura nesta versão)",
+    "inApp": "In-app",
+    "email": "Email (SMTP)",
+    "whatsapp": "WhatsApp (Twilio)",
+    "active": "Ativo",
+    "inactive": "Não configurado",
+    "loadError": "Não foi possível carregar o status dos canais"
+  },
+  "dashboard": {
+    "title": "Resumo do dia",
+    "ventasHoy": "Vendas de hoje",
+    "facturasVencidas": "Faturas vencidas",
+    "cobrosHoy": "Cobranças de hoje",
+    "alertasActivas": "Alertas ativos",
+    "invoices": "{{count}} fatura",
+    "invoices_other": "{{count}} faturas",
+    "noData": "Sem dados",
+    "overdueNote": "Estimado — prazos reais disponíveis na próxima versão",
+    "pendingFeature": "Disponível em v0.2.0"
   }
 }

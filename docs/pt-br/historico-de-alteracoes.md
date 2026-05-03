@@ -8,8 +8,18 @@ Versionamento: [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Corrigido
+
+- **CORS + cookie de sessão:** `cors` no Express usa `credentials: true` e allowlist de origens (`http://localhost:5173`, `http://127.0.0.1:5173`, mais `CORS_ORIGINS` em CSV) para o SPA (Axios `withCredentials`) receber e enviar cookies de sessão entre origens; [`server/createApp.ts`](../../server/createApp.ts), [`.env.example`](../../.env.example), [`tests/server/cors.test.ts`](../../tests/server/cors.test.ts); [seguranca.md](seguranca.md) atualizado.
+
+### Adicionado
+
+- **Gestão de usuários (issue #25):** `GET/POST /api/users`, `PUT /api/users/:id`, `POST /api/auth/change-password`; página Usuários (`src/pages/users/`) com DataTable + modal criação/edição, atalhos de teclado (F2/F3/F5/Esc), restrição de hierarquia de perfis; componente `<CanAccess permission="..." />` para renderização condicional por permissão; link na sidebar visível somente para titulares de `users.manage`; i18n em EN/ES/PT-BR; 17 novos testes de integração; OpenAPI atualizado; docs trilingues em `docs/*/quality/`.
+
 ### Added
 
+- **Fluxo de arquivamento na aprovação de planos:** novo comando `npm run plan:approve -- --plan <arquivo>` que salva planos aprovados em `.cursor/plans/{timestamp}-{slug}.plan.md` e depois executa o fluxo existente `plan:sync` (Issues/Project v2 no GitHub); `plan:sync` continua disponível para sincronização manual/direta.
+- **UX de autenticacao + bootstrap seguro:** tela de login com guard de rotas/logout ligada a `/api/auth/login|me|logout`, suporte de cookie de sessao em [`src/lib/api.ts`](../../src/lib/api.ts), provider em [`src/auth/AuthProvider.tsx`](../../src/auth/AuthProvider.tsx), e comando `npm run bootstrap:superadmin` para criar super admin (senha via `BIZCODE_BOOTSTRAP_SUPERADMIN_PASSWORD`, sem credencial hardcoded) por [`scripts/bootstrap-superadmin.ts`](../../scripts/bootstrap-superadmin.ts).
 - **Visão de produto e governança:** documento trilíngue [visao-produto-e-implantacao.md](quality/visao-produto-e-implantacao.md) (PROD-VISION-001) · [en](../en/quality/product-vision-and-deployment.md) · [es](../es/quality/vision-producto-y-despliegue.md); [ADR-0007](adr/ADR-0007-dual-deployment-and-fiscal-modularity.md) (desktop/SaaS + modularidade fiscal); linha em [DOCUMENT_LOCALE_MAP.md](../DOCUMENT_LOCALE_MAP.md); [AGENTS.md](../../AGENTS.md) e [`.cursor/rules/product-vision.mdc`](../../.cursor/rules/product-vision.mdc); matriz [rastreabilidade-iso.md](certificacion-iso/rastreabilidade-iso.md); links na arquitetura
 - **Documentação (pacote ISO):** [Certificación-ISO/README.md](../../Certificación-ISO/README.md) como ponto de entrada; manual do SGQ, matriz de rastreabilidade ISO, modelos de registros e ciclo de vida documental em `docs/{en,es,pt-br}/certificacion-iso/` (fonte única); [indice-pacote-iso.md](certificacion-iso/indice-pacote-iso.md) (ISO-PKG-001); stubs em [`docs/quality/`](../quality/); estratégia de testes / CI/CD / plano Swagger permanecem em `docs/*/quality/`; **SBOM:** `@cyclonedx/cyclonedx-npm`, `npm run sbom:generate` → [`docs/evidence/sbom-cyclonedx.json`](../evidence/sbom-cyclonedx.json) (SBOM-001), [`docs/evidence/README.md`](../evidence/README.md)
 - **API:** **Swagger UI** em `http://localhost:3001/api-docs/` (`swagger-ui-express`, [`server/createApp.ts`](../../server/createApp.ts), OpenAPI em [`openapi.yaml`](../api/openapi.yaml)); [`tests/api/swagger-ui.test.ts`](../../tests/api/swagger-ui.test.ts); dependência runtime `yaml`; `info.description` do OpenAPI atualizado
@@ -33,6 +43,7 @@ Versionamento: [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- **Segurança / setup:** [`.env.example`](../../.env.example) não inclui mais credenciais de exemplo do banco nem literal de senha de seed padrão; `npx prisma db seed` **exige** `BIZCODE_SEED_SUPERADMIN_PASSWORD` no `.env` (≥ 8 caracteres). Ver [seguranca.md](seguranca.md), [superadmin-bootstrap-e-rbac.md](quality/superadmin-bootstrap-e-rbac.md) e [README.md](../../README.md).
 - Documentação: manuais de usuário (`docs/pt-br/user/`) alinhados ao inglês; `certificacion-iso/modelos-registros.md` completo (sessão de teste manual com tabela); `glossario.md` ampliado; título do índice ADR em português
 - Glossário e [mapa-dados-pessoais.md](mapa-dados-pessoais.md): autoridade fiscal argentina como **ARCA** (ex-AFIP); [I18N_DOCUMENTATION.md](../I18N_DOCUMENTATION.md) e [DOCUMENT_LOCALE_MAP.md](../DOCUMENT_LOCALE_MAP.md) descrevem **nomes de arquivo localizados** por árvore (ADRs com o mesmo slug nos três idiomas)
 

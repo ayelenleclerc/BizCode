@@ -6,7 +6,7 @@ info:
     REST API for BizCode commercial management system.
     Runs as an Express 5 sidecar on localhost:3001.
     Responses use a JSON envelope `{ success: true, data: ... }` except `/api/health`.
-    No authentication is required (loopback-only access).
+    Session authentication is required for protected resources.
     Interactive documentation (Swagger UI): http://localhost:3001/api-docs/ (same contract as this file).
   contact:
     name: BizCode Team
@@ -18,6 +18,8 @@ servers:
 tags:
   - name: health
     description: Health check
+  - name: auth
+    description: Authentication and session bootstrap
   - name: clientes
     description: Customer management
   - name: articulos
@@ -28,8 +30,81 @@ tags:
     description: Invoice management
   - name: formasPago
     description: Payment methods
+  - name: users
+    description: User management (requires users.manage permission)
 
 paths:
+  /api/auth/setup-owner:
+    post:
+      tags: [auth]
+      summary: Bootstrap first owner account
+      description: One-time endpoint to create initial tenant and owner user.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SetupOwnerInput'
+      responses:
+        '201':
+          description: Owner created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SetupOwnerEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          $ref: '#/components/responses/ConflictError'
+
+  /api/auth/login:
+    post:
+      tags: [auth]
+      summary: Create authenticated session
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginInput'
+      responses:
+        '200':
+          description: Session created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /api/auth/logout:
+    post:
+      tags: [auth]
+      summary: Revoke current session
+      responses:
+        '200':
+          description: Session revoked (or already missing)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LogoutEnvelope'
+
+  /api/auth/me:
+    get:
+      tags: [auth]
+      summary: Get authenticated claims
+      responses:
+        '200':
+          description: Current authenticated claims
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthClaimsEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
   /api/health:
     get:
       tags: [health]
@@ -61,6 +136,10 @@ paths:
                 $ref: '#/components/schemas/ClienteListEnvelope'
         '500':
           $ref: '#/components/responses/ServerError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
     post:
       tags: [clientes]
       summary: Create a customer
@@ -79,6 +158,10 @@ paths:
                 $ref: '#/components/schemas/ClienteEnvelope'
         '500':
           $ref: '#/components/responses/ServerError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
 
   /api/clientes/{id}:
     get:
@@ -99,6 +182,10 @@ paths:
                 $ref: '#/components/schemas/ClienteNullableEnvelope'
         '500':
           $ref: '#/components/responses/ServerError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
     put:
       tags: [clientes]
       summary: Update a customer
@@ -123,6 +210,10 @@ paths:
                 $ref: '#/components/schemas/ClienteEnvelope'
         '500':
           $ref: '#/components/responses/ServerError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
 
   /api/articulos:
     get:
@@ -143,6 +234,10 @@ paths:
                 $ref: '#/components/schemas/ArticuloListEnvelope'
         '500':
           $ref: '#/components/responses/ServerError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
     post:
       tags: [articulos]
       summary: Create a product
@@ -161,6 +256,10 @@ paths:
                 $ref: '#/components/schemas/ArticuloEnvelope'
         '500':
           $ref: '#/components/responses/ServerError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
 
   /api/articulos/{id}:
     get:
@@ -181,6 +280,10 @@ paths:
                 $ref: '#/components/schemas/ArticuloNullableEnvelope'
         '500':
           $ref: '#/components/responses/ServerError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
     put:
       tags: [articulos]
       summary: Update a product
@@ -205,6 +308,10 @@ paths:
                 $ref: '#/components/schemas/ArticuloEnvelope'
         '500':
           $ref: '#/components/responses/ServerError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
 
   /api/rubros:
     get:
@@ -219,6 +326,10 @@ paths:
                 $ref: '#/components/schemas/RubroListEnvelope'
         '500':
           $ref: '#/components/responses/ServerError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
     post:
       tags: [rubros]
       summary: Create a category
@@ -237,6 +348,10 @@ paths:
                 $ref: '#/components/schemas/RubroEnvelope'
         '500':
           $ref: '#/components/responses/ServerError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
 
   /api/facturas:
     get:
@@ -251,6 +366,10 @@ paths:
                 $ref: '#/components/schemas/FacturaListEnvelope'
         '500':
           $ref: '#/components/responses/ServerError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
     post:
       tags: [facturas]
       summary: Create an invoice
@@ -269,6 +388,10 @@ paths:
                 $ref: '#/components/schemas/FacturaEnvelope'
         '500':
           $ref: '#/components/responses/ServerError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
 
   /api/formas-pago:
     get:
@@ -284,7 +407,259 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
 
+  /api/users:
+    get:
+      tags: [users]
+      summary: List users for the current tenant
+      description: Returns all users belonging to the authenticated user's tenant. Requires `users.manage` permission.
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: List of users
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppUserListEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    post:
+      tags: [users]
+      summary: Create a new user
+      description: Creates a new user in the current tenant. Requires `users.manage` and `roles.assign` permissions.
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AppUserInput'
+      responses:
+        '201':
+          description: User created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppUserEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '409':
+          $ref: '#/components/responses/ConflictError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/users/{id}:
+    put:
+      tags: [users]
+      summary: Update a user
+      description: Updates role, active flag, or scope for a user in the current tenant. Requires `users.manage`.
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AppUserUpdateInput'
+      responses:
+        '200':
+          description: User updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppUserEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/auth/change-password:
+    post:
+      tags: [auth]
+      summary: Change own password
+      description: Allows the authenticated user to change their password by supplying the current password.
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangePasswordInput'
+      responses:
+        '200':
+          description: Password changed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    const: true
+                  data:
+                    type: object
+                    properties:
+                      changed:
+                        type: boolean
+                        const: true
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/notifications/channels:
+    get:
+      tags: [notifications]
+      summary: Report which external notification channels are configured
+      description: Returns boolean flags for each channel. No sensitive values are exposed.
+      security:
+        - cookieSession: []
+      responses:
+        '200':
+          description: Channel status
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [success, data]
+                properties:
+                  success:
+                    type: boolean
+                    const: true
+                  data:
+                    type: object
+                    required: [inApp, email, whatsapp]
+                    properties:
+                      inApp:
+                        type: boolean
+                      email:
+                        type: boolean
+                      whatsapp:
+                        type: boolean
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /api/zonas-entrega:
+    get:
+      tags: [logistics]
+      summary: List delivery zones for the authenticated tenant
+      security:
+        - cookieSession: []
+      responses:
+        '200':
+          description: List of delivery zones
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeliveryZoneListEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    post:
+      tags: [logistics]
+      summary: Create a delivery zone
+      security:
+        - cookieSession: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeliveryZoneInput'
+      responses:
+        '201':
+          description: Zone created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeliveryZoneEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/zonas-entrega/{id}:
+    put:
+      tags: [logistics]
+      summary: Update a delivery zone
+      security:
+        - cookieSession: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeliveryZoneUpdateInput'
+      responses:
+        '200':
+          description: Zone updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeliveryZoneEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Zone not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
 components:
+  securitySchemes:
+    cookieSession:
+      type: apiKey
+      in: cookie
+      name: bizcode_session
+
   schemas:
     HealthResponse:
       type: object
@@ -306,6 +681,148 @@ components:
           const: false
         error:
           type: string
+
+    SetupOwnerInput:
+      type: object
+      required: [tenantName, tenantSlug, username, password]
+      properties:
+        tenantName:
+          type: string
+          minLength: 2
+        tenantSlug:
+          type: string
+          minLength: 2
+        username:
+          type: string
+          minLength: 3
+        password:
+          type: string
+          minLength: 8
+
+    SetupOwnerResult:
+      type: object
+      required: [tenantId, userId, role]
+      properties:
+        tenantId:
+          type: integer
+        userId:
+          type: integer
+        role:
+          type: string
+
+    SetupOwnerEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/SetupOwnerResult'
+
+    LoginInput:
+      type: object
+      required: [tenantSlug, username, password]
+      properties:
+        tenantSlug:
+          type: string
+        username:
+          type: string
+        password:
+          type: string
+
+    LoginResult:
+      type: object
+      required: [userId, tenantId, username, role]
+      properties:
+        userId:
+          type: integer
+        tenantId:
+          type: integer
+        username:
+          type: string
+        role:
+          type: string
+
+    LoginEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/LoginResult'
+
+    LogoutResult:
+      type: object
+      required: [loggedOut]
+      properties:
+        loggedOut:
+          type: boolean
+          const: true
+
+    LogoutEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/LogoutResult'
+
+    AuthScope:
+      type: object
+      required: [tenantId, branchIds, warehouseIds, routeIds, channels]
+      properties:
+        tenantId:
+          type: integer
+        branchIds:
+          type: array
+          items:
+            type: integer
+        warehouseIds:
+          type: array
+          items:
+            type: integer
+        routeIds:
+          type: array
+          items:
+            type: integer
+        channels:
+          type: array
+          items:
+            type: string
+
+    AuthClaims:
+      type: object
+      required: [userId, tenantId, username, role, permissions, scope]
+      properties:
+        userId:
+          type: integer
+        tenantId:
+          type: integer
+        username:
+          type: string
+        role:
+          type: string
+        permissions:
+          type: array
+          items:
+            type: string
+        scope:
+          $ref: '#/components/schemas/AuthScope'
+
+    AuthClaimsEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/AuthClaims'
 
     Cliente:
       type: object
@@ -342,6 +859,36 @@ components:
           nullable: true
         activo:
           type: boolean
+        creditLimit:
+          type: number
+          nullable: true
+          description: Credit limit in ARS. null = no limit.
+        creditDays:
+          type: integer
+          default: 0
+          description: Usual credit days for this customer.
+        balance:
+          type: number
+          default: 0
+          description: Accumulated balance (incremented on each new factura).
+        balanceInicial:
+          type: number
+          default: 0
+          description: Opening balance at migration time.
+        score:
+          type: integer
+          minimum: 0
+          maximum: 100
+          default: 50
+          description: Payment score 0-100 (50=neutral, 0=high risk, 100=perfect).
+        suspended:
+          type: boolean
+          default: false
+          description: When true, POST /api/facturas returns 422 CLIENT_SUSPENDED.
+        deliveryZoneId:
+          type: integer
+          nullable: true
+          description: FK to DeliveryZone. Assign a delivery zone to this customer.
 
     ClienteInput:
       type: object
@@ -379,6 +926,17 @@ components:
           format: email
         activo:
           type: boolean
+        creditLimit:
+          type: number
+          nullable: true
+        creditDays:
+          type: integer
+          minimum: 0
+        suspended:
+          type: boolean
+        deliveryZoneId:
+          type: integer
+          nullable: true
 
     ClienteListEnvelope:
       type: object
@@ -714,7 +1272,252 @@ components:
           items:
             $ref: '#/components/schemas/FormaPago'
 
+    AppUser:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          type: integer
+        username:
+          type: string
+        role:
+          type: string
+          enum: [super_admin, owner, manager, seller, backoffice, warehouse_op, warehouse_lead, logistics_planner, driver, billing, cashier, collections, finance, auditor]
+        active:
+          type: boolean
+        scopeChannels:
+          type: array
+          items:
+            type: string
+            enum: [counter, field, backoffice, warehouse, delivery]
+        scopeBranchIds:
+          type: array
+          items:
+            type: integer
+        scopeWarehouseIds:
+          type: array
+          items:
+            type: integer
+        scopeRouteIds:
+          type: array
+          items:
+            type: integer
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    AppUserInput:
+      type: object
+      required: [username, password, role]
+      properties:
+        username:
+          type: string
+          minLength: 3
+        password:
+          type: string
+          minLength: 8
+        role:
+          type: string
+          enum: [super_admin, owner, manager, seller, backoffice, warehouse_op, warehouse_lead, logistics_planner, driver, billing, cashier, collections, finance, auditor]
+        active:
+          type: boolean
+          default: true
+        scopeChannels:
+          type: array
+          items:
+            type: string
+            enum: [counter, field, backoffice, warehouse, delivery]
+        scopeBranchIds:
+          type: array
+          items:
+            type: integer
+        scopeWarehouseIds:
+          type: array
+          items:
+            type: integer
+        scopeRouteIds:
+          type: array
+          items:
+            type: integer
+
+    AppUserUpdateInput:
+      type: object
+      properties:
+        role:
+          type: string
+          enum: [super_admin, owner, manager, seller, backoffice, warehouse_op, warehouse_lead, logistics_planner, driver, billing, cashier, collections, finance, auditor]
+        active:
+          type: boolean
+        scopeChannels:
+          type: array
+          items:
+            type: string
+            enum: [counter, field, backoffice, warehouse, delivery]
+        scopeBranchIds:
+          type: array
+          items:
+            type: integer
+        scopeWarehouseIds:
+          type: array
+          items:
+            type: integer
+        scopeRouteIds:
+          type: array
+          items:
+            type: integer
+
+    AppUserListEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/AppUser'
+
+    AppUserEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/AppUser'
+
+    ChangePasswordInput:
+      type: object
+      required: [currentPassword, newPassword]
+      properties:
+        currentPassword:
+          type: string
+        newPassword:
+          type: string
+          minLength: 8
+
+    DeliveryZone:
+      type: object
+      additionalProperties: true
+      properties:
+        id:
+          type: integer
+        tenantId:
+          type: integer
+        nombre:
+          type: string
+        tipo:
+          type: string
+          enum: [barrio, manual, predefinida]
+          default: barrio
+        diasEntrega:
+          type: string
+          nullable: true
+          description: Comma-separated delivery day numbers, e.g. "1,3,5"
+        horario:
+          type: string
+          nullable: true
+          description: Preferred time window, e.g. "08:00-12:00"
+        activo:
+          type: boolean
+          default: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    DeliveryZoneInput:
+      type: object
+      required: [nombre]
+      properties:
+        nombre:
+          type: string
+          minLength: 1
+          maxLength: 60
+        tipo:
+          type: string
+          enum: [barrio, manual, predefinida]
+          default: barrio
+        diasEntrega:
+          type: string
+          maxLength: 20
+        horario:
+          type: string
+          maxLength: 30
+
+    DeliveryZoneUpdateInput:
+      type: object
+      properties:
+        nombre:
+          type: string
+          minLength: 1
+          maxLength: 60
+        tipo:
+          type: string
+          enum: [barrio, manual, predefinida]
+        diasEntrega:
+          type: string
+          maxLength: 20
+        horario:
+          type: string
+          maxLength: 30
+        activo:
+          type: boolean
+
+    DeliveryZoneListEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/DeliveryZone'
+
+    DeliveryZoneEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/DeliveryZone'
+
   responses:
+    BadRequest:
+      description: Request payload is invalid
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiErrorEnvelope'
+    UnauthorizedError:
+      description: Authentication required or invalid credentials
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiErrorEnvelope'
+    ForbiddenError:
+      description: Authenticated but missing permission
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiErrorEnvelope'
+    ConflictError:
+      description: Resource conflict
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiErrorEnvelope'
     ServerError:
       description: Internal server error
       content:

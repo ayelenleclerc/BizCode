@@ -1,0 +1,37 @@
+{
+  "title": "Delivery zones",
+  "new": "New zone",
+  "edit": "Edit zone",
+  "empty": "No delivery zones registered",
+  "table": {
+    "nombre": "Name",
+    "tipo": "Type",
+    "diasEntrega": "Days",
+    "horario": "Schedule",
+    "activo": "Active"
+  },
+  "form": {
+    "nombre": "Name",
+    "nombrePlaceholder": "E.g.: Downtown",
+    "tipo": "Type",
+    "diasEntrega": "Delivery days",
+    "diasEntregaHint": "Comma-separated numbers, e.g.: 1,3,5 (Mon, Wed, Fri)",
+    "horario": "Schedule",
+    "horarioPlaceholder": "E.g.: 08:00-12:00",
+    "activo": "Active"
+  },
+  "tipos": {
+    "barrio": "Neighborhood",
+    "manual": "Manual",
+    "predefinida": "Predefined"
+  },
+  "errors": {
+    "nombreRequired": "Zone name is required",
+    "loadFailed": "Could not load delivery zones",
+    "saveFailed": "Could not save delivery zone"
+  },
+  "cliente": {
+    "label": "Delivery zone",
+    "none": "No zone assigned"
+  }
+}

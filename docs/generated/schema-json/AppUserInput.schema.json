@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "active": {
+      "default": true,
+      "type": "boolean"
+    },
+    "password": {
+      "minLength": 8,
+      "type": "string"
+    },
+    "role": {
+      "enum": [
+        "super_admin",
+        "owner",
+        "manager",
+        "seller",
+        "backoffice",
+        "warehouse_op",
+        "warehouse_lead",
+        "logistics_planner",
+        "driver",
+        "billing",
+        "cashier",
+        "collections",
+        "finance",
+        "auditor"
+      ],
+      "type": "string"
+    },
+    "scopeBranchIds": {
+      "items": {
+        "type": "integer"
+      },
+      "type": "array"
+    },
+    "scopeChannels": {
+      "items": {
+        "enum": [
+          "counter",
+          "field",
+          "backoffice",
+          "warehouse",
+          "delivery"
+        ],
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "scopeRouteIds": {
+      "items": {
+        "type": "integer"
+      },
+      "type": "array"
+    },
+    "scopeWarehouseIds": {
+      "items": {
+        "type": "integer"
+      },
+      "type": "array"
+    },
+    "username": {
+      "minLength": 3,
+      "type": "string"
+    }
+  },
+  "required": [
+    "username",
+    "password",
+    "role"
+  ],
+  "title": "AppUserInput",
+  "type": "object"
+}
