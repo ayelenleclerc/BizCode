@@ -20,12 +20,14 @@ import {
   ApiRequestFailedError,
   authAPI,
   articulosAPI,
+  chatAPI,
   checkAPI,
   clientesAPI,
   facturasAPI,
   formasPagoAPI,
   getAuthErrorI18nKey,
   notifChannelsAPI,
+  proveedoresAPI,
   rubrosAPI,
   usersAPI,
   zonasEntregaAPI,
@@ -155,6 +157,21 @@ describe('authAPI', () => {
         axiosCode: 'ERR_NETWORK',
         hasResponse: false,
       })
+    })
+
+    it('respuesta con error no string usa mensaje de Axios', async () => {
+      const err = new Error('Request failed') as Error & {
+        response: { data: { error: { code: number } }; status: number }
+        code: string
+        isAxiosError: boolean
+      }
+      err.response = { data: { error: { code: 400 } }, status: 400 }
+      err.code = 'ERR_BAD_REQUEST'
+      err.isAxiosError = true
+      mockPost.mockRejectedValueOnce(err)
+      await expect(authAPI.login({ tenantSlug: 'd', username: 'u', password: 'p' })).rejects.toThrow(
+        'Request failed',
+      )
     })
   })
 
@@ -290,6 +307,40 @@ describe('clientesAPI', () => {
       await expect(clientesAPI.update(1, {})).rejects.toThrow('Error de actualización')
     })
   })
+
+  describe('downloadImportTemplate', () => {
+    it('retorna Blob en el happy path', async () => {
+      mockGet.mockResolvedValueOnce({ data: new Blob(['a,b']) })
+      const blob = await clientesAPI.downloadImportTemplate()
+      expect(blob).toBeInstanceOf(Blob)
+      expect(mockGet).toHaveBeenCalledWith('/clientes/import/template', { responseType: 'blob' })
+    })
+
+    it('lanza ApiRequestFailedError en fallo', async () => {
+      mockGet.mockRejectedValueOnce(axiosErrorWithResponse('Forbidden'))
+      await expect(clientesAPI.downloadImportTemplate()).rejects.toThrow('Forbidden')
+    })
+  })
+
+  describe('importFromCsv', () => {
+    it('envía FormData con timeout extendido', async () => {
+      mockPost.mockResolvedValueOnce({
+        data: { data: { created: 2, skipped: 1, errors: [{ row: 3, message: 'x' }] } },
+      })
+      const file = new File(['csv'], 'c.csv', { type: 'text/csv' })
+      const result = await clientesAPI.importFromCsv(file)
+      expect(result).toEqual({ created: 2, skipped: 1, errors: [{ row: 3, message: 'x' }] })
+      expect(mockPost).toHaveBeenCalledWith('/clientes/import', expect.any(FormData), {
+        timeout: 120000,
+      })
+    })
+
+    it('lanza ApiRequestFailedError en fallo', async () => {
+      mockPost.mockRejectedValueOnce(axiosErrorWithResponse('Invalid CSV'))
+      const file = new File(['x'], 'bad.csv')
+      await expect(clientesAPI.importFromCsv(file)).rejects.toThrow('Invalid CSV')
+    })
+  })
 })
 
 // ════════════════════════════════════════════════════════════
@@ -349,6 +400,36 @@ describe('articulosAPI', () => {
       await expect(articulosAPI.update(3, {})).rejects.toThrow('Update error')
     })
   })
+
+  describe('downloadImportTemplate', () => {
+    it('retorna Blob en el happy path', async () => {
+      mockGet.mockResolvedValueOnce({ data: new Blob(['h']) })
+      const blob = await articulosAPI.downloadImportTemplate()
+      expect(blob).toBeInstanceOf(Blob)
+      expect(mockGet).toHaveBeenCalledWith('/articulos/import/template', { responseType: 'blob' })
+    })
+
+    it('lanza error del servidor', async () => {
+      mockGet.mockRejectedValueOnce(axiosErrorWithResponse('No template'))
+      await expect(articulosAPI.downloadImportTemplate()).rejects.toThrow('No template')
+    })
+  })
+
+  describe('importFromCsv', () => {
+    it('retorna resumen de importación', async () => {
+      mockPost.mockResolvedValueOnce({ data: { data: { created: 1, skipped: 0, errors: [] } } })
+      const file = new File(['a'], 'a.csv')
+      expect(await articulosAPI.importFromCsv(file)).toEqual({ created: 1, skipped: 0, errors: [] })
+      expect(mockPost).toHaveBeenCalledWith('/articulos/import', expect.any(FormData), {
+        timeout: 120000,
+      })
+    })
+
+    it('lanza error del servidor', async () => {
+      mockPost.mockRejectedValueOnce(axiosErrorWithResponse('Bad file'))
+      await expect(articulosAPI.importFromCsv(new File([], 'x.csv'))).rejects.toThrow('Bad file')
+    })
+  })
 })
 
 // ════════════════════════════════════════════════════════════
@@ -376,6 +457,119 @@ describe('rubrosAPI', () => {
     it('lanza error del servidor', async () => {
       mockPost.mockRejectedValueOnce(axiosErrorWithResponse('Rubro duplicado'))
       await expect(rubrosAPI.create({})).rejects.toThrow('Rubro duplicado')
+    })
+  })
+
+  describe('downloadImportTemplate', () => {
+    it('retorna Blob en el happy path', async () => {
+      mockGet.mockResolvedValueOnce({ data: new Blob(['t']) })
+      expect(await rubrosAPI.downloadImportTemplate()).toBeInstanceOf(Blob)
+      expect(mockGet).toHaveBeenCalledWith('/rubros/import/template', { responseType: 'blob' })
+    })
+
+    it('lanza error del servidor', async () => {
+      mockGet.mockRejectedValueOnce(axiosErrorWithResponse('Denied'))
+      await expect(rubrosAPI.downloadImportTemplate()).rejects.toThrow('Denied')
+    })
+  })
+
+  describe('importFromCsv', () => {
+    it('retorna resumen de importación', async () => {
+      mockPost.mockResolvedValueOnce({ data: { data: { created: 0, skipped: 2, errors: [] } } })
+      const file = new File(['r'], 'r.csv')
+      expect(await rubrosAPI.importFromCsv(file)).toEqual({ created: 0, skipped: 2, errors: [] })
+    })
+
+    it('lanza error del servidor', async () => {
+      mockPost.mockRejectedValueOnce(axiosErrorWithResponse('Parse error'))
+      await expect(rubrosAPI.importFromCsv(new File([], 'e.csv'))).rejects.toThrow('Parse error')
+    })
+  })
+})
+
+// ════════════════════════════════════════════════════════════
+// proveedoresAPI
+// ════════════════════════════════════════════════════════════
+describe('proveedoresAPI', () => {
+  describe('list', () => {
+    it('retorna datos en el happy path', async () => {
+      mockGet.mockResolvedValueOnce({ data: { data: [{ id: 1 }] } })
+      expect(await proveedoresAPI.list()).toEqual([{ id: 1 }])
+      expect(mockGet).toHaveBeenCalledWith('/proveedores', { params: { q: undefined } })
+    })
+
+    it('aplica filtro q', async () => {
+      mockGet.mockResolvedValueOnce({ data: { data: [] } })
+      await proveedoresAPI.list('acme')
+      expect(mockGet).toHaveBeenCalledWith('/proveedores', { params: { q: 'acme' } })
+    })
+
+    it('lanza error del servidor', async () => {
+      mockGet.mockRejectedValueOnce(axiosErrorWithResponse('DB error'))
+      await expect(proveedoresAPI.list()).rejects.toThrow('DB error')
+    })
+  })
+
+  describe('get', () => {
+    it('retorna proveedor por id', async () => {
+      mockGet.mockResolvedValueOnce({ data: { data: { id: 9, rsocial: 'P' } } })
+      expect(await proveedoresAPI.get(9)).toEqual({ id: 9, rsocial: 'P' })
+    })
+
+    it('lanza error del servidor', async () => {
+      mockGet.mockRejectedValueOnce(axiosErrorWithResponse('Not found'))
+      await expect(proveedoresAPI.get(1)).rejects.toThrow('Not found')
+    })
+  })
+
+  describe('create', () => {
+    it('retorna proveedor creado', async () => {
+      mockPost.mockResolvedValueOnce({ data: { data: { id: 2 } } })
+      expect(await proveedoresAPI.create({ rsocial: 'New' })).toEqual({ id: 2 })
+    })
+
+    it('lanza error del servidor', async () => {
+      mockPost.mockRejectedValueOnce(axiosErrorWithResponse('Duplicate'))
+      await expect(proveedoresAPI.create({})).rejects.toThrow('Duplicate')
+    })
+  })
+
+  describe('update', () => {
+    it('retorna proveedor actualizado', async () => {
+      mockPut.mockResolvedValueOnce({ data: { data: { id: 1, rsocial: 'Up' } } })
+      expect(await proveedoresAPI.update(1, { rsocial: 'Up' })).toEqual({ id: 1, rsocial: 'Up' })
+    })
+
+    it('lanza error del servidor', async () => {
+      mockPut.mockRejectedValueOnce(axiosErrorWithResponse('Conflict'))
+      await expect(proveedoresAPI.update(1, {})).rejects.toThrow('Conflict')
+    })
+  })
+
+  describe('downloadImportTemplate', () => {
+    it('retorna Blob en el happy path', async () => {
+      mockGet.mockResolvedValueOnce({ data: new Blob(['z']) })
+      expect(await proveedoresAPI.downloadImportTemplate()).toBeInstanceOf(Blob)
+    })
+
+    it('lanza error del servidor', async () => {
+      mockGet.mockRejectedValueOnce(axiosErrorWithResponse('Nope'))
+      await expect(proveedoresAPI.downloadImportTemplate()).rejects.toThrow('Nope')
+    })
+  })
+
+  describe('importFromCsv', () => {
+    it('retorna resumen', async () => {
+      mockPost.mockResolvedValueOnce({ data: { data: { created: 1, skipped: 0, errors: [] } } })
+      await proveedoresAPI.importFromCsv(new File([''], 'p.csv'))
+      expect(mockPost).toHaveBeenCalledWith('/proveedores/import', expect.any(FormData), {
+        timeout: 120000,
+      })
+    })
+
+    it('lanza error del servidor', async () => {
+      mockPost.mockRejectedValueOnce(axiosErrorWithResponse('Bad CSV'))
+      await expect(proveedoresAPI.importFromCsv(new File([], 'x.csv'))).rejects.toThrow('Bad CSV')
     })
   })
 })
@@ -599,6 +793,72 @@ describe('notifChannelsAPI', () => {
       Object.assign(new Error('fail'), { response: { data: { error: 'Unauthorized' } }, isAxiosError: true }),
     )
     await expect(notifChannelsAPI.status()).rejects.toThrow('Unauthorized')
+  })
+})
+
+// ════════════════════════════════════════════════════════════
+// chatAPI
+// ════════════════════════════════════════════════════════════
+describe('chatAPI', () => {
+  const SAMPLE_CONV = [
+    {
+      user: { id: 1, username: 'a', role: 'seller' },
+      unreadCount: 0,
+      lastMessage: null,
+    },
+  ]
+  const SAMPLE_MSG = {
+    id: 1,
+    tenantId: 1,
+    fromUserId: 1,
+    toUserId: 2,
+    content: 'hola',
+    createdAt: '2026-01-01',
+  }
+
+  describe('conversations', () => {
+    it('usa límite por defecto', async () => {
+      mockGet.mockResolvedValueOnce({ data: { success: true, data: SAMPLE_CONV } })
+      expect(await chatAPI.conversations()).toEqual(SAMPLE_CONV)
+      expect(mockGet).toHaveBeenCalledWith('/chat/conversations', { params: { limit: 20 } })
+    })
+
+    it('permite override de limit', async () => {
+      mockGet.mockResolvedValueOnce({ data: { success: true, data: [] } })
+      await chatAPI.conversations(5)
+      expect(mockGet).toHaveBeenCalledWith('/chat/conversations', { params: { limit: 5 } })
+    })
+
+    it('lanza ApiRequestFailedError en fallo', async () => {
+      mockGet.mockRejectedValueOnce(axiosErrorWithResponse('No chat'))
+      await expect(chatAPI.conversations()).rejects.toThrow('No chat')
+    })
+  })
+
+  describe('messages', () => {
+    it('pasa params opcionales', async () => {
+      mockGet.mockResolvedValueOnce({ data: { success: true, data: [SAMPLE_MSG] } })
+      expect(await chatAPI.messages(2, { limit: 10, before: 99 })).toEqual([SAMPLE_MSG])
+      expect(mockGet).toHaveBeenCalledWith('/chat/messages/2', { params: { limit: 10, before: 99 } })
+    })
+
+    it('lanza error del servidor', async () => {
+      mockGet.mockRejectedValueOnce(axiosErrorWithResponse('Forbidden'))
+      await expect(chatAPI.messages(3)).rejects.toThrow('Forbidden')
+    })
+  })
+
+  describe('send', () => {
+    it('retorna mensaje enviado', async () => {
+      mockPost.mockResolvedValueOnce({ data: { success: true, data: SAMPLE_MSG } })
+      expect(await chatAPI.send(2, 'hola')).toEqual(SAMPLE_MSG)
+      expect(mockPost).toHaveBeenCalledWith('/chat/messages', { toUserId: 2, content: 'hola' })
+    })
+
+    it('lanza error del servidor', async () => {
+      mockPost.mockRejectedValueOnce(axiosErrorWithResponse('Empty content'))
+      await expect(chatAPI.send(1, '')).rejects.toThrow('Empty content')
+    })
   })
 })
 

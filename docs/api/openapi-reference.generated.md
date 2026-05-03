@@ -5,7 +5,7 @@
 - **OpenAPI Version:** `3.1.0`
 - **API Version:** `0.1.0`
 
-REST API for BizCode commercial management system. Runs as an Express 5 sidecar on localhost:3001. Responses use a JSON envelope `{ success: true, data: ... }` except `/api/health`. Session authentication is required for protected resources. Protected endpoints can optionally receive `x-bizcode-channel` to enforce channel scope authorization. Interactive documentation (Swagger UI): <http://localhost:3001/api-docs/> (same contract as this file).
+REST API for BizCode commercial management system. Runs as an Express 5 sidecar on localhost:3001. Responses use a JSON envelope `{ success: true, data: ... }` except `/api/health`. Session authentication is required for protected resources. Protected endpoints can optionally receive `x-bizcode-channel` to enforce channel scope authorization. All routes accept optional `X-Request-Id` (max 128 characters); invalid or empty values are ignored and a UUID is assigned. The effective id is echoed on every response (`X-Request-Id`; see runtime middleware `correlationId`). Interactive documentation (Swagger UI): <http://localhost:3001/api-docs/> (same contract as this file).
 
 ## Servers
 

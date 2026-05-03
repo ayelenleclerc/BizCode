@@ -19,17 +19,18 @@ push / pull_request
 │  3b. npm audit (informational, continue-on-error)          │
 │  4. npx prisma generate                                     │
 │  5. npx prisma migrate deploy  ← schema on PostgreSQL       │
-│  6. npm run type-check           ← blocks                   │
-│  6b. npm run docs:generate       ← blocks                   │
-│  6c. git diff (generated docs)   ← blocks                   │
-│  7. npm run lint                 ← blocks                   │
-│  8. npm run test:coverage        ← blocks (Vitest + coverage + API contract + a11y) │
-│  9. npm run check:i18n           ← blocks                   │
-│ 10. npx playwright install --with-deps chromium             │
-│ 11. npm run test:e2e             ← blocks (Playwright smoke; see ADR-0004) │
-│ 12. npm run test:integration     ← blocks (Prisma + PostgreSQL; ADR-0004 B) │
-│ 13. npm run check:docs-map       ← blocks                   │
-│ 14. Upload coverage artifact (always)                       │
+│  6. npm run type-check                      ← blocks         │
+│  6b. npm run check:openapi                 ← blocks         │
+│  7. npm run docs:generate                  ← blocks         │
+│  8. git diff (generated docs / SBOM check) ← blocks         │
+│  9. npm run lint                           ← blocks         │
+│ 10. npm run test:coverage      ← blocks (Vitest + coverage + API contract + a11y) │
+│ 11. npm run check:i18n         ← blocks                        │
+│ 12. npx playwright install --with-deps chromium              │
+│ 13. npm run test:e2e           ← blocks (Playwright smoke; see ADR-0004) │
+│ 14. npm run test:integration   ← blocks (Prisma + PostgreSQL; ADR-0004 B) │
+│ 15. npm run check:docs-map     ← blocks                        │
+│ 16. Upload coverage artifact (always)                       │
 └──────────────────────────────────────────────────────────────┘
 ```
 
@@ -38,13 +39,14 @@ push / pull_request
 | Event | Branches |
 |---|---|
 | `push` | `main`, `develop` |
-| `pull_request` | targeting `main` |
+| `pull_request` | targeting `main` or `develop` |
 
 ## Blocking Conditions
 
 | Step | Blocking condition |
 |---|---|
 | type-check | Any TypeScript compilation error |
+| check:openapi | OpenAPI 3.x validation failures for `docs/api/openapi.yaml` (script `npm run check:openapi`) |
 | docs:generate + git diff | Drift between committed files and regenerated docs under `docs/generated/`, `docs/api/openapi-reference.generated.md`, `docs/evidence/sbom-cyclonedx.json` |
 | lint | Any ESLint error or **warning** (`npm run lint` uses `--max-warnings 0`) |
 | test:coverage | Any test failure OR any coverage threshold not met |
@@ -116,6 +118,8 @@ Implementation:
 - **Optional approve flow:** `npm run plan:approve -- --plan <path>` archives a copy under `.cursor/plans/` and runs `plan:sync` (see `scripts/github/plan-approve-main.ts`).
 - **Interaction with PR automation:** Once items are on the board, `.github/workflows/project-status-automation.yml` still updates status from PR open/close/merge when issues are linked with `Closes #<issue>`.
 - **Board hygiene:** Keep **Backlog** for work not actively in flight (no open PR). Use **Ready** when committed but no PR yet; **In Progress** when a linked PR is open. Avoid **In Progress** without a PR.
+
+**Post-merge (maintainer):** After merging a PR that links issues with `Closes #…`, verify in GitHub that those issues closed, and confirm the **BizCode Delivery** project columns moved affected items to **Done** when expected (requires secrets/variables documented above for `.github/workflows/project-status-automation.yml`).
 
 Daily usage checklist:
 

@@ -2,6 +2,8 @@ import { PrismaClient } from '@prisma/client'
 import type { Application } from 'express'
 import type { Server } from 'node:http'
 import { createApp } from './server/createApp'
+import { logger } from './server/logger'
+import { validateBootEnv } from './server/validateBootEnv'
 
 export const PORT = 3001
 
@@ -35,8 +37,7 @@ export function bindHttpServer(
   options?: BindHttpServerOptions,
 ): Server {
   const server = app.listen(port, () => {
-    console.log(`✓ API Server running on http://localhost:${port}`)
-    console.log(`✓ PostgreSQL connected`)
+    logger.info({ port }, 'API server listening')
   })
   if (options?.registerSigint !== false) {
     process.once('SIGINT', async () => {
@@ -53,6 +54,7 @@ export function bindHttpServer(
  * @pt-BR Inicia o servidor API na porta informada (padrão {@link PORT}).
  */
 export function startServer(port: number = PORT, options?: BindHttpServerOptions): Server {
+  validateBootEnv()
   const { app, prisma } = createServerInstance()
   return bindHttpServer(app, prisma, port, options)
 }

@@ -3,9 +3,9 @@
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
   "version": 1,
-  "serialNumber": "urn:uuid:990f90cc-9b0d-4e55-87fc-6bc80987ee70",
+  "serialNumber": "urn:uuid:4d06822c-968d-4ab5-8766-3bc44bb305e7",
   "metadata": {
-    "timestamp": "2026-04-19T00:53:41.568Z",
+    "timestamp": "2026-05-03T13:39:00.639Z",
     "tools": {
       "components": [
         {
@@ -331,8 +331,8 @@
     {
       "type": "library",
       "name": "express-rate-limit",
-      "version": "8.3.2",
-      "bom-ref": "bizcode@0.1.0|express-rate-limit@8.3.2",
+      "version": "8.4.1",
+      "bom-ref": "bizcode@0.1.0|express-rate-limit@8.4.1",
       "licenses": [
         {
           "license": {
@@ -341,15 +341,15 @@
           }
         }
       ],
-      "purl": "pkg:npm/express-rate-limit@8.3.2",
+      "purl": "pkg:npm/express-rate-limit@8.4.1",
       "externalReferences": [
         {
-          "url": "https://registry.npmjs.org/express-rate-limit/-/express-rate-limit-8.3.2.tgz",
+          "url": "https://registry.npmjs.org/express-rate-limit/-/express-rate-limit-8.4.1.tgz",
           "type": "distribution",
           "hashes": [
             {
               "alg": "SHA-512",
-              "content": "efb56615e2643b4febbe29840ee502e47df4a2a502e04c8e87219c71faa82de6c1d2888461f33b9f03ebb03b012f582c4e9c1fcd7f12172d8c4f74c3c91abe6e"
+              "content": "346558c10480c84420cf15f588233defc3cff4074efe15bdde031c17a6704029beac5bcbb011fac38c5c5d64dc9624bc2dae443d1377a7dc3322da81c09adf37"
             }
           ],
           "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
@@ -633,6 +633,40 @@
         {
           "name": "cdx:npm:package:path",
           "value": "node_modules/nodemailer"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "pino",
+      "version": "10.3.1",
+      "bom-ref": "bizcode@0.1.0|pino@10.3.1",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/pino@10.3.1",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/pino/-/pino-10.3.1.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "af7e321ff1a54292996d4d41bc516a3a3848491a3530dc75b5662c62f9a3e8a2111d23cc4f6fb21ce11bd521ba34cbd1a07445d1ad3b9023a8c7ff726a4975be"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/pino"
         }
       ]
     },
@@ -2507,6 +2541,417 @@
               "value": "node_modules/concat-stream/node_modules/readable-stream"
             }
           ]
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "redact",
+      "group": "@pinojs",
+      "version": "0.4.0",
+      "bom-ref": "bizcode@0.1.0|@pinojs/redact@0.4.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/%40pinojs/redact@0.4.0",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/@pinojs/redact/-/redact-0.4.0.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "93610d9e606e804febcd07c471d58770263efc533754bcc7f5c604b1b76ca2aaefcc029185465e44d84066f07c3a2b502754c179ddf2a96b5d8f34bac09281c2"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/@pinojs/redact"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "atomic-sleep",
+      "version": "1.0.0",
+      "bom-ref": "bizcode@0.1.0|atomic-sleep@1.0.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/atomic-sleep@1.0.0",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/atomic-sleep/-/atomic-sleep-1.0.0.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "90d3a30ea021ee9c745d6348fb841bce8891fe74e41c058db9ddaebe726ab83d7fc796bb11064c253d00733a8ad109faee863f4d34352db50a6a3669a7723db5"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/atomic-sleep"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "on-exit-leak-free",
+      "version": "2.1.2",
+      "bom-ref": "bizcode@0.1.0|on-exit-leak-free@2.1.2",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/on-exit-leak-free@2.1.2",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/on-exit-leak-free/-/on-exit-leak-free-2.1.2.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "d1e24963a8572c67f5b9d1f07cd7ed06a1fe83bdc4538079d389d978aa73d6c61129a7c0821c31109ba70763bbac36642f83c67ec3159d35d9d848e26dba9cb0"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/on-exit-leak-free"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "pino-abstract-transport",
+      "version": "3.0.0",
+      "bom-ref": "bizcode@0.1.0|pino-abstract-transport@3.0.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/pino-abstract-transport@3.0.0",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/pino-abstract-transport/-/pino-abstract-transport-3.0.0.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "c257d473353e9fb1f2fc76b98fd6bf819372ed67b9f9c5e9f182fe5fe3c6f12d0a5f1c3b9ff257037738e98d334339c827cdd44498b0cbb2e1e7a58ba2436ec6"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/pino-abstract-transport"
+        }
+      ],
+      "components": [
+        {
+          "type": "library",
+          "name": "split2",
+          "version": "4.2.0",
+          "bom-ref": "bizcode@0.1.0|pino-abstract-transport@3.0.0|split2@4.2.0",
+          "licenses": [
+            {
+              "license": {
+                "id": "ISC",
+                "acknowledgement": "declared"
+              }
+            }
+          ],
+          "purl": "pkg:npm/split2@4.2.0",
+          "externalReferences": [
+            {
+              "url": "https://registry.npmjs.org/split2/-/split2-4.2.0.tgz",
+              "type": "distribution",
+              "hashes": [
+                {
+                  "alg": "SHA-512",
+                  "content": "51c8dc24e5a49eb36417a3cb5fcdea70733a28781528d915eb663c6b9b980d5bfdc9d19057000730aa877498ded554d6a658c6d1662908386b09d00e607e135a"
+                }
+              ],
+              "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+            }
+          ],
+          "properties": [
+            {
+              "name": "cdx:npm:package:path",
+              "value": "node_modules/pino-abstract-transport/node_modules/split2"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "pino-std-serializers",
+      "version": "7.1.0",
+      "bom-ref": "bizcode@0.1.0|pino-std-serializers@7.1.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/pino-std-serializers@7.1.0",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/pino-std-serializers/-/pino-std-serializers-7.1.0.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "06774f1faeff271184c518225f5757d30d45bd9724e566b869a97dd7df12ad18598c7dc6c4a4142880676094dd8f61c3377510012d3a1e57dc49b423d8e1e66b"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/pino-std-serializers"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "process-warning",
+      "version": "5.0.0",
+      "bom-ref": "bizcode@0.1.0|process-warning@5.0.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/process-warning@5.0.0",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/process-warning/-/process-warning-5.0.0.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "6b7f6df40a47371d8be3e1c19d02aac711cdb35afb285f889ed77c43f8356d487aab4588a7dbe83d727fc748fe64be39285d6925df7eab68cb21131fbc4b2190"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/process-warning"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "quick-format-unescaped",
+      "version": "4.0.4",
+      "bom-ref": "bizcode@0.1.0|quick-format-unescaped@4.0.4",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/quick-format-unescaped@4.0.4",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/quick-format-unescaped/-/quick-format-unescaped-4.0.4.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "b580b5435860c91b87825a15fd85ecdb0d79ba73d587ca9fbbfa824df85361a99ac3b7f286e98a6b6c86a5d4a8f3bbd8df6ac87258fee1f59841750cb3d107be"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/quick-format-unescaped"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "real-require",
+      "version": "0.2.0",
+      "bom-ref": "bizcode@0.1.0|real-require@0.2.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/real-require@0.2.0",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/real-require/-/real-require-0.2.0.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "e7b7ebac633f3824cba8b3808749a1540f5504c1ddfbd53b65bd931cc19d054a1954eb466c9ce3c6c6060c9dc0f4061808fe219facb54d56da39fcd6b66e4616"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/real-require"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "safe-stable-stringify",
+      "version": "2.5.0",
+      "bom-ref": "bizcode@0.1.0|safe-stable-stringify@2.5.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/safe-stable-stringify@2.5.0",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/safe-stable-stringify/-/safe-stable-stringify-2.5.0.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "6f7ae9a532a6f53f8fb1508110e511e3a19623b7dd3acd3454a675fbd7351160da0ccbe341cead530b85c88a6b806813716a151d22ab53c1f7d591c0d9ed111c"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/safe-stable-stringify"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "sonic-boom",
+      "version": "4.2.1",
+      "bom-ref": "bizcode@0.1.0|sonic-boom@4.2.1",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/sonic-boom@4.2.1",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/sonic-boom/-/sonic-boom-4.2.1.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "c3a031b6e6d76b6c135c052c64c316111aec21101dacad1273e154cad5af60084124bcae238965acc202d43b65352748f7d108f3a299ba6d8c32adc4019945f5"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/sonic-boom"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "thread-stream",
+      "version": "4.0.0",
+      "bom-ref": "bizcode@0.1.0|thread-stream@4.0.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/thread-stream@4.0.0",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/thread-stream/-/thread-stream-4.0.0.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "e223152fa1c020d5d67f564a66320f733e7061a39d3e1b4ef004ef67e5eaa7705375aaad03042436628e46a708a3962442a197ab97307ecc03c0caaa40dae924"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/thread-stream"
         }
       ]
     },
@@ -5113,11 +5558,12 @@
         "bizcode@0.1.0|cors@2.8.6",
         "bizcode@0.1.0|csv-parse@6.2.1",
         "bizcode@0.1.0|dotenv@17.3.1",
-        "bizcode@0.1.0|express-rate-limit@8.3.2",
+        "bizcode@0.1.0|express-rate-limit@8.4.1",
         "bizcode@0.1.0|express@5.2.1",
         "bizcode@0.1.0|i18next@26.0.3",
         "bizcode@0.1.0|multer@2.1.1",
         "bizcode@0.1.0|nodemailer@8.0.5",
+        "bizcode@0.1.0|pino@10.3.1",
         "bizcode@0.1.0|react-dom@18.3.1",
         "bizcode@0.1.0|react-hook-form@7.72.0",
         "bizcode@0.1.0|react-hotkeys-hook@4.6.2",
@@ -5163,7 +5609,7 @@
       "ref": "bizcode@0.1.0|dotenv@17.3.1"
     },
     {
-      "ref": "bizcode@0.1.0|express-rate-limit@8.3.2",
+      "ref": "bizcode@0.1.0|express-rate-limit@8.4.1",
       "dependsOn": [
         "bizcode@0.1.0|express@5.2.1",
         "bizcode@0.1.0|ip-address@10.1.0"
@@ -5239,6 +5685,22 @@
     },
     {
       "ref": "bizcode@0.1.0|nodemailer@8.0.5"
+    },
+    {
+      "ref": "bizcode@0.1.0|pino@10.3.1",
+      "dependsOn": [
+        "bizcode@0.1.0|@pinojs/redact@0.4.0",
+        "bizcode@0.1.0|atomic-sleep@1.0.0",
+        "bizcode@0.1.0|on-exit-leak-free@2.1.2",
+        "bizcode@0.1.0|pino-abstract-transport@3.0.0",
+        "bizcode@0.1.0|pino-std-serializers@7.1.0",
+        "bizcode@0.1.0|process-warning@5.0.0",
+        "bizcode@0.1.0|quick-format-unescaped@4.0.4",
+        "bizcode@0.1.0|real-require@0.2.0",
+        "bizcode@0.1.0|safe-stable-stringify@2.5.0",
+        "bizcode@0.1.0|sonic-boom@4.2.1",
+        "bizcode@0.1.0|thread-stream@4.0.0"
+      ]
     },
     {
       "ref": "bizcode@0.1.0|react-dom@18.3.1",
@@ -5561,6 +6023,51 @@
         "bizcode@0.1.0|inherits@2.0.4",
         "bizcode@0.1.0|string_decoder@1.1.1",
         "bizcode@0.1.0|util-deprecate@1.0.2"
+      ]
+    },
+    {
+      "ref": "bizcode@0.1.0|@pinojs/redact@0.4.0"
+    },
+    {
+      "ref": "bizcode@0.1.0|atomic-sleep@1.0.0"
+    },
+    {
+      "ref": "bizcode@0.1.0|on-exit-leak-free@2.1.2"
+    },
+    {
+      "ref": "bizcode@0.1.0|pino-abstract-transport@3.0.0",
+      "dependsOn": [
+        "bizcode@0.1.0|pino-abstract-transport@3.0.0|split2@4.2.0"
+      ]
+    },
+    {
+      "ref": "bizcode@0.1.0|pino-abstract-transport@3.0.0|split2@4.2.0"
+    },
+    {
+      "ref": "bizcode@0.1.0|pino-std-serializers@7.1.0"
+    },
+    {
+      "ref": "bizcode@0.1.0|process-warning@5.0.0"
+    },
+    {
+      "ref": "bizcode@0.1.0|quick-format-unescaped@4.0.4"
+    },
+    {
+      "ref": "bizcode@0.1.0|real-require@0.2.0"
+    },
+    {
+      "ref": "bizcode@0.1.0|safe-stable-stringify@2.5.0"
+    },
+    {
+      "ref": "bizcode@0.1.0|sonic-boom@4.2.1",
+      "dependsOn": [
+        "bizcode@0.1.0|atomic-sleep@1.0.0"
+      ]
+    },
+    {
+      "ref": "bizcode@0.1.0|thread-stream@4.0.0",
+      "dependsOn": [
+        "bizcode@0.1.0|real-require@0.2.0"
       ]
     },
     {
