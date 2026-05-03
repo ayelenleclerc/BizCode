@@ -21,7 +21,7 @@ interface NuevaFacturaFormProps {
   articulos: Articulo[]
   formasPago: FormaPago[]
   onCancel: () => void
-  onGuardada: () => void
+  onGuardada: () => void | Promise<void>
 }
 
 export default function NuevaFacturaForm({
@@ -167,7 +167,7 @@ export default function NuevaFacturaForm({
       }
 
       await facturasAPI.create(facturaData)
-      onGuardada()
+      await Promise.resolve(onGuardada())
     } catch (err: unknown) {
       setError((err as Error).message || t('errors.generic'))
     } finally {
@@ -176,7 +176,7 @@ export default function NuevaFacturaForm({
   }
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="h-full flex flex-col" data-testid="nueva-factura-form">
       <div className="mb-6">
         <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100">{t('newInvoice')}</h2>
       </div>
@@ -252,6 +252,7 @@ export default function NuevaFacturaForm({
           <input
             id="factura-numero"
             type="number"
+            data-testid="factura-form-numero"
             value={numero}
             onChange={(e) => setNumero(e.target.value)}
             aria-required="true"
@@ -278,6 +279,7 @@ export default function NuevaFacturaForm({
           </label>
           <select
             id="factura-clienteId"
+            data-testid="factura-form-clienteId"
             value={clienteId}
             onChange={(e) => setClienteId(parseInt(e.target.value))}
             aria-required="true"
@@ -294,7 +296,11 @@ export default function NuevaFacturaForm({
       </div>
 
       <div className="flex-1 overflow-auto mb-6">
-        <table className="w-full border-collapse bg-white dark:bg-slate-800 rounded border border-slate-200 dark:border-slate-700" aria-label={t('newInvoice')}>
+        <table
+          className="w-full border-collapse bg-white dark:bg-slate-800 rounded border border-slate-200 dark:border-slate-700"
+          aria-label={t('newInvoice')}
+          data-testid="factura-items-table"
+        >
           <thead className="bg-slate-100 dark:bg-slate-700 sticky top-0">
             <tr className="border-b border-slate-200 dark:border-slate-600">
               <th className="px-3 py-2 text-left text-slate-700 dark:text-slate-300 font-semibold text-sm">{t('items.articulo')}</th>
@@ -330,6 +336,7 @@ export default function NuevaFacturaForm({
                   <td className="px-3 py-2 text-sm">
                     <select
                       value={linea.articuloId}
+                      data-testid={`factura-line-${idx}-articulo`}
                       onChange={(e) =>
                         updateLinea(idx, 'articuloId', parseInt(e.target.value))
                       }
@@ -413,12 +420,15 @@ export default function NuevaFacturaForm({
 
       <div className="flex gap-3">
         <button
+          type="button"
+          data-testid="btn-agregar-linea-factura"
           onClick={agregarLinea}
           className="px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded font-semibold transition"
         >
           {t('items.addItem')}
         </button>
         <button
+          type="button"
           data-testid="btn-save-factura"
           onClick={handleGuardar}
           disabled={loading || lineas.length === 0 || !clienteId}
@@ -427,6 +437,7 @@ export default function NuevaFacturaForm({
           {loading ? tc('actions.saving') : t('save')}
         </button>
         <button
+          type="button"
           onClick={onCancel}
           className="px-6 py-3 bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-900 dark:text-slate-100 rounded font-semibold transition"
         >
