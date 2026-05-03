@@ -116,10 +116,10 @@ jobs:
 
       - name: Check for health endpoint (Issue #85)
         run: |
-          if grep -qE "'/api/health'|\"/api/health\"" server/registerRestDomainRoutes.ts 2>/dev/null; then
+          if grep -rE "'/api/health'|\"/api/health\"" server --include='*.ts' >/dev/null 2>&1; then
             echo "✅ Health check endpoint registered"
           else
-            echo "::error::GET /api/health must be registered (Issue #85)"
+            echo "::error::GET /api/health must be registered under server/ (Issue #85)"
             exit 1
           fi
 

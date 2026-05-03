@@ -59,7 +59,8 @@ Acción del usuario (teclado/clic)
 | `src/pages/facturacion/` | Emisión y listado de facturas |
 | `server/main.ts` | Entrada CLI (`npm run server`): llama a `startServer()` en `server.ts` |
 | `server.ts` (raíz) | Arranque: `createServerInstance`, `bindHttpServer`, `startServer`; usa `createApp` de `server/createApp.ts` |
-| `server/createApp.ts` | Fábrica Express reutilizable en tests de contrato OpenAPI |
+| `server/createApp.ts` | Fábrica Express reutilizable en tests de contrato OpenAPI (middleware, routers de auth, `registerRestDomainRoutes`) |
+| `server/registerRestDomainRoutes.ts` | Registra REST de dominio bajo `/api/*` vía módulos en `server/routes/` (CSV/validación compartidos en `server/routes/restDomainShared.ts`) |
 
 ## Tematización (Tailwind modo oscuro)
 
@@ -73,7 +74,7 @@ El **mismo dominio de negocio** debe poder soportar **escritorio** (este documen
 
 ## Riesgos y restricciones conocidas
 
-- **Rutas API en un solo módulo:** La lógica HTTP está en `server/createApp.ts` (un archivo); `server.ts` expone el arranque; `server/main.ts` es la entrada de proceso para `npm run server`. Evolución recomendada: routers por dominio (véase ADR futuro si se refactoriza).
-- **Sin autenticación:** La API no tiene capa de autenticación. Está pensada para ejecutarse en local en la máquina del usuario (sidecar Tauri en loopback). Si la aplicación se expone a red, debe añadirse autenticación.
+- **Superficie API repartida en módulos:** `server/createApp.ts` compone middleware y routers; los manejadores REST de dominio están bajo `server/routes/` y se enlazan desde `server/registerRestDomainRoutes.ts`. `server.ts` expone el arranque; `server/main.ts` es la entrada de proceso para `npm run server`.
+- **Sesión y exposición a red:** Hay sesión por cookie, `resolveSession` y `requirePermission` en rutas protegidas (ver `server/auth.ts` y [modelo-iam-sesiones-auditoria.md](quality/modelo-iam-sesiones-auditoria.md)). El diseño desktop por defecto sigue asumiendo sidecar local en loopback; un SaaS alojado debe sumar controles de transporte y endurecimiento descritos en [seguridad.md](seguridad.md).
 - **Build Tauri no en CI:** Requiere WebKit nativo por plataforma. Ver [quality/ciclo-ci-cd.md](quality/ciclo-ci-cd.md).
 - **Sin modo offline:** El SPA React requiere el sidecar Express en ejecución. El ciclo de vida de Tauri lo garantiza en producción.

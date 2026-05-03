@@ -24,7 +24,16 @@ O backlog **BP1-1** define quando implementar persistência e APIs.
 - **Prós:** Sem schema especulativo; contrato de API e testes permanecem fiéis ao código.
 - **Contras:** Operações formais de pedido ficam de fora do sistema até BP1-1.
 
+## Alternativas consideradas (#69)
+
+Resumo na versão EN: [ADR-0009-order-entity-design-only.md](../../en/adr/ADR-0009-order-entity-design-only.md) (*Alternatives considered*). Decisão: `Pedido` + `PedidoItem` relacionais com enum de estados (`draft` … `collected`).
+
+## Moeda e chaves de estado
+
+Moeda **padrão do tenant** no primeiro slice; multi-moeda em ADR separado se necessário. Mapeamento diagrama → chaves: secção *Estados canônicos de implementação* em [fluxo-operacional-pedido-entrega-cobranca.md](../../quality/fluxo-operacional-pedido-entrega-cobranca.md). Rascunho Prisma/OpenAPI: [rascunho-implementacao-dominio-pedido.md](../../quality/rascunho-implementacao-dominio-pedido.md).
+
 ## Referências
 
 - [`docs/pt-br/quality/fluxo-operacional-pedido-entrega-cobranca.md`](../../quality/fluxo-operacional-pedido-entrega-cobranca.md)
+- [`docs/pt-br/quality/rascunho-implementacao-dominio-pedido.md`](../../quality/rascunho-implementacao-dominio-pedido.md)
 - [`docs/api/openapi.yaml`](../../api/openapi.yaml)

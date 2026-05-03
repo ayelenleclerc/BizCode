@@ -24,7 +24,16 @@ El backlog **BP1-1** fija cuándo implementar persistencia y APIs.
 - **Pros:** Sin esquema especulativo ni endpoints no documentados; contrato y pruebas reflejan el código real.
 - **Contras:** Los flujos “pedido” siguen fuera del sistema hasta BP1-1.
 
+## Alternativas consideradas (#69)
+
+Tabla resumida en la versión EN del ADR: [ADR-0009-order-entity-design-only.md](../../en/adr/ADR-0009-order-entity-design-only.md) (sección *Alternatives considered*). Decisión: modelo relacional `Pedido` + `PedidoItem` con enum de estados (`draft` … `collected`).
+
+## Moneda y claves de estado
+
+**Moneda por tenant** en el primer slice; multi-moneda en ADR aparte si producto lo exige. Mapeo diagrama → claves de implementación: sección *Estados canónicos de implementación* en [flujo-operativo-pedido-entrega-cobranza.md](../../quality/flujo-operativo-pedido-entrega-cobranza.md). Boceto Prisma/OpenAPI: [boceto-implementacion-dominio-pedido.md](../../quality/boceto-implementacion-dominio-pedido.md).
+
 ## Referencias
 
 - [`docs/es/quality/flujo-operativo-pedido-entrega-cobranza.md`](../../quality/flujo-operativo-pedido-entrega-cobranza.md)
+- [`docs/es/quality/boceto-implementacion-dominio-pedido.md`](../../quality/boceto-implementacion-dominio-pedido.md)
 - [`docs/api/openapi.yaml`](../../api/openapi.yaml)

@@ -59,7 +59,8 @@ User action (keyboard/click)
 | `src/pages/facturacion/` | Invoice creation and listing |
 | `server/main.ts` | CLI entry (`npm run server`): calls `startServer()` from `server.ts` |
 | `server.ts` (root) | Bootstrap: `createServerInstance`, `bindHttpServer`, `startServer`; uses `createApp` from `server/createApp.ts` |
-| `server/createApp.ts` | Reusable Express factory for OpenAPI contract tests |
+| `server/createApp.ts` | Reusable Express factory for OpenAPI contract tests (middleware, auth routers, `registerRestDomainRoutes`) |
+| `server/registerRestDomainRoutes.ts` | Registers tenant-scoped domain REST under `/api/*` via modules in `server/routes/` (shared CSV/validation helpers in `server/routes/restDomainShared.ts`) |
 
 ## Theming (Tailwind dark mode)
 
@@ -73,7 +74,7 @@ The **same business domain** is intended to support **desktop** (this document) 
 
 ## Risks and Known Constraints
 
-- **API routes in a single module:** HTTP logic lives in `server/createApp.ts` (one file); `server.ts` exposes bootstrap helpers; `server/main.ts` is the process entry for `npm run server`. Recommended evolution: domain routers (see future ADR if refactored).
-- **No authentication:** The API has no auth layer. It is intended to run locally on the user's machine (Tauri sidecar on loopback). If the app is ever exposed to a network, authentication must be added.
+- **API surface split across modules:** `server/createApp.ts` composes middleware and routers; domain REST handlers live under `server/routes/` and are wired from `server/registerRestDomainRoutes.ts`. `server.ts` exposes bootstrap helpers; `server/main.ts` is the process entry for `npm run server`.
+- **Session auth and network exposure:** The stack uses cookie sessions, `resolveSession`, and `requirePermission` on protected routes (see `server/auth.ts` and [iam-model-sessions-audit.md](quality/iam-model-sessions-audit.md)). The default desktop layout still assumes a local sidecar on loopback; a hosted SaaS deployment must add transport and hardening controls described in [security.md](security.md).
 - **Tauri build not in CI:** Requires platform-native WebKit. See [quality/ci-cd.md](quality/ci-cd.md).
 - **No offline mode:** The React SPA requires the Express sidecar to be running. Tauri lifecycle management ensures this in production.
