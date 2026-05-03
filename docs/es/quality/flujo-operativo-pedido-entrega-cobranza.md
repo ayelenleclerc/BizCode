@@ -16,6 +16,26 @@ stateDiagram-v2
   Cobrado --> [*]
 ```
 
+## Estados canónicos de implementación (BP1-1 / GitHub #65)
+
+El diagrama usa **nombres de ciclo de vida orientados al usuario**. Cuando exista entidad persistida `Pedido`, OpenAPI y Prisma deben usar las **claves en inglés** siguientes para alinear issues, ADR y código.
+
+| Clave de implementación | Equivale en el diagrama | Significado |
+|--------------------------|-------------------------|-------------|
+| `draft` | Creado | Pedido capturado; editable; aún no comprometido con cumplimiento. |
+| `confirmed` | Asignado | Comprometido para planificación; puede asignarse depósito/ruta. |
+| `packed` | Picking / Empaquetado | Stock preparado / listo para despacho (en MVP puede ser un solo estado). |
+| `shipped` | Despachado | Entregado a transportista o tramo de reparto. |
+| `delivered` | Entregado | Recepción confirmada. |
+| `invoiced` | (antes de cobranza) | Factura vinculada (`Factura`) existente. |
+| `collected` | Cobrado | Pago / liquidación cerrada para la línea del pedido. |
+
+**Transiciones:** saltos inválidos (p. ej. `draft` → `collected`) deben rechazarse en la API futura. Cancelaciones: solo desde `draft` o `confirmed`, salvo que un ADR de implementación defina un terminal `cancelled`.
+
+**Integraciones:** `Cliente.creditLimit`, `Articulo.stock`, `DeliveryZone` y ámbito de canal (`x-bizcode-channel` / `AuthScope.channels`) en los mismos hitos que la tabla RACI.
+
+**Bocetos (sin migraciones):** artefactos Prisma/OpenAPI de trabajo en [boceto-implementacion-dominio-pedido.md](boceto-implementacion-dominio-pedido.md).
+
 | Estado (concepto) | Significado |
 |-------------------|-------------|
 | Creado | Pedido capturado (ventas / backoffice). |

@@ -16,6 +16,26 @@ stateDiagram-v2
   Collected --> [*]
 ```
 
+## Canonical implementation states (BP1-1 / GitHub #65)
+
+The diagram above uses **user-facing lifecycle names**. When persisting a `Pedido` entity (future BP1-1), OpenAPI and Prisma should use the **stable English keys** below so issues, ADRs, and code stay aligned.
+
+| Implementation key | Maps from diagram | Meaning |
+|--------------------|--------------------|---------|
+| `draft` | Created | Order captured; editable; not yet committed to fulfillment. |
+| `confirmed` | Assigned | Committed for planning; warehouse/route assignment may proceed. |
+| `packed` | Picking / Packed | Stock prepared / ready for dispatch (may stay a single state in MVP). |
+| `shipped` | Dispatched | Handed to carrier or driver leg. |
+| `delivered` | Delivered | Receipt confirmed. |
+| `invoiced` | (implicit before collection) | Linked invoice issued (`Factura`); financial record exists. |
+| `collected` | Collected | Payment / settlement closed for the order line. |
+
+**Transitions (normative):** invalid jumps (e.g. `draft` → `collected` without intermediate states) must be rejected by the future API. Cancellations: only from `draft` or `confirmed` unless a separate `cancelled` terminal state is added in the implementation ADR.
+
+**Integrations (unchanged intent):** `Cliente.creditLimit`, `Articulo.stock`, `DeliveryZone`, and channel scope (`x-bizcode-channel` / `AuthScope.channels`) apply at the same gates described in the RACI table.
+
+**Sketches (no migrations):** Prisma/OpenAPI **draft** artifacts for BP1-1 live in [order-domain-implementation-sketch.md](order-domain-implementation-sketch.md) (EN; ES/PT-BR in locale map).
+
 | State (concept) | Meaning |
 |-----------------|--------|
 | Created | Order captured (sales / backoffice). |

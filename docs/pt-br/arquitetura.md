@@ -59,7 +59,8 @@ Ação do usuário (teclado/clique)
 | `src/pages/facturacion/` | Emissão e listagem de faturas |
 | `server/main.ts` | Entrada CLI (`npm run server`): chama `startServer()` em `server.ts` |
 | `server.ts` (raiz) | Bootstrap: `createServerInstance`, `bindHttpServer`, `startServer`; usa `createApp` de `server/createApp.ts` |
-| `server/createApp.ts` | Fábrica Express reutilizável em testes de contrato OpenAPI |
+| `server/createApp.ts` | Fábrica Express reutilizável em testes de contrato OpenAPI (middleware, routers de auth, `registerRestDomainRoutes`) |
+| `server/registerRestDomainRoutes.ts` | Registra REST de domínio sob `/api/*` via módulos em `server/routes/` (CSV/validação compartilhados em `server/routes/restDomainShared.ts`) |
 
 ## Temas (Tailwind modo escuro)
 
@@ -73,8 +74,8 @@ O **mesmo domínio de negócio** deve suportar **desktop** (este documento) e, q
 
 ## Riscos e restrições
 
-- **Rotas da API em um único módulo:** a lógica HTTP está em `server/createApp.ts`; `server.ts` expõe o bootstrap; `server/main.ts` é a entrada de processo para `npm run server`. Evolução: routers por domínio.
-- **Sem autenticação:** a API não tem camada de auth; uso local (loopback). Se exposta à rede, é necessário autenticação.
+- **Superfície da API em módulos:** `server/createApp.ts` compõe middleware e routers; os handlers REST de domínio ficam em `server/routes/` e são registrados a partir de `server/registerRestDomainRoutes.ts`. `server.ts` expõe o bootstrap; `server/main.ts` é a entrada do `npm run server`.
+- **Sessão e exposição à rede:** há cookie de sessão, `resolveSession` e `requirePermission` nas rotas protegidas (ver `server/auth.ts` e [modelo-iam-sessoes-auditoria.md](quality/modelo-iam-sessoes-auditoria.md)). O layout desktop padrão ainda pressupõe sidecar local em loopback; SaaS hospedado exige transporte e hardening conforme [seguranca.md](seguranca.md).
 - **Build Tauri fora do CI:** ver [quality/ciclo-ci-cd.md](quality/ciclo-ci-cd.md).
 - **Sem modo offline:** o SPA exige o sidecar Express em execução.
 

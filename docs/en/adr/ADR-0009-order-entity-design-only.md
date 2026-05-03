@@ -25,7 +25,26 @@ GitHub backlog item **BP1-1** (orders) decides when to implement persistence and
 - **Negative:** Operational “order” workflows stay manual/off-system until BP1-1 ships.
 - **Follow-up:** On implementation, update this ADR status or supersede with a numbered ADR for the concrete `Pedido` schema.
 
+## Alternatives considered (GitHub #69)
+
+| Option | Rationale | Why not now |
+|--------|-----------|-------------|
+| Flat `estado` string without enum | Faster spike | Harder to enforce transitions and i18n labels consistently. |
+| Event-sourced order log | Full audit of transitions | Heavier operations and read models; defer until product requires replay. |
+| Single wide `Pedido` row with JSON `items` | Fewer tables | Weak relational integrity vs `Articulo`/`Cliente`; Prisma relations preferred when implemented. |
+
+**Chosen path for BP1-1:** relational `Pedido` + `PedidoItem` (sketched, not migrated) with an explicit `PedidoEstado` enum keyed as in the operational-flow doc (`draft` … `collected`).
+
+## Currency strategy
+
+**Tenant-default currency** for the first implementation slice (see [order-domain-implementation-sketch.md](../quality/order-domain-implementation-sketch.md)). Multi-currency requires a separate ADR if product mandates FX rules.
+
+## State machine (implementation keys)
+
+Authoritative mapping from the UX-facing diagram to persisted/API keys lives in the **Canonical implementation states** section of [`operational-flow-order-delivery-collection.md`](../quality/operational-flow-order-delivery-collection.md) (EN; ES/PT in locale map).
+
 ## References
 
 - [`docs/en/quality/operational-flow-order-delivery-collection.md`](../../quality/operational-flow-order-delivery-collection.md)
+- [`docs/en/quality/order-domain-implementation-sketch.md`](../quality/order-domain-implementation-sketch.md)
 - [`docs/api/openapi.yaml`](../../api/openapi.yaml)
