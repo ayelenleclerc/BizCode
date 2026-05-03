@@ -21,4 +21,10 @@ describe('Swagger UI', () => {
     const res = await request(app).get('/api-docs/').expect(200)
     expect(res.text.toLowerCase()).toContain('swagger')
   })
+
+  it('GET ruta API inexistente responde 404 JSON desde createApp', async () => {
+    const app = createApp(prismaStub)
+    const res = await request(app).get('/api/ruta-que-no-existe-swagger-ui-test').expect(404)
+    expect(res.body).toEqual({ success: false, error: 'Not found' })
+  })
 })

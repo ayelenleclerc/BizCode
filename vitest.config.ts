@@ -29,7 +29,13 @@ export default defineConfig({
         statements: 82,
       },
       include: ['src/lib/**/*.ts', 'server/createApp.ts', 'server.ts'],
-      exclude: ['src/lib/**/*.test.ts', '**/*.d.ts', 'server/main.ts'],
+      exclude: [
+        'src/lib/**/*.test.ts',
+        '**/*.d.ts',
+        'server/main.ts',
+        // Barrel de re-export sin lógica; no aporta a la métrica y arrastra líneas sin ejecutar.
+        'src/lib/plan-sync/index.ts',
+      ],
     },
   },
   resolve: {
