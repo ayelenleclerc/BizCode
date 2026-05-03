@@ -195,8 +195,7 @@ export default function ClientesPage() {
               {clientes.map((cliente, idx) => (
                 <tr
                   key={cliente.id}
-                  role="row"
-                  aria-selected={selectedRow === idx}
+                  data-selected={selectedRow === idx ? 'true' : 'false'}
                   onClick={() => setSelectedRow(idx)}
                   onKeyDown={(e) => handleKeyDown(e, idx)}
                   tabIndex={0}

@@ -21,7 +21,8 @@ export async function loginAsTestUser(page: Page, password: string) {
   // Submit login form
   await page.click('[data-testid="login-submit"]')
 
-  // Wait for navigation to complete and session to be established
-  await page.waitForURL('**/inicio', { timeout: 10000 })
-  await page.waitForLoadState('networkidle')
+  // Wait for navigation to complete and session to be established.
+  // Avoid `networkidle`: SPAs / APIs keep connections open and CI often times out.
+  await page.waitForURL('**/inicio', { timeout: 15_000 })
+  await page.waitForLoadState('load')
 }
