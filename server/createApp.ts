@@ -395,6 +395,16 @@ function validateFacturaInput(raw: unknown): ValidationResult<FacturaInput> {
   }
 }
 
+/** Prisma `DateTime` requires a {@link Date}; SPA sends date-only (`YYYY-MM-DD`). */
+function parseFacturaFechaForPersistence(raw: string): Date | null {
+  const trimmed = raw.trim()
+  if (trimmed.length === 0) return null
+  const hasTime = /^\d{4}-\d{2}-\d{2}T/.test(trimmed)
+  const iso = hasTime ? trimmed : `${trimmed.slice(0, 10)}T12:00:00.000Z`
+  const d = new Date(iso)
+  return Number.isNaN(d.getTime()) ? null : d
+}
+
 /** @en Max length for invoice void reason (audit metadata). @es Máx. motivo anulación. @pt-BR Máx. motivo anulação. */
 const FACTURA_VOID_MOTIVO_MAX_LEN = 500
 
@@ -1526,7 +1536,12 @@ export function createApp(prisma: PrismaClient): Application {
         res.status(400).json({ success: false, error: parsed.error })
         return
       }
-      const { items, ...factura } = parsed.value
+      const { items, fecha: fechaRaw, ...factura } = parsed.value
+      const fechaPersist = parseFacturaFechaForPersistence(fechaRaw)
+      if (!fechaPersist) {
+        res.status(400).json({ success: false, error: 'fecha must be a valid date or ISO datetime' })
+        return
+      }
       const clienteId = factura.clienteId
 
       const articuloIds = [...new Set(items.map((it) => it.articuloId))]
@@ -1558,6 +1573,7 @@ export function createApp(prisma: PrismaClient): Application {
         const newFactura = await tx.factura.create({
           data: {
             ...factura,
+            fecha: fechaPersist,
             tenantId,
             items: { create: items },
           } as Parameters<typeof prisma.factura.create>[0]['data'],
