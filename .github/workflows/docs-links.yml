@@ -1,0 +1,37 @@
+# Comprueba sólo enlaces HTTP(S) en Markdown bajo docs/ (Lychee).
+# Evita usar markdown-link-check con rutas relativas a .md, que este runner trata como URLs y marca 400.
+# Sin --exclude-mail: en Lychee ≥0.24 ese flag no existe; mailto solo se chequea si se pasa --include-mail.
+name: Documentation links check
+
+on:
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - 'docs/**'
+      - '.github/workflows/docs-links.yml'
+      - '.lycheeignore'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  lychee-docs:
+    name: External HTTP(S) link check (docs)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run Lychee (https + http sólo)
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: >-
+            --no-progress
+            --verbose
+            --scheme https
+            --scheme http
+            --max-concurrency 8
+            './docs/**/*.md'
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fail: true

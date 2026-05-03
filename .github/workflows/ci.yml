@@ -49,6 +49,9 @@ jobs:
       - name: Generate Prisma client
         run: npx prisma generate
 
+      - name: Validate Prisma schema (sin conectar BD)
+        run: npx prisma validate
+
       - name: Apply database schema
         run: |
           set -euo pipefail

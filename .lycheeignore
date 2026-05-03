@@ -1,0 +1,10 @@
+# Excluye destinos locales / no externos en el chequeo automatizado HTTP(S).
+# Enlaces relativos entre .md siguen cubiertos por check:docs-map y revisión editorial.
+#
+# npmjs.com responde 403 a clientes tipo bot (Lychee/CI); las URLs siguen son válidas en navegador.
+https://www\.npmjs\.com/package/@adobe/jsonschema2md
+https://www\.npmjs\.com/package/@scalar/openapi-to-markdown
+http://localhost
+http://127.0.0.1
+https://localhost
+https://127.0.0.1

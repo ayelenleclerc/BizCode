@@ -55,6 +55,9 @@ jobs:
       - name: Generate Prisma client
         run: npx prisma generate
 
+      - name: Validate Prisma schema
+        run: npx prisma validate
+
       - name: Check for createApp.ts size (Issue #77 ratchet, threshold 1800)
         run: |
           LINES=$(wc -l < server/createApp.ts)
@@ -65,78 +68,72 @@ jobs:
           fi
           echo "✅ createApp.ts size: $LINES lines (threshold 1800)"
 
-      - name: Validate error handling patterns
+      - name: Validate error handling patterns (403/409)
         run: |
-          if grep -r "res.status(.*).json" server/ | grep -E "(403|409)" > /dev/null; then
-            echo "✅ Found error status codes (403/409)"
+          if grep -rE 'res\.status\((403|409)\)' server --include='*.ts' >/dev/null; then
+            echo "✅ Found explicit HTTP 403/409 responses"
           else
-            echo "⚠️ No 403/409 status codes found - check Issue #78"
+            echo "::error::Expected authorization/conflict responses (403/409) somewhere in server/ (Issue #78)"
+            exit 1
           fi
 
       - name: Check for AppError class (Issue #78)
         run: |
-          if grep -q "class AppError" server/lib/errors.ts 2>/dev/null; then
+          if grep -q "export class AppError" server/errors/AppError.ts 2>/dev/null; then
             echo "✅ AppError class exists"
           else
-            echo "⚠️ AppError class not found (Issue #78)"
+            echo "::error::AppError must be exported in server/errors/AppError.ts"
+            exit 1
           fi
 
       - name: Validate multi-tenant enforcement (Issue #83)
         run: |
-          # grep exits 1 when there are no matches; with `set -e` + `pipefail` that must not fail the step.
-          TENANT_CHECKS=$( { grep -r "tenantId.*req.user.tenantId" server/ 2>/dev/null || true; } | wc -l )
-          echo "✅ Found $TENANT_CHECKS tenantId validation checks"
-          if [ $TENANT_CHECKS -lt 5 ]; then
-            echo "⚠️ Low number of tenantId checks - see Issue #83"
+          set -euo pipefail
+          TENANT_CHECKS=$(grep -r "claims\.tenantId" server --include='*.ts' | wc -l)
+          echo "✅ Found $TENANT_CHECKS claims.tenantId references in server/"
+          if [ "$TENANT_CHECKS" -lt 5 ]; then
+            echo "::error::Expected at least 5 tenant scoping usages (claims.tenantId) in server/ (Issue #83)"
+            exit 1
           fi
 
       - name: Check for Pino logger (Issue #78)
         run: |
-          if grep -q "import.*pino" server/lib/logger.ts 2>/dev/null; then
+          if grep -q "from 'pino'" server/logger.ts 2>/dev/null; then
             echo "✅ Pino logger configured"
           else
-            echo "⚠️ Pino not found (Issue #78)"
+            echo "::error::Structured logger must import pino in server/logger.ts"
+            exit 1
           fi
 
       - name: Verify AuditEvent logging (Issue #84)
         run: |
-          if grep -q "auditEvent" server/middleware/*.ts 2>/dev/null || grep -q "AuditEvent" prisma/schema.prisma; then
-            echo "✅ Audit logging infrastructure exists"
+          if grep -q "model AuditEvent" prisma/schema.prisma && grep -q "writeAuditEvent" server/audit.ts; then
+            echo "✅ Audit model + writeAuditEvent present"
           else
-            echo "⚠️ Audit logging not implemented (Issue #84)"
+            echo "::error::AuditEvent model and writeAuditEvent required (Issue #84)"
+            exit 1
           fi
 
       - name: Check for health endpoint (Issue #85)
         run: |
-          if grep -qE '/api/health|/health' server/createApp.ts 2>/dev/null; then
-            echo "✅ Health check endpoint exists"
+          if grep -qE "'/api/health'|\"/api/health\"" server/registerRestDomainRoutes.ts 2>/dev/null; then
+            echo "✅ Health check endpoint registered"
           else
-            echo "⚠️ Health endpoint not found (Issue #85)"
+            echo "::error::GET /api/health must be registered (Issue #85)"
+            exit 1
           fi
 
-      - name: Validate Zod schemas (Issue #79)
+      - name: Validate Zod domain schemas (Issue #79)
         run: |
-          ZODE_SCHEMAS=0
-          if [ -d server/routes ]; then
-            ZODE_SCHEMAS=$(find server/routes -name "validation.ts" -print | wc -l)
-          fi
-          echo "✅ Found $ZODE_SCHEMAS validation schema files"
-          if [ -d server/routes ]; then
-            shopt -s nullglob
-            paths=(server/routes/*/validation.ts)
-            if [ ${#paths[@]} -gt 0 ] && grep -q "z.object\|z.ZodSchema" "${paths[@]}" 2>/dev/null; then
-              echo "✅ Zod schemas are in use"
-            else
-              echo "⚠️ Manual validation patterns may still exist (Issue #79)"
-            fi
-            shopt -u nullglob
+          if grep -q "from 'zod'" server/schemas/domain.ts && grep -qE 'z\.[a-zA-Z]' server/schemas/domain.ts; then
+            echo "✅ Zod in use under server/schemas/domain.ts"
           else
-            echo "⚠️ No server/routes directory (Issue #79)"
+            echo "::error::Expect Zod usage in server/schemas/domain.ts (Issue #79)"
+            exit 1
           fi
 
-      - name: Server unit tests
-        run: |
-          npm run test -- server/ --reporter=verbose 2>/dev/null || echo 'No server-specific tests matched filter (Issue 86)'
+      - name: API unit tests (server exercised via mocks)
+        run: npm run test -- tests/api tests/server tests/plan-sync --reporter=verbose
 
       - name: Migration validation
         run: |
