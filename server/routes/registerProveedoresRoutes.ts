@@ -2,7 +2,7 @@ import { Prisma } from '@prisma/client'
 import type { Application, Request, Response } from 'express'
 import { requirePermission, type AuthenticatedRequest } from '../auth'
 import { validateBody } from '../middleware/validateBody'
-import { proveedorBodySchema } from '../schemas/domain'
+import { proveedorBodySchema, safeParseBodySchema } from '../schemas/domain'
 import type { ProveedorInput } from '../createApp.types'
 import { parseCsvWithFixedHeaders, CSV_IMPORT_MAX_ROWS } from '../csvImport'
 import { paginatedListJson, parseListPagination } from '../services/listPagination'
@@ -14,7 +14,6 @@ import {
   errorMessage,
   getTenantId,
   singleCsvUpload,
-  validateProveedorInput,
 } from './restDomainShared'
 
 /**
@@ -77,7 +76,7 @@ export function registerProveedoresRoutes(app: Application, ctx: RestRouteContex
           for (const [i, row] of parsedCsv.records.entries()) {
             const rowNum = i + 2
             const raw = csvRowToRawProveedor(row)
-            const parsed = validateProveedorInput(raw)
+            const parsed = safeParseBodySchema(proveedorBodySchema, raw)
             if (!parsed.ok) {
               errors.push({ row: rowNum, message: parsed.error })
               continue

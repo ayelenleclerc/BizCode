@@ -55,7 +55,7 @@ model Cliente {
   rsocial        String   @db.VarChar(30)
   fantasia       String?  @db.VarChar(30)
   cuit           String?  @db.VarChar(14)
-  condIva        String   @db.VarChar(10) // RI, Mono, CF, Exento (aligned with validateClienteInput)
+  condIva        String   @db.VarChar(10) // RI, Mono, CF, Exento (aligned with clienteBodySchema / Zod)
   domicilio      String?  @db.VarChar(40)
   localidad      String?  @db.VarChar(25)
   cpost          String?  @db.VarChar(8)
@@ -64,7 +64,7 @@ model Cliente {
   formaPago      Int?     // FK a FormaPago.id
   activo         Boolean  @default(true)
   // ── Financial fields (Issue #31) ──────────────────────────────────────────
-  creditLimit    Decimal? @db.Decimal(14, 2)         // null = sin límite
+  creditLimit    Decimal? @db.Decimal(14, 2)         // null = sin límite; DB: Cliente_creditLimit_nonneg_check
   creditDays     Int      @default(0)                 // días de plazo habituales
   balance        Decimal  @db.Decimal(14, 2) @default(0)  // saldo acumulado
   balanceInicial Decimal  @db.Decimal(14, 2) @default(0)  // saldo al migrar datos
@@ -111,8 +111,8 @@ model Articulo {
   precioLista1 Decimal @db.Decimal(14, 2)
   precioLista2 Decimal @db.Decimal(14, 2)
   costo        Decimal @db.Decimal(13, 2)
-  stock        Int    @default(0)
-  minimo       Int    @default(0)
+  stock        Int    @default(0) // DB: Articulo_stock_nonneg_check
+  minimo       Int    @default(0) // DB: Articulo_minimo_nonneg_check
   activo       Boolean @default(true)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt

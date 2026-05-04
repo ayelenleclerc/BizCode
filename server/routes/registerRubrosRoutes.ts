@@ -1,7 +1,7 @@
 import type { Application, Request, Response } from 'express'
 import { requirePermission, type AuthenticatedRequest } from '../auth'
 import { validateBody } from '../middleware/validateBody'
-import { rubroBodySchema } from '../schemas/domain'
+import { rubroBodySchema, safeParseBodySchema } from '../schemas/domain'
 import type { RubroInput } from '../createApp.types'
 import { parseCsvWithFixedHeaders, CSV_IMPORT_MAX_ROWS } from '../csvImport'
 import { paginatedListJson, parseListPagination } from '../services/listPagination'
@@ -13,7 +13,6 @@ import {
   errorMessage,
   getTenantId,
   singleCsvUpload,
-  validateRubroInput,
 } from './restDomainShared'
 
 /**
@@ -86,7 +85,7 @@ export function registerRubrosRoutes(app: Application, ctx: RestRouteContext): v
           for (const [i, row] of parsedCsv.records.entries()) {
             const rowNum = i + 2
             const raw = csvRowToRawRubro(row)
-            const parsed = validateRubroInput(raw)
+            const parsed = safeParseBodySchema(rubroBodySchema, raw)
             if (!parsed.ok) {
               errors.push({ row: rowNum, message: parsed.error })
               continue

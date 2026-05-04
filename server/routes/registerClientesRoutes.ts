@@ -2,7 +2,7 @@ import { Prisma } from '@prisma/client'
 import type { Application, Request, Response } from 'express'
 import { requirePermission, type AuthenticatedRequest } from '../auth'
 import { validateBody } from '../middleware/validateBody'
-import { clienteBodySchema } from '../schemas/domain'
+import { clienteBodySchema, safeParseBodySchema } from '../schemas/domain'
 import type { ClienteInput } from '../createApp.types'
 import { parseCsvWithFixedHeaders, CSV_IMPORT_MAX_ROWS } from '../csvImport'
 import { paginatedListJson, parseListPagination } from '../services/listPagination'
@@ -14,7 +14,6 @@ import {
   errorMessage,
   getTenantId,
   singleCsvUpload,
-  validateClienteInput,
 } from './restDomainShared'
 
 /**
@@ -78,7 +77,7 @@ export function registerClientesRoutes(app: Application, ctx: RestRouteContext):
         for (const [i, row] of parsedCsv.records.entries()) {
           const rowNum = i + 2
           const raw = csvRowToRawCliente(row)
-          const parsed = validateClienteInput(raw)
+          const parsed = safeParseBodySchema(clienteBodySchema, raw)
           if (!parsed.ok) {
             errors.push({ row: rowNum, message: parsed.error })
             continue

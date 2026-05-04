@@ -2,7 +2,7 @@ import { Prisma } from '@prisma/client'
 import type { Application, Request, Response } from 'express'
 import { requirePermission, type AuthenticatedRequest } from '../auth'
 import { validateBody } from '../middleware/validateBody'
-import { articuloBodySchema } from '../schemas/domain'
+import { articuloBodySchema, safeParseBodySchema } from '../schemas/domain'
 import type { ArticuloInput } from '../createApp.types'
 import { parseCsvWithFixedHeaders, CSV_IMPORT_MAX_ROWS } from '../csvImport'
 import { paginatedListJson, parseListPagination } from '../services/listPagination'
@@ -14,7 +14,6 @@ import {
   errorMessage,
   getTenantId,
   singleCsvUpload,
-  validateArticuloInput,
 } from './restDomainShared'
 
 /**
@@ -167,7 +166,7 @@ export function registerArticulosRoutes(app: Application, ctx: RestRouteContext)
             }
             const { rubroCodigo: _rc, ...rest } = raw
             const forValidate = { ...rest, rubroId }
-            const parsed = validateArticuloInput(forValidate)
+            const parsed = safeParseBodySchema(articuloBodySchema, forValidate)
             if (!parsed.ok) {
               errors.push({ row: rowNum, message: parsed.error })
               continue

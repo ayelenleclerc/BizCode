@@ -561,3 +561,28 @@ export const deliveryZoneUpdateBodySchema = z
     }
     return out
   })
+
+/** Resultado de validar un objeto arbitrario (p. ej. fila CSV → raw) con un schema Zod de dominio. */
+export type SafeParseBodyResult<T> = { ok: true; value: T } | { ok: false; error: string }
+
+/**
+ * Valida `raw` con el mismo schema que `validateBody` en rutas JSON (p. ej. import CSV tras `csvRowToRaw*`).
+ */
+function firstZodIssueMessage(err: z.ZodError): string {
+  const issue = err.errors[0]
+  if (!issue) {
+    return 'Validation failed'
+  }
+  const path = issue.path.length > 0 ? `${issue.path.join('.')}: ` : ''
+  const m = issue.message
+  const combined = `${path}${m}`.trim()
+  return combined.length > 0 ? combined : 'Validation failed'
+}
+
+export function safeParseBodySchema<S extends z.ZodTypeAny>(schema: S, raw: unknown): SafeParseBodyResult<z.output<S>> {
+  const parsed = schema.safeParse(raw)
+  if (!parsed.success) {
+    return { ok: false, error: firstZodIssueMessage(parsed.error) }
+  }
+  return { ok: true, value: parsed.data }
+}
