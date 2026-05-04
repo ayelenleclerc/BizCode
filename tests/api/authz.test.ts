@@ -6,19 +6,23 @@ import { createApp } from '../../server/createApp'
 function buildPrismaMock(): PrismaClient {
   return {
     cliente: {
+      count: vi.fn().mockResolvedValue(0),
       findMany: vi.fn().mockResolvedValue([]),
       create: vi.fn().mockResolvedValue({ id: 1 }),
     },
     articulo: {
+      count: vi.fn().mockResolvedValue(0),
       findMany: vi.fn().mockResolvedValue([]),
     },
     rubro: {
+      count: vi.fn().mockResolvedValue(0),
       findMany: vi.fn().mockResolvedValue([]),
     },
     formaPago: {
       findMany: vi.fn().mockResolvedValue([]),
     },
     factura: {
+      count: vi.fn().mockResolvedValue(0),
       findMany: vi.fn().mockResolvedValue([]),
     },
     auditEvent: {

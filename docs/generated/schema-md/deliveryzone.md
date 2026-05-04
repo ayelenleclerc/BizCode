@@ -1,7 +1,7 @@
 # DeliveryZone Schema
 
 ```txt
-undefined#/properties/data/items
+undefined#/allOf/0/properties/data/items
 ```
 
 

@@ -6,7 +6,7 @@ import {
   deliveryZoneUpdateBodySchema,
 } from '../schemas/domain'
 import type { DeliveryZoneCreateParsed, DeliveryZoneUpdateParsed } from '../createApp.types'
-import { parseListPagination } from '../services/listPagination'
+import { paginatedListJson, parseListPagination } from '../services/listPagination'
 import type { RestRouteContext } from './restRouteTypes'
 import { errorMessage } from './restDomainShared'
 
@@ -21,13 +21,17 @@ export function registerZonasEntregaRoutes(app: Application, ctx: RestRouteConte
       const authReq = req as AuthenticatedRequest
       const tenantId = authReq.auth!.claims.tenantId
       const { take, skip } = parseListPagination(req)
-      const zones = await prisma.deliveryZone.findMany({
-        where: { tenantId },
-        orderBy: { nombre: 'asc' },
-        take,
-        skip,
-      })
-      res.json({ success: true, data: zones })
+      const where = { tenantId }
+      const [total, zones] = await Promise.all([
+        prisma.deliveryZone.count({ where }),
+        prisma.deliveryZone.findMany({
+          where,
+          orderBy: { nombre: 'asc' },
+          take,
+          skip,
+        }),
+      ])
+      res.json(paginatedListJson(zones, total, take, skip))
     } catch (err: unknown) {
       res.status(500).json({ success: false, error: errorMessage(err) })
     }

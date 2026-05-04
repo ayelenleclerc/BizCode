@@ -1532,17 +1532,37 @@ components:
         data:
           $ref: '#/components/schemas/ClienteImportResult'
 
-    ClienteListEnvelope:
+    ListPaginationMeta:
       type: object
-      required: [success, data]
+      required: [total, limit, offset]
       properties:
-        success:
-          type: boolean
-          const: true
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/Cliente'
+        total:
+          type: integer
+          minimum: 0
+          description: Row count matching the list filter (before limit/offset)
+        limit:
+          type: integer
+          minimum: 1
+          maximum: 500
+          description: Effective page size (same semantics as query `limit`)
+        offset:
+          type: integer
+          minimum: 0
+          description: Effective skip (same semantics as query `offset`)
+
+    ClienteListEnvelope:
+      allOf:
+        - type: object
+          required: [success, data]
+          properties:
+            success:
+              type: boolean
+              const: true
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/Cliente'
+        - $ref: '#/components/schemas/ListPaginationMeta'
 
     ClienteEnvelope:
       type: object
@@ -1636,16 +1656,18 @@ components:
           type: boolean
 
     ArticuloListEnvelope:
-      type: object
-      required: [success, data]
-      properties:
-        success:
-          type: boolean
-          const: true
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/Articulo'
+      allOf:
+        - type: object
+          required: [success, data]
+          properties:
+            success:
+              type: boolean
+              const: true
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/Articulo'
+        - $ref: '#/components/schemas/ListPaginationMeta'
 
     ArticuloEnvelope:
       type: object
@@ -1692,16 +1714,18 @@ components:
           maxLength: 20
 
     RubroListEnvelope:
-      type: object
-      required: [success, data]
-      properties:
-        success:
-          type: boolean
-          const: true
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/Rubro'
+      allOf:
+        - type: object
+          required: [success, data]
+          properties:
+            success:
+              type: boolean
+              const: true
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/Rubro'
+        - $ref: '#/components/schemas/ListPaginationMeta'
 
     RubroEnvelope:
       type: object
@@ -1770,16 +1794,18 @@ components:
           type: boolean
 
     ProveedorListEnvelope:
-      type: object
-      required: [success, data]
-      properties:
-        success:
-          type: boolean
-          const: true
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/Proveedor'
+      allOf:
+        - type: object
+          required: [success, data]
+          properties:
+            success:
+              type: boolean
+              const: true
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/Proveedor'
+        - $ref: '#/components/schemas/ListPaginationMeta'
 
     ProveedorEnvelope:
       type: object
@@ -1920,16 +1946,18 @@ components:
                 type: number
 
     FacturaListEnvelope:
-      type: object
-      required: [success, data]
-      properties:
-        success:
-          type: boolean
-          const: true
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/Factura'
+      allOf:
+        - type: object
+          required: [success, data]
+          properties:
+            success:
+              type: boolean
+              const: true
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/Factura'
+        - $ref: '#/components/schemas/ListPaginationMeta'
 
     FacturaEnvelope:
       type: object
@@ -2261,16 +2289,18 @@ components:
           type: boolean
 
     DeliveryZoneListEnvelope:
-      type: object
-      required: [success, data]
-      properties:
-        success:
-          type: boolean
-          const: true
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/DeliveryZone'
+      allOf:
+        - type: object
+          required: [success, data]
+          properties:
+            success:
+              type: boolean
+              const: true
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/DeliveryZone'
+        - $ref: '#/components/schemas/ListPaginationMeta'
 
     DeliveryZoneEnvelope:
       type: object

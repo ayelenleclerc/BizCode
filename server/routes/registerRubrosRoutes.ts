@@ -4,7 +4,7 @@ import { validateBody } from '../middleware/validateBody'
 import { rubroBodySchema } from '../schemas/domain'
 import type { RubroInput } from '../createApp.types'
 import { parseCsvWithFixedHeaders, CSV_IMPORT_MAX_ROWS } from '../csvImport'
-import { parseListPagination } from '../services/listPagination'
+import { paginatedListJson, parseListPagination } from '../services/listPagination'
 import type { RestRouteContext } from './restRouteTypes'
 import {
   RUBRO_IMPORT_CSV_HEADERS,
@@ -26,13 +26,17 @@ export function registerRubrosRoutes(app: Application, ctx: RestRouteContext): v
     try {
       const tenantId = getTenantId(req)
       const { take, skip } = parseListPagination(req)
-      const rubros = await prisma.rubro.findMany({
-        where: { tenantId },
-        orderBy: { codigo: 'asc' },
-        take,
-        skip,
-      })
-      res.json({ success: true, data: rubros })
+      const where = { tenantId }
+      const [total, rubros] = await Promise.all([
+        prisma.rubro.count({ where }),
+        prisma.rubro.findMany({
+          where,
+          orderBy: { codigo: 'asc' },
+          take,
+          skip,
+        }),
+      ])
+      res.json(paginatedListJson(rubros, total, take, skip))
     } catch (err: unknown) {
       res.status(500).json({ success: false, error: errorMessage(err) })
     }

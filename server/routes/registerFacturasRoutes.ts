@@ -3,7 +3,7 @@ import { requirePermission, type AuthenticatedRequest } from '../auth'
 import { validateBody } from '../middleware/validateBody'
 import { facturaBodySchema, facturaVoidBodySchema } from '../schemas/domain'
 import type { FacturaInput } from '../createApp.types'
-import { parseListPagination } from '../services/listPagination'
+import { paginatedListJson, parseListPagination } from '../services/listPagination'
 import { dispatchNotification } from '../channels'
 import type { RestRouteContext } from './restRouteTypes'
 import { errorMessage, facturaFechaToPrismaDate, getTenantId } from './restDomainShared'
@@ -19,14 +19,18 @@ export function registerFacturasRoutes(app: Application, ctx: RestRouteContext):
     try {
       const tenantId = getTenantId(req)
       const { take, skip } = parseListPagination(req)
-      const facturas = await prisma.factura.findMany({
-        where: { tenantId },
-        include: { cliente: true, items: true },
-        orderBy: { fecha: 'desc' },
-        take,
-        skip,
-      })
-      res.json({ success: true, data: facturas })
+      const where = { tenantId }
+      const [total, facturas] = await Promise.all([
+        prisma.factura.count({ where }),
+        prisma.factura.findMany({
+          where,
+          include: { cliente: true, items: true },
+          orderBy: { fecha: 'desc' },
+          take,
+          skip,
+        }),
+      ])
+      res.json(paginatedListJson(facturas, total, take, skip))
     } catch (err: unknown) {
       res.status(500).json({ success: false, error: errorMessage(err) })
     }

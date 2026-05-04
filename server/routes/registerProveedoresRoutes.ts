@@ -1,10 +1,11 @@
+import { Prisma } from '@prisma/client'
 import type { Application, Request, Response } from 'express'
 import { requirePermission, type AuthenticatedRequest } from '../auth'
 import { validateBody } from '../middleware/validateBody'
 import { proveedorBodySchema } from '../schemas/domain'
 import type { ProveedorInput } from '../createApp.types'
 import { parseCsvWithFixedHeaders, CSV_IMPORT_MAX_ROWS } from '../csvImport'
-import { parseListPagination } from '../services/listPagination'
+import { paginatedListJson, parseListPagination } from '../services/listPagination'
 import type { RestRouteContext } from './restRouteTypes'
 import {
   PROVEEDOR_IMPORT_CSV_HEADERS,
@@ -27,19 +28,23 @@ export function registerProveedoresRoutes(app: Application, ctx: RestRouteContex
       const tenantId = getTenantId(req)
       const filtro = (req.query.q as string) || ''
       const { take, skip } = parseListPagination(req)
-      const proveedores = await prisma.proveedor.findMany({
-        where: {
-          tenantId,
-          OR: [
-            { rsocial: { contains: filtro, mode: 'insensitive' } },
-            { codigo: { equals: filtro ? parseInt(filtro, 10) : undefined } },
-          ],
-        },
-        orderBy: { codigo: 'asc' },
-        take,
-        skip,
-      })
-      res.json({ success: true, data: proveedores })
+      const where = {
+        tenantId,
+        OR: [
+          { rsocial: { contains: filtro, mode: Prisma.QueryMode.insensitive } },
+          { codigo: { equals: filtro ? parseInt(filtro, 10) : undefined } },
+        ],
+      }
+      const [total, proveedores] = await Promise.all([
+        prisma.proveedor.count({ where }),
+        prisma.proveedor.findMany({
+          where,
+          orderBy: { codigo: 'asc' },
+          take,
+          skip,
+        }),
+      ])
+      res.json(paginatedListJson(proveedores, total, take, skip))
     } catch (err: unknown) {
       res.status(500).json({ success: false, error: errorMessage(err) })
     }

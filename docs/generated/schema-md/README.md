@@ -86,6 +86,8 @@
 
 * [HealthResponse](./healthresponse.md) – `-`
 
+* [ListPaginationMeta](./listpaginationmeta.md) – `-`
+
 * [LoginEnvelope](./loginenvelope.md) – `-`
 
 * [LoginInput](./logininput.md) – `-`
@@ -126,11 +128,23 @@
 
 ### Objects
 
+* [Untitled object in ArticuloListEnvelope](./articulolistenvelope-allof-0.md) – `undefined#/allOf/0`
+
 * [Untitled object in ChatConversation](./chatconversation-properties-lastmessage-anyof-1.md) – `undefined#/properties/lastMessage/anyOf/1`
 
 * [Untitled object in ChatConversation](./chatconversation-properties-user.md) – `undefined#/properties/user`
 
+* [Untitled object in ClienteListEnvelope](./clientelistenvelope-allof-0.md) – `undefined#/allOf/0`
+
+* [Untitled object in DeliveryZoneListEnvelope](./deliveryzonelistenvelope-allof-0.md) – `undefined#/allOf/0`
+
 * [Untitled object in FacturaInput](./facturainput-properties-items-items.md) – `undefined#/properties/items/items`
+
+* [Untitled object in FacturaListEnvelope](./facturalistenvelope-allof-0.md) – `undefined#/allOf/0`
+
+* [Untitled object in ProveedorListEnvelope](./proveedorlistenvelope-allof-0.md) – `undefined#/allOf/0`
+
+* [Untitled object in RubroListEnvelope](./rubrolistenvelope-allof-0.md) – `undefined#/allOf/0`
 
 ### Arrays
 
@@ -160,7 +174,7 @@
 
 * [Untitled array in AppUserUpdateInput](./appuserupdateinput-properties-scopewarehouseids.md) – `undefined#/properties/scopeWarehouseIds`
 
-* [Untitled array in ArticuloListEnvelope](./articulolistenvelope-properties-data.md) – `undefined#/properties/data`
+* [Untitled array in ArticuloListEnvelope](./articulolistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
 
 * [Untitled array in AuthClaims](./authclaims-properties-permissions.md) – `undefined#/properties/permissions`
 
@@ -178,21 +192,21 @@
 
 * [Untitled array in ClienteImportResult](./clienteimportresult-properties-errors.md) – `undefined#/properties/errors`
 
-* [Untitled array in ClienteListEnvelope](./clientelistenvelope-properties-data.md) – `undefined#/properties/data`
+* [Untitled array in ClienteListEnvelope](./clientelistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
 
-* [Untitled array in DeliveryZoneListEnvelope](./deliveryzonelistenvelope-properties-data.md) – `undefined#/properties/data`
+* [Untitled array in DeliveryZoneListEnvelope](./deliveryzonelistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
 
 * [Untitled array in Factura](./factura-properties-items.md) – `undefined#/properties/items`
 
 * [Untitled array in FacturaInput](./facturainput-properties-items.md) – `undefined#/properties/items`
 
-* [Untitled array in FacturaListEnvelope](./facturalistenvelope-properties-data.md) – `undefined#/properties/data`
+* [Untitled array in FacturaListEnvelope](./facturalistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
 
 * [Untitled array in FormaPagoListEnvelope](./formapagolistenvelope-properties-data.md) – `undefined#/properties/data`
 
-* [Untitled array in ProveedorListEnvelope](./proveedorlistenvelope-properties-data.md) – `undefined#/properties/data`
+* [Untitled array in ProveedorListEnvelope](./proveedorlistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
 
-* [Untitled array in RubroListEnvelope](./rubrolistenvelope-properties-data.md) – `undefined#/properties/data`
+* [Untitled array in RubroListEnvelope](./rubrolistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
 
 ## Version Note
 
