@@ -110,6 +110,7 @@ function buildPrisma(): PrismaClient {
   const p = {
     deliveryZone: { findFirst: vi.fn().mockResolvedValue(null) },
     cliente: {
+      count: vi.fn().mockResolvedValue(1),
       findMany: vi.fn((args?: unknown) => {
         const w =
           args && typeof args === 'object' && args !== null && 'where' in args
@@ -126,6 +127,7 @@ function buildPrisma(): PrismaClient {
       update: vi.fn().mockResolvedValue(clienteRow), // PUT /api/clientes/:id returns full row
     },
     articulo: {
+      count: vi.fn().mockResolvedValue(1),
       findMany: vi.fn((args?: unknown) => {
         const w =
           args && typeof args === 'object' && args !== null && 'where' in args
@@ -148,6 +150,7 @@ function buildPrisma(): PrismaClient {
       update: vi.fn().mockResolvedValue(articuloRow),
     },
     rubro: {
+      count: vi.fn().mockResolvedValue(1),
       findFirst: vi.fn().mockResolvedValue(rubroRow),
       findMany: vi.fn().mockImplementation((args?: unknown) => {
         const a =
@@ -169,11 +172,13 @@ function buildPrisma(): PrismaClient {
       findMany: vi.fn().mockResolvedValue([formaPagoRow]),
     },
     factura: {
+      count: vi.fn().mockResolvedValue(0),
       findMany: vi.fn().mockResolvedValue([]),
       create: facturaCreate,
       aggregate: vi.fn().mockResolvedValue({ _count: { id: 0 }, _sum: { total: null } }),
     },
     proveedor: {
+      count: vi.fn().mockResolvedValue(1),
       findMany: vi.fn((args?: unknown) => {
         const w =
           args && typeof args === 'object' && args !== null && 'where' in args
@@ -225,12 +230,27 @@ describe('API — contrato OpenAPI', () => {
     const app = createApp(prisma)
     const res = await request(app).get('/api/clientes').expect(200)
     await assertMatchesOpenApi('/api/clientes', 'get', '200', res.body)
+    expect(res.body).toMatchObject({
+      success: true,
+      total: 1,
+      limit: 100,
+      offset: 0,
+      data: expect.any(Array),
+    })
   })
 
   it('GET /api/clientes?q numérico (rama filtro en query OR)', async () => {
     const app = createApp(prisma)
     const res = await request(app).get('/api/clientes').query({ q: '42' }).expect(200)
     await assertMatchesOpenApi('/api/clientes', 'get', '200', res.body)
+    expect(res.body).toMatchObject({ total: 1, limit: 100, offset: 0 })
+  })
+
+  it('GET /api/clientes refleja limit y offset de query en la respuesta', async () => {
+    const app = createApp(prisma)
+    const res = await request(app).get('/api/clientes').query({ limit: '25', offset: '7' }).expect(200)
+    await assertMatchesOpenApi('/api/clientes', 'get', '200', res.body)
+    expect(res.body).toMatchObject({ total: 1, limit: 25, offset: 7 })
   })
 
   it('GET /api/clientes/:id', async () => {

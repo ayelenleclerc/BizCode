@@ -1,10 +1,11 @@
+import { Prisma } from '@prisma/client'
 import type { Application, Request, Response } from 'express'
 import { requirePermission, type AuthenticatedRequest } from '../auth'
 import { validateBody } from '../middleware/validateBody'
 import { articuloBodySchema } from '../schemas/domain'
 import type { ArticuloInput } from '../createApp.types'
 import { parseCsvWithFixedHeaders, CSV_IMPORT_MAX_ROWS } from '../csvImport'
-import { parseListPagination } from '../services/listPagination'
+import { paginatedListJson, parseListPagination } from '../services/listPagination'
 import type { RestRouteContext } from './restRouteTypes'
 import {
   ARTICULO_IMPORT_CSV_HEADERS,
@@ -27,20 +28,24 @@ export function registerArticulosRoutes(app: Application, ctx: RestRouteContext)
       const tenantId = getTenantId(req)
       const filtro = (req.query.q as string) || ''
       const { take, skip } = parseListPagination(req)
-      const articulos = await prisma.articulo.findMany({
-        where: {
-          tenantId,
-          OR: [
-            { descripcion: { contains: filtro, mode: 'insensitive' } },
-            { codigo: { equals: filtro ? parseInt(filtro, 10) : undefined } },
-          ],
-        },
-        include: { rubro: true },
-        orderBy: { codigo: 'asc' },
-        take,
-        skip,
-      })
-      res.json({ success: true, data: articulos })
+      const where = {
+        tenantId,
+        OR: [
+          { descripcion: { contains: filtro, mode: Prisma.QueryMode.insensitive } },
+          { codigo: { equals: filtro ? parseInt(filtro, 10) : undefined } },
+        ],
+      }
+      const [total, articulos] = await Promise.all([
+        prisma.articulo.count({ where }),
+        prisma.articulo.findMany({
+          where,
+          include: { rubro: true },
+          orderBy: { codigo: 'asc' },
+          take,
+          skip,
+        }),
+      ])
+      res.json(paginatedListJson(articulos, total, take, skip))
     } catch (err: unknown) {
       res.status(500).json({ success: false, error: errorMessage(err) })
     }

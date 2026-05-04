@@ -1,10 +1,11 @@
+import { Prisma } from '@prisma/client'
 import type { Application, Request, Response } from 'express'
 import { requirePermission, type AuthenticatedRequest } from '../auth'
 import { validateBody } from '../middleware/validateBody'
 import { clienteBodySchema } from '../schemas/domain'
 import type { ClienteInput } from '../createApp.types'
 import { parseCsvWithFixedHeaders, CSV_IMPORT_MAX_ROWS } from '../csvImport'
-import { parseListPagination } from '../services/listPagination'
+import { paginatedListJson, parseListPagination } from '../services/listPagination'
 import type { RestRouteContext } from './restRouteTypes'
 import {
   buildClienteImportTemplateCsv,
@@ -27,20 +28,24 @@ export function registerClientesRoutes(app: Application, ctx: RestRouteContext):
       const tenantId = getTenantId(req)
       const filtro = (req.query.q as string) || ''
       const { take, skip } = parseListPagination(req)
-      const clientes = await prisma.cliente.findMany({
-        where: {
-          tenantId,
-          OR: [
-            { rsocial: { contains: filtro, mode: 'insensitive' } },
-            { cuit: { contains: filtro, mode: 'insensitive' } },
-            { codigo: { equals: filtro ? parseInt(filtro, 10) : undefined } },
-          ],
-        },
-        orderBy: { codigo: 'asc' },
-        take,
-        skip,
-      })
-      res.json({ success: true, data: clientes })
+      const where = {
+        tenantId,
+        OR: [
+          { rsocial: { contains: filtro, mode: Prisma.QueryMode.insensitive } },
+          { cuit: { contains: filtro, mode: Prisma.QueryMode.insensitive } },
+          { codigo: { equals: filtro ? parseInt(filtro, 10) : undefined } },
+        ],
+      }
+      const [total, clientes] = await Promise.all([
+        prisma.cliente.count({ where }),
+        prisma.cliente.findMany({
+          where,
+          orderBy: { codigo: 'asc' },
+          take,
+          skip,
+        }),
+      ])
+      res.json(paginatedListJson(clientes, total, take, skip))
     } catch (err: unknown) {
       res.status(500).json({ success: false, error: errorMessage(err) })
     }

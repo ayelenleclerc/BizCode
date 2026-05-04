@@ -70,6 +70,7 @@ describe('API — integración PostgreSQL (Prisma real)', () => {
     const res = await request(app).get('/api/clientes').expect(200)
     expect(res.body.success).toBe(true)
     expect(res.body.data).toEqual([])
+    expect(res.body).toMatchObject({ total: 0, limit: 100, offset: 0 })
   })
 
   it('POST /api/clientes persiste y GET /api/clientes/:id lee desde PostgreSQL', async () => {
@@ -102,6 +103,7 @@ describe('API — integración PostgreSQL (Prisma real)', () => {
     const res = await request(app).get('/api/articulos').expect(200)
     expect(res.body.success).toBe(true)
     expect(res.body.data).toEqual([])
+    expect(res.body).toMatchObject({ total: 0, limit: 100, offset: 0 })
   })
 
   it('POST /api/articulos persiste y GET /api/articulos/:id lee desde PostgreSQL', async () => {
@@ -148,6 +150,7 @@ describe('API — integración PostgreSQL (Prisma real)', () => {
 
     const listRes = await request(app).get('/api/clientes').expect(200)
     expect(listRes.body.success).toBe(true)
+    expect(typeof listRes.body.total).toBe('number')
     expect((listRes.body.data as { id: number }[]).some((c) => c.id === otherCliente.id)).toBe(false)
 
     const getRes = await request(app).get(`/api/clientes/${otherCliente.id}`).expect(200)

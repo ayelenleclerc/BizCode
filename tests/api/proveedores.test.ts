@@ -49,6 +49,7 @@ function buildPrisma(overrides: Partial<Record<string, unknown>> = {}): PrismaCl
     articulo: { findMany: vi.fn().mockResolvedValue([]) },
     rubro: { findMany: vi.fn().mockResolvedValue([]), create: vi.fn() },
     proveedor: {
+      count: vi.fn().mockResolvedValue(1),
       findMany: proveedorFindMany,
       findFirst: vi.fn().mockResolvedValue(proveedorRow),
       findUnique: vi.fn().mockResolvedValue(proveedorRow),
@@ -104,6 +105,7 @@ describe('Proveedores API', () => {
     expect(res.body.success).toBe(true)
     expect(Array.isArray(res.body.data)).toBe(true)
     expect(res.body.data[0].codigo).toBe(4001)
+    expect(res.body).toMatchObject({ total: 1, limit: 100, offset: 0 })
   })
 
   it('GET /api/proveedores/:id', async () => {

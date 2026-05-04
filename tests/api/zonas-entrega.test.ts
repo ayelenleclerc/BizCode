@@ -20,6 +20,7 @@ const ZONE_BASE = {
 function buildPrismaMock(overrides: Partial<Record<string, unknown>> = {}): PrismaClient {
   return {
     deliveryZone: {
+      count: vi.fn().mockResolvedValue(1),
       findMany: vi.fn().mockResolvedValue([ZONE_BASE]),
       findFirst: vi.fn().mockResolvedValue(ZONE_BASE),
       create: vi.fn().mockResolvedValue(ZONE_BASE),
@@ -91,6 +92,7 @@ describe('GET /api/zonas-entrega', () => {
     expect(res.body.success).toBe(true)
     expect(Array.isArray(res.body.data)).toBe(true)
     expect(res.body.data[0].nombre).toBe('Barrio Norte')
+    expect(res.body).toMatchObject({ total: 1, limit: 100, offset: 0 })
   })
 
   it('returns 403 for billing role (missing logistics.read)', async () => {
@@ -316,6 +318,7 @@ describe('zonas-entrega 500 error branches', () => {
   it('GET returns 500 when prisma throws', async () => {
     const prisma = buildPrismaMock({
       deliveryZone: {
+        count: vi.fn().mockResolvedValue(0),
         findMany: vi.fn().mockRejectedValue(new Error('DB error')),
         findFirst: vi.fn(),
         create: vi.fn(),
@@ -329,6 +332,7 @@ describe('zonas-entrega 500 error branches', () => {
   it('POST returns 500 when prisma.create throws', async () => {
     const prisma = buildPrismaMock({
       deliveryZone: {
+        count: vi.fn().mockResolvedValue(0),
         findMany: vi.fn().mockResolvedValue([]),
         findFirst: vi.fn().mockResolvedValue(null),
         create: vi.fn().mockRejectedValue(new Error('DB error')),
@@ -345,6 +349,7 @@ describe('zonas-entrega 500 error branches', () => {
   it('PUT returns 500 when prisma.update throws', async () => {
     const prisma = buildPrismaMock({
       deliveryZone: {
+        count: vi.fn().mockResolvedValue(0),
         findMany: vi.fn().mockResolvedValue([]),
         findFirst: vi.fn().mockResolvedValue(ZONE_BASE),
         create: vi.fn(),

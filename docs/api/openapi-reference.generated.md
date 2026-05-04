@@ -470,6 +470,8 @@ One-time endpoint to create initial tenant and owner user.
 
 ###### Content-Type: application/json
 
+**All of:**
+
 - **`data` (required)**
 
   `array`
@@ -556,6 +558,18 @@ One-time endpoint to create initial tenant and owner user.
 
   `boolean`
 
+* **`limit` (required)**
+
+  `integer` — Effective page size (same semantics as query \`limit\`)
+
+* **`offset` (required)**
+
+  `integer` — Effective skip (same semantics as query \`offset\`)
+
+* **`total` (required)**
+
+  `integer` — Row count matching the list filter (before limit/offset)
+
 **Example:**
 
 ```json
@@ -584,7 +598,10 @@ One-time endpoint to create initial tenant and owner user.
       "deliveryZoneId": 1,
       "additionalProperty": "anything"
     }
-  ]
+  ],
+  "total": 0,
+  "limit": 1,
+  "offset": 0
 }
 ```
 
@@ -1610,6 +1627,8 @@ One-time endpoint to create initial tenant and owner user.
 
 ###### Content-Type: application/json
 
+**All of:**
+
 - **`data` (required)**
 
   `array`
@@ -1684,6 +1703,18 @@ One-time endpoint to create initial tenant and owner user.
 
   `boolean`
 
+* **`limit` (required)**
+
+  `integer` — Effective page size (same semantics as query \`limit\`)
+
+* **`offset` (required)**
+
+  `integer` — Effective skip (same semantics as query \`offset\`)
+
+* **`total` (required)**
+
+  `integer` — Row count matching the list filter (before limit/offset)
+
 **Example:**
 
 ```json
@@ -1711,7 +1742,10 @@ One-time endpoint to create initial tenant and owner user.
       "activo": true,
       "additionalProperty": "anything"
     }
-  ]
+  ],
+  "total": 0,
+  "limit": 1,
+  "offset": 0
 }
 ```
 
@@ -2670,6 +2704,8 @@ One-time endpoint to create initial tenant and owner user.
 
 ###### Content-Type: application/json
 
+**All of:**
+
 - **`data` (required)**
 
   `array`
@@ -2692,6 +2728,18 @@ One-time endpoint to create initial tenant and owner user.
 
   `boolean`
 
+* **`limit` (required)**
+
+  `integer` — Effective page size (same semantics as query \`limit\`)
+
+* **`offset` (required)**
+
+  `integer` — Effective skip (same semantics as query \`offset\`)
+
+* **`total` (required)**
+
+  `integer` — Row count matching the list filter (before limit/offset)
+
 **Example:**
 
 ```json
@@ -2704,7 +2752,10 @@ One-time endpoint to create initial tenant and owner user.
       "nombre": "",
       "additionalProperty": "anything"
     }
-  ]
+  ],
+  "total": 0,
+  "limit": 1,
+  "offset": 0
 }
 ```
 
@@ -3171,6 +3222,8 @@ One-time endpoint to create initial tenant and owner user.
 
 ###### Content-Type: application/json
 
+**All of:**
+
 - **`data` (required)**
 
   `array`
@@ -3217,6 +3270,18 @@ One-time endpoint to create initial tenant and owner user.
 
   `boolean`
 
+* **`limit` (required)**
+
+  `integer` — Effective page size (same semantics as query \`limit\`)
+
+* **`offset` (required)**
+
+  `integer` — Effective skip (same semantics as query \`offset\`)
+
+* **`total` (required)**
+
+  `integer` — Row count matching the list filter (before limit/offset)
+
 **Example:**
 
 ```json
@@ -3235,7 +3300,10 @@ One-time endpoint to create initial tenant and owner user.
       "activo": true,
       "additionalProperty": "anything"
     }
-  ]
+  ],
+  "total": 0,
+  "limit": 1,
+  "offset": 0
 }
 ```
 
@@ -4081,6 +4149,8 @@ One-time endpoint to create initial tenant and owner user.
 
 ###### Content-Type: application/json
 
+**All of:**
+
 - **`data` (required)**
 
   `array`
@@ -4245,6 +4315,18 @@ One-time endpoint to create initial tenant and owner user.
 
   `boolean`
 
+* **`limit` (required)**
+
+  `integer` — Effective page size (same semantics as query \`limit\`)
+
+* **`offset` (required)**
+
+  `integer` — Effective skip (same semantics as query \`offset\`)
+
+* **`total` (required)**
+
+  `integer` — Row count matching the list filter (before limit/offset)
+
 **Example:**
 
 ```json
@@ -4300,7 +4382,10 @@ One-time endpoint to create initial tenant and owner user.
       ],
       "additionalProperty": "anything"
     }
-  ]
+  ],
+  "total": 0,
+  "limit": 1,
+  "offset": 0
 }
 ```
 
@@ -6636,6 +6721,8 @@ Returns boolean flags for each channel. No sensitive values are exposed.
 
 ###### Content-Type: application/json
 
+**All of:**
+
 - **`data` (required)**
 
   `array`
@@ -6682,6 +6769,18 @@ Returns boolean flags for each channel. No sensitive values are exposed.
 
   `boolean`
 
+* **`limit` (required)**
+
+  `integer` — Effective page size (same semantics as query \`limit\`)
+
+* **`offset` (required)**
+
+  `integer` — Effective skip (same semantics as query \`offset\`)
+
+* **`total` (required)**
+
+  `integer` — Row count matching the list filter (before limit/offset)
+
 **Example:**
 
 ```json
@@ -6700,7 +6799,10 @@ Returns boolean flags for each channel. No sensitive values are exposed.
       "updatedAt": "",
       "additionalProperty": "anything"
     }
-  ]
+  ],
+  "total": 0,
+  "limit": 1,
+  "offset": 0
 }
 ```
 
@@ -8032,127 +8134,37 @@ Returns boolean flags for each channel. No sensitive values are exposed.
 }
 ```
 
-### ClienteListEnvelope
+### ListPaginationMeta
 
 - **Type:**`object`
 
-* **`data` (required)**
+* **`limit` (required)**
 
-  `array`
+  `integer` — Effective page size (same semantics as query \`limit\`)
 
-  **Items:**
+* **`offset` (required)**
 
-  - **`activo`**
+  `integer` — Effective skip (same semantics as query \`offset\`)
 
-    `boolean`
+* **`total` (required)**
 
-  - **`balance`**
-
-    `number`, default: `0` — Accumulated balance (incremented on each new factura).
-
-  - **`balanceInicial`**
-
-    `number`, default: `0` — Opening balance at migration time.
-
-  - **`codigo`**
-
-    `integer`
-
-  - **`condIva`**
-
-    `string`
-
-  - **`cpost`**
-
-    `string`
-
-  - **`creditDays`**
-
-    `integer`, default: `0` — Usual credit days for this customer.
-
-  - **`creditLimit`**
-
-    `number` — Credit limit in ARS. null = no limit.
-
-  - **`cuit`**
-
-    `string`
-
-  - **`deliveryZoneId`**
-
-    `integer` — FK to DeliveryZone. Assign a delivery zone to this customer.
-
-  - **`domicilio`**
-
-    `string`
-
-  - **`email`**
-
-    `string`
-
-  - **`fantasia`**
-
-    `string`
-
-  - **`id`**
-
-    `integer`
-
-  - **`localidad`**
-
-    `string`
-
-  - **`rsocial`**
-
-    `string`
-
-  - **`score`**
-
-    `integer`, default: `50` — Payment score 0-100 (50=neutral, 0=high risk, 100=perfect).
-
-  - **`suspended`**
-
-    `boolean`, default: `false` — When true, POST /api/facturas returns 422 CLIENT\_SUSPENDED.
-
-  - **`telef`**
-
-    `string`
-
-* **`success` (required)**
-
-  `boolean`
+  `integer` — Row count matching the list filter (before limit/offset)
 
 **Example:**
 
 ```json
 {
-  "success": true,
-  "data": [
-    {
-      "id": 1,
-      "codigo": 1,
-      "rsocial": "",
-      "fantasia": "",
-      "cuit": "",
-      "condIva": "",
-      "domicilio": "",
-      "localidad": "",
-      "cpost": "",
-      "telef": "",
-      "email": "",
-      "activo": true,
-      "creditLimit": 1,
-      "creditDays": 0,
-      "balance": 0,
-      "balanceInicial": 0,
-      "score": 50,
-      "suspended": false,
-      "deliveryZoneId": 1,
-      "additionalProperty": "anything"
-    }
-  ]
+  "total": 0,
+  "limit": 1,
+  "offset": 0
 }
 ```
+
+### ClienteListEnvelope
+
+- **Type:**
+
+**Example:**
 
 ### ClienteEnvelope
 
@@ -8476,112 +8488,9 @@ Returns boolean flags for each channel. No sensitive values are exposed.
 
 ### ArticuloListEnvelope
 
-- **Type:**`object`
-
-* **`data` (required)**
-
-  `array`
-
-  **Items:**
-
-  - **`activo`**
-
-    `boolean`
-
-  - **`codigo`**
-
-    `integer`
-
-  - **`condIva`**
-
-    `string`
-
-  - **`costo`**
-
-    `number`
-
-  - **`descripcion`**
-
-    `string`
-
-  - **`id`**
-
-    `integer`
-
-  - **`minimo`**
-
-    `integer`
-
-  - **`precioLista1`**
-
-    `number`
-
-  - **`precioLista2`**
-
-    `number`
-
-  - **`rubro`**
-
-    `object`
-
-    - **`codigo`**
-
-      `integer`
-
-    - **`id`**
-
-      `integer`
-
-    - **`nombre`**
-
-      `string`
-
-  - **`rubroId`**
-
-    `integer`
-
-  - **`stock`**
-
-    `integer`
-
-  - **`umedida`**
-
-    `string`
-
-* **`success` (required)**
-
-  `boolean`
+- **Type:**
 
 **Example:**
-
-```json
-{
-  "success": true,
-  "data": [
-    {
-      "id": 1,
-      "codigo": 1,
-      "descripcion": "",
-      "rubroId": 1,
-      "rubro": {
-        "id": 1,
-        "codigo": 1,
-        "nombre": "",
-        "additionalProperty": "anything"
-      },
-      "condIva": "",
-      "umedida": "",
-      "precioLista1": 1,
-      "precioLista2": 1,
-      "costo": 1,
-      "stock": 1,
-      "minimo": 1,
-      "activo": true,
-      "additionalProperty": "anything"
-    }
-  ]
-}
-```
 
 ### ArticuloEnvelope
 
@@ -8779,45 +8688,9 @@ Returns boolean flags for each channel. No sensitive values are exposed.
 
 ### RubroListEnvelope
 
-- **Type:**`object`
-
-* **`data` (required)**
-
-  `array`
-
-  **Items:**
-
-  - **`codigo`**
-
-    `integer`
-
-  - **`id`**
-
-    `integer`
-
-  - **`nombre`**
-
-    `string`
-
-* **`success` (required)**
-
-  `boolean`
+- **Type:**
 
 **Example:**
-
-```json
-{
-  "success": true,
-  "data": [
-    {
-      "id": 1,
-      "codigo": 1,
-      "nombre": "",
-      "additionalProperty": "anything"
-    }
-  ]
-}
-```
 
 ### RubroEnvelope
 
@@ -8967,75 +8840,9 @@ Returns boolean flags for each channel. No sensitive values are exposed.
 
 ### ProveedorListEnvelope
 
-- **Type:**`object`
-
-* **`data` (required)**
-
-  `array`
-
-  **Items:**
-
-  - **`activo`**
-
-    `boolean`
-
-  - **`codigo`**
-
-    `integer`
-
-  - **`condIva`**
-
-    `string`
-
-  - **`cuit`**
-
-    `string`
-
-  - **`email`**
-
-    `string`
-
-  - **`fantasia`**
-
-    `string`
-
-  - **`id`**
-
-    `integer`
-
-  - **`rsocial`**
-
-    `string`
-
-  - **`telef`**
-
-    `string`
-
-* **`success` (required)**
-
-  `boolean`
+- **Type:**
 
 **Example:**
-
-```json
-{
-  "success": true,
-  "data": [
-    {
-      "id": 1,
-      "codigo": 1,
-      "rsocial": "",
-      "fantasia": "",
-      "cuit": "",
-      "condIva": "",
-      "telef": "",
-      "email": "",
-      "activo": true,
-      "additionalProperty": "anything"
-    }
-  ]
-}
-```
 
 ### ProveedorEnvelope
 
@@ -9604,230 +9411,9 @@ Returns boolean flags for each channel. No sensitive values are exposed.
 
 ### FacturaListEnvelope
 
-- **Type:**`object`
-
-* **`data` (required)**
-
-  `array`
-
-  **Items:**
-
-  - **`clienteId`**
-
-    `integer`
-
-  - **`estado`**
-
-    `string`
-
-  - **`fecha`**
-
-    `string`, format: `date-time`
-
-  - **`formaPagoId`**
-
-    `integer`
-
-  - **`id`**
-
-    `integer`
-
-  - **`items`**
-
-    `array`
-
-    **Items:**
-
-    - **`articulo`**
-
-      `object`
-
-      - **`activo`**
-
-        `boolean`
-
-      - **`codigo`**
-
-        `integer`
-
-      - **`condIva`**
-
-        `string`
-
-      - **`costo`**
-
-        `number`
-
-      - **`descripcion`**
-
-        `string`
-
-      - **`id`**
-
-        `integer`
-
-      - **`minimo`**
-
-        `integer`
-
-      - **`precioLista1`**
-
-        `number`
-
-      - **`precioLista2`**
-
-        `number`
-
-      - **`rubro`**
-
-        `object`
-
-        - **`codigo`**
-
-          `integer`
-
-        - **`id`**
-
-          `integer`
-
-        - **`nombre`**
-
-          `string`
-
-      - **`rubroId`**
-
-        `integer`
-
-      - **`stock`**
-
-        `integer`
-
-      - **`umedida`**
-
-        `string`
-
-    - **`articuloId`**
-
-      `integer`
-
-    - **`cantidad`**
-
-      `number`
-
-    - **`dscto`**
-
-      `number`
-
-    - **`id`**
-
-      `integer`
-
-    - **`precio`**
-
-      `number`
-
-    - **`subtotal`**
-
-      `number`
-
-  - **`iva1`**
-
-    `number`
-
-  - **`iva2`**
-
-    `number`
-
-  - **`neto1`**
-
-    `number`
-
-  - **`neto2`**
-
-    `number`
-
-  - **`neto3`**
-
-    `number`
-
-  - **`numero`**
-
-    `integer`
-
-  - **`prefijo`**
-
-    `string`
-
-  - **`tipo`**
-
-    `string`
-
-  - **`total`**
-
-    `number`
-
-* **`success` (required)**
-
-  `boolean`
+- **Type:**
 
 **Example:**
-
-```json
-{
-  "success": true,
-  "data": [
-    {
-      "id": 1,
-      "fecha": "",
-      "tipo": "",
-      "prefijo": "",
-      "numero": 1,
-      "clienteId": 1,
-      "formaPagoId": 1,
-      "neto1": 1,
-      "neto2": 1,
-      "neto3": 1,
-      "iva1": 1,
-      "iva2": 1,
-      "total": 1,
-      "estado": "",
-      "items": [
-        {
-          "id": 1,
-          "articuloId": 1,
-          "articulo": {
-            "id": 1,
-            "codigo": 1,
-            "descripcion": "",
-            "rubroId": 1,
-            "rubro": {
-              "id": 1,
-              "codigo": 1,
-              "nombre": "",
-              "additionalProperty": "anything"
-            },
-            "condIva": "",
-            "umedida": "",
-            "precioLista1": 1,
-            "precioLista2": 1,
-            "costo": 1,
-            "stock": 1,
-            "minimo": 1,
-            "activo": true,
-            "additionalProperty": "anything"
-          },
-          "cantidad": 1,
-          "precio": 1,
-          "dscto": 1,
-          "subtotal": 1,
-          "additionalProperty": "anything"
-        }
-      ],
-      "additionalProperty": "anything"
-    }
-  ]
-}
-```
 
 ### FacturaEnvelope
 
@@ -10980,75 +10566,9 @@ Returns boolean flags for each channel. No sensitive values are exposed.
 
 ### DeliveryZoneListEnvelope
 
-- **Type:**`object`
-
-* **`data` (required)**
-
-  `array`
-
-  **Items:**
-
-  - **`activo`**
-
-    `boolean`, default: `true`
-
-  - **`createdAt`**
-
-    `string`, format: `date-time`
-
-  - **`diasEntrega`**
-
-    `string` — Comma-separated delivery day numbers, e.g. "1,3,5"
-
-  - **`horario`**
-
-    `string` — Preferred time window, e.g. "08:00-12:00"
-
-  - **`id`**
-
-    `integer`
-
-  - **`nombre`**
-
-    `string`
-
-  - **`tenantId`**
-
-    `integer`
-
-  - **`tipo`**
-
-    `string`, possible values: `"barrio", "manual", "predefinida"`, default: `"barrio"`
-
-  - **`updatedAt`**
-
-    `string`, format: `date-time`
-
-* **`success` (required)**
-
-  `boolean`
+- **Type:**
 
 **Example:**
-
-```json
-{
-  "success": true,
-  "data": [
-    {
-      "id": 1,
-      "tenantId": 1,
-      "nombre": "",
-      "tipo": "barrio",
-      "diasEntrega": "",
-      "horario": "",
-      "activo": true,
-      "createdAt": "",
-      "updatedAt": "",
-      "additionalProperty": "anything"
-    }
-  ]
-}
-```
 
 ### DeliveryZoneEnvelope
 

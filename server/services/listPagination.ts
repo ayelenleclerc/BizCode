@@ -14,3 +14,18 @@ export function parseListPagination(req: Request): { take: number; skip: number 
   const skip = Number.isFinite(offsetRaw) && offsetRaw >= 0 ? offsetRaw : 0
   return { take, skip }
 }
+
+/**
+ * @en Response body for paginated GET lists (`data` + `total` / `limit` / `offset` per OpenAPI list envelopes).
+ * @es Cuerpo de respuesta para listas GET paginadas (`data` + `total` / `limit` / `offset`).
+ * @pt-BR Corpo de resposta para listas GET paginadas (`data` + `total` / `limit` / `offset`).
+ */
+export function paginatedListJson<T>(data: T[], total: number, take: number, skip: number): {
+  success: true
+  data: T[]
+  total: number
+  limit: number
+  offset: number
+} {
+  return { success: true, data, total, limit: take, offset: skip }
+}
