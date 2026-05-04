@@ -12,7 +12,7 @@ Organize by domain, not HTTP method. Break apart createApp.ts (1521 lines).
 - server/routes/facturas/
 - server/routes/rubros/
 - server/routes/proveedores/
-- server/middleware/ (errorHandler, logger, validateRequest, multiTenant)
+- server/middleware/ (errorHandler, logger, validateBody, correlationId, global rate limit, etc.)
 - server/lib/ (errors, logger, validators)
 - server/createApp.ts (<100 lines, bootstrap only)
 
@@ -58,13 +58,12 @@ Every mutation (POST/PUT/DELETE) logs AuditEvent to database.
 
 ## 4. REQUEST VALIDATION (Issue #79)
 
-Use Zod schemas, not manual ValidationResult pattern.
+Use **Zod** as the single source of truth for REST entity bodies — not ad-hoc per-route parsers.
 
-Define schemas in routes/<domain>/validation.ts.
-
-Use validateRequest() middleware to parse & validate.
-
-Single schema covers both POST and PUT with .partial().
+- **Schemas:** [`server/schemas/domain.ts`](../../server/schemas/domain.ts) — `clienteBodySchema`, `articuloBodySchema`, `rubroBodySchema`, `proveedorBodySchema`, `facturaBodySchema`, delivery zone schemas, etc.
+- **JSON (POST/PUT):** [`server/middleware/validateBody.ts`](../../server/middleware/validateBody.ts) — `validateBody(schema)` runs `safeParse` on `req.body` and forwards `ValidationAppError` on failure.
+- **CSV import:** same schemas via [`safeParseBodySchema`](../../server/schemas/domain.ts) on the object built by `csvRowToRaw*` helpers in [`server/routes/restDomainShared.ts`](../../server/routes/restDomainShared.ts); per-row errors use the first Zod issue with **field path** prefix for operators.
+- **Database invariants:** non-negative `Articulo.stock` / `Articulo.minimo` and `Cliente.creditLimit` (null or ≥ 0) are enforced with PostgreSQL **CHECK** constraints in `prisma/migrations/` (see migration `20260505130000_nonneg_entity_checks`); keep Zod and DB aligned when rules change.
 
 ---
 

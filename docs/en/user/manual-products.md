@@ -59,7 +59,7 @@ Rubros classify products (e.g. "Tools", "Electronics"). Users with **product man
 With **products.manage**:
 
 - **Rubros:** fixed columns `codigo`, `nombre`. `.csv` file; max file size and row count are shown in the import dialog. Rows are skipped if the category code already exists in the database or is duplicated in the same file.
-- **Products:** columns as in the template; **`rubroCodigo`** must match the **numeric code** of an existing rubro. The same duplicate policy applies to the product `codigo` (within the file and in the database).
+- **Products:** columns as in the template; **`rubroCodigo`** must match the **numeric code** of an existing rubro. The same duplicate policy applies to the product `codigo` (within the file and in the database). Row validation matches the REST API; rejected rows show a **field path** prefix in the error text.
 
 **Esc** closes the import dialog when it is open; otherwise it closes the product form.
 
