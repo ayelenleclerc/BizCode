@@ -122,6 +122,7 @@ model Articulo {
   @@unique([tenantId, codigo])
   @@index([tenantId])
   @@index([tenantId, codigo])
+  @@index([tenantId, rubroId])
 }
 
 model Proveedor {
@@ -179,6 +180,7 @@ model Factura {
   @@unique([tenantId, tipo, prefijo, numero])
   @@index([tenantId])
   @@index([tenantId, fecha])
+  @@index([tenantId, clienteId])
 }
 
 model FacturaItem {
