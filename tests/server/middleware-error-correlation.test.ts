@@ -109,6 +109,22 @@ describe('errorHandler middleware', () => {
     expect(loggerMod.logger.error).toHaveBeenCalled()
   })
 
+  it('exposes error message in development for non-AppError', async () => {
+    process.env.NODE_ENV = 'development'
+
+    const app = express()
+    app.get('/x', (_req, _res, next) => {
+      next(new Error('visible dev message'))
+    })
+    app.use(errorHandler)
+
+    await request(app)
+      .get('/x')
+      .expect(500)
+      .expect({ success: false, error: 'visible dev message' })
+    expect(loggerMod.logger.error).toHaveBeenCalled()
+  })
+
   it('returns early when response headers were already sent', () => {
     process.env.NODE_ENV = 'development'
 
