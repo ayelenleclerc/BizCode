@@ -59,7 +59,7 @@ Los rubros son las categorías de artículos (ej: "Herramientas", "Electrónica"
 Con permiso **products.manage**:
 
 - **Rubros:** columnas fijas `codigo`, `nombre`. Archivo `.csv`, tamaño y filas máximas según el texto de ayuda del cuadro de importación. No se vuelven a crear códigos que ya existan en la base ni duplicados dentro del mismo archivo.
-- **Artículos:** columnas según la plantilla; **`rubroCodigo`** debe coincidir con el **código numérico** de un rubro ya existente. Misma política de duplicados por `codigo` de artículo (archivo y base).
+- **Artículos:** columnas según la plantilla; **`rubroCodigo`** debe coincidir con el **código numérico** de un rubro ya existente. Misma política de duplicados por `codigo` de artículo (archivo y base). La validación por fila es la misma que la API REST; los errores incluyen prefijo de **campo** (p. ej. `descripcion: …`).
 
 **Esc** cierra el cuadro de importación si está abierto; si no, cierra el formulario de artículo.
 

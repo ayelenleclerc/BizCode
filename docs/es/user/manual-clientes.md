@@ -67,7 +67,7 @@ Quienes tengan permiso de gestión de clientes pueden cargar muchos registros de
 1. En el listado, abra **Importar CSV** (o el botón equivalente).
 2. Descargue la **plantilla** desde el mismo diálogo: incluye la fila de cabeceras obligatorias y un ejemplo.
 3. No modifique los nombres ni el orden de las columnas de la primera fila. Guarde el archivo como `.csv` (UTF-8).
-4. Adjunte el archivo y confirme la importación. El sistema muestra cuántas filas se crearon y, si hubo errores de validación o duplicados, el detalle **por fila** (el número de fila cuenta desde la primera fila de datos; la fila 1 es el encabezado).
+4. Adjunte el archivo y confirme la importación. El sistema muestra cuántas filas se crearon y, si hubo errores de validación o duplicados, el detalle **por fila** (el número de fila cuenta desde la primera fila de datos; la fila 1 es el encabezado). Las reglas coinciden con la API REST de alta/edición; cada mensaje incluye la **ruta del campo** (p. ej. `rsocial: …`) cuando el servidor rechaza una fila.
 
 **Política de duplicados:** si el **código** de cliente ya existe en la base de datos, o aparece repetido dentro del mismo archivo, esa fila se rechaza y no se inserta.
 

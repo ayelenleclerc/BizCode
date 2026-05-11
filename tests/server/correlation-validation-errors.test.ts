@@ -70,7 +70,7 @@ describe('ValidationAppError envelope', () => {
   beforeEach(() => {
     process.env.NODE_ENV = 'test'
     process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
-    process.env.BIZCODE_TEST_ROLE = 'logistics_planner'
+    process.env.BIZCODE_TEST_ROLE = 'owner'
     vi.spyOn(console, 'error').mockImplementation(() => {})
   })
 
@@ -79,5 +79,37 @@ describe('ValidationAppError envelope', () => {
     const res = await request(app).post('/api/zonas-entrega').send({}).expect(400)
 
     expect(res.body).toEqual({ success: false, error: expect.stringContaining('nombre') })
+  })
+
+  it('returns { success:false, error } when body fails Zod on POST /api/clientes', async () => {
+    const app = createApp(buildPrismaMock())
+    const res = await request(app)
+      .post('/api/clientes')
+      .send({ codigo: 1, rsocial: 'AB', condIva: 'RI', activo: true })
+      .expect(400)
+
+    expect(res.body).toEqual({ success: false, error: expect.stringContaining('rsocial') })
+  })
+
+  it('returns { success:false, error } when body fails Zod on POST /api/articulos', async () => {
+    const app = createApp(buildPrismaMock())
+    const res = await request(app)
+      .post('/api/articulos')
+      .send({
+        codigo: 10,
+        descripcion: 'Producto ok',
+        rubroId: 1,
+        condIva: '1',
+        umedida: 'UN',
+        precioLista1: 10,
+        precioLista2: 9,
+        costo: 5,
+        stock: -1,
+        minimo: 0,
+        activo: true,
+      })
+      .expect(400)
+
+    expect(res.body).toEqual({ success: false, error: expect.stringContaining('stock') })
   })
 })

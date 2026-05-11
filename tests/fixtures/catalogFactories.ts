@@ -18,7 +18,7 @@ export async function createIntegrationRubro(
   })
 }
 
-/** Valid POST /api/articulos body aligned with validateArticuloInput in server/createApp.ts */
+/** Valid POST /api/articulos body aligned with articuloBodySchema (Zod) in server/schemas/domain.ts */
 export function buildArticuloCreateBody(rubroId: number, codigo = 42) {
   return {
     codigo,

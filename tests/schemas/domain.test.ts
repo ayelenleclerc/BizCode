@@ -1,5 +1,25 @@
 import { describe, expect, it } from 'vitest'
-import { clienteBodySchema, facturaBodySchema, rubroBodySchema } from '../../server/schemas/domain'
+import {
+  articuloBodySchema,
+  clienteBodySchema,
+  facturaBodySchema,
+  proveedorBodySchema,
+  rubroBodySchema,
+} from '../../server/schemas/domain'
+
+const validArticuloPayload = {
+  codigo: 10,
+  descripcion: 'Producto ok',
+  rubroId: 1,
+  condIva: '1' as const,
+  umedida: 'UN',
+  precioLista1: 10,
+  precioLista2: 9,
+  costo: 5,
+  stock: 0,
+  minimo: 0,
+  activo: true,
+}
 
 describe('clienteBodySchema', () => {
   it('parses valid payload and trims rsocial', () => {
@@ -22,6 +42,64 @@ describe('clienteBodySchema', () => {
       extraUnknown: 'ignored',
     } as Record<string, unknown>)
     expect('extraUnknown' in out).toBe(false)
+  })
+
+  it('rejects invalid CUIT', () => {
+    const r = clienteBodySchema.safeParse({
+      codigo: 10,
+      rsocial: 'ACME SA',
+      condIva: 'RI',
+      activo: true,
+      cuit: '20123456787',
+    })
+    expect(r.success).toBe(false)
+    if (!r.success) {
+      expect(r.error.errors.some((e) => e.path.includes('cuit'))).toBe(true)
+    }
+  })
+
+  it('rejects missing required fields', () => {
+    const r = clienteBodySchema.safeParse({ codigo: 10, rsocial: 'ACME SA' })
+    expect(r.success).toBe(false)
+    if (!r.success) {
+      expect(r.error.errors.some((e) => e.path.includes('condIva') || e.path.includes('activo'))).toBe(true)
+    }
+  })
+})
+
+describe('articuloBodySchema', () => {
+  it('rejects negative stock', () => {
+    const r = articuloBodySchema.safeParse({ ...validArticuloPayload, stock: -1 })
+    expect(r.success).toBe(false)
+    if (!r.success) {
+      expect(r.error.errors.some((e) => e.path.includes('stock'))).toBe(true)
+    }
+  })
+})
+
+describe('proveedorBodySchema', () => {
+  it('parses valid payload', () => {
+    const out = proveedorBodySchema.parse({
+      codigo: 1,
+      rsocial: 'Proveedor SA',
+      condIva: 'RI',
+      activo: true,
+    })
+    expect(out.rsocial).toBe('Proveedor SA')
+  })
+
+  it('rejects invalid CUIT', () => {
+    const r = proveedorBodySchema.safeParse({
+      codigo: 1,
+      rsocial: 'Proveedor SA',
+      condIva: 'RI',
+      activo: true,
+      cuit: '20123456787',
+    })
+    expect(r.success).toBe(false)
+    if (!r.success) {
+      expect(r.error.errors.some((e) => e.path.includes('cuit'))).toBe(true)
+    }
   })
 })
 

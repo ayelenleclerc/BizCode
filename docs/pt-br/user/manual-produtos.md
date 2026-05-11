@@ -59,7 +59,7 @@ As categorias classificam produtos. Quem tiver permissão de **gestão de produt
 Com **products.manage**:
 
 - **Rubros:** colunas fixas `codigo`, `nombre` (como na plantilla). Arquivo `.csv`; limites aparecem no diálogo. Códigos já existentes no banco ou duplicados no arquivo são ignorados com mensagem.
-- **Produtos:** colunas conforme o modelo; **`rubroCodigo`** deve ser o **código numérico** de um rubro existente. Mesma política de duplicados pelo `codigo` do produto (arquivo e banco).
+- **Produtos:** colunas conforme o modelo; **`rubroCodigo`** deve ser o **código numérico** de um rubro existente. Mesma política de duplicados pelo `codigo` do produto (arquivo e banco). A validação por linha segue a API REST; mensagens de erro trazem o **campo** em prefixo (por exemplo `descripcion: …`).
 
 **Esc** fecha o diálogo de importação se estiver aberto; caso contrário, fecha o formulário.
 

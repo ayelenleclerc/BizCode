@@ -67,7 +67,7 @@ Usuários com permissão de gestão de clientes podem carregar muitos registros 
 1. Na lista, abra **Importar CSV** (ou o controle equivalente).
 2. **Baixe o modelo** no mesmo diálogo: inclui a linha de cabeçalhos obrigatória e um exemplo.
 3. Não altere os nomes nem a ordem das colunas da primeira linha. Salve como `.csv` (UTF-8).
-4. Anexe o arquivo e confirme. O sistema informa quantas linhas foram criadas e, se houver erros de validação ou duplicados, o detalhe **por linha** (a numeração das linhas de dados começa após o cabeçalho; a linha 1 é o cabeçalho).
+4. Anexe o arquivo e confirme. O sistema informa quantas linhas foram criadas e, se houver erros de validação ou duplicados, o detalhe **por linha** (a numeração das linhas de dados começa após o cabeçalho; a linha 1 é o cabeçalho). As regras seguem a mesma API REST de criação/edição; cada mensagem traz o **caminho do campo** (por exemplo `rsocial: …`) quando a linha é rejeitada.
 
 **Política de duplicados:** se o **código** do cliente já existir na base ou estiver repetido no mesmo arquivo, a linha é rejeitada.
 

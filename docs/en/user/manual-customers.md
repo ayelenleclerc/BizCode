@@ -67,7 +67,7 @@ Users with customer management permission can load many records from a **UTF-8 C
 1. On the list screen, open **Import CSV** (or the equivalent control).
 2. **Download the template** from the same dialog: it includes the required header row and one example row.
 3. Do not change the header row column names or order. Save the file as `.csv` (UTF-8).
-4. Attach the file and confirm. The system reports how many rows were created and, if any rows failed validation or duplicates, **per-row** errors (data row numbers start after the header; row 1 is the header).
+4. Attach the file and confirm. The system reports how many rows were created and, if any rows failed validation or duplicates, **per-row** errors (data row numbers start after the header; row 1 is the header). Validation rules match the REST API for create/update; each error message includes the **field path** (for example `rsocial: …`) when the server rejects a row.
 
 **Duplicate policy:** if a customer **code** already exists in the database, or is repeated within the same file, that row is rejected and not inserted.
 

@@ -15,7 +15,7 @@ BizCode is a **desktop application** built with Tauri 1.5. The Rust shell hosts 
 │  │                         │    │                            │ │
 │  │  React 18 + TypeScript  │◄──►│  REST API (:3001)          │ │
 │  │  Vite 5 (bundled)       │    │  Prisma 5 ORM              │ │
-│  │  react-i18next (i18n)   │    │  Input validation          │ │
+│  │  react-i18next (i18n)   │    │  Zod (REST + CSV import)   │ │
 │  │  react-hook-form + zod  │    │                            │ │
 │  └─────────────────────────┘    └────────────┬───────────────┘ │
 │                                              │                 │
@@ -60,7 +60,8 @@ User action (keyboard/click)
 | `server/main.ts` | CLI entry (`npm run server`): calls `startServer()` from `server.ts` |
 | `server.ts` (root) | Bootstrap: `createServerInstance`, `bindHttpServer`, `startServer`; uses `createApp` from `server/createApp.ts` |
 | `server/createApp.ts` | Reusable Express factory for OpenAPI contract tests (middleware, auth routers, `registerRestDomainRoutes`) |
-| `server/registerRestDomainRoutes.ts` | Registers tenant-scoped domain REST under `/api/*` via modules in `server/routes/` (shared CSV/validation helpers in `server/routes/restDomainShared.ts`) |
+| `server/schemas/domain.ts` | Zod schemas for REST JSON bodies and CSV import (`*BodySchema`, `safeParseBodySchema`); shared with [`server/middleware/validateBody.ts`](../../server/middleware/validateBody.ts) |
+| `server/registerRestDomainRoutes.ts` | Registers tenant-scoped domain REST under `/api/*` via modules in `server/routes/` (CSV row parsing helpers in `server/routes/restDomainShared.ts`; validation uses `server/schemas/domain.ts`) |
 
 ## Theming (Tailwind dark mode)
 

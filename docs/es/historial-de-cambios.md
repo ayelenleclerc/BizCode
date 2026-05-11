@@ -14,6 +14,7 @@ Versionado: [Semantic Versioning](https://semver.org/lang/es/).
 
 ### Agregado
 
+- **Backend (GitHub #79):** la importación CSV usa los mismos esquemas Zod `*BodySchema` que el cuerpo JSON del REST (`safeParseBodySchema` en [`server/schemas/domain.ts`](../../server/schemas/domain.ts)); restricciones **CHECK** en PostgreSQL para `Articulo.stock`, `Articulo.minimo` y `Cliente.creditLimit` (migración `prisma/migrations/20260505130000_nonneg_entity_checks`); documentación para desarrolladores en [estandares-codigo.md](estandares-codigo.md) y [`.cursor/rules/backend-standards.mdc`](../../.cursor/rules/backend-standards.mdc); los manuales de usuario mencionan mensajes de error por campo en la importación.
 - **Gestión de usuarios (issue #25):** `GET/POST /api/users`, `PUT /api/users/:id`, `POST /api/auth/change-password`; página Usuarios (`src/pages/users/`) con DataTable + modal creación/edición, atajos de teclado (F2/F3/F5/Esc), restricción de jerarquía de roles; componente `<CanAccess permission="..." />` para renderizado condicional por permiso; link en sidebar visible solo para titulares de `users.manage`; i18n en EN/ES/PT-BR; 17 tests de integración nuevos; OpenAPI actualizado; docs trilingues en `docs/*/quality/`.
 
 ### Added
