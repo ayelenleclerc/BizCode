@@ -146,6 +146,8 @@ jobs:
           npx prisma db seed
 
       - name: Start API for E2E (background)
+        env:
+          NODE_ENV: test
         run: |
           npm run server &
           for i in $(seq 1 45); do

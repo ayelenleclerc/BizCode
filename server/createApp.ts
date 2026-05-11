@@ -15,7 +15,7 @@ import { isSmtpConfigured, isTwilioConfigured } from './channels'
 import { registerChatRoutes } from './chat'
 import { correlationId } from './middleware/correlationId'
 import { errorHandler } from './middleware/errorHandler'
-import { globalHttpRateLimiter } from './middleware/globalRateLimit'
+import { routeHttpRateLimiter } from './middleware/routeRateLimit'
 import { registerRestDomainRoutes } from './registerRestDomainRoutes'
 
 const DEFAULT_CORS_ORIGINS = [
@@ -74,7 +74,7 @@ function getOpenApiDocument(): Record<string, unknown> {
 export function createApp(prisma: PrismaClient): Application {
   const app = express()
   app.use(correlationId)
-  app.use(globalHttpRateLimiter)
+  app.use(routeHttpRateLimiter)
 
   const allowedOrigins = getCorsAllowedOrigins()
   app.use(
