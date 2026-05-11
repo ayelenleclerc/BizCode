@@ -175,6 +175,7 @@ jobs:
       - name: Start API for E2E (background)
         env:
           DATABASE_URL: postgresql://test@localhost:5432/bizcode_test?sslmode=disable
+          NODE_ENV: test
         run: |
           npm run server &
           for i in $(seq 1 45); do
