@@ -1,6 +1,5 @@
 import { createHash, randomBytes } from 'node:crypto'
 import type { NextFunction, Request, Response } from 'express'
-import rateLimit from 'express-rate-limit'
 import type { PrismaClient } from '@prisma/client'
 import {
   ROLE_PERMISSIONS,
@@ -20,8 +19,7 @@ const SESSION_COOKIE_NAME = 'bizcode_session'
 const SESSION_DURATION_MS = 1000 * 60 * 60 * 8
 
 const LOGIN_WINDOW_MS = 15 * 60 * 1000 // 15 minutes
-const LOGIN_MAX_FAILURES = 5            // consecutive failures before lockout
-const LOGIN_RATE_LIMIT = 20             // requests per window per IP
+const LOGIN_MAX_FAILURES = 5 // consecutive failures before lockout
 
 export type RequestAuthContext = {
   claims: AuthClaims
@@ -365,18 +363,7 @@ export function registerAuthRoutes(app: import('express').Application, prisma: P
     })
   })
 
-  const loginRateLimiter = rateLimit({
-    windowMs: LOGIN_WINDOW_MS,
-    max: LOGIN_RATE_LIMIT,
-    standardHeaders: true,
-    legacyHeaders: false,
-    skip: () => process.env.NODE_ENV === 'test',
-    handler: (_req: Request, res: Response) => {
-      res.status(429).json({ success: false, error: 'TOO_MANY_REQUESTS' })
-    },
-  })
-
-  app.post('/api/auth/login', loginRateLimiter, async (req: Request, res: Response) => {
+  app.post('/api/auth/login', async (req: Request, res: Response) => {
     const body = (req.body ?? {}) as LoginBody
     if (!isNonEmptyString(body.tenantSlug) || !isNonEmptyString(body.username) || !isNonEmptyString(body.password)) {
       res.status(400).json({ success: false, error: 'tenantSlug, username and password are required' })
