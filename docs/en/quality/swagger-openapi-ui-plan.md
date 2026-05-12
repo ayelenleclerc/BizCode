@@ -46,6 +46,8 @@ Since IAM/RBAC Phase 1, operational endpoints (`clientes`, `articulos`, `rubros`
 ## Verification
 
 - `npm run lint` · `npm run test` · `npm run type-check`
+- `npm run docs:validate` — OpenAPI syntax (`check:openapi`) plus Express `/api/*` route coverage vs [`docs/api/openapi.yaml`](../../api/openapi.yaml)
+- When adding or changing HTTP routes: update `docs/api/openapi.yaml`, extend [`tests/api/contract.test.ts`](../../../tests/api/contract.test.ts) where response shape is asserted, then run `npm run docs:validate`
 - `npm run check:docs-map` if [`DOCUMENT_LOCALE_MAP.md`](../../DOCUMENT_LOCALE_MAP.md) changes
 
 ## Architecture (runtime)

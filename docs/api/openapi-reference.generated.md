@@ -6205,6 +6205,472 @@ Allows the authenticated user to change their password by supplying the current 
 }
 ```
 
+### Dashboard operational summary
+
+- **Method:** `GET`
+- **Path:** `/api/dashboard/summary`
+- **Tags:** dashboard
+
+#### Responses
+
+##### Status: 200 Aggregated dashboard metrics for the authenticated tenant
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`alertasActivas` (required)**
+
+    `integer`
+
+  - **`cobrosHoy` (required)**
+
+    `object`
+
+    - **`count` (required)**
+
+      `integer`
+
+    - **`total` (required)**
+
+      `string`
+
+  - **`facturasVencidas` (required)**
+
+    `object`
+
+    - **`count` (required)**
+
+      `integer`
+
+    - **`total` (required)**
+
+      `string`
+
+  - **`ventasHoy` (required)**
+
+    `object`
+
+    - **`count` (required)**
+
+      `integer`
+
+    - **`total` (required)**
+
+      `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "ventasHoy": {
+      "count": 1,
+      "total": ""
+    },
+    "facturasVencidas": {
+      "count": 1,
+      "total": ""
+    },
+    "cobrosHoy": {
+      "count": 1,
+      "total": ""
+    },
+    "alertasActivas": 1
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### List unread notifications for the authenticated user
+
+- **Method:** `GET`
+- **Path:** `/api/notifications`
+- **Tags:** notifications
+
+#### Responses
+
+##### Status: 200 Unread notifications, newest first
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`payload` (required)**
+
+    `object`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`type` (required)**
+
+    `string`
+
+  - **`userId` (required)**
+
+    `integer`
+
+  - **`readAt`**
+
+    `string`, format: `date-time`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "userId": 1,
+      "type": "",
+      "payload": {
+        "additionalProperty": "anything"
+      },
+      "readAt": "",
+      "createdAt": ""
+    }
+  ]
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Mark all unread notifications as read
+
+- **Method:** `PUT`
+- **Path:** `/api/notifications/read-all`
+- **Tags:** notifications
+
+#### Responses
+
+##### Status: 200 Updated notification count
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`updated` (required)**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "updated": 1
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Mark a single notification as read
+
+- **Method:** `PUT`
+- **Path:** `/api/notifications/{id}/read`
+- **Tags:** notifications
+
+#### Responses
+
+##### Status: 200 Updated notification
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`payload` (required)**
+
+    `object`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`type` (required)**
+
+    `string`
+
+  - **`userId` (required)**
+
+    `integer`
+
+  - **`readAt`**
+
+    `string`, format: `date-time`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "userId": 1,
+    "type": "",
+    "payload": {
+      "additionalProperty": "anything"
+    },
+    "readAt": "",
+    "createdAt": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Notification not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ### PARAMETERS /api/notifications/channels
 
 - **Method:** `PARAMETERS`
@@ -10634,6 +11100,342 @@ Returns boolean flags for each channel. No sensitive values are exposed.
     "createdAt": "",
     "updatedAt": "",
     "additionalProperty": "anything"
+  }
+}
+```
+
+### DashboardSummary
+
+- **Type:**`object`
+
+* **`alertasActivas` (required)**
+
+  `integer`
+
+* **`cobrosHoy` (required)**
+
+  `object`
+
+  - **`count` (required)**
+
+    `integer`
+
+  - **`total` (required)**
+
+    `string`
+
+* **`facturasVencidas` (required)**
+
+  `object`
+
+  - **`count` (required)**
+
+    `integer`
+
+  - **`total` (required)**
+
+    `string`
+
+* **`ventasHoy` (required)**
+
+  `object`
+
+  - **`count` (required)**
+
+    `integer`
+
+  - **`total` (required)**
+
+    `string`
+
+**Example:**
+
+```json
+{
+  "ventasHoy": {
+    "count": 1,
+    "total": ""
+  },
+  "facturasVencidas": {
+    "count": 1,
+    "total": ""
+  },
+  "cobrosHoy": {
+    "count": 1,
+    "total": ""
+  },
+  "alertasActivas": 1
+}
+```
+
+### DashboardSummaryEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`alertasActivas` (required)**
+
+    `integer`
+
+  - **`cobrosHoy` (required)**
+
+    `object`
+
+    - **`count` (required)**
+
+      `integer`
+
+    - **`total` (required)**
+
+      `string`
+
+  - **`facturasVencidas` (required)**
+
+    `object`
+
+    - **`count` (required)**
+
+      `integer`
+
+    - **`total` (required)**
+
+      `string`
+
+  - **`ventasHoy` (required)**
+
+    `object`
+
+    - **`count` (required)**
+
+      `integer`
+
+    - **`total` (required)**
+
+      `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "ventasHoy": {
+      "count": 1,
+      "total": ""
+    },
+    "facturasVencidas": {
+      "count": 1,
+      "total": ""
+    },
+    "cobrosHoy": {
+      "count": 1,
+      "total": ""
+    },
+    "alertasActivas": 1
+  }
+}
+```
+
+### Notification
+
+- **Type:**`object`
+
+* **`createdAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`payload` (required)**
+
+  `object`
+
+* **`tenantId` (required)**
+
+  `integer`
+
+* **`type` (required)**
+
+  `string`
+
+* **`userId` (required)**
+
+  `integer`
+
+* **`readAt`**
+
+  `string`, format: `date-time`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "tenantId": 1,
+  "userId": 1,
+  "type": "",
+  "payload": {
+    "additionalProperty": "anything"
+  },
+  "readAt": "",
+  "createdAt": ""
+}
+```
+
+### NotificationListEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`payload` (required)**
+
+    `object`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`type` (required)**
+
+    `string`
+
+  - **`userId` (required)**
+
+    `integer`
+
+  - **`readAt`**
+
+    `string`, format: `date-time`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "userId": 1,
+      "type": "",
+      "payload": {
+        "additionalProperty": "anything"
+      },
+      "readAt": "",
+      "createdAt": ""
+    }
+  ]
+}
+```
+
+### NotificationEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`payload` (required)**
+
+    `object`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`type` (required)**
+
+    `string`
+
+  - **`userId` (required)**
+
+    `integer`
+
+  - **`readAt`**
+
+    `string`, format: `date-time`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "userId": 1,
+    "type": "",
+    "payload": {
+      "additionalProperty": "anything"
+    },
+    "readAt": "",
+    "createdAt": ""
+  }
+}
+```
+
+### NotificationReadAllEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`updated` (required)**
+
+    `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "updated": 1
   }
 }
 ```

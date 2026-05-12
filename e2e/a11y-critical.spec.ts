@@ -6,8 +6,8 @@ const TEST_PASSWORD = (process.env.BIZCODE_SEED_SUPERADMIN_PASSWORD ?? '').trim(
 
 test.describe('Accessibility — axe (critical surfaces)', () => {
   test('login page has no axe violations', async ({ page }) => {
-    await page.goto('/login')
-    await page.getByRole('heading', { level: 1 }).waitFor({ state: 'visible' })
+    await page.goto('/login', { waitUntil: 'load' })
+    await page.getByTestId('login-tenant-slug').waitFor({ state: 'visible' })
     const { violations } = await new AxeBuilder({ page }).analyze()
     expect(violations, JSON.stringify(violations, null, 2)).toHaveLength(0)
   })

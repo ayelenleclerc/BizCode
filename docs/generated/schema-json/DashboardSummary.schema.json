@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "alertasActivas": {
+      "type": "integer"
+    },
+    "cobrosHoy": {
+      "properties": {
+        "count": {
+          "type": "integer"
+        },
+        "total": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "count",
+        "total"
+      ],
+      "type": "object"
+    },
+    "facturasVencidas": {
+      "properties": {
+        "count": {
+          "type": "integer"
+        },
+        "total": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "count",
+        "total"
+      ],
+      "type": "object"
+    },
+    "ventasHoy": {
+      "properties": {
+        "count": {
+          "type": "integer"
+        },
+        "total": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "count",
+        "total"
+      ],
+      "type": "object"
+    }
+  },
+  "required": [
+    "ventasHoy",
+    "facturasVencidas",
+    "cobrosHoy",
+    "alertasActivas"
+  ],
+  "title": "DashboardSummary",
+  "type": "object"
+}

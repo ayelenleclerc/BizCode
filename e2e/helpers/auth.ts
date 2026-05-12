@@ -11,7 +11,8 @@ export async function loginAsTestUser(page: Page, password: string) {
       'E2E login password missing: set BIZCODE_SEED_SUPERADMIN_PASSWORD (GitHub secret or local .env), same as prisma seed for superadmin.'
     )
   }
-  await page.goto('/login')
+  await page.goto('/login', { waitUntil: 'load' })
+  await page.getByTestId('login-tenant-slug').waitFor({ state: 'visible' })
 
   // Fill in login form with test credentials
   await page.fill('[data-testid="login-tenant-slug"]', 'platform')

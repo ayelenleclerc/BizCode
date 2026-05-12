@@ -46,6 +46,8 @@ Desde a Fase 1 de IAM/RBAC, os endpoints operacionais (`clientes`, `articulos`, 
 ## Verificação
 
 - `npm run lint` · `npm run test` · `npm run type-check`
+- `npm run docs:validate` — sintaxe OpenAPI (`check:openapi`) e cobertura de rotas Express `/api/*` em relação a [`docs/api/openapi.yaml`](../../api/openapi.yaml)
+- Ao adicionar ou alterar rotas HTTP: atualizar `docs/api/openapi.yaml`, estender [`tests/api/contract.test.ts`](../../../tests/api/contract.test.ts) onde a forma da resposta é verificada e executar `npm run docs:validate`
 - `npm run check:docs-map` se [`DOCUMENT_LOCALE_MAP.md`](../../DOCUMENT_LOCALE_MAP.md) mudar
 
 ## Arquitetura (runtime)

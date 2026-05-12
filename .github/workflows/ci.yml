@@ -67,7 +67,7 @@ jobs:
         run: npm run type-check
 
       - name: Validate OpenAPI specification
-        run: npm run check:openapi
+        run: npm run docs:validate
 
       - name: Generate documentation (TypeDoc, OpenAPI MD, schemas, SBOM)
         run: npm run docs:generate
@@ -137,6 +137,7 @@ jobs:
       - name: Start API for E2E (background)
         env:
           NODE_ENV: test
+          BIZCODE_TEST_AUTH_BYPASS: 'false'
         run: |
           npm run server &
           for i in $(seq 1 45); do
