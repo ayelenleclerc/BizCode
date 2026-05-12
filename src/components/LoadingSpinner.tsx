@@ -19,6 +19,7 @@ export default function LoadingSpinner({ message }: LoadingSpinnerProps) {
       role="status"
       aria-live="polite"
       aria-busy="true"
+      aria-label={label}
       data-testid="loading-spinner"
     >
       <span
