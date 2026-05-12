@@ -176,6 +176,7 @@ jobs:
         env:
           DATABASE_URL: postgresql://test@localhost:5432/bizcode_test?sslmode=disable
           NODE_ENV: test
+          JWT_SECRET: ci-test-jwt-secret
           BIZCODE_TEST_AUTH_BYPASS: 'false'
         run: |
           npm run server &

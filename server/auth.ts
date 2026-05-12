@@ -1,4 +1,4 @@
-import { createHash, randomBytes } from 'node:crypto'
+import { createHmac, randomBytes } from 'node:crypto'
 import type { NextFunction, Request, Response } from 'express'
 import type { PrismaClient } from '@prisma/client'
 import {
@@ -14,6 +14,7 @@ import {
 } from '../src/lib/rbac'
 import { hashPassword, verifyPassword } from './passwordHash'
 import { writeAuditEvent } from './audit'
+import { getAppConfig } from './config/env'
 
 const SESSION_COOKIE_NAME = 'bizcode_session'
 const SESSION_DURATION_MS = 1000 * 60 * 60 * 8
@@ -47,7 +48,7 @@ function createSessionToken(): string {
 }
 
 function hashToken(token: string): string {
-  return createHash('sha256').update(token).digest('hex')
+  return createHmac('sha256', getAppConfig().JWT_SECRET).update(token).digest('hex')
 }
 
 function normalizeRole(value: string): UserRole | null {
