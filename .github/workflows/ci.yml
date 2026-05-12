@@ -137,6 +137,7 @@ jobs:
       - name: Start API for E2E (background)
         env:
           NODE_ENV: test
+          BIZCODE_TEST_AUTH_BYPASS: 'false'
         run: |
           npm run server &
           for i in $(seq 1 45); do
