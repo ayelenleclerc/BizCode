@@ -3,6 +3,8 @@ import { useHotkeys } from 'react-hotkeys-hook'
 import { useTranslation } from 'react-i18next'
 import { ApiRequestFailedError, proveedoresAPI, type CsvBulkImportResult } from '@/lib/api'
 import { CanAccess } from '@/components/CanAccess'
+import ErrorBoundary from '@/components/ErrorBoundary'
+import AsyncWrapper from '@/components/shared/AsyncWrapper'
 import type { Proveedor } from '@/types'
 
 const COND_IVA = ['RI', 'Mono', 'CF', 'Exento'] as const
@@ -13,6 +15,7 @@ export default function ProveedoresPage() {
   const [proveedores, setProveedores] = useState<Proveedor[]>([])
   const [filtro, setFiltro] = useState('')
   const [loading, setLoading] = useState(false)
+  const [loadError, setLoadError] = useState<Error | null>(null)
   const [showForm, setShowForm] = useState(false)
   const [selected, setSelected] = useState<Proveedor | null>(null)
   const [selectedRow, setSelectedRow] = useState(0)
@@ -38,12 +41,13 @@ export default function ProveedoresPage() {
 
   const loadList = async (search?: string) => {
     setLoading(true)
+    setLoadError(null)
     try {
       const data = await proveedoresAPI.list(search)
       setProveedores(data || [])
       setSelectedRow(0)
     } catch (error) {
-      console.error(error)
+      setLoadError(error instanceof Error ? error : new Error(String(error)))
     } finally {
       setLoading(false)
     }
@@ -208,6 +212,7 @@ export default function ProveedoresPage() {
         </div>
       }
     >
+      <ErrorBoundary>
       <div className="p-8 h-full flex flex-col">
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100">{t('title')}</h1>
@@ -248,9 +253,8 @@ export default function ProveedoresPage() {
         </div>
 
         <div className="flex-1 overflow-auto">
-          {loading ? (
-            <div className="text-center py-12 text-slate-500 dark:text-slate-400">{tc('status.loading')}</div>
-          ) : proveedores.length === 0 ? (
+          <AsyncWrapper loading={loading} error={loadError}>
+          {proveedores.length === 0 ? (
             <div className="text-center py-12 text-slate-500 dark:text-slate-400">{t('empty')}</div>
           ) : (
             <table
@@ -295,6 +299,7 @@ export default function ProveedoresPage() {
               </tbody>
             </table>
           )}
+          </AsyncWrapper>
         </div>
 
         {showForm ? (
@@ -572,6 +577,7 @@ export default function ProveedoresPage() {
           </div>
         ) : null}
       </div>
+      </ErrorBoundary>
     </CanAccess>
   )
 }
