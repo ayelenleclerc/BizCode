@@ -13,6 +13,7 @@ import { registerDashboardRoutes } from './dashboard'
 import { registerNotificationRoutes } from './notifications'
 import { isSmtpConfigured, isTwilioConfigured } from './channels'
 import { registerChatRoutes } from './chat'
+import { registerAuditEventRoutes } from './auditEvents'
 import { correlationId } from './middleware/correlationId'
 import { errorHandler } from './middleware/errorHandler'
 import { routeHttpRateLimiter } from './middleware/routeRateLimit'
@@ -99,6 +100,7 @@ export function createApp(prisma: PrismaClient): Application {
   registerDashboardRoutes(app, prisma)
   registerNotificationRoutes(app, prisma)
   registerChatRoutes(app, prisma)
+  registerAuditEventRoutes(app, prisma)
 
   /**
    * @en Reports which external notification channels are configured (reads env vars server-side).

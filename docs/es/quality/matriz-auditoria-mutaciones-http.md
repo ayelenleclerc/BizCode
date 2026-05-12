@@ -20,6 +20,10 @@ Evidencia automática equivalente en `tests/server/http-mutations-audit-coverage
 | POST | `/api/zonas-entrega` | `delivery_zone_create` | código HTTP esperado por contrato/ruta puede ser **201** |
 | PUT | `/api/zonas-entrega/:id` | `delivery_zone_update` | `resourceId` del path |
 
+## Consulta del registro de auditoría (#67)
+
+Los operadores con permiso `audit.read` pueden obtener el listado paginado mediante **GET** `/api/audit-events` (filtros y paginación descritos en el contrato OpenAPI) y revisar los eventos en la aplicación en la ruta **`/admin/audit-log`**.
+
 ## Exclusiones (no objeto de esta tabla)
 
 Operaciones sólo lectura (**GET**/listados) y otros dominios (**auth**, **notifications**, etc.) están fuera de esta matriz; si se exige auditoría adicional debe definirse en issue y tests dedicados.

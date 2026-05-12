@@ -13,6 +13,7 @@ import FinanzasPage from './pages/finanzas'
 import ConfiguracionPage from './pages/configuracion'
 import ZonasEntregaPage from './pages/configuracion/ZonasEntregaPage'
 import ChatPage from './pages/chat'
+import AuditLogPage from './pages/admin/audit-log'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
 
 function ProtectedRoute() {
@@ -94,6 +95,7 @@ function AppRoutes() {
           <Route path="configuracion" element={<ConfiguracionPage />} />
           <Route path="configuracion/zonas-entrega" element={<ZonasEntregaPage />} />
           <Route path="chat" element={<ChatPage />} />
+          <Route path="admin/audit-log" element={<AuditLogPage />} />
         </Route>
       </Route>
       <Route path="/" element={<RootRedirect />} />

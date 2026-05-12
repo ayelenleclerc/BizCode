@@ -14,7 +14,7 @@ const { mockClaims } = vi.hoisted(() => ({
     tenantId: 1,
     username: 'cov-user',
     role: 'owner' as const,
-    permissions: ['customers.read', 'customers.manage', 'products.read', 'products.manage'] as string[],
+    permissions: ['customers.read', 'customers.manage', 'products.read', 'products.manage', 'audit.read'] as string[],
     scope: {
       tenantId: 1,
       branchIds: [] as number[],
@@ -116,6 +116,9 @@ vi.mock('@/lib/api', async () => {
       messages: vi.fn().mockResolvedValue([sampleChatMsg]),
       send: vi.fn().mockResolvedValue(sampleChatMsg),
     },
+    auditEventsAPI: {
+      list: vi.fn().mockResolvedValue({ data: [], total: 0, limit: 50, offset: 0 }),
+    },
     usersAPI: {
       list: vi.fn().mockResolvedValue([]),
       create: vi.fn(),
@@ -167,6 +170,7 @@ describe('App — cobertura de rutas protegidas (smoke navegación)', () => {
       '/proveedores',
       '/logistica',
       '/finanzas',
+      '/admin/audit-log',
       '/chat',
       '/configuracion',
     ] as const
