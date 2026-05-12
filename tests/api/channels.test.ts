@@ -96,6 +96,7 @@ describe('GET /api/notifications/channels', () => {
     delete process.env.SMTP_USER
     delete process.env.SMTP_PASS
     delete process.env.SMTP_FROM
+    delete process.env.SMTP_URL
     delete process.env.TWILIO_ACCOUNT_SID
     delete process.env.TWILIO_AUTH_TOKEN
     delete process.env.TWILIO_WHATSAPP_FROM
@@ -119,6 +120,14 @@ describe('GET /api/notifications/channels', () => {
     const res = await request(app).get('/api/notifications/channels').expect(200)
     expect(res.body.data.email).toBe(true)
     expect(res.body.data.whatsapp).toBe(false)
+  })
+
+  it('reports email:true when SMTP_URL is set', async () => {
+    process.env.SMTP_URL = 'smtp://user:pass@smtp.example.com:587'
+
+    const app = createApp(buildPrismaMock())
+    const res = await request(app).get('/api/notifications/channels').expect(200)
+    expect(res.body.data.email).toBe(true)
   })
 
   it('reports whatsapp:true when Twilio vars are all set', async () => {
@@ -151,6 +160,7 @@ describe('dispatchNotification — silent fallback when SMTP unconfigured', () =
     delete process.env.SMTP_USER
     delete process.env.SMTP_PASS
     delete process.env.SMTP_FROM
+    delete process.env.SMTP_URL
     delete process.env.TWILIO_ACCOUNT_SID
     delete process.env.TWILIO_AUTH_TOKEN
     delete process.env.TWILIO_WHATSAPP_FROM
@@ -163,6 +173,7 @@ describe('dispatchNotification — silent fallback when SMTP unconfigured', () =
     delete process.env.SMTP_USER
     delete process.env.SMTP_PASS
     delete process.env.SMTP_FROM
+    delete process.env.SMTP_URL
     delete process.env.TWILIO_ACCOUNT_SID
     delete process.env.TWILIO_AUTH_TOKEN
     delete process.env.TWILIO_WHATSAPP_FROM
@@ -204,6 +215,28 @@ describe('dispatchNotification — silent fallback when SMTP unconfigured', () =
     expect(mockSendMail).toHaveBeenCalledOnce()
     const mailArgs = mockSendMail.mock.calls[0][0]
     expect(mailArgs.subject).toContain('ACME SA')
+  })
+
+  it('calls nodemailer when SMTP_URL is configured', async () => {
+    process.env.SMTP_URL = 'smtp://user:pass@smtp.example.com:587'
+
+    const { dispatchNotification } = await import('../../server/channels')
+    const prisma = buildPrismaMock()
+    await dispatchNotification(prisma, 1, 'credit_limit_exceeded', {
+      clienteId: 1,
+      rsocial: 'URL SA',
+      amount: '20000',
+      limit: '10000',
+    })
+
+    await new Promise((r) => setTimeout(r, 10))
+    expect(mockCreateTransport).toHaveBeenCalledWith({
+      host: 'smtp.example.com',
+      port: 587,
+      secure: false,
+      auth: { user: 'user', pass: 'pass' },
+    })
+    expect(mockSendMail).toHaveBeenCalledOnce()
   })
 
   it('swallows nodemailer error without throwing', async () => {

@@ -3,7 +3,7 @@ import type { Application } from 'express'
 import type { Server } from 'node:http'
 import { createApp } from './server/createApp'
 import { logger } from './server/logger'
-import { validateBootEnv } from './server/validateBootEnv'
+import { initializeAppConfig } from './server/config/env'
 
 export const PORT = 3001
 
@@ -54,7 +54,7 @@ export function bindHttpServer(
  * @pt-BR Inicia o servidor API na porta informada (padrão {@link PORT}).
  */
 export function startServer(port: number = PORT, options?: BindHttpServerOptions): Server {
-  validateBootEnv()
+  initializeAppConfig()
   const { app, prisma } = createServerInstance()
   return bindHttpServer(app, prisma, port, options)
 }

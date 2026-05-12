@@ -1,8 +1,9 @@
-import { createHash, randomBytes, scryptSync } from 'node:crypto'
+import { createHmac, randomBytes, scryptSync } from 'node:crypto'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import request from 'supertest'
 import type { PrismaClient } from '@prisma/client'
 import { createApp } from '../../server/createApp'
+import { initializeAppConfig, resetAppConfigCache } from '../../server/config/env'
 
 function hashPassword(password: string): string {
   const salt = randomBytes(16).toString('hex')
@@ -10,8 +11,8 @@ function hashPassword(password: string): string {
   return `${salt}:${hash}`
 }
 
-function hashToken(token: string): string {
-  return createHash('sha256').update(token).digest('hex')
+function hashToken(token: string, jwtSecret: string): string {
+  return createHmac('sha256', jwtSecret).update(token).digest('hex')
 }
 
 /**
@@ -96,11 +97,15 @@ function buildPrismaMock(loginName: string, loginSecret: string): PrismaClient {
 describe('Auth session endpoints', () => {
   let loginName: string
   let loginSecret: string
+  const jwtSecret = 'auth-session-test-jwt-secret'
 
   beforeEach(() => {
+    resetAppConfigCache()
     process.env.NODE_ENV = 'test'
+    process.env.JWT_SECRET = jwtSecret
     process.env.BIZCODE_TEST_AUTH_BYPASS = 'false'
     delete process.env.BIZCODE_TEST_ROLE
+    initializeAppConfig()
     loginName = `u${randomBytes(8).toString('hex')}`
     loginSecret = randomBytes(16).toString('hex')
   })
@@ -132,8 +137,31 @@ describe('Auth session endpoints', () => {
     expect(me.body.success).toBe(true)
     expect(me.body.data.role).toBe('super_admin')
 
-    // Ensure token hashing aligns with lookup path used by middleware.
-    expect(hashToken(token).length).toBe(64)
+    expect(hashToken(token, jwtSecret).length).toBe(64)
+  })
+
+  it('rejects session cookie when JWT_SECRET differs from login', async () => {
+    const app = createApp(buildPrismaMock(loginName, loginSecret))
+
+    const login = await request(app).post('/api/auth/login').send({
+      tenantSlug: 'platform',
+      username: loginName,
+      password: loginSecret,
+    })
+
+    expect(login.status).toBe(200)
+    const cookie = login.headers['set-cookie']?.[0]
+    const token = decodeURIComponent(cookie!.split(';')[0].split('=')[1])
+
+    resetAppConfigCache()
+    process.env.JWT_SECRET = 'different-jwt-secret'
+    initializeAppConfig()
+
+    const me = await request(app)
+      .get('/api/auth/me')
+      .set('Cookie', `bizcode_session=${encodeURIComponent(token)}`)
+
+    expect(me.status).toBe(401)
   })
 
   it('returns 401 for invalid credentials', async () => {

@@ -15,6 +15,7 @@
 
 import nodemailer from 'nodemailer'
 import type { PrismaClient } from '@prisma/client'
+import { resolveSmtpTransportConfig } from './config/smtpTransport'
 import { notifyManagers } from './notifications'
 import type { NotificationType, NotificationPayload } from './notifications'
 
@@ -54,13 +55,7 @@ function buildMessage(type: NotificationType, payload: NotificationPayload): Mes
 // ─── SMTP helpers ──────────────────────────────────────────────────────────────
 
 export function isSmtpConfigured(): boolean {
-  return Boolean(
-    process.env.SMTP_HOST &&
-      process.env.SMTP_PORT &&
-      process.env.SMTP_USER &&
-      process.env.SMTP_PASS &&
-      process.env.SMTP_FROM,
-  )
+  return resolveSmtpTransportConfig() !== null
 }
 
 /**
@@ -75,18 +70,17 @@ async function sendEmail(
   text: string,
 ): Promise<void> {
   if (!isSmtpConfigured() || to.length === 0) return
+  const smtp = resolveSmtpTransportConfig()
+  if (!smtp) return
   try {
     const transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST!,
-      port: parseInt(process.env.SMTP_PORT!, 10),
-      secure: parseInt(process.env.SMTP_PORT!, 10) === 465,
-      auth: {
-        user: process.env.SMTP_USER!,
-        pass: process.env.SMTP_PASS!,
-      },
+      host: smtp.host,
+      port: smtp.port,
+      secure: smtp.secure,
+      auth: smtp.auth,
     })
     await transporter.sendMail({
-      from: process.env.SMTP_FROM!,
+      from: smtp.from,
       to: to.join(', '),
       subject,
       text,
