@@ -51,6 +51,7 @@ Os limiares são aplicados pelo Vitest (`coverage.thresholds`). O CI falha se n�
 | Lint (incl. jsx-a11y) | `npm run lint` | `ci.yml`, `frontend-validation.yml` |
 | Unitários + cobertura | `npm run test`, `npm run test:coverage` | `ci.yml`, `qa-validation.yml` (`unit_tests`) |
 | Contrato API | parte de `npm run test` | `ci.yml` |
+| Sintaxe OpenAPI + sync de rotas | `npm run docs:validate` | `ci.yml` |
 | Integração | `npm run test:integration` (precisa `DATABASE_URL`) | `ci.yml`, `qa-validation.yml` |
 | E2E Playwright | `npm run test:e2e` | `ci.yml`, `qa-validation.yml` |
 | A11y unitário | `npm run test:a11y` | `qa-validation.yml` (`accessibility_tests`) |

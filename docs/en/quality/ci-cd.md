@@ -21,7 +21,7 @@ push / pull_request
 │  5. npx prisma validate       ← schema syntax / metadata (no DB write) │
 │  6. npx prisma migrate deploy  ← schema on PostgreSQL       │
 │  7. npm run type-check                      ← blocks         │
-│  7b. npm run check:openapi                 ← blocks         │
+│  7b. npm run docs:validate                 ← blocks         │
 │  8. npm run docs:generate                  ← blocks         │
 │  9. git diff (generated docs / SBOM check) ← blocks         │
 │ 10. npm run lint                           ← blocks         │
@@ -62,7 +62,7 @@ push / pull_request
 | Surface | Evidence / behavior checked | Typical workflow(s) |
 |---|---|---|
 | TypeScript compilation | Whole repo `tsconfig` include (`src`, `server`, `tests`, `e2e`, …) | `ci.yml` → `npm run type-check` |
-| REST API vs contract | OpenAPI YAML + regenerated schemas / MD drift | `ci.yml` → `check:openapi`, `docs:generate`, git diff |
+| REST API vs contract | OpenAPI YAML syntax + route sync + regenerated schemas / MD drift | `ci.yml` → `docs:validate`, `docs:generate`, git diff |
 | Database schema lifecycle | Client generation, validated schema file, migrations or `db push`, seed used by runtime tests | `ci.yml` → `prisma generate`, `prisma validate`, migrate/push + `test:integration`; `backend-validation.yml` (paths) adds DB migration smoke |
 | Line / branch metrics (coverage) | **`vitest` v8 thresholds** apply only to **`server/**/*.ts`**, root `server.ts`, and **`src/**/*.{ts,tsx}`**, excluding tests, barrels, typings, and `server/main.ts`/`server/createApp.types.ts`/`src/types.ts` via `coverage.exclude`. **Not everything in repo** (scripts, prisma seed, standalone tools) file: `vitest.config.ts` | `ci.yml`, `frontend-validation.yml`, `qa-validation.yml` → `npm run test:coverage` |
 | Integration with PostgreSQL | Real DB paths in `tests/integration/**`; **explicitly without line-coverage instrumentation** (`vitest.integration.config.ts`) | `ci.yml`, `backend-validation.yml` |

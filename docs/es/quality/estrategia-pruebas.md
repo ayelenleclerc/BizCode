@@ -51,6 +51,7 @@ Los umbrales los aplica Vitest (`coverage.thresholds`). El CI falla si no se cum
 | Lint (incl. jsx-a11y) | `npm run lint` | `ci.yml`, `frontend-validation.yml` |
 | Unitarias + cobertura | `npm run test`, `npm run test:coverage` | `ci.yml`, `qa-validation.yml` (job `unit_tests`) |
 | Contrato API | parte de `npm run test` | `ci.yml` |
+| Sintaxis OpenAPI + sync de rutas | `npm run docs:validate` | `ci.yml` |
 | Integración | `npm run test:integration` (requiere `DATABASE_URL`) | `ci.yml`, `qa-validation.yml` |
 | E2E Playwright | `npm run test:e2e` | `ci.yml`, `qa-validation.yml` |
 | A11y unitaria | `npm run test:a11y` | `qa-validation.yml` (`accessibility_tests`) |
