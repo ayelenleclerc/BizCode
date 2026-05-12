@@ -20,7 +20,7 @@ export const validClienteSamples: ClienteDbfRecord[] = [
     CODIGO: 1002,
     RSOCIAL: 'Acentos Ñandú',
     CUIT: undefined,
-    COND: 'MT',
+    COND: 'Mono',
     BAJA: false,
   },
 ]
@@ -35,7 +35,7 @@ export const edgeClienteSamples: ClienteDbfRecord[] = [
     CODIGO: 3001,
     RSOCIAL: 'Caracteres "especiales"',
     CUIT: undefined,
-    COND: 'CF',
+    COND: 'Exento',
     BAJA: true,
     CREDITO: 0,
   },
