@@ -88,6 +88,13 @@
     "inactive": "Inactive",
     "comingSoon": "Coming soon in v0.2.0"
   },
+  "async": {
+    "loadFailed": "Could not load data"
+  },
+  "errorBoundary": {
+    "title": "Something went wrong",
+    "message": "This screen could not be displayed. Reload the page or try again."
+  },
   "errors": {
     "generic": "Error saving",
     "required": "Required field"

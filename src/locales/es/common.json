@@ -88,6 +88,13 @@
     "inactive": "Inactivo",
     "comingSoon": "Próximamente disponible en v0.2.0"
   },
+  "async": {
+    "loadFailed": "No se pudieron cargar los datos"
+  },
+  "errorBoundary": {
+    "title": "Algo salió mal",
+    "message": "La pantalla no pudo mostrarse. Recargue la página o vuelva a intentarlo."
+  },
   "errors": {
     "generic": "Error al guardar",
     "required": "Campo requerido"
