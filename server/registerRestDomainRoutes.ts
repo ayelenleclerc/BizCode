@@ -11,6 +11,7 @@ import { registerProveedoresRoutes } from './routes/registerProveedoresRoutes'
 import { registerRubrosRoutes } from './routes/registerRubrosRoutes'
 import type { RestRouteContext } from './routes/restRouteTypes'
 import { registerZonasEntregaRoutes } from './routes/registerZonasEntregaRoutes'
+import { createDomainServices } from './services/createDomainServices'
 
 /**
  * @en Registers core REST handlers (customers, products, invoicing, delivery zones, health).
@@ -35,7 +36,7 @@ export function registerRestDomainRoutes(app: Application, prisma: PrismaClient)
     })
   }
 
-  const ctx: RestRouteContext = { prisma, writeAudit }
+  const ctx: RestRouteContext = { prisma, services: createDomainServices(prisma), writeAudit }
 
   registerClientesRoutes(app, ctx)
   registerArticulosRoutes(app, ctx)
