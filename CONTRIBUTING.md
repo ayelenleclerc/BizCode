@@ -16,6 +16,10 @@ See also [AGENTS.md](AGENTS.md) for the short index.
 - **Install:** run `npm ci` after cloning (respects [`.npmrc`](.npmrc) `legacy-peer-deps`, required for `eslint-plugin-jsx-a11y` with ESLint 10 until upstream peers align).
 - **Lockfile:** commit `package-lock.json` with every dependency change; bump packages in focused steps and run the quality gate locally.
 
+### Local development (PostgreSQL, seed, dev servers)
+
+Trilingual guide: [docs/en/quality/local-development-setup.md](docs/en/quality/local-development-setup.md) (see [DOCUMENT_LOCALE_MAP.md](docs/DOCUMENT_LOCALE_MAP.md) for ES/PT-BR paths). Quick start also lives in [README.md](README.md).
+
 ### Windows: PowerShell and `npm`
 
 If `npm run …` fails with **script execution disabled** / `npm.ps1` / `PSSecurityException`, the `package.json` scripts are fine: **PowerShell is blocking the `npm` shim**, not your project.

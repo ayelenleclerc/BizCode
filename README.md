@@ -31,6 +31,8 @@
 
 ## Quick Start
 
+See [docs/en/quality/local-development-setup.md](docs/en/quality/local-development-setup.md) (ES/PT-BR paths in [docs/DOCUMENT_LOCALE_MAP.md](docs/DOCUMENT_LOCALE_MAP.md)) for the full contributor setup. Summary:
+
 ```bash
 # 1. Clone the repository
 git clone <repo-url>
