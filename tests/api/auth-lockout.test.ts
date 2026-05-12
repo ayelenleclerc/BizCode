@@ -138,9 +138,12 @@ describe('POST /api/auth/login — account lockout', () => {
     const res = await request(app)
       .post('/api/auth/login')
       .send(VALID_BODY(user, 'wrong'))
-      .expect(401)
+      .expect(429)
 
     expect(res.body).toEqual({ success: false, error: 'ACCOUNT_LOCKED' })
+    expect(res.headers['x-ratelimit-limit']).toBe('5')
+    expect(res.headers['x-ratelimit-remaining']).toBe('0')
+    expect(res.headers['x-ratelimit-reset']).toBeTruthy()
   })
 
   it('locks the AppUser account (sets active=false) on 5th failure', async () => {
@@ -176,9 +179,10 @@ describe('POST /api/auth/login — account lockout', () => {
     const res = await request(app)
       .post('/api/auth/login')
       .send(VALID_BODY(user, 'correct')) // even correct password
-      .expect(401)
+      .expect(429)
 
     expect(res.body).toEqual({ success: false, error: 'ACCOUNT_LOCKED' })
+    expect(res.headers['x-ratelimit-limit']).toBe('5')
   })
 
   it('a successful login resets the failure streak', async () => {
@@ -224,7 +228,7 @@ describe('POST /api/auth/login — no enumeration', () => {
     const res = await request(app)
       .post('/api/auth/login')
       .send(VALID_BODY(ghost, 'any'))
-      .expect(401)
+      .expect(429)
 
     expect(res.body).toEqual({ success: false, error: 'ACCOUNT_LOCKED' })
   })

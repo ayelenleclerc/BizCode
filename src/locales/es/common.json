@@ -58,6 +58,9 @@
       "network": "No hay conexión con el servidor. Compruebe que el API está en marcha (p. ej. puerto 3001) y vuelva a intentarlo.",
       "timeout": "La petición tardó demasiado. Inténtelo de nuevo.",
       "offline": "Sin conexión. Compruebe su red e inténtelo de nuevo."
+    },
+    "lockout": {
+      "retryIn": "Podrá intentarlo de nuevo en {{time}}"
     }
   },
   "session": {

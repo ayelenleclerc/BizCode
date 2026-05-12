@@ -1,14 +1,29 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useTranslation } from 'react-i18next'
 import LanguageSelect from '@/components/LanguageSelect'
 import { useAuth } from '@/contexts/AuthContext'
-import { getAuthErrorI18nKey } from '@/lib/api'
+import { ApiRequestFailedError, getAuthErrorI18nKey } from '@/lib/api'
 
 const loginInputClassName =
   'w-full rounded border border-slate-300 px-3 py-2 text-slate-900 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100'
+
+function resolveLockoutResetAt(rateLimitReset?: string): number | null {
+  if (rateLimitReset) {
+    const parsed = Date.parse(rateLimitReset)
+    return Number.isFinite(parsed) ? parsed : null
+  }
+  return Date.now() + 15 * 60_000
+}
+
+function formatRetryCountdown(remainingMs: number): string {
+  const totalSeconds = Math.max(0, Math.ceil(remainingMs / 1000))
+  const minutes = Math.floor(totalSeconds / 60)
+  const seconds = totalSeconds % 60
+  return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
+}
 
 /**
  * @en Login form (tenant, user, password) with i18n and cookie session via AuthProvider.
@@ -19,6 +34,8 @@ export default function LoginPage() {
   const { t } = useTranslation('common')
   const { login } = useAuth()
   const [submitError, setSubmitError] = useState<string | null>(null)
+  const [lockoutUntil, setLockoutUntil] = useState<number | null>(null)
+  const [now, setNow] = useState(() => Date.now())
 
   const loginSchema = z.object({
     tenantSlug: z.string().min(1, t('auth.validation.tenantRequired')),
@@ -42,6 +59,22 @@ export default function LoginPage() {
     },
   })
 
+  const retryCountdown =
+    lockoutUntil !== null && lockoutUntil > now ? formatRetryCountdown(lockoutUntil - now) : null
+  const isLockedOut = retryCountdown !== null
+  const isLoginDisabled = isSubmitting || isLockedOut
+
+  useEffect(() => {
+    if (lockoutUntil === null || lockoutUntil <= Date.now()) {
+      return
+    }
+
+    const id = window.setInterval(() => {
+      setNow(Date.now())
+    }, 1000)
+    return () => window.clearInterval(id)
+  }, [lockoutUntil])
+
   const onSubmit = async (data: LoginFormData) => {
     setSubmitError(null)
     try {
@@ -50,7 +83,19 @@ export default function LoginPage() {
         username: data.username.trim(),
         password: data.password,
       })
+      setLockoutUntil(null)
     } catch (err) {
+      if (
+        err instanceof ApiRequestFailedError &&
+        (err.message === 'ACCOUNT_LOCKED' || err.httpStatus === 429)
+      ) {
+        const resetAt = resolveLockoutResetAt(err.rateLimitReset)
+        if (resetAt !== null) {
+          setLockoutUntil(resetAt)
+        }
+      } else {
+        setLockoutUntil(null)
+      }
       setSubmitError(t(getAuthErrorI18nKey(err)))
     }
   }
@@ -84,6 +129,7 @@ export default function LoginPage() {
                   type="text"
                   autoComplete="organization"
                   className={loginInputClassName}
+                  disabled={isLoginDisabled}
                   {...register('tenantSlug')}
                   aria-invalid="true"
                   aria-describedby="login-tenant-slug-error"
@@ -95,6 +141,7 @@ export default function LoginPage() {
                   type="text"
                   autoComplete="organization"
                   className={loginInputClassName}
+                  disabled={isLoginDisabled}
                   {...register('tenantSlug')}
                 />
               )}
@@ -116,6 +163,7 @@ export default function LoginPage() {
                   type="text"
                   autoComplete="username"
                   className={loginInputClassName}
+                  disabled={isLoginDisabled}
                   {...register('username')}
                   aria-invalid="true"
                   aria-describedby="login-username-error"
@@ -127,6 +175,7 @@ export default function LoginPage() {
                   type="text"
                   autoComplete="username"
                   className={loginInputClassName}
+                  disabled={isLoginDisabled}
                   {...register('username')}
                 />
               )}
@@ -148,6 +197,7 @@ export default function LoginPage() {
                   type="password"
                   autoComplete="current-password"
                   className={loginInputClassName}
+                  disabled={isLoginDisabled}
                   {...register('password')}
                   aria-invalid="true"
                   aria-describedby="login-password-error"
@@ -159,6 +209,7 @@ export default function LoginPage() {
                   type="password"
                   autoComplete="current-password"
                   className={loginInputClassName}
+                  disabled={isLoginDisabled}
                   {...register('password')}
                 />
               )}
@@ -177,12 +228,17 @@ export default function LoginPage() {
             aria-atomic="true"
           >
             {submitError ?? ''}
+            {retryCountdown ? (
+              <p className="mt-1" data-testid="login-lockout-countdown">
+                {t('auth.lockout.retryIn', { time: retryCountdown })}
+              </p>
+            ) : null}
           </div>
 
           <button
             type="submit"
             data-testid="login-submit"
-            disabled={isSubmitting}
+            disabled={isLoginDisabled}
             className="mt-2 w-full rounded bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-700 disabled:opacity-60 dark:bg-blue-700 dark:hover:bg-blue-800"
           >
             {isSubmitting ? t('auth.submitting') : t('auth.submit')}
