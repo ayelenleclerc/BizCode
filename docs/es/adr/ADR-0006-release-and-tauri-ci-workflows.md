@@ -15,6 +15,7 @@ El pipeline por defecto ([ciclo-ci-cd.md](../quality/ciclo-ci-cd.md)) no publica
 1. **`npm audit`:** el workflow ejecuta `npm audit --audit-level=high` tras `npm ci` con **`continue-on-error: true`** para visibilidad sin fallar el gate.
 2. **semantic-release:** `release.config.cjs` en la raíz; `.github/workflows/release.yml` solo con **`workflow_dispatch`**, crea GitHub Releases desde commits convencionales en `main` con `GITHUB_TOKEN`. Sin publicación npm (paquete `private`).
 3. **Tauri self-hosted:** `.github/workflows/tauri-selfhosted.yml` solo **`workflow_dispatch`** en **`runs-on: self-hosted`**. El runner debe tener Rust, Node y dependencias WebView nativas — no sustituye el job de calidad en `ubuntu-latest`.
+4. **Releases Tauri por tag:** `.github/workflows/tauri-release.yml` en **`push` de tags `v*.*.*`**, matriz en runners alojados de GitHub y artefactos en borrador de release; firma/notarización opcional vía secrets.
 
 ## Consecuencias
 

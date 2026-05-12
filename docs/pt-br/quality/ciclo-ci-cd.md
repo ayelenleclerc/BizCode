@@ -63,7 +63,7 @@ push / pull_request → job quality (ubuntu-latest):
 
 Build desktop Tauri (WebKit nativo, display, Rust). Build local: `npm run tauri build`.
 
-**Gate manual (desktop):** após **`main`** verde, executar **Actions → Tauri self-hosted** (`tauri-selfhosted.yml`) antes de distribuir instaladores; tags via semantic-release seguem isoladas (`release.yml`). Referência [ADR-0006](../adr/ADR-0006-release-and-tauri-ci-workflows.md).
+**Gate manual (desktop):** após **`main`** verde, executar **Actions → Tauri self-hosted** (`tauri-selfhosted.yml`) antes de distribuir instaladores; releases por tag podem usar **Actions → Tauri release** (`tauri-release.yml` em tags `v*.*.*`). Referência [ADR-0006](../adr/ADR-0006-release-and-tauri-ci-workflows.md).
 
 ## Branch órfão `documentacion`
 
