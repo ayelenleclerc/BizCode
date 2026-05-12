@@ -16,6 +16,7 @@ import { registerChatRoutes } from './chat'
 import { correlationId } from './middleware/correlationId'
 import { errorHandler } from './middleware/errorHandler'
 import { routeHttpRateLimiter } from './middleware/routeRateLimit'
+import { tenantContext } from './middleware/tenantContext'
 import { registerRestDomainRoutes } from './registerRestDomainRoutes'
 
 const DEFAULT_CORS_ORIGINS = [
@@ -91,6 +92,7 @@ export function createApp(prisma: PrismaClient): Application {
   )
   app.use(express.json())
   app.use(resolveSession(prisma))
+  app.use(tenantContext)
 
   registerAuthRoutes(app, prisma)
   registerUserRoutes(app, prisma)

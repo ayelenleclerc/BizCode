@@ -27,7 +27,7 @@ export type RequestAuthContext = {
   sessionId?: number
 }
 
-export type AuthenticatedRequest = Request & { auth?: RequestAuthContext }
+export type AuthenticatedRequest = Request & { auth?: RequestAuthContext; tenantId?: number }
 
 function getCookieValue(rawCookieHeader: string | undefined, key: string): string | null {
   if (!rawCookieHeader) {
