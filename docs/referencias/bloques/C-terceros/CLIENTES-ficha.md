@@ -1,7 +1,7 @@
 # Ficha: `CLIENTES.DBF`
 
 - **Grupo:** C — Terceros y operaciones
-- **Estado:** inventario verificado; análisis de campos en volcado global
+- **Estado:** ETL v1 en `scripts/migrate-from-dbf.ts` cuando el archivo tiene registros
 
 ## Evidencia numérica
 
@@ -16,4 +16,8 @@ Ver sección `### CLIENTES.DBF` en [`exports/inventario-dbf-volcado.md`](../../e
 
 ## Mapeo BizCode
 
-Pendiente — modelo [`Cliente`](../../../../prisma/schema.prisma). El script actual usa placeholders; siguiente paso: mapeo campo a campo desde el volcado.
+Modelo [`Cliente`](../../../../prisma/schema.prisma). Transformación en [`src/lib/migration/legacyClienteDbf.ts`](../../../../src/lib/migration/legacyClienteDbf.ts); contrato y rechazos en [`scripts/MIGRACION_PROGRAMA_VIEJO.md`](../../../../scripts/MIGRACION_PROGRAMA_VIEJO.md).
+
+Campos v1: `CODIG`, `RSOCIAL`, `FANTASIA`, `DOMIC`, `LOCAL`, `CPOST`, `TELEF`, `EMAIL`, `CUIT`, `CREDITO`, `BAJA`, `COND`.
+
+Pendiente: `SALDO`, `FPAGO`, `ZONA`, `ACTIVO` (sin precedencia sobre `BAJA` en v1).

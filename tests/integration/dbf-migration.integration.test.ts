@@ -17,7 +17,7 @@ async function truncateMigrationTables(prisma: PrismaClient): Promise<void> {
   ])
 }
 
-async function createFixtureDbfTree(root: string): Promise<void> {
+async function createFixtureDbfTree(root: string, options?: { includeClientes?: boolean }): Promise<void> {
   const sistema = path.join(root, '16-07-2025 completa', 'sistema')
   await fs.mkdir(sistema, { recursive: true })
 
@@ -48,6 +48,21 @@ async function createFixtureDbfTree(root: string): Promise<void> {
     { name: 'FIELD_TYPE', type: 'C', size: 10 },
   ])
   await listCli.appendRecords([{ FIELD_NAME: 'RSOCIAL', FIELD_TYPE: 'C' }])
+
+  if (options?.includeClientes) {
+    const clientes = await DBFFile.create(path.join(sistema, 'CLIENTES.DBF'), [
+      { name: 'CODIG', type: 'N', size: 5, decimalPlaces: 0 },
+      { name: 'RSOCIAL', type: 'C', size: 30 },
+      { name: 'COND', type: 'C', size: 1 },
+      { name: 'BAJA', type: 'L', size: 1 },
+      { name: 'CREDITO', type: 'N', size: 12, decimalPlaces: 2 },
+    ])
+    await clientes.appendRecords([
+      { CODIG: 501, RSOCIAL: 'Cliente DBF Uno', COND: 'I', BAJA: false, CREDITO: 1000 },
+      { CODIG: 502, RSOCIAL: 'Cliente DBF Dos', COND: 'M', BAJA: true, CREDITO: 0 },
+      { CODIG: 503, RSOCIAL: 'Cliente DBF Tres', COND: 'Z', BAJA: false, CREDITO: 0 },
+    ])
+  }
 }
 
 describe('DBF migration integration', () => {
@@ -93,6 +108,33 @@ describe('DBF migration integration', () => {
 
     const importedProducts = await prisma.articulo.findMany({ where: { tenantId } })
     expect(importedProducts.length).toBeGreaterThan(0)
+  })
+
+  it('imports real clients from CLIENTES.DBF and skips invalid COND rows', async () => {
+    const clientesRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'bizcode-dbf-clientes-'))
+    await createFixtureDbfTree(clientesRoot, { includeClientes: true })
+    process.env.PROGRAMA_VIEJO_ROOT = clientesRoot
+    await runDbfMigration()
+
+    const tenantId = parseInt(process.env.BIZCODE_MIGRATION_TENANT_ID ?? '0', 10)
+    const imported = await prisma.cliente.findMany({
+      where: { tenantId, codigo: { in: [501, 502, 503] } },
+      orderBy: { codigo: 'asc' },
+    })
+    expect(imported).toHaveLength(2)
+    expect(imported[0]?.codigo).toBe(501)
+    expect(imported[0]?.condIva).toBe('RI')
+    expect(imported[0]?.activo).toBe(true)
+    expect(imported[1]?.codigo).toBe(502)
+    expect(imported[1]?.condIva).toBe('Mono')
+    expect(imported[1]?.activo).toBe(false)
+
+    const placeholders = await prisma.cliente.count({
+      where: { tenantId, codigo: { gte: 91001, lte: 91010 } },
+    })
+    expect(placeholders).toBe(0)
+
+    await fs.rm(clientesRoot, { recursive: true, force: true })
   })
 })
 
