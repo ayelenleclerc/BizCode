@@ -9,7 +9,7 @@ BizCode usa GitHub Actions. Definição: `.github/workflows/ci.yml`.
 ```
 push / pull_request → job quality (ubuntu-latest):
   checkout → Node 22 → npm ci → npm audit (informativo) → prisma generate → prisma validate → prisma migrate deploy →
-  type-check → check:openapi → docs:generate → git diff (docs gerados / SBOM) → lint → test:coverage → check:i18n →
+  type-check → docs:validate → docs:generate → git diff (docs gerados / SBOM) → lint → test:coverage → check:i18n →
   playwright install chromium → test:e2e → test:integration → check:docs-map →
   artefato de cobertura
 ```
@@ -27,7 +27,7 @@ push / pull_request → job quality (ubuntu-latest):
 |---|---|
 | prisma validate | `schema.prisma` inválido segundo Prisma (sem gravar PostgreSQL) |
 | type-check | Erro TypeScript |
-| check:openapi | Falha na validação OpenAPI 3.x de `docs/api/openapi.yaml` (`npm run check:openapi`) |
+| docs:validate | Sintaxe OpenAPI 3.x (`npm run check:openapi`) e cobertura de rotas Express `/api/*` em `docs/api/openapi.yaml` (`npm run check:openapi-sync`) |
 | docs:generate + git diff | Divergência entre arquivos commitados e documentação regenerada (`docs/generated/`, `docs/api/openapi-reference.generated.md`, `docs/evidence/sbom-cyclonedx.json`) |
 | lint | Erro ou **warning** ESLint (`--max-warnings 0`) |
 | test:coverage | Falha de teste ou cobertura abaixo do limite |
@@ -41,7 +41,7 @@ push / pull_request → job quality (ubuntu-latest):
 | Superfície | Evidência / comportamento | Workflow(s) |
 |---|---|---|
 | TypeScript compilando | Projeto inteiro segundo `tsconfig` (`src`, `server`, `tests`, `e2e`, …) | `ci.yml` → `npm run type-check` |
-| API × contrato | OpenAPI YAML + artefatos regenerados consistentes | `ci.yml` → `check:openapi`, `docs:generate`, git diff |
+| API × contrato | Sintaxe OpenAPI + sync de rotas + artefatos regenerados consistentes | `ci.yml` → `docs:validate`, `docs:generate`, git diff |
 | Esquema de BD | `prisma generate`, `prisma validate`, migrations ou `db push`, seeds usados nos testes | `ci.yml`; `backend-validation.yml` (filtros de caminho) reforço de migrations |
 | Cobertura de linhas/ramificações | Vitest v8 apenas em **`server/**/*.ts`**, `server.ts` e **`src/**/*.{ts,tsx}`**, com exclusões em `coverage.exclude` de `vitest.config.ts`; **nem todo arquivo** da raiz está instrumentado | `ci.yml`, `frontend-validation.yml`, `qa-validation.yml` → `test:coverage` |
 | Integração PostgreSQL | `tests/integration/**`, **sem instrumentação de linhas** (`vitest.integration.config.ts`) | `ci.yml`, `backend-validation.yml` |

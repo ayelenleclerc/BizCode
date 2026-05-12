@@ -51,6 +51,7 @@ Thresholds are enforced by Vitest's `coverage.thresholds` configuration. The CI 
 | Lint (incl. jsx-a11y) | `npm run lint` | `ci.yml`, `frontend-validation.yml` |
 | Unit + coverage | `npm run test`, `npm run test:coverage` | `ci.yml`, `qa-validation.yml` (`unit_tests`) |
 | API contract | part of `npm run test` | `ci.yml` |
+| OpenAPI syntax + route sync | `npm run docs:validate` | `ci.yml` |
 | Integration | `npm run test:integration` (needs `DATABASE_URL`) | `ci.yml`, `qa-validation.yml` (`integration_tests`) |
 | E2E Playwright | `npm run test:e2e` (uses `playwright.config.ts` webServer) | `ci.yml`, `qa-validation.yml` (`e2e_tests`) |
 | A11y unit smoke | `npm run test:a11y` | `qa-validation.yml` (`accessibility_tests`) |

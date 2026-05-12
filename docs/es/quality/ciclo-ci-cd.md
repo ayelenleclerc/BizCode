@@ -9,7 +9,7 @@ BizCode usa GitHub Actions para integración continua. El pipeline está definid
 ```
 push / pull_request → job quality (ubuntu-latest):
   checkout → Node 22 → npm ci → npm audit (informativo) → prisma generate → prisma validate → prisma migrate deploy →
-  type-check → check:openapi → docs:generate → git diff (docs generados / SBOM) → lint → test:coverage → check:i18n →
+  type-check → docs:validate → docs:generate → git diff (docs generados / SBOM) → lint → test:coverage → check:i18n →
   playwright install chromium → test:e2e → test:integration → check:docs-map →
   artefacto de cobertura
 ```
@@ -29,7 +29,7 @@ Un paso bloquea el pipeline (código de salida ≠ 0) cuando:
 |---|---|
 | prisma validate | `schema.prisma` inválido según Prisma (sin mutar PostgreSQL) |
 | type-check | Cualquier error de compilación TypeScript |
-| check:openapi | Fallo de validación OpenAPI 3.x sobre `docs/api/openapi.yaml` (`npm run check:openapi`) |
+| docs:validate | Sintaxis OpenAPI 3.x (`npm run check:openapi`) y cobertura de rutas Express `/api/*` en `docs/api/openapi.yaml` (`npm run check:openapi-sync`) |
 | docs:generate + git diff | Desalineación entre lo commitado y la documentación regenerada (`docs/generated/`, `docs/api/openapi-reference.generated.md`, `docs/evidence/sbom-cyclonedx.json`) |
 | lint | Cualquier error o **advertencia** de ESLint (`npm run lint` usa `--max-warnings 0`) |
 | test:coverage | Fallo de test O umbral de cobertura no cumplido |
@@ -43,7 +43,7 @@ Un paso bloquea el pipeline (código de salida ≠ 0) cuando:
 | Superficie | Qué se verifica | Workflow(s) típico(s) |
 |---|---|---|
 | Compilación TypeScript | Árbol completo del `tsconfig` (`src`, `server`, `tests`, `e2e`, …) | `ci.yml` → `npm run type-check` |
-| API vs contrato | OpenAPI + drift de esquemas / MD generados | `ci.yml` → `check:openapi`, `docs:generate`, `git diff` |
+| API vs contrato | Sintaxis OpenAPI + sync de rutas + drift de esquemas / MD generados | `ci.yml` → `docs:validate`, `docs:generate`, `git diff` |
 | Ciclo de vida del esquema BD | `prisma generate`, `prisma validate`, migraciones o `db push`, seed usado en pruebas | `ci.yml`; `backend-validation.yml` (rutas) refuerzo de migraciones |
 | Cobertura de líneas/ramas (Vitest/v8) | Umbrales sobre **`server/**/*.ts`**, `server.ts` y **`src/**/*.{ts,tsx}`**, excluyendo tests, barrels solo re-export y tipados (`coverage.exclude` en `vitest.config.ts`). **No todo el repo** (scripts auxiliares, seed aislado, etc.) no entra | `ci.yml`, `frontend-validation.yml`, `qa-validation.yml` → `test:coverage` |
 | Integración PostgreSQL | `tests/integration/**` **sin instrumentación de cobertura de líneas** (`vitest.integration.config.ts`) | `ci.yml`, `backend-validation.yml` |
