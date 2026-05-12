@@ -275,6 +275,18 @@ async function countConsecutiveFailures(
   return count
 }
 
+function setLoginRateLimitHeaders(res: Response, failureCount: number): void {
+  const remaining = Math.max(0, LOGIN_MAX_FAILURES - failureCount)
+  res.setHeader('X-RateLimit-Limit', String(LOGIN_MAX_FAILURES))
+  res.setHeader('X-RateLimit-Remaining', String(remaining))
+  res.setHeader('X-RateLimit-Reset', new Date(Date.now() + LOGIN_WINDOW_MS).toISOString())
+}
+
+function respondAccountLocked(res: Response, failureCount: number): void {
+  setLoginRateLimitHeaders(res, failureCount)
+  res.status(429).json({ success: false, error: 'ACCOUNT_LOCKED' })
+}
+
 /**
  * @en Records a login attempt and, when failures reach the threshold, locks the user account.
  * @es Registra un intento de login y, cuando las fallas alcanzan el umbral, bloquea la cuenta.
@@ -383,7 +395,7 @@ export function registerAuthRoutes(app: import('express').Application, prisma: P
     // Check consecutive failures BEFORE looking up the user (no enumeration).
     const priorFailures = await countConsecutiveFailures(prisma, tenant.id, username)
     if (priorFailures >= LOGIN_MAX_FAILURES) {
-      res.status(401).json({ success: false, error: 'ACCOUNT_LOCKED' })
+      respondAccountLocked(res, priorFailures)
       return
     }
 
@@ -399,8 +411,9 @@ export function registerAuthRoutes(app: import('express').Application, prisma: P
       // Re-count so we return ACCOUNT_LOCKED on the exact threshold attempt.
       const newFailures = await countConsecutiveFailures(prisma, tenant.id, username)
       if (newFailures >= LOGIN_MAX_FAILURES) {
-        res.status(401).json({ success: false, error: 'ACCOUNT_LOCKED' })
+        respondAccountLocked(res, newFailures)
       } else {
+        setLoginRateLimitHeaders(res, newFailures)
         res.status(401).json({ success: false, error: 'Invalid credentials' })
       }
       return

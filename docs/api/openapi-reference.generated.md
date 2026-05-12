@@ -231,7 +231,28 @@ One-time endpoint to create initial tenant and owner user.
 }
 ```
 
-##### Status: 401 Authentication required or invalid credentials
+##### Status: 401 Invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 429 Account locked after too many failed login attempts
 
 ###### Content-Type: application/json
 

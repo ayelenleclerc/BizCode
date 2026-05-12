@@ -58,6 +58,9 @@
       "network": "Cannot reach the server. Make sure the API is running (e.g. port 3001) and try again.",
       "timeout": "The request took too long. Please try again.",
       "offline": "You are offline. Check your network and try again."
+    },
+    "lockout": {
+      "retryIn": "You can try again in {{time}}"
     }
   },
   "session": {

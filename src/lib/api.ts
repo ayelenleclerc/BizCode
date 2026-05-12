@@ -19,15 +19,24 @@ type ApiErrorPayload = { error?: string }
 export class ApiRequestFailedError extends Error {
   readonly axiosCode: string | undefined
   readonly hasResponse: boolean
+  readonly httpStatus: number | undefined
+  readonly rateLimitReset: string | undefined
 
   constructor(
     message: string,
-    options: { axiosCode?: string; hasResponse: boolean },
+    options: {
+      axiosCode?: string
+      hasResponse: boolean
+      httpStatus?: number
+      rateLimitReset?: string
+    },
   ) {
     super(message)
     this.name = 'ApiRequestFailedError'
     this.axiosCode = options.axiosCode
     this.hasResponse = options.hasResponse
+    this.httpStatus = options.httpStatus
+    this.rateLimitReset = options.rateLimitReset
   }
 }
 
@@ -36,12 +45,22 @@ const handleError = (error: AxiosError<ApiErrorPayload>): never => {
   const ax = error
   const hasResponse = !!ax.response
   const data = ax.response?.data
+  const rawReset = ax.response?.headers?.['x-ratelimit-reset']
+  const rateLimitReset =
+    typeof rawReset === 'string' ? rawReset : Array.isArray(rawReset) ? rawReset[0] : undefined
   if (data && typeof data === 'object' && 'error' in data && typeof data.error === 'string') {
-    throw new ApiRequestFailedError(data.error, { axiosCode: ax.code, hasResponse: true })
+    throw new ApiRequestFailedError(data.error, {
+      axiosCode: ax.code,
+      hasResponse: true,
+      httpStatus: ax.response?.status,
+      rateLimitReset,
+    })
   }
   throw new ApiRequestFailedError(ax.message || 'Unknown error', {
     axiosCode: ax.code,
     hasResponse,
+    httpStatus: ax.response?.status,
+    rateLimitReset,
   })
 }
 
@@ -54,6 +73,12 @@ export function getAuthErrorI18nKey(error: unknown): string {
   if (error instanceof ApiRequestFailedError) {
     if (error.message === 'Invalid credentials') {
       return 'auth.errors.invalidCredentials'
+    }
+    if (error.message === 'ACCOUNT_LOCKED') {
+      return 'auth.errors.accountLocked'
+    }
+    if (error.httpStatus === 429 || error.message === 'Too many requests') {
+      return 'auth.errors.tooManyRequests'
     }
     const msg = error.message
     const isTimeout =
