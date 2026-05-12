@@ -7,7 +7,11 @@ export function errorMessage(err: unknown): string {
 }
 
 export function getTenantId(req: Request): number {
-  return (req as AuthenticatedRequest).auth!.claims.tenantId
+  const authReq = req as AuthenticatedRequest
+  if (authReq.tenantId !== undefined) {
+    return authReq.tenantId
+  }
+  return authReq.auth!.claims.tenantId
 }
 
 export function isObjectRecord(value: unknown): value is Record<string, unknown> {
