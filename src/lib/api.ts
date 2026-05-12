@@ -662,6 +662,56 @@ export const chatAPI = {
   },
 }
 
+// ============ AUDIT EVENTS ============
+
+export type AuditEventDTO = {
+  id: number
+  tenantId: number
+  userId: number | null
+  username: string | null
+  action: string
+  resource: string
+  resourceId: string | null
+  ipAddress: string | null
+  metadata: JsonRecord | null
+  createdAt: string
+}
+
+export type AuditEventsListParams = {
+  userId?: number
+  action?: string
+  resource?: string
+  startDate?: string
+  endDate?: string
+  limit?: number
+  offset?: number
+}
+
+export type AuditEventListResult = {
+  data: AuditEventDTO[]
+  total: number
+  limit: number
+  offset: number
+}
+
+export const auditEventsAPI = {
+  list: async (params?: AuditEventsListParams): Promise<AuditEventListResult> => {
+    try {
+      const response = await api.get<{
+        success: boolean
+        data: AuditEventDTO[]
+        total: number
+        limit: number
+        offset: number
+      }>('/audit-events', { params })
+      const { data, total, limit, offset } = response.data
+      return { data, total, limit, offset }
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+}
+
 // ============ ZONAS DE ENTREGA ============
 
 export const zonasEntregaAPI = {

@@ -1,0 +1,36 @@
+{
+  "title": "Audit log",
+  "description": "Read-only history of actions recorded for your organization.",
+  "forbidden": "You do not have permission to view the audit log.",
+  "filters": {
+    "userId": "User ID",
+    "userIdPlaceholder": "Optional",
+    "action": "Action",
+    "actionPlaceholder": "e.g. cliente_create",
+    "resource": "Resource",
+    "resourcePlaceholder": "e.g. cliente",
+    "startDate": "From (ISO-8601)",
+    "endDate": "To (ISO-8601)",
+    "apply": "Apply filters",
+    "clear": "Clear"
+  },
+  "table": {
+    "caption": "Audit events",
+    "createdAt": "When",
+    "username": "User",
+    "userId": "User ID",
+    "action": "Action",
+    "resource": "Resource",
+    "resourceId": "Resource ID",
+    "ipAddress": "IP",
+    "metadata": "Details"
+  },
+  "empty": "No events match the current filters.",
+  "error": "Could not load audit events.",
+  "refresh": "Refresh",
+  "pagination": {
+    "summary": "Showing {{from}}–{{to}} of {{total}}",
+    "prev": "Previous page",
+    "next": "Next page"
+  }
+}

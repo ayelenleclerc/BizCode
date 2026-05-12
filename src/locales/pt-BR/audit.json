@@ -1,0 +1,36 @@
+{
+  "title": "Registro de auditoria",
+  "description": "Histórico somente leitura das ações registradas na sua organização.",
+  "forbidden": "Você não tem permissão para ver o registro de auditoria.",
+  "filters": {
+    "userId": "ID do usuário",
+    "userIdPlaceholder": "Opcional",
+    "action": "Ação",
+    "actionPlaceholder": "ex.: cliente_create",
+    "resource": "Recurso",
+    "resourcePlaceholder": "ex.: cliente",
+    "startDate": "De (ISO-8601)",
+    "endDate": "Até (ISO-8601)",
+    "apply": "Aplicar filtros",
+    "clear": "Limpar"
+  },
+  "table": {
+    "caption": "Eventos de auditoria",
+    "createdAt": "Quando",
+    "username": "Usuário",
+    "userId": "ID usuário",
+    "action": "Ação",
+    "resource": "Recurso",
+    "resourceId": "ID recurso",
+    "ipAddress": "IP",
+    "metadata": "Detalhes"
+  },
+  "empty": "Nenhum evento corresponde aos filtros.",
+  "error": "Não foi possível carregar os eventos de auditoria.",
+  "refresh": "Atualizar",
+  "pagination": {
+    "summary": "Exibindo {{from}}–{{to}} de {{total}}",
+    "prev": "Página anterior",
+    "next": "Próxima página"
+  }
+}
