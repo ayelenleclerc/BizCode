@@ -15,6 +15,7 @@ O pipeline padrão ([ciclo-ci-cd.md](../quality/ciclo-ci-cd.md)) não publica re
 1. **`npm audit`:** o workflow executa `npm audit --audit-level=high` após `npm ci` com **`continue-on-error: true`**.
 2. **semantic-release:** `release.config.cjs` na raiz; `.github/workflows/release.yml` apenas **`workflow_dispatch`**, cria GitHub Releases a partir de commits convencionais em `main` com `GITHUB_TOKEN`. Sem publicação npm (`private`).
 3. **Tauri self-hosted:** `.github/workflows/tauri-selfhosted.yml` apenas **`workflow_dispatch`** em **`runs-on: self-hosted`**. O runner precisa de Rust, Node e dependências WebView nativas.
+4. **Releases Tauri por tag:** `.github/workflows/tauri-release.yml` em **`push` de tags `v*.*.*`**, matriz em runners hospedados do GitHub e artefatos em release rascunho; assinatura/notarização opcional via secrets.
 
 ## Consequências
 

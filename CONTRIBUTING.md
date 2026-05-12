@@ -113,4 +113,4 @@ npm run test:integration    # HTTP + real Prisma vs PostgreSQL; requires DATABAS
 
 All must exit 0 before opening a PR. If you do not run PostgreSQL locally, rely on CI for `test:integration`; contract + unit coverage do not require a database.
 
-`npm run server` executes `tsx server/main.ts` (API bootstrap is in `server.ts`; see [ADR-0005](docs/en/adr/ADR-0005-vitest-coverage-server-bootstrap.md)). Optional release workflows: [ADR-0006](docs/en/adr/ADR-0006-release-and-tauri-ci-workflows.md).
+`npm run server` executes `tsx server/main.ts` (API bootstrap is in `server.ts`; see [ADR-0005](docs/en/adr/ADR-0005-vitest-coverage-server-bootstrap.md)). Optional release workflows: [ADR-0006](docs/en/adr/ADR-0006-release-and-tauri-ci-workflows.md) (`release.yml`, `tauri-selfhosted.yml`, and tagged desktop builds via `tauri-release.yml` on `v*.*.*` tags).

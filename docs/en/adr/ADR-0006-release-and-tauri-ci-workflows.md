@@ -15,6 +15,7 @@ The default pipeline ([ci-cd.md](../quality/ci-cd.md)) blocks on quality gates; 
 1. **`npm audit`:** GitHub Actions runs `npm audit --audit-level=high` after `npm ci` with **`continue-on-error: true`** so vulnerabilities are visible without failing the gate until the team resolves them.
 2. **semantic-release:** `release.config.cjs` at the repo root; workflow `.github/workflows/release.yml` runs **only** on **`workflow_dispatch`**, creates GitHub Releases from [Conventional Commits](https://www.conventionalcommits.org/) on `main` using the default `GITHUB_TOKEN`. No npm publish (package is `private`).
 3. **Tauri self-hosted:** workflow `.github/workflows/tauri-selfhosted.yml` runs **only** on **`workflow_dispatch`** on **`runs-on: self-hosted`**. The runner must provide Rust, Node, and platform-native WebView dependencies (see [ci-cd.md](../quality/ci-cd.md)) — the workflow does **not** run on `ubuntu-latest` in the default job.
+4. **Tauri tagged releases:** workflow `.github/workflows/tauri-release.yml` runs on **`push` tags `v*.*.*`**, building installers on GitHub-hosted `ubuntu-latest`, `windows-latest`, and `macos-latest` and uploading draft release assets. Code signing and notarization remain optional via repository secrets and are not required for the workflow to run.
 
 ## Consequences
 
@@ -30,4 +31,4 @@ The default pipeline ([ci-cd.md](../quality/ci-cd.md)) blocks on quality gates; 
 ## References
 
 - [quality/ci-cd.md](../quality/ci-cd.md)
-- `release.config.cjs`, `.github/workflows/release.yml`, `.github/workflows/tauri-selfhosted.yml`
+- `release.config.cjs`, `.github/workflows/release.yml`, `.github/workflows/tauri-selfhosted.yml`, `.github/workflows/tauri-release.yml`

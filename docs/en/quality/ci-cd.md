@@ -86,7 +86,7 @@ The job starts a **PostgreSQL 16** service container (`DATABASE_URL` is set). Af
 
 **Tauri desktop build** is excluded from CI (native WebKit/WebView2, display server, Rust toolchain). See workflow comments in `.github/workflows/ci.yml`.
 
-**Manual release gate (desktop binaries):** after `main` is green, invoke **Actions → Tauri self-hosted build** (`tauri-selfhosted.yml`) before shipping installers; semantic-release tagging remains separate (`release.yml`). See [ADR-0006](../adr/ADR-0006-release-and-tauri-ci-workflows.md).
+**Manual release gate (desktop binaries):** after `main` is green, invoke **Actions → Tauri self-hosted build** (`tauri-selfhosted.yml`) before shipping installers; tagged releases can also use **Actions → Tauri release** (`tauri-release.yml` on `v*.*.*` tags). See [ADR-0006](../adr/ADR-0006-release-and-tauri-ci-workflows.md).
 
 ## Documentation branch (`documentacion`)
 
