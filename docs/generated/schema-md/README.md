@@ -60,6 +60,10 @@
 
 * [ClienteNullableEnvelope](./clientenullableenvelope.md) – `-`
 
+* [DashboardSummary](./dashboardsummary.md) – `-`
+
+* [DashboardSummaryEnvelope](./dashboardsummaryenvelope.md) – `-`
+
 * [DeliveryZone](./deliveryzone.md) – `-`
 
 * [DeliveryZoneEnvelope](./deliveryzoneenvelope.md) – `-`
@@ -97,6 +101,14 @@
 * [LogoutEnvelope](./logoutenvelope.md) – `-`
 
 * [LogoutResult](./logoutresult.md) – `-`
+
+* [Notification](./notification.md) – `-`
+
+* [NotificationEnvelope](./notificationenvelope.md) – `-`
+
+* [NotificationListEnvelope](./notificationlistenvelope.md) – `-`
+
+* [NotificationReadAllEnvelope](./notificationreadallenvelope.md) – `-`
 
 * [Proveedor](./proveedor.md) – `-`
 
@@ -136,11 +148,21 @@
 
 * [Untitled object in ClienteListEnvelope](./clientelistenvelope-allof-0.md) – `undefined#/allOf/0`
 
+* [Untitled object in DashboardSummary](./dashboardsummary-properties-cobroshoy.md) – `undefined#/properties/cobrosHoy`
+
+* [Untitled object in DashboardSummary](./dashboardsummary-properties-facturasvencidas.md) – `undefined#/properties/facturasVencidas`
+
+* [Untitled object in DashboardSummary](./dashboardsummary-properties-ventashoy.md) – `undefined#/properties/ventasHoy`
+
 * [Untitled object in DeliveryZoneListEnvelope](./deliveryzonelistenvelope-allof-0.md) – `undefined#/allOf/0`
 
 * [Untitled object in FacturaInput](./facturainput-properties-items-items.md) – `undefined#/properties/items/items`
 
 * [Untitled object in FacturaListEnvelope](./facturalistenvelope-allof-0.md) – `undefined#/allOf/0`
+
+* [Untitled object in Notification](./notification-properties-payload.md) – `undefined#/properties/payload`
+
+* [Untitled object in NotificationReadAllEnvelope](./notificationreadallenvelope-properties-data.md) – `undefined#/properties/data`
 
 * [Untitled object in ProveedorListEnvelope](./proveedorlistenvelope-allof-0.md) – `undefined#/allOf/0`
 
@@ -203,6 +225,8 @@
 * [Untitled array in FacturaListEnvelope](./facturalistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
 
 * [Untitled array in FormaPagoListEnvelope](./formapagolistenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled array in NotificationListEnvelope](./notificationlistenvelope-properties-data.md) – `undefined#/properties/data`
 
 * [Untitled array in ProveedorListEnvelope](./proveedorlistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
 

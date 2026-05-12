@@ -67,7 +67,7 @@ jobs:
         run: npm run type-check
 
       - name: Validate OpenAPI specification
-        run: npm run check:openapi
+        run: npm run docs:validate
 
       - name: Generate documentation (TypeDoc, OpenAPI MD, schemas, SBOM)
         run: npm run docs:generate

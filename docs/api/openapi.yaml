@@ -38,6 +38,10 @@ tags:
     description: User management (requires users.manage permission)
   - name: chat
     description: Internal chat conversations and messages
+  - name: dashboard
+    description: Operational dashboard summary
+  - name: notifications
+    description: In-app notifications
 
 paths:
   /api/auth/setup-owner:
@@ -952,6 +956,92 @@ paths:
           $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/dashboard/summary:
+    get:
+      tags: [dashboard]
+      summary: Dashboard operational summary
+      security:
+        - cookieSession: []
+      responses:
+        '200':
+          description: Aggregated dashboard metrics for the authenticated tenant
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DashboardSummaryEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/notifications:
+    get:
+      tags: [notifications]
+      summary: List unread notifications for the authenticated user
+      security:
+        - cookieSession: []
+      responses:
+        '200':
+          description: Unread notifications, newest first
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationListEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/notifications/read-all:
+    put:
+      tags: [notifications]
+      summary: Mark all unread notifications as read
+      security:
+        - cookieSession: []
+      responses:
+        '200':
+          description: Updated notification count
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationReadAllEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/notifications/{id}/read:
+    put:
+      tags: [notifications]
+      summary: Mark a single notification as read
+      security:
+        - cookieSession: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Updated notification
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          description: Notification not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
         '500':
           $ref: '#/components/responses/ServerError'
 
@@ -2311,6 +2401,106 @@ components:
           const: true
         data:
           $ref: '#/components/schemas/DeliveryZone'
+
+    DashboardSummary:
+      type: object
+      required: [ventasHoy, facturasVencidas, cobrosHoy, alertasActivas]
+      properties:
+        ventasHoy:
+          type: object
+          required: [count, total]
+          properties:
+            count:
+              type: integer
+            total:
+              type: string
+        facturasVencidas:
+          type: object
+          required: [count, total]
+          properties:
+            count:
+              type: integer
+            total:
+              type: string
+        cobrosHoy:
+          type: object
+          required: [count, total]
+          properties:
+            count:
+              type: integer
+            total:
+              type: string
+        alertasActivas:
+          type: integer
+
+    DashboardSummaryEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/DashboardSummary'
+
+    Notification:
+      type: object
+      required: [id, tenantId, userId, type, payload, createdAt]
+      properties:
+        id:
+          type: integer
+        tenantId:
+          type: integer
+        userId:
+          type: integer
+        type:
+          type: string
+        payload:
+          type: object
+          additionalProperties: true
+        readAt:
+          type: string
+          format: date-time
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+
+    NotificationListEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Notification'
+
+    NotificationEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/Notification'
+
+    NotificationReadAllEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: object
+          required: [updated]
+          properties:
+            updated:
+              type: integer
 
   responses:
     BadRequest:

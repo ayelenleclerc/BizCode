@@ -32,6 +32,8 @@
     "preview": "vite preview",
     "type-check": "tsc --noEmit",
     "check:openapi": "tsx scripts/check-openapi.ts",
+    "check:openapi-sync": "tsx scripts/validate-openapi-sync.ts",
+    "docs:validate": "npm run check:openapi && npm run check:openapi-sync",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
