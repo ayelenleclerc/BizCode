@@ -73,7 +73,7 @@ El job inicia **PostgreSQL 16** (`DATABASE_URL` configurada). Tras `prisma migra
 
 **Alternativa:** build local con `npm run tauri build` o `npm run tauri dev`.
 
-**Gate manual de escritorio:** una vez **`main`** verde, ejecutar **Actions → build Tauri self-hosted** (`tauri-selfhosted.yml`) antes de publicar instaladores; el tagging con semantic-release permanece aparte (`release.yml`). Detalle: [ADR-0006](../adr/ADR-0006-release-and-tauri-ci-workflows.md).
+**Gate manual de escritorio:** una vez **`main`** verde, ejecutar **Actions → build Tauri self-hosted** (`tauri-selfhosted.yml`) antes de publicar instaladores; también puede usarse **Actions → Tauri release** (`tauri-release.yml` en tags `v*.*.*`). Detalle: [ADR-0006](../adr/ADR-0006-release-and-tauri-ci-workflows.md).
 
 ## Rama huérfana `documentacion`
 
