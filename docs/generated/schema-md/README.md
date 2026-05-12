@@ -24,6 +24,10 @@
 
 * [ArticuloNullableEnvelope](./articulonullableenvelope.md) – `-`
 
+* [AuditEvent](./auditevent.md) – `-`
+
+* [AuditEventListEnvelope](./auditeventlistenvelope.md) – `-`
+
 * [AuthClaims](./authclaims.md) – `-`
 
 * [AuthClaimsEnvelope](./authclaimsenvelope.md) – `-`
@@ -142,6 +146,10 @@
 
 * [Untitled object in ArticuloListEnvelope](./articulolistenvelope-allof-0.md) – `undefined#/allOf/0`
 
+* [Untitled object in AuditEvent](./auditevent-properties-metadata-anyof-0.md) – `undefined#/properties/metadata/anyOf/0`
+
+* [Untitled object in AuditEventListEnvelope](./auditeventlistenvelope-allof-0.md) – `undefined#/allOf/0`
+
 * [Untitled object in ChatConversation](./chatconversation-properties-lastmessage-anyof-1.md) – `undefined#/properties/lastMessage/anyOf/1`
 
 * [Untitled object in ChatConversation](./chatconversation-properties-user.md) – `undefined#/properties/user`
@@ -197,6 +205,8 @@
 * [Untitled array in AppUserUpdateInput](./appuserupdateinput-properties-scopewarehouseids.md) – `undefined#/properties/scopeWarehouseIds`
 
 * [Untitled array in ArticuloListEnvelope](./articulolistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
+
+* [Untitled array in AuditEventListEnvelope](./auditeventlistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
 
 * [Untitled array in AuthClaims](./authclaims-properties-permissions.md) – `undefined#/properties/permissions`
 

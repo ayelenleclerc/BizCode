@@ -42,6 +42,8 @@ tags:
     description: Operational dashboard summary
   - name: notifications
     description: In-app notifications
+  - name: audit
+    description: Audit event history (read-only)
 
 paths:
   /api/auth/setup-owner:
@@ -1009,6 +1011,60 @@ paths:
                 $ref: '#/components/schemas/DashboardSummaryEnvelope'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/audit-events:
+    get:
+      tags: [audit]
+      summary: List audit events for the authenticated tenant
+      description: |
+        Read-only list scoped to the session tenant. Requires permission `audit.read`.
+        Default page size is **50** rows (maximum **500**). Optional filters restrict by actor, action, resource type, and `createdAt` bounds (`startDate` / `endDate` as ISO-8601 timestamps; inclusive range).
+      security:
+        - cookieSession: []
+      parameters:
+        - name: userId
+          in: query
+          description: Filter by author user id (`AuditEvent.userId`)
+          schema:
+            type: integer
+            minimum: 1
+        - name: action
+          in: query
+          description: Exact match on `AuditEvent.action`
+          schema:
+            type: string
+        - name: resource
+          in: query
+          description: Exact match on `AuditEvent.resource`
+          schema:
+            type: string
+        - name: startDate
+          in: query
+          description: Lower bound on `createdAt` (inclusive)
+          schema:
+            type: string
+            format: date-time
+        - name: endDate
+          in: query
+          description: Upper bound on `createdAt` (inclusive)
+          schema:
+            type: string
+            format: date-time
+        - $ref: '#/components/parameters/ListLimit'
+        - $ref: '#/components/parameters/ListOffset'
+      responses:
+        '200':
+          description: Paginated audit events, newest first
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditEventListEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
         '500':
           $ref: '#/components/responses/ServerError'
 
@@ -2477,6 +2533,55 @@ components:
           const: true
         data:
           $ref: '#/components/schemas/DashboardSummary'
+
+    AuditEvent:
+      type: object
+      required: [id, tenantId, action, resource, createdAt]
+      properties:
+        id:
+          type: integer
+        tenantId:
+          type: integer
+        userId:
+          type: integer
+          nullable: true
+        username:
+          type: string
+          nullable: true
+          description: Username of the actor when resolved; otherwise null
+        action:
+          type: string
+        resource:
+          type: string
+        resourceId:
+          type: string
+          nullable: true
+        ipAddress:
+          type: string
+          nullable: true
+        metadata:
+          description: Optional structured details for the event
+          anyOf:
+            - type: object
+              additionalProperties: true
+            - type: 'null'
+        createdAt:
+          type: string
+          format: date-time
+
+    AuditEventListEnvelope:
+      allOf:
+        - type: object
+          required: [success, data]
+          properties:
+            success:
+              type: boolean
+              const: true
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/AuditEvent'
+        - $ref: '#/components/schemas/ListPaginationMeta'
 
     Notification:
       type: object

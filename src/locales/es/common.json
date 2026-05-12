@@ -17,7 +17,8 @@
     "articulos": "Artículos",
     "facturacion": "Facturación",
     "users": "Usuarios",
-    "zonasEntrega": "Zonas de entrega"
+    "zonasEntrega": "Zonas de entrega",
+    "auditLog": "Registro de auditoría"
   },
   "language": {
     "legend": "Idioma de la interfaz",

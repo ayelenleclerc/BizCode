@@ -10,6 +10,7 @@ import facturacionEs from '@/locales/es/facturacion.json'
 import zonasEntregaEs from '@/locales/es/zonasEntrega.json'
 import chatEs from '@/locales/es/chat.json'
 import proveedoresEs from '@/locales/es/proveedores.json'
+import auditEs from '@/locales/es/audit.json'
 
 import commonEn from '@/locales/en/common.json'
 import clientesEn from '@/locales/en/clientes.json'
@@ -18,6 +19,7 @@ import facturacionEn from '@/locales/en/facturacion.json'
 import zonasEntregaEn from '@/locales/en/zonasEntrega.json'
 import chatEn from '@/locales/en/chat.json'
 import proveedoresEn from '@/locales/en/proveedores.json'
+import auditEn from '@/locales/en/audit.json'
 
 import commonPt from '@/locales/pt-BR/common.json'
 import clientesPt from '@/locales/pt-BR/clientes.json'
@@ -26,6 +28,7 @@ import facturacionPt from '@/locales/pt-BR/facturacion.json'
 import zonasEntregaPt from '@/locales/pt-BR/zonasEntrega.json'
 import chatPt from '@/locales/pt-BR/chat.json'
 import proveedoresPt from '@/locales/pt-BR/proveedores.json'
+import auditPt from '@/locales/pt-BR/audit.json'
 
 // Persist language preference in localStorage
 const savedLang = typeof localStorage !== 'undefined'
@@ -38,7 +41,7 @@ i18n
     lng: savedLang,
     fallbackLng: 'es',
     defaultNS: 'common',
-    ns: ['common', 'clientes', 'articulos', 'proveedores', 'facturacion', 'zonasEntrega', 'chat'],
+    ns: ['common', 'clientes', 'articulos', 'proveedores', 'facturacion', 'zonasEntrega', 'chat', 'audit'],
     resources: {
       es: {
         common: commonEs,
@@ -48,6 +51,7 @@ i18n
         facturacion: facturacionEs,
         zonasEntrega: zonasEntregaEs,
         chat: chatEs,
+        audit: auditEs,
       },
       en: {
         common: commonEn,
@@ -57,6 +61,7 @@ i18n
         facturacion: facturacionEn,
         zonasEntrega: zonasEntregaEn,
         chat: chatEn,
+        audit: auditEn,
       },
       'pt-BR': {
         common: commonPt,
@@ -66,6 +71,7 @@ i18n
         facturacion: facturacionPt,
         zonasEntrega: zonasEntregaPt,
         chat: chatPt,
+        audit: auditPt,
       },
     },
     interpolation: {

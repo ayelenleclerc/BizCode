@@ -70,6 +70,12 @@ const NAV_SECTIONS: {
     roles: ['owner', 'manager', 'billing', 'cashier', 'collections', 'finance', 'auditor'],
   },
   {
+    key: 'auditLog',
+    path: '/admin/audit-log',
+    icon: '📜',
+    roles: ['owner', 'manager', 'finance', 'auditor'],
+  },
+  {
     key: 'chat',
     path: '/chat',
     icon: '💬',

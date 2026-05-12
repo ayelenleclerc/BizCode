@@ -6351,6 +6351,174 @@ Allows the authenticated user to change their password by supplying the current 
 }
 ```
 
+### List audit events for the authenticated tenant
+
+- **Method:** `GET`
+- **Path:** `/api/audit-events`
+- **Tags:** audit
+
+Read-only list scoped to the session tenant. Requires permission `audit.read`. Default page size is **50** rows (maximum **500**). Optional filters restrict by actor, action, resource type, and `createdAt` bounds (`startDate` / `endDate` as ISO-8601 timestamps; inclusive range).
+
+#### Responses
+
+##### Status: 200 Paginated audit events, newest first
+
+###### Content-Type: application/json
+
+**All of:**
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`action` (required)**
+
+    `string`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`resource` (required)**
+
+    `string`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`ipAddress`**
+
+    `string`
+
+  - **`metadata`**
+
+    `object` — Optional structured details for the event
+
+  - **`resourceId`**
+
+    `string`
+
+  - **`userId`**
+
+    `integer`
+
+  - **`username`**
+
+    `string` — Username of the actor when resolved; otherwise null
+
+- **`success` (required)**
+
+  `boolean`
+
+* **`limit` (required)**
+
+  `integer` — Effective page size (same semantics as query \`limit\`)
+
+* **`offset` (required)**
+
+  `integer` — Effective skip (same semantics as query \`offset\`)
+
+* **`total` (required)**
+
+  `integer` — Row count matching the list filter (before limit/offset)
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "userId": 1,
+      "username": "",
+      "action": "",
+      "resource": "",
+      "resourceId": "",
+      "ipAddress": "",
+      "metadata": {
+        "additionalProperty": "anything"
+      },
+      "createdAt": ""
+    }
+  ],
+  "total": 0,
+  "limit": 1,
+  "offset": 0
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ### List unread notifications for the authenticated user
 
 - **Method:** `GET`
@@ -11263,6 +11431,75 @@ Returns boolean flags for each channel. No sensitive values are exposed.
   }
 }
 ```
+
+### AuditEvent
+
+- **Type:**`object`
+
+* **`action` (required)**
+
+  `string`
+
+* **`createdAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`resource` (required)**
+
+  `string`
+
+* **`tenantId` (required)**
+
+  `integer`
+
+* **`ipAddress`**
+
+  `string`
+
+* **`metadata`**
+
+  `object` — Optional structured details for the event
+
+* **`resourceId`**
+
+  `string`
+
+* **`userId`**
+
+  `integer`
+
+* **`username`**
+
+  `string` — Username of the actor when resolved; otherwise null
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "tenantId": 1,
+  "userId": 1,
+  "username": "",
+  "action": "",
+  "resource": "",
+  "resourceId": "",
+  "ipAddress": "",
+  "metadata": {
+    "additionalProperty": "anything"
+  },
+  "createdAt": ""
+}
+```
+
+### AuditEventListEnvelope
+
+- **Type:**
+
+**Example:**
 
 ### Notification
 

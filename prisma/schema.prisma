@@ -275,6 +275,8 @@ model AuditEvent {
   ipAddress  String?  @db.VarChar(64)
   metadata   Json?
   createdAt  DateTime @default(now())
+
+  @@index([tenantId, createdAt])
 }
 
 model Notification {
