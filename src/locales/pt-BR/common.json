@@ -58,6 +58,9 @@
       "network": "Não foi possível conectar ao servidor. Verifique se a API está em execução (ex.: porta 3001) e tente novamente.",
       "timeout": "A requisição demorou demais. Tente novamente.",
       "offline": "Sem conexão. Verifique a rede e tente novamente."
+    },
+    "lockout": {
+      "retryIn": "Você poderá tentar novamente em {{time}}"
     }
   },
   "session": {

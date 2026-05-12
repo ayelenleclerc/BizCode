@@ -46,6 +46,18 @@ describe('getAuthErrorI18nKey', () => {
     ).toBe('auth.errors.invalidCredentials')
   })
 
+  it('mapea ACCOUNT_LOCKED', () => {
+    expect(
+      getAuthErrorI18nKey(new ApiRequestFailedError('ACCOUNT_LOCKED', { hasResponse: true, httpStatus: 429 })),
+    ).toBe('auth.errors.accountLocked')
+  })
+
+  it('mapea 429 Too many requests', () => {
+    expect(
+      getAuthErrorI18nKey(new ApiRequestFailedError('Too many requests', { hasResponse: true, httpStatus: 429 })),
+    ).toBe('auth.errors.tooManyRequests')
+  })
+
   it('mapea Error genérico con mensaje Invalid credentials (legacy)', () => {
     expect(getAuthErrorI18nKey(new Error('Invalid credentials'))).toBe('auth.errors.invalidCredentials')
   })

@@ -87,7 +87,42 @@ paths:
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
-          $ref: '#/components/responses/UnauthorizedError'
+          description: Invalid credentials
+          headers:
+            X-RateLimit-Limit:
+              schema:
+                type: integer
+              example: 5
+            X-RateLimit-Remaining:
+              schema:
+                type: integer
+            X-RateLimit-Reset:
+              schema:
+                type: string
+                format: date-time
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '429':
+          description: Account locked after too many failed login attempts
+          headers:
+            X-RateLimit-Limit:
+              schema:
+                type: integer
+              example: 5
+            X-RateLimit-Remaining:
+              schema:
+                type: integer
+              example: 0
+            X-RateLimit-Reset:
+              schema:
+                type: string
+                format: date-time
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
 
   /api/auth/logout:
     post:
