@@ -8,6 +8,7 @@ import {
   ensureMigrationTenant,
   runMigrationFromRoot,
   truncateMigrationTables,
+  writeClientesFixtureTree,
   writeProductFixtureTree,
 } from '../helpers/migration-harness'
 
@@ -45,5 +46,31 @@ describe('DBF migration integration', () => {
 
     const importedProducts = await prisma.articulo.findMany({ where: { tenantId } })
     expect(importedProducts.length).toBeGreaterThan(0)
+  })
+
+  it('imports real clients from CLIENTES.DBF and skips invalid COND rows', async () => {
+    const clientesRoot = await createTempDbfRoot()
+    await writeClientesFixtureTree(clientesRoot)
+    await runMigrationFromRoot(clientesRoot)
+
+    const tenantId = parseInt(process.env.BIZCODE_MIGRATION_TENANT_ID ?? '0', 10)
+    const imported = await prisma.cliente.findMany({
+      where: { tenantId, codigo: { in: [501, 502, 503] } },
+      orderBy: { codigo: 'asc' },
+    })
+    expect(imported).toHaveLength(2)
+    expect(imported[0]?.codigo).toBe(501)
+    expect(imported[0]?.condIva).toBe('RI')
+    expect(imported[0]?.activo).toBe(true)
+    expect(imported[1]?.codigo).toBe(502)
+    expect(imported[1]?.condIva).toBe('Mono')
+    expect(imported[1]?.activo).toBe(false)
+
+    const placeholders = await prisma.cliente.count({
+      where: { tenantId, codigo: { gte: 91001, lte: 91010 } },
+    })
+    expect(placeholders).toBe(0)
+
+    await cleanupTempDbfRoot(clientesRoot)
   })
 })

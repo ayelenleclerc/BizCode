@@ -11,7 +11,8 @@ Por defecto los scripts buscan `Programa_Viejo/16-07-2025 completa/sistema/` **e
 | Archivo        | Contenido real (verificado con `npx tsx scripts/inspect-dbf.ts`) |
 |----------------|-------------------------------------------------------------------|
 | `LIST_CLI.DBF` | **Metadatos** de columnas de listado (FLD_NAME, FIELD_NAME, …), **no** filas de clientes. |
-| `PVAR.DBF`     | Estructura tipo maestro de artículos (`CODIG`, `DESCR`, …) con **0 registros** en esta copia. |
+| `CLIENTES.DBF` | Maestro de clientes cuando la copia legacy lo incluye (evidencia inventario: **2310** registros en copia Suarez; ver `docs/referencias/exports/inventario-dbf-volcado.md`). |
+| `PVAR.DBF`     | Estructura tipo maestro de artículos (`CODIG`, `DESCR`, …) con **0 registros** en la copia mínima del repo. |
 | `PVAR2.DBF`    | **Líneas** de pedido/compra: `ARTIC` (código), `IMPORTE`, `COSTO_N`, `IVA`, `CAJA`, `UNID`, … |
 
 Codificación usada al leer: **cp437** (típico DOS/Visual Fox en español).
@@ -31,11 +32,45 @@ Codificación usada al leer: **cp437** (típico DOS/Visual Fox en español).
 
 Se importan **10** códigos distintos (los 10 menores `ARTIC` > 0 tras ordenar), e idempotencia por `codigo` único (`skipDuplicates` en `createMany` o comprobación previa).
 
-### `Cliente`
+### `Cliente` (desde `CLIENTES.DBF`)
 
-En esta copia **no hay** tabla DBF con filas de clientes. El script inserta **10 clientes placeholder** con códigos `91001`–`91010` y razón social acotada a 30 caracteres, `condIva` = `R` (1 carácter, acorde a `VARCHAR(1)` en la migración SQL actual).
+Si `CLIENTES.DBF` existe y `recordCount > 0`, `npm run migrate:dbf` importa clientes reales con validación `clienteBodySchema` (mismo contrato que REST/CSV). Si no hay maestro con filas, el script mantiene **10 placeholders** `91001`–`91010`.
 
-Si en el futuro agregas un `CLIENTES.DBF` (o similar) con datos reales, habría que ampliar el script leyendo ese archivo y mapeando campos según `LIST_CLI.DBF` (definición de columnas).
+| Campo legacy | Campo BizCode | Regla |
+|--------------|---------------|--------|
+| `CODIG` | `codigo` | Entero > 0 |
+| `RSOCIAL` | `rsocial` | Trim; 3–30 caracteres |
+| `FANTASIA` | `fantasia` | Opcional; máx. 30 |
+| `DOMIC` | `domicilio` | Opcional; máx. 40 |
+| `LOCAL` | `localidad` | Opcional; máx. 25 |
+| `CPOST` | `cpost` | Opcional; máx. 8 |
+| `TELEF` | `telef` | Opcional; máx. 25 |
+| `EMAIL` | `email` | Opcional; máx. 50 |
+| `CUIT` | `cuit` | Opcional; validación CUIT argentina en schema |
+| `CREDITO` | `creditLimit` | Numérico ≥ 0 |
+| `BAJA` | `activo` | `BAJA=true` → `activo=false`; `BAJA=false` → `activo=true` (precedencia sobre `ACTIVO`) |
+| `COND` | `condIva` | Catálogo cerrado (tabla siguiente) |
+
+**Fuera de alcance v1:** `SALDO` → `balanceInicial`, `FPAGO` → `formaPago`, `ZONA` → `deliveryZoneId`.
+
+#### Catálogo `COND` → `condIva`
+
+| `COND` legacy | `condIva` BizCode |
+|---------------|-------------------|
+| `I` | `RI` |
+| `M` | `Mono` |
+| `E` | `Exento` |
+| `N` | `CF` |
+| `C` | `CF` |
+| `X` | `Exento` |
+
+`COND` desconocido o vacío: **no** migrar la fila; registrar error crítico en consola y continuar el lote.
+
+#### Política de rechazo e idempotencia
+
+- Rechazo por `COND` inválido, fallo Zod (p. ej. `rsocial` corta, CUIT inválido, `creditLimit` negativo) o `codigo` duplicado en el mismo archivo.
+- Si `(tenantId, codigo)` ya existe en PostgreSQL: omitir inserción y contabilizar en el informe (sin upsert en v1).
+- Transformación pura en [`src/lib/migration/legacyClienteDbf.ts`](../src/lib/migration/legacyClienteDbf.ts); orquestación en [`scripts/migrate-from-dbf.ts`](migrate-from-dbf.ts).
 
 ### Rubro semilla
 
@@ -45,23 +80,16 @@ Si en el futuro agregas un `CLIENTES.DBF` (o similar) con datos reales, habría 
 
 Desde la raíz del proyecto:
 
-1. Variables: archivo `.env` con `DATABASE_URL` apuntando a PostgreSQL (misma cadena que usa el servidor Express / Prisma). Si `Programa_Viejo` no está en la raíz del repo, añade `PROGRAMA_VIEJO_ROOT` (véase arriba).
+1. Variables: archivo `.env` con `DATABASE_URL` apuntando a PostgreSQL (misma cadena que usa el servidor Express / Prisma). Si `Programa_Viejo` no está en la raíz del repo, añade `PROGRAMA_VIEJO_ROOT` (véase arriba). Opcional: `BIZCODE_MIGRATION_TENANT_ID`.
 2. Esquema aplicado: `npx prisma migrate deploy` (o `npx prisma migrate dev` en desarrollo).
 3. Cliente generado: `npx prisma generate`.
 4. Importar: `npm run migrate:dbf`.
 
 Inspección opcional de DBF (campos y muestras): `npx tsx scripts/inspect-dbf.ts`.
 
-## Relevamiento issue #51 (preparación ETL clientes)
+## Relevamiento issue #51 (ETL clientes)
 
-Estado: **bloqueado** hasta contar con una **fuente DBF real** acordada (tabla y ruta verificables en el entorno de migración). No sustituir placeholders del script hasta esa evidencia. Mientras tanto: CSV de clientes en aplicación (issue #58) es la vía soportada para altas masivas auditables.
-
-Estado previo: **preparación documental/técnica**, sin ETL productivo de clientes en esta rama.
-
-- Evidencia disponible: existe `CLIENTES.DBF` en la copia legacy fuera del repo (fuente externa).
-- Reglas de mapeo acordadas para implementación posterior:
-  - `CREDITO` legacy -> `creditLimit`.
-  - `BAJA=true` -> `activo=false`; `BAJA=false` -> `activo=true`.
-  - `COND` -> `condIva` con catálogo explícito: `I->R`, `M->M`, `E->E`, `N->N`, `C->C`, `X->X`.
-  - Política de rechazo para `COND` desconocido/vacío: no migrar ese cliente, registrar error crítico y continuar el lote.
-- Pendiente para ETL real: formalizar parser de `CLIENTES.DBF` en `scripts/migrate-from-dbf.ts` con evidencia de rechazos y trazabilidad de remediación.
+- Fuente acordada: `CLIENTES.DBF` bajo `PROGRAMA_VIEJO_ROOT/16-07-2025 completa/sistema/`.
+- Evidencia de inventario: **2310** registros en copia Suarez (`docs/referencias/exports/inventario-dbf-volcado.md`).
+- Altas masivas en aplicación: importación CSV de clientes (issue #58), auditada por API.
+- Remediación de rechazos: corregir origen DBF o importar filas corregidas vía CSV.

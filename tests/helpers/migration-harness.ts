@@ -62,6 +62,24 @@ export async function writeProductFixtureTree(root: string): Promise<void> {
   await listCli.appendRecords([{ FIELD_NAME: 'RSOCIAL', FIELD_TYPE: 'C' }])
 }
 
+export async function writeClientesFixtureTree(root: string): Promise<void> {
+  await writeProductFixtureTree(root)
+
+  const sistema = path.join(root, '16-07-2025 completa', 'sistema')
+  const clientes = await DBFFile.create(path.join(sistema, 'CLIENTES.DBF'), [
+    { name: 'CODIG', type: 'N', size: 5, decimalPlaces: 0 },
+    { name: 'RSOCIAL', type: 'C', size: 30 },
+    { name: 'COND', type: 'C', size: 1 },
+    { name: 'BAJA', type: 'L', size: 1 },
+    { name: 'CREDITO', type: 'N', size: 12, decimalPlaces: 2 },
+  ])
+  await clientes.appendRecords([
+    { CODIG: 501, RSOCIAL: 'Cliente DBF Uno', COND: 'I', BAJA: false, CREDITO: 1000 },
+    { CODIG: 502, RSOCIAL: 'Cliente DBF Dos', COND: 'M', BAJA: true, CREDITO: 0 },
+    { CODIG: 503, RSOCIAL: 'Cliente DBF Tres', COND: 'Z', BAJA: false, CREDITO: 0 },
+  ])
+}
+
 export async function runMigrationFromRoot(root: string): Promise<void> {
   process.env.PROGRAMA_VIEJO_ROOT = root
   await runDbfMigration()

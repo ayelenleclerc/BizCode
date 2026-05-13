@@ -6,10 +6,14 @@
  * Ejecutar: npm run migrate:dbf
  */
 import 'dotenv/config'
+import fs from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { PrismaClient } from '@prisma/client'
 import { DBFFile } from 'dbffile'
+import { dbfRowToRawCliente, mapLegacyCondToCondIva } from '../src/lib/migration/legacyClienteDbf'
+import type { ClienteInput } from '../server/createApp.types'
+import { clienteBodySchema, safeParseBodySchema } from '../server/schemas/domain'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -34,6 +38,14 @@ const ENCODING = 'cp437' as const
 const PLACEHOLDER_CLIENT_BASE = 91001
 const PLACEHOLDER_CLIENT_COUNT = 10
 const ARTICULOS_A_IMPORTAR = 10
+const CLIENTES_BATCH_SIZE = 100
+
+type ClienteMigrationReport = {
+  created: number
+  rejected: Array<{ codigo: number | null; message: string }>
+  skippedExisting: number
+  skippedDuplicateInFile: number
+}
 
 const prisma = new PrismaClient()
 
@@ -121,6 +133,103 @@ async function listCliIsMetadataOnly(): Promise<boolean> {
   const rows = await dbf.readRecords(1)
   const r = rows[0] as Record<string, unknown> | undefined
   return r != null && Object.prototype.hasOwnProperty.call(r, 'FIELD_NAME')
+}
+
+async function clientesDbfHasRecords(): Promise<boolean> {
+  const filePath = path.join(sistemaDir(), 'CLIENTES.DBF')
+  try {
+    await fs.access(filePath)
+  } catch {
+    return false
+  }
+  const dbf = await DBFFile.open(filePath, { readMode: 'loose', encoding: ENCODING })
+  return dbf.recordCount > 0
+}
+
+function logClienteMigrationReport(report: ClienteMigrationReport): void {
+  console.log(
+    `[migrate-from-dbf] Clientes: insertados=${report.created}, rechazados=${report.rejected.length}, omitidos_existentes=${report.skippedExisting}, duplicados_archivo=${report.skippedDuplicateInFile}.`
+  )
+  for (const rejection of report.rejected) {
+    const codeLabel = rejection.codigo == null ? '?' : String(rejection.codigo)
+    console.error(`[migrate-from-dbf] CRITICAL cliente codigo=${codeLabel}: ${rejection.message}`)
+  }
+}
+
+async function migrateClientesFromDbf(tenantId: number): Promise<ClienteMigrationReport> {
+  const filePath = path.join(sistemaDir(), 'CLIENTES.DBF')
+  const dbf = await DBFFile.open(filePath, { readMode: 'loose', encoding: ENCODING })
+  const report: ClienteMigrationReport = {
+    created: 0,
+    rejected: [],
+    skippedExisting: 0,
+    skippedDuplicateInFile: 0,
+  }
+  const seenInFile = new Set<number>()
+  const pending: Array<ClienteInput & { tenantId: number }> = []
+
+  const flushPending = async () => {
+    if (pending.length === 0) return
+    const codigos = pending.map((row) => row.codigo)
+    const existing = new Set(
+      (
+        await prisma.cliente.findMany({
+          where: { tenantId, codigo: { in: codigos } },
+          select: { codigo: true },
+        })
+      ).map((row) => row.codigo),
+    )
+    const toCreate = pending.filter((row) => {
+      if (existing.has(row.codigo)) {
+        report.skippedExisting += 1
+        return false
+      }
+      return true
+    })
+    pending.length = 0
+    if (toCreate.length === 0) return
+    const result = await prisma.cliente.createMany({ data: toCreate, skipDuplicates: true })
+    report.created += result.count
+  }
+
+  for await (const rawRow of dbf) {
+    const row = rawRow as Record<string, unknown>
+    const codigoRaw = Math.round(Number(row.CODIG))
+    const codigo = Number.isFinite(codigoRaw) ? codigoRaw : null
+    const cond = String(row.COND ?? '').trim()
+    const condIva = mapLegacyCondToCondIva(cond)
+    if (condIva === null) {
+      report.rejected.push({
+        codigo,
+        message: `COND invalid or empty: "${cond}"`,
+      })
+      continue
+    }
+
+    const raw = dbfRowToRawCliente(row)
+    const parsed = safeParseBodySchema(clienteBodySchema, raw)
+    if (!parsed.ok) {
+      report.rejected.push({
+        codigo,
+        message: parsed.error,
+      })
+      continue
+    }
+
+    const parsedCodigo = parsed.value.codigo
+    if (seenInFile.has(parsedCodigo)) {
+      report.skippedDuplicateInFile += 1
+      continue
+    }
+    seenInFile.add(parsedCodigo)
+    pending.push({ ...parsed.value, tenantId })
+    if (pending.length >= CLIENTES_BATCH_SIZE) {
+      await flushPending()
+    }
+  }
+
+  await flushPending()
+  return report
 }
 
 async function ensureRubroGeneral(tenantId: number): Promise<number> {
@@ -227,7 +336,13 @@ export async function runDbfMigration() {
   const tenantId = await resolveMigrationTenantId()
   const rubroId = await ensureRubroGeneral(tenantId)
   const descrFromPvar = await loadPvarDescriptions()
-  await migrateClientesPlaceholder(tenantId)
+  if (await clientesDbfHasRecords()) {
+    console.log('[migrate-from-dbf] CLIENTES.DBF detectado con registros; importando clientes reales.')
+    const report = await migrateClientesFromDbf(tenantId)
+    logClienteMigrationReport(report)
+  } else {
+    await migrateClientesPlaceholder(tenantId)
+  }
   await migrateArticulos(tenantId, rubroId, descrFromPvar)
   console.log('[migrate-from-dbf] Listo.')
 }
