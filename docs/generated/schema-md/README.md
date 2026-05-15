@@ -76,6 +76,10 @@
 
 * [Cobro](./cobro.md) – `-`
 
+* [CobroCreateData](./cobrocreatedata.md) – `-`
+
+* [CobroCreateEnvelope](./cobrocreateenvelope.md) – `-`
+
 * [CobroEnvelope](./cobroenvelope.md) – `-`
 
 * [CobroInput](./cobroinput.md) – `-`
@@ -195,6 +199,8 @@
 * [Untitled object in ClienteListEnvelope](./clientelistenvelope-allof-0.md) – `undefined#/allOf/0`
 
 * [Untitled object in Cobro](./cobro-properties-cliente.md) – `undefined#/properties/cliente`
+
+* [Untitled object in CobroCreateData](./cobrocreatedata-properties-updatedcliente.md) – `undefined#/properties/updatedCliente`
 
 * [Untitled object in CobroListEnvelope](./cobrolistenvelope-allof-0.md) – `undefined#/allOf/0`
 

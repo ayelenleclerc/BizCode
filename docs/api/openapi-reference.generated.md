@@ -5103,7 +5103,7 @@ One-time endpoint to create initial tenant and owner user.
 - **Path:** `/api/cobros`
 - **Tags:** cobros
 
-Decrements `Cliente.balance` by `monto` in the same transaction and adjusts `Cliente.score` (+5 on-time, -10 late vs oldest open invoice + creditDays). Requires `sales.create`.
+Decrements `Cliente.balance` by `monto` in the same transaction. When the customer has at least one active invoice (`estado: A`), adjusts `Cliente.score` from the oldest active invoice due date (`factura.fecha + creditDays`) vs payment date: on-time +5; 1–10 days late −3; 11–30 −7; >30 −15. No score change when there is no active invoice (on-account payment). Audit metadata includes `scoreBefore`, `scoreAfter`, `delta`. Requires `sales.create`.
 
 #### Request Body
 
@@ -5156,11 +5156,35 @@ Decrements `Cliente.balance` by `monto` in the same transaction and adjusts `Cli
 
   `object`
 
-  - **`cliente`**
+  - **`cobro` (required)**
 
     `object`
 
-    - **`codigo`**
+    - **`cliente`**
+
+      `object`
+
+      - **`codigo`**
+
+        `integer`
+
+      - **`id`**
+
+        `integer`
+
+      - **`rsocial`**
+
+        `string`
+
+    - **`clienteId`**
+
+      `integer`
+
+    - **`fecha`**
+
+      `string`, format: `date-time`
+
+    - **`formaPagoId`**
 
       `integer`
 
@@ -5168,41 +5192,45 @@ Decrements `Cliente.balance` by `monto` in the same transaction and adjusts `Cli
 
       `integer`
 
-    - **`rsocial`**
+    - **`monto`**
+
+      `number`
+
+    - **`nota`**
 
       `string`
 
-  - **`clienteId`**
+    - **`referencia`**
 
-    `integer`
+      `string`
 
-  - **`fecha`**
+    - **`tenantId`**
 
-    `string`, format: `date-time`
+      `integer`
 
-  - **`formaPagoId`**
+  - **`updatedCliente` (required)**
 
-    `integer`
+    `object`
 
-  - **`id`**
+    - **`id` (required)**
 
-    `integer`
+      `integer`
 
-  - **`monto`**
+    - **`score` (required)**
 
-    `number`
+      `integer`
 
-  - **`nota`**
+    - **`balance`**
 
-    `string`
+      `number`
 
-  - **`referencia`**
+    - **`creditLimit`**
 
-    `string`
+      `number`
 
-  - **`tenantId`**
+    - **`rsocial`**
 
-    `integer`
+      `string`
 
 - **`success` (required)**
 
@@ -5214,21 +5242,31 @@ Decrements `Cliente.balance` by `monto` in the same transaction and adjusts `Cli
 {
   "success": true,
   "data": {
-    "id": 1,
-    "tenantId": 1,
-    "clienteId": 1,
-    "fecha": "",
-    "monto": 1,
-    "formaPagoId": 1,
-    "referencia": "",
-    "nota": "",
-    "cliente": {
+    "cobro": {
       "id": 1,
-      "codigo": 1,
-      "rsocial": "",
+      "tenantId": 1,
+      "clienteId": 1,
+      "fecha": "",
+      "monto": 1,
+      "formaPagoId": 1,
+      "referencia": "",
+      "nota": "",
+      "cliente": {
+        "id": 1,
+        "codigo": 1,
+        "rsocial": "",
+        "additionalProperty": "anything"
+      },
       "additionalProperty": "anything"
     },
-    "additionalProperty": "anything"
+    "updatedCliente": {
+      "id": 1,
+      "rsocial": "",
+      "balance": 1,
+      "creditLimit": 1,
+      "score": 0,
+      "additionalProperty": "anything"
+    }
   }
 }
 ```
@@ -10693,6 +10731,241 @@ Returns boolean flags for each channel. No sensitive values are exposed.
       "additionalProperty": "anything"
     },
     "additionalProperty": "anything"
+  }
+}
+```
+
+### CobroCreateData
+
+- **Type:**`object`
+
+* **`cobro` (required)**
+
+  `object`
+
+  - **`cliente`**
+
+    `object`
+
+    - **`codigo`**
+
+      `integer`
+
+    - **`id`**
+
+      `integer`
+
+    - **`rsocial`**
+
+      `string`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`fecha`**
+
+    `string`, format: `date-time`
+
+  - **`formaPagoId`**
+
+    `integer`
+
+  - **`id`**
+
+    `integer`
+
+  - **`monto`**
+
+    `number`
+
+  - **`nota`**
+
+    `string`
+
+  - **`referencia`**
+
+    `string`
+
+  - **`tenantId`**
+
+    `integer`
+
+* **`updatedCliente` (required)**
+
+  `object`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`score` (required)**
+
+    `integer`
+
+  - **`balance`**
+
+    `number`
+
+  - **`creditLimit`**
+
+    `number`
+
+  - **`rsocial`**
+
+    `string`
+
+**Example:**
+
+```json
+{
+  "cobro": {
+    "id": 1,
+    "tenantId": 1,
+    "clienteId": 1,
+    "fecha": "",
+    "monto": 1,
+    "formaPagoId": 1,
+    "referencia": "",
+    "nota": "",
+    "cliente": {
+      "id": 1,
+      "codigo": 1,
+      "rsocial": "",
+      "additionalProperty": "anything"
+    },
+    "additionalProperty": "anything"
+  },
+  "updatedCliente": {
+    "id": 1,
+    "rsocial": "",
+    "balance": 1,
+    "creditLimit": 1,
+    "score": 0,
+    "additionalProperty": "anything"
+  }
+}
+```
+
+### CobroCreateEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`cobro` (required)**
+
+    `object`
+
+    - **`cliente`**
+
+      `object`
+
+      - **`codigo`**
+
+        `integer`
+
+      - **`id`**
+
+        `integer`
+
+      - **`rsocial`**
+
+        `string`
+
+    - **`clienteId`**
+
+      `integer`
+
+    - **`fecha`**
+
+      `string`, format: `date-time`
+
+    - **`formaPagoId`**
+
+      `integer`
+
+    - **`id`**
+
+      `integer`
+
+    - **`monto`**
+
+      `number`
+
+    - **`nota`**
+
+      `string`
+
+    - **`referencia`**
+
+      `string`
+
+    - **`tenantId`**
+
+      `integer`
+
+  - **`updatedCliente` (required)**
+
+    `object`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`score` (required)**
+
+      `integer`
+
+    - **`balance`**
+
+      `number`
+
+    - **`creditLimit`**
+
+      `number`
+
+    - **`rsocial`**
+
+      `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "cobro": {
+      "id": 1,
+      "tenantId": 1,
+      "clienteId": 1,
+      "fecha": "",
+      "monto": 1,
+      "formaPagoId": 1,
+      "referencia": "",
+      "nota": "",
+      "cliente": {
+        "id": 1,
+        "codigo": 1,
+        "rsocial": "",
+        "additionalProperty": "anything"
+      },
+      "additionalProperty": "anything"
+    },
+    "updatedCliente": {
+      "id": 1,
+      "rsocial": "",
+      "balance": 1,
+      "creditLimit": 1,
+      "score": 0,
+      "additionalProperty": "anything"
+    }
   }
 }
 ```

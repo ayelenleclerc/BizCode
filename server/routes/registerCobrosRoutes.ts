@@ -85,9 +85,16 @@ export function registerCobrosRoutes(app: Application, ctx: RestRouteContext): v
           return
         }
 
-        const { cobro: created } = result.data
-        await writeAudit(req as AuthenticatedRequest, 'cobro_create', 'cobro', String(created.id))
-        res.json({ success: true, data: created })
+        const { cobro: created, updatedCliente, scoreChange } = result.data
+        await writeAudit(req as AuthenticatedRequest, 'cobro_create', 'cobro', String(created.id), {
+          scoreBefore: scoreChange.scoreBefore,
+          scoreAfter: scoreChange.scoreAfter,
+          delta: scoreChange.delta,
+        })
+        res.json({
+          success: true,
+          data: { cobro: created, updatedCliente },
+        })
       } catch (err: unknown) {
         res.status(500).json({ success: false, error: errorMessage(err) })
       }

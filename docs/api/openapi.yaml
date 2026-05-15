@@ -845,8 +845,11 @@ paths:
       tags: [cobros]
       summary: Register a customer payment
       description: |
-        Decrements `Cliente.balance` by `monto` in the same transaction and adjusts `Cliente.score`
-        (+5 on-time, -10 late vs oldest open invoice + creditDays). Requires `sales.create`.
+        Decrements `Cliente.balance` by `monto` in the same transaction. When the customer has at least
+        one active invoice (`estado: A`), adjusts `Cliente.score` from the oldest active invoice due date
+        (`factura.fecha + creditDays`) vs payment date: on-time +5; 1–10 days late −3; 11–30 −7; >30 −15.
+        No score change when there is no active invoice (on-account payment). Audit metadata includes
+        `scoreBefore`, `scoreAfter`, `delta`. Requires `sales.create`.
       requestBody:
         required: true
         content:
@@ -859,7 +862,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CobroEnvelope'
+                $ref: '#/components/schemas/CobroCreateEnvelope'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -2152,6 +2155,41 @@ components:
           const: true
         data:
           $ref: '#/components/schemas/Cobro'
+
+    CobroCreateData:
+      type: object
+      required: [cobro, updatedCliente]
+      properties:
+        cobro:
+          $ref: '#/components/schemas/Cobro'
+        updatedCliente:
+          type: object
+          additionalProperties: true
+          required: [id, score]
+          properties:
+            id:
+              type: integer
+            rsocial:
+              type: string
+            balance:
+              type: number
+            creditLimit:
+              type: number
+              nullable: true
+            score:
+              type: integer
+              minimum: 0
+              maximum: 100
+
+    CobroCreateEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/CobroCreateData'
 
     AgingBucket:
       type: object

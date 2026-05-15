@@ -12,19 +12,55 @@ export type CobroListResult = {
   cobros: CobroWithCliente[]
 }
 
+export type ScoreChange = {
+  scoreBefore: number
+  scoreAfter: number
+  delta: number
+}
+
 export type CobroCreateResult = {
   cobro: CobroWithCliente
   updatedCliente: Pick<Cliente, 'id' | 'rsocial' | 'balance' | 'creditLimit' | 'score'>
+  scoreChange: ScoreChange
 }
 
 function clampScore(value: number): number {
   return Math.min(100, Math.max(0, value))
 }
 
+function calendarDaysBetween(from: Date, to: Date): number {
+  const msPerDay = 86_400_000
+  const utcFrom = Date.UTC(from.getFullYear(), from.getMonth(), from.getDate())
+  const utcTo = Date.UTC(to.getFullYear(), to.getMonth(), to.getDate())
+  return Math.floor((utcTo - utcFrom) / msPerDay)
+}
+
 /**
- * @en Computes payment score delta from oldest open invoice due date vs payment date.
- * @es Calcula el delta de score según vencimiento de la factura más antigua vs fecha de cobro.
- * @pt-BR Calcula o delta de score pela data de vencimento da fatura mais antiga vs data do pagamento.
+ * @en Score delta from payment date vs invoice due date (days past due). Zero when no active invoice.
+ * @es Delta de score según días de mora vs vencimiento. Cero sin factura activa de referencia.
+ * @pt-BR Delta de score pelos dias em atraso vs vencimento. Zero sem fatura ativa de referência.
+ */
+export function computeScoreDelta(
+  cobroFecha: Date,
+  creditDays: number,
+  oldestFacturaFecha: Date | null,
+): number {
+  if (oldestFacturaFecha === null) {
+    return 0
+  }
+  const due = new Date(oldestFacturaFecha)
+  due.setDate(due.getDate() + creditDays)
+  const daysPastDue = calendarDaysBetween(due, cobroFecha)
+  if (daysPastDue <= 0) return 5
+  if (daysPastDue <= 10) return -3
+  if (daysPastDue <= 30) return -7
+  return -15
+}
+
+/**
+ * @en Applies score delta with clamp 0–100.
+ * @es Aplica el delta de score con límite 0–100.
+ * @pt-BR Aplica o delta de score com limite 0–100.
  */
 export function computeScoreAfterCobro(
   currentScore: number,
@@ -32,15 +68,25 @@ export function computeScoreAfterCobro(
   creditDays: number,
   oldestFacturaFecha: Date | null,
 ): number {
-  if (oldestFacturaFecha === null) {
-    return clampScore(currentScore + 5)
-  }
-  const due = new Date(oldestFacturaFecha)
-  due.setDate(due.getDate() + creditDays)
-  if (cobroFecha.getTime() <= due.getTime()) {
-    return clampScore(currentScore + 5)
-  }
-  return clampScore(currentScore - 10)
+  const delta = computeScoreDelta(cobroFecha, creditDays, oldestFacturaFecha)
+  return clampScore(currentScore + delta)
+}
+
+/**
+ * @en Full score update payload for cobro registration.
+ * @es Resultado completo de actualización de score al registrar cobro.
+ * @pt-BR Resultado completo de atualização de score ao registrar recebimento.
+ */
+export function computeScoreChange(
+  currentScore: number,
+  cobroFecha: Date,
+  creditDays: number,
+  oldestFacturaFecha: Date | null,
+): ScoreChange {
+  const scoreBefore = currentScore
+  const delta = computeScoreDelta(cobroFecha, creditDays, oldestFacturaFecha)
+  const scoreAfter = clampScore(scoreBefore + delta)
+  return { scoreBefore, scoreAfter, delta }
 }
 
 /**
@@ -120,12 +166,12 @@ export class CobroService {
     const monto = input.monto
 
     const oldestFactura = await this.prisma.factura.findFirst({
-      where: { tenantId, clienteId: input.clienteId, estado: { not: 'N' } },
+      where: { tenantId, clienteId: input.clienteId, estado: 'A' },
       orderBy: { fecha: 'asc' },
       select: { fecha: true },
     })
 
-    const newScore = computeScoreAfterCobro(
+    const scoreChange = computeScoreChange(
       cliente.score,
       cobroFecha,
       cliente.creditDays,
@@ -146,16 +192,20 @@ export class CobroService {
         include: { cliente: { select: { id: true, codigo: true, rsocial: true } } },
       })
 
+      const clienteUpdateData: Prisma.ClienteUpdateInput = {
+        balance: { decrement: monto },
+      }
+      if (scoreChange.delta !== 0) {
+        clienteUpdateData.score = scoreChange.scoreAfter
+      }
+
       const updatedCliente = await tx.cliente.update({
         where: { id: input.clienteId },
-        data: {
-          balance: { decrement: monto },
-          score: newScore,
-        },
+        data: clienteUpdateData,
         select: { id: true, rsocial: true, balance: true, creditLimit: true, score: true },
       })
 
-      return { cobro, updatedCliente }
+      return { cobro, updatedCliente, scoreChange }
     })
 
     return { ok: true, data: result }

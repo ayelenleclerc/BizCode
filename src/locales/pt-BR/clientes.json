@@ -70,6 +70,7 @@
       "scoreLow": "Alto risco",
       "scoreMid": "Risco médio",
       "scoreHigh": "Bom pagador",
+      "scoreTooltipHelp": "Score de pagamento (0–100): 0–40 alto risco, 41–70 moderado, 71–100 confiável. Atualizado ao registrar recebimentos com faturas ativas.",
       "suspendedBadge": "SUSPENSO",
       "readOnly": "Somente leitura — seu perfil não pode modificar dados financeiros"
     }
