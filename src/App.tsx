@@ -11,6 +11,7 @@ import InicioPage from './pages/inicio'
 import LogisticaPage from './pages/logistica'
 import FinanzasPage from './pages/finanzas'
 import CobrosPage from './pages/cobros'
+import ReportesPage from './pages/reportes'
 import ConfiguracionPage from './pages/configuracion'
 import ZonasEntregaPage from './pages/configuracion/ZonasEntregaPage'
 import ChatPage from './pages/chat'
@@ -93,6 +94,7 @@ function AppRoutes() {
           <Route path="logistica" element={<LogisticaPage />} />
           <Route path="finanzas" element={<FinanzasPage />} />
           <Route path="cobros" element={<CobrosPage />} />
+          <Route path="reportes" element={<ReportesPage />} />
           {/* Configuración */}
           <Route path="configuracion" element={<ConfiguracionPage />} />
           <Route path="configuracion/zonas-entrega" element={<ZonasEntregaPage />} />

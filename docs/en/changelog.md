@@ -14,6 +14,7 @@ Versioning: [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **Reports (GitHub #129):** Operational reports at `/reportes` — `GET /api/reportes/ventas`, `GET /api/reportes/stock-critico`, `GET /api/reportes/cobranzas` with JSON or `Accept: text/csv` export; permissions `reports.operational.read` / `reports.financial.read`; i18n EN/ES/PT-BR.
 - **Finance (GitHub #125):** Real `/finanzas` module — `GET /api/reportes/aging` and `GET /api/reportes/cuenta-corriente/:clienteId` (AR aging by `creditDays`, account statement with running balance); dashboard `facturasVencidas` uses the same due-date rule; i18n EN/ES/PT-BR.
 
 - **Collections (GitHub #124):** Customer payment registration — `Cobro` model, REST API (`POST/GET /api/cobros`), `/cobros` UI, recent payments on the customer form, dashboard `cobrosHoy` widget wired to real data; i18n EN/ES/PT-BR.

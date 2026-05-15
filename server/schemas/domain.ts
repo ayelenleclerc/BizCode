@@ -631,6 +631,38 @@ function firstZodIssueMessage(err: z.ZodError): string {
   return combined.length > 0 ? combined : 'Validation failed'
 }
 
+const isoDateString = z
+  .string()
+  .regex(/^\d{4}-\d{2}-\d{2}$/, 'from/to must be YYYY-MM-DD')
+
+function refineReportesPeriodOrder(
+  data: { from: string; to: string },
+  ctx: z.RefinementCtx,
+): void {
+  if (data.from > data.to) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'from must be on or before to',
+      path: ['from'],
+    })
+  }
+}
+
+export const reportesPeriodQuerySchema = z
+  .object({
+    from: isoDateString,
+    to: isoDateString,
+  })
+  .superRefine(refineReportesPeriodOrder)
+
+export const reportesVentasQuerySchema = z
+  .object({
+    from: isoDateString,
+    to: isoDateString,
+    agrupar: z.enum(['dia', 'semana', 'mes']).default('dia'),
+  })
+  .superRefine(refineReportesPeriodOrder)
+
 export function safeParseBodySchema<S extends z.ZodTypeAny>(schema: S, raw: unknown): SafeParseBodyResult<z.output<S>> {
   const parsed = schema.safeParse(raw)
   if (!parsed.success) {

@@ -170,6 +170,7 @@ describe('App — cobertura de rutas protegidas (smoke navegación)', () => {
       '/proveedores',
       '/logistica',
       '/finanzas',
+      '/reportes',
       '/cobros',
       '/admin/audit-log',
       '/chat',

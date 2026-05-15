@@ -1176,6 +1176,130 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
 
+  /api/reportes/ventas:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [reportes]
+      summary: Sales by period
+      description: |
+        Aggregates active invoices (`estado = A`) in the date range using server local calendar.
+        Grouping `agrupar`: `dia` (YYYY-MM-DD), `semana` (Monday of week as YYYY-MM-DD), `mes` (YYYY-MM).
+        Requires permission `reports.operational.read`.
+        Send `Accept: text/csv` for CSV export (raw CSV body, not JSON envelope).
+      security:
+        - cookieSession: []
+      parameters:
+        - name: from
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+        - name: to
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+        - name: agrupar
+          in: query
+          schema:
+            type: string
+            enum: [dia, semana, mes]
+            default: dia
+      responses:
+        '200':
+          description: Sales rows or CSV export
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReporteVentasListEnvelope'
+            text/csv:
+              schema:
+                type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/reportes/stock-critico:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [reportes]
+      summary: Critical stock (stock at or below minimum)
+      description: |
+        Active articles with `stock <= minimo`. `deficit = minimo - stock`.
+        Requires permission `reports.operational.read`.
+        Send `Accept: text/csv` for CSV export.
+      security:
+        - cookieSession: []
+      responses:
+        '200':
+          description: Critical stock rows or CSV export
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockCriticoListEnvelope'
+            text/csv:
+              schema:
+                type: string
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/reportes/cobranzas:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [reportes]
+      summary: Collections by period
+      description: |
+        Customer payments grouped by calendar day with breakdown by payment method.
+        Requires permission `reports.financial.read`.
+        Send `Accept: text/csv` for CSV export.
+      security:
+        - cookieSession: []
+      parameters:
+        - name: from
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+        - name: to
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Collections rows or CSV export
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReporteCobranzasListEnvelope'
+            text/csv:
+              schema:
+                type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
   /api/dashboard/summary:
     get:
       tags: [dashboard]
@@ -2079,6 +2203,117 @@ components:
           const: true
         data:
           $ref: '#/components/schemas/AgingAr'
+
+    ReporteVentasRow:
+      type: object
+      required: [periodo, count, total, neto1, neto2, iva1, iva2]
+      properties:
+        periodo:
+          type: string
+          description: Bucket key (YYYY-MM-DD, YYYY-MM, or week Monday date)
+        count:
+          type: integer
+          minimum: 0
+        total:
+          type: string
+        neto1:
+          type: string
+        neto2:
+          type: string
+        iva1:
+          type: string
+        iva2:
+          type: string
+
+    ReporteVentasListEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReporteVentasRow'
+
+    StockCriticoArticulo:
+      type: object
+      required: [id, codigo, descripcion]
+      properties:
+        id:
+          type: integer
+        codigo:
+          type: integer
+        descripcion:
+          type: string
+
+    StockCriticoRow:
+      type: object
+      required: [articulo, stock, minimo, deficit]
+      properties:
+        articulo:
+          $ref: '#/components/schemas/StockCriticoArticulo'
+        stock:
+          type: integer
+        minimo:
+          type: integer
+        deficit:
+          type: integer
+          minimum: 0
+
+    StockCriticoListEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/StockCriticoRow'
+
+    CobranzasPorFormaPago:
+      type: object
+      required: [descripcion, total]
+      properties:
+        formaPagoId:
+          type: integer
+          nullable: true
+        descripcion:
+          type: string
+        total:
+          type: string
+
+    ReporteCobranzasRow:
+      type: object
+      required: [fecha, count, total, porFormaPago]
+      properties:
+        fecha:
+          type: string
+          description: Calendar day YYYY-MM-DD (server local)
+        count:
+          type: integer
+          minimum: 0
+        total:
+          type: string
+        porFormaPago:
+          type: array
+          items:
+            $ref: '#/components/schemas/CobranzasPorFormaPago'
+
+    ReporteCobranzasListEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReporteCobranzasRow'
 
     CuentaCorrienteLine:
       type: object

@@ -7241,6 +7241,501 @@ Chronological list of opening balance (if non-zero), active invoices (debit), an
 }
 ```
 
+### PARAMETERS /api/reportes/ventas
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/reportes/ventas`
+
+### Sales by period
+
+- **Method:** `GET`
+- **Path:** `/api/reportes/ventas`
+- **Tags:** reportes
+
+Aggregates active invoices (`estado = A`) in the date range using server local calendar. Grouping `agrupar`: `dia` (YYYY-MM-DD), `semana` (Monday of week as YYYY-MM-DD), `mes` (YYYY-MM). Requires permission `reports.operational.read`. Send `Accept: text/csv` for CSV export (raw CSV body, not JSON envelope).
+
+#### Responses
+
+##### Status: 200 Sales rows or CSV export
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`count` (required)**
+
+    `integer`
+
+  - **`iva1` (required)**
+
+    `string`
+
+  - **`iva2` (required)**
+
+    `string`
+
+  - **`neto1` (required)**
+
+    `string`
+
+  - **`neto2` (required)**
+
+    `string`
+
+  - **`periodo` (required)**
+
+    `string` — Bucket key (YYYY-MM-DD, YYYY-MM, or week Monday date)
+
+  - **`total` (required)**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "periodo": "",
+      "count": 0,
+      "total": "",
+      "neto1": "",
+      "neto2": "",
+      "iva1": "",
+      "iva2": ""
+    }
+  ]
+}
+```
+
+###### Content-Type: text/csv
+
+`string`
+
+**Example:**
+
+```json
+true
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/reportes/stock-critico
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/reportes/stock-critico`
+
+### Critical stock (stock at or below minimum)
+
+- **Method:** `GET`
+- **Path:** `/api/reportes/stock-critico`
+- **Tags:** reportes
+
+Active articles with `stock <= minimo`. `deficit = minimo - stock`. Requires permission `reports.operational.read`. Send `Accept: text/csv` for CSV export.
+
+#### Responses
+
+##### Status: 200 Critical stock rows or CSV export
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`articulo` (required)**
+
+    `object`
+
+    - **`codigo` (required)**
+
+      `integer`
+
+    - **`descripcion` (required)**
+
+      `string`
+
+    - **`id` (required)**
+
+      `integer`
+
+  - **`deficit` (required)**
+
+    `integer`
+
+  - **`minimo` (required)**
+
+    `integer`
+
+  - **`stock` (required)**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "articulo": {
+        "id": 1,
+        "codigo": 1,
+        "descripcion": ""
+      },
+      "stock": 1,
+      "minimo": 1,
+      "deficit": 0
+    }
+  ]
+}
+```
+
+###### Content-Type: text/csv
+
+`string`
+
+**Example:**
+
+```json
+true
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/reportes/cobranzas
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/reportes/cobranzas`
+
+### Collections by period
+
+- **Method:** `GET`
+- **Path:** `/api/reportes/cobranzas`
+- **Tags:** reportes
+
+Customer payments grouped by calendar day with breakdown by payment method. Requires permission `reports.financial.read`. Send `Accept: text/csv` for CSV export.
+
+#### Responses
+
+##### Status: 200 Collections rows or CSV export
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`count` (required)**
+
+    `integer`
+
+  - **`fecha` (required)**
+
+    `string` — Calendar day YYYY-MM-DD (server local)
+
+  - **`porFormaPago` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`descripcion` (required)**
+
+      `string`
+
+    - **`total` (required)**
+
+      `string`
+
+    - **`formaPagoId`**
+
+      `integer`
+
+  - **`total` (required)**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "fecha": "",
+      "count": 0,
+      "total": "",
+      "porFormaPago": [
+        {
+          "formaPagoId": 1,
+          "descripcion": "",
+          "total": ""
+        }
+      ]
+    }
+  ]
+}
+```
+
+###### Content-Type: text/csv
+
+`string`
+
+**Example:**
+
+```json
+true
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ### Dashboard operational summary
 
 - **Method:** `GET`
@@ -10401,6 +10896,391 @@ Returns boolean flags for each channel. No sensitive values are exposed.
       "clientesSuspendidos": 0
     }
   }
+}
+```
+
+### ReporteVentasRow
+
+- **Type:**`object`
+
+* **`count` (required)**
+
+  `integer`
+
+* **`iva1` (required)**
+
+  `string`
+
+* **`iva2` (required)**
+
+  `string`
+
+* **`neto1` (required)**
+
+  `string`
+
+* **`neto2` (required)**
+
+  `string`
+
+* **`periodo` (required)**
+
+  `string` — Bucket key (YYYY-MM-DD, YYYY-MM, or week Monday date)
+
+* **`total` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "periodo": "",
+  "count": 0,
+  "total": "",
+  "neto1": "",
+  "neto2": "",
+  "iva1": "",
+  "iva2": ""
+}
+```
+
+### ReporteVentasListEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`count` (required)**
+
+    `integer`
+
+  - **`iva1` (required)**
+
+    `string`
+
+  - **`iva2` (required)**
+
+    `string`
+
+  - **`neto1` (required)**
+
+    `string`
+
+  - **`neto2` (required)**
+
+    `string`
+
+  - **`periodo` (required)**
+
+    `string` — Bucket key (YYYY-MM-DD, YYYY-MM, or week Monday date)
+
+  - **`total` (required)**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "periodo": "",
+      "count": 0,
+      "total": "",
+      "neto1": "",
+      "neto2": "",
+      "iva1": "",
+      "iva2": ""
+    }
+  ]
+}
+```
+
+### StockCriticoArticulo
+
+- **Type:**`object`
+
+* **`codigo` (required)**
+
+  `integer`
+
+* **`descripcion` (required)**
+
+  `string`
+
+* **`id` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "codigo": 1,
+  "descripcion": ""
+}
+```
+
+### StockCriticoRow
+
+- **Type:**`object`
+
+* **`articulo` (required)**
+
+  `object`
+
+  - **`codigo` (required)**
+
+    `integer`
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`id` (required)**
+
+    `integer`
+
+* **`deficit` (required)**
+
+  `integer`
+
+* **`minimo` (required)**
+
+  `integer`
+
+* **`stock` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "articulo": {
+    "id": 1,
+    "codigo": 1,
+    "descripcion": ""
+  },
+  "stock": 1,
+  "minimo": 1,
+  "deficit": 0
+}
+```
+
+### StockCriticoListEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`articulo` (required)**
+
+    `object`
+
+    - **`codigo` (required)**
+
+      `integer`
+
+    - **`descripcion` (required)**
+
+      `string`
+
+    - **`id` (required)**
+
+      `integer`
+
+  - **`deficit` (required)**
+
+    `integer`
+
+  - **`minimo` (required)**
+
+    `integer`
+
+  - **`stock` (required)**
+
+    `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "articulo": {
+        "id": 1,
+        "codigo": 1,
+        "descripcion": ""
+      },
+      "stock": 1,
+      "minimo": 1,
+      "deficit": 0
+    }
+  ]
+}
+```
+
+### CobranzasPorFormaPago
+
+- **Type:**`object`
+
+* **`descripcion` (required)**
+
+  `string`
+
+* **`total` (required)**
+
+  `string`
+
+* **`formaPagoId`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "formaPagoId": 1,
+  "descripcion": "",
+  "total": ""
+}
+```
+
+### ReporteCobranzasRow
+
+- **Type:**`object`
+
+* **`count` (required)**
+
+  `integer`
+
+* **`fecha` (required)**
+
+  `string` — Calendar day YYYY-MM-DD (server local)
+
+* **`porFormaPago` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`total` (required)**
+
+    `string`
+
+  - **`formaPagoId`**
+
+    `integer`
+
+* **`total` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "fecha": "",
+  "count": 0,
+  "total": "",
+  "porFormaPago": [
+    {
+      "formaPagoId": 1,
+      "descripcion": "",
+      "total": ""
+    }
+  ]
+}
+```
+
+### ReporteCobranzasListEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`count` (required)**
+
+    `integer`
+
+  - **`fecha` (required)**
+
+    `string` — Calendar day YYYY-MM-DD (server local)
+
+  - **`porFormaPago` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`descripcion` (required)**
+
+      `string`
+
+    - **`total` (required)**
+
+      `string`
+
+    - **`formaPagoId`**
+
+      `integer`
+
+  - **`total` (required)**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "fecha": "",
+      "count": 0,
+      "total": "",
+      "porFormaPago": [
+        {
+          "formaPagoId": 1,
+          "descripcion": "",
+          "total": ""
+        }
+      ]
+    }
+  ]
 }
 ```
 

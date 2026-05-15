@@ -3,9 +3,9 @@
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
   "version": 1,
-  "serialNumber": "urn:uuid:2f19fe66-44e4-4b8a-a1f5-09e9b9f17158",
+  "serialNumber": "urn:uuid:d2346acd-c848-48ca-8230-8ca94bc48e5a",
   "metadata": {
-    "timestamp": "2026-05-15T13:17:04.241Z",
+    "timestamp": "2026-05-15T13:50:48.938Z",
     "tools": {
       "components": [
         {
