@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "buckets": {
+      "items": {
+        "$ref": "./AgingBucket.schema.json"
+      },
+      "type": "array"
+    },
+    "resumen": {
+      "$ref": "./AgingArResumen.schema.json"
+    },
+    "totalDeuda": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "buckets",
+    "totalDeuda",
+    "resumen"
+  ],
+  "title": "AgingAr",
+  "type": "object"
+}

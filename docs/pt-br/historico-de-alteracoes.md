@@ -14,6 +14,8 @@ Versionamento: [Semantic Versioning](https://semver.org/).
 
 ### Adicionado
 
+- **Finanças (GitHub #125):** Módulo real em `/finanzas` — `GET /api/reportes/aging` e `GET /api/reportes/cuenta-corriente/:clienteId` (aging por `creditDays`, extrato com saldo acumulado); `facturasVencidas` do dashboard com a mesma regra de vencimento; i18n EN/ES/PT-BR.
+
 - **Cobranças (GitHub #124):** Registro de pagamentos de clientes — modelo `Cobro`, API REST (`POST/GET /api/cobros`), UI `/cobros`, recebimentos recentes na ficha do cliente, widget `cobrosHoy` do dashboard com dados reais; i18n EN/ES/PT-BR.
 
 - **Backend (GitHub #79):** importação CSV usa os mesmos esquemas Zod `*BodySchema` que o corpo JSON do REST (`safeParseBodySchema` em [`server/schemas/domain.ts`](../../server/schemas/domain.ts)); restrições **CHECK** no PostgreSQL para `Articulo.stock`, `Articulo.minimo` e `Cliente.creditLimit` (migração `prisma/migrations/20260505130000_nonneg_entity_checks`); documentação em [padroes-codigo.md](padroes-codigo.md) e [`.cursor/rules/backend-standards.mdc`](../../.cursor/rules/backend-standards.mdc); manuais do usuário citam erros de importação com nome do campo.

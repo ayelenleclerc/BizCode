@@ -1,0 +1,44 @@
+{
+  "title": "Finanças",
+  "subtitle": "Contas a receber, aging e extrato",
+  "forbidden": "Você não tem permissão para ver relatórios financeiros.",
+  "summary": {
+    "totalDebt": "Dívida total",
+    "overdue": "Vencida",
+    "notDue": "A vencer",
+    "delinquencyPct": "% em atraso",
+    "suspendedClients": "Clientes suspensos"
+  },
+  "aging": {
+    "title": "Aging de contas a receber",
+    "bucket": "Faixa",
+    "count": "Faturas",
+    "total": "Valor",
+    "empty": "Não há faturas ativas para aging."
+  },
+  "clients": {
+    "title": "Consulta por cliente",
+    "clientId": "ID do cliente",
+    "clientIdPlaceholder": "Ex. 1",
+    "viewStatement": "Ver extrato",
+    "hint": "Informe o ID do cliente para ver movimentos e saldo."
+  },
+  "statement": {
+    "title": "Extrato de conta",
+    "balance": "Saldo atual",
+    "date": "Data",
+    "reference": "Referência",
+    "debit": "Débito",
+    "credit": "Crédito",
+    "balanceCol": "Saldo",
+    "typeFactura": "Fatura",
+    "typeCobro": "Recebimento",
+    "typeSaldoInicial": "Saldo inicial",
+    "empty": "Sem movimentos.",
+    "close": "Fechar"
+  },
+  "sort": {
+    "asc": "Ordem crescente",
+    "desc": "Ordem decrescente"
+  }
+}

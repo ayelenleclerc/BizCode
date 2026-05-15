@@ -1,0 +1,44 @@
+{
+  "title": "Finanzas",
+  "subtitle": "Cuentas por cobrar, aging y cuenta corriente",
+  "forbidden": "No tenés permiso para ver reportes financieros.",
+  "summary": {
+    "totalDebt": "Deuda total",
+    "overdue": "Deuda vencida",
+    "notDue": "Por vencer",
+    "delinquencyPct": "% en mora",
+    "suspendedClients": "Clientes suspendidos"
+  },
+  "aging": {
+    "title": "Aging de cuentas por cobrar",
+    "bucket": "Tramo",
+    "count": "Facturas",
+    "total": "Importe",
+    "empty": "No hay facturas activas para aging."
+  },
+  "clients": {
+    "title": "Consulta por cliente",
+    "clientId": "ID cliente",
+    "clientIdPlaceholder": "Ej. 1",
+    "viewStatement": "Ver cuenta corriente",
+    "hint": "Ingresá el ID del cliente para ver movimientos y saldo."
+  },
+  "statement": {
+    "title": "Cuenta corriente",
+    "balance": "Saldo actual",
+    "date": "Fecha",
+    "reference": "Referencia",
+    "debit": "Débito",
+    "credit": "Crédito",
+    "balanceCol": "Saldo",
+    "typeFactura": "Factura",
+    "typeCobro": "Cobro",
+    "typeSaldoInicial": "Saldo inicial",
+    "empty": "Sin movimientos.",
+    "close": "Cerrar"
+  },
+  "sort": {
+    "asc": "Orden ascendente",
+    "desc": "Orden descendente"
+  }
+}

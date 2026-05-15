@@ -1,0 +1,44 @@
+{
+  "title": "Finance",
+  "subtitle": "Accounts receivable, aging, and statements",
+  "forbidden": "You do not have permission to view financial reports.",
+  "summary": {
+    "totalDebt": "Total debt",
+    "overdue": "Overdue",
+    "notDue": "Not yet due",
+    "delinquencyPct": "Delinquency %",
+    "suspendedClients": "Suspended customers"
+  },
+  "aging": {
+    "title": "Accounts receivable aging",
+    "bucket": "Bucket",
+    "count": "Invoices",
+    "total": "Amount",
+    "empty": "No active invoices for aging."
+  },
+  "clients": {
+    "title": "Customer lookup",
+    "clientId": "Customer ID",
+    "clientIdPlaceholder": "e.g. 1",
+    "viewStatement": "View statement",
+    "hint": "Enter a customer ID to see movements and balance."
+  },
+  "statement": {
+    "title": "Account statement",
+    "balance": "Current balance",
+    "date": "Date",
+    "reference": "Reference",
+    "debit": "Debit",
+    "credit": "Credit",
+    "balanceCol": "Balance",
+    "typeFactura": "Invoice",
+    "typeCobro": "Payment",
+    "typeSaldoInicial": "Opening balance",
+    "empty": "No movements.",
+    "close": "Close"
+  },
+  "sort": {
+    "asc": "Sort ascending",
+    "desc": "Sort descending"
+  }
+}

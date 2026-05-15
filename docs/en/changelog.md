@@ -14,6 +14,8 @@ Versioning: [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **Finance (GitHub #125):** Real `/finanzas` module — `GET /api/reportes/aging` and `GET /api/reportes/cuenta-corriente/:clienteId` (AR aging by `creditDays`, account statement with running balance); dashboard `facturasVencidas` uses the same due-date rule; i18n EN/ES/PT-BR.
+
 - **Collections (GitHub #124):** Customer payment registration — `Cobro` model, REST API (`POST/GET /api/cobros`), `/cobros` UI, recent payments on the customer form, dashboard `cobrosHoy` widget wired to real data; i18n EN/ES/PT-BR.
 
 - **Backend (GitHub #79):** CSV bulk import uses the same Zod `*BodySchema` instances as REST JSON bodies (`safeParseBodySchema` in [`server/schemas/domain.ts`](../../server/schemas/domain.ts)); PostgreSQL **CHECK** constraints on `Articulo.stock`, `Articulo.minimo`, and `Cliente.creditLimit` (migration `prisma/migrations/20260505130000_nonneg_entity_checks`); developer docs in [coding-standards.md](coding-standards.md) (EN/ES/PT-BR per [DOCUMENT_LOCALE_MAP.md](../DOCUMENT_LOCALE_MAP.md)) and [`.cursor/rules/backend-standards.mdc`](../../.cursor/rules/backend-standards.mdc); user manuals note field-level import errors.
