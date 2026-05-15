@@ -471,6 +471,64 @@ export const cobrosAPI = {
   },
 }
 
+// ============ REPORTES ============
+
+export type AgingBucket = {
+  label: '0-30d' | '31-60d' | '61-90d' | '>90d'
+  count: number
+  total: string
+}
+
+export type AgingArData = {
+  buckets: AgingBucket[]
+  totalDeuda: string
+  resumen: {
+    deudaVencida: string
+    deudaPorVencer: string
+    porcentajeMora: string
+    clientesSuspendidos: number
+  }
+}
+
+export type CuentaCorrienteLine = {
+  tipo: 'factura' | 'cobro' | 'saldo_inicial'
+  fecha: string
+  referencia: string
+  debito: string
+  credito: string
+  saldo: string
+  facturaId?: number
+  cobroId?: number
+}
+
+export type CuentaCorrienteData = {
+  clienteId: number
+  codigo: number
+  rsocial: string
+  balanceActual: string
+  lineas: CuentaCorrienteLine[]
+}
+
+export const reportesAPI = {
+  aging: async () => {
+    try {
+      const response = await api.get('/reportes/aging')
+      return response.data.data as AgingArData
+    } catch (error) {
+      handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  cuentaCorriente: async (clienteId: number) => {
+    try {
+      const response = await api.get(`/reportes/cuenta-corriente/${clienteId}`)
+      return response.data.data as CuentaCorrienteData
+    } catch (error) {
+      handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+}
+
 // ============ FACTURAS ============
 
 export const facturasAPI = {

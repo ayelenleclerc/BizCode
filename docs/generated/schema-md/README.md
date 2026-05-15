@@ -2,6 +2,14 @@
 
 ## Top-level Schemas
 
+* [AgingAr](./agingar.md) – `-`
+
+* [AgingArEnvelope](./agingarenvelope.md) – `-`
+
+* [AgingArResumen](./agingarresumen.md) – `-`
+
+* [AgingBucket](./agingbucket.md) – `-`
+
 * [ApiErrorEnvelope](./apierrorenvelope.md) – `-`
 
 * [AppUser](./appuser.md) – `-`
@@ -71,6 +79,12 @@
 * [CobroInput](./cobroinput.md) – `-`
 
 * [CobroListEnvelope](./cobrolistenvelope.md) – `-`
+
+* [CuentaCorriente](./cuentacorriente.md) – `-`
+
+* [CuentaCorrienteEnvelope](./cuentacorrienteenvelope.md) – `-`
+
+* [CuentaCorrienteLine](./cuentacorrienteline.md) – `-`
 
 * [DashboardSummary](./dashboardsummary.md) – `-`
 
@@ -190,6 +204,8 @@
 
 ### Arrays
 
+* [Untitled array in AgingAr](./agingar-properties-buckets.md) – `undefined#/properties/buckets`
+
 * [Untitled array in AppUser](./appuser-properties-scopebranchids.md) – `undefined#/properties/scopeBranchIds`
 
 * [Untitled array in AppUser](./appuser-properties-scopechannels.md) – `undefined#/properties/scopeChannels`
@@ -239,6 +255,8 @@
 * [Untitled array in ClienteListEnvelope](./clientelistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
 
 * [Untitled array in CobroListEnvelope](./cobrolistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
+
+* [Untitled array in CuentaCorriente](./cuentacorriente-properties-lineas.md) – `undefined#/properties/lineas`
 
 * [Untitled array in DeliveryZoneListEnvelope](./deliveryzonelistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
 

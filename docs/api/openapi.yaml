@@ -40,6 +40,8 @@ tags:
     description: User management (requires users.manage permission)
   - name: chat
     description: Internal chat conversations and messages
+  - name: reportes
+    description: Financial and operational reports
   - name: dashboard
     description: Operational dashboard summary
   - name: notifications
@@ -1107,6 +1109,73 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
 
+  /api/reportes/aging:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [reportes]
+      summary: Accounts receivable aging report
+      description: |
+        Groups active invoices (`estado = A`) into aging buckets using each customer's `creditDays`.
+        Due date = invoice `fecha` + `creditDays`; days past due drive the bucket assignment.
+        Each invoice contributes its full `total` to exactly one bucket (no payment allocation per invoice).
+        Requires permission `reports.financial.read`.
+      security:
+        - cookieSession: []
+      responses:
+        '200':
+          description: AR aging buckets and executive summary
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AgingArEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/reportes/cuenta-corriente/{clienteId}:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [reportes]
+      summary: Customer account statement (running balance)
+      description: |
+        Chronological list of opening balance (if non-zero), active invoices (debit), and payments (credit)
+        with a running `saldo`. Requires permission `reports.financial.read`.
+      security:
+        - cookieSession: []
+      parameters:
+        - name: clienteId
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '200':
+          description: Account statement lines
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CuentaCorrienteEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Customer not found for tenant
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
   /api/dashboard/summary:
     get:
       tags: [dashboard]
@@ -1959,6 +2028,107 @@ components:
           const: true
         data:
           $ref: '#/components/schemas/Cobro'
+
+    AgingBucket:
+      type: object
+      required: [label, count, total]
+      properties:
+        label:
+          type: string
+          enum: ['0-30d', '31-60d', '61-90d', '>90d']
+        count:
+          type: integer
+          minimum: 0
+        total:
+          type: string
+          description: Decimal amount as string (two fractional digits)
+
+    AgingArResumen:
+      type: object
+      required: [deudaVencida, deudaPorVencer, porcentajeMora, clientesSuspendidos]
+      properties:
+        deudaVencida:
+          type: string
+        deudaPorVencer:
+          type: string
+        porcentajeMora:
+          type: string
+        clientesSuspendidos:
+          type: integer
+          minimum: 0
+
+    AgingAr:
+      type: object
+      required: [buckets, totalDeuda, resumen]
+      properties:
+        buckets:
+          type: array
+          items:
+            $ref: '#/components/schemas/AgingBucket'
+        totalDeuda:
+          type: string
+        resumen:
+          $ref: '#/components/schemas/AgingArResumen'
+
+    AgingArEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/AgingAr'
+
+    CuentaCorrienteLine:
+      type: object
+      required: [tipo, fecha, referencia, debito, credito, saldo]
+      properties:
+        tipo:
+          type: string
+          enum: [factura, cobro, saldo_inicial]
+        fecha:
+          type: string
+          description: ISO-8601 timestamp (empty for saldo_inicial)
+        referencia:
+          type: string
+        debito:
+          type: string
+        credito:
+          type: string
+        saldo:
+          type: string
+        facturaId:
+          type: integer
+        cobroId:
+          type: integer
+
+    CuentaCorriente:
+      type: object
+      required: [clienteId, codigo, rsocial, balanceActual, lineas]
+      properties:
+        clienteId:
+          type: integer
+        codigo:
+          type: integer
+        rsocial:
+          type: string
+        balanceActual:
+          type: string
+        lineas:
+          type: array
+          items:
+            $ref: '#/components/schemas/CuentaCorrienteLine'
+
+    CuentaCorrienteEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/CuentaCorriente'
 
     Articulo:
       type: object

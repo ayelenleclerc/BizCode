@@ -6873,6 +6873,374 @@ Allows the authenticated user to change their password by supplying the current 
 }
 ```
 
+### PARAMETERS /api/reportes/aging
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/reportes/aging`
+
+### Accounts receivable aging report
+
+- **Method:** `GET`
+- **Path:** `/api/reportes/aging`
+- **Tags:** reportes
+
+Groups active invoices (`estado = A`) into aging buckets using each customer's `creditDays`. Due date = invoice `fecha` + `creditDays`; days past due drive the bucket assignment. Each invoice contributes its full `total` to exactly one bucket (no payment allocation per invoice). Requires permission `reports.financial.read`.
+
+#### Responses
+
+##### Status: 200 AR aging buckets and executive summary
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`buckets` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`count` (required)**
+
+      `integer`
+
+    - **`label` (required)**
+
+      `string`, possible values: `"0-30d", "31-60d", "61-90d", ">90d"`
+
+    - **`total` (required)**
+
+      `string` — Decimal amount as string (two fractional digits)
+
+  - **`resumen` (required)**
+
+    `object`
+
+    - **`clientesSuspendidos` (required)**
+
+      `integer`
+
+    - **`deudaPorVencer` (required)**
+
+      `string`
+
+    - **`deudaVencida` (required)**
+
+      `string`
+
+    - **`porcentajeMora` (required)**
+
+      `string`
+
+  - **`totalDeuda` (required)**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "buckets": [
+      {
+        "label": "0-30d",
+        "count": 0,
+        "total": ""
+      }
+    ],
+    "totalDeuda": "",
+    "resumen": {
+      "deudaVencida": "",
+      "deudaPorVencer": "",
+      "porcentajeMora": "",
+      "clientesSuspendidos": 0
+    }
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/reportes/cuenta-corriente/{clienteId}
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/reportes/cuenta-corriente/{clienteId}`
+
+### Customer account statement (running balance)
+
+- **Method:** `GET`
+- **Path:** `/api/reportes/cuenta-corriente/{clienteId}`
+- **Tags:** reportes
+
+Chronological list of opening balance (if non-zero), active invoices (debit), and payments (credit) with a running `saldo`. Requires permission `reports.financial.read`.
+
+#### Responses
+
+##### Status: 200 Account statement lines
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`balanceActual` (required)**
+
+    `string`
+
+  - **`clienteId` (required)**
+
+    `integer`
+
+  - **`codigo` (required)**
+
+    `integer`
+
+  - **`lineas` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`credito` (required)**
+
+      `string`
+
+    - **`debito` (required)**
+
+      `string`
+
+    - **`fecha` (required)**
+
+      `string` — ISO-8601 timestamp (empty for saldo\_inicial)
+
+    - **`referencia` (required)**
+
+      `string`
+
+    - **`saldo` (required)**
+
+      `string`
+
+    - **`tipo` (required)**
+
+      `string`, possible values: `"factura", "cobro", "saldo_inicial"`
+
+    - **`cobroId`**
+
+      `integer`
+
+    - **`facturaId`**
+
+      `integer`
+
+  - **`rsocial` (required)**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "clienteId": 1,
+    "codigo": 1,
+    "rsocial": "",
+    "balanceActual": "",
+    "lineas": [
+      {
+        "tipo": "factura",
+        "fecha": "",
+        "referencia": "",
+        "debito": "",
+        "credito": "",
+        "saldo": "",
+        "facturaId": 1,
+        "cobroId": 1
+      }
+    ]
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Customer not found for tenant
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ### Dashboard operational summary
 
 - **Method:** `GET`
@@ -9830,6 +10198,432 @@ Returns boolean flags for each channel. No sensitive values are exposed.
       "additionalProperty": "anything"
     },
     "additionalProperty": "anything"
+  }
+}
+```
+
+### AgingBucket
+
+- **Type:**`object`
+
+* **`count` (required)**
+
+  `integer`
+
+* **`label` (required)**
+
+  `string`, possible values: `"0-30d", "31-60d", "61-90d", ">90d"`
+
+* **`total` (required)**
+
+  `string` — Decimal amount as string (two fractional digits)
+
+**Example:**
+
+```json
+{
+  "label": "0-30d",
+  "count": 0,
+  "total": ""
+}
+```
+
+### AgingArResumen
+
+- **Type:**`object`
+
+* **`clientesSuspendidos` (required)**
+
+  `integer`
+
+* **`deudaPorVencer` (required)**
+
+  `string`
+
+* **`deudaVencida` (required)**
+
+  `string`
+
+* **`porcentajeMora` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "deudaVencida": "",
+  "deudaPorVencer": "",
+  "porcentajeMora": "",
+  "clientesSuspendidos": 0
+}
+```
+
+### AgingAr
+
+- **Type:**`object`
+
+* **`buckets` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`count` (required)**
+
+    `integer`
+
+  - **`label` (required)**
+
+    `string`, possible values: `"0-30d", "31-60d", "61-90d", ">90d"`
+
+  - **`total` (required)**
+
+    `string` — Decimal amount as string (two fractional digits)
+
+* **`resumen` (required)**
+
+  `object`
+
+  - **`clientesSuspendidos` (required)**
+
+    `integer`
+
+  - **`deudaPorVencer` (required)**
+
+    `string`
+
+  - **`deudaVencida` (required)**
+
+    `string`
+
+  - **`porcentajeMora` (required)**
+
+    `string`
+
+* **`totalDeuda` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "buckets": [
+    {
+      "label": "0-30d",
+      "count": 0,
+      "total": ""
+    }
+  ],
+  "totalDeuda": "",
+  "resumen": {
+    "deudaVencida": "",
+    "deudaPorVencer": "",
+    "porcentajeMora": "",
+    "clientesSuspendidos": 0
+  }
+}
+```
+
+### AgingArEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`buckets` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`count` (required)**
+
+      `integer`
+
+    - **`label` (required)**
+
+      `string`, possible values: `"0-30d", "31-60d", "61-90d", ">90d"`
+
+    - **`total` (required)**
+
+      `string` — Decimal amount as string (two fractional digits)
+
+  - **`resumen` (required)**
+
+    `object`
+
+    - **`clientesSuspendidos` (required)**
+
+      `integer`
+
+    - **`deudaPorVencer` (required)**
+
+      `string`
+
+    - **`deudaVencida` (required)**
+
+      `string`
+
+    - **`porcentajeMora` (required)**
+
+      `string`
+
+  - **`totalDeuda` (required)**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "buckets": [
+      {
+        "label": "0-30d",
+        "count": 0,
+        "total": ""
+      }
+    ],
+    "totalDeuda": "",
+    "resumen": {
+      "deudaVencida": "",
+      "deudaPorVencer": "",
+      "porcentajeMora": "",
+      "clientesSuspendidos": 0
+    }
+  }
+}
+```
+
+### CuentaCorrienteLine
+
+- **Type:**`object`
+
+* **`credito` (required)**
+
+  `string`
+
+* **`debito` (required)**
+
+  `string`
+
+* **`fecha` (required)**
+
+  `string` — ISO-8601 timestamp (empty for saldo\_inicial)
+
+* **`referencia` (required)**
+
+  `string`
+
+* **`saldo` (required)**
+
+  `string`
+
+* **`tipo` (required)**
+
+  `string`, possible values: `"factura", "cobro", "saldo_inicial"`
+
+* **`cobroId`**
+
+  `integer`
+
+* **`facturaId`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "tipo": "factura",
+  "fecha": "",
+  "referencia": "",
+  "debito": "",
+  "credito": "",
+  "saldo": "",
+  "facturaId": 1,
+  "cobroId": 1
+}
+```
+
+### CuentaCorriente
+
+- **Type:**`object`
+
+* **`balanceActual` (required)**
+
+  `string`
+
+* **`clienteId` (required)**
+
+  `integer`
+
+* **`codigo` (required)**
+
+  `integer`
+
+* **`lineas` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`credito` (required)**
+
+    `string`
+
+  - **`debito` (required)**
+
+    `string`
+
+  - **`fecha` (required)**
+
+    `string` — ISO-8601 timestamp (empty for saldo\_inicial)
+
+  - **`referencia` (required)**
+
+    `string`
+
+  - **`saldo` (required)**
+
+    `string`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura", "cobro", "saldo_inicial"`
+
+  - **`cobroId`**
+
+    `integer`
+
+  - **`facturaId`**
+
+    `integer`
+
+* **`rsocial` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "clienteId": 1,
+  "codigo": 1,
+  "rsocial": "",
+  "balanceActual": "",
+  "lineas": [
+    {
+      "tipo": "factura",
+      "fecha": "",
+      "referencia": "",
+      "debito": "",
+      "credito": "",
+      "saldo": "",
+      "facturaId": 1,
+      "cobroId": 1
+    }
+  ]
+}
+```
+
+### CuentaCorrienteEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`balanceActual` (required)**
+
+    `string`
+
+  - **`clienteId` (required)**
+
+    `integer`
+
+  - **`codigo` (required)**
+
+    `integer`
+
+  - **`lineas` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`credito` (required)**
+
+      `string`
+
+    - **`debito` (required)**
+
+      `string`
+
+    - **`fecha` (required)**
+
+      `string` — ISO-8601 timestamp (empty for saldo\_inicial)
+
+    - **`referencia` (required)**
+
+      `string`
+
+    - **`saldo` (required)**
+
+      `string`
+
+    - **`tipo` (required)**
+
+      `string`, possible values: `"factura", "cobro", "saldo_inicial"`
+
+    - **`cobroId`**
+
+      `integer`
+
+    - **`facturaId`**
+
+      `integer`
+
+  - **`rsocial` (required)**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "clienteId": 1,
+    "codigo": 1,
+    "rsocial": "",
+    "balanceActual": "",
+    "lineas": [
+      {
+        "tipo": "factura",
+        "fecha": "",
+        "referencia": "",
+        "debito": "",
+        "credito": "",
+        "saldo": "",
+        "facturaId": 1,
+        "cobroId": 1
+      }
+    ]
   }
 }
 ```

@@ -1,6 +1,7 @@
 import type { Application, Request, Response } from 'express'
 import type { PrismaClient } from '@prisma/client'
 import { type AuthenticatedRequest } from './auth'
+import { computeDaysPastDue } from './services/ReportesFinancierosService'
 
 /**
  * @en Dashboard summary shape returned by GET /api/dashboard/summary.
@@ -10,10 +11,7 @@ import { type AuthenticatedRequest } from './auth'
 export type DashboardSummary = {
   /** Invoices issued today (estado = "A"). */
   ventasHoy: { count: number; total: string }
-  /**
-   * Overdue invoices: active invoices whose fecha < (today – 30 days).
-   * Approximation until credit-term fields are available (Issue #31).
-   */
+  /** Active invoices past due per customer creditDays. */
   facturasVencidas: { count: number; total: string }
   /** Customer payments registered today. */
   cobrosHoy: { count: number; total: string }
@@ -45,24 +43,21 @@ export function registerDashboardRoutes(app: Application, prisma: PrismaClient):
       const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0)
       const todayEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999)
 
-      // 30-day threshold for overdue approximation (real credit-term calculation in Issue #31)
-      const thirtyDaysAgo = new Date(now)
-      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
-
       const tenantId = authReq.auth.claims.tenantId
 
-      const [ventasResult, vencidasResult, cobrosResult] = await Promise.all([
-        // Active invoices created today
+      const [ventasResult, openInvoices, cobrosResult] = await Promise.all([
         prisma.factura.aggregate({
           where: { tenantId, estado: 'A', fecha: { gte: todayStart, lte: todayEnd } },
           _count: { id: true },
           _sum: { total: true },
         }),
-        // Active invoices older than 30 days (overdue approximation)
-        prisma.factura.aggregate({
-          where: { tenantId, estado: 'A', fecha: { lt: thirtyDaysAgo } },
-          _count: { id: true },
-          _sum: { total: true },
+        prisma.factura.findMany({
+          where: { tenantId, estado: 'A' },
+          select: {
+            total: true,
+            fecha: true,
+            cliente: { select: { creditDays: true } },
+          },
         }),
         prisma.cobro.aggregate({
           where: { tenantId, fecha: { gte: todayStart, lte: todayEnd } },
@@ -71,14 +66,23 @@ export function registerDashboardRoutes(app: Application, prisma: PrismaClient):
         }),
       ])
 
+      let vencidasCount = 0
+      let vencidasTotal = 0
+      for (const inv of openInvoices) {
+        if (computeDaysPastDue(inv.fecha, inv.cliente.creditDays, now) > 0) {
+          vencidasCount += 1
+          vencidasTotal += inv.total.toNumber()
+        }
+      }
+
       const summary: DashboardSummary = {
         ventasHoy: {
           count: ventasResult._count.id,
           total: ventasResult._sum.total?.toString() ?? '0',
         },
         facturasVencidas: {
-          count: vencidasResult._count.id,
-          total: vencidasResult._sum.total?.toString() ?? '0',
+          count: vencidasCount,
+          total: vencidasTotal.toFixed(2),
         },
         cobrosHoy: {
           count: cobrosResult._count.id,

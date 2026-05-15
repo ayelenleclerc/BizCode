@@ -1,7 +1,8 @@
 /** Contrato HTTP vs docs/api/openapi.yaml (Ajv + spec dereferenciado). Entorno: node (vitest.config). */
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import request from 'supertest'
 import type { PrismaClient } from '@prisma/client'
+import { Decimal } from '@prisma/client/runtime/library'
 import { createApp } from '../../server/createApp'
 import { assertMatchesOpenApi } from './validate-openapi-response'
 
@@ -174,8 +175,12 @@ function buildPrisma(): PrismaClient {
     factura: {
       count: vi.fn().mockResolvedValue(0),
       findMany: vi.fn().mockResolvedValue([]),
+      findFirst: vi.fn().mockResolvedValue(null),
       create: facturaCreate,
       aggregate: vi.fn().mockResolvedValue({ _count: { id: 0 }, _sum: { total: null } }),
+    },
+    cobro: {
+      findMany: vi.fn().mockResolvedValue([]),
     },
     proveedor: {
       count: vi.fn().mockResolvedValue(1),
@@ -218,6 +223,11 @@ describe('API — contrato OpenAPI', () => {
 
   beforeEach(() => {
     prisma = buildPrisma()
+  })
+
+  afterEach(() => {
+    delete process.env.BIZCODE_TEST_ROLE
+    delete process.env.BIZCODE_TEST_AUTH_BYPASS
   })
 
   it('GET /api/health', async () => {
@@ -446,9 +456,37 @@ describe('API — contrato OpenAPI', () => {
     expect(res.body).toEqual({ success: false, error: 'fallo-plano' })
     await assertMatchesOpenApi('/api/clientes', 'get', '500', res.body)
   })
+
+  it('GET /api/reportes/aging', async () => {
+    process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
+    process.env.BIZCODE_TEST_ROLE = 'finance'
+    const app = createApp(prisma)
+    const res = await request(app).get('/api/reportes/aging').expect(200)
+    await assertMatchesOpenApi('/api/reportes/aging', 'get', '200', res.body)
+    expect(res.body.data.buckets).toHaveLength(4)
+  })
+
+  it('GET /api/reportes/cuenta-corriente/{clienteId}', async () => {
+    process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
+    process.env.BIZCODE_TEST_ROLE = 'finance'
+    const p = buildPrisma()
+    vi.mocked(p.cliente.findFirst).mockResolvedValueOnce({
+      ...clienteRow,
+      balance: new Decimal(0),
+      balanceInicial: new Decimal(0),
+    } as never)
+    const app = createApp(p)
+    const res = await request(app).get('/api/reportes/cuenta-corriente/1').expect(200)
+    await assertMatchesOpenApi('/api/reportes/cuenta-corriente/{clienteId}', 'get', '200', res.body)
+  })
 })
 
 describe('API — errores 500 (cobertura de ramas catch)', () => {
+  beforeEach(() => {
+    delete process.env.BIZCODE_TEST_ROLE
+    delete process.env.BIZCODE_TEST_AUTH_BYPASS
+  })
+
   const err = new Error('db')
 
   it('GET /api/clientes/:id', async () => {
