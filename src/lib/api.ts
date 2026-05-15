@@ -292,6 +292,48 @@ export const articulosAPI = {
       handleError(error as AxiosError<ApiErrorPayload>)
     }
   },
+
+  stockAjuste: async (id: number, body: { cantidad: number; motivo: string }) => {
+    try {
+      const response = await api.post<{ success: boolean; data: StockAdjustResult }>(
+        `/articulos/${id}/stock-ajuste`,
+        body,
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  stockHistorial: async (id: number, params?: { limit?: number; offset?: number }) => {
+    try {
+      const response = await api.get<{
+        success: boolean
+        data: StockAjusteHistorialRow[]
+        total: number
+        limit: number
+        offset: number
+      }>(`/articulos/${id}/stock-historial`, { params })
+      return response.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+}
+
+export type StockAjusteHistorialRow = {
+  id: number
+  cantidad: number
+  motivo: string
+  createdAt: string
+  user: { id: number; username: string }
+}
+
+export type StockAdjustResult = {
+  stockBefore: number
+  stockAfter: number
+  articulo: { id: number; codigo: number; descripcion: string; stock: number; minimo: number }
+  ajuste: StockAjusteHistorialRow
 }
 
 // ============ RUBROS ============

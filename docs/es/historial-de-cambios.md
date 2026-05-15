@@ -16,8 +16,9 @@ Versionado: [Semantic Versioning](https://semver.org/lang/es/).
 
 ### Agregado
 
-- **Documentación (sincronización ISO-ready):** paquete specs v0.2 (RF-011–RF-015); manuales de cobros, finanzas, reportes y logística (EN/ES/PT-BR); flujo operativo MVP; trazabilidad ISO y stubs REQ-007, TST-003, TST-005, ARC-004; post-proceso TypeDoc [`scripts/patch-typedoc-html-noopener.mjs`](../../scripts/patch-typedoc-html-noopener.mjs); [`DOCUMENT_LOCALE_MAP.md`](../DOCUMENT_LOCALE_MAP.md).
+- **Ajustes de stock (GitHub #128):** modelo `StockAjuste` y migración; `POST /api/articulos/:id/stock-ajuste` (`inventory.adjust`) y `GET /api/articulos/:id/stock-historial`; al crear factura se decrementa stock y se notifica `stock_below_minimum`; auditoría `stock_adjust`; i18n EN/ES/PT-BR.
 
+- **Documentación (sincronización ISO-ready):** paquete specs v0.2 (RF-011–RF-015); manuales de cobros, finanzas, reportes y logística (EN/ES/PT-BR); flujo operativo MVP; trazabilidad ISO y stubs REQ-007, TST-003, TST-005, ARC-004; post-proceso TypeDoc [`scripts/patch-typedoc-html-noopener.mjs`](../../scripts/patch-typedoc-html-noopener.mjs); [`DOCUMENT_LOCALE_MAP.md`](../DOCUMENT_LOCALE_MAP.md).
 - **Configuración de empresa (GitHub #127):** `ParamEmpresa` por tenant con `GET/PUT /api/empresa`; `puntoVenta` define `prefijoFactura` de 4 dígitos; UI en `/configuracion/empresa` (edición con `settings.business.manage`); formulario de nueva factura precarga prefijo y tipo por defecto; i18n EN/ES/PT-BR.
 - **Score de pago (GitHub #130):** Recálculo automático de `Cliente.score` en `POST /api/cobros` según días de mora vs factura activa más antigua (+5 / −3 / −7 / −15); sin cambio sin factura activa; `metadata` de auditoría con `scoreBefore`, `scoreAfter`, `delta`; respuesta incluye `updatedCliente`; tooltip en ficha de cliente; i18n EN/ES/PT-BR.
 - **Órdenes de entrega (GitHub #126):** modelo `OrdenEntrega` y migración; API `GET/POST/PUT /api/ordenes-entrega` con RBAC; listado restringido para repartidor; auditoría en cambios de estado (`entrega_confirmed`); UI `/logistica` planner y repartidor; i18n EN/ES/PT-BR.

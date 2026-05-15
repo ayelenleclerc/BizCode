@@ -120,7 +120,8 @@ model Articulo {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  facturaItems FacturaItem[]
+  facturaItems  FacturaItem[]
+  stockAjustes  StockAjuste[]
 
   @@unique([tenantId, codigo])
   @@index([tenantId])
@@ -256,6 +257,7 @@ model Tenant {
   cobros         Cobro[]
   ordenesEntrega OrdenEntrega[]
   paramEmpresa   ParamEmpresa?
+  stockAjustes   StockAjuste[]
 }
 
 model OrdenEntrega {
@@ -303,8 +305,25 @@ model AppUser {
   chatMessagesSent     ChatMessage[] @relation("ChatMessageSender")
   chatMessagesReceived ChatMessage[] @relation("ChatMessageRecipient")
   ordenesEntregaDriver OrdenEntrega[] @relation("OrdenEntregaDriver")
+  stockAjustes         StockAjuste[]
 
   @@unique([tenantId, username])
+}
+
+model StockAjuste {
+  id         Int      @id @default(autoincrement())
+  tenantId   Int
+  tenant     Tenant   @relation(fields: [tenantId], references: [id])
+  articuloId Int
+  articulo   Articulo @relation(fields: [articuloId], references: [id])
+  cantidad   Int
+  motivo     String   @db.VarChar(100)
+  userId     Int
+  user       AppUser  @relation(fields: [userId], references: [id])
+  createdAt  DateTime @default(now())
+
+  @@index([tenantId, articuloId])
+  @@index([tenantId, articuloId, createdAt])
 }
 
 model AppSession {

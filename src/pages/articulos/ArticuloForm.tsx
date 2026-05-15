@@ -1,10 +1,13 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback, type FormEvent } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useHotkeys } from 'react-hotkeys-hook'
 import { useTranslation } from 'react-i18next'
-import { articulosAPI } from '@/lib/api'
+import { ApiRequestFailedError, articulosAPI, type StockAjusteHistorialRow } from '@/lib/api'
+import { hasPermission } from '@/lib/rbac'
+import { CanAccess } from '@/components/CanAccess'
+import { useAuth } from '@/contexts/AuthContext'
 import { Articulo, Rubro } from '@/types'
 
 const articuloSchema = z.object({
@@ -36,11 +39,32 @@ interface ArticuloFormProps {
   onGuardado: (articulo: Articulo) => void
 }
 
+function canViewStockHistorial(role: string): boolean {
+  return (
+    hasPermission(role as Parameters<typeof hasPermission>[0], 'inventory.adjust') ||
+    role === 'owner' ||
+    role === 'manager' ||
+    role === 'warehouse_lead'
+  )
+}
+
 export default function ArticuloForm({ articulo, rubros, onClose, onGuardado }: ArticuloFormProps) {
   const { t } = useTranslation('articulos')
   const { t: tc } = useTranslation('common')
+  const { claims } = useAuth()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [stockDisplay, setStockDisplay] = useState(articulo?.stock ?? 0)
+  const [showAdjust, setShowAdjust] = useState(false)
+  const [adjustCantidad, setAdjustCantidad] = useState('')
+  const [adjustMotivo, setAdjustMotivo] = useState('')
+  const [adjustLoading, setAdjustLoading] = useState(false)
+  const [adjustError, setAdjustError] = useState<string | null>(null)
+  const [historial, setHistorial] = useState<StockAjusteHistorialRow[]>([])
+  const [historialTotal, setHistorialTotal] = useState(0)
+  const [historialLoading, setHistorialLoading] = useState(false)
+
+  const showHistorial = Boolean(articulo && claims && canViewStockHistorial(claims.role))
 
   const {
     register,
@@ -73,8 +97,29 @@ export default function ArticuloForm({ articulo, rubros, onClose, onGuardado }: 
       setValue('stock', articulo.stock)
       setValue('minimo', articulo.minimo)
       setValue('activo', articulo.activo)
+      setStockDisplay(articulo.stock)
     }
   }, [articulo, setValue])
+
+  const loadHistorial = useCallback(async () => {
+    if (!articulo) return
+    setHistorialLoading(true)
+    try {
+      const page = await articulosAPI.stockHistorial(articulo.id, { limit: 20, offset: 0 })
+      if (page) {
+        setHistorial(page.data)
+        setHistorialTotal(page.total)
+      }
+    } finally {
+      setHistorialLoading(false)
+    }
+  }, [articulo])
+
+  useEffect(() => {
+    if (showHistorial) {
+      void loadHistorial()
+    }
+  }, [showHistorial, loadHistorial])
 
   useHotkeys('f5', () => {
     const form = document.querySelector('form') as HTMLFormElement
@@ -90,7 +135,9 @@ export default function ArticuloForm({ articulo, rubros, onClose, onGuardado }: 
     try {
       let result: Articulo
       if (articulo) {
-        result = await articulosAPI.update(articulo.id, data)
+        const { stock: _omitStock, ...payload } = data
+        void _omitStock
+        result = await articulosAPI.update(articulo.id, payload)
       } else {
         result = await articulosAPI.create(data)
       }
@@ -99,6 +146,41 @@ export default function ArticuloForm({ articulo, rubros, onClose, onGuardado }: 
       setError((err as Error).message || t('form.errors.generic'))
     } finally {
       setLoading(false)
+    }
+  }
+
+  const onAdjustSubmit = async (e: FormEvent) => {
+    e.preventDefault()
+    if (!articulo) return
+    const cantidad = Number(adjustCantidad)
+    if (!Number.isFinite(cantidad) || cantidad === 0) {
+      setAdjustError(t('stockAdjust.errors.cantidad'))
+      return
+    }
+    const motivo = adjustMotivo.trim()
+    if (motivo.length < 1) {
+      setAdjustError(t('stockAdjust.errors.motivo'))
+      return
+    }
+    setAdjustLoading(true)
+    setAdjustError(null)
+    try {
+      const result = await articulosAPI.stockAjuste(articulo.id, { cantidad, motivo })
+      if (!result) return
+      setStockDisplay(result.stockAfter)
+      setValue('stock', result.stockAfter)
+      setShowAdjust(false)
+      setAdjustCantidad('')
+      setAdjustMotivo('')
+      if (showHistorial) await loadHistorial()
+    } catch (err: unknown) {
+      if (err instanceof ApiRequestFailedError && err.message === 'INSUFFICIENT_STOCK') {
+        setAdjustError(t('stockAdjust.errors.insufficient'))
+      } else {
+        setAdjustError((err as Error).message || t('stockAdjust.errors.generic'))
+      }
+    } finally {
+      setAdjustLoading(false)
     }
   }
 
@@ -294,12 +376,37 @@ export default function ArticuloForm({ articulo, rubros, onClose, onGuardado }: 
                 type="number"
                 data-testid="articulo-form-stock"
                 {...register('stock')}
+                readOnly={Boolean(articulo)}
+                key={articulo ? `stock-${stockDisplay}` : 'stock-new'}
                 aria-required="true"
-                aria-describedby={errors.stock ? 'articulo-stock-error' : undefined}
+                aria-readonly={articulo ? 'true' : undefined}
+                aria-describedby={
+                  articulo ? 'articulo-stock-readonly-hint' : errors.stock ? 'articulo-stock-error' : undefined
+                }
                 className="w-full px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 rounded border border-slate-300 dark:border-slate-600 focus:border-blue-500 focus:outline-none"
               />
+              {articulo && (
+                <p id="articulo-stock-readonly-hint" className="text-slate-500 dark:text-slate-400 text-xs mt-1">
+                  {t('stockAdjust.readonlyHint')}
+                </p>
+              )}
               {errors.stock && (
                 <p id="articulo-stock-error" className="text-red-400 text-sm mt-1">{errors.stock.message}</p>
+              )}
+              {articulo && (
+                <CanAccess permission="inventory.adjust">
+                  <button
+                    type="button"
+                    data-testid="btn-stock-adjust"
+                    onClick={() => {
+                      setAdjustError(null)
+                      setShowAdjust(true)
+                    }}
+                    className="mt-2 px-3 py-2 bg-amber-600 hover:bg-amber-700 text-white font-semibold rounded transition"
+                  >
+                    {t('stockAdjust.button')}
+                  </button>
+                </CanAccess>
               )}
             </div>
             <div>
@@ -319,6 +426,49 @@ export default function ArticuloForm({ articulo, rubros, onClose, onGuardado }: 
               )}
             </div>
           </div>
+
+          {showHistorial && (
+            <section
+              className="border border-slate-200 dark:border-slate-600 rounded-lg p-4"
+              aria-labelledby="articulo-stock-history-title"
+              data-testid="articulo-stock-history"
+            >
+              <h3 id="articulo-stock-history-title" className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-2">
+                {t('stockHistory.title')}
+              </h3>
+              {historialLoading ? (
+                <p className="text-slate-600 dark:text-slate-400 text-sm">{t('stockHistory.loading')}</p>
+              ) : historial.length === 0 ? (
+                <p className="text-slate-600 dark:text-slate-400 text-sm">{t('stockHistory.empty')}</p>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm text-left">
+                    <thead>
+                      <tr className="border-b border-slate-200 dark:border-slate-600">
+                        <th scope="col" className="py-2 pr-2">{t('stockHistory.columns.date')}</th>
+                        <th scope="col" className="py-2 pr-2">{t('stockHistory.columns.qty')}</th>
+                        <th scope="col" className="py-2 pr-2">{t('stockHistory.columns.reason')}</th>
+                        <th scope="col" className="py-2">{t('stockHistory.columns.user')}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {historial.map((row) => (
+                        <tr key={row.id} className="border-b border-slate-100 dark:border-slate-700">
+                          <td className="py-2 pr-2">{new Date(row.createdAt).toLocaleString()}</td>
+                          <td className="py-2 pr-2">{row.cantidad}</td>
+                          <td className="py-2 pr-2">{row.motivo}</td>
+                          <td className="py-2">{row.user.username}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
+                {t('stockHistory.total', { count: historialTotal })}
+              </p>
+            </section>
+          )}
 
           <div className="flex items-center gap-3 pt-4">
             <input
@@ -351,6 +501,74 @@ export default function ArticuloForm({ articulo, rubros, onClose, onGuardado }: 
           </div>
         </form>
       </div>
+
+      {showAdjust && articulo && (
+        <div
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="stock-adjust-title"
+          data-testid="stock-adjust-dialog"
+        >
+          <form
+            onSubmit={onAdjustSubmit}
+            className="bg-white dark:bg-slate-800 rounded-lg shadow-xl w-full max-w-md p-6 space-y-4"
+          >
+            <h3 id="stock-adjust-title" className="text-lg font-bold text-slate-900 dark:text-slate-100">
+              {t('stockAdjust.title')}
+            </h3>
+            {adjustError && (
+              <div role="alert" className="p-3 bg-red-100 dark:bg-red-900 text-red-900 dark:text-red-100 rounded text-sm">
+                {adjustError}
+              </div>
+            )}
+            <div>
+              <label htmlFor="stock-adjust-cantidad" className="block font-semibold mb-1 text-slate-700 dark:text-slate-300">
+                {t('stockAdjust.cantidad')}
+              </label>
+              <input
+                id="stock-adjust-cantidad"
+                type="number"
+                data-testid="stock-adjust-cantidad"
+                value={adjustCantidad}
+                onChange={(e) => setAdjustCantidad(e.target.value)}
+                className="w-full px-3 py-2 rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700"
+              />
+              <p className="text-xs text-slate-500 mt-1">{t('stockAdjust.cantidadHint')}</p>
+            </div>
+            <div>
+              <label htmlFor="stock-adjust-motivo" className="block font-semibold mb-1 text-slate-700 dark:text-slate-300">
+                {t('stockAdjust.motivo')}
+              </label>
+              <textarea
+                id="stock-adjust-motivo"
+                data-testid="stock-adjust-motivo"
+                value={adjustMotivo}
+                onChange={(e) => setAdjustMotivo(e.target.value)}
+                rows={3}
+                className="w-full px-3 py-2 rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700"
+              />
+            </div>
+            <div className="flex gap-2 pt-2">
+              <button
+                type="submit"
+                data-testid="btn-stock-adjust-submit"
+                disabled={adjustLoading}
+                className="flex-1 px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white font-semibold rounded disabled:opacity-50"
+              >
+                {adjustLoading ? tc('actions.saving') : t('stockAdjust.submit')}
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowAdjust(false)}
+                className="flex-1 px-4 py-2 bg-slate-200 dark:bg-slate-700 font-semibold rounded"
+              >
+                {tc('actions.cancel')}
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
     </div>
   )
 }

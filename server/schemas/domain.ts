@@ -10,6 +10,7 @@ import type {
   FacturaItemInput,
   ProveedorInput,
   RubroInput,
+  StockAjusteInput,
 } from '../createApp.types'
 
 /** @see server/createApp.ts FACTURA_VOID_MOTIVO_MAX_LEN */
@@ -703,6 +704,33 @@ export const ordenEntregaUpdateBodySchema = z
       nota: note === undefined ? undefined : note.length > 0 ? note : null,
     }
   })
+
+export const stockAjusteBodySchema = z
+  .object({
+    cantidad: z.number({ invalid_type_error: 'cantidad must be a number' }),
+    motivo: z.string({ invalid_type_error: 'motivo must be a string' }),
+  })
+  .superRefine((data, ctx) => {
+    if (!Number.isInteger(data.cantidad) || data.cantidad === 0) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'cantidad must be a non-zero integer',
+        path: ['cantidad'],
+      })
+    }
+    const motivo = data.motivo.trim()
+    if (motivo.length < 1 || motivo.length > 100) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'motivo must be between 1 and 100 characters',
+        path: ['motivo'],
+      })
+    }
+  })
+  .transform((data): StockAjusteInput => ({
+    cantidad: data.cantidad,
+    motivo: data.motivo.trim(),
+  }))
 
 const empresaTipoFacturaSchema = z.enum(['A', 'B', 'C'], {
   errorMap: () => ({ message: 'tipoFactura must be one of: A, B, C' }),
