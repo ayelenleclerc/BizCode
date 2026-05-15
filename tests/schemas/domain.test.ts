@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   articuloBodySchema,
   clienteBodySchema,
+  empresaUpdateBodySchema,
   facturaBodySchema,
   proveedorBodySchema,
   rubroBodySchema,
@@ -108,6 +109,40 @@ describe('rubroBodySchema', () => {
     const r = rubroBodySchema.safeParse({ codigo: 1, nombre: '   ' })
     expect(r.success).toBe(false)
     if (!r.success) expect(r.error.errors.some((e) => e.message.includes('nombre'))).toBe(true)
+  })
+})
+
+describe('empresaUpdateBodySchema', () => {
+  it('parses valid company settings', () => {
+    const out = empresaUpdateBodySchema.parse({
+      nombre: '  Mi Empresa  ',
+      cuit: '20-12345678-6',
+      domicilio: 'Calle 1',
+      puntoVenta: 12,
+      tipoFactura: 'B',
+    })
+    expect(out.nombre).toBe('Mi Empresa')
+    expect(out.puntoVenta).toBe(12)
+  })
+
+  it('rejects invalid CUIT', () => {
+    const r = empresaUpdateBodySchema.safeParse({
+      nombre: 'Co',
+      cuit: '20-00000000-0',
+      puntoVenta: 1,
+      tipoFactura: 'B',
+    })
+    expect(r.success).toBe(false)
+  })
+
+  it('rejects puntoVenta above 9999', () => {
+    const r = empresaUpdateBodySchema.safeParse({
+      nombre: 'Co',
+      cuit: '20-12345678-6',
+      puntoVenta: 10000,
+      tipoFactura: 'B',
+    })
+    expect(r.success).toBe(false)
   })
 })
 

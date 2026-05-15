@@ -224,10 +224,15 @@ model FacturaItem {
 }
 
 model ParamEmpresa {
-  id        Int     @id @default(autoincrement())
-  nombre    String  @db.VarChar(40)
-  cuit      String  @db.VarChar(14)
-  domicilio String? @db.VarChar(40)
+  id          Int     @id @default(autoincrement())
+  tenantId    Int     @unique
+  tenant      Tenant  @relation(fields: [tenantId], references: [id])
+  nombre      String  @db.VarChar(40)
+  cuit        String  @db.VarChar(14)
+  domicilio   String? @db.VarChar(40)
+  puntoVenta  Int     @default(1)
+  tipoFactura String  @db.VarChar(1) @default("B")
+  logoUrl     String? @db.VarChar(255)
 }
 
 model Tenant {
@@ -250,6 +255,7 @@ model Tenant {
   facturas       Factura[]
   cobros         Cobro[]
   ordenesEntrega OrdenEntrega[]
+  paramEmpresa   ParamEmpresa?
 }
 
 model OrdenEntrega {

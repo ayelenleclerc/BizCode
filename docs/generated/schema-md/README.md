@@ -106,6 +106,12 @@
 
 * [DeliveryZoneUpdateInput](./deliveryzoneupdateinput.md) – `-`
 
+* [EmpresaConfig](./empresaconfig.md) – `-`
+
+* [EmpresaEnvelope](./empresaenvelope.md) – `-`
+
+* [EmpresaInput](./empresainput.md) – `-`
+
 * [Factura](./factura.md) – `-`
 
 * [FacturaEnvelope](./facturaenvelope.md) – `-`

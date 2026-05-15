@@ -129,6 +129,18 @@ export interface DeliveryZone {
   updatedAt?: Date
 }
 
+export interface EmpresaConfig {
+  id: number | null
+  nombre: string
+  cuit: string
+  domicilio: string | null
+  puntoVenta: number
+  tipoFactura: 'A' | 'B' | 'C'
+  logoUrl: string | null
+  prefijoFactura: string
+}
+
+/** @deprecated Use EmpresaConfig — kept for legacy references */
 export interface ParamEmpresa {
   id: number
   nombre: string

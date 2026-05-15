@@ -113,3 +113,12 @@ export type OrdenEntregaUpdateBody = {
   zonaId?: number | null
   nota?: string | null
 }
+
+export type EmpresaInput = {
+  nombre: string
+  cuit: string
+  domicilio?: string | null
+  puntoVenta: number
+  tipoFactura: 'A' | 'B' | 'C'
+  logoUrl?: string | null
+}

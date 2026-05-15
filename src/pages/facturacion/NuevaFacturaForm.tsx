@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useHotkeys } from 'react-hotkeys-hook'
 import { useTranslation } from 'react-i18next'
-import { facturasAPI } from '@/lib/api'
+import { empresaAPI, facturasAPI } from '@/lib/api'
 import { calculateInvoice, calculateItemSubtotal } from '@/lib/invoice'
 import { Cliente, Articulo, FormaPago } from '@/types'
 import KeyboardHint, { useInvoiceShortcuts } from '@/components/shared/KeyboardHint'
@@ -47,6 +47,16 @@ export default function NuevaFacturaForm({
   const [totales, setTotales] = useState({ neto1: 0, neto2: 0, neto3: 0, iva1: 0, iva2: 0, total: 0 })
 
   const cliente = clientes.find((c) => c.id === clienteId)
+
+  useEffect(() => {
+    void empresaAPI.get().then((data) => {
+      if (!data) return
+      setPrefijo((prev) => (prev.trim() === '' ? data.prefijoFactura : prev))
+      if (data.tipoFactura === 'A' || data.tipoFactura === 'B') {
+        setTipo(data.tipoFactura)
+      }
+    }).catch(() => {})
+  }, [])
 
   // Credit limit warning: shown when balance + this invoice total would exceed the limit
   const creditLimitWarning = (() => {
