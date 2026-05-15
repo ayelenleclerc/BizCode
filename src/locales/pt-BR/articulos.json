@@ -78,5 +78,32 @@
     "errors": {
       "generic": "Erro ao salvar produto"
     }
+  },
+  "stockAdjust": {
+    "button": "Ajustar estoque",
+    "title": "Ajuste manual de estoque",
+    "readonlyHint": "O estoque só muda por ajustes auditados (não neste formulário).",
+    "cantidad": "Quantidade (+ entrada / − saída)",
+    "cantidadHint": "Use números negativos para saídas.",
+    "motivo": "Motivo",
+    "submit": "Aplicar ajuste",
+    "errors": {
+      "cantidad": "Informe uma quantidade diferente de zero.",
+      "motivo": "O motivo é obrigatório.",
+      "insufficient": "Estoque insuficiente para este ajuste.",
+      "generic": "Não foi possível aplicar o ajuste."
+    }
+  },
+  "stockHistory": {
+    "title": "Histórico de ajustes",
+    "loading": "Carregando histórico…",
+    "empty": "Nenhum ajuste registrado.",
+    "total": "Total de registros: {{count}}",
+    "columns": {
+      "date": "Data",
+      "qty": "Qtd.",
+      "reason": "Motivo",
+      "user": "Usuário"
+    }
   }
 }

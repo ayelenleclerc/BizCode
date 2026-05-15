@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "properties": {
+    "articuloId": {
+      "type": "integer"
+    },
+    "cantidad": {
+      "type": "integer"
+    },
+    "createdAt": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "id": {
+      "type": "integer"
+    },
+    "motivo": {
+      "type": "string"
+    },
+    "user": {
+      "$ref": "./StockAjusteUser.schema.json"
+    },
+    "userId": {
+      "type": "integer"
+    }
+  },
+  "title": "StockAjuste",
+  "type": "object"
+}

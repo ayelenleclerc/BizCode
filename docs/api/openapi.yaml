@@ -441,6 +441,85 @@ paths:
         '403':
           $ref: '#/components/responses/ForbiddenError'
 
+  /api/articulos/{id}/stock-historial:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    get:
+      tags: [articulos]
+      summary: List manual stock adjustments for a product
+      parameters:
+        - $ref: '#/components/parameters/ListLimit'
+        - $ref: '#/components/parameters/ListOffset'
+      responses:
+        '200':
+          description: Paginated adjustment history
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockAjusteListEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Product not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/articulos/{id}/stock-ajuste:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    post:
+      tags: [articulos]
+      summary: Apply a manual stock adjustment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StockAjusteInput'
+      responses:
+        '200':
+          description: Adjustment applied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockAdjustEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Product not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '422':
+          description: Insufficient stock (INSUFFICIENT_STOCK)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
   /api/articulos/import/template:
     parameters:
       - $ref: '#/components/parameters/BizcodeChannelHeader'
@@ -799,6 +878,12 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         '403':
           $ref: '#/components/responses/ForbiddenError'
+        '422':
+          description: Client suspended, insufficient stock, or other business rule
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
 
   /api/cobros:
     parameters:
@@ -2782,6 +2867,83 @@ components:
           anyOf:
             - $ref: '#/components/schemas/Articulo'
             - type: 'null'
+
+    StockAjusteInput:
+      type: object
+      required: [cantidad, motivo]
+      properties:
+        cantidad:
+          type: integer
+        motivo:
+          type: string
+          minLength: 1
+          maxLength: 100
+
+    StockAjusteUser:
+      type: object
+      properties:
+        id:
+          type: integer
+        username:
+          type: string
+
+    StockAjuste:
+      type: object
+      additionalProperties: true
+      properties:
+        id:
+          type: integer
+        articuloId:
+          type: integer
+        cantidad:
+          type: integer
+        motivo:
+          type: string
+        userId:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+        user:
+          $ref: '#/components/schemas/StockAjusteUser'
+
+    StockAdjustData:
+      type: object
+      additionalProperties: true
+      properties:
+        ajuste:
+          $ref: '#/components/schemas/StockAjuste'
+        articulo:
+          type: object
+          additionalProperties: true
+        stockBefore:
+          type: integer
+        stockAfter:
+          type: integer
+
+    StockAdjustEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/StockAdjustData'
+
+    StockAjusteListEnvelope:
+      allOf:
+        - type: object
+          required: [success, data]
+          properties:
+            success:
+              type: boolean
+              const: true
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/StockAjuste'
+        - $ref: '#/components/schemas/ListPaginationMeta'
 
     Rubro:
       type: object

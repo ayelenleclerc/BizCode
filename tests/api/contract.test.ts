@@ -150,6 +150,18 @@ function buildPrisma(): PrismaClient {
       create: vi.fn().mockResolvedValue(articuloRow),
       update: vi.fn().mockResolvedValue(articuloRow),
     },
+    stockAjuste: {
+      count: vi.fn().mockResolvedValue(0),
+      findMany: vi.fn().mockResolvedValue([]),
+      create: vi.fn().mockResolvedValue({
+        id: 1,
+        cantidad: -1,
+        motivo: 'Test',
+        createdAt: new Date('2026-05-18T12:00:00.000Z'),
+        user: { id: 1, username: 'owner1' },
+      }),
+    },
+    auditEvent: { create: vi.fn().mockResolvedValue({ id: 1 }) },
     rubro: {
       count: vi.fn().mockResolvedValue(1),
       findFirst: vi.fn().mockResolvedValue(rubroRow),
@@ -259,8 +271,17 @@ function buildPrisma(): PrismaClient {
           factura: { create: facturaCreate },
           cliente: { update: txClienteUpdate, create: clienteTxCreate },
           rubro: { create: rubroTxCreate },
-          articulo: { create: articuloTxCreate },
+          articulo: { create: articuloTxCreate, update: vi.fn().mockResolvedValue(articuloRow) },
           proveedor: { create: proveedorTxCreate },
+          stockAjuste: {
+            create: vi.fn().mockResolvedValue({
+              id: 1,
+              cantidad: -1,
+              motivo: 'Test',
+              createdAt: new Date(),
+              user: { id: 1, username: 'owner1' },
+            }),
+          },
         }
         return arg(tx)
       }
@@ -377,6 +398,58 @@ describe('API — contrato OpenAPI', () => {
     const app = createApp(prisma)
     const res = await request(app).put('/api/articulos/1').send(articuloInput).expect(200)
     await assertMatchesOpenApi('/api/articulos/{id}', 'put', '200', res.body)
+  })
+
+  it('GET /api/articulos/:id/stock-historial', async () => {
+    process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
+    process.env.BIZCODE_TEST_ROLE = 'owner'
+    ;(prisma.stockAjuste.count as ReturnType<typeof vi.fn>).mockResolvedValueOnce(1)
+    ;(prisma.stockAjuste.findMany as ReturnType<typeof vi.fn>).mockResolvedValueOnce([
+      {
+        id: 1,
+        cantidad: -2,
+        motivo: 'Merma',
+        createdAt: new Date('2026-05-18T12:00:00.000Z'),
+        user: { id: 1, username: 'owner1' },
+      },
+    ])
+    const app = createApp(prisma)
+    const res = await request(app).get('/api/articulos/1/stock-historial').expect(200)
+    await assertMatchesOpenApi('/api/articulos/{id}/stock-historial', 'get', '200', res.body)
+  })
+
+  it('POST /api/articulos/:id/stock-ajuste', async () => {
+    process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
+    process.env.BIZCODE_TEST_ROLE = 'owner'
+    ;(prisma.articulo.findFirst as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+      ...articuloRow,
+      stock: 10,
+      minimo: 0,
+    })
+    const articuloUpdate = vi.fn().mockResolvedValue({ ...articuloRow, stock: 9 })
+    prisma.$transaction = vi.fn(async (arg: unknown) => {
+      if (typeof arg === 'function') {
+        return arg({
+          articulo: { update: articuloUpdate },
+          stockAjuste: {
+            create: vi.fn().mockResolvedValue({
+              id: 1,
+              cantidad: -1,
+              motivo: 'Test',
+              createdAt: new Date('2026-05-18T12:00:00.000Z'),
+              user: { id: 1, username: 'owner1' },
+            }),
+          },
+        })
+      }
+      return arg
+    })
+    const app = createApp(prisma)
+    const res = await request(app)
+      .post('/api/articulos/1/stock-ajuste')
+      .send({ cantidad: -1, motivo: 'Test' })
+      .expect(200)
+    await assertMatchesOpenApi('/api/articulos/{id}/stock-ajuste', 'post', '200', res.body)
   })
 
   it('GET /api/rubros', async () => {

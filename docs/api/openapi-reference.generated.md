@@ -2476,6 +2476,446 @@ One-time endpoint to create initial tenant and owner user.
 }
 ```
 
+### PARAMETERS /api/articulos/{id}/stock-historial
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/articulos/{id}/stock-historial`
+
+### List manual stock adjustments for a product
+
+- **Method:** `GET`
+- **Path:** `/api/articulos/{id}/stock-historial`
+- **Tags:** articulos
+
+#### Responses
+
+##### Status: 200 Paginated adjustment history
+
+###### Content-Type: application/json
+
+**All of:**
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`articuloId`**
+
+    `integer`
+
+  - **`cantidad`**
+
+    `integer`
+
+  - **`createdAt`**
+
+    `string`, format: `date-time`
+
+  - **`id`**
+
+    `integer`
+
+  - **`motivo`**
+
+    `string`
+
+  - **`user`**
+
+    `object`
+
+    - **`id`**
+
+      `integer`
+
+    - **`username`**
+
+      `string`
+
+  - **`userId`**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+* **`limit` (required)**
+
+  `integer` — Effective page size (same semantics as query \`limit\`)
+
+* **`offset` (required)**
+
+  `integer` — Effective skip (same semantics as query \`offset\`)
+
+* **`total` (required)**
+
+  `integer` — Row count matching the list filter (before limit/offset)
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "articuloId": 1,
+      "cantidad": 1,
+      "motivo": "",
+      "userId": 1,
+      "createdAt": "",
+      "user": {
+        "id": 1,
+        "username": ""
+      },
+      "additionalProperty": "anything"
+    }
+  ],
+  "total": 0,
+  "limit": 1,
+  "offset": 0
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Product not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/articulos/{id}/stock-ajuste
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/articulos/{id}/stock-ajuste`
+
+### Apply a manual stock adjustment
+
+- **Method:** `POST`
+- **Path:** `/api/articulos/{id}/stock-ajuste`
+- **Tags:** articulos
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`cantidad` (required)**
+
+  `integer`
+
+- **`motivo` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "cantidad": 1,
+  "motivo": ""
+}
+```
+
+#### Responses
+
+##### Status: 200 Adjustment applied
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`ajuste`**
+
+    `object`
+
+    - **`articuloId`**
+
+      `integer`
+
+    - **`cantidad`**
+
+      `integer`
+
+    - **`createdAt`**
+
+      `string`, format: `date-time`
+
+    - **`id`**
+
+      `integer`
+
+    - **`motivo`**
+
+      `string`
+
+    - **`user`**
+
+      `object`
+
+      - **`id`**
+
+        `integer`
+
+      - **`username`**
+
+        `string`
+
+    - **`userId`**
+
+      `integer`
+
+  - **`articulo`**
+
+    `object`
+
+  - **`stockAfter`**
+
+    `integer`
+
+  - **`stockBefore`**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "ajuste": {
+      "id": 1,
+      "articuloId": 1,
+      "cantidad": 1,
+      "motivo": "",
+      "userId": 1,
+      "createdAt": "",
+      "user": {
+        "id": 1,
+        "username": ""
+      },
+      "additionalProperty": "anything"
+    },
+    "articulo": {
+      "additionalProperty": "anything"
+    },
+    "stockBefore": 1,
+    "stockAfter": 1,
+    "additionalProperty": "anything"
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Product not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 422 Insufficient stock (INSUFFICIENT\_STOCK)
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ### PARAMETERS /api/articulos/import/template
 
 - **Method:** `PARAMETERS`
@@ -4853,6 +5293,27 @@ One-time endpoint to create initial tenant and owner user.
 ```
 
 ##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 422 Client suspended, insufficient stock, or other business rule
 
 ###### Content-Type: application/json
 
@@ -13363,6 +13824,287 @@ Requires `orders.dispatch` for transitions to `assigned`, `in_transit`, or `fail
   }
 }
 ```
+
+### StockAjusteInput
+
+- **Type:**`object`
+
+* **`cantidad` (required)**
+
+  `integer`
+
+* **`motivo` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "cantidad": 1,
+  "motivo": ""
+}
+```
+
+### StockAjusteUser
+
+- **Type:**`object`
+
+* **`id`**
+
+  `integer`
+
+* **`username`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "username": ""
+}
+```
+
+### StockAjuste
+
+- **Type:**`object`
+
+* **`articuloId`**
+
+  `integer`
+
+* **`cantidad`**
+
+  `integer`
+
+* **`createdAt`**
+
+  `string`, format: `date-time`
+
+* **`id`**
+
+  `integer`
+
+* **`motivo`**
+
+  `string`
+
+* **`user`**
+
+  `object`
+
+  - **`id`**
+
+    `integer`
+
+  - **`username`**
+
+    `string`
+
+* **`userId`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "articuloId": 1,
+  "cantidad": 1,
+  "motivo": "",
+  "userId": 1,
+  "createdAt": "",
+  "user": {
+    "id": 1,
+    "username": ""
+  },
+  "additionalProperty": "anything"
+}
+```
+
+### StockAdjustData
+
+- **Type:**`object`
+
+* **`ajuste`**
+
+  `object`
+
+  - **`articuloId`**
+
+    `integer`
+
+  - **`cantidad`**
+
+    `integer`
+
+  - **`createdAt`**
+
+    `string`, format: `date-time`
+
+  - **`id`**
+
+    `integer`
+
+  - **`motivo`**
+
+    `string`
+
+  - **`user`**
+
+    `object`
+
+    - **`id`**
+
+      `integer`
+
+    - **`username`**
+
+      `string`
+
+  - **`userId`**
+
+    `integer`
+
+* **`articulo`**
+
+  `object`
+
+* **`stockAfter`**
+
+  `integer`
+
+* **`stockBefore`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "ajuste": {
+    "id": 1,
+    "articuloId": 1,
+    "cantidad": 1,
+    "motivo": "",
+    "userId": 1,
+    "createdAt": "",
+    "user": {
+      "id": 1,
+      "username": ""
+    },
+    "additionalProperty": "anything"
+  },
+  "articulo": {
+    "additionalProperty": "anything"
+  },
+  "stockBefore": 1,
+  "stockAfter": 1,
+  "additionalProperty": "anything"
+}
+```
+
+### StockAdjustEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`ajuste`**
+
+    `object`
+
+    - **`articuloId`**
+
+      `integer`
+
+    - **`cantidad`**
+
+      `integer`
+
+    - **`createdAt`**
+
+      `string`, format: `date-time`
+
+    - **`id`**
+
+      `integer`
+
+    - **`motivo`**
+
+      `string`
+
+    - **`user`**
+
+      `object`
+
+      - **`id`**
+
+        `integer`
+
+      - **`username`**
+
+        `string`
+
+    - **`userId`**
+
+      `integer`
+
+  - **`articulo`**
+
+    `object`
+
+  - **`stockAfter`**
+
+    `integer`
+
+  - **`stockBefore`**
+
+    `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "ajuste": {
+      "id": 1,
+      "articuloId": 1,
+      "cantidad": 1,
+      "motivo": "",
+      "userId": 1,
+      "createdAt": "",
+      "user": {
+        "id": 1,
+        "username": ""
+      },
+      "additionalProperty": "anything"
+    },
+    "articulo": {
+      "additionalProperty": "anything"
+    },
+    "stockBefore": 1,
+    "stockAfter": 1,
+    "additionalProperty": "anything"
+  }
+}
+```
+
+### StockAjusteListEnvelope
+
+- **Type:**
+
+**Example:**
 
 ### Rubro
 

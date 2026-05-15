@@ -16,7 +16,7 @@
 import nodemailer from 'nodemailer'
 import type { PrismaClient } from '@prisma/client'
 import { resolveSmtpTransportConfig } from './config/smtpTransport'
-import { notifyManagers } from './notifications'
+import { notifyInventoryStakeholders, notifyManagers } from './notifications'
 import type { NotificationType, NotificationPayload } from './notifications'
 
 // ─── Message templates ────────────────────────────────────────────────────────
@@ -49,6 +49,13 @@ function buildMessage(type: NotificationType, payload: NotificationPayload): Mes
         subject: '[BizCode] Nuevo mensaje interno',
         text: payload.preview ? `Nuevo mensaje: ${payload.preview}` : 'Tiene un nuevo mensaje interno.',
       }
+    case 'stock_below_minimum': {
+      const desc = payload.descripcion ?? `Artículo ${payload.codigo ?? ''}`
+      return {
+        subject: `[BizCode] Stock bajo mínimo — ${desc}`,
+        text: `El artículo ${desc} (cód. ${payload.codigo ?? '—'}) quedó con stock ${payload.stock ?? 0} (mínimo ${payload.minimo ?? 0}).`,
+      }
+    }
   }
 }
 
@@ -160,7 +167,11 @@ export async function dispatchNotification(
   payload: NotificationPayload,
 ): Promise<void> {
   // 1. Always send in-app
-  await notifyManagers(prisma, tenantId, type, payload)
+  if (type === 'stock_below_minimum') {
+    await notifyInventoryStakeholders(prisma, tenantId, type, payload)
+  } else {
+    await notifyManagers(prisma, tenantId, type, payload)
+  }
 
   // 2. External channels — only if at least one is configured
   if (!isSmtpConfigured() && !isTwilioConfigured()) return

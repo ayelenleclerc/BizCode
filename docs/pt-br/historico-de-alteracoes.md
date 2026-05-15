@@ -14,6 +14,7 @@ Versionamento: [Semantic Versioning](https://semver.org/).
 
 ### Adicionado
 
+- **Ajustes de estoque (GitHub #128):** modelo `StockAjuste` e migração; `POST /api/articulos/:id/stock-ajuste` (`inventory.adjust`) e `GET /api/articulos/:id/stock-historial`; ao criar fatura decrementa estoque e notifica `stock_below_minimum`; auditoria `stock_adjust`; i18n EN/ES/PT-BR.
 - **Configuração da empresa (GitHub #127):** `ParamEmpresa` por tenant com `GET/PUT /api/empresa`; `puntoVenta` define `prefijoFactura` de 4 dígitos; UI em `/configuracion/empresa` (edição com `settings.business.manage`); formulário de nova fatura pré-preenche prefixo e tipo padrão; i18n EN/ES/PT-BR.
 - **Score de pagamento (GitHub #130):** Recálculo automático de `Cliente.score` em `POST /api/cobros` pelos dias em atraso vs fatura ativa mais antiga (+5 / −3 / −7 / −15); sem alteração sem fatura ativa; `metadata` de auditoria com `scoreBefore`, `scoreAfter`, `delta`; resposta inclui `updatedCliente`; tooltip na ficha do cliente; i18n EN/ES/PT-BR.
 - **Ordens de entrega (GitHub #126):** modelo `OrdenEntrega` e migração; API `GET/POST/PUT /api/ordenes-entrega` com RBAC; listagem restrita ao motorista; auditoria em mudanças de status (`entrega_confirmed`); UI `/logistica` planner e motorista; i18n EN/ES/PT-BR.

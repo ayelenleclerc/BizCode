@@ -78,5 +78,32 @@
     "errors": {
       "generic": "Error saving product"
     }
+  },
+  "stockAdjust": {
+    "button": "Adjust stock",
+    "title": "Manual stock adjustment",
+    "readonlyHint": "Stock changes only through audited adjustments (not this form).",
+    "cantidad": "Quantity (+ in / − out)",
+    "cantidadHint": "Use negative numbers for outbound adjustments.",
+    "motivo": "Reason",
+    "submit": "Apply adjustment",
+    "errors": {
+      "cantidad": "Enter a non-zero quantity.",
+      "motivo": "Reason is required.",
+      "insufficient": "Insufficient stock for this adjustment.",
+      "generic": "Could not apply adjustment."
+    }
+  },
+  "stockHistory": {
+    "title": "Adjustment history",
+    "loading": "Loading history…",
+    "empty": "No adjustments recorded.",
+    "total": "Total records: {{count}}",
+    "columns": {
+      "date": "Date",
+      "qty": "Qty",
+      "reason": "Reason",
+      "user": "User"
+    }
   }
 }

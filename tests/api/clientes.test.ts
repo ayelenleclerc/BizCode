@@ -55,6 +55,14 @@ const FACTURA_RESULT = {
   updatedAt: new Date(),
 }
 
+const ARTICULO_STOCK_ROW = {
+  id: 1,
+  codigo: 10,
+  descripcion: 'Producto',
+  stock: 100,
+  minimo: 0,
+}
+
 function buildPrismaMock(overrides: Partial<Record<string, unknown>> = {}): PrismaClient {
   return {
     deliveryZone: { findFirst: vi.fn().mockResolvedValue({ id: 1, tenantId: 1 }) },
@@ -65,7 +73,10 @@ function buildPrismaMock(overrides: Partial<Record<string, unknown>> = {}): Pris
       create: vi.fn().mockResolvedValue(CLIENTE_BASE),
       update: vi.fn().mockResolvedValue(CLIENTE_BASE),
     },
-    articulo: { findMany: vi.fn().mockResolvedValue([{ id: 1 }]) },
+    articulo: {
+      findMany: vi.fn().mockResolvedValue([ARTICULO_STOCK_ROW]),
+      update: vi.fn().mockResolvedValue(ARTICULO_STOCK_ROW),
+    },
     rubro: { findMany: vi.fn().mockResolvedValue([]) },
     formaPago: { findMany: vi.fn().mockResolvedValue([]) },
     factura: {
@@ -199,9 +210,11 @@ describe('POST /api/facturas — balance update', () => {
     })
     const facturaCreate = vi.fn().mockResolvedValue(FACTURA_RESULT)
 
+    const articuloUpdate = vi.fn().mockResolvedValue(ARTICULO_STOCK_ROW)
     const txPrisma = {
       cliente: { update: clienteUpdate },
       factura: { create: facturaCreate },
+      articulo: { update: articuloUpdate },
     } as unknown as PrismaClient
 
     const prisma = buildPrismaMock({
@@ -249,9 +262,11 @@ describe('POST /api/facturas — credit limit notification', () => {
 
     const managers = [{ id: 10 }, { id: 11 }]
 
+    const articuloUpdate = vi.fn().mockResolvedValue(ARTICULO_STOCK_ROW)
     const txPrisma = {
       cliente: { update: clienteUpdate },
       factura: { create: facturaCreate },
+      articulo: { update: articuloUpdate },
     } as unknown as PrismaClient
 
     const prisma = buildPrismaMock({
@@ -306,10 +321,12 @@ describe('POST /api/facturas — credit limit notification', () => {
 
     const clienteUpdate = vi.fn().mockResolvedValue(updatedCliente)
     const notifCreateMany = vi.fn().mockResolvedValue({ count: 0 })
+    const articuloUpdate = vi.fn().mockResolvedValue(ARTICULO_STOCK_ROW)
 
     const txPrisma = {
       cliente: { update: clienteUpdate },
       factura: { create: vi.fn().mockResolvedValue(FACTURA_RESULT) },
+      articulo: { update: articuloUpdate },
     } as unknown as PrismaClient
 
     const prisma = buildPrismaMock({
@@ -346,10 +363,12 @@ describe('POST /api/facturas — credit limit notification', () => {
 
     const clienteUpdate = vi.fn().mockResolvedValue(updatedCliente)
     const notifCreateMany = vi.fn().mockResolvedValue({ count: 0 })
+    const articuloUpdate = vi.fn().mockResolvedValue(ARTICULO_STOCK_ROW)
 
     const txPrisma = {
       cliente: { update: clienteUpdate },
       factura: { create: vi.fn().mockResolvedValue(FACTURA_RESULT) },
+      articulo: { update: articuloUpdate },
     } as unknown as PrismaClient
 
     const prisma = buildPrismaMock({

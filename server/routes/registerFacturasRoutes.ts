@@ -40,17 +40,26 @@ export function registerFacturasRoutes(app: Application, ctx: RestRouteContext):
           return
         }
 
-        const { factura: createdFactura, updatedCliente } = result.data
+        const { factura: createdFactura, updatedCliente, stockBelowMinimum } = result.data
+        const authReq = req as AuthenticatedRequest
         if (
           updatedCliente.creditLimit !== null &&
           Number(updatedCliente.balance) > Number(updatedCliente.creditLimit)
         ) {
-          const authReq = req as AuthenticatedRequest
           dispatchNotification(prisma, authReq.auth!.claims.tenantId, 'credit_limit_exceeded', {
             clienteId: updatedCliente.id,
             rsocial: updatedCliente.rsocial,
             amount: String(updatedCliente.balance),
             limit: String(updatedCliente.creditLimit),
+          }).catch(() => { /* notification failure must not block the sale */ })
+        }
+        for (const alert of stockBelowMinimum) {
+          dispatchNotification(prisma, authReq.auth!.claims.tenantId, 'stock_below_minimum', {
+            articuloId: alert.articuloId,
+            codigo: alert.codigo,
+            descripcion: alert.descripcion,
+            stock: alert.stock,
+            minimo: alert.minimo,
           }).catch(() => { /* notification failure must not block the sale */ })
         }
 

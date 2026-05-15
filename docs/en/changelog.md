@@ -14,6 +14,7 @@ Versioning: [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **Stock adjustments (GitHub #128):** `StockAjuste` model and migration; `POST /api/articulos/:id/stock-ajuste` (`inventory.adjust`) and `GET /api/articulos/:id/stock-historial`; invoice create decrements stock and emits `stock_below_minimum` notifications; audit `stock_adjust`; i18n EN/ES/PT-BR.
 - **Company settings (GitHub #127):** Tenant-scoped `ParamEmpresa` with `GET/PUT /api/empresa`; `puntoVenta` drives 4-digit `prefijoFactura`; settings UI at `/configuracion/empresa` (`settings.business.manage` to edit); new invoice form prefills prefix and default type; i18n EN/ES/PT-BR.
 - **Payment score (GitHub #130):** Automatic `Cliente.score` recalculation on `POST /api/cobros` using days past due vs oldest active invoice (+5 / −3 / −7 / −15); no change without active invoice; audit `metadata` with `scoreBefore`, `scoreAfter`, `delta`; response includes `updatedCliente`; score tooltip on customer form; i18n EN/ES/PT-BR.
 - **Delivery orders (GitHub #126):** `OrdenEntrega` model and migration; `GET/POST/PUT /api/ordenes-entrega` with RBAC (`logistics.read` / `orders.create` / `orders.dispatch` / `orders.deliver.confirm`); driver-scoped list; audit on state changes including `entrega_confirmed`; `/logistica` planner and driver UI; i18n EN/ES/PT-BR.
