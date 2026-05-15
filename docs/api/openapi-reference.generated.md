@@ -8907,6 +8907,318 @@ Returns boolean flags for each channel. No sensitive values are exposed.
 }
 ```
 
+### PARAMETERS /api/empresa
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/empresa`
+
+### Get company settings for the authenticated tenant
+
+- **Method:** `GET`
+- **Path:** `/api/empresa`
+- **Tags:** settings
+
+#### Responses
+
+##### Status: 200 Company settings (persisted row or tenant defaults)
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`cuit` (required)**
+
+    `string`
+
+  - **`nombre` (required)**
+
+    `string`
+
+  - **`prefijoFactura` (required)**
+
+    `string` — Four-digit invoice prefix derived from puntoVenta.
+
+  - **`puntoVenta` (required)**
+
+    `integer`
+
+  - **`tipoFactura` (required)**
+
+    `string`, possible values: `"A", "B", "C"`
+
+  - **`domicilio`**
+
+    `string`
+
+  - **`id`**
+
+    `integer` — Null when settings have not been saved yet (defaults only).
+
+  - **`logoUrl`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "nombre": "",
+    "cuit": "",
+    "domicilio": "",
+    "puntoVenta": 1,
+    "tipoFactura": "A",
+    "logoUrl": "",
+    "prefijoFactura": ""
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Update company settings
+
+- **Method:** `PUT`
+- **Path:** `/api/empresa`
+- **Tags:** settings
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`cuit` (required)**
+
+  `string`
+
+- **`nombre` (required)**
+
+  `string`
+
+- **`puntoVenta` (required)**
+
+  `integer`
+
+- **`tipoFactura` (required)**
+
+  `string`, possible values: `"A", "B", "C"`
+
+- **`domicilio`**
+
+  `string`
+
+- **`logoUrl`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "nombre": "",
+  "cuit": "",
+  "domicilio": "",
+  "puntoVenta": 1,
+  "tipoFactura": "A",
+  "logoUrl": ""
+}
+```
+
+#### Responses
+
+##### Status: 200 Settings updated
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`cuit` (required)**
+
+    `string`
+
+  - **`nombre` (required)**
+
+    `string`
+
+  - **`prefijoFactura` (required)**
+
+    `string` — Four-digit invoice prefix derived from puntoVenta.
+
+  - **`puntoVenta` (required)**
+
+    `integer`
+
+  - **`tipoFactura` (required)**
+
+    `string`, possible values: `"A", "B", "C"`
+
+  - **`domicilio`**
+
+    `string`
+
+  - **`id`**
+
+    `integer` — Null when settings have not been saved yet (defaults only).
+
+  - **`logoUrl`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "nombre": "",
+    "cuit": "",
+    "domicilio": "",
+    "puntoVenta": 1,
+    "tipoFactura": "A",
+    "logoUrl": "",
+    "prefijoFactura": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ### PARAMETERS /api/zonas-entrega
 
 - **Method:** `PARAMETERS`
@@ -9741,9 +10053,96 @@ Requires `orders.create`. Initial estado is `pending`, or `assigned` when `drive
 
 ###### Content-Type: application/json
 
+- **`data` (required)**
+
+  `object`
+
+  - **`cliente`**
+
+    `object`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`driver`**
+
+    `object`
+
+  - **`driverId`**
+
+    `integer`
+
+  - **`estado`**
+
+    `string`, possible values: `"pending", "assigned", "in_transit", "delivered", "failed"`
+
+  - **`factura`**
+
+    `object`
+
+  - **`facturaId`**
+
+    `integer`
+
+  - **`fecha`**
+
+    `string`, format: `date-time`
+
+  - **`id`**
+
+    `integer`
+
+  - **`nota`**
+
+    `string`
+
+  - **`tenantId`**
+
+    `integer`
+
+  - **`zona`**
+
+    `object`
+
+  - **`zonaId`**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
 **Example:**
 
-```
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "facturaId": 1,
+    "clienteId": 1,
+    "zonaId": 1,
+    "driverId": 1,
+    "fecha": "",
+    "estado": "pending",
+    "nota": "",
+    "cliente": {
+      "additionalProperty": "anything"
+    },
+    "zona": {
+      "additionalProperty": "anything"
+    },
+    "driver": {
+      "additionalProperty": "anything"
+    },
+    "factura": {
+      "additionalProperty": "anything"
+    },
+    "additionalProperty": "anything"
+  }
+}
 ```
 
 ##### Status: 400 Request payload is invalid
@@ -9880,9 +10279,96 @@ Requires `orders.dispatch` for transitions to `assigned`, `in_transit`, or `fail
 
 ###### Content-Type: application/json
 
+- **`data` (required)**
+
+  `object`
+
+  - **`cliente`**
+
+    `object`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`driver`**
+
+    `object`
+
+  - **`driverId`**
+
+    `integer`
+
+  - **`estado`**
+
+    `string`, possible values: `"pending", "assigned", "in_transit", "delivered", "failed"`
+
+  - **`factura`**
+
+    `object`
+
+  - **`facturaId`**
+
+    `integer`
+
+  - **`fecha`**
+
+    `string`, format: `date-time`
+
+  - **`id`**
+
+    `integer`
+
+  - **`nota`**
+
+    `string`
+
+  - **`tenantId`**
+
+    `integer`
+
+  - **`zona`**
+
+    `object`
+
+  - **`zonaId`**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
 **Example:**
 
-```
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "facturaId": 1,
+    "clienteId": 1,
+    "zonaId": 1,
+    "driverId": 1,
+    "fecha": "",
+    "estado": "pending",
+    "nota": "",
+    "cliente": {
+      "additionalProperty": "anything"
+    },
+    "zona": {
+      "additionalProperty": "anything"
+    },
+    "driver": {
+      "additionalProperty": "anything"
+    },
+    "factura": {
+      "additionalProperty": "anything"
+    },
+    "additionalProperty": "anything"
+  }
+}
 ```
 
 ##### Status: 400 Request payload is invalid
@@ -11658,6 +12144,102 @@ Requires `orders.dispatch` for transitions to `assigned`, `in_transit`, or `fail
 - **Type:**
 
 **Example:**
+
+### OrdenEntregaEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`cliente`**
+
+    `object`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`driver`**
+
+    `object`
+
+  - **`driverId`**
+
+    `integer`
+
+  - **`estado`**
+
+    `string`, possible values: `"pending", "assigned", "in_transit", "delivered", "failed"`
+
+  - **`factura`**
+
+    `object`
+
+  - **`facturaId`**
+
+    `integer`
+
+  - **`fecha`**
+
+    `string`, format: `date-time`
+
+  - **`id`**
+
+    `integer`
+
+  - **`nota`**
+
+    `string`
+
+  - **`tenantId`**
+
+    `integer`
+
+  - **`zona`**
+
+    `object`
+
+  - **`zonaId`**
+
+    `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "facturaId": 1,
+    "clienteId": 1,
+    "zonaId": 1,
+    "driverId": 1,
+    "fecha": "",
+    "estado": "pending",
+    "nota": "",
+    "cliente": {
+      "additionalProperty": "anything"
+    },
+    "zona": {
+      "additionalProperty": "anything"
+    },
+    "driver": {
+      "additionalProperty": "anything"
+    },
+    "factura": {
+      "additionalProperty": "anything"
+    },
+    "additionalProperty": "anything"
+  }
+}
+```
 
 ### AgingBucket
 
@@ -14778,6 +15360,160 @@ Requires `orders.dispatch` for transitions to `assigned`, `in_transit`, or `fail
     "createdAt": "",
     "updatedAt": "",
     "additionalProperty": "anything"
+  }
+}
+```
+
+### EmpresaConfig
+
+- **Type:**`object`
+
+* **`cuit` (required)**
+
+  `string`
+
+* **`nombre` (required)**
+
+  `string`
+
+* **`prefijoFactura` (required)**
+
+  `string` — Four-digit invoice prefix derived from puntoVenta.
+
+* **`puntoVenta` (required)**
+
+  `integer`
+
+* **`tipoFactura` (required)**
+
+  `string`, possible values: `"A", "B", "C"`
+
+* **`domicilio`**
+
+  `string`
+
+* **`id`**
+
+  `integer` — Null when settings have not been saved yet (defaults only).
+
+* **`logoUrl`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "nombre": "",
+  "cuit": "",
+  "domicilio": "",
+  "puntoVenta": 1,
+  "tipoFactura": "A",
+  "logoUrl": "",
+  "prefijoFactura": ""
+}
+```
+
+### EmpresaInput
+
+- **Type:**`object`
+
+* **`cuit` (required)**
+
+  `string`
+
+* **`nombre` (required)**
+
+  `string`
+
+* **`puntoVenta` (required)**
+
+  `integer`
+
+* **`tipoFactura` (required)**
+
+  `string`, possible values: `"A", "B", "C"`
+
+* **`domicilio`**
+
+  `string`
+
+* **`logoUrl`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "nombre": "",
+  "cuit": "",
+  "domicilio": "",
+  "puntoVenta": 1,
+  "tipoFactura": "A",
+  "logoUrl": ""
+}
+```
+
+### EmpresaEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`cuit` (required)**
+
+    `string`
+
+  - **`nombre` (required)**
+
+    `string`
+
+  - **`prefijoFactura` (required)**
+
+    `string` — Four-digit invoice prefix derived from puntoVenta.
+
+  - **`puntoVenta` (required)**
+
+    `integer`
+
+  - **`tipoFactura` (required)**
+
+    `string`, possible values: `"A", "B", "C"`
+
+  - **`domicilio`**
+
+    `string`
+
+  - **`id`**
+
+    `integer` — Null when settings have not been saved yet (defaults only).
+
+  - **`logoUrl`**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "nombre": "",
+    "cuit": "",
+    "domicilio": "",
+    "puntoVenta": 1,
+    "tipoFactura": "A",
+    "logoUrl": "",
+    "prefijoFactura": ""
   }
 }
 ```

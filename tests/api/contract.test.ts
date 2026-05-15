@@ -210,6 +210,31 @@ function buildPrisma(): PrismaClient {
         cliente: { id: 1, codigo: 1, rsocial: 'ACME SA' },
       }),
     },
+    paramEmpresa: {
+      findUnique: vi.fn().mockResolvedValue({
+        id: 1,
+        tenantId: 1,
+        nombre: 'Demo Co',
+        cuit: '20-12345678-6',
+        domicilio: null,
+        puntoVenta: 1,
+        tipoFactura: 'B',
+        logoUrl: null,
+      }),
+      upsert: vi.fn().mockResolvedValue({
+        id: 1,
+        tenantId: 1,
+        nombre: 'Demo Co',
+        cuit: '20-12345678-6',
+        domicilio: 'Calle 1',
+        puntoVenta: 2,
+        tipoFactura: 'A',
+        logoUrl: null,
+      }),
+    },
+    tenant: {
+      findUnique: vi.fn().mockResolvedValue({ id: 1, name: 'Demo', slug: 'demo', active: true }),
+    },
     proveedor: {
       count: vi.fn().mockResolvedValue(1),
       findMany: vi.fn((args?: unknown) => {
@@ -555,6 +580,32 @@ describe('API — contrato OpenAPI', () => {
       .send({ clienteId: 1, fecha: '2026-05-16' })
       .expect(201)
     await assertMatchesOpenApi('/api/ordenes-entrega', 'post', '201', res.body)
+  })
+
+  it('GET /api/empresa', async () => {
+    process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
+    process.env.BIZCODE_TEST_ROLE = 'seller'
+    const app = createApp(prisma)
+    const res = await request(app).get('/api/empresa').expect(200)
+    await assertMatchesOpenApi('/api/empresa', 'get', '200', res.body)
+  })
+
+  it('PUT /api/empresa', async () => {
+    process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
+    process.env.BIZCODE_TEST_ROLE = 'owner'
+    const app = createApp(prisma)
+    const res = await request(app)
+      .put('/api/empresa')
+      .send({
+        nombre: 'Demo Co',
+        cuit: '20-12345678-6',
+        domicilio: 'Calle 1',
+        puntoVenta: 2,
+        tipoFactura: 'A',
+        logoUrl: null,
+      })
+      .expect(200)
+    await assertMatchesOpenApi('/api/empresa', 'put', '200', res.body)
   })
 })
 

@@ -983,6 +983,32 @@ export const ordenesEntregaAPI = {
   },
 }
 
+export const empresaAPI = {
+  get: async () => {
+    try {
+      const response = await api.get<{ success: boolean; data: import('@/types').EmpresaConfig }>('/empresa')
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+  update: async (body: {
+    nombre: string
+    cuit: string
+    domicilio?: string | null
+    puntoVenta: number
+    tipoFactura: 'A' | 'B' | 'C'
+    logoUrl?: string | null
+  }) => {
+    try {
+      const response = await api.put<{ success: boolean; data: import('@/types').EmpresaConfig }>('/empresa', body)
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+}
+
 export const zonasEntregaAPI = {
   list: async () => {
     try {

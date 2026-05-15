@@ -1,0 +1,33 @@
+{
+  "title": "Datos de la empresa",
+  "subtitle": "Identidad comercial y parámetros por defecto de facturación",
+  "readOnlyHint": "Puede consultar estos datos; solo propietarios y gerentes pueden editarlos.",
+  "form": {
+    "nombre": "Razón social",
+    "cuit": "CUIT",
+    "cuitHint": "Formato XX-XXXXXXXX-X",
+    "domicilio": "Domicilio",
+    "puntoVenta": "Punto de venta",
+    "puntoVentaHint": "Se usa como prefijo de factura de 4 dígitos (1–9999)",
+    "tipoFactura": "Tipo de factura por defecto",
+    "logoUrl": "URL del logo",
+    "logoUrlHint": "Enlace https opcional al logo",
+    "prefijoPreview": "Vista previa del prefijo",
+    "tipoA": "Tipo A",
+    "tipoB": "Tipo B",
+    "tipoC": "Tipo C"
+  },
+  "actions": {
+    "save": "Guardar configuración"
+  },
+  "errors": {
+    "loadFailed": "No se pudieron cargar los datos de la empresa",
+    "saveFailed": "No se pudieron guardar los datos de la empresa",
+    "nombreRequired": "La razón social es obligatoria",
+    "cuitInvalid": "Ingrese un CUIT válido",
+    "puntoVentaInvalid": "El punto de venta debe estar entre 1 y 9999"
+  },
+  "success": {
+    "saved": "Configuración de empresa guardada"
+  }
+}

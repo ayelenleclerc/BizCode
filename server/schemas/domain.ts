@@ -5,6 +5,7 @@ import type {
   ClienteInput,
   DeliveryZoneCreateParsed,
   DeliveryZoneUpdateParsed,
+  EmpresaInput,
   FacturaInput,
   FacturaItemInput,
   ProveedorInput,
@@ -700,6 +701,82 @@ export const ordenEntregaUpdateBodySchema = z
       driverId: data.driverId === undefined ? undefined : data.driverId,
       zonaId: data.zonaId === undefined ? undefined : data.zonaId,
       nota: note === undefined ? undefined : note.length > 0 ? note : null,
+    }
+  })
+
+const empresaTipoFacturaSchema = z.enum(['A', 'B', 'C'], {
+  errorMap: () => ({ message: 'tipoFactura must be one of: A, B, C' }),
+})
+
+export const empresaUpdateBodySchema = z
+  .object({
+    nombre: z.string({ required_error: 'nombre is required', invalid_type_error: 'nombre must be a string' }),
+    cuit: z.string({ required_error: 'cuit is required', invalid_type_error: 'cuit must be a string' }),
+    domicilio: z.union([z.string(), z.null(), z.undefined()]).optional(),
+    puntoVenta: z.number({ invalid_type_error: 'puntoVenta must be an integer' }),
+    tipoFactura: empresaTipoFacturaSchema,
+    logoUrl: z.union([z.string(), z.null(), z.undefined()]).optional(),
+  })
+  .superRefine((data, ctx) => {
+    const nombre = data.nombre.trim()
+    if (nombre.length < 1 || nombre.length > 40) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'nombre must be between 1 and 40 characters', path: ['nombre'] })
+    }
+    normalizeOptStr(data.domicilio === undefined ? undefined : data.domicilio, 40, 'domicilio', ctx)
+    const cuitTrim = data.cuit.trim()
+    if (cuitTrim.length === 0) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'cuit is required', path: ['cuit'] })
+    } else if (!validateCUIT(cuitTrim)) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'cuit must be a valid Argentine CUIT', path: ['cuit'] })
+    }
+    if (!Number.isInteger(data.puntoVenta) || data.puntoVenta < 1 || data.puntoVenta > 9999) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'puntoVenta must be an integer between 1 and 9999',
+        path: ['puntoVenta'],
+      })
+    }
+    if (data.logoUrl !== undefined && data.logoUrl !== null && typeof data.logoUrl === 'string') {
+      const logo = data.logoUrl.trim()
+      if (logo.length > 255) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'logoUrl must be at most 255 characters', path: ['logoUrl'] })
+      }
+      if (logo.length > 0) {
+        try {
+          const parsed = new URL(logo)
+          if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
+            ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'logoUrl must be an http or https URL', path: ['logoUrl'] })
+          }
+        } catch {
+          ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'logoUrl must be a valid URL', path: ['logoUrl'] })
+        }
+      }
+    }
+  })
+  .transform((data): EmpresaInput => {
+    const dom =
+      data.domicilio === undefined
+        ? null
+        : data.domicilio === null
+          ? null
+          : data.domicilio.trim() === ''
+            ? null
+            : data.domicilio.trim()
+    const logo =
+      data.logoUrl === undefined
+        ? null
+        : data.logoUrl === null
+          ? null
+          : data.logoUrl.trim() === ''
+            ? null
+            : data.logoUrl.trim()
+    return {
+      nombre: data.nombre.trim(),
+      cuit: data.cuit.trim(),
+      domicilio: dom,
+      puntoVenta: data.puntoVenta,
+      tipoFactura: data.tipoFactura,
+      logoUrl: logo,
     }
   })
 

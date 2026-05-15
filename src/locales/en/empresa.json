@@ -1,0 +1,33 @@
+{
+  "title": "Company settings",
+  "subtitle": "Business identity and default invoicing parameters",
+  "readOnlyHint": "You can view these settings; only owners and managers can edit them.",
+  "form": {
+    "nombre": "Company name",
+    "cuit": "Tax ID (CUIT)",
+    "cuitHint": "Format XX-XXXXXXXX-X",
+    "domicilio": "Address",
+    "puntoVenta": "Point of sale number",
+    "puntoVentaHint": "Used as the 4-digit invoice prefix (1–9999)",
+    "tipoFactura": "Default invoice type",
+    "logoUrl": "Logo URL",
+    "logoUrlHint": "Optional https link to your logo",
+    "prefijoPreview": "Invoice prefix preview",
+    "tipoA": "Type A",
+    "tipoB": "Type B",
+    "tipoC": "Type C"
+  },
+  "actions": {
+    "save": "Save settings"
+  },
+  "errors": {
+    "loadFailed": "Could not load company settings",
+    "saveFailed": "Could not save company settings",
+    "nombreRequired": "Company name is required",
+    "cuitInvalid": "Enter a valid CUIT",
+    "puntoVentaInvalid": "Point of sale must be between 1 and 9999"
+  },
+  "success": {
+    "saved": "Company settings saved"
+  }
+}

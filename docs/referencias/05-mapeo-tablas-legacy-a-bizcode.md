@@ -21,7 +21,7 @@
 | `Cliente` | `CLIENTES.DBF` cuando la copia legacy lo incluye (2310 registros en copia Suarez); placeholders `91001`–`91010` si no hay filas | cubierto-script | ETL v1 en `migrate-from-dbf.ts` + `src/lib/migration/legacyClienteDbf.ts`; ver `MIGRACION_PROGRAMA_VIEJO.md`. |
 | `Factura` / `FacturaItem` | `FACT.DBF` y tablas relacionadas (`DET_COMP`, `ENCAB`, …) en inventario | pendiente | `FACT.DBF` tiene 418354 registros en la copia analizada; mapeo por definir tras análisis de campos. |
 | `FormaPago` | — | pendiente | |
-| `ParamEmpresa` | — | pendiente | |
+| `ParamEmpresa` | — | cubierto-api | `GET/PUT /api/empresa`, UI `/configuracion/empresa` (GitHub #127). |
 
 ## Campos `Articulo` (desde `PVAR2` / `PVAR`)
 

@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "cuit": {
+      "maxLength": 14,
+      "type": "string"
+    },
+    "domicilio": {
+      "maxLength": 40,
+      "nullable": true,
+      "type": "string"
+    },
+    "id": {
+      "description": "Null when settings have not been saved yet (defaults only).",
+      "nullable": true,
+      "type": "integer"
+    },
+    "logoUrl": {
+      "maxLength": 255,
+      "nullable": true,
+      "type": "string"
+    },
+    "nombre": {
+      "maxLength": 40,
+      "type": "string"
+    },
+    "prefijoFactura": {
+      "description": "Four-digit invoice prefix derived from puntoVenta.",
+      "pattern": "^[0-9]{4}$",
+      "type": "string"
+    },
+    "puntoVenta": {
+      "maximum": 9999,
+      "minimum": 1,
+      "type": "integer"
+    },
+    "tipoFactura": {
+      "enum": [
+        "A",
+        "B",
+        "C"
+      ],
+      "type": "string"
+    }
+  },
+  "required": [
+    "nombre",
+    "cuit",
+    "puntoVenta",
+    "tipoFactura",
+    "prefijoFactura"
+  ],
+  "title": "EmpresaConfig",
+  "type": "object"
+}
