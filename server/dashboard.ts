@@ -15,7 +15,7 @@ export type DashboardSummary = {
    * Approximation until credit-term fields are available (Issue #31).
    */
   facturasVencidas: { count: number; total: string }
-  /** Pending collections — placeholder until payment model is ready (Issue #31). */
+  /** Customer payments registered today. */
   cobrosHoy: { count: number; total: string }
   /** Active unread alerts — placeholder until Notification model is ready (Issue #30). */
   alertasActivas: number
@@ -51,7 +51,7 @@ export function registerDashboardRoutes(app: Application, prisma: PrismaClient):
 
       const tenantId = authReq.auth.claims.tenantId
 
-      const [ventasResult, vencidasResult] = await Promise.all([
+      const [ventasResult, vencidasResult, cobrosResult] = await Promise.all([
         // Active invoices created today
         prisma.factura.aggregate({
           where: { tenantId, estado: 'A', fecha: { gte: todayStart, lte: todayEnd } },
@@ -64,6 +64,11 @@ export function registerDashboardRoutes(app: Application, prisma: PrismaClient):
           _count: { id: true },
           _sum: { total: true },
         }),
+        prisma.cobro.aggregate({
+          where: { tenantId, fecha: { gte: todayStart, lte: todayEnd } },
+          _count: { id: true },
+          _sum: { monto: true },
+        }),
       ])
 
       const summary: DashboardSummary = {
@@ -75,8 +80,10 @@ export function registerDashboardRoutes(app: Application, prisma: PrismaClient):
           count: vencidasResult._count.id,
           total: vencidasResult._sum.total?.toString() ?? '0',
         },
-        // Placeholders — implemented in Issues #30 (notifications) and #31 (payments)
-        cobrosHoy: { count: 0, total: '0' },
+        cobrosHoy: {
+          count: cobrosResult._count.id,
+          total: cobrosResult._sum.monto?.toString() ?? '0',
+        },
         alertasActivas: 0,
       }
 

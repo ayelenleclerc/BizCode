@@ -1,5 +1,6 @@
 import axios, { AxiosError } from 'axios'
 import type { AuthClaims } from '@/lib/rbac'
+import type { Cobro } from '@/types'
 
 const API_BASE = 'http://localhost:3001/api'
 
@@ -410,6 +411,60 @@ export const formasPagoAPI = {
     try {
       const response = await api.get('/formas-pago')
       return response.data.data
+    } catch (error) {
+      handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+}
+
+// ============ COBROS ============
+
+export type CobroListParams = {
+  clienteId?: number
+  desde?: string
+  hasta?: string
+  limit?: number
+  offset?: number
+}
+
+export type CobroCreateBody = {
+  clienteId: number
+  fecha: string
+  monto: number
+  formaPagoId?: number | null
+  referencia?: string | null
+  nota?: string | null
+}
+
+export const cobrosAPI = {
+  list: async (params?: CobroListParams) => {
+    try {
+      const response = await api.get('/cobros', { params })
+      return response.data as {
+        success: true
+        data: Cobro[]
+        total: number
+        limit: number
+        offset: number
+      }
+    } catch (error) {
+      handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  get: async (id: number) => {
+    try {
+      const response = await api.get(`/cobros/${id}`)
+      return response.data.data as Cobro
+    } catch (error) {
+      handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  create: async (data: CobroCreateBody) => {
+    try {
+      const response = await api.post('/cobros', data)
+      return response.data.data as Cobro
     } catch (error) {
       handleError(error as AxiosError<ApiErrorPayload>)
     }

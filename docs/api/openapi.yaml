@@ -32,6 +32,8 @@ tags:
     description: Suppliers (master data and CSV import)
   - name: facturas
     description: Invoice management
+  - name: cobros
+    description: Customer payment collections
   - name: formasPago
     description: Payment methods
   - name: users
@@ -795,6 +797,115 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         '403':
           $ref: '#/components/responses/ForbiddenError'
+
+  /api/cobros:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [cobros]
+      summary: List customer payments
+      parameters:
+        - name: clienteId
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+        - name: desde
+          in: query
+          schema:
+            type: string
+            format: date
+          description: Filter fecha >= (YYYY-MM-DD or ISO-8601)
+        - name: hasta
+          in: query
+          schema:
+            type: string
+            format: date
+          description: Filter fecha <= end of day
+        - $ref: '#/components/parameters/ListLimit'
+        - $ref: '#/components/parameters/ListOffset'
+      responses:
+        '200':
+          description: Paginated list of payments
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CobroListEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    post:
+      tags: [cobros]
+      summary: Register a customer payment
+      description: |
+        Decrements `Cliente.balance` by `monto` in the same transaction and adjusts `Cliente.score`
+        (+5 on-time, -10 late vs oldest open invoice + creditDays). Requires `sales.create`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CobroInput'
+      responses:
+        '200':
+          description: Payment registered
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CobroEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '422':
+          description: Client suspended or inactive
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/cobros/{id}:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [cobros]
+      summary: Get payment by id
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Payment detail
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CobroEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Payment not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
 
   /api/facturas/{id}/void:
     parameters:
@@ -1766,6 +1877,88 @@ components:
           anyOf:
             - $ref: '#/components/schemas/Cliente'
             - type: 'null'
+
+    Cobro:
+      type: object
+      additionalProperties: true
+      properties:
+        id:
+          type: integer
+        tenantId:
+          type: integer
+        clienteId:
+          type: integer
+        fecha:
+          type: string
+          format: date-time
+        monto:
+          type: number
+        formaPagoId:
+          type: integer
+          nullable: true
+        referencia:
+          type: string
+          nullable: true
+        nota:
+          type: string
+          nullable: true
+        cliente:
+          type: object
+          additionalProperties: true
+          properties:
+            id:
+              type: integer
+            codigo:
+              type: integer
+            rsocial:
+              type: string
+
+    CobroInput:
+      type: object
+      required: [clienteId, fecha, monto]
+      properties:
+        clienteId:
+          type: integer
+          minimum: 1
+        fecha:
+          type: string
+          description: YYYY-MM-DD or ISO-8601
+        monto:
+          type: number
+          exclusiveMinimum: 0
+        formaPagoId:
+          type: integer
+          nullable: true
+        referencia:
+          type: string
+          maxLength: 60
+        nota:
+          type: string
+          maxLength: 200
+
+    CobroListEnvelope:
+      allOf:
+        - type: object
+          required: [success, data]
+          properties:
+            success:
+              type: boolean
+              const: true
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/Cobro'
+        - $ref: '#/components/schemas/ListPaginationMeta'
+
+    CobroEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/Cobro'
 
     Articulo:
       type: object

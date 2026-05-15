@@ -72,6 +72,15 @@ export type FacturaInput = {
   items: FacturaItemInput[]
 }
 
+export type CobroInput = {
+  clienteId: number
+  fecha: string
+  monto: number
+  formaPagoId?: number | null
+  referencia?: string | null
+  nota?: string | null
+}
+
 export type DeliveryZoneCreateParsed = {
   nombre: string
   tipo: 'barrio' | 'manual' | 'predefinida'

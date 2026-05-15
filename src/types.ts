@@ -42,6 +42,20 @@ export interface Articulo {
   updatedAt?: Date
 }
 
+export interface Cobro {
+  id: number
+  tenantId?: number
+  clienteId: number
+  fecha: string | Date
+  monto: number | string
+  formaPagoId?: number | null
+  referencia?: string | null
+  nota?: string | null
+  cliente?: Pick<Cliente, 'id' | 'codigo' | 'rsocial'>
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
 export interface Rubro {
   id: number
   codigo: number

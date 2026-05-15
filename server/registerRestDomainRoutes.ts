@@ -4,6 +4,7 @@ import type { AuthenticatedRequest } from './auth'
 import { writeAuditEvent } from './audit'
 import { registerArticulosRoutes } from './routes/registerArticulosRoutes'
 import { registerClientesRoutes } from './routes/registerClientesRoutes'
+import { registerCobrosRoutes } from './routes/registerCobrosRoutes'
 import { registerFacturasRoutes } from './routes/registerFacturasRoutes'
 import { registerFormasPagoRoutes } from './routes/registerFormasPagoRoutes'
 import { registerHealthRoute } from './routes/registerHealthRoute'
@@ -44,6 +45,7 @@ export function registerRestDomainRoutes(app: Application, prisma: PrismaClient)
   registerProveedoresRoutes(app, ctx)
   registerFormasPagoRoutes(app, ctx)
   registerFacturasRoutes(app, ctx)
+  registerCobrosRoutes(app, ctx)
   registerZonasEntregaRoutes(app, ctx)
   registerHealthRoute(app, ctx)
 }

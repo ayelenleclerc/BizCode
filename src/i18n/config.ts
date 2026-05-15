@@ -11,6 +11,7 @@ import zonasEntregaEs from '@/locales/es/zonasEntrega.json'
 import chatEs from '@/locales/es/chat.json'
 import proveedoresEs from '@/locales/es/proveedores.json'
 import auditEs from '@/locales/es/audit.json'
+import cobrosEs from '@/locales/es/cobros.json'
 
 import commonEn from '@/locales/en/common.json'
 import clientesEn from '@/locales/en/clientes.json'
@@ -20,6 +21,7 @@ import zonasEntregaEn from '@/locales/en/zonasEntrega.json'
 import chatEn from '@/locales/en/chat.json'
 import proveedoresEn from '@/locales/en/proveedores.json'
 import auditEn from '@/locales/en/audit.json'
+import cobrosEn from '@/locales/en/cobros.json'
 
 import commonPt from '@/locales/pt-BR/common.json'
 import clientesPt from '@/locales/pt-BR/clientes.json'
@@ -29,6 +31,7 @@ import zonasEntregaPt from '@/locales/pt-BR/zonasEntrega.json'
 import chatPt from '@/locales/pt-BR/chat.json'
 import proveedoresPt from '@/locales/pt-BR/proveedores.json'
 import auditPt from '@/locales/pt-BR/audit.json'
+import cobrosPt from '@/locales/pt-BR/cobros.json'
 
 // Persist language preference in localStorage
 const savedLang = typeof localStorage !== 'undefined'
@@ -41,7 +44,7 @@ i18n
     lng: savedLang,
     fallbackLng: 'es',
     defaultNS: 'common',
-    ns: ['common', 'clientes', 'articulos', 'proveedores', 'facturacion', 'zonasEntrega', 'chat', 'audit'],
+    ns: ['common', 'clientes', 'articulos', 'proveedores', 'facturacion', 'cobros', 'zonasEntrega', 'chat', 'audit'],
     resources: {
       es: {
         common: commonEs,
@@ -52,6 +55,7 @@ i18n
         zonasEntrega: zonasEntregaEs,
         chat: chatEs,
         audit: auditEs,
+        cobros: cobrosEs,
       },
       en: {
         common: commonEn,
@@ -62,6 +66,7 @@ i18n
         zonasEntrega: zonasEntregaEn,
         chat: chatEn,
         audit: auditEn,
+        cobros: cobrosEn,
       },
       'pt-BR': {
         common: commonPt,
@@ -72,6 +77,7 @@ i18n
         zonasEntrega: zonasEntregaPt,
         chat: chatPt,
         audit: auditPt,
+        cobros: cobrosPt,
       },
     },
     interpolation: {

@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "properties": {
+    "cliente": {
+      "additionalProperties": true,
+      "properties": {
+        "codigo": {
+          "type": "integer"
+        },
+        "id": {
+          "type": "integer"
+        },
+        "rsocial": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "clienteId": {
+      "type": "integer"
+    },
+    "fecha": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "formaPagoId": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "id": {
+      "type": "integer"
+    },
+    "monto": {
+      "type": "number"
+    },
+    "nota": {
+      "nullable": true,
+      "type": "string"
+    },
+    "referencia": {
+      "nullable": true,
+      "type": "string"
+    },
+    "tenantId": {
+      "type": "integer"
+    }
+  },
+  "title": "Cobro",
+  "type": "object"
+}
