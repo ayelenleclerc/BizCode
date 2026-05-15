@@ -1,0 +1,51 @@
+{
+  "title": "Relatórios",
+  "subtitle": "Relatórios operacionais e financeiros com exportação CSV",
+  "forbidden": "Você não tem permissão para ver relatórios.",
+  "empty": "Sem dados para os filtros selecionados.",
+  "exportCsv": "Exportar CSV",
+  "tabs": {
+    "legend": "Seções de relatórios",
+    "ventas": "Vendas",
+    "stock": "Estoque crítico",
+    "cobranzas": "Recebimentos"
+  },
+  "period": {
+    "legend": "Intervalo de datas",
+    "from": "De",
+    "to": "Até",
+    "presets": "Intervalos rápidos",
+    "agrupar": "Agrupar por",
+    "agruparDia": "Dia",
+    "agruparSemana": "Semana",
+    "agruparMes": "Mês",
+    "preset": {
+      "today": "Hoje",
+      "week": "Esta semana",
+      "month": "Este mês",
+      "quarter": "Este trimestre"
+    }
+  },
+  "ventas": {
+    "periodo": "Período",
+    "count": "Faturas",
+    "total": "Total",
+    "neto1": "Líquido 21%",
+    "iva1": "IVA 21%",
+    "chartLabel": "Gráfico de barras de vendas por período"
+  },
+  "stock": {
+    "codigo": "Código",
+    "descripcion": "Descrição",
+    "stock": "Estoque",
+    "minimo": "Mínimo",
+    "deficit": "Déficit"
+  },
+  "cobranzas": {
+    "fecha": "Data",
+    "count": "Recebimentos",
+    "total": "Total",
+    "forma": "Forma de pagamento",
+    "fpTotal": "Total forma"
+  }
+}

@@ -72,6 +72,8 @@
 
 * [ClienteNullableEnvelope](./clientenullableenvelope.md) – `-`
 
+* [CobranzasPorFormaPago](./cobranzasporformapago.md) – `-`
+
 * [Cobro](./cobro.md) – `-`
 
 * [CobroEnvelope](./cobroenvelope.md) – `-`
@@ -146,6 +148,14 @@
 
 * [ProveedorNullableEnvelope](./proveedornullableenvelope.md) – `-`
 
+* [ReporteCobranzasListEnvelope](./reportecobranzaslistenvelope.md) – `-`
+
+* [ReporteCobranzasRow](./reportecobranzasrow.md) – `-`
+
+* [ReporteVentasListEnvelope](./reporteventaslistenvelope.md) – `-`
+
+* [ReporteVentasRow](./reporteventasrow.md) – `-`
+
 * [Rubro](./rubro.md) – `-`
 
 * [RubroEnvelope](./rubroenvelope.md) – `-`
@@ -159,6 +169,12 @@
 * [SetupOwnerInput](./setupownerinput.md) – `-`
 
 * [SetupOwnerResult](./setupownerresult.md) – `-`
+
+* [StockCriticoArticulo](./stockcriticoarticulo.md) – `-`
+
+* [StockCriticoListEnvelope](./stockcriticolistenvelope.md) – `-`
+
+* [StockCriticoRow](./stockcriticorow.md) – `-`
 
 * [VoidInput](./voidinput.md) – `-`
 
@@ -272,7 +288,15 @@
 
 * [Untitled array in ProveedorListEnvelope](./proveedorlistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
 
+* [Untitled array in ReporteCobranzasListEnvelope](./reportecobranzaslistenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled array in ReporteCobranzasRow](./reportecobranzasrow-properties-porformapago.md) – `undefined#/properties/porFormaPago`
+
+* [Untitled array in ReporteVentasListEnvelope](./reporteventaslistenvelope-properties-data.md) – `undefined#/properties/data`
+
 * [Untitled array in RubroListEnvelope](./rubrolistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
+
+* [Untitled array in StockCriticoListEnvelope](./stockcriticolistenvelope-properties-data.md) – `undefined#/properties/data`
 
 ## Version Note
 

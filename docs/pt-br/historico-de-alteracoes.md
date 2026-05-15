@@ -14,6 +14,7 @@ Versionamento: [Semantic Versioning](https://semver.org/).
 
 ### Adicionado
 
+- **Relatórios (GitHub #129):** Relatórios operacionais em `/reportes` — `GET /api/reportes/ventas`, `GET /api/reportes/stock-critico`, `GET /api/reportes/cobranzas` com exportação JSON ou `Accept: text/csv`; permissões `reports.operational.read` / `reports.financial.read`; i18n EN/ES/PT-BR.
 - **Finanças (GitHub #125):** Módulo real em `/finanzas` — `GET /api/reportes/aging` e `GET /api/reportes/cuenta-corriente/:clienteId` (aging por `creditDays`, extrato com saldo acumulado); `facturasVencidas` do dashboard com a mesma regra de vencimento; i18n EN/ES/PT-BR.
 
 - **Cobranças (GitHub #124):** Registro de pagamentos de clientes — modelo `Cobro`, API REST (`POST/GET /api/cobros`), UI `/cobros`, recebimentos recentes na ficha do cliente, widget `cobrosHoy` do dashboard com dados reais; i18n EN/ES/PT-BR.

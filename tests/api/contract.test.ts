@@ -479,6 +479,36 @@ describe('API — contrato OpenAPI', () => {
     const res = await request(app).get('/api/reportes/cuenta-corriente/1').expect(200)
     await assertMatchesOpenApi('/api/reportes/cuenta-corriente/{clienteId}', 'get', '200', res.body)
   })
+
+  it('GET /api/reportes/ventas', async () => {
+    process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
+    process.env.BIZCODE_TEST_ROLE = 'manager'
+    const app = createApp(prisma)
+    const res = await request(app)
+      .get('/api/reportes/ventas')
+      .query({ from: '2026-01-01', to: '2026-01-31', agrupar: 'dia' })
+      .expect(200)
+    await assertMatchesOpenApi('/api/reportes/ventas', 'get', '200', res.body)
+  })
+
+  it('GET /api/reportes/stock-critico', async () => {
+    process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
+    process.env.BIZCODE_TEST_ROLE = 'manager'
+    const app = createApp(prisma)
+    const res = await request(app).get('/api/reportes/stock-critico').expect(200)
+    await assertMatchesOpenApi('/api/reportes/stock-critico', 'get', '200', res.body)
+  })
+
+  it('GET /api/reportes/cobranzas', async () => {
+    process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
+    process.env.BIZCODE_TEST_ROLE = 'finance'
+    const app = createApp(prisma)
+    const res = await request(app)
+      .get('/api/reportes/cobranzas')
+      .query({ from: '2026-01-01', to: '2026-01-31' })
+      .expect(200)
+    await assertMatchesOpenApi('/api/reportes/cobranzas', 'get', '200', res.body)
+  })
 })
 
 describe('API — errores 500 (cobertura de ramas catch)', () => {

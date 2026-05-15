@@ -1,5 +1,6 @@
 import type { PrismaClient } from '@prisma/client'
 import { Decimal } from '@prisma/client/runtime/library'
+import { endOfDay } from '../reportesPeriodUtils'
 
 export const AGING_BUCKET_LABELS = ['0-30d', '31-60d', '61-90d', '>90d'] as const
 export type AgingBucketLabel = (typeof AGING_BUCKET_LABELS)[number]
@@ -40,6 +41,19 @@ export type CuentaCorrienteResult = {
   rsocial: string
   balanceActual: string
   lineas: CuentaCorrienteLine[]
+}
+
+export type CobranzasPorFormaPago = {
+  formaPagoId: number | null
+  descripcion: string
+  total: string
+}
+
+export type ReporteCobranzasRow = {
+  fecha: string
+  count: number
+  total: string
+  porFormaPago: CobranzasPorFormaPago[]
 }
 
 /**
@@ -279,5 +293,78 @@ export class ReportesFinancierosService {
       balanceActual: decimalToMoneyString(cliente.balance),
       lineas,
     }
+  }
+
+  /**
+   * @en Collections grouped by calendar day and payment method.
+   * @es Cobranzas agrupadas por día calendario y forma de pago.
+   * @pt-BR Recebimentos agrupados por dia civil e forma de pagamento.
+   */
+  async getCobranzasPorPeriodo(
+    tenantId: number,
+    from: Date,
+    to: Date,
+  ): Promise<ReporteCobranzasRow[]> {
+    const rangeEnd = endOfDay(to)
+    const cobros = await this.prisma.cobro.findMany({
+      where: {
+        tenantId,
+        fecha: { gte: from, lte: rangeEnd },
+      },
+      select: {
+        fecha: true,
+        monto: true,
+        formaPagoId: true,
+        formaPago: { select: { id: true, descripcion: true } },
+      },
+    })
+
+    type DayBucket = {
+      count: number
+      total: number
+      byForma: Map<string, { formaPagoId: number | null; descripcion: string; total: number }>
+    }
+
+    const byDay = new Map<string, DayBucket>()
+
+    for (const c of cobros) {
+      const day = startOfDay(c.fecha)
+      const y = day.getFullYear()
+      const m = String(day.getMonth() + 1).padStart(2, '0')
+      const d = String(day.getDate()).padStart(2, '0')
+      const fechaKey = `${y}-${m}-${d}`
+
+      const bucket = byDay.get(fechaKey) ?? { count: 0, total: 0, byForma: new Map() }
+      bucket.count += 1
+      const amount = c.monto.toNumber()
+      bucket.total += amount
+
+      const fpKey =
+        c.formaPagoId === null ? 'null' : String(c.formaPagoId)
+      const fpRow = bucket.byForma.get(fpKey) ?? {
+        formaPagoId: c.formaPagoId,
+        descripcion: c.formaPago?.descripcion ?? '—',
+        total: 0,
+      }
+      fpRow.total += amount
+      bucket.byForma.set(fpKey, fpRow)
+
+      byDay.set(fechaKey, bucket)
+    }
+
+    return [...byDay.entries()]
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([fecha, bucket]) => ({
+        fecha,
+        count: bucket.count,
+        total: bucket.total.toFixed(2),
+        porFormaPago: [...bucket.byForma.values()]
+          .sort((a, b) => (a.formaPagoId ?? 0) - (b.formaPagoId ?? 0))
+          .map((fp) => ({
+            formaPagoId: fp.formaPagoId,
+            descripcion: fp.descripcion,
+            total: fp.total.toFixed(2),
+          })),
+      }))
   }
 }

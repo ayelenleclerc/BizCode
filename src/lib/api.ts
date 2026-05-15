@@ -509,6 +509,42 @@ export type CuentaCorrienteData = {
   lineas: CuentaCorrienteLine[]
 }
 
+export type ReporteVentasRow = {
+  periodo: string
+  count: number
+  total: string
+  neto1: string
+  neto2: string
+  iva1: string
+  iva2: string
+}
+
+export type StockCriticoRow = {
+  articulo: { id: number; codigo: number; descripcion: string }
+  stock: number
+  minimo: number
+  deficit: number
+}
+
+export type CobranzasPorFormaPago = {
+  formaPagoId: number | null
+  descripcion: string
+  total: string
+}
+
+export type ReporteCobranzasRow = {
+  fecha: string
+  count: number
+  total: string
+  porFormaPago: CobranzasPorFormaPago[]
+}
+
+export type ReportesPeriodParams = {
+  from: string
+  to: string
+  agrupar?: 'dia' | 'semana' | 'mes'
+}
+
 export const reportesAPI = {
   aging: async () => {
     try {
@@ -523,6 +559,46 @@ export const reportesAPI = {
     try {
       const response = await api.get(`/reportes/cuenta-corriente/${clienteId}`)
       return response.data.data as CuentaCorrienteData
+    } catch (error) {
+      handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  ventas: async (params: ReportesPeriodParams) => {
+    try {
+      const response = await api.get('/reportes/ventas', { params })
+      return response.data.data as ReporteVentasRow[]
+    } catch (error) {
+      handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  stockCritico: async () => {
+    try {
+      const response = await api.get('/reportes/stock-critico')
+      return response.data.data as StockCriticoRow[]
+    } catch (error) {
+      handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  cobranzas: async (params: Pick<ReportesPeriodParams, 'from' | 'to'>) => {
+    try {
+      const response = await api.get('/reportes/cobranzas', { params })
+      return response.data.data as ReporteCobranzasRow[]
+    } catch (error) {
+      handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  exportCsv: async (path: string, params?: Record<string, string>) => {
+    try {
+      const response = await api.get(path, {
+        params,
+        headers: { Accept: 'text/csv' },
+        responseType: 'blob',
+      })
+      return response.data as Blob
     } catch (error) {
       handleError(error as AxiosError<ApiErrorPayload>)
     }
