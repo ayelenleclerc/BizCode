@@ -14,6 +14,7 @@ Versioning: [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **Payment score (GitHub #130):** Automatic `Cliente.score` recalculation on `POST /api/cobros` using days past due vs oldest active invoice (+5 / −3 / −7 / −15); no change without active invoice; audit `metadata` with `scoreBefore`, `scoreAfter`, `delta`; response includes `updatedCliente`; score tooltip on customer form; i18n EN/ES/PT-BR.
 - **Reports (GitHub #129):** Operational reports at `/reportes` — `GET /api/reportes/ventas`, `GET /api/reportes/stock-critico`, `GET /api/reportes/cobranzas` with JSON or `Accept: text/csv` export; permissions `reports.operational.read` / `reports.financial.read`; i18n EN/ES/PT-BR.
 - **Finance (GitHub #125):** Real `/finanzas` module — `GET /api/reportes/aging` and `GET /api/reportes/cuenta-corriente/:clienteId` (AR aging by `creditDays`, account statement with running balance); dashboard `facturasVencidas` uses the same due-date rule; i18n EN/ES/PT-BR.
 

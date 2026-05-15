@@ -70,6 +70,7 @@
       "scoreLow": "High risk",
       "scoreMid": "Medium risk",
       "scoreHigh": "Good payer",
+      "scoreTooltipHelp": "Payment score (0–100): 0–40 high risk, 41–70 moderate, 71–100 reliable. Updated when registering payments against active invoices.",
       "suspendedBadge": "SUSPENDED",
       "readOnly": "Read-only — your role cannot modify financial data"
     }

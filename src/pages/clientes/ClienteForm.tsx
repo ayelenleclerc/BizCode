@@ -384,6 +384,8 @@ export default function ClienteForm({ cliente, onClose, onGuardado }: ClienteFor
                 {/* Score badge */}
                 {cliente.score != null && (
                   <span
+                    id="cliente-score-badge"
+                    title={t('form.financial.scoreTooltipHelp')}
                     className={`text-xs font-bold px-2 py-1 rounded-full ${
                       (cliente.score ?? 50) >= 71
                         ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'

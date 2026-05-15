@@ -1,6 +1,6 @@
 import axios, { AxiosError } from 'axios'
 import type { AuthClaims } from '@/lib/rbac'
-import type { Cobro } from '@/types'
+import type { Cliente, Cobro } from '@/types'
 
 const API_BASE = 'http://localhost:3001/api'
 
@@ -464,7 +464,10 @@ export const cobrosAPI = {
   create: async (data: CobroCreateBody) => {
     try {
       const response = await api.post('/cobros', data)
-      return response.data.data as Cobro
+      return response.data.data as {
+        cobro: Cobro
+        updatedCliente: Pick<Cliente, 'id' | 'rsocial' | 'balance' | 'creditLimit' | 'score'>
+      }
     } catch (error) {
       handleError(error as AxiosError<ApiErrorPayload>)
     }
