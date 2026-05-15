@@ -10,11 +10,15 @@ Versioning: [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- **Collections filters (a11y):** `/cobros` filter inputs use visible labels plus `aria-label` / placeholder so static HTML analyzers associate controls; [`src/pages/cobros/index.tsx`](../../src/pages/cobros/index.tsx).
+
 - **CORS + session cookie:** Express `cors` now uses `credentials: true` and an origin allowlist (`http://localhost:5173`, `http://127.0.0.1:5173`, plus comma-separated `CORS_ORIGINS`) so the SPA (Axios `withCredentials`) can receive and send session cookies across origins; [`server/createApp.ts`](../../server/createApp.ts), [`.env.example`](../../.env.example), [`tests/server/cors.test.ts`](../../tests/server/cors.test.ts); [security.md](security.md) updated.
 
 ### Added
 
 - **Stock adjustments (GitHub #128):** `StockAjuste` model and migration; `POST /api/articulos/:id/stock-ajuste` (`inventory.adjust`) and `GET /api/articulos/:id/stock-historial`; invoice create decrements stock and emits `stock_below_minimum` notifications; audit `stock_adjust`; i18n EN/ES/PT-BR.
+
+- **Documentation (ISO-ready sync):** Specs package v0.2 (FR-011–FR-015, UC/US/TC); user manuals for collections, finance, reports, logistics (EN/ES/PT-BR); operational flow MVP table updated; ISO traceability and stubs REQ-007, TST-003, TST-005, ARC-004; TypeDoc post-process [`scripts/patch-typedoc-html-noopener.mjs`](../../scripts/patch-typedoc-html-noopener.mjs) in `docs:typedoc`; [`DOCUMENT_LOCALE_MAP.md`](../DOCUMENT_LOCALE_MAP.md).
 - **Company settings (GitHub #127):** Tenant-scoped `ParamEmpresa` with `GET/PUT /api/empresa`; `puntoVenta` drives 4-digit `prefijoFactura`; settings UI at `/configuracion/empresa` (`settings.business.manage` to edit); new invoice form prefills prefix and default type; i18n EN/ES/PT-BR.
 - **Payment score (GitHub #130):** Automatic `Cliente.score` recalculation on `POST /api/cobros` using days past due vs oldest active invoice (+5 / −3 / −7 / −15); no change without active invoice; audit `metadata` with `scoreBefore`, `scoreAfter`, `delta`; response includes `updatedCliente`; score tooltip on customer form; i18n EN/ES/PT-BR.
 - **Delivery orders (GitHub #126):** `OrdenEntrega` model and migration; `GET/POST/PUT /api/ordenes-entrega` with RBAC (`logistics.read` / `orders.create` / `orders.dispatch` / `orders.deliver.confirm`); driver-scoped list; audit on state changes including `entrega_confirmed`; `/logistica` planner and driver UI; i18n EN/ES/PT-BR.

@@ -19,7 +19,9 @@ Mapa dos artefactos de qualidade do BizCode para cláusulas ISO. Documentação 
 | QUALITY_MANUAL | §4.4, §10.2 | §6.1 | — | — | — |
 | ADR-0001, ADR-0002 | §8.3.3 | §6.3.2 | — | — | — |
 | PRIVACY_DATA_MAP | §8.1 | — | A.5.x | — | — |
-| Manuais do usuário | §7.5 | §6.4.12 | — | Usabilidade | — |
+| Manuais do usuário (clientes, produtos, faturamento, aparência, cobranças, finanças, relatórios, logística) | §7.5 | §6.4.12 | — | Usabilidade | — |
+| API de cobranças + `tests/api/cobros.test.ts` | §8.3 | §6.3.2 | — | Adequação funcional | 29119-2 |
+| documentacao-gerada.md + `npm run docs:generate` | §7.5 | §6.4.12 | A.8.31 (SBOM) | Manutenibilidade | — |
 | THEMING | §8.3 | §6.4.12 | — | Usabilidade | — |
 | CONTRIBUTING DoD | §8.5.1 | §6.3.6 | A.8.25 | — | 29119-2 §7 |
 | RECORDS_TEMPLATE | §10.2.2 | §6.7.1 | A.5.33 | — | 29119-3 |

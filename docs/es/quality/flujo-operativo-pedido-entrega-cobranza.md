@@ -69,8 +69,14 @@ Las celdas vacías indican que el paso no tiene un permiso RBAC dedicado; el rol
 |------|------------------------|-------------------------|
 | Clientes / productos / rubros | REST bajo `/api/clientes`, `/api/articulos`, `/api/rubros` con auth | Ampliar según necesidad |
 | Facturación | `/api/facturas`, `/api/formas-pago` | Misma base |
+| Cobranzas / pagos | Modelo `Cobro`; `POST/GET /api/cobros`; UI `/cobros`; dashboard `cobrosHoy`; cobros recientes en formulario de cliente | Vincular a entidad pedido cuando exista BP1-1 |
+| UI / finanzas CxC | `/finanzas`; `GET /api/reportes/aging`, `GET /api/reportes/cuenta-corriente/:clienteId` | Flujos de gestión de mora según backlog |
+| Reportes | `/reportes`; `GET /api/reportes/ventas`, `stock-critico`, `cobranzas` (JSON o CSV) | Tipos de reporte adicionales |
+| Logística | `/logistica`; `OrdenEntrega`; `GET/POST/PUT /api/ordenes-entrega` | Ciclo de vida completo del pedido (BP1-1) |
 | Entidad pedido (`pedido`) | **No evidenciada** en Prisma ni OpenAPI | Modelo, estados y APIs al ejecutar BP1-1 del plan de ejecución |
-| Permisos `orders.*` | Definidos en RBAC; sin entidad de dominio aún | Aplicar en nuevas rutas cuando existan |
+| Permisos `orders.*` | Definidos en RBAC; aplicados en `/api/ordenes-entrega` | Extender cuando exista la entidad `pedido` |
+
+El estado **Cobrado** del diagrama queda cubierto hoy en parte por el **registro de cobros** (`Cobro`), no por un registro `pedido`.
 
 ## Documentos relacionados
 

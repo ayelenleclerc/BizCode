@@ -74,6 +74,15 @@ jobs:
       - name: Generate documentation (TypeDoc, OpenAPI MD, schemas, SBOM)
         run: npm run docs:generate
 
+      - name: Verify TypeDoc HTML post-process
+        run: |
+          set -euo pipefail
+          if grep -rq 'target="_blank">TypeDoc</' docs/generated/typedoc; then
+            echo "::error::TypeDoc footer still uses target=_blank; ensure docs:typedoc runs scripts/patch-typedoc-html-noopener.mjs"
+            exit 1
+          fi
+          echo "TypeDoc footer patch OK"
+
       - name: Verify generated docs match committed files
         run: |
           set -euo pipefail
@@ -115,6 +124,9 @@ jobs:
 
       - name: ESLint (jsx-a11y y TypeScript — cero advertencias)
         run: npm run lint
+
+      - name: API contract tests (OpenAPI / Ajv)
+        run: npx vitest run tests/api/contract.test.ts
 
       - name: Unit tests with coverage
         run: npm run test:coverage

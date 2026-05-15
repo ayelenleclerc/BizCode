@@ -23,15 +23,17 @@ push / pull_request
 │  7. npm run type-check                      ← blocks         │
 │  7b. npm run docs:validate                 ← blocks         │
 │  8. npm run docs:generate                  ← blocks         │
-│  9. git diff (generated docs / SBOM check) ← blocks         │
-│ 10. npm run lint                           ← blocks         │
-│ 11. npm run test:coverage ← blocks (Vitest + v8 thresholds; scope see matrix below) │
-│ 12. npm run check:i18n         ← blocks                        │
-│ 13. npx playwright install --with-deps chromium              │
-│ 14. npm run test:e2e           ← blocks (Playwright smoke; see ADR-0004) │
-│ 15. npm run test:integration   ← blocks (Prisma + PostgreSQL; ADR-0004 B) │
-│ 16. npm run check:docs-map     ← blocks                        │
-│ 17. Upload coverage artifact (always)                       │
+│  9. Verify TypeDoc HTML post-process (no unpatched footer)  ← blocks │
+│ 10. git diff (generated docs / SBOM check) ← blocks         │
+│ 11. npm run lint                           ← blocks         │
+│ 12. API contract tests (tests/api/contract.test.ts) ← blocks │
+│ 13. npm run test:coverage ← blocks (Vitest + v8 thresholds; scope see matrix below) │
+│ 14. npm run check:i18n         ← blocks                        │
+│ 15. npx playwright install --with-deps chromium              │
+│ 16. npm run test:e2e           ← blocks (Playwright smoke; see ADR-0004) │
+│ 17. npm run test:integration   ← blocks (Prisma + PostgreSQL; ADR-0004 B) │
+│ 18. npm run check:docs-map     ← blocks                        │
+│ 19. Upload coverage artifact (always)                       │
 └──────────────────────────────────────────────────────────────┘
 ```
 
@@ -50,7 +52,9 @@ push / pull_request
 | type-check | Any TypeScript compilation error |
 | check:openapi | OpenAPI 3.x validation failures for `docs/api/openapi.yaml` (script `npm run check:openapi`) |
 | docs:generate + git diff | Drift between committed files and regenerated docs under `docs/generated/`, `docs/api/openapi-reference.generated.md`, `docs/evidence/sbom-cyclonedx.json` |
+| TypeDoc post-process | No `target="_blank">TypeDoc</` in `docs/generated/typedoc/` (runs via `docs:typedoc` + `scripts/patch-typedoc-html-noopener.mjs`) |
 | lint | Any ESLint error or **warning** (`npm run lint` uses `--max-warnings 0`) |
+| API contract tests | Any failure in `tests/api/contract.test.ts` (OpenAPI paths/schemas vs Ajv) |
 | test:coverage | Any test failure OR any coverage threshold not met |
 | check:i18n | Any locale namespace has missing or extra keys vs. `es` source |
 | test:e2e | Any Playwright failure (includes `vite build` + preview via `playwright.config.ts`) |
@@ -69,7 +73,7 @@ push / pull_request
 | Frontend production bundle | `vite build` is executed by Playwright **`webServer`** before UI smoke (`playwright.config.ts`) | `ci.yml`, `frontend-validation.yml` → `test:e2e` |
 | i18n key parity | All locales aligned to source `es` | `npm run check:i18n` |
 | Human docs structure | Locale map completeness | `check:docs-map` |
-| Human docs localization policy | Controlled roots must stay trilingual EN/ES/PT-BR | `docs-governance.yml` (**PR to `main` and `develop`**) |
+| Human docs localization policy | Controlled roots (quality, ISO, specs, **user manuals**, changelogs, ADR, OpenAPI) must stay trilingual EN/ES/PT-BR | `docs-governance.yml` (**PR to `main` and `develop`**) |
 | External links in Markdown (under `docs/`) | HTTP(S) targets alive (**Lychee**; loopback en `.lycheeignore`). Enlaces relativos entre `.md` no se validan aquí (mapa + revisión). | `docs-links.yml` |
 
 ## Services

@@ -10,11 +10,15 @@ Versionamento: [Semantic Versioning](https://semver.org/).
 
 ### Corrigido
 
+- **Filtros de cobranças (a11y):** campos de filtro em `/cobros` com rótulo visível e `aria-label` / `placeholder`; [`src/pages/cobros/index.tsx`](../../src/pages/cobros/index.tsx).
+
 - **CORS + cookie de sessão:** `cors` no Express usa `credentials: true` e allowlist de origens (`http://localhost:5173`, `http://127.0.0.1:5173`, mais `CORS_ORIGINS` em CSV) para o SPA (Axios `withCredentials`) receber e enviar cookies de sessão entre origens; [`server/createApp.ts`](../../server/createApp.ts), [`.env.example`](../../.env.example), [`tests/server/cors.test.ts`](../../tests/server/cors.test.ts); [seguranca.md](seguranca.md) atualizado.
 
 ### Adicionado
 
 - **Ajustes de estoque (GitHub #128):** modelo `StockAjuste` e migração; `POST /api/articulos/:id/stock-ajuste` (`inventory.adjust`) e `GET /api/articulos/:id/stock-historial`; ao criar fatura decrementa estoque e notifica `stock_below_minimum`; auditoria `stock_adjust`; i18n EN/ES/PT-BR.
+
+- **Documentação (sincronização ISO-ready):** pacote specs v0.2 (RF-011–RF-015); manuais de cobranças, finanças, relatórios e logística (EN/ES/PT-BR); fluxo operacional MVP; rastreabilidade ISO e stubs REQ-007, TST-003, TST-005, ARC-004; pós-processamento TypeDoc [`scripts/patch-typedoc-html-noopener.mjs`](../../scripts/patch-typedoc-html-noopener.mjs); [`DOCUMENT_LOCALE_MAP.md`](../DOCUMENT_LOCALE_MAP.md).
 - **Configuração da empresa (GitHub #127):** `ParamEmpresa` por tenant com `GET/PUT /api/empresa`; `puntoVenta` define `prefijoFactura` de 4 dígitos; UI em `/configuracion/empresa` (edição com `settings.business.manage`); formulário de nova fatura pré-preenche prefixo e tipo padrão; i18n EN/ES/PT-BR.
 - **Score de pagamento (GitHub #130):** Recálculo automático de `Cliente.score` em `POST /api/cobros` pelos dias em atraso vs fatura ativa mais antiga (+5 / −3 / −7 / −15); sem alteração sem fatura ativa; `metadata` de auditoria com `scoreBefore`, `scoreAfter`, `delta`; resposta inclui `updatedCliente`; tooltip na ficha do cliente; i18n EN/ES/PT-BR.
 - **Ordens de entrega (GitHub #126):** modelo `OrdenEntrega` e migração; API `GET/POST/PUT /api/ordenes-entrega` com RBAC; listagem restrita ao motorista; auditoria em mudanças de status (`entrega_confirmed`); UI `/logistica` planner e motorista; i18n EN/ES/PT-BR.

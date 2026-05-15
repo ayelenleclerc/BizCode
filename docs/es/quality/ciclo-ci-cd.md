@@ -9,7 +9,8 @@ BizCode usa GitHub Actions para integración continua. El pipeline está definid
 ```
 push / pull_request → job quality (ubuntu-latest):
   checkout → Node 22 → npm ci → npm audit (informativo) → prisma generate → prisma validate → prisma migrate deploy →
-  type-check → docs:validate → docs:generate → git diff (docs generados / SBOM) → lint → test:coverage → check:i18n →
+  type-check → docs:validate → docs:generate → verificación post-proceso TypeDoc → git diff (docs generados / SBOM) → lint →
+  contract tests (OpenAPI/Ajv) → test:coverage → check:i18n →
   playwright install chromium → test:e2e → test:integration → check:docs-map →
   artefacto de cobertura
 ```
@@ -31,7 +32,9 @@ Un paso bloquea el pipeline (código de salida ≠ 0) cuando:
 | type-check | Cualquier error de compilación TypeScript |
 | docs:validate | Sintaxis OpenAPI 3.x (`npm run check:openapi`) y cobertura de rutas Express `/api/*` en `docs/api/openapi.yaml` (`npm run check:openapi-sync`) |
 | docs:generate + git diff | Desalineación entre lo commitado y la documentación regenerada (`docs/generated/`, `docs/api/openapi-reference.generated.md`, `docs/evidence/sbom-cyclonedx.json`) |
+| Post-proceso TypeDoc | Sin `target="_blank">TypeDoc</` en `docs/generated/typedoc/` (`docs:typedoc` + `scripts/patch-typedoc-html-noopener.mjs`) |
 | lint | Cualquier error o **advertencia** de ESLint (`npm run lint` usa `--max-warnings 0`) |
+| Contract tests API | Fallo en `tests/api/contract.test.ts` (rutas/esquemas OpenAPI vs Ajv) |
 | test:coverage | Fallo de test O umbral de cobertura no cumplido |
 | check:i18n | Claves faltantes o sobrantes vs. fuente `es` |
 | test:e2e | Fallo de Playwright (incluye `vite build` + preview; ver [ADR-0004](../adr/ADR-0004-e2e-playwright-integration-roadmap.md)) |
@@ -50,7 +53,7 @@ Un paso bloquea el pipeline (código de salida ≠ 0) cuando:
 | Bundle web producción | `vite build` vía `webServer` de Playwright antes del smoke UI | `ci.yml`, `frontend-validation.yml` → `test:e2e` |
 | Paridad i18n | Claves coherentes entre locales respecto de `es` | `npm run check:i18n` |
 | Estructura docs humanos | Existencia de rutas del mapa (`DOCUMENT_LOCALE_MAP.md`) | `check:docs-map` |
-| Política de localización docs | Áreas controladas trilingües EN/ES/PT-BR | `docs-governance.yml` (**PR a `main` y `develop`**) |
+| Política de localización docs | Áreas controladas trilingües (calidad, ISO, specs, **manuales de usuario**, changelogs, ADR, OpenAPI) | `docs-governance.yml` (**PR a `main` y `develop`**) |
 | Enlaces externos en Markdown (`docs/**`) | Destinos HTTP(S) vivos (**Lychee**; loopback en `.lycheeignore`). Los enlaces relativos entre `.md` no entran en este job. | `docs-links.yml` |
 
 ## Servicios

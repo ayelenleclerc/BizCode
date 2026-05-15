@@ -2,9 +2,9 @@
 
 | Field | Value |
 |-------|--------|
-| Document version | 0.1 |
-| Revision | 1 |
-| Date | 2026-03-31 |
+| Document version | 0.2 |
+| Revision | 2 |
+| Date | 2026-05-15 |
 | Product reference | BizCode 0.1.0 MVP |
 
 Maps **functional requirements** to **use cases**, **user stories**, **manual test cases**, and **implementation / doc evidence**. Empty cells mean “not applicable” for this MVP slice.
@@ -21,7 +21,12 @@ Maps **functional requirements** to **use cases**, **user stories**, **manual te
 | FR-008 | UC-04 | US-04 | TC-006 | `theming.md`, `Layout.tsx` |
 | FR-009 | UC-05 | US-05 | TC-007 | `src/i18n/`, locales |
 | FR-010 | — | — | TC-008 | `GET /api/health` |
+| FR-011 | UC-06 | US-06 | TC-011, TC-012 | `src/pages/cobros/`, `tests/api/cobros.test.ts` |
+| FR-012 | UC-06 | US-06 | TC-011 | `POST /api/cobros`, `CobroService.ts` |
+| FR-013 | UC-07 | US-07 | TC-013 | `src/pages/finanzas/`, `GET /api/reportes/aging` |
+| FR-014 | UC-08 | US-08 | TC-014 | `src/pages/reportes/`, `registerReportesRoutes.ts` |
+| FR-015 | UC-09 | US-09 | TC-015 | `src/pages/logistica/`, `registerOrdenesEntregaRoutes.ts` |
 
 **NFR traceability (summary):** NFR-001 ↔ [accessibility.md](../accessibility.md) + `App.a11y.test.tsx`; NFR-002 ↔ [i18n-strategy.md](../i18n-strategy.md) + `check:i18n`; NFR-005 ↔ [testing-strategy.md](../quality/testing-strategy.md) + `vitest.config.ts` + contract tests.
 
-**Other languages:** [Español](../../es/specs/traceability-matrix.md) · [Português](../../pt-br/specs/traceability-matrix.md)
+**Other languages:** [Español](../../es/specs/matriz-trazabilidad.md) · [Português](../../pt-br/specs/matriz-rastreabilidade.md)

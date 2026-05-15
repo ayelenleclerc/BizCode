@@ -73,6 +73,14 @@ Usuários com permissão de gestão de clientes podem carregar muitos registros 
 
 **Limites:** tamanho máximo do arquivo e quantidade máxima de linhas são aplicados pela API (veja OpenAPI em `/api-docs`).
 
+## Cobranças recentes
+
+Ao editar um cliente existente, o formulário exibe **cobranças recentes** carregadas de `GET /api/cobros?clienteId=…`. Use o link para abrir **Cobranças** filtrado por esse cliente ou registrar uma nova cobrança.
+
+## Score de cobrança
+
+O formulário de cliente mostra o **score de cobrança** (0–100) quando disponível, com tooltip que descreve como o score muda ao registrar cobranças contra faturas ativas. As regras estão documentadas no OpenAPI para `POST /api/cobros`.
+
 ## Atalhos de teclado
 
 | Tecla | Ação |

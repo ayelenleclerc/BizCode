@@ -20,9 +20,9 @@ Controlled specifications derived **only** from evidence in this repository (sou
 
 | Field | Value |
 |-------|--------|
-| Document set version | 0.1 |
-| Revision | 1 |
-| Date | 2026-03-31 |
+| Document set version | 0.2 |
+| Revision | 2 |
+| Date | 2026-05-15 |
 | Product reference | BizCode 0.1.0 MVP (see [changelog.md](../changelog.md)) |
 
 Each file in this folder repeats the version block in its own header for standalone printing.

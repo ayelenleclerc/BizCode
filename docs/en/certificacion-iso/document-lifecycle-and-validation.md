@@ -21,6 +21,7 @@ When you change narrative documentation:
 - [ ] [DOCUMENT_LOCALE_MAP.md](../DOCUMENT_LOCALE_MAP.md) is updated if any **path** changes.
 - [ ] `npm run check:docs-map` passes.
 - [ ] If HTTP API behaviour changes: [docs/api/openapi.yaml](../../api/openapi.yaml) and contract tests are updated (see [ADR-0003](../../adr/ADR-0003-api-contract-testing.md)).
+- [ ] If TypeScript, OpenAPI, or production dependencies change: run `npm run docs:generate` and commit generated paths without drift (see [generated-documentation.md](../quality/generated-documentation.md)).
 
 ## Verification
 

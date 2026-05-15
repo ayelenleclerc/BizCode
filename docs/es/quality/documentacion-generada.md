@@ -6,7 +6,7 @@ El proyecto versiona **material de referencia generado automáticamente** junto 
 
 | Artefacto | Ubicación | Generador |
 |-----------|-----------|-----------|
-| API TypeScript (HTML) | [`docs/generated/typedoc/`](../../generated/typedoc/index.html) | [TypeDoc](https://typedoc.org/) (`typedoc.json`) |
+| API TypeScript (HTML) | [`docs/generated/typedoc/`](../../generated/typedoc/index.html) | [TypeDoc](https://typedoc.org/) (`typedoc.json`), luego [`scripts/patch-typedoc-html-noopener.mjs`](../../../scripts/patch-typedoc-html-noopener.mjs) (etiquetas accesibles / comprobaciones HTML estáticas) |
 | OpenAPI → Markdown | [`docs/api/openapi-reference.generated.md`](../../api/openapi-reference.generated.md) | [`@scalar/openapi-to-markdown`](https://www.npmjs.com/package/@scalar/openapi-to-markdown) vía `scripts/generate-openapi-markdown.ts` |
 | JSON Schema → Markdown | [`docs/generated/schema-md/`](../../generated/schema-md/README.md) | Esquemas extraídos del OpenAPI (`scripts/extract-openapi-schemas.ts`) + [`@adobe/jsonschema2md`](https://www.npmjs.com/package/@adobe/jsonschema2md) |
 | SBOM (CycloneDX JSON) | [`docs/evidence/sbom-cyclonedx.json`](../../evidence/sbom-cyclonedx.json) | `@cyclonedx/cyclonedx-npm` (`npm run sbom:generate`) |

@@ -19,7 +19,9 @@ Esta matriz relaciona los artefactos de calidad de BizCode con cláusulas de nor
 | **manual-calidad.md** | §4.4, §10.2 | §6.1 | — | — | — |
 | **ADR-0001**, **ADR-0002** | §8.3.3 | §6.3.2 | — | — | — |
 | **mapa-datos-personales.md** | §8.1 | — | A.5.12, A.5.33 | — | — |
-| **Manuales de usuario** | §7.5 | §6.4.12 | — | Usabilidad §4.2.4 | — |
+| **Manuales de usuario** (clientes, artículos, facturación, apariencia, cobros, finanzas, reportes, logística) | §7.5 | §6.4.12 | — | Usabilidad §4.2.4 | — |
+| **API de cobros** + `tests/api/cobros.test.ts` | §8.3 | §6.3.2 | — | Idoneidad funcional | 29119-2 |
+| **documentacion-generada.md** + `npm run docs:generate` | §7.5 | §6.4.12 | A.8.31 (SBOM) | Mantenibilidad | — |
 | **temas-interfaz.md** | §8.3 | §6.4.12 | — | Usabilidad §4.2.4 | — |
 | **CONTRIBUTING.md** Definition of Done | §8.5.1 | §6.3.6 | A.8.25 | — | 29119-2 §7 |
 | **plantillas-registros.md** | §10.2.2 | §6.7.1 | A.5.33 | — | 29119-3 |

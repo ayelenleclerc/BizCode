@@ -22,7 +22,9 @@ This matrix maps BizCode's quality artefacts to clauses of the applicable ISO st
 | **ADR-0001** (REST/Prisma decision) | §8.3.3 Design outputs | §6.3.2 Software Design | — | Maintainability §4.2.7 | — |
 | **ADR-0002** (i18n library decision) | §8.3.3 Design outputs | §6.3.2 Software Design | — | Portability §4.2.8 | — |
 | **privacy-data-map.md** | §8.1 | — | A.5.12 Classification, A.5.33 Protection of records | — | — |
-| **User manuals** (clientes, articulos, facturacion, apariencia) | §7.5 Documented information | §6.4.12 Software Documentation | — | Usability §4.2.4 (User documentation) | — |
+| **User manuals** (customers, products, invoicing, appearance, collections, finance, reports, logistics) | §7.5 Documented information | §6.4.12 Software Documentation | — | Usability §4.2.4 (User documentation) | — |
+| **Collections API** + `tests/api/cobros.test.ts` | §8.3 Design and development | §6.3.2 Software Design | — | Functional suitability §4.2.1 | 29119-2 (test design) |
+| **generated-documentation.md** + `npm run docs:generate` (TypeDoc, OpenAPI MD, schema MD, SBOM) | §7.5 Documented information | §6.4.12 Software Documentation | A.8.31 (component inventory via SBOM) | Maintainability §4.2.7 | — |
 | **theming.md** (UI theme, Tailwind, `index.html`) | §8.3 Design and development | §6.4.12 Software Documentation | — | Usability §4.2.4 (User interface aesthetics) | — |
 | **CONTRIBUTING.md** Definition of Done | §8.5.1 Control of production | §6.3.6 Software Integration | A.8.25 | — | 29119-2 §7 (Entry/exit criteria) |
 | **records-template.md** (nonconformity, test records) | §10.2.2 Corrective action records | §6.7.1 Records | A.5.33 | — | 29119-3 (Test documentation) |
