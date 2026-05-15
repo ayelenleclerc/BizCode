@@ -15,6 +15,7 @@ Versionamento: [Semantic Versioning](https://semver.org/).
 ### Adicionado
 
 - **Score de pagamento (GitHub #130):** Recálculo automático de `Cliente.score` em `POST /api/cobros` pelos dias em atraso vs fatura ativa mais antiga (+5 / −3 / −7 / −15); sem alteração sem fatura ativa; `metadata` de auditoria com `scoreBefore`, `scoreAfter`, `delta`; resposta inclui `updatedCliente`; tooltip na ficha do cliente; i18n EN/ES/PT-BR.
+- **Ordens de entrega (GitHub #126):** modelo `OrdenEntrega` e migração; API `GET/POST/PUT /api/ordenes-entrega` com RBAC; listagem restrita ao motorista; auditoria em mudanças de status (`entrega_confirmed`); UI `/logistica` planner e motorista; i18n EN/ES/PT-BR.
 - **Relatórios (GitHub #129):** Relatórios operacionais em `/reportes` — `GET /api/reportes/ventas`, `GET /api/reportes/stock-critico`, `GET /api/reportes/cobranzas` com exportação JSON ou `Accept: text/csv`; permissões `reports.operational.read` / `reports.financial.read`; i18n EN/ES/PT-BR.
 - **Finanças (GitHub #125):** Módulo real em `/finanzas` — `GET /api/reportes/aging` e `GET /api/reportes/cuenta-corriente/:clienteId` (aging por `creditDays`, extrato com saldo acumulado); `facturasVencidas` do dashboard com a mesma regra de vencimento; i18n EN/ES/PT-BR.
 

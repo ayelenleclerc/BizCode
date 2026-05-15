@@ -42,7 +42,8 @@ model DeliveryZone {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  clientes Cliente[]
+  clientes      Cliente[]
+  ordenesEntrega OrdenEntrega[]
 
   @@index([tenantId])
 }
@@ -77,8 +78,9 @@ model Cliente {
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
-  facturas Factura[]
-  cobros   Cobro[]
+  facturas       Factura[]
+  cobros         Cobro[]
+  ordenesEntrega OrdenEntrega[]
 
   @@unique([tenantId, codigo])
   @@index([tenantId])
@@ -196,7 +198,8 @@ model Factura {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 
-  items FacturaItem[]
+  items          FacturaItem[]
+  ordenesEntrega OrdenEntrega[]
 
   @@unique([tenantId, tipo, prefijo, numero])
   @@index([tenantId])
@@ -246,6 +249,31 @@ model Tenant {
   proveedores    Proveedor[]
   facturas       Factura[]
   cobros         Cobro[]
+  ordenesEntrega OrdenEntrega[]
+}
+
+model OrdenEntrega {
+  id        Int       @id @default(autoincrement())
+  tenantId  Int
+  tenant    Tenant    @relation(fields: [tenantId], references: [id])
+  facturaId Int?
+  factura   Factura?  @relation(fields: [facturaId], references: [id])
+  clienteId Int
+  cliente   Cliente   @relation(fields: [clienteId], references: [id])
+  zonaId    Int?
+  zona      DeliveryZone? @relation(fields: [zonaId], references: [id])
+  driverId  Int?
+  driver    AppUser?  @relation("OrdenEntregaDriver", fields: [driverId], references: [id])
+  fecha     DateTime
+  /// pending | assigned | in_transit | delivered | failed
+  estado    String    @db.VarChar(20) @default("pending")
+  nota      String?   @db.VarChar(200)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([tenantId, estado])
+  @@index([tenantId, fecha])
+  @@index([tenantId, driverId])
 }
 
 model AppUser {
@@ -268,6 +296,7 @@ model AppUser {
   notifications Notification[]
   chatMessagesSent     ChatMessage[] @relation("ChatMessageSender")
   chatMessagesReceived ChatMessage[] @relation("ChatMessageRecipient")
+  ordenesEntregaDriver OrdenEntrega[] @relation("OrdenEntregaDriver")
 
   @@unique([tenantId, username])
 }

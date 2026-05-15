@@ -906,6 +906,83 @@ export const auditEventsAPI = {
 
 // ============ ZONAS DE ENTREGA ============
 
+export type OrdenEntregaEstado = 'pending' | 'assigned' | 'in_transit' | 'delivered' | 'failed'
+
+export type OrdenEntrega = {
+  id: number
+  tenantId: number
+  facturaId: number | null
+  clienteId: number
+  zonaId: number | null
+  driverId: number | null
+  fecha: string
+  estado: OrdenEntregaEstado
+  nota: string | null
+  cliente?: { id: number; codigo: number; rsocial: string }
+  zona?: { id: number; nombre: string } | null
+  driver?: { id: number; username: string; role: string } | null
+  factura?: { id: number; tipo: string; prefijo: string; numero: number } | null
+}
+
+export type OrdenEntregaListParams = {
+  estado?: OrdenEntregaEstado
+  zonaId?: number
+  driverId?: number
+  fecha?: string
+  limit?: number
+  offset?: number
+}
+
+export const ordenesEntregaAPI = {
+  list: async (params?: OrdenEntregaListParams) => {
+    try {
+      const response = await api.get('/ordenes-entrega', { params })
+      return response.data as {
+        success: true
+        data: OrdenEntrega[]
+        total: number
+        limit: number
+        offset: number
+      }
+    } catch (error) {
+      handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  create: async (body: {
+    clienteId: number
+    fecha: string
+    facturaId?: number | null
+    zonaId?: number | null
+    driverId?: number | null
+    nota?: string | null
+  }) => {
+    try {
+      const response = await api.post('/ordenes-entrega', body)
+      return response.data.data as OrdenEntrega
+    } catch (error) {
+      handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  update: async (
+    id: number,
+    body: {
+      estado: OrdenEntregaEstado
+      driverId?: number | null
+      zonaId?: number | null
+      nota?: string | null
+    },
+  ) => {
+    try {
+      const response = await api.put(`/ordenes-entrega/${id}`, body)
+      return response.data.data as OrdenEntrega
+    } catch (error) {
+      handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+}
+
 export const zonasEntregaAPI = {
   list: async () => {
     try {

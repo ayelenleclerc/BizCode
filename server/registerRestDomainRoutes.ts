@@ -13,6 +13,7 @@ import { registerProveedoresRoutes } from './routes/registerProveedoresRoutes'
 import { registerRubrosRoutes } from './routes/registerRubrosRoutes'
 import type { RestRouteContext } from './routes/restRouteTypes'
 import { registerZonasEntregaRoutes } from './routes/registerZonasEntregaRoutes'
+import { registerOrdenesEntregaRoutes } from './routes/registerOrdenesEntregaRoutes'
 import { createDomainServices } from './services/createDomainServices'
 
 /**
@@ -49,5 +50,6 @@ export function registerRestDomainRoutes(app: Application, prisma: PrismaClient)
   registerCobrosRoutes(app, ctx)
   registerReportesRoutes(app, ctx)
   registerZonasEntregaRoutes(app, ctx)
+  registerOrdenesEntregaRoutes(app, ctx)
   registerHealthRoute(app, ctx)
 }

@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "properties": {
+    "cliente": {
+      "additionalProperties": true,
+      "type": "object"
+    },
+    "clienteId": {
+      "type": "integer"
+    },
+    "driver": {
+      "additionalProperties": true,
+      "nullable": true,
+      "type": "object"
+    },
+    "driverId": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "estado": {
+      "enum": [
+        "pending",
+        "assigned",
+        "in_transit",
+        "delivered",
+        "failed"
+      ],
+      "type": "string"
+    },
+    "factura": {
+      "additionalProperties": true,
+      "nullable": true,
+      "type": "object"
+    },
+    "facturaId": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "fecha": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "id": {
+      "type": "integer"
+    },
+    "nota": {
+      "nullable": true,
+      "type": "string"
+    },
+    "tenantId": {
+      "type": "integer"
+    },
+    "zona": {
+      "additionalProperties": true,
+      "nullable": true,
+      "type": "object"
+    },
+    "zonaId": {
+      "nullable": true,
+      "type": "integer"
+    }
+  },
+  "title": "OrdenEntrega",
+  "type": "object"
+}

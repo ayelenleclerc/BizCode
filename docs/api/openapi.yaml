@@ -1659,6 +1659,129 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
 
+  /api/ordenes-entrega:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [logistics]
+      summary: List delivery orders
+      description: |
+        Requires `logistics.read` or `orders.deliver.confirm`. Drivers only see their own orders
+        (`driverId` forced to session user).
+      parameters:
+        - name: estado
+          in: query
+          schema:
+            type: string
+            enum: [pending, assigned, in_transit, delivered, failed]
+        - name: zonaId
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+        - name: driverId
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+        - name: fecha
+          in: query
+          schema:
+            type: string
+            format: date
+        - $ref: '#/components/parameters/ListLimit'
+        - $ref: '#/components/parameters/ListOffset'
+      responses:
+        '200':
+          description: Paginated delivery orders
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrdenEntregaListEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    post:
+      tags: [logistics]
+      summary: Create a delivery order
+      description: Requires `orders.create`. Initial estado is `pending`, or `assigned` when `driverId` is set.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrdenEntregaCreateInput'
+      responses:
+        '201':
+          description: Order created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrdenEntregaEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/ordenes-entrega/{id}:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    put:
+      tags: [logistics]
+      summary: Update delivery order status
+      description: |
+        Requires `orders.dispatch` for transitions to `assigned`, `in_transit`, or `failed`, and
+        `orders.deliver.confirm` for `delivered`. Drivers may only confirm their own `in_transit` orders.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrdenEntregaUpdateInput'
+      responses:
+        '200':
+          description: Order updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrdenEntregaEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Order not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '422':
+          description: Invalid state transition
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
 components:
   securitySchemes:
     cookieSession:
@@ -2191,6 +2314,101 @@ components:
         data:
           $ref: '#/components/schemas/CobroCreateData'
 
+    OrdenEntrega:
+      type: object
+      additionalProperties: true
+      properties:
+        id:
+          type: integer
+        tenantId:
+          type: integer
+        facturaId:
+          type: integer
+          nullable: true
+        clienteId:
+          type: integer
+        zonaId:
+          type: integer
+          nullable: true
+        driverId:
+          type: integer
+          nullable: true
+        fecha:
+          type: string
+          format: date-time
+        estado:
+          type: string
+          enum: [pending, assigned, in_transit, delivered, failed]
+        nota:
+          type: string
+          nullable: true
+        cliente:
+          type: object
+          additionalProperties: true
+        zona:
+          type: object
+          additionalProperties: true
+          nullable: true
+        driver:
+          type: object
+          additionalProperties: true
+          nullable: true
+        factura:
+          type: object
+          additionalProperties: true
+          nullable: true
+
+    OrdenEntregaCreateInput:
+      type: object
+      required: [clienteId, fecha]
+      properties:
+        clienteId:
+          type: integer
+          minimum: 1
+        fecha:
+          type: string
+        facturaId:
+          type: integer
+          nullable: true
+        zonaId:
+          type: integer
+          nullable: true
+        driverId:
+          type: integer
+          nullable: true
+        nota:
+          type: string
+          maxLength: 200
+
+    OrdenEntregaUpdateInput:
+      type: object
+      required: [estado]
+      properties:
+        estado:
+          type: string
+          enum: [pending, assigned, in_transit, delivered, failed]
+        driverId:
+          type: integer
+          nullable: true
+        zonaId:
+          type: integer
+          nullable: true
+        nota:
+          type: string
+          maxLength: 200
+
+    OrdenEntregaListEnvelope:
+      allOf:
+        - type: object
+          required: [success, data]
+          properties:
+            success:
+              type: boolean
+              const: true
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/OrdenEntrega'
     AgingBucket:
       type: object
       required: [label, count, total]

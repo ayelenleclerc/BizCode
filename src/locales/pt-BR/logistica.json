@@ -1,0 +1,54 @@
+{
+  "title": "Logística de entregas",
+  "forbidden": "Você não tem permissão para ver ordens de entrega.",
+  "filters": {
+    "fecha": "Data",
+    "estado": "Status",
+    "zona": "Zona",
+    "allEstados": "Todos os status",
+    "allZonas": "Todas as zonas"
+  },
+  "estado": {
+    "pending": "Pendente",
+    "assigned": "Atribuída",
+    "in_transit": "Em trânsito",
+    "delivered": "Entregue",
+    "failed": "Falhou"
+  },
+  "table": {
+    "cliente": "Cliente",
+    "fecha": "Data",
+    "estado": "Status",
+    "zona": "Zona",
+    "driver": "Motorista",
+    "actions": "Ações"
+  },
+  "actions": {
+    "refresh": "Atualizar",
+    "newOrder": "Nova ordem",
+    "assignTransit": "Marcar em trânsito",
+    "markDelivered": "Confirmar entrega",
+    "markFailed": "Marcar falha"
+  },
+  "empty": "Não há ordens de entrega para os filtros selecionados.",
+  "loading": "Carregando ordens…",
+  "errors": {
+    "load": "Não foi possível carregar as ordens de entrega.",
+    "save": "Não foi possível salvar a ordem.",
+    "transition": "Não foi possível atualizar o status."
+  },
+  "form": {
+    "title": "Nova ordem de entrega",
+    "clienteId": "ID do cliente",
+    "fecha": "Data de entrega",
+    "zonaId": "ID da zona (opcional)",
+    "driverId": "ID do motorista (opcional)",
+    "nota": "Notas",
+    "submit": "Criar ordem",
+    "cancel": "Cancelar"
+  },
+  "driverView": {
+    "title": "Minhas entregas do dia",
+    "confirm": "Confirmar entrega"
+  }
+}
