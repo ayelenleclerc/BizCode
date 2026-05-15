@@ -14,6 +14,7 @@ import CobrosPage from './pages/cobros'
 import ReportesPage from './pages/reportes'
 import ConfiguracionPage from './pages/configuracion'
 import ZonasEntregaPage from './pages/configuracion/ZonasEntregaPage'
+import EmpresaPage from './pages/configuracion/EmpresaPage'
 import ChatPage from './pages/chat'
 import AuditLogPage from './pages/admin/audit-log'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
@@ -98,6 +99,7 @@ function AppRoutes() {
           {/* Configuración */}
           <Route path="configuracion" element={<ConfiguracionPage />} />
           <Route path="configuracion/zonas-entrega" element={<ZonasEntregaPage />} />
+          <Route path="configuracion/empresa" element={<EmpresaPage />} />
           <Route path="chat" element={<ChatPage />} />
           <Route path="admin/audit-log" element={<AuditLogPage />} />
         </Route>

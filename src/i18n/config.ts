@@ -15,6 +15,7 @@ import cobrosEs from '@/locales/es/cobros.json'
 import finanzasEs from '@/locales/es/finanzas.json'
 import reportesEs from '@/locales/es/reportes.json'
 import logisticaEs from '@/locales/es/logistica.json'
+import empresaEs from '@/locales/es/empresa.json'
 
 import commonEn from '@/locales/en/common.json'
 import clientesEn from '@/locales/en/clientes.json'
@@ -28,6 +29,7 @@ import cobrosEn from '@/locales/en/cobros.json'
 import finanzasEn from '@/locales/en/finanzas.json'
 import reportesEn from '@/locales/en/reportes.json'
 import logisticaEn from '@/locales/en/logistica.json'
+import empresaEn from '@/locales/en/empresa.json'
 
 import commonPt from '@/locales/pt-BR/common.json'
 import clientesPt from '@/locales/pt-BR/clientes.json'
@@ -41,6 +43,7 @@ import cobrosPt from '@/locales/pt-BR/cobros.json'
 import finanzasPt from '@/locales/pt-BR/finanzas.json'
 import reportesPt from '@/locales/pt-BR/reportes.json'
 import logisticaPt from '@/locales/pt-BR/logistica.json'
+import empresaPt from '@/locales/pt-BR/empresa.json'
 
 // Persist language preference in localStorage
 const savedLang = typeof localStorage !== 'undefined'
@@ -53,7 +56,7 @@ i18n
     lng: savedLang,
     fallbackLng: 'es',
     defaultNS: 'common',
-    ns: ['common', 'clientes', 'articulos', 'proveedores', 'facturacion', 'cobros', 'finanzas', 'reportes', 'logistica', 'zonasEntrega', 'chat', 'audit'],
+    ns: ['common', 'clientes', 'articulos', 'proveedores', 'facturacion', 'cobros', 'finanzas', 'reportes', 'logistica', 'zonasEntrega', 'empresa', 'chat', 'audit'],
     resources: {
       es: {
         common: commonEs,
@@ -68,6 +71,7 @@ i18n
         finanzas: finanzasEs,
         reportes: reportesEs,
         logistica: logisticaEs,
+        empresa: empresaEs,
       },
       en: {
         common: commonEn,
@@ -82,6 +86,7 @@ i18n
         finanzas: finanzasEn,
         reportes: reportesEn,
         logistica: logisticaEn,
+        empresa: empresaEn,
       },
       'pt-BR': {
         common: commonPt,
@@ -96,6 +101,7 @@ i18n
         finanzas: finanzasPt,
         reportes: reportesPt,
         logistica: logisticaPt,
+        empresa: empresaPt,
       },
     },
     interpolation: {

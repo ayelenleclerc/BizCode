@@ -8,6 +8,18 @@ vi.mock('@/lib/api', () => ({
   facturasAPI: {
     create: vi.fn().mockResolvedValue({ id: 1 }),
   },
+  empresaAPI: {
+    get: vi.fn().mockResolvedValue({
+      id: null,
+      nombre: 'Demo',
+      cuit: '20-12345678-6',
+      domicilio: null,
+      puntoVenta: 1,
+      tipoFactura: 'B',
+      logoUrl: null,
+      prefijoFactura: '0001',
+    }),
+  },
 }))
 
 const now = new Date()

@@ -1566,6 +1566,52 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
 
+  /api/empresa:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [settings]
+      summary: Get company settings for the authenticated tenant
+      security:
+        - cookieSession: []
+      responses:
+        '200':
+          description: Company settings (persisted row or tenant defaults)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmpresaEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    put:
+      tags: [settings]
+      summary: Update company settings
+      security:
+        - cookieSession: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmpresaInput'
+      responses:
+        '200':
+          description: Settings updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmpresaEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
   /api/zonas-entrega:
     parameters:
       - $ref: '#/components/parameters/BizcodeChannelHeader'
@@ -2409,6 +2455,17 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/OrdenEntrega'
+
+    OrdenEntregaEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/OrdenEntrega'
+
     AgingBucket:
       type: object
       required: [label, count, total]
@@ -3346,6 +3403,76 @@ components:
           const: true
         data:
           $ref: '#/components/schemas/DeliveryZone'
+
+    EmpresaConfig:
+      type: object
+      required: [nombre, cuit, puntoVenta, tipoFactura, prefijoFactura]
+      properties:
+        id:
+          type: integer
+          nullable: true
+          description: Null when settings have not been saved yet (defaults only).
+        nombre:
+          type: string
+          maxLength: 40
+        cuit:
+          type: string
+          maxLength: 14
+        domicilio:
+          type: string
+          nullable: true
+          maxLength: 40
+        puntoVenta:
+          type: integer
+          minimum: 1
+          maximum: 9999
+        tipoFactura:
+          type: string
+          enum: [A, B, C]
+        logoUrl:
+          type: string
+          nullable: true
+          maxLength: 255
+        prefijoFactura:
+          type: string
+          description: Four-digit invoice prefix derived from puntoVenta.
+          pattern: '^[0-9]{4}$'
+
+    EmpresaInput:
+      type: object
+      required: [nombre, cuit, puntoVenta, tipoFactura]
+      properties:
+        nombre:
+          type: string
+          maxLength: 40
+        cuit:
+          type: string
+          maxLength: 14
+        domicilio:
+          type: string
+          nullable: true
+          maxLength: 40
+        puntoVenta:
+          type: integer
+          minimum: 1
+          maximum: 9999
+        tipoFactura:
+          type: string
+          enum: [A, B, C]
+        logoUrl:
+          type: string
+          nullable: true
+          maxLength: 255
+
+    EmpresaEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/EmpresaConfig'
 
     DashboardSummary:
       type: object

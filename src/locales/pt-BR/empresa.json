@@ -1,0 +1,33 @@
+{
+  "title": "Dados da empresa",
+  "subtitle": "Identidade comercial e parâmetros padrão de faturamento",
+  "readOnlyHint": "Você pode consultar estes dados; apenas proprietários e gerentes podem editá-los.",
+  "form": {
+    "nombre": "Razão social",
+    "cuit": "CUIT",
+    "cuitHint": "Formato XX-XXXXXXXX-X",
+    "domicilio": "Endereço",
+    "puntoVenta": "Ponto de venda",
+    "puntoVentaHint": "Usado como prefixo de fatura de 4 dígitos (1–9999)",
+    "tipoFactura": "Tipo de fatura padrão",
+    "logoUrl": "URL do logotipo",
+    "logoUrlHint": "Link https opcional para o logotipo",
+    "prefijoPreview": "Prévia do prefixo",
+    "tipoA": "Tipo A",
+    "tipoB": "Tipo B",
+    "tipoC": "Tipo C"
+  },
+  "actions": {
+    "save": "Salvar configuração"
+  },
+  "errors": {
+    "loadFailed": "Não foi possível carregar os dados da empresa",
+    "saveFailed": "Não foi possível salvar os dados da empresa",
+    "nombreRequired": "A razão social é obrigatória",
+    "cuitInvalid": "Informe um CUIT válido",
+    "puntoVentaInvalid": "O ponto de venda deve estar entre 1 e 9999"
+  },
+  "success": {
+    "saved": "Configuração da empresa salva"
+  }
+}

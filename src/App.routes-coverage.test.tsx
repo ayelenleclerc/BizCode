@@ -109,6 +109,28 @@ vi.mock('@/lib/api', async () => {
       create: vi.fn().mockResolvedValue(sampleZone),
       update: vi.fn().mockResolvedValue(sampleZone),
     },
+    empresaAPI: {
+      get: vi.fn().mockResolvedValue({
+        id: null,
+        nombre: 'Demo',
+        cuit: '20-12345678-6',
+        domicilio: null,
+        puntoVenta: 1,
+        tipoFactura: 'B',
+        logoUrl: null,
+        prefijoFactura: '0001',
+      }),
+      update: vi.fn().mockResolvedValue({
+        id: 1,
+        nombre: 'Demo',
+        cuit: '20-12345678-6',
+        domicilio: null,
+        puntoVenta: 1,
+        tipoFactura: 'B',
+        logoUrl: null,
+        prefijoFactura: '0001',
+      }),
+    },
     chatAPI: {
       conversations: vi.fn().mockResolvedValue(
         [] as import('@/lib/api').ChatConversation[],
@@ -186,6 +208,10 @@ describe('App — cobertura de rutas protegidas (smoke navegación)', () => {
 
     await clickMainLink('/users')
     await waitFor(() => expect(globalThis.location.pathname).toBe('/users'))
+
+    await clickAsideLink('/configuracion')
+    await clickMainLink('/configuracion/empresa')
+    await waitFor(() => expect(globalThis.location.pathname).toBe('/configuracion/empresa'))
 
     await clickAsideLink('/configuracion')
     await clickMainLink('/configuracion/zonas-entrega')
