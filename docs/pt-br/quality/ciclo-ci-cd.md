@@ -9,7 +9,8 @@ BizCode usa GitHub Actions. Definição: `.github/workflows/ci.yml`.
 ```
 push / pull_request → job quality (ubuntu-latest):
   checkout → Node 22 → npm ci → npm audit (informativo) → prisma generate → prisma validate → prisma migrate deploy →
-  type-check → docs:validate → docs:generate → git diff (docs gerados / SBOM) → lint → test:coverage → check:i18n →
+  type-check → docs:validate → docs:generate → verificação pós-processo TypeDoc → git diff (docs gerados / SBOM) → lint →
+  contract tests (OpenAPI/Ajv) → test:coverage → check:i18n →
   playwright install chromium → test:e2e → test:integration → check:docs-map →
   artefato de cobertura
 ```
@@ -29,7 +30,9 @@ push / pull_request → job quality (ubuntu-latest):
 | type-check | Erro TypeScript |
 | docs:validate | Sintaxe OpenAPI 3.x (`npm run check:openapi`) e cobertura de rotas Express `/api/*` em `docs/api/openapi.yaml` (`npm run check:openapi-sync`) |
 | docs:generate + git diff | Divergência entre arquivos commitados e documentação regenerada (`docs/generated/`, `docs/api/openapi-reference.generated.md`, `docs/evidence/sbom-cyclonedx.json`) |
+| Pós-processo TypeDoc | Sem `target="_blank">TypeDoc</` em `docs/generated/typedoc/` (`docs:typedoc` + `scripts/patch-typedoc-html-noopener.mjs`) |
 | lint | Erro ou **warning** ESLint (`--max-warnings 0`) |
+| Contract tests API | Falha em `tests/api/contract.test.ts` (rotas/esquemas OpenAPI vs Ajv) |
 | test:coverage | Falha de teste ou cobertura abaixo do limite |
 | check:i18n | Chaves divergentes da fonte `es` |
 | test:e2e | Falha Playwright (build + `vite preview`; ver [ADR-0004](../adr/ADR-0004-e2e-playwright-integration-roadmap.md)) |
@@ -48,7 +51,7 @@ push / pull_request → job quality (ubuntu-latest):
 | Bundle web | `vite build` via **`webServer`** do Playwright | `ci.yml`, `frontend-validation.yml` → `test:e2e` |
 | i18n | Paridade de namespaces vs. fonte `es` | `check:i18n` |
 | Estrutura de docs humanos | Paths do mapa (`DOCUMENT_LOCALE_MAP.md`) | `check:docs-map` |
-| Política de localização docs | Roots controlados trilingues EN/ES/PT-BR | `docs-governance.yml` (**PR para `main` e `develop`**) |
+| Política de localização docs | Roots controlados trilingues (qualidade, ISO, specs, **manuais de usuário**, changelogs, ADR, OpenAPI) | `docs-governance.yml` (**PR para `main` e `develop`**) |
 | Links externos em Markdown (`docs/**`) | Destinos HTTP(S) ativos (**Lychee**; loopback em `.lycheeignore`). Links relativos entre `.md` ficam fora deste job. | `docs-links.yml` |
 
 ## Serviços
