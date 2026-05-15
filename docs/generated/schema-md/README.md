@@ -146,6 +146,8 @@
 
 * [OrdenEntregaCreateInput](./ordenentregacreateinput.md) – `-`
 
+* [OrdenEntregaEnvelope](./ordenentregaenvelope.md) – `-`
+
 * [OrdenEntregaListEnvelope](./ordenentregalistenvelope.md) – `-`
 
 * [OrdenEntregaUpdateInput](./ordenentregaupdateinput.md) – `-`

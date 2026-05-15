@@ -73,6 +73,14 @@ Users with customer management permission can load many records from a **UTF-8 C
 
 **Limits:** maximum file size and maximum number of data rows are enforced by the API (see OpenAPI at `/api-docs`). Oversized uploads return an error.
 
+## Recent payments
+
+When editing an existing customer, the form shows **recent payments** loaded from `GET /api/cobros?clienteId=…`. Use the link to open **Cobros** filtered for that customer or register a new payment.
+
+## Payment score
+
+The customer form displays **payment score** (0–100) when available, with a tooltip describing how score changes when registering payments against active invoices. Rules are documented in OpenAPI for `POST /api/cobros`.
+
 ## Keyboard Shortcuts
 
 | Key | Action |

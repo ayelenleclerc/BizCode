@@ -1,8 +1,8 @@
 # Test cases catalog
 
 | Document code | TST-003 |
-| Version | 0.1 |
-| Date | 2026-04-01 |
+| Version | 0.2 |
+| Date | 2026-05-15 |
 | Author | BizCode |
 | Requirement level | Highly recommended |
 | Normative applicability | ISO 9001:2015; ISO/IEC/IEEE 29119 (testing) |
@@ -26,3 +26,4 @@ Complete when product or organizational scope is defined. Do not claim certifica
 | Version | Date | Author | Summary of changes |
 |--------------|-----------|-------------|----------------|
 | 0.1 | 2026-04-01 | BizCode | Initial stub |
+| 0.2 | 2026-05-15 | BizCode | TC-011–TC-015 (collections, finance, reports, logistics) |

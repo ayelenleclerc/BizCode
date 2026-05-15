@@ -6,7 +6,7 @@ BizCode commits **machine-generated** reference material alongside the source of
 
 | Artifact | Location | Generator |
 |----------|----------|-----------|
-| TypeScript API (HTML) | [`docs/generated/typedoc/`](../../generated/typedoc/index.html) | [TypeDoc](https://typedoc.org/) (`typedoc.json`) |
+| TypeScript API (HTML) | [`docs/generated/typedoc/`](../../generated/typedoc/index.html) | [TypeDoc](https://typedoc.org/) (`typedoc.json`), then [`scripts/patch-typedoc-html-noopener.mjs`](../../../scripts/patch-typedoc-html-noopener.mjs) (accessible labels / static HTML checks) |
 | OpenAPI → Markdown | [`docs/api/openapi-reference.generated.md`](../../api/openapi-reference.generated.md) | [`@scalar/openapi-to-markdown`](https://www.npmjs.com/package/@scalar/openapi-to-markdown) via `scripts/generate-openapi-markdown.ts` |
 | JSON Schema → Markdown | [`docs/generated/schema-md/`](../../generated/schema-md/README.md) | Schemas extracted from OpenAPI (`scripts/extract-openapi-schemas.ts`) + [`@adobe/jsonschema2md`](https://www.npmjs.com/package/@adobe/jsonschema2md) |
 | SBOM (CycloneDX JSON) | [`docs/evidence/sbom-cyclonedx.json`](../../evidence/sbom-cyclonedx.json) | `@cyclonedx/cyclonedx-npm` (`npm run sbom:generate`) |

@@ -2409,6 +2409,17 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/OrdenEntrega'
+
+    OrdenEntregaEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/OrdenEntrega'
+
     AgingBucket:
       type: object
       required: [label, count, total]

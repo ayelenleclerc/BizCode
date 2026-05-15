@@ -16,6 +16,7 @@ Complete when product or organizational scope is defined. Do not claim certifica
 ## Canonical body (single source of truth)
 
 - [records-template.md](../records-template.md)
+- Automated API evidence: [`tests/api/cobros.test.ts`](../../../tests/api/cobros.test.ts) (collections)
 
 ## Purpose
 
@@ -26,3 +27,4 @@ Complete when product or organizational scope is defined. Do not claim certifica
 | Version | Date | Author | Summary of changes |
 |--------------|-----------|-------------|----------------|
 | 0.1 | 2026-04-01 | BizCode | Initial stub |
+| 0.2 | 2026-05-15 | BizCode | Link to `tests/api/cobros.test.ts` |
