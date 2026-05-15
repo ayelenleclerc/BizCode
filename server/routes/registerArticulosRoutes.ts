@@ -1,8 +1,9 @@
 import type { Application, Request, Response } from 'express'
 import { requirePermission, type AuthenticatedRequest } from '../auth'
 import { validateBody } from '../middleware/validateBody'
-import { articuloBodySchema } from '../schemas/domain'
-import type { ArticuloInput } from '../createApp.types'
+import { articuloBodySchema, stockAjusteBodySchema } from '../schemas/domain'
+import type { ArticuloInput, StockAjusteInput } from '../createApp.types'
+import { hasPermission } from '../../src/lib/rbac'
 import { parseCsvWithFixedHeaders, CSV_IMPORT_MAX_ROWS } from '../csvImport'
 import { paginatedListJson, parseListPagination } from '../services/listPagination'
 import type { RestRouteContext } from './restRouteTypes'
@@ -19,7 +20,16 @@ import {
  */
 export function registerArticulosRoutes(app: Application, ctx: RestRouteContext): void {
   const { services, writeAudit } = ctx
-  const { articulo, import: importService } = services
+  const { articulo, stockAjuste, import: importService } = services
+
+  function canViewStockHistorial(role: string): boolean {
+    return (
+      hasPermission(role as Parameters<typeof hasPermission>[0], 'inventory.adjust') ||
+      role === 'owner' ||
+      role === 'manager' ||
+      role === 'warehouse_lead'
+    )
+  }
 
   app.get('/api/articulos', requirePermission('products.read'), async (req: Request, res: Response) => {
     try {
@@ -78,6 +88,64 @@ export function registerArticulosRoutes(app: Application, ctx: RestRouteContext)
           return
         }
         await writeAudit(req as AuthenticatedRequest, 'articulo_update', 'articulo', String(result.data.id))
+        res.json({ success: true, data: result.data })
+      } catch (err: unknown) {
+        res.status(500).json({ success: false, error: errorMessage(err) })
+      }
+    },
+  )
+
+  app.get(
+    '/api/articulos/:id/stock-historial',
+    requirePermission('products.read'),
+    async (req: Request, res: Response) => {
+      const authReq = req as AuthenticatedRequest
+      if (!canViewStockHistorial(authReq.auth!.claims.role)) {
+        res.status(403).json({ success: false, error: 'Missing permission to view stock history' })
+        return
+      }
+      try {
+        const tenantId = getTenantId(req)
+        const articuloId = parseInt(String(req.params.id), 10)
+        const { take, skip } = parseListPagination(req)
+        const result = await stockAjuste.listHistorial(tenantId, articuloId, take, skip)
+        if (!result.ok) {
+          res.status(result.status).json({ success: false, error: result.error })
+          return
+        }
+        res.json(paginatedListJson(result.data.ajustes, result.data.total, take, skip))
+      } catch (err: unknown) {
+        res.status(500).json({ success: false, error: errorMessage(err) })
+      }
+    },
+  )
+
+  app.post(
+    '/api/articulos/:id/stock-ajuste',
+    requirePermission('inventory.adjust'),
+    validateBody(stockAjusteBodySchema),
+    async (req: Request, res: Response) => {
+      try {
+        const authReq = req as AuthenticatedRequest
+        const tenantId = getTenantId(req)
+        const articuloId = parseInt(String(req.params.id), 10)
+        const body = req.body as StockAjusteInput
+        const result = await stockAjuste.adjust(
+          tenantId,
+          articuloId,
+          authReq.auth!.claims.userId,
+          body,
+        )
+        if (!result.ok) {
+          res.status(result.status).json({ success: false, error: result.error })
+          return
+        }
+        await writeAudit(authReq, 'stock_adjust', 'articulo', String(articuloId), {
+          stockBefore: result.data.stockBefore,
+          stockAfter: result.data.stockAfter,
+          cantidad: body.cantidad,
+          motivo: body.motivo,
+        })
         res.json({ success: true, data: result.data })
       } catch (err: unknown) {
         res.status(500).json({ success: false, error: errorMessage(err) })

@@ -6,6 +6,7 @@ import {
   facturaBodySchema,
   proveedorBodySchema,
   rubroBodySchema,
+  stockAjusteBodySchema,
 } from '../../server/schemas/domain'
 
 const validArticuloPayload = {
@@ -101,6 +102,24 @@ describe('proveedorBodySchema', () => {
     if (!r.success) {
       expect(r.error.errors.some((e) => e.path.includes('cuit'))).toBe(true)
     }
+  })
+})
+
+describe('stockAjusteBodySchema', () => {
+  it('parses valid adjustment', () => {
+    const out = stockAjusteBodySchema.parse({ cantidad: -3, motivo: '  Merma  ' })
+    expect(out.cantidad).toBe(-3)
+    expect(out.motivo).toBe('Merma')
+  })
+
+  it('rejects zero cantidad', () => {
+    const r = stockAjusteBodySchema.safeParse({ cantidad: 0, motivo: 'Ok' })
+    expect(r.success).toBe(false)
+  })
+
+  it('rejects empty motivo', () => {
+    const r = stockAjusteBodySchema.safeParse({ cantidad: 1, motivo: '   ' })
+    expect(r.success).toBe(false)
   })
 })
 

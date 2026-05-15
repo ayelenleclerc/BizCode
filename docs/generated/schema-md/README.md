@@ -190,6 +190,18 @@
 
 * [SetupOwnerResult](./setupownerresult.md) – `-`
 
+* [StockAdjustData](./stockadjustdata.md) – `-`
+
+* [StockAdjustEnvelope](./stockadjustenvelope.md) – `-`
+
+* [StockAjuste](./stockajuste.md) – `-`
+
+* [StockAjusteInput](./stockajusteinput.md) – `-`
+
+* [StockAjusteListEnvelope](./stockajustelistenvelope.md) – `-`
+
+* [StockAjusteUser](./stockajusteuser.md) – `-`
+
 * [StockCriticoArticulo](./stockcriticoarticulo.md) – `-`
 
 * [StockCriticoListEnvelope](./stockcriticolistenvelope.md) – `-`
@@ -249,6 +261,10 @@
 * [Untitled object in ProveedorListEnvelope](./proveedorlistenvelope-allof-0.md) – `undefined#/allOf/0`
 
 * [Untitled object in RubroListEnvelope](./rubrolistenvelope-allof-0.md) – `undefined#/allOf/0`
+
+* [Untitled object in StockAdjustData](./stockadjustdata-properties-articulo.md) – `undefined#/properties/articulo`
+
+* [Untitled object in StockAjusteListEnvelope](./stockajustelistenvelope-allof-0.md) – `undefined#/allOf/0`
 
 ### Arrays
 
@@ -329,6 +345,8 @@
 * [Untitled array in ReporteVentasListEnvelope](./reporteventaslistenvelope-properties-data.md) – `undefined#/properties/data`
 
 * [Untitled array in RubroListEnvelope](./rubrolistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
+
+* [Untitled array in StockAjusteListEnvelope](./stockajustelistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
 
 * [Untitled array in StockCriticoListEnvelope](./stockcriticolistenvelope-properties-data.md) – `undefined#/properties/data`
 

@@ -8,6 +8,7 @@ export const NOTIFICATION_TYPES = [
   'invoice_overdue',
   'invoice_due_soon',
   'chat_message',
+  'stock_below_minimum',
 ] as const
 
 export type NotificationType = (typeof NOTIFICATION_TYPES)[number]
@@ -21,6 +22,11 @@ export type NotificationPayload = {
   messageId?: number
   fromUserId?: number
   preview?: string
+  articuloId?: number
+  codigo?: number
+  descripcion?: string
+  stock?: number
+  minimo?: number
 }
 
 /**
@@ -64,6 +70,33 @@ export async function notifyManagers(
 
   await prisma.notification.createMany({
     data: managers.map((m) => ({ tenantId, userId: m.id, type, payload })),
+  })
+}
+
+/**
+ * @en Notifies owner, manager, and warehouse_lead for inventory alerts.
+ * @es Notifica a owner, manager y warehouse_lead para alertas de inventario.
+ * @pt-BR Notifica owner, manager e warehouse_lead para alertas de estoque.
+ */
+export async function notifyInventoryStakeholders(
+  prisma: PrismaClient,
+  tenantId: number,
+  type: NotificationType,
+  payload: NotificationPayload,
+): Promise<void> {
+  const users = await prisma.appUser.findMany({
+    where: {
+      tenantId,
+      active: true,
+      role: { in: ['owner', 'manager', 'warehouse_lead'] },
+    },
+    select: { id: true },
+  })
+
+  if (users.length === 0) return
+
+  await prisma.notification.createMany({
+    data: users.map((u) => ({ tenantId, userId: u.id, type, payload })),
   })
 }
 

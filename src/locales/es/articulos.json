@@ -78,5 +78,32 @@
     "errors": {
       "generic": "Error al guardar artículo"
     }
+  },
+  "stockAdjust": {
+    "button": "Ajustar stock",
+    "title": "Ajuste manual de stock",
+    "readonlyHint": "El stock solo se modifica con ajustes auditados (no desde este formulario).",
+    "cantidad": "Cantidad (+ ingreso / − egreso)",
+    "cantidadHint": "Use números negativos para salidas.",
+    "motivo": "Motivo",
+    "submit": "Aplicar ajuste",
+    "errors": {
+      "cantidad": "Indique una cantidad distinta de cero.",
+      "motivo": "El motivo es obligatorio.",
+      "insufficient": "Stock insuficiente para este ajuste.",
+      "generic": "No se pudo aplicar el ajuste."
+    }
+  },
+  "stockHistory": {
+    "title": "Historial de ajustes",
+    "loading": "Cargando historial…",
+    "empty": "Sin ajustes registrados.",
+    "total": "Total de registros: {{count}}",
+    "columns": {
+      "date": "Fecha",
+      "qty": "Cantidad",
+      "reason": "Motivo",
+      "user": "Usuario"
+    }
   }
 }

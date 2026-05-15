@@ -114,6 +114,11 @@ export type OrdenEntregaUpdateBody = {
   nota?: string | null
 }
 
+export type StockAjusteInput = {
+  cantidad: number
+  motivo: string
+}
+
 export type EmpresaInput = {
   nombre: string
   cuit: string

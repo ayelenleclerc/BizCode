@@ -2,6 +2,11 @@ import type { Cliente, Factura, Prisma, PrismaClient } from '@prisma/client'
 import type { FacturaInput } from '../createApp.types'
 import { facturaFechaToPrismaDate } from '../routes/restDomainShared'
 import type { ServiceResult } from './serviceResults'
+import {
+  aggregateItemQuantities,
+  evaluateStockForInvoice,
+  type StockBelowMinimumAlert,
+} from './facturaStock'
 
 type FacturaWithRelations = Prisma.FacturaGetPayload<{ include: { cliente: true; items: true } }>
 
@@ -13,6 +18,7 @@ export type FacturaListResult = {
 export type FacturaCreateResult = {
   factura: FacturaWithRelations
   updatedCliente: Pick<Cliente, 'id' | 'rsocial' | 'balance' | 'creditLimit'>
+  stockBelowMinimum: StockBelowMinimumAlert[]
 }
 
 /**
@@ -43,16 +49,22 @@ export class FacturaService {
     const clienteId = factura.clienteId
 
     const articuloIds = [...new Set(items.map((it) => it.articuloId))]
-    const articulosOk = await this.prisma.articulo.findMany({
+    const articulos = await this.prisma.articulo.findMany({
       where: { tenantId, id: { in: articuloIds } },
-      select: { id: true },
+      select: { id: true, codigo: true, descripcion: true, stock: true, minimo: true },
     })
-    if (articulosOk.length !== articuloIds.length) {
+    if (articulos.length !== articuloIds.length) {
       return {
         ok: false,
         status: 400,
         error: 'One or more articuloId values are not valid for this tenant',
       }
+    }
+
+    const qtyByArticulo = aggregateItemQuantities(items)
+    const stockEval = evaluateStockForInvoice(articulos, qtyByArticulo)
+    if (stockEval.insufficient) {
+      return { ok: false, status: 422, error: 'INSUFFICIENT_STOCK' }
     }
 
     const clienteCheck = await this.prisma.cliente.findFirst({
@@ -83,10 +95,24 @@ export class FacturaService {
         select: { id: true, rsocial: true, balance: true, creditLimit: true },
       })
 
+      for (const [articuloId, qty] of qtyByArticulo) {
+        await tx.articulo.update({
+          where: { id: articuloId },
+          data: { stock: { decrement: qty } },
+        })
+      }
+
       return [created, updated] as const
     })
 
-    return { ok: true, data: { factura: newFactura, updatedCliente } }
+    return {
+      ok: true,
+      data: {
+        factura: newFactura,
+        updatedCliente,
+        stockBelowMinimum: stockEval.alerts,
+      },
+    }
   }
 
   async void(tenantId: number, id: number): Promise<ServiceResult<Factura>> {
