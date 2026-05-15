@@ -9485,6 +9485,532 @@ Returns boolean flags for each channel. No sensitive values are exposed.
 }
 ```
 
+### PARAMETERS /api/ordenes-entrega
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/ordenes-entrega`
+
+### List delivery orders
+
+- **Method:** `GET`
+- **Path:** `/api/ordenes-entrega`
+- **Tags:** logistics
+
+Requires `logistics.read` or `orders.deliver.confirm`. Drivers only see their own orders (`driverId` forced to session user).
+
+#### Responses
+
+##### Status: 200 Paginated delivery orders
+
+###### Content-Type: application/json
+
+**All of:**
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`cliente`**
+
+    `object`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`driver`**
+
+    `object`
+
+  - **`driverId`**
+
+    `integer`
+
+  - **`estado`**
+
+    `string`, possible values: `"pending", "assigned", "in_transit", "delivered", "failed"`
+
+  - **`factura`**
+
+    `object`
+
+  - **`facturaId`**
+
+    `integer`
+
+  - **`fecha`**
+
+    `string`, format: `date-time`
+
+  - **`id`**
+
+    `integer`
+
+  - **`nota`**
+
+    `string`
+
+  - **`tenantId`**
+
+    `integer`
+
+  - **`zona`**
+
+    `object`
+
+  - **`zonaId`**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "facturaId": 1,
+      "clienteId": 1,
+      "zonaId": 1,
+      "driverId": 1,
+      "fecha": "",
+      "estado": "pending",
+      "nota": "",
+      "cliente": {
+        "additionalProperty": "anything"
+      },
+      "zona": {
+        "additionalProperty": "anything"
+      },
+      "driver": {
+        "additionalProperty": "anything"
+      },
+      "factura": {
+        "additionalProperty": "anything"
+      },
+      "additionalProperty": "anything"
+    }
+  ]
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Create a delivery order
+
+- **Method:** `POST`
+- **Path:** `/api/ordenes-entrega`
+- **Tags:** logistics
+
+Requires `orders.create`. Initial estado is `pending`, or `assigned` when `driverId` is set.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`clienteId` (required)**
+
+  `integer`
+
+- **`fecha` (required)**
+
+  `string`
+
+- **`driverId`**
+
+  `integer`
+
+- **`facturaId`**
+
+  `integer`
+
+- **`nota`**
+
+  `string`
+
+- **`zonaId`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "clienteId": 1,
+  "fecha": "",
+  "facturaId": 1,
+  "zonaId": 1,
+  "driverId": 1,
+  "nota": ""
+}
+```
+
+#### Responses
+
+##### Status: 201 Order created
+
+###### Content-Type: application/json
+
+**Example:**
+
+```
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/ordenes-entrega/{id}
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/ordenes-entrega/{id}`
+
+### Update delivery order status
+
+- **Method:** `PUT`
+- **Path:** `/api/ordenes-entrega/{id}`
+- **Tags:** logistics
+
+Requires `orders.dispatch` for transitions to `assigned`, `in_transit`, or `failed`, and `orders.deliver.confirm` for `delivered`. Drivers may only confirm their own `in_transit` orders.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`estado` (required)**
+
+  `string`, possible values: `"pending", "assigned", "in_transit", "delivered", "failed"`
+
+- **`driverId`**
+
+  `integer`
+
+- **`nota`**
+
+  `string`
+
+- **`zonaId`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "estado": "pending",
+  "driverId": 1,
+  "zonaId": 1,
+  "nota": ""
+}
+```
+
+#### Responses
+
+##### Status: 200 Order updated
+
+###### Content-Type: application/json
+
+**Example:**
+
+```
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Order not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 422 Invalid state transition
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ## Schemas
 
 ### HealthResponse
@@ -10969,6 +11495,169 @@ Returns boolean flags for each channel. No sensitive values are exposed.
   }
 }
 ```
+
+### OrdenEntrega
+
+- **Type:**`object`
+
+* **`cliente`**
+
+  `object`
+
+* **`clienteId`**
+
+  `integer`
+
+* **`driver`**
+
+  `object`
+
+* **`driverId`**
+
+  `integer`
+
+* **`estado`**
+
+  `string`, possible values: `"pending", "assigned", "in_transit", "delivered", "failed"`
+
+* **`factura`**
+
+  `object`
+
+* **`facturaId`**
+
+  `integer`
+
+* **`fecha`**
+
+  `string`, format: `date-time`
+
+* **`id`**
+
+  `integer`
+
+* **`nota`**
+
+  `string`
+
+* **`tenantId`**
+
+  `integer`
+
+* **`zona`**
+
+  `object`
+
+* **`zonaId`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "tenantId": 1,
+  "facturaId": 1,
+  "clienteId": 1,
+  "zonaId": 1,
+  "driverId": 1,
+  "fecha": "",
+  "estado": "pending",
+  "nota": "",
+  "cliente": {
+    "additionalProperty": "anything"
+  },
+  "zona": {
+    "additionalProperty": "anything"
+  },
+  "driver": {
+    "additionalProperty": "anything"
+  },
+  "factura": {
+    "additionalProperty": "anything"
+  },
+  "additionalProperty": "anything"
+}
+```
+
+### OrdenEntregaCreateInput
+
+- **Type:**`object`
+
+* **`clienteId` (required)**
+
+  `integer`
+
+* **`fecha` (required)**
+
+  `string`
+
+* **`driverId`**
+
+  `integer`
+
+* **`facturaId`**
+
+  `integer`
+
+* **`nota`**
+
+  `string`
+
+* **`zonaId`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "clienteId": 1,
+  "fecha": "",
+  "facturaId": 1,
+  "zonaId": 1,
+  "driverId": 1,
+  "nota": ""
+}
+```
+
+### OrdenEntregaUpdateInput
+
+- **Type:**`object`
+
+* **`estado` (required)**
+
+  `string`, possible values: `"pending", "assigned", "in_transit", "delivered", "failed"`
+
+* **`driverId`**
+
+  `integer`
+
+* **`nota`**
+
+  `string`
+
+* **`zonaId`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "estado": "pending",
+  "driverId": 1,
+  "zonaId": 1,
+  "nota": ""
+}
+```
+
+### OrdenEntregaListEnvelope
+
+- **Type:**
+
+**Example:**
 
 ### AgingBucket
 

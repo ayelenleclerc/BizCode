@@ -1,0 +1,54 @@
+{
+  "title": "Logística de entregas",
+  "forbidden": "No tiene permiso para ver órdenes de entrega.",
+  "filters": {
+    "fecha": "Fecha",
+    "estado": "Estado",
+    "zona": "Zona",
+    "allEstados": "Todos los estados",
+    "allZonas": "Todas las zonas"
+  },
+  "estado": {
+    "pending": "Pendiente",
+    "assigned": "Asignada",
+    "in_transit": "En camino",
+    "delivered": "Entregada",
+    "failed": "Fallida"
+  },
+  "table": {
+    "cliente": "Cliente",
+    "fecha": "Fecha",
+    "estado": "Estado",
+    "zona": "Zona",
+    "driver": "Repartidor",
+    "actions": "Acciones"
+  },
+  "actions": {
+    "refresh": "Actualizar",
+    "newOrder": "Nueva orden",
+    "assignTransit": "Marcar en camino",
+    "markDelivered": "Confirmar entrega",
+    "markFailed": "Marcar fallida"
+  },
+  "empty": "No hay órdenes de entrega para los filtros seleccionados.",
+  "loading": "Cargando órdenes…",
+  "errors": {
+    "load": "No se pudieron cargar las órdenes de entrega.",
+    "save": "No se pudo guardar la orden.",
+    "transition": "No se pudo actualizar el estado."
+  },
+  "form": {
+    "title": "Nueva orden de entrega",
+    "clienteId": "ID de cliente",
+    "fecha": "Fecha de entrega",
+    "zonaId": "ID de zona (opcional)",
+    "driverId": "ID de repartidor (opcional)",
+    "nota": "Notas",
+    "submit": "Crear orden",
+    "cancel": "Cancelar"
+  },
+  "driverView": {
+    "title": "Mis entregas del día",
+    "confirm": "Confirmar entrega"
+  }
+}

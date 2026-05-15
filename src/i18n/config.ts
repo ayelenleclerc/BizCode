@@ -14,6 +14,7 @@ import auditEs from '@/locales/es/audit.json'
 import cobrosEs from '@/locales/es/cobros.json'
 import finanzasEs from '@/locales/es/finanzas.json'
 import reportesEs from '@/locales/es/reportes.json'
+import logisticaEs from '@/locales/es/logistica.json'
 
 import commonEn from '@/locales/en/common.json'
 import clientesEn from '@/locales/en/clientes.json'
@@ -26,6 +27,7 @@ import auditEn from '@/locales/en/audit.json'
 import cobrosEn from '@/locales/en/cobros.json'
 import finanzasEn from '@/locales/en/finanzas.json'
 import reportesEn from '@/locales/en/reportes.json'
+import logisticaEn from '@/locales/en/logistica.json'
 
 import commonPt from '@/locales/pt-BR/common.json'
 import clientesPt from '@/locales/pt-BR/clientes.json'
@@ -38,6 +40,7 @@ import auditPt from '@/locales/pt-BR/audit.json'
 import cobrosPt from '@/locales/pt-BR/cobros.json'
 import finanzasPt from '@/locales/pt-BR/finanzas.json'
 import reportesPt from '@/locales/pt-BR/reportes.json'
+import logisticaPt from '@/locales/pt-BR/logistica.json'
 
 // Persist language preference in localStorage
 const savedLang = typeof localStorage !== 'undefined'
@@ -50,7 +53,7 @@ i18n
     lng: savedLang,
     fallbackLng: 'es',
     defaultNS: 'common',
-    ns: ['common', 'clientes', 'articulos', 'proveedores', 'facturacion', 'cobros', 'finanzas', 'reportes', 'zonasEntrega', 'chat', 'audit'],
+    ns: ['common', 'clientes', 'articulos', 'proveedores', 'facturacion', 'cobros', 'finanzas', 'reportes', 'logistica', 'zonasEntrega', 'chat', 'audit'],
     resources: {
       es: {
         common: commonEs,
@@ -64,6 +67,7 @@ i18n
         cobros: cobrosEs,
         finanzas: finanzasEs,
         reportes: reportesEs,
+        logistica: logisticaEs,
       },
       en: {
         common: commonEn,
@@ -77,6 +81,7 @@ i18n
         cobros: cobrosEn,
         finanzas: finanzasEn,
         reportes: reportesEn,
+        logistica: logisticaEn,
       },
       'pt-BR': {
         common: commonPt,
@@ -90,6 +95,7 @@ i18n
         cobros: cobrosPt,
         finanzas: finanzasPt,
         reportes: reportesPt,
+        logistica: logisticaPt,
       },
     },
     interpolation: {

@@ -182,6 +182,34 @@ function buildPrisma(): PrismaClient {
     cobro: {
       findMany: vi.fn().mockResolvedValue([]),
     },
+    ordenEntrega: {
+      count: vi.fn().mockResolvedValue(0),
+      findMany: vi.fn().mockResolvedValue([]),
+      findFirst: vi.fn().mockResolvedValue(null),
+      create: vi.fn().mockResolvedValue({
+        id: 1,
+        tenantId: 1,
+        clienteId: 1,
+        zonaId: null,
+        driverId: null,
+        facturaId: null,
+        fecha: new Date('2026-05-16T12:00:00.000Z'),
+        estado: 'pending',
+        nota: null,
+        cliente: { id: 1, codigo: 1, rsocial: 'ACME SA' },
+        zona: null,
+        driver: null,
+        factura: null,
+      }),
+      update: vi.fn().mockResolvedValue({
+        id: 1,
+        tenantId: 1,
+        clienteId: 1,
+        estado: 'delivered',
+        fecha: new Date('2026-05-16T12:00:00.000Z'),
+        cliente: { id: 1, codigo: 1, rsocial: 'ACME SA' },
+      }),
+    },
     proveedor: {
       count: vi.fn().mockResolvedValue(1),
       findMany: vi.fn((args?: unknown) => {
@@ -508,6 +536,25 @@ describe('API — contrato OpenAPI', () => {
       .query({ from: '2026-01-01', to: '2026-01-31' })
       .expect(200)
     await assertMatchesOpenApi('/api/reportes/cobranzas', 'get', '200', res.body)
+  })
+
+  it('GET /api/ordenes-entrega', async () => {
+    process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
+    process.env.BIZCODE_TEST_ROLE = 'manager'
+    const app = createApp(prisma)
+    const res = await request(app).get('/api/ordenes-entrega').expect(200)
+    await assertMatchesOpenApi('/api/ordenes-entrega', 'get', '200', res.body)
+  })
+
+  it('POST /api/ordenes-entrega', async () => {
+    process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
+    process.env.BIZCODE_TEST_ROLE = 'manager'
+    const app = createApp(prisma)
+    const res = await request(app)
+      .post('/api/ordenes-entrega')
+      .send({ clienteId: 1, fecha: '2026-05-16' })
+      .expect(201)
+    await assertMatchesOpenApi('/api/ordenes-entrega', 'post', '201', res.body)
   })
 })
 

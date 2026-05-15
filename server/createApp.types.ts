@@ -95,3 +95,21 @@ export type DeliveryZoneUpdateParsed = {
   horario?: string | null
   activo?: boolean
 }
+
+export type OrdenEntregaEstado = 'pending' | 'assigned' | 'in_transit' | 'delivered' | 'failed'
+
+export type OrdenEntregaCreateInput = {
+  clienteId: number
+  fecha: string
+  facturaId?: number | null
+  zonaId?: number | null
+  driverId?: number | null
+  nota?: string | null
+}
+
+export type OrdenEntregaUpdateBody = {
+  estado: OrdenEntregaEstado
+  driverId?: number | null
+  zonaId?: number | null
+  nota?: string | null
+}

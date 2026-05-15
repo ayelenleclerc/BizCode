@@ -142,6 +142,14 @@
 
 * [NotificationReadAllEnvelope](./notificationreadallenvelope.md) – `-`
 
+* [OrdenEntrega](./ordenentrega.md) – `-`
+
+* [OrdenEntregaCreateInput](./ordenentregacreateinput.md) – `-`
+
+* [OrdenEntregaListEnvelope](./ordenentregalistenvelope.md) – `-`
+
+* [OrdenEntregaUpdateInput](./ordenentregaupdateinput.md) – `-`
+
 * [Proveedor](./proveedor.md) – `-`
 
 * [ProveedorEnvelope](./proveedorenvelope.md) – `-`
@@ -220,6 +228,16 @@
 
 * [Untitled object in NotificationReadAllEnvelope](./notificationreadallenvelope-properties-data.md) – `undefined#/properties/data`
 
+* [Untitled object in OrdenEntrega](./ordenentrega-properties-cliente.md) – `undefined#/properties/cliente`
+
+* [Untitled object in OrdenEntrega](./ordenentrega-properties-driver.md) – `undefined#/properties/driver`
+
+* [Untitled object in OrdenEntrega](./ordenentrega-properties-factura.md) – `undefined#/properties/factura`
+
+* [Untitled object in OrdenEntrega](./ordenentrega-properties-zona.md) – `undefined#/properties/zona`
+
+* [Untitled object in OrdenEntregaListEnvelope](./ordenentregalistenvelope-allof-0.md) – `undefined#/allOf/0`
+
 * [Untitled object in ProveedorListEnvelope](./proveedorlistenvelope-allof-0.md) – `undefined#/allOf/0`
 
 * [Untitled object in RubroListEnvelope](./rubrolistenvelope-allof-0.md) – `undefined#/allOf/0`
@@ -291,6 +309,8 @@
 * [Untitled array in FormaPagoListEnvelope](./formapagolistenvelope-properties-data.md) – `undefined#/properties/data`
 
 * [Untitled array in NotificationListEnvelope](./notificationlistenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled array in OrdenEntregaListEnvelope](./ordenentregalistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
 
 * [Untitled array in ProveedorListEnvelope](./proveedorlistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
 

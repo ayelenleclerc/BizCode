@@ -614,6 +614,95 @@ export const cobroBodySchema = z
     }
   })
 
+const ORDEN_ENTREGA_ESTADOS = ['pending', 'assigned', 'in_transit', 'delivered', 'failed'] as const
+
+export const ordenEntregaCreateBodySchema = z
+  .object({
+    clienteId: z.number(),
+    fecha: z.string(),
+    facturaId: z.union([z.number(), z.null(), z.undefined()]).optional(),
+    zonaId: z.union([z.number(), z.null(), z.undefined()]).optional(),
+    driverId: z.union([z.number(), z.null(), z.undefined()]).optional(),
+    nota: z.string().optional(),
+  })
+  .superRefine((data, ctx) => {
+    if (!Number.isInteger(data.clienteId) || data.clienteId < 1) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'clienteId must be >= 1', path: ['clienteId'] })
+    }
+    if (data.fecha.trim().length === 0) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'fecha is required', path: ['fecha'] })
+    }
+    for (const [field, val] of [
+      ['facturaId', data.facturaId],
+      ['zonaId', data.zonaId],
+      ['driverId', data.driverId],
+    ] as const) {
+      if (
+        val !== undefined &&
+        val !== null &&
+        (typeof val !== 'number' || !Number.isInteger(val) || val < 1)
+      ) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `${field} must be a positive integer or null`,
+          path: [field],
+        })
+      }
+    }
+    if (data.nota !== undefined && data.nota.length > 200) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'nota max 200 chars', path: ['nota'] })
+    }
+  })
+  .transform((data) => {
+    const note = data.nota?.trim()
+    return {
+      clienteId: data.clienteId,
+      fecha: data.fecha.trim(),
+      facturaId: data.facturaId ?? null,
+      zonaId: data.zonaId ?? null,
+      driverId: data.driverId ?? null,
+      nota: note && note.length > 0 ? note : null,
+    }
+  })
+
+export const ordenEntregaUpdateBodySchema = z
+  .object({
+    estado: z.enum(ORDEN_ENTREGA_ESTADOS),
+    driverId: z.union([z.number(), z.null(), z.undefined()]).optional(),
+    zonaId: z.union([z.number(), z.null(), z.undefined()]).optional(),
+    nota: z.string().optional(),
+  })
+  .superRefine((data, ctx) => {
+    for (const [field, val] of [
+      ['driverId', data.driverId],
+      ['zonaId', data.zonaId],
+    ] as const) {
+      if (
+        val !== undefined &&
+        val !== null &&
+        (typeof val !== 'number' || !Number.isInteger(val) || val < 1)
+      ) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `${field} must be a positive integer or null`,
+          path: [field],
+        })
+      }
+    }
+    if (data.nota !== undefined && data.nota.length > 200) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'nota max 200 chars', path: ['nota'] })
+    }
+  })
+  .transform((data) => {
+    const note = data.nota?.trim()
+    return {
+      estado: data.estado,
+      driverId: data.driverId === undefined ? undefined : data.driverId,
+      zonaId: data.zonaId === undefined ? undefined : data.zonaId,
+      nota: note === undefined ? undefined : note.length > 0 ? note : null,
+    }
+  })
+
 /** Resultado de validar un objeto arbitrario (p. ej. fila CSV → raw) con un schema Zod de dominio. */
 export type SafeParseBodyResult<T> = { ok: true; value: T } | { ok: false; error: string }
 
