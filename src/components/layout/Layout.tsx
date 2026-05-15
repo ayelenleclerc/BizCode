@@ -70,6 +70,12 @@ const NAV_SECTIONS: {
     roles: ['owner', 'manager', 'billing', 'cashier', 'collections', 'finance', 'auditor'],
   },
   {
+    key: 'cobros',
+    path: '/cobros',
+    icon: '💵',
+    roles: ['owner', 'manager', 'billing', 'cashier', 'collections', 'finance', 'auditor'],
+  },
+  {
     key: 'auditLog',
     path: '/admin/audit-log',
     icon: '📜',

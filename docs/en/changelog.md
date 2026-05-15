@@ -14,6 +14,8 @@ Versioning: [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **Collections (GitHub #124):** Customer payment registration — `Cobro` model, REST API (`POST/GET /api/cobros`), `/cobros` UI, recent payments on the customer form, dashboard `cobrosHoy` widget wired to real data; i18n EN/ES/PT-BR.
+
 - **Backend (GitHub #79):** CSV bulk import uses the same Zod `*BodySchema` instances as REST JSON bodies (`safeParseBodySchema` in [`server/schemas/domain.ts`](../../server/schemas/domain.ts)); PostgreSQL **CHECK** constraints on `Articulo.stock`, `Articulo.minimo`, and `Cliente.creditLimit` (migration `prisma/migrations/20260505130000_nonneg_entity_checks`); developer docs in [coding-standards.md](coding-standards.md) (EN/ES/PT-BR per [DOCUMENT_LOCALE_MAP.md](../DOCUMENT_LOCALE_MAP.md)) and [`.cursor/rules/backend-standards.mdc`](../../.cursor/rules/backend-standards.mdc); user manuals note field-level import errors.
 - **User management (issue #25):** `GET/POST /api/users`, `PUT /api/users/:id`, `POST /api/auth/change-password`; Users page (`src/pages/users/`) with DataTable + create/edit modal, keyboard shortcuts (F2/F3/F5/Esc), role hierarchy enforcement; `<CanAccess permission="..." />` utility component for permission-aware rendering; sidebar link visible only to `users.manage` holders; i18n in EN/ES/PT-BR; 17 new integration tests; OpenAPI paths and schemas updated; trilingual docs in `docs/*/quality/`.
 - **Plan approval archival workflow:** new `npm run plan:approve -- --plan <file>` command archives approved plans into `.cursor/plans/{timestamp}-{slug}.plan.md` and then executes the existing `plan:sync` GitHub Issues/Project v2 flow; `plan:sync` remains available for direct/manual sync.

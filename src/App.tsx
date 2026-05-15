@@ -10,6 +10,7 @@ import UsersPage from './pages/users'
 import InicioPage from './pages/inicio'
 import LogisticaPage from './pages/logistica'
 import FinanzasPage from './pages/finanzas'
+import CobrosPage from './pages/cobros'
 import ConfiguracionPage from './pages/configuracion'
 import ZonasEntregaPage from './pages/configuracion/ZonasEntregaPage'
 import ChatPage from './pages/chat'
@@ -91,6 +92,7 @@ function AppRoutes() {
           {/* New section stubs — real pages delivered in Sprint 2 */}
           <Route path="logistica" element={<LogisticaPage />} />
           <Route path="finanzas" element={<FinanzasPage />} />
+          <Route path="cobros" element={<CobrosPage />} />
           {/* Configuración */}
           <Route path="configuracion" element={<ConfiguracionPage />} />
           <Route path="configuracion/zonas-entrega" element={<ZonasEntregaPage />} />

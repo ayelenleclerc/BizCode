@@ -8,6 +8,7 @@ import { clientesAPI, zonasEntregaAPI } from '@/lib/api'
 import { validateCUIT, formatCUIT } from '@/lib/validators'
 import { useAuth } from '@/contexts/AuthContext'
 import { Cliente, DeliveryZone } from '@/types'
+import ClienteCobrosRecientes from './ClienteCobrosRecientes'
 
 const clienteSchema = z.object({
   codigo: z.coerce.number().int().positive('Código debe ser positivo'),
@@ -479,6 +480,7 @@ export default function ClienteForm({ cliente, onClose, onGuardado }: ClienteFor
               ) : (
                 <p className="text-xs text-slate-400 italic">{t('form.financial.readOnly')}</p>
               )}
+              <ClienteCobrosRecientes clienteId={cliente.id} />
             </div>
           )}
 

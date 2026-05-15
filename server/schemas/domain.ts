@@ -562,6 +562,58 @@ export const deliveryZoneUpdateBodySchema = z
     return out
   })
 
+export const cobroBodySchema = z
+  .object({
+    clienteId: z.number(),
+    fecha: z.string(),
+    monto: z.number(),
+    formaPagoId: z.union([z.number(), z.null(), z.undefined()]).optional(),
+    referencia: z.string().optional(),
+    nota: z.string().optional(),
+  })
+  .superRefine((data, ctx) => {
+    if (!Number.isInteger(data.clienteId) || data.clienteId < 1) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'clienteId must be >= 1', path: ['clienteId'] })
+    }
+    const f = data.fecha.trim()
+    if (f.length === 0) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'fecha is required', path: ['fecha'] })
+    }
+    if (typeof data.monto !== 'number' || Number.isNaN(data.monto) || data.monto <= 0) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'monto must be > 0', path: ['monto'] })
+    }
+    const fp = data.formaPagoId
+    if (
+      fp !== undefined &&
+      fp !== null &&
+      (typeof fp !== 'number' || !Number.isInteger(fp) || fp < 1)
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'formaPagoId must be a positive integer or null',
+        path: ['formaPagoId'],
+      })
+    }
+    if (data.referencia !== undefined && data.referencia.length > 60) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'referencia max 60 chars', path: ['referencia'] })
+    }
+    if (data.nota !== undefined && data.nota.length > 200) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'nota max 200 chars', path: ['nota'] })
+    }
+  })
+  .transform((data) => {
+    const ref = data.referencia?.trim()
+    const note = data.nota?.trim()
+    return {
+      clienteId: data.clienteId,
+      fecha: data.fecha.trim(),
+      monto: data.monto,
+      formaPagoId: data.formaPagoId ?? null,
+      referencia: ref && ref.length > 0 ? ref : null,
+      nota: note && note.length > 0 ? note : null,
+    }
+  })
+
 /** Resultado de validar un objeto arbitrario (p. ej. fila CSV → raw) con un schema Zod de dominio. */
 export type SafeParseBodyResult<T> = { ok: true; value: T } | { ok: false; error: string }
 

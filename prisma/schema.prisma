@@ -78,6 +78,7 @@ model Cliente {
   updatedAt      DateTime @updatedAt
 
   facturas Factura[]
+  cobros   Cobro[]
 
   @@unique([tenantId, codigo])
   @@index([tenantId])
@@ -146,10 +147,30 @@ model Proveedor {
 }
 
 model FormaPago {
-  id    Int    @id @default(autoincrement())
-  codigo Int   @unique
-  descripcion String @db.VarChar(25)
-  vto_dias Int  @default(0)
+  id          Int     @id @default(autoincrement())
+  codigo      Int     @unique
+  descripcion String  @db.VarChar(25)
+  vto_dias    Int     @default(0)
+  cobros      Cobro[]
+}
+
+model Cobro {
+  id          Int       @id @default(autoincrement())
+  tenantId    Int
+  tenant      Tenant    @relation(fields: [tenantId], references: [id])
+  clienteId   Int
+  cliente     Cliente   @relation(fields: [clienteId], references: [id])
+  fecha       DateTime
+  monto       Decimal   @db.Decimal(14, 2)
+  formaPagoId Int?
+  formaPago   FormaPago? @relation(fields: [formaPagoId], references: [id])
+  referencia  String?   @db.VarChar(60)
+  nota        String?   @db.VarChar(200)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([tenantId, clienteId])
+  @@index([tenantId, fecha])
 }
 
 model Factura {
@@ -224,6 +245,7 @@ model Tenant {
   articulos      Articulo[]
   proveedores    Proveedor[]
   facturas       Factura[]
+  cobros         Cobro[]
 }
 
 model AppUser {

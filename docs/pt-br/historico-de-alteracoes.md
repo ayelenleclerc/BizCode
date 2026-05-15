@@ -14,6 +14,8 @@ Versionamento: [Semantic Versioning](https://semver.org/).
 
 ### Adicionado
 
+- **Cobranças (GitHub #124):** Registro de pagamentos de clientes — modelo `Cobro`, API REST (`POST/GET /api/cobros`), UI `/cobros`, recebimentos recentes na ficha do cliente, widget `cobrosHoy` do dashboard com dados reais; i18n EN/ES/PT-BR.
+
 - **Backend (GitHub #79):** importação CSV usa os mesmos esquemas Zod `*BodySchema` que o corpo JSON do REST (`safeParseBodySchema` em [`server/schemas/domain.ts`](../../server/schemas/domain.ts)); restrições **CHECK** no PostgreSQL para `Articulo.stock`, `Articulo.minimo` e `Cliente.creditLimit` (migração `prisma/migrations/20260505130000_nonneg_entity_checks`); documentação em [padroes-codigo.md](padroes-codigo.md) e [`.cursor/rules/backend-standards.mdc`](../../.cursor/rules/backend-standards.mdc); manuais do usuário citam erros de importação com nome do campo.
 - **Gestão de usuários (issue #25):** `GET/POST /api/users`, `PUT /api/users/:id`, `POST /api/auth/change-password`; página Usuários (`src/pages/users/`) com DataTable + modal criação/edição, atalhos de teclado (F2/F3/F5/Esc), restrição de hierarquia de perfis; componente `<CanAccess permission="..." />` para renderização condicional por permissão; link na sidebar visível somente para titulares de `users.manage`; i18n em EN/ES/PT-BR; 17 novos testes de integração; OpenAPI atualizado; docs trilingues em `docs/*/quality/`.
 

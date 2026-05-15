@@ -64,6 +64,14 @@
 
 * [ClienteNullableEnvelope](./clientenullableenvelope.md) – `-`
 
+* [Cobro](./cobro.md) – `-`
+
+* [CobroEnvelope](./cobroenvelope.md) – `-`
+
+* [CobroInput](./cobroinput.md) – `-`
+
+* [CobroListEnvelope](./cobrolistenvelope.md) – `-`
+
 * [DashboardSummary](./dashboardsummary.md) – `-`
 
 * [DashboardSummaryEnvelope](./dashboardsummaryenvelope.md) – `-`
@@ -156,6 +164,10 @@
 
 * [Untitled object in ClienteListEnvelope](./clientelistenvelope-allof-0.md) – `undefined#/allOf/0`
 
+* [Untitled object in Cobro](./cobro-properties-cliente.md) – `undefined#/properties/cliente`
+
+* [Untitled object in CobroListEnvelope](./cobrolistenvelope-allof-0.md) – `undefined#/allOf/0`
+
 * [Untitled object in DashboardSummary](./dashboardsummary-properties-cobroshoy.md) – `undefined#/properties/cobrosHoy`
 
 * [Untitled object in DashboardSummary](./dashboardsummary-properties-facturasvencidas.md) – `undefined#/properties/facturasVencidas`
@@ -225,6 +237,8 @@
 * [Untitled array in ClienteImportResult](./clienteimportresult-properties-errors.md) – `undefined#/properties/errors`
 
 * [Untitled array in ClienteListEnvelope](./clientelistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
+
+* [Untitled array in CobroListEnvelope](./cobrolistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
 
 * [Untitled array in DeliveryZoneListEnvelope](./deliveryzonelistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
 

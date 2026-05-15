@@ -4894,6 +4894,653 @@ One-time endpoint to create initial tenant and owner user.
 }
 ```
 
+### PARAMETERS /api/cobros
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/cobros`
+
+### List customer payments
+
+- **Method:** `GET`
+- **Path:** `/api/cobros`
+- **Tags:** cobros
+
+#### Responses
+
+##### Status: 200 Paginated list of payments
+
+###### Content-Type: application/json
+
+**All of:**
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`cliente`**
+
+    `object`
+
+    - **`codigo`**
+
+      `integer`
+
+    - **`id`**
+
+      `integer`
+
+    - **`rsocial`**
+
+      `string`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`fecha`**
+
+    `string`, format: `date-time`
+
+  - **`formaPagoId`**
+
+    `integer`
+
+  - **`id`**
+
+    `integer`
+
+  - **`monto`**
+
+    `number`
+
+  - **`nota`**
+
+    `string`
+
+  - **`referencia`**
+
+    `string`
+
+  - **`tenantId`**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+* **`limit` (required)**
+
+  `integer` — Effective page size (same semantics as query \`limit\`)
+
+* **`offset` (required)**
+
+  `integer` — Effective skip (same semantics as query \`offset\`)
+
+* **`total` (required)**
+
+  `integer` — Row count matching the list filter (before limit/offset)
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "clienteId": 1,
+      "fecha": "",
+      "monto": 1,
+      "formaPagoId": 1,
+      "referencia": "",
+      "nota": "",
+      "cliente": {
+        "id": 1,
+        "codigo": 1,
+        "rsocial": "",
+        "additionalProperty": "anything"
+      },
+      "additionalProperty": "anything"
+    }
+  ],
+  "total": 0,
+  "limit": 1,
+  "offset": 0
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Register a customer payment
+
+- **Method:** `POST`
+- **Path:** `/api/cobros`
+- **Tags:** cobros
+
+Decrements `Cliente.balance` by `monto` in the same transaction and adjusts `Cliente.score` (+5 on-time, -10 late vs oldest open invoice + creditDays). Requires `sales.create`.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`clienteId` (required)**
+
+  `integer`
+
+- **`fecha` (required)**
+
+  `string` — YYYY-MM-DD or ISO-8601
+
+- **`monto` (required)**
+
+  `number`
+
+- **`formaPagoId`**
+
+  `integer`
+
+- **`nota`**
+
+  `string`
+
+- **`referencia`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "clienteId": 1,
+  "fecha": "",
+  "monto": 1,
+  "formaPagoId": 1,
+  "referencia": "",
+  "nota": ""
+}
+```
+
+#### Responses
+
+##### Status: 200 Payment registered
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`cliente`**
+
+    `object`
+
+    - **`codigo`**
+
+      `integer`
+
+    - **`id`**
+
+      `integer`
+
+    - **`rsocial`**
+
+      `string`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`fecha`**
+
+    `string`, format: `date-time`
+
+  - **`formaPagoId`**
+
+    `integer`
+
+  - **`id`**
+
+    `integer`
+
+  - **`monto`**
+
+    `number`
+
+  - **`nota`**
+
+    `string`
+
+  - **`referencia`**
+
+    `string`
+
+  - **`tenantId`**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "clienteId": 1,
+    "fecha": "",
+    "monto": 1,
+    "formaPagoId": 1,
+    "referencia": "",
+    "nota": "",
+    "cliente": {
+      "id": 1,
+      "codigo": 1,
+      "rsocial": "",
+      "additionalProperty": "anything"
+    },
+    "additionalProperty": "anything"
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 422 Client suspended or inactive
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/cobros/{id}
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/cobros/{id}`
+
+### Get payment by id
+
+- **Method:** `GET`
+- **Path:** `/api/cobros/{id}`
+- **Tags:** cobros
+
+#### Responses
+
+##### Status: 200 Payment detail
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`cliente`**
+
+    `object`
+
+    - **`codigo`**
+
+      `integer`
+
+    - **`id`**
+
+      `integer`
+
+    - **`rsocial`**
+
+      `string`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`fecha`**
+
+    `string`, format: `date-time`
+
+  - **`formaPagoId`**
+
+    `integer`
+
+  - **`id`**
+
+    `integer`
+
+  - **`monto`**
+
+    `number`
+
+  - **`nota`**
+
+    `string`
+
+  - **`referencia`**
+
+    `string`
+
+  - **`tenantId`**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "clienteId": 1,
+    "fecha": "",
+    "monto": 1,
+    "formaPagoId": 1,
+    "referencia": "",
+    "nota": "",
+    "cliente": {
+      "id": 1,
+      "codigo": 1,
+      "rsocial": "",
+      "additionalProperty": "anything"
+    },
+    "additionalProperty": "anything"
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Payment not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ### PARAMETERS /api/facturas/{id}/void
 
 - **Method:** `PARAMETERS`
@@ -8976,6 +9623,212 @@ Returns boolean flags for each channel. No sensitive values are exposed.
     "score": 50,
     "suspended": false,
     "deliveryZoneId": 1,
+    "additionalProperty": "anything"
+  }
+}
+```
+
+### Cobro
+
+- **Type:**`object`
+
+* **`cliente`**
+
+  `object`
+
+  - **`codigo`**
+
+    `integer`
+
+  - **`id`**
+
+    `integer`
+
+  - **`rsocial`**
+
+    `string`
+
+* **`clienteId`**
+
+  `integer`
+
+* **`fecha`**
+
+  `string`, format: `date-time`
+
+* **`formaPagoId`**
+
+  `integer`
+
+* **`id`**
+
+  `integer`
+
+* **`monto`**
+
+  `number`
+
+* **`nota`**
+
+  `string`
+
+* **`referencia`**
+
+  `string`
+
+* **`tenantId`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "tenantId": 1,
+  "clienteId": 1,
+  "fecha": "",
+  "monto": 1,
+  "formaPagoId": 1,
+  "referencia": "",
+  "nota": "",
+  "cliente": {
+    "id": 1,
+    "codigo": 1,
+    "rsocial": "",
+    "additionalProperty": "anything"
+  },
+  "additionalProperty": "anything"
+}
+```
+
+### CobroInput
+
+- **Type:**`object`
+
+* **`clienteId` (required)**
+
+  `integer`
+
+* **`fecha` (required)**
+
+  `string` — YYYY-MM-DD or ISO-8601
+
+* **`monto` (required)**
+
+  `number`
+
+* **`formaPagoId`**
+
+  `integer`
+
+* **`nota`**
+
+  `string`
+
+* **`referencia`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "clienteId": 1,
+  "fecha": "",
+  "monto": 1,
+  "formaPagoId": 1,
+  "referencia": "",
+  "nota": ""
+}
+```
+
+### CobroListEnvelope
+
+- **Type:**
+
+**Example:**
+
+### CobroEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`cliente`**
+
+    `object`
+
+    - **`codigo`**
+
+      `integer`
+
+    - **`id`**
+
+      `integer`
+
+    - **`rsocial`**
+
+      `string`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`fecha`**
+
+    `string`, format: `date-time`
+
+  - **`formaPagoId`**
+
+    `integer`
+
+  - **`id`**
+
+    `integer`
+
+  - **`monto`**
+
+    `number`
+
+  - **`nota`**
+
+    `string`
+
+  - **`referencia`**
+
+    `string`
+
+  - **`tenantId`**
+
+    `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "clienteId": 1,
+    "fecha": "",
+    "monto": 1,
+    "formaPagoId": 1,
+    "referencia": "",
+    "nota": "",
+    "cliente": {
+      "id": 1,
+      "codigo": 1,
+      "rsocial": "",
+      "additionalProperty": "anything"
+    },
     "additionalProperty": "anything"
   }
 }

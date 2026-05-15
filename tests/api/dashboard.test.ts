@@ -4,10 +4,13 @@ import type { PrismaClient } from '@prisma/client'
 import { createApp } from '../../server/createApp'
 
 /** Aggregate result shape returned by prisma.factura.aggregate */
-type AggregateResult = { _count: { id: number }; _sum: { total: string | null } }
+type FacturaAggregateResult = { _count: { id: number }; _sum: { total: string | null } }
+type CobroAggregateResult = { _count: { id: number }; _sum: { monto: string | null } }
 
-const EMPTY_AGGREGATE: AggregateResult = { _count: { id: 0 }, _sum: { total: null } }
-const FILLED_AGGREGATE: AggregateResult = { _count: { id: 3 }, _sum: { total: '150000.00' } }
+const EMPTY_FACTURA_AGGREGATE: FacturaAggregateResult = { _count: { id: 0 }, _sum: { total: null } }
+const FILLED_FACTURA_AGGREGATE: FacturaAggregateResult = { _count: { id: 3 }, _sum: { total: '150000.00' } }
+const EMPTY_COBRO_AGGREGATE: CobroAggregateResult = { _count: { id: 0 }, _sum: { monto: null } }
+const FILLED_COBRO_AGGREGATE: CobroAggregateResult = { _count: { id: 2 }, _sum: { monto: '5000.00' } }
 
 function buildPrismaMock(overrides: Partial<Record<string, unknown>> = {}): PrismaClient {
   return {
@@ -17,7 +20,10 @@ function buildPrismaMock(overrides: Partial<Record<string, unknown>> = {}): Pris
     formaPago: { findMany: vi.fn().mockResolvedValue([]) },
     factura: {
       findMany: vi.fn().mockResolvedValue([]),
-      aggregate: vi.fn().mockResolvedValue(EMPTY_AGGREGATE),
+      aggregate: vi.fn().mockResolvedValue(EMPTY_FACTURA_AGGREGATE),
+    },
+    cobro: {
+      aggregate: vi.fn().mockResolvedValue(EMPTY_COBRO_AGGREGATE),
     },
     auditEvent: { create: vi.fn().mockResolvedValue({ id: 1 }) },
     appUser: {
@@ -92,8 +98,8 @@ describe('GET /api/dashboard/summary', () => {
     process.env.BIZCODE_TEST_ROLE = 'owner'
     const prisma = buildPrismaMock()
     ;(prisma.factura.aggregate as ReturnType<typeof vi.fn>)
-      .mockResolvedValueOnce(FILLED_AGGREGATE)  // ventasHoy
-      .mockResolvedValueOnce(EMPTY_AGGREGATE)   // facturasVencidas
+      .mockResolvedValueOnce(FILLED_FACTURA_AGGREGATE)  // ventasHoy
+      .mockResolvedValueOnce(EMPTY_FACTURA_AGGREGATE)   // facturasVencidas
     const app = createApp(prisma)
     const res = await request(app).get('/api/dashboard/summary').expect(200)
     expect(res.body.data.ventasHoy.count).toBe(3)
@@ -105,20 +111,22 @@ describe('GET /api/dashboard/summary', () => {
     process.env.BIZCODE_TEST_ROLE = 'owner'
     const prisma = buildPrismaMock()
     ;(prisma.factura.aggregate as ReturnType<typeof vi.fn>)
-      .mockResolvedValueOnce(EMPTY_AGGREGATE)   // ventasHoy
-      .mockResolvedValueOnce(FILLED_AGGREGATE)  // facturasVencidas
+      .mockResolvedValueOnce(EMPTY_FACTURA_AGGREGATE)   // ventasHoy
+      .mockResolvedValueOnce(FILLED_FACTURA_AGGREGATE)  // facturasVencidas
     const app = createApp(prisma)
     const res = await request(app).get('/api/dashboard/summary').expect(200)
     expect(res.body.data.facturasVencidas.count).toBe(3)
     expect(res.body.data.facturasVencidas.total).toBe('150000.00')
   })
 
-  it('cobrosHoy and alertasActivas are placeholder zeros', async () => {
+  it('cobrosHoy reflects cobro aggregate and alertasActivas is zero', async () => {
     process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
     process.env.BIZCODE_TEST_ROLE = 'owner'
-    const app = createApp(buildPrismaMock())
+    const prisma = buildPrismaMock()
+    ;(prisma.cobro.aggregate as ReturnType<typeof vi.fn>).mockResolvedValueOnce(FILLED_COBRO_AGGREGATE)
+    const app = createApp(prisma)
     const res = await request(app).get('/api/dashboard/summary').expect(200)
-    expect(res.body.data.cobrosHoy).toEqual({ count: 0, total: '0' })
+    expect(res.body.data.cobrosHoy).toEqual({ count: 2, total: '5000.00' })
     expect(res.body.data.alertasActivas).toBe(0)
   })
 
@@ -135,12 +143,13 @@ describe('GET /api/dashboard/summary', () => {
     expect(res.body.error).toContain('DB connection lost')
   })
 
-  it('calls factura.aggregate twice (ventasHoy + facturasVencidas)', async () => {
+  it('calls factura.aggregate twice and cobro.aggregate once', async () => {
     process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
     process.env.BIZCODE_TEST_ROLE = 'owner'
     const prisma = buildPrismaMock()
     const app = createApp(prisma)
     await request(app).get('/api/dashboard/summary').expect(200)
     expect(prisma.factura.aggregate).toHaveBeenCalledTimes(2)
+    expect(prisma.cobro.aggregate).toHaveBeenCalledTimes(1)
   })
 })
