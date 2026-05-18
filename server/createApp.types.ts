@@ -127,3 +127,29 @@ export type EmpresaInput = {
   tipoFactura: 'A' | 'B' | 'C'
   logoUrl?: string | null
 }
+
+/** @en Commercial order lifecycle (ADR-0009). @es Ciclo de pedido comercial. @pt-BR Ciclo do pedido comercial. */
+export type PedidoEstado = 'draft' | 'confirmed' | 'invoiced' | 'cancelled'
+
+export type PedidoItemInput = {
+  articuloId: number
+  cantidad: number
+  precio: number
+  dscto: number
+  subtotal: number
+}
+
+export type PedidoInput = {
+  clienteId: number
+  vendedorId?: number | null
+  validUntil?: string | null
+  items: PedidoItemInput[]
+}
+
+export type PedidoInvoiceInput = {
+  fecha: string
+  tipo: 'A' | 'B'
+  numero: number
+  prefijo?: string
+  formaPagoId?: number | null
+}

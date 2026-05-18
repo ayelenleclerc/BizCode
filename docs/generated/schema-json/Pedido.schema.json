@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "properties": {
+    "clienteId": {
+      "type": "integer"
+    },
+    "createdAt": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "estado": {
+      "enum": [
+        "draft",
+        "confirmed",
+        "invoiced",
+        "cancelled"
+      ],
+      "type": "string"
+    },
+    "facturaId": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "id": {
+      "type": "integer"
+    },
+    "items": {
+      "items": {
+        "$ref": "./PedidoItem.schema.json"
+      },
+      "type": "array"
+    },
+    "tenantId": {
+      "type": "integer"
+    },
+    "total": {
+      "type": "number"
+    },
+    "updatedAt": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "validUntil": {
+      "format": "date-time",
+      "nullable": true,
+      "type": "string"
+    },
+    "vendedorId": {
+      "nullable": true,
+      "type": "integer"
+    }
+  },
+  "title": "Pedido",
+  "type": "object"
+}

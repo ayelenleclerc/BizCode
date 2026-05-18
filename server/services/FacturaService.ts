@@ -7,6 +7,7 @@ import {
   evaluateStockForInvoice,
   type StockBelowMinimumAlert,
 } from './facturaStock'
+import { AfipService } from '../fiscal/ar/AfipService'
 
 type FacturaWithRelations = Prisma.FacturaGetPayload<{ include: { cliente: true; items: true } }>
 
@@ -27,7 +28,11 @@ export type FacturaCreateResult = {
  * @pt-BR Operações de domínio de faturas (listagem, criação, anulação).
  */
 export class FacturaService {
-  constructor(private readonly prisma: PrismaClient) {}
+  private readonly afip: AfipService
+
+  constructor(private readonly prisma: PrismaClient) {
+    this.afip = new AfipService(prisma)
+  }
 
   async list(tenantId: number, take: number, skip: number): Promise<FacturaListResult> {
     const where = { tenantId }
@@ -103,6 +108,10 @@ export class FacturaService {
       }
 
       return [created, updated] as const
+    })
+
+    void this.afip.requestCaeForFactura(tenantId, newFactura.id).catch(() => {
+      /* retry: npm run afip:retry-pending */
     })
 
     return {

@@ -32,6 +32,10 @@ tags:
     description: Suppliers (master data and CSV import)
   - name: facturas
     description: Invoice management
+  - name: afip
+    description: Argentina AFIP electronic invoicing (CAE; homologación mock in dev)
+  - name: pedidos
+    description: Commercial orders and quotes (ADR-0009)
   - name: cobros
     description: Customer payment collections
   - name: cobranzas
@@ -977,6 +981,349 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiErrorEnvelope'
+
+  /api/afip/config:
+    put:
+      tags: [afip]
+      summary: Upsert tenant AFIP credentials
+      description: Requires `settings.fiscal.manage`. Certificate and key encrypted at rest.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AfipConfigInput'
+      responses:
+        '200':
+          description: Config saved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AfipConfigEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/afip/auth:
+    post:
+      tags: [afip]
+      summary: Request AFIP TA (ticket de acceso)
+      description: Requires `settings.fiscal.manage`. Homologación mock when AFIP network is not configured.
+      responses:
+        '200':
+          description: TA issued
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AfipTaEnvelope'
+        '404':
+          description: Fiscal config not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/afip/cae:
+    post:
+      tags: [afip]
+      summary: Request CAE for a factura
+      description: Requires `sales.create`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AfipCaeInput'
+      responses:
+        '200':
+          description: CAE issued
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AfipCaeEnvelope'
+        '404':
+          description: Factura or config not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '502':
+          description: AFIP request failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/pedidos:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [pedidos]
+      summary: List commercial orders / quotes
+      description: Requires `orders.create` or `reports.operational.read`.
+      parameters:
+        - name: estado
+          in: query
+          schema:
+            type: string
+            enum: [draft, confirmed, invoiced, cancelled]
+        - name: clienteId
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+        - $ref: '#/components/parameters/ListLimit'
+        - $ref: '#/components/parameters/ListOffset'
+      responses:
+        '200':
+          description: Paginated pedidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PedidoListEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    post:
+      tags: [pedidos]
+      summary: Create pedido (draft)
+      description: Requires `orders.create`. Initial estado is `draft`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PedidoInput'
+      responses:
+        '201':
+          description: Pedido created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PedidoEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '422':
+          description: Client suspended or business rule
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/pedidos/{id}:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    get:
+      tags: [pedidos]
+      summary: Get pedido by id
+      description: Requires `orders.create` or `reports.operational.read`.
+      responses:
+        '200':
+          description: Pedido detail
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PedidoEnvelope'
+        '404':
+          description: Pedido not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    put:
+      tags: [pedidos]
+      summary: Update pedido (draft only)
+      description: Requires `orders.create`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PedidoInput'
+      responses:
+        '200':
+          description: Pedido updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PedidoEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          description: Pedido not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '409':
+          description: Not in draft state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    delete:
+      tags: [pedidos]
+      summary: Cancel pedido (soft)
+      description: Requires `sales.cancel`. Sets estado to `cancelled` (not allowed when invoiced).
+      responses:
+        '200':
+          description: Pedido cancelled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PedidoEnvelope'
+        '404':
+          description: Pedido not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '409':
+          description: Invalid state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/pedidos/{id}/confirm:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    post:
+      tags: [pedidos]
+      summary: Confirm pedido (draft → confirmed)
+      description: Requires `orders.create`.
+      responses:
+        '200':
+          description: Pedido confirmed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PedidoEnvelope'
+        '404':
+          description: Pedido not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '409':
+          description: Invalid state transition
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/pedidos/{id}/invoice:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    post:
+      tags: [pedidos]
+      summary: Invoice pedido (creates Factura)
+      description: Requires `sales.create`. Pedido must be `confirmed`. Creates invoice via FacturaService (no CAE in this release).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PedidoInvoiceInput'
+      responses:
+        '200':
+          description: Pedido invoiced
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PedidoEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          description: Pedido not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '409':
+          description: Invalid state transition
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '422':
+          description: Client suspended, insufficient stock
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
 
   /api/cobros:
     parameters:
@@ -3448,6 +3795,185 @@ components:
           const: true
         data:
           $ref: '#/components/schemas/Factura'
+
+    AfipConfigInput:
+      type: object
+      required: [cuit, certificate, privateKey]
+      properties:
+        cuit: { type: string }
+        certificate: { type: string }
+        privateKey: { type: string }
+        ambiente:
+          type: string
+          enum: [homologacion, produccion]
+
+    AfipConfigEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success: { type: boolean, const: true }
+        data:
+          type: object
+          properties:
+            configured: { type: boolean }
+
+    AfipTaEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success: { type: boolean, const: true }
+        data:
+          type: object
+          properties:
+            token: { type: string }
+            sign: { type: string }
+            expiration: { type: string, format: date-time }
+
+    AfipCaeInput:
+      type: object
+      required: [facturaId]
+      properties:
+        facturaId: { type: integer, minimum: 1 }
+
+    AfipCaeEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success: { type: boolean, const: true }
+        data:
+          type: object
+          properties:
+            cae: { type: string }
+            caeVto: { type: string, format: date-time }
+
+    PedidoItem:
+      type: object
+      additionalProperties: true
+      properties:
+        id:
+          type: integer
+        articuloId:
+          type: integer
+        cantidad:
+          type: integer
+        precio:
+          type: number
+        dscto:
+          type: number
+        subtotal:
+          type: number
+
+    Pedido:
+      type: object
+      additionalProperties: true
+      properties:
+        id:
+          type: integer
+        tenantId:
+          type: integer
+        clienteId:
+          type: integer
+        vendedorId:
+          type: integer
+          nullable: true
+        estado:
+          type: string
+          enum: [draft, confirmed, invoiced, cancelled]
+        total:
+          type: number
+        validUntil:
+          type: string
+          format: date-time
+          nullable: true
+        facturaId:
+          type: integer
+          nullable: true
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/PedidoItem'
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    PedidoInput:
+      type: object
+      required: [clienteId, items]
+      properties:
+        clienteId:
+          type: integer
+          minimum: 1
+        vendedorId:
+          type: integer
+          nullable: true
+        validUntil:
+          type: string
+          nullable: true
+        items:
+          type: array
+          minItems: 1
+          items:
+            type: object
+            required: [articuloId, cantidad, precio]
+            properties:
+              articuloId:
+                type: integer
+                minimum: 1
+              cantidad:
+                type: integer
+                minimum: 1
+              precio:
+                type: number
+                minimum: 0
+              dscto:
+                type: number
+                minimum: 0
+                maximum: 100
+
+    PedidoInvoiceInput:
+      type: object
+      required: [fecha, tipo, numero]
+      properties:
+        fecha:
+          type: string
+        tipo:
+          type: string
+          enum: [A, B]
+        numero:
+          type: integer
+          minimum: 1
+        prefijo:
+          type: string
+        formaPagoId:
+          type: integer
+          nullable: true
+
+    PedidoEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/Pedido'
+
+    PedidoListEnvelope:
+      allOf:
+        - type: object
+          required: [success, data]
+          properties:
+            success:
+              type: boolean
+              const: true
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/Pedido'
+        - $ref: '#/components/schemas/ListPaginationMeta'
 
     FormaPago:
       type: object

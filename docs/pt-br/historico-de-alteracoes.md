@@ -17,6 +17,8 @@ Versionamento: [Semantic Versioning](https://semver.org/).
 ### Adicionado
 
 - **Lembretes de inadimplência (GitHub #134):** modelo `CobroRecordatorio`; `ParamEmpresa.recordatorioDiasGracia`; `GET /api/cobranzas/vencidas` e `POST /api/cobranzas/recordatorios` (`reports.financial.read`); `CobranzasService` + job `npm run cobranzas:recordatorios`; seção em `/finanzas`; auditoria `cobranza_recordatorio_send`; i18n EN/ES/PT-BR.
+- **AFIP CAE (GitHub #133):** `TenantFiscalConfig`, campos CAE em `Factura`, `PUT /api/afip/config`, `POST /api/afip/auth`, `POST /api/afip/cae`; mock WSFE homologação; hook pós-criação em `FacturaService`; `npm run afip:retry-pending`. Badge PDF em follow-up.
+- **Pedidos comerciais (GitHub #132):** modelos `Pedido` / `PedidoItem`; `GET/POST/PUT/DELETE /api/pedidos` e `POST .../confirm` / `POST .../invoice` (estados e rotas em inglês, ADR-0009); RBAC `orders.create` / `sales.create` / `sales.cancel`; auditoria `pedido_*`; UI de listagem `/pedidos`; i18n EN/ES/PT-BR. Gating modular (`requireModule`) pendente de #223.
 
 - **Migração DBF de catálogo (GitHub #131):** parsers `legacyRubroDbf.ts` / `legacyArticuloDbf.ts`; `POST /api/rubros/migrate-dbf` e `POST /api/articulos/migrate-dbf` (`settings.business.manage`, upsert por código); `npm run migrate:dbf` importa `RUBROS.DBF` / `ARTICULOS.DBF` quando existirem (fallback `PVAR2`/`PVAR`); fixtures e testes de integração.
 

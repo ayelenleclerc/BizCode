@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "clienteId": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "items": {
+      "items": {
+        "properties": {
+          "articuloId": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "cantidad": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "dscto": {
+            "maximum": 100,
+            "minimum": 0,
+            "type": "number"
+          },
+          "precio": {
+            "minimum": 0,
+            "type": "number"
+          }
+        },
+        "required": [
+          "articuloId",
+          "cantidad",
+          "precio"
+        ],
+        "type": "object"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "validUntil": {
+      "nullable": true,
+      "type": "string"
+    },
+    "vendedorId": {
+      "nullable": true,
+      "type": "integer"
+    }
+  },
+  "required": [
+    "clienteId",
+    "items"
+  ],
+  "title": "PedidoInput",
+  "type": "object"
+}

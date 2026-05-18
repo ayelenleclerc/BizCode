@@ -15,7 +15,9 @@ import { registerRubrosRoutes } from './routes/registerRubrosRoutes'
 import type { RestRouteContext } from './routes/restRouteTypes'
 import { registerZonasEntregaRoutes } from './routes/registerZonasEntregaRoutes'
 import { registerOrdenesEntregaRoutes } from './routes/registerOrdenesEntregaRoutes'
+import { registerAfipRoutes } from './routes/registerAfipRoutes'
 import { registerCobranzasRoutes } from './routes/registerCobranzasRoutes'
+import { registerPedidosRoutes } from './routes/registerPedidosRoutes'
 import { registerEmpresaRoutes } from './routes/registerEmpresaRoutes'
 import { createDomainServices } from './services/createDomainServices'
 
@@ -50,6 +52,8 @@ export function registerRestDomainRoutes(app: Application, prisma: PrismaClient)
   registerProveedoresRoutes(app, ctx)
   registerFormasPagoRoutes(app, ctx)
   registerFacturasRoutes(app, ctx)
+  registerAfipRoutes(app, ctx)
+  registerPedidosRoutes(app, ctx)
   registerCobrosRoutes(app, ctx)
   registerCobranzasRoutes(app, ctx)
   registerReportesRoutes(app, ctx)

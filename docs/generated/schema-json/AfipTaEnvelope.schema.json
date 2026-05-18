@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "data": {
+      "properties": {
+        "expiration": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "sign": {
+          "type": "string"
+        },
+        "token": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "success": {
+      "const": true,
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "success",
+    "data"
+  ],
+  "title": "AfipTaEnvelope",
+  "type": "object"
+}

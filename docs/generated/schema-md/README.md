@@ -2,6 +2,16 @@
 
 ## Top-level Schemas
 
+* [AfipCaeEnvelope](./afipcaeenvelope.md) – `-`
+
+* [AfipCaeInput](./afipcaeinput.md) – `-`
+
+* [AfipConfigEnvelope](./afipconfigenvelope.md) – `-`
+
+* [AfipConfigInput](./afipconfiginput.md) – `-`
+
+* [AfipTaEnvelope](./afiptaenvelope.md) – `-`
+
 * [AgingAr](./agingar.md) – `-`
 
 * [AgingArEnvelope](./agingarenvelope.md) – `-`
@@ -174,6 +184,18 @@
 
 * [OrdenEntregaUpdateInput](./ordenentregaupdateinput.md) – `-`
 
+* [Pedido](./pedido.md) – `-`
+
+* [PedidoEnvelope](./pedidoenvelope.md) – `-`
+
+* [PedidoInput](./pedidoinput.md) – `-`
+
+* [PedidoInvoiceInput](./pedidoinvoiceinput.md) – `-`
+
+* [PedidoItem](./pedidoitem.md) – `-`
+
+* [PedidoListEnvelope](./pedidolistenvelope.md) – `-`
+
 * [Proveedor](./proveedor.md) – `-`
 
 * [ProveedorEnvelope](./proveedorenvelope.md) – `-`
@@ -230,6 +252,12 @@
 
 ### Objects
 
+* [Untitled object in AfipCaeEnvelope](./afipcaeenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled object in AfipConfigEnvelope](./afipconfigenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled object in AfipTaEnvelope](./afiptaenvelope-properties-data.md) – `undefined#/properties/data`
+
 * [Untitled object in ArticuloListEnvelope](./articulolistenvelope-allof-0.md) – `undefined#/allOf/0`
 
 * [Untitled object in AuditEvent](./auditevent-properties-metadata-anyof-0.md) – `undefined#/properties/metadata/anyOf/0`
@@ -277,6 +305,10 @@
 * [Untitled object in OrdenEntrega](./ordenentrega-properties-zona.md) – `undefined#/properties/zona`
 
 * [Untitled object in OrdenEntregaListEnvelope](./ordenentregalistenvelope-allof-0.md) – `undefined#/allOf/0`
+
+* [Untitled object in PedidoInput](./pedidoinput-properties-items-items.md) – `undefined#/properties/items/items`
+
+* [Untitled object in PedidoListEnvelope](./pedidolistenvelope-allof-0.md) – `undefined#/allOf/0`
 
 * [Untitled object in ProveedorListEnvelope](./proveedorlistenvelope-allof-0.md) – `undefined#/allOf/0`
 
@@ -363,6 +395,12 @@
 * [Untitled array in NotificationListEnvelope](./notificationlistenvelope-properties-data.md) – `undefined#/properties/data`
 
 * [Untitled array in OrdenEntregaListEnvelope](./ordenentregalistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
+
+* [Untitled array in Pedido](./pedido-properties-items.md) – `undefined#/properties/items`
+
+* [Untitled array in PedidoInput](./pedidoinput-properties-items.md) – `undefined#/properties/items`
+
+* [Untitled array in PedidoListEnvelope](./pedidolistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
 
 * [Untitled array in ProveedorListEnvelope](./proveedorlistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
 

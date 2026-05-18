@@ -5844,6 +5844,2223 @@ Requires `settings.business.manage`. Upserts by tenant and codigo.
 }
 ```
 
+### Upsert tenant AFIP credentials
+
+- **Method:** `PUT`
+- **Path:** `/api/afip/config`
+- **Tags:** afip
+
+Requires `settings.fiscal.manage`. Certificate and key encrypted at rest.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`certificate` (required)**
+
+  `string`
+
+- **`cuit` (required)**
+
+  `string`
+
+- **`privateKey` (required)**
+
+  `string`
+
+- **`ambiente`**
+
+  `string`, possible values: `"homologacion", "produccion"`
+
+**Example:**
+
+```json
+{
+  "cuit": "",
+  "certificate": "",
+  "privateKey": "",
+  "ambiente": "homologacion"
+}
+```
+
+#### Responses
+
+##### Status: 200 Config saved
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`configured`**
+
+    `boolean`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "configured": true
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Request AFIP TA (ticket de acceso)
+
+- **Method:** `POST`
+- **Path:** `/api/afip/auth`
+- **Tags:** afip
+
+Requires `settings.fiscal.manage`. Homologación mock when AFIP network is not configured.
+
+#### Responses
+
+##### Status: 200 TA issued
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`expiration`**
+
+    `string`, format: `date-time`
+
+  - **`sign`**
+
+    `string`
+
+  - **`token`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "token": "",
+    "sign": "",
+    "expiration": ""
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Fiscal config not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Request CAE for a factura
+
+- **Method:** `POST`
+- **Path:** `/api/afip/cae`
+- **Tags:** afip
+
+Requires `sales.create`.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`facturaId` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "facturaId": 1
+}
+```
+
+#### Responses
+
+##### Status: 200 CAE issued
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`cae`**
+
+    `string`
+
+  - **`caeVto`**
+
+    `string`, format: `date-time`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "cae": "",
+    "caeVto": ""
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Factura or config not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 502 AFIP request failed
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/pedidos
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/pedidos`
+
+### List commercial orders / quotes
+
+- **Method:** `GET`
+- **Path:** `/api/pedidos`
+- **Tags:** pedidos
+
+Requires `orders.create` or `reports.operational.read`.
+
+#### Responses
+
+##### Status: 200 Paginated pedidos
+
+###### Content-Type: application/json
+
+**All of:**
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`createdAt`**
+
+    `string`, format: `date-time`
+
+  - **`estado`**
+
+    `string`, possible values: `"draft", "confirmed", "invoiced", "cancelled"`
+
+  - **`facturaId`**
+
+    `integer`
+
+  - **`id`**
+
+    `integer`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId`**
+
+      `integer`
+
+    - **`cantidad`**
+
+      `integer`
+
+    - **`dscto`**
+
+      `number`
+
+    - **`id`**
+
+      `integer`
+
+    - **`precio`**
+
+      `number`
+
+    - **`subtotal`**
+
+      `number`
+
+  - **`tenantId`**
+
+    `integer`
+
+  - **`total`**
+
+    `number`
+
+  - **`updatedAt`**
+
+    `string`, format: `date-time`
+
+  - **`validUntil`**
+
+    `string`, format: `date-time`
+
+  - **`vendedorId`**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+* **`limit` (required)**
+
+  `integer` — Effective page size (same semantics as query \`limit\`)
+
+* **`offset` (required)**
+
+  `integer` — Effective skip (same semantics as query \`offset\`)
+
+* **`total` (required)**
+
+  `integer` — Row count matching the list filter (before limit/offset)
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "clienteId": 1,
+      "vendedorId": 1,
+      "estado": "draft",
+      "total": 1,
+      "validUntil": "",
+      "facturaId": 1,
+      "items": [
+        {
+          "id": 1,
+          "articuloId": 1,
+          "cantidad": 1,
+          "precio": 1,
+          "dscto": 1,
+          "subtotal": 1,
+          "additionalProperty": "anything"
+        }
+      ],
+      "createdAt": "",
+      "updatedAt": "",
+      "additionalProperty": "anything"
+    }
+  ],
+  "total": 0,
+  "limit": 1,
+  "offset": 0
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Create pedido (draft)
+
+- **Method:** `POST`
+- **Path:** `/api/pedidos`
+- **Tags:** pedidos
+
+Requires `orders.create`. Initial estado is `draft`.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`clienteId` (required)**
+
+  `integer`
+
+- **`items` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`cantidad` (required)**
+
+    `integer`
+
+  - **`precio` (required)**
+
+    `number`
+
+  - **`dscto`**
+
+    `number`
+
+- **`validUntil`**
+
+  `string`
+
+- **`vendedorId`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "clienteId": 1,
+  "vendedorId": 1,
+  "validUntil": "",
+  "items": [
+    {
+      "articuloId": 1,
+      "cantidad": 1,
+      "precio": 0,
+      "dscto": 0
+    }
+  ]
+}
+```
+
+#### Responses
+
+##### Status: 201 Pedido created
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`createdAt`**
+
+    `string`, format: `date-time`
+
+  - **`estado`**
+
+    `string`, possible values: `"draft", "confirmed", "invoiced", "cancelled"`
+
+  - **`facturaId`**
+
+    `integer`
+
+  - **`id`**
+
+    `integer`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId`**
+
+      `integer`
+
+    - **`cantidad`**
+
+      `integer`
+
+    - **`dscto`**
+
+      `number`
+
+    - **`id`**
+
+      `integer`
+
+    - **`precio`**
+
+      `number`
+
+    - **`subtotal`**
+
+      `number`
+
+  - **`tenantId`**
+
+    `integer`
+
+  - **`total`**
+
+    `number`
+
+  - **`updatedAt`**
+
+    `string`, format: `date-time`
+
+  - **`validUntil`**
+
+    `string`, format: `date-time`
+
+  - **`vendedorId`**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "clienteId": 1,
+    "vendedorId": 1,
+    "estado": "draft",
+    "total": 1,
+    "validUntil": "",
+    "facturaId": 1,
+    "items": [
+      {
+        "id": 1,
+        "articuloId": 1,
+        "cantidad": 1,
+        "precio": 1,
+        "dscto": 1,
+        "subtotal": 1,
+        "additionalProperty": "anything"
+      }
+    ],
+    "createdAt": "",
+    "updatedAt": "",
+    "additionalProperty": "anything"
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 422 Client suspended or business rule
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/pedidos/{id}
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/pedidos/{id}`
+
+### Get pedido by id
+
+- **Method:** `GET`
+- **Path:** `/api/pedidos/{id}`
+- **Tags:** pedidos
+
+Requires `orders.create` or `reports.operational.read`.
+
+#### Responses
+
+##### Status: 200 Pedido detail
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`createdAt`**
+
+    `string`, format: `date-time`
+
+  - **`estado`**
+
+    `string`, possible values: `"draft", "confirmed", "invoiced", "cancelled"`
+
+  - **`facturaId`**
+
+    `integer`
+
+  - **`id`**
+
+    `integer`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId`**
+
+      `integer`
+
+    - **`cantidad`**
+
+      `integer`
+
+    - **`dscto`**
+
+      `number`
+
+    - **`id`**
+
+      `integer`
+
+    - **`precio`**
+
+      `number`
+
+    - **`subtotal`**
+
+      `number`
+
+  - **`tenantId`**
+
+    `integer`
+
+  - **`total`**
+
+    `number`
+
+  - **`updatedAt`**
+
+    `string`, format: `date-time`
+
+  - **`validUntil`**
+
+    `string`, format: `date-time`
+
+  - **`vendedorId`**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "clienteId": 1,
+    "vendedorId": 1,
+    "estado": "draft",
+    "total": 1,
+    "validUntil": "",
+    "facturaId": 1,
+    "items": [
+      {
+        "id": 1,
+        "articuloId": 1,
+        "cantidad": 1,
+        "precio": 1,
+        "dscto": 1,
+        "subtotal": 1,
+        "additionalProperty": "anything"
+      }
+    ],
+    "createdAt": "",
+    "updatedAt": "",
+    "additionalProperty": "anything"
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Pedido not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Update pedido (draft only)
+
+- **Method:** `PUT`
+- **Path:** `/api/pedidos/{id}`
+- **Tags:** pedidos
+
+Requires `orders.create`.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`clienteId` (required)**
+
+  `integer`
+
+- **`items` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`cantidad` (required)**
+
+    `integer`
+
+  - **`precio` (required)**
+
+    `number`
+
+  - **`dscto`**
+
+    `number`
+
+- **`validUntil`**
+
+  `string`
+
+- **`vendedorId`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "clienteId": 1,
+  "vendedorId": 1,
+  "validUntil": "",
+  "items": [
+    {
+      "articuloId": 1,
+      "cantidad": 1,
+      "precio": 0,
+      "dscto": 0
+    }
+  ]
+}
+```
+
+#### Responses
+
+##### Status: 200 Pedido updated
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`createdAt`**
+
+    `string`, format: `date-time`
+
+  - **`estado`**
+
+    `string`, possible values: `"draft", "confirmed", "invoiced", "cancelled"`
+
+  - **`facturaId`**
+
+    `integer`
+
+  - **`id`**
+
+    `integer`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId`**
+
+      `integer`
+
+    - **`cantidad`**
+
+      `integer`
+
+    - **`dscto`**
+
+      `number`
+
+    - **`id`**
+
+      `integer`
+
+    - **`precio`**
+
+      `number`
+
+    - **`subtotal`**
+
+      `number`
+
+  - **`tenantId`**
+
+    `integer`
+
+  - **`total`**
+
+    `number`
+
+  - **`updatedAt`**
+
+    `string`, format: `date-time`
+
+  - **`validUntil`**
+
+    `string`, format: `date-time`
+
+  - **`vendedorId`**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "clienteId": 1,
+    "vendedorId": 1,
+    "estado": "draft",
+    "total": 1,
+    "validUntil": "",
+    "facturaId": 1,
+    "items": [
+      {
+        "id": 1,
+        "articuloId": 1,
+        "cantidad": 1,
+        "precio": 1,
+        "dscto": 1,
+        "subtotal": 1,
+        "additionalProperty": "anything"
+      }
+    ],
+    "createdAt": "",
+    "updatedAt": "",
+    "additionalProperty": "anything"
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Pedido not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 409 Not in draft state
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Cancel pedido (soft)
+
+- **Method:** `DELETE`
+- **Path:** `/api/pedidos/{id}`
+- **Tags:** pedidos
+
+Requires `sales.cancel`. Sets estado to `cancelled` (not allowed when invoiced).
+
+#### Responses
+
+##### Status: 200 Pedido cancelled
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`createdAt`**
+
+    `string`, format: `date-time`
+
+  - **`estado`**
+
+    `string`, possible values: `"draft", "confirmed", "invoiced", "cancelled"`
+
+  - **`facturaId`**
+
+    `integer`
+
+  - **`id`**
+
+    `integer`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId`**
+
+      `integer`
+
+    - **`cantidad`**
+
+      `integer`
+
+    - **`dscto`**
+
+      `number`
+
+    - **`id`**
+
+      `integer`
+
+    - **`precio`**
+
+      `number`
+
+    - **`subtotal`**
+
+      `number`
+
+  - **`tenantId`**
+
+    `integer`
+
+  - **`total`**
+
+    `number`
+
+  - **`updatedAt`**
+
+    `string`, format: `date-time`
+
+  - **`validUntil`**
+
+    `string`, format: `date-time`
+
+  - **`vendedorId`**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "clienteId": 1,
+    "vendedorId": 1,
+    "estado": "draft",
+    "total": 1,
+    "validUntil": "",
+    "facturaId": 1,
+    "items": [
+      {
+        "id": 1,
+        "articuloId": 1,
+        "cantidad": 1,
+        "precio": 1,
+        "dscto": 1,
+        "subtotal": 1,
+        "additionalProperty": "anything"
+      }
+    ],
+    "createdAt": "",
+    "updatedAt": "",
+    "additionalProperty": "anything"
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Pedido not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 409 Invalid state
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/pedidos/{id}/confirm
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/pedidos/{id}/confirm`
+
+### Confirm pedido (draft → confirmed)
+
+- **Method:** `POST`
+- **Path:** `/api/pedidos/{id}/confirm`
+- **Tags:** pedidos
+
+Requires `orders.create`.
+
+#### Responses
+
+##### Status: 200 Pedido confirmed
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`createdAt`**
+
+    `string`, format: `date-time`
+
+  - **`estado`**
+
+    `string`, possible values: `"draft", "confirmed", "invoiced", "cancelled"`
+
+  - **`facturaId`**
+
+    `integer`
+
+  - **`id`**
+
+    `integer`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId`**
+
+      `integer`
+
+    - **`cantidad`**
+
+      `integer`
+
+    - **`dscto`**
+
+      `number`
+
+    - **`id`**
+
+      `integer`
+
+    - **`precio`**
+
+      `number`
+
+    - **`subtotal`**
+
+      `number`
+
+  - **`tenantId`**
+
+    `integer`
+
+  - **`total`**
+
+    `number`
+
+  - **`updatedAt`**
+
+    `string`, format: `date-time`
+
+  - **`validUntil`**
+
+    `string`, format: `date-time`
+
+  - **`vendedorId`**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "clienteId": 1,
+    "vendedorId": 1,
+    "estado": "draft",
+    "total": 1,
+    "validUntil": "",
+    "facturaId": 1,
+    "items": [
+      {
+        "id": 1,
+        "articuloId": 1,
+        "cantidad": 1,
+        "precio": 1,
+        "dscto": 1,
+        "subtotal": 1,
+        "additionalProperty": "anything"
+      }
+    ],
+    "createdAt": "",
+    "updatedAt": "",
+    "additionalProperty": "anything"
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Pedido not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 409 Invalid state transition
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/pedidos/{id}/invoice
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/pedidos/{id}/invoice`
+
+### Invoice pedido (creates Factura)
+
+- **Method:** `POST`
+- **Path:** `/api/pedidos/{id}/invoice`
+- **Tags:** pedidos
+
+Requires `sales.create`. Pedido must be `confirmed`. Creates invoice via FacturaService (no CAE in this release).
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`fecha` (required)**
+
+  `string`
+
+- **`numero` (required)**
+
+  `integer`
+
+- **`tipo` (required)**
+
+  `string`, possible values: `"A", "B"`
+
+- **`formaPagoId`**
+
+  `integer`
+
+- **`prefijo`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "fecha": "",
+  "tipo": "A",
+  "numero": 1,
+  "prefijo": "",
+  "formaPagoId": 1
+}
+```
+
+#### Responses
+
+##### Status: 200 Pedido invoiced
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`createdAt`**
+
+    `string`, format: `date-time`
+
+  - **`estado`**
+
+    `string`, possible values: `"draft", "confirmed", "invoiced", "cancelled"`
+
+  - **`facturaId`**
+
+    `integer`
+
+  - **`id`**
+
+    `integer`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId`**
+
+      `integer`
+
+    - **`cantidad`**
+
+      `integer`
+
+    - **`dscto`**
+
+      `number`
+
+    - **`id`**
+
+      `integer`
+
+    - **`precio`**
+
+      `number`
+
+    - **`subtotal`**
+
+      `number`
+
+  - **`tenantId`**
+
+    `integer`
+
+  - **`total`**
+
+    `number`
+
+  - **`updatedAt`**
+
+    `string`, format: `date-time`
+
+  - **`validUntil`**
+
+    `string`, format: `date-time`
+
+  - **`vendedorId`**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "clienteId": 1,
+    "vendedorId": 1,
+    "estado": "draft",
+    "total": 1,
+    "validUntil": "",
+    "facturaId": 1,
+    "items": [
+      {
+        "id": 1,
+        "articuloId": 1,
+        "cantidad": 1,
+        "precio": 1,
+        "dscto": 1,
+        "subtotal": 1,
+        "additionalProperty": "anything"
+      }
+    ],
+    "createdAt": "",
+    "updatedAt": "",
+    "additionalProperty": "anything"
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Pedido not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 409 Invalid state transition
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 422 Client suspended, insufficient stock
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ### PARAMETERS /api/cobros
 
 - **Method:** `PARAMETERS`
@@ -16093,6 +18310,506 @@ Requires `orders.dispatch` for transitions to `assigned`, `in_transit`, or `fail
   }
 }
 ```
+
+### AfipConfigInput
+
+- **Type:**`object`
+
+* **`certificate` (required)**
+
+  `string`
+
+* **`cuit` (required)**
+
+  `string`
+
+* **`privateKey` (required)**
+
+  `string`
+
+* **`ambiente`**
+
+  `string`, possible values: `"homologacion", "produccion"`
+
+**Example:**
+
+```json
+{
+  "cuit": "",
+  "certificate": "",
+  "privateKey": "",
+  "ambiente": "homologacion"
+}
+```
+
+### AfipConfigEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`configured`**
+
+    `boolean`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "configured": true
+  }
+}
+```
+
+### AfipTaEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`expiration`**
+
+    `string`, format: `date-time`
+
+  - **`sign`**
+
+    `string`
+
+  - **`token`**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "token": "",
+    "sign": "",
+    "expiration": ""
+  }
+}
+```
+
+### AfipCaeInput
+
+- **Type:**`object`
+
+* **`facturaId` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "facturaId": 1
+}
+```
+
+### AfipCaeEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`cae`**
+
+    `string`
+
+  - **`caeVto`**
+
+    `string`, format: `date-time`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "cae": "",
+    "caeVto": ""
+  }
+}
+```
+
+### PedidoItem
+
+- **Type:**`object`
+
+* **`articuloId`**
+
+  `integer`
+
+* **`cantidad`**
+
+  `integer`
+
+* **`dscto`**
+
+  `number`
+
+* **`id`**
+
+  `integer`
+
+* **`precio`**
+
+  `number`
+
+* **`subtotal`**
+
+  `number`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "articuloId": 1,
+  "cantidad": 1,
+  "precio": 1,
+  "dscto": 1,
+  "subtotal": 1,
+  "additionalProperty": "anything"
+}
+```
+
+### Pedido
+
+- **Type:**`object`
+
+* **`clienteId`**
+
+  `integer`
+
+* **`createdAt`**
+
+  `string`, format: `date-time`
+
+* **`estado`**
+
+  `string`, possible values: `"draft", "confirmed", "invoiced", "cancelled"`
+
+* **`facturaId`**
+
+  `integer`
+
+* **`id`**
+
+  `integer`
+
+* **`items`**
+
+  `array`
+
+  **Items:**
+
+  - **`articuloId`**
+
+    `integer`
+
+  - **`cantidad`**
+
+    `integer`
+
+  - **`dscto`**
+
+    `number`
+
+  - **`id`**
+
+    `integer`
+
+  - **`precio`**
+
+    `number`
+
+  - **`subtotal`**
+
+    `number`
+
+* **`tenantId`**
+
+  `integer`
+
+* **`total`**
+
+  `number`
+
+* **`updatedAt`**
+
+  `string`, format: `date-time`
+
+* **`validUntil`**
+
+  `string`, format: `date-time`
+
+* **`vendedorId`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "tenantId": 1,
+  "clienteId": 1,
+  "vendedorId": 1,
+  "estado": "draft",
+  "total": 1,
+  "validUntil": "",
+  "facturaId": 1,
+  "items": [
+    {
+      "id": 1,
+      "articuloId": 1,
+      "cantidad": 1,
+      "precio": 1,
+      "dscto": 1,
+      "subtotal": 1,
+      "additionalProperty": "anything"
+    }
+  ],
+  "createdAt": "",
+  "updatedAt": "",
+  "additionalProperty": "anything"
+}
+```
+
+### PedidoInput
+
+- **Type:**`object`
+
+* **`clienteId` (required)**
+
+  `integer`
+
+* **`items` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`cantidad` (required)**
+
+    `integer`
+
+  - **`precio` (required)**
+
+    `number`
+
+  - **`dscto`**
+
+    `number`
+
+* **`validUntil`**
+
+  `string`
+
+* **`vendedorId`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "clienteId": 1,
+  "vendedorId": 1,
+  "validUntil": "",
+  "items": [
+    {
+      "articuloId": 1,
+      "cantidad": 1,
+      "precio": 0,
+      "dscto": 0
+    }
+  ]
+}
+```
+
+### PedidoInvoiceInput
+
+- **Type:**`object`
+
+* **`fecha` (required)**
+
+  `string`
+
+* **`numero` (required)**
+
+  `integer`
+
+* **`tipo` (required)**
+
+  `string`, possible values: `"A", "B"`
+
+* **`formaPagoId`**
+
+  `integer`
+
+* **`prefijo`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "fecha": "",
+  "tipo": "A",
+  "numero": 1,
+  "prefijo": "",
+  "formaPagoId": 1
+}
+```
+
+### PedidoEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`createdAt`**
+
+    `string`, format: `date-time`
+
+  - **`estado`**
+
+    `string`, possible values: `"draft", "confirmed", "invoiced", "cancelled"`
+
+  - **`facturaId`**
+
+    `integer`
+
+  - **`id`**
+
+    `integer`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId`**
+
+      `integer`
+
+    - **`cantidad`**
+
+      `integer`
+
+    - **`dscto`**
+
+      `number`
+
+    - **`id`**
+
+      `integer`
+
+    - **`precio`**
+
+      `number`
+
+    - **`subtotal`**
+
+      `number`
+
+  - **`tenantId`**
+
+    `integer`
+
+  - **`total`**
+
+    `number`
+
+  - **`updatedAt`**
+
+    `string`, format: `date-time`
+
+  - **`validUntil`**
+
+    `string`, format: `date-time`
+
+  - **`vendedorId`**
+
+    `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "clienteId": 1,
+    "vendedorId": 1,
+    "estado": "draft",
+    "total": 1,
+    "validUntil": "",
+    "facturaId": 1,
+    "items": [
+      {
+        "id": 1,
+        "articuloId": 1,
+        "cantidad": 1,
+        "precio": 1,
+        "dscto": 1,
+        "subtotal": 1,
+        "additionalProperty": "anything"
+      }
+    ],
+    "createdAt": "",
+    "updatedAt": "",
+    "additionalProperty": "anything"
+  }
+}
+```
+
+### PedidoListEnvelope
+
+- **Type:**
+
+**Example:**
 
 ### FormaPago
 
