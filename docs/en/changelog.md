@@ -16,6 +16,8 @@ Versioning: [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **AFIP CAE (GitHub #133):** `TenantFiscalConfig`, CAE fields on `Factura`, `PUT /api/afip/config`, `POST /api/afip/auth`, `POST /api/afip/cae`; homologación WSFE mock; post-create hook in `FacturaService`; `npm run afip:retry-pending`. PDF badge follow-up.
+
 - **Legacy DBF catalog migration (GitHub #131):** Parsers `legacyRubroDbf.ts` / `legacyArticuloDbf.ts`; `POST /api/rubros/migrate-dbf` and `POST /api/articulos/migrate-dbf` (`settings.business.manage`, upsert by codigo); `npm run migrate:dbf` imports `RUBROS.DBF` / `ARTICULOS.DBF` when present (fallback to `PVAR2`/`PVAR`); integration fixtures and tests.
 
 - **Stock adjustments (GitHub #128):** `StockAjuste` model and migration; `POST /api/articulos/:id/stock-ajuste` (`inventory.adjust`) and `GET /api/articulos/:id/stock-historial`; invoice create decrements stock and emits `stock_below_minimum` notifications; audit `stock_adjust`; i18n EN/ES/PT-BR.

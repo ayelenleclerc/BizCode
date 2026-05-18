@@ -32,6 +32,8 @@ tags:
     description: Suppliers (master data and CSV import)
   - name: facturas
     description: Invoice management
+  - name: afip
+    description: Argentina AFIP electronic invoicing (CAE; homologación mock in dev)
   - name: cobros
     description: Customer payment collections
   - name: formasPago
@@ -975,6 +977,93 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiErrorEnvelope'
+
+  /api/afip/config:
+    put:
+      tags: [afip]
+      summary: Upsert tenant AFIP credentials
+      description: Requires `settings.fiscal.manage`. Certificate and key encrypted at rest.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AfipConfigInput'
+      responses:
+        '200':
+          description: Config saved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AfipConfigEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/afip/auth:
+    post:
+      tags: [afip]
+      summary: Request AFIP TA (ticket de acceso)
+      description: Requires `settings.fiscal.manage`. Homologación mock when AFIP network is not configured.
+      responses:
+        '200':
+          description: TA issued
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AfipTaEnvelope'
+        '404':
+          description: Fiscal config not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/afip/cae:
+    post:
+      tags: [afip]
+      summary: Request CAE for a factura
+      description: Requires `sales.create`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AfipCaeInput'
+      responses:
+        '200':
+          description: CAE issued
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AfipCaeEnvelope'
+        '404':
+          description: Factura or config not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '502':
+          description: AFIP request failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
 
   /api/cobros:
     parameters:
@@ -3317,6 +3406,56 @@ components:
           const: true
         data:
           $ref: '#/components/schemas/Factura'
+
+    AfipConfigInput:
+      type: object
+      required: [cuit, certificate, privateKey]
+      properties:
+        cuit: { type: string }
+        certificate: { type: string }
+        privateKey: { type: string }
+        ambiente:
+          type: string
+          enum: [homologacion, produccion]
+
+    AfipConfigEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success: { type: boolean, const: true }
+        data:
+          type: object
+          properties:
+            configured: { type: boolean }
+
+    AfipTaEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success: { type: boolean, const: true }
+        data:
+          type: object
+          properties:
+            token: { type: string }
+            sign: { type: string }
+            expiration: { type: string, format: date-time }
+
+    AfipCaeInput:
+      type: object
+      required: [facturaId]
+      properties:
+        facturaId: { type: integer, minimum: 1 }
+
+    AfipCaeEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success: { type: boolean, const: true }
+        data:
+          type: object
+          properties:
+            cae: { type: string }
+            caeVto: { type: string, format: date-time }
 
     FormaPago:
       type: object
