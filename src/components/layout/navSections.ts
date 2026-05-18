@@ -113,6 +113,13 @@ export const NAV_SECTIONS: readonly NavSection[] = [
     roles: ['owner', 'manager'],
     moduleKey: null,
   },
+  {
+    key: 'superadmin',
+    path: '/superadmin',
+    icon: '🛡️',
+    roles: ['super_admin'],
+    moduleKey: null,
+  },
 ] as const
 
 /** @en Paths guarded by ModuleRoute in App.tsx. @es Rutas con ModuleRoute en App.tsx. @pt-BR Rotas com ModuleRoute em App.tsx. */

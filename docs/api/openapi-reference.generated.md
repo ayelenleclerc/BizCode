@@ -674,6 +674,780 @@ Returns module and integration keys enabled for the authenticated user's tenant.
 }
 ```
 
+### Platform-wide tenant statistics (super admin)
+
+- **Method:** `GET`
+- **Path:** `/api/superadmin/stats`
+- **Tags:** platform
+
+#### Responses
+
+##### Status: 200 Global platform stats (metadata only)
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`activeTenants` (required)**
+
+    `integer`
+
+  - **`facturasToday` (required)**
+
+    `integer`
+
+  - **`inactiveTenants` (required)**
+
+    `integer`
+
+  - **`totalTenants` (required)**
+
+    `integer`
+
+  - **`totalUsers` (required)**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "activeTenants": 0,
+    "totalTenants": 0,
+    "inactiveTenants": 0,
+    "facturasToday": 0,
+    "totalUsers": 0
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### List tenants (super admin)
+
+- **Method:** `GET`
+- **Path:** `/api/superadmin/tenants`
+- **Tags:** platform
+
+#### Responses
+
+##### Status: 200 Tenant list with aggregate counts
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`active` (required)**
+
+    `boolean`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`facturaCount` (required)**
+
+    `integer`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`name` (required)**
+
+    `string`
+
+  - **`plan` (required)**
+
+    `string`
+
+  - **`slug` (required)**
+
+    `string`
+
+  - **`userCount` (required)**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "name": "",
+      "slug": "",
+      "active": true,
+      "plan": "",
+      "userCount": 0,
+      "facturaCount": 0,
+      "createdAt": ""
+    }
+  ]
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Create tenant with default module config (super admin)
+
+- **Method:** `POST`
+- **Path:** `/api/superadmin/tenants`
+- **Tags:** platform
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`name` (required)**
+
+  `string`
+
+- **`slug` (required)**
+
+  `string`
+
+- **`ownerPassword`**
+
+  `string`, format: `password`
+
+- **`ownerUsername`**
+
+  `string`
+
+- **`plan`**
+
+  `string`, possible values: `"starter", "pro", "enterprise"`
+
+**Example:**
+
+```json
+{
+  "name": "",
+  "slug": "",
+  "plan": "starter",
+  "ownerUsername": "",
+  "ownerPassword": ""
+}
+```
+
+#### Responses
+
+##### Status: 201 Tenant created
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`ownerUserId` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "tenantId": 1,
+    "ownerUserId": 1
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 409 Slug already exists
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/superadmin/tenants/{tenantId}
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/superadmin/tenants/{tenantId}`
+
+### Tenant detail with platform stats (super admin)
+
+- **Method:** `GET`
+- **Path:** `/api/superadmin/tenants/{tenantId}`
+- **Tags:** platform
+
+#### Responses
+
+##### Status: 200 Tenant metadata and aggregate stats
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`active` (required)**
+
+    `boolean`
+
+  - **`configUpdatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`lastActivityAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`modulesCount` (required)**
+
+    `integer`
+
+  - **`name` (required)**
+
+    `string`
+
+  - **`plan` (required)**
+
+    `string`
+
+  - **`slug` (required)**
+
+    `string`
+
+  - **`stats` (required)**
+
+    `object`
+
+    - **`clienteCount` (required)**
+
+      `integer`
+
+    - **`facturaCount` (required)**
+
+      `integer`
+
+    - **`pedidoCount` (required)**
+
+      `integer`
+
+    - **`userCount` (required)**
+
+      `integer`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "name": "",
+    "slug": "",
+    "active": true,
+    "createdAt": "",
+    "updatedAt": "",
+    "plan": "",
+    "modulesCount": 0,
+    "configUpdatedAt": "",
+    "stats": {
+      "userCount": 0,
+      "facturaCount": 0,
+      "pedidoCount": 0,
+      "clienteCount": 0
+    },
+    "lastActivityAt": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Tenant not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Suspend or reactivate tenant (super admin)
+
+- **Method:** `PATCH`
+- **Path:** `/api/superadmin/tenants/{tenantId}`
+- **Tags:** platform
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`active` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "active": true
+}
+```
+
+#### Responses
+
+##### Status: 200 Updated tenant
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`active` (required)**
+
+    `boolean`
+
+  - **`configUpdatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`lastActivityAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`modulesCount` (required)**
+
+    `integer`
+
+  - **`name` (required)**
+
+    `string`
+
+  - **`plan` (required)**
+
+    `string`
+
+  - **`slug` (required)**
+
+    `string`
+
+  - **`stats` (required)**
+
+    `object`
+
+    - **`clienteCount` (required)**
+
+      `integer`
+
+    - **`facturaCount` (required)**
+
+      `integer`
+
+    - **`pedidoCount` (required)**
+
+      `integer`
+
+    - **`userCount` (required)**
+
+      `integer`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "name": "",
+    "slug": "",
+    "active": true,
+    "createdAt": "",
+    "updatedAt": "",
+    "plan": "",
+    "modulesCount": 0,
+    "configUpdatedAt": "",
+    "stats": {
+      "userCount": 0,
+      "facturaCount": 0,
+      "pedidoCount": 0,
+      "clienteCount": 0
+    },
+    "lastActivityAt": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Tenant not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ### PARAMETERS /api/superadmin/tenants/{tenantId}/config
 
 - **Method:** `PARAMETERS`
@@ -24347,6 +25121,527 @@ Requires `orders.dispatch` for transitions to `assigned`, `in_transit`, or `fail
       }
     ]
   }
+}
+```
+
+### SuperadminGlobalStats
+
+- **Type:**`object`
+
+* **`activeTenants` (required)**
+
+  `integer`
+
+* **`facturasToday` (required)**
+
+  `integer`
+
+* **`inactiveTenants` (required)**
+
+  `integer`
+
+* **`totalTenants` (required)**
+
+  `integer`
+
+* **`totalUsers` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "activeTenants": 0,
+  "totalTenants": 0,
+  "inactiveTenants": 0,
+  "facturasToday": 0,
+  "totalUsers": 0
+}
+```
+
+### SuperadminGlobalStatsEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`activeTenants` (required)**
+
+    `integer`
+
+  - **`facturasToday` (required)**
+
+    `integer`
+
+  - **`inactiveTenants` (required)**
+
+    `integer`
+
+  - **`totalTenants` (required)**
+
+    `integer`
+
+  - **`totalUsers` (required)**
+
+    `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "activeTenants": 0,
+    "totalTenants": 0,
+    "inactiveTenants": 0,
+    "facturasToday": 0,
+    "totalUsers": 0
+  }
+}
+```
+
+### SuperadminTenantListRow
+
+- **Type:**`object`
+
+* **`active` (required)**
+
+  `boolean`
+
+* **`createdAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`facturaCount` (required)**
+
+  `integer`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`name` (required)**
+
+  `string`
+
+* **`plan` (required)**
+
+  `string`
+
+* **`slug` (required)**
+
+  `string`
+
+* **`userCount` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "name": "",
+  "slug": "",
+  "active": true,
+  "plan": "",
+  "userCount": 0,
+  "facturaCount": 0,
+  "createdAt": ""
+}
+```
+
+### SuperadminTenantListEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`active` (required)**
+
+    `boolean`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`facturaCount` (required)**
+
+    `integer`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`name` (required)**
+
+    `string`
+
+  - **`plan` (required)**
+
+    `string`
+
+  - **`slug` (required)**
+
+    `string`
+
+  - **`userCount` (required)**
+
+    `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "name": "",
+      "slug": "",
+      "active": true,
+      "plan": "",
+      "userCount": 0,
+      "facturaCount": 0,
+      "createdAt": ""
+    }
+  ]
+}
+```
+
+### SuperadminTenantStats
+
+- **Type:**`object`
+
+* **`clienteCount` (required)**
+
+  `integer`
+
+* **`facturaCount` (required)**
+
+  `integer`
+
+* **`pedidoCount` (required)**
+
+  `integer`
+
+* **`userCount` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "userCount": 0,
+  "facturaCount": 0,
+  "pedidoCount": 0,
+  "clienteCount": 0
+}
+```
+
+### SuperadminTenantDetail
+
+- **Type:**`object`
+
+* **`active` (required)**
+
+  `boolean`
+
+* **`configUpdatedAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`createdAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`lastActivityAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`modulesCount` (required)**
+
+  `integer`
+
+* **`name` (required)**
+
+  `string`
+
+* **`plan` (required)**
+
+  `string`
+
+* **`slug` (required)**
+
+  `string`
+
+* **`stats` (required)**
+
+  `object`
+
+  - **`clienteCount` (required)**
+
+    `integer`
+
+  - **`facturaCount` (required)**
+
+    `integer`
+
+  - **`pedidoCount` (required)**
+
+    `integer`
+
+  - **`userCount` (required)**
+
+    `integer`
+
+* **`updatedAt` (required)**
+
+  `string`, format: `date-time`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "name": "",
+  "slug": "",
+  "active": true,
+  "createdAt": "",
+  "updatedAt": "",
+  "plan": "",
+  "modulesCount": 0,
+  "configUpdatedAt": "",
+  "stats": {
+    "userCount": 0,
+    "facturaCount": 0,
+    "pedidoCount": 0,
+    "clienteCount": 0
+  },
+  "lastActivityAt": ""
+}
+```
+
+### SuperadminTenantDetailEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`active` (required)**
+
+    `boolean`
+
+  - **`configUpdatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`lastActivityAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`modulesCount` (required)**
+
+    `integer`
+
+  - **`name` (required)**
+
+    `string`
+
+  - **`plan` (required)**
+
+    `string`
+
+  - **`slug` (required)**
+
+    `string`
+
+  - **`stats` (required)**
+
+    `object`
+
+    - **`clienteCount` (required)**
+
+      `integer`
+
+    - **`facturaCount` (required)**
+
+      `integer`
+
+    - **`pedidoCount` (required)**
+
+      `integer`
+
+    - **`userCount` (required)**
+
+      `integer`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "name": "",
+    "slug": "",
+    "active": true,
+    "createdAt": "",
+    "updatedAt": "",
+    "plan": "",
+    "modulesCount": 0,
+    "configUpdatedAt": "",
+    "stats": {
+      "userCount": 0,
+      "facturaCount": 0,
+      "pedidoCount": 0,
+      "clienteCount": 0
+    },
+    "lastActivityAt": ""
+  }
+}
+```
+
+### SuperadminTenantCreateInput
+
+- **Type:**`object`
+
+* **`name` (required)**
+
+  `string`
+
+* **`slug` (required)**
+
+  `string`
+
+* **`ownerPassword`**
+
+  `string`, format: `password`
+
+* **`ownerUsername`**
+
+  `string`
+
+* **`plan`**
+
+  `string`, possible values: `"starter", "pro", "enterprise"`
+
+**Example:**
+
+```json
+{
+  "name": "",
+  "slug": "",
+  "plan": "starter",
+  "ownerUsername": "",
+  "ownerPassword": ""
+}
+```
+
+### SuperadminTenantCreateResult
+
+- **Type:**`object`
+
+* **`ownerUserId` (required)**
+
+  `integer`
+
+* **`tenantId` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "tenantId": 1,
+  "ownerUserId": 1
+}
+```
+
+### SuperadminTenantCreateEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`ownerUserId` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "tenantId": 1,
+    "ownerUserId": 1
+  }
+}
+```
+
+### SuperadminTenantPatchInput
+
+- **Type:**`object`
+
+* **`active` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "active": true
 }
 ```
 

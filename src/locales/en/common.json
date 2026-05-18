@@ -23,7 +23,8 @@
     "users": "Users",
     "zonasEntrega": "Delivery zones",
     "empresa": "Company",
-    "auditLog": "Audit log"
+    "auditLog": "Audit log",
+    "superadmin": "SuperAdmin"
   },
   "language": {
     "legend": "Interface language",
@@ -89,7 +90,9 @@
     "save": "Save",
     "cancel": "Cancel",
     "saving": "Saving...",
-    "new": "New"
+    "new": "New",
+    "search": "Search",
+    "retry": "Retry"
   },
   "status": {
     "loading": "Loading...",
@@ -146,6 +149,60 @@
     "analytics_dashboard": "Dashboard",
     "admin_audit_log": "Audit log",
     "comms_chat": "Internal chat"
+  },
+  "superadmin": {
+    "title": "SuperAdmin panel",
+    "subtitle": "Platform tenant management (metadata only)",
+    "statsSection": "Platform statistics",
+    "tenantsSection": "Tenants",
+    "searchLabel": "Search by name or slug",
+    "emptyTenants": "No tenants match the filter.",
+    "viewDetail": "View detail",
+    "backToList": "Back to list",
+    "backToDetail": "Back to detail",
+    "suspend": "Suspend tenant",
+    "reactivate": "Reactivate tenant",
+    "manageModules": "Manage modules",
+    "modulesPlaceholderTitle": "Tenant modules",
+    "modulesPlaceholderBody": "Visual module configuration will be implemented in issue #225.",
+    "status": {
+      "active": "Active",
+      "suspended": "Suspended"
+    },
+    "stats": {
+      "activeTenants": "Active tenants",
+      "totalTenants": "Total tenants",
+      "facturasToday": "Invoices today (global)",
+      "totalUsers": "Total users"
+    },
+    "columns": {
+      "name": "Name",
+      "slug": "Slug",
+      "plan": "Plan",
+      "users": "Users",
+      "invoices": "Invoices",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "detail": {
+      "status": "Status",
+      "plan": "Plan",
+      "modulesCount": "Enabled modules",
+      "lastActivity": "Last activity",
+      "createdAt": "Created",
+      "configUpdated": "Config updated",
+      "statsSection": "Aggregate statistics",
+      "statUsers": "{{count}} users",
+      "statInvoices": "{{count}} invoices",
+      "statOrders": "{{count}} orders",
+      "statClients": "{{count}} customers"
+    },
+    "errors": {
+      "loadFailed": "Could not load platform data.",
+      "patchFailed": "Could not update tenant status.",
+      "invalidId": "Invalid tenant id.",
+      "notFound": "Tenant not found."
+    }
   },
   "dashboard": {
     "title": "Today's summary",

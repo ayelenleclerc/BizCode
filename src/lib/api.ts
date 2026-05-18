@@ -173,6 +173,116 @@ export const featuresAPI = {
   },
 }
 
+// ============ SUPERADMIN (PLATFORM) ============
+
+export type SuperadminTenantListRow = {
+  id: number
+  name: string
+  slug: string
+  active: boolean
+  plan: string | null
+  userCount: number
+  facturaCount: number
+  createdAt: string
+}
+
+export type SuperadminTenantDetail = {
+  id: number
+  name: string
+  slug: string
+  active: boolean
+  createdAt: string
+  updatedAt: string
+  plan: string | null
+  modulesCount: number
+  configUpdatedAt: string | null
+  stats: {
+    userCount: number
+    facturaCount: number
+    pedidoCount: number
+    clienteCount: number
+  }
+  lastActivityAt: string | null
+}
+
+export type SuperadminGlobalStats = {
+  activeTenants: number
+  totalTenants: number
+  inactiveTenants: number
+  facturasToday: number
+  totalUsers: number
+}
+
+export type SuperadminTenantCreateInput = {
+  name: string
+  slug: string
+  plan?: string
+  ownerUsername?: string
+  ownerPassword?: string
+}
+
+export const superadminAPI = {
+  getStats: async (): Promise<SuperadminGlobalStats> => {
+    try {
+      const response = await api.get<{ success: boolean; data: SuperadminGlobalStats }>(
+        '/superadmin/stats',
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  listTenants: async (q?: string): Promise<SuperadminTenantListRow[]> => {
+    try {
+      const response = await api.get<{ success: boolean; data: SuperadminTenantListRow[] }>(
+        '/superadmin/tenants',
+        { params: q ? { q } : undefined },
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  getTenant: async (tenantId: number): Promise<SuperadminTenantDetail> => {
+    try {
+      const response = await api.get<{ success: boolean; data: SuperadminTenantDetail }>(
+        `/superadmin/tenants/${tenantId}`,
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  createTenant: async (
+    input: SuperadminTenantCreateInput,
+  ): Promise<{ tenantId: number; ownerUserId: number | null }> => {
+    try {
+      const response = await api.post<{
+        success: boolean
+        data: { tenantId: number; ownerUserId: number | null }
+      }>('/superadmin/tenants', input)
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  patchTenant: async (tenantId: number, active: boolean): Promise<SuperadminTenantDetail> => {
+    try {
+      const response = await api.patch<{ success: boolean; data: SuperadminTenantDetail }>(
+        `/superadmin/tenants/${tenantId}`,
+        { active },
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+}
+
 // ============ CLIENTES ============
 
 export type ClienteImportRowError = { row: number; message: string }

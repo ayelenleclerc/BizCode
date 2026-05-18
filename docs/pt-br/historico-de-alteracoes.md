@@ -10,6 +10,8 @@ Versionamento: [Semantic Versioning](https://semver.org/).
 
 ### Adicionado
 
+- **Painel SuperAdmin multi-tenant (GitHub #137):** API `GET/POST/PATCH /api/superadmin/tenants`, `GET /api/superadmin/tenants/:id`, `GET /api/superadmin/stats` com `requireSuperAdmin` e `platform.tenants.manage`; serviço `SuperadminTenantService`; UI `/superadmin` (lista, detalhe, suspender/reativar) e link placeholder para módulos (`#225`); OpenAPI e `tests/api/superadmin-tenants.test.ts`; i18n EN/ES/PT-BR em `common.superadmin.*`.
+
 - **Feature flags no frontend (GitHub #224):** `FeatureFlagsContext` / `useFeatureFlags`; `GET /api/me/features` via `featuresAPI`; `IfModule`, `ModuleRoute`, `FeatureFlagsGate`; nav e rotas condicionais (`navSections.ts`, `Layout`, `App.tsx`); alerta acessível em `/inicio`; i18n `modules.*`; testes em `FeatureFlagsContext.test.tsx`, `IfModule.test.tsx`, `Layout.nav-modules.test.tsx`.
 
 - **Feature flags por tenant (GitHub #223):** modelos `TenantConfig` / `TenantConfigHistory`; `GET /api/me/features`; middleware `requireModule` (ex.: `billing.orders` em `/api/pedidos`); API SuperAdmin `GET/PUT /api/superadmin/tenants/:id/config`, histórico e `POST .../apply-template`; `TenantConfig` no `setup-owner` e seed; cache em processo (sem Redis); i18n `errors.moduleNotEnabled`; testes em `tests/api/me-features.test.ts`, `tests/api/superadmin-tenant-config.test.ts`, `tests/server/require-module.test.ts`.
