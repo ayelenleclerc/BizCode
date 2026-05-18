@@ -163,8 +163,45 @@
     "suspend": "Suspender tenant",
     "reactivate": "Reativar tenant",
     "manageModules": "Gerenciar módulos",
-    "modulesPlaceholderTitle": "Módulos do tenant",
-    "modulesPlaceholderBody": "A configuração visual de módulos será implementada no issue #225.",
+    "modules": {
+      "title": "Módulos do tenant",
+      "deploymentEnv": "Ambiente de implantação: {{env}}",
+      "modulesSection": "Módulos habilitados",
+      "saveSection": "Salvar alterações",
+      "reasonLabel": "Motivo da alteração (obrigatório)",
+      "save": "Salvar configuração",
+      "saveSuccess": "Configuração salva com sucesso.",
+      "presetSection": "Modelo de negócio",
+      "presetLabel": "Modelo",
+      "presetPlaceholder": "Escolher modelo…",
+      "applyPreset": "Aplicar modelo",
+      "confirmApplyPreset": "Aplicar o modelo «{{preset}}»? O conjunto de módulos ativos será substituído.",
+      "presetReason": "apply_template:{{preset}}",
+      "historySection": "Histórico de alterações",
+      "historyEmpty": "Sem entradas no histórico.",
+      "historyDate": "Data",
+      "historyReason": "Motivo",
+      "historyUser": "Usuário",
+      "historyTruncated": "Exibindo {{shown}} de {{total}} entradas.",
+      "dependsOn": "Depende de: {{deps}}",
+      "missingDeps": "Ative primeiro: {{deps}}",
+      "cannotDeactivate": "Não pode ser desativado neste ambiente.",
+      "presets": {
+        "MAYORISTA_ALIMENTOS": "Atacado alimentos",
+        "MINORISTA_ROPA": "Varejo roupas",
+        "MAYORISTA_GENERAL": "Atacado geral",
+        "MINORISTA_ALIMENTOS": "Varejo alimentos",
+        "EMPRESA_SERVICIOS": "Empresa serviços",
+        "RETAIL_POS": "Varejo PDV"
+      },
+      "errors": {
+        "loadFailed": "Não foi possível carregar a configuração de módulos.",
+        "saveFailed": "Não foi possível salvar a configuração.",
+        "presetFailed": "Não foi possível aplicar o modelo.",
+        "reasonRequired": "Informe o motivo da alteração.",
+        "invalidModuleSet": "Conjunto de módulos inválido."
+      }
+    },
     "status": {
       "active": "Ativo",
       "suspended": "Suspenso"

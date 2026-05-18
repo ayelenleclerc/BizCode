@@ -10,6 +10,8 @@ Versionado: [Semantic Versioning](https://semver.org/lang/es/).
 
 ### Agregado
 
+- **UI módulos SuperAdmin (GitHub #225):** página `/superadmin/tenants/:id/modules` con toggles, motivo obligatorio, plantillas y historial; clientes `superadminAPI` (config) y `modulesCatalogAPI` en `src/lib/api.ts`; pruebas `TenantModulesPage.test.tsx`; i18n `common.superadmin.modules.*` (EN/ES/PT-BR).
+
 - **Panel SuperAdmin multi-tenant (GitHub #137):** API `GET/POST/PATCH /api/superadmin/tenants`, `GET /api/superadmin/tenants/:id`, `GET /api/superadmin/stats` con `requireSuperAdmin` y `platform.tenants.manage`; servicio `SuperadminTenantService`; UI `/superadmin` (listado, detalle, suspender/reactivar) y enlace placeholder a módulos (`#225`); OpenAPI y `tests/api/superadmin-tenants.test.ts`; i18n EN/ES/PT-BR en `common.superadmin.*`.
 
 - **Feature flags en frontend (GitHub #224):** `FeatureFlagsContext` / `useFeatureFlags`; `GET /api/me/features` vía `featuresAPI`; `IfModule`, `ModuleRoute`, `FeatureFlagsGate`; nav y rutas condicionales (`navSections.ts`, `Layout`, `App.tsx`); alerta accesible en `/inicio`; i18n `modules.*`; pruebas en `FeatureFlagsContext.test.tsx`, `IfModule.test.tsx`, `Layout.nav-modules.test.tsx`.

@@ -163,8 +163,45 @@
     "suspend": "Suspend tenant",
     "reactivate": "Reactivate tenant",
     "manageModules": "Manage modules",
-    "modulesPlaceholderTitle": "Tenant modules",
-    "modulesPlaceholderBody": "Visual module configuration will be implemented in issue #225.",
+    "modules": {
+      "title": "Tenant modules",
+      "deploymentEnv": "Deployment environment: {{env}}",
+      "modulesSection": "Enabled modules",
+      "saveSection": "Save changes",
+      "reasonLabel": "Change reason (required)",
+      "save": "Save configuration",
+      "saveSuccess": "Configuration saved successfully.",
+      "presetSection": "Business template",
+      "presetLabel": "Template",
+      "presetPlaceholder": "Choose template…",
+      "applyPreset": "Apply template",
+      "confirmApplyPreset": "Apply template «{{preset}}»? This will replace the active module set.",
+      "presetReason": "apply_template:{{preset}}",
+      "historySection": "Change history",
+      "historyEmpty": "No history entries.",
+      "historyDate": "Date",
+      "historyReason": "Reason",
+      "historyUser": "User",
+      "historyTruncated": "Showing {{shown}} of {{total}} entries.",
+      "dependsOn": "Depends on: {{deps}}",
+      "missingDeps": "Enable first: {{deps}}",
+      "cannotDeactivate": "Cannot be disabled in this environment.",
+      "presets": {
+        "MAYORISTA_ALIMENTOS": "Wholesale food",
+        "MINORISTA_ROPA": "Retail apparel",
+        "MAYORISTA_GENERAL": "General wholesale",
+        "MINORISTA_ALIMENTOS": "Retail food",
+        "EMPRESA_SERVICIOS": "Services company",
+        "RETAIL_POS": "Retail POS"
+      },
+      "errors": {
+        "loadFailed": "Could not load module configuration.",
+        "saveFailed": "Could not save configuration.",
+        "presetFailed": "Could not apply template.",
+        "reasonRequired": "Enter a change reason.",
+        "invalidModuleSet": "Invalid module set."
+      }
+    },
     "status": {
       "active": "Active",
       "suspended": "Suspended"
