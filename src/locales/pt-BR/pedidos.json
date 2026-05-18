@@ -1,0 +1,22 @@
+{
+  "title": "Pedidos",
+  "subtitle": "Orçamentos e pedidos comerciais",
+  "newOrder": "Novo pedido",
+  "empty": "Não há pedidos para exibir.",
+  "columns": {
+    "id": "N.º",
+    "cliente": "Cliente",
+    "estado": "Status",
+    "total": "Total",
+    "fecha": "Criado"
+  },
+  "estado": {
+    "draft": "Rascunho",
+    "confirmed": "Confirmado",
+    "invoiced": "Faturado",
+    "cancelled": "Cancelado"
+  },
+  "filterEstado": "Status",
+  "filterAll": "Todos",
+  "loadError": "Não foi possível carregar os pedidos."
+}

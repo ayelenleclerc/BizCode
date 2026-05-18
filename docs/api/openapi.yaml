@@ -34,6 +34,8 @@ tags:
     description: Invoice management
   - name: afip
     description: Argentina AFIP electronic invoicing (CAE; homologación mock in dev)
+  - name: pedidos
+    description: Commercial orders and quotes (ADR-0009)
   - name: cobros
     description: Customer payment collections
   - name: formasPago
@@ -52,6 +54,8 @@ tags:
     description: Audit event history (read-only)
   - name: modules
     description: Platform module catalog and feature-flag metadata
+  - name: recuentos
+    description: Physical inventory counts
 
 paths:
   /api/auth/setup-owner:
@@ -536,6 +540,204 @@ paths:
                 $ref: '#/components/schemas/ApiErrorEnvelope'
         '422':
           description: Insufficient stock (INSUFFICIENT_STOCK)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '423':
+          description: Stock movements blocked while a count is in progress (RECUENTO_IN_PROGRESS)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/recuentos:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [recuentos]
+      summary: List physical inventory counts (paginated)
+      responses:
+        '200':
+          description: Paginated list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecuentoListEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    post:
+      tags: [recuentos]
+      summary: Start a new count (snapshot of active product stock)
+      responses:
+        '201':
+          description: Count started
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecuentoSingleEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '409':
+          description: Another count is already in progress (RECUENTO_ALREADY_OPEN)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/recuentos/{id}:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    get:
+      tags: [recuentos]
+      summary: Get count by id (with line items)
+      responses:
+        '200':
+          description: Count detail
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecuentoSingleEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Count not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/recuentos/{id}/items:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    put:
+      tags: [recuentos]
+      summary: Update physical quantities for count lines
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecuentoUpdateItemsInput'
+      responses:
+        '200':
+          description: Updated count
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecuentoSingleEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Count not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '422':
+          description: Not editable or invalid line
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/recuentos/{id}/close:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    post:
+      tags: [recuentos]
+      summary: Close count and apply stock adjustments for non-zero diffs
+      responses:
+        '200':
+          description: Count closed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecuentoSingleEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Count not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '422':
+          description: Incomplete lines or insufficient stock
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/recuentos/{id}/report:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    get:
+      tags: [recuentos]
+      summary: Printable HTML report for a closed count
+      responses:
+        '200':
+          description: HTML document
+          content:
+            text/html:
+              schema:
+                type: string
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Count not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '422':
+          description: Count not closed yet (RECUENTO_NOT_CLOSED)
           content:
             application/json:
               schema:
@@ -1054,6 +1256,262 @@ paths:
                 $ref: '#/components/schemas/ApiErrorEnvelope'
         '502':
           description: AFIP request failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/pedidos:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [pedidos]
+      summary: List commercial orders / quotes
+      description: Requires `orders.create` or `reports.operational.read`.
+      parameters:
+        - name: estado
+          in: query
+          schema:
+            type: string
+            enum: [draft, confirmed, invoiced, cancelled]
+        - name: clienteId
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+        - $ref: '#/components/parameters/ListLimit'
+        - $ref: '#/components/parameters/ListOffset'
+      responses:
+        '200':
+          description: Paginated pedidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PedidoListEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    post:
+      tags: [pedidos]
+      summary: Create pedido (draft)
+      description: Requires `orders.create`. Initial estado is `draft`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PedidoInput'
+      responses:
+        '201':
+          description: Pedido created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PedidoEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '422':
+          description: Client suspended or business rule
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/pedidos/{id}:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    get:
+      tags: [pedidos]
+      summary: Get pedido by id
+      description: Requires `orders.create` or `reports.operational.read`.
+      responses:
+        '200':
+          description: Pedido detail
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PedidoEnvelope'
+        '404':
+          description: Pedido not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    put:
+      tags: [pedidos]
+      summary: Update pedido (draft only)
+      description: Requires `orders.create`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PedidoInput'
+      responses:
+        '200':
+          description: Pedido updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PedidoEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          description: Pedido not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '409':
+          description: Not in draft state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    delete:
+      tags: [pedidos]
+      summary: Cancel pedido (soft)
+      description: Requires `sales.cancel`. Sets estado to `cancelled` (not allowed when invoiced).
+      responses:
+        '200':
+          description: Pedido cancelled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PedidoEnvelope'
+        '404':
+          description: Pedido not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '409':
+          description: Invalid state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/pedidos/{id}/confirm:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    post:
+      tags: [pedidos]
+      summary: Confirm pedido (draft → confirmed)
+      description: Requires `orders.create`.
+      responses:
+        '200':
+          description: Pedido confirmed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PedidoEnvelope'
+        '404':
+          description: Pedido not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '409':
+          description: Invalid state transition
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/pedidos/{id}/invoice:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    post:
+      tags: [pedidos]
+      summary: Invoice pedido (creates Factura)
+      description: Requires `sales.create`. Pedido must be `confirmed`. Creates invoice via FacturaService (no CAE in this release).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PedidoInvoiceInput'
+      responses:
+        '200':
+          description: Pedido invoiced
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PedidoEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          description: Pedido not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '409':
+          description: Invalid state transition
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '422':
+          description: Client suspended, insufficient stock
           content:
             application/json:
               schema:
@@ -3129,6 +3587,99 @@ components:
                 $ref: '#/components/schemas/StockAjuste'
         - $ref: '#/components/schemas/ListPaginationMeta'
 
+    RecuentoItem:
+      type: object
+      additionalProperties: true
+      properties:
+        id:
+          type: integer
+        articuloId:
+          type: integer
+        cantSistema:
+          type: integer
+        cantFisica:
+          type: integer
+          nullable: true
+        diff:
+          type: integer
+          nullable: true
+        articulo:
+          type: object
+          additionalProperties: true
+
+    Recuento:
+      type: object
+      additionalProperties: true
+      properties:
+        id:
+          type: integer
+        tenantId:
+          type: integer
+        operadorId:
+          type: integer
+        estado:
+          type: string
+          enum: [in_progress, closed]
+        closedAt:
+          type: string
+          format: date-time
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        operador:
+          type: object
+          additionalProperties: true
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/RecuentoItem'
+
+    RecuentoUpdateItemsInput:
+      type: object
+      required: [items]
+      properties:
+        items:
+          type: array
+          minItems: 1
+          items:
+            type: object
+            required: [itemId, cantFisica]
+            properties:
+              itemId:
+                type: integer
+                minimum: 1
+              cantFisica:
+                type: integer
+                minimum: 0
+
+    RecuentoSingleEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/Recuento'
+
+    RecuentoListEnvelope:
+      allOf:
+        - type: object
+          required: [success, data]
+          properties:
+            success:
+              type: boolean
+              const: true
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/Recuento'
+        - $ref: '#/components/schemas/ListPaginationMeta'
+
     Rubro:
       type: object
       additionalProperties: true
@@ -3456,6 +4007,135 @@ components:
           properties:
             cae: { type: string }
             caeVto: { type: string, format: date-time }
+
+    PedidoItem:
+      type: object
+      additionalProperties: true
+      properties:
+        id:
+          type: integer
+        articuloId:
+          type: integer
+        cantidad:
+          type: integer
+        precio:
+          type: number
+        dscto:
+          type: number
+        subtotal:
+          type: number
+
+    Pedido:
+      type: object
+      additionalProperties: true
+      properties:
+        id:
+          type: integer
+        tenantId:
+          type: integer
+        clienteId:
+          type: integer
+        vendedorId:
+          type: integer
+          nullable: true
+        estado:
+          type: string
+          enum: [draft, confirmed, invoiced, cancelled]
+        total:
+          type: number
+        validUntil:
+          type: string
+          format: date-time
+          nullable: true
+        facturaId:
+          type: integer
+          nullable: true
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/PedidoItem'
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    PedidoInput:
+      type: object
+      required: [clienteId, items]
+      properties:
+        clienteId:
+          type: integer
+          minimum: 1
+        vendedorId:
+          type: integer
+          nullable: true
+        validUntil:
+          type: string
+          nullable: true
+        items:
+          type: array
+          minItems: 1
+          items:
+            type: object
+            required: [articuloId, cantidad, precio]
+            properties:
+              articuloId:
+                type: integer
+                minimum: 1
+              cantidad:
+                type: integer
+                minimum: 1
+              precio:
+                type: number
+                minimum: 0
+              dscto:
+                type: number
+                minimum: 0
+                maximum: 100
+
+    PedidoInvoiceInput:
+      type: object
+      required: [fecha, tipo, numero]
+      properties:
+        fecha:
+          type: string
+        tipo:
+          type: string
+          enum: [A, B]
+        numero:
+          type: integer
+          minimum: 1
+        prefijo:
+          type: string
+        formaPagoId:
+          type: integer
+          nullable: true
+
+    PedidoEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/Pedido'
+
+    PedidoListEnvelope:
+      allOf:
+        - type: object
+          required: [success, data]
+          properties:
+            success:
+              type: boolean
+              const: true
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/Pedido'
+        - $ref: '#/components/schemas/ListPaginationMeta'
 
     FormaPago:
       type: object

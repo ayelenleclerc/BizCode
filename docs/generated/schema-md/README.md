@@ -176,6 +176,18 @@
 
 * [OrdenEntregaUpdateInput](./ordenentregaupdateinput.md) – `-`
 
+* [Pedido](./pedido.md) – `-`
+
+* [PedidoEnvelope](./pedidoenvelope.md) – `-`
+
+* [PedidoInput](./pedidoinput.md) – `-`
+
+* [PedidoInvoiceInput](./pedidoinvoiceinput.md) – `-`
+
+* [PedidoItem](./pedidoitem.md) – `-`
+
+* [PedidoListEnvelope](./pedidolistenvelope.md) – `-`
+
 * [Proveedor](./proveedor.md) – `-`
 
 * [ProveedorEnvelope](./proveedorenvelope.md) – `-`
@@ -284,6 +296,10 @@
 
 * [Untitled object in OrdenEntregaListEnvelope](./ordenentregalistenvelope-allof-0.md) – `undefined#/allOf/0`
 
+* [Untitled object in PedidoInput](./pedidoinput-properties-items-items.md) – `undefined#/properties/items/items`
+
+* [Untitled object in PedidoListEnvelope](./pedidolistenvelope-allof-0.md) – `undefined#/allOf/0`
+
 * [Untitled object in ProveedorListEnvelope](./proveedorlistenvelope-allof-0.md) – `undefined#/allOf/0`
 
 * [Untitled object in RubroListEnvelope](./rubrolistenvelope-allof-0.md) – `undefined#/allOf/0`
@@ -367,6 +383,12 @@
 * [Untitled array in NotificationListEnvelope](./notificationlistenvelope-properties-data.md) – `undefined#/properties/data`
 
 * [Untitled array in OrdenEntregaListEnvelope](./ordenentregalistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
+
+* [Untitled array in Pedido](./pedido-properties-items.md) – `undefined#/properties/items`
+
+* [Untitled array in PedidoInput](./pedidoinput-properties-items.md) – `undefined#/properties/items`
+
+* [Untitled array in PedidoListEnvelope](./pedidolistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
 
 * [Untitled array in ProveedorListEnvelope](./proveedorlistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
 

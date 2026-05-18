@@ -17,6 +17,7 @@ Versionado: [Semantic Versioning](https://semver.org/lang/es/).
 ### Agregado
 
 - **AFIP CAE (GitHub #133):** `TenantFiscalConfig`, campos CAE en `Factura`, `PUT /api/afip/config`, `POST /api/afip/auth`, `POST /api/afip/cae`; mock WSFE homologación; hook post-alta en `FacturaService`; `npm run afip:retry-pending`. Badge PDF en seguimiento.
+- **Pedidos comerciales (GitHub #132):** modelos `Pedido` / `PedidoItem`; `GET/POST/PUT/DELETE /api/pedidos` y `POST .../confirm` / `POST .../invoice` (estados y rutas en inglés, ADR-0009); RBAC `orders.create` / `sales.create` / `sales.cancel`; auditoría `pedido_*`; UI listado `/pedidos`; i18n EN/ES/PT-BR. Gating modular (`requireModule`) pendiente de #223.
 
 - **Migración DBF catálogo (GitHub #131):** parsers `legacyRubroDbf.ts` / `legacyArticuloDbf.ts`; `POST /api/rubros/migrate-dbf` y `POST /api/articulos/migrate-dbf` (`settings.business.manage`, upsert por código); `npm run migrate:dbf` importa `RUBROS.DBF` / `ARTICULOS.DBF` si existen (fallback `PVAR2`/`PVAR`); fixtures y pruebas de integración.
 
