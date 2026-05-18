@@ -132,6 +132,9 @@
     "inactive": "Não configurado",
     "loadError": "Não foi possível carregar o status dos canais"
   },
+  "errors": {
+    "moduleNotEnabled": "O módulo «{{module}}» não está habilitado para sua empresa. Contate o administrador."
+  },
   "dashboard": {
     "title": "Resumo do dia",
     "ventasHoy": "Vendas de hoje",

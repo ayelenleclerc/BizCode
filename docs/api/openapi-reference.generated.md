@@ -480,7 +480,7 @@ One-time endpoint to create initial tenant and owner user.
 - **Path:** `/api/modules/catalog`
 - **Tags:** modules
 
-Returns the full module catalog with dependency graph metadata, deployment environment, and business presets. Does not include tenant-specific enabled modules (see future `/api/me/features`).
+Returns the full module catalog with dependency graph metadata, deployment environment, and business presets. Does not include tenant-specific enabled modules (see `/api/me/features`).
 
 #### Responses
 
@@ -579,6 +579,735 @@ Returns the full module catalog with dependency graph metadata, deployment envir
 ```
 
 ##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Enabled modules for current tenant
+
+- **Method:** `GET`
+- **Path:** `/api/me/features`
+- **Tags:** modules
+
+Returns module and integration keys enabled for the authenticated user's tenant.
+
+#### Responses
+
+##### Status: 200 Tenant feature flags
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`integrations` (required)**
+
+    `array`
+
+    **Items:**
+
+    `string`
+
+  - **`modules` (required)**
+
+    `array`
+
+    **Items:**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "modules": [
+      ""
+    ],
+    "integrations": [
+      ""
+    ]
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/superadmin/tenants/{tenantId}/config
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/superadmin/tenants/{tenantId}/config`
+
+### Get tenant module configuration (super admin)
+
+- **Method:** `GET`
+- **Path:** `/api/superadmin/tenants/{tenantId}/config`
+- **Tags:** platform
+
+#### Responses
+
+##### Status: 200 Tenant configuration
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`businessType` (required)**
+
+    `string`, possible values: `"mayorista", "minorista", "ambos"`
+
+  - **`integrations` (required)**
+
+    `array`
+
+    **Items:**
+
+    `string`
+
+  - **`modules` (required)**
+
+    `array`
+
+    **Items:**
+
+    `string`
+
+  - **`plan` (required)**
+
+    `string`, possible values: `"starter", "pro", "enterprise"`
+
+  - **`rubros` (required)**
+
+    `array`
+
+    **Items:**
+
+    `string`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "tenantId": 1,
+    "businessType": "mayorista",
+    "rubros": [
+      ""
+    ],
+    "plan": "starter",
+    "modules": [
+      ""
+    ],
+    "integrations": [
+      ""
+    ],
+    "updatedAt": ""
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Tenant not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Update tenant module configuration (super admin)
+
+- **Method:** `PUT`
+- **Path:** `/api/superadmin/tenants/{tenantId}/config`
+- **Tags:** platform
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`modules` (required)**
+
+  `array`
+
+  **Items:**
+
+  `string`
+
+- **`reason` (required)**
+
+  `string`
+
+- **`businessType`**
+
+  `string`, possible values: `"mayorista", "minorista", "ambos"`
+
+- **`integrations`**
+
+  `array`
+
+  **Items:**
+
+  `string`
+
+- **`plan`**
+
+  `string`, possible values: `"starter", "pro", "enterprise"`
+
+- **`rubros`**
+
+  `array`
+
+  **Items:**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "businessType": "mayorista",
+  "rubros": [
+    ""
+  ],
+  "plan": "starter",
+  "modules": [
+    ""
+  ],
+  "integrations": [
+    ""
+  ],
+  "reason": ""
+}
+```
+
+#### Responses
+
+##### Status: 200 Updated configuration
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`businessType` (required)**
+
+    `string`, possible values: `"mayorista", "minorista", "ambos"`
+
+  - **`integrations` (required)**
+
+    `array`
+
+    **Items:**
+
+    `string`
+
+  - **`modules` (required)**
+
+    `array`
+
+    **Items:**
+
+    `string`
+
+  - **`plan` (required)**
+
+    `string`, possible values: `"starter", "pro", "enterprise"`
+
+  - **`rubros` (required)**
+
+    `array`
+
+    **Items:**
+
+    `string`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "tenantId": 1,
+    "businessType": "mayorista",
+    "rubros": [
+      ""
+    ],
+    "plan": "starter",
+    "modules": [
+      ""
+    ],
+    "integrations": [
+      ""
+    ],
+    "updatedAt": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/superadmin/tenants/{tenantId}/config/history
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/superadmin/tenants/{tenantId}/config/history`
+
+### Tenant configuration change history (super admin)
+
+- **Method:** `GET`
+- **Path:** `/api/superadmin/tenants/{tenantId}/config/history`
+- **Tags:** platform
+
+#### Responses
+
+##### Status: 200 History entries
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`items` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`after` (required)**
+
+      `object`
+
+    - **`before` (required)**
+
+      `object`
+
+    - **`changedById` (required)**
+
+      `integer`
+
+    - **`createdAt` (required)**
+
+      `string`, format: `date-time`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`reason`**
+
+      `string`
+
+  - **`total` (required)**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "total": 1,
+    "items": [
+      {
+        "id": 1,
+        "changedById": 1,
+        "before": {
+          "additionalProperty": "anything"
+        },
+        "after": {
+          "additionalProperty": "anything"
+        },
+        "reason": "",
+        "createdAt": ""
+      }
+    ]
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/superadmin/tenants/{tenantId}/config/apply-template
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/superadmin/tenants/{tenantId}/config/apply-template`
+
+### Apply module preset to tenant (super admin)
+
+- **Method:** `POST`
+- **Path:** `/api/superadmin/tenants/{tenantId}/config/apply-template`
+- **Tags:** platform
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`preset` (required)**
+
+  `string`
+
+- **`reason`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "preset": "",
+  "reason": ""
+}
+```
+
+#### Responses
+
+##### Status: 200 Configuration after preset
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`businessType` (required)**
+
+    `string`, possible values: `"mayorista", "minorista", "ambos"`
+
+  - **`integrations` (required)**
+
+    `array`
+
+    **Items:**
+
+    `string`
+
+  - **`modules` (required)**
+
+    `array`
+
+    **Items:**
+
+    `string`
+
+  - **`plan` (required)**
+
+    `string`, possible values: `"starter", "pro", "enterprise"`
+
+  - **`rubros` (required)**
+
+    `array`
+
+    **Items:**
+
+    `string`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "tenantId": 1,
+    "businessType": "mayorista",
+    "rubros": [
+      ""
+    ],
+    "plan": "starter",
+    "modules": [
+      ""
+    ],
+    "integrations": [
+      ""
+    ],
+    "updatedAt": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
 
 ###### Content-Type: application/json
 
@@ -23146,5 +23875,503 @@ Requires `orders.dispatch` for transitions to `assigned`, `in_transit`, or `fail
       }
     }
   }
+}
+```
+
+### TenantFeaturesData
+
+- **Type:**`object`
+
+* **`integrations` (required)**
+
+  `array`
+
+  **Items:**
+
+  `string`
+
+* **`modules` (required)**
+
+  `array`
+
+  **Items:**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "modules": [
+    ""
+  ],
+  "integrations": [
+    ""
+  ]
+}
+```
+
+### TenantFeaturesEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`integrations` (required)**
+
+    `array`
+
+    **Items:**
+
+    `string`
+
+  - **`modules` (required)**
+
+    `array`
+
+    **Items:**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "modules": [
+      ""
+    ],
+    "integrations": [
+      ""
+    ]
+  }
+}
+```
+
+### TenantConfig
+
+- **Type:**`object`
+
+* **`businessType` (required)**
+
+  `string`, possible values: `"mayorista", "minorista", "ambos"`
+
+* **`integrations` (required)**
+
+  `array`
+
+  **Items:**
+
+  `string`
+
+* **`modules` (required)**
+
+  `array`
+
+  **Items:**
+
+  `string`
+
+* **`plan` (required)**
+
+  `string`, possible values: `"starter", "pro", "enterprise"`
+
+* **`rubros` (required)**
+
+  `array`
+
+  **Items:**
+
+  `string`
+
+* **`tenantId` (required)**
+
+  `integer`
+
+* **`updatedAt` (required)**
+
+  `string`, format: `date-time`
+
+**Example:**
+
+```json
+{
+  "tenantId": 1,
+  "businessType": "mayorista",
+  "rubros": [
+    ""
+  ],
+  "plan": "starter",
+  "modules": [
+    ""
+  ],
+  "integrations": [
+    ""
+  ],
+  "updatedAt": ""
+}
+```
+
+### TenantConfigEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`businessType` (required)**
+
+    `string`, possible values: `"mayorista", "minorista", "ambos"`
+
+  - **`integrations` (required)**
+
+    `array`
+
+    **Items:**
+
+    `string`
+
+  - **`modules` (required)**
+
+    `array`
+
+    **Items:**
+
+    `string`
+
+  - **`plan` (required)**
+
+    `string`, possible values: `"starter", "pro", "enterprise"`
+
+  - **`rubros` (required)**
+
+    `array`
+
+    **Items:**
+
+    `string`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "tenantId": 1,
+    "businessType": "mayorista",
+    "rubros": [
+      ""
+    ],
+    "plan": "starter",
+    "modules": [
+      ""
+    ],
+    "integrations": [
+      ""
+    ],
+    "updatedAt": ""
+  }
+}
+```
+
+### TenantConfigUpsertBody
+
+- **Type:**`object`
+
+* **`modules` (required)**
+
+  `array`
+
+  **Items:**
+
+  `string`
+
+* **`reason` (required)**
+
+  `string`
+
+* **`businessType`**
+
+  `string`, possible values: `"mayorista", "minorista", "ambos"`
+
+* **`integrations`**
+
+  `array`
+
+  **Items:**
+
+  `string`
+
+* **`plan`**
+
+  `string`, possible values: `"starter", "pro", "enterprise"`
+
+* **`rubros`**
+
+  `array`
+
+  **Items:**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "businessType": "mayorista",
+  "rubros": [
+    ""
+  ],
+  "plan": "starter",
+  "modules": [
+    ""
+  ],
+  "integrations": [
+    ""
+  ],
+  "reason": ""
+}
+```
+
+### TenantConfigApplyTemplateBody
+
+- **Type:**`object`
+
+* **`preset` (required)**
+
+  `string`
+
+* **`reason`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "preset": "",
+  "reason": ""
+}
+```
+
+### TenantConfigHistoryEntry
+
+- **Type:**`object`
+
+* **`after` (required)**
+
+  `object`
+
+* **`before` (required)**
+
+  `object`
+
+* **`changedById` (required)**
+
+  `integer`
+
+* **`createdAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`reason`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "changedById": 1,
+  "before": {
+    "additionalProperty": "anything"
+  },
+  "after": {
+    "additionalProperty": "anything"
+  },
+  "reason": "",
+  "createdAt": ""
+}
+```
+
+### TenantConfigHistoryData
+
+- **Type:**`object`
+
+* **`items` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`after` (required)**
+
+    `object`
+
+  - **`before` (required)**
+
+    `object`
+
+  - **`changedById` (required)**
+
+    `integer`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`reason`**
+
+    `string`
+
+* **`total` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "total": 1,
+  "items": [
+    {
+      "id": 1,
+      "changedById": 1,
+      "before": {
+        "additionalProperty": "anything"
+      },
+      "after": {
+        "additionalProperty": "anything"
+      },
+      "reason": "",
+      "createdAt": ""
+    }
+  ]
+}
+```
+
+### TenantConfigHistoryEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`items` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`after` (required)**
+
+      `object`
+
+    - **`before` (required)**
+
+      `object`
+
+    - **`changedById` (required)**
+
+      `integer`
+
+    - **`createdAt` (required)**
+
+      `string`, format: `date-time`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`reason`**
+
+      `string`
+
+  - **`total` (required)**
+
+    `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "total": 1,
+    "items": [
+      {
+        "id": 1,
+        "changedById": 1,
+        "before": {
+          "additionalProperty": "anything"
+        },
+        "after": {
+          "additionalProperty": "anything"
+        },
+        "reason": "",
+        "createdAt": ""
+      }
+    ]
+  }
+}
+```
+
+### ModuleNotEnabledEnvelope
+
+- **Type:**`object`
+
+* **`error` (required)**
+
+  `string`
+
+* **`module` (required)**
+
+  `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "module_not_enabled",
+  "module": ""
 }
 ```

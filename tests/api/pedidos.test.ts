@@ -110,4 +110,13 @@ describe('Pedidos API', () => {
     const res = await request(app).post('/api/pedidos').send(PEDIDO_BODY)
     expect(res.status).toBe(403)
   })
+
+  it('returns 403 when billing.orders module is disabled', async () => {
+    process.env.BIZCODE_TEST_MODULES = 'core.auth,core.catalog,core.clients,core.invoicing'
+    const app = createApp(buildPrismaMock())
+    const res = await request(app).post('/api/pedidos').send(PEDIDO_BODY)
+    expect(res.status).toBe(403)
+    expect(res.body.error).toBe('module_not_enabled')
+    expect(res.body.module).toBe('billing.orders')
+  })
 })

@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "error": {
+      "const": "module_not_enabled",
+      "type": "string"
+    },
+    "module": {
+      "type": "string"
+    },
+    "success": {
+      "const": false,
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "success",
+    "error",
+    "module"
+  ],
+  "title": "ModuleNotEnabledEnvelope",
+  "type": "object"
+}

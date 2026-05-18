@@ -58,6 +58,8 @@ tags:
     description: Audit event history (read-only)
   - name: modules
     description: Platform module catalog and feature-flag metadata
+  - name: platform
+    description: Super-admin platform operations (tenant configuration)
 
 paths:
   /api/auth/setup-owner:
@@ -186,7 +188,7 @@ paths:
       summary: Module catalog (feature flags metadata)
       description: |
         Returns the full module catalog with dependency graph metadata, deployment environment,
-        and business presets. Does not include tenant-specific enabled modules (see future `/api/me/features`).
+        and business presets. Does not include tenant-specific enabled modules (see `/api/me/features`).
       parameters:
         - $ref: '#/components/parameters/XRequestId'
       responses:
@@ -198,6 +200,115 @@ paths:
                 $ref: '#/components/schemas/ModuleCatalogEnvelope'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+
+  /api/me/features:
+    get:
+      tags: [modules]
+      summary: Enabled modules for current tenant
+      description: Returns module and integration keys enabled for the authenticated user's tenant.
+      parameters:
+        - $ref: '#/components/parameters/XRequestId'
+      responses:
+        '200':
+          description: Tenant feature flags
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TenantFeaturesEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /api/superadmin/tenants/{tenantId}/config:
+    parameters:
+      - $ref: '#/components/parameters/TenantIdPath'
+    get:
+      tags: [platform]
+      summary: Get tenant module configuration (super admin)
+      responses:
+        '200':
+          description: Tenant configuration
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TenantConfigEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Tenant not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+    put:
+      tags: [platform]
+      summary: Update tenant module configuration (super admin)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TenantConfigUpsertBody'
+      responses:
+        '200':
+          description: Updated configuration
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TenantConfigEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /api/superadmin/tenants/{tenantId}/config/history:
+    parameters:
+      - $ref: '#/components/parameters/TenantIdPath'
+      - $ref: '#/components/parameters/ListLimit'
+      - $ref: '#/components/parameters/ListOffset'
+    get:
+      tags: [platform]
+      summary: Tenant configuration change history (super admin)
+      responses:
+        '200':
+          description: History entries
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TenantConfigHistoryEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /api/superadmin/tenants/{tenantId}/config/apply-template:
+    parameters:
+      - $ref: '#/components/parameters/TenantIdPath'
+    post:
+      tags: [platform]
+      summary: Apply module preset to tenant (super admin)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TenantConfigApplyTemplateBody'
+      responses:
+        '200':
+          description: Configuration after preset
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TenantConfigEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
 
   /api/clientes:
     parameters:
@@ -2728,6 +2839,14 @@ components:
         type: string
         maxLength: 128
 
+    TenantIdPath:
+      name: tenantId
+      in: path
+      required: true
+      schema:
+        type: integer
+        minimum: 1
+
     ListLimit:
       name: limit
       in: query
@@ -5035,6 +5154,159 @@ components:
           const: true
         data:
           $ref: '#/components/schemas/ModuleCatalogData'
+
+    TenantFeaturesData:
+      type: object
+      required: [modules, integrations]
+      properties:
+        modules:
+          type: array
+          items:
+            type: string
+        integrations:
+          type: array
+          items:
+            type: string
+
+    TenantFeaturesEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/TenantFeaturesData'
+
+    TenantConfig:
+      type: object
+      required: [tenantId, businessType, rubros, plan, modules, integrations, updatedAt]
+      properties:
+        tenantId:
+          type: integer
+        businessType:
+          type: string
+          enum: [mayorista, minorista, ambos]
+        rubros:
+          type: array
+          items:
+            type: string
+        plan:
+          type: string
+          enum: [starter, pro, enterprise]
+        modules:
+          type: array
+          items:
+            type: string
+        integrations:
+          type: array
+          items:
+            type: string
+        updatedAt:
+          type: string
+          format: date-time
+
+    TenantConfigEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/TenantConfig'
+
+    TenantConfigUpsertBody:
+      type: object
+      required: [modules, reason]
+      properties:
+        businessType:
+          type: string
+          enum: [mayorista, minorista, ambos]
+        rubros:
+          type: array
+          items:
+            type: string
+        plan:
+          type: string
+          enum: [starter, pro, enterprise]
+        modules:
+          type: array
+          items:
+            type: string
+        integrations:
+          type: array
+          items:
+            type: string
+        reason:
+          type: string
+          minLength: 1
+          maxLength: 500
+
+    TenantConfigApplyTemplateBody:
+      type: object
+      required: [preset]
+      properties:
+        preset:
+          type: string
+        reason:
+          type: string
+          maxLength: 500
+
+    TenantConfigHistoryEntry:
+      type: object
+      required: [id, changedById, before, after, createdAt]
+      properties:
+        id:
+          type: integer
+        changedById:
+          type: integer
+        before:
+          type: object
+          additionalProperties: true
+        after:
+          type: object
+          additionalProperties: true
+        reason:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+
+    TenantConfigHistoryData:
+      type: object
+      required: [total, items]
+      properties:
+        total:
+          type: integer
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/TenantConfigHistoryEntry'
+
+    TenantConfigHistoryEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/TenantConfigHistoryData'
+
+    ModuleNotEnabledEnvelope:
+      type: object
+      required: [success, error, module]
+      properties:
+        success:
+          type: boolean
+          const: false
+        error:
+          type: string
+          const: module_not_enabled
+        module:
+          type: string
 
   responses:
     BadRequest:

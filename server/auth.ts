@@ -1,6 +1,7 @@
 import { createHmac, randomBytes } from 'node:crypto'
 import type { NextFunction, Request, Response } from 'express'
 import type { PrismaClient } from '@prisma/client'
+import type { ModuleKey } from '../src/lib/modules'
 import {
   ROLE_PERMISSIONS,
   USER_CHANNELS,
@@ -15,6 +16,7 @@ import {
 import { hashPassword, verifyPassword } from './passwordHash'
 import { writeAuditEvent } from './audit'
 import { getAppConfig } from './config/env'
+import { NEW_TENANT_MODULES } from '../src/lib/modules/tenantDefaults'
 
 const SESSION_COOKIE_NAME = 'bizcode_session'
 const SESSION_DURATION_MS = 1000 * 60 * 60 * 8
@@ -27,7 +29,11 @@ export type RequestAuthContext = {
   sessionId?: number
 }
 
-export type AuthenticatedRequest = Request & { auth?: RequestAuthContext; tenantId?: number }
+export type AuthenticatedRequest = Request & {
+  auth?: RequestAuthContext
+  tenantId?: number
+  tenantModules?: readonly ModuleKey[]
+}
 
 function getCookieValue(rawCookieHeader: string | undefined, key: string): string | null {
   if (!rawCookieHeader) {
@@ -140,9 +146,10 @@ export function resolveSession(prisma: PrismaClient) {
     const bypassEnabled = process.env.NODE_ENV === 'test' && process.env.BIZCODE_TEST_AUTH_BYPASS !== 'false'
     if (bypassEnabled) {
       const bypassRole = normalizeRole(process.env.BIZCODE_TEST_ROLE ?? 'owner') ?? 'owner'
+      const bypassUserId = parseInt(process.env.BIZCODE_TEST_USER_ID ?? '0', 10)
       req.auth = {
         claims: buildClaims({
-          userId: 0,
+          userId: Number.isInteger(bypassUserId) ? bypassUserId : 0,
           username: 'test-owner',
           tenantId: 1,
           role: bypassRole,
@@ -256,6 +263,25 @@ export function requireAnyPermission(...permissions: Permission[]) {
       return
     }
     if (!enforceChannelScope(req, res)) {
+      return
+    }
+    next()
+  }
+}
+
+/**
+ * @en Requires `super_admin` role (platform operations).
+ * @es Exige rol `super_admin` (operaciones de plataforma).
+ * @pt-BR Exige papel `super_admin` (operações de plataforma).
+ */
+export function requireSuperAdmin() {
+  return (req: AuthenticatedRequest, res: Response, next: NextFunction): void => {
+    if (!req.auth) {
+      res.status(401).json({ success: false, error: 'Authentication required' })
+      return
+    }
+    if (req.auth.claims.role !== 'super_admin') {
+      res.status(403).json({ success: false, error: 'Super admin role required' })
       return
     }
     next()
@@ -381,6 +407,16 @@ export function registerAuthRoutes(app: import('express').Application, prisma: P
           passwordHash: hashPassword(password),
           role: 'owner',
           scopeChannels: [...USER_CHANNELS],
+        },
+      })
+      await tx.tenantConfig.create({
+        data: {
+          tenantId: tenant.id,
+          businessType: 'ambos',
+          rubros: [],
+          plan: 'starter',
+          modules: [...NEW_TENANT_MODULES],
+          integrations: [],
         },
       })
       await writeAuditEvent({

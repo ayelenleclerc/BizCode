@@ -8,6 +8,10 @@ Versionamento: [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Adicionado
+
+- **Feature flags por tenant (GitHub #223):** modelos `TenantConfig` / `TenantConfigHistory`; `GET /api/me/features`; middleware `requireModule` (ex.: `billing.orders` em `/api/pedidos`); API SuperAdmin `GET/PUT /api/superadmin/tenants/:id/config`, histórico e `POST .../apply-template`; `TenantConfig` no `setup-owner` e seed; cache em processo (sem Redis); i18n `errors.moduleNotEnabled`; testes em `tests/api/me-features.test.ts`, `tests/api/superadmin-tenant-config.test.ts`, `tests/server/require-module.test.ts`.
+
 ### Corrigido
 
 - **Filtros de cobranças (a11y):** campos de filtro em `/cobros` com rótulo visível e `aria-label` / `placeholder`; [`src/pages/cobros/index.tsx`](../../src/pages/cobros/index.tsx).
@@ -19,7 +23,7 @@ Versionamento: [Semantic Versioning](https://semver.org/).
 - **Ordens de compra (GitHub #135):** `OrdenCompra` + `OrdenCompraItem`; CRUD `/api/compras`, `POST .../send`, `POST .../receive` (recebimento parcial → `StockAjuste` motivo `compra`); UI `/compras`; RBAC `suppliers.read` / `suppliers.manage` + `inventory.adjust` na recepção; i18n EN/ES/PT-BR.
 - **Lembretes de inadimplência (GitHub #134):** modelo `CobroRecordatorio`; `ParamEmpresa.recordatorioDiasGracia`; `GET /api/cobranzas/vencidas` e `POST /api/cobranzas/recordatorios` (`reports.financial.read`); `CobranzasService` + job `npm run cobranzas:recordatorios`; seção em `/finanzas`; auditoria `cobranza_recordatorio_send`; i18n EN/ES/PT-BR.
 - **AFIP CAE (GitHub #133):** `TenantFiscalConfig`, campos CAE em `Factura`, `PUT /api/afip/config`, `POST /api/afip/auth`, `POST /api/afip/cae`; mock WSFE homologação; hook pós-criação em `FacturaService`; `npm run afip:retry-pending`. Badge PDF em follow-up.
-- **Pedidos comerciais (GitHub #132):** modelos `Pedido` / `PedidoItem`; `GET/POST/PUT/DELETE /api/pedidos` e `POST .../confirm` / `POST .../invoice` (estados e rotas em inglês, ADR-0009); RBAC `orders.create` / `sales.create` / `sales.cancel`; auditoria `pedido_*`; UI de listagem `/pedidos`; i18n EN/ES/PT-BR. Gating modular (`requireModule`) pendente de #223.
+- **Pedidos comerciais (GitHub #132):** modelos `Pedido` / `PedidoItem`; `GET/POST/PUT/DELETE /api/pedidos` e `POST .../confirm` / `POST .../invoice` (estados e rotas em inglês, ADR-0009); RBAC `orders.create` / `sales.create` / `sales.cancel`; auditoria `pedido_*`; UI de listagem `/pedidos`; i18n EN/ES/PT-BR. Gating modular: `requireModule('billing.orders')` (#223).
 
 - **Migração DBF de catálogo (GitHub #131):** parsers `legacyRubroDbf.ts` / `legacyArticuloDbf.ts`; `POST /api/rubros/migrate-dbf` e `POST /api/articulos/migrate-dbf` (`settings.business.manage`, upsert por código); `npm run migrate:dbf` importa `RUBROS.DBF` / `ARTICULOS.DBF` quando existirem (fallback `PVAR2`/`PVAR`); fixtures e testes de integração.
 

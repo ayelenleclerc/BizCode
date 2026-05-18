@@ -73,7 +73,7 @@ Células vazias: a etapa não tem permissão RBAC dedicada; o papel pode partici
 | UI / finanças contas a receber | `/finanzas`; `GET /api/reportes/aging`, `GET /api/reportes/cuenta-corriente/:clienteId` | Fluxos de cobrança conforme backlog |
 | Relatórios | `/reportes`; `GET /api/reportes/ventas`, `stock-critico`, `cobranzas` (JSON ou CSV) | Tipos adicionais de relatório |
 | Logística | `/logistica`; `OrdenEntrega`; `GET/POST/PUT /api/ordenes-entrega` | Ciclo de vida completo do pedido (BP1-1) |
-| Entidade pedido (`pedido`) | **Não evidenciada** no Prisma nem OpenAPI | Modelo, estados e APIs ao executar BP1-1 do plano de execução |
+| Entidade pedido (`pedido`) | Modelos `Pedido`/`PedidoItem`, `/api/pedidos`, UI `/pedidos` (#132); `requireModule('billing.orders')` (#223) | Estados `packed`…`collected` e transições genéricas (#65 / BP1-1 completo) |
 | Permissões `orders.*` | Definidas no RBAC; aplicadas em `/api/ordenes-entrega` | Estender quando a entidade `pedido` existir |
 
 O estado **Cobrado** do diagrama é coberto hoje em parte pelo **registro de cobranças** (`Cobro`), não por um registro `pedido`.

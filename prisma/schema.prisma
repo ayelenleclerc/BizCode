@@ -368,6 +368,37 @@ model Tenant {
   paramEmpresa   ParamEmpresa?
   fiscalConfig   TenantFiscalConfig?
   stockAjustes   StockAjuste[]
+  tenantConfig   TenantConfig?
+}
+
+model TenantConfig {
+  id            Int      @id @default(autoincrement())
+  tenantId      Int      @unique
+  tenant        Tenant   @relation(fields: [tenantId], references: [id])
+  businessType  String   @db.VarChar(20) @default("ambos")
+  rubros        String[] @default([])
+  plan          String   @db.VarChar(20) @default("starter")
+  modules       String[]
+  integrations  String[] @default([])
+  updatedById   Int?
+  updatedBy     AppUser? @relation("TenantConfigUpdatedBy", fields: [updatedById], references: [id])
+  updatedAt     DateTime @updatedAt
+  createdAt     DateTime @default(now())
+
+  @@index([tenantId])
+}
+
+model TenantConfigHistory {
+  id          Int      @id @default(autoincrement())
+  tenantId    Int
+  changedById Int
+  changedBy   AppUser  @relation("TenantConfigHistoryChangedBy", fields: [changedById], references: [id])
+  before      Json
+  after       Json
+  reason      String?  @db.VarChar(500)
+  createdAt   DateTime @default(now())
+
+  @@index([tenantId, createdAt])
 }
 
 model OrdenEntrega {
@@ -417,6 +448,8 @@ model AppUser {
   ordenesEntregaDriver OrdenEntrega[] @relation("OrdenEntregaDriver")
   pedidosVendedor      Pedido[]
   stockAjustes         StockAjuste[]
+  tenantConfigsUpdated TenantConfig[] @relation("TenantConfigUpdatedBy")
+  tenantConfigHistory  TenantConfigHistory[] @relation("TenantConfigHistoryChangedBy")
 
   @@unique([tenantId, username])
 }

@@ -1,6 +1,6 @@
-# ADR-0009: Domínio “Pedido” — apenas design até BP1-1
+# ADR-0009: Domínio “Pedido” — design e recorte MVP comercial
 
-**Status:** Aceito  
+**Status:** Aceito (atualizado 2026-05-18: recorte MVP #132 no código; gating modular #223)  
 **Data:** 2026-05-03  
 **Referência ISO:** ISO/IEC 12207 (ciclo de vida design/implementação); ISO 9001:2015 cláusula 8.3 (design e desenvolvimento)
 
@@ -8,21 +8,23 @@
 
 ## Contexto
 
-A documentação de qualidade descreve o fluxo-alvo **pedido → entrega → cobrança** ([`docs/pt-br/quality/fluxo-operacional-pedido-entrega-cobranca.md`](../../quality/fluxo-operacional-pedido-entrega-cobranca.md)). O RBAC já expõe permissões `orders.*` em [`src/lib/rbac.ts`](../../../../src/lib/rbac.ts). **Não há** modelo Prisma nem endpoints REST públicos persistindo `Pedido` no MVP atual (`docs/api/openapi.yaml`).
+A documentação de qualidade descreve o fluxo-alvo **pedido → entrega → cobrança** ([`docs/pt-br/quality/fluxo-operacional-pedido-entrega-cobranca.md`](../../quality/fluxo-operacional-pedido-entrega-cobranca.md)). O RBAC expõe permissões `orders.*` em [`src/lib/rbac.ts`](../../../../src/lib/rbac.ts).
 
-O backlog **BP1-1** define quando implementar persistência e APIs.
+**Evidência no repositório (MVP #132):** modelos `Pedido` / `PedidoItem` em [`prisma/schema.prisma`](../../../../prisma/schema.prisma); rotas `GET/POST/PUT/DELETE /api/pedidos` e `POST .../confirm`, `POST .../invoice` em [`server/routes/registerPedidosRoutes.ts`](../../../../server/routes/registerPedidosRoutes.ts); contrato em [`docs/api/openapi.yaml`](../../api/openapi.yaml). Estados neste recorte: `draft`, `confirmed`, `invoiced`, `cancelled` (não o ciclo logístico completo `packed`…`collected` — backlog #65).
+
+**Gating modular (#223):** pedidos exigem módulo `billing.orders` via `requireModule` e `TenantConfig` por tenant.
 
 ## Decisão
 
-1. Tratar o ciclo de **pedido** como **apenas design** até a execução de BP1-1 com plano de implementação + migrações aprovadas.
-2. **Não** adicionar modelos Prisma ou rotas REST de `Pedido` neste recorte de backlog; manter o desenho canônico no documento operacional acima e equivalentes EN/ES.
-3. Ao iniciar BP1-1: alinhar schema e OpenAPI aos estados e ao mapa RACI do documento, e ligar **`orders.*`** a handlers reais (com auditoria alinhada a `#84`).
-4. **Escopo por canal:** o cabeçalho opcional `x-bizcode-channel` ([`docs/api/openapi.yaml`](../../api/openapi.yaml), [`server/auth.ts`](../../../../server/auth.ts)) permanece ortogonal; rotas futuras de pedidos devem respeitar `claims.scope.channels`.
+1. **Recorte comercial BP1-1 (#132):** persistir `Pedido` + `PedidoItem` e expor APIs no OpenAPI com auditoria `pedido_*`.
+2. **Pendente (#65 / BP1-1 completo):** estados logísticos e vínculo pedido→entrega→cobrança conforme o documento operacional.
+3. Manter o documento operacional e equivalentes EN/ES como referência do ciclo-alvo.
+4. **Escopo por canal:** `x-bizcode-channel` permanece ortogonal; APIs de pedidos respeitam `claims.scope.channels`.
 
 ## Consequências
 
-- **Prós:** Sem schema especulativo; contrato de API e testes permanecem fiéis ao código.
-- **Contras:** Operações formais de pedido ficam de fora do sistema até BP1-1.
+- **Prós:** Contrato, testes e docs alinhados ao MVP comercial; gating por tenant sem Redis (cache em processo, #223).
+- **Contras:** O fluxo completo do diagrama permanece parcial até #65.
 
 ## Alternativas consideradas (#69)
 

@@ -1,5 +1,6 @@
 import type { PrismaClient } from '@prisma/client'
 import { hashPassword } from '../server/passwordHash'
+import { NEW_TENANT_MODULES } from '../src/lib/modules/tenantDefaults'
 import { USER_CHANNELS } from '../src/lib/rbac'
 
 export const SUPERADMIN_SEED_TENANT_SLUG = 'platform'
@@ -34,6 +35,19 @@ export async function runSuperAdminSeed(args: {
 
   const passwordHash = hashPassword(rawPassword)
   const channelList = [...USER_CHANNELS]
+
+  await args.prisma.tenantConfig.upsert({
+    where: { tenantId: tenant.id },
+    create: {
+      tenantId: tenant.id,
+      businessType: 'ambos',
+      rubros: [],
+      plan: 'enterprise',
+      modules: [...NEW_TENANT_MODULES, 'billing.orders'],
+      integrations: [],
+    },
+    update: {},
+  })
 
   await args.prisma.appUser.upsert({
     where: {

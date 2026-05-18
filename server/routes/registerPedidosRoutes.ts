@@ -1,5 +1,6 @@
 import type { Application, Request, Response } from 'express'
 import { requireAnyPermission, requirePermission, type AuthenticatedRequest } from '../auth'
+import { requireModule } from '../middleware/requireModule'
 import { validateBody } from '../middleware/validateBody'
 import { pedidoBodySchema, pedidoInvoiceBodySchema } from '../schemas/domain'
 import type { PedidoEstado, PedidoInput, PedidoInvoiceInput } from '../createApp.types'
@@ -25,9 +26,11 @@ function parseEstadoQuery(raw: unknown): PedidoEstado | undefined {
 export function registerPedidosRoutes(app: Application, ctx: RestRouteContext): void {
   const { services, writeAudit } = ctx
   const { pedido } = services
+  const ordersModule = requireModule('billing.orders')
 
   app.get(
     '/api/pedidos',
+    ordersModule,
     requireAnyPermission('orders.create', 'reports.operational.read'),
     async (req: Request, res: Response) => {
       try {
@@ -57,6 +60,7 @@ export function registerPedidosRoutes(app: Application, ctx: RestRouteContext): 
 
   app.get(
     '/api/pedidos/:id',
+    ordersModule,
     requireAnyPermission('orders.create', 'reports.operational.read'),
     async (req: Request, res: Response) => {
       try {
@@ -76,6 +80,7 @@ export function registerPedidosRoutes(app: Application, ctx: RestRouteContext): 
 
   app.post(
     '/api/pedidos',
+    ordersModule,
     requirePermission('orders.create'),
     validateBody(pedidoBodySchema),
     async (req: Request, res: Response) => {
@@ -97,6 +102,7 @@ export function registerPedidosRoutes(app: Application, ctx: RestRouteContext): 
 
   app.put(
     '/api/pedidos/:id',
+    ordersModule,
     requirePermission('orders.create'),
     validateBody(pedidoBodySchema),
     async (req: Request, res: Response) => {
@@ -119,6 +125,7 @@ export function registerPedidosRoutes(app: Application, ctx: RestRouteContext): 
 
   app.post(
     '/api/pedidos/:id/confirm',
+    ordersModule,
     requirePermission('orders.create'),
     async (req: Request, res: Response) => {
       try {
@@ -139,6 +146,7 @@ export function registerPedidosRoutes(app: Application, ctx: RestRouteContext): 
 
   app.post(
     '/api/pedidos/:id/invoice',
+    ordersModule,
     requirePermission('sales.create'),
     validateBody(pedidoInvoiceBodySchema),
     async (req: Request, res: Response) => {
@@ -163,6 +171,7 @@ export function registerPedidosRoutes(app: Application, ctx: RestRouteContext): 
 
   app.delete(
     '/api/pedidos/:id',
+    ordersModule,
     requirePermission('sales.cancel'),
     async (req: Request, res: Response) => {
       try {

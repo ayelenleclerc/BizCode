@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "businessType": {
+      "enum": [
+        "mayorista",
+        "minorista",
+        "ambos"
+      ],
+      "type": "string"
+    },
+    "integrations": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "modules": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "plan": {
+      "enum": [
+        "starter",
+        "pro",
+        "enterprise"
+      ],
+      "type": "string"
+    },
+    "reason": {
+      "maxLength": 500,
+      "minLength": 1,
+      "type": "string"
+    },
+    "rubros": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    }
+  },
+  "required": [
+    "modules",
+    "reason"
+  ],
+  "title": "TenantConfigUpsertBody",
+  "type": "object"
+}

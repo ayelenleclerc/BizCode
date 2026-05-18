@@ -166,6 +166,8 @@
 
 * [ModuleCatalogPreset](./modulecatalogpreset.md) – `-`
 
+* [ModuleNotEnabledEnvelope](./modulenotenabledenvelope.md) – `-`
+
 * [Notification](./notification.md) – `-`
 
 * [NotificationEnvelope](./notificationenvelope.md) – `-`
@@ -262,6 +264,24 @@
 
 * [StockCriticoRow](./stockcriticorow.md) – `-`
 
+* [TenantConfig](./tenantconfig.md) – `-`
+
+* [TenantConfigApplyTemplateBody](./tenantconfigapplytemplatebody.md) – `-`
+
+* [TenantConfigEnvelope](./tenantconfigenvelope.md) – `-`
+
+* [TenantConfigHistoryData](./tenantconfighistorydata.md) – `-`
+
+* [TenantConfigHistoryEntry](./tenantconfighistoryentry.md) – `-`
+
+* [TenantConfigHistoryEnvelope](./tenantconfighistoryenvelope.md) – `-`
+
+* [TenantConfigUpsertBody](./tenantconfigupsertbody.md) – `-`
+
+* [TenantFeaturesData](./tenantfeaturesdata.md) – `-`
+
+* [TenantFeaturesEnvelope](./tenantfeaturesenvelope.md) – `-`
+
 * [VoidInput](./voidinput.md) – `-`
 
 ## Other Schemas
@@ -341,6 +361,10 @@
 * [Untitled object in StockAdjustData](./stockadjustdata-properties-articulo.md) – `undefined#/properties/articulo`
 
 * [Untitled object in StockAjusteListEnvelope](./stockajustelistenvelope-allof-0.md) – `undefined#/allOf/0`
+
+* [Untitled object in TenantConfigHistoryEntry](./tenantconfighistoryentry-properties-after.md) – `undefined#/properties/after`
+
+* [Untitled object in TenantConfigHistoryEntry](./tenantconfighistoryentry-properties-before.md) – `undefined#/properties/before`
 
 ### Arrays
 
@@ -449,6 +473,24 @@
 * [Untitled array in StockAjusteListEnvelope](./stockajustelistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
 
 * [Untitled array in StockCriticoListEnvelope](./stockcriticolistenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled array in TenantConfig](./tenantconfig-properties-integrations.md) – `undefined#/properties/integrations`
+
+* [Untitled array in TenantConfig](./tenantconfig-properties-modules.md) – `undefined#/properties/modules`
+
+* [Untitled array in TenantConfig](./tenantconfig-properties-rubros.md) – `undefined#/properties/rubros`
+
+* [Untitled array in TenantConfigHistoryData](./tenantconfighistorydata-properties-items.md) – `undefined#/properties/items`
+
+* [Untitled array in TenantConfigUpsertBody](./tenantconfigupsertbody-properties-integrations.md) – `undefined#/properties/integrations`
+
+* [Untitled array in TenantConfigUpsertBody](./tenantconfigupsertbody-properties-modules.md) – `undefined#/properties/modules`
+
+* [Untitled array in TenantConfigUpsertBody](./tenantconfigupsertbody-properties-rubros.md) – `undefined#/properties/rubros`
+
+* [Untitled array in TenantFeaturesData](./tenantfeaturesdata-properties-integrations.md) – `undefined#/properties/integrations`
+
+* [Untitled array in TenantFeaturesData](./tenantfeaturesdata-properties-modules.md) – `undefined#/properties/modules`
 
 ## Version Note
 
