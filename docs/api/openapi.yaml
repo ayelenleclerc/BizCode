@@ -436,6 +436,123 @@ paths:
         '403':
           $ref: '#/components/responses/ForbiddenError'
 
+  /api/superadmin/tenants/{tenantId}/pricing:
+    parameters:
+      - $ref: '#/components/parameters/TenantIdPath'
+      - name: modules
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Comma-separated module keys for price preview without persisting
+    get:
+      tags: [platform]
+      summary: Estimated monthly pricing for tenant (super admin)
+      responses:
+        '200':
+          description: Pricing breakdown
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TenantPricingEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Tenant not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+
+  /api/superadmin/tenants/{tenantId}/trials:
+    parameters:
+      - $ref: '#/components/parameters/TenantIdPath'
+    get:
+      tags: [platform]
+      summary: List active module trials for tenant (super admin)
+      responses:
+        '200':
+          description: Active trials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TenantModuleTrialListEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Tenant not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+    post:
+      tags: [platform]
+      summary: Activate or extend module trial (super admin)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TenantModuleTrialActivateBody'
+      responses:
+        '201':
+          description: Trial activated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TenantModuleTrialEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Tenant not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+
+  /api/superadmin/tenants/{tenantId}/trials/{moduleKey}:
+    parameters:
+      - $ref: '#/components/parameters/TenantIdPath'
+      - name: moduleKey
+        in: path
+        required: true
+        schema:
+          type: string
+    delete:
+      tags: [platform]
+      summary: Deactivate module trial (super admin)
+      responses:
+        '200':
+          description: Trial deactivated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TenantModuleTrialEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Trial not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+
   /api/clientes:
     parameters:
       - $ref: '#/components/parameters/BizcodeChannelHeader'
@@ -5420,6 +5537,102 @@ components:
           const: true
         data:
           $ref: '#/components/schemas/TenantConfigHistoryData'
+
+    TenantPricingAddon:
+      type: object
+      required: [moduleKey, price]
+      properties:
+        moduleKey:
+          type: string
+        price:
+          type: number
+          minimum: 0
+
+    TenantPricingData:
+      type: object
+      required: [plan, basePrice, addons, totalMonthly]
+      properties:
+        plan:
+          type: string
+        basePrice:
+          type: number
+          minimum: 0
+        addons:
+          type: array
+          items:
+            $ref: '#/components/schemas/TenantPricingAddon'
+        totalMonthly:
+          type: number
+          minimum: 0
+
+    TenantPricingEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/TenantPricingData'
+
+    TenantModuleTrial:
+      type: object
+      required: [id, tenantId, moduleKey, expiresAt, active, daysRemaining, createdAt]
+      properties:
+        id:
+          type: integer
+        tenantId:
+          type: integer
+        moduleKey:
+          type: string
+        expiresAt:
+          type: string
+          format: date-time
+        active:
+          type: boolean
+        daysRemaining:
+          type: integer
+          minimum: 0
+        createdAt:
+          type: string
+          format: date-time
+
+    TenantModuleTrialListEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/TenantModuleTrial'
+
+    TenantModuleTrialEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/TenantModuleTrial'
+
+    TenantModuleTrialActivateBody:
+      type: object
+      required: [moduleKey]
+      properties:
+        moduleKey:
+          type: string
+        days:
+          type: integer
+          minimum: 1
+          maximum: 365
+          default: 30
+        reason:
+          type: string
+          maxLength: 500
 
     SuperadminGlobalStats:
       type: object

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useId, useState } from 'react'
+import { useCallback, useEffect, useId, useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import {
@@ -9,8 +9,16 @@ import {
   type ModuleCatalogEntryDTO,
   type TenantConfigDTO,
   type TenantConfigHistoryEntry,
+  type TenantModuleTrialDTO,
+  type TenantPricingData,
 } from '@/lib/api'
-import { MODULE_KEYS, MODULE_PRESET_KEYS, moduleI18nKey, type ModuleKey } from '@/lib/modules'
+import {
+  MODULE_KEYS,
+  MODULE_PRESET_KEYS,
+  estimateTenantMonthlyPrice,
+  moduleI18nKey,
+  type ModuleKey,
+} from '@/lib/modules'
 
 function isModuleKey(value: string): value is ModuleKey {
   return (MODULE_KEYS as readonly string[]).includes(value)
@@ -33,10 +41,17 @@ export default function TenantModulesPage() {
   const { t, i18n } = useTranslation('common')
   const reasonFieldId = useId()
   const presetFieldId = useId()
+  const trialModuleFieldId = useId()
+  const trialDaysFieldId = useId()
 
   const [tenantName, setTenantName] = useState<string | null>(null)
+  const [tenantPlan, setTenantPlan] = useState<string>('starter')
   const [catalog, setCatalog] = useState<ModuleCatalogDataDTO | null>(null)
   const [activeModules, setActiveModules] = useState<Set<string>>(new Set())
+  const [trials, setTrials] = useState<TenantModuleTrialDTO[]>([])
+  const [trialModuleKey, setTrialModuleKey] = useState('')
+  const [trialDays, setTrialDays] = useState(30)
+  const [activatingTrial, setActivatingTrial] = useState(false)
   const [reason, setReason] = useState('')
   const [selectedPreset, setSelectedPreset] = useState('')
   const [history, setHistory] = useState<TenantConfigHistoryEntry[]>([])
@@ -50,7 +65,33 @@ export default function TenantModulesPage() {
 
   const applyConfigToState = useCallback((config: TenantConfigDTO) => {
     setActiveModules(new Set(config.modules))
+    setTenantPlan(config.plan)
   }, [])
+
+  const trialsByModule = useMemo(() => {
+    const map = new Map<string, TenantModuleTrialDTO>()
+    for (const trial of trials) {
+      if (trial.active) {
+        map.set(trial.moduleKey, trial)
+      }
+    }
+    return map
+  }, [trials])
+
+  const pricingEstimate: TenantPricingData = useMemo(
+    () => estimateTenantMonthlyPrice(tenantPlan, [...activeModules]),
+    [tenantPlan, activeModules],
+  )
+
+  const formatMoney = useCallback(
+    (amount: number) =>
+      new Intl.NumberFormat(i18n.language === 'en' ? 'en-US' : 'es-AR', {
+        style: 'currency',
+        currency: 'ARS',
+        maximumFractionDigits: 0,
+      }).format(amount),
+    [i18n.language],
+  )
 
   const loadHistory = useCallback(async (id: number) => {
     const data = await superadminAPI.getConfigHistory(id, { take: 20, skip: 0 })
@@ -69,14 +110,16 @@ export default function TenantModulesPage() {
     setValidationDetail(null)
     setSaveSuccess(false)
     try {
-      const [tenant, config, catalogData] = await Promise.all([
+      const [tenant, config, catalogData, trialList] = await Promise.all([
         superadminAPI.getTenant(tenantId),
         superadminAPI.getConfig(tenantId),
         modulesCatalogAPI.get(),
+        superadminAPI.listTrials(tenantId),
       ])
       setTenantName(tenant.name)
       setCatalog(catalogData)
       applyConfigToState(config)
+      setTrials(trialList)
       await loadHistory(tenantId)
     } catch {
       setError(t('superadmin.modules.errors.loadFailed'))
@@ -151,6 +194,51 @@ export default function TenantModulesPage() {
       }
     } finally {
       setSaving(false)
+    }
+  }
+
+  const handleActivateTrial = async () => {
+    if (tenantId === null || !trialModuleKey) return
+    const confirmed = window.confirm(t('superadmin.modules.trial.confirmActivate'))
+    if (!confirmed) return
+
+    setActivatingTrial(true)
+    setError(null)
+    setValidationDetail(null)
+    try {
+      const created = await superadminAPI.activateTrial(tenantId, {
+        moduleKey: trialModuleKey,
+        days: trialDays,
+        reason: t('superadmin.modules.trial.activateReason', { module: trialModuleKey }),
+      })
+      setTrials((prev) => {
+        const next = prev.filter((tr) => tr.moduleKey !== created.moduleKey)
+        return [...next, created]
+      })
+      const config = await superadminAPI.getConfig(tenantId)
+      applyConfigToState(config)
+      setTrialModuleKey('')
+      setSaveSuccess(true)
+    } catch (e) {
+      if (e instanceof ApiRequestFailedError && e.message === 'invalid_module_set') {
+        setValidationDetail(formatValidationErrors(e.validation, t))
+      } else {
+        setError(t('superadmin.modules.trial.errors.activateFailed'))
+      }
+    } finally {
+      setActivatingTrial(false)
+    }
+  }
+
+  const handleDeactivateTrial = async (moduleKey: string) => {
+    if (tenantId === null) return
+    const confirmed = window.confirm(t('superadmin.modules.trial.confirmDeactivate'))
+    if (!confirmed) return
+    try {
+      await superadminAPI.deactivateTrial(tenantId, moduleKey)
+      setTrials((prev) => prev.filter((tr) => tr.moduleKey !== moduleKey))
+    } catch {
+      setError(t('superadmin.modules.trial.errors.deactivateFailed'))
     }
   }
 
@@ -248,6 +336,42 @@ export default function TenantModulesPage() {
         <ValidationAlert message={validationDetail} />
       ) : null}
 
+      <section
+        className="mb-8 rounded border border-slate-200 p-4 dark:border-slate-700"
+        aria-labelledby="superadmin-pricing-heading"
+        data-testid="superadmin-pricing-panel"
+        role="status"
+        aria-live="polite"
+      >
+        <h2 id="superadmin-pricing-heading" className="text-lg font-semibold mb-2">
+          {t('superadmin.modules.pricing.title')}
+        </h2>
+        <p className="text-sm text-slate-600 dark:text-slate-400">
+          {t('superadmin.modules.pricing.plan', { plan: pricingEstimate.plan })}
+        </p>
+        <p className="text-sm">
+          {t('superadmin.modules.pricing.base', { amount: formatMoney(pricingEstimate.basePrice) })}
+        </p>
+        {pricingEstimate.addons.length > 0 ? (
+          <ul className="mt-2 text-sm list-disc pl-5">
+            {pricingEstimate.addons.map((addon) => (
+              <li key={addon.moduleKey}>
+                {isModuleKey(addon.moduleKey) ? t(moduleI18nKey(addon.moduleKey)) : addon.moduleKey}:{' '}
+                {formatMoney(addon.price)}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="mt-1 text-xs text-slate-500">{t('superadmin.modules.pricing.noAddons')}</p>
+        )}
+        <p className="mt-3 text-lg font-semibold" data-testid="superadmin-pricing-total">
+          {t('superadmin.modules.pricing.total', {
+            amount: formatMoney(pricingEstimate.totalMonthly),
+          })}
+        </p>
+        <p className="mt-1 text-xs text-slate-500">{t('superadmin.modules.pricing.disclaimer')}</p>
+      </section>
+
       {saveSuccess ? (
         <div
           role="status"
@@ -271,6 +395,7 @@ export default function TenantModulesPage() {
             const i18nKey = isModuleKey(key) ? moduleI18nKey(key) : undefined
             const label = i18nKey ? t(i18nKey) : key
             const missing = missingDependencies(key)
+            const trial = trialsByModule.get(key)
             const hint =
               missing.length > 0
                 ? t('superadmin.modules.missingDeps', {
@@ -301,6 +426,14 @@ export default function TenantModulesPage() {
                   <label htmlFor={`module-toggle-${key}`} className="font-medium cursor-pointer">
                     {label}
                   </label>
+                  {trial ? (
+                    <span
+                      className="ml-2 inline-block rounded bg-amber-100 px-2 py-0.5 text-xs text-amber-900 dark:bg-amber-900 dark:text-amber-100"
+                      data-testid={`superadmin-trial-badge-${key}`}
+                    >
+                      {t('superadmin.modules.trial.badge', { days: trial.daysRemaining })}
+                    </span>
+                  ) : null}
                   {entry.dependencies.length > 0 ? (
                     <p className="text-xs text-slate-500 dark:text-slate-400">
                       {t('superadmin.modules.dependsOn', {
@@ -315,11 +448,70 @@ export default function TenantModulesPage() {
                       {hint}
                     </p>
                   ) : null}
+                  {trial ? (
+                    <button
+                      type="button"
+                      className="mt-2 text-xs text-red-700 underline dark:text-red-300"
+                      onClick={() => void handleDeactivateTrial(key)}
+                      data-testid={`superadmin-trial-deactivate-${key}`}
+                    >
+                      {t('superadmin.modules.trial.deactivate')}
+                    </button>
+                  ) : null}
                 </div>
               </li>
             )
           })}
         </ul>
+      </section>
+
+      <section className="mb-8" aria-labelledby="superadmin-trial-heading">
+        <h2 id="superadmin-trial-heading" className="text-lg font-semibold mb-3">
+          {t('superadmin.modules.trial.section')}
+        </h2>
+        <div className="flex flex-wrap items-end gap-3 max-w-lg">
+          <label htmlFor={trialModuleFieldId} className="flex flex-col gap-1 text-sm font-medium">
+            {t('superadmin.modules.trial.moduleLabel')}
+            <select
+              id={trialModuleFieldId}
+              value={trialModuleKey}
+              onChange={(e) => setTrialModuleKey(e.target.value)}
+              className="rounded border border-slate-300 px-3 py-2 dark:border-slate-600 dark:bg-slate-900"
+              data-testid="superadmin-trial-module-select"
+            >
+              <option value="">{t('superadmin.modules.trial.modulePlaceholder')}</option>
+              {catalog?.modules
+                .filter((m) => m.price > 0)
+                .map((m) => (
+                  <option key={m.key} value={m.key}>
+                    {isModuleKey(m.key) ? t(moduleI18nKey(m.key)) : m.key}
+                  </option>
+                ))}
+            </select>
+          </label>
+          <label htmlFor={trialDaysFieldId} className="flex flex-col gap-1 text-sm font-medium">
+            {t('superadmin.modules.trial.daysLabel')}
+            <input
+              id={trialDaysFieldId}
+              type="number"
+              min={1}
+              max={365}
+              value={trialDays}
+              onChange={(e) => setTrialDays(Number.parseInt(e.target.value, 10) || 30)}
+              className="w-24 rounded border border-slate-300 px-3 py-2 dark:border-slate-600 dark:bg-slate-900"
+              data-testid="superadmin-trial-days"
+            />
+          </label>
+          <button
+            type="button"
+            disabled={!trialModuleKey || activatingTrial}
+            onClick={() => void handleActivateTrial()}
+            className="rounded bg-amber-600 px-4 py-2 text-white hover:bg-amber-700 disabled:opacity-50"
+            data-testid="superadmin-trial-activate"
+          >
+            {activatingTrial ? t('actions.saving') : t('superadmin.modules.trial.activate')}
+          </button>
+        </div>
       </section>
 
       <section className="mb-8" aria-labelledby="superadmin-save-heading">

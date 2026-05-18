@@ -194,6 +194,30 @@
         "EMPRESA_SERVICIOS": "Empresa serviços",
         "RETAIL_POS": "Varejo PDV"
       },
+      "pricing": {
+        "title": "Preço mensal estimado",
+        "plan": "Plano: {{plan}}",
+        "base": "Base do plano: {{amount}}",
+        "noAddons": "Nenhum módulo pago ativo.",
+        "total": "Total estimado: {{amount}} / mês",
+        "disclaimer": "Apenas estimativa; sincronização com assinatura ficará disponível depois."
+      },
+      "trial": {
+        "section": "Modo trial",
+        "moduleLabel": "Módulo",
+        "modulePlaceholder": "Escolher módulo pago…",
+        "daysLabel": "Dias de trial",
+        "activate": "Ativar trial",
+        "deactivate": "Encerrar trial",
+        "badge": "Trial — vence em {{days}} dias",
+        "confirmActivate": "Ativar trial para este módulo? Ele será habilitado na configuração do tenant.",
+        "confirmDeactivate": "Encerrar o trial deste módulo?",
+        "activateReason": "module_trial_activate:{{module}}",
+        "errors": {
+          "activateFailed": "Não foi possível ativar o trial.",
+          "deactivateFailed": "Não foi possível encerrar o trial."
+        }
+      },
       "errors": {
         "loadFailed": "Não foi possível carregar a configuração de módulos.",
         "saveFailed": "Não foi possível salvar a configuração.",

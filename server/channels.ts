@@ -56,6 +56,14 @@ function buildMessage(type: NotificationType, payload: NotificationPayload): Mes
         text: `El artículo ${desc} (cód. ${payload.codigo ?? '—'}) quedó con stock ${payload.stock ?? 0} (mínimo ${payload.minimo ?? 0}).`,
       }
     }
+    case 'module_trial_expiring': {
+      const moduleKey = payload.moduleKey ?? 'módulo'
+      const days = payload.daysRemaining ?? 7
+      return {
+        subject: `[BizCode] Trial de módulo por vencer — ${moduleKey}`,
+        text: `El trial del módulo ${moduleKey} vence en ${days} días. Contrate el módulo para mantenerlo activo.`,
+      }
+    }
   }
 }
 

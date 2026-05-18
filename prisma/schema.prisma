@@ -369,6 +369,7 @@ model Tenant {
   fiscalConfig   TenantFiscalConfig?
   stockAjustes   StockAjuste[]
   tenantConfig   TenantConfig?
+  moduleTrials   TenantModuleTrial[]
 }
 
 model TenantConfig {
@@ -386,6 +387,19 @@ model TenantConfig {
   createdAt     DateTime @default(now())
 
   @@index([tenantId])
+}
+
+model TenantModuleTrial {
+  id        Int      @id @default(autoincrement())
+  tenantId  Int
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+  moduleKey String   @db.VarChar(80)
+  expiresAt DateTime
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  @@unique([tenantId, moduleKey])
+  @@index([tenantId, active, expiresAt])
 }
 
 model TenantConfigHistory {

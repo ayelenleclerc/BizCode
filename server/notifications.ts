@@ -9,6 +9,7 @@ export const NOTIFICATION_TYPES = [
   'invoice_due_soon',
   'chat_message',
   'stock_below_minimum',
+  'module_trial_expiring',
 ] as const
 
 export type NotificationType = (typeof NOTIFICATION_TYPES)[number]
@@ -27,6 +28,9 @@ export type NotificationPayload = {
   descripcion?: string
   stock?: number
   minimo?: number
+  moduleKey?: string
+  expiresAt?: string
+  daysRemaining?: number
 }
 
 /**
@@ -70,6 +74,33 @@ export async function notifyManagers(
 
   await prisma.notification.createMany({
     data: managers.map((m) => ({ tenantId, userId: m.id, type, payload })),
+  })
+}
+
+/**
+ * @en Notifies all active owners of a tenant (module trial warnings).
+ * @es Notifica a todos los owners activos de un tenant (avisos de trial de módulo).
+ * @pt-BR Notifica todos os owners ativos de um tenant (avisos de trial de módulo).
+ */
+export async function notifyTenantOwners(
+  prisma: PrismaClient,
+  tenantId: number,
+  type: NotificationType,
+  payload: NotificationPayload,
+): Promise<void> {
+  const owners = await prisma.appUser.findMany({
+    where: {
+      tenantId,
+      active: true,
+      role: 'owner',
+    },
+    select: { id: true },
+  })
+
+  if (owners.length === 0) return
+
+  await prisma.notification.createMany({
+    data: owners.map((o) => ({ tenantId, userId: o.id, type, payload })),
   })
 }
 

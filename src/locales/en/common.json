@@ -194,6 +194,30 @@
         "EMPRESA_SERVICIOS": "Services company",
         "RETAIL_POS": "Retail POS"
       },
+      "pricing": {
+        "title": "Estimated monthly price",
+        "plan": "Plan: {{plan}}",
+        "base": "Plan base: {{amount}}",
+        "noAddons": "No paid modules active.",
+        "total": "Estimated total: {{amount}} / month",
+        "disclaimer": "Estimate only; subscription billing sync will be available later."
+      },
+      "trial": {
+        "section": "Trial mode",
+        "moduleLabel": "Module",
+        "modulePlaceholder": "Choose a paid module…",
+        "daysLabel": "Trial days",
+        "activate": "Start trial",
+        "deactivate": "End trial",
+        "badge": "Trial — expires in {{days}} days",
+        "confirmActivate": "Start a trial for this module? It will be enabled on the tenant configuration.",
+        "confirmDeactivate": "End the trial for this module?",
+        "activateReason": "module_trial_activate:{{module}}",
+        "errors": {
+          "activateFailed": "Could not start the trial.",
+          "deactivateFailed": "Could not end the trial."
+        }
+      },
       "errors": {
         "loadFailed": "Could not load module configuration.",
         "saveFailed": "Could not save configuration.",

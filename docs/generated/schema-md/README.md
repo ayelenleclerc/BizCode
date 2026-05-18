@@ -304,6 +304,20 @@
 
 * [TenantFeaturesEnvelope](./tenantfeaturesenvelope.md) – `-`
 
+* [TenantModuleTrial](./tenantmoduletrial.md) – `-`
+
+* [TenantModuleTrialActivateBody](./tenantmoduletrialactivatebody.md) – `-`
+
+* [TenantModuleTrialEnvelope](./tenantmoduletrialenvelope.md) – `-`
+
+* [TenantModuleTrialListEnvelope](./tenantmoduletriallistenvelope.md) – `-`
+
+* [TenantPricingAddon](./tenantpricingaddon.md) – `-`
+
+* [TenantPricingData](./tenantpricingdata.md) – `-`
+
+* [TenantPricingEnvelope](./tenantpricingenvelope.md) – `-`
+
 * [VoidInput](./voidinput.md) – `-`
 
 ## Other Schemas
@@ -515,6 +529,10 @@
 * [Untitled array in TenantFeaturesData](./tenantfeaturesdata-properties-integrations.md) – `undefined#/properties/integrations`
 
 * [Untitled array in TenantFeaturesData](./tenantfeaturesdata-properties-modules.md) – `undefined#/properties/modules`
+
+* [Untitled array in TenantModuleTrialListEnvelope](./tenantmoduletriallistenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled array in TenantPricingData](./tenantpricingdata-properties-addons.md) – `undefined#/properties/addons`
 
 ## Version Note
 

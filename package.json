@@ -61,6 +61,7 @@
     "bootstrap:superadmin": "tsx scripts/bootstrap-superadmin.ts",
     "migrate:dbf": "tsx scripts/migrate-from-dbf.ts",
     "cobranzas:recordatorios": "tsx scripts/cobranzas-recordatorios-job.ts",
+    "modules:trial-expire": "tsx scripts/module-trial-expire-job.ts",
     "afip:retry-pending": "tsx scripts/afip-retry-pending.ts",
     "inspect:dbf-all": "tsx scripts/inspect-dbf-all.ts",
     "release": "semantic-release"

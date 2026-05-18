@@ -12,6 +12,9 @@ vi.mock('@/lib/api', () => ({
     putConfig: vi.fn(),
     getConfigHistory: vi.fn(),
     applyConfigTemplate: vi.fn(),
+    listTrials: vi.fn(),
+    activateTrial: vi.fn(),
+    deactivateTrial: vi.fn(),
   },
   modulesCatalogAPI: {
     get: vi.fn(),
@@ -103,6 +106,7 @@ describe('TenantModulesPage', () => {
     vi.mocked(superadminAPI.getConfig).mockResolvedValue(configRow)
     vi.mocked(modulesCatalogAPI.get).mockResolvedValue(catalogPayload)
     vi.mocked(superadminAPI.getConfigHistory).mockResolvedValue({ total: 0, items: [] })
+    vi.mocked(superadminAPI.listTrials).mockResolvedValue([])
   })
 
   it('shows loading then module list', async () => {
@@ -138,6 +142,14 @@ describe('TenantModulesPage', () => {
       })
     })
     expect(screen.getByTestId('superadmin-config-save-success')).toBeInTheDocument()
+  })
+
+  it('shows estimated pricing panel', async () => {
+    renderPage()
+    await waitFor(() => {
+      expect(screen.getByTestId('superadmin-pricing-panel')).toBeInTheDocument()
+    })
+    expect(screen.getByTestId('superadmin-pricing-total')).toBeInTheDocument()
   })
 
   it('shows validation error on invalid_module_set', async () => {

@@ -10,6 +10,8 @@ Versionamento: [Semantic Versioning](https://semver.org/).
 
 ### Adicionado
 
+- **Pricing e trials de módulos SuperAdmin (GitHub #226):** `GET /api/superadmin/tenants/:id/pricing`, `GET/POST/DELETE .../trials`; modelo `TenantModuleTrial`; `src/lib/modules/pricing.ts`, `TenantPricingService`, `TenantTrialService`; `npm run modules:trial-expire`; notificação `module_trial_expiring`; UI pricing/trial em `/superadmin/tenants/:id/modules`; OpenAPI e testes API; i18n EN/ES/PT-BR (sync billing adiado para #181).
+
 - **UI de módulos SuperAdmin (GitHub #225):** página `/superadmin/tenants/:id/modules` com toggles, motivo obrigatório, modelos e histórico; clientes `superadminAPI` (config) e `modulesCatalogAPI` em `src/lib/api.ts`; testes `TenantModulesPage.test.tsx`; i18n `common.superadmin.modules.*` (EN/ES/PT-BR).
 
 - **Painel SuperAdmin multi-tenant (GitHub #137):** API `GET/POST/PATCH /api/superadmin/tenants`, `GET /api/superadmin/tenants/:id`, `GET /api/superadmin/stats` com `requireSuperAdmin` e `platform.tenants.manage`; serviço `SuperadminTenantService`; UI `/superadmin` (lista, detalhe, suspender/reativar) e link placeholder para módulos (`#225`); OpenAPI e `tests/api/superadmin-tenants.test.ts`; i18n EN/ES/PT-BR em `common.superadmin.*`.
