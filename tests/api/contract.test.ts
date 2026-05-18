@@ -235,6 +235,7 @@ function buildPrisma(): PrismaClient {
         puntoVenta: 1,
         tipoFactura: 'B',
         logoUrl: null,
+        recordatorioDiasGracia: 0,
       }),
       upsert: vi.fn().mockResolvedValue({
         id: 1,
@@ -245,7 +246,25 @@ function buildPrisma(): PrismaClient {
         puntoVenta: 2,
         tipoFactura: 'A',
         logoUrl: null,
+        recordatorioDiasGracia: 0,
       }),
+    },
+    cobroRecordatorio: {
+      count: vi.fn().mockResolvedValue(0),
+      create: vi.fn().mockResolvedValue({ id: 1 }),
+    },
+    appUser: {
+      count: vi.fn().mockResolvedValue(1),
+      findMany: vi.fn().mockResolvedValue([{ id: 1 }]),
+      findFirst: vi.fn().mockResolvedValue(null),
+    },
+    notification: {
+      createMany: vi.fn().mockResolvedValue({ count: 1 }),
+      create: vi.fn().mockResolvedValue({ id: 1 }),
+      findMany: vi.fn().mockResolvedValue([]),
+      findFirst: vi.fn().mockResolvedValue(null),
+      update: vi.fn(),
+      updateMany: vi.fn(),
     },
     tenant: {
       findUnique: vi.fn().mockResolvedValue({ id: 1, name: 'Demo', slug: 'demo', active: true }),
@@ -653,6 +672,34 @@ describe('API — contrato OpenAPI', () => {
       .query({ from: '2026-01-01', to: '2026-01-31' })
       .expect(200)
     await assertMatchesOpenApi('/api/reportes/cobranzas', 'get', '200', res.body)
+  })
+
+  it('GET /api/cobranzas/vencidas', async () => {
+    process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
+    process.env.BIZCODE_TEST_ROLE = 'finance'
+    const app = createApp(prisma)
+    const res = await request(app).get('/api/cobranzas/vencidas').expect(200)
+    await assertMatchesOpenApi('/api/cobranzas/vencidas', 'get', '200', res.body)
+  })
+
+  it('POST /api/cobranzas/recordatorios', async () => {
+    process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
+    process.env.BIZCODE_TEST_ROLE = 'finance'
+    const p = buildPrisma()
+    vi.mocked(p.factura.findFirst).mockResolvedValueOnce({
+      id: 1,
+      tenantId: 1,
+      clienteId: 1,
+      fecha: new Date('2020-01-01'),
+      estado: 'A',
+      cliente: { rsocial: 'ACME SA', creditDays: 0 },
+    } as never)
+    const app = createApp(p)
+    const res = await request(app)
+      .post('/api/cobranzas/recordatorios')
+      .send({ facturaId: 1, canal: 'email' })
+      .expect(201)
+    await assertMatchesOpenApi('/api/cobranzas/recordatorios', 'post', '201', res.body)
   })
 
   it('GET /api/ordenes-entrega', async () => {

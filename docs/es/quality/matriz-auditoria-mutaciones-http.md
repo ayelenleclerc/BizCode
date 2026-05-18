@@ -26,6 +26,7 @@ Evidencia automática equivalente en `tests/server/http-mutations-audit-coverage
 | DELETE | `/api/pedidos/:id` | `pedido_cancel` | soft cancel → `cancelled` |
 | POST | `/api/zonas-entrega` | `delivery_zone_create` | código HTTP esperado por contrato/ruta puede ser **201** |
 | PUT | `/api/zonas-entrega/:id` | `delivery_zone_update` | `resourceId` del path |
+| POST | `/api/cobranzas/recordatorios` | `cobranza_recordatorio_send` | `resource: factura`, `resourceId` = `facturaId` del body |
 
 ## Consulta del registro de auditoría (#67)
 

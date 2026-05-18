@@ -40,5 +40,21 @@
   "sort": {
     "asc": "Orden ascendente",
     "desc": "Orden descendente"
+  },
+  "overdue": {
+    "title": "Facturas vencidas — recordatorios",
+    "hint": "Enviá un recordatorio de cobro (canal email por defecto). Un envío por factura por día.",
+    "minDays": "Mín. días de mora",
+    "invoice": "Factura",
+    "customer": "Cliente",
+    "total": "Importe",
+    "date": "Fecha",
+    "daysPastDue": "Días de mora",
+    "send": "Enviar recordatorio",
+    "sending": "Enviando…",
+    "sent": "Recordatorio enviado",
+    "alreadySent": "Ya enviado hoy",
+    "empty": "No hay facturas vencidas con ese filtro.",
+    "loadError": "No se pudieron cargar las facturas vencidas."
   }
 }

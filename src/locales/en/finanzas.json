@@ -40,5 +40,21 @@
   "sort": {
     "asc": "Sort ascending",
     "desc": "Sort descending"
+  },
+  "overdue": {
+    "title": "Overdue invoices — reminders",
+    "hint": "Send a payment reminder (email channel by default). One send per invoice per day.",
+    "minDays": "Min. days overdue",
+    "invoice": "Invoice",
+    "customer": "Customer",
+    "total": "Amount",
+    "date": "Date",
+    "daysPastDue": "Days overdue",
+    "send": "Send reminder",
+    "sending": "Sending…",
+    "sent": "Reminder sent",
+    "alreadySent": "Already sent today",
+    "empty": "No overdue invoices match the filter.",
+    "loadError": "Could not load overdue invoices."
   }
 }
