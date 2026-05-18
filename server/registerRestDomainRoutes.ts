@@ -13,6 +13,7 @@ import { registerHealthRoute } from './routes/registerHealthRoute'
 import { registerMeFeaturesRoute } from './routes/registerMeFeaturesRoute'
 import { registerModulesCatalogRoute } from './routes/registerModulesCatalogRoute'
 import { registerSuperadminTenantConfigRoutes } from './routes/registerSuperadminTenantConfigRoutes'
+import { registerSuperadminTenantsRoutes } from './routes/registerSuperadminTenantsRoutes'
 import { registerProveedoresRoutes } from './routes/registerProveedoresRoutes'
 import { registerRubrosRoutes } from './routes/registerRubrosRoutes'
 import type { RestRouteContext } from './routes/restRouteTypes'
@@ -67,5 +68,6 @@ export function registerRestDomainRoutes(app: Application, prisma: PrismaClient)
   registerHealthRoute(app, ctx)
   registerModulesCatalogRoute(app, ctx)
   registerMeFeaturesRoute(app, prisma)
+  registerSuperadminTenantsRoutes(app, prisma)
   registerSuperadminTenantConfigRoutes(app, prisma)
 }

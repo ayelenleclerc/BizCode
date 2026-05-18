@@ -218,6 +218,132 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
 
+  /api/superadmin/stats:
+    get:
+      tags: [platform]
+      summary: Platform-wide tenant statistics (super admin)
+      parameters:
+        - $ref: '#/components/parameters/XRequestId'
+      responses:
+        '200':
+          description: Global platform stats (metadata only)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuperadminGlobalStatsEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /api/superadmin/tenants:
+    get:
+      tags: [platform]
+      summary: List tenants (super admin)
+      parameters:
+        - $ref: '#/components/parameters/XRequestId'
+        - name: q
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Filter by tenant name or slug (case-insensitive)
+      responses:
+        '200':
+          description: Tenant list with aggregate counts
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuperadminTenantListEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+    post:
+      tags: [platform]
+      summary: Create tenant with default module config (super admin)
+      parameters:
+        - $ref: '#/components/parameters/XRequestId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SuperadminTenantCreateInput'
+      responses:
+        '201':
+          description: Tenant created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuperadminTenantCreateEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '409':
+          description: Slug already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+
+  /api/superadmin/tenants/{tenantId}:
+    parameters:
+      - $ref: '#/components/parameters/TenantIdPath'
+    get:
+      tags: [platform]
+      summary: Tenant detail with platform stats (super admin)
+      responses:
+        '200':
+          description: Tenant metadata and aggregate stats
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuperadminTenantDetailEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Tenant not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+    patch:
+      tags: [platform]
+      summary: Suspend or reactivate tenant (super admin)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SuperadminTenantPatchInput'
+      responses:
+        '200':
+          description: Updated tenant
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuperadminTenantDetailEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Tenant not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+
   /api/superadmin/tenants/{tenantId}/config:
     parameters:
       - $ref: '#/components/parameters/TenantIdPath'
@@ -5294,6 +5420,192 @@ components:
           const: true
         data:
           $ref: '#/components/schemas/TenantConfigHistoryData'
+
+    SuperadminGlobalStats:
+      type: object
+      required: [activeTenants, totalTenants, inactiveTenants, facturasToday, totalUsers]
+      properties:
+        activeTenants:
+          type: integer
+          minimum: 0
+        totalTenants:
+          type: integer
+          minimum: 0
+        inactiveTenants:
+          type: integer
+          minimum: 0
+        facturasToday:
+          type: integer
+          minimum: 0
+        totalUsers:
+          type: integer
+          minimum: 0
+
+    SuperadminGlobalStatsEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/SuperadminGlobalStats'
+
+    SuperadminTenantListRow:
+      type: object
+      required: [id, name, slug, active, plan, userCount, facturaCount, createdAt]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        slug:
+          type: string
+        active:
+          type: boolean
+        plan:
+          type: string
+          nullable: true
+        userCount:
+          type: integer
+          minimum: 0
+        facturaCount:
+          type: integer
+          minimum: 0
+        createdAt:
+          type: string
+          format: date-time
+
+    SuperadminTenantListEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/SuperadminTenantListRow'
+
+    SuperadminTenantStats:
+      type: object
+      required: [userCount, facturaCount, pedidoCount, clienteCount]
+      properties:
+        userCount:
+          type: integer
+          minimum: 0
+        facturaCount:
+          type: integer
+          minimum: 0
+        pedidoCount:
+          type: integer
+          minimum: 0
+        clienteCount:
+          type: integer
+          minimum: 0
+
+    SuperadminTenantDetail:
+      type: object
+      required:
+        - id
+        - name
+        - slug
+        - active
+        - createdAt
+        - updatedAt
+        - plan
+        - modulesCount
+        - configUpdatedAt
+        - stats
+        - lastActivityAt
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        slug:
+          type: string
+        active:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        plan:
+          type: string
+          nullable: true
+        modulesCount:
+          type: integer
+          minimum: 0
+        configUpdatedAt:
+          type: string
+          format: date-time
+          nullable: true
+        stats:
+          $ref: '#/components/schemas/SuperadminTenantStats'
+        lastActivityAt:
+          type: string
+          format: date-time
+          nullable: true
+
+    SuperadminTenantDetailEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/SuperadminTenantDetail'
+
+    SuperadminTenantCreateInput:
+      type: object
+      required: [name, slug]
+      properties:
+        name:
+          type: string
+          minLength: 1
+        slug:
+          type: string
+          minLength: 1
+        plan:
+          type: string
+          enum: [starter, pro, enterprise]
+        ownerUsername:
+          type: string
+        ownerPassword:
+          type: string
+          format: password
+
+    SuperadminTenantCreateResult:
+      type: object
+      required: [tenantId, ownerUserId]
+      properties:
+        tenantId:
+          type: integer
+        ownerUserId:
+          type: integer
+          nullable: true
+
+    SuperadminTenantCreateEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/SuperadminTenantCreateResult'
+
+    SuperadminTenantPatchInput:
+      type: object
+      required: [active]
+      properties:
+        active:
+          type: boolean
 
     ModuleNotEnabledEnvelope:
       type: object

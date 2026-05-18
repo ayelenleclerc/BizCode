@@ -23,7 +23,8 @@
     "users": "Usuarios",
     "zonasEntrega": "Zonas de entrega",
     "empresa": "Empresa",
-    "auditLog": "Registro de auditoría"
+    "auditLog": "Registro de auditoría",
+    "superadmin": "SuperAdmin"
   },
   "language": {
     "legend": "Idioma de la interfaz",
@@ -89,7 +90,9 @@
     "save": "Guardar",
     "cancel": "Cancelar",
     "saving": "Guardando...",
-    "new": "Nuevo"
+    "new": "Nuevo",
+    "search": "Buscar",
+    "retry": "Reintentar"
   },
   "status": {
     "loading": "Cargando...",
@@ -146,6 +149,60 @@
     "analytics_dashboard": "Dashboard",
     "admin_audit_log": "Log de auditoría",
     "comms_chat": "Chat interno"
+  },
+  "superadmin": {
+    "title": "Panel SuperAdmin",
+    "subtitle": "Gestión de tenants de la plataforma (solo metadatos)",
+    "statsSection": "Estadísticas de plataforma",
+    "tenantsSection": "Tenants",
+    "searchLabel": "Buscar por nombre o slug",
+    "emptyTenants": "No hay tenants que coincidan con el filtro.",
+    "viewDetail": "Ver detalle",
+    "backToList": "Volver al listado",
+    "backToDetail": "Volver al detalle",
+    "suspend": "Suspender tenant",
+    "reactivate": "Reactivar tenant",
+    "manageModules": "Gestionar módulos",
+    "modulesPlaceholderTitle": "Módulos del tenant",
+    "modulesPlaceholderBody": "La configuración visual de módulos se implementará en el issue #225.",
+    "status": {
+      "active": "Activo",
+      "suspended": "Suspendido"
+    },
+    "stats": {
+      "activeTenants": "Tenants activos",
+      "totalTenants": "Total tenants",
+      "facturasToday": "Facturas hoy (global)",
+      "totalUsers": "Usuarios totales"
+    },
+    "columns": {
+      "name": "Nombre",
+      "slug": "Slug",
+      "plan": "Plan",
+      "users": "Usuarios",
+      "invoices": "Facturas",
+      "status": "Estado",
+      "actions": "Acciones"
+    },
+    "detail": {
+      "status": "Estado",
+      "plan": "Plan",
+      "modulesCount": "Módulos habilitados",
+      "lastActivity": "Última actividad",
+      "createdAt": "Creado",
+      "configUpdated": "Config actualizada",
+      "statsSection": "Estadísticas agregadas",
+      "statUsers": "{{count}} usuarios",
+      "statInvoices": "{{count}} facturas",
+      "statOrders": "{{count}} pedidos",
+      "statClients": "{{count}} clientes"
+    },
+    "errors": {
+      "loadFailed": "No se pudieron cargar los datos de plataforma.",
+      "patchFailed": "No se pudo actualizar el estado del tenant.",
+      "invalidId": "Identificador de tenant inválido.",
+      "notFound": "Tenant no encontrado."
+    }
   },
   "dashboard": {
     "title": "Resumen del día",

@@ -20,6 +20,10 @@ import ZonasEntregaPage from './pages/configuracion/ZonasEntregaPage'
 import EmpresaPage from './pages/configuracion/EmpresaPage'
 import ChatPage from './pages/chat'
 import AuditLogPage from './pages/admin/audit-log'
+import SuperAdminRoute from './components/SuperAdminRoute'
+import SuperadminHomePage from './pages/superadmin'
+import TenantDetailPage from './pages/superadmin/TenantDetailPage'
+import TenantModulesPage from './pages/superadmin/TenantModulesPage'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
 import { FeatureFlagsProvider, FeatureFlagsGate } from './contexts/FeatureFlagsContext'
 
@@ -176,6 +180,11 @@ function AppRoutes() {
               </ModuleRoute>
             }
           />
+          <Route element={<SuperAdminRoute />}>
+            <Route path="superadmin" element={<SuperadminHomePage />} />
+            <Route path="superadmin/tenants/:tenantId" element={<TenantDetailPage />} />
+            <Route path="superadmin/tenants/:tenantId/modules" element={<TenantModulesPage />} />
+          </Route>
         </Route>
       </Route>
       <Route path="/" element={<RootRedirect />} />
