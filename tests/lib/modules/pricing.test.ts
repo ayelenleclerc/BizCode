@@ -15,6 +15,12 @@ describe('estimateTenantMonthlyPrice', () => {
     expect(result.totalMonthly).toBe(PLAN_BASE_MONTHLY_ARS.pro + 1500 + 2000)
   })
 
+  it('uses enterprise plan base', () => {
+    const result = estimateTenantMonthlyPrice('enterprise', ['core.auth'])
+    expect(result.basePrice).toBe(PLAN_BASE_MONTHLY_ARS.enterprise)
+    expect(result.totalMonthly).toBe(PLAN_BASE_MONTHLY_ARS.enterprise)
+  })
+
   it('ignores unknown module keys', () => {
     const result = estimateTenantMonthlyPrice('starter', ['core.auth', 'not.a.module'])
     expect(result.basePrice).toBe(0)

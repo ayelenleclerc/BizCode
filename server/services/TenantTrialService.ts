@@ -54,10 +54,14 @@ function rowToDto(row: {
  * @pt-BR Trials de módulos super-admin: ativar, listar, expirar e avisos a owners (#226).
  */
 export class TenantTrialService {
-  constructor(
-    private readonly prisma: PrismaClient,
-    private readonly configService = new TenantConfigService(prisma),
-  ) {}
+  private readonly configService: TenantConfigService
+
+  constructor(prisma: PrismaClient, configService?: TenantConfigService) {
+    this.prisma = prisma
+    this.configService = configService ?? new TenantConfigService(prisma)
+  }
+
+  private readonly prisma: PrismaClient
 
   async listActiveTrials(tenantId: number, now = new Date()): Promise<TenantModuleTrialDto[]> {
     const rows = await this.prisma.tenantModuleTrial.findMany({

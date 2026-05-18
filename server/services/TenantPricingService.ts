@@ -34,10 +34,14 @@ export { parseModulesQuery }
  * @pt-BR Preço mensal estimado para super-admin por plano e módulos do tenant (#226).
  */
 export class TenantPricingService {
-  constructor(
-    private readonly prisma: PrismaClient,
-    private readonly configService = new TenantConfigService(prisma),
-  ) {}
+  private readonly configService: TenantConfigService
+
+  constructor(prisma: PrismaClient, configService?: TenantConfigService) {
+    this.prisma = prisma
+    this.configService = configService ?? new TenantConfigService(prisma)
+  }
+
+  private readonly prisma: PrismaClient
 
   async getPricing(
     tenantId: number,

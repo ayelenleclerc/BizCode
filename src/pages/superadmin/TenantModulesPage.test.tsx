@@ -58,7 +58,7 @@ const catalogPayload = {
       requiredInProd: false,
       dependencies: ['core.catalog', 'core.clients'],
       plan: 'starter',
-      price: 0,
+      price: 1500,
       canDeactivate: true,
     },
   ],
@@ -150,6 +150,53 @@ describe('TenantModulesPage', () => {
       expect(screen.getByTestId('superadmin-pricing-panel')).toBeInTheDocument()
     })
     expect(screen.getByTestId('superadmin-pricing-total')).toBeInTheDocument()
+  })
+
+  it('shows trial badge when trial is active', async () => {
+    vi.mocked(superadminAPI.listTrials).mockResolvedValue([
+      {
+        id: 1,
+        tenantId: 1,
+        moduleKey: 'billing.orders',
+        expiresAt: new Date(Date.now() + 10 * 86400000).toISOString(),
+        active: true,
+        daysRemaining: 10,
+        createdAt: new Date().toISOString(),
+      },
+    ])
+    renderPage()
+    await waitFor(() => {
+      expect(screen.getByTestId('superadmin-trial-badge-billing.orders')).toBeInTheDocument()
+    })
+  })
+
+  it('activates trial when confirmed', async () => {
+    const user = userEvent.setup()
+    const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(true)
+    vi.mocked(superadminAPI.activateTrial).mockResolvedValue({
+      id: 2,
+      tenantId: 1,
+      moduleKey: 'billing.orders',
+      expiresAt: new Date().toISOString(),
+      active: true,
+      daysRemaining: 30,
+      createdAt: new Date().toISOString(),
+    })
+    vi.mocked(superadminAPI.getConfig).mockResolvedValue({
+      ...configRow,
+      modules: [...DEFAULT_MODULES, 'billing.orders'],
+    })
+
+    renderPage()
+    await waitFor(() => screen.getByTestId('superadmin-modules-page'))
+
+    await user.selectOptions(screen.getByTestId('superadmin-trial-module-select'), 'billing.orders')
+    await user.click(screen.getByTestId('superadmin-trial-activate'))
+
+    await waitFor(() => {
+      expect(superadminAPI.activateTrial).toHaveBeenCalled()
+    })
+    confirmSpy.mockRestore()
   })
 
   it('shows validation error on invalid_module_set', async () => {
