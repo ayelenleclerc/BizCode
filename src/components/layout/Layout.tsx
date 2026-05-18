@@ -3,126 +3,13 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import LanguageSelect from '@/components/LanguageSelect'
 import { useAuth } from '@/contexts/AuthContext'
-import type { UserRole } from '@/lib/rbac'
+import { useFeatureFlags } from '@/contexts/FeatureFlagsContext'
 import { notificationsAPI, type AppNotification } from '@/lib/api'
+import { NAV_SECTIONS } from '@/components/layout/navSections'
 
 interface LayoutProps {
   children: React.ReactNode
 }
-
-/**
- * @en Nav sections and the roles that can see each one.
- *     `null` means visible to every authenticated user.
- *     Role `super_admin` sees every section (platform support).
- * @es Secciones del nav y los roles que pueden verlas.
- *     `null` significa visible para todo usuario autenticado.
- *     El rol `super_admin` ve todas las secciones (plataforma / soporte).
- * @pt-BR Seções do nav e os papéis que podem visualizá-las.
- *     `null` significa visível para todo usuário autenticado.
- *     O papel `super_admin` vê todas as seções (plataforma / suporte).
- */
-const NAV_SECTIONS: {
-  key: string
-  path: string
-  icon: string
-  roles: readonly UserRole[] | null
-}[] = [
-  {
-    key: 'inicio',
-    path: '/inicio',
-    icon: '🏠',
-    roles: null,
-  },
-  {
-    key: 'ventas',
-    path: '/facturacion',
-    icon: '💰',
-    roles: ['owner', 'manager', 'seller', 'billing', 'cashier'],
-  },
-  {
-    key: 'pedidos',
-    path: '/pedidos',
-    icon: '📝',
-    roles: ['owner', 'manager', 'seller', 'backoffice'],
-  },
-  {
-    key: 'clientes',
-    path: '/clientes',
-    icon: '📋',
-    roles: ['owner', 'manager', 'seller', 'backoffice', 'collections', 'finance', 'auditor'],
-  },
-  {
-    key: 'catalogo',
-    path: '/articulos',
-    icon: '📦',
-    roles: ['owner', 'manager', 'seller', 'backoffice', 'warehouse_op', 'warehouse_lead', 'logistics_planner'],
-  },
-  {
-    key: 'proveedores',
-    path: '/proveedores',
-    icon: '\u{1F3ED}',
-    roles: ['owner', 'manager', 'seller', 'backoffice', 'warehouse_op', 'warehouse_lead', 'logistics_planner'],
-  },
-  {
-    key: 'compras',
-    path: '/compras',
-    icon: '🛒',
-    roles: ['owner', 'manager', 'warehouse_lead'],
-  },
-  {
-    key: 'logistica',
-    path: '/logistica',
-    icon: '🚚',
-    roles: ['owner', 'manager', 'warehouse_op', 'warehouse_lead', 'logistics_planner', 'driver'],
-  },
-  {
-    key: 'finanzas',
-    path: '/finanzas',
-    icon: '💹',
-    roles: ['owner', 'manager', 'billing', 'cashier', 'collections', 'finance', 'auditor'],
-  },
-  {
-    key: 'reportes',
-    path: '/reportes',
-    icon: '📊',
-    roles: [
-      'owner',
-      'manager',
-      'billing',
-      'cashier',
-      'collections',
-      'finance',
-      'auditor',
-      'backoffice',
-      'warehouse_lead',
-      'logistics_planner',
-    ],
-  },
-  {
-    key: 'cobros',
-    path: '/cobros',
-    icon: '💵',
-    roles: ['owner', 'manager', 'billing', 'cashier', 'collections', 'finance', 'auditor'],
-  },
-  {
-    key: 'auditLog',
-    path: '/admin/audit-log',
-    icon: '📜',
-    roles: ['owner', 'manager', 'finance', 'auditor'],
-  },
-  {
-    key: 'chat',
-    path: '/chat',
-    icon: '💬',
-    roles: null,
-  },
-  {
-    key: 'configuracion',
-    path: '/configuracion',
-    icon: '⚙️',
-    roles: ['owner', 'manager'],
-  },
-]
 
 const NOTIFICATION_POLL_MS = 30_000
 
@@ -275,6 +162,7 @@ function NotificationBell() {
 export default function Layout({ children }: LayoutProps) {
   const { t } = useTranslation('common')
   const { logout, status, claims } = useAuth()
+  const { hasModule } = useFeatureFlags()
   const navigate = useNavigate()
   const location = useLocation()
 
@@ -306,10 +194,12 @@ export default function Layout({ children }: LayoutProps) {
 
   const userRole = claims?.role ?? null
   const visibleSections = NAV_SECTIONS.filter((s) => {
-    if (s.roles === null) return true
-    if (userRole === null) return false
-    if (userRole === 'super_admin') return true
-    return s.roles.includes(userRole)
+    if (s.roles !== null) {
+      if (userRole === null) return false
+      if (userRole !== 'super_admin' && !s.roles.includes(userRole)) return false
+    }
+    if (s.moduleKey !== null && !hasModule(s.moduleKey)) return false
+    return true
   })
 
   return (

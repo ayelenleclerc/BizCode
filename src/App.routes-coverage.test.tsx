@@ -54,6 +54,24 @@ vi.mock('@/lib/api', async () => {
       login: vi.fn().mockResolvedValue(undefined),
       logout: vi.fn().mockResolvedValue({ loggedOut: true }),
     },
+    featuresAPI: {
+      get: vi.fn().mockResolvedValue({
+        modules: [
+          'core.auth',
+          'core.catalog',
+          'core.clients',
+          'core.invoicing',
+          'billing.orders',
+          'logistics.dispatches',
+          'logistics.purchases',
+          'finance.collections',
+          'analytics.dashboard',
+          'admin.audit_log',
+          'comms.chat',
+        ],
+        integrations: [],
+      }),
+    },
     clientesAPI: {
       list: vi.fn().mockResolvedValue([]),
       get: vi.fn(),
