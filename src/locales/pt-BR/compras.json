@@ -1,0 +1,43 @@
+{
+  "title": "Ordens de compra",
+  "subtitle": "Pedidos a fornecedores e recebimento de estoque",
+  "noAccess": "Você não tem permissão para ver ordens de compra.",
+  "empty": "Não há ordens de compra.",
+  "filterEstado": "Status",
+  "filterAll": "Todos",
+  "estado": {
+    "draft": "Rascunho",
+    "sent": "Enviada",
+    "received": "Recebida",
+    "cancelled": "Cancelada"
+  },
+  "columns": {
+    "id": "N.º",
+    "proveedor": "Fornecedor",
+    "total": "Total",
+    "estado": "Status",
+    "actions": "Ações"
+  },
+  "actions": {
+    "new": "Nova ordem",
+    "send": "Enviar",
+    "cancel": "Cancelar",
+    "receive": "Receber",
+    "save": "Salvar",
+    "close": "Fechar"
+  },
+  "form": {
+    "title": "Nova ordem de compra",
+    "proveedorId": "ID fornecedor",
+    "articuloId": "ID artigo",
+    "cantidad": "Quantidade",
+    "costoUnitario": "Custo unitário",
+    "nota": "Nota"
+  },
+  "receive": {
+    "title": "Recebimento parcial ou total",
+    "item": "Item",
+    "pending": "Pendente",
+    "cantidad": "Quantidade a receber"
+  }
+}

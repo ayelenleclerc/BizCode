@@ -142,6 +142,7 @@ export const ROLE_PERMISSIONS: Record<UserRole, readonly Permission[]> = {
     'inventory.adjust',
     'products.read',
     'suppliers.read',
+    'suppliers.manage',
     'reports.operational.read',
     'logistics.read',
   ],

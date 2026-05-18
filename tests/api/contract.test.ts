@@ -197,6 +197,24 @@ function buildPrisma(): PrismaClient {
     cobro: {
       findMany: vi.fn().mockResolvedValue([]),
     },
+    ordenCompra: {
+      count: vi.fn().mockResolvedValue(0),
+      findMany: vi.fn().mockResolvedValue([]),
+      findFirst: vi.fn().mockResolvedValue(null),
+      create: vi.fn().mockResolvedValue({
+        id: 1,
+        tenantId: 1,
+        proveedorId: 1,
+        estado: 'draft',
+        total: new Decimal(0),
+        fechaEstimada: null,
+        nota: null,
+        proveedor: { id: 1, codigo: 1, rsocial: 'Prov' },
+        items: [],
+      }),
+      update: vi.fn(),
+    },
+    ordenCompraItem: { deleteMany: vi.fn(), update: vi.fn() },
     ordenEntrega: {
       count: vi.fn().mockResolvedValue(0),
       findMany: vi.fn().mockResolvedValue([]),
@@ -653,6 +671,31 @@ describe('API — contrato OpenAPI', () => {
       .query({ from: '2026-01-01', to: '2026-01-31' })
       .expect(200)
     await assertMatchesOpenApi('/api/reportes/cobranzas', 'get', '200', res.body)
+  })
+
+  it('GET /api/compras', async () => {
+    process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
+    process.env.BIZCODE_TEST_ROLE = 'warehouse_lead'
+    const app = createApp(prisma)
+    const res = await request(app).get('/api/compras').expect(200)
+    await assertMatchesOpenApi('/api/compras', 'get', '200', res.body)
+  })
+
+  it('POST /api/compras', async () => {
+    process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
+    process.env.BIZCODE_TEST_ROLE = 'warehouse_lead'
+    const p = buildPrisma()
+    vi.mocked(p.proveedor.findFirst).mockResolvedValueOnce({ id: 1 } as never)
+    vi.mocked(p.articulo.count).mockResolvedValueOnce(1)
+    const app = createApp(p)
+    const res = await request(app)
+      .post('/api/compras')
+      .send({
+        proveedorId: 1,
+        items: [{ articuloId: 1, cantidad: 2, costoUnitario: 10 }],
+      })
+      .expect(201)
+    await assertMatchesOpenApi('/api/compras', 'post', '201', res.body)
   })
 
   it('GET /api/ordenes-entrega', async () => {

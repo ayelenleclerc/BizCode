@@ -10,6 +10,7 @@
     "clientes": "Customers",
     "catalogo": "Products",
     "proveedores": "Suppliers",
+    "compras": "Purchasing",
     "logistica": "Logistics",
     "finanzas": "Finance",
     "reportes": "Reports",

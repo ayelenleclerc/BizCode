@@ -10,6 +10,7 @@ import facturacionEs from '@/locales/es/facturacion.json'
 import zonasEntregaEs from '@/locales/es/zonasEntrega.json'
 import chatEs from '@/locales/es/chat.json'
 import proveedoresEs from '@/locales/es/proveedores.json'
+import comprasEs from '@/locales/es/compras.json'
 import auditEs from '@/locales/es/audit.json'
 import cobrosEs from '@/locales/es/cobros.json'
 import finanzasEs from '@/locales/es/finanzas.json'
@@ -24,6 +25,7 @@ import facturacionEn from '@/locales/en/facturacion.json'
 import zonasEntregaEn from '@/locales/en/zonasEntrega.json'
 import chatEn from '@/locales/en/chat.json'
 import proveedoresEn from '@/locales/en/proveedores.json'
+import comprasEn from '@/locales/en/compras.json'
 import auditEn from '@/locales/en/audit.json'
 import cobrosEn from '@/locales/en/cobros.json'
 import finanzasEn from '@/locales/en/finanzas.json'
@@ -38,6 +40,7 @@ import facturacionPt from '@/locales/pt-BR/facturacion.json'
 import zonasEntregaPt from '@/locales/pt-BR/zonasEntrega.json'
 import chatPt from '@/locales/pt-BR/chat.json'
 import proveedoresPt from '@/locales/pt-BR/proveedores.json'
+import comprasPt from '@/locales/pt-BR/compras.json'
 import auditPt from '@/locales/pt-BR/audit.json'
 import cobrosPt from '@/locales/pt-BR/cobros.json'
 import finanzasPt from '@/locales/pt-BR/finanzas.json'
@@ -56,13 +59,14 @@ i18n
     lng: savedLang,
     fallbackLng: 'es',
     defaultNS: 'common',
-    ns: ['common', 'clientes', 'articulos', 'proveedores', 'facturacion', 'cobros', 'finanzas', 'reportes', 'logistica', 'zonasEntrega', 'empresa', 'chat', 'audit'],
+    ns: ['common', 'clientes', 'articulos', 'proveedores', 'compras', 'facturacion', 'cobros', 'finanzas', 'reportes', 'logistica', 'zonasEntrega', 'empresa', 'chat', 'audit'],
     resources: {
       es: {
         common: commonEs,
         clientes: clientesEs,
         articulos: articulosEs,
         proveedores: proveedoresEs,
+        compras: comprasEs,
         facturacion: facturacionEs,
         zonasEntrega: zonasEntregaEs,
         chat: chatEs,
@@ -78,6 +82,7 @@ i18n
         clientes: clientesEn,
         articulos: articulosEn,
         proveedores: proveedoresEn,
+        compras: comprasEn,
         facturacion: facturacionEn,
         zonasEntrega: zonasEntregaEn,
         chat: chatEn,
@@ -93,6 +98,7 @@ i18n
         clientes: clientesPt,
         articulos: articulosPt,
         proveedores: proveedoresPt,
+        compras: comprasPt,
         facturacion: facturacionPt,
         zonasEntrega: zonasEntregaPt,
         chat: chatPt,

@@ -4,6 +4,7 @@ import Layout from './components/layout/Layout'
 import ClientesPage from './pages/clientes'
 import ArticulosPage from './pages/articulos'
 import ProveedoresPage from './pages/proveedores'
+import ComprasPage from './pages/compras'
 import FacturacionPage from './pages/facturacion'
 import LoginPage from './pages/login'
 import UsersPage from './pages/users'
@@ -89,6 +90,7 @@ function AppRoutes() {
           <Route path="clientes" element={<ClientesPage />} />
           <Route path="articulos" element={<ArticulosPage />} />
           <Route path="proveedores" element={<ProveedoresPage />} />
+          <Route path="compras" element={<ComprasPage />} />
           <Route path="facturacion" element={<FacturacionPage />} />
           <Route path="users" element={<UsersPage />} />
           {/* New section stubs — real pages delivered in Sprint 2 */}

@@ -10,6 +10,10 @@ import type {
   FacturaItemInput,
   ProveedorInput,
   RubroInput,
+  OrdenCompraCreateInput,
+  OrdenCompraItemInput,
+  OrdenCompraReceiveLineInput,
+  OrdenCompraUpdateInput,
   StockAjusteInput,
 } from '../createApp.types'
 
@@ -856,6 +860,125 @@ export const reportesVentasQuerySchema = z
     agrupar: z.enum(['dia', 'semana', 'mes']).default('dia'),
   })
   .superRefine(refineReportesPeriodOrder)
+
+const ordenCompraItemBodySchema = z
+  .object({
+    articuloId: z.number({ invalid_type_error: 'articuloId must be a number' }),
+    cantidad: z.number({ invalid_type_error: 'cantidad must be a number' }),
+    costoUnitario: z.number({ invalid_type_error: 'costoUnitario must be a number' }),
+  })
+  .superRefine((data, ctx) => {
+    if (!Number.isInteger(data.articuloId) || data.articuloId < 1) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'articuloId must be a positive integer', path: ['articuloId'] })
+    }
+    if (!Number.isInteger(data.cantidad) || data.cantidad < 1) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'cantidad must be a positive integer', path: ['cantidad'] })
+    }
+    if (!Number.isFinite(data.costoUnitario) || data.costoUnitario < 0) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'costoUnitario must be a non-negative number',
+        path: ['costoUnitario'],
+      })
+    }
+  })
+  .transform((data): OrdenCompraItemInput => ({
+    articuloId: data.articuloId,
+    cantidad: data.cantidad,
+    costoUnitario: data.costoUnitario,
+  }))
+
+export const ordenCompraCreateBodySchema = z
+  .object({
+    proveedorId: z.number({ invalid_type_error: 'proveedorId must be a number' }),
+    fechaEstimada: z.union([z.string(), z.null(), z.undefined()]).optional(),
+    nota: z.union([z.string(), z.null(), z.undefined()]).optional(),
+    items: z.array(ordenCompraItemBodySchema).min(1, 'items must contain at least one line'),
+  })
+  .superRefine((data, ctx) => {
+    if (!Number.isInteger(data.proveedorId) || data.proveedorId < 1) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'proveedorId must be a positive integer',
+        path: ['proveedorId'],
+      })
+    }
+    if (data.nota !== undefined && data.nota !== null && data.nota.length > 200) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'nota max 200 chars', path: ['nota'] })
+    }
+  })
+  .transform((data): OrdenCompraCreateInput => {
+    const note = data.nota?.trim()
+    return {
+      proveedorId: data.proveedorId,
+      fechaEstimada: data.fechaEstimada ?? null,
+      nota: note === undefined ? null : note.length > 0 ? note : null,
+      items: data.items,
+    }
+  })
+
+export const ordenCompraUpdateBodySchema = z
+  .object({
+    proveedorId: z.number({ invalid_type_error: 'proveedorId must be a number' }).optional(),
+    fechaEstimada: z.union([z.string(), z.null(), z.undefined()]).optional(),
+    nota: z.union([z.string(), z.null(), z.undefined()]).optional(),
+    items: z.array(ordenCompraItemBodySchema).min(1).optional(),
+  })
+  .superRefine((data, ctx) => {
+    if (
+      data.proveedorId !== undefined &&
+      (!Number.isInteger(data.proveedorId) || data.proveedorId < 1)
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'proveedorId must be a positive integer',
+        path: ['proveedorId'],
+      })
+    }
+    if (data.nota !== undefined && data.nota !== null && data.nota.length > 200) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'nota max 200 chars', path: ['nota'] })
+    }
+  })
+  .transform((data): OrdenCompraUpdateInput => {
+    const note = data.nota?.trim()
+    return {
+      proveedorId: data.proveedorId,
+      fechaEstimada: data.fechaEstimada,
+      nota:
+        data.nota === undefined ? undefined : note === undefined || note.length === 0 ? null : note,
+      items: data.items,
+    }
+  })
+
+export const ordenCompraReceiveBodySchema = z
+  .object({
+    lines: z
+      .array(
+        z
+          .object({
+            itemId: z.number({ invalid_type_error: 'itemId must be a number' }),
+            cantidad: z.number({ invalid_type_error: 'cantidad must be a number' }),
+          })
+          .superRefine((line, ctx) => {
+            if (!Number.isInteger(line.itemId) || line.itemId < 1) {
+              ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: 'itemId must be a positive integer',
+                path: ['itemId'],
+              })
+            }
+            if (!Number.isInteger(line.cantidad) || line.cantidad < 1) {
+              ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: 'cantidad must be a positive integer',
+                path: ['cantidad'],
+              })
+            }
+          }),
+      )
+      .min(1, 'lines must contain at least one entry'),
+  })
+  .transform((data): { lines: OrdenCompraReceiveLineInput[] } => ({ lines: data.lines }))
 
 export function safeParseBodySchema<S extends z.ZodTypeAny>(schema: S, raw: unknown): SafeParseBodyResult<z.output<S>> {
   const parsed = schema.safeParse(raw)
