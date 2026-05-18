@@ -163,8 +163,45 @@
     "suspend": "Suspender tenant",
     "reactivate": "Reactivar tenant",
     "manageModules": "Gestionar módulos",
-    "modulesPlaceholderTitle": "Módulos del tenant",
-    "modulesPlaceholderBody": "La configuración visual de módulos se implementará en el issue #225.",
+    "modules": {
+      "title": "Módulos del tenant",
+      "deploymentEnv": "Ambiente de despliegue: {{env}}",
+      "modulesSection": "Módulos habilitados",
+      "saveSection": "Guardar cambios",
+      "reasonLabel": "Motivo del cambio (obligatorio)",
+      "save": "Guardar configuración",
+      "saveSuccess": "Configuración guardada correctamente.",
+      "presetSection": "Plantilla de negocio",
+      "presetLabel": "Plantilla",
+      "presetPlaceholder": "Elegir plantilla…",
+      "applyPreset": "Aplicar plantilla",
+      "confirmApplyPreset": "¿Aplicar la plantilla «{{preset}}»? Se reemplazará el conjunto de módulos activos.",
+      "presetReason": "apply_template:{{preset}}",
+      "historySection": "Historial de cambios",
+      "historyEmpty": "Sin entradas de historial.",
+      "historyDate": "Fecha",
+      "historyReason": "Motivo",
+      "historyUser": "Usuario",
+      "historyTruncated": "Mostrando {{shown}} de {{total}} entradas.",
+      "dependsOn": "Depende de: {{deps}}",
+      "missingDeps": "Active primero: {{deps}}",
+      "cannotDeactivate": "No se puede desactivar en este ambiente.",
+      "presets": {
+        "MAYORISTA_ALIMENTOS": "Mayorista alimentos",
+        "MINORISTA_ROPA": "Minorista ropa",
+        "MAYORISTA_GENERAL": "Mayorista general",
+        "MINORISTA_ALIMENTOS": "Minorista alimentos",
+        "EMPRESA_SERVICIOS": "Empresa servicios",
+        "RETAIL_POS": "Retail POS"
+      },
+      "errors": {
+        "loadFailed": "No se pudo cargar la configuración de módulos.",
+        "saveFailed": "No se pudo guardar la configuración.",
+        "presetFailed": "No se pudo aplicar la plantilla.",
+        "reasonRequired": "Indique el motivo del cambio.",
+        "invalidModuleSet": "Conjunto de módulos inválido."
+      }
+    },
     "status": {
       "active": "Activo",
       "suspended": "Suspendido"

@@ -16,14 +16,11 @@
 - **SuperAdmin API:** `GET/PUT /api/superadmin/tenants/:id/config`, history, `POST .../apply-template` — [`server/routes/registerSuperadminTenantConfigRoutes.ts`](../../../server/routes/registerSuperadminTenantConfigRoutes.ts); requires `super_admin` and `platform.tenants.manage`.
 - **Tenant bootstrap:** `POST /api/auth/setup-owner` and SuperAdmin seed create `TenantConfig` with [`NEW_TENANT_MODULES`](../../../src/lib/modules/tenantDefaults.ts); existing-tenant backfill includes `billing.orders` for #132 compatibility.
 - **Frontend (#224):** [`src/contexts/FeatureFlagsContext.tsx`](../../../src/contexts/FeatureFlagsContext.tsx) (`useFeatureFlags`, `FeatureFlagsGate`); [`src/components/IfModule.tsx`](../../../src/components/IfModule.tsx); [`src/components/ModuleRoute.tsx`](../../../src/components/ModuleRoute.tsx); nav map in [`src/components/layout/navSections.ts`](../../../src/components/layout/navSections.ts); loaded after login via `featuresAPI.get()` in [`src/lib/api.ts`](../../../src/lib/api.ts); i18n `modules.*` labels; `/inicio` alert via `errors.moduleNotEnabled`.
+- **SuperAdmin UI (#225):** [`src/pages/superadmin/TenantModulesPage.tsx`](../../../src/pages/superadmin/TenantModulesPage.tsx) at `/superadmin/tenants/:tenantId/modules`; client `superadminAPI.getConfig` / `putConfig` / `getConfigHistory` / `applyConfigTemplate` and `modulesCatalogAPI.get()` in [`src/lib/api.ts`](../../../src/lib/api.ts); toggles with UX validation (`canDeactivate`, dependencies); required reason on save; presets and history.
 
 ## `requiredInProd` (Argentina)
 
 `billing.afip_cae` has `requiredInProd: true`: it must stay enabled when `deploymentEnv` is `prod`. In `dev`, super_admin may disable it for AFIP-free testing. Core modules (`core.*`) use `required: true` in all environments.
-
-## Pending (#225)
-
-- **#225:** SuperAdmin UI `/superadmin/tenants/:id/modules` (depends on #137 multi-tenant panel).
 
 ## Related
 

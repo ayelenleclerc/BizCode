@@ -10,7 +10,10 @@ const api = axios.create({
   withCredentials: true,
 })
 
-type ApiErrorPayload = { error?: string }
+type ApiErrorPayload = {
+  error?: string
+  validation?: { valid: boolean; errors: Array<{ module: string; reason: string }> }
+}
 
 /**
  * @en Thrown by the API client when a request fails; preserves Axios `code` and whether a response existed (for i18n mapping on login).
@@ -22,6 +25,7 @@ export class ApiRequestFailedError extends Error {
   readonly hasResponse: boolean
   readonly httpStatus: number | undefined
   readonly rateLimitReset: string | undefined
+  readonly validation: ApiErrorPayload['validation']
 
   constructor(
     message: string,
@@ -30,6 +34,7 @@ export class ApiRequestFailedError extends Error {
       hasResponse: boolean
       httpStatus?: number
       rateLimitReset?: string
+      validation?: ApiErrorPayload['validation']
     },
   ) {
     super(message)
@@ -38,6 +43,7 @@ export class ApiRequestFailedError extends Error {
     this.hasResponse = options.hasResponse
     this.httpStatus = options.httpStatus
     this.rateLimitReset = options.rateLimitReset
+    this.validation = options.validation
   }
 }
 
@@ -55,6 +61,7 @@ const handleError = (error: AxiosError<ApiErrorPayload>): never => {
       hasResponse: true,
       httpStatus: ax.response?.status,
       rateLimitReset,
+      validation: data.validation,
     })
   }
   throw new ApiRequestFailedError(ax.message || 'Unknown error', {
@@ -275,6 +282,127 @@ export const superadminAPI = {
       const response = await api.patch<{ success: boolean; data: SuperadminTenantDetail }>(
         `/superadmin/tenants/${tenantId}`,
         { active },
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  getConfig: async (tenantId: number): Promise<TenantConfigDTO> => {
+    try {
+      const response = await api.get<{ success: boolean; data: TenantConfigDTO }>(
+        `/superadmin/tenants/${tenantId}/config`,
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  putConfig: async (tenantId: number, body: TenantConfigUpsertInput): Promise<TenantConfigDTO> => {
+    try {
+      const response = await api.put<{ success: boolean; data: TenantConfigDTO }>(
+        `/superadmin/tenants/${tenantId}/config`,
+        body,
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  getConfigHistory: async (
+    tenantId: number,
+    params?: { take?: number; skip?: number },
+  ): Promise<TenantConfigHistoryData> => {
+    try {
+      const response = await api.get<{ success: boolean; data: TenantConfigHistoryData }>(
+        `/superadmin/tenants/${tenantId}/config/history`,
+        { params },
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  applyConfigTemplate: async (
+    tenantId: number,
+    body: TenantConfigApplyTemplateInput,
+  ): Promise<TenantConfigDTO> => {
+    try {
+      const response = await api.post<{ success: boolean; data: TenantConfigDTO }>(
+        `/superadmin/tenants/${tenantId}/config/apply-template`,
+        body,
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+}
+
+export type TenantConfigDTO = {
+  tenantId: number
+  businessType: string
+  rubros: string[]
+  plan: string
+  modules: string[]
+  integrations: string[]
+  updatedAt: string
+}
+
+export type TenantConfigUpsertInput = {
+  modules: string[]
+  reason: string
+  businessType?: string
+  rubros?: string[]
+  plan?: string
+  integrations?: string[]
+}
+
+export type TenantConfigApplyTemplateInput = {
+  preset: string
+  reason?: string
+}
+
+export type TenantConfigHistoryEntry = {
+  id: number
+  changedById: number
+  before: Record<string, unknown>
+  after: Record<string, unknown>
+  reason: string | null
+  createdAt: string
+}
+
+export type TenantConfigHistoryData = {
+  total: number
+  items: TenantConfigHistoryEntry[]
+}
+
+export type ModuleCatalogEntryDTO = {
+  key: string
+  label: string
+  required: boolean
+  requiredInProd: boolean
+  dependencies: string[]
+  plan: string
+  price: number
+  canDeactivate: boolean
+}
+
+export type ModuleCatalogDataDTO = {
+  deploymentEnv: 'dev' | 'prod'
+  modules: ModuleCatalogEntryDTO[]
+  presets: Record<string, { modules: string[] }>
+}
+
+export const modulesCatalogAPI = {
+  get: async (): Promise<ModuleCatalogDataDTO> => {
+    try {
+      const response = await api.get<{ success: boolean; data: ModuleCatalogDataDTO }>(
+        '/modules/catalog',
       )
       return response.data.data
     } catch (error) {
