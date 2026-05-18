@@ -149,6 +149,7 @@ function buildPrisma(): PrismaClient {
       findUnique: vi.fn().mockResolvedValue(articuloRow),
       create: vi.fn().mockResolvedValue(articuloRow),
       update: vi.fn().mockResolvedValue(articuloRow),
+      upsert: vi.fn().mockResolvedValue(articuloRow),
     },
     stockAjuste: {
       count: vi.fn().mockResolvedValue(0),
@@ -180,6 +181,8 @@ function buildPrisma(): PrismaClient {
         return Promise.resolve([rubroRow])
       }),
       create: vi.fn().mockResolvedValue(rubroRow),
+      findUnique: vi.fn().mockResolvedValue(null),
+      upsert: vi.fn().mockResolvedValue(rubroRow),
     },
     formaPago: {
       findMany: vi.fn().mockResolvedValue([formaPagoRow]),
@@ -270,8 +273,17 @@ function buildPrisma(): PrismaClient {
         const tx = {
           factura: { create: facturaCreate },
           cliente: { update: txClienteUpdate, create: clienteTxCreate },
-          rubro: { create: rubroTxCreate },
-          articulo: { create: articuloTxCreate, update: vi.fn().mockResolvedValue(articuloRow) },
+          rubro: {
+            create: rubroTxCreate,
+            findUnique: vi.fn().mockResolvedValue(null),
+            upsert: vi.fn().mockResolvedValue(rubroRow),
+          },
+          articulo: {
+            create: articuloTxCreate,
+            update: vi.fn().mockResolvedValue(articuloRow),
+            findUnique: vi.fn().mockResolvedValue(null),
+            upsert: vi.fn().mockResolvedValue(articuloRow),
+          },
           proveedor: { create: proveedorTxCreate },
           stockAjuste: {
             create: vi.fn().mockResolvedValue({

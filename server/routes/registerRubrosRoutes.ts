@@ -5,6 +5,7 @@ import { rubroBodySchema, safeParseBodySchema } from '../schemas/domain'
 import type { RubroInput } from '../createApp.types'
 import { parseCsvWithFixedHeaders, CSV_IMPORT_MAX_ROWS } from '../csvImport'
 import { paginatedListJson, parseListPagination } from '../services/listPagination'
+import { readDbfRecordsFromBuffer } from '../../src/lib/migration/readDbfBuffer'
 import type { RestRouteContext } from './restRouteTypes'
 import {
   RUBRO_IMPORT_CSV_HEADERS,
@@ -13,13 +14,15 @@ import {
   errorMessage,
   getTenantId,
   singleCsvUpload,
+  singleDbfUpload,
 } from './restDomainShared'
 
 /**
  * @en Rubro (category) REST routes and CSV import.
  */
 export function registerRubrosRoutes(app: Application, ctx: RestRouteContext): void {
-  const { prisma, writeAudit } = ctx
+  const { prisma, writeAudit, services } = ctx
+  const { import: importService } = services
 
   app.get('/api/rubros', requirePermission('products.read'), async (req: Request, res: Response) => {
     try {
@@ -140,4 +143,37 @@ export function registerRubrosRoutes(app: Application, ctx: RestRouteContext): v
     }
     })()
   })
+
+  app.post(
+    '/api/rubros/migrate-dbf',
+    requirePermission('settings.business.manage'),
+    singleDbfUpload,
+    (req: Request, res: Response) => {
+      void (async () => {
+        const file = (req as Request & { file?: { buffer: Buffer } }).file
+        if (!file?.buffer) {
+          res.status(400).json({ success: false, error: 'Expected multipart field "file" with a .dbf file' })
+          return
+        }
+        try {
+          const tenantId = getTenantId(req)
+          const rows = await readDbfRecordsFromBuffer(file.buffer)
+          const { created, updated = 0, errors } = await importService.importRubrosFromDbf(tenantId, rows)
+          const authReq = req as AuthenticatedRequest
+          await writeAudit(authReq, 'rubro_import', 'rubro', undefined, {
+            createdCount: created,
+            updatedCount: updated,
+            errorCount: errors.length,
+            source: 'dbf',
+          })
+          res.json({
+            success: true,
+            data: { created, updated, skipped: errors.length, errors },
+          })
+        } catch (err: unknown) {
+          res.status(500).json({ success: false, error: errorMessage(err) })
+        }
+      })()
+    },
+  )
 }

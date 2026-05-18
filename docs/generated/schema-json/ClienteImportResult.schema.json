@@ -14,6 +14,11 @@
     "skipped": {
       "minimum": 0,
       "type": "integer"
+    },
+    "updated": {
+      "description": "Rows updated via upsert (legacy DBF migration endpoints)",
+      "minimum": 0,
+      "type": "integer"
     }
   },
   "required": [

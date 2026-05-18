@@ -18,5 +18,7 @@ export type ImportRowError = {
 
 export type ImportPersistResult = {
   created: number
+  /** @en Rows updated via upsert (DBF migration). */
+  updated?: number
   errors: ImportRowError[]
 }

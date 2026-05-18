@@ -1,5 +1,6 @@
 ﻿import type { Request } from 'express'
 import { csvImportUploadSingle } from '../csvImport'
+import { dbfImportUploadSingle } from '../dbfImport'
 import type { AuthenticatedRequest } from '../auth'
 
 export function errorMessage(err: unknown): string {
@@ -57,6 +58,8 @@ export const CLIENTE_IMPORT_CSV_HEADERS = [
 ] as const
 
 export const singleCsvUpload = csvImportUploadSingle()
+
+export const singleDbfUpload = dbfImportUploadSingle()
 
 export const RUBRO_IMPORT_CSV_HEADERS = ['codigo', 'nombre'] as const
 

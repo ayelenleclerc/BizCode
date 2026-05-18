@@ -573,6 +573,41 @@ paths:
         '403':
           $ref: '#/components/responses/ForbiddenError'
 
+  /api/articulos/migrate-dbf:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    post:
+      tags: [articulos]
+      summary: Import products from legacy ARTICULOS.DBF (rubros must exist first)
+      description: Requires `settings.business.manage`. Import `RUBROS.DBF` before `ARTICULOS.DBF`.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: FoxPro DBF file (cp437)
+      responses:
+        '200':
+          description: Import summary (created, updated, per-row errors)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClienteImportEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/ServerError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
   /api/rubros:
     parameters:
       - $ref: '#/components/parameters/BizcodeChannelHeader'
@@ -659,6 +694,41 @@ paths:
       responses:
         '200':
           description: Import summary
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClienteImportEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/ServerError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /api/rubros/migrate-dbf:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    post:
+      tags: [rubros]
+      summary: Import product categories from legacy RUBROS.DBF
+      description: Requires `settings.business.manage`. Upserts by tenant and codigo.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: FoxPro DBF file (cp437)
+      responses:
+        '200':
+          description: Import summary (created, updated, per-row errors)
           content:
             application/json:
               schema:
@@ -2256,6 +2326,10 @@ components:
         created:
           type: integer
           minimum: 0
+        updated:
+          type: integer
+          minimum: 0
+          description: Rows updated via upsert (legacy DBF migration endpoints)
         skipped:
           type: integer
           minimum: 0

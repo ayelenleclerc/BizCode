@@ -10,6 +10,7 @@ import {
   truncateMigrationTables,
   writeClientesFixtureTree,
   writeProductFixtureTree,
+  writeRubrosArticulosFixtureTree,
 } from '../helpers/migration-harness'
 
 describe('DBF migration integration', () => {
@@ -72,5 +73,31 @@ describe('DBF migration integration', () => {
     expect(placeholders).toBe(0)
 
     await cleanupTempDbfRoot(clientesRoot)
+  })
+
+  it('imports rubros and articulos from RUBROS.DBF and ARTICULOS.DBF with upsert', async () => {
+    const catalogRoot = await createTempDbfRoot()
+    await writeRubrosArticulosFixtureTree(catalogRoot)
+    await runMigrationFromRoot(catalogRoot)
+
+    const tenantId = parseInt(process.env.BIZCODE_MIGRATION_TENANT_ID ?? '0', 10)
+    const rubros = await prisma.rubro.findMany({ where: { tenantId }, orderBy: { codigo: 'asc' } })
+    expect(rubros.map((r) => r.codigo)).toEqual(expect.arrayContaining([1, 2]))
+
+    const imported = await prisma.articulo.findMany({
+      where: { tenantId, codigo: 2001 },
+    })
+    expect(imported).toHaveLength(1)
+    expect(imported[0]?.descripcion).toBe('Detergente 1L')
+    expect(imported[0]?.stock).toBe(15)
+
+    const rejected = await prisma.articulo.count({ where: { tenantId, codigo: 2002 } })
+    expect(rejected).toBe(0)
+
+    await runMigrationFromRoot(catalogRoot)
+    const rubroCount = await prisma.rubro.count({ where: { tenantId, codigo: { in: [1, 2] } } })
+    expect(rubroCount).toBe(2)
+
+    await cleanupTempDbfRoot(catalogRoot)
   })
 })

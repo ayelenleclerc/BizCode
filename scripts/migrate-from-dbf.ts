@@ -13,6 +13,7 @@ import { PrismaClient } from '@prisma/client'
 import { DBFFile } from 'dbffile'
 import { dbfRowToRawCliente, mapLegacyCondToCondIva } from '../src/lib/migration/legacyClienteDbf'
 import type { ClienteInput } from '../server/createApp.types'
+import { ImportService } from '../server/services/ImportService'
 import { clienteBodySchema, safeParseBodySchema } from '../server/schemas/domain'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -135,8 +136,8 @@ async function listCliIsMetadataOnly(): Promise<boolean> {
   return r != null && Object.prototype.hasOwnProperty.call(r, 'FIELD_NAME')
 }
 
-async function clientesDbfHasRecords(): Promise<boolean> {
-  const filePath = path.join(sistemaDir(), 'CLIENTES.DBF')
+async function dbfFileHasRecords(fileName: string): Promise<boolean> {
+  const filePath = path.join(sistemaDir(), fileName)
   try {
     await fs.access(filePath)
   } catch {
@@ -144,6 +145,54 @@ async function clientesDbfHasRecords(): Promise<boolean> {
   }
   const dbf = await DBFFile.open(filePath, { readMode: 'loose', encoding: ENCODING })
   return dbf.recordCount > 0
+}
+
+async function clientesDbfHasRecords(): Promise<boolean> {
+  return dbfFileHasRecords('CLIENTES.DBF')
+}
+
+async function readAllDbfRows(fileName: string): Promise<Record<string, unknown>[]> {
+  const filePath = path.join(sistemaDir(), fileName)
+  const dbf = await DBFFile.open(filePath, { readMode: 'loose', encoding: ENCODING })
+  const rows: Record<string, unknown>[] = []
+  for await (const raw of dbf) {
+    rows.push(raw as Record<string, unknown>)
+  }
+  return rows
+}
+
+async function migrateRubrosFromDbf(tenantId: number): Promise<boolean> {
+  if (!(await dbfFileHasRecords('RUBROS.DBF'))) {
+    return false
+  }
+  console.log('[migrate-from-dbf] RUBROS.DBF detectado; importando rubros.')
+  const importService = new ImportService(prisma)
+  const rows = await readAllDbfRows('RUBROS.DBF')
+  const result = await importService.importRubrosFromDbf(tenantId, rows)
+  console.log(
+    `[migrate-from-dbf] Rubros: creados=${result.created}, actualizados=${result.updated ?? 0}, errores=${result.errors.length}.`,
+  )
+  for (const err of result.errors) {
+    console.error(`[migrate-from-dbf] rubro fila=${err.row}: ${err.message}`)
+  }
+  return true
+}
+
+async function migrateArticulosFromDbf(tenantId: number): Promise<boolean> {
+  if (!(await dbfFileHasRecords('ARTICULOS.DBF'))) {
+    return false
+  }
+  console.log('[migrate-from-dbf] ARTICULOS.DBF detectado; importando artículos.')
+  const importService = new ImportService(prisma)
+  const rows = await readAllDbfRows('ARTICULOS.DBF')
+  const result = await importService.importArticulosFromDbf(tenantId, rows)
+  console.log(
+    `[migrate-from-dbf] Artículos: creados=${result.created}, actualizados=${result.updated ?? 0}, errores=${result.errors.length}.`,
+  )
+  for (const err of result.errors) {
+    console.error(`[migrate-from-dbf] articulo fila=${err.row}: ${err.message}`)
+  }
+  return true
 }
 
 function logClienteMigrationReport(report: ClienteMigrationReport): void {
@@ -334,7 +383,6 @@ export async function runDbfMigration() {
     process.exit(1)
   }
   const tenantId = await resolveMigrationTenantId()
-  const rubroId = await ensureRubroGeneral(tenantId)
   const descrFromPvar = await loadPvarDescriptions()
   if (await clientesDbfHasRecords()) {
     console.log('[migrate-from-dbf] CLIENTES.DBF detectado con registros; importando clientes reales.')
@@ -343,7 +391,18 @@ export async function runDbfMigration() {
   } else {
     await migrateClientesPlaceholder(tenantId)
   }
-  await migrateArticulos(tenantId, rubroId, descrFromPvar)
+
+  const rubrosFromDbf = await migrateRubrosFromDbf(tenantId)
+  if (!rubrosFromDbf) {
+    await ensureRubroGeneral(tenantId)
+  }
+
+  const articulosFromDbf = await migrateArticulosFromDbf(tenantId)
+  if (!articulosFromDbf) {
+    const rubroId = await ensureRubroGeneral(tenantId)
+    await migrateArticulos(tenantId, rubroId, descrFromPvar)
+  }
+
   console.log('[migrate-from-dbf] Listo.')
 }
 
