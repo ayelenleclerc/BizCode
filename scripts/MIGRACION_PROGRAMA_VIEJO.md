@@ -14,12 +14,40 @@ Por defecto los scripts buscan `Programa_Viejo/16-07-2025 completa/sistema/` **e
 | `CLIENTES.DBF` | Maestro de clientes cuando la copia legacy lo incluye (evidencia inventario: **2310** registros en copia Suarez; ver `docs/referencias/exports/inventario-dbf-volcado.md`). |
 | `PVAR.DBF`     | Estructura tipo maestro de artículos (`CODIG`, `DESCR`, …) con **0 registros** en la copia mínima del repo. |
 | `PVAR2.DBF`    | **Líneas** de pedido/compra: `ARTIC` (código), `IMPORTE`, `COSTO_N`, `IVA`, `CAJA`, `UNID`, … |
+| `RUBROS.DBF`   | Maestro de rubros (`COD_RUBRO`, `NOMBRE`) cuando la copia legacy lo incluye. |
+| `ARTICULOS.DBF`| Maestro de artículos (`COD_ART`, `DESCRIP`, `COD_RUBRO`, precios, stock, …) cuando la copia lo incluye. |
 
 Codificación usada al leer: **cp437** (típico DOS/Visual Fox en español).
 
 ## Mapeo a Prisma
 
-### `Articulo` (desde `PVAR2.DBF`)
+### `Rubro` (desde `RUBROS.DBF`)
+
+Si `RUBROS.DBF` existe y tiene registros, `npm run migrate:dbf` hace **upsert** por `codigo` (mismo servicio que `POST /api/rubros/migrate-dbf`). Transformación en [`src/lib/migration/legacyRubroDbf.ts`](../src/lib/migration/legacyRubroDbf.ts).
+
+| Campo legacy | Campo BizCode |
+|--------------|---------------|
+| `COD_RUBRO` | `codigo` |
+| `NOMBRE` | `nombre` (trim, máx. 20) |
+
+### `Articulo` (desde `ARTICULOS.DBF`)
+
+Si `ARTICULOS.DBF` existe y tiene registros, se importa con **upsert** (requiere rubros existentes por `COD_RUBRO`). Transformación en [`src/lib/migration/legacyArticuloDbf.ts`](../src/lib/migration/legacyArticuloDbf.ts). API: `POST /api/articulos/migrate-dbf` (importar rubros primero).
+
+| Campo legacy | Campo BizCode |
+|--------------|---------------|
+| `COD_ART` | `codigo` |
+| `DESCRIP` | `descripcion` (máx. 30) |
+| `COD_RUBRO` | lookup → `rubroId` |
+| `COND_IVA` | `condIva` (`1`/`2`/`3`) |
+| `UMEDIDA` | `umedida` (máx. 6) |
+| `PRECIO1` / `PRECIO2` | `precioLista1` / `precioLista2` |
+| `COSTO` | `costo` |
+| `STOCK` | `stock` (0 si null) |
+| `STOCK_MIN` | `minimo` |
+| `ACTIVO` | `activo` (logical DBF) |
+
+### `Articulo` (fallback desde `PVAR2.DBF`)
 
 - `codigo` ← entero redondeado de `ARTIC` (omitir filas con `ARTIC` 0 o nulo).
 - `descripcion` ← `Artículo {codigo}` (máx. 30 caracteres; no hay texto en `DESCR` en esta copia porque `PVAR` está vacío).

@@ -125,4 +125,69 @@ describe('POST /api/facturas — stock', () => {
 
     expect(res.body.error).toBe('INSUFFICIENT_STOCK')
   })
+
+  it('dispatches stock_below_minimum when stock falls below minimum after sale', async () => {
+    const articuloUpdate = vi.fn().mockResolvedValue({ ...ARTICULO_STOCK, stock: 7 })
+    const facturaCreate = vi.fn().mockResolvedValue(FACTURA_RESULT)
+    const clienteUpdate = vi.fn().mockResolvedValue({
+      id: 1,
+      rsocial: 'ACME SA',
+      balance: '1000.00',
+      creditLimit: null,
+    })
+    const notificationCreateMany = vi.fn().mockResolvedValue({ count: 1 })
+
+    const prisma = {
+      deliveryZone: { findFirst: vi.fn().mockResolvedValue(null) },
+      cliente: {
+        findMany: vi.fn().mockResolvedValue([]),
+        findFirst: vi.fn().mockResolvedValue(CLIENTE_BASE),
+      },
+      articulo: {
+        findMany: vi.fn().mockResolvedValue([ARTICULO_STOCK]),
+        update: articuloUpdate,
+      },
+      rubro: { findMany: vi.fn().mockResolvedValue([]) },
+      formaPago: { findMany: vi.fn().mockResolvedValue([]) },
+      factura: { findMany: vi.fn().mockResolvedValue([]) },
+      cobro: { findMany: vi.fn().mockResolvedValue([]) },
+      ordenEntrega: { count: vi.fn().mockResolvedValue(0), findMany: vi.fn().mockResolvedValue([]) },
+      paramEmpresa: { findUnique: vi.fn().mockResolvedValue(null) },
+      notification: { findMany: vi.fn().mockResolvedValue([]), createMany: notificationCreateMany },
+      auditEvent: { create: vi.fn().mockResolvedValue({ id: 1 }) },
+      appUser: {
+        count: vi.fn().mockResolvedValue(0),
+        findMany: vi.fn().mockResolvedValue([{ id: 2 }]),
+      },
+      tenant: { findUnique: vi.fn().mockResolvedValue({ id: 1, name: 'Demo', slug: 'demo', active: true }) },
+      $transaction: vi.fn(async (fn: unknown) => {
+        if (typeof fn === 'function') {
+          return fn({
+            factura: { create: facturaCreate },
+            cliente: { update: clienteUpdate },
+            articulo: { update: articuloUpdate },
+          })
+        }
+        return fn
+      }),
+    } as unknown as PrismaClient
+
+    await request(createApp(prisma)).post('/api/facturas').send(FACTURA_BODY).expect(200)
+
+    expect(notificationCreateMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: [
+          expect.objectContaining({
+            type: 'stock_below_minimum',
+            payload: expect.objectContaining({
+              articuloId: 1,
+              codigo: 10,
+              stock: 7,
+              minimo: 8,
+            }),
+          }),
+        ],
+      }),
+    )
+  })
 })

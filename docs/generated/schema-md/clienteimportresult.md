@@ -21,6 +21,7 @@ undefined
 | [created](#created) | `integer` | Required | cannot be null | [ClienteImportResult](clienteimportresult-properties-created.md "undefined#/properties/created") |
 | [errors](#errors)   | `array`   | Required | cannot be null | [ClienteImportResult](clienteimportresult-properties-errors.md "undefined#/properties/errors")   |
 | [skipped](#skipped) | `integer` | Required | cannot be null | [ClienteImportResult](clienteimportresult-properties-skipped.md "undefined#/properties/skipped") |
+| [updated](#updated) | `integer` | Optional | cannot be null | [ClienteImportResult](clienteimportresult-properties-updated.md "undefined#/properties/updated") |
 
 ## created
 
@@ -81,5 +82,27 @@ undefined
 `integer`
 
 ### skipped Constraints
+
+**minimum**: the value of this number must greater than or equal to: `0`
+
+## updated
+
+Rows updated via upsert (legacy DBF migration endpoints)
+
+`updated`
+
+* is optional
+
+* Type: `integer`
+
+* cannot be null
+
+* defined in: [ClienteImportResult](clienteimportresult-properties-updated.md "undefined#/properties/updated")
+
+### updated Type
+
+`integer`
+
+### updated Constraints
 
 **minimum**: the value of this number must greater than or equal to: `0`

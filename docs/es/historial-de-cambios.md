@@ -16,6 +16,8 @@ Versionado: [Semantic Versioning](https://semver.org/lang/es/).
 
 ### Agregado
 
+- **Migración DBF catálogo (GitHub #131):** parsers `legacyRubroDbf.ts` / `legacyArticuloDbf.ts`; `POST /api/rubros/migrate-dbf` y `POST /api/articulos/migrate-dbf` (`settings.business.manage`, upsert por código); `npm run migrate:dbf` importa `RUBROS.DBF` / `ARTICULOS.DBF` si existen (fallback `PVAR2`/`PVAR`); fixtures y pruebas de integración.
+
 - **Ajustes de stock (GitHub #128):** modelo `StockAjuste` y migración; `POST /api/articulos/:id/stock-ajuste` (`inventory.adjust`) y `GET /api/articulos/:id/stock-historial`; al crear factura se decrementa stock y se notifica `stock_below_minimum`; auditoría `stock_adjust`; i18n EN/ES/PT-BR.
 
 - **Documentación (sincronización ISO-ready):** paquete specs v0.2 (RF-011–RF-015); manuales de cobros, finanzas, reportes y logística (EN/ES/PT-BR); flujo operativo MVP; trazabilidad ISO y stubs REQ-007, TST-003, TST-005, ARC-004; post-proceso TypeDoc [`scripts/patch-typedoc-html-noopener.mjs`](../../scripts/patch-typedoc-html-noopener.mjs); [`DOCUMENT_LOCALE_MAP.md`](../DOCUMENT_LOCALE_MAP.md).

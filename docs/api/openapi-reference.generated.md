@@ -1236,6 +1236,10 @@ Returns the full module catalog with dependency graph metadata, deployment envir
 
     `integer`
 
+  - **`updated`**
+
+    `integer` — Rows updated via upsert (legacy DBF migration endpoints)
+
 - **`success` (required)**
 
   `boolean`
@@ -1247,6 +1251,7 @@ Returns the full module catalog with dependency graph metadata, deployment envir
   "success": true,
   "data": {
     "created": 0,
+    "updated": 0,
     "skipped": 0,
     "errors": [
       {
@@ -3167,6 +3172,10 @@ Returns the full module catalog with dependency graph metadata, deployment envir
 
     `integer`
 
+  - **`updated`**
+
+    `integer` — Rows updated via upsert (legacy DBF migration endpoints)
+
 - **`success` (required)**
 
   `boolean`
@@ -3178,6 +3187,179 @@ Returns the full module catalog with dependency graph metadata, deployment envir
   "success": true,
   "data": {
     "created": 0,
+    "updated": 0,
+    "skipped": 0,
+    "errors": [
+      {
+        "row": 2,
+        "message": ""
+      }
+    ]
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/articulos/migrate-dbf
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/articulos/migrate-dbf`
+
+### Import products from legacy ARTICULOS.DBF (rubros must exist first)
+
+- **Method:** `POST`
+- **Path:** `/api/articulos/migrate-dbf`
+- **Tags:** articulos
+
+Requires `settings.business.manage`. Import `RUBROS.DBF` before `ARTICULOS.DBF`.
+
+#### Request Body
+
+##### Content-Type: multipart/form-data
+
+- **`file` (required)**
+
+  `string`, format: `binary` — FoxPro DBF file (cp437)
+
+**Example:**
+
+```json
+{
+  "file": {}
+}
+```
+
+#### Responses
+
+##### Status: 200 Import summary (created, updated, per-row errors)
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`created` (required)**
+
+    `integer`
+
+  - **`errors` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`message` (required)**
+
+      `string`
+
+    - **`row` (required)**
+
+      `integer` — Data row number in the file (row 1 is the header)
+
+  - **`skipped` (required)**
+
+    `integer`
+
+  - **`updated`**
+
+    `integer` — Rows updated via upsert (legacy DBF migration endpoints)
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "created": 0,
+    "updated": 0,
     "skipped": 0,
     "errors": [
       {
@@ -3685,6 +3867,10 @@ Returns the full module catalog with dependency graph metadata, deployment envir
 
     `integer`
 
+  - **`updated`**
+
+    `integer` — Rows updated via upsert (legacy DBF migration endpoints)
+
 - **`success` (required)**
 
   `boolean`
@@ -3696,6 +3882,179 @@ Returns the full module catalog with dependency graph metadata, deployment envir
   "success": true,
   "data": {
     "created": 0,
+    "updated": 0,
+    "skipped": 0,
+    "errors": [
+      {
+        "row": 2,
+        "message": ""
+      }
+    ]
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/rubros/migrate-dbf
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/rubros/migrate-dbf`
+
+### Import product categories from legacy RUBROS.DBF
+
+- **Method:** `POST`
+- **Path:** `/api/rubros/migrate-dbf`
+- **Tags:** rubros
+
+Requires `settings.business.manage`. Upserts by tenant and codigo.
+
+#### Request Body
+
+##### Content-Type: multipart/form-data
+
+- **`file` (required)**
+
+  `string`, format: `binary` — FoxPro DBF file (cp437)
+
+**Example:**
+
+```json
+{
+  "file": {}
+}
+```
+
+#### Responses
+
+##### Status: 200 Import summary (created, updated, per-row errors)
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`created` (required)**
+
+    `integer`
+
+  - **`errors` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`message` (required)**
+
+      `string`
+
+    - **`row` (required)**
+
+      `integer` — Data row number in the file (row 1 is the header)
+
+  - **`skipped` (required)**
+
+    `integer`
+
+  - **`updated`**
+
+    `integer` — Rows updated via upsert (legacy DBF migration endpoints)
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "created": 0,
+    "updated": 0,
     "skipped": 0,
     "errors": [
       {
@@ -4293,6 +4652,10 @@ Returns the full module catalog with dependency graph metadata, deployment envir
 
     `integer`
 
+  - **`updated`**
+
+    `integer` — Rows updated via upsert (legacy DBF migration endpoints)
+
 - **`success` (required)**
 
   `boolean`
@@ -4304,6 +4667,7 @@ Returns the full module catalog with dependency graph metadata, deployment envir
   "success": true,
   "data": {
     "created": 0,
+    "updated": 0,
     "skipped": 0,
     "errors": [
       {
@@ -11868,11 +12232,16 @@ Requires `orders.dispatch` for transitions to `assigned`, `in_transit`, or `fail
 
   `integer`
 
+* **`updated`**
+
+  `integer` — Rows updated via upsert (legacy DBF migration endpoints)
+
 **Example:**
 
 ```json
 {
   "created": 0,
+  "updated": 0,
   "skipped": 0,
   "errors": [
     {
@@ -11913,6 +12282,10 @@ Requires `orders.dispatch` for transitions to `assigned`, `in_transit`, or `fail
 
     `integer`
 
+  - **`updated`**
+
+    `integer` — Rows updated via upsert (legacy DBF migration endpoints)
+
 * **`success` (required)**
 
   `boolean`
@@ -11924,6 +12297,7 @@ Requires `orders.dispatch` for transitions to `assigned`, `in_transit`, or `fail
   "success": true,
   "data": {
     "created": 0,
+    "updated": 0,
     "skipped": 0,
     "errors": [
       {
