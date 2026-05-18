@@ -8,6 +8,9 @@ import type {
   EmpresaInput,
   FacturaInput,
   FacturaItemInput,
+  PedidoInput,
+  PedidoInvoiceInput,
+  PedidoItemInput,
   ProveedorInput,
   RubroInput,
   OrdenCompraCreateInput,
@@ -811,6 +814,100 @@ export const empresaUpdateBodySchema = z
       logoUrl: logo,
     }
   })
+
+const pedidoItemLineSchema = z
+  .object({
+    articuloId: z.number(),
+    cantidad: z.number(),
+    precio: z.number(),
+    dscto: z.number().optional(),
+  })
+  .superRefine((data, ctx) => {
+    if (!Number.isInteger(data.articuloId) || data.articuloId < 1) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'articuloId must be >= 1', path: ['articuloId'] })
+    }
+    if (!Number.isInteger(data.cantidad) || data.cantidad < 1) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'cantidad must be >= 1', path: ['cantidad'] })
+    }
+    if (typeof data.precio !== 'number' || Number.isNaN(data.precio) || data.precio < 0) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'precio must be >= 0', path: ['precio'] })
+    }
+    const ds = data.dscto ?? 0
+    if (typeof ds !== 'number' || Number.isNaN(ds) || ds < 0 || ds > 100) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'dscto must be between 0 and 100', path: ['dscto'] })
+    }
+  })
+
+function mapPedidoItemLine(
+  data: z.infer<typeof pedidoItemLineSchema>,
+): PedidoItemInput {
+  const dscto = data.dscto ?? 0
+  const subtotal =
+    Math.round((data.cantidad * data.precio - (data.cantidad * data.precio * dscto) / 100) * 100) / 100
+  return {
+    articuloId: data.articuloId,
+    cantidad: data.cantidad,
+    precio: data.precio,
+    dscto,
+    subtotal,
+  }
+}
+
+const pedidoItemsField = z
+  .array(pedidoItemLineSchema)
+  .min(1, 'items must contain at least one line')
+  .transform((lines) => lines.map(mapPedidoItemLine))
+
+export const pedidoBodySchema = z
+  .object({
+    clienteId: z.number(),
+    vendedorId: z.union([z.number(), z.null()]).optional(),
+    validUntil: z.union([z.string(), z.null()]).optional(),
+    items: pedidoItemsField,
+  })
+  .superRefine((data, ctx) => {
+    if (!Number.isInteger(data.clienteId) || data.clienteId < 1) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'clienteId must be >= 1', path: ['clienteId'] })
+    }
+    const v = data.vendedorId
+    if (v !== undefined && v !== null && (!Number.isInteger(v) || v < 1)) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'vendedorId must be >= 1 or null', path: ['vendedorId'] })
+    }
+  })
+  .transform(
+    (data): PedidoInput => ({
+      clienteId: data.clienteId,
+      vendedorId: data.vendedorId,
+      validUntil: data.validUntil,
+      items: data.items,
+    }),
+  )
+
+export const pedidoInvoiceBodySchema = z
+  .object({
+    fecha: z.string(),
+    tipo: z.enum(['A', 'B'], { errorMap: () => ({ message: 'tipo must be A or B' }) }),
+    numero: z.number(),
+    prefijo: z.string().optional(),
+    formaPagoId: z.union([z.number(), z.null()]).optional(),
+  })
+  .superRefine((data, ctx) => {
+    if (data.fecha.trim().length === 0) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'fecha is required', path: ['fecha'] })
+    }
+    if (!Number.isInteger(data.numero) || data.numero < 1) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'numero must be >= 1', path: ['numero'] })
+    }
+  })
+  .transform(
+    (data): PedidoInvoiceInput => ({
+      fecha: data.fecha.trim(),
+      tipo: data.tipo,
+      numero: data.numero,
+      prefijo: data.prefijo,
+      formaPagoId: data.formaPagoId,
+    }),
+  )
 
 /** Resultado de validar un objeto arbitrario (p. ej. fila CSV → raw) con un schema Zod de dominio. */
 export type SafeParseBodyResult<T> = { ok: true; value: T } | { ok: false; error: string }

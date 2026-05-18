@@ -93,6 +93,15 @@ vi.mock('@/lib/api', async () => {
       receive: vi.fn(),
     },
     formasPagoAPI: { list: vi.fn().mockResolvedValue([]) },
+    pedidosAPI: {
+      list: vi.fn().mockResolvedValue({ success: true, data: [], total: 0, limit: 100, offset: 0 }),
+      get: vi.fn(),
+      create: vi.fn(),
+      update: vi.fn(),
+      confirm: vi.fn(),
+      invoice: vi.fn(),
+      cancel: vi.fn(),
+    },
     facturasAPI: {
       list: vi.fn().mockResolvedValue([]),
       create: vi.fn(),
@@ -195,6 +204,7 @@ describe('App — cobertura de rutas protegidas (smoke navegación)', () => {
     const sidebarPaths = [
       '/inicio',
       '/facturacion',
+      '/pedidos',
       '/clientes',
       '/articulos',
       '/proveedores',

@@ -678,6 +678,35 @@ export type ReportesPeriodParams = {
   agrupar?: 'dia' | 'semana' | 'mes'
 }
 
+export type FacturaVencidaRow = {
+  facturaId: number
+  clienteId: number
+  rsocial: string
+  total: string
+  fecha: string
+  diasMora: number
+}
+
+export const cobranzasAPI = {
+  listVencidas: async () => {
+    try {
+      const response = await api.get('/cobranzas/vencidas')
+      return response.data.data as FacturaVencidaRow[]
+    } catch (error) {
+      handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  sendRecordatorio: async (facturaId: number, canal = 'email') => {
+    try {
+      const response = await api.post('/cobranzas/recordatorios', { facturaId, canal })
+      return response.data.data as { id: number }
+    } catch (error) {
+      handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+}
+
 export const reportesAPI = {
   aging: async () => {
     try {
@@ -734,6 +763,97 @@ export const reportesAPI = {
       return response.data as Blob
     } catch (error) {
       handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+}
+
+// ============ PEDIDOS ============
+
+export type PedidoEstado = 'draft' | 'confirmed' | 'invoiced' | 'cancelled'
+
+export type PedidoRow = {
+  id: number
+  clienteId: number
+  vendedorId: number | null
+  estado: PedidoEstado
+  total: number | string
+  validUntil: string | null
+  facturaId: number | null
+  createdAt: string
+  updatedAt: string
+  cliente?: { id: number; codigo: number; rsocial: string }
+  items?: unknown[]
+}
+
+export type PedidoListResponse = {
+  success: boolean
+  data: PedidoRow[]
+  total: number
+  take: number
+  skip: number
+}
+
+export const pedidosAPI = {
+  list: async (params?: { estado?: string; clienteId?: number }): Promise<PedidoListResponse> => {
+    try {
+      const response = await api.get<PedidoListResponse>('/pedidos', { params })
+      return response.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  get: async (id: number): Promise<PedidoRow> => {
+    try {
+      const response = await api.get<{ success: boolean; data: PedidoRow }>(`/pedidos/${id}`)
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  create: async (body: JsonRecord): Promise<PedidoRow> => {
+    try {
+      const response = await api.post<{ success: boolean; data: PedidoRow }>('/pedidos', body)
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  update: async (id: number, body: JsonRecord): Promise<PedidoRow> => {
+    try {
+      const response = await api.put<{ success: boolean; data: PedidoRow }>(`/pedidos/${id}`, body)
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  confirm: async (id: number): Promise<PedidoRow> => {
+    try {
+      const response = await api.post<{ success: boolean; data: PedidoRow }>(`/pedidos/${id}/confirm`)
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  invoice: async (id: number, body: JsonRecord): Promise<PedidoRow> => {
+    try {
+      const response = await api.post<{ success: boolean; data: PedidoRow }>(`/pedidos/${id}/invoice`, body)
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  cancel: async (id: number): Promise<PedidoRow> => {
+    try {
+      const response = await api.delete<{ success: boolean; data: PedidoRow }>(`/pedidos/${id}`)
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
     }
   },
 }

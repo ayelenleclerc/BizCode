@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "clienteId": {
+      "type": "integer"
+    },
+    "diasMora": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "facturaId": {
+      "type": "integer"
+    },
+    "fecha": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "rsocial": {
+      "type": "string"
+    },
+    "total": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "facturaId",
+    "clienteId",
+    "rsocial",
+    "total",
+    "fecha",
+    "diasMora"
+  ],
+  "title": "FacturaVencidaRow",
+  "type": "object"
+}

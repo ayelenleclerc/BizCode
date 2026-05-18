@@ -17,6 +17,13 @@ Evidencia automática equivalente en `tests/server/http-mutations-audit-coverage
 | PUT | `/api/proveedores/:id` | `proveedor_update` | `resourceId` del path |
 | POST | `/api/facturas` | `factura_create` | `resource: factura` |
 | PUT | `/api/facturas/:id/void` | `factura_void` | motivo persistido dentro de la misma operación auditada |
+| PUT | `/api/afip/config` | `afip_config_upsert` | credenciales cifradas en reposo |
+| POST | `/api/afip/cae` | `afip_cae_request` | `resource: factura` |
+| POST | `/api/pedidos` | `pedido_create` | `resource: pedido`; respuesta **201** |
+| PUT | `/api/pedidos/:id` | `pedido_update` | solo estado `draft` |
+| POST | `/api/pedidos/:id/confirm` | `pedido_confirm` | `draft` → `confirmed` |
+| POST | `/api/pedidos/:id/invoice` | `pedido_invoice` | metadata `facturaId` cuando aplica |
+| DELETE | `/api/pedidos/:id` | `pedido_cancel` | soft cancel → `cancelled` |
 | POST | `/api/zonas-entrega` | `delivery_zone_create` | código HTTP esperado por contrato/ruta puede ser **201** |
 | PUT | `/api/zonas-entrega/:id` | `delivery_zone_update` | `resourceId` del path |
 | POST | `/api/compras` | `orden_compra_create` | `resource: orden_compra` |
@@ -24,6 +31,7 @@ Evidencia automática equivalente en `tests/server/http-mutations-audit-coverage
 | POST | `/api/compras/:id/send` | `orden_compra_send` | `resourceId` del path |
 | POST | `/api/compras/:id/cancel` | `orden_compra_cancel` | `resourceId` del path |
 | POST | `/api/compras/:id/receive` | `orden_compra_receive` | `resourceId` del path; `StockAjuste` motivo `compra` |
+| POST | `/api/cobranzas/recordatorios` | `cobranza_recordatorio_send` | `resource: factura`, `resourceId` = `facturaId` del body |
 
 ## Consulta del registro de auditoría (#67)
 

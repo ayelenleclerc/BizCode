@@ -40,6 +40,12 @@ const NAV_SECTIONS: {
     roles: ['owner', 'manager', 'seller', 'billing', 'cashier'],
   },
   {
+    key: 'pedidos',
+    path: '/pedidos',
+    icon: '📝',
+    roles: ['owner', 'manager', 'seller', 'backoffice'],
+  },
+  {
     key: 'clientes',
     path: '/clientes',
     icon: '📋',

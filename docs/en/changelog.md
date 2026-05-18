@@ -17,6 +17,9 @@ Versioning: [Semantic Versioning](https://semver.org/).
 ### Added
 
 - **Purchase orders (GitHub #135):** `OrdenCompra` + `OrdenCompraItem`; CRUD `/api/compras`, `POST .../send`, `POST .../receive` (partial receipt → `StockAjuste` motivo `compra`); UI `/compras`; RBAC `suppliers.read` / `suppliers.manage` + `inventory.adjust` on receive; i18n EN/ES/PT-BR.
+- **Overdue reminders (GitHub #134):** `CobroRecordatorio` model; `ParamEmpresa.recordatorioDiasGracia`; `GET /api/cobranzas/vencidas` and `POST /api/cobranzas/recordatorios` (`reports.financial.read`); `CobranzasService` + `npm run cobranzas:recordatorios` job; overdue section on `/finanzas`; audit `cobranza_recordatorio_send`; i18n EN/ES/PT-BR.
+- **AFIP CAE (GitHub #133):** `TenantFiscalConfig`, CAE fields on `Factura`, `PUT /api/afip/config`, `POST /api/afip/auth`, `POST /api/afip/cae`; homologación WSFE mock; post-create hook in `FacturaService`; `npm run afip:retry-pending`. PDF badge follow-up.
+- **Commercial orders (GitHub #132):** `Pedido` / `PedidoItem` models; `GET/POST/PUT/DELETE /api/pedidos` plus `POST .../confirm` and `POST .../invoice` (ADR-0009 English states and paths); RBAC `orders.create` / `sales.create` / `sales.cancel`; audit actions `pedido_*`; `/pedidos` list UI; i18n EN/ES/PT-BR. Module gating (`requireModule`) deferred until #223.
 
 - **Legacy DBF catalog migration (GitHub #131):** Parsers `legacyRubroDbf.ts` / `legacyArticuloDbf.ts`; `POST /api/rubros/migrate-dbf` and `POST /api/articulos/migrate-dbf` (`settings.business.manage`, upsert by codigo); `npm run migrate:dbf` imports `RUBROS.DBF` / `ARTICULOS.DBF` when present (fallback to `PVAR2`/`PVAR`); integration fixtures and tests.
 

@@ -40,5 +40,21 @@
   "sort": {
     "asc": "Ordem crescente",
     "desc": "Ordem decrescente"
+  },
+  "overdue": {
+    "title": "Faturas vencidas — lembretes",
+    "hint": "Envie um lembrete de cobrança (canal e-mail por padrão). Um envio por fatura por dia.",
+    "minDays": "Mín. dias em atraso",
+    "invoice": "Fatura",
+    "customer": "Cliente",
+    "total": "Valor",
+    "date": "Data",
+    "daysPastDue": "Dias em atraso",
+    "send": "Enviar lembrete",
+    "sending": "Enviando…",
+    "sent": "Lembrete enviado",
+    "alreadySent": "Já enviado hoje",
+    "empty": "Nenhuma fatura vencida com esse filtro.",
+    "loadError": "Não foi possível carregar faturas vencidas."
   }
 }

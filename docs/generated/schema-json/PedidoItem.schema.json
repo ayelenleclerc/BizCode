@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "properties": {
+    "articuloId": {
+      "type": "integer"
+    },
+    "cantidad": {
+      "type": "integer"
+    },
+    "dscto": {
+      "type": "number"
+    },
+    "id": {
+      "type": "integer"
+    },
+    "precio": {
+      "type": "number"
+    },
+    "subtotal": {
+      "type": "number"
+    }
+  },
+  "title": "PedidoItem",
+  "type": "object"
+}

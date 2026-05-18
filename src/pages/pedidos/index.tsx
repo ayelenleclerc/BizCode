@@ -1,0 +1,130 @@
+import { useCallback, useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { pedidosAPI, type PedidoRow } from '@/lib/api'
+import { CanAccess } from '@/components/CanAccess'
+import ErrorBoundary from '@/components/ErrorBoundary'
+import AsyncWrapper from '@/components/shared/AsyncWrapper'
+
+const ESTADOS = ['draft', 'confirmed', 'invoiced', 'cancelled'] as const
+
+function formatMoney(value: number | string): string {
+  const n = typeof value === 'number' ? value : Number.parseFloat(String(value))
+  if (Number.isNaN(n)) return String(value)
+  return n.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' })
+}
+
+export default function PedidosPage() {
+  const { t } = useTranslation('pedidos')
+  const [pedidos, setPedidos] = useState<PedidoRow[]>([])
+  const [loading, setLoading] = useState(false)
+  const [loadError, setLoadError] = useState<Error | null>(null)
+  const [filterEstado, setFilterEstado] = useState('')
+
+  const loadPedidos = useCallback(async () => {
+    setLoading(true)
+    setLoadError(null)
+    try {
+      const res = await pedidosAPI.list({
+        estado: filterEstado || undefined,
+      })
+      setPedidos(res?.data ?? [])
+    } catch (error) {
+      setLoadError(error instanceof Error ? error : new Error(t('loadError')))
+    } finally {
+      setLoading(false)
+    }
+  }, [filterEstado, t])
+
+  useEffect(() => {
+    void loadPedidos()
+  }, [loadPedidos])
+
+  return (
+    <ErrorBoundary>
+      <div className="p-6" data-testid="pedidos-page">
+        <header className="flex flex-wrap items-center justify-between gap-4 mb-6">
+          <div>
+            <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">{t('title')}</h1>
+            <p className="text-slate-500 dark:text-slate-400 text-sm">{t('subtitle')}</p>
+          </div>
+          <CanAccess permission="orders.create">
+            <button
+              type="button"
+              className="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700"
+              data-testid="pedidos-new-btn"
+              disabled
+            >
+              {t('newOrder')}
+            </button>
+          </CanAccess>
+        </header>
+
+        <div className="mb-4 flex flex-wrap gap-3 items-center">
+          <label htmlFor="pedidos-filter-estado" className="text-sm text-slate-600 dark:text-slate-300">
+            {t('filterEstado')}
+          </label>
+          <select
+            id="pedidos-filter-estado"
+            className="border rounded px-2 py-1 dark:bg-slate-800 dark:border-slate-600"
+            value={filterEstado}
+            onChange={(e) => setFilterEstado(e.target.value)}
+            data-testid="pedidos-filter-estado"
+          >
+            <option value="">{t('filterAll')}</option>
+            {ESTADOS.map((est) => (
+              <option key={est} value={est}>
+                {t(`estado.${est}`)}
+              </option>
+            ))}
+          </select>
+          <button
+            type="button"
+            className="px-3 py-1 rounded border border-slate-300 dark:border-slate-600"
+            onClick={() => void loadPedidos()}
+            data-testid="pedidos-refresh-btn"
+            aria-label={t('filterEstado')}
+          >
+            ↻
+          </button>
+        </div>
+
+        <AsyncWrapper loading={loading} error={loadError}>
+          {pedidos.length === 0 ? (
+            <p className="text-slate-500 dark:text-slate-400" data-testid="pedidos-empty">
+              {t('empty')}
+            </p>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="min-w-full text-sm" data-testid="pedidos-table">
+                <thead>
+                  <tr className="text-left border-b border-slate-200 dark:border-slate-700">
+                    <th className="py-2 pr-4">{t('columns.id')}</th>
+                    <th className="py-2 pr-4">{t('columns.cliente')}</th>
+                    <th className="py-2 pr-4">{t('columns.estado')}</th>
+                    <th className="py-2 pr-4">{t('columns.total')}</th>
+                    <th className="py-2">{t('columns.fecha')}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {pedidos.map((p) => (
+                    <tr
+                      key={p.id}
+                      className="border-b border-slate-100 dark:border-slate-800"
+                      data-testid={`pedidos-row-${p.id}`}
+                    >
+                      <td className="py-2 pr-4">{p.id}</td>
+                      <td className="py-2 pr-4">{p.cliente?.rsocial ?? p.clienteId}</td>
+                      <td className="py-2 pr-4">{t(`estado.${p.estado}`)}</td>
+                      <td className="py-2 pr-4">{formatMoney(p.total)}</td>
+                      <td className="py-2">{new Date(p.createdAt).toLocaleDateString()}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </AsyncWrapper>
+      </div>
+    </ErrorBoundary>
+  )
+}

@@ -2,12 +2,14 @@ import type { PrismaClient } from '@prisma/client'
 import { ArticuloService } from './ArticuloService'
 import { ClienteService } from './ClienteService'
 import { CobroService } from './CobroService'
+import { CobranzasService } from './CobranzasService'
 import { CompraService } from './CompraService'
 import { FacturaService } from './FacturaService'
 import { ImportService } from './ImportService'
 import { ReportesFinancierosService } from './ReportesFinancierosService'
 import { ReportesOperacionalesService } from './ReportesOperacionalesService'
 import { OrdenEntregaService } from './OrdenEntregaService'
+import { PedidoService } from './PedidoService'
 import { EmpresaService } from './EmpresaService'
 import { StockAjusteService } from './StockAjusteService'
 
@@ -16,8 +18,10 @@ export type DomainServices = {
   articulo: ArticuloService
   factura: FacturaService
   cobro: CobroService
+  cobranzas: CobranzasService
   compras: CompraService
   ordenEntrega: OrdenEntregaService
+  pedido: PedidoService
   empresa: EmpresaService
   stockAjuste: StockAjusteService
   reportes: ReportesFinancierosService
@@ -36,8 +40,10 @@ export function createDomainServices(prisma: PrismaClient): DomainServices {
     articulo: new ArticuloService(prisma),
     factura: new FacturaService(prisma),
     cobro: new CobroService(prisma),
+    cobranzas: new CobranzasService(prisma),
     compras: new CompraService(prisma),
     ordenEntrega: new OrdenEntregaService(prisma),
+    pedido: new PedidoService(prisma),
     empresa: new EmpresaService(prisma),
     stockAjuste: new StockAjusteService(prisma),
     reportes: new ReportesFinancierosService(prisma),
