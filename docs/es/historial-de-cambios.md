@@ -10,6 +10,8 @@ Versionado: [Semantic Versioning](https://semver.org/lang/es/).
 
 ### Agregado
 
+- **Feature flags en frontend (GitHub #224):** `FeatureFlagsContext` / `useFeatureFlags`; `GET /api/me/features` vía `featuresAPI`; `IfModule`, `ModuleRoute`, `FeatureFlagsGate`; nav y rutas condicionales (`navSections.ts`, `Layout`, `App.tsx`); alerta accesible en `/inicio`; i18n `modules.*`; pruebas en `FeatureFlagsContext.test.tsx`, `IfModule.test.tsx`, `Layout.nav-modules.test.tsx`.
+
 - **Feature flags por tenant (GitHub #223):** modelos `TenantConfig` / `TenantConfigHistory`; `GET /api/me/features`; middleware `requireModule` (p. ej. `billing.orders` en `/api/pedidos`); API SuperAdmin `GET/PUT /api/superadmin/tenants/:id/config`, historial y `POST .../apply-template`; `TenantConfig` en `setup-owner` y seed; caché en memoria (sin Redis); i18n `errors.moduleNotEnabled`; pruebas en `tests/api/me-features.test.ts`, `tests/api/superadmin-tenant-config.test.ts`, `tests/server/require-module.test.ts`.
 
 ### Corregido

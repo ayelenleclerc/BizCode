@@ -135,6 +135,18 @@
   "errors": {
     "moduleNotEnabled": "Module «{{module}}» is not enabled for your company. Contact your administrator."
   },
+  "modules": {
+    "core_invoicing": "Core invoicing",
+    "core_clients": "Customers",
+    "core_catalog": "Catalog",
+    "billing_orders": "Orders",
+    "logistics_purchases": "Purchase orders",
+    "logistics_dispatches": "Dispatches",
+    "finance_collections": "Collections",
+    "analytics_dashboard": "Dashboard",
+    "admin_audit_log": "Audit log",
+    "comms_chat": "Internal chat"
+  },
   "dashboard": {
     "title": "Today's summary",
     "ventasHoy": "Today's sales",

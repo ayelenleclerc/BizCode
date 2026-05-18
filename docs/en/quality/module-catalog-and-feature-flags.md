@@ -1,6 +1,6 @@
 # Module catalog and feature flags (implementation record)
 
-**Evidence:** GitHub issues #227 (catalog), #223 (per-tenant engine) · milestone v0.11.5
+**Evidence:** GitHub issues #227 (catalog), #223 (per-tenant engine), #224 (frontend) · milestone v0.11.5
 
 ## Scope in repository
 
@@ -15,14 +15,14 @@
 - **Middleware:** [`server/middleware/requireModule.ts`](../../../server/middleware/requireModule.ts) + [`server/middleware/tenantModules.ts`](../../../server/middleware/tenantModules.ts); first consumer: `/api/pedidos` requires `billing.orders`.
 - **SuperAdmin API:** `GET/PUT /api/superadmin/tenants/:id/config`, history, `POST .../apply-template` — [`server/routes/registerSuperadminTenantConfigRoutes.ts`](../../../server/routes/registerSuperadminTenantConfigRoutes.ts); requires `super_admin` and `platform.tenants.manage`.
 - **Tenant bootstrap:** `POST /api/auth/setup-owner` and SuperAdmin seed create `TenantConfig` with [`NEW_TENANT_MODULES`](../../../src/lib/modules/tenantDefaults.ts); existing-tenant backfill includes `billing.orders` for #132 compatibility.
+- **Frontend (#224):** [`src/contexts/FeatureFlagsContext.tsx`](../../../src/contexts/FeatureFlagsContext.tsx) (`useFeatureFlags`, `FeatureFlagsGate`); [`src/components/IfModule.tsx`](../../../src/components/IfModule.tsx); [`src/components/ModuleRoute.tsx`](../../../src/components/ModuleRoute.tsx); nav map in [`src/components/layout/navSections.ts`](../../../src/components/layout/navSections.ts); loaded after login via `featuresAPI.get()` in [`src/lib/api.ts`](../../../src/lib/api.ts); i18n `modules.*` labels; `/inicio` alert via `errors.moduleNotEnabled`.
 
 ## `requiredInProd` (Argentina)
 
 `billing.afip_cae` has `requiredInProd: true`: it must stay enabled when `deploymentEnv` is `prod`. In `dev`, super_admin may disable it for AFIP-free testing. Core modules (`core.*`) use `required: true` in all environments.
 
-## Pending (#224–#225)
+## Pending (#225)
 
-- **#224:** `useFeatureFlags` hook, conditional nav and routes in the SPA.
 - **#225:** SuperAdmin UI `/superadmin/tenants/:id/modules` (depends on #137 multi-tenant panel).
 
 ## Related

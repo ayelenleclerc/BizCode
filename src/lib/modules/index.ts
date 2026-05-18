@@ -10,6 +10,7 @@ export { resolveDeploymentEnv } from './env'
 import { MODULE_PRESETS } from './presets'
 export { MODULE_PRESET_KEYS, MODULE_PRESETS, type ModulePresetKey } from './presets'
 export { BACKFILL_TENANT_MODULES, NEW_TENANT_MODULES } from './tenantDefaults'
+export { moduleI18nKey, moduleI18nSuffix } from './moduleI18n'
 import type { ModulePlan } from './types'
 export {
   DEPLOYMENT_ENVS,

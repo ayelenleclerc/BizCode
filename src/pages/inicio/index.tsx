@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { dashboardAPI, type DashboardSummaryDTO } from '@/lib/api'
+import type { ModuleDisabledLocationState } from '@/components/ModuleRoute'
+import { MODULE_KEYS, moduleI18nKey, type ModuleKey } from '@/lib/modules'
 
 // ─── KPI Card ────────────────────────────────────────────────────────────────
 
@@ -92,11 +95,27 @@ function AlertCard({ count, pending }: { count: number; pending: boolean }) {
  * @es Página de inicio — muestra los KPIs del día de GET /api/dashboard/summary.
  * @pt-BR Página inicial — exibe os KPIs do dia de GET /api/dashboard/summary.
  */
+function parseModuleDisabledState(state: unknown): ModuleKey | null {
+  if (!state || typeof state !== 'object') return null
+  const key = (state as ModuleDisabledLocationState).moduleDisabled
+  if (typeof key !== 'string') return null
+  return (MODULE_KEYS as readonly string[]).includes(key) ? (key as ModuleKey) : null
+}
+
 export default function InicioPage() {
   const { t } = useTranslation('common')
+  const location = useLocation()
+  const navigate = useNavigate()
+  const [moduleAlert] = useState<ModuleKey | null>(() => parseModuleDisabledState(location.state))
   const [data, setData] = useState<DashboardSummaryDTO | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (moduleAlert) {
+      navigate(location.pathname, { replace: true, state: {} })
+    }
+  }, [moduleAlert, location.pathname, navigate])
 
   useEffect(() => {
     let cancelled = false
@@ -124,6 +143,16 @@ export default function InicioPage() {
       <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-6">
         {t('dashboard.title')}
       </h1>
+
+      {moduleAlert ? (
+        <p
+          role="alert"
+          className="mb-4 rounded border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900 dark:border-amber-700 dark:bg-amber-950 dark:text-amber-100"
+          data-testid="module-disabled-alert"
+        >
+          {t('errors.moduleNotEnabled', { module: t(moduleI18nKey(moduleAlert)) })}
+        </p>
+      ) : null}
 
       {loading && (
         <p className="text-slate-500 dark:text-slate-400" role="status" aria-busy="true">

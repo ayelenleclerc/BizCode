@@ -1,6 +1,6 @@
 # Catálogo de módulos y feature flags (registro de implementación)
 
-**Evidencia:** issues GitHub #227 (catálogo), #223 (motor por tenant) · hito v0.11.5
+**Evidencia:** issues GitHub #227 (catálogo), #223 (motor por tenant), #224 (frontend) · hito v0.11.5
 
 ## Alcance en el repositorio
 
@@ -15,14 +15,14 @@
 - **Middleware:** [`server/middleware/requireModule.ts`](../../../server/middleware/requireModule.ts) + [`server/middleware/tenantModules.ts`](../../../server/middleware/tenantModules.ts); primer consumidor: `/api/pedidos` exige `billing.orders`.
 - **SuperAdmin API:** `GET/PUT /api/superadmin/tenants/:id/config`, historial y `POST .../apply-template` — [`server/routes/registerSuperadminTenantConfigRoutes.ts`](../../../server/routes/registerSuperadminTenantConfigRoutes.ts); requiere rol `super_admin` y permiso `platform.tenants.manage`.
 - **Alta de tenant:** `POST /api/auth/setup-owner` y seed SuperAdmin crean fila `TenantConfig` con [`NEW_TENANT_MODULES`](../../../src/lib/modules/tenantDefaults.ts); backfill de tenants existentes incluye `billing.orders` por compatibilidad con #132.
+- **Frontend (#224):** [`src/contexts/FeatureFlagsContext.tsx`](../../../src/contexts/FeatureFlagsContext.tsx) (`useFeatureFlags`, `FeatureFlagsGate`); [`src/components/IfModule.tsx`](../../../src/components/IfModule.tsx); [`src/components/ModuleRoute.tsx`](../../../src/components/ModuleRoute.tsx); mapa nav en [`src/components/layout/navSections.ts`](../../../src/components/layout/navSections.ts); carga tras login vía `featuresAPI.get()` en [`src/lib/api.ts`](../../../src/lib/api.ts); etiquetas i18n `modules.*` en locales; alerta en `/inicio` con `errors.moduleNotEnabled`.
 
 ## `requiredInProd` (Argentina)
 
 `billing.afip_cae` tiene `requiredInProd: true`: debe permanecer activo cuando `deploymentEnv` es `prod`. En `dev`, super_admin puede desactivarlo para pruebas sin AFIP. Los módulos core (`core.*`) usan `required: true` en todos los ambientes.
 
-## Pendiente (#224–#225)
+## Pendiente (#225)
 
-- **#224:** hook `useFeatureFlags`, nav y rutas condicionales en el SPA.
 - **#225:** UI SuperAdmin `/superadmin/tenants/:id/modules` (depende de #137 panel multi-tenant).
 
 ## Relacionado

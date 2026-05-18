@@ -155,6 +155,24 @@ export const authAPI = {
   },
 }
 
+// ============ FEATURE FLAGS (TENANT) ============
+
+export type TenantFeaturesData = {
+  modules: string[]
+  integrations: string[]
+}
+
+export const featuresAPI = {
+  get: async (): Promise<TenantFeaturesData> => {
+    try {
+      const response = await api.get<{ success: boolean; data: TenantFeaturesData }>('/me/features')
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+}
+
 // ============ CLIENTES ============
 
 export type ClienteImportRowError = { row: number; message: string }

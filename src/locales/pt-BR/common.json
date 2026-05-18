@@ -135,6 +135,18 @@
   "errors": {
     "moduleNotEnabled": "O módulo «{{module}}» não está habilitado para sua empresa. Contate o administrador."
   },
+  "modules": {
+    "core_invoicing": "Faturamento base",
+    "core_clients": "Clientes",
+    "core_catalog": "Catálogo",
+    "billing_orders": "Pedidos",
+    "logistics_purchases": "Ordens de compra",
+    "logistics_dispatches": "Entregas",
+    "finance_collections": "Cobranças",
+    "analytics_dashboard": "Dashboard",
+    "admin_audit_log": "Log de auditoria",
+    "comms_chat": "Chat interno"
+  },
   "dashboard": {
     "title": "Resumo do dia",
     "ventasHoy": "Vendas de hoje",
