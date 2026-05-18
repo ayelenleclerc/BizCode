@@ -310,6 +310,13 @@ describe('API — contrato OpenAPI', () => {
     await assertMatchesOpenApi('/api/health', 'get', '200', res.body)
   })
 
+  it('GET /api/modules/catalog', async () => {
+    const app = createApp(prisma)
+    const res = await request(app).get('/api/modules/catalog').expect(200)
+    await assertMatchesOpenApi('/api/modules/catalog', 'get', '200', res.body)
+    expect(res.body.data.modules.length).toBeGreaterThanOrEqual(45)
+  })
+
   it('GET /api/clientes', async () => {
     const app = createApp(prisma)
     const res = await request(app).get('/api/clientes').expect(200)
