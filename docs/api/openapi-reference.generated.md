@@ -474,6 +474,131 @@ One-time endpoint to create initial tenant and owner user.
 }
 ```
 
+### Module catalog (feature flags metadata)
+
+- **Method:** `GET`
+- **Path:** `/api/modules/catalog`
+- **Tags:** modules
+
+Returns the full module catalog with dependency graph metadata, deployment environment, and business presets. Does not include tenant-specific enabled modules (see future `/api/me/features`).
+
+#### Responses
+
+##### Status: 200 Module catalog
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`deploymentEnv` (required)**
+
+    `string`, possible values: `"dev", "prod"`
+
+  - **`modules` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`canDeactivate` (required)**
+
+      `boolean`
+
+    - **`dependencies` (required)**
+
+      `array`
+
+      **Items:**
+
+      `string`
+
+    - **`key` (required)**
+
+      `string`
+
+    - **`label` (required)**
+
+      `string`
+
+    - **`plan` (required)**
+
+      `string`, possible values: `"starter", "pro", "enterprise"`
+
+    - **`price` (required)**
+
+      `number`
+
+    - **`required` (required)**
+
+      `boolean`
+
+    - **`requiredInProd` (required)**
+
+      `boolean`
+
+  - **`presets` (required)**
+
+    `object`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "deploymentEnv": "dev",
+    "modules": [
+      {
+        "key": "",
+        "label": "",
+        "required": true,
+        "requiredInProd": true,
+        "dependencies": [
+          ""
+        ],
+        "plan": "starter",
+        "price": 1,
+        "canDeactivate": true
+      }
+    ],
+    "presets": {
+      "additionalProperty": {
+        "modules": [
+          ""
+        ]
+      }
+    }
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ### PARAMETERS /api/clientes
 
 - **Method:** `PARAMETERS`
@@ -16661,6 +16786,262 @@ Requires `orders.dispatch` for transitions to `assigned`, `in_transit`, or `fail
   "success": true,
   "data": {
     "updated": 1
+  }
+}
+```
+
+### ModuleCatalogEntry
+
+- **Type:**`object`
+
+* **`canDeactivate` (required)**
+
+  `boolean`
+
+* **`dependencies` (required)**
+
+  `array`
+
+  **Items:**
+
+  `string`
+
+* **`key` (required)**
+
+  `string`
+
+* **`label` (required)**
+
+  `string`
+
+* **`plan` (required)**
+
+  `string`, possible values: `"starter", "pro", "enterprise"`
+
+* **`price` (required)**
+
+  `number`
+
+* **`required` (required)**
+
+  `boolean`
+
+* **`requiredInProd` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "key": "",
+  "label": "",
+  "required": true,
+  "requiredInProd": true,
+  "dependencies": [
+    ""
+  ],
+  "plan": "starter",
+  "price": 1,
+  "canDeactivate": true
+}
+```
+
+### ModuleCatalogPreset
+
+- **Type:**`object`
+
+* **`modules` (required)**
+
+  `array`
+
+  **Items:**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "modules": [
+    ""
+  ]
+}
+```
+
+### ModuleCatalogData
+
+- **Type:**`object`
+
+* **`deploymentEnv` (required)**
+
+  `string`, possible values: `"dev", "prod"`
+
+* **`modules` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`canDeactivate` (required)**
+
+    `boolean`
+
+  - **`dependencies` (required)**
+
+    `array`
+
+    **Items:**
+
+    `string`
+
+  - **`key` (required)**
+
+    `string`
+
+  - **`label` (required)**
+
+    `string`
+
+  - **`plan` (required)**
+
+    `string`, possible values: `"starter", "pro", "enterprise"`
+
+  - **`price` (required)**
+
+    `number`
+
+  - **`required` (required)**
+
+    `boolean`
+
+  - **`requiredInProd` (required)**
+
+    `boolean`
+
+* **`presets` (required)**
+
+  `object`
+
+**Example:**
+
+```json
+{
+  "deploymentEnv": "dev",
+  "modules": [
+    {
+      "key": "",
+      "label": "",
+      "required": true,
+      "requiredInProd": true,
+      "dependencies": [
+        ""
+      ],
+      "plan": "starter",
+      "price": 1,
+      "canDeactivate": true
+    }
+  ],
+  "presets": {
+    "additionalProperty": {
+      "modules": [
+        ""
+      ]
+    }
+  }
+}
+```
+
+### ModuleCatalogEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`deploymentEnv` (required)**
+
+    `string`, possible values: `"dev", "prod"`
+
+  - **`modules` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`canDeactivate` (required)**
+
+      `boolean`
+
+    - **`dependencies` (required)**
+
+      `array`
+
+      **Items:**
+
+      `string`
+
+    - **`key` (required)**
+
+      `string`
+
+    - **`label` (required)**
+
+      `string`
+
+    - **`plan` (required)**
+
+      `string`, possible values: `"starter", "pro", "enterprise"`
+
+    - **`price` (required)**
+
+      `number`
+
+    - **`required` (required)**
+
+      `boolean`
+
+    - **`requiredInProd` (required)**
+
+      `boolean`
+
+  - **`presets` (required)**
+
+    `object`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "deploymentEnv": "dev",
+    "modules": [
+      {
+        "key": "",
+        "label": "",
+        "required": true,
+        "requiredInProd": true,
+        "dependencies": [
+          ""
+        ],
+        "plan": "starter",
+        "price": 1,
+        "canDeactivate": true
+      }
+    ],
+    "presets": {
+      "additionalProperty": {
+        "modules": [
+          ""
+        ]
+      }
+    }
   }
 }
 ```
