@@ -5082,6 +5082,2035 @@ Requires `settings.business.manage`. Upserts by tenant and codigo.
 }
 ```
 
+### PARAMETERS /api/compras
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/compras`
+
+### List purchase orders
+
+- **Method:** `GET`
+- **Path:** `/api/compras`
+- **Tags:** compras
+
+#### Responses
+
+##### Status: 200 Paginated purchase orders
+
+###### Content-Type: application/json
+
+**All of:**
+
+- **`limit` (required)**
+
+  `integer` — Effective page size (same semantics as query \`limit\`)
+
+- **`offset` (required)**
+
+  `integer` — Effective skip (same semantics as query \`offset\`)
+
+- **`total` (required)**
+
+  `integer` — Row count matching the list filter (before limit/offset)
+
+* **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"draft", "sent", "received", "cancelled"`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`proveedorId` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`total` (required)**
+
+    `string`
+
+  - **`fechaEstimada`**
+
+    `string`, format: `date-time`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId` (required)**
+
+      `integer`
+
+    - **`cantidad` (required)**
+
+      `integer`
+
+    - **`cantidadRecibida` (required)**
+
+      `integer`
+
+    - **`costoUnitario` (required)**
+
+      `string`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`subtotal` (required)**
+
+      `string`
+
+    - **`articulo`**
+
+      `object`
+
+      - **`codigo`**
+
+        `integer`
+
+      - **`descripcion`**
+
+        `string`
+
+      - **`id`**
+
+        `integer`
+
+  - **`nota`**
+
+    `string`
+
+  - **`proveedor`**
+
+    `object`
+
+    - **`codigo`**
+
+      `integer`
+
+    - **`id`**
+
+      `integer`
+
+    - **`rsocial`**
+
+      `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "total": 0,
+  "limit": 1,
+  "offset": 0,
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "proveedorId": 1,
+      "estado": "draft",
+      "total": "",
+      "fechaEstimada": "",
+      "nota": "",
+      "proveedor": {
+        "id": 1,
+        "codigo": 1,
+        "rsocial": ""
+      },
+      "items": [
+        {
+          "id": 1,
+          "articuloId": 1,
+          "cantidad": 1,
+          "cantidadRecibida": 1,
+          "costoUnitario": "",
+          "subtotal": "",
+          "articulo": {
+            "id": 1,
+            "codigo": 1,
+            "descripcion": ""
+          }
+        }
+      ]
+    }
+  ]
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Create purchase order (draft)
+
+- **Method:** `POST`
+- **Path:** `/api/compras`
+- **Tags:** compras
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`items` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`cantidad` (required)**
+
+    `integer`
+
+  - **`costoUnitario` (required)**
+
+    `number`
+
+- **`proveedorId` (required)**
+
+  `integer`
+
+- **`fechaEstimada`**
+
+  `string`, format: `date`
+
+- **`nota`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "proveedorId": 1,
+  "fechaEstimada": "",
+  "nota": "",
+  "items": [
+    {
+      "articuloId": 1,
+      "cantidad": 1,
+      "costoUnitario": 0
+    }
+  ]
+}
+```
+
+#### Responses
+
+##### Status: 201 Purchase order created
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"draft", "sent", "received", "cancelled"`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`proveedorId` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`total` (required)**
+
+    `string`
+
+  - **`fechaEstimada`**
+
+    `string`, format: `date-time`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId` (required)**
+
+      `integer`
+
+    - **`cantidad` (required)**
+
+      `integer`
+
+    - **`cantidadRecibida` (required)**
+
+      `integer`
+
+    - **`costoUnitario` (required)**
+
+      `string`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`subtotal` (required)**
+
+      `string`
+
+    - **`articulo`**
+
+      `object`
+
+      - **`codigo`**
+
+        `integer`
+
+      - **`descripcion`**
+
+        `string`
+
+      - **`id`**
+
+        `integer`
+
+  - **`nota`**
+
+    `string`
+
+  - **`proveedor`**
+
+    `object`
+
+    - **`codigo`**
+
+      `integer`
+
+    - **`id`**
+
+      `integer`
+
+    - **`rsocial`**
+
+      `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "proveedorId": 1,
+    "estado": "draft",
+    "total": "",
+    "fechaEstimada": "",
+    "nota": "",
+    "proveedor": {
+      "id": 1,
+      "codigo": 1,
+      "rsocial": ""
+    },
+    "items": [
+      {
+        "id": 1,
+        "articuloId": 1,
+        "cantidad": 1,
+        "cantidadRecibida": 1,
+        "costoUnitario": "",
+        "subtotal": "",
+        "articulo": {
+          "id": 1,
+          "codigo": 1,
+          "descripcion": ""
+        }
+      }
+    ]
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Supplier not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 422 Invalid article line
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/compras/{id}
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/compras/{id}`
+
+### Get purchase order by id
+
+- **Method:** `GET`
+- **Path:** `/api/compras/{id}`
+- **Tags:** compras
+
+#### Responses
+
+##### Status: 200 Purchase order detail
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"draft", "sent", "received", "cancelled"`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`proveedorId` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`total` (required)**
+
+    `string`
+
+  - **`fechaEstimada`**
+
+    `string`, format: `date-time`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId` (required)**
+
+      `integer`
+
+    - **`cantidad` (required)**
+
+      `integer`
+
+    - **`cantidadRecibida` (required)**
+
+      `integer`
+
+    - **`costoUnitario` (required)**
+
+      `string`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`subtotal` (required)**
+
+      `string`
+
+    - **`articulo`**
+
+      `object`
+
+      - **`codigo`**
+
+        `integer`
+
+      - **`descripcion`**
+
+        `string`
+
+      - **`id`**
+
+        `integer`
+
+  - **`nota`**
+
+    `string`
+
+  - **`proveedor`**
+
+    `object`
+
+    - **`codigo`**
+
+      `integer`
+
+    - **`id`**
+
+      `integer`
+
+    - **`rsocial`**
+
+      `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "proveedorId": 1,
+    "estado": "draft",
+    "total": "",
+    "fechaEstimada": "",
+    "nota": "",
+    "proveedor": {
+      "id": 1,
+      "codigo": 1,
+      "rsocial": ""
+    },
+    "items": [
+      {
+        "id": 1,
+        "articuloId": 1,
+        "cantidad": 1,
+        "cantidadRecibida": 1,
+        "costoUnitario": "",
+        "subtotal": "",
+        "articulo": {
+          "id": 1,
+          "codigo": 1,
+          "descripcion": ""
+        }
+      }
+    ]
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Update draft purchase order
+
+- **Method:** `PUT`
+- **Path:** `/api/compras/{id}`
+- **Tags:** compras
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`fechaEstimada`**
+
+  `string`, format: `date`
+
+- **`items`**
+
+  `array`
+
+  **Items:**
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`cantidad` (required)**
+
+    `integer`
+
+  - **`costoUnitario` (required)**
+
+    `number`
+
+- **`nota`**
+
+  `string`
+
+- **`proveedorId`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "proveedorId": 1,
+  "fechaEstimada": "",
+  "nota": "",
+  "items": [
+    {
+      "articuloId": 1,
+      "cantidad": 1,
+      "costoUnitario": 0
+    }
+  ]
+}
+```
+
+#### Responses
+
+##### Status: 200 Updated
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"draft", "sent", "received", "cancelled"`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`proveedorId` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`total` (required)**
+
+    `string`
+
+  - **`fechaEstimada`**
+
+    `string`, format: `date-time`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId` (required)**
+
+      `integer`
+
+    - **`cantidad` (required)**
+
+      `integer`
+
+    - **`cantidadRecibida` (required)**
+
+      `integer`
+
+    - **`costoUnitario` (required)**
+
+      `string`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`subtotal` (required)**
+
+      `string`
+
+    - **`articulo`**
+
+      `object`
+
+      - **`codigo`**
+
+        `integer`
+
+      - **`descripcion`**
+
+        `string`
+
+      - **`id`**
+
+        `integer`
+
+  - **`nota`**
+
+    `string`
+
+  - **`proveedor`**
+
+    `object`
+
+    - **`codigo`**
+
+      `integer`
+
+    - **`id`**
+
+      `integer`
+
+    - **`rsocial`**
+
+      `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "proveedorId": 1,
+    "estado": "draft",
+    "total": "",
+    "fechaEstimada": "",
+    "nota": "",
+    "proveedor": {
+      "id": 1,
+      "codigo": 1,
+      "rsocial": ""
+    },
+    "items": [
+      {
+        "id": 1,
+        "articuloId": 1,
+        "cantidad": 1,
+        "cantidadRecibida": 1,
+        "costoUnitario": "",
+        "subtotal": "",
+        "articulo": {
+          "id": 1,
+          "codigo": 1,
+          "descripcion": ""
+        }
+      }
+    ]
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 422 Not editable or invalid lines
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/compras/{id}/send
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/compras/{id}/send`
+
+### Mark purchase order as sent
+
+- **Method:** `POST`
+- **Path:** `/api/compras/{id}/send`
+- **Tags:** compras
+
+#### Responses
+
+##### Status: 200 Sent
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"draft", "sent", "received", "cancelled"`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`proveedorId` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`total` (required)**
+
+    `string`
+
+  - **`fechaEstimada`**
+
+    `string`, format: `date-time`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId` (required)**
+
+      `integer`
+
+    - **`cantidad` (required)**
+
+      `integer`
+
+    - **`cantidadRecibida` (required)**
+
+      `integer`
+
+    - **`costoUnitario` (required)**
+
+      `string`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`subtotal` (required)**
+
+      `string`
+
+    - **`articulo`**
+
+      `object`
+
+      - **`codigo`**
+
+        `integer`
+
+      - **`descripcion`**
+
+        `string`
+
+      - **`id`**
+
+        `integer`
+
+  - **`nota`**
+
+    `string`
+
+  - **`proveedor`**
+
+    `object`
+
+    - **`codigo`**
+
+      `integer`
+
+    - **`id`**
+
+      `integer`
+
+    - **`rsocial`**
+
+      `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "proveedorId": 1,
+    "estado": "draft",
+    "total": "",
+    "fechaEstimada": "",
+    "nota": "",
+    "proveedor": {
+      "id": 1,
+      "codigo": 1,
+      "rsocial": ""
+    },
+    "items": [
+      {
+        "id": 1,
+        "articuloId": 1,
+        "cantidad": 1,
+        "cantidadRecibida": 1,
+        "costoUnitario": "",
+        "subtotal": "",
+        "articulo": {
+          "id": 1,
+          "codigo": 1,
+          "descripcion": ""
+        }
+      }
+    ]
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 422 Invalid state
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/compras/{id}/cancel
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/compras/{id}/cancel`
+
+### Cancel purchase order
+
+- **Method:** `POST`
+- **Path:** `/api/compras/{id}/cancel`
+- **Tags:** compras
+
+#### Responses
+
+##### Status: 200 Cancelled
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"draft", "sent", "received", "cancelled"`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`proveedorId` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`total` (required)**
+
+    `string`
+
+  - **`fechaEstimada`**
+
+    `string`, format: `date-time`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId` (required)**
+
+      `integer`
+
+    - **`cantidad` (required)**
+
+      `integer`
+
+    - **`cantidadRecibida` (required)**
+
+      `integer`
+
+    - **`costoUnitario` (required)**
+
+      `string`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`subtotal` (required)**
+
+      `string`
+
+    - **`articulo`**
+
+      `object`
+
+      - **`codigo`**
+
+        `integer`
+
+      - **`descripcion`**
+
+        `string`
+
+      - **`id`**
+
+        `integer`
+
+  - **`nota`**
+
+    `string`
+
+  - **`proveedor`**
+
+    `object`
+
+    - **`codigo`**
+
+      `integer`
+
+    - **`id`**
+
+      `integer`
+
+    - **`rsocial`**
+
+      `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "proveedorId": 1,
+    "estado": "draft",
+    "total": "",
+    "fechaEstimada": "",
+    "nota": "",
+    "proveedor": {
+      "id": 1,
+      "codigo": 1,
+      "rsocial": ""
+    },
+    "items": [
+      {
+        "id": 1,
+        "articuloId": 1,
+        "cantidad": 1,
+        "cantidadRecibida": 1,
+        "costoUnitario": "",
+        "subtotal": "",
+        "articulo": {
+          "id": 1,
+          "codigo": 1,
+          "descripcion": ""
+        }
+      }
+    ]
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 422 Invalid state
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/compras/{id}/receive
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/compras/{id}/receive`
+
+### Receive goods (partial allowed)
+
+- **Method:** `POST`
+- **Path:** `/api/compras/{id}/receive`
+- **Tags:** compras
+
+Requires `suppliers.manage` and `inventory.adjust`. Creates `StockAjuste` rows with motivo `compra` per line in a single transaction.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`lines` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`cantidad` (required)**
+
+    `integer`
+
+  - **`itemId` (required)**
+
+    `integer`
+
+**Example:**
+
+```json
+{
+  "lines": [
+    {
+      "itemId": 1,
+      "cantidad": 1
+    }
+  ]
+}
+```
+
+#### Responses
+
+##### Status: 200 Received (full or partial)
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"draft", "sent", "received", "cancelled"`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`proveedorId` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`total` (required)**
+
+    `string`
+
+  - **`fechaEstimada`**
+
+    `string`, format: `date-time`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId` (required)**
+
+      `integer`
+
+    - **`cantidad` (required)**
+
+      `integer`
+
+    - **`cantidadRecibida` (required)**
+
+      `integer`
+
+    - **`costoUnitario` (required)**
+
+      `string`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`subtotal` (required)**
+
+      `string`
+
+    - **`articulo`**
+
+      `object`
+
+      - **`codigo`**
+
+        `integer`
+
+      - **`descripcion`**
+
+        `string`
+
+      - **`id`**
+
+        `integer`
+
+  - **`nota`**
+
+    `string`
+
+  - **`proveedor`**
+
+    `object`
+
+    - **`codigo`**
+
+      `integer`
+
+    - **`id`**
+
+      `integer`
+
+    - **`rsocial`**
+
+      `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "proveedorId": 1,
+    "estado": "draft",
+    "total": "",
+    "fechaEstimada": "",
+    "nota": "",
+    "proveedor": {
+      "id": 1,
+      "codigo": 1,
+      "rsocial": ""
+    },
+    "items": [
+      {
+        "id": 1,
+        "articuloId": 1,
+        "cantidad": 1,
+        "cantidadRecibida": 1,
+        "costoUnitario": "",
+        "subtotal": "",
+        "articulo": {
+          "id": 1,
+          "codigo": 1,
+          "descripcion": ""
+        }
+      }
+    ]
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 422 Not receivable or quantity exceeds pending
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ### PARAMETERS /api/facturas
 
 - **Method:** `PARAMETERS`
@@ -17516,6 +19545,500 @@ Requires `orders.dispatch` for transitions to `assigned`, `in_transit`, or `fail
 - **Type:**
 
 **Example:**
+
+### OrdenCompraItemLine
+
+- **Type:**`object`
+
+* **`articuloId` (required)**
+
+  `integer`
+
+* **`cantidad` (required)**
+
+  `integer`
+
+* **`cantidadRecibida` (required)**
+
+  `integer`
+
+* **`costoUnitario` (required)**
+
+  `string`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`subtotal` (required)**
+
+  `string`
+
+* **`articulo`**
+
+  `object`
+
+  - **`codigo`**
+
+    `integer`
+
+  - **`descripcion`**
+
+    `string`
+
+  - **`id`**
+
+    `integer`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "articuloId": 1,
+  "cantidad": 1,
+  "cantidadRecibida": 1,
+  "costoUnitario": "",
+  "subtotal": "",
+  "articulo": {
+    "id": 1,
+    "codigo": 1,
+    "descripcion": ""
+  }
+}
+```
+
+### OrdenCompra
+
+- **Type:**`object`
+
+* **`estado` (required)**
+
+  `string`, possible values: `"draft", "sent", "received", "cancelled"`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`proveedorId` (required)**
+
+  `integer`
+
+* **`tenantId` (required)**
+
+  `integer`
+
+* **`total` (required)**
+
+  `string`
+
+* **`fechaEstimada`**
+
+  `string`, format: `date-time`
+
+* **`items`**
+
+  `array`
+
+  **Items:**
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`cantidad` (required)**
+
+    `integer`
+
+  - **`cantidadRecibida` (required)**
+
+    `integer`
+
+  - **`costoUnitario` (required)**
+
+    `string`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`subtotal` (required)**
+
+    `string`
+
+  - **`articulo`**
+
+    `object`
+
+    - **`codigo`**
+
+      `integer`
+
+    - **`descripcion`**
+
+      `string`
+
+    - **`id`**
+
+      `integer`
+
+* **`nota`**
+
+  `string`
+
+* **`proveedor`**
+
+  `object`
+
+  - **`codigo`**
+
+    `integer`
+
+  - **`id`**
+
+    `integer`
+
+  - **`rsocial`**
+
+    `string`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "tenantId": 1,
+  "proveedorId": 1,
+  "estado": "draft",
+  "total": "",
+  "fechaEstimada": "",
+  "nota": "",
+  "proveedor": {
+    "id": 1,
+    "codigo": 1,
+    "rsocial": ""
+  },
+  "items": [
+    {
+      "id": 1,
+      "articuloId": 1,
+      "cantidad": 1,
+      "cantidadRecibida": 1,
+      "costoUnitario": "",
+      "subtotal": "",
+      "articulo": {
+        "id": 1,
+        "codigo": 1,
+        "descripcion": ""
+      }
+    }
+  ]
+}
+```
+
+### OrdenCompraListEnvelope
+
+- **Type:**
+
+**Example:**
+
+### OrdenCompraEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"draft", "sent", "received", "cancelled"`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`proveedorId` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`total` (required)**
+
+    `string`
+
+  - **`fechaEstimada`**
+
+    `string`, format: `date-time`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId` (required)**
+
+      `integer`
+
+    - **`cantidad` (required)**
+
+      `integer`
+
+    - **`cantidadRecibida` (required)**
+
+      `integer`
+
+    - **`costoUnitario` (required)**
+
+      `string`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`subtotal` (required)**
+
+      `string`
+
+    - **`articulo`**
+
+      `object`
+
+      - **`codigo`**
+
+        `integer`
+
+      - **`descripcion`**
+
+        `string`
+
+      - **`id`**
+
+        `integer`
+
+  - **`nota`**
+
+    `string`
+
+  - **`proveedor`**
+
+    `object`
+
+    - **`codigo`**
+
+      `integer`
+
+    - **`id`**
+
+      `integer`
+
+    - **`rsocial`**
+
+      `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "proveedorId": 1,
+    "estado": "draft",
+    "total": "",
+    "fechaEstimada": "",
+    "nota": "",
+    "proveedor": {
+      "id": 1,
+      "codigo": 1,
+      "rsocial": ""
+    },
+    "items": [
+      {
+        "id": 1,
+        "articuloId": 1,
+        "cantidad": 1,
+        "cantidadRecibida": 1,
+        "costoUnitario": "",
+        "subtotal": "",
+        "articulo": {
+          "id": 1,
+          "codigo": 1,
+          "descripcion": ""
+        }
+      }
+    ]
+  }
+}
+```
+
+### OrdenCompraItemInput
+
+- **Type:**`object`
+
+* **`articuloId` (required)**
+
+  `integer`
+
+* **`cantidad` (required)**
+
+  `integer`
+
+* **`costoUnitario` (required)**
+
+  `number`
+
+**Example:**
+
+```json
+{
+  "articuloId": 1,
+  "cantidad": 1,
+  "costoUnitario": 0
+}
+```
+
+### OrdenCompraCreateInput
+
+- **Type:**`object`
+
+* **`items` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`cantidad` (required)**
+
+    `integer`
+
+  - **`costoUnitario` (required)**
+
+    `number`
+
+* **`proveedorId` (required)**
+
+  `integer`
+
+* **`fechaEstimada`**
+
+  `string`, format: `date`
+
+* **`nota`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "proveedorId": 1,
+  "fechaEstimada": "",
+  "nota": "",
+  "items": [
+    {
+      "articuloId": 1,
+      "cantidad": 1,
+      "costoUnitario": 0
+    }
+  ]
+}
+```
+
+### OrdenCompraUpdateInput
+
+- **Type:**`object`
+
+* **`fechaEstimada`**
+
+  `string`, format: `date`
+
+* **`items`**
+
+  `array`
+
+  **Items:**
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`cantidad` (required)**
+
+    `integer`
+
+  - **`costoUnitario` (required)**
+
+    `number`
+
+* **`nota`**
+
+  `string`
+
+* **`proveedorId`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "proveedorId": 1,
+  "fechaEstimada": "",
+  "nota": "",
+  "items": [
+    {
+      "articuloId": 1,
+      "cantidad": 1,
+      "costoUnitario": 0
+    }
+  ]
+}
+```
+
+### OrdenCompraReceiveInput
+
+- **Type:**`object`
+
+* **`lines` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`cantidad` (required)**
+
+    `integer`
+
+  - **`itemId` (required)**
+
+    `integer`
+
+**Example:**
+
+```json
+{
+  "lines": [
+    {
+      "itemId": 1,
+      "cantidad": 1
+    }
+  ]
+}
+```
 
 ### ProveedorEnvelope
 

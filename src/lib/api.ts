@@ -384,6 +384,94 @@ export const rubrosAPI = {
 
 // ============ PROVEEDORES ============
 
+export type OrdenCompraItemRow = {
+  id: number
+  articuloId: number
+  cantidad: number
+  cantidadRecibida: number
+  costoUnitario: string
+  subtotal: string
+  articulo?: { id: number; codigo: number; descripcion: string }
+}
+
+export type OrdenCompra = {
+  id: number
+  proveedorId: number
+  estado: string
+  total: string
+  fechaEstimada?: string | null
+  nota?: string | null
+  proveedor?: { id: number; codigo: number; rsocial: string }
+  items: OrdenCompraItemRow[]
+}
+
+export const comprasAPI = {
+  list: async (params?: { estado?: string; proveedorId?: number; limit?: number; offset?: number }) => {
+    try {
+      const response = await api.get('/compras', { params })
+      return response.data as {
+        success: true
+        data: OrdenCompra[]
+        total: number
+        limit: number
+        offset: number
+      }
+    } catch (error) {
+      handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  get: async (id: number) => {
+    try {
+      const response = await api.get(`/compras/${id}`)
+      return response.data.data as OrdenCompra
+    } catch (error) {
+      handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  create: async (body: {
+    proveedorId: number
+    fechaEstimada?: string | null
+    nota?: string | null
+    items: { articuloId: number; cantidad: number; costoUnitario: number }[]
+  }) => {
+    try {
+      const response = await api.post('/compras', body)
+      return response.data.data as OrdenCompra
+    } catch (error) {
+      handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  send: async (id: number) => {
+    try {
+      const response = await api.post(`/compras/${id}/send`)
+      return response.data.data as OrdenCompra
+    } catch (error) {
+      handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  cancel: async (id: number) => {
+    try {
+      const response = await api.post(`/compras/${id}/cancel`)
+      return response.data.data as OrdenCompra
+    } catch (error) {
+      handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  receive: async (id: number, lines: { itemId: number; cantidad: number }[]) => {
+    try {
+      const response = await api.post(`/compras/${id}/receive`, { lines })
+      return response.data.data as OrdenCompra
+    } catch (error) {
+      handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+}
+
 export const proveedoresAPI = {
   list: async (filtro?: string) => {
     try {

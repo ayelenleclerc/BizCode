@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "fechaEstimada": {
+      "format": "date",
+      "nullable": true,
+      "type": "string"
+    },
+    "items": {
+      "items": {
+        "$ref": "./OrdenCompraItemInput.schema.json"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "nota": {
+      "maxLength": 200,
+      "nullable": true,
+      "type": "string"
+    },
+    "proveedorId": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "proveedorId",
+    "items"
+  ],
+  "title": "OrdenCompraCreateInput",
+  "type": "object"
+}

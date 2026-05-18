@@ -119,6 +119,33 @@ export type StockAjusteInput = {
   motivo: string
 }
 
+export type OrdenCompraEstado = 'draft' | 'sent' | 'received' | 'cancelled'
+
+export type OrdenCompraItemInput = {
+  articuloId: number
+  cantidad: number
+  costoUnitario: number
+}
+
+export type OrdenCompraCreateInput = {
+  proveedorId: number
+  fechaEstimada?: string | null
+  nota?: string | null
+  items: OrdenCompraItemInput[]
+}
+
+export type OrdenCompraUpdateInput = {
+  proveedorId?: number
+  fechaEstimada?: string | null
+  nota?: string | null
+  items?: OrdenCompraItemInput[]
+}
+
+export type OrdenCompraReceiveLineInput = {
+  itemId: number
+  cantidad: number
+}
+
 export type EmpresaInput = {
   nombre: string
   cuit: string

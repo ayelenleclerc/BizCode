@@ -1,0 +1,43 @@
+{
+  "title": "Purchase orders",
+  "subtitle": "Supplier orders and stock receipt",
+  "noAccess": "You do not have permission to view purchase orders.",
+  "empty": "No purchase orders.",
+  "filterEstado": "Status",
+  "filterAll": "All",
+  "estado": {
+    "draft": "Draft",
+    "sent": "Sent",
+    "received": "Received",
+    "cancelled": "Cancelled"
+  },
+  "columns": {
+    "id": "No.",
+    "proveedor": "Supplier",
+    "total": "Total",
+    "estado": "Status",
+    "actions": "Actions"
+  },
+  "actions": {
+    "new": "New order",
+    "send": "Send",
+    "cancel": "Cancel",
+    "receive": "Receive",
+    "save": "Save",
+    "close": "Close"
+  },
+  "form": {
+    "title": "New purchase order",
+    "proveedorId": "Supplier ID",
+    "articuloId": "Product ID",
+    "cantidad": "Quantity",
+    "costoUnitario": "Unit cost",
+    "nota": "Note"
+  },
+  "receive": {
+    "title": "Partial or full receipt",
+    "item": "Line",
+    "pending": "Pending",
+    "cantidad": "Quantity to receive"
+  }
+}

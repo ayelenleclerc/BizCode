@@ -26,6 +26,11 @@ Evidencia automática equivalente en `tests/server/http-mutations-audit-coverage
 | DELETE | `/api/pedidos/:id` | `pedido_cancel` | soft cancel → `cancelled` |
 | POST | `/api/zonas-entrega` | `delivery_zone_create` | código HTTP esperado por contrato/ruta puede ser **201** |
 | PUT | `/api/zonas-entrega/:id` | `delivery_zone_update` | `resourceId` del path |
+| POST | `/api/compras` | `orden_compra_create` | `resource: orden_compra` |
+| PUT | `/api/compras/:id` | `orden_compra_update` | `resourceId` del path |
+| POST | `/api/compras/:id/send` | `orden_compra_send` | `resourceId` del path |
+| POST | `/api/compras/:id/cancel` | `orden_compra_cancel` | `resourceId` del path |
+| POST | `/api/compras/:id/receive` | `orden_compra_receive` | `resourceId` del path; `StockAjuste` motivo `compra` |
 | POST | `/api/cobranzas/recordatorios` | `cobranza_recordatorio_send` | `resource: factura`, `resourceId` = `facturaId` del body |
 
 ## Consulta del registro de auditoría (#67)

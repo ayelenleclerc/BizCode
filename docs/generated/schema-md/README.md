@@ -174,6 +174,22 @@
 
 * [NotificationReadAllEnvelope](./notificationreadallenvelope.md) – `-`
 
+* [OrdenCompra](./ordencompra.md) – `-`
+
+* [OrdenCompraCreateInput](./ordencompracreateinput.md) – `-`
+
+* [OrdenCompraEnvelope](./ordencompraenvelope.md) – `-`
+
+* [OrdenCompraItemInput](./ordencompraiteminput.md) – `-`
+
+* [OrdenCompraItemLine](./ordencompraitemline.md) – `-`
+
+* [OrdenCompraListEnvelope](./ordencompralistenvelope.md) – `-`
+
+* [OrdenCompraReceiveInput](./ordencomprareceiveinput.md) – `-`
+
+* [OrdenCompraUpdateInput](./ordencompraupdateinput.md) – `-`
+
 * [OrdenEntrega](./ordenentrega.md) – `-`
 
 * [OrdenEntregaCreateInput](./ordenentregacreateinput.md) – `-`
@@ -296,6 +312,14 @@
 
 * [Untitled object in NotificationReadAllEnvelope](./notificationreadallenvelope-properties-data.md) – `undefined#/properties/data`
 
+* [Untitled object in OrdenCompra](./ordencompra-properties-proveedor.md) – `undefined#/properties/proveedor`
+
+* [Untitled object in OrdenCompraItemLine](./ordencompraitemline-properties-articulo.md) – `undefined#/properties/articulo`
+
+* [Untitled object in OrdenCompraListEnvelope](./ordencompralistenvelope-allof-1.md) – `undefined#/allOf/1`
+
+* [Untitled object in OrdenCompraReceiveInput](./ordencomprareceiveinput-properties-lines-items.md) – `undefined#/properties/lines/items`
+
 * [Untitled object in OrdenEntrega](./ordenentrega-properties-cliente.md) – `undefined#/properties/cliente`
 
 * [Untitled object in OrdenEntrega](./ordenentrega-properties-driver.md) – `undefined#/properties/driver`
@@ -393,6 +417,16 @@
 * [Untitled array in ModuleCatalogPreset](./modulecatalogpreset-properties-modules.md) – `undefined#/properties/modules`
 
 * [Untitled array in NotificationListEnvelope](./notificationlistenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled array in OrdenCompra](./ordencompra-properties-items.md) – `undefined#/properties/items`
+
+* [Untitled array in OrdenCompraCreateInput](./ordencompracreateinput-properties-items.md) – `undefined#/properties/items`
+
+* [Untitled array in OrdenCompraListEnvelope](./ordencompralistenvelope-allof-1-properties-data.md) – `undefined#/allOf/1/properties/data`
+
+* [Untitled array in OrdenCompraReceiveInput](./ordencomprareceiveinput-properties-lines.md) – `undefined#/properties/lines`
+
+* [Untitled array in OrdenCompraUpdateInput](./ordencompraupdateinput-properties-items.md) – `undefined#/properties/items`
 
 * [Untitled array in OrdenEntregaListEnvelope](./ordenentregalistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
 

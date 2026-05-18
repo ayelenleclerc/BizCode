@@ -30,6 +30,8 @@ tags:
     description: Product categories
   - name: proveedores
     description: Suppliers (master data and CSV import)
+  - name: compras
+    description: Purchase orders to suppliers (#135)
   - name: facturas
     description: Invoice management
   - name: afip
@@ -928,6 +930,281 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         '403':
           $ref: '#/components/responses/ForbiddenError'
+
+  /api/compras:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [compras]
+      summary: List purchase orders
+      parameters:
+        - $ref: '#/components/parameters/ListLimit'
+        - $ref: '#/components/parameters/ListOffset'
+        - name: estado
+          in: query
+          schema:
+            type: string
+            enum: [draft, sent, received, cancelled]
+        - name: proveedorId
+          in: query
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Paginated purchase orders
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrdenCompraListEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    post:
+      tags: [compras]
+      summary: Create purchase order (draft)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrdenCompraCreateInput'
+      responses:
+        '201':
+          description: Purchase order created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrdenCompraEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Supplier not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '422':
+          description: Invalid article line
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/compras/{id}:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [compras]
+      summary: Get purchase order by id
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Purchase order detail
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrdenCompraEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    put:
+      tags: [compras]
+      summary: Update draft purchase order
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrdenCompraUpdateInput'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrdenCompraEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '422':
+          description: Not editable or invalid lines
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/compras/{id}/send:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    post:
+      tags: [compras]
+      summary: Mark purchase order as sent
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Sent
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrdenCompraEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '422':
+          description: Invalid state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/compras/{id}/cancel:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    post:
+      tags: [compras]
+      summary: Cancel purchase order
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Cancelled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrdenCompraEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '422':
+          description: Invalid state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/compras/{id}/receive:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    post:
+      tags: [compras]
+      summary: Receive goods (partial allowed)
+      description: |
+        Requires `suppliers.manage` and `inventory.adjust`. Creates `StockAjuste` rows
+        with motivo `compra` per line in a single transaction.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrdenCompraReceiveInput'
+      responses:
+        '200':
+          description: Received (full or partial)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrdenCompraEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '422':
+          description: Not receivable or quantity exceeds pending
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
 
   /api/facturas:
     parameters:
@@ -3633,6 +3910,161 @@ components:
               items:
                 $ref: '#/components/schemas/Proveedor'
         - $ref: '#/components/schemas/ListPaginationMeta'
+
+    OrdenCompraItemLine:
+      type: object
+      required: [id, articuloId, cantidad, cantidadRecibida, costoUnitario, subtotal]
+      properties:
+        id:
+          type: integer
+        articuloId:
+          type: integer
+        cantidad:
+          type: integer
+        cantidadRecibida:
+          type: integer
+        costoUnitario:
+          type: string
+        subtotal:
+          type: string
+        articulo:
+          type: object
+          properties:
+            id:
+              type: integer
+            codigo:
+              type: integer
+            descripcion:
+              type: string
+
+    OrdenCompra:
+      type: object
+      required: [id, tenantId, proveedorId, estado, total]
+      properties:
+        id:
+          type: integer
+        tenantId:
+          type: integer
+        proveedorId:
+          type: integer
+        estado:
+          type: string
+          enum: [draft, sent, received, cancelled]
+        total:
+          type: string
+        fechaEstimada:
+          type: string
+          format: date-time
+          nullable: true
+        nota:
+          type: string
+          nullable: true
+        proveedor:
+          type: object
+          properties:
+            id:
+              type: integer
+            codigo:
+              type: integer
+            rsocial:
+              type: string
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrdenCompraItemLine'
+
+    OrdenCompraListEnvelope:
+      allOf:
+        - $ref: '#/components/schemas/ListPaginationMeta'
+        - type: object
+          required: [success, data]
+          properties:
+            success:
+              type: boolean
+              const: true
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/OrdenCompra'
+
+    OrdenCompraEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/OrdenCompra'
+
+    OrdenCompraItemInput:
+      type: object
+      required: [articuloId, cantidad, costoUnitario]
+      properties:
+        articuloId:
+          type: integer
+        cantidad:
+          type: integer
+          minimum: 1
+        costoUnitario:
+          type: number
+          minimum: 0
+
+    OrdenCompraCreateInput:
+      type: object
+      required: [proveedorId, items]
+      properties:
+        proveedorId:
+          type: integer
+        fechaEstimada:
+          type: string
+          format: date
+          nullable: true
+        nota:
+          type: string
+          maxLength: 200
+          nullable: true
+        items:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/OrdenCompraItemInput'
+
+    OrdenCompraUpdateInput:
+      type: object
+      properties:
+        proveedorId:
+          type: integer
+        fechaEstimada:
+          type: string
+          format: date
+          nullable: true
+        nota:
+          type: string
+          maxLength: 200
+          nullable: true
+        items:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/OrdenCompraItemInput'
+
+    OrdenCompraReceiveInput:
+      type: object
+      required: [lines]
+      properties:
+        lines:
+          type: array
+          minItems: 1
+          items:
+            type: object
+            required: [itemId, cantidad]
+            properties:
+              itemId:
+                type: integer
+              cantidad:
+                type: integer
+                minimum: 1
 
     ProveedorEnvelope:
       type: object
