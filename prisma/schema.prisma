@@ -176,6 +176,18 @@ model Cobro {
   @@index([tenantId, fecha])
 }
 
+model CobroRecordatorio {
+  id        Int      @id @default(autoincrement())
+  tenantId  Int
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+  facturaId Int
+  factura   Factura  @relation(fields: [facturaId], references: [id])
+  canal     String   @db.VarChar(20)
+  enviadoAt DateTime @default(now())
+
+  @@index([tenantId, facturaId, enviadoAt])
+}
+
 model Factura {
   id        Int       @id @default(autoincrement())
   tenantId  Int
@@ -201,6 +213,7 @@ model Factura {
 
   items          FacturaItem[]
   ordenesEntrega OrdenEntrega[]
+  recordatorios  CobroRecordatorio[]
 
   @@unique([tenantId, tipo, prefijo, numero])
   @@index([tenantId])
@@ -234,6 +247,7 @@ model ParamEmpresa {
   puntoVenta  Int     @default(1)
   tipoFactura String  @db.VarChar(1) @default("B")
   logoUrl     String? @db.VarChar(255)
+  recordatorioDiasGracia Int @default(0)
 }
 
 model Tenant {
@@ -255,6 +269,7 @@ model Tenant {
   proveedores    Proveedor[]
   facturas       Factura[]
   cobros         Cobro[]
+  cobroRecordatorios CobroRecordatorio[]
   ordenesEntrega OrdenEntrega[]
   paramEmpresa   ParamEmpresa?
   stockAjustes   StockAjuste[]

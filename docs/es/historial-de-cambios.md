@@ -16,6 +16,8 @@ Versionado: [Semantic Versioning](https://semver.org/lang/es/).
 
 ### Agregado
 
+- **Recordatorios de mora (GitHub #134):** modelo `CobroRecordatorio`; `ParamEmpresa.recordatorioDiasGracia`; `GET /api/cobranzas/vencidas` y `POST /api/cobranzas/recordatorios` (`reports.financial.read`); `CobranzasService` + job `npm run cobranzas:recordatorios`; sección en `/finanzas`; auditoría `cobranza_recordatorio_send`; i18n EN/ES/PT-BR.
+
 - **Migración DBF catálogo (GitHub #131):** parsers `legacyRubroDbf.ts` / `legacyArticuloDbf.ts`; `POST /api/rubros/migrate-dbf` y `POST /api/articulos/migrate-dbf` (`settings.business.manage`, upsert por código); `npm run migrate:dbf` importa `RUBROS.DBF` / `ARTICULOS.DBF` si existen (fallback `PVAR2`/`PVAR`); fixtures y pruebas de integración.
 
 - **Ajustes de stock (GitHub #128):** modelo `StockAjuste` y migración; `POST /api/articulos/:id/stock-ajuste` (`inventory.adjust`) y `GET /api/articulos/:id/stock-historial`; al crear factura se decrementa stock y se notifica `stock_below_minimum`; auditoría `stock_adjust`; i18n EN/ES/PT-BR.

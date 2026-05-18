@@ -590,6 +590,35 @@ export type ReportesPeriodParams = {
   agrupar?: 'dia' | 'semana' | 'mes'
 }
 
+export type FacturaVencidaRow = {
+  facturaId: number
+  clienteId: number
+  rsocial: string
+  total: string
+  fecha: string
+  diasMora: number
+}
+
+export const cobranzasAPI = {
+  listVencidas: async () => {
+    try {
+      const response = await api.get('/cobranzas/vencidas')
+      return response.data.data as FacturaVencidaRow[]
+    } catch (error) {
+      handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  sendRecordatorio: async (facturaId: number, canal = 'email') => {
+    try {
+      const response = await api.post('/cobranzas/recordatorios', { facturaId, canal })
+      return response.data.data as { id: number }
+    } catch (error) {
+      handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+}
+
 export const reportesAPI = {
   aging: async () => {
     try {

@@ -72,7 +72,13 @@
 
 * [ClienteNullableEnvelope](./clientenullableenvelope.md) – `-`
 
+* [CobranzaRecordatorioEnvelope](./cobranzarecordatorioenvelope.md) – `-`
+
+* [CobranzaRecordatorioInput](./cobranzarecordatorioinput.md) – `-`
+
 * [CobranzasPorFormaPago](./cobranzasporformapago.md) – `-`
+
+* [CobranzasVencidasEnvelope](./cobranzasvencidasenvelope.md) – `-`
 
 * [Cobro](./cobro.md) – `-`
 
@@ -121,6 +127,8 @@
 * [FacturaItem](./facturaitem.md) – `-`
 
 * [FacturaListEnvelope](./facturalistenvelope.md) – `-`
+
+* [FacturaVencidaRow](./facturavencidarow.md) – `-`
 
 * [FormaPago](./formapago.md) – `-`
 
@@ -234,6 +242,8 @@
 
 * [Untitled object in ClienteListEnvelope](./clientelistenvelope-allof-0.md) – `undefined#/allOf/0`
 
+* [Untitled object in CobranzaRecordatorioEnvelope](./cobranzarecordatorioenvelope-properties-data.md) – `undefined#/properties/data`
+
 * [Untitled object in Cobro](./cobro-properties-cliente.md) – `undefined#/properties/cliente`
 
 * [Untitled object in CobroCreateData](./cobrocreatedata-properties-updatedcliente.md) – `undefined#/properties/updatedCliente`
@@ -327,6 +337,8 @@
 * [Untitled array in ClienteImportResult](./clienteimportresult-properties-errors.md) – `undefined#/properties/errors`
 
 * [Untitled array in ClienteListEnvelope](./clientelistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
+
+* [Untitled array in CobranzasVencidasEnvelope](./cobranzasvencidasenvelope-properties-data.md) – `undefined#/properties/data`
 
 * [Untitled array in CobroListEnvelope](./cobrolistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
 

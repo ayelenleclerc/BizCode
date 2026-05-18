@@ -6529,6 +6529,350 @@ Decrements `Cliente.balance` by `monto` in the same transaction. When the custom
 }
 ```
 
+### PARAMETERS /api/cobranzas/vencidas
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/cobranzas/vencidas`
+
+### List overdue active invoices
+
+- **Method:** `GET`
+- **Path:** `/api/cobranzas/vencidas`
+- **Tags:** cobranzas
+
+Returns active invoices (`estado` A) past due per customer `creditDays`, minus `ParamEmpresa.recordatorioDiasGracia`. Requires `reports.financial.read`.
+
+#### Responses
+
+##### Status: 200 Overdue invoices
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`clienteId` (required)**
+
+    `integer`
+
+  - **`diasMora` (required)**
+
+    `integer`
+
+  - **`facturaId` (required)**
+
+    `integer`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`rsocial` (required)**
+
+    `string`
+
+  - **`total` (required)**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "facturaId": 1,
+      "clienteId": 1,
+      "rsocial": "",
+      "total": "",
+      "fecha": "",
+      "diasMora": 1
+    }
+  ]
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/cobranzas/recordatorios
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/cobranzas/recordatorios`
+
+### Send overdue payment reminder
+
+- **Method:** `POST`
+- **Path:** `/api/cobranzas/recordatorios`
+- **Tags:** cobranzas
+
+Persists `CobroRecordatorio`, dispatches `invoice_overdue` notification, and audits `cobranza_recordatorio_send`. At most one successful send per invoice per calendar day.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`facturaId` (required)**
+
+  `integer`
+
+- **`canal`**
+
+  `string`, default: `"email"`
+
+**Example:**
+
+```json
+{
+  "facturaId": 1,
+  "canal": "email"
+}
+```
+
+#### Responses
+
+##### Status: 201 Reminder sent
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`id` (required)**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Invoice not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 409 Reminder already sent today
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 422 Invoice not overdue
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ### PARAMETERS /api/facturas/{id}/void
 
 - **Method:** `PARAMETERS`
@@ -12938,6 +13282,151 @@ Requires `orders.dispatch` for transitions to `assigned`, `in_transit`, or `fail
       "score": 0,
       "additionalProperty": "anything"
     }
+  }
+}
+```
+
+### FacturaVencidaRow
+
+- **Type:**`object`
+
+* **`clienteId` (required)**
+
+  `integer`
+
+* **`diasMora` (required)**
+
+  `integer`
+
+* **`facturaId` (required)**
+
+  `integer`
+
+* **`fecha` (required)**
+
+  `string`, format: `date-time`
+
+* **`rsocial` (required)**
+
+  `string`
+
+* **`total` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "facturaId": 1,
+  "clienteId": 1,
+  "rsocial": "",
+  "total": "",
+  "fecha": "",
+  "diasMora": 1
+}
+```
+
+### CobranzasVencidasEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`clienteId` (required)**
+
+    `integer`
+
+  - **`diasMora` (required)**
+
+    `integer`
+
+  - **`facturaId` (required)**
+
+    `integer`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`rsocial` (required)**
+
+    `string`
+
+  - **`total` (required)**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "facturaId": 1,
+      "clienteId": 1,
+      "rsocial": "",
+      "total": "",
+      "fecha": "",
+      "diasMora": 1
+    }
+  ]
+}
+```
+
+### CobranzaRecordatorioInput
+
+- **Type:**`object`
+
+* **`facturaId` (required)**
+
+  `integer`
+
+* **`canal`**
+
+  `string`, default: `"email"`
+
+**Example:**
+
+```json
+{
+  "facturaId": 1,
+  "canal": "email"
+}
+```
+
+### CobranzaRecordatorioEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`id` (required)**
+
+    `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1
   }
 }
 ```

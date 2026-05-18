@@ -16,6 +16,8 @@ Versioning: [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **Overdue reminders (GitHub #134):** `CobroRecordatorio` model; `ParamEmpresa.recordatorioDiasGracia`; `GET /api/cobranzas/vencidas` and `POST /api/cobranzas/recordatorios` (`reports.financial.read`); `CobranzasService` + `npm run cobranzas:recordatorios` job; overdue section on `/finanzas`; audit `cobranza_recordatorio_send`; i18n EN/ES/PT-BR.
+
 - **Legacy DBF catalog migration (GitHub #131):** Parsers `legacyRubroDbf.ts` / `legacyArticuloDbf.ts`; `POST /api/rubros/migrate-dbf` and `POST /api/articulos/migrate-dbf` (`settings.business.manage`, upsert by codigo); `npm run migrate:dbf` imports `RUBROS.DBF` / `ARTICULOS.DBF` when present (fallback to `PVAR2`/`PVAR`); integration fixtures and tests.
 
 - **Stock adjustments (GitHub #128):** `StockAjuste` model and migration; `POST /api/articulos/:id/stock-ajuste` (`inventory.adjust`) and `GET /api/articulos/:id/stock-historial`; invoice create decrements stock and emits `stock_below_minimum` notifications; audit `stock_adjust`; i18n EN/ES/PT-BR.

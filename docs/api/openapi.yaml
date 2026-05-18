@@ -34,6 +34,8 @@ tags:
     description: Invoice management
   - name: cobros
     description: Customer payment collections
+  - name: cobranzas
+    description: Overdue invoice reminders (#134)
   - name: formasPago
     description: Payment methods
   - name: users
@@ -1081,6 +1083,78 @@ paths:
           $ref: '#/components/responses/ForbiddenError'
         '404':
           description: Payment not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/cobranzas/vencidas:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [cobranzas]
+      summary: List overdue active invoices
+      description: |
+        Returns active invoices (`estado` A) past due per customer `creditDays`, minus
+        `ParamEmpresa.recordatorioDiasGracia`. Requires `reports.financial.read`.
+      responses:
+        '200':
+          description: Overdue invoices
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CobranzasVencidasEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/cobranzas/recordatorios:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    post:
+      tags: [cobranzas]
+      summary: Send overdue payment reminder
+      description: |
+        Persists `CobroRecordatorio`, dispatches `invoice_overdue` notification, and audits
+        `cobranza_recordatorio_send`. At most one successful send per invoice per calendar day.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CobranzaRecordatorioInput'
+      responses:
+        '201':
+          description: Reminder sent
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CobranzaRecordatorioEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Invoice not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '409':
+          description: Reminder already sent today
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '422':
+          description: Invoice not overdue
           content:
             application/json:
               schema:
@@ -2539,6 +2613,63 @@ components:
           const: true
         data:
           $ref: '#/components/schemas/CobroCreateData'
+
+    FacturaVencidaRow:
+      type: object
+      required: [facturaId, clienteId, rsocial, total, fecha, diasMora]
+      properties:
+        facturaId:
+          type: integer
+        clienteId:
+          type: integer
+        rsocial:
+          type: string
+        total:
+          type: string
+        fecha:
+          type: string
+          format: date-time
+        diasMora:
+          type: integer
+          minimum: 1
+
+    CobranzasVencidasEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/FacturaVencidaRow'
+
+    CobranzaRecordatorioInput:
+      type: object
+      required: [facturaId]
+      properties:
+        facturaId:
+          type: integer
+          minimum: 1
+        canal:
+          type: string
+          maxLength: 20
+          default: email
+
+    CobranzaRecordatorioEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: object
+          required: [id]
+          properties:
+            id:
+              type: integer
 
     OrdenEntrega:
       type: object

@@ -4,10 +4,13 @@ import { CanAccess } from '@/components/CanAccess'
 import ErrorBoundary from '@/components/ErrorBoundary'
 import AsyncWrapper from '@/components/shared/AsyncWrapper'
 import {
+  ApiRequestFailedError,
+  cobranzasAPI,
   reportesAPI,
   type AgingArData,
   type AgingBucket,
   type CuentaCorrienteData,
+  type FacturaVencidaRow,
 } from '@/lib/api'
 
 function formatMoney(value: number | string): string {
@@ -54,6 +57,12 @@ function FinanzasPageContent() {
   const [statement, setStatement] = useState<CuentaCorrienteData | null>(null)
   const [statementLoading, setStatementLoading] = useState(false)
   const [statementError, setStatementError] = useState<Error | null>(null)
+  const [vencidas, setVencidas] = useState<FacturaVencidaRow[]>([])
+  const [vencidasLoading, setVencidasLoading] = useState(false)
+  const [vencidasError, setVencidasError] = useState<Error | null>(null)
+  const [minDiasMora, setMinDiasMora] = useState('1')
+  const [sendingId, setSendingId] = useState<number | null>(null)
+  const [sendFeedback, setSendFeedback] = useState<Record<number, 'ok' | '409'>>({})
 
   const loadAging = useCallback(async () => {
     setLoading(true)
@@ -71,6 +80,43 @@ function FinanzasPageContent() {
   useEffect(() => {
     void loadAging()
   }, [loadAging])
+
+  const loadVencidas = useCallback(async () => {
+    setVencidasLoading(true)
+    setVencidasError(null)
+    try {
+      const data = await cobranzasAPI.listVencidas()
+      setVencidas(data ?? [])
+    } catch (error) {
+      setVencidasError(error instanceof Error ? error : new Error(String(error)))
+    } finally {
+      setVencidasLoading(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    void loadVencidas()
+  }, [loadVencidas])
+
+  const minDias = Number.parseInt(minDiasMora, 10)
+  const filteredVencidas = useMemo(() => {
+    const threshold = Number.isFinite(minDias) && minDias >= 1 ? minDias : 1
+    return vencidas.filter((row) => row.diasMora >= threshold)
+  }, [vencidas, minDias])
+
+  const sendReminder = async (facturaId: number) => {
+    setSendingId(facturaId)
+    try {
+      await cobranzasAPI.sendRecordatorio(facturaId)
+      setSendFeedback((prev) => ({ ...prev, [facturaId]: 'ok' }))
+    } catch (error) {
+      if (error instanceof ApiRequestFailedError && error.httpStatus === 409) {
+        setSendFeedback((prev) => ({ ...prev, [facturaId]: '409' }))
+      }
+    } finally {
+      setSendingId(null)
+    }
+  }
 
   const sortedBuckets = useMemo(() => {
     if (!aging) return []
@@ -141,6 +187,89 @@ function FinanzasPageContent() {
                 onSort={toggleSort}
                 t={t}
               />
+            )}
+          </AsyncWrapper>
+        </section>
+
+        <section className="mt-8" aria-labelledby="finanzas-overdue-heading">
+          <h2 id="finanzas-overdue-heading" className="text-lg font-semibold mb-2 text-slate-900 dark:text-slate-100">
+            {t('overdue.title')}
+          </h2>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mb-3">{t('overdue.hint')}</p>
+          <div className="mb-3 flex flex-wrap items-end gap-3" data-testid="finanzas-vencidas-filter">
+            <div>
+              <label htmlFor="finanzas-min-dias-mora" className="block text-xs text-slate-500 mb-1">
+                {t('overdue.minDays')}
+              </label>
+              <input
+                id="finanzas-min-dias-mora"
+                type="number"
+                min={1}
+                className="border border-slate-300 dark:border-slate-600 rounded px-2 py-1 bg-white dark:bg-slate-800 w-24"
+                value={minDiasMora}
+                onChange={(e) => setMinDiasMora(e.target.value)}
+              />
+            </div>
+          </div>
+          <AsyncWrapper loading={vencidasLoading} error={vencidasError}>
+            {filteredVencidas.length === 0 ? (
+              <p className="text-slate-500" data-testid="finanzas-vencidas-empty">
+                {t('overdue.empty')}
+              </p>
+            ) : (
+              <div className="overflow-x-auto" data-testid="finanzas-vencidas-table">
+                <table className="w-full text-sm">
+                  <caption className="sr-only">{t('overdue.title')}</caption>
+                  <thead>
+                    <tr className="border-b border-slate-200 dark:border-slate-700 text-left">
+                      <th scope="col" className="py-2 pr-2">{t('overdue.invoice')}</th>
+                      <th scope="col" className="py-2 pr-2">{t('overdue.customer')}</th>
+                      <th scope="col" className="py-2 pr-2">{t('overdue.total')}</th>
+                      <th scope="col" className="py-2 pr-2">{t('overdue.date')}</th>
+                      <th scope="col" className="py-2 pr-2">{t('overdue.daysPastDue')}</th>
+                      <th scope="col" className="py-2 pr-2">
+                        <span className="sr-only">{t('overdue.send')}</span>
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredVencidas.map((row) => (
+                      <tr
+                        key={row.facturaId}
+                        className="border-b border-slate-100 dark:border-slate-800"
+                        data-testid={`finanzas-vencida-row-${row.facturaId}`}
+                      >
+                        <td className="py-2 pr-2 font-mono">#{row.facturaId}</td>
+                        <td className="py-2 pr-2">{row.rsocial}</td>
+                        <td className="py-2 pr-2 font-mono">{formatMoney(row.total)}</td>
+                        <td className="py-2 pr-2">{formatDate(row.fecha)}</td>
+                        <td className="py-2 pr-2 font-mono">{row.diasMora}</td>
+                        <td className="py-2 pr-2">
+                          <button
+                            type="button"
+                            className="px-3 py-1 rounded bg-amber-600 text-white hover:bg-amber-700 disabled:opacity-50"
+                            disabled={sendingId === row.facturaId}
+                            data-testid={`finanzas-send-reminder-${row.facturaId}`}
+                            onClick={() => void sendReminder(row.facturaId)}
+                          >
+                            {sendingId === row.facturaId ? t('overdue.sending') : t('overdue.send')}
+                          </button>
+                          {sendFeedback[row.facturaId] === 'ok' && (
+                            <span className="ml-2 text-xs text-green-700 dark:text-green-400" role="status">
+                              {t('overdue.sent')}
+                            </span>
+                          )}
+                          {sendFeedback[row.facturaId] === '409' && (
+                            <span className="ml-2 text-xs text-amber-700 dark:text-amber-300" role="status">
+                              {t('overdue.alreadySent')}
+                            </span>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             )}
           </AsyncWrapper>
         </section>
