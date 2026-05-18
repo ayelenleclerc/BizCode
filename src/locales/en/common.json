@@ -132,6 +132,9 @@
     "inactive": "Not configured",
     "loadError": "Could not load channel status"
   },
+  "errors": {
+    "moduleNotEnabled": "Module «{{module}}» is not enabled for your company. Contact your administrator."
+  },
   "dashboard": {
     "title": "Today's summary",
     "ventasHoy": "Today's sales",

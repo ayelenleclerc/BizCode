@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "integrations": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "modules": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    }
+  },
+  "required": [
+    "modules",
+    "integrations"
+  ],
+  "title": "TenantFeaturesData",
+  "type": "object"
+}

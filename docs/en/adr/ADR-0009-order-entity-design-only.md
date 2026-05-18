@@ -1,6 +1,6 @@
-# ADR-0009: Order / “Pedido” domain — design only until BP1-1
+# ADR-0009: Order / “Pedido” domain — design and commercial MVP slice
 
-**Status:** Accepted  
+**Status:** Accepted (updated 2026-05-18: MVP slice #132 in code; modular gating #223)  
 **Date:** 2026-05-03  
 **ISO reference:** ISO/IEC 12207 (design vs implementation lifecycle); ISO 9001:2015 clause 8.3 (design and development)
 
@@ -8,22 +8,23 @@
 
 ## Context
 
-Quality docs describe a target lifecycle for **pedido → entrega → cobrança** (`docs/en/quality/operational-flow-order-delivery-collection.md`). The RBAC vocabulary already exposes `orders.*` permissions in [`src/lib/rbac.ts`](../../../../src/lib/rbac.ts). The database and public REST contract **do not** yet model a persisted `Pedido` entity (`docs/api/openapi.yaml` MVP scope is cliente / producto / factura).
+Quality docs describe a target lifecycle for **pedido → delivery → collection** (`docs/en/quality/operational-flow-order-delivery-collection.md`). RBAC exposes `orders.*` in [`src/lib/rbac.ts`](../../../../src/lib/rbac.ts).
 
-GitHub backlog item **BP1-1** (orders) decides when to implement persistence and APIs.
+**Repository evidence (MVP #132):** `Pedido` / `PedidoItem` in [`prisma/schema.prisma`](../../../../prisma/schema.prisma); `GET/POST/PUT/DELETE /api/pedidos` plus `POST .../confirm` and `POST .../invoice` in [`server/routes/registerPedidosRoutes.ts`](../../../../server/routes/registerPedidosRoutes.ts); contract in [`docs/api/openapi.yaml`](../../api/openapi.yaml). States in this slice: `draft`, `confirmed`, `invoiced`, `cancelled` (not the full logistics cycle `packed`…`collected` — backlog #65).
+
+**Modular gating (#223):** orders require `billing.orders` via `requireModule` and per-tenant `TenantConfig`.
 
 ## Decision
 
-1. Treat the **pedido/order** lifecycle as **design-only** until BP1-1 is executed and an implementation plan + migrations are approved.
-2. Do **not** add Prisma models or REST routes for `Pedido` in this backlog slice; keep the authoritative design narrative in [`docs/en/quality/operational-flow-order-delivery-collection.md`](../../quality/operational-flow-order-delivery-collection.md) and equivalents in ES/PT-BR.
-3. When BP1-1 starts: align schema and OpenAPI with the states and RACI table in that doc, and wire **`orders.*`** to real handlers (with audit parity per `#84`).
-4. **Channel scope:** the optional header `x-bizcode-channel` (see [`server/auth.ts`](../../../../server/auth.ts) and [`docs/api/openapi.yaml`](../../api/openapi.yaml)) remains orthogonal; order APIs must respect authenticated `claims.scope.channels` the same way as existing routes once implemented.
+1. **Commercial BP1-1 slice (#132):** persist `Pedido` + `PedidoItem` and expose documented OpenAPI routes with audit actions `pedido_*`.
+2. **Pending (#65 / full BP1-1):** logistics states and pedido→delivery→collection links per the operational-flow doc.
+3. Keep the operational-flow narrative in EN/ES/PT-BR as the target lifecycle reference.
+4. **Channel scope:** optional `x-bizcode-channel` remains orthogonal; order APIs respect `claims.scope.channels` like other authenticated routes.
 
 ## Consequences
 
-- **Positive:** No speculative schema or undocumented endpoints; audit and contract tests remain truthful to the codebase.
-- **Negative:** Operational “order” workflows stay manual/off-system until BP1-1 ships.
-- **Follow-up:** On implementation, update this ADR status or supersede with a numbered ADR for the concrete `Pedido` schema.
+- **Positive:** Contract, tests, and docs match the commercial MVP; per-tenant module gating without Redis (in-process cache, #223).
+- **Negative:** Full diagram lifecycle remains partial until #65.
 
 ## Alternatives considered (GitHub #69)
 

@@ -73,7 +73,7 @@ Empty cells mean no direct RBAC permission names the step; the role may still pa
 | AR / finance UI | `/finanzas`; `GET /api/reportes/aging`, `GET /api/reportes/cuenta-corriente/:clienteId` | Dunning workflows per backlog |
 | Reports | `/reportes`; `GET /api/reportes/ventas`, `stock-critico`, `cobranzas` (JSON or CSV) | Additional report types |
 | Logistics | `/logistica`; `OrdenEntrega`; `GET/POST/PUT /api/ordenes-entrega` | Full order lifecycle (BP1-1) |
-| Order entity `pedido` | **Not evidenced** in Prisma or OpenAPI | Model, states, and APIs when backlog BP1-1 is executed |
+| Order entity `pedido` | `Pedido`/`PedidoItem` models, `/api/pedidos`, UI `/pedidos` (#132); `requireModule('billing.orders')` (#223) | States `packed`…`collected` and generic transitions (#65 / full BP1-1) |
 | Permissions `orders.*` | Defined in RBAC; enforced on `/api/ordenes-entrega` | Extend when `pedido` entity ships |
 
 The diagram state **Collected** is partially covered today by **payment registration** (`Cobro`), not by a `pedido` record.

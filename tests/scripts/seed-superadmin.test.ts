@@ -23,6 +23,9 @@ function buildPrismaMock(tenantId = 7): PrismaClient {
     appUser: {
       upsert: vi.fn().mockResolvedValue({ id: 2 }),
     },
+    tenantConfig: {
+      upsert: vi.fn().mockResolvedValue({ id: 1, tenantId }),
+    },
   } as unknown as PrismaClient
 }
 
@@ -69,6 +72,7 @@ describe('runSuperAdminSeed', () => {
       update: { name: SUPERADMIN_SEED_TENANT_NAME, active: true },
     })
 
+    expect(prisma.tenantConfig.upsert).toHaveBeenCalledTimes(1)
     expect(prisma.appUser.upsert).toHaveBeenCalledTimes(1)
     const upsertArg = vi.mocked(prisma.appUser.upsert).mock.calls[0]?.[0]
     expect(upsertArg).toBeDefined()

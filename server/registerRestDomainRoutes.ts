@@ -10,7 +10,9 @@ import { registerReportesRoutes } from './routes/registerReportesRoutes'
 import { registerFacturasRoutes } from './routes/registerFacturasRoutes'
 import { registerFormasPagoRoutes } from './routes/registerFormasPagoRoutes'
 import { registerHealthRoute } from './routes/registerHealthRoute'
+import { registerMeFeaturesRoute } from './routes/registerMeFeaturesRoute'
 import { registerModulesCatalogRoute } from './routes/registerModulesCatalogRoute'
+import { registerSuperadminTenantConfigRoutes } from './routes/registerSuperadminTenantConfigRoutes'
 import { registerProveedoresRoutes } from './routes/registerProveedoresRoutes'
 import { registerRubrosRoutes } from './routes/registerRubrosRoutes'
 import type { RestRouteContext } from './routes/restRouteTypes'
@@ -64,4 +66,6 @@ export function registerRestDomainRoutes(app: Application, prisma: PrismaClient)
   registerEmpresaRoutes(app, ctx)
   registerHealthRoute(app, ctx)
   registerModulesCatalogRoute(app, ctx)
+  registerMeFeaturesRoute(app, prisma)
+  registerSuperadminTenantConfigRoutes(app, prisma)
 }

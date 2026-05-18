@@ -1,6 +1,6 @@
-# ADR-0009: Dominio Pedido — solo diseño hasta BP1-1
+# ADR-0009: Dominio Pedido — diseño y slice MVP comercial
 
-**Estado:** Aceptado  
+**Estado:** Aceptado (actualizado 2026-05-18: slice MVP #132 en código; gating modular #223)  
 **Fecha:** 2026-05-03  
 **Referencia ISO:** ISO/IEC 12207 (ciclo de vida diseño/implementación); ISO 9001:2015 cláusula 8.3 (diseño y desarrollo)
 
@@ -8,21 +8,23 @@
 
 ## Contexto
 
-La documentación de calidad describe el flujo objetivo **pedido → entrega → cobranza** ([`docs/es/quality/flujo-operativo-pedido-entrega-cobranza.md`](../../quality/flujo-operativo-pedido-entrega-cobranza.md)). El RBAC ya define permisos `orders.*` en [`src/lib/rbac.ts`](../../../../src/lib/rbac.ts). **No hay** modelo Prisma ni rutas REST públicas persistidas para un `Pedido` en el MVP documentado (`docs/api/openapi.yaml`).
+La documentación de calidad describe el flujo objetivo **pedido → entrega → cobranza** ([`docs/es/quality/flujo-operativo-pedido-entrega-cobranza.md`](../../quality/flujo-operativo-pedido-entrega-cobranza.md)). El RBAC define permisos `orders.*` en [`src/lib/rbac.ts`](../../../../src/lib/rbac.ts).
 
-El backlog **BP1-1** fija cuándo implementar persistencia y APIs.
+**Evidencia en repositorio (MVP #132):** modelos `Pedido` / `PedidoItem` en [`prisma/schema.prisma`](../../../../prisma/schema.prisma); rutas `GET/POST/PUT/DELETE /api/pedidos` y transiciones `POST .../confirm`, `POST .../invoice` en [`server/routes/registerPedidosRoutes.ts`](../../../../server/routes/registerPedidosRoutes.ts); contrato en [`docs/api/openapi.yaml`](../../api/openapi.yaml). Estados implementados en este slice: `draft`, `confirmed`, `invoiced`, `cancelled` (no el ciclo logístico completo `packed`…`collected` del diagrama — backlog #65).
+
+**Gating modular (#223):** acceso a pedidos exige módulo `billing.orders` vía `requireModule` y configuración por tenant (`TenantConfig`).
 
 ## Decisión
 
-1. Considerar el ciclo de **pedido** como **solo diseño** hasta ejecutar BP1-1 con plan de implementación y migraciones aprobados.
-2. **No** añadir modelos Prisma ni rutas REST para `Pedido` en este entregable; mantener la narrativa de diseño en el documento operativo anterior y equivalentes EN/PT-BR.
-3. Al iniciar BP1-1: alinear Prisma y OpenAPI con los estados y RACI del documento operativo y conectar **`orders.*`** a handlers reales (con auditoría coherente con `#84`).
-4. **Ámbito de canal:** la cabecera opcional `x-bizcode-channel` ([`docs/api/openapi.yaml`](../../api/openapi.yaml), [`server/auth.ts`](../../../../server/auth.ts)) permanece ortogonal; las futuras APIs de pedidos deberán respetar `claims.scope.channels`.
+1. **Slice comercial BP1-1 (#132):** persistir `Pedido` + `PedidoItem` y exponer APIs documentadas en OpenAPI con los estados del slice anterior y auditoría `pedido_*`.
+2. **Pendiente (#65 / BP1-1 completo):** estados y transiciones logísticas (`packed`…`collected`) y vínculo pedido→entrega→cobranza según el documento operativo.
+3. Mantener la narrativa de diseño en el documento operativo y equivalentes EN/PT-BR como referencia del ciclo objetivo.
+4. **Ámbito de canal:** la cabecera opcional `x-bizcode-channel` permanece ortogonal; las APIs de pedidos respetan `claims.scope.channels` como el resto de rutas autenticadas.
 
 ## Consecuencias
 
-- **Pros:** Sin esquema especulativo ni endpoints no documentados; contrato y pruebas reflejan el código real.
-- **Contras:** Los flujos “pedido” siguen fuera del sistema hasta BP1-1.
+- **Pros:** Contrato, pruebas y docs alineados al código del MVP comercial; gating por tenant sin Redis (caché en proceso, #223).
+- **Contras:** El flujo operativo completo del diagrama sigue parcial hasta #65.
 
 ## Alternativas consideradas (#69)
 
