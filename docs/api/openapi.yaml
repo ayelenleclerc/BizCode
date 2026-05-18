@@ -48,6 +48,8 @@ tags:
     description: In-app notifications
   - name: audit
     description: Audit event history (read-only)
+  - name: modules
+    description: Platform module catalog and feature-flag metadata
 
 paths:
   /api/auth/setup-owner:
@@ -169,6 +171,25 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HealthResponse'
+
+  /api/modules/catalog:
+    get:
+      tags: [modules]
+      summary: Module catalog (feature flags metadata)
+      description: |
+        Returns the full module catalog with dependency graph metadata, deployment environment,
+        and business presets. Does not include tenant-specific enabled modules (see future `/api/me/features`).
+      parameters:
+        - $ref: '#/components/parameters/XRequestId'
+      responses:
+        '200':
+          description: Module catalog
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ModuleCatalogEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
 
   /api/clientes:
     parameters:
@@ -3858,6 +3879,73 @@ components:
           properties:
             updated:
               type: integer
+
+    ModuleCatalogEntry:
+      type: object
+      required:
+        - key
+        - label
+        - required
+        - requiredInProd
+        - dependencies
+        - plan
+        - price
+        - canDeactivate
+      properties:
+        key:
+          type: string
+        label:
+          type: string
+        required:
+          type: boolean
+        requiredInProd:
+          type: boolean
+        dependencies:
+          type: array
+          items:
+            type: string
+        plan:
+          type: string
+          enum: [starter, pro, enterprise]
+        price:
+          type: number
+        canDeactivate:
+          type: boolean
+
+    ModuleCatalogPreset:
+      type: object
+      required: [modules]
+      properties:
+        modules:
+          type: array
+          items:
+            type: string
+
+    ModuleCatalogData:
+      type: object
+      required: [deploymentEnv, modules, presets]
+      properties:
+        deploymentEnv:
+          type: string
+          enum: [dev, prod]
+        modules:
+          type: array
+          items:
+            $ref: '#/components/schemas/ModuleCatalogEntry'
+        presets:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/ModuleCatalogPreset'
+
+    ModuleCatalogEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/ModuleCatalogData'
 
   responses:
     BadRequest:

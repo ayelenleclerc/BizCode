@@ -140,6 +140,14 @@
 
 * [LogoutResult](./logoutresult.md) – `-`
 
+* [ModuleCatalogData](./modulecatalogdata.md) – `-`
+
+* [ModuleCatalogEntry](./modulecatalogentry.md) – `-`
+
+* [ModuleCatalogEnvelope](./modulecatalogenvelope.md) – `-`
+
+* [ModuleCatalogPreset](./modulecatalogpreset.md) – `-`
+
 * [Notification](./notification.md) – `-`
 
 * [NotificationEnvelope](./notificationenvelope.md) – `-`
@@ -244,6 +252,8 @@
 
 * [Untitled object in FacturaListEnvelope](./facturalistenvelope-allof-0.md) – `undefined#/allOf/0`
 
+* [Untitled object in ModuleCatalogData](./modulecatalogdata-properties-presets.md) – `undefined#/properties/presets`
+
 * [Untitled object in Notification](./notification-properties-payload.md) – `undefined#/properties/payload`
 
 * [Untitled object in NotificationReadAllEnvelope](./notificationreadallenvelope-properties-data.md) – `undefined#/properties/data`
@@ -331,6 +341,12 @@
 * [Untitled array in FacturaListEnvelope](./facturalistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
 
 * [Untitled array in FormaPagoListEnvelope](./formapagolistenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled array in ModuleCatalogData](./modulecatalogdata-properties-modules.md) – `undefined#/properties/modules`
+
+* [Untitled array in ModuleCatalogEntry](./modulecatalogentry-properties-dependencies.md) – `undefined#/properties/dependencies`
+
+* [Untitled array in ModuleCatalogPreset](./modulecatalogpreset-properties-modules.md) – `undefined#/properties/modules`
 
 * [Untitled array in NotificationListEnvelope](./notificationlistenvelope-properties-data.md) – `undefined#/properties/data`
 
