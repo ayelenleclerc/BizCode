@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "ambiente": {
+      "enum": [
+        "homologacion",
+        "produccion"
+      ],
+      "type": "string"
+    },
+    "certificate": {
+      "type": "string"
+    },
+    "cuit": {
+      "type": "string"
+    },
+    "privateKey": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "cuit",
+    "certificate",
+    "privateKey"
+  ],
+  "title": "AfipConfigInput",
+  "type": "object"
+}

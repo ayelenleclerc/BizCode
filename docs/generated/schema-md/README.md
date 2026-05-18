@@ -2,6 +2,16 @@
 
 ## Top-level Schemas
 
+* [AfipCaeEnvelope](./afipcaeenvelope.md) – `-`
+
+* [AfipCaeInput](./afipcaeinput.md) – `-`
+
+* [AfipConfigEnvelope](./afipconfigenvelope.md) – `-`
+
+* [AfipConfigInput](./afipconfiginput.md) – `-`
+
+* [AfipTaEnvelope](./afiptaenvelope.md) – `-`
+
 * [AgingAr](./agingar.md) – `-`
 
 * [AgingArEnvelope](./agingarenvelope.md) – `-`
@@ -233,6 +243,12 @@
 ## Other Schemas
 
 ### Objects
+
+* [Untitled object in AfipCaeEnvelope](./afipcaeenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled object in AfipConfigEnvelope](./afipconfigenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled object in AfipTaEnvelope](./afiptaenvelope-properties-data.md) – `undefined#/properties/data`
 
 * [Untitled object in ArticuloListEnvelope](./articulolistenvelope-allof-0.md) – `undefined#/allOf/0`
 

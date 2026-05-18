@@ -17,6 +17,8 @@ Evidencia automática equivalente en `tests/server/http-mutations-audit-coverage
 | PUT | `/api/proveedores/:id` | `proveedor_update` | `resourceId` del path |
 | POST | `/api/facturas` | `factura_create` | `resource: factura` |
 | PUT | `/api/facturas/:id/void` | `factura_void` | motivo persistido dentro de la misma operación auditada |
+| PUT | `/api/afip/config` | `afip_config_upsert` | credenciales cifradas en reposo |
+| POST | `/api/afip/cae` | `afip_cae_request` | `resource: factura` |
 | POST | `/api/pedidos` | `pedido_create` | `resource: pedido`; respuesta **201** |
 | PUT | `/api/pedidos/:id` | `pedido_update` | solo estado `draft` |
 | POST | `/api/pedidos/:id/confirm` | `pedido_confirm` | `draft` → `confirmed` |

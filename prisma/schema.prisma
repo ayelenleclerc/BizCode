@@ -197,6 +197,9 @@ model Factura {
   total     Decimal   @db.Decimal(14, 2) @default(0)
 
   formaPagoId Int?
+  cae           String?   @db.VarChar(20)
+  caeVto        DateTime?
+  estadoCae     String    @db.VarChar(20) @default("pending")
   estado    String    @db.VarChar(1) @default("A") // A=activa, A=anulada
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -275,6 +278,18 @@ model ParamEmpresa {
   logoUrl     String? @db.VarChar(255)
 }
 
+model TenantFiscalConfig {
+  id            Int      @id @default(autoincrement())
+  tenantId      Int      @unique
+  tenant        Tenant   @relation(fields: [tenantId], references: [id])
+  cuit          String   @db.VarChar(14)
+  certEncrypted String   @db.Text
+  keyEncrypted  String   @db.Text
+  ambiente      String   @db.VarChar(20) @default("homologacion")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
 model Tenant {
   id        Int       @id @default(autoincrement())
   name      String    @db.VarChar(80)
@@ -297,6 +312,7 @@ model Tenant {
   cobros         Cobro[]
   ordenesEntrega OrdenEntrega[]
   paramEmpresa   ParamEmpresa?
+  fiscalConfig   TenantFiscalConfig?
   stockAjustes   StockAjuste[]
 }
 

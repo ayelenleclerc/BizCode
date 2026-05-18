@@ -5844,6 +5844,431 @@ Requires `settings.business.manage`. Upserts by tenant and codigo.
 }
 ```
 
+### Upsert tenant AFIP credentials
+
+- **Method:** `PUT`
+- **Path:** `/api/afip/config`
+- **Tags:** afip
+
+Requires `settings.fiscal.manage`. Certificate and key encrypted at rest.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`certificate` (required)**
+
+  `string`
+
+- **`cuit` (required)**
+
+  `string`
+
+- **`privateKey` (required)**
+
+  `string`
+
+- **`ambiente`**
+
+  `string`, possible values: `"homologacion", "produccion"`
+
+**Example:**
+
+```json
+{
+  "cuit": "",
+  "certificate": "",
+  "privateKey": "",
+  "ambiente": "homologacion"
+}
+```
+
+#### Responses
+
+##### Status: 200 Config saved
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`configured`**
+
+    `boolean`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "configured": true
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Request AFIP TA (ticket de acceso)
+
+- **Method:** `POST`
+- **Path:** `/api/afip/auth`
+- **Tags:** afip
+
+Requires `settings.fiscal.manage`. Homologación mock when AFIP network is not configured.
+
+#### Responses
+
+##### Status: 200 TA issued
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`expiration`**
+
+    `string`, format: `date-time`
+
+  - **`sign`**
+
+    `string`
+
+  - **`token`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "token": "",
+    "sign": "",
+    "expiration": ""
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Fiscal config not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Request CAE for a factura
+
+- **Method:** `POST`
+- **Path:** `/api/afip/cae`
+- **Tags:** afip
+
+Requires `sales.create`.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`facturaId` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "facturaId": 1
+}
+```
+
+#### Responses
+
+##### Status: 200 CAE issued
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`cae`**
+
+    `string`
+
+  - **`caeVto`**
+
+    `string`, format: `date-time`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "cae": "",
+    "caeVto": ""
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Factura or config not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 502 AFIP request failed
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ### PARAMETERS /api/pedidos
 
 - **Method:** `PARAMETERS`
@@ -17393,6 +17818,149 @@ Requires `orders.dispatch` for transitions to `assigned`, `in_transit`, or `fail
       }
     ],
     "additionalProperty": "anything"
+  }
+}
+```
+
+### AfipConfigInput
+
+- **Type:**`object`
+
+* **`certificate` (required)**
+
+  `string`
+
+* **`cuit` (required)**
+
+  `string`
+
+* **`privateKey` (required)**
+
+  `string`
+
+* **`ambiente`**
+
+  `string`, possible values: `"homologacion", "produccion"`
+
+**Example:**
+
+```json
+{
+  "cuit": "",
+  "certificate": "",
+  "privateKey": "",
+  "ambiente": "homologacion"
+}
+```
+
+### AfipConfigEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`configured`**
+
+    `boolean`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "configured": true
+  }
+}
+```
+
+### AfipTaEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`expiration`**
+
+    `string`, format: `date-time`
+
+  - **`sign`**
+
+    `string`
+
+  - **`token`**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "token": "",
+    "sign": "",
+    "expiration": ""
+  }
+}
+```
+
+### AfipCaeInput
+
+- **Type:**`object`
+
+* **`facturaId` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "facturaId": 1
+}
+```
+
+### AfipCaeEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`cae`**
+
+    `string`
+
+  - **`caeVto`**
+
+    `string`, format: `date-time`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "cae": "",
+    "caeVto": ""
   }
 }
 ```
