@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "fecha": {
+      "type": "string"
+    },
+    "formaPagoId": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "numero": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "prefijo": {
+      "type": "string"
+    },
+    "tipo": {
+      "enum": [
+        "A",
+        "B"
+      ],
+      "type": "string"
+    }
+  },
+  "required": [
+    "fecha",
+    "tipo",
+    "numero"
+  ],
+  "title": "PedidoInvoiceInput",
+  "type": "object"
+}

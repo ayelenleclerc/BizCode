@@ -16,6 +16,8 @@ Versioning: [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **Commercial orders (GitHub #132):** `Pedido` / `PedidoItem` models; `GET/POST/PUT/DELETE /api/pedidos` plus `POST .../confirm` and `POST .../invoice` (ADR-0009 English states and paths); RBAC `orders.create` / `sales.create` / `sales.cancel`; audit actions `pedido_*`; `/pedidos` list UI; i18n EN/ES/PT-BR. Module gating (`requireModule`) deferred until #223.
+
 - **Legacy DBF catalog migration (GitHub #131):** Parsers `legacyRubroDbf.ts` / `legacyArticuloDbf.ts`; `POST /api/rubros/migrate-dbf` and `POST /api/articulos/migrate-dbf` (`settings.business.manage`, upsert by codigo); `npm run migrate:dbf` imports `RUBROS.DBF` / `ARTICULOS.DBF` when present (fallback to `PVAR2`/`PVAR`); integration fixtures and tests.
 
 - **Stock adjustments (GitHub #128):** `StockAjuste` model and migration; `POST /api/articulos/:id/stock-ajuste` (`inventory.adjust`) and `GET /api/articulos/:id/stock-historial`; invoice create decrements stock and emits `stock_below_minimum` notifications; audit `stock_adjust`; i18n EN/ES/PT-BR.

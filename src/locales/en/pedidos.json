@@ -1,0 +1,22 @@
+{
+  "title": "Orders",
+  "subtitle": "Quotes and commercial orders",
+  "newOrder": "New order",
+  "empty": "No orders to display.",
+  "columns": {
+    "id": "No.",
+    "cliente": "Customer",
+    "estado": "Status",
+    "total": "Total",
+    "fecha": "Created"
+  },
+  "estado": {
+    "draft": "Draft",
+    "confirmed": "Confirmed",
+    "invoiced": "Invoiced",
+    "cancelled": "Cancelled"
+  },
+  "filterEstado": "Status",
+  "filterAll": "All",
+  "loadError": "Could not load orders."
+}
