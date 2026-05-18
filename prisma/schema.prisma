@@ -79,6 +79,7 @@ model Cliente {
   updatedAt      DateTime @updatedAt
 
   facturas       Factura[]
+  pedidos        Pedido[]
   cobros         Cobro[]
   ordenesEntrega OrdenEntrega[]
 
@@ -121,6 +122,7 @@ model Articulo {
   updatedAt    DateTime @updatedAt
 
   facturaItems  FacturaItem[]
+  pedidoItems   PedidoItem[]
   stockAjustes  StockAjuste[]
 
   @@unique([tenantId, codigo])
@@ -201,11 +203,48 @@ model Factura {
 
   items          FacturaItem[]
   ordenesEntrega OrdenEntrega[]
+  pedido         Pedido?
 
   @@unique([tenantId, tipo, prefijo, numero])
   @@index([tenantId])
   @@index([tenantId, fecha])
   @@index([tenantId, clienteId])
+}
+
+model Pedido {
+  id          Int       @id @default(autoincrement())
+  tenantId    Int
+  tenant      Tenant    @relation(fields: [tenantId], references: [id])
+  clienteId   Int
+  cliente     Cliente   @relation(fields: [clienteId], references: [id])
+  vendedorId  Int?
+  vendedor    AppUser?  @relation(fields: [vendedorId], references: [id])
+  /// draft | confirmed | invoiced | cancelled (ADR-0009)
+  estado      String    @db.VarChar(20)
+  total       Decimal   @db.Decimal(14, 2) @default(0)
+  validUntil  DateTime?
+  facturaId   Int?      @unique
+  factura     Factura?  @relation(fields: [facturaId], references: [id])
+  items       PedidoItem[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([tenantId, estado])
+  @@index([tenantId, clienteId])
+}
+
+model PedidoItem {
+  id         Int     @id @default(autoincrement())
+  pedidoId   Int
+  pedido     Pedido  @relation(fields: [pedidoId], references: [id], onDelete: Cascade)
+  articuloId Int
+  articulo   Articulo @relation(fields: [articuloId], references: [id])
+  cantidad   Int     @default(1)
+  precio     Decimal @db.Decimal(14, 2)
+  dscto      Decimal @db.Decimal(5, 2) @default(0)
+  subtotal   Decimal @db.Decimal(14, 2)
+
+  createdAt DateTime @default(now())
 }
 
 model FacturaItem {
@@ -254,6 +293,7 @@ model Tenant {
   articulos      Articulo[]
   proveedores    Proveedor[]
   facturas       Factura[]
+  pedidos        Pedido[]
   cobros         Cobro[]
   ordenesEntrega OrdenEntrega[]
   paramEmpresa   ParamEmpresa?
@@ -305,6 +345,7 @@ model AppUser {
   chatMessagesSent     ChatMessage[] @relation("ChatMessageSender")
   chatMessagesReceived ChatMessage[] @relation("ChatMessageRecipient")
   ordenesEntregaDriver OrdenEntrega[] @relation("OrdenEntregaDriver")
+  pedidosVendedor      Pedido[]
   stockAjustes         StockAjuste[]
 
   @@unique([tenantId, username])

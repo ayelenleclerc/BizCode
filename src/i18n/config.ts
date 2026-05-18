@@ -12,6 +12,7 @@ import chatEs from '@/locales/es/chat.json'
 import proveedoresEs from '@/locales/es/proveedores.json'
 import auditEs from '@/locales/es/audit.json'
 import cobrosEs from '@/locales/es/cobros.json'
+import pedidosEs from '@/locales/es/pedidos.json'
 import finanzasEs from '@/locales/es/finanzas.json'
 import reportesEs from '@/locales/es/reportes.json'
 import logisticaEs from '@/locales/es/logistica.json'
@@ -26,6 +27,7 @@ import chatEn from '@/locales/en/chat.json'
 import proveedoresEn from '@/locales/en/proveedores.json'
 import auditEn from '@/locales/en/audit.json'
 import cobrosEn from '@/locales/en/cobros.json'
+import pedidosEn from '@/locales/en/pedidos.json'
 import finanzasEn from '@/locales/en/finanzas.json'
 import reportesEn from '@/locales/en/reportes.json'
 import logisticaEn from '@/locales/en/logistica.json'
@@ -40,6 +42,7 @@ import chatPt from '@/locales/pt-BR/chat.json'
 import proveedoresPt from '@/locales/pt-BR/proveedores.json'
 import auditPt from '@/locales/pt-BR/audit.json'
 import cobrosPt from '@/locales/pt-BR/cobros.json'
+import pedidosPt from '@/locales/pt-BR/pedidos.json'
 import finanzasPt from '@/locales/pt-BR/finanzas.json'
 import reportesPt from '@/locales/pt-BR/reportes.json'
 import logisticaPt from '@/locales/pt-BR/logistica.json'
@@ -56,7 +59,7 @@ i18n
     lng: savedLang,
     fallbackLng: 'es',
     defaultNS: 'common',
-    ns: ['common', 'clientes', 'articulos', 'proveedores', 'facturacion', 'cobros', 'finanzas', 'reportes', 'logistica', 'zonasEntrega', 'empresa', 'chat', 'audit'],
+    ns: ['common', 'clientes', 'articulos', 'proveedores', 'facturacion', 'pedidos', 'cobros', 'finanzas', 'reportes', 'logistica', 'zonasEntrega', 'empresa', 'chat', 'audit'],
     resources: {
       es: {
         common: commonEs,
@@ -64,6 +67,7 @@ i18n
         articulos: articulosEs,
         proveedores: proveedoresEs,
         facturacion: facturacionEs,
+        pedidos: pedidosEs,
         zonasEntrega: zonasEntregaEs,
         chat: chatEs,
         audit: auditEs,
@@ -79,6 +83,7 @@ i18n
         articulos: articulosEn,
         proveedores: proveedoresEn,
         facturacion: facturacionEn,
+        pedidos: pedidosEn,
         zonasEntrega: zonasEntregaEn,
         chat: chatEn,
         audit: auditEn,
@@ -94,6 +99,7 @@ i18n
         articulos: articulosPt,
         proveedores: proveedoresPt,
         facturacion: facturacionPt,
+        pedidos: pedidosPt,
         zonasEntrega: zonasEntregaPt,
         chat: chatPt,
         audit: auditPt,

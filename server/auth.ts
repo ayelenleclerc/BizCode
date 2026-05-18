@@ -207,6 +207,22 @@ export function resolveSession(prisma: PrismaClient) {
   }
 }
 
+function enforceChannelScope(req: AuthenticatedRequest, res: Response): boolean {
+  const requestedChannel = getRequestedChannel(req)
+  if (requestedChannel === 'invalid') {
+    res.status(400).json({
+      success: false,
+      error: `Invalid x-bizcode-channel header. Allowed values: ${USER_CHANNELS.join(', ')}`,
+    })
+    return false
+  }
+  if (requestedChannel !== null && !req.auth!.claims.scope.channels.includes(requestedChannel)) {
+    res.status(403).json({ success: false, error: `Missing channel scope: ${requestedChannel}` })
+    return false
+  }
+  return true
+}
+
 export function requirePermission(permission: Permission) {
   return (req: AuthenticatedRequest, res: Response, next: NextFunction): void => {
     if (!req.auth) {
@@ -217,16 +233,29 @@ export function requirePermission(permission: Permission) {
       res.status(403).json({ success: false, error: `Missing permission: ${permission}` })
       return
     }
-    const requestedChannel = getRequestedChannel(req)
-    if (requestedChannel === 'invalid') {
-      res.status(400).json({
+    if (!enforceChannelScope(req, res)) {
+      return
+    }
+    next()
+  }
+}
+
+/** @en Requires at least one of the listed permissions (channel scope still enforced). */
+export function requireAnyPermission(...permissions: Permission[]) {
+  return (req: AuthenticatedRequest, res: Response, next: NextFunction): void => {
+    if (!req.auth) {
+      res.status(401).json({ success: false, error: 'Authentication required' })
+      return
+    }
+    const allowed = permissions.some((p) => hasPermission(req.auth!.claims.role, p))
+    if (!allowed) {
+      res.status(403).json({
         success: false,
-        error: `Invalid x-bizcode-channel header. Allowed values: ${USER_CHANNELS.join(', ')}`,
+        error: `Missing one of permissions: ${permissions.join(', ')}`,
       })
       return
     }
-    if (requestedChannel !== null && !req.auth.claims.scope.channels.includes(requestedChannel)) {
-      res.status(403).json({ success: false, error: `Missing channel scope: ${requestedChannel}` })
+    if (!enforceChannelScope(req, res)) {
       return
     }
     next()
