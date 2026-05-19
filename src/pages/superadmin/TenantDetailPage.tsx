@@ -149,12 +149,21 @@ export default function TenantDetailPage() {
       </header>
 
       <dl className="grid gap-4 sm:grid-cols-2 max-w-3xl" data-testid="superadmin-detail-meta">
-        <DetailItem label={t('superadmin.detail.status')} value={tenant.active ? t('superadmin.status.active') : t('superadmin.status.suspended')} />
-        <DetailItem label={t('superadmin.detail.plan')} value={tenant.plan ?? '—'} />
-        <DetailItem label={t('superadmin.detail.modulesCount')} value={String(tenant.modulesCount)} />
-        <DetailItem label={t('superadmin.detail.lastActivity')} value={formatDate(tenant.lastActivityAt)} />
-        <DetailItem label={t('superadmin.detail.createdAt')} value={formatDate(tenant.createdAt)} />
-        <DetailItem label={t('superadmin.detail.configUpdated')} value={formatDate(tenant.configUpdatedAt)} />
+        {(
+          [
+            { key: 'status', label: t('superadmin.detail.status'), value: tenant.active ? t('superadmin.status.active') : t('superadmin.status.suspended') },
+            { key: 'plan', label: t('superadmin.detail.plan'), value: tenant.plan ?? '—' },
+            { key: 'modulesCount', label: t('superadmin.detail.modulesCount'), value: String(tenant.modulesCount) },
+            { key: 'lastActivity', label: t('superadmin.detail.lastActivity'), value: formatDate(tenant.lastActivityAt) },
+            { key: 'createdAt', label: t('superadmin.detail.createdAt'), value: formatDate(tenant.createdAt) },
+            { key: 'configUpdated', label: t('superadmin.detail.configUpdated'), value: formatDate(tenant.configUpdatedAt) },
+          ] as const
+        ).map(({ key, label, value }) => (
+          <div key={key}>
+            <dt className="text-sm text-slate-500 dark:text-slate-400">{label}</dt>
+            <dd className="font-medium text-slate-900 dark:text-slate-100">{value}</dd>
+          </div>
+        ))}
       </dl>
 
       <section className="mt-8 max-w-lg" aria-labelledby="superadmin-plan-heading">
@@ -188,15 +197,6 @@ export default function TenantDetailPage() {
           <li>{t('superadmin.detail.statClients', { count: tenant.stats.clienteCount })}</li>
         </ul>
       </section>
-    </div>
-  )
-}
-
-function DetailItem({ label, value }: { label: string; value: string }) {
-  return (
-    <div>
-      <dt className="text-sm text-slate-500 dark:text-slate-400">{label}</dt>
-      <dd className="font-medium text-slate-900 dark:text-slate-100">{value}</dd>
     </div>
   )
 }
