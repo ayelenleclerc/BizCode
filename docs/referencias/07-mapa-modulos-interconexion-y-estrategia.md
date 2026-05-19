@@ -24,7 +24,7 @@
 ## 3. Estrategia de implementación sugerida (BizCode)
 
 1. **Estabilizar maestros ya migrados** — `Rubro`, `Articulo` desde `PVAR`/`PVAR2` (script actual); completar descripciones cuando haya datos en `PVAR` o fuente alternativa (`ARTIC.DBF` tiene 2038 registros en esta copia).
-2. **`Cliente`** — sustituir placeholders: leer estructura y muestras de `CLIENTES.DBF`, mapear a `Cliente` en Prisma y ampliar `migrate-from-dbf.ts` (o script dedicado).
+2. **`Cliente`** — **v1 implementado (#51, PR #120):** ETL desde `CLIENTES.DBF` en [`migrate-from-dbf.ts`](../../scripts/migrate-from-dbf.ts) + [`legacyClienteDbf.ts`](../../src/lib/migration/legacyClienteDbf.ts); placeholders solo sin maestro con filas; ver [`scripts/MIGRACION_PROGRAMA_VIEJO.md`](../../scripts/MIGRACION_PROGRAMA_VIEJO.md).
 3. **`Factura` / `FacturaItem`** — analizar `FACT.DBF`, `DET_COMP`, `ENCAB*`, `IVA_V` para proponer mapeo; volumen alto: migración por lotes y pruebas en subconjunto.
 4. **Cuenta corriente / pagos** — `CCTE_V`, `PAGOS`, `MOV_STK` en fase posterior según prioridad de negocio.
 5. **Validación API** — alinear `POST/PUT` con esquemas Zod/OpenAPI antes de exponer ETL masivo.

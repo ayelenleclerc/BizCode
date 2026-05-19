@@ -43,7 +43,7 @@ node scripts/_generate-referencias-02-table.mjs docs/referencias/exports/inventa
 | CLAS09.DBF | 0 | 99 | B | pendiente |
 | CLAS10.DBF | 0 | 99 | B | pendiente |
 | CLAVES.DBF | 8 | 1242 | C | pendiente |
-| CLIENTES.DBF | 2310 | 2575999 | C | pendiente |
+| CLIENTES.DBF | 2310 | 2575999 | C | cubierto-script |
 | COLORES.DBF | 23 | 2783 | B | pendiente |
 | COMIS.DBF | 96191 | 7022457 | D | pendiente |
 | CONCEPTO.DBF | 5 | 214 | B | pendiente |

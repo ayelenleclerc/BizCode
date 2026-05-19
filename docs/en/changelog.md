@@ -10,6 +10,8 @@ Versioning: [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **DBF customer migration (GitHub #51):** `npm run migrate:dbf` imports customers from `CLIENTES.DBF` when the file exists with rows (`legacyClienteDbf.ts`, `clienteBodySchema`, rejection report); placeholders `91001`–`91010` only without a populated master; see [DBF migration testing](guides/dbf-migration-testing.md) and `scripts/MIGRACION_PROGRAMA_VIEJO.md`. Bulk load in the app uses CSV import (#58).
+
 - **SaaS plans and per-tenant limits (GitHub #181):** `Plan` / `TenantPlan` models; `GET /api/planes`, `GET /api/me/plan`, `POST /api/superadmin/tenants/:id/plan`; `requirePlanFeature`; limits on `POST /api/users` and `POST /api/facturas`; `PlanProvider`, `PlanGate`, SuperAdmin plan selector; i18n EN/ES/PT-BR.
 
 - **SuperAdmin module pricing and trials (GitHub #226):** `GET /api/superadmin/tenants/:id/pricing`, `GET/POST/DELETE .../trials`; `TenantModuleTrial` model; `src/lib/modules/pricing.ts`, `TenantPricingService`, `TenantTrialService`; `npm run modules:trial-expire`; notification type `module_trial_expiring`; pricing/trial UI on `/superadmin/tenants/:id/modules`; OpenAPI and API tests; i18n EN/ES/PT-BR (billing sync deferred to #181).

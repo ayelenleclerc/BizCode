@@ -1,7 +1,7 @@
 # Ficha: `CLIENTES.DBF`
 
 - **Grupo:** C — Terceros y operaciones
-- **Estado:** ETL v1 en `scripts/migrate-from-dbf.ts` cuando el archivo tiene registros
+- **Estado:** ETL v1 implementado (#51, PR #120) en `scripts/migrate-from-dbf.ts` cuando el archivo tiene registros
 
 ## Evidencia numérica
 

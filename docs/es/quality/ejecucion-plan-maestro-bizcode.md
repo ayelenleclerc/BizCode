@@ -51,7 +51,7 @@ Las prioridades siguientes son ítems de **planificación**; la verificación es
 | BP1-2 | P1 | Cobertura E2E / integración de caminos críticos | **Hecho (#66):** `e2e/critical-paths.spec.ts` + CI; ampliar según estrategia si se exigen más flujos |
 | BP1-3 | P1 | Refuerzo de alcance por canal | **Implementado en el código actual:** `requirePermission` en [`server/auth.ts`](../../../server/auth.ts) valida `x-bizcode-channel` opcional contra `AuthScope.channels`; cabecera inválida devuelve `400` y canal fuera de alcance devuelve `403`. Cubierto por [`tests/server/scope-channel.test.ts`](../../../tests/server/scope-channel.test.ts) |
 | BP1-4 | P1 | Chat interno (alcance mínimo) | Implementado con `/api/chat/conversations`, `/api/chat/messages`, contador de no leídos vía `Notification` (`chat_message`), historial paginado y ruta UI `/chat` en `src/pages/chat/index.tsx` |
-| BP1-5 | P1 | Preparación ETL clientes DBF (#51) | Relevamiento documentado en `scripts/MIGRACION_PROGRAMA_VIEJO.md` (mapeo explícito `COND`/`BAJA`/`CREDITO` y política de rechazo); sin implementación productiva de ETL de clientes en esta fase |
+| BP1-5 | P1 | ETL clientes DBF (#51) | **Hecho (PR #120):** ETL v1 desde `CLIENTES.DBF` con `legacyClienteDbf.ts` + `migrate-from-dbf.ts` y `clienteBodySchema`; mapeo y rechazos en `scripts/MIGRACION_PROGRAMA_VIEJO.md`; placeholders `91001`–`91010` solo sin maestro con filas; fuera de alcance v1: `SALDO`, `FPAGO`, `ZONA` |
 
 ## Estado del repositorio vs este paquete
 
