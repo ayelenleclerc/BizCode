@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useHotkeys } from 'react-hotkeys-hook'
 import { useTranslation } from 'react-i18next'
-import { usersAPI, type AppUserDTO, type CreateUserBody, type UpdateUserBody } from '@/lib/api'
+import { ApiRequestFailedError, usersAPI, type AppUserDTO, type CreateUserBody, type UpdateUserBody } from '@/lib/api'
 import { USER_ROLES, USER_CHANNELS, type UserRole, type UserChannel } from '@/lib/rbac'
 import { useAuth } from '@/contexts/AuthContext'
 
@@ -119,7 +119,9 @@ export default function UserForm({ user, onClose, onSaved }: Props) {
       onSaved(saved)
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err)
-      if (msg.includes('already exists') || msg.includes('Unique')) {
+      if (err instanceof ApiRequestFailedError && err.message === 'plan_limit_users') {
+        setError('root', { message: tc('errors.planLimitUsers') })
+      } else if (msg.includes('already exists') || msg.includes('Unique')) {
         setError('username', { message: t('form.errors.duplicate') })
       } else {
         setError('root', { message: t('form.errors.generic') })

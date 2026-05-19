@@ -10,6 +10,8 @@ Versioning: [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **SaaS plans and per-tenant limits (GitHub #181):** `Plan` / `TenantPlan` models; `GET /api/planes`, `GET /api/me/plan`, `POST /api/superadmin/tenants/:id/plan`; `requirePlanFeature`; limits on `POST /api/users` and `POST /api/facturas`; `PlanProvider`, `PlanGate`, SuperAdmin plan selector; i18n EN/ES/PT-BR.
+
 - **SuperAdmin module pricing and trials (GitHub #226):** `GET /api/superadmin/tenants/:id/pricing`, `GET/POST/DELETE .../trials`; `TenantModuleTrial` model; `src/lib/modules/pricing.ts`, `TenantPricingService`, `TenantTrialService`; `npm run modules:trial-expire`; notification type `module_trial_expiring`; pricing/trial UI on `/superadmin/tenants/:id/modules`; OpenAPI and API tests; i18n EN/ES/PT-BR (billing sync deferred to #181).
 
 - **SuperAdmin modules UI (GitHub #225):** `/superadmin/tenants/:id/modules` page with toggles, required change reason, presets, and history; `superadminAPI` config client and `modulesCatalogAPI` in `src/lib/api.ts`; `TenantModulesPage.test.tsx`; i18n `common.superadmin.modules.*` (EN/ES/PT-BR).

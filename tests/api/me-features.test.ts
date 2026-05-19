@@ -5,7 +5,7 @@ import { createApp } from '../../server/createApp'
 import { DEFAULT_MODULES } from '../../src/lib/modules'
 import { assertMatchesOpenApi } from './validate-openapi-response'
 
-function buildPrismaMock(): PrismaClient {
+export function buildPrismaMock(): PrismaClient {
   return {
     tenantConfig: {
       findUnique: vi.fn().mockResolvedValue({

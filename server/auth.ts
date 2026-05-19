@@ -2,6 +2,7 @@ import { createHmac, randomBytes } from 'node:crypto'
 import type { NextFunction, Request, Response } from 'express'
 import type { PrismaClient } from '@prisma/client'
 import type { ModuleKey } from '../src/lib/modules'
+import type { TenantPlanSnapshot } from '../src/lib/plans'
 import {
   ROLE_PERMISSIONS,
   USER_CHANNELS,
@@ -33,6 +34,7 @@ export type AuthenticatedRequest = Request & {
   auth?: RequestAuthContext
   tenantId?: number
   tenantModules?: readonly ModuleKey[]
+  tenantPlan?: TenantPlanSnapshot
 }
 
 function getCookieValue(rawCookieHeader: string | undefined, key: string): string | null {
@@ -409,6 +411,7 @@ export function registerAuthRoutes(app: import('express').Application, prisma: P
           scopeChannels: [...USER_CHANNELS],
         },
       })
+      const starterPlan = await tx.plan.findUnique({ where: { key: 'starter' } })
       await tx.tenantConfig.create({
         data: {
           tenantId: tenant.id,
@@ -419,6 +422,16 @@ export function registerAuthRoutes(app: import('express').Application, prisma: P
           integrations: [],
         },
       })
+      if (starterPlan) {
+        await tx.tenantPlan.create({
+          data: {
+            tenantId: tenant.id,
+            planId: starterPlan.id,
+            status: 'active',
+            changedById: user.id,
+          },
+        })
+      }
       await writeAuditEvent({
         prisma: tx as unknown as PrismaClient,
         tenantId: tenant.id,

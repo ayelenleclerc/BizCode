@@ -218,6 +218,40 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
 
+  /api/planes:
+    get:
+      tags: [platform]
+      summary: Public SaaS plan catalog
+      description: Lists active subscription plans with limits and feature keys (no authentication required).
+      parameters:
+        - $ref: '#/components/parameters/XRequestId'
+      responses:
+        '200':
+          description: Plan catalog
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlanCatalogEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/me/plan:
+    get:
+      tags: [platform]
+      summary: Current tenant SaaS plan and usage
+      description: Returns plan limits, enabled plan features, and current usage for the authenticated tenant.
+      parameters:
+        - $ref: '#/components/parameters/XRequestId'
+      responses:
+        '200':
+          description: Tenant plan snapshot
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TenantPlanSnapshotEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
   /api/superadmin/stats:
     get:
       tags: [platform]
@@ -435,6 +469,38 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         '403':
           $ref: '#/components/responses/ForbiddenError'
+
+  /api/superadmin/tenants/{tenantId}/plan:
+    parameters:
+      - $ref: '#/components/parameters/TenantIdPath'
+    post:
+      tags: [platform]
+      summary: Change tenant SaaS plan (super admin)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TenantPlanChangeBody'
+      responses:
+        '200':
+          description: Updated tenant plan
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TenantPlanSnapshotEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Tenant not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
 
   /api/superadmin/tenants/{tenantId}/pricing:
     parameters:
@@ -5420,6 +5486,125 @@ components:
           const: true
         data:
           $ref: '#/components/schemas/TenantFeaturesData'
+
+    PublicPlan:
+      type: object
+      required: [key, name, monthlyPrice, currency, maxUsers, maxInvoicesPerMonth, features]
+      properties:
+        key:
+          type: string
+        name:
+          type: string
+        monthlyPrice:
+          type: integer
+        currency:
+          type: string
+        maxUsers:
+          type: integer
+          nullable: true
+        maxInvoicesPerMonth:
+          type: integer
+          nullable: true
+        features:
+          type: array
+          items:
+            type: string
+
+    PlanCatalogEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/PublicPlan'
+
+    TenantPlanUsage:
+      type: object
+      required: [usersUsed, invoicesUsed]
+      properties:
+        usersUsed:
+          type: integer
+        invoicesUsed:
+          type: integer
+
+    TenantPlanSnapshot:
+      type: object
+      required:
+        - planKey
+        - planName
+        - monthlyPrice
+        - currency
+        - maxUsers
+        - maxInvoicesPerMonth
+        - features
+        - status
+        - usage
+      properties:
+        planKey:
+          type: string
+        planName:
+          type: string
+        monthlyPrice:
+          type: integer
+        currency:
+          type: string
+        maxUsers:
+          type: integer
+          nullable: true
+        maxInvoicesPerMonth:
+          type: integer
+          nullable: true
+        features:
+          type: array
+          items:
+            type: string
+        status:
+          type: string
+        usage:
+          $ref: '#/components/schemas/TenantPlanUsage'
+
+    TenantPlanSnapshotEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/TenantPlanSnapshot'
+
+    TenantPlanChangeBody:
+      type: object
+      required: [planKey, reason]
+      properties:
+        planKey:
+          type: string
+          enum: [starter, pro, enterprise, trial]
+        reason:
+          type: string
+          maxLength: 500
+
+    PlanLimitErrorEnvelope:
+      type: object
+      required: [success, error]
+      properties:
+        success:
+          type: boolean
+          const: false
+        error:
+          type: string
+          enum:
+            - plan_limit_users
+            - plan_limit_invoices
+            - plan_feature_required
+        feature:
+          type: string
+        currentPlan:
+          type: string
 
     TenantConfig:
       type: object

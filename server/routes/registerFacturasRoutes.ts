@@ -6,6 +6,7 @@ import type { FacturaInput } from '../createApp.types'
 import { paginatedListJson, parseListPagination } from '../services/listPagination'
 import { dispatchNotification } from '../channels'
 import type { RestRouteContext } from './restRouteTypes'
+import { planErrorBody, TenantPlanService } from '../services/TenantPlanService'
 import { errorMessage, getTenantId } from './restDomainShared'
 
 /**
@@ -33,6 +34,20 @@ export function registerFacturasRoutes(app: Application, ctx: RestRouteContext):
     async (req: Request, res: Response) => {
       try {
         const tenantId = getTenantId(req)
+        const authReq = req as AuthenticatedRequest
+        const planService = new TenantPlanService(prisma)
+        try {
+          const snapshot =
+            authReq.tenantPlan ?? (await planService.getSnapshotForTenant(tenantId))
+          planService.assertCanCreateInvoice(snapshot)
+        } catch (planErr: unknown) {
+          if (planErr instanceof Error && planErr.message === 'plan_limit_invoices') {
+            res.status(402).json(planErrorBody(planErr))
+            return
+          }
+          throw planErr
+        }
+
         const parsedValue = req.body as FacturaInput
         const result = await factura.create(tenantId, parsedValue)
         if (!result.ok) {
@@ -41,7 +56,6 @@ export function registerFacturasRoutes(app: Application, ctx: RestRouteContext):
         }
 
         const { factura: createdFactura, updatedCliente, stockBelowMinimum } = result.data
-        const authReq = req as AuthenticatedRequest
         if (
           updatedCliente.creditLimit !== null &&
           Number(updatedCliente.balance) > Number(updatedCliente.creditLimit)

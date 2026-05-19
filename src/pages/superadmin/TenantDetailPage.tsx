@@ -1,7 +1,8 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useId, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { superadminAPI, type SuperadminTenantDetail } from '@/lib/api'
+import { PLAN_KEYS } from '@/lib/plans'
+import { planAPI, superadminAPI, type PublicPlanDTO, type SuperadminTenantDetail } from '@/lib/api'
 
 export default function TenantDetailPage() {
   const { tenantId: tenantIdParam } = useParams()
@@ -11,6 +12,12 @@ export default function TenantDetailPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [patching, setPatching] = useState(false)
+  const [plans, setPlans] = useState<PublicPlanDTO[]>([])
+  const [selectedPlanKey, setSelectedPlanKey] = useState('')
+  const [planReason, setPlanReason] = useState('')
+  const [planSaving, setPlanSaving] = useState(false)
+  const [planMessage, setPlanMessage] = useState<string | null>(null)
+  const planReasonId = useId()
 
   const load = useCallback(async () => {
     if (!Number.isInteger(tenantId) || tenantId <= 0) {
@@ -23,6 +30,7 @@ export default function TenantDetailPage() {
     try {
       const data = await superadminAPI.getTenant(tenantId)
       setTenant(data)
+      setSelectedPlanKey(data.plan ?? 'starter')
     } catch {
       setError(t('superadmin.errors.loadFailed'))
       setTenant(null)
@@ -37,6 +45,35 @@ export default function TenantDetailPage() {
     }, 0)
     return () => window.clearTimeout(timer)
   }, [load])
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      void planAPI.list().then(setPlans).catch(() => setPlans([]))
+    }, 0)
+    return () => window.clearTimeout(timer)
+  }, [])
+
+  const handleChangePlan = async () => {
+    if (!tenant || !selectedPlanKey || !planReason.trim()) {
+      setPlanMessage(t('superadmin.plan.errors.reasonRequired'))
+      return
+    }
+    setPlanSaving(true)
+    setPlanMessage(null)
+    try {
+      await superadminAPI.changeTenantPlan(tenant.id, {
+        planKey: selectedPlanKey,
+        reason: planReason.trim(),
+      })
+      setPlanReason('')
+      setPlanMessage(t('superadmin.plan.saveSuccess'))
+      await load()
+    } catch {
+      setPlanMessage(t('superadmin.plan.errors.saveFailed'))
+    } finally {
+      setPlanSaving(false)
+    }
+  }
 
   const handleToggleActive = async () => {
     if (!tenant) return
@@ -120,6 +157,28 @@ export default function TenantDetailPage() {
         <DetailItem label={t('superadmin.detail.configUpdated')} value={formatDate(tenant.configUpdatedAt)} />
       </dl>
 
+      <section className="mt-8 max-w-lg" aria-labelledby="superadmin-plan-heading">
+        <h2 id="superadmin-plan-heading" className="text-lg font-semibold mb-3">
+          {t('superadmin.plan.sectionTitle')}
+        </h2>
+        {planMessage ? (
+          <p role="status" className="mb-3 text-sm text-green-800 dark:text-green-200" data-testid="superadmin-plan-message">
+            {planMessage}
+          </p>
+        ) : null}
+        <SuperadminPlanForm
+          planReasonId={planReasonId}
+          selectedPlanKey={selectedPlanKey}
+          onPlanKeyChange={setSelectedPlanKey}
+          planReason={planReason}
+          onPlanReasonChange={setPlanReason}
+          planSaving={planSaving}
+          onSave={() => void handleChangePlan()}
+          plans={plans}
+          t={t}
+        />
+      </section>
+
       <section className="mt-8" aria-label={t('superadmin.detail.statsSection')}>
         <h2 className="text-lg font-semibold mb-3">{t('superadmin.detail.statsSection')}</h2>
         <ul className="grid gap-2 sm:grid-cols-2 max-w-md list-none p-0" data-testid="superadmin-detail-stats">
@@ -138,6 +197,83 @@ function DetailItem({ label, value }: { label: string; value: string }) {
     <div>
       <dt className="text-sm text-slate-500 dark:text-slate-400">{label}</dt>
       <dd className="font-medium text-slate-900 dark:text-slate-100">{value}</dd>
+    </div>
+  )
+}
+
+function SuperadminPlanForm({
+  planReasonId,
+  selectedPlanKey,
+  onPlanKeyChange,
+  planReason,
+  onPlanReasonChange,
+  planSaving,
+  onSave,
+  plans,
+  t,
+}: {
+  planReasonId: string
+  selectedPlanKey: string
+  onPlanKeyChange: (v: string) => void
+  planReason: string
+  onPlanReasonChange: (v: string) => void
+  planSaving: boolean
+  onSave: () => void
+  plans: PublicPlanDTO[]
+  t: (key: string, opts?: Record<string, unknown>) => string
+}) {
+  const options =
+    plans.length > 0
+      ? plans
+      : PLAN_KEYS.map((key) => ({
+          key,
+          name: key,
+          monthlyPrice: 0,
+          currency: 'ARS',
+          maxUsers: null,
+          maxInvoicesPerMonth: null,
+          features: [],
+        }))
+
+  return (
+    <div className="flex flex-col gap-3" data-testid="superadmin-plan-form">
+      <label htmlFor="superadmin-plan-select" className="text-sm font-medium">
+        {t('superadmin.plan.selectLabel')}
+      </label>
+      <select
+        id="superadmin-plan-select"
+        value={selectedPlanKey}
+        onChange={(e) => onPlanKeyChange(e.target.value)}
+        className="rounded border border-slate-300 px-3 py-2 dark:border-slate-600 dark:bg-slate-900"
+        data-testid="superadmin-plan-select"
+      >
+        {options.map((p) => (
+          <option key={p.key} value={p.key}>
+            {t(`plans.names.${p.key}`, { defaultValue: p.name })}
+          </option>
+        ))}
+      </select>
+      <label htmlFor={planReasonId} className="text-sm font-medium">
+        {t('superadmin.plan.reasonLabel')}
+      </label>
+      <textarea
+        id={planReasonId}
+        value={planReason}
+        onChange={(e) => onPlanReasonChange(e.target.value)}
+        rows={2}
+        maxLength={500}
+        className="rounded border border-slate-300 px-3 py-2 dark:border-slate-600 dark:bg-slate-900"
+        data-testid="superadmin-plan-reason"
+      />
+      <button
+        type="button"
+        disabled={planSaving}
+        onClick={onSave}
+        className="w-fit rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:opacity-50"
+        data-testid="superadmin-plan-save"
+      >
+        {planSaving ? t('actions.saving') : t('superadmin.plan.save')}
+      </button>
     </div>
   )
 }

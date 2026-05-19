@@ -370,6 +370,41 @@ model Tenant {
   stockAjustes   StockAjuste[]
   tenantConfig   TenantConfig?
   moduleTrials   TenantModuleTrial[]
+  tenantPlan     TenantPlan?
+}
+
+model Plan {
+  id                  Int      @id @default(autoincrement())
+  key                 String   @unique @db.VarChar(20)
+  name                String   @db.VarChar(80)
+  monthlyPrice        Int      @default(0)
+  currency            String   @db.VarChar(3) @default("ARS")
+  maxUsers            Int?
+  maxInvoicesPerMonth Int?
+  features            Json     @default("[]")
+  active              Boolean  @default(true)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  tenantPlans TenantPlan[]
+}
+
+model TenantPlan {
+  id          Int       @id @default(autoincrement())
+  tenantId    Int       @unique
+  tenant      Tenant    @relation(fields: [tenantId], references: [id])
+  planId      Int
+  plan        Plan      @relation(fields: [planId], references: [id])
+  status      String    @db.VarChar(20) @default("active")
+  startedAt   DateTime  @default(now())
+  endsAt      DateTime?
+  changedById Int?
+  changedBy   AppUser?  @relation("TenantPlanChangedBy", fields: [changedById], references: [id])
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([tenantId])
+  @@index([planId])
 }
 
 model TenantConfig {
@@ -464,6 +499,7 @@ model AppUser {
   stockAjustes         StockAjuste[]
   tenantConfigsUpdated TenantConfig[] @relation("TenantConfigUpdatedBy")
   tenantConfigHistory  TenantConfigHistory[] @relation("TenantConfigHistoryChangedBy")
+  tenantPlansChanged   TenantPlan[] @relation("TenantPlanChangedBy")
 
   @@unique([tenantId, username])
 }

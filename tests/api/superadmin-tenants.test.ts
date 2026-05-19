@@ -75,6 +75,12 @@ function buildPrismaMock(): PrismaClient {
     appSession: {
       findFirst: vi.fn().mockResolvedValue({ lastSeenAt: new Date('2025-01-04T00:00:00.000Z') }),
     },
+    plan: {
+      findUnique: vi.fn().mockResolvedValue({ id: 1, key: 'starter' }),
+    },
+    tenantPlan: {
+      create: vi.fn().mockResolvedValue({ id: 1, tenantId: 2, planId: 1, status: 'active' }),
+    },
     $transaction: vi.fn().mockImplementation(async (fn: (tx: PrismaClient) => Promise<unknown>) => {
       const tx = {
         tenant: {
@@ -82,6 +88,12 @@ function buildPrismaMock(): PrismaClient {
         },
         tenantConfig: {
           create: vi.fn().mockResolvedValue(configRow),
+        },
+        plan: {
+          findUnique: vi.fn().mockResolvedValue({ id: 1, key: 'starter' }),
+        },
+        tenantPlan: {
+          create: vi.fn().mockResolvedValue({ id: 1, tenantId: 2, planId: 1, status: 'active' }),
         },
         appUser: {
           create: vi.fn().mockResolvedValue({ id: 10 }),
