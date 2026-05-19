@@ -129,6 +129,17 @@ Checklist diário de uso:
 4. Verificar checks (`Quality Gate`, `Docs governance`, links Markdown em `docs/`, segurança/CodeQL conforme configurado).
 5. Fazer merge somente com CI em verde.
 
+## Jobs operacionais agendados (cron no host)
+
+Não fazem parte do pipeline padrão do GitHub Actions; agende no servidor de implantação (ou orquestrador) com acesso ao banco do tenant.
+
+| Agendamento | Comando | Finalidade |
+|---|---|---|
+| `*/5 * * * *` | `npm run afip:retry-pending-job` | Reprocessa faturas com `estadoCae: pending` via mock WSFE de homologação (`AfipService.retryPending`) para cada tenant com `TenantFiscalConfig`. |
+| Diário 08:00 (horário local do tenant) | `npm run cobranzas:recordatorios` | Lembretes de inadimplência (um tenant; ver script). |
+
+Variável opcional para um único tenant em dev/staging: `BIZCODE_TENANT_ID=<id>` (vale para `afip:retry-pending-job` e `afip:retry-pending`).
+
 Governança documental (Wiki vs documentação controlada):
 
 - Notas operacionais rápidas podem ficar no Wiki.

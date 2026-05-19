@@ -153,6 +153,17 @@ Daily usage checklist:
 4. Verify required checks (`Quality Gate`, `Docs governance`, `Documentation links`, security/CodeQL checks as enabled).
 5. Merge only when CI is green.
 
+## Scheduled operational jobs (host cron)
+
+These jobs are **not** run by GitHub Actions in the default pipeline; schedule them on the deployment host (or an orchestrator) with tenant database access.
+
+| Schedule | Command | Purpose |
+|---|---|---|
+| `*/5 * * * *` | `npm run afip:retry-pending-job` | Retry `estadoCae: pending` invoices via homologación WSFE mock (`AfipService.retryPending`) for every tenant with `TenantFiscalConfig`. |
+| Daily 08:00 (tenant local) | `npm run cobranzas:recordatorios` | Overdue collection reminders (single tenant; see script). |
+
+Optional env for a single tenant in dev/staging: `BIZCODE_TENANT_ID=<id>` (applies to `afip:retry-pending-job` and `afip:retry-pending`).
+
 Documentation governance (Wiki vs controlled docs):
 
 - Fast-changing operational notes can live in Wiki.

@@ -8,6 +8,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import { hasPermission } from '@/lib/rbac'
 import { validateCUIT } from '@/lib/validators'
 import type { EmpresaConfig } from '@/types'
+import AfipFiscalSection from './AfipFiscalSection'
 
 const empresaFormSchema = z.object({
   nombre: z.string().trim().min(1).max(40),
@@ -338,6 +339,8 @@ export default function EmpresaPage() {
           </button>
         )}
       </form>
+
+      <AfipFiscalSection />
     </div>
   )
 }

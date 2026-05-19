@@ -29,5 +29,34 @@
   },
   "success": {
     "saved": "Configuración de empresa guardada"
+  },
+  "afip": {
+    "title": "Facturación electrónica AFIP (CAE)",
+    "subtitle": "Homologación mock — credenciales cifradas; certificado y clave no se muestran tras guardar.",
+    "loading": "Cargando configuración AFIP…",
+    "configuredHint": "Configurado para CUIT {{cuit}} ({{ambiente}}).",
+    "notConfigured": "Aún no hay credenciales AFIP configuradas.",
+    "readOnlyHint": "Puede ver el estado; solo roles con permiso fiscal pueden editar.",
+    "cuit": "CUIT AFIP",
+    "certificate": "Certificado X.509 (PEM)",
+    "certificatePlaceholder": "Pegue el certificado PEM…",
+    "certificatePlaceholderUpdate": "Deje vacío para conservar; pegue PEM para reemplazar.",
+    "privateKey": "Clave privada (PEM)",
+    "privateKeyPlaceholder": "Pegue la clave privada PEM…",
+    "privateKeyPlaceholderUpdate": "Deje vacío para conservar; pegue PEM para reemplazar.",
+    "ambiente": "Ambiente",
+    "ambienteHomologacion": "Homologación (mock)",
+    "ambienteProduccion": "Producción (no habilitado en esta versión)",
+    "save": "Guardar credenciales AFIP",
+    "saving": "Guardando…",
+    "saveSuccess": "Credenciales AFIP guardadas",
+    "testAuth": "Probar ticket (TA)",
+    "authLoading": "Solicitando TA…",
+    "authSuccess": "TA mock OK — vence {{expiration}}",
+    "errors": {
+      "loadFailed": "No se pudo cargar la configuración AFIP",
+      "saveFailed": "No se pudieron guardar las credenciales AFIP",
+      "authFailed": "No se pudo obtener el ticket AFIP"
+    }
   }
 }

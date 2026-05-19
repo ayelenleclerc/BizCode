@@ -10,6 +10,10 @@
 
 * [AfipConfigInput](./afipconfiginput.md) – `-`
 
+* [AfipConfigStatus](./afipconfigstatus.md) – `-`
+
+* [AfipConfigStatusEnvelope](./afipconfigstatusenvelope.md) – `-`
+
 * [AfipTaEnvelope](./afiptaenvelope.md) – `-`
 
 * [AgingAr](./agingar.md) – `-`

@@ -7,6 +7,7 @@ import { paginatedListJson, parseListPagination } from '../services/listPaginati
 import { dispatchNotification } from '../channels'
 import type { RestRouteContext } from './restRouteTypes'
 import { planErrorBody, TenantPlanService } from '../services/TenantPlanService'
+import { buildFacturaPdfBuffer, facturaPdfFilename } from '../fiscal/ar/facturaPdf'
 import { errorMessage, getTenantId } from './restDomainShared'
 
 /**
@@ -79,6 +80,48 @@ export function registerFacturasRoutes(app: Application, ctx: RestRouteContext):
 
         await writeAudit(req as AuthenticatedRequest, 'factura_create', 'factura', String(createdFactura.id))
         res.json({ success: true, data: createdFactura })
+      } catch (err: unknown) {
+        res.status(500).json({ success: false, error: errorMessage(err) })
+      }
+    },
+  )
+
+  app.get(
+    '/api/facturas/:id/pdf/preview',
+    requirePermission('reports.operational.read'),
+    async (req: Request, res: Response) => {
+      try {
+        const tenantId = getTenantId(req)
+        const id = parseInt(String(req.params.id), 10)
+        const result = await buildFacturaPdfBuffer(prisma, tenantId, id, { preview: true })
+        if (!result.ok) {
+          res.status(result.status).json({ success: false, error: result.error })
+          return
+        }
+        res.setHeader('Content-Type', 'application/pdf')
+        res.setHeader('Content-Disposition', `inline; filename="${facturaPdfFilename(id, true)}"`)
+        res.send(result.data)
+      } catch (err: unknown) {
+        res.status(500).json({ success: false, error: errorMessage(err) })
+      }
+    },
+  )
+
+  app.get(
+    '/api/facturas/:id/pdf',
+    requirePermission('reports.operational.read'),
+    async (req: Request, res: Response) => {
+      try {
+        const tenantId = getTenantId(req)
+        const id = parseInt(String(req.params.id), 10)
+        const result = await buildFacturaPdfBuffer(prisma, tenantId, id, { preview: false })
+        if (!result.ok) {
+          res.status(result.status).json({ success: false, error: result.error })
+          return
+        }
+        res.setHeader('Content-Type', 'application/pdf')
+        res.setHeader('Content-Disposition', `attachment; filename="${facturaPdfFilename(id, false)}"`)
+        res.send(result.data)
       } catch (err: unknown) {
         res.status(500).json({ success: false, error: errorMessage(err) })
       }

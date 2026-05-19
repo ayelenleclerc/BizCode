@@ -139,6 +139,17 @@ Checklist de uso diario:
 4. Verificar checks (`Quality Gate`, `Docs governance`, enlaces Markdown en `docs/`, seguridad/CodeQL si aplica).
 5. Mergear cuando CI esté verde.
 
+## Jobs operativos programados (cron en el host)
+
+No forman parte del pipeline por defecto de GitHub Actions; prográmelos en el servidor de despliegue (u orquestador) con acceso a la base del tenant.
+
+| Programación | Comando | Propósito |
+|---|---|---|
+| `*/5 * * * *` | `npm run afip:retry-pending-job` | Reintenta facturas con `estadoCae: pending` vía mock WSFE de homologación (`AfipService.retryPending`) para cada tenant con `TenantFiscalConfig`. |
+| Diario 08:00 (hora local del tenant) | `npm run cobranzas:recordatorios` | Recordatorios de mora (un tenant; ver script). |
+
+Variable opcional para un solo tenant en dev/staging: `BIZCODE_TENANT_ID=<id>` (aplica a `afip:retry-pending-job` y `afip:retry-pending`).
+
 Política de documentación (Wiki vs controlada):
 
 - Operativo/rápido en Wiki.

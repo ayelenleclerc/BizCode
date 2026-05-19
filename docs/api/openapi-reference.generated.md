@@ -9695,6 +9695,14 @@ Requires `suppliers.manage` and `inventory.adjust`. Creates `StockAjuste` rows w
 
   **Items:**
 
+  - **`cae`**
+
+    `string`
+
+  - **`caeVto`**
+
+    `string`, format: `date-time`
+
   - **`clienteId`**
 
     `integer`
@@ -9702,6 +9710,10 @@ Requires `suppliers.manage` and `inventory.adjust`. Creates `StockAjuste` rows w
   - **`estado`**
 
     `string`
+
+  - **`estadoCae`**
+
+    `string`, possible values: `"pending", "issued", "failed"`
 
   - **`fecha`**
 
@@ -9886,6 +9898,9 @@ Requires `suppliers.manage` and `inventory.adjust`. Creates `StockAjuste` rows w
       "iva2": 1,
       "total": 1,
       "estado": "",
+      "cae": "",
+      "caeVto": "",
+      "estadoCae": "pending",
       "items": [
         {
           "id": 1,
@@ -10112,6 +10127,14 @@ Requires `suppliers.manage` and `inventory.adjust`. Creates `StockAjuste` rows w
 
   `object`
 
+  - **`cae`**
+
+    `string`
+
+  - **`caeVto`**
+
+    `string`, format: `date-time`
+
   - **`clienteId`**
 
     `integer`
@@ -10119,6 +10142,10 @@ Requires `suppliers.manage` and `inventory.adjust`. Creates `StockAjuste` rows w
   - **`estado`**
 
     `string`
+
+  - **`estadoCae`**
+
+    `string`, possible values: `"pending", "issued", "failed"`
 
   - **`fecha`**
 
@@ -10290,6 +10317,9 @@ Requires `suppliers.manage` and `inventory.adjust`. Creates `StockAjuste` rows w
     "iva2": 1,
     "total": 1,
     "estado": "",
+    "cae": "",
+    "caeVto": "",
+    "estadoCae": "pending",
     "items": [
       {
         "id": 1,
@@ -10391,6 +10421,116 @@ Requires `suppliers.manage` and `inventory.adjust`. Creates `StockAjuste` rows w
 ```
 
 ##### Status: 422 Client suspended, insufficient stock, or other business rule
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### AFIP fiscal config status (metadata only)
+
+- **Method:** `GET`
+- **Path:** `/api/afip/config`
+- **Tags:** afip
+
+Requires `settings.fiscal.manage`. Does not return certificate or private key.
+
+#### Responses
+
+##### Status: 200 Config status
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`configured` (required)**
+
+    `boolean`
+
+  - **`ambiente`**
+
+    `string`
+
+  - **`cuit`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "configured": true,
+    "cuit": "",
+    "ambiente": ""
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
 
 ###### Content-Type: application/json
 
@@ -13678,6 +13818,249 @@ Persists `CobroRecordatorio`, dispatches `invoice_overdue` notification, and aud
 }
 ```
 
+### PARAMETERS /api/facturas/{id}/pdf
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/facturas/{id}/pdf`
+
+### Download invoice PDF (requires issued CAE)
+
+- **Method:** `GET`
+- **Path:** `/api/facturas/{id}/pdf`
+- **Tags:** facturas
+
+Requires `reports.operational.read`. Returns 422 when `estadoCae` is not `issued` or CAE is missing.
+
+#### Responses
+
+##### Status: 200 PDF file
+
+###### Content-Type: application/pdf
+
+`string`, format: `binary`
+
+**Example:**
+
+```json
+{}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Invoice not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 422 CAE not issued
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/facturas/{id}/pdf/preview
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/facturas/{id}/pdf/preview`
+
+### Preview invoice PDF (watermarked, no valid fiscal barcode)
+
+- **Method:** `GET`
+- **Path:** `/api/facturas/{id}/pdf/preview`
+- **Tags:** facturas
+
+Requires `reports.operational.read`. Allowed without CAE.
+
+#### Responses
+
+##### Status: 200 PDF preview
+
+###### Content-Type: application/pdf
+
+`string`, format: `binary`
+
+**Example:**
+
+```json
+{}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Invoice not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ### PARAMETERS /api/facturas/{id}/void
 
 - **Method:** `PARAMETERS`
@@ -13717,6 +14100,14 @@ Sets `estado` to `N` (anulada), reverses the customer balance by the invoice tot
 
   `object`
 
+  - **`cae`**
+
+    `string`
+
+  - **`caeVto`**
+
+    `string`, format: `date-time`
+
   - **`clienteId`**
 
     `integer`
@@ -13724,6 +14115,10 @@ Sets `estado` to `N` (anulada), reverses the customer balance by the invoice tot
   - **`estado`**
 
     `string`
+
+  - **`estadoCae`**
+
+    `string`, possible values: `"pending", "issued", "failed"`
 
   - **`fecha`**
 
@@ -13895,6 +14290,9 @@ Sets `estado` to `N` (anulada), reverses the customer balance by the invoice tot
     "iva2": 1,
     "total": 1,
     "estado": "",
+    "cae": "",
+    "caeVto": "",
+    "estadoCae": "pending",
     "items": [
       {
         "id": 1,
@@ -22703,6 +23101,14 @@ Requires `orders.dispatch` for transitions to `assigned`, `in_transit`, or `fail
 
 - **Type:**`object`
 
+* **`cae`**
+
+  `string`
+
+* **`caeVto`**
+
+  `string`, format: `date-time`
+
 * **`clienteId`**
 
   `integer`
@@ -22710,6 +23116,10 @@ Requires `orders.dispatch` for transitions to `assigned`, `in_transit`, or `fail
 * **`estado`**
 
   `string`
+
+* **`estadoCae`**
+
+  `string`, possible values: `"pending", "issued", "failed"`
 
 * **`fecha`**
 
@@ -22875,6 +23285,9 @@ Requires `orders.dispatch` for transitions to `assigned`, `in_transit`, or `fail
   "iva2": 1,
   "total": 1,
   "estado": "",
+  "cae": "",
+  "caeVto": "",
+  "estadoCae": "pending",
   "items": [
     {
       "id": 1,
@@ -23178,6 +23591,14 @@ Requires `orders.dispatch` for transitions to `assigned`, `in_transit`, or `fail
 
   `object`
 
+  - **`cae`**
+
+    `string`
+
+  - **`caeVto`**
+
+    `string`, format: `date-time`
+
   - **`clienteId`**
 
     `integer`
@@ -23185,6 +23606,10 @@ Requires `orders.dispatch` for transitions to `assigned`, `in_transit`, or `fail
   - **`estado`**
 
     `string`
+
+  - **`estadoCae`**
+
+    `string`, possible values: `"pending", "issued", "failed"`
 
   - **`fecha`**
 
@@ -23356,6 +23781,9 @@ Requires `orders.dispatch` for transitions to `assigned`, `in_transit`, or `fail
     "iva2": 1,
     "total": 1,
     "estado": "",
+    "cae": "",
+    "caeVto": "",
+    "estadoCae": "pending",
     "items": [
       {
         "id": 1,
@@ -23421,6 +23849,69 @@ Requires `orders.dispatch` for transitions to `assigned`, `in_transit`, or `fail
   "certificate": "",
   "privateKey": "",
   "ambiente": "homologacion"
+}
+```
+
+### AfipConfigStatus
+
+- **Type:**`object`
+
+* **`configured` (required)**
+
+  `boolean`
+
+* **`ambiente`**
+
+  `string`
+
+* **`cuit`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "configured": true,
+  "cuit": "",
+  "ambiente": ""
+}
+```
+
+### AfipConfigStatusEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`configured` (required)**
+
+    `boolean`
+
+  - **`ambiente`**
+
+    `string`
+
+  - **`cuit`**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "configured": true,
+    "cuit": "",
+    "ambiente": ""
+  }
 }
 ```
 

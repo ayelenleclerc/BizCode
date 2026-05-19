@@ -1,22 +1,63 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { facturasAPI } from '@/lib/api'
+import { afipAPI, facturasAPI } from '@/lib/api'
 import { CanAccess } from '@/components/CanAccess'
+import IfModule from '@/components/IfModule'
 import { Factura, Cliente } from '@/types'
 
 interface ListadoFacturasProps {
   facturas: Factura[]
   clientes: Cliente[]
   onFacturaVoided?: () => void
+  onFacturaUpdated?: () => void
 }
 
-export default function ListadoFacturas({ facturas, clientes, onFacturaVoided }: ListadoFacturasProps) {
+function triggerBlobDownload(blob: Blob, filename: string): void {
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = filename
+  link.click()
+  URL.revokeObjectURL(url)
+}
+
+function CaeBadge({ estado }: { estado: Factura['estadoCae'] }) {
+  const { t } = useTranslation('facturacion')
+  if (!estado) return null
+  const label =
+    estado === 'issued' ? t('cae.issued') : estado === 'failed' ? t('cae.failed') : t('cae.pending')
+  const className =
+    estado === 'issued'
+      ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-300'
+      : estado === 'failed'
+        ? 'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-300'
+        : 'bg-amber-100 dark:bg-amber-900 text-amber-800 dark:text-amber-300'
+  return (
+    <span
+      data-testid={`factura-cae-badge-${estado}`}
+      className={`inline-block px-2 py-1 rounded text-xs font-semibold ${className}`}
+    >
+      {label}
+    </span>
+  )
+}
+
+export default function ListadoFacturas({
+  facturas,
+  clientes,
+  onFacturaVoided,
+  onFacturaUpdated,
+}: ListadoFacturasProps) {
   const { t } = useTranslation('facturacion')
   const [expandedId, setExpandedId] = useState<number | null>(null)
   const [voidingId, setVoidingId] = useState<number | null>(null)
   const [motivo, setMotivo] = useState('')
   const [voidLoading, setVoidLoading] = useState(false)
   const [voidError, setVoidError] = useState<string | null>(null)
+  const [caeLoadingId, setCaeLoadingId] = useState<number | null>(null)
+  const [caeError, setCaeError] = useState<string | null>(null)
+  const [pdfLoadingId, setPdfLoadingId] = useState<number | null>(null)
+  const [pdfError, setPdfError] = useState<string | null>(null)
 
   const getClienteName = (clienteId: number) => {
     return clientes.find((c) => c.id === clienteId)?.rsocial || `Cliente #${clienteId}`
@@ -42,6 +83,35 @@ export default function ListadoFacturas({ facturas, clientes, onFacturaVoided }:
     }
   }
 
+  const handleRetryCae = async (facturaId: number) => {
+    setCaeLoadingId(facturaId)
+    setCaeError(null)
+    try {
+      await afipAPI.requestCae(facturaId)
+      onFacturaUpdated?.()
+    } catch (err: unknown) {
+      setCaeError((err as Error).message || t('cae.retryError'))
+    } finally {
+      setCaeLoadingId(null)
+    }
+  }
+
+  const handlePdf = async (facturaId: number, preview: boolean) => {
+    setPdfLoadingId(facturaId)
+    setPdfError(null)
+    try {
+      const blob = preview
+        ? await facturasAPI.downloadPdfPreview(facturaId)
+        : await facturasAPI.downloadPdf(facturaId)
+      const name = preview ? `factura-${facturaId}-preview.pdf` : `factura-${facturaId}.pdf`
+      triggerBlobDownload(blob, name)
+    } catch (err: unknown) {
+      setPdfError((err as Error).message || t('cae.pdfError'))
+    } finally {
+      setPdfLoadingId(null)
+    }
+  }
+
   return (
     <div className="flex-1 overflow-auto">
       {facturas.length === 0 ? (
@@ -63,6 +133,9 @@ export default function ListadoFacturas({ facturas, clientes, onFacturaVoided }:
               <th className="px-4 py-3 text-right text-slate-700 dark:text-slate-300 font-semibold">{t('list.neto')}</th>
               <th className="px-4 py-3 text-right text-slate-700 dark:text-slate-300 font-semibold">{t('list.iva')}</th>
               <th className="px-4 py-3 text-right text-slate-700 dark:text-slate-300 font-semibold">{t('list.total')}</th>
+              <IfModule flag="billing.afip_cae">
+                <th className="px-4 py-3 text-center text-slate-700 dark:text-slate-300 font-semibold">{t('cae.column')}</th>
+              </IfModule>
               <th className="px-4 py-3 text-center text-slate-700 dark:text-slate-300 font-semibold">{t('list.estado')}</th>
             </tr>
           </thead>
@@ -91,6 +164,11 @@ export default function ListadoFacturas({ facturas, clientes, onFacturaVoided }:
                   <td className="px-4 py-3 text-right font-mono font-semibold text-green-700 dark:text-green-400">
                     ${Number(factura.total).toFixed(2)}
                   </td>
+                  <IfModule flag="billing.afip_cae">
+                    <td className="px-4 py-3 text-center" onClick={(e) => e.stopPropagation()}>
+                      <CaeBadge estado={factura.estadoCae} />
+                    </td>
+                  </IfModule>
                   <td className="px-4 py-3 text-center">
                     {factura.estado === 'A' ? (
                       <span className="inline-block px-2 py-1 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-300 rounded text-xs font-semibold">
@@ -121,6 +199,10 @@ export default function ListadoFacturas({ facturas, clientes, onFacturaVoided }:
               const factura = facturas.find((f) => f.id === expandedId)
               if (!factura) return null
 
+              const canRetryCae =
+                factura.estadoCae === 'pending' || factura.estadoCae === 'failed'
+              const canDownloadPdf = factura.estadoCae === 'issued' && !!factura.cae
+
               return (
                 <>
                   <div className="bg-slate-200 dark:bg-slate-700 px-6 py-4 border-b border-slate-300 dark:border-slate-600">
@@ -134,6 +216,18 @@ export default function ListadoFacturas({ facturas, clientes, onFacturaVoided }:
                     <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
                       {new Date(factura.fecha).toLocaleDateString('es-AR')} — {getClienteName(factura.clienteId)}
                     </p>
+                    <IfModule flag="billing.afip_cae">
+                      <div className="mt-2">
+                        <CaeBadge estado={factura.estadoCae} />
+                        {factura.cae && (
+                          <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
+                            {t('cae.caeNumber', { cae: factura.cae })}
+                            {factura.caeVto &&
+                              ` — ${t('cae.caeVto', { date: new Date(factura.caeVto).toLocaleDateString('es-AR') })}`}
+                          </p>
+                        )}
+                      </div>
+                    </IfModule>
                   </div>
 
                   <div className="p-6 space-y-4">
@@ -184,7 +278,51 @@ export default function ListadoFacturas({ facturas, clientes, onFacturaVoided }:
                       </div>
                     </div>
 
-                    {/* Void section */}
+                    <IfModule flag="billing.afip_cae">
+                      <div className="flex flex-wrap gap-2" role="group" aria-label={t('cae.column')}>
+                        <CanAccess permission="reports.operational.read">
+                          <button
+                            type="button"
+                            data-testid="btn-factura-pdf-preview"
+                            disabled={pdfLoadingId === factura.id}
+                            onClick={() => void handlePdf(factura.id, true)}
+                            className="px-3 py-2 text-sm bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-900 dark:text-slate-100 rounded transition disabled:opacity-50"
+                          >
+                            {pdfLoadingId === factura.id ? t('cae.pdfLoading') : t('cae.previewPdf')}
+                          </button>
+                          {canDownloadPdf && (
+                            <button
+                              type="button"
+                              data-testid="btn-factura-pdf-download"
+                              disabled={pdfLoadingId === factura.id}
+                              onClick={() => void handlePdf(factura.id, false)}
+                              className="px-3 py-2 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded transition disabled:opacity-50"
+                            >
+                              {pdfLoadingId === factura.id ? t('cae.pdfLoading') : t('cae.downloadPdf')}
+                            </button>
+                          )}
+                        </CanAccess>
+                        {canRetryCae && (
+                          <CanAccess permission="sales.create">
+                            <button
+                              type="button"
+                              data-testid="btn-factura-retry-cae"
+                              disabled={caeLoadingId === factura.id}
+                              onClick={() => void handleRetryCae(factura.id)}
+                              className="px-3 py-2 text-sm bg-amber-100 hover:bg-amber-200 dark:bg-amber-900/40 text-amber-900 dark:text-amber-200 rounded transition disabled:opacity-50"
+                            >
+                              {caeLoadingId === factura.id ? t('cae.retryLoading') : t('cae.retry')}
+                            </button>
+                          </CanAccess>
+                        )}
+                      </div>
+                      {(caeError || pdfError) && (
+                        <p className="text-sm text-red-600 dark:text-red-400" role="alert" aria-live="polite">
+                          {caeError ?? pdfError}
+                        </p>
+                      )}
+                    </IfModule>
+
                     {factura.estado === 'A' && (
                       <CanAccess permission="sales.cancel">
                         {voidingId === factura.id ? (

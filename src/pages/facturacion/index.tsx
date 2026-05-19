@@ -83,6 +83,7 @@ export default function FacturacionPage() {
               facturas={facturas}
               clientes={clientes}
               onFacturaVoided={handleFacturaGuardada}
+              onFacturaUpdated={handleFacturaGuardada}
             />
           </AsyncWrapper>
         </>

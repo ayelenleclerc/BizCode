@@ -29,5 +29,34 @@
   },
   "success": {
     "saved": "Company settings saved"
+  },
+  "afip": {
+    "title": "AFIP electronic invoicing (CAE)",
+    "subtitle": "Homologación mock — credentials encrypted at rest; certificate and key are never shown after save.",
+    "loading": "Loading AFIP settings…",
+    "configuredHint": "Configured for CUIT {{cuit}} ({{ambiente}}).",
+    "notConfigured": "AFIP credentials are not configured yet.",
+    "readOnlyHint": "You can view status; only roles with fiscal settings permission can edit.",
+    "cuit": "AFIP CUIT",
+    "certificate": "X.509 certificate (PEM)",
+    "certificatePlaceholder": "Paste certificate PEM…",
+    "certificatePlaceholderUpdate": "Leave blank to keep current certificate; paste PEM to replace.",
+    "privateKey": "Private key (PEM)",
+    "privateKeyPlaceholder": "Paste private key PEM…",
+    "privateKeyPlaceholderUpdate": "Leave blank to keep current key; paste PEM to replace.",
+    "ambiente": "Environment",
+    "ambienteHomologacion": "Homologación (mock)",
+    "ambienteProduccion": "Production (not enabled in this build)",
+    "save": "Save AFIP credentials",
+    "saving": "Saving…",
+    "saveSuccess": "AFIP credentials saved",
+    "testAuth": "Test ticket (TA)",
+    "authLoading": "Requesting TA…",
+    "authSuccess": "Mock TA OK — expires {{expiration}}",
+    "errors": {
+      "loadFailed": "Could not load AFIP settings",
+      "saveFailed": "Could not save AFIP credentials",
+      "authFailed": "Could not obtain AFIP ticket"
+    }
   }
 }
