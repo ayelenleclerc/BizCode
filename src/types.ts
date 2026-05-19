@@ -99,6 +99,9 @@ export interface Factura {
   total: number | string
   formaPagoId?: number
   estado: string // A, N (anulada)
+  cae?: string | null
+  caeVto?: Date | string | null
+  estadoCae?: 'pending' | 'issued' | 'failed' | null
   items?: FacturaItem[]
   createdAt?: Date
   updatedAt?: Date

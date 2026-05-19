@@ -1287,6 +1287,84 @@ export const facturasAPI = {
       return handleError(error as AxiosError<ApiErrorPayload>)
     }
   },
+
+  downloadPdf: async (id: number): Promise<Blob> => {
+    try {
+      const response = await api.get(`/facturas/${id}/pdf`, { responseType: 'blob' })
+      return response.data as Blob
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  downloadPdfPreview: async (id: number): Promise<Blob> => {
+    try {
+      const response = await api.get(`/facturas/${id}/pdf/preview`, { responseType: 'blob' })
+      return response.data as Blob
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+}
+
+export type AfipConfigStatus = {
+  configured: boolean
+  cuit?: string
+  ambiente?: string
+}
+
+export type AfipConfigInput = {
+  cuit: string
+  certificate: string
+  privateKey: string
+  ambiente?: 'homologacion' | 'produccion'
+}
+
+export const afipAPI = {
+  getConfig: async (): Promise<AfipConfigStatus> => {
+    try {
+      const response = await api.get<{ success: boolean; data: AfipConfigStatus }>('/afip/config')
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  putConfig: async (body: AfipConfigInput): Promise<{ configured: boolean }> => {
+    try {
+      const response = await api.put<{ success: boolean; data: { configured: boolean } }>(
+        '/afip/config',
+        body,
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  auth: async (): Promise<{ token: string; sign: string; expiration: string }> => {
+    try {
+      const response = await api.post<{
+        success: boolean
+        data: { token: string; sign: string; expiration: string }
+      }>('/afip/auth')
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  requestCae: async (facturaId: number): Promise<{ cae: string; caeVto: string }> => {
+    try {
+      const response = await api.post<{
+        success: boolean
+        data: { cae: string; caeVto: string }
+      }>('/afip/cae', { facturaId })
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
 }
 
 // ============ USERS ============

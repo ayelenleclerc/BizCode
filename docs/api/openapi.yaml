@@ -1680,6 +1680,23 @@ paths:
                 $ref: '#/components/schemas/ApiErrorEnvelope'
 
   /api/afip/config:
+    get:
+      tags: [afip]
+      summary: AFIP fiscal config status (metadata only)
+      description: Requires `settings.fiscal.manage`. Does not return certificate or private key.
+      responses:
+        '200':
+          description: Config status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AfipConfigStatusEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
     put:
       tags: [afip]
       summary: Upsert tenant AFIP credentials
@@ -2199,6 +2216,80 @@ paths:
                 $ref: '#/components/schemas/ApiErrorEnvelope'
         '422':
           description: Invoice not overdue
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/facturas/{id}/pdf:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [facturas]
+      summary: Download invoice PDF (requires issued CAE)
+      description: Requires `reports.operational.read`. Returns 422 when `estadoCae` is not `issued` or CAE is missing.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: PDF file
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Invoice not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '422':
+          description: CAE not issued
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/facturas/{id}/pdf/preview:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [facturas]
+      summary: Preview invoice PDF (watermarked, no valid fiscal barcode)
+      description: Requires `reports.operational.read`. Allowed without CAE.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: PDF preview
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Invoice not found
           content:
             application/json:
               schema:
@@ -4550,6 +4641,17 @@ components:
           type: number
         estado:
           type: string
+        cae:
+          type: string
+          nullable: true
+        caeVto:
+          type: string
+          format: date-time
+          nullable: true
+        estadoCae:
+          type: string
+          enum: [pending, issued, failed]
+          nullable: true
         items:
           type: array
           items:
@@ -4666,6 +4768,22 @@ components:
         ambiente:
           type: string
           enum: [homologacion, produccion]
+
+    AfipConfigStatus:
+      type: object
+      required: [configured]
+      properties:
+        configured: { type: boolean }
+        cuit: { type: string }
+        ambiente: { type: string }
+
+    AfipConfigStatusEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success: { type: boolean, const: true }
+        data:
+          $ref: '#/components/schemas/AfipConfigStatus'
 
     AfipConfigEnvelope:
       type: object

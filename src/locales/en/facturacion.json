@@ -78,5 +78,20 @@
     "error": "Could not void the invoice"
   },
   "save": "✓ Save Invoice (F5)",
-  "cancel": "Cancel (Esc)"
+  "cancel": "Cancel (Esc)",
+  "cae": {
+    "column": "CAE",
+    "pending": "CAE pending",
+    "issued": "CAE issued",
+    "failed": "CAE failed",
+    "retry": "Retry CAE",
+    "retryLoading": "Requesting CAE…",
+    "retryError": "Could not request CAE",
+    "previewPdf": "Preview PDF",
+    "downloadPdf": "Download PDF",
+    "pdfLoading": "Generating PDF…",
+    "pdfError": "Could not generate PDF",
+    "caeNumber": "CAE: {{cae}}",
+    "caeVto": "Expires: {{date}}"
+  }
 }

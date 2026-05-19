@@ -78,5 +78,20 @@
     "error": "Não foi possível cancelar a nota fiscal"
   },
   "save": "✓ Salvar NF (F5)",
-  "cancel": "Cancelar (Esc)"
+  "cancel": "Cancelar (Esc)",
+  "cae": {
+    "column": "CAE",
+    "pending": "CAE pendente",
+    "issued": "CAE emitido",
+    "failed": "CAE falhou",
+    "retry": "Repetir CAE",
+    "retryLoading": "Solicitando CAE…",
+    "retryError": "Não foi possível solicitar o CAE",
+    "previewPdf": "Pré-visualizar PDF",
+    "downloadPdf": "Baixar PDF",
+    "pdfLoading": "Gerando PDF…",
+    "pdfError": "Não foi possível gerar o PDF",
+    "caeNumber": "CAE: {{cae}}",
+    "caeVto": "Venc.: {{date}}"
+  }
 }

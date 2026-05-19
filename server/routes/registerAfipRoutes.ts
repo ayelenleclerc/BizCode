@@ -28,6 +28,15 @@ export function registerAfipRoutes(app: Application, ctx: RestRouteContext): voi
   const { prisma, writeAudit } = ctx
   const afip = new AfipService(prisma)
 
+  app.get('/api/afip/config', requirePermission('settings.fiscal.manage'), async (req: Request, res: Response) => {
+    try {
+      const status = await afip.getConfigStatus(getTenantId(req))
+      res.json({ success: true, data: status })
+    } catch (err: unknown) {
+      res.status(500).json({ success: false, error: errorMessage(err) })
+    }
+  })
+
   app.put(
     '/api/afip/config',
     requirePermission('settings.fiscal.manage'),
@@ -79,8 +88,11 @@ export function registerAfipRoutes(app: Application, ctx: RestRouteContext): voi
           res.status(result.status).json({ success: false, error: result.error })
           return
         }
-        await writeAudit(req as AuthenticatedRequest, 'afip_cae_request', 'factura', String(facturaId))
-        res.json({ success: true, data: result.data })
+        await writeAudit(req as AuthenticatedRequest, 'afip_cae_request', 'factura', String(facturaId), {
+          tipo: result.data.tipo,
+          cae: result.data.cae,
+        })
+        res.json({ success: true, data: { cae: result.data.cae, caeVto: result.data.caeVto } })
       } catch (err: unknown) {
         res.status(500).json({ success: false, error: errorMessage(err) })
       }

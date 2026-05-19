@@ -78,5 +78,20 @@
     "error": "No se pudo anular la factura"
   },
   "save": "✓ Guardar Factura (F5)",
-  "cancel": "Cancelar (Esc)"
+  "cancel": "Cancelar (Esc)",
+  "cae": {
+    "column": "CAE",
+    "pending": "CAE pendiente",
+    "issued": "CAE emitido",
+    "failed": "CAE fallido",
+    "retry": "Reintentar CAE",
+    "retryLoading": "Solicitando CAE…",
+    "retryError": "No se pudo solicitar el CAE",
+    "previewPdf": "Vista previa PDF",
+    "downloadPdf": "Descargar PDF",
+    "pdfLoading": "Generando PDF…",
+    "pdfError": "No se pudo generar el PDF",
+    "caeNumber": "CAE: {{cae}}",
+    "caeVto": "Vto: {{date}}"
+  }
 }

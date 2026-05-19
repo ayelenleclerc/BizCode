@@ -243,6 +243,10 @@ function buildPrisma(): PrismaClient {
         cliente: { id: 1, codigo: 1, rsocial: 'ACME SA' },
       }),
     },
+    tenantFiscalConfig: {
+      findUnique: vi.fn().mockResolvedValue(null),
+      upsert: vi.fn().mockResolvedValue({ id: 1 }),
+    },
     paramEmpresa: {
       findUnique: vi.fn().mockResolvedValue({
         id: 1,
@@ -621,6 +625,47 @@ describe('API — contrato OpenAPI', () => {
       })
       .expect(200)
     await assertMatchesOpenApi('/api/facturas', 'post', '200', res.body)
+  })
+
+  it('GET /api/afip/config', async () => {
+    process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
+    process.env.BIZCODE_TEST_ROLE = 'owner'
+    const p = buildPrisma()
+    vi.mocked(p.tenantFiscalConfig.findUnique).mockResolvedValue({
+      cuit: '20123456789',
+      ambiente: 'homologacion',
+    } as never)
+    const app = createApp(p)
+    const res = await request(app).get('/api/afip/config').expect(200)
+    await assertMatchesOpenApi('/api/afip/config', 'get', '200', res.body)
+  })
+
+  it('GET /api/facturas/:id/pdf/preview returns application/pdf', async () => {
+    process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
+    process.env.BIZCODE_TEST_ROLE = 'owner'
+    const p = buildPrisma()
+    vi.mocked(p.factura.findFirst).mockResolvedValue({
+      id: 1,
+      tipo: 'A',
+      prefijo: '0001',
+      numero: 1,
+      fecha: new Date('2025-01-15T12:00:00.000Z'),
+      total: 121,
+      neto1: 100,
+      neto2: 0,
+      neto3: 0,
+      iva1: 21,
+      iva2: 0,
+      estadoCae: 'pending',
+      cae: null,
+      caeVto: null,
+      cliente: { rsocial: 'ACME SA', cuit: null, domicilio: null },
+      items: [],
+    } as never)
+    const app = createApp(p)
+    const res = await request(app).get('/api/facturas/1/pdf/preview').expect(200)
+    expect(res.headers['content-type']).toMatch(/application\/pdf/)
+    expect(res.body.subarray(0, 4).toString()).toBe('%PDF')
   })
 
   it('GET /api/clientes devuelve 500 cuando Prisma falla', async () => {
