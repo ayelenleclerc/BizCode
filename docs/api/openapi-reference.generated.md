@@ -2102,6 +2102,647 @@ Returns module and integration keys enabled for the authenticated user's tenant.
 }
 ```
 
+### PARAMETERS /api/superadmin/tenants/{tenantId}/pricing
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/superadmin/tenants/{tenantId}/pricing`
+
+### Estimated monthly pricing for tenant (super admin)
+
+- **Method:** `GET`
+- **Path:** `/api/superadmin/tenants/{tenantId}/pricing`
+- **Tags:** platform
+
+#### Responses
+
+##### Status: 200 Pricing breakdown
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`addons` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`moduleKey` (required)**
+
+      `string`
+
+    - **`price` (required)**
+
+      `number`
+
+  - **`basePrice` (required)**
+
+    `number`
+
+  - **`plan` (required)**
+
+    `string`
+
+  - **`totalMonthly` (required)**
+
+    `number`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "plan": "",
+    "basePrice": 0,
+    "addons": [
+      {
+        "moduleKey": "",
+        "price": 0
+      }
+    ],
+    "totalMonthly": 0
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Tenant not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/superadmin/tenants/{tenantId}/trials
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/superadmin/tenants/{tenantId}/trials`
+
+### List active module trials for tenant (super admin)
+
+- **Method:** `GET`
+- **Path:** `/api/superadmin/tenants/{tenantId}/trials`
+- **Tags:** platform
+
+#### Responses
+
+##### Status: 200 Active trials
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`active` (required)**
+
+    `boolean`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`daysRemaining` (required)**
+
+    `integer`
+
+  - **`expiresAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`moduleKey` (required)**
+
+    `string`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "moduleKey": "",
+      "expiresAt": "",
+      "active": true,
+      "daysRemaining": 0,
+      "createdAt": ""
+    }
+  ]
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Tenant not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Activate or extend module trial (super admin)
+
+- **Method:** `POST`
+- **Path:** `/api/superadmin/tenants/{tenantId}/trials`
+- **Tags:** platform
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`moduleKey` (required)**
+
+  `string`
+
+- **`days`**
+
+  `integer`, default: `30`
+
+- **`reason`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "moduleKey": "",
+  "days": 30,
+  "reason": ""
+}
+```
+
+#### Responses
+
+##### Status: 201 Trial activated
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`active` (required)**
+
+    `boolean`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`daysRemaining` (required)**
+
+    `integer`
+
+  - **`expiresAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`moduleKey` (required)**
+
+    `string`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "moduleKey": "",
+    "expiresAt": "",
+    "active": true,
+    "daysRemaining": 0,
+    "createdAt": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Tenant not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/superadmin/tenants/{tenantId}/trials/{moduleKey}
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/superadmin/tenants/{tenantId}/trials/{moduleKey}`
+
+### Deactivate module trial (super admin)
+
+- **Method:** `DELETE`
+- **Path:** `/api/superadmin/tenants/{tenantId}/trials/{moduleKey}`
+- **Tags:** platform
+
+#### Responses
+
+##### Status: 200 Trial deactivated
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`active` (required)**
+
+    `boolean`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`daysRemaining` (required)**
+
+    `integer`
+
+  - **`expiresAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`moduleKey` (required)**
+
+    `string`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "moduleKey": "",
+    "expiresAt": "",
+    "active": true,
+    "daysRemaining": 0,
+    "createdAt": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Trial not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ### PARAMETERS /api/clientes
 
 - **Method:** `PARAMETERS`
@@ -25121,6 +25762,320 @@ Requires `orders.dispatch` for transitions to `assigned`, `in_transit`, or `fail
       }
     ]
   }
+}
+```
+
+### TenantPricingAddon
+
+- **Type:**`object`
+
+* **`moduleKey` (required)**
+
+  `string`
+
+* **`price` (required)**
+
+  `number`
+
+**Example:**
+
+```json
+{
+  "moduleKey": "",
+  "price": 0
+}
+```
+
+### TenantPricingData
+
+- **Type:**`object`
+
+* **`addons` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`moduleKey` (required)**
+
+    `string`
+
+  - **`price` (required)**
+
+    `number`
+
+* **`basePrice` (required)**
+
+  `number`
+
+* **`plan` (required)**
+
+  `string`
+
+* **`totalMonthly` (required)**
+
+  `number`
+
+**Example:**
+
+```json
+{
+  "plan": "",
+  "basePrice": 0,
+  "addons": [
+    {
+      "moduleKey": "",
+      "price": 0
+    }
+  ],
+  "totalMonthly": 0
+}
+```
+
+### TenantPricingEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`addons` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`moduleKey` (required)**
+
+      `string`
+
+    - **`price` (required)**
+
+      `number`
+
+  - **`basePrice` (required)**
+
+    `number`
+
+  - **`plan` (required)**
+
+    `string`
+
+  - **`totalMonthly` (required)**
+
+    `number`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "plan": "",
+    "basePrice": 0,
+    "addons": [
+      {
+        "moduleKey": "",
+        "price": 0
+      }
+    ],
+    "totalMonthly": 0
+  }
+}
+```
+
+### TenantModuleTrial
+
+- **Type:**`object`
+
+* **`active` (required)**
+
+  `boolean`
+
+* **`createdAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`daysRemaining` (required)**
+
+  `integer`
+
+* **`expiresAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`moduleKey` (required)**
+
+  `string`
+
+* **`tenantId` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "tenantId": 1,
+  "moduleKey": "",
+  "expiresAt": "",
+  "active": true,
+  "daysRemaining": 0,
+  "createdAt": ""
+}
+```
+
+### TenantModuleTrialListEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`active` (required)**
+
+    `boolean`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`daysRemaining` (required)**
+
+    `integer`
+
+  - **`expiresAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`moduleKey` (required)**
+
+    `string`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "moduleKey": "",
+      "expiresAt": "",
+      "active": true,
+      "daysRemaining": 0,
+      "createdAt": ""
+    }
+  ]
+}
+```
+
+### TenantModuleTrialEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`active` (required)**
+
+    `boolean`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`daysRemaining` (required)**
+
+    `integer`
+
+  - **`expiresAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`moduleKey` (required)**
+
+    `string`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "moduleKey": "",
+    "expiresAt": "",
+    "active": true,
+    "daysRemaining": 0,
+    "createdAt": ""
+  }
+}
+```
+
+### TenantModuleTrialActivateBody
+
+- **Type:**`object`
+
+* **`moduleKey` (required)**
+
+  `string`
+
+* **`days`**
+
+  `integer`, default: `30`
+
+* **`reason`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "moduleKey": "",
+  "days": 30,
+  "reason": ""
 }
 ```
 

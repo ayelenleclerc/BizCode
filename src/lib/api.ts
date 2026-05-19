@@ -341,6 +341,90 @@ export const superadminAPI = {
       return handleError(error as AxiosError<ApiErrorPayload>)
     }
   },
+
+  getPricing: async (
+    tenantId: number,
+    params?: { modules?: string[] },
+  ): Promise<TenantPricingData> => {
+    try {
+      const modulesCsv = params?.modules?.length ? params.modules.join(',') : undefined
+      const response = await api.get<{ success: boolean; data: TenantPricingData }>(
+        `/superadmin/tenants/${tenantId}/pricing`,
+        { params: modulesCsv ? { modules: modulesCsv } : undefined },
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  listTrials: async (tenantId: number): Promise<TenantModuleTrialDTO[]> => {
+    try {
+      const response = await api.get<{ success: boolean; data: TenantModuleTrialDTO[] }>(
+        `/superadmin/tenants/${tenantId}/trials`,
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  activateTrial: async (
+    tenantId: number,
+    body: TenantModuleTrialActivateInput,
+  ): Promise<TenantModuleTrialDTO> => {
+    try {
+      const response = await api.post<{ success: boolean; data: TenantModuleTrialDTO }>(
+        `/superadmin/tenants/${tenantId}/trials`,
+        body,
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  deactivateTrial: async (
+    tenantId: number,
+    moduleKey: string,
+  ): Promise<TenantModuleTrialDTO> => {
+    try {
+      const response = await api.delete<{ success: boolean; data: TenantModuleTrialDTO }>(
+        `/superadmin/tenants/${tenantId}/trials/${encodeURIComponent(moduleKey)}`,
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+}
+
+export type TenantPricingAddon = {
+  moduleKey: string
+  price: number
+}
+
+export type TenantPricingData = {
+  plan: string
+  basePrice: number
+  addons: TenantPricingAddon[]
+  totalMonthly: number
+}
+
+export type TenantModuleTrialDTO = {
+  id: number
+  tenantId: number
+  moduleKey: string
+  expiresAt: string
+  active: boolean
+  daysRemaining: number
+  createdAt: string
+}
+
+export type TenantModuleTrialActivateInput = {
+  moduleKey: string
+  days?: number
+  reason?: string
 }
 
 export type TenantConfigDTO = {

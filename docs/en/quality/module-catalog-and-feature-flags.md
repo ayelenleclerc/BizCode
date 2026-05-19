@@ -1,6 +1,6 @@
 # Module catalog and feature flags (implementation record)
 
-**Evidence:** GitHub issues #227 (catalog), #223 (per-tenant engine), #224 (frontend) · milestone v0.11.5
+**Evidence:** GitHub issues #227 (catalog), #223 (per-tenant engine), #224 (frontend), #226 (pricing/trials) · milestone v0.11.5
 
 ## Scope in repository
 
@@ -17,6 +17,7 @@
 - **Tenant bootstrap:** `POST /api/auth/setup-owner` and SuperAdmin seed create `TenantConfig` with [`NEW_TENANT_MODULES`](../../../src/lib/modules/tenantDefaults.ts); existing-tenant backfill includes `billing.orders` for #132 compatibility.
 - **Frontend (#224):** [`src/contexts/FeatureFlagsContext.tsx`](../../../src/contexts/FeatureFlagsContext.tsx) (`useFeatureFlags`, `FeatureFlagsGate`); [`src/components/IfModule.tsx`](../../../src/components/IfModule.tsx); [`src/components/ModuleRoute.tsx`](../../../src/components/ModuleRoute.tsx); nav map in [`src/components/layout/navSections.ts`](../../../src/components/layout/navSections.ts); loaded after login via `featuresAPI.get()` in [`src/lib/api.ts`](../../../src/lib/api.ts); i18n `modules.*` labels; `/inicio` alert via `errors.moduleNotEnabled`.
 - **SuperAdmin UI (#225):** [`src/pages/superadmin/TenantModulesPage.tsx`](../../../src/pages/superadmin/TenantModulesPage.tsx) at `/superadmin/tenants/:tenantId/modules`; client `superadminAPI.getConfig` / `putConfig` / `getConfigHistory` / `applyConfigTemplate` and `modulesCatalogAPI.get()` in [`src/lib/api.ts`](../../../src/lib/api.ts); toggles with UX validation (`canDeactivate`, dependencies); required reason on save; presets and history.
+- **Pricing and trials (#226):** [`src/lib/modules/pricing.ts`](../../../src/lib/modules/pricing.ts) (`PLAN_BASE_MONTHLY_ARS`, `estimateTenantMonthlyPrice`); `GET /api/superadmin/tenants/:id/pricing` ([`TenantPricingService`](../../../server/services/TenantPricingService.ts)); `TenantModuleTrial` + `GET/POST/DELETE .../trials` ([`TenantTrialService`](../../../server/services/TenantTrialService.ts)); job `npm run modules:trial-expire` ([`scripts/module-trial-expire-job.ts`](../../../scripts/module-trial-expire-job.ts)); notification `module_trial_expiring` to tenant owners; UI pricing panel and trial controls on `TenantModulesPage`. Billing/subscription sync is **out of scope** until #181.
 
 ## `requiredInProd` (Argentina)
 
