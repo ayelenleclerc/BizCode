@@ -125,6 +125,7 @@ model Articulo {
   pedidoItems      PedidoItem[]
   stockAjustes     StockAjuste[]
   ordenCompraItems OrdenCompraItem[]
+  recuentoItems    RecuentoItem[]
 
   @@unique([tenantId, codigo])
   @@index([tenantId])
@@ -186,6 +187,38 @@ model OrdenCompraItem {
   subtotal         Decimal     @db.Decimal(14, 2)
 
   @@index([ordenCompraId])
+  @@index([articuloId])
+}
+
+model Recuento {
+  id         Int       @id @default(autoincrement())
+  tenantId   Int
+  tenant     Tenant    @relation(fields: [tenantId], references: [id])
+  operadorId Int
+  operador   AppUser   @relation("RecuentoOperador", fields: [operadorId], references: [id])
+  /// in_progress | closed
+  estado     String    @db.VarChar(20) @default("in_progress")
+  fecha      DateTime  @default(now())
+  closedAt   DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  items RecuentoItem[]
+
+  @@index([tenantId, estado])
+}
+
+model RecuentoItem {
+  id          Int      @id @default(autoincrement())
+  recuentoId  Int
+  recuento    Recuento @relation(fields: [recuentoId], references: [id], onDelete: Cascade)
+  articuloId  Int
+  articulo    Articulo @relation(fields: [articuloId], references: [id])
+  cantSistema Int
+  cantFisica  Int?
+
+  @@unique([recuentoId, articuloId])
+  @@index([recuentoId])
   @@index([articuloId])
 }
 
@@ -374,6 +407,7 @@ model Tenant {
   paramEmpresa   ParamEmpresa?
   fiscalConfig   TenantFiscalConfig?
   stockAjustes   StockAjuste[]
+  recuentos      Recuento[]
   tenantConfig   TenantConfig?
   moduleTrials   TenantModuleTrial[]
   tenantPlan     TenantPlan?
@@ -503,6 +537,7 @@ model AppUser {
   ordenesEntregaDriver OrdenEntrega[] @relation("OrdenEntregaDriver")
   pedidosVendedor      Pedido[]
   stockAjustes         StockAjuste[]
+  recuentosOperados    Recuento[]     @relation("RecuentoOperador")
   tenantConfigsUpdated TenantConfig[] @relation("TenantConfigUpdatedBy")
   tenantConfigHistory  TenantConfigHistory[] @relation("TenantConfigHistoryChangedBy")
   tenantPlansChanged   TenantPlan[] @relation("TenantPlanChangedBy")

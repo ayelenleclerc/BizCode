@@ -1,0 +1,39 @@
+{
+  "title": "Contagem de inventário",
+  "subtitle": "Contagem física e ajuste de estoque por diferenças",
+  "noAccess": "Você não tem permissão para realizar contagens de inventário.",
+  "empty": "Não há contagens registradas.",
+  "stockBlocked": "Há uma contagem em andamento: operações que alteram estoque estão bloqueadas até o fechamento.",
+  "estado": {
+    "in_progress": "Em andamento",
+    "closed": "Fechada"
+  },
+  "columns": {
+    "id": "N.º",
+    "fecha": "Data",
+    "operador": "Operador",
+    "estado": "Status",
+    "items": "Itens"
+  },
+  "actions": {
+    "start": "Iniciar contagem",
+    "saveCounts": "Salvar contagens",
+    "close": "Fechar contagem",
+    "pdf": "Ver PDF de diferenças",
+    "closeDialog": "Fechar"
+  },
+  "detail": {
+    "title": "Contagem #{{id}}",
+    "progress": "{{counted}} de {{total}} itens contados",
+    "codigo": "Código",
+    "descripcion": "Descrição",
+    "sistema": "Sistema",
+    "fisico": "Físico",
+    "diff": "Diferença",
+    "pending": "Pendente"
+  },
+  "errors": {
+    "alreadyOpen": "Já existe uma contagem em andamento.",
+    "incomplete": "Conclua a contagem de todos os itens antes de fechar."
+  }
+}

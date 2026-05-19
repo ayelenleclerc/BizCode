@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "articulo": {
+      "properties": {
+        "codigo": {
+          "type": "integer"
+        },
+        "descripcion": {
+          "type": "string"
+        },
+        "id": {
+          "type": "integer"
+        }
+      },
+      "type": "object"
+    },
+    "articuloId": {
+      "type": "integer"
+    },
+    "cantFisica": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "cantSistema": {
+      "type": "integer"
+    },
+    "id": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "id",
+    "articuloId",
+    "cantSistema"
+  ],
+  "title": "RecuentoItemLine",
+  "type": "object"
+}

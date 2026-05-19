@@ -7,12 +7,12 @@
 | Role | Permissions (from `ROLE_PERMISSIONS`) |
 |------|----------------------------------------|
 | `super_admin` | All `OWNER_PERMISSIONS` plus `platform.tenants.manage`, `platform.support.impersonate` |
-| `owner` | `users.manage`, `roles.assign`, `sales.create`, `sales.cancel`, `customers.read`, `customers.manage`, `products.read`, `products.manage`, `inventory.adjust`, `orders.create`, `orders.pick`, `orders.dispatch`, `orders.deliver.confirm`, `reports.operational.read`, `reports.financial.read`, `settings.business.manage`, `settings.fiscal.manage`, `audit.read` |
-| `manager` | `sales.create`, `sales.cancel`, `customers.read`, `customers.manage`, `products.read`, `products.manage`, `inventory.adjust`, `orders.create`, `orders.pick`, `orders.dispatch`, `reports.operational.read`, `audit.read` |
+| `owner` | `users.manage`, `roles.assign`, `sales.create`, `sales.cancel`, `customers.read`, `customers.manage`, `products.read`, `products.manage`, `inventory.adjust`, `inventory.count`, `orders.create`, `orders.pick`, `orders.dispatch`, `orders.deliver.confirm`, `reports.operational.read`, `reports.financial.read`, `settings.business.manage`, `settings.fiscal.manage`, `audit.read` |
+| `manager` | `sales.create`, `sales.cancel`, `customers.read`, `customers.manage`, `products.read`, `products.manage`, `inventory.adjust`, `inventory.count`, `orders.create`, `orders.pick`, `orders.dispatch`, `reports.operational.read`, `audit.read` |
 | `seller` | `sales.create`, `customers.read`, `customers.manage`, `orders.create`, `products.read` |
 | `backoffice` | `customers.read`, `customers.manage`, `products.read`, `reports.operational.read` |
 | `warehouse_op` | `orders.pick`, `products.read` |
-| `warehouse_lead` | `orders.pick`, `orders.dispatch`, `inventory.adjust`, `reports.operational.read` |
+| `warehouse_lead` | `orders.pick`, `orders.dispatch`, `inventory.adjust`, `inventory.count`, `reports.operational.read` |
 | `logistics_planner` | `orders.dispatch`, `reports.operational.read` |
 | `driver` | `orders.deliver.confirm` |
 | `billing` | `sales.create`, `sales.cancel`, `reports.operational.read` |

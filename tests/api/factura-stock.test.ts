@@ -72,6 +72,7 @@ describe('POST /api/facturas — stock', () => {
       paramEmpresa: { findUnique: vi.fn().mockResolvedValue(null) },
       notification: { findMany: vi.fn().mockResolvedValue([]), createMany: vi.fn().mockResolvedValue({ count: 0 }) },
       auditEvent: { create: vi.fn().mockResolvedValue({ id: 1 }) },
+      recuento: { findFirst: vi.fn().mockResolvedValue(null) },
       appUser: { count: vi.fn().mockResolvedValue(0), findMany: vi.fn().mockResolvedValue([]) },
       tenant: { findUnique: vi.fn().mockResolvedValue({ id: 1, name: 'Demo', slug: 'demo', active: true }) },
       $transaction: vi.fn(async (fn: unknown) => {
@@ -113,6 +114,7 @@ describe('POST /api/facturas — stock', () => {
       paramEmpresa: { findUnique: vi.fn().mockResolvedValue(null) },
       notification: { findMany: vi.fn().mockResolvedValue([]), createMany: vi.fn() },
       auditEvent: { create: vi.fn() },
+      recuento: { findFirst: vi.fn().mockResolvedValue(null) },
       appUser: { count: vi.fn().mockResolvedValue(0), findMany: vi.fn().mockResolvedValue([]) },
       tenant: { findUnique: vi.fn().mockResolvedValue({ id: 1, name: 'Demo', slug: 'demo', active: true }) },
       $transaction: vi.fn(),
@@ -155,6 +157,7 @@ describe('POST /api/facturas — stock', () => {
       paramEmpresa: { findUnique: vi.fn().mockResolvedValue(null) },
       notification: { findMany: vi.fn().mockResolvedValue([]), createMany: notificationCreateMany },
       auditEvent: { create: vi.fn().mockResolvedValue({ id: 1 }) },
+      recuento: { findFirst: vi.fn().mockResolvedValue(null) },
       appUser: {
         count: vi.fn().mockResolvedValue(0),
         findMany: vi.fn().mockResolvedValue([{ id: 2 }]),

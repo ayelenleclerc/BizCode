@@ -1,0 +1,39 @@
+{
+  "title": "Recuento de inventario",
+  "subtitle": "Conteo físico y ajuste de stock por diferencias",
+  "noAccess": "No tenés permiso para realizar recuentos de inventario.",
+  "empty": "No hay recuentos registrados.",
+  "stockBlocked": "Hay un recuento en curso: las operaciones que modifican stock están bloqueadas hasta cerrarlo.",
+  "estado": {
+    "in_progress": "En curso",
+    "closed": "Cerrado"
+  },
+  "columns": {
+    "id": "N.º",
+    "fecha": "Fecha",
+    "operador": "Operador",
+    "estado": "Estado",
+    "items": "Ítems"
+  },
+  "actions": {
+    "start": "Iniciar recuento",
+    "saveCounts": "Guardar conteos",
+    "close": "Cerrar recuento",
+    "pdf": "Ver PDF de diferencias",
+    "closeDialog": "Cerrar"
+  },
+  "detail": {
+    "title": "Recuento #{{id}}",
+    "progress": "{{counted}} de {{total}} artículos contados",
+    "codigo": "Código",
+    "descripcion": "Descripción",
+    "sistema": "Sistema",
+    "fisico": "Físico",
+    "diff": "Diferencia",
+    "pending": "Pendiente"
+  },
+  "errors": {
+    "alreadyOpen": "Ya hay un recuento en curso.",
+    "incomplete": "Completá el conteo de todos los artículos antes de cerrar."
+  }
+}

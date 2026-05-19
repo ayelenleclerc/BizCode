@@ -61,6 +61,7 @@ function buildPrismaMock(overrides: Partial<Record<string, unknown>> = {}): Pris
       findMany: vi.fn().mockResolvedValue([AJUSTE_ROW]),
       create: stockAjusteCreate,
     },
+    recuento: { findFirst: vi.fn().mockResolvedValue(null) },
     $transaction: vi.fn(async (fn: unknown) => {
       if (typeof fn === 'function') {
         return fn({

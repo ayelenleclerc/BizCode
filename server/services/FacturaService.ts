@@ -1,5 +1,6 @@
 import type { Cliente, Factura, Prisma, PrismaClient } from '@prisma/client'
 import type { FacturaInput } from '../createApp.types'
+import { assertNoOpenRecuento } from '../lib/recuentoStockGuard'
 import { facturaFechaToPrismaDate } from '../routes/restDomainShared'
 import type { ServiceResult } from './serviceResults'
 import {
@@ -81,6 +82,11 @@ export class FacturaService {
     }
     if (clienteCheck.suspended) {
       return { ok: false, status: 422, error: 'CLIENT_SUSPENDED' }
+    }
+
+    const recuentoBlock = await assertNoOpenRecuento(this.prisma, tenantId)
+    if (!recuentoBlock.ok) {
+      return recuentoBlock
     }
 
     const [newFactura, updatedCliente] = await this.prisma.$transaction(async (tx) => {

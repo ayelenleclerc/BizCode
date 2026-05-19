@@ -122,6 +122,28 @@ const ordenCompraContractRow = {
   ],
 }
 
+const recuentoContractRow = {
+  id: 1,
+  tenantId: 1,
+  operadorId: 1,
+  estado: 'in_progress',
+  fecha: new Date('2026-05-20T10:00:00.000Z'),
+  closedAt: null,
+  createdAt: new Date('2026-05-20T10:00:00.000Z'),
+  updatedAt: new Date('2026-05-20T10:00:00.000Z'),
+  operador: { id: 1, username: 'owner1' },
+  items: [
+    {
+      id: 10,
+      recuentoId: 1,
+      articuloId: 1,
+      cantSistema: 5,
+      cantFisica: null,
+      articulo: { id: 1, codigo: 1, descripcion: 'Prod' },
+    },
+  ],
+}
+
 function buildPrisma(): PrismaClient {
   const facturaCreate = vi.fn().mockResolvedValue(facturaRow)
   // tx-level cliente.update: returns the financial summary the route uses for the credit check
@@ -228,6 +250,14 @@ function buildPrisma(): PrismaClient {
       update: vi.fn().mockResolvedValue(ordenCompraContractRow),
     },
     ordenCompraItem: { deleteMany: vi.fn(), update: vi.fn() },
+    recuento: {
+      count: vi.fn().mockResolvedValue(1),
+      findMany: vi.fn().mockResolvedValue([recuentoContractRow]),
+      findFirst: vi.fn().mockResolvedValue(null),
+      create: vi.fn().mockResolvedValue(recuentoContractRow),
+      update: vi.fn().mockResolvedValue({ ...recuentoContractRow, estado: 'closed', closedAt: new Date() }),
+    },
+    recuentoItem: { update: vi.fn().mockResolvedValue({}) },
     ordenEntrega: {
       count: vi.fn().mockResolvedValue(0),
       findMany: vi.fn().mockResolvedValue([]),
@@ -862,6 +892,83 @@ describe('API — contrato OpenAPI', () => {
       .send({ lines: [{ itemId: 10, cantidad: 2 }] })
       .expect(200)
     await assertMatchesOpenApi('/api/compras/{id}/receive', 'post', '200', res.body)
+  })
+
+  it('GET /api/recuentos', async () => {
+    process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
+    process.env.BIZCODE_TEST_ROLE = 'warehouse_lead'
+    const p = buildPrisma()
+    vi.mocked(p.recuento.findMany).mockResolvedValueOnce([recuentoContractRow] as never)
+    const app = createApp(p)
+    const res = await request(app).get('/api/recuentos').expect(200)
+    await assertMatchesOpenApi('/api/recuentos', 'get', '200', res.body)
+  })
+
+  it('POST /api/recuentos', async () => {
+    process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
+    process.env.BIZCODE_TEST_ROLE = 'warehouse_lead'
+    const p = buildPrisma()
+    vi.mocked(p.recuento.findFirst).mockResolvedValueOnce(null)
+    const app = createApp(p)
+    const res = await request(app).post('/api/recuentos').expect(201)
+    await assertMatchesOpenApi('/api/recuentos', 'post', '201', res.body)
+  })
+
+  it('GET /api/recuentos/{id}', async () => {
+    process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
+    process.env.BIZCODE_TEST_ROLE = 'warehouse_lead'
+    const p = buildPrisma()
+    vi.mocked(p.recuento.findFirst).mockResolvedValueOnce(recuentoContractRow as never)
+    const app = createApp(p)
+    const res = await request(app).get('/api/recuentos/1').expect(200)
+    await assertMatchesOpenApi('/api/recuentos/{id}', 'get', '200', res.body)
+  })
+
+  it('PUT /api/recuentos/{id}/items', async () => {
+    process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
+    process.env.BIZCODE_TEST_ROLE = 'warehouse_lead'
+    const p = buildPrisma()
+    vi.mocked(p.recuento.findFirst)
+      .mockResolvedValueOnce(recuentoContractRow as never)
+      .mockResolvedValueOnce({
+        ...recuentoContractRow,
+        items: [{ ...recuentoContractRow.items[0], cantFisica: 5 }],
+      } as never)
+    p.$transaction = vi.fn(async (fn: unknown) => {
+      if (typeof fn === 'function') {
+        return (fn as (tx: PrismaClient) => Promise<unknown>)(p)
+      }
+      return fn
+    }) as PrismaClient['$transaction']
+    const app = createApp(p)
+    const res = await request(app)
+      .put('/api/recuentos/1/items')
+      .send({ lines: [{ articuloId: 1, cantFisica: 5 }] })
+      .expect(200)
+    await assertMatchesOpenApi('/api/recuentos/{id}/items', 'put', '200', res.body)
+  })
+
+  it('POST /api/recuentos/{id}/close', async () => {
+    process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
+    process.env.BIZCODE_TEST_ROLE = 'warehouse_lead'
+    const p = buildPrisma()
+    const counted = {
+      ...recuentoContractRow,
+      items: [{ ...recuentoContractRow.items[0], cantFisica: 5 }],
+    }
+    const closed = { ...counted, estado: 'closed', closedAt: new Date() }
+    vi.mocked(p.recuento.findFirst)
+      .mockResolvedValueOnce(counted as never)
+      .mockResolvedValueOnce(closed as never)
+    p.$transaction = vi.fn(async (fn: unknown) => {
+      if (typeof fn === 'function') {
+        return (fn as (tx: PrismaClient) => Promise<unknown>)(p)
+      }
+      return fn
+    }) as PrismaClient['$transaction']
+    const app = createApp(p)
+    const res = await request(app).post('/api/recuentos/1/close').expect(200)
+    await assertMatchesOpenApi('/api/recuentos/{id}/close', 'post', '200', res.body)
   })
 
   it('GET /api/cobranzas/vencidas', async () => {

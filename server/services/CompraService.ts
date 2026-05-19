@@ -7,6 +7,7 @@ import type {
   OrdenCompraReceiveLineInput,
   OrdenCompraUpdateInput,
 } from '../createApp.types'
+import { assertNoOpenRecuento } from '../lib/recuentoStockGuard'
 import { facturaFechaToPrismaDate } from '../routes/restDomainShared'
 import type { ServiceResult } from './serviceResults'
 
@@ -248,6 +249,11 @@ export class CompraService {
     }
     if (orden.estado !== 'sent') {
       return { ok: false, status: 422, error: 'ORDER_NOT_RECEIVABLE' }
+    }
+
+    const recuentoBlock = await assertNoOpenRecuento(this.prisma, tenantId)
+    if (!recuentoBlock.ok) {
+      return recuentoBlock
     }
 
     const itemById = new Map(orden.items.map((i) => [i.id, i]))

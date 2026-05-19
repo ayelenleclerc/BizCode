@@ -9670,6 +9670,1347 @@ Requires `suppliers.manage` and `inventory.adjust`. Creates `StockAjuste` rows w
 }
 ```
 
+### PARAMETERS /api/recuentos
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/recuentos`
+
+### List physical inventory counts
+
+- **Method:** `GET`
+- **Path:** `/api/recuentos`
+- **Tags:** recuentos
+
+#### Responses
+
+##### Status: 200 Paginated inventory counts
+
+###### Content-Type: application/json
+
+**All of:**
+
+- **`limit` (required)**
+
+  `integer` — Effective page size (same semantics as query \`limit\`)
+
+- **`offset` (required)**
+
+  `integer` — Effective skip (same semantics as query \`offset\`)
+
+- **`total` (required)**
+
+  `integer` — Row count matching the list filter (before limit/offset)
+
+* **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"in_progress", "closed"`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`items` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId` (required)**
+
+      `integer`
+
+    - **`cantSistema` (required)**
+
+      `integer`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`articulo`**
+
+      `object`
+
+      - **`codigo`**
+
+        `integer`
+
+      - **`descripcion`**
+
+        `string`
+
+      - **`id`**
+
+        `integer`
+
+    - **`cantFisica`**
+
+      `integer`
+
+  - **`operadorId` (required)**
+
+    `integer`
+
+  - **`closedAt`**
+
+    `string`, format: `date-time`
+
+  - **`operador`**
+
+    `object`
+
+    - **`id`**
+
+      `integer`
+
+    - **`username`**
+
+      `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "total": 0,
+  "limit": 1,
+  "offset": 0,
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "operadorId": 1,
+      "estado": "in_progress",
+      "fecha": "",
+      "closedAt": "",
+      "operador": {
+        "id": 1,
+        "username": ""
+      },
+      "items": [
+        {
+          "id": 1,
+          "articuloId": 1,
+          "cantSistema": 1,
+          "cantFisica": 1,
+          "articulo": {
+            "id": 1,
+            "codigo": 1,
+            "descripcion": ""
+          }
+        }
+      ]
+    }
+  ]
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Start inventory count (snapshot active articles)
+
+- **Method:** `POST`
+- **Path:** `/api/recuentos`
+- **Tags:** recuentos
+
+Requires `inventory.count`. Only one `in_progress` count per tenant.
+
+#### Responses
+
+##### Status: 201 Count started
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"in_progress", "closed"`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`items` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId` (required)**
+
+      `integer`
+
+    - **`cantSistema` (required)**
+
+      `integer`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`articulo`**
+
+      `object`
+
+      - **`codigo`**
+
+        `integer`
+
+      - **`descripcion`**
+
+        `string`
+
+      - **`id`**
+
+        `integer`
+
+    - **`cantFisica`**
+
+      `integer`
+
+  - **`operadorId` (required)**
+
+    `integer`
+
+  - **`closedAt`**
+
+    `string`, format: `date-time`
+
+  - **`operador`**
+
+    `object`
+
+    - **`id`**
+
+      `integer`
+
+    - **`username`**
+
+      `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "operadorId": 1,
+    "estado": "in_progress",
+    "fecha": "",
+    "closedAt": "",
+    "operador": {
+      "id": 1,
+      "username": ""
+    },
+    "items": [
+      {
+        "id": 1,
+        "articuloId": 1,
+        "cantSistema": 1,
+        "cantFisica": 1,
+        "articulo": {
+          "id": 1,
+          "codigo": 1,
+          "descripcion": ""
+        }
+      }
+    ]
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 422 Count already in progress
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/recuentos/{id}
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/recuentos/{id}`
+
+### Get inventory count by id
+
+- **Method:** `GET`
+- **Path:** `/api/recuentos/{id}`
+- **Tags:** recuentos
+
+#### Responses
+
+##### Status: 200 Count detail with items
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"in_progress", "closed"`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`items` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId` (required)**
+
+      `integer`
+
+    - **`cantSistema` (required)**
+
+      `integer`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`articulo`**
+
+      `object`
+
+      - **`codigo`**
+
+        `integer`
+
+      - **`descripcion`**
+
+        `string`
+
+      - **`id`**
+
+        `integer`
+
+    - **`cantFisica`**
+
+      `integer`
+
+  - **`operadorId` (required)**
+
+    `integer`
+
+  - **`closedAt`**
+
+    `string`, format: `date-time`
+
+  - **`operador`**
+
+    `object`
+
+    - **`id`**
+
+      `integer`
+
+    - **`username`**
+
+      `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "operadorId": 1,
+    "estado": "in_progress",
+    "fecha": "",
+    "closedAt": "",
+    "operador": {
+      "id": 1,
+      "username": ""
+    },
+    "items": [
+      {
+        "id": 1,
+        "articuloId": 1,
+        "cantSistema": 1,
+        "cantFisica": 1,
+        "articulo": {
+          "id": 1,
+          "codigo": 1,
+          "descripcion": ""
+        }
+      }
+    ]
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/recuentos/{id}/items
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/recuentos/{id}/items`
+
+### Update physical quantities (partial allowed)
+
+- **Method:** `PUT`
+- **Path:** `/api/recuentos/{id}/items`
+- **Tags:** recuentos
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`lines` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`cantFisica` (required)**
+
+    `integer`
+
+**Example:**
+
+```json
+{
+  "lines": [
+    {
+      "articuloId": 1,
+      "cantFisica": 0
+    }
+  ]
+}
+```
+
+#### Responses
+
+##### Status: 200 Updated count
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"in_progress", "closed"`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`items` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId` (required)**
+
+      `integer`
+
+    - **`cantSistema` (required)**
+
+      `integer`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`articulo`**
+
+      `object`
+
+      - **`codigo`**
+
+        `integer`
+
+      - **`descripcion`**
+
+        `string`
+
+      - **`id`**
+
+        `integer`
+
+    - **`cantFisica`**
+
+      `integer`
+
+  - **`operadorId` (required)**
+
+    `integer`
+
+  - **`closedAt`**
+
+    `string`, format: `date-time`
+
+  - **`operador`**
+
+    `object`
+
+    - **`id`**
+
+      `integer`
+
+    - **`username`**
+
+      `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "operadorId": 1,
+    "estado": "in_progress",
+    "fecha": "",
+    "closedAt": "",
+    "operador": {
+      "id": 1,
+      "username": ""
+    },
+    "items": [
+      {
+        "id": 1,
+        "articuloId": 1,
+        "cantSistema": 1,
+        "cantFisica": 1,
+        "articulo": {
+          "id": 1,
+          "codigo": 1,
+          "descripcion": ""
+        }
+      }
+    ]
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 422 Not editable or invalid line
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/recuentos/{id}/close
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/recuentos/{id}/close`
+
+### Close inventory count and apply stock adjustments
+
+- **Method:** `POST`
+- **Path:** `/api/recuentos/{id}/close`
+- **Tags:** recuentos
+
+Requires all items to have `cantFisica`. For each line with non-zero variance, updates article stock and creates `StockAjuste` with motivo `recuento`. Lines with zero variance do not create adjustments.
+
+#### Responses
+
+##### Status: 200 Count closed
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"in_progress", "closed"`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`items` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId` (required)**
+
+      `integer`
+
+    - **`cantSistema` (required)**
+
+      `integer`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`articulo`**
+
+      `object`
+
+      - **`codigo`**
+
+        `integer`
+
+      - **`descripcion`**
+
+        `string`
+
+      - **`id`**
+
+        `integer`
+
+    - **`cantFisica`**
+
+      `integer`
+
+  - **`operadorId` (required)**
+
+    `integer`
+
+  - **`closedAt`**
+
+    `string`, format: `date-time`
+
+  - **`operador`**
+
+    `object`
+
+    - **`id`**
+
+      `integer`
+
+    - **`username`**
+
+      `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "operadorId": 1,
+    "estado": "in_progress",
+    "fecha": "",
+    "closedAt": "",
+    "operador": {
+      "id": 1,
+      "username": ""
+    },
+    "items": [
+      {
+        "id": 1,
+        "articuloId": 1,
+        "cantSistema": 1,
+        "cantFisica": 1,
+        "articulo": {
+          "id": 1,
+          "codigo": 1,
+          "descripcion": ""
+        }
+      }
+    ]
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 422 Incomplete items, not closable, or insufficient stock
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/recuentos/{id}/pdf
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/recuentos/{id}/pdf`
+
+### Download variance PDF (closed counts only)
+
+- **Method:** `GET`
+- **Path:** `/api/recuentos/{id}/pdf`
+- **Tags:** recuentos
+
+#### Responses
+
+##### Status: 200 PDF document
+
+###### Content-Type: application/pdf
+
+`string`, format: `binary`
+
+**Example:**
+
+```json
+{}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 422 Count not closed
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ### PARAMETERS /api/facturas
 
 - **Method:** `PARAMETERS`
@@ -23052,6 +24393,312 @@ Requires `orders.dispatch` for transitions to `assigned`, `in_transit`, or `fail
     {
       "itemId": 1,
       "cantidad": 1
+    }
+  ]
+}
+```
+
+### RecuentoItemLine
+
+- **Type:**`object`
+
+* **`articuloId` (required)**
+
+  `integer`
+
+* **`cantSistema` (required)**
+
+  `integer`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`articulo`**
+
+  `object`
+
+  - **`codigo`**
+
+    `integer`
+
+  - **`descripcion`**
+
+    `string`
+
+  - **`id`**
+
+    `integer`
+
+* **`cantFisica`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "articuloId": 1,
+  "cantSistema": 1,
+  "cantFisica": 1,
+  "articulo": {
+    "id": 1,
+    "codigo": 1,
+    "descripcion": ""
+  }
+}
+```
+
+### Recuento
+
+- **Type:**`object`
+
+* **`estado` (required)**
+
+  `string`, possible values: `"in_progress", "closed"`
+
+* **`fecha` (required)**
+
+  `string`, format: `date-time`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`items` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`cantSistema` (required)**
+
+    `integer`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`articulo`**
+
+    `object`
+
+    - **`codigo`**
+
+      `integer`
+
+    - **`descripcion`**
+
+      `string`
+
+    - **`id`**
+
+      `integer`
+
+  - **`cantFisica`**
+
+    `integer`
+
+* **`operadorId` (required)**
+
+  `integer`
+
+* **`closedAt`**
+
+  `string`, format: `date-time`
+
+* **`operador`**
+
+  `object`
+
+  - **`id`**
+
+    `integer`
+
+  - **`username`**
+
+    `string`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "operadorId": 1,
+  "estado": "in_progress",
+  "fecha": "",
+  "closedAt": "",
+  "operador": {
+    "id": 1,
+    "username": ""
+  },
+  "items": [
+    {
+      "id": 1,
+      "articuloId": 1,
+      "cantSistema": 1,
+      "cantFisica": 1,
+      "articulo": {
+        "id": 1,
+        "codigo": 1,
+        "descripcion": ""
+      }
+    }
+  ]
+}
+```
+
+### RecuentoListEnvelope
+
+- **Type:**
+
+**Example:**
+
+### RecuentoEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"in_progress", "closed"`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`items` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId` (required)**
+
+      `integer`
+
+    - **`cantSistema` (required)**
+
+      `integer`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`articulo`**
+
+      `object`
+
+      - **`codigo`**
+
+        `integer`
+
+      - **`descripcion`**
+
+        `string`
+
+      - **`id`**
+
+        `integer`
+
+    - **`cantFisica`**
+
+      `integer`
+
+  - **`operadorId` (required)**
+
+    `integer`
+
+  - **`closedAt`**
+
+    `string`, format: `date-time`
+
+  - **`operador`**
+
+    `object`
+
+    - **`id`**
+
+      `integer`
+
+    - **`username`**
+
+      `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "operadorId": 1,
+    "estado": "in_progress",
+    "fecha": "",
+    "closedAt": "",
+    "operador": {
+      "id": 1,
+      "username": ""
+    },
+    "items": [
+      {
+        "id": 1,
+        "articuloId": 1,
+        "cantSistema": 1,
+        "cantFisica": 1,
+        "articulo": {
+          "id": 1,
+          "codigo": 1,
+          "descripcion": ""
+        }
+      }
+    ]
+  }
+}
+```
+
+### RecuentoItemsInput
+
+- **Type:**`object`
+
+* **`lines` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`cantFisica` (required)**
+
+    `integer`
+
+**Example:**
+
+```json
+{
+  "lines": [
+    {
+      "articuloId": 1,
+      "cantFisica": 0
     }
   ]
 }
