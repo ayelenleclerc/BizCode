@@ -34,11 +34,18 @@ function buildMessage(type: NotificationType, payload: NotificationPayload): Mes
         subject: `[BizCode] Límite de crédito superado — ${rsocial}`,
         text: `El saldo de ${rsocial} (${amount}) superó el límite de crédito configurado (${limit}).`,
       }
-    case 'invoice_overdue':
+    case 'invoice_overdue': {
+      const facturaRef = payload.facturaId != null ? ` #${payload.facturaId}` : ''
+      const mora =
+        payload.diasMora != null && payload.diasMora > 0
+          ? ` (${payload.diasMora} días de mora)`
+          : ''
+      const amountPart = amount ? ` por ${amount}` : ''
       return {
-        subject: `[BizCode] Factura vencida — ${rsocial}`,
-        text: `Hay una factura vencida de ${rsocial}. Revise el estado de cuenta del cliente.`,
+        subject: `[BizCode] Factura vencida${facturaRef} — ${rsocial}`,
+        text: `Factura${facturaRef} de ${rsocial}${amountPart} está vencida${mora}. Revise el estado de cuenta del cliente.`,
       }
+    }
     case 'invoice_due_soon':
       return {
         subject: `[BizCode] Factura próxima a vencer — ${rsocial}`,

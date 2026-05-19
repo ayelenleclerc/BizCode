@@ -258,6 +258,9 @@ function buildPrisma(): PrismaClient {
         tipoFactura: 'B',
         logoUrl: null,
         recordatorioDiasGracia: 0,
+        timezone: 'America/Argentina/Buenos_Aires',
+        recordatorioHoraInicio: 8,
+        recordatorioHoraFin: 18,
       }),
       upsert: vi.fn().mockResolvedValue({
         id: 1,
@@ -269,6 +272,9 @@ function buildPrisma(): PrismaClient {
         tipoFactura: 'A',
         logoUrl: null,
         recordatorioDiasGracia: 0,
+        timezone: 'America/Argentina/Buenos_Aires',
+        recordatorioHoraInicio: 8,
+        recordatorioHoraFin: 18,
       }),
     },
     cobroRecordatorio: {
@@ -778,6 +784,7 @@ describe('API — contrato OpenAPI', () => {
       id: 1,
       tenantId: 1,
       clienteId: 1,
+      total: 1500,
       fecha: new Date('2020-01-01'),
       estado: 'A',
       cliente: { rsocial: 'ACME SA', creditDays: 0 },

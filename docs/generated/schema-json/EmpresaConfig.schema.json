@@ -34,6 +34,30 @@
       "minimum": 1,
       "type": "integer"
     },
+    "recordatorioDiasGracia": {
+      "description": "Grace days after due date before an invoice is eligible for collection reminders.",
+      "maximum": 365,
+      "minimum": 0,
+      "type": "integer"
+    },
+    "recordatorioHoraFin": {
+      "description": "Business-hour window end (tenant local hour, exclusive).",
+      "maximum": 24,
+      "minimum": 1,
+      "type": "integer"
+    },
+    "recordatorioHoraInicio": {
+      "description": "Business-hour window start (tenant local hour, inclusive).",
+      "maximum": 23,
+      "minimum": 0,
+      "type": "integer"
+    },
+    "timezone": {
+      "description": "IANA time zone for the daily reminder job and business-hour window.",
+      "example": "America/Argentina/Buenos_Aires",
+      "maxLength": 64,
+      "type": "string"
+    },
     "tipoFactura": {
       "enum": [
         "A",

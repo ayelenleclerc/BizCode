@@ -16,16 +16,20 @@ undefined#/properties/data
 
 # data Properties
 
-| Property                          | Type      | Required | Nullable       | Defined by                                                                                         |
-| :-------------------------------- | :-------- | :------- | :------------- | :------------------------------------------------------------------------------------------------- |
-| [cuit](#cuit)                     | `string`  | Required | cannot be null | [EmpresaConfig](empresaconfig-properties-cuit.md "undefined#/properties/cuit")                     |
-| [domicilio](#domicilio)           | `string`  | Optional | cannot be null | [EmpresaConfig](empresaconfig-properties-domicilio.md "undefined#/properties/domicilio")           |
-| [id](#id)                         | `integer` | Optional | cannot be null | [EmpresaConfig](empresaconfig-properties-id.md "undefined#/properties/id")                         |
-| [logoUrl](#logourl)               | `string`  | Optional | cannot be null | [EmpresaConfig](empresaconfig-properties-logourl.md "undefined#/properties/logoUrl")               |
-| [nombre](#nombre)                 | `string`  | Required | cannot be null | [EmpresaConfig](empresaconfig-properties-nombre.md "undefined#/properties/nombre")                 |
-| [prefijoFactura](#prefijofactura) | `string`  | Required | cannot be null | [EmpresaConfig](empresaconfig-properties-prefijofactura.md "undefined#/properties/prefijoFactura") |
-| [puntoVenta](#puntoventa)         | `integer` | Required | cannot be null | [EmpresaConfig](empresaconfig-properties-puntoventa.md "undefined#/properties/puntoVenta")         |
-| [tipoFactura](#tipofactura)       | `string`  | Required | cannot be null | [EmpresaConfig](empresaconfig-properties-tipofactura.md "undefined#/properties/tipoFactura")       |
+| Property                                          | Type      | Required | Nullable       | Defined by                                                                                                         |
+| :------------------------------------------------ | :-------- | :------- | :------------- | :----------------------------------------------------------------------------------------------------------------- |
+| [cuit](#cuit)                                     | `string`  | Required | cannot be null | [EmpresaConfig](empresaconfig-properties-cuit.md "undefined#/properties/cuit")                                     |
+| [domicilio](#domicilio)                           | `string`  | Optional | cannot be null | [EmpresaConfig](empresaconfig-properties-domicilio.md "undefined#/properties/domicilio")                           |
+| [id](#id)                                         | `integer` | Optional | cannot be null | [EmpresaConfig](empresaconfig-properties-id.md "undefined#/properties/id")                                         |
+| [logoUrl](#logourl)                               | `string`  | Optional | cannot be null | [EmpresaConfig](empresaconfig-properties-logourl.md "undefined#/properties/logoUrl")                               |
+| [nombre](#nombre)                                 | `string`  | Required | cannot be null | [EmpresaConfig](empresaconfig-properties-nombre.md "undefined#/properties/nombre")                                 |
+| [prefijoFactura](#prefijofactura)                 | `string`  | Required | cannot be null | [EmpresaConfig](empresaconfig-properties-prefijofactura.md "undefined#/properties/prefijoFactura")                 |
+| [puntoVenta](#puntoventa)                         | `integer` | Required | cannot be null | [EmpresaConfig](empresaconfig-properties-puntoventa.md "undefined#/properties/puntoVenta")                         |
+| [recordatorioDiasGracia](#recordatoriodiasgracia) | `integer` | Optional | cannot be null | [EmpresaConfig](empresaconfig-properties-recordatoriodiasgracia.md "undefined#/properties/recordatorioDiasGracia") |
+| [recordatorioHoraFin](#recordatoriohorafin)       | `integer` | Optional | cannot be null | [EmpresaConfig](empresaconfig-properties-recordatoriohorafin.md "undefined#/properties/recordatorioHoraFin")       |
+| [recordatorioHoraInicio](#recordatoriohorainicio) | `integer` | Optional | cannot be null | [EmpresaConfig](empresaconfig-properties-recordatoriohorainicio.md "undefined#/properties/recordatorioHoraInicio") |
+| [timezone](#timezone)                             | `string`  | Optional | cannot be null | [EmpresaConfig](empresaconfig-properties-timezone.md "undefined#/properties/timezone")                             |
+| [tipoFactura](#tipofactura)                       | `string`  | Required | cannot be null | [EmpresaConfig](empresaconfig-properties-tipofactura.md "undefined#/properties/tipoFactura")                       |
 
 ## cuit
 
@@ -184,6 +188,100 @@ Four-digit invoice prefix derived from puntoVenta.
 **maximum**: the value of this number must smaller than or equal to: `9999`
 
 **minimum**: the value of this number must greater than or equal to: `1`
+
+## recordatorioDiasGracia
+
+Grace days after due date before an invoice is eligible for collection reminders.
+
+`recordatorioDiasGracia`
+
+* is optional
+
+* Type: `integer`
+
+* cannot be null
+
+* defined in: [EmpresaConfig](empresaconfig-properties-recordatoriodiasgracia.md "undefined#/properties/recordatorioDiasGracia")
+
+### recordatorioDiasGracia Type
+
+`integer`
+
+### recordatorioDiasGracia Constraints
+
+**maximum**: the value of this number must smaller than or equal to: `365`
+
+**minimum**: the value of this number must greater than or equal to: `0`
+
+## recordatorioHoraFin
+
+Business-hour window end (tenant local hour, exclusive).
+
+`recordatorioHoraFin`
+
+* is optional
+
+* Type: `integer`
+
+* cannot be null
+
+* defined in: [EmpresaConfig](empresaconfig-properties-recordatoriohorafin.md "undefined#/properties/recordatorioHoraFin")
+
+### recordatorioHoraFin Type
+
+`integer`
+
+### recordatorioHoraFin Constraints
+
+**maximum**: the value of this number must smaller than or equal to: `24`
+
+**minimum**: the value of this number must greater than or equal to: `1`
+
+## recordatorioHoraInicio
+
+Business-hour window start (tenant local hour, inclusive).
+
+`recordatorioHoraInicio`
+
+* is optional
+
+* Type: `integer`
+
+* cannot be null
+
+* defined in: [EmpresaConfig](empresaconfig-properties-recordatoriohorainicio.md "undefined#/properties/recordatorioHoraInicio")
+
+### recordatorioHoraInicio Type
+
+`integer`
+
+### recordatorioHoraInicio Constraints
+
+**maximum**: the value of this number must smaller than or equal to: `23`
+
+**minimum**: the value of this number must greater than or equal to: `0`
+
+## timezone
+
+IANA time zone for the daily reminder job and business-hour window.
+
+`timezone`
+
+* is optional
+
+* Type: `string`
+
+* cannot be null
+
+* defined in: [EmpresaConfig](empresaconfig-properties-timezone.md "undefined#/properties/timezone")
+
+### timezone Type
+
+`string`
+
+### timezone Constraints
+
+**maximum length**: the maximum number of characters for this string is: `64`
 
 ## tipoFactura
 

@@ -14,6 +14,10 @@ const EMPRESA_ROW = {
   puntoVenta: 3,
   tipoFactura: 'B',
   logoUrl: null,
+  recordatorioDiasGracia: 3,
+  timezone: 'America/Argentina/Buenos_Aires',
+  recordatorioHoraInicio: 8,
+  recordatorioHoraFin: 18,
 }
 
 const EMPRESA_BODY = {
@@ -23,6 +27,10 @@ const EMPRESA_BODY = {
   puntoVenta: 3,
   tipoFactura: 'B',
   logoUrl: null,
+  recordatorioDiasGracia: 3,
+  timezone: 'America/Argentina/Buenos_Aires',
+  recordatorioHoraInicio: 8,
+  recordatorioHoraFin: 18,
 }
 
 function buildPrismaMock(overrides: Partial<Record<string, unknown>> = {}): PrismaClient {
@@ -115,6 +123,10 @@ describe('/api/empresa', () => {
     expect(res.body.data.nombre).toBe('Demo Tenant')
     expect(res.body.data.prefijoFactura).toBe('0001')
     expect(res.body.data.id).toBeNull()
+    expect(res.body.data.recordatorioDiasGracia).toBe(0)
+    expect(res.body.data.timezone).toBe('America/Argentina/Buenos_Aires')
+    expect(res.body.data.recordatorioHoraInicio).toBe(8)
+    expect(res.body.data.recordatorioHoraFin).toBe(18)
   })
 
   it('GET returns persisted settings', async () => {
@@ -131,6 +143,8 @@ describe('/api/empresa', () => {
     expect(res.body.data.nombre).toBe('Mi Empresa SA')
     expect(res.body.data.prefijoFactura).toBe('0003')
     expect(res.body.data.id).toBe(1)
+    expect(res.body.data.recordatorioDiasGracia).toBe(3)
+    expect(res.body.data.timezone).toBe('America/Argentina/Buenos_Aires')
   })
 
   it('GET returns 401 without auth', async () => {
@@ -157,6 +171,18 @@ describe('/api/empresa', () => {
 
     expect(res.body.data.prefijoFactura).toBe('0003')
     expect(upsert).toHaveBeenCalled()
+    expect(res.body.data.recordatorioDiasGracia).toBe(3)
+  })
+
+  it('PUT returns 400 for invalid reminder window', async () => {
+    const app = createApp(buildPrismaMock())
+
+    const res = await request(app)
+      .put('/api/empresa')
+      .send({ ...EMPRESA_BODY, recordatorioHoraInicio: 18, recordatorioHoraFin: 8 })
+      .expect(400)
+
+    expect(res.body.success).toBe(false)
   })
 
   it('PUT returns 403 for seller without settings.business.manage', async () => {

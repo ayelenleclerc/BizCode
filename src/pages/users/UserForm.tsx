@@ -221,7 +221,9 @@ export default function UserForm({ user, onClose, onSaved }: Props) {
                   key={ch}
                   type="button"
                   onClick={() => toggleChannel(ch)}
-                  aria-pressed={selectedChannels.includes(ch)}
+                  {...(selectedChannels.includes(ch)
+                    ? { 'aria-pressed': 'true' as const }
+                    : { 'aria-pressed': 'false' as const })}
                   className={`px-3 py-1 text-xs rounded-full border transition ${
                     selectedChannels.includes(ch)
                       ? 'bg-blue-600 border-blue-600 text-white'

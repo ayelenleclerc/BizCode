@@ -379,7 +379,6 @@ export default function ArticuloForm({ articulo, rubros, onClose, onGuardado }: 
                 readOnly={Boolean(articulo)}
                 key={articulo ? `stock-${stockDisplay}` : 'stock-new'}
                 aria-required="true"
-                aria-readonly={articulo ? 'true' : undefined}
                 aria-describedby={
                   articulo ? 'articulo-stock-readonly-hint' : errors.stock ? 'articulo-stock-error' : undefined
                 }

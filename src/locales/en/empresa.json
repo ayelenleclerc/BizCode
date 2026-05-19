@@ -15,7 +15,15 @@
     "prefijoPreview": "Invoice prefix preview",
     "tipoA": "Type A",
     "tipoB": "Type B",
-    "tipoC": "Type C"
+    "tipoC": "Type C",
+    "remindersLegend": "Overdue collection reminders",
+    "remindersHint": "The daily job sends reminders at 08:00 in the configured time zone, within business hours.",
+    "recordatorioDiasGracia": "Grace days",
+    "recordatorioDiasGraciaHint": "Days after due date before an invoice counts as overdue (0–365).",
+    "timezone": "Time zone (IANA)",
+    "recordatorioHoraInicio": "Business hours start",
+    "recordatorioHoraFin": "Business hours end (exclusive)",
+    "recordatorioHoraFinHint": "The job does not send reminders outside this range in tenant local time."
   },
   "actions": {
     "save": "Save settings"
@@ -25,7 +33,8 @@
     "saveFailed": "Could not save company settings",
     "nombreRequired": "Company name is required",
     "cuitInvalid": "Enter a valid CUIT",
-    "puntoVentaInvalid": "Point of sale must be between 1 and 9999"
+    "puntoVentaInvalid": "Point of sale must be between 1 and 9999",
+    "reminderWindowInvalid": "End hour must be after start hour"
   },
   "success": {
     "saved": "Company settings saved"

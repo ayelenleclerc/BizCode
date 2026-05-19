@@ -46,7 +46,9 @@ export default function ReportesTabPanel({
                 type="button"
                 role="tab"
                 id={`reportes-tab-${tab.id}`}
-                aria-selected={selected}
+                {...(selected
+                  ? { 'aria-selected': 'true' as const }
+                  : { 'aria-selected': 'false' as const })}
                 aria-controls={`reportes-panel-${tab.id}`}
                 tabIndex={selected ? 0 : -1}
                 onClick={() => onTabChange(tab.id)}

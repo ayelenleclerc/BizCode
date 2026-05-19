@@ -19,6 +19,7 @@ export type NotificationPayload = {
   facturaId?: number
   rsocial?: string
   amount?: string
+  diasMora?: number
   limit?: string
   messageId?: number
   fromUserId?: number

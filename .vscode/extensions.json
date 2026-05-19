@@ -1,0 +1,7 @@
+{
+  "recommendations": [
+    "Prisma.prisma",
+    "ckolkman.vscode-postgres",
+    "mtxr.sqltools-driver-pg"
+  ]
+}

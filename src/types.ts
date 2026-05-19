@@ -141,6 +141,10 @@ export interface EmpresaConfig {
   tipoFactura: 'A' | 'B' | 'C'
   logoUrl: string | null
   prefijoFactura: string
+  recordatorioDiasGracia: number
+  timezone: string
+  recordatorioHoraInicio: number
+  recordatorioHoraFin: number
 }
 
 /** @deprecated Use EmpresaConfig — kept for legacy references */

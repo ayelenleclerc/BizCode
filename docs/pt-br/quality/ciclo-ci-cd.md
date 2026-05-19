@@ -136,9 +136,9 @@ Não fazem parte do pipeline padrão do GitHub Actions; agende no servidor de im
 | Agendamento | Comando | Finalidade |
 |---|---|---|
 | `*/5 * * * *` | `npm run afip:retry-pending-job` | Reprocessa faturas com `estadoCae: pending` via mock WSFE de homologação (`AfipService.retryPending`) para cada tenant com `TenantFiscalConfig`. |
-| Diário 08:00 (horário local do tenant) | `npm run cobranzas:recordatorios` | Lembretes de inadimplência (um tenant; ver script). |
+| `0 * * * *` (a cada hora) | `npm run cobranzas:recordatorios` | Lembretes de inadimplência para cada tenant com `ParamEmpresa`; envio às **08:00 horário local** (minuto &lt; 15) dentro do horário comercial configurado. Use `0 8 * * *` apenas em implantações mono-fuso. |
 
-Variável opcional para um único tenant em dev/staging: `BIZCODE_TENANT_ID=<id>` (vale para `afip:retry-pending-job` e `afip:retry-pending`).
+Variável opcional para um único tenant em dev/staging: `BIZCODE_TENANT_ID=<id>` (vale para `afip:retry-pending-job`, `afip:retry-pending` e `cobranzas:recordatorios`). Opcional `BIZCODE_RECORDATORIO_CANAL` (padrão `email`).
 
 Governança documental (Wiki vs documentação controlada):
 

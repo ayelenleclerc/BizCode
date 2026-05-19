@@ -138,7 +138,9 @@ export default function UsersPage() {
                 <tr
                   key={user.id}
                   role="row"
-                  aria-selected={selectedRow === idx}
+                  {...(selectedRow === idx
+                    ? { 'aria-selected': 'true' as const }
+                    : { 'aria-selected': 'false' as const })}
                   onClick={() => setSelectedRow(idx)}
                   onDoubleClick={() => {
                     setSelectedUser(user)
