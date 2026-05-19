@@ -15,7 +15,15 @@
     "prefijoPreview": "Vista previa del prefijo",
     "tipoA": "Tipo A",
     "tipoB": "Tipo B",
-    "tipoC": "Tipo C"
+    "tipoC": "Tipo C",
+    "remindersLegend": "Recordatorios de mora",
+    "remindersHint": "El job diario envía recordatorios a las 08:00 en la zona horaria configurada, dentro del horario comercial.",
+    "recordatorioDiasGracia": "Días de gracia",
+    "recordatorioDiasGraciaHint": "Días después del vencimiento antes de considerar la factura en mora (0–365).",
+    "timezone": "Zona horaria (IANA)",
+    "recordatorioHoraInicio": "Hora inicio (horario comercial)",
+    "recordatorioHoraFin": "Hora fin (exclusiva)",
+    "recordatorioHoraFinHint": "El job no envía recordatorios fuera de este rango en hora local del tenant."
   },
   "actions": {
     "save": "Guardar configuración"
@@ -25,7 +33,8 @@
     "saveFailed": "No se pudieron guardar los datos de la empresa",
     "nombreRequired": "La razón social es obligatoria",
     "cuitInvalid": "Ingrese un CUIT válido",
-    "puntoVentaInvalid": "El punto de venta debe estar entre 1 y 9999"
+    "puntoVentaInvalid": "El punto de venta debe estar entre 1 y 9999",
+    "reminderWindowInvalid": "La hora de fin debe ser posterior a la hora de inicio"
   },
   "success": {
     "saved": "Configuración de empresa guardada"

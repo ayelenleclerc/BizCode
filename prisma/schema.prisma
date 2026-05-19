@@ -328,6 +328,12 @@ model ParamEmpresa {
   tipoFactura String  @db.VarChar(1) @default("B")
   logoUrl     String? @db.VarChar(255)
   recordatorioDiasGracia Int @default(0)
+  /// IANA timezone for collection reminders (e.g. America/Argentina/Buenos_Aires)
+  timezone    String  @default("America/Argentina/Buenos_Aires") @db.VarChar(64)
+  /// Business-hour window start (0–23, tenant local) for reminder job
+  recordatorioHoraInicio Int @default(8)
+  /// Business-hour window end exclusive (1–24, tenant local)
+  recordatorioHoraFin    Int @default(18)
 }
 
 model TenantFiscalConfig {

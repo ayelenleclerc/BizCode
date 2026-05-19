@@ -276,7 +276,10 @@ export default function ProveedoresPage() {
                 {proveedores.map((p, idx) => (
                   <tr
                     key={p.id}
-                    data-selected={selectedRow === idx ? 'true' : 'false'}
+                    role="row"
+                    {...(selectedRow === idx
+                      ? { 'aria-selected': 'true' as const }
+                      : { 'aria-selected': 'false' as const })}
                     onClick={() => setSelectedRow(idx)}
                     onKeyDown={(e) => handleKeyDown(e, idx)}
                     tabIndex={0}

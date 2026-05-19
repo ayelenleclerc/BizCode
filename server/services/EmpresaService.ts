@@ -1,5 +1,11 @@
 import type { ParamEmpresa, PrismaClient } from '@prisma/client'
 import { formatCUIT } from '../../src/lib/validators'
+import {
+  DEFAULT_RECORDATORIO_DIAS_GRACIA,
+  DEFAULT_RECORDATORIO_HORA_FIN,
+  DEFAULT_RECORDATORIO_HORA_INICIO,
+} from '../lib/cobranzasReminderDefaults'
+import { DEFAULT_TENANT_TIMEZONE } from '../lib/tenantLocalTime'
 import type { EmpresaInput } from '../createApp.types'
 
 export type EmpresaConfigDto = {
@@ -11,6 +17,10 @@ export type EmpresaConfigDto = {
   tipoFactura: 'A' | 'B' | 'C'
   logoUrl: string | null
   prefijoFactura: string
+  recordatorioDiasGracia: number
+  timezone: string
+  recordatorioHoraInicio: number
+  recordatorioHoraFin: number
 }
 
 /**
@@ -32,7 +42,18 @@ function rowToDto(row: ParamEmpresa): EmpresaConfigDto {
     tipoFactura: row.tipoFactura as EmpresaConfigDto['tipoFactura'],
     logoUrl: row.logoUrl,
     prefijoFactura: formatPrefijoFromPuntoVenta(row.puntoVenta),
+    recordatorioDiasGracia: row.recordatorioDiasGracia,
+    timezone: row.timezone,
+    recordatorioHoraInicio: row.recordatorioHoraInicio,
+    recordatorioHoraFin: row.recordatorioHoraFin,
   }
+}
+
+const defaultReminderFields = {
+  recordatorioDiasGracia: DEFAULT_RECORDATORIO_DIAS_GRACIA,
+  timezone: DEFAULT_TENANT_TIMEZONE,
+  recordatorioHoraInicio: DEFAULT_RECORDATORIO_HORA_INICIO,
+  recordatorioHoraFin: DEFAULT_RECORDATORIO_HORA_FIN,
 }
 
 /**
@@ -63,6 +84,7 @@ export class EmpresaService {
       tipoFactura: 'B',
       logoUrl: null,
       prefijoFactura: formatPrefijoFromPuntoVenta(1),
+      ...defaultReminderFields,
     }
   }
 
@@ -75,6 +97,10 @@ export class EmpresaService {
       puntoVenta: input.puntoVenta,
       tipoFactura: input.tipoFactura,
       logoUrl: input.logoUrl ?? null,
+      recordatorioDiasGracia: input.recordatorioDiasGracia ?? DEFAULT_RECORDATORIO_DIAS_GRACIA,
+      timezone: input.timezone ?? DEFAULT_TENANT_TIMEZONE,
+      recordatorioHoraInicio: input.recordatorioHoraInicio ?? DEFAULT_RECORDATORIO_HORA_INICIO,
+      recordatorioHoraFin: input.recordatorioHoraFin ?? DEFAULT_RECORDATORIO_HORA_FIN,
     }
 
     const row = await this.prisma.paramEmpresa.upsert({

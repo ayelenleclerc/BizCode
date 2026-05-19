@@ -1727,6 +1727,10 @@ export const empresaAPI = {
     puntoVenta: number
     tipoFactura: 'A' | 'B' | 'C'
     logoUrl?: string | null
+    recordatorioDiasGracia?: number
+    timezone?: string
+    recordatorioHoraInicio?: number
+    recordatorioHoraFin?: number
   }) => {
     try {
       const response = await api.put<{ success: boolean; data: import('@/types').EmpresaConfig }>('/empresa', body)

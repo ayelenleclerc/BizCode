@@ -10,14 +10,35 @@ import { validateCUIT } from '@/lib/validators'
 import type { EmpresaConfig } from '@/types'
 import AfipFiscalSection from './AfipFiscalSection'
 
-const empresaFormSchema = z.object({
-  nombre: z.string().trim().min(1).max(40),
-  cuit: z.string().trim().refine((v) => validateCUIT(v), { message: 'cuitInvalid' }),
-  domicilio: z.string().max(40).optional(),
-  puntoVenta: z.coerce.number().int().min(1).max(9999),
-  tipoFactura: z.enum(['A', 'B', 'C']),
-  logoUrl: z.string().max(255).optional(),
-})
+const EMPRESA_TIMEZONE_OPTIONS = [
+  'America/Argentina/Buenos_Aires',
+  'America/Argentina/Cordoba',
+  'America/Argentina/Mendoza',
+  'America/Sao_Paulo',
+  'America/Montevideo',
+  'America/Santiago',
+  'America/Bogota',
+  'America/Mexico_City',
+  'UTC',
+] as const
+
+const empresaFormSchema = z
+  .object({
+    nombre: z.string().trim().min(1).max(40),
+    cuit: z.string().trim().refine((v) => validateCUIT(v), { message: 'cuitInvalid' }),
+    domicilio: z.string().max(40).optional(),
+    puntoVenta: z.coerce.number().int().min(1).max(9999),
+    tipoFactura: z.enum(['A', 'B', 'C']),
+    logoUrl: z.string().max(255).optional(),
+    recordatorioDiasGracia: z.coerce.number().int().min(0).max(365),
+    timezone: z.string().min(1).max(64),
+    recordatorioHoraInicio: z.coerce.number().int().min(0).max(23),
+    recordatorioHoraFin: z.coerce.number().int().min(1).max(24),
+  })
+  .refine((data) => data.recordatorioHoraInicio < data.recordatorioHoraFin, {
+    message: 'reminderWindowInvalid',
+    path: ['recordatorioHoraFin'],
+  })
 
 type EmpresaFormData = z.infer<typeof empresaFormSchema>
 
@@ -29,6 +50,10 @@ function configToFormValues(data: EmpresaConfig): EmpresaFormData {
     puntoVenta: data.puntoVenta,
     tipoFactura: data.tipoFactura,
     logoUrl: data.logoUrl ?? '',
+    recordatorioDiasGracia: data.recordatorioDiasGracia,
+    timezone: data.timezone,
+    recordatorioHoraInicio: data.recordatorioHoraInicio,
+    recordatorioHoraFin: data.recordatorioHoraFin,
   }
 }
 
@@ -60,6 +85,10 @@ export default function EmpresaPage() {
       puntoVenta: 1,
       tipoFactura: 'B',
       logoUrl: '',
+      recordatorioDiasGracia: 0,
+      timezone: 'America/Argentina/Buenos_Aires',
+      recordatorioHoraInicio: 8,
+      recordatorioHoraFin: 18,
     },
   })
 
@@ -108,6 +137,10 @@ export default function EmpresaPage() {
         puntoVenta: data.puntoVenta,
         tipoFactura: data.tipoFactura,
         logoUrl: logo && logo.length > 0 ? logo : null,
+        recordatorioDiasGracia: data.recordatorioDiasGracia,
+        timezone: data.timezone,
+        recordatorioHoraInicio: data.recordatorioHoraInicio,
+        recordatorioHoraFin: data.recordatorioHoraFin,
       })
       if (!saved) {
         setSaveError(t('errors.saveFailed'))
@@ -125,6 +158,7 @@ export default function EmpresaPage() {
     const err = errors[key]
     if (!err?.message) return null
     if (err.message === 'cuitInvalid') return t('errors.cuitInvalid')
+    if (err.message === 'reminderWindowInvalid') return t('errors.reminderWindowInvalid')
     return fallback
   }
 
@@ -180,8 +214,7 @@ export default function EmpresaPage() {
               {...register('nombre')}
               readOnly={!canEdit}
               aria-required="true"
-              aria-readonly={!canEdit}
-              aria-invalid={errors.nombre ? true : undefined}
+              {...(errors.nombre ? { 'aria-invalid': 'true' as const } : {})}
               aria-describedby={errors.nombre ? 'empresa-nombre-error' : undefined}
               className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 disabled:opacity-70"
               disabled={!canEdit}
@@ -207,8 +240,7 @@ export default function EmpresaPage() {
               {...register('cuit')}
               readOnly={!canEdit}
               aria-required="true"
-              aria-readonly={!canEdit}
-              aria-invalid={errors.cuit ? true : undefined}
+              {...(errors.cuit ? { 'aria-invalid': 'true' as const } : {})}
               aria-describedby="empresa-cuit-hint empresa-cuit-error"
               className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 disabled:opacity-70"
               disabled={!canEdit}
@@ -232,7 +264,6 @@ export default function EmpresaPage() {
               data-testid="input-empresa-domicilio"
               {...register('domicilio')}
               readOnly={!canEdit}
-              aria-readonly={!canEdit}
               className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 disabled:opacity-70"
               disabled={!canEdit}
             />
@@ -255,8 +286,7 @@ export default function EmpresaPage() {
               {...register('puntoVenta')}
               readOnly={!canEdit}
               aria-required="true"
-              aria-readonly={!canEdit}
-              aria-invalid={errors.puntoVenta ? true : undefined}
+              {...(errors.puntoVenta ? { 'aria-invalid': 'true' as const } : {})}
               aria-describedby="empresa-pv-hint empresa-pv-error"
               className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 disabled:opacity-70"
               disabled={!canEdit}
@@ -279,7 +309,6 @@ export default function EmpresaPage() {
               id="empresa-tipo-factura"
               data-testid="select-empresa-tipo-factura"
               {...register('tipoFactura')}
-              aria-readonly={!canEdit}
               className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 disabled:opacity-70"
               disabled={!canEdit}
             >
@@ -306,7 +335,6 @@ export default function EmpresaPage() {
               data-testid="input-empresa-logo-url"
               {...register('logoUrl')}
               readOnly={!canEdit}
-              aria-readonly={!canEdit}
               aria-describedby="empresa-logo-hint"
               className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 disabled:opacity-70"
               disabled={!canEdit}
@@ -316,6 +344,103 @@ export default function EmpresaPage() {
             </p>
           </div>
         </div>
+
+        <fieldset className="border border-slate-200 dark:border-slate-600 rounded-lg p-4 space-y-4">
+          <legend className="px-2 text-sm font-semibold text-slate-800 dark:text-slate-200">
+            {t('form.remindersLegend')}
+          </legend>
+          <p className="text-xs text-slate-500 dark:text-slate-400">{t('form.remindersHint')}</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label
+                htmlFor="empresa-recordatorio-dias-gracia"
+                className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1"
+              >
+                {t('form.recordatorioDiasGracia')}
+              </label>
+              <input
+                id="empresa-recordatorio-dias-gracia"
+                type="number"
+                min={0}
+                max={365}
+                data-testid="input-empresa-recordatorio-dias-gracia"
+                {...register('recordatorioDiasGracia')}
+                readOnly={!canEdit}
+                className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 disabled:opacity-70"
+                disabled={!canEdit}
+              />
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{t('form.recordatorioDiasGraciaHint')}</p>
+            </div>
+            <div>
+              <label htmlFor="empresa-timezone" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                {t('form.timezone')}
+              </label>
+              <select
+                id="empresa-timezone"
+                data-testid="select-empresa-timezone"
+                {...register('timezone')}
+                className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 disabled:opacity-70"
+                disabled={!canEdit}
+              >
+                {EMPRESA_TIMEZONE_OPTIONS.map((tz) => (
+                  <option key={tz} value={tz}>
+                    {tz}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label
+                htmlFor="empresa-recordatorio-hora-inicio"
+                className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1"
+              >
+                {t('form.recordatorioHoraInicio')}
+              </label>
+              <select
+                id="empresa-recordatorio-hora-inicio"
+                data-testid="select-empresa-recordatorio-hora-inicio"
+                {...register('recordatorioHoraInicio')}
+                className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 disabled:opacity-70"
+                disabled={!canEdit}
+              >
+                {Array.from({ length: 24 }, (_, h) => (
+                  <option key={h} value={h}>
+                    {String(h).padStart(2, '0')}:00
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label
+                htmlFor="empresa-recordatorio-hora-fin"
+                className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1"
+              >
+                {t('form.recordatorioHoraFin')}
+              </label>
+              <select
+                id="empresa-recordatorio-hora-fin"
+                data-testid="select-empresa-recordatorio-hora-fin"
+                {...register('recordatorioHoraFin')}
+                {...(errors.recordatorioHoraFin ? { 'aria-invalid': 'true' as const } : {})}
+                aria-describedby={errors.recordatorioHoraFin ? 'empresa-recordatorio-hora-fin-error' : undefined}
+                className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 disabled:opacity-70"
+                disabled={!canEdit}
+              >
+                {Array.from({ length: 24 }, (_, h) => (
+                  <option key={h + 1} value={h + 1}>
+                    {String(h + 1).padStart(2, '0')}:00
+                  </option>
+                ))}
+              </select>
+              {errors.recordatorioHoraFin && (
+                <p id="empresa-recordatorio-hora-fin-error" className="text-red-500 text-xs mt-1" role="alert">
+                  {fieldError('recordatorioHoraFin', t('errors.reminderWindowInvalid'))}
+                </p>
+              )}
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{t('form.recordatorioHoraFinHint')}</p>
+            </div>
+          </div>
+        </fieldset>
 
         {saveError && (
           <p className="text-red-600 dark:text-red-400 text-sm" role="alert">

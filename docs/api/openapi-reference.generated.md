@@ -17457,6 +17457,22 @@ Returns boolean flags for each channel. No sensitive values are exposed.
 
     `string`
 
+  - **`recordatorioDiasGracia`**
+
+    `integer` — Grace days after due date before an invoice is eligible for collection reminders.
+
+  - **`recordatorioHoraFin`**
+
+    `integer` — Business-hour window end (tenant local hour, exclusive).
+
+  - **`recordatorioHoraInicio`**
+
+    `integer` — Business-hour window start (tenant local hour, inclusive).
+
+  - **`timezone`**
+
+    `string` — IANA time zone for the daily reminder job and business-hour window.
+
 - **`success` (required)**
 
   `boolean`
@@ -17474,7 +17490,11 @@ Returns boolean flags for each channel. No sensitive values are exposed.
     "puntoVenta": 1,
     "tipoFactura": "A",
     "logoUrl": "",
-    "prefijoFactura": ""
+    "prefijoFactura": "",
+    "recordatorioDiasGracia": 0,
+    "timezone": "America/Argentina/Buenos_Aires",
+    "recordatorioHoraInicio": 0,
+    "recordatorioHoraFin": 1
   }
 }
 ```
@@ -17555,6 +17575,22 @@ Returns boolean flags for each channel. No sensitive values are exposed.
 
   `string`
 
+- **`recordatorioDiasGracia`**
+
+  `integer`
+
+- **`recordatorioHoraFin`**
+
+  `integer`
+
+- **`recordatorioHoraInicio`**
+
+  `integer`
+
+- **`timezone`**
+
+  `string`
+
 **Example:**
 
 ```json
@@ -17564,7 +17600,11 @@ Returns boolean flags for each channel. No sensitive values are exposed.
   "domicilio": "",
   "puntoVenta": 1,
   "tipoFactura": "A",
-  "logoUrl": ""
+  "logoUrl": "",
+  "recordatorioDiasGracia": 0,
+  "timezone": "",
+  "recordatorioHoraInicio": 0,
+  "recordatorioHoraFin": 1
 }
 ```
 
@@ -17610,6 +17650,22 @@ Returns boolean flags for each channel. No sensitive values are exposed.
 
     `string`
 
+  - **`recordatorioDiasGracia`**
+
+    `integer` — Grace days after due date before an invoice is eligible for collection reminders.
+
+  - **`recordatorioHoraFin`**
+
+    `integer` — Business-hour window end (tenant local hour, exclusive).
+
+  - **`recordatorioHoraInicio`**
+
+    `integer` — Business-hour window start (tenant local hour, inclusive).
+
+  - **`timezone`**
+
+    `string` — IANA time zone for the daily reminder job and business-hour window.
+
 - **`success` (required)**
 
   `boolean`
@@ -17627,7 +17683,11 @@ Returns boolean flags for each channel. No sensitive values are exposed.
     "puntoVenta": 1,
     "tipoFactura": "A",
     "logoUrl": "",
-    "prefijoFactura": ""
+    "prefijoFactura": "",
+    "recordatorioDiasGracia": 0,
+    "timezone": "America/Argentina/Buenos_Aires",
+    "recordatorioHoraInicio": 0,
+    "recordatorioHoraFin": 1
   }
 }
 ```
@@ -25420,6 +25480,22 @@ Requires `orders.dispatch` for transitions to `assigned`, `in_transit`, or `fail
 
   `string`
 
+* **`recordatorioDiasGracia`**
+
+  `integer` — Grace days after due date before an invoice is eligible for collection reminders.
+
+* **`recordatorioHoraFin`**
+
+  `integer` — Business-hour window end (tenant local hour, exclusive).
+
+* **`recordatorioHoraInicio`**
+
+  `integer` — Business-hour window start (tenant local hour, inclusive).
+
+* **`timezone`**
+
+  `string` — IANA time zone for the daily reminder job and business-hour window.
+
 **Example:**
 
 ```json
@@ -25431,7 +25507,11 @@ Requires `orders.dispatch` for transitions to `assigned`, `in_transit`, or `fail
   "puntoVenta": 1,
   "tipoFactura": "A",
   "logoUrl": "",
-  "prefijoFactura": ""
+  "prefijoFactura": "",
+  "recordatorioDiasGracia": 0,
+  "timezone": "America/Argentina/Buenos_Aires",
+  "recordatorioHoraInicio": 0,
+  "recordatorioHoraFin": 1
 }
 ```
 
@@ -25463,6 +25543,22 @@ Requires `orders.dispatch` for transitions to `assigned`, `in_transit`, or `fail
 
   `string`
 
+* **`recordatorioDiasGracia`**
+
+  `integer`
+
+* **`recordatorioHoraFin`**
+
+  `integer`
+
+* **`recordatorioHoraInicio`**
+
+  `integer`
+
+* **`timezone`**
+
+  `string`
+
 **Example:**
 
 ```json
@@ -25472,7 +25568,11 @@ Requires `orders.dispatch` for transitions to `assigned`, `in_transit`, or `fail
   "domicilio": "",
   "puntoVenta": 1,
   "tipoFactura": "A",
-  "logoUrl": ""
+  "logoUrl": "",
+  "recordatorioDiasGracia": 0,
+  "timezone": "",
+  "recordatorioHoraInicio": 0,
+  "recordatorioHoraFin": 1
 }
 ```
 
@@ -25516,6 +25616,22 @@ Requires `orders.dispatch` for transitions to `assigned`, `in_transit`, or `fail
 
     `string`
 
+  - **`recordatorioDiasGracia`**
+
+    `integer` — Grace days after due date before an invoice is eligible for collection reminders.
+
+  - **`recordatorioHoraFin`**
+
+    `integer` — Business-hour window end (tenant local hour, exclusive).
+
+  - **`recordatorioHoraInicio`**
+
+    `integer` — Business-hour window start (tenant local hour, inclusive).
+
+  - **`timezone`**
+
+    `string` — IANA time zone for the daily reminder job and business-hour window.
+
 * **`success` (required)**
 
   `boolean`
@@ -25533,7 +25649,11 @@ Requires `orders.dispatch` for transitions to `assigned`, `in_transit`, or `fail
     "puntoVenta": 1,
     "tipoFactura": "A",
     "logoUrl": "",
-    "prefijoFactura": ""
+    "prefijoFactura": "",
+    "recordatorioDiasGracia": 0,
+    "timezone": "America/Argentina/Buenos_Aires",
+    "recordatorioHoraInicio": 0,
+    "recordatorioHoraFin": 1
   }
 }
 ```

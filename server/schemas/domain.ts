@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { validateCUIT } from '../../src/lib/validators'
+import { isValidIanaTimeZone } from '../lib/tenantLocalTime'
 import type {
   ArticuloInput,
   ClienteInput,
@@ -751,6 +752,12 @@ export const empresaUpdateBodySchema = z
     puntoVenta: z.number({ invalid_type_error: 'puntoVenta must be an integer' }),
     tipoFactura: empresaTipoFacturaSchema,
     logoUrl: z.union([z.string(), z.null(), z.undefined()]).optional(),
+    recordatorioDiasGracia: z.number({ invalid_type_error: 'recordatorioDiasGracia must be an integer' }).optional(),
+    timezone: z.string({ invalid_type_error: 'timezone must be a string' }).optional(),
+    recordatorioHoraInicio: z
+      .number({ invalid_type_error: 'recordatorioHoraInicio must be an integer' })
+      .optional(),
+    recordatorioHoraFin: z.number({ invalid_type_error: 'recordatorioHoraFin must be an integer' }).optional(),
   })
   .superRefine((data, ctx) => {
     const nombre = data.nombre.trim()
@@ -787,6 +794,55 @@ export const empresaUpdateBodySchema = z
         }
       }
     }
+    if (data.recordatorioDiasGracia !== undefined) {
+      const grace = data.recordatorioDiasGracia
+      if (!Number.isInteger(grace) || grace < 0 || grace > 365) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'recordatorioDiasGracia must be an integer between 0 and 365',
+          path: ['recordatorioDiasGracia'],
+        })
+      }
+    }
+    if (data.timezone !== undefined) {
+      const tz = data.timezone.trim()
+      if (tz.length < 1 || tz.length > 64 || !isValidIanaTimeZone(tz)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'timezone must be a valid IANA time zone',
+          path: ['timezone'],
+        })
+      }
+    }
+    if (data.recordatorioHoraInicio !== undefined) {
+      const h = data.recordatorioHoraInicio
+      if (!Number.isInteger(h) || h < 0 || h > 23) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'recordatorioHoraInicio must be an integer between 0 and 23',
+          path: ['recordatorioHoraInicio'],
+        })
+      }
+    }
+    if (data.recordatorioHoraFin !== undefined) {
+      const h = data.recordatorioHoraFin
+      if (!Number.isInteger(h) || h < 1 || h > 24) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'recordatorioHoraFin must be an integer between 1 and 24',
+          path: ['recordatorioHoraFin'],
+        })
+      }
+    }
+    const start = data.recordatorioHoraInicio
+    const end = data.recordatorioHoraFin
+    if (start !== undefined && end !== undefined && start >= end) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'recordatorioHoraFin must be greater than recordatorioHoraInicio',
+        path: ['recordatorioHoraFin'],
+      })
+    }
   })
   .transform((data): EmpresaInput => {
     const dom =
@@ -812,6 +868,10 @@ export const empresaUpdateBodySchema = z
       puntoVenta: data.puntoVenta,
       tipoFactura: data.tipoFactura,
       logoUrl: logo,
+      recordatorioDiasGracia: data.recordatorioDiasGracia,
+      timezone: data.timezone?.trim(),
+      recordatorioHoraInicio: data.recordatorioHoraInicio,
+      recordatorioHoraFin: data.recordatorioHoraFin,
     }
   })
 

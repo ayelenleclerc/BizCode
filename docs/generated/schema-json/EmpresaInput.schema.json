@@ -24,6 +24,25 @@
       "minimum": 1,
       "type": "integer"
     },
+    "recordatorioDiasGracia": {
+      "maximum": 365,
+      "minimum": 0,
+      "type": "integer"
+    },
+    "recordatorioHoraFin": {
+      "maximum": 24,
+      "minimum": 1,
+      "type": "integer"
+    },
+    "recordatorioHoraInicio": {
+      "maximum": 23,
+      "minimum": 0,
+      "type": "integer"
+    },
+    "timezone": {
+      "maxLength": 64,
+      "type": "string"
+    },
     "tipoFactura": {
       "enum": [
         "A",

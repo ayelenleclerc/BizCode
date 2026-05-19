@@ -12,7 +12,12 @@ function buildPrismaMock(overrides: Partial<Record<string, unknown>> = {}): Pris
     rubro: { findMany: vi.fn() },
     formaPago: { findMany: vi.fn() },
     paramEmpresa: {
-      findUnique: vi.fn().mockResolvedValue({ recordatorioDiasGracia: 0 }),
+      findUnique: vi.fn().mockResolvedValue({
+        recordatorioDiasGracia: 0,
+        timezone: 'America/Argentina/Buenos_Aires',
+        recordatorioHoraInicio: 8,
+        recordatorioHoraFin: 18,
+      }),
     },
     factura: {
       findMany: vi.fn().mockResolvedValue([]),
@@ -112,6 +117,7 @@ describe('POST /api/cobranzas/recordatorios', () => {
         findFirst: vi.fn().mockResolvedValue({
           id: 7,
           clienteId: 2,
+          total: new Decimal(250),
           fecha: new Date('2026-01-01'),
           cliente: { rsocial: 'ACME', creditDays: 0 },
         }),
@@ -146,5 +152,27 @@ describe('POST /api/cobranzas/recordatorios', () => {
       .send({ facturaId: 7 })
       .expect(409)
     expect(res.body.error).toBe('REMINDER_ALREADY_SENT_TODAY')
+  })
+
+  it('returns 422 when invoice is not overdue', async () => {
+    const prisma = buildPrismaMock({
+      factura: {
+        findMany: vi.fn(),
+        aggregate: vi.fn(),
+        findFirst: vi.fn().mockResolvedValue({
+          id: 8,
+          clienteId: 2,
+          total: new Decimal(100),
+          fecha: new Date(),
+          cliente: { rsocial: 'ACME', creditDays: 30 },
+        }),
+      },
+    })
+    const app = createApp(prisma)
+    const res = await request(app)
+      .post('/api/cobranzas/recordatorios')
+      .send({ facturaId: 8 })
+      .expect(422)
+    expect(res.body.error).toBe('FACTURA_NOT_OVERDUE')
   })
 })

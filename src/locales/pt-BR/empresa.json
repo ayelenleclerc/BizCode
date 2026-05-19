@@ -15,7 +15,15 @@
     "prefijoPreview": "Prévia do prefixo",
     "tipoA": "Tipo A",
     "tipoB": "Tipo B",
-    "tipoC": "Tipo C"
+    "tipoC": "Tipo C",
+    "remindersLegend": "Lembretes de inadimplência",
+    "remindersHint": "O job diário envia lembretes às 08:00 no fuso horário configurado, dentro do horário comercial.",
+    "recordatorioDiasGracia": "Dias de carência",
+    "recordatorioDiasGraciaHint": "Dias após o vencimento antes de considerar a fatura em atraso (0–365).",
+    "timezone": "Fuso horário (IANA)",
+    "recordatorioHoraInicio": "Hora início (horário comercial)",
+    "recordatorioHoraFin": "Hora fim (exclusiva)",
+    "recordatorioHoraFinHint": "O job não envia lembretes fora deste intervalo no horário local do tenant."
   },
   "actions": {
     "save": "Salvar configuração"
@@ -25,7 +33,8 @@
     "saveFailed": "Não foi possível salvar os dados da empresa",
     "nombreRequired": "A razão social é obrigatória",
     "cuitInvalid": "Informe um CUIT válido",
-    "puntoVentaInvalid": "O ponto de venda deve estar entre 1 e 9999"
+    "puntoVentaInvalid": "O ponto de venda deve estar entre 1 e 9999",
+    "reminderWindowInvalid": "A hora de fim deve ser posterior à hora de início"
   },
   "success": {
     "saved": "Configuração da empresa salva"

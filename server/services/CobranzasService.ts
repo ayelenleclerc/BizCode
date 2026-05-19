@@ -1,7 +1,18 @@
 import type { PrismaClient } from '@prisma/client'
 import { dispatchNotification } from '../channels'
+import {
+  type CobranzasReminderSettings,
+  reminderSettingsFromParamEmpresa,
+} from '../lib/cobranzasReminderDefaults'
+import {
+  getLocalHour,
+  getLocalMinute,
+  isWithinHourRange,
+} from '../lib/tenantLocalTime'
 import { computeDaysPastDue } from './ReportesFinancierosService'
 import type { ServiceResult } from './serviceResults'
+
+export type { CobranzasReminderSettings }
 
 export type FacturaVencidaRow = {
   facturaId: number
@@ -12,6 +23,9 @@ export type FacturaVencidaRow = {
   diasMora: number
 }
 
+const DAILY_JOB_LOCAL_HOUR = 8
+const DAILY_JOB_MINUTE_TOLERANCE = 15
+
 /**
  * @en Overdue invoice reminders (#134).
  * @es Recordatorios de facturas vencidas (#134).
@@ -20,12 +34,21 @@ export type FacturaVencidaRow = {
 export class CobranzasService {
   constructor(private readonly prisma: PrismaClient) {}
 
-  async listVencidas(tenantId: number, asOf = new Date()): Promise<FacturaVencidaRow[]> {
-    const empresa = await this.prisma.paramEmpresa.findUnique({
+  private async getReminderSettings(tenantId: number): Promise<CobranzasReminderSettings> {
+    const row = await this.prisma.paramEmpresa.findUnique({
       where: { tenantId },
-      select: { recordatorioDiasGracia: true },
+      select: {
+        recordatorioDiasGracia: true,
+        timezone: true,
+        recordatorioHoraInicio: true,
+        recordatorioHoraFin: true,
+      },
     })
-    const grace = empresa?.recordatorioDiasGracia ?? 0
+    return reminderSettingsFromParamEmpresa(row)
+  }
+
+  async listVencidas(tenantId: number, asOf = new Date()): Promise<FacturaVencidaRow[]> {
+    const { recordatorioDiasGracia: grace } = await this.getReminderSettings(tenantId)
 
     const facturas = await this.prisma.factura.findMany({
       where: { tenantId, estado: 'A' },
@@ -64,12 +87,21 @@ export class CobranzasService {
     return count > 0
   }
 
-  /** @en True when local hour is within configured business window (job only). */
-  isWithinBusinessWindow(now: Date): boolean {
-    const start = Number(process.env.BIZCODE_COBRANZAS_HORA_INICIO ?? 8)
-    const end = Number(process.env.BIZCODE_COBRANZAS_HORA_FIN ?? 18)
-    const hour = now.getHours()
-    return hour >= start && hour < end
+  /** @en True when tenant-local hour is within configured business window (job only). */
+  isWithinBusinessWindow(now: Date, settings: CobranzasReminderSettings): boolean {
+    return isWithinHourRange(
+      now,
+      settings.timezone,
+      settings.recordatorioHoraInicio,
+      settings.recordatorioHoraFin,
+    )
+  }
+
+  /** @en True when tenant-local time is the 08:00 daily slot (minute &lt; 15 for hourly cron). */
+  shouldRunDailyJob(now: Date, settings: CobranzasReminderSettings): boolean {
+    const hour = getLocalHour(now, settings.timezone)
+    const minute = getLocalMinute(now, settings.timezone)
+    return hour === DAILY_JOB_LOCAL_HOUR && minute < DAILY_JOB_MINUTE_TOLERANCE
   }
 
   async sendReminder(
@@ -85,13 +117,10 @@ export class CobranzasService {
       return { ok: false, status: 404, error: 'Factura not found' }
     }
 
-    const empresa = await this.prisma.paramEmpresa.findUnique({
-      where: { tenantId },
-      select: { recordatorioDiasGracia: true },
-    })
-    const grace = empresa?.recordatorioDiasGracia ?? 0
+    const settings = await this.getReminderSettings(tenantId)
     const dias =
-      computeDaysPastDue(factura.fecha, factura.cliente.creditDays, new Date()) - grace
+      computeDaysPastDue(factura.fecha, factura.cliente.creditDays, new Date()) -
+      settings.recordatorioDiasGracia
     if (dias <= 0) {
       return { ok: false, status: 422, error: 'FACTURA_NOT_OVERDUE' }
     }
@@ -108,13 +137,19 @@ export class CobranzasService {
       clienteId: factura.clienteId,
       rsocial: factura.cliente.rsocial,
       facturaId,
+      amount: factura.total.toString(),
+      diasMora: dias,
     })
 
     return { ok: true, data: { id: row.id } }
   }
 
   async runDailyJob(tenantId: number, canal = 'email', now = new Date()): Promise<{ sent: number; skipped: number }> {
-    if (!this.isWithinBusinessWindow(now)) {
+    const settings = await this.getReminderSettings(tenantId)
+    if (!this.shouldRunDailyJob(now, settings)) {
+      return { sent: 0, skipped: 0 }
+    }
+    if (!this.isWithinBusinessWindow(now, settings)) {
       return { sent: 0, skipped: 0 }
     }
     const vencidas = await this.listVencidas(tenantId, now)

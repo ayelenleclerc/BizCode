@@ -153,6 +153,10 @@ export type EmpresaInput = {
   puntoVenta: number
   tipoFactura: 'A' | 'B' | 'C'
   logoUrl?: string | null
+  recordatorioDiasGracia?: number
+  timezone?: string
+  recordatorioHoraInicio?: number
+  recordatorioHoraFin?: number
 }
 
 /** @en Commercial order lifecycle (ADR-0009). @es Ciclo de pedido comercial. @pt-BR Ciclo do pedido comercial. */

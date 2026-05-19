@@ -18,6 +18,16 @@ Al cargar, la página consulta **`GET /api/reportes/aging`** y muestra buckets (
 
 Si el cliente no existe, la API devuelve 404.
 
+## Facturas vencidas y recordatorios
+
+La misma página **Finanzas** incluye una sección de facturas vencidas (`GET /api/cobranzas/vencidas`):
+
+1. Opcionalmente filtre por **días mínimos de mora**.
+2. Revise la tabla (cliente, total, fecha, días de mora).
+3. Use **Enviar recordatorio** en una fila para disparar `POST /api/cobranzas/recordatorios` (permiso `reports.financial.read`). No se envía más de un recordatorio por factura el mismo día.
+
+La configuración del job automático (días de gracia, zona horaria IANA, horario comercial) está en **Configuración → Empresa**. El job operativo `npm run cobranzas:recordatorios` recorre todos los tenants con parámetros de empresa y envía a las **08:00 hora local** dentro de la ventana configurada (véase [ciclo CI/CD](../quality/ciclo-ci-cd.md)).
+
 ## Referencia API
 
 [`docs/api/openapi.yaml`](../../api/openapi.yaml) — rutas `/api/reportes/aging` y `/api/reportes/cuenta-corriente/{clienteId}`.

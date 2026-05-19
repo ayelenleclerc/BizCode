@@ -160,9 +160,9 @@ These jobs are **not** run by GitHub Actions in the default pipeline; schedule t
 | Schedule | Command | Purpose |
 |---|---|---|
 | `*/5 * * * *` | `npm run afip:retry-pending-job` | Retry `estadoCae: pending` invoices via homologación WSFE mock (`AfipService.retryPending`) for every tenant with `TenantFiscalConfig`. |
-| Daily 08:00 (tenant local) | `npm run cobranzas:recordatorios` | Overdue collection reminders (single tenant; see script). |
+| `0 * * * *` (hourly) | `npm run cobranzas:recordatorios` | Overdue collection reminders for every tenant with `ParamEmpresa`; sends at **08:00 tenant local** (minute &lt; 15) within configured business hours. Use `0 8 * * *` only for single–time zone deployments. |
 
-Optional env for a single tenant in dev/staging: `BIZCODE_TENANT_ID=<id>` (applies to `afip:retry-pending-job` and `afip:retry-pending`).
+Optional env for a single tenant in dev/staging: `BIZCODE_TENANT_ID=<id>` (applies to `afip:retry-pending-job`, `afip:retry-pending`, and `cobranzas:recordatorios`). Optional `BIZCODE_RECORDATORIO_CANAL` (default `email`).
 
 Documentation governance (Wiki vs controlled docs):
 
