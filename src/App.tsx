@@ -26,6 +26,7 @@ import TenantDetailPage from './pages/superadmin/TenantDetailPage'
 import TenantModulesPage from './pages/superadmin/TenantModulesPage'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
 import { FeatureFlagsProvider, FeatureFlagsGate } from './contexts/FeatureFlagsContext'
+import { PlanProvider } from './contexts/PlanContext'
 
 function ProtectedRoute() {
   const { status } = useAuth()
@@ -197,9 +198,11 @@ function App() {
   return (
     <AuthProvider>
       <FeatureFlagsProvider>
-        <Router>
-          <AppRoutes />
-        </Router>
+        <PlanProvider>
+          <Router>
+            <AppRoutes />
+          </Router>
+        </PlanProvider>
       </FeatureFlagsProvider>
     </AuthProvider>
   )

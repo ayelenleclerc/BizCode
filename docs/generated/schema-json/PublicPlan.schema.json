@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "currency": {
+      "type": "string"
+    },
+    "features": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "key": {
+      "type": "string"
+    },
+    "maxInvoicesPerMonth": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "maxUsers": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "monthlyPrice": {
+      "type": "integer"
+    },
+    "name": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "key",
+    "name",
+    "monthlyPrice",
+    "currency",
+    "maxUsers",
+    "maxInvoicesPerMonth",
+    "features"
+  ],
+  "title": "PublicPlan",
+  "type": "object"
+}

@@ -136,7 +136,20 @@
     "loadError": "Could not load channel status"
   },
   "errors": {
-    "moduleNotEnabled": "Module «{{module}}» is not enabled for your company. Contact your administrator."
+    "moduleNotEnabled": "Module «{{module}}» is not enabled for your company. Contact your administrator.",
+    "planLimitUsers": "You reached your plan user limit. Upgrade your plan to add more users.",
+    "planLimitInvoices": "You reached your plan monthly invoice limit. Upgrade your plan to keep invoicing.",
+    "planFeatureRequired": "Feature «{{feature}}» is not included in plan «{{plan}}». Upgrade to enable it."
+  },
+  "plans": {
+    "upgradeTitle": "Feature not available on your plan",
+    "upgradeCta": "Contact your company administrator or support to upgrade the plan.",
+    "names": {
+      "starter": "Starter",
+      "pro": "Pro",
+      "enterprise": "Enterprise",
+      "trial": "Trial"
+    }
   },
   "modules": {
     "core_invoicing": "Core invoicing",
@@ -163,6 +176,17 @@
     "suspend": "Suspend tenant",
     "reactivate": "Reactivate tenant",
     "manageModules": "Manage modules",
+    "plan": {
+      "sectionTitle": "SaaS plan",
+      "selectLabel": "Plan",
+      "reasonLabel": "Change reason (required)",
+      "save": "Apply plan",
+      "saveSuccess": "Plan updated successfully.",
+      "errors": {
+        "reasonRequired": "Enter a reason for the plan change.",
+        "saveFailed": "Could not update the plan."
+      }
+    },
     "modules": {
       "title": "Tenant modules",
       "deploymentEnv": "Deployment environment: {{env}}",

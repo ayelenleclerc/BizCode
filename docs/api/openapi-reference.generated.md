@@ -674,6 +674,219 @@ Returns module and integration keys enabled for the authenticated user's tenant.
 }
 ```
 
+### Public SaaS plan catalog
+
+- **Method:** `GET`
+- **Path:** `/api/planes`
+- **Tags:** platform
+
+Lists active subscription plans with limits and feature keys (no authentication required).
+
+#### Responses
+
+##### Status: 200 Plan catalog
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`currency` (required)**
+
+    `string`
+
+  - **`features` (required)**
+
+    `array`
+
+    **Items:**
+
+    `string`
+
+  - **`key` (required)**
+
+    `string`
+
+  - **`maxInvoicesPerMonth` (required)**
+
+    `integer`
+
+  - **`maxUsers` (required)**
+
+    `integer`
+
+  - **`monthlyPrice` (required)**
+
+    `integer`
+
+  - **`name` (required)**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "key": "",
+      "name": "",
+      "monthlyPrice": 1,
+      "currency": "",
+      "maxUsers": 1,
+      "maxInvoicesPerMonth": 1,
+      "features": [
+        ""
+      ]
+    }
+  ]
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Current tenant SaaS plan and usage
+
+- **Method:** `GET`
+- **Path:** `/api/me/plan`
+- **Tags:** platform
+
+Returns plan limits, enabled plan features, and current usage for the authenticated tenant.
+
+#### Responses
+
+##### Status: 200 Tenant plan snapshot
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`currency` (required)**
+
+    `string`
+
+  - **`features` (required)**
+
+    `array`
+
+    **Items:**
+
+    `string`
+
+  - **`maxInvoicesPerMonth` (required)**
+
+    `integer`
+
+  - **`maxUsers` (required)**
+
+    `integer`
+
+  - **`monthlyPrice` (required)**
+
+    `integer`
+
+  - **`planKey` (required)**
+
+    `string`
+
+  - **`planName` (required)**
+
+    `string`
+
+  - **`status` (required)**
+
+    `string`
+
+  - **`usage` (required)**
+
+    `object`
+
+    - **`invoicesUsed` (required)**
+
+      `integer`
+
+    - **`usersUsed` (required)**
+
+      `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "planKey": "",
+    "planName": "",
+    "monthlyPrice": 1,
+    "currency": "",
+    "maxUsers": 1,
+    "maxInvoicesPerMonth": 1,
+    "features": [
+      ""
+    ],
+    "status": "",
+    "usage": {
+      "usersUsed": 1,
+      "invoicesUsed": 1
+    }
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ### Platform-wide tenant statistics (super admin)
 
 - **Method:** `GET`
@@ -2082,6 +2295,208 @@ Returns module and integration keys enabled for the authenticated user's tenant.
 ```
 
 ##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/superadmin/tenants/{tenantId}/plan
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/superadmin/tenants/{tenantId}/plan`
+
+### Change tenant SaaS plan (super admin)
+
+- **Method:** `POST`
+- **Path:** `/api/superadmin/tenants/{tenantId}/plan`
+- **Tags:** platform
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`planKey` (required)**
+
+  `string`, possible values: `"starter", "pro", "enterprise", "trial"`
+
+- **`reason` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "planKey": "starter",
+  "reason": ""
+}
+```
+
+#### Responses
+
+##### Status: 200 Updated tenant plan
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`currency` (required)**
+
+    `string`
+
+  - **`features` (required)**
+
+    `array`
+
+    **Items:**
+
+    `string`
+
+  - **`maxInvoicesPerMonth` (required)**
+
+    `integer`
+
+  - **`maxUsers` (required)**
+
+    `integer`
+
+  - **`monthlyPrice` (required)**
+
+    `integer`
+
+  - **`planKey` (required)**
+
+    `string`
+
+  - **`planName` (required)**
+
+    `string`
+
+  - **`status` (required)**
+
+    `string`
+
+  - **`usage` (required)**
+
+    `object`
+
+    - **`invoicesUsed` (required)**
+
+      `integer`
+
+    - **`usersUsed` (required)**
+
+      `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "planKey": "",
+    "planName": "",
+    "monthlyPrice": 1,
+    "currency": "",
+    "maxUsers": 1,
+    "maxInvoicesPerMonth": 1,
+    "features": [
+      ""
+    ],
+    "status": "",
+    "usage": {
+      "usersUsed": 1,
+      "invoicesUsed": 1
+    }
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Tenant not found
 
 ###### Content-Type: application/json
 
@@ -25367,6 +25782,355 @@ Requires `orders.dispatch` for transitions to `assigned`, `in_transit`, or `fail
       ""
     ]
   }
+}
+```
+
+### PublicPlan
+
+- **Type:**`object`
+
+* **`currency` (required)**
+
+  `string`
+
+* **`features` (required)**
+
+  `array`
+
+  **Items:**
+
+  `string`
+
+* **`key` (required)**
+
+  `string`
+
+* **`maxInvoicesPerMonth` (required)**
+
+  `integer`
+
+* **`maxUsers` (required)**
+
+  `integer`
+
+* **`monthlyPrice` (required)**
+
+  `integer`
+
+* **`name` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "key": "",
+  "name": "",
+  "monthlyPrice": 1,
+  "currency": "",
+  "maxUsers": 1,
+  "maxInvoicesPerMonth": 1,
+  "features": [
+    ""
+  ]
+}
+```
+
+### PlanCatalogEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`currency` (required)**
+
+    `string`
+
+  - **`features` (required)**
+
+    `array`
+
+    **Items:**
+
+    `string`
+
+  - **`key` (required)**
+
+    `string`
+
+  - **`maxInvoicesPerMonth` (required)**
+
+    `integer`
+
+  - **`maxUsers` (required)**
+
+    `integer`
+
+  - **`monthlyPrice` (required)**
+
+    `integer`
+
+  - **`name` (required)**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "key": "",
+      "name": "",
+      "monthlyPrice": 1,
+      "currency": "",
+      "maxUsers": 1,
+      "maxInvoicesPerMonth": 1,
+      "features": [
+        ""
+      ]
+    }
+  ]
+}
+```
+
+### TenantPlanUsage
+
+- **Type:**`object`
+
+* **`invoicesUsed` (required)**
+
+  `integer`
+
+* **`usersUsed` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "usersUsed": 1,
+  "invoicesUsed": 1
+}
+```
+
+### TenantPlanSnapshot
+
+- **Type:**`object`
+
+* **`currency` (required)**
+
+  `string`
+
+* **`features` (required)**
+
+  `array`
+
+  **Items:**
+
+  `string`
+
+* **`maxInvoicesPerMonth` (required)**
+
+  `integer`
+
+* **`maxUsers` (required)**
+
+  `integer`
+
+* **`monthlyPrice` (required)**
+
+  `integer`
+
+* **`planKey` (required)**
+
+  `string`
+
+* **`planName` (required)**
+
+  `string`
+
+* **`status` (required)**
+
+  `string`
+
+* **`usage` (required)**
+
+  `object`
+
+  - **`invoicesUsed` (required)**
+
+    `integer`
+
+  - **`usersUsed` (required)**
+
+    `integer`
+
+**Example:**
+
+```json
+{
+  "planKey": "",
+  "planName": "",
+  "monthlyPrice": 1,
+  "currency": "",
+  "maxUsers": 1,
+  "maxInvoicesPerMonth": 1,
+  "features": [
+    ""
+  ],
+  "status": "",
+  "usage": {
+    "usersUsed": 1,
+    "invoicesUsed": 1
+  }
+}
+```
+
+### TenantPlanSnapshotEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`currency` (required)**
+
+    `string`
+
+  - **`features` (required)**
+
+    `array`
+
+    **Items:**
+
+    `string`
+
+  - **`maxInvoicesPerMonth` (required)**
+
+    `integer`
+
+  - **`maxUsers` (required)**
+
+    `integer`
+
+  - **`monthlyPrice` (required)**
+
+    `integer`
+
+  - **`planKey` (required)**
+
+    `string`
+
+  - **`planName` (required)**
+
+    `string`
+
+  - **`status` (required)**
+
+    `string`
+
+  - **`usage` (required)**
+
+    `object`
+
+    - **`invoicesUsed` (required)**
+
+      `integer`
+
+    - **`usersUsed` (required)**
+
+      `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "planKey": "",
+    "planName": "",
+    "monthlyPrice": 1,
+    "currency": "",
+    "maxUsers": 1,
+    "maxInvoicesPerMonth": 1,
+    "features": [
+      ""
+    ],
+    "status": "",
+    "usage": {
+      "usersUsed": 1,
+      "invoicesUsed": 1
+    }
+  }
+}
+```
+
+### TenantPlanChangeBody
+
+- **Type:**`object`
+
+* **`planKey` (required)**
+
+  `string`, possible values: `"starter", "pro", "enterprise", "trial"`
+
+* **`reason` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "planKey": "starter",
+  "reason": ""
+}
+```
+
+### PlanLimitErrorEnvelope
+
+- **Type:**`object`
+
+* **`error` (required)**
+
+  `string`, possible values: `"plan_limit_users", "plan_limit_invoices", "plan_feature_required"`
+
+* **`success` (required)**
+
+  `boolean`
+
+* **`currentPlan`**
+
+  `string`
+
+* **`feature`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "plan_limit_users",
+  "feature": "",
+  "currentPlan": ""
 }
 ```
 

@@ -214,6 +214,10 @@
 
 * [PedidoListEnvelope](./pedidolistenvelope.md) – `-`
 
+* [PlanCatalogEnvelope](./plancatalogenvelope.md) – `-`
+
+* [PlanLimitErrorEnvelope](./planlimiterrorenvelope.md) – `-`
+
 * [Proveedor](./proveedor.md) – `-`
 
 * [ProveedorEnvelope](./proveedorenvelope.md) – `-`
@@ -223,6 +227,8 @@
 * [ProveedorListEnvelope](./proveedorlistenvelope.md) – `-`
 
 * [ProveedorNullableEnvelope](./proveedornullableenvelope.md) – `-`
+
+* [PublicPlan](./publicplan.md) – `-`
 
 * [ReporteCobranzasListEnvelope](./reportecobranzaslistenvelope.md) – `-`
 
@@ -311,6 +317,14 @@
 * [TenantModuleTrialEnvelope](./tenantmoduletrialenvelope.md) – `-`
 
 * [TenantModuleTrialListEnvelope](./tenantmoduletriallistenvelope.md) – `-`
+
+* [TenantPlanChangeBody](./tenantplanchangebody.md) – `-`
+
+* [TenantPlanSnapshot](./tenantplansnapshot.md) – `-`
+
+* [TenantPlanSnapshotEnvelope](./tenantplansnapshotenvelope.md) – `-`
+
+* [TenantPlanUsage](./tenantplanusage.md) – `-`
 
 * [TenantPricingAddon](./tenantpricingaddon.md) – `-`
 
@@ -496,7 +510,11 @@
 
 * [Untitled array in PedidoListEnvelope](./pedidolistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
 
+* [Untitled array in PlanCatalogEnvelope](./plancatalogenvelope-properties-data.md) – `undefined#/properties/data`
+
 * [Untitled array in ProveedorListEnvelope](./proveedorlistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
+
+* [Untitled array in PublicPlan](./publicplan-properties-features.md) – `undefined#/properties/features`
 
 * [Untitled array in ReporteCobranzasListEnvelope](./reportecobranzaslistenvelope-properties-data.md) – `undefined#/properties/data`
 
@@ -531,6 +549,8 @@
 * [Untitled array in TenantFeaturesData](./tenantfeaturesdata-properties-modules.md) – `undefined#/properties/modules`
 
 * [Untitled array in TenantModuleTrialListEnvelope](./tenantmoduletriallistenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled array in TenantPlanSnapshot](./tenantplansnapshot-properties-features.md) – `undefined#/properties/features`
 
 * [Untitled array in TenantPricingData](./tenantpricingdata-properties-addons.md) – `undefined#/properties/addons`
 

@@ -180,6 +180,51 @@ export const featuresAPI = {
   },
 }
 
+export type PublicPlanDTO = {
+  key: string
+  name: string
+  monthlyPrice: number
+  currency: string
+  maxUsers: number | null
+  maxInvoicesPerMonth: number | null
+  features: string[]
+}
+
+export type TenantPlanSnapshotDTO = {
+  planKey: string
+  planName: string
+  monthlyPrice: number
+  currency: string
+  maxUsers: number | null
+  maxInvoicesPerMonth: number | null
+  features: string[]
+  status: string
+  usage: {
+    usersUsed: number
+    invoicesUsed: number
+  }
+}
+
+export const planAPI = {
+  list: async (): Promise<PublicPlanDTO[]> => {
+    try {
+      const response = await api.get<{ success: boolean; data: PublicPlanDTO[] }>('/planes')
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  getMe: async (): Promise<TenantPlanSnapshotDTO> => {
+    try {
+      const response = await api.get<{ success: boolean; data: TenantPlanSnapshotDTO }>('/me/plan')
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+}
+
 // ============ SUPERADMIN (PLATFORM) ============
 
 export type SuperadminTenantListRow = {
@@ -282,6 +327,21 @@ export const superadminAPI = {
       const response = await api.patch<{ success: boolean; data: SuperadminTenantDetail }>(
         `/superadmin/tenants/${tenantId}`,
         { active },
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  changeTenantPlan: async (
+    tenantId: number,
+    body: { planKey: string; reason: string },
+  ): Promise<TenantPlanSnapshotDTO> => {
+    try {
+      const response = await api.post<{ success: boolean; data: TenantPlanSnapshotDTO }>(
+        `/superadmin/tenants/${tenantId}/plan`,
+        body,
       )
       return response.data.data
     } catch (error) {

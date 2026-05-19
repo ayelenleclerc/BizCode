@@ -136,7 +136,20 @@
     "loadError": "Não foi possível carregar o status dos canais"
   },
   "errors": {
-    "moduleNotEnabled": "O módulo «{{module}}» não está habilitado para sua empresa. Contate o administrador."
+    "moduleNotEnabled": "O módulo «{{module}}» não está habilitado para sua empresa. Contate o administrador.",
+    "planLimitUsers": "Você atingiu o limite de usuários do plano. Atualize o plano para adicionar mais usuários.",
+    "planLimitInvoices": "Você atingiu o limite de faturas do mês do plano. Atualize o plano para continuar faturando.",
+    "planFeatureRequired": "O recurso «{{feature}}» não está incluído no plano «{{plan}}». Atualize para habilitá-lo."
+  },
+  "plans": {
+    "upgradeTitle": "Recurso indisponível no seu plano",
+    "upgradeCta": "Contate o administrador da empresa ou o suporte para atualizar o plano.",
+    "names": {
+      "starter": "Starter",
+      "pro": "Pro",
+      "enterprise": "Enterprise",
+      "trial": "Trial"
+    }
   },
   "modules": {
     "core_invoicing": "Faturamento base",
@@ -163,6 +176,17 @@
     "suspend": "Suspender tenant",
     "reactivate": "Reativar tenant",
     "manageModules": "Gerenciar módulos",
+    "plan": {
+      "sectionTitle": "Plano SaaS",
+      "selectLabel": "Plano",
+      "reasonLabel": "Motivo da alteração (obrigatório)",
+      "save": "Aplicar plano",
+      "saveSuccess": "Plano atualizado com sucesso.",
+      "errors": {
+        "reasonRequired": "Informe o motivo da alteração de plano.",
+        "saveFailed": "Não foi possível atualizar o plano."
+      }
+    },
     "modules": {
       "title": "Módulos do tenant",
       "deploymentEnv": "Ambiente de implantação: {{env}}",

@@ -1,6 +1,6 @@
 # Catálogo de módulos y feature flags (registro de implementación)
 
-**Evidencia:** issues GitHub #227 (catálogo), #223 (motor por tenant), #224 (frontend), #226 (pricing/trials) · hito v0.11.5
+**Evidencia:** issues GitHub #227 (catálogo), #223 (motor por tenant), #224 (frontend), #226 (pricing/trials), #181 (planes SaaS) · hitos v0.11.5 / v0.11.0
 
 ## Alcance en el repositorio
 
@@ -17,7 +17,8 @@
 - **Alta de tenant:** `POST /api/auth/setup-owner` y seed SuperAdmin crean fila `TenantConfig` con [`NEW_TENANT_MODULES`](../../../src/lib/modules/tenantDefaults.ts); backfill de tenants existentes incluye `billing.orders` por compatibilidad con #132.
 - **Frontend (#224):** [`src/contexts/FeatureFlagsContext.tsx`](../../../src/contexts/FeatureFlagsContext.tsx) (`useFeatureFlags`, `FeatureFlagsGate`); [`src/components/IfModule.tsx`](../../../src/components/IfModule.tsx); [`src/components/ModuleRoute.tsx`](../../../src/components/ModuleRoute.tsx); mapa nav en [`src/components/layout/navSections.ts`](../../../src/components/layout/navSections.ts); carga tras login vía `featuresAPI.get()` en [`src/lib/api.ts`](../../../src/lib/api.ts); etiquetas i18n `modules.*` en locales; alerta en `/inicio` con `errors.moduleNotEnabled`.
 - **SuperAdmin UI (#225):** [`src/pages/superadmin/TenantModulesPage.tsx`](../../../src/pages/superadmin/TenantModulesPage.tsx) en `/superadmin/tenants/:tenantId/modules`; cliente `superadminAPI.getConfig` / `putConfig` / `getConfigHistory` / `applyConfigTemplate` y `modulesCatalogAPI.get()` en [`src/lib/api.ts`](../../../src/lib/api.ts); toggles con validación UX (`canDeactivate`, dependencias); motivo obligatorio al guardar; plantillas y historial.
-- **Pricing y trials (#226):** [`src/lib/modules/pricing.ts`](../../../src/lib/modules/pricing.ts); `GET /api/superadmin/tenants/:id/pricing`; modelo `TenantModuleTrial` y `GET/POST/DELETE .../trials`; job `npm run modules:trial-expire`; notificación `module_trial_expiring` a owners; panel de precio y controles de trial en `TenantModulesPage`. Sync con billing **fuera de alcance** hasta #181.
+- **Pricing y trials (#226):** [`src/lib/modules/pricing.ts`](../../../src/lib/modules/pricing.ts); `GET /api/superadmin/tenants/:id/pricing`; modelo `TenantModuleTrial` y `GET/POST/DELETE .../trials`; job `npm run modules:trial-expire`; notificación `module_trial_expiring` a owners; panel de precio y controles de trial en `TenantModulesPage`.
+- **Planes SaaS (#181):** modelos `Plan` / `TenantPlan`; catálogo en [`src/lib/plans/catalog.ts`](../../../src/lib/plans/catalog.ts); `GET /api/planes`, `GET /api/me/plan`, `POST /api/superadmin/tenants/:id/plan`; middleware `requirePlanFeature` y límites hard en `POST /api/users` / `POST /api/facturas`; `PlanProvider` / `PlanGate` en frontend; selector de plan en `TenantDetailPage`. Cobro externo (MP) **fuera de alcance** en este slice.
 
 ## `requiredInProd` (Argentina)
 

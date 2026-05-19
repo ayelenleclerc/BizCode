@@ -4,6 +4,7 @@ import { USER_ROLES, USER_CHANNELS, hasPermission, type UserRole, type UserChann
 import { hashPassword, verifyPassword } from './passwordHash'
 import { requirePermission, type AuthenticatedRequest } from './auth'
 import { writeAuditEvent } from './audit'
+import { planErrorBody, TenantPlanService } from './services/TenantPlanService'
 
 /**
  * @en Role hierarchy index — a user may only assign roles with an equal or lower index than their own.
@@ -111,6 +112,20 @@ export function registerUserRoutes(app: Application, prisma: PrismaClient): void
     if (!hasPermission(callerRole, 'roles.assign') && body.role !== 'seller') {
       res.status(403).json({ success: false, error: "Missing permission: roles.assign" })
       return
+    }
+
+    const planService = new TenantPlanService(prisma)
+    try {
+      const snapshot =
+        authReq.tenantPlan ??
+        (await planService.getSnapshotForTenant(authReq.auth!.claims.tenantId))
+      planService.assertCanAddUser(snapshot)
+    } catch (planErr: unknown) {
+      if (planErr instanceof Error && planErr.message === 'plan_limit_users') {
+        res.status(402).json(planErrorBody(planErr))
+        return
+      }
+      throw planErr
     }
 
     try {

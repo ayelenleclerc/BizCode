@@ -193,6 +193,17 @@ export class SuperadminTenantService {
         },
       })
 
+      const planRow = await tx.plan.findUnique({ where: { key: plan } })
+      if (planRow) {
+        await tx.tenantPlan.create({
+          data: {
+            tenantId: tenant.id,
+            planId: planRow.id,
+            status: 'active',
+          },
+        })
+      }
+
       let ownerUserId: number | null = null
       if (input.ownerUsername && input.ownerPassword) {
         const user = await tx.appUser.create({
