@@ -4,30 +4,34 @@ import type { PrismaClient } from '@prisma/client'
 import { Decimal } from '@prisma/client/runtime/library'
 import { createApp } from '../../server/createApp'
 
-const ordenIncludeRow = {
-  id: 1,
-  tenantId: 1,
-  proveedorId: 2,
-  estado: 'draft',
-  total: new Decimal(50),
-  fechaEstimada: null,
-  nota: null,
-  createdAt: new Date(),
-  updatedAt: new Date(),
-  proveedor: { id: 2, codigo: 1, rsocial: 'Prov SA' },
-  items: [
-    {
-      id: 10,
-      ordenCompraId: 1,
-      articuloId: 3,
-      cantidad: 5,
-      cantidadRecibida: 0,
-      costoUnitario: new Decimal(10),
-      subtotal: new Decimal(50),
-      articulo: { id: 3, codigo: 100, descripcion: 'Prod' },
-    },
-  ],
+function buildOrdenRow(estado: string, cantidadRecibida = 0) {
+  return {
+    id: 1,
+    tenantId: 1,
+    proveedorId: 2,
+    estado,
+    total: new Decimal(50),
+    fechaEstimada: null,
+    nota: null,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    proveedor: { id: 2, codigo: 1, rsocial: 'Prov SA' },
+    items: [
+      {
+        id: 10,
+        ordenCompraId: 1,
+        articuloId: 3,
+        cantidad: 5,
+        cantidadRecibida,
+        costoUnitario: new Decimal(10),
+        subtotal: new Decimal(50),
+        articulo: { id: 3, codigo: 100, descripcion: 'Prod' },
+      },
+    ],
+  }
 }
+
+const ordenIncludeRow = buildOrdenRow('draft')
 
 function buildPrismaMock(overrides: Partial<Record<string, unknown>> = {}): PrismaClient {
   return {
@@ -78,11 +82,15 @@ function buildPrismaMock(overrides: Partial<Record<string, unknown>> = {}): Pris
   } as unknown as PrismaClient
 }
 
+function setupComprasAuth(role = 'warehouse_lead') {
+  process.env.NODE_ENV = 'test'
+  process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
+  process.env.BIZCODE_TEST_ROLE = role
+}
+
 describe('GET /api/compras', () => {
   beforeEach(() => {
-    process.env.NODE_ENV = 'test'
-    process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
-    process.env.BIZCODE_TEST_ROLE = 'warehouse_lead'
+    setupComprasAuth()
   })
 
   it('returns paginated purchase orders', async () => {
@@ -93,21 +101,160 @@ describe('GET /api/compras', () => {
   })
 
   it('returns 403 without suppliers.read', async () => {
-    process.env.BIZCODE_TEST_ROLE = 'driver'
+    setupComprasAuth('driver')
     const app = createApp(buildPrismaMock())
     await request(app).get('/api/compras').expect(403)
   })
 })
 
+describe('GET /api/compras/:id', () => {
+  beforeEach(() => {
+    setupComprasAuth()
+  })
+
+  it('returns purchase order detail', async () => {
+    const app = createApp(buildPrismaMock())
+    const res = await request(app).get('/api/compras/1').expect(200)
+    expect(res.body.data.id).toBe(1)
+  })
+
+  it('returns 404 when not found', async () => {
+    const prisma = buildPrismaMock({
+      ordenCompra: {
+        count: vi.fn(),
+        findMany: vi.fn(),
+        findFirst: vi.fn().mockResolvedValue(null),
+        create: vi.fn(),
+        update: vi.fn(),
+      },
+    })
+    const app = createApp(prisma)
+    await request(app).get('/api/compras/99').expect(404)
+  })
+})
+
+describe('POST /api/compras', () => {
+  beforeEach(() => {
+    setupComprasAuth()
+  })
+
+  it('creates draft purchase order', async () => {
+    const app = createApp(buildPrismaMock())
+    const res = await request(app)
+      .post('/api/compras')
+      .send({
+        proveedorId: 2,
+        items: [{ articuloId: 3, cantidad: 5, costoUnitario: 10 }],
+      })
+      .expect(201)
+    expect(res.body.data.estado).toBe('draft')
+  })
+
+  it('returns 403 without suppliers.manage', async () => {
+    setupComprasAuth('driver')
+    const app = createApp(buildPrismaMock())
+    await request(app)
+      .post('/api/compras')
+      .send({
+        proveedorId: 2,
+        items: [{ articuloId: 3, cantidad: 1, costoUnitario: 10 }],
+      })
+      .expect(403)
+  })
+})
+
+describe('PUT /api/compras/:id', () => {
+  beforeEach(() => {
+    setupComprasAuth()
+  })
+
+  it('updates draft purchase order', async () => {
+    const prisma = buildPrismaMock({
+      ordenCompra: {
+        count: vi.fn(),
+        findMany: vi.fn(),
+        findFirst: vi.fn().mockResolvedValue({ id: 1, estado: 'draft' }),
+        create: vi.fn(),
+        update: vi.fn().mockResolvedValue({ ...ordenIncludeRow, nota: 'Updated' }),
+      },
+    })
+    prisma.$transaction = vi.fn(async (fn: unknown) => {
+      if (typeof fn === 'function') {
+        return (fn as (tx: PrismaClient) => Promise<unknown>)(prisma)
+      }
+      return fn
+    }) as PrismaClient['$transaction']
+    const app = createApp(prisma)
+    const res = await request(app).put('/api/compras/1').send({ nota: 'Updated' }).expect(200)
+    expect(res.body.data.nota).toBe('Updated')
+  })
+
+  it('returns 422 when order is not draft', async () => {
+    const prisma = buildPrismaMock({
+      ordenCompra: {
+        count: vi.fn(),
+        findMany: vi.fn(),
+        findFirst: vi.fn().mockResolvedValue({ id: 1, estado: 'sent' }),
+        create: vi.fn(),
+        update: vi.fn(),
+      },
+    })
+    const app = createApp(prisma)
+    const res = await request(app).put('/api/compras/1').send({ nota: 'X' }).expect(422)
+    expect(res.body.error).toBe('ORDER_NOT_EDITABLE')
+  })
+})
+
+describe('POST /api/compras/:id/send', () => {
+  beforeEach(() => {
+    setupComprasAuth()
+  })
+
+  it('marks draft order as sent', async () => {
+    const prisma = buildPrismaMock({
+      ordenCompra: {
+        count: vi.fn(),
+        findMany: vi.fn(),
+        findFirst: vi.fn().mockResolvedValue(ordenIncludeRow),
+        create: vi.fn(),
+        update: vi.fn().mockResolvedValue({ ...ordenIncludeRow, estado: 'sent' }),
+      },
+    })
+    const app = createApp(prisma)
+    const res = await request(app).post('/api/compras/1/send').expect(200)
+    expect(res.body.data.estado).toBe('sent')
+  })
+})
+
+describe('POST /api/compras/:id/cancel', () => {
+  beforeEach(() => {
+    setupComprasAuth()
+  })
+
+  it('cancels sent order', async () => {
+    const sentOrder = buildOrdenRow('sent')
+    const prisma = buildPrismaMock({
+      ordenCompra: {
+        count: vi.fn(),
+        findMany: vi.fn(),
+        findFirst: vi.fn().mockResolvedValue({ id: 1, estado: 'sent' }),
+        create: vi.fn(),
+        update: vi.fn().mockResolvedValue({ ...sentOrder, estado: 'cancelled' }),
+      },
+    })
+    const app = createApp(prisma)
+    const res = await request(app).post('/api/compras/1/cancel').expect(200)
+    expect(res.body.data.estado).toBe('cancelled')
+  })
+})
+
 describe('POST /api/compras/:id/receive', () => {
   beforeEach(() => {
-    process.env.NODE_ENV = 'test'
-    process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
-    process.env.BIZCODE_TEST_ROLE = 'warehouse_lead'
+    setupComprasAuth()
   })
 
   it('returns 403 without inventory.adjust', async () => {
-    process.env.BIZCODE_TEST_ROLE = 'seller'
+    setupComprasAuth('seller')
     const app = createApp(buildPrismaMock())
     await request(app)
       .post('/api/compras/1/receive')
@@ -115,8 +262,8 @@ describe('POST /api/compras/:id/receive', () => {
       .expect(403)
   })
 
-  it('receives stock with audit', async () => {
-    const sentOrder = { ...ordenIncludeRow, estado: 'sent' }
+  it('receives stock with audit when fully received', async () => {
+    const sentOrder = buildOrdenRow('sent')
     const auditCreate = vi.fn().mockResolvedValue({ id: 1 })
     const prisma = buildPrismaMock({
       auditEvent: { create: auditCreate },
@@ -144,5 +291,34 @@ describe('POST /api/compras/:id/receive', () => {
       .expect(200)
     expect(res.body.data.estado).toBe('received')
     expect(auditCreate).toHaveBeenCalled()
+  })
+
+  it('keeps estado sent on partial receive', async () => {
+    const sentOrder = buildOrdenRow('sent')
+    const prisma = buildPrismaMock({
+      ordenCompra: {
+        count: vi.fn(),
+        findMany: vi.fn(),
+        findFirst: vi.fn().mockResolvedValue(sentOrder),
+        update: vi.fn().mockResolvedValue({
+          ...sentOrder,
+          estado: 'sent',
+          items: [{ ...sentOrder.items[0], cantidadRecibida: 2 }],
+        }),
+      },
+    })
+    prisma.$transaction = vi.fn(async (fn: unknown) => {
+      if (typeof fn === 'function') {
+        return (fn as (tx: PrismaClient) => Promise<unknown>)(prisma)
+      }
+      return fn
+    }) as PrismaClient['$transaction']
+    const app = createApp(prisma)
+    const res = await request(app)
+      .post('/api/compras/1/receive')
+      .send({ lines: [{ itemId: 10, cantidad: 2 }] })
+      .expect(200)
+    expect(res.body.data.estado).toBe('sent')
+    expect(prisma.stockAjuste.create).toHaveBeenCalled()
   })
 })
