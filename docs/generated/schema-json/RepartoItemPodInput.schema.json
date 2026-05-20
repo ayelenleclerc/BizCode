@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "firmaBase64": {
+      "description": "Data URL or base64 signature; max ~50KB decoded when delivered.",
+      "nullable": true,
+      "type": "string"
+    },
+    "fotoBase64": {
+      "description": "Data URL or base64 photo; max ~200KB decoded.",
+      "nullable": true,
+      "type": "string"
+    },
+    "motivoNoEntrega": {
+      "enum": [
+        "ausente",
+        "rechazo",
+        "domicilio_incorrecto",
+        "producto_dañado",
+        "otro"
+      ],
+      "nullable": true,
+      "type": "string"
+    },
+    "notasEntrega": {
+      "maxLength": 500,
+      "nullable": true,
+      "type": "string"
+    },
+    "outcome": {
+      "enum": [
+        "delivered",
+        "not_delivered"
+      ],
+      "type": "string"
+    },
+    "receptorDni": {
+      "maxLength": 20,
+      "nullable": true,
+      "type": "string"
+    },
+    "receptorNombre": {
+      "maxLength": 120,
+      "nullable": true,
+      "type": "string"
+    }
+  },
+  "required": [
+    "outcome"
+  ],
+  "title": "RepartoItemPodInput",
+  "type": "object"
+}

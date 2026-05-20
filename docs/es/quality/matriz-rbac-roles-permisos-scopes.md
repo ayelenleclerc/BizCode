@@ -46,6 +46,10 @@ La pestaña **Inicio → Análisis** usa `GET /api/dashboard/ventas-historico` y
 
 La UI `/logistica/repartos` depende del módulo **`logistics.dispatches`**. API: listado/detalle `GET /api/repartos` y `GET /api/repartos/{id}` exigen **`logistics.read`**; crear, iniciar y cerrar exigen **`orders.dispatch`**. Roles típicos: `owner`, `manager`, `logistics_planner`, `warehouse_lead` (véase `ROLE_PERMISSIONS` en código para `logistics.read` del planificador).
 
+## Comprobante de entrega (POD) (#142)
+
+Módulo **`logistics.pod`**. UI chofer `/logistica/repartos/chofer` requiere **`orders.deliver.confirm`** (rol `driver` en su reparto). `PUT /api/repartos/{id}/items/{itemId}` usa el mismo permiso; el servicio exige `choferId === actor.userId` para `driver`. `GET /api/repartos/{id}/items/{itemId}/pod` exige **`logistics.read`** y rol ∈ `owner`, `manager`, `logistics_planner` (excluye `driver`).
+
 ## Documentos relacionados
 
 - Índice de ejecución del plan maestro: [ejecucion-plan-maestro-bizcode.md](ejecucion-plan-maestro-bizcode.md)

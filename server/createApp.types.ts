@@ -126,6 +126,18 @@ export type RepartoCreateInput = {
   ordenEntregaIds: number[]
 }
 
+export type RepartoItemPodOutcome = 'delivered' | 'not_delivered'
+
+export type RepartoItemPodInput = {
+  outcome: RepartoItemPodOutcome
+  receptorNombre?: string | null
+  receptorDni?: string | null
+  firmaBase64?: string | null
+  fotoBase64?: string | null
+  notasEntrega?: string | null
+  motivoNoEntrega?: string | null
+}
+
 export type StockAjusteInput = {
   cantidad: number
   motivo: string

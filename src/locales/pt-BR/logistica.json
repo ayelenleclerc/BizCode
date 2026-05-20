@@ -49,6 +49,7 @@
   },
   "driverView": {
     "title": "Minhas entregas do dia",
-    "confirm": "Confirmar entrega"
+    "confirm": "Confirmar entrega",
+    "routeLink": "Minha rota em andamento"
   }
 }

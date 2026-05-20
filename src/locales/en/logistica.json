@@ -49,6 +49,7 @@
   },
   "driverView": {
     "title": "My deliveries today",
-    "confirm": "Confirm delivery"
+    "confirm": "Confirm delivery",
+    "routeLink": "My route in progress"
   }
 }

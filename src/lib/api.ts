@@ -1809,14 +1809,39 @@ export type RepartoEstado = 'planned' | 'on_route' | 'completed' | 'cancelled'
 
 export type RepartoItemEstado = 'pending' | 'delivered' | 'not_delivered' | 'returned'
 
+export type MotivoNoEntrega =
+  | 'ausente'
+  | 'rechazo'
+  | 'domicilio_incorrecto'
+  | 'producto_dañado'
+  | 'otro'
+
 export type RepartoItemRow = {
   id: number
   ordenEntregaId: number
   secuencia: number
   estado: RepartoItemEstado
   entregadoAt: string | null
-  motivoNoEntrega: string | null
+  motivoNoEntrega: MotivoNoEntrega | null
+  receptorNombre: string | null
+  receptorDni: string | null
+  notasEntrega: string | null
+  hasPod: boolean
   ordenEntrega: OrdenEntrega
+}
+
+export type RepartoItemPodDetail = RepartoItemRow & {
+  podMedia: { firmaBase64?: string; fotoBase64?: string } | null
+}
+
+export type RepartoItemPodInput = {
+  outcome: 'delivered' | 'not_delivered'
+  receptorNombre?: string | null
+  receptorDni?: string | null
+  firmaBase64?: string | null
+  fotoBase64?: string | null
+  notasEntrega?: string | null
+  motivoNoEntrega?: MotivoNoEntrega | null
 }
 
 export type Reparto = {
@@ -1902,6 +1927,24 @@ export const repartosAPI = {
         reparto: response.data.data as Reparto,
         summary: response.data.summary as RepartoCloseSummary,
       }
+    } catch (error) {
+      handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  updateItemPod: async (repartoId: number, itemId: number, body: RepartoItemPodInput) => {
+    try {
+      const response = await api.put(`/repartos/${repartoId}/items/${itemId}`, body)
+      return response.data.data as RepartoItemRow
+    } catch (error) {
+      handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  getItemPod: async (repartoId: number, itemId: number) => {
+    try {
+      const response = await api.get(`/repartos/${repartoId}/items/${itemId}/pod`)
+      return response.data.data as RepartoItemPodDetail
     } catch (error) {
       handleError(error as AxiosError<ApiErrorPayload>)
     }

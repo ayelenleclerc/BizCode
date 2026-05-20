@@ -164,6 +164,15 @@ function LogisticaPageContent() {
               {tRepartos('navLink')}
             </Link>
           )}
+          {isDriver && canDeliver && (
+            <Link
+              to="/logistica/repartos/chofer"
+              className="px-3 py-2 text-sm bg-blue-600 text-white rounded inline-flex items-center"
+              data-testid="logistica-chofer-route-link"
+            >
+              {t('driverView.routeLink')}
+            </Link>
+          )}
           <button
             type="button"
             onClick={() => void loadOrdenes()}

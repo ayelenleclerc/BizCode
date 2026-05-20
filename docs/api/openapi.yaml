@@ -3681,6 +3681,106 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
 
+  /api/repartos/{id}/items/{itemId}:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    put:
+      tags: [repartos]
+      summary: Record delivery proof (POD) for a route item
+      description: |
+        Requires `orders.deliver.confirm`. Route must be `on_route`; item `pending`.
+        Driver may only update items on their own route. Delivered outcome requires `receptorNombre` and non-empty `firmaBase64` within size limits.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+        - name: itemId
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RepartoItemPodInput'
+      responses:
+        '200':
+          description: Item updated (public fields only; no pod blobs)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RepartoItemLineEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Route or item not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '422':
+          description: Invalid state, signature, or motivo
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/repartos/{id}/items/{itemId}/pod:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [repartos]
+      summary: Get full delivery proof for a route item
+      description: |
+        Requires `logistics.read` and role `owner`, `manager`, or `logistics_planner` (not `driver`).
+        Returns signature/photo blobs in `podMedia`.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+        - name: itemId
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '200':
+          description: Full POD detail
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RepartoItemPodEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Item not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
 components:
   securitySchemes:
     cookieSession:
@@ -5164,7 +5264,7 @@ components:
 
     RepartoItemLine:
       type: object
-      required: [id, ordenEntregaId, secuencia, estado, ordenEntrega]
+      required: [id, ordenEntregaId, secuencia, estado, hasPod, ordenEntrega]
       properties:
         id:
           type: integer
@@ -5182,8 +5282,91 @@ components:
         motivoNoEntrega:
           type: string
           nullable: true
+        receptorNombre:
+          type: string
+          nullable: true
+        receptorDni:
+          type: string
+          nullable: true
+        notasEntrega:
+          type: string
+          nullable: true
+        hasPod:
+          type: boolean
         ordenEntrega:
           $ref: '#/components/schemas/OrdenEntrega'
+
+    RepartoItemPodInput:
+      type: object
+      required: [outcome]
+      properties:
+        outcome:
+          type: string
+          enum: [delivered, not_delivered]
+        receptorNombre:
+          type: string
+          maxLength: 120
+          nullable: true
+        receptorDni:
+          type: string
+          maxLength: 20
+          nullable: true
+        firmaBase64:
+          type: string
+          nullable: true
+          description: Data URL or base64 signature; max ~50KB decoded when delivered.
+        fotoBase64:
+          type: string
+          nullable: true
+          description: Data URL or base64 photo; max ~200KB decoded.
+        notasEntrega:
+          type: string
+          maxLength: 500
+          nullable: true
+        motivoNoEntrega:
+          type: string
+          nullable: true
+          enum: [ausente, rechazo, domicilio_incorrecto, producto_dañado, otro]
+
+    RepartoItemPodMedia:
+      type: object
+      properties:
+        firmaBase64:
+          type: string
+          nullable: true
+        fotoBase64:
+          type: string
+          nullable: true
+
+    RepartoItemPod:
+      allOf:
+        - $ref: '#/components/schemas/RepartoItemLine'
+        - type: object
+          required: [podMedia]
+          properties:
+            podMedia:
+              $ref: '#/components/schemas/RepartoItemPodMedia'
+              nullable: true
+
+    RepartoItemPodEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/RepartoItemPod'
+
+    RepartoItemLineEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/RepartoItemLine'
 
     Reparto:
       type: object

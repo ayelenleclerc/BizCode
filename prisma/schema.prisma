@@ -551,7 +551,13 @@ model RepartoItem {
   /// pending | delivered | not_delivered | returned
   estado           String       @db.VarChar(20) @default("pending")
   entregadoAt      DateTime?
-  motivoNoEntrega  String?      @db.VarChar(200)
+  /// ausente | rechazo | domicilio_incorrecto | producto_dañado | otro
+  motivoNoEntrega  String?      @db.VarChar(30)
+  receptorNombre   String?      @db.VarChar(120)
+  receptorDni      String?      @db.VarChar(20)
+  notasEntrega     String?      @db.VarChar(500)
+  /// { firmaBase64?, fotoBase64? } — MVP POD media (#142)
+  podMedia         Json?
 
   @@index([repartoId])
   @@index([ordenEntregaId])
