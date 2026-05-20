@@ -175,7 +175,9 @@ export default function InicioPage() {
           type="button"
           role="tab"
           id="inicio-tab-summary"
-          aria-selected={activeTab === 'summary'}
+          {...(activeTab === 'summary'
+            ? { 'aria-selected': 'true' as const }
+            : { 'aria-selected': 'false' as const })}
           aria-controls="inicio-panel-summary"
           className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px ${
             activeTab === 'summary'
@@ -191,7 +193,9 @@ export default function InicioPage() {
           type="button"
           role="tab"
           id="inicio-tab-analytics"
-          aria-selected={activeTab === 'analytics'}
+          {...(activeTab === 'analytics'
+            ? { 'aria-selected': 'true' as const }
+            : { 'aria-selected': 'false' as const })}
           aria-controls="inicio-panel-analytics"
           className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px ${
             activeTab === 'analytics'

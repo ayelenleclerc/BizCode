@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useFeatureFlags } from '@/contexts/FeatureFlagsContext'
 import { repartosAPI, type Reparto, type RepartoCloseSummary } from '@/lib/api'
+import PodViewDialog from './PodViewDialog'
 
 type Props = {
   reparto: Reparto
@@ -10,9 +12,13 @@ type Props = {
 
 export default function RepartosTrackingPanel({ reparto, canDispatch, onUpdated }: Props) {
   const { t } = useTranslation('repartos')
+  const { t: tPod } = useTranslation('pod')
+  const { hasModule } = useFeatureFlags()
+  const podEnabled = hasModule('logistics.pod')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [closeSummary, setCloseSummary] = useState<RepartoCloseSummary | null>(null)
+  const [podViewItemId, setPodViewItemId] = useState<number | null>(null)
 
   const handleStart = async () => {
     setLoading(true)
@@ -64,10 +70,33 @@ export default function RepartosTrackingPanel({ reparto, canDispatch, onUpdated 
 
       <ol className="space-y-2 mb-4" data-testid="repartos-tracking-items">
         {reparto.items.map((item) => (
-          <li key={item.id} className="text-sm border-b border-slate-100 dark:border-slate-700 pb-2">
-            <span className="font-mono text-xs text-slate-500 mr-2">{item.secuencia}.</span>
-            {item.ordenEntrega.cliente?.rsocial ?? `#${item.ordenEntregaId}`}
-            <span className="ml-2 text-slate-500">({t(`itemEstado.${item.estado}`)})</span>
+          <li
+            key={item.id}
+            className="text-sm border-b border-slate-100 dark:border-slate-700 pb-2 flex flex-wrap items-center gap-2 justify-between"
+          >
+            <span>
+              <span className="font-mono text-xs text-slate-500 mr-2">{item.secuencia}.</span>
+              {item.ordenEntrega.cliente?.rsocial ?? `#${item.ordenEntregaId}`}
+              <span className="ml-2 text-slate-500">({t(`itemEstado.${item.estado}`)})</span>
+              {podEnabled && item.hasPod && (
+                <span
+                  className="ml-2 text-xs font-medium text-green-700 dark:text-green-400"
+                  data-testid={`reparto-item-pod-badge-${item.id}`}
+                >
+                  {tPod('podAvailable')}
+                </span>
+              )}
+            </span>
+            {podEnabled && item.hasPod && (
+              <button
+                type="button"
+                className="text-xs text-blue-600 underline"
+                onClick={() => setPodViewItemId(item.id)}
+                data-testid={`reparto-view-pod-${item.id}`}
+              >
+                {tPod('viewPod')}
+              </button>
+            )}
           </li>
         ))}
       </ol>
@@ -82,6 +111,15 @@ export default function RepartosTrackingPanel({ reparto, canDispatch, onUpdated 
         <p role="alert" className="text-sm text-red-600 mb-3" data-testid="repartos-tracking-error">
           {error}
         </p>
+      )}
+
+      {podViewItemId != null && (
+        <PodViewDialog
+          repartoId={reparto.id}
+          itemId={podViewItemId}
+          open
+          onClose={() => setPodViewItemId(null)}
+        />
       )}
 
       {canDispatch && (

@@ -1,0 +1,43 @@
+{
+  "title": "Comprobante de entrega",
+  "wizardTitle": "Confirmar entrega",
+  "stepReceptor": "Receptor",
+  "stepSignature": "Firma",
+  "stepPhoto": "Foto",
+  "stepConfirm": "Confirmar",
+  "receptorNombre": "Nombre de quien recibe",
+  "receptorDni": "DNI (opcional)",
+  "signatureLabel": "Firma del receptor",
+  "signatureClear": "Limpiar firma",
+  "signatureRequired": "La firma es obligatoria para confirmar la entrega.",
+  "photoLabel": "Foto del paquete (opcional)",
+  "photoCapture": "Tomar o elegir foto",
+  "notas": "Observaciones",
+  "outcomeDelivered": "Entregado",
+  "outcomeNotDelivered": "No entregado",
+  "motivoLabel": "Motivo de no entrega",
+  "motivo": {
+    "ausente": "Ausente",
+    "rechazo": "Rechazo",
+    "domicilio_incorrecto": "Domicilio incorrecto",
+    "producto_dañado": "Producto dañado",
+    "otro": "Otro"
+  },
+  "confirm": "Confirmar",
+  "cancel": "Cancelar",
+  "next": "Siguiente",
+  "back": "Atrás",
+  "podAvailable": "POD disponible",
+  "viewPod": "Ver comprobante",
+  "downloadHint": "Firma y foto almacenadas en el sistema.",
+  "noPod": "Sin comprobante registrado.",
+  "choferTitle": "Mi ruta",
+  "choferSubtitle": "Órdenes en curso — confirme cada entrega con comprobante.",
+  "noRoute": "No tiene un reparto en ruta activo.",
+  "forbidden": "No tiene permiso para registrar comprobantes de entrega.",
+  "errors": {
+    "save": "No se pudo guardar el comprobante.",
+    "photoTooLarge": "La foto supera el tamaño máximo permitido.",
+    "firmaTooLarge": "La firma supera el tamaño máximo permitido."
+  }
+}

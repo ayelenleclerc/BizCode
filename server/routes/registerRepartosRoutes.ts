@@ -2,7 +2,9 @@ import type { Application, Request, Response } from 'express'
 import { requirePermission } from '../auth'
 import type { AuthenticatedRequest } from '../auth'
 import { validateBody } from '../middleware/validateBody'
-import { repartoCreateBodySchema } from '../schemas/domain'
+import { hasPermission, type Permission } from '../../src/lib/rbac'
+import { repartoCreateBodySchema, repartoItemPodBodySchema } from '../schemas/domain'
+import { POD_VIEW_ROLES } from '../services/RepartoService'
 import type { RepartoService, RepartoEstado } from '../services/RepartoService'
 import { REPARTO_ESTADOS } from '../services/RepartoService'
 import { paginatedListJson, parseListPagination } from '../services/listPagination'
@@ -167,6 +169,81 @@ export function registerRepartosRoutes(app: Application, ctx: RestRouteContext):
           summary: result.data.summary,
         })
         res.json({ success: true, data: result.data.reparto, summary: result.data.summary })
+      } catch (err: unknown) {
+        res.status(500).json({ success: false, error: errorMessage(err) })
+      }
+    },
+  )
+
+  app.put(
+    '/api/repartos/:id/items/:itemId',
+    requirePermission('orders.deliver.confirm'),
+    validateBody(repartoItemPodBodySchema),
+    async (req: Request, res: Response) => {
+      try {
+        const authReq = req as AuthenticatedRequest
+        const tenantId = getTenantId(req)
+        const repartoId = Number.parseInt(String(req.params.id), 10)
+        const itemId = Number.parseInt(String(req.params.itemId), 10)
+        if (!Number.isFinite(repartoId) || repartoId < 1 || !Number.isFinite(itemId) || itemId < 1) {
+          res.status(400).json({ success: false, error: 'Invalid id' })
+          return
+        }
+        const result = await repartos.updateItemPod(tenantId, repartoId, itemId, req.body, {
+          userId: authReq.auth!.claims.userId,
+          role: authReq.auth!.claims.role,
+        })
+        if (!result.ok) {
+          res.status(result.status).json({ success: false, error: result.error })
+          return
+        }
+        if (result.data.auditSigned) {
+          await writeAudit(authReq, 'reparto_item_pod_signed', 'reparto_item', String(itemId), {
+            repartoId,
+          })
+        }
+        res.json({ success: true, data: result.data.item })
+      } catch (err: unknown) {
+        res.status(500).json({ success: false, error: errorMessage(err) })
+      }
+    },
+  )
+
+  app.get(
+    '/api/repartos/:id/items/:itemId/pod',
+    (req: Request, res: Response, next) => {
+      const authReq = req as AuthenticatedRequest
+      const role = authReq.auth!.claims.role
+      if (
+        hasPermission(role, 'logistics.read' as Permission) &&
+        POD_VIEW_ROLES.includes(role as (typeof POD_VIEW_ROLES)[number])
+      ) {
+        next()
+        return
+      }
+      res.status(403).json({ success: false, error: 'Forbidden' })
+    },
+    async (req: Request, res: Response) => {
+      try {
+        const authReq = req as AuthenticatedRequest
+        const tenantId = getTenantId(req)
+        const repartoId = Number.parseInt(String(req.params.id), 10)
+        const itemId = Number.parseInt(String(req.params.itemId), 10)
+        if (!Number.isFinite(repartoId) || repartoId < 1 || !Number.isFinite(itemId) || itemId < 1) {
+          res.status(400).json({ success: false, error: 'Invalid id' })
+          return
+        }
+        const result = await repartos.getItemPod(
+          tenantId,
+          repartoId,
+          itemId,
+          authReq.auth!.claims.role,
+        )
+        if (!result.ok) {
+          res.status(result.status).json({ success: false, error: result.error })
+          return
+        }
+        res.json({ success: true, data: result.data })
       } catch (err: unknown) {
         res.status(500).json({ success: false, error: errorMessage(err) })
       }

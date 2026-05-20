@@ -20676,6 +20676,10 @@ Requires `logistics.read`. Filter by `fecha`, `choferId`, `estado`.
 
       `string`, possible values: `"pending", "delivered", "not_delivered", "returned"`
 
+    - **`hasPod` (required)**
+
+      `boolean`
+
     - **`id` (required)**
 
       `integer`
@@ -20749,6 +20753,18 @@ Requires `logistics.read`. Filter by `fecha`, `choferId`, `estado`.
       `string`, format: `date-time`
 
     - **`motivoNoEntrega`**
+
+      `string`
+
+    - **`notasEntrega`**
+
+      `string`
+
+    - **`receptorDni`**
+
+      `string`
+
+    - **`receptorNombre`**
 
       `string`
 
@@ -20835,6 +20851,10 @@ Requires `logistics.read`. Filter by `fecha`, `choferId`, `estado`.
           "estado": "pending",
           "entregadoAt": "",
           "motivoNoEntrega": "",
+          "receptorNombre": "",
+          "receptorDni": "",
+          "notasEntrega": "",
+          "hasPod": true,
           "ordenEntrega": {
             "id": 1,
             "tenantId": 1,
@@ -21041,6 +21061,10 @@ Requires `orders.dispatch`. Groups pending delivery orders; assigns driver and s
 
       `string`, possible values: `"pending", "delivered", "not_delivered", "returned"`
 
+    - **`hasPod` (required)**
+
+      `boolean`
+
     - **`id` (required)**
 
       `integer`
@@ -21114,6 +21138,18 @@ Requires `orders.dispatch`. Groups pending delivery orders; assigns driver and s
       `string`, format: `date-time`
 
     - **`motivoNoEntrega`**
+
+      `string`
+
+    - **`notasEntrega`**
+
+      `string`
+
+    - **`receptorDni`**
+
+      `string`
+
+    - **`receptorNombre`**
 
       `string`
 
@@ -21196,6 +21232,10 @@ Requires `orders.dispatch`. Groups pending delivery orders; assigns driver and s
         "estado": "pending",
         "entregadoAt": "",
         "motivoNoEntrega": "",
+        "receptorNombre": "",
+        "receptorDni": "",
+        "notasEntrega": "",
+        "hasPod": true,
         "ordenEntrega": {
           "id": 1,
           "tenantId": 1,
@@ -21385,6 +21425,10 @@ Requires `logistics.read`.
 
       `string`, possible values: `"pending", "delivered", "not_delivered", "returned"`
 
+    - **`hasPod` (required)**
+
+      `boolean`
+
     - **`id` (required)**
 
       `integer`
@@ -21458,6 +21502,18 @@ Requires `logistics.read`.
       `string`, format: `date-time`
 
     - **`motivoNoEntrega`**
+
+      `string`
+
+    - **`notasEntrega`**
+
+      `string`
+
+    - **`receptorDni`**
+
+      `string`
+
+    - **`receptorNombre`**
 
       `string`
 
@@ -21540,6 +21596,10 @@ Requires `logistics.read`.
         "estado": "pending",
         "entregadoAt": "",
         "motivoNoEntrega": "",
+        "receptorNombre": "",
+        "receptorDni": "",
+        "notasEntrega": "",
+        "hasPod": true,
         "ordenEntrega": {
           "id": 1,
           "tenantId": 1,
@@ -21729,6 +21789,10 @@ Requires `orders.dispatch`. `planned` → `on_route`; pending items' OEs → `in
 
       `string`, possible values: `"pending", "delivered", "not_delivered", "returned"`
 
+    - **`hasPod` (required)**
+
+      `boolean`
+
     - **`id` (required)**
 
       `integer`
@@ -21802,6 +21866,18 @@ Requires `orders.dispatch`. `planned` → `on_route`; pending items' OEs → `in
       `string`, format: `date-time`
 
     - **`motivoNoEntrega`**
+
+      `string`
+
+    - **`notasEntrega`**
+
+      `string`
+
+    - **`receptorDni`**
+
+      `string`
+
+    - **`receptorNombre`**
 
       `string`
 
@@ -21884,6 +21960,10 @@ Requires `orders.dispatch`. `planned` → `on_route`; pending items' OEs → `in
         "estado": "pending",
         "entregadoAt": "",
         "motivoNoEntrega": "",
+        "receptorNombre": "",
+        "receptorDni": "",
+        "notasEntrega": "",
+        "hasPod": true,
         "ordenEntrega": {
           "id": 1,
           "tenantId": 1,
@@ -22094,6 +22174,10 @@ Requires `orders.dispatch`. `on_route` → `completed`; pending items → `not_d
 
       `string`, possible values: `"pending", "delivered", "not_delivered", "returned"`
 
+    - **`hasPod` (required)**
+
+      `boolean`
+
     - **`id` (required)**
 
       `integer`
@@ -22167,6 +22251,18 @@ Requires `orders.dispatch`. `on_route` → `completed`; pending items → `not_d
       `string`, format: `date-time`
 
     - **`motivoNoEntrega`**
+
+      `string`
+
+    - **`notasEntrega`**
+
+      `string`
+
+    - **`receptorDni`**
+
+      `string`
+
+    - **`receptorNombre`**
 
       `string`
 
@@ -22269,6 +22365,10 @@ Requires `orders.dispatch`. `on_route` → `completed`; pending items → `not_d
         "estado": "pending",
         "entregadoAt": "",
         "motivoNoEntrega": "",
+        "receptorNombre": "",
+        "receptorDni": "",
+        "notasEntrega": "",
+        "hasPod": true,
         "ordenEntrega": {
           "id": 1,
           "tenantId": 1,
@@ -22395,6 +22495,525 @@ Requires `orders.dispatch`. `on_route` → `completed`; pending items → `not_d
 ```
 
 ##### Status: 422 Invalid state
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/repartos/{id}/items/{itemId}
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/repartos/{id}/items/{itemId}`
+
+### Record delivery proof (POD) for a route item
+
+- **Method:** `PUT`
+- **Path:** `/api/repartos/{id}/items/{itemId}`
+- **Tags:** repartos
+
+Requires `orders.deliver.confirm`. Route must be `on_route`; item `pending`. Driver may only update items on their own route. Delivered outcome requires `receptorNombre` and non-empty `firmaBase64` within size limits.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`outcome` (required)**
+
+  `string`, possible values: `"delivered", "not_delivered"`
+
+- **`firmaBase64`**
+
+  `string` — Data URL or base64 signature; max \~50KB decoded when delivered.
+
+- **`fotoBase64`**
+
+  `string` — Data URL or base64 photo; max \~200KB decoded.
+
+- **`motivoNoEntrega`**
+
+  `string`, possible values: `"ausente", "rechazo", "domicilio_incorrecto", "producto_dañado", "otro"`
+
+- **`notasEntrega`**
+
+  `string`
+
+- **`receptorDni`**
+
+  `string`
+
+- **`receptorNombre`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "outcome": "delivered",
+  "receptorNombre": "",
+  "receptorDni": "",
+  "firmaBase64": "",
+  "fotoBase64": "",
+  "notasEntrega": "",
+  "motivoNoEntrega": "ausente"
+}
+```
+
+#### Responses
+
+##### Status: 200 Item updated (public fields only; no pod blobs)
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"pending", "delivered", "not_delivered", "returned"`
+
+  - **`hasPod` (required)**
+
+    `boolean`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`ordenEntrega` (required)**
+
+    `object`
+
+    - **`cliente`**
+
+      `object`
+
+    - **`clienteId`**
+
+      `integer`
+
+    - **`driver`**
+
+      `object`
+
+    - **`driverId`**
+
+      `integer`
+
+    - **`estado`**
+
+      `string`, possible values: `"pending", "assigned", "in_transit", "delivered", "failed"`
+
+    - **`factura`**
+
+      `object`
+
+    - **`facturaId`**
+
+      `integer`
+
+    - **`fecha`**
+
+      `string`, format: `date-time`
+
+    - **`id`**
+
+      `integer`
+
+    - **`nota`**
+
+      `string`
+
+    - **`tenantId`**
+
+      `integer`
+
+    - **`zona`**
+
+      `object`
+
+    - **`zonaId`**
+
+      `integer`
+
+  - **`ordenEntregaId` (required)**
+
+    `integer`
+
+  - **`secuencia` (required)**
+
+    `integer`
+
+  - **`entregadoAt`**
+
+    `string`, format: `date-time`
+
+  - **`motivoNoEntrega`**
+
+    `string`
+
+  - **`notasEntrega`**
+
+    `string`
+
+  - **`receptorDni`**
+
+    `string`
+
+  - **`receptorNombre`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "ordenEntregaId": 1,
+    "secuencia": 1,
+    "estado": "pending",
+    "entregadoAt": "",
+    "motivoNoEntrega": "",
+    "receptorNombre": "",
+    "receptorDni": "",
+    "notasEntrega": "",
+    "hasPod": true,
+    "ordenEntrega": {
+      "id": 1,
+      "tenantId": 1,
+      "facturaId": 1,
+      "clienteId": 1,
+      "zonaId": 1,
+      "driverId": 1,
+      "fecha": "",
+      "estado": "pending",
+      "nota": "",
+      "cliente": {
+        "additionalProperty": "anything"
+      },
+      "zona": {
+        "additionalProperty": "anything"
+      },
+      "driver": {
+        "additionalProperty": "anything"
+      },
+      "factura": {
+        "additionalProperty": "anything"
+      },
+      "additionalProperty": "anything"
+    }
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Route or item not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 422 Invalid state, signature, or motivo
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/repartos/{id}/items/{itemId}/pod
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/repartos/{id}/items/{itemId}/pod`
+
+### Get full delivery proof for a route item
+
+- **Method:** `GET`
+- **Path:** `/api/repartos/{id}/items/{itemId}/pod`
+- **Tags:** repartos
+
+Requires `logistics.read` and role `owner`, `manager`, or `logistics_planner` (not `driver`). Returns signature/photo blobs in `podMedia`.
+
+#### Responses
+
+##### Status: 200 Full POD detail
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "ordenEntregaId": 1,
+    "secuencia": 1,
+    "estado": "pending",
+    "entregadoAt": "",
+    "motivoNoEntrega": "",
+    "receptorNombre": "",
+    "receptorDni": "",
+    "notasEntrega": "",
+    "hasPod": true,
+    "ordenEntrega": {
+      "id": 1,
+      "tenantId": 1,
+      "facturaId": 1,
+      "clienteId": 1,
+      "zonaId": 1,
+      "driverId": 1,
+      "fecha": "",
+      "estado": "pending",
+      "nota": "",
+      "cliente": {
+        "additionalProperty": "anything"
+      },
+      "zona": {
+        "additionalProperty": "anything"
+      },
+      "driver": {
+        "additionalProperty": "anything"
+      },
+      "factura": {
+        "additionalProperty": "anything"
+      },
+      "additionalProperty": "anything"
+    },
+    "podMedia": {
+      "firmaBase64": "",
+      "fotoBase64": ""
+    }
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Item not found
 
 ###### Content-Type: application/json
 
@@ -26779,6 +27398,10 @@ Requires `orders.dispatch`. `on_route` → `completed`; pending items → `not_d
 
   `string`, possible values: `"pending", "delivered", "not_delivered", "returned"`
 
+* **`hasPod` (required)**
+
+  `boolean`
+
 * **`id` (required)**
 
   `integer`
@@ -26855,6 +27478,18 @@ Requires `orders.dispatch`. `on_route` → `completed`; pending items → `not_d
 
   `string`
 
+* **`notasEntrega`**
+
+  `string`
+
+* **`receptorDni`**
+
+  `string`
+
+* **`receptorNombre`**
+
+  `string`
+
 **Example:**
 
 ```json
@@ -26865,6 +27500,10 @@ Requires `orders.dispatch`. `on_route` → `completed`; pending items → `not_d
   "estado": "pending",
   "entregadoAt": "",
   "motivoNoEntrega": "",
+  "receptorNombre": "",
+  "receptorDni": "",
+  "notasEntrega": "",
+  "hasPod": true,
   "ordenEntrega": {
     "id": 1,
     "tenantId": 1,
@@ -26892,35 +27531,154 @@ Requires `orders.dispatch`. `on_route` → `completed`; pending items → `not_d
 }
 ```
 
-### Reparto
+### RepartoItemPodInput
 
 - **Type:**`object`
 
-* **`choferId` (required)**
+* **`outcome` (required)**
 
-  `integer`
+  `string`, possible values: `"delivered", "not_delivered"`
 
-* **`estado` (required)**
+* **`firmaBase64`**
 
-  `string`, possible values: `"planned", "on_route", "completed", "cancelled"`
+  `string` — Data URL or base64 signature; max \~50KB decoded when delivered.
 
-* **`fecha` (required)**
+* **`fotoBase64`**
 
-  `string`, format: `date-time`
+  `string` — Data URL or base64 photo; max \~200KB decoded.
 
-* **`id` (required)**
+* **`motivoNoEntrega`**
 
-  `integer`
+  `string`, possible values: `"ausente", "rechazo", "domicilio_incorrecto", "producto_dañado", "otro"`
 
-* **`items` (required)**
+* **`notasEntrega`**
 
-  `array`
+  `string`
 
-  **Items:**
+* **`receptorDni`**
+
+  `string`
+
+* **`receptorNombre`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "outcome": "delivered",
+  "receptorNombre": "",
+  "receptorDni": "",
+  "firmaBase64": "",
+  "fotoBase64": "",
+  "notasEntrega": "",
+  "motivoNoEntrega": "ausente"
+}
+```
+
+### RepartoItemPodMedia
+
+- **Type:**`object`
+
+* **`firmaBase64`**
+
+  `string`
+
+* **`fotoBase64`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "firmaBase64": "",
+  "fotoBase64": ""
+}
+```
+
+### RepartoItemPod
+
+- **Type:**
+
+**Example:**
+
+### RepartoItemPodEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "ordenEntregaId": 1,
+    "secuencia": 1,
+    "estado": "pending",
+    "entregadoAt": "",
+    "motivoNoEntrega": "",
+    "receptorNombre": "",
+    "receptorDni": "",
+    "notasEntrega": "",
+    "hasPod": true,
+    "ordenEntrega": {
+      "id": 1,
+      "tenantId": 1,
+      "facturaId": 1,
+      "clienteId": 1,
+      "zonaId": 1,
+      "driverId": 1,
+      "fecha": "",
+      "estado": "pending",
+      "nota": "",
+      "cliente": {
+        "additionalProperty": "anything"
+      },
+      "zona": {
+        "additionalProperty": "anything"
+      },
+      "driver": {
+        "additionalProperty": "anything"
+      },
+      "factura": {
+        "additionalProperty": "anything"
+      },
+      "additionalProperty": "anything"
+    },
+    "podMedia": {
+      "firmaBase64": "",
+      "fotoBase64": ""
+    }
+  }
+}
+```
+
+### RepartoItemLineEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
 
   - **`estado` (required)**
 
     `string`, possible values: `"pending", "delivered", "not_delivered", "returned"`
+
+  - **`hasPod` (required)**
+
+    `boolean`
 
   - **`id` (required)**
 
@@ -26998,6 +27756,188 @@ Requires `orders.dispatch`. `on_route` → `completed`; pending items → `not_d
 
     `string`
 
+  - **`notasEntrega`**
+
+    `string`
+
+  - **`receptorDni`**
+
+    `string`
+
+  - **`receptorNombre`**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "ordenEntregaId": 1,
+    "secuencia": 1,
+    "estado": "pending",
+    "entregadoAt": "",
+    "motivoNoEntrega": "",
+    "receptorNombre": "",
+    "receptorDni": "",
+    "notasEntrega": "",
+    "hasPod": true,
+    "ordenEntrega": {
+      "id": 1,
+      "tenantId": 1,
+      "facturaId": 1,
+      "clienteId": 1,
+      "zonaId": 1,
+      "driverId": 1,
+      "fecha": "",
+      "estado": "pending",
+      "nota": "",
+      "cliente": {
+        "additionalProperty": "anything"
+      },
+      "zona": {
+        "additionalProperty": "anything"
+      },
+      "driver": {
+        "additionalProperty": "anything"
+      },
+      "factura": {
+        "additionalProperty": "anything"
+      },
+      "additionalProperty": "anything"
+    }
+  }
+}
+```
+
+### Reparto
+
+- **Type:**`object`
+
+* **`choferId` (required)**
+
+  `integer`
+
+* **`estado` (required)**
+
+  `string`, possible values: `"planned", "on_route", "completed", "cancelled"`
+
+* **`fecha` (required)**
+
+  `string`, format: `date-time`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`items` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"pending", "delivered", "not_delivered", "returned"`
+
+  - **`hasPod` (required)**
+
+    `boolean`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`ordenEntrega` (required)**
+
+    `object`
+
+    - **`cliente`**
+
+      `object`
+
+    - **`clienteId`**
+
+      `integer`
+
+    - **`driver`**
+
+      `object`
+
+    - **`driverId`**
+
+      `integer`
+
+    - **`estado`**
+
+      `string`, possible values: `"pending", "assigned", "in_transit", "delivered", "failed"`
+
+    - **`factura`**
+
+      `object`
+
+    - **`facturaId`**
+
+      `integer`
+
+    - **`fecha`**
+
+      `string`, format: `date-time`
+
+    - **`id`**
+
+      `integer`
+
+    - **`nota`**
+
+      `string`
+
+    - **`tenantId`**
+
+      `integer`
+
+    - **`zona`**
+
+      `object`
+
+    - **`zonaId`**
+
+      `integer`
+
+  - **`ordenEntregaId` (required)**
+
+    `integer`
+
+  - **`secuencia` (required)**
+
+    `integer`
+
+  - **`entregadoAt`**
+
+    `string`, format: `date-time`
+
+  - **`motivoNoEntrega`**
+
+    `string`
+
+  - **`notasEntrega`**
+
+    `string`
+
+  - **`receptorDni`**
+
+    `string`
+
+  - **`receptorNombre`**
+
+    `string`
+
 * **`progress` (required)**
 
   `object`
@@ -27071,6 +28011,10 @@ Requires `orders.dispatch`. `on_route` → `completed`; pending items → `not_d
       "estado": "pending",
       "entregadoAt": "",
       "motivoNoEntrega": "",
+      "receptorNombre": "",
+      "receptorDni": "",
+      "notasEntrega": "",
+      "hasPod": true,
       "ordenEntrega": {
         "id": 1,
         "tenantId": 1,
@@ -27187,6 +28131,10 @@ Requires `orders.dispatch`. `on_route` → `completed`; pending items → `not_d
 
       `string`, possible values: `"pending", "delivered", "not_delivered", "returned"`
 
+    - **`hasPod` (required)**
+
+      `boolean`
+
     - **`id` (required)**
 
       `integer`
@@ -27260,6 +28208,18 @@ Requires `orders.dispatch`. `on_route` → `completed`; pending items → `not_d
       `string`, format: `date-time`
 
     - **`motivoNoEntrega`**
+
+      `string`
+
+    - **`notasEntrega`**
+
+      `string`
+
+    - **`receptorDni`**
+
+      `string`
+
+    - **`receptorNombre`**
 
       `string`
 
@@ -27342,6 +28302,10 @@ Requires `orders.dispatch`. `on_route` → `completed`; pending items → `not_d
         "estado": "pending",
         "entregadoAt": "",
         "motivoNoEntrega": "",
+        "receptorNombre": "",
+        "receptorDni": "",
+        "notasEntrega": "",
+        "hasPod": true,
         "ordenEntrega": {
           "id": 1,
           "tenantId": 1,
@@ -27442,6 +28406,10 @@ Requires `orders.dispatch`. `on_route` → `completed`; pending items → `not_d
 
       `string`, possible values: `"pending", "delivered", "not_delivered", "returned"`
 
+    - **`hasPod` (required)**
+
+      `boolean`
+
     - **`id` (required)**
 
       `integer`
@@ -27515,6 +28483,18 @@ Requires `orders.dispatch`. `on_route` → `completed`; pending items → `not_d
       `string`, format: `date-time`
 
     - **`motivoNoEntrega`**
+
+      `string`
+
+    - **`notasEntrega`**
+
+      `string`
+
+    - **`receptorDni`**
+
+      `string`
+
+    - **`receptorNombre`**
 
       `string`
 
@@ -27617,6 +28597,10 @@ Requires `orders.dispatch`. `on_route` → `completed`; pending items → `not_d
         "estado": "pending",
         "entregadoAt": "",
         "motivoNoEntrega": "",
+        "receptorNombre": "",
+        "receptorDni": "",
+        "notasEntrega": "",
+        "hasPod": true,
         "ordenEntrega": {
           "id": 1,
           "tenantId": 1,

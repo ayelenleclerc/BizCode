@@ -46,6 +46,10 @@ The **Inicio → Analytics** tab calls `GET /api/dashboard/ventas-historico` and
 
 UI `/logistica/repartos` is gated by module **`logistics.dispatches`**. API: list/detail `GET /api/repartos` and `GET /api/repartos/{id}` require **`logistics.read`**; create, start, and close require **`orders.dispatch`**. Typical roles: `owner`, `manager`, `logistics_planner`, `warehouse_lead` (see `ROLE_PERMISSIONS` in code for `logistics.read` on planner).
 
+## Delivery proof (POD) (#142)
+
+Module **`logistics.pod`**. Driver UI `/logistica/repartos/chofer` requires **`orders.deliver.confirm`** (role `driver` on own route). `PUT /api/repartos/{id}/items/{itemId}` uses the same permission; service enforces `choferId === actor.userId` for `driver`. `GET /api/repartos/{id}/items/{itemId}/pod` requires **`logistics.read`** and role ∈ `owner`, `manager`, `logistics_planner` (excludes `driver`).
+
 ## Related documents
 
 - Master plan execution index: [master-plan-bizcode-execution.md](master-plan-bizcode-execution.md)

@@ -1,8 +1,19 @@
-import type { Prisma, PrismaClient } from '@prisma/client'
-import type { RepartoCreateInput } from '../createApp.types'
+import { Prisma, type PrismaClient } from '@prisma/client'
+import type { RepartoCreateInput, RepartoItemPodInput } from '../createApp.types'
 import { assertOrdenNotInActiveReparto } from '../lib/repartoActiveGuard'
+import {
+  MOTIVO_NO_ENTREGA_VALUES,
+  type MotivoNoEntrega,
+  type PodMediaPayload,
+  itemHasPod,
+  isNonEmptyBase64,
+  parsePodMediaJson,
+  validatePodMediaSizes,
+} from '../lib/podMediaValidation'
 import { facturaFechaToPrismaDate } from '../routes/restDomainShared'
 import type { ServiceResult } from './serviceResults'
+
+export const POD_VIEW_ROLES = ['owner', 'manager', 'logistics_planner'] as const
 
 export const REPARTO_ESTADOS = ['planned', 'on_route', 'completed', 'cancelled'] as const
 export type RepartoEstado = (typeof REPARTO_ESTADOS)[number]
@@ -28,8 +39,31 @@ const repartoInclude = {
 
 export type RepartoRow = Prisma.RepartoGetPayload<{ include: typeof repartoInclude }>
 
-export type RepartoListRow = RepartoRow & {
+export type RepartoItemRow = RepartoRow['items'][number]
+
+export type RepartoItemPublicRow = Omit<RepartoItemRow, 'podMedia'> & {
+  hasPod: boolean
+}
+
+export type RepartoListRow = Omit<RepartoRow, 'items'> & {
+  items: RepartoItemPublicRow[]
   progress: { total: number; delivered: number; pending: number }
+}
+
+export type RepartoItemPodDetail = RepartoItemPublicRow & {
+  podMedia: PodMediaPayload | null
+}
+
+function sanitizeItem(item: RepartoItemRow): RepartoItemPublicRow {
+  const { podMedia: _pod, ...rest } = item
+  return { ...rest, hasPod: itemHasPod(item) }
+}
+
+function sanitizeReparto(row: RepartoRow): Omit<RepartoListRow, 'progress'> & { items: RepartoItemPublicRow[] } {
+  return {
+    ...row,
+    items: row.items.map(sanitizeItem),
+  }
 }
 
 function mapProgress(items: { estado: string }[]): RepartoListRow['progress'] {
@@ -40,7 +74,8 @@ function mapProgress(items: { estado: string }[]): RepartoListRow['progress'] {
 }
 
 function withProgress(row: RepartoRow): RepartoListRow {
-  return { ...row, progress: mapProgress(row.items) }
+  const base = sanitizeReparto(row)
+  return { ...base, progress: mapProgress(row.items) }
 }
 
 /**
@@ -241,5 +276,124 @@ export class RepartoService {
     }
 
     return { ok: true, data: { reparto: withProgress(row), summary } }
+  }
+
+  async updateItemPod(
+    tenantId: number,
+    repartoId: number,
+    itemId: number,
+    input: RepartoItemPodInput,
+    actor: { userId: number; role: string },
+  ): Promise<ServiceResult<{ item: RepartoItemPublicRow; auditSigned: boolean }>> {
+    const reparto = await this.prisma.reparto.findFirst({
+      where: { id: repartoId, tenantId },
+      select: { id: true, estado: true, choferId: true },
+    })
+    if (!reparto) {
+      return { ok: false, status: 404, error: 'REPARTO_NOT_FOUND' }
+    }
+    if (reparto.estado !== 'on_route') {
+      return { ok: false, status: 422, error: 'REPARTO_INVALID_STATE' }
+    }
+    if (actor.role === 'driver' && reparto.choferId !== actor.userId) {
+      return { ok: false, status: 403, error: 'Forbidden' }
+    }
+
+    const item = await this.prisma.repartoItem.findFirst({
+      where: { id: itemId, repartoId, reparto: { tenantId } },
+      include: { ordenEntrega: repartoInclude.items.include.ordenEntrega },
+    })
+    if (!item) {
+      return { ok: false, status: 404, error: 'REPARTO_ITEM_NOT_FOUND' }
+    }
+    if (item.estado !== 'pending') {
+      return { ok: false, status: 422, error: 'REPARTO_ITEM_INVALID_STATE' }
+    }
+
+    const podMedia: PodMediaPayload = {}
+    if (input.firmaBase64?.trim()) {
+      podMedia.firmaBase64 = input.firmaBase64.trim()
+    }
+    if (input.fotoBase64?.trim()) {
+      podMedia.fotoBase64 = input.fotoBase64.trim()
+    }
+
+    if (input.outcome === 'delivered') {
+      if (!isNonEmptyBase64(podMedia.firmaBase64)) {
+        return { ok: false, status: 422, error: 'POD_FIRMA_REQUIRED' }
+      }
+      const sizeErr = validatePodMediaSizes(podMedia)
+      if (sizeErr) {
+        return { ok: false, status: 422, error: sizeErr }
+      }
+    } else {
+      const motivo = input.motivoNoEntrega
+      if (motivo == null || !MOTIVO_NO_ENTREGA_VALUES.includes(motivo as MotivoNoEntrega)) {
+        return { ok: false, status: 422, error: 'INVALID_MOTIVO_NO_ENTREGA' }
+      }
+      if (isNonEmptyBase64(podMedia.firmaBase64)) {
+        return { ok: false, status: 422, error: 'POD_FIRMA_NOT_ALLOWED' }
+      }
+    }
+
+    const itemEstado = input.outcome === 'delivered' ? 'delivered' : 'not_delivered'
+    const oeEstado = input.outcome === 'delivered' ? 'delivered' : 'failed'
+    const now = new Date()
+
+    const updated = await this.prisma.$transaction(async (tx) => {
+      const row = await tx.repartoItem.update({
+        where: { id: itemId },
+        data: {
+          estado: itemEstado,
+          entregadoAt: now,
+          receptorNombre: input.outcome === 'delivered' ? (input.receptorNombre?.trim() ?? null) : null,
+          receptorDni: input.outcome === 'delivered' ? (input.receptorDni?.trim() || null) : null,
+          notasEntrega: input.notasEntrega?.trim() || null,
+          motivoNoEntrega: input.outcome === 'not_delivered' ? input.motivoNoEntrega! : null,
+          podMedia:
+            input.outcome === 'delivered' && Object.keys(podMedia).length > 0
+              ? (podMedia as Prisma.InputJsonValue)
+              : Prisma.DbNull,
+        },
+        include: { ordenEntrega: repartoInclude.items.include.ordenEntrega },
+      })
+      await tx.ordenEntrega.update({
+        where: { id: row.ordenEntregaId },
+        data: { estado: oeEstado },
+      })
+      return row
+    })
+
+    const fullItem = { ...updated, ordenEntrega: item.ordenEntrega } as RepartoItemRow
+    const auditSigned = input.outcome === 'delivered' && isNonEmptyBase64(podMedia.firmaBase64)
+    return { ok: true, data: { item: sanitizeItem(fullItem), auditSigned } }
+  }
+
+  async getItemPod(
+    tenantId: number,
+    repartoId: number,
+    itemId: number,
+    actorRole: string,
+  ): Promise<ServiceResult<RepartoItemPodDetail>> {
+    if (!POD_VIEW_ROLES.includes(actorRole as (typeof POD_VIEW_ROLES)[number])) {
+      return { ok: false, status: 403, error: 'Forbidden' }
+    }
+
+    const item = await this.prisma.repartoItem.findFirst({
+      where: { id: itemId, repartoId, reparto: { tenantId } },
+      include: {
+        ordenEntrega: repartoInclude.items.include.ordenEntrega,
+      },
+    })
+    if (!item) {
+      return { ok: false, status: 404, error: 'REPARTO_ITEM_NOT_FOUND' }
+    }
+
+    const publicRow = sanitizeItem(item as RepartoItemRow)
+    const media = parsePodMediaJson(item.podMedia)
+    return {
+      ok: true,
+      data: { ...publicRow, podMedia: media },
+    }
   }
 }

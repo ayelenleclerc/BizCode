@@ -46,6 +46,10 @@ A aba **Início → Análise** chama `GET /api/dashboard/ventas-historico` e exi
 
 A UI `/logistica/repartos` depende do módulo **`logistics.dispatches`**. API: listagem/detalhe `GET /api/repartos` e `GET /api/repartos/{id}` exigem **`logistics.read`**; criar, iniciar e fechar exigem **`orders.dispatch`**. Papéis típicos: `owner`, `manager`, `logistics_planner`, `warehouse_lead` (ver `ROLE_PERMISSIONS` no código para `logistics.read` do planejador).
 
+## Comprovante de entrega (POD) (#142)
+
+Módulo **`logistics.pod`**. UI motorista `/logistica/repartos/chofer` exige **`orders.deliver.confirm`** (papel `driver` na própria rota). `PUT /api/repartos/{id}/items/{itemId}` usa a mesma permissão; o serviço exige `choferId === actor.userId` para `driver`. `GET /api/repartos/{id}/items/{itemId}/pod` exige **`logistics.read`** e papel ∈ `owner`, `manager`, `logistics_planner` (exclui `driver`).
+
 ## Documentos relacionados
 
 - Índice de execução do plano mestre: [execucao-plano-mestre-bizcode.md](execucao-plano-mestre-bizcode.md)

@@ -1,29 +1,33 @@
 # RepartoItemLine Schema
 
 ```txt
-undefined
+undefined#/allOf/0
 ```
 
 
 
 | Abstract            | Extensible | Status         | Identifiable | Custom Properties | Additional Properties | Access Restrictions | Defined In                                                                                       |
 | :------------------ | :--------- | :------------- | :----------- | :---------------- | :-------------------- | :------------------ | :----------------------------------------------------------------------------------------------- |
-| Can be instantiated | No         | Unknown status | No           | Forbidden         | Allowed               | none                | [RepartoItemLine.schema.json](../schema-json/RepartoItemLine.schema.json "open original schema") |
+| Can be instantiated | No         | Unknown status | No           | Forbidden         | Allowed               | none                | [RepartoItemPod.schema.json\*](../schema-json/RepartoItemPod.schema.json "open original schema") |
 
-## RepartoItemLine Type
+## 0 Type
 
 `object` ([RepartoItemLine](repartoitemline.md))
 
-# RepartoItemLine Properties
+# 0 Properties
 
 | Property                            | Type      | Required | Nullable       | Defined by                                                                                               |
 | :---------------------------------- | :-------- | :------- | :------------- | :------------------------------------------------------------------------------------------------------- |
 | [entregadoAt](#entregadoat)         | `string`  | Optional | cannot be null | [RepartoItemLine](repartoitemline-properties-entregadoat.md "undefined#/properties/entregadoAt")         |
 | [estado](#estado)                   | `string`  | Required | cannot be null | [RepartoItemLine](repartoitemline-properties-estado.md "undefined#/properties/estado")                   |
+| [hasPod](#haspod)                   | `boolean` | Required | cannot be null | [RepartoItemLine](repartoitemline-properties-haspod.md "undefined#/properties/hasPod")                   |
 | [id](#id)                           | `integer` | Required | cannot be null | [RepartoItemLine](repartoitemline-properties-id.md "undefined#/properties/id")                           |
 | [motivoNoEntrega](#motivonoentrega) | `string`  | Optional | cannot be null | [RepartoItemLine](repartoitemline-properties-motivonoentrega.md "undefined#/properties/motivoNoEntrega") |
+| [notasEntrega](#notasentrega)       | `string`  | Optional | cannot be null | [RepartoItemLine](repartoitemline-properties-notasentrega.md "undefined#/properties/notasEntrega")       |
 | [ordenEntrega](#ordenentrega)       | `object`  | Required | cannot be null | [RepartoItemLine](ordenentrega.md "undefined#/properties/ordenEntrega")                                  |
 | [ordenEntregaId](#ordenentregaid)   | `integer` | Required | cannot be null | [RepartoItemLine](repartoitemline-properties-ordenentregaid.md "undefined#/properties/ordenEntregaId")   |
+| [receptorDni](#receptordni)         | `string`  | Optional | cannot be null | [RepartoItemLine](repartoitemline-properties-receptordni.md "undefined#/properties/receptorDni")         |
+| [receptorNombre](#receptornombre)   | `string`  | Optional | cannot be null | [RepartoItemLine](repartoitemline-properties-receptornombre.md "undefined#/properties/receptorNombre")   |
 | [secuencia](#secuencia)             | `integer` | Required | cannot be null | [RepartoItemLine](repartoitemline-properties-secuencia.md "undefined#/properties/secuencia")             |
 
 ## entregadoAt
@@ -77,6 +81,24 @@ undefined
 | `"not_delivered"` |             |
 | `"returned"`      |             |
 
+## hasPod
+
+
+
+`hasPod`
+
+* is required
+
+* Type: `boolean`
+
+* cannot be null
+
+* defined in: [RepartoItemLine](repartoitemline-properties-haspod.md "undefined#/properties/hasPod")
+
+### hasPod Type
+
+`boolean`
+
 ## id
 
 
@@ -110,6 +132,24 @@ undefined
 * defined in: [RepartoItemLine](repartoitemline-properties-motivonoentrega.md "undefined#/properties/motivoNoEntrega")
 
 ### motivoNoEntrega Type
+
+`string`
+
+## notasEntrega
+
+
+
+`notasEntrega`
+
+* is optional
+
+* Type: `string`
+
+* cannot be null
+
+* defined in: [RepartoItemLine](repartoitemline-properties-notasentrega.md "undefined#/properties/notasEntrega")
+
+### notasEntrega Type
 
 `string`
 
@@ -148,6 +188,42 @@ undefined
 ### ordenEntregaId Type
 
 `integer`
+
+## receptorDni
+
+
+
+`receptorDni`
+
+* is optional
+
+* Type: `string`
+
+* cannot be null
+
+* defined in: [RepartoItemLine](repartoitemline-properties-receptordni.md "undefined#/properties/receptorDni")
+
+### receptorDni Type
+
+`string`
+
+## receptorNombre
+
+
+
+`receptorNombre`
+
+* is optional
+
+* Type: `string`
+
+* cannot be null
+
+* defined in: [RepartoItemLine](repartoitemline-properties-receptornombre.md "undefined#/properties/receptorNombre")
+
+### receptorNombre Type
+
+`string`
 
 ## secuencia
 

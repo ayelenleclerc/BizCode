@@ -1221,6 +1221,52 @@ export const repartoCreateBodySchema = z
     }
   })
 
+const motivoNoEntregaEnum = z.enum([
+  'ausente',
+  'rechazo',
+  'domicilio_incorrecto',
+  'producto_dañado',
+  'otro',
+])
+
+export const repartoItemPodBodySchema = z
+  .object({
+    outcome: z.enum(['delivered', 'not_delivered']),
+    receptorNombre: z.string().max(120).nullable().optional(),
+    receptorDni: z.string().max(20).nullable().optional(),
+    firmaBase64: z.string().nullable().optional(),
+    fotoBase64: z.string().nullable().optional(),
+    notasEntrega: z.string().max(500).nullable().optional(),
+    motivoNoEntrega: motivoNoEntregaEnum.nullable().optional(),
+  })
+  .superRefine((body, ctx) => {
+    if (body.outcome === 'delivered') {
+      const name = body.receptorNombre?.trim() ?? ''
+      if (name.length === 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'receptorNombre is required for delivered outcome',
+          path: ['receptorNombre'],
+        })
+      }
+      const firma = body.firmaBase64?.trim() ?? ''
+      if (firma.length === 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'firmaBase64 is required for delivered outcome',
+          path: ['firmaBase64'],
+        })
+      }
+    }
+    if (body.outcome === 'not_delivered' && body.motivoNoEntrega == null) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'motivoNoEntrega is required for not_delivered outcome',
+        path: ['motivoNoEntrega'],
+      })
+    }
+  })
+
 export function safeParseBodySchema<S extends z.ZodTypeAny>(schema: S, raw: unknown): SafeParseBodyResult<z.output<S>> {
   const parsed = schema.safeParse(raw)
   if (!parsed.success) {

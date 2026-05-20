@@ -15,10 +15,17 @@
       ],
       "type": "string"
     },
+    "hasPod": {
+      "type": "boolean"
+    },
     "id": {
       "type": "integer"
     },
     "motivoNoEntrega": {
+      "nullable": true,
+      "type": "string"
+    },
+    "notasEntrega": {
       "nullable": true,
       "type": "string"
     },
@@ -27,6 +34,14 @@
     },
     "ordenEntregaId": {
       "type": "integer"
+    },
+    "receptorDni": {
+      "nullable": true,
+      "type": "string"
+    },
+    "receptorNombre": {
+      "nullable": true,
+      "type": "string"
     },
     "secuencia": {
       "type": "integer"
@@ -37,6 +52,7 @@
     "ordenEntregaId",
     "secuencia",
     "estado",
+    "hasPod",
     "ordenEntrega"
   ],
   "title": "RepartoItemLine",

@@ -10,6 +10,8 @@ Versionamento: [Semantic Versioning](https://semver.org/).
 
 ### Adicionado
 
+- **Comprovante de entrega (POD) em itens de reparto (GitHub #142):** campos em `RepartoItem` (receptor, notas, `motivoNoEntrega`, `podMedia` JSON); `PUT /api/repartos/{id}/items/{itemId}` (`orders.deliver.confirm`, motorista na própria rota `on_route`) e `GET .../pod` (`logistics.read`, papéis `owner`/`manager`/`logistics_planner`); listagens com `hasPod` sem blobs; UI motorista `/logistica/repartos/chofer` (módulo `logistics.pod`, wizard 4 etapas); badge e diálogo no back-office; OpenAPI, testes e manual (EN/ES/PT-BR).
+
 - **Repartos / rotas de entrega (GitHub #140):** modelos `Reparto` / `RepartoItem`; API `GET/POST /api/repartos`, `GET /api/repartos/{id}`, `POST .../iniciar`, `POST .../cerrar`; leitura `logistics.read`, mutações `orders.dispatch`; agrupa OEs pendentes, inicia rota (`on_route`), ao fechar itens pendentes `not_delivered` e OEs `failed`; UI `/logistica/repartos` (módulo `logistics.dispatches`, reordenação por arrastar); OpenAPI, testes e manual de logística (EN/ES/PT-BR).
 
 - **Análise avançada do dashboard (GitHub #138):** `GET /api/dashboard/ventas-historico` (agregação PostgreSQL, JSON + CSV); aba **Análise** em **Início** com gráficos linha/barras/pizza (recharts), presets 30/90/365 dias, filtros vendedor e zona; exige `reports.operational.read` e módulo `analytics.advanced`; índice `Factura_tenantId_estado_fecha_idx`; OpenAPI, testes e manual de relatórios (EN/ES/PT-BR).

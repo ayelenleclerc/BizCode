@@ -41,6 +41,26 @@ Abra **Repartos** pelo link na página de logística ou navegue para `/logistica
 
 Uma OE não pode estar em dois repartos ativos (`planned` ou `on_route`) ao mesmo tempo (`422 ORDEN_ALREADY_IN_ACTIVE_REPARTO`).
 
+## Comprovante de entrega (POD)
+
+Módulo **`logistics.pod`** (depende de **`logistics.dispatches`**). Motoristas com **`orders.deliver.confirm`** usam **`/logistica/repartos/chofer`** (mobile-first) quando o reparto está **`on_route`**.
+
+| Etapa | Ação |
+|-------|------|
+| Receptor | Nome obrigatório; documento opcional |
+| Assinatura | Canvas; obrigatória para confirmar entrega |
+| Foto | Opcional; compressão no cliente |
+| Confirmar | Notas; ou **não entregue** com motivo (`ausente`, `rechazo`, `domicilio_incorrecto`, `producto_dañado`, `otro`) |
+
+| API | Permissão / papel |
+|-----|-------------------|
+| `PUT /api/repartos/{id}/items/{itemId}` | `orders.deliver.confirm`; motorista só no próprio reparto `on_route` |
+| `GET /api/repartos/{id}/items/{itemId}/pod` | `logistics.read` + `owner`, `manager` ou `logistics_planner` (não `driver`) |
+
+Listagens/detalhe expõem **`hasPod`** sem blobs. Limites decodificados: assinatura ~50KB, foto ~200KB. Assinatura vazia não confirma entrega.
+
+Back-office: em **`/logistica/repartos`**, painel de acompanhamento com badge **POD disponível** e **Ver comprovante** quando `hasPod`.
+
 ## Ordens de compra
 
 Abra **Compras** (`/compras`) na barra lateral. A rota depende do módulo do tenant **`logistics.purchases`** e é visível para papéis como **owner**, **manager** e **warehouse_lead** (conforme a configuração de navegação do produto).

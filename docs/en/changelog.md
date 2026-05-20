@@ -10,6 +10,8 @@ Versioning: [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **Delivery proof (POD) on route items (GitHub #142):** `RepartoItem` fields for recipient, notes, `motivoNoEntrega`, and `podMedia` JSON; `PUT /api/repartos/{id}/items/{itemId}` (`orders.deliver.confirm`, driver on own `on_route` route) and `GET .../pod` (`logistics.read`, roles `owner`/`manager`/`logistics_planner` only); list/detail expose `hasPod` without blobs; driver UI `/logistica/repartos/chofer` (module `logistics.pod`, 4-step wizard with signature/photo limits); back-office POD badge and view dialog; OpenAPI, tests, and logistics manual (EN/ES/PT-BR).
+
 - **Delivery routes / repartos (GitHub #140):** `Reparto` / `RepartoItem` models; API `GET/POST /api/repartos`, `GET /api/repartos/{id}`, `POST .../iniciar`, `POST .../cerrar`; read `logistics.read`, mutations `orders.dispatch`; groups pending delivery orders, start route (`on_route`), close marks pending items `not_delivered` and OEs `failed`; UI `/logistica/repartos` (module `logistics.dispatches`, drag-and-drop route sequence); OpenAPI, tests, and logistics manual (EN/ES/PT-BR).
 
 - **Advanced dashboard analytics (GitHub #138):** `GET /api/dashboard/ventas-historico` (PostgreSQL aggregation, JSON + CSV); **Inicio** tab **Analytics** with line/bar/pie charts (recharts), date presets (30/90/365 days), seller and delivery-zone filters; requires `reports.operational.read` and module `analytics.advanced`; index `Factura_tenantId_estado_fecha_idx`; OpenAPI, tests, and reports manual (EN/ES/PT-BR).

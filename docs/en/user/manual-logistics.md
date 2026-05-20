@@ -41,6 +41,26 @@ Open **Delivery routes** from the logistics page link or navigate to `/logistica
 
 A delivery order cannot belong to two active routes (`planned` or `on_route`) at once (`422 ORDEN_ALREADY_IN_ACTIVE_REPARTO`).
 
+## Delivery proof (POD)
+
+Module **`logistics.pod`** (depends on **`logistics.dispatches`**). Drivers with **`orders.deliver.confirm`** open **`/logistica/repartos/chofer`** (mobile-first) when their route is **`on_route`**.
+
+| Step | Action |
+|------|--------|
+| Receptor | Name required; optional ID |
+| Signature | Canvas capture; required to confirm delivery |
+| Photo | Optional (`capture="environment"`); client compression |
+| Confirm | Notes; or mark **not delivered** with reason (`ausente`, `rechazo`, `domicilio_incorrecto`, `producto_dañado`, `otro`) |
+
+| API | Permission / role |
+|-----|-------------------|
+| `PUT /api/repartos/{id}/items/{itemId}` | `orders.deliver.confirm`; driver only on own route while `on_route` |
+| `GET /api/repartos/{id}/items/{itemId}/pod` | `logistics.read` + `owner`, `manager`, or `logistics_planner` (not `driver`) |
+
+List/detail responses include **`hasPod`** only (no signature/photo blobs). Decoded size limits: signature ~50KB, photo ~200KB. Empty signature cannot confirm delivery.
+
+Back-office: on **`/logistica/repartos`**, tracking panel shows **POD available** and **View proof** when `hasPod` is true.
+
 ## Purchase orders
 
 Open **Purchasing** (`/compras`) from the sidebar. The route is gated by the tenant module **`logistics.purchases`** and is visible to roles such as **owner**, **manager**, and **warehouse_lead** (see navigation configuration in the product).

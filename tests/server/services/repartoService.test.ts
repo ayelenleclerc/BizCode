@@ -1,6 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { PrismaClient } from '@prisma/client'
 import { RepartoService } from '../../../server/services/RepartoService'
+import { POD_MAX_FIRMA_BYTES } from '../../../server/lib/podMediaValidation'
+
+const TEST_FIRMA =
+  'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=='
 
 const ordenPending = {
   id: 10,
@@ -29,6 +33,10 @@ const repartoRow = {
       estado: 'pending',
       entregadoAt: null,
       motivoNoEntrega: null,
+      receptorNombre: null,
+      receptorDni: null,
+      notasEntrega: null,
+      podMedia: null,
       ordenEntrega: {
         id: 10,
         tenantId: 1,
@@ -54,6 +62,7 @@ function buildPrisma(overrides: Partial<Record<string, unknown>> = {}): PrismaCl
     },
     repartoItem: {
       findFirst: vi.fn().mockResolvedValue(null),
+      update: vi.fn(),
       updateMany: vi.fn().mockResolvedValue({ count: 1 }),
     },
     reparto: {
@@ -135,5 +144,169 @@ describe('RepartoService.cerrar', () => {
     }
     expect(prisma.repartoItem.updateMany).toHaveBeenCalled()
     expect(prisma.ordenEntrega.updateMany).toHaveBeenCalled()
+  })
+})
+
+describe('RepartoService.updateItemPod', () => {
+  const onRouteItem = {
+    ...repartoRow.items[0],
+    estado: 'pending',
+  }
+
+  it('rejects delivered without firma', async () => {
+    const prisma = buildPrisma({
+      reparto: {
+        count: vi.fn(),
+        findMany: vi.fn(),
+        findFirst: vi.fn().mockResolvedValue({ id: 1, estado: 'on_route', choferId: 5, tenantId: 1 }),
+        create: vi.fn(),
+        update: vi.fn(),
+      },
+      repartoItem: {
+        findFirst: vi.fn().mockResolvedValue(onRouteItem),
+        update: vi.fn(),
+        updateMany: vi.fn(),
+      },
+    })
+    const svc = new RepartoService(prisma)
+    const result = await svc.updateItemPod(
+      1,
+      1,
+      100,
+      { outcome: 'delivered', receptorNombre: 'Ana', firmaBase64: '' },
+      { userId: 5, role: 'driver' },
+    )
+    expect(result.ok).toBe(false)
+    if (!result.ok) expect(result.error).toBe('POD_FIRMA_REQUIRED')
+  })
+
+  it('records delivered with firma and sets hasPod', async () => {
+    const updated = {
+      ...onRouteItem,
+      estado: 'delivered',
+      entregadoAt: new Date(),
+      receptorNombre: 'Ana',
+      podMedia: { firmaBase64: TEST_FIRMA },
+    }
+    const prisma = buildPrisma({
+      reparto: {
+        count: vi.fn(),
+        findMany: vi.fn(),
+        findFirst: vi.fn().mockResolvedValue({ id: 1, estado: 'on_route', choferId: 5, tenantId: 1 }),
+        create: vi.fn(),
+        update: vi.fn(),
+      },
+      repartoItem: {
+        findFirst: vi.fn().mockResolvedValue(onRouteItem),
+        update: vi.fn().mockResolvedValue(updated),
+        updateMany: vi.fn(),
+      },
+      ordenEntrega: {
+        findMany: vi.fn(),
+        updateMany: vi.fn(),
+        update: vi.fn().mockResolvedValue({}),
+      },
+    })
+    const svc = new RepartoService(prisma)
+    const result = await svc.updateItemPod(
+      1,
+      1,
+      100,
+      { outcome: 'delivered', receptorNombre: 'Ana', firmaBase64: TEST_FIRMA },
+      { userId: 5, role: 'driver' },
+    )
+    expect(result.ok).toBe(true)
+    if (result.ok) {
+      expect(result.data.item.estado).toBe('delivered')
+      expect(result.data.item.hasPod).toBe(true)
+      expect(result.data.auditSigned).toBe(true)
+    }
+  })
+
+  it('rejects not_delivered without motivo', async () => {
+    const prisma = buildPrisma({
+      reparto: {
+        count: vi.fn(),
+        findMany: vi.fn(),
+        findFirst: vi.fn().mockResolvedValue({ id: 1, estado: 'on_route', choferId: 5, tenantId: 1 }),
+        create: vi.fn(),
+        update: vi.fn(),
+      },
+      repartoItem: {
+        findFirst: vi.fn().mockResolvedValue(onRouteItem),
+        update: vi.fn(),
+        updateMany: vi.fn(),
+      },
+    })
+    const svc = new RepartoService(prisma)
+    const result = await svc.updateItemPod(
+      1,
+      1,
+      100,
+      { outcome: 'not_delivered' },
+      { userId: 5, role: 'driver' },
+    )
+    expect(result.ok).toBe(false)
+    if (!result.ok) expect(result.error).toBe('INVALID_MOTIVO_NO_ENTREGA')
+  })
+
+  it('rejects firma larger than limit', async () => {
+    const huge = `data:image/png;base64,${'A'.repeat(POD_MAX_FIRMA_BYTES * 2)}`
+    const prisma = buildPrisma({
+      reparto: {
+        count: vi.fn(),
+        findMany: vi.fn(),
+        findFirst: vi.fn().mockResolvedValue({ id: 1, estado: 'on_route', choferId: 5, tenantId: 1 }),
+        create: vi.fn(),
+        update: vi.fn(),
+      },
+      repartoItem: {
+        findFirst: vi.fn().mockResolvedValue(onRouteItem),
+        update: vi.fn(),
+        updateMany: vi.fn(),
+      },
+    })
+    const svc = new RepartoService(prisma)
+    const result = await svc.updateItemPod(
+      1,
+      1,
+      100,
+      { outcome: 'delivered', receptorNombre: 'Ana', firmaBase64: huge },
+      { userId: 5, role: 'driver' },
+    )
+    expect(result.ok).toBe(false)
+    if (!result.ok) expect(result.error).toBe('POD_FIRMA_TOO_LARGE')
+  })
+})
+
+describe('RepartoService.getItemPod', () => {
+  it('returns 403 for driver role', async () => {
+    const prisma = buildPrisma()
+    const svc = new RepartoService(prisma)
+    const result = await svc.getItemPod(1, 1, 100, 'driver')
+    expect(result.ok).toBe(false)
+    if (!result.ok) expect(result.status).toBe(403)
+  })
+
+  it('returns pod media for planner', async () => {
+    const item = {
+      ...repartoRow.items[0],
+      estado: 'delivered',
+      podMedia: { firmaBase64: TEST_FIRMA },
+      receptorNombre: 'Ana',
+    }
+    const prisma = buildPrisma({
+      repartoItem: {
+        findFirst: vi.fn().mockResolvedValue(item),
+        update: vi.fn(),
+        updateMany: vi.fn(),
+      },
+    })
+    const svc = new RepartoService(prisma)
+    const result = await svc.getItemPod(1, 1, 100, 'logistics_planner')
+    expect(result.ok).toBe(true)
+    if (result.ok) {
+      expect(result.data.podMedia?.firmaBase64).toBe(TEST_FIRMA)
+    }
   })
 })

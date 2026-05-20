@@ -142,6 +142,10 @@ const repartoContractRow = {
       estado: 'pending',
       entregadoAt: null,
       motivoNoEntrega: null,
+      receptorNombre: null,
+      receptorDni: null,
+      notasEntrega: null,
+      podMedia: null,
       ordenEntrega: {
         id: 1,
         tenantId: 1,
@@ -307,6 +311,7 @@ function buildPrisma(): PrismaClient {
     },
     repartoItem: {
       findFirst: vi.fn().mockResolvedValue(null),
+      update: vi.fn(),
       updateMany: vi.fn().mockResolvedValue({ count: 0 }),
     },
     ordenEntrega: {
@@ -1113,6 +1118,77 @@ describe('API — contrato OpenAPI', () => {
     const app = createApp(p)
     const res = await request(app).post('/api/repartos/1/cerrar').expect(200)
     await assertMatchesOpenApi('/api/repartos/{id}/cerrar', 'post', '200', res.body)
+  })
+
+  const TEST_FIRMA =
+    'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=='
+
+  it('PUT /api/repartos/{id}/items/{itemId}', async () => {
+    process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
+    process.env.BIZCODE_TEST_ROLE = 'driver'
+    process.env.BIZCODE_TEST_USER_ID = '2'
+    const p = buildPrisma()
+    const itemRow = {
+      ...repartoContractRow.items[0],
+      repartoId: 1,
+      estado: 'pending',
+      podMedia: { firmaBase64: TEST_FIRMA },
+      receptorNombre: 'Juan Pérez',
+    }
+    vi.mocked(p.reparto.findFirst).mockResolvedValueOnce({
+      id: 1,
+      estado: 'on_route',
+      choferId: 2,
+      tenantId: 1,
+    } as never)
+    vi.mocked(p.repartoItem.findFirst).mockResolvedValueOnce({
+      ...itemRow,
+      ordenEntrega: repartoContractRow.items[0].ordenEntrega,
+    } as never)
+    vi.mocked(p.repartoItem.update).mockResolvedValueOnce({
+      ...itemRow,
+      estado: 'delivered',
+      entregadoAt: new Date(),
+    } as never)
+    vi.mocked(p.ordenEntrega.update).mockResolvedValueOnce({} as never)
+    p.$transaction = vi.fn(async (fn: unknown) => {
+      if (typeof fn === 'function') {
+        return (fn as (tx: PrismaClient) => Promise<unknown>)(p)
+      }
+      return fn
+    }) as PrismaClient['$transaction']
+    const app = createApp(p)
+    const res = await request(app)
+      .put('/api/repartos/1/items/10')
+      .send({
+        outcome: 'delivered',
+        receptorNombre: 'Juan Pérez',
+        firmaBase64: TEST_FIRMA,
+      })
+      .expect(200)
+    await assertMatchesOpenApi('/api/repartos/{id}/items/{itemId}', 'put', '200', res.body)
+    expect(res.body.data.hasPod).toBe(true)
+  })
+
+  it('GET /api/repartos/{id}/items/{itemId}/pod', async () => {
+    process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
+    process.env.BIZCODE_TEST_ROLE = 'logistics_planner'
+    const p = buildPrisma()
+    const itemRow = {
+      ...repartoContractRow.items[0],
+      repartoId: 1,
+      estado: 'delivered',
+      podMedia: { firmaBase64: TEST_FIRMA },
+      receptorNombre: 'Juan Pérez',
+    }
+    vi.mocked(p.repartoItem.findFirst).mockResolvedValueOnce({
+      ...itemRow,
+      ordenEntrega: repartoContractRow.items[0].ordenEntrega,
+    } as never)
+    const app = createApp(p)
+    const res = await request(app).get('/api/repartos/1/items/10/pod').expect(200)
+    await assertMatchesOpenApi('/api/repartos/{id}/items/{itemId}/pod', 'get', '200', res.body)
+    expect(res.body.data.podMedia?.firmaBase64).toBe(TEST_FIRMA)
   })
 
   it('GET /api/dashboard/ventas-historico', async () => {

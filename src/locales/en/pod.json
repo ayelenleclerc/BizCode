@@ -1,0 +1,43 @@
+{
+  "title": "Proof of delivery",
+  "wizardTitle": "Confirm delivery",
+  "stepReceptor": "Recipient",
+  "stepSignature": "Signature",
+  "stepPhoto": "Photo",
+  "stepConfirm": "Confirm",
+  "receptorNombre": "Recipient name",
+  "receptorDni": "ID number (optional)",
+  "signatureLabel": "Recipient signature",
+  "signatureClear": "Clear signature",
+  "signatureRequired": "Signature is required to confirm delivery.",
+  "photoLabel": "Package photo (optional)",
+  "photoCapture": "Take or choose photo",
+  "notas": "Notes",
+  "outcomeDelivered": "Delivered",
+  "outcomeNotDelivered": "Not delivered",
+  "motivoLabel": "Failure reason",
+  "motivo": {
+    "ausente": "Absent",
+    "rechazo": "Refused",
+    "domicilio_incorrecto": "Wrong address",
+    "producto_dañado": "Damaged product",
+    "otro": "Other"
+  },
+  "confirm": "Confirm",
+  "cancel": "Cancel",
+  "next": "Next",
+  "back": "Back",
+  "podAvailable": "POD available",
+  "viewPod": "View proof",
+  "downloadHint": "Signature and photo stored in the system.",
+  "noPod": "No proof of delivery recorded.",
+  "choferTitle": "My route",
+  "choferSubtitle": "Orders in progress — confirm each delivery with proof.",
+  "noRoute": "You have no active route in progress.",
+  "forbidden": "You do not have permission to record delivery proof.",
+  "errors": {
+    "save": "Could not save proof of delivery.",
+    "photoTooLarge": "Photo exceeds the maximum allowed size.",
+    "firmaTooLarge": "Signature exceeds the maximum allowed size."
+  }
+}
