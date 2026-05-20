@@ -38,6 +38,10 @@ Definidos no código: `counter`, `field`, `backoffice`, `warehouse`, `delivery`.
 - Cenários **atacado / distribuição** usam `warehouse_op`, `warehouse_lead`, `logistics_planner`, `driver` e canais `delivery`/`warehouse` para separação, despacho e confirmação de entrega.
 - Permissões `orders.*` sustentam domínio de **pedidos futuro**; **não** há entidade `pedido` evidenciada no schema Prisma nem nos paths OpenAPI atuais. A faturação atual usa `facturas` e permissões relacionadas (`sales.create`, `reports.operational.read`, etc.).
 
+## Módulos de produto (análise do dashboard #138)
+
+A aba **Início → Análise** chama `GET /api/dashboard/ventas-historico` e exige **`reports.operational.read`** e o módulo do tenant **`analytics.advanced`** (depende de `analytics.dashboard`). Nenhuma permissão literal nova foi adicionada.
+
 ## Documentos relacionados
 
 - Índice de execução do plano mestre: [execucao-plano-mestre-bizcode.md](execucao-plano-mestre-bizcode.md)

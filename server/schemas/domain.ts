@@ -1019,6 +1019,29 @@ export const reportesVentasQuerySchema = z
   })
   .superRefine(refineReportesPeriodOrder)
 
+const optionalPositiveIntQuery = z
+  .string()
+  .optional()
+  .transform((v) => {
+    if (v === undefined || v === '') return undefined
+    const n = Number.parseInt(v, 10)
+    if (!Number.isFinite(n) || n < 1) return NaN
+    return n
+  })
+  .refine((v) => v === undefined || !Number.isNaN(v), {
+    message: 'must be a positive integer',
+  })
+
+export const dashboardVentasHistoricoQuerySchema = z
+  .object({
+    from: isoDateString,
+    to: isoDateString,
+    groupBy: z.enum(['day', 'week', 'month']).default('day'),
+    vendedorId: optionalPositiveIntQuery,
+    deliveryZoneId: optionalPositiveIntQuery,
+  })
+  .superRefine(refineReportesPeriodOrder)
+
 const ordenCompraItemBodySchema = z
   .object({
     articuloId: z.number({ invalid_type_error: 'articuloId must be a number' }),

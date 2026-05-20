@@ -1530,6 +1530,43 @@ export type DashboardSummaryDTO = {
   alertasActivas: number
 }
 
+export type DashboardVentasGroupBy = 'day' | 'week' | 'month'
+
+export type DashboardVentasSeriesRow = {
+  period: string
+  count: number
+  total: string
+}
+
+export type DashboardTopArticuloRow = {
+  articuloId: number
+  codigo: number
+  descripcion: string
+  quantity: number
+  total: string
+}
+
+export type DashboardVentasBySellerRow = {
+  vendedorId: number | null
+  username: string | null
+  count: number
+  total: string
+}
+
+export type DashboardVentasHistoricoDTO = {
+  series: DashboardVentasSeriesRow[]
+  topArticles: DashboardTopArticuloRow[]
+  bySeller: DashboardVentasBySellerRow[]
+}
+
+export type DashboardVentasHistoricoParams = {
+  from: string
+  to: string
+  groupBy: DashboardVentasGroupBy
+  vendedorId?: number
+  deliveryZoneId?: number
+}
+
 export const dashboardAPI = {
   summary: async (): Promise<DashboardSummaryDTO> => {
     try {
@@ -1537,6 +1574,33 @@ export const dashboardAPI = {
         '/dashboard/summary',
       )
       return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  ventasHistorico: async (
+    params: DashboardVentasHistoricoParams,
+  ): Promise<DashboardVentasHistoricoDTO> => {
+    try {
+      const response = await api.get<{ success: boolean; data: DashboardVentasHistoricoDTO }>(
+        '/dashboard/ventas-historico',
+        { params },
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  exportVentasHistoricoCsv: async (params: DashboardVentasHistoricoParams): Promise<Blob> => {
+    try {
+      const response = await api.get<Blob>('/dashboard/ventas-historico', {
+        params,
+        headers: { Accept: 'text/csv' },
+        responseType: 'blob',
+      })
+      return response.data
     } catch (error) {
       return handleError(error as AxiosError<ApiErrorPayload>)
     }

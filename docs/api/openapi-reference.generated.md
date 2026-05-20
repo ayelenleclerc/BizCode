@@ -17737,6 +17737,222 @@ true
 }
 ```
 
+### Historical sales analytics for charts and CSV export (#138)
+
+- **Method:** `GET`
+- **Path:** `/api/dashboard/ventas-historico`
+- **Tags:** dashboard
+
+Aggregates active invoices (`estado = A`) in PostgreSQL by period, top 10 articles, and sales by seller (via linked `Pedido`). Requires permission `reports.operational.read`. JSON by default; send `Accept: text/csv` for period series export.
+
+#### Responses
+
+##### Status: 200 Aggregated analytics or CSV series
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`bySeller` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`count` (required)**
+
+      `integer`
+
+    - **`total` (required)**
+
+      `string`
+
+    - **`username` (required)**
+
+      `string`
+
+    - **`vendedorId` (required)**
+
+      `integer`
+
+  - **`series` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`count` (required)**
+
+      `integer`
+
+    - **`period` (required)**
+
+      `string`
+
+    - **`total` (required)**
+
+      `string`
+
+  - **`topArticles` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId` (required)**
+
+      `integer`
+
+    - **`codigo` (required)**
+
+      `integer`
+
+    - **`descripcion` (required)**
+
+      `string`
+
+    - **`quantity` (required)**
+
+      `integer`
+
+    - **`total` (required)**
+
+      `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "series": [
+      {
+        "period": "",
+        "count": 1,
+        "total": ""
+      }
+    ],
+    "topArticles": [
+      {
+        "articuloId": 1,
+        "codigo": 1,
+        "descripcion": "",
+        "quantity": 1,
+        "total": ""
+      }
+    ],
+    "bySeller": [
+      {
+        "vendedorId": 1,
+        "username": "",
+        "count": 1,
+        "total": ""
+      }
+    ]
+  }
+}
+```
+
+###### Content-Type: text/csv
+
+`string`
+
+**Example:**
+
+```json
+true
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ### List audit events for the authenticated tenant
 
 - **Method:** `GET`
@@ -27440,6 +27656,312 @@ Requires `orders.dispatch` for transitions to `assigned`, `in_transit`, or `fail
       "total": ""
     },
     "alertasActivas": 1
+  }
+}
+```
+
+### DashboardVentasSeriesRow
+
+- **Type:**`object`
+
+* **`count` (required)**
+
+  `integer`
+
+* **`period` (required)**
+
+  `string`
+
+* **`total` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "period": "",
+  "count": 1,
+  "total": ""
+}
+```
+
+### DashboardTopArticuloRow
+
+- **Type:**`object`
+
+* **`articuloId` (required)**
+
+  `integer`
+
+* **`codigo` (required)**
+
+  `integer`
+
+* **`descripcion` (required)**
+
+  `string`
+
+* **`quantity` (required)**
+
+  `integer`
+
+* **`total` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "articuloId": 1,
+  "codigo": 1,
+  "descripcion": "",
+  "quantity": 1,
+  "total": ""
+}
+```
+
+### DashboardVentasBySellerRow
+
+- **Type:**`object`
+
+* **`count` (required)**
+
+  `integer`
+
+* **`total` (required)**
+
+  `string`
+
+* **`username` (required)**
+
+  `string`
+
+* **`vendedorId` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "vendedorId": 1,
+  "username": "",
+  "count": 1,
+  "total": ""
+}
+```
+
+### DashboardVentasHistorico
+
+- **Type:**`object`
+
+* **`bySeller` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`count` (required)**
+
+    `integer`
+
+  - **`total` (required)**
+
+    `string`
+
+  - **`username` (required)**
+
+    `string`
+
+  - **`vendedorId` (required)**
+
+    `integer`
+
+* **`series` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`count` (required)**
+
+    `integer`
+
+  - **`period` (required)**
+
+    `string`
+
+  - **`total` (required)**
+
+    `string`
+
+* **`topArticles` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`codigo` (required)**
+
+    `integer`
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`quantity` (required)**
+
+    `integer`
+
+  - **`total` (required)**
+
+    `string`
+
+**Example:**
+
+```json
+{
+  "series": [
+    {
+      "period": "",
+      "count": 1,
+      "total": ""
+    }
+  ],
+  "topArticles": [
+    {
+      "articuloId": 1,
+      "codigo": 1,
+      "descripcion": "",
+      "quantity": 1,
+      "total": ""
+    }
+  ],
+  "bySeller": [
+    {
+      "vendedorId": 1,
+      "username": "",
+      "count": 1,
+      "total": ""
+    }
+  ]
+}
+```
+
+### DashboardVentasHistoricoEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`bySeller` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`count` (required)**
+
+      `integer`
+
+    - **`total` (required)**
+
+      `string`
+
+    - **`username` (required)**
+
+      `string`
+
+    - **`vendedorId` (required)**
+
+      `integer`
+
+  - **`series` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`count` (required)**
+
+      `integer`
+
+    - **`period` (required)**
+
+      `string`
+
+    - **`total` (required)**
+
+      `string`
+
+  - **`topArticles` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId` (required)**
+
+      `integer`
+
+    - **`codigo` (required)**
+
+      `integer`
+
+    - **`descripcion` (required)**
+
+      `string`
+
+    - **`quantity` (required)**
+
+      `integer`
+
+    - **`total` (required)**
+
+      `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "series": [
+      {
+        "period": "",
+        "count": 1,
+        "total": ""
+      }
+    ],
+    "topArticles": [
+      {
+        "articuloId": 1,
+        "codigo": 1,
+        "descripcion": "",
+        "quantity": 1,
+        "total": ""
+      }
+    ],
+    "bySeller": [
+      {
+        "vendedorId": 1,
+        "username": "",
+        "count": 1,
+        "total": ""
+      }
+    ]
   }
 }
 ```

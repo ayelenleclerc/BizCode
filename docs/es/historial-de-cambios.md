@@ -10,6 +10,8 @@ Versionado: [Semantic Versioning](https://semver.org/lang/es/).
 
 ### Agregado
 
+- **Analítica avanzada del dashboard (GitHub #138):** `GET /api/dashboard/ventas-historico` (agregación en PostgreSQL, JSON + CSV); pestaña **Análisis** en **Inicio** con gráficos línea/barras/torta (recharts), presets 30/90/365 días, filtros vendedor y zona; requiere `reports.operational.read` y módulo `analytics.advanced`; índice `Factura_tenantId_estado_fecha_idx`; OpenAPI, pruebas y manual de reportes (EN/ES/PT-BR).
+
 - **Recuento físico de inventario (GitHub #136):** modelos `Recuento` / `RecuentoItem`; API `GET/POST /api/recuentos`, `GET /api/recuentos/{id}`, `PUT .../items`, `POST .../close`, `GET .../pdf`; permiso `inventory.count`; bloqueo de stock `RECUENTO_IN_PROGRESS` en ajustes, recepción de compras y facturación; UI `/recuentos` (módulo `inventory.count`); OpenAPI, pruebas y manual de logística (EN/ES/PT-BR).
 
 - **Migración DBF de clientes (GitHub #51):** `npm run migrate:dbf` importa clientes desde `CLIENTES.DBF` cuando el archivo existe con filas (`legacyClienteDbf.ts`, `clienteBodySchema`, informe de rechazos); placeholders `91001`–`91010` solo sin maestro poblado; ver [Pruebas de migración DBF](guides/pruebas-migracion-dbf.md) y `scripts/MIGRACION_PROGRAMA_VIEJO.md`. Carga masiva en la app vía importación CSV (#58).

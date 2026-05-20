@@ -3,9 +3,9 @@
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
   "version": 1,
-  "serialNumber": "urn:uuid:3a5b1aa7-7afb-4fbb-babb-ed3b76546b3c",
+  "serialNumber": "urn:uuid:f0de94b5-0ed0-4415-95b5-5b1f4325f9d8",
   "metadata": {
-    "timestamp": "2026-05-19T14:02:20.917Z",
+    "timestamp": "2026-05-20T11:58:48.745Z",
     "tools": {
       "components": [
         {
@@ -939,6 +939,40 @@
         {
           "name": "cdx:npm:package:path",
           "value": "node_modules/react"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "recharts",
+      "version": "3.8.1",
+      "bom-ref": "bizcode@0.1.0|recharts@3.8.1",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/recharts@3.8.1",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/recharts/-/recharts-3.8.1.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "9b0ce63b5b3db052f44ddb94a709ddc4250da17b01c37bb713fd3e03e70b72b49f422b521bad8bdf637af4686a52bad3e6a29c004de9086548342ea9aa404142"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/recharts"
         }
       ]
     },
@@ -3464,6 +3498,419 @@
     },
     {
       "type": "library",
+      "name": "toolkit",
+      "group": "@reduxjs",
+      "version": "2.12.0",
+      "bom-ref": "bizcode@0.1.0|@reduxjs/toolkit@2.12.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/%40reduxjs/toolkit@2.12.0",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/@reduxjs/toolkit/-/toolkit-2.12.0.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "2a24fe47365ba7a990113f8c83e87673defef63d6c35f954c509081c8ed8bb37fa3debbe398a66927ea76c75a62cb5a3fb564e0d4245c0667b831dcbf51f443b"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/@reduxjs/toolkit"
+        }
+      ],
+      "components": [
+        {
+          "type": "library",
+          "name": "immer",
+          "version": "11.1.8",
+          "bom-ref": "bizcode@0.1.0|@reduxjs/toolkit@2.12.0|immer@11.1.8",
+          "licenses": [
+            {
+              "license": {
+                "id": "MIT",
+                "acknowledgement": "declared"
+              }
+            }
+          ],
+          "purl": "pkg:npm/immer@11.1.8",
+          "externalReferences": [
+            {
+              "url": "https://registry.npmjs.org/immer/-/immer-11.1.8.tgz",
+              "type": "distribution",
+              "hashes": [
+                {
+                  "alg": "SHA-512",
+                  "content": "fed6e41cc5bbcb5d0bc7a8b572b2e30f8fce84d9111be168edbc991ed6a1d39e3b9c879761ca485da521d0801063a80ee78e7daa918661aa5c10e1ed157908b8"
+                }
+              ],
+              "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+            }
+          ],
+          "properties": [
+            {
+              "name": "cdx:npm:package:path",
+              "value": "node_modules/@reduxjs/toolkit/node_modules/immer"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "clsx",
+      "version": "2.1.1",
+      "bom-ref": "bizcode@0.1.0|clsx@2.1.1",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/clsx@2.1.1",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/clsx/-/clsx-2.1.1.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "7989b441606d52b0566561b4777f3a386030d7a67df793e2395a3607b6e35926c779d1a5e5ed1959aabae6438681448d7ac1080e407d2126d383f24af5d84264"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/clsx"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "decimal.js-light",
+      "version": "2.5.1",
+      "bom-ref": "bizcode@0.1.0|decimal.js-light@2.5.1",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/decimal.js-light@2.5.1",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/decimal.js-light/-/decimal.js-light-2.5.1.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "a88305a533199a7cbe30c222b4007a0fb8953c4a2b570e984115a4bdaad3913e2d05e48b2e21f37308faab4326612142895a62a8f253244608ae970fcd5108be"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/decimal.js-light"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "es-toolkit",
+      "version": "1.46.1",
+      "bom-ref": "bizcode@0.1.0|es-toolkit@1.46.1",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/es-toolkit@1.46.1",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/es-toolkit/-/es-toolkit-1.46.1.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "e5e36d5ceb37b5b7f15ce8f4e2d8e3b1e79691159aa028dd108fbde83830cd9a1ee9cf63b8be3da579730054c8ef66960bd63ca7bd7af20e9720a8e1ee4ea9c9"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/es-toolkit"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "eventemitter3",
+      "version": "5.0.4",
+      "bom-ref": "bizcode@0.1.0|eventemitter3@5.0.4",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/eventemitter3@5.0.4",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/eventemitter3/-/eventemitter3-5.0.4.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "9a5b1347219a3c18cf79d93a06fc3e6aa6ec5c3b680320339b930eec9814fb2551c8c4393bc6c3e0a71c8bb052f397fddef79e81e08f90bf11e062c29678cb17"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/eventemitter3"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "immer",
+      "version": "10.2.0",
+      "bom-ref": "bizcode@0.1.0|immer@10.2.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/immer@10.2.0",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/immer/-/immer-10.2.0.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "77ff974cddf37ce0f28ebf3d80cde63ead56357d81f2962cbbb78e462b5dc32036b01b9b9d397795a625064e2c5d8e4551ae6a4d91810cf2480956efab38e56f"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/immer"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "react-is",
+      "version": "18.3.1",
+      "bom-ref": "bizcode@0.1.0|react-is@18.3.1",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/react-is@18.3.1",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/react-is/-/react-is-18.3.1.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "fcb2cc5726acd258e302da1888fa9888bf15597cd451d4e1ae6539fa7db40d9bfe6be0a54687af533c3927153e21e879fdcf3bcada13055f46d4588a7cd25d9a"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:development",
+          "value": "true"
+        },
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/react-is"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "react-redux",
+      "version": "9.3.0",
+      "bom-ref": "bizcode@0.1.0|react-redux@9.3.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/react-redux@9.3.0",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/react-redux/-/react-redux-9.3.0.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "290a2982a168fe9fdf82602ce6acfaa7945668d033ab8d1602eedf2485e742963114f6c962db093d6bc6785dab381698fe412e57bec056c5fc4ec4332a6f80fe"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/react-redux"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "reselect",
+      "version": "5.1.1",
+      "bom-ref": "bizcode@0.1.0|reselect@5.1.1",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/reselect@5.1.1",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/reselect/-/reselect-5.1.1.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "2bf046e9e224cbf481a737c766ffdd77ef49045892e12595ec522e8d5c8946ec7a7b8e7eef745a5075cb9884757fb58e31a434535926eaac24951431a49258d3"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/reselect"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "tiny-invariant",
+      "version": "1.3.3",
+      "bom-ref": "bizcode@0.1.0|tiny-invariant@1.3.3",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/tiny-invariant@1.3.3",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/tiny-invariant/-/tiny-invariant-1.3.3.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "f856c13c4d68f50018bef89abbfa82e5213771ac36d6adf192f58a06d8dae6f82a3962071c9de2a1aab554f7e7fd2cea72dcf66d4fe861e29df7fcf904bf8f56"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/tiny-invariant"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "victory-vendor",
+      "version": "37.3.6",
+      "bom-ref": "bizcode@0.1.0|victory-vendor@37.3.6",
+      "licenses": [
+        {
+          "expression": "MIT AND ISC",
+          "acknowledgement": "declared"
+        }
+      ],
+      "purl": "pkg:npm/victory-vendor@37.3.6",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/victory-vendor/-/victory-vendor-37.3.6.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "49b3c33dd0c1629fb93091e104203223bc0a3377798af7a48a07360e4dacee981b67dc08808058195c38cc61c19a5fea4c56dec6ba1f5d6e86bb89e81b1acec1"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/victory-vendor"
+        }
+      ]
+    },
+    {
+      "type": "library",
       "name": "swagger-ui-dist",
       "version": "5.32.1",
       "bom-ref": "bizcode@0.1.0|swagger-ui-dist@5.32.1",
@@ -4926,6 +5373,627 @@
     },
     {
       "type": "library",
+      "name": "spec",
+      "group": "@standard-schema",
+      "version": "1.1.0",
+      "bom-ref": "bizcode@0.1.0|@standard-schema/spec@1.1.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/%40standard-schema/spec@1.1.0",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/@standard-schema/spec/-/spec-1.1.0.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "976685cb98c02e19e21b91e0aab0fa8d72e2feb516acabea37fa89c7aca826c80a85b95577e8aaa94e110976af9bf8cf8adc83a394c2bca327a632a73ab8b2d3"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/@standard-schema/spec"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "redux-thunk",
+      "version": "3.1.0",
+      "bom-ref": "bizcode@0.1.0|redux-thunk@3.1.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/redux-thunk@3.1.0",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/redux-thunk/-/redux-thunk-3.1.0.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "356dabe53ea4b1429709a6f384bf73fa1db4e87430fcd26470b9b518f226450f08cdf5f0446aa356128919ab878ab4f40c0bb2cba863767319691a00732d0a97"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/redux-thunk"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "redux",
+      "version": "5.0.1",
+      "bom-ref": "bizcode@0.1.0|redux@5.0.1",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/redux@5.0.1",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/redux/-/redux-5.0.1.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "33dfc42ea17a7f2f05c269299c5d12dd828ea8cca8589e3e092e447e0d9cb77a18f5d690bddfcf73bd45a4666c56c6e5dc2a5bf8821c8c10d49e7c817506eae3"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/redux"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "use-sync-external-store",
+      "group": "@types",
+      "version": "0.0.6",
+      "bom-ref": "bizcode@0.1.0|@types/use-sync-external-store@0.0.6",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/%40types/use-sync-external-store@0.0.6",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/@types/use-sync-external-store/-/use-sync-external-store-0.0.6.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "cc50c00feb65a5fdabe1ab2e1c48f45c7ea963a8b483935e0073e7fb5e70937055e8903af5e1111570b58321938439156b5cc2c8aaf98e8c75fb62db57f00c2e"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/@types/use-sync-external-store"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "d3-array",
+      "group": "@types",
+      "version": "3.2.2",
+      "bom-ref": "bizcode@0.1.0|@types/d3-array@3.2.2",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/%40types/d3-array@3.2.2",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/@types/d3-array/-/d3-array-3.2.2.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "84e2d655b9bbb91cdad01617a48216e69c5faca7b45be0f996b162004611fa96fac373764b048c6896d77547d212ff9d4f831f1c12ed9f98ecd0b01668eea8b7"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/@types/d3-array"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "d3-ease",
+      "group": "@types",
+      "version": "3.0.2",
+      "bom-ref": "bizcode@0.1.0|@types/d3-ease@3.0.2",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/%40types/d3-ease@3.0.2",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/@types/d3-ease/-/d3-ease-3.0.2.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "35c5752633b9a03ce82b6ea83336c82c4e875bbb955ce1cb42f1ec841516e1431d6467e263abf905e43087d6bdb42ceff8279e7d940726de524602b5e7846d88"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/@types/d3-ease"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "d3-interpolate",
+      "group": "@types",
+      "version": "3.0.4",
+      "bom-ref": "bizcode@0.1.0|@types/d3-interpolate@3.0.4",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/%40types/d3-interpolate@3.0.4",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/@types/d3-interpolate/-/d3-interpolate-3.0.4.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "9a02cf11396ba55575611248825af8133e3b83b6318e5d658fb60ab223026f6ed5247f56f0d54ce816fd77c924a46fee0104b90266c0e3cab6200a2528aa3530"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/@types/d3-interpolate"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "d3-scale",
+      "group": "@types",
+      "version": "4.0.9",
+      "bom-ref": "bizcode@0.1.0|@types/d3-scale@4.0.9",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/%40types/d3-scale@4.0.9",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/@types/d3-scale/-/d3-scale-4.0.9.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "74b9adc01f3390078efe3b8031f9d5fac22d2a396cc3694a759555cba2d1af470199e8314800622c4a4656648927c3b4f22e3eb0647aa90b5be96b6ec0976f57"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/@types/d3-scale"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "d3-shape",
+      "group": "@types",
+      "version": "3.1.8",
+      "bom-ref": "bizcode@0.1.0|@types/d3-shape@3.1.8",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/%40types/d3-shape@3.1.8",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/@types/d3-shape/-/d3-shape-3.1.8.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "95a7b48967dc0de47baadeeb03cf01362a9dbcf4b9a4554fa68e4e7e3125c0d693db2c9e91b3340bdbcafb2a81a84987afa9439119d83684c162502025aedae3"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/@types/d3-shape"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "d3-time",
+      "group": "@types",
+      "version": "3.0.4",
+      "bom-ref": "bizcode@0.1.0|@types/d3-time@3.0.4",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/%40types/d3-time@3.0.4",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/@types/d3-time/-/d3-time-3.0.4.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "caecd9ba0d6790001a0650418a42994e0cc2780fa4d6ecb8645c1600d39f2b0e73e4b46157480d03b80d90a9bb1e82be1d1374c17dc49311a4d1fa5b5a1981ee"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/@types/d3-time"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "d3-timer",
+      "group": "@types",
+      "version": "3.0.2",
+      "bom-ref": "bizcode@0.1.0|@types/d3-timer@3.0.2",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/%40types/d3-timer@3.0.2",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/@types/d3-timer/-/d3-timer-3.0.2.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "3ecdd3f04f1d6436a6e9f5323623247a42b75d4b1a5048a4fa274ef7f6233ed7e3daaaee17cb450574bb5e1b44e2221704bc6198b8cfdd25e92e155fdb523d2f"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/@types/d3-timer"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "d3-array",
+      "version": "3.2.4",
+      "bom-ref": "bizcode@0.1.0|d3-array@3.2.4",
+      "licenses": [
+        {
+          "license": {
+            "id": "ISC",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/d3-array@3.2.4",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/d3-array/-/d3-array-3.2.4.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "b5d4009b2035f22e09ef0a6ba58abc0a5731672dd20b7d5031e072c8217246dec1547751110679969ce87b998511865459efa8abc1c1be4f498e989bc8457826"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/d3-array"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "d3-ease",
+      "version": "3.0.1",
+      "bom-ref": "bizcode@0.1.0|d3-ease@3.0.1",
+      "licenses": [
+        {
+          "license": {
+            "id": "BSD-3-Clause",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/d3-ease@3.0.1",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/d3-ease/-/d3-ease-3.0.1.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "c11fd72b70f75dc2c8670a5bbd0c10e5f2bef1891db358a9ec0d93c5ed32c6771749dab52fdb24706edb95c79d90e5fe65c83118098b5f516b4466c00f0ce2d3"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/d3-ease"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "d3-interpolate",
+      "version": "3.0.1",
+      "bom-ref": "bizcode@0.1.0|d3-interpolate@3.0.1",
+      "licenses": [
+        {
+          "license": {
+            "id": "ISC",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/d3-interpolate@3.0.1",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/d3-interpolate/-/d3-interpolate-3.0.1.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "ddb62cd6b383df7ba8f1aa897ca3f72563c089b830f199b6f8bf6f04a107276460faf89347ba39326bf999972278df854586803965f94890135fa9353d6cfbda"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/d3-interpolate"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "d3-scale",
+      "version": "4.0.2",
+      "bom-ref": "bizcode@0.1.0|d3-scale@4.0.2",
+      "licenses": [
+        {
+          "license": {
+            "id": "ISC",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/d3-scale@4.0.2",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/d3-scale/-/d3-scale-4.0.2.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "1995b8eb8835487eda83763b8578dff11a14b80148aa494e02adcc465e0e69669b4c5258f4f37f1356249615cb87e390ddf33dc92da73a40a84be58b67a92fc5"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/d3-scale"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "d3-shape",
+      "version": "3.2.0",
+      "bom-ref": "bizcode@0.1.0|d3-shape@3.2.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "ISC",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/d3-shape@3.2.0",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/d3-shape/-/d3-shape-3.2.0.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "49a2c1bb01a6dcc395891ab600193778ba31c1910ba47eb3865dc56c0a09ed59b58287cac7a125d486f9cf6dcd504845f40b0697bcbe7732dee42c36000ac64c"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/d3-shape"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "d3-time",
+      "version": "3.1.0",
+      "bom-ref": "bizcode@0.1.0|d3-time@3.1.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "ISC",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/d3-time@3.1.0",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/d3-time/-/d3-time-3.1.0.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "56a2a3cc12de8db48c4f82206e65600e3a6462b3565182676c21a8f3be2eecc30a216b082d15fe3a95ff81393c32a8e94f503f73a1d8d9d080efb64dd25910d9"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/d3-time"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "d3-timer",
+      "version": "3.0.1",
+      "bom-ref": "bizcode@0.1.0|d3-timer@3.0.1",
+      "licenses": [
+        {
+          "license": {
+            "id": "ISC",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/d3-timer@3.0.1",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/d3-timer/-/d3-timer-3.0.1.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "9dd7c9fc9c7131dde7c37d6ec8aa18da76a2bc5fabdbd57e2dcd2cbd9c5ed49bef2119a2f2152caccbdd3b0812d68eae0479a2cfdd60790d3294f3f46a3d5550"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/d3-timer"
+        }
+      ]
+    },
+    {
+      "type": "library",
       "name": "scarf",
       "group": "@scarf",
       "version": "1.4.0",
@@ -5886,6 +6954,246 @@
     },
     {
       "type": "library",
+      "name": "d3-color",
+      "group": "@types",
+      "version": "3.1.3",
+      "bom-ref": "bizcode@0.1.0|@types/d3-color@3.1.3",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/%40types/d3-color@3.1.3",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/@types/d3-color/-/d3-color-3.1.3.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "88ef74b1cb61f5601b9a0bfba20a2ae7b3bd6292a61416e6a04a021c3076c4c058d3efca56ba806820f2084d7a754b2978ebc8c4515123ed2c12da83ab2d9be0"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/@types/d3-color"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "d3-path",
+      "group": "@types",
+      "version": "3.1.1",
+      "bom-ref": "bizcode@0.1.0|@types/d3-path@3.1.1",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/%40types/d3-path@3.1.1",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/@types/d3-path/-/d3-path-3.1.1.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "54c64163242f6c6996c9655e6b4107b3f0702e0c5cf8c2a2d732c308e364b28cc8e1824c713b7c644b8847849bd4c31313c30c5b8f6fd08c08e7e6fb4667d696"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/@types/d3-path"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "internmap",
+      "version": "2.0.3",
+      "bom-ref": "bizcode@0.1.0|internmap@2.0.3",
+      "licenses": [
+        {
+          "license": {
+            "id": "ISC",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/internmap@2.0.3",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/internmap/-/internmap-2.0.3.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "e4787b635c106ef639a281a03db0da2f98982c03f331352b8ccba5b241cb1fac27bff03ed6ae6b8046a2baa12307ea3119721566cd4517e47f28f37765241862"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/internmap"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "d3-color",
+      "version": "3.1.0",
+      "bom-ref": "bizcode@0.1.0|d3-color@3.1.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "ISC",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/d3-color@3.1.0",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/d3-color/-/d3-color-3.1.0.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "ce0fdc85b5f2781b4c4352db0ff592a16d83a42dc8d26a663dd5beca74538ffc760c0598ac863ba9e6481e2768cf0576e26e226afaf5e653702302f14663b184"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/d3-color"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "d3-format",
+      "version": "3.1.2",
+      "bom-ref": "bizcode@0.1.0|d3-format@3.1.2",
+      "licenses": [
+        {
+          "license": {
+            "id": "ISC",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/d3-format@3.1.2",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/d3-format/-/d3-format-3.1.2.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "0090dd60e767c910d5e5be80ae297308f3f07357a3907728c856abaa53ea4fbcd162385abdc4f7b92aea70cbec821d828283db2b7442c321da572c5870fd80ae"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/d3-format"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "d3-time-format",
+      "version": "4.1.0",
+      "bom-ref": "bizcode@0.1.0|d3-time-format@4.1.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "ISC",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/d3-time-format@4.1.0",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/d3-time-format/-/d3-time-format-4.1.0.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "749c4f065cc2ecdba00763c32f0a3d43c2624d1dccddee3f5c0364ade29253117cbef5caaa6d587eae10e5d97c6ee765ba745595451a0d4805b7b780f03e8d2e"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/d3-time-format"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "d3-path",
+      "version": "3.1.0",
+      "bom-ref": "bizcode@0.1.0|d3-path@3.1.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "ISC",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/d3-path@3.1.0",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/d3-path/-/d3-path-3.1.0.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "a7728fe4709ffdbbe305248ab9789de99aa28f1ef021f356f89fe668fb3e8b0477e5ab792426cb513d0bcc5d5c9e36c21d686acd04c83762697bca5179b20415"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/d3-path"
+        }
+      ]
+    },
+    {
+      "type": "library",
       "name": "jwa",
       "version": "2.0.1",
       "bom-ref": "bizcode@0.1.0|jwa@2.0.1",
@@ -6351,6 +7659,7 @@
         "bizcode@0.1.0|react-i18next@17.0.2",
         "bizcode@0.1.0|react-router-dom@6.30.3",
         "bizcode@0.1.0|react@18.3.1",
+        "bizcode@0.1.0|recharts@3.8.1",
         "bizcode@0.1.0|swagger-ui-express@5.0.1",
         "bizcode@0.1.0|twilio@5.13.1",
         "bizcode@0.1.0|yaml@2.8.3",
@@ -6545,6 +7854,25 @@
       ]
     },
     {
+      "ref": "bizcode@0.1.0|recharts@3.8.1",
+      "dependsOn": [
+        "bizcode@0.1.0|@reduxjs/toolkit@2.12.0",
+        "bizcode@0.1.0|clsx@2.1.1",
+        "bizcode@0.1.0|decimal.js-light@2.5.1",
+        "bizcode@0.1.0|es-toolkit@1.46.1",
+        "bizcode@0.1.0|eventemitter3@5.0.4",
+        "bizcode@0.1.0|immer@10.2.0",
+        "bizcode@0.1.0|react-dom@18.3.1",
+        "bizcode@0.1.0|react-is@18.3.1",
+        "bizcode@0.1.0|react-redux@9.3.0",
+        "bizcode@0.1.0|react@18.3.1",
+        "bizcode@0.1.0|reselect@5.1.1",
+        "bizcode@0.1.0|tiny-invariant@1.3.3",
+        "bizcode@0.1.0|use-sync-external-store@1.6.0",
+        "bizcode@0.1.0|victory-vendor@37.3.6"
+      ]
+    },
+    {
       "ref": "bizcode@0.1.0|swagger-ui-express@5.0.1",
       "dependsOn": [
         "bizcode@0.1.0|express@5.2.1",
@@ -6586,6 +7914,7 @@
       "ref": "bizcode@0.1.0|zustand@4.5.7",
       "dependsOn": [
         "bizcode@0.1.0|@types/react@18.3.28",
+        "bizcode@0.1.0|immer@10.2.0",
         "bizcode@0.1.0|react@18.3.1",
         "bizcode@0.1.0|use-sync-external-store@1.6.0"
       ]
@@ -6939,6 +8268,75 @@
       ]
     },
     {
+      "ref": "bizcode@0.1.0|@reduxjs/toolkit@2.12.0",
+      "dependsOn": [
+        "bizcode@0.1.0|@standard-schema/spec@1.1.0",
+        "bizcode@0.1.0|@standard-schema/utils@0.3.0",
+        "bizcode@0.1.0|@reduxjs/toolkit@2.12.0|immer@11.1.8",
+        "bizcode@0.1.0|react-redux@9.3.0",
+        "bizcode@0.1.0|react@18.3.1",
+        "bizcode@0.1.0|redux-thunk@3.1.0",
+        "bizcode@0.1.0|redux@5.0.1",
+        "bizcode@0.1.0|reselect@5.1.1"
+      ]
+    },
+    {
+      "ref": "bizcode@0.1.0|@reduxjs/toolkit@2.12.0|immer@11.1.8"
+    },
+    {
+      "ref": "bizcode@0.1.0|clsx@2.1.1"
+    },
+    {
+      "ref": "bizcode@0.1.0|decimal.js-light@2.5.1"
+    },
+    {
+      "ref": "bizcode@0.1.0|es-toolkit@1.46.1"
+    },
+    {
+      "ref": "bizcode@0.1.0|eventemitter3@5.0.4"
+    },
+    {
+      "ref": "bizcode@0.1.0|immer@10.2.0"
+    },
+    {
+      "ref": "bizcode@0.1.0|react-is@18.3.1"
+    },
+    {
+      "ref": "bizcode@0.1.0|react-redux@9.3.0",
+      "dependsOn": [
+        "bizcode@0.1.0|@types/react@18.3.28",
+        "bizcode@0.1.0|@types/use-sync-external-store@0.0.6",
+        "bizcode@0.1.0|react@18.3.1",
+        "bizcode@0.1.0|redux@5.0.1",
+        "bizcode@0.1.0|use-sync-external-store@1.6.0"
+      ]
+    },
+    {
+      "ref": "bizcode@0.1.0|reselect@5.1.1"
+    },
+    {
+      "ref": "bizcode@0.1.0|tiny-invariant@1.3.3"
+    },
+    {
+      "ref": "bizcode@0.1.0|victory-vendor@37.3.6",
+      "dependsOn": [
+        "bizcode@0.1.0|@types/d3-array@3.2.2",
+        "bizcode@0.1.0|@types/d3-ease@3.0.2",
+        "bizcode@0.1.0|@types/d3-interpolate@3.0.4",
+        "bizcode@0.1.0|@types/d3-scale@4.0.9",
+        "bizcode@0.1.0|@types/d3-shape@3.1.8",
+        "bizcode@0.1.0|@types/d3-time@3.0.4",
+        "bizcode@0.1.0|@types/d3-timer@3.0.2",
+        "bizcode@0.1.0|d3-array@3.2.4",
+        "bizcode@0.1.0|d3-ease@3.0.1",
+        "bizcode@0.1.0|d3-interpolate@3.0.1",
+        "bizcode@0.1.0|d3-scale@4.0.2",
+        "bizcode@0.1.0|d3-shape@3.2.0",
+        "bizcode@0.1.0|d3-time@3.1.0",
+        "bizcode@0.1.0|d3-timer@3.0.1"
+      ]
+    },
+    {
       "ref": "bizcode@0.1.0|swagger-ui-dist@5.32.1",
       "dependsOn": [
         "bizcode@0.1.0|@scarf/scarf@1.4.0"
@@ -7132,6 +8530,91 @@
       "ref": "bizcode@0.1.0|void-elements@3.1.0"
     },
     {
+      "ref": "bizcode@0.1.0|@standard-schema/spec@1.1.0"
+    },
+    {
+      "ref": "bizcode@0.1.0|redux-thunk@3.1.0",
+      "dependsOn": [
+        "bizcode@0.1.0|redux@5.0.1"
+      ]
+    },
+    {
+      "ref": "bizcode@0.1.0|redux@5.0.1"
+    },
+    {
+      "ref": "bizcode@0.1.0|@types/use-sync-external-store@0.0.6"
+    },
+    {
+      "ref": "bizcode@0.1.0|@types/d3-array@3.2.2"
+    },
+    {
+      "ref": "bizcode@0.1.0|@types/d3-ease@3.0.2"
+    },
+    {
+      "ref": "bizcode@0.1.0|@types/d3-interpolate@3.0.4",
+      "dependsOn": [
+        "bizcode@0.1.0|@types/d3-color@3.1.3"
+      ]
+    },
+    {
+      "ref": "bizcode@0.1.0|@types/d3-scale@4.0.9",
+      "dependsOn": [
+        "bizcode@0.1.0|@types/d3-time@3.0.4"
+      ]
+    },
+    {
+      "ref": "bizcode@0.1.0|@types/d3-shape@3.1.8",
+      "dependsOn": [
+        "bizcode@0.1.0|@types/d3-path@3.1.1"
+      ]
+    },
+    {
+      "ref": "bizcode@0.1.0|@types/d3-time@3.0.4"
+    },
+    {
+      "ref": "bizcode@0.1.0|@types/d3-timer@3.0.2"
+    },
+    {
+      "ref": "bizcode@0.1.0|d3-array@3.2.4",
+      "dependsOn": [
+        "bizcode@0.1.0|internmap@2.0.3"
+      ]
+    },
+    {
+      "ref": "bizcode@0.1.0|d3-ease@3.0.1"
+    },
+    {
+      "ref": "bizcode@0.1.0|d3-interpolate@3.0.1",
+      "dependsOn": [
+        "bizcode@0.1.0|d3-color@3.1.0"
+      ]
+    },
+    {
+      "ref": "bizcode@0.1.0|d3-scale@4.0.2",
+      "dependsOn": [
+        "bizcode@0.1.0|d3-array@3.2.4",
+        "bizcode@0.1.0|d3-format@3.1.2",
+        "bizcode@0.1.0|d3-interpolate@3.0.1",
+        "bizcode@0.1.0|d3-time-format@4.1.0",
+        "bizcode@0.1.0|d3-time@3.1.0"
+      ]
+    },
+    {
+      "ref": "bizcode@0.1.0|d3-shape@3.2.0",
+      "dependsOn": [
+        "bizcode@0.1.0|d3-path@3.1.0"
+      ]
+    },
+    {
+      "ref": "bizcode@0.1.0|d3-time@3.1.0",
+      "dependsOn": [
+        "bizcode@0.1.0|d3-array@3.2.4"
+      ]
+    },
+    {
+      "ref": "bizcode@0.1.0|d3-timer@3.0.1"
+    },
+    {
       "ref": "bizcode@0.1.0|@scarf/scarf@1.4.0"
     },
     {
@@ -7253,6 +8736,30 @@
     },
     {
       "ref": "bizcode@0.1.0|pako@1.0.11"
+    },
+    {
+      "ref": "bizcode@0.1.0|@types/d3-color@3.1.3"
+    },
+    {
+      "ref": "bizcode@0.1.0|@types/d3-path@3.1.1"
+    },
+    {
+      "ref": "bizcode@0.1.0|internmap@2.0.3"
+    },
+    {
+      "ref": "bizcode@0.1.0|d3-color@3.1.0"
+    },
+    {
+      "ref": "bizcode@0.1.0|d3-format@3.1.2"
+    },
+    {
+      "ref": "bizcode@0.1.0|d3-time-format@4.1.0",
+      "dependsOn": [
+        "bizcode@0.1.0|d3-time@3.1.0"
+      ]
+    },
+    {
+      "ref": "bizcode@0.1.0|d3-path@3.1.0"
     },
     {
       "ref": "bizcode@0.1.0|jwa@2.0.1",

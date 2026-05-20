@@ -116,6 +116,16 @@
 
 * [DashboardSummaryEnvelope](./dashboardsummaryenvelope.md) – `-`
 
+* [DashboardTopArticuloRow](./dashboardtoparticulorow.md) – `-`
+
+* [DashboardVentasBySellerRow](./dashboardventasbysellerrow.md) – `-`
+
+* [DashboardVentasHistorico](./dashboardventashistorico.md) – `-`
+
+* [DashboardVentasHistoricoEnvelope](./dashboardventashistoricoenvelope.md) – `-`
+
+* [DashboardVentasSeriesRow](./dashboardventasseriesrow.md) – `-`
+
 * [DeliveryZone](./deliveryzone.md) – `-`
 
 * [DeliveryZoneEnvelope](./deliveryzoneenvelope.md) – `-`
@@ -495,6 +505,12 @@
 * [Untitled array in CobroListEnvelope](./cobrolistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
 
 * [Untitled array in CuentaCorriente](./cuentacorriente-properties-lineas.md) – `undefined#/properties/lineas`
+
+* [Untitled array in DashboardVentasHistorico](./dashboardventashistorico-properties-byseller.md) – `undefined#/properties/bySeller`
+
+* [Untitled array in DashboardVentasHistorico](./dashboardventashistorico-properties-series.md) – `undefined#/properties/series`
+
+* [Untitled array in DashboardVentasHistorico](./dashboardventashistorico-properties-toparticles.md) – `undefined#/properties/topArticles`
 
 * [Untitled array in DeliveryZoneListEnvelope](./deliveryzonelistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
 

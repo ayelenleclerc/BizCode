@@ -14,6 +14,7 @@ async function truncateAll(prisma: PrismaClient): Promise<void> {
   // Use Prisma model operations to avoid coupling tests to physical table naming/casing.
   await prisma.$transaction([
     prisma.facturaItem.deleteMany(),
+    prisma.pedido.deleteMany(),
     prisma.factura.deleteMany(),
     prisma.articulo.deleteMany(),
     prisma.cliente.deleteMany(),
