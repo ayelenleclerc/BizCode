@@ -22,6 +22,25 @@ With **`orders.create`**, open the new-order form, enter customer id, date, opti
 
 Users with **`orders.dispatch`** or **`orders.deliver.confirm`** can change order state per UI controls (`PUT /api/ordenes-entrega/:id`).
 
+## Delivery routes (repartos)
+
+Open **Delivery routes** from the logistics page link or navigate to `/logistica/repartos`. The route uses module **`logistics.dispatches`**.
+
+| Permission | Use |
+|------------|-----|
+| `logistics.read` | List and view routes |
+| `orders.dispatch` | Create route, start (`iniciar`), close (`cerrar`) |
+
+**Route status:** `planned` → `on_route` → `completed` (or `cancelled` in data model; no cancel API yet).
+
+| Step | Action |
+|------|--------|
+| Plan | `POST /api/repartos` — select driver, optional vehicle/notes, assign pending delivery orders in sequence (UI supports drag-and-drop and keyboard reorder); OEs become `assigned` with `driverId` |
+| Start | `POST /api/repartos/{id}/iniciar` — `planned` → `on_route`; pending items' OEs → `in_transit` |
+| Close | `POST /api/repartos/{id}/cerrar` — `on_route` → `completed`; items still `pending` → `not_delivered` and linked OEs → `failed` |
+
+A delivery order cannot belong to two active routes (`planned` or `on_route`) at once (`422 ORDEN_ALREADY_IN_ACTIVE_REPARTO`).
+
 ## Purchase orders
 
 Open **Purchasing** (`/compras`) from the sidebar. The route is gated by the tenant module **`logistics.purchases`** and is visible to roles such as **owner**, **manager**, and **warehouse_lead** (see navigation configuration in the product).
@@ -51,6 +70,6 @@ While a count is `in_progress`, stock mutations are blocked (`422 RECUENTO_IN_PR
 
 ## API reference
 
-[`docs/api/openapi.yaml`](../../api/openapi.yaml) — paths `/api/ordenes-entrega`, `/api/compras`, `/api/recuentos`.
+[`docs/api/openapi.yaml`](../../api/openapi.yaml) — paths `/api/ordenes-entrega`, `/api/repartos`, `/api/compras`, `/api/recuentos`.
 
 **Other languages:** [Español](../../es/user/manual-logistica.md) · [Português](../../pt-br/user/manual-logistica.md)

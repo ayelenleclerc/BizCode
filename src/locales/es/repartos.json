@@ -1,0 +1,64 @@
+{
+  "title": "Repartos",
+  "subtitle": "Agrupe órdenes de entrega en rutas y asigne un chofer.",
+  "forbidden": "No tiene permiso para ver repartos.",
+  "navLink": "Ir a repartos",
+  "backToOrders": "Órdenes de entrega",
+  "filters": {
+    "fecha": "Fecha",
+    "estado": "Estado",
+    "allEstados": "Todos los estados"
+  },
+  "estado": {
+    "planned": "Planificado",
+    "on_route": "En ruta",
+    "completed": "Completado",
+    "cancelled": "Cancelado"
+  },
+  "itemEstado": {
+    "pending": "Pendiente",
+    "delivered": "Entregado",
+    "not_delivered": "No entregado",
+    "returned": "Devuelto"
+  },
+  "list": {
+    "chofer": "Chofer",
+    "vehiculo": "Vehículo",
+    "progress": "Progreso",
+    "empty": "No hay repartos para esta fecha.",
+    "loading": "Cargando repartos…"
+  },
+  "actions": {
+    "refresh": "Actualizar",
+    "newRoute": "Nuevo reparto",
+    "create": "Crear reparto",
+    "cancel": "Cancelar",
+    "start": "Iniciar ruta",
+    "close": "Cerrar ruta",
+    "moveUp": "Subir",
+    "moveDown": "Bajar",
+    "addOrder": "Agregar",
+    "removeOrder": "Quitar"
+  },
+  "form": {
+    "chofer": "Chofer",
+    "vehiculo": "Vehículo (opcional)",
+    "observaciones": "Observaciones (opcional)",
+    "routeSequence": "Secuencia de la ruta",
+    "availableOrders": "Órdenes disponibles",
+    "selectChofer": "Seleccione un chofer",
+    "noDrivers": "No hay choferes activos."
+  },
+  "tracking": {
+    "title": "Detalle del reparto",
+    "summaryClose": "Cierre: {{pending}} pendientes marcados no entregados."
+  },
+  "errors": {
+    "load": "No se pudieron cargar los repartos.",
+    "create": "No se pudo crear el reparto.",
+    "start": "No se pudo iniciar la ruta.",
+    "close": "No se pudo cerrar la ruta.",
+    "alreadyInRoute": "Una orden ya está en un reparto activo.",
+    "invalidState": "Estado del reparto no válido para esta acción."
+  }
+}

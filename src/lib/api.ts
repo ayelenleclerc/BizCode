@@ -1805,6 +1805,109 @@ export type OrdenEntregaListParams = {
   offset?: number
 }
 
+export type RepartoEstado = 'planned' | 'on_route' | 'completed' | 'cancelled'
+
+export type RepartoItemEstado = 'pending' | 'delivered' | 'not_delivered' | 'returned'
+
+export type RepartoItemRow = {
+  id: number
+  ordenEntregaId: number
+  secuencia: number
+  estado: RepartoItemEstado
+  entregadoAt: string | null
+  motivoNoEntrega: string | null
+  ordenEntrega: OrdenEntrega
+}
+
+export type Reparto = {
+  id: number
+  tenantId: number
+  fecha: string
+  choferId: number
+  estado: RepartoEstado
+  vehiculo: string | null
+  observaciones: string | null
+  closedAt: string | null
+  chofer: { id: number; username: string; role: string }
+  items: RepartoItemRow[]
+  progress: { total: number; delivered: number; pending: number }
+}
+
+export type RepartoCloseSummary = {
+  pendingClosed: number
+  delivered: number
+  notDelivered: number
+  returned: number
+}
+
+export const repartosAPI = {
+  list: async (params?: {
+    fecha?: string
+    choferId?: number
+    estado?: RepartoEstado
+    limit?: number
+    offset?: number
+  }) => {
+    try {
+      const response = await api.get('/repartos', { params })
+      return response.data as {
+        success: true
+        data: Reparto[]
+        total: number
+        limit: number
+        offset: number
+      }
+    } catch (error) {
+      handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  get: async (id: number) => {
+    try {
+      const response = await api.get(`/repartos/${id}`)
+      return response.data.data as Reparto
+    } catch (error) {
+      handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  create: async (body: {
+    fecha: string
+    choferId: number
+    vehiculo?: string | null
+    observaciones?: string | null
+    ordenEntregaIds: number[]
+  }) => {
+    try {
+      const response = await api.post('/repartos', body)
+      return response.data.data as Reparto
+    } catch (error) {
+      handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  iniciar: async (id: number) => {
+    try {
+      const response = await api.post(`/repartos/${id}/iniciar`)
+      return response.data.data as Reparto
+    } catch (error) {
+      handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  cerrar: async (id: number) => {
+    try {
+      const response = await api.post(`/repartos/${id}/cerrar`)
+      return {
+        reparto: response.data.data as Reparto,
+        summary: response.data.summary as RepartoCloseSummary,
+      }
+    } catch (error) {
+      handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+}
+
 export const ordenesEntregaAPI = {
   list: async (params?: OrdenEntregaListParams) => {
     try {

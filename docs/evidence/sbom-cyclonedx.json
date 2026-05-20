@@ -3,9 +3,9 @@
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
   "version": 1,
-  "serialNumber": "urn:uuid:f0de94b5-0ed0-4415-95b5-5b1f4325f9d8",
+  "serialNumber": "urn:uuid:6d09cecd-540a-4ebe-b6ac-9f0a13aec343",
   "metadata": {
-    "timestamp": "2026-05-20T11:58:48.745Z",
+    "timestamp": "2026-05-20T12:37:06.354Z",
     "tools": {
       "components": [
         {
@@ -124,6 +124,111 @@
     }
   },
   "components": [
+    {
+      "type": "library",
+      "name": "core",
+      "group": "@dnd-kit",
+      "version": "6.3.1",
+      "bom-ref": "bizcode@0.1.0|@dnd-kit/core@6.3.1",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/%40dnd-kit/core@6.3.1",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/@dnd-kit/core/-/core-6.3.1.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "c6418145041a6f844bc205f1a2a113202afa4b9265a2069f6e136c89d9ab915bf6611b3930bc298e8176aa98868d0b7c4bd028c6d215eb4decd06214a58e5e61"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/@dnd-kit/core"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "sortable",
+      "group": "@dnd-kit",
+      "version": "10.0.0",
+      "bom-ref": "bizcode@0.1.0|@dnd-kit/sortable@10.0.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/%40dnd-kit/sortable@10.0.0",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/@dnd-kit/sortable/-/sortable-10.0.0.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "fb1aa1988233bc060c19f0586276cab8d89c7d2b24e1192c6365dd989853f87002d359e2c7a7c70b3b54ebc8e8a0588c501d352b2dc5d05c8ebe11bf059ad692"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/@dnd-kit/sortable"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "utilities",
+      "group": "@dnd-kit",
+      "version": "3.2.2",
+      "bom-ref": "bizcode@0.1.0|@dnd-kit/utilities@3.2.2",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/%40dnd-kit/utilities@3.2.2",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/@dnd-kit/utilities/-/utilities-3.2.2.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "f8c28024439f6817b94a657ab77e29f3430c2a18ef533d2f46bbd525b3d3d16125cda389ff5c6cf83f8a0effad0ff344e6e8dfac284472c85de1f2e7d30a62aa"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/@dnd-kit/utilities"
+        }
+      ]
+    },
     {
       "type": "library",
       "name": "resolvers",
@@ -1213,6 +1318,75 @@
         {
           "name": "cdx:npm:package:path",
           "value": "node_modules/zustand"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "accessibility",
+      "group": "@dnd-kit",
+      "version": "3.1.1",
+      "bom-ref": "bizcode@0.1.0|@dnd-kit/accessibility@3.1.1",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/%40dnd-kit/accessibility@3.1.1",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/@dnd-kit/accessibility/-/accessibility-3.1.1.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "d8ff9881a5c5fa046c222870c18d600ac412627bbd6728f6a72f246397c5bd4335aa6d96036bbadfd47a60d55f538196afe64ce66a84b1f1d964ba1138d6de9b"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/@dnd-kit/accessibility"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "tslib",
+      "version": "2.8.1",
+      "bom-ref": "bizcode@0.1.0|tslib@2.8.1",
+      "licenses": [
+        {
+          "license": {
+            "id": "0BSD",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/tslib@2.8.1",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/tslib/-/tslib-2.8.1.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "a0916ef781d06fe29576e49440bef09e99aa9df98bb0e03f9c087a6fa107d30084a0ad3f98f79753a737c0a0d5f373243ae1cf447b525ca294f7d2016b34bfdb"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/tslib"
         }
       ]
     },
@@ -6854,40 +7028,6 @@
     },
     {
       "type": "library",
-      "name": "tslib",
-      "version": "2.8.1",
-      "bom-ref": "bizcode@0.1.0|tslib@2.8.1",
-      "licenses": [
-        {
-          "license": {
-            "id": "0BSD",
-            "acknowledgement": "declared"
-          }
-        }
-      ],
-      "purl": "pkg:npm/tslib@2.8.1",
-      "externalReferences": [
-        {
-          "url": "https://registry.npmjs.org/tslib/-/tslib-2.8.1.tgz",
-          "type": "distribution",
-          "hashes": [
-            {
-              "alg": "SHA-512",
-              "content": "a0916ef781d06fe29576e49440bef09e99aa9df98bb0e03f9c087a6fa107d30084a0ad3f98f79753a737c0a0d5f373243ae1cf447b525ca294f7d2016b34bfdb"
-            }
-          ],
-          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
-        }
-      ],
-      "properties": [
-        {
-          "name": "cdx:npm:package:path",
-          "value": "node_modules/tslib"
-        }
-      ]
-    },
-    {
-      "type": "library",
       "name": "base64-js",
       "version": "1.5.1",
       "bom-ref": "bizcode@0.1.0|base64-js@1.5.1",
@@ -7639,6 +7779,9 @@
     {
       "ref": "bizcode@0.1.0",
       "dependsOn": [
+        "bizcode@0.1.0|@dnd-kit/core@6.3.1",
+        "bizcode@0.1.0|@dnd-kit/sortable@10.0.0",
+        "bizcode@0.1.0|@dnd-kit/utilities@3.2.2",
         "bizcode@0.1.0|@hookform/resolvers@5.2.2",
         "bizcode@0.1.0|@tauri-apps/api@1.5.6",
         "bizcode@0.1.0|axios@1.14.0",
@@ -7665,6 +7808,32 @@
         "bizcode@0.1.0|yaml@2.8.3",
         "bizcode@0.1.0|zod@3.25.76",
         "bizcode@0.1.0|zustand@4.5.7"
+      ]
+    },
+    {
+      "ref": "bizcode@0.1.0|@dnd-kit/core@6.3.1",
+      "dependsOn": [
+        "bizcode@0.1.0|@dnd-kit/accessibility@3.1.1",
+        "bizcode@0.1.0|@dnd-kit/utilities@3.2.2",
+        "bizcode@0.1.0|react-dom@18.3.1",
+        "bizcode@0.1.0|react@18.3.1",
+        "bizcode@0.1.0|tslib@2.8.1"
+      ]
+    },
+    {
+      "ref": "bizcode@0.1.0|@dnd-kit/sortable@10.0.0",
+      "dependsOn": [
+        "bizcode@0.1.0|@dnd-kit/core@6.3.1",
+        "bizcode@0.1.0|@dnd-kit/utilities@3.2.2",
+        "bizcode@0.1.0|react@18.3.1",
+        "bizcode@0.1.0|tslib@2.8.1"
+      ]
+    },
+    {
+      "ref": "bizcode@0.1.0|@dnd-kit/utilities@3.2.2",
+      "dependsOn": [
+        "bizcode@0.1.0|react@18.3.1",
+        "bizcode@0.1.0|tslib@2.8.1"
       ]
     },
     {
@@ -7918,6 +8087,16 @@
         "bizcode@0.1.0|react@18.3.1",
         "bizcode@0.1.0|use-sync-external-store@1.6.0"
       ]
+    },
+    {
+      "ref": "bizcode@0.1.0|@dnd-kit/accessibility@3.1.1",
+      "dependsOn": [
+        "bizcode@0.1.0|react@18.3.1",
+        "bizcode@0.1.0|tslib@2.8.1"
+      ]
+    },
+    {
+      "ref": "bizcode@0.1.0|tslib@2.8.1"
     },
     {
       "ref": "bizcode@0.1.0|@standard-schema/utils@0.3.0"
@@ -8727,9 +8906,6 @@
     },
     {
       "ref": "bizcode@0.1.0|util-deprecate@1.0.2"
-    },
-    {
-      "ref": "bizcode@0.1.0|tslib@2.8.1"
     },
     {
       "ref": "bizcode@0.1.0|base64-js@1.5.1"

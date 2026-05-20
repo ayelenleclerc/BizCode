@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "chofer": {
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "role": {
+          "type": "string"
+        },
+        "username": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "choferId": {
+      "type": "integer"
+    },
+    "closedAt": {
+      "format": "date-time",
+      "nullable": true,
+      "type": "string"
+    },
+    "estado": {
+      "enum": [
+        "planned",
+        "on_route",
+        "completed",
+        "cancelled"
+      ],
+      "type": "string"
+    },
+    "fecha": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "id": {
+      "type": "integer"
+    },
+    "items": {
+      "items": {
+        "$ref": "./RepartoItemLine.schema.json"
+      },
+      "type": "array"
+    },
+    "observaciones": {
+      "nullable": true,
+      "type": "string"
+    },
+    "progress": {
+      "$ref": "./RepartoProgress.schema.json"
+    },
+    "tenantId": {
+      "type": "integer"
+    },
+    "vehiculo": {
+      "nullable": true,
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "tenantId",
+    "fecha",
+    "choferId",
+    "estado",
+    "items",
+    "progress"
+  ],
+  "title": "Reparto",
+  "type": "object"
+}

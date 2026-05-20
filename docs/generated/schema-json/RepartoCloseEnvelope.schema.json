@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "data": {
+      "$ref": "./Reparto.schema.json"
+    },
+    "success": {
+      "const": true,
+      "type": "boolean"
+    },
+    "summary": {
+      "$ref": "./RepartoCloseSummary.schema.json"
+    }
+  },
+  "required": [
+    "success",
+    "data",
+    "summary"
+  ],
+  "title": "RepartoCloseEnvelope",
+  "type": "object"
+}

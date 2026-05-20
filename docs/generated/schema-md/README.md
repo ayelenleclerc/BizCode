@@ -254,6 +254,22 @@
 
 * [RecuentoListEnvelope](./recuentolistenvelope.md) – `-`
 
+* [Reparto](./reparto.md) – `-`
+
+* [RepartoCloseEnvelope](./repartocloseenvelope.md) – `-`
+
+* [RepartoCloseSummary](./repartoclosesummary.md) – `-`
+
+* [RepartoCreateInput](./repartocreateinput.md) – `-`
+
+* [RepartoEnvelope](./repartoenvelope.md) – `-`
+
+* [RepartoItemLine](./repartoitemline.md) – `-`
+
+* [RepartoListEnvelope](./repartolistenvelope.md) – `-`
+
+* [RepartoProgress](./repartoprogress.md) – `-`
+
 * [ReporteCobranzasListEnvelope](./reportecobranzaslistenvelope.md) – `-`
 
 * [ReporteCobranzasRow](./reportecobranzasrow.md) – `-`
@@ -438,6 +454,10 @@
 
 * [Untitled object in RecuentoListEnvelope](./recuentolistenvelope-allof-1.md) – `undefined#/allOf/1`
 
+* [Untitled object in Reparto](./reparto-properties-chofer.md) – `undefined#/properties/chofer`
+
+* [Untitled object in RepartoListEnvelope](./repartolistenvelope-allof-1.md) – `undefined#/allOf/1`
+
 * [Untitled object in RubroListEnvelope](./rubrolistenvelope-allof-0.md) – `undefined#/allOf/0`
 
 * [Untitled object in StockAdjustData](./stockadjustdata-properties-articulo.md) – `undefined#/properties/articulo`
@@ -559,6 +579,12 @@
 * [Untitled array in RecuentoItemsInput](./recuentoitemsinput-properties-lines.md) – `undefined#/properties/lines`
 
 * [Untitled array in RecuentoListEnvelope](./recuentolistenvelope-allof-1-properties-data.md) – `undefined#/allOf/1/properties/data`
+
+* [Untitled array in Reparto](./reparto-properties-items.md) – `undefined#/properties/items`
+
+* [Untitled array in RepartoCreateInput](./repartocreateinput-properties-ordenentregaids.md) – `undefined#/properties/ordenEntregaIds`
+
+* [Untitled array in RepartoListEnvelope](./repartolistenvelope-allof-1-properties-data.md) – `undefined#/allOf/1/properties/data`
 
 * [Untitled array in ReporteCobranzasListEnvelope](./reportecobranzaslistenvelope-properties-data.md) – `undefined#/properties/data`
 

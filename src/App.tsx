@@ -12,6 +12,7 @@ import LoginPage from './pages/login'
 import UsersPage from './pages/users'
 import InicioPage from './pages/inicio'
 import LogisticaPage from './pages/logistica'
+import RepartosPage from './pages/logistica/repartos'
 import FinanzasPage from './pages/finanzas'
 import CobrosPage from './pages/cobros'
 import PedidosPage from './pages/pedidos'
@@ -144,6 +145,14 @@ function AppRoutes() {
             element={
               <ModuleRoute moduleKey="logistics.dispatches">
                 <LogisticaPage />
+              </ModuleRoute>
+            }
+          />
+          <Route
+            path="logistica/repartos"
+            element={
+              <ModuleRoute moduleKey="logistics.dispatches">
+                <RepartosPage />
               </ModuleRoute>
             }
           />

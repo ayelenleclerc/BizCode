@@ -42,6 +42,10 @@ Definidos no código: `counter`, `field`, `backoffice`, `warehouse`, `delivery`.
 
 A aba **Início → Análise** chama `GET /api/dashboard/ventas-historico` e exige **`reports.operational.read`** e o módulo do tenant **`analytics.advanced`** (depende de `analytics.dashboard`). Nenhuma permissão literal nova foi adicionada.
 
+## Repartos (#140)
+
+A UI `/logistica/repartos` depende do módulo **`logistics.dispatches`**. API: listagem/detalhe `GET /api/repartos` e `GET /api/repartos/{id}` exigem **`logistics.read`**; criar, iniciar e fechar exigem **`orders.dispatch`**. Papéis típicos: `owner`, `manager`, `logistics_planner`, `warehouse_lead` (ver `ROLE_PERMISSIONS` no código para `logistics.read` do planejador).
+
 ## Documentos relacionados
 
 - Índice de execução do plano mestre: [execucao-plano-mestre-bizcode.md](execucao-plano-mestre-bizcode.md)

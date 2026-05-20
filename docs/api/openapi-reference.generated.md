@@ -20611,6 +20611,1831 @@ Requires `orders.dispatch` for transitions to `assigned`, `in_transit`, or `fail
 }
 ```
 
+### PARAMETERS /api/repartos
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/repartos`
+
+### List delivery routes
+
+- **Method:** `GET`
+- **Path:** `/api/repartos`
+- **Tags:** repartos
+
+Requires `logistics.read`. Filter by `fecha`, `choferId`, `estado`.
+
+#### Responses
+
+##### Status: 200 Paginated delivery routes
+
+###### Content-Type: application/json
+
+**All of:**
+
+- **`limit` (required)**
+
+  `integer` — Effective page size (same semantics as query \`limit\`)
+
+- **`offset` (required)**
+
+  `integer` — Effective skip (same semantics as query \`offset\`)
+
+- **`total` (required)**
+
+  `integer` — Row count matching the list filter (before limit/offset)
+
+* **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`choferId` (required)**
+
+    `integer`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"planned", "on_route", "completed", "cancelled"`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`items` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`estado` (required)**
+
+      `string`, possible values: `"pending", "delivered", "not_delivered", "returned"`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`ordenEntrega` (required)**
+
+      `object`
+
+      - **`cliente`**
+
+        `object`
+
+      - **`clienteId`**
+
+        `integer`
+
+      - **`driver`**
+
+        `object`
+
+      - **`driverId`**
+
+        `integer`
+
+      - **`estado`**
+
+        `string`, possible values: `"pending", "assigned", "in_transit", "delivered", "failed"`
+
+      - **`factura`**
+
+        `object`
+
+      - **`facturaId`**
+
+        `integer`
+
+      - **`fecha`**
+
+        `string`, format: `date-time`
+
+      - **`id`**
+
+        `integer`
+
+      - **`nota`**
+
+        `string`
+
+      - **`tenantId`**
+
+        `integer`
+
+      - **`zona`**
+
+        `object`
+
+      - **`zonaId`**
+
+        `integer`
+
+    - **`ordenEntregaId` (required)**
+
+      `integer`
+
+    - **`secuencia` (required)**
+
+      `integer`
+
+    - **`entregadoAt`**
+
+      `string`, format: `date-time`
+
+    - **`motivoNoEntrega`**
+
+      `string`
+
+  - **`progress` (required)**
+
+    `object`
+
+    - **`delivered` (required)**
+
+      `integer`
+
+    - **`pending` (required)**
+
+      `integer`
+
+    - **`total` (required)**
+
+      `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`chofer`**
+
+    `object`
+
+    - **`id`**
+
+      `integer`
+
+    - **`role`**
+
+      `string`
+
+    - **`username`**
+
+      `string`
+
+  - **`closedAt`**
+
+    `string`, format: `date-time`
+
+  - **`observaciones`**
+
+    `string`
+
+  - **`vehiculo`**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "total": 0,
+  "limit": 1,
+  "offset": 0,
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "fecha": "",
+      "choferId": 1,
+      "estado": "planned",
+      "vehiculo": "",
+      "observaciones": "",
+      "closedAt": "",
+      "chofer": {
+        "id": 1,
+        "username": "",
+        "role": ""
+      },
+      "items": [
+        {
+          "id": 1,
+          "ordenEntregaId": 1,
+          "secuencia": 1,
+          "estado": "pending",
+          "entregadoAt": "",
+          "motivoNoEntrega": "",
+          "ordenEntrega": {
+            "id": 1,
+            "tenantId": 1,
+            "facturaId": 1,
+            "clienteId": 1,
+            "zonaId": 1,
+            "driverId": 1,
+            "fecha": "",
+            "estado": "pending",
+            "nota": "",
+            "cliente": {
+              "additionalProperty": "anything"
+            },
+            "zona": {
+              "additionalProperty": "anything"
+            },
+            "driver": {
+              "additionalProperty": "anything"
+            },
+            "factura": {
+              "additionalProperty": "anything"
+            },
+            "additionalProperty": "anything"
+          }
+        }
+      ],
+      "progress": {
+        "total": 0,
+        "delivered": 0,
+        "pending": 0
+      }
+    }
+  ]
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Create delivery route
+
+- **Method:** `POST`
+- **Path:** `/api/repartos`
+- **Tags:** repartos
+
+Requires `orders.dispatch`. Groups pending delivery orders; assigns driver and sets OEs to `assigned`. Rejects when an OE is already on an active route (`planned` or `on_route`).
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`choferId` (required)**
+
+  `integer`
+
+- **`fecha` (required)**
+
+  `string`, format: `date`
+
+- **`ordenEntregaIds` (required)**
+
+  `array`
+
+  **Items:**
+
+  `integer`
+
+- **`observaciones`**
+
+  `string`
+
+- **`vehiculo`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "fecha": "",
+  "choferId": 1,
+  "vehiculo": "",
+  "observaciones": "",
+  "ordenEntregaIds": [
+    1
+  ]
+}
+```
+
+#### Responses
+
+##### Status: 201 Route created
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`choferId` (required)**
+
+    `integer`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"planned", "on_route", "completed", "cancelled"`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`items` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`estado` (required)**
+
+      `string`, possible values: `"pending", "delivered", "not_delivered", "returned"`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`ordenEntrega` (required)**
+
+      `object`
+
+      - **`cliente`**
+
+        `object`
+
+      - **`clienteId`**
+
+        `integer`
+
+      - **`driver`**
+
+        `object`
+
+      - **`driverId`**
+
+        `integer`
+
+      - **`estado`**
+
+        `string`, possible values: `"pending", "assigned", "in_transit", "delivered", "failed"`
+
+      - **`factura`**
+
+        `object`
+
+      - **`facturaId`**
+
+        `integer`
+
+      - **`fecha`**
+
+        `string`, format: `date-time`
+
+      - **`id`**
+
+        `integer`
+
+      - **`nota`**
+
+        `string`
+
+      - **`tenantId`**
+
+        `integer`
+
+      - **`zona`**
+
+        `object`
+
+      - **`zonaId`**
+
+        `integer`
+
+    - **`ordenEntregaId` (required)**
+
+      `integer`
+
+    - **`secuencia` (required)**
+
+      `integer`
+
+    - **`entregadoAt`**
+
+      `string`, format: `date-time`
+
+    - **`motivoNoEntrega`**
+
+      `string`
+
+  - **`progress` (required)**
+
+    `object`
+
+    - **`delivered` (required)**
+
+      `integer`
+
+    - **`pending` (required)**
+
+      `integer`
+
+    - **`total` (required)**
+
+      `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`chofer`**
+
+    `object`
+
+    - **`id`**
+
+      `integer`
+
+    - **`role`**
+
+      `string`
+
+    - **`username`**
+
+      `string`
+
+  - **`closedAt`**
+
+    `string`, format: `date-time`
+
+  - **`observaciones`**
+
+    `string`
+
+  - **`vehiculo`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "fecha": "",
+    "choferId": 1,
+    "estado": "planned",
+    "vehiculo": "",
+    "observaciones": "",
+    "closedAt": "",
+    "chofer": {
+      "id": 1,
+      "username": "",
+      "role": ""
+    },
+    "items": [
+      {
+        "id": 1,
+        "ordenEntregaId": 1,
+        "secuencia": 1,
+        "estado": "pending",
+        "entregadoAt": "",
+        "motivoNoEntrega": "",
+        "ordenEntrega": {
+          "id": 1,
+          "tenantId": 1,
+          "facturaId": 1,
+          "clienteId": 1,
+          "zonaId": 1,
+          "driverId": 1,
+          "fecha": "",
+          "estado": "pending",
+          "nota": "",
+          "cliente": {
+            "additionalProperty": "anything"
+          },
+          "zona": {
+            "additionalProperty": "anything"
+          },
+          "driver": {
+            "additionalProperty": "anything"
+          },
+          "factura": {
+            "additionalProperty": "anything"
+          },
+          "additionalProperty": "anything"
+        }
+      }
+    ],
+    "progress": {
+      "total": 0,
+      "delivered": 0,
+      "pending": 0
+    }
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 422 Invalid line item or OE already on active route
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/repartos/{id}
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/repartos/{id}`
+
+### Get delivery route by id
+
+- **Method:** `GET`
+- **Path:** `/api/repartos/{id}`
+- **Tags:** repartos
+
+Requires `logistics.read`.
+
+#### Responses
+
+##### Status: 200 Route detail with ordered items
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`choferId` (required)**
+
+    `integer`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"planned", "on_route", "completed", "cancelled"`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`items` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`estado` (required)**
+
+      `string`, possible values: `"pending", "delivered", "not_delivered", "returned"`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`ordenEntrega` (required)**
+
+      `object`
+
+      - **`cliente`**
+
+        `object`
+
+      - **`clienteId`**
+
+        `integer`
+
+      - **`driver`**
+
+        `object`
+
+      - **`driverId`**
+
+        `integer`
+
+      - **`estado`**
+
+        `string`, possible values: `"pending", "assigned", "in_transit", "delivered", "failed"`
+
+      - **`factura`**
+
+        `object`
+
+      - **`facturaId`**
+
+        `integer`
+
+      - **`fecha`**
+
+        `string`, format: `date-time`
+
+      - **`id`**
+
+        `integer`
+
+      - **`nota`**
+
+        `string`
+
+      - **`tenantId`**
+
+        `integer`
+
+      - **`zona`**
+
+        `object`
+
+      - **`zonaId`**
+
+        `integer`
+
+    - **`ordenEntregaId` (required)**
+
+      `integer`
+
+    - **`secuencia` (required)**
+
+      `integer`
+
+    - **`entregadoAt`**
+
+      `string`, format: `date-time`
+
+    - **`motivoNoEntrega`**
+
+      `string`
+
+  - **`progress` (required)**
+
+    `object`
+
+    - **`delivered` (required)**
+
+      `integer`
+
+    - **`pending` (required)**
+
+      `integer`
+
+    - **`total` (required)**
+
+      `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`chofer`**
+
+    `object`
+
+    - **`id`**
+
+      `integer`
+
+    - **`role`**
+
+      `string`
+
+    - **`username`**
+
+      `string`
+
+  - **`closedAt`**
+
+    `string`, format: `date-time`
+
+  - **`observaciones`**
+
+    `string`
+
+  - **`vehiculo`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "fecha": "",
+    "choferId": 1,
+    "estado": "planned",
+    "vehiculo": "",
+    "observaciones": "",
+    "closedAt": "",
+    "chofer": {
+      "id": 1,
+      "username": "",
+      "role": ""
+    },
+    "items": [
+      {
+        "id": 1,
+        "ordenEntregaId": 1,
+        "secuencia": 1,
+        "estado": "pending",
+        "entregadoAt": "",
+        "motivoNoEntrega": "",
+        "ordenEntrega": {
+          "id": 1,
+          "tenantId": 1,
+          "facturaId": 1,
+          "clienteId": 1,
+          "zonaId": 1,
+          "driverId": 1,
+          "fecha": "",
+          "estado": "pending",
+          "nota": "",
+          "cliente": {
+            "additionalProperty": "anything"
+          },
+          "zona": {
+            "additionalProperty": "anything"
+          },
+          "driver": {
+            "additionalProperty": "anything"
+          },
+          "factura": {
+            "additionalProperty": "anything"
+          },
+          "additionalProperty": "anything"
+        }
+      }
+    ],
+    "progress": {
+      "total": 0,
+      "delivered": 0,
+      "pending": 0
+    }
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Route not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/repartos/{id}/iniciar
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/repartos/{id}/iniciar`
+
+### Start delivery route
+
+- **Method:** `POST`
+- **Path:** `/api/repartos/{id}/iniciar`
+- **Tags:** repartos
+
+Requires `orders.dispatch`. `planned` → `on_route`; pending items' OEs → `in_transit`.
+
+#### Responses
+
+##### Status: 200 Route started
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`choferId` (required)**
+
+    `integer`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"planned", "on_route", "completed", "cancelled"`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`items` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`estado` (required)**
+
+      `string`, possible values: `"pending", "delivered", "not_delivered", "returned"`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`ordenEntrega` (required)**
+
+      `object`
+
+      - **`cliente`**
+
+        `object`
+
+      - **`clienteId`**
+
+        `integer`
+
+      - **`driver`**
+
+        `object`
+
+      - **`driverId`**
+
+        `integer`
+
+      - **`estado`**
+
+        `string`, possible values: `"pending", "assigned", "in_transit", "delivered", "failed"`
+
+      - **`factura`**
+
+        `object`
+
+      - **`facturaId`**
+
+        `integer`
+
+      - **`fecha`**
+
+        `string`, format: `date-time`
+
+      - **`id`**
+
+        `integer`
+
+      - **`nota`**
+
+        `string`
+
+      - **`tenantId`**
+
+        `integer`
+
+      - **`zona`**
+
+        `object`
+
+      - **`zonaId`**
+
+        `integer`
+
+    - **`ordenEntregaId` (required)**
+
+      `integer`
+
+    - **`secuencia` (required)**
+
+      `integer`
+
+    - **`entregadoAt`**
+
+      `string`, format: `date-time`
+
+    - **`motivoNoEntrega`**
+
+      `string`
+
+  - **`progress` (required)**
+
+    `object`
+
+    - **`delivered` (required)**
+
+      `integer`
+
+    - **`pending` (required)**
+
+      `integer`
+
+    - **`total` (required)**
+
+      `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`chofer`**
+
+    `object`
+
+    - **`id`**
+
+      `integer`
+
+    - **`role`**
+
+      `string`
+
+    - **`username`**
+
+      `string`
+
+  - **`closedAt`**
+
+    `string`, format: `date-time`
+
+  - **`observaciones`**
+
+    `string`
+
+  - **`vehiculo`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "fecha": "",
+    "choferId": 1,
+    "estado": "planned",
+    "vehiculo": "",
+    "observaciones": "",
+    "closedAt": "",
+    "chofer": {
+      "id": 1,
+      "username": "",
+      "role": ""
+    },
+    "items": [
+      {
+        "id": 1,
+        "ordenEntregaId": 1,
+        "secuencia": 1,
+        "estado": "pending",
+        "entregadoAt": "",
+        "motivoNoEntrega": "",
+        "ordenEntrega": {
+          "id": 1,
+          "tenantId": 1,
+          "facturaId": 1,
+          "clienteId": 1,
+          "zonaId": 1,
+          "driverId": 1,
+          "fecha": "",
+          "estado": "pending",
+          "nota": "",
+          "cliente": {
+            "additionalProperty": "anything"
+          },
+          "zona": {
+            "additionalProperty": "anything"
+          },
+          "driver": {
+            "additionalProperty": "anything"
+          },
+          "factura": {
+            "additionalProperty": "anything"
+          },
+          "additionalProperty": "anything"
+        }
+      }
+    ],
+    "progress": {
+      "total": 0,
+      "delivered": 0,
+      "pending": 0
+    }
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Route not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 422 Invalid state
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/repartos/{id}/cerrar
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/repartos/{id}/cerrar`
+
+### Close delivery route
+
+- **Method:** `POST`
+- **Path:** `/api/repartos/{id}/cerrar`
+- **Tags:** repartos
+
+Requires `orders.dispatch`. `on_route` → `completed`; pending items → `not_delivered` and OEs → `failed`.
+
+#### Responses
+
+##### Status: 200 Route closed with summary
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`choferId` (required)**
+
+    `integer`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"planned", "on_route", "completed", "cancelled"`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`items` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`estado` (required)**
+
+      `string`, possible values: `"pending", "delivered", "not_delivered", "returned"`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`ordenEntrega` (required)**
+
+      `object`
+
+      - **`cliente`**
+
+        `object`
+
+      - **`clienteId`**
+
+        `integer`
+
+      - **`driver`**
+
+        `object`
+
+      - **`driverId`**
+
+        `integer`
+
+      - **`estado`**
+
+        `string`, possible values: `"pending", "assigned", "in_transit", "delivered", "failed"`
+
+      - **`factura`**
+
+        `object`
+
+      - **`facturaId`**
+
+        `integer`
+
+      - **`fecha`**
+
+        `string`, format: `date-time`
+
+      - **`id`**
+
+        `integer`
+
+      - **`nota`**
+
+        `string`
+
+      - **`tenantId`**
+
+        `integer`
+
+      - **`zona`**
+
+        `object`
+
+      - **`zonaId`**
+
+        `integer`
+
+    - **`ordenEntregaId` (required)**
+
+      `integer`
+
+    - **`secuencia` (required)**
+
+      `integer`
+
+    - **`entregadoAt`**
+
+      `string`, format: `date-time`
+
+    - **`motivoNoEntrega`**
+
+      `string`
+
+  - **`progress` (required)**
+
+    `object`
+
+    - **`delivered` (required)**
+
+      `integer`
+
+    - **`pending` (required)**
+
+      `integer`
+
+    - **`total` (required)**
+
+      `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`chofer`**
+
+    `object`
+
+    - **`id`**
+
+      `integer`
+
+    - **`role`**
+
+      `string`
+
+    - **`username`**
+
+      `string`
+
+  - **`closedAt`**
+
+    `string`, format: `date-time`
+
+  - **`observaciones`**
+
+    `string`
+
+  - **`vehiculo`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`summary` (required)**
+
+  `object`
+
+  - **`delivered` (required)**
+
+    `integer`
+
+  - **`notDelivered` (required)**
+
+    `integer`
+
+  - **`pendingClosed` (required)**
+
+    `integer`
+
+  - **`returned` (required)**
+
+    `integer`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "fecha": "",
+    "choferId": 1,
+    "estado": "planned",
+    "vehiculo": "",
+    "observaciones": "",
+    "closedAt": "",
+    "chofer": {
+      "id": 1,
+      "username": "",
+      "role": ""
+    },
+    "items": [
+      {
+        "id": 1,
+        "ordenEntregaId": 1,
+        "secuencia": 1,
+        "estado": "pending",
+        "entregadoAt": "",
+        "motivoNoEntrega": "",
+        "ordenEntrega": {
+          "id": 1,
+          "tenantId": 1,
+          "facturaId": 1,
+          "clienteId": 1,
+          "zonaId": 1,
+          "driverId": 1,
+          "fecha": "",
+          "estado": "pending",
+          "nota": "",
+          "cliente": {
+            "additionalProperty": "anything"
+          },
+          "zona": {
+            "additionalProperty": "anything"
+          },
+          "driver": {
+            "additionalProperty": "anything"
+          },
+          "factura": {
+            "additionalProperty": "anything"
+          },
+          "additionalProperty": "anything"
+        }
+      }
+    ],
+    "progress": {
+      "total": 0,
+      "delivered": 0,
+      "pending": 0
+    }
+  },
+  "summary": {
+    "pendingClosed": 0,
+    "delivered": 0,
+    "notDelivered": 0,
+    "returned": 0
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Route not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 422 Invalid state
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ## Schemas
 
 ### HealthResponse
@@ -24917,6 +26742,919 @@ Requires `orders.dispatch` for transitions to `assigned`, `in_transit`, or `fail
       "cantFisica": 0
     }
   ]
+}
+```
+
+### RepartoProgress
+
+- **Type:**`object`
+
+* **`delivered` (required)**
+
+  `integer`
+
+* **`pending` (required)**
+
+  `integer`
+
+* **`total` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "total": 0,
+  "delivered": 0,
+  "pending": 0
+}
+```
+
+### RepartoItemLine
+
+- **Type:**`object`
+
+* **`estado` (required)**
+
+  `string`, possible values: `"pending", "delivered", "not_delivered", "returned"`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`ordenEntrega` (required)**
+
+  `object`
+
+  - **`cliente`**
+
+    `object`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`driver`**
+
+    `object`
+
+  - **`driverId`**
+
+    `integer`
+
+  - **`estado`**
+
+    `string`, possible values: `"pending", "assigned", "in_transit", "delivered", "failed"`
+
+  - **`factura`**
+
+    `object`
+
+  - **`facturaId`**
+
+    `integer`
+
+  - **`fecha`**
+
+    `string`, format: `date-time`
+
+  - **`id`**
+
+    `integer`
+
+  - **`nota`**
+
+    `string`
+
+  - **`tenantId`**
+
+    `integer`
+
+  - **`zona`**
+
+    `object`
+
+  - **`zonaId`**
+
+    `integer`
+
+* **`ordenEntregaId` (required)**
+
+  `integer`
+
+* **`secuencia` (required)**
+
+  `integer`
+
+* **`entregadoAt`**
+
+  `string`, format: `date-time`
+
+* **`motivoNoEntrega`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "ordenEntregaId": 1,
+  "secuencia": 1,
+  "estado": "pending",
+  "entregadoAt": "",
+  "motivoNoEntrega": "",
+  "ordenEntrega": {
+    "id": 1,
+    "tenantId": 1,
+    "facturaId": 1,
+    "clienteId": 1,
+    "zonaId": 1,
+    "driverId": 1,
+    "fecha": "",
+    "estado": "pending",
+    "nota": "",
+    "cliente": {
+      "additionalProperty": "anything"
+    },
+    "zona": {
+      "additionalProperty": "anything"
+    },
+    "driver": {
+      "additionalProperty": "anything"
+    },
+    "factura": {
+      "additionalProperty": "anything"
+    },
+    "additionalProperty": "anything"
+  }
+}
+```
+
+### Reparto
+
+- **Type:**`object`
+
+* **`choferId` (required)**
+
+  `integer`
+
+* **`estado` (required)**
+
+  `string`, possible values: `"planned", "on_route", "completed", "cancelled"`
+
+* **`fecha` (required)**
+
+  `string`, format: `date-time`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`items` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"pending", "delivered", "not_delivered", "returned"`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`ordenEntrega` (required)**
+
+    `object`
+
+    - **`cliente`**
+
+      `object`
+
+    - **`clienteId`**
+
+      `integer`
+
+    - **`driver`**
+
+      `object`
+
+    - **`driverId`**
+
+      `integer`
+
+    - **`estado`**
+
+      `string`, possible values: `"pending", "assigned", "in_transit", "delivered", "failed"`
+
+    - **`factura`**
+
+      `object`
+
+    - **`facturaId`**
+
+      `integer`
+
+    - **`fecha`**
+
+      `string`, format: `date-time`
+
+    - **`id`**
+
+      `integer`
+
+    - **`nota`**
+
+      `string`
+
+    - **`tenantId`**
+
+      `integer`
+
+    - **`zona`**
+
+      `object`
+
+    - **`zonaId`**
+
+      `integer`
+
+  - **`ordenEntregaId` (required)**
+
+    `integer`
+
+  - **`secuencia` (required)**
+
+    `integer`
+
+  - **`entregadoAt`**
+
+    `string`, format: `date-time`
+
+  - **`motivoNoEntrega`**
+
+    `string`
+
+* **`progress` (required)**
+
+  `object`
+
+  - **`delivered` (required)**
+
+    `integer`
+
+  - **`pending` (required)**
+
+    `integer`
+
+  - **`total` (required)**
+
+    `integer`
+
+* **`tenantId` (required)**
+
+  `integer`
+
+* **`chofer`**
+
+  `object`
+
+  - **`id`**
+
+    `integer`
+
+  - **`role`**
+
+    `string`
+
+  - **`username`**
+
+    `string`
+
+* **`closedAt`**
+
+  `string`, format: `date-time`
+
+* **`observaciones`**
+
+  `string`
+
+* **`vehiculo`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "tenantId": 1,
+  "fecha": "",
+  "choferId": 1,
+  "estado": "planned",
+  "vehiculo": "",
+  "observaciones": "",
+  "closedAt": "",
+  "chofer": {
+    "id": 1,
+    "username": "",
+    "role": ""
+  },
+  "items": [
+    {
+      "id": 1,
+      "ordenEntregaId": 1,
+      "secuencia": 1,
+      "estado": "pending",
+      "entregadoAt": "",
+      "motivoNoEntrega": "",
+      "ordenEntrega": {
+        "id": 1,
+        "tenantId": 1,
+        "facturaId": 1,
+        "clienteId": 1,
+        "zonaId": 1,
+        "driverId": 1,
+        "fecha": "",
+        "estado": "pending",
+        "nota": "",
+        "cliente": {
+          "additionalProperty": "anything"
+        },
+        "zona": {
+          "additionalProperty": "anything"
+        },
+        "driver": {
+          "additionalProperty": "anything"
+        },
+        "factura": {
+          "additionalProperty": "anything"
+        },
+        "additionalProperty": "anything"
+      }
+    }
+  ],
+  "progress": {
+    "total": 0,
+    "delivered": 0,
+    "pending": 0
+  }
+}
+```
+
+### RepartoCreateInput
+
+- **Type:**`object`
+
+* **`choferId` (required)**
+
+  `integer`
+
+* **`fecha` (required)**
+
+  `string`, format: `date`
+
+* **`ordenEntregaIds` (required)**
+
+  `array`
+
+  **Items:**
+
+  `integer`
+
+* **`observaciones`**
+
+  `string`
+
+* **`vehiculo`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "fecha": "",
+  "choferId": 1,
+  "vehiculo": "",
+  "observaciones": "",
+  "ordenEntregaIds": [
+    1
+  ]
+}
+```
+
+### RepartoListEnvelope
+
+- **Type:**
+
+**Example:**
+
+### RepartoEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`choferId` (required)**
+
+    `integer`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"planned", "on_route", "completed", "cancelled"`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`items` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`estado` (required)**
+
+      `string`, possible values: `"pending", "delivered", "not_delivered", "returned"`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`ordenEntrega` (required)**
+
+      `object`
+
+      - **`cliente`**
+
+        `object`
+
+      - **`clienteId`**
+
+        `integer`
+
+      - **`driver`**
+
+        `object`
+
+      - **`driverId`**
+
+        `integer`
+
+      - **`estado`**
+
+        `string`, possible values: `"pending", "assigned", "in_transit", "delivered", "failed"`
+
+      - **`factura`**
+
+        `object`
+
+      - **`facturaId`**
+
+        `integer`
+
+      - **`fecha`**
+
+        `string`, format: `date-time`
+
+      - **`id`**
+
+        `integer`
+
+      - **`nota`**
+
+        `string`
+
+      - **`tenantId`**
+
+        `integer`
+
+      - **`zona`**
+
+        `object`
+
+      - **`zonaId`**
+
+        `integer`
+
+    - **`ordenEntregaId` (required)**
+
+      `integer`
+
+    - **`secuencia` (required)**
+
+      `integer`
+
+    - **`entregadoAt`**
+
+      `string`, format: `date-time`
+
+    - **`motivoNoEntrega`**
+
+      `string`
+
+  - **`progress` (required)**
+
+    `object`
+
+    - **`delivered` (required)**
+
+      `integer`
+
+    - **`pending` (required)**
+
+      `integer`
+
+    - **`total` (required)**
+
+      `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`chofer`**
+
+    `object`
+
+    - **`id`**
+
+      `integer`
+
+    - **`role`**
+
+      `string`
+
+    - **`username`**
+
+      `string`
+
+  - **`closedAt`**
+
+    `string`, format: `date-time`
+
+  - **`observaciones`**
+
+    `string`
+
+  - **`vehiculo`**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "fecha": "",
+    "choferId": 1,
+    "estado": "planned",
+    "vehiculo": "",
+    "observaciones": "",
+    "closedAt": "",
+    "chofer": {
+      "id": 1,
+      "username": "",
+      "role": ""
+    },
+    "items": [
+      {
+        "id": 1,
+        "ordenEntregaId": 1,
+        "secuencia": 1,
+        "estado": "pending",
+        "entregadoAt": "",
+        "motivoNoEntrega": "",
+        "ordenEntrega": {
+          "id": 1,
+          "tenantId": 1,
+          "facturaId": 1,
+          "clienteId": 1,
+          "zonaId": 1,
+          "driverId": 1,
+          "fecha": "",
+          "estado": "pending",
+          "nota": "",
+          "cliente": {
+            "additionalProperty": "anything"
+          },
+          "zona": {
+            "additionalProperty": "anything"
+          },
+          "driver": {
+            "additionalProperty": "anything"
+          },
+          "factura": {
+            "additionalProperty": "anything"
+          },
+          "additionalProperty": "anything"
+        }
+      }
+    ],
+    "progress": {
+      "total": 0,
+      "delivered": 0,
+      "pending": 0
+    }
+  }
+}
+```
+
+### RepartoCloseSummary
+
+- **Type:**`object`
+
+* **`delivered` (required)**
+
+  `integer`
+
+* **`notDelivered` (required)**
+
+  `integer`
+
+* **`pendingClosed` (required)**
+
+  `integer`
+
+* **`returned` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "pendingClosed": 0,
+  "delivered": 0,
+  "notDelivered": 0,
+  "returned": 0
+}
+```
+
+### RepartoCloseEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`choferId` (required)**
+
+    `integer`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"planned", "on_route", "completed", "cancelled"`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`items` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`estado` (required)**
+
+      `string`, possible values: `"pending", "delivered", "not_delivered", "returned"`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`ordenEntrega` (required)**
+
+      `object`
+
+      - **`cliente`**
+
+        `object`
+
+      - **`clienteId`**
+
+        `integer`
+
+      - **`driver`**
+
+        `object`
+
+      - **`driverId`**
+
+        `integer`
+
+      - **`estado`**
+
+        `string`, possible values: `"pending", "assigned", "in_transit", "delivered", "failed"`
+
+      - **`factura`**
+
+        `object`
+
+      - **`facturaId`**
+
+        `integer`
+
+      - **`fecha`**
+
+        `string`, format: `date-time`
+
+      - **`id`**
+
+        `integer`
+
+      - **`nota`**
+
+        `string`
+
+      - **`tenantId`**
+
+        `integer`
+
+      - **`zona`**
+
+        `object`
+
+      - **`zonaId`**
+
+        `integer`
+
+    - **`ordenEntregaId` (required)**
+
+      `integer`
+
+    - **`secuencia` (required)**
+
+      `integer`
+
+    - **`entregadoAt`**
+
+      `string`, format: `date-time`
+
+    - **`motivoNoEntrega`**
+
+      `string`
+
+  - **`progress` (required)**
+
+    `object`
+
+    - **`delivered` (required)**
+
+      `integer`
+
+    - **`pending` (required)**
+
+      `integer`
+
+    - **`total` (required)**
+
+      `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`chofer`**
+
+    `object`
+
+    - **`id`**
+
+      `integer`
+
+    - **`role`**
+
+      `string`
+
+    - **`username`**
+
+      `string`
+
+  - **`closedAt`**
+
+    `string`, format: `date-time`
+
+  - **`observaciones`**
+
+    `string`
+
+  - **`vehiculo`**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+* **`summary` (required)**
+
+  `object`
+
+  - **`delivered` (required)**
+
+    `integer`
+
+  - **`notDelivered` (required)**
+
+    `integer`
+
+  - **`pendingClosed` (required)**
+
+    `integer`
+
+  - **`returned` (required)**
+
+    `integer`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "fecha": "",
+    "choferId": 1,
+    "estado": "planned",
+    "vehiculo": "",
+    "observaciones": "",
+    "closedAt": "",
+    "chofer": {
+      "id": 1,
+      "username": "",
+      "role": ""
+    },
+    "items": [
+      {
+        "id": 1,
+        "ordenEntregaId": 1,
+        "secuencia": 1,
+        "estado": "pending",
+        "entregadoAt": "",
+        "motivoNoEntrega": "",
+        "ordenEntrega": {
+          "id": 1,
+          "tenantId": 1,
+          "facturaId": 1,
+          "clienteId": 1,
+          "zonaId": 1,
+          "driverId": 1,
+          "fecha": "",
+          "estado": "pending",
+          "nota": "",
+          "cliente": {
+            "additionalProperty": "anything"
+          },
+          "zona": {
+            "additionalProperty": "anything"
+          },
+          "driver": {
+            "additionalProperty": "anything"
+          },
+          "factura": {
+            "additionalProperty": "anything"
+          },
+          "additionalProperty": "anything"
+        }
+      }
+    ],
+    "progress": {
+      "total": 0,
+      "delivered": 0,
+      "pending": 0
+    }
+  },
+  "summary": {
+    "pendingClosed": 0,
+    "delivered": 0,
+    "notDelivered": 0,
+    "returned": 0
+  }
 }
 ```
 
