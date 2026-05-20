@@ -38,6 +38,10 @@ Declared in code: `counter`, `field`, `backoffice`, `warehouse`, `delivery`. The
 - **Wholesale / distributor** scenarios lean on `warehouse_op`, `warehouse_lead`, `logistics_planner`, `driver`, and `delivery`/`warehouse` channels for picking, dispatch, and delivery confirmation.
 - Permissions named `orders.*` support a **future** order domain; **no `pedido` / order entity** is evidenced in the current Prisma schema or OpenAPI paths. Invoicing today uses `facturas` and related permissions (`sales.create`, `reports.operational.read`, etc.).
 
+## Product modules (dashboard analytics #138)
+
+The **Inicio → Analytics** tab calls `GET /api/dashboard/ventas-historico` and requires **`reports.operational.read`** plus tenant module **`analytics.advanced`** (catalog dependency: `analytics.dashboard`). No new permission literal was added.
+
 ## Related documents
 
 - Master plan execution index: [master-plan-bizcode-execution.md](master-plan-bizcode-execution.md)

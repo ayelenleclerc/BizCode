@@ -53,7 +53,7 @@ tags:
   - name: reportes
     description: Financial and operational reports
   - name: dashboard
-    description: Operational dashboard summary
+    description: Operational dashboard summary and historical sales analytics (#138)
   - name: notifications
     description: In-app notifications
   - name: audit
@@ -2919,6 +2919,63 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
 
+  /api/dashboard/ventas-historico:
+    get:
+      tags: [dashboard]
+      summary: Historical sales analytics for charts and CSV export (#138)
+      description: |
+        Aggregates active invoices (`estado = A`) in PostgreSQL by period, top 10 articles, and sales by seller (via linked `Pedido`).
+        Requires permission `reports.operational.read`. JSON by default; send `Accept: text/csv` for period series export.
+      security:
+        - cookieSession: []
+      parameters:
+        - name: from
+          in: query
+          required: true
+          schema:
+            type: string
+            pattern: '^\\d{4}-\\d{2}-\\d{2}$'
+        - name: to
+          in: query
+          required: true
+          schema:
+            type: string
+            pattern: '^\\d{4}-\\d{2}-\\d{2}$'
+        - name: groupBy
+          in: query
+          schema:
+            type: string
+            enum: [day, week, month]
+            default: day
+        - name: vendedorId
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+        - name: deliveryZoneId
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '200':
+          description: Aggregated analytics or CSV series
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DashboardVentasHistoricoEnvelope'
+            text/csv:
+              schema:
+                type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
   /api/audit-events:
     get:
       tags: [audit]
@@ -5749,6 +5806,74 @@ components:
           const: true
         data:
           $ref: '#/components/schemas/DashboardSummary'
+
+    DashboardVentasSeriesRow:
+      type: object
+      required: [period, count, total]
+      properties:
+        period:
+          type: string
+        count:
+          type: integer
+        total:
+          type: string
+
+    DashboardTopArticuloRow:
+      type: object
+      required: [articuloId, codigo, descripcion, quantity, total]
+      properties:
+        articuloId:
+          type: integer
+        codigo:
+          type: integer
+        descripcion:
+          type: string
+        quantity:
+          type: integer
+        total:
+          type: string
+
+    DashboardVentasBySellerRow:
+      type: object
+      required: [vendedorId, username, count, total]
+      properties:
+        vendedorId:
+          type: integer
+          nullable: true
+        username:
+          type: string
+          nullable: true
+        count:
+          type: integer
+        total:
+          type: string
+
+    DashboardVentasHistorico:
+      type: object
+      required: [series, topArticles, bySeller]
+      properties:
+        series:
+          type: array
+          items:
+            $ref: '#/components/schemas/DashboardVentasSeriesRow'
+        topArticles:
+          type: array
+          items:
+            $ref: '#/components/schemas/DashboardTopArticuloRow'
+        bySeller:
+          type: array
+          items:
+            $ref: '#/components/schemas/DashboardVentasBySellerRow'
+
+    DashboardVentasHistoricoEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/DashboardVentasHistorico'
 
     AuditEvent:
       type: object

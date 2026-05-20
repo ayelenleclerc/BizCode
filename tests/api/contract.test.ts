@@ -389,6 +389,7 @@ function buildPrisma(): PrismaClient {
       }
       return arg
     }),
+    $queryRaw: vi.fn().mockResolvedValue([]),
   } as unknown as PrismaClient
 
   return p
@@ -969,6 +970,33 @@ describe('API — contrato OpenAPI', () => {
     const app = createApp(p)
     const res = await request(app).post('/api/recuentos/1/close').expect(200)
     await assertMatchesOpenApi('/api/recuentos/{id}/close', 'post', '200', res.body)
+  })
+
+  it('GET /api/dashboard/ventas-historico', async () => {
+    process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
+    process.env.BIZCODE_TEST_ROLE = 'owner'
+    const p = buildPrisma()
+    vi.mocked(p.$queryRaw)
+      .mockReset()
+      .mockResolvedValueOnce([{ period: '2026-05-01', count: BigInt(2), total: '150.00' }])
+      .mockResolvedValueOnce([
+        {
+          articuloId: 1,
+          codigo: 100,
+          descripcion: 'Item',
+          quantity: BigInt(3),
+          total: '150.00',
+        },
+      ])
+      .mockResolvedValueOnce([
+        { vendedorId: 1, username: 'owner', count: BigInt(2), total: '150.00' },
+      ])
+    const app = createApp(p)
+    const res = await request(app)
+      .get('/api/dashboard/ventas-historico')
+      .query({ from: '2026-05-01', to: '2026-05-20', groupBy: 'day' })
+      .expect(200)
+    await assertMatchesOpenApi('/api/dashboard/ventas-historico', 'get', '200', res.body)
   })
 
   it('GET /api/cobranzas/vencidas', async () => {

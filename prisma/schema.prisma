@@ -295,6 +295,7 @@ model Factura {
   @@unique([tenantId, tipo, prefijo, numero])
   @@index([tenantId])
   @@index([tenantId, fecha])
+  @@index([tenantId, estado, fecha])
   @@index([tenantId, clienteId])
 }
 

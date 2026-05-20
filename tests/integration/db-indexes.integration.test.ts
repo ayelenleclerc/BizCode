@@ -11,6 +11,7 @@ const TENANT_SCOPED_INDEXES = [
   'Articulo_tenantId_codigo_idx',
   'Articulo_tenantId_rubroId_idx',
   'Factura_tenantId_fecha_idx',
+  'Factura_tenantId_estado_fecha_idx',
   'Factura_tenantId_clienteId_idx',
 ] as const
 

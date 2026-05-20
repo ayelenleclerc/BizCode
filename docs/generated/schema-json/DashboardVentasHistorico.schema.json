@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "bySeller": {
+      "items": {
+        "$ref": "./DashboardVentasBySellerRow.schema.json"
+      },
+      "type": "array"
+    },
+    "series": {
+      "items": {
+        "$ref": "./DashboardVentasSeriesRow.schema.json"
+      },
+      "type": "array"
+    },
+    "topArticles": {
+      "items": {
+        "$ref": "./DashboardTopArticuloRow.schema.json"
+      },
+      "type": "array"
+    }
+  },
+  "required": [
+    "series",
+    "topArticles",
+    "bySeller"
+  ],
+  "title": "DashboardVentasHistorico",
+  "type": "object"
+}

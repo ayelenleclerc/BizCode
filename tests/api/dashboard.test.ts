@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import request from 'supertest'
 import type { PrismaClient } from '@prisma/client'
 import { Decimal } from '@prisma/client/runtime/library'
+import { Prisma } from '@prisma/client'
 import { createApp } from '../../server/createApp'
 
 /** Aggregate result shape returned by prisma.factura.aggregate */
@@ -50,6 +51,11 @@ function buildPrismaMock(overrides: Partial<Record<string, unknown>> = {}): Pris
       if (typeof arg === 'function') return arg(buildPrismaMock())
       return arg
     }),
+    $queryRaw: vi
+      .fn()
+      .mockResolvedValueOnce([{ period: '2026-05-01', count: BigInt(1), total: new Prisma.Decimal(10) }])
+      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce([]),
     ...overrides,
   } as unknown as PrismaClient
 }
@@ -168,5 +174,93 @@ describe('GET /api/dashboard/summary', () => {
     expect(prisma.factura.aggregate).toHaveBeenCalledTimes(1)
     expect(prisma.factura.findMany).toHaveBeenCalledTimes(1)
     expect(prisma.cobro.aggregate).toHaveBeenCalledTimes(1)
+  })
+})
+
+describe('GET /api/dashboard/ventas-historico', () => {
+  beforeEach(() => {
+    process.env.NODE_ENV = 'test'
+  })
+
+  it('returns 401 without session', async () => {
+    process.env.BIZCODE_TEST_AUTH_BYPASS = 'false'
+    delete process.env.BIZCODE_TEST_ROLE
+    const app = createApp(buildPrismaMock())
+    const res = await request(app)
+      .get('/api/dashboard/ventas-historico')
+      .query({ from: '2026-05-01', to: '2026-05-20' })
+      .expect(401)
+    expect(res.body.error).toBe('Authentication required')
+  })
+
+  it('returns 403 for seller without reports permission', async () => {
+    process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
+    process.env.BIZCODE_TEST_ROLE = 'seller'
+    const app = createApp(buildPrismaMock())
+    const res = await request(app)
+      .get('/api/dashboard/ventas-historico')
+      .query({ from: '2026-05-01', to: '2026-05-20' })
+      .expect(403)
+    expect(res.body.success).toBe(false)
+  })
+
+  it('returns 400 for invalid dates', async () => {
+    process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
+    process.env.BIZCODE_TEST_ROLE = 'owner'
+    const app = createApp(buildPrismaMock())
+    const res = await request(app)
+      .get('/api/dashboard/ventas-historico')
+      .query({ from: 'bad', to: '2026-05-20' })
+      .expect(400)
+    expect(res.body.success).toBe(false)
+  })
+
+  it('returns aggregated JSON for owner', async () => {
+    process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
+    process.env.BIZCODE_TEST_ROLE = 'owner'
+    const prisma = buildPrismaMock()
+    vi.mocked(prisma.$queryRaw)
+      .mockReset()
+      .mockResolvedValueOnce([{ period: '2026-05-01', count: BigInt(2), total: new Prisma.Decimal(200) }])
+      .mockResolvedValueOnce([
+        {
+          articuloId: 5,
+          codigo: 10,
+          descripcion: 'Prod',
+          quantity: BigInt(4),
+          total: new Prisma.Decimal(80),
+        },
+      ])
+      .mockResolvedValueOnce([
+        { vendedorId: null, username: null, count: BigInt(2), total: new Prisma.Decimal(200) },
+      ])
+    const app = createApp(prisma)
+    const res = await request(app)
+      .get('/api/dashboard/ventas-historico')
+      .query({ from: '2026-05-01', to: '2026-05-20', groupBy: 'week' })
+      .expect(200)
+    expect(res.body.success).toBe(true)
+    expect(res.body.data.series).toHaveLength(1)
+    expect(res.body.data.topArticles).toHaveLength(1)
+    expect(res.body.data.bySeller).toHaveLength(1)
+  })
+
+  it('returns CSV when Accept is text/csv', async () => {
+    process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
+    process.env.BIZCODE_TEST_ROLE = 'manager'
+    const prisma = buildPrismaMock()
+    vi.mocked(prisma.$queryRaw)
+      .mockReset()
+      .mockResolvedValueOnce([{ period: '2026-05', count: BigInt(1), total: new Prisma.Decimal(50) }])
+      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce([])
+    const app = createApp(prisma)
+    const res = await request(app)
+      .get('/api/dashboard/ventas-historico')
+      .set('Accept', 'text/csv')
+      .query({ from: '2026-01-01', to: '2026-05-20', groupBy: 'month' })
+      .expect(200)
+    expect(res.headers['content-type']).toMatch(/text\/csv/)
+    expect(res.text).toContain('period,count,total')
   })
 })
