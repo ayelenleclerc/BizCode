@@ -32,6 +32,8 @@ tags:
     description: Suppliers (master data and CSV import)
   - name: compras
     description: Purchase orders to suppliers (#135)
+  - name: recuentos
+    description: Physical inventory count (#136)
   - name: facturas
     description: Invoice management
   - name: afip
@@ -1619,6 +1621,217 @@ paths:
                 $ref: '#/components/schemas/ApiErrorEnvelope'
         '422':
           description: Not receivable or quantity exceeds pending
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/recuentos:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [recuentos]
+      summary: List physical inventory counts
+      parameters:
+        - $ref: '#/components/parameters/ListLimit'
+        - $ref: '#/components/parameters/ListOffset'
+      responses:
+        '200':
+          description: Paginated inventory counts
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecuentoListEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    post:
+      tags: [recuentos]
+      summary: Start inventory count (snapshot active articles)
+      description: Requires `inventory.count`. Only one `in_progress` count per tenant.
+      responses:
+        '201':
+          description: Count started
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecuentoEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '422':
+          description: Count already in progress
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/recuentos/{id}:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [recuentos]
+      summary: Get inventory count by id
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Count detail with items
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecuentoEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/recuentos/{id}/items:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    put:
+      tags: [recuentos]
+      summary: Update physical quantities (partial allowed)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecuentoItemsInput'
+      responses:
+        '200':
+          description: Updated count
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecuentoEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '422':
+          description: Not editable or invalid line
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/recuentos/{id}/close:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    post:
+      tags: [recuentos]
+      summary: Close inventory count and apply stock adjustments
+      description: |
+        Requires all items to have `cantFisica`. For each line with non-zero variance,
+        updates article stock and creates `StockAjuste` with motivo `recuento`.
+        Lines with zero variance do not create adjustments.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Count closed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecuentoEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '422':
+          description: Incomplete items, not closable, or insufficient stock
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/recuentos/{id}/pdf:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [recuentos]
+      summary: Download variance PDF (closed counts only)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: PDF document
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '422':
+          description: Count not closed
           content:
             application/json:
               schema:
@@ -4584,6 +4797,101 @@ components:
               cantidad:
                 type: integer
                 minimum: 1
+
+    RecuentoItemLine:
+      type: object
+      required: [id, articuloId, cantSistema]
+      properties:
+        id:
+          type: integer
+        articuloId:
+          type: integer
+        cantSistema:
+          type: integer
+        cantFisica:
+          type: integer
+          nullable: true
+        articulo:
+          type: object
+          properties:
+            id:
+              type: integer
+            codigo:
+              type: integer
+            descripcion:
+              type: string
+
+    Recuento:
+      type: object
+      required: [id, operadorId, estado, fecha, items]
+      properties:
+        id:
+          type: integer
+        operadorId:
+          type: integer
+        estado:
+          type: string
+          enum: [in_progress, closed]
+        fecha:
+          type: string
+          format: date-time
+        closedAt:
+          type: string
+          format: date-time
+          nullable: true
+        operador:
+          type: object
+          properties:
+            id:
+              type: integer
+            username:
+              type: string
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/RecuentoItemLine'
+
+    RecuentoListEnvelope:
+      allOf:
+        - $ref: '#/components/schemas/ListPaginationMeta'
+        - type: object
+          required: [success, data]
+          properties:
+            success:
+              type: boolean
+              const: true
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/Recuento'
+
+    RecuentoEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/Recuento'
+
+    RecuentoItemsInput:
+      type: object
+      required: [lines]
+      properties:
+        lines:
+          type: array
+          minItems: 1
+          items:
+            type: object
+            required: [articuloId, cantFisica]
+            properties:
+              articuloId:
+                type: integer
+                minimum: 1
+              cantFisica:
+                type: integer
+                minimum: 0
 
     ProveedorEnvelope:
       type: object

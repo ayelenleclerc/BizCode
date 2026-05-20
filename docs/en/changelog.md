@@ -10,6 +10,8 @@ Versioning: [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **Physical inventory count (GitHub #136):** `Recuento` / `RecuentoItem` models; API `GET/POST /api/recuentos`, `GET /api/recuentos/{id}`, `PUT .../items`, `POST .../close`, `GET .../pdf`; permission `inventory.count`; stock block `RECUENTO_IN_PROGRESS` on adjustments, purchase receipt, and invoice stock; UI `/recuentos` (module `inventory.count`); OpenAPI, tests, and logistics manual (EN/ES/PT-BR).
+
 - **DBF customer migration (GitHub #51):** `npm run migrate:dbf` imports customers from `CLIENTES.DBF` when the file exists with rows (`legacyClienteDbf.ts`, `clienteBodySchema`, rejection report); placeholders `91001`–`91010` only without a populated master; see [DBF migration testing](guides/dbf-migration-testing.md) and `scripts/MIGRACION_PROGRAMA_VIEJO.md`. Bulk load in the app uses CSV import (#58).
 
 - **SaaS plans and per-tenant limits (GitHub #181):** `Plan` / `TenantPlan` models; `GET /api/planes`, `GET /api/me/plan`, `POST /api/superadmin/tenants/:id/plan`; `requirePlanFeature`; limits on `POST /api/users` and `POST /api/facturas`; `PlanProvider`, `PlanGate`, SuperAdmin plan selector; i18n EN/ES/PT-BR.

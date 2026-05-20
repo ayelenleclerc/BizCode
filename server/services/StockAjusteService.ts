@@ -1,5 +1,6 @@
 import type { Articulo, Prisma, PrismaClient } from '@prisma/client'
 import type { StockAjusteInput } from '../createApp.types'
+import { assertNoOpenRecuento } from '../lib/recuentoStockGuard'
 import type { ServiceResult } from './serviceResults'
 
 export type StockAjusteRow = Prisma.StockAjusteGetPayload<{
@@ -38,6 +39,11 @@ export class StockAjusteService {
     })
     if (!articulo) {
       return { ok: false, status: 404, error: 'Articulo not found' }
+    }
+
+    const recuentoBlock = await assertNoOpenRecuento(this.prisma, tenantId)
+    if (!recuentoBlock.ok) {
+      return recuentoBlock
     }
 
     const stockBefore = articulo.stock

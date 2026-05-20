@@ -57,6 +57,7 @@ function buildPrismaMock(overrides: Partial<Record<string, unknown>> = {}): Pris
     },
     ordenCompraItem: { deleteMany: vi.fn(), update: vi.fn().mockResolvedValue({}) },
     stockAjuste: { create: vi.fn().mockResolvedValue({ id: 1 }) },
+    recuento: { findFirst: vi.fn().mockResolvedValue(null) },
     notification: {
       findMany: vi.fn().mockResolvedValue([]),
       findFirst: vi.fn(),

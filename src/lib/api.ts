@@ -805,6 +805,86 @@ export type OrdenCompra = {
   items: OrdenCompraItemRow[]
 }
 
+export type RecuentoItemRow = {
+  id: number
+  articuloId: number
+  cantSistema: number
+  cantFisica: number | null
+  articulo?: { id: number; codigo: number; descripcion: string }
+}
+
+export type Recuento = {
+  id: number
+  operadorId: number
+  estado: 'in_progress' | 'closed'
+  fecha: string
+  closedAt?: string | null
+  operador?: { id: number; username: string }
+  items: RecuentoItemRow[]
+}
+
+export const recuentosAPI = {
+  list: async (params?: { limit?: number; offset?: number }) => {
+    try {
+      const response = await api.get('/recuentos', { params })
+      return response.data as {
+        success: true
+        data: Recuento[]
+        total: number
+        limit: number
+        offset: number
+      }
+    } catch (error) {
+      handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  get: async (id: number) => {
+    try {
+      const response = await api.get(`/recuentos/${id}`)
+      return response.data.data as Recuento
+    } catch (error) {
+      handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  start: async () => {
+    try {
+      const response = await api.post('/recuentos')
+      return response.data.data as Recuento
+    } catch (error) {
+      handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  updateItems: async (id: number, lines: { articuloId: number; cantFisica: number }[]) => {
+    try {
+      const response = await api.put(`/recuentos/${id}/items`, { lines })
+      return response.data.data as Recuento
+    } catch (error) {
+      handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  close: async (id: number) => {
+    try {
+      const response = await api.post(`/recuentos/${id}/close`)
+      return response.data.data as Recuento
+    } catch (error) {
+      handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  downloadPdf: async (id: number): Promise<Blob> => {
+    try {
+      const response = await api.get(`/recuentos/${id}/pdf`, { responseType: 'blob' })
+      return response.data as Blob
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+}
+
 export const comprasAPI = {
   list: async (params?: { estado?: string; proveedorId?: number; limit?: number; offset?: number }) => {
     try {

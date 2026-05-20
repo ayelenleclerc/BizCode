@@ -5,6 +5,7 @@ import { writeAuditEvent } from './audit'
 import { registerArticulosRoutes } from './routes/registerArticulosRoutes'
 import { registerClientesRoutes } from './routes/registerClientesRoutes'
 import { registerComprasRoutes } from './routes/registerComprasRoutes'
+import { registerRecuentosRoutes } from './routes/registerRecuentosRoutes'
 import { registerCobrosRoutes } from './routes/registerCobrosRoutes'
 import { registerReportesRoutes } from './routes/registerReportesRoutes'
 import { registerFacturasRoutes } from './routes/registerFacturasRoutes'
@@ -58,6 +59,7 @@ export function registerRestDomainRoutes(app: Application, prisma: PrismaClient)
   registerRubrosRoutes(app, ctx)
   registerProveedoresRoutes(app, ctx)
   registerComprasRoutes(app, ctx)
+  registerRecuentosRoutes(app, ctx)
   registerFormasPagoRoutes(app, ctx)
   registerFacturasRoutes(app, ctx)
   registerAfipRoutes(app, ctx)

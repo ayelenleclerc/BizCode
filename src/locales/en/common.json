@@ -12,6 +12,7 @@
     "catalogo": "Products",
     "proveedores": "Suppliers",
     "compras": "Purchasing",
+    "recuentos": "Inventory count",
     "logistica": "Logistics",
     "finanzas": "Finance",
     "reportes": "Reports",

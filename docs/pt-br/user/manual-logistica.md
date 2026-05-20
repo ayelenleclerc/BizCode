@@ -36,8 +36,21 @@ Abra **Compras** (`/compras`) na barra lateral. A rota depende do módulo do ten
 
 Rotas API usuais: `GET/POST /api/compras`, `GET/PUT /api/compras/{id}`, `POST /api/compras/{id}/send`, `POST /api/compras/{id}/cancel`, `POST /api/compras/{id}/receive`.
 
+## Contagem física de inventário
+
+Abra **Contagem** (`/recuentos`) na barra lateral. A rota depende do módulo do tenant **`inventory.count`** e exige a permissão `inventory.count` (papéis como **owner**, **manager**, **warehouse_lead**).
+
+| Etapa | Ação |
+|-------|------|
+| Início | `POST /api/recuentos` — snapshot do estoque dos artigos ativos (`cantSistema`); apenas uma contagem `in_progress` por tenant |
+| Contagem | `PUT /api/recuentos/{id}/items` — registrar `cantFisica` por artigo (atualizações parciais) |
+| Fechamento | `POST /api/recuentos/{id}/close` — todos os itens devem estar contados; diferenças não zero atualizam estoque e criam `StockAjuste` com motivo `recuento`; diferença zero não gera ajuste |
+| Relatório | `GET /api/recuentos/{id}/pdf` — PDF de diferenças (somente contagens fechadas) |
+
+Enquanto uma contagem está `in_progress`, mutações de estoque ficam bloqueadas (`422 RECUENTO_IN_PROGRESS`) em ajustes, recebimento de compras e baixa por faturamento.
+
 ## Referência API
 
-[`docs/api/openapi.yaml`](../../api/openapi.yaml) — rotas `/api/ordenes-entrega`, `/api/compras`.
+[`docs/api/openapi.yaml`](../../api/openapi.yaml) — rotas `/api/ordenes-entrega`, `/api/compras`, `/api/recuentos`.
 
 **Outros idiomas:** [English](../../en/user/manual-logistics.md) · [Español](../../es/user/manual-logistica.md)

@@ -146,6 +146,13 @@ export type OrdenCompraReceiveLineInput = {
   cantidad: number
 }
 
+export type RecuentoEstado = 'in_progress' | 'closed'
+
+export type RecuentoItemLineInput = {
+  articuloId: number
+  cantFisica: number
+}
+
 export type EmpresaInput = {
   nombre: string
   cuit: string

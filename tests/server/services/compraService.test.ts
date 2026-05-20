@@ -50,6 +50,7 @@ function buildPrisma(overrides: Partial<Record<string, unknown>> = {}): PrismaCl
       update: vi.fn().mockResolvedValue({}),
     },
     stockAjuste: { create: vi.fn().mockResolvedValue({ id: 1 }) },
+    recuento: { findFirst: vi.fn().mockResolvedValue(null) },
     $transaction: vi.fn(async (fn: (tx: PrismaClient) => Promise<unknown>) => fn(buildPrisma() as PrismaClient)),
     ...overrides,
   } as unknown as PrismaClient

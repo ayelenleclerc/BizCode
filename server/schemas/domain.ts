@@ -18,6 +18,7 @@ import type {
   OrdenCompraItemInput,
   OrdenCompraReceiveLineInput,
   OrdenCompraUpdateInput,
+  RecuentoItemLineInput,
   StockAjusteInput,
 } from '../createApp.types'
 
@@ -1136,6 +1137,36 @@ export const ordenCompraReceiveBodySchema = z
       .min(1, 'lines must contain at least one entry'),
   })
   .transform((data): { lines: OrdenCompraReceiveLineInput[] } => ({ lines: data.lines }))
+
+export const recuentoItemsBodySchema = z
+  .object({
+    lines: z
+      .array(
+        z
+          .object({
+            articuloId: z.number({ invalid_type_error: 'articuloId must be a number' }),
+            cantFisica: z.number({ invalid_type_error: 'cantFisica must be a number' }),
+          })
+          .superRefine((line, ctx) => {
+            if (!Number.isInteger(line.articuloId) || line.articuloId < 1) {
+              ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: 'articuloId must be a positive integer',
+                path: ['articuloId'],
+              })
+            }
+            if (!Number.isInteger(line.cantFisica) || line.cantFisica < 0) {
+              ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: 'cantFisica must be a non-negative integer',
+                path: ['cantFisica'],
+              })
+            }
+          }),
+      )
+      .min(1, 'lines must contain at least one entry'),
+  })
+  .transform((data): { lines: RecuentoItemLineInput[] } => ({ lines: data.lines }))
 
 export function safeParseBodySchema<S extends z.ZodTypeAny>(schema: S, raw: unknown): SafeParseBodyResult<z.output<S>> {
   const parsed = schema.safeParse(raw)

@@ -36,8 +36,21 @@ Open **Purchasing** (`/compras`) from the sidebar. The route is gated by the ten
 
 Typical API paths: `GET/POST /api/compras`, `GET/PUT /api/compras/{id}`, `POST /api/compras/{id}/send`, `POST /api/compras/{id}/cancel`, `POST /api/compras/{id}/receive`.
 
+## Physical inventory count
+
+Open **Inventory count** (`/recuentos`) from the sidebar. The route is gated by the tenant module **`inventory.count`** and is visible to roles such as **owner**, **manager**, and **warehouse_lead** with permission `inventory.count`.
+
+| Step | Action |
+|------|--------|
+| Start | `POST /api/recuentos` — snapshots system stock for all active articles (`cantSistema`); only one `in_progress` count per tenant |
+| Count | `PUT /api/recuentos/{id}/items` — record `cantFisica` per article (partial updates allowed) |
+| Close | `POST /api/recuentos/{id}/close` — all items must be counted; non-zero variances update stock and create `StockAjuste` with motivo `recuento`; zero variance skips adjustment |
+| Report | `GET /api/recuentos/{id}/pdf` — variance PDF (closed counts only) |
+
+While a count is `in_progress`, stock mutations are blocked (`422 RECUENTO_IN_PROGRESS`) on stock adjustments, purchase receipt, and invoicing stock decrement.
+
 ## API reference
 
-[`docs/api/openapi.yaml`](../../api/openapi.yaml) — paths `/api/ordenes-entrega`, `/api/compras`.
+[`docs/api/openapi.yaml`](../../api/openapi.yaml) — paths `/api/ordenes-entrega`, `/api/compras`, `/api/recuentos`.
 
 **Other languages:** [Español](../../es/user/manual-logistica.md) · [Português](../../pt-br/user/manual-logistica.md)

@@ -160,6 +160,7 @@ function basePrismaForMutations(): {
     updateMany: vi.fn().mockResolvedValue({ count: 0 }),
   }
   prisma.auditEvent = { create: auditCreate }
+  prisma.recuento = { findFirst: vi.fn().mockResolvedValue(null) }
   prisma.appUser = {
     count: vi.fn().mockResolvedValue(1),
     findMany: vi.fn().mockResolvedValue([]),

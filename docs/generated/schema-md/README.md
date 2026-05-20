@@ -234,6 +234,16 @@
 
 * [PublicPlan](./publicplan.md) – `-`
 
+* [Recuento](./recuento.md) – `-`
+
+* [RecuentoEnvelope](./recuentoenvelope.md) – `-`
+
+* [RecuentoItemLine](./recuentoitemline.md) – `-`
+
+* [RecuentoItemsInput](./recuentoitemsinput.md) – `-`
+
+* [RecuentoListEnvelope](./recuentolistenvelope.md) – `-`
+
 * [ReporteCobranzasListEnvelope](./reportecobranzaslistenvelope.md) – `-`
 
 * [ReporteCobranzasRow](./reportecobranzasrow.md) – `-`
@@ -410,6 +420,14 @@
 
 * [Untitled object in ProveedorListEnvelope](./proveedorlistenvelope-allof-0.md) – `undefined#/allOf/0`
 
+* [Untitled object in Recuento](./recuento-properties-operador.md) – `undefined#/properties/operador`
+
+* [Untitled object in RecuentoItemLine](./recuentoitemline-properties-articulo.md) – `undefined#/properties/articulo`
+
+* [Untitled object in RecuentoItemsInput](./recuentoitemsinput-properties-lines-items.md) – `undefined#/properties/lines/items`
+
+* [Untitled object in RecuentoListEnvelope](./recuentolistenvelope-allof-1.md) – `undefined#/allOf/1`
+
 * [Untitled object in RubroListEnvelope](./rubrolistenvelope-allof-0.md) – `undefined#/allOf/0`
 
 * [Untitled object in StockAdjustData](./stockadjustdata-properties-articulo.md) – `undefined#/properties/articulo`
@@ -519,6 +537,12 @@
 * [Untitled array in ProveedorListEnvelope](./proveedorlistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
 
 * [Untitled array in PublicPlan](./publicplan-properties-features.md) – `undefined#/properties/features`
+
+* [Untitled array in Recuento](./recuento-properties-items.md) – `undefined#/properties/items`
+
+* [Untitled array in RecuentoItemsInput](./recuentoitemsinput-properties-lines.md) – `undefined#/properties/lines`
+
+* [Untitled array in RecuentoListEnvelope](./recuentolistenvelope-allof-1-properties-data.md) – `undefined#/allOf/1/properties/data`
 
 * [Untitled array in ReporteCobranzasListEnvelope](./reportecobranzaslistenvelope-properties-data.md) – `undefined#/properties/data`
 
