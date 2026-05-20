@@ -1,20 +1,20 @@
 # OrdenEntrega Schema
 
 ```txt
-undefined#/allOf/0/properties/data/items
+undefined#/properties/ordenEntrega
 ```
 
 
 
-| Abstract            | Extensible | Status         | Identifiable | Custom Properties | Additional Properties | Access Restrictions | Defined In                                                                                                           |
-| :------------------ | :--------- | :------------- | :----------- | :---------------- | :-------------------- | :------------------ | :------------------------------------------------------------------------------------------------------------------- |
-| Can be instantiated | No         | Unknown status | No           | Forbidden         | Allowed               | none                | [OrdenEntregaListEnvelope.schema.json\*](../schema-json/OrdenEntregaListEnvelope.schema.json "open original schema") |
+| Abstract            | Extensible | Status         | Identifiable | Custom Properties | Additional Properties | Access Restrictions | Defined In                                                                                         |
+| :------------------ | :--------- | :------------- | :----------- | :---------------- | :-------------------- | :------------------ | :------------------------------------------------------------------------------------------------- |
+| Can be instantiated | No         | Unknown status | No           | Forbidden         | Allowed               | none                | [RepartoItemLine.schema.json\*](../schema-json/RepartoItemLine.schema.json "open original schema") |
 
-## items Type
+## ordenEntrega Type
 
 `object` ([OrdenEntrega](ordenentrega.md))
 
-# items Properties
+# ordenEntrega Properties
 
 | Property                | Type      | Required | Nullable       | Defined by                                                                             |
 | :---------------------- | :-------- | :------- | :------------- | :------------------------------------------------------------------------------------- |

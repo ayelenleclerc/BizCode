@@ -42,6 +42,10 @@ Declared in code: `counter`, `field`, `backoffice`, `warehouse`, `delivery`. The
 
 The **Inicio → Analytics** tab calls `GET /api/dashboard/ventas-historico` and requires **`reports.operational.read`** plus tenant module **`analytics.advanced`** (catalog dependency: `analytics.dashboard`). No new permission literal was added.
 
+## Delivery routes / repartos (#140)
+
+UI `/logistica/repartos` is gated by module **`logistics.dispatches`**. API: list/detail `GET /api/repartos` and `GET /api/repartos/{id}` require **`logistics.read`**; create, start, and close require **`orders.dispatch`**. Typical roles: `owner`, `manager`, `logistics_planner`, `warehouse_lead` (see `ROLE_PERMISSIONS` in code for `logistics.read` on planner).
+
 ## Related documents
 
 - Master plan execution index: [master-plan-bizcode-execution.md](master-plan-bizcode-execution.md)

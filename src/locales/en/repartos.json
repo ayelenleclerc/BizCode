@@ -1,0 +1,64 @@
+{
+  "title": "Delivery routes",
+  "subtitle": "Group delivery orders into routes and assign a driver.",
+  "forbidden": "You do not have permission to view delivery routes.",
+  "navLink": "Go to delivery routes",
+  "backToOrders": "Delivery orders",
+  "filters": {
+    "fecha": "Date",
+    "estado": "Status",
+    "allEstados": "All statuses"
+  },
+  "estado": {
+    "planned": "Planned",
+    "on_route": "On route",
+    "completed": "Completed",
+    "cancelled": "Cancelled"
+  },
+  "itemEstado": {
+    "pending": "Pending",
+    "delivered": "Delivered",
+    "not_delivered": "Not delivered",
+    "returned": "Returned"
+  },
+  "list": {
+    "chofer": "Driver",
+    "vehiculo": "Vehicle",
+    "progress": "Progress",
+    "empty": "No routes for this date.",
+    "loading": "Loading routes…"
+  },
+  "actions": {
+    "refresh": "Refresh",
+    "newRoute": "New route",
+    "create": "Create route",
+    "cancel": "Cancel",
+    "start": "Start route",
+    "close": "Close route",
+    "moveUp": "Move up",
+    "moveDown": "Move down",
+    "addOrder": "Add",
+    "removeOrder": "Remove"
+  },
+  "form": {
+    "chofer": "Driver",
+    "vehiculo": "Vehicle (optional)",
+    "observaciones": "Notes (optional)",
+    "routeSequence": "Route sequence",
+    "availableOrders": "Available orders",
+    "selectChofer": "Select a driver",
+    "noDrivers": "No active drivers."
+  },
+  "tracking": {
+    "title": "Route detail",
+    "summaryClose": "Closed: {{pending}} pending marked not delivered."
+  },
+  "errors": {
+    "load": "Could not load delivery routes.",
+    "create": "Could not create the route.",
+    "start": "Could not start the route.",
+    "close": "Could not close the route.",
+    "alreadyInRoute": "An order is already on an active route.",
+    "invalidState": "Route status is not valid for this action."
+  }
+}

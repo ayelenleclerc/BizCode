@@ -10,6 +10,8 @@ Versioning: [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **Delivery routes / repartos (GitHub #140):** `Reparto` / `RepartoItem` models; API `GET/POST /api/repartos`, `GET /api/repartos/{id}`, `POST .../iniciar`, `POST .../cerrar`; read `logistics.read`, mutations `orders.dispatch`; groups pending delivery orders, start route (`on_route`), close marks pending items `not_delivered` and OEs `failed`; UI `/logistica/repartos` (module `logistics.dispatches`, drag-and-drop route sequence); OpenAPI, tests, and logistics manual (EN/ES/PT-BR).
+
 - **Advanced dashboard analytics (GitHub #138):** `GET /api/dashboard/ventas-historico` (PostgreSQL aggregation, JSON + CSV); **Inicio** tab **Analytics** with line/bar/pie charts (recharts), date presets (30/90/365 days), seller and delivery-zone filters; requires `reports.operational.read` and module `analytics.advanced`; index `Factura_tenantId_estado_fecha_idx`; OpenAPI, tests, and reports manual (EN/ES/PT-BR).
 
 - **Physical inventory count (GitHub #136):** `Recuento` / `RecuentoItem` models; API `GET/POST /api/recuentos`, `GET /api/recuentos/{id}`, `PUT .../items`, `POST .../close`, `GET .../pdf`; permission `inventory.count`; stock block `RECUENTO_IN_PROGRESS` on adjustments, purchase receipt, and invoice stock; UI `/recuentos` (module `inventory.count`); OpenAPI, tests, and logistics manual (EN/ES/PT-BR).

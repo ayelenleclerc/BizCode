@@ -1,0 +1,245 @@
+import type { Prisma, PrismaClient } from '@prisma/client'
+import type { RepartoCreateInput } from '../createApp.types'
+import { assertOrdenNotInActiveReparto } from '../lib/repartoActiveGuard'
+import { facturaFechaToPrismaDate } from '../routes/restDomainShared'
+import type { ServiceResult } from './serviceResults'
+
+export const REPARTO_ESTADOS = ['planned', 'on_route', 'completed', 'cancelled'] as const
+export type RepartoEstado = (typeof REPARTO_ESTADOS)[number]
+
+export const REPARTO_ITEM_ESTADOS = ['pending', 'delivered', 'not_delivered', 'returned'] as const
+export type RepartoItemEstado = (typeof REPARTO_ITEM_ESTADOS)[number]
+
+const repartoInclude = {
+  chofer: { select: { id: true, username: true, role: true } },
+  items: {
+    orderBy: { secuencia: 'asc' as const },
+    include: {
+      ordenEntrega: {
+        include: {
+          cliente: { select: { id: true, codigo: true, rsocial: true } },
+          zona: { select: { id: true, nombre: true } },
+          factura: { select: { id: true, tipo: true, prefijo: true, numero: true } },
+        },
+      },
+    },
+  },
+} satisfies Prisma.RepartoInclude
+
+export type RepartoRow = Prisma.RepartoGetPayload<{ include: typeof repartoInclude }>
+
+export type RepartoListRow = RepartoRow & {
+  progress: { total: number; delivered: number; pending: number }
+}
+
+function mapProgress(items: { estado: string }[]): RepartoListRow['progress'] {
+  const total = items.length
+  const delivered = items.filter((i) => i.estado === 'delivered').length
+  const pending = items.filter((i) => i.estado === 'pending').length
+  return { total, delivered, pending }
+}
+
+function withProgress(row: RepartoRow): RepartoListRow {
+  return { ...row, progress: mapProgress(row.items) }
+}
+
+/**
+ * @en Delivery routes: group orders, start route, close with failed pending OEs (#140).
+ * @es Repartos: agrupar OEs, iniciar ruta, cerrar con OEs pendientes en failed (#140).
+ * @pt-BR Rotas de entrega: agrupar OEs, iniciar rota, fechar com OEs pendentes em failed (#140).
+ */
+export class RepartoService {
+  constructor(private readonly prisma: PrismaClient) {}
+
+  async list(
+    tenantId: number,
+    filters: { fecha?: Date; choferId?: number; estado?: RepartoEstado },
+    take: number,
+    skip: number,
+  ): Promise<{ total: number; repartos: RepartoListRow[] }> {
+    const where: Prisma.RepartoWhereInput = { tenantId }
+    if (filters.estado !== undefined) {
+      where.estado = filters.estado
+    }
+    if (filters.choferId !== undefined) {
+      where.choferId = filters.choferId
+    }
+    if (filters.fecha !== undefined) {
+      const start = new Date(filters.fecha)
+      start.setHours(0, 0, 0, 0)
+      const end = new Date(filters.fecha)
+      end.setHours(23, 59, 59, 999)
+      where.fecha = { gte: start, lte: end }
+    }
+
+    const [total, rows] = await Promise.all([
+      this.prisma.reparto.count({ where }),
+      this.prisma.reparto.findMany({
+        where,
+        include: repartoInclude,
+        orderBy: [{ fecha: 'desc' }, { id: 'desc' }],
+        take,
+        skip,
+      }),
+    ])
+    return { total, repartos: rows.map(withProgress) }
+  }
+
+  async getById(tenantId: number, id: number): Promise<RepartoListRow | null> {
+    const row = await this.prisma.reparto.findFirst({
+      where: { id, tenantId },
+      include: repartoInclude,
+    })
+    return row ? withProgress(row) : null
+  }
+
+  async create(tenantId: number, input: RepartoCreateInput): Promise<ServiceResult<RepartoListRow>> {
+    const fecha = facturaFechaToPrismaDate(input.fecha)
+    const chofer = await this.prisma.appUser.findFirst({
+      where: { id: input.choferId, tenantId, role: 'driver', active: true },
+      select: { id: true },
+    })
+    if (!chofer) {
+      return { ok: false, status: 400, error: 'choferId must be an active driver for this tenant' }
+    }
+
+    const uniqueIds = [...new Set(input.ordenEntregaIds)]
+    if (uniqueIds.length === 0) {
+      return { ok: false, status: 400, error: 'ordenEntregaIds must contain at least one id' }
+    }
+
+    const ordenes = await this.prisma.ordenEntrega.findMany({
+      where: { tenantId, id: { in: uniqueIds } },
+      select: { id: true, estado: true, fecha: true },
+    })
+    if (ordenes.length !== uniqueIds.length) {
+      return { ok: false, status: 400, error: 'INVALID_LINE_ITEM' }
+    }
+
+    for (const oe of ordenes) {
+      if (oe.estado !== 'pending') {
+        return { ok: false, status: 422, error: 'INVALID_LINE_ITEM' }
+      }
+    }
+
+    const guard = await assertOrdenNotInActiveReparto(this.prisma, tenantId, uniqueIds)
+    if (!guard.ok) {
+      return { ok: false, status: 422, error: 'ORDEN_ALREADY_IN_ACTIVE_REPARTO' }
+    }
+
+    const row = await this.prisma.$transaction(async (tx) => {
+      const reparto = await tx.reparto.create({
+        data: {
+          tenantId,
+          fecha,
+          choferId: input.choferId,
+          estado: 'planned',
+          vehiculo: input.vehiculo ?? null,
+          observaciones: input.observaciones ?? null,
+          items: {
+            create: uniqueIds.map((ordenEntregaId, index) => ({
+              ordenEntregaId,
+              secuencia: index + 1,
+              estado: 'pending',
+            })),
+          },
+        },
+        include: repartoInclude,
+      })
+
+      await tx.ordenEntrega.updateMany({
+        where: { tenantId, id: { in: uniqueIds } },
+        data: { estado: 'assigned', driverId: input.choferId },
+      })
+
+      return reparto
+    })
+
+    return { ok: true, data: withProgress(row) }
+  }
+
+  async iniciar(tenantId: number, id: number): Promise<ServiceResult<RepartoListRow>> {
+    const existing = await this.prisma.reparto.findFirst({
+      where: { id, tenantId },
+      include: { items: { where: { estado: 'pending' }, select: { ordenEntregaId: true } } },
+    })
+    if (!existing) {
+      return { ok: false, status: 404, error: 'REPARTO_NOT_FOUND' }
+    }
+    if (existing.estado !== 'planned') {
+      return { ok: false, status: 422, error: 'REPARTO_INVALID_STATE' }
+    }
+
+    const oeIds = existing.items.map((i) => i.ordenEntregaId)
+
+    const row = await this.prisma.$transaction(async (tx) => {
+      const updated = await tx.reparto.update({
+        where: { id },
+        data: { estado: 'on_route' },
+        include: repartoInclude,
+      })
+      if (oeIds.length > 0) {
+        await tx.ordenEntrega.updateMany({
+          where: { tenantId, id: { in: oeIds }, estado: 'assigned' },
+          data: { estado: 'in_transit' },
+        })
+      }
+      return updated
+    })
+
+    return { ok: true, data: withProgress(row) }
+  }
+
+  async cerrar(
+    tenantId: number,
+    id: number,
+  ): Promise<
+    ServiceResult<{
+      reparto: RepartoListRow
+      summary: { pendingClosed: number; delivered: number; notDelivered: number; returned: number }
+    }>
+  > {
+    const existing = await this.prisma.reparto.findFirst({
+      where: { id, tenantId },
+      include: { items: true },
+    })
+    if (!existing) {
+      return { ok: false, status: 404, error: 'REPARTO_NOT_FOUND' }
+    }
+    if (existing.estado !== 'on_route') {
+      return { ok: false, status: 422, error: 'REPARTO_INVALID_STATE' }
+    }
+
+    const pendingItems = existing.items.filter((i) => i.estado === 'pending')
+    const pendingOeIds = pendingItems.map((i) => i.ordenEntregaId)
+    const now = new Date()
+
+    const row = await this.prisma.$transaction(async (tx) => {
+      if (pendingItems.length > 0) {
+        await tx.repartoItem.updateMany({
+          where: { id: { in: pendingItems.map((i) => i.id) } },
+          data: { estado: 'not_delivered' },
+        })
+        await tx.ordenEntrega.updateMany({
+          where: { tenantId, id: { in: pendingOeIds } },
+          data: { estado: 'failed' },
+        })
+      }
+
+      return tx.reparto.update({
+        where: { id },
+        data: { estado: 'completed', closedAt: now },
+        include: repartoInclude,
+      })
+    })
+
+    const summary = {
+      pendingClosed: pendingItems.length,
+      delivered: row.items.filter((i) => i.estado === 'delivered').length,
+      notDelivered: row.items.filter((i) => i.estado === 'not_delivered').length,
+      returned: row.items.filter((i) => i.estado === 'returned').length,
+    }
+
+    return { ok: true, data: { reparto: withProgress(row), summary } }
+  }
+}

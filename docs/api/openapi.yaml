@@ -34,6 +34,8 @@ tags:
     description: Purchase orders to suppliers (#135)
   - name: recuentos
     description: Physical inventory count (#136)
+  - name: repartos
+    description: Delivery routes grouping orders (#140)
   - name: facturas
     description: Invoice management
   - name: afip
@@ -3483,6 +3485,202 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
 
+  /api/repartos:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [repartos]
+      summary: List delivery routes
+      description: Requires `logistics.read`. Filter by `fecha`, `choferId`, `estado`.
+      parameters:
+        - name: fecha
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: choferId
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+        - name: estado
+          in: query
+          schema:
+            type: string
+            enum: [planned, on_route, completed, cancelled]
+        - $ref: '#/components/parameters/ListLimit'
+        - $ref: '#/components/parameters/ListOffset'
+      responses:
+        '200':
+          description: Paginated delivery routes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RepartoListEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    post:
+      tags: [repartos]
+      summary: Create delivery route
+      description: |
+        Requires `orders.dispatch`. Groups pending delivery orders; assigns driver and sets OEs to `assigned`.
+        Rejects when an OE is already on an active route (`planned` or `on_route`).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RepartoCreateInput'
+      responses:
+        '201':
+          description: Route created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RepartoEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '422':
+          description: Invalid line item or OE already on active route
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/repartos/{id}:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [repartos]
+      summary: Get delivery route by id
+      description: Requires `logistics.read`.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '200':
+          description: Route detail with ordered items
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RepartoEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Route not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/repartos/{id}/iniciar:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    post:
+      tags: [repartos]
+      summary: Start delivery route
+      description: |
+        Requires `orders.dispatch`. `planned` → `on_route`; pending items' OEs → `in_transit`.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '200':
+          description: Route started
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RepartoEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Route not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '422':
+          description: Invalid state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/repartos/{id}/cerrar:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    post:
+      tags: [repartos]
+      summary: Close delivery route
+      description: |
+        Requires `orders.dispatch`. `on_route` → `completed`; pending items → `not_delivered` and OEs → `failed`.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '200':
+          description: Route closed with summary
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RepartoCloseEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Route not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '422':
+          description: Invalid state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
 components:
   securitySchemes:
     cookieSession:
@@ -4949,6 +5147,163 @@ components:
               cantFisica:
                 type: integer
                 minimum: 0
+
+    RepartoProgress:
+      type: object
+      required: [total, delivered, pending]
+      properties:
+        total:
+          type: integer
+          minimum: 0
+        delivered:
+          type: integer
+          minimum: 0
+        pending:
+          type: integer
+          minimum: 0
+
+    RepartoItemLine:
+      type: object
+      required: [id, ordenEntregaId, secuencia, estado, ordenEntrega]
+      properties:
+        id:
+          type: integer
+        ordenEntregaId:
+          type: integer
+        secuencia:
+          type: integer
+        estado:
+          type: string
+          enum: [pending, delivered, not_delivered, returned]
+        entregadoAt:
+          type: string
+          format: date-time
+          nullable: true
+        motivoNoEntrega:
+          type: string
+          nullable: true
+        ordenEntrega:
+          $ref: '#/components/schemas/OrdenEntrega'
+
+    Reparto:
+      type: object
+      required: [id, tenantId, fecha, choferId, estado, items, progress]
+      properties:
+        id:
+          type: integer
+        tenantId:
+          type: integer
+        fecha:
+          type: string
+          format: date-time
+        choferId:
+          type: integer
+        estado:
+          type: string
+          enum: [planned, on_route, completed, cancelled]
+        vehiculo:
+          type: string
+          nullable: true
+        observaciones:
+          type: string
+          nullable: true
+        closedAt:
+          type: string
+          format: date-time
+          nullable: true
+        chofer:
+          type: object
+          properties:
+            id:
+              type: integer
+            username:
+              type: string
+            role:
+              type: string
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/RepartoItemLine'
+        progress:
+          $ref: '#/components/schemas/RepartoProgress'
+
+    RepartoCreateInput:
+      type: object
+      required: [fecha, choferId, ordenEntregaIds]
+      properties:
+        fecha:
+          type: string
+          format: date
+        choferId:
+          type: integer
+          minimum: 1
+        vehiculo:
+          type: string
+          maxLength: 60
+          nullable: true
+        observaciones:
+          type: string
+          maxLength: 500
+          nullable: true
+        ordenEntregaIds:
+          type: array
+          minItems: 1
+          items:
+            type: integer
+            minimum: 1
+
+    RepartoListEnvelope:
+      allOf:
+        - $ref: '#/components/schemas/ListPaginationMeta'
+        - type: object
+          required: [success, data]
+          properties:
+            success:
+              type: boolean
+              const: true
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/Reparto'
+
+    RepartoEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/Reparto'
+
+    RepartoCloseSummary:
+      type: object
+      required: [pendingClosed, delivered, notDelivered, returned]
+      properties:
+        pendingClosed:
+          type: integer
+          minimum: 0
+        delivered:
+          type: integer
+          minimum: 0
+        notDelivered:
+          type: integer
+          minimum: 0
+        returned:
+          type: integer
+          minimum: 0
+
+    RepartoCloseEnvelope:
+      type: object
+      required: [success, data, summary]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/Reparto'
+        summary:
+          $ref: '#/components/schemas/RepartoCloseSummary'
 
     ProveedorEnvelope:
       type: object

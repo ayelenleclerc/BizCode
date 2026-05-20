@@ -22,6 +22,25 @@ Con **`orders.create`**, abra el formulario de nueva orden, ingrese id de client
 
 Usuarios con **`orders.dispatch`** o **`orders.deliver.confirm`** pueden cambiar el estado de la orden según los controles de la UI (`PUT /api/ordenes-entrega/:id`).
 
+## Repartos
+
+Abra **Repartos** desde el enlace en la página de logística o navegue a `/logistica/repartos`. La ruta usa el módulo **`logistics.dispatches`**.
+
+| Permiso | Uso |
+|---------|-----|
+| `logistics.read` | Listar y ver detalle de repartos |
+| `orders.dispatch` | Crear reparto, iniciar (`iniciar`) y cerrar (`cerrar`) |
+
+**Estados del reparto:** `planned` → `on_route` → `completed` (en el modelo también `cancelled`; sin API de cancelación por ahora).
+
+| Paso | Acción |
+|------|--------|
+| Planificar | `POST /api/repartos` — chofer, vehículo/notas opcionales, OEs pendientes en secuencia (UI con arrastre y teclado); las OEs pasan a `assigned` con `driverId` |
+| Iniciar | `POST /api/repartos/{id}/iniciar` — `planned` → `on_route`; OEs de ítems pendientes → `in_transit` |
+| Cerrar | `POST /api/repartos/{id}/cerrar` — `on_route` → `completed`; ítems `pending` → `not_delivered` y OEs vinculadas → `failed` |
+
+Una OE no puede estar en dos repartos activos (`planned` u `on_route`) a la vez (`422 ORDEN_ALREADY_IN_ACTIVE_REPARTO`).
+
 ## Órdenes de compra
 
 Abra **Compras** (`/compras`) desde el menú lateral. La ruta depende del módulo de tenant **`logistics.purchases`** y es visible para roles como **owner**, **manager** y **warehouse_lead** (según la configuración de navegación del producto).
@@ -51,6 +70,6 @@ Mientras un recuento está `in_progress`, las mutaciones de stock quedan bloquea
 
 ## Referencia API
 
-[`docs/api/openapi.yaml`](../../api/openapi.yaml) — rutas `/api/ordenes-entrega`, `/api/compras`, `/api/recuentos`.
+[`docs/api/openapi.yaml`](../../api/openapi.yaml) — rutas `/api/ordenes-entrega`, `/api/repartos`, `/api/compras`, `/api/recuentos`.
 
 **Otros idiomas:** [English](../../en/user/manual-logistics.md) · [Português](../../pt-br/user/manual-logistica.md)

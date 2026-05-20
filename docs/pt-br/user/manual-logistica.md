@@ -22,6 +22,25 @@ Com **`orders.create`**, abra o formulário de nova ordem, informe id do cliente
 
 Usuários com **`orders.dispatch`** ou **`orders.deliver.confirm`** podem alterar o estado da ordem pelos controles da UI (`PUT /api/ordenes-entrega/:id`).
 
+## Repartos
+
+Abra **Repartos** pelo link na página de logística ou navegue para `/logistica/repartos`. A rota usa o módulo **`logistics.dispatches`**.
+
+| Permissão | Uso |
+|-----------|-----|
+| `logistics.read` | Listar e ver detalhe dos repartos |
+| `orders.dispatch` | Criar reparto, iniciar (`iniciar`) e fechar (`cerrar`) |
+
+**Status do reparto:** `planned` → `on_route` → `completed` (no modelo também `cancelled`; sem API de cancelamento por enquanto).
+
+| Etapa | Ação |
+|-------|------|
+| Planejar | `POST /api/repartos` — motorista, veículo/notas opcionais, OEs pendentes em sequência (UI com arrastar e teclado); OEs passam a `assigned` com `driverId` |
+| Iniciar | `POST /api/repartos/{id}/iniciar` — `planned` → `on_route`; OEs dos itens pendentes → `in_transit` |
+| Fechar | `POST /api/repartos/{id}/cerrar` — `on_route` → `completed`; itens `pending` → `not_delivered` e OEs vinculadas → `failed` |
+
+Uma OE não pode estar em dois repartos ativos (`planned` ou `on_route`) ao mesmo tempo (`422 ORDEN_ALREADY_IN_ACTIVE_REPARTO`).
+
 ## Ordens de compra
 
 Abra **Compras** (`/compras`) na barra lateral. A rota depende do módulo do tenant **`logistics.purchases`** e é visível para papéis como **owner**, **manager** e **warehouse_lead** (conforme a configuração de navegação do produto).
@@ -51,6 +70,6 @@ Enquanto uma contagem está `in_progress`, mutações de estoque ficam bloqueada
 
 ## Referência API
 
-[`docs/api/openapi.yaml`](../../api/openapi.yaml) — rotas `/api/ordenes-entrega`, `/api/compras`, `/api/recuentos`.
+[`docs/api/openapi.yaml`](../../api/openapi.yaml) — rotas `/api/ordenes-entrega`, `/api/repartos`, `/api/compras`, `/api/recuentos`.
 
 **Outros idiomas:** [English](../../en/user/manual-logistics.md) · [Español](../../es/user/manual-logistica.md)

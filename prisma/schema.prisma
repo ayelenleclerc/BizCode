@@ -405,6 +405,7 @@ model Tenant {
   cobros         Cobro[]
   cobroRecordatorios CobroRecordatorio[]
   ordenesEntrega OrdenEntrega[]
+  repartos       Reparto[]
   paramEmpresa   ParamEmpresa?
   fiscalConfig   TenantFiscalConfig?
   stockAjustes   StockAjuste[]
@@ -510,9 +511,50 @@ model OrdenEntrega {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 
+  repartoItems RepartoItem[]
+
   @@index([tenantId, estado])
   @@index([tenantId, fecha])
   @@index([tenantId, driverId])
+}
+
+/// Delivery route grouping delivery orders (#140).
+model Reparto {
+  id            Int       @id @default(autoincrement())
+  tenantId      Int
+  tenant        Tenant    @relation(fields: [tenantId], references: [id])
+  fecha         DateTime
+  choferId      Int
+  chofer        AppUser   @relation("RepartoChofer", fields: [choferId], references: [id])
+  /// planned | on_route | completed | cancelled
+  estado        String    @db.VarChar(20) @default("planned")
+  vehiculo      String?   @db.VarChar(60)
+  observaciones String?   @db.VarChar(500)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  closedAt      DateTime?
+
+  items RepartoItem[]
+
+  @@index([tenantId, fecha])
+  @@index([tenantId, estado])
+  @@index([tenantId, choferId])
+}
+
+model RepartoItem {
+  id               Int          @id @default(autoincrement())
+  repartoId        Int
+  reparto          Reparto      @relation(fields: [repartoId], references: [id], onDelete: Cascade)
+  ordenEntregaId   Int
+  ordenEntrega     OrdenEntrega @relation(fields: [ordenEntregaId], references: [id])
+  secuencia        Int
+  /// pending | delivered | not_delivered | returned
+  estado           String       @db.VarChar(20) @default("pending")
+  entregadoAt      DateTime?
+  motivoNoEntrega  String?      @db.VarChar(200)
+
+  @@index([repartoId])
+  @@index([ordenEntregaId])
 }
 
 model AppUser {
@@ -536,6 +578,7 @@ model AppUser {
   chatMessagesSent     ChatMessage[] @relation("ChatMessageSender")
   chatMessagesReceived ChatMessage[] @relation("ChatMessageRecipient")
   ordenesEntregaDriver OrdenEntrega[] @relation("OrdenEntregaDriver")
+  repartosChofer       Reparto[]      @relation("RepartoChofer")
   pedidosVendedor      Pedido[]
   stockAjustes         StockAjuste[]
   recuentosOperados    Recuento[]     @relation("RecuentoOperador")

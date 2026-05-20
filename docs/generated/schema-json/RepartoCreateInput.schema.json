@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "choferId": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "fecha": {
+      "format": "date",
+      "type": "string"
+    },
+    "observaciones": {
+      "maxLength": 500,
+      "nullable": true,
+      "type": "string"
+    },
+    "ordenEntregaIds": {
+      "items": {
+        "minimum": 1,
+        "type": "integer"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "vehiculo": {
+      "maxLength": 60,
+      "nullable": true,
+      "type": "string"
+    }
+  },
+  "required": [
+    "fecha",
+    "choferId",
+    "ordenEntregaIds"
+  ],
+  "title": "RepartoCreateInput",
+  "type": "object"
+}

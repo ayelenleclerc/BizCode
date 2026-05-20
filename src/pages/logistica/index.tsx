@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import ErrorBoundary from '@/components/ErrorBoundary'
 import { CanAccess } from '@/components/CanAccess'
@@ -50,6 +51,7 @@ function LogisticaForbidden({ t }: { t: (key: string) => string }) {
 
 function LogisticaPageContent() {
   const { t } = useTranslation('logistica')
+  const { t: tRepartos } = useTranslation('repartos')
   const { claims } = useAuth()
   const isDriver = claims?.role === 'driver'
   const canDispatch = claims?.permissions.includes('orders.dispatch') ?? false
@@ -152,7 +154,16 @@ function LogisticaPageContent() {
     <div className="p-8 max-w-6xl mx-auto" data-testid="logistica-page">
       <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
         <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">{pageTitle}</h1>
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
+          {!isDriver && (
+            <Link
+              to="/logistica/repartos"
+              className="px-3 py-2 text-sm border border-slate-300 dark:border-slate-600 rounded inline-flex items-center"
+              data-testid="logistica-repartos-link"
+            >
+              {tRepartos('navLink')}
+            </Link>
+          )}
           <button
             type="button"
             onClick={() => void loadOrdenes()}

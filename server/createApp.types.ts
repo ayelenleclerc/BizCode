@@ -114,6 +114,18 @@ export type OrdenEntregaUpdateBody = {
   nota?: string | null
 }
 
+export type RepartoEstado = 'planned' | 'on_route' | 'completed' | 'cancelled'
+
+export type RepartoItemEstado = 'pending' | 'delivered' | 'not_delivered' | 'returned'
+
+export type RepartoCreateInput = {
+  fecha: string
+  choferId: number
+  vehiculo?: string | null
+  observaciones?: string | null
+  ordenEntregaIds: number[]
+}
+
 export type StockAjusteInput = {
   cantidad: number
   motivo: string

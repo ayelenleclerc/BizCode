@@ -1191,6 +1191,36 @@ export const recuentoItemsBodySchema = z
   })
   .transform((data): { lines: RecuentoItemLineInput[] } => ({ lines: data.lines }))
 
+export const repartoCreateBodySchema = z
+  .object({
+    fecha: z.string().min(1, 'fecha is required'),
+    choferId: z.number({ invalid_type_error: 'choferId must be a number' }),
+    vehiculo: z.string().max(60).nullable().optional(),
+    observaciones: z.string().max(500).nullable().optional(),
+    ordenEntregaIds: z
+      .array(z.number({ invalid_type_error: 'ordenEntregaIds entries must be numbers' }))
+      .min(1, 'ordenEntregaIds must contain at least one id'),
+  })
+  .superRefine((body, ctx) => {
+    if (!Number.isInteger(body.choferId) || body.choferId < 1) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'choferId must be a positive integer',
+        path: ['choferId'],
+      })
+    }
+    for (let i = 0; i < body.ordenEntregaIds.length; i++) {
+      const id = body.ordenEntregaIds[i]
+      if (!Number.isInteger(id) || id < 1) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'ordenEntregaIds entries must be positive integers',
+          path: ['ordenEntregaIds', i],
+        })
+      }
+    }
+  })
+
 export function safeParseBodySchema<S extends z.ZodTypeAny>(schema: S, raw: unknown): SafeParseBodyResult<z.output<S>> {
   const parsed = schema.safeParse(raw)
   if (!parsed.success) {

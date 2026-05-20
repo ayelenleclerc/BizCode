@@ -12,6 +12,7 @@ import chatEs from '@/locales/es/chat.json'
 import proveedoresEs from '@/locales/es/proveedores.json'
 import comprasEs from '@/locales/es/compras.json'
 import recuentosEs from '@/locales/es/recuentos.json'
+import repartosEs from '@/locales/es/repartos.json'
 import auditEs from '@/locales/es/audit.json'
 import cobrosEs from '@/locales/es/cobros.json'
 import pedidosEs from '@/locales/es/pedidos.json'
@@ -30,6 +31,7 @@ import chatEn from '@/locales/en/chat.json'
 import proveedoresEn from '@/locales/en/proveedores.json'
 import comprasEn from '@/locales/en/compras.json'
 import recuentosEn from '@/locales/en/recuentos.json'
+import repartosEn from '@/locales/en/repartos.json'
 import auditEn from '@/locales/en/audit.json'
 import cobrosEn from '@/locales/en/cobros.json'
 import pedidosEn from '@/locales/en/pedidos.json'
@@ -48,6 +50,7 @@ import chatPt from '@/locales/pt-BR/chat.json'
 import proveedoresPt from '@/locales/pt-BR/proveedores.json'
 import comprasPt from '@/locales/pt-BR/compras.json'
 import recuentosPt from '@/locales/pt-BR/recuentos.json'
+import repartosPt from '@/locales/pt-BR/repartos.json'
 import auditPt from '@/locales/pt-BR/audit.json'
 import cobrosPt from '@/locales/pt-BR/cobros.json'
 import pedidosPt from '@/locales/pt-BR/pedidos.json'
@@ -68,7 +71,7 @@ i18n
     lng: savedLang,
     fallbackLng: 'es',
     defaultNS: 'common',
-    ns: ['common', 'clientes', 'articulos', 'proveedores', 'compras', 'recuentos', 'facturacion', 'pedidos', 'cobros', 'finanzas', 'reportes', 'dashboardAnalytics', 'logistica', 'zonasEntrega', 'empresa', 'chat', 'audit'],
+    ns: ['common', 'clientes', 'articulos', 'proveedores', 'compras', 'recuentos', 'repartos', 'facturacion', 'pedidos', 'cobros', 'finanzas', 'reportes', 'dashboardAnalytics', 'logistica', 'zonasEntrega', 'empresa', 'chat', 'audit'],
     resources: {
       es: {
         common: commonEs,
@@ -77,6 +80,7 @@ i18n
         proveedores: proveedoresEs,
         compras: comprasEs,
         recuentos: recuentosEs,
+        repartos: repartosEs,
         facturacion: facturacionEs,
         pedidos: pedidosEs,
         zonasEntrega: zonasEntregaEs,
@@ -96,6 +100,7 @@ i18n
         proveedores: proveedoresEn,
         compras: comprasEn,
         recuentos: recuentosEn,
+        repartos: repartosEn,
         facturacion: facturacionEn,
         pedidos: pedidosEn,
         zonasEntrega: zonasEntregaEn,
@@ -115,6 +120,7 @@ i18n
         proveedores: proveedoresPt,
         compras: comprasPt,
         recuentos: recuentosPt,
+        repartos: repartosPt,
         facturacion: facturacionPt,
         pedidos: pedidosPt,
         zonasEntrega: zonasEntregaPt,
