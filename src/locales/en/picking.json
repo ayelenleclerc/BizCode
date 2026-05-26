@@ -1,0 +1,35 @@
+{
+  "title": "Warehouse picking",
+  "forbidden": "You do not have permission to pick delivery orders.",
+  "queue": {
+    "title": "Picking queue",
+    "empty": "No orders waiting to be picked.",
+    "loading": "Loading queue…",
+    "selectHint": "Select an order to view details."
+  },
+  "detail": {
+    "cliente": "Customer",
+    "fecha": "Commitment date",
+    "zona": "Zone",
+    "horario": "Zone schedule",
+    "picker": "Picker",
+    "noItems": "This order has no invoice line items. Confirm the package is complete before marking ready.",
+    "checklistTitle": "Items to pick",
+    "markReady": "Mark as ready",
+    "starting": "Claiming order…",
+    "saving": "Saving…"
+  },
+  "lead": {
+    "title": "Ready for dispatch",
+    "empty": "No orders ready to add to a route.",
+    "cta": "Plan route",
+    "hint": "Orders in «Ready» status can be added when creating a route under Dispatches."
+  },
+  "errors": {
+    "load": "Could not load the picking queue.",
+    "start": "Could not start picking for this order.",
+    "ready": "Could not mark the order as ready.",
+    "locked": "Another user is picking this order.",
+    "checklist": "Check all items before continuing."
+  }
+}

@@ -10,6 +10,8 @@ Versionado: [Semantic Versioning](https://semver.org/lang/es/).
 
 ### Agregado
 
+- **Picking en depósito (GitHub #143):** estados `picking` / `ready` / `cancelled` en `OrdenEntrega`; campos `pickerUserId`, `pickingIniciadoAt`, `pickingListoAt`; `POST /api/ordenes-entrega/{id}/iniciar-picking` y `POST .../lista` (`orders.pick`, módulo `logistics.picking`); `GET /api/ordenes-entrega` también con `orders.pick`; repartos (#140) solo aceptan OEs `ready`; UI `/logistica/picking`; OpenAPI, pruebas y manual (EN/ES/PT-BR).
+
 - **Comprobante de entrega (POD) en ítems de reparto (GitHub #142):** campos en `RepartoItem` (receptor, notas, `motivoNoEntrega`, `podMedia` JSON); `PUT /api/repartos/{id}/items/{itemId}` (`orders.deliver.confirm`, chofer en reparto propio `on_route`) y `GET .../pod` (`logistics.read`, roles `owner`/`manager`/`logistics_planner`); listados con `hasPod` sin blobs; UI chofer `/logistica/repartos/chofer` (módulo `logistics.pod`, wizard 4 pasos); badge y diálogo en back-office; OpenAPI, pruebas y manual (EN/ES/PT-BR).
 
 - **Repartos / rutas de entrega (GitHub #140):** modelos `Reparto` / `RepartoItem`; API `GET/POST /api/repartos`, `GET /api/repartos/{id}`, `POST .../iniciar`, `POST .../cerrar`; lectura `logistics.read`, mutaciones `orders.dispatch`; agrupa OEs pendientes, inicia ruta (`on_route`), al cerrar ítems pendientes `not_delivered` y OEs `failed`; UI `/logistica/repartos` (módulo `logistics.dispatches`, reorden por arrastre); OpenAPI, pruebas y manual de logística (EN/ES/PT-BR).

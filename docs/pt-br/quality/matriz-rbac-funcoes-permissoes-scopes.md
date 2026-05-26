@@ -23,6 +23,8 @@
 
 Os literais completos estão em `PERMISSIONS` no mesmo arquivo.
 
+**Picking (#143):** `GET /api/ordenes-entrega` também aceita `orders.pick` (ex.: `warehouse_op`). `POST .../iniciar-picking` e `POST .../lista` exigem `orders.pick` e módulo `logistics.picking`.
+
 ## Canais (`USER_CHANNELS`)
 
 Definidos no código: `counter`, `field`, `backoffice`, `warehouse`, `delivery`. Fazem parte de `AuthScope.channels` e persistem em `AppUser.scopeChannels` (schema Prisma). O enforcement está ativo via `requirePermission` em [`server/auth.ts`](../../../server/auth.ts), validando `x-bizcode-channel` opcional contra o escopo de `AuthClaims`.

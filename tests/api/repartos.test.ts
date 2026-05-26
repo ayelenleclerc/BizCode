@@ -45,7 +45,7 @@ function buildPrismaMock(overrides: Partial<Record<string, unknown>> = {}): Pris
     },
     ordenEntrega: {
       count: vi.fn(),
-      findMany: vi.fn().mockResolvedValue([{ id: 5, estado: 'pending' }]),
+      findMany: vi.fn().mockResolvedValue([{ id: 5, estado: 'ready' }]),
       findFirst: vi.fn(),
       updateMany: vi.fn().mockResolvedValue({ count: 1 }),
     },

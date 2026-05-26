@@ -1044,7 +1044,7 @@ describe('API — contrato OpenAPI', () => {
     process.env.BIZCODE_TEST_ROLE = 'logistics_planner'
     const p = buildPrisma()
     vi.mocked(p.appUser.findFirst).mockResolvedValueOnce({ id: 2, role: 'driver' } as never)
-    vi.mocked(p.ordenEntrega.findMany).mockResolvedValueOnce([{ id: 1, estado: 'pending' }] as never)
+    vi.mocked(p.ordenEntrega.findMany).mockResolvedValueOnce([{ id: 1, estado: 'ready' }] as never)
     vi.mocked(p.repartoItem.findFirst).mockResolvedValueOnce(null)
     p.$transaction = vi.fn(async (fn: unknown) => {
       if (typeof fn === 'function') {
@@ -1264,6 +1264,98 @@ describe('API — contrato OpenAPI', () => {
       .send({ clienteId: 1, fecha: '2026-05-16' })
       .expect(201)
     await assertMatchesOpenApi('/api/ordenes-entrega', 'post', '201', res.body)
+  })
+
+  it('POST /api/ordenes-entrega/:id/iniciar-picking', async () => {
+    process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
+    process.env.BIZCODE_TEST_ROLE = 'warehouse_op'
+    process.env.BIZCODE_TEST_USER_ID = '7'
+    vi.mocked(prisma.ordenEntrega.findFirst).mockResolvedValueOnce({
+      id: 1,
+      tenantId: 1,
+      facturaId: null,
+      clienteId: 1,
+      zonaId: null,
+      driverId: null,
+      pickerUserId: null,
+      pickingIniciadoAt: null,
+      pickingListoAt: null,
+      fecha: new Date('2026-05-16'),
+      estado: 'pending',
+      nota: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    } as never)
+    vi.mocked(prisma.ordenEntrega.update).mockResolvedValueOnce({
+      id: 1,
+      tenantId: 1,
+      facturaId: null,
+      clienteId: 1,
+      zonaId: null,
+      driverId: null,
+      pickerUserId: 7,
+      pickingIniciadoAt: new Date(),
+      pickingListoAt: null,
+      fecha: new Date('2026-05-16'),
+      estado: 'picking',
+      nota: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      cliente: { id: 1, codigo: 1, rsocial: 'Cliente' },
+      zona: null,
+      driver: null,
+      picker: { id: 7, username: 'wh1', role: 'warehouse_op' },
+      factura: null,
+    } as never)
+    const app = createApp(prisma)
+    const res = await request(app).post('/api/ordenes-entrega/1/iniciar-picking').expect(200)
+    await assertMatchesOpenApi('/api/ordenes-entrega/{id}/iniciar-picking', 'post', '200', res.body)
+  })
+
+  it('POST /api/ordenes-entrega/:id/lista', async () => {
+    process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
+    process.env.BIZCODE_TEST_ROLE = 'warehouse_op'
+    process.env.BIZCODE_TEST_USER_ID = '7'
+    vi.mocked(prisma.ordenEntrega.findFirst).mockResolvedValueOnce({
+      id: 1,
+      tenantId: 1,
+      estado: 'picking',
+      pickerUserId: 7,
+      driverId: null,
+      clienteId: 1,
+      facturaId: null,
+      zonaId: null,
+      pickingIniciadoAt: new Date(),
+      pickingListoAt: null,
+      fecha: new Date(),
+      nota: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    } as never)
+    vi.mocked(prisma.ordenEntrega.update).mockResolvedValueOnce({
+      id: 1,
+      tenantId: 1,
+      facturaId: null,
+      clienteId: 1,
+      zonaId: null,
+      driverId: null,
+      pickerUserId: 7,
+      pickingIniciadoAt: new Date(),
+      pickingListoAt: new Date(),
+      fecha: new Date('2026-05-16'),
+      estado: 'ready',
+      nota: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      cliente: { id: 1, codigo: 1, rsocial: 'Cliente' },
+      zona: null,
+      driver: null,
+      picker: { id: 7, username: 'wh1', role: 'warehouse_op' },
+      factura: null,
+    } as never)
+    const app = createApp(prisma)
+    const res = await request(app).post('/api/ordenes-entrega/1/lista').expect(200)
+    await assertMatchesOpenApi('/api/ordenes-entrega/{id}/lista', 'post', '200', res.body)
   })
 
   it('GET /api/empresa', async () => {

@@ -504,8 +504,12 @@ model OrdenEntrega {
   zona      DeliveryZone? @relation(fields: [zonaId], references: [id])
   driverId  Int?
   driver    AppUser?  @relation("OrdenEntregaDriver", fields: [driverId], references: [id])
+  pickerUserId      Int?
+  picker            AppUser?  @relation("OrdenEntregaPicker", fields: [pickerUserId], references: [id])
+  pickingIniciadoAt DateTime?
+  pickingListoAt    DateTime?
   fecha     DateTime
-  /// pending | assigned | in_transit | delivered | failed
+  /// pending | picking | ready | assigned | in_transit | delivered | failed | cancelled
   estado    String    @db.VarChar(20) @default("pending")
   nota      String?   @db.VarChar(200)
   createdAt DateTime  @default(now())
@@ -516,6 +520,7 @@ model OrdenEntrega {
   @@index([tenantId, estado])
   @@index([tenantId, fecha])
   @@index([tenantId, driverId])
+  @@index([tenantId, pickerUserId])
 }
 
 /// Delivery route grouping delivery orders (#140).
@@ -584,6 +589,7 @@ model AppUser {
   chatMessagesSent     ChatMessage[] @relation("ChatMessageSender")
   chatMessagesReceived ChatMessage[] @relation("ChatMessageRecipient")
   ordenesEntregaDriver OrdenEntrega[] @relation("OrdenEntregaDriver")
+  ordenesEntregaPicker OrdenEntrega[] @relation("OrdenEntregaPicker")
   repartosChofer       Reparto[]      @relation("RepartoChofer")
   pedidosVendedor      Pedido[]
   stockAjustes         StockAjuste[]

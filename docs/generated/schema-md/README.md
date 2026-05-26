@@ -212,6 +212,8 @@
 
 * [OrdenEntregaEnvelope](./ordenentregaenvelope.md) – `-`
 
+* [OrdenEntregaLineItem](./ordenentregalineitem.md) – `-`
+
 * [OrdenEntregaListEnvelope](./ordenentregalistenvelope.md) – `-`
 
 * [OrdenEntregaUpdateInput](./ordenentregaupdateinput.md) – `-`
@@ -446,7 +448,11 @@
 
 * [Untitled object in OrdenEntrega](./ordenentrega-properties-factura.md) – `undefined#/properties/factura`
 
+* [Untitled object in OrdenEntrega](./ordenentrega-properties-picker.md) – `undefined#/properties/picker`
+
 * [Untitled object in OrdenEntrega](./ordenentrega-properties-zona.md) – `undefined#/properties/zona`
+
+* [Untitled object in OrdenEntregaLineItem](./ordenentregalineitem-properties-articulo.md) – `undefined#/properties/articulo`
 
 * [Untitled object in OrdenEntregaListEnvelope](./ordenentregalistenvelope-allof-0.md) – `undefined#/allOf/0`
 
@@ -571,6 +577,8 @@
 * [Untitled array in OrdenCompraReceiveInput](./ordencomprareceiveinput-properties-lines.md) – `undefined#/properties/lines`
 
 * [Untitled array in OrdenCompraUpdateInput](./ordencompraupdateinput-properties-items.md) – `undefined#/properties/items`
+
+* [Untitled array in OrdenEntrega](./ordenentrega-properties-items.md) – `undefined#/properties/items`
 
 * [Untitled array in OrdenEntregaListEnvelope](./ordenentregalistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
 

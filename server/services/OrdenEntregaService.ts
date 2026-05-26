@@ -5,32 +5,93 @@ import type { ServiceResult } from './serviceResults'
 
 export const ORDEN_ENTREGA_ESTADOS: OrdenEntregaEstado[] = [
   'pending',
+  'picking',
+  'ready',
   'assigned',
   'in_transit',
   'delivered',
   'failed',
+  'cancelled',
 ]
 
 const ALLOWED_TRANSITIONS: Record<OrdenEntregaEstado, OrdenEntregaEstado[]> = {
-  pending: ['assigned', 'failed'],
+  pending: ['picking', 'cancelled', 'failed'],
+  picking: ['ready', 'cancelled'],
+  ready: ['cancelled'],
   assigned: ['in_transit', 'failed'],
   in_transit: ['delivered', 'failed'],
   delivered: [],
   failed: [],
+  cancelled: [],
 }
 
 const ordenInclude = {
   cliente: { select: { id: true, codigo: true, rsocial: true } },
-  zona: { select: { id: true, nombre: true } },
+  zona: { select: { id: true, nombre: true, horario: true } },
   driver: { select: { id: true, username: true, role: true } },
-  factura: { select: { id: true, tipo: true, prefijo: true, numero: true } },
+  picker: { select: { id: true, username: true, role: true } },
+  factura: {
+    select: {
+      id: true,
+      tipo: true,
+      prefijo: true,
+      numero: true,
+      items: {
+        select: {
+          id: true,
+          cantidad: true,
+          articulo: { select: { id: true, codigo: true, descripcion: true } },
+        },
+      },
+    },
+  },
 } satisfies Prisma.OrdenEntregaInclude
 
 export type OrdenEntregaRow = Prisma.OrdenEntregaGetPayload<{ include: typeof ordenInclude }>
 
+export type OrdenEntregaLineItem = {
+  id: number
+  cantidad: number
+  articulo: { id: number; codigo: number; descripcion: string }
+}
+
+export type OrdenEntregaFacturaHeader = {
+  id: number
+  tipo: string
+  prefijo: string
+  numero: number
+}
+
+export type OrdenEntregaPublic = Omit<OrdenEntregaRow, 'factura'> & {
+  factura: OrdenEntregaFacturaHeader | null
+  items: OrdenEntregaLineItem[]
+}
+
 export type OrdenEntregaListResult = {
   total: number
-  ordenes: OrdenEntregaRow[]
+  ordenes: OrdenEntregaPublic[]
+}
+
+function mapLineItems(row: OrdenEntregaRow): OrdenEntregaLineItem[] {
+  const facturaItems = row.factura?.items
+  if (!facturaItems?.length) return []
+  return facturaItems.map((item) => ({
+    id: item.id,
+    cantidad: item.cantidad,
+    articulo: item.articulo,
+  }))
+}
+
+export function mapOrdenEntregaPublic(row: OrdenEntregaRow): OrdenEntregaPublic {
+  const { factura, ...rest } = row
+  const facturaHeader = factura
+    ? { id: factura.id, tipo: factura.tipo, prefijo: factura.prefijo, numero: factura.numero }
+    : null
+  return {
+    ...rest,
+    factura: facturaHeader,
+    items: mapLineItems(row),
+  }
 }
 
 function isValidTransition(from: OrdenEntregaEstado, to: OrdenEntregaEstado): boolean {
@@ -42,13 +103,13 @@ function requiresDeliverConfirm(to: OrdenEntregaEstado): boolean {
 }
 
 function requiresDispatch(to: OrdenEntregaEstado): boolean {
-  return to === 'assigned' || to === 'in_transit' || to === 'failed'
+  return to === 'in_transit' || to === 'failed'
 }
 
 /**
- * @en Delivery order lifecycle (list, create, status updates).
- * @es Ciclo de vida de órdenes de entrega (listado, alta, cambios de estado).
- * @pt-BR Ciclo de vida de ordens de entrega (listagem, criação, mudanças de status).
+ * @en Delivery order lifecycle (list, create, status updates, warehouse picking).
+ * @es Ciclo de vida de órdenes de entrega (listado, alta, cambios de estado, picking en depósito).
+ * @pt-BR Ciclo de vida de ordens de entrega (listagem, criação, mudanças de status, picking no depósito).
  */
 export class OrdenEntregaService {
   constructor(private readonly prisma: PrismaClient) {}
@@ -82,24 +143,25 @@ export class OrdenEntregaService {
       where.fecha = { gte: start, lte: end }
     }
 
-    const [total, ordenes] = await Promise.all([
+    const [total, rows] = await Promise.all([
       this.prisma.ordenEntrega.count({ where }),
       this.prisma.ordenEntrega.findMany({
         where,
         include: ordenInclude,
-        orderBy: [{ fecha: 'asc' }, { id: 'asc' }],
+        orderBy: [{ zona: { nombre: 'asc' } }, { fecha: 'asc' }, { id: 'asc' }],
         take,
         skip,
       }),
     ])
-    return { total, ordenes }
+    return { total, ordenes: rows.map(mapOrdenEntregaPublic) }
   }
 
-  async getById(tenantId: number, id: number): Promise<OrdenEntregaRow | null> {
-    return this.prisma.ordenEntrega.findFirst({
+  async getById(tenantId: number, id: number): Promise<OrdenEntregaPublic | null> {
+    const row = await this.prisma.ordenEntrega.findFirst({
       where: { id, tenantId },
       include: ordenInclude,
     })
+    return row ? mapOrdenEntregaPublic(row) : null
   }
 
   private async validateRefs(
@@ -147,7 +209,7 @@ export class OrdenEntregaService {
     return { ok: true, data: null }
   }
 
-  async create(tenantId: number, input: OrdenEntregaCreateInput): Promise<ServiceResult<OrdenEntregaRow>> {
+  async create(tenantId: number, input: OrdenEntregaCreateInput): Promise<ServiceResult<OrdenEntregaPublic>> {
     const refs = await this.validateRefs(tenantId, input)
     if (!refs.ok) return refs
 
@@ -170,7 +232,81 @@ export class OrdenEntregaService {
       },
       include: ordenInclude,
     })
-    return { ok: true, data: orden }
+    return { ok: true, data: mapOrdenEntregaPublic(orden) }
+  }
+
+  async iniciarPicking(
+    tenantId: number,
+    id: number,
+    userId: number,
+  ): Promise<ServiceResult<OrdenEntregaPublic>> {
+    const existing = await this.prisma.ordenEntrega.findFirst({
+      where: { id, tenantId },
+    })
+    if (!existing) {
+      return { ok: false, status: 404, error: 'OrdenEntrega not found' }
+    }
+
+    const fromEstado = existing.estado as OrdenEntregaEstado
+
+    if (fromEstado === 'picking') {
+      if (existing.pickerUserId === userId) {
+        const current = await this.getById(tenantId, id)
+        if (!current) {
+          return { ok: false, status: 404, error: 'OrdenEntrega not found' }
+        }
+        return { ok: true, data: current }
+      }
+      return { ok: false, status: 409, error: 'PICKING_ASSIGNED_TO_OTHER_USER' }
+    }
+
+    if (fromEstado !== 'pending') {
+      return { ok: false, status: 422, error: `Invalid transition from ${fromEstado} to picking` }
+    }
+
+    const orden = await this.prisma.ordenEntrega.update({
+      where: { id },
+      data: {
+        estado: 'picking',
+        pickerUserId: userId,
+        pickingIniciadoAt: new Date(),
+      },
+      include: ordenInclude,
+    })
+    return { ok: true, data: mapOrdenEntregaPublic(orden) }
+  }
+
+  async marcarLista(
+    tenantId: number,
+    id: number,
+    userId: number,
+    allowLeadOverride: boolean,
+  ): Promise<ServiceResult<OrdenEntregaPublic>> {
+    const existing = await this.prisma.ordenEntrega.findFirst({
+      where: { id, tenantId },
+    })
+    if (!existing) {
+      return { ok: false, status: 404, error: 'OrdenEntrega not found' }
+    }
+
+    const fromEstado = existing.estado as OrdenEntregaEstado
+    if (fromEstado !== 'picking') {
+      return { ok: false, status: 422, error: `Invalid transition from ${fromEstado} to ready` }
+    }
+
+    if (existing.pickerUserId !== userId && !allowLeadOverride) {
+      return { ok: false, status: 409, error: 'PICKING_ASSIGNED_TO_OTHER_USER' }
+    }
+
+    const orden = await this.prisma.ordenEntrega.update({
+      where: { id },
+      data: {
+        estado: 'ready',
+        pickingListoAt: new Date(),
+      },
+      include: ordenInclude,
+    })
+    return { ok: true, data: mapOrdenEntregaPublic(orden) }
   }
 
   async update(
@@ -178,7 +314,9 @@ export class OrdenEntregaService {
     id: number,
     input: OrdenEntregaUpdateBody,
     actor: { userId: number; role: string; canDispatch: boolean; canDeliverConfirm: boolean },
-  ): Promise<ServiceResult<{ orden: OrdenEntregaRow; auditAction: string; previousEstado: OrdenEntregaEstado }>> {
+  ): Promise<
+    ServiceResult<{ orden: OrdenEntregaPublic; auditAction: string; previousEstado: OrdenEntregaEstado }>
+  > {
     const existing = await this.prisma.ordenEntrega.findFirst({
       where: { id, tenantId },
     })
@@ -215,6 +353,9 @@ export class OrdenEntregaService {
       if (requiresDispatch(toEstado) && !actor.canDispatch) {
         return { ok: false, status: 403, error: 'Forbidden' }
       }
+      if (toEstado === 'cancelled' && !actor.canDispatch) {
+        return { ok: false, status: 403, error: 'Forbidden' }
+      }
     }
 
     const nextDriverId = input.driverId !== undefined ? input.driverId : existing.driverId
@@ -233,6 +374,9 @@ export class OrdenEntregaService {
     const data: Prisma.OrdenEntregaUncheckedUpdateInput = {}
     if (fromEstado !== toEstado) {
       data.estado = toEstado
+      if (toEstado === 'cancelled') {
+        data.pickerUserId = null
+      }
     }
     if (input.driverId !== undefined) {
       data.driverId = input.driverId
@@ -255,6 +399,9 @@ export class OrdenEntregaService {
         ? 'entrega_confirmed'
         : `orden_entrega_${toEstado}`
 
-    return { ok: true, data: { orden, auditAction, previousEstado: fromEstado } }
+    return {
+      ok: true,
+      data: { orden: mapOrdenEntregaPublic(orden), auditAction, previousEstado: fromEstado },
+    }
   }
 }

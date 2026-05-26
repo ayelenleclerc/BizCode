@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import ErrorBoundary from '@/components/ErrorBoundary'
 import { CanAccess } from '@/components/CanAccess'
 import { useAuth } from '@/contexts/AuthContext'
+import { useFeatureFlags } from '@/contexts/FeatureFlagsContext'
 import {
   ordenesEntregaAPI,
   zonasEntregaAPI,
@@ -11,7 +12,16 @@ import {
   type OrdenEntregaEstado,
 } from '@/lib/api'
 
-const ESTADOS: OrdenEntregaEstado[] = ['pending', 'assigned', 'in_transit', 'delivered', 'failed']
+const ESTADOS: OrdenEntregaEstado[] = [
+  'pending',
+  'picking',
+  'ready',
+  'assigned',
+  'in_transit',
+  'delivered',
+  'failed',
+  'cancelled',
+]
 
 function todayIso(): string {
   return new Date().toISOString().slice(0, 10)
@@ -57,6 +67,9 @@ function LogisticaPageContent() {
   const canDispatch = claims?.permissions.includes('orders.dispatch') ?? false
   const canDeliver = claims?.permissions.includes('orders.deliver.confirm') ?? false
   const canCreate = claims?.permissions.includes('orders.create') ?? false
+  const canPick = claims?.permissions.includes('orders.pick') ?? false
+  const { hasModule } = useFeatureFlags()
+  const showPickingLink = canPick && hasModule('logistics.picking')
 
   const [fecha, setFecha] = useState(todayIso)
   const [estado, setEstado] = useState<OrdenEntregaEstado | ''>('')
@@ -155,6 +168,15 @@ function LogisticaPageContent() {
       <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
         <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">{pageTitle}</h1>
         <div className="flex gap-2 flex-wrap">
+          {!isDriver && showPickingLink && (
+            <Link
+              to="/logistica/picking"
+              className="px-3 py-2 text-sm border border-slate-300 dark:border-slate-600 rounded inline-flex items-center"
+              data-testid="logistica-picking-link"
+            >
+              {t('linkPicking')}
+            </Link>
+          )}
           {!isDriver && (
             <Link
               to="/logistica/repartos"

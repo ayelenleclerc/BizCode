@@ -19922,7 +19922,7 @@ Returns boolean flags for each channel. No sensitive values are exposed.
 - **Path:** `/api/ordenes-entrega`
 - **Tags:** logistics
 
-Requires `logistics.read` or `orders.deliver.confirm`. Drivers only see their own orders (`driverId` forced to session user).
+Requires `logistics.read`, `orders.deliver.confirm`, or `orders.pick`. Drivers only see their own orders (`driverId` forced to session user).
 
 #### Responses
 
@@ -19956,7 +19956,7 @@ Requires `logistics.read` or `orders.deliver.confirm`. Drivers only see their ow
 
   - **`estado`**
 
-    `string`, possible values: `"pending", "assigned", "in_transit", "delivered", "failed"`
+    `string`, possible values: `"pending", "picking", "ready", "assigned", "in_transit", "delivered", "failed", "cancelled"`
 
   - **`factura`**
 
@@ -19974,9 +19974,55 @@ Requires `logistics.read` or `orders.deliver.confirm`. Drivers only see their ow
 
     `integer`
 
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+    - **`articulo` (required)**
+
+      `object`
+
+      - **`codigo` (required)**
+
+        `integer`
+
+      - **`descripcion` (required)**
+
+        `string`
+
+      - **`id` (required)**
+
+        `integer`
+
+    - **`cantidad` (required)**
+
+      `integer`
+
+    - **`id` (required)**
+
+      `integer`
+
   - **`nota`**
 
     `string`
+
+  - **`picker`**
+
+    `object`
+
+  - **`pickerUserId`**
+
+    `integer`
+
+  - **`pickingIniciadoAt`**
+
+    `string`, format: `date-time`
+
+  - **`pickingListoAt`**
+
+    `string`, format: `date-time`
 
   - **`tenantId`**
 
@@ -20007,9 +20053,23 @@ Requires `logistics.read` or `orders.deliver.confirm`. Drivers only see their ow
       "clienteId": 1,
       "zonaId": 1,
       "driverId": 1,
+      "pickerUserId": 1,
+      "pickingIniciadoAt": "",
+      "pickingListoAt": "",
       "fecha": "",
       "estado": "pending",
       "nota": "",
+      "items": [
+        {
+          "id": 1,
+          "cantidad": 1,
+          "articulo": {
+            "id": 1,
+            "codigo": 1,
+            "descripcion": ""
+          }
+        }
+      ],
       "cliente": {
         "additionalProperty": "anything"
       },
@@ -20020,6 +20080,9 @@ Requires `logistics.read` or `orders.deliver.confirm`. Drivers only see their ow
         "additionalProperty": "anything"
       },
       "factura": {
+        "additionalProperty": "anything"
+      },
+      "picker": {
         "additionalProperty": "anything"
       },
       "additionalProperty": "anything"
@@ -20189,7 +20252,7 @@ Requires `orders.create`. Initial estado is `pending`, or `assigned` when `drive
 
   - **`estado`**
 
-    `string`, possible values: `"pending", "assigned", "in_transit", "delivered", "failed"`
+    `string`, possible values: `"pending", "picking", "ready", "assigned", "in_transit", "delivered", "failed", "cancelled"`
 
   - **`factura`**
 
@@ -20207,9 +20270,55 @@ Requires `orders.create`. Initial estado is `pending`, or `assigned` when `drive
 
     `integer`
 
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+    - **`articulo` (required)**
+
+      `object`
+
+      - **`codigo` (required)**
+
+        `integer`
+
+      - **`descripcion` (required)**
+
+        `string`
+
+      - **`id` (required)**
+
+        `integer`
+
+    - **`cantidad` (required)**
+
+      `integer`
+
+    - **`id` (required)**
+
+      `integer`
+
   - **`nota`**
 
     `string`
+
+  - **`picker`**
+
+    `object`
+
+  - **`pickerUserId`**
+
+    `integer`
+
+  - **`pickingIniciadoAt`**
+
+    `string`, format: `date-time`
+
+  - **`pickingListoAt`**
+
+    `string`, format: `date-time`
 
   - **`tenantId`**
 
@@ -20239,9 +20348,23 @@ Requires `orders.create`. Initial estado is `pending`, or `assigned` when `drive
     "clienteId": 1,
     "zonaId": 1,
     "driverId": 1,
+    "pickerUserId": 1,
+    "pickingIniciadoAt": "",
+    "pickingListoAt": "",
     "fecha": "",
     "estado": "pending",
     "nota": "",
+    "items": [
+      {
+        "id": 1,
+        "cantidad": 1,
+        "articulo": {
+          "id": 1,
+          "codigo": 1,
+          "descripcion": ""
+        }
+      }
+    ],
     "cliente": {
       "additionalProperty": "anything"
     },
@@ -20252,6 +20375,9 @@ Requires `orders.create`. Initial estado is `pending`, or `assigned` when `drive
       "additionalProperty": "anything"
     },
     "factura": {
+      "additionalProperty": "anything"
+    },
+    "picker": {
       "additionalProperty": "anything"
     },
     "additionalProperty": "anything"
@@ -20362,7 +20488,7 @@ Requires `orders.dispatch` for transitions to `assigned`, `in_transit`, or `fail
 
 - **`estado` (required)**
 
-  `string`, possible values: `"pending", "assigned", "in_transit", "delivered", "failed"`
+  `string`, possible values: `"pending", "picking", "ready", "assigned", "in_transit", "delivered", "failed", "cancelled"`
 
 - **`driverId`**
 
@@ -20415,7 +20541,7 @@ Requires `orders.dispatch` for transitions to `assigned`, `in_transit`, or `fail
 
   - **`estado`**
 
-    `string`, possible values: `"pending", "assigned", "in_transit", "delivered", "failed"`
+    `string`, possible values: `"pending", "picking", "ready", "assigned", "in_transit", "delivered", "failed", "cancelled"`
 
   - **`factura`**
 
@@ -20433,9 +20559,55 @@ Requires `orders.dispatch` for transitions to `assigned`, `in_transit`, or `fail
 
     `integer`
 
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+    - **`articulo` (required)**
+
+      `object`
+
+      - **`codigo` (required)**
+
+        `integer`
+
+      - **`descripcion` (required)**
+
+        `string`
+
+      - **`id` (required)**
+
+        `integer`
+
+    - **`cantidad` (required)**
+
+      `integer`
+
+    - **`id` (required)**
+
+      `integer`
+
   - **`nota`**
 
     `string`
+
+  - **`picker`**
+
+    `object`
+
+  - **`pickerUserId`**
+
+    `integer`
+
+  - **`pickingIniciadoAt`**
+
+    `string`, format: `date-time`
+
+  - **`pickingListoAt`**
+
+    `string`, format: `date-time`
 
   - **`tenantId`**
 
@@ -20465,9 +20637,23 @@ Requires `orders.dispatch` for transitions to `assigned`, `in_transit`, or `fail
     "clienteId": 1,
     "zonaId": 1,
     "driverId": 1,
+    "pickerUserId": 1,
+    "pickingIniciadoAt": "",
+    "pickingListoAt": "",
     "fecha": "",
     "estado": "pending",
     "nota": "",
+    "items": [
+      {
+        "id": 1,
+        "cantidad": 1,
+        "articulo": {
+          "id": 1,
+          "codigo": 1,
+          "descripcion": ""
+        }
+      }
+    ],
     "cliente": {
       "additionalProperty": "anything"
     },
@@ -20478,6 +20664,9 @@ Requires `orders.dispatch` for transitions to `assigned`, `in_transit`, or `fail
       "additionalProperty": "anything"
     },
     "factura": {
+      "additionalProperty": "anything"
+    },
+    "picker": {
       "additionalProperty": "anything"
     },
     "additionalProperty": "anything"
@@ -20549,6 +20738,606 @@ Requires `orders.dispatch` for transitions to `assigned`, `in_transit`, or `fail
 ```
 
 ##### Status: 404 Order not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 422 Invalid state transition
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/ordenes-entrega/{id}/iniciar-picking
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/ordenes-entrega/{id}/iniciar-picking`
+
+### Start warehouse picking for a delivery order
+
+- **Method:** `POST`
+- **Path:** `/api/ordenes-entrega/{id}/iniciar-picking`
+- **Tags:** logistics
+
+Requires `orders.pick` and tenant module `logistics.picking`. Transitions `pending` → `picking` and assigns the session user as picker. Returns 409 when another user already holds the order in picking.
+
+#### Responses
+
+##### Status: 200 Picking started (or idempotent for same picker)
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`cliente`**
+
+    `object`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`driver`**
+
+    `object`
+
+  - **`driverId`**
+
+    `integer`
+
+  - **`estado`**
+
+    `string`, possible values: `"pending", "picking", "ready", "assigned", "in_transit", "delivered", "failed", "cancelled"`
+
+  - **`factura`**
+
+    `object`
+
+  - **`facturaId`**
+
+    `integer`
+
+  - **`fecha`**
+
+    `string`, format: `date-time`
+
+  - **`id`**
+
+    `integer`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+    - **`articulo` (required)**
+
+      `object`
+
+      - **`codigo` (required)**
+
+        `integer`
+
+      - **`descripcion` (required)**
+
+        `string`
+
+      - **`id` (required)**
+
+        `integer`
+
+    - **`cantidad` (required)**
+
+      `integer`
+
+    - **`id` (required)**
+
+      `integer`
+
+  - **`nota`**
+
+    `string`
+
+  - **`picker`**
+
+    `object`
+
+  - **`pickerUserId`**
+
+    `integer`
+
+  - **`pickingIniciadoAt`**
+
+    `string`, format: `date-time`
+
+  - **`pickingListoAt`**
+
+    `string`, format: `date-time`
+
+  - **`tenantId`**
+
+    `integer`
+
+  - **`zona`**
+
+    `object`
+
+  - **`zonaId`**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "facturaId": 1,
+    "clienteId": 1,
+    "zonaId": 1,
+    "driverId": 1,
+    "pickerUserId": 1,
+    "pickingIniciadoAt": "",
+    "pickingListoAt": "",
+    "fecha": "",
+    "estado": "pending",
+    "nota": "",
+    "items": [
+      {
+        "id": 1,
+        "cantidad": 1,
+        "articulo": {
+          "id": 1,
+          "codigo": 1,
+          "descripcion": ""
+        }
+      }
+    ],
+    "cliente": {
+      "additionalProperty": "anything"
+    },
+    "zona": {
+      "additionalProperty": "anything"
+    },
+    "driver": {
+      "additionalProperty": "anything"
+    },
+    "factura": {
+      "additionalProperty": "anything"
+    },
+    "picker": {
+      "additionalProperty": "anything"
+    },
+    "additionalProperty": "anything"
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Order not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 409 Order is being picked by another user
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 422 Invalid state transition
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/ordenes-entrega/{id}/lista
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/ordenes-entrega/{id}/lista`
+
+### Mark delivery order ready after picking
+
+- **Method:** `POST`
+- **Path:** `/api/ordenes-entrega/{id}/lista`
+- **Tags:** logistics
+
+Requires `orders.pick` and tenant module `logistics.picking`. Transitions `picking` → `ready`. Only the assigned picker may complete, except `warehouse_lead` who may override.
+
+#### Responses
+
+##### Status: 200 Order marked ready for dispatch
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`cliente`**
+
+    `object`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`driver`**
+
+    `object`
+
+  - **`driverId`**
+
+    `integer`
+
+  - **`estado`**
+
+    `string`, possible values: `"pending", "picking", "ready", "assigned", "in_transit", "delivered", "failed", "cancelled"`
+
+  - **`factura`**
+
+    `object`
+
+  - **`facturaId`**
+
+    `integer`
+
+  - **`fecha`**
+
+    `string`, format: `date-time`
+
+  - **`id`**
+
+    `integer`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+    - **`articulo` (required)**
+
+      `object`
+
+      - **`codigo` (required)**
+
+        `integer`
+
+      - **`descripcion` (required)**
+
+        `string`
+
+      - **`id` (required)**
+
+        `integer`
+
+    - **`cantidad` (required)**
+
+      `integer`
+
+    - **`id` (required)**
+
+      `integer`
+
+  - **`nota`**
+
+    `string`
+
+  - **`picker`**
+
+    `object`
+
+  - **`pickerUserId`**
+
+    `integer`
+
+  - **`pickingIniciadoAt`**
+
+    `string`, format: `date-time`
+
+  - **`pickingListoAt`**
+
+    `string`, format: `date-time`
+
+  - **`tenantId`**
+
+    `integer`
+
+  - **`zona`**
+
+    `object`
+
+  - **`zonaId`**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "facturaId": 1,
+    "clienteId": 1,
+    "zonaId": 1,
+    "driverId": 1,
+    "pickerUserId": 1,
+    "pickingIniciadoAt": "",
+    "pickingListoAt": "",
+    "fecha": "",
+    "estado": "pending",
+    "nota": "",
+    "items": [
+      {
+        "id": 1,
+        "cantidad": 1,
+        "articulo": {
+          "id": 1,
+          "codigo": 1,
+          "descripcion": ""
+        }
+      }
+    ],
+    "cliente": {
+      "additionalProperty": "anything"
+    },
+    "zona": {
+      "additionalProperty": "anything"
+    },
+    "driver": {
+      "additionalProperty": "anything"
+    },
+    "factura": {
+      "additionalProperty": "anything"
+    },
+    "picker": {
+      "additionalProperty": "anything"
+    },
+    "additionalProperty": "anything"
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Order not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 409 Order is assigned to another picker
 
 ###### Content-Type: application/json
 
@@ -20706,7 +21495,7 @@ Requires `logistics.read`. Filter by `fecha`, `choferId`, `estado`.
 
       - **`estado`**
 
-        `string`, possible values: `"pending", "assigned", "in_transit", "delivered", "failed"`
+        `string`, possible values: `"pending", "picking", "ready", "assigned", "in_transit", "delivered", "failed", "cancelled"`
 
       - **`factura`**
 
@@ -20724,9 +21513,55 @@ Requires `logistics.read`. Filter by `fecha`, `choferId`, `estado`.
 
         `integer`
 
+      - **`items`**
+
+        `array`
+
+        **Items:**
+
+        - **`articulo` (required)**
+
+          `object`
+
+          - **`codigo` (required)**
+
+            `integer`
+
+          - **`descripcion` (required)**
+
+            `string`
+
+          - **`id` (required)**
+
+            `integer`
+
+        - **`cantidad` (required)**
+
+          `integer`
+
+        - **`id` (required)**
+
+          `integer`
+
       - **`nota`**
 
         `string`
+
+      - **`picker`**
+
+        `object`
+
+      - **`pickerUserId`**
+
+        `integer`
+
+      - **`pickingIniciadoAt`**
+
+        `string`, format: `date-time`
+
+      - **`pickingListoAt`**
+
+        `string`, format: `date-time`
 
       - **`tenantId`**
 
@@ -20862,9 +21697,23 @@ Requires `logistics.read`. Filter by `fecha`, `choferId`, `estado`.
             "clienteId": 1,
             "zonaId": 1,
             "driverId": 1,
+            "pickerUserId": 1,
+            "pickingIniciadoAt": "",
+            "pickingListoAt": "",
             "fecha": "",
             "estado": "pending",
             "nota": "",
+            "items": [
+              {
+                "id": 1,
+                "cantidad": 1,
+                "articulo": {
+                  "id": 1,
+                  "codigo": 1,
+                  "descripcion": ""
+                }
+              }
+            ],
             "cliente": {
               "additionalProperty": "anything"
             },
@@ -20875,6 +21724,9 @@ Requires `logistics.read`. Filter by `fecha`, `choferId`, `estado`.
               "additionalProperty": "anything"
             },
             "factura": {
+              "additionalProperty": "anything"
+            },
+            "picker": {
               "additionalProperty": "anything"
             },
             "additionalProperty": "anything"
@@ -20981,7 +21833,7 @@ Requires `logistics.read`. Filter by `fecha`, `choferId`, `estado`.
 - **Path:** `/api/repartos`
 - **Tags:** repartos
 
-Requires `orders.dispatch`. Groups pending delivery orders; assigns driver and sets OEs to `assigned`. Rejects when an OE is already on an active route (`planned` or `on_route`).
+Requires `orders.dispatch`. Groups delivery orders in estado `ready`; assigns driver and sets OEs to `assigned`. Rejects when an OE is already on an active route (`planned` or `on_route`).
 
 #### Request Body
 
@@ -21091,7 +21943,7 @@ Requires `orders.dispatch`. Groups pending delivery orders; assigns driver and s
 
       - **`estado`**
 
-        `string`, possible values: `"pending", "assigned", "in_transit", "delivered", "failed"`
+        `string`, possible values: `"pending", "picking", "ready", "assigned", "in_transit", "delivered", "failed", "cancelled"`
 
       - **`factura`**
 
@@ -21109,9 +21961,55 @@ Requires `orders.dispatch`. Groups pending delivery orders; assigns driver and s
 
         `integer`
 
+      - **`items`**
+
+        `array`
+
+        **Items:**
+
+        - **`articulo` (required)**
+
+          `object`
+
+          - **`codigo` (required)**
+
+            `integer`
+
+          - **`descripcion` (required)**
+
+            `string`
+
+          - **`id` (required)**
+
+            `integer`
+
+        - **`cantidad` (required)**
+
+          `integer`
+
+        - **`id` (required)**
+
+          `integer`
+
       - **`nota`**
 
         `string`
+
+      - **`picker`**
+
+        `object`
+
+      - **`pickerUserId`**
+
+        `integer`
+
+      - **`pickingIniciadoAt`**
+
+        `string`, format: `date-time`
+
+      - **`pickingListoAt`**
+
+        `string`, format: `date-time`
 
       - **`tenantId`**
 
@@ -21243,9 +22141,23 @@ Requires `orders.dispatch`. Groups pending delivery orders; assigns driver and s
           "clienteId": 1,
           "zonaId": 1,
           "driverId": 1,
+          "pickerUserId": 1,
+          "pickingIniciadoAt": "",
+          "pickingListoAt": "",
           "fecha": "",
           "estado": "pending",
           "nota": "",
+          "items": [
+            {
+              "id": 1,
+              "cantidad": 1,
+              "articulo": {
+                "id": 1,
+                "codigo": 1,
+                "descripcion": ""
+              }
+            }
+          ],
           "cliente": {
             "additionalProperty": "anything"
           },
@@ -21256,6 +22168,9 @@ Requires `orders.dispatch`. Groups pending delivery orders; assigns driver and s
             "additionalProperty": "anything"
           },
           "factura": {
+            "additionalProperty": "anything"
+          },
+          "picker": {
             "additionalProperty": "anything"
           },
           "additionalProperty": "anything"
@@ -21455,7 +22370,7 @@ Requires `logistics.read`.
 
       - **`estado`**
 
-        `string`, possible values: `"pending", "assigned", "in_transit", "delivered", "failed"`
+        `string`, possible values: `"pending", "picking", "ready", "assigned", "in_transit", "delivered", "failed", "cancelled"`
 
       - **`factura`**
 
@@ -21473,9 +22388,55 @@ Requires `logistics.read`.
 
         `integer`
 
+      - **`items`**
+
+        `array`
+
+        **Items:**
+
+        - **`articulo` (required)**
+
+          `object`
+
+          - **`codigo` (required)**
+
+            `integer`
+
+          - **`descripcion` (required)**
+
+            `string`
+
+          - **`id` (required)**
+
+            `integer`
+
+        - **`cantidad` (required)**
+
+          `integer`
+
+        - **`id` (required)**
+
+          `integer`
+
       - **`nota`**
 
         `string`
+
+      - **`picker`**
+
+        `object`
+
+      - **`pickerUserId`**
+
+        `integer`
+
+      - **`pickingIniciadoAt`**
+
+        `string`, format: `date-time`
+
+      - **`pickingListoAt`**
+
+        `string`, format: `date-time`
 
       - **`tenantId`**
 
@@ -21607,9 +22568,23 @@ Requires `logistics.read`.
           "clienteId": 1,
           "zonaId": 1,
           "driverId": 1,
+          "pickerUserId": 1,
+          "pickingIniciadoAt": "",
+          "pickingListoAt": "",
           "fecha": "",
           "estado": "pending",
           "nota": "",
+          "items": [
+            {
+              "id": 1,
+              "cantidad": 1,
+              "articulo": {
+                "id": 1,
+                "codigo": 1,
+                "descripcion": ""
+              }
+            }
+          ],
           "cliente": {
             "additionalProperty": "anything"
           },
@@ -21620,6 +22595,9 @@ Requires `logistics.read`.
             "additionalProperty": "anything"
           },
           "factura": {
+            "additionalProperty": "anything"
+          },
+          "picker": {
             "additionalProperty": "anything"
           },
           "additionalProperty": "anything"
@@ -21819,7 +22797,7 @@ Requires `orders.dispatch`. `planned` → `on_route`; pending items' OEs → `in
 
       - **`estado`**
 
-        `string`, possible values: `"pending", "assigned", "in_transit", "delivered", "failed"`
+        `string`, possible values: `"pending", "picking", "ready", "assigned", "in_transit", "delivered", "failed", "cancelled"`
 
       - **`factura`**
 
@@ -21837,9 +22815,55 @@ Requires `orders.dispatch`. `planned` → `on_route`; pending items' OEs → `in
 
         `integer`
 
+      - **`items`**
+
+        `array`
+
+        **Items:**
+
+        - **`articulo` (required)**
+
+          `object`
+
+          - **`codigo` (required)**
+
+            `integer`
+
+          - **`descripcion` (required)**
+
+            `string`
+
+          - **`id` (required)**
+
+            `integer`
+
+        - **`cantidad` (required)**
+
+          `integer`
+
+        - **`id` (required)**
+
+          `integer`
+
       - **`nota`**
 
         `string`
+
+      - **`picker`**
+
+        `object`
+
+      - **`pickerUserId`**
+
+        `integer`
+
+      - **`pickingIniciadoAt`**
+
+        `string`, format: `date-time`
+
+      - **`pickingListoAt`**
+
+        `string`, format: `date-time`
 
       - **`tenantId`**
 
@@ -21971,9 +22995,23 @@ Requires `orders.dispatch`. `planned` → `on_route`; pending items' OEs → `in
           "clienteId": 1,
           "zonaId": 1,
           "driverId": 1,
+          "pickerUserId": 1,
+          "pickingIniciadoAt": "",
+          "pickingListoAt": "",
           "fecha": "",
           "estado": "pending",
           "nota": "",
+          "items": [
+            {
+              "id": 1,
+              "cantidad": 1,
+              "articulo": {
+                "id": 1,
+                "codigo": 1,
+                "descripcion": ""
+              }
+            }
+          ],
           "cliente": {
             "additionalProperty": "anything"
           },
@@ -21984,6 +23022,9 @@ Requires `orders.dispatch`. `planned` → `on_route`; pending items' OEs → `in
             "additionalProperty": "anything"
           },
           "factura": {
+            "additionalProperty": "anything"
+          },
+          "picker": {
             "additionalProperty": "anything"
           },
           "additionalProperty": "anything"
@@ -22204,7 +23245,7 @@ Requires `orders.dispatch`. `on_route` → `completed`; pending items → `not_d
 
       - **`estado`**
 
-        `string`, possible values: `"pending", "assigned", "in_transit", "delivered", "failed"`
+        `string`, possible values: `"pending", "picking", "ready", "assigned", "in_transit", "delivered", "failed", "cancelled"`
 
       - **`factura`**
 
@@ -22222,9 +23263,55 @@ Requires `orders.dispatch`. `on_route` → `completed`; pending items → `not_d
 
         `integer`
 
+      - **`items`**
+
+        `array`
+
+        **Items:**
+
+        - **`articulo` (required)**
+
+          `object`
+
+          - **`codigo` (required)**
+
+            `integer`
+
+          - **`descripcion` (required)**
+
+            `string`
+
+          - **`id` (required)**
+
+            `integer`
+
+        - **`cantidad` (required)**
+
+          `integer`
+
+        - **`id` (required)**
+
+          `integer`
+
       - **`nota`**
 
         `string`
+
+      - **`picker`**
+
+        `object`
+
+      - **`pickerUserId`**
+
+        `integer`
+
+      - **`pickingIniciadoAt`**
+
+        `string`, format: `date-time`
+
+      - **`pickingListoAt`**
+
+        `string`, format: `date-time`
 
       - **`tenantId`**
 
@@ -22376,9 +23463,23 @@ Requires `orders.dispatch`. `on_route` → `completed`; pending items → `not_d
           "clienteId": 1,
           "zonaId": 1,
           "driverId": 1,
+          "pickerUserId": 1,
+          "pickingIniciadoAt": "",
+          "pickingListoAt": "",
           "fecha": "",
           "estado": "pending",
           "nota": "",
+          "items": [
+            {
+              "id": 1,
+              "cantidad": 1,
+              "articulo": {
+                "id": 1,
+                "codigo": 1,
+                "descripcion": ""
+              }
+            }
+          ],
           "cliente": {
             "additionalProperty": "anything"
           },
@@ -22389,6 +23490,9 @@ Requires `orders.dispatch`. `on_route` → `completed`; pending items → `not_d
             "additionalProperty": "anything"
           },
           "factura": {
+            "additionalProperty": "anything"
+          },
+          "picker": {
             "additionalProperty": "anything"
           },
           "additionalProperty": "anything"
@@ -22639,7 +23743,7 @@ Requires `orders.deliver.confirm`. Route must be `on_route`; item `pending`. Dri
 
     - **`estado`**
 
-      `string`, possible values: `"pending", "assigned", "in_transit", "delivered", "failed"`
+      `string`, possible values: `"pending", "picking", "ready", "assigned", "in_transit", "delivered", "failed", "cancelled"`
 
     - **`factura`**
 
@@ -22657,9 +23761,55 @@ Requires `orders.deliver.confirm`. Route must be `on_route`; item `pending`. Dri
 
       `integer`
 
+    - **`items`**
+
+      `array`
+
+      **Items:**
+
+      - **`articulo` (required)**
+
+        `object`
+
+        - **`codigo` (required)**
+
+          `integer`
+
+        - **`descripcion` (required)**
+
+          `string`
+
+        - **`id` (required)**
+
+          `integer`
+
+      - **`cantidad` (required)**
+
+        `integer`
+
+      - **`id` (required)**
+
+        `integer`
+
     - **`nota`**
 
       `string`
+
+    - **`picker`**
+
+      `object`
+
+    - **`pickerUserId`**
+
+      `integer`
+
+    - **`pickingIniciadoAt`**
+
+      `string`, format: `date-time`
+
+    - **`pickingListoAt`**
+
+      `string`, format: `date-time`
 
     - **`tenantId`**
 
@@ -22728,9 +23878,23 @@ Requires `orders.deliver.confirm`. Route must be `on_route`; item `pending`. Dri
       "clienteId": 1,
       "zonaId": 1,
       "driverId": 1,
+      "pickerUserId": 1,
+      "pickingIniciadoAt": "",
+      "pickingListoAt": "",
       "fecha": "",
       "estado": "pending",
       "nota": "",
+      "items": [
+        {
+          "id": 1,
+          "cantidad": 1,
+          "articulo": {
+            "id": 1,
+            "codigo": 1,
+            "descripcion": ""
+          }
+        }
+      ],
       "cliente": {
         "additionalProperty": "anything"
       },
@@ -22741,6 +23905,9 @@ Requires `orders.deliver.confirm`. Route must be `on_route`; item `pending`. Dri
         "additionalProperty": "anything"
       },
       "factura": {
+        "additionalProperty": "anything"
+      },
+      "picker": {
         "additionalProperty": "anything"
       },
       "additionalProperty": "anything"
@@ -22925,9 +24092,23 @@ Requires `logistics.read` and role `owner`, `manager`, or `logistics_planner` (n
       "clienteId": 1,
       "zonaId": 1,
       "driverId": 1,
+      "pickerUserId": 1,
+      "pickingIniciadoAt": "",
+      "pickingListoAt": "",
       "fecha": "",
       "estado": "pending",
       "nota": "",
+      "items": [
+        {
+          "id": 1,
+          "cantidad": 1,
+          "articulo": {
+            "id": 1,
+            "codigo": 1,
+            "descripcion": ""
+          }
+        }
+      ],
       "cliente": {
         "additionalProperty": "anything"
       },
@@ -22938,6 +24119,9 @@ Requires `logistics.read` and role `owner`, `manager`, or `logistics_planner` (n
         "additionalProperty": "anything"
       },
       "factura": {
+        "additionalProperty": "anything"
+      },
+      "picker": {
         "additionalProperty": "anything"
       },
       "additionalProperty": "anything"
@@ -24717,7 +25901,7 @@ Requires `logistics.read` and role `owner`, `manager`, or `logistics_planner` (n
 
 * **`estado`**
 
-  `string`, possible values: `"pending", "assigned", "in_transit", "delivered", "failed"`
+  `string`, possible values: `"pending", "picking", "ready", "assigned", "in_transit", "delivered", "failed", "cancelled"`
 
 * **`factura`**
 
@@ -24735,9 +25919,55 @@ Requires `logistics.read` and role `owner`, `manager`, or `logistics_planner` (n
 
   `integer`
 
+* **`items`**
+
+  `array`
+
+  **Items:**
+
+  - **`articulo` (required)**
+
+    `object`
+
+    - **`codigo` (required)**
+
+      `integer`
+
+    - **`descripcion` (required)**
+
+      `string`
+
+    - **`id` (required)**
+
+      `integer`
+
+  - **`cantidad` (required)**
+
+    `integer`
+
+  - **`id` (required)**
+
+    `integer`
+
 * **`nota`**
 
   `string`
+
+* **`picker`**
+
+  `object`
+
+* **`pickerUserId`**
+
+  `integer`
+
+* **`pickingIniciadoAt`**
+
+  `string`, format: `date-time`
+
+* **`pickingListoAt`**
+
+  `string`, format: `date-time`
 
 * **`tenantId`**
 
@@ -24761,9 +25991,23 @@ Requires `logistics.read` and role `owner`, `manager`, or `logistics_planner` (n
   "clienteId": 1,
   "zonaId": 1,
   "driverId": 1,
+  "pickerUserId": 1,
+  "pickingIniciadoAt": "",
+  "pickingListoAt": "",
   "fecha": "",
   "estado": "pending",
   "nota": "",
+  "items": [
+    {
+      "id": 1,
+      "cantidad": 1,
+      "articulo": {
+        "id": 1,
+        "codigo": 1,
+        "descripcion": ""
+      }
+    }
+  ],
   "cliente": {
     "additionalProperty": "anything"
   },
@@ -24776,7 +26020,52 @@ Requires `logistics.read` and role `owner`, `manager`, or `logistics_planner` (n
   "factura": {
     "additionalProperty": "anything"
   },
+  "picker": {
+    "additionalProperty": "anything"
+  },
   "additionalProperty": "anything"
+}
+```
+
+### OrdenEntregaLineItem
+
+- **Type:**`object`
+
+* **`articulo` (required)**
+
+  `object`
+
+  - **`codigo` (required)**
+
+    `integer`
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`id` (required)**
+
+    `integer`
+
+* **`cantidad` (required)**
+
+  `integer`
+
+* **`id` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "cantidad": 1,
+  "articulo": {
+    "id": 1,
+    "codigo": 1,
+    "descripcion": ""
+  }
 }
 ```
 
@@ -24827,7 +26116,7 @@ Requires `logistics.read` and role `owner`, `manager`, or `logistics_planner` (n
 
 * **`estado` (required)**
 
-  `string`, possible values: `"pending", "assigned", "in_transit", "delivered", "failed"`
+  `string`, possible values: `"pending", "picking", "ready", "assigned", "in_transit", "delivered", "failed", "cancelled"`
 
 * **`driverId`**
 
@@ -24884,7 +26173,7 @@ Requires `logistics.read` and role `owner`, `manager`, or `logistics_planner` (n
 
   - **`estado`**
 
-    `string`, possible values: `"pending", "assigned", "in_transit", "delivered", "failed"`
+    `string`, possible values: `"pending", "picking", "ready", "assigned", "in_transit", "delivered", "failed", "cancelled"`
 
   - **`factura`**
 
@@ -24902,9 +26191,55 @@ Requires `logistics.read` and role `owner`, `manager`, or `logistics_planner` (n
 
     `integer`
 
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+    - **`articulo` (required)**
+
+      `object`
+
+      - **`codigo` (required)**
+
+        `integer`
+
+      - **`descripcion` (required)**
+
+        `string`
+
+      - **`id` (required)**
+
+        `integer`
+
+    - **`cantidad` (required)**
+
+      `integer`
+
+    - **`id` (required)**
+
+      `integer`
+
   - **`nota`**
 
     `string`
+
+  - **`picker`**
+
+    `object`
+
+  - **`pickerUserId`**
+
+    `integer`
+
+  - **`pickingIniciadoAt`**
+
+    `string`, format: `date-time`
+
+  - **`pickingListoAt`**
+
+    `string`, format: `date-time`
 
   - **`tenantId`**
 
@@ -24934,9 +26269,23 @@ Requires `logistics.read` and role `owner`, `manager`, or `logistics_planner` (n
     "clienteId": 1,
     "zonaId": 1,
     "driverId": 1,
+    "pickerUserId": 1,
+    "pickingIniciadoAt": "",
+    "pickingListoAt": "",
     "fecha": "",
     "estado": "pending",
     "nota": "",
+    "items": [
+      {
+        "id": 1,
+        "cantidad": 1,
+        "articulo": {
+          "id": 1,
+          "codigo": 1,
+          "descripcion": ""
+        }
+      }
+    ],
     "cliente": {
       "additionalProperty": "anything"
     },
@@ -24947,6 +26296,9 @@ Requires `logistics.read` and role `owner`, `manager`, or `logistics_planner` (n
       "additionalProperty": "anything"
     },
     "factura": {
+      "additionalProperty": "anything"
+    },
+    "picker": {
       "additionalProperty": "anything"
     },
     "additionalProperty": "anything"
@@ -27428,7 +28780,7 @@ Requires `logistics.read` and role `owner`, `manager`, or `logistics_planner` (n
 
   - **`estado`**
 
-    `string`, possible values: `"pending", "assigned", "in_transit", "delivered", "failed"`
+    `string`, possible values: `"pending", "picking", "ready", "assigned", "in_transit", "delivered", "failed", "cancelled"`
 
   - **`factura`**
 
@@ -27446,9 +28798,55 @@ Requires `logistics.read` and role `owner`, `manager`, or `logistics_planner` (n
 
     `integer`
 
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+    - **`articulo` (required)**
+
+      `object`
+
+      - **`codigo` (required)**
+
+        `integer`
+
+      - **`descripcion` (required)**
+
+        `string`
+
+      - **`id` (required)**
+
+        `integer`
+
+    - **`cantidad` (required)**
+
+      `integer`
+
+    - **`id` (required)**
+
+      `integer`
+
   - **`nota`**
 
     `string`
+
+  - **`picker`**
+
+    `object`
+
+  - **`pickerUserId`**
+
+    `integer`
+
+  - **`pickingIniciadoAt`**
+
+    `string`, format: `date-time`
+
+  - **`pickingListoAt`**
+
+    `string`, format: `date-time`
 
   - **`tenantId`**
 
@@ -27511,9 +28909,23 @@ Requires `logistics.read` and role `owner`, `manager`, or `logistics_planner` (n
     "clienteId": 1,
     "zonaId": 1,
     "driverId": 1,
+    "pickerUserId": 1,
+    "pickingIniciadoAt": "",
+    "pickingListoAt": "",
     "fecha": "",
     "estado": "pending",
     "nota": "",
+    "items": [
+      {
+        "id": 1,
+        "cantidad": 1,
+        "articulo": {
+          "id": 1,
+          "codigo": 1,
+          "descripcion": ""
+        }
+      }
+    ],
     "cliente": {
       "additionalProperty": "anything"
     },
@@ -27524,6 +28936,9 @@ Requires `logistics.read` and role `owner`, `manager`, or `logistics_planner` (n
       "additionalProperty": "anything"
     },
     "factura": {
+      "additionalProperty": "anything"
+    },
+    "picker": {
       "additionalProperty": "anything"
     },
     "additionalProperty": "anything"
@@ -27639,9 +29054,23 @@ Requires `logistics.read` and role `owner`, `manager`, or `logistics_planner` (n
       "clienteId": 1,
       "zonaId": 1,
       "driverId": 1,
+      "pickerUserId": 1,
+      "pickingIniciadoAt": "",
+      "pickingListoAt": "",
       "fecha": "",
       "estado": "pending",
       "nota": "",
+      "items": [
+        {
+          "id": 1,
+          "cantidad": 1,
+          "articulo": {
+            "id": 1,
+            "codigo": 1,
+            "descripcion": ""
+          }
+        }
+      ],
       "cliente": {
         "additionalProperty": "anything"
       },
@@ -27652,6 +29081,9 @@ Requires `logistics.read` and role `owner`, `manager`, or `logistics_planner` (n
         "additionalProperty": "anything"
       },
       "factura": {
+        "additionalProperty": "anything"
+      },
+      "picker": {
         "additionalProperty": "anything"
       },
       "additionalProperty": "anything"
@@ -27706,7 +29138,7 @@ Requires `logistics.read` and role `owner`, `manager`, or `logistics_planner` (n
 
     - **`estado`**
 
-      `string`, possible values: `"pending", "assigned", "in_transit", "delivered", "failed"`
+      `string`, possible values: `"pending", "picking", "ready", "assigned", "in_transit", "delivered", "failed", "cancelled"`
 
     - **`factura`**
 
@@ -27724,9 +29156,55 @@ Requires `logistics.read` and role `owner`, `manager`, or `logistics_planner` (n
 
       `integer`
 
+    - **`items`**
+
+      `array`
+
+      **Items:**
+
+      - **`articulo` (required)**
+
+        `object`
+
+        - **`codigo` (required)**
+
+          `integer`
+
+        - **`descripcion` (required)**
+
+          `string`
+
+        - **`id` (required)**
+
+          `integer`
+
+      - **`cantidad` (required)**
+
+        `integer`
+
+      - **`id` (required)**
+
+        `integer`
+
     - **`nota`**
 
       `string`
+
+    - **`picker`**
+
+      `object`
+
+    - **`pickerUserId`**
+
+      `integer`
+
+    - **`pickingIniciadoAt`**
+
+      `string`, format: `date-time`
+
+    - **`pickingListoAt`**
+
+      `string`, format: `date-time`
 
     - **`tenantId`**
 
@@ -27795,9 +29273,23 @@ Requires `logistics.read` and role `owner`, `manager`, or `logistics_planner` (n
       "clienteId": 1,
       "zonaId": 1,
       "driverId": 1,
+      "pickerUserId": 1,
+      "pickingIniciadoAt": "",
+      "pickingListoAt": "",
       "fecha": "",
       "estado": "pending",
       "nota": "",
+      "items": [
+        {
+          "id": 1,
+          "cantidad": 1,
+          "articulo": {
+            "id": 1,
+            "codigo": 1,
+            "descripcion": ""
+          }
+        }
+      ],
       "cliente": {
         "additionalProperty": "anything"
       },
@@ -27808,6 +29300,9 @@ Requires `logistics.read` and role `owner`, `manager`, or `logistics_planner` (n
         "additionalProperty": "anything"
       },
       "factura": {
+        "additionalProperty": "anything"
+      },
+      "picker": {
         "additionalProperty": "anything"
       },
       "additionalProperty": "anything"
@@ -27876,7 +29371,7 @@ Requires `logistics.read` and role `owner`, `manager`, or `logistics_planner` (n
 
     - **`estado`**
 
-      `string`, possible values: `"pending", "assigned", "in_transit", "delivered", "failed"`
+      `string`, possible values: `"pending", "picking", "ready", "assigned", "in_transit", "delivered", "failed", "cancelled"`
 
     - **`factura`**
 
@@ -27894,9 +29389,55 @@ Requires `logistics.read` and role `owner`, `manager`, or `logistics_planner` (n
 
       `integer`
 
+    - **`items`**
+
+      `array`
+
+      **Items:**
+
+      - **`articulo` (required)**
+
+        `object`
+
+        - **`codigo` (required)**
+
+          `integer`
+
+        - **`descripcion` (required)**
+
+          `string`
+
+        - **`id` (required)**
+
+          `integer`
+
+      - **`cantidad` (required)**
+
+        `integer`
+
+      - **`id` (required)**
+
+        `integer`
+
     - **`nota`**
 
       `string`
+
+    - **`picker`**
+
+      `object`
+
+    - **`pickerUserId`**
+
+      `integer`
+
+    - **`pickingIniciadoAt`**
+
+      `string`, format: `date-time`
+
+    - **`pickingListoAt`**
+
+      `string`, format: `date-time`
 
     - **`tenantId`**
 
@@ -28022,9 +29563,23 @@ Requires `logistics.read` and role `owner`, `manager`, or `logistics_planner` (n
         "clienteId": 1,
         "zonaId": 1,
         "driverId": 1,
+        "pickerUserId": 1,
+        "pickingIniciadoAt": "",
+        "pickingListoAt": "",
         "fecha": "",
         "estado": "pending",
         "nota": "",
+        "items": [
+          {
+            "id": 1,
+            "cantidad": 1,
+            "articulo": {
+              "id": 1,
+              "codigo": 1,
+              "descripcion": ""
+            }
+          }
+        ],
         "cliente": {
           "additionalProperty": "anything"
         },
@@ -28035,6 +29590,9 @@ Requires `logistics.read` and role `owner`, `manager`, or `logistics_planner` (n
           "additionalProperty": "anything"
         },
         "factura": {
+          "additionalProperty": "anything"
+        },
+        "picker": {
           "additionalProperty": "anything"
         },
         "additionalProperty": "anything"
@@ -28161,7 +29719,7 @@ Requires `logistics.read` and role `owner`, `manager`, or `logistics_planner` (n
 
       - **`estado`**
 
-        `string`, possible values: `"pending", "assigned", "in_transit", "delivered", "failed"`
+        `string`, possible values: `"pending", "picking", "ready", "assigned", "in_transit", "delivered", "failed", "cancelled"`
 
       - **`factura`**
 
@@ -28179,9 +29737,55 @@ Requires `logistics.read` and role `owner`, `manager`, or `logistics_planner` (n
 
         `integer`
 
+      - **`items`**
+
+        `array`
+
+        **Items:**
+
+        - **`articulo` (required)**
+
+          `object`
+
+          - **`codigo` (required)**
+
+            `integer`
+
+          - **`descripcion` (required)**
+
+            `string`
+
+          - **`id` (required)**
+
+            `integer`
+
+        - **`cantidad` (required)**
+
+          `integer`
+
+        - **`id` (required)**
+
+          `integer`
+
       - **`nota`**
 
         `string`
+
+      - **`picker`**
+
+        `object`
+
+      - **`pickerUserId`**
+
+        `integer`
+
+      - **`pickingIniciadoAt`**
+
+        `string`, format: `date-time`
+
+      - **`pickingListoAt`**
+
+        `string`, format: `date-time`
 
       - **`tenantId`**
 
@@ -28313,9 +29917,23 @@ Requires `logistics.read` and role `owner`, `manager`, or `logistics_planner` (n
           "clienteId": 1,
           "zonaId": 1,
           "driverId": 1,
+          "pickerUserId": 1,
+          "pickingIniciadoAt": "",
+          "pickingListoAt": "",
           "fecha": "",
           "estado": "pending",
           "nota": "",
+          "items": [
+            {
+              "id": 1,
+              "cantidad": 1,
+              "articulo": {
+                "id": 1,
+                "codigo": 1,
+                "descripcion": ""
+              }
+            }
+          ],
           "cliente": {
             "additionalProperty": "anything"
           },
@@ -28326,6 +29944,9 @@ Requires `logistics.read` and role `owner`, `manager`, or `logistics_planner` (n
             "additionalProperty": "anything"
           },
           "factura": {
+            "additionalProperty": "anything"
+          },
+          "picker": {
             "additionalProperty": "anything"
           },
           "additionalProperty": "anything"
@@ -28436,7 +30057,7 @@ Requires `logistics.read` and role `owner`, `manager`, or `logistics_planner` (n
 
       - **`estado`**
 
-        `string`, possible values: `"pending", "assigned", "in_transit", "delivered", "failed"`
+        `string`, possible values: `"pending", "picking", "ready", "assigned", "in_transit", "delivered", "failed", "cancelled"`
 
       - **`factura`**
 
@@ -28454,9 +30075,55 @@ Requires `logistics.read` and role `owner`, `manager`, or `logistics_planner` (n
 
         `integer`
 
+      - **`items`**
+
+        `array`
+
+        **Items:**
+
+        - **`articulo` (required)**
+
+          `object`
+
+          - **`codigo` (required)**
+
+            `integer`
+
+          - **`descripcion` (required)**
+
+            `string`
+
+          - **`id` (required)**
+
+            `integer`
+
+        - **`cantidad` (required)**
+
+          `integer`
+
+        - **`id` (required)**
+
+          `integer`
+
       - **`nota`**
 
         `string`
+
+      - **`picker`**
+
+        `object`
+
+      - **`pickerUserId`**
+
+        `integer`
+
+      - **`pickingIniciadoAt`**
+
+        `string`, format: `date-time`
+
+      - **`pickingListoAt`**
+
+        `string`, format: `date-time`
 
       - **`tenantId`**
 
@@ -28608,9 +30275,23 @@ Requires `logistics.read` and role `owner`, `manager`, or `logistics_planner` (n
           "clienteId": 1,
           "zonaId": 1,
           "driverId": 1,
+          "pickerUserId": 1,
+          "pickingIniciadoAt": "",
+          "pickingListoAt": "",
           "fecha": "",
           "estado": "pending",
           "nota": "",
+          "items": [
+            {
+              "id": 1,
+              "cantidad": 1,
+              "articulo": {
+                "id": 1,
+                "codigo": 1,
+                "descripcion": ""
+              }
+            }
+          ],
           "cliente": {
             "additionalProperty": "anything"
           },
@@ -28621,6 +30302,9 @@ Requires `logistics.read` and role `owner`, `manager`, or `logistics_planner` (n
             "additionalProperty": "anything"
           },
           "factura": {
+            "additionalProperty": "anything"
+          },
+          "picker": {
             "additionalProperty": "anything"
           },
           "additionalProperty": "anything"

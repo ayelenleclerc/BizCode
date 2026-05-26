@@ -16,22 +16,27 @@ undefined#/properties/ordenEntrega
 
 # ordenEntrega Properties
 
-| Property                | Type      | Required | Nullable       | Defined by                                                                             |
-| :---------------------- | :-------- | :------- | :------------- | :------------------------------------------------------------------------------------- |
-| [cliente](#cliente)     | `object`  | Optional | cannot be null | [OrdenEntrega](ordenentrega-properties-cliente.md "undefined#/properties/cliente")     |
-| [clienteId](#clienteid) | `integer` | Optional | cannot be null | [OrdenEntrega](ordenentrega-properties-clienteid.md "undefined#/properties/clienteId") |
-| [driver](#driver)       | `object`  | Optional | cannot be null | [OrdenEntrega](ordenentrega-properties-driver.md "undefined#/properties/driver")       |
-| [driverId](#driverid)   | `integer` | Optional | cannot be null | [OrdenEntrega](ordenentrega-properties-driverid.md "undefined#/properties/driverId")   |
-| [estado](#estado)       | `string`  | Optional | cannot be null | [OrdenEntrega](ordenentrega-properties-estado.md "undefined#/properties/estado")       |
-| [factura](#factura)     | `object`  | Optional | cannot be null | [OrdenEntrega](ordenentrega-properties-factura.md "undefined#/properties/factura")     |
-| [facturaId](#facturaid) | `integer` | Optional | cannot be null | [OrdenEntrega](ordenentrega-properties-facturaid.md "undefined#/properties/facturaId") |
-| [fecha](#fecha)         | `string`  | Optional | cannot be null | [OrdenEntrega](ordenentrega-properties-fecha.md "undefined#/properties/fecha")         |
-| [id](#id)               | `integer` | Optional | cannot be null | [OrdenEntrega](ordenentrega-properties-id.md "undefined#/properties/id")               |
-| [nota](#nota)           | `string`  | Optional | cannot be null | [OrdenEntrega](ordenentrega-properties-nota.md "undefined#/properties/nota")           |
-| [tenantId](#tenantid)   | `integer` | Optional | cannot be null | [OrdenEntrega](ordenentrega-properties-tenantid.md "undefined#/properties/tenantId")   |
-| [zona](#zona)           | `object`  | Optional | cannot be null | [OrdenEntrega](ordenentrega-properties-zona.md "undefined#/properties/zona")           |
-| [zonaId](#zonaid)       | `integer` | Optional | cannot be null | [OrdenEntrega](ordenentrega-properties-zonaid.md "undefined#/properties/zonaId")       |
-| Additional Properties   | Any       | Optional | can be null    |                                                                                        |
+| Property                                | Type      | Required | Nullable       | Defined by                                                                                             |
+| :-------------------------------------- | :-------- | :------- | :------------- | :----------------------------------------------------------------------------------------------------- |
+| [cliente](#cliente)                     | `object`  | Optional | cannot be null | [OrdenEntrega](ordenentrega-properties-cliente.md "undefined#/properties/cliente")                     |
+| [clienteId](#clienteid)                 | `integer` | Optional | cannot be null | [OrdenEntrega](ordenentrega-properties-clienteid.md "undefined#/properties/clienteId")                 |
+| [driver](#driver)                       | `object`  | Optional | cannot be null | [OrdenEntrega](ordenentrega-properties-driver.md "undefined#/properties/driver")                       |
+| [driverId](#driverid)                   | `integer` | Optional | cannot be null | [OrdenEntrega](ordenentrega-properties-driverid.md "undefined#/properties/driverId")                   |
+| [estado](#estado)                       | `string`  | Optional | cannot be null | [OrdenEntrega](ordenentrega-properties-estado.md "undefined#/properties/estado")                       |
+| [factura](#factura)                     | `object`  | Optional | cannot be null | [OrdenEntrega](ordenentrega-properties-factura.md "undefined#/properties/factura")                     |
+| [facturaId](#facturaid)                 | `integer` | Optional | cannot be null | [OrdenEntrega](ordenentrega-properties-facturaid.md "undefined#/properties/facturaId")                 |
+| [fecha](#fecha)                         | `string`  | Optional | cannot be null | [OrdenEntrega](ordenentrega-properties-fecha.md "undefined#/properties/fecha")                         |
+| [id](#id)                               | `integer` | Optional | cannot be null | [OrdenEntrega](ordenentrega-properties-id.md "undefined#/properties/id")                               |
+| [items](#items)                         | `array`   | Optional | cannot be null | [OrdenEntrega](ordenentrega-properties-items.md "undefined#/properties/items")                         |
+| [nota](#nota)                           | `string`  | Optional | cannot be null | [OrdenEntrega](ordenentrega-properties-nota.md "undefined#/properties/nota")                           |
+| [picker](#picker)                       | `object`  | Optional | cannot be null | [OrdenEntrega](ordenentrega-properties-picker.md "undefined#/properties/picker")                       |
+| [pickerUserId](#pickeruserid)           | `integer` | Optional | cannot be null | [OrdenEntrega](ordenentrega-properties-pickeruserid.md "undefined#/properties/pickerUserId")           |
+| [pickingIniciadoAt](#pickinginiciadoat) | `string`  | Optional | cannot be null | [OrdenEntrega](ordenentrega-properties-pickinginiciadoat.md "undefined#/properties/pickingIniciadoAt") |
+| [pickingListoAt](#pickinglistoat)       | `string`  | Optional | cannot be null | [OrdenEntrega](ordenentrega-properties-pickinglistoat.md "undefined#/properties/pickingListoAt")       |
+| [tenantId](#tenantid)                   | `integer` | Optional | cannot be null | [OrdenEntrega](ordenentrega-properties-tenantid.md "undefined#/properties/tenantId")                   |
+| [zona](#zona)                           | `object`  | Optional | cannot be null | [OrdenEntrega](ordenentrega-properties-zona.md "undefined#/properties/zona")                           |
+| [zonaId](#zonaid)                       | `integer` | Optional | cannot be null | [OrdenEntrega](ordenentrega-properties-zonaid.md "undefined#/properties/zonaId")                       |
+| Additional Properties                   | Any       | Optional | can be null    |                                                                                                        |
 
 ## cliente
 
@@ -130,10 +135,13 @@ undefined#/properties/ordenEntrega
 | Value          | Explanation |
 | :------------- | :---------- |
 | `"pending"`    |             |
+| `"picking"`    |             |
+| `"ready"`      |             |
 | `"assigned"`   |             |
 | `"in_transit"` |             |
 | `"delivered"`  |             |
 | `"failed"`     |             |
+| `"cancelled"`  |             |
 
 ## factura
 
@@ -211,6 +219,24 @@ undefined#/properties/ordenEntrega
 
 `integer`
 
+## items
+
+
+
+`items`
+
+* is optional
+
+* Type: `object[]` ([OrdenEntregaLineItem](ordenentregalineitem.md))
+
+* cannot be null
+
+* defined in: [OrdenEntrega](ordenentrega-properties-items.md "undefined#/properties/items")
+
+### items Type
+
+`object[]` ([OrdenEntregaLineItem](ordenentregalineitem.md))
+
 ## nota
 
 
@@ -228,6 +254,86 @@ undefined#/properties/ordenEntrega
 ### nota Type
 
 `string`
+
+## picker
+
+
+
+`picker`
+
+* is optional
+
+* Type: `object` ([Details](ordenentrega-properties-picker.md))
+
+* cannot be null
+
+* defined in: [OrdenEntrega](ordenentrega-properties-picker.md "undefined#/properties/picker")
+
+### picker Type
+
+`object` ([Details](ordenentrega-properties-picker.md))
+
+## pickerUserId
+
+
+
+`pickerUserId`
+
+* is optional
+
+* Type: `integer`
+
+* cannot be null
+
+* defined in: [OrdenEntrega](ordenentrega-properties-pickeruserid.md "undefined#/properties/pickerUserId")
+
+### pickerUserId Type
+
+`integer`
+
+## pickingIniciadoAt
+
+
+
+`pickingIniciadoAt`
+
+* is optional
+
+* Type: `string`
+
+* cannot be null
+
+* defined in: [OrdenEntrega](ordenentrega-properties-pickinginiciadoat.md "undefined#/properties/pickingIniciadoAt")
+
+### pickingIniciadoAt Type
+
+`string`
+
+### pickingIniciadoAt Constraints
+
+**date time**: the string must be a date time string, according to [RFC 3339, section 5.6](https://tools.ietf.org/html/rfc3339 "check the specification")
+
+## pickingListoAt
+
+
+
+`pickingListoAt`
+
+* is optional
+
+* Type: `string`
+
+* cannot be null
+
+* defined in: [OrdenEntrega](ordenentrega-properties-pickinglistoat.md "undefined#/properties/pickingListoAt")
+
+### pickingListoAt Type
+
+`string`
+
+### pickingListoAt Constraints
+
+**date time**: the string must be a date time string, according to [RFC 3339, section 5.6](https://tools.ietf.org/html/rfc3339 "check the specification")
 
 ## tenantId
 

@@ -1778,7 +1778,21 @@ export const auditEventsAPI = {
 
 // ============ ZONAS DE ENTREGA ============
 
-export type OrdenEntregaEstado = 'pending' | 'assigned' | 'in_transit' | 'delivered' | 'failed'
+export type OrdenEntregaEstado =
+  | 'pending'
+  | 'picking'
+  | 'ready'
+  | 'assigned'
+  | 'in_transit'
+  | 'delivered'
+  | 'failed'
+  | 'cancelled'
+
+export type OrdenEntregaLineItem = {
+  id: number
+  cantidad: number
+  articulo: { id: number; codigo: number; descripcion: string }
+}
 
 export type OrdenEntrega = {
   id: number
@@ -1787,12 +1801,17 @@ export type OrdenEntrega = {
   clienteId: number
   zonaId: number | null
   driverId: number | null
+  pickerUserId: number | null
+  pickingIniciadoAt: string | null
+  pickingListoAt: string | null
   fecha: string
   estado: OrdenEntregaEstado
   nota: string | null
+  items: OrdenEntregaLineItem[]
   cliente?: { id: number; codigo: number; rsocial: string }
-  zona?: { id: number; nombre: string } | null
+  zona?: { id: number; nombre: string; horario?: string | null } | null
   driver?: { id: number; username: string; role: string } | null
+  picker?: { id: number; username: string; role: string } | null
   factura?: { id: number; tipo: string; prefijo: string; numero: number } | null
 }
 
@@ -1994,6 +2013,24 @@ export const ordenesEntregaAPI = {
   ) => {
     try {
       const response = await api.put(`/ordenes-entrega/${id}`, body)
+      return response.data.data as OrdenEntrega
+    } catch (error) {
+      handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  iniciarPicking: async (id: number) => {
+    try {
+      const response = await api.post(`/ordenes-entrega/${id}/iniciar-picking`)
+      return response.data.data as OrdenEntrega
+    } catch (error) {
+      handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  marcarLista: async (id: number) => {
+    try {
+      const response = await api.post(`/ordenes-entrega/${id}/lista`)
       return response.data.data as OrdenEntrega
     } catch (error) {
       handleError(error as AxiosError<ApiErrorPayload>)

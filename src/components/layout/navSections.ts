@@ -74,6 +74,13 @@ export const NAV_SECTIONS: readonly NavSection[] = [
     moduleKey: 'logistics.dispatches',
   },
   {
+    key: 'picking',
+    path: '/logistica/picking',
+    icon: '📦',
+    roles: ['owner', 'manager', 'warehouse_op', 'warehouse_lead', 'logistics_planner'],
+    moduleKey: 'logistics.picking',
+  },
+  {
     key: 'finanzas',
     path: '/finanzas',
     icon: '💹',
@@ -133,6 +140,7 @@ export const NAV_SECTIONS: readonly NavSection[] = [
 export const ROUTE_MODULE_GUARDS: ReadonlyArray<{ path: string; moduleKey: ModuleKey }> = [
   { path: 'pedidos', moduleKey: 'billing.orders' },
   { path: 'logistica', moduleKey: 'logistics.dispatches' },
+  { path: 'logistica/picking', moduleKey: 'logistics.picking' },
   { path: 'chat', moduleKey: 'comms.chat' },
   { path: 'cobros', moduleKey: 'finance.collections' },
   { path: 'finanzas', moduleKey: 'finance.collections' },

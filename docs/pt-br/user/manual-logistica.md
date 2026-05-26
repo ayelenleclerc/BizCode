@@ -11,7 +11,7 @@ Clique em **Logística** na barra lateral.
 | Filtro | Descrição |
 |--------|-----------|
 | Data | Data de entrega (padrão: hoje). |
-| Status | `pending`, `assigned`, `in_transit`, `delivered`, `failed`, ou todos. |
+| Status | `pending`, `picking`, `ready`, `assigned`, `in_transit`, `delivered`, `failed`, `cancelled`, ou todos. |
 | Zona | Zona de entrega (visão planejador). |
 
 ## Criar uma ordem
@@ -21,6 +21,19 @@ Com **`orders.create`**, abra o formulário de nova ordem, informe id do cliente
 ## Atualizar status
 
 Usuários com **`orders.dispatch`** ou **`orders.deliver.confirm`** podem alterar o estado da ordem pelos controles da UI (`PUT /api/ordenes-entrega/:id`).
+
+## Picking no depósito
+
+Abra **Picking** (`/logistica/picking`) pela barra lateral ou pelo link na página de logística. Requer o módulo **`logistics.picking`**, permissão **`orders.pick`** e papéis como **`warehouse_op`** ou **`warehouse_lead`**.
+
+| Etapa | Ação |
+|-------|------|
+| Fila | OEs em `pending`, ordenadas por zona e data |
+| Assumir | `POST /api/ordenes-entrega/{id}/iniciar-picking` → `picking` (usuário da sessão como separador) |
+| Checklist | Itens da fatura vinculada (se houver); confirmação na UI |
+| Pronta | `POST /api/ordenes-entrega/{id}/lista` → `ready` |
+
+Uma OE em `picking` fica bloqueada para outros operadores (`409 PICKING_ASSIGNED_TO_OTHER_USER`). O líder vê OEs `ready` e planeja o reparto em **Repartos**.
 
 ## Repartos
 
@@ -35,7 +48,7 @@ Abra **Repartos** pelo link na página de logística ou navegue para `/logistica
 
 | Etapa | Ação |
 |-------|------|
-| Planejar | `POST /api/repartos` — motorista, veículo/notas opcionais, OEs pendentes em sequência (UI com arrastar e teclado); OEs passam a `assigned` com `driverId` |
+| Planejar | `POST /api/repartos` — motorista, veículo/notas opcionais, OEs em estado **`ready`** em sequência (UI com arrastar e teclado); OEs passam a `assigned` com `driverId` |
 | Iniciar | `POST /api/repartos/{id}/iniciar` — `planned` → `on_route`; OEs dos itens pendentes → `in_transit` |
 | Fechar | `POST /api/repartos/{id}/cerrar` — `on_route` → `completed`; itens `pending` → `not_delivered` e OEs vinculadas → `failed` |
 

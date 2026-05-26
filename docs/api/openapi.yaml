@@ -3369,14 +3369,14 @@ paths:
       tags: [logistics]
       summary: List delivery orders
       description: |
-        Requires `logistics.read` or `orders.deliver.confirm`. Drivers only see their own orders
+        Requires `logistics.read`, `orders.deliver.confirm`, or `orders.pick`. Drivers only see their own orders
         (`driverId` forced to session user).
       parameters:
         - name: estado
           in: query
           schema:
             type: string
-            enum: [pending, assigned, in_transit, delivered, failed]
+            enum: [pending, picking, ready, assigned, in_transit, delivered, failed, cancelled]
         - name: zonaId
           in: query
           schema:
@@ -3485,6 +3485,100 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
 
+  /api/ordenes-entrega/{id}/iniciar-picking:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    post:
+      tags: [logistics]
+      summary: Start warehouse picking for a delivery order
+      description: |
+        Requires `orders.pick` and tenant module `logistics.picking`. Transitions `pending` → `picking`
+        and assigns the session user as picker. Returns 409 when another user already holds the order in picking.
+      responses:
+        '200':
+          description: Picking started (or idempotent for same picker)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrdenEntregaEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Order not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '409':
+          description: Order is being picked by another user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '422':
+          description: Invalid state transition
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/ordenes-entrega/{id}/lista:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    post:
+      tags: [logistics]
+      summary: Mark delivery order ready after picking
+      description: |
+        Requires `orders.pick` and tenant module `logistics.picking`. Transitions `picking` → `ready`.
+        Only the assigned picker may complete, except `warehouse_lead` who may override.
+      responses:
+        '200':
+          description: Order marked ready for dispatch
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrdenEntregaEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Order not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '409':
+          description: Order is assigned to another picker
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '422':
+          description: Invalid state transition
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
   /api/repartos:
     parameters:
       - $ref: '#/components/parameters/BizcodeChannelHeader'
@@ -3529,7 +3623,7 @@ paths:
       tags: [repartos]
       summary: Create delivery route
       description: |
-        Requires `orders.dispatch`. Groups pending delivery orders; assigns driver and sets OEs to `assigned`.
+        Requires `orders.dispatch`. Groups delivery orders in estado `ready`; assigns driver and sets OEs to `assigned`.
         Rejects when an OE is already on an active route (`planned` or `on_route`).
       requestBody:
         required: true
@@ -4401,15 +4495,30 @@ components:
         driverId:
           type: integer
           nullable: true
+        pickerUserId:
+          type: integer
+          nullable: true
+        pickingIniciadoAt:
+          type: string
+          format: date-time
+          nullable: true
+        pickingListoAt:
+          type: string
+          format: date-time
+          nullable: true
         fecha:
           type: string
           format: date-time
         estado:
           type: string
-          enum: [pending, assigned, in_transit, delivered, failed]
+          enum: [pending, picking, ready, assigned, in_transit, delivered, failed, cancelled]
         nota:
           type: string
           nullable: true
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrdenEntregaLineItem'
         cliente:
           type: object
           additionalProperties: true
@@ -4425,6 +4534,29 @@ components:
           type: object
           additionalProperties: true
           nullable: true
+        picker:
+          type: object
+          additionalProperties: true
+          nullable: true
+
+    OrdenEntregaLineItem:
+      type: object
+      required: [id, cantidad, articulo]
+      properties:
+        id:
+          type: integer
+        cantidad:
+          type: integer
+        articulo:
+          type: object
+          required: [id, codigo, descripcion]
+          properties:
+            id:
+              type: integer
+            codigo:
+              type: integer
+            descripcion:
+              type: string
 
     OrdenEntregaCreateInput:
       type: object
@@ -4454,7 +4586,7 @@ components:
       properties:
         estado:
           type: string
-          enum: [pending, assigned, in_transit, delivered, failed]
+          enum: [pending, picking, ready, assigned, in_transit, delivered, failed, cancelled]
         driverId:
           type: integer
           nullable: true

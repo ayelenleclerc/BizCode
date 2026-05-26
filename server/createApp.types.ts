@@ -96,7 +96,15 @@ export type DeliveryZoneUpdateParsed = {
   activo?: boolean
 }
 
-export type OrdenEntregaEstado = 'pending' | 'assigned' | 'in_transit' | 'delivered' | 'failed'
+export type OrdenEntregaEstado =
+  | 'pending'
+  | 'picking'
+  | 'ready'
+  | 'assigned'
+  | 'in_transit'
+  | 'delivered'
+  | 'failed'
+  | 'cancelled'
 
 export type OrdenEntregaCreateInput = {
   clienteId: number

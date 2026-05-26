@@ -1,0 +1,35 @@
+{
+  "title": "Picking en depósito",
+  "forbidden": "No tiene permiso para preparar órdenes en depósito.",
+  "queue": {
+    "title": "Cola de picking",
+    "empty": "No hay órdenes pendientes de preparar.",
+    "loading": "Cargando cola…",
+    "selectHint": "Seleccione una orden para ver el detalle."
+  },
+  "detail": {
+    "cliente": "Cliente",
+    "fecha": "Fecha compromiso",
+    "zona": "Zona",
+    "horario": "Horario zona",
+    "picker": "Operario",
+    "noItems": "Esta orden no tiene ítems de factura. Confirme que el armado está completo antes de marcar como lista.",
+    "checklistTitle": "Artículos a preparar",
+    "markReady": "Marcar como lista",
+    "starting": "Tomando orden…",
+    "saving": "Guardando…"
+  },
+  "lead": {
+    "title": "Listas para despacho",
+    "empty": "No hay órdenes listas para incluir en un reparto.",
+    "cta": "Planificar reparto",
+    "hint": "Las órdenes en estado «Lista» pueden agregarse al crear una ruta en Repartos."
+  },
+  "errors": {
+    "load": "No se pudo cargar la cola de picking.",
+    "start": "No se pudo iniciar el picking de la orden.",
+    "ready": "No se pudo marcar la orden como lista.",
+    "locked": "Otra persona está preparando esta orden.",
+    "checklist": "Marque todos los artículos antes de continuar."
+  }
+}

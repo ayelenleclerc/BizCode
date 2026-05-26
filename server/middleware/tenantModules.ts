@@ -16,7 +16,12 @@ function parseTestModulesFromEnv(): ModuleKey[] | undefined {
   return keys as ModuleKey[]
 }
 
-const TEST_DEFAULT_MODULES: ModuleKey[] = [...NEW_TENANT_MODULES, 'billing.orders']
+const TEST_DEFAULT_MODULES: ModuleKey[] = [
+  ...NEW_TENANT_MODULES,
+  'billing.orders',
+  'logistics.dispatches',
+  'logistics.picking',
+]
 
 /**
  * @en Loads enabled modules for the authenticated tenant onto `req.tenantModules`.
