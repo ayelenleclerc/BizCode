@@ -22,6 +22,7 @@ import reportesEs from '@/locales/es/reportes.json'
 import dashboardAnalyticsEs from '@/locales/es/dashboard-analytics.json'
 import logisticaEs from '@/locales/es/logistica.json'
 import pickingEs from '@/locales/es/picking.json'
+import seguimientoEs from '@/locales/es/seguimiento.json'
 import empresaEs from '@/locales/es/empresa.json'
 
 import commonEn from '@/locales/en/common.json'
@@ -43,6 +44,7 @@ import reportesEn from '@/locales/en/reportes.json'
 import dashboardAnalyticsEn from '@/locales/en/dashboard-analytics.json'
 import logisticaEn from '@/locales/en/logistica.json'
 import pickingEn from '@/locales/en/picking.json'
+import seguimientoEn from '@/locales/en/seguimiento.json'
 import empresaEn from '@/locales/en/empresa.json'
 
 import commonPt from '@/locales/pt-BR/common.json'
@@ -64,6 +66,7 @@ import reportesPt from '@/locales/pt-BR/reportes.json'
 import dashboardAnalyticsPt from '@/locales/pt-BR/dashboard-analytics.json'
 import logisticaPt from '@/locales/pt-BR/logistica.json'
 import pickingPt from '@/locales/pt-BR/picking.json'
+import seguimientoPt from '@/locales/pt-BR/seguimiento.json'
 import empresaPt from '@/locales/pt-BR/empresa.json'
 
 // Persist language preference in localStorage
@@ -77,7 +80,7 @@ i18n
     lng: savedLang,
     fallbackLng: 'es',
     defaultNS: 'common',
-    ns: ['common', 'clientes', 'articulos', 'proveedores', 'compras', 'recuentos', 'repartos', 'pod', 'picking', 'facturacion', 'pedidos', 'cobros', 'finanzas', 'reportes', 'dashboardAnalytics', 'logistica', 'zonasEntrega', 'empresa', 'chat', 'audit'],
+    ns: ['common', 'clientes', 'articulos', 'proveedores', 'compras', 'recuentos', 'repartos', 'pod', 'picking', 'seguimiento', 'facturacion', 'pedidos', 'cobros', 'finanzas', 'reportes', 'dashboardAnalytics', 'logistica', 'zonasEntrega', 'empresa', 'chat', 'audit'],
     resources: {
       es: {
         common: commonEs,
@@ -99,6 +102,7 @@ i18n
         dashboardAnalytics: dashboardAnalyticsEs,
         logistica: logisticaEs,
         picking: pickingEs,
+        seguimiento: seguimientoEs,
         empresa: empresaEs,
       },
       en: {
@@ -121,6 +125,7 @@ i18n
         dashboardAnalytics: dashboardAnalyticsEn,
         logistica: logisticaEn,
         picking: pickingEn,
+        seguimiento: seguimientoEn,
         empresa: empresaEn,
       },
       'pt-BR': {
@@ -143,6 +148,7 @@ i18n
         dashboardAnalytics: dashboardAnalyticsPt,
         logistica: logisticaPt,
         picking: pickingPt,
+        seguimiento: seguimientoPt,
         empresa: empresaPt,
       },
     },

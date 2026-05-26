@@ -258,6 +258,12 @@
 
 * [Reparto](./reparto.md) – `-`
 
+* [RepartoActivo](./repartoactivo.md) – `-`
+
+* [RepartoActivoCurrentStop](./repartoactivocurrentstop.md) – `-`
+
+* [RepartoActivoListEnvelope](./repartoactivolistenvelope.md) – `-`
+
 * [RepartoCloseEnvelope](./repartocloseenvelope.md) – `-`
 
 * [RepartoCloseSummary](./repartoclosesummary.md) – `-`
@@ -281,6 +287,14 @@
 * [RepartoListEnvelope](./repartolistenvelope.md) – `-`
 
 * [RepartoProgress](./repartoprogress.md) – `-`
+
+* [RepartoUbicacion](./repartoubicacion.md) – `-`
+
+* [RepartoUbicacionEnvelope](./repartoubicacionenvelope.md) – `-`
+
+* [RepartoUbicacionInput](./repartoubicacioninput.md) – `-`
+
+* [RepartoUbicacionNullableEnvelope](./repartoubicacionnullableenvelope.md) – `-`
 
 * [ReporteCobranzasListEnvelope](./reportecobranzaslistenvelope.md) – `-`
 
@@ -472,6 +486,12 @@
 
 * [Untitled object in Reparto](./reparto-properties-chofer.md) – `undefined#/properties/chofer`
 
+* [Untitled object in RepartoActivo](./repartoactivo-properties-chofer.md) – `undefined#/properties/chofer`
+
+* [Untitled object in RepartoActivoCurrentStop](./repartoactivocurrentstop-properties-cliente.md) – `undefined#/properties/cliente`
+
+* [Untitled object in RepartoActivoCurrentStop](./repartoactivocurrentstop-properties-zona.md) – `undefined#/properties/zona`
+
 * [Untitled object in RepartoItemPod](./repartoitempod-allof-1.md) – `undefined#/allOf/1`
 
 * [Untitled object in RepartoListEnvelope](./repartolistenvelope-allof-1.md) – `undefined#/allOf/1`
@@ -601,6 +621,8 @@
 * [Untitled array in RecuentoListEnvelope](./recuentolistenvelope-allof-1-properties-data.md) – `undefined#/allOf/1/properties/data`
 
 * [Untitled array in Reparto](./reparto-properties-items.md) – `undefined#/properties/items`
+
+* [Untitled array in RepartoActivoListEnvelope](./repartoactivolistenvelope-properties-data.md) – `undefined#/properties/data`
 
 * [Untitled array in RepartoCreateInput](./repartocreateinput-properties-ordenentregaids.md) – `undefined#/properties/ordenEntregaIds`
 

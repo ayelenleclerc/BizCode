@@ -38,6 +38,16 @@ function buildPrismaMock(overrides: Partial<Record<string, unknown>> = {}): Pris
       create: vi.fn().mockResolvedValue(repartoRow),
       update: vi.fn().mockResolvedValue({ ...repartoRow, estado: 'on_route' }),
     },
+    repartoUbicacion: {
+      create: vi.fn().mockResolvedValue({
+        lat: { toString: () => '-34.6' },
+        lng: { toString: () => '-58.4' },
+        recordedAt: new Date('2026-05-26T12:00:00.000Z'),
+      }),
+      deleteMany: vi.fn().mockResolvedValue({ count: 0 }),
+      findFirst: vi.fn().mockResolvedValue(null),
+      findMany: vi.fn().mockResolvedValue([]),
+    },
     repartoItem: {
       findFirst: vi.fn().mockResolvedValue(null),
       update: vi.fn(),
@@ -125,6 +135,69 @@ describe('API /api/repartos', () => {
       .expect(201)
     expect(res.body.success).toBe(true)
     expect(res.body.data.id).toBe(1)
+  })
+
+  it('GET /api/repartos/activos returns 403 for driver', async () => {
+    process.env.BIZCODE_TEST_ROLE = 'driver'
+    const app = createApp(buildPrismaMock())
+    await request(app).get('/api/repartos/activos').expect(403)
+  })
+
+  it('GET /api/repartos/activos returns 200 for logistics_planner', async () => {
+    process.env.BIZCODE_TEST_ROLE = 'logistics_planner'
+    const activo = {
+      ...repartoRow,
+      estado: 'on_route',
+      items: [
+        {
+          secuencia: 1,
+          estado: 'pending',
+          ordenEntrega: {
+            cliente: { id: 1, codigo: 1, rsocial: 'Cliente', domicilio: null },
+            zona: null,
+          },
+        },
+      ],
+    }
+    const prisma = buildPrismaMock({
+      reparto: {
+        count: vi.fn(),
+        findMany: vi.fn().mockResolvedValue([activo]),
+        findFirst: vi.fn(),
+        create: vi.fn(),
+        update: vi.fn(),
+      },
+      repartoUbicacion: {
+        create: vi.fn(),
+        deleteMany: vi.fn(),
+        findFirst: vi.fn(),
+        findMany: vi.fn().mockResolvedValue([]),
+      },
+    })
+    const app = createApp(prisma)
+    const res = await request(app).get('/api/repartos/activos').expect(200)
+    expect(res.body.success).toBe(true)
+    expect(Array.isArray(res.body.data)).toBe(true)
+  })
+
+  it('POST /api/repartos/:id/ubicacion records position for driver on_route', async () => {
+    process.env.BIZCODE_TEST_ROLE = 'driver'
+    process.env.BIZCODE_TEST_USER_ID = '2'
+    const prisma = buildPrismaMock({
+      reparto: {
+        count: vi.fn(),
+        findMany: vi.fn(),
+        findFirst: vi.fn().mockResolvedValue({ id: 1, choferId: 2, estado: 'on_route', tenantId: 1 }),
+        create: vi.fn(),
+        update: vi.fn(),
+      },
+    })
+    const app = createApp(prisma)
+    const res = await request(app)
+      .post('/api/repartos/1/ubicacion')
+      .send({ lat: -34.6, lng: -58.4 })
+      .expect(200)
+    expect(res.body.data.lat).toBeCloseTo(-34.6)
   })
 
   it('POST /api/repartos/:id/iniciar transitions planned to on_route', async () => {

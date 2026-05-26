@@ -1884,6 +1884,30 @@ export type RepartoCloseSummary = {
   returned: number
 }
 
+export type RepartoUbicacionPoint = {
+  lat: number
+  lng: number
+  recordedAt: string
+}
+
+export type RepartoActivo = {
+  id: number
+  tenantId: number
+  fecha: string
+  choferId: number
+  estado: RepartoEstado
+  vehiculo: string | null
+  observaciones: string | null
+  chofer: { id: number; username: string; role: string }
+  progress: { total: number; delivered: number; pending: number }
+  ultimaUbicacion: RepartoUbicacionPoint | null
+  currentStop: {
+    secuencia: number
+    cliente: { id: number; codigo: number; rsocial: string; domicilio: string | null }
+    zona: { id: number; nombre: string } | null
+  } | null
+}
+
 export const repartosAPI = {
   list: async (params?: {
     fecha?: string
@@ -1964,6 +1988,33 @@ export const repartosAPI = {
     try {
       const response = await api.get(`/repartos/${repartoId}/items/${itemId}/pod`)
       return response.data.data as RepartoItemPodDetail
+    } catch (error) {
+      handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  recordUbicacion: async (repartoId: number, body: { lat: number; lng: number }) => {
+    try {
+      const response = await api.post(`/repartos/${repartoId}/ubicacion`, body)
+      return response.data.data as RepartoUbicacionPoint
+    } catch (error) {
+      handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  getUltimaUbicacion: async (repartoId: number) => {
+    try {
+      const response = await api.get(`/repartos/${repartoId}/ubicacion/ultima`)
+      return response.data.data as RepartoUbicacionPoint | null
+    } catch (error) {
+      handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  listActivos: async () => {
+    try {
+      const response = await api.get('/repartos/activos')
+      return response.data.data as RepartoActivo[]
     } catch (error) {
       handleError(error as AxiosError<ApiErrorPayload>)
     }

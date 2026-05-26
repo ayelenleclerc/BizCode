@@ -15,6 +15,7 @@ import LogisticaPage from './pages/logistica'
 import RepartosPage from './pages/logistica/repartos'
 import ChoferRepartosPage from './pages/logistica/repartos/chofer'
 import PickingPage from './pages/logistica/picking'
+import SeguimientoPage from './pages/logistica/seguimiento'
 import FinanzasPage from './pages/finanzas'
 import CobrosPage from './pages/cobros'
 import PedidosPage from './pages/pedidos'
@@ -155,6 +156,14 @@ function AppRoutes() {
             element={
               <ModuleRoute moduleKey="logistics.picking">
                 <PickingPage />
+              </ModuleRoute>
+            }
+          />
+          <Route
+            path="logistica/seguimiento"
+            element={
+              <ModuleRoute moduleKey="logistics.gps">
+                <SeguimientoPage />
               </ModuleRoute>
             }
           />

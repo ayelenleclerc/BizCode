@@ -15,6 +15,8 @@ import type { ServiceResult } from './serviceResults'
 
 export const POD_VIEW_ROLES = ['owner', 'manager', 'logistics_planner'] as const
 
+export const GPS_VIEW_ROLES = ['owner', 'manager', 'logistics_planner'] as const
+
 export const REPARTO_ESTADOS = ['planned', 'on_route', 'completed', 'cancelled'] as const
 export type RepartoEstado = (typeof REPARTO_ESTADOS)[number]
 
@@ -66,7 +68,7 @@ function sanitizeReparto(row: RepartoRow): Omit<RepartoListRow, 'progress'> & { 
   }
 }
 
-function mapProgress(items: { estado: string }[]): RepartoListRow['progress'] {
+export function mapRepartoProgress(items: { estado: string }[]): RepartoListRow['progress'] {
   const total = items.length
   const delivered = items.filter((i) => i.estado === 'delivered').length
   const pending = items.filter((i) => i.estado === 'pending').length
@@ -75,7 +77,7 @@ function mapProgress(items: { estado: string }[]): RepartoListRow['progress'] {
 
 function withProgress(row: RepartoRow): RepartoListRow {
   const base = sanitizeReparto(row)
-  return { ...base, progress: mapProgress(row.items) }
+  return { ...base, progress: mapRepartoProgress(row.items) }
 }
 
 /**

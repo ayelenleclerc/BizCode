@@ -3,9 +3,9 @@
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
   "version": 1,
-  "serialNumber": "urn:uuid:26349336-708a-4e51-8ce7-a5ad98be7568",
+  "serialNumber": "urn:uuid:2d06ae6a-5539-4e10-9d48-854634dead41",
   "metadata": {
-    "timestamp": "2026-05-26T11:19:05.619Z",
+    "timestamp": "2026-05-26T11:45:18.565Z",
     "tools": {
       "components": [
         {
@@ -571,6 +571,40 @@
     },
     {
       "type": "library",
+      "name": "leaflet",
+      "version": "1.9.4",
+      "bom-ref": "bizcode@0.1.0|leaflet@1.9.4",
+      "licenses": [
+        {
+          "license": {
+            "id": "BSD-2-Clause",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/leaflet@1.9.4",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/leaflet/-/leaflet-1.9.4.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "9f14b5ca7cc93a63a51e9fa22f71725aa2bcf46b4d2fc53caef94c3ac41d4d3b2cc59c025e1f0dd8d07718340e2fe611dd79d6c99031c108b15116fe140ef83c"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/leaflet"
+        }
+      ]
+    },
+    {
+      "type": "library",
       "name": "multer",
       "version": "2.1.1",
       "bom-ref": "bizcode@0.1.0|multer@2.1.1",
@@ -976,6 +1010,40 @@
         {
           "name": "cdx:npm:package:path",
           "value": "node_modules/react-i18next"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "react-leaflet",
+      "version": "4.2.1",
+      "bom-ref": "bizcode@0.1.0|react-leaflet@4.2.1",
+      "licenses": [
+        {
+          "license": {
+            "id": "Hippocratic-2.1",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/react-leaflet@4.2.1",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/react-leaflet/-/react-leaflet-4.2.1.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "a7d72192f85c2ab5a7fc7ff51457954aa2dd45e1b09f6aa68a86ce4063b70627d7fbfbd5ff7f6a858f1d1aa6dd70f8757ba8f187f407ae22d7afb6b878b14ae1"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/react-leaflet"
         }
       ]
     },
@@ -3598,6 +3666,41 @@
         {
           "name": "cdx:npm:package:path",
           "value": "node_modules/use-sync-external-store"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "core",
+      "group": "@react-leaflet",
+      "version": "2.1.0",
+      "bom-ref": "bizcode@0.1.0|@react-leaflet/core@2.1.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "Hippocratic-2.1",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/%40react-leaflet/core@2.1.0",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/@react-leaflet/core/-/core-2.1.0.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "424ecf7eef0149aaca1aa20b8f8c7b6c2499d698ee00f67eaa64701f94bb9834bdd5549b555b094ab5b8a80f863ebae8f2debd8056153166f565ce321663e256"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/@react-leaflet/core"
         }
       ]
     },
@@ -7792,6 +7895,7 @@
         "bizcode@0.1.0|express-rate-limit@8.4.1",
         "bizcode@0.1.0|express@5.2.1",
         "bizcode@0.1.0|i18next@26.0.3",
+        "bizcode@0.1.0|leaflet@1.9.4",
         "bizcode@0.1.0|multer@2.1.1",
         "bizcode@0.1.0|nodemailer@8.0.5",
         "bizcode@0.1.0|pdfkit@0.18.0",
@@ -7800,6 +7904,7 @@
         "bizcode@0.1.0|react-hook-form@7.72.0",
         "bizcode@0.1.0|react-hotkeys-hook@4.6.2",
         "bizcode@0.1.0|react-i18next@17.0.2",
+        "bizcode@0.1.0|react-leaflet@4.2.1",
         "bizcode@0.1.0|react-router-dom@6.30.3",
         "bizcode@0.1.0|react@18.3.1",
         "bizcode@0.1.0|recharts@3.8.1",
@@ -7918,6 +8023,9 @@
       ]
     },
     {
+      "ref": "bizcode@0.1.0|leaflet@1.9.4"
+    },
+    {
       "ref": "bizcode@0.1.0|multer@2.1.1",
       "dependsOn": [
         "bizcode@0.1.0|append-field@1.0.0",
@@ -8005,6 +8113,15 @@
         "bizcode@0.1.0|react@18.3.1",
         "bizcode@0.1.0|typescript@5.9.3",
         "bizcode@0.1.0|use-sync-external-store@1.6.0"
+      ]
+    },
+    {
+      "ref": "bizcode@0.1.0|react-leaflet@4.2.1",
+      "dependsOn": [
+        "bizcode@0.1.0|@react-leaflet/core@2.1.0",
+        "bizcode@0.1.0|leaflet@1.9.4",
+        "bizcode@0.1.0|react-dom@18.3.1",
+        "bizcode@0.1.0|react@18.3.1"
       ]
     },
     {
@@ -8433,6 +8550,14 @@
     {
       "ref": "bizcode@0.1.0|use-sync-external-store@1.6.0",
       "dependsOn": [
+        "bizcode@0.1.0|react@18.3.1"
+      ]
+    },
+    {
+      "ref": "bizcode@0.1.0|@react-leaflet/core@2.1.0",
+      "dependsOn": [
+        "bizcode@0.1.0|leaflet@1.9.4",
+        "bizcode@0.1.0|react-dom@18.3.1",
         "bizcode@0.1.0|react@18.3.1"
       ]
     },

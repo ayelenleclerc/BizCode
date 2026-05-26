@@ -309,6 +309,16 @@ function buildPrisma(): PrismaClient {
       create: vi.fn().mockResolvedValue(repartoContractRow),
       update: vi.fn().mockResolvedValue({ ...repartoContractRow, estado: 'on_route' }),
     },
+    repartoUbicacion: {
+      create: vi.fn().mockResolvedValue({
+        lat: { toString: () => '-34.6037' },
+        lng: { toString: () => '-58.3816' },
+        recordedAt: new Date('2026-05-26T12:00:00.000Z'),
+      }),
+      deleteMany: vi.fn().mockResolvedValue({ count: 0 }),
+      findFirst: vi.fn().mockResolvedValue(null),
+      findMany: vi.fn().mockResolvedValue([]),
+    },
     repartoItem: {
       findFirst: vi.fn().mockResolvedValue(null),
       update: vi.fn(),
@@ -1058,6 +1068,66 @@ describe('API — contrato OpenAPI', () => {
       .send({ fecha: '2026-05-20', choferId: 2, ordenEntregaIds: [1] })
       .expect(201)
     await assertMatchesOpenApi('/api/repartos', 'post', '201', res.body)
+  })
+
+  it('GET /api/repartos/activos', async () => {
+    process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
+    process.env.BIZCODE_TEST_ROLE = 'logistics_planner'
+    const p = buildPrisma()
+    const activo = {
+      ...repartoContractRow,
+      estado: 'on_route',
+      items: [
+        {
+          ...repartoContractRow.items[0],
+          estado: 'pending',
+          ordenEntrega: {
+            ...repartoContractRow.items[0].ordenEntrega,
+            cliente: {
+              ...repartoContractRow.items[0].ordenEntrega.cliente,
+              domicilio: 'Av. Demo 123',
+            },
+          },
+        },
+      ],
+    }
+    vi.mocked(p.reparto.findMany).mockResolvedValueOnce([activo] as never)
+    const app = createApp(p)
+    const res = await request(app).get('/api/repartos/activos').expect(200)
+    await assertMatchesOpenApi('/api/repartos/activos', 'get', '200', res.body)
+  })
+
+  it('POST /api/repartos/{id}/ubicacion', async () => {
+    process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
+    process.env.BIZCODE_TEST_ROLE = 'driver'
+    process.env.BIZCODE_TEST_USER_ID = '2'
+    const p = buildPrisma()
+    vi.mocked(p.reparto.findFirst).mockResolvedValueOnce({
+      id: 1,
+      choferId: 2,
+      estado: 'on_route',
+      tenantId: 1,
+    } as never)
+    const app = createApp(p)
+    const res = await request(app)
+      .post('/api/repartos/1/ubicacion')
+      .send({ lat: -34.6037, lng: -58.3816 })
+      .expect(200)
+    await assertMatchesOpenApi('/api/repartos/{id}/ubicacion', 'post', '200', res.body)
+  })
+
+  it('GET /api/repartos/{id}/ubicacion/ultima', async () => {
+    process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
+    process.env.BIZCODE_TEST_ROLE = 'logistics_planner'
+    const p = buildPrisma()
+    vi.mocked(p.reparto.findFirst).mockResolvedValueOnce({
+      id: 1,
+      choferId: 2,
+      tenantId: 1,
+    } as never)
+    const app = createApp(p)
+    const res = await request(app).get('/api/repartos/1/ubicacion/ultima').expect(200)
+    await assertMatchesOpenApi('/api/repartos/{id}/ubicacion/ultima', 'get', '200', res.body)
   })
 
   it('GET /api/repartos/{id}', async () => {

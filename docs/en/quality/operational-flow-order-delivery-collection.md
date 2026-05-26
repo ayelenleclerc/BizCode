@@ -73,6 +73,7 @@ Empty cells mean no direct RBAC permission names the step; the role may still pa
 | AR / finance UI | `/finanzas`; `GET /api/reportes/aging`, `GET /api/reportes/cuenta-corriente/:clienteId` | Dunning workflows per backlog |
 | Reports | `/reportes`; `GET /api/reportes/ventas`, `stock-critico`, `cobranzas` (JSON or CSV) | Additional report types |
 | Logistics | `/logistica`, `/logistica/picking` (#143); `OrdenEntrega`; `GET/POST/PUT /api/ordenes-entrega`, `POST .../iniciar-picking`, `POST .../lista` | OE: `pending` → `picking` → `ready` → `assigned` (route) → `in_transit` → `delivered` \| `failed` \| `cancelled` |
+| GPS tracking | `/logistica/seguimiento` (#144); `RepartoUbicacion`; `GET /api/repartos/activos`, `POST /api/repartos/{id}/ubicacion` | Driver on `on_route` route; planner sees last position; 7-day retention |
 | Order entity `pedido` | `Pedido`/`PedidoItem` models, `/api/pedidos`, UI `/pedidos` (#132); `requireModule('billing.orders')` (#223) | States `packed`…`collected` and generic transitions (#65 / full BP1-1) |
 | Permissions `orders.*` | Defined in RBAC; enforced on `/api/ordenes-entrega` | Extend when `pedido` entity ships |
 

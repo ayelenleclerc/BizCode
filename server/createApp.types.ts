@@ -146,6 +146,11 @@ export type RepartoItemPodInput = {
   motivoNoEntrega?: string | null
 }
 
+export type RepartoUbicacionInput = {
+  lat: number
+  lng: number
+}
+
 export type StockAjusteInput = {
   cantidad: number
   motivo: string

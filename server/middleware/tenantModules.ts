@@ -21,6 +21,7 @@ const TEST_DEFAULT_MODULES: ModuleKey[] = [
   'billing.orders',
   'logistics.dispatches',
   'logistics.picking',
+  'logistics.gps',
 ]
 
 /**

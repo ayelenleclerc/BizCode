@@ -62,6 +62,7 @@ function LogisticaForbidden({ t }: { t: (key: string) => string }) {
 function LogisticaPageContent() {
   const { t } = useTranslation('logistica')
   const { t: tRepartos } = useTranslation('repartos')
+  const { t: tSeguimiento } = useTranslation('seguimiento')
   const { claims } = useAuth()
   const isDriver = claims?.role === 'driver'
   const canDispatch = claims?.permissions.includes('orders.dispatch') ?? false
@@ -70,6 +71,12 @@ function LogisticaPageContent() {
   const canPick = claims?.permissions.includes('orders.pick') ?? false
   const { hasModule } = useFeatureFlags()
   const showPickingLink = canPick && hasModule('logistics.picking')
+  const showSeguimientoLink =
+    !isDriver &&
+    hasModule('logistics.gps') &&
+    (claims?.role === 'owner' ||
+      claims?.role === 'manager' ||
+      claims?.role === 'logistics_planner')
 
   const [fecha, setFecha] = useState(todayIso)
   const [estado, setEstado] = useState<OrdenEntregaEstado | ''>('')
@@ -175,6 +182,15 @@ function LogisticaPageContent() {
               data-testid="logistica-picking-link"
             >
               {t('linkPicking')}
+            </Link>
+          )}
+          {showSeguimientoLink && (
+            <Link
+              to="/logistica/seguimiento"
+              className="px-3 py-2 text-sm border border-slate-300 dark:border-slate-600 rounded inline-flex items-center"
+              data-testid="logistica-seguimiento-link"
+            >
+              {tSeguimiento('title')}
             </Link>
           )}
           {!isDriver && (

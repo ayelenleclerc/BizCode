@@ -74,6 +74,18 @@ Listados/detalle exponen **`hasPod`** sin blobs. Límites decodificados: firma ~
 
 Back-office: en **`/logistica/repartos`**, panel de seguimiento con badge **POD disponible** y **Ver comprobante** si `hasPod`.
 
+## Seguimiento GPS en vivo (#144)
+
+Módulo **`logistics.gps`** (depende de **`logistics.dispatches`**). Planificadores con roles **`owner`**, **`manager`** o **`logistics_planner`** abren **`/logistica/seguimiento`** (mapa OpenStreetMap + Leaflet, lista de repartos `on_route`, actualización cada **60 s**).
+
+| API | Permiso / rol |
+|-----|----------------|
+| `GET /api/repartos/activos` | `logistics.read` + rol planificador (`GPS_VIEW_ROLES`) |
+| `GET /api/repartos/{id}/ubicacion/ultima` | `logistics.read` + planificador; chofer solo en su reparto |
+| `POST /api/repartos/{id}/ubicacion` | `orders.deliver.confirm`; chofer dueño, reparto `on_route` |
+
+El chofer en **`/logistica/repartos/chofer`** envía coordenadas cada **2 min** si el navegador permite geolocalización (no bloquea POD si se deniega). Retención: **7 días** (purga en cada registro y `npm run reparto-ubicacion:purge`). No hay coordenadas de cliente en el mapa; el detalle muestra domicilio como texto.
+
 ## Órdenes de compra
 
 Abra **Compras** (`/compras`) desde el menú lateral. La ruta depende del módulo de tenant **`logistics.purchases`** y es visible para roles como **owner**, **manager** y **warehouse_lead** (según la configuración de navegación del producto).

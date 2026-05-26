@@ -22291,6 +22291,213 @@ Requires `orders.dispatch`. Groups delivery orders in estado `ready`; assigns dr
 }
 ```
 
+### PARAMETERS /api/repartos/activos
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/repartos/activos`
+
+### List on-route deliveries with last GPS position
+
+- **Method:** `GET`
+- **Path:** `/api/repartos/activos`
+- **Tags:** repartos
+
+Requires tenant module `logistics.gps`, permission `logistics.read`, and role `owner`, `manager`, or `logistics_planner`. Returns repartos in estado `on_route` with `ultimaUbicacion`, `progress`, and `currentStop` (first pending item).
+
+#### Responses
+
+##### Status: 200 Active routes for live tracking
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`chofer` (required)**
+
+    `object`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`role` (required)**
+
+      `string`
+
+    - **`username` (required)**
+
+      `string`
+
+  - **`choferId` (required)**
+
+    `integer`
+
+  - **`currentStop` (required)**
+
+    `object`
+
+  - **`estado` (required)**
+
+    `string`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`progress` (required)**
+
+    `object`
+
+    - **`delivered` (required)**
+
+      `integer`
+
+    - **`pending` (required)**
+
+      `integer`
+
+    - **`total` (required)**
+
+      `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`ultimaUbicacion` (required)**
+
+    `object`
+
+  - **`observaciones`**
+
+    `string`
+
+  - **`vehiculo`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "fecha": "",
+      "choferId": 1,
+      "estado": "",
+      "vehiculo": "",
+      "observaciones": "",
+      "chofer": {
+        "id": 1,
+        "username": "",
+        "role": ""
+      },
+      "progress": {
+        "total": 0,
+        "delivered": 0,
+        "pending": 0
+      },
+      "ultimaUbicacion": {
+        "lat": 1,
+        "lng": 1,
+        "recordedAt": ""
+      },
+      "currentStop": {
+        "secuencia": 1,
+        "cliente": {
+          "id": 1,
+          "codigo": 1,
+          "rsocial": "",
+          "domicilio": ""
+        },
+        "zona": {
+          "id": 1,
+          "nombre": ""
+        }
+      }
+    }
+  ]
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ### PARAMETERS /api/repartos/{id}
 
 - **Method:** `PARAMETERS`
@@ -23125,6 +23332,350 @@ Requires `orders.dispatch`. `planned` → `on_route`; pending items' OEs → `in
 ```
 
 ##### Status: 422 Invalid state
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/repartos/{id}/ubicacion
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/repartos/{id}/ubicacion`
+
+### Record driver GPS position
+
+- **Method:** `POST`
+- **Path:** `/api/repartos/{id}/ubicacion`
+- **Tags:** repartos
+
+Requires tenant module `logistics.gps` and permission `orders.deliver.confirm`. Only the assigned driver on a reparto in estado `on_route`. Purges locations older than 7 days.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`lat` (required)**
+
+  `number`
+
+- **`lng` (required)**
+
+  `number`
+
+**Example:**
+
+```json
+{
+  "lat": -90,
+  "lng": -180
+}
+```
+
+#### Responses
+
+##### Status: 200 Location recorded
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`lat` (required)**
+
+    `number`
+
+  - **`lng` (required)**
+
+    `number`
+
+  - **`recordedAt` (required)**
+
+    `string`, format: `date-time`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "lat": 1,
+    "lng": 1,
+    "recordedAt": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Route not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 422 Invalid state
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/repartos/{id}/ubicacion/ultima
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/repartos/{id}/ubicacion/ultima`
+
+### Get last GPS position for a route
+
+- **Method:** `GET`
+- **Path:** `/api/repartos/{id}/ubicacion/ultima`
+- **Tags:** repartos
+
+Requires tenant module `logistics.gps` and permission `logistics.read`. Planners (`owner`, `manager`, `logistics_planner`) on any route; drivers only on their own route.
+
+#### Responses
+
+##### Status: 200 Last recorded position or null
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "lat": 1,
+    "lng": 1,
+    "recordedAt": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Route not found
 
 ###### Content-Type: application/json
 
@@ -30323,6 +30874,416 @@ Requires `logistics.read` and role `owner`, `manager`, or `logistics_planner` (n
     "notDelivered": 0,
     "returned": 0
   }
+}
+```
+
+### RepartoUbicacionInput
+
+- **Type:**`object`
+
+* **`lat` (required)**
+
+  `number`
+
+* **`lng` (required)**
+
+  `number`
+
+**Example:**
+
+```json
+{
+  "lat": -90,
+  "lng": -180
+}
+```
+
+### RepartoUbicacion
+
+- **Type:**`object`
+
+* **`lat` (required)**
+
+  `number`
+
+* **`lng` (required)**
+
+  `number`
+
+* **`recordedAt` (required)**
+
+  `string`, format: `date-time`
+
+**Example:**
+
+```json
+{
+  "lat": 1,
+  "lng": 1,
+  "recordedAt": ""
+}
+```
+
+### RepartoUbicacionEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`lat` (required)**
+
+    `number`
+
+  - **`lng` (required)**
+
+    `number`
+
+  - **`recordedAt` (required)**
+
+    `string`, format: `date-time`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "lat": 1,
+    "lng": 1,
+    "recordedAt": ""
+  }
+}
+```
+
+### RepartoUbicacionNullableEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "lat": 1,
+    "lng": 1,
+    "recordedAt": ""
+  }
+}
+```
+
+### RepartoActivoCurrentStop
+
+- **Type:**`object`
+
+* **`cliente` (required)**
+
+  `object`
+
+  - **`codigo` (required)**
+
+    `integer`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`rsocial` (required)**
+
+    `string`
+
+  - **`domicilio`**
+
+    `string`
+
+* **`secuencia` (required)**
+
+  `integer`
+
+* **`zona`**
+
+  `object`
+
+  - **`id`**
+
+    `integer`
+
+  - **`nombre`**
+
+    `string`
+
+**Example:**
+
+```json
+{
+  "secuencia": 1,
+  "cliente": {
+    "id": 1,
+    "codigo": 1,
+    "rsocial": "",
+    "domicilio": ""
+  },
+  "zona": {
+    "id": 1,
+    "nombre": ""
+  }
+}
+```
+
+### RepartoActivo
+
+- **Type:**`object`
+
+* **`chofer` (required)**
+
+  `object`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`role` (required)**
+
+    `string`
+
+  - **`username` (required)**
+
+    `string`
+
+* **`choferId` (required)**
+
+  `integer`
+
+* **`currentStop` (required)**
+
+  `object`
+
+* **`estado` (required)**
+
+  `string`
+
+* **`fecha` (required)**
+
+  `string`, format: `date-time`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`progress` (required)**
+
+  `object`
+
+  - **`delivered` (required)**
+
+    `integer`
+
+  - **`pending` (required)**
+
+    `integer`
+
+  - **`total` (required)**
+
+    `integer`
+
+* **`tenantId` (required)**
+
+  `integer`
+
+* **`ultimaUbicacion` (required)**
+
+  `object`
+
+* **`observaciones`**
+
+  `string`
+
+* **`vehiculo`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "tenantId": 1,
+  "fecha": "",
+  "choferId": 1,
+  "estado": "",
+  "vehiculo": "",
+  "observaciones": "",
+  "chofer": {
+    "id": 1,
+    "username": "",
+    "role": ""
+  },
+  "progress": {
+    "total": 0,
+    "delivered": 0,
+    "pending": 0
+  },
+  "ultimaUbicacion": {
+    "lat": 1,
+    "lng": 1,
+    "recordedAt": ""
+  },
+  "currentStop": {
+    "secuencia": 1,
+    "cliente": {
+      "id": 1,
+      "codigo": 1,
+      "rsocial": "",
+      "domicilio": ""
+    },
+    "zona": {
+      "id": 1,
+      "nombre": ""
+    }
+  }
+}
+```
+
+### RepartoActivoListEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`chofer` (required)**
+
+    `object`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`role` (required)**
+
+      `string`
+
+    - **`username` (required)**
+
+      `string`
+
+  - **`choferId` (required)**
+
+    `integer`
+
+  - **`currentStop` (required)**
+
+    `object`
+
+  - **`estado` (required)**
+
+    `string`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`progress` (required)**
+
+    `object`
+
+    - **`delivered` (required)**
+
+      `integer`
+
+    - **`pending` (required)**
+
+      `integer`
+
+    - **`total` (required)**
+
+      `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`ultimaUbicacion` (required)**
+
+    `object`
+
+  - **`observaciones`**
+
+    `string`
+
+  - **`vehiculo`**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "fecha": "",
+      "choferId": 1,
+      "estado": "",
+      "vehiculo": "",
+      "observaciones": "",
+      "chofer": {
+        "id": 1,
+        "username": "",
+        "role": ""
+      },
+      "progress": {
+        "total": 0,
+        "delivered": 0,
+        "pending": 0
+      },
+      "ultimaUbicacion": {
+        "lat": 1,
+        "lng": 1,
+        "recordedAt": ""
+      },
+      "currentStop": {
+        "secuencia": 1,
+        "cliente": {
+          "id": 1,
+          "codigo": 1,
+          "rsocial": "",
+          "domicilio": ""
+        },
+        "zona": {
+          "id": 1,
+          "nombre": ""
+        }
+      }
+    }
+  ]
 }
 ```
 
