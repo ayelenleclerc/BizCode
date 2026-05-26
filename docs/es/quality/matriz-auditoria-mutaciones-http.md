@@ -42,6 +42,8 @@ Evidencia automática equivalente en `tests/server/http-mutations-audit-coverage
 | POST | `/api/repartos/:id/ubicacion` | `reparto_ubicacion_recorded` | módulo `logistics.gps`; `metadata` lat/lng |
 | PUT | `/api/repartos/:repartoId/items/:itemId` | `reparto_item_pod_signed` | POD en ítem; `resource: reparto_item` |
 
+Las filas de logística anteriores tienen cobertura automática en [`tests/server/http-mutations-audit-coverage.test.ts`](../../../tests/server/http-mutations-audit-coverage.test.ts) (picking, repartos, GPS, POD).
+
 ## Consulta del registro de auditoría (#67)
 
 Los operadores con permiso `audit.read` pueden obtener el listado paginado mediante **GET** `/api/audit-events` (filtros y paginación descritos en el contrato OpenAPI) y revisar los eventos en la aplicación en la ruta **`/admin/audit-log`**.

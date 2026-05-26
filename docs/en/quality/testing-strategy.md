@@ -113,6 +113,7 @@ Vitest **excludes** `e2e/**` (`vitest.config.ts`) so files under `e2e/` are only
 | Delivery routes | `tests/api/repartos.test.ts`, `tests/api/contract.test.ts` | CRUD, iniciar/cerrar, POD item, OpenAPI paths |
 | GPS tracking | `tests/api/repartos.test.ts`, `tests/server/services/repartoUbicacionService.test.ts`, contract paths `/api/repartos/activos`, `.../ubicacion` | Module gate `logistics.gps`; `TEST_DEFAULT_MODULES` in [`server/middleware/tenantModules.ts`](../../../server/middleware/tenantModules.ts) |
 | Warehouse picking | `tests/api/ordenes-entrega.test.ts`, contract `iniciar-picking` / `lista` | Module `logistics.picking` |
+| Audit matrix (#84) | `tests/server/http-mutations-audit-coverage.test.ts` | Picking, repartos, GPS `ubicacion`, POD `reparto_item_pod_signed` |
 | Integration | `tests/integration/repartos.integration.test.ts` | Optional; requires migrated PostgreSQL |
 
 Contract tests mock Prisma; they validate HTTP status and OpenAPI response shapes. Service unit tests cover purge (7-day retention) and role gates without a database.

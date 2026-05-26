@@ -103,6 +103,7 @@ O Vitest **exclui** `e2e/**` (`vitest.config.ts`) para que apenas o Playwright e
 | Repartos | `tests/api/repartos.test.ts`, `tests/api/contract.test.ts` | CRUD, iniciar/fechar, POD, contrato OpenAPI |
 | GPS | `repartoUbicacionService.test.ts`, rotas `activos` / `ubicacion` | Módulo `logistics.gps`; `TEST_DEFAULT_MODULES` em `tenantModules.ts` |
 | Picking | `tests/api/ordenes-entrega.test.ts` | Módulo `logistics.picking` |
+| Matriz auditoria (#84) | `tests/server/http-mutations-audit-coverage.test.ts` | Picking, repartos, GPS, POD |
 | Integração | `tests/integration/repartos.integration.test.ts` | Opcional; PostgreSQL migrado | **`tests/integration/**`** fica fora do `npm run test:coverage` (não exige `DATABASE_URL`); integração usa `vitest.integration.config.ts`.
 
 ## Mocks

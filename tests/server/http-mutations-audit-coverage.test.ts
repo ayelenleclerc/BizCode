@@ -66,6 +66,47 @@ const FACTURA_VOID_ROW = {
   clienteId: 1,
 }
 
+const ORDEN_ENTREGA_ROW = {
+  id: 1,
+  tenantId: 1,
+  facturaId: null,
+  clienteId: 1,
+  zonaId: 10,
+  driverId: null,
+  pickerUserId: null,
+  pickingIniciadoAt: null,
+  pickingListoAt: null,
+  fecha: new Date('2026-05-16T12:00:00.000Z'),
+  estado: 'pending',
+  nota: null,
+  createdAt: new Date(),
+  updatedAt: new Date(),
+  cliente: { id: 1, codigo: 1001, rsocial: 'ACME SA' },
+  zona: { id: 10, nombre: 'Norte', horario: null },
+  driver: null,
+  picker: null,
+  factura: null,
+}
+
+const REPARTO_ROW = {
+  id: 1,
+  tenantId: 1,
+  fecha: new Date('2026-05-20'),
+  choferId: 2,
+  estado: 'planned',
+  vehiculo: null,
+  observaciones: null,
+  closedAt: null,
+  createdAt: new Date(),
+  updatedAt: new Date(),
+  chofer: { id: 2, username: 'driver1', role: 'driver' },
+  items: [],
+  progress: { total: 0, delivered: 0, pending: 0 },
+}
+
+const TEST_FIRMA =
+  'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=='
+
 function auditCreateMock() {
   return vi.fn().mockResolvedValue({ id: 999 })
 }
@@ -175,6 +216,48 @@ function basePrismaForMutations(): {
     findFirst: vi.fn().mockResolvedValue(null),
     updateMany: vi.fn().mockResolvedValue({ count: 1 }),
     update: vi.fn().mockResolvedValue({ id: 1 }),
+  }
+  prisma.ordenEntrega = {
+    count: vi.fn().mockResolvedValue(0),
+    findMany: vi.fn().mockResolvedValue([]),
+    findFirst: vi.fn().mockResolvedValue(null),
+    create: vi.fn().mockResolvedValue({ ...ORDEN_ENTREGA_ROW, id: 1 }),
+    update: vi.fn().mockResolvedValue(ORDEN_ENTREGA_ROW),
+    updateMany: vi.fn().mockResolvedValue({ count: 0 }),
+  }
+  prisma.reparto = {
+    count: vi.fn().mockResolvedValue(0),
+    findMany: vi.fn().mockResolvedValue([]),
+    findFirst: vi.fn().mockResolvedValue(null),
+    create: vi.fn().mockResolvedValue(REPARTO_ROW),
+    update: vi.fn().mockResolvedValue(REPARTO_ROW),
+  }
+  prisma.repartoItem = {
+    findFirst: vi.fn().mockResolvedValue(null),
+    update: vi.fn(),
+    updateMany: vi.fn().mockResolvedValue({ count: 0 }),
+  }
+  prisma.repartoUbicacion = {
+    create: vi.fn().mockResolvedValue({
+      lat: { toString: () => '-34.6' },
+      lng: { toString: () => '-58.4' },
+      recordedAt: new Date('2026-05-26T12:00:00.000Z'),
+    }),
+    deleteMany: vi.fn().mockResolvedValue({ count: 0 }),
+    findFirst: vi.fn().mockResolvedValue(null),
+    findMany: vi.fn().mockResolvedValue([]),
+  }
+  prisma.cobro = {
+    count: vi.fn().mockResolvedValue(0),
+    findMany: vi.fn().mockResolvedValue([]),
+    findFirst: vi.fn().mockResolvedValue(null),
+    create: vi.fn(),
+    aggregate: vi.fn().mockResolvedValue({ _count: { id: 0 }, _sum: { monto: null } }),
+  }
+  prisma.ordenCompra = {
+    count: vi.fn().mockResolvedValue(0),
+    findMany: vi.fn().mockResolvedValue([]),
+    findFirst: vi.fn().mockResolvedValue(null),
   }
 
   prisma.$transaction = vi.fn(async (fn: (tx: Tx) => Promise<unknown>) =>
@@ -462,6 +545,238 @@ describe('HTTP mutations emit AuditEvent (coverage matrix)', () => {
     expect(auditCreate).toHaveBeenCalledWith(
       expect.objectContaining({
         data: expect.objectContaining({ action: 'delivery_zone_update', resource: 'delivery_zone', resourceId: '10' }),
+      }),
+    )
+  })
+
+  it('POST /api/ordenes-entrega/:id/iniciar-picking → orden_entrega_picking_start', async () => {
+    const { prisma, auditCreate } = basePrismaForMutations()
+    process.env.BIZCODE_TEST_ROLE = 'warehouse_op'
+    process.env.BIZCODE_TEST_USER_ID = '7'
+
+    vi.mocked(prisma.ordenEntrega.findFirst).mockResolvedValue({
+      ...ORDEN_ENTREGA_ROW,
+      estado: 'pending',
+      driverId: null,
+    } as never)
+    vi.mocked(prisma.ordenEntrega.update).mockResolvedValue({
+      ...ORDEN_ENTREGA_ROW,
+      estado: 'picking',
+      pickerUserId: 7,
+      pickingIniciadoAt: new Date(),
+      picker: { id: 7, username: 'wh1', role: 'warehouse_op' },
+    } as never)
+
+    const app = createApp(prisma)
+    await request(app).post('/api/ordenes-entrega/1/iniciar-picking').expect(200)
+
+    expect(auditCreate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          action: 'orden_entrega_picking_start',
+          resource: 'orden_entrega',
+          resourceId: '1',
+        }),
+      }),
+    )
+  })
+
+  it('POST /api/ordenes-entrega/:id/lista → orden_entrega_picking_ready', async () => {
+    const { prisma, auditCreate } = basePrismaForMutations()
+    process.env.BIZCODE_TEST_ROLE = 'warehouse_op'
+    process.env.BIZCODE_TEST_USER_ID = '7'
+
+    vi.mocked(prisma.ordenEntrega.findFirst).mockResolvedValue({
+      ...ORDEN_ENTREGA_ROW,
+      estado: 'picking',
+      pickerUserId: 7,
+      driverId: null,
+    } as never)
+    vi.mocked(prisma.ordenEntrega.update).mockResolvedValue({
+      ...ORDEN_ENTREGA_ROW,
+      estado: 'ready',
+      pickerUserId: 7,
+      pickingListoAt: new Date(),
+    } as never)
+
+    const app = createApp(prisma)
+    await request(app).post('/api/ordenes-entrega/1/lista').expect(200)
+
+    expect(auditCreate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          action: 'orden_entrega_picking_ready',
+          resource: 'orden_entrega',
+          resourceId: '1',
+        }),
+      }),
+    )
+  })
+
+  it('POST /api/repartos → reparto_created', async () => {
+    const { prisma, auditCreate } = basePrismaForMutations()
+    process.env.BIZCODE_TEST_ROLE = 'logistics_planner'
+
+    vi.mocked(prisma.appUser.findFirst).mockResolvedValue({ id: 2 } as never)
+    vi.mocked(prisma.ordenEntrega.findMany).mockResolvedValue([
+      { id: 5, estado: 'ready', fecha: new Date('2026-05-20') },
+    ] as never)
+    vi.mocked(prisma.repartoItem.findFirst).mockResolvedValue(null)
+    vi.mocked(prisma.reparto.create).mockResolvedValue({ ...REPARTO_ROW, id: 1 } as never)
+
+    const app = createApp(prisma)
+    await request(app)
+      .post('/api/repartos')
+      .send({ fecha: '2026-05-20', choferId: 2, ordenEntregaIds: [5] })
+      .expect(201)
+
+    expect(auditCreate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ action: 'reparto_created', resource: 'reparto', resourceId: '1' }),
+      }),
+    )
+  })
+
+  it('POST /api/repartos/:id/iniciar → reparto_started', async () => {
+    const { prisma, auditCreate } = basePrismaForMutations()
+    process.env.BIZCODE_TEST_ROLE = 'logistics_planner'
+
+    vi.mocked(prisma.reparto.findFirst)
+      .mockResolvedValueOnce({
+        ...REPARTO_ROW,
+        items: [{ id: 10, ordenEntregaId: 5, estado: 'pending' }],
+      } as never)
+      .mockResolvedValueOnce({ ...REPARTO_ROW, estado: 'on_route' } as never)
+    vi.mocked(prisma.reparto.update).mockResolvedValue({ ...REPARTO_ROW, estado: 'on_route' } as never)
+
+    const app = createApp(prisma)
+    await request(app).post('/api/repartos/1/iniciar').expect(200)
+
+    expect(auditCreate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ action: 'reparto_started', resource: 'reparto', resourceId: '1' }),
+      }),
+    )
+  })
+
+  it('POST /api/repartos/:id/cerrar → reparto_closed', async () => {
+    const { prisma, auditCreate } = basePrismaForMutations()
+    process.env.BIZCODE_TEST_ROLE = 'logistics_planner'
+
+    const items = [
+      { id: 10, ordenEntregaId: 5, estado: 'delivered' },
+      { id: 11, ordenEntregaId: 6, estado: 'pending' },
+    ]
+    vi.mocked(prisma.reparto.findFirst).mockResolvedValue({
+      ...REPARTO_ROW,
+      estado: 'on_route',
+      items,
+    } as never)
+    vi.mocked(prisma.reparto.update).mockResolvedValue({
+      ...REPARTO_ROW,
+      estado: 'completed',
+      closedAt: new Date(),
+      items: [
+        { ...items[0], estado: 'delivered' },
+        { ...items[1], estado: 'not_delivered' },
+      ],
+      chofer: REPARTO_ROW.chofer,
+    } as never)
+
+    const app = createApp(prisma)
+    await request(app).post('/api/repartos/1/cerrar').expect(200)
+
+    expect(auditCreate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ action: 'reparto_closed', resource: 'reparto', resourceId: '1' }),
+      }),
+    )
+  })
+
+  it('POST /api/repartos/:id/ubicacion → reparto_ubicacion_recorded', async () => {
+    const { prisma, auditCreate } = basePrismaForMutations()
+    process.env.BIZCODE_TEST_ROLE = 'driver'
+    process.env.BIZCODE_TEST_USER_ID = '2'
+
+    vi.mocked(prisma.reparto.findFirst).mockResolvedValue({
+      id: 1,
+      choferId: 2,
+      estado: 'on_route',
+      tenantId: 1,
+    } as never)
+
+    const app = createApp(prisma)
+    await request(app).post('/api/repartos/1/ubicacion').send({ lat: -34.6, lng: -58.4 }).expect(200)
+
+    expect(auditCreate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          action: 'reparto_ubicacion_recorded',
+          resource: 'reparto',
+          resourceId: '1',
+        }),
+      }),
+    )
+  })
+
+  it('PUT /api/repartos/:id/items/:itemId → reparto_item_pod_signed', async () => {
+    const { prisma, auditCreate } = basePrismaForMutations()
+    process.env.BIZCODE_TEST_ROLE = 'driver'
+    process.env.BIZCODE_TEST_USER_ID = '2'
+
+    const itemBase = {
+      id: 10,
+      repartoId: 1,
+      ordenEntregaId: 5,
+      secuencia: 1,
+      estado: 'pending',
+      entregadoAt: null,
+      motivoNoEntrega: null,
+      receptorNombre: null,
+      receptorDni: null,
+      notasEntrega: null,
+      podMedia: null,
+      ordenEntrega: {
+        id: 5,
+        tenantId: 1,
+        clienteId: 1,
+        estado: 'in_transit',
+        fecha: new Date(),
+        cliente: { id: 1, codigo: 1, rsocial: 'Cliente' },
+        zona: null,
+        factura: null,
+      },
+    }
+
+    vi.mocked(prisma.reparto.findFirst).mockResolvedValue({
+      id: 1,
+      estado: 'on_route',
+      choferId: 2,
+      tenantId: 1,
+    } as never)
+    vi.mocked(prisma.repartoItem.findFirst).mockResolvedValue(itemBase as never)
+    vi.mocked(prisma.repartoItem.update).mockResolvedValue({
+      ...itemBase,
+      estado: 'delivered',
+      entregadoAt: new Date(),
+      receptorNombre: 'Ana',
+      podMedia: { firmaBase64: TEST_FIRMA },
+    } as never)
+    vi.mocked(prisma.ordenEntrega.update).mockResolvedValue({} as never)
+
+    const app = createApp(prisma)
+    await request(app)
+      .put('/api/repartos/1/items/10')
+      .send({ outcome: 'delivered', receptorNombre: 'Ana', firmaBase64: TEST_FIRMA })
+      .expect(200)
+
+    expect(auditCreate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          action: 'reparto_item_pod_signed',
+          resource: 'reparto_item',
+          resourceId: '10',
+        }),
       }),
     )
   })
