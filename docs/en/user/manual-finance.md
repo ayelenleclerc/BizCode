@@ -36,4 +36,15 @@ Automatic job settings (grace days, IANA time zone, business hours) are under **
 
 With module **`billing.credit_notes`** enabled, the page adds a **Credit notes** section: filter by **from** / **to** date (on credit note `createdAt`) and optionally by **customer ID** (originating invoice customer). Data comes from `GET /api/notas-credito` (requires **`reports.financial.read`** or **`reports.operational.read`**; this screen is only reachable with financial reports access). See [ADR-0012](../adr/ADR-0012-invoice-void-credit-note.md) and the invoicing manual for voiding invoices.
 
+## VAT sales book — Fase 1 (`finance.ledger`, #147)
+
+With module **`finance.ledger`** enabled, a **Accounting — VAT sales book** section appears:
+
+1. Select **period** (month).
+2. Review **preview** totals (CBTV / ALICUOTAS record counts, net and VAT by rate). ARCA official validator confirmation may still be pending (see [ADR-0013](../adr/ADR-0013-libro-iva-ventas-fase1.md)).
+3. **Download ARCA (ZIP)** — `format=txt` → `CBTV.txt` + `ALICUOTAS.txt`.
+4. **Download Excel** — internal review only.
+
+**Libro IVA Compras** is **not** implemented in Fase 1; purchase orders do not yet model supplier fiscal vouchers.
+
 **Other languages:** [Español](../../es/user/manual-finanzas.md) · [Português](../../pt-br/user/manual-financas.md)

@@ -1306,6 +1306,15 @@ export const repartoUbicacionBodySchema = z
     }
   })
 
+const libroIvaPeriodoString = z
+  .string()
+  .regex(/^\d{4}-\d{2}$/, 'periodo must be YYYY-MM')
+
+export const libroIvaVentasQuerySchema = z.object({
+  periodo: libroIvaPeriodoString,
+  format: z.enum(['txt', 'xlsx', 'preview']).default('preview'),
+})
+
 export function safeParseBodySchema<S extends z.ZodTypeAny>(schema: S, raw: unknown): SafeParseBodyResult<z.output<S>> {
   const parsed = schema.safeParse(raw)
   if (!parsed.success) {

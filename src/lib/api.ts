@@ -1481,6 +1481,47 @@ export const notasCreditoAPI = {
   },
 }
 
+export type LibroIvaVentasPreviewDTO = {
+  periodo: string
+  recordCountCbtv: number
+  recordCountAlicuotas: number
+  totalsByAlicuota: { alicuotaCode: string; neto: number; iva: number }[]
+  totalNeto: number
+  totalIva: number
+  totalExento: number
+  totalGeneral: number
+  arcaValidationPending: true
+}
+
+export const contabilidadAPI = {
+  libroIvaVentasPreview: async (periodo: string): Promise<LibroIvaVentasPreviewDTO> => {
+    try {
+      const response = await api.get<{ success: boolean; data: LibroIvaVentasPreviewDTO }>(
+        '/contabilidad/libro-iva-ventas',
+        { params: { periodo, format: 'preview' } },
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  downloadLibroIvaVentas: async (
+    periodo: string,
+    format: 'txt' | 'xlsx',
+  ): Promise<Blob> => {
+    try {
+      const response = await api.get('/contabilidad/libro-iva-ventas', {
+        params: { periodo, format },
+        responseType: 'blob',
+      })
+      return response.data as Blob
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+}
+
 export type AfipConfigStatus = {
   configured: boolean
   cuit?: string

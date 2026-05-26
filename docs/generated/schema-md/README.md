@@ -166,6 +166,12 @@
 
 * [HealthResponse](./healthresponse.md) – `-`
 
+* [LibroIvaVentasAlicuotaTotal](./libroivaventasalicuotatotal.md) – `-`
+
+* [LibroIvaVentasPreview](./libroivaventaspreview.md) – `-`
+
+* [LibroIvaVentasPreviewEnvelope](./libroivaventaspreviewenvelope.md) – `-`
+
 * [ListPaginationMeta](./listpaginationmeta.md) – `-`
 
 * [LoginEnvelope](./loginenvelope.md) – `-`
@@ -611,6 +617,8 @@
 * [Untitled array in FacturaListEnvelope](./facturalistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
 
 * [Untitled array in FormaPagoListEnvelope](./formapagolistenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled array in LibroIvaVentasPreview](./libroivaventaspreview-properties-totalsbyalicuota.md) – `undefined#/properties/totalsByAlicuota`
 
 * [Untitled array in LogisticaChoferesListEnvelope](./logisticachofereslistenvelope-properties-data.md) – `undefined#/properties/data`
 

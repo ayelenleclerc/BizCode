@@ -64,6 +64,10 @@ Module **`logistics.gps`**. UI `/logistica/seguimiento`: **`logistics.read`** an
 
 Tenant module **`billing.credit_notes`**. `PUT /api/facturas/{id}/void` requires **`sales.cancel`** and the module; request body motivo minimum length matches server schema (10 characters). **`GET /api/notas-credito`** and **`GET /api/notas-credito/{id}`** require **`reports.financial.read`** *or* **`reports.operational.read`**. UI: invoice void action appears in **`Facturación`** detail (`ListadoFacturas.tsx`) only when `billing.credit_notes` is enabled; **Finance** lists credit notes in the same module (`Finanzas` page retains `reports.financial.read`). See [`ADR-0012`](../adr/ADR-0012-invoice-void-credit-note.md).
 
+## Libro IVA Ventas — Fase 1 (#147)
+
+Tenant module **`finance.ledger`**. **`GET /api/contabilidad/libro-iva-ventas`** requires **`reports.financial.read`** (roles `finance`, `auditor`, `owner`). Formats: `preview` (JSON), `txt` (ZIP with CBTV + ALICUOTAS), `xlsx` (review). **Libro IVA Compras** and **`libro-iva-compras`** are **out of scope** until supplier fiscal vouchers exist (follow-up issue). See [`ADR-0013`](../adr/ADR-0013-libro-iva-ventas-fase1.md).
+
 ## Related documents
 
 - Master plan execution index: [master-plan-bizcode-execution.md](master-plan-bizcode-execution.md)

@@ -12,6 +12,7 @@ This matrix maps BizCode's quality artefacts to clauses of the applicable ISO st
 | **security.md** (STRIDE model, OWASP mapping) | §8.1 Operational planning | §6.3.8 Software Construction | A.8.1–A.8.34 Technological controls | Security §4.2.6 | — |
 | **docs/api/openapi.yaml** + `tests/api/contract.test.ts` (Ajv) | §8.3 Design and development | §6.3.2 Software Design | — | Functional suitability §4.2.1 | 29119-2 (test design) |
 | **ADR-0012 / credit notes (#146)** — `PUT /api/facturas/{id}/void`, `GET /api/notas-credito`, UI **Facturación** / **Finanzas**, `tests/api/notas-credito.test.ts`, `tests/api/facturas-void.test.ts` | §8.3 Design and development | §6.3.2 Software Design | — | Functional suitability §4.2.1 | 29119-2 (test design) |
+| **ADR-0013 / Libro IVA Ventas Fase 1 (#147)** — `GET /api/contabilidad/libro-iva-ventas`, UI **Finanzas**, `tests/api/libro-iva-ventas.test.ts`, `tests/server/fiscal/ar/libroIvaVentas.test.ts` | §8.3 Design and development | §6.3.2 Software Design | — | Functional suitability §4.2.1 | 29119-2 (test design) |
 | **swagger-openapi-ui-plan.md** (+ localized mirrors) — Swagger UI mount checklist, agent OpenAPI policy | §7.5 Documented information, §8.3 Design and development | §6.3.2 Software Design, §6.4.12 Software Documentation | — | Functional suitability §4.2.1 | 29119-2 (test design) |
 | **ADR-0003** (API contract) | §8.3.3 Design outputs | §6.3.6 Software Integration | — | Maintainability §4.2.7 | — |
 | **ADR-0005** (Vitest coverage — `server.ts`) | §8.7 | §6.4.9 | — | Maintainability §4.2.7 | 29119-2 |

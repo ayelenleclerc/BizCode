@@ -36,4 +36,15 @@ La configuración del job automático (días de gracia, zona horaria IANA, horar
 
 Con el módulo **`billing.credit_notes`** habilitado, la página añade la sección **Notas de crédito**: filtre por fechas **desde** / **hasta** (sobre `createdAt` de la nota) y opcionalmente por **ID de cliente** (cliente de la factura origen). Los datos provienen de `GET /api/notas-credito` (requiere **`reports.financial.read`** u **`reports.operational.read`**; esta pantalla solo es accesible con permisos de reportes financieros). Véase [ADR-0012](../adr/ADR-0012-anulacion-factura-nota-credito.md) y el manual de facturación para anular facturas.
 
+## Libro IVA Ventas — Fase 1 (`finance.ledger`, #147)
+
+Con el módulo **`finance.ledger`** habilitado, aparece la sección **Contabilidad — Libro IVA Ventas**:
+
+1. Seleccione **período** (mes).
+2. Revise la **vista previa** (cantidad de registros CBTV/ALICUOTAS, totales por alícuota). La validación con herramienta oficial ARCA puede estar pendiente ([ADR-0013](../adr/ADR-0013-libro-iva-ventas-fase1.md)).
+3. **Descargar ARCA (ZIP)** — `format=txt` → `CBTV.txt` + `ALICUOTAS.txt`.
+4. **Descargar Excel** — solo revisión interna.
+
+**Libro IVA Compras** no está implementado en Fase 1; las órdenes de compra aún no modelan comprobantes fiscales de proveedor.
+
 **Otros idiomas:** [English](../../en/user/manual-finance.md) · [Português](../../pt-br/user/manual-financas.md)

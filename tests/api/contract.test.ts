@@ -772,6 +772,16 @@ describe('API — contrato OpenAPI', () => {
     expect(res.body.data.id).toBe(1)
   })
 
+  it('GET /api/contabilidad/libro-iva-ventas preview', async () => {
+    const app = createApp(prisma)
+    const res = await request(app)
+      .get('/api/contabilidad/libro-iva-ventas')
+      .query({ periodo: '2026-05', format: 'preview' })
+      .expect(200)
+    await assertMatchesOpenApi('/api/contabilidad/libro-iva-ventas', 'get', '200', res.body)
+    expect(res.body.data.periodo).toBe('2026-05')
+  })
+
   it('GET /api/facturas', async () => {
     const app = createApp(prisma)
     const res = await request(app).get('/api/facturas').expect(200)
