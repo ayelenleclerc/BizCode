@@ -77,4 +77,32 @@ Formato: critérios **Given / When / Then** são de verificação **manual**, sa
   - Dado `orders.create`, quando envio uma ordem nova, então `POST /api/ordenes-entrega` cria o registro.
 - **Evidência:** `src/pages/logistica/`, `registerOrdenesEntregaRoutes.ts`.
 
+## HU-10 — Picking no depósito
+
+- **História:** Como equipe de depósito, quero retirar ordens da fila e marcá-las prontas para despacho.
+- **Critérios:**
+  - Dado `orders.pick` e `logistics.picking`, quando completo o checklist, então o estado passa a `ready`.
+- **Evidência:** `src/pages/logistica/picking/`, endpoints de picking em `registerOrdenesEntregaRoutes.ts`.
+
+## HU-11 — Repartos
+
+- **História:** Como planejador, quero agrupar OE prontas em um reparto, iniciá-lo e fechá-lo ao terminar.
+- **Critérios:**
+  - Dado `orders.dispatch` e `logistics.dispatches`, quando crio e inicio um reparto, então fica `on_route` com OE vinculadas.
+- **Evidência:** `src/pages/logistica/repartos/`, `registerRepartosRoutes.ts`.
+
+## HU-12 — Comprovante de entrega (POD)
+
+- **História:** Como motorista, quero confirmar cada parada com assinatura para deixar prova.
+- **Critérios:**
+  - Dado `orders.deliver.confirm` e `logistics.pod`, quando envio POD de um item, então fica `delivered` e o comprovante é consultável.
+- **Evidência:** `src/pages/logistica/repartos/chofer/`, `PUT .../items/{itemId}`, `GET .../pod`.
+
+## HU-13 — Rastreamento GPS ao vivo
+
+- **História:** Como planejador, quero ver repartos ativos no mapa; como motorista, enviar minha localização na rota.
+- **Critérios:**
+  - Dado `logistics.gps`, quando o reparto está `on_route`, então o mapa mostra a última posição e o motorista pode publicar localização periodicamente.
+- **Evidência:** `src/pages/logistica/seguimiento/`, `RepartoUbicacionService.ts`, `GET /api/repartos/activos`.
+
 **Outros idiomas:** [English](../../en/specs/user-stories-and-acceptance.md) · [Español](../../es/specs/historias-usuario-criterios-aceptacion.md)

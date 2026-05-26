@@ -26,6 +26,10 @@ Maps **functional requirements** to **use cases**, **user stories**, **manual te
 | FR-013 | UC-07 | US-07 | TC-013 | `src/pages/finanzas/`, `GET /api/reportes/aging` |
 | FR-014 | UC-08 | US-08 | TC-014 | `src/pages/reportes/`, `registerReportesRoutes.ts` |
 | FR-015 | UC-09 | US-09 | TC-015 | `src/pages/logistica/`, `registerOrdenesEntregaRoutes.ts` |
+| FR-016 | UC-10 | US-10 | TC-016 | `src/pages/logistica/picking/`, picking API |
+| FR-017 | UC-11 | US-11 | TC-017 | `src/pages/logistica/repartos/`, `registerRepartosRoutes.ts` |
+| FR-018 | UC-12 | US-12 | TC-018 | `src/pages/logistica/repartos/chofer/`, POD API |
+| FR-019 | UC-13 | US-13 | TC-019 | `src/pages/logistica/seguimiento/`, `RepartoUbicacionService.ts` |
 
 **NFR traceability (summary):** NFR-001 ↔ [accessibility.md](../accessibility.md) + `App.a11y.test.tsx`; NFR-002 ↔ [i18n-strategy.md](../i18n-strategy.md) + `check:i18n`; NFR-005 ↔ [testing-strategy.md](../quality/testing-strategy.md) + `vitest.config.ts` + contract tests.
 

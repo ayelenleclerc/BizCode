@@ -64,6 +64,10 @@ Non-form errors (e.g., API failures) must use `role="alert"`:
 </div>
 ```
 
+## Maps (logistics GPS)
+
+The planner view at `/logistica/seguimiento` embeds a **Leaflet** map (OpenStreetMap tiles). Markers and the route list use text labels from i18n; map tiles are decorative for screen-reader users when the sidebar list is available. Prefer keyboard-operable controls in the list panel; do not add redundant `aria-pressed` on native checkboxes or `aria-checked` on native `<input type="checkbox">` (see `logistica/picking` and `logistica/seguimiento`).
+
 ## Verification
 
 - **CI:** `src/App.a11y.test.tsx` runs **jest-axe** on the initial route (customer list) with the API mocked; `expect(results.violations).toHaveLength(0)`.

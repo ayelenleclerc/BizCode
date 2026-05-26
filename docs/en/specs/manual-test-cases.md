@@ -26,5 +26,9 @@ Execute in a session record using [certificacion-iso/records-template.md](../cer
 | TC-013 | AR aging | `reports.financial.read` | Open Finanzas | Buckets visible | `finanzas/index` |
 | TC-014 | Report CSV export | Reportes tab with data | Export CSV control | File download | `reportes/index` |
 | TC-015 | Delivery order list | `logistics.read` | Open Logística → filter date | Orders table loads | `logistica/index` |
+| TC-016 | Picking flow | `orders.pick`, `logistics.picking` | Open Picking → take OE → checklist → mark ready | OE in `ready`; visible to planner | `logistica/picking` |
+| TC-017 | Create route | `orders.dispatch`, `logistics.dispatches` | Repartos → create with ready OEs → iniciar | Route `on_route` | `logistica/repartos` |
+| TC-018 | Driver POD | `orders.deliver.confirm`, `logistics.pod` | Chofer app → deliver one stop with signature | Item `delivered`; `hasPod` in back-office | `logistica/repartos/chofer` |
+| TC-019 | GPS tracking | `logistics.gps`, planner role | Seguimiento map loads; reparto on_route visible | Marker or empty state; sidebar updates | `logistica/seguimiento` |
 
 **Other languages:** [Español](../../es/specs/casos-de-prueba-manual.md) · [Português](../../pt-br/specs/casos-de-teste-manual.md)

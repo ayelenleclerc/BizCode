@@ -20,5 +20,9 @@
 | UC-07 | Review AR and statements | View aging buckets → load account statement by customer id. | `src/pages/finanzas/` |
 | UC-08 | Run operational reports | Select period/tab → view sales, critical stock, or collections; export CSV. | `src/pages/reportes/` |
 | UC-09 | Manage delivery orders | Filter orders → create or update estado (planner/driver per RBAC). | `src/pages/logistica/` |
+| UC-10 | Warehouse picking | Take OE from queue → checklist → mark ready. | `src/pages/logistica/picking/` |
+| UC-11 | Plan delivery route | Select ready OEs → create route → start → close. | `src/pages/logistica/repartos/` |
+| UC-12 | Driver POD | Confirm delivery per stop with signature. | `src/pages/logistica/repartos/chofer/` |
+| UC-13 | Live GPS tracking | Planner views map; driver sends location on route. | `src/pages/logistica/seguimiento/` |
 
 **Other languages:** [Español](../../es/specs/casos-de-uso.md) · [Português](../../pt-br/specs/casos-de-uso.md)

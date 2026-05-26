@@ -26,6 +26,10 @@ Relaciona **requisitos funcionales** con **casos de uso**, **historias de usuari
 | RF-013 | CU-07 | HU-07 | TC-013 | `src/pages/finanzas/`, `GET /api/reportes/aging` |
 | RF-014 | CU-08 | HU-08 | TC-014 | `src/pages/reportes/`, `registerReportesRoutes.ts` |
 | RF-015 | CU-09 | HU-09 | TC-015 | `src/pages/logistica/`, `registerOrdenesEntregaRoutes.ts` |
+| RF-016 | CU-10 | HU-10 | TC-016 | `src/pages/logistica/picking/`, API picking |
+| RF-017 | CU-11 | HU-11 | TC-017 | `src/pages/logistica/repartos/`, `registerRepartosRoutes.ts` |
+| RF-018 | CU-12 | HU-12 | TC-018 | `src/pages/logistica/repartos/chofer/`, API POD |
+| RF-019 | CU-13 | HU-13 | TC-019 | `src/pages/logistica/seguimiento/`, `RepartoUbicacionService.ts` |
 
 **RNF (resumen):** RNF-001 ↔ [accesibilidad.md](../accesibilidad.md) + `App.a11y.test.tsx`; RNF-002 ↔ [estrategia-i18n.md](../estrategia-i18n.md) + `check:i18n`; RNF-005 ↔ [estrategia-pruebas.md](../quality/estrategia-pruebas.md) + `vitest.config.ts` + pruebas de contrato.
 

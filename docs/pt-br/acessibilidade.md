@@ -27,6 +27,10 @@ Modais: `role="dialog"`, `aria-modal="true"`, `aria-labelledby` no título.
 Formulários: `label`/`htmlFor`/`id`, erros com `role="alert"` e `aria-describedby`.  
 Tabelas: `aria-label`, linhas com `role="row"` e `aria-selected` quando aplicável.
 
+## Mapas (GPS logística)
+
+A vista do planejador em `/logistica/seguimiento` incorpora mapa **Leaflet** (teselas OpenStreetMap). Marcadores e lista lateral usam rótulos i18n; teselas são decorativas para leitores de tela quando a lista está disponível. Priorizar controles por teclado no painel lateral; não usar `aria-pressed` redundante nem `aria-checked` em `<input type="checkbox">` nativo (`logistica/picking`, `logistica/seguimiento`).
+
 ## Verificação
 
 - **CI:** `src/App.a11y.test.tsx` com **jest-axe** na rota inicial (API mockada).
