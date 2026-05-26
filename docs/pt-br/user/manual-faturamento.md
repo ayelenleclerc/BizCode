@@ -10,6 +10,10 @@ Exibe as notas emitidas com: **Data**, **Tipo** (**NF-e Tipo A** / **NF-e Tipo B
 
 **Detalhe:** clique numa linha para expandir itens e discriminação de impostos.
 
+## Cancelamento com nota de crédito (módulo)
+
+Com o módulo do tenant **`billing.credit_notes`** ativo e permissão **`sales.cancel`**, abra o detalhe de uma nota **ativa** e use **Cancelar nota fiscal**. É obrigatório informar um **motivo** com pelo menos **10** caracteres (validação no servidor). A operação chama `PUT /api/facturas/{id}/void`; o sistema registra uma **nota de crédito** ligada à nota original (veja [ADR-0012](../adr/ADR-0012-anulacao-fatura-nota-credito.md)). Listagem no app: página **Finanças**, mesmo módulo (API `GET /api/notas-credito`).
+
 ## Nova nota fiscal
 
 1. **F3** ou **➕ Nova Nota Fiscal (F3)**.

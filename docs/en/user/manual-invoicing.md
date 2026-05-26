@@ -10,6 +10,10 @@ Shows all issued invoices with: Date, Type (A/B), Number, Customer, Net, VAT, To
 
 **View detail:** Click an invoice to expand line items and VAT breakdown.
 
+## Voiding an invoice (credit notes module)
+
+When tenant module **`billing.credit_notes`** is enabled and your role has **`sales.cancel`**, open an **active** invoice detail and use **Void invoice**. You must enter a **reason** with at least **10** characters (server validation). The operation calls `PUT /api/facturas/{id}/void`; the system records a **credit note** linked to the original invoice (see [ADR-0012](../adr/ADR-0012-invoice-void-credit-note.md)). Listing credit notes in the app: **Finance** page, same module (API `GET /api/notas-credito`).
+
 ## Issue a New Invoice
 
 1. Press **F3** or click **➕ Nueva Factura**.

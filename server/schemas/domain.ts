@@ -465,7 +465,7 @@ export const facturaVoidBodySchema = z.object({
   motivo: z
     .string({ required_error: 'motivo is required', invalid_type_error: 'motivo must be a string' })
     .trim()
-    .min(1, 'motivo is required')
+    .min(10, 'motivo must be at least 10 characters')
     .max(FACTURA_VOID_MOTIVO_MAX_LEN, `motivo must be at most ${FACTURA_VOID_MOTIVO_MAX_LEN} characters`),
 })
 
@@ -1040,6 +1040,14 @@ const optionalPositiveIntQuery = z
   .refine((v) => v === undefined || !Number.isNaN(v), {
     message: 'must be a positive integer',
   })
+
+export const notasCreditoListQuerySchema = z
+  .object({
+    from: isoDateString,
+    to: isoDateString,
+    clienteId: optionalPositiveIntQuery,
+  })
+  .superRefine(refineReportesPeriodOrder)
 
 export const logisticaReportesQuerySchema = z
   .object({

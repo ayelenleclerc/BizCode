@@ -4,7 +4,7 @@
 undefined#/properties/motivo
 ```
 
-Reason for voiding the invoice. Stored in AuditEvent metadata.
+Reason for voiding the invoice (persisted on credit note and AuditEvent metadata).
 
 | Abstract            | Extensible | Status         | Identifiable            | Custom Properties | Additional Properties | Access Restrictions | Defined In                                                                             |
 | :------------------ | :--------- | :------------- | :---------------------- | :---------------- | :-------------------- | :------------------ | :------------------------------------------------------------------------------------- |
@@ -18,4 +18,4 @@ Reason for voiding the invoice. Stored in AuditEvent metadata.
 
 **maximum length**: the maximum number of characters for this string is: `500`
 
-**minimum length**: the minimum number of characters for this string is: `1`
+**minimum length**: the minimum number of characters for this string is: `10`

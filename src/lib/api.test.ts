@@ -26,6 +26,7 @@ import {
   facturasAPI,
   formasPagoAPI,
   getAuthErrorI18nKey,
+  notasCreditoAPI,
   notifChannelsAPI,
   proveedoresAPI,
   rubrosAPI,
@@ -634,16 +635,106 @@ describe('facturasAPI', () => {
   })
 
   describe('void', () => {
-    it('retorna factura anulada en el happy path', async () => {
-      const voided = { id: 1, estado: 'N', total: 5000 }
-      mockPut.mockResolvedValueOnce({ data: { success: true, data: voided } })
-      expect(await facturasAPI.void(1, 'Error en precio')).toEqual(voided)
-      expect(mockPut).toHaveBeenCalledWith('/facturas/1/void', { motivo: 'Error en precio' })
+    it('retorna resultado con factura, nota de crédito y cliente actualizado', async () => {
+      const motivo = 'xxxxxxxxxx'
+      const envelope = {
+        factura: { id: 1, estado: 'N', total: 5000 },
+        notaCredito: {
+          id: 99,
+          tenantId: 1,
+          facturaOrigenId: 1,
+          motivo,
+          monto: 5000,
+          cae: null,
+          caeVto: null,
+          estadoCae: 'not_required' as const,
+          createdById: null,
+          createdAt: '2026-01-01T00:00:00.000Z',
+        },
+        updatedCliente: { id: 3, rsocial: 'ACME', balance: '0', creditLimit: null },
+      }
+      mockPut.mockResolvedValueOnce({ data: { success: true, data: envelope } })
+      expect(await facturasAPI.void(1, motivo)).toEqual(envelope)
+      expect(mockPut).toHaveBeenCalledWith('/facturas/1/void', { motivo })
     })
 
     it('lanza ApiRequestFailedError en fallo', async () => {
       mockPut.mockRejectedValueOnce(axiosErrorWithResponse('Already voided'))
-      await expect(facturasAPI.void(1, 'Test')).rejects.toThrow('Already voided')
+      await expect(facturasAPI.void(1, 'xxxxxxxxxx')).rejects.toThrow('Already voided')
+    })
+  })
+})
+
+// ════════════════════════════════════════════════════════════
+// notasCreditoAPI
+// ════════════════════════════════════════════════════════════
+describe('notasCreditoAPI', () => {
+  describe('list', () => {
+    it('retorna filas paginadas', async () => {
+      const row = {
+        id: 1,
+        tenantId: 1,
+        facturaOrigenId: 10,
+        motivo: 'xxxxxxxxxx',
+        monto: 100,
+        cae: null,
+        caeVto: null,
+        estadoCae: 'pending' as const,
+        createdById: 1,
+        createdAt: '2026-01-15T12:00:00.000Z',
+        facturaOrigen: {
+          id: 10,
+          tipo: 'B',
+          prefijo: '0001',
+          numero: 5,
+          clienteId: 3,
+          fecha: '2026-01-10T00:00:00.000Z',
+          total: 100,
+          estado: 'N',
+        },
+      }
+      mockGet.mockResolvedValueOnce({
+        data: { success: true, data: [row], total: 1, limit: 100, offset: 0 },
+      })
+      expect(await notasCreditoAPI.list({ from: '2026-01-01', to: '2026-01-31' })).toEqual({
+        data: [row],
+        total: 1,
+        limit: 100,
+        offset: 0,
+      })
+      expect(mockGet).toHaveBeenCalledWith('/notas-credito', {
+        params: { from: '2026-01-01', to: '2026-01-31' },
+      })
+    })
+  })
+
+  describe('getById', () => {
+    it('retorna detalle', async () => {
+      const row = {
+        id: 2,
+        tenantId: 1,
+        facturaOrigenId: 11,
+        motivo: 'yyyyyyyyyy',
+        monto: 50,
+        cae: null,
+        caeVto: null,
+        estadoCae: 'issued' as const,
+        createdById: 1,
+        createdAt: '2026-01-16T12:00:00.000Z',
+        facturaOrigen: {
+          id: 11,
+          tipo: 'A',
+          prefijo: '0001',
+          numero: 1,
+          clienteId: 4,
+          fecha: '2026-01-11T00:00:00.000Z',
+          total: 50,
+          estado: 'N',
+        },
+      }
+      mockGet.mockResolvedValueOnce({ data: { success: true, data: row } })
+      expect(await notasCreditoAPI.getById(2)).toEqual(row)
+      expect(mockGet).toHaveBeenCalledWith('/notas-credito/2')
     })
   })
 })

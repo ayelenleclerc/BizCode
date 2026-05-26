@@ -1,4 +1,4 @@
-import type { Cliente, Factura, Prisma, PrismaClient } from '@prisma/client'
+﻿import type { Cliente, Factura, NotaCredito, Prisma, PrismaClient } from '@prisma/client'
 import type { FacturaInput } from '../createApp.types'
 import { assertNoOpenRecuento } from '../lib/recuentoStockGuard'
 import { facturaFechaToPrismaDate } from '../routes/restDomainShared'
@@ -22,11 +22,20 @@ export type FacturaCreateResult = {
   updatedCliente: Pick<Cliente, 'id' | 'rsocial' | 'balance' | 'creditLimit'>
   stockBelowMinimum: StockBelowMinimumAlert[]
 }
+export type FacturaVoidAuditContext = {
+  userId: number | null
+  ipAddress: string | null
+}
 
+export type FacturaVoidResult = {
+  factura: Factura
+  notaCredito: NotaCredito
+  updatedCliente: Pick<Cliente, 'id' | 'rsocial' | 'balance' | 'creditLimit'>
+}
 /**
  * @en Invoice domain operations (list, create, void).
- * @es Operaciones de dominio de facturas (listado, alta, anulación).
- * @pt-BR Operações de domínio de faturas (listagem, criação, anulação).
+ * @es Operaciones de dominio de facturas (listado, alta, anulaciÃ³n).
+ * @pt-BR OperaÃ§Ãµes de domÃ­nio de faturas (listagem, criaÃ§Ã£o, anulaÃ§Ã£o).
  */
 export class FacturaService {
   private readonly afip: AfipService
@@ -130,32 +139,83 @@ export class FacturaService {
     }
   }
 
-  async void(tenantId: number, id: number): Promise<ServiceResult<Factura>> {
+  /**
+   * @en Voids an active invoice, creates a credit note, reverses balance, and records audit in one transaction.
+   * @es Anula factura vigente, crea nota de crédito, revierte saldo y audita en una transacción.
+   * @pt-BR Anula fatura ativa, cria nota de crédito, reverte saldo e audita em uma transação.
+   */
+  async void(
+    tenantId: number,
+    id: number,
+    motivo: string,
+    audit: FacturaVoidAuditContext,
+  ): Promise<ServiceResult<FacturaVoidResult>> {
     const factura = await this.prisma.factura.findFirst({
       where: { id, tenantId },
-      select: { id: true, estado: true, total: true, clienteId: true },
+      select: {
+        id: true,
+        estado: true,
+        total: true,
+        clienteId: true,
+        estadoCae: true,
+        tipo: true,
+      },
     })
 
     if (!factura) {
       return { ok: false, status: 404, error: 'Factura not found' }
     }
 
-    if (factura.estado === 'N') {
+    if (factura.estado !== 'A') {
       return { ok: false, status: 409, error: 'Factura already voided' }
     }
 
-    const updated = await this.prisma.$transaction(async (tx) => {
+    const notaCreditoEstadoCae = factura.estadoCae === 'issued' ? 'pending' : 'not_required'
+
+    const result = await this.prisma.$transaction(async (tx) => {
       const voided = await tx.factura.update({
         where: { id },
         data: { estado: 'N' },
       })
-      await tx.cliente.update({
+
+      const updatedCliente = await tx.cliente.update({
         where: { id: factura.clienteId },
         data: { balance: { decrement: factura.total } },
+        select: { id: true, rsocial: true, balance: true, creditLimit: true },
       })
-      return voided
+
+      const notaCredito = await tx.notaCredito.create({
+        data: {
+          tenantId,
+          facturaOrigenId: id,
+          motivo,
+          monto: factura.total,
+          estadoCae: notaCreditoEstadoCae,
+          createdById: audit.userId,
+        },
+      })
+
+      await tx.auditEvent.create({
+        data: {
+          tenantId,
+          userId: audit.userId,
+          action: 'factura_void',
+          resource: 'factura',
+          resourceId: String(id),
+          ipAddress: audit.ipAddress,
+          metadata: { motivo, notaCreditoId: notaCredito.id },
+        },
+      })
+
+      return { factura: voided, notaCredito, updatedCliente }
     })
 
-    return { ok: true, data: updated }
+    if (factura.estadoCae === 'issued') {
+      void this.afip.requestCaeForNotaCredito(tenantId, result.notaCredito.id).catch(() => {
+        /* homologación mock; retry job may be added later */
+      })
+    }
+
+    return { ok: true, data: result }
   }
 }

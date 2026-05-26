@@ -60,6 +60,10 @@ Módulo **`logistics.dispatches`**. `GET /api/logistica/kpis`, `reporte-choferes
 
 Módulo **`logistics.gps`**. UI `/logistica/seguimiento`: **`logistics.read`** e `GPS_VIEW_ROLES` (`owner`, `manager`, `logistics_planner`). `GET /api/repartos/activos` e `GET .../ubicacion/ultima` (planejador; motorista só na própria rota em `ultima`). `POST /api/repartos/{id}/ubicacion`: **`orders.deliver.confirm`**, motorista dono, reparto `on_route`; motorista não lista activos.
 
+## Notas de crédito e anulação de fatura (#146)
+
+Módulo de tenant **`billing.credit_notes`**. `PUT /api/facturas/{id}/void` exige **`sales.cancel`** e o módulo; o motivo no corpo cumpre o mínimo do esquema no servidor (10 caracteres). **`GET /api/notas-credito`** e **`GET /api/notas-credito/{id}`** exigem **`reports.financial.read`** *ou* **`reports.operational.read`**. UI: ação **Cancelar nota fiscal** em **`Faturamento`** (`ListadoFacturas.tsx`) somente com `billing.credit_notes`; **Finanças** lista notas no mesmo módulo (a página continua a exigir `reports.financial.read`). Veja [`ADR-0012`](../adr/ADR-0012-anulacao-fatura-nota-credito.md).
+
 ## Documentos relacionados
 
 - Índice de execução do plano mestre: [execucao-plano-mestre-bizcode.md](execucao-plano-mestre-bizcode.md)

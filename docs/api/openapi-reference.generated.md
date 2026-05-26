@@ -15413,7 +15413,7 @@ Requires `reports.operational.read`. Allowed without CAE.
 - **Path:** `/api/facturas/{id}/void`
 - **Tags:** facturas
 
-Sets `estado` to `N` (anulada), reverses the customer balance by the invoice total, and records an AuditEvent with the provided motivo. Requires `sales.cancel` permission.
+Sets `estado` to `N` (anulada), reverses the customer balance by the invoice total, creates a tenant-scoped `NotaCredito`, and records `AuditEvent` `factura_void` with motivo and `notaCreditoId` in metadata — all in one database transaction. Requires `sales.cancel` and module `billing.credit_notes`. When the source invoice has `estadoCae === issued`, the credit note CAE is requested asynchronously via AFIP adapter.
 
 #### Request Body
 
@@ -15421,7 +15421,7 @@ Sets `estado` to `N` (anulada), reverses the customer balance by the invoice tot
 
 - **`motivo` (required)**
 
-  `string` — Reason for voiding the invoice. Stored in AuditEvent metadata.
+  `string` — Reason for voiding the invoice (persisted on credit note and AuditEvent metadata).
 
 **Example:**
 
@@ -15433,7 +15433,7 @@ Sets `estado` to `N` (anulada), reverses the customer balance by the invoice tot
 
 #### Responses
 
-##### Status: 200 Invoice voided
+##### Status: 200 Invoice voided with credit note and updated customer balance snapshot
 
 ###### Content-Type: application/json
 
@@ -15441,171 +15441,239 @@ Sets `estado` to `N` (anulada), reverses the customer balance by the invoice tot
 
   `object`
 
-  - **`cae`**
+  - **`factura` (required)**
 
-    `string`
+    `object`
 
-  - **`caeVto`**
+    - **`cae`**
 
-    `string`, format: `date-time`
+      `string`
 
-  - **`clienteId`**
+    - **`caeVto`**
 
-    `integer`
+      `string`, format: `date-time`
 
-  - **`estado`**
-
-    `string`
-
-  - **`estadoCae`**
-
-    `string`, possible values: `"pending", "issued", "failed"`
-
-  - **`fecha`**
-
-    `string`, format: `date-time`
-
-  - **`formaPagoId`**
-
-    `integer`
-
-  - **`id`**
-
-    `integer`
-
-  - **`items`**
-
-    `array`
-
-    **Items:**
-
-    - **`articulo`**
-
-      `object`
-
-      - **`activo`**
-
-        `boolean`
-
-      - **`codigo`**
-
-        `integer`
-
-      - **`condIva`**
-
-        `string`
-
-      - **`costo`**
-
-        `number`
-
-      - **`descripcion`**
-
-        `string`
-
-      - **`id`**
-
-        `integer`
-
-      - **`minimo`**
-
-        `integer`
-
-      - **`precioLista1`**
-
-        `number`
-
-      - **`precioLista2`**
-
-        `number`
-
-      - **`rubro`**
-
-        `object`
-
-        - **`codigo`**
-
-          `integer`
-
-        - **`id`**
-
-          `integer`
-
-        - **`nombre`**
-
-          `string`
-
-      - **`rubroId`**
-
-        `integer`
-
-      - **`stock`**
-
-        `integer`
-
-      - **`umedida`**
-
-        `string`
-
-    - **`articuloId`**
+    - **`clienteId`**
 
       `integer`
 
-    - **`cantidad`**
+    - **`estado`**
 
-      `number`
+      `string`
 
-    - **`dscto`**
+    - **`estadoCae`**
 
-      `number`
+      `string`, possible values: `"pending", "issued", "failed"`
+
+    - **`fecha`**
+
+      `string`, format: `date-time`
+
+    - **`formaPagoId`**
+
+      `integer`
 
     - **`id`**
 
       `integer`
 
-    - **`precio`**
+    - **`items`**
+
+      `array`
+
+      **Items:**
+
+      - **`articulo`**
+
+        `object`
+
+        - **`activo`**
+
+          `boolean`
+
+        - **`codigo`**
+
+          `integer`
+
+        - **`condIva`**
+
+          `string`
+
+        - **`costo`**
+
+          `number`
+
+        - **`descripcion`**
+
+          `string`
+
+        - **`id`**
+
+          `integer`
+
+        - **`minimo`**
+
+          `integer`
+
+        - **`precioLista1`**
+
+          `number`
+
+        - **`precioLista2`**
+
+          `number`
+
+        - **`rubro`**
+
+          `object`
+
+          - **`codigo`**
+
+            `integer`
+
+          - **`id`**
+
+            `integer`
+
+          - **`nombre`**
+
+            `string`
+
+        - **`rubroId`**
+
+          `integer`
+
+        - **`stock`**
+
+          `integer`
+
+        - **`umedida`**
+
+          `string`
+
+      - **`articuloId`**
+
+        `integer`
+
+      - **`cantidad`**
+
+        `number`
+
+      - **`dscto`**
+
+        `number`
+
+      - **`id`**
+
+        `integer`
+
+      - **`precio`**
+
+        `number`
+
+      - **`subtotal`**
+
+        `number`
+
+    - **`iva1`**
 
       `number`
 
-    - **`subtotal`**
+    - **`iva2`**
 
       `number`
 
-  - **`iva1`**
+    - **`neto1`**
 
-    `number`
+      `number`
 
-  - **`iva2`**
+    - **`neto2`**
 
-    `number`
+      `number`
 
-  - **`neto1`**
+    - **`neto3`**
 
-    `number`
+      `number`
 
-  - **`neto2`**
+    - **`numero`**
 
-    `number`
+      `integer`
 
-  - **`neto3`**
+    - **`prefijo`**
 
-    `number`
+      `string`
 
-  - **`numero`**
+    - **`tipo`**
 
-    `integer`
+      `string`
 
-  - **`prefijo`**
+    - **`total`**
 
-    `string`
+      `number`
 
-  - **`tipo`**
+  - **`notaCredito` (required)**
 
-    `string`
+    `object`
 
-  - **`total`**
+    - **`createdAt` (required)**
 
-    `number`
+      `string`, format: `date-time`
+
+    - **`estadoCae` (required)**
+
+      `string`, possible values: `"pending", "issued", "failed", "not_required"`
+
+    - **`facturaOrigenId` (required)**
+
+      `integer`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`monto` (required)**
+
+      `object`
+
+    - **`motivo` (required)**
+
+      `string`
+
+    - **`tenantId` (required)**
+
+      `integer`
+
+    - **`cae`**
+
+      `string`
+
+    - **`caeVto`**
+
+      `string`, format: `date-time`
+
+    - **`createdById`**
+
+      `integer`
+
+  - **`updatedCliente` (required)**
+
+    `object`
+
+    - **`balance` (required)**
+
+      `object` — Customer balance after decrement (Prisma Decimal may serialize as string in JSON)
+
+    - **`creditLimit` (required)**
+
+      `number`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`rsocial` (required)**
+
+      `string`
 
 - **`success` (required)**
 
@@ -15617,56 +15685,77 @@ Sets `estado` to `N` (anulada), reverses the customer balance by the invoice tot
 {
   "success": true,
   "data": {
-    "id": 1,
-    "fecha": "",
-    "tipo": "",
-    "prefijo": "",
-    "numero": 1,
-    "clienteId": 1,
-    "formaPagoId": 1,
-    "neto1": 1,
-    "neto2": 1,
-    "neto3": 1,
-    "iva1": 1,
-    "iva2": 1,
-    "total": 1,
-    "estado": "",
-    "cae": "",
-    "caeVto": "",
-    "estadoCae": "pending",
-    "items": [
-      {
-        "id": 1,
-        "articuloId": 1,
-        "articulo": {
+    "factura": {
+      "id": 1,
+      "fecha": "",
+      "tipo": "",
+      "prefijo": "",
+      "numero": 1,
+      "clienteId": 1,
+      "formaPagoId": 1,
+      "neto1": 1,
+      "neto2": 1,
+      "neto3": 1,
+      "iva1": 1,
+      "iva2": 1,
+      "total": 1,
+      "estado": "",
+      "cae": "",
+      "caeVto": "",
+      "estadoCae": "pending",
+      "items": [
+        {
           "id": 1,
-          "codigo": 1,
-          "descripcion": "",
-          "rubroId": 1,
-          "rubro": {
+          "articuloId": 1,
+          "articulo": {
             "id": 1,
             "codigo": 1,
-            "nombre": "",
+            "descripcion": "",
+            "rubroId": 1,
+            "rubro": {
+              "id": 1,
+              "codigo": 1,
+              "nombre": "",
+              "additionalProperty": "anything"
+            },
+            "condIva": "",
+            "umedida": "",
+            "precioLista1": 1,
+            "precioLista2": 1,
+            "costo": 1,
+            "stock": 1,
+            "minimo": 1,
+            "activo": true,
             "additionalProperty": "anything"
           },
-          "condIva": "",
-          "umedida": "",
-          "precioLista1": 1,
-          "precioLista2": 1,
-          "costo": 1,
-          "stock": 1,
-          "minimo": 1,
-          "activo": true,
+          "cantidad": 1,
+          "precio": 1,
+          "dscto": 1,
+          "subtotal": 1,
           "additionalProperty": "anything"
-        },
-        "cantidad": 1,
-        "precio": 1,
-        "dscto": 1,
-        "subtotal": 1,
-        "additionalProperty": "anything"
-      }
-    ],
-    "additionalProperty": "anything"
+        }
+      ],
+      "additionalProperty": "anything"
+    },
+    "notaCredito": {
+      "id": 1,
+      "tenantId": 1,
+      "facturaOrigenId": 1,
+      "motivo": "",
+      "monto": 1,
+      "cae": "",
+      "caeVto": "",
+      "estadoCae": "pending",
+      "createdById": 1,
+      "createdAt": "",
+      "additionalProperty": "anything"
+    },
+    "updatedCliente": {
+      "id": 1,
+      "rsocial": "",
+      "balance": 1,
+      "creditLimit": 1
+    }
   }
 }
 ```
@@ -15756,6 +15845,486 @@ Sets `estado` to `N` (anulada), reverses the customer balance by the invoice tot
 ```
 
 ##### Status: 409 Invoice already voided
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/notas-credito
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/notas-credito`
+
+### List credit notes
+
+- **Method:** `GET`
+- **Path:** `/api/notas-credito`
+- **Tags:** notasCredito
+
+Paginated list filtered by `createdAt` in `[from, to]` (inclusive calendar days, server local timezone). Optional `clienteId` filters by the originating invoice's customer. Requires module `billing.credit_notes` and one of `reports.financial.read`, `reports.operational.read`.
+
+#### Responses
+
+##### Status: 200 Paginated credit notes with originating invoice header
+
+###### Content-Type: application/json
+
+**All of:**
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`estadoCae` (required)**
+
+    `string`, possible values: `"pending", "issued", "failed", "not_required"`
+
+  - **`facturaOrigen` (required)**
+
+    `object` — Originating invoice header (selected columns)
+
+    - **`clienteId`**
+
+      `integer`
+
+    - **`estado`**
+
+      `string`
+
+    - **`fecha`**
+
+      `string`, format: `date-time`
+
+    - **`id`**
+
+      `integer`
+
+    - **`numero`**
+
+      `integer`
+
+    - **`prefijo`**
+
+      `string`
+
+    - **`tipo`**
+
+      `string`
+
+    - **`total`**
+
+      `object`
+
+  - **`facturaOrigenId` (required)**
+
+    `integer`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`monto` (required)**
+
+    `object`
+
+  - **`motivo` (required)**
+
+    `string`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`cae`**
+
+    `string`
+
+  - **`caeVto`**
+
+    `string`, format: `date-time`
+
+  - **`createdById`**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+* **`limit` (required)**
+
+  `integer` — Effective page size (same semantics as query \`limit\`)
+
+* **`offset` (required)**
+
+  `integer` — Effective skip (same semantics as query \`offset\`)
+
+* **`total` (required)**
+
+  `integer` — Row count matching the list filter (before limit/offset)
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "facturaOrigenId": 1,
+      "motivo": "",
+      "monto": 1,
+      "cae": "",
+      "caeVto": "",
+      "estadoCae": "pending",
+      "createdById": 1,
+      "createdAt": "",
+      "facturaOrigen": {
+        "id": 1,
+        "tipo": "",
+        "prefijo": "",
+        "numero": 1,
+        "clienteId": 1,
+        "fecha": "",
+        "total": 1,
+        "estado": "",
+        "additionalProperty": "anything"
+      },
+      "additionalProperty": "anything"
+    }
+  ],
+  "total": 0,
+  "limit": 1,
+  "offset": 0
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/notas-credito/{id}
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/notas-credito/{id}`
+
+### Get credit note by id
+
+- **Method:** `GET`
+- **Path:** `/api/notas-credito/{id}`
+- **Tags:** notasCredito
+
+Returns a credit note with originating invoice header for the current tenant. Requires module `billing.credit_notes` and one of `reports.financial.read`, `reports.operational.read`.
+
+#### Responses
+
+##### Status: 200 Credit note row
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`estadoCae` (required)**
+
+    `string`, possible values: `"pending", "issued", "failed", "not_required"`
+
+  - **`facturaOrigen` (required)**
+
+    `object` — Originating invoice header (selected columns)
+
+    - **`clienteId`**
+
+      `integer`
+
+    - **`estado`**
+
+      `string`
+
+    - **`fecha`**
+
+      `string`, format: `date-time`
+
+    - **`id`**
+
+      `integer`
+
+    - **`numero`**
+
+      `integer`
+
+    - **`prefijo`**
+
+      `string`
+
+    - **`tipo`**
+
+      `string`
+
+    - **`total`**
+
+      `object`
+
+  - **`facturaOrigenId` (required)**
+
+    `integer`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`monto` (required)**
+
+    `object`
+
+  - **`motivo` (required)**
+
+    `string`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`cae`**
+
+    `string`
+
+  - **`caeVto`**
+
+    `string`, format: `date-time`
+
+  - **`createdById`**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "facturaOrigenId": 1,
+    "motivo": "",
+    "monto": 1,
+    "cae": "",
+    "caeVto": "",
+    "estadoCae": "pending",
+    "createdById": 1,
+    "createdAt": "",
+    "facturaOrigen": {
+      "id": 1,
+      "tipo": "",
+      "prefijo": "",
+      "numero": 1,
+      "clienteId": 1,
+      "fecha": "",
+      "total": 1,
+      "estado": "",
+      "additionalProperty": "anything"
+    },
+    "additionalProperty": "anything"
+  }
+}
+```
+
+##### Status: 400 Invalid path id
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Not found
 
 ###### Content-Type: application/json
 
@@ -32754,7 +33323,7 @@ true
 
 * **`motivo` (required)**
 
-  `string` — Reason for voiding the invoice. Stored in AuditEvent metadata.
+  `string` — Reason for voiding the invoice (persisted on credit note and AuditEvent metadata).
 
 **Example:**
 
@@ -33110,6 +33679,1031 @@ true
       }
     ],
     "additionalProperty": "anything"
+  }
+}
+```
+
+### FacturaVoidBalanceCliente
+
+- **Type:**`object`
+
+* **`balance` (required)**
+
+  `object` — Customer balance after decrement (Prisma Decimal may serialize as string in JSON)
+
+* **`creditLimit` (required)**
+
+  `number`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`rsocial` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "rsocial": "",
+  "balance": 1,
+  "creditLimit": 1
+}
+```
+
+### NotaCreditoFacturaOrigen
+
+- **Type:**`object`
+
+Originating invoice header (selected columns)
+
+- **`clienteId`**
+
+  `integer`
+
+- **`estado`**
+
+  `string`
+
+- **`fecha`**
+
+  `string`, format: `date-time`
+
+- **`id`**
+
+  `integer`
+
+- **`numero`**
+
+  `integer`
+
+- **`prefijo`**
+
+  `string`
+
+- **`tipo`**
+
+  `string`
+
+- **`total`**
+
+  `object`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "tipo": "",
+  "prefijo": "",
+  "numero": 1,
+  "clienteId": 1,
+  "fecha": "",
+  "total": 1,
+  "estado": "",
+  "additionalProperty": "anything"
+}
+```
+
+### NotaCredito
+
+- **Type:**`object`
+
+* **`createdAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`estadoCae` (required)**
+
+  `string`, possible values: `"pending", "issued", "failed", "not_required"`
+
+* **`facturaOrigenId` (required)**
+
+  `integer`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`monto` (required)**
+
+  `object`
+
+* **`motivo` (required)**
+
+  `string`
+
+* **`tenantId` (required)**
+
+  `integer`
+
+* **`cae`**
+
+  `string`
+
+* **`caeVto`**
+
+  `string`, format: `date-time`
+
+* **`createdById`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "tenantId": 1,
+  "facturaOrigenId": 1,
+  "motivo": "",
+  "monto": 1,
+  "cae": "",
+  "caeVto": "",
+  "estadoCae": "pending",
+  "createdById": 1,
+  "createdAt": "",
+  "additionalProperty": "anything"
+}
+```
+
+### NotaCreditoDetail
+
+- **Type:**`object`
+
+* **`createdAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`estadoCae` (required)**
+
+  `string`, possible values: `"pending", "issued", "failed", "not_required"`
+
+* **`facturaOrigen` (required)**
+
+  `object` — Originating invoice header (selected columns)
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`estado`**
+
+    `string`
+
+  - **`fecha`**
+
+    `string`, format: `date-time`
+
+  - **`id`**
+
+    `integer`
+
+  - **`numero`**
+
+    `integer`
+
+  - **`prefijo`**
+
+    `string`
+
+  - **`tipo`**
+
+    `string`
+
+  - **`total`**
+
+    `object`
+
+* **`facturaOrigenId` (required)**
+
+  `integer`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`monto` (required)**
+
+  `object`
+
+* **`motivo` (required)**
+
+  `string`
+
+* **`tenantId` (required)**
+
+  `integer`
+
+* **`cae`**
+
+  `string`
+
+* **`caeVto`**
+
+  `string`, format: `date-time`
+
+* **`createdById`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "tenantId": 1,
+  "facturaOrigenId": 1,
+  "motivo": "",
+  "monto": 1,
+  "cae": "",
+  "caeVto": "",
+  "estadoCae": "pending",
+  "createdById": 1,
+  "createdAt": "",
+  "facturaOrigen": {
+    "id": 1,
+    "tipo": "",
+    "prefijo": "",
+    "numero": 1,
+    "clienteId": 1,
+    "fecha": "",
+    "total": 1,
+    "estado": "",
+    "additionalProperty": "anything"
+  },
+  "additionalProperty": "anything"
+}
+```
+
+### NotaCreditoListEnvelope
+
+- **Type:**
+
+**Example:**
+
+### NotaCreditoEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`estadoCae` (required)**
+
+    `string`, possible values: `"pending", "issued", "failed", "not_required"`
+
+  - **`facturaOrigen` (required)**
+
+    `object` — Originating invoice header (selected columns)
+
+    - **`clienteId`**
+
+      `integer`
+
+    - **`estado`**
+
+      `string`
+
+    - **`fecha`**
+
+      `string`, format: `date-time`
+
+    - **`id`**
+
+      `integer`
+
+    - **`numero`**
+
+      `integer`
+
+    - **`prefijo`**
+
+      `string`
+
+    - **`tipo`**
+
+      `string`
+
+    - **`total`**
+
+      `object`
+
+  - **`facturaOrigenId` (required)**
+
+    `integer`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`monto` (required)**
+
+    `object`
+
+  - **`motivo` (required)**
+
+    `string`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`cae`**
+
+    `string`
+
+  - **`caeVto`**
+
+    `string`, format: `date-time`
+
+  - **`createdById`**
+
+    `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "facturaOrigenId": 1,
+    "motivo": "",
+    "monto": 1,
+    "cae": "",
+    "caeVto": "",
+    "estadoCae": "pending",
+    "createdById": 1,
+    "createdAt": "",
+    "facturaOrigen": {
+      "id": 1,
+      "tipo": "",
+      "prefijo": "",
+      "numero": 1,
+      "clienteId": 1,
+      "fecha": "",
+      "total": 1,
+      "estado": "",
+      "additionalProperty": "anything"
+    },
+    "additionalProperty": "anything"
+  }
+}
+```
+
+### FacturaVoidResult
+
+- **Type:**`object`
+
+* **`factura` (required)**
+
+  `object`
+
+  - **`cae`**
+
+    `string`
+
+  - **`caeVto`**
+
+    `string`, format: `date-time`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`estado`**
+
+    `string`
+
+  - **`estadoCae`**
+
+    `string`, possible values: `"pending", "issued", "failed"`
+
+  - **`fecha`**
+
+    `string`, format: `date-time`
+
+  - **`formaPagoId`**
+
+    `integer`
+
+  - **`id`**
+
+    `integer`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+    - **`articulo`**
+
+      `object`
+
+      - **`activo`**
+
+        `boolean`
+
+      - **`codigo`**
+
+        `integer`
+
+      - **`condIva`**
+
+        `string`
+
+      - **`costo`**
+
+        `number`
+
+      - **`descripcion`**
+
+        `string`
+
+      - **`id`**
+
+        `integer`
+
+      - **`minimo`**
+
+        `integer`
+
+      - **`precioLista1`**
+
+        `number`
+
+      - **`precioLista2`**
+
+        `number`
+
+      - **`rubro`**
+
+        `object`
+
+        - **`codigo`**
+
+          `integer`
+
+        - **`id`**
+
+          `integer`
+
+        - **`nombre`**
+
+          `string`
+
+      - **`rubroId`**
+
+        `integer`
+
+      - **`stock`**
+
+        `integer`
+
+      - **`umedida`**
+
+        `string`
+
+    - **`articuloId`**
+
+      `integer`
+
+    - **`cantidad`**
+
+      `number`
+
+    - **`dscto`**
+
+      `number`
+
+    - **`id`**
+
+      `integer`
+
+    - **`precio`**
+
+      `number`
+
+    - **`subtotal`**
+
+      `number`
+
+  - **`iva1`**
+
+    `number`
+
+  - **`iva2`**
+
+    `number`
+
+  - **`neto1`**
+
+    `number`
+
+  - **`neto2`**
+
+    `number`
+
+  - **`neto3`**
+
+    `number`
+
+  - **`numero`**
+
+    `integer`
+
+  - **`prefijo`**
+
+    `string`
+
+  - **`tipo`**
+
+    `string`
+
+  - **`total`**
+
+    `number`
+
+* **`notaCredito` (required)**
+
+  `object`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`estadoCae` (required)**
+
+    `string`, possible values: `"pending", "issued", "failed", "not_required"`
+
+  - **`facturaOrigenId` (required)**
+
+    `integer`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`monto` (required)**
+
+    `object`
+
+  - **`motivo` (required)**
+
+    `string`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`cae`**
+
+    `string`
+
+  - **`caeVto`**
+
+    `string`, format: `date-time`
+
+  - **`createdById`**
+
+    `integer`
+
+* **`updatedCliente` (required)**
+
+  `object`
+
+  - **`balance` (required)**
+
+    `object` — Customer balance after decrement (Prisma Decimal may serialize as string in JSON)
+
+  - **`creditLimit` (required)**
+
+    `number`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`rsocial` (required)**
+
+    `string`
+
+**Example:**
+
+```json
+{
+  "factura": {
+    "id": 1,
+    "fecha": "",
+    "tipo": "",
+    "prefijo": "",
+    "numero": 1,
+    "clienteId": 1,
+    "formaPagoId": 1,
+    "neto1": 1,
+    "neto2": 1,
+    "neto3": 1,
+    "iva1": 1,
+    "iva2": 1,
+    "total": 1,
+    "estado": "",
+    "cae": "",
+    "caeVto": "",
+    "estadoCae": "pending",
+    "items": [
+      {
+        "id": 1,
+        "articuloId": 1,
+        "articulo": {
+          "id": 1,
+          "codigo": 1,
+          "descripcion": "",
+          "rubroId": 1,
+          "rubro": {
+            "id": 1,
+            "codigo": 1,
+            "nombre": "",
+            "additionalProperty": "anything"
+          },
+          "condIva": "",
+          "umedida": "",
+          "precioLista1": 1,
+          "precioLista2": 1,
+          "costo": 1,
+          "stock": 1,
+          "minimo": 1,
+          "activo": true,
+          "additionalProperty": "anything"
+        },
+        "cantidad": 1,
+        "precio": 1,
+        "dscto": 1,
+        "subtotal": 1,
+        "additionalProperty": "anything"
+      }
+    ],
+    "additionalProperty": "anything"
+  },
+  "notaCredito": {
+    "id": 1,
+    "tenantId": 1,
+    "facturaOrigenId": 1,
+    "motivo": "",
+    "monto": 1,
+    "cae": "",
+    "caeVto": "",
+    "estadoCae": "pending",
+    "createdById": 1,
+    "createdAt": "",
+    "additionalProperty": "anything"
+  },
+  "updatedCliente": {
+    "id": 1,
+    "rsocial": "",
+    "balance": 1,
+    "creditLimit": 1
+  }
+}
+```
+
+### FacturaVoidEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`factura` (required)**
+
+    `object`
+
+    - **`cae`**
+
+      `string`
+
+    - **`caeVto`**
+
+      `string`, format: `date-time`
+
+    - **`clienteId`**
+
+      `integer`
+
+    - **`estado`**
+
+      `string`
+
+    - **`estadoCae`**
+
+      `string`, possible values: `"pending", "issued", "failed"`
+
+    - **`fecha`**
+
+      `string`, format: `date-time`
+
+    - **`formaPagoId`**
+
+      `integer`
+
+    - **`id`**
+
+      `integer`
+
+    - **`items`**
+
+      `array`
+
+      **Items:**
+
+      - **`articulo`**
+
+        `object`
+
+        - **`activo`**
+
+          `boolean`
+
+        - **`codigo`**
+
+          `integer`
+
+        - **`condIva`**
+
+          `string`
+
+        - **`costo`**
+
+          `number`
+
+        - **`descripcion`**
+
+          `string`
+
+        - **`id`**
+
+          `integer`
+
+        - **`minimo`**
+
+          `integer`
+
+        - **`precioLista1`**
+
+          `number`
+
+        - **`precioLista2`**
+
+          `number`
+
+        - **`rubro`**
+
+          `object`
+
+          - **`codigo`**
+
+            `integer`
+
+          - **`id`**
+
+            `integer`
+
+          - **`nombre`**
+
+            `string`
+
+        - **`rubroId`**
+
+          `integer`
+
+        - **`stock`**
+
+          `integer`
+
+        - **`umedida`**
+
+          `string`
+
+      - **`articuloId`**
+
+        `integer`
+
+      - **`cantidad`**
+
+        `number`
+
+      - **`dscto`**
+
+        `number`
+
+      - **`id`**
+
+        `integer`
+
+      - **`precio`**
+
+        `number`
+
+      - **`subtotal`**
+
+        `number`
+
+    - **`iva1`**
+
+      `number`
+
+    - **`iva2`**
+
+      `number`
+
+    - **`neto1`**
+
+      `number`
+
+    - **`neto2`**
+
+      `number`
+
+    - **`neto3`**
+
+      `number`
+
+    - **`numero`**
+
+      `integer`
+
+    - **`prefijo`**
+
+      `string`
+
+    - **`tipo`**
+
+      `string`
+
+    - **`total`**
+
+      `number`
+
+  - **`notaCredito` (required)**
+
+    `object`
+
+    - **`createdAt` (required)**
+
+      `string`, format: `date-time`
+
+    - **`estadoCae` (required)**
+
+      `string`, possible values: `"pending", "issued", "failed", "not_required"`
+
+    - **`facturaOrigenId` (required)**
+
+      `integer`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`monto` (required)**
+
+      `object`
+
+    - **`motivo` (required)**
+
+      `string`
+
+    - **`tenantId` (required)**
+
+      `integer`
+
+    - **`cae`**
+
+      `string`
+
+    - **`caeVto`**
+
+      `string`, format: `date-time`
+
+    - **`createdById`**
+
+      `integer`
+
+  - **`updatedCliente` (required)**
+
+    `object`
+
+    - **`balance` (required)**
+
+      `object` — Customer balance after decrement (Prisma Decimal may serialize as string in JSON)
+
+    - **`creditLimit` (required)**
+
+      `number`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`rsocial` (required)**
+
+      `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "factura": {
+      "id": 1,
+      "fecha": "",
+      "tipo": "",
+      "prefijo": "",
+      "numero": 1,
+      "clienteId": 1,
+      "formaPagoId": 1,
+      "neto1": 1,
+      "neto2": 1,
+      "neto3": 1,
+      "iva1": 1,
+      "iva2": 1,
+      "total": 1,
+      "estado": "",
+      "cae": "",
+      "caeVto": "",
+      "estadoCae": "pending",
+      "items": [
+        {
+          "id": 1,
+          "articuloId": 1,
+          "articulo": {
+            "id": 1,
+            "codigo": 1,
+            "descripcion": "",
+            "rubroId": 1,
+            "rubro": {
+              "id": 1,
+              "codigo": 1,
+              "nombre": "",
+              "additionalProperty": "anything"
+            },
+            "condIva": "",
+            "umedida": "",
+            "precioLista1": 1,
+            "precioLista2": 1,
+            "costo": 1,
+            "stock": 1,
+            "minimo": 1,
+            "activo": true,
+            "additionalProperty": "anything"
+          },
+          "cantidad": 1,
+          "precio": 1,
+          "dscto": 1,
+          "subtotal": 1,
+          "additionalProperty": "anything"
+        }
+      ],
+      "additionalProperty": "anything"
+    },
+    "notaCredito": {
+      "id": 1,
+      "tenantId": 1,
+      "facturaOrigenId": 1,
+      "motivo": "",
+      "monto": 1,
+      "cae": "",
+      "caeVto": "",
+      "estadoCae": "pending",
+      "createdById": 1,
+      "createdAt": "",
+      "additionalProperty": "anything"
+    },
+    "updatedCliente": {
+      "id": 1,
+      "rsocial": "",
+      "balance": 1,
+      "creditLimit": 1
+    }
   }
 }
 ```

@@ -71,6 +71,29 @@ const facturaRow = {
   items: [] as unknown[],
 }
 
+const notaCreditoContractRow = {
+  id: 1,
+  tenantId: 1,
+  facturaOrigenId: 1,
+  motivo: 'Nota motivo suficientemente largo',
+  monto: 121,
+  cae: null,
+  caeVto: null,
+  estadoCae: 'not_required',
+  createdById: null,
+  createdAt: new Date('2025-01-15T12:00:00.000Z'),
+  facturaOrigen: {
+    id: 1,
+    tipo: 'A',
+    prefijo: 'A',
+    numero: 1,
+    clienteId: 1,
+    fecha: new Date('2025-01-15T12:00:00.000Z'),
+    total: 121,
+    estado: 'N',
+  },
+}
+
 const clienteInput = {
   codigo: 1,
   rsocial: 'ACME SA',
@@ -282,6 +305,11 @@ function buildPrisma(): PrismaClient {
       findFirst: vi.fn().mockResolvedValue(null),
       create: facturaCreate,
       aggregate: vi.fn().mockResolvedValue({ _count: { id: 0 }, _sum: { total: null } }),
+    },
+    notaCredito: {
+      count: vi.fn().mockResolvedValue(0),
+      findMany: vi.fn().mockResolvedValue([]),
+      findFirst: vi.fn().mockResolvedValue(null),
     },
     cobro: {
       findMany: vi.fn().mockResolvedValue([]),
@@ -706,6 +734,42 @@ describe('API — contrato OpenAPI', () => {
     const app = createApp(prisma)
     const res = await request(app).get('/api/formas-pago').expect(200)
     await assertMatchesOpenApi('/api/formas-pago', 'get', '200', res.body)
+  })
+
+  it('GET /api/notas-credito', async () => {
+    const app = createApp(prisma)
+    const res = await request(app)
+      .get('/api/notas-credito')
+      .query({ from: '2026-05-01', to: '2026-05-31' })
+      .expect(200)
+    await assertMatchesOpenApi('/api/notas-credito', 'get', '200', res.body)
+    expect(res.body).toMatchObject({ success: true, total: 0, data: [] })
+  })
+
+  it('GET /api/notas-credito with rows', async () => {
+    vi.mocked(prisma.notaCredito.count).mockResolvedValue(1)
+    vi.mocked(prisma.notaCredito.findMany).mockResolvedValue([notaCreditoContractRow] as never)
+    const app = createApp(prisma)
+    const res = await request(app)
+      .get('/api/notas-credito')
+      .query({ from: '2025-01-01', to: '2025-12-31' })
+      .expect(200)
+    await assertMatchesOpenApi('/api/notas-credito', 'get', '200', res.body)
+    expect(res.body.data).toHaveLength(1)
+  })
+
+  it('GET /api/notas-credito/{id} — 404', async () => {
+    const app = createApp(prisma)
+    const res = await request(app).get('/api/notas-credito/999').expect(404)
+    await assertMatchesOpenApi('/api/notas-credito/{id}', 'get', '404', res.body)
+  })
+
+  it('GET /api/notas-credito/{id}', async () => {
+    vi.mocked(prisma.notaCredito.findFirst).mockResolvedValue(notaCreditoContractRow as never)
+    const app = createApp(prisma)
+    const res = await request(app).get('/api/notas-credito/1').expect(200)
+    await assertMatchesOpenApi('/api/notas-credito/{id}', 'get', '200', res.body)
+    expect(res.body.data.id).toBe(1)
   })
 
   it('GET /api/facturas', async () => {

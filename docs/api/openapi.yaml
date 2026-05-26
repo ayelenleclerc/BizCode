@@ -40,6 +40,8 @@ tags:
     description: Logistics KPIs and operational reports (#145)
   - name: facturas
     description: Invoice management
+  - name: notasCredito
+    description: Credit notes (invoice void flow, module billing.credit_notes, #146)
   - name: afip
     description: Argentina AFIP electronic invoicing (CAE; homologación mock in dev)
   - name: pedidos
@@ -2522,7 +2524,10 @@ paths:
       summary: Void an invoice
       description: |
         Sets `estado` to `N` (anulada), reverses the customer balance by the invoice total,
-        and records an AuditEvent with the provided motivo. Requires `sales.cancel` permission.
+        creates a tenant-scoped `NotaCredito`, and records `AuditEvent` `factura_void` with motivo
+        and `notaCreditoId` in metadata — all in one database transaction. Requires `sales.cancel`
+        and module `billing.credit_notes`. When the source invoice has `estadoCae === issued`, the
+        credit note CAE is requested asynchronously via AFIP adapter.
       parameters:
         - name: id
           in: path
@@ -2537,11 +2542,11 @@ paths:
               $ref: '#/components/schemas/VoidInput'
       responses:
         '200':
-          description: Invoice voided
+          description: Invoice voided with credit note and updated customer balance snapshot
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/FacturaEnvelope'
+                $ref: '#/components/schemas/FacturaVoidEnvelope'
         '400':
           $ref: '#/components/responses/BadRequest'
         '404':
@@ -2562,6 +2567,95 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         '403':
           $ref: '#/components/responses/ForbiddenError'
+
+  /api/notas-credito:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [notasCredito]
+      summary: List credit notes
+      description: |
+        Paginated list filtered by `createdAt` in `[from, to]` (inclusive calendar days, server local timezone).
+        Optional `clienteId` filters by the originating invoice's customer. Requires module `billing.credit_notes`
+        and one of `reports.financial.read`, `reports.operational.read`.
+      parameters:
+        - name: from
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+        - name: to
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+        - name: clienteId
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+        - $ref: '#/components/parameters/ListLimit'
+        - $ref: '#/components/parameters/ListOffset'
+      responses:
+        '200':
+          description: Paginated credit notes with originating invoice header
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotaCreditoListEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/notas-credito/{id}:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [notasCredito]
+      summary: Get credit note by id
+      description: |
+        Returns a credit note with originating invoice header for the current tenant. Requires module
+        `billing.credit_notes` and one of `reports.financial.read`, `reports.operational.read`.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '200':
+          description: Credit note row
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotaCreditoEnvelope'
+        '400':
+          description: Invalid path id
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
 
   /api/formas-pago:
     parameters:
@@ -6230,10 +6324,9 @@ components:
       properties:
         motivo:
           type: string
-          minLength: 1
+          minLength: 10
           maxLength: 500
-          description: Reason for voiding the invoice. Stored in AuditEvent metadata.
-
+          description: Reason for voiding the invoice (persisted on credit note and AuditEvent metadata).
     FacturaInput:
       type: object
       required: [fecha, tipo, numero, clienteId, neto1, neto2, neto3, iva1, iva2, total, items]
@@ -6305,6 +6398,163 @@ components:
           const: true
         data:
           $ref: '#/components/schemas/Factura'
+
+    FacturaVoidBalanceCliente:
+      type: object
+      required: [id, rsocial, balance, creditLimit]
+      properties:
+        id:
+          type: integer
+        rsocial:
+          type: string
+        balance:
+          description: Customer balance after decrement (Prisma Decimal may serialize as string in JSON)
+          oneOf:
+            - type: number
+            - type: string
+        creditLimit:
+          type: number
+          nullable: true
+
+    NotaCreditoFacturaOrigen:
+      type: object
+      additionalProperties: true
+      description: Originating invoice header (selected columns)
+      properties:
+        id:
+          type: integer
+        tipo:
+          type: string
+        prefijo:
+          type: string
+        numero:
+          type: integer
+        clienteId:
+          type: integer
+        fecha:
+          type: string
+          format: date-time
+        total:
+          oneOf:
+            - type: number
+            - type: string
+        estado:
+          type: string
+
+    NotaCredito:
+      type: object
+      additionalProperties: true
+      required: [id, tenantId, facturaOrigenId, motivo, monto, estadoCae, createdAt]
+      properties:
+        id:
+          type: integer
+        tenantId:
+          type: integer
+        facturaOrigenId:
+          type: integer
+        motivo:
+          type: string
+        monto:
+          oneOf:
+            - type: number
+            - type: string
+        cae:
+          type: string
+          nullable: true
+        caeVto:
+          type: string
+          format: date-time
+          nullable: true
+        estadoCae:
+          type: string
+          enum: [pending, issued, failed, not_required]
+        createdById:
+          type: integer
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+
+    NotaCreditoDetail:
+      type: object
+      additionalProperties: true
+      required: [id, tenantId, facturaOrigenId, motivo, monto, estadoCae, createdAt, facturaOrigen]
+      properties:
+        id:
+          type: integer
+        tenantId:
+          type: integer
+        facturaOrigenId:
+          type: integer
+        motivo:
+          type: string
+        monto:
+          oneOf:
+            - type: number
+            - type: string
+        cae:
+          type: string
+          nullable: true
+        caeVto:
+          type: string
+          format: date-time
+          nullable: true
+        estadoCae:
+          type: string
+          enum: [pending, issued, failed, not_required]
+        createdById:
+          type: integer
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        facturaOrigen:
+          $ref: '#/components/schemas/NotaCreditoFacturaOrigen'
+
+    NotaCreditoListEnvelope:
+      allOf:
+        - type: object
+          required: [success, data]
+          properties:
+            success:
+              type: boolean
+              const: true
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/NotaCreditoDetail'
+        - $ref: '#/components/schemas/ListPaginationMeta'
+
+    NotaCreditoEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/NotaCreditoDetail'
+
+    FacturaVoidResult:
+      type: object
+      required: [factura, notaCredito, updatedCliente]
+      properties:
+        factura:
+          $ref: '#/components/schemas/Factura'
+        notaCredito:
+          $ref: '#/components/schemas/NotaCredito'
+        updatedCliente:
+          $ref: '#/components/schemas/FacturaVoidBalanceCliente'
+
+    FacturaVoidEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/FacturaVoidResult'
 
     AfipConfigInput:
       type: object

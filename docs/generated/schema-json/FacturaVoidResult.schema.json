@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "factura": {
+      "$ref": "./Factura.schema.json"
+    },
+    "notaCredito": {
+      "$ref": "./NotaCredito.schema.json"
+    },
+    "updatedCliente": {
+      "$ref": "./FacturaVoidBalanceCliente.schema.json"
+    }
+  },
+  "required": [
+    "factura",
+    "notaCredito",
+    "updatedCliente"
+  ],
+  "title": "FacturaVoidResult",
+  "type": "object"
+}

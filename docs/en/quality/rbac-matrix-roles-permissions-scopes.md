@@ -60,6 +60,10 @@ Module **`logistics.dispatches`**. Endpoints `GET /api/logistica/kpis`, `reporte
 
 Module **`logistics.gps`**. UI `/logistica/seguimiento`: **`logistics.read`** and `GPS_VIEW_ROLES` (`owner`, `manager`, `logistics_planner`). `GET /api/repartos/activos` and `GET .../ubicacion/ultima` (planner; driver only on own route for `ultima`). `POST /api/repartos/{id}/ubicacion`: **`orders.deliver.confirm`**, owning driver, route `on_route`; drivers cannot list activos.
 
+## Credit notes & invoice void (#146)
+
+Tenant module **`billing.credit_notes`**. `PUT /api/facturas/{id}/void` requires **`sales.cancel`** and the module; request body motivo minimum length matches server schema (10 characters). **`GET /api/notas-credito`** and **`GET /api/notas-credito/{id}`** require **`reports.financial.read`** *or* **`reports.operational.read`**. UI: invoice void action appears in **`Facturación`** detail (`ListadoFacturas.tsx`) only when `billing.credit_notes` is enabled; **Finance** lists credit notes in the same module (`Finanzas` page retains `reports.financial.read`). See [`ADR-0012`](../adr/ADR-0012-invoice-void-credit-note.md).
+
 ## Related documents
 
 - Master plan execution index: [master-plan-bizcode-execution.md](master-plan-bizcode-execution.md)

@@ -1,4 +1,4 @@
-import type { Application, Request, Response } from 'express'
+﻿import type { Application, Request, Response } from 'express'
 import { requirePermission, type AuthenticatedRequest } from '../auth'
 import { validateBody } from '../middleware/validateBody'
 import { facturaBodySchema, facturaVoidBodySchema } from '../schemas/domain'
@@ -8,6 +8,7 @@ import { dispatchNotification } from '../channels'
 import type { RestRouteContext } from './restRouteTypes'
 import { planErrorBody, TenantPlanService } from '../services/TenantPlanService'
 import { buildFacturaPdfBuffer, facturaPdfFilename } from '../fiscal/ar/facturaPdf'
+import { requireModule } from '../middleware/requireModule'
 import { errorMessage, getTenantId } from './restDomainShared'
 
 /**
@@ -16,6 +17,7 @@ import { errorMessage, getTenantId } from './restDomainShared'
 export function registerFacturasRoutes(app: Application, ctx: RestRouteContext): void {
   const { prisma, services, writeAudit } = ctx
   const { factura } = services
+  const creditNotesModule = requireModule('billing.credit_notes')
 
   app.get('/api/facturas', requirePermission('reports.operational.read'), async (req: Request, res: Response) => {
     try {
@@ -130,6 +132,7 @@ export function registerFacturasRoutes(app: Application, ctx: RestRouteContext):
 
   app.put(
     '/api/facturas/:id/void',
+    creditNotesModule,
     requirePermission('sales.cancel'),
     validateBody(facturaVoidBodySchema),
     async (req: Request, res: Response) => {
@@ -138,12 +141,14 @@ export function registerFacturasRoutes(app: Application, ctx: RestRouteContext):
         const tenantId = getTenantId(req)
         const id = parseInt(String(req.params.id), 10)
         const { motivo } = req.body as { motivo: string }
-        const result = await factura.void(tenantId, id)
+        const result = await factura.void(tenantId, id, motivo, {
+          userId: authReq.auth?.claims.userId ?? null,
+          ipAddress: authReq.ip ?? null,
+        })
         if (!result.ok) {
           res.status(result.status).json({ success: false, error: result.error })
           return
         }
-        await writeAudit(authReq, 'factura_void', 'factura', String(id), { motivo })
         res.json({ success: true, data: result.data })
       } catch (err: unknown) {
         res.status(500).json({ success: false, error: errorMessage(err) })

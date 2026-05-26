@@ -154,6 +154,12 @@
 
 * [FacturaVencidaRow](./facturavencidarow.md) – `-`
 
+* [FacturaVoidBalanceCliente](./facturavoidbalancecliente.md) – `-`
+
+* [FacturaVoidEnvelope](./facturavoidenvelope.md) – `-`
+
+* [FacturaVoidResult](./facturavoidresult.md) – `-`
+
 * [FormaPago](./formapago.md) – `-`
 
 * [FormaPagoListEnvelope](./formapagolistenvelope.md) – `-`
@@ -195,6 +201,16 @@
 * [ModuleCatalogPreset](./modulecatalogpreset.md) – `-`
 
 * [ModuleNotEnabledEnvelope](./modulenotenabledenvelope.md) – `-`
+
+* [NotaCredito](./notacredito.md) – `-`
+
+* [NotaCreditoDetail](./notacreditodetail.md) – `-`
+
+* [NotaCreditoEnvelope](./notacreditoenvelope.md) – `-`
+
+* [NotaCreditoFacturaOrigen](./notacreditofacturaorigen.md "Originating invoice header (selected columns)") – `-`
+
+* [NotaCreditoListEnvelope](./notacreditolistenvelope.md) – `-`
 
 * [Notification](./notification.md) – `-`
 
@@ -458,6 +474,8 @@
 
 * [Untitled object in ModuleCatalogData](./modulecatalogdata-properties-presets.md) – `undefined#/properties/presets`
 
+* [Untitled object in NotaCreditoListEnvelope](./notacreditolistenvelope-allof-0.md) – `undefined#/allOf/0`
+
 * [Untitled object in Notification](./notification-properties-payload.md) – `undefined#/properties/payload`
 
 * [Untitled object in NotificationReadAllEnvelope](./notificationreadallenvelope-properties-data.md) – `undefined#/properties/data`
@@ -605,6 +623,8 @@
 * [Untitled array in ModuleCatalogEntry](./modulecatalogentry-properties-dependencies.md) – `undefined#/properties/dependencies`
 
 * [Untitled array in ModuleCatalogPreset](./modulecatalogpreset-properties-modules.md) – `undefined#/properties/modules`
+
+* [Untitled array in NotaCreditoListEnvelope](./notacreditolistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
 
 * [Untitled array in NotificationListEnvelope](./notificationlistenvelope-properties-data.md) – `undefined#/properties/data`
 

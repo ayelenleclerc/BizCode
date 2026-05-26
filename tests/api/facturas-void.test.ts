@@ -15,6 +15,19 @@ const FACTURA_ACTIVA = {
   estado: 'A',
   total: 10000,
   clienteId: 1,
+  estadoCae: 'pending',
+  tipo: 'B',
+}
+
+const NOTA_CREDITO = {
+  id: 10,
+  tenantId: 1,
+  facturaOrigenId: 1,
+  motivo: 'Error en el precio',
+  monto: 10000,
+  estadoCae: 'not_required',
+  createdById: null,
+  createdAt: new Date(),
 }
 
 const FACTURA_ANULADA = {
@@ -25,7 +38,7 @@ const FACTURA_ANULADA = {
 }
 
 function buildPrismaMock(overrides: Partial<Record<string, unknown>> = {}): PrismaClient {
-  return {
+  const base = {
     deliveryZone: {
       findMany: vi.fn().mockResolvedValue([]),
       findFirst: vi.fn().mockResolvedValue(null),
@@ -37,7 +50,7 @@ function buildPrismaMock(overrides: Partial<Record<string, unknown>> = {}): Pris
       findFirst: vi.fn().mockResolvedValue({ id: 1, suspended: false }),
       findUnique: vi.fn().mockResolvedValue(null),
       create: vi.fn().mockResolvedValue(null),
-      update: vi.fn().mockResolvedValue({ id: 1, balance: 0 }),
+      update: vi.fn().mockResolvedValue({ id: 1, rsocial: 'Cliente', balance: 0, creditLimit: null }),
     },
     articulo: { findMany: vi.fn().mockResolvedValue([]) },
     rubro: { findMany: vi.fn().mockResolvedValue([]) },
@@ -57,6 +70,9 @@ function buildPrismaMock(overrides: Partial<Record<string, unknown>> = {}): Pris
       update: vi.fn().mockResolvedValue(null),
       updateMany: vi.fn().mockResolvedValue({ count: 0 }),
     },
+    notaCredito: {
+      create: vi.fn().mockResolvedValue(NOTA_CREDITO),
+    },
     auditEvent: { create: vi.fn().mockResolvedValue({ id: 1 }) },
     appUser: {
       count: vi.fn().mockResolvedValue(1),
@@ -75,12 +91,14 @@ function buildPrismaMock(overrides: Partial<Record<string, unknown>> = {}): Pris
       updateMany: vi.fn().mockResolvedValue({ count: 1 }),
       update: vi.fn().mockResolvedValue({ id: 1 }),
     },
-    $transaction: vi.fn(async (fn: unknown) => {
-      if (typeof fn === 'function') return fn(buildPrismaMock())
-      return fn
-    }),
-    ...overrides,
-  } as unknown as PrismaClient
+        ...overrides,
+  }
+  const prisma = { ...base, ...overrides } as unknown as PrismaClient
+  prisma.$transaction = vi.fn(async (fn: unknown) => {
+    if (typeof fn === 'function') return fn(prisma)
+    return fn
+  }) as PrismaClient['$transaction']
+  return prisma
 }
 
 // ─── PUT /api/facturas/:id/void ───────────────────────────────────────────────
@@ -111,7 +129,9 @@ describe('PUT /api/facturas/:id/void', () => {
       .expect(200)
 
     expect(res.body.success).toBe(true)
-    expect(res.body.data.estado).toBe('N')
+    expect(res.body.data.factura.estado).toBe('N')
+    expect(res.body.data.notaCredito.id).toBe(10)
+    expect(res.body.data.notaCredito.estadoCae).toBe('not_required')
   })
 
   it('returns 400 when motivo is missing', async () => {
@@ -152,6 +172,19 @@ describe('PUT /api/facturas/:id/void', () => {
     expect(String(res.body.error)).toMatch(/motivo/)
   })
 
+  it('returns 400 when motivo is shorter than 10 characters', async () => {
+    const prisma = buildPrismaMock()
+    const app = createApp(prisma)
+
+    const res = await request(app)
+      .put('/api/facturas/1/void')
+      .send({ motivo: 'corto' })
+      .expect(400)
+
+    expect(res.body.success).toBe(false)
+    expect(String(res.body.error)).toMatch(/at least 10/)
+  })
+
   it('returns 400 when motivo exceeds max length', async () => {
     const prisma = buildPrismaMock()
     const app = createApp(prisma)
@@ -179,7 +212,7 @@ describe('PUT /api/facturas/:id/void', () => {
 
     const res = await request(app)
       .put('/api/facturas/999/void')
-      .send({ motivo: 'Test' })
+      .send({ motivo: 'Motivo test' })
       .expect(404)
 
     expect(res.body.success).toBe(false)
@@ -199,7 +232,7 @@ describe('PUT /api/facturas/:id/void', () => {
 
     const res = await request(app)
       .put('/api/facturas/2/void')
-      .send({ motivo: 'Test' })
+      .send({ motivo: 'Motivo test' })
       .expect(409)
 
     expect(res.body.success).toBe(false)
@@ -213,7 +246,7 @@ describe('PUT /api/facturas/:id/void', () => {
 
     await request(app)
       .put('/api/facturas/1/void')
-      .send({ motivo: 'Test' })
+      .send({ motivo: 'Motivo test' })
       .expect(403)
   })
 
@@ -224,7 +257,7 @@ describe('PUT /api/facturas/:id/void', () => {
 
     const res = await request(app)
       .put('/api/facturas/1/void')
-      .send({ motivo: 'Devuelto' })
+      .send({ motivo: 'Devuelto total' })
       .expect(200)
 
     expect(res.body.success).toBe(true)
@@ -244,7 +277,7 @@ describe('PUT /api/facturas/:id/void', () => {
 
     const res = await request(app)
       .put('/api/facturas/1/void')
-      .send({ motivo: 'Test' })
+      .send({ motivo: 'Motivo test' })
       .expect(500)
 
     expect(res.body.success).toBe(false)

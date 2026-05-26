@@ -11,6 +11,7 @@ Esta matriz relaciona los artefactos de calidad de BizCode con cláusulas de nor
 | **estrategia-i18n.md** + check-i18n en CI | §8.1 | — | — | Portabilidad §4.2.8 | — |
 | **seguridad.md** | §8.1 | §6.3.8 | A.8.x | Seguridad §4.2.6 | — |
 | **docs/api/openapi.yaml** + `tests/api/contract.test.ts` | §8.3 | §6.3.2 | — | Idoneidad funcional §4.2.1 | 29119-2 |
+| **ADR-0012 / notas de crédito (#146)** — `PUT /api/facturas/{id}/void`, `GET /api/notas-credito`, UI facturación / finanzas, `tests/api/notas-credito.test.ts`, `tests/api/facturas-void.test.ts` | §8.3 | §6.3.2 | — | Idoneidad funcional §4.2.1 | 29119-2 |
 | **plan-swagger-openapi-ui.md** (espejos EN/PT) — checklist Swagger UI, política OpenAPI agentes | §7.5, §8.3 | §6.3.2, §6.4.12 | — | Idoneidad funcional §4.2.1 | 29119-2 |
 | **ADR-0003** | §8.3.3 | §6.3.6 | — | Mantenibilidad §4.2.7 | — |
 | **vision-producto-y-despliegue.md** (espejos EN/PT, **PROD-VISION-001**) — dirección escritorio/SaaS, modularidad fiscal | §7.5, §8.3 | §6.3.2 | — | Portabilidad §4.2.8 | — |
