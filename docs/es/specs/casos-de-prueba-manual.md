@@ -26,5 +26,9 @@ Ejecutar en un registro de sesión usando [certificacion-iso/plantillas-registro
 | TC-013 | Antigüedad CxC | `reports.financial.read` | Abrir Finanzas | Buckets visibles | `finanzas/index` |
 | TC-014 | Exportar CSV reporte | Pestaña con datos | Control Exportar CSV | Descarga de archivo | `reportes/index` |
 | TC-015 | Lista órdenes entrega | `logistics.read` | Abrir Logística → filtrar fecha | Tabla de órdenes carga | `logistica/index` |
+| TC-016 | Flujo picking | `orders.pick`, `logistics.picking` | Abrir Picking → tomar OE → checklist → listo | OE en `ready`; visible al planificador | `logistica/picking` |
+| TC-017 | Crear reparto | `orders.dispatch`, `logistics.dispatches` | Repartos → crear con OE listas → iniciar | Reparto `on_route` | `logistica/repartos` |
+| TC-018 | POD chofer | `orders.deliver.confirm`, `logistics.pod` | App chofer → entregar parada con firma | Ítem `delivered`; `hasPod` en back-office | `logistica/repartos/chofer` |
+| TC-019 | Seguimiento GPS | `logistics.gps`, rol planificador | Mapa Seguimiento carga; reparto `on_route` visible | Marcador o estado vacío; barra lateral actualiza | `logistica/seguimiento` |
 
 **Otros idiomas:** [English](../../en/specs/manual-test-cases.md) · [Português](../../pt-br/specs/casos-de-teste-manual.md)

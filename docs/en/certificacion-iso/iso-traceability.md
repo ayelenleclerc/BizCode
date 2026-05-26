@@ -24,6 +24,7 @@ This matrix maps BizCode's quality artefacts to clauses of the applicable ISO st
 | **privacy-data-map.md** | §8.1 | — | A.5.12 Classification, A.5.33 Protection of records | — | — |
 | **User manuals** (customers, products, invoicing, appearance, collections, finance, reports, logistics) | §7.5 Documented information | §6.4.12 Software Documentation | — | Usability §4.2.4 (User documentation) | — |
 | **Collections API** + `tests/api/cobros.test.ts` | §8.3 Design and development | §6.3.2 Software Design | — | Functional suitability §4.2.1 | 29119-2 (test design) |
+| **Logistics** (#140–#144): manuals + `tests/api/repartos.test.ts`, `tests/api/ordenes-entrega.test.ts`, `tests/server/services/repartoUbicacionService.test.ts`, OpenAPI repartos/GPS paths | §8.3 Design and development | §6.3.2 Software Design | A.5.12 (location data when `logistics.gps` enabled) | Functional suitability §4.2.1 | 29119-2 (test design) |
 | **generated-documentation.md** + `npm run docs:generate` (TypeDoc, OpenAPI MD, schema MD, SBOM) | §7.5 Documented information | §6.4.12 Software Documentation | A.8.31 (component inventory via SBOM) | Maintainability §4.2.7 | — |
 | **theming.md** (UI theme, Tailwind, `index.html`) | §8.3 Design and development | §6.4.12 Software Documentation | — | Usability §4.2.4 (User interface aesthetics) | — |
 | **CONTRIBUTING.md** Definition of Done | §8.5.1 Control of production | §6.3.6 Software Integration | A.8.25 | — | 29119-2 §7 (Entry/exit criteria) |

@@ -26,5 +26,9 @@ Requirements below are **evidenced** by UI (`src/pages/`), client (`src/lib/api.
 | FR-013 | AR aging and account statement per customer. | `src/pages/finanzas/`, `GET /api/reportes/aging`, `GET /api/reportes/cuenta-corriente/:clienteId` |
 | FR-014 | Operational and financial reports with optional CSV export (`Accept: text/csv`). | `src/pages/reportes/`, `GET /api/reportes/ventas`, `stock-critico`, `cobranzas` |
 | FR-015 | Delivery orders: list, create, update state; driver-scoped list when role is `driver`. | `src/pages/logistica/`, `GET/POST/PUT /api/ordenes-entrega` |
+| FR-016 | Warehouse picking: queue, start picking, checklist, mark ready (`logistics.picking`). | `src/pages/logistica/picking/`, `POST .../iniciar-picking`, `POST .../lista` |
+| FR-017 | Delivery routes: plan, start, close; sequence OEs in `ready`. | `src/pages/logistica/repartos/`, `GET/POST /api/repartos`, `POST .../iniciar`, `POST .../cerrar` |
+| FR-018 | POD on route items: driver wizard; back-office view proof. | `src/pages/logistica/repartos/chofer/`, `PUT .../items/{itemId}`, `GET .../pod` |
+| FR-019 | Live GPS tracking: planner map; driver posts location every 2 min (`logistics.gps`). | `src/pages/logistica/seguimiento/`, `GET /api/repartos/activos`, `POST .../ubicacion` |
 
 **Other languages:** [Español](../../es/specs/requisitos-funcionales.md) · [Português](../../pt-br/specs/requisitos-funcionais.md)

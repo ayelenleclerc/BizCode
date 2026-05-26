@@ -32,6 +32,17 @@ Evidencia automática equivalente en `tests/server/http-mutations-audit-coverage
 | POST | `/api/compras/:id/cancel` | `orden_compra_cancel` | `resourceId` del path |
 | POST | `/api/compras/:id/receive` | `orden_compra_receive` | `resourceId` del path; `StockAjuste` motivo `compra` |
 | POST | `/api/cobranzas/recordatorios` | `cobranza_recordatorio_send` | `resource: factura`, `resourceId` = `facturaId` del body |
+| POST | `/api/ordenes-entrega` | `orden_entrega_create` | `resource: orden_entrega` |
+| PUT | `/api/ordenes-entrega/:id` | `orden_entrega_update` | `resourceId` del path; `metadata` con estado |
+| POST | `/api/ordenes-entrega/:id/iniciar-picking` | `orden_entrega_picking_start` | módulo `logistics.picking`; asigna picker |
+| POST | `/api/ordenes-entrega/:id/lista` | `orden_entrega_picking_ready` | OE → `ready` |
+| POST | `/api/repartos` | `reparto_created` | `resource: reparto` |
+| POST | `/api/repartos/:id/iniciar` | `reparto_started` | `resourceId` del path |
+| POST | `/api/repartos/:id/cerrar` | `reparto_closed` | `metadata` con resumen de cierre |
+| POST | `/api/repartos/:id/ubicacion` | `reparto_ubicacion_recorded` | módulo `logistics.gps`; `metadata` lat/lng |
+| PUT | `/api/repartos/:repartoId/items/:itemId` | `reparto_item_pod_signed` | POD en ítem; `resource: reparto_item` |
+
+Las filas de logística anteriores tienen cobertura automática en [`tests/server/http-mutations-audit-coverage.test.ts`](../../../tests/server/http-mutations-audit-coverage.test.ts) (picking, repartos, GPS, POD).
 
 ## Consulta del registro de auditoría (#67)
 

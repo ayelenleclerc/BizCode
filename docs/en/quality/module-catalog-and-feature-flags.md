@@ -20,6 +20,17 @@
 - **Pricing and trials (#226):** [`src/lib/modules/pricing.ts`](../../../src/lib/modules/pricing.ts) (`PLAN_BASE_MONTHLY_ARS`, `estimateTenantMonthlyPrice`); `GET /api/superadmin/tenants/:id/pricing` ([`TenantPricingService`](../../../server/services/TenantPricingService.ts)); `TenantModuleTrial` + `GET/POST/DELETE .../trials` ([`TenantTrialService`](../../../server/services/TenantTrialService.ts)); job `npm run modules:trial-expire` ([`scripts/module-trial-expire-job.ts`](../../../scripts/module-trial-expire-job.ts)); notification `module_trial_expiring` to tenant owners; UI pricing panel and trial controls on `TenantModulesPage`.
 - **SaaS plans (#181):** `Plan` / `TenantPlan` models; catalog [`src/lib/plans/catalog.ts`](../../../src/lib/plans/catalog.ts); `GET /api/planes`, `GET /api/me/plan`, `POST /api/superadmin/tenants/:id/plan`; `requirePlanFeature` middleware and hard limits on `POST /api/users` / `POST /api/facturas`; `PlanProvider` / `PlanGate`; plan selector on `TenantDetailPage`. External payment (MP) **out of scope** in this slice.
 
+## Logistics modules (#140–#144)
+
+| Module key | Catalog label | UI / API gate (evidence) |
+|------------|---------------|---------------------------|
+| `logistics.dispatches` | Repartos | `ModuleRoute` on `/logistica`, `/logistica/repartos`, `/logistica/repartos/chofer`; nav in [`navSections.ts`](../../../src/components/layout/navSections.ts); `/api/repartos` routes (no `requireModule` on base CRUD — permission `logistics.read` / dispatch permissions) |
+| `logistics.picking` | Picking | `ModuleRoute` on `/logistica/picking`; `requireModule('logistics.picking')` on picking endpoints in [`registerOrdenesEntregaRoutes.ts`](../../../server/routes/registerOrdenesEntregaRoutes.ts) |
+| `logistics.pod` | POD firma | `hasModule('logistics.pod')` in chofer wizard and tracking panel; POD `PUT` on reparto items (permissions `orders.deliver.confirm`) |
+| `logistics.gps` | Tracking GPS | `ModuleRoute` on `/logistica/seguimiento`; `requireModule('logistics.gps')` on `activos` / `ubicacion` / `ubicacion/ultima` in [`registerRepartosRoutes.ts`](../../../server/routes/registerRepartosRoutes.ts) |
+
+Dependencies (from [`catalog.ts`](../../../src/lib/modules/catalog.ts)): `logistics.picking` → `logistics.dispatches` + `inventory.stock`; `logistics.pod` and `logistics.gps` → `logistics.dispatches`. Retention job: `npm run reparto-ubicacion:purge` ([`scripts/reparto-ubicacion-purge-job.ts`](../../../scripts/reparto-ubicacion-purge-job.ts)).
+
 ## `requiredInProd` (Argentina)
 
 `billing.afip_cae` has `requiredInProd: true`: it must stay enabled when `deploymentEnv` is `prod`. In `dev`, super_admin may disable it for AFIP-free testing. Core modules (`core.*`) use `required: true` in all environments.

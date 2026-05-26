@@ -20,6 +20,17 @@
 - **Pricing e trials (#226):** [`src/lib/modules/pricing.ts`](../../../src/lib/modules/pricing.ts); `GET /api/superadmin/tenants/:id/pricing`; modelo `TenantModuleTrial` e `GET/POST/DELETE .../trials`; job `npm run modules:trial-expire`; notificação `module_trial_expiring` para owners; painel de preço e controles de trial em `TenantModulesPage`.
 - **Planos SaaS (#181):** modelos `Plan` / `TenantPlan`; catálogo [`src/lib/plans/catalog.ts`](../../../src/lib/plans/catalog.ts); `GET /api/planes`, `GET /api/me/plan`, `POST /api/superadmin/tenants/:id/plan`; middleware `requirePlanFeature` e limites em `POST /api/users` / `POST /api/facturas`; `PlanProvider` / `PlanGate`; seletor de plano em `TenantDetailPage`. Cobrança externa (MP) **fora de escopo** neste slice.
 
+## Módulos de logística (#140–#144)
+
+| Chave | Rótulo no catálogo | Porta UI / API (evidência) |
+|-------|-------------------|----------------------------|
+| `logistics.dispatches` | Repartos | `ModuleRoute` em `/logistica`, `/logistica/repartos`, `/logistica/repartos/chofer`; nav em [`navSections.ts`](../../../src/components/layout/navSections.ts); rotas `/api/repartos` (RBAC, sem `requireModule` no CRUD base) |
+| `logistics.picking` | Picking | `ModuleRoute` em `/logistica/picking`; `requireModule('logistics.picking')` nos endpoints de picking em [`registerOrdenesEntregaRoutes.ts`](../../../server/routes/registerOrdenesEntregaRoutes.ts) |
+| `logistics.pod` | POD firma | `hasModule('logistics.pod')` no wizard motorista e painel; `PUT` POD nos itens |
+| `logistics.gps` | Tracking GPS | `ModuleRoute` em `/logistica/seguimiento`; `requireModule('logistics.gps')` em `activos` / `ubicacion` / `ubicacion/ultima` em [`registerRepartosRoutes.ts`](../../../server/routes/registerRepartosRoutes.ts) |
+
+Dependências ([`catalog.ts`](../../../src/lib/modules/catalog.ts)): `logistics.picking` → `logistics.dispatches` + `inventory.stock`; `logistics.pod` e `logistics.gps` → `logistics.dispatches`. Job de retenção: `npm run reparto-ubicacion:purge`.
+
 ## `requiredInProd` (Argentina)
 
 `billing.afip_cae` tem `requiredInProd: true`: deve permanecer ativo quando `deploymentEnv` é `prod`. Em `dev`, super_admin pode desativá-lo para testes sem AFIP. Módulos core (`core.*`) usam `required: true` em todos os ambientes.

@@ -77,4 +77,32 @@ Format: **Given / When / Then** acceptance checks are **manual** unless linked a
   - Given `orders.create`, when I submit a new order, then `POST /api/ordenes-entrega` creates a row.
 - **Evidence:** `src/pages/logistica/`, `registerOrdenesEntregaRoutes.ts`.
 
+## US-10 — Warehouse picking
+
+- **Story:** As warehouse staff, I want to pick orders from a queue and mark them ready for dispatch.
+- **Acceptance:**
+  - Given `orders.pick` and `logistics.picking`, when I take an OE and complete the checklist, then estado becomes `ready`.
+- **Evidence:** `src/pages/logistica/picking/`, picking endpoints on `registerOrdenesEntregaRoutes.ts`.
+
+## US-11 — Delivery routes
+
+- **Story:** As a planner, I want to group ready OEs into a route, start it, and close it when done.
+- **Acceptance:**
+  - Given `orders.dispatch` and `logistics.dispatches`, when I create and start a route, then reparto is `on_route` and OEs are linked.
+- **Evidence:** `src/pages/logistica/repartos/`, `registerRepartosRoutes.ts`.
+
+## US-12 — Proof of delivery
+
+- **Story:** As a driver, I want to confirm each stop with a signature so dispatch has proof.
+- **Acceptance:**
+  - Given `orders.deliver.confirm` and `logistics.pod`, when I submit POD for an item, then item is `delivered` and proof is retrievable.
+- **Evidence:** `src/pages/logistica/repartos/chofer/`, `PUT .../items/{itemId}`, `GET .../pod`.
+
+## US-13 — Live GPS tracking
+
+- **Story:** As a planner, I want to see active routes on a map; as a driver, I want my location sent while on route.
+- **Acceptance:**
+  - Given `logistics.gps`, when a route is `on_route`, then planner map shows last position; driver posts location periodically.
+- **Evidence:** `src/pages/logistica/seguimiento/`, `RepartoUbicacionService.ts`, `GET /api/repartos/activos`.
+
 **Other languages:** [Español](../../es/specs/historias-usuario-criterios-aceptacion.md) · [Português](../../pt-br/specs/historias-usuario-criterios-aceptacao.md)

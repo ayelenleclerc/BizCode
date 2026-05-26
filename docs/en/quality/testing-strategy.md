@@ -91,16 +91,32 @@ App.a11y.test.tsx       ← axe smoke on initial route (API mocked)
 tests/api/
   contract.test.ts      ← HTTP contract + 500 responses (Prisma mocked)
   validate-openapi-response.ts  ← Ajv against docs/api/openapi.yaml
+  repartos.test.ts      ← Repartos + GPS ubicacion/activos (mocked Prisma)
+  ordenes-entrega.test.ts ← Delivery orders + picking (mocked Prisma)
 tests/server/
   server.test.ts        ← `server.ts` bootstrap (Prisma mocked; see ADR-0005)
+  services/repartoUbicacionService.test.ts ← GPS retention and role gates
 e2e/
   smoke.spec.ts         ← Playwright smoke (production bundle via vite preview)
 tests/integration/
   api.integration.test.ts  ← HTTP + real Prisma against PostgreSQL (`npm run test:integration`; excluded from default Vitest)
   dbf-migration.integration.test.ts ← Generates minimal DBF fixtures at runtime and validates `scripts/migrate-from-dbf.ts` against PostgreSQL
+  repartos.integration.test.ts ← Delivery routes with real Prisma when `DATABASE_URL` is set
 ```
 
 Vitest **excludes** `e2e/**` (`vitest.config.ts`) so files under `e2e/` are only executed by Playwright. **`tests/integration/**`** is excluded from the default Vitest run (no `DATABASE_URL` required for `npm run test:coverage`); integration tests use `vitest.integration.config.ts`.
+
+### Logistics API evidence (#140–#144)
+
+| Area | Test files | Notes |
+|------|------------|--------|
+| Delivery routes | `tests/api/repartos.test.ts`, `tests/api/contract.test.ts` | CRUD, iniciar/cerrar, POD item, OpenAPI paths |
+| GPS tracking | `tests/api/repartos.test.ts`, `tests/server/services/repartoUbicacionService.test.ts`, contract paths `/api/repartos/activos`, `.../ubicacion` | Module gate `logistics.gps`; `TEST_DEFAULT_MODULES` in [`server/middleware/tenantModules.ts`](../../../server/middleware/tenantModules.ts) |
+| Warehouse picking | `tests/api/ordenes-entrega.test.ts`, contract `iniciar-picking` / `lista` | Module `logistics.picking` |
+| Audit matrix (#84) | `tests/server/http-mutations-audit-coverage.test.ts` | Picking, repartos, GPS `ubicacion`, POD `reparto_item_pod_signed` |
+| Integration | `tests/integration/repartos.integration.test.ts` | Optional; requires migrated PostgreSQL |
+
+Contract tests mock Prisma; they validate HTTP status and OpenAPI response shapes. Service unit tests cover purge (7-day retention) and role gates without a database.
 
 ## Mocking Strategy
 

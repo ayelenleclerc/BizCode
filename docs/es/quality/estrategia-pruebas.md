@@ -90,9 +90,22 @@ tests/server/server.test.ts  ← arranque `server.ts` (Prisma mock; ADR-0005)
 e2e/smoke.spec.ts
 tests/integration/api.integration.test.ts  ← HTTP + Prisma real (`npm run test:integration`; excluido del Vitest por defecto)
 tests/integration/dbf-migration.integration.test.ts  ← genera fixtures DBF mínimos en runtime y valida `scripts/migrate-from-dbf.ts` sobre PostgreSQL
+tests/integration/repartos.integration.test.ts  ← repartos con Prisma real si hay `DATABASE_URL`
+tests/api/repartos.test.ts, ordenes-entrega.test.ts  ← repartos, GPS y picking (Prisma mock)
+tests/server/services/repartoUbicacionService.test.ts  ← retención GPS 7 días y roles
 ```
 
-Vitest **excluye** `e2e/**` (`vitest.config.ts`) para que solo Playwright ejecute esos archivos. **`tests/integration/**`** queda fuera del `npm run test:coverage` (no exige `DATABASE_URL`); integración usa `vitest.integration.config.ts`.
+Vitest **excluye** `e2e/**` (`vitest.config.ts`) para que solo Playwright ejecute esos archivos.
+
+### Evidencia API logística (#140–#144)
+
+| Área | Archivos de prueba | Notas |
+|------|-------------------|--------|
+| Repartos | `tests/api/repartos.test.ts`, `tests/api/contract.test.ts` | CRUD, iniciar/cerrar, POD, contrato OpenAPI |
+| GPS | `repartoUbicacionService.test.ts`, rutas `activos` / `ubicacion` | Módulo `logistics.gps`; `TEST_DEFAULT_MODULES` en `tenantModules.ts` |
+| Picking | `tests/api/ordenes-entrega.test.ts` | Módulo `logistics.picking` |
+| Matriz auditoría (#84) | `tests/server/http-mutations-audit-coverage.test.ts` | Picking, repartos, GPS, POD |
+| Integración | `tests/integration/repartos.integration.test.ts` | Opcional; PostgreSQL migrado | **`tests/integration/**`** queda fuera del `npm run test:coverage` (no exige `DATABASE_URL`); integración usa `vitest.integration.config.ts`.
 
 ## Estrategia de mocks
 

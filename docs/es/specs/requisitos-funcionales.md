@@ -26,5 +26,9 @@ Los requisitos siguientes están **evidenciados** por UI (`src/pages/`), cliente
 | RF-013 | Antigüedad de saldos y cuenta corriente por cliente. | `src/pages/finanzas/`, `GET /api/reportes/aging`, cuenta corriente |
 | RF-014 | Reportes operativos y financieros con exportación CSV opcional. | `src/pages/reportes/`, `/api/reportes/*` |
 | RF-015 | Órdenes de entrega: listar, crear y actualizar estado (planificador/conductor según RBAC). | `src/pages/logistica/`, `/api/ordenes-entrega` |
+| RF-016 | Picking en depósito: cola, iniciar picking, checklist, marcar listo (`logistics.picking`). | `src/pages/logistica/picking/`, `POST .../iniciar-picking`, `POST .../lista` |
+| RF-017 | Repartos: planificar, iniciar y cerrar; secuencia de OE en `ready`. | `src/pages/logistica/repartos/`, `GET/POST /api/repartos`, `POST .../iniciar`, `POST .../cerrar` |
+| RF-018 | POD en ítems de reparto: wizard chofer; vista de comprobante en back-office. | `src/pages/logistica/repartos/chofer/`, `PUT .../items/{itemId}`, `GET .../pod` |
+| RF-019 | Seguimiento GPS en vivo: mapa planificador; chofer envía ubicación cada 2 min (`logistics.gps`). | `src/pages/logistica/seguimiento/`, `GET /api/repartos/activos`, `POST .../ubicacion` |
 
 **Otros idiomas:** [English](../../en/specs/functional-requirements.md) · [Português](../../pt-br/specs/functional-requirements.md)

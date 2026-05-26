@@ -20,5 +20,9 @@
 | CU-07 | Revisar CxC y cuenta corriente | Ver buckets de antigüedad → cargar cuenta corriente por id de cliente. | `src/pages/finanzas/` |
 | CU-08 | Ejecutar reportes operativos | Elegir período/pestaña → ver ventas, stock crítico o cobranzas; exportar CSV. | `src/pages/reportes/` |
 | CU-09 | Gestionar órdenes de entrega | Filtrar órdenes → crear o actualizar estado (planificador/conductor según RBAC). | `src/pages/logistica/` |
+| CU-10 | Picking en depósito | Tomar OE de la cola → checklist → marcar listo. | `src/pages/logistica/picking/` |
+| CU-11 | Planificar reparto | Seleccionar OE listas → crear reparto → iniciar → cerrar. | `src/pages/logistica/repartos/` |
+| CU-12 | POD chofer | Confirmar entrega por parada con firma. | `src/pages/logistica/repartos/chofer/` |
+| CU-13 | Seguimiento GPS | Planificador ve mapa; chofer envía ubicación en ruta. | `src/pages/logistica/seguimiento/` |
 
 **Otros idiomas:** [English](../../en/specs/use-cases.md) · [Português](../../pt-br/specs/casos-de-uso.md)

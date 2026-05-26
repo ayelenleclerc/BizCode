@@ -26,5 +26,9 @@ Executar em registro de sessão usando [certificacion-iso/modelos-registros.md](
 | TC-013 | Aging contas a receber | `reports.financial.read` | Abrir Finanças | Faixas visíveis | `finanzas/index` |
 | TC-014 | Exportar CSV relatório | Aba com dados | Controle Exportar CSV | Download do arquivo | `reportes/index` |
 | TC-015 | Lista ordens de entrega | `logistics.read` | Abrir Logística → filtrar data | Tabela de ordens carrega | `logistica/index` |
+| TC-016 | Fluxo picking | `orders.pick`, `logistics.picking` | Abrir Picking → pegar OE → checklist → pronto | OE em `ready`; visível ao planejador | `logistica/picking` |
+| TC-017 | Criar reparto | `orders.dispatch`, `logistics.dispatches` | Repartos → criar com OE prontas → iniciar | Reparto `on_route` | `logistica/repartos` |
+| TC-018 | POD motorista | `orders.deliver.confirm`, `logistics.pod` | App motorista → entregar parada com assinatura | Item `delivered`; `hasPod` no back-office | `logistica/repartos/chofer` |
+| TC-019 | Rastreamento GPS | `logistics.gps`, papel planejador | Mapa Seguimiento carrega; reparto `on_route` visível | Marcador ou estado vazio; barra lateral atualiza | `logistica/seguimiento` |
 
 **Outros idiomas:** [English](../../en/specs/manual-test-cases.md) · [Español](../../es/specs/casos-de-prueba-manual.md)
