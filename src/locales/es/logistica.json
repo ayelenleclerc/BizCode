@@ -10,11 +10,15 @@
   },
   "estado": {
     "pending": "Pendiente",
+    "picking": "En preparación",
+    "ready": "Lista",
     "assigned": "Asignada",
     "in_transit": "En camino",
     "delivered": "Entregada",
-    "failed": "Fallida"
+    "failed": "Fallida",
+    "cancelled": "Cancelada"
   },
+  "linkPicking": "Picking en depósito",
   "table": {
     "cliente": "Cliente",
     "fecha": "Fecha",

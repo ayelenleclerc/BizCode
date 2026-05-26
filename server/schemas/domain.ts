@@ -625,7 +625,16 @@ export const cobroBodySchema = z
     }
   })
 
-const ORDEN_ENTREGA_ESTADOS = ['pending', 'assigned', 'in_transit', 'delivered', 'failed'] as const
+const ORDEN_ENTREGA_ESTADOS = [
+  'pending',
+  'picking',
+  'ready',
+  'assigned',
+  'in_transit',
+  'delivered',
+  'failed',
+  'cancelled',
+] as const
 
 export const ordenEntregaCreateBodySchema = z
   .object({

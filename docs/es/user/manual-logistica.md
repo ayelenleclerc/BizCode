@@ -11,7 +11,7 @@ Requiere **`logistics.read`** o **`orders.deliver.confirm`**. Los conductores (`
 | Filtro | Descripción |
 |--------|-------------|
 | Fecha | Fecha de entrega (predeterminada: hoy). |
-| Estado | `pending`, `assigned`, `in_transit`, `delivered`, `failed`, o todos. |
+| Estado | `pending`, `picking`, `ready`, `assigned`, `in_transit`, `delivered`, `failed`, `cancelled`, o todos. |
 | Zona | Zona de entrega (vista planificador). |
 
 ## Crear una orden
@@ -21,6 +21,19 @@ Con **`orders.create`**, abra el formulario de nueva orden, ingrese id de client
 ## Actualizar estado
 
 Usuarios con **`orders.dispatch`** o **`orders.deliver.confirm`** pueden cambiar el estado de la orden según los controles de la UI (`PUT /api/ordenes-entrega/:id`).
+
+## Picking en depósito
+
+Abra **Picking** (`/logistica/picking`) desde el menú lateral o el enlace en la página de logística. Requiere el módulo **`logistics.picking`**, permiso **`orders.pick`** y roles como **`warehouse_op`** o **`warehouse_lead`**.
+
+| Paso | Acción |
+|------|--------|
+| Cola | OEs en estado `pending`, ordenadas por zona y fecha |
+| Tomar | `POST /api/ordenes-entrega/{id}/iniciar-picking` → `picking` (asigna al operario de sesión) |
+| Checklist | Ítems de la factura vinculada (si existe); confirmación en UI |
+| Lista | `POST /api/ordenes-entrega/{id}/lista` → `ready` |
+
+Una OE en `picking` queda bloqueada para otros operarios (`409 PICKING_ASSIGNED_TO_OTHER_USER`). El líder de depósito ve las OEs `ready` y planifica el reparto en **Repartos**.
 
 ## Repartos
 
@@ -35,7 +48,7 @@ Abra **Repartos** desde el enlace en la página de logística o navegue a `/logi
 
 | Paso | Acción |
 |------|--------|
-| Planificar | `POST /api/repartos` — chofer, vehículo/notas opcionales, OEs pendientes en secuencia (UI con arrastre y teclado); las OEs pasan a `assigned` con `driverId` |
+| Planificar | `POST /api/repartos` — chofer, vehículo/notas opcionales, OEs en estado **`ready`** en secuencia (UI con arrastre y teclado); las OEs pasan a `assigned` con `driverId` |
 | Iniciar | `POST /api/repartos/{id}/iniciar` — `planned` → `on_route`; OEs de ítems pendientes → `in_transit` |
 | Cerrar | `POST /api/repartos/{id}/cerrar` — `on_route` → `completed`; ítems `pending` → `not_delivered` y OEs vinculadas → `failed` |
 

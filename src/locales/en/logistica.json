@@ -10,11 +10,15 @@
   },
   "estado": {
     "pending": "Pending",
+    "picking": "Picking",
+    "ready": "Ready",
     "assigned": "Assigned",
     "in_transit": "In transit",
     "delivered": "Delivered",
-    "failed": "Failed"
+    "failed": "Failed",
+    "cancelled": "Cancelled"
   },
+  "linkPicking": "Warehouse picking",
   "table": {
     "cliente": "Customer",
     "fecha": "Date",

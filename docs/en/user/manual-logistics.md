@@ -11,7 +11,7 @@ Requires **`logistics.read`** or **`orders.deliver.confirm`**. Drivers (`role: d
 | Filter | Description |
 |--------|-------------|
 | Date | Delivery date (default: today). |
-| Status | `pending`, `assigned`, `in_transit`, `delivered`, `failed`, or all. |
+| Status | `pending`, `picking`, `ready`, `assigned`, `in_transit`, `delivered`, `failed`, `cancelled`, or all. |
 | Zone | Delivery zone (planner view). |
 
 ## Create an order
@@ -21,6 +21,19 @@ With **`orders.create`**, open the new-order form, enter customer id, date, opti
 ## Update status
 
 Users with **`orders.dispatch`** or **`orders.deliver.confirm`** can change order state per UI controls (`PUT /api/ordenes-entrega/:id`).
+
+## Warehouse picking
+
+Open **Picking** (`/logistica/picking`) from the sidebar or the logistics page link. Requires module **`logistics.picking`**, permission **`orders.pick`**, and roles such as **`warehouse_op`** or **`warehouse_lead`**.
+
+| Step | Action |
+|------|--------|
+| Queue | OEs in `pending`, sorted by zone and date |
+| Claim | `POST /api/ordenes-entrega/{id}/iniciar-picking` → `picking` (session user as picker) |
+| Checklist | Invoice line items when linked; confirmed in UI |
+| Ready | `POST /api/ordenes-entrega/{id}/lista` → `ready` |
+
+An OE in `picking` is locked for other operators (`409 PICKING_ASSIGNED_TO_OTHER_USER`). The warehouse lead sees `ready` OEs and plans routes under **Delivery routes**.
 
 ## Delivery routes (repartos)
 
@@ -35,7 +48,7 @@ Open **Delivery routes** from the logistics page link or navigate to `/logistica
 
 | Step | Action |
 |------|--------|
-| Plan | `POST /api/repartos` — select driver, optional vehicle/notes, assign pending delivery orders in sequence (UI supports drag-and-drop and keyboard reorder); OEs become `assigned` with `driverId` |
+| Plan | `POST /api/repartos` — select driver, optional vehicle/notes, assign **`ready`** delivery orders in sequence (UI supports drag-and-drop and keyboard reorder); OEs become `assigned` with `driverId` |
 | Start | `POST /api/repartos/{id}/iniciar` — `planned` → `on_route`; pending items' OEs → `in_transit` |
 | Close | `POST /api/repartos/{id}/cerrar` — `on_route` → `completed`; items still `pending` → `not_delivered` and linked OEs → `failed` |
 

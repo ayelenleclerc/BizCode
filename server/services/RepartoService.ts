@@ -152,7 +152,7 @@ export class RepartoService {
     }
 
     for (const oe of ordenes) {
-      if (oe.estado !== 'pending') {
+      if (oe.estado !== 'ready') {
         return { ok: false, status: 422, error: 'INVALID_LINE_ITEM' }
       }
     }

@@ -87,7 +87,12 @@ describe('API — repartos integración PostgreSQL', () => {
     ordenEntregaId = orden.id
   })
 
-  it('crear → iniciar → cerrar deja OE pendiente en failed', async () => {
+  it('picking → crear reparto → iniciar → cerrar deja OE en failed', async () => {
+    process.env.BIZCODE_TEST_ROLE = 'warehouse_op'
+    await request(app).post(`/api/ordenes-entrega/${ordenEntregaId}/iniciar-picking`).expect(200)
+    await request(app).post(`/api/ordenes-entrega/${ordenEntregaId}/lista`).expect(200)
+
+    process.env.BIZCODE_TEST_ROLE = 'logistics_planner'
     const createRes = await request(app)
       .post('/api/repartos')
       .send({

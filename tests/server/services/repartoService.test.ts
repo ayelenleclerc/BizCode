@@ -8,7 +8,7 @@ const TEST_FIRMA =
 
 const ordenPending = {
   id: 10,
-  estado: 'pending',
+  estado: 'ready',
   fecha: new Date('2026-05-20'),
 }
 

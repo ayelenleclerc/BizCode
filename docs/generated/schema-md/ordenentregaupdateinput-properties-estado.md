@@ -21,7 +21,10 @@ undefined#/properties/estado
 | Value          | Explanation |
 | :------------- | :---------- |
 | `"pending"`    |             |
+| `"picking"`    |             |
+| `"ready"`      |             |
 | `"assigned"`   |             |
 | `"in_transit"` |             |
 | `"delivered"`  |             |
 | `"failed"`     |             |
+| `"cancelled"`  |             |

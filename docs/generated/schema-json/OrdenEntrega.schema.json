@@ -21,10 +21,13 @@
     "estado": {
       "enum": [
         "pending",
+        "picking",
+        "ready",
         "assigned",
         "in_transit",
         "delivered",
-        "failed"
+        "failed",
+        "cancelled"
       ],
       "type": "string"
     },
@@ -44,7 +47,32 @@
     "id": {
       "type": "integer"
     },
+    "items": {
+      "items": {
+        "$ref": "./OrdenEntregaLineItem.schema.json"
+      },
+      "type": "array"
+    },
     "nota": {
+      "nullable": true,
+      "type": "string"
+    },
+    "picker": {
+      "additionalProperties": true,
+      "nullable": true,
+      "type": "object"
+    },
+    "pickerUserId": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "pickingIniciadoAt": {
+      "format": "date-time",
+      "nullable": true,
+      "type": "string"
+    },
+    "pickingListoAt": {
+      "format": "date-time",
       "nullable": true,
       "type": "string"
     },

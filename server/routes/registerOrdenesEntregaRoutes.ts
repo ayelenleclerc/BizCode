@@ -1,6 +1,7 @@
 import type { Application, NextFunction, Request, Response } from 'express'
 import { hasPermission, type Permission } from '../../src/lib/rbac'
 import { requirePermission, type AuthenticatedRequest } from '../auth'
+import { requireModule } from '../middleware/requireModule'
 import { validateBody } from '../middleware/validateBody'
 import type { OrdenEntregaCreateInput, OrdenEntregaEstado, OrdenEntregaUpdateBody } from '../createApp.types'
 import {
@@ -33,6 +34,7 @@ function parseOptionalPositiveInt(value: unknown): number | undefined {
 export function registerOrdenesEntregaRoutes(app: Application, ctx: RestRouteContext): void {
   const { services, writeAudit } = ctx
   const ordenEntrega: OrdenEntregaService = services.ordenEntrega
+  const pickingModule = requireModule('logistics.picking')
 
   app.get(
     '/api/ordenes-entrega',
@@ -41,7 +43,8 @@ export function registerOrdenesEntregaRoutes(app: Application, ctx: RestRouteCon
       const role = authReq.auth!.claims.role
       if (
         hasPermission(role, 'logistics.read' as Permission) ||
-        hasPermission(role, 'orders.deliver.confirm' as Permission)
+        hasPermission(role, 'orders.deliver.confirm' as Permission) ||
+        hasPermission(role, 'orders.pick' as Permission)
       ) {
         next()
         return
@@ -173,6 +176,71 @@ export function registerOrdenesEntregaRoutes(app: Application, ctx: RestRouteCon
           driverId: orden.driverId,
         })
         res.json({ success: true, data: orden })
+      } catch (err: unknown) {
+        res.status(500).json({ success: false, error: errorMessage(err) })
+      }
+    },
+  )
+
+  app.post(
+    '/api/ordenes-entrega/:id/iniciar-picking',
+    pickingModule,
+    requirePermission('orders.pick'),
+    async (req: Request, res: Response) => {
+      try {
+        const authReq = req as AuthenticatedRequest
+        const tenantId = getTenantId(req)
+        const id = Number.parseInt(String(req.params.id), 10)
+        if (!Number.isFinite(id) || id < 1) {
+          res.status(400).json({ success: false, error: 'Invalid orden entrega id' })
+          return
+        }
+        const result = await ordenEntrega.iniciarPicking(tenantId, id, authReq.auth!.claims.userId)
+        if (!result.ok) {
+          res.status(result.status).json({ success: false, error: result.error })
+          return
+        }
+        await writeAudit(authReq, 'orden_entrega_picking_start', 'orden_entrega', String(result.data.id), {
+          pickerUserId: result.data.pickerUserId,
+          estado: result.data.estado,
+        })
+        res.json({ success: true, data: result.data })
+      } catch (err: unknown) {
+        res.status(500).json({ success: false, error: errorMessage(err) })
+      }
+    },
+  )
+
+  app.post(
+    '/api/ordenes-entrega/:id/lista',
+    pickingModule,
+    requirePermission('orders.pick'),
+    async (req: Request, res: Response) => {
+      try {
+        const authReq = req as AuthenticatedRequest
+        const tenantId = getTenantId(req)
+        const id = Number.parseInt(String(req.params.id), 10)
+        if (!Number.isFinite(id) || id < 1) {
+          res.status(400).json({ success: false, error: 'Invalid orden entrega id' })
+          return
+        }
+        const role = authReq.auth!.claims.role
+        const allowLeadOverride = role === 'warehouse_lead'
+        const result = await ordenEntrega.marcarLista(
+          tenantId,
+          id,
+          authReq.auth!.claims.userId,
+          allowLeadOverride,
+        )
+        if (!result.ok) {
+          res.status(result.status).json({ success: false, error: result.error })
+          return
+        }
+        await writeAudit(authReq, 'orden_entrega_picking_ready', 'orden_entrega', String(result.data.id), {
+          pickerUserId: result.data.pickerUserId,
+          estado: result.data.estado,
+        })
+        res.json({ success: true, data: result.data })
       } catch (err: unknown) {
         res.status(500).json({ success: false, error: errorMessage(err) })
       }

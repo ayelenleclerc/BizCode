@@ -72,7 +72,7 @@ Células vazias: a etapa não tem permissão RBAC dedicada; o papel pode partici
 | Cobranças / pagamentos | Modelo `Cobro`; `POST/GET /api/cobros`; UI `/cobros`; dashboard `cobrosHoy`; cobranças recentes no formulário de cliente | Vincular à entidade pedido quando existir BP1-1 |
 | UI / finanças contas a receber | `/finanzas`; `GET /api/reportes/aging`, `GET /api/reportes/cuenta-corriente/:clienteId` | Fluxos de cobrança conforme backlog |
 | Relatórios | `/reportes`; `GET /api/reportes/ventas`, `stock-critico`, `cobranzas` (JSON ou CSV) | Tipos adicionais de relatório |
-| Logística | `/logistica`; `OrdenEntrega`; `GET/POST/PUT /api/ordenes-entrega` | Ciclo de vida completo do pedido (BP1-1) |
+| Logística | `/logistica`, `/logistica/picking` (#143); `OrdenEntrega`; `GET/POST/PUT /api/ordenes-entrega`, `POST .../iniciar-picking`, `POST .../lista` | OE: `pending` → `picking` → `ready` → `assigned` (reparto) → `in_transit` → `delivered` \| `failed` \| `cancelled` |
 | Entidade pedido (`pedido`) | Modelos `Pedido`/`PedidoItem`, `/api/pedidos`, UI `/pedidos` (#132); `requireModule('billing.orders')` (#223) | Estados `packed`…`collected` e transições genéricas (#65 / BP1-1 completo) |
 | Permissões `orders.*` | Definidas no RBAC; aplicadas em `/api/ordenes-entrega` | Estender quando a entidade `pedido` existir |
 

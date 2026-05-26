@@ -13,14 +13,18 @@ const ORDEN_BASE = {
   clienteId: 1,
   zonaId: 10,
   driverId: 5,
+  pickerUserId: null,
+  pickingIniciadoAt: null,
+  pickingListoAt: null,
   fecha: new Date('2026-05-16T12:00:00.000Z'),
   estado: 'in_transit',
   nota: null,
   createdAt: new Date(),
   updatedAt: new Date(),
   cliente: CLIENTE_REF,
-  zona: { id: 10, nombre: 'Norte' },
+  zona: { id: 10, nombre: 'Norte', horario: null },
   driver: DRIVER_USER,
+  picker: null,
   factura: null,
 }
 
@@ -113,6 +117,14 @@ describe('GET /api/ordenes-entrega', () => {
     expect(res.body.success).toBe(true)
     expect(res.body.data).toHaveLength(1)
     expect(res.body.data[0].estado).toBe('in_transit')
+    expect(res.body.data[0].items).toEqual([])
+  })
+
+  it('allows warehouse_op with orders.pick', async () => {
+    process.env.BIZCODE_TEST_ROLE = 'warehouse_op'
+    const app = createApp(buildPrismaMock())
+    await request(app).get('/api/ordenes-entrega').expect(200)
+    delete process.env.BIZCODE_TEST_ROLE
   })
 
   it('returns 403 for billing role', async () => {
@@ -257,5 +269,120 @@ describe('PUT /api/ordenes-entrega/:id', () => {
     const app = createApp(prisma)
     await request(app).put('/api/ordenes-entrega/1').send({ estado: 'delivered' }).expect(403)
     delete process.env.BIZCODE_TEST_ROLE
+  })
+})
+
+describe('POST /api/ordenes-entrega/:id/iniciar-picking', () => {
+  beforeEach(() => {
+    process.env.NODE_ENV = 'test'
+    process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
+    process.env.BIZCODE_TEST_ROLE = 'warehouse_op'
+    process.env.BIZCODE_TEST_USER_ID = '7'
+  })
+
+  it('starts picking from pending', async () => {
+    const update = vi.fn().mockResolvedValue({
+      ...ORDEN_BASE,
+      id: 1,
+      estado: 'picking',
+      pickerUserId: 7,
+      pickingIniciadoAt: new Date(),
+      picker: { id: 7, username: 'wh1', role: 'warehouse_op' },
+    })
+    const prisma = buildPrismaMock({
+      ordenEntrega: {
+        count: vi.fn(),
+        findMany: vi.fn(),
+        findFirst: vi.fn().mockResolvedValue({ ...ORDEN_BASE, estado: 'pending', driverId: null }),
+        create: vi.fn(),
+        update,
+      },
+    })
+    const app = createApp(prisma)
+    const res = await request(app).post('/api/ordenes-entrega/1/iniciar-picking').expect(200)
+    expect(res.body.data.estado).toBe('picking')
+    expect(res.body.data.items).toEqual([])
+    expect(prisma.auditEvent.create).toHaveBeenCalled()
+  })
+
+  it('returns 409 when another picker holds the order', async () => {
+    const prisma = buildPrismaMock({
+      ordenEntrega: {
+        count: vi.fn(),
+        findMany: vi.fn(),
+        findFirst: vi.fn().mockResolvedValue({
+          ...ORDEN_BASE,
+          estado: 'picking',
+          pickerUserId: 99,
+          driverId: null,
+        }),
+        create: vi.fn(),
+        update: vi.fn(),
+      },
+    })
+    const app = createApp(prisma)
+    const res = await request(app).post('/api/ordenes-entrega/1/iniciar-picking').expect(409)
+    expect(res.body.error).toBe('PICKING_ASSIGNED_TO_OTHER_USER')
+  })
+
+  it('returns 403 without orders.pick', async () => {
+    process.env.BIZCODE_TEST_ROLE = 'billing'
+    const app = createApp(buildPrismaMock())
+    await request(app).post('/api/ordenes-entrega/1/iniciar-picking').expect(403)
+    delete process.env.BIZCODE_TEST_ROLE
+  })
+})
+
+describe('POST /api/ordenes-entrega/:id/lista', () => {
+  beforeEach(() => {
+    process.env.NODE_ENV = 'test'
+    process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
+    process.env.BIZCODE_TEST_ROLE = 'warehouse_op'
+    process.env.BIZCODE_TEST_USER_ID = '7'
+  })
+
+  it('marks order ready when picker matches', async () => {
+    const update = vi.fn().mockResolvedValue({
+      ...ORDEN_BASE,
+      estado: 'ready',
+      pickerUserId: 7,
+      pickingListoAt: new Date(),
+    })
+    const prisma = buildPrismaMock({
+      ordenEntrega: {
+        count: vi.fn(),
+        findMany: vi.fn(),
+        findFirst: vi.fn().mockResolvedValue({
+          ...ORDEN_BASE,
+          estado: 'picking',
+          pickerUserId: 7,
+          driverId: null,
+        }),
+        create: vi.fn(),
+        update,
+      },
+    })
+    const app = createApp(prisma)
+    const res = await request(app).post('/api/ordenes-entrega/1/lista').expect(200)
+    expect(res.body.data.estado).toBe('ready')
+  })
+
+  it('returns 409 when picker does not match', async () => {
+    const prisma = buildPrismaMock({
+      ordenEntrega: {
+        count: vi.fn(),
+        findMany: vi.fn(),
+        findFirst: vi.fn().mockResolvedValue({
+          ...ORDEN_BASE,
+          estado: 'picking',
+          pickerUserId: 99,
+          driverId: null,
+        }),
+        create: vi.fn(),
+        update: vi.fn(),
+      },
+    })
+    const app = createApp(prisma)
+    await request(app).post('/api/ordenes-entrega/1/lista').expect(409)
   })
 })

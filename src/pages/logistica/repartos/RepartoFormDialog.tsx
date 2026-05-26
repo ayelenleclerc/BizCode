@@ -122,7 +122,7 @@ export default function RepartoFormDialog({ open, fecha, onClose, onCreated }: P
     try {
       const [usersRes, ordenesRes] = await Promise.all([
         usersAPI.list(),
-        ordenesEntregaAPI.list({ fecha, estado: 'pending', limit: 200 }),
+        ordenesEntregaAPI.list({ fecha, estado: 'ready', limit: 200 }),
       ])
       setDrivers((usersRes ?? []).filter((u) => u.role === 'driver' && u.active).map((u) => ({ id: u.id, username: u.username })))
       setPendingOrders(ordenesRes?.data ?? [])
