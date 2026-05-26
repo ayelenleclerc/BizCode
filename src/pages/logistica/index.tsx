@@ -5,6 +5,7 @@ import ErrorBoundary from '@/components/ErrorBoundary'
 import { CanAccess } from '@/components/CanAccess'
 import { useAuth } from '@/contexts/AuthContext'
 import { useFeatureFlags } from '@/contexts/FeatureFlagsContext'
+import LogisticaReportesPanel from './LogisticaReportesPanel'
 import {
   ordenesEntregaAPI,
   zonasEntregaAPI,
@@ -59,18 +60,28 @@ function LogisticaForbidden({ t }: { t: (key: string) => string }) {
   )
 }
 
+type LogisticaPageTab = 'ordenes' | 'reportes'
+
 function LogisticaPageContent() {
   const { t } = useTranslation('logistica')
+  const { t: tReportes } = useTranslation('logisticaReportes')
   const { t: tRepartos } = useTranslation('repartos')
   const { t: tSeguimiento } = useTranslation('seguimiento')
   const { claims } = useAuth()
+  const { hasModule } = useFeatureFlags()
+  const [pageTab, setPageTab] = useState<LogisticaPageTab>('ordenes')
   const isDriver = claims?.role === 'driver'
   const canDispatch = claims?.permissions.includes('orders.dispatch') ?? false
   const canDeliver = claims?.permissions.includes('orders.deliver.confirm') ?? false
   const canCreate = claims?.permissions.includes('orders.create') ?? false
   const canPick = claims?.permissions.includes('orders.pick') ?? false
-  const { hasModule } = useFeatureFlags()
   const showPickingLink = canPick && hasModule('logistics.picking')
+  const showReportesTab =
+    !isDriver &&
+    hasModule('logistics.dispatches') &&
+    (claims?.role === 'owner' ||
+      claims?.role === 'manager' ||
+      claims?.role === 'logistics_planner')
   const showSeguimientoLink =
     !isDriver &&
     hasModule('logistics.gps') &&
@@ -234,6 +245,47 @@ function LogisticaPageContent() {
         </div>
       </div>
 
+      {showReportesTab && (
+        <div
+          className="flex gap-2 mb-6 border-b border-slate-200 dark:border-slate-700"
+          role="tablist"
+          aria-label={t('tabs.label')}
+        >
+          <button
+            type="button"
+            role="tab"
+            aria-selected={pageTab === 'ordenes'}
+            onClick={() => setPageTab('ordenes')}
+            className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px ${
+              pageTab === 'ordenes'
+                ? 'border-blue-600 text-blue-600 dark:text-blue-400'
+                : 'border-transparent text-slate-600 dark:text-slate-400'
+            }`}
+            data-testid="logistica-tab-ordenes"
+          >
+            {t('tabs.ordenes')}
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={pageTab === 'reportes'}
+            onClick={() => setPageTab('reportes')}
+            className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px ${
+              pageTab === 'reportes'
+                ? 'border-blue-600 text-blue-600 dark:text-blue-400'
+                : 'border-transparent text-slate-600 dark:text-slate-400'
+            }`}
+            data-testid="logistica-tab-reportes"
+          >
+            {tReportes('tab')}
+          </button>
+        </div>
+      )}
+
+      {pageTab === 'reportes' && showReportesTab ? (
+        <LogisticaReportesPanel />
+      ) : (
+        <>
       {error && (
         <p className="mb-4 text-sm text-red-600 dark:text-red-400" role="alert">
           {error}
@@ -453,6 +505,8 @@ function LogisticaPageContent() {
             </div>
           </form>
         </div>
+      )}
+        </>
       )}
     </div>
   )

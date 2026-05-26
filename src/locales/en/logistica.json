@@ -1,5 +1,9 @@
 {
   "title": "Delivery logistics",
+  "tabs": {
+    "label": "Logistics sections",
+    "ordenes": "Orders"
+  },
   "forbidden": "You do not have permission to view delivery orders.",
   "filters": {
     "fecha": "Date",

@@ -1908,6 +1908,93 @@ export type RepartoActivo = {
   } | null
 }
 
+export type LogisticaKpis = {
+  dispatchedCount: number
+  firstVisitDeliveredCount: number
+  firstVisitRate: number | null
+  avgDeliveryMinutes: number | null
+  returnsByReason: { motivo: string; count: number }[]
+  overdueCount: number
+}
+
+export type LogisticaChoferRow = {
+  choferId: number
+  choferUsername: string
+  day: string
+  dispatched: number
+  delivered: number
+  notDelivered: number
+}
+
+export type LogisticaZonaRow = {
+  zonaId: number | null
+  zonaNombre: string
+  dispatched: number
+  delivered: number
+  notDelivered: number
+}
+
+export type LogisticaReportesParams = {
+  from: string
+  to: string
+  choferId?: number
+}
+
+export const logisticaReportesAPI = {
+  kpis: async (params: LogisticaReportesParams) => {
+    try {
+      const response = await api.get('/logistica/kpis', { params })
+      return response.data.data as LogisticaKpis
+    } catch (error) {
+      handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  reporteChoferes: async (params: LogisticaReportesParams) => {
+    try {
+      const response = await api.get('/logistica/reporte-choferes', { params })
+      return response.data.data as LogisticaChoferRow[]
+    } catch (error) {
+      handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  reporteZonas: async (params: LogisticaReportesParams) => {
+    try {
+      const response = await api.get('/logistica/reporte-zonas', { params })
+      return response.data.data as LogisticaZonaRow[]
+    } catch (error) {
+      handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  exportChoferesCsv: async (params: LogisticaReportesParams) => {
+    try {
+      const response = await api.get('/logistica/reporte-choferes', {
+        params,
+        headers: { Accept: 'text/csv' },
+        responseType: 'blob',
+      })
+      return response.data as Blob
+    } catch (error) {
+      handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  exportZonasCsv: async (params: LogisticaReportesParams) => {
+    try {
+      const response = await api.get('/logistica/reporte-zonas', {
+        params,
+        headers: { Accept: 'text/csv' },
+        responseType: 'blob',
+      })
+      return response.data as Blob
+    } catch (error) {
+      handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+}
+
 export const repartosAPI = {
   list: async (params?: {
     fecha?: string

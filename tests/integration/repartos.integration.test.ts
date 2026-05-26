@@ -32,6 +32,7 @@ describe('API — repartos integración PostgreSQL', () => {
   let prisma: PrismaClient
   let app: Application
   let driverId: number
+  let pickerUserId: number
   let ordenEntregaId: number
 
   beforeAll(async () => {
@@ -66,6 +67,19 @@ describe('API — repartos integración PostgreSQL', () => {
     })
     driverId = driver.id
 
+    const picker = await prisma.appUser.upsert({
+      where: { tenantId_username: { tenantId: 1, username: 'int-picker-140' } },
+      create: {
+        tenantId: 1,
+        username: 'int-picker-140',
+        passwordHash: 'x',
+        role: UserRole.warehouse_op,
+        active: true,
+      },
+      update: { active: true, role: UserRole.warehouse_op },
+    })
+    pickerUserId = picker.id
+
     const cliente = await prisma.cliente.create({
       data: {
         tenantId: 1,
@@ -89,9 +103,11 @@ describe('API — repartos integración PostgreSQL', () => {
 
   it('picking → crear reparto → iniciar → cerrar deja OE en failed', async () => {
     process.env.BIZCODE_TEST_ROLE = 'warehouse_op'
+    process.env.BIZCODE_TEST_USER_ID = String(pickerUserId)
     await request(app).post(`/api/ordenes-entrega/${ordenEntregaId}/iniciar-picking`).expect(200)
     await request(app).post(`/api/ordenes-entrega/${ordenEntregaId}/lista`).expect(200)
 
+    delete process.env.BIZCODE_TEST_USER_ID
     process.env.BIZCODE_TEST_ROLE = 'logistics_planner'
     const createRes = await request(app)
       .post('/api/repartos')

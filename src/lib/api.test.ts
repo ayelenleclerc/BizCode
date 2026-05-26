@@ -31,6 +31,7 @@ import {
   rubrosAPI,
   usersAPI,
   zonasEntregaAPI,
+  logisticaReportesAPI,
 } from './api'
 
 beforeEach(() => {
@@ -924,6 +925,88 @@ describe('zonasEntregaAPI', () => {
       )
       await expect(zonasEntregaAPI.update(99, {})).rejects.toThrow('Not Found')
     })
+  })
+})
+
+// ════════════════════════════════════════════════════════════
+// logisticaReportesAPI (#145)
+// ════════════════════════════════════════════════════════════
+describe('logisticaReportesAPI', () => {
+  const params = { from: '2026-05-01', to: '2026-05-31', choferId: 2 }
+  const kpis = {
+    dispatchedCount: 1,
+    firstVisitDeliveredCount: 1,
+    firstVisitRate: 1,
+    avgDeliveryMinutes: 5,
+    returnsByReason: [],
+    overdueCount: 0,
+  }
+
+  it('kpis returns payload', async () => {
+    mockGet.mockResolvedValueOnce({ data: { success: true, data: kpis } })
+    expect(await logisticaReportesAPI.kpis(params)).toEqual(kpis)
+    expect(mockGet).toHaveBeenCalledWith('/logistica/kpis', { params })
+  })
+
+  it('reporteChoferes returns rows', async () => {
+    const rows = [{ choferId: 2, choferUsername: 'd', day: '2026-05-01', dispatched: 1, delivered: 1, notDelivered: 0 }]
+    mockGet.mockResolvedValueOnce({ data: { success: true, data: rows } })
+    expect(await logisticaReportesAPI.reporteChoferes(params)).toEqual(rows)
+    expect(mockGet).toHaveBeenCalledWith('/logistica/reporte-choferes', { params })
+  })
+
+  it('reporteZonas returns rows', async () => {
+    const rows = [{ zonaId: 1, zonaNombre: 'N', dispatched: 1, delivered: 1, notDelivered: 0 }]
+    mockGet.mockResolvedValueOnce({ data: { success: true, data: rows } })
+    expect(await logisticaReportesAPI.reporteZonas(params)).toEqual(rows)
+    expect(mockGet).toHaveBeenCalledWith('/logistica/reporte-zonas', { params })
+  })
+
+  it('exportChoferesCsv returns blob', async () => {
+    const blob = new Blob(['a'])
+    mockGet.mockResolvedValueOnce({ data: blob })
+    expect(await logisticaReportesAPI.exportChoferesCsv(params)).toBe(blob)
+    expect(mockGet).toHaveBeenCalledWith('/logistica/reporte-choferes', {
+      params,
+      headers: { Accept: 'text/csv' },
+      responseType: 'blob',
+    })
+  })
+
+  it('exportZonasCsv returns blob', async () => {
+    const blob = new Blob(['z'])
+    mockGet.mockResolvedValueOnce({ data: blob })
+    expect(await logisticaReportesAPI.exportZonasCsv(params)).toBe(blob)
+    expect(mockGet).toHaveBeenCalledWith('/logistica/reporte-zonas', {
+      params,
+      headers: { Accept: 'text/csv' },
+      responseType: 'blob',
+    })
+  })
+
+  it('kpis propagates server errors', async () => {
+    mockGet.mockRejectedValueOnce(axiosErrorWithResponse('Forbidden'))
+    await expect(logisticaReportesAPI.kpis(params)).rejects.toThrow('Forbidden')
+  })
+
+  it('reporteChoferes propagates server errors', async () => {
+    mockGet.mockRejectedValueOnce(axiosErrorWithResponse('Server error'))
+    await expect(logisticaReportesAPI.reporteChoferes(params)).rejects.toThrow('Server error')
+  })
+
+  it('reporteZonas propagates server errors', async () => {
+    mockGet.mockRejectedValueOnce(axiosErrorWithResponse('Server error'))
+    await expect(logisticaReportesAPI.reporteZonas(params)).rejects.toThrow('Server error')
+  })
+
+  it('exportChoferesCsv propagates server errors', async () => {
+    mockGet.mockRejectedValueOnce(axiosErrorWithResponse('Server error'))
+    await expect(logisticaReportesAPI.exportChoferesCsv(params)).rejects.toThrow('Server error')
+  })
+
+  it('exportZonasCsv propagates server errors', async () => {
+    mockGet.mockRejectedValueOnce(axiosErrorWithResponse('Server error'))
+    await expect(logisticaReportesAPI.exportZonasCsv(params)).rejects.toThrow('Server error')
   })
 })
 

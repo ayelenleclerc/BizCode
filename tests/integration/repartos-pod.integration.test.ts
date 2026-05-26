@@ -86,7 +86,7 @@ describe('API — repartos POD integración PostgreSQL', () => {
         tenantId: 1,
         clienteId: cliente.id,
         fecha: new Date('2026-05-20T12:00:00.000Z'),
-        estado: 'pending',
+        estado: 'ready',
       },
     })
     ordenEntregaId = orden.id

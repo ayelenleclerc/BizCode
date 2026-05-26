@@ -36,6 +36,8 @@ tags:
     description: Physical inventory count (#136)
   - name: repartos
     description: Delivery routes grouping orders (#140)
+  - name: logistica
+    description: Logistics KPIs and operational reports (#145)
   - name: facturas
     description: Invoice management
   - name: afip
@@ -3987,6 +3989,149 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
 
+  /api/logistica/kpis:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [logistica]
+      summary: Logistics KPIs for a date range
+      description: |
+        Aggregated logistics metrics using DB-side queries (#145).
+        Requires tenant module `logistics.dispatches` and permission `logistics.read`.
+        Optional `choferId` filters all metrics to one driver.
+        Uses `OrdenEntrega.dispatchedAt` (ADR-0011) as dispatch baseline.
+      security:
+        - cookieSession: []
+      parameters:
+        - name: from
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+        - name: to
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+        - name: choferId
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '200':
+          description: KPI aggregate object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LogisticaKpisEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/logistica/reporte-choferes:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [logistica]
+      summary: Driver productivity report
+      description: |
+        Rows grouped by driver and dispatch day. Requires `logistics.dispatches` and `logistics.read`.
+        Send `Accept: text/csv` for CSV export.
+      security:
+        - cookieSession: []
+      parameters:
+        - name: from
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+        - name: to
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+        - name: choferId
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '200':
+          description: Driver rows or CSV
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LogisticaChoferesListEnvelope'
+            text/csv:
+              schema:
+                type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/logistica/reporte-zonas:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [logistica]
+      summary: Delivery coverage by zone
+      description: |
+        Rows grouped by delivery zone. Requires `logistics.dispatches` and `logistics.read`.
+        Send `Accept: text/csv` for CSV export.
+      security:
+        - cookieSession: []
+      parameters:
+        - name: from
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+        - name: to
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+        - name: choferId
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '200':
+          description: Zone rows or CSV
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LogisticaZonasListEnvelope'
+            text/csv:
+              schema:
+                type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
 components:
   securitySchemes:
     cookieSession:
@@ -4627,6 +4772,16 @@ components:
         nota:
           type: string
           nullable: true
+        dispatchedAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: When the order entered in_transit (ADR-0011).
+        dispatchTimestampSource:
+          type: string
+          nullable: true
+          enum: [event, estimated]
+          description: How dispatchedAt was derived (audit event vs estimated from updatedAt).
         items:
           type: array
           items:
@@ -4815,6 +4970,122 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ReporteVentasRow'
+
+    LogisticaReturnReasonRow:
+      type: object
+      required: [motivo, count]
+      properties:
+        motivo:
+          type: string
+        count:
+          type: integer
+          minimum: 0
+
+    LogisticaKpis:
+      type: object
+      required:
+        - dispatchedCount
+        - firstVisitDeliveredCount
+        - firstVisitRate
+        - avgDeliveryMinutes
+        - returnsByReason
+        - overdueCount
+      properties:
+        dispatchedCount:
+          type: integer
+          minimum: 0
+        firstVisitDeliveredCount:
+          type: integer
+          minimum: 0
+        firstVisitRate:
+          type: number
+          nullable: true
+          minimum: 0
+          maximum: 1
+        avgDeliveryMinutes:
+          type: number
+          nullable: true
+        returnsByReason:
+          type: array
+          items:
+            $ref: '#/components/schemas/LogisticaReturnReasonRow'
+        overdueCount:
+          type: integer
+          minimum: 0
+
+    LogisticaKpisEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/LogisticaKpis'
+
+    LogisticaChoferRow:
+      type: object
+      required: [choferId, choferUsername, day, dispatched, delivered, notDelivered]
+      properties:
+        choferId:
+          type: integer
+        choferUsername:
+          type: string
+        day:
+          type: string
+          format: date
+        dispatched:
+          type: integer
+          minimum: 0
+        delivered:
+          type: integer
+          minimum: 0
+        notDelivered:
+          type: integer
+          minimum: 0
+
+    LogisticaChoferesListEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/LogisticaChoferRow'
+
+    LogisticaZonaRow:
+      type: object
+      required: [zonaId, zonaNombre, dispatched, delivered, notDelivered]
+      properties:
+        zonaId:
+          type: integer
+          nullable: true
+        zonaNombre:
+          type: string
+        dispatched:
+          type: integer
+          minimum: 0
+        delivered:
+          type: integer
+          minimum: 0
+        notDelivered:
+          type: integer
+          minimum: 0
+
+    LogisticaZonasListEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/LogisticaZonaRow'
 
     StockCriticoArticulo:
       type: object

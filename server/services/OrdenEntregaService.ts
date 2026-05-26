@@ -377,6 +377,10 @@ export class OrdenEntregaService {
       if (toEstado === 'cancelled') {
         data.pickerUserId = null
       }
+      if (toEstado === 'in_transit' && existing.dispatchedAt == null) {
+        data.dispatchedAt = new Date()
+        data.dispatchTimestampSource = 'event'
+      }
     }
     if (input.driverId !== undefined) {
       data.driverId = input.driverId

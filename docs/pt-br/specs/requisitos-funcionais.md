@@ -28,5 +28,6 @@
 | RF-017 | Repartos: planejar, iniciar e fechar; sequência de OE em `ready`. | `src/pages/logistica/repartos/`, `GET/POST /api/repartos` |
 | RF-018 | POD em itens de reparto: wizard motorista; comprovante no back-office. | `src/pages/logistica/repartos/chofer/`, `PUT .../items/{itemId}`, `GET .../pod` |
 | RF-019 | Rastreamento GPS ao vivo: mapa do planejador; motorista envia localização a cada 2 min (`logistics.gps`). | `src/pages/logistica/seguimiento/`, `GET /api/repartos/activos`, `POST .../ubicacion` |
+| RF-020 | KPIs/relatórios logísticos: taxa 1ª visita, tempos, devoluções, tabelas motorista/zona, CSV (`logistics.dispatches`, `dispatchedAt`). | `src/pages/logistica/LogisticaReportesPanel.tsx`, `GET /api/logistica/kpis`, `reporte-choferes`, `reporte-zonas` |
 
 **Outros idiomas:** [English](../../en/specs/functional-requirements.md) · [Español](../../es/specs/functional-requirements.md)

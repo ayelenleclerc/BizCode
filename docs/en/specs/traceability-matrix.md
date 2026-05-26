@@ -30,6 +30,7 @@ Maps **functional requirements** to **use cases**, **user stories**, **manual te
 | FR-017 | UC-11 | US-11 | TC-017 | `src/pages/logistica/repartos/`, `registerRepartosRoutes.ts` |
 | FR-018 | UC-12 | US-12 | TC-018 | `src/pages/logistica/repartos/chofer/`, POD API |
 | FR-019 | UC-13 | US-13 | TC-019 | `src/pages/logistica/seguimiento/`, `RepartoUbicacionService.ts` |
+| FR-020 | UC-14 | US-14 | TC-020 | `src/pages/logistica/LogisticaReportesPanel.tsx`, `GET /api/logistica/kpis`, `reporte-choferes`, `reporte-zonas`, `tests/api/logistica-reportes.test.ts` |
 
 **NFR traceability (summary):** NFR-001 ↔ [accessibility.md](../accessibility.md) + `App.a11y.test.tsx`; NFR-002 ↔ [i18n-strategy.md](../i18n-strategy.md) + `check:i18n`; NFR-005 ↔ [testing-strategy.md](../quality/testing-strategy.md) + `vitest.config.ts` + contract tests.
 

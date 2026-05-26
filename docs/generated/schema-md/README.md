@@ -168,6 +168,20 @@
 
 * [LoginResult](./loginresult.md) – `-`
 
+* [LogisticaChoferRow](./logisticachoferrow.md) – `-`
+
+* [LogisticaChoferesListEnvelope](./logisticachofereslistenvelope.md) – `-`
+
+* [LogisticaKpis](./logisticakpis.md) – `-`
+
+* [LogisticaKpisEnvelope](./logisticakpisenvelope.md) – `-`
+
+* [LogisticaReturnReasonRow](./logisticareturnreasonrow.md) – `-`
+
+* [LogisticaZonaRow](./logisticazonarow.md) – `-`
+
+* [LogisticaZonasListEnvelope](./logisticazonaslistenvelope.md) – `-`
+
 * [LogoutEnvelope](./logoutenvelope.md) – `-`
 
 * [LogoutResult](./logoutresult.md) – `-`
@@ -579,6 +593,12 @@
 * [Untitled array in FacturaListEnvelope](./facturalistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
 
 * [Untitled array in FormaPagoListEnvelope](./formapagolistenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled array in LogisticaChoferesListEnvelope](./logisticachofereslistenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled array in LogisticaKpis](./logisticakpis-properties-returnsbyreason.md) – `undefined#/properties/returnsByReason`
+
+* [Untitled array in LogisticaZonasListEnvelope](./logisticazonaslistenvelope-properties-data.md) – `undefined#/properties/data`
 
 * [Untitled array in ModuleCatalogData](./modulecatalogdata-properties-modules.md) – `undefined#/properties/modules`
 

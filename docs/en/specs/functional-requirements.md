@@ -30,5 +30,6 @@ Requirements below are **evidenced** by UI (`src/pages/`), client (`src/lib/api.
 | FR-017 | Delivery routes: plan, start, close; sequence OEs in `ready`. | `src/pages/logistica/repartos/`, `GET/POST /api/repartos`, `POST .../iniciar`, `POST .../cerrar` |
 | FR-018 | POD on route items: driver wizard; back-office view proof. | `src/pages/logistica/repartos/chofer/`, `PUT .../items/{itemId}`, `GET .../pod` |
 | FR-019 | Live GPS tracking: planner map; driver posts location every 2 min (`logistics.gps`). | `src/pages/logistica/seguimiento/`, `GET /api/repartos/activos`, `POST .../ubicacion` |
+| FR-020 | Logistics KPIs/reports: first-visit rate, avg delivery time, returns by reason, driver/zone tables, CSV (`logistics.dispatches`, `dispatchedAt`). | `src/pages/logistica/LogisticaReportesPanel.tsx`, `GET /api/logistica/kpis`, `reporte-choferes`, `reporte-zonas` |
 
 **Other languages:** [Español](../../es/specs/requisitos-funcionales.md) · [Português](../../pt-br/specs/requisitos-funcionais.md)

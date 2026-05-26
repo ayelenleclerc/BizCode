@@ -74,6 +74,7 @@ Células vazias: a etapa não tem permissão RBAC dedicada; o papel pode partici
 | Relatórios | `/reportes`; `GET /api/reportes/ventas`, `stock-critico`, `cobranzas` (JSON ou CSV) | Tipos adicionais de relatório |
 | Logística | `/logistica`, `/logistica/picking` (#143); `OrdenEntrega`; `GET/POST/PUT /api/ordenes-entrega`, `POST .../iniciar-picking`, `POST .../lista` | OE: `pending` → `picking` → `ready` → `assigned` (reparto) → `in_transit` → `delivered` \| `failed` \| `cancelled` |
 | Rastreamento GPS | `/logistica/seguimiento` (#144); `RepartoUbicacion`; `GET /api/repartos/activos`, `POST /api/repartos/{id}/ubicacion` | Motorista em reparto `on_route`; planejador vê última posição; retenção 7 dias |
+| KPIs logística | `/logistica` aba Relatórios (#145); `dispatchedAt`; `GET /api/logistica/kpis`, `reporte-choferes`, `reporte-zonas` | Planejador/gestor; agregados no DB; export CSV |
 | Entidade pedido (`pedido`) | Modelos `Pedido`/`PedidoItem`, `/api/pedidos`, UI `/pedidos` (#132); `requireModule('billing.orders')` (#223) | Estados `packed`…`collected` e transições genéricas (#65 / BP1-1 completo) |
 | Permissões `orders.*` | Definidas no RBAC; aplicadas em `/api/ordenes-entrega` | Estender quando a entidade `pedido` existir |
 

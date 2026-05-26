@@ -1041,6 +1041,14 @@ const optionalPositiveIntQuery = z
     message: 'must be a positive integer',
   })
 
+export const logisticaReportesQuerySchema = z
+  .object({
+    from: isoDateString,
+    to: isoDateString,
+    choferId: optionalPositiveIntQuery,
+  })
+  .superRefine(refineReportesPeriodOrder)
+
 export const dashboardVentasHistoricoQuerySchema = z
   .object({
     from: isoDateString,
