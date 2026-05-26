@@ -508,6 +508,10 @@ model OrdenEntrega {
   picker            AppUser?  @relation("OrdenEntregaPicker", fields: [pickerUserId], references: [id])
   pickingIniciadoAt DateTime?
   pickingListoAt    DateTime?
+  /// Set when OE transitions to in_transit (physical dispatch); see ADR-0011 (#145).
+  dispatchedAt      DateTime?
+  /// event | estimated — estimated only from legacy backfill (#145).
+  dispatchTimestampSource String? @db.VarChar(20)
   fecha     DateTime
   /// pending | picking | ready | assigned | in_transit | delivered | failed | cancelled
   estado    String    @db.VarChar(20) @default("pending")
@@ -521,6 +525,7 @@ model OrdenEntrega {
   @@index([tenantId, fecha])
   @@index([tenantId, driverId])
   @@index([tenantId, pickerUserId])
+  @@index([tenantId, dispatchedAt])
 }
 
 /// Delivery route grouping delivery orders (#140).

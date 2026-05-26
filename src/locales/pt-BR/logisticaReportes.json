@@ -1,0 +1,54 @@
+{
+  "tab": "Relatórios",
+  "period": {
+    "from": "De",
+    "to": "Até",
+    "presetToday": "Hoje",
+    "presetWeek": "Semana",
+    "presetMonth": "Mês",
+    "apply": "Aplicar"
+  },
+  "filters": {
+    "chofer": "Motorista",
+    "allChoferes": "Todos os motoristas",
+    "choferId": "ID motorista"
+  },
+  "kpis": {
+    "dispatched": "OEs despachadas",
+    "firstVisitRate": "Taxa 1ª visita",
+    "firstVisitDelivered": "Entregas 1ª visita",
+    "avgDeliveryMinutes": "Tempo médio entrega (min)",
+    "overdue": "OEs vencidas",
+    "returnsTitle": "Devoluções por motivo"
+  },
+  "tables": {
+    "choferesTitle": "Ranking de motoristas",
+    "zonasTitle": "Entregas por zona",
+    "chofer": "Motorista",
+    "day": "Dia",
+    "dispatched": "Despachadas",
+    "delivered": "Entregues",
+    "notDelivered": "Não entregues",
+    "zona": "Zona",
+    "motivo": "Motivo",
+    "count": "Quantidade"
+  },
+  "actions": {
+    "exportChoferesCsv": "Exportar motoristas CSV",
+    "exportZonasCsv": "Exportar zonas CSV",
+    "refresh": "Atualizar"
+  },
+  "loading": "Carregando relatórios…",
+  "emptyChoferes": "Sem dados de motoristas no período.",
+  "emptyZonas": "Sem dados por zona no período.",
+  "errors": {
+    "load": "Não foi possível carregar os relatórios logísticos."
+  },
+  "motivo": {
+    "ausente": "Ausente",
+    "rechazo": "Recusa",
+    "domicilio_incorrecto": "Endereço incorreto",
+    "producto_dañado": "Produto danificado",
+    "otro": "Outro"
+  }
+}

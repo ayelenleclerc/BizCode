@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "delivered": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "dispatched": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "notDelivered": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "zonaId": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "zonaNombre": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "zonaId",
+    "zonaNombre",
+    "dispatched",
+    "delivered",
+    "notDelivered"
+  ],
+  "title": "LogisticaZonaRow",
+  "type": "object"
+}

@@ -24790,6 +24790,497 @@ Requires `logistics.read` and role `owner`, `manager`, or `logistics_planner` (n
 }
 ```
 
+### PARAMETERS /api/logistica/kpis
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/logistica/kpis`
+
+### Logistics KPIs for a date range
+
+- **Method:** `GET`
+- **Path:** `/api/logistica/kpis`
+- **Tags:** logistica
+
+Aggregated logistics metrics using DB-side queries (#145). Requires tenant module `logistics.dispatches` and permission `logistics.read`. Optional `choferId` filters all metrics to one driver. Uses `OrdenEntrega.dispatchedAt` (ADR-0011) as dispatch baseline.
+
+#### Responses
+
+##### Status: 200 KPI aggregate object
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`avgDeliveryMinutes` (required)**
+
+    `number`
+
+  - **`dispatchedCount` (required)**
+
+    `integer`
+
+  - **`firstVisitDeliveredCount` (required)**
+
+    `integer`
+
+  - **`firstVisitRate` (required)**
+
+    `number`
+
+  - **`overdueCount` (required)**
+
+    `integer`
+
+  - **`returnsByReason` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`count` (required)**
+
+      `integer`
+
+    - **`motivo` (required)**
+
+      `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "dispatchedCount": 0,
+    "firstVisitDeliveredCount": 0,
+    "firstVisitRate": 0,
+    "avgDeliveryMinutes": 1,
+    "returnsByReason": [
+      {
+        "motivo": "",
+        "count": 0
+      }
+    ],
+    "overdueCount": 0
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/logistica/reporte-choferes
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/logistica/reporte-choferes`
+
+### Driver productivity report
+
+- **Method:** `GET`
+- **Path:** `/api/logistica/reporte-choferes`
+- **Tags:** logistica
+
+Rows grouped by driver and dispatch day. Requires `logistics.dispatches` and `logistics.read`. Send `Accept: text/csv` for CSV export.
+
+#### Responses
+
+##### Status: 200 Driver rows or CSV
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`choferId` (required)**
+
+    `integer`
+
+  - **`choferUsername` (required)**
+
+    `string`
+
+  - **`day` (required)**
+
+    `string`, format: `date`
+
+  - **`delivered` (required)**
+
+    `integer`
+
+  - **`dispatched` (required)**
+
+    `integer`
+
+  - **`notDelivered` (required)**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "choferId": 1,
+      "choferUsername": "",
+      "day": "",
+      "dispatched": 0,
+      "delivered": 0,
+      "notDelivered": 0
+    }
+  ]
+}
+```
+
+###### Content-Type: text/csv
+
+`string`
+
+**Example:**
+
+```json
+true
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/logistica/reporte-zonas
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/logistica/reporte-zonas`
+
+### Delivery coverage by zone
+
+- **Method:** `GET`
+- **Path:** `/api/logistica/reporte-zonas`
+- **Tags:** logistica
+
+Rows grouped by delivery zone. Requires `logistics.dispatches` and `logistics.read`. Send `Accept: text/csv` for CSV export.
+
+#### Responses
+
+##### Status: 200 Zone rows or CSV
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`delivered` (required)**
+
+    `integer`
+
+  - **`dispatched` (required)**
+
+    `integer`
+
+  - **`notDelivered` (required)**
+
+    `integer`
+
+  - **`zonaId` (required)**
+
+    `integer`
+
+  - **`zonaNombre` (required)**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "zonaId": 1,
+      "zonaNombre": "",
+      "dispatched": 0,
+      "delivered": 0,
+      "notDelivered": 0
+    }
+  ]
+}
+```
+
+###### Content-Type: text/csv
+
+`string`
+
+**Example:**
+
+```json
+true
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ## Schemas
 
 ### HealthResponse
@@ -27161,6 +27652,334 @@ Requires `logistics.read` and role `owner`, `manager`, or `logistics_planner` (n
       "neto2": "",
       "iva1": "",
       "iva2": ""
+    }
+  ]
+}
+```
+
+### LogisticaReturnReasonRow
+
+- **Type:**`object`
+
+* **`count` (required)**
+
+  `integer`
+
+* **`motivo` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "motivo": "",
+  "count": 0
+}
+```
+
+### LogisticaKpis
+
+- **Type:**`object`
+
+* **`avgDeliveryMinutes` (required)**
+
+  `number`
+
+* **`dispatchedCount` (required)**
+
+  `integer`
+
+* **`firstVisitDeliveredCount` (required)**
+
+  `integer`
+
+* **`firstVisitRate` (required)**
+
+  `number`
+
+* **`overdueCount` (required)**
+
+  `integer`
+
+* **`returnsByReason` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`count` (required)**
+
+    `integer`
+
+  - **`motivo` (required)**
+
+    `string`
+
+**Example:**
+
+```json
+{
+  "dispatchedCount": 0,
+  "firstVisitDeliveredCount": 0,
+  "firstVisitRate": 0,
+  "avgDeliveryMinutes": 1,
+  "returnsByReason": [
+    {
+      "motivo": "",
+      "count": 0
+    }
+  ],
+  "overdueCount": 0
+}
+```
+
+### LogisticaKpisEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`avgDeliveryMinutes` (required)**
+
+    `number`
+
+  - **`dispatchedCount` (required)**
+
+    `integer`
+
+  - **`firstVisitDeliveredCount` (required)**
+
+    `integer`
+
+  - **`firstVisitRate` (required)**
+
+    `number`
+
+  - **`overdueCount` (required)**
+
+    `integer`
+
+  - **`returnsByReason` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`count` (required)**
+
+      `integer`
+
+    - **`motivo` (required)**
+
+      `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "dispatchedCount": 0,
+    "firstVisitDeliveredCount": 0,
+    "firstVisitRate": 0,
+    "avgDeliveryMinutes": 1,
+    "returnsByReason": [
+      {
+        "motivo": "",
+        "count": 0
+      }
+    ],
+    "overdueCount": 0
+  }
+}
+```
+
+### LogisticaChoferRow
+
+- **Type:**`object`
+
+* **`choferId` (required)**
+
+  `integer`
+
+* **`choferUsername` (required)**
+
+  `string`
+
+* **`day` (required)**
+
+  `string`, format: `date`
+
+* **`delivered` (required)**
+
+  `integer`
+
+* **`dispatched` (required)**
+
+  `integer`
+
+* **`notDelivered` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "choferId": 1,
+  "choferUsername": "",
+  "day": "",
+  "dispatched": 0,
+  "delivered": 0,
+  "notDelivered": 0
+}
+```
+
+### LogisticaChoferesListEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`choferId` (required)**
+
+    `integer`
+
+  - **`choferUsername` (required)**
+
+    `string`
+
+  - **`day` (required)**
+
+    `string`, format: `date`
+
+  - **`delivered` (required)**
+
+    `integer`
+
+  - **`dispatched` (required)**
+
+    `integer`
+
+  - **`notDelivered` (required)**
+
+    `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "choferId": 1,
+      "choferUsername": "",
+      "day": "",
+      "dispatched": 0,
+      "delivered": 0,
+      "notDelivered": 0
+    }
+  ]
+}
+```
+
+### LogisticaZonaRow
+
+- **Type:**`object`
+
+* **`delivered` (required)**
+
+  `integer`
+
+* **`dispatched` (required)**
+
+  `integer`
+
+* **`notDelivered` (required)**
+
+  `integer`
+
+* **`zonaId` (required)**
+
+  `integer`
+
+* **`zonaNombre` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "zonaId": 1,
+  "zonaNombre": "",
+  "dispatched": 0,
+  "delivered": 0,
+  "notDelivered": 0
+}
+```
+
+### LogisticaZonasListEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`delivered` (required)**
+
+    `integer`
+
+  - **`dispatched` (required)**
+
+    `integer`
+
+  - **`notDelivered` (required)**
+
+    `integer`
+
+  - **`zonaId` (required)**
+
+    `integer`
+
+  - **`zonaNombre` (required)**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "zonaId": 1,
+      "zonaNombre": "",
+      "dispatched": 0,
+      "delivered": 0,
+      "notDelivered": 0
     }
   ]
 }
