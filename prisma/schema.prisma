@@ -291,12 +291,36 @@ model Factura {
   ordenesEntrega OrdenEntrega[]
   recordatorios  CobroRecordatorio[]
   pedido         Pedido?
+  notasCredito   NotaCredito[]
 
   @@unique([tenantId, tipo, prefijo, numero])
   @@index([tenantId])
   @@index([tenantId, fecha])
   @@index([tenantId, estado, fecha])
   @@index([tenantId, clienteId])
+}
+
+
+/// Credit note issued when voiding an invoice (GitHub #146, ADR-0012).
+model NotaCredito {
+  id              Int       @id @default(autoincrement())
+  tenantId        Int
+  tenant          Tenant    @relation(fields: [tenantId], references: [id])
+  facturaOrigenId Int
+  facturaOrigen   Factura   @relation(fields: [facturaOrigenId], references: [id])
+  motivo          String    @db.VarChar(500)
+  monto           Decimal   @db.Decimal(14, 2)
+  cae             String?   @db.VarChar(20)
+  caeVto          DateTime?
+  /// pending | issued | failed | not_required (ADR-0012)
+  estadoCae       String    @db.VarChar(20) @default("pending")
+  createdById     Int?
+  createdBy       AppUser?  @relation("NotaCreditoCreatedBy", fields: [createdById], references: [id])
+  createdAt       DateTime  @default(now())
+
+  @@unique([tenantId, facturaOrigenId])
+  @@index([tenantId, createdAt])
+  @@index([tenantId, facturaOrigenId])
 }
 
 model Pedido {
@@ -401,6 +425,7 @@ model Tenant {
   proveedores    Proveedor[]
   ordenesCompra  OrdenCompra[]
   facturas       Factura[]
+  notasCredito   NotaCredito[]
   pedidos        Pedido[]
   cobros         Cobro[]
   cobroRecordatorios CobroRecordatorio[]
@@ -617,6 +642,7 @@ model AppUser {
   tenantConfigsUpdated TenantConfig[] @relation("TenantConfigUpdatedBy")
   tenantConfigHistory  TenantConfigHistory[] @relation("TenantConfigHistoryChangedBy")
   tenantPlansChanged   TenantPlan[] @relation("TenantPlanChangedBy")
+  notasCreditoCreated  NotaCredito[] @relation("NotaCreditoCreatedBy")
 
   @@unique([tenantId, username])
 }

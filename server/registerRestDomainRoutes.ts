@@ -9,6 +9,7 @@ import { registerRecuentosRoutes } from './routes/registerRecuentosRoutes'
 import { registerCobrosRoutes } from './routes/registerCobrosRoutes'
 import { registerReportesRoutes } from './routes/registerReportesRoutes'
 import { registerFacturasRoutes } from './routes/registerFacturasRoutes'
+import { registerNotasCreditoRoutes } from './routes/registerNotasCreditoRoutes'
 import { registerFormasPagoRoutes } from './routes/registerFormasPagoRoutes'
 import { registerHealthRoute } from './routes/registerHealthRoute'
 import { registerMeFeaturesRoute } from './routes/registerMeFeaturesRoute'
@@ -64,6 +65,7 @@ export function registerRestDomainRoutes(app: Application, prisma: PrismaClient)
   registerRecuentosRoutes(app, ctx)
   registerFormasPagoRoutes(app, ctx)
   registerFacturasRoutes(app, ctx)
+  registerNotasCreditoRoutes(app, ctx)
   registerAfipRoutes(app, ctx)
   registerPedidosRoutes(app, ctx)
   registerCobrosRoutes(app, ctx)

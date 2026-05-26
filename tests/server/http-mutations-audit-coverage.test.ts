@@ -1,7 +1,7 @@
-/**
- * @en Mutation → AuditEvent.action matrix verification (issue #84). Each successful persistence path must emit an audit row.
- * @es Verificación matriz mutación → AuditEvent.action (#84).
- * @pt-BR Verificação mutação → AuditEvent.action (#84).
+﻿/**
+ * @en Mutation â†’ AuditEvent.action matrix verification (issue #84). Each successful persistence path must emit an audit row.
+ * @es VerificaciÃ³n matriz mutaciÃ³n â†’ AuditEvent.action (#84).
+ * @pt-BR VerificaÃ§Ã£o mutaÃ§Ã£o â†’ AuditEvent.action (#84).
  */
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import request from 'supertest'
@@ -64,6 +64,8 @@ const FACTURA_VOID_ROW = {
   estado: 'A',
   total: 100,
   clienteId: 1,
+  estadoCae: 'pending',
+  tipo: 'B',
 }
 
 const ORDEN_ENTREGA_ROW = {
@@ -260,6 +262,25 @@ function basePrismaForMutations(): {
     findFirst: vi.fn().mockResolvedValue(null),
   }
 
+  prisma.notaCredito = {
+    create: vi.fn().mockResolvedValue({
+      id: 50,
+      tenantId: 1,
+      facturaOrigenId: 7,
+      motivo: 'Devolución',
+      monto: 100,
+      estadoCae: 'not_required',
+      cae: null,
+      caeVto: null,
+      createdById: null,
+      createdAt: new Date(),
+    }),
+    findFirst: vi.fn().mockResolvedValue(null),
+    findMany: vi.fn().mockResolvedValue([]),
+    count: vi.fn().mockResolvedValue(0),
+    update: vi.fn(),
+  }
+
   prisma.$transaction = vi.fn(async (fn: (tx: Tx) => Promise<unknown>) =>
     fn(prisma as unknown as Tx),
   ) as typeof prisma.$transaction
@@ -291,7 +312,7 @@ describe('HTTP mutations emit AuditEvent (coverage matrix)', () => {
     process.env.BIZCODE_TEST_ROLE = 'owner'
   })
 
-  it('POST /api/clientes → cliente_create', async () => {
+  it('POST /api/clientes â†’ cliente_create', async () => {
     const { prisma, auditCreate } = basePrismaForMutations()
     const app = createApp(prisma)
 
@@ -312,7 +333,7 @@ describe('HTTP mutations emit AuditEvent (coverage matrix)', () => {
     )
   })
 
-  it('PUT /api/clientes/:id → cliente_update', async () => {
+  it('PUT /api/clientes/:id â†’ cliente_update', async () => {
     const { prisma, auditCreate } = basePrismaForMutations()
     const app = createApp(prisma)
 
@@ -333,7 +354,7 @@ describe('HTTP mutations emit AuditEvent (coverage matrix)', () => {
     )
   })
 
-  it('POST /api/articulos → articulo_create', async () => {
+  it('POST /api/articulos â†’ articulo_create', async () => {
     const { prisma, auditCreate } = basePrismaForMutations()
     const app = createApp(prisma)
 
@@ -361,7 +382,7 @@ describe('HTTP mutations emit AuditEvent (coverage matrix)', () => {
     )
   })
 
-  it('PUT /api/articulos/:id → articulo_update', async () => {
+  it('PUT /api/articulos/:id â†’ articulo_update', async () => {
     const { prisma, auditCreate } = basePrismaForMutations()
     const app = createApp(prisma)
 
@@ -389,7 +410,7 @@ describe('HTTP mutations emit AuditEvent (coverage matrix)', () => {
     )
   })
 
-  it('POST /api/rubros → rubro_create', async () => {
+  it('POST /api/rubros â†’ rubro_create', async () => {
     const { prisma, auditCreate } = basePrismaForMutations()
     const app = createApp(prisma)
 
@@ -402,7 +423,7 @@ describe('HTTP mutations emit AuditEvent (coverage matrix)', () => {
     )
   })
 
-  it('POST /api/proveedores → proveedor_create', async () => {
+  it('POST /api/proveedores â†’ proveedor_create', async () => {
     const { prisma, auditCreate } = basePrismaForMutations()
     const app = createApp(prisma)
 
@@ -423,7 +444,7 @@ describe('HTTP mutations emit AuditEvent (coverage matrix)', () => {
     )
   })
 
-  it('PUT /api/proveedores/:id → proveedor_update', async () => {
+  it('PUT /api/proveedores/:id â†’ proveedor_update', async () => {
     const { prisma, auditCreate } = basePrismaForMutations()
     vi.mocked(prisma.proveedor.findFirst).mockResolvedValue({
       id: 5,
@@ -453,7 +474,7 @@ describe('HTTP mutations emit AuditEvent (coverage matrix)', () => {
     )
   })
 
-  it('POST /api/facturas → factura_create', async () => {
+  it('POST /api/facturas â†’ factura_create', async () => {
     const { prisma, auditCreate } = basePrismaForMutations()
 
     vi.mocked(prisma.cliente.findFirst).mockResolvedValue({ ...CLIENTE_ROW, suspended: false } as never)
@@ -485,28 +506,29 @@ describe('HTTP mutations emit AuditEvent (coverage matrix)', () => {
     )
   })
 
-  it('PUT /api/facturas/:id/void → factura_void', async () => {
+  it('PUT /api/facturas/:id/void -> factura_void', async () => {
     const { prisma, auditCreate } = basePrismaForMutations()
 
     vi.mocked(prisma.factura.findFirst).mockResolvedValue(FACTURA_VOID_ROW as never)
-    const runVoidTx = async () => {
-      await prisma.factura.update({ where: { id: 7 }, data: { estado: 'N' } } as never)
-      return { ...FACTURA_VOID_ROW, estado: 'N' }
-    }
-    vi.mocked(prisma.$transaction).mockImplementation(runVoidTx as never)
+    vi.mocked(prisma.factura.update).mockResolvedValue({ ...FACTURA_VOID_ROW, estado: 'N' } as never)
 
     const app = createApp(prisma)
 
-    await request(app).put('/api/facturas/7/void').send({ motivo: 'Devolución' }).expect(200)
+    await request(app).put('/api/facturas/7/void').send({ motivo: 'Devolucion total' }).expect(200)
 
     expect(auditCreate).toHaveBeenCalledWith(
       expect.objectContaining({
-        data: expect.objectContaining({ action: 'factura_void', resource: 'factura', resourceId: '7' }),
+        data: expect.objectContaining({
+          action: 'factura_void',
+          resource: 'factura',
+          resourceId: '7',
+          metadata: expect.objectContaining({ motivo: 'Devolucion total', notaCreditoId: 50 }),
+        }),
       }),
     )
   })
 
-  it('POST /api/zonas-entrega → delivery_zone_create', async () => {
+  it('POST /api/zonas-entrega â†’ delivery_zone_create', async () => {
     const { prisma, auditCreate } = basePrismaForMutations()
     process.env.BIZCODE_TEST_ROLE = 'logistics_planner'
 
@@ -523,7 +545,7 @@ describe('HTTP mutations emit AuditEvent (coverage matrix)', () => {
     )
   })
 
-  it('PUT /api/zonas-entrega/:id → delivery_zone_update', async () => {
+  it('PUT /api/zonas-entrega/:id â†’ delivery_zone_update', async () => {
     const { prisma, auditCreate } = basePrismaForMutations()
 
     vi.mocked(prisma.deliveryZone.findFirst).mockResolvedValue({
@@ -549,7 +571,7 @@ describe('HTTP mutations emit AuditEvent (coverage matrix)', () => {
     )
   })
 
-  it('POST /api/ordenes-entrega/:id/iniciar-picking → orden_entrega_picking_start', async () => {
+  it('POST /api/ordenes-entrega/:id/iniciar-picking â†’ orden_entrega_picking_start', async () => {
     const { prisma, auditCreate } = basePrismaForMutations()
     process.env.BIZCODE_TEST_ROLE = 'warehouse_op'
     process.env.BIZCODE_TEST_USER_ID = '7'
@@ -581,7 +603,7 @@ describe('HTTP mutations emit AuditEvent (coverage matrix)', () => {
     )
   })
 
-  it('POST /api/ordenes-entrega/:id/lista → orden_entrega_picking_ready', async () => {
+  it('POST /api/ordenes-entrega/:id/lista â†’ orden_entrega_picking_ready', async () => {
     const { prisma, auditCreate } = basePrismaForMutations()
     process.env.BIZCODE_TEST_ROLE = 'warehouse_op'
     process.env.BIZCODE_TEST_USER_ID = '7'
@@ -613,7 +635,7 @@ describe('HTTP mutations emit AuditEvent (coverage matrix)', () => {
     )
   })
 
-  it('POST /api/repartos → reparto_created', async () => {
+  it('POST /api/repartos â†’ reparto_created', async () => {
     const { prisma, auditCreate } = basePrismaForMutations()
     process.env.BIZCODE_TEST_ROLE = 'logistics_planner'
 
@@ -637,7 +659,7 @@ describe('HTTP mutations emit AuditEvent (coverage matrix)', () => {
     )
   })
 
-  it('POST /api/repartos/:id/iniciar → reparto_started', async () => {
+  it('POST /api/repartos/:id/iniciar â†’ reparto_started', async () => {
     const { prisma, auditCreate } = basePrismaForMutations()
     process.env.BIZCODE_TEST_ROLE = 'logistics_planner'
 
@@ -659,7 +681,7 @@ describe('HTTP mutations emit AuditEvent (coverage matrix)', () => {
     )
   })
 
-  it('POST /api/repartos/:id/cerrar → reparto_closed', async () => {
+  it('POST /api/repartos/:id/cerrar â†’ reparto_closed', async () => {
     const { prisma, auditCreate } = basePrismaForMutations()
     process.env.BIZCODE_TEST_ROLE = 'logistics_planner'
 
@@ -693,7 +715,7 @@ describe('HTTP mutations emit AuditEvent (coverage matrix)', () => {
     )
   })
 
-  it('POST /api/repartos/:id/ubicacion → reparto_ubicacion_recorded', async () => {
+  it('POST /api/repartos/:id/ubicacion â†’ reparto_ubicacion_recorded', async () => {
     const { prisma, auditCreate } = basePrismaForMutations()
     process.env.BIZCODE_TEST_ROLE = 'driver'
     process.env.BIZCODE_TEST_USER_ID = '2'
@@ -719,7 +741,7 @@ describe('HTTP mutations emit AuditEvent (coverage matrix)', () => {
     )
   })
 
-  it('PUT /api/repartos/:id/items/:itemId → reparto_item_pod_signed', async () => {
+  it('PUT /api/repartos/:id/items/:itemId â†’ reparto_item_pod_signed', async () => {
     const { prisma, auditCreate } = basePrismaForMutations()
     process.env.BIZCODE_TEST_ROLE = 'driver'
     process.env.BIZCODE_TEST_USER_ID = '2'

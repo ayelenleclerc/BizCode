@@ -113,6 +113,61 @@ export class AfipService {
     })
   }
 
+
+  async requestCaeForNotaCredito(
+    tenantId: number,
+    notaCreditoId: number,
+  ): Promise<ServiceResult<{ cae: string; caeVto: Date }>> {
+    const nota = await this.prisma.notaCredito.findFirst({
+      where: { id: notaCreditoId, tenantId },
+      select: {
+        id: true,
+        monto: true,
+        estadoCae: true,
+        facturaOrigen: { select: { tipo: true } },
+      },
+    })
+    if (!nota) return { ok: false, status: 404, error: 'NotaCredito not found' }
+    if (nota.estadoCae === 'not_required') {
+      return { ok: false, status: 422, error: 'NOTA_CREDITO_CAE_NOT_REQUIRED' }
+    }
+
+    const config = await this.prisma.tenantFiscalConfig.findUnique({ where: { tenantId } })
+    if (!config) {
+      await this.prisma.notaCredito.update({
+        where: { id: notaCreditoId },
+        data: { estadoCae: 'failed' },
+      })
+      return { ok: false, status: 422, error: 'FISCAL_CONFIG_NOT_FOUND' }
+    }
+
+    const taResult = await this.getTa(tenantId)
+    if (!taResult.ok) {
+      await this.markPendingNotaCreditoCae(notaCreditoId)
+      return { ok: false, status: taResult.status, error: taResult.error }
+    }
+
+    try {
+      void taResult.data
+      const tipo = nota.facturaOrigen.tipo
+      const { cae, caeVto } = mockRequestCae(notaCreditoId, Number(nota.monto), tipo)
+      await this.prisma.notaCredito.update({
+        where: { id: notaCreditoId },
+        data: { cae, caeVto, estadoCae: 'issued' },
+      })
+      return { ok: true, data: { cae, caeVto } }
+    } catch {
+      await this.markPendingNotaCreditoCae(notaCreditoId)
+      return { ok: false, status: 502, error: 'AFIP_CAE_REQUEST_FAILED' }
+    }
+  }
+
+  private async markPendingNotaCreditoCae(notaCreditoId: number): Promise<void> {
+    await this.prisma.notaCredito.update({
+      where: { id: notaCreditoId },
+      data: { estadoCae: 'pending', cae: null, caeVto: null },
+    })
+  }
   async retryPending(tenantId: number): Promise<{ processed: number; issued: number; failed: number }> {
     const pending = await this.prisma.factura.findMany({
       where: { tenantId, estadoCae: 'pending' },
