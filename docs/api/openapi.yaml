@@ -58,6 +58,8 @@ tags:
     description: Internal chat conversations and messages
   - name: reportes
     description: Financial and operational reports
+  - name: contabilidad
+    description: Accounting exports — Libro IVA Ventas Fase 1 (#147); Compras out of scope
   - name: dashboard
     description: Operational dashboard summary and historical sales analytics (#138)
   - name: notifications
@@ -2654,6 +2656,60 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/contabilidad/libro-iva-ventas:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [contabilidad]
+      summary: Libro IVA Ventas export (ARCA RG 3685 — Fase 1)
+      description: |
+        Generates **Libro IVA Ventas** from persisted `Factura` fiscal fields (types A/B/C, netos, IVA, total, estado).
+        Includes credit notes and voided vouchers (`tipo 999`) per ADR-0013 when `NotaCredito` falls in the period.
+        Requires module `finance.ledger` and permission `reports.financial.read`.
+        **Out of scope:** Libro IVA Compras / CBTU (see follow-up issue).
+        - `format=preview` (default): JSON totals and record counts.
+        - `format=txt`: ZIP download with `CBTV.txt` + `ALICUOTAS.txt` (comma-separated, RG 3685 layout).
+        - `format=xlsx`: internal review workbook (not an ARCA substitute).
+        ARCA validator confirmation may be pending; structural consistency is covered by tests.
+      parameters:
+        - name: periodo
+          in: query
+          required: true
+          schema:
+            type: string
+            pattern: '^\d{4}-\d{2}$'
+            example: '2026-05'
+        - name: format
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [preview, txt, xlsx]
+            default: preview
+      responses:
+        '200':
+          description: Preview JSON or file download
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LibroIvaVentasPreviewEnvelope'
+            application/zip:
+              schema:
+                type: string
+                format: binary
+            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+              schema:
+                type: string
+                format: binary
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
         '500':
           $ref: '#/components/responses/ServerError'
 
@@ -6534,6 +6590,65 @@ components:
           const: true
         data:
           $ref: '#/components/schemas/NotaCreditoDetail'
+
+    LibroIvaVentasAlicuotaTotal:
+      type: object
+      required: [alicuotaCode, neto, iva]
+      properties:
+        alicuotaCode:
+          type: string
+        neto:
+          type: number
+        iva:
+          type: number
+
+    LibroIvaVentasPreview:
+      type: object
+      required:
+        - periodo
+        - recordCountCbtv
+        - recordCountAlicuotas
+        - totalsByAlicuota
+        - totalNeto
+        - totalIva
+        - totalExento
+        - totalGeneral
+        - arcaValidationPending
+      properties:
+        periodo:
+          type: string
+          pattern: '^\d{4}-\d{2}$'
+        recordCountCbtv:
+          type: integer
+          minimum: 0
+        recordCountAlicuotas:
+          type: integer
+          minimum: 0
+        totalsByAlicuota:
+          type: array
+          items:
+            $ref: '#/components/schemas/LibroIvaVentasAlicuotaTotal'
+        totalNeto:
+          type: number
+        totalIva:
+          type: number
+        totalExento:
+          type: number
+        totalGeneral:
+          type: number
+        arcaValidationPending:
+          type: boolean
+          const: true
+
+    LibroIvaVentasPreviewEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/LibroIvaVentasPreview'
 
     FacturaVoidResult:
       type: object

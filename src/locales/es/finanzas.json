@@ -81,5 +81,23 @@
       "failed": "CAE fallido",
       "not_required": "CAE no requerido"
     }
+  },
+  "libroIva": {
+    "title": "Contabilidad — Libro IVA Ventas",
+    "hint": "Exportá el Libro IVA Ventas (ARCA RG 3685) desde los campos fiscales persistidos en facturas. Requiere módulo finance.ledger. Libro IVA Compras queda fuera de alcance (ADR-0013).",
+    "periodo": "Período (mes)",
+    "downloadTxt": "Descargar ARCA (ZIP)",
+    "downloadXlsx": "Descargar Excel",
+    "downloading": "Descargando…",
+    "empty": "Sin datos de vista previa para este período.",
+    "arcaPending": "La validación con herramienta oficial ARCA puede estar pendiente; revisá totales antes de presentar.",
+    "recordsCbtv": "Registros CBTV",
+    "recordsAlicuotas": "Registros ALICUOTAS",
+    "totalNeto": "Neto gravado",
+    "totalIva": "Total IVA",
+    "alicuotasCaption": "Totales por alícuota",
+    "colAlicuota": "Código alícuota",
+    "colNeto": "Neto",
+    "colIva": "IVA"
   }
 }

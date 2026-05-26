@@ -81,5 +81,23 @@
       "failed": "CAE failed",
       "not_required": "CAE not required"
     }
+  },
+  "libroIva": {
+    "title": "Accounting — VAT sales book",
+    "hint": "Export Libro IVA Ventas (ARCA RG 3685) from persisted invoice fiscal fields. Module finance.ledger required. Purchases book is out of scope (see ADR-0013).",
+    "periodo": "Period (month)",
+    "downloadTxt": "Download ARCA (ZIP)",
+    "downloadXlsx": "Download Excel",
+    "downloading": "Downloading…",
+    "empty": "No preview data for this period.",
+    "arcaPending": "ARCA official validator confirmation may be pending; use preview totals before filing.",
+    "recordsCbtv": "CBTV records",
+    "recordsAlicuotas": "ALICUOTAS records",
+    "totalNeto": "Taxable net",
+    "totalIva": "VAT total",
+    "alicuotasCaption": "Totals by VAT rate",
+    "colAlicuota": "Rate code",
+    "colNeto": "Net",
+    "colIva": "VAT"
   }
 }

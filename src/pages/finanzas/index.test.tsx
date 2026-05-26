@@ -3,7 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import '@/i18n/config'
 import FinanzasPage from './index'
-import { cobranzasAPI, notasCreditoAPI, reportesAPI } from '@/lib/api'
+import { cobranzasAPI, contabilidadAPI, notasCreditoAPI, reportesAPI } from '@/lib/api'
 import { useAuth } from '@/contexts/AuthContext'
 import { useFeatureFlags } from '@/contexts/FeatureFlagsContext'
 import type { AuthClaims, Permission } from '@/lib/rbac'
@@ -49,6 +49,10 @@ vi.mock('@/lib/api', async () => {
     notasCreditoAPI: {
       list: vi.fn(),
     },
+    contabilidadAPI: {
+      libroIvaVentasPreview: vi.fn(),
+      downloadLibroIvaVentas: vi.fn(),
+    },
   }
 })
 
@@ -65,9 +69,9 @@ function mockAuth(permissions: Permission[]) {
 function mockFlagsWithCreditNotes() {
   vi.mocked(useFeatureFlags).mockReturnValue({
     status: 'ready',
-    modules: ['billing.credit_notes'],
+    modules: ['billing.credit_notes', 'finance.ledger'],
     integrations: [],
-    hasModule: (k) => k === 'billing.credit_notes',
+    hasModule: (k) => k === 'billing.credit_notes' || k === 'finance.ledger',
     hasIntegration: () => false,
     refreshFeatures: vi.fn(),
   })
@@ -80,6 +84,17 @@ describe('FinanzasPage', () => {
     mockAuth(baseClaims.permissions)
     mockFlagsWithCreditNotes()
     vi.mocked(notasCreditoAPI.list).mockResolvedValue({ data: [], total: 0, limit: 100, offset: 0 })
+    vi.mocked(contabilidadAPI.libroIvaVentasPreview).mockResolvedValue({
+      periodo: '2026-05',
+      recordCountCbtv: 1,
+      recordCountAlicuotas: 1,
+      totalsByAlicuota: [{ alicuotaCode: '0005', neto: 100, iva: 21 }],
+      totalNeto: 100,
+      totalIva: 21,
+      totalExento: 0,
+      totalGeneral: 121,
+      arcaValidationPending: true,
+    })
     vi.mocked(reportesAPI.aging).mockResolvedValue({
       buckets: [
         { label: '0-30d', count: 2, total: '1000' },
@@ -164,6 +179,15 @@ describe('FinanzasPage', () => {
       expect(notasCreditoAPI.list).toHaveBeenCalled()
     })
     expect(await screen.findByTestId('finanzas-nc-row-9')).toBeInTheDocument()
+  })
+
+  it('muestra preview del Libro IVA Ventas con finance.ledger', async () => {
+    render(<FinanzasPage />)
+    await screen.findByTestId('finanzas-page')
+    await waitFor(() => {
+      expect(contabilidadAPI.libroIvaVentasPreview).toHaveBeenCalled()
+    })
+    expect(await screen.findByTestId('finanzas-libro-iva-preview')).toBeInTheDocument()
   })
 
   it('abre cuenta corriente con cliente válido', async () => {

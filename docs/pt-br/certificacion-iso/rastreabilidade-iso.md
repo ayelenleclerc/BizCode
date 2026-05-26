@@ -12,6 +12,7 @@ Mapa dos artefactos de qualidade do BizCode para cláusulas ISO. Documentação 
 | SECURITY | §8.1 | §6.3.8 | A.8.x | Segurança | — |
 | openapi.yaml + contract tests | §8.3 | §6.3.2 | — | Adequação funcional | 29119-2 |
 | **ADR-0012 / notas de crédito (#146)** — `PUT /api/facturas/{id}/void`, `GET /api/notas-credito`, UI faturamento / finanças, `tests/api/notas-credito.test.ts`, `tests/api/facturas-void.test.ts` | §8.3 | §6.3.2 | — | Adequação funcional | 29119-2 |
+| **ADR-0013 / Livro IVA Vendas Fase 1 (#147)** — `GET /api/contabilidad/libro-iva-ventas`, UI finanças, `tests/api/libro-iva-ventas.test.ts`, `tests/server/fiscal/ar/libroIvaVentas.test.ts` | §8.3 | §6.3.2 | — | Adequação funcional | 29119-2 |
 | plano-swagger-openapi-ui.md (espelhos EN/ES) — checklist Swagger UI, política OpenAPI agentes | §7.5, §8.3 | §6.3.2, §6.4.12 | — | Adequação funcional | 29119-2 |
 | ADR-0003 (contrato API) | §8.3.3 | §6.3.6 | — | Manutenibilidade | — |
 | **visao-produto-e-implantacao.md** (espelhos EN/ES, **PROD-VISION-001**) — direção desktop/SaaS, modularidade fiscal | §7.5, §8.3 | §6.3.2 | — | Portabilidade §4.2.8 | — |

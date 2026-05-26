@@ -10,6 +10,8 @@ Versioning: [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **Libro IVA Ventas — Fase 1 (GitHub #147):** `GET /api/contabilidad/libro-iva-ventas` (`reports.financial.read`, module `finance.ledger`) exports sales book from persisted `Factura` fields; `format=preview|txt|xlsx` (ZIP with `CBTV.txt` + `ALICUOTAS.txt`); credit notes and void tipo `999` per ADR-0013; **Finanzas** accounting section; **Libro IVA Compras out of scope** (follow-up issue). OpenAPI, tests, manuals (EN/ES/PT-BR).
+
 - **Invoice void and credit notes (GitHub #146):** `PUT /api/facturas/{id}/void` (`sales.cancel`, module `billing.credit_notes`, reason min. 10 chars) returns updated invoice, issued `NotaCredito`, and customer balance; `GET /api/notas-credito`, `GET /api/notas-credito/{id}` (`reports.financial.read` or `reports.operational.read`); AFIP credit-note flow per ADR-0012; **Finanzas** lists credit notes by date range (UI under module); **Facturación** void action gated on `billing.credit_notes`; OpenAPI, tests (`notas-credito`, `facturas-void`), manuals and specs (EN/ES/PT-BR).
 
 - **Logistics KPIs and reports (GitHub #145):** `OrdenEntrega.dispatchedAt` / `dispatchTimestampSource` (ADR-0011); `GET /api/logistica/kpis`, `reporte-choferes`, `reporte-zonas` (`logistics.read`, module `logistics.dispatches`, DB aggregates); **Reportes** tab on `/logistica` with KPI cards, driver ranking, zone table, CSV export; i18n, OpenAPI, tests, manual (EN/ES/PT-BR).

@@ -64,6 +64,10 @@ Módulo **`logistics.gps`**. UI `/logistica/seguimiento`: **`logistics.read`** e
 
 Módulo de tenant **`billing.credit_notes`**. `PUT /api/facturas/{id}/void` exige **`sales.cancel`** e o módulo; o motivo no corpo cumpre o mínimo do esquema no servidor (10 caracteres). **`GET /api/notas-credito`** e **`GET /api/notas-credito/{id}`** exigem **`reports.financial.read`** *ou* **`reports.operational.read`**. UI: ação **Cancelar nota fiscal** em **`Faturamento`** (`ListadoFacturas.tsx`) somente com `billing.credit_notes`; **Finanças** lista notas no mesmo módulo (a página continua a exigir `reports.financial.read`). Veja [`ADR-0012`](../adr/ADR-0012-anulacao-fatura-nota-credito.md).
 
+## Livro IVA Vendas — Fase 1 (#147)
+
+Módulo **`finance.ledger`**. **`GET /api/contabilidad/libro-iva-ventas`** exige **`reports.financial.read`**. **Livro IVA Compras** fora de escopo ([`ADR-0013`](../adr/ADR-0013-libro-iva-ventas-fase1.md)).
+
 ## Documentos relacionados
 
 - Índice de execução do plano mestre: [execucao-plano-mestre-bizcode.md](execucao-plano-mestre-bizcode.md)

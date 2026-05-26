@@ -16366,6 +16366,216 @@ Returns a credit note with originating invoice header for the current tenant. Re
 }
 ```
 
+### PARAMETERS /api/contabilidad/libro-iva-ventas
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/contabilidad/libro-iva-ventas`
+
+### Libro IVA Ventas export (ARCA RG 3685 — Fase 1)
+
+- **Method:** `GET`
+- **Path:** `/api/contabilidad/libro-iva-ventas`
+- **Tags:** contabilidad
+
+Generates **Libro IVA Ventas** from persisted `Factura` fiscal fields (types A/B/C, netos, IVA, total, estado). Includes credit notes and voided vouchers (`tipo 999`) per ADR-0013 when `NotaCredito` falls in the period. Requires module `finance.ledger` and permission `reports.financial.read`. **Out of scope:** Libro IVA Compras / CBTU (see follow-up issue).
+
+- `format=preview` (default): JSON totals and record counts.
+- `format=txt`: ZIP download with `CBTV.txt` + `ALICUOTAS.txt` (comma-separated, RG 3685 layout).
+- `format=xlsx`: internal review workbook (not an ARCA substitute). ARCA validator confirmation may be pending; structural consistency is covered by tests.
+
+#### Responses
+
+##### Status: 200 Preview JSON or file download
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`arcaValidationPending` (required)**
+
+    `boolean`
+
+  - **`periodo` (required)**
+
+    `string`
+
+  - **`recordCountAlicuotas` (required)**
+
+    `integer`
+
+  - **`recordCountCbtv` (required)**
+
+    `integer`
+
+  - **`totalExento` (required)**
+
+    `number`
+
+  - **`totalGeneral` (required)**
+
+    `number`
+
+  - **`totalIva` (required)**
+
+    `number`
+
+  - **`totalNeto` (required)**
+
+    `number`
+
+  - **`totalsByAlicuota` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`alicuotaCode` (required)**
+
+      `string`
+
+    - **`iva` (required)**
+
+      `number`
+
+    - **`neto` (required)**
+
+      `number`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "periodo": "",
+    "recordCountCbtv": 0,
+    "recordCountAlicuotas": 0,
+    "totalsByAlicuota": [
+      {
+        "alicuotaCode": "",
+        "neto": 1,
+        "iva": 1
+      }
+    ],
+    "totalNeto": 1,
+    "totalIva": 1,
+    "totalExento": 1,
+    "totalGeneral": 1,
+    "arcaValidationPending": true
+  }
+}
+```
+
+###### Content-Type: application/zip
+
+`string`, format: `binary`
+
+**Example:**
+
+```json
+{}
+```
+
+###### Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+
+`string`, format: `binary`
+
+**Example:**
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ### PARAMETERS /api/formas-pago
 
 - **Method:** `PARAMETERS`
@@ -34061,6 +34271,195 @@ Originating invoice header (selected columns)
       "additionalProperty": "anything"
     },
     "additionalProperty": "anything"
+  }
+}
+```
+
+### LibroIvaVentasAlicuotaTotal
+
+- **Type:**`object`
+
+* **`alicuotaCode` (required)**
+
+  `string`
+
+* **`iva` (required)**
+
+  `number`
+
+* **`neto` (required)**
+
+  `number`
+
+**Example:**
+
+```json
+{
+  "alicuotaCode": "",
+  "neto": 1,
+  "iva": 1
+}
+```
+
+### LibroIvaVentasPreview
+
+- **Type:**`object`
+
+* **`arcaValidationPending` (required)**
+
+  `boolean`
+
+* **`periodo` (required)**
+
+  `string`
+
+* **`recordCountAlicuotas` (required)**
+
+  `integer`
+
+* **`recordCountCbtv` (required)**
+
+  `integer`
+
+* **`totalExento` (required)**
+
+  `number`
+
+* **`totalGeneral` (required)**
+
+  `number`
+
+* **`totalIva` (required)**
+
+  `number`
+
+* **`totalNeto` (required)**
+
+  `number`
+
+* **`totalsByAlicuota` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`alicuotaCode` (required)**
+
+    `string`
+
+  - **`iva` (required)**
+
+    `number`
+
+  - **`neto` (required)**
+
+    `number`
+
+**Example:**
+
+```json
+{
+  "periodo": "",
+  "recordCountCbtv": 0,
+  "recordCountAlicuotas": 0,
+  "totalsByAlicuota": [
+    {
+      "alicuotaCode": "",
+      "neto": 1,
+      "iva": 1
+    }
+  ],
+  "totalNeto": 1,
+  "totalIva": 1,
+  "totalExento": 1,
+  "totalGeneral": 1,
+  "arcaValidationPending": true
+}
+```
+
+### LibroIvaVentasPreviewEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`arcaValidationPending` (required)**
+
+    `boolean`
+
+  - **`periodo` (required)**
+
+    `string`
+
+  - **`recordCountAlicuotas` (required)**
+
+    `integer`
+
+  - **`recordCountCbtv` (required)**
+
+    `integer`
+
+  - **`totalExento` (required)**
+
+    `number`
+
+  - **`totalGeneral` (required)**
+
+    `number`
+
+  - **`totalIva` (required)**
+
+    `number`
+
+  - **`totalNeto` (required)**
+
+    `number`
+
+  - **`totalsByAlicuota` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`alicuotaCode` (required)**
+
+      `string`
+
+    - **`iva` (required)**
+
+      `number`
+
+    - **`neto` (required)**
+
+      `number`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "periodo": "",
+    "recordCountCbtv": 0,
+    "recordCountAlicuotas": 0,
+    "totalsByAlicuota": [
+      {
+        "alicuotaCode": "",
+        "neto": 1,
+        "iva": 1
+      }
+    ],
+    "totalNeto": 1,
+    "totalIva": 1,
+    "totalExento": 1,
+    "totalGeneral": 1,
+    "arcaValidationPending": true
   }
 }
 ```
