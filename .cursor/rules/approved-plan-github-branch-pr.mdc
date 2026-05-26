@@ -22,6 +22,7 @@ Cuando el usuario **apruebe un plan** de implementación (Cursor plan / backlog 
 
 - Commits atómicos y mensajes alineados con [Conventional Commits](CONTRIBUTING.md) cuando aplique.
 - Cumplir [`.cursor/rules/bizcode.mdc`](.cursor/rules/bizcode.mdc) y el resto de reglas del repositorio.
+- Cuando se ejecute un plan aprobado que involucre múltiples fases o áreas críticas —Prisma, backend, frontend, OpenAPI, documentación, testing, seguridad, accesibilidad o CI/CD— se debe aplicar también [`.cursor/rules/controlled-plan-execution.mdc`](.cursor/rules/controlled-plan-execution.mdc). La implementación debe realizarse por fases, con evidencia técnica y aprobación explícita antes de continuar.
 
 ## 4. Cierre: pull request
 

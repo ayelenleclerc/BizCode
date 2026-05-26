@@ -1,0 +1,137 @@
+---
+description: Ejecución controlada por fases para issues y planes aprobados de BizCode
+alwaysApply: true
+---
+
+# BizCode — Controlled Plan Execution
+
+## Objetivo
+
+Cuando se trabaje sobre issues, planes aprobados, bugs, features, refactors o documentación de BizCode, Cursor debe ejecutar el trabajo de forma controlada, incremental y verificable.
+
+Cursor no debe implementar un plan completo de punta a punta sin checkpoints intermedios, sin evidencia técnica y sin aprobación explícita para avanzar entre fases.
+
+Esta regla complementa:
+
+- `approved-plan-github-branch-pr.mdc`
+- `bizcode.mdc`
+- `backend-standards.mdc`
+- `frontend-standards.mdc`
+- `qa-standards.mdc`
+- `bizcode-documentation.mdc`
+- `doc-generation.mdc`
+- `certificacion-iso.mdc`
+- `iso-documentation-standards.mdc`
+- `product-vision.mdc`
+
+## Principio obligatorio
+
+Cursor debe trabajar por fases.
+
+Al finalizar cada fase debe:
+
+1. Detenerse.
+2. Informar qué revisó.
+3. Informar qué modificó.
+4. Mostrar evidencia técnica.
+5. Indicar riesgos o bloqueos.
+6. Indicar validaciones ejecutadas.
+7. Indicar la próxima fase propuesta.
+8. Esperar aprobación explícita de Ayelen antes de continuar.
+
+No avanzar automáticamente a la siguiente fase salvo que Ayelen lo haya autorizado explícitamente.
+
+## Cuándo aplica obligatoriamente
+
+Además de issues, planes aprobados, bugs, features, refactors y documentación, esta regla es **obligatoria** cuando el plan aprobado:
+
+- tenga **múltiples fases**, o
+- impacte cualquiera de estas áreas: **Prisma**, **backend**, **frontend**, **OpenAPI**, **documentación**, **pruebas**, **seguridad**, **accesibilidad** o **CI/CD**.
+
+En esos casos el trabajo debe ejecutarse **por fases**, con **evidencia técnica** y **aprobación explícita** de Ayelen antes de continuar.
+
+## Relación con `approved-plan-github-branch-pr.mdc`
+
+- **`approved-plan-github-branch-pr.mdc`:** GitHub (issues/proyecto), rama desde `develop`, commits y PR al cierre.
+- **Esta regla:** ritmo de ejecución, checkpoints entre fases y plantilla de cierre.
+
+Ambas aplican en planes aprobados: primero alinear tareas y rama (regla de PR); luego ejecutar por fases con la plantilla de esta regla. No sustituyen `bizcode.mdc` ni las reglas de dominio listadas arriba.
+
+## Fuente oficial
+
+Repositorio oficial:
+
+https://github.com/ayelenleclerc/BizCode
+
+Ramas relevantes:
+
+- `main`: baseline estable.
+- `develop`: integración y evolución activa.
+- ramas `feature/*`, `fix/*`, `docs/*`: trabajo controlado por issue o plan.
+
+Las ramas de trabajo deben salir de `develop` y los Pull Requests deben apuntar a `develop`.
+
+No hacer merge a `develop` ni a `main`.
+
+No hacer push directo a `main`.
+
+## Flujo obligatorio por issue o plan
+
+Antes de modificar código, Cursor debe:
+
+1. Leer el issue o plan aprobado.
+2. Confirmar rama actual.
+3. Confirmar base `develop`.
+4. Revisar estado Git.
+5. Identificar archivos potencialmente impactados.
+6. Separar alcance implementado, pendiente y propuesto.
+7. Dividir el trabajo en fases.
+8. Informar el plan de ejecución.
+9. Esperar aprobación para iniciar la primera fase si el trabajo es amplio o toca áreas críticas.
+
+Comandos recomendados al inicio:
+
+```bash
+git status
+git branch --show-current
+git fetch origin
+git diff --stat origin/develop...HEAD
+```
+
+## Plantilla obligatoria al cerrar cada fase
+
+Al terminar cada fase, Cursor debe informar usando **exactamente** esta estructura (rellenar cada apartado; si no aplica, indicar «N/A»):
+
+```markdown
+## Fase completada: <nombre de fase>
+
+### Estado
+Completada / Bloqueada / Requiere decisión
+
+### Archivos revisados
+- ...
+
+### Archivos modificados
+- ...
+
+### Cambios realizados
+- ...
+
+### Validaciones ejecutadas
+- Comando: resultado
+
+### Evidencia técnica
+- ...
+
+### Riesgos detectados
+- ...
+
+### Pendientes
+- ...
+
+### Requiere aprobación para continuar
+Sí / No
+
+### Próxima fase propuesta
+<nombre de fase>
+```

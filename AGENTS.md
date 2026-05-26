@@ -6,6 +6,8 @@
 
 **Planes aprobados (GitHub + rama + PR):** cuando se implemente un plan aprobado, seguir [`.cursor/rules/approved-plan-github-branch-pr.mdc`](.cursor/rules/approved-plan-github-branch-pr.mdc) (tareas en proyecto GitHub, rama nueva desde `develop`, PR al final).
 
+**Ejecución controlada por fases:** en issues, planes aprobados, bugs, features, refactors o documentación, seguir [`.cursor/rules/controlled-plan-execution.mdc`](.cursor/rules/controlled-plan-execution.mdc) (trabajo incremental, plantilla de cierre por fase, evidencia técnica y aprobación explícita antes de continuar; obligatoria con especial rigor si el plan tiene varias fases o impacta Prisma, backend, frontend, OpenAPI, documentación, pruebas, seguridad, accesibilidad o CI/CD; complementa la regla anterior).
+
 ## Referencias normativas (detalle en `docs/`)
 
 - **Convenciones de código y comentarios trilingües:** [docs/en/coding-standards.md](docs/en/coding-standards.md) · [es](docs/es/estandares-codigo.md) · [pt-BR](docs/pt-br/padroes-codigo.md)
