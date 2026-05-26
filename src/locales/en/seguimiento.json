@@ -8,6 +8,7 @@
     "load": "Could not load tracking. Please try again."
   },
   "sidebarTitle": "Active routes",
+  "selected": "Selected",
   "lastUpdate": "Last position: {{time}}",
   "noLocation": "No GPS position yet",
   "progress": "{{delivered}}/{{total}} deliveries",

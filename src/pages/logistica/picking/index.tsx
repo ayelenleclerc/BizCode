@@ -263,7 +263,6 @@ function PickingPageContent() {
                               type="checkbox"
                               checked={checkedItems[item.id] === true}
                               onChange={() => toggleItem(item.id)}
-                              aria-checked={checkedItems[item.id] === true}
                               data-testid={`picking-check-${item.id}`}
                             />
                             <span>

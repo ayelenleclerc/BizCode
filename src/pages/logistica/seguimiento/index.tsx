@@ -184,9 +184,11 @@ function SeguimientoPageContent() {
                         : 'border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800'
                     }`}
                     data-testid={`seguimiento-reparto-${activo.id}`}
-                    aria-pressed={selectedId === activo.id}
                     onClick={() => setSelectedId(activo.id)}
                   >
+                    {selectedId === activo.id ? (
+                      <span className="sr-only">{t('selected')}</span>
+                    ) : null}
                     <span className="font-medium block">{activo.chofer.username}</span>
                     <span className="text-slate-600 dark:text-slate-400 block">
                       {t('progress', {

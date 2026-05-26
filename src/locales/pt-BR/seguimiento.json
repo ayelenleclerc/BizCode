@@ -8,6 +8,7 @@
     "load": "Não foi possível carregar o rastreamento. Tente novamente."
   },
   "sidebarTitle": "Repartos ativos",
+  "selected": "Selecionado",
   "lastUpdate": "Última posição: {{time}}",
   "noLocation": "Sem posição GPS ainda",
   "progress": "{{delivered}}/{{total}} entregas",
