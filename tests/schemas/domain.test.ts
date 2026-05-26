@@ -4,6 +4,7 @@ import {
   clienteBodySchema,
   empresaUpdateBodySchema,
   facturaBodySchema,
+  logisticaReportesQuerySchema,
   proveedorBodySchema,
   rubroBodySchema,
   stockAjusteBodySchema,
@@ -160,6 +161,34 @@ describe('empresaUpdateBodySchema', () => {
       cuit: '20-12345678-6',
       puntoVenta: 10000,
       tipoFactura: 'B',
+    })
+    expect(r.success).toBe(false)
+  })
+})
+
+describe('logisticaReportesQuerySchema', () => {
+  it('parses valid period and optional choferId', () => {
+    const out = logisticaReportesQuerySchema.parse({
+      from: '2026-05-01',
+      to: '2026-05-31',
+      choferId: '3',
+    })
+    expect(out.choferId).toBe(3)
+  })
+
+  it('rejects from after to', () => {
+    const r = logisticaReportesQuerySchema.safeParse({
+      from: '2026-05-31',
+      to: '2026-05-01',
+    })
+    expect(r.success).toBe(false)
+  })
+
+  it('rejects invalid choferId', () => {
+    const r = logisticaReportesQuerySchema.safeParse({
+      from: '2026-05-01',
+      to: '2026-05-31',
+      choferId: 'abc',
     })
     expect(r.success).toBe(false)
   })

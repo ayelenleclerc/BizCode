@@ -50,4 +50,73 @@ describe('LogisticaReportesService', () => {
     expect(result.firstVisitRate).toBeNull()
     expect(result.avgDeliveryMinutes).toBeNull()
   })
+
+  it('getReporteChoferes maps query rows', async () => {
+    const prisma = {
+      $queryRaw: vi.fn().mockResolvedValueOnce([
+        {
+          chofer_id: 3,
+          chofer_username: 'driver3',
+          day: new Date('2026-05-10'),
+          dispatched: BigInt(2),
+          delivered: BigInt(1),
+          not_delivered: BigInt(1),
+        },
+      ]),
+    } as unknown as PrismaClient
+    const service = new LogisticaReportesService(prisma)
+    const rows = await service.getReporteChoferes({
+      tenantId: 1,
+      from: new Date('2026-05-01'),
+      to: new Date('2026-05-31'),
+      choferId: 3,
+    })
+    expect(rows[0]?.choferUsername).toBe('driver3')
+    expect(rows[0]?.day).toBe('2026-05-10')
+  })
+
+  it('getReporteZonas applies choferId filter in query', async () => {
+    const prisma = {
+      $queryRaw: vi.fn().mockResolvedValueOnce([
+        {
+          zona_id: 1,
+          zona_nombre: 'Norte',
+          dispatched: BigInt(2),
+          delivered: BigInt(1),
+          not_delivered: BigInt(1),
+        },
+      ]),
+    } as unknown as PrismaClient
+    const service = new LogisticaReportesService(prisma)
+    const rows = await service.getReporteZonas({
+      tenantId: 1,
+      from: new Date('2026-05-01'),
+      to: new Date('2026-05-31'),
+      choferId: 7,
+    })
+    expect(rows).toHaveLength(1)
+    expect(rows[0].zonaNombre).toBe('Norte')
+    expect(prisma.$queryRaw).toHaveBeenCalled()
+  })
+
+  it('getReporteZonas uses em dash when zone name is null', async () => {
+    const prisma = {
+      $queryRaw: vi.fn().mockResolvedValueOnce([
+        {
+          zona_id: null,
+          zona_nombre: null,
+          dispatched: BigInt(1),
+          delivered: BigInt(0),
+          not_delivered: BigInt(1),
+        },
+      ]),
+    } as unknown as PrismaClient
+    const service = new LogisticaReportesService(prisma)
+    const rows = await service.getReporteZonas({
+      tenantId: 1,
+      from: new Date('2026-05-01'),
+      to: new Date('2026-05-31'),
+    })
+    expect(rows[0]?.zonaNombre).toBe('—')
+  })
 })

@@ -1959,7 +1959,7 @@ export const logisticaReportesAPI = {
     }
   },
 
-  reporteZonas: async (params: Pick<LogisticaReportesParams, 'from' | 'to'>) => {
+  reporteZonas: async (params: LogisticaReportesParams) => {
     try {
       const response = await api.get('/logistica/reporte-zonas', { params })
       return response.data.data as LogisticaZonaRow[]
@@ -1981,7 +1981,7 @@ export const logisticaReportesAPI = {
     }
   },
 
-  exportZonasCsv: async (params: Pick<LogisticaReportesParams, 'from' | 'to'>) => {
+  exportZonasCsv: async (params: LogisticaReportesParams) => {
     try {
       const response = await api.get('/logistica/reporte-zonas', {
         params,

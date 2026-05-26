@@ -180,8 +180,9 @@ export class LogisticaReportesService {
     }))
   }
 
-  async getReporteZonas(filter: Omit<PeriodFilter, 'choferId'>): Promise<LogisticaZonaRow[]> {
-    const { tenantId, from, to } = filter
+  async getReporteZonas(filter: PeriodFilter): Promise<LogisticaZonaRow[]> {
+    const { tenantId, from, to, choferId } = filter
+    const choferFilter = choferId ?? null
 
     const rows = await this.prisma.$queryRaw<
       {
@@ -203,6 +204,7 @@ export class LogisticaReportesService {
       WHERE oe."tenantId" = ${tenantId}
         AND oe."dispatchedAt" >= ${from}
         AND oe."dispatchedAt" <= ${to}
+        AND (${choferFilter}::int IS NULL OR oe."driverId" = ${choferFilter})
       GROUP BY z.id, z.nombre
       ORDER BY dispatched DESC
     `

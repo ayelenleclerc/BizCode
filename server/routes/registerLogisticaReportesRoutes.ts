@@ -116,6 +116,7 @@ export function registerLogisticaReportesRoutes(app: Application, ctx: RestRoute
           tenantId,
           from: period.from,
           to: period.to,
+          choferId: period.choferId,
         })
         if (wantsCsv(req)) {
           sendCsv(res, 'logistica-zonas.csv', zonasToCsv(data))

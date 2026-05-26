@@ -96,13 +96,14 @@ tests/server/services/repartoUbicacionService.test.ts  ← retenção GPS 7 dias
 
 O Vitest **exclui** `e2e/**` (`vitest.config.ts`) para que apenas o Playwright execute esses arquivos.
 
-### Evidência API logística (#140–#144)
+### Evidência API logística (#140–#145)
 
 | Área | Arquivos de teste | Notas |
 |------|-------------------|--------|
 | Repartos | `tests/api/repartos.test.ts`, `tests/api/contract.test.ts` | CRUD, iniciar/fechar, POD, contrato OpenAPI |
 | GPS | `repartoUbicacionService.test.ts`, rotas `activos` / `ubicacion` | Módulo `logistics.gps`; `TEST_DEFAULT_MODULES` em `tenantModules.ts` |
 | Picking | `tests/api/ordenes-entrega.test.ts` | Módulo `logistics.picking` |
+| KPIs e relatórios (#145) | `tests/api/logistica-reportes.test.ts`, `logisticaReportesService.test.ts`, `LogisticaReportesPanel.test.tsx`, contrato `/api/logistica/kpis`, `reporte-choferes`, `reporte-zonas` | Módulo `logistics.dispatches`; `dispatchedAt` / ADR-0011; `choferId` opcional nos três endpoints |
 | Matriz auditoria (#84) | `tests/server/http-mutations-audit-coverage.test.ts` | Picking, repartos, GPS, POD |
 | Integração | `tests/integration/repartos.integration.test.ts` | Opcional; PostgreSQL migrado | **`tests/integration/**`** fica fora do `npm run test:coverage` (não exige `DATABASE_URL`); integração usa `vitest.integration.config.ts`.
 

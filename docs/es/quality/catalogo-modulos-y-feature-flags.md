@@ -20,11 +20,11 @@
 - **Pricing y trials (#226):** [`src/lib/modules/pricing.ts`](../../../src/lib/modules/pricing.ts); `GET /api/superadmin/tenants/:id/pricing`; modelo `TenantModuleTrial` y `GET/POST/DELETE .../trials`; job `npm run modules:trial-expire`; notificación `module_trial_expiring` a owners; panel de precio y controles de trial en `TenantModulesPage`.
 - **Planes SaaS (#181):** modelos `Plan` / `TenantPlan`; catálogo en [`src/lib/plans/catalog.ts`](../../../src/lib/plans/catalog.ts); `GET /api/planes`, `GET /api/me/plan`, `POST /api/superadmin/tenants/:id/plan`; middleware `requirePlanFeature` y límites hard en `POST /api/users` / `POST /api/facturas`; `PlanProvider` / `PlanGate` en frontend; selector de plan en `TenantDetailPage`. Cobro externo (MP) **fuera de alcance** en este slice.
 
-## Módulos de logística (#140–#144)
+## Módulos de logística (#140–#145)
 
 | Clave | Etiqueta catálogo | Puerta UI / API (evidencia) |
 |-------|-------------------|-----------------------------|
-| `logistics.dispatches` | Repartos | `ModuleRoute` en `/logistica`, `/logistica/repartos`, `/logistica/repartos/chofer`; nav en [`navSections.ts`](../../../src/components/layout/navSections.ts); rutas `/api/repartos` (permisos RBAC, sin `requireModule` en CRUD base) |
+| `logistics.dispatches` | Repartos + reportes | `ModuleRoute` en `/logistica`, `/logistica/repartos`, `/logistica/repartos/chofer`; pestaña **Reportes** en `/logistica` (#145, sin clave nueva); `requireModule('logistics.dispatches')` en `GET /api/logistica/*` ([`registerLogisticaReportesRoutes.ts`](../../../server/routes/registerLogisticaReportesRoutes.ts)); nav en [`navSections.ts`](../../../src/components/layout/navSections.ts); rutas `/api/repartos` (permisos RBAC) |
 | `logistics.picking` | Picking | `ModuleRoute` en `/logistica/picking`; `requireModule('logistics.picking')` en endpoints de picking en [`registerOrdenesEntregaRoutes.ts`](../../../server/routes/registerOrdenesEntregaRoutes.ts) |
 | `logistics.pod` | POD firma | `hasModule('logistics.pod')` en wizard chofer y panel de seguimiento; `PUT` POD en ítems de reparto |
 | `logistics.gps` | Tracking GPS | `ModuleRoute` en `/logistica/seguimiento`; `requireModule('logistics.gps')` en `activos` / `ubicacion` / `ubicacion/ultima` en [`registerRepartosRoutes.ts`](../../../server/routes/registerRepartosRoutes.ts) |

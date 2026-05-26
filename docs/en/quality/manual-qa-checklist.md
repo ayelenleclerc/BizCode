@@ -29,7 +29,7 @@ Use this checklist for releases, regression passes, or audit evidence when autom
 - [ ] Tab order usable on login and one main module
 - [ ] Visible focus; form errors associated with fields where tested
 
-## Logistics (#140–#144) — when modules enabled
+## Logistics (#140–#145) — when modules enabled
 
 Prerequisites: tenant modules `logistics.dispatches` (+ `logistics.picking`, `logistics.pod`, `logistics.gps` as needed); roles/permissions per [rbac-matrix-roles-permissions-scopes.md](rbac-matrix-roles-permissions-scopes.md); manual [manual-logistics.md](../user/manual-logistics.md).
 
@@ -38,6 +38,7 @@ Prerequisites: tenant modules `logistics.dispatches` (+ `logistics.picking`, `lo
 - [ ] **Routes** (`/logistica/repartos`, `logistics.dispatches`): create route with ready OEs → start → close
 - [ ] **Driver POD** (`/logistica/repartos/chofer`, `logistics.pod`): confirm one stop with signature; back-office shows proof
 - [ ] **GPS tracking** (`/logistica/seguimiento`, `logistics.gps`): planner map lists `on_route` routes; optional driver geolocation on chofer app (denied permission must not block POD)
+- [ ] **Reports (#145)** (`/logistica` → **Reports** tab, `logistics.dispatches`): KPI cards and driver/zone tables load for a period; optional driver filter applies to KPIs and both tables; CSV export for drivers and zones
 
 ## Exit criteria
 

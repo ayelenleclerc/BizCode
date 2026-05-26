@@ -19946,6 +19946,14 @@ Requires `logistics.read`, `orders.deliver.confirm`, or `orders.pick`. Drivers o
 
     `integer`
 
+  - **`dispatchedAt`**
+
+    `string`, format: `date-time` — When the order entered in\_transit (ADR-0011).
+
+  - **`dispatchTimestampSource`**
+
+    `string`, possible values: `"event", "estimated"` — How dispatchedAt was derived (audit event vs estimated from updatedAt).
+
   - **`driver`**
 
     `object`
@@ -20059,6 +20067,8 @@ Requires `logistics.read`, `orders.deliver.confirm`, or `orders.pick`. Drivers o
       "fecha": "",
       "estado": "pending",
       "nota": "",
+      "dispatchedAt": "",
+      "dispatchTimestampSource": "event",
       "items": [
         {
           "id": 1,
@@ -20242,6 +20252,14 @@ Requires `orders.create`. Initial estado is `pending`, or `assigned` when `drive
 
     `integer`
 
+  - **`dispatchedAt`**
+
+    `string`, format: `date-time` — When the order entered in\_transit (ADR-0011).
+
+  - **`dispatchTimestampSource`**
+
+    `string`, possible values: `"event", "estimated"` — How dispatchedAt was derived (audit event vs estimated from updatedAt).
+
   - **`driver`**
 
     `object`
@@ -20354,6 +20372,8 @@ Requires `orders.create`. Initial estado is `pending`, or `assigned` when `drive
     "fecha": "",
     "estado": "pending",
     "nota": "",
+    "dispatchedAt": "",
+    "dispatchTimestampSource": "event",
     "items": [
       {
         "id": 1,
@@ -20531,6 +20551,14 @@ Requires `orders.dispatch` for transitions to `assigned`, `in_transit`, or `fail
 
     `integer`
 
+  - **`dispatchedAt`**
+
+    `string`, format: `date-time` — When the order entered in\_transit (ADR-0011).
+
+  - **`dispatchTimestampSource`**
+
+    `string`, possible values: `"event", "estimated"` — How dispatchedAt was derived (audit event vs estimated from updatedAt).
+
   - **`driver`**
 
     `object`
@@ -20643,6 +20671,8 @@ Requires `orders.dispatch` for transitions to `assigned`, `in_transit`, or `fail
     "fecha": "",
     "estado": "pending",
     "nota": "",
+    "dispatchedAt": "",
+    "dispatchTimestampSource": "event",
     "items": [
       {
         "id": 1,
@@ -20831,6 +20861,14 @@ Requires `orders.pick` and tenant module `logistics.picking`. Transitions `pendi
 
     `integer`
 
+  - **`dispatchedAt`**
+
+    `string`, format: `date-time` — When the order entered in\_transit (ADR-0011).
+
+  - **`dispatchTimestampSource`**
+
+    `string`, possible values: `"event", "estimated"` — How dispatchedAt was derived (audit event vs estimated from updatedAt).
+
   - **`driver`**
 
     `object`
@@ -20943,6 +20981,8 @@ Requires `orders.pick` and tenant module `logistics.picking`. Transitions `pendi
     "fecha": "",
     "estado": "pending",
     "nota": "",
+    "dispatchedAt": "",
+    "dispatchTimestampSource": "event",
     "items": [
       {
         "id": 1,
@@ -21131,6 +21171,14 @@ Requires `orders.pick` and tenant module `logistics.picking`. Transitions `picki
 
     `integer`
 
+  - **`dispatchedAt`**
+
+    `string`, format: `date-time` — When the order entered in\_transit (ADR-0011).
+
+  - **`dispatchTimestampSource`**
+
+    `string`, possible values: `"event", "estimated"` — How dispatchedAt was derived (audit event vs estimated from updatedAt).
+
   - **`driver`**
 
     `object`
@@ -21243,6 +21291,8 @@ Requires `orders.pick` and tenant module `logistics.picking`. Transitions `picki
     "fecha": "",
     "estado": "pending",
     "nota": "",
+    "dispatchedAt": "",
+    "dispatchTimestampSource": "event",
     "items": [
       {
         "id": 1,
@@ -21485,6 +21535,14 @@ Requires `logistics.read`. Filter by `fecha`, `choferId`, `estado`.
 
         `integer`
 
+      - **`dispatchedAt`**
+
+        `string`, format: `date-time` — When the order entered in\_transit (ADR-0011).
+
+      - **`dispatchTimestampSource`**
+
+        `string`, possible values: `"event", "estimated"` — How dispatchedAt was derived (audit event vs estimated from updatedAt).
+
       - **`driver`**
 
         `object`
@@ -21703,6 +21761,8 @@ Requires `logistics.read`. Filter by `fecha`, `choferId`, `estado`.
             "fecha": "",
             "estado": "pending",
             "nota": "",
+            "dispatchedAt": "",
+            "dispatchTimestampSource": "event",
             "items": [
               {
                 "id": 1,
@@ -21933,6 +21993,14 @@ Requires `orders.dispatch`. Groups delivery orders in estado `ready`; assigns dr
 
         `integer`
 
+      - **`dispatchedAt`**
+
+        `string`, format: `date-time` — When the order entered in\_transit (ADR-0011).
+
+      - **`dispatchTimestampSource`**
+
+        `string`, possible values: `"event", "estimated"` — How dispatchedAt was derived (audit event vs estimated from updatedAt).
+
       - **`driver`**
 
         `object`
@@ -22147,6 +22215,8 @@ Requires `orders.dispatch`. Groups delivery orders in estado `ready`; assigns dr
           "fecha": "",
           "estado": "pending",
           "nota": "",
+          "dispatchedAt": "",
+          "dispatchTimestampSource": "event",
           "items": [
             {
               "id": 1,
@@ -22567,6 +22637,14 @@ Requires `logistics.read`.
 
         `integer`
 
+      - **`dispatchedAt`**
+
+        `string`, format: `date-time` — When the order entered in\_transit (ADR-0011).
+
+      - **`dispatchTimestampSource`**
+
+        `string`, possible values: `"event", "estimated"` — How dispatchedAt was derived (audit event vs estimated from updatedAt).
+
       - **`driver`**
 
         `object`
@@ -22781,6 +22859,8 @@ Requires `logistics.read`.
           "fecha": "",
           "estado": "pending",
           "nota": "",
+          "dispatchedAt": "",
+          "dispatchTimestampSource": "event",
           "items": [
             {
               "id": 1,
@@ -22994,6 +23074,14 @@ Requires `orders.dispatch`. `planned` → `on_route`; pending items' OEs → `in
 
         `integer`
 
+      - **`dispatchedAt`**
+
+        `string`, format: `date-time` — When the order entered in\_transit (ADR-0011).
+
+      - **`dispatchTimestampSource`**
+
+        `string`, possible values: `"event", "estimated"` — How dispatchedAt was derived (audit event vs estimated from updatedAt).
+
       - **`driver`**
 
         `object`
@@ -23208,6 +23296,8 @@ Requires `orders.dispatch`. `planned` → `on_route`; pending items' OEs → `in
           "fecha": "",
           "estado": "pending",
           "nota": "",
+          "dispatchedAt": "",
+          "dispatchTimestampSource": "event",
           "items": [
             {
               "id": 1,
@@ -23786,6 +23876,14 @@ Requires `orders.dispatch`. `on_route` → `completed`; pending items → `not_d
 
         `integer`
 
+      - **`dispatchedAt`**
+
+        `string`, format: `date-time` — When the order entered in\_transit (ADR-0011).
+
+      - **`dispatchTimestampSource`**
+
+        `string`, possible values: `"event", "estimated"` — How dispatchedAt was derived (audit event vs estimated from updatedAt).
+
       - **`driver`**
 
         `object`
@@ -24020,6 +24118,8 @@ Requires `orders.dispatch`. `on_route` → `completed`; pending items → `not_d
           "fecha": "",
           "estado": "pending",
           "nota": "",
+          "dispatchedAt": "",
+          "dispatchTimestampSource": "event",
           "items": [
             {
               "id": 1,
@@ -24284,6 +24384,14 @@ Requires `orders.deliver.confirm`. Route must be `on_route`; item `pending`. Dri
 
       `integer`
 
+    - **`dispatchedAt`**
+
+      `string`, format: `date-time` — When the order entered in\_transit (ADR-0011).
+
+    - **`dispatchTimestampSource`**
+
+      `string`, possible values: `"event", "estimated"` — How dispatchedAt was derived (audit event vs estimated from updatedAt).
+
     - **`driver`**
 
       `object`
@@ -24435,6 +24543,8 @@ Requires `orders.deliver.confirm`. Route must be `on_route`; item `pending`. Dri
       "fecha": "",
       "estado": "pending",
       "nota": "",
+      "dispatchedAt": "",
+      "dispatchTimestampSource": "event",
       "items": [
         {
           "id": 1,
@@ -24649,6 +24759,8 @@ Requires `logistics.read` and role `owner`, `manager`, or `logistics_planner` (n
       "fecha": "",
       "estado": "pending",
       "nota": "",
+      "dispatchedAt": "",
+      "dispatchTimestampSource": "event",
       "items": [
         {
           "id": 1,
@@ -26933,6 +27045,14 @@ true
 
   `integer`
 
+* **`dispatchedAt`**
+
+  `string`, format: `date-time` — When the order entered in\_transit (ADR-0011).
+
+* **`dispatchTimestampSource`**
+
+  `string`, possible values: `"event", "estimated"` — How dispatchedAt was derived (audit event vs estimated from updatedAt).
+
 * **`driver`**
 
   `object`
@@ -27039,6 +27159,8 @@ true
   "fecha": "",
   "estado": "pending",
   "nota": "",
+  "dispatchedAt": "",
+  "dispatchTimestampSource": "event",
   "items": [
     {
       "id": 1,
@@ -27205,6 +27327,14 @@ true
 
     `integer`
 
+  - **`dispatchedAt`**
+
+    `string`, format: `date-time` — When the order entered in\_transit (ADR-0011).
+
+  - **`dispatchTimestampSource`**
+
+    `string`, possible values: `"event", "estimated"` — How dispatchedAt was derived (audit event vs estimated from updatedAt).
+
   - **`driver`**
 
     `object`
@@ -27317,6 +27447,8 @@ true
     "fecha": "",
     "estado": "pending",
     "nota": "",
+    "dispatchedAt": "",
+    "dispatchTimestampSource": "event",
     "items": [
       {
         "id": 1,
@@ -30140,6 +30272,14 @@ true
 
     `integer`
 
+  - **`dispatchedAt`**
+
+    `string`, format: `date-time` — When the order entered in\_transit (ADR-0011).
+
+  - **`dispatchTimestampSource`**
+
+    `string`, possible values: `"event", "estimated"` — How dispatchedAt was derived (audit event vs estimated from updatedAt).
+
   - **`driver`**
 
     `object`
@@ -30285,6 +30425,8 @@ true
     "fecha": "",
     "estado": "pending",
     "nota": "",
+    "dispatchedAt": "",
+    "dispatchTimestampSource": "event",
     "items": [
       {
         "id": 1,
@@ -30430,6 +30572,8 @@ true
       "fecha": "",
       "estado": "pending",
       "nota": "",
+      "dispatchedAt": "",
+      "dispatchTimestampSource": "event",
       "items": [
         {
           "id": 1,
@@ -30497,6 +30641,14 @@ true
     - **`clienteId`**
 
       `integer`
+
+    - **`dispatchedAt`**
+
+      `string`, format: `date-time` — When the order entered in\_transit (ADR-0011).
+
+    - **`dispatchTimestampSource`**
+
+      `string`, possible values: `"event", "estimated"` — How dispatchedAt was derived (audit event vs estimated from updatedAt).
 
     - **`driver`**
 
@@ -30649,6 +30801,8 @@ true
       "fecha": "",
       "estado": "pending",
       "nota": "",
+      "dispatchedAt": "",
+      "dispatchTimestampSource": "event",
       "items": [
         {
           "id": 1,
@@ -30730,6 +30884,14 @@ true
     - **`clienteId`**
 
       `integer`
+
+    - **`dispatchedAt`**
+
+      `string`, format: `date-time` — When the order entered in\_transit (ADR-0011).
+
+    - **`dispatchTimestampSource`**
+
+      `string`, possible values: `"event", "estimated"` — How dispatchedAt was derived (audit event vs estimated from updatedAt).
 
     - **`driver`**
 
@@ -30939,6 +31101,8 @@ true
         "fecha": "",
         "estado": "pending",
         "nota": "",
+        "dispatchedAt": "",
+        "dispatchTimestampSource": "event",
         "items": [
           {
             "id": 1,
@@ -31078,6 +31242,14 @@ true
       - **`clienteId`**
 
         `integer`
+
+      - **`dispatchedAt`**
+
+        `string`, format: `date-time` — When the order entered in\_transit (ADR-0011).
+
+      - **`dispatchTimestampSource`**
+
+        `string`, possible values: `"event", "estimated"` — How dispatchedAt was derived (audit event vs estimated from updatedAt).
 
       - **`driver`**
 
@@ -31293,6 +31465,8 @@ true
           "fecha": "",
           "estado": "pending",
           "nota": "",
+          "dispatchedAt": "",
+          "dispatchTimestampSource": "event",
           "items": [
             {
               "id": 1,
@@ -31416,6 +31590,14 @@ true
       - **`clienteId`**
 
         `integer`
+
+      - **`dispatchedAt`**
+
+        `string`, format: `date-time` — When the order entered in\_transit (ADR-0011).
+
+      - **`dispatchTimestampSource`**
+
+        `string`, possible values: `"event", "estimated"` — How dispatchedAt was derived (audit event vs estimated from updatedAt).
 
       - **`driver`**
 
@@ -31651,6 +31833,8 @@ true
           "fecha": "",
           "estado": "pending",
           "nota": "",
+          "dispatchedAt": "",
+          "dispatchTimestampSource": "event",
           "items": [
             {
               "id": 1,

@@ -105,4 +105,12 @@ Formato: los criterios **Given / When / Then** son de verificación **manual** s
   - Dado `logistics.gps`, cuando el reparto está `on_route`, entonces el mapa muestra la última posición y el chofer puede publicar ubicación periódicamente.
 - **Evidencia:** `src/pages/logistica/seguimiento/`, `RepartoUbicacionService.ts`, `GET /api/repartos/activos`.
 
+## HU-14 — KPIs y reportes logísticos (#145)
+
+- **Historia:** Como planificador o manager quiero KPIs y reportes por chofer/zona en un período para medir 1ª visita, tiempos, devoluciones y exportar CSV.
+- **Criterios:**
+  - Dado `logistics.dispatches` y `logistics.read`, cuando abro la pestaña **Reportes** en `/logistica`, entonces cargan tarjetas KPI y tablas chofer/zona del período.
+  - Dado filtro de chofer opcional, cuando actualizo o exporto, entonces KPIs, reporte choferes y reporte zonas usan el mismo `choferId`.
+- **Evidencia:** `src/pages/logistica/LogisticaReportesPanel.tsx`, `GET /api/logistica/kpis`, `reporte-choferes`, `reporte-zonas`; [ADR-0011](../adr/ADR-0011-orden-entrega-dispatched-at.md) (`dispatchedAt`).
+
 **Otros idiomas:** [English](../../en/specs/user-stories-and-acceptance.md) · [Português](../../pt-br/specs/historias-usuario-criterios-aceitacao.md)

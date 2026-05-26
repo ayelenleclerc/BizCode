@@ -94,7 +94,7 @@ Módulo **`logistics.dispatches`**. Planificadores (`owner`, `manager`, `logisti
 |-----|--------|
 | `GET /api/logistica/kpis?from&to&choferId?` | Tasa 1ª visita, tiempo prom. entrega, devoluciones por motivo, OEs vencidas |
 | `GET /api/logistica/reporte-choferes?from&to&choferId?` | Productividad por chofer/día; `Accept: text/csv` |
-| `GET /api/logistica/reporte-zonas?from&to` | Cobertura por zona; `Accept: text/csv` |
+| `GET /api/logistica/reporte-zonas?from&to&choferId?` | Cobertura por zona; filtro chofer opcional; `Accept: text/csv` |
 
 **Despacho:** `OrdenEntrega.dispatchedAt` se setea al pasar a `in_transit`. Filas legacy pueden tener `dispatchTimestampSource = estimated` (ADR-0011).
 

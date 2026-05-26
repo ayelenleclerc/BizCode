@@ -70,6 +70,51 @@ describe('GET /api/logistica/* (#145)', () => {
     expect(res.body.data.firstVisitRate).toBe(0.8)
   })
 
+  it('GET /api/logistica/kpis returns 400 for invalid dates', async () => {
+    const prisma = buildPrismaMock()
+    const app = createApp(prisma)
+    await request(app)
+      .get('/api/logistica/kpis')
+      .query({ from: 'not-a-date', to: '2026-05-31' })
+      .expect(400)
+  })
+
+  it('GET /api/logistica/kpis returns 400 when from is after to', async () => {
+    const prisma = buildPrismaMock()
+    const app = createApp(prisma)
+    await request(app)
+      .get('/api/logistica/kpis')
+      .query({ from: '2026-05-31', to: '2026-05-01' })
+      .expect(400)
+  })
+
+  it('GET /api/logistica/kpis returns 400 for invalid choferId', async () => {
+    const prisma = buildPrismaMock()
+    const app = createApp(prisma)
+    await request(app)
+      .get('/api/logistica/kpis')
+      .query({ from: '2026-05-01', to: '2026-05-31', choferId: '0' })
+      .expect(400)
+  })
+
+  it('GET /api/logistica/kpis returns 400 when from is missing', async () => {
+    const prisma = buildPrismaMock()
+    const app = createApp(prisma)
+    await request(app).get('/api/logistica/kpis').query({ to: '2026-05-31' }).expect(400)
+  })
+
+  it('GET /api/logistica/kpis returns 500 when query fails', async () => {
+    const prisma = buildPrismaMock()
+    vi.mocked(prisma.$queryRaw).mockReset()
+    vi.mocked(prisma.$queryRaw).mockRejectedValueOnce(new Error('db down'))
+    const app = createApp(prisma)
+    const res = await request(app)
+      .get('/api/logistica/kpis')
+      .query({ from: '2026-05-01', to: '2026-05-31' })
+      .expect(500)
+    expect(res.body.success).toBe(false)
+  })
+
   it('GET /api/logistica/kpis returns 403 for driver', async () => {
     process.env.BIZCODE_TEST_ROLE = 'driver'
     const prisma = buildPrismaMock()
@@ -143,5 +188,83 @@ describe('GET /api/logistica/* (#145)', () => {
       .query({ from: '2026-05-01', to: '2026-05-31' })
       .expect(200)
     expect(res.body.data[0].zonaNombre).toBe('Norte')
+  })
+
+  it('GET /api/logistica/kpis filters by choferId', async () => {
+    const prisma = buildPrismaMock()
+    const app = createApp(prisma)
+    const res = await request(app)
+      .get('/api/logistica/kpis')
+      .query({ from: '2026-05-01', to: '2026-05-31', choferId: '2' })
+      .expect(200)
+    expect(res.body.data.dispatchedCount).toBe(10)
+    expect(prisma.$queryRaw).toHaveBeenCalled()
+  })
+
+  it('GET /api/logistica/reporte-choferes returns 500 on failure', async () => {
+    const prisma = buildPrismaMock()
+    vi.mocked(prisma.$queryRaw).mockReset()
+    vi.mocked(prisma.$queryRaw).mockRejectedValueOnce(new Error('db'))
+    const app = createApp(prisma)
+    const res = await request(app)
+      .get('/api/logistica/reporte-choferes')
+      .query({ from: '2026-05-01', to: '2026-05-31' })
+      .expect(500)
+    expect(res.body.success).toBe(false)
+  })
+
+  it('GET /api/logistica/reporte-zonas returns CSV', async () => {
+    const prisma = buildPrismaMock()
+    vi.mocked(prisma.$queryRaw).mockReset()
+    vi.mocked(prisma.$queryRaw).mockResolvedValueOnce([
+      {
+        zona_id: 1,
+        zona_nombre: 'Sur',
+        dispatched: BigInt(1),
+        delivered: BigInt(1),
+        not_delivered: BigInt(0),
+      },
+    ])
+    const app = createApp(prisma)
+    const res = await request(app)
+      .get('/api/logistica/reporte-zonas')
+      .query({ from: '2026-05-01', to: '2026-05-31', choferId: '4' })
+      .set('Accept', 'text/csv')
+      .expect(200)
+    expect(res.headers['content-type']).toMatch(/text\/csv/)
+    expect(res.text).toContain('Sur')
+  })
+
+  it('GET /api/logistica/reporte-zonas forwards choferId to service query', async () => {
+    const prisma = buildPrismaMock()
+    vi.mocked(prisma.$queryRaw).mockReset()
+    vi.mocked(prisma.$queryRaw).mockResolvedValueOnce([
+      {
+        zona_id: 1,
+        zona_nombre: 'Norte',
+        dispatched: BigInt(2),
+        delivered: BigInt(2),
+        not_delivered: BigInt(0),
+      },
+    ])
+    const app = createApp(prisma)
+    const res = await request(app)
+      .get('/api/logistica/reporte-zonas')
+      .query({ from: '2026-05-01', to: '2026-05-31', choferId: '7' })
+      .expect(200)
+    expect(res.body.data).toHaveLength(1)
+    expect(prisma.$queryRaw).toHaveBeenCalledTimes(1)
+  })
+
+  it('GET /api/logistica/reporte-zonas returns 500 on failure', async () => {
+    const prisma = buildPrismaMock()
+    vi.mocked(prisma.$queryRaw).mockReset()
+    vi.mocked(prisma.$queryRaw).mockRejectedValueOnce(new Error('db'))
+    const app = createApp(prisma)
+    const res = await request(app)
+      .get('/api/logistica/reporte-zonas')
+      .query({ from: '2026-05-01', to: '2026-05-31' })
+      .expect(500)
+    expect(res.body.success).toBe(false)
   })
 })

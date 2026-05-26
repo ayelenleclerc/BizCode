@@ -4108,6 +4108,11 @@ paths:
           schema:
             type: string
             format: date
+        - name: choferId
+          in: query
+          schema:
+            type: integer
+            minimum: 1
       responses:
         '200':
           description: Zone rows or CSV
@@ -4767,6 +4772,16 @@ components:
         nota:
           type: string
           nullable: true
+        dispatchedAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: When the order entered in_transit (ADR-0011).
+        dispatchTimestampSource:
+          type: string
+          nullable: true
+          enum: [event, estimated]
+          description: How dispatchedAt was derived (audit event vs estimated from updatedAt).
         items:
           type: array
           items:

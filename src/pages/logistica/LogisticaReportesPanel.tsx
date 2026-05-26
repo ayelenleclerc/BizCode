@@ -43,7 +43,7 @@ export default function LogisticaReportesPanel() {
       const [k, c, z] = await Promise.all([
         logisticaReportesAPI.kpis(params),
         logisticaReportesAPI.reporteChoferes(params),
-        logisticaReportesAPI.reporteZonas({ from: params.from, to: params.to }),
+        logisticaReportesAPI.reporteZonas(params),
       ])
       setKpis(k ?? null)
       setChoferes(c ?? [])
@@ -80,7 +80,7 @@ export default function LogisticaReportesPanel() {
   }
 
   const exportZonas = async () => {
-    const blob = await logisticaReportesAPI.exportZonasCsv({ from, to })
+    const blob = await logisticaReportesAPI.exportZonasCsv(queryParams())
     if (blob) downloadCsvBlob(blob, 'logistica-zonas.csv')
   }
 

@@ -94,7 +94,7 @@ Module **`logistics.dispatches`**. Planners (`owner`, `manager`, `logistics_plan
 |-----|--------|
 | `GET /api/logistica/kpis?from&to&choferId?` | First-visit rate, avg delivery minutes, returns by reason, overdue OEs |
 | `GET /api/logistica/reporte-choferes?from&to&choferId?` | Driver/day productivity; `Accept: text/csv` |
-| `GET /api/logistica/reporte-zonas?from&to` | Coverage by zone; `Accept: text/csv` |
+| `GET /api/logistica/reporte-zonas?from&to&choferId?` | Coverage by zone; optional driver filter; `Accept: text/csv` |
 
 **Dispatch timestamp:** `OrdenEntrega.dispatchedAt` is set when the OE becomes `in_transit` (route start or manual). Legacy rows may have `dispatchTimestampSource = estimated` after migration (see ADR-0011).
 
