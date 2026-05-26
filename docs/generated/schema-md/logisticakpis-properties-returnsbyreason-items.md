@@ -1,7 +1,7 @@
-# Untitled integer in LogisticaKpis Schema
+# Untitled undefined type in LogisticaKpis Schema
 
 ```txt
-undefined#/properties/overdueCount
+undefined#/properties/returnsByReason/items
 ```
 
 
@@ -10,10 +10,6 @@ undefined#/properties/overdueCount
 | :------------------ | :--------- | :------------- | :---------------------- | :---------------- | :-------------------- | :------------------ | :-------------------------------------------------------------------------------------------------- |
 | Can be instantiated | No         | Unknown status | Unknown identifiability | Forbidden         | Allowed               | none                | [LogisticaKpis.schema.json\*](../schema-json/LogisticaKpis.schema.json "open original schema") |
 
-## overdueCount Type
+## items Type
 
-`integer`
-
-## overdueCount Constraints
-
-**minimum**: the value of this number must greater than or equal to: `0`
+unknown

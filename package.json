@@ -53,7 +53,7 @@
     "sbom:generate": "cyclonedx-npm --output-file docs/evidence/sbom-cyclonedx.json --package-lock-only --ignore-npm-errors --omit dev",
     "sbom:generate:full": "cyclonedx-npm --output-file docs/evidence/sbom-cyclonedx-full.json --package-lock-only --ignore-npm-errors",
     "docs:extract-schemas": "tsx scripts/extract-openapi-schemas.ts",
-    "docs:schemas-md": "jsonschema2md -d docs/generated/schema-json -o docs/generated/schema-md -x -",
+    "docs:schemas-md": "tsx scripts/generate-schema-md.ts",
     "docs:openapi-md": "tsx scripts/generate-openapi-markdown.ts",
     "docs:typedoc": "typedoc --options typedoc.json && node scripts/patch-typedoc-html-noopener.mjs",
     "docs:sbom": "npm run sbom:generate",

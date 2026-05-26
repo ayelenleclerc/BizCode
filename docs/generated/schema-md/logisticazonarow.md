@@ -1,20 +1,20 @@
 # LogisticaZonaRow Schema
 
 ```txt
-undefined#/properties/data/items
+undefined
 ```
 
 
 
-| Abstract            | Extensible | Status         | Identifiable | Custom Properties | Additional Properties | Access Restrictions | Defined In                                                                                                               |
-| :------------------ | :--------- | :------------- | :----------- | :---------------- | :-------------------- | :------------------ | :----------------------------------------------------------------------------------------------------------------------- |
-| Can be instantiated | No         | Unknown status | No           | Forbidden         | Allowed               | none                | [LogisticaZonasListEnvelope.schema.json\*](../schema-json/LogisticaZonasListEnvelope.schema.json "open original schema") |
+| Abstract            | Extensible | Status         | Identifiable | Custom Properties | Additional Properties | Access Restrictions | Defined In                                                                                              |
+| :------------------ | :--------- | :------------- | :----------- | :---------------- | :-------------------- | :------------------ | :------------------------------------------------------------------------------------------------------ |
+| Can be instantiated | No         | Unknown status | No           | Forbidden         | Allowed               | none                | [LogisticaZonaRow.schema.json](../schema-json/LogisticaZonaRow.schema.json "open original schema") |
 
-## items Type
+## LogisticaZonaRow Type
 
 `object` ([LogisticaZonaRow](logisticazonarow.md))
 
-# items Properties
+# LogisticaZonaRow Properties
 
 | Property                      | Type      | Required | Nullable       | Defined by                                                                                           |
 | :---------------------------- | :-------- | :------- | :------------- | :--------------------------------------------------------------------------------------------------- |

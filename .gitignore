@@ -16,6 +16,7 @@ src-tauri/target/
 # Legacy / local SQL at repo root only — Prisma history lives in prisma/migrations/
 /migrations/
 coverage/
+docs/generated/.schema-md-stamp/
 
 playwright-report/
 test-results/

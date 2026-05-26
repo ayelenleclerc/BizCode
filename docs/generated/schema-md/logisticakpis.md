@@ -1,20 +1,20 @@
 # LogisticaKpis Schema
 
 ```txt
-undefined#/properties/data
+undefined
 ```
 
 
 
-| Abstract            | Extensible | Status         | Identifiable | Custom Properties | Additional Properties | Access Restrictions | Defined In                                                                                                     |
-| :------------------ | :--------- | :------------- | :----------- | :---------------- | :-------------------- | :------------------ | :------------------------------------------------------------------------------------------------------------- |
-| Can be instantiated | No         | Unknown status | No           | Forbidden         | Allowed               | none                | [LogisticaKpisEnvelope.schema.json\*](../schema-json/LogisticaKpisEnvelope.schema.json "open original schema") |
+| Abstract            | Extensible | Status         | Identifiable | Custom Properties | Additional Properties | Access Restrictions | Defined In                                                                                        |
+| :------------------ | :--------- | :------------- | :----------- | :---------------- | :-------------------- | :------------------ | :------------------------------------------------------------------------------------------------ |
+| Can be instantiated | No         | Unknown status | No           | Forbidden         | Allowed               | none                | [LogisticaKpis.schema.json](../schema-json/LogisticaKpis.schema.json "open original schema") |
 
-## data Type
+## LogisticaKpis Type
 
 `object` ([LogisticaKpis](logisticakpis.md))
 
-# data Properties
+# LogisticaKpis Properties
 
 | Property                                              | Type      | Required | Nullable       | Defined by                                                                                                             |
 | :---------------------------------------------------- | :-------- | :------- | :------------- | :--------------------------------------------------------------------------------------------------------------------- |
@@ -141,7 +141,7 @@ undefined#/properties/data
 
 * is required
 
-* Type: `object[]` ([LogisticaReturnReasonRow](logisticareturnreasonrow.md))
+* Type: `object[]` ([LogisticaReturnReasonRow](logisticakpis-properties-returnsbyreason-logisticareturnreasonrow.md))
 
 * cannot be null
 
@@ -149,4 +149,4 @@ undefined#/properties/data
 
 ### returnsByReason Type
 
-`object[]` ([LogisticaReturnReasonRow](logisticareturnreasonrow.md))
+`object[]` ([LogisticaReturnReasonRow](logisticakpis-properties-returnsbyreason-logisticareturnreasonrow.md))

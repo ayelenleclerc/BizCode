@@ -1,20 +1,20 @@
 # LogisticaReturnReasonRow Schema
 
 ```txt
-undefined
+undefined#/properties/returnsByReason/items
 ```
 
 
 
-| Abstract            | Extensible | Status         | Identifiable | Custom Properties | Additional Properties | Access Restrictions | Defined In                                                                                                              |
-| :------------------ | :--------- | :------------- | :----------- | :---------------- | :-------------------- | :------------------ | :---------------------------------------------------------------------------------------------------------------------- |
-| Can be instantiated | No         | Unknown status | No           | Forbidden         | Allowed               | none                | [LogisticaReturnReasonRow.schema.json](../schema-json/LogisticaReturnReasonRow.schema.json "open original schema") |
+| Abstract            | Extensible | Status         | Identifiable | Custom Properties | Additional Properties | Access Restrictions | Defined In                                                                                          |
+| :------------------ | :--------- | :------------- | :----------- | :---------------- | :-------------------- | :------------------ | :-------------------------------------------------------------------------------------------------- |
+| Can be instantiated | No         | Unknown status | No           | Forbidden         | Allowed               | none                | [LogisticaKpis.schema.json\*](../schema-json/LogisticaKpis.schema.json "open original schema") |
 
-## LogisticaReturnReasonRow Type
+## items Type
 
-`object` ([LogisticaReturnReasonRow](logisticareturnreasonrow.md))
+`object` ([LogisticaReturnReasonRow](logisticakpis-properties-returnsbyreason-logisticareturnreasonrow.md))
 
-# LogisticaReturnReasonRow Properties
+# items Properties
 
 | Property          | Type      | Required | Nullable       | Defined by                                                                                               |
 | :---------------- | :-------- | :------- | :------------- | :------------------------------------------------------------------------------------------------------- |
