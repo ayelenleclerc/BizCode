@@ -1,6 +1,6 @@
 import axios, { AxiosError } from 'axios'
 import type { AuthClaims } from '@/lib/rbac'
-import type { Cliente, Cobro } from '@/types'
+import type { Cliente, Cobro, Factura } from '@/types'
 
 const API_BASE = 'http://localhost:3001/api'
 
@@ -1338,7 +1338,65 @@ export const pedidosAPI = {
   },
 }
 
-// ============ FACTURAS ============
+// ============ FACTURAS / NOTAS DE CRÉDITO (#146) ============
+
+export type NotaCreditoEstadoCae = 'pending' | 'issued' | 'failed' | 'not_required'
+
+export type NotaCreditoFacturaOrigenDTO = {
+  id: number
+  tipo: string
+  prefijo: string
+  numero: number
+  clienteId: number
+  fecha: string
+  total: number | string
+  estado: string
+}
+
+export type NotaCreditoSnippetDTO = {
+  id: number
+  tenantId: number
+  facturaOrigenId: number
+  motivo: string
+  monto: number | string
+  cae: string | null
+  caeVto: string | null
+  estadoCae: NotaCreditoEstadoCae
+  createdById: number | null
+  createdAt: string
+}
+
+export type NotaCreditoRowDTO = NotaCreditoSnippetDTO & {
+  facturaOrigen: NotaCreditoFacturaOrigenDTO
+}
+
+export type FacturaVoidBalanceClienteDTO = {
+  id: number
+  rsocial: string
+  balance: number | string
+  creditLimit: number | null
+}
+
+export type FacturaVoidResultDTO = {
+  factura: Factura
+  notaCredito: NotaCreditoSnippetDTO
+  updatedCliente: FacturaVoidBalanceClienteDTO
+}
+
+export type NotasCreditoListParams = {
+  from: string
+  to: string
+  clienteId?: number
+  limit?: number
+  offset?: number
+}
+
+export type NotasCreditoListResult = {
+  data: NotaCreditoRowDTO[]
+  total: number
+  limit: number
+  offset: number
+}
 
 export const facturasAPI = {
   list: async () => {
@@ -1359,9 +1417,12 @@ export const facturasAPI = {
     }
   },
 
-  void: async (id: number, motivo: string) => {
+  void: async (id: number, motivo: string): Promise<FacturaVoidResultDTO> => {
     try {
-      const response = await api.put(`/facturas/${id}/void`, { motivo })
+      const response = await api.put<{ success: boolean; data: FacturaVoidResultDTO }>(
+        `/facturas/${id}/void`,
+        { motivo },
+      )
       return response.data.data
     } catch (error) {
       return handleError(error as AxiosError<ApiErrorPayload>)
@@ -1381,6 +1442,39 @@ export const facturasAPI = {
     try {
       const response = await api.get(`/facturas/${id}/pdf/preview`, { responseType: 'blob' })
       return response.data as Blob
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+}
+
+export const notasCreditoAPI = {
+  list: async (params: NotasCreditoListParams): Promise<NotasCreditoListResult> => {
+    try {
+      const response = await api.get<{
+        success: boolean
+        data: NotaCreditoRowDTO[]
+        total: number
+        limit: number
+        offset: number
+      }>('/notas-credito', { params })
+      return {
+        data: response.data.data,
+        total: response.data.total,
+        limit: response.data.limit,
+        offset: response.data.offset,
+      }
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  getById: async (id: number): Promise<NotaCreditoRowDTO> => {
+    try {
+      const response = await api.get<{ success: boolean; data: NotaCreditoRowDTO }>(
+        `/notas-credito/${id}`,
+      )
+      return response.data.data
     } catch (error) {
       return handleError(error as AxiosError<ApiErrorPayload>)
     }

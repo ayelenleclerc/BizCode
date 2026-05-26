@@ -72,6 +72,7 @@
     "motivoLabel": "Motivo do cancelamento",
     "motivoPlaceholder": "Ex.: Preço incorreto, devolvido pelo cliente…",
     "motivoRequired": "O motivo é obrigatório",
+    "motivoMinLength": "O motivo deve ter pelo menos 10 caracteres",
     "confirm": "Confirmar cancelamento",
     "cancel": "Cancelar",
     "loading": "Cancelando…",

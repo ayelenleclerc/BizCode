@@ -3,8 +3,9 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import '@/i18n/config'
 import FinanzasPage from './index'
-import { cobranzasAPI, reportesAPI } from '@/lib/api'
+import { cobranzasAPI, notasCreditoAPI, reportesAPI } from '@/lib/api'
 import { useAuth } from '@/contexts/AuthContext'
+import { useFeatureFlags } from '@/contexts/FeatureFlagsContext'
 import type { AuthClaims, Permission } from '@/lib/rbac'
 
 const baseClaims: AuthClaims = {
@@ -26,6 +27,10 @@ vi.mock('@/contexts/AuthContext', () => ({
   useAuth: vi.fn(),
 }))
 
+vi.mock('@/contexts/FeatureFlagsContext', () => ({
+  useFeatureFlags: vi.fn(),
+}))
+
 vi.mock('@/lib/api', async () => {
   const actual = await vi.importActual<typeof import('@/lib/api')>('@/lib/api')
   return {
@@ -41,6 +46,9 @@ vi.mock('@/lib/api', async () => {
       listVencidas: vi.fn(),
       sendRecordatorio: vi.fn(),
     },
+    notasCreditoAPI: {
+      list: vi.fn(),
+    },
   }
 })
 
@@ -54,11 +62,24 @@ function mockAuth(permissions: Permission[]) {
   })
 }
 
+function mockFlagsWithCreditNotes() {
+  vi.mocked(useFeatureFlags).mockReturnValue({
+    status: 'ready',
+    modules: ['billing.credit_notes'],
+    integrations: [],
+    hasModule: (k) => k === 'billing.credit_notes',
+    hasIntegration: () => false,
+    refreshFeatures: vi.fn(),
+  })
+}
+
 describe('FinanzasPage', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     localStorage.setItem('lang', 'es')
     mockAuth(baseClaims.permissions)
+    mockFlagsWithCreditNotes()
+    vi.mocked(notasCreditoAPI.list).mockResolvedValue({ data: [], total: 0, limit: 100, offset: 0 })
     vi.mocked(reportesAPI.aging).mockResolvedValue({
       buckets: [
         { label: '0-30d', count: 2, total: '1000' },
@@ -105,6 +126,44 @@ describe('FinanzasPage', () => {
       expect(cobranzasAPI.listVencidas).toHaveBeenCalled()
     })
     expect(screen.getByTestId('finanzas-aging-table')).toBeInTheDocument()
+  })
+
+  it('lista notas de crédito cuando el módulo está habilitado', async () => {
+    vi.mocked(notasCreditoAPI.list).mockResolvedValue({
+      data: [
+        {
+          id: 9,
+          tenantId: 1,
+          facturaOrigenId: 10,
+          motivo: 'xxxxxxxxxx',
+          monto: '100',
+          cae: null,
+          caeVto: null,
+          estadoCae: 'pending',
+          createdById: 1,
+          createdAt: '2026-05-01T10:00:00.000Z',
+          facturaOrigen: {
+            id: 10,
+            tipo: 'B',
+            prefijo: '0001',
+            numero: 2,
+            clienteId: 3,
+            fecha: '2026-04-20T00:00:00.000Z',
+            total: '100',
+            estado: 'N',
+          },
+        },
+      ],
+      total: 1,
+      limit: 100,
+      offset: 0,
+    })
+    render(<FinanzasPage />)
+    await screen.findByTestId('finanzas-page')
+    await waitFor(() => {
+      expect(notasCreditoAPI.list).toHaveBeenCalled()
+    })
+    expect(await screen.findByTestId('finanzas-nc-row-9')).toBeInTheDocument()
   })
 
   it('abre cuenta corriente con cliente válido', async () => {

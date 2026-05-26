@@ -56,5 +56,30 @@
     "alreadySent": "Ya enviado hoy",
     "empty": "No hay facturas vencidas con ese filtro.",
     "loadError": "No se pudieron cargar las facturas vencidas."
+  },
+  "creditNotes": {
+    "title": "Notas de crédito",
+    "hint": "Notas emitidas ligadas a facturas anuladas en el período (módulo billing.credit_notes). El ID de cliente opcional filtra por el cliente de la factura origen.",
+    "from": "Desde",
+    "to": "Hasta",
+    "clienteId": "ID cliente (opcional)",
+    "clienteIdPlaceholder": "Ej. 3",
+    "empty": "No hay notas de crédito en este rango.",
+    "colId": "ID",
+    "colDate": "Fecha",
+    "colInvoice": "Factura orig.",
+    "colCliente": "ID cliente",
+    "colAmount": "Importe",
+    "colMotivo": "Motivo",
+    "colCae": "Estado CAE",
+    "prev": "Anterior",
+    "next": "Siguiente",
+    "pageInfo": "{{start}}–{{end}} de {{total}}",
+    "cae": {
+      "pending": "CAE pendiente",
+      "issued": "CAE emitido",
+      "failed": "CAE fallido",
+      "not_required": "CAE no requerido"
+    }
   }
 }

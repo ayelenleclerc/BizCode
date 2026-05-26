@@ -31,5 +31,6 @@ Requirements below are **evidenced** by UI (`src/pages/`), client (`src/lib/api.
 | FR-018 | POD on route items: driver wizard; back-office view proof. | `src/pages/logistica/repartos/chofer/`, `PUT .../items/{itemId}`, `GET .../pod` |
 | FR-019 | Live GPS tracking: planner map; driver posts location every 2 min (`logistics.gps`). | `src/pages/logistica/seguimiento/`, `GET /api/repartos/activos`, `POST .../ubicacion` |
 | FR-020 | Logistics KPIs/reports: first-visit rate, avg delivery time, returns by reason, driver/zone tables, CSV (`logistics.dispatches`, `dispatchedAt`). | `src/pages/logistica/LogisticaReportesPanel.tsx`, `GET /api/logistica/kpis`, `reporte-choferes`, `reporte-zonas` |
+| FR-021 | Void active invoice with documented reason (`billing.credit_notes`, `sales.cancel`); list/get credit notes by period. | `PUT /api/facturas/{id}/void`, `GET /api/notas-credito`, `GET /api/notas-credito/{id}`, `ListadoFacturas.tsx`, `src/pages/finanzas/index.tsx`, [ADR-0012](../adr/ADR-0012-invoice-void-credit-note.md), `tests/api/notas-credito.test.ts`, `tests/api/facturas-void.test.ts` |
 
 **Other languages:** [Español](../../es/specs/requisitos-funcionales.md) · [Português](../../pt-br/specs/requisitos-funcionais.md)

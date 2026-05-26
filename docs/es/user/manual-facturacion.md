@@ -10,6 +10,10 @@ Muestra todas las facturas emitidas con: Fecha, Tipo (A/B), Número, Cliente, Ne
 
 **Ver detalle:** Haga clic en una factura para expandir el detalle con el desglose de ítems e IVA.
 
+## Anulación de factura (módulo notas de crédito)
+
+Con el módulo de tenant **`billing.credit_notes`** habilitado y permiso **`sales.cancel`**, abra el detalle de una factura **activa** y use **Anular factura**. Debe ingresar un **motivo** de al menos **10** caracteres (validación en servidor). La operación llama a `PUT /api/facturas/{id}/void`; el sistema registra una **nota de crédito** vinculada a la factura original (véase [ADR-0012](../adr/ADR-0012-anulacion-factura-nota-credito.md)). El listado de notas de crédito en la app: página **Finanzas**, mismo módulo (API `GET /api/notas-credito`).
+
 ## Emitir una Factura Nueva
 
 1. Presione **F3** o haga clic en **➕ Nueva Factura**.

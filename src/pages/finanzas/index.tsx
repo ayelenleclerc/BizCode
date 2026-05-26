@@ -3,14 +3,17 @@ import { useTranslation } from 'react-i18next'
 import { CanAccess } from '@/components/CanAccess'
 import ErrorBoundary from '@/components/ErrorBoundary'
 import AsyncWrapper from '@/components/shared/AsyncWrapper'
+import IfModule from '@/components/IfModule'
 import {
   ApiRequestFailedError,
   cobranzasAPI,
+  notasCreditoAPI,
   reportesAPI,
   type AgingArData,
   type AgingBucket,
   type CuentaCorrienteData,
   type FacturaVencidaRow,
+  type NotaCreditoRowDTO,
 } from '@/lib/api'
 
 function formatMoney(value: number | string): string {
@@ -25,6 +28,19 @@ function formatDate(value: string): string {
   if (Number.isNaN(d.getTime())) return value
   return d.toLocaleDateString('es-AR')
 }
+
+function monthRangeIso(): { from: string; to: string } {
+  const now = new Date()
+  const y = now.getFullYear()
+  const m = now.getMonth()
+  const pad = (n: number) => String(n).padStart(2, '0')
+  const from = `${y}-${pad(m + 1)}-01`
+  const lastDay = new Date(y, m + 1, 0).getDate()
+  const to = `${y}-${pad(m + 1)}-${pad(lastDay)}`
+  return { from, to }
+}
+
+const CREDIT_NOTE_LIST_PAGE_SIZE = 50 as const
 
 type SortKey = 'label' | 'count' | 'total'
 type SortDir = 'asc' | 'desc'
@@ -191,6 +207,10 @@ function FinanzasPageContent() {
           </AsyncWrapper>
         </section>
 
+        <IfModule flag="billing.credit_notes">
+          <FinanzasCreditNotesSection />
+        </IfModule>
+
         <section className="mt-8" aria-labelledby="finanzas-overdue-heading">
           <h2 id="finanzas-overdue-heading" className="text-lg font-semibold mb-2 text-slate-900 dark:text-slate-100">
             {t('overdue.title')}
@@ -319,6 +339,189 @@ function FinanzasPageContent() {
         )}
       </div>
     </ErrorBoundary>
+  )
+}
+
+function ncInvoiceRef(row: NotaCreditoRowDTO): string {
+  const n = row.facturaOrigen.numero
+  return `${row.facturaOrigen.tipo} ${row.facturaOrigen.prefijo}-${String(n).padStart(8, '0')}`
+}
+
+function FinanzasCreditNotesSection() {
+  const { t } = useTranslation('finanzas')
+  const defaults = useMemo(() => monthRangeIso(), [])
+  const [from, setFrom] = useState(defaults.from)
+  const [to, setTo] = useState(defaults.to)
+  const [clienteIdFilter, setClienteIdFilter] = useState('')
+  const [offset, setOffset] = useState(0)
+  const [rows, setRows] = useState<NotaCreditoRowDTO[]>([])
+  const [total, setTotal] = useState(0)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<Error | null>(null)
+
+  const load = useCallback(async () => {
+    setLoading(true)
+    setError(null)
+    try {
+      const raw = clienteIdFilter.trim()
+      let clienteId: number | undefined
+      if (raw !== '') {
+        const n = Number.parseInt(raw, 10)
+        if (Number.isFinite(n) && n >= 1) clienteId = n
+      }
+      const result = await notasCreditoAPI.list({
+        from,
+        to,
+        ...(clienteId !== undefined ? { clienteId } : {}),
+        limit: CREDIT_NOTE_LIST_PAGE_SIZE,
+        offset,
+      })
+      setRows(result.data)
+      setTotal(result.total)
+    } catch (e) {
+      setError(e instanceof Error ? e : new Error(String(e)))
+    } finally {
+      setLoading(false)
+    }
+  }, [from, to, clienteIdFilter, offset])
+
+  useEffect(() => {
+    void load()
+  }, [load])
+
+  const canPrev = offset > 0
+  const canNext = offset + CREDIT_NOTE_LIST_PAGE_SIZE < total
+
+  return (
+    <section className="mt-8" aria-labelledby="finanzas-nc-heading" data-testid="finanzas-nc-section">
+      <h2 id="finanzas-nc-heading" className="text-lg font-semibold mb-2 text-slate-900 dark:text-slate-100">
+        {t('creditNotes.title')}
+      </h2>
+      <p className="text-sm text-slate-500 dark:text-slate-400 mb-3">{t('creditNotes.hint')}</p>
+      <div className="mb-3 flex flex-wrap items-end gap-3" data-testid="finanzas-nc-filters">
+        <div>
+          <label htmlFor="finanzas-nc-from" className="block text-xs text-slate-500 mb-1">
+            {t('creditNotes.from')}
+          </label>
+          <input
+            id="finanzas-nc-from"
+            type="date"
+            className="border border-slate-300 dark:border-slate-600 rounded px-2 py-1 bg-white dark:bg-slate-800"
+            value={from}
+            onChange={(e) => {
+              setFrom(e.target.value)
+              setOffset(0)
+            }}
+          />
+        </div>
+        <div>
+          <label htmlFor="finanzas-nc-to" className="block text-xs text-slate-500 mb-1">
+            {t('creditNotes.to')}
+          </label>
+          <input
+            id="finanzas-nc-to"
+            type="date"
+            className="border border-slate-300 dark:border-slate-600 rounded px-2 py-1 bg-white dark:bg-slate-800"
+            value={to}
+            onChange={(e) => {
+              setTo(e.target.value)
+              setOffset(0)
+            }}
+          />
+        </div>
+        <div>
+          <label htmlFor="finanzas-nc-cliente" className="block text-xs text-slate-500 mb-1">
+            {t('creditNotes.clienteId')}
+          </label>
+          <input
+            id="finanzas-nc-cliente"
+            type="number"
+            min={1}
+            className="border border-slate-300 dark:border-slate-600 rounded px-2 py-1 bg-white dark:bg-slate-800 w-32"
+            placeholder={t('creditNotes.clienteIdPlaceholder')}
+            value={clienteIdFilter}
+            onChange={(e) => {
+              setClienteIdFilter(e.target.value)
+              setOffset(0)
+            }}
+          />
+        </div>
+      </div>
+      <AsyncWrapper loading={loading} error={error}>
+        {rows.length === 0 ? (
+          <p className="text-slate-500" data-testid="finanzas-nc-empty">
+            {t('creditNotes.empty')}
+          </p>
+        ) : (
+          <>
+            <div className="overflow-x-auto" data-testid="finanzas-nc-table">
+              <table className="w-full text-sm">
+                <caption className="sr-only">{t('creditNotes.title')}</caption>
+                <thead>
+                  <tr className="border-b border-slate-200 dark:border-slate-700 text-left">
+                    <th scope="col" className="py-2 pr-2">{t('creditNotes.colId')}</th>
+                    <th scope="col" className="py-2 pr-2">{t('creditNotes.colDate')}</th>
+                    <th scope="col" className="py-2 pr-2">{t('creditNotes.colInvoice')}</th>
+                    <th scope="col" className="py-2 pr-2">{t('creditNotes.colCliente')}</th>
+                    <th scope="col" className="py-2 pr-2">{t('creditNotes.colAmount')}</th>
+                    <th scope="col" className="py-2 pr-2">{t('creditNotes.colMotivo')}</th>
+                    <th scope="col" className="py-2 pr-2">{t('creditNotes.colCae')}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {rows.map((row) => (
+                    <tr
+                      key={row.id}
+                      className="border-b border-slate-100 dark:border-slate-800"
+                      data-testid={`finanzas-nc-row-${row.id}`}
+                    >
+                      <td className="py-2 pr-2 font-mono">{row.id}</td>
+                      <td className="py-2 pr-2">{formatDate(row.createdAt)}</td>
+                      <td className="py-2 pr-2 font-mono">{ncInvoiceRef(row)}</td>
+                      <td className="py-2 pr-2 font-mono">{row.facturaOrigen.clienteId}</td>
+                      <td className="py-2 pr-2 font-mono">{formatMoney(row.monto)}</td>
+                      <td className="py-2 pr-2 max-w-xs truncate" title={row.motivo}>
+                        {row.motivo}
+                      </td>
+                      <td className="py-2 pr-2">{t(`creditNotes.cae.${row.estadoCae}`)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            {total > CREDIT_NOTE_LIST_PAGE_SIZE && (
+              <div className="mt-3 flex gap-2 items-center">
+                <button
+                  type="button"
+                  className="px-3 py-1 rounded bg-slate-200 dark:bg-slate-700 disabled:opacity-50"
+                  disabled={!canPrev}
+                  data-testid="finanzas-nc-prev"
+                  onClick={() => setOffset((o) => Math.max(0, o - CREDIT_NOTE_LIST_PAGE_SIZE))}
+                >
+                  {t('creditNotes.prev')}
+                </button>
+                <span className="text-sm text-slate-600 dark:text-slate-300" data-testid="finanzas-nc-pageinfo">
+                  {t('creditNotes.pageInfo', {
+                    start: offset + 1,
+                    end: Math.min(offset + rows.length, total),
+                    total,
+                  })}
+                </span>
+                <button
+                  type="button"
+                  className="px-3 py-1 rounded bg-slate-200 dark:bg-slate-700 disabled:opacity-50"
+                  disabled={!canNext}
+                  data-testid="finanzas-nc-next"
+                  onClick={() => setOffset((o) => o + CREDIT_NOTE_LIST_PAGE_SIZE)}
+                >
+                  {t('creditNotes.next')}
+                </button>
+              </div>
+            )}
+          </>
+        )}
+      </AsyncWrapper>
+    </section>
   )
 }
 

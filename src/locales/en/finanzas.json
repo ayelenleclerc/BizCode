@@ -56,5 +56,30 @@
     "alreadySent": "Already sent today",
     "empty": "No overdue invoices match the filter.",
     "loadError": "Could not load overdue invoices."
+  },
+  "creditNotes": {
+    "title": "Credit notes",
+    "hint": "Issued credit notes linked to voided invoices in the selected period (module billing.credit_notes). Optional customer ID filters by originating invoice customer.",
+    "from": "From",
+    "to": "To",
+    "clienteId": "Customer ID (optional)",
+    "clienteIdPlaceholder": "e.g. 3",
+    "empty": "No credit notes in this range.",
+    "colId": "ID",
+    "colDate": "Date",
+    "colInvoice": "Orig. invoice",
+    "colCliente": "Customer ID",
+    "colAmount": "Amount",
+    "colMotivo": "Reason",
+    "colCae": "CAE status",
+    "prev": "Previous",
+    "next": "Next",
+    "pageInfo": "{{start}}–{{end}} of {{total}}",
+    "cae": {
+      "pending": "CAE pending",
+      "issued": "CAE issued",
+      "failed": "CAE failed",
+      "not_required": "CAE not required"
+    }
   }
 }

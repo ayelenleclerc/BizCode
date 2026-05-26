@@ -31,5 +31,6 @@ Los requisitos siguientes están **evidenciados** por UI (`src/pages/`), cliente
 | RF-018 | POD en ítems de reparto: wizard chofer; vista de comprobante en back-office. | `src/pages/logistica/repartos/chofer/`, `PUT .../items/{itemId}`, `GET .../pod` |
 | RF-019 | Seguimiento GPS en vivo: mapa planificador; chofer envía ubicación cada 2 min (`logistics.gps`). | `src/pages/logistica/seguimiento/`, `GET /api/repartos/activos`, `POST .../ubicacion` |
 | RF-020 | KPIs/reportes logísticos: tasa 1ª visita, tiempos, devoluciones, tablas chofer/zona, CSV (`logistics.dispatches`, `dispatchedAt`). | `src/pages/logistica/LogisticaReportesPanel.tsx`, `GET /api/logistica/kpis`, `reporte-choferes`, `reporte-zonas` |
+| RF-021 | Anular factura activa con motivo documentado (`billing.credit_notes`, `sales.cancel`); listar/obtener notas de crédito por período. | `PUT /api/facturas/{id}/void`, `GET /api/notas-credito`, `GET /api/notas-credito/{id}`, `ListadoFacturas.tsx`, `src/pages/finanzas/index.tsx`, [ADR-0012](../adr/ADR-0012-anulacion-factura-nota-credito.md), `tests/api/notas-credito.test.ts`, `tests/api/facturas-void.test.ts` |
 
 **Otros idiomas:** [English](../../en/specs/functional-requirements.md) · [Português](../../pt-br/specs/functional-requirements.md)

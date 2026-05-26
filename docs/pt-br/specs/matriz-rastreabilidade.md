@@ -31,6 +31,7 @@ Relaciona **requisitos funcionais** a **casos de uso**, **histórias de usuário
 | RF-018 | CU-12 | HU-12 | TC-018 | `src/pages/logistica/repartos/chofer/`, API POD |
 | RF-019 | CU-13 | HU-13 | TC-019 | `src/pages/logistica/seguimiento/`, `RepartoUbicacionService.ts` |
 | RF-020 | CU-14 | HU-14 | TC-020 | `src/pages/logistica/LogisticaReportesPanel.tsx`, `GET /api/logistica/kpis`, `reporte-choferes`, `reporte-zonas`, `tests/api/logistica-reportes.test.ts` |
+| RF-021 | — | — | — | `PUT /api/facturas/{id}/void`, `GET /api/notas-credito`, `ListadoFacturas.tsx`, `src/pages/finanzas/index.tsx`, [ADR-0012](../adr/ADR-0012-anulacao-fatura-nota-credito.md), `tests/api/notas-credito.test.ts`, `tests/api/facturas-void.test.ts` |
 
 **RNF (resumo):** RNF-001 ↔ [acessibilidade.md](../acessibilidade.md) + `App.a11y.test.tsx`; RNF-002 ↔ [estrategia-i18n.md](../estrategia-i18n.md) + `check:i18n`; RNF-005 ↔ [estrategia-testes.md](../quality/estrategia-testes.md) + `vitest.config.ts` + testes de contrato.
 

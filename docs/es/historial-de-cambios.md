@@ -10,6 +10,8 @@ Versionado: [Semantic Versioning](https://semver.org/lang/es/).
 
 ### Agregado
 
+- **Anulación de factura y notas de crédito (GitHub #146):** `PUT /api/facturas/{id}/void` (`sales.cancel`, módulo `billing.credit_notes`, motivo mín. 10 caracteres) devuelve factura actualizada, `NotaCredito` emitida y saldo del cliente; `GET /api/notas-credito`, `GET /api/notas-credito/{id}` (`reports.financial.read` u `reports.operational.read`); flujo AFIP de nota de crédito según ADR-0012; **Finanzas** lista notas por rango de fechas (UI con módulo); **Facturación** acción anular condicionada a `billing.credit_notes`; OpenAPI, pruebas (`notas-credito`, `facturas-void`), manuales y specs (EN/ES/PT-BR).
+
 - **KPIs y reportes logísticos (GitHub #145):** `dispatchedAt` / `dispatchTimestampSource` en `OrdenEntrega` (ADR-0011); `GET /api/logistica/kpis`, `reporte-choferes`, `reporte-zonas` (`logistics.read`, módulo `logistics.dispatches`, agregados en DB); pestaña **Reportes** en `/logistica` con tarjetas KPI, ranking de choferes, tabla por zona, export CSV; i18n, OpenAPI, pruebas y manual (EN/ES/PT-BR).
 
 - **Seguimiento GPS en tiempo real (GitHub #144):** modelo `RepartoUbicacion`; `POST /api/repartos/{id}/ubicacion` (`orders.deliver.confirm`, chofer en reparto propio `on_route`, módulo `logistics.gps`); `GET /api/repartos/activos` y `GET .../ubicacion/ultima` (`logistics.read`, roles `owner`/`manager`/`logistics_planner`); purga de ubicaciones con más de 7 días; UI `/logistica/seguimiento` (mapa Leaflet, polling 60 s); app chofer envía posición cada 2 min (opcional si geolocalización denegada); script `npm run reparto-ubicacion:purge`; OpenAPI, pruebas y manual (EN/ES/PT-BR).

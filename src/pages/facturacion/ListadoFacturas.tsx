@@ -21,6 +21,9 @@ function triggerBlobDownload(blob: Blob, filename: string): void {
   URL.revokeObjectURL(url)
 }
 
+/** @see server/schemas/domain.ts factura void body — motivo min length */
+const FACTURA_VOID_MOTIVO_MIN_LEN = 10 as const
+
 function CaeBadge({ estado }: { estado: Factura['estadoCae'] }) {
   const { t } = useTranslation('facturacion')
   if (!estado) return null
@@ -64,14 +67,19 @@ export default function ListadoFacturas({
   }
 
   const handleVoid = async (facturaId: number) => {
-    if (!motivo.trim()) {
+    const motivoTrim = motivo.trim()
+    if (!motivoTrim) {
       setVoidError(t('void.motivoRequired'))
+      return
+    }
+    if (motivoTrim.length < FACTURA_VOID_MOTIVO_MIN_LEN) {
+      setVoidError(t('void.motivoMinLength'))
       return
     }
     setVoidLoading(true)
     setVoidError(null)
     try {
-      await facturasAPI.void(facturaId, motivo.trim())
+      await facturasAPI.void(facturaId, motivoTrim)
       setVoidingId(null)
       setMotivo('')
       setExpandedId(null)
@@ -324,53 +332,55 @@ export default function ListadoFacturas({
                     </IfModule>
 
                     {factura.estado === 'A' && (
-                      <CanAccess permission="sales.cancel">
-                        {voidingId === factura.id ? (
-                          <div className="border border-red-300 dark:border-red-700 rounded p-4 bg-red-50 dark:bg-red-900/20">
-                            <p className="text-sm font-semibold text-red-800 dark:text-red-300 mb-2">
-                              {t('void.confirmTitle')}
-                            </p>
-                            <label className="block text-xs text-red-700 dark:text-red-400 mb-1">
-                              {t('void.motivoLabel')} <span aria-hidden="true">*</span>
-                            </label>
-                            <input
-                              type="text"
-                              value={motivo}
-                              onChange={(e) => setMotivo(e.target.value)}
-                              placeholder={t('void.motivoPlaceholder')}
-                              className="w-full px-3 py-1.5 text-sm border border-red-300 dark:border-red-600 rounded bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 mb-2"
-                            />
-                            {voidError && (
-                              <p className="text-xs text-red-600 dark:text-red-400 mb-2">{voidError}</p>
-                            )}
-                            <div className="flex gap-2">
-                              <button
-                                type="button"
-                                onClick={() => handleVoid(factura.id)}
-                                disabled={voidLoading}
-                                className="px-3 py-1.5 text-sm bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white rounded font-semibold transition"
-                              >
-                                {voidLoading ? t('void.loading') : t('void.confirm')}
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => { setVoidingId(null); setMotivo(''); setVoidError(null) }}
-                                className="px-3 py-1.5 text-sm bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-800 dark:text-slate-200 rounded transition"
-                              >
-                                {t('void.cancel')}
-                              </button>
+                      <IfModule flag="billing.credit_notes">
+                        <CanAccess permission="sales.cancel">
+                          {voidingId === factura.id ? (
+                            <div className="border border-red-300 dark:border-red-700 rounded p-4 bg-red-50 dark:bg-red-900/20">
+                              <p className="text-sm font-semibold text-red-800 dark:text-red-300 mb-2">
+                                {t('void.confirmTitle')}
+                              </p>
+                              <label className="block text-xs text-red-700 dark:text-red-400 mb-1">
+                                {t('void.motivoLabel')} <span aria-hidden="true">*</span>
+                              </label>
+                              <input
+                                type="text"
+                                value={motivo}
+                                onChange={(e) => setMotivo(e.target.value)}
+                                placeholder={t('void.motivoPlaceholder')}
+                                className="w-full px-3 py-1.5 text-sm border border-red-300 dark:border-red-600 rounded bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 mb-2"
+                              />
+                              {voidError && (
+                                <p className="text-xs text-red-600 dark:text-red-400 mb-2">{voidError}</p>
+                              )}
+                              <div className="flex gap-2">
+                                <button
+                                  type="button"
+                                  onClick={() => handleVoid(factura.id)}
+                                  disabled={voidLoading}
+                                  className="px-3 py-1.5 text-sm bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white rounded font-semibold transition"
+                                >
+                                  {voidLoading ? t('void.loading') : t('void.confirm')}
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => { setVoidingId(null); setMotivo(''); setVoidError(null) }}
+                                  className="px-3 py-1.5 text-sm bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-800 dark:text-slate-200 rounded transition"
+                                >
+                                  {t('void.cancel')}
+                                </button>
+                              </div>
                             </div>
-                          </div>
-                        ) : (
-                          <button
-                            type="button"
-                            onClick={() => { setVoidingId(factura.id); setMotivo(''); setVoidError(null) }}
-                            className="w-full px-4 py-2 bg-red-100 hover:bg-red-200 dark:bg-red-900/30 dark:hover:bg-red-900/50 text-red-800 dark:text-red-300 border border-red-300 dark:border-red-700 rounded font-semibold transition text-sm"
-                          >
-                            {t('void.button')}
-                          </button>
-                        )}
-                      </CanAccess>
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={() => { setVoidingId(factura.id); setMotivo(''); setVoidError(null) }}
+                              className="w-full px-4 py-2 bg-red-100 hover:bg-red-200 dark:bg-red-900/30 dark:hover:bg-red-900/50 text-red-800 dark:text-red-300 border border-red-300 dark:border-red-700 rounded font-semibold transition text-sm"
+                            >
+                              {t('void.button')}
+                            </button>
+                          )}
+                        </CanAccess>
+                      </IfModule>
                     )}
 
                     <button
