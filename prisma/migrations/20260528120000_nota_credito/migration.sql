@@ -1,4 +1,4 @@
-﻿-- CreateTable
+-- CreateTable
 CREATE TABLE "NotaCredito" (
     "id" SERIAL NOT NULL,
     "tenantId" INTEGER NOT NULL,
