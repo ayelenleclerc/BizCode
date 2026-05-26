@@ -52,6 +52,10 @@ UI `/logistica/repartos` is gated by module **`logistics.dispatches`**. API: lis
 
 Module **`logistics.pod`**. Driver UI `/logistica/repartos/chofer` requires **`orders.deliver.confirm`** (role `driver` on own route). `PUT /api/repartos/{id}/items/{itemId}` uses the same permission; service enforces `choferId === actor.userId` for `driver`. `GET /api/repartos/{id}/items/{itemId}/pod` requires **`logistics.read`** and role ∈ `owner`, `manager`, `logistics_planner` (excludes `driver`).
 
+## GPS tracking (#144)
+
+Module **`logistics.gps`**. UI `/logistica/seguimiento`: **`logistics.read`** and `GPS_VIEW_ROLES` (`owner`, `manager`, `logistics_planner`). `GET /api/repartos/activos` and `GET .../ubicacion/ultima` (planner; driver only on own route for `ultima`). `POST /api/repartos/{id}/ubicacion`: **`orders.deliver.confirm`**, owning driver, route `on_route`; drivers cannot list activos.
+
 ## Related documents
 
 - Master plan execution index: [master-plan-bizcode-execution.md](master-plan-bizcode-execution.md)

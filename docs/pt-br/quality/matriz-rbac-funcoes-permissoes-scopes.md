@@ -52,6 +52,10 @@ A UI `/logistica/repartos` depende do módulo **`logistics.dispatches`**. API: l
 
 Módulo **`logistics.pod`**. UI motorista `/logistica/repartos/chofer` exige **`orders.deliver.confirm`** (papel `driver` na própria rota). `PUT /api/repartos/{id}/items/{itemId}` usa a mesma permissão; o serviço exige `choferId === actor.userId` para `driver`. `GET /api/repartos/{id}/items/{itemId}/pod` exige **`logistics.read`** e papel ∈ `owner`, `manager`, `logistics_planner` (exclui `driver`).
 
+## Rastreamento GPS (#144)
+
+Módulo **`logistics.gps`**. UI `/logistica/seguimiento`: **`logistics.read`** e `GPS_VIEW_ROLES` (`owner`, `manager`, `logistics_planner`). `GET /api/repartos/activos` e `GET .../ubicacion/ultima` (planejador; motorista só na própria rota em `ultima`). `POST /api/repartos/{id}/ubicacion`: **`orders.deliver.confirm`**, motorista dono, reparto `on_route`; motorista não lista activos.
+
 ## Documentos relacionados
 
 - Índice de execução do plano mestre: [execucao-plano-mestre-bizcode.md](execucao-plano-mestre-bizcode.md)

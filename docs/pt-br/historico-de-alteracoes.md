@@ -10,6 +10,8 @@ Versionamento: [Semantic Versioning](https://semver.org/).
 
 ### Adicionado
 
+- **Rastreamento GPS em tempo real (GitHub #144):** modelo `RepartoUbicacion`; `POST /api/repartos/{id}/ubicacion` (`orders.deliver.confirm`, motorista na própria rota `on_route`, módulo `logistics.gps`); `GET /api/repartos/activos` e `GET .../ubicacion/ultima` (`logistics.read`, papéis `owner`/`manager`/`logistics_planner`); purga de localizações com mais de 7 dias; UI `/logistica/seguimiento` (mapa Leaflet, polling 60 s); app motorista envia posição a cada 2 min (opcional se geolocalização negada); script `npm run reparto-ubicacion:purge`; OpenAPI, testes e manual (EN/ES/PT-BR).
+
 - **Picking no depósito (GitHub #143):** estados `picking` / `ready` / `cancelled` em `OrdenEntrega`; campos `pickerUserId`, `pickingIniciadoAt`, `pickingListoAt`; `POST /api/ordenes-entrega/{id}/iniciar-picking` e `POST .../lista` (`orders.pick`, módulo `logistics.picking`); `GET /api/ordenes-entrega` também com `orders.pick`; repartos (#140) só aceitam OEs `ready`; UI `/logistica/picking`; OpenAPI, testes e manual (EN/ES/PT-BR).
 
 - **Comprovante de entrega (POD) em itens de reparto (GitHub #142):** campos em `RepartoItem` (receptor, notas, `motivoNoEntrega`, `podMedia` JSON); `PUT /api/repartos/{id}/items/{itemId}` (`orders.deliver.confirm`, motorista na própria rota `on_route`) e `GET .../pod` (`logistics.read`, papéis `owner`/`manager`/`logistics_planner`); listagens com `hasPod` sem blobs; UI motorista `/logistica/repartos/chofer` (módulo `logistics.pod`, wizard 4 etapas); badge e diálogo no back-office; OpenAPI, testes e manual (EN/ES/PT-BR).

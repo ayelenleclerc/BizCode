@@ -5,6 +5,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import { useFeatureFlags } from '@/contexts/FeatureFlagsContext'
 import { repartosAPI, type Reparto, type RepartoItemRow } from '@/lib/api'
 import DriverDeliveryWizard from './DriverDeliveryWizard'
+import { useDriverLocationTracking } from './useDriverLocationTracking'
 
 export default function ChoferRepartosPage() {
   const { claims } = useAuth()
@@ -26,6 +27,7 @@ export default function ChoferRepartosPage() {
 
 function ChoferRepartosContent({ driverId }: { driverId: number }) {
   const { t } = useTranslation('pod')
+  const { hasModule } = useFeatureFlags()
   const [reparto, setReparto] = useState<Reparto | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -53,6 +55,9 @@ function ChoferRepartosContent({ driverId }: { driverId: number }) {
   useEffect(() => {
     void loadRoute()
   }, [loadRoute])
+
+  const gpsEnabled = hasModule('logistics.gps') && reparto?.estado === 'on_route'
+  useDriverLocationTracking(reparto?.id ?? null, gpsEnabled)
 
   const pendingItems = reparto?.items.filter((i) => i.estado === 'pending') ?? []
 

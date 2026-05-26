@@ -1,0 +1,22 @@
+{
+  "title": "Live tracking",
+  "subtitle": "On-route deliveries with last GPS position",
+  "forbidden": "You do not have permission to view GPS tracking.",
+  "empty": "There are no routes on the road right now.",
+  "loading": "Loading active routes…",
+  "errors": {
+    "load": "Could not load tracking. Please try again."
+  },
+  "sidebarTitle": "Active routes",
+  "lastUpdate": "Last position: {{time}}",
+  "noLocation": "No GPS position yet",
+  "progress": "{{delivered}}/{{total}} deliveries",
+  "detailTitle": "Route #{{id}} details",
+  "driver": "Driver",
+  "currentClient": "Next stop",
+  "address": "Address",
+  "zone": "Zone",
+  "mapAria": "Map of active routes",
+  "listAria": "List of on-route deliveries",
+  "liveRegion": "Tracking data updated"
+}

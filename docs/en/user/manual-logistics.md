@@ -74,6 +74,18 @@ List/detail responses include **`hasPod`** only (no signature/photo blobs). Deco
 
 Back-office: on **`/logistica/repartos`**, tracking panel shows **POD available** and **View proof** when `hasPod` is true.
 
+## Live GPS tracking (#144)
+
+Module **`logistics.gps`** (requires **`logistics.dispatches`**). Planners with roles **`owner`**, **`manager`**, or **`logistics_planner`** open **`/logistica/seguimiento`** (OpenStreetMap + Leaflet map, list of `on_route` routes, refresh every **60 s**).
+
+| API | Permission / role |
+|-----|-------------------|
+| `GET /api/repartos/activos` | `logistics.read` + planner role (`GPS_VIEW_ROLES`) |
+| `GET /api/repartos/{id}/ubicacion/ultima` | `logistics.read` + planner; driver only on own route |
+| `POST /api/repartos/{id}/ubicacion` | `orders.deliver.confirm`; owning driver, route `on_route` |
+
+On **`/logistica/repartos/chofer`**, the driver posts coordinates every **2 min** when the browser allows geolocation (POD is not blocked if denied). Retention: **7 days** (purge on each record and `npm run reparto-ubicacion:purge`). Customer coordinates are not on the map; detail shows address as text.
+
 ## Purchase orders
 
 Open **Purchasing** (`/compras`) from the sidebar. The route is gated by the tenant module **`logistics.purchases`** and is visible to roles such as **owner**, **manager**, and **warehouse_lead** (see navigation configuration in the product).

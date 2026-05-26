@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "chofer": {
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "role": {
+          "type": "string"
+        },
+        "username": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "username",
+        "role"
+      ],
+      "type": "object"
+    },
+    "choferId": {
+      "type": "integer"
+    },
+    "currentStop": {
+      "oneOf": [
+        {
+          "$ref": "./RepartoActivoCurrentStop.schema.json"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "estado": {
+      "type": "string"
+    },
+    "fecha": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "id": {
+      "type": "integer"
+    },
+    "observaciones": {
+      "nullable": true,
+      "type": "string"
+    },
+    "progress": {
+      "$ref": "./RepartoProgress.schema.json"
+    },
+    "tenantId": {
+      "type": "integer"
+    },
+    "ultimaUbicacion": {
+      "oneOf": [
+        {
+          "$ref": "./RepartoUbicacion.schema.json"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "vehiculo": {
+      "nullable": true,
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "tenantId",
+    "fecha",
+    "choferId",
+    "estado",
+    "chofer",
+    "progress",
+    "ultimaUbicacion",
+    "currentStop"
+  ],
+  "title": "RepartoActivo",
+  "type": "object"
+}

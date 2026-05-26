@@ -3653,6 +3653,30 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
 
+  /api/repartos/activos:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [repartos]
+      summary: List on-route deliveries with last GPS position
+      description: |
+        Requires tenant module `logistics.gps`, permission `logistics.read`, and role
+        `owner`, `manager`, or `logistics_planner`. Returns repartos in estado `on_route`
+        with `ultimaUbicacion`, `progress`, and `currentStop` (first pending item).
+      responses:
+        '200':
+          description: Active routes for live tracking
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RepartoActivoListEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
   /api/repartos/{id}:
     parameters:
       - $ref: '#/components/parameters/BizcodeChannelHeader'
@@ -3725,6 +3749,94 @@ paths:
                 $ref: '#/components/schemas/ApiErrorEnvelope'
         '422':
           description: Invalid state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/repartos/{id}/ubicacion:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    post:
+      tags: [repartos]
+      summary: Record driver GPS position
+      description: |
+        Requires tenant module `logistics.gps` and permission `orders.deliver.confirm`.
+        Only the assigned driver on a reparto in estado `on_route`. Purges locations older than 7 days.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RepartoUbicacionInput'
+      responses:
+        '200':
+          description: Location recorded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RepartoUbicacionEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Route not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '422':
+          description: Invalid state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/repartos/{id}/ubicacion/ultima:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [repartos]
+      summary: Get last GPS position for a route
+      description: |
+        Requires tenant module `logistics.gps` and permission `logistics.read`.
+        Planners (`owner`, `manager`, `logistics_planner`) on any route; drivers only on their own route.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '200':
+          description: Last recorded position or null
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RepartoUbicacionNullableEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Route not found
           content:
             application/json:
               schema:
@@ -5619,6 +5731,136 @@ components:
           $ref: '#/components/schemas/Reparto'
         summary:
           $ref: '#/components/schemas/RepartoCloseSummary'
+
+    RepartoUbicacionInput:
+      type: object
+      required: [lat, lng]
+      properties:
+        lat:
+          type: number
+          minimum: -90
+          maximum: 90
+        lng:
+          type: number
+          minimum: -180
+          maximum: 180
+
+    RepartoUbicacion:
+      type: object
+      required: [lat, lng, recordedAt]
+      properties:
+        lat:
+          type: number
+        lng:
+          type: number
+        recordedAt:
+          type: string
+          format: date-time
+
+    RepartoUbicacionEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/RepartoUbicacion'
+
+    RepartoUbicacionNullableEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          oneOf:
+            - $ref: '#/components/schemas/RepartoUbicacion'
+            - type: 'null'
+
+    RepartoActivoCurrentStop:
+      type: object
+      required: [secuencia, cliente]
+      properties:
+        secuencia:
+          type: integer
+          minimum: 1
+        cliente:
+          type: object
+          required: [id, codigo, rsocial]
+          properties:
+            id:
+              type: integer
+            codigo:
+              type: integer
+            rsocial:
+              type: string
+            domicilio:
+              type: string
+              nullable: true
+        zona:
+          type: object
+          nullable: true
+          properties:
+            id:
+              type: integer
+            nombre:
+              type: string
+
+    RepartoActivo:
+      type: object
+      required: [id, tenantId, fecha, choferId, estado, chofer, progress, ultimaUbicacion, currentStop]
+      properties:
+        id:
+          type: integer
+        tenantId:
+          type: integer
+        fecha:
+          type: string
+          format: date-time
+        choferId:
+          type: integer
+        estado:
+          type: string
+        vehiculo:
+          type: string
+          nullable: true
+        observaciones:
+          type: string
+          nullable: true
+        chofer:
+          type: object
+          required: [id, username, role]
+          properties:
+            id:
+              type: integer
+            username:
+              type: string
+            role:
+              type: string
+        progress:
+          $ref: '#/components/schemas/RepartoProgress'
+        ultimaUbicacion:
+          oneOf:
+            - $ref: '#/components/schemas/RepartoUbicacion'
+            - type: 'null'
+        currentStop:
+          oneOf:
+            - $ref: '#/components/schemas/RepartoActivoCurrentStop'
+            - type: 'null'
+
+    RepartoActivoListEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/RepartoActivo'
 
     ProveedorEnvelope:
       type: object

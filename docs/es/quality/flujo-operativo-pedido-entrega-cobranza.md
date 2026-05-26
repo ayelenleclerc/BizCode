@@ -73,6 +73,7 @@ Las celdas vacías indican que el paso no tiene un permiso RBAC dedicado; el rol
 | UI / finanzas CxC | `/finanzas`; `GET /api/reportes/aging`, `GET /api/reportes/cuenta-corriente/:clienteId` | Flujos de gestión de mora según backlog |
 | Reportes | `/reportes`; `GET /api/reportes/ventas`, `stock-critico`, `cobranzas` (JSON o CSV) | Tipos de reporte adicionales |
 | Logística | `/logistica`, `/logistica/picking` (#143); `OrdenEntrega`; `GET/POST/PUT /api/ordenes-entrega`, `POST .../iniciar-picking`, `POST .../lista` | OE: `pending` → `picking` → `ready` → `assigned` (reparto) → `in_transit` → `delivered` \| `failed` \| `cancelled` |
+| Seguimiento GPS | `/logistica/seguimiento` (#144); `RepartoUbicacion`; `GET /api/repartos/activos`, `POST /api/repartos/{id}/ubicacion` | Chofer en reparto `on_route`; planificador ve última posición; retención 7 días |
 | Entidad pedido (`pedido`) | Modelo `Pedido`/`PedidoItem`, `/api/pedidos`, UI `/pedidos` (#132); `requireModule('billing.orders')` (#223) | Estados `packed`…`collected` y transiciones genéricas (#65 / BP1-1 completo) |
 | Permisos `orders.*` | Definidos en RBAC; aplicados en `/api/ordenes-entrega` | Extender cuando exista la entidad `pedido` |
 

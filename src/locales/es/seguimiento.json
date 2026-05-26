@@ -1,0 +1,22 @@
+{
+  "title": "Seguimiento en vivo",
+  "subtitle": "Repartos en ruta con última posición GPS",
+  "forbidden": "No tiene permiso para ver el seguimiento GPS.",
+  "empty": "No hay repartos en ruta en este momento.",
+  "loading": "Cargando repartos activos…",
+  "errors": {
+    "load": "No se pudo cargar el seguimiento. Intente de nuevo."
+  },
+  "sidebarTitle": "Repartos activos",
+  "lastUpdate": "Última posición: {{time}}",
+  "noLocation": "Sin posición GPS aún",
+  "progress": "{{delivered}}/{{total}} entregas",
+  "detailTitle": "Detalle del reparto #{{id}}",
+  "driver": "Chofer",
+  "currentClient": "Próxima entrega",
+  "address": "Domicilio",
+  "zone": "Zona",
+  "mapAria": "Mapa de repartos activos",
+  "listAria": "Lista de repartos en ruta",
+  "liveRegion": "Datos de seguimiento actualizados"
+}

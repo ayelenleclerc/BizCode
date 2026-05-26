@@ -3,8 +3,10 @@ import { requirePermission } from '../auth'
 import type { AuthenticatedRequest } from '../auth'
 import { validateBody } from '../middleware/validateBody'
 import { hasPermission, type Permission } from '../../src/lib/rbac'
-import { repartoCreateBodySchema, repartoItemPodBodySchema } from '../schemas/domain'
-import { POD_VIEW_ROLES } from '../services/RepartoService'
+import { requireModule } from '../middleware/requireModule'
+import { repartoCreateBodySchema, repartoItemPodBodySchema, repartoUbicacionBodySchema } from '../schemas/domain'
+import { GPS_VIEW_ROLES, POD_VIEW_ROLES } from '../services/RepartoService'
+import type { RepartoUbicacionService } from '../services/RepartoUbicacionService'
 import type { RepartoService, RepartoEstado } from '../services/RepartoService'
 import { REPARTO_ESTADOS } from '../services/RepartoService'
 import { paginatedListJson, parseListPagination } from '../services/listPagination'
@@ -32,6 +34,8 @@ function parseOptionalPositiveInt(value: unknown): number | undefined {
 export function registerRepartosRoutes(app: Application, ctx: RestRouteContext): void {
   const { services, writeAudit } = ctx
   const repartos: RepartoService = services.repartos
+  const repartoUbicacion: RepartoUbicacionService = services.repartoUbicacion
+  const gpsModule = requireModule('logistics.gps')
 
   app.get(
     '/api/repartos',
@@ -80,6 +84,35 @@ export function registerRepartosRoutes(app: Application, ctx: RestRouteContext):
   )
 
   app.get(
+    '/api/repartos/activos',
+    gpsModule,
+    requirePermission('logistics.read'),
+    (req: Request, res: Response, next) => {
+      const authReq = req as AuthenticatedRequest
+      const role = authReq.auth!.claims.role
+      if (GPS_VIEW_ROLES.includes(role as (typeof GPS_VIEW_ROLES)[number])) {
+        next()
+        return
+      }
+      res.status(403).json({ success: false, error: 'Forbidden' })
+    },
+    async (req: Request, res: Response) => {
+      try {
+        const authReq = req as AuthenticatedRequest
+        const tenantId = getTenantId(req)
+        const result = await repartoUbicacion.listActivos(tenantId, authReq.auth!.claims.role)
+        if (!result.ok) {
+          res.status(result.status).json({ success: false, error: result.error })
+          return
+        }
+        res.json({ success: true, data: result.data })
+      } catch (err: unknown) {
+        res.status(500).json({ success: false, error: errorMessage(err) })
+      }
+    },
+  )
+
+  app.get(
     '/api/repartos/:id',
     requirePermission('logistics.read'),
     async (req: Request, res: Response) => {
@@ -117,6 +150,69 @@ export function registerRepartosRoutes(app: Application, ctx: RestRouteContext):
         }
         await writeAudit(authReq, 'reparto_created', 'reparto', String(result.data.id))
         res.status(201).json({ success: true, data: result.data })
+      } catch (err: unknown) {
+        res.status(500).json({ success: false, error: errorMessage(err) })
+      }
+    },
+  )
+
+  app.post(
+    '/api/repartos/:id/ubicacion',
+    gpsModule,
+    requirePermission('orders.deliver.confirm'),
+    validateBody(repartoUbicacionBodySchema),
+    async (req: Request, res: Response) => {
+      try {
+        const authReq = req as AuthenticatedRequest
+        const tenantId = getTenantId(req)
+        const id = Number.parseInt(String(req.params.id), 10)
+        if (!Number.isFinite(id) || id < 1) {
+          res.status(400).json({ success: false, error: 'Invalid id' })
+          return
+        }
+        const result = await repartoUbicacion.recordLocation(
+          tenantId,
+          id,
+          authReq.auth!.claims.userId,
+          req.body,
+        )
+        if (!result.ok) {
+          res.status(result.status).json({ success: false, error: result.error })
+          return
+        }
+        await writeAudit(authReq, 'reparto_ubicacion_recorded', 'reparto', String(id), {
+          lat: result.data.lat,
+          lng: result.data.lng,
+        })
+        res.json({ success: true, data: result.data })
+      } catch (err: unknown) {
+        res.status(500).json({ success: false, error: errorMessage(err) })
+      }
+    },
+  )
+
+  app.get(
+    '/api/repartos/:id/ubicacion/ultima',
+    gpsModule,
+    requirePermission('logistics.read'),
+    async (req: Request, res: Response) => {
+      try {
+        const authReq = req as AuthenticatedRequest
+        const tenantId = getTenantId(req)
+        const id = Number.parseInt(String(req.params.id), 10)
+        if (!Number.isFinite(id) || id < 1) {
+          res.status(400).json({ success: false, error: 'Invalid id' })
+          return
+        }
+        const result = await repartoUbicacion.getUltima(tenantId, id, {
+          role: authReq.auth!.claims.role,
+          userId: authReq.auth!.claims.userId,
+        })
+        if (!result.ok) {
+          res.status(result.status).json({ success: false, error: result.error })
+          return
+        }
+        res.json({ success: true, data: result.data })
       } catch (err: unknown) {
         res.status(500).json({ success: false, error: errorMessage(err) })
       }

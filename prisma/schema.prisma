@@ -540,10 +540,25 @@ model Reparto {
   closedAt      DateTime?
 
   items RepartoItem[]
+  ubicaciones RepartoUbicacion[]
 
   @@index([tenantId, fecha])
   @@index([tenantId, estado])
   @@index([tenantId, choferId])
+}
+
+/// Driver GPS samples for active routes (#144).
+model RepartoUbicacion {
+  id         Int      @id @default(autoincrement())
+  tenantId   Int
+  repartoId  Int
+  reparto    Reparto  @relation(fields: [repartoId], references: [id], onDelete: Cascade)
+  lat        Decimal  @db.Decimal(10, 7)
+  lng        Decimal  @db.Decimal(10, 7)
+  recordedAt DateTime @default(now())
+
+  @@index([repartoId, recordedAt])
+  @@index([tenantId, recordedAt])
 }
 
 model RepartoItem {

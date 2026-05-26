@@ -1,0 +1,22 @@
+{
+  "title": "Rastreamento ao vivo",
+  "subtitle": "Repartos em rota com última posição GPS",
+  "forbidden": "Você não tem permissão para ver o rastreamento GPS.",
+  "empty": "Não há repartos em rota no momento.",
+  "loading": "Carregando repartos ativos…",
+  "errors": {
+    "load": "Não foi possível carregar o rastreamento. Tente novamente."
+  },
+  "sidebarTitle": "Repartos ativos",
+  "lastUpdate": "Última posição: {{time}}",
+  "noLocation": "Sem posição GPS ainda",
+  "progress": "{{delivered}}/{{total}} entregas",
+  "detailTitle": "Detalhe do reparto #{{id}}",
+  "driver": "Motorista",
+  "currentClient": "Próxima entrega",
+  "address": "Endereço",
+  "zone": "Zona",
+  "mapAria": "Mapa de repartos ativos",
+  "listAria": "Lista de repartos em rota",
+  "liveRegion": "Dados de rastreamento atualizados"
+}

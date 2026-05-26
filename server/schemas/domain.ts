@@ -1276,6 +1276,20 @@ export const repartoItemPodBodySchema = z
     }
   })
 
+export const repartoUbicacionBodySchema = z
+  .object({
+    lat: z.number(),
+    lng: z.number(),
+  })
+  .superRefine((body, ctx) => {
+    if (body.lat < -90 || body.lat > 90) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'lat must be between -90 and 90', path: ['lat'] })
+    }
+    if (body.lng < -180 || body.lng > 180) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'lng must be between -180 and 180', path: ['lng'] })
+    }
+  })
+
 export function safeParseBodySchema<S extends z.ZodTypeAny>(schema: S, raw: unknown): SafeParseBodyResult<z.output<S>> {
   const parsed = schema.safeParse(raw)
   if (!parsed.success) {
