@@ -1,20 +1,20 @@
 # Factura Schema
 
 ```txt
-undefined#/allOf/0/properties/data/items
+undefined#/properties/factura
 ```
 
 
 
-| Abstract            | Extensible | Status         | Identifiable | Custom Properties | Additional Properties | Access Restrictions | Defined In                                                                                                 |
-| :------------------ | :--------- | :------------- | :----------- | :---------------- | :-------------------- | :------------------ | :--------------------------------------------------------------------------------------------------------- |
-| Can be instantiated | No         | Unknown status | No           | Forbidden         | Allowed               | none                | [FacturaListEnvelope.schema.json\*](../schema-json/FacturaListEnvelope.schema.json "open original schema") |
+| Abstract            | Extensible | Status         | Identifiable | Custom Properties | Additional Properties | Access Restrictions | Defined In                                                                                             |
+| :------------------ | :--------- | :------------- | :----------- | :---------------- | :-------------------- | :------------------ | :----------------------------------------------------------------------------------------------------- |
+| Can be instantiated | No         | Unknown status | No           | Forbidden         | Allowed               | none                | [FacturaVoidResult.schema.json\*](../schema-json/FacturaVoidResult.schema.json "open original schema") |
 
-## items Type
+## factura Type
 
 `object` ([Factura](factura.md))
 
-# items Properties
+# factura Properties
 
 | Property                    | Type      | Required | Nullable       | Defined by                                                                       |
 | :-------------------------- | :-------- | :------- | :------------- | :------------------------------------------------------------------------------- |

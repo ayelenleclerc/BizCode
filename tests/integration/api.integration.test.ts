@@ -13,6 +13,7 @@ import { buildArticuloCreateBody, createIntegrationRubro } from '../fixtures/cat
 async function truncateAll(prisma: PrismaClient): Promise<void> {
   // Use Prisma model operations to avoid coupling tests to physical table naming/casing.
   await prisma.$transaction([
+    prisma.notaCredito.deleteMany(),
     prisma.facturaItem.deleteMany(),
     prisma.pedido.deleteMany(),
     prisma.factura.deleteMany(),

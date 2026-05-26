@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "properties": {
+    "cae": {
+      "nullable": true,
+      "type": "string"
+    },
+    "caeVto": {
+      "format": "date-time",
+      "nullable": true,
+      "type": "string"
+    },
+    "createdAt": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "createdById": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "estadoCae": {
+      "enum": [
+        "pending",
+        "issued",
+        "failed",
+        "not_required"
+      ],
+      "type": "string"
+    },
+    "facturaOrigenId": {
+      "type": "integer"
+    },
+    "id": {
+      "type": "integer"
+    },
+    "monto": {
+      "oneOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "string"
+        }
+      ]
+    },
+    "motivo": {
+      "type": "string"
+    },
+    "tenantId": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "id",
+    "tenantId",
+    "facturaOrigenId",
+    "motivo",
+    "monto",
+    "estadoCae",
+    "createdAt"
+  ],
+  "title": "NotaCredito",
+  "type": "object"
+}
