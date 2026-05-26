@@ -216,9 +216,14 @@ export class RepartoService {
         include: repartoInclude,
       })
       if (oeIds.length > 0) {
+        const now = new Date()
         await tx.ordenEntrega.updateMany({
           where: { tenantId, id: { in: oeIds }, estado: 'assigned' },
-          data: { estado: 'in_transit' },
+          data: {
+            estado: 'in_transit',
+            dispatchedAt: now,
+            dispatchTimestampSource: 'event',
+          },
         })
       }
       return updated

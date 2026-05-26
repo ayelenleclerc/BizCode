@@ -7,6 +7,7 @@ import { CompraService } from './CompraService'
 import { FacturaService } from './FacturaService'
 import { ImportService } from './ImportService'
 import { ReportesFinancierosService } from './ReportesFinancierosService'
+import { LogisticaReportesService } from './LogisticaReportesService'
 import { ReportesOperacionalesService } from './ReportesOperacionalesService'
 import { OrdenEntregaService } from './OrdenEntregaService'
 import { PedidoService } from './PedidoService'
@@ -32,6 +33,7 @@ export type DomainServices = {
   repartoUbicacion: RepartoUbicacionService
   reportes: ReportesFinancierosService
   reportesOperacionales: ReportesOperacionalesService
+  logisticaReportes: LogisticaReportesService
   import: ImportService
 }
 
@@ -57,6 +59,7 @@ export function createDomainServices(prisma: PrismaClient): DomainServices {
     repartoUbicacion: new RepartoUbicacionService(prisma),
     reportes: new ReportesFinancierosService(prisma),
     reportesOperacionales: new ReportesOperacionalesService(prisma),
+    logisticaReportes: new LogisticaReportesService(prisma),
     import: new ImportService(prisma),
   }
 }

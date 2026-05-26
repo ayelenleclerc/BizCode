@@ -19946,6 +19946,14 @@ Requires `logistics.read`, `orders.deliver.confirm`, or `orders.pick`. Drivers o
 
     `integer`
 
+  - **`dispatchedAt`**
+
+    `string`, format: `date-time` — When the order entered in\_transit (ADR-0011).
+
+  - **`dispatchTimestampSource`**
+
+    `string`, possible values: `"event", "estimated"` — How dispatchedAt was derived (audit event vs estimated from updatedAt).
+
   - **`driver`**
 
     `object`
@@ -20059,6 +20067,8 @@ Requires `logistics.read`, `orders.deliver.confirm`, or `orders.pick`. Drivers o
       "fecha": "",
       "estado": "pending",
       "nota": "",
+      "dispatchedAt": "",
+      "dispatchTimestampSource": "event",
       "items": [
         {
           "id": 1,
@@ -20242,6 +20252,14 @@ Requires `orders.create`. Initial estado is `pending`, or `assigned` when `drive
 
     `integer`
 
+  - **`dispatchedAt`**
+
+    `string`, format: `date-time` — When the order entered in\_transit (ADR-0011).
+
+  - **`dispatchTimestampSource`**
+
+    `string`, possible values: `"event", "estimated"` — How dispatchedAt was derived (audit event vs estimated from updatedAt).
+
   - **`driver`**
 
     `object`
@@ -20354,6 +20372,8 @@ Requires `orders.create`. Initial estado is `pending`, or `assigned` when `drive
     "fecha": "",
     "estado": "pending",
     "nota": "",
+    "dispatchedAt": "",
+    "dispatchTimestampSource": "event",
     "items": [
       {
         "id": 1,
@@ -20531,6 +20551,14 @@ Requires `orders.dispatch` for transitions to `assigned`, `in_transit`, or `fail
 
     `integer`
 
+  - **`dispatchedAt`**
+
+    `string`, format: `date-time` — When the order entered in\_transit (ADR-0011).
+
+  - **`dispatchTimestampSource`**
+
+    `string`, possible values: `"event", "estimated"` — How dispatchedAt was derived (audit event vs estimated from updatedAt).
+
   - **`driver`**
 
     `object`
@@ -20643,6 +20671,8 @@ Requires `orders.dispatch` for transitions to `assigned`, `in_transit`, or `fail
     "fecha": "",
     "estado": "pending",
     "nota": "",
+    "dispatchedAt": "",
+    "dispatchTimestampSource": "event",
     "items": [
       {
         "id": 1,
@@ -20831,6 +20861,14 @@ Requires `orders.pick` and tenant module `logistics.picking`. Transitions `pendi
 
     `integer`
 
+  - **`dispatchedAt`**
+
+    `string`, format: `date-time` — When the order entered in\_transit (ADR-0011).
+
+  - **`dispatchTimestampSource`**
+
+    `string`, possible values: `"event", "estimated"` — How dispatchedAt was derived (audit event vs estimated from updatedAt).
+
   - **`driver`**
 
     `object`
@@ -20943,6 +20981,8 @@ Requires `orders.pick` and tenant module `logistics.picking`. Transitions `pendi
     "fecha": "",
     "estado": "pending",
     "nota": "",
+    "dispatchedAt": "",
+    "dispatchTimestampSource": "event",
     "items": [
       {
         "id": 1,
@@ -21131,6 +21171,14 @@ Requires `orders.pick` and tenant module `logistics.picking`. Transitions `picki
 
     `integer`
 
+  - **`dispatchedAt`**
+
+    `string`, format: `date-time` — When the order entered in\_transit (ADR-0011).
+
+  - **`dispatchTimestampSource`**
+
+    `string`, possible values: `"event", "estimated"` — How dispatchedAt was derived (audit event vs estimated from updatedAt).
+
   - **`driver`**
 
     `object`
@@ -21243,6 +21291,8 @@ Requires `orders.pick` and tenant module `logistics.picking`. Transitions `picki
     "fecha": "",
     "estado": "pending",
     "nota": "",
+    "dispatchedAt": "",
+    "dispatchTimestampSource": "event",
     "items": [
       {
         "id": 1,
@@ -21485,6 +21535,14 @@ Requires `logistics.read`. Filter by `fecha`, `choferId`, `estado`.
 
         `integer`
 
+      - **`dispatchedAt`**
+
+        `string`, format: `date-time` — When the order entered in\_transit (ADR-0011).
+
+      - **`dispatchTimestampSource`**
+
+        `string`, possible values: `"event", "estimated"` — How dispatchedAt was derived (audit event vs estimated from updatedAt).
+
       - **`driver`**
 
         `object`
@@ -21703,6 +21761,8 @@ Requires `logistics.read`. Filter by `fecha`, `choferId`, `estado`.
             "fecha": "",
             "estado": "pending",
             "nota": "",
+            "dispatchedAt": "",
+            "dispatchTimestampSource": "event",
             "items": [
               {
                 "id": 1,
@@ -21933,6 +21993,14 @@ Requires `orders.dispatch`. Groups delivery orders in estado `ready`; assigns dr
 
         `integer`
 
+      - **`dispatchedAt`**
+
+        `string`, format: `date-time` — When the order entered in\_transit (ADR-0011).
+
+      - **`dispatchTimestampSource`**
+
+        `string`, possible values: `"event", "estimated"` — How dispatchedAt was derived (audit event vs estimated from updatedAt).
+
       - **`driver`**
 
         `object`
@@ -22147,6 +22215,8 @@ Requires `orders.dispatch`. Groups delivery orders in estado `ready`; assigns dr
           "fecha": "",
           "estado": "pending",
           "nota": "",
+          "dispatchedAt": "",
+          "dispatchTimestampSource": "event",
           "items": [
             {
               "id": 1,
@@ -22567,6 +22637,14 @@ Requires `logistics.read`.
 
         `integer`
 
+      - **`dispatchedAt`**
+
+        `string`, format: `date-time` — When the order entered in\_transit (ADR-0011).
+
+      - **`dispatchTimestampSource`**
+
+        `string`, possible values: `"event", "estimated"` — How dispatchedAt was derived (audit event vs estimated from updatedAt).
+
       - **`driver`**
 
         `object`
@@ -22781,6 +22859,8 @@ Requires `logistics.read`.
           "fecha": "",
           "estado": "pending",
           "nota": "",
+          "dispatchedAt": "",
+          "dispatchTimestampSource": "event",
           "items": [
             {
               "id": 1,
@@ -22994,6 +23074,14 @@ Requires `orders.dispatch`. `planned` → `on_route`; pending items' OEs → `in
 
         `integer`
 
+      - **`dispatchedAt`**
+
+        `string`, format: `date-time` — When the order entered in\_transit (ADR-0011).
+
+      - **`dispatchTimestampSource`**
+
+        `string`, possible values: `"event", "estimated"` — How dispatchedAt was derived (audit event vs estimated from updatedAt).
+
       - **`driver`**
 
         `object`
@@ -23208,6 +23296,8 @@ Requires `orders.dispatch`. `planned` → `on_route`; pending items' OEs → `in
           "fecha": "",
           "estado": "pending",
           "nota": "",
+          "dispatchedAt": "",
+          "dispatchTimestampSource": "event",
           "items": [
             {
               "id": 1,
@@ -23786,6 +23876,14 @@ Requires `orders.dispatch`. `on_route` → `completed`; pending items → `not_d
 
         `integer`
 
+      - **`dispatchedAt`**
+
+        `string`, format: `date-time` — When the order entered in\_transit (ADR-0011).
+
+      - **`dispatchTimestampSource`**
+
+        `string`, possible values: `"event", "estimated"` — How dispatchedAt was derived (audit event vs estimated from updatedAt).
+
       - **`driver`**
 
         `object`
@@ -24020,6 +24118,8 @@ Requires `orders.dispatch`. `on_route` → `completed`; pending items → `not_d
           "fecha": "",
           "estado": "pending",
           "nota": "",
+          "dispatchedAt": "",
+          "dispatchTimestampSource": "event",
           "items": [
             {
               "id": 1,
@@ -24284,6 +24384,14 @@ Requires `orders.deliver.confirm`. Route must be `on_route`; item `pending`. Dri
 
       `integer`
 
+    - **`dispatchedAt`**
+
+      `string`, format: `date-time` — When the order entered in\_transit (ADR-0011).
+
+    - **`dispatchTimestampSource`**
+
+      `string`, possible values: `"event", "estimated"` — How dispatchedAt was derived (audit event vs estimated from updatedAt).
+
     - **`driver`**
 
       `object`
@@ -24435,6 +24543,8 @@ Requires `orders.deliver.confirm`. Route must be `on_route`; item `pending`. Dri
       "fecha": "",
       "estado": "pending",
       "nota": "",
+      "dispatchedAt": "",
+      "dispatchTimestampSource": "event",
       "items": [
         {
           "id": 1,
@@ -24649,6 +24759,8 @@ Requires `logistics.read` and role `owner`, `manager`, or `logistics_planner` (n
       "fecha": "",
       "estado": "pending",
       "nota": "",
+      "dispatchedAt": "",
+      "dispatchTimestampSource": "event",
       "items": [
         {
           "id": 1,
@@ -24749,6 +24861,497 @@ Requires `logistics.read` and role `owner`, `manager`, or `logistics_planner` (n
 ```
 
 ##### Status: 404 Item not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/logistica/kpis
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/logistica/kpis`
+
+### Logistics KPIs for a date range
+
+- **Method:** `GET`
+- **Path:** `/api/logistica/kpis`
+- **Tags:** logistica
+
+Aggregated logistics metrics using DB-side queries (#145). Requires tenant module `logistics.dispatches` and permission `logistics.read`. Optional `choferId` filters all metrics to one driver. Uses `OrdenEntrega.dispatchedAt` (ADR-0011) as dispatch baseline.
+
+#### Responses
+
+##### Status: 200 KPI aggregate object
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`avgDeliveryMinutes` (required)**
+
+    `number`
+
+  - **`dispatchedCount` (required)**
+
+    `integer`
+
+  - **`firstVisitDeliveredCount` (required)**
+
+    `integer`
+
+  - **`firstVisitRate` (required)**
+
+    `number`
+
+  - **`overdueCount` (required)**
+
+    `integer`
+
+  - **`returnsByReason` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`count` (required)**
+
+      `integer`
+
+    - **`motivo` (required)**
+
+      `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "dispatchedCount": 0,
+    "firstVisitDeliveredCount": 0,
+    "firstVisitRate": 0,
+    "avgDeliveryMinutes": 1,
+    "returnsByReason": [
+      {
+        "motivo": "",
+        "count": 0
+      }
+    ],
+    "overdueCount": 0
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/logistica/reporte-choferes
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/logistica/reporte-choferes`
+
+### Driver productivity report
+
+- **Method:** `GET`
+- **Path:** `/api/logistica/reporte-choferes`
+- **Tags:** logistica
+
+Rows grouped by driver and dispatch day. Requires `logistics.dispatches` and `logistics.read`. Send `Accept: text/csv` for CSV export.
+
+#### Responses
+
+##### Status: 200 Driver rows or CSV
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`choferId` (required)**
+
+    `integer`
+
+  - **`choferUsername` (required)**
+
+    `string`
+
+  - **`day` (required)**
+
+    `string`, format: `date`
+
+  - **`delivered` (required)**
+
+    `integer`
+
+  - **`dispatched` (required)**
+
+    `integer`
+
+  - **`notDelivered` (required)**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "choferId": 1,
+      "choferUsername": "",
+      "day": "",
+      "dispatched": 0,
+      "delivered": 0,
+      "notDelivered": 0
+    }
+  ]
+}
+```
+
+###### Content-Type: text/csv
+
+`string`
+
+**Example:**
+
+```json
+true
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/logistica/reporte-zonas
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/logistica/reporte-zonas`
+
+### Delivery coverage by zone
+
+- **Method:** `GET`
+- **Path:** `/api/logistica/reporte-zonas`
+- **Tags:** logistica
+
+Rows grouped by delivery zone. Requires `logistics.dispatches` and `logistics.read`. Send `Accept: text/csv` for CSV export.
+
+#### Responses
+
+##### Status: 200 Zone rows or CSV
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`delivered` (required)**
+
+    `integer`
+
+  - **`dispatched` (required)**
+
+    `integer`
+
+  - **`notDelivered` (required)**
+
+    `integer`
+
+  - **`zonaId` (required)**
+
+    `integer`
+
+  - **`zonaNombre` (required)**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "zonaId": 1,
+      "zonaNombre": "",
+      "dispatched": 0,
+      "delivered": 0,
+      "notDelivered": 0
+    }
+  ]
+}
+```
+
+###### Content-Type: text/csv
+
+`string`
+
+**Example:**
+
+```json
+true
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
 
 ###### Content-Type: application/json
 
@@ -26442,6 +27045,14 @@ Requires `logistics.read` and role `owner`, `manager`, or `logistics_planner` (n
 
   `integer`
 
+* **`dispatchedAt`**
+
+  `string`, format: `date-time` — When the order entered in\_transit (ADR-0011).
+
+* **`dispatchTimestampSource`**
+
+  `string`, possible values: `"event", "estimated"` — How dispatchedAt was derived (audit event vs estimated from updatedAt).
+
 * **`driver`**
 
   `object`
@@ -26548,6 +27159,8 @@ Requires `logistics.read` and role `owner`, `manager`, or `logistics_planner` (n
   "fecha": "",
   "estado": "pending",
   "nota": "",
+  "dispatchedAt": "",
+  "dispatchTimestampSource": "event",
   "items": [
     {
       "id": 1,
@@ -26714,6 +27327,14 @@ Requires `logistics.read` and role `owner`, `manager`, or `logistics_planner` (n
 
     `integer`
 
+  - **`dispatchedAt`**
+
+    `string`, format: `date-time` — When the order entered in\_transit (ADR-0011).
+
+  - **`dispatchTimestampSource`**
+
+    `string`, possible values: `"event", "estimated"` — How dispatchedAt was derived (audit event vs estimated from updatedAt).
+
   - **`driver`**
 
     `object`
@@ -26826,6 +27447,8 @@ Requires `logistics.read` and role `owner`, `manager`, or `logistics_planner` (n
     "fecha": "",
     "estado": "pending",
     "nota": "",
+    "dispatchedAt": "",
+    "dispatchTimestampSource": "event",
     "items": [
       {
         "id": 1,
@@ -27161,6 +27784,334 @@ Requires `logistics.read` and role `owner`, `manager`, or `logistics_planner` (n
       "neto2": "",
       "iva1": "",
       "iva2": ""
+    }
+  ]
+}
+```
+
+### LogisticaReturnReasonRow
+
+- **Type:**`object`
+
+* **`count` (required)**
+
+  `integer`
+
+* **`motivo` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "motivo": "",
+  "count": 0
+}
+```
+
+### LogisticaKpis
+
+- **Type:**`object`
+
+* **`avgDeliveryMinutes` (required)**
+
+  `number`
+
+* **`dispatchedCount` (required)**
+
+  `integer`
+
+* **`firstVisitDeliveredCount` (required)**
+
+  `integer`
+
+* **`firstVisitRate` (required)**
+
+  `number`
+
+* **`overdueCount` (required)**
+
+  `integer`
+
+* **`returnsByReason` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`count` (required)**
+
+    `integer`
+
+  - **`motivo` (required)**
+
+    `string`
+
+**Example:**
+
+```json
+{
+  "dispatchedCount": 0,
+  "firstVisitDeliveredCount": 0,
+  "firstVisitRate": 0,
+  "avgDeliveryMinutes": 1,
+  "returnsByReason": [
+    {
+      "motivo": "",
+      "count": 0
+    }
+  ],
+  "overdueCount": 0
+}
+```
+
+### LogisticaKpisEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`avgDeliveryMinutes` (required)**
+
+    `number`
+
+  - **`dispatchedCount` (required)**
+
+    `integer`
+
+  - **`firstVisitDeliveredCount` (required)**
+
+    `integer`
+
+  - **`firstVisitRate` (required)**
+
+    `number`
+
+  - **`overdueCount` (required)**
+
+    `integer`
+
+  - **`returnsByReason` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`count` (required)**
+
+      `integer`
+
+    - **`motivo` (required)**
+
+      `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "dispatchedCount": 0,
+    "firstVisitDeliveredCount": 0,
+    "firstVisitRate": 0,
+    "avgDeliveryMinutes": 1,
+    "returnsByReason": [
+      {
+        "motivo": "",
+        "count": 0
+      }
+    ],
+    "overdueCount": 0
+  }
+}
+```
+
+### LogisticaChoferRow
+
+- **Type:**`object`
+
+* **`choferId` (required)**
+
+  `integer`
+
+* **`choferUsername` (required)**
+
+  `string`
+
+* **`day` (required)**
+
+  `string`, format: `date`
+
+* **`delivered` (required)**
+
+  `integer`
+
+* **`dispatched` (required)**
+
+  `integer`
+
+* **`notDelivered` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "choferId": 1,
+  "choferUsername": "",
+  "day": "",
+  "dispatched": 0,
+  "delivered": 0,
+  "notDelivered": 0
+}
+```
+
+### LogisticaChoferesListEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`choferId` (required)**
+
+    `integer`
+
+  - **`choferUsername` (required)**
+
+    `string`
+
+  - **`day` (required)**
+
+    `string`, format: `date`
+
+  - **`delivered` (required)**
+
+    `integer`
+
+  - **`dispatched` (required)**
+
+    `integer`
+
+  - **`notDelivered` (required)**
+
+    `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "choferId": 1,
+      "choferUsername": "",
+      "day": "",
+      "dispatched": 0,
+      "delivered": 0,
+      "notDelivered": 0
+    }
+  ]
+}
+```
+
+### LogisticaZonaRow
+
+- **Type:**`object`
+
+* **`delivered` (required)**
+
+  `integer`
+
+* **`dispatched` (required)**
+
+  `integer`
+
+* **`notDelivered` (required)**
+
+  `integer`
+
+* **`zonaId` (required)**
+
+  `integer`
+
+* **`zonaNombre` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "zonaId": 1,
+  "zonaNombre": "",
+  "dispatched": 0,
+  "delivered": 0,
+  "notDelivered": 0
+}
+```
+
+### LogisticaZonasListEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`delivered` (required)**
+
+    `integer`
+
+  - **`dispatched` (required)**
+
+    `integer`
+
+  - **`notDelivered` (required)**
+
+    `integer`
+
+  - **`zonaId` (required)**
+
+    `integer`
+
+  - **`zonaNombre` (required)**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "zonaId": 1,
+      "zonaNombre": "",
+      "dispatched": 0,
+      "delivered": 0,
+      "notDelivered": 0
     }
   ]
 }
@@ -29321,6 +30272,14 @@ Requires `logistics.read` and role `owner`, `manager`, or `logistics_planner` (n
 
     `integer`
 
+  - **`dispatchedAt`**
+
+    `string`, format: `date-time` — When the order entered in\_transit (ADR-0011).
+
+  - **`dispatchTimestampSource`**
+
+    `string`, possible values: `"event", "estimated"` — How dispatchedAt was derived (audit event vs estimated from updatedAt).
+
   - **`driver`**
 
     `object`
@@ -29466,6 +30425,8 @@ Requires `logistics.read` and role `owner`, `manager`, or `logistics_planner` (n
     "fecha": "",
     "estado": "pending",
     "nota": "",
+    "dispatchedAt": "",
+    "dispatchTimestampSource": "event",
     "items": [
       {
         "id": 1,
@@ -29611,6 +30572,8 @@ Requires `logistics.read` and role `owner`, `manager`, or `logistics_planner` (n
       "fecha": "",
       "estado": "pending",
       "nota": "",
+      "dispatchedAt": "",
+      "dispatchTimestampSource": "event",
       "items": [
         {
           "id": 1,
@@ -29678,6 +30641,14 @@ Requires `logistics.read` and role `owner`, `manager`, or `logistics_planner` (n
     - **`clienteId`**
 
       `integer`
+
+    - **`dispatchedAt`**
+
+      `string`, format: `date-time` — When the order entered in\_transit (ADR-0011).
+
+    - **`dispatchTimestampSource`**
+
+      `string`, possible values: `"event", "estimated"` — How dispatchedAt was derived (audit event vs estimated from updatedAt).
 
     - **`driver`**
 
@@ -29830,6 +30801,8 @@ Requires `logistics.read` and role `owner`, `manager`, or `logistics_planner` (n
       "fecha": "",
       "estado": "pending",
       "nota": "",
+      "dispatchedAt": "",
+      "dispatchTimestampSource": "event",
       "items": [
         {
           "id": 1,
@@ -29911,6 +30884,14 @@ Requires `logistics.read` and role `owner`, `manager`, or `logistics_planner` (n
     - **`clienteId`**
 
       `integer`
+
+    - **`dispatchedAt`**
+
+      `string`, format: `date-time` — When the order entered in\_transit (ADR-0011).
+
+    - **`dispatchTimestampSource`**
+
+      `string`, possible values: `"event", "estimated"` — How dispatchedAt was derived (audit event vs estimated from updatedAt).
 
     - **`driver`**
 
@@ -30120,6 +31101,8 @@ Requires `logistics.read` and role `owner`, `manager`, or `logistics_planner` (n
         "fecha": "",
         "estado": "pending",
         "nota": "",
+        "dispatchedAt": "",
+        "dispatchTimestampSource": "event",
         "items": [
           {
             "id": 1,
@@ -30259,6 +31242,14 @@ Requires `logistics.read` and role `owner`, `manager`, or `logistics_planner` (n
       - **`clienteId`**
 
         `integer`
+
+      - **`dispatchedAt`**
+
+        `string`, format: `date-time` — When the order entered in\_transit (ADR-0011).
+
+      - **`dispatchTimestampSource`**
+
+        `string`, possible values: `"event", "estimated"` — How dispatchedAt was derived (audit event vs estimated from updatedAt).
 
       - **`driver`**
 
@@ -30474,6 +31465,8 @@ Requires `logistics.read` and role `owner`, `manager`, or `logistics_planner` (n
           "fecha": "",
           "estado": "pending",
           "nota": "",
+          "dispatchedAt": "",
+          "dispatchTimestampSource": "event",
           "items": [
             {
               "id": 1,
@@ -30597,6 +31590,14 @@ Requires `logistics.read` and role `owner`, `manager`, or `logistics_planner` (n
       - **`clienteId`**
 
         `integer`
+
+      - **`dispatchedAt`**
+
+        `string`, format: `date-time` — When the order entered in\_transit (ADR-0011).
+
+      - **`dispatchTimestampSource`**
+
+        `string`, possible values: `"event", "estimated"` — How dispatchedAt was derived (audit event vs estimated from updatedAt).
 
       - **`driver`**
 
@@ -30832,6 +31833,8 @@ Requires `logistics.read` and role `owner`, `manager`, or `logistics_planner` (n
           "fecha": "",
           "estado": "pending",
           "nota": "",
+          "dispatchedAt": "",
+          "dispatchTimestampSource": "event",
           "items": [
             {
               "id": 1,

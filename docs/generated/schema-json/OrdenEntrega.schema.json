@@ -9,6 +9,21 @@
     "clienteId": {
       "type": "integer"
     },
+    "dispatchTimestampSource": {
+      "description": "How dispatchedAt was derived (audit event vs estimated from updatedAt).",
+      "enum": [
+        "event",
+        "estimated"
+      ],
+      "nullable": true,
+      "type": "string"
+    },
+    "dispatchedAt": {
+      "description": "When the order entered in_transit (ADR-0011).",
+      "format": "date-time",
+      "nullable": true,
+      "type": "string"
+    },
     "driver": {
       "additionalProperties": true,
       "nullable": true,

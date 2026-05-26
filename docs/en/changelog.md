@@ -10,6 +10,8 @@ Versioning: [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **Logistics KPIs and reports (GitHub #145):** `OrdenEntrega.dispatchedAt` / `dispatchTimestampSource` (ADR-0011); `GET /api/logistica/kpis`, `reporte-choferes`, `reporte-zonas` (`logistics.read`, module `logistics.dispatches`, DB aggregates); **Reportes** tab on `/logistica` with KPI cards, driver ranking, zone table, CSV export; i18n, OpenAPI, tests, manual (EN/ES/PT-BR).
+
 - **Real-time GPS tracking (GitHub #144):** `RepartoUbicacion` model; `POST /api/repartos/{id}/ubicacion` (`orders.deliver.confirm`, driver on own `on_route` route, `logistics.gps` module); `GET /api/repartos/activos` and `GET .../ubicacion/ultima` (`logistics.read`, roles `owner`/`manager`/`logistics_planner`); purge locations older than 7 days; UI `/logistica/seguimiento` (Leaflet map, 60 s polling); driver app posts position every 2 min (optional if geolocation denied); `npm run reparto-ubicacion:purge` script; OpenAPI, tests, and manual (EN/ES/PT-BR).
 
 - **Warehouse picking (GitHub #143):** `picking` / `ready` / `cancelled` on `OrdenEntrega`; `pickerUserId`, `pickingIniciadoAt`, `pickingListoAt`; `POST /api/ordenes-entrega/{id}/iniciar-picking` and `POST .../lista` (`orders.pick`, `logistics.picking` module); `GET /api/ordenes-entrega` also with `orders.pick`; routes (#140) only accept `ready` OEs; UI `/logistica/picking`; OpenAPI, tests, and manual (EN/ES/PT-BR).

@@ -106,13 +106,14 @@ tests/integration/
 
 Vitest **excludes** `e2e/**` (`vitest.config.ts`) so files under `e2e/` are only executed by Playwright. **`tests/integration/**`** is excluded from the default Vitest run (no `DATABASE_URL` required for `npm run test:coverage`); integration tests use `vitest.integration.config.ts`.
 
-### Logistics API evidence (#140–#144)
+### Logistics API evidence (#140–#145)
 
 | Area | Test files | Notes |
 |------|------------|--------|
 | Delivery routes | `tests/api/repartos.test.ts`, `tests/api/contract.test.ts` | CRUD, iniciar/cerrar, POD item, OpenAPI paths |
 | GPS tracking | `tests/api/repartos.test.ts`, `tests/server/services/repartoUbicacionService.test.ts`, contract paths `/api/repartos/activos`, `.../ubicacion` | Module gate `logistics.gps`; `TEST_DEFAULT_MODULES` in [`server/middleware/tenantModules.ts`](../../../server/middleware/tenantModules.ts) |
 | Warehouse picking | `tests/api/ordenes-entrega.test.ts`, contract `iniciar-picking` / `lista` | Module `logistics.picking` |
+| KPIs and reports (#145) | `tests/api/logistica-reportes.test.ts`, `tests/server/services/logisticaReportesService.test.ts`, `src/pages/logistica/LogisticaReportesPanel.test.tsx`, contract `/api/logistica/kpis`, `reporte-choferes`, `reporte-zonas` | Module `logistics.dispatches`; `dispatchedAt` / ADR-0011; optional `choferId` on all three endpoints |
 | Audit matrix (#84) | `tests/server/http-mutations-audit-coverage.test.ts` | Picking, repartos, GPS `ubicacion`, POD `reparto_item_pod_signed` |
 | Integration | `tests/integration/repartos.integration.test.ts` | Optional; requires migrated PostgreSQL |
 

@@ -1,5 +1,9 @@
 {
   "title": "Logística de entregas",
+  "tabs": {
+    "label": "Secciones de logística",
+    "ordenes": "Órdenes"
+  },
   "forbidden": "No tiene permiso para ver órdenes de entrega.",
   "filters": {
     "fecha": "Fecha",

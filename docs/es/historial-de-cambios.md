@@ -10,6 +10,8 @@ Versionado: [Semantic Versioning](https://semver.org/lang/es/).
 
 ### Agregado
 
+- **KPIs y reportes logísticos (GitHub #145):** `dispatchedAt` / `dispatchTimestampSource` en `OrdenEntrega` (ADR-0011); `GET /api/logistica/kpis`, `reporte-choferes`, `reporte-zonas` (`logistics.read`, módulo `logistics.dispatches`, agregados en DB); pestaña **Reportes** en `/logistica` con tarjetas KPI, ranking de choferes, tabla por zona, export CSV; i18n, OpenAPI, pruebas y manual (EN/ES/PT-BR).
+
 - **Seguimiento GPS en tiempo real (GitHub #144):** modelo `RepartoUbicacion`; `POST /api/repartos/{id}/ubicacion` (`orders.deliver.confirm`, chofer en reparto propio `on_route`, módulo `logistics.gps`); `GET /api/repartos/activos` y `GET .../ubicacion/ultima` (`logistics.read`, roles `owner`/`manager`/`logistics_planner`); purga de ubicaciones con más de 7 días; UI `/logistica/seguimiento` (mapa Leaflet, polling 60 s); app chofer envía posición cada 2 min (opcional si geolocalización denegada); script `npm run reparto-ubicacion:purge`; OpenAPI, pruebas y manual (EN/ES/PT-BR).
 
 - **Picking en depósito (GitHub #143):** estados `picking` / `ready` / `cancelled` en `OrdenEntrega`; campos `pickerUserId`, `pickingIniciadoAt`, `pickingListoAt`; `POST /api/ordenes-entrega/{id}/iniciar-picking` y `POST .../lista` (`orders.pick`, módulo `logistics.picking`); `GET /api/ordenes-entrega` también con `orders.pick`; repartos (#140) solo aceptan OEs `ready`; UI `/logistica/picking`; OpenAPI, pruebas y manual (EN/ES/PT-BR).

@@ -29,7 +29,7 @@ Para releases, regressão ou evidência de auditoria quando a automação não c
 - [ ] Ordem de tabulação utilizável no login e um módulo principal
 - [ ] Foco visível; erros de formulário associados aos campos testados
 
-## Logística (#140–#144) — com módulos habilitados
+## Logística (#140–#145) — com módulos habilitados
 
 Pré-requisitos: módulos `logistics.dispatches` (+ `logistics.picking`, `logistics.pod`, `logistics.gps` conforme o caso); papéis/permissões em [matriz-rbac-funcoes-permissoes-scopes.md](matriz-rbac-funcoes-permissoes-scopes.md); manual [manual-logistica.md](../user/manual-logistica.md).
 
@@ -38,6 +38,7 @@ Pré-requisitos: módulos `logistics.dispatches` (+ `logistics.picking`, `logist
 - [ ] **Repartos** (`/logistica/repartos`, `logistics.dispatches`): criar com OE prontas → iniciar → fechar
 - [ ] **POD motorista** (`/logistica/repartos/chofer`, `logistics.pod`): confirmar parada com assinatura; back-office mostra comprovante
 - [ ] **Rastreamento GPS** (`/logistica/seguimiento`, `logistics.gps`): mapa com repartos `on_route`; geolocalização opcional no app motorista (negada não bloqueia POD)
+- [ ] **Relatórios (#145)** (`/logistica` → aba **Relatórios**, `logistics.dispatches`): cards KPI e tabelas motorista/zona carregam no período; filtro de motorista opcional aplica a KPIs e ambas tabelas; exportação CSV motoristas e zonas
 
 ## Critérios de saída
 

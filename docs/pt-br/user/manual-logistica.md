@@ -86,6 +86,18 @@ Módulo **`logistics.gps`** (depende de **`logistics.dispatches`**). Planejadore
 
 O motorista em **`/logistica/repartos/chofer`** envia coordenadas a cada **2 min** se o navegador permitir geolocalização (não bloqueia POD se negado). Retenção: **7 dias** (purga a cada registro e `npm run reparto-ubicacion:purge`). Não há coordenadas de cliente no mapa; o detalhe mostra endereço como texto.
 
+## KPIs e relatórios (#145)
+
+Módulo **`logistics.dispatches`**. Planejadores (`owner`, `manager`, `logistics_planner`) abrem **`/logistica`** → aba **Relatórios**.
+
+| API | Notas |
+|-----|--------|
+| `GET /api/logistica/kpis?from&to&choferId?` | Taxa 1ª visita, tempo médio, devoluções por motivo, OEs vencidas |
+| `GET /api/logistica/reporte-choferes?from&to&choferId?` | Produtividade por motorista/dia; `Accept: text/csv` |
+| `GET /api/logistica/reporte-zonas?from&to&choferId?` | Cobertura por zona; filtro motorista opcional; `Accept: text/csv` |
+
+**Despacho:** `OrdenEntrega.dispatchedAt` ao passar para `in_transit`. Legado pode ter `dispatchTimestampSource = estimated` (ADR-0011).
+
 ## Ordens de compra
 
 Abra **Compras** (`/compras`) na barra lateral. A rota depende do módulo do tenant **`logistics.purchases`** e é visível para papéis como **owner**, **manager** e **warehouse_lead** (conforme a configuração de navegação do produto).

@@ -86,6 +86,18 @@ Module **`logistics.gps`** (requires **`logistics.dispatches`**). Planners with 
 
 On **`/logistica/repartos/chofer`**, the driver posts coordinates every **2 min** when the browser allows geolocation (POD is not blocked if denied). Retention: **7 days** (purge on each record and `npm run reparto-ubicacion:purge`). Customer coordinates are not on the map; detail shows address as text.
 
+## KPIs and reports (#145)
+
+Module **`logistics.dispatches`**. Planners (`owner`, `manager`, `logistics_planner`) open **`/logistica`** → tab **Reports**.
+
+| API | Notes |
+|-----|--------|
+| `GET /api/logistica/kpis?from&to&choferId?` | First-visit rate, avg delivery minutes, returns by reason, overdue OEs |
+| `GET /api/logistica/reporte-choferes?from&to&choferId?` | Driver/day productivity; `Accept: text/csv` |
+| `GET /api/logistica/reporte-zonas?from&to&choferId?` | Coverage by zone; optional driver filter; `Accept: text/csv` |
+
+**Dispatch timestamp:** `OrdenEntrega.dispatchedAt` is set when the OE becomes `in_transit` (route start or manual). Legacy rows may have `dispatchTimestampSource = estimated` after migration (see ADR-0011).
+
 ## Purchase orders
 
 Open **Purchasing** (`/compras`) from the sidebar. The route is gated by the tenant module **`logistics.purchases`** and is visible to roles such as **owner**, **manager**, and **warehouse_lead** (see navigation configuration in the product).

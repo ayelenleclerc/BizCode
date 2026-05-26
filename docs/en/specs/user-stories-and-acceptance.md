@@ -105,4 +105,12 @@ Format: **Given / When / Then** acceptance checks are **manual** unless linked a
   - Given `logistics.gps`, when a route is `on_route`, then planner map shows last position; driver posts location periodically.
 - **Evidence:** `src/pages/logistica/seguimiento/`, `RepartoUbicacionService.ts`, `GET /api/repartos/activos`.
 
+## US-14 — Logistics KPIs and reports (#145)
+
+- **Story:** As a planner or manager, I want logistics KPIs and driver/zone reports for a period so I can measure first-visit rate, delivery times, returns, and export CSV.
+- **Acceptance:**
+  - Given `logistics.dispatches` and `logistics.read`, when I open the **Reports** tab on `/logistica`, then KPI cards and driver/zone tables load for the selected period.
+  - Given an optional driver filter, when I refresh or export, then KPIs, driver report, and zone report all use the same `choferId`.
+- **Evidence:** `src/pages/logistica/LogisticaReportesPanel.tsx`, `GET /api/logistica/kpis`, `reporte-choferes`, `reporte-zonas`; [ADR-0011](../adr/ADR-0011-orden-entrega-dispatched-at.md) (`dispatchedAt`).
+
 **Other languages:** [Español](../../es/specs/historias-usuario-criterios-aceptacion.md) · [Português](../../pt-br/specs/historias-usuario-criterios-aceptacao.md)

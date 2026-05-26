@@ -29,7 +29,7 @@ Para releases, regresiones o evidencia de auditoría cuando la automatización n
 - [ ] Orden de tabulación usable en login y un módulo principal
 - [ ] Foco visible; errores de formulario asociados a campos probados
 
-## Logística (#140–#144) — con módulos habilitados
+## Logística (#140–#145) — con módulos habilitados
 
 Requisitos: módulos `logistics.dispatches` (+ `logistics.picking`, `logistics.pod`, `logistics.gps` según caso); roles/permisos en [matriz-rbac-roles-permisos-scopes.md](matriz-rbac-roles-permisos-scopes.md); manual [manual-logistica.md](../user/manual-logistica.md).
 
@@ -38,6 +38,7 @@ Requisitos: módulos `logistics.dispatches` (+ `logistics.picking`, `logistics.p
 - [ ] **Repartos** (`/logistica/repartos`, `logistics.dispatches`): crear con OE listas → iniciar → cerrar
 - [ ] **POD chofer** (`/logistica/repartos/chofer`, `logistics.pod`): confirmar parada con firma; back-office muestra comprobante
 - [ ] **Seguimiento GPS** (`/logistica/seguimiento`, `logistics.gps`): mapa con repartos `on_route`; geolocalización opcional en app chofer (denegada no bloquea POD)
+- [ ] **Reportes (#145)** (`/logistica` → pestaña **Reportes**, `logistics.dispatches`): cargan KPIs y tablas chofer/zona del período; filtro de chofer opcional aplica a KPIs y ambas tablas; exportación CSV choferes y zonas
 
 ## Criterios de salida
 

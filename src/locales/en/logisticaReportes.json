@@ -1,0 +1,54 @@
+{
+  "tab": "Reports",
+  "period": {
+    "from": "From",
+    "to": "To",
+    "presetToday": "Today",
+    "presetWeek": "Week",
+    "presetMonth": "Month",
+    "apply": "Apply"
+  },
+  "filters": {
+    "chofer": "Driver",
+    "allChoferes": "All drivers",
+    "choferId": "Driver ID"
+  },
+  "kpis": {
+    "dispatched": "Dispatched OEs",
+    "firstVisitRate": "First-visit rate",
+    "firstVisitDelivered": "First-visit deliveries",
+    "avgDeliveryMinutes": "Avg delivery time (min)",
+    "overdue": "Overdue OEs",
+    "returnsTitle": "Returns by reason"
+  },
+  "tables": {
+    "choferesTitle": "Driver ranking",
+    "zonasTitle": "Deliveries by zone",
+    "chofer": "Driver",
+    "day": "Day",
+    "dispatched": "Dispatched",
+    "delivered": "Delivered",
+    "notDelivered": "Not delivered",
+    "zona": "Zone",
+    "motivo": "Reason",
+    "count": "Count"
+  },
+  "actions": {
+    "exportChoferesCsv": "Export drivers CSV",
+    "exportZonasCsv": "Export zones CSV",
+    "refresh": "Refresh"
+  },
+  "loading": "Loading reports…",
+  "emptyChoferes": "No driver data for this period.",
+  "emptyZonas": "No zone data for this period.",
+  "errors": {
+    "load": "Could not load logistics reports."
+  },
+  "motivo": {
+    "ausente": "Absent",
+    "rechazo": "Refused",
+    "domicilio_incorrecto": "Wrong address",
+    "producto_dañado": "Damaged product",
+    "otro": "Other"
+  }
+}

@@ -24,5 +24,6 @@
 | UC-11 | Plan delivery route | Select ready OEs → create route → start → close. | `src/pages/logistica/repartos/` |
 | UC-12 | Driver POD | Confirm delivery per stop with signature. | `src/pages/logistica/repartos/chofer/` |
 | UC-13 | Live GPS tracking | Planner views map; driver sends location on route. | `src/pages/logistica/seguimiento/` |
+| UC-14 | Logistics KPIs and reports | Select period (and optional driver) → view KPIs, driver/zone tables → export CSV. | `src/pages/logistica/LogisticaReportesPanel.tsx`, `/api/logistica/*` |
 
 **Other languages:** [Español](../../es/specs/casos-de-uso.md) · [Português](../../pt-br/specs/casos-de-uso.md)

@@ -1565,4 +1565,65 @@ describe('API — errores 500 (cobertura de ramas catch)', () => {
       .expect(500)
     await assertMatchesOpenApi('/api/facturas', 'post', '500', res.body)
   })
+
+  it('GET /api/logistica/kpis', async () => {
+    process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
+    process.env.BIZCODE_TEST_ROLE = 'logistics_planner'
+    const p = buildPrisma()
+    vi.mocked(p.$queryRaw)
+      .mockResolvedValueOnce([{ count: BigInt(2) }])
+      .mockResolvedValueOnce([{ count: BigInt(1) }])
+      .mockResolvedValueOnce([{ avg_seconds: 600 }])
+      .mockResolvedValueOnce([{ motivo: 'ausente', count: BigInt(1) }])
+      .mockResolvedValueOnce([{ count: BigInt(0) }])
+    const app = createApp(p)
+    const res = await request(app)
+      .get('/api/logistica/kpis')
+      .query({ from: '2026-05-01', to: '2026-05-31' })
+      .expect(200)
+    await assertMatchesOpenApi('/api/logistica/kpis', 'get', '200', res.body)
+  })
+
+  it('GET /api/logistica/reporte-choferes', async () => {
+    process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
+    process.env.BIZCODE_TEST_ROLE = 'logistics_planner'
+    const p = buildPrisma()
+    vi.mocked(p.$queryRaw).mockResolvedValueOnce([
+      {
+        chofer_id: 2,
+        chofer_username: 'driver1',
+        day: new Date('2026-05-20'),
+        dispatched: BigInt(3),
+        delivered: BigInt(2),
+        not_delivered: BigInt(1),
+      },
+    ])
+    const app = createApp(p)
+    const res = await request(app)
+      .get('/api/logistica/reporte-choferes')
+      .query({ from: '2026-05-01', to: '2026-05-31' })
+      .expect(200)
+    await assertMatchesOpenApi('/api/logistica/reporte-choferes', 'get', '200', res.body)
+  })
+
+  it('GET /api/logistica/reporte-zonas', async () => {
+    process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
+    process.env.BIZCODE_TEST_ROLE = 'logistics_planner'
+    const p = buildPrisma()
+    vi.mocked(p.$queryRaw).mockResolvedValueOnce([
+      {
+        zona_id: 1,
+        zona_nombre: 'Centro',
+        dispatched: BigInt(4),
+        delivered: BigInt(3),
+        not_delivered: BigInt(1),
+      },
+    ])
+    const app = createApp(p)
+    const res = await request(app)
+      .get('/api/logistica/reporte-zonas')
+      .query({ from: '2026-05-01', to: '2026-05-31' })
+      .expect(200)
+    await assertMatchesOpenApi('/api/logistica/reporte-zonas', 'get', '200', res.body)
+  })
 })

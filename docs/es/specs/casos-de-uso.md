@@ -24,5 +24,6 @@
 | CU-11 | Planificar reparto | Seleccionar OE listas → crear reparto → iniciar → cerrar. | `src/pages/logistica/repartos/` |
 | CU-12 | POD chofer | Confirmar entrega por parada con firma. | `src/pages/logistica/repartos/chofer/` |
 | CU-13 | Seguimiento GPS | Planificador ve mapa; chofer envía ubicación en ruta. | `src/pages/logistica/seguimiento/` |
+| CU-14 | KPIs y reportes logística | Elegir período (y chofer opcional) → ver KPIs y tablas → exportar CSV. | `src/pages/logistica/LogisticaReportesPanel.tsx`, `/api/logistica/*` |
 
 **Otros idiomas:** [English](../../en/specs/use-cases.md) · [Português](../../pt-br/specs/casos-de-uso.md)

@@ -30,5 +30,6 @@ Ejecutar en un registro de sesión usando [certificacion-iso/plantillas-registro
 | TC-017 | Crear reparto | `orders.dispatch`, `logistics.dispatches` | Repartos → crear con OE listas → iniciar | Reparto `on_route` | `logistica/repartos` |
 | TC-018 | POD chofer | `orders.deliver.confirm`, `logistics.pod` | App chofer → entregar parada con firma | Ítem `delivered`; `hasPod` en back-office | `logistica/repartos/chofer` |
 | TC-019 | Seguimiento GPS | `logistics.gps`, rol planificador | Mapa Seguimiento carga; reparto `on_route` visible | Marcador o estado vacío; barra lateral actualiza | `logistica/seguimiento` |
+| TC-020 | Reportes logística (#145) | `logistics.dispatches`, `logistics.read`, planificador/manager | Abrir `/logistica` → pestaña **Reportes** → período → filtro chofer opcional → exportar CSV | KPIs y tablas cargan; reportes chofer/zona respetan `choferId` si se indica | `logistica` (pestaña Reportes) |
 
 **Otros idiomas:** [English](../../en/specs/manual-test-cases.md) · [Português](../../pt-br/specs/casos-de-teste-manual.md)

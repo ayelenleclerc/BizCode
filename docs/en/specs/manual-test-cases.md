@@ -30,5 +30,6 @@ Execute in a session record using [certificacion-iso/records-template.md](../cer
 | TC-017 | Create route | `orders.dispatch`, `logistics.dispatches` | Repartos → create with ready OEs → iniciar | Route `on_route` | `logistica/repartos` |
 | TC-018 | Driver POD | `orders.deliver.confirm`, `logistics.pod` | Chofer app → deliver one stop with signature | Item `delivered`; `hasPod` in back-office | `logistica/repartos/chofer` |
 | TC-019 | GPS tracking | `logistics.gps`, planner role | Seguimiento map loads; reparto on_route visible | Marker or empty state; sidebar updates | `logistica/seguimiento` |
+| TC-020 | Logistics reports (#145) | `logistics.dispatches`, `logistics.read`, planner/manager role | Open `/logistica` → **Reports** tab → set period → optional driver filter → export driver/zone CSV | KPI cards and tables load; driver and zone reports respect `choferId` when set | `logistica` (Reports tab) |
 
 **Other languages:** [Español](../../es/specs/casos-de-prueba-manual.md) · [Português](../../pt-br/specs/casos-de-teste-manual.md)
