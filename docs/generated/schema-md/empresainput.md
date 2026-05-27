@@ -18,8 +18,11 @@ undefined
 
 | Property                                          | Type      | Required | Nullable       | Defined by                                                                                                       |
 | :------------------------------------------------ | :-------- | :------- | :------------- | :--------------------------------------------------------------------------------------------------------------- |
+| [condicionIva](#condicioniva)                     | `string`  | Optional | cannot be null | [EmpresaInput](empresainput-properties-condicioniva.md "undefined#/properties/condicionIva")                     |
 | [cuit](#cuit)                                     | `string`  | Required | cannot be null | [EmpresaInput](empresainput-properties-cuit.md "undefined#/properties/cuit")                                     |
 | [domicilio](#domicilio)                           | `string`  | Optional | cannot be null | [EmpresaInput](empresainput-properties-domicilio.md "undefined#/properties/domicilio")                           |
+| [fechaInicioActividades](#fechainicioactividades) | `string`  | Optional | cannot be null | [EmpresaInput](empresainput-properties-fechainicioactividades.md "undefined#/properties/fechaInicioActividades") |
+| [ingresosBrutos](#ingresosbrutos)                 | `string`  | Optional | cannot be null | [EmpresaInput](empresainput-properties-ingresosbrutos.md "undefined#/properties/ingresosBrutos")                 |
 | [logoUrl](#logourl)                               | `string`  | Optional | cannot be null | [EmpresaInput](empresainput-properties-logourl.md "undefined#/properties/logoUrl")                               |
 | [nombre](#nombre)                                 | `string`  | Required | cannot be null | [EmpresaInput](empresainput-properties-nombre.md "undefined#/properties/nombre")                                 |
 | [puntoVenta](#puntoventa)                         | `integer` | Required | cannot be null | [EmpresaInput](empresainput-properties-puntoventa.md "undefined#/properties/puntoVenta")                         |
@@ -28,6 +31,35 @@ undefined
 | [recordatorioHoraInicio](#recordatoriohorainicio) | `integer` | Optional | cannot be null | [EmpresaInput](empresainput-properties-recordatoriohorainicio.md "undefined#/properties/recordatorioHoraInicio") |
 | [timezone](#timezone)                             | `string`  | Optional | cannot be null | [EmpresaInput](empresainput-properties-timezone.md "undefined#/properties/timezone")                             |
 | [tipoFactura](#tipofactura)                       | `string`  | Required | cannot be null | [EmpresaInput](empresainput-properties-tipofactura.md "undefined#/properties/tipoFactura")                       |
+
+## condicionIva
+
+
+
+`condicionIva`
+
+* is optional
+
+* Type: `string`
+
+* cannot be null
+
+* defined in: [EmpresaInput](empresainput-properties-condicioniva.md "undefined#/properties/condicionIva")
+
+### condicionIva Type
+
+`string`
+
+### condicionIva Constraints
+
+**enum**: the value of this property must be equal to one of the following values:
+
+| Value      | Explanation |
+| :--------- | :---------- |
+| `"RI"`     |             |
+| `"Mono"`   |             |
+| `"CF"`     |             |
+| `"Exento"` |             |
 
 ## cuit
 
@@ -72,6 +104,50 @@ undefined
 ### domicilio Constraints
 
 **maximum length**: the maximum number of characters for this string is: `40`
+
+## fechaInicioActividades
+
+
+
+`fechaInicioActividades`
+
+* is optional
+
+* Type: `string`
+
+* cannot be null
+
+* defined in: [EmpresaInput](empresainput-properties-fechainicioactividades.md "undefined#/properties/fechaInicioActividades")
+
+### fechaInicioActividades Type
+
+`string`
+
+### fechaInicioActividades Constraints
+
+**date**: the string must be a date string, according to [RFC 3339, section 5.6](https://tools.ietf.org/html/rfc3339 "check the specification")
+
+## ingresosBrutos
+
+
+
+`ingresosBrutos`
+
+* is optional
+
+* Type: `string`
+
+* cannot be null
+
+* defined in: [EmpresaInput](empresainput-properties-ingresosbrutos.md "undefined#/properties/ingresosBrutos")
+
+### ingresosBrutos Type
+
+`string`
+
+### ingresosBrutos Constraints
+
+**maximum length**: the maximum number of characters for this string is: `30`
 
 ## logoUrl
 

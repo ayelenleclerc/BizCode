@@ -10,6 +10,8 @@ Versionamento: [Semantic Versioning](https://semver.org/).
 
 ### Adicionado
 
+- **PDF legal AFIP (GitHub #148):** `GET /api/facturas/{id}/pdf` (PDF fiscal com CAE emitido), `/pdf/preview` (não fiscal), `/ticket` (80 mm operacional); layout alinhado RG 4291, QR e código de barras I2of5; campos emitente em `ParamEmpresa`; modal pré-visualização/impressão em Faturamento; ADR-0014. Validação manual no portal AFIP pendente.
+
 - **Livro IVA Vendas — Fase 1 (GitHub #147):** `GET /api/contabilidad/libro-iva-ventas` (`reports.financial.read`, módulo `finance.ledger`) exporta vendas a partir de `Factura`; `format=preview|txt|xlsx` (ZIP `CBTV.txt` + `ALICUOTAS.txt`); NC e anulações tipo `999` conforme ADR-0013; seção **Contabilidade** em **Finanças**; **Livro IVA Compras fora de escopo** (issue posterior). OpenAPI, testes, manuais (EN/ES/PT-BR).
 
 - **Anulação de fatura e notas de crédito (GitHub #146):** `PUT /api/facturas/{id}/void` (`sales.cancel`, módulo `billing.credit_notes`, motivo mín. 10 caracteres) devolve fatura atualizada, `NotaCredito` emitida e saldo do cliente; `GET /api/notas-credito`, `GET /api/notas-credito/{id}` (`reports.financial.read` ou `reports.operational.read`); fluxo AFIP conforme ADR-0012; **Finanças** lista notas por intervalo (UI com módulo); **Faturamento** ação anular condicionada a `billing.credit_notes`; OpenAPI, testes (`notas-credito`, `facturas-void`), manuais e specs (EN/ES/PT-BR).

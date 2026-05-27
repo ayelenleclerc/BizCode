@@ -10,6 +10,8 @@ Versioning: [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **Legal AFIP invoice PDF (GitHub #148):** `GET /api/facturas/{id}/pdf` (legal fiscal PDF, requires issued CAE), `/pdf/preview` (non-fiscal watermark), `/ticket` (80mm operational; non-fiscal without CAE); RG 4291-aligned layout, AFIP QR and Interleaved 2 of 5 barcode (`bwip-js`); `ParamEmpresa` issuer fields (`condicionIva`, `ingresosBrutos`, `fechaInicioActividades`); billing UI PDF preview/print modal; ADR-0014; OpenAPI and tests. Manual AFIP portal validation pending.
+
 - **Libro IVA Ventas — Fase 1 (GitHub #147):** `GET /api/contabilidad/libro-iva-ventas` (`reports.financial.read`, module `finance.ledger`) exports sales book from persisted `Factura` fields; `format=preview|txt|xlsx` (ZIP with `CBTV.txt` + `ALICUOTAS.txt`); credit notes and void tipo `999` per ADR-0013; **Finanzas** accounting section; **Libro IVA Compras out of scope** (follow-up issue). OpenAPI, tests, manuals (EN/ES/PT-BR).
 
 - **Invoice void and credit notes (GitHub #146):** `PUT /api/facturas/{id}/void` (`sales.cancel`, module `billing.credit_notes`, reason min. 10 chars) returns updated invoice, issued `NotaCredito`, and customer balance; `GET /api/notas-credito`, `GET /api/notas-credito/{id}` (`reports.financial.read` or `reports.operational.read`); AFIP credit-note flow per ADR-0012; **Finanzas** lists credit notes by date range (UI under module); **Facturación** void action gated on `billing.credit_notes`; OpenAPI, tests (`notas-credito`, `facturas-void`), manuals and specs (EN/ES/PT-BR).

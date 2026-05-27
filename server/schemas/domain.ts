@@ -754,6 +754,10 @@ const empresaTipoFacturaSchema = z.enum(['A', 'B', 'C'], {
   errorMap: () => ({ message: 'tipoFactura must be one of: A, B, C' }),
 })
 
+const empresaCondicionIvaSchema = z.enum(['RI', 'Mono', 'CF', 'Exento'], {
+  errorMap: () => ({ message: 'condicionIva must be one of: RI, Mono, CF, Exento' }),
+})
+
 export const empresaUpdateBodySchema = z
   .object({
     nombre: z.string({ required_error: 'nombre is required', invalid_type_error: 'nombre must be a string' }),
@@ -768,6 +772,9 @@ export const empresaUpdateBodySchema = z
       .number({ invalid_type_error: 'recordatorioHoraInicio must be an integer' })
       .optional(),
     recordatorioHoraFin: z.number({ invalid_type_error: 'recordatorioHoraFin must be an integer' }).optional(),
+    condicionIva: empresaCondicionIvaSchema.optional(),
+    ingresosBrutos: z.union([z.string(), z.null(), z.undefined()]).optional(),
+    fechaInicioActividades: z.union([z.string(), z.null(), z.undefined()]).optional(),
   })
   .superRefine((data, ctx) => {
     const nombre = data.nombre.trim()
@@ -853,6 +860,30 @@ export const empresaUpdateBodySchema = z
         path: ['recordatorioHoraFin'],
       })
     }
+    if (data.ingresosBrutos !== undefined && data.ingresosBrutos !== null && typeof data.ingresosBrutos === 'string') {
+      const ib = data.ingresosBrutos.trim()
+      if (ib.length > 30) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'ingresosBrutos must be at most 30 characters',
+          path: ['ingresosBrutos'],
+        })
+      }
+    }
+    if (
+      data.fechaInicioActividades !== undefined &&
+      data.fechaInicioActividades !== null &&
+      typeof data.fechaInicioActividades === 'string'
+    ) {
+      const raw = data.fechaInicioActividades.trim()
+      if (raw.length > 0 && !/^\d{4}-\d{2}-\d{2}$/.test(raw)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'fechaInicioActividades must be YYYY-MM-DD',
+          path: ['fechaInicioActividades'],
+        })
+      }
+    }
   })
   .transform((data): EmpresaInput => {
     const dom =
@@ -871,6 +902,23 @@ export const empresaUpdateBodySchema = z
           : data.logoUrl.trim() === ''
             ? null
             : data.logoUrl.trim()
+    const ingresosBrutos =
+      data.ingresosBrutos === undefined
+        ? undefined
+        : data.ingresosBrutos === null
+          ? null
+          : data.ingresosBrutos.trim() === ''
+            ? null
+            : data.ingresosBrutos.trim()
+    const fechaInicioActividades =
+      data.fechaInicioActividades === undefined
+        ? undefined
+        : data.fechaInicioActividades === null
+          ? null
+          : data.fechaInicioActividades.trim() === ''
+            ? null
+            : data.fechaInicioActividades.trim()
+
     return {
       nombre: data.nombre.trim(),
       cuit: data.cuit.trim(),
@@ -882,6 +930,9 @@ export const empresaUpdateBodySchema = z
       timezone: data.timezone?.trim(),
       recordatorioHoraInicio: data.recordatorioHoraInicio,
       recordatorioHoraFin: data.recordatorioHoraFin,
+      condicionIva: data.condicionIva,
+      ingresosBrutos,
+      fechaInicioActividades,
     }
   })
 

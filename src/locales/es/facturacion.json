@@ -94,5 +94,14 @@
     "pdfError": "No se pudo generar el PDF",
     "caeNumber": "CAE: {{cae}}",
     "caeVto": "Vto: {{date}}"
+  },
+  "pdfModal": {
+    "title": "PDF — {{filename}}",
+    "close": "Cerrar",
+    "download": "Descargar PDF",
+    "print": "Imprimir / vista previa",
+    "ticket": "Ticket 80 mm",
+    "previewFrameTitle": "Vista previa del PDF de factura",
+    "actions": "Acciones PDF"
   }
 }

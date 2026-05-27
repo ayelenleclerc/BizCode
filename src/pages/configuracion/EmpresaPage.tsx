@@ -34,6 +34,14 @@ const empresaFormSchema = z
     timezone: z.string().min(1).max(64),
     recordatorioHoraInicio: z.coerce.number().int().min(0).max(23),
     recordatorioHoraFin: z.coerce.number().int().min(1).max(24),
+    condicionIva: z.enum(['RI', 'Mono', 'CF', 'Exento']),
+    ingresosBrutos: z.string().max(30).optional(),
+    fechaInicioActividades: z
+      .string()
+      .optional()
+      .refine((v) => !v || v.trim() === '' || /^\d{4}-\d{2}-\d{2}$/.test(v.trim()), {
+        message: 'fechaInicioInvalid',
+      }),
   })
   .refine((data) => data.recordatorioHoraInicio < data.recordatorioHoraFin, {
     message: 'reminderWindowInvalid',
@@ -54,6 +62,9 @@ function configToFormValues(data: EmpresaConfig): EmpresaFormData {
     timezone: data.timezone,
     recordatorioHoraInicio: data.recordatorioHoraInicio,
     recordatorioHoraFin: data.recordatorioHoraFin,
+    condicionIva: data.condicionIva,
+    ingresosBrutos: data.ingresosBrutos ?? '',
+    fechaInicioActividades: data.fechaInicioActividades ?? '',
   }
 }
 
@@ -89,6 +100,9 @@ export default function EmpresaPage() {
       timezone: 'America/Argentina/Buenos_Aires',
       recordatorioHoraInicio: 8,
       recordatorioHoraFin: 18,
+      condicionIva: 'RI',
+      ingresosBrutos: '',
+      fechaInicioActividades: '',
     },
   })
 
@@ -141,6 +155,11 @@ export default function EmpresaPage() {
         timezone: data.timezone,
         recordatorioHoraInicio: data.recordatorioHoraInicio,
         recordatorioHoraFin: data.recordatorioHoraFin,
+        condicionIva: data.condicionIva,
+        ingresosBrutos: data.ingresosBrutos?.trim() ? data.ingresosBrutos.trim() : null,
+        fechaInicioActividades: data.fechaInicioActividades?.trim()
+          ? data.fechaInicioActividades.trim()
+          : null,
       })
       if (!saved) {
         setSaveError(t('errors.saveFailed'))
@@ -159,6 +178,7 @@ export default function EmpresaPage() {
     if (!err?.message) return null
     if (err.message === 'cuitInvalid') return t('errors.cuitInvalid')
     if (err.message === 'reminderWindowInvalid') return t('errors.reminderWindowInvalid')
+    if (err.message === 'fechaInicioInvalid') return t('errors.fechaInicioInvalid')
     return fallback
   }
 
@@ -267,6 +287,62 @@ export default function EmpresaPage() {
               className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 disabled:opacity-70"
               disabled={!canEdit}
             />
+          </div>
+
+          <div>
+            <label htmlFor="empresa-condicion-iva" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+              {t('form.condicionIva')}
+            </label>
+            <select
+              id="empresa-condicion-iva"
+              data-testid="select-empresa-condicion-iva"
+              {...register('condicionIva')}
+              disabled={!canEdit}
+              className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 disabled:opacity-70"
+            >
+              <option value="RI">{t('form.condicionRi')}</option>
+              <option value="Mono">{t('form.condicionMono')}</option>
+              <option value="CF">{t('form.condicionCf')}</option>
+              <option value="Exento">{t('form.condicionExento')}</option>
+            </select>
+          </div>
+
+          <div>
+            <label htmlFor="empresa-ingresos-brutos" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+              {t('form.ingresosBrutos')}
+            </label>
+            <input
+              id="empresa-ingresos-brutos"
+              data-testid="input-empresa-ingresos-brutos"
+              {...register('ingresosBrutos')}
+              readOnly={!canEdit}
+              className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 disabled:opacity-70"
+              disabled={!canEdit}
+            />
+          </div>
+
+          <div>
+            <label
+              htmlFor="empresa-fecha-inicio"
+              className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1"
+            >
+              {t('form.fechaInicioActividades')}
+            </label>
+            <input
+              id="empresa-fecha-inicio"
+              type="date"
+              data-testid="input-empresa-fecha-inicio"
+              {...register('fechaInicioActividades')}
+              readOnly={!canEdit}
+              {...(errors.fechaInicioActividades ? { 'aria-invalid': 'true' as const } : {})}
+              className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 disabled:opacity-70"
+              disabled={!canEdit}
+            />
+            {errors.fechaInicioActividades && (
+              <p className="text-red-500 text-xs mt-1" role="alert">
+                {fieldError('fechaInicioActividades', t('errors.fechaInicioInvalid'))}
+              </p>
+            )}
           </div>
 
           <div>

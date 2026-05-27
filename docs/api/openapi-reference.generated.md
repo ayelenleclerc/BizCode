@@ -15159,18 +15159,129 @@ Persists `CobroRecordatorio`, dispatches `invoice_overdue` notification, and aud
 }
 ```
 
+### PARAMETERS /api/facturas/{id}/ticket
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/facturas/{id}/ticket`
+
+### Download 80mm ticket PDF (operational; non-fiscal without issued CAE)
+
+- **Method:** `GET`
+- **Path:** `/api/facturas/{id}/ticket`
+- **Tags:** facturas
+
+Requires `reports.operational.read`. Thermal-style ticket for counter use. When `estadoCae` is not `issued` or CAE is missing, the PDF is explicitly **non-fiscal** (quotation/preview). Does not replace the legal fiscal PDF at `/api/facturas/{id}/pdf`.
+
+#### Responses
+
+##### Status: 200 Ticket PDF
+
+###### Content-Type: application/pdf
+
+`string`, format: `binary`
+
+**Example:**
+
+```json
+{}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Invoice not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ### PARAMETERS /api/facturas/{id}/pdf
 
 - **Method:** `PARAMETERS`
 - **Path:** `/api/facturas/{id}/pdf`
 
-### Download invoice PDF (requires issued CAE)
+### Download legal fiscal invoice PDF (requires issued CAE)
 
 - **Method:** `GET`
 - **Path:** `/api/facturas/{id}/pdf`
 - **Tags:** facturas
 
-Requires `reports.operational.read`. Returns 422 when `estadoCae` is not `issued` or CAE is missing.
+Requires `reports.operational.read`. **Legal fiscal voucher** (RG 4291-aligned layout; manual AFIP validation pending per ADR-0014). Returns 422 when `estadoCae` is not `issued` or CAE is missing. Use `/pdf/preview` for non-fiscal preview.
 
 #### Responses
 
@@ -15296,13 +15407,13 @@ Requires `reports.operational.read`. Returns 422 when `estadoCae` is not `issued
 - **Method:** `PARAMETERS`
 - **Path:** `/api/facturas/{id}/pdf/preview`
 
-### Preview invoice PDF (watermarked, no valid fiscal barcode)
+### Preview invoice PDF (watermarked, non-fiscal)
 
 - **Method:** `GET`
 - **Path:** `/api/facturas/{id}/pdf/preview`
 - **Tags:** facturas
 
-Requires `reports.operational.read`. Allowed without CAE.
+Requires `reports.operational.read`. Non-fiscal preview without CAE; no valid AFIP QR/barcode.
 
 #### Responses
 
@@ -19781,13 +19892,25 @@ Returns boolean flags for each channel. No sensitive values are exposed.
 
     `string`, possible values: `"A", "B", "C"`
 
+  - **`condicionIva`**
+
+    `string`, possible values: `"RI", "Mono", "CF", "Exento"` — Issuer VAT condition for legal invoice PDF header (#148).
+
   - **`domicilio`**
 
     `string`
 
+  - **`fechaInicioActividades`**
+
+    `string`, format: `date` — Activity start date (YYYY-MM-DD).
+
   - **`id`**
 
     `integer` — Null when settings have not been saved yet (defaults only).
+
+  - **`ingresosBrutos`**
+
+    `string`
 
   - **`logoUrl`**
 
@@ -19830,7 +19953,10 @@ Returns boolean flags for each channel. No sensitive values are exposed.
     "recordatorioDiasGracia": 0,
     "timezone": "America/Argentina/Buenos_Aires",
     "recordatorioHoraInicio": 0,
-    "recordatorioHoraFin": 1
+    "recordatorioHoraFin": 1,
+    "condicionIva": "RI",
+    "ingresosBrutos": "",
+    "fechaInicioActividades": ""
   }
 }
 ```
@@ -19903,7 +20029,19 @@ Returns boolean flags for each channel. No sensitive values are exposed.
 
   `string`, possible values: `"A", "B", "C"`
 
+- **`condicionIva`**
+
+  `string`, possible values: `"RI", "Mono", "CF", "Exento"`
+
 - **`domicilio`**
+
+  `string`
+
+- **`fechaInicioActividades`**
+
+  `string`, format: `date`
+
+- **`ingresosBrutos`**
 
   `string`
 
@@ -19940,7 +20078,10 @@ Returns boolean flags for each channel. No sensitive values are exposed.
   "recordatorioDiasGracia": 0,
   "timezone": "",
   "recordatorioHoraInicio": 0,
-  "recordatorioHoraFin": 1
+  "recordatorioHoraFin": 1,
+  "condicionIva": "RI",
+  "ingresosBrutos": "",
+  "fechaInicioActividades": ""
 }
 ```
 
@@ -19974,13 +20115,25 @@ Returns boolean flags for each channel. No sensitive values are exposed.
 
     `string`, possible values: `"A", "B", "C"`
 
+  - **`condicionIva`**
+
+    `string`, possible values: `"RI", "Mono", "CF", "Exento"` — Issuer VAT condition for legal invoice PDF header (#148).
+
   - **`domicilio`**
 
     `string`
 
+  - **`fechaInicioActividades`**
+
+    `string`, format: `date` — Activity start date (YYYY-MM-DD).
+
   - **`id`**
 
     `integer` — Null when settings have not been saved yet (defaults only).
+
+  - **`ingresosBrutos`**
+
+    `string`
 
   - **`logoUrl`**
 
@@ -20023,7 +20176,10 @@ Returns boolean flags for each channel. No sensitive values are exposed.
     "recordatorioDiasGracia": 0,
     "timezone": "America/Argentina/Buenos_Aires",
     "recordatorioHoraInicio": 0,
-    "recordatorioHoraFin": 1
+    "recordatorioHoraFin": 1,
+    "condicionIva": "RI",
+    "ingresosBrutos": "",
+    "fechaInicioActividades": ""
   }
 }
 ```
@@ -36694,13 +36850,25 @@ Originating invoice header (selected columns)
 
   `string`, possible values: `"A", "B", "C"`
 
+* **`condicionIva`**
+
+  `string`, possible values: `"RI", "Mono", "CF", "Exento"` — Issuer VAT condition for legal invoice PDF header (#148).
+
 * **`domicilio`**
 
   `string`
 
+* **`fechaInicioActividades`**
+
+  `string`, format: `date` — Activity start date (YYYY-MM-DD).
+
 * **`id`**
 
   `integer` — Null when settings have not been saved yet (defaults only).
+
+* **`ingresosBrutos`**
+
+  `string`
 
 * **`logoUrl`**
 
@@ -36737,7 +36905,10 @@ Originating invoice header (selected columns)
   "recordatorioDiasGracia": 0,
   "timezone": "America/Argentina/Buenos_Aires",
   "recordatorioHoraInicio": 0,
-  "recordatorioHoraFin": 1
+  "recordatorioHoraFin": 1,
+  "condicionIva": "RI",
+  "ingresosBrutos": "",
+  "fechaInicioActividades": ""
 }
 ```
 
@@ -36761,7 +36932,19 @@ Originating invoice header (selected columns)
 
   `string`, possible values: `"A", "B", "C"`
 
+* **`condicionIva`**
+
+  `string`, possible values: `"RI", "Mono", "CF", "Exento"`
+
 * **`domicilio`**
+
+  `string`
+
+* **`fechaInicioActividades`**
+
+  `string`, format: `date`
+
+* **`ingresosBrutos`**
 
   `string`
 
@@ -36798,7 +36981,10 @@ Originating invoice header (selected columns)
   "recordatorioDiasGracia": 0,
   "timezone": "",
   "recordatorioHoraInicio": 0,
-  "recordatorioHoraFin": 1
+  "recordatorioHoraFin": 1,
+  "condicionIva": "RI",
+  "ingresosBrutos": "",
+  "fechaInicioActividades": ""
 }
 ```
 
@@ -36830,13 +37016,25 @@ Originating invoice header (selected columns)
 
     `string`, possible values: `"A", "B", "C"`
 
+  - **`condicionIva`**
+
+    `string`, possible values: `"RI", "Mono", "CF", "Exento"` — Issuer VAT condition for legal invoice PDF header (#148).
+
   - **`domicilio`**
 
     `string`
 
+  - **`fechaInicioActividades`**
+
+    `string`, format: `date` — Activity start date (YYYY-MM-DD).
+
   - **`id`**
 
     `integer` — Null when settings have not been saved yet (defaults only).
+
+  - **`ingresosBrutos`**
+
+    `string`
 
   - **`logoUrl`**
 
@@ -36879,7 +37077,10 @@ Originating invoice header (selected columns)
     "recordatorioDiasGracia": 0,
     "timezone": "America/Argentina/Buenos_Aires",
     "recordatorioHoraInicio": 0,
-    "recordatorioHoraFin": 1
+    "recordatorioHoraFin": 1,
+    "condicionIva": "RI",
+    "ingresosBrutos": "",
+    "fechaInicioActividades": ""
   }
 }
 ```

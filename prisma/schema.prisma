@@ -392,6 +392,12 @@ model ParamEmpresa {
   recordatorioHoraInicio Int @default(8)
   /// Business-hour window end exclusive (1–24, tenant local)
   recordatorioHoraFin    Int @default(18)
+  /// Issuer VAT condition (RI, Mono, CF, Exento) — invoice PDF header (#148)
+  condicionIva           String   @default("RI") @db.VarChar(10)
+  /// Gross income registration (optional, PDF header)
+  ingresosBrutos         String?  @db.VarChar(30)
+  /// Activity start date (optional, PDF header)
+  fechaInicioActividades DateTime? @db.Date
 }
 
 model TenantFiscalConfig {

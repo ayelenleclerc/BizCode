@@ -21,6 +21,9 @@ export type EmpresaConfigDto = {
   timezone: string
   recordatorioHoraInicio: number
   recordatorioHoraFin: number
+  condicionIva: 'RI' | 'Mono' | 'CF' | 'Exento'
+  ingresosBrutos: string | null
+  fechaInicioActividades: string | null
 }
 
 /**
@@ -46,6 +49,11 @@ function rowToDto(row: ParamEmpresa): EmpresaConfigDto {
     timezone: row.timezone,
     recordatorioHoraInicio: row.recordatorioHoraInicio,
     recordatorioHoraFin: row.recordatorioHoraFin,
+    condicionIva: row.condicionIva as EmpresaConfigDto['condicionIva'],
+    ingresosBrutos: row.ingresosBrutos,
+    fechaInicioActividades: row.fechaInicioActividades
+      ? row.fechaInicioActividades.toISOString().slice(0, 10)
+      : null,
   }
 }
 
@@ -84,12 +92,20 @@ export class EmpresaService {
       tipoFactura: 'B',
       logoUrl: null,
       prefijoFactura: formatPrefijoFromPuntoVenta(1),
+      condicionIva: 'RI',
+      ingresosBrutos: null,
+      fechaInicioActividades: null,
       ...defaultReminderFields,
     }
   }
 
   async upsert(tenantId: number, input: EmpresaInput): Promise<EmpresaConfigDto> {
     const cuitFormatted = formatCUIT(input.cuit.replace(/[-\s]/g, ''))
+    const fechaInicio =
+      input.fechaInicioActividades && input.fechaInicioActividades.trim() !== ''
+        ? new Date(`${input.fechaInicioActividades.trim()}T12:00:00.000Z`)
+        : null
+
     const data = {
       nombre: input.nombre.trim(),
       cuit: cuitFormatted.length === 13 ? cuitFormatted : input.cuit.trim(),
@@ -101,6 +117,14 @@ export class EmpresaService {
       timezone: input.timezone ?? DEFAULT_TENANT_TIMEZONE,
       recordatorioHoraInicio: input.recordatorioHoraInicio ?? DEFAULT_RECORDATORIO_HORA_INICIO,
       recordatorioHoraFin: input.recordatorioHoraFin ?? DEFAULT_RECORDATORIO_HORA_FIN,
+      condicionIva: input.condicionIva ?? 'RI',
+      ingresosBrutos:
+        input.ingresosBrutos === undefined || input.ingresosBrutos === null
+          ? null
+          : input.ingresosBrutos.trim() === ''
+            ? null
+            : input.ingresosBrutos.trim(),
+      fechaInicioActividades: fechaInicio,
     }
 
     const row = await this.prisma.paramEmpresa.upsert({
