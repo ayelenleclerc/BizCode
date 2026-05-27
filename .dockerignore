@@ -1,0 +1,12 @@
+node_modules
+dist
+coverage
+.git
+.github
+.cursor
+.vscode
+playwright-report
+test-results
+*.log
+docs/generated
+docs/evidence/sbom-cyclonedx-full.json

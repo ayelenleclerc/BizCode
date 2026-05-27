@@ -103,6 +103,82 @@ The **orphan** branch `documentacion` contains **no application source** — onl
 | Manual ref | Optional input `source_ref` (default `main`) to copy from another branch or SHA |
 | Code branches | Unchanged: work on `develop` / `feature/*` / `fix/*`, merge to `main` per [CONTRIBUTING](../../../CONTRIBUTING.md); this job **does not** land app code on `documentacion` |
 
+## Docker production deployment (issue #149)
+
+### Container topology
+
+- `server` (`Dockerfile`): Node 22 container running `npm run server`, health check on `GET /api/health`.
+- `frontend` (`Dockerfile.frontend`): Vite static build served by Nginx, health check on `/`.
+- `postgres`: PostgreSQL 16 with persistent volume.
+- `docker-compose.prod.yml` orchestrates the three services. Existing local parity compose (`docker-compose.postgres.yml`) remains unchanged.
+- Current status is **deploy-ready**: infrastructure is prepared, but real production deploy is pending a defined server.
+
+### Nginx role
+
+- The Nginx container serves frontend static assets.
+- It proxies `/api/*` requests to the backend service (`server:3001`) inside the compose network.
+- This is an internal reverse proxy role within the stack; no external domain/certificate assumptions are embedded in repository files.
+
+### Required deploy environment variables
+
+- Runtime env (`.env` on target host, never committed): `DATABASE_URL`, `POSTGRES_PASSWORD`, `JWT_SECRET`/`SESSION_SECRET`, `APP_ENV`.
+- Optional tuning: `POSTGRES_DB`, `POSTGRES_USER`, `FRONTEND_PORT`, `VITE_API_URL`, `CORS_ORIGINS`, `LOG_LEVEL`, SMTP/Twilio variables.
+- Optional fiscal encryption key: `BIZCODE_FISCAL_ENCRYPTION_KEY`.
+
+### GitHub Actions deployment workflow
+
+Workflow file: `.github/workflows/deploy.yml`.
+
+- `build_and_test` (always-on validation for `push`/`pull_request`/manual):
+  - `npm ci`
+  - `npm run type-check`
+  - `npm run lint`
+  - `npm run test`
+  - `npm run check:i18n`
+  - `npm run check:docs-map`
+  - `npm run docs:validate`
+  - Docker build validation for backend/frontend images
+- `publish_images` (prepared for `main`, release tags, or manual run):
+  - Login to GHCR using `GHCR_TOKEN` when provided, otherwise `GITHUB_TOKEN`
+  - Build/push `ghcr.io/<owner>/bizcode-server` and `ghcr.io/<owner>/bizcode-frontend`
+- `deploy` (real deploy remains blocked unless explicitly enabled):
+  - Runs only on `workflow_dispatch` with input `run_deploy: true` (after `publish_images`)
+  - SSH port via workflow input `deploy_ssh_port` (default `22`); add GitHub Environment `production` with reviewers when a server exists
+  - SSH to host and run `docker compose -f docker-compose.prod.yml pull && up -d`
+  - Feature/develop workflows still pass validation/build without requiring server infrastructure
+
+### Required repository secrets for SSH deploy
+
+- `DEPLOY_HOST`
+- `DEPLOY_USER`
+- `DEPLOY_SSH_KEY`
+- `DEPLOY_PATH`
+- Workflow input `deploy_ssh_port` (optional; default `22`, not a secret)
+- `DATABASE_URL`
+- `POSTGRES_USER`
+- `POSTGRES_PASSWORD`
+- `POSTGRES_DB`
+- `APP_ENV`
+- `VITE_API_URL`
+- `CORS_ORIGINS`
+- `SESSION_SECRET`
+- `GHCR_TOKEN` (optional when `GITHUB_TOKEN` is insufficient)
+
+### Activation checklist (future production server)
+
+1. Define host/domain/networking outside repository.
+2. Create repository secrets listed above (no plaintext in git).
+3. Protect `production` environment with required manual approval.
+4. Run `workflow_dispatch` or publish release tag.
+5. Verify `/api/health` and `/` health checks after deployment.
+
+### Rollback baseline
+
+- Keep previous image tags in GHCR (`sha` and tag-based references are published).
+- On host, rollback by pinning previous image tags in `docker-compose.prod.yml` (or host-level override) and re-running:
+  - `docker compose -f docker-compose.prod.yml pull`
+  - `docker compose -f docker-compose.prod.yml up -d`
+
 ## Optional / follow-up automation
 
 - [x] **Sync `documentacion` orphan branch** from `main` — `.github/workflows/sync-documentacion.yml` (see *Documentation branch* above)

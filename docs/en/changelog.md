@@ -10,6 +10,8 @@ Versioning: [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **Production Docker + deploy workflow baseline (GitHub #149):** added `Dockerfile` (backend), `Dockerfile.frontend` (Vite build + Nginx runtime), `docker-compose.prod.yml` (server + frontend + PostgreSQL with health checks), internal Nginx API proxy config (`deploy/nginx/default.conf`), `.dockerignore`, deploy-ready env reference updates in `.env.example`, and GitHub Actions workflow `.github/workflows/deploy.yml` with always-on build/test + conditional GHCR publish and conditional SSH deploy (requires repository secrets). Production host/domain/certificate values remain external configuration.
+
 - **Legal AFIP invoice PDF (GitHub #148):** `GET /api/facturas/{id}/pdf` (legal fiscal PDF, requires issued CAE), `/pdf/preview` (non-fiscal watermark), `/ticket` (80mm operational; non-fiscal without CAE); RG 4291-aligned layout, AFIP QR and Interleaved 2 of 5 barcode (`bwip-js`); `ParamEmpresa` issuer fields (`condicionIva`, `ingresosBrutos`, `fechaInicioActividades`); billing UI PDF preview/print modal; ADR-0014; OpenAPI and tests. Manual AFIP portal validation pending.
 
 - **Libro IVA Ventas — Fase 1 (GitHub #147):** `GET /api/contabilidad/libro-iva-ventas` (`reports.financial.read`, module `finance.ledger`) exports sales book from persisted `Factura` fields; `format=preview|txt|xlsx` (ZIP with `CBTV.txt` + `ALICUOTAS.txt`); credit notes and void tipo `999` per ADR-0013; **Finanzas** accounting section; **Libro IVA Compras out of scope** (follow-up issue). OpenAPI, tests, manuals (EN/ES/PT-BR).
