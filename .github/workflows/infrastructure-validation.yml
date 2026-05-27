@@ -26,6 +26,10 @@ jobs:
 
       - name: Terraform Format Check
         run: |
+          if [ ! -d terraform ]; then
+            echo "⚠️  terraform/ not present; skipping Terraform format check"
+            exit 0
+          fi
           cd terraform
           terraform fmt -check -recursive .
           if [ $? -ne 0 ]; then
@@ -37,6 +41,10 @@ jobs:
 
       - name: Terraform Validate
         run: |
+          if [ ! -d terraform ]; then
+            echo "⚠️  terraform/ not present; skipping Terraform validate"
+            exit 0
+          fi
           cd terraform
           terraform init -backend=false
           if ! terraform validate; then
@@ -47,6 +55,10 @@ jobs:
 
       - name: Terraform Plan (Dry Run)
         run: |
+          if [ ! -d terraform ]; then
+            echo "⚠️  terraform/ not present; skipping Terraform plan"
+            exit 0
+          fi
           cd terraform
           terraform plan -var-file=environments/development/terraform.tfvars -no-color > /tmp/tfplan.txt 2>&1 || true
           if grep -q "Error" /tmp/tfplan.txt; then
@@ -63,6 +75,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Run Trivy IaC scan (Terraform)
+        if: hashFiles('terraform/**') != ''
         uses: aquasecurity/trivy-action@v0.35.0
         continue-on-error: true
         with:
@@ -73,6 +86,7 @@ jobs:
           hide-progress: true
 
       - name: Check Trivy IaC results
+        if: hashFiles('terraform/**') != ''
         run: |
           if [ -f trivy-iac.json ]; then
             CRITICAL=$(jq '[.Results[]? | (.Misconfigurations // [])[] | select(.Severity=="CRITICAL")] | length' trivy-iac.json 2>/dev/null || echo 0)
