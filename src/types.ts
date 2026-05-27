@@ -145,6 +145,9 @@ export interface EmpresaConfig {
   timezone: string
   recordatorioHoraInicio: number
   recordatorioHoraFin: number
+  condicionIva: 'RI' | 'Mono' | 'CF' | 'Exento'
+  ingresosBrutos: string | null
+  fechaInicioActividades: string | null
 }
 
 /** @deprecated Use EmpresaConfig — kept for legacy references */

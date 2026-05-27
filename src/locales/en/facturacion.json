@@ -94,5 +94,14 @@
     "pdfError": "Could not generate PDF",
     "caeNumber": "CAE: {{cae}}",
     "caeVto": "Expires: {{date}}"
+  },
+  "pdfModal": {
+    "title": "PDF — {{filename}}",
+    "close": "Close",
+    "download": "Download PDF",
+    "print": "Print / preview",
+    "ticket": "80mm ticket",
+    "previewFrameTitle": "Invoice PDF preview",
+    "actions": "PDF actions"
   }
 }

@@ -10,6 +10,20 @@ Muestra todas las facturas emitidas con: Fecha, Tipo (A/B), Número, Cliente, Ne
 
 **Ver detalle:** Haga clic en una factura para expandir el detalle con el desglose de ítems e IVA.
 
+## PDF e impresión (módulo CAE AFIP)
+
+Con **`billing.afip_cae`** y permiso **`reports.operational.read`**:
+
+| Acción | API | Notas |
+|--------|-----|--------|
+| Vista previa PDF | `GET /api/facturas/{id}/pdf/preview` | Marca de agua, **no fiscal** (sin CAE). |
+| PDF legal | `GET /api/facturas/{id}/pdf` | Requiere **CAE emitido**; layout fiscal con QR y código de barras ([ADR-0014](../adr/ADR-0014-legal-afip-invoice-pdf.md)). |
+| Ticket 80 mm | `GET /api/facturas/{id}/ticket` | Mostrador; **no fiscal** si no hay CAE emitido. |
+
+En el detalle de factura: vista previa, imprimir (modal con descarga alternativa), descarga legal y ticket. Configurar emisor en **Configuración → Empresa** (`condicionIva`, ingresos brutos, inicio de actividades).
+
+La validación en el portal AFIP puede seguir siendo manual en homologación.
+
 ## Anulación de factura (módulo notas de crédito)
 
 Con el módulo de tenant **`billing.credit_notes`** habilitado y permiso **`sales.cancel`**, abra el detalle de una factura **activa** y use **Anular factura**. Debe ingresar un **motivo** de al menos **10** caracteres (validación en servidor). La operación llama a `PUT /api/facturas/{id}/void`; el sistema registra una **nota de crédito** vinculada a la factura original (véase [ADR-0012](../adr/ADR-0012-anulacion-factura-nota-credito.md)). El listado de notas de crédito en la app: página **Finanzas**, mismo módulo (API `GET /api/notas-credito`).

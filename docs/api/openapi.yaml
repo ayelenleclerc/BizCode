@@ -2444,13 +2444,52 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
 
+  /api/facturas/{id}/ticket:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [facturas]
+      summary: Download 80mm ticket PDF (operational; non-fiscal without issued CAE)
+      description: |
+        Requires `reports.operational.read`. Thermal-style ticket for counter use.
+        When `estadoCae` is not `issued` or CAE is missing, the PDF is explicitly **non-fiscal** (quotation/preview).
+        Does not replace the legal fiscal PDF at `/api/facturas/{id}/pdf`.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Ticket PDF
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Invoice not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
   /api/facturas/{id}/pdf:
     parameters:
       - $ref: '#/components/parameters/BizcodeChannelHeader'
     get:
       tags: [facturas]
-      summary: Download invoice PDF (requires issued CAE)
-      description: Requires `reports.operational.read`. Returns 422 when `estadoCae` is not `issued` or CAE is missing.
+      summary: Download legal fiscal invoice PDF (requires issued CAE)
+      description: |
+        Requires `reports.operational.read`. **Legal fiscal voucher** (RG 4291-aligned layout; manual AFIP validation pending per ADR-0014).
+        Returns 422 when `estadoCae` is not `issued` or CAE is missing. Use `/pdf/preview` for non-fiscal preview.
       parameters:
         - name: id
           in: path
@@ -2489,8 +2528,8 @@ paths:
       - $ref: '#/components/parameters/BizcodeChannelHeader'
     get:
       tags: [facturas]
-      summary: Preview invoice PDF (watermarked, no valid fiscal barcode)
-      description: Requires `reports.operational.read`. Allowed without CAE.
+      summary: Preview invoice PDF (watermarked, non-fiscal)
+      description: Requires `reports.operational.read`. Non-fiscal preview without CAE; no valid AFIP QR/barcode.
       parameters:
         - name: id
           in: path
@@ -7262,6 +7301,19 @@ components:
           minimum: 1
           maximum: 24
           description: Business-hour window end (tenant local hour, exclusive).
+        condicionIva:
+          type: string
+          enum: [RI, Mono, CF, Exento]
+          description: Issuer VAT condition for legal invoice PDF header (#148).
+        ingresosBrutos:
+          type: string
+          nullable: true
+          maxLength: 30
+        fechaInicioActividades:
+          type: string
+          nullable: true
+          format: date
+          description: Activity start date (YYYY-MM-DD).
 
     EmpresaInput:
       type: object
@@ -7303,6 +7355,17 @@ components:
           type: integer
           minimum: 1
           maximum: 24
+        condicionIva:
+          type: string
+          enum: [RI, Mono, CF, Exento]
+        ingresosBrutos:
+          type: string
+          nullable: true
+          maxLength: 30
+        fechaInicioActividades:
+          type: string
+          nullable: true
+          format: date
 
     EmpresaEnvelope:
       type: object

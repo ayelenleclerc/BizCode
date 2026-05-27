@@ -18,9 +18,12 @@ undefined#/properties/data
 
 | Property                                          | Type      | Required | Nullable       | Defined by                                                                                                         |
 | :------------------------------------------------ | :-------- | :------- | :------------- | :----------------------------------------------------------------------------------------------------------------- |
+| [condicionIva](#condicioniva)                     | `string`  | Optional | cannot be null | [EmpresaConfig](empresaconfig-properties-condicioniva.md "undefined#/properties/condicionIva")                     |
 | [cuit](#cuit)                                     | `string`  | Required | cannot be null | [EmpresaConfig](empresaconfig-properties-cuit.md "undefined#/properties/cuit")                                     |
 | [domicilio](#domicilio)                           | `string`  | Optional | cannot be null | [EmpresaConfig](empresaconfig-properties-domicilio.md "undefined#/properties/domicilio")                           |
+| [fechaInicioActividades](#fechainicioactividades) | `string`  | Optional | cannot be null | [EmpresaConfig](empresaconfig-properties-fechainicioactividades.md "undefined#/properties/fechaInicioActividades") |
 | [id](#id)                                         | `integer` | Optional | cannot be null | [EmpresaConfig](empresaconfig-properties-id.md "undefined#/properties/id")                                         |
+| [ingresosBrutos](#ingresosbrutos)                 | `string`  | Optional | cannot be null | [EmpresaConfig](empresaconfig-properties-ingresosbrutos.md "undefined#/properties/ingresosBrutos")                 |
 | [logoUrl](#logourl)                               | `string`  | Optional | cannot be null | [EmpresaConfig](empresaconfig-properties-logourl.md "undefined#/properties/logoUrl")                               |
 | [nombre](#nombre)                                 | `string`  | Required | cannot be null | [EmpresaConfig](empresaconfig-properties-nombre.md "undefined#/properties/nombre")                                 |
 | [prefijoFactura](#prefijofactura)                 | `string`  | Required | cannot be null | [EmpresaConfig](empresaconfig-properties-prefijofactura.md "undefined#/properties/prefijoFactura")                 |
@@ -30,6 +33,35 @@ undefined#/properties/data
 | [recordatorioHoraInicio](#recordatoriohorainicio) | `integer` | Optional | cannot be null | [EmpresaConfig](empresaconfig-properties-recordatoriohorainicio.md "undefined#/properties/recordatorioHoraInicio") |
 | [timezone](#timezone)                             | `string`  | Optional | cannot be null | [EmpresaConfig](empresaconfig-properties-timezone.md "undefined#/properties/timezone")                             |
 | [tipoFactura](#tipofactura)                       | `string`  | Required | cannot be null | [EmpresaConfig](empresaconfig-properties-tipofactura.md "undefined#/properties/tipoFactura")                       |
+
+## condicionIva
+
+Issuer VAT condition for legal invoice PDF header (#148).
+
+`condicionIva`
+
+* is optional
+
+* Type: `string`
+
+* cannot be null
+
+* defined in: [EmpresaConfig](empresaconfig-properties-condicioniva.md "undefined#/properties/condicionIva")
+
+### condicionIva Type
+
+`string`
+
+### condicionIva Constraints
+
+**enum**: the value of this property must be equal to one of the following values:
+
+| Value      | Explanation |
+| :--------- | :---------- |
+| `"RI"`     |             |
+| `"Mono"`   |             |
+| `"CF"`     |             |
+| `"Exento"` |             |
 
 ## cuit
 
@@ -75,6 +107,28 @@ undefined#/properties/data
 
 **maximum length**: the maximum number of characters for this string is: `40`
 
+## fechaInicioActividades
+
+Activity start date (YYYY-MM-DD).
+
+`fechaInicioActividades`
+
+* is optional
+
+* Type: `string`
+
+* cannot be null
+
+* defined in: [EmpresaConfig](empresaconfig-properties-fechainicioactividades.md "undefined#/properties/fechaInicioActividades")
+
+### fechaInicioActividades Type
+
+`string`
+
+### fechaInicioActividades Constraints
+
+**date**: the string must be a date string, according to [RFC 3339, section 5.6](https://tools.ietf.org/html/rfc3339 "check the specification")
+
 ## id
 
 Null when settings have not been saved yet (defaults only).
@@ -92,6 +146,28 @@ Null when settings have not been saved yet (defaults only).
 ### id Type
 
 `integer`
+
+## ingresosBrutos
+
+
+
+`ingresosBrutos`
+
+* is optional
+
+* Type: `string`
+
+* cannot be null
+
+* defined in: [EmpresaConfig](empresaconfig-properties-ingresosbrutos.md "undefined#/properties/ingresosBrutos")
+
+### ingresosBrutos Type
+
+`string`
+
+### ingresosBrutos Constraints
+
+**maximum length**: the maximum number of characters for this string is: `30`
 
 ## logoUrl
 

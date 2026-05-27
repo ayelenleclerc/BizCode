@@ -18,6 +18,9 @@ const EMPRESA_ROW = {
   timezone: 'America/Argentina/Buenos_Aires',
   recordatorioHoraInicio: 8,
   recordatorioHoraFin: 18,
+  condicionIva: 'RI',
+  ingresosBrutos: null,
+  fechaInicioActividades: null,
 }
 
 const EMPRESA_BODY = {
@@ -31,6 +34,9 @@ const EMPRESA_BODY = {
   timezone: 'America/Argentina/Buenos_Aires',
   recordatorioHoraInicio: 8,
   recordatorioHoraFin: 18,
+  condicionIva: 'RI',
+  ingresosBrutos: '901-123456-7',
+  fechaInicioActividades: '2015-03-01',
 }
 
 function buildPrismaMock(overrides: Partial<Record<string, unknown>> = {}): PrismaClient {

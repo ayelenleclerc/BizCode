@@ -850,11 +850,63 @@ describe('API — contrato OpenAPI', () => {
       estadoCae: 'pending',
       cae: null,
       caeVto: null,
-      cliente: { rsocial: 'ACME SA', cuit: null, domicilio: null },
+      cliente: { rsocial: 'ACME SA', cuit: null, domicilio: null, condIva: 'CF' },
       items: [],
+    } as never)
+    vi.mocked(p.paramEmpresa.findUnique).mockResolvedValue({
+      nombre: 'Demo',
+      cuit: '30-12345678-9',
+      domicilio: null,
+      condicionIva: 'RI',
+      ingresosBrutos: null,
+      fechaInicioActividades: null,
     } as never)
     const app = createApp(p)
     const res = await request(app).get('/api/facturas/1/pdf/preview').expect(200)
+    expect(res.headers['content-type']).toMatch(/application\/pdf/)
+    expect(res.body.subarray(0, 4).toString()).toBe('%PDF')
+  })
+
+  it('GET /api/facturas/:id/ticket returns application/pdf', async () => {
+    process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
+    process.env.BIZCODE_TEST_ROLE = 'owner'
+    const p = buildPrisma()
+    vi.mocked(p.factura.findFirst).mockResolvedValue({
+      id: 2,
+      tipo: 'B',
+      prefijo: '0001',
+      numero: 2,
+      fecha: new Date('2025-01-15T12:00:00.000Z'),
+      total: 50,
+      neto1: 50,
+      neto2: 0,
+      neto3: 0,
+      iva1: 0,
+      iva2: 0,
+      estadoCae: 'pending',
+      cae: null,
+      caeVto: null,
+      cliente: { rsocial: 'Cliente', cuit: '20123456789', domicilio: null, condIva: 'RI' },
+      items: [
+        {
+          cantidad: 1,
+          precio: 50,
+          dscto: 0,
+          subtotal: 50,
+          articulo: { descripcion: 'Item' },
+        },
+      ],
+    } as never)
+    vi.mocked(p.paramEmpresa.findUnique).mockResolvedValue({
+      nombre: 'Demo',
+      cuit: '30-12345678-9',
+      domicilio: null,
+      condicionIva: 'RI',
+      ingresosBrutos: null,
+      fechaInicioActividades: null,
+    } as never)
+    const app = createApp(p)
+    const res = await request(app).get('/api/facturas/2/ticket').expect(200)
     expect(res.headers['content-type']).toMatch(/application\/pdf/)
     expect(res.body.subarray(0, 4).toString()).toBe('%PDF')
   })

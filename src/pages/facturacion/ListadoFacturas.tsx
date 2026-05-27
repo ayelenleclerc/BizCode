@@ -1,9 +1,10 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { afipAPI, facturasAPI } from '@/lib/api'
 import { CanAccess } from '@/components/CanAccess'
 import IfModule from '@/components/IfModule'
 import { Factura, Cliente } from '@/types'
+import FacturaPdfPreviewDialog from './FacturaPdfPreviewDialog'
 
 interface ListadoFacturasProps {
   facturas: Factura[]
@@ -61,6 +62,14 @@ export default function ListadoFacturas({
   const [caeError, setCaeError] = useState<string | null>(null)
   const [pdfLoadingId, setPdfLoadingId] = useState<number | null>(null)
   const [pdfError, setPdfError] = useState<string | null>(null)
+  const [pdfPreviewUrl, setPdfPreviewUrl] = useState<string | null>(null)
+  const [pdfPreviewFilename, setPdfPreviewFilename] = useState('factura.pdf')
+
+  useEffect(() => {
+    return () => {
+      if (pdfPreviewUrl) URL.revokeObjectURL(pdfPreviewUrl)
+    }
+  }, [pdfPreviewUrl])
 
   const getClienteName = (clienteId: number) => {
     return clientes.find((c) => c.id === clienteId)?.rsocial || `Cliente #${clienteId}`
@@ -104,7 +113,19 @@ export default function ListadoFacturas({
     }
   }
 
-  const handlePdf = async (facturaId: number, preview: boolean) => {
+  const openPdfPreview = (blob: Blob, filename: string) => {
+    if (pdfPreviewUrl) URL.revokeObjectURL(pdfPreviewUrl)
+    const url = URL.createObjectURL(blob)
+    setPdfPreviewUrl(url)
+    setPdfPreviewFilename(filename)
+  }
+
+  const closePdfPreview = () => {
+    if (pdfPreviewUrl) URL.revokeObjectURL(pdfPreviewUrl)
+    setPdfPreviewUrl(null)
+  }
+
+  const handlePdfDownload = async (facturaId: number, preview: boolean) => {
     setPdfLoadingId(facturaId)
     setPdfError(null)
     try {
@@ -113,6 +134,40 @@ export default function ListadoFacturas({
         : await facturasAPI.downloadPdf(facturaId)
       const name = preview ? `factura-${facturaId}-preview.pdf` : `factura-${facturaId}.pdf`
       triggerBlobDownload(blob, name)
+    } catch (err: unknown) {
+      setPdfError((err as Error).message || t('cae.pdfError'))
+    } finally {
+      setPdfLoadingId(null)
+    }
+  }
+
+  const handlePdfPreview = async (facturaId: number, preview: boolean) => {
+    setPdfLoadingId(facturaId)
+    setPdfError(null)
+    try {
+      const blob = preview
+        ? await facturasAPI.downloadPdfPreview(facturaId)
+        : await facturasAPI.downloadPdf(facturaId)
+      const name = preview ? `factura-${facturaId}-preview.pdf` : `factura-${facturaId}.pdf`
+      openPdfPreview(blob, name)
+    } catch (err: unknown) {
+      setPdfError((err as Error).message || t('cae.pdfError'))
+    } finally {
+      setPdfLoadingId(null)
+    }
+  }
+
+  const handleTicket = async (facturaId: number, downloadOnly: boolean) => {
+    setPdfLoadingId(facturaId)
+    setPdfError(null)
+    try {
+      const blob = await facturasAPI.downloadTicket(facturaId)
+      const name = `factura-${facturaId}-ticket.pdf`
+      if (downloadOnly) {
+        triggerBlobDownload(blob, name)
+      } else {
+        openPdfPreview(blob, name)
+      }
     } catch (err: unknown) {
       setPdfError((err as Error).message || t('cae.pdfError'))
     } finally {
@@ -293,22 +348,42 @@ export default function ListadoFacturas({
                             type="button"
                             data-testid="btn-factura-pdf-preview"
                             disabled={pdfLoadingId === factura.id}
-                            onClick={() => void handlePdf(factura.id, true)}
+                            onClick={() => void handlePdfPreview(factura.id, true)}
                             className="px-3 py-2 text-sm bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-900 dark:text-slate-100 rounded transition disabled:opacity-50"
                           >
                             {pdfLoadingId === factura.id ? t('cae.pdfLoading') : t('cae.previewPdf')}
                           </button>
                           {canDownloadPdf && (
-                            <button
-                              type="button"
-                              data-testid="btn-factura-pdf-download"
-                              disabled={pdfLoadingId === factura.id}
-                              onClick={() => void handlePdf(factura.id, false)}
-                              className="px-3 py-2 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded transition disabled:opacity-50"
-                            >
-                              {pdfLoadingId === factura.id ? t('cae.pdfLoading') : t('cae.downloadPdf')}
-                            </button>
+                            <>
+                              <button
+                                type="button"
+                                data-testid="btn-factura-pdf-print"
+                                disabled={pdfLoadingId === factura.id}
+                                onClick={() => void handlePdfPreview(factura.id, false)}
+                                className="px-3 py-2 text-sm bg-indigo-600 hover:bg-indigo-700 text-white rounded transition disabled:opacity-50"
+                              >
+                                {pdfLoadingId === factura.id ? t('cae.pdfLoading') : t('pdfModal.print')}
+                              </button>
+                              <button
+                                type="button"
+                                data-testid="btn-factura-pdf-download"
+                                disabled={pdfLoadingId === factura.id}
+                                onClick={() => void handlePdfDownload(factura.id, false)}
+                                className="px-3 py-2 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded transition disabled:opacity-50"
+                              >
+                                {pdfLoadingId === factura.id ? t('cae.pdfLoading') : t('cae.downloadPdf')}
+                              </button>
+                            </>
                           )}
+                          <button
+                            type="button"
+                            data-testid="btn-factura-ticket"
+                            disabled={pdfLoadingId === factura.id}
+                            onClick={() => void handleTicket(factura.id, false)}
+                            className="px-3 py-2 text-sm bg-slate-100 hover:bg-slate-200 dark:bg-slate-600 dark:hover:bg-slate-500 text-slate-900 dark:text-slate-100 rounded transition disabled:opacity-50"
+                          >
+                            {pdfLoadingId === factura.id ? t('cae.pdfLoading') : t('pdfModal.ticket')}
+                          </button>
                         </CanAccess>
                         {canRetryCae && (
                           <CanAccess permission="sales.create">
@@ -397,6 +472,20 @@ export default function ListadoFacturas({
           </div>
         </div>
       )}
+
+      <FacturaPdfPreviewDialog
+        open={pdfPreviewUrl != null}
+        blobUrl={pdfPreviewUrl}
+        filename={pdfPreviewFilename}
+        onClose={closePdfPreview}
+        onDownload={() => {
+          if (!pdfPreviewUrl) return
+          void fetch(pdfPreviewUrl)
+            .then((r) => r.blob())
+            .then((blob) => triggerBlobDownload(blob, pdfPreviewFilename))
+            .catch(() => setPdfError(t('cae.pdfError')))
+        }}
+      />
     </div>
   )
 }

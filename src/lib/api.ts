@@ -1446,6 +1446,15 @@ export const facturasAPI = {
       return handleError(error as AxiosError<ApiErrorPayload>)
     }
   },
+
+  downloadTicket: async (id: number): Promise<Blob> => {
+    try {
+      const response = await api.get(`/facturas/${id}/ticket`, { responseType: 'blob' })
+      return response.data as Blob
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
 }
 
 export const notasCreditoAPI = {
@@ -2331,6 +2340,9 @@ export const empresaAPI = {
     timezone?: string
     recordatorioHoraInicio?: number
     recordatorioHoraFin?: number
+    condicionIva?: 'RI' | 'Mono' | 'CF' | 'Exento'
+    ingresosBrutos?: string | null
+    fechaInicioActividades?: string | null
   }) => {
     try {
       const response = await api.put<{ success: boolean; data: import('@/types').EmpresaConfig }>('/empresa', body)

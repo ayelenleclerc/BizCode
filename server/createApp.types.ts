@@ -201,6 +201,9 @@ export type EmpresaInput = {
   timezone?: string
   recordatorioHoraInicio?: number
   recordatorioHoraFin?: number
+  condicionIva?: 'RI' | 'Mono' | 'CF' | 'Exento'
+  ingresosBrutos?: string | null
+  fechaInicioActividades?: string | null
 }
 
 /** @en Commercial order lifecycle (ADR-0009). @es Ciclo de pedido comercial. @pt-BR Ciclo do pedido comercial. */

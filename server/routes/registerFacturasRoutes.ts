@@ -7,7 +7,12 @@ import { paginatedListJson, parseListPagination } from '../services/listPaginati
 import { dispatchNotification } from '../channels'
 import type { RestRouteContext } from './restRouteTypes'
 import { planErrorBody, TenantPlanService } from '../services/TenantPlanService'
-import { buildFacturaPdfBuffer, facturaPdfFilename } from '../fiscal/ar/facturaPdf'
+import {
+  buildFacturaPdfBuffer,
+  buildFacturaTicketPdfBuffer,
+  facturaPdfFilename,
+  facturaTicketPdfFilename,
+} from '../fiscal/ar/facturaPdf'
 import { requireModule } from '../middleware/requireModule'
 import { errorMessage, getTenantId } from './restDomainShared'
 
@@ -102,6 +107,27 @@ export function registerFacturasRoutes(app: Application, ctx: RestRouteContext):
         }
         res.setHeader('Content-Type', 'application/pdf')
         res.setHeader('Content-Disposition', `inline; filename="${facturaPdfFilename(id, true)}"`)
+        res.send(result.data)
+      } catch (err: unknown) {
+        res.status(500).json({ success: false, error: errorMessage(err) })
+      }
+    },
+  )
+
+  app.get(
+    '/api/facturas/:id/ticket',
+    requirePermission('reports.operational.read'),
+    async (req: Request, res: Response) => {
+      try {
+        const tenantId = getTenantId(req)
+        const id = parseInt(String(req.params.id), 10)
+        const result = await buildFacturaTicketPdfBuffer(prisma, tenantId, id)
+        if (!result.ok) {
+          res.status(result.status).json({ success: false, error: result.error })
+          return
+        }
+        res.setHeader('Content-Type', 'application/pdf')
+        res.setHeader('Content-Disposition', `inline; filename="${facturaTicketPdfFilename(id)}"`)
         res.send(result.data)
       } catch (err: unknown) {
         res.status(500).json({ success: false, error: errorMessage(err) })

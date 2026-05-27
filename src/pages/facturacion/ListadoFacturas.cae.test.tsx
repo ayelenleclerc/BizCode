@@ -24,6 +24,7 @@ vi.mock('@/lib/api', () => ({
     void: vi.fn(),
     downloadPdf: vi.fn(),
     downloadPdfPreview: vi.fn(),
+    downloadTicket: vi.fn(),
   },
   afipAPI: { requestCae: vi.fn() },
 }))
