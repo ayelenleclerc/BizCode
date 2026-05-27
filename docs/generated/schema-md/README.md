@@ -198,6 +198,10 @@
 
 * [LogoutResult](./logoutresult.md) – `-`
 
+* [MetricsEnvelope](./metricsenvelope.md) – `-`
+
+* [MetricsSnapshot](./metricssnapshot.md) – `-`
+
 * [ModuleCatalogData](./modulecatalogdata.md) – `-`
 
 * [ModuleCatalogEntry](./modulecatalogentry.md) – `-`
@@ -477,6 +481,16 @@
 * [Untitled object in FacturaInput](./facturainput-properties-items-items.md) – `undefined#/properties/items/items`
 
 * [Untitled object in FacturaListEnvelope](./facturalistenvelope-allof-0.md) – `undefined#/allOf/0`
+
+* [Untitled object in HealthResponse](./healthresponse-properties-db.md) – `undefined#/properties/db`
+
+* [Untitled object in MetricsSnapshot](./metricssnapshot-properties-requestsbymethod.md) – `undefined#/properties/requestsByMethod`
+
+* [Untitled object in MetricsSnapshot](./metricssnapshot-properties-requestsbyroute.md) – `undefined#/properties/requestsByRoute`
+
+* [Untitled object in MetricsSnapshot](./metricssnapshot-properties-responsesbystatus.md) – `undefined#/properties/responsesByStatus`
+
+* [Untitled object in MetricsSnapshot](./metricssnapshot-properties-totals.md) – `undefined#/properties/totals`
 
 * [Untitled object in ModuleCatalogData](./modulecatalogdata-properties-presets.md) – `undefined#/properties/presets`
 

@@ -18,6 +18,7 @@ import type { PrismaClient } from '@prisma/client'
 import { resolveSmtpTransportConfig } from './config/smtpTransport'
 import { notifyInventoryStakeholders, notifyManagers } from './notifications'
 import type { NotificationType, NotificationPayload } from './notifications'
+import { logger } from './logger'
 
 // ─── Message templates ────────────────────────────────────────────────────────
 
@@ -108,7 +109,10 @@ async function sendEmail(
       text,
     })
   } catch (err) {
-    console.warn('[channels] SMTP send failed:', err instanceof Error ? err.message : String(err))
+    logger.warn(
+      { err: err instanceof Error ? { name: err.name, message: err.message } : String(err) },
+      '[channels] SMTP send failed',
+    )
   }
 }
 
@@ -150,7 +154,10 @@ async function sendWhatsApp(
       ),
     )
   } catch (err) {
-    console.warn('[channels] Twilio send failed:', err instanceof Error ? err.message : String(err))
+    logger.warn(
+      { err: err instanceof Error ? { name: err.name, message: err.message } : String(err) },
+      '[channels] Twilio send failed',
+    )
   }
 }
 

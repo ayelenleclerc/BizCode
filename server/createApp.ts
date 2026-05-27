@@ -16,11 +16,13 @@ import { registerChatRoutes } from './chat'
 import { registerAuditEventRoutes } from './auditEvents'
 import { correlationId } from './middleware/correlationId'
 import { errorHandler } from './middleware/errorHandler'
+import { observabilityMiddleware } from './middleware/observability'
 import { routeHttpRateLimiter } from './middleware/routeRateLimit'
 import { tenantContext } from './middleware/tenantContext'
 import { tenantModules } from './middleware/tenantModules'
 import { tenantPlan } from './middleware/tenantPlan'
 import { registerRestDomainRoutes } from './registerRestDomainRoutes'
+import { registerMetricsRoute } from './routes/registerMetricsRoute'
 
 const DEFAULT_CORS_ORIGINS = [
   'http://localhost:5173',
@@ -98,6 +100,7 @@ export function createApp(prisma: PrismaClient): Application {
   app.use(tenantContext)
   app.use(tenantModules(prisma))
   app.use(tenantPlan(prisma))
+  app.use(observabilityMiddleware)
 
   registerAuthRoutes(app, prisma)
   registerUserRoutes(app, prisma)
@@ -105,6 +108,7 @@ export function createApp(prisma: PrismaClient): Application {
   registerNotificationRoutes(app, prisma)
   registerChatRoutes(app, prisma)
   registerAuditEventRoutes(app, prisma)
+  registerMetricsRoute(app)
 
   /**
    * @en Reports which external notification channels are configured (reads env vars server-side).

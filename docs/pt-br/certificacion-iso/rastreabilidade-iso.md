@@ -10,6 +10,7 @@ Mapa dos artefactos de qualidade do BizCode para cláusulas ISO. Documentação 
 | ACCESSIBILITY + jsx-a11y | §8.1 | — | — | Usabilidade | — |
 | I18N_STRATEGY + check-i18n | §8.1 | — | — | Portabilidade | — |
 | SECURITY | §8.1 | §6.3.8 | A.8.x | Segurança | — |
+| **quality/observabilidade.md** + `server/middleware/observability.ts` + `GET /api/metrics` (`audit.read`) | §8.1 | §6.3.2, §6.4.9 | A.8.15 (logging), A.8.16 (monitoramento) | Confiabilidade, Segurança | 29119-2 |
 | openapi.yaml + contract tests | §8.3 | §6.3.2 | — | Adequação funcional | 29119-2 |
 | **ADR-0012 / notas de crédito (#146)** — `PUT /api/facturas/{id}/void`, `GET /api/notas-credito`, UI faturamento / finanças, `tests/api/notas-credito.test.ts`, `tests/api/facturas-void.test.ts` | §8.3 | §6.3.2 | — | Adequação funcional | 29119-2 |
 | **ADR-0013 / Livro IVA Vendas Fase 1 (#147)** — `GET /api/contabilidad/libro-iva-ventas`, UI finanças, `tests/api/libro-iva-ventas.test.ts`, `tests/server/fiscal/ar/libroIvaVentas.test.ts` | §8.3 | §6.3.2 | — | Adequação funcional | 29119-2 |
