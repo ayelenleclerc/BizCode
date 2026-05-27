@@ -16,12 +16,14 @@ export function errorHandler(err: unknown, req: Request, res: Response, _next: N
     typeof req.requestId === 'string' ? req.requestId : undefined
   const authReq = req as AuthenticatedRequest
   const userId = authReq.auth?.claims.userId
+  const tenantId = authReq.tenantId
 
   if (err instanceof AppError) {
     logger.warn(
       {
         requestId,
         userId,
+        ...(tenantId !== undefined ? { tenantId } : {}),
         path: req.path,
         httpStatus: err.statusCode,
         code: err.code,
@@ -38,6 +40,7 @@ export function errorHandler(err: unknown, req: Request, res: Response, _next: N
     {
       requestId,
       userId,
+      ...(tenantId !== undefined ? { tenantId } : {}),
       path: req.path,
       err: err instanceof Error ? { name: err.name, message: err.message, stack: err.stack } : err,
     },

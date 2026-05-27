@@ -10,6 +10,8 @@ Versionado: [Semantic Versioning](https://semver.org/lang/es/).
 
 ### Agregado
 
+- **Línea base de observabilidad MVP (GitHub #151):** logs estructurados del servidor con redacción en Pino (`password`, `token`, `authorization`, `cookie`, `session`, `secret`, `privateKey`, `certificate`), correlación de requests vía `X-Request-Id`, endpoint técnico en memoria `GET /api/metrics` protegido con `audit.read`, diagnóstico aditivo en `/api/health` (check DB + latencia, uptime, versión), actualización de OpenAPI/pruebas y documentación trilingüe de observabilidad. Prometheus/Grafana/Loki/Datadog/Sentry y alertas reales quedan fuera de alcance.
+
 - **Baseline Docker productivo + workflow de deploy (GitHub #149):** se agregan `Dockerfile` (backend), `Dockerfile.frontend` (build Vite + runtime Nginx), `docker-compose.prod.yml` (server + frontend + PostgreSQL con health checks), configuración de proxy interno Nginx para API (`deploy/nginx/default.conf`), `.dockerignore`, actualización de referencia de variables en `.env.example` y workflow `.github/workflows/deploy.yml` con build/test siempre, publicación condicional a GHCR y deploy condicional por SSH (requiere secrets). Los valores reales de host/dominio/certificados quedan fuera del repositorio.
 
 - **PDF legal AFIP (GitHub #148):** `GET /api/facturas/{id}/pdf` (PDF fiscal con CAE emitido), `/pdf/preview` (no fiscal), `/ticket` (80 mm operativo); layout alineado RG 4291, QR y código de barras I2of5; campos emisor en `ParamEmpresa`; modal vista previa/imprimir en Facturación; ADR-0014. Validación manual en portal AFIP pendiente.

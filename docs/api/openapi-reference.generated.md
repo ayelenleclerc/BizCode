@@ -465,12 +465,200 @@ One-time endpoint to create initial tenant and owner user.
 
   `string`, format: `date-time`
 
+- **`db`**
+
+  `object`
+
+  - **`latencyMs` (required)**
+
+    `number`
+
+  - **`ok` (required)**
+
+    `boolean`
+
+- **`uptimeSeconds`**
+
+  `number`
+
+- **`version`**
+
+  `string`
+
 **Example:**
 
 ```json
 {
   "status": "ok",
-  "timestamp": ""
+  "timestamp": "",
+  "db": {
+    "ok": true,
+    "latencyMs": 0
+  },
+  "uptimeSeconds": 0,
+  "version": ""
+}
+```
+
+### In-memory observability metrics
+
+- **Method:** `GET`
+- **Path:** `/api/metrics`
+- **Tags:** health
+
+Returns aggregated technical counters kept in process memory. This endpoint excludes tenant/user identifiers and client hints.
+
+#### Responses
+
+##### Status: 200 Aggregated in-memory metrics
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`appEnv` (required)**
+
+    `string`
+
+  - **`requestsByMethod` (required)**
+
+    `object`
+
+  - **`requestsByRoute` (required)**
+
+    `object`
+
+  - **`responsesByStatus` (required)**
+
+    `object`
+
+  - **`startedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`totals` (required)**
+
+    `object`
+
+    - **`averageDurationMs` (required)**
+
+      `number`
+
+    - **`errors4xx` (required)**
+
+      `integer`
+
+    - **`errors5xx` (required)**
+
+      `integer`
+
+    - **`requests` (required)**
+
+      `integer`
+
+  - **`uptimeSeconds` (required)**
+
+    `integer`
+
+  - **`appVersion`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "startedAt": "",
+    "uptimeSeconds": 0,
+    "appEnv": "",
+    "appVersion": "",
+    "totals": {
+      "requests": 0,
+      "errors4xx": 0,
+      "errors5xx": 0,
+      "averageDurationMs": 0
+    },
+    "requestsByMethod": {
+      "additionalProperty": 0
+    },
+    "responsesByStatus": {
+      "additionalProperty": 0
+    },
+    "requestsByRoute": {
+      "additionalProperty": 0
+    }
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Metrics endpoint disabled
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
 }
 ```
 
@@ -26342,12 +26530,205 @@ true
 
   `string`, format: `date-time`
 
+* **`db`**
+
+  `object`
+
+  - **`latencyMs` (required)**
+
+    `number`
+
+  - **`ok` (required)**
+
+    `boolean`
+
+* **`uptimeSeconds`**
+
+  `number`
+
+* **`version`**
+
+  `string`
+
 **Example:**
 
 ```json
 {
   "status": "ok",
-  "timestamp": ""
+  "timestamp": "",
+  "db": {
+    "ok": true,
+    "latencyMs": 0
+  },
+  "uptimeSeconds": 0,
+  "version": ""
+}
+```
+
+### MetricsEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`appEnv` (required)**
+
+    `string`
+
+  - **`requestsByMethod` (required)**
+
+    `object`
+
+  - **`requestsByRoute` (required)**
+
+    `object`
+
+  - **`responsesByStatus` (required)**
+
+    `object`
+
+  - **`startedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`totals` (required)**
+
+    `object`
+
+    - **`averageDurationMs` (required)**
+
+      `number`
+
+    - **`errors4xx` (required)**
+
+      `integer`
+
+    - **`errors5xx` (required)**
+
+      `integer`
+
+    - **`requests` (required)**
+
+      `integer`
+
+  - **`uptimeSeconds` (required)**
+
+    `integer`
+
+  - **`appVersion`**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "startedAt": "",
+    "uptimeSeconds": 0,
+    "appEnv": "",
+    "appVersion": "",
+    "totals": {
+      "requests": 0,
+      "errors4xx": 0,
+      "errors5xx": 0,
+      "averageDurationMs": 0
+    },
+    "requestsByMethod": {
+      "additionalProperty": 0
+    },
+    "responsesByStatus": {
+      "additionalProperty": 0
+    },
+    "requestsByRoute": {
+      "additionalProperty": 0
+    }
+  }
+}
+```
+
+### MetricsSnapshot
+
+- **Type:**`object`
+
+* **`appEnv` (required)**
+
+  `string`
+
+* **`requestsByMethod` (required)**
+
+  `object`
+
+* **`requestsByRoute` (required)**
+
+  `object`
+
+* **`responsesByStatus` (required)**
+
+  `object`
+
+* **`startedAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`totals` (required)**
+
+  `object`
+
+  - **`averageDurationMs` (required)**
+
+    `number`
+
+  - **`errors4xx` (required)**
+
+    `integer`
+
+  - **`errors5xx` (required)**
+
+    `integer`
+
+  - **`requests` (required)**
+
+    `integer`
+
+* **`uptimeSeconds` (required)**
+
+  `integer`
+
+* **`appVersion`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "startedAt": "",
+  "uptimeSeconds": 0,
+  "appEnv": "",
+  "appVersion": "",
+  "totals": {
+    "requests": 0,
+    "errors4xx": 0,
+    "errors5xx": 0,
+    "averageDurationMs": 0
+  },
+  "requestsByMethod": {
+    "additionalProperty": 0
+  },
+  "responsesByStatus": {
+    "additionalProperty": 0
+  },
+  "requestsByRoute": {
+    "additionalProperty": 0
+  }
 }
 ```
 

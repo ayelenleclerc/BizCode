@@ -508,6 +508,15 @@ describe('API — contrato OpenAPI', () => {
     await assertMatchesOpenApi('/api/health', 'get', '200', res.body)
   })
 
+  it('GET /api/metrics', async () => {
+    process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
+    process.env.BIZCODE_TEST_ROLE = 'auditor'
+    process.env.METRICS_ENABLED = 'true'
+    const app = createApp(prisma)
+    const res = await request(app).get('/api/metrics').expect(200)
+    await assertMatchesOpenApi('/api/metrics', 'get', '200', res.body)
+  })
+
   it('GET /api/modules/catalog', async () => {
     const app = createApp(prisma)
     const res = await request(app).get('/api/modules/catalog').expect(200)

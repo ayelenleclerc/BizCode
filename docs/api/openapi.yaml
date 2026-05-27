@@ -192,6 +192,35 @@ paths:
               schema:
                 $ref: '#/components/schemas/HealthResponse'
 
+  /api/metrics:
+    get:
+      tags: [health]
+      summary: In-memory observability metrics
+      description: |
+        Returns aggregated technical counters kept in process memory.
+        This endpoint excludes tenant/user identifiers and client hints.
+      security:
+        - cookieSession: []
+      parameters:
+        - $ref: '#/components/parameters/XRequestId'
+      responses:
+        '200':
+          description: Aggregated in-memory metrics
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MetricsEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Metrics endpoint disabled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+
   /api/modules/catalog:
     get:
       tags: [modules]
@@ -4387,6 +4416,84 @@ components:
         timestamp:
           type: string
           format: date-time
+        db:
+          type: object
+          required: [ok, latencyMs]
+          properties:
+            ok:
+              type: boolean
+            latencyMs:
+              type: number
+              minimum: 0
+        uptimeSeconds:
+          type: number
+          minimum: 0
+        version:
+          type: string
+
+    MetricsEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/MetricsSnapshot'
+
+    MetricsSnapshot:
+      type: object
+      required:
+        - startedAt
+        - uptimeSeconds
+        - appEnv
+        - totals
+        - requestsByMethod
+        - responsesByStatus
+        - requestsByRoute
+      properties:
+        startedAt:
+          type: string
+          format: date-time
+        uptimeSeconds:
+          type: integer
+          minimum: 0
+        appEnv:
+          type: string
+        appVersion:
+          type: string
+          nullable: true
+        totals:
+          type: object
+          required: [requests, errors4xx, errors5xx, averageDurationMs]
+          properties:
+            requests:
+              type: integer
+              minimum: 0
+            errors4xx:
+              type: integer
+              minimum: 0
+            errors5xx:
+              type: integer
+              minimum: 0
+            averageDurationMs:
+              type: number
+              minimum: 0
+        requestsByMethod:
+          type: object
+          additionalProperties:
+            type: integer
+            minimum: 0
+        responsesByStatus:
+          type: object
+          additionalProperties:
+            type: integer
+            minimum: 0
+        requestsByRoute:
+          type: object
+          additionalProperties:
+            type: integer
+            minimum: 0
 
     ApiErrorEnvelope:
       type: object

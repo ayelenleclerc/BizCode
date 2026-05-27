@@ -10,6 +10,7 @@ Esta matriz relaciona los artefactos de calidad de BizCode con cláusulas de nor
 | **accesibilidad.md** + jsx-a11y + `App.a11y.test.tsx` | §8.1 | — | — | Usabilidad §4.2.4 | — |
 | **estrategia-i18n.md** + check-i18n en CI | §8.1 | — | — | Portabilidad §4.2.8 | — |
 | **seguridad.md** | §8.1 | §6.3.8 | A.8.x | Seguridad §4.2.6 | — |
+| **quality/observabilidad.md** + `server/middleware/observability.ts` + `GET /api/metrics` (`audit.read`) | §8.1 | §6.3.2, §6.4.9 | A.8.15 (registro), A.8.16 (monitorización) | Confiabilidad §4.2.2, Seguridad §4.2.6 | 29119-2 |
 | **docs/api/openapi.yaml** + `tests/api/contract.test.ts` | §8.3 | §6.3.2 | — | Idoneidad funcional §4.2.1 | 29119-2 |
 | **ADR-0012 / notas de crédito (#146)** — `PUT /api/facturas/{id}/void`, `GET /api/notas-credito`, UI facturación / finanzas, `tests/api/notas-credito.test.ts`, `tests/api/facturas-void.test.ts` | §8.3 | §6.3.2 | — | Idoneidad funcional §4.2.1 | 29119-2 |
 | **ADR-0013 / Libro IVA Ventas Fase 1 (#147)** — `GET /api/contabilidad/libro-iva-ventas`, UI finanzas, `tests/api/libro-iva-ventas.test.ts`, `tests/server/fiscal/ar/libroIvaVentas.test.ts` | §8.3 | §6.3.2 | — | Idoneidad funcional §4.2.1 | 29119-2 |
