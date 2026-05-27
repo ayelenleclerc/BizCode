@@ -254,7 +254,9 @@ function LogisticaPageContent() {
           <button
             type="button"
             role="tab"
-            aria-selected={pageTab === 'ordenes'}
+            {...(pageTab === 'ordenes'
+              ? { 'aria-selected': 'true' as const }
+              : { 'aria-selected': 'false' as const })}
             onClick={() => setPageTab('ordenes')}
             className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px ${
               pageTab === 'ordenes'
@@ -268,7 +270,9 @@ function LogisticaPageContent() {
           <button
             type="button"
             role="tab"
-            aria-selected={pageTab === 'reportes'}
+            {...(pageTab === 'reportes'
+              ? { 'aria-selected': 'true' as const }
+              : { 'aria-selected': 'false' as const })}
             onClick={() => setPageTab('reportes')}
             className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px ${
               pageTab === 'reportes'

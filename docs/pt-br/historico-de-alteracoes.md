@@ -10,6 +10,8 @@ Versionamento: [Semantic Versioning](https://semver.org/).
 
 ### Adicionado
 
+- **Baseline Docker produtivo + workflow de deploy (GitHub #149):** adicionados `Dockerfile` (backend), `Dockerfile.frontend` (build Vite + runtime Nginx), `docker-compose.prod.yml` (server + frontend + PostgreSQL com health checks), configuração de proxy interno Nginx para API (`deploy/nginx/default.conf`), `.dockerignore`, atualização de referência de variáveis em `.env.example` e workflow `.github/workflows/deploy.yml` com build/test sempre, publicação condicional no GHCR e deploy condicional por SSH (exige secrets). Valores reais de host/domínio/certificados ficam fora do repositório.
+
 - **PDF legal AFIP (GitHub #148):** `GET /api/facturas/{id}/pdf` (PDF fiscal com CAE emitido), `/pdf/preview` (não fiscal), `/ticket` (80 mm operacional); layout alinhado RG 4291, QR e código de barras I2of5; campos emitente em `ParamEmpresa`; modal pré-visualização/impressão em Faturamento; ADR-0014. Validação manual no portal AFIP pendente.
 
 - **Livro IVA Vendas — Fase 1 (GitHub #147):** `GET /api/contabilidad/libro-iva-ventas` (`reports.financial.read`, módulo `finance.ledger`) exporta vendas a partir de `Factura`; `format=preview|txt|xlsx` (ZIP `CBTV.txt` + `ALICUOTAS.txt`); NC e anulações tipo `999` conforme ADR-0013; seção **Contabilidade** em **Finanças**; **Livro IVA Compras fora de escopo** (issue posterior). OpenAPI, testes, manuais (EN/ES/PT-BR).

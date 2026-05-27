@@ -2,7 +2,8 @@ import axios, { AxiosError } from 'axios'
 import type { AuthClaims } from '@/lib/rbac'
 import type { Cliente, Cobro, Factura } from '@/types'
 
-const API_BASE = 'http://localhost:3001/api'
+const envApiBase = import.meta.env.VITE_API_URL?.trim()
+const API_BASE = envApiBase && envApiBase.length > 0 ? envApiBase : 'http://localhost:3001/api'
 
 const api = axios.create({
   baseURL: API_BASE,
