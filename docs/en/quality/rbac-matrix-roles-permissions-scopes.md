@@ -66,7 +66,7 @@ Tenant module **`billing.credit_notes`**. `PUT /api/facturas/{id}/void` requires
 
 ## Libro IVA Ventas — Fase 1 (#147)
 
-Tenant module **`finance.ledger`**. **`GET /api/contabilidad/libro-iva-ventas`** requires **`reports.financial.read`** (roles `finance`, `auditor`, `owner`). Formats: `preview` (JSON), `txt` (ZIP with CBTV + ALICUOTAS), `xlsx` (review). **Libro IVA Compras** and **`libro-iva-compras`** are **out of scope** until supplier fiscal vouchers exist (follow-up issue). See [`ADR-0013`](../adr/ADR-0013-libro-iva-ventas-fase1.md).
+Tenant module **`finance.ledger`**. **`GET /api/contabilidad/libro-iva-ventas`** requires **`reports.financial.read`** (roles `finance`, `auditor`, `owner`). Formats: `preview` (JSON), `txt` (ZIP with CBTV + ALICUOTAS), `xlsx` (review). **`GET /api/contabilidad/libro-iva-compras`** and **`POST /api/comprobantes-compra`** use the same module and permission (#306). See [`ADR-0014`](../adr/ADR-0014-libro-iva-compras.md) and [`ADR-0013`](../adr/ADR-0013-libro-iva-ventas-fase1.md).
 
 ## Related documents
 

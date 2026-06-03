@@ -17150,7 +17150,7 @@ Returns a credit note with originating invoice header for the current tenant. Re
 - **Path:** `/api/contabilidad/libro-iva-ventas`
 - **Tags:** contabilidad
 
-Generates **Libro IVA Ventas** from persisted `Factura` fiscal fields (types A/B/C, netos, IVA, total, estado). Includes credit notes and voided vouchers (`tipo 999`) per ADR-0013 when `NotaCredito` falls in the period. Requires module `finance.ledger` and permission `reports.financial.read`. **Out of scope:** Libro IVA Compras / CBTU (see follow-up issue).
+Generates **Libro IVA Ventas** from persisted `Factura` fiscal fields (types A/B/C, netos, IVA, total, estado). Includes credit notes and voided vouchers (`tipo 999`) per ADR-0013 when `NotaCredito` falls in the period. Requires module `finance.ledger` and permission `reports.financial.read`. Purchases book: see `GET /api/contabilidad/libro-iva-compras` (#306).
 
 - `format=preview` (default): JSON totals and record counts.
 - `format=txt`: ZIP download with `CBTV.txt` + `ALICUOTAS.txt` (comma-separated, RG 3685 layout).
@@ -17308,6 +17308,555 @@ Generates **Libro IVA Ventas** from persisted `Factura` fiscal fields (types A/B
 ```
 
 ##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/contabilidad/libro-iva-compras
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/contabilidad/libro-iva-compras`
+
+### Libro IVA Compras export (ARCA RG 3685 —
+
+- **Method:** `GET`
+- **Path:** `/api/contabilidad/libro-iva-compras`
+- **Tags:** contabilidad
+
+Generates **Libro IVA Compras** from persisted `ComprobanteCompra` fiscal fields (types A/B/C, netos, IVA, total, estado). Requires module `finance.ledger` and permission `reports.financial.read`. Data entry: `POST /api/comprobantes-compra` (supplier fiscal voucher).
+
+- `format=preview` (default): JSON totals and record counts.
+- `format=txt`: ZIP download with `CBTU.txt` + `ALICUOTAS.txt` (comma-separated, RG 3685 layout).
+- `format=xlsx`: internal review workbook (not an ARCA substitute).
+
+#### Responses
+
+##### Status: 200 Preview JSON or file download
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`arcaValidationPending` (required)**
+
+    `boolean`
+
+  - **`periodo` (required)**
+
+    `string`
+
+  - **`recordCountAlicuotas` (required)**
+
+    `integer`
+
+  - **`recordCountCbtu` (required)**
+
+    `integer`
+
+  - **`totalExento` (required)**
+
+    `number`
+
+  - **`totalGeneral` (required)**
+
+    `number`
+
+  - **`totalIva` (required)**
+
+    `number`
+
+  - **`totalNeto` (required)**
+
+    `number`
+
+  - **`totalsByAlicuota` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`alicuotaCode` (required)**
+
+      `string`
+
+    - **`iva` (required)**
+
+      `number`
+
+    - **`neto` (required)**
+
+      `number`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "periodo": "",
+    "recordCountCbtu": 0,
+    "recordCountAlicuotas": 0,
+    "totalsByAlicuota": [
+      {
+        "alicuotaCode": "",
+        "neto": 1,
+        "iva": 1
+      }
+    ],
+    "totalNeto": 1,
+    "totalIva": 1,
+    "totalExento": 1,
+    "totalGeneral": 1,
+    "arcaValidationPending": true
+  }
+}
+```
+
+###### Content-Type: application/zip
+
+`string`, format: `binary`
+
+**Example:**
+
+```json
+{}
+```
+
+###### Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+
+`string`, format: `binary`
+
+**Example:**
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/comprobantes-compra
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/comprobantes-compra`
+
+### Register supplier fiscal purchase voucher (#306)
+
+- **Method:** `POST`
+- **Path:** `/api/comprobantes-compra`
+- **Tags:** contabilidad
+
+Persists a supplier fiscal voucher with netos/IVA breakdown for Libro IVA Compras. Requires module `finance.ledger` and permission `reports.financial.read`. Unique per tenant on `tipo` + `prefijo` + `numero`.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`fecha` (required)**
+
+  `string`, format: `date-time`
+
+- **`iva1` (required)**
+
+  `number`
+
+- **`iva2` (required)**
+
+  `number`
+
+- **`neto1` (required)**
+
+  `number`
+
+- **`neto2` (required)**
+
+  `number`
+
+- **`neto3` (required)**
+
+  `number`
+
+- **`numero` (required)**
+
+  `integer`
+
+- **`prefijo` (required)**
+
+  `string`
+
+- **`proveedorId` (required)**
+
+  `integer`
+
+- **`tipo` (required)**
+
+  `string`, possible values: `"A", "B", "C"`
+
+- **`total` (required)**
+
+  `number`
+
+- **`cae`**
+
+  `string`
+
+- **`caeVto`**
+
+  `string`, format: `date-time`
+
+- **`ordenCompraId`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "fecha": "",
+  "tipo": "A",
+  "prefijo": "",
+  "numero": 1,
+  "proveedorId": 1,
+  "ordenCompraId": 1,
+  "neto1": 0,
+  "neto2": 0,
+  "neto3": 0,
+  "iva1": 0,
+  "iva2": 0,
+  "total": 0,
+  "cae": "",
+  "caeVto": ""
+}
+```
+
+#### Responses
+
+##### Status: 201 Created
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`estado` (required)**
+
+    `string`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`iva1` (required)**
+
+    `number`
+
+  - **`iva2` (required)**
+
+    `number`
+
+  - **`neto1` (required)**
+
+    `number`
+
+  - **`neto2` (required)**
+
+    `number`
+
+  - **`neto3` (required)**
+
+    `number`
+
+  - **`numero` (required)**
+
+    `integer`
+
+  - **`prefijo` (required)**
+
+    `string`
+
+  - **`proveedorId` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`tipo` (required)**
+
+    `string`
+
+  - **`total` (required)**
+
+    `number`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`cae`**
+
+    `string`
+
+  - **`caeVto`**
+
+    `string`, format: `date-time`
+
+  - **`ordenCompraId`**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "proveedorId": 1,
+    "ordenCompraId": 1,
+    "fecha": "",
+    "tipo": "",
+    "prefijo": "",
+    "numero": 1,
+    "neto1": 1,
+    "neto2": 1,
+    "neto3": 1,
+    "iva1": 1,
+    "iva2": 1,
+    "total": 1,
+    "cae": "",
+    "caeVto": "",
+    "estado": "",
+    "createdAt": "",
+    "updatedAt": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 409 Resource conflict
 
 ###### Content-Type: application/json
 
@@ -35471,6 +36020,473 @@ Originating invoice header (selected columns)
     "totalExento": 1,
     "totalGeneral": 1,
     "arcaValidationPending": true
+  }
+}
+```
+
+### LibroIvaComprasPreview
+
+- **Type:**`object`
+
+* **`arcaValidationPending` (required)**
+
+  `boolean`
+
+* **`periodo` (required)**
+
+  `string`
+
+* **`recordCountAlicuotas` (required)**
+
+  `integer`
+
+* **`recordCountCbtu` (required)**
+
+  `integer`
+
+* **`totalExento` (required)**
+
+  `number`
+
+* **`totalGeneral` (required)**
+
+  `number`
+
+* **`totalIva` (required)**
+
+  `number`
+
+* **`totalNeto` (required)**
+
+  `number`
+
+* **`totalsByAlicuota` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`alicuotaCode` (required)**
+
+    `string`
+
+  - **`iva` (required)**
+
+    `number`
+
+  - **`neto` (required)**
+
+    `number`
+
+**Example:**
+
+```json
+{
+  "periodo": "",
+  "recordCountCbtu": 0,
+  "recordCountAlicuotas": 0,
+  "totalsByAlicuota": [
+    {
+      "alicuotaCode": "",
+      "neto": 1,
+      "iva": 1
+    }
+  ],
+  "totalNeto": 1,
+  "totalIva": 1,
+  "totalExento": 1,
+  "totalGeneral": 1,
+  "arcaValidationPending": true
+}
+```
+
+### LibroIvaComprasPreviewEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`arcaValidationPending` (required)**
+
+    `boolean`
+
+  - **`periodo` (required)**
+
+    `string`
+
+  - **`recordCountAlicuotas` (required)**
+
+    `integer`
+
+  - **`recordCountCbtu` (required)**
+
+    `integer`
+
+  - **`totalExento` (required)**
+
+    `number`
+
+  - **`totalGeneral` (required)**
+
+    `number`
+
+  - **`totalIva` (required)**
+
+    `number`
+
+  - **`totalNeto` (required)**
+
+    `number`
+
+  - **`totalsByAlicuota` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`alicuotaCode` (required)**
+
+      `string`
+
+    - **`iva` (required)**
+
+      `number`
+
+    - **`neto` (required)**
+
+      `number`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "periodo": "",
+    "recordCountCbtu": 0,
+    "recordCountAlicuotas": 0,
+    "totalsByAlicuota": [
+      {
+        "alicuotaCode": "",
+        "neto": 1,
+        "iva": 1
+      }
+    ],
+    "totalNeto": 1,
+    "totalIva": 1,
+    "totalExento": 1,
+    "totalGeneral": 1,
+    "arcaValidationPending": true
+  }
+}
+```
+
+### ComprobanteCompraInput
+
+- **Type:**`object`
+
+* **`fecha` (required)**
+
+  `string`, format: `date-time`
+
+* **`iva1` (required)**
+
+  `number`
+
+* **`iva2` (required)**
+
+  `number`
+
+* **`neto1` (required)**
+
+  `number`
+
+* **`neto2` (required)**
+
+  `number`
+
+* **`neto3` (required)**
+
+  `number`
+
+* **`numero` (required)**
+
+  `integer`
+
+* **`prefijo` (required)**
+
+  `string`
+
+* **`proveedorId` (required)**
+
+  `integer`
+
+* **`tipo` (required)**
+
+  `string`, possible values: `"A", "B", "C"`
+
+* **`total` (required)**
+
+  `number`
+
+* **`cae`**
+
+  `string`
+
+* **`caeVto`**
+
+  `string`, format: `date-time`
+
+* **`ordenCompraId`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "fecha": "",
+  "tipo": "A",
+  "prefijo": "",
+  "numero": 1,
+  "proveedorId": 1,
+  "ordenCompraId": 1,
+  "neto1": 0,
+  "neto2": 0,
+  "neto3": 0,
+  "iva1": 0,
+  "iva2": 0,
+  "total": 0,
+  "cae": "",
+  "caeVto": ""
+}
+```
+
+### ComprobanteCompra
+
+- **Type:**`object`
+
+* **`createdAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`estado` (required)**
+
+  `string`
+
+* **`fecha` (required)**
+
+  `string`, format: `date-time`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`iva1` (required)**
+
+  `number`
+
+* **`iva2` (required)**
+
+  `number`
+
+* **`neto1` (required)**
+
+  `number`
+
+* **`neto2` (required)**
+
+  `number`
+
+* **`neto3` (required)**
+
+  `number`
+
+* **`numero` (required)**
+
+  `integer`
+
+* **`prefijo` (required)**
+
+  `string`
+
+* **`proveedorId` (required)**
+
+  `integer`
+
+* **`tenantId` (required)**
+
+  `integer`
+
+* **`tipo` (required)**
+
+  `string`
+
+* **`total` (required)**
+
+  `number`
+
+* **`updatedAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`cae`**
+
+  `string`
+
+* **`caeVto`**
+
+  `string`, format: `date-time`
+
+* **`ordenCompraId`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "tenantId": 1,
+  "proveedorId": 1,
+  "ordenCompraId": 1,
+  "fecha": "",
+  "tipo": "",
+  "prefijo": "",
+  "numero": 1,
+  "neto1": 1,
+  "neto2": 1,
+  "neto3": 1,
+  "iva1": 1,
+  "iva2": 1,
+  "total": 1,
+  "cae": "",
+  "caeVto": "",
+  "estado": "",
+  "createdAt": "",
+  "updatedAt": ""
+}
+```
+
+### ComprobanteCompraEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`estado` (required)**
+
+    `string`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`iva1` (required)**
+
+    `number`
+
+  - **`iva2` (required)**
+
+    `number`
+
+  - **`neto1` (required)**
+
+    `number`
+
+  - **`neto2` (required)**
+
+    `number`
+
+  - **`neto3` (required)**
+
+    `number`
+
+  - **`numero` (required)**
+
+    `integer`
+
+  - **`prefijo` (required)**
+
+    `string`
+
+  - **`proveedorId` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`tipo` (required)**
+
+    `string`
+
+  - **`total` (required)**
+
+    `number`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`cae`**
+
+    `string`
+
+  - **`caeVto`**
+
+    `string`, format: `date-time`
+
+  - **`ordenCompraId`**
+
+    `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "proveedorId": 1,
+    "ordenCompraId": 1,
+    "fecha": "",
+    "tipo": "",
+    "prefijo": "",
+    "numero": 1,
+    "neto1": 1,
+    "neto2": 1,
+    "neto3": 1,
+    "iva1": 1,
+    "iva2": 1,
+    "total": 1,
+    "cae": "",
+    "caeVto": "",
+    "estado": "",
+    "createdAt": "",
+    "updatedAt": ""
   }
 }
 ```

@@ -66,7 +66,7 @@ Módulo de tenant **`billing.credit_notes`**. `PUT /api/facturas/{id}/void` exig
 
 ## Livro IVA Vendas — Fase 1 (#147)
 
-Módulo **`finance.ledger`**. **`GET /api/contabilidad/libro-iva-ventas`** exige **`reports.financial.read`**. **Livro IVA Compras** fora de escopo ([`ADR-0013`](../adr/ADR-0013-libro-iva-ventas-fase1.md)).
+Módulo **`finance.ledger`**. **`GET /api/contabilidad/libro-iva-ventas`** exige **`reports.financial.read`**. **`GET /api/contabilidad/libro-iva-compras`** e **`POST /api/comprobantes-compra`** usam o mesmo módulo e permissão (#306). Veja [`ADR-0014`](../adr/ADR-0014-libro-iva-compras.md) e [`ADR-0013`](../adr/ADR-0013-libro-iva-ventas-fase1.md).
 
 ## Documentos relacionados
 

@@ -38,6 +38,10 @@ Com o módulo **`billing.credit_notes`** habilitado, a página inclui a seção 
 
 ## Livro IVA Vendas — Fase 1 (`finance.ledger`, #147)
 
-Com o módulo **`finance.ledger`**, a seção **Contabilidade — Livro IVA Vendas** permite escolher o **período**, ver **pré-visualização** e baixar **ARCA (ZIP)** ou **Excel** (revisão interna). **Livro IVA Compras** fora de escopo ([ADR-0013](../adr/ADR-0013-libro-iva-ventas-fase1.md)).
+Com o módulo **`finance.ledger`**, a seção **Contabilidade — Livro IVA Vendas** permite escolher o **período**, ver **pré-visualização** e baixar **ARCA (ZIP)** ou **Excel** (revisão interna). Veja [ADR-0013](../adr/ADR-0013-libro-iva-ventas-fase1.md).
+
+## Livro IVA Compras (`finance.ledger`, #306)
+
+Abaixo de vendas, **Contabilidade — Livro IVA Compras**: registre comprovantes via `POST /api/comprobantes-compra`, escolha o **período**, pré-visualize (CBTU / ALICUOTAS) e baixe ZIP ou Excel ([ADR-0014](../adr/ADR-0014-libro-iva-compras.md)). Ordens de compra não substituem comprovantes fiscais de fornecedor.
 
 **Outros idiomas:** [English](../../en/user/manual-finance.md) · [Español](../../es/user/manual-finanzas.md)

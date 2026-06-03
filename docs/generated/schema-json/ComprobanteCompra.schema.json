@@ -1,0 +1,89 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "cae": {
+      "nullable": true,
+      "type": "string"
+    },
+    "caeVto": {
+      "format": "date-time",
+      "nullable": true,
+      "type": "string"
+    },
+    "createdAt": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "estado": {
+      "type": "string"
+    },
+    "fecha": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "id": {
+      "type": "integer"
+    },
+    "iva1": {
+      "type": "number"
+    },
+    "iva2": {
+      "type": "number"
+    },
+    "neto1": {
+      "type": "number"
+    },
+    "neto2": {
+      "type": "number"
+    },
+    "neto3": {
+      "type": "number"
+    },
+    "numero": {
+      "type": "integer"
+    },
+    "ordenCompraId": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "prefijo": {
+      "type": "string"
+    },
+    "proveedorId": {
+      "type": "integer"
+    },
+    "tenantId": {
+      "type": "integer"
+    },
+    "tipo": {
+      "type": "string"
+    },
+    "total": {
+      "type": "number"
+    },
+    "updatedAt": {
+      "format": "date-time",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "tenantId",
+    "proveedorId",
+    "fecha",
+    "tipo",
+    "prefijo",
+    "numero",
+    "neto1",
+    "neto2",
+    "neto3",
+    "iva1",
+    "iva2",
+    "total",
+    "estado",
+    "createdAt",
+    "updatedAt"
+  ],
+  "title": "ComprobanteCompra",
+  "type": "object"
+}

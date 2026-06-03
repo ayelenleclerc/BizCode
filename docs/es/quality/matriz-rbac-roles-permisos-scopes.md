@@ -66,7 +66,7 @@ Módulo de tenant **`billing.credit_notes`**. `PUT /api/facturas/{id}/void` requ
 
 ## Libro IVA Ventas — Fase 1 (#147)
 
-Módulo **`finance.ledger`**. **`GET /api/contabilidad/libro-iva-ventas`** requiere **`reports.financial.read`** (roles `finance`, `auditor`, `owner`). Formatos: `preview`, `txt` (ZIP CBTV + ALICUOTAS), `xlsx`. **Libro IVA Compras** fuera de alcance hasta modelar comprobantes de proveedor. Véase [`ADR-0013`](../adr/ADR-0013-libro-iva-ventas-fase1.md).
+Módulo **`finance.ledger`**. **`GET /api/contabilidad/libro-iva-ventas`** requiere **`reports.financial.read`** (roles `finance`, `auditor`, `owner`). Formatos: `preview`, `txt` (ZIP CBTV + ALICUOTAS), `xlsx`. **`GET /api/contabilidad/libro-iva-compras`** y **`POST /api/comprobantes-compra`** usan el mismo módulo y permiso (#306). Véase [`ADR-0014`](../adr/ADR-0014-libro-iva-compras.md) y [`ADR-0013`](../adr/ADR-0013-libro-iva-ventas-fase1.md).
 
 ## Documentos relacionados
 

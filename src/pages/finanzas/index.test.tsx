@@ -52,6 +52,8 @@ vi.mock('@/lib/api', async () => {
     contabilidadAPI: {
       libroIvaVentasPreview: vi.fn(),
       downloadLibroIvaVentas: vi.fn(),
+      libroIvaComprasPreview: vi.fn(),
+      downloadLibroIvaCompras: vi.fn(),
     },
   }
 })
@@ -93,6 +95,17 @@ describe('FinanzasPage', () => {
       totalIva: 21,
       totalExento: 0,
       totalGeneral: 121,
+      arcaValidationPending: true,
+    })
+    vi.mocked(contabilidadAPI.libroIvaComprasPreview).mockResolvedValue({
+      periodo: '2026-05',
+      recordCountCbtu: 0,
+      recordCountAlicuotas: 0,
+      totalsByAlicuota: [],
+      totalNeto: 0,
+      totalIva: 0,
+      totalExento: 0,
+      totalGeneral: 0,
       arcaValidationPending: true,
     })
     vi.mocked(reportesAPI.aging).mockResolvedValue({
@@ -188,6 +201,15 @@ describe('FinanzasPage', () => {
       expect(contabilidadAPI.libroIvaVentasPreview).toHaveBeenCalled()
     })
     expect(await screen.findByTestId('finanzas-libro-iva-preview')).toBeInTheDocument()
+  })
+
+  it('muestra preview del Libro IVA Compras con finance.ledger', async () => {
+    render(<FinanzasPage />)
+    await screen.findByTestId('finanzas-page')
+    await waitFor(() => {
+      expect(contabilidadAPI.libroIvaComprasPreview).toHaveBeenCalled()
+    })
+    expect(await screen.findByTestId('finanzas-libro-iva-compras-preview')).toBeInTheDocument()
   })
 
   it('abre cuenta corriente con cliente válido', async () => {

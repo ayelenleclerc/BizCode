@@ -14,6 +14,7 @@ import {
   type AgingBucket,
   type CuentaCorrienteData,
   type FacturaVencidaRow,
+  type LibroIvaComprasPreviewDTO,
   type LibroIvaVentasPreviewDTO,
   type NotaCreditoRowDTO,
 } from '@/lib/api'
@@ -214,7 +215,8 @@ function FinanzasPageContent() {
         </IfModule>
 
         <IfModule flag="finance.ledger">
-          <FinanzasLibroIvaSection />
+          <FinanzasLibroIvaVentasSection />
+          <FinanzasLibroIvaComprasSection />
         </IfModule>
 
         <section className="mt-8" aria-labelledby="finanzas-overdue-heading">
@@ -364,7 +366,7 @@ function downloadBlob(blob: Blob, filename: string): void {
   URL.revokeObjectURL(url)
 }
 
-function FinanzasLibroIvaSection() {
+function FinanzasLibroIvaVentasSection() {
   const { t } = useTranslation('finanzas')
   const [periodo, setPeriodo] = useState(currentMonthPeriodo)
   const [preview, setPreview] = useState<LibroIvaVentasPreviewDTO | null>(null)
@@ -490,6 +492,156 @@ function FinanzasLibroIvaSection() {
                       <th scope="col" className="py-2 pr-2">{t('libroIva.colAlicuota')}</th>
                       <th scope="col" className="py-2 pr-2">{t('libroIva.colNeto')}</th>
                       <th scope="col" className="py-2 pr-2">{t('libroIva.colIva')}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {preview.totalsByAlicuota.map((row) => (
+                      <tr key={row.alicuotaCode} className="border-b border-slate-100 dark:border-slate-800">
+                        <td className="py-2 pr-2 font-mono">{row.alicuotaCode}</td>
+                        <td className="py-2 pr-2 font-mono">{formatMoney(row.neto)}</td>
+                        <td className="py-2 pr-2 font-mono">{formatMoney(row.iva)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        )}
+      </AsyncWrapper>
+    </section>
+  )
+}
+
+function FinanzasLibroIvaComprasSection() {
+  const { t } = useTranslation('finanzas')
+  const [periodo, setPeriodo] = useState(currentMonthPeriodo)
+  const [preview, setPreview] = useState<LibroIvaComprasPreviewDTO | null>(null)
+  const [loading, setLoading] = useState(false)
+  const [downloading, setDownloading] = useState<'txt' | 'xlsx' | null>(null)
+  const [error, setError] = useState<Error | null>(null)
+
+  const loadPreview = useCallback(async () => {
+    setLoading(true)
+    setError(null)
+    try {
+      const data = await contabilidadAPI.libroIvaComprasPreview(periodo)
+      setPreview(data)
+    } catch (e) {
+      setPreview(null)
+      setError(e instanceof Error ? e : new Error(String(e)))
+    } finally {
+      setLoading(false)
+    }
+  }, [periodo])
+
+  useEffect(() => {
+    void loadPreview()
+  }, [loadPreview])
+
+  const handleDownload = async (format: 'txt' | 'xlsx') => {
+    setDownloading(format)
+    setError(null)
+    try {
+      const blob = await contabilidadAPI.downloadLibroIvaCompras(periodo, format)
+      const ext = format === 'txt' ? 'zip' : 'xlsx'
+      downloadBlob(blob, `libro-iva-compras-${periodo}.${ext}`)
+    } catch (e) {
+      setError(e instanceof Error ? e : new Error(String(e)))
+    } finally {
+      setDownloading(null)
+    }
+  }
+
+  return (
+    <section
+      className="mt-8"
+      aria-labelledby="finanzas-libro-iva-compras-heading"
+      data-testid="finanzas-libro-iva-compras-section"
+    >
+      <h2
+        id="finanzas-libro-iva-compras-heading"
+        className="text-lg font-semibold mb-2 text-slate-900 dark:text-slate-100"
+      >
+        {t('libroIvaCompras.title')}
+      </h2>
+      <p className="text-sm text-slate-500 dark:text-slate-400 mb-3">{t('libroIvaCompras.hint')}</p>
+      <div className="mb-3 flex flex-wrap items-end gap-3" data-testid="finanzas-libro-iva-compras-controls">
+        <div>
+          <label htmlFor="finanzas-libro-iva-compras-periodo" className="block text-xs text-slate-500 mb-1">
+            {t('libroIvaCompras.periodo')}
+          </label>
+          <input
+            id="finanzas-libro-iva-compras-periodo"
+            type="month"
+            className="border border-slate-300 dark:border-slate-600 rounded px-2 py-1 bg-white dark:bg-slate-800"
+            value={periodo}
+            onChange={(e) => setPeriodo(e.target.value)}
+          />
+        </div>
+        <button
+          type="button"
+          className="px-4 py-1 rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50"
+          data-testid="finanzas-libro-iva-compras-download-txt"
+          disabled={downloading !== null}
+          onClick={() => void handleDownload('txt')}
+        >
+          {downloading === 'txt' ? t('libroIvaCompras.downloading') : t('libroIvaCompras.downloadTxt')}
+        </button>
+        <button
+          type="button"
+          className="px-4 py-1 rounded border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-50"
+          data-testid="finanzas-libro-iva-compras-download-xlsx"
+          disabled={downloading !== null}
+          onClick={() => void handleDownload('xlsx')}
+        >
+          {downloading === 'xlsx' ? t('libroIvaCompras.downloading') : t('libroIvaCompras.downloadXlsx')}
+        </button>
+      </div>
+      {error && (
+        <p className="text-sm text-red-600 dark:text-red-400 mb-2" role="alert" aria-live="polite">
+          {error.message}
+        </p>
+      )}
+      <AsyncWrapper loading={loading} error={null}>
+        {!preview ? (
+          <p className="text-slate-500" data-testid="finanzas-libro-iva-compras-empty">
+            {t('libroIvaCompras.empty')}
+          </p>
+        ) : (
+          <div data-testid="finanzas-libro-iva-compras-preview">
+            <p className="text-sm text-slate-600 dark:text-slate-300 mb-2">{t('libroIvaCompras.arcaPending')}</p>
+            <dl className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm mb-4">
+              <div>
+                <dt className="text-slate-500">{t('libroIvaCompras.recordsCbtu')}</dt>
+                <dd className="font-mono" data-testid="finanzas-libro-iva-compras-count-cbtu">
+                  {preview.recordCountCbtu}
+                </dd>
+              </div>
+              <div>
+                <dt className="text-slate-500">{t('libroIvaCompras.recordsAlicuotas')}</dt>
+                <dd className="font-mono" data-testid="finanzas-libro-iva-compras-count-alicuotas">
+                  {preview.recordCountAlicuotas}
+                </dd>
+              </div>
+              <div>
+                <dt className="text-slate-500">{t('libroIvaCompras.totalNeto')}</dt>
+                <dd className="font-mono">{formatMoney(preview.totalNeto)}</dd>
+              </div>
+              <div>
+                <dt className="text-slate-500">{t('libroIvaCompras.totalIva')}</dt>
+                <dd className="font-mono">{formatMoney(preview.totalIva)}</dd>
+              </div>
+            </dl>
+            {preview.totalsByAlicuota.length > 0 && (
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm" data-testid="finanzas-libro-iva-compras-alicuotas-table">
+                  <caption className="sr-only">{t('libroIvaCompras.alicuotasCaption')}</caption>
+                  <thead>
+                    <tr className="border-b border-slate-200 dark:border-slate-700 text-left">
+                      <th scope="col" className="py-2 pr-2">{t('libroIvaCompras.colAlicuota')}</th>
+                      <th scope="col" className="py-2 pr-2">{t('libroIvaCompras.colNeto')}</th>
+                      <th scope="col" className="py-2 pr-2">{t('libroIvaCompras.colIva')}</th>
                     </tr>
                   </thead>
                   <tbody>

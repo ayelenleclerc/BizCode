@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "arcaValidationPending": {
+      "const": true,
+      "type": "boolean"
+    },
+    "periodo": {
+      "pattern": "^\\d{4}-\\d{2}$",
+      "type": "string"
+    },
+    "recordCountAlicuotas": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "recordCountCbtu": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "totalExento": {
+      "type": "number"
+    },
+    "totalGeneral": {
+      "type": "number"
+    },
+    "totalIva": {
+      "type": "number"
+    },
+    "totalNeto": {
+      "type": "number"
+    },
+    "totalsByAlicuota": {
+      "items": {
+        "$ref": "./LibroIvaVentasAlicuotaTotal.schema.json"
+      },
+      "type": "array"
+    }
+  },
+  "required": [
+    "periodo",
+    "recordCountCbtu",
+    "recordCountAlicuotas",
+    "totalsByAlicuota",
+    "totalNeto",
+    "totalIva",
+    "totalExento",
+    "totalGeneral",
+    "arcaValidationPending"
+  ],
+  "title": "LibroIvaComprasPreview",
+  "type": "object"
+}

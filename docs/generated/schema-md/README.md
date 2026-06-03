@@ -106,6 +106,12 @@
 
 * [CobroListEnvelope](./cobrolistenvelope.md) – `-`
 
+* [ComprobanteCompra](./comprobantecompra.md) – `-`
+
+* [ComprobanteCompraEnvelope](./comprobantecompraenvelope.md) – `-`
+
+* [ComprobanteCompraInput](./comprobantecomprainput.md) – `-`
+
 * [CuentaCorriente](./cuentacorriente.md) – `-`
 
 * [CuentaCorrienteEnvelope](./cuentacorrienteenvelope.md) – `-`
@@ -171,6 +177,10 @@
 * [FormaPagoListEnvelope](./formapagolistenvelope.md) – `-`
 
 * [HealthResponse](./healthresponse.md) – `-`
+
+* [LibroIvaComprasPreview](./libroivacompraspreview.md) – `-`
+
+* [LibroIvaComprasPreviewEnvelope](./libroivacompraspreviewenvelope.md) – `-`
 
 * [LibroIvaVentasAlicuotaTotal](./libroivaventasalicuotatotal.md) – `-`
 
@@ -647,6 +657,8 @@
 * [Untitled array in FacturaListEnvelope](./facturalistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
 
 * [Untitled array in FormaPagoListEnvelope](./formapagolistenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled array in LibroIvaComprasPreview](./libroivacompraspreview-properties-totalsbyalicuota.md) – `undefined#/properties/totalsByAlicuota`
 
 * [Untitled array in LibroIvaVentasPreview](./libroivaventaspreview-properties-totalsbyalicuota.md) – `undefined#/properties/totalsByAlicuota`
 

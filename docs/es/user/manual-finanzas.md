@@ -45,6 +45,15 @@ Con el módulo **`finance.ledger`** habilitado, aparece la sección **Contabilid
 3. **Descargar ARCA (ZIP)** — `format=txt` → `CBTV.txt` + `ALICUOTAS.txt`.
 4. **Descargar Excel** — solo revisión interna.
 
-**Libro IVA Compras** no está implementado en Fase 1; las órdenes de compra aún no modelan comprobantes fiscales de proveedor.
+## Libro IVA Compras (`finance.ledger`, #306)
+
+Con **`finance.ledger`**, debajo de ventas aparece **Contabilidad — Libro IVA Compras**:
+
+1. Registre comprobantes con `POST /api/comprobantes-compra` (cabecera fiscal: tipo A/B/C, netos, IVA, PV y número del proveedor).
+2. Seleccione **período** y revise la **vista previa** (CBTU / ALICUOTAS). Véase [ADR-0014](../adr/ADR-0014-libro-iva-compras.md).
+3. **Descargar ARCA (ZIP)** — `CBTU.txt` + `ALICUOTAS.txt`.
+4. **Descargar Excel** — solo revisión interna.
+
+Las órdenes de compra (`OrdenCompra`) **no** sustituyen comprobantes fiscales de proveedor.
 
 **Otros idiomas:** [English](../../en/user/manual-finance.md) · [Português](../../pt-br/user/manual-financas.md)

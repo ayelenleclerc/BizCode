@@ -148,7 +148,8 @@ model Proveedor {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  ordenesCompra OrdenCompra[]
+  ordenesCompra     OrdenCompra[]
+  comprobantesCompra ComprobanteCompra[]
 
   @@unique([tenantId, codigo])
   @@index([tenantId])
@@ -169,10 +170,43 @@ model OrdenCompra {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  items OrdenCompraItem[]
+  items              OrdenCompraItem[]
+  comprobantesCompra ComprobanteCompra[]
 
   @@index([tenantId, estado])
   @@index([tenantId, proveedorId])
+}
+
+/// Supplier fiscal voucher for Libro IVA Compras (#306, ADR-0014).
+model ComprobanteCompra {
+  id            Int         @id @default(autoincrement())
+  tenantId      Int
+  tenant        Tenant      @relation(fields: [tenantId], references: [id])
+  proveedorId   Int
+  proveedor     Proveedor   @relation(fields: [proveedorId], references: [id])
+  ordenCompraId Int?
+  ordenCompra   OrdenCompra? @relation(fields: [ordenCompraId], references: [id])
+  fecha         DateTime
+  tipo          String      @db.VarChar(1)
+  prefijo       String      @db.VarChar(4)
+  numero        Int
+  neto1         Decimal     @db.Decimal(14, 2) @default(0)
+  neto2         Decimal     @db.Decimal(14, 2) @default(0)
+  neto3         Decimal     @db.Decimal(14, 2) @default(0)
+  iva1          Decimal     @db.Decimal(14, 2) @default(0)
+  iva2          Decimal     @db.Decimal(14, 2) @default(0)
+  total         Decimal     @db.Decimal(14, 2) @default(0)
+  cae           String?     @db.VarChar(20)
+  caeVto        DateTime?
+  /// A=active (included in libro compras)
+  estado        String      @db.VarChar(1) @default("A")
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@unique([tenantId, tipo, prefijo, numero])
+  @@index([tenantId, fecha])
+  @@index([tenantId, proveedorId])
+  @@index([tenantId, estado, fecha])
 }
 
 model OrdenCompraItem {
@@ -428,8 +462,9 @@ model Tenant {
   clientes       Cliente[]
   rubros         Rubro[]
   articulos      Articulo[]
-  proveedores    Proveedor[]
-  ordenesCompra  OrdenCompra[]
+  proveedores         Proveedor[]
+  ordenesCompra       OrdenCompra[]
+  comprobantesCompra  ComprobanteCompra[]
   facturas       Factura[]
   notasCredito   NotaCredito[]
   pedidos        Pedido[]
