@@ -10,6 +10,10 @@ Versionamento: [Semantic Versioning](https://semver.org/).
 
 ### Adicionado
 
+- **Endurecimento de sanitização de logs (GitHub #218):** catálogo ampliado `LOGGER_REDACT_PATHS` em [`server/logRedaction.ts`](../../server/logRedaction.ts), auditoria de superfícies de log e política de retenção/acesso (EN/ES/PT-BR), e guardrail `npm run check:logs` integrado em `docs:validate`. Complementa o #151 sem duplicar o MVP de observabilidade.
+
+- **Headers HTTP de segurança (GitHub #214):** middleware `helmet` na API REST ([`server/middleware/securityHeaders.ts`](../../server/middleware/securityHeaders.ts)) com `X-Frame-Options: DENY`, `X-Content-Type-Options`, CSP, `Referrer-Policy` e HSTS em produção; testes em [`tests/server/security-headers.test.ts`](../../tests/server/security-headers.test.ts). CORS permanece via `CORS_ORIGINS`.
+
 - **Baseline de observabilidade MVP (GitHub #151):** logs estruturados do servidor com redação em Pino (`password`, `token`, `authorization`, `cookie`, `session`, `secret`, `privateKey`, `certificate`), correlação de requests por `X-Request-Id`, endpoint técnico em memória `GET /api/metrics` protegido com `audit.read`, diagnóstico aditivo em `/api/health` (checagem DB + latência, uptime, versão), atualização de OpenAPI/testes e documentação trilíngue de observabilidade. Prometheus/Grafana/Loki/Datadog/Sentry e alertas reais permanecem fora de escopo.
 
 - **Baseline Docker produtivo + workflow de deploy (GitHub #149):** adicionados `Dockerfile` (backend), `Dockerfile.frontend` (build Vite + runtime Nginx), `docker-compose.prod.yml` (server + frontend + PostgreSQL com health checks), configuração de proxy interno Nginx para API (`deploy/nginx/default.conf`), `.dockerignore`, atualização de referência de variáveis em `.env.example` e workflow `.github/workflows/deploy.yml` com build/test sempre, publicação condicional no GHCR e deploy condicional por SSH (exige secrets). Valores reais de host/domínio/certificados ficam fora do repositório.

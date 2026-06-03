@@ -14,7 +14,7 @@ Fora do escopo deste MVP: Prometheus, Grafana, Loki, Datadog, Sentry e alertas o
 ## Logs estruturados
 
 - Nível de log definido por `LOG_LEVEL` (padrão `info`, `silent` em testes).
-- Campos sensíveis são redigidos (`password`, `token`, `authorization`, `cookie`, `session`, `secret`, `privateKey`, `certificate`).
+- Campos sensíveis são redigidos via `LOGGER_REDACT_PATHS` em [`server/logRedaction.ts`](../../../server/logRedaction.ts) (chaves base do #151; catálogo ampliado e auditoria em [politica-sanitizacao-logs.md](politica-sanitizacao-logs.md) — #218).
 - Logs de request armazenam apenas metadados operacionais (`requestId`, `method`, `path` normalizado, `statusCode`, `durationMs`; `tenantId` e `userId` quando disponíveis no servidor).
 - O `req.body` completo não é logado.
 
