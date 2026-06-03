@@ -4,6 +4,7 @@ import { printingAPI } from '@/lib/api'
 
 type PrintingStatus = {
   fiscalPrinterEnabled: boolean
+  thermalPrinterEnabled: boolean
   fiscalMode: 'mock'
   thermalMode: 'mock'
 }
@@ -33,7 +34,11 @@ export default function PrintDevicesSection() {
     try {
       const result = await printingAPI.test(device)
       if (result.fallbackToPdf) {
-        setFeedback(t('printDevices.feedback.fiscalFallback'))
+        setFeedback(
+          device === 'thermal'
+            ? t('printDevices.feedback.thermalFallback')
+            : t('printDevices.feedback.fiscalFallback'),
+        )
         return
       }
       if (result.jobId) {
@@ -49,6 +54,9 @@ export default function PrintDevicesSection() {
       setTestingDevice(null)
     }
   }
+
+  const anyDeviceEnabled =
+    status?.fiscalPrinterEnabled === true || status?.thermalPrinterEnabled === true
 
   return (
     <section
@@ -77,29 +85,44 @@ export default function PrintDevicesSection() {
               ? t('printDevices.fiscalEnabled')
               : t('printDevices.fiscalDisabled')}
           </p>
+          <p className="text-sm text-slate-700 dark:text-slate-300 mb-2">
+            {status.thermalPrinterEnabled
+              ? t('printDevices.thermalEnabled')
+              : t('printDevices.thermalDisabled')}
+          </p>
           <p className="text-xs text-slate-500 dark:text-slate-400 mb-4">
             {t('printDevices.modeMock')} — {status.thermalMode} / {status.fiscalMode}
           </p>
-          <div className="flex flex-wrap gap-2">
-            <button
-              type="button"
-              data-testid="btn-print-test-thermal"
-              disabled={testingDevice !== null}
-              onClick={() => void handleTest('thermal')}
-              className="px-3 py-2 text-sm bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-900 dark:text-slate-100 rounded transition disabled:opacity-50"
-            >
-              {testingDevice === 'thermal' ? t('printDevices.testing') : t('printDevices.testThermal')}
-            </button>
-            <button
-              type="button"
-              data-testid="btn-print-test-fiscal"
-              disabled={testingDevice !== null}
-              onClick={() => void handleTest('fiscal')}
-              className="px-3 py-2 text-sm bg-indigo-600 hover:bg-indigo-700 text-white rounded transition disabled:opacity-50"
-            >
-              {testingDevice === 'fiscal' ? t('printDevices.testing') : t('printDevices.testFiscal')}
-            </button>
-          </div>
+          {!anyDeviceEnabled ? (
+            <p className="text-sm text-slate-600 dark:text-slate-300 mb-2" data-testid="print-devices-opt-in-hint">
+              {t('printDevices.optInHint')}
+            </p>
+          ) : (
+            <div className="flex flex-wrap gap-2">
+              {status.thermalPrinterEnabled ? (
+                <button
+                  type="button"
+                  data-testid="btn-print-test-thermal"
+                  disabled={testingDevice !== null}
+                  onClick={() => void handleTest('thermal')}
+                  className="px-3 py-2 text-sm bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-900 dark:text-slate-100 rounded transition disabled:opacity-50"
+                >
+                  {testingDevice === 'thermal' ? t('printDevices.testing') : t('printDevices.testThermal')}
+                </button>
+              ) : null}
+              {status.fiscalPrinterEnabled ? (
+                <button
+                  type="button"
+                  data-testid="btn-print-test-fiscal"
+                  disabled={testingDevice !== null}
+                  onClick={() => void handleTest('fiscal')}
+                  className="px-3 py-2 text-sm bg-indigo-600 hover:bg-indigo-700 text-white rounded transition disabled:opacity-50"
+                >
+                  {testingDevice === 'fiscal' ? t('printDevices.testing') : t('printDevices.testFiscal')}
+                </button>
+              ) : null}
+            </div>
+          )}
         </>
       )}
 

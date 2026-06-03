@@ -46,6 +46,7 @@ describe('POST /api/facturas/:id/print', () => {
     process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
     process.env.BIZCODE_TEST_ROLE = 'owner'
     delete process.env.FISCAL_PRINTER_ENABLED
+    delete process.env.THERMAL_PRINTER_ENABLED
   })
 
   it('falls back to PDF when fiscal printer is disabled', async () => {
@@ -76,12 +77,25 @@ describe('POST /api/facturas/:id/print', () => {
     expect(typeof res.body.data.jobId).toBe('string')
   })
 
-  it('uses thermal mock channel in phase 1', async () => {
+  it('falls back to PDF when thermal printer is disabled', async () => {
     const prisma = buildPrismaMock()
     const app = createApp(prisma)
 
     const res = await request(app).post('/api/facturas/7/print').send({ device: 'thermal' }).expect(200)
-    expect(res.body.success).toBe(true)
+    expect(res.body.data).toMatchObject({
+      device: 'thermal',
+      channel: 'pdf',
+      fallbackToPdf: true,
+      downloadPath: '/api/facturas/7/pdf',
+    })
+  })
+
+  it('uses thermal mock channel when enabled', async () => {
+    process.env.THERMAL_PRINTER_ENABLED = 'true'
+    const prisma = buildPrismaMock()
+    const app = createApp(prisma)
+
+    const res = await request(app).post('/api/facturas/7/print').send({ device: 'thermal' }).expect(200)
     expect(res.body.data.device).toBe('thermal')
     expect(res.body.data.channel).toBe('thermal_mock')
     expect(res.body.data.fallbackToPdf).toBe(false)

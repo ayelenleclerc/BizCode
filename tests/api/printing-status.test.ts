@@ -36,15 +36,17 @@ describe('GET /api/printing/status', () => {
     process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
     process.env.BIZCODE_TEST_ROLE = 'owner'
     delete process.env.FISCAL_PRINTER_ENABLED
+    delete process.env.THERMAL_PRINTER_ENABLED
   })
 
-  it('returns mock modes and fiscal disabled by default', async () => {
+  it('returns mock modes and both printers disabled by default', async () => {
     const app = createApp(buildPrismaMock())
     const res = await request(app).get('/api/printing/status').expect(200)
     expect(res.body).toEqual({
       success: true,
       data: {
         fiscalPrinterEnabled: false,
+        thermalPrinterEnabled: false,
         fiscalMode: 'mock',
         thermalMode: 'mock',
       },
@@ -56,6 +58,14 @@ describe('GET /api/printing/status', () => {
     const app = createApp(buildPrismaMock())
     const res = await request(app).get('/api/printing/status').expect(200)
     expect(res.body.data.fiscalPrinterEnabled).toBe(true)
+    expect(res.body.data.thermalPrinterEnabled).toBe(false)
+  })
+
+  it('reflects THERMAL_PRINTER_ENABLED=true', async () => {
+    process.env.THERMAL_PRINTER_ENABLED = 'true'
+    const app = createApp(buildPrismaMock())
+    const res = await request(app).get('/api/printing/status').expect(200)
+    expect(res.body.data.thermalPrinterEnabled).toBe(true)
   })
 })
 
@@ -65,9 +75,21 @@ describe('POST /api/printing/test', () => {
     process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
     process.env.BIZCODE_TEST_ROLE = 'owner'
     delete process.env.FISCAL_PRINTER_ENABLED
+    delete process.env.THERMAL_PRINTER_ENABLED
   })
 
-  it('thermal mock returns jobId', async () => {
+  it('thermal falls back to PDF flag when disabled', async () => {
+    const app = createApp(buildPrismaMock())
+    const res = await request(app).post('/api/printing/test').send({ device: 'thermal' }).expect(200)
+    expect(res.body.data).toMatchObject({
+      device: 'thermal',
+      channel: 'pdf',
+      fallbackToPdf: true,
+    })
+  })
+
+  it('thermal mock returns jobId when enabled', async () => {
+    process.env.THERMAL_PRINTER_ENABLED = 'true'
     const app = createApp(buildPrismaMock())
     const res = await request(app).post('/api/printing/test').send({ device: 'thermal' }).expect(200)
     expect(res.body.success).toBe(true)

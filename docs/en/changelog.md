@@ -10,6 +10,8 @@ Versioning: [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **Optional POS printing (hardware opt-in):** `THERMAL_PRINTER_ENABLED` (default off) mirrors fiscal opt-in; `GET /api/printing/status` exposes `thermalPrinterEnabled`; invoice print falls back to legal PDF when devices are disabled; billing UI hides fiscal/thermal actions unless enabled; trilingual [optional-pos-printing.md](en/quality/optional-pos-printing.md). Physical drivers remain optional per customer (GitHub #153 phase 2).
+
 - **Log sanitization hardening (GitHub #218):** extended `LOGGER_REDACT_PATHS` catalog in [`server/logRedaction.ts`](../../server/logRedaction.ts), documented log-surface audit and retention/access policy (EN/ES/PT-BR), and `npm run check:logs` guardrail integrated into `docs:validate`. Complements #151 without duplicating observability MVP scope.
 
 - **HTTP security headers (GitHub #214):** `helmet` middleware on the REST API ([`server/middleware/securityHeaders.ts`](../../server/middleware/securityHeaders.ts)) with `X-Frame-Options: DENY`, `X-Content-Type-Options`, CSP, `Referrer-Policy`, and HSTS in production; tests in [`tests/server/security-headers.test.ts`](../../tests/server/security-headers.test.ts). CORS remains env-driven via `CORS_ORIGINS` (existing credentialed SPA behavior).

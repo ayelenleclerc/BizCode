@@ -10,6 +10,8 @@ Versionado: [Semantic Versioning](https://semver.org/lang/es/).
 
 ### Agregado
 
+- **Impresión POS opcional (hardware opt-in):** `THERMAL_PRINTER_ENABLED` (apagado por defecto) alineado al fiscal; `GET /api/printing/status` expone `thermalPrinterEnabled`; impresión de factura con fallback a PDF legal; UI de facturación oculta acciones fiscal/térmica si no están habilitadas; doc trilingüe [impresion-pos-opcional.md](es/quality/impresion-pos-opcional.md). Drivers físicos siguen optativos por cliente (#153 Fase 2).
+
 - **Endurecimiento de sanitización de logs (GitHub #218):** catálogo ampliado `LOGGER_REDACT_PATHS` en [`server/logRedaction.ts`](../../server/logRedaction.ts), auditoría de superficies de log y política de retención/acceso (EN/ES/PT-BR), y guardrail `npm run check:logs` integrado en `docs:validate`. Complementa #151 sin duplicar el MVP de observabilidad.
 
 - **Headers HTTP de seguridad (GitHub #214):** middleware `helmet` en la API REST ([`server/middleware/securityHeaders.ts`](../../server/middleware/securityHeaders.ts)) con `X-Frame-Options: DENY`, `X-Content-Type-Options`, CSP, `Referrer-Policy` y HSTS en producción; pruebas en [`tests/server/security-headers.test.ts`](../../tests/server/security-headers.test.ts). CORS sigue por entorno vía `CORS_ORIGINS`.

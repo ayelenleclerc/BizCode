@@ -113,6 +113,7 @@
     "feedback": {
       "mockSuccess": "Mock print job sent (job {{jobId}}).",
       "fiscalFallbackPdf": "Fiscal disabled: opened legal PDF.",
+      "thermalFallbackPdf": "Thermal disabled: opened legal PDF.",
       "error": "Could not print with the selected device"
     }
   }

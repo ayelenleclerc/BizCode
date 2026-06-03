@@ -16,11 +16,12 @@ undefined#/properties/data
 
 # data Properties
 
-| Property                                      | Type      | Required | Nullable       | Defined by                                                                                                       |
-| :-------------------------------------------- | :-------- | :------- | :------------- | :--------------------------------------------------------------------------------------------------------------- |
-| [fiscalMode](#fiscalmode)                     | `string`  | Required | cannot be null | [PrintingStatus](printingstatus-properties-fiscalmode.md "undefined#/properties/fiscalMode")                     |
-| [fiscalPrinterEnabled](#fiscalprinterenabled) | `boolean` | Required | cannot be null | [PrintingStatus](printingstatus-properties-fiscalprinterenabled.md "undefined#/properties/fiscalPrinterEnabled") |
-| [thermalMode](#thermalmode)                   | `string`  | Required | cannot be null | [PrintingStatus](printingstatus-properties-thermalmode.md "undefined#/properties/thermalMode")                   |
+| Property                                        | Type      | Required | Nullable       | Defined by                                                                                                         |
+| :---------------------------------------------- | :-------- | :------- | :------------- | :----------------------------------------------------------------------------------------------------------------- |
+| [fiscalMode](#fiscalmode)                       | `string`  | Required | cannot be null | [PrintingStatus](printingstatus-properties-fiscalmode.md "undefined#/properties/fiscalMode")                       |
+| [fiscalPrinterEnabled](#fiscalprinterenabled)   | `boolean` | Required | cannot be null | [PrintingStatus](printingstatus-properties-fiscalprinterenabled.md "undefined#/properties/fiscalPrinterEnabled")   |
+| [thermalMode](#thermalmode)                     | `string`  | Required | cannot be null | [PrintingStatus](printingstatus-properties-thermalmode.md "undefined#/properties/thermalMode")                     |
+| [thermalPrinterEnabled](#thermalprinterenabled) | `boolean` | Required | cannot be null | [PrintingStatus](printingstatus-properties-thermalprinterenabled.md "undefined#/properties/thermalPrinterEnabled") |
 
 ## fiscalMode
 
@@ -50,7 +51,7 @@ undefined#/properties/data
 
 ## fiscalPrinterEnabled
 
-
+Opt-in fiscal controller (RS-232/USB); false uses PDF fallback.
 
 `fiscalPrinterEnabled`
 
@@ -91,3 +92,21 @@ undefined#/properties/data
 | Value    | Explanation |
 | :------- | :---------- |
 | `"mock"` |             |
+
+## thermalPrinterEnabled
+
+Opt-in 80mm thermal ESC/POS path; false uses PDF fallback.
+
+`thermalPrinterEnabled`
+
+* is required
+
+* Type: `boolean`
+
+* cannot be null
+
+* defined in: [PrintingStatus](printingstatus-properties-thermalprinterenabled.md "undefined#/properties/thermalPrinterEnabled")
+
+### thermalPrinterEnabled Type
+
+`boolean`

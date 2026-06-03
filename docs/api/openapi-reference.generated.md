@@ -15661,7 +15661,7 @@ Requires `reports.operational.read`. Phase 1 endpoint for device selection with 
 - **Path:** `/api/printing/status`
 - **Tags:** printing
 
-Requires `settings.business.manage`. Returns env-derived fiscal flag and mock channel modes without secrets.
+Requires `settings.business.manage`. Returns opt-in flags from server env (`FISCAL_PRINTER_ENABLED`, `THERMAL_PRINTER_ENABLED`; default false) and mock channel modes. PDF/legal billing does not require hardware.
 
 #### Responses
 
@@ -15679,11 +15679,15 @@ Requires `settings.business.manage`. Returns env-derived fiscal flag and mock ch
 
   - **`fiscalPrinterEnabled` (required)**
 
-    `boolean`
+    `boolean` — Opt-in fiscal controller (RS-232/USB); false uses PDF fallback.
 
   - **`thermalMode` (required)**
 
     `string`, possible values: `"mock"`
+
+  - **`thermalPrinterEnabled` (required)**
+
+    `boolean` — Opt-in 80mm thermal ESC/POS path; false uses PDF fallback.
 
 - **`success` (required)**
 
@@ -15696,6 +15700,7 @@ Requires `settings.business.manage`. Returns env-derived fiscal flag and mock ch
   "success": true,
   "data": {
     "fiscalPrinterEnabled": true,
+    "thermalPrinterEnabled": true,
     "fiscalMode": "mock",
     "thermalMode": "mock"
   }
@@ -15776,7 +15781,7 @@ Requires `settings.business.manage`. Returns env-derived fiscal flag and mock ch
 - **Path:** `/api/printing/test`
 - **Tags:** printing
 
-Requires `settings.business.manage`. Runs phase-1 mock adapters with a fixed test payload (no invoice id). When `device` is `fiscal` and `FISCAL_PRINTER_ENABLED` is not `true`, returns HTTP 200 with `fallbackToPdf: true`.
+Requires `settings.business.manage`. Runs phase-1 mock adapters with a fixed test payload (no invoice id). When `device` is `fiscal` and `FISCAL_PRINTER_ENABLED` is not `true`, or `device` is `thermal` and `THERMAL_PRINTER_ENABLED` is not `true`, returns HTTP 200 with `fallbackToPdf: true`.
 
 #### Request Body
 
@@ -36232,17 +36237,22 @@ Originating invoice header (selected columns)
 
 * **`fiscalPrinterEnabled` (required)**
 
-  `boolean`
+  `boolean` — Opt-in fiscal controller (RS-232/USB); false uses PDF fallback.
 
 * **`thermalMode` (required)**
 
   `string`, possible values: `"mock"`
+
+* **`thermalPrinterEnabled` (required)**
+
+  `boolean` — Opt-in 80mm thermal ESC/POS path; false uses PDF fallback.
 
 **Example:**
 
 ```json
 {
   "fiscalPrinterEnabled": true,
+  "thermalPrinterEnabled": true,
   "fiscalMode": "mock",
   "thermalMode": "mock"
 }
@@ -36262,11 +36272,15 @@ Originating invoice header (selected columns)
 
   - **`fiscalPrinterEnabled` (required)**
 
-    `boolean`
+    `boolean` — Opt-in fiscal controller (RS-232/USB); false uses PDF fallback.
 
   - **`thermalMode` (required)**
 
     `string`, possible values: `"mock"`
+
+  - **`thermalPrinterEnabled` (required)**
+
+    `boolean` — Opt-in 80mm thermal ESC/POS path; false uses PDF fallback.
 
 * **`success` (required)**
 
@@ -36279,6 +36293,7 @@ Originating invoice header (selected columns)
   "success": true,
   "data": {
     "fiscalPrinterEnabled": true,
+    "thermalPrinterEnabled": true,
     "fiscalMode": "mock",
     "thermalMode": "mock"
   }

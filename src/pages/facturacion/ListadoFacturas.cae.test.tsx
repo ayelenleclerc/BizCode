@@ -26,6 +26,15 @@ vi.mock('@/lib/api', () => ({
     downloadPdfPreview: vi.fn(),
     downloadTicket: vi.fn(),
   },
+  printingAPI: {
+    status: vi.fn().mockResolvedValue({
+      fiscalPrinterEnabled: false,
+      thermalPrinterEnabled: false,
+      fiscalMode: 'mock',
+      thermalMode: 'mock',
+    }),
+    test: vi.fn(),
+  },
   afipAPI: { requestCae: vi.fn() },
 }))
 

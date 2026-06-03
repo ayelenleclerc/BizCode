@@ -78,9 +78,12 @@
   },
   "printDevices": {
     "title": "Dispositivos de impressão",
-    "subtitle": "Fase 1: canais mock locais sem hardware. O driver fiscal real é habilitado com FISCAL_PRINTER_ENABLED no servidor.",
+    "subtitle": "Opcional por cliente: habilite apenas se usar hardware de PDV. PDF e faturação eletrônica funcionam sem impressora.",
     "fiscalEnabled": "Driver fiscal habilitado no servidor",
     "fiscalDisabled": "Driver fiscal desabilitado (fallback para PDF)",
+    "thermalEnabled": "Impressora térmica 80 mm habilitada no servidor",
+    "thermalDisabled": "Impressora térmica desabilitada (fallback para PDF)",
+    "optInHint": "Nenhuma impressora POS habilitada. Defina FISCAL_PRINTER_ENABLED e/ou THERMAL_PRINTER_ENABLED no servidor quando o negócio as utilizar.",
     "modeMock": "Modo: mock",
     "testThermal": "Testar impressão térmica (mock)",
     "testFiscal": "Testar driver fiscal (mock)",
@@ -90,6 +93,7 @@
       "thermalSuccess": "Térmica mock OK (job {{jobId}}).",
       "fiscalSuccess": "Fiscal mock OK (job {{jobId}}).",
       "fiscalFallback": "Fiscal desabilitado: o sistema usaria PDF legal.",
+      "thermalFallback": "Térmica desabilitada: o sistema usaria PDF legal.",
       "error": "Não foi possível executar o teste de impressão"
     }
   }

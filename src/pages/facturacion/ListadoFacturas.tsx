@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { afipAPI, facturasAPI } from '@/lib/api'
+import { afipAPI, facturasAPI, printingAPI } from '@/lib/api'
 import { CanAccess } from '@/components/CanAccess'
 import IfModule from '@/components/IfModule'
 import { Factura, Cliente } from '@/types'
@@ -67,12 +67,27 @@ export default function ListadoFacturas({
   const [printLoadingId, setPrintLoadingId] = useState<number | null>(null)
   const [printError, setPrintError] = useState<string | null>(null)
   const [printFeedback, setPrintFeedback] = useState<string | null>(null)
+  const [fiscalPrinterEnabled, setFiscalPrinterEnabled] = useState(false)
+  const [thermalPrinterEnabled, setThermalPrinterEnabled] = useState(false)
 
   useEffect(() => {
     return () => {
       if (pdfPreviewUrl) URL.revokeObjectURL(pdfPreviewUrl)
     }
   }, [pdfPreviewUrl])
+
+  useEffect(() => {
+    printingAPI
+      .status()
+      .then((data) => {
+        setFiscalPrinterEnabled(data.fiscalPrinterEnabled)
+        setThermalPrinterEnabled(data.thermalPrinterEnabled)
+      })
+      .catch(() => {
+        setFiscalPrinterEnabled(false)
+        setThermalPrinterEnabled(false)
+      })
+  }, [])
 
   const getClienteName = (clienteId: number) => {
     return clientes.find((c) => c.id === clienteId)?.rsocial || `Cliente #${clienteId}`
@@ -187,7 +202,11 @@ export default function ListadoFacturas({
         } finally {
           setPdfLoadingId(null)
         }
-        setPrintFeedback(t('print.feedback.fiscalFallbackPdf'))
+        setPrintFeedback(
+          device === 'thermal'
+            ? t('print.feedback.thermalFallbackPdf')
+            : t('print.feedback.fiscalFallbackPdf'),
+        )
         return
       }
       if (device === 'pdf' && result.downloadPath) {
@@ -483,24 +502,28 @@ export default function ListadoFacturas({
                         >
                           {printLoadingId === factura.id ? t('print.loading') : t('print.legalPdf')}
                         </button>
-                        <button
-                          type="button"
-                          data-testid="btn-factura-print-thermal"
-                          disabled={printLoadingId === factura.id}
-                          onClick={() => void handleDevicePrint(factura.id, 'thermal', canDownloadPdf)}
-                          className="px-3 py-2 text-sm bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-900 dark:text-slate-100 rounded transition disabled:opacity-50"
-                        >
-                          {printLoadingId === factura.id ? t('print.loading') : t('print.thermal')}
-                        </button>
-                        <button
-                          type="button"
-                          data-testid="btn-factura-print-fiscal"
-                          disabled={printLoadingId === factura.id}
-                          onClick={() => void handleDevicePrint(factura.id, 'fiscal', canDownloadPdf)}
-                          className="px-3 py-2 text-sm bg-indigo-600 hover:bg-indigo-700 text-white rounded transition disabled:opacity-50"
-                        >
-                          {printLoadingId === factura.id ? t('print.loading') : t('print.fiscal')}
-                        </button>
+                        {thermalPrinterEnabled ? (
+                          <button
+                            type="button"
+                            data-testid="btn-factura-print-thermal"
+                            disabled={printLoadingId === factura.id}
+                            onClick={() => void handleDevicePrint(factura.id, 'thermal', canDownloadPdf)}
+                            className="px-3 py-2 text-sm bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-900 dark:text-slate-100 rounded transition disabled:opacity-50"
+                          >
+                            {printLoadingId === factura.id ? t('print.loading') : t('print.thermal')}
+                          </button>
+                        ) : null}
+                        {fiscalPrinterEnabled ? (
+                          <button
+                            type="button"
+                            data-testid="btn-factura-print-fiscal"
+                            disabled={printLoadingId === factura.id}
+                            onClick={() => void handleDevicePrint(factura.id, 'fiscal', canDownloadPdf)}
+                            className="px-3 py-2 text-sm bg-indigo-600 hover:bg-indigo-700 text-white rounded transition disabled:opacity-50"
+                          >
+                            {printLoadingId === factura.id ? t('print.loading') : t('print.fiscal')}
+                          </button>
+                        ) : null}
                       </div>
                       {(printError || printFeedback) && (
                         <p

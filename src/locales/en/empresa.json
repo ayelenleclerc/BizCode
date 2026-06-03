@@ -78,9 +78,12 @@
   },
   "printDevices": {
     "title": "Print devices",
-    "subtitle": "Phase 1: local mock channels without hardware. Real fiscal driver is enabled via FISCAL_PRINTER_ENABLED on the server.",
+    "subtitle": "Optional per customer: enable only if you use POS hardware. PDF and electronic invoicing work without any printer.",
     "fiscalEnabled": "Fiscal driver enabled on server",
     "fiscalDisabled": "Fiscal driver disabled (PDF fallback)",
+    "thermalEnabled": "Thermal 80mm printer enabled on server",
+    "thermalDisabled": "Thermal printer disabled (PDF fallback)",
+    "optInHint": "No POS printers are enabled. Set FISCAL_PRINTER_ENABLED and/or THERMAL_PRINTER_ENABLED on the server when this business uses them.",
     "modeMock": "Mode: mock",
     "testThermal": "Test thermal print (mock)",
     "testFiscal": "Test fiscal driver (mock)",
@@ -90,6 +93,7 @@
       "thermalSuccess": "Thermal mock OK (job {{jobId}}).",
       "fiscalSuccess": "Fiscal mock OK (job {{jobId}}).",
       "fiscalFallback": "Fiscal disabled: system would use legal PDF.",
+      "thermalFallback": "Thermal disabled: system would use legal PDF.",
       "error": "Could not run print test"
     }
   }

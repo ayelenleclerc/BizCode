@@ -27,6 +27,7 @@ export type FacturaPrintDependencies = {
 
 export type PrintingStatus = {
   fiscalPrinterEnabled: boolean
+  thermalPrinterEnabled: boolean
   fiscalMode: 'mock'
   thermalMode: 'mock'
 }
@@ -41,13 +42,28 @@ export type PrintingTestResult = {
   transport?: 'mock-serial'
 }
 
+/**
+ * @en True when fiscal printer integration is opt-in enabled on the server.
+ * @es Verdadero cuando la integración del controlador fiscal está habilitada en el servidor.
+ * @pt-BR Verdadeiro quando a integração da impressora fiscal está habilitada no servidor.
+ */
 export function isFiscalPrinterEnabled(): boolean {
   return process.env.FISCAL_PRINTER_ENABLED === 'true'
+}
+
+/**
+ * @en True when thermal ticket printer integration is opt-in enabled on the server.
+ * @es Verdadero cuando la impresora térmica está habilitada en el servidor.
+ * @pt-BR Verdadeiro quando a impressora térmica de tickets está habilitada no servidor.
+ */
+export function isThermalPrinterEnabled(): boolean {
+  return process.env.THERMAL_PRINTER_ENABLED === 'true'
 }
 
 export function getPrintingStatus(): PrintingStatus {
   return {
     fiscalPrinterEnabled: isFiscalPrinterEnabled(),
+    thermalPrinterEnabled: isThermalPrinterEnabled(),
     fiscalMode: 'mock',
     thermalMode: 'mock',
   }
@@ -69,6 +85,14 @@ export async function runPrintingTest(
   if (device === 'fiscal' && !isFiscalPrinterEnabled()) {
     return {
       device: 'fiscal',
+      channel: 'pdf',
+      fallbackToPdf: true,
+    }
+  }
+
+  if (device === 'thermal' && !isThermalPrinterEnabled()) {
+    return {
+      device: 'thermal',
       channel: 'pdf',
       fallbackToPdf: true,
     }
@@ -162,6 +186,18 @@ export class FacturaPrintService {
           fallbackToPdf: false,
           jobId: printed.jobId,
           transport: printed.transport,
+        },
+      }
+    }
+
+    if (!isThermalPrinterEnabled()) {
+      return {
+        ok: true,
+        data: {
+          device: 'thermal',
+          channel: 'pdf',
+          fallbackToPdf: true,
+          downloadPath: `/api/facturas/${factura.id}/pdf`,
         },
       }
     }
