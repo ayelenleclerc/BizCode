@@ -162,8 +162,9 @@ model Proveedor {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  ordenesCompra     OrdenCompra[]
-  comprobantesCompra ComprobanteCompra[]
+  ordenesCompra            OrdenCompra[]
+  comprobantesCompra       ComprobanteCompra[]
+  movimientosCuentaCorriente MovimientoProveedorCC[]
 
   @@unique([tenantId, codigo])
   @@index([tenantId])
@@ -218,6 +219,8 @@ model ComprobanteCompra {
   estado        String      @db.VarChar(1) @default("A")
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
+
+  movimientoCuentaCorriente MovimientoProveedorCC?
 
   @@unique([tenantId, tipo, prefijo, numero])
   @@index([tenantId, fecha])
@@ -480,7 +483,8 @@ model Tenant {
   articulos      Articulo[]
   proveedores         Proveedor[]
   ordenesCompra       OrdenCompra[]
-  comprobantesCompra  ComprobanteCompra[]
+  comprobantesCompra       ComprobanteCompra[]
+  movimientosProveedorCC   MovimientoProveedorCC[]
   facturas       Factura[]
   notasCredito   NotaCredito[]
   pedidos        Pedido[]
@@ -700,8 +704,34 @@ model AppUser {
   tenantConfigHistory  TenantConfigHistory[] @relation("TenantConfigHistoryChangedBy")
   tenantPlansChanged   TenantPlan[] @relation("TenantPlanChangedBy")
   notasCreditoCreated  NotaCredito[] @relation("NotaCreditoCreatedBy")
+  movimientosProveedorCC MovimientoProveedorCC[]
 
   @@unique([tenantId, username])
+}
+
+/// Supplier accounts-payable ledger (#270).
+model MovimientoProveedorCC {
+  id                  Int               @id @default(autoincrement())
+  tenantId            Int
+  tenant              Tenant            @relation(fields: [tenantId], references: [id])
+  proveedorId         Int
+  proveedor           Proveedor         @relation(fields: [proveedorId], references: [id])
+  /// factura_compra | pago | nc_proveedor | ajuste
+  tipo                String            @db.VarChar(20)
+  referencia          String?           @db.VarChar(40)
+  /// Positive increases debt; negative reduces debt.
+  monto               Decimal           @db.Decimal(14, 2)
+  saldoPost           Decimal           @db.Decimal(14, 2)
+  fecha               DateTime
+  usuarioId           Int
+  usuario             AppUser           @relation(fields: [usuarioId], references: [id])
+  notas               String?           @db.VarChar(500)
+  comprobanteCompraId Int?              @unique
+  comprobanteCompra   ComprobanteCompra? @relation(fields: [comprobanteCompraId], references: [id])
+  createdAt           DateTime          @default(now())
+
+  @@index([tenantId, proveedorId, fecha])
+  @@index([tenantId, proveedorId])
 }
 
 model StockAjuste {

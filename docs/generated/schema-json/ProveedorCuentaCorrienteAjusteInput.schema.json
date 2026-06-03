@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "monto": {
+      "description": "Non-zero; positive increases debt, negative reduces debt",
+      "type": "number"
+    },
+    "motivo": {
+      "maxLength": 500,
+      "type": "string"
+    }
+  },
+  "required": [
+    "monto",
+    "motivo"
+  ],
+  "title": "ProveedorCuentaCorrienteAjusteInput",
+  "type": "object"
+}

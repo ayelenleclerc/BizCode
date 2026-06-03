@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { ApiRequestFailedError, proveedoresAPI, type ProveedorInputDTO } from '@/lib/api'
 import { formatCUIT, validateCBU, validateCUIT } from '@/lib/validators'
 import type { Proveedor, ProveedorCategoria, ProveedorCondicionPago, ProveedorTipoCuenta } from '@/types'
+import ProveedorCuentaCorrienteSection from './ProveedorCuentaCorrienteSection'
 
 const COND_IVA = ['RI', 'Mono', 'CF', 'Exento'] as const
 const TIPOS_CUENTA: ProveedorTipoCuenta[] = ['cc', 'ca']
@@ -57,6 +58,7 @@ export default function ProveedorForm({ proveedorId, onClose, onSaved }: Proveed
   const [formSaving, setFormSaving] = useState(false)
   const [formError, setFormError] = useState<string | null>(null)
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
+  const [activeTab, setActiveTab] = useState<'datos' | 'cc'>('datos')
 
   const applyProveedor = useCallback((p: Proveedor) => {
     setFormCodigo(String(p.codigo))
@@ -207,6 +209,46 @@ export default function ProveedorForm({ proveedorId, onClose, onSaved }: Proveed
           {proveedorId != null ? t('form.titleEdit', { codigo: formCodigo || '…' }) : t('form.titleNew')}
         </h2>
         <p className="text-xs text-slate-500 mb-4">{t('form.hint')}</p>
+        {proveedorId != null && !loading ? (
+          <div
+            role="tablist"
+            aria-label={t('form.tabsLabel')}
+            className="flex gap-1 mb-4 border-b border-slate-200 dark:border-slate-600"
+          >
+            <button
+              type="button"
+              role="tab"
+              id="proveedor-tab-datos"
+              aria-selected={activeTab === 'datos'}
+              aria-controls="proveedor-tabpanel-datos"
+              data-testid="proveedor-tab-datos"
+              className={`px-3 py-2 text-sm font-medium border-b-2 -mb-px ${
+                activeTab === 'datos'
+                  ? 'border-blue-600 text-blue-700 dark:text-blue-300'
+                  : 'border-transparent text-slate-600 dark:text-slate-400'
+              }`}
+              onClick={() => setActiveTab('datos')}
+            >
+              {t('form.tabDatos')}
+            </button>
+            <button
+              type="button"
+              role="tab"
+              id="proveedor-tab-cc"
+              aria-selected={activeTab === 'cc'}
+              aria-controls="proveedor-tabpanel-cc"
+              data-testid="proveedor-tab-cc"
+              className={`px-3 py-2 text-sm font-medium border-b-2 -mb-px ${
+                activeTab === 'cc'
+                  ? 'border-blue-600 text-blue-700 dark:text-blue-300'
+                  : 'border-transparent text-slate-600 dark:text-slate-400'
+              }`}
+              onClick={() => setActiveTab('cc')}
+            >
+              {t('form.tabCuentaCorriente')}
+            </button>
+          </div>
+        ) : null}
         {loading ? (
           <p className="text-sm text-slate-500" data-testid="proveedor-form-loading">
             {tc('status.loading')}
@@ -218,7 +260,21 @@ export default function ProveedorForm({ proveedorId, onClose, onSaved }: Proveed
                 {formError}
               </p>
             ) : null}
+            {proveedorId != null && activeTab === 'cc' ? (
+              <div
+                role="tabpanel"
+                id="proveedor-tabpanel-cc"
+                aria-labelledby="proveedor-tab-cc"
+                data-testid="proveedor-tabpanel-cc"
+              >
+                <ProveedorCuentaCorrienteSection proveedorId={proveedorId} />
+              </div>
+            ) : null}
             <form
+              role={proveedorId != null ? 'tabpanel' : undefined}
+              id={proveedorId != null ? 'proveedor-tabpanel-datos' : undefined}
+              aria-labelledby={proveedorId != null ? 'proveedor-tab-datos' : undefined}
+              hidden={proveedorId != null && activeTab === 'cc'}
               className="space-y-4"
               onSubmit={(e) => {
                 e.preventDefault()

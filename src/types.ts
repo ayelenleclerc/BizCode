@@ -66,6 +66,42 @@ export type ProveedorTipoCuenta = 'cc' | 'ca'
 export type ProveedorCondicionPago = 'contado' | '15dias' | '30dias' | '60dias' | 'otro'
 export type ProveedorCategoria = 'materia_prima' | 'insumos' | 'servicios' | 'logistica'
 
+export type MovimientoProveedorCCTipo = 'factura_compra' | 'pago' | 'nc_proveedor' | 'ajuste'
+
+export interface MovimientoProveedorCC {
+  id: number
+  tipo: MovimientoProveedorCCTipo
+  referencia: string | null
+  monto: string
+  saldoPost: string
+  fecha: string
+  usuarioId: number
+  notas: string | null
+}
+
+export interface ProveedorCuentaCorrienteChartPoint {
+  period: string
+  saldo: string
+}
+
+export interface ProveedorCuentaCorriente {
+  proveedorId: number
+  codigo: number
+  rsocial: string
+  saldo: string
+  limiteCredito: string | null
+  excedeLimite: boolean
+  movimientos: MovimientoProveedorCC[]
+  serie: ProveedorCuentaCorrienteChartPoint[]
+}
+
+export interface ProveedorCuentaCorrienteSaldo {
+  proveedorId: number
+  saldo: string
+  limiteCredito: string | null
+  excedeLimite: boolean
+}
+
 export interface Proveedor {
   id: number
   codigo: number

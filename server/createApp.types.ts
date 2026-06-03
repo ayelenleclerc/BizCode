@@ -66,6 +66,13 @@ export type ProveedorInput = {
   notas?: string | null
 }
 
+export type MovimientoProveedorCCTipo = 'factura_compra' | 'pago' | 'nc_proveedor' | 'ajuste'
+
+export type ProveedorCuentaCorrienteAjusteInput = {
+  monto: number
+  motivo: string
+}
+
 export type FacturaItemInput = {
   articuloId: number
   cantidad: number

@@ -1430,6 +1430,119 @@ paths:
         '403':
           $ref: '#/components/responses/ForbiddenError'
 
+  /api/proveedores/{id}/cuenta-corriente:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    get:
+      tags: [proveedores]
+      summary: Supplier accounts-payable statement
+      description: Ledger movements, current balance, credit-limit alert, and 6-month debt series (#270).
+      parameters:
+        - name: tipo
+          in: query
+          schema:
+            type: string
+            enum: [factura_compra, pago, nc_proveedor, ajuste]
+        - name: from
+          in: query
+          description: ISO-8601 filter start (inclusive)
+          schema:
+            type: string
+            format: date-time
+        - name: to
+          in: query
+          description: ISO-8601 filter end (inclusive)
+          schema:
+            type: string
+            format: date-time
+      responses:
+        '200':
+          description: Statement
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProveedorCuentaCorrienteEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /api/proveedores/{id}/cuenta-corriente/saldo:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    get:
+      tags: [proveedores]
+      summary: Supplier accounts-payable balance only
+      responses:
+        '200':
+          description: Balance snapshot
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProveedorCuentaCorrienteSaldoEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /api/proveedores/{id}/cuenta-corriente/ajuste:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    post:
+      tags: [proveedores]
+      summary: Manual supplier ledger adjustment
+      description: Requires suppliers.manage; posts audit event proveedor_cc_ajuste.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProveedorCuentaCorrienteAjusteInput'
+      responses:
+        '201':
+          description: Movement created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MovimientoProveedorCCEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
   /api/compras:
     parameters:
       - $ref: '#/components/parameters/BizcodeChannelHeader'
@@ -5740,6 +5853,122 @@ components:
           const: true
         data:
           $ref: '#/components/schemas/CuentaCorriente'
+
+    MovimientoProveedorCC:
+      type: object
+      required: [id, tipo, monto, saldoPost, fecha, usuarioId]
+      properties:
+        id:
+          type: integer
+        tipo:
+          type: string
+          enum: [factura_compra, pago, nc_proveedor, ajuste]
+        referencia:
+          type: string
+          nullable: true
+        monto:
+          type: string
+        saldoPost:
+          type: string
+        fecha:
+          type: string
+          format: date-time
+        usuarioId:
+          type: integer
+        notas:
+          type: string
+          nullable: true
+
+    ProveedorCuentaCorrienteChartPoint:
+      type: object
+      required: [period, saldo]
+      properties:
+        period:
+          type: string
+          description: YYYY-MM month bucket
+        saldo:
+          type: string
+
+    ProveedorCuentaCorriente:
+      type: object
+      required: [proveedorId, codigo, rsocial, saldo, excedeLimite, movimientos, serie]
+      properties:
+        proveedorId:
+          type: integer
+        codigo:
+          type: integer
+        rsocial:
+          type: string
+        saldo:
+          type: string
+        limiteCredito:
+          type: string
+          nullable: true
+        excedeLimite:
+          type: boolean
+        movimientos:
+          type: array
+          items:
+            $ref: '#/components/schemas/MovimientoProveedorCC'
+        serie:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProveedorCuentaCorrienteChartPoint'
+
+    ProveedorCuentaCorrienteSaldo:
+      type: object
+      required: [proveedorId, saldo, excedeLimite]
+      properties:
+        proveedorId:
+          type: integer
+        saldo:
+          type: string
+        limiteCredito:
+          type: string
+          nullable: true
+        excedeLimite:
+          type: boolean
+
+    ProveedorCuentaCorrienteAjusteInput:
+      type: object
+      required: [monto, motivo]
+      properties:
+        monto:
+          type: number
+          description: Non-zero; positive increases debt, negative reduces debt
+        motivo:
+          type: string
+          maxLength: 500
+
+    ProveedorCuentaCorrienteEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/ProveedorCuentaCorriente'
+
+    ProveedorCuentaCorrienteSaldoEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/ProveedorCuentaCorrienteSaldo'
+
+    MovimientoProveedorCCEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/MovimientoProveedorCC'
 
     Articulo:
       type: object

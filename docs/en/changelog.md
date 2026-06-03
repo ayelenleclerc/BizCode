@@ -10,6 +10,7 @@ Versioning: [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **Supplier accounts payable ledger (GitHub #270):** `MovimientoProveedorCC` running balance; `GET/POST` under `/api/proveedores/{id}/cuenta-corriente`; automatic movement on purchase voucher create; UI tab with balance, credit-limit alert, 6-month chart, audited manual adjustment; OpenAPI, tests, trilingual manuals.
 - **Supplier full profile (GitHub #269):** extended `Proveedor` model (banking, commercial, contact); `GET /api/proveedores` filters `activo`/`categoria`; `DELETE /api/proveedores/{id}` logical deactivate; CBU/CUIT validation; Suppliers UI with collapsible sections; trilingual user manuals and OpenAPI.
 
 - **Libro IVA Compras (GitHub #306):** `ComprobanteCompra` model for supplier fiscal vouchers; `POST /api/comprobantes-compra`; `GET /api/contabilidad/libro-iva-compras` (`reports.financial.read`, module `finance.ledger`) with `format=preview|txt|xlsx` (ZIP `CBTU.txt` + `ALICUOTAS.txt`); Finanzas purchases export section; ADR-0014; OpenAPI and tests (EN/ES/PT-BR).

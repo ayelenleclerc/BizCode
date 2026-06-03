@@ -19,6 +19,20 @@
 
 Atalhos: **F5** salvar, **Esc** cancelar.
 
+## Conta corrente (GitHub #270)
+
+Em fornecedores **existentes**, aba **Conta corrente**:
+
+- **Saldo atual** (dívida acumulada pelos movimentos).
+- Alerta quando o saldo ultrapassa o **limite de crédito** da ficha.
+- **Gráfico** de evolução da dívida (últimos 6 meses).
+- **Tabela de movimentos** com filtros por tipo e datas.
+- **Ajuste manual** (`suppliers.manage`): valor diferente de zero e motivo obrigatório; auditoria `proveedor_cc_ajuste`.
+
+Ao registrar um **comprovante de compra** ativo (`POST /api/comprobantes-compra`, módulo `finance.ledger`) é criado movimento `factura_compra` pelo total.
+
+**API:** `GET /api/proveedores/{id}/cuenta-corriente`, `GET .../saldo`, `POST .../cuenta-corriente/ajuste` — [OpenAPI](../../api/openapi.yaml).
+
 ## Desativação (exclusão lógica)
 
 **Desativar** define `activo: false` sem apagar o registro. Use o filtro de inativos para revisar.

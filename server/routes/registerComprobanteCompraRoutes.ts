@@ -27,7 +27,12 @@ export function registerComprobanteCompraRoutes(app: Application, ctx: RestRoute
       try {
         const tenantId = getTenantId(req)
         const body = req.body as ComprobanteCompraCreateInput
-        const created = await comprobanteCompra.create(tenantId, body)
+        const authReq = req as AuthenticatedRequest
+        const created = await comprobanteCompra.create(
+          tenantId,
+          body,
+          authReq.auth!.claims.userId,
+        )
         await writeAudit(
           req as AuthenticatedRequest,
           'comprobante_compra_create',

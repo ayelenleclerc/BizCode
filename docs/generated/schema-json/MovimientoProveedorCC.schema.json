@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "fecha": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "id": {
+      "type": "integer"
+    },
+    "monto": {
+      "type": "string"
+    },
+    "notas": {
+      "nullable": true,
+      "type": "string"
+    },
+    "referencia": {
+      "nullable": true,
+      "type": "string"
+    },
+    "saldoPost": {
+      "type": "string"
+    },
+    "tipo": {
+      "enum": [
+        "factura_compra",
+        "pago",
+        "nc_proveedor",
+        "ajuste"
+      ],
+      "type": "string"
+    },
+    "usuarioId": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "id",
+    "tipo",
+    "monto",
+    "saldoPost",
+    "fecha",
+    "usuarioId"
+  ],
+  "title": "MovimientoProveedorCC",
+  "type": "object"
+}

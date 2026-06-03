@@ -10,6 +10,7 @@ Versionado: [Semantic Versioning](https://semver.org/lang/es/).
 
 ### Agregado
 
+- **Cuenta corriente de proveedor (GitHub #270):** modelo `MovimientoProveedorCC` con saldo corrido; `GET/POST` cuenta corriente bajo `/api/proveedores/{id}`; movimiento automático al crear comprobante de compra; pestaña UI con saldo, alerta de límite, gráfico 6 meses y ajuste manual auditado; OpenAPI, pruebas y manuales trilingües.
 - **Ficha completa de proveedor (GitHub #269):** modelo `Proveedor` ampliado (bancarios, comerciales, contacto); filtros `activo`/`categoria` en `GET /api/proveedores`; `DELETE /api/proveedores/{id}` baja lógica; validación CBU/CUIT; UI Proveedores con secciones colapsables; manuales trilingües y OpenAPI.
 
 - **Libro IVA Compras (GitHub #306):** modelo `ComprobanteCompra` para comprobantes fiscales de proveedor; `POST /api/comprobantes-compra`; `GET /api/contabilidad/libro-iva-compras` (`reports.financial.read`, módulo `finance.ledger`) con `format=preview|txt|xlsx` (ZIP `CBTU.txt` + `ALICUOTAS.txt`); sección de exportación en **Finanzas**; ADR-0014; OpenAPI y pruebas (EN/ES/PT-BR).

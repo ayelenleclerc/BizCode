@@ -228,6 +228,10 @@
 
 * [ModuleNotEnabledEnvelope](./modulenotenabledenvelope.md) – `-`
 
+* [MovimientoProveedorCC](./movimientoproveedorcc.md) – `-`
+
+* [MovimientoProveedorCCEnvelope](./movimientoproveedorccenvelope.md) – `-`
+
 * [NotaCredito](./notacredito.md) – `-`
 
 * [NotaCreditoDetail](./notacreditodetail.md) – `-`
@@ -301,6 +305,18 @@
 * [PrintingTestResult](./printingtestresult.md) – `-`
 
 * [Proveedor](./proveedor.md) – `-`
+
+* [ProveedorCuentaCorriente](./proveedorcuentacorriente.md) – `-`
+
+* [ProveedorCuentaCorrienteAjusteInput](./proveedorcuentacorrienteajusteinput.md) – `-`
+
+* [ProveedorCuentaCorrienteChartPoint](./proveedorcuentacorrientechartpoint.md) – `-`
+
+* [ProveedorCuentaCorrienteEnvelope](./proveedorcuentacorrienteenvelope.md) – `-`
+
+* [ProveedorCuentaCorrienteSaldo](./proveedorcuentacorrientesaldo.md) – `-`
+
+* [ProveedorCuentaCorrienteSaldoEnvelope](./proveedorcuentacorrientesaldoenvelope.md) – `-`
 
 * [ProveedorEnvelope](./proveedorenvelope.md) – `-`
 
@@ -699,6 +715,10 @@
 * [Untitled array in PedidoListEnvelope](./pedidolistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
 
 * [Untitled array in PlanCatalogEnvelope](./plancatalogenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled array in ProveedorCuentaCorriente](./proveedorcuentacorriente-properties-movimientos.md) – `undefined#/properties/movimientos`
+
+* [Untitled array in ProveedorCuentaCorriente](./proveedorcuentacorriente-properties-serie.md) – `undefined#/properties/serie`
 
 * [Untitled array in ProveedorListEnvelope](./proveedorlistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
 

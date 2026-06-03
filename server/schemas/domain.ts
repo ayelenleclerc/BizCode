@@ -15,6 +15,7 @@ import type {
   PedidoInvoiceInput,
   PedidoItemInput,
   ProveedorInput,
+  ProveedorCuentaCorrienteAjusteInput,
   RubroInput,
   OrdenCompraCreateInput,
   OrdenCompraItemInput,
@@ -1459,6 +1460,24 @@ export const libroIvaVentasQuerySchema = z.object({
 export const libroIvaComprasQuerySchema = libroIvaVentasQuerySchema
 
 /** @en Supplier purchase voucher body (#306). */
+const movimientoProveedorCCTipoSchema = z.enum(
+  ['factura_compra', 'pago', 'nc_proveedor', 'ajuste'],
+  { invalid_type_error: 'tipo must be factura_compra, pago, nc_proveedor or ajuste' },
+)
+
+/** @en Supplier ledger manual adjustment body (#270). */
+export const proveedorCuentaCorrienteAjusteBodySchema = z
+  .object({
+    monto: z.number().refine((v) => v !== 0, { message: 'monto must be non-zero' }),
+    motivo: z.string().trim().min(1, 'motivo is required').max(500),
+  })
+  .transform((data): ProveedorCuentaCorrienteAjusteInput => ({
+    monto: data.monto,
+    motivo: data.motivo,
+  }))
+
+export { movimientoProveedorCCTipoSchema }
+
 export const comprobanteCompraBodySchema = z
   .object({
     fecha: z.string(),
