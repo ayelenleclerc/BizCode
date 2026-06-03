@@ -8948,6 +8948,12 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/ApiErrorEnvelope'
+    NotFoundError:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiErrorEnvelope'
     ServerError:
       description: Internal server error
       content:
