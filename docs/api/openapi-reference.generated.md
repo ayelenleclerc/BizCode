@@ -8385,7 +8385,26 @@ Sets `activo` to false. Does not remove rows referenced by purchase orders or vo
 }
 ```
 
-##### Status: 404
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
 
 ##### Status: 500 Internal server error
 
