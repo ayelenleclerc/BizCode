@@ -49,7 +49,7 @@ With module **`finance.ledger`** enabled, a **Accounting — VAT sales book** se
 
 With **`finance.ledger`**, an **Accounting — VAT purchases book** section appears below sales:
 
-1. Register supplier vouchers via API `POST /api/comprobantes-compra` (fiscal header: tipo A/B/C, netos, IVA, supplier punto de venta and number).
+1. Use the **Register purchase voucher** form (supplier, date, tipo A/B/C, point of sale, number, netos, IVA, total; optional CAE). The API `POST /api/comprobantes-compra` remains available for integrations.
 2. Select **period** and review **preview** (CBTU / ALICUOTAS counts). See [ADR-0014](../adr/ADR-0014-libro-iva-compras.md).
 3. **Download ARCA (ZIP)** — `CBTU.txt` + `ALICUOTAS.txt`.
 4. **Download Excel** — internal review only.

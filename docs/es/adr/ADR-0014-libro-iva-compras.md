@@ -13,7 +13,7 @@ ADR-0013 entregó el **Libro IVA Ventas** solo desde `Factura`. El issue #306 ci
 ## Decisión
 
 1. **Modelo:** `ComprobanteCompra` con campos fiscales de cabecera alineados a `Factura` (neto1/2/3, iva1/2, total, tipo, prefijo, numero, proveedorId, ordenCompraId opcional).
-2. **Alta de datos:** `POST /api/comprobantes-compra` (módulo `finance.ledger`, permiso `reports.financial.read`).
+2. **Alta de datos:** formulario en Finanzas **Alta de comprobante de compra** y `POST /api/comprobantes-compra` (módulo `finance.ledger`, permiso `reports.financial.read`).
 3. **Exportación:** `GET /api/contabilidad/libro-iva-compras?periodo=YYYY-MM&format=preview|txt|xlsx`.
 4. **TXT:** ZIP con `CBTU.txt` + `ALICUOTAS.txt` (mismo layout RG 3685 que ventas; contraparte = proveedor).
 5. **Fuera de alcance:** Inferir IVA desde totales de `OrdenCompra`; notas de crédito de compra / anulación tipo 999 (issue futuro).
@@ -21,7 +21,7 @@ ADR-0013 entregó el **Libro IVA Ventas** solo desde `Factura`. El issue #306 ci
 ## Consecuencias
 
 - **Positivo:** Libro de compras defendible sin datos ficticios desde órdenes de compra.
-- **Negativo:** Registro manual de comprobantes hasta ampliar captura en UI.
+- **Negativo:** Registro manual vía formulario en Finanzas; ampliaciones futuras (NC compras, escáner) quedan fuera de alcance.
 - **Dependencias:** Reutiliza `exceljs`, `archiver` y helpers de formato de ventas.
 
 ## Referencias

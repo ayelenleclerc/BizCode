@@ -4,6 +4,7 @@ import { CanAccess } from '@/components/CanAccess'
 import ErrorBoundary from '@/components/ErrorBoundary'
 import AsyncWrapper from '@/components/shared/AsyncWrapper'
 import IfModule from '@/components/IfModule'
+import ComprobanteCompraRegisterForm from '@/pages/finanzas/ComprobanteCompraRegisterForm'
 import {
   ApiRequestFailedError,
   cobranzasAPI,
@@ -566,6 +567,7 @@ function FinanzasLibroIvaComprasSection() {
         {t('libroIvaCompras.title')}
       </h2>
       <p className="text-sm text-slate-500 dark:text-slate-400 mb-3">{t('libroIvaCompras.hint')}</p>
+      <ComprobanteCompraRegisterForm onRegistered={() => void loadPreview()} />
       <div className="mb-3 flex flex-wrap items-end gap-3" data-testid="finanzas-libro-iva-compras-controls">
         <div>
           <label htmlFor="finanzas-libro-iva-compras-periodo" className="block text-xs text-slate-500 mb-1">

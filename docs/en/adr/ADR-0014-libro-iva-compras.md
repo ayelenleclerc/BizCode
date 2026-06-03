@@ -13,7 +13,7 @@ ADR-0013 delivered **Libro IVA Ventas** from `Factura` only. Issue #306 closes t
 ## Decision
 
 1. **Model:** `ComprobanteCompra` with fiscal header fields aligned to `Factura` (neto1/2/3, iva1/2, total, tipo, prefijo, numero, proveedorId, optional ordenCompraId).
-2. **Data entry:** `POST /api/comprobantes-compra` (module `finance.ledger`, permission `reports.financial.read`).
+2. **Data entry:** Finanzas **Register purchase voucher** form and `POST /api/comprobantes-compra` (module `finance.ledger`, permission `reports.financial.read`).
 3. **Export:** `GET /api/contabilidad/libro-iva-compras?periodo=YYYY-MM&format=preview|txt|xlsx`.
 4. **TXT:** ZIP with `CBTU.txt` + `ALICUOTAS.txt` (same RG 3685 comma layout as ventas; counterparty = supplier).
 5. **Out of scope:** Inferring IVA from `OrdenCompra` totals; purchase credit notes / void tipo 999 (future issue).
@@ -21,7 +21,7 @@ ADR-0013 delivered **Libro IVA Ventas** from `Factura` only. Issue #306 closes t
 ## Consequences
 
 - **Positive:** Audit-ready purchases book without fake data from purchase orders.
-- **Negative:** Manual registration of supplier vouchers until purchase invoice capture UX expands.
+- **Negative:** Manual entry via Finanzas form; future scope (purchase credit notes, scanner) remains out of band.
 - **Dependencies:** Reuses `exceljs`, `archiver`, and ventas format helpers.
 
 ## References

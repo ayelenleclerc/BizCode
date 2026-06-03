@@ -49,7 +49,7 @@ Con el módulo **`finance.ledger`** habilitado, aparece la sección **Contabilid
 
 Con **`finance.ledger`**, debajo de ventas aparece **Contabilidad — Libro IVA Compras**:
 
-1. Registre comprobantes con `POST /api/comprobantes-compra` (cabecera fiscal: tipo A/B/C, netos, IVA, PV y número del proveedor).
+1. Use el formulario **Alta de comprobante de compra** (proveedor, fecha, tipo A/B/C, punto de venta, número, netos, IVA, total; CAE opcional). La API `POST /api/comprobantes-compra` sigue disponible para integraciones.
 2. Seleccione **período** y revise la **vista previa** (CBTU / ALICUOTAS). Véase [ADR-0014](../adr/ADR-0014-libro-iva-compras.md).
 3. **Descargar ARCA (ZIP)** — `CBTU.txt` + `ALICUOTAS.txt`.
 4. **Descargar Excel** — solo revisión interna.
