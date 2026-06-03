@@ -2561,7 +2561,8 @@ paths:
     get:
       tags: [printing]
       summary: Printing device status (phase 1 mock)
-      description: Requires `settings.business.manage`. Returns env-derived fiscal flag and mock channel modes without secrets.
+      description: |
+        Requires `settings.business.manage`. Returns opt-in flags from server env (`FISCAL_PRINTER_ENABLED`, `THERMAL_PRINTER_ENABLED`; default false) and mock channel modes. PDF/legal billing does not require hardware.
       responses:
         '200':
           description: Printing status
@@ -2584,7 +2585,7 @@ paths:
       summary: Test mock printing device
       description: |
         Requires `settings.business.manage`. Runs phase-1 mock adapters with a fixed test payload (no invoice id).
-        When `device` is `fiscal` and `FISCAL_PRINTER_ENABLED` is not `true`, returns HTTP 200 with `fallbackToPdf: true`.
+        When `device` is `fiscal` and `FISCAL_PRINTER_ENABLED` is not `true`, or `device` is `thermal` and `THERMAL_PRINTER_ENABLED` is not `true`, returns HTTP 200 with `fallbackToPdf: true`.
       requestBody:
         required: true
         content:
@@ -6954,10 +6955,14 @@ components:
 
     PrintingStatus:
       type: object
-      required: [fiscalPrinterEnabled, fiscalMode, thermalMode]
+      required: [fiscalPrinterEnabled, thermalPrinterEnabled, fiscalMode, thermalMode]
       properties:
         fiscalPrinterEnabled:
           type: boolean
+          description: Opt-in fiscal controller (RS-232/USB); false uses PDF fallback.
+        thermalPrinterEnabled:
+          type: boolean
+          description: Opt-in 80mm thermal ESC/POS path; false uses PDF fallback.
         fiscalMode:
           type: string
           enum: [mock]

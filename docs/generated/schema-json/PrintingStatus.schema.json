@@ -8,6 +8,7 @@
       "type": "string"
     },
     "fiscalPrinterEnabled": {
+      "description": "Opt-in fiscal controller (RS-232/USB); false uses PDF fallback.",
       "type": "boolean"
     },
     "thermalMode": {
@@ -15,10 +16,15 @@
         "mock"
       ],
       "type": "string"
+    },
+    "thermalPrinterEnabled": {
+      "description": "Opt-in 80mm thermal ESC/POS path; false uses PDF fallback.",
+      "type": "boolean"
     }
   },
   "required": [
     "fiscalPrinterEnabled",
+    "thermalPrinterEnabled",
     "fiscalMode",
     "thermalMode"
   ],

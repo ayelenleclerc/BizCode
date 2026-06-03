@@ -37,6 +37,12 @@ Implantações desktop podem ter **vários usuários** (p. ex. escritório/LAN).
 
 ## Contêineres opcionais
 
+## Impressão POS opcional
+
+Impressoras fiscais e térmicas 80 mm são **opcionais por cliente** (flags no servidor; PDF/CAE sempre disponíveis). Ver [impressao-pos-opcional.md](impressao-pos-opcional.md).
+
+## Contêineres opcionais
+
 **Dockerfile** / **docker-compose** para **API + PostgreSQL** (e opcionalmente build web estático) podem ajudar **dev e deploy server-side**. **Não** substituem builds nativos **Tauri** para desktop. Ao introduzir, documentar em qualidade/ops junto a [ciclo-ci-cd.md](ciclo-ci-cd.md).
 
 ## Governança: manter o foco

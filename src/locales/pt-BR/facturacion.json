@@ -113,6 +113,7 @@
     "feedback": {
       "mockSuccess": "Impressão mock enviada (job {{jobId}}).",
       "fiscalFallbackPdf": "Fiscal desabilitado: PDF legal aberto.",
+      "thermalFallbackPdf": "Térmica desabilitada: PDF legal aberto.",
       "error": "Não foi possível imprimir com o dispositivo selecionado"
     }
   }

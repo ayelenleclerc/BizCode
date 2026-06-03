@@ -2353,13 +2353,19 @@ export const ordenesEntregaAPI = {
 export const printingAPI = {
   status: async (): Promise<{
     fiscalPrinterEnabled: boolean
+    thermalPrinterEnabled: boolean
     fiscalMode: 'mock'
     thermalMode: 'mock'
   }> => {
     try {
       const response = await api.get<{
         success: boolean
-        data: { fiscalPrinterEnabled: boolean; fiscalMode: 'mock'; thermalMode: 'mock' }
+        data: {
+          fiscalPrinterEnabled: boolean
+          thermalPrinterEnabled: boolean
+          fiscalMode: 'mock'
+          thermalMode: 'mock'
+        }
       }>('/printing/status')
       return response.data.data
     } catch (error) {

@@ -78,9 +78,12 @@
   },
   "printDevices": {
     "title": "Dispositivos de impresión",
-    "subtitle": "Fase 1: canales mock locales sin hardware. El controlador fiscal real se habilita con FISCAL_PRINTER_ENABLED en el servidor.",
+    "subtitle": "Opcional por cliente: habilitá solo si usás hardware de punto de venta. PDF y facturación electrónica funcionan sin impresora.",
     "fiscalEnabled": "Controlador fiscal habilitado en servidor",
     "fiscalDisabled": "Controlador fiscal deshabilitado (fallback a PDF)",
+    "thermalEnabled": "Impresora térmica 80 mm habilitada en servidor",
+    "thermalDisabled": "Impresora térmica deshabilitada (fallback a PDF)",
+    "optInHint": "No hay impresoras POS habilitadas. Configurá FISCAL_PRINTER_ENABLED y/o THERMAL_PRINTER_ENABLED en el servidor cuando el negocio las use.",
     "modeMock": "Modo: mock",
     "testThermal": "Probar impresión térmica (mock)",
     "testFiscal": "Probar controlador fiscal (mock)",
@@ -90,6 +93,7 @@
       "thermalSuccess": "Térmica mock OK (job {{jobId}}).",
       "fiscalSuccess": "Fiscal mock OK (job {{jobId}}).",
       "fiscalFallback": "Fiscal deshabilitado: el sistema usaría PDF legal.",
+      "thermalFallback": "Térmica deshabilitada: el sistema usaría PDF legal.",
       "error": "No se pudo ejecutar la prueba de impresión"
     }
   }

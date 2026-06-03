@@ -15,13 +15,30 @@ describe('PrintDevicesSection', () => {
   beforeEach(() => {
     vi.mocked(printingAPI.status).mockResolvedValue({
       fiscalPrinterEnabled: false,
+      thermalPrinterEnabled: false,
       fiscalMode: 'mock',
       thermalMode: 'mock',
     })
     vi.mocked(printingAPI.test).mockReset()
   })
 
-  it('loads status and runs thermal mock test', async () => {
+  it('shows opt-in hint when no device is enabled', async () => {
+    render(<PrintDevicesSection />)
+
+    await waitFor(() => {
+      expect(screen.getByTestId('print-devices-opt-in-hint')).toBeInTheDocument()
+    })
+    expect(screen.queryByTestId('btn-print-test-thermal')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('btn-print-test-fiscal')).not.toBeInTheDocument()
+  })
+
+  it('loads status and runs thermal mock test when enabled', async () => {
+    vi.mocked(printingAPI.status).mockResolvedValue({
+      fiscalPrinterEnabled: false,
+      thermalPrinterEnabled: true,
+      fiscalMode: 'mock',
+      thermalMode: 'mock',
+    })
     vi.mocked(printingAPI.test).mockResolvedValue({
       device: 'thermal',
       channel: 'thermal_mock',

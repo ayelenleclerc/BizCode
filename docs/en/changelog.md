@@ -10,6 +10,8 @@ Versioning: [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **Optional POS printing (hardware opt-in):** `THERMAL_PRINTER_ENABLED` (default off) mirrors fiscal opt-in; `GET /api/printing/status` exposes `thermalPrinterEnabled`; invoice print falls back to legal PDF when devices are disabled; billing UI hides fiscal/thermal actions unless enabled; trilingual [optional-pos-printing.md](en/quality/optional-pos-printing.md). Physical drivers remain optional per customer (GitHub #153 phase 2).
+
 - **Observability MVP baseline (GitHub #151):** structured server logging with Pino redaction (`password`, `token`, `authorization`, `cookie`, `session`, `secret`, `privateKey`, `certificate`), request correlation via `X-Request-Id`, in-memory technical metrics endpoint `GET /api/metrics` protected with `audit.read`, additive `/api/health` diagnostics (DB check + latency, uptime, version), OpenAPI contract/tests updates, and trilingual observability documentation. External stacks (Prometheus/Grafana/Loki/Datadog/Sentry) and real alerts remain out of scope.
 
 - **Production Docker + deploy workflow baseline (GitHub #149):** added `Dockerfile` (backend), `Dockerfile.frontend` (Vite build + Nginx runtime), `docker-compose.prod.yml` (server + frontend + PostgreSQL with health checks), internal Nginx API proxy config (`deploy/nginx/default.conf`), `.dockerignore`, deploy-ready env reference updates in `.env.example`, and GitHub Actions workflow `.github/workflows/deploy.yml` with always-on build/test + conditional GHCR publish and conditional SSH deploy (requires repository secrets). Production host/domain/certificate values remain external configuration.

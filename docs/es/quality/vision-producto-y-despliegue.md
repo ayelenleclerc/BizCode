@@ -35,6 +35,10 @@ Los despliegues de escritorio pueden tener **varios usuarios** (p. ej. oficina/L
 | **Frontera API clara** | OpenAPI + pruebas de contrato como ancla; el SaaS debe **respetar o versionar** el contrato público. |
 | **Entrega por fases** | Cerrar escritorio con límites claros; añadir despliegue alojado sin reescribir desde cero. |
 
+## Impresión POS opcional
+
+Los controladores fiscales y las impresoras térmicas de 80 mm son **optativos por cliente** (flags en el servidor; PDF/CAE siempre disponibles). Véase [impresion-pos-opcional.md](impresion-pos-opcional.md).
+
 ## Contenedores opcionales
 
 Un **Dockerfile** / **docker-compose** para **API + PostgreSQL** (y opcionalmente build web estático) puede ayudar al **desarrollo y despliegue del lado servidor**. **No** sustituye los builds nativos **Tauri** de escritorio. Al introducirlo, documentarlo en calidad/ops junto a [ciclo-ci-cd.md](ciclo-ci-cd.md).
