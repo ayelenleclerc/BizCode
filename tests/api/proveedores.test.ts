@@ -128,6 +128,69 @@ describe('Proveedores API', () => {
     expect(res.body.success).toBe(true)
   })
 
+  it('DELETE /api/proveedores/:id deactivates supplier', async () => {
+    const update = vi.fn().mockResolvedValue({ ...proveedorRow, activo: false })
+    const prisma = buildPrisma()
+    prisma.proveedor.update = update
+    const app = createApp(prisma)
+    const res = await request(app).delete('/api/proveedores/1').expect(200)
+    expect(res.body.success).toBe(true)
+    expect(res.body.data.activo).toBe(false)
+    expect(update).toHaveBeenCalledWith(
+      expect.objectContaining({ where: { id: 1 }, data: { activo: false } }),
+    )
+  })
+
+  it('DELETE /api/proveedores/:id returns 404 when missing', async () => {
+    const prisma = buildPrisma({
+      proveedor: {
+        count: vi.fn().mockResolvedValue(0),
+        findMany: vi.fn().mockResolvedValue([]),
+        findFirst: vi.fn().mockResolvedValue(null),
+        findUnique: vi.fn().mockResolvedValue(null),
+        create: vi.fn(),
+        update: vi.fn(),
+      },
+    })
+    const app = createApp(prisma)
+    const res = await request(app).delete('/api/proveedores/99').expect(404)
+    expect(res.body.success).toBe(false)
+  })
+
+  it('GET /api/proveedores accepts activo and categoria filters', async () => {
+    const findMany = vi.fn().mockResolvedValue([proveedorRow])
+    const prisma = buildPrisma()
+    prisma.proveedor.findMany = findMany
+    const app = createApp(prisma)
+    await request(app)
+      .get('/api/proveedores')
+      .query({ activo: 'true', categoria: 'insumos' })
+      .expect(200)
+    expect(findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.objectContaining({ activo: true, categoria: 'insumos' }),
+      }),
+    )
+  })
+
+  it('POST /api/proveedores rejects invalid CBU', async () => {
+    const app = createApp(buildPrisma())
+    const res = await request(app)
+      .post('/api/proveedores')
+      .send({ ...proveedorInput, cbu: '1234567890123456789012' })
+      .expect(400)
+    expect(res.body.success).toBe(false)
+  })
+
+  it('POST /api/proveedores accepts valid CBU', async () => {
+    const app = createApp(buildPrisma())
+    const res = await request(app)
+      .post('/api/proveedores')
+      .send({ ...proveedorInput, cbu: '2850590940090418135201' })
+      .expect(200)
+    expect(res.body.success).toBe(true)
+  })
+
   it('GET /api/proveedores/import/template returns CSV', async () => {
     const app = createApp(buildPrisma())
     const res = await request(app).get('/api/proveedores/import/template').expect(200)

@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { validateCUIT } from '../../src/lib/validators'
+import { validateCBU, validateCUIT } from '../../src/lib/validators'
 import { isValidIanaTimeZone } from '../lib/tenantLocalTime'
 import type {
   ArticuloInput,
@@ -259,6 +259,16 @@ export const rubroBodySchema = z
   })
   .transform((data): RubroInput => ({ codigo: data.codigo, nombre: data.nombre.trim() }))
 
+const proveedorTipoCuentaSchema = z.enum(['cc', 'ca'], {
+  errorMap: () => ({ message: 'tipoCuenta must be cc or ca' }),
+})
+const proveedorCondicionPagoSchema = z.enum(['contado', '15dias', '30dias', '60dias', 'otro'], {
+  errorMap: () => ({ message: 'condicionPago must be contado, 15dias, 30dias, 60dias, or otro' }),
+})
+const proveedorCategoriaSchema = z.enum(['materia_prima', 'insumos', 'servicios', 'logistica'], {
+  errorMap: () => ({ message: 'categoria must be materia_prima, insumos, servicios, or logistica' }),
+})
+
 export const proveedorBodySchema = z
   .object({
     codigo: z.number(),
@@ -271,6 +281,20 @@ export const proveedorBodySchema = z
     telef: z.union([z.string(), z.null(), z.undefined()]).optional(),
     email: z.union([z.string(), z.null(), z.undefined()]).optional(),
     cuit: z.union([z.string(), z.null(), z.undefined()]).optional(),
+    cbu: z.union([z.string(), z.null(), z.undefined()]).optional(),
+    alias: z.union([z.string(), z.null(), z.undefined()]).optional(),
+    banco: z.union([z.string(), z.null(), z.undefined()]).optional(),
+    tipoCuenta: z.union([proveedorTipoCuentaSchema, z.null(), z.undefined()]).optional(),
+    moneda: z.union([z.string(), z.undefined()]).optional(),
+    condicionPago: z.union([proveedorCondicionPagoSchema, z.null(), z.undefined()]).optional(),
+    plazoHabitual: z.union([z.number(), z.null(), z.undefined()]).optional(),
+    descuentoPct: z.union([z.number(), z.null(), z.undefined()]).optional(),
+    limiteCredito: z.union([z.number(), z.null(), z.undefined()]).optional(),
+    categoria: z.union([proveedorCategoriaSchema, z.null(), z.undefined()]).optional(),
+    contactoNombre: z.union([z.string(), z.null(), z.undefined()]).optional(),
+    contactoEmail: z.union([z.string(), z.null(), z.undefined()]).optional(),
+    contactoTel: z.union([z.string(), z.null(), z.undefined()]).optional(),
+    notas: z.union([z.string(), z.null(), z.undefined()]).optional(),
   })
   .superRefine((data, ctx) => {
     if (!Number.isInteger(data.codigo) || data.codigo < 1) {
@@ -290,6 +314,36 @@ export const proveedorBodySchema = z
     const cui = typeof data.cuit === 'string' ? data.cuit.trim() : data.cuit
     if (cui != null && typeof cui === 'string' && cui !== '' && !validateCUIT(cui)) {
       ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'cuit must be a valid Argentine CUIT', path: ['cuit'] })
+    }
+    normalizeOptStr(data.cbu === undefined ? undefined : data.cbu, 22, 'cbu', ctx)
+    const cbuRaw = typeof data.cbu === 'string' ? data.cbu.trim() : data.cbu
+    if (cbuRaw != null && typeof cbuRaw === 'string' && cbuRaw !== '' && !validateCBU(cbuRaw)) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'cbu must be a valid Argentine CBU', path: ['cbu'] })
+    }
+    normalizeOptStr(data.alias === undefined ? undefined : data.alias, 20, 'alias', ctx)
+    normalizeOptStr(data.banco === undefined ? undefined : data.banco, 50, 'banco', ctx)
+    if (data.moneda !== undefined && data.moneda.trim().length > 3) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'moneda must be at most 3 characters', path: ['moneda'] })
+    }
+    const ph = data.plazoHabitual
+    if (ph !== undefined && ph !== null && (!Number.isInteger(ph) || ph < 0)) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'plazoHabitual must be a non-negative integer', path: ['plazoHabitual'] })
+    }
+    if (data.descuentoPct !== undefined && data.descuentoPct !== null) {
+      if (typeof data.descuentoPct !== 'number' || Number.isNaN(data.descuentoPct) || data.descuentoPct < 0 || data.descuentoPct > 100) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'descuentoPct must be between 0 and 100', path: ['descuentoPct'] })
+      }
+    }
+    if (data.limiteCredito !== undefined && data.limiteCredito !== null) {
+      if (typeof data.limiteCredito !== 'number' || Number.isNaN(data.limiteCredito) || data.limiteCredito < 0) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'limiteCredito must be >= 0', path: ['limiteCredito'] })
+      }
+    }
+    normalizeOptStr(data.contactoNombre === undefined ? undefined : data.contactoNombre, 50, 'contactoNombre', ctx)
+    normalizeOptStr(data.contactoEmail === undefined ? undefined : data.contactoEmail, 50, 'contactoEmail', ctx)
+    normalizeOptStr(data.contactoTel === undefined ? undefined : data.contactoTel, 25, 'contactoTel', ctx)
+    if (data.notas !== undefined && data.notas !== null && typeof data.notas === 'string' && data.notas.length > 2000) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'notas must be at most 2000 characters', path: ['notas'] })
     }
   })
   .transform((data): ProveedorInput => {
@@ -311,23 +365,45 @@ export const proveedorBodySchema = z
       rsocial: data.rsocial.trim(),
       condIva: data.condIva,
       activo: data.activo,
+      moneda: (data.moneda ?? 'ARS').trim() || 'ARS',
     }
-    const fa = trimOrNull(data.fantasia)
-    if (fa !== undefined) {
-      out.fantasia = fa
+    const assignOpt = <K extends keyof ProveedorInput>(key: K, val: ProveedorInput[K] | undefined) => {
+      if (val !== undefined) {
+        out[key] = val
+      }
     }
-    const cu = trimOrNull(data.cuit)
-    if (cu !== undefined) {
-      out.cuit = cu
+    assignOpt('fantasia', trimOrNull(data.fantasia) as ProveedorInput['fantasia'])
+    assignOpt('cuit', trimOrNull(data.cuit) as ProveedorInput['cuit'])
+    assignOpt('telef', trimOrNull(data.telef) as ProveedorInput['telef'])
+    assignOpt('email', trimOrNull(data.email) as ProveedorInput['email'])
+    const cbuTrim = trimOrNull(data.cbu)
+    if (cbuTrim !== undefined) {
+      out.cbu = cbuTrim === null ? null : cbuTrim.replace(/\D/g, '')
     }
-    const te = trimOrNull(data.telef)
-    if (te !== undefined) {
-      out.telef = te
+    assignOpt('alias', trimOrNull(data.alias) as ProveedorInput['alias'])
+    assignOpt('banco', trimOrNull(data.banco) as ProveedorInput['banco'])
+    if (data.tipoCuenta !== undefined) {
+      out.tipoCuenta = data.tipoCuenta
     }
-    const em = trimOrNull(data.email)
-    if (em !== undefined) {
-      out.email = em
+    if (data.condicionPago !== undefined) {
+      out.condicionPago = data.condicionPago
     }
+    if (data.plazoHabitual !== undefined) {
+      out.plazoHabitual = data.plazoHabitual
+    }
+    if (data.descuentoPct !== undefined) {
+      out.descuentoPct = data.descuentoPct
+    }
+    if (data.limiteCredito !== undefined) {
+      out.limiteCredito = data.limiteCredito
+    }
+    if (data.categoria !== undefined) {
+      out.categoria = data.categoria
+    }
+    assignOpt('contactoNombre', trimOrNull(data.contactoNombre) as ProveedorInput['contactoNombre'])
+    assignOpt('contactoEmail', trimOrNull(data.contactoEmail) as ProveedorInput['contactoEmail'])
+    assignOpt('contactoTel', trimOrNull(data.contactoTel) as ProveedorInput['contactoTel'])
+    assignOpt('notas', trimOrNull(data.notas) as ProveedorInput['notas'])
     return out
   })
 

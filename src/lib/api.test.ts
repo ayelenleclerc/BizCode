@@ -539,24 +539,32 @@ describe('proveedoresAPI', () => {
   describe('create', () => {
     it('retorna proveedor creado', async () => {
       mockPost.mockResolvedValueOnce({ data: { data: { id: 2 } } })
-      expect(await proveedoresAPI.create({ rsocial: 'New' })).toEqual({ id: 2 })
+      expect(
+        await proveedoresAPI.create({ codigo: 1, rsocial: 'New', condIva: 'RI', activo: true }),
+      ).toEqual({ id: 2 })
     })
 
     it('lanza error del servidor', async () => {
       mockPost.mockRejectedValueOnce(axiosErrorWithResponse('Duplicate'))
-      await expect(proveedoresAPI.create({})).rejects.toThrow('Duplicate')
+      await expect(
+        proveedoresAPI.create({ codigo: 1, rsocial: 'New', condIva: 'RI', activo: true }),
+      ).rejects.toThrow('Duplicate')
     })
   })
 
   describe('update', () => {
     it('retorna proveedor actualizado', async () => {
       mockPut.mockResolvedValueOnce({ data: { data: { id: 1, rsocial: 'Up' } } })
-      expect(await proveedoresAPI.update(1, { rsocial: 'Up' })).toEqual({ id: 1, rsocial: 'Up' })
+      expect(
+        await proveedoresAPI.update(1, { codigo: 1, rsocial: 'Up', condIva: 'RI', activo: true }),
+      ).toEqual({ id: 1, rsocial: 'Up' })
     })
 
     it('lanza error del servidor', async () => {
       mockPut.mockRejectedValueOnce(axiosErrorWithResponse('Conflict'))
-      await expect(proveedoresAPI.update(1, {})).rejects.toThrow('Conflict')
+      await expect(
+        proveedoresAPI.update(1, { codigo: 1, rsocial: 'Up', condIva: 'RI', activo: true }),
+      ).rejects.toThrow('Conflict')
     })
   })
 

@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest'
 import {
   validateCUIT,
   formatCUIT,
+  validateCBU,
   calculateIVA,
   validateCode,
   validatePrice,
@@ -46,6 +47,31 @@ describe('validateCUIT', () => {
   it('retorna false cuando remainder=0 pero el último dígito no es 0', () => {
     // Mismo prefijo pero último dígito incorrecto
     expect(validateCUIT('11000000011')).toBe(false)
+  })
+})
+
+/** CBU de ejemplo con dígitos verificadores válidos (22 dígitos). */
+const VALID_CBU = '2850590940090418135201'
+
+describe('validateCBU', () => {
+  it('retorna false para string vacío', () => {
+    expect(validateCBU('')).toBe(false)
+  })
+
+  it('retorna false para longitud distinta de 22', () => {
+    expect(validateCBU('123')).toBe(false)
+  })
+
+  it('retorna false para dígito verificador incorrecto', () => {
+    expect(validateCBU('2850590940090418135200')).toBe(false)
+  })
+
+  it('retorna true para CBU válido (solo dígitos)', () => {
+    expect(validateCBU(VALID_CBU)).toBe(true)
+  })
+
+  it('ignora espacios y guiones al validar', () => {
+    expect(validateCBU('2850-5909-400904181352-01')).toBe(true)
   })
 })
 

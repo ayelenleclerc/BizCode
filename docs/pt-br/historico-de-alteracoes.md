@@ -10,6 +10,8 @@ Versionamento: [Semantic Versioning](https://semver.org/).
 
 ### Adicionado
 
+- **Ficha completa de fornecedor (GitHub #269):** modelo `Proveedor` ampliado (bancário, comercial, contato); filtros `activo`/`categoria` em `GET /api/proveedores`; `DELETE /api/proveedores/{id}` desativação lógica; validação CBU/CUIT; UI Fornecedores com seções recolhíveis; manuais trilíngues e OpenAPI.
+
 - **Livro IVA Compras (GitHub #306):** modelo `ComprobanteCompra` para comprovantes fiscais de fornecedor; `POST /api/comprobantes-compra`; `GET /api/contabilidad/libro-iva-compras` (`reports.financial.read`, módulo `finance.ledger`) com `format=preview|txt|xlsx` (ZIP `CBTU.txt` + `ALICUOTAS.txt`); seção de exportação em **Finanças**; ADR-0014; OpenAPI e testes (EN/ES/PT-BR).
 
 - **Impressão POS opcional (hardware opt-in):** `THERMAL_PRINTER_ENABLED` (desligado por padrão) alinhado ao fiscal; `GET /api/printing/status` expõe `thermalPrinterEnabled`; impressão de fatura com fallback para PDF legal; UI oculta ações fiscal/térmica se desabilitadas; doc trilíngue [impressao-pos-opcional.md](pt-br/quality/impressao-pos-opcional.md). Drivers físicos permanecem opcionais por cliente (#153 Fase 2).

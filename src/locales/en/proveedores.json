@@ -4,13 +4,25 @@
   "search": {
     "placeholder": "Search by code or business name... (F2)"
   },
+  "filters": {
+    "activo": "Status",
+    "activoAll": "All",
+    "activoOnly": "Active only",
+    "inactivoOnly": "Inactive only",
+    "categoria": "Category",
+    "categoriaAll": "All categories"
+  },
+  "actions": {
+    "edit": "Edit",
+    "deactivate": "Deactivate"
+  },
   "table": {
     "codigo": "Code",
     "rsocial": "Business name",
     "cuit": "Tax ID",
     "condIva": "VAT status",
     "telef": "Phone",
-    "activo": "Active"
+    "activo": "Status"
   },
   "empty": "No suppliers yet. Create one with F3.",
   "import": {
@@ -34,6 +46,12 @@
     "titleNew": "New supplier",
     "titleEdit": "Edit supplier #{{codigo}}",
     "hint": "F5=save, Esc=cancel",
+    "sections": {
+      "general": "General",
+      "banking": "Banking",
+      "commercial": "Commercial terms",
+      "contact": "Contact and notes"
+    },
     "codigo": "Code",
     "rsocial": "Business name",
     "fantasia": "Trade name",
@@ -42,6 +60,40 @@
     "telef": "Phone",
     "email": "Email",
     "activo": "Active",
+    "cbu": "CBU",
+    "alias": "CBU alias",
+    "banco": "Bank",
+    "tipoCuenta": "Account type",
+    "tipoCuentaNone": "Not specified",
+    "tipoCuentaOptions": {
+      "cc": "Checking account",
+      "ca": "Savings account"
+    },
+    "moneda": "Currency",
+    "condicionPago": "Payment terms",
+    "condicionPagoNone": "Not specified",
+    "condicionPagoOptions": {
+      "contado": "Cash",
+      "15dias": "15 days",
+      "30dias": "30 days",
+      "60dias": "60 days",
+      "otro": "Other"
+    },
+    "plazoHabitual": "Usual term (days)",
+    "descuentoPct": "Usual discount (%)",
+    "limiteCredito": "Credit limit",
+    "categoria": "Category",
+    "categoriaNone": "No category",
+    "categoriaOptions": {
+      "materia_prima": "Raw materials",
+      "insumos": "Supplies",
+      "servicios": "Services",
+      "logistica": "Logistics"
+    },
+    "contactoNombre": "Contact name",
+    "contactoEmail": "Contact email",
+    "contactoTel": "Contact phone",
+    "notas": "Notes",
     "condIvaOptions": {
       "RI": "RI",
       "Mono": "Monotributo",
@@ -49,7 +101,13 @@
       "Exento": "Exempt"
     },
     "errors": {
-      "generic": "Could not save supplier"
+      "generic": "Could not save supplier",
+      "loadFailed": "Could not load supplier profile",
+      "deactivateFailed": "Could not deactivate supplier",
+      "codigoInvalid": "Code must be a positive integer",
+      "rsocialInvalid": "Business name must be at least 3 characters",
+      "cuitInvalid": "Invalid tax ID",
+      "cbuInvalid": "Invalid CBU"
     }
   }
 }

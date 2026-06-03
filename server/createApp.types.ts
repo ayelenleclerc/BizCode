@@ -37,6 +37,10 @@ export type RubroInput = {
   nombre: string
 }
 
+export type ProveedorTipoCuenta = 'cc' | 'ca'
+export type ProveedorCondicionPago = 'contado' | '15dias' | '30dias' | '60dias' | 'otro'
+export type ProveedorCategoria = 'materia_prima' | 'insumos' | 'servicios' | 'logistica'
+
 export type ProveedorInput = {
   codigo: number
   rsocial: string
@@ -46,6 +50,20 @@ export type ProveedorInput = {
   cuit?: string | null
   telef?: string | null
   email?: string | null
+  cbu?: string | null
+  alias?: string | null
+  banco?: string | null
+  tipoCuenta?: ProveedorTipoCuenta | null
+  moneda?: string
+  condicionPago?: ProveedorCondicionPago | null
+  plazoHabitual?: number | null
+  descuentoPct?: number | null
+  limiteCredito?: number | null
+  categoria?: ProveedorCategoria | null
+  contactoNombre?: string | null
+  contactoEmail?: string | null
+  contactoTel?: string | null
+  notas?: string | null
 }
 
 export type FacturaItemInput = {

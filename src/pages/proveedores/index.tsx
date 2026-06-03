@@ -1,13 +1,14 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { useHotkeys } from 'react-hotkeys-hook'
 import { useTranslation } from 'react-i18next'
-import { ApiRequestFailedError, proveedoresAPI, type CsvBulkImportResult } from '@/lib/api'
+import { ApiRequestFailedError, proveedoresAPI, type CsvBulkImportResult, type ProveedorListParams } from '@/lib/api'
 import { CanAccess } from '@/components/CanAccess'
 import ErrorBoundary from '@/components/ErrorBoundary'
 import AsyncWrapper from '@/components/shared/AsyncWrapper'
-import type { Proveedor } from '@/types'
+import type { Proveedor, ProveedorCategoria } from '@/types'
+import ProveedorForm from '@/pages/proveedores/ProveedorForm'
 
-const COND_IVA = ['RI', 'Mono', 'CF', 'Exento'] as const
+const CATEGORIAS: ProveedorCategoria[] = ['materia_prima', 'insumos', 'servicios', 'logistica']
 
 export default function ProveedoresPage() {
   const { t } = useTranslation('proveedores')
@@ -17,8 +18,11 @@ export default function ProveedoresPage() {
   const [loading, setLoading] = useState(false)
   const [loadError, setLoadError] = useState<Error | null>(null)
   const [showForm, setShowForm] = useState(false)
-  const [selected, setSelected] = useState<Proveedor | null>(null)
+  const [editingId, setEditingId] = useState<number | null>(null)
   const [selectedRow, setSelectedRow] = useState(0)
+  const [filtroActivo, setFiltroActivo] = useState<'all' | 'true' | 'false'>('all')
+  const [filtroCategoria, setFiltroCategoria] = useState<ProveedorCategoria | ''>('')
+  const [deactivating, setDeactivating] = useState(false)
   const tableRef = useRef<HTMLTableElement>(null)
   const [showImportDialog, setShowImportDialog] = useState(false)
   const [importFile, setImportFile] = useState<File | null>(null)
@@ -28,22 +32,21 @@ export default function ProveedoresPage() {
   const importCloseRef = useRef<HTMLButtonElement>(null)
   const importFileInputRef = useRef<HTMLInputElement>(null)
 
-  const [formCodigo, setFormCodigo] = useState('')
-  const [formRsocial, setFormRsocial] = useState('')
-  const [formFantasia, setFormFantasia] = useState('')
-  const [formCuit, setFormCuit] = useState('')
-  const [formCondIva, setFormCondIva] = useState<(typeof COND_IVA)[number]>('RI')
-  const [formTelef, setFormTelef] = useState('')
-  const [formEmail, setFormEmail] = useState('')
-  const [formActivo, setFormActivo] = useState(true)
-  const [formSaving, setFormSaving] = useState(false)
-  const [formError, setFormError] = useState<string | null>(null)
-
-  const loadList = async (search?: string) => {
+  const loadList = useCallback(async (
+    search?: string,
+    activoFilter: 'all' | 'true' | 'false' = filtroActivo,
+    categoriaFilter: ProveedorCategoria | '' = filtroCategoria,
+  ) => {
     setLoading(true)
     setLoadError(null)
     try {
-      const data = await proveedoresAPI.list(search)
+      const params: ProveedorListParams = {}
+      const q = search ?? filtro
+      if (q) params.q = q
+      if (activoFilter === 'true') params.activo = true
+      if (activoFilter === 'false') params.activo = false
+      if (categoriaFilter) params.categoria = categoriaFilter
+      const data = await proveedoresAPI.list(params)
       setProveedores(data || [])
       setSelectedRow(0)
     } catch (error) {
@@ -51,11 +54,11 @@ export default function ProveedoresPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [filtro, filtroActivo, filtroCategoria])
 
   useEffect(() => {
-    loadList()
-  }, [])
+    void loadList()
+  }, [loadList])
 
   useHotkeys('f2', () => {
     const input = document.getElementById('search-proveedores') as HTMLInputElement
@@ -63,12 +66,8 @@ export default function ProveedoresPage() {
   })
 
   useHotkeys('f3', () => {
-    setSelected(null)
-    openNewForm()
-  })
-
-  useHotkeys('f5', () => {
-    if (showForm) void submitForm()
+    setEditingId(null)
+    setShowForm(true)
   })
 
   useHotkeys('escape', () => {
@@ -85,63 +84,21 @@ export default function ProveedoresPage() {
     }
   }, [showImportDialog])
 
-  const openNewForm = () => {
-    setFormCodigo('')
-    setFormRsocial('')
-    setFormFantasia('')
-    setFormCuit('')
-    setFormCondIva('RI')
-    setFormTelef('')
-    setFormEmail('')
-    setFormActivo(true)
-    setFormError(null)
-    setShowForm(true)
-  }
-
   const openEditForm = (p: Proveedor) => {
-    setSelected(p)
-    setFormCodigo(String(p.codigo))
-    setFormRsocial(p.rsocial)
-    setFormFantasia(p.fantasia ?? '')
-    setFormCuit(p.cuit ?? '')
-    setFormCondIva((COND_IVA.includes(p.condIva as (typeof COND_IVA)[number]) ? p.condIva : 'RI') as (typeof COND_IVA)[number])
-    setFormTelef(p.telef ?? '')
-    setFormEmail(p.email ?? '')
-    setFormActivo(p.activo)
-    setFormError(null)
+    setEditingId(p.id)
     setShowForm(true)
   }
 
-  const submitForm = async () => {
-    const codigo = parseInt(formCodigo, 10)
-    if (!Number.isInteger(codigo) || codigo < 1) {
-      setFormError('codigo')
-      return
-    }
-    setFormSaving(true)
-    setFormError(null)
+  const handleDeactivate = async (p: Proveedor) => {
+    if (!p.activo) return
+    setDeactivating(true)
     try {
-      const body = {
-        codigo,
-        rsocial: formRsocial.trim(),
-        fantasia: formFantasia.trim() || null,
-        cuit: formCuit.trim() || null,
-        condIva: formCondIva,
-        telef: formTelef.trim() || null,
-        email: formEmail.trim() || null,
-        activo: formActivo,
-      }
-      if (selected) {
-        await proveedoresAPI.update(selected.id, body)
-      } else {
-        await proveedoresAPI.create(body)
-      }
-      setShowForm(false)
+      await proveedoresAPI.delete(p.id)
       await loadList(filtro)
-    } catch (_) {
-      setFormError(t('form.errors.generic'))
+    } catch {
+      setLoadError(new Error(t('form.errors.deactivateFailed')))
     } finally {
-      setFormSaving(false)
+      setDeactivating(false)
     }
   }
 
@@ -218,7 +175,7 @@ export default function ProveedoresPage() {
           <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100">{t('title')}</h1>
         </div>
 
-        <div className="mb-6 flex flex-wrap gap-4">
+        <div className="mb-6 flex flex-wrap gap-4 items-end">
           <input
             id="search-proveedores"
             type="text"
@@ -227,6 +184,49 @@ export default function ProveedoresPage() {
             onChange={(e) => handleSearch(e.target.value)}
             className="flex-1 min-w-[200px] px-4 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 rounded border border-slate-300 dark:border-slate-600 focus:border-blue-500 focus:outline-none"
           />
+          <div>
+            <label htmlFor="filtro-proveedor-activo" className="block text-xs text-slate-500 mb-1">
+              {t('filters.activo')}
+            </label>
+            <select
+              id="filtro-proveedor-activo"
+              data-testid="filtro-proveedor-activo"
+              value={filtroActivo}
+              onChange={(e) => {
+                const v = e.target.value as 'all' | 'true' | 'false'
+                setFiltroActivo(v)
+                void loadList(filtro, v, filtroCategoria)
+              }}
+              className="px-3 py-2 rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700"
+            >
+              <option value="all">{t('filters.activoAll')}</option>
+              <option value="true">{t('filters.activoOnly')}</option>
+              <option value="false">{t('filters.inactivoOnly')}</option>
+            </select>
+          </div>
+          <div>
+            <label htmlFor="filtro-proveedor-categoria" className="block text-xs text-slate-500 mb-1">
+              {t('filters.categoria')}
+            </label>
+            <select
+              id="filtro-proveedor-categoria"
+              data-testid="filtro-proveedor-categoria"
+              value={filtroCategoria}
+              onChange={(e) => {
+                const v = e.target.value as ProveedorCategoria | ''
+                setFiltroCategoria(v)
+                void loadList(filtro, filtroActivo, v)
+              }}
+              className="px-3 py-2 rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700"
+            >
+              <option value="">{t('filters.categoriaAll')}</option>
+              {CATEGORIAS.map((c) => (
+                <option key={c} value={c}>
+                  {t(`form.categoriaOptions.${c}`)}
+                </option>
+              ))}
+            </select>
+          </div>
           <CanAccess permission="suppliers.manage">
             <button
               type="button"
@@ -242,8 +242,8 @@ export default function ProveedoresPage() {
               type="button"
               data-testid="btn-nuevo-proveedor"
               onClick={() => {
-                setSelected(null)
-                openNewForm()
+                setEditingId(null)
+                setShowForm(true)
               }}
               className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded transition"
             >
@@ -295,7 +295,16 @@ export default function ProveedoresPage() {
                     <td className="px-4 py-3">{p.condIva}</td>
                     <td className="px-4 py-3">{p.telef || '-'}</td>
                     <td className="px-4 py-3 text-center">
-                      {p.activo ? tc('status.active') : tc('status.inactive')}
+                      <span
+                        data-testid={p.activo ? 'proveedor-badge-activo' : 'proveedor-badge-inactivo'}
+                        className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${
+                          p.activo
+                            ? 'bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-200'
+                            : 'bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-300'
+                        }`}
+                      >
+                        {p.activo ? tc('status.active') : tc('status.inactive')}
+                      </span>
                     </td>
                   </tr>
                 ))}
@@ -305,148 +314,38 @@ export default function ProveedoresPage() {
           </AsyncWrapper>
         </div>
 
-        {showForm ? (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <button
-              type="button"
-              className="absolute inset-0 h-full w-full bg-black/50"
-              aria-label={tc('actions.cancel')}
-              onClick={() => setShowForm(false)}
-            />
-            <div
-              role="dialog"
-              aria-modal="true"
-              aria-labelledby="proveedor-form-title"
-              data-testid="dialog-proveedor-form"
-              className="relative z-10 w-full max-w-md rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 p-6 shadow-xl text-slate-900 dark:text-slate-100"
-            >
-              <h2 id="proveedor-form-title" className="text-xl font-semibold mb-2">
-                {selected
-                  ? t('form.titleEdit', { codigo: selected.codigo })
-                  : t('form.titleNew')}
-              </h2>
-              <p className="text-xs text-slate-500 mb-4">{t('form.hint')}</p>
-              {formError ? (
-                <p role="alert" className="text-sm text-red-600 mb-2">
-                  {formError}
-                </p>
+        {proveedores[selectedRow] && (
+          <CanAccess permission="suppliers.manage">
+            <div className="mt-4 flex gap-2">
+              <button
+                type="button"
+                data-testid="btn-editar-proveedor"
+                className="px-4 py-2 rounded border border-slate-300 dark:border-slate-600"
+                onClick={() => openEditForm(proveedores[selectedRow])}
+              >
+                {t('actions.edit')}
+              </button>
+              {proveedores[selectedRow].activo ? (
+                <button
+                  type="button"
+                  data-testid="btn-desactivar-proveedor"
+                  disabled={deactivating}
+                  className="px-4 py-2 rounded border border-red-300 text-red-700 dark:border-red-800 dark:text-red-300 disabled:opacity-50"
+                  onClick={() => void handleDeactivate(proveedores[selectedRow])}
+                >
+                  {t('actions.deactivate')}
+                </button>
               ) : null}
-              <div className="space-y-3">
-                <div>
-                  <label htmlFor="prov-codigo" className="block text-sm font-medium mb-1">
-                    {t('form.codigo')}
-                  </label>
-                  <input
-                    id="prov-codigo"
-                    type="number"
-                    disabled={!!selected}
-                    value={formCodigo}
-                    onChange={(e) => setFormCodigo(e.target.value)}
-                    className="w-full px-3 py-2 rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="prov-rsocial" className="block text-sm font-medium mb-1">
-                    {t('form.rsocial')}
-                  </label>
-                  <input
-                    id="prov-rsocial"
-                    type="text"
-                    value={formRsocial}
-                    onChange={(e) => setFormRsocial(e.target.value)}
-                    className="w-full px-3 py-2 rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="prov-fantasia" className="block text-sm font-medium mb-1">
-                    {t('form.fantasia')}
-                  </label>
-                  <input
-                    id="prov-fantasia"
-                    type="text"
-                    value={formFantasia}
-                    onChange={(e) => setFormFantasia(e.target.value)}
-                    className="w-full px-3 py-2 rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="prov-cuit" className="block text-sm font-medium mb-1">
-                    {t('form.cuit')}
-                  </label>
-                  <input
-                    id="prov-cuit"
-                    type="text"
-                    value={formCuit}
-                    onChange={(e) => setFormCuit(e.target.value)}
-                    className="w-full px-3 py-2 rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="prov-cond" className="block text-sm font-medium mb-1">
-                    {t('form.condIva')}
-                  </label>
-                  <select
-                    id="prov-cond"
-                    value={formCondIva}
-                    onChange={(e) => setFormCondIva(e.target.value as (typeof COND_IVA)[number])}
-                    className="w-full px-3 py-2 rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700"
-                  >
-                    {COND_IVA.map((c) => (
-                      <option key={c} value={c}>
-                        {t(`form.condIvaOptions.${c}` as 'form.condIvaOptions.RI')}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label htmlFor="prov-telef" className="block text-sm font-medium mb-1">
-                    {t('form.telef')}
-                  </label>
-                  <input
-                    id="prov-telef"
-                    type="text"
-                    value={formTelef}
-                    onChange={(e) => setFormTelef(e.target.value)}
-                    className="w-full px-3 py-2 rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="prov-email" className="block text-sm font-medium mb-1">
-                    {t('form.email')}
-                  </label>
-                  <input
-                    id="prov-email"
-                    type="email"
-                    value={formEmail}
-                    onChange={(e) => setFormEmail(e.target.value)}
-                    className="w-full px-3 py-2 rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700"
-                  />
-                </div>
-                <label className="flex items-center gap-2">
-                  <input type="checkbox" checked={formActivo} onChange={(e) => setFormActivo(e.target.checked)} />
-                  {t('form.activo')}
-                </label>
-              </div>
-              <div className="flex justify-end gap-2 mt-6">
-                <button
-                  type="button"
-                  className="px-4 py-2 rounded border border-slate-300 dark:border-slate-600"
-                  onClick={() => setShowForm(false)}
-                >
-                  {tc('actions.cancel')}
-                </button>
-                <button
-                  type="button"
-                  data-testid="btn-guardar-proveedor"
-                  disabled={formSaving}
-                  className="px-4 py-2 rounded bg-blue-600 text-white disabled:opacity-50"
-                  onClick={() => void submitForm()}
-                >
-                  {formSaving ? tc('actions.saving') : tc('actions.save')}
-                </button>
-              </div>
             </div>
-          </div>
+          </CanAccess>
+        )}
+
+        {showForm ? (
+          <ProveedorForm
+            proveedorId={editingId}
+            onClose={() => setShowForm(false)}
+            onSaved={() => void loadList(filtro)}
+          />
         ) : null}
 
         {showImportDialog ? (

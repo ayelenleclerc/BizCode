@@ -62,6 +62,10 @@ export interface Rubro {
   nombre: string
 }
 
+export type ProveedorTipoCuenta = 'cc' | 'ca'
+export type ProveedorCondicionPago = 'contado' | '15dias' | '30dias' | '60dias' | 'otro'
+export type ProveedorCategoria = 'materia_prima' | 'insumos' | 'servicios' | 'logistica'
+
 export interface Proveedor {
   id: number
   codigo: number
@@ -72,6 +76,20 @@ export interface Proveedor {
   telef?: string | null
   email?: string | null
   activo: boolean
+  cbu?: string | null
+  alias?: string | null
+  banco?: string | null
+  tipoCuenta?: ProveedorTipoCuenta | null
+  moneda?: string
+  condicionPago?: ProveedorCondicionPago | null
+  plazoHabitual?: number | null
+  descuentoPct?: number | string | null
+  limiteCredito?: number | string | null
+  categoria?: ProveedorCategoria | null
+  contactoNombre?: string | null
+  contactoEmail?: string | null
+  contactoTel?: string | null
+  notas?: string | null
   createdAt?: Date
   updatedAt?: Date
 }

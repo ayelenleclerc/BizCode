@@ -27,12 +27,30 @@ export function registerProveedoresRoutes(app: Application, ctx: RestRouteContex
       const tenantId = getTenantId(req)
       const filtro = (req.query.q as string) || ''
       const { take, skip } = parseListPagination(req)
-      const where = {
+      const activoParam = req.query.activo
+      let activoFilter: boolean | undefined
+      if (activoParam === 'true') activoFilter = true
+      if (activoParam === 'false') activoFilter = false
+      const categoriaParam = req.query.categoria
+      const categoriaValid = ['materia_prima', 'insumos', 'servicios', 'logistica'] as const
+      const categoriaFilter =
+        typeof categoriaParam === 'string' &&
+        (categoriaValid as readonly string[]).includes(categoriaParam)
+          ? categoriaParam
+          : undefined
+      const codigoFilter = filtro ? parseInt(filtro, 10) : NaN
+      const where: Prisma.ProveedorWhereInput = {
         tenantId,
-        OR: [
-          { rsocial: { contains: filtro, mode: Prisma.QueryMode.insensitive } },
-          { codigo: { equals: filtro ? parseInt(filtro, 10) : undefined } },
-        ],
+        ...(activoFilter !== undefined ? { activo: activoFilter } : {}),
+        ...(categoriaFilter !== undefined ? { categoria: categoriaFilter } : {}),
+        ...(filtro
+          ? {
+              OR: [
+                { rsocial: { contains: filtro, mode: Prisma.QueryMode.insensitive } },
+                ...(Number.isInteger(codigoFilter) ? [{ codigo: { equals: codigoFilter } }] : []),
+              ],
+            }
+          : {}),
       }
       const [total, proveedores] = await Promise.all([
         prisma.proveedor.count({ where }),
@@ -156,6 +174,10 @@ export function registerProveedoresRoutes(app: Application, ctx: RestRouteContex
       await writeAudit(req as AuthenticatedRequest, 'proveedor_create', 'proveedor', String(proveedor.id))
       res.json({ success: true, data: proveedor })
     } catch (err: unknown) {
+      if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') {
+        res.status(409).json({ success: false, error: 'codigo already exists for this tenant' })
+        return
+      }
       res.status(500).json({ success: false, error: errorMessage(err) })
     }
     },
@@ -182,8 +204,36 @@ export function registerProveedoresRoutes(app: Application, ctx: RestRouteContex
       await writeAudit(req as AuthenticatedRequest, 'proveedor_update', 'proveedor', String(proveedor.id))
       res.json({ success: true, data: proveedor })
     } catch (err: unknown) {
+      if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') {
+        res.status(409).json({ success: false, error: 'codigo already exists for this tenant' })
+        return
+      }
       res.status(500).json({ success: false, error: errorMessage(err) })
     }
     },
   )
+
+  app.delete('/api/proveedores/:id', requirePermission('suppliers.manage'), async (req: Request, res: Response) => {
+    try {
+      const tenantId = getTenantId(req)
+      const id = parseInt(String(req.params.id), 10)
+      if (!Number.isInteger(id) || id < 1) {
+        res.status(400).json({ success: false, error: 'Invalid proveedor id' })
+        return
+      }
+      const existing = await prisma.proveedor.findFirst({ where: { id, tenantId } })
+      if (!existing) {
+        res.status(404).json({ success: false, error: 'Proveedor not found' })
+        return
+      }
+      const proveedor = await prisma.proveedor.update({
+        where: { id },
+        data: { activo: false },
+      })
+      await writeAudit(req as AuthenticatedRequest, 'proveedor_deactivate', 'proveedor', String(proveedor.id))
+      res.json({ success: true, data: proveedor })
+    } catch (err: unknown) {
+      res.status(500).json({ success: false, error: errorMessage(err) })
+    }
+  })
 }
