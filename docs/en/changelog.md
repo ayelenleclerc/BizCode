@@ -10,6 +10,8 @@ Versioning: [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **Supplier full profile (GitHub #269):** extended `Proveedor` model (banking, commercial, contact); `GET /api/proveedores` filters `activo`/`categoria`; `DELETE /api/proveedores/{id}` logical deactivate; CBU/CUIT validation; Suppliers UI with collapsible sections; trilingual user manuals and OpenAPI.
+
 - **Libro IVA Compras (GitHub #306):** `ComprobanteCompra` model for supplier fiscal vouchers; `POST /api/comprobantes-compra`; `GET /api/contabilidad/libro-iva-compras` (`reports.financial.read`, module `finance.ledger`) with `format=preview|txt|xlsx` (ZIP `CBTU.txt` + `ALICUOTAS.txt`); Finanzas purchases export section; ADR-0014; OpenAPI and tests (EN/ES/PT-BR).
 
 - **Optional POS printing (hardware opt-in):** `THERMAL_PRINTER_ENABLED` (default off) mirrors fiscal opt-in; `GET /api/printing/status` exposes `thermalPrinterEnabled`; invoice print falls back to legal PDF when devices are disabled; billing UI hides fiscal/thermal actions unless enabled; trilingual [optional-pos-printing.md](en/quality/optional-pos-printing.md). Physical drivers remain optional per customer (GitHub #153 phase 2).

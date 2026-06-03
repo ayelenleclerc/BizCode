@@ -145,6 +145,20 @@ model Proveedor {
   telef     String?  @db.VarChar(25)
   email     String?  @db.VarChar(50)
   activo    Boolean  @default(true)
+  cbu            String?  @db.VarChar(22)
+  alias          String?  @db.VarChar(20)
+  banco          String?  @db.VarChar(50)
+  tipoCuenta     String?  @db.VarChar(2)
+  moneda         String   @default("ARS") @db.VarChar(3)
+  condicionPago  String?  @db.VarChar(10)
+  plazoHabitual  Int?
+  descuentoPct   Decimal? @db.Decimal(5, 2)
+  limiteCredito  Decimal? @db.Decimal(14, 2)
+  categoria      String?  @db.VarChar(20)
+  contactoNombre String?  @db.VarChar(50)
+  contactoEmail  String?  @db.VarChar(50)
+  contactoTel    String?  @db.VarChar(25)
+  notas          String?  @db.Text
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -154,6 +168,8 @@ model Proveedor {
   @@unique([tenantId, codigo])
   @@index([tenantId])
   @@index([tenantId, codigo])
+  @@index([tenantId, activo])
+  @@index([tenantId, categoria])
 }
 
 model OrdenCompra {

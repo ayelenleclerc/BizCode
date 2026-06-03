@@ -6926,17 +6926,53 @@ Requires `settings.business.manage`. Upserts by tenant and codigo.
 
     `boolean`
 
+  - **`alias`**
+
+    `string`
+
+  - **`banco`**
+
+    `string`
+
+  - **`categoria`**
+
+    `string`
+
+  - **`cbu`**
+
+    `string`
+
   - **`codigo`**
 
     `integer`
 
+  - **`condicionPago`**
+
+    `string`
+
   - **`condIva`**
+
+    `string`
+
+  - **`contactoEmail`**
+
+    `string`
+
+  - **`contactoNombre`**
+
+    `string`
+
+  - **`contactoTel`**
 
     `string`
 
   - **`cuit`**
 
     `string`
+
+  - **`descuentoPct`**
+
+    `number`
 
   - **`email`**
 
@@ -6950,11 +6986,31 @@ Requires `settings.business.manage`. Upserts by tenant and codigo.
 
     `integer`
 
+  - **`limiteCredito`**
+
+    `number`
+
+  - **`moneda`**
+
+    `string`
+
+  - **`notas`**
+
+    `string`
+
+  - **`plazoHabitual`**
+
+    `integer`
+
   - **`rsocial`**
 
     `string`
 
   - **`telef`**
+
+    `string`
+
+  - **`tipoCuenta`**
 
     `string`
 
@@ -6990,6 +7046,20 @@ Requires `settings.business.manage`. Upserts by tenant and codigo.
       "telef": "",
       "email": "",
       "activo": true,
+      "cbu": "",
+      "alias": "",
+      "banco": "",
+      "tipoCuenta": "",
+      "moneda": "",
+      "condicionPago": "",
+      "plazoHabitual": 1,
+      "descuentoPct": 1,
+      "limiteCredito": 1,
+      "categoria": "",
+      "contactoNombre": "",
+      "contactoEmail": "",
+      "contactoTel": "",
+      "notas": "",
       "additionalProperty": "anything"
     }
   ],
@@ -7088,9 +7158,45 @@ Requires `settings.business.manage`. Upserts by tenant and codigo.
 
   `string`
 
+- **`alias`**
+
+  `string`
+
+- **`banco`**
+
+  `string`
+
+- **`categoria`**
+
+  `string`, possible values: `"materia_prima", "insumos", "servicios", "logistica"`
+
+- **`cbu`**
+
+  `string`
+
+- **`condicionPago`**
+
+  `string`, possible values: `"contado", "15dias", "30dias", "60dias", "otro"`
+
+- **`contactoEmail`**
+
+  `string`
+
+- **`contactoNombre`**
+
+  `string`
+
+- **`contactoTel`**
+
+  `string`
+
 - **`cuit`**
 
   `string`
+
+- **`descuentoPct`**
+
+  `number`
 
 - **`email`**
 
@@ -7100,9 +7206,29 @@ Requires `settings.business.manage`. Upserts by tenant and codigo.
 
   `string`
 
+- **`limiteCredito`**
+
+  `number`
+
+- **`moneda`**
+
+  `string`, default: `"ARS"`
+
+- **`notas`**
+
+  `string`
+
+- **`plazoHabitual`**
+
+  `integer`
+
 - **`telef`**
 
   `string`
+
+- **`tipoCuenta`**
+
+  `string`, possible values: `"cc", "ca"`
 
 **Example:**
 
@@ -7115,7 +7241,21 @@ Requires `settings.business.manage`. Upserts by tenant and codigo.
   "condIva": "RI",
   "telef": "",
   "email": "",
-  "activo": true
+  "activo": true,
+  "cbu": "",
+  "alias": "",
+  "banco": "",
+  "tipoCuenta": "cc",
+  "moneda": "ARS",
+  "condicionPago": "contado",
+  "plazoHabitual": 0,
+  "descuentoPct": 1,
+  "limiteCredito": 1,
+  "categoria": "materia_prima",
+  "contactoNombre": "",
+  "contactoEmail": "",
+  "contactoTel": "",
+  "notas": ""
 }
 ```
 
@@ -7133,17 +7273,53 @@ Requires `settings.business.manage`. Upserts by tenant and codigo.
 
     `boolean`
 
+  - **`alias`**
+
+    `string`
+
+  - **`banco`**
+
+    `string`
+
+  - **`categoria`**
+
+    `string`
+
+  - **`cbu`**
+
+    `string`
+
   - **`codigo`**
 
     `integer`
 
+  - **`condicionPago`**
+
+    `string`
+
   - **`condIva`**
+
+    `string`
+
+  - **`contactoEmail`**
+
+    `string`
+
+  - **`contactoNombre`**
+
+    `string`
+
+  - **`contactoTel`**
 
     `string`
 
   - **`cuit`**
 
     `string`
+
+  - **`descuentoPct`**
+
+    `number`
 
   - **`email`**
 
@@ -7157,11 +7333,31 @@ Requires `settings.business.manage`. Upserts by tenant and codigo.
 
     `integer`
 
+  - **`limiteCredito`**
+
+    `number`
+
+  - **`moneda`**
+
+    `string`
+
+  - **`notas`**
+
+    `string`
+
+  - **`plazoHabitual`**
+
+    `integer`
+
   - **`rsocial`**
 
     `string`
 
   - **`telef`**
+
+    `string`
+
+  - **`tipoCuenta`**
 
     `string`
 
@@ -7184,6 +7380,20 @@ Requires `settings.business.manage`. Upserts by tenant and codigo.
     "telef": "",
     "email": "",
     "activo": true,
+    "cbu": "",
+    "alias": "",
+    "banco": "",
+    "tipoCuenta": "",
+    "moneda": "",
+    "condicionPago": "",
+    "plazoHabitual": 1,
+    "descuentoPct": 1,
+    "limiteCredito": 1,
+    "categoria": "",
+    "contactoNombre": "",
+    "contactoEmail": "",
+    "contactoTel": "",
+    "notas": "",
     "additionalProperty": "anything"
   }
 }
@@ -7550,6 +7760,20 @@ Requires `settings.business.manage`. Upserts by tenant and codigo.
     "telef": "",
     "email": "",
     "activo": true,
+    "cbu": "",
+    "alias": "",
+    "banco": "",
+    "tipoCuenta": "",
+    "moneda": "",
+    "condicionPago": "",
+    "plazoHabitual": 1,
+    "descuentoPct": 1,
+    "limiteCredito": 1,
+    "categoria": "",
+    "contactoNombre": "",
+    "contactoEmail": "",
+    "contactoTel": "",
+    "notas": "",
     "additionalProperty": "anything"
   }
 }
@@ -7644,9 +7868,45 @@ Requires `settings.business.manage`. Upserts by tenant and codigo.
 
   `string`
 
+- **`alias`**
+
+  `string`
+
+- **`banco`**
+
+  `string`
+
+- **`categoria`**
+
+  `string`, possible values: `"materia_prima", "insumos", "servicios", "logistica"`
+
+- **`cbu`**
+
+  `string`
+
+- **`condicionPago`**
+
+  `string`, possible values: `"contado", "15dias", "30dias", "60dias", "otro"`
+
+- **`contactoEmail`**
+
+  `string`
+
+- **`contactoNombre`**
+
+  `string`
+
+- **`contactoTel`**
+
+  `string`
+
 - **`cuit`**
 
   `string`
+
+- **`descuentoPct`**
+
+  `number`
 
 - **`email`**
 
@@ -7656,9 +7916,29 @@ Requires `settings.business.manage`. Upserts by tenant and codigo.
 
   `string`
 
+- **`limiteCredito`**
+
+  `number`
+
+- **`moneda`**
+
+  `string`, default: `"ARS"`
+
+- **`notas`**
+
+  `string`
+
+- **`plazoHabitual`**
+
+  `integer`
+
 - **`telef`**
 
   `string`
+
+- **`tipoCuenta`**
+
+  `string`, possible values: `"cc", "ca"`
 
 **Example:**
 
@@ -7671,7 +7951,21 @@ Requires `settings.business.manage`. Upserts by tenant and codigo.
   "condIva": "RI",
   "telef": "",
   "email": "",
-  "activo": true
+  "activo": true,
+  "cbu": "",
+  "alias": "",
+  "banco": "",
+  "tipoCuenta": "cc",
+  "moneda": "ARS",
+  "condicionPago": "contado",
+  "plazoHabitual": 0,
+  "descuentoPct": 1,
+  "limiteCredito": 1,
+  "categoria": "materia_prima",
+  "contactoNombre": "",
+  "contactoEmail": "",
+  "contactoTel": "",
+  "notas": ""
 }
 ```
 
@@ -7689,17 +7983,53 @@ Requires `settings.business.manage`. Upserts by tenant and codigo.
 
     `boolean`
 
+  - **`alias`**
+
+    `string`
+
+  - **`banco`**
+
+    `string`
+
+  - **`categoria`**
+
+    `string`
+
+  - **`cbu`**
+
+    `string`
+
   - **`codigo`**
 
     `integer`
 
+  - **`condicionPago`**
+
+    `string`
+
   - **`condIva`**
+
+    `string`
+
+  - **`contactoEmail`**
+
+    `string`
+
+  - **`contactoNombre`**
+
+    `string`
+
+  - **`contactoTel`**
 
     `string`
 
   - **`cuit`**
 
     `string`
+
+  - **`descuentoPct`**
+
+    `number`
 
   - **`email`**
 
@@ -7713,11 +8043,31 @@ Requires `settings.business.manage`. Upserts by tenant and codigo.
 
     `integer`
 
+  - **`limiteCredito`**
+
+    `number`
+
+  - **`moneda`**
+
+    `string`
+
+  - **`notas`**
+
+    `string`
+
+  - **`plazoHabitual`**
+
+    `integer`
+
   - **`rsocial`**
 
     `string`
 
   - **`telef`**
+
+    `string`
+
+  - **`tipoCuenta`**
 
     `string`
 
@@ -7740,6 +8090,20 @@ Requires `settings.business.manage`. Upserts by tenant and codigo.
     "telef": "",
     "email": "",
     "activo": true,
+    "cbu": "",
+    "alias": "",
+    "banco": "",
+    "tipoCuenta": "",
+    "moneda": "",
+    "condicionPago": "",
+    "plazoHabitual": 1,
+    "descuentoPct": 1,
+    "limiteCredito": 1,
+    "categoria": "",
+    "contactoNombre": "",
+    "contactoEmail": "",
+    "contactoTel": "",
+    "notas": "",
     "additionalProperty": "anything"
   }
 }
@@ -7807,6 +8171,221 @@ Requires `settings.business.manage`. Upserts by tenant and codigo.
   "error": ""
 }
 ```
+
+##### Status: 409 Duplicate codigo for tenant
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Deactivate supplier (logical delete)
+
+- **Method:** `DELETE`
+- **Path:** `/api/proveedores/{id}`
+- **Tags:** proveedores
+
+Sets `activo` to false. Does not remove rows referenced by purchase orders or vouchers.
+
+#### Responses
+
+##### Status: 200 Supplier deactivated
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`activo`**
+
+    `boolean`
+
+  - **`alias`**
+
+    `string`
+
+  - **`banco`**
+
+    `string`
+
+  - **`categoria`**
+
+    `string`
+
+  - **`cbu`**
+
+    `string`
+
+  - **`codigo`**
+
+    `integer`
+
+  - **`condicionPago`**
+
+    `string`
+
+  - **`condIva`**
+
+    `string`
+
+  - **`contactoEmail`**
+
+    `string`
+
+  - **`contactoNombre`**
+
+    `string`
+
+  - **`contactoTel`**
+
+    `string`
+
+  - **`cuit`**
+
+    `string`
+
+  - **`descuentoPct`**
+
+    `number`
+
+  - **`email`**
+
+    `string`
+
+  - **`fantasia`**
+
+    `string`
+
+  - **`id`**
+
+    `integer`
+
+  - **`limiteCredito`**
+
+    `number`
+
+  - **`moneda`**
+
+    `string`
+
+  - **`notas`**
+
+    `string`
+
+  - **`plazoHabitual`**
+
+    `integer`
+
+  - **`rsocial`**
+
+    `string`
+
+  - **`telef`**
+
+    `string`
+
+  - **`tipoCuenta`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "codigo": 1,
+    "rsocial": "",
+    "fantasia": "",
+    "cuit": "",
+    "condIva": "",
+    "telef": "",
+    "email": "",
+    "activo": true,
+    "cbu": "",
+    "alias": "",
+    "banco": "",
+    "tipoCuenta": "",
+    "moneda": "",
+    "condicionPago": "",
+    "plazoHabitual": 1,
+    "descuentoPct": 1,
+    "limiteCredito": 1,
+    "categoria": "",
+    "contactoNombre": "",
+    "contactoEmail": "",
+    "contactoTel": "",
+    "notas": "",
+    "additionalProperty": "anything"
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404
 
 ##### Status: 500 Internal server error
 
@@ -31663,9 +32242,45 @@ true
 
   `string`
 
+* **`alias`**
+
+  `string`
+
+* **`banco`**
+
+  `string`
+
+* **`categoria`**
+
+  `string`, possible values: `"materia_prima", "insumos", "servicios", "logistica"`
+
+* **`cbu`**
+
+  `string`
+
+* **`condicionPago`**
+
+  `string`, possible values: `"contado", "15dias", "30dias", "60dias", "otro"`
+
+* **`contactoEmail`**
+
+  `string`
+
+* **`contactoNombre`**
+
+  `string`
+
+* **`contactoTel`**
+
+  `string`
+
 * **`cuit`**
 
   `string`
+
+* **`descuentoPct`**
+
+  `number`
 
 * **`email`**
 
@@ -31675,9 +32290,29 @@ true
 
   `string`
 
+* **`limiteCredito`**
+
+  `number`
+
+* **`moneda`**
+
+  `string`, default: `"ARS"`
+
+* **`notas`**
+
+  `string`
+
+* **`plazoHabitual`**
+
+  `integer`
+
 * **`telef`**
 
   `string`
+
+* **`tipoCuenta`**
+
+  `string`, possible values: `"cc", "ca"`
 
 **Example:**
 
@@ -31690,7 +32325,21 @@ true
   "condIva": "RI",
   "telef": "",
   "email": "",
-  "activo": true
+  "activo": true,
+  "cbu": "",
+  "alias": "",
+  "banco": "",
+  "tipoCuenta": "cc",
+  "moneda": "ARS",
+  "condicionPago": "contado",
+  "plazoHabitual": 0,
+  "descuentoPct": 1,
+  "limiteCredito": 1,
+  "categoria": "materia_prima",
+  "contactoNombre": "",
+  "contactoEmail": "",
+  "contactoTel": "",
+  "notas": ""
 }
 ```
 
@@ -31702,17 +32351,53 @@ true
 
   `boolean`
 
+* **`alias`**
+
+  `string`
+
+* **`banco`**
+
+  `string`
+
+* **`categoria`**
+
+  `string`
+
+* **`cbu`**
+
+  `string`
+
 * **`codigo`**
 
   `integer`
 
+* **`condicionPago`**
+
+  `string`
+
 * **`condIva`**
+
+  `string`
+
+* **`contactoEmail`**
+
+  `string`
+
+* **`contactoNombre`**
+
+  `string`
+
+* **`contactoTel`**
 
   `string`
 
 * **`cuit`**
 
   `string`
+
+* **`descuentoPct`**
+
+  `number`
 
 * **`email`**
 
@@ -31726,11 +32411,31 @@ true
 
   `integer`
 
+* **`limiteCredito`**
+
+  `number`
+
+* **`moneda`**
+
+  `string`
+
+* **`notas`**
+
+  `string`
+
+* **`plazoHabitual`**
+
+  `integer`
+
 * **`rsocial`**
 
   `string`
 
 * **`telef`**
+
+  `string`
+
+* **`tipoCuenta`**
 
   `string`
 
@@ -31747,6 +32452,20 @@ true
   "telef": "",
   "email": "",
   "activo": true,
+  "cbu": "",
+  "alias": "",
+  "banco": "",
+  "tipoCuenta": "",
+  "moneda": "",
+  "condicionPago": "",
+  "plazoHabitual": 1,
+  "descuentoPct": 1,
+  "limiteCredito": 1,
+  "categoria": "",
+  "contactoNombre": "",
+  "contactoEmail": "",
+  "contactoTel": "",
+  "notas": "",
   "additionalProperty": "anything"
 }
 ```
@@ -34641,17 +35360,53 @@ true
 
     `boolean`
 
+  - **`alias`**
+
+    `string`
+
+  - **`banco`**
+
+    `string`
+
+  - **`categoria`**
+
+    `string`
+
+  - **`cbu`**
+
+    `string`
+
   - **`codigo`**
 
     `integer`
 
+  - **`condicionPago`**
+
+    `string`
+
   - **`condIva`**
+
+    `string`
+
+  - **`contactoEmail`**
+
+    `string`
+
+  - **`contactoNombre`**
+
+    `string`
+
+  - **`contactoTel`**
 
     `string`
 
   - **`cuit`**
 
     `string`
+
+  - **`descuentoPct`**
+
+    `number`
 
   - **`email`**
 
@@ -34665,11 +35420,31 @@ true
 
     `integer`
 
+  - **`limiteCredito`**
+
+    `number`
+
+  - **`moneda`**
+
+    `string`
+
+  - **`notas`**
+
+    `string`
+
+  - **`plazoHabitual`**
+
+    `integer`
+
   - **`rsocial`**
 
     `string`
 
   - **`telef`**
+
+    `string`
+
+  - **`tipoCuenta`**
 
     `string`
 
@@ -34692,6 +35467,20 @@ true
     "telef": "",
     "email": "",
     "activo": true,
+    "cbu": "",
+    "alias": "",
+    "banco": "",
+    "tipoCuenta": "",
+    "moneda": "",
+    "condicionPago": "",
+    "plazoHabitual": 1,
+    "descuentoPct": 1,
+    "limiteCredito": 1,
+    "categoria": "",
+    "contactoNombre": "",
+    "contactoEmail": "",
+    "contactoTel": "",
+    "notas": "",
     "additionalProperty": "anything"
   }
 }
@@ -34724,6 +35513,20 @@ true
     "telef": "",
     "email": "",
     "activo": true,
+    "cbu": "",
+    "alias": "",
+    "banco": "",
+    "tipoCuenta": "",
+    "moneda": "",
+    "condicionPago": "",
+    "plazoHabitual": 1,
+    "descuentoPct": 1,
+    "limiteCredito": 1,
+    "categoria": "",
+    "contactoNombre": "",
+    "contactoEmail": "",
+    "contactoTel": "",
+    "notas": "",
     "additionalProperty": "anything"
   }
 }

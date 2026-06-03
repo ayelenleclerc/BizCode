@@ -953,10 +953,49 @@ export const comprasAPI = {
   },
 }
 
+export type ProveedorInputDTO = {
+  codigo: number
+  rsocial: string
+  condIva: 'RI' | 'Mono' | 'CF' | 'Exento'
+  activo: boolean
+  fantasia?: string | null
+  cuit?: string | null
+  telef?: string | null
+  email?: string | null
+  cbu?: string | null
+  alias?: string | null
+  banco?: string | null
+  tipoCuenta?: 'cc' | 'ca' | null
+  moneda?: string
+  condicionPago?: 'contado' | '15dias' | '30dias' | '60dias' | 'otro' | null
+  plazoHabitual?: number | null
+  descuentoPct?: number | null
+  limiteCredito?: number | null
+  categoria?: 'materia_prima' | 'insumos' | 'servicios' | 'logistica' | null
+  contactoNombre?: string | null
+  contactoEmail?: string | null
+  contactoTel?: string | null
+  notas?: string | null
+}
+
+export type ProveedorListParams = {
+  q?: string
+  activo?: boolean
+  categoria?: ProveedorInputDTO['categoria']
+}
+
 export const proveedoresAPI = {
-  list: async (filtro?: string) => {
+  list: async (params?: string | ProveedorListParams) => {
     try {
-      const response = await api.get('/proveedores', { params: { q: filtro } })
+      const query =
+        typeof params === 'string' || params === undefined
+          ? { q: typeof params === 'string' ? params : undefined }
+          : {
+              ...(params.q ? { q: params.q } : {}),
+              ...(params.activo !== undefined ? { activo: String(params.activo) } : {}),
+              ...(params.categoria ? { categoria: params.categoria } : {}),
+            }
+      const response = await api.get('/proveedores', { params: query })
       return response.data.data
     } catch (error) {
       handleError(error as AxiosError<ApiErrorPayload>)
@@ -972,7 +1011,7 @@ export const proveedoresAPI = {
     }
   },
 
-  create: async (data: JsonRecord) => {
+  create: async (data: ProveedorInputDTO) => {
     try {
       const response = await api.post('/proveedores', data)
       return response.data.data
@@ -981,9 +1020,18 @@ export const proveedoresAPI = {
     }
   },
 
-  update: async (id: number, data: JsonRecord) => {
+  update: async (id: number, data: ProveedorInputDTO) => {
     try {
       const response = await api.put(`/proveedores/${id}`, data)
+      return response.data.data
+    } catch (error) {
+      handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  delete: async (id: number) => {
+    try {
+      const response = await api.delete(`/proveedores/${id}`)
       return response.data.data
     } catch (error) {
       handleError(error as AxiosError<ApiErrorPayload>)

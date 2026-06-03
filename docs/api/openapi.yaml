@@ -1242,6 +1242,19 @@ paths:
           required: false
           schema:
             type: string
+        - name: activo
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: ['true', 'false']
+          description: Filter by active flag (logical status).
+        - name: categoria
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [materia_prima, insumos, servicios, logistica]
         - $ref: '#/components/parameters/ListLimit'
         - $ref: '#/components/parameters/ListOffset'
       responses:
@@ -1383,6 +1396,33 @@ paths:
                 $ref: '#/components/schemas/ProveedorEnvelope'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '409':
+          description: Duplicate codigo for tenant
+        '500':
+          $ref: '#/components/responses/ServerError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+    delete:
+      tags: [proveedores]
+      summary: Deactivate supplier (logical delete)
+      description: Sets `activo` to false. Does not remove rows referenced by purchase orders or vouchers.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Supplier deactivated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProveedorEnvelope'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
         '500':
           $ref: '#/components/responses/ServerError'
         '401':
@@ -5957,6 +5997,53 @@ components:
           nullable: true
         activo:
           type: boolean
+        cbu:
+          type: string
+          nullable: true
+          maxLength: 22
+        alias:
+          type: string
+          nullable: true
+        banco:
+          type: string
+          nullable: true
+        tipoCuenta:
+          type: string
+          nullable: true
+          enum: [cc, ca]
+        moneda:
+          type: string
+          default: ARS
+        condicionPago:
+          type: string
+          nullable: true
+          enum: [contado, 15dias, 30dias, 60dias, otro]
+        plazoHabitual:
+          type: integer
+          nullable: true
+          minimum: 0
+        descuentoPct:
+          type: number
+          nullable: true
+        limiteCredito:
+          type: number
+          nullable: true
+        categoria:
+          type: string
+          nullable: true
+          enum: [materia_prima, insumos, servicios, logistica]
+        contactoNombre:
+          type: string
+          nullable: true
+        contactoEmail:
+          type: string
+          nullable: true
+        contactoTel:
+          type: string
+          nullable: true
+        notas:
+          type: string
+          nullable: true
 
     Proveedor:
       type: object
@@ -5984,6 +6071,47 @@ components:
           nullable: true
         activo:
           type: boolean
+        cbu:
+          type: string
+          nullable: true
+        alias:
+          type: string
+          nullable: true
+        banco:
+          type: string
+          nullable: true
+        tipoCuenta:
+          type: string
+          nullable: true
+        moneda:
+          type: string
+        condicionPago:
+          type: string
+          nullable: true
+        plazoHabitual:
+          type: integer
+          nullable: true
+        descuentoPct:
+          type: number
+          nullable: true
+        limiteCredito:
+          type: number
+          nullable: true
+        categoria:
+          type: string
+          nullable: true
+        contactoNombre:
+          type: string
+          nullable: true
+        contactoEmail:
+          type: string
+          nullable: true
+        contactoTel:
+          type: string
+          nullable: true
+        notas:
+          type: string
+          nullable: true
 
     ProveedorListEnvelope:
       allOf:

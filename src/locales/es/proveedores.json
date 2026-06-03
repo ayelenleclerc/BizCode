@@ -4,13 +4,25 @@
   "search": {
     "placeholder": "Buscar por código o razón social... (F2)"
   },
+  "filters": {
+    "activo": "Estado",
+    "activoAll": "Todos",
+    "activoOnly": "Solo activos",
+    "inactivoOnly": "Solo inactivos",
+    "categoria": "Categoría",
+    "categoriaAll": "Todas"
+  },
+  "actions": {
+    "edit": "Editar",
+    "deactivate": "Dar de baja"
+  },
   "table": {
     "codigo": "Código",
     "rsocial": "Razón social",
     "cuit": "CUIT",
     "condIva": "Cond. IVA",
     "telef": "Teléfono",
-    "activo": "Activo"
+    "activo": "Estado"
   },
   "empty": "No hay proveedores. Creá uno con F3.",
   "import": {
@@ -34,6 +46,12 @@
     "titleNew": "Nuevo proveedor",
     "titleEdit": "Editar proveedor #{{codigo}}",
     "hint": "F5=guardar, Esc=cancelar",
+    "sections": {
+      "general": "Datos generales",
+      "banking": "Datos bancarios",
+      "commercial": "Condición comercial",
+      "contact": "Contacto y notas"
+    },
     "codigo": "Código",
     "rsocial": "Razón social",
     "fantasia": "Nombre fantasía",
@@ -42,6 +60,40 @@
     "telef": "Teléfono",
     "email": "Email",
     "activo": "Activo",
+    "cbu": "CBU",
+    "alias": "Alias CBU",
+    "banco": "Banco",
+    "tipoCuenta": "Tipo de cuenta",
+    "tipoCuentaNone": "Sin especificar",
+    "tipoCuentaOptions": {
+      "cc": "Cuenta corriente",
+      "ca": "Caja de ahorro"
+    },
+    "moneda": "Moneda",
+    "condicionPago": "Condición de pago",
+    "condicionPagoNone": "Sin especificar",
+    "condicionPagoOptions": {
+      "contado": "Contado",
+      "15dias": "15 días",
+      "30dias": "30 días",
+      "60dias": "60 días",
+      "otro": "Otro"
+    },
+    "plazoHabitual": "Plazo habitual (días)",
+    "descuentoPct": "Descuento habitual (%)",
+    "limiteCredito": "Límite de crédito",
+    "categoria": "Categoría",
+    "categoriaNone": "Sin categoría",
+    "categoriaOptions": {
+      "materia_prima": "Materia prima",
+      "insumos": "Insumos",
+      "servicios": "Servicios",
+      "logistica": "Logística"
+    },
+    "contactoNombre": "Nombre de contacto",
+    "contactoEmail": "Email de contacto",
+    "contactoTel": "Teléfono de contacto",
+    "notas": "Notas",
     "condIvaOptions": {
       "RI": "RI",
       "Mono": "Monotributo",
@@ -49,7 +101,13 @@
       "Exento": "Exento"
     },
     "errors": {
-      "generic": "Error al guardar proveedor"
+      "generic": "Error al guardar proveedor",
+      "loadFailed": "No se pudo cargar la ficha del proveedor",
+      "deactivateFailed": "No se pudo dar de baja al proveedor",
+      "codigoInvalid": "El código debe ser un entero mayor a cero",
+      "rsocialInvalid": "La razón social debe tener al menos 3 caracteres",
+      "cuitInvalid": "CUIT inválido",
+      "cbuInvalid": "CBU inválido"
     }
   }
 }
