@@ -75,5 +75,22 @@
       "saveFailed": "Could not save AFIP credentials",
       "authFailed": "Could not obtain AFIP ticket"
     }
+  },
+  "printDevices": {
+    "title": "Print devices",
+    "subtitle": "Phase 1: local mock channels without hardware. Real fiscal driver is enabled via FISCAL_PRINTER_ENABLED on the server.",
+    "fiscalEnabled": "Fiscal driver enabled on server",
+    "fiscalDisabled": "Fiscal driver disabled (PDF fallback)",
+    "modeMock": "Mode: mock",
+    "testThermal": "Test thermal print (mock)",
+    "testFiscal": "Test fiscal driver (mock)",
+    "testing": "Testing…",
+    "loadError": "Could not load printing status",
+    "feedback": {
+      "thermalSuccess": "Thermal mock OK (job {{jobId}}).",
+      "fiscalSuccess": "Fiscal mock OK (job {{jobId}}).",
+      "fiscalFallback": "Fiscal disabled: system would use legal PDF.",
+      "error": "Could not run print test"
+    }
   }
 }

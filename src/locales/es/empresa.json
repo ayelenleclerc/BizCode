@@ -75,5 +75,22 @@
       "saveFailed": "No se pudieron guardar las credenciales AFIP",
       "authFailed": "No se pudo obtener el ticket AFIP"
     }
+  },
+  "printDevices": {
+    "title": "Dispositivos de impresión",
+    "subtitle": "Fase 1: canales mock locales sin hardware. El controlador fiscal real se habilita con FISCAL_PRINTER_ENABLED en el servidor.",
+    "fiscalEnabled": "Controlador fiscal habilitado en servidor",
+    "fiscalDisabled": "Controlador fiscal deshabilitado (fallback a PDF)",
+    "modeMock": "Modo: mock",
+    "testThermal": "Probar impresión térmica (mock)",
+    "testFiscal": "Probar controlador fiscal (mock)",
+    "testing": "Probando…",
+    "loadError": "No se pudo cargar el estado de impresión",
+    "feedback": {
+      "thermalSuccess": "Térmica mock OK (job {{jobId}}).",
+      "fiscalSuccess": "Fiscal mock OK (job {{jobId}}).",
+      "fiscalFallback": "Fiscal deshabilitado: el sistema usaría PDF legal.",
+      "error": "No se pudo ejecutar la prueba de impresión"
+    }
   }
 }

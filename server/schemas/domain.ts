@@ -8,6 +8,8 @@ import type {
   DeliveryZoneUpdateParsed,
   EmpresaInput,
   FacturaInput,
+  FacturaPrintInput,
+  PrintingTestInput,
   FacturaItemInput,
   PedidoInput,
   PedidoInvoiceInput,
@@ -468,6 +470,18 @@ export const facturaVoidBodySchema = z.object({
     .min(10, 'motivo must be at least 10 characters')
     .max(FACTURA_VOID_MOTIVO_MAX_LEN, `motivo must be at most ${FACTURA_VOID_MOTIVO_MAX_LEN} characters`),
 })
+
+export const facturaPrintBodySchema = z.object({
+  device: z.enum(['pdf', 'fiscal', 'thermal']),
+}).transform((data): FacturaPrintInput => ({
+  device: data.device,
+}))
+
+export const printingTestBodySchema = z.object({
+  device: z.enum(['fiscal', 'thermal']),
+}).transform((data): PrintingTestInput => ({
+  device: data.device,
+}))
 
 export const deliveryZoneCreateBodySchema = z
   .object({

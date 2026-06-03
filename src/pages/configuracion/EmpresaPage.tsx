@@ -9,6 +9,7 @@ import { hasPermission } from '@/lib/rbac'
 import { validateCUIT } from '@/lib/validators'
 import type { EmpresaConfig } from '@/types'
 import AfipFiscalSection from './AfipFiscalSection'
+import PrintDevicesSection from './PrintDevicesSection'
 
 const EMPRESA_TIMEZONE_OPTIONS = [
   'America/Argentina/Buenos_Aires',
@@ -542,6 +543,7 @@ export default function EmpresaPage() {
       </form>
 
       <AfipFiscalSection />
+      <PrintDevicesSection />
     </div>
   )
 }

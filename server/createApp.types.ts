@@ -72,6 +72,14 @@ export type FacturaInput = {
   items: FacturaItemInput[]
 }
 
+export type FacturaPrintInput = {
+  device: 'pdf' | 'fiscal' | 'thermal'
+}
+
+export type PrintingTestInput = {
+  device: 'fiscal' | 'thermal'
+}
+
 export type CobroInput = {
   clienteId: number
   fecha: string

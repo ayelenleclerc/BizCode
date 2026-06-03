@@ -1456,6 +1456,35 @@ export const facturasAPI = {
       return handleError(error as AxiosError<ApiErrorPayload>)
     }
   },
+
+  print: async (
+    id: number,
+    device: 'pdf' | 'fiscal' | 'thermal',
+  ): Promise<{
+    device: 'pdf' | 'fiscal' | 'thermal'
+    channel: 'pdf' | 'fiscal_mock' | 'thermal_mock'
+    fallbackToPdf: boolean
+    downloadPath?: string
+    jobId?: string
+    transport?: 'mock-serial'
+  }> => {
+    try {
+      const response = await api.post<{
+        success: boolean
+        data: {
+          device: 'pdf' | 'fiscal' | 'thermal'
+          channel: 'pdf' | 'fiscal_mock' | 'thermal_mock'
+          fallbackToPdf: boolean
+          downloadPath?: string
+          jobId?: string
+          transport?: 'mock-serial'
+        }
+      }>(`/facturas/${id}/print`, { device })
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
 }
 
 export const notasCreditoAPI = {
@@ -2317,6 +2346,49 @@ export const ordenesEntregaAPI = {
       return response.data.data as OrdenEntrega
     } catch (error) {
       handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+}
+
+export const printingAPI = {
+  status: async (): Promise<{
+    fiscalPrinterEnabled: boolean
+    fiscalMode: 'mock'
+    thermalMode: 'mock'
+  }> => {
+    try {
+      const response = await api.get<{
+        success: boolean
+        data: { fiscalPrinterEnabled: boolean; fiscalMode: 'mock'; thermalMode: 'mock' }
+      }>('/printing/status')
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+  test: async (
+    device: 'fiscal' | 'thermal',
+  ): Promise<{
+    device: 'fiscal' | 'thermal'
+    channel: 'pdf' | 'fiscal_mock' | 'thermal_mock'
+    fallbackToPdf: boolean
+    jobId?: string
+    transport?: 'mock-serial'
+  }> => {
+    try {
+      const response = await api.post<{
+        success: boolean
+        data: {
+          device: 'fiscal' | 'thermal'
+          channel: 'pdf' | 'fiscal_mock' | 'thermal_mock'
+          fallbackToPdf: boolean
+          jobId?: string
+          transport?: 'mock-serial'
+        }
+      }>('/printing/test', { device })
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
     }
   },
 }

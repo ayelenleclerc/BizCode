@@ -103,5 +103,17 @@
     "ticket": "Ticket 80 mm",
     "previewFrameTitle": "Vista previa del PDF de factura",
     "actions": "Acciones PDF"
+  },
+  "print": {
+    "actionsGroup": "Imprimir con dispositivo",
+    "thermal": "Térmica 80 mm (mock)",
+    "fiscal": "Controlador fiscal (mock)",
+    "legalPdf": "PDF legal",
+    "loading": "Enviando impresión…",
+    "feedback": {
+      "mockSuccess": "Impresión mock enviada (job {{jobId}}).",
+      "fiscalFallbackPdf": "Fiscal deshabilitado: se abrió el PDF legal.",
+      "error": "No se pudo imprimir con el dispositivo seleccionado"
+    }
   }
 }

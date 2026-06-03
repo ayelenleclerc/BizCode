@@ -1,8 +1,8 @@
 ﻿import type { Application, Request, Response } from 'express'
 import { requirePermission, type AuthenticatedRequest } from '../auth'
 import { validateBody } from '../middleware/validateBody'
-import { facturaBodySchema, facturaVoidBodySchema } from '../schemas/domain'
-import type { FacturaInput } from '../createApp.types'
+import { facturaBodySchema, facturaPrintBodySchema, facturaVoidBodySchema } from '../schemas/domain'
+import type { FacturaInput, FacturaPrintInput } from '../createApp.types'
 import { paginatedListJson, parseListPagination } from '../services/listPagination'
 import { dispatchNotification } from '../channels'
 import type { RestRouteContext } from './restRouteTypes'
@@ -15,6 +15,7 @@ import {
 } from '../fiscal/ar/facturaPdf'
 import { requireModule } from '../middleware/requireModule'
 import { errorMessage, getTenantId } from './restDomainShared'
+import { FacturaPrintService } from '../services/FacturaPrintService'
 
 /**
  * @en Invoice create/list and void routes.
@@ -108,6 +109,32 @@ export function registerFacturasRoutes(app: Application, ctx: RestRouteContext):
         res.setHeader('Content-Type', 'application/pdf')
         res.setHeader('Content-Disposition', `inline; filename="${facturaPdfFilename(id, true)}"`)
         res.send(result.data)
+      } catch (err: unknown) {
+        res.status(500).json({ success: false, error: errorMessage(err) })
+      }
+    },
+  )
+
+  app.post(
+    '/api/facturas/:id/print',
+    requirePermission('reports.operational.read'),
+    validateBody(facturaPrintBodySchema),
+    async (req: Request, res: Response) => {
+      try {
+        const tenantId = getTenantId(req)
+        const id = parseInt(String(req.params.id), 10)
+        const body = req.body as FacturaPrintInput
+        const service = new FacturaPrintService(prisma)
+        const result = await service.print({
+          tenantId,
+          facturaId: id,
+          device: body.device,
+        })
+        if (!result.ok) {
+          res.status(result.status).json({ success: false, error: result.error })
+          return
+        }
+        res.json({ success: true, data: result.data })
       } catch (err: unknown) {
         res.status(500).json({ success: false, error: errorMessage(err) })
       }
