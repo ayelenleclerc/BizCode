@@ -10,6 +10,10 @@ Versioning: [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **Log sanitization hardening (GitHub #218):** extended `LOGGER_REDACT_PATHS` catalog in [`server/logRedaction.ts`](../../server/logRedaction.ts), documented log-surface audit and retention/access policy (EN/ES/PT-BR), and `npm run check:logs` guardrail integrated into `docs:validate`. Complements #151 without duplicating observability MVP scope.
+
+- **HTTP security headers (GitHub #214):** `helmet` middleware on the REST API ([`server/middleware/securityHeaders.ts`](../../server/middleware/securityHeaders.ts)) with `X-Frame-Options: DENY`, `X-Content-Type-Options`, CSP, `Referrer-Policy`, and HSTS in production; tests in [`tests/server/security-headers.test.ts`](../../tests/server/security-headers.test.ts). CORS remains env-driven via `CORS_ORIGINS` (existing credentialed SPA behavior).
+
 - **Observability MVP baseline (GitHub #151):** structured server logging with Pino redaction (`password`, `token`, `authorization`, `cookie`, `session`, `secret`, `privateKey`, `certificate`), request correlation via `X-Request-Id`, in-memory technical metrics endpoint `GET /api/metrics` protected with `audit.read`, additive `/api/health` diagnostics (DB check + latency, uptime, version), OpenAPI contract/tests updates, and trilingual observability documentation. External stacks (Prometheus/Grafana/Loki/Datadog/Sentry) and real alerts remain out of scope.
 
 - **Production Docker + deploy workflow baseline (GitHub #149):** added `Dockerfile` (backend), `Dockerfile.frontend` (Vite build + Nginx runtime), `docker-compose.prod.yml` (server + frontend + PostgreSQL with health checks), internal Nginx API proxy config (`deploy/nginx/default.conf`), `.dockerignore`, deploy-ready env reference updates in `.env.example`, and GitHub Actions workflow `.github/workflows/deploy.yml` with always-on build/test + conditional GHCR publish and conditional SSH deploy (requires repository secrets). Production host/domain/certificate values remain external configuration.

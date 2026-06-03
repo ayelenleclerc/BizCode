@@ -17,6 +17,7 @@ import { registerAuditEventRoutes } from './auditEvents'
 import { correlationId } from './middleware/correlationId'
 import { errorHandler } from './middleware/errorHandler'
 import { observabilityMiddleware } from './middleware/observability'
+import { getSecurityHeadersMiddleware } from './middleware/securityHeaders'
 import { routeHttpRateLimiter } from './middleware/routeRateLimit'
 import { tenantContext } from './middleware/tenantContext'
 import { tenantModules } from './middleware/tenantModules'
@@ -79,6 +80,7 @@ function getOpenApiDocument(): Record<string, unknown> {
  */
 export function createApp(prisma: PrismaClient): Application {
   const app = express()
+  app.use(getSecurityHeadersMiddleware())
   app.use(correlationId)
   app.use(routeHttpRateLimiter)
 

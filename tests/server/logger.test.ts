@@ -1,10 +1,23 @@
 import { describe, expect, it } from 'vitest'
 import pino from 'pino'
-import { LOGGER_REDACT_PATHS } from '../../server/logger'
+import { LOGGER_REDACT_PATHS, SENSITIVE_LOG_FIELD_NAMES } from '../../server/logger'
 
 describe('logger redaction policy', () => {
-  it('includes mandatory sensitive keys', () => {
+  it('includes mandatory sensitive keys from #151 and extended catalog (#218)', () => {
     const required = [
+      'password',
+      'token',
+      'authorization',
+      'cookie',
+      'session',
+      'secret',
+      'privateKey',
+      'certificate',
+      'apiKey',
+      'accessToken',
+      'refreshToken',
+      'clientSecret',
+      'cbu',
       '*.password',
       '*.token',
       '*.authorization',
@@ -13,12 +26,16 @@ describe('logger redaction policy', () => {
       '*.secret',
       '*.privateKey',
       '*.certificate',
+      '*.apiKey',
+      '*.accessToken',
       'req.headers.authorization',
       'req.headers.cookie',
+      'req.headers["x-api-key"]',
     ]
     for (const key of required) {
       expect(LOGGER_REDACT_PATHS).toContain(key)
     }
+    expect(SENSITIVE_LOG_FIELD_NAMES.length).toBeGreaterThanOrEqual(12)
   })
 
   it('redacts sensitive values when serializing JSON logs', () => {

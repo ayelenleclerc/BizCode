@@ -14,7 +14,7 @@ Out of scope for this MVP: Prometheus, Grafana, Loki, Datadog, Sentry, and real 
 ## Structured logs
 
 - Log level comes from `LOG_LEVEL` (default `info`, `silent` in tests).
-- Sensitive fields are redacted (`password`, `token`, `authorization`, `cookie`, `session`, `secret`, `privateKey`, `certificate`).
+- Sensitive fields are redacted via `LOGGER_REDACT_PATHS` in [`server/logRedaction.ts`](../../../server/logRedaction.ts) (base keys from #151; extended catalog and audit in [log-sanitization-policy.md](log-sanitization-policy.md) — #218).
 - Request logs store operational metadata only (`requestId`, `method`, normalized `path`, `statusCode`, `durationMs`; `tenantId` and `userId` when available server-side).
 - Full `req.body` payloads are not logged.
 

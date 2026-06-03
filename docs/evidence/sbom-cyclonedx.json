@@ -3,9 +3,9 @@
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
   "version": 1,
-  "serialNumber": "urn:uuid:89c92a42-aa04-471f-b393-e9220fd7a422",
+  "serialNumber": "urn:uuid:faeb05b5-bb29-4f7c-9ebf-cad9fcf7424c",
   "metadata": {
-    "timestamp": "2026-06-03T11:00:47.461Z",
+    "timestamp": "2026-06-03T11:22:14.500Z",
     "tools": {
       "components": [
         {
@@ -1288,6 +1288,40 @@
         {
           "name": "cdx:npm:package:path",
           "value": "node_modules/express"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "helmet",
+      "version": "8.2.0",
+      "bom-ref": "bizcode@0.1.0|helmet@8.2.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/helmet@8.2.0",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/helmet/-/helmet-8.2.0.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "0d181321482759c27ad8ac9aaf1c738aea98c4a1a747a460835f4195bb9c37f7699896e5d573a2b7aaafa0e5f4653f878567b939456153f6b5ce91b2735c40d1"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/helmet"
         }
       ]
     },
@@ -12204,6 +12238,7 @@
         "bizcode@0.1.0|exceljs@4.4.0",
         "bizcode@0.1.0|express-rate-limit@8.4.1",
         "bizcode@0.1.0|express@5.2.1",
+        "bizcode@0.1.0|helmet@8.2.0",
         "bizcode@0.1.0|i18next@26.0.3",
         "bizcode@0.1.0|leaflet@1.9.4",
         "bizcode@0.1.0|multer@2.1.1",
@@ -12500,6 +12535,9 @@
         "bizcode@0.1.0|type-is@2.0.1",
         "bizcode@0.1.0|vary@1.1.2"
       ]
+    },
+    {
+      "ref": "bizcode@0.1.0|helmet@8.2.0"
     },
     {
       "ref": "bizcode@0.1.0|i18next@26.0.3",

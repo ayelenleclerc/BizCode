@@ -1,27 +1,7 @@
 import pino from 'pino'
+import { LOGGER_REDACT_PATHS } from './logRedaction'
 
-export const LOGGER_REDACT_PATHS = [
-  'password',
-  'token',
-  'authorization',
-  'cookie',
-  'session',
-  'secret',
-  'privateKey',
-  'certificate',
-  '*.password',
-  '*.token',
-  '*.authorization',
-  '*.cookie',
-  '*.session',
-  '*.secret',
-  '*.privateKey',
-  '*.certificate',
-  'req.headers.authorization',
-  'req.headers.cookie',
-  'headers.authorization',
-  'headers.cookie',
-]
+export { LOGGER_REDACT_PATHS, SENSITIVE_LOG_FIELD_NAMES } from './logRedaction'
 
 export function createLogger(): pino.Logger {
   return pino({
