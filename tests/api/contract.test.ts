@@ -876,6 +876,38 @@ describe('API — contrato OpenAPI', () => {
     expect(res.body.subarray(0, 4).toString()).toBe('%PDF')
   })
 
+  it('POST /api/facturas/:id/print', async () => {
+    process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
+    process.env.BIZCODE_TEST_ROLE = 'owner'
+    const p = buildPrisma()
+    vi.mocked(p.factura.findFirst).mockResolvedValue({
+      id: 7,
+      tipo: 'B',
+      prefijo: '0001',
+      numero: 77,
+      total: 1200,
+    } as never)
+    const app = createApp(p)
+    const res = await request(app).post('/api/facturas/7/print').send({ device: 'thermal' }).expect(200)
+    await assertMatchesOpenApi('/api/facturas/{id}/print', 'post', '200', res.body)
+  })
+
+  it('GET /api/printing/status', async () => {
+    process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
+    process.env.BIZCODE_TEST_ROLE = 'owner'
+    const app = createApp(buildPrisma())
+    const res = await request(app).get('/api/printing/status').expect(200)
+    await assertMatchesOpenApi('/api/printing/status', 'get', '200', res.body)
+  })
+
+  it('POST /api/printing/test', async () => {
+    process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
+    process.env.BIZCODE_TEST_ROLE = 'owner'
+    const app = createApp(buildPrisma())
+    const res = await request(app).post('/api/printing/test').send({ device: 'thermal' }).expect(200)
+    await assertMatchesOpenApi('/api/printing/test', 'post', '200', res.body)
+  })
+
   it('GET /api/facturas/:id/ticket returns application/pdf', async () => {
     process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
     process.env.BIZCODE_TEST_ROLE = 'owner'

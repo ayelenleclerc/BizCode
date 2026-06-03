@@ -103,5 +103,17 @@
     "ticket": "80mm ticket",
     "previewFrameTitle": "Invoice PDF preview",
     "actions": "PDF actions"
+  },
+  "print": {
+    "actionsGroup": "Print with device",
+    "thermal": "80mm thermal (mock)",
+    "fiscal": "Fiscal printer (mock)",
+    "legalPdf": "Legal PDF",
+    "loading": "Sending print job…",
+    "feedback": {
+      "mockSuccess": "Mock print job sent (job {{jobId}}).",
+      "fiscalFallbackPdf": "Fiscal disabled: opened legal PDF.",
+      "error": "Could not print with the selected device"
+    }
   }
 }

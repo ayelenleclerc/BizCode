@@ -152,6 +152,12 @@
 
 * [FacturaListEnvelope](./facturalistenvelope.md) – `-`
 
+* [FacturaPrintEnvelope](./facturaprintenvelope.md) – `-`
+
+* [FacturaPrintInput](./facturaprintinput.md) – `-`
+
+* [FacturaPrintResult](./facturaprintresult.md) – `-`
+
 * [FacturaVencidaRow](./facturavencidarow.md) – `-`
 
 * [FacturaVoidBalanceCliente](./facturavoidbalancecliente.md) – `-`
@@ -273,6 +279,16 @@
 * [PlanCatalogEnvelope](./plancatalogenvelope.md) – `-`
 
 * [PlanLimitErrorEnvelope](./planlimiterrorenvelope.md) – `-`
+
+* [PrintingStatus](./printingstatus.md) – `-`
+
+* [PrintingStatusEnvelope](./printingstatusenvelope.md) – `-`
+
+* [PrintingTestEnvelope](./printingtestenvelope.md) – `-`
+
+* [PrintingTestInput](./printingtestinput.md) – `-`
+
+* [PrintingTestResult](./printingtestresult.md) – `-`
 
 * [Proveedor](./proveedor.md) – `-`
 

@@ -31,6 +31,7 @@ import { registerAfipRoutes } from './routes/registerAfipRoutes'
 import { registerCobranzasRoutes } from './routes/registerCobranzasRoutes'
 import { registerPedidosRoutes } from './routes/registerPedidosRoutes'
 import { registerEmpresaRoutes } from './routes/registerEmpresaRoutes'
+import { registerPrintingRoutes } from './routes/registerPrintingRoutes'
 import { createDomainServices } from './services/createDomainServices'
 
 /**
@@ -78,6 +79,7 @@ export function registerRestDomainRoutes(app: Application, prisma: PrismaClient)
   registerRepartosRoutes(app, ctx)
   registerLogisticaReportesRoutes(app, ctx)
   registerEmpresaRoutes(app, ctx)
+  registerPrintingRoutes(app)
   registerHealthRoute(app, ctx)
   registerModulesCatalogRoute(app, ctx)
   registerMeFeaturesRoute(app, prisma)

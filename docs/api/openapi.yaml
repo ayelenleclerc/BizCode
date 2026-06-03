@@ -2510,6 +2510,103 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
 
+  /api/facturas/{id}/print:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    post:
+      tags: [facturas]
+      summary: Print invoice using selected device (phase 1 mock)
+      description: |
+        Requires `reports.operational.read`. Phase 1 endpoint for device selection with mocked channels.
+        - `pdf`: returns download path for legal PDF.
+        - `fiscal`: if `FISCAL_PRINTER_ENABLED=false`, automatically falls back to PDF.
+        - `thermal`: executes mock thermal channel (`mock-serial`) without real hardware dependency.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FacturaPrintInput'
+      responses:
+        '200':
+          description: Printing workflow executed (or PDF fallback resolved)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FacturaPrintEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Invoice not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/printing/status:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [printing]
+      summary: Printing device status (phase 1 mock)
+      description: Requires `settings.business.manage`. Returns env-derived fiscal flag and mock channel modes without secrets.
+      responses:
+        '200':
+          description: Printing status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PrintingStatusEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/printing/test:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    post:
+      tags: [printing]
+      summary: Test mock printing device
+      description: |
+        Requires `settings.business.manage`. Runs phase-1 mock adapters with a fixed test payload (no invoice id).
+        When `device` is `fiscal` and `FISCAL_PRINTER_ENABLED` is not `true`, returns HTTP 200 with `fallbackToPdf: true`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PrintingTestInput'
+      responses:
+        '200':
+          description: Mock test executed (or fiscal PDF fallback flag)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PrintingTestEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
   /api/facturas/{id}/pdf:
     parameters:
       - $ref: '#/components/parameters/BizcodeChannelHeader'
@@ -6816,6 +6913,103 @@ components:
           const: true
         data:
           $ref: '#/components/schemas/FacturaVoidResult'
+
+    FacturaPrintInput:
+      type: object
+      required: [device]
+      properties:
+        device:
+          type: string
+          enum: [pdf, fiscal, thermal]
+
+    FacturaPrintResult:
+      type: object
+      required: [device, channel, fallbackToPdf]
+      properties:
+        device:
+          type: string
+          enum: [pdf, fiscal, thermal]
+        channel:
+          type: string
+          enum: [pdf, fiscal_mock, thermal_mock]
+        fallbackToPdf:
+          type: boolean
+        downloadPath:
+          type: string
+        jobId:
+          type: string
+        transport:
+          type: string
+          enum: [mock-serial]
+
+    FacturaPrintEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/FacturaPrintResult'
+
+    PrintingStatus:
+      type: object
+      required: [fiscalPrinterEnabled, fiscalMode, thermalMode]
+      properties:
+        fiscalPrinterEnabled:
+          type: boolean
+        fiscalMode:
+          type: string
+          enum: [mock]
+        thermalMode:
+          type: string
+          enum: [mock]
+
+    PrintingStatusEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/PrintingStatus'
+
+    PrintingTestInput:
+      type: object
+      required: [device]
+      properties:
+        device:
+          type: string
+          enum: [fiscal, thermal]
+
+    PrintingTestResult:
+      type: object
+      required: [device, channel, fallbackToPdf]
+      properties:
+        device:
+          type: string
+          enum: [fiscal, thermal]
+        channel:
+          type: string
+          enum: [pdf, fiscal_mock, thermal_mock]
+        fallbackToPdf:
+          type: boolean
+        jobId:
+          type: string
+        transport:
+          type: string
+          enum: [mock-serial]
+
+    PrintingTestEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/PrintingTestResult'
 
     AfipConfigInput:
       type: object

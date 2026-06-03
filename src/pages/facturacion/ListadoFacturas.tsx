@@ -64,6 +64,9 @@ export default function ListadoFacturas({
   const [pdfError, setPdfError] = useState<string | null>(null)
   const [pdfPreviewUrl, setPdfPreviewUrl] = useState<string | null>(null)
   const [pdfPreviewFilename, setPdfPreviewFilename] = useState('factura.pdf')
+  const [printLoadingId, setPrintLoadingId] = useState<number | null>(null)
+  const [printError, setPrintError] = useState<string | null>(null)
+  const [printFeedback, setPrintFeedback] = useState<string | null>(null)
 
   useEffect(() => {
     return () => {
@@ -154,6 +157,65 @@ export default function ListadoFacturas({
       setPdfError((err as Error).message || t('cae.pdfError'))
     } finally {
       setPdfLoadingId(null)
+    }
+  }
+
+  const handleDevicePrint = async (
+    facturaId: number,
+    device: 'pdf' | 'fiscal' | 'thermal',
+    canDownloadPdf: boolean,
+  ) => {
+    setPrintLoadingId(facturaId)
+    setPrintError(null)
+    setPrintFeedback(null)
+    try {
+      const result = await facturasAPI.print(facturaId, device)
+      if (result.fallbackToPdf && result.downloadPath) {
+        setPdfLoadingId(facturaId)
+        try {
+          const blob = canDownloadPdf
+            ? await facturasAPI.downloadPdf(facturaId)
+            : await facturasAPI.downloadPdfPreview(facturaId)
+          const name = canDownloadPdf ? `factura-${facturaId}.pdf` : `factura-${facturaId}-preview.pdf`
+          if (canDownloadPdf) {
+            triggerBlobDownload(blob, name)
+          } else {
+            openPdfPreview(blob, name)
+          }
+        } catch (err: unknown) {
+          setPrintError((err as Error).message || t('cae.pdfError'))
+        } finally {
+          setPdfLoadingId(null)
+        }
+        setPrintFeedback(t('print.feedback.fiscalFallbackPdf'))
+        return
+      }
+      if (device === 'pdf' && result.downloadPath) {
+        setPdfLoadingId(facturaId)
+        try {
+          const blob = canDownloadPdf
+            ? await facturasAPI.downloadPdf(facturaId)
+            : await facturasAPI.downloadPdfPreview(facturaId)
+          const name = canDownloadPdf ? `factura-${facturaId}.pdf` : `factura-${facturaId}-preview.pdf`
+          if (canDownloadPdf) {
+            triggerBlobDownload(blob, name)
+          } else {
+            openPdfPreview(blob, name)
+          }
+        } catch (err: unknown) {
+          setPrintError((err as Error).message || t('cae.pdfError'))
+        } finally {
+          setPdfLoadingId(null)
+        }
+        return
+      }
+      if (result.jobId) {
+        setPrintFeedback(t('print.feedback.mockSuccess', { jobId: result.jobId }))
+      }
+    } catch (err: unknown) {
+      setPrintError((err as Error).message || t('print.feedback.error'))
+    } finally {
+      setPrintLoadingId(null)
     }
   }
 
@@ -405,6 +467,52 @@ export default function ListadoFacturas({
                         </p>
                       )}
                     </IfModule>
+
+                    <CanAccess permission="reports.operational.read">
+                      <div
+                        className="flex flex-wrap gap-2 mt-2"
+                        role="group"
+                        aria-label={t('print.actionsGroup')}
+                      >
+                        <button
+                          type="button"
+                          data-testid="btn-factura-print-pdf"
+                          disabled={printLoadingId === factura.id || pdfLoadingId === factura.id}
+                          onClick={() => void handleDevicePrint(factura.id, 'pdf', canDownloadPdf)}
+                          className="px-3 py-2 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded transition disabled:opacity-50"
+                        >
+                          {printLoadingId === factura.id ? t('print.loading') : t('print.legalPdf')}
+                        </button>
+                        <button
+                          type="button"
+                          data-testid="btn-factura-print-thermal"
+                          disabled={printLoadingId === factura.id}
+                          onClick={() => void handleDevicePrint(factura.id, 'thermal', canDownloadPdf)}
+                          className="px-3 py-2 text-sm bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-900 dark:text-slate-100 rounded transition disabled:opacity-50"
+                        >
+                          {printLoadingId === factura.id ? t('print.loading') : t('print.thermal')}
+                        </button>
+                        <button
+                          type="button"
+                          data-testid="btn-factura-print-fiscal"
+                          disabled={printLoadingId === factura.id}
+                          onClick={() => void handleDevicePrint(factura.id, 'fiscal', canDownloadPdf)}
+                          className="px-3 py-2 text-sm bg-indigo-600 hover:bg-indigo-700 text-white rounded transition disabled:opacity-50"
+                        >
+                          {printLoadingId === factura.id ? t('print.loading') : t('print.fiscal')}
+                        </button>
+                      </div>
+                      {(printError || printFeedback) && (
+                        <p
+                          data-testid="factura-print-feedback"
+                          className={`text-sm mt-2 ${printError ? 'text-red-600 dark:text-red-400' : 'text-green-700 dark:text-green-300'}`}
+                          role="alert"
+                          aria-live="polite"
+                        >
+                          {printError ?? printFeedback}
+                        </p>
+                      )}
+                    </CanAccess>
 
                     {factura.estado === 'A' && (
                       <IfModule flag="billing.credit_notes">

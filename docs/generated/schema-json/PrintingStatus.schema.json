@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "fiscalMode": {
+      "enum": [
+        "mock"
+      ],
+      "type": "string"
+    },
+    "fiscalPrinterEnabled": {
+      "type": "boolean"
+    },
+    "thermalMode": {
+      "enum": [
+        "mock"
+      ],
+      "type": "string"
+    }
+  },
+  "required": [
+    "fiscalPrinterEnabled",
+    "fiscalMode",
+    "thermalMode"
+  ],
+  "title": "PrintingStatus",
+  "type": "object"
+}

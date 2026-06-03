@@ -15458,6 +15458,475 @@ Requires `reports.operational.read`. Thermal-style ticket for counter use. When 
 }
 ```
 
+### PARAMETERS /api/facturas/{id}/print
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/facturas/{id}/print`
+
+### Print invoice using selected device (phase 1 mock)
+
+- **Method:** `POST`
+- **Path:** `/api/facturas/{id}/print`
+- **Tags:** facturas
+
+Requires `reports.operational.read`. Phase 1 endpoint for device selection with mocked channels.
+
+- `pdf`: returns download path for legal PDF.
+- `fiscal`: if `FISCAL_PRINTER_ENABLED=false`, automatically falls back to PDF.
+- `thermal`: executes mock thermal channel (`mock-serial`) without real hardware dependency.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`device` (required)**
+
+  `string`, possible values: `"pdf", "fiscal", "thermal"`
+
+**Example:**
+
+```json
+{
+  "device": "pdf"
+}
+```
+
+#### Responses
+
+##### Status: 200 Printing workflow executed (or PDF fallback resolved)
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`channel` (required)**
+
+    `string`, possible values: `"pdf", "fiscal_mock", "thermal_mock"`
+
+  - **`device` (required)**
+
+    `string`, possible values: `"pdf", "fiscal", "thermal"`
+
+  - **`fallbackToPdf` (required)**
+
+    `boolean`
+
+  - **`downloadPath`**
+
+    `string`
+
+  - **`jobId`**
+
+    `string`
+
+  - **`transport`**
+
+    `string`, possible values: `"mock-serial"`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "device": "pdf",
+    "channel": "pdf",
+    "fallbackToPdf": true,
+    "downloadPath": "",
+    "jobId": "",
+    "transport": "mock-serial"
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Invoice not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/printing/status
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/printing/status`
+
+### Printing device status (phase 1 mock)
+
+- **Method:** `GET`
+- **Path:** `/api/printing/status`
+- **Tags:** printing
+
+Requires `settings.business.manage`. Returns env-derived fiscal flag and mock channel modes without secrets.
+
+#### Responses
+
+##### Status: 200 Printing status
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`fiscalMode` (required)**
+
+    `string`, possible values: `"mock"`
+
+  - **`fiscalPrinterEnabled` (required)**
+
+    `boolean`
+
+  - **`thermalMode` (required)**
+
+    `string`, possible values: `"mock"`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "fiscalPrinterEnabled": true,
+    "fiscalMode": "mock",
+    "thermalMode": "mock"
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/printing/test
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/printing/test`
+
+### Test mock printing device
+
+- **Method:** `POST`
+- **Path:** `/api/printing/test`
+- **Tags:** printing
+
+Requires `settings.business.manage`. Runs phase-1 mock adapters with a fixed test payload (no invoice id). When `device` is `fiscal` and `FISCAL_PRINTER_ENABLED` is not `true`, returns HTTP 200 with `fallbackToPdf: true`.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`device` (required)**
+
+  `string`, possible values: `"fiscal", "thermal"`
+
+**Example:**
+
+```json
+{
+  "device": "fiscal"
+}
+```
+
+#### Responses
+
+##### Status: 200 Mock test executed (or fiscal PDF fallback flag)
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`channel` (required)**
+
+    `string`, possible values: `"pdf", "fiscal_mock", "thermal_mock"`
+
+  - **`device` (required)**
+
+    `string`, possible values: `"fiscal", "thermal"`
+
+  - **`fallbackToPdf` (required)**
+
+    `boolean`
+
+  - **`jobId`**
+
+    `string`
+
+  - **`transport`**
+
+    `string`, possible values: `"mock-serial"`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "device": "fiscal",
+    "channel": "pdf",
+    "fallbackToPdf": true,
+    "jobId": "",
+    "transport": "mock-serial"
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ### PARAMETERS /api/facturas/{id}/pdf
 
 - **Method:** `PARAMETERS`
@@ -35640,6 +36109,277 @@ Originating invoice header (selected columns)
       "balance": 1,
       "creditLimit": 1
     }
+  }
+}
+```
+
+### FacturaPrintInput
+
+- **Type:**`object`
+
+* **`device` (required)**
+
+  `string`, possible values: `"pdf", "fiscal", "thermal"`
+
+**Example:**
+
+```json
+{
+  "device": "pdf"
+}
+```
+
+### FacturaPrintResult
+
+- **Type:**`object`
+
+* **`channel` (required)**
+
+  `string`, possible values: `"pdf", "fiscal_mock", "thermal_mock"`
+
+* **`device` (required)**
+
+  `string`, possible values: `"pdf", "fiscal", "thermal"`
+
+* **`fallbackToPdf` (required)**
+
+  `boolean`
+
+* **`downloadPath`**
+
+  `string`
+
+* **`jobId`**
+
+  `string`
+
+* **`transport`**
+
+  `string`, possible values: `"mock-serial"`
+
+**Example:**
+
+```json
+{
+  "device": "pdf",
+  "channel": "pdf",
+  "fallbackToPdf": true,
+  "downloadPath": "",
+  "jobId": "",
+  "transport": "mock-serial"
+}
+```
+
+### FacturaPrintEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`channel` (required)**
+
+    `string`, possible values: `"pdf", "fiscal_mock", "thermal_mock"`
+
+  - **`device` (required)**
+
+    `string`, possible values: `"pdf", "fiscal", "thermal"`
+
+  - **`fallbackToPdf` (required)**
+
+    `boolean`
+
+  - **`downloadPath`**
+
+    `string`
+
+  - **`jobId`**
+
+    `string`
+
+  - **`transport`**
+
+    `string`, possible values: `"mock-serial"`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "device": "pdf",
+    "channel": "pdf",
+    "fallbackToPdf": true,
+    "downloadPath": "",
+    "jobId": "",
+    "transport": "mock-serial"
+  }
+}
+```
+
+### PrintingStatus
+
+- **Type:**`object`
+
+* **`fiscalMode` (required)**
+
+  `string`, possible values: `"mock"`
+
+* **`fiscalPrinterEnabled` (required)**
+
+  `boolean`
+
+* **`thermalMode` (required)**
+
+  `string`, possible values: `"mock"`
+
+**Example:**
+
+```json
+{
+  "fiscalPrinterEnabled": true,
+  "fiscalMode": "mock",
+  "thermalMode": "mock"
+}
+```
+
+### PrintingStatusEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`fiscalMode` (required)**
+
+    `string`, possible values: `"mock"`
+
+  - **`fiscalPrinterEnabled` (required)**
+
+    `boolean`
+
+  - **`thermalMode` (required)**
+
+    `string`, possible values: `"mock"`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "fiscalPrinterEnabled": true,
+    "fiscalMode": "mock",
+    "thermalMode": "mock"
+  }
+}
+```
+
+### PrintingTestInput
+
+- **Type:**`object`
+
+* **`device` (required)**
+
+  `string`, possible values: `"fiscal", "thermal"`
+
+**Example:**
+
+```json
+{
+  "device": "fiscal"
+}
+```
+
+### PrintingTestResult
+
+- **Type:**`object`
+
+* **`channel` (required)**
+
+  `string`, possible values: `"pdf", "fiscal_mock", "thermal_mock"`
+
+* **`device` (required)**
+
+  `string`, possible values: `"fiscal", "thermal"`
+
+* **`fallbackToPdf` (required)**
+
+  `boolean`
+
+* **`jobId`**
+
+  `string`
+
+* **`transport`**
+
+  `string`, possible values: `"mock-serial"`
+
+**Example:**
+
+```json
+{
+  "device": "fiscal",
+  "channel": "pdf",
+  "fallbackToPdf": true,
+  "jobId": "",
+  "transport": "mock-serial"
+}
+```
+
+### PrintingTestEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`channel` (required)**
+
+    `string`, possible values: `"pdf", "fiscal_mock", "thermal_mock"`
+
+  - **`device` (required)**
+
+    `string`, possible values: `"fiscal", "thermal"`
+
+  - **`fallbackToPdf` (required)**
+
+    `boolean`
+
+  - **`jobId`**
+
+    `string`
+
+  - **`transport`**
+
+    `string`, possible values: `"mock-serial"`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "device": "fiscal",
+    "channel": "pdf",
+    "fallbackToPdf": true,
+    "jobId": "",
+    "transport": "mock-serial"
   }
 }
 ```
