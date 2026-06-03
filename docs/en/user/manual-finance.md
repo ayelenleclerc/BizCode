@@ -45,6 +45,15 @@ With module **`finance.ledger`** enabled, a **Accounting — VAT sales book** se
 3. **Download ARCA (ZIP)** — `format=txt` → `CBTV.txt` + `ALICUOTAS.txt`.
 4. **Download Excel** — internal review only.
 
-**Libro IVA Compras** is **not** implemented in Fase 1; purchase orders do not yet model supplier fiscal vouchers.
+## VAT purchases book (`finance.ledger`, #306)
+
+With **`finance.ledger`**, an **Accounting — VAT purchases book** section appears below sales:
+
+1. Register supplier vouchers via API `POST /api/comprobantes-compra` (fiscal header: tipo A/B/C, netos, IVA, supplier punto de venta and number).
+2. Select **period** and review **preview** (CBTU / ALICUOTAS counts). See [ADR-0014](../adr/ADR-0014-libro-iva-compras.md).
+3. **Download ARCA (ZIP)** — `CBTU.txt` + `ALICUOTAS.txt`.
+4. **Download Excel** — internal review only.
+
+Purchase orders (`OrdenCompra`) do **not** substitute for supplier fiscal vouchers.
 
 **Other languages:** [Español](../../es/user/manual-finanzas.md) · [Português](../../pt-br/user/manual-financas.md)

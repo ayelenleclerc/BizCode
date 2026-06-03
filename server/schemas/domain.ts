@@ -1380,6 +1380,36 @@ export const libroIvaVentasQuerySchema = z.object({
   format: z.enum(['txt', 'xlsx', 'preview']).default('preview'),
 })
 
+export const libroIvaComprasQuerySchema = libroIvaVentasQuerySchema
+
+/** @en Supplier purchase voucher body (#306). */
+export const comprobanteCompraBodySchema = z
+  .object({
+    fecha: z.string(),
+    tipo: z.enum(['A', 'B', 'C'], {
+      required_error: 'tipo must be A, B or C',
+      invalid_type_error: 'tipo must be A, B or C',
+    }),
+    prefijo: z.string().min(1).max(4),
+    numero: z.number().int().min(1),
+    proveedorId: z.number().int().min(1),
+    ordenCompraId: z.number().int().min(1).optional(),
+    neto1: z.number().min(0),
+    neto2: z.number().min(0),
+    neto3: z.number().min(0),
+    iva1: z.number().min(0),
+    iva2: z.number().min(0),
+    total: z.number().min(0),
+    cae: z.string().max(20).optional(),
+    caeVto: z.string().optional(),
+  })
+  .superRefine((data, ctx) => {
+    const f = data.fecha.trim()
+    if (f.length === 0) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'fecha is required', path: ['fecha'] })
+    }
+  })
+
 export function safeParseBodySchema<S extends z.ZodTypeAny>(schema: S, raw: unknown): SafeParseBodyResult<z.output<S>> {
   const parsed = schema.safeParse(raw)
   if (!parsed.success) {

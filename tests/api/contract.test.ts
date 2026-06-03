@@ -311,6 +311,30 @@ function buildPrisma(): PrismaClient {
       findMany: vi.fn().mockResolvedValue([]),
       findFirst: vi.fn().mockResolvedValue(null),
     },
+    comprobanteCompra: {
+      findMany: vi.fn().mockResolvedValue([]),
+      create: vi.fn().mockResolvedValue({
+        id: 1,
+        tenantId: 1,
+        proveedorId: 1,
+        ordenCompraId: null,
+        fecha: new Date('2026-05-10T12:00:00.000Z'),
+        tipo: 'B',
+        prefijo: '0001',
+        numero: 1,
+        neto1: 100,
+        neto2: 0,
+        neto3: 0,
+        iva1: 21,
+        iva2: 0,
+        total: 121,
+        cae: null,
+        caeVto: null,
+        estado: 'A',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      }),
+    },
     cobro: {
       findMany: vi.fn().mockResolvedValue([]),
     },
@@ -789,6 +813,38 @@ describe('API — contrato OpenAPI', () => {
       .expect(200)
     await assertMatchesOpenApi('/api/contabilidad/libro-iva-ventas', 'get', '200', res.body)
     expect(res.body.data.periodo).toBe('2026-05')
+  })
+
+  it('GET /api/contabilidad/libro-iva-compras preview', async () => {
+    const app = createApp(prisma)
+    const res = await request(app)
+      .get('/api/contabilidad/libro-iva-compras')
+      .query({ periodo: '2026-05', format: 'preview' })
+      .expect(200)
+    await assertMatchesOpenApi('/api/contabilidad/libro-iva-compras', 'get', '200', res.body)
+    expect(res.body.data.periodo).toBe('2026-05')
+  })
+
+  it('POST /api/comprobantes-compra', async () => {
+    const app = createApp(prisma)
+    const res = await request(app)
+      .post('/api/comprobantes-compra')
+      .send({
+        fecha: '2026-05-10T12:00:00.000Z',
+        tipo: 'B',
+        prefijo: '0001',
+        numero: 1,
+        proveedorId: 1,
+        neto1: 100,
+        neto2: 0,
+        neto3: 0,
+        iva1: 21,
+        iva2: 0,
+        total: 121,
+      })
+      .expect(201)
+    await assertMatchesOpenApi('/api/comprobantes-compra', 'post', '201', res.body)
+    expect(res.body.data.id).toBe(1)
   })
 
   it('GET /api/facturas', async () => {

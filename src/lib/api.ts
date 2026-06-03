@@ -1532,6 +1532,35 @@ export type LibroIvaVentasPreviewDTO = {
   arcaValidationPending: true
 }
 
+export type LibroIvaComprasPreviewDTO = {
+  periodo: string
+  recordCountCbtu: number
+  recordCountAlicuotas: number
+  totalsByAlicuota: { alicuotaCode: string; neto: number; iva: number }[]
+  totalNeto: number
+  totalIva: number
+  totalExento: number
+  totalGeneral: number
+  arcaValidationPending: true
+}
+
+export type ComprobanteCompraInputDTO = {
+  fecha: string
+  tipo: 'A' | 'B' | 'C'
+  prefijo: string
+  numero: number
+  proveedorId: number
+  ordenCompraId?: number
+  neto1: number
+  neto2: number
+  neto3: number
+  iva1: number
+  iva2: number
+  total: number
+  cae?: string
+  caeVto?: string
+}
+
 export const contabilidadAPI = {
   libroIvaVentasPreview: async (periodo: string): Promise<LibroIvaVentasPreviewDTO> => {
     try {
@@ -1555,6 +1584,47 @@ export const contabilidadAPI = {
         responseType: 'blob',
       })
       return response.data as Blob
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  libroIvaComprasPreview: async (periodo: string): Promise<LibroIvaComprasPreviewDTO> => {
+    try {
+      const response = await api.get<{ success: boolean; data: LibroIvaComprasPreviewDTO }>(
+        '/contabilidad/libro-iva-compras',
+        { params: { periodo, format: 'preview' } },
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  downloadLibroIvaCompras: async (
+    periodo: string,
+    format: 'txt' | 'xlsx',
+  ): Promise<Blob> => {
+    try {
+      const response = await api.get('/contabilidad/libro-iva-compras', {
+        params: { periodo, format },
+        responseType: 'blob',
+      })
+      return response.data as Blob
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  createComprobanteCompra: async (
+    body: ComprobanteCompraInputDTO,
+  ): Promise<{ id: number }> => {
+    try {
+      const response = await api.post<{ success: boolean; data: { id: number } }>(
+        '/comprobantes-compra',
+        body,
+      )
+      return response.data.data
     } catch (error) {
       return handleError(error as AxiosError<ApiErrorPayload>)
     }
