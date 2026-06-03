@@ -42,6 +42,6 @@ Com o módulo **`finance.ledger`**, a seção **Contabilidade — Livro IVA Vend
 
 ## Livro IVA Compras (`finance.ledger`, #306)
 
-Abaixo de vendas, **Contabilidade — Livro IVA Compras**: registre comprovantes via `POST /api/comprobantes-compra`, escolha o **período**, pré-visualize (CBTU / ALICUOTAS) e baixe ZIP ou Excel ([ADR-0014](../adr/ADR-0014-libro-iva-compras.md)). Ordens de compra não substituem comprovantes fiscais de fornecedor.
+Abaixo de vendas, **Contabilidade — Livro IVA Compras**: use o formulário **Cadastro de comprovante de compra** (fornecedor, data, tipo A/B/C, PV, número, líquidos, IVA, total; CAE opcional). A API `POST /api/comprobantes-compra` permanece para integrações. Escolha o **período**, pré-visualize (CBTU / ALICUOTAS) e baixe ZIP ou Excel ([ADR-0014](../adr/ADR-0014-libro-iva-compras.md)). Ordens de compra não substituem comprovantes fiscais de fornecedor.
 
 **Outros idiomas:** [English](../../en/user/manual-finance.md) · [Español](../../es/user/manual-finanzas.md)

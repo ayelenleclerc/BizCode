@@ -102,7 +102,7 @@
   },
   "libroIvaCompras": {
     "title": "Contabilidad — Libro IVA Compras",
-    "hint": "Exportá el Libro IVA Compras (CBTU) desde comprobantes de proveedor registrados con POST /api/comprobantes-compra. Requiere módulo finance.ledger (ADR-0014).",
+    "hint": "Registrá comprobantes de proveedor con el formulario de abajo, revisá la vista previa por período y exportá ARCA o Excel. Requiere módulo finance.ledger (ADR-0014).",
     "periodo": "Período (mes)",
     "downloadTxt": "Descargar ARCA (ZIP)",
     "downloadXlsx": "Descargar Excel",
@@ -117,5 +117,31 @@
     "colAlicuota": "Código alícuota",
     "colNeto": "Neto",
     "colIva": "IVA"
+  },
+  "comprobanteCompra": {
+    "formTitle": "Alta de comprobante de compra",
+    "proveedor": "Proveedor",
+    "selectProveedor": "Seleccionar proveedor…",
+    "fecha": "Fecha del comprobante",
+    "tipo": "Tipo (A/B/C)",
+    "prefijo": "Punto de venta",
+    "numero": "Número",
+    "neto1": "Neto gravado 1",
+    "neto2": "Neto gravado 2",
+    "neto3": "Neto gravado 3",
+    "iva1": "IVA 1",
+    "iva2": "IVA 2",
+    "total": "Total",
+    "cae": "CAE (opcional)",
+    "caeVto": "Vencimiento CAE (opcional)",
+    "submit": "Guardar comprobante",
+    "saving": "Guardando…",
+    "saved": "Comprobante guardado (id {{id}}). La vista previa se actualizó.",
+    "errors": {
+      "proveedorRequired": "Seleccioná un proveedor.",
+      "numeroInvalid": "El número debe ser un entero mayor a cero.",
+      "prefijoRequired": "Ingresá el punto de venta.",
+      "saveFailed": "No se pudo guardar el comprobante."
+    }
   }
 }

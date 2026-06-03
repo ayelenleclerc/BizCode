@@ -102,7 +102,7 @@
   },
   "libroIvaCompras": {
     "title": "Accounting — VAT purchases book",
-    "hint": "Export Libro IVA Compras (CBTU) from supplier vouchers registered via POST /api/comprobantes-compra. Module finance.ledger required (ADR-0014).",
+    "hint": "Register supplier vouchers with the form below, review the period preview, then export ARCA or Excel. Module finance.ledger required (ADR-0014).",
     "periodo": "Period (month)",
     "downloadTxt": "Download ARCA (ZIP)",
     "downloadXlsx": "Download Excel",
@@ -117,5 +117,31 @@
     "colAlicuota": "Rate code",
     "colNeto": "Net",
     "colIva": "VAT"
+  },
+  "comprobanteCompra": {
+    "formTitle": "Register purchase voucher",
+    "proveedor": "Supplier",
+    "selectProveedor": "Select supplier…",
+    "fecha": "Voucher date",
+    "tipo": "Type (A/B/C)",
+    "prefijo": "Point of sale",
+    "numero": "Number",
+    "neto1": "Taxable net 1",
+    "neto2": "Taxable net 2",
+    "neto3": "Taxable net 3",
+    "iva1": "VAT 1",
+    "iva2": "VAT 2",
+    "total": "Total",
+    "cae": "CAE (optional)",
+    "caeVto": "CAE expiry (optional)",
+    "submit": "Save voucher",
+    "saving": "Saving…",
+    "saved": "Voucher saved (id {{id}}). Preview refreshed.",
+    "errors": {
+      "proveedorRequired": "Select a supplier.",
+      "numeroInvalid": "Number must be a positive integer.",
+      "prefijoRequired": "Enter point of sale.",
+      "saveFailed": "Could not save the voucher."
+    }
   }
 }

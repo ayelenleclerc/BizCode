@@ -3,7 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import '@/i18n/config'
 import FinanzasPage from './index'
-import { cobranzasAPI, contabilidadAPI, notasCreditoAPI, reportesAPI } from '@/lib/api'
+import { cobranzasAPI, contabilidadAPI, notasCreditoAPI, proveedoresAPI, reportesAPI } from '@/lib/api'
 import { useAuth } from '@/contexts/AuthContext'
 import { useFeatureFlags } from '@/contexts/FeatureFlagsContext'
 import type { AuthClaims, Permission } from '@/lib/rbac'
@@ -54,6 +54,10 @@ vi.mock('@/lib/api', async () => {
       downloadLibroIvaVentas: vi.fn(),
       libroIvaComprasPreview: vi.fn(),
       downloadLibroIvaCompras: vi.fn(),
+      createComprobanteCompra: vi.fn(),
+    },
+    proveedoresAPI: {
+      list: vi.fn(),
     },
   }
 })
@@ -97,16 +101,43 @@ describe('FinanzasPage', () => {
       totalGeneral: 121,
       arcaValidationPending: true,
     })
-    vi.mocked(contabilidadAPI.libroIvaComprasPreview).mockResolvedValue({
-      periodo: '2026-05',
-      recordCountCbtu: 0,
-      recordCountAlicuotas: 0,
-      totalsByAlicuota: [],
-      totalNeto: 0,
-      totalIva: 0,
-      totalExento: 0,
-      totalGeneral: 0,
-      arcaValidationPending: true,
+    vi.mocked(proveedoresAPI.list).mockResolvedValue([
+      {
+        id: 1,
+        codigo: 100,
+        rsocial: 'Proveedor Test SA',
+        condIva: 'RI',
+        activo: true,
+      },
+    ])
+    vi.mocked(contabilidadAPI.createComprobanteCompra).mockResolvedValue({ id: 42 })
+    let comprasPreviewCalls = 0
+    vi.mocked(contabilidadAPI.libroIvaComprasPreview).mockImplementation(async () => {
+      comprasPreviewCalls += 1
+      if (comprasPreviewCalls === 1) {
+        return {
+          periodo: '2026-05',
+          recordCountCbtu: 0,
+          recordCountAlicuotas: 0,
+          totalsByAlicuota: [],
+          totalNeto: 0,
+          totalIva: 0,
+          totalExento: 0,
+          totalGeneral: 0,
+          arcaValidationPending: true,
+        }
+      }
+      return {
+        periodo: '2026-05',
+        recordCountCbtu: 1,
+        recordCountAlicuotas: 1,
+        totalsByAlicuota: [{ alicuotaCode: '0005', neto: 100, iva: 21 }],
+        totalNeto: 100,
+        totalIva: 21,
+        totalExento: 0,
+        totalGeneral: 121,
+        arcaValidationPending: true,
+      }
     })
     vi.mocked(reportesAPI.aging).mockResolvedValue({
       buckets: [
@@ -210,6 +241,42 @@ describe('FinanzasPage', () => {
       expect(contabilidadAPI.libroIvaComprasPreview).toHaveBeenCalled()
     })
     expect(await screen.findByTestId('finanzas-libro-iva-compras-preview')).toBeInTheDocument()
+    expect(screen.getByTestId('finanzas-comprobante-compra-form')).toBeInTheDocument()
+  })
+
+  it('registra comprobante de compra y refresca preview', async () => {
+    const user = userEvent.setup()
+    render(<FinanzasPage />)
+    await screen.findByTestId('finanzas-comprobante-compra-form')
+    await waitFor(() => {
+      expect(proveedoresAPI.list).toHaveBeenCalled()
+    })
+    await user.selectOptions(screen.getByTestId('finanzas-comprobante-compra-proveedor'), '1')
+    await user.clear(screen.getByTestId('finanzas-comprobante-compra-neto1'))
+    await user.type(screen.getByTestId('finanzas-comprobante-compra-neto1'), '100')
+    await user.clear(screen.getByTestId('finanzas-comprobante-compra-iva1'))
+    await user.type(screen.getByTestId('finanzas-comprobante-compra-iva1'), '21')
+    await user.clear(screen.getByTestId('finanzas-comprobante-compra-total'))
+    await user.type(screen.getByTestId('finanzas-comprobante-compra-total'), '121')
+    await user.click(screen.getByTestId('finanzas-comprobante-compra-submit'))
+    await waitFor(() => {
+      expect(contabilidadAPI.createComprobanteCompra).toHaveBeenCalledWith(
+        expect.objectContaining({
+          proveedorId: 1,
+          tipo: 'B',
+          prefijo: '0001',
+          numero: 1,
+          neto1: 100,
+          iva1: 21,
+          total: 121,
+        }),
+      )
+    })
+    await waitFor(() => {
+      expect(contabilidadAPI.libroIvaComprasPreview).toHaveBeenCalledTimes(2)
+    })
+    expect(await screen.findByTestId('finanzas-comprobante-compra-success')).toBeInTheDocument()
+    expect(await screen.findByTestId('finanzas-libro-iva-compras-count-cbtu')).toHaveTextContent('1')
   })
 
   it('abre cuenta corriente con cliente válido', async () => {
