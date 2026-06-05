@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor, within } from '@testing-library/react'
 import { describe, expect, it, vi, beforeEach } from 'vitest'
 import ProveedorCuentaCorrienteSection from './ProveedorCuentaCorrienteSection'
 
@@ -56,17 +56,20 @@ vi.mock('@/components/CanAccess', () => ({
   CanAccess: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }))
 
-const { mockCuentaCorriente, mockCuentaCorrienteAjuste } = vi.hoisted(() => ({
+const { mockCuentaCorriente, mockCuentaCorrienteAjuste, mockListPagos } = vi.hoisted(() => ({
   mockCuentaCorriente: vi.fn(),
   mockCuentaCorrienteAjuste: vi.fn(),
+  mockListPagos: vi.fn(),
 }))
 
 vi.mock('@/lib/api', () => {
   mockCuentaCorrienteAjuste.mockResolvedValue({ id: 2, tipo: 'ajuste', monto: '-10.00' })
+  mockListPagos.mockResolvedValue({ data: [] })
   return {
     proveedoresAPI: {
       cuentaCorriente: mockCuentaCorriente,
       cuentaCorrienteAjuste: mockCuentaCorrienteAjuste,
+      listPagos: mockListPagos,
     },
     ApiRequestFailedError: class ApiRequestFailedError extends Error {},
   }
@@ -108,7 +111,9 @@ describe('ProveedorCuentaCorrienteSection', () => {
     await waitFor(() => {
       expect(screen.getByTestId('proveedor-cc-saldo')).toHaveTextContent('500.00')
     })
-    expect(screen.getByRole('alert')).toHaveTextContent('Excede límite')
+    expect(within(screen.getByTestId('proveedor-cc-saldo-panel')).getByRole('alert')).toHaveTextContent(
+      'Excede límite',
+    )
     expect(screen.getByTestId('proveedor-cc-chart')).toBeInTheDocument()
     expect(screen.getByTestId('proveedor-cc-table')).toBeInTheDocument()
   })
