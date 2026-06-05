@@ -100,10 +100,17 @@ export class ProveedorCuentaCorrienteService {
     usuarioId: number
     notas?: string | null
     comprobanteCompraId?: number | null
+    reciboPagoId?: number | null
   }): Promise<MovimientoProveedorCC> {
     if (params.comprobanteCompraId != null) {
       const existing = await this.db.movimientoProveedorCC.findFirst({
         where: { tenantId: params.tenantId, comprobanteCompraId: params.comprobanteCompraId },
+      })
+      if (existing) return existing
+    }
+    if (params.reciboPagoId != null) {
+      const existing = await this.db.movimientoProveedorCC.findFirst({
+        where: { tenantId: params.tenantId, reciboPagoId: params.reciboPagoId },
       })
       if (existing) return existing
     }
@@ -124,6 +131,7 @@ export class ProveedorCuentaCorrienteService {
         usuarioId: params.usuarioId,
         notas: params.notas ?? null,
         comprobanteCompraId: params.comprobanteCompraId ?? null,
+        reciboPagoId: params.reciboPagoId ?? null,
       },
     })
   }

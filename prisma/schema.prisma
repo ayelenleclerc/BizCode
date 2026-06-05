@@ -165,6 +165,7 @@ model Proveedor {
   ordenesCompra            OrdenCompra[]
   comprobantesCompra       ComprobanteCompra[]
   movimientosCuentaCorriente MovimientoProveedorCC[]
+  recibosPago              ReciboPago[]
 
   @@unique([tenantId, codigo])
   @@index([tenantId])
@@ -221,6 +222,7 @@ model ComprobanteCompra {
   updatedAt     DateTime    @updatedAt
 
   movimientoCuentaCorriente MovimientoProveedorCC?
+  reciboPagoFacturas       ReciboPagoFactura[]
 
   @@unique([tenantId, tipo, prefijo, numero])
   @@index([tenantId, fecha])
@@ -485,6 +487,7 @@ model Tenant {
   ordenesCompra       OrdenCompra[]
   comprobantesCompra       ComprobanteCompra[]
   movimientosProveedorCC   MovimientoProveedorCC[]
+  recibosPago              ReciboPago[]
   facturas       Factura[]
   notasCredito   NotaCredito[]
   pedidos        Pedido[]
@@ -705,8 +708,51 @@ model AppUser {
   tenantPlansChanged   TenantPlan[] @relation("TenantPlanChangedBy")
   notasCreditoCreated  NotaCredito[] @relation("NotaCreditoCreatedBy")
   movimientosProveedorCC MovimientoProveedorCC[]
+  recibosPago            ReciboPago[]
 
   @@unique([tenantId, username])
+}
+
+/// Supplier payment receipt (#271).
+model ReciboPago {
+  id          Int      @id @default(autoincrement())
+  tenantId    Int
+  tenant      Tenant   @relation(fields: [tenantId], references: [id])
+  numero      Int
+  proveedorId Int
+  proveedor   Proveedor @relation(fields: [proveedorId], references: [id])
+  fecha       DateTime
+  total       Decimal  @db.Decimal(14, 2)
+  /// transferencia | cheque | efectivo | echeq
+  metodoPago  String   @db.VarChar(20)
+  cbu         String?  @db.VarChar(22)
+  referencia  String?  @db.VarChar(60)
+  /// emitido | anulado
+  estado      String   @db.VarChar(20) @default("emitido")
+  notas       String?  @db.VarChar(500)
+  usuarioId   Int
+  usuario     AppUser  @relation(fields: [usuarioId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  facturas    ReciboPagoFactura[]
+  movimiento  MovimientoProveedorCC?
+
+  @@unique([tenantId, numero])
+  @@index([tenantId, proveedorId])
+  @@index([tenantId, proveedorId, fecha])
+}
+
+model ReciboPagoFactura {
+  id                  Int              @id @default(autoincrement())
+  reciboPagoId        Int
+  reciboPago          ReciboPago       @relation(fields: [reciboPagoId], references: [id], onDelete: Cascade)
+  comprobanteCompraId Int?
+  comprobanteCompra   ComprobanteCompra? @relation(fields: [comprobanteCompraId], references: [id])
+  facturaRef          String           @db.VarChar(40)
+  monto               Decimal          @db.Decimal(14, 2)
+
+  @@index([reciboPagoId])
 }
 
 /// Supplier accounts-payable ledger (#270).
@@ -728,6 +774,8 @@ model MovimientoProveedorCC {
   notas               String?           @db.VarChar(500)
   comprobanteCompraId Int?              @unique
   comprobanteCompra   ComprobanteCompra? @relation(fields: [comprobanteCompraId], references: [id])
+  reciboPagoId        Int?              @unique
+  reciboPago          ReciboPago?       @relation(fields: [reciboPagoId], references: [id])
   createdAt           DateTime          @default(now())
 
   @@index([tenantId, proveedorId, fecha])

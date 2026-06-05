@@ -9032,6 +9032,1239 @@ Requires suppliers.manage; posts audit event proveedor\_cc\_ajuste.
 }
 ```
 
+### PARAMETERS /api/proveedores/{id}/pagos/comprobantes-pendientes
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/proveedores/{id}/pagos/comprobantes-pendientes`
+
+### Pending purchase vouchers for payment allocation
+
+- **Method:** `GET`
+- **Path:** `/api/proveedores/{id}/pagos/comprobantes-pendientes`
+- **Tags:** proveedores
+
+Active comprobantes with remaining balance for imputation (#271). Requires module `finance.receipts`.
+
+#### Responses
+
+##### Status: 200 Pending vouchers
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`comprobanteCompraId` (required)**
+
+    `integer`
+
+  - **`facturaRef` (required)**
+
+    `string`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`pagado` (required)**
+
+    `string`
+
+  - **`pendiente` (required)**
+
+    `string`
+
+  - **`total` (required)**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "comprobanteCompraId": 1,
+      "facturaRef": "",
+      "fecha": "",
+      "total": "",
+      "pagado": "",
+      "pendiente": ""
+    }
+  ]
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/proveedores/{id}/pagos
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/proveedores/{id}/pagos`
+
+### Supplier payment receipt history
+
+- **Method:** `GET`
+- **Path:** `/api/proveedores/{id}/pagos`
+- **Tags:** proveedores
+
+Requires module `finance.receipts` and permission `suppliers.read`.
+
+#### Responses
+
+##### Status: 200 Paginated payment receipts
+
+###### Content-Type: application/json
+
+**All of:**
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"emitido", "anulado"`
+
+  - **`facturas` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`facturaRef` (required)**
+
+      `string`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`monto` (required)**
+
+      `string`
+
+    - **`comprobanteCompraId`**
+
+      `integer`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`metodoPago` (required)**
+
+    `string`, possible values: `"transferencia", "cheque", "efectivo", "echeq"`
+
+  - **`numero` (required)**
+
+    `integer`
+
+  - **`proveedor` (required)**
+
+    `object`
+
+    - **`codigo` (required)**
+
+      `integer`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`rsocial` (required)**
+
+      `string`
+
+    - **`cuit`**
+
+      `string`
+
+  - **`proveedorId` (required)**
+
+    `integer`
+
+  - **`total` (required)**
+
+    `string`
+
+  - **`usuario` (required)**
+
+    `object`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`username` (required)**
+
+      `string`
+
+  - **`usuarioId` (required)**
+
+    `integer`
+
+  - **`cbu`**
+
+    `string`
+
+  - **`notas`**
+
+    `string`
+
+  - **`referencia`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+* **`limit` (required)**
+
+  `integer` — Effective page size (same semantics as query \`limit\`)
+
+* **`offset` (required)**
+
+  `integer` — Effective skip (same semantics as query \`offset\`)
+
+* **`total` (required)**
+
+  `integer` — Row count matching the list filter (before limit/offset)
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "numero": 1,
+      "proveedorId": 1,
+      "fecha": "",
+      "total": "",
+      "metodoPago": "transferencia",
+      "cbu": "",
+      "referencia": "",
+      "estado": "emitido",
+      "notas": "",
+      "usuarioId": 1,
+      "proveedor": {
+        "id": 1,
+        "codigo": 1,
+        "rsocial": "",
+        "cuit": ""
+      },
+      "usuario": {
+        "id": 1,
+        "username": ""
+      },
+      "facturas": [
+        {
+          "id": 1,
+          "comprobanteCompraId": 1,
+          "facturaRef": "",
+          "monto": ""
+        }
+      ],
+      "createdAt": ""
+    }
+  ],
+  "total": 0,
+  "limit": 1,
+  "offset": 0
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Register supplier payment
+
+- **Method:** `POST`
+- **Path:** `/api/proveedores/{id}/pagos`
+- **Tags:** proveedores
+
+Creates `ReciboPago` with tenant-correlative `numero`, posts `pago` ledger movement (negative monto), and audit event `recibo_pago_create`. Requires module `finance.receipts` and `suppliers.manage`.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`facturas` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`facturaRef` (required)**
+
+    `string`
+
+  - **`monto` (required)**
+
+    `number`
+
+  - **`comprobanteCompraId`**
+
+    `integer`
+
+- **`fecha` (required)**
+
+  `string`
+
+- **`metodoPago` (required)**
+
+  `string`, possible values: `"transferencia", "cheque", "efectivo", "echeq"`
+
+- **`total` (required)**
+
+  `number`
+
+- **`cbu`**
+
+  `string`
+
+- **`notas`**
+
+  `string`
+
+- **`referencia`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "fecha": "",
+  "total": 1,
+  "metodoPago": "transferencia",
+  "cbu": "",
+  "referencia": "",
+  "notas": "",
+  "facturas": [
+    {
+      "comprobanteCompraId": 1,
+      "facturaRef": "",
+      "monto": 1
+    }
+  ]
+}
+```
+
+#### Responses
+
+##### Status: 201 Payment receipt created
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"emitido", "anulado"`
+
+  - **`facturas` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`facturaRef` (required)**
+
+      `string`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`monto` (required)**
+
+      `string`
+
+    - **`comprobanteCompraId`**
+
+      `integer`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`metodoPago` (required)**
+
+    `string`, possible values: `"transferencia", "cheque", "efectivo", "echeq"`
+
+  - **`numero` (required)**
+
+    `integer`
+
+  - **`proveedor` (required)**
+
+    `object`
+
+    - **`codigo` (required)**
+
+      `integer`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`rsocial` (required)**
+
+      `string`
+
+    - **`cuit`**
+
+      `string`
+
+  - **`proveedorId` (required)**
+
+    `integer`
+
+  - **`total` (required)**
+
+    `string`
+
+  - **`usuario` (required)**
+
+    `object`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`username` (required)**
+
+      `string`
+
+  - **`usuarioId` (required)**
+
+    `integer`
+
+  - **`cbu`**
+
+    `string`
+
+  - **`notas`**
+
+    `string`
+
+  - **`referencia`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "numero": 1,
+    "proveedorId": 1,
+    "fecha": "",
+    "total": "",
+    "metodoPago": "transferencia",
+    "cbu": "",
+    "referencia": "",
+    "estado": "emitido",
+    "notas": "",
+    "usuarioId": 1,
+    "proveedor": {
+      "id": 1,
+      "codigo": 1,
+      "rsocial": "",
+      "cuit": ""
+    },
+    "usuario": {
+      "id": 1,
+      "username": ""
+    },
+    "facturas": [
+      {
+        "id": 1,
+        "comprobanteCompraId": 1,
+        "facturaRef": "",
+        "monto": ""
+      }
+    ],
+    "createdAt": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/proveedores/{id}/pagos/{reciboId}/anular
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/proveedores/{id}/pagos/{reciboId}/anular`
+
+### Void supplier payment receipt
+
+- **Method:** `POST`
+- **Path:** `/api/proveedores/{id}/pagos/{reciboId}/anular`
+- **Tags:** proveedores
+
+Sets estado `anulado` and posts compensating ledger movement. Audit `recibo_pago_void`.
+
+#### Responses
+
+##### Status: 200 Receipt voided
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"emitido", "anulado"`
+
+  - **`facturas` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`facturaRef` (required)**
+
+      `string`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`monto` (required)**
+
+      `string`
+
+    - **`comprobanteCompraId`**
+
+      `integer`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`metodoPago` (required)**
+
+    `string`, possible values: `"transferencia", "cheque", "efectivo", "echeq"`
+
+  - **`numero` (required)**
+
+    `integer`
+
+  - **`proveedor` (required)**
+
+    `object`
+
+    - **`codigo` (required)**
+
+      `integer`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`rsocial` (required)**
+
+      `string`
+
+    - **`cuit`**
+
+      `string`
+
+  - **`proveedorId` (required)**
+
+    `integer`
+
+  - **`total` (required)**
+
+    `string`
+
+  - **`usuario` (required)**
+
+    `object`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`username` (required)**
+
+      `string`
+
+  - **`usuarioId` (required)**
+
+    `integer`
+
+  - **`cbu`**
+
+    `string`
+
+  - **`notas`**
+
+    `string`
+
+  - **`referencia`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "numero": 1,
+    "proveedorId": 1,
+    "fecha": "",
+    "total": "",
+    "metodoPago": "transferencia",
+    "cbu": "",
+    "referencia": "",
+    "estado": "emitido",
+    "notas": "",
+    "usuarioId": 1,
+    "proveedor": {
+      "id": 1,
+      "codigo": 1,
+      "rsocial": "",
+      "cuit": ""
+    },
+    "usuario": {
+      "id": 1,
+      "username": ""
+    },
+    "facturas": [
+      {
+        "id": 1,
+        "comprobanteCompraId": 1,
+        "facturaRef": "",
+        "monto": ""
+      }
+    ],
+    "createdAt": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 422 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/proveedores/{id}/pagos/{reciboId}/pdf
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/proveedores/{id}/pagos/{reciboId}/pdf`
+
+### Download supplier payment receipt PDF
+
+- **Method:** `GET`
+- **Path:** `/api/proveedores/{id}/pagos/{reciboId}/pdf`
+- **Tags:** proveedores
+
+PDF with company header, supplier data, imputed vouchers, payment method (#271).
+
+#### Responses
+
+##### Status: 200 PDF document
+
+###### Content-Type: application/pdf
+
+`string`, format: `binary`
+
+**Example:**
+
+```json
+{}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ### PARAMETERS /api/compras
 
 - **Method:** `PARAMETERS`
@@ -32619,6 +33852,503 @@ true
     "usuarioId": 1,
     "notas": ""
   }
+}
+```
+
+### ReciboPagoFactura
+
+- **Type:**`object`
+
+* **`facturaRef` (required)**
+
+  `string`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`monto` (required)**
+
+  `string`
+
+* **`comprobanteCompraId`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "comprobanteCompraId": 1,
+  "facturaRef": "",
+  "monto": ""
+}
+```
+
+### ReciboPago
+
+- **Type:**`object`
+
+* **`createdAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`estado` (required)**
+
+  `string`, possible values: `"emitido", "anulado"`
+
+* **`facturas` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`facturaRef` (required)**
+
+    `string`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`monto` (required)**
+
+    `string`
+
+  - **`comprobanteCompraId`**
+
+    `integer`
+
+* **`fecha` (required)**
+
+  `string`, format: `date-time`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`metodoPago` (required)**
+
+  `string`, possible values: `"transferencia", "cheque", "efectivo", "echeq"`
+
+* **`numero` (required)**
+
+  `integer`
+
+* **`proveedor` (required)**
+
+  `object`
+
+  - **`codigo` (required)**
+
+    `integer`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`rsocial` (required)**
+
+    `string`
+
+  - **`cuit`**
+
+    `string`
+
+* **`proveedorId` (required)**
+
+  `integer`
+
+* **`total` (required)**
+
+  `string`
+
+* **`usuario` (required)**
+
+  `object`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`username` (required)**
+
+    `string`
+
+* **`usuarioId` (required)**
+
+  `integer`
+
+* **`cbu`**
+
+  `string`
+
+* **`notas`**
+
+  `string`
+
+* **`referencia`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "numero": 1,
+  "proveedorId": 1,
+  "fecha": "",
+  "total": "",
+  "metodoPago": "transferencia",
+  "cbu": "",
+  "referencia": "",
+  "estado": "emitido",
+  "notas": "",
+  "usuarioId": 1,
+  "proveedor": {
+    "id": 1,
+    "codigo": 1,
+    "rsocial": "",
+    "cuit": ""
+  },
+  "usuario": {
+    "id": 1,
+    "username": ""
+  },
+  "facturas": [
+    {
+      "id": 1,
+      "comprobanteCompraId": 1,
+      "facturaRef": "",
+      "monto": ""
+    }
+  ],
+  "createdAt": ""
+}
+```
+
+### ReciboPagoInput
+
+- **Type:**`object`
+
+* **`facturas` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`facturaRef` (required)**
+
+    `string`
+
+  - **`monto` (required)**
+
+    `number`
+
+  - **`comprobanteCompraId`**
+
+    `integer`
+
+* **`fecha` (required)**
+
+  `string`
+
+* **`metodoPago` (required)**
+
+  `string`, possible values: `"transferencia", "cheque", "efectivo", "echeq"`
+
+* **`total` (required)**
+
+  `number`
+
+* **`cbu`**
+
+  `string`
+
+* **`notas`**
+
+  `string`
+
+* **`referencia`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "fecha": "",
+  "total": 1,
+  "metodoPago": "transferencia",
+  "cbu": "",
+  "referencia": "",
+  "notas": "",
+  "facturas": [
+    {
+      "comprobanteCompraId": 1,
+      "facturaRef": "",
+      "monto": 1
+    }
+  ]
+}
+```
+
+### ComprobantePendiente
+
+- **Type:**`object`
+
+* **`comprobanteCompraId` (required)**
+
+  `integer`
+
+* **`facturaRef` (required)**
+
+  `string`
+
+* **`fecha` (required)**
+
+  `string`, format: `date-time`
+
+* **`pagado` (required)**
+
+  `string`
+
+* **`pendiente` (required)**
+
+  `string`
+
+* **`total` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "comprobanteCompraId": 1,
+  "facturaRef": "",
+  "fecha": "",
+  "total": "",
+  "pagado": "",
+  "pendiente": ""
+}
+```
+
+### ReciboPagoListEnvelope
+
+- **Type:**
+
+**Example:**
+
+### ReciboPagoEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"emitido", "anulado"`
+
+  - **`facturas` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`facturaRef` (required)**
+
+      `string`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`monto` (required)**
+
+      `string`
+
+    - **`comprobanteCompraId`**
+
+      `integer`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`metodoPago` (required)**
+
+    `string`, possible values: `"transferencia", "cheque", "efectivo", "echeq"`
+
+  - **`numero` (required)**
+
+    `integer`
+
+  - **`proveedor` (required)**
+
+    `object`
+
+    - **`codigo` (required)**
+
+      `integer`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`rsocial` (required)**
+
+      `string`
+
+    - **`cuit`**
+
+      `string`
+
+  - **`proveedorId` (required)**
+
+    `integer`
+
+  - **`total` (required)**
+
+    `string`
+
+  - **`usuario` (required)**
+
+    `object`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`username` (required)**
+
+      `string`
+
+  - **`usuarioId` (required)**
+
+    `integer`
+
+  - **`cbu`**
+
+    `string`
+
+  - **`notas`**
+
+    `string`
+
+  - **`referencia`**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "numero": 1,
+    "proveedorId": 1,
+    "fecha": "",
+    "total": "",
+    "metodoPago": "transferencia",
+    "cbu": "",
+    "referencia": "",
+    "estado": "emitido",
+    "notas": "",
+    "usuarioId": 1,
+    "proveedor": {
+      "id": 1,
+      "codigo": 1,
+      "rsocial": "",
+      "cuit": ""
+    },
+    "usuario": {
+      "id": 1,
+      "username": ""
+    },
+    "facturas": [
+      {
+        "id": 1,
+        "comprobanteCompraId": 1,
+        "facturaRef": "",
+        "monto": ""
+      }
+    ],
+    "createdAt": ""
+  }
+}
+```
+
+### ComprobantePendienteListEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`comprobanteCompraId` (required)**
+
+    `integer`
+
+  - **`facturaRef` (required)**
+
+    `string`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`pagado` (required)**
+
+    `string`
+
+  - **`pendiente` (required)**
+
+    `string`
+
+  - **`total` (required)**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "comprobanteCompraId": 1,
+      "facturaRef": "",
+      "fecha": "",
+      "total": "",
+      "pagado": "",
+      "pendiente": ""
+    }
+  ]
 }
 ```
 

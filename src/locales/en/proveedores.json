@@ -147,5 +147,48 @@
       "nc_proveedor": "Credit note",
       "ajuste": "Manual adjustment"
     }
+  },
+  "pagos": {
+    "title": "Payment receipts",
+    "register": "Register payment",
+    "formTitle": "New payment receipt",
+    "noPending": "No vouchers pending payment.",
+    "allocCaption": "Allocation to pending vouchers",
+    "colSelect": "Include",
+    "colFactura": "Voucher",
+    "colPendiente": "Pending",
+    "colMonto": "Amount to pay",
+    "colNumero": "No.",
+    "colFecha": "Date",
+    "colTotal": "Total",
+    "colEstado": "Status",
+    "colAcciones": "Actions",
+    "fecha": "Payment date",
+    "metodo": "Payment method",
+    "cbu": "Destination CBU",
+    "referencia": "Reference (cheque, transfer, etc.)",
+    "notas": "Notes",
+    "totalSeleccionado": "Selected total: {{total}}",
+    "submit": "Save receipt",
+    "empty": "No payment receipts yet.",
+    "tableCaption": "Payment receipt history",
+    "downloadPdf": "Download PDF",
+    "void": "Void",
+    "voidConfirm": "Void payment receipt No. {{numero}}? The ledger balance will be reversed.",
+    "selectRow": "Include {{ref}} in payment",
+    "montoRow": "Amount to pay for {{ref}}",
+    "errorNoAllocation": "Select at least one voucher.",
+    "errorAllocationAmount": "Invalid amount for {{ref}}.",
+    "errorTotal": "Total must be greater than zero.",
+    "metodoOptions": {
+      "transferencia": "Bank transfer",
+      "cheque": "Cheque",
+      "efectivo": "Cash",
+      "echeq": "eCheq"
+    },
+    "estado": {
+      "emitido": "Issued",
+      "anulado": "Voided"
+    }
   }
 }

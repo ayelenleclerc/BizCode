@@ -73,6 +73,24 @@ export type ProveedorCuentaCorrienteAjusteInput = {
   motivo: string
 }
 
+export type ReciboPagoMetodo = 'transferencia' | 'cheque' | 'efectivo' | 'echeq'
+
+export type ReciboPagoFacturaInput = {
+  comprobanteCompraId?: number | null
+  facturaRef: string
+  monto: number
+}
+
+export type ReciboPagoInput = {
+  fecha: string
+  total: number
+  metodoPago: ReciboPagoMetodo
+  cbu?: string | null
+  referencia?: string | null
+  notas?: string | null
+  facturas: ReciboPagoFacturaInput[]
+}
+
 export type FacturaItemInput = {
   articuloId: number
   cantidad: number

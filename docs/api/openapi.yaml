@@ -1543,6 +1543,171 @@ paths:
         '403':
           $ref: '#/components/responses/ForbiddenError'
 
+  /api/proveedores/{id}/pagos/comprobantes-pendientes:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    get:
+      tags: [proveedores]
+      summary: Pending purchase vouchers for payment allocation
+      description: Active comprobantes with remaining balance for imputation (#271). Requires module `finance.receipts`.
+      responses:
+        '200':
+          description: Pending vouchers
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComprobantePendienteListEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /api/proveedores/{id}/pagos:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    get:
+      tags: [proveedores]
+      summary: Supplier payment receipt history
+      description: Requires module `finance.receipts` and permission `suppliers.read`.
+      parameters:
+        - $ref: '#/components/parameters/ListLimit'
+        - $ref: '#/components/parameters/ListOffset'
+      responses:
+        '200':
+          description: Paginated payment receipts
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReciboPagoListEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+    post:
+      tags: [proveedores]
+      summary: Register supplier payment
+      description: |
+        Creates `ReciboPago` with tenant-correlative `numero`, posts `pago` ledger movement (negative monto),
+        and audit event `recibo_pago_create`. Requires module `finance.receipts` and `suppliers.manage`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReciboPagoInput'
+      responses:
+        '201':
+          description: Payment receipt created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReciboPagoEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /api/proveedores/{id}/pagos/{reciboId}/anular:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: reciboId
+        in: path
+        required: true
+        schema:
+          type: integer
+    post:
+      tags: [proveedores]
+      summary: Void supplier payment receipt
+      description: Sets estado `anulado` and posts compensating ledger movement. Audit `recibo_pago_void`.
+      responses:
+        '200':
+          description: Receipt voided
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReciboPagoEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '422':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/ServerError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /api/proveedores/{id}/pagos/{reciboId}/pdf:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: reciboId
+        in: path
+        required: true
+        schema:
+          type: integer
+    get:
+      tags: [proveedores]
+      summary: Download supplier payment receipt PDF
+      description: PDF with company header, supplier data, imputed vouchers, payment method (#271).
+      responses:
+        '200':
+          description: PDF document
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
   /api/compras:
     parameters:
       - $ref: '#/components/parameters/BizcodeChannelHeader'
@@ -5969,6 +6134,187 @@ components:
           const: true
         data:
           $ref: '#/components/schemas/MovimientoProveedorCC'
+
+    ReciboPagoFactura:
+      type: object
+      required: [id, facturaRef, monto]
+      properties:
+        id:
+          type: integer
+        comprobanteCompraId:
+          type: integer
+          nullable: true
+        facturaRef:
+          type: string
+        monto:
+          type: string
+
+    ReciboPago:
+      type: object
+      required:
+        - id
+        - numero
+        - proveedorId
+        - fecha
+        - total
+        - metodoPago
+        - estado
+        - usuarioId
+        - proveedor
+        - usuario
+        - facturas
+        - createdAt
+      properties:
+        id:
+          type: integer
+        numero:
+          type: integer
+        proveedorId:
+          type: integer
+        fecha:
+          type: string
+          format: date-time
+        total:
+          type: string
+        metodoPago:
+          type: string
+          enum: [transferencia, cheque, efectivo, echeq]
+        cbu:
+          type: string
+          nullable: true
+        referencia:
+          type: string
+          nullable: true
+        estado:
+          type: string
+          enum: [emitido, anulado]
+        notas:
+          type: string
+          nullable: true
+        usuarioId:
+          type: integer
+        proveedor:
+          type: object
+          required: [id, codigo, rsocial]
+          properties:
+            id:
+              type: integer
+            codigo:
+              type: integer
+            rsocial:
+              type: string
+            cuit:
+              type: string
+              nullable: true
+        usuario:
+          type: object
+          required: [id, username]
+          properties:
+            id:
+              type: integer
+            username:
+              type: string
+        facturas:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReciboPagoFactura'
+        createdAt:
+          type: string
+          format: date-time
+
+    ReciboPagoInput:
+      type: object
+      required: [fecha, total, metodoPago, facturas]
+      properties:
+        fecha:
+          type: string
+        total:
+          type: number
+          exclusiveMinimum: 0
+        metodoPago:
+          type: string
+          enum: [transferencia, cheque, efectivo, echeq]
+        cbu:
+          type: string
+          maxLength: 22
+          nullable: true
+        referencia:
+          type: string
+          maxLength: 60
+          nullable: true
+        notas:
+          type: string
+          maxLength: 500
+          nullable: true
+        facturas:
+          type: array
+          minItems: 1
+          items:
+            type: object
+            required: [facturaRef, monto]
+            properties:
+              comprobanteCompraId:
+                type: integer
+                nullable: true
+              facturaRef:
+                type: string
+              monto:
+                type: number
+                exclusiveMinimum: 0
+
+    ComprobantePendiente:
+      type: object
+      required: [comprobanteCompraId, facturaRef, fecha, total, pagado, pendiente]
+      properties:
+        comprobanteCompraId:
+          type: integer
+        facturaRef:
+          type: string
+        fecha:
+          type: string
+          format: date-time
+        total:
+          type: string
+        pagado:
+          type: string
+        pendiente:
+          type: string
+
+    ReciboPagoListEnvelope:
+      allOf:
+        - type: object
+          required: [success, data]
+          properties:
+            success:
+              type: boolean
+              const: true
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/ReciboPago'
+        - $ref: '#/components/schemas/ListPaginationMeta'
+
+    ReciboPagoEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/ReciboPago'
+
+    ComprobantePendienteListEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ComprobantePendiente'
 
     Articulo:
       type: object

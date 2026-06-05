@@ -33,6 +33,17 @@ Creating an active **purchase voucher** (`POST /api/comprobantes-compra`, `finan
 
 **API:** `GET /api/proveedores/{id}/cuenta-corriente`, `GET .../saldo`, `POST .../cuenta-corriente/ajuste` — see [OpenAPI](../../api/openapi.yaml).
 
+## Payment receipts (GitHub #271)
+
+In the **Accounts payable** tab, the **Payment receipts** block lets you register payments to the supplier (`finance.receipts` module, `suppliers.manage`):
+
+1. **Register payment** — pending purchase vouchers are listed (oldest first); select lines and amounts (partial or full).
+2. Choose payment date, method (transfer, cheque, cash, eCheq), optional CBU/reference/notes.
+3. Saving creates a tenant-correlative receipt number, posts a `pago` ledger movement (negative amount), and audit event `recibo_pago_create`.
+4. **Download PDF** per receipt; **Void** (`recibo_pago_void`) reverses the balance with a compensating movement.
+
+**API:** `GET /api/proveedores/{id}/pagos/comprobantes-pendientes`, `GET/POST /api/proveedores/{id}/pagos`, `POST .../pagos/{reciboId}/anular`, `GET .../pagos/{reciboId}/pdf` — see [OpenAPI](../../api/openapi.yaml).
+
 ## Deactivate (logical delete)
 
 Select a row and **Deactivate**. The record stays in the database (`activo: false`) for purchase orders and purchase vouchers already linked. Use the inactive filter to review deactivated suppliers.

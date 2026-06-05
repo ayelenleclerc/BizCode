@@ -112,6 +112,10 @@
 
 * [ComprobanteCompraInput](./comprobantecomprainput.md) – `-`
 
+* [ComprobantePendiente](./comprobantependiente.md) – `-`
+
+* [ComprobantePendienteListEnvelope](./comprobantependientelistenvelope.md) – `-`
+
 * [CuentaCorriente](./cuentacorriente.md) – `-`
 
 * [CuentaCorrienteEnvelope](./cuentacorrienteenvelope.md) – `-`
@@ -327,6 +331,16 @@
 * [ProveedorNullableEnvelope](./proveedornullableenvelope.md) – `-`
 
 * [PublicPlan](./publicplan.md) – `-`
+
+* [ReciboPago](./recibopago.md) – `-`
+
+* [ReciboPagoEnvelope](./recibopagoenvelope.md) – `-`
+
+* [ReciboPagoFactura](./recibopagofactura.md) – `-`
+
+* [ReciboPagoInput](./recibopagoinput.md) – `-`
+
+* [ReciboPagoListEnvelope](./recibopagolistenvelope.md) – `-`
 
 * [Recuento](./recuento.md) – `-`
 
@@ -570,6 +584,14 @@
 
 * [Untitled object in ProveedorListEnvelope](./proveedorlistenvelope-allof-0.md) – `undefined#/allOf/0`
 
+* [Untitled object in ReciboPago](./recibopago-properties-proveedor.md) – `undefined#/properties/proveedor`
+
+* [Untitled object in ReciboPago](./recibopago-properties-usuario.md) – `undefined#/properties/usuario`
+
+* [Untitled object in ReciboPagoInput](./recibopagoinput-properties-facturas-items.md) – `undefined#/properties/facturas/items`
+
+* [Untitled object in ReciboPagoListEnvelope](./recibopagolistenvelope-allof-0.md) – `undefined#/allOf/0`
+
 * [Untitled object in Recuento](./recuento-properties-operador.md) – `undefined#/properties/operador`
 
 * [Untitled object in RecuentoItemLine](./recuentoitemline-properties-articulo.md) – `undefined#/properties/articulo`
@@ -656,6 +678,8 @@
 
 * [Untitled array in CobroListEnvelope](./cobrolistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
 
+* [Untitled array in ComprobantePendienteListEnvelope](./comprobantependientelistenvelope-properties-data.md) – `undefined#/properties/data`
+
 * [Untitled array in CuentaCorriente](./cuentacorriente-properties-lineas.md) – `undefined#/properties/lineas`
 
 * [Untitled array in DashboardVentasHistorico](./dashboardventashistorico-properties-byseller.md) – `undefined#/properties/bySeller`
@@ -723,6 +747,12 @@
 * [Untitled array in ProveedorListEnvelope](./proveedorlistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
 
 * [Untitled array in PublicPlan](./publicplan-properties-features.md) – `undefined#/properties/features`
+
+* [Untitled array in ReciboPago](./recibopago-properties-facturas.md) – `undefined#/properties/facturas`
+
+* [Untitled array in ReciboPagoInput](./recibopagoinput-properties-facturas.md) – `undefined#/properties/facturas`
+
+* [Untitled array in ReciboPagoListEnvelope](./recibopagolistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
 
 * [Untitled array in Recuento](./recuento-properties-items.md) – `undefined#/properties/items`
 

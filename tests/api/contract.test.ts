@@ -350,7 +350,123 @@ function buildPrisma(): PrismaClient {
         usuarioId: 1,
         notas: null,
         comprobanteCompraId: 1,
+        reciboPagoId: null,
         createdAt: new Date(),
+      }),
+    },
+    reciboPagoFactura: {
+      groupBy: vi.fn().mockResolvedValue([]),
+    },
+    reciboPago: {
+      count: vi.fn().mockResolvedValue(1),
+      findMany: vi.fn().mockResolvedValue([
+        {
+          id: 1,
+          tenantId: 1,
+          numero: 1,
+          proveedorId: 1,
+          fecha: new Date('2026-06-01T12:00:00.000Z'),
+          total: new Decimal(100),
+          metodoPago: 'transferencia',
+          cbu: null,
+          referencia: 'TRX-1',
+          estado: 'emitido',
+          notas: null,
+          usuarioId: 1,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          proveedor: { id: 1, codigo: 5001, rsocial: 'Proveedor API SA', cuit: null },
+          usuario: { id: 1, username: 'owner1' },
+          facturas: [
+            {
+              id: 1,
+              comprobanteCompraId: 1,
+              facturaRef: 'B-0001-1',
+              monto: new Decimal(100),
+            },
+          ],
+        },
+      ]),
+      findFirst: vi.fn().mockImplementation(async (args?: { where?: Record<string, unknown> }) => {
+        if (args?.where && 'numero' in args.where) return null
+        return {
+          id: 1,
+          tenantId: 1,
+          numero: 1,
+          proveedorId: 1,
+          fecha: new Date('2026-06-01T12:00:00.000Z'),
+          total: new Decimal(100),
+          metodoPago: 'transferencia',
+          cbu: null,
+          referencia: 'TRX-1',
+          estado: 'emitido',
+          notas: null,
+          usuarioId: 1,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          proveedor: { id: 1, codigo: 5001, rsocial: 'Proveedor API SA', cuit: null },
+          usuario: { id: 1, username: 'owner1' },
+          facturas: [
+            {
+              id: 1,
+              comprobanteCompraId: 1,
+              facturaRef: 'B-0001-1',
+              monto: new Decimal(100),
+            },
+          ],
+        }
+      }),
+      create: vi.fn().mockResolvedValue({
+        id: 1,
+        tenantId: 1,
+        numero: 1,
+        proveedorId: 1,
+        fecha: new Date('2026-06-01T12:00:00.000Z'),
+        total: new Decimal(100),
+        metodoPago: 'transferencia',
+        cbu: null,
+        referencia: 'TRX-1',
+        estado: 'emitido',
+        notas: null,
+        usuarioId: 1,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        proveedor: { id: 1, codigo: 5001, rsocial: 'Proveedor API SA', cuit: null },
+        usuario: { id: 1, username: 'owner1' },
+        facturas: [
+          {
+            id: 1,
+            comprobanteCompraId: 1,
+            facturaRef: 'B-0001-1',
+            monto: new Decimal(100),
+          },
+        ],
+      }),
+      update: vi.fn().mockResolvedValue({
+        id: 1,
+        tenantId: 1,
+        numero: 1,
+        proveedorId: 1,
+        fecha: new Date('2026-06-01T12:00:00.000Z'),
+        total: new Decimal(100),
+        metodoPago: 'transferencia',
+        cbu: null,
+        referencia: 'TRX-1',
+        estado: 'anulado',
+        notas: null,
+        usuarioId: 1,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        proveedor: { id: 1, codigo: 5001, rsocial: 'Proveedor API SA', cuit: null },
+        usuario: { id: 1, username: 'owner1' },
+        facturas: [
+          {
+            id: 1,
+            comprobanteCompraId: 1,
+            facturaRef: 'B-0001-1',
+            monto: new Decimal(100),
+          },
+        ],
       }),
     },
     cobro: {
@@ -428,6 +544,12 @@ function buildPrisma(): PrismaClient {
       upsert: vi.fn().mockResolvedValue({ id: 1 }),
     },
     paramEmpresa: {
+      findFirst: vi.fn().mockResolvedValue({
+        nombre: 'Demo Co',
+        cuit: '20-12345678-6',
+        domicilio: 'Calle 1',
+        logoUrl: null,
+      }),
       findUnique: vi.fn().mockResolvedValue({
         id: 1,
         tenantId: 1,
@@ -549,7 +671,63 @@ function buildPrisma(): PrismaClient {
               usuarioId: 1,
               notas: null,
               comprobanteCompraId: 1,
+              reciboPagoId: null,
               createdAt: new Date(),
+            }),
+          },
+          reciboPago: {
+            findFirst: vi.fn().mockResolvedValue(null),
+            create: vi.fn().mockResolvedValue({
+              id: 1,
+              tenantId: 1,
+              numero: 1,
+              proveedorId: 1,
+              fecha: new Date('2026-06-01T12:00:00.000Z'),
+              total: new Decimal(100),
+              metodoPago: 'transferencia',
+              cbu: null,
+              referencia: 'TRX-1',
+              estado: 'emitido',
+              notas: null,
+              usuarioId: 1,
+              createdAt: new Date(),
+              updatedAt: new Date(),
+              proveedor: { id: 1, codigo: 5001, rsocial: 'Proveedor API SA', cuit: null },
+              usuario: { id: 1, username: 'owner1' },
+              facturas: [
+                {
+                  id: 1,
+                  comprobanteCompraId: 1,
+                  facturaRef: 'B-0001-1',
+                  monto: new Decimal(100),
+                },
+              ],
+            }),
+            update: vi.fn().mockResolvedValue({
+              id: 1,
+              tenantId: 1,
+              numero: 1,
+              proveedorId: 1,
+              fecha: new Date('2026-06-01T12:00:00.000Z'),
+              total: new Decimal(100),
+              metodoPago: 'transferencia',
+              cbu: null,
+              referencia: 'TRX-1',
+              estado: 'anulado',
+              notas: null,
+              usuarioId: 1,
+              createdAt: new Date(),
+              updatedAt: new Date(),
+              proveedor: { id: 1, codigo: 5001, rsocial: 'Proveedor API SA', cuit: null },
+              usuario: { id: 1, username: 'owner1' },
+              facturas: [
+                {
+                  id: 1,
+                  comprobanteCompraId: 1,
+                  facturaRef: 'B-0001-1',
+                  monto: new Decimal(100),
+                },
+              ],
             }),
           },
           stockAjuste: {
@@ -829,6 +1007,91 @@ describe('API — contrato OpenAPI', () => {
       .send({ monto: -10, motivo: 'Contract test adjustment' })
       .expect(201)
     await assertMatchesOpenApi('/api/proveedores/{id}/cuenta-corriente/ajuste', 'post', '201', res.body)
+  })
+
+  it('GET /api/proveedores/{id}/pagos/comprobantes-pendientes', async () => {
+    vi.mocked(prisma.comprobanteCompra.findMany).mockResolvedValueOnce([
+      {
+        id: 1,
+        tenantId: 1,
+        proveedorId: 1,
+        ordenCompraId: null,
+        fecha: new Date('2026-05-10T12:00:00.000Z'),
+        tipo: 'B',
+        prefijo: '0001',
+        numero: 1,
+        neto1: new Decimal(100),
+        neto2: new Decimal(0),
+        neto3: new Decimal(0),
+        iva1: new Decimal(21),
+        iva2: new Decimal(0),
+        total: new Decimal(121),
+        cae: null,
+        caeVto: null,
+        estado: 'A',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+    ] as never)
+    const app = createApp(prisma)
+    const res = await request(app)
+      .get('/api/proveedores/1/pagos/comprobantes-pendientes')
+      .expect(200)
+    await assertMatchesOpenApi(
+      '/api/proveedores/{id}/pagos/comprobantes-pendientes',
+      'get',
+      '200',
+      res.body,
+    )
+  })
+
+  it('GET /api/proveedores/{id}/pagos', async () => {
+    const app = createApp(prisma)
+    const res = await request(app).get('/api/proveedores/1/pagos').expect(200)
+    await assertMatchesOpenApi('/api/proveedores/{id}/pagos', 'get', '200', res.body)
+  })
+
+  it('POST /api/proveedores/{id}/pagos', async () => {
+    vi.mocked(prisma.comprobanteCompra.findMany).mockResolvedValueOnce([
+      {
+        id: 1,
+        tenantId: 1,
+        proveedorId: 1,
+        ordenCompraId: null,
+        fecha: new Date('2026-05-10T12:00:00.000Z'),
+        tipo: 'B',
+        prefijo: '0001',
+        numero: 1,
+        neto1: new Decimal(100),
+        neto2: new Decimal(0),
+        neto3: new Decimal(0),
+        iva1: new Decimal(21),
+        iva2: new Decimal(0),
+        total: new Decimal(121),
+        cae: null,
+        caeVto: null,
+        estado: 'A',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+    ] as never)
+    const app = createApp(prisma)
+    const res = await request(app)
+      .post('/api/proveedores/1/pagos')
+      .send({
+        fecha: '2026-06-01',
+        total: 100,
+        metodoPago: 'transferencia',
+        facturas: [{ comprobanteCompraId: 1, facturaRef: 'B-0001-1', monto: 100 }],
+      })
+      .expect(201)
+    await assertMatchesOpenApi('/api/proveedores/{id}/pagos', 'post', '201', res.body)
+  })
+
+  it('POST /api/proveedores/{id}/pagos/{reciboId}/anular', async () => {
+    const app = createApp(prisma)
+    const res = await request(app).post('/api/proveedores/1/pagos/1/anular').expect(200)
+    await assertMatchesOpenApi('/api/proveedores/{id}/pagos/{reciboId}/anular', 'post', '200', res.body)
   })
 
   it('POST /api/proveedores/import', async () => {

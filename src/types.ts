@@ -102,6 +102,42 @@ export interface ProveedorCuentaCorrienteSaldo {
   excedeLimite: boolean
 }
 
+export type ReciboPagoMetodo = 'transferencia' | 'cheque' | 'efectivo' | 'echeq'
+
+export interface ReciboPagoFactura {
+  id: number
+  comprobanteCompraId: number | null
+  facturaRef: string
+  monto: string
+}
+
+export interface ReciboPago {
+  id: number
+  numero: number
+  proveedorId: number
+  fecha: string
+  total: string
+  metodoPago: ReciboPagoMetodo
+  cbu: string | null
+  referencia: string | null
+  estado: string
+  notas: string | null
+  usuarioId: number
+  proveedor: { id: number; codigo: number; rsocial: string; cuit: string | null }
+  usuario: { id: number; username: string }
+  facturas: ReciboPagoFactura[]
+  createdAt: string
+}
+
+export interface ComprobantePendiente {
+  comprobanteCompraId: number
+  facturaRef: string
+  fecha: string
+  total: string
+  pagado: string
+  pendiente: string
+}
+
 export interface Proveedor {
   id: number
   codigo: number
