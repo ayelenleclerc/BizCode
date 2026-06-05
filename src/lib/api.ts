@@ -1068,6 +1068,64 @@ export const proveedoresAPI = {
     }
   },
 
+  pagosComprobantesPendientes: async (id: number) => {
+    try {
+      const response = await api.get(`/proveedores/${id}/pagos/comprobantes-pendientes`)
+      return response.data.data
+    } catch (error) {
+      handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  listPagos: async (id: number, params?: { limit?: number; offset?: number }) => {
+    try {
+      const response = await api.get(`/proveedores/${id}/pagos`, { params })
+      return response.data
+    } catch (error) {
+      handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  createPago: async (
+    id: number,
+    body: {
+      fecha: string
+      total: number
+      metodoPago: string
+      cbu?: string | null
+      referencia?: string | null
+      notas?: string | null
+      facturas: { comprobanteCompraId?: number | null; facturaRef: string; monto: number }[]
+    },
+  ) => {
+    try {
+      const response = await api.post(`/proveedores/${id}/pagos`, body)
+      return response.data.data
+    } catch (error) {
+      handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  anularPago: async (proveedorId: number, reciboId: number) => {
+    try {
+      const response = await api.post(`/proveedores/${proveedorId}/pagos/${reciboId}/anular`)
+      return response.data.data
+    } catch (error) {
+      handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  downloadPagoPdf: async (proveedorId: number, reciboId: number): Promise<Blob> => {
+    try {
+      const response = await api.get<Blob>(`/proveedores/${proveedorId}/pagos/${reciboId}/pdf`, {
+        responseType: 'blob',
+      })
+      return response.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
   downloadImportTemplate: async (): Promise<Blob> => {
     try {
       const response = await api.get<Blob>('/proveedores/import/template', { responseType: 'blob' })

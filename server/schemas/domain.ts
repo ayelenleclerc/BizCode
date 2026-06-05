@@ -1478,6 +1478,52 @@ export const proveedorCuentaCorrienteAjusteBodySchema = z
 
 export { movimientoProveedorCCTipoSchema }
 
+const reciboPagoMetodoSchema = z.enum(['transferencia', 'cheque', 'efectivo', 'echeq'])
+
+/** @en Supplier payment receipt body (#271). */
+export const reciboPagoBodySchema = z
+  .object({
+    fecha: z.string(),
+    total: z.number().positive('total must be positive'),
+    metodoPago: reciboPagoMetodoSchema,
+    cbu: z.union([z.string(), z.null(), z.undefined()]).optional(),
+    referencia: z.union([z.string(), z.null(), z.undefined()]).optional(),
+    notas: z.union([z.string(), z.null(), z.undefined()]).optional(),
+    facturas: z
+      .array(
+        z.object({
+          comprobanteCompraId: z.union([z.number(), z.null(), z.undefined()]).optional(),
+          facturaRef: z.string().trim().min(1).max(40),
+          monto: z.number().positive('monto must be positive'),
+        }),
+      )
+      .min(1, 'At least one factura allocation is required'),
+  })
+  .superRefine((data, ctx) => {
+    const f = data.fecha.trim()
+    if (f.length === 0) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'fecha is required', path: ['fecha'] })
+    }
+    if (data.cbu != null && data.cbu.length > 22) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'cbu max 22 chars', path: ['cbu'] })
+    }
+    if (data.referencia != null && data.referencia.length > 60) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'referencia max 60 chars', path: ['referencia'] })
+    }
+    if (data.notas != null && data.notas.length > 500) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'notas max 500 chars', path: ['notas'] })
+    }
+    for (const line of data.facturas) {
+      if (line.comprobanteCompraId != null && (!Number.isInteger(line.comprobanteCompraId) || line.comprobanteCompraId < 1)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'comprobanteCompraId must be >= 1',
+          path: ['facturas'],
+        })
+      }
+    }
+  })
+
 export const comprobanteCompraBodySchema = z
   .object({
     fecha: z.string(),

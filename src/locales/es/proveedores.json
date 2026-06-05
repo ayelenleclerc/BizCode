@@ -147,5 +147,48 @@
       "nc_proveedor": "Nota de crédito",
       "ajuste": "Ajuste manual"
     }
+  },
+  "pagos": {
+    "title": "Recibos de pago",
+    "register": "Registrar pago",
+    "formTitle": "Nuevo recibo de pago",
+    "noPending": "No hay comprobantes pendientes de pago.",
+    "allocCaption": "Imputación a comprobantes pendientes",
+    "colSelect": "Incluir",
+    "colFactura": "Comprobante",
+    "colPendiente": "Pendiente",
+    "colMonto": "Monto a pagar",
+    "colNumero": "N°",
+    "colFecha": "Fecha",
+    "colTotal": "Total",
+    "colEstado": "Estado",
+    "colAcciones": "Acciones",
+    "fecha": "Fecha de pago",
+    "metodo": "Método de pago",
+    "cbu": "CBU destino",
+    "referencia": "Referencia (cheque, transferencia, etc.)",
+    "notas": "Notas",
+    "totalSeleccionado": "Total seleccionado: {{total}}",
+    "submit": "Registrar recibo",
+    "empty": "No hay recibos de pago registrados.",
+    "tableCaption": "Historial de recibos de pago",
+    "downloadPdf": "Descargar PDF",
+    "void": "Anular",
+    "voidConfirm": "¿Anular el recibo de pago N° {{numero}}? Se revertirá el saldo en cuenta corriente.",
+    "selectRow": "Incluir {{ref}} en el pago",
+    "montoRow": "Monto a pagar de {{ref}}",
+    "errorNoAllocation": "Seleccioná al menos un comprobante.",
+    "errorAllocationAmount": "Monto inválido para {{ref}}.",
+    "errorTotal": "El total debe ser mayor a cero.",
+    "metodoOptions": {
+      "transferencia": "Transferencia",
+      "cheque": "Cheque",
+      "efectivo": "Efectivo",
+      "echeq": "eCheq"
+    },
+    "estado": {
+      "emitido": "Emitido",
+      "anulado": "Anulado"
+    }
   }
 }

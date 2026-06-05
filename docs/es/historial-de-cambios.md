@@ -10,6 +10,8 @@ Versionado: [Semantic Versioning](https://semver.org/lang/es/).
 
 ### Agregado
 
+- **Recibo de pago a proveedor (GitHub #271):** modelos `ReciboPago` + `ReciboPagoFactura`; `GET/POST /api/proveedores/{id}/pagos`, helper de comprobantes pendientes, anulación y PDF; movimiento `pago` automático en CC; UI en pestaña cuenta corriente; módulo `finance.receipts`; OpenAPI, pruebas y manuales trilingües.
+
 - **Cuenta corriente de proveedor (GitHub #270):** modelo `MovimientoProveedorCC` con saldo corrido; `GET/POST` cuenta corriente bajo `/api/proveedores/{id}`; movimiento automático al crear comprobante de compra; pestaña UI con saldo, alerta de límite, gráfico 6 meses y ajuste manual auditado; OpenAPI, pruebas y manuales trilingües.
 - **Ficha completa de proveedor (GitHub #269):** modelo `Proveedor` ampliado (bancarios, comerciales, contacto); filtros `activo`/`categoria` en `GET /api/proveedores`; `DELETE /api/proveedores/{id}` baja lógica; validación CBU/CUIT; UI Proveedores con secciones colapsables; manuales trilingües y OpenAPI.
 

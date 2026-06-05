@@ -1,0 +1,116 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "cbu": {
+      "nullable": true,
+      "type": "string"
+    },
+    "createdAt": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "estado": {
+      "enum": [
+        "emitido",
+        "anulado"
+      ],
+      "type": "string"
+    },
+    "facturas": {
+      "items": {
+        "$ref": "./ReciboPagoFactura.schema.json"
+      },
+      "type": "array"
+    },
+    "fecha": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "id": {
+      "type": "integer"
+    },
+    "metodoPago": {
+      "enum": [
+        "transferencia",
+        "cheque",
+        "efectivo",
+        "echeq"
+      ],
+      "type": "string"
+    },
+    "notas": {
+      "nullable": true,
+      "type": "string"
+    },
+    "numero": {
+      "type": "integer"
+    },
+    "proveedor": {
+      "properties": {
+        "codigo": {
+          "type": "integer"
+        },
+        "cuit": {
+          "nullable": true,
+          "type": "string"
+        },
+        "id": {
+          "type": "integer"
+        },
+        "rsocial": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "codigo",
+        "rsocial"
+      ],
+      "type": "object"
+    },
+    "proveedorId": {
+      "type": "integer"
+    },
+    "referencia": {
+      "nullable": true,
+      "type": "string"
+    },
+    "total": {
+      "type": "string"
+    },
+    "usuario": {
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "username": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "username"
+      ],
+      "type": "object"
+    },
+    "usuarioId": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "id",
+    "numero",
+    "proveedorId",
+    "fecha",
+    "total",
+    "metodoPago",
+    "estado",
+    "usuarioId",
+    "proveedor",
+    "usuario",
+    "facturas",
+    "createdAt"
+  ],
+  "title": "ReciboPago",
+  "type": "object"
+}

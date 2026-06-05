@@ -10,6 +10,8 @@ Versioning: [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **Supplier payment receipts (GitHub #271):** `ReciboPago` + `ReciboPagoFactura`; `GET/POST /api/proveedores/{id}/pagos`, pending-voucher helper, void endpoint, PDF download; automatic `pago` ledger movement; UI in accounts-payable tab; module `finance.receipts`; OpenAPI, tests, trilingual manuals.
+
 - **Supplier accounts payable ledger (GitHub #270):** `MovimientoProveedorCC` running balance; `GET/POST` under `/api/proveedores/{id}/cuenta-corriente`; automatic movement on purchase voucher create; UI tab with balance, credit-limit alert, 6-month chart, audited manual adjustment; OpenAPI, tests, trilingual manuals.
 - **Supplier full profile (GitHub #269):** extended `Proveedor` model (banking, commercial, contact); `GET /api/proveedores` filters `activo`/`categoria`; `DELETE /api/proveedores/{id}` logical deactivate; CBU/CUIT validation; Suppliers UI with collapsible sections; trilingual user manuals and OpenAPI.
 

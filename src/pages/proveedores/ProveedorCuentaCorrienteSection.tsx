@@ -4,6 +4,7 @@ import { CanAccess } from '@/components/CanAccess'
 import { ApiRequestFailedError, proveedoresAPI } from '@/lib/api'
 import type { MovimientoProveedorCCTipo, ProveedorCuentaCorriente } from '@/types'
 import ProveedorDeudaChart from './ProveedorDeudaChart'
+import ProveedorReciboPagoSection from './ProveedorReciboPagoSection'
 
 const TIPOS: MovimientoProveedorCCTipo[] = ['factura_compra', 'pago', 'nc_proveedor', 'ajuste']
 
@@ -139,6 +140,8 @@ export default function ProveedorCuentaCorrienteSection({ proveedorId }: Props) 
       </div>
 
       <ProveedorDeudaChart serie={data.serie} />
+
+      <ProveedorReciboPagoSection proveedorId={proveedorId} onPaymentRegistered={() => void load()} />
 
       <div className="flex flex-wrap gap-2 items-end">
         <div>

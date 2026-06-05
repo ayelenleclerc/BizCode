@@ -33,6 +33,17 @@ Ao registrar um **comprovante de compra** ativo (`POST /api/comprobantes-compra`
 
 **API:** `GET /api/proveedores/{id}/cuenta-corriente`, `GET .../saldo`, `POST .../cuenta-corriente/ajuste` — [OpenAPI](../../api/openapi.yaml).
 
+## Recibos de pagamento (GitHub #271)
+
+Na aba **Conta corrente**, o bloco **Recibos de pagamento** registra pagamentos ao fornecedor (módulo `finance.receipts`, `suppliers.manage`):
+
+1. **Registrar pagamento** — comprovantes pendentes (mais antigos primeiro); selecione linhas e valores (parcial ou total).
+2. Data, forma (transferência, cheque, dinheiro, eCheq), CBU/referência/notas opcionais.
+3. Ao salvar: número correlativo por tenant, movimento `pago` na CC (valor negativo) e auditoria `recibo_pago_create`.
+4. **Baixar PDF** por recibo; **Anular** (`recibo_pago_void`) reverte o saldo com movimento compensatório.
+
+**API:** `GET /api/proveedores/{id}/pagos/comprobantes-pendientes`, `GET/POST /api/proveedores/{id}/pagos`, `POST .../pagos/{reciboId}/anular`, `GET .../pagos/{reciboId}/pdf` — [OpenAPI](../../api/openapi.yaml).
+
 ## Desativação (exclusão lógica)
 
 **Desativar** define `activo: false` sem apagar o registro. Use o filtro de inativos para revisar.

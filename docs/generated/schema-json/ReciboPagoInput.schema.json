@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "cbu": {
+      "maxLength": 22,
+      "nullable": true,
+      "type": "string"
+    },
+    "facturas": {
+      "items": {
+        "properties": {
+          "comprobanteCompraId": {
+            "nullable": true,
+            "type": "integer"
+          },
+          "facturaRef": {
+            "type": "string"
+          },
+          "monto": {
+            "exclusiveMinimum": 0,
+            "type": "number"
+          }
+        },
+        "required": [
+          "facturaRef",
+          "monto"
+        ],
+        "type": "object"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "fecha": {
+      "type": "string"
+    },
+    "metodoPago": {
+      "enum": [
+        "transferencia",
+        "cheque",
+        "efectivo",
+        "echeq"
+      ],
+      "type": "string"
+    },
+    "notas": {
+      "maxLength": 500,
+      "nullable": true,
+      "type": "string"
+    },
+    "referencia": {
+      "maxLength": 60,
+      "nullable": true,
+      "type": "string"
+    },
+    "total": {
+      "exclusiveMinimum": 0,
+      "type": "number"
+    }
+  },
+  "required": [
+    "fecha",
+    "total",
+    "metodoPago",
+    "facturas"
+  ],
+  "title": "ReciboPagoInput",
+  "type": "object"
+}
