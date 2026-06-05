@@ -1038,6 +1038,36 @@ export const proveedoresAPI = {
     }
   },
 
+  cuentaCorriente: async (
+    id: number,
+    params?: { tipo?: string; from?: string; to?: string },
+  ) => {
+    try {
+      const response = await api.get(`/proveedores/${id}/cuenta-corriente`, { params })
+      return response.data.data
+    } catch (error) {
+      handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  cuentaCorrienteSaldo: async (id: number) => {
+    try {
+      const response = await api.get(`/proveedores/${id}/cuenta-corriente/saldo`)
+      return response.data.data
+    } catch (error) {
+      handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  cuentaCorrienteAjuste: async (id: number, body: { monto: number; motivo: string }) => {
+    try {
+      const response = await api.post(`/proveedores/${id}/cuenta-corriente/ajuste`, body)
+      return response.data.data
+    } catch (error) {
+      handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
   downloadImportTemplate: async (): Promise<Blob> => {
     try {
       const response = await api.get<Blob>('/proveedores/import/template', { responseType: 'blob' })

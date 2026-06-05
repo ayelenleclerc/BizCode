@@ -46,6 +46,9 @@
     "titleNew": "New supplier",
     "titleEdit": "Edit supplier #{{codigo}}",
     "hint": "F5=save, Esc=cancel",
+    "tabsLabel": "Profile sections",
+    "tabDatos": "Details",
+    "tabCuentaCorriente": "Accounts payable",
     "sections": {
       "general": "General",
       "banking": "Banking",
@@ -108,6 +111,41 @@
       "rsocialInvalid": "Business name must be at least 3 characters",
       "cuitInvalid": "Invalid tax ID",
       "cbuInvalid": "Invalid CBU"
+    }
+  },
+  "cc": {
+    "saldoActual": "Current balance (debt)",
+    "limiteCredito": "Credit limit: {{limite}}",
+    "excedeLimite": "Balance exceeds the configured credit limit.",
+    "chartTitle": "Debt trend (6 months)",
+    "chartAria": "Supplier debt evolution chart",
+    "chartEmpty": "No movements to chart.",
+    "saldo": "Balance",
+    "filterTipo": "Type",
+    "filterTipoAll": "All",
+    "filterFrom": "From",
+    "filterTo": "To",
+    "filterApply": "Apply filters",
+    "ajusteOpen": "Manual adjustment",
+    "ajusteTitle": "Ledger adjustment",
+    "ajusteMonto": "Amount (+ increases debt, − reduces)",
+    "ajusteMotivo": "Reason (required)",
+    "ajusteSubmit": "Post adjustment",
+    "ajusteMontoInvalid": "Enter a non-zero amount.",
+    "ajusteMotivoRequired": "Reason is required.",
+    "movimientosEmpty": "No movements for the selected filters.",
+    "empty": "Could not load accounts payable.",
+    "tableCaption": "Accounts payable movements",
+    "colFecha": "Date",
+    "colTipo": "Type",
+    "colReferencia": "Reference",
+    "colMonto": "Amount",
+    "colSaldo": "Balance after",
+    "tipo": {
+      "factura_compra": "Purchase invoice",
+      "pago": "Payment",
+      "nc_proveedor": "Credit note",
+      "ajuste": "Manual adjustment"
     }
   }
 }

@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "codigo": {
+      "type": "integer"
+    },
+    "excedeLimite": {
+      "type": "boolean"
+    },
+    "limiteCredito": {
+      "nullable": true,
+      "type": "string"
+    },
+    "movimientos": {
+      "items": {
+        "$ref": "./MovimientoProveedorCC.schema.json"
+      },
+      "type": "array"
+    },
+    "proveedorId": {
+      "type": "integer"
+    },
+    "rsocial": {
+      "type": "string"
+    },
+    "saldo": {
+      "type": "string"
+    },
+    "serie": {
+      "items": {
+        "$ref": "./ProveedorCuentaCorrienteChartPoint.schema.json"
+      },
+      "type": "array"
+    }
+  },
+  "required": [
+    "proveedorId",
+    "codigo",
+    "rsocial",
+    "saldo",
+    "excedeLimite",
+    "movimientos",
+    "serie"
+  ],
+  "title": "ProveedorCuentaCorriente",
+  "type": "object"
+}

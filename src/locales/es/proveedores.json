@@ -46,6 +46,9 @@
     "titleNew": "Nuevo proveedor",
     "titleEdit": "Editar proveedor #{{codigo}}",
     "hint": "F5=guardar, Esc=cancelar",
+    "tabsLabel": "Secciones de la ficha",
+    "tabDatos": "Datos",
+    "tabCuentaCorriente": "Cuenta corriente",
     "sections": {
       "general": "Datos generales",
       "banking": "Datos bancarios",
@@ -108,6 +111,41 @@
       "rsocialInvalid": "La razón social debe tener al menos 3 caracteres",
       "cuitInvalid": "CUIT inválido",
       "cbuInvalid": "CBU inválido"
+    }
+  },
+  "cc": {
+    "saldoActual": "Saldo actual (deuda)",
+    "limiteCredito": "Límite de crédito: {{limite}}",
+    "excedeLimite": "El saldo supera el límite de crédito configurado.",
+    "chartTitle": "Evolución de deuda (6 meses)",
+    "chartAria": "Gráfico de evolución de deuda del proveedor",
+    "chartEmpty": "Sin movimientos para graficar.",
+    "saldo": "Saldo",
+    "filterTipo": "Tipo",
+    "filterTipoAll": "Todos",
+    "filterFrom": "Desde",
+    "filterTo": "Hasta",
+    "filterApply": "Aplicar filtros",
+    "ajusteOpen": "Ajuste manual",
+    "ajusteTitle": "Ajuste de cuenta corriente",
+    "ajusteMonto": "Monto (+ aumenta deuda, − reduce)",
+    "ajusteMotivo": "Motivo (obligatorio)",
+    "ajusteSubmit": "Registrar ajuste",
+    "ajusteMontoInvalid": "Ingresá un monto distinto de cero.",
+    "ajusteMotivoRequired": "El motivo es obligatorio.",
+    "movimientosEmpty": "No hay movimientos con los filtros seleccionados.",
+    "empty": "No se pudo cargar la cuenta corriente.",
+    "tableCaption": "Movimientos de cuenta corriente",
+    "colFecha": "Fecha",
+    "colTipo": "Tipo",
+    "colReferencia": "Referencia",
+    "colMonto": "Monto",
+    "colSaldo": "Saldo después",
+    "tipo": {
+      "factura_compra": "Factura de compra",
+      "pago": "Pago",
+      "nc_proveedor": "Nota de crédito",
+      "ajuste": "Ajuste manual"
     }
   }
 }

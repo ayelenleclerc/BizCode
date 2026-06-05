@@ -19,6 +19,20 @@ Open **New** (F3) or select a row and **Edit**. The form has four sections:
 
 Shortcuts: **F5** save, **Esc** cancel.
 
+## Accounts payable ledger (GitHub #270)
+
+For **existing** suppliers, open the **Accounts payable** tab:
+
+- **Current balance** (debt accumulated from ledger movements).
+- Visual alert when balance exceeds the configured **credit limit**.
+- **Chart** of debt trend (last 6 months).
+- **Movements table** with type and date filters.
+- **Manual adjustment** (`suppliers.manage`): non-zero amount and required reason; audited as `proveedor_cc_ajuste`.
+
+Creating an active **purchase voucher** (`POST /api/comprobantes-compra`, `finance.ledger` module) posts a `factura_compra` movement for the voucher total.
+
+**API:** `GET /api/proveedores/{id}/cuenta-corriente`, `GET .../saldo`, `POST .../cuenta-corriente/ajuste` — see [OpenAPI](../../api/openapi.yaml).
+
 ## Deactivate (logical delete)
 
 Select a row and **Deactivate**. The record stays in the database (`activo: false`) for purchase orders and purchase vouchers already linked. Use the inactive filter to review deactivated suppliers.

@@ -8427,6 +8427,611 @@ Sets `activo` to false. Does not remove rows referenced by purchase orders or vo
 }
 ```
 
+### PARAMETERS /api/proveedores/{id}/cuenta-corriente
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/proveedores/{id}/cuenta-corriente`
+
+### Supplier accounts-payable statement
+
+- **Method:** `GET`
+- **Path:** `/api/proveedores/{id}/cuenta-corriente`
+- **Tags:** proveedores
+
+Ledger movements, current balance, credit-limit alert, and 6-month debt series (#270).
+
+#### Responses
+
+##### Status: 200 Statement
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`codigo` (required)**
+
+    `integer`
+
+  - **`excedeLimite` (required)**
+
+    `boolean`
+
+  - **`movimientos` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`fecha` (required)**
+
+      `string`, format: `date-time`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`monto` (required)**
+
+      `string`
+
+    - **`saldoPost` (required)**
+
+      `string`
+
+    - **`tipo` (required)**
+
+      `string`, possible values: `"factura_compra", "pago", "nc_proveedor", "ajuste"`
+
+    - **`usuarioId` (required)**
+
+      `integer`
+
+    - **`notas`**
+
+      `string`
+
+    - **`referencia`**
+
+      `string`
+
+  - **`proveedorId` (required)**
+
+    `integer`
+
+  - **`rsocial` (required)**
+
+    `string`
+
+  - **`saldo` (required)**
+
+    `string`
+
+  - **`serie` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`period` (required)**
+
+      `string` — YYYY-MM month bucket
+
+    - **`saldo` (required)**
+
+      `string`
+
+  - **`limiteCredito`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "proveedorId": 1,
+    "codigo": 1,
+    "rsocial": "",
+    "saldo": "",
+    "limiteCredito": "",
+    "excedeLimite": true,
+    "movimientos": [
+      {
+        "id": 1,
+        "tipo": "factura_compra",
+        "referencia": "",
+        "monto": "",
+        "saldoPost": "",
+        "fecha": "",
+        "usuarioId": 1,
+        "notas": ""
+      }
+    ],
+    "serie": [
+      {
+        "period": "",
+        "saldo": ""
+      }
+    ]
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/proveedores/{id}/cuenta-corriente/saldo
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/proveedores/{id}/cuenta-corriente/saldo`
+
+### Supplier accounts-payable balance only
+
+- **Method:** `GET`
+- **Path:** `/api/proveedores/{id}/cuenta-corriente/saldo`
+- **Tags:** proveedores
+
+#### Responses
+
+##### Status: 200 Balance snapshot
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`excedeLimite` (required)**
+
+    `boolean`
+
+  - **`proveedorId` (required)**
+
+    `integer`
+
+  - **`saldo` (required)**
+
+    `string`
+
+  - **`limiteCredito`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "proveedorId": 1,
+    "saldo": "",
+    "limiteCredito": "",
+    "excedeLimite": true
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/proveedores/{id}/cuenta-corriente/ajuste
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/proveedores/{id}/cuenta-corriente/ajuste`
+
+### Manual supplier ledger adjustment
+
+- **Method:** `POST`
+- **Path:** `/api/proveedores/{id}/cuenta-corriente/ajuste`
+- **Tags:** proveedores
+
+Requires suppliers.manage; posts audit event proveedor\_cc\_ajuste.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`monto` (required)**
+
+  `number` — Non-zero; positive increases debt, negative reduces debt
+
+- **`motivo` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "monto": 1,
+  "motivo": ""
+}
+```
+
+#### Responses
+
+##### Status: 201 Movement created
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`monto` (required)**
+
+    `string`
+
+  - **`saldoPost` (required)**
+
+    `string`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_compra", "pago", "nc_proveedor", "ajuste"`
+
+  - **`usuarioId` (required)**
+
+    `integer`
+
+  - **`notas`**
+
+    `string`
+
+  - **`referencia`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tipo": "factura_compra",
+    "referencia": "",
+    "monto": "",
+    "saldoPost": "",
+    "fecha": "",
+    "usuarioId": 1,
+    "notas": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ### PARAMETERS /api/compras
 
 - **Method:** `PARAMETERS`
@@ -31552,6 +32157,467 @@ true
         "cobroId": 1
       }
     ]
+  }
+}
+```
+
+### MovimientoProveedorCC
+
+- **Type:**`object`
+
+* **`fecha` (required)**
+
+  `string`, format: `date-time`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`monto` (required)**
+
+  `string`
+
+* **`saldoPost` (required)**
+
+  `string`
+
+* **`tipo` (required)**
+
+  `string`, possible values: `"factura_compra", "pago", "nc_proveedor", "ajuste"`
+
+* **`usuarioId` (required)**
+
+  `integer`
+
+* **`notas`**
+
+  `string`
+
+* **`referencia`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "tipo": "factura_compra",
+  "referencia": "",
+  "monto": "",
+  "saldoPost": "",
+  "fecha": "",
+  "usuarioId": 1,
+  "notas": ""
+}
+```
+
+### ProveedorCuentaCorrienteChartPoint
+
+- **Type:**`object`
+
+* **`period` (required)**
+
+  `string` — YYYY-MM month bucket
+
+* **`saldo` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "period": "",
+  "saldo": ""
+}
+```
+
+### ProveedorCuentaCorriente
+
+- **Type:**`object`
+
+* **`codigo` (required)**
+
+  `integer`
+
+* **`excedeLimite` (required)**
+
+  `boolean`
+
+* **`movimientos` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`monto` (required)**
+
+    `string`
+
+  - **`saldoPost` (required)**
+
+    `string`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_compra", "pago", "nc_proveedor", "ajuste"`
+
+  - **`usuarioId` (required)**
+
+    `integer`
+
+  - **`notas`**
+
+    `string`
+
+  - **`referencia`**
+
+    `string`
+
+* **`proveedorId` (required)**
+
+  `integer`
+
+* **`rsocial` (required)**
+
+  `string`
+
+* **`saldo` (required)**
+
+  `string`
+
+* **`serie` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`period` (required)**
+
+    `string` — YYYY-MM month bucket
+
+  - **`saldo` (required)**
+
+    `string`
+
+* **`limiteCredito`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "proveedorId": 1,
+  "codigo": 1,
+  "rsocial": "",
+  "saldo": "",
+  "limiteCredito": "",
+  "excedeLimite": true,
+  "movimientos": [
+    {
+      "id": 1,
+      "tipo": "factura_compra",
+      "referencia": "",
+      "monto": "",
+      "saldoPost": "",
+      "fecha": "",
+      "usuarioId": 1,
+      "notas": ""
+    }
+  ],
+  "serie": [
+    {
+      "period": "",
+      "saldo": ""
+    }
+  ]
+}
+```
+
+### ProveedorCuentaCorrienteSaldo
+
+- **Type:**`object`
+
+* **`excedeLimite` (required)**
+
+  `boolean`
+
+* **`proveedorId` (required)**
+
+  `integer`
+
+* **`saldo` (required)**
+
+  `string`
+
+* **`limiteCredito`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "proveedorId": 1,
+  "saldo": "",
+  "limiteCredito": "",
+  "excedeLimite": true
+}
+```
+
+### ProveedorCuentaCorrienteAjusteInput
+
+- **Type:**`object`
+
+* **`monto` (required)**
+
+  `number` — Non-zero; positive increases debt, negative reduces debt
+
+* **`motivo` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "monto": 1,
+  "motivo": ""
+}
+```
+
+### ProveedorCuentaCorrienteEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`codigo` (required)**
+
+    `integer`
+
+  - **`excedeLimite` (required)**
+
+    `boolean`
+
+  - **`movimientos` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`fecha` (required)**
+
+      `string`, format: `date-time`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`monto` (required)**
+
+      `string`
+
+    - **`saldoPost` (required)**
+
+      `string`
+
+    - **`tipo` (required)**
+
+      `string`, possible values: `"factura_compra", "pago", "nc_proveedor", "ajuste"`
+
+    - **`usuarioId` (required)**
+
+      `integer`
+
+    - **`notas`**
+
+      `string`
+
+    - **`referencia`**
+
+      `string`
+
+  - **`proveedorId` (required)**
+
+    `integer`
+
+  - **`rsocial` (required)**
+
+    `string`
+
+  - **`saldo` (required)**
+
+    `string`
+
+  - **`serie` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`period` (required)**
+
+      `string` — YYYY-MM month bucket
+
+    - **`saldo` (required)**
+
+      `string`
+
+  - **`limiteCredito`**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "proveedorId": 1,
+    "codigo": 1,
+    "rsocial": "",
+    "saldo": "",
+    "limiteCredito": "",
+    "excedeLimite": true,
+    "movimientos": [
+      {
+        "id": 1,
+        "tipo": "factura_compra",
+        "referencia": "",
+        "monto": "",
+        "saldoPost": "",
+        "fecha": "",
+        "usuarioId": 1,
+        "notas": ""
+      }
+    ],
+    "serie": [
+      {
+        "period": "",
+        "saldo": ""
+      }
+    ]
+  }
+}
+```
+
+### ProveedorCuentaCorrienteSaldoEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`excedeLimite` (required)**
+
+    `boolean`
+
+  - **`proveedorId` (required)**
+
+    `integer`
+
+  - **`saldo` (required)**
+
+    `string`
+
+  - **`limiteCredito`**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "proveedorId": 1,
+    "saldo": "",
+    "limiteCredito": "",
+    "excedeLimite": true
+  }
+}
+```
+
+### MovimientoProveedorCCEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`monto` (required)**
+
+    `string`
+
+  - **`saldoPost` (required)**
+
+    `string`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_compra", "pago", "nc_proveedor", "ajuste"`
+
+  - **`usuarioId` (required)**
+
+    `integer`
+
+  - **`notas`**
+
+    `string`
+
+  - **`referencia`**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tipo": "factura_compra",
+    "referencia": "",
+    "monto": "",
+    "saldoPost": "",
+    "fecha": "",
+    "usuarioId": 1,
+    "notas": ""
   }
 }
 ```

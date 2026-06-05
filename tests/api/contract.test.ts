@@ -335,6 +335,24 @@ function buildPrisma(): PrismaClient {
         updatedAt: new Date(),
       }),
     },
+    movimientoProveedorCC: {
+      findFirst: vi.fn().mockResolvedValue(null),
+      findMany: vi.fn().mockResolvedValue([]),
+      create: vi.fn().mockResolvedValue({
+        id: 1,
+        tenantId: 1,
+        proveedorId: 1,
+        tipo: 'factura_compra',
+        referencia: 'B-0001-1',
+        monto: 121,
+        saldoPost: 121,
+        fecha: new Date('2026-05-10T12:00:00.000Z'),
+        usuarioId: 1,
+        notas: null,
+        comprobanteCompraId: 1,
+        createdAt: new Date(),
+      }),
+    },
     cobro: {
       findMany: vi.fn().mockResolvedValue([]),
     },
@@ -494,6 +512,46 @@ function buildPrisma(): PrismaClient {
             upsert: vi.fn().mockResolvedValue(articuloRow),
           },
           proveedor: { create: proveedorTxCreate },
+          comprobanteCompra: {
+            create: vi.fn().mockResolvedValue({
+              id: 1,
+              tenantId: 1,
+              proveedorId: 1,
+              ordenCompraId: null,
+              fecha: new Date('2026-05-10T12:00:00.000Z'),
+              tipo: 'B',
+              prefijo: '0001',
+              numero: 1,
+              neto1: 100,
+              neto2: 0,
+              neto3: 0,
+              iva1: 21,
+              iva2: 0,
+              total: 121,
+              cae: null,
+              caeVto: null,
+              estado: 'A',
+              createdAt: new Date(),
+              updatedAt: new Date(),
+            }),
+          },
+          movimientoProveedorCC: {
+            findFirst: vi.fn().mockResolvedValue(null),
+            create: vi.fn().mockResolvedValue({
+              id: 1,
+              tenantId: 1,
+              proveedorId: 1,
+              tipo: 'factura_compra',
+              referencia: 'B-0001-1',
+              monto: 121,
+              saldoPost: 121,
+              fecha: new Date('2026-05-10T12:00:00.000Z'),
+              usuarioId: 1,
+              notas: null,
+              comprobanteCompraId: 1,
+              createdAt: new Date(),
+            }),
+          },
           stockAjuste: {
             create: vi.fn().mockResolvedValue({
               id: 1,
@@ -749,6 +807,28 @@ describe('API — contrato OpenAPI', () => {
     const app = createApp(prisma)
     const res = await request(app).put('/api/proveedores/1').send(proveedorInput).expect(200)
     await assertMatchesOpenApi('/api/proveedores/{id}', 'put', '200', res.body)
+  })
+
+  it('GET /api/proveedores/{id}/cuenta-corriente', async () => {
+    const app = createApp(prisma)
+    const res = await request(app).get('/api/proveedores/1/cuenta-corriente').expect(200)
+    await assertMatchesOpenApi('/api/proveedores/{id}/cuenta-corriente', 'get', '200', res.body)
+    expect(res.body.data.serie).toHaveLength(6)
+  })
+
+  it('GET /api/proveedores/{id}/cuenta-corriente/saldo', async () => {
+    const app = createApp(prisma)
+    const res = await request(app).get('/api/proveedores/1/cuenta-corriente/saldo').expect(200)
+    await assertMatchesOpenApi('/api/proveedores/{id}/cuenta-corriente/saldo', 'get', '200', res.body)
+  })
+
+  it('POST /api/proveedores/{id}/cuenta-corriente/ajuste', async () => {
+    const app = createApp(prisma)
+    const res = await request(app)
+      .post('/api/proveedores/1/cuenta-corriente/ajuste')
+      .send({ monto: -10, motivo: 'Contract test adjustment' })
+      .expect(201)
+    await assertMatchesOpenApi('/api/proveedores/{id}/cuenta-corriente/ajuste', 'post', '201', res.body)
   })
 
   it('POST /api/proveedores/import', async () => {

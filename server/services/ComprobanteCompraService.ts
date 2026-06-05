@@ -1,5 +1,6 @@
 import type { ComprobanteCompra, Prisma, PrismaClient } from '@prisma/client'
 import { ConflictAppError, NotFoundAppError, ValidationAppError } from '../errors/AppError'
+import { ProveedorCuentaCorrienteService } from './ProveedorCuentaCorrienteService'
 
 export type ComprobanteCompraCreateInput = {
   fecha: string
@@ -26,7 +27,11 @@ export type ComprobanteCompraCreateInput = {
 export class ComprobanteCompraService {
   constructor(private readonly prisma: PrismaClient) {}
 
-  async create(tenantId: number, input: ComprobanteCompraCreateInput): Promise<ComprobanteCompra> {
+  async create(
+    tenantId: number,
+    input: ComprobanteCompraCreateInput,
+    usuarioId?: number,
+  ): Promise<ComprobanteCompra> {
     const fecha = new Date(input.fecha)
     if (Number.isNaN(fecha.getTime())) {
       throw new ValidationAppError('Invalid fecha')
@@ -68,19 +73,32 @@ export class ComprobanteCompraService {
         : {}),
     }
 
-    try {
-      return await this.prisma.comprobanteCompra.create({ data })
-    } catch (err: unknown) {
-      if (
-        err &&
-        typeof err === 'object' &&
-        'code' in err &&
-        (err as { code: string }).code === 'P2002'
-      ) {
-        throw new ConflictAppError('Comprobante compra already exists for tipo/prefijo/numero')
+    const createOne = async (client: PrismaClient | Prisma.TransactionClient) => {
+      try {
+        return await client.comprobanteCompra.create({ data })
+      } catch (err: unknown) {
+        if (
+          err &&
+          typeof err === 'object' &&
+          'code' in err &&
+          (err as { code: string }).code === 'P2002'
+        ) {
+          throw new ConflictAppError('Comprobante compra already exists for tipo/prefijo/numero')
+        }
+        throw err
       }
-      throw err
     }
+
+    if (usuarioId == null) {
+      return createOne(this.prisma)
+    }
+
+    return this.prisma.$transaction(async (tx) => {
+      const created = await createOne(tx)
+      const cc = new ProveedorCuentaCorrienteService(tx)
+      await cc.recordFromComprobanteCompra(tenantId, created, usuarioId)
+      return created
+    })
   }
 
   async listByPeriod(
