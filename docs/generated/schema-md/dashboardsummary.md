@@ -20,6 +20,7 @@ undefined#/properties/data
 | :------------------------------------ | :-------- | :------- | :------------- | :----------------------------------------------------------------------------------------------------------- |
 | [alertasActivas](#alertasactivas)     | `integer` | Required | cannot be null | [DashboardSummary](dashboardsummary-properties-alertasactivas.md "undefined#/properties/alertasActivas")     |
 | [cobrosHoy](#cobroshoy)               | `object`  | Required | cannot be null | [DashboardSummary](dashboardsummary-properties-cobroshoy.md "undefined#/properties/cobrosHoy")               |
+| [facturasPagar](#facturaspagar)       | `object`  | Required | cannot be null | [DashboardSummary](dashboardfacturaspagarwidget.md "undefined#/properties/facturasPagar")                    |
 | [facturasVencidas](#facturasvencidas) | `object`  | Required | cannot be null | [DashboardSummary](dashboardsummary-properties-facturasvencidas.md "undefined#/properties/facturasVencidas") |
 | [ventasHoy](#ventashoy)               | `object`  | Required | cannot be null | [DashboardSummary](dashboardsummary-properties-ventashoy.md "undefined#/properties/ventasHoy")               |
 
@@ -58,6 +59,24 @@ undefined#/properties/data
 ### cobrosHoy Type
 
 `object` ([Details](dashboardsummary-properties-cobroshoy.md))
+
+## facturasPagar
+
+
+
+`facturasPagar`
+
+* is required
+
+* Type: `object` ([DashboardFacturasPagarWidget](dashboardfacturaspagarwidget.md))
+
+* cannot be null
+
+* defined in: [DashboardSummary](dashboardfacturaspagarwidget.md "undefined#/properties/facturasPagar")
+
+### facturasPagar Type
+
+`object` ([DashboardFacturasPagarWidget](dashboardfacturaspagarwidget.md))
 
 ## facturasVencidas
 

@@ -24,6 +24,7 @@ import { registerSuperadminTenantsRoutes } from './routes/registerSuperadminTena
 import { registerProveedoresRoutes } from './routes/registerProveedoresRoutes'
 import { registerProveedorCuentaCorrienteRoutes } from './routes/registerProveedorCuentaCorrienteRoutes'
 import { registerReciboPagoRoutes } from './routes/registerReciboPagoRoutes'
+import { registerProveedorAlertasRoutes } from './routes/registerProveedorAlertasRoutes'
 import { registerRubrosRoutes } from './routes/registerRubrosRoutes'
 import type { RestRouteContext } from './routes/restRouteTypes'
 import { registerZonasEntregaRoutes } from './routes/registerZonasEntregaRoutes'
@@ -65,6 +66,7 @@ export function registerRestDomainRoutes(app: Application, prisma: PrismaClient)
   registerClientesRoutes(app, ctx)
   registerArticulosRoutes(app, ctx)
   registerRubrosRoutes(app, ctx)
+  registerProveedorAlertasRoutes(app, ctx)
   registerProveedoresRoutes(app, ctx)
   registerProveedorCuentaCorrienteRoutes(app, ctx)
   registerReciboPagoRoutes(app, ctx)

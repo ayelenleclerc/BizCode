@@ -205,6 +205,8 @@ model ComprobanteCompra {
   ordenCompraId Int?
   ordenCompra   OrdenCompra? @relation(fields: [ordenCompraId], references: [id])
   fecha         DateTime
+  /// Explicit due date; when null, derived from proveedor plazo (#275).
+  vencimiento   DateTime?
   tipo          String      @db.VarChar(1)
   prefijo       String      @db.VarChar(4)
   numero        Int
@@ -223,6 +225,7 @@ model ComprobanteCompra {
 
   movimientoCuentaCorriente MovimientoProveedorCC?
   reciboPagoFacturas       ReciboPagoFactura[]
+  alertasProveedor         AlertaProveedorLog[]
 
   @@unique([tenantId, tipo, prefijo, numero])
   @@index([tenantId, fecha])
@@ -488,6 +491,8 @@ model Tenant {
   comprobantesCompra       ComprobanteCompra[]
   movimientosProveedorCC   MovimientoProveedorCC[]
   recibosPago              ReciboPago[]
+  alertaProveedorConfig    AlertaProveedorConfig?
+  alertasProveedorLog      AlertaProveedorLog[]
   facturas       Factura[]
   notasCredito   NotaCredito[]
   pedidos        Pedido[]
@@ -711,6 +716,33 @@ model AppUser {
   recibosPago            ReciboPago[]
 
   @@unique([tenantId, username])
+}
+
+/// Supplier payable alert settings per tenant (#275).
+model AlertaProveedorConfig {
+  id              Int      @id @default(autoincrement())
+  tenantId        Int      @unique
+  tenant          Tenant   @relation(fields: [tenantId], references: [id])
+  diasPrevioAviso Int      @default(3)
+  diasCritico     Int      @default(7)
+  notifEmail      Boolean  @default(true)
+  notifInApp      Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+/// Dedup log for supplier payable alerts (#275).
+model AlertaProveedorLog {
+  id                  Int               @id @default(autoincrement())
+  tenantId            Int
+  tenant              Tenant            @relation(fields: [tenantId], references: [id])
+  comprobanteCompraId Int
+  comprobanteCompra   ComprobanteCompra @relation(fields: [comprobanteCompraId], references: [id])
+  /// proxima_vencer | vencida_hoy | vencida_critica | limite_credito
+  tipo                String            @db.VarChar(30)
+  enviadoAt           DateTime          @default(now())
+
+  @@index([tenantId, comprobanteCompraId, tipo, enviadoAt])
 }
 
 /// Supplier payment receipt (#271).

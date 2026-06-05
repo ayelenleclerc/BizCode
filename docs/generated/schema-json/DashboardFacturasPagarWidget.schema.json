@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "proximoVencer": {
+      "properties": {
+        "count": {
+          "type": "integer"
+        },
+        "total": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "count",
+        "total"
+      ],
+      "type": "object"
+    },
+    "vencido": {
+      "properties": {
+        "count": {
+          "type": "integer"
+        },
+        "total": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "count",
+        "total"
+      ],
+      "type": "object"
+    }
+  },
+  "required": [
+    "vencido",
+    "proximoVencer"
+  ],
+  "title": "DashboardFacturasPagarWidget",
+  "type": "object"
+}

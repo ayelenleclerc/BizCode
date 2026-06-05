@@ -10,7 +10,10 @@ import {
   cobranzasAPI,
   contabilidadAPI,
   notasCreditoAPI,
+  proveedoresAPI,
   reportesAPI,
+  type FacturaPendienteEstado,
+  type FacturaPendienteRow,
   type AgingArData,
   type AgingBucket,
   type CuentaCorrienteData,
@@ -83,6 +86,10 @@ function FinanzasPageContent() {
   const [minDiasMora, setMinDiasMora] = useState('1')
   const [sendingId, setSendingId] = useState<number | null>(null)
   const [sendFeedback, setSendFeedback] = useState<Record<number, 'ok' | '409'>>({})
+  const [payables, setPayables] = useState<FacturaPendienteRow[]>([])
+  const [payablesLoading, setPayablesLoading] = useState(false)
+  const [payablesError, setPayablesError] = useState<Error | null>(null)
+  const [payablesEstado, setPayablesEstado] = useState<FacturaPendienteEstado | ''>('')
 
   const loadAging = useCallback(async () => {
     setLoading(true)
@@ -117,6 +124,25 @@ function FinanzasPageContent() {
   useEffect(() => {
     void loadVencidas()
   }, [loadVencidas])
+
+  const loadPayables = useCallback(async () => {
+    setPayablesLoading(true)
+    setPayablesError(null)
+    try {
+      const data = await proveedoresAPI.facturasPendientes(
+        payablesEstado ? { estado: payablesEstado } : undefined,
+      )
+      setPayables(data ?? [])
+    } catch (error) {
+      setPayablesError(error instanceof Error ? error : new Error(String(error)))
+    } finally {
+      setPayablesLoading(false)
+    }
+  }, [payablesEstado])
+
+  useEffect(() => {
+    void loadPayables()
+  }, [loadPayables])
 
   const minDias = Number.parseInt(minDiasMora, 10)
   const filteredVencidas = useMemo(() => {
@@ -302,6 +328,74 @@ function FinanzasPageContent() {
             )}
           </AsyncWrapper>
         </section>
+
+        <IfModule flag="finance.ledger">
+          <section className="mt-8" aria-labelledby="finanzas-payables-heading">
+            <h2
+              id="finanzas-payables-heading"
+              className="text-lg font-semibold mb-2 text-slate-900 dark:text-slate-100"
+            >
+              {t('payables.title')}
+            </h2>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mb-3">{t('payables.hint')}</p>
+            <div className="mb-3" data-testid="finanzas-payables-filter">
+              <label htmlFor="finanzas-payables-estado" className="block text-xs text-slate-500 mb-1">
+                {t('payables.filterEstado')}
+              </label>
+              <select
+                id="finanzas-payables-estado"
+                className="border border-slate-300 dark:border-slate-600 rounded px-2 py-1 bg-white dark:bg-slate-800"
+                value={payablesEstado}
+                onChange={(e) =>
+                  setPayablesEstado((e.target.value || '') as FacturaPendienteEstado | '')
+                }
+              >
+                <option value="">{t('payables.estadoAll')}</option>
+                <option value="proxima_vencer">{t('payables.estado_proxima_vencer')}</option>
+                <option value="vencida_hoy">{t('payables.estado_vencida_hoy')}</option>
+                <option value="vencida_critica">{t('payables.estado_vencida_critica')}</option>
+                <option value="pendiente">{t('payables.estado_pendiente')}</option>
+              </select>
+            </div>
+            <AsyncWrapper loading={payablesLoading} error={payablesError}>
+              {payables.length === 0 ? (
+                <p className="text-slate-500" data-testid="finanzas-payables-empty">
+                  {t('payables.empty')}
+                </p>
+              ) : (
+                <div className="overflow-x-auto" data-testid="finanzas-payables-table">
+                  <table className="w-full text-sm">
+                    <caption className="sr-only">{t('payables.title')}</caption>
+                    <thead>
+                      <tr className="border-b border-slate-200 dark:border-slate-700 text-left">
+                        <th scope="col" className="py-2 pr-2">{t('payables.voucher')}</th>
+                        <th scope="col" className="py-2 pr-2">{t('payables.supplier')}</th>
+                        <th scope="col" className="py-2 pr-2">{t('payables.dueDate')}</th>
+                        <th scope="col" className="py-2 pr-2">{t('payables.pending')}</th>
+                        <th scope="col" className="py-2 pr-2">{t('payables.status')}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {payables.map((row) => (
+                        <tr
+                          key={row.comprobanteCompraId}
+                          className="border-b border-slate-100 dark:border-slate-800"
+                          data-testid={`finanzas-payable-row-${row.comprobanteCompraId}`}
+                        >
+                          <td className="py-2 pr-2 font-mono">{row.facturaRef}</td>
+                          <td className="py-2 pr-2">{row.proveedorRsocial}</td>
+                          <td className="py-2 pr-2">{formatDate(row.vencimiento)}</td>
+                          <td className="py-2 pr-2 font-mono">{formatMoney(row.pendiente)}</td>
+                          <td className="py-2 pr-2">{t(`payables.estado_${row.estado}`)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </AsyncWrapper>
+          </section>
+        </IfModule>
 
         <section className="mt-8" aria-labelledby="finanzas-clients-heading">
           <h2 id="finanzas-clients-heading" className="text-lg font-semibold mb-2 text-slate-900 dark:text-slate-100">

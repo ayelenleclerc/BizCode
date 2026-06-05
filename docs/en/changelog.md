@@ -10,6 +10,8 @@ Versioning: [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **Supplier payable due-date alerts (GitHub #275):** optional `vencimiento` on `ComprobanteCompra`; `AlertaProveedorConfig` + `AlertaProveedorLog`; `GET /api/proveedores/facturas-pendientes`, `GET/PATCH /api/configuracion/alertas-proveedores`; daily job `scripts/proveedor-alertas-job.ts`; dashboard and Finanzas UI; credit-limit in-app trigger on voucher create; OpenAPI, tests, trilingual manuals.
+
 - **Supplier payment receipts (GitHub #271):** `ReciboPago` + `ReciboPagoFactura`; `GET/POST /api/proveedores/{id}/pagos`, pending-voucher helper, void endpoint, PDF download; automatic `pago` ledger movement; UI in accounts-payable tab; module `finance.receipts`; OpenAPI, tests, trilingual manuals.
 
 - **Supplier accounts payable ledger (GitHub #270):** `MovimientoProveedorCC` running balance; `GET/POST` under `/api/proveedores/{id}/cuenta-corriente`; automatic movement on purchase voucher create; UI tab with balance, credit-limit alert, 6-month chart, audited manual adjustment; OpenAPI, tests, trilingual manuals.

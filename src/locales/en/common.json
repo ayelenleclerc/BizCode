@@ -296,6 +296,8 @@
     "title": "Today's summary",
     "ventasHoy": "Today's sales",
     "facturasVencidas": "Overdue invoices",
+    "facturasPagarVencidas": "Payables — overdue",
+    "facturasPagarProximas": "Payables — due soon",
     "cobrosHoy": "Today's collections",
     "alertasActivas": "Active alerts",
     "invoices": "{{count}} invoice",

@@ -19,6 +19,9 @@
       ],
       "type": "object"
     },
+    "facturasPagar": {
+      "$ref": "./DashboardFacturasPagarWidget.schema.json"
+    },
     "facturasVencidas": {
       "properties": {
         "count": {
@@ -54,7 +57,8 @@
     "ventasHoy",
     "facturasVencidas",
     "cobrosHoy",
-    "alertasActivas"
+    "alertasActivas",
+    "facturasPagar"
   ],
   "title": "DashboardSummary",
   "type": "object"

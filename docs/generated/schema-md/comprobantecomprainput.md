@@ -32,6 +32,7 @@ undefined
 | [proveedorId](#proveedorid)     | `integer` | Required | cannot be null | [ComprobanteCompraInput](comprobantecomprainput-properties-proveedorid.md "undefined#/properties/proveedorId")     |
 | [tipo](#tipo)                   | `string`  | Required | cannot be null | [ComprobanteCompraInput](comprobantecomprainput-properties-tipo.md "undefined#/properties/tipo")                   |
 | [total](#total)                 | `number`  | Required | cannot be null | [ComprobanteCompraInput](comprobantecomprainput-properties-total.md "undefined#/properties/total")                 |
+| [vencimiento](#vencimiento)     | `string`  | Optional | cannot be null | [ComprobanteCompraInput](comprobantecomprainput-properties-vencimiento.md "undefined#/properties/vencimiento")     |
 
 ## cae
 
@@ -346,3 +347,25 @@ undefined
 ### total Constraints
 
 **minimum**: the value of this number must greater than or equal to: `0`
+
+## vencimiento
+
+Explicit due date; when omitted, derived from supplier payment terms (#275).
+
+`vencimiento`
+
+* is optional
+
+* Type: `string`
+
+* cannot be null
+
+* defined in: [ComprobanteCompraInput](comprobantecomprainput-properties-vencimiento.md "undefined#/properties/vencimiento")
+
+### vencimiento Type
+
+`string`
+
+### vencimiento Constraints
+
+**date time**: the string must be a date time string, according to [RFC 3339, section 5.6](https://tools.ietf.org/html/rfc3339 "check the specification")

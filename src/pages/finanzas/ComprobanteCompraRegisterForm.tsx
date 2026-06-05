@@ -30,6 +30,7 @@ export default function ComprobanteCompraRegisterForm({ onRegistered }: Comproba
   const [loadingProveedores, setLoadingProveedores] = useState(false)
   const [proveedorId, setProveedorId] = useState('')
   const [fecha, setFecha] = useState(() => new Date().toISOString().slice(0, 10))
+  const [vencimiento, setVencimiento] = useState('')
   const [tipo, setTipo] = useState<(typeof TIPOS)[number]>('B')
   const [prefijo, setPrefijo] = useState('0001')
   const [numero, setNumero] = useState('1')
@@ -95,6 +96,9 @@ export default function ComprobanteCompraRegisterForm({ onRegistered }: Comproba
       total: parseAmount(total),
       ...(cae.trim() ? { cae: cae.trim() } : {}),
       ...(caeVto ? { caeVto: new Date(`${caeVto}T12:00:00.000Z`).toISOString() } : {}),
+      ...(vencimiento.trim()
+        ? { vencimiento: new Date(`${vencimiento}T12:00:00.000Z`).toISOString() }
+        : {}),
     }
 
     setSaving(true)
@@ -163,6 +167,24 @@ export default function ComprobanteCompraRegisterForm({ onRegistered }: Comproba
             required
             data-testid="finanzas-comprobante-compra-fecha"
           />
+        </div>
+        <div>
+          <label htmlFor="finanzas-cc-vencimiento" className="block text-xs text-slate-500 mb-1">
+            {t('comprobanteCompra.vencimiento')}
+          </label>
+          <input
+            id="finanzas-cc-vencimiento"
+            type="date"
+            className="w-full border border-slate-300 dark:border-slate-600 rounded px-2 py-1 bg-white dark:bg-slate-800"
+            value={vencimiento}
+            onChange={(e) => setVencimiento(e.target.value)}
+            disabled={saving}
+            data-testid="finanzas-comprobante-compra-vencimiento"
+            aria-describedby="finanzas-cc-vencimiento-hint"
+          />
+          <p id="finanzas-cc-vencimiento-hint" className="text-xs text-slate-500 mt-1">
+            {t('comprobanteCompra.vencimientoHint')}
+          </p>
         </div>
         <div>
           <label htmlFor="finanzas-cc-tipo" className="block text-xs text-slate-500 mb-1">

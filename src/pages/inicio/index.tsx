@@ -229,31 +229,54 @@ export default function InicioPage() {
           )}
 
           {!loading && !error && data && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
-              <KpiCard
-                title={t('common:dashboard.ventasHoy')}
-                count={data.ventasHoy.count}
-                total={data.ventasHoy.total}
-                icon="💰"
-                color="blue"
-              />
-              <KpiCard
-                title={t('common:dashboard.facturasVencidas')}
-                count={data.facturasVencidas.count}
-                total={data.facturasVencidas.total}
-                icon="⚠️"
-                color="red"
-                note={t('common:dashboard.overdueNote')}
-              />
-              <KpiCard
-                title={t('common:dashboard.cobrosHoy')}
-                count={data.cobrosHoy.count}
-                total={data.cobrosHoy.total}
-                icon="💳"
-                color="green"
-                pending={true}
-              />
-              <AlertCard count={data.alertasActivas} pending={data.alertasActivas === 0} />
+            <div className="space-y-5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
+                <KpiCard
+                  title={t('common:dashboard.ventasHoy')}
+                  count={data.ventasHoy.count}
+                  total={data.ventasHoy.total}
+                  icon="💰"
+                  color="blue"
+                />
+                <KpiCard
+                  title={t('common:dashboard.facturasVencidas')}
+                  count={data.facturasVencidas.count}
+                  total={data.facturasVencidas.total}
+                  icon="⚠️"
+                  color="red"
+                  note={t('common:dashboard.overdueNote')}
+                />
+                <KpiCard
+                  title={t('common:dashboard.cobrosHoy')}
+                  count={data.cobrosHoy.count}
+                  total={data.cobrosHoy.total}
+                  icon="💳"
+                  color="green"
+                  pending={true}
+                />
+                <AlertCard count={data.alertasActivas} pending={data.alertasActivas === 0} />
+              </div>
+              {hasModule('finance.ledger') && data.facturasPagar && (
+                <div
+                  className="grid grid-cols-1 sm:grid-cols-2 gap-5"
+                  data-testid="inicio-facturas-pagar-widgets"
+                >
+                  <KpiCard
+                    title={t('common:dashboard.facturasPagarVencidas')}
+                    count={data.facturasPagar.vencido.count}
+                    total={data.facturasPagar.vencido.total}
+                    icon="📋"
+                    color="red"
+                  />
+                  <KpiCard
+                    title={t('common:dashboard.facturasPagarProximas')}
+                    count={data.facturasPagar.proximoVencer.count}
+                    total={data.facturasPagar.proximoVencer.total}
+                    icon="📅"
+                    color="yellow"
+                  />
+                </div>
+              )}
             </div>
           )}
         </div>

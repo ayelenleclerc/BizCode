@@ -44,6 +44,20 @@ In the **Accounts payable** tab, the **Payment receipts** block lets you registe
 
 **API:** `GET /api/proveedores/{id}/pagos/comprobantes-pendientes`, `GET/POST /api/proveedores/{id}/pagos`, `POST .../pagos/{reciboId}/anular`, `GET .../pagos/{reciboId}/pdf` — see [OpenAPI](../../api/openapi.yaml).
 
+## Payable due-date alerts (GitHub #275)
+
+Module `finance.ledger`, permission `suppliers.read`:
+
+- **Due date** on `ComprobanteCompra`: optional `vencimiento` on create; otherwise `fecha` + supplier `plazoHabitual` / `condicionPago`.
+- **List** unpaid vouchers: `GET /api/proveedores/facturas-pendientes` (filter by `estado`, `proveedorId`).
+- **Dashboard** widget on **Home** — overdue and due-soon payables totals.
+- **Finanzas** screen — filtered payables table.
+- **Settings** (Company): supplier alert thresholds (`diasPrevioAviso`, `diasCritico`), in-app toggle; email toggle reserved for future tenant SMTP recipient.
+- **Daily job** `scripts/proveedor-alertas-job.ts` at 07:00 tenant-local time; dedup via `AlertaProveedorLog`.
+- **Credit limit** in-app alert when a new purchase voucher pushes balance over `limiteCredito`.
+
+**API:** `GET/PATCH /api/configuracion/alertas-proveedores` — see [OpenAPI](../../api/openapi.yaml).
+
 ## Deactivate (logical delete)
 
 Select a row and **Deactivate**. The record stays in the database (`activo: false`) for purchase orders and purchase vouchers already linked. Use the inactive filter to review deactivated suppliers.

@@ -60,6 +60,11 @@
     "total": {
       "minimum": 0,
       "type": "number"
+    },
+    "vencimiento": {
+      "description": "Explicit due date; when omitted, derived from supplier payment terms (#275).",
+      "format": "date-time",
+      "type": "string"
     }
   },
   "required": [

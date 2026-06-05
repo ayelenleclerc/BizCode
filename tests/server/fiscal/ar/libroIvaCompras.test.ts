@@ -40,6 +40,7 @@ describe('libroIvaComprasMapper', () => {
         proveedorId: 1,
         ordenCompraId: null,
         fecha: new Date(2026, 4, 10),
+        vencimiento: null,
         tipo: 'B',
         prefijo: '0001',
         numero: 7,

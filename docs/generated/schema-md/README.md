@@ -24,6 +24,12 @@
 
 * [AgingBucket](./agingbucket.md) – `-`
 
+* [AlertaProveedorConfig](./alertaproveedorconfig.md) – `-`
+
+* [AlertaProveedorConfigEnvelope](./alertaproveedorconfigenvelope.md) – `-`
+
+* [AlertaProveedorConfigInput](./alertaproveedorconfiginput.md) – `-`
+
 * [ApiErrorEnvelope](./apierrorenvelope.md) – `-`
 
 * [AppUser](./appuser.md) – `-`
@@ -122,6 +128,8 @@
 
 * [CuentaCorrienteLine](./cuentacorrienteline.md) – `-`
 
+* [DashboardFacturasPagarWidget](./dashboardfacturaspagarwidget.md) – `-`
+
 * [DashboardSummary](./dashboardsummary.md) – `-`
 
 * [DashboardSummaryEnvelope](./dashboardsummaryenvelope.md) – `-`
@@ -162,6 +170,10 @@
 
 * [FacturaListEnvelope](./facturalistenvelope.md) – `-`
 
+* [FacturaPendienteEstado](./facturapendienteestado.md) – `-`
+
+* [FacturaPendienteRow](./facturapendienterow.md) – `-`
+
 * [FacturaPrintEnvelope](./facturaprintenvelope.md) – `-`
 
 * [FacturaPrintInput](./facturaprintinput.md) – `-`
@@ -175,6 +187,8 @@
 * [FacturaVoidEnvelope](./facturavoidenvelope.md) – `-`
 
 * [FacturaVoidResult](./facturavoidresult.md) – `-`
+
+* [FacturasPendientesEnvelope](./facturaspendientesenvelope.md) – `-`
 
 * [FormaPago](./formapago.md) – `-`
 
@@ -526,6 +540,10 @@
 
 * [Untitled object in CobroListEnvelope](./cobrolistenvelope-allof-0.md) – `undefined#/allOf/0`
 
+* [Untitled object in DashboardFacturasPagarWidget](./dashboardfacturaspagarwidget-properties-proximovencer.md) – `undefined#/properties/proximoVencer`
+
+* [Untitled object in DashboardFacturasPagarWidget](./dashboardfacturaspagarwidget-properties-vencido.md) – `undefined#/properties/vencido`
+
 * [Untitled object in DashboardSummary](./dashboardsummary-properties-cobroshoy.md) – `undefined#/properties/cobrosHoy`
 
 * [Untitled object in DashboardSummary](./dashboardsummary-properties-facturasvencidas.md) – `undefined#/properties/facturasVencidas`
@@ -695,6 +713,8 @@
 * [Untitled array in FacturaInput](./facturainput-properties-items.md) – `undefined#/properties/items`
 
 * [Untitled array in FacturaListEnvelope](./facturalistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
+
+* [Untitled array in FacturasPendientesEnvelope](./facturaspendientesenvelope-properties-data.md) – `undefined#/properties/data`
 
 * [Untitled array in FormaPagoListEnvelope](./formapagolistenvelope-properties-data.md) – `undefined#/properties/data`
 

@@ -96,5 +96,17 @@
       "thermalFallback": "Thermal disabled: system would use legal PDF.",
       "error": "Could not run print test"
     }
+  },
+  "proveedorAlertas": {
+    "title": "Payable invoice alerts",
+    "hint": "Daily job at 07:00 (company timezone). In-app notifications go to owner and manager.",
+    "loading": "Loading settings…",
+    "diasPrevio": "Days before due date to warn",
+    "diasCritico": "Days overdue for critical alert",
+    "notifInApp": "In-app notifications",
+    "notifEmail": "Email notifications (SMTP)",
+    "emailNote": "External email requires server SMTP; without a configured recipient only in-app applies.",
+    "save": "Save alerts",
+    "saved": "Settings saved"
   }
 }

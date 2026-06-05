@@ -282,3 +282,11 @@ export type PedidoInvoiceInput = {
   prefijo?: string
   formaPagoId?: number | null
 }
+
+/** @en Supplier payable alert settings (#275). @es Config alertas facturas a pagar (#275). @pt-BR Config alertas faturas a pagar (#275). */
+export type AlertaProveedorConfigInput = {
+  diasPrevioAviso?: number
+  diasCritico?: number
+  notifEmail?: boolean
+  notifInApp?: boolean
+}

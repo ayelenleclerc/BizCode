@@ -44,6 +44,20 @@ Na aba **Conta corrente**, o bloco **Recibos de pagamento** registra pagamentos 
 
 **API:** `GET /api/proveedores/{id}/pagos/comprobantes-pendientes`, `GET/POST /api/proveedores/{id}/pagos`, `POST .../pagos/{reciboId}/anular`, `GET .../pagos/{reciboId}/pdf` — [OpenAPI](../../api/openapi.yaml).
 
+## Alertas de vencimento a pagar (GitHub #275)
+
+Módulo `finance.ledger`, permissão `suppliers.read`:
+
+- **Vencimento** em `ComprobanteCompra`: campo opcional `vencimiento` no cadastro; senão, `fecha` + `plazoHabitual` / `condicionPago` do fornecedor.
+- **Listagem** em aberto: `GET /api/proveedores/facturas-pendientes` (filtros `estado`, `proveedorId`).
+- **Início** — widget com totais vencidas e próximas a vencer.
+- **Finanças** — tabela filtrada de faturas a pagar.
+- **Configuração da empresa** — limites de alerta, toggle in-app; email reservado para futuro destinatário SMTP.
+- **Job diário** `scripts/proveedor-alertas-job.ts` às 07:00 no fuso do tenant; deduplicação `AlertaProveedorLog`.
+- **Limite de crédito** — alerta in-app ao registrar comprovante se o saldo exceder `limiteCredito`.
+
+**API:** `GET/PATCH /api/configuracion/alertas-proveedores` — [OpenAPI](../../api/openapi.yaml).
+
 ## Desativação (exclusão lógica)
 
 **Desativar** define `activo: false` sem apagar o registro. Use o filtro de inativos para revisar.

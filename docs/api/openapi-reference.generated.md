@@ -10133,6 +10133,483 @@ Sets estado `anulado` and posts compensating ledger movement. Audit `recibo_pago
 }
 ```
 
+### PARAMETERS /api/proveedores/facturas-pendientes
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/proveedores/facturas-pendientes`
+
+### List unpaid supplier vouchers with due-date alert state
+
+- **Method:** `GET`
+- **Path:** `/api/proveedores/facturas-pendientes`
+- **Tags:** proveedores
+
+Requires module finance.ledger and permission suppliers.read (#275).
+
+#### Responses
+
+##### Status: 200 Pending payable vouchers
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`comprobanteCompraId` (required)**
+
+    `integer`
+
+  - **`diasHastaVencimiento` (required)**
+
+    `integer`
+
+  - **`diasVencido` (required)**
+
+    `integer`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"pendiente", "proxima_vencer", "vencida_hoy", "vencida_critica"`
+
+  - **`facturaRef` (required)**
+
+    `string`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`pagado` (required)**
+
+    `string`
+
+  - **`pendiente` (required)**
+
+    `string`
+
+  - **`proveedorCodigo` (required)**
+
+    `integer`
+
+  - **`proveedorId` (required)**
+
+    `integer`
+
+  - **`proveedorRsocial` (required)**
+
+    `string`
+
+  - **`total` (required)**
+
+    `string`
+
+  - **`vencimiento` (required)**
+
+    `string`, format: `date-time`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "comprobanteCompraId": 1,
+      "proveedorId": 1,
+      "proveedorCodigo": 1,
+      "proveedorRsocial": "",
+      "facturaRef": "",
+      "fecha": "",
+      "vencimiento": "",
+      "total": "",
+      "pagado": "",
+      "pendiente": "",
+      "estado": "pendiente",
+      "diasHastaVencimiento": 1,
+      "diasVencido": 1
+    }
+  ]
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/configuracion/alertas-proveedores
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/configuracion/alertas-proveedores`
+
+### Get supplier payable alert settings
+
+- **Method:** `GET`
+- **Path:** `/api/configuracion/alertas-proveedores`
+- **Tags:** proveedores
+
+Requires module finance.ledger and permission suppliers.read (#275).
+
+#### Responses
+
+##### Status: 200 Alert configuration
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`diasCritico` (required)**
+
+    `integer`
+
+  - **`diasPrevioAviso` (required)**
+
+    `integer`
+
+  - **`notifEmail` (required)**
+
+    `boolean`
+
+  - **`notifInApp` (required)**
+
+    `boolean`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "diasPrevioAviso": 0,
+    "diasCritico": 1,
+    "notifEmail": true,
+    "notifInApp": true
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Update supplier payable alert settings
+
+- **Method:** `PATCH`
+- **Path:** `/api/configuracion/alertas-proveedores`
+- **Tags:** proveedores
+
+Requires module finance.ledger and permission suppliers.manage (#275).
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`diasCritico`**
+
+  `integer`
+
+- **`diasPrevioAviso`**
+
+  `integer`
+
+- **`notifEmail`**
+
+  `boolean`
+
+- **`notifInApp`**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "diasPrevioAviso": 0,
+  "diasCritico": 1,
+  "notifEmail": true,
+  "notifInApp": true
+}
+```
+
+#### Responses
+
+##### Status: 200 Updated configuration
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`diasCritico` (required)**
+
+    `integer`
+
+  - **`diasPrevioAviso` (required)**
+
+    `integer`
+
+  - **`notifEmail` (required)**
+
+    `boolean`
+
+  - **`notifInApp` (required)**
+
+    `boolean`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "diasPrevioAviso": 0,
+    "diasCritico": 1,
+    "notifEmail": true,
+    "notifInApp": true
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ### PARAMETERS /api/proveedores/{id}/pagos/{reciboId}/pdf
 
 - **Method:** `PARAMETERS`
@@ -20068,6 +20545,10 @@ Persists a supplier fiscal voucher with netos/IVA breakdown for Libro IVA Compra
 
   `integer`
 
+- **`vencimiento`**
+
+  `string`, format: `date-time` — Explicit due date; when omitted, derived from supplier payment terms (#275).
+
 **Example:**
 
 ```json
@@ -20085,7 +20566,8 @@ Persists a supplier fiscal voucher with netos/IVA breakdown for Libro IVA Compra
   "iva2": 0,
   "total": 0,
   "cae": "",
-  "caeVto": ""
+  "caeVto": "",
+  "vencimiento": ""
 }
 ```
 
@@ -22181,6 +22663,34 @@ true
 
       `string`
 
+  - **`facturasPagar` (required)**
+
+    `object`
+
+    - **`proximoVencer` (required)**
+
+      `object`
+
+      - **`count` (required)**
+
+        `integer`
+
+      - **`total` (required)**
+
+        `string`
+
+    - **`vencido` (required)**
+
+      `object`
+
+      - **`count` (required)**
+
+        `integer`
+
+      - **`total` (required)**
+
+        `string`
+
   - **`facturasVencidas` (required)**
 
     `object`
@@ -22227,7 +22737,17 @@ true
       "count": 1,
       "total": ""
     },
-    "alertasActivas": 1
+    "alertasActivas": 1,
+    "facturasPagar": {
+      "vencido": {
+        "count": 1,
+        "total": ""
+      },
+      "proximoVencer": {
+        "count": 1,
+        "total": ""
+      }
+    }
   }
 }
 ```
@@ -39865,6 +40385,10 @@ Originating invoice header (selected columns)
 
   `integer`
 
+* **`vencimiento`**
+
+  `string`, format: `date-time` — Explicit due date; when omitted, derived from supplier payment terms (#275).
+
 **Example:**
 
 ```json
@@ -39882,7 +40406,8 @@ Originating invoice header (selected columns)
   "iva2": 0,
   "total": 0,
   "cae": "",
-  "caeVto": ""
+  "caeVto": "",
+  "vencimiento": ""
 }
 ```
 
@@ -42855,6 +43380,326 @@ Originating invoice header (selected columns)
 }
 ```
 
+### FacturaPendienteEstado
+
+- **Type:**`string`
+
+**Example:**
+
+### FacturaPendienteRow
+
+- **Type:**`object`
+
+* **`comprobanteCompraId` (required)**
+
+  `integer`
+
+* **`diasHastaVencimiento` (required)**
+
+  `integer`
+
+* **`diasVencido` (required)**
+
+  `integer`
+
+* **`estado` (required)**
+
+  `string`, possible values: `"pendiente", "proxima_vencer", "vencida_hoy", "vencida_critica"`
+
+* **`facturaRef` (required)**
+
+  `string`
+
+* **`fecha` (required)**
+
+  `string`, format: `date-time`
+
+* **`pagado` (required)**
+
+  `string`
+
+* **`pendiente` (required)**
+
+  `string`
+
+* **`proveedorCodigo` (required)**
+
+  `integer`
+
+* **`proveedorId` (required)**
+
+  `integer`
+
+* **`proveedorRsocial` (required)**
+
+  `string`
+
+* **`total` (required)**
+
+  `string`
+
+* **`vencimiento` (required)**
+
+  `string`, format: `date-time`
+
+**Example:**
+
+```json
+{
+  "comprobanteCompraId": 1,
+  "proveedorId": 1,
+  "proveedorCodigo": 1,
+  "proveedorRsocial": "",
+  "facturaRef": "",
+  "fecha": "",
+  "vencimiento": "",
+  "total": "",
+  "pagado": "",
+  "pendiente": "",
+  "estado": "pendiente",
+  "diasHastaVencimiento": 1,
+  "diasVencido": 1
+}
+```
+
+### FacturasPendientesEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`comprobanteCompraId` (required)**
+
+    `integer`
+
+  - **`diasHastaVencimiento` (required)**
+
+    `integer`
+
+  - **`diasVencido` (required)**
+
+    `integer`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"pendiente", "proxima_vencer", "vencida_hoy", "vencida_critica"`
+
+  - **`facturaRef` (required)**
+
+    `string`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`pagado` (required)**
+
+    `string`
+
+  - **`pendiente` (required)**
+
+    `string`
+
+  - **`proveedorCodigo` (required)**
+
+    `integer`
+
+  - **`proveedorId` (required)**
+
+    `integer`
+
+  - **`proveedorRsocial` (required)**
+
+    `string`
+
+  - **`total` (required)**
+
+    `string`
+
+  - **`vencimiento` (required)**
+
+    `string`, format: `date-time`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "comprobanteCompraId": 1,
+      "proveedorId": 1,
+      "proveedorCodigo": 1,
+      "proveedorRsocial": "",
+      "facturaRef": "",
+      "fecha": "",
+      "vencimiento": "",
+      "total": "",
+      "pagado": "",
+      "pendiente": "",
+      "estado": "pendiente",
+      "diasHastaVencimiento": 1,
+      "diasVencido": 1
+    }
+  ]
+}
+```
+
+### AlertaProveedorConfig
+
+- **Type:**`object`
+
+* **`diasCritico` (required)**
+
+  `integer`
+
+* **`diasPrevioAviso` (required)**
+
+  `integer`
+
+* **`notifEmail` (required)**
+
+  `boolean`
+
+* **`notifInApp` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "diasPrevioAviso": 0,
+  "diasCritico": 1,
+  "notifEmail": true,
+  "notifInApp": true
+}
+```
+
+### AlertaProveedorConfigInput
+
+- **Type:**`object`
+
+* **`diasCritico`**
+
+  `integer`
+
+* **`diasPrevioAviso`**
+
+  `integer`
+
+* **`notifEmail`**
+
+  `boolean`
+
+* **`notifInApp`**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "diasPrevioAviso": 0,
+  "diasCritico": 1,
+  "notifEmail": true,
+  "notifInApp": true
+}
+```
+
+### AlertaProveedorConfigEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`diasCritico` (required)**
+
+    `integer`
+
+  - **`diasPrevioAviso` (required)**
+
+    `integer`
+
+  - **`notifEmail` (required)**
+
+    `boolean`
+
+  - **`notifInApp` (required)**
+
+    `boolean`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "diasPrevioAviso": 0,
+    "diasCritico": 1,
+    "notifEmail": true,
+    "notifInApp": true
+  }
+}
+```
+
+### DashboardFacturasPagarWidget
+
+- **Type:**`object`
+
+* **`proximoVencer` (required)**
+
+  `object`
+
+  - **`count` (required)**
+
+    `integer`
+
+  - **`total` (required)**
+
+    `string`
+
+* **`vencido` (required)**
+
+  `object`
+
+  - **`count` (required)**
+
+    `integer`
+
+  - **`total` (required)**
+
+    `string`
+
+**Example:**
+
+```json
+{
+  "vencido": {
+    "count": 1,
+    "total": ""
+  },
+  "proximoVencer": {
+    "count": 1,
+    "total": ""
+  }
+}
+```
+
 ### DashboardSummary
 
 - **Type:**`object`
@@ -42874,6 +43719,34 @@ Originating invoice header (selected columns)
   - **`total` (required)**
 
     `string`
+
+* **`facturasPagar` (required)**
+
+  `object`
+
+  - **`proximoVencer` (required)**
+
+    `object`
+
+    - **`count` (required)**
+
+      `integer`
+
+    - **`total` (required)**
+
+      `string`
+
+  - **`vencido` (required)**
+
+    `object`
+
+    - **`count` (required)**
+
+      `integer`
+
+    - **`total` (required)**
+
+      `string`
 
 * **`facturasVencidas` (required)**
 
@@ -42915,7 +43788,17 @@ Originating invoice header (selected columns)
     "count": 1,
     "total": ""
   },
-  "alertasActivas": 1
+  "alertasActivas": 1,
+  "facturasPagar": {
+    "vencido": {
+      "count": 1,
+      "total": ""
+    },
+    "proximoVencer": {
+      "count": 1,
+      "total": ""
+    }
+  }
 }
 ```
 
@@ -42942,6 +43825,34 @@ Originating invoice header (selected columns)
     - **`total` (required)**
 
       `string`
+
+  - **`facturasPagar` (required)**
+
+    `object`
+
+    - **`proximoVencer` (required)**
+
+      `object`
+
+      - **`count` (required)**
+
+        `integer`
+
+      - **`total` (required)**
+
+        `string`
+
+    - **`vencido` (required)**
+
+      `object`
+
+      - **`count` (required)**
+
+        `integer`
+
+      - **`total` (required)**
+
+        `string`
 
   - **`facturasVencidas` (required)**
 
@@ -42989,7 +43900,17 @@ Originating invoice header (selected columns)
       "count": 1,
       "total": ""
     },
-    "alertasActivas": 1
+    "alertasActivas": 1,
+    "facturasPagar": {
+      "vencido": {
+        "count": 1,
+        "total": ""
+      },
+      "proximoVencer": {
+        "count": 1,
+        "total": ""
+      }
+    }
   }
 }
 ```

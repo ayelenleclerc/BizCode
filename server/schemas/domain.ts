@@ -1543,11 +1543,45 @@ export const comprobanteCompraBodySchema = z
     total: z.number().min(0),
     cae: z.string().max(20).optional(),
     caeVto: z.string().optional(),
+    vencimiento: z.string().optional(),
   })
   .superRefine((data, ctx) => {
     const f = data.fecha.trim()
     if (f.length === 0) {
       ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'fecha is required', path: ['fecha'] })
+    }
+  })
+
+export const facturaPendienteEstadoSchema = z.enum([
+  'pendiente',
+  'proxima_vencer',
+  'vencida_hoy',
+  'vencida_critica',
+])
+
+export const facturasPendientesQuerySchema = z.object({
+  estado: facturaPendienteEstadoSchema.optional(),
+  proveedorId: z.coerce.number().int().min(1).optional(),
+})
+
+export const alertaProveedorConfigBodySchema = z
+  .object({
+    diasPrevioAviso: z.number().int().min(0).max(90).optional(),
+    diasCritico: z.number().int().min(1).max(365).optional(),
+    notifEmail: z.boolean().optional(),
+    notifInApp: z.boolean().optional(),
+  })
+  .superRefine((data, ctx) => {
+    if (
+      data.diasPrevioAviso != null &&
+      data.diasCritico != null &&
+      data.diasCritico <= data.diasPrevioAviso
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'diasCritico must be greater than diasPrevioAviso',
+        path: ['diasCritico'],
+      })
     }
   })
 
