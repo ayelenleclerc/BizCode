@@ -296,6 +296,8 @@
     "title": "Resumo do dia",
     "ventasHoy": "Vendas de hoje",
     "facturasVencidas": "Faturas vencidas",
+    "facturasPagarVencidas": "A pagar — vencidas",
+    "facturasPagarProximas": "A pagar — próximas",
     "cobrosHoy": "Cobranças de hoje",
     "alertasActivas": "Alertas ativos",
     "invoices": "{{count}} fatura",

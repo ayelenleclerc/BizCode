@@ -10,6 +10,7 @@ import { validateCUIT } from '@/lib/validators'
 import type { EmpresaConfig } from '@/types'
 import AfipFiscalSection from './AfipFiscalSection'
 import PrintDevicesSection from './PrintDevicesSection'
+import ProveedorAlertasConfigSection from './ProveedorAlertasConfigSection'
 
 const EMPRESA_TIMEZONE_OPTIONS = [
   'America/Argentina/Buenos_Aires',
@@ -544,6 +545,7 @@ export default function EmpresaPage() {
 
       <AfipFiscalSection />
       <PrintDevicesSection />
+      <ProveedorAlertasConfigSection />
     </div>
   )
 }

@@ -17,6 +17,7 @@ export type ComprobanteCompraCreateInput = {
   total: number
   cae?: string
   caeVto?: string
+  vencimiento?: string
 }
 
 /**
@@ -68,6 +69,7 @@ export class ComprobanteCompraService {
       total: input.total,
       cae: input.cae ?? null,
       caeVto: input.caeVto ? new Date(input.caeVto) : null,
+      vencimiento: input.vencimiento ? new Date(input.vencimiento) : null,
       ...(input.ordenCompraId != null
         ? { ordenCompra: { connect: { id: input.ordenCompraId } } }
         : {}),

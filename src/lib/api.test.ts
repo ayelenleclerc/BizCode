@@ -822,7 +822,13 @@ describe('usersAPI', () => {
 // ════════════════════════════════════════════════════════════
 describe('dashboardAPI', () => {
   it('retorna el resumen del dashboard en el happy path', async () => {
-    const summary = { ventasHoy: { count: 1, total: '100' }, facturasVencidas: { count: 0, total: '0' }, cobrosHoy: { count: 0, total: '0' }, alertasActivas: 0 }
+    const summary = {
+      ventasHoy: { count: 1, total: '100' },
+      facturasVencidas: { count: 0, total: '0' },
+      cobrosHoy: { count: 0, total: '0' },
+      alertasActivas: 0,
+      facturasPagar: { vencido: { count: 0, total: '0' }, proximoVencer: { count: 0, total: '0' } },
+    }
     mockGet.mockResolvedValueOnce({ data: { success: true, data: summary } })
     const { dashboardAPI } = await import('./api')
     expect(await dashboardAPI.summary()).toEqual(summary)

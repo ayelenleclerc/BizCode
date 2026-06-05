@@ -9,6 +9,7 @@ import {
   dashboardVentasSeriesToCsv,
 } from './services/DashboardAnalyticsService'
 import { computeDaysPastDue } from './services/ReportesFinancierosService'
+import { ProveedorAlertasService } from './services/ProveedorAlertasService'
 
 /**
  * @en Dashboard summary shape returned by GET /api/dashboard/summary.
@@ -24,6 +25,11 @@ export type DashboardSummary = {
   cobrosHoy: { count: number; total: string }
   /** Active unread alerts — placeholder until Notification model is ready (Issue #30). */
   alertasActivas: number
+  /** Unpaid supplier vouchers overdue or due soon (#275). */
+  facturasPagar: {
+    vencido: { count: number; total: string }
+    proximoVencer: { count: number; total: string }
+  }
 }
 
 /**
@@ -33,6 +39,7 @@ export type DashboardSummary = {
  */
 export function registerDashboardRoutes(app: Application, prisma: PrismaClient): void {
   const analytics = new DashboardAnalyticsService(prisma)
+  const proveedorAlertas = new ProveedorAlertasService(prisma)
 
   app.get('/api/dashboard/summary', async (req: Request, res: Response) => {
     const authReq = req as AuthenticatedRequest
@@ -48,7 +55,7 @@ export function registerDashboardRoutes(app: Application, prisma: PrismaClient):
 
       const tenantId = authReq.auth.claims.tenantId
 
-      const [ventasResult, openInvoices, cobrosResult] = await Promise.all([
+      const [ventasResult, openInvoices, cobrosResult, facturasPagar] = await Promise.all([
         prisma.factura.aggregate({
           where: { tenantId, estado: 'A', fecha: { gte: todayStart, lte: todayEnd } },
           _count: { id: true },
@@ -67,6 +74,7 @@ export function registerDashboardRoutes(app: Application, prisma: PrismaClient):
           _count: { id: true },
           _sum: { monto: true },
         }),
+        proveedorAlertas.getDashboardTotals(tenantId, now),
       ])
 
       let vencidasCount = 0
@@ -92,6 +100,7 @@ export function registerDashboardRoutes(app: Application, prisma: PrismaClient):
           total: cobrosResult._sum.monto?.toString() ?? '0',
         },
         alertasActivas: 0,
+        facturasPagar,
       }
 
       res.json({ success: true, data: summary })

@@ -1135,6 +1135,21 @@ export const proveedoresAPI = {
     }
   },
 
+  facturasPendientes: async (params?: {
+    estado?: FacturaPendienteEstado
+    proveedorId?: number
+  }): Promise<FacturaPendienteRow[]> => {
+    try {
+      const response = await api.get<{ success: boolean; data: FacturaPendienteRow[] }>(
+        '/proveedores/facturas-pendientes',
+        { params },
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
   importFromCsv: async (file: File): Promise<CsvBulkImportResult> => {
     try {
       const body = new FormData()
@@ -1695,6 +1710,36 @@ export type ComprobanteCompraInputDTO = {
   total: number
   cae?: string
   caeVto?: string
+  vencimiento?: string
+}
+
+export type FacturaPendienteEstado =
+  | 'pendiente'
+  | 'proxima_vencer'
+  | 'vencida_hoy'
+  | 'vencida_critica'
+
+export type FacturaPendienteRow = {
+  comprobanteCompraId: number
+  proveedorId: number
+  proveedorCodigo: number
+  proveedorRsocial: string
+  facturaRef: string
+  fecha: string
+  vencimiento: string
+  total: string
+  pagado: string
+  pendiente: string
+  estado: FacturaPendienteEstado
+  diasHastaVencimiento: number
+  diasVencido: number
+}
+
+export type AlertaProveedorConfigDTO = {
+  diasPrevioAviso: number
+  diasCritico: number
+  notifEmail: boolean
+  notifInApp: boolean
 }
 
 export const contabilidadAPI = {
@@ -1903,11 +1948,42 @@ export const usersAPI = {
 
 export type DashboardWidget = { count: number; total: string }
 
+export type DashboardFacturasPagarDTO = {
+  vencido: DashboardWidget
+  proximoVencer: DashboardWidget
+}
+
 export type DashboardSummaryDTO = {
   ventasHoy: DashboardWidget
   facturasVencidas: DashboardWidget
   cobrosHoy: DashboardWidget
   alertasActivas: number
+  facturasPagar: DashboardFacturasPagarDTO
+}
+
+export const proveedorAlertasAPI = {
+  getConfig: async (): Promise<AlertaProveedorConfigDTO> => {
+    try {
+      const response = await api.get<{ success: boolean; data: AlertaProveedorConfigDTO }>(
+        '/configuracion/alertas-proveedores',
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  updateConfig: async (body: Partial<AlertaProveedorConfigDTO>): Promise<AlertaProveedorConfigDTO> => {
+    try {
+      const response = await api.patch<{ success: boolean; data: AlertaProveedorConfigDTO }>(
+        '/configuracion/alertas-proveedores',
+        body,
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
 }
 
 export type DashboardVentasGroupBy = 'day' | 'week' | 'month'

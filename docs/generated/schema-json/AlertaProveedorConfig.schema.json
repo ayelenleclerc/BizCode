@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "diasCritico": {
+      "maximum": 365,
+      "minimum": 1,
+      "type": "integer"
+    },
+    "diasPrevioAviso": {
+      "maximum": 90,
+      "minimum": 0,
+      "type": "integer"
+    },
+    "notifEmail": {
+      "type": "boolean"
+    },
+    "notifInApp": {
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "diasPrevioAviso",
+    "diasCritico",
+    "notifEmail",
+    "notifInApp"
+  ],
+  "title": "AlertaProveedorConfig",
+  "type": "object"
+}

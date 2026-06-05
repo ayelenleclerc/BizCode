@@ -58,6 +58,7 @@ vi.mock('@/lib/api', async () => {
     },
     proveedoresAPI: {
       list: vi.fn(),
+      facturasPendientes: vi.fn().mockResolvedValue([]),
     },
   }
 })

@@ -131,6 +131,10 @@ vi.mock('@/lib/api', async () => {
         facturasVencidas: { count: 0, total: '0' },
         cobrosHoy: { count: 0, total: '0' },
         alertasActivas: 0,
+        facturasPagar: {
+          vencido: { count: 0, total: '0' },
+          proximoVencer: { count: 0, total: '0' },
+        },
       }),
     },
     notificationsAPI: {

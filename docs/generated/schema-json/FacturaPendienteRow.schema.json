@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "comprobanteCompraId": {
+      "type": "integer"
+    },
+    "diasHastaVencimiento": {
+      "type": "integer"
+    },
+    "diasVencido": {
+      "type": "integer"
+    },
+    "estado": {
+      "$ref": "./FacturaPendienteEstado.schema.json"
+    },
+    "facturaRef": {
+      "type": "string"
+    },
+    "fecha": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "pagado": {
+      "type": "string"
+    },
+    "pendiente": {
+      "type": "string"
+    },
+    "proveedorCodigo": {
+      "type": "integer"
+    },
+    "proveedorId": {
+      "type": "integer"
+    },
+    "proveedorRsocial": {
+      "type": "string"
+    },
+    "total": {
+      "type": "string"
+    },
+    "vencimiento": {
+      "format": "date-time",
+      "type": "string"
+    }
+  },
+  "required": [
+    "comprobanteCompraId",
+    "proveedorId",
+    "proveedorCodigo",
+    "proveedorRsocial",
+    "facturaRef",
+    "fecha",
+    "vencimiento",
+    "total",
+    "pagado",
+    "pendiente",
+    "estado",
+    "diasHastaVencimiento",
+    "diasVencido"
+  ],
+  "title": "FacturaPendienteRow",
+  "type": "object"
+}

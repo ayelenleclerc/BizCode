@@ -1672,6 +1672,85 @@ paths:
         '403':
           $ref: '#/components/responses/ForbiddenError'
 
+  /api/proveedores/facturas-pendientes:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [proveedores]
+      summary: List unpaid supplier vouchers with due-date alert state
+      description: Requires module finance.ledger and permission suppliers.read (#275).
+      parameters:
+        - name: estado
+          in: query
+          schema:
+            $ref: '#/components/schemas/FacturaPendienteEstado'
+        - name: proveedorId
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '200':
+          description: Pending payable vouchers
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FacturasPendientesEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/configuracion/alertas-proveedores:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [proveedores]
+      summary: Get supplier payable alert settings
+      description: Requires module finance.ledger and permission suppliers.read (#275).
+      responses:
+        '200':
+          description: Alert configuration
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AlertaProveedorConfigEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    patch:
+      tags: [proveedores]
+      summary: Update supplier payable alert settings
+      description: Requires module finance.ledger and permission suppliers.manage (#275).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AlertaProveedorConfigInput'
+      responses:
+        '200':
+          description: Updated configuration
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AlertaProveedorConfigEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
   /api/proveedores/{id}/pagos/{reciboId}/pdf:
     parameters:
       - $ref: '#/components/parameters/BizcodeChannelHeader'
@@ -7794,6 +7873,10 @@ components:
         caeVto:
           type: string
           format: date-time
+        vencimiento:
+          type: string
+          format: date-time
+          description: Explicit due date; when omitted, derived from supplier payment terms (#275).
 
     ComprobanteCompra:
       type: object
@@ -8660,9 +8743,135 @@ components:
         data:
           $ref: '#/components/schemas/EmpresaConfig'
 
+    FacturaPendienteEstado:
+      type: string
+      enum: [pendiente, proxima_vencer, vencida_hoy, vencida_critica]
+
+    FacturaPendienteRow:
+      type: object
+      required:
+        - comprobanteCompraId
+        - proveedorId
+        - proveedorCodigo
+        - proveedorRsocial
+        - facturaRef
+        - fecha
+        - vencimiento
+        - total
+        - pagado
+        - pendiente
+        - estado
+        - diasHastaVencimiento
+        - diasVencido
+      properties:
+        comprobanteCompraId:
+          type: integer
+        proveedorId:
+          type: integer
+        proveedorCodigo:
+          type: integer
+        proveedorRsocial:
+          type: string
+        facturaRef:
+          type: string
+        fecha:
+          type: string
+          format: date-time
+        vencimiento:
+          type: string
+          format: date-time
+        total:
+          type: string
+        pagado:
+          type: string
+        pendiente:
+          type: string
+        estado:
+          $ref: '#/components/schemas/FacturaPendienteEstado'
+        diasHastaVencimiento:
+          type: integer
+        diasVencido:
+          type: integer
+
+    FacturasPendientesEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/FacturaPendienteRow'
+
+    AlertaProveedorConfig:
+      type: object
+      required: [diasPrevioAviso, diasCritico, notifEmail, notifInApp]
+      properties:
+        diasPrevioAviso:
+          type: integer
+          minimum: 0
+          maximum: 90
+        diasCritico:
+          type: integer
+          minimum: 1
+          maximum: 365
+        notifEmail:
+          type: boolean
+        notifInApp:
+          type: boolean
+
+    AlertaProveedorConfigInput:
+      type: object
+      properties:
+        diasPrevioAviso:
+          type: integer
+          minimum: 0
+          maximum: 90
+        diasCritico:
+          type: integer
+          minimum: 1
+          maximum: 365
+        notifEmail:
+          type: boolean
+        notifInApp:
+          type: boolean
+
+    AlertaProveedorConfigEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/AlertaProveedorConfig'
+
+    DashboardFacturasPagarWidget:
+      type: object
+      required: [vencido, proximoVencer]
+      properties:
+        vencido:
+          type: object
+          required: [count, total]
+          properties:
+            count:
+              type: integer
+            total:
+              type: string
+        proximoVencer:
+          type: object
+          required: [count, total]
+          properties:
+            count:
+              type: integer
+            total:
+              type: string
+
     DashboardSummary:
       type: object
-      required: [ventasHoy, facturasVencidas, cobrosHoy, alertasActivas]
+      required: [ventasHoy, facturasVencidas, cobrosHoy, alertasActivas, facturasPagar]
       properties:
         ventasHoy:
           type: object
@@ -8690,6 +8899,8 @@ components:
               type: string
         alertasActivas:
           type: integer
+        facturasPagar:
+          $ref: '#/components/schemas/DashboardFacturasPagarWidget'
 
     DashboardSummaryEnvelope:
       type: object

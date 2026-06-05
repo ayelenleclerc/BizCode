@@ -4,6 +4,7 @@ import { requirePermission } from '../auth'
 import { requireModule } from '../middleware/requireModule'
 import { validateBody } from '../middleware/validateBody'
 import { comprobanteCompraBodySchema } from '../schemas/domain'
+import { ProveedorAlertasService } from '../services/ProveedorAlertasService'
 import type { ComprobanteCompraCreateInput } from '../services/ComprobanteCompraService'
 import type { RestRouteContext } from './restRouteTypes'
 import { errorMessage, getTenantId } from './restDomainShared'
@@ -14,8 +15,9 @@ import { errorMessage, getTenantId } from './restDomainShared'
  * @pt-BR Comprovantes fiscais de compra de fornecedor (#306).
  */
 export function registerComprobanteCompraRoutes(app: Application, ctx: RestRouteContext): void {
-  const { services, writeAudit } = ctx
+  const { prisma, services, writeAudit } = ctx
   const { comprobanteCompra } = services
+  const alertas = new ProveedorAlertasService(prisma)
   const ledgerModule = requireModule('finance.ledger')
 
   app.post(
@@ -33,6 +35,10 @@ export function registerComprobanteCompraRoutes(app: Application, ctx: RestRoute
           body,
           authReq.auth!.claims.userId,
         )
+        alertas
+          .notifyCreditLimitIfExceeded(tenantId, created.proveedorId)
+          .catch(() => { /* notification failure must not block registration */ })
+
         await writeAudit(
           req as AuthenticatedRequest,
           'comprobante_compra_create',

@@ -7,6 +7,10 @@ export const NOTIFICATION_TYPES = [
   'credit_limit_exceeded',
   'invoice_overdue',
   'invoice_due_soon',
+  'supplier_invoice_due_soon',
+  'supplier_invoice_overdue',
+  'supplier_invoice_overdue_critical',
+  'supplier_credit_limit_exceeded',
   'chat_message',
   'stock_below_minimum',
   'module_trial_expiring',
@@ -17,9 +21,14 @@ export type NotificationType = (typeof NOTIFICATION_TYPES)[number]
 export type NotificationPayload = {
   clienteId?: number
   facturaId?: number
+  proveedorId?: number
+  comprobanteCompraId?: number
+  facturaRef?: string
   rsocial?: string
   amount?: string
   diasMora?: number
+  diasVencido?: number
+  diasHastaVencimiento?: number
   limit?: string
   messageId?: number
   fromUserId?: number
@@ -110,6 +119,20 @@ export async function notifyTenantOwners(
  * @es Notifica a owner, manager y warehouse_lead para alertas de inventario.
  * @pt-BR Notifica owner, manager e warehouse_lead para alertas de estoque.
  */
+/**
+ * @en Notifies finance stakeholders (owner/manager) for supplier payable alerts (#275).
+ * @es Notifica a responsables de finanzas (owner/manager) para alertas de proveedores (#275).
+ * @pt-BR Notifica responsáveis de finanças (owner/manager) para alertas de fornecedores (#275).
+ */
+export async function notifyFinanceStakeholders(
+  prisma: PrismaClient,
+  tenantId: number,
+  type: NotificationType,
+  payload: NotificationPayload,
+): Promise<void> {
+  await notifyManagers(prisma, tenantId, type, payload)
+}
+
 export async function notifyInventoryStakeholders(
   prisma: PrismaClient,
   tenantId: number,

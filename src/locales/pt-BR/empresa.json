@@ -96,5 +96,17 @@
       "thermalFallback": "Térmica desabilitada: o sistema usaria PDF legal.",
       "error": "Não foi possível executar o teste de impressão"
     }
+  },
+  "proveedorAlertas": {
+    "title": "Alertas de faturas a pagar",
+    "hint": "Job diário às 07:00 (fuso da empresa). Notificações in-app vão para owner e manager.",
+    "loading": "Carregando configuração…",
+    "diasPrevio": "Dias de aviso antes do vencimento",
+    "diasCritico": "Dias vencidos para alerta crítica",
+    "notifInApp": "Notificações in-app",
+    "notifEmail": "Notificações por email (SMTP)",
+    "emailNote": "Email externo requer SMTP no servidor; sem destinatário configurado só in-app se aplica.",
+    "save": "Salvar alertas",
+    "saved": "Configuração salva"
   }
 }

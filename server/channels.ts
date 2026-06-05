@@ -16,7 +16,7 @@
 import nodemailer from 'nodemailer'
 import type { PrismaClient } from '@prisma/client'
 import { resolveSmtpTransportConfig } from './config/smtpTransport'
-import { notifyInventoryStakeholders, notifyManagers } from './notifications'
+import { notifyInventoryStakeholders, notifyManagers, notifyFinanceStakeholders } from './notifications'
 import type { NotificationType, NotificationPayload } from './notifications'
 import { logger } from './logger'
 
@@ -51,6 +51,44 @@ function buildMessage(type: NotificationType, payload: NotificationPayload): Mes
       return {
         subject: `[BizCode] Factura próxima a vencer — ${rsocial}`,
         text: `Una factura de ${rsocial} está próxima a vencer. Coordine el cobro con anticipación.`,
+      }
+    case 'supplier_invoice_due_soon': {
+      const ref = payload.facturaRef ? ` ${payload.facturaRef}` : ''
+      const days =
+        payload.diasHastaVencimiento != null && payload.diasHastaVencimiento > 0
+          ? ` (vence en ${payload.diasHastaVencimiento} días)`
+          : ''
+      return {
+        subject: `[BizCode] Factura a pagar próxima a vencer — ${rsocial}`,
+        text: `Comprobante${ref} de ${rsocial}${amount ? ` por ${amount}` : ''} está próximo a vencer${days}.`,
+      }
+    }
+    case 'supplier_invoice_overdue': {
+      const ref = payload.facturaRef ? ` ${payload.facturaRef}` : ''
+      const mora =
+        payload.diasVencido != null && payload.diasVencido > 0
+          ? ` (${payload.diasVencido} días vencido)`
+          : ''
+      return {
+        subject: `[BizCode] Factura a pagar vencida — ${rsocial}`,
+        text: `Comprobante${ref} de ${rsocial}${amount ? ` por ${amount}` : ''} está vencido${mora}.`,
+      }
+    }
+    case 'supplier_invoice_overdue_critical': {
+      const ref = payload.facturaRef ? ` ${payload.facturaRef}` : ''
+      const mora =
+        payload.diasVencido != null && payload.diasVencido > 0
+          ? ` (${payload.diasVencido} días vencido)`
+          : ''
+      return {
+        subject: `[BizCode] Factura a pagar vencida (crítica) — ${rsocial}`,
+        text: `Comprobante${ref} de ${rsocial}${amount ? ` por ${amount}` : ''} supera el umbral crítico${mora}.`,
+      }
+    }
+    case 'supplier_credit_limit_exceeded':
+      return {
+        subject: `[BizCode] Límite de crédito proveedor superado — ${rsocial}`,
+        text: `El saldo de ${rsocial} (${amount}) superó el límite de crédito configurado (${limit}).`,
       }
     case 'chat_message':
       return {
@@ -234,4 +272,29 @@ export async function dispatchNotification(
 
   // 4. WhatsApp
   void sendWhatsApp(phoneRecipients, `${msg.subject}\n\n${msg.text}`)
+}
+
+export type SupplierNotificationChannels = {
+  inApp: boolean
+  email: boolean
+}
+
+/**
+ * @en Dispatches supplier payable alerts respecting tenant channel toggles (#275).
+ * @es Despacha alertas de facturas a pagar respetando canales del tenant (#275).
+ * @pt-BR Despacha alertas de faturas a pagar respeitando canais do tenant (#275).
+ */
+export async function dispatchSupplierNotification(
+  prisma: PrismaClient,
+  tenantId: number,
+  type: NotificationType,
+  payload: NotificationPayload,
+  channels: SupplierNotificationChannels,
+): Promise<void> {
+  if (channels.inApp) {
+    await notifyFinanceStakeholders(prisma, tenantId, type, payload)
+  }
+
+  // AppUser has no email field; external SMTP for supplier alerts is reserved for a future tenant contact address.
+  if (!channels.email || !isSmtpConfigured()) return
 }

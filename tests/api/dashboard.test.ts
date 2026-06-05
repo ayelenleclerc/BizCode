@@ -29,6 +29,15 @@ function buildPrismaMock(overrides: Partial<Record<string, unknown>> = {}): Pris
       findMany: vi.fn().mockResolvedValue([]),
       aggregate: vi.fn().mockResolvedValue(EMPTY_COBRO_AGGREGATE),
     },
+    alertaProveedorConfig: {
+      findUnique: vi.fn().mockResolvedValue(null),
+    },
+    comprobanteCompra: {
+      findMany: vi.fn().mockResolvedValue([]),
+    },
+    reciboPagoFactura: {
+      groupBy: vi.fn().mockResolvedValue([]),
+    },
     auditEvent: { create: vi.fn().mockResolvedValue({ id: 1 }) },
     appUser: {
       count: vi.fn().mockResolvedValue(1),
@@ -84,6 +93,11 @@ describe('GET /api/dashboard/summary', () => {
     expect(d).toHaveProperty('facturasVencidas')
     expect(d).toHaveProperty('cobrosHoy')
     expect(d).toHaveProperty('alertasActivas')
+    expect(d).toHaveProperty('facturasPagar')
+    expect(d.facturasPagar).toEqual({
+      vencido: { count: 0, total: '0.00' },
+      proximoVencer: { count: 0, total: '0.00' },
+    })
   })
 
   it('returns summary for authenticated seller', async () => {
@@ -174,6 +188,53 @@ describe('GET /api/dashboard/summary', () => {
     expect(prisma.factura.aggregate).toHaveBeenCalledTimes(1)
     expect(prisma.factura.findMany).toHaveBeenCalledTimes(1)
     expect(prisma.cobro.aggregate).toHaveBeenCalledTimes(1)
+    expect(prisma.comprobanteCompra.findMany).toHaveBeenCalledTimes(1)
+  })
+
+  it('facturasPagar aggregates overdue and due-soon payables', async () => {
+    process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
+    process.env.BIZCODE_TEST_ROLE = 'owner'
+    const prisma = buildPrismaMock()
+    ;(prisma.comprobanteCompra.findMany as ReturnType<typeof vi.fn>).mockResolvedValueOnce([
+      {
+        id: 1,
+        proveedorId: 2,
+        fecha: new Date('2026-05-01'),
+        vencimiento: new Date('2026-05-15'),
+        tipo: 'B',
+        prefijo: '0001',
+        numero: 1,
+        total: new Decimal(800),
+        proveedor: {
+          id: 2,
+          codigo: 10,
+          rsocial: 'Proveedor SA',
+          plazoHabitual: 0,
+          condicionPago: 'contado',
+        },
+      },
+      {
+        id: 2,
+        proveedorId: 2,
+        fecha: new Date('2026-06-01'),
+        vencimiento: new Date('2026-06-10'),
+        tipo: 'B',
+        prefijo: '0001',
+        numero: 2,
+        total: new Decimal(200),
+        proveedor: {
+          id: 2,
+          codigo: 10,
+          rsocial: 'Proveedor SA',
+          plazoHabitual: 0,
+          condicionPago: 'contado',
+        },
+      },
+    ])
+    const app = createApp(prisma)
+    const res = await request(app).get('/api/dashboard/summary').expect(200)
+    expect(res.body.data.facturasPagar.vencido.count).toBeGreaterThanOrEqual(1)
+    expect(res.body.data.facturasPagar.proximoVencer.count).toBeGreaterThanOrEqual(0)
   })
 })
 

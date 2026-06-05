@@ -37,6 +37,10 @@ const summaryFixture = {
   facturasVencidas: { count: 0, total: '0.00' },
   cobrosHoy: { count: 0, total: '0.00' },
   alertasActivas: 0,
+  facturasPagar: {
+    vencido: { count: 1, total: '500.00' },
+    proximoVencer: { count: 2, total: '300.00' },
+  },
 }
 
 const historicoFixture = {
