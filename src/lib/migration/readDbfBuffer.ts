@@ -31,7 +31,14 @@ export function assertValidDbfUploadBuffer(buffer: Buffer): void {
   if (headerLength < 32 || headerLength > buffer.length) {
     throw new Error('Invalid DBF: invalid header length')
   }
-  if (buffer[headerLength - 1] !== 0x0d) {
+  const recordLength = buffer.readUInt16LE(10)
+  if (recordLength < 1) {
+    throw new Error('Invalid DBF: invalid record length')
+  }
+  const terminatorIndex = buffer.indexOf(0x0d, 32)
+  const hasHeaderTerminator =
+    (terminatorIndex >= 32 && terminatorIndex < headerLength) || buffer[headerLength - 1] === 0x0d
+  if (!hasHeaderTerminator) {
     throw new Error('Invalid DBF: missing header terminator')
   }
 }
