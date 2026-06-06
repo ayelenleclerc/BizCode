@@ -52,14 +52,14 @@ function createRouteLimiter(options: {
 }
 
 /**
- * @en Per-IP rate limit for `/api/auth/*` (default 20 req/min; `HTTP_RATE_LIMIT_AUTH_PER_MINUTE`).
- * @es Límite por IP para `/api/auth/*` (20 req/min por defecto; `HTTP_RATE_LIMIT_AUTH_PER_MINUTE`).
- * @pt-BR Limite por IP para `/api/auth/*` (20 req/min padrão; `HTTP_RATE_LIMIT_AUTH_PER_MINUTE`).
+ * @en Per-IP rate limit for the `/api/auth` router (default 20 req/min; `HTTP_RATE_LIMIT_AUTH_PER_MINUTE`).
+ * @es Límite por IP para el router `/api/auth` (20 req/min por defecto; `HTTP_RATE_LIMIT_AUTH_PER_MINUTE`).
+ * @pt-BR Limite por IP para o router `/api/auth` (20 req/min padrão; `HTTP_RATE_LIMIT_AUTH_PER_MINUTE`).
  */
-export const authHttpRateLimiter = createRouteLimiter({
+export const authRouterHttpRateLimiter = createRouteLimiter({
   windowMs: MINUTE_MS,
   limit: parsePositiveInt(process.env.HTTP_RATE_LIMIT_AUTH_PER_MINUTE, AUTH_DEFAULT),
-  skipUnless: (req) => isAuthPath(req.path),
+  skipUnless: () => true,
 })
 
 /**
@@ -113,5 +113,6 @@ function runLimiterChain(
  * @pt-BR Aplica limites auth, import e API geral sem contar a mesma requisição duas vezes.
  */
 export function routeHttpRateLimiter(req: Request, res: Response, next: NextFunction): void {
-  runLimiterChain(req, res, next, [authHttpRateLimiter, importHttpRateLimiter, apiHttpRateLimiter], 0)
+  // `/api/auth/*` is rate-limited on the auth router (`registerAuthRoutes`) so CodeQL can see it.
+  runLimiterChain(req, res, next, [importHttpRateLimiter, apiHttpRateLimiter], 0)
 }
