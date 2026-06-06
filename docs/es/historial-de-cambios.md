@@ -10,6 +10,10 @@ Versionado: [Semantic Versioning](https://semver.org/lang/es/).
 
 ### Agregado
 
+- **Historial de compras de proveedor (GitHub #272):** `GET /api/proveedores/{id}/historial` y `GET /api/proveedores/{id}/articulos` con períodos móviles (30/90/180/365 días); métricas desde OC recibidas y comprobantes (total, frecuencia, top artículos, PPP); pestaña **Historial** en ficha de proveedor; OpenAPI, pruebas y manuales trilingües.
+
+- **Alertas de vencimiento a proveedor (GitHub #275):** `vencimiento` opcional en `ComprobanteCompra`; `AlertaProveedorConfig` + `AlertaProveedorLog`; `GET /api/proveedores/facturas-pendientes`, `GET/PATCH /api/configuracion/alertas-proveedores`; job diario `scripts/proveedor-alertas-job.ts`; widget en inicio y UI en Finanzas; alerta de límite de crédito al registrar comprobante; OpenAPI, pruebas y manuales trilingües.
+
 - **Recibo de pago a proveedor (GitHub #271):** modelos `ReciboPago` + `ReciboPagoFactura`; `GET/POST /api/proveedores/{id}/pagos`, helper de comprobantes pendientes, anulación y PDF; movimiento `pago` automático en CC; UI en pestaña cuenta corriente; módulo `finance.receipts`; OpenAPI, pruebas y manuales trilingües.
 
 - **Cuenta corriente de proveedor (GitHub #270):** modelo `MovimientoProveedorCC` con saldo corrido; `GET/POST` cuenta corriente bajo `/api/proveedores/{id}`; movimiento automático al crear comprobante de compra; pestaña UI con saldo, alerta de límite, gráfico 6 meses y ajuste manual auditado; OpenAPI, pruebas y manuales trilingües.

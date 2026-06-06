@@ -1564,6 +1564,12 @@ export const facturasPendientesQuerySchema = z.object({
   proveedorId: z.coerce.number().int().min(1).optional(),
 })
 
+export const proveedorHistorialQuerySchema = z.object({
+  dias: z.coerce.number().int().refine((v) => [30, 90, 180, 365].includes(v), {
+    message: 'dias must be one of: 30, 90, 180, 365',
+  }).optional(),
+})
+
 export const alertaProveedorConfigBodySchema = z
   .object({
     diasPrevioAviso: z.number().int().min(0).max(90).optional(),

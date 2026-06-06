@@ -58,6 +58,19 @@ Module `finance.ledger`, permission `suppliers.read`:
 
 **API:** `GET/PATCH /api/configuracion/alertas-proveedores` — see [OpenAPI](../../api/openapi.yaml).
 
+## Purchase history (GitHub #272)
+
+For **existing** suppliers, open the **History** tab (`finance.ledger`, `suppliers.read`):
+
+- Select a rolling period: **30 / 90 / 180 / 365** days.
+- **Metric cards:** total purchased, average days between purchases, purchase count, top item by amount.
+- **Orders and vouchers table** with payment status (`pending`, `partial`, `paid`, or N/A for purchase orders without a linked voucher).
+- **Items table** with weighted average price (WAP) from **received** purchase-order lines.
+
+Metrics use received purchase orders (`OrdenCompraItem.cantidadRecibida`) and active purchase vouchers (`ComprobanteCompra`); vouchers linked to an order are not double-counted in totals.
+
+**API:** `GET /api/proveedores/{id}/historial`, `GET /api/proveedores/{id}/articulos?dias=` — see [OpenAPI](../../api/openapi.yaml).
+
 ## Deactivate (logical delete)
 
 Select a row and **Deactivate**. The record stays in the database (`activo: false`) for purchase orders and purchase vouchers already linked. Use the inactive filter to review deactivated suppliers.

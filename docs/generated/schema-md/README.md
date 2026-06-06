@@ -324,6 +324,18 @@
 
 * [Proveedor](./proveedor.md) – `-`
 
+* [ProveedorArticuloHistorialRow](./proveedorarticulohistorialrow.md) – `-`
+
+* [ProveedorArticuloPrecioPunto](./proveedorarticulopreciopunto.md) – `-`
+
+* [ProveedorArticulosHistorialData](./proveedorarticuloshistorialdata.md) – `-`
+
+* [ProveedorArticulosHistorialEnvelope](./proveedorarticuloshistorialenvelope.md) – `-`
+
+* [ProveedorCompraEstadoPago](./proveedorcompraestadopago.md) – `-`
+
+* [ProveedorCompraRow](./proveedorcomprarow.md) – `-`
+
 * [ProveedorCuentaCorriente](./proveedorcuentacorriente.md) – `-`
 
 * [ProveedorCuentaCorrienteAjusteInput](./proveedorcuentacorrienteajusteinput.md) – `-`
@@ -337,6 +349,12 @@
 * [ProveedorCuentaCorrienteSaldoEnvelope](./proveedorcuentacorrientesaldoenvelope.md) – `-`
 
 * [ProveedorEnvelope](./proveedorenvelope.md) – `-`
+
+* [ProveedorHistorialEnvelope](./proveedorhistorialenvelope.md) – `-`
+
+* [ProveedorHistorialResumen](./proveedorhistorialresumen.md) – `-`
+
+* [ProveedorHistorialTopArticulo](./proveedorhistorialtoparticulo.md) – `-`
 
 * [ProveedorInput](./proveedorinput.md) – `-`
 
@@ -760,9 +778,17 @@
 
 * [Untitled array in PlanCatalogEnvelope](./plancatalogenvelope-properties-data.md) – `undefined#/properties/data`
 
+* [Untitled array in ProveedorArticuloHistorialRow](./proveedorarticulohistorialrow-properties-evolucionprecios.md) – `undefined#/properties/evolucionPrecios`
+
+* [Untitled array in ProveedorArticulosHistorialData](./proveedorarticuloshistorialdata-properties-articulos.md) – `undefined#/properties/articulos`
+
 * [Untitled array in ProveedorCuentaCorriente](./proveedorcuentacorriente-properties-movimientos.md) – `undefined#/properties/movimientos`
 
 * [Untitled array in ProveedorCuentaCorriente](./proveedorcuentacorriente-properties-serie.md) – `undefined#/properties/serie`
+
+* [Untitled array in ProveedorHistorialResumen](./proveedorhistorialresumen-properties-compras.md) – `undefined#/properties/compras`
+
+* [Untitled array in ProveedorHistorialResumen](./proveedorhistorialresumen-properties-toparticulos.md) – `undefined#/properties/topArticulos`
 
 * [Untitled array in ProveedorListEnvelope](./proveedorlistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
 

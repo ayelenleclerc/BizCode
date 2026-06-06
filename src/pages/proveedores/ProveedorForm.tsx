@@ -5,6 +5,7 @@ import { ApiRequestFailedError, proveedoresAPI, type ProveedorInputDTO } from '@
 import { formatCUIT, validateCBU, validateCUIT } from '@/lib/validators'
 import type { Proveedor, ProveedorCategoria, ProveedorCondicionPago, ProveedorTipoCuenta } from '@/types'
 import ProveedorCuentaCorrienteSection from './ProveedorCuentaCorrienteSection'
+import ProveedorHistorialSection from './ProveedorHistorialSection'
 
 const COND_IVA = ['RI', 'Mono', 'CF', 'Exento'] as const
 const TIPOS_CUENTA: ProveedorTipoCuenta[] = ['cc', 'ca']
@@ -58,7 +59,7 @@ export default function ProveedorForm({ proveedorId, onClose, onSaved }: Proveed
   const [formSaving, setFormSaving] = useState(false)
   const [formError, setFormError] = useState<string | null>(null)
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
-  const [activeTab, setActiveTab] = useState<'datos' | 'cc'>('datos')
+  const [activeTab, setActiveTab] = useState<'datos' | 'cc' | 'historial'>('datos')
 
   const applyProveedor = useCallback((p: Proveedor) => {
     setFormCodigo(String(p.codigo))
@@ -247,6 +248,22 @@ export default function ProveedorForm({ proveedorId, onClose, onSaved }: Proveed
             >
               {t('form.tabCuentaCorriente')}
             </button>
+            <button
+              type="button"
+              role="tab"
+              id="proveedor-tab-historial"
+              aria-selected={activeTab === 'historial'}
+              aria-controls="proveedor-tabpanel-historial"
+              data-testid="proveedor-tab-historial"
+              className={`px-3 py-2 text-sm font-medium border-b-2 -mb-px ${
+                activeTab === 'historial'
+                  ? 'border-blue-600 text-blue-700 dark:text-blue-300'
+                  : 'border-transparent text-slate-600 dark:text-slate-400'
+              }`}
+              onClick={() => setActiveTab('historial')}
+            >
+              {t('form.tabHistorial')}
+            </button>
           </div>
         ) : null}
         {loading ? (
@@ -270,11 +287,21 @@ export default function ProveedorForm({ proveedorId, onClose, onSaved }: Proveed
                 <ProveedorCuentaCorrienteSection proveedorId={proveedorId} />
               </div>
             ) : null}
+            {proveedorId != null && activeTab === 'historial' ? (
+              <div
+                role="tabpanel"
+                id="proveedor-tabpanel-historial"
+                aria-labelledby="proveedor-tab-historial"
+                data-testid="proveedor-tabpanel-historial"
+              >
+                <ProveedorHistorialSection proveedorId={proveedorId} />
+              </div>
+            ) : null}
             <form
               role={proveedorId != null ? 'tabpanel' : undefined}
               id={proveedorId != null ? 'proveedor-tabpanel-datos' : undefined}
               aria-labelledby={proveedorId != null ? 'proveedor-tab-datos' : undefined}
-              hidden={proveedorId != null && activeTab === 'cc'}
+              hidden={proveedorId != null && activeTab !== 'datos'}
               className="space-y-4"
               onSubmit={(e) => {
                 e.preventDefault()
