@@ -27,6 +27,7 @@ import { registerReciboPagoRoutes } from './routes/registerReciboPagoRoutes'
 import { registerProveedorAlertasRoutes } from './routes/registerProveedorAlertasRoutes'
 import { registerProveedorHistorialRoutes } from './routes/registerProveedorHistorialRoutes'
 import { registerProveedorCatalogoRoutes } from './routes/registerProveedorCatalogoRoutes'
+import { registerArticuloProveedoresComparadorRoutes } from './routes/registerArticuloProveedoresComparadorRoutes'
 import { registerRubrosRoutes } from './routes/registerRubrosRoutes'
 import type { RestRouteContext } from './routes/restRouteTypes'
 import { registerZonasEntregaRoutes } from './routes/registerZonasEntregaRoutes'
@@ -69,6 +70,7 @@ export function registerRestDomainRoutes(app: Application, prisma: PrismaClient)
   registerArticulosRoutes(app, ctx)
   registerRubrosRoutes(app, ctx)
   registerProveedorAlertasRoutes(app, ctx)
+  registerArticuloProveedoresComparadorRoutes(app, ctx)
   registerProveedoresRoutes(app, ctx)
   registerProveedorCuentaCorrienteRoutes(app, ctx)
   registerProveedorHistorialRoutes(app, ctx)

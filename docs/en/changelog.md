@@ -10,6 +10,8 @@ Versioning: [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **Supplier price comparator (GitHub #274):** `ArticuloProveedoresComparadorService`; `GET /api/articulos/{id}/proveedores` and `GET /api/proveedores/comparar?articuloId=` (module `logistics.purchases`, `products.read` or `suppliers.read`); active supplier catalog rows with list price, stale-price flag (>30 days), and last **received** purchase-order date; **View suppliers** on the product profile with sort, cheapest-row highlight, stale-price indicator, and **[PO]** (`suppliers.manage`) pre-filling the purchase-order form; OpenAPI, tests, trilingual manuals.
+
 - **Supplier product catalog (GitHub #273):** `ProveedorArticulo` model and migration; `GET/POST /api/proveedores/{id}/catalogo`, `PUT .../catalogo/{articuloId}`, `POST .../catalogo/import` (module `logistics.purchases`); per-supplier codes, descriptions, list prices and CSV import; **Catalog** tab on supplier profile with price-age indicators; audit `proveedor_catalogo_*`; OpenAPI, tests, trilingual manuals.
 
 - **Supplier purchase history (GitHub #272):** `GET /api/proveedores/{id}/historial` and `GET /api/proveedores/{id}/articulos` with rolling periods (30/90/180/365 days); metrics from received purchase orders and purchase vouchers (total, frequency, top items, WAP/PPP); **History** tab on supplier profile; OpenAPI, tests, trilingual manuals.

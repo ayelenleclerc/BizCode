@@ -1,8 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { MemoryRouter } from 'react-router-dom'
 import '@/i18n/config'
 import ComprasPage from './index'
+import type { ComprasOcPrefillState } from '@/lib/comprasOcPrefill'
 import { comprasAPI, type OrdenCompra } from '@/lib/api'
 import { useAuth } from '@/contexts/AuthContext'
 import type { AuthClaims, Permission } from '@/lib/rbac'
@@ -82,6 +84,14 @@ function mockAuth(permissions: Permission[]) {
   })
 }
 
+function renderCompras(state?: ComprasOcPrefillState) {
+  return render(
+    <MemoryRouter initialEntries={[{ pathname: '/compras', state: state ?? {} }]}>
+      <ComprasPage />
+    </MemoryRouter>,
+  )
+}
+
 describe('ComprasPage', () => {
   beforeEach(() => {
     vi.clearAllMocks()
@@ -103,12 +113,12 @@ describe('ComprasPage', () => {
 
   it('muestra acceso denegado sin suppliers.read', async () => {
     mockAuth([])
-    render(<ComprasPage />)
+    renderCompras()
     expect(await screen.findByTestId('compras-forbidden')).toBeInTheDocument()
   })
 
   it('carga el listado y muestra la tabla', async () => {
-    render(<ComprasPage />)
+    renderCompras()
     expect(await screen.findByTestId('compras-page')).toBeInTheDocument()
     expect(await screen.findByTestId('compras-table')).toBeInTheDocument()
     expect(screen.getByTestId('compras-row-1')).toBeInTheDocument()
@@ -123,13 +133,13 @@ describe('ComprasPage', () => {
       limit: 50,
       offset: 0,
     })
-    render(<ComprasPage />)
+    renderCompras()
     expect(await screen.findByTestId('compras-empty')).toBeInTheDocument()
   })
 
   it('muestra error de carga', async () => {
     vi.mocked(comprasAPI.list).mockRejectedValue(new Error('fallo red'))
-    render(<ComprasPage />)
+    renderCompras()
     await waitFor(() => {
       expect(screen.queryByTestId('compras-table')).not.toBeInTheDocument()
     })
@@ -137,7 +147,7 @@ describe('ComprasPage', () => {
 
   it('filtra por estado', async () => {
     const user = userEvent.setup()
-    render(<ComprasPage />)
+    renderCompras()
     await screen.findByTestId('compras-table')
     await user.selectOptions(screen.getByLabelText(/estado/i), 'sent')
     await waitFor(() => {
@@ -147,7 +157,7 @@ describe('ComprasPage', () => {
 
   it('crea una orden desde el formulario', async () => {
     const user = userEvent.setup()
-    render(<ComprasPage />)
+    renderCompras()
     await user.click(await screen.findByTestId('compras-btn-new'))
     await user.type(screen.getByLabelText(/proveedor/i), '2')
     await user.type(screen.getByLabelText(/artículo/i), '3')
@@ -168,7 +178,7 @@ describe('ComprasPage', () => {
 
   it('envía una orden en borrador', async () => {
     const user = userEvent.setup()
-    render(<ComprasPage />)
+    renderCompras()
     await user.click(await screen.findByTestId('compras-row-1'))
     await user.click(await screen.findByTestId('compras-btn-send'))
     await waitFor(() => {
@@ -178,7 +188,7 @@ describe('ComprasPage', () => {
 
   it('cancela una orden', async () => {
     const user = userEvent.setup()
-    render(<ComprasPage />)
+    renderCompras()
     await user.click(await screen.findByTestId('compras-row-1'))
     await user.click(await screen.findByTestId('compras-btn-cancel'))
     await waitFor(() => {
@@ -188,16 +198,27 @@ describe('ComprasPage', () => {
 
   it('no crea orden con datos inválidos', async () => {
     const user = userEvent.setup()
-    render(<ComprasPage />)
+    renderCompras()
     await user.click(await screen.findByTestId('compras-btn-new'))
     await user.click(screen.getByTestId('compras-form-save'))
     expect(comprasAPI.create).not.toHaveBeenCalled()
   })
 
+  it('precarga el formulario desde ocPrefill del comparador', async () => {
+    renderCompras({
+      ocPrefill: { proveedorId: 2, articuloId: 3, costoUnitario: '1500.00' },
+    })
+    expect(await screen.findByTestId('compras-form-dialog')).toBeInTheDocument()
+    expect(screen.getByLabelText(/proveedor/i)).toHaveValue(2)
+    expect(screen.getByLabelText(/artículo/i)).toHaveValue(3)
+    expect(screen.getByLabelText(/costo/i)).toHaveValue(1500)
+    expect(screen.getByLabelText(/cantidad/i)).toHaveValue(1)
+  })
+
   it('recibe stock parcial', async () => {
     vi.mocked(comprasAPI.get).mockResolvedValue(sentOrden)
     const user = userEvent.setup()
-    render(<ComprasPage />)
+    renderCompras()
     await user.click(await screen.findByTestId('compras-row-1'))
     await user.click(await screen.findByTestId('compras-btn-receive'))
     const qtyInput = await screen.findByLabelText(/cantidad/i)

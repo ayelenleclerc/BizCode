@@ -105,5 +105,31 @@
       "reason": "Reason",
       "user": "User"
     }
+  },
+  "comparador": {
+    "view": "View suppliers",
+    "hide": "Hide suppliers",
+    "title": "Supplier comparator",
+    "subtitle": "Item {{codigo}} — {{descripcion}}",
+    "empty": "No active supplier has this item in catalog.",
+    "tableCaption": "List prices by supplier",
+    "colProveedor": "Supplier",
+    "colCodigoProveedor": "Supplier code",
+    "colPrecioLista": "List price",
+    "colUltActualiz": "Last update",
+    "colUltCompra": "Last purchase",
+    "colAcciones": "Actions",
+    "accionOc": "PO",
+    "masBarato": "Cheapest supplier",
+    "sinPrecio": "No price",
+    "precioDesactualizado": "Stale price ({{dias}} days)",
+    "diasAtras": "{{dias}} days ago",
+    "sortBy": "Sort by",
+    "sortDir": "Direction",
+    "sortPrecio": "List price",
+    "sortPrecioFecha": "Price date",
+    "sortUltimaCompra": "Last purchase",
+    "sortAsc": "Ascending",
+    "sortDesc": "Descending"
   }
 }

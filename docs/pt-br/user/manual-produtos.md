@@ -50,6 +50,21 @@ A alíquota do **produto** define a taxa; o **regime fiscal do cliente** define 
 
 Selecione o produto → **Enter** ou duplo clique → altere → **F5**.
 
+## Comparador de fornecedores (GitHub #274)
+
+Em produtos **existentes** (`logistics.purchases`, `products.read` ou `suppliers.read`):
+
+- Clique em **Ver fornecedores** abaixo do campo de estoque para expandir o comparador.
+- **Tabela:** fornecedor, código do fornecedor, preço de lista, última atualização de preço e última compra (de OC **recebidas** com quantidade recebida &gt; 0).
+- A linha do fornecedor **mais barato** é destacada entre quem tem preço de lista.
+- **Preço desatualizado:** destaque âmbar quando a data do preço tem mais de **30** dias.
+- **Ordenação:** por preço, data do preço ou última compra (ascendente/descendente); valores nulos ficam por último.
+- **[OC]** (`suppliers.manage`): abre **Compras** com fornecedor, produto e custo unitário pré-preenchidos no formulário de nova ordem.
+
+Somente fornecedores **ativos** com entrada de catálogo **ativa** para o produto são listados.
+
+**API:** `GET /api/articulos/{id}/proveedores`, `GET /api/proveedores/comparar?articuloId=` — [OpenAPI](../../api/openapi.yaml).
+
 ## Categorias (rubros)
 
 As categorias classificam produtos. Quem tiver permissão de **gestão de produtos** pode **importar rubros por CSV** nesta tela («Importar rubros CSV»): baixe o modelo, não altere a linha de cabeçalho, use UTF-8 e confira o resumo de linhas criadas ou ignoradas.

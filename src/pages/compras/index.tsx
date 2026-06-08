@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { CanAccess } from '@/components/CanAccess'
 import ErrorBoundary from '@/components/ErrorBoundary'
 import AsyncWrapper from '@/components/shared/AsyncWrapper'
 import { comprasAPI, type OrdenCompra } from '@/lib/api'
+import type { ComprasOcPrefillState } from '@/lib/comprasOcPrefill'
 
 const ESTADOS = ['draft', 'sent', 'received', 'cancelled'] as const
 
@@ -32,6 +34,8 @@ export default function ComprasPage() {
 
 function ComprasPageContent() {
   const { t } = useTranslation('compras')
+  const location = useLocation()
+  const navigate = useNavigate()
   const [ordenes, setOrdenes] = useState<OrdenCompra[]>([])
   const [loading, setLoading] = useState(false)
   const [loadError, setLoadError] = useState<Error | null>(null)
@@ -63,6 +67,18 @@ function ComprasPageContent() {
   useEffect(() => {
     void loadList()
   }, [loadList])
+
+  useEffect(() => {
+    const prefill = (location.state as ComprasOcPrefillState | null)?.ocPrefill
+    if (!prefill) return
+    setFormProveedorId(String(prefill.proveedorId))
+    setFormArticuloId(String(prefill.articuloId))
+    setFormCosto(prefill.costoUnitario ?? '')
+    setFormCantidad('1')
+    setFormNota('')
+    setShowForm(true)
+    navigate(location.pathname, { replace: true, state: {} })
+  }, [location.pathname, location.state, navigate])
 
   const refreshSelected = async (id: number) => {
     const detail = await comprasAPI.get(id)

@@ -5540,6 +5540,228 @@ Returns plan limits, enabled plan features, and current usage for the authentica
 }
 ```
 
+### PARAMETERS /api/articulos/{id}/proveedores
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/articulos/{id}/proveedores`
+
+### Compare supplier catalog prices for a product (#274)
+
+- **Method:** `GET`
+- **Path:** `/api/articulos/{id}/proveedores`
+- **Tags:** articulos
+
+Lists active suppliers with an active catalog entry for the article, including list price, price age, and last received purchase order date. Requires module `logistics.purchases` and permission `products.read` or `suppliers.read`.
+
+#### Responses
+
+##### Status: 200 Supplier price comparison for the article
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`articuloCodigo` (required)**
+
+    `integer`
+
+  - **`articuloDescripcion` (required)**
+
+    `string`
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`proveedores` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`codigoProveedor` (required)**
+
+      `string`
+
+    - **`descripcionProveedor` (required)**
+
+      `string`
+
+    - **`esMasBarato` (required)**
+
+      `boolean`
+
+    - **`precioDesactualizado` (required)**
+
+      `boolean`
+
+    - **`precioLista` (required)**
+
+      `string`
+
+    - **`precioListaFecha` (required)**
+
+      `string`, format: `date-time`
+
+    - **`proveedorCodigo` (required)**
+
+      `integer`
+
+    - **`proveedorId` (required)**
+
+      `integer`
+
+    - **`proveedorRsocial` (required)**
+
+      `string`
+
+    - **`ultimaCompraFecha` (required)**
+
+      `string`, format: `date-time`
+
+  - **`proveedorMasBaratoId` (required)**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "articuloId": 1,
+    "articuloCodigo": 1,
+    "articuloDescripcion": "",
+    "proveedorMasBaratoId": 1,
+    "proveedores": [
+      {
+        "proveedorId": 1,
+        "proveedorCodigo": 1,
+        "proveedorRsocial": "",
+        "codigoProveedor": "",
+        "descripcionProveedor": "",
+        "precioLista": "",
+        "precioListaFecha": "",
+        "precioDesactualizado": true,
+        "ultimaCompraFecha": "",
+        "esMasBarato": true
+      }
+    ]
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ### PARAMETERS /api/articulos/{id}/stock-ajuste
 
 - **Method:** `PARAMETERS`
@@ -7679,6 +7901,228 @@ Requires `settings.business.manage`. Upserts by tenant and codigo.
 ```
 
 ##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/proveedores/comparar
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/proveedores/comparar`
+
+### Compare supplier prices for an article (#274)
+
+- **Method:** `GET`
+- **Path:** `/api/proveedores/comparar`
+- **Tags:** proveedores
+
+Same payload as `GET /api/articulos/{id}/proveedores` with `articuloId` as a query parameter. Requires module `logistics.purchases` and permission `products.read` or `suppliers.read`.
+
+#### Responses
+
+##### Status: 200 Supplier price comparison
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`articuloCodigo` (required)**
+
+    `integer`
+
+  - **`articuloDescripcion` (required)**
+
+    `string`
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`proveedores` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`codigoProveedor` (required)**
+
+      `string`
+
+    - **`descripcionProveedor` (required)**
+
+      `string`
+
+    - **`esMasBarato` (required)**
+
+      `boolean`
+
+    - **`precioDesactualizado` (required)**
+
+      `boolean`
+
+    - **`precioLista` (required)**
+
+      `string`
+
+    - **`precioListaFecha` (required)**
+
+      `string`, format: `date-time`
+
+    - **`proveedorCodigo` (required)**
+
+      `integer`
+
+    - **`proveedorId` (required)**
+
+      `integer`
+
+    - **`proveedorRsocial` (required)**
+
+      `string`
+
+    - **`ultimaCompraFecha` (required)**
+
+      `string`, format: `date-time`
+
+  - **`proveedorMasBaratoId` (required)**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "articuloId": 1,
+    "articuloCodigo": 1,
+    "articuloDescripcion": "",
+    "proveedorMasBaratoId": 1,
+    "proveedores": [
+      {
+        "proveedorId": 1,
+        "proveedorCodigo": 1,
+        "proveedorRsocial": "",
+        "codigoProveedor": "",
+        "descripcionProveedor": "",
+        "precioLista": "",
+        "precioListaFecha": "",
+        "precioDesactualizado": true,
+        "ultimaCompraFecha": "",
+        "esMasBarato": true
+      }
+    ]
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
 
 ###### Content-Type: application/json
 
@@ -36705,6 +37149,260 @@ true
       {
         "row": 1,
         "message": ""
+      }
+    ]
+  }
+}
+```
+
+### ArticuloProveedorComparadorRow
+
+- **Type:**`object`
+
+* **`codigoProveedor` (required)**
+
+  `string`
+
+* **`descripcionProveedor` (required)**
+
+  `string`
+
+* **`esMasBarato` (required)**
+
+  `boolean`
+
+* **`precioDesactualizado` (required)**
+
+  `boolean`
+
+* **`precioLista` (required)**
+
+  `string`
+
+* **`precioListaFecha` (required)**
+
+  `string`, format: `date-time`
+
+* **`proveedorCodigo` (required)**
+
+  `integer`
+
+* **`proveedorId` (required)**
+
+  `integer`
+
+* **`proveedorRsocial` (required)**
+
+  `string`
+
+* **`ultimaCompraFecha` (required)**
+
+  `string`, format: `date-time`
+
+**Example:**
+
+```json
+{
+  "proveedorId": 1,
+  "proveedorCodigo": 1,
+  "proveedorRsocial": "",
+  "codigoProveedor": "",
+  "descripcionProveedor": "",
+  "precioLista": "",
+  "precioListaFecha": "",
+  "precioDesactualizado": true,
+  "ultimaCompraFecha": "",
+  "esMasBarato": true
+}
+```
+
+### ArticuloProveedoresComparadorData
+
+- **Type:**`object`
+
+* **`articuloCodigo` (required)**
+
+  `integer`
+
+* **`articuloDescripcion` (required)**
+
+  `string`
+
+* **`articuloId` (required)**
+
+  `integer`
+
+* **`proveedores` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`codigoProveedor` (required)**
+
+    `string`
+
+  - **`descripcionProveedor` (required)**
+
+    `string`
+
+  - **`esMasBarato` (required)**
+
+    `boolean`
+
+  - **`precioDesactualizado` (required)**
+
+    `boolean`
+
+  - **`precioLista` (required)**
+
+    `string`
+
+  - **`precioListaFecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`proveedorCodigo` (required)**
+
+    `integer`
+
+  - **`proveedorId` (required)**
+
+    `integer`
+
+  - **`proveedorRsocial` (required)**
+
+    `string`
+
+  - **`ultimaCompraFecha` (required)**
+
+    `string`, format: `date-time`
+
+* **`proveedorMasBaratoId` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "articuloId": 1,
+  "articuloCodigo": 1,
+  "articuloDescripcion": "",
+  "proveedorMasBaratoId": 1,
+  "proveedores": [
+    {
+      "proveedorId": 1,
+      "proveedorCodigo": 1,
+      "proveedorRsocial": "",
+      "codigoProveedor": "",
+      "descripcionProveedor": "",
+      "precioLista": "",
+      "precioListaFecha": "",
+      "precioDesactualizado": true,
+      "ultimaCompraFecha": "",
+      "esMasBarato": true
+    }
+  ]
+}
+```
+
+### ArticuloProveedoresComparadorEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`articuloCodigo` (required)**
+
+    `integer`
+
+  - **`articuloDescripcion` (required)**
+
+    `string`
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`proveedores` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`codigoProveedor` (required)**
+
+      `string`
+
+    - **`descripcionProveedor` (required)**
+
+      `string`
+
+    - **`esMasBarato` (required)**
+
+      `boolean`
+
+    - **`precioDesactualizado` (required)**
+
+      `boolean`
+
+    - **`precioLista` (required)**
+
+      `string`
+
+    - **`precioListaFecha` (required)**
+
+      `string`, format: `date-time`
+
+    - **`proveedorCodigo` (required)**
+
+      `integer`
+
+    - **`proveedorId` (required)**
+
+      `integer`
+
+    - **`proveedorRsocial` (required)**
+
+      `string`
+
+    - **`ultimaCompraFecha` (required)**
+
+      `string`, format: `date-time`
+
+  - **`proveedorMasBaratoId` (required)**
+
+    `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "articuloId": 1,
+    "articuloCodigo": 1,
+    "articuloDescripcion": "",
+    "proveedorMasBaratoId": 1,
+    "proveedores": [
+      {
+        "proveedorId": 1,
+        "proveedorCodigo": 1,
+        "proveedorRsocial": "",
+        "codigoProveedor": "",
+        "descripcionProveedor": "",
+        "precioLista": "",
+        "precioListaFecha": "",
+        "precioDesactualizado": true,
+        "ultimaCompraFecha": "",
+        "esMasBarato": true
       }
     ]
   }

@@ -720,6 +720,24 @@ export const articulosAPI = {
       return handleError(error as AxiosError<ApiErrorPayload>)
     }
   },
+
+  listProveedoresComparador: async (
+    id: number,
+    params?: {
+      sortBy?: 'precio' | 'precioListaFecha' | 'ultimaCompra'
+      sortDir?: 'asc' | 'desc'
+    },
+  ): Promise<ArticuloProveedoresComparadorData> => {
+    try {
+      const response = await api.get<{ success: boolean; data: ArticuloProveedoresComparadorData }>(
+        `/articulos/${id}/proveedores`,
+        { params },
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
 }
 
 export type StockAjusteHistorialRow = {
@@ -1927,6 +1945,27 @@ export type ProveedorCatalogoImportResult = {
   updated: number
   skipped: number
   errors: { row: number; message: string }[]
+}
+
+export type ArticuloProveedorComparadorRow = {
+  proveedorId: number
+  proveedorCodigo: number
+  proveedorRsocial: string
+  codigoProveedor: string
+  descripcionProveedor: string | null
+  precioLista: string | null
+  precioListaFecha: string | null
+  precioDesactualizado: boolean
+  ultimaCompraFecha: string | null
+  esMasBarato: boolean
+}
+
+export type ArticuloProveedoresComparadorData = {
+  articuloId: number
+  articuloCodigo: number
+  articuloDescripcion: string
+  proveedorMasBaratoId: number | null
+  proveedores: ArticuloProveedorComparadorRow[]
 }
 
 export const contabilidadAPI = {

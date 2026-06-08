@@ -10,6 +10,8 @@ Versionamento: [Semantic Versioning](https://semver.org/).
 
 ### Adicionado
 
+- **Comparador de preços por fornecedor (GitHub #274):** `ArticuloProveedoresComparadorService`; `GET /api/articulos/{id}/proveedores` e `GET /api/proveedores/comparar?articuloId=` (módulo `logistics.purchases`, `products.read` ou `suppliers.read`); linhas de catálogo ativas com preço de lista, indicador de preço desatualizado (>30 dias) e data da última OC **recebida**; botão **Ver fornecedores** na ficha do produto com ordenação, destaque do mais barato, aviso de preço antigo e ação **[OC]** (`suppliers.manage`) que pré-preenche o formulário de compras; OpenAPI, testes e manuais trilíngues.
+
 - **Catálogo de produtos por fornecedor (GitHub #273):** modelo `ProveedorArticulo` e migração; `GET/POST /api/proveedores/{id}/catalogo`, `PUT .../catalogo/{articuloId}`, `POST .../catalogo/import` (módulo `logistics.purchases`); códigos, descrições e preços de lista por fornecedor e importação CSV; aba **Catálogo** na ficha com indicadores de idade do preço; auditoria `proveedor_catalogo_*`; OpenAPI, testes e manuais trilíngues.
 
 - **Histórico de compras de fornecedor (GitHub #272):** `GET /api/proveedores/{id}/historial` e `GET /api/proveedores/{id}/articulos` com períodos móveis (30/90/180/365 dias); métricas de OC recebidas e comprovantes (total, frequência, top artigos, PMP); aba **Histórico** na ficha do fornecedor; OpenAPI, testes e manuais trilíngues.

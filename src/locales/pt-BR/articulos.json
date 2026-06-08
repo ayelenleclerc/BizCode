@@ -105,5 +105,31 @@
       "reason": "Motivo",
       "user": "Usuário"
     }
+  },
+  "comparador": {
+    "view": "Ver fornecedores",
+    "hide": "Ocultar fornecedores",
+    "title": "Comparador de fornecedores",
+    "subtitle": "Artigo {{codigo}} — {{descripcion}}",
+    "empty": "Nenhum fornecedor ativo com este artigo no catálogo.",
+    "tableCaption": "Preços de lista por fornecedor",
+    "colProveedor": "Fornecedor",
+    "colCodigoProveedor": "Cód. fornecedor",
+    "colPrecioLista": "Preço lista",
+    "colUltActualiz": "Últ. atualiz.",
+    "colUltCompra": "Últ. compra",
+    "colAcciones": "Ações",
+    "accionOc": "OC",
+    "masBarato": "Fornecedor mais barato",
+    "sinPrecio": "Sem preço",
+    "precioDesactualizado": "Preço desatualizado ({{dias}} dias)",
+    "diasAtras": "há {{dias}} dias",
+    "sortBy": "Ordenar por",
+    "sortDir": "Direção",
+    "sortPrecio": "Preço lista",
+    "sortPrecioFecha": "Data do preço",
+    "sortUltimaCompra": "Última compra",
+    "sortAsc": "Ascendente",
+    "sortDesc": "Descendente"
   }
 }

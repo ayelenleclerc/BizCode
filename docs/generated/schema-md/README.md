@@ -52,6 +52,12 @@
 
 * [ArticuloNullableEnvelope](./articulonullableenvelope.md) – `-`
 
+* [ArticuloProveedorComparadorRow](./articuloproveedorcomparadorrow.md) – `-`
+
+* [ArticuloProveedoresComparadorData](./articuloproveedorescomparadordata.md) – `-`
+
+* [ArticuloProveedoresComparadorEnvelope](./articuloproveedorescomparadorenvelope.md) – `-`
+
 * [AuditEvent](./auditevent.md) – `-`
 
 * [AuditEventListEnvelope](./auditeventlistenvelope.md) – `-`
@@ -709,6 +715,8 @@
 * [Untitled array in AppUserUpdateInput](./appuserupdateinput-properties-scopewarehouseids.md) – `undefined#/properties/scopeWarehouseIds`
 
 * [Untitled array in ArticuloListEnvelope](./articulolistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
+
+* [Untitled array in ArticuloProveedoresComparadorData](./articuloproveedorescomparadordata-properties-proveedores.md) – `undefined#/properties/proveedores`
 
 * [Untitled array in AuditEventListEnvelope](./auditeventlistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
 

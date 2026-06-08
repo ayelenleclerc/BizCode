@@ -1570,6 +1570,17 @@ export const proveedorHistorialQuerySchema = z.object({
   }).optional(),
 })
 
+export const articuloProveedoresSortFieldSchema = z.enum(['precio', 'precioListaFecha', 'ultimaCompra'])
+
+export const articuloProveedoresComparadorQuerySchema = z.object({
+  sortBy: articuloProveedoresSortFieldSchema.optional(),
+  sortDir: z.enum(['asc', 'desc']).optional(),
+})
+
+export const proveedoresCompararQuerySchema = articuloProveedoresComparadorQuerySchema.extend({
+  articuloId: z.coerce.number().int().min(1),
+})
+
 export type ProveedorArticuloInput = {
   articuloId: number
   codigoProveedor: string

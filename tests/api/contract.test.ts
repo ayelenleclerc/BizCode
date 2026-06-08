@@ -68,6 +68,7 @@ const proveedorCatalogoRow = {
   createdAt: new Date(),
   updatedAt: new Date(),
   articulo: { id: 1, codigo: 1, descripcion: 'Producto' },
+  proveedor: { id: 1, codigo: 5001, rsocial: 'Proveedor API SA' },
 }
 
 const facturaRow = {
@@ -495,6 +496,9 @@ function buildPrisma(): PrismaClient {
       findFirst: vi.fn().mockResolvedValue(ordenCompraContractRow),
       create: vi.fn().mockResolvedValue(ordenCompraContractRow),
       update: vi.fn().mockResolvedValue(ordenCompraContractRow),
+      groupBy: vi.fn().mockResolvedValue([
+        { proveedorId: 1, _max: { updatedAt: new Date('2026-05-20T00:00:00.000Z') } },
+      ]),
     },
     ordenCompraItem: { deleteMany: vi.fn(), update: vi.fn() },
     recuento: {
@@ -1066,6 +1070,20 @@ describe('API — contrato OpenAPI', () => {
     const app = createApp(prisma)
     const res = await request(app).get('/api/proveedores/1/articulos?dias=30').expect(200)
     await assertMatchesOpenApi('/api/proveedores/{id}/articulos', 'get', '200', res.body)
+  })
+
+  it('GET /api/articulos/{id}/proveedores', async () => {
+    const app = createApp(prisma)
+    const res = await request(app).get('/api/articulos/1/proveedores').expect(200)
+    await assertMatchesOpenApi('/api/articulos/{id}/proveedores', 'get', '200', res.body)
+    expect(res.body.data.proveedores).toHaveLength(1)
+  })
+
+  it('GET /api/proveedores/comparar', async () => {
+    const app = createApp(prisma)
+    const res = await request(app).get('/api/proveedores/comparar?articuloId=1').expect(200)
+    await assertMatchesOpenApi('/api/proveedores/comparar', 'get', '200', res.body)
+    expect(res.body.data.proveedorMasBaratoId).toBe(1)
   })
 
   it('GET /api/proveedores/{id}/catalogo', async () => {
