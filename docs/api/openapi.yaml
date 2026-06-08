@@ -963,6 +963,50 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
 
+  /api/articulos/{id}/proveedores:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    get:
+      tags: [articulos]
+      summary: Compare supplier catalog prices for a product (#274)
+      description: |
+        Lists active suppliers with an active catalog entry for the article, including list price,
+        price age, and last received purchase order date. Requires module `logistics.purchases` and
+        permission `products.read` or `suppliers.read`.
+      parameters:
+        - name: sortBy
+          in: query
+          schema:
+            type: string
+            enum: [precio, precioListaFecha, ultimaCompra]
+        - name: sortDir
+          in: query
+          schema:
+            type: string
+            enum: [asc, desc]
+      responses:
+        '200':
+          description: Supplier price comparison for the article
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArticuloProveedoresComparadorEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
   /api/articulos/{id}/stock-ajuste:
     parameters:
       - $ref: '#/components/parameters/BizcodeChannelHeader'
@@ -1340,6 +1384,50 @@ paths:
                 $ref: '#/components/schemas/ClienteImportEnvelope'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/ServerError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /api/proveedores/comparar:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [proveedores]
+      summary: Compare supplier prices for an article (#274)
+      description: |
+        Same payload as `GET /api/articulos/{id}/proveedores` with `articuloId` as a query parameter.
+        Requires module `logistics.purchases` and permission `products.read` or `suppliers.read`.
+      parameters:
+        - name: articuloId
+          in: query
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+        - name: sortBy
+          in: query
+          schema:
+            type: string
+            enum: [precio, precioListaFecha, ultimaCompra]
+        - name: sortDir
+          in: query
+          schema:
+            type: string
+            enum: [asc, desc]
+      responses:
+        '200':
+          description: Supplier price comparison
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArticuloProveedoresComparadorEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
         '500':
           $ref: '#/components/responses/ServerError'
         '401':
@@ -6711,6 +6799,80 @@ components:
           const: true
         data:
           $ref: '#/components/schemas/ProveedorCatalogoImportData'
+
+    ArticuloProveedorComparadorRow:
+      type: object
+      required:
+        - proveedorId
+        - proveedorCodigo
+        - proveedorRsocial
+        - codigoProveedor
+        - descripcionProveedor
+        - precioLista
+        - precioListaFecha
+        - precioDesactualizado
+        - ultimaCompraFecha
+        - esMasBarato
+      properties:
+        proveedorId:
+          type: integer
+        proveedorCodigo:
+          type: integer
+        proveedorRsocial:
+          type: string
+        codigoProveedor:
+          type: string
+        descripcionProveedor:
+          type: string
+          nullable: true
+        precioLista:
+          type: string
+          nullable: true
+        precioListaFecha:
+          type: string
+          format: date-time
+          nullable: true
+        precioDesactualizado:
+          type: boolean
+        ultimaCompraFecha:
+          type: string
+          format: date-time
+          nullable: true
+        esMasBarato:
+          type: boolean
+
+    ArticuloProveedoresComparadorData:
+      type: object
+      required:
+        - articuloId
+        - articuloCodigo
+        - articuloDescripcion
+        - proveedorMasBaratoId
+        - proveedores
+      properties:
+        articuloId:
+          type: integer
+        articuloCodigo:
+          type: integer
+        articuloDescripcion:
+          type: string
+        proveedorMasBaratoId:
+          type: integer
+          nullable: true
+        proveedores:
+          type: array
+          items:
+            $ref: '#/components/schemas/ArticuloProveedorComparadorRow'
+
+    ArticuloProveedoresComparadorEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/ArticuloProveedoresComparadorData'
 
     ProveedorCuentaCorrienteEnvelope:
       type: object

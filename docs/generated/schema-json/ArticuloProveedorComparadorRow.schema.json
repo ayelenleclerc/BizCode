@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "codigoProveedor": {
+      "type": "string"
+    },
+    "descripcionProveedor": {
+      "nullable": true,
+      "type": "string"
+    },
+    "esMasBarato": {
+      "type": "boolean"
+    },
+    "precioDesactualizado": {
+      "type": "boolean"
+    },
+    "precioLista": {
+      "nullable": true,
+      "type": "string"
+    },
+    "precioListaFecha": {
+      "format": "date-time",
+      "nullable": true,
+      "type": "string"
+    },
+    "proveedorCodigo": {
+      "type": "integer"
+    },
+    "proveedorId": {
+      "type": "integer"
+    },
+    "proveedorRsocial": {
+      "type": "string"
+    },
+    "ultimaCompraFecha": {
+      "format": "date-time",
+      "nullable": true,
+      "type": "string"
+    }
+  },
+  "required": [
+    "proveedorId",
+    "proveedorCodigo",
+    "proveedorRsocial",
+    "codigoProveedor",
+    "descripcionProveedor",
+    "precioLista",
+    "precioListaFecha",
+    "precioDesactualizado",
+    "ultimaCompraFecha",
+    "esMasBarato"
+  ],
+  "title": "ArticuloProveedorComparadorRow",
+  "type": "object"
+}

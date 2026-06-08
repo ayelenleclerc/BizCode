@@ -9,6 +9,7 @@ import { hasPermission } from '@/lib/rbac'
 import { CanAccess } from '@/components/CanAccess'
 import { useAuth } from '@/contexts/AuthContext'
 import { Articulo, Rubro } from '@/types'
+import ArticuloProveedoresComparadorSection from './ArticuloProveedoresComparadorSection'
 
 const articuloSchema = z.object({
   codigo: z.coerce.number().int().positive('Código debe ser positivo'),
@@ -48,6 +49,10 @@ function canViewStockHistorial(role: string): boolean {
   )
 }
 
+function canViewProveedoresComparador(permissions: string[]): boolean {
+  return permissions.includes('products.read') || permissions.includes('suppliers.read')
+}
+
 export default function ArticuloForm({ articulo, rubros, onClose, onGuardado }: ArticuloFormProps) {
   const { t } = useTranslation('articulos')
   const { t: tc } = useTranslation('common')
@@ -63,8 +68,12 @@ export default function ArticuloForm({ articulo, rubros, onClose, onGuardado }: 
   const [historial, setHistorial] = useState<StockAjusteHistorialRow[]>([])
   const [historialTotal, setHistorialTotal] = useState(0)
   const [historialLoading, setHistorialLoading] = useState(false)
+  const [showComparador, setShowComparador] = useState(false)
 
   const showHistorial = Boolean(articulo && claims && canViewStockHistorial(claims.role))
+  const showComparadorAccess = Boolean(
+    articulo && claims && canViewProveedoresComparador(claims.permissions),
+  )
 
   const {
     register,
@@ -393,19 +402,32 @@ export default function ArticuloForm({ articulo, rubros, onClose, onGuardado }: 
                 <p id="articulo-stock-error" className="text-red-400 text-sm mt-1">{errors.stock.message}</p>
               )}
               {articulo && (
-                <CanAccess permission="inventory.adjust">
-                  <button
-                    type="button"
-                    data-testid="btn-stock-adjust"
-                    onClick={() => {
-                      setAdjustError(null)
-                      setShowAdjust(true)
-                    }}
-                    className="mt-2 px-3 py-2 bg-amber-600 hover:bg-amber-700 text-white font-semibold rounded transition"
-                  >
-                    {t('stockAdjust.button')}
-                  </button>
-                </CanAccess>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  <CanAccess permission="inventory.adjust">
+                    <button
+                      type="button"
+                      data-testid="btn-stock-adjust"
+                      onClick={() => {
+                        setAdjustError(null)
+                        setShowAdjust(true)
+                      }}
+                      className="px-3 py-2 bg-amber-600 hover:bg-amber-700 text-white font-semibold rounded transition"
+                    >
+                      {t('stockAdjust.button')}
+                    </button>
+                  </CanAccess>
+                  {showComparadorAccess && (
+                    <button
+                      type="button"
+                      data-testid="btn-ver-proveedores"
+                      onClick={() => setShowComparador((v) => !v)}
+                      aria-expanded={showComparador}
+                      className="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded transition"
+                    >
+                      {showComparador ? t('comparador.hide') : t('comparador.view')}
+                    </button>
+                  )}
+                </div>
               )}
             </div>
             <div>
@@ -425,6 +447,10 @@ export default function ArticuloForm({ articulo, rubros, onClose, onGuardado }: 
               )}
             </div>
           </div>
+
+          {showComparador && articulo && showComparadorAccess && (
+            <ArticuloProveedoresComparadorSection articuloId={articulo.id} />
+          )}
 
           {showHistorial && (
             <section
