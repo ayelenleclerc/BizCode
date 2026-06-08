@@ -6,6 +6,8 @@ import DocumentoCompraImportSection from './DocumentoCompraImportSection'
 const mockProcesar = vi.hoisted(() => vi.fn())
 const mockConfirmar = vi.hoisted(() => vi.fn())
 const mockProveedoresList = vi.hoisted(() => vi.fn())
+const mockProveedoresListCatalogo = vi.hoisted(() => vi.fn())
+const mockArticulosGet = vi.hoisted(() => vi.fn())
 
 vi.mock('@/lib/api', () => ({
   documentosCompraAPI: {
@@ -22,6 +24,11 @@ vi.mock('@/lib/api', () => ({
   },
   proveedoresAPI: {
     list: mockProveedoresList,
+    listCatalogo: mockProveedoresListCatalogo,
+    create: vi.fn(),
+  },
+  articulosAPI: {
+    get: mockArticulosGet,
   },
   ApiRequestFailedError: class ApiRequestFailedError extends Error {},
 }))
@@ -65,6 +72,8 @@ describe('DocumentoCompraImportSection', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     mockProveedoresList.mockResolvedValue([{ id: 1, codigo: 10, rsocial: 'Proveedor SA' }])
+    mockProveedoresListCatalogo.mockResolvedValue([])
+    mockArticulosGet.mockResolvedValue({ id: 1, descripcion: 'Artículo demo' })
     mockProcesar.mockResolvedValue(sampleDoc)
     mockConfirmar.mockResolvedValue({
       documento: { ...sampleDoc, estado: 'confirmado' },
