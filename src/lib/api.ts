@@ -1180,6 +1180,66 @@ export const proveedoresAPI = {
     }
   },
 
+  listCatalogo: async (id: number): Promise<ProveedorCatalogoRow[]> => {
+    try {
+      const response = await api.get<{ success: boolean; data: { items: ProveedorCatalogoRow[] } }>(
+        `/proveedores/${id}/catalogo`,
+      )
+      return response.data.data.items
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  createCatalogoEntry: async (
+    id: number,
+    body: ProveedorCatalogoInput,
+  ): Promise<ProveedorCatalogoRow> => {
+    try {
+      const response = await api.post<{ success: boolean; data: ProveedorCatalogoRow }>(
+        `/proveedores/${id}/catalogo`,
+        body,
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  updateCatalogoEntry: async (
+    proveedorId: number,
+    articuloId: number,
+    body: ProveedorCatalogoUpdateInput,
+  ): Promise<ProveedorCatalogoRow> => {
+    try {
+      const response = await api.put<{ success: boolean; data: ProveedorCatalogoRow }>(
+        `/proveedores/${proveedorId}/catalogo/${articuloId}`,
+        body,
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  importCatalogoFromCsv: async (
+    proveedorId: number,
+    file: File,
+  ): Promise<ProveedorCatalogoImportResult> => {
+    try {
+      const body = new FormData()
+      body.append('file', file)
+      const response = await api.post<{ success: boolean; data: ProveedorCatalogoImportResult }>(
+        `/proveedores/${proveedorId}/catalogo/import`,
+        body,
+        { timeout: 120000 },
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
   importFromCsv: async (file: File): Promise<CsvBulkImportResult> => {
     try {
       const body = new FormData()
@@ -1822,6 +1882,51 @@ export type ProveedorArticuloHistorialRow = {
 
 export type ProveedorArticulosHistorialData = {
   articulos: ProveedorArticuloHistorialRow[]
+}
+
+export type ProveedorCatalogoArticuloRef = {
+  id: number
+  codigo: number
+  descripcion: string
+}
+
+export type ProveedorCatalogoRow = {
+  id: number
+  articuloId: number
+  codigoProveedor: string
+  descripcion: string | null
+  precioLista: string | null
+  precioListaFecha: string | null
+  unidadCompra: string | null
+  multiplo: string
+  activo: boolean
+  articulo: ProveedorCatalogoArticuloRef
+}
+
+export type ProveedorCatalogoInput = {
+  articuloId: number
+  codigoProveedor: string
+  descripcion?: string | null
+  precioLista?: number | null
+  unidadCompra?: string | null
+  multiplo?: number
+  activo?: boolean
+}
+
+export type ProveedorCatalogoUpdateInput = {
+  codigoProveedor?: string
+  descripcion?: string | null
+  precioLista?: number | null
+  unidadCompra?: string | null
+  multiplo?: number
+  activo?: boolean
+}
+
+export type ProveedorCatalogoImportResult = {
+  created: number
+  updated: number
+  skipped: number
+  errors: { row: number; message: string }[]
 }
 
 export const contabilidadAPI = {

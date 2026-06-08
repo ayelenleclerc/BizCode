@@ -10,6 +10,8 @@ Versionamento: [Semantic Versioning](https://semver.org/).
 
 ### Adicionado
 
+- **Catálogo de produtos por fornecedor (GitHub #273):** modelo `ProveedorArticulo` e migração; `GET/POST /api/proveedores/{id}/catalogo`, `PUT .../catalogo/{articuloId}`, `POST .../catalogo/import` (módulo `logistics.purchases`); códigos, descrições e preços de lista por fornecedor e importação CSV; aba **Catálogo** na ficha com indicadores de idade do preço; auditoria `proveedor_catalogo_*`; OpenAPI, testes e manuais trilíngues.
+
 - **Histórico de compras de fornecedor (GitHub #272):** `GET /api/proveedores/{id}/historial` e `GET /api/proveedores/{id}/articulos` com períodos móveis (30/90/180/365 dias); métricas de OC recebidas e comprovantes (total, frequência, top artigos, PMP); aba **Histórico** na ficha do fornecedor; OpenAPI, testes e manuais trilíngues.
 
 - **Recibo de pagamento a fornecedor (GitHub #271):** modelos `ReciboPago` + `ReciboPagoFactura`; `GET/POST /api/proveedores/{id}/pagos`, helper de comprovantes pendentes, anulação e PDF; movimento `pago` automático na CC; UI na aba conta corrente; módulo `finance.receipts`; OpenAPI, testes e manuais trilíngues.

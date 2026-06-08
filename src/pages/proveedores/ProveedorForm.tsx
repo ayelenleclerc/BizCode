@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { ApiRequestFailedError, proveedoresAPI, type ProveedorInputDTO } from '@/lib/api'
 import { formatCUIT, validateCBU, validateCUIT } from '@/lib/validators'
 import type { Proveedor, ProveedorCategoria, ProveedorCondicionPago, ProveedorTipoCuenta } from '@/types'
+import ProveedorCatalogoSection from './ProveedorCatalogoSection'
 import ProveedorCuentaCorrienteSection from './ProveedorCuentaCorrienteSection'
 import ProveedorHistorialSection from './ProveedorHistorialSection'
 
@@ -32,7 +33,7 @@ function ProveedorDatosFormShell({
   children,
 }: {
   wrapAsTabPanel: boolean
-  activeTab: 'datos' | 'cc' | 'historial'
+  activeTab: 'datos' | 'catalogo' | 'cc' | 'historial'
   onSubmit: (event: FormEvent<HTMLFormElement>) => void
   children: ReactNode
 }) {
@@ -91,7 +92,7 @@ export default function ProveedorForm({ proveedorId, onClose, onSaved }: Proveed
   const [formSaving, setFormSaving] = useState(false)
   const [formError, setFormError] = useState<string | null>(null)
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
-  const [activeTab, setActiveTab] = useState<'datos' | 'cc' | 'historial'>('datos')
+  const [activeTab, setActiveTab] = useState<'datos' | 'catalogo' | 'cc' | 'historial'>('datos')
 
   const applyProveedor = useCallback((p: Proveedor) => {
     setFormCodigo(String(p.codigo))
@@ -269,6 +270,24 @@ export default function ProveedorForm({ proveedorId, onClose, onSaved }: Proveed
             <button
               type="button"
               role="tab"
+              id="proveedor-tab-catalogo"
+              {...(activeTab === 'catalogo'
+                ? { 'aria-selected': 'true' as const }
+                : { 'aria-selected': 'false' as const })}
+              aria-controls="proveedor-tabpanel-catalogo"
+              data-testid="proveedor-tab-catalogo"
+              className={`px-3 py-2 text-sm font-medium border-b-2 -mb-px ${
+                activeTab === 'catalogo'
+                  ? 'border-blue-600 text-blue-700 dark:text-blue-300'
+                  : 'border-transparent text-slate-600 dark:text-slate-400'
+              }`}
+              onClick={() => setActiveTab('catalogo')}
+            >
+              {t('form.tabCatalogo')}
+            </button>
+            <button
+              type="button"
+              role="tab"
               id="proveedor-tab-cc"
               {...(activeTab === 'cc'
                 ? { 'aria-selected': 'true' as const }
@@ -314,6 +333,16 @@ export default function ProveedorForm({ proveedorId, onClose, onSaved }: Proveed
               <p role="alert" className="text-sm text-red-600 mb-2" data-testid="proveedor-form-error">
                 {formError}
               </p>
+            ) : null}
+            {proveedorId != null && activeTab === 'catalogo' ? (
+              <div
+                role="tabpanel"
+                id="proveedor-tabpanel-catalogo"
+                aria-labelledby="proveedor-tab-catalogo"
+                data-testid="proveedor-tabpanel-catalogo"
+              >
+                <ProveedorCatalogoSection proveedorId={proveedorId} />
+              </div>
             ) : null}
             {proveedorId != null && activeTab === 'cc' ? (
               <div

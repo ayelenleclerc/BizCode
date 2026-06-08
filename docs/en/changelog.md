@@ -10,6 +10,8 @@ Versioning: [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **Supplier product catalog (GitHub #273):** `ProveedorArticulo` model and migration; `GET/POST /api/proveedores/{id}/catalogo`, `PUT .../catalogo/{articuloId}`, `POST .../catalogo/import` (module `logistics.purchases`); per-supplier codes, descriptions, list prices and CSV import; **Catalog** tab on supplier profile with price-age indicators; audit `proveedor_catalogo_*`; OpenAPI, tests, trilingual manuals.
+
 - **Supplier purchase history (GitHub #272):** `GET /api/proveedores/{id}/historial` and `GET /api/proveedores/{id}/articulos` with rolling periods (30/90/180/365 days); metrics from received purchase orders and purchase vouchers (total, frequency, top items, WAP/PPP); **History** tab on supplier profile; OpenAPI, tests, trilingual manuals.
 
 - **Supplier payable due-date alerts (GitHub #275):**** optional `vencimiento` on `ComprobanteCompra`; `AlertaProveedorConfig` + `AlertaProveedorLog`; `GET /api/proveedores/facturas-pendientes`, `GET/PATCH /api/configuracion/alertas-proveedores`; daily job `scripts/proveedor-alertas-job.ts`; dashboard and Finanzas UI; credit-limit in-app trigger on voucher create; OpenAPI, tests, trilingual manuals.

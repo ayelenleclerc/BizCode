@@ -5,6 +5,10 @@ import '@/i18n/config'
 import ProveedorForm from './ProveedorForm'
 import { proveedoresAPI } from '@/lib/api'
 
+vi.mock('@/components/CanAccess', () => ({
+  CanAccess: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+}))
+
 vi.mock('@/lib/api', async () => {
   const actual = await vi.importActual<typeof import('@/lib/api')>('@/lib/api')
   return {
@@ -17,6 +21,14 @@ vi.mock('@/lib/api', async () => {
       delete: vi.fn(),
       downloadImportTemplate: vi.fn(),
       importFromCsv: vi.fn(),
+      listCatalogo: vi.fn().mockResolvedValue([]),
+      createCatalogoEntry: vi.fn(),
+      updateCatalogoEntry: vi.fn(),
+      importCatalogoFromCsv: vi.fn(),
+      historial: vi.fn(),
+      articulosHistorial: vi.fn(),
+      cuentaCorriente: vi.fn(),
+      listPagos: vi.fn(),
     },
   }
 })
@@ -73,5 +85,23 @@ describe('ProveedorForm', () => {
       )
     })
     expect(onSaved).toHaveBeenCalled()
+  })
+
+  it('muestra pestaña Catálogo en ficha existente', async () => {
+    const user = userEvent.setup()
+    vi.mocked(proveedoresAPI.get).mockResolvedValue({
+      id: 1,
+      codigo: 4001,
+      rsocial: 'Proveedor Test SA',
+      condIva: 'RI',
+      activo: true,
+    })
+    render(<ProveedorForm proveedorId={1} onClose={vi.fn()} onSaved={vi.fn()} />)
+    await waitFor(() => {
+      expect(screen.getByTestId('proveedor-tab-catalogo')).toBeInTheDocument()
+    })
+    await user.click(screen.getByTestId('proveedor-tab-catalogo'))
+    expect(screen.getByTestId('proveedor-tabpanel-catalogo')).toBeInTheDocument()
+    expect(proveedoresAPI.listCatalogo).toHaveBeenCalledWith(1)
   })
 })

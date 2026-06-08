@@ -50,6 +50,7 @@
     "tabDatos": "Details",
     "tabCuentaCorriente": "Accounts payable",
     "tabHistorial": "History",
+    "tabCatalogo": "Catalog",
     "sections": {
       "general": "General",
       "banking": "Banking",
@@ -190,6 +191,46 @@
     "estado": {
       "emitido": "Issued",
       "anulado": "Voided"
+    }
+  },
+  "catalogo": {
+    "empty": "No items in this supplier catalog.",
+    "tableCaption": "Supplier product catalog",
+    "addOpen": "Add item",
+    "addCancel": "Close form",
+    "addTitle": "New catalog item",
+    "addSubmit": "Add to catalog",
+    "edit": "Edit",
+    "colCodigoProveedor": "Supplier code",
+    "colCodigoInterno": "Internal code",
+    "colDescripcionInterna": "Internal description",
+    "colDescripcionProveedor": "Supplier description",
+    "colPrecioLista": "List price",
+    "colUnidad": "Purchase unit",
+    "colMultiplo": "Multiple",
+    "colActivo": "Active",
+    "colAcciones": "Actions",
+    "precioStaleWarning": "Price last updated more than 30 days ago",
+    "precioStaleDanger": "Price last updated more than 90 days ago",
+    "errors": {
+      "articuloNotFound": "No product found with that internal code",
+      "codigoProveedorRequired": "Supplier code is required",
+      "precioInvalid": "Price must be a number greater than or equal to zero",
+      "multiploInvalid": "Multiple must be greater than zero"
+    },
+    "import": {
+      "button": "Import CSV",
+      "title": "Import catalog from CSV",
+      "description": "Columns: codigo_proveedor, codigo_interno, precio, unidad. The first row must be the header.",
+      "downloadTemplate": "Download CSV template",
+      "chooseFile": "Choose .csv file",
+      "submit": "Import",
+      "close": "Close",
+      "loading": "Importing…",
+      "successSummary": "Import: {{created}} created, {{updated}} updated, {{skipped}} skipped.",
+      "row": "Row",
+      "message": "Message",
+      "errorGeneric": "Could not import catalog."
     }
   },
   "historial": {

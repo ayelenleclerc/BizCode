@@ -124,8 +124,9 @@ model Articulo {
   facturaItems     FacturaItem[]
   pedidoItems      PedidoItem[]
   stockAjustes     StockAjuste[]
-  ordenCompraItems OrdenCompraItem[]
-  recuentoItems    RecuentoItem[]
+  ordenCompraItems     OrdenCompraItem[]
+  recuentoItems        RecuentoItem[]
+  proveedorArticulos   ProveedorArticulo[]
 
   @@unique([tenantId, codigo])
   @@index([tenantId])
@@ -166,12 +167,38 @@ model Proveedor {
   comprobantesCompra       ComprobanteCompra[]
   movimientosCuentaCorriente MovimientoProveedorCC[]
   recibosPago              ReciboPago[]
+  catalogoArticulos        ProveedorArticulo[]
 
   @@unique([tenantId, codigo])
   @@index([tenantId])
   @@index([tenantId, codigo])
   @@index([tenantId, activo])
   @@index([tenantId, categoria])
+}
+
+/// Supplier-specific product codes and list prices (#273).
+model ProveedorArticulo {
+  id               Int       @id @default(autoincrement())
+  tenantId         Int
+  tenant           Tenant    @relation(fields: [tenantId], references: [id])
+  proveedorId      Int
+  proveedor        Proveedor @relation(fields: [proveedorId], references: [id])
+  articuloId       Int
+  articulo         Articulo  @relation(fields: [articuloId], references: [id])
+  codigoProveedor  String    @db.VarChar(50)
+  descripcion      String?   @db.VarChar(120)
+  precioLista      Decimal?  @db.Decimal(14, 2)
+  precioListaFecha DateTime?
+  unidadCompra     String?   @db.VarChar(30)
+  multiplo         Decimal   @default(1) @db.Decimal(10, 2)
+  activo           Boolean   @default(true)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  @@unique([tenantId, proveedorId, articuloId])
+  @@unique([tenantId, proveedorId, codigoProveedor])
+  @@index([tenantId, proveedorId])
+  @@index([tenantId, articuloId])
 }
 
 model OrdenCompra {
@@ -493,6 +520,7 @@ model Tenant {
   recibosPago              ReciboPago[]
   alertaProveedorConfig    AlertaProveedorConfig?
   alertasProveedorLog      AlertaProveedorLog[]
+  proveedorArticulos       ProveedorArticulo[]
   facturas       Factura[]
   notasCredito   NotaCredito[]
   pedidos        Pedido[]

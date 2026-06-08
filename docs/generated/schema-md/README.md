@@ -332,6 +332,26 @@
 
 * [ProveedorArticulosHistorialEnvelope](./proveedorarticuloshistorialenvelope.md) – `-`
 
+* [ProveedorCatalogoArticuloRef](./proveedorcatalogoarticuloref.md) – `-`
+
+* [ProveedorCatalogoEnvelope](./proveedorcatalogoenvelope.md) – `-`
+
+* [ProveedorCatalogoImportData](./proveedorcatalogoimportdata.md) – `-`
+
+* [ProveedorCatalogoImportEnvelope](./proveedorcatalogoimportenvelope.md) – `-`
+
+* [ProveedorCatalogoImportError](./proveedorcatalogoimporterror.md) – `-`
+
+* [ProveedorCatalogoInput](./proveedorcatalogoinput.md) – `-`
+
+* [ProveedorCatalogoListData](./proveedorcatalogolistdata.md) – `-`
+
+* [ProveedorCatalogoListEnvelope](./proveedorcatalogolistenvelope.md) – `-`
+
+* [ProveedorCatalogoRow](./proveedorcatalogorow.md) – `-`
+
+* [ProveedorCatalogoUpdateInput](./proveedorcatalogoupdateinput.md) – `-`
+
 * [ProveedorCompraEstadoPago](./proveedorcompraestadopago.md) – `-`
 
 * [ProveedorCompraRow](./proveedorcomprarow.md) – `-`
@@ -781,6 +801,10 @@
 * [Untitled array in ProveedorArticuloHistorialRow](./proveedorarticulohistorialrow-properties-evolucionprecios.md) – `undefined#/properties/evolucionPrecios`
 
 * [Untitled array in ProveedorArticulosHistorialData](./proveedorarticuloshistorialdata-properties-articulos.md) – `undefined#/properties/articulos`
+
+* [Untitled array in ProveedorCatalogoImportData](./proveedorcatalogoimportdata-properties-errors.md) – `undefined#/properties/errors`
+
+* [Untitled array in ProveedorCatalogoListData](./proveedorcatalogolistdata-properties-items.md) – `undefined#/properties/items`
 
 * [Untitled array in ProveedorCuentaCorriente](./proveedorcuentacorriente-properties-movimientos.md) – `undefined#/properties/movimientos`
 

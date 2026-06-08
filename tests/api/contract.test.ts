@@ -53,6 +53,23 @@ const proveedorRow = {
   activo: true,
 }
 
+const proveedorCatalogoRow = {
+  id: 7,
+  tenantId: 1,
+  proveedorId: 1,
+  articuloId: 1,
+  codigoProveedor: 'AG-1000',
+  descripcion: 'Aceite girasol',
+  precioLista: new Decimal(1250),
+  precioListaFecha: new Date('2026-06-01T00:00:00.000Z'),
+  unidadCompra: 'caja x12',
+  multiplo: new Decimal(1),
+  activo: true,
+  createdAt: new Date(),
+  updatedAt: new Date(),
+  articulo: { id: 1, codigo: 1, descripcion: 'Producto' },
+}
+
 const facturaRow = {
   id: 1,
   fecha: new Date('2025-01-15T12:00:00.000Z').toISOString(),
@@ -599,6 +616,12 @@ function buildPrisma(): PrismaClient {
     tenant: {
       findUnique: vi.fn().mockResolvedValue({ id: 1, name: 'Demo', slug: 'demo', active: true }),
     },
+    proveedorArticulo: {
+      findMany: vi.fn().mockResolvedValue([proveedorCatalogoRow]),
+      findFirst: vi.fn().mockResolvedValue(proveedorCatalogoRow),
+      create: vi.fn().mockResolvedValue(proveedorCatalogoRow),
+      update: vi.fn().mockResolvedValue(proveedorCatalogoRow),
+    },
     proveedor: {
       count: vi.fn().mockResolvedValue(1),
       findMany: vi.fn((args?: unknown) => {
@@ -1043,6 +1066,35 @@ describe('API — contrato OpenAPI', () => {
     const app = createApp(prisma)
     const res = await request(app).get('/api/proveedores/1/articulos?dias=30').expect(200)
     await assertMatchesOpenApi('/api/proveedores/{id}/articulos', 'get', '200', res.body)
+  })
+
+  it('GET /api/proveedores/{id}/catalogo', async () => {
+    const app = createApp(prisma)
+    const res = await request(app).get('/api/proveedores/1/catalogo').expect(200)
+    await assertMatchesOpenApi('/api/proveedores/{id}/catalogo', 'get', '200', res.body)
+    expect(res.body.data.items).toHaveLength(1)
+  })
+
+  it('POST /api/proveedores/{id}/catalogo', async () => {
+    const app = createApp(prisma)
+    const res = await request(app)
+      .post('/api/proveedores/1/catalogo')
+      .send({
+        articuloId: 1,
+        codigoProveedor: 'AG-1000',
+        precioLista: 1250,
+      })
+      .expect(201)
+    await assertMatchesOpenApi('/api/proveedores/{id}/catalogo', 'post', '201', res.body)
+  })
+
+  it('PUT /api/proveedores/{id}/catalogo/{articuloId}', async () => {
+    const app = createApp(prisma)
+    const res = await request(app)
+      .put('/api/proveedores/1/catalogo/1')
+      .send({ precioLista: 1300 })
+      .expect(200)
+    await assertMatchesOpenApi('/api/proveedores/{id}/catalogo/{articuloId}', 'put', '200', res.body)
   })
 
   it('GET /api/proveedores/{id}/pagos/comprobantes-pendientes', async () => {
