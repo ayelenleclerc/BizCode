@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, type FormEvent } from 'react'
+import { useState, useEffect, useCallback, useLayoutEffect, useRef, type FormEvent } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -69,6 +69,12 @@ export default function ArticuloForm({ articulo, rubros, onClose, onGuardado }: 
   const [historialTotal, setHistorialTotal] = useState(0)
   const [historialLoading, setHistorialLoading] = useState(false)
   const [showComparador, setShowComparador] = useState(false)
+  const comparadorButtonRef = useRef<HTMLButtonElement>(null)
+
+  // Microsoft Edge Tools (webhint) flags dynamic `aria-expanded` in JSX; sync the token in the DOM instead.
+  useLayoutEffect(() => {
+    comparadorButtonRef.current?.setAttribute('aria-expanded', showComparador ? 'true' : 'false')
+  }, [showComparador])
 
   const showHistorial = Boolean(articulo && claims && canViewStockHistorial(claims.role))
   const showComparadorAccess = Boolean(
@@ -418,10 +424,10 @@ export default function ArticuloForm({ articulo, rubros, onClose, onGuardado }: 
                   </CanAccess>
                   {showComparadorAccess && (
                     <button
+                      ref={comparadorButtonRef}
                       type="button"
                       data-testid="btn-ver-proveedores"
                       onClick={() => setShowComparador((v) => !v)}
-                      aria-expanded={showComparador}
                       className="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded transition"
                     >
                       {showComparador ? t('comparador.hide') : t('comparador.view')}
