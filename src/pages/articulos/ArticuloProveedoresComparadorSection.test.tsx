@@ -129,6 +129,8 @@ describe('ArticuloProveedoresComparadorSection', () => {
           proveedorId: 2,
           articuloId: 10,
           costoUnitario: '1500.00',
+          codigoProveedor: 'AG-2000',
+          descripcionProveedor: null,
         },
       })
     })

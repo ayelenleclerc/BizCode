@@ -16,15 +16,17 @@ undefined
 
 # OrdenCompraItemLine Properties
 
-| Property                              | Type      | Required | Nullable       | Defined by                                                                                                         |
-| :------------------------------------ | :-------- | :------- | :------------- | :----------------------------------------------------------------------------------------------------------------- |
-| [articulo](#articulo)                 | `object`  | Optional | cannot be null | [OrdenCompraItemLine](ordencompraitemline-properties-articulo.md "undefined#/properties/articulo")                 |
-| [articuloId](#articuloid)             | `integer` | Required | cannot be null | [OrdenCompraItemLine](ordencompraitemline-properties-articuloid.md "undefined#/properties/articuloId")             |
-| [cantidad](#cantidad)                 | `integer` | Required | cannot be null | [OrdenCompraItemLine](ordencompraitemline-properties-cantidad.md "undefined#/properties/cantidad")                 |
-| [cantidadRecibida](#cantidadrecibida) | `integer` | Required | cannot be null | [OrdenCompraItemLine](ordencompraitemline-properties-cantidadrecibida.md "undefined#/properties/cantidadRecibida") |
-| [costoUnitario](#costounitario)       | `string`  | Required | cannot be null | [OrdenCompraItemLine](ordencompraitemline-properties-costounitario.md "undefined#/properties/costoUnitario")       |
-| [id](#id)                             | `integer` | Required | cannot be null | [OrdenCompraItemLine](ordencompraitemline-properties-id.md "undefined#/properties/id")                             |
-| [subtotal](#subtotal)                 | `string`  | Required | cannot be null | [OrdenCompraItemLine](ordencompraitemline-properties-subtotal.md "undefined#/properties/subtotal")                 |
+| Property                                      | Type      | Required | Nullable       | Defined by                                                                                                                 |
+| :-------------------------------------------- | :-------- | :------- | :------------- | :------------------------------------------------------------------------------------------------------------------------- |
+| [articulo](#articulo)                         | `object`  | Optional | cannot be null | [OrdenCompraItemLine](ordencompraitemline-properties-articulo.md "undefined#/properties/articulo")                         |
+| [articuloId](#articuloid)                     | `integer` | Required | cannot be null | [OrdenCompraItemLine](ordencompraitemline-properties-articuloid.md "undefined#/properties/articuloId")                     |
+| [cantidad](#cantidad)                         | `integer` | Required | cannot be null | [OrdenCompraItemLine](ordencompraitemline-properties-cantidad.md "undefined#/properties/cantidad")                         |
+| [cantidadRecibida](#cantidadrecibida)         | `integer` | Required | cannot be null | [OrdenCompraItemLine](ordencompraitemline-properties-cantidadrecibida.md "undefined#/properties/cantidadRecibida")         |
+| [codigoProveedor](#codigoproveedor)           | `string`  | Optional | cannot be null | [OrdenCompraItemLine](ordencompraitemline-properties-codigoproveedor.md "undefined#/properties/codigoProveedor")           |
+| [costoUnitario](#costounitario)               | `string`  | Required | cannot be null | [OrdenCompraItemLine](ordencompraitemline-properties-costounitario.md "undefined#/properties/costoUnitario")               |
+| [descripcionProveedor](#descripcionproveedor) | `string`  | Optional | cannot be null | [OrdenCompraItemLine](ordencompraitemline-properties-descripcionproveedor.md "undefined#/properties/descripcionProveedor") |
+| [id](#id)                                     | `integer` | Required | cannot be null | [OrdenCompraItemLine](ordencompraitemline-properties-id.md "undefined#/properties/id")                                     |
+| [subtotal](#subtotal)                         | `string`  | Required | cannot be null | [OrdenCompraItemLine](ordencompraitemline-properties-subtotal.md "undefined#/properties/subtotal")                         |
 
 ## articulo
 
@@ -98,6 +100,24 @@ undefined
 
 `integer`
 
+## codigoProveedor
+
+Supplier catalog code snapshot (#323)
+
+`codigoProveedor`
+
+* is optional
+
+* Type: `string`
+
+* cannot be null
+
+* defined in: [OrdenCompraItemLine](ordencompraitemline-properties-codigoproveedor.md "undefined#/properties/codigoProveedor")
+
+### codigoProveedor Type
+
+`string`
+
 ## costoUnitario
 
 
@@ -113,6 +133,24 @@ undefined
 * defined in: [OrdenCompraItemLine](ordencompraitemline-properties-costounitario.md "undefined#/properties/costoUnitario")
 
 ### costoUnitario Type
+
+`string`
+
+## descripcionProveedor
+
+Supplier catalog description snapshot (#323)
+
+`descripcionProveedor`
+
+* is optional
+
+* Type: `string`
+
+* cannot be null
+
+* defined in: [OrdenCompraItemLine](ordencompraitemline-properties-descripcionproveedor.md "undefined#/properties/descripcionProveedor")
+
+### descripcionProveedor Type
 
 `string`
 

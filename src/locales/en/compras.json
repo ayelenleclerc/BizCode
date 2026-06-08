@@ -24,7 +24,16 @@
     "cancel": "Cancel",
     "receive": "Receive",
     "save": "Save",
-    "close": "Close"
+    "close": "Close",
+    "downloadPdf": "Download PDF"
+  },
+  "detail": {
+    "itemsCaption": "Purchase order line items",
+    "colCodigoProveedor": "Supplier code",
+    "colDescripcionProveedor": "Supplier description",
+    "colCantidad": "Qty",
+    "colCosto": "Unit cost",
+    "colSubtotal": "Subtotal"
   },
   "form": {
     "title": "New purchase order",
@@ -32,7 +41,8 @@
     "articuloId": "Product ID",
     "cantidad": "Quantity",
     "costoUnitario": "Unit cost",
-    "nota": "Note"
+    "nota": "Note",
+    "catalogMatch": "Supplier catalog: {{label}}"
   },
   "receive": {
     "title": "Partial or full receipt",

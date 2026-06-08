@@ -83,6 +83,8 @@ export default function ArticuloProveedoresComparadorSection({ articuloId }: Pro
         proveedorId: row.proveedorId,
         articuloId,
         costoUnitario: row.precioLista,
+        codigoProveedor: row.codigoProveedor,
+        descripcionProveedor: row.descripcionProveedor,
       },
     }
     navigate('/compras', { state })

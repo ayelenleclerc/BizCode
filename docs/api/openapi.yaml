@@ -2164,6 +2164,44 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
 
+  /api/compras/{id}/pdf:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    get:
+      tags: [compras]
+      summary: Download purchase order PDF (#323)
+      description: |
+        Returns a PDF with supplier catalog code and description per line when snapshotted.
+        Requires module `logistics.purchases` and permission `suppliers.read`.
+      responses:
+        '200':
+          description: Purchase order PDF
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
   /api/compras/{id}:
     parameters:
       - $ref: '#/components/parameters/BizcodeChannelHeader'
@@ -7716,6 +7754,14 @@ components:
           type: integer
         articuloId:
           type: integer
+        codigoProveedor:
+          type: string
+          nullable: true
+          description: Supplier catalog code snapshot (#323)
+        descripcionProveedor:
+          type: string
+          nullable: true
+          description: Supplier catalog description snapshot (#323)
         cantidad:
           type: integer
         cantidadRecibida:

@@ -24,7 +24,17 @@
     "cantidadRecibida": {
       "type": "integer"
     },
+    "codigoProveedor": {
+      "description": "Supplier catalog code snapshot (#323)",
+      "nullable": true,
+      "type": "string"
+    },
     "costoUnitario": {
+      "type": "string"
+    },
+    "descripcionProveedor": {
+      "description": "Supplier catalog description snapshot (#323)",
+      "nullable": true,
       "type": "string"
     },
     "id": {

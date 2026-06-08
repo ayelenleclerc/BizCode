@@ -24,7 +24,16 @@
     "cancel": "Cancelar",
     "receive": "Recibir",
     "save": "Guardar",
-    "close": "Cerrar"
+    "close": "Cerrar",
+    "downloadPdf": "Descargar PDF"
+  },
+  "detail": {
+    "itemsCaption": "Ítems de la orden de compra",
+    "colCodigoProveedor": "Cód. proveedor",
+    "colDescripcionProveedor": "Descripción proveedor",
+    "colCantidad": "Cant.",
+    "colCosto": "Costo unit.",
+    "colSubtotal": "Subtotal"
   },
   "form": {
     "title": "Nueva orden de compra",
@@ -32,7 +41,8 @@
     "articuloId": "ID artículo",
     "cantidad": "Cantidad",
     "costoUnitario": "Costo unitario",
-    "nota": "Nota"
+    "nota": "Nota",
+    "catalogMatch": "Catálogo del proveedor: {{label}}"
   },
   "receive": {
     "title": "Recepción parcial o total",

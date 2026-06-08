@@ -10,6 +10,7 @@ import type {
 import { assertNoOpenRecuento } from '../lib/recuentoStockGuard'
 import { facturaFechaToPrismaDate } from '../routes/restDomainShared'
 import type { ServiceResult } from './serviceResults'
+import { ProveedorCatalogoService } from './ProveedorCatalogoService'
 
 export const ORDEN_COMPRA_ESTADOS: OrdenCompraEstado[] = ['draft', 'sent', 'received', 'cancelled']
 
@@ -26,6 +27,11 @@ const ordenInclude = {
 } satisfies Prisma.OrdenCompraInclude
 
 export type OrdenCompraRow = Prisma.OrdenCompraGetPayload<{ include: typeof ordenInclude }>
+
+export type OrdenCompraItemCatalogSnapshot = {
+  codigoProveedor: string | null
+  descripcionProveedor: string | null
+}
 
 function computeTotal(items: OrdenCompraItemInput[]): Decimal {
   return items.reduce(
@@ -51,7 +57,53 @@ function allItemsFullyReceived(items: { cantidad: number; cantidadRecibida: numb
  * @pt-BR Ordens de compra a fornecedores com recebimento parcial → estoque (#135).
  */
 export class CompraService {
-  constructor(private readonly prisma: PrismaClient) {}
+  private readonly catalogo: ProveedorCatalogoService
+
+  constructor(
+    private readonly prisma: PrismaClient,
+    catalogo?: ProveedorCatalogoService,
+  ) {
+    this.catalogo = catalogo ?? new ProveedorCatalogoService(prisma)
+  }
+
+  async resolveItemCatalogSnapshot(
+    tenantId: number,
+    proveedorId: number,
+    articuloId: number,
+  ): Promise<OrdenCompraItemCatalogSnapshot> {
+    const entry = await this.catalogo.findByArticuloId(tenantId, proveedorId, articuloId)
+    if (!entry?.activo) {
+      return { codigoProveedor: null, descripcionProveedor: null }
+    }
+    return {
+      codigoProveedor: entry.codigoProveedor,
+      descripcionProveedor: entry.descripcion,
+    }
+  }
+
+  private async mapItemsWithCatalog(
+    tenantId: number,
+    proveedorId: number,
+    items: OrdenCompraItemInput[],
+  ): Promise<
+    Array<
+      OrdenCompraItemInput & {
+        codigoProveedor: string | null
+        descripcionProveedor: string | null
+      }
+    >
+  > {
+    return Promise.all(
+      items.map(async (line) => {
+        const snapshot = await this.resolveItemCatalogSnapshot(
+          tenantId,
+          proveedorId,
+          line.articuloId,
+        )
+        return { ...line, ...snapshot }
+      }),
+    )
+  }
 
   async list(
     tenantId: number,
@@ -100,6 +152,11 @@ export class CompraService {
       return { ok: false, status: 422, error: 'INVALID_ARTICULO' }
     }
 
+    const itemsWithCatalog = await this.mapItemsWithCatalog(
+      tenantId,
+      input.proveedorId,
+      input.items,
+    )
     const total = computeTotal(input.items)
     const row = await this.prisma.ordenCompra.create({
       data: {
@@ -110,8 +167,10 @@ export class CompraService {
         fechaEstimada: parseFechaEstimada(input.fechaEstimada),
         nota: input.nota,
         items: {
-          create: input.items.map((line) => ({
+          create: itemsWithCatalog.map((line) => ({
             articuloId: line.articuloId,
+            codigoProveedor: line.codigoProveedor,
+            descripcionProveedor: line.descripcionProveedor,
             cantidad: line.cantidad,
             costoUnitario: line.costoUnitario,
             subtotal: new Decimal(line.cantidad).mul(line.costoUnitario),
@@ -130,7 +189,7 @@ export class CompraService {
   ): Promise<ServiceResult<OrdenCompraRow>> {
     const existing = await this.prisma.ordenCompra.findFirst({
       where: { id, tenantId },
-      select: { id: true, estado: true },
+      select: { id: true, estado: true, proveedorId: true },
     })
     if (!existing) {
       return { ok: false, status: 404, error: 'OrdenCompra not found' }
@@ -159,6 +218,12 @@ export class CompraService {
       }
     }
 
+    const effectiveProveedorId = input.proveedorId ?? existing.proveedorId ?? 0
+    const itemsWithCatalog =
+      input.items && effectiveProveedorId > 0
+        ? await this.mapItemsWithCatalog(tenantId, effectiveProveedorId, input.items)
+        : null
+
     const row = await this.prisma.$transaction(async (tx) => {
       if (input.items) {
         await tx.ordenCompraItem.deleteMany({ where: { ordenCompraId: id } })
@@ -173,10 +238,12 @@ export class CompraService {
               : parseFechaEstimada(input.fechaEstimada),
           nota: input.nota,
           total: input.items ? computeTotal(input.items) : undefined,
-          items: input.items
+          items: itemsWithCatalog
             ? {
-                create: input.items.map((line) => ({
+                create: itemsWithCatalog.map((line) => ({
                   articuloId: line.articuloId,
+                  codigoProveedor: line.codigoProveedor,
+                  descripcionProveedor: line.descripcionProveedor,
                   cantidad: line.cantidad,
                   costoUnitario: line.costoUnitario,
                   subtotal: new Decimal(line.cantidad).mul(line.costoUnitario),

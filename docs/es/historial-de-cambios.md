@@ -10,6 +10,8 @@ Versionado: [Semantic Versioning](https://semver.org/lang/es/).
 
 ### Agregado
 
+- **Snapshot de catálogo en OC y PDF (GitHub #323):** `OrdenCompraItem.codigoProveedor` y `descripcionProveedor` como snapshot desde `ProveedorArticulo` activo al crear/actualizar; `GET /api/compras/{id}/pdf` imprimible con cabecera de proveedor y columnas de catálogo (fallback a datos internos del artículo); tabla de líneas en UI Compras, prefill desde catálogo, extensión del comparador y botón **Descargar PDF**; OpenAPI, pruebas y manuales trilingües.
+
 - **Accesibilidad por teclado (pantallas):** hooks reutilizables (`useListPageKeyboard`, `KeyboardHint`) y referencias visibles de atajos en listados, formularios, finanzas, logística, login e inicio; política ampliada en `docs/*/accesibilidad.md` (Enter abrir/editar).
 
 ### Cambiado

@@ -1,6 +1,11 @@
 import type { Application, NextFunction, Request, Response } from 'express'
 import { hasPermission, type Permission } from '../../src/lib/rbac'
 import { requirePermission, type AuthenticatedRequest } from '../auth'
+import {
+  buildOrdenCompraPdfBuffer,
+  ordenCompraPdfFilename,
+} from '../logistics/ordenCompraPdf'
+import { requireModule } from '../middleware/requireModule'
 import { validateBody } from '../middleware/validateBody'
 import {
   ordenCompraCreateBodySchema,
@@ -44,8 +49,9 @@ function requirePermissions(...permissions: Permission[]) {
  * @en Purchase order REST routes (`/api/compras`) — issue #135.
  */
 export function registerComprasRoutes(app: Application, ctx: RestRouteContext): void {
-  const { services, writeAudit } = ctx
+  const { prisma, services, writeAudit } = ctx
   const compras: CompraService = services.compras
+  const purchasesModule = requireModule('logistics.purchases')
 
   app.get(
     '/api/compras',
@@ -71,6 +77,51 @@ export function registerComprasRoutes(app: Application, ctx: RestRouteContext): 
         const { take, skip } = parseListPagination(req)
         const { total, ordenes } = await compras.list(tenantId, { estado, proveedorId }, take, skip)
         res.json(paginatedListJson(ordenes, total, take, skip))
+      } catch (err: unknown) {
+        res.status(500).json({ success: false, error: errorMessage(err) })
+      }
+    },
+  )
+
+  app.get(
+    '/api/compras/:id/pdf',
+    purchasesModule,
+    requirePermission('suppliers.read'),
+    async (req: Request, res: Response) => {
+      try {
+        const tenantId = getTenantId(req)
+        const id = Number.parseInt(String(req.params.id), 10)
+        if (!Number.isFinite(id) || id < 1) {
+          res.status(400).json({ success: false, error: 'Invalid id' })
+          return
+        }
+        const row = await compras.getById(tenantId, id)
+        if (!row) {
+          res.status(404).json({ success: false, error: 'OrdenCompra not found' })
+          return
+        }
+        const proveedor = await prisma.proveedor.findFirst({
+          where: { id: row.proveedorId, tenantId },
+          select: { rsocial: true, codigo: true, cuit: true },
+        })
+        if (!proveedor) {
+          res.status(404).json({ success: false, error: 'Proveedor not found' })
+          return
+        }
+        const buffer = await buildOrdenCompraPdfBuffer({
+          orden: row,
+          proveedor: {
+            rsocial: proveedor.rsocial,
+            codigo: proveedor.codigo,
+            cuit: proveedor.cuit,
+          },
+        })
+        res.setHeader('Content-Type', 'application/pdf')
+        res.setHeader(
+          'Content-Disposition',
+          `attachment; filename="${encodeURIComponent(ordenCompraPdfFilename(id))}"`,
+        )
+        res.send(buffer)
       } catch (err: unknown) {
         res.status(500).json({ success: false, error: errorMessage(err) })
       }

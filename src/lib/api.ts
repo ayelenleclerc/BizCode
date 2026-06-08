@@ -806,6 +806,8 @@ export const rubrosAPI = {
 export type OrdenCompraItemRow = {
   id: number
   articuloId: number
+  codigoProveedor?: string | null
+  descripcionProveedor?: string | null
   cantidad: number
   cantidadRecibida: number
   costoUnitario: string
@@ -967,6 +969,15 @@ export const comprasAPI = {
       return response.data.data as OrdenCompra
     } catch (error) {
       handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  downloadPdf: async (id: number): Promise<Blob> => {
+    try {
+      const response = await api.get(`/compras/${id}/pdf`, { responseType: 'blob' })
+      return response.data as Blob
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
     }
   },
 }

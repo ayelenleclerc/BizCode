@@ -12677,6 +12677,14 @@ PDF with company header, supplier data, imputed vouchers, payment method (#271).
 
         `integer`
 
+    - **`codigoProveedor`**
+
+      `string` — Supplier catalog code snapshot (#323)
+
+    - **`descripcionProveedor`**
+
+      `string` — Supplier catalog description snapshot (#323)
+
   - **`nota`**
 
     `string`
@@ -12727,6 +12735,8 @@ PDF with company header, supplier data, imputed vouchers, payment method (#271).
         {
           "id": 1,
           "articuloId": 1,
+          "codigoProveedor": "",
+          "descripcionProveedor": "",
           "cantidad": 1,
           "cantidadRecibida": 1,
           "costoUnitario": "",
@@ -12964,6 +12974,14 @@ PDF with company header, supplier data, imputed vouchers, payment method (#271).
 
         `integer`
 
+    - **`codigoProveedor`**
+
+      `string` — Supplier catalog code snapshot (#323)
+
+    - **`descripcionProveedor`**
+
+      `string` — Supplier catalog description snapshot (#323)
+
   - **`nota`**
 
     `string`
@@ -13010,6 +13028,8 @@ PDF with company header, supplier data, imputed vouchers, payment method (#271).
       {
         "id": 1,
         "articuloId": 1,
+        "codigoProveedor": "",
+        "descripcionProveedor": "",
         "cantidad": 1,
         "cantidadRecibida": 1,
         "costoUnitario": "",
@@ -13151,6 +13171,138 @@ PDF with company header, supplier data, imputed vouchers, payment method (#271).
 }
 ```
 
+### PARAMETERS /api/compras/{id}/pdf
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/compras/{id}/pdf`
+
+### Download purchase order PDF (#323)
+
+- **Method:** `GET`
+- **Path:** `/api/compras/{id}/pdf`
+- **Tags:** compras
+
+Returns a PDF with supplier catalog code and description per line when snapshotted. Requires module `logistics.purchases` and permission `suppliers.read`.
+
+#### Responses
+
+##### Status: 200 Purchase order PDF
+
+###### Content-Type: application/pdf
+
+`string`, format: `binary`
+
+**Example:**
+
+```json
+{}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ### PARAMETERS /api/compras/{id}
 
 - **Method:** `PARAMETERS`
@@ -13242,6 +13394,14 @@ PDF with company header, supplier data, imputed vouchers, payment method (#271).
 
         `integer`
 
+    - **`codigoProveedor`**
+
+      `string` — Supplier catalog code snapshot (#323)
+
+    - **`descripcionProveedor`**
+
+      `string` — Supplier catalog description snapshot (#323)
+
   - **`nota`**
 
     `string`
@@ -13288,6 +13448,8 @@ PDF with company header, supplier data, imputed vouchers, payment method (#271).
       {
         "id": 1,
         "articuloId": 1,
+        "codigoProveedor": "",
+        "descripcionProveedor": "",
         "cantidad": 1,
         "cantidadRecibida": 1,
         "costoUnitario": "",
@@ -13545,6 +13707,14 @@ PDF with company header, supplier data, imputed vouchers, payment method (#271).
 
         `integer`
 
+    - **`codigoProveedor`**
+
+      `string` — Supplier catalog code snapshot (#323)
+
+    - **`descripcionProveedor`**
+
+      `string` — Supplier catalog description snapshot (#323)
+
   - **`nota`**
 
     `string`
@@ -13591,6 +13761,8 @@ PDF with company header, supplier data, imputed vouchers, payment method (#271).
       {
         "id": 1,
         "articuloId": 1,
+        "codigoProveedor": "",
+        "descripcionProveedor": "",
         "cantidad": 1,
         "cantidadRecibida": 1,
         "costoUnitario": "",
@@ -13823,6 +13995,14 @@ PDF with company header, supplier data, imputed vouchers, payment method (#271).
 
         `integer`
 
+    - **`codigoProveedor`**
+
+      `string` — Supplier catalog code snapshot (#323)
+
+    - **`descripcionProveedor`**
+
+      `string` — Supplier catalog description snapshot (#323)
+
   - **`nota`**
 
     `string`
@@ -13869,6 +14049,8 @@ PDF with company header, supplier data, imputed vouchers, payment method (#271).
       {
         "id": 1,
         "articuloId": 1,
+        "codigoProveedor": "",
+        "descripcionProveedor": "",
         "cantidad": 1,
         "cantidadRecibida": 1,
         "costoUnitario": "",
@@ -14101,6 +14283,14 @@ PDF with company header, supplier data, imputed vouchers, payment method (#271).
 
         `integer`
 
+    - **`codigoProveedor`**
+
+      `string` — Supplier catalog code snapshot (#323)
+
+    - **`descripcionProveedor`**
+
+      `string` — Supplier catalog description snapshot (#323)
+
   - **`nota`**
 
     `string`
@@ -14147,6 +14337,8 @@ PDF with company header, supplier data, imputed vouchers, payment method (#271).
       {
         "id": 1,
         "articuloId": 1,
+        "codigoProveedor": "",
+        "descripcionProveedor": "",
         "cantidad": 1,
         "cantidadRecibida": 1,
         "costoUnitario": "",
@@ -14412,6 +14604,14 @@ Requires `suppliers.manage` and `inventory.adjust`. Creates `StockAjuste` rows w
 
         `integer`
 
+    - **`codigoProveedor`**
+
+      `string` — Supplier catalog code snapshot (#323)
+
+    - **`descripcionProveedor`**
+
+      `string` — Supplier catalog description snapshot (#323)
+
   - **`nota`**
 
     `string`
@@ -14458,6 +14658,8 @@ Requires `suppliers.manage` and `inventory.adjust`. Creates `StockAjuste` rows w
       {
         "id": 1,
         "articuloId": 1,
+        "codigoProveedor": "",
+        "descripcionProveedor": "",
         "cantidad": 1,
         "cantidadRecibida": 1,
         "costoUnitario": "",
@@ -41136,12 +41338,22 @@ true
 
     `integer`
 
+* **`codigoProveedor`**
+
+  `string` — Supplier catalog code snapshot (#323)
+
+* **`descripcionProveedor`**
+
+  `string` — Supplier catalog description snapshot (#323)
+
 **Example:**
 
 ```json
 {
   "id": 1,
   "articuloId": 1,
+  "codigoProveedor": "",
+  "descripcionProveedor": "",
   "cantidad": 1,
   "cantidadRecibida": 1,
   "costoUnitario": "",
@@ -41228,6 +41440,14 @@ true
 
       `integer`
 
+  - **`codigoProveedor`**
+
+    `string` — Supplier catalog code snapshot (#323)
+
+  - **`descripcionProveedor`**
+
+    `string` — Supplier catalog description snapshot (#323)
+
 * **`nota`**
 
   `string`
@@ -41268,6 +41488,8 @@ true
     {
       "id": 1,
       "articuloId": 1,
+      "codigoProveedor": "",
+      "descripcionProveedor": "",
       "cantidad": 1,
       "cantidadRecibida": 1,
       "costoUnitario": "",
@@ -41366,6 +41588,14 @@ true
 
         `integer`
 
+    - **`codigoProveedor`**
+
+      `string` — Supplier catalog code snapshot (#323)
+
+    - **`descripcionProveedor`**
+
+      `string` — Supplier catalog description snapshot (#323)
+
   - **`nota`**
 
     `string`
@@ -41412,6 +41642,8 @@ true
       {
         "id": 1,
         "articuloId": 1,
+        "codigoProveedor": "",
+        "descripcionProveedor": "",
         "cantidad": 1,
         "cantidadRecibida": 1,
         "costoUnitario": "",

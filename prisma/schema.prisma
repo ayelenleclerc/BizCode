@@ -288,15 +288,19 @@ model DocumentoCompraImportado {
 }
 
 model OrdenCompraItem {
-  id               Int         @id @default(autoincrement())
-  ordenCompraId    Int
-  ordenCompra      OrdenCompra @relation(fields: [ordenCompraId], references: [id], onDelete: Cascade)
-  articuloId       Int
-  articulo         Articulo    @relation(fields: [articuloId], references: [id])
-  cantidad         Int
-  cantidadRecibida Int         @default(0)
-  costoUnitario    Decimal     @db.Decimal(14, 2)
-  subtotal         Decimal     @db.Decimal(14, 2)
+  id                   Int         @id @default(autoincrement())
+  ordenCompraId        Int
+  ordenCompra          OrdenCompra @relation(fields: [ordenCompraId], references: [id], onDelete: Cascade)
+  articuloId           Int
+  articulo             Articulo    @relation(fields: [articuloId], references: [id])
+  /// Supplier catalog code snapshot at PO create/update (#323).
+  codigoProveedor      String?     @db.VarChar(50)
+  /// Supplier catalog description snapshot at PO create/update (#323).
+  descripcionProveedor String?     @db.VarChar(120)
+  cantidad             Int
+  cantidadRecibida     Int         @default(0)
+  costoUnitario        Decimal     @db.Decimal(14, 2)
+  subtotal             Decimal     @db.Decimal(14, 2)
 
   @@index([ordenCompraId])
   @@index([articuloId])
