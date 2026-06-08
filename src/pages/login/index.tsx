@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useTranslation } from 'react-i18next'
 import LanguageSelect from '@/components/LanguageSelect'
+import KeyboardHint, { useLoginShortcuts } from '@/components/shared/KeyboardHint'
 import { useAuth } from '@/contexts/AuthContext'
 import { ApiRequestFailedError, getAuthErrorI18nKey } from '@/lib/api'
 
@@ -32,6 +33,7 @@ function formatRetryCountdown(remainingMs: number): string {
  */
 export default function LoginPage() {
   const { t } = useTranslation('common')
+  const loginShortcuts = useLoginShortcuts()
   const { login } = useAuth()
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [lockoutUntil, setLockoutUntil] = useState<number | null>(null)
@@ -111,6 +113,8 @@ export default function LoginPage() {
         <div className="mb-6 flex justify-end">
           <LanguageSelect data-testid="login-language" id="login-language-select" />
         </div>
+
+        <KeyboardHint shortcuts={loginShortcuts} className="mb-4" />
 
         <form onSubmit={handleSubmit(onSubmit)} noValidate aria-labelledby="login-heading">
           <h2 id="login-heading" className="sr-only">

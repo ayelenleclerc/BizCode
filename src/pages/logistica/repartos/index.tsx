@@ -2,6 +2,8 @@ import { useCallback, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import ErrorBoundary from '@/components/ErrorBoundary'
+import KeyboardHint, { useGlobalListShortcuts } from '@/components/shared/KeyboardHint'
+import { useListKeyboardNav, useListPageHotkeys } from '@/hooks/useListPageKeyboard'
 import { useAuth } from '@/contexts/AuthContext'
 import { repartosAPI, type Reparto, type RepartoEstado } from '@/lib/api'
 import RepartoFormDialog from './RepartoFormDialog'
@@ -36,6 +38,7 @@ export default function RepartosPage() {
 
 function RepartosPageContent({ canDispatch }: { canDispatch: boolean }) {
   const { t } = useTranslation('repartos')
+  const listShortcuts = useGlobalListShortcuts()
   const [fecha, setFecha] = useState(todayIso)
   const [estado, setEstado] = useState<RepartoEstado | ''>('')
   const [repartos, setRepartos] = useState<Reparto[]>([])
@@ -43,6 +46,7 @@ function RepartosPageContent({ canDispatch }: { canDispatch: boolean }) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [showForm, setShowForm] = useState(false)
+  const [selectedRow, setSelectedRow] = useState(0)
 
   const loadRepartos = useCallback(async () => {
     setLoading(true)
@@ -54,6 +58,7 @@ function RepartosPageContent({ canDispatch }: { canDispatch: boolean }) {
         limit: 100,
       })
       setRepartos(res?.data ?? [])
+      setSelectedRow(0)
     } catch {
       setError(t('errors.load'))
       setRepartos([])
@@ -66,14 +71,36 @@ function RepartosPageContent({ canDispatch }: { canDispatch: boolean }) {
     void loadRepartos()
   }, [loadRepartos])
 
-  const selectReparto = async (id: number) => {
+  const selectReparto = useCallback(async (id: number) => {
     try {
       const detail = await repartosAPI.get(id)
       if (detail) setSelected(detail)
     } catch {
       setError(t('errors.load'))
     }
-  }
+  }, [t])
+
+  const onOpenRow = useCallback(
+    (index: number) => {
+      const reparto = repartos[index]
+      if (reparto) void selectReparto(reparto.id)
+    },
+    [repartos, selectReparto],
+  )
+
+  const handleKeyDown = useListKeyboardNav({
+    itemCount: repartos.length,
+    selectedRow,
+    setSelectedRow,
+    onOpenRow,
+  })
+
+  useListPageHotkeys({
+    searchInputId: 'search-repartos',
+    onNew: canDispatch ? () => setShowForm(true) : undefined,
+    onClose: () => setShowForm(false),
+    isOverlayOpen: showForm,
+  })
 
   return (
     <div className="p-8 max-w-6xl mx-auto" data-testid="repartos-page">
@@ -91,10 +118,13 @@ function RepartosPageContent({ canDispatch }: { canDispatch: boolean }) {
         </Link>
       </div>
 
+      <KeyboardHint shortcuts={listShortcuts} className="mb-4" />
+
       <div className="flex flex-wrap gap-3 mb-6 items-end">
         <label className="text-sm">
           <span className="block text-slate-600 dark:text-slate-400">{t('filters.fecha')}</span>
           <input
+            id="search-repartos"
             type="date"
             value={fecha}
             onChange={(e) => setFecha(e.target.value)}
@@ -164,8 +194,22 @@ function RepartosPageContent({ canDispatch }: { canDispatch: boolean }) {
               </tr>
             </thead>
             <tbody>
-              {repartos.map((r) => (
-                <tr key={r.id} className="border-b border-slate-100 dark:border-slate-700">
+              {repartos.map((r, idx) => (
+                <tr
+                  key={r.id}
+                  role="row"
+                  tabIndex={0}
+                  {...(selectedRow === idx
+                    ? { 'aria-selected': 'true' as const }
+                    : { 'aria-selected': 'false' as const })}
+                  onClick={() => setSelectedRow(idx)}
+                  onKeyDown={(e) => handleKeyDown(e, idx)}
+                  className={`border-b border-slate-100 dark:border-slate-700 cursor-pointer transition ${
+                    selectedRow === idx
+                      ? 'bg-blue-600 text-white'
+                      : 'hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-900 dark:text-slate-100'
+                  }`}
+                >
                   <td className="py-2 pr-4">{r.id}</td>
                   <td className="py-2 pr-4">{r.chofer.username}</td>
                   <td className="py-2 pr-4">{t(`estado.${r.estado}`)}</td>

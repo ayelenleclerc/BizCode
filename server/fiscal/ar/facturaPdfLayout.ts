@@ -1,6 +1,6 @@
 import PDFDocument from 'pdfkit'
-import { condicionIvaPdfLabel } from './afipCondicionIvaLabels'
-import type { AfipFacturaPdfInput } from './afipFiscalPdfTypes'
+import { condicionIvaPdfLabel } from './arcaCondicionIvaLabels'
+import type { ArcaFacturaPdfInput } from './arcaFiscalPdfTypes'
 import type { FacturaPdfImages } from './facturaPdfImages'
 
 function formatMoney(value: number): string {
@@ -17,7 +17,7 @@ function formatDate(d: Date): string {
  * @pt-BR Renderiza PDF A4 de fatura fiscal (legal ou pré-visualização).
  */
 export function renderFacturaPdfA4(
-  input: AfipFacturaPdfInput,
+  input: ArcaFacturaPdfInput,
   images: FacturaPdfImages,
 ): Promise<Buffer> {
   return new Promise((resolve, reject) => {
@@ -100,7 +100,7 @@ export function renderFacturaPdfA4(
       doc.fontSize(10).text(`CAE Nº: ${factura.cae}`)
       if (factura.caeVto) doc.text(`Fecha vto. CAE: ${formatDate(factura.caeVto)}`)
       doc.moveDown(0.5)
-      doc.text('Comprobante Autorizado por AFIP', { align: 'center' })
+      doc.text('Comprobante Autorizado por ARCA', { align: 'center' })
       if (images.qrPng) {
         const qrX = (doc.page.width - 100) / 2
         doc.image(images.qrPng, qrX, doc.y + 4, { width: 100, height: 100 })
@@ -126,7 +126,7 @@ export function renderFacturaPdfA4(
  * @es Ticket 80mm operativo (no fiscal válido sin CAE emitido).
  * @pt-BR Ticket 80mm operacional (não fiscal válido sem CAE emitido).
  */
-export function renderFacturaTicket80mm(input: AfipFacturaPdfInput): Promise<Buffer> {
+export function renderFacturaTicket80mm(input: ArcaFacturaPdfInput): Promise<Buffer> {
   return new Promise((resolve, reject) => {
     const widthPt = (80 / 25.4) * 72
     const doc = new PDFDocument({ margin: 12, size: [widthPt, 600] })

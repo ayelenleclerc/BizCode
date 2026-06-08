@@ -26,9 +26,9 @@ describe('module catalog', () => {
     expect(detectCatalogDependencyCycles()).toEqual([])
   })
 
-  it('blocks billing.afip_cae deactivation in prod but allows dev', () => {
-    expect(canDeactivate('billing.afip_cae', 'prod')).toBe(false)
-    expect(canDeactivate('billing.afip_cae', 'dev')).toBe(true)
+  it('blocks billing.arca_cae deactivation in prod but allows dev', () => {
+    expect(canDeactivate('billing.arca_cae', 'prod')).toBe(false)
+    expect(canDeactivate('billing.arca_cae', 'dev')).toBe(true)
     expect(canDeactivate('core.auth', 'prod')).toBe(false)
     expect(canDeactivate('core.auth', 'dev')).toBe(false)
   })
@@ -56,14 +56,14 @@ describe('module catalog', () => {
     ).toBe(true)
   })
 
-  it('requires billing.afip_cae in prod when not in active set', () => {
-    const modules = MODULE_KEYS.filter((k) => k !== 'billing.afip_cae')
+  it('requires billing.arca_cae in prod when not in active set', () => {
+    const modules = MODULE_KEYS.filter((k) => k !== 'billing.arca_cae')
     const result = validateModuleSet(modules, 'prod')
     expect(result.valid).toBe(false)
-    expect(result.errors.some((e) => e.module === 'billing.afip_cae')).toBe(true)
+    expect(result.errors.some((e) => e.module === 'billing.arca_cae')).toBe(true)
   })
 
-  it('allows omitting billing.afip_cae in dev when dependents are inactive', () => {
+  it('allows omitting billing.arca_cae in dev when dependents are inactive', () => {
     const modules = ['core.auth', 'core.catalog', 'core.clients', 'core.invoicing'] as const
     const result = validateModuleSet(modules, 'dev')
     expect(result.valid).toBe(true)
@@ -77,9 +77,9 @@ describe('module catalog', () => {
     }
   })
 
-  it('exposes billing.afip_cae with requiredInProd in catalog', () => {
-    expect(MODULE_CATALOG['billing.afip_cae'].requiredInProd).toBe(true)
-    expect(MODULE_CATALOG['billing.afip_cae'].required).toBe(false)
+  it('exposes billing.arca_cae with requiredInProd in catalog', () => {
+    expect(MODULE_CATALOG['billing.arca_cae'].requiredInProd).toBe(true)
+    expect(MODULE_CATALOG['billing.arca_cae'].required).toBe(false)
   })
 })
 
@@ -102,10 +102,10 @@ describe('GET /api/modules/catalog', () => {
       },
     })
     expect(res.body.data.modules.length).toBeGreaterThanOrEqual(45)
-    const afip = res.body.data.modules.find(
-      (m: { key: string }) => m.key === 'billing.afip_cae',
+    const arca = res.body.data.modules.find(
+      (m: { key: string }) => m.key === 'billing.arca_cae',
     )
-    expect(afip).toMatchObject({ requiredInProd: true, required: false })
+    expect(arca).toMatchObject({ requiredInProd: true, required: false })
   })
 
   it('returns 401 when auth bypass is disabled', async () => {

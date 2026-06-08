@@ -101,7 +101,7 @@ function buildPrismaMock(overrides: Partial<Record<string, unknown>> = {}): Pris
 }
 
 const MODULES =
-  'core.auth,billing.credit_notes,billing.afip_cae,finance.ledger,billing.orders,logistics.dispatches,logistics.picking,logistics.gps'
+  'core.auth,billing.credit_notes,billing.arca_cae,finance.ledger,billing.orders,logistics.dispatches,logistics.picking,logistics.gps'
 
 describe('GET /api/contabilidad/libro-iva-compras', () => {
   beforeEach(() => {
@@ -128,7 +128,7 @@ describe('GET /api/contabilidad/libro-iva-compras', () => {
   })
 
   it('returns 403 when finance.ledger is disabled', async () => {
-    vi.stubEnv('BIZCODE_TEST_MODULES', 'core.auth,billing.afip_cae')
+    vi.stubEnv('BIZCODE_TEST_MODULES', 'core.auth,billing.arca_cae')
     const prisma = buildPrismaMock()
     const app = createApp(prisma)
     await request(app)

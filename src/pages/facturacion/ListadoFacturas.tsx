@@ -1,6 +1,8 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { afipAPI, facturasAPI, printingAPI } from '@/lib/api'
+import { arcaAPI, facturasAPI, printingAPI } from '@/lib/api'
+import KeyboardHint from '@/components/shared/KeyboardHint'
+import { useListKeyboardNav, useListPageHotkeys } from '@/hooks/useListPageKeyboard'
 import { CanAccess } from '@/components/CanAccess'
 import IfModule from '@/components/IfModule'
 import { Factura, Cliente } from '@/types'
@@ -53,7 +55,17 @@ export default function ListadoFacturas({
   onFacturaUpdated,
 }: ListadoFacturasProps) {
   const { t } = useTranslation('facturacion')
+  const { t: tc } = useTranslation('common')
+  const listShortcuts = useMemo(
+    () => [
+      { key: '↑↓', description: tc('shortcuts.navigate') },
+      { key: 'Enter', description: tc('shortcuts.open') },
+      { key: 'Esc', description: tc('shortcuts.cancel') },
+    ],
+    [tc],
+  )
   const [expandedId, setExpandedId] = useState<number | null>(null)
+  const [selectedRow, setSelectedRow] = useState(0)
   const [voidingId, setVoidingId] = useState<number | null>(null)
   const [motivo, setMotivo] = useState('')
   const [voidLoading, setVoidLoading] = useState(false)
@@ -71,10 +83,29 @@ export default function ListadoFacturas({
   const [thermalPrinterEnabled, setThermalPrinterEnabled] = useState(false)
 
   useEffect(() => {
+    setSelectedRow(0)
+  }, [facturas])
+
+  useEffect(() => {
     return () => {
       if (pdfPreviewUrl) URL.revokeObjectURL(pdfPreviewUrl)
     }
   }, [pdfPreviewUrl])
+
+  const onOpenRow = useCallback(
+    (index: number) => {
+      const factura = facturas[index]
+      if (factura) setExpandedId(factura.id)
+    },
+    [facturas],
+  )
+
+  const handleKeyDown = useListKeyboardNav({
+    itemCount: facturas.length,
+    selectedRow,
+    setSelectedRow,
+    onOpenRow,
+  })
 
   useEffect(() => {
     printingAPI
@@ -122,7 +153,7 @@ export default function ListadoFacturas({
     setCaeLoadingId(facturaId)
     setCaeError(null)
     try {
-      await afipAPI.requestCae(facturaId)
+      await arcaAPI.requestCae(facturaId)
       onFacturaUpdated?.()
     } catch (err: unknown) {
       setCaeError((err as Error).message || t('cae.retryError'))
@@ -142,6 +173,22 @@ export default function ListadoFacturas({
     if (pdfPreviewUrl) URL.revokeObjectURL(pdfPreviewUrl)
     setPdfPreviewUrl(null)
   }
+
+  const isOverlayOpen = expandedId !== null || pdfPreviewUrl !== null || voidingId !== null
+
+  useListPageHotkeys({
+    onClose: () => {
+      if (pdfPreviewUrl) closePdfPreview()
+      else if (voidingId !== null) {
+        setVoidingId(null)
+        setMotivo('')
+        setVoidError(null)
+      } else {
+        setExpandedId(null)
+      }
+    },
+    isOverlayOpen,
+  })
 
   const handlePdfDownload = async (facturaId: number, preview: boolean) => {
     setPdfLoadingId(facturaId)
@@ -258,6 +305,7 @@ export default function ListadoFacturas({
 
   return (
     <div className="flex-1 overflow-auto">
+      {facturas.length > 0 && <KeyboardHint shortcuts={listShortcuts} className="mb-4" />}
       {facturas.length === 0 ? (
         <div className="text-center py-12 text-slate-500 dark:text-slate-400">
           {t('list.empty')}
@@ -277,14 +325,14 @@ export default function ListadoFacturas({
               <th className="px-4 py-3 text-right text-slate-700 dark:text-slate-300 font-semibold">{t('list.neto')}</th>
               <th className="px-4 py-3 text-right text-slate-700 dark:text-slate-300 font-semibold">{t('list.iva')}</th>
               <th className="px-4 py-3 text-right text-slate-700 dark:text-slate-300 font-semibold">{t('list.total')}</th>
-              <IfModule flag="billing.afip_cae">
+              <IfModule flag="billing.arca_cae">
                 <th className="px-4 py-3 text-center text-slate-700 dark:text-slate-300 font-semibold">{t('cae.column')}</th>
               </IfModule>
               <th className="px-4 py-3 text-center text-slate-700 dark:text-slate-300 font-semibold">{t('list.estado')}</th>
             </tr>
           </thead>
           <tbody>
-            {facturas.map((factura) => {
+            {facturas.map((factura, idx) => {
               const neto = (Number(factura.neto1) + Number(factura.neto2) + Number(factura.neto3)).toFixed(2)
               const iva = (Number(factura.iva1) + Number(factura.iva2)).toFixed(2)
 
@@ -292,8 +340,20 @@ export default function ListadoFacturas({
                 <tr
                   key={factura.id}
                   role="row"
-                  onClick={() => setExpandedId(expandedId === factura.id ? null : factura.id)}
-                  className="border-b border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer transition text-slate-900 dark:text-slate-100"
+                  tabIndex={0}
+                  {...(selectedRow === idx
+                    ? { 'aria-selected': 'true' as const }
+                    : { 'aria-selected': 'false' as const })}
+                  onClick={() => {
+                    setSelectedRow(idx)
+                    setExpandedId(expandedId === factura.id ? null : factura.id)
+                  }}
+                  onKeyDown={(e) => handleKeyDown(e, idx)}
+                  className={`border-b border-slate-200 dark:border-slate-700 cursor-pointer transition ${
+                    selectedRow === idx
+                      ? 'bg-blue-600 text-white'
+                      : 'hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-900 dark:text-slate-100'
+                  }`}
                 >
                   <td className="px-4 py-3">
                     {new Date(factura.fecha).toLocaleDateString('es-AR')}
@@ -308,7 +368,7 @@ export default function ListadoFacturas({
                   <td className="px-4 py-3 text-right font-mono font-semibold text-green-700 dark:text-green-400">
                     ${Number(factura.total).toFixed(2)}
                   </td>
-                  <IfModule flag="billing.afip_cae">
+                  <IfModule flag="billing.arca_cae">
                     <td className="px-4 py-3 text-center" onClick={(e) => e.stopPropagation()}>
                       <CaeBadge estado={factura.estadoCae} />
                     </td>
@@ -360,7 +420,7 @@ export default function ListadoFacturas({
                     <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
                       {new Date(factura.fecha).toLocaleDateString('es-AR')} — {getClienteName(factura.clienteId)}
                     </p>
-                    <IfModule flag="billing.afip_cae">
+                    <IfModule flag="billing.arca_cae">
                       <div className="mt-2">
                         <CaeBadge estado={factura.estadoCae} />
                         {factura.cae && (
@@ -422,7 +482,7 @@ export default function ListadoFacturas({
                       </div>
                     </div>
 
-                    <IfModule flag="billing.afip_cae">
+                    <IfModule flag="billing.arca_cae">
                       <div className="flex flex-wrap gap-2" role="group" aria-label={t('cae.column')}>
                         <CanAccess permission="reports.operational.read">
                           <button

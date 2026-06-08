@@ -12,12 +12,12 @@ Muestra todas las facturas emitidas con: Fecha, Tipo (A/B), Número, Cliente, Ne
 
 ## PDF e impresión (módulo CAE AFIP)
 
-Con **`billing.afip_cae`** y permiso **`reports.operational.read`**:
+Con **`billing.arca_cae`** y permiso **`reports.operational.read`**:
 
 | Acción | API | Notas |
 |--------|-----|--------|
 | Vista previa PDF | `GET /api/facturas/{id}/pdf/preview` | Marca de agua, **no fiscal** (sin CAE). |
-| PDF legal | `GET /api/facturas/{id}/pdf` | Requiere **CAE emitido**; layout fiscal con QR y código de barras ([ADR-0014](../adr/ADR-0014-legal-afip-invoice-pdf.md)). |
+| PDF legal | `GET /api/facturas/{id}/pdf` | Requiere **CAE emitido**; layout fiscal con QR y código de barras ([ADR-0014](../adr/ADR-0014-legal-arca-invoice-pdf.md)). |
 | Ticket 80 mm | `GET /api/facturas/{id}/ticket` | Mostrador; **no fiscal** si no hay CAE emitido. |
 
 En el detalle de factura: vista previa, imprimir (modal con descarga alternativa), descarga legal y ticket. Configurar emisor en **Configuración → Empresa** (`condicionIva`, ingresos brutos, inicio de actividades).

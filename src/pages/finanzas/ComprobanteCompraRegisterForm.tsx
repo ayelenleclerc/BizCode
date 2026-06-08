@@ -6,6 +6,8 @@ import {
   proveedoresAPI,
   type ComprobanteCompraInputDTO,
 } from '@/lib/api'
+import KeyboardHint, { useFormShortcuts } from '@/components/shared/KeyboardHint'
+import { useFormPageHotkeys } from '@/hooks/useListPageKeyboard'
 import type { Proveedor } from '@/types'
 
 type ComprobanteCompraRegisterFormProps = {
@@ -26,6 +28,7 @@ function parseAmount(value: string): number {
  */
 export default function ComprobanteCompraRegisterForm({ onRegistered }: ComprobanteCompraRegisterFormProps) {
   const { t } = useTranslation('finanzas')
+  const formShortcuts = useFormShortcuts()
   const [proveedores, setProveedores] = useState<Proveedor[]>([])
   const [loadingProveedores, setLoadingProveedores] = useState(false)
   const [proveedorId, setProveedorId] = useState('')
@@ -62,8 +65,7 @@ export default function ComprobanteCompraRegisterForm({ onRegistered }: Comproba
     void loadProveedores()
   }, [loadProveedores])
 
-  const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault()
+  const submitForm = useCallback(async () => {
     setFormError(null)
     setSuccessId(null)
 
@@ -115,6 +117,33 @@ export default function ComprobanteCompraRegisterForm({ onRegistered }: Comproba
     } finally {
       setSaving(false)
     }
+  }, [
+    cae,
+    caeVto,
+    fecha,
+    neto1,
+    neto2,
+    neto3,
+    iva1,
+    iva2,
+    numero,
+    onRegistered,
+    prefijo,
+    proveedorId,
+    t,
+    tipo,
+    total,
+    vencimiento,
+  ])
+
+  useFormPageHotkeys({
+    onSave: () => void submitForm(),
+    onClose: () => {},
+  })
+
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault()
+    await submitForm()
   }
 
   return (
@@ -124,6 +153,7 @@ export default function ComprobanteCompraRegisterForm({ onRegistered }: Comproba
       data-testid="finanzas-comprobante-compra-form"
       aria-labelledby="finanzas-comprobante-compra-form-heading"
     >
+      <KeyboardHint shortcuts={formShortcuts} className="mb-4" />
       <h3
         id="finanzas-comprobante-compra-form-heading"
         className="text-sm font-semibold mb-3 text-slate-800 dark:text-slate-200"

@@ -1,6 +1,9 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useHotkeys } from 'react-hotkeys-hook'
 import { useTranslation } from 'react-i18next'
 import ErrorBoundary from '@/components/ErrorBoundary'
+import KeyboardHint, { useGlobalListShortcuts } from '@/components/shared/KeyboardHint'
+import { useListKeyboardNav, useListPageHotkeys } from '@/hooks/useListPageKeyboard'
 import { useAuth } from '@/contexts/AuthContext'
 import {
   reportesAPI,
@@ -23,6 +26,7 @@ function formatMoney(value: string): string {
 
 export default function ReportesPage() {
   const { t } = useTranslation('reportes')
+  const listShortcuts = useGlobalListShortcuts()
   const { claims } = useAuth()
   const canOperational = claims?.permissions.includes('reports.operational.read') ?? false
   const canFinancial = claims?.permissions.includes('reports.financial.read') ?? false
@@ -38,6 +42,7 @@ export default function ReportesPage() {
   const [cobranzas, setCobranzas] = useState<ReporteCobranzasRow[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<Error | null>(null)
+  const [selectedRow, setSelectedRow] = useState(0)
 
   const loadActive = useCallback(async () => {
     if (!canOperational && !canFinancial) return
@@ -64,6 +69,10 @@ export default function ReportesPage() {
   useEffect(() => {
     void loadActive()
   }, [loadActive])
+
+  useEffect(() => {
+    setSelectedRow(0)
+  }, [activeTab, ventas, stock, cobranzas])
 
   const applyPreset = (preset: ReportesPreset) => {
     const range = resolvePresetRange(preset)
@@ -138,6 +147,32 @@ export default function ReportesPage() {
     return flat
   }, [cobranzas])
 
+  const activeRowCount =
+    activeTab === 'ventas' ? ventasRows.length : activeTab === 'stock' ? stockRows.length : cobranzasRows.length
+
+  const handleKeyDown = useListKeyboardNav({
+    itemCount: activeRowCount,
+    selectedRow,
+    setSelectedRow,
+    onOpenRow: () => {},
+  })
+
+  const filterInputId =
+    activeTab === 'ventas' || activeTab === 'cobranzas' ? 'reportes-from' : undefined
+
+  useListPageHotkeys({ searchInputId: filterInputId })
+
+  useHotkeys(
+    'f2',
+    () => {
+      if (activeTab === 'stock') {
+        const exportBtn = document.querySelector('[data-testid="reportes-export-csv"]') as HTMLButtonElement | null
+        exportBtn?.focus()
+      }
+    },
+    { enabled: activeTab === 'stock' },
+  )
+
   if (!canOperational && !canFinancial) {
     return (
       <div className="p-8" data-testid="reportes-forbidden">
@@ -153,6 +188,8 @@ export default function ReportesPage() {
           <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">{t('title')}</h1>
           <p className="text-slate-500 dark:text-slate-400 text-sm">{t('subtitle')}</p>
         </header>
+
+        <KeyboardHint shortcuts={listShortcuts} className="mb-4" />
 
         <ReportesTabPanel
           activeTab={activeTab}
@@ -189,6 +226,9 @@ export default function ReportesPage() {
                 tableTestId="reportes-ventas-table"
                 onExportCsv={() => void exportCsv()}
                 exportDisabled={loading}
+                selectedRow={selectedRow}
+                onRowKeyDown={handleKeyDown}
+                onRowClick={setSelectedRow}
               >
                 <ReportesVentasChart rows={ventas} />
               </ReportesDataPanel>
@@ -210,6 +250,9 @@ export default function ReportesPage() {
               tableTestId="reportes-stock-table"
               onExportCsv={() => void exportCsv()}
               exportDisabled={loading}
+              selectedRow={selectedRow}
+              onRowKeyDown={handleKeyDown}
+              onRowClick={setSelectedRow}
             />
           }
           cobranzasPanel={
@@ -236,6 +279,9 @@ export default function ReportesPage() {
                 tableTestId="reportes-cobranzas-table"
                 onExportCsv={() => void exportCsv()}
                 exportDisabled={loading}
+                selectedRow={selectedRow}
+                onRowKeyDown={handleKeyDown}
+                onRowClick={setSelectedRow}
               />
             </>
           }

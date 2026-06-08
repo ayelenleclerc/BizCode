@@ -2,7 +2,7 @@ import fs from 'node:fs/promises'
 import os from 'node:os'
 import path from 'node:path'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { buildAfipQrUrl } from '../../../server/fiscal/ar/afipQrPayload'
+import { buildArcaQrUrl } from '../../../server/fiscal/ar/arcaQrPayload'
 import { DocumentoCompraImportService } from '../../../server/services/DocumentoCompraImportService'
 
 const mockExtractPdf = vi.hoisted(() => vi.fn())
@@ -139,7 +139,7 @@ describe('DocumentoCompraImportService', () => {
     const prisma = buildPrisma()
     const storage = new DocumentoCompraStorage(tmpDir)
     const service = new DocumentoCompraImportService(prisma as never, storage)
-    const qrUrl = buildAfipQrUrl({
+    const qrUrl = buildArcaQrUrl({
       fecha: new Date('2026-01-10T12:00:00.000Z'),
       cuitEmisor: '30-71234567-8',
       prefijo: '0003',
@@ -303,7 +303,7 @@ describe('DocumentoCompraImportService', () => {
     const prisma = buildPrisma()
     const service = new DocumentoCompraImportService(prisma as never)
     const before = service.listTemplates(1)
-    expect(before.some((t) => t.issuer === 'generic-afip-ar')).toBe(true)
+    expect(before.some((t) => t.issuer === 'generic-arca-ar')).toBe(true)
     const yaml =
       'issuer: tenant-test-yaml\nkeywords:\n  - FACTURA\nfields:\n  vat_id:\n    regex: "([0-9]{11})"\n'
     const saved = service.saveTemplate(1, yaml)

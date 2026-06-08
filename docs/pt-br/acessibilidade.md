@@ -12,14 +12,17 @@ BizCode visa conformidade **WCAG 2.2 nível AA**.
 
 | Tecla | Ação |
 |---|---|
-| F2 | Focar busca |
+| F2 | Focar busca ou filtro ativo |
 | F3 | Abrir formulário “Novo” |
 | F5 | Salvar formulário |
 | Ins | Adicionar linha (fatura) |
 | Del | Remover linha selecionada |
-| ↑ / ↓ | Navegar linhas da tabela |
-| Enter | Abrir linha para edição |
+| ↑ / ↓ | Navegar linhas ou listas laterais |
+| Enter | Abrir linha / confirmar diálogo |
 | Esc | Fechar / cancelar |
+| Tab | Navegar controles (início, login) |
+
+Telas com atalhos extras exibem cartão **Atalhos** (`KeyboardHint`) abaixo do cabeçalho global.
 
 ## Padrões ARIA
 

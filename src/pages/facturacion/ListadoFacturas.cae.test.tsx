@@ -35,7 +35,7 @@ vi.mock('@/lib/api', () => ({
     }),
     test: vi.fn(),
   },
-  afipAPI: { requestCae: vi.fn() },
+  arcaAPI: { requestCae: vi.fn() },
 }))
 
 import { useFeatureFlags } from '@/contexts/FeatureFlagsContext'
@@ -75,9 +75,9 @@ describe('ListadoFacturas — CAE UI', () => {
   it('shows pending badge and retry when module enabled', () => {
     vi.mocked(useFeatureFlags).mockReturnValue({
       status: 'ready',
-      modules: ['billing.afip_cae'],
+      modules: ['billing.arca_cae'],
       integrations: [],
-      hasModule: (key) => key === 'billing.afip_cae',
+      hasModule: (key) => key === 'billing.arca_cae',
       hasIntegration: () => false,
       refreshFeatures: vi.fn(),
     })
@@ -100,9 +100,9 @@ describe('ListadoFacturas — CAE UI', () => {
   it('shows download PDF when CAE issued', () => {
     vi.mocked(useFeatureFlags).mockReturnValue({
       status: 'ready',
-      modules: ['billing.afip_cae'],
+      modules: ['billing.arca_cae'],
       integrations: [],
-      hasModule: (key) => key === 'billing.afip_cae',
+      hasModule: (key) => key === 'billing.arca_cae',
       hasIntegration: () => false,
       refreshFeatures: vi.fn(),
     })

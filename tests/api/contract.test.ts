@@ -1451,7 +1451,7 @@ describe('API — contrato OpenAPI', () => {
     await assertMatchesOpenApi('/api/facturas', 'post', '200', res.body)
   })
 
-  it('GET /api/afip/config', async () => {
+  it('GET /api/arca/config', async () => {
     process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
     process.env.BIZCODE_TEST_ROLE = 'owner'
     const p = buildPrisma()
@@ -1460,8 +1460,8 @@ describe('API — contrato OpenAPI', () => {
       ambiente: 'homologacion',
     } as never)
     const app = createApp(p)
-    const res = await request(app).get('/api/afip/config').expect(200)
-    await assertMatchesOpenApi('/api/afip/config', 'get', '200', res.body)
+    const res = await request(app).get('/api/arca/config').expect(200)
+    await assertMatchesOpenApi('/api/arca/config', 'get', '200', res.body)
   })
 
   it('GET /api/facturas/:id/pdf/preview returns application/pdf', async () => {

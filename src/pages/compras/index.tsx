@@ -4,6 +4,8 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { CanAccess } from '@/components/CanAccess'
 import ErrorBoundary from '@/components/ErrorBoundary'
 import AsyncWrapper from '@/components/shared/AsyncWrapper'
+import KeyboardHint, { useGlobalListShortcuts } from '@/components/shared/KeyboardHint'
+import { useListKeyboardNav, useListPageHotkeys } from '@/hooks/useListPageKeyboard'
 import { comprasAPI, type OrdenCompra } from '@/lib/api'
 import type { ComprasOcPrefillState } from '@/lib/comprasOcPrefill'
 
@@ -50,6 +52,8 @@ function ComprasPageContent() {
   const [formCosto, setFormCosto] = useState('')
   const [formNota, setFormNota] = useState('')
   const [actionLoading, setActionLoading] = useState(false)
+  const [selectedRow, setSelectedRow] = useState(0)
+  const listShortcuts = useGlobalListShortcuts()
 
   const loadList = useCallback(async () => {
     setLoading(true)
@@ -57,6 +61,7 @@ function ComprasPageContent() {
     try {
       const res = await comprasAPI.list(estadoFilter ? { estado: estadoFilter } : undefined)
       setOrdenes(res?.data ?? [])
+      setSelectedRow(0)
     } catch (error) {
       setLoadError(error instanceof Error ? error : new Error(String(error)))
     } finally {
@@ -136,6 +141,31 @@ function ComprasPageContent() {
     }
   }
 
+  const openOrdenRow = useCallback(
+    (index: number) => {
+      const o = ordenes[index]
+      if (o) void refreshSelected(o.id)
+    },
+    [ordenes],
+  )
+
+  const handleKeyDown = useListKeyboardNav({
+    itemCount: ordenes.length,
+    selectedRow,
+    setSelectedRow,
+    onOpenRow: openOrdenRow,
+  })
+
+  useListPageHotkeys({
+    searchInputId: 'search-compras-estado',
+    onNew: () => setShowForm(true),
+    onClose: () => {
+      setShowForm(false)
+      setShowReceive(false)
+    },
+    isOverlayOpen: showForm || showReceive,
+  })
+
   const handleReceive = async () => {
     if (!selected) return
     const lines = selected.items
@@ -179,11 +209,12 @@ function ComprasPageContent() {
 
         <div className="mb-4 flex gap-3 items-end" data-testid="compras-filter">
           <div>
-            <label htmlFor="compras-estado-filter" className="block text-xs text-slate-500 mb-1">
+            <label htmlFor="search-compras-estado" className="block text-xs text-slate-500 mb-1">
               {t('filterEstado')}
             </label>
             <select
-              id="compras-estado-filter"
+              id="search-compras-estado"
+              data-testid="search-compras-estado"
               className="border border-slate-300 dark:border-slate-600 rounded px-2 py-1 bg-white dark:bg-slate-800"
               value={estadoFilter}
               onChange={(e) => setEstadoFilter(e.target.value)}
@@ -214,16 +245,25 @@ function ComprasPageContent() {
                   </tr>
                 </thead>
                 <tbody>
-                  {ordenes.map((o) => (
+                  {ordenes.map((o, idx) => (
                     <tr
                       key={o.id}
-                      className={`border-b border-slate-100 dark:border-slate-800 cursor-pointer ${
-                        selected?.id === o.id ? 'bg-blue-50 dark:bg-slate-800' : ''
+                      role="row"
+                      {...(selectedRow === idx
+                        ? { 'aria-selected': 'true' as const }
+                        : { 'aria-selected': 'false' as const })}
+                      className={`border-b border-slate-100 dark:border-slate-800 cursor-pointer transition ${
+                        selectedRow === idx
+                          ? 'bg-blue-600 text-white'
+                          : 'hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-900 dark:text-slate-100'
                       }`}
                       data-testid={`compras-row-${o.id}`}
+                      tabIndex={0}
                       onClick={() => {
+                        setSelectedRow(idx)
                         void refreshSelected(o.id)
                       }}
+                      onKeyDown={(e) => handleKeyDown(e, idx)}
                     >
                       <td className="py-2 pr-2 font-mono">#{o.id}</td>
                       <td className="py-2 pr-2">{o.proveedor?.rsocial ?? o.proveedorId}</td>
@@ -443,6 +483,8 @@ function ComprasPageContent() {
             </div>
           </div>
         )}
+
+        <KeyboardHint shortcuts={listShortcuts} className="mt-4" />
       </div>
     </ErrorBoundary>
   )

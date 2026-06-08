@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import KeyboardHint from '@/components/shared/KeyboardHint'
+import { useListKeyboardNav } from '@/hooks/useListPageKeyboard'
 import L from 'leaflet'
 import { MapContainer, Marker, Popup, TileLayer, useMap } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
@@ -91,10 +93,19 @@ export default function SeguimientoPage() {
 
 function SeguimientoPageContent() {
   const { t } = useTranslation('seguimiento')
+  const { t: tc } = useTranslation('common')
+  const listShortcuts = useMemo(
+    () => [
+      { key: '↑↓', description: tc('shortcuts.navigate') },
+      { key: 'Enter', description: tc('shortcuts.open') },
+    ],
+    [tc],
+  )
   const [activos, setActivos] = useState<RepartoActivo[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [selectedId, setSelectedId] = useState<number | null>(null)
+  const [selectedRow, setSelectedRow] = useState(0)
   const [liveMessage, setLiveMessage] = useState('')
 
   const selected = useMemo(
@@ -137,6 +148,25 @@ function SeguimientoPageContent() {
 
   const markers = activos.filter((a) => a.ultimaUbicacion != null)
 
+  useEffect(() => {
+    setSelectedRow(0)
+  }, [activos])
+
+  const onOpenRow = useCallback(
+    (index: number) => {
+      const activo = activos[index]
+      if (activo) setSelectedId(activo.id)
+    },
+    [activos],
+  )
+
+  const handleKeyDown = useListKeyboardNav({
+    itemCount: activos.length,
+    selectedRow,
+    setSelectedRow,
+    onOpenRow,
+  })
+
   return (
     <div className="p-4 lg:p-6 flex flex-col gap-4 min-h-[70vh]" data-testid="seguimiento-page">
       <div>
@@ -146,6 +176,8 @@ function SeguimientoPageContent() {
         <h1 className="text-2xl font-bold mt-2">{t('title')}</h1>
         <p className="text-sm text-slate-600 dark:text-slate-400">{t('subtitle')}</p>
       </div>
+
+      {activos.length > 0 && <KeyboardHint shortcuts={listShortcuts} className="mb-2" />}
 
       <p className="sr-only" aria-live="polite">
         {liveMessage}
@@ -174,17 +206,25 @@ function SeguimientoPageContent() {
           >
             <h2 className="font-semibold text-sm mb-2">{t('sidebarTitle')}</h2>
             <ul className="space-y-2">
-              {activos.map((activo) => (
+              {activos.map((activo, idx) => (
                 <li key={activo.id}>
                   <button
                     type="button"
+                    tabIndex={0}
+                    {...(selectedRow === idx
+                      ? { 'aria-selected': 'true' as const }
+                      : { 'aria-selected': 'false' as const })}
                     className={`w-full text-left rounded-md p-2 text-sm border ${
-                      selectedId === activo.id
+                      selectedRow === idx || selectedId === activo.id
                         ? 'border-blue-600 bg-blue-50 dark:bg-slate-800'
                         : 'border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800'
                     }`}
                     data-testid={`seguimiento-reparto-${activo.id}`}
-                    onClick={() => setSelectedId(activo.id)}
+                    onClick={() => {
+                      setSelectedRow(idx)
+                      setSelectedId(activo.id)
+                    }}
+                    onKeyDown={(e) => handleKeyDown(e, idx)}
                   >
                     {selectedId === activo.id ? (
                       <span className="sr-only">{t('selected')}</span>

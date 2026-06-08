@@ -22,7 +22,7 @@ Para #146, la **anulación fiscal** implica: anular factura, revertir saldo del 
 4. **Transacción única:** `Factura.estado` → `N`, decremento de `Cliente.balance`, alta de `NotaCredito`, `AuditEvent` (`factura_void`). Fallo en cualquier paso → rollback.
 5. **Respuesta:** `{ success, data: { factura, notaCredito, updatedCliente } }` — actualizar cliente API, OpenAPI, tests y UI en la misma fase.
 6. **`NotaCredito.estadoCae` al crear:**
-   - Si la factura origen tiene `estadoCae === 'issued'`: **`pending`** y luego CAE async con `billing.afip_cae` (mock #133).
+   - Si la factura origen tiene `estadoCae === 'issued'`: **`pending`** y luego CAE async con `billing.arca_cae` (mock #133).
    - Si no: **`not_required`** (sin intento AFIP; evita NC eternamente `pending`).
    - Valores: `pending` | `issued` | `failed` | `not_required`.
 7. **Estado factura:** `A` / `N`; la NC es entidad aparte.

@@ -5,6 +5,7 @@ import { ApiRequestFailedError, articulosAPI, rubrosAPI, type CsvBulkImportResul
 import { CanAccess } from '@/components/CanAccess'
 import ErrorBoundary from '@/components/ErrorBoundary'
 import AsyncWrapper from '@/components/shared/AsyncWrapper'
+import KeyboardHint, { useGlobalListShortcuts } from '@/components/shared/KeyboardHint'
 import { Articulo, Rubro } from '@/types'
 import ArticuloForm from './ArticuloForm'
 
@@ -13,6 +14,7 @@ type ImportDialogKind = 'rubros' | 'articulos'
 export default function ArticulosPage() {
   const { t } = useTranslation('articulos')
   const { t: tc } = useTranslation('common')
+  const listShortcuts = useGlobalListShortcuts()
   const [articulos, setArticulos] = useState<Articulo[]>([])
   const [rubros, setRubros] = useState<Rubro[]>([])
   const [filtro, setFiltro] = useState('')
@@ -167,6 +169,7 @@ export default function ArticulosPage() {
       <div className="mb-6 flex flex-wrap gap-4">
         <input
           id="search-articulos"
+          data-testid="search-articulos"
           type="text"
           placeholder={t('search.placeholder')}
           value={filtro}
@@ -265,6 +268,8 @@ export default function ArticulosPage() {
         )}
         </AsyncWrapper>
       </div>
+
+      <KeyboardHint shortcuts={listShortcuts} className="mt-4" />
 
       {showForm && (
         <ArticuloForm

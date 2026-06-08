@@ -8,7 +8,7 @@ import {
   evaluateStockForInvoice,
   type StockBelowMinimumAlert,
 } from './facturaStock'
-import { AfipService } from '../fiscal/ar/AfipService'
+import { ArcaService } from '../fiscal/ar/ArcaService'
 
 type FacturaWithRelations = Prisma.FacturaGetPayload<{ include: { cliente: true; items: true } }>
 
@@ -38,10 +38,10 @@ export type FacturaVoidResult = {
  * @pt-BR OperaÃ§Ãµes de domÃ­nio de faturas (listagem, criaÃ§Ã£o, anulaÃ§Ã£o).
  */
 export class FacturaService {
-  private readonly afip: AfipService
+  private readonly arca: ArcaService
 
   constructor(private readonly prisma: PrismaClient) {
-    this.afip = new AfipService(prisma)
+    this.arca = new ArcaService(prisma)
   }
 
   async list(tenantId: number, take: number, skip: number): Promise<FacturaListResult> {
@@ -125,8 +125,8 @@ export class FacturaService {
       return [created, updated] as const
     })
 
-    void this.afip.requestCaeForFactura(tenantId, newFactura.id).catch(() => {
-      /* retry: npm run afip:retry-pending */
+    void this.arca.requestCaeForFactura(tenantId, newFactura.id).catch(() => {
+      /* retry: npm run arca:retry-pending */
     })
 
     return {
@@ -211,7 +211,7 @@ export class FacturaService {
     })
 
     if (factura.estadoCae === 'issued') {
-      void this.afip.requestCaeForNotaCredito(tenantId, result.notaCredito.id).catch(() => {
+      void this.arca.requestCaeForNotaCredito(tenantId, result.notaCredito.id).catch(() => {
         /* homologación mock; retry job may be added later */
       })
     }

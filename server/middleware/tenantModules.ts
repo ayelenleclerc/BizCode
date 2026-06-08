@@ -23,7 +23,7 @@ const TEST_DEFAULT_MODULES: ModuleKey[] = [
   'logistics.picking',
   'logistics.gps',
   'billing.credit_notes',
-  'billing.afip_cae',
+  'billing.arca_cae',
   'finance.ledger',
   'logistics.purchases',
 ]

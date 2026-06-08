@@ -10,6 +10,12 @@ Versioning: [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **Keyboard accessibility (screens):** reusable hooks (`useListPageKeyboard`, `KeyboardHint`) and visible shortcut hints on lists, forms, finance, logistics, login, and home; policy updated in `docs/*/accessibility.md` (Enter open/edit).
+
+### Changed
+
+- **AFIP → ARCA rename (breaking):** `/api/arca/*` routes, `billing.arca_cae` module, `arcaAPI` client, `ArcaService`, `arca:retry-pending*` scripts; Prisma migration `20260608120000_arca_module_rename`; empresa/finanzas i18n; ADR-0014 slug `legal-arca-invoice-pdf`. Literal portal URLs (`afip.gob.ar`) kept in QR/PDF payloads.
+
 - **Supplier price comparator (GitHub #274):** `ArticuloProveedoresComparadorService`; `GET /api/articulos/{id}/proveedores` and `GET /api/proveedores/comparar?articuloId=` (module `logistics.purchases`, `products.read` or `suppliers.read`); active supplier catalog rows with list price, stale-price flag (>30 days), and last **received** purchase-order date; **View suppliers** on the product profile with sort, cheapest-row highlight, stale-price indicator, and **[PO]** (`suppliers.manage`) pre-filling the purchase-order form; OpenAPI, tests, trilingual manuals.
 
 - **Supplier product catalog (GitHub #273):** `ProveedorArticulo` model and migration; `GET/POST /api/proveedores/{id}/catalogo`, `PUT .../catalogo/{articuloId}`, `POST .../catalogo/import` (module `logistics.purchases`); per-supplier codes, descriptions, list prices and CSV import; **Catalog** tab on supplier profile with price-age indicators; audit `proveedor_catalogo_*`; OpenAPI, tests, trilingual manuals.
@@ -79,7 +85,7 @@ Versioning: [Semantic Versioning](https://semver.org/).
 
 - **Purchase orders (GitHub #135):** `OrdenCompra` + `OrdenCompraItem`; CRUD `/api/compras`, `POST .../send`, `POST .../receive` (partial receipt → `StockAjuste` motivo `compra`); UI `/compras`; RBAC `suppliers.read` / `suppliers.manage` + `inventory.adjust` on receive; i18n EN/ES/PT-BR.
 - **Overdue reminders (GitHub #134):** `CobroRecordatorio` model; per-tenant reminder settings on `ParamEmpresa` (`recordatorioDiasGracia`, IANA `timezone`, business-hour window `recordatorioHoraInicio` / `recordatorioHoraFin`) editable under **Settings → Company**; `GET /api/cobranzas/vencidas` and `POST /api/cobranzas/recordatorios` (`reports.financial.read`); `CobranzasService` with tenant-local 08:00 slot and business window; multi-tenant `npm run cobranzas:recordatorios` (hourly cron `0 * * * *` recommended); enriched `invoice_overdue` notifications; overdue section on `/finanzas`; audit `cobranza_recordatorio_send`; i18n EN/ES/PT-BR.
-- **AFIP CAE (GitHub #133):** `GET /api/afip/config` (metadata only), invoice PDF (`GET /api/facturas/:id/pdf`, preview with watermark), CAE badges and retry in billing UI, AFIP section on company settings (`billing.afip_cae`), homologación WSFE mock, `npm run afip:retry-pending-job` (cron `*/5`), i18n EN/ES/PT-BR.
+- **AFIP CAE (GitHub #133):** `GET /api/arca/config` (metadata only), invoice PDF (`GET /api/facturas/:id/pdf`, preview with watermark), CAE badges and retry in billing UI, AFIP section on company settings (`billing.arca_cae`), homologación WSFE mock, `npm run arca:retry-pending-job` (cron `*/5`), i18n EN/ES/PT-BR.
 - **Commercial orders (GitHub #132):** `Pedido` / `PedidoItem` models; `GET/POST/PUT/DELETE /api/pedidos` plus `POST .../confirm` and `POST .../invoice` (ADR-0009 English states and paths); RBAC `orders.create` / `sales.create` / `sales.cancel`; audit actions `pedido_*`; `/pedidos` list UI; i18n EN/ES/PT-BR. Module gating: `requireModule('billing.orders')` (#223).
 
 - **Legacy DBF catalog migration (GitHub #131):** Parsers `legacyRubroDbf.ts` / `legacyArticuloDbf.ts`; `POST /api/rubros/migrate-dbf` and `POST /api/articulos/migrate-dbf` (`settings.business.manage`, upsert by codigo); `npm run migrate:dbf` imports `RUBROS.DBF` / `ARTICULOS.DBF` when present (fallback to `PVAR2`/`PVAR`); integration fixtures and tests.

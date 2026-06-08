@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { CanAccess } from '@/components/CanAccess'
 import ErrorBoundary from '@/components/ErrorBoundary'
+import KeyboardHint from '@/components/shared/KeyboardHint'
+import { useListKeyboardNav } from '@/hooks/useListPageKeyboard'
 import { useAuth } from '@/contexts/AuthContext'
 import { ordenesEntregaAPI, type OrdenEntrega, type OrdenEntregaLineItem } from '@/lib/api'
 
@@ -42,7 +44,15 @@ export default function PickingPage() {
 
 function PickingPageContent() {
   const { t } = useTranslation('picking')
+  const { t: tc } = useTranslation('common')
   const { t: tLog } = useTranslation('logistica')
+  const listShortcuts = useMemo(
+    () => [
+      { key: '↑↓', description: tc('shortcuts.navigate') },
+      { key: 'Enter', description: tc('shortcuts.open') },
+    ],
+    [tc],
+  )
   const { claims } = useAuth()
   const isLead = claims?.role === 'warehouse_lead' || (claims?.permissions.includes('orders.dispatch') ?? false)
 
@@ -51,12 +61,17 @@ function PickingPageContent() {
   const [loading, setLoading] = useState(false)
   const [loadError, setLoadError] = useState<string | null>(null)
   const [selectedId, setSelectedId] = useState<number | null>(null)
+  const [selectedRow, setSelectedRow] = useState(0)
   const [activeOrden, setActiveOrden] = useState<OrdenEntrega | null>(null)
   const [checkedItems, setCheckedItems] = useState<Record<number, boolean>>({})
   const [actionLoading, setActionLoading] = useState(false)
   const [actionError, setActionError] = useState<string | null>(null)
 
   const sortedPending = useMemo(() => sortQueue(pendingQueue), [pendingQueue])
+
+  useEffect(() => {
+    setSelectedRow(0)
+  }, [sortedPending])
 
   const loadQueues = useCallback(async () => {
     setLoading(true)
@@ -121,6 +136,24 @@ function PickingPageContent() {
     [claims?.userId, loadQueues, resetChecklist, t],
   )
 
+  const onOpenRow = useCallback(
+    (index: number) => {
+      const orden = sortedPending[index]
+      if (orden) {
+        setSelectedId(orden.id)
+        void openOrder(orden)
+      }
+    },
+    [openOrder, sortedPending],
+  )
+
+  const handleKeyDown = useListKeyboardNav({
+    itemCount: sortedPending.length,
+    selectedRow,
+    setSelectedRow,
+    onOpenRow,
+  })
+
   const allItemsChecked = useMemo(() => {
     if (!activeOrden) return false
     if (activeOrden.items.length === 0) return true
@@ -167,6 +200,8 @@ function PickingPageContent() {
         </button>
       </header>
 
+      {sortedPending.length > 0 && <KeyboardHint shortcuts={listShortcuts} className="mb-4" />}
+
       {loadError ? (
         <p className="mb-4 text-red-700 dark:text-red-400" role="alert" data-testid="picking-load-error">
           {loadError}
@@ -184,17 +219,25 @@ function PickingPageContent() {
             <p className="text-slate-600 dark:text-slate-400">{t('queue.empty')}</p>
           ) : (
             <ul className="divide-y rounded border border-slate-200 dark:divide-slate-700 dark:border-slate-700">
-              {sortedPending.map((orden) => (
+              {sortedPending.map((orden, idx) => (
                 <li key={orden.id}>
                   <button
                     type="button"
+                    tabIndex={0}
+                    {...(selectedRow === idx
+                      ? { 'aria-selected': 'true' as const }
+                      : { 'aria-selected': 'false' as const })}
                     className={`w-full px-4 py-3 text-left hover:bg-slate-50 dark:hover:bg-slate-800 ${
-                      selectedId === orden.id ? 'bg-slate-100 dark:bg-slate-800' : ''
+                      selectedRow === idx || selectedId === orden.id
+                        ? 'bg-blue-600 text-white dark:bg-blue-900'
+                        : ''
                     }`}
                     onClick={() => {
+                      setSelectedRow(idx)
                       setSelectedId(orden.id)
                       void openOrder(orden)
                     }}
+                    onKeyDown={(e) => handleKeyDown(e, idx)}
                     data-testid={`picking-queue-item-${orden.id}`}
                   >
                     <span className="font-medium">{orden.cliente?.rsocial ?? `#${orden.clienteId}`}</span>

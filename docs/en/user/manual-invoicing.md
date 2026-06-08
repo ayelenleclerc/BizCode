@@ -12,12 +12,12 @@ Shows all issued invoices with: Date, Type (A/B), Number, Customer, Net, VAT, To
 
 ## PDF and printing (AFIP CAE module)
 
-When **`billing.afip_cae`** is enabled and you have **`reports.operational.read`**:
+When **`billing.arca_cae`** is enabled and you have **`reports.operational.read`**:
 
 | Action | API | Notes |
 |--------|-----|--------|
 | Preview PDF | `GET /api/facturas/{id}/pdf/preview` | Watermarked, **non-fiscal** (no CAE required). |
-| Legal PDF | `GET /api/facturas/{id}/pdf` | Requires **issued CAE**; fiscal layout with QR and barcode ([ADR-0014](../adr/ADR-0014-legal-afip-invoice-pdf.md)). |
+| Legal PDF | `GET /api/facturas/{id}/pdf` | Requires **issued CAE**; fiscal layout with QR and barcode ([ADR-0014](../adr/ADR-0014-legal-arca-invoice-pdf.md)). |
 | 80mm ticket | `GET /api/facturas/{id}/ticket` | Counter ticket; **non-fiscal** if CAE is not issued. |
 
 In invoice detail: **Preview PDF**, **Print / preview** (modal with download fallback), **Download PDF** (legal), and **80mm ticket**. Configure issuer header fields under **Settings → Company** (`condicionIva`, gross income, activity start date).

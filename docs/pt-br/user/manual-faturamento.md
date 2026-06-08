@@ -12,12 +12,12 @@ Exibe as notas emitidas com: **Data**, **Tipo** (**NF-e Tipo A** / **NF-e Tipo B
 
 ## PDF e impressão (módulo CAE AFIP)
 
-Com **`billing.afip_cae`** e permissão **`reports.operational.read`**:
+Com **`billing.arca_cae`** e permissão **`reports.operational.read`**:
 
 | Ação | API | Notas |
 |------|-----|--------|
 | Pré-visualização PDF | `GET /api/facturas/{id}/pdf/preview` | Marca d'água, **não fiscal** (sem CAE). |
-| PDF legal | `GET /api/facturas/{id}/pdf` | Exige **CAE emitido**; layout fiscal com QR e código de barras ([ADR-0014](../adr/ADR-0014-legal-afip-invoice-pdf.md)). |
+| PDF legal | `GET /api/facturas/{id}/pdf` | Exige **CAE emitido**; layout fiscal com QR e código de barras ([ADR-0014](../adr/ADR-0014-legal-arca-invoice-pdf.md)). |
 | Ticket 80 mm | `GET /api/facturas/{id}/ticket` | Balcão; **não fiscal** sem CAE emitido. |
 
 No detalhe da nota: pré-visualização, imprimir (modal com download alternativo), download legal e ticket. Configure o emitente em **Configurações → Empresa** (`condicionIva`, inscrição em gross income, início das atividades).

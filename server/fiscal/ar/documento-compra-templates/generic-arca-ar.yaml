@@ -1,0 +1,19 @@
+# Argentina — pre-2021 or non-QR AFIP invoices (#277 Tier 2).
+# invoice2data-style template; parsed by documentoCompraTemplateEngine.ts (no Python runtime).
+issuer: generic-arca-ar
+keywords:
+  - CUIT
+  - CAE
+fields:
+  invoice_number: '(?:Comp\.?|Factura|Nro\.?)\s+(\d{4,5}[-–]\d{1,8})'
+  date: 'Fecha\s+(\d{2}/\d{2}/\d{4})'
+  amount: 'TOTAL\s+\$?\s*([\d.,]+)'
+  vat_id: 'CUIT[:\s]+(\d{2}[-]?\d{8}[-]?\d{1})'
+  cae: 'CAE\s+(\d{14})'
+  tipo_letra: 'Factura\s+([ABC])\b'
+options:
+  currency: ARS
+  date_formats:
+    - '%d/%m/%Y'
+  decimal_separator: ','
+  thousands_separator: '.'

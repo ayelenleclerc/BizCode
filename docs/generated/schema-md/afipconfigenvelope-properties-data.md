@@ -1,4 +1,4 @@
-# Untitled object in AfipConfigEnvelope Schema
+# Untitled object in ArcaConfigEnvelope Schema
 
 ```txt
 undefined#/properties/data
@@ -8,7 +8,7 @@ undefined#/properties/data
 
 | Abstract            | Extensible | Status         | Identifiable | Custom Properties | Additional Properties | Access Restrictions | Defined In                                                                                               |
 | :------------------ | :--------- | :------------- | :----------- | :---------------- | :-------------------- | :------------------ | :------------------------------------------------------------------------------------------------------- |
-| Can be instantiated | No         | Unknown status | No           | Forbidden         | Allowed               | none                | [AfipConfigEnvelope.schema.json\*](../schema-json/AfipConfigEnvelope.schema.json "open original schema") |
+| Can be instantiated | No         | Unknown status | No           | Forbidden         | Allowed               | none                | [ArcaConfigEnvelope.schema.json\*](../schema-json/ArcaConfigEnvelope.schema.json "open original schema") |
 
 ## data Type
 
@@ -18,7 +18,7 @@ undefined#/properties/data
 
 | Property                  | Type      | Required | Nullable       | Defined by                                                                                                                           |
 | :------------------------ | :-------- | :------- | :------------- | :----------------------------------------------------------------------------------------------------------------------------------- |
-| [configured](#configured) | `boolean` | Optional | cannot be null | [AfipConfigEnvelope](afipconfigenvelope-properties-data-properties-configured.md "undefined#/properties/data/properties/configured") |
+| [configured](#configured) | `boolean` | Optional | cannot be null | [ArcaConfigEnvelope](afipconfigenvelope-properties-data-properties-configured.md "undefined#/properties/data/properties/configured") |
 
 ## configured
 
@@ -32,7 +32,7 @@ undefined#/properties/data
 
 * cannot be null
 
-* defined in: [AfipConfigEnvelope](afipconfigenvelope-properties-data-properties-configured.md "undefined#/properties/data/properties/configured")
+* defined in: [ArcaConfigEnvelope](afipconfigenvelope-properties-data-properties-configured.md "undefined#/properties/data/properties/configured")
 
 ### configured Type
 

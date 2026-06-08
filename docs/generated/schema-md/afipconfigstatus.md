@@ -1,4 +1,4 @@
-# AfipConfigStatus Schema
+# ArcaConfigStatus Schema
 
 ```txt
 undefined#/properties/data
@@ -8,19 +8,19 @@ undefined#/properties/data
 
 | Abstract            | Extensible | Status         | Identifiable | Custom Properties | Additional Properties | Access Restrictions | Defined In                                                                                                           |
 | :------------------ | :--------- | :------------- | :----------- | :---------------- | :-------------------- | :------------------ | :------------------------------------------------------------------------------------------------------------------- |
-| Can be instantiated | No         | Unknown status | No           | Forbidden         | Allowed               | none                | [AfipConfigStatusEnvelope.schema.json\*](../schema-json/AfipConfigStatusEnvelope.schema.json "open original schema") |
+| Can be instantiated | No         | Unknown status | No           | Forbidden         | Allowed               | none                | [ArcaConfigStatusEnvelope.schema.json\*](../schema-json/ArcaConfigStatusEnvelope.schema.json "open original schema") |
 
 ## data Type
 
-`object` ([AfipConfigStatus](afipconfigstatus.md))
+`object` ([ArcaConfigStatus](afipconfigstatus.md))
 
 # data Properties
 
 | Property                  | Type      | Required | Nullable       | Defined by                                                                                       |
 | :------------------------ | :-------- | :------- | :------------- | :----------------------------------------------------------------------------------------------- |
-| [ambiente](#ambiente)     | `string`  | Optional | cannot be null | [AfipConfigStatus](afipconfigstatus-properties-ambiente.md "undefined#/properties/ambiente")     |
-| [configured](#configured) | `boolean` | Required | cannot be null | [AfipConfigStatus](afipconfigstatus-properties-configured.md "undefined#/properties/configured") |
-| [cuit](#cuit)             | `string`  | Optional | cannot be null | [AfipConfigStatus](afipconfigstatus-properties-cuit.md "undefined#/properties/cuit")             |
+| [ambiente](#ambiente)     | `string`  | Optional | cannot be null | [ArcaConfigStatus](afipconfigstatus-properties-ambiente.md "undefined#/properties/ambiente")     |
+| [configured](#configured) | `boolean` | Required | cannot be null | [ArcaConfigStatus](afipconfigstatus-properties-configured.md "undefined#/properties/configured") |
+| [cuit](#cuit)             | `string`  | Optional | cannot be null | [ArcaConfigStatus](afipconfigstatus-properties-cuit.md "undefined#/properties/cuit")             |
 
 ## ambiente
 
@@ -34,7 +34,7 @@ undefined#/properties/data
 
 * cannot be null
 
-* defined in: [AfipConfigStatus](afipconfigstatus-properties-ambiente.md "undefined#/properties/ambiente")
+* defined in: [ArcaConfigStatus](afipconfigstatus-properties-ambiente.md "undefined#/properties/ambiente")
 
 ### ambiente Type
 
@@ -52,7 +52,7 @@ undefined#/properties/data
 
 * cannot be null
 
-* defined in: [AfipConfigStatus](afipconfigstatus-properties-configured.md "undefined#/properties/configured")
+* defined in: [ArcaConfigStatus](afipconfigstatus-properties-configured.md "undefined#/properties/configured")
 
 ### configured Type
 
@@ -70,7 +70,7 @@ undefined#/properties/data
 
 * cannot be null
 
-* defined in: [AfipConfigStatus](afipconfigstatus-properties-cuit.md "undefined#/properties/cuit")
+* defined in: [ArcaConfigStatus](afipconfigstatus-properties-cuit.md "undefined#/properties/cuit")
 
 ### cuit Type
 

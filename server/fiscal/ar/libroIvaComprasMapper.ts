@@ -1,6 +1,6 @@
 import type { ComprobanteCompra, Proveedor } from '@prisma/client'
 import { Decimal } from '@prisma/client/runtime/library'
-import { TIPO_FACTURA_AFIP } from './libroIvaVentasConstants'
+import { TIPO_FACTURA_ARCA } from './libroIvaVentasConstants'
 import {
   alicuotaCodeForRate,
   buildAlicuotaLine,
@@ -31,12 +31,12 @@ function dec(value: Decimal | number | null | undefined): number {
   return Number(value)
 }
 
-function resolveTipoAfip(tipo: string): string | null {
-  return TIPO_FACTURA_AFIP[tipo.toUpperCase()] ?? null
+function resolveTipoArca(tipo: string): string | null {
+  return TIPO_FACTURA_ARCA[tipo.toUpperCase()] ?? null
 }
 
 function buildAlicuotaRowsFromComprobante(
-  tipoAfip: string,
+  tipoArca: string,
   puntoVenta: string,
   numeroComprobante: string,
   neto1: number,
@@ -47,7 +47,7 @@ function buildAlicuotaRowsFromComprobante(
   const rows: LibroIvaAlicuotaRow[] = []
   if (neto1 !== 0 || iva1 !== 0) {
     rows.push({
-      tipoComprobante: tipoAfip,
+      tipoComprobante: tipoArca,
       puntoVenta,
       numeroComprobante,
       netoGravado: neto1,
@@ -57,7 +57,7 @@ function buildAlicuotaRowsFromComprobante(
   }
   if (neto2 !== 0 || iva2 !== 0) {
     rows.push({
-      tipoComprobante: tipoAfip,
+      tipoComprobante: tipoArca,
       puntoVenta,
       numeroComprobante,
       netoGravado: neto2,
@@ -97,8 +97,8 @@ export function mapLibroIvaCompras(
   const previewMap = new Map<string, LibroIvaComprasPreviewTotals>()
 
   for (const comp of comprobantes) {
-    const tipoAfip = resolveTipoAfip(comp.tipo)
-    if (!tipoAfip) continue
+    const tipoArca = resolveTipoArca(comp.tipo)
+    if (!tipoArca) continue
 
     const neto1 = dec(comp.neto1)
     const neto2 = dec(comp.neto2)
@@ -110,7 +110,7 @@ export function mapLibroIvaCompras(
     const numero = String(comp.numero)
 
     const alicuotaRows = buildAlicuotaRowsFromComprobante(
-      tipoAfip,
+      tipoArca,
       puntoVenta,
       numero,
       neto1,
@@ -122,7 +122,7 @@ export function mapLibroIvaCompras(
     cbtuLines.push(
       buildCbtvLine({
         fecha: comp.fecha,
-        tipoComprobante: tipoAfip,
+        tipoComprobante: tipoArca,
         puntoVenta,
         numeroComprobante: numero,
         buyerName: comp.proveedor.rsocial,

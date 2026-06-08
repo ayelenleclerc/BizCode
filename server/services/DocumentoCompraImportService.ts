@@ -1,10 +1,10 @@
 import type { ComprobanteCompra, DocumentoCompraImportado, Prisma, PrismaClient } from '@prisma/client'
 import { ConflictAppError, NotFoundAppError, ValidationAppError } from '../errors/AppError'
-import { normalizeCuitDigits } from '../fiscal/ar/afipComprobanteCodes'
+import { normalizeCuitDigits } from '../fiscal/ar/arcaComprobanteCodes'
 import {
-  afipQrEmisorCuitDigits,
-  mapAfipQrToDocumentoCompraPreview,
-} from '../fiscal/ar/afipQrDecode'
+  arcaQrEmisorCuitDigits,
+  mapArcaQrToDocumentoCompraPreview,
+} from '../fiscal/ar/arcaQrDecode'
 import {
   createEmptyDocumentoCompraPreview,
   type DocumentoCompraPreviewData,
@@ -184,9 +184,9 @@ export class DocumentoCompraImportService {
       input.tipoArchivo,
     )
     if (tier1) {
-      const cuitEmisor = afipQrEmisorCuitDigits(tier1.payload)
+      const cuitEmisor = arcaQrEmisorCuitDigits(tier1.payload)
       const proveedorId = await this.resolveProveedorIdByCuit(tenantId, cuitEmisor)
-      datosExtraidos = mapAfipQrToDocumentoCompraPreview(tier1.payload, proveedorId)
+      datosExtraidos = mapArcaQrToDocumentoCompraPreview(tier1.payload, proveedorId)
       tier = 1
       confianza = 1
       if (proveedorId == null && cuitEmisor.length >= 10) {

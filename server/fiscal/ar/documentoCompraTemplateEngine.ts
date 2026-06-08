@@ -2,7 +2,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { parse as parseYaml } from 'yaml'
-import { normalizeCuitDigits } from './afipComprobanteCodes'
+import { normalizeCuitDigits } from './arcaComprobanteCodes'
 import type {
   DocumentoCompraTemplate,
   DocumentoCompraTemplateExtractResult,

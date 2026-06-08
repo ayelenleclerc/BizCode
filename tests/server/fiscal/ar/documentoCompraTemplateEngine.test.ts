@@ -6,7 +6,7 @@ import {
 import type { DocumentoCompraTemplate } from '../../../../server/fiscal/ar/documentoCompraTemplateTypes'
 
 const arTemplate: DocumentoCompraTemplate = {
-  issuer: 'generic-afip-ar-test',
+  issuer: 'generic-arca-ar-test',
   keywords: ['CUIT', 'CAE'],
   fields: {
     invoice_number: '(?:Comp\\.?|Factura|Nro\\.?)\\s+(\\d{4,5}[-–]\\d{1,8})',
@@ -32,7 +32,7 @@ describe('documentoCompraTemplateEngine', () => {
   it('extracts Argentina template fields from digital PDF text', () => {
     const result = extractWithDocumentoCompraTemplates(sampleText, [arTemplate])
     expect(result).not.toBeNull()
-    expect(result?.issuer).toBe('generic-afip-ar-test')
+    expect(result?.issuer).toBe('generic-arca-ar-test')
     expect(result?.tipo).toBe('B')
     expect(result?.prefijo).toBe('0003')
     expect(result?.numero).toBe(157)

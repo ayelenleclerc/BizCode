@@ -12,14 +12,17 @@ BizCode targets **WCAG 2.2 Level AA** conformance.
 
 | Key | Action |
 |---|---|
-| F2 | Focus search input |
+| F2 | Focus search or active filter |
 | F3 | Open "New record" form |
 | F5 | Save current form |
 | Ins | Add line item (invoice form) |
 | Del | Remove selected line item |
-| ↑ / ↓ | Navigate table rows |
-| Enter | Open selected row for editing |
+| ↑ / ↓ | Navigate table rows or side lists |
+| Enter | Open selected row / confirm dialog |
 | Esc | Close form / cancel |
+| Tab | Move between controls (home, login) |
+
+Screens with extra shortcuts show a **KeyboardHint** card below the global layout header bar.
 
 ## ARIA Patterns
 

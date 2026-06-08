@@ -98,7 +98,7 @@ function buildPrismaMock(overrides: Partial<Record<string, unknown>> = {}): Pris
 }
 
 const MODULES_WITH_NC =
-  'core.auth,billing.credit_notes,billing.afip_cae,billing.orders,logistics.dispatches,logistics.picking,logistics.gps'
+  'core.auth,billing.credit_notes,billing.arca_cae,billing.orders,logistics.dispatches,logistics.picking,logistics.gps'
 
 describe('GET /api/notas-credito', () => {
   beforeEach(() => {

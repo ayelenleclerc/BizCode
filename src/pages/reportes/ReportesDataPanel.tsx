@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import type { KeyboardEvent, ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import AsyncWrapper from '@/components/shared/AsyncWrapper'
 
@@ -14,6 +14,9 @@ type Props = {
   onExportCsv?: () => void
   exportDisabled?: boolean
   children?: ReactNode
+  selectedRow?: number
+  onRowKeyDown?: (e: KeyboardEvent, index: number) => void
+  onRowClick?: (index: number) => void
 }
 
 export default function ReportesDataPanel({
@@ -26,6 +29,9 @@ export default function ReportesDataPanel({
   onExportCsv,
   exportDisabled,
   children,
+  selectedRow,
+  onRowKeyDown,
+  onRowClick,
 }: Props) {
   const { t } = useTranslation('reportes')
 
@@ -63,7 +69,27 @@ export default function ReportesDataPanel({
             </thead>
             <tbody>
               {rows.map((row, idx) => (
-                <tr key={idx} className="border-b border-slate-100 dark:border-slate-800">
+                <tr
+                  key={idx}
+                  role="row"
+                  tabIndex={onRowKeyDown ? 0 : undefined}
+                  {...(selectedRow === idx
+                    ? { 'aria-selected': 'true' as const }
+                    : onRowKeyDown
+                      ? { 'aria-selected': 'false' as const }
+                      : {})}
+                  onClick={onRowClick ? () => onRowClick(idx) : undefined}
+                  onKeyDown={onRowKeyDown ? (e) => onRowKeyDown(e, idx) : undefined}
+                  className={`border-b border-slate-100 dark:border-slate-800 ${
+                    onRowKeyDown
+                      ? `cursor-pointer transition ${
+                          selectedRow === idx
+                            ? 'bg-blue-600 text-white'
+                            : 'hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-900 dark:text-slate-100'
+                        }`
+                      : ''
+                  }`}
+                >
                   {columns.map((col) => (
                     <td key={col.key} className="py-2 px-3">
                       {row[col.key]}

@@ -12,14 +12,17 @@ BizCode apunta a conformidad **WCAG 2.2 nivel AA**.
 
 | Tecla | Acción |
 |---|---|
-| F2 | Enfocar búsqueda |
+| F2 | Enfocar búsqueda o filtro activo |
 | F3 | Abrir formulario “Nuevo” |
 | F5 | Guardar formulario |
 | Ins | Agregar línea (factura) |
 | Del | Quitar línea seleccionada |
-| ↑ / ↓ | Navegar filas |
-| Enter | Abrir fila para editar |
+| ↑ / ↓ | Navegar filas o listas laterales |
+| Enter | Abrir fila para editar / confirmar diálogo |
 | Esc | Cerrar / cancelar |
+| Tab | Navegar controles (inicio, login) |
+
+Cada pantalla con atajos adicionales muestra una tarjeta **Atajos** (`KeyboardHint`) bajo el encabezado global del layout.
 
 ## Patrones ARIA
 

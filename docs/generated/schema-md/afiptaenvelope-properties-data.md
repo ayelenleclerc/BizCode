@@ -1,4 +1,4 @@
-# Untitled object in AfipTaEnvelope Schema
+# Untitled object in ArcaTaEnvelope Schema
 
 ```txt
 undefined#/properties/data
@@ -8,7 +8,7 @@ undefined#/properties/data
 
 | Abstract            | Extensible | Status         | Identifiable | Custom Properties | Additional Properties | Access Restrictions | Defined In                                                                                       |
 | :------------------ | :--------- | :------------- | :----------- | :---------------- | :-------------------- | :------------------ | :----------------------------------------------------------------------------------------------- |
-| Can be instantiated | No         | Unknown status | No           | Forbidden         | Allowed               | none                | [AfipTaEnvelope.schema.json\*](../schema-json/AfipTaEnvelope.schema.json "open original schema") |
+| Can be instantiated | No         | Unknown status | No           | Forbidden         | Allowed               | none                | [ArcaTaEnvelope.schema.json\*](../schema-json/ArcaTaEnvelope.schema.json "open original schema") |
 
 ## data Type
 
@@ -18,9 +18,9 @@ undefined#/properties/data
 
 | Property                  | Type     | Required | Nullable       | Defined by                                                                                                                   |
 | :------------------------ | :------- | :------- | :------------- | :--------------------------------------------------------------------------------------------------------------------------- |
-| [expiration](#expiration) | `string` | Optional | cannot be null | [AfipTaEnvelope](afiptaenvelope-properties-data-properties-expiration.md "undefined#/properties/data/properties/expiration") |
-| [sign](#sign)             | `string` | Optional | cannot be null | [AfipTaEnvelope](afiptaenvelope-properties-data-properties-sign.md "undefined#/properties/data/properties/sign")             |
-| [token](#token)           | `string` | Optional | cannot be null | [AfipTaEnvelope](afiptaenvelope-properties-data-properties-token.md "undefined#/properties/data/properties/token")           |
+| [expiration](#expiration) | `string` | Optional | cannot be null | [ArcaTaEnvelope](afiptaenvelope-properties-data-properties-expiration.md "undefined#/properties/data/properties/expiration") |
+| [sign](#sign)             | `string` | Optional | cannot be null | [ArcaTaEnvelope](afiptaenvelope-properties-data-properties-sign.md "undefined#/properties/data/properties/sign")             |
+| [token](#token)           | `string` | Optional | cannot be null | [ArcaTaEnvelope](afiptaenvelope-properties-data-properties-token.md "undefined#/properties/data/properties/token")           |
 
 ## expiration
 
@@ -34,7 +34,7 @@ undefined#/properties/data
 
 * cannot be null
 
-* defined in: [AfipTaEnvelope](afiptaenvelope-properties-data-properties-expiration.md "undefined#/properties/data/properties/expiration")
+* defined in: [ArcaTaEnvelope](afiptaenvelope-properties-data-properties-expiration.md "undefined#/properties/data/properties/expiration")
 
 ### expiration Type
 
@@ -56,7 +56,7 @@ undefined#/properties/data
 
 * cannot be null
 
-* defined in: [AfipTaEnvelope](afiptaenvelope-properties-data-properties-sign.md "undefined#/properties/data/properties/sign")
+* defined in: [ArcaTaEnvelope](afiptaenvelope-properties-data-properties-sign.md "undefined#/properties/data/properties/sign")
 
 ### sign Type
 
@@ -74,7 +74,7 @@ undefined#/properties/data
 
 * cannot be null
 
-* defined in: [AfipTaEnvelope](afiptaenvelope-properties-data-properties-token.md "undefined#/properties/data/properties/token")
+* defined in: [ArcaTaEnvelope](afiptaenvelope-properties-data-properties-token.md "undefined#/properties/data/properties/token")
 
 ### token Type
 

@@ -143,7 +143,7 @@ describe('documentos-compra API', () => {
   it('GET /api/documentos-compra/templates lists bundled templates', async () => {
     const app = createApp(prisma as never)
     const res = await request(app).get('/api/documentos-compra/templates').expect(200)
-    expect(res.body.data.some((t: { issuer: string }) => t.issuer === 'generic-afip-ar')).toBe(true)
+    expect(res.body.data.some((t: { issuer: string }) => t.issuer === 'generic-arca-ar')).toBe(true)
   })
 
   it('GET /api/documentos-compra/:id/original returns file bytes', async () => {

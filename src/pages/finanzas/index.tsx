@@ -1,8 +1,11 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { useHotkeys } from 'react-hotkeys-hook'
 import { useTranslation } from 'react-i18next'
 import { CanAccess } from '@/components/CanAccess'
 import ErrorBoundary from '@/components/ErrorBoundary'
 import AsyncWrapper from '@/components/shared/AsyncWrapper'
+import KeyboardHint from '@/components/shared/KeyboardHint'
+import { useListPageHotkeys } from '@/hooks/useListPageKeyboard'
 import IfModule from '@/components/IfModule'
 import ComprobanteCompraRegisterForm from '@/pages/finanzas/ComprobanteCompraRegisterForm'
 import DocumentoCompraImportSection from '@/pages/finanzas/DocumentoCompraImportSection'
@@ -70,8 +73,31 @@ export default function FinanzasPage() {
   )
 }
 
+function focusFirstVisibleFinanzasFilter(): void {
+  const containers = document.querySelectorAll(
+    '[data-testid="finanzas-vencidas-filter"], [data-testid="finanzas-payables-filter"], [data-testid="finanzas-nc-filters"], [data-testid="finanzas-client-lookup"], [data-testid="finanzas-libro-iva-controls"], [data-testid="finanzas-libro-iva-compras-controls"]',
+  )
+  for (const container of containers) {
+    const el = container as HTMLElement
+    const rect = el.getBoundingClientRect()
+    if (rect.top < window.innerHeight && rect.bottom > 80) {
+      const focusable = el.querySelector('input, select, textarea') as HTMLElement | null
+      focusable?.focus()
+      return
+    }
+  }
+}
+
 function FinanzasPageContent() {
   const { t } = useTranslation('finanzas')
+  const { t: tc } = useTranslation('common')
+  const finanzasShortcuts = useMemo(
+    () => [
+      { key: 'F2', description: tc('shortcuts.search') },
+      { key: 'Esc', description: tc('shortcuts.cancel') },
+    ],
+    [tc],
+  )
   const [aging, setAging] = useState<AgingArData | null>(null)
   const [loading, setLoading] = useState(false)
   const [loadError, setLoadError] = useState<Error | null>(null)
@@ -189,6 +215,20 @@ function FinanzasPageContent() {
     }
   }
 
+  const statementOpen = statement !== null || statementLoading || statementError !== null
+
+  useHotkeys('f2', () => {
+    focusFirstVisibleFinanzasFilter()
+  })
+
+  useListPageHotkeys({
+    onClose: () => {
+      setStatement(null)
+      setStatementError(null)
+    },
+    isOverlayOpen: statementOpen,
+  })
+
   const openStatement = async () => {
     const id = Number.parseInt(clienteIdInput.trim(), 10)
     if (!Number.isFinite(id) || id < 1) return
@@ -212,6 +252,8 @@ function FinanzasPageContent() {
           <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">{t('title')}</h1>
           <p className="text-slate-500 dark:text-slate-400 text-sm">{t('subtitle')}</p>
         </header>
+
+        <KeyboardHint shortcuts={finanzasShortcuts} className="mb-4" />
 
         <AsyncWrapper loading={loading} error={loadError}>
           {aging && <FinanzasResumenCards aging={aging} t={t} />}
