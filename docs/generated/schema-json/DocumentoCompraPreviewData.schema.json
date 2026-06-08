@@ -10,6 +10,11 @@
       "nullable": true,
       "type": "string"
     },
+    "cuitExtracted": {
+      "description": "Supplier tax id digits extracted when no match (#277 Fase F)",
+      "nullable": true,
+      "type": "string"
+    },
     "fecha": {
       "format": "date-time",
       "nullable": true,
@@ -53,6 +58,11 @@
     "proveedorId": {
       "nullable": true,
       "type": "integer"
+    },
+    "rsocialExtracted": {
+      "description": "Supplier name hint from OCR/LLM (#277 Fase F)",
+      "nullable": true,
+      "type": "string"
     },
     "tipo": {
       "anyOf": [

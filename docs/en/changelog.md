@@ -10,6 +10,8 @@ Versioning: [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **Purchase document scanner — Phase F (GitHub #277):** line-item extraction (Tier 4 Ollama + template text parsing), preview items table with confidence indicators and `articuloId` mapping, confirm API persists `items[]` in `datosExtraidos`, inline supplier creation from extracted CUIT/CNPJ/RUT, bundled Brazil (`generic-nfe-brasil`) and Uruguay (`generic-dgi-uruguay`) YAML templates, mobile camera capture on upload; OpenAPI, API/UI tests, trilingual finance manuals.
+
 - **Purchase order supplier catalog snapshot and PDF (GitHub #323):** `OrdenCompraItem.codigoProveedor` and `descripcionProveedor` snapshot from active `ProveedorArticulo` on create/update; `GET /api/compras/{id}/pdf` printable order with supplier header and catalog columns (fallback to internal article fields); Purchasing UI line table, catalog prefill, comparator prefill extension, and **Download PDF**; OpenAPI, tests, trilingual manuals.
 
 - **Keyboard accessibility (screens):** reusable hooks (`useListPageKeyboard`, `KeyboardHint`) and visible shortcut hints on lists, forms, finance, logistics, login, and home; policy updated in `docs/*/accessibility.md` (Enter open/edit).

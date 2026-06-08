@@ -123,6 +123,13 @@ export class DocumentoCompraImportService {
         ? await this.resolveProveedorIdByCuit(tenantId, extracted.cuitDigits)
         : null
     let datosExtraidos = mapTemplateExtractToDocumentoCompraPreview(extracted, proveedorId)
+    if (proveedorId == null && extracted.cuitDigits != null) {
+      datosExtraidos = {
+        ...datosExtraidos,
+        cuitExtracted: extracted.cuitDigits,
+        rsocialExtracted: extracted.rsocialExtracted ?? datosExtraidos.rsocialExtracted ?? null,
+      }
+    }
     let errores: Prisma.InputJsonValue | undefined
 
     if (proveedorId == null && extracted.cuitDigits != null) {
@@ -196,6 +203,7 @@ export class DocumentoCompraImportService {
         } as Prisma.InputJsonValue
         datosExtraidos = {
           ...datosExtraidos,
+          cuitExtracted: cuitEmisor,
           fieldConfidence: { ...datosExtraidos.fieldConfidence, proveedorId: 0 },
         }
       }
@@ -392,8 +400,11 @@ export class DocumentoCompraImportService {
       throw new ConflictAppError('Comprobante compra already exists for tipo/prefijo/numero')
     }
 
+    const confirmedItems = input.items ?? []
     const preview: DocumentoCompraPreviewData = {
       proveedorId: input.proveedorId,
+      cuitExtracted: doc.datosExtraidos.cuitExtracted ?? null,
+      rsocialExtracted: doc.datosExtraidos.rsocialExtracted ?? null,
       fecha: input.fecha,
       vencimiento: input.vencimiento ?? null,
       tipo: input.tipo as DocumentoCompraPreviewData['tipo'],
@@ -407,7 +418,7 @@ export class DocumentoCompraImportService {
       total: input.total,
       cae: input.cae ?? null,
       caeVto: input.caeVto ?? null,
-      items: input.items ?? [],
+      items: confirmedItems,
       fieldConfidence: {
         proveedorId: 1,
         fecha: 1,
@@ -415,6 +426,7 @@ export class DocumentoCompraImportService {
         prefijo: 1,
         numero: 1,
         total: 1,
+        items: confirmedItems.length > 0 ? 1 : 0.5,
       },
     }
 

@@ -1,0 +1,16 @@
+# Brazil — NF-e style purchase invoice (#277 Fase F).
+issuer: generic-nfe-brasil
+keywords:
+  - NF-e
+  - CNPJ
+fields:
+  invoice_number: 'N[°º\.\s]+(\d+)'
+  date: 'Data\s+(\d{2}/\d{2}/\d{4})'
+  amount: 'VALOR TOTAL\s+R?\$?\s*([\d.,]+)'
+  vat_id: 'CNPJ[:\s]+([\d./-]+)'
+options:
+  currency: BRL
+  date_formats:
+    - '%d/%m/%Y'
+  decimal_separator: ','
+  thousands_separator: '.'

@@ -16,24 +16,26 @@ undefined
 
 # DocumentoCompraPreviewData Properties
 
-| Property                            | Type      | Required | Nullable       | Defined by                                                                                                                     |
-| :---------------------------------- | :-------- | :------- | :------------- | :----------------------------------------------------------------------------------------------------------------------------- |
-| [cae](#cae)                         | `string`  | Optional | cannot be null | [DocumentoCompraPreviewData](documentocomprapreviewdata-properties-cae.md "undefined#/properties/cae")                         |
-| [caeVto](#caevto)                   | `string`  | Optional | cannot be null | [DocumentoCompraPreviewData](documentocomprapreviewdata-properties-caevto.md "undefined#/properties/caeVto")                   |
-| [fecha](#fecha)                     | `string`  | Optional | cannot be null | [DocumentoCompraPreviewData](documentocomprapreviewdata-properties-fecha.md "undefined#/properties/fecha")                     |
-| [fieldConfidence](#fieldconfidence) | `object`  | Optional | cannot be null | [DocumentoCompraPreviewData](documentocomprapreviewdata-properties-fieldconfidence.md "undefined#/properties/fieldConfidence") |
-| [items](#items)                     | `array`   | Optional | cannot be null | [DocumentoCompraPreviewData](documentocomprapreviewdata-properties-items.md "undefined#/properties/items")                     |
-| [iva1](#iva1)                       | `number`  | Optional | cannot be null | [DocumentoCompraPreviewData](documentocomprapreviewdata-properties-iva1.md "undefined#/properties/iva1")                       |
-| [iva2](#iva2)                       | `number`  | Optional | cannot be null | [DocumentoCompraPreviewData](documentocomprapreviewdata-properties-iva2.md "undefined#/properties/iva2")                       |
-| [neto1](#neto1)                     | `number`  | Optional | cannot be null | [DocumentoCompraPreviewData](documentocomprapreviewdata-properties-neto1.md "undefined#/properties/neto1")                     |
-| [neto2](#neto2)                     | `number`  | Optional | cannot be null | [DocumentoCompraPreviewData](documentocomprapreviewdata-properties-neto2.md "undefined#/properties/neto2")                     |
-| [neto3](#neto3)                     | `number`  | Optional | cannot be null | [DocumentoCompraPreviewData](documentocomprapreviewdata-properties-neto3.md "undefined#/properties/neto3")                     |
-| [numero](#numero)                   | `integer` | Optional | cannot be null | [DocumentoCompraPreviewData](documentocomprapreviewdata-properties-numero.md "undefined#/properties/numero")                   |
-| [prefijo](#prefijo)                 | `string`  | Optional | cannot be null | [DocumentoCompraPreviewData](documentocomprapreviewdata-properties-prefijo.md "undefined#/properties/prefijo")                 |
-| [proveedorId](#proveedorid)         | `integer` | Optional | cannot be null | [DocumentoCompraPreviewData](documentocomprapreviewdata-properties-proveedorid.md "undefined#/properties/proveedorId")         |
-| [tipo](#tipo)                       | Merged    | Optional | cannot be null | [DocumentoCompraPreviewData](documentocomprapreviewdata-properties-tipo.md "undefined#/properties/tipo")                       |
-| [total](#total)                     | `number`  | Optional | cannot be null | [DocumentoCompraPreviewData](documentocomprapreviewdata-properties-total.md "undefined#/properties/total")                     |
-| [vencimiento](#vencimiento)         | `string`  | Optional | cannot be null | [DocumentoCompraPreviewData](documentocomprapreviewdata-properties-vencimiento.md "undefined#/properties/vencimiento")         |
+| Property                              | Type      | Required | Nullable       | Defined by                                                                                                                       |
+| :------------------------------------ | :-------- | :------- | :------------- | :------------------------------------------------------------------------------------------------------------------------------- |
+| [cae](#cae)                           | `string`  | Optional | cannot be null | [DocumentoCompraPreviewData](documentocomprapreviewdata-properties-cae.md "undefined#/properties/cae")                           |
+| [caeVto](#caevto)                     | `string`  | Optional | cannot be null | [DocumentoCompraPreviewData](documentocomprapreviewdata-properties-caevto.md "undefined#/properties/caeVto")                     |
+| [cuitExtracted](#cuitextracted)       | `string`  | Optional | cannot be null | [DocumentoCompraPreviewData](documentocomprapreviewdata-properties-cuitextracted.md "undefined#/properties/cuitExtracted")       |
+| [fecha](#fecha)                       | `string`  | Optional | cannot be null | [DocumentoCompraPreviewData](documentocomprapreviewdata-properties-fecha.md "undefined#/properties/fecha")                       |
+| [fieldConfidence](#fieldconfidence)   | `object`  | Optional | cannot be null | [DocumentoCompraPreviewData](documentocomprapreviewdata-properties-fieldconfidence.md "undefined#/properties/fieldConfidence")   |
+| [items](#items)                       | `array`   | Optional | cannot be null | [DocumentoCompraPreviewData](documentocomprapreviewdata-properties-items.md "undefined#/properties/items")                       |
+| [iva1](#iva1)                         | `number`  | Optional | cannot be null | [DocumentoCompraPreviewData](documentocomprapreviewdata-properties-iva1.md "undefined#/properties/iva1")                         |
+| [iva2](#iva2)                         | `number`  | Optional | cannot be null | [DocumentoCompraPreviewData](documentocomprapreviewdata-properties-iva2.md "undefined#/properties/iva2")                         |
+| [neto1](#neto1)                       | `number`  | Optional | cannot be null | [DocumentoCompraPreviewData](documentocomprapreviewdata-properties-neto1.md "undefined#/properties/neto1")                       |
+| [neto2](#neto2)                       | `number`  | Optional | cannot be null | [DocumentoCompraPreviewData](documentocomprapreviewdata-properties-neto2.md "undefined#/properties/neto2")                       |
+| [neto3](#neto3)                       | `number`  | Optional | cannot be null | [DocumentoCompraPreviewData](documentocomprapreviewdata-properties-neto3.md "undefined#/properties/neto3")                       |
+| [numero](#numero)                     | `integer` | Optional | cannot be null | [DocumentoCompraPreviewData](documentocomprapreviewdata-properties-numero.md "undefined#/properties/numero")                     |
+| [prefijo](#prefijo)                   | `string`  | Optional | cannot be null | [DocumentoCompraPreviewData](documentocomprapreviewdata-properties-prefijo.md "undefined#/properties/prefijo")                   |
+| [proveedorId](#proveedorid)           | `integer` | Optional | cannot be null | [DocumentoCompraPreviewData](documentocomprapreviewdata-properties-proveedorid.md "undefined#/properties/proveedorId")           |
+| [rsocialExtracted](#rsocialextracted) | `string`  | Optional | cannot be null | [DocumentoCompraPreviewData](documentocomprapreviewdata-properties-rsocialextracted.md "undefined#/properties/rsocialExtracted") |
+| [tipo](#tipo)                         | Merged    | Optional | cannot be null | [DocumentoCompraPreviewData](documentocomprapreviewdata-properties-tipo.md "undefined#/properties/tipo")                         |
+| [total](#total)                       | `number`  | Optional | cannot be null | [DocumentoCompraPreviewData](documentocomprapreviewdata-properties-total.md "undefined#/properties/total")                       |
+| [vencimiento](#vencimiento)           | `string`  | Optional | cannot be null | [DocumentoCompraPreviewData](documentocomprapreviewdata-properties-vencimiento.md "undefined#/properties/vencimiento")           |
 
 ## cae
 
@@ -74,6 +76,24 @@ undefined
 ### caeVto Constraints
 
 **date time**: the string must be a date time string, according to [RFC 3339, section 5.6](https://tools.ietf.org/html/rfc3339 "check the specification")
+
+## cuitExtracted
+
+Supplier tax id digits extracted when no match (#277 Fase F)
+
+`cuitExtracted`
+
+* is optional
+
+* Type: `string`
+
+* cannot be null
+
+* defined in: [DocumentoCompraPreviewData](documentocomprapreviewdata-properties-cuitextracted.md "undefined#/properties/cuitExtracted")
+
+### cuitExtracted Type
+
+`string`
 
 ## fecha
 
@@ -276,6 +296,24 @@ undefined
 ### proveedorId Type
 
 `integer`
+
+## rsocialExtracted
+
+Supplier name hint from OCR/LLM (#277 Fase F)
+
+`rsocialExtracted`
+
+* is optional
+
+* Type: `string`
+
+* cannot be null
+
+* defined in: [DocumentoCompraPreviewData](documentocomprapreviewdata-properties-rsocialextracted.md "undefined#/properties/rsocialExtracted")
+
+### rsocialExtracted Type
+
+`string`
 
 ## tipo
 

@@ -1,3 +1,5 @@
+import type { DocumentoCompraItemPreview } from '../../lib/documentoCompraTypes'
+
 /**
  * @en YAML template schema for purchase document regex extraction (#277 Tier 2).
  * @es Esquema de plantillas YAML para extracción regex de documentos de compra (#277 Tier 2).
@@ -34,4 +36,6 @@ export type DocumentoCompraTemplateExtractResult = {
   fechaIso: string | null
   total: number | null
   cae: string | null
+  items?: DocumentoCompraItemPreview[]
+  rsocialExtracted?: string | null
 }

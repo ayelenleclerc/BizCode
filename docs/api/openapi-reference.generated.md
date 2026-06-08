@@ -22917,6 +22917,10 @@ Stores the original PDF/image on local filesystem and returns an editable previe
 
       `string`, format: `date-time`
 
+    - **`cuitExtracted`**
+
+      `string` — Supplier tax id digits extracted when no match (#277 Fase F)
+
     - **`fecha`**
 
       `string`, format: `date-time`
@@ -22986,6 +22990,10 @@ Stores the original PDF/image on local filesystem and returns an editable previe
     - **`proveedorId`**
 
       `integer`
+
+    - **`rsocialExtracted`**
+
+      `string` — Supplier name hint from OCR/LLM (#277 Fase F)
 
     - **`tipo`**
 
@@ -23057,6 +23065,8 @@ Stores the original PDF/image on local filesystem and returns an editable previe
     "estado": "procesando",
     "datosExtraidos": {
       "proveedorId": 1,
+      "cuitExtracted": "",
+      "rsocialExtracted": "",
       "fecha": "",
       "vencimiento": "",
       "tipo": "A",
@@ -23255,6 +23265,10 @@ Processes up to 20 PDF/image files sequentially (same tier pipeline as `procesar
 
       `string`, format: `date-time`
 
+    - **`cuitExtracted`**
+
+      `string` — Supplier tax id digits extracted when no match (#277 Fase F)
+
     - **`fecha`**
 
       `string`, format: `date-time`
@@ -23324,6 +23338,10 @@ Processes up to 20 PDF/image files sequentially (same tier pipeline as `procesar
     - **`proveedorId`**
 
       `integer`
+
+    - **`rsocialExtracted`**
+
+      `string` — Supplier name hint from OCR/LLM (#277 Fase F)
 
     - **`tipo`**
 
@@ -23396,6 +23414,8 @@ Processes up to 20 PDF/image files sequentially (same tier pipeline as `procesar
       "estado": "procesando",
       "datosExtraidos": {
         "proveedorId": 1,
+        "cuitExtracted": "",
+        "rsocialExtracted": "",
         "fecha": "",
         "vencimiento": "",
         "tipo": "A",
@@ -23585,6 +23605,10 @@ Returns counts by estado and the 20 most recent import rows for the current user
 
         `string`, format: `date-time`
 
+      - **`cuitExtracted`**
+
+        `string` — Supplier tax id digits extracted when no match (#277 Fase F)
+
       - **`fecha`**
 
         `string`, format: `date-time`
@@ -23654,6 +23678,10 @@ Returns counts by estado and the 20 most recent import rows for the current user
       - **`proveedorId`**
 
         `integer`
+
+      - **`rsocialExtracted`**
+
+        `string` — Supplier name hint from OCR/LLM (#277 Fase F)
 
       - **`tipo`**
 
@@ -23739,6 +23767,8 @@ Returns counts by estado and the 20 most recent import rows for the current user
         "estado": "procesando",
         "datosExtraidos": {
           "proveedorId": 1,
+          "cuitExtracted": "",
+          "rsocialExtracted": "",
           "fecha": "",
           "vencimiento": "",
           "tipo": "A",
@@ -24391,6 +24421,10 @@ Persists `ComprobanteCompra` from reviewed preview and links the import record. 
 
         `string`, format: `date-time`
 
+      - **`cuitExtracted`**
+
+        `string` — Supplier tax id digits extracted when no match (#277 Fase F)
+
       - **`fecha`**
 
         `string`, format: `date-time`
@@ -24460,6 +24494,10 @@ Persists `ComprobanteCompra` from reviewed preview and links the import record. 
       - **`proveedorId`**
 
         `integer`
+
+      - **`rsocialExtracted`**
+
+        `string` — Supplier name hint from OCR/LLM (#277 Fase F)
 
       - **`tipo`**
 
@@ -24532,6 +24570,8 @@ Persists `ComprobanteCompra` from reviewed preview and links the import record. 
       "estado": "procesando",
       "datosExtraidos": {
         "proveedorId": 1,
+        "cuitExtracted": "",
+        "rsocialExtracted": "",
         "fecha": "",
         "vencimiento": "",
         "tipo": "A",
@@ -46200,6 +46240,10 @@ Originating invoice header (selected columns)
 
   `string`, format: `date-time`
 
+* **`cuitExtracted`**
+
+  `string` — Supplier tax id digits extracted when no match (#277 Fase F)
+
 * **`fecha`**
 
   `string`, format: `date-time`
@@ -46270,6 +46314,10 @@ Originating invoice header (selected columns)
 
   `integer`
 
+* **`rsocialExtracted`**
+
+  `string` — Supplier name hint from OCR/LLM (#277 Fase F)
+
 * **`tipo`**
 
   `object`
@@ -46287,6 +46335,8 @@ Originating invoice header (selected columns)
 ```json
 {
   "proveedorId": 1,
+  "cuitExtracted": "",
+  "rsocialExtracted": "",
   "fecha": "",
   "vencimiento": "",
   "tipo": "A",
@@ -46351,6 +46401,10 @@ Originating invoice header (selected columns)
   - **`caeVto`**
 
     `string`, format: `date-time`
+
+  - **`cuitExtracted`**
+
+    `string` — Supplier tax id digits extracted when no match (#277 Fase F)
 
   - **`fecha`**
 
@@ -46422,6 +46476,10 @@ Originating invoice header (selected columns)
 
     `integer`
 
+  - **`rsocialExtracted`**
+
+    `string` — Supplier name hint from OCR/LLM (#277 Fase F)
+
   - **`tipo`**
 
     `object`
@@ -46486,6 +46544,8 @@ Originating invoice header (selected columns)
   "estado": "procesando",
   "datosExtraidos": {
     "proveedorId": 1,
+    "cuitExtracted": "",
+    "rsocialExtracted": "",
     "fecha": "",
     "vencimiento": "",
     "tipo": "A",
@@ -46560,6 +46620,10 @@ Originating invoice header (selected columns)
 
       `string`, format: `date-time`
 
+    - **`cuitExtracted`**
+
+      `string` — Supplier tax id digits extracted when no match (#277 Fase F)
+
     - **`fecha`**
 
       `string`, format: `date-time`
@@ -46629,6 +46693,10 @@ Originating invoice header (selected columns)
     - **`proveedorId`**
 
       `integer`
+
+    - **`rsocialExtracted`**
+
+      `string` — Supplier name hint from OCR/LLM (#277 Fase F)
 
     - **`tipo`**
 
@@ -46700,6 +46768,8 @@ Originating invoice header (selected columns)
     "estado": "procesando",
     "datosExtraidos": {
       "proveedorId": 1,
+      "cuitExtracted": "",
+      "rsocialExtracted": "",
       "fecha": "",
       "vencimiento": "",
       "tipo": "A",
@@ -46777,6 +46847,10 @@ Originating invoice header (selected columns)
 
       `string`, format: `date-time`
 
+    - **`cuitExtracted`**
+
+      `string` — Supplier tax id digits extracted when no match (#277 Fase F)
+
     - **`fecha`**
 
       `string`, format: `date-time`
@@ -46846,6 +46920,10 @@ Originating invoice header (selected columns)
     - **`proveedorId`**
 
       `integer`
+
+    - **`rsocialExtracted`**
+
+      `string` — Supplier name hint from OCR/LLM (#277 Fase F)
 
     - **`tipo`**
 
@@ -46918,6 +46996,8 @@ Originating invoice header (selected columns)
       "estado": "procesando",
       "datosExtraidos": {
         "proveedorId": 1,
+        "cuitExtracted": "",
+        "rsocialExtracted": "",
         "fecha": "",
         "vencimiento": "",
         "tipo": "A",
@@ -47004,6 +47084,10 @@ Originating invoice header (selected columns)
 
       `string`, format: `date-time`
 
+    - **`cuitExtracted`**
+
+      `string` — Supplier tax id digits extracted when no match (#277 Fase F)
+
     - **`fecha`**
 
       `string`, format: `date-time`
@@ -47073,6 +47157,10 @@ Originating invoice header (selected columns)
     - **`proveedorId`**
 
       `integer`
+
+    - **`rsocialExtracted`**
+
+      `string` — Supplier name hint from OCR/LLM (#277 Fase F)
 
     - **`tipo`**
 
@@ -47152,6 +47240,8 @@ Originating invoice header (selected columns)
       "estado": "procesando",
       "datosExtraidos": {
         "proveedorId": 1,
+        "cuitExtracted": "",
+        "rsocialExtracted": "",
         "fecha": "",
         "vencimiento": "",
         "tipo": "A",
@@ -47242,6 +47332,10 @@ Originating invoice header (selected columns)
 
         `string`, format: `date-time`
 
+      - **`cuitExtracted`**
+
+        `string` — Supplier tax id digits extracted when no match (#277 Fase F)
+
       - **`fecha`**
 
         `string`, format: `date-time`
@@ -47311,6 +47405,10 @@ Originating invoice header (selected columns)
       - **`proveedorId`**
 
         `integer`
+
+      - **`rsocialExtracted`**
+
+        `string` — Supplier name hint from OCR/LLM (#277 Fase F)
 
       - **`tipo`**
 
@@ -47396,6 +47494,8 @@ Originating invoice header (selected columns)
         "estado": "procesando",
         "datosExtraidos": {
           "proveedorId": 1,
+          "cuitExtracted": "",
+          "rsocialExtracted": "",
           "fecha": "",
           "vencimiento": "",
           "tipo": "A",
@@ -47733,6 +47833,10 @@ Originating invoice header (selected columns)
 
       `string`, format: `date-time`
 
+    - **`cuitExtracted`**
+
+      `string` — Supplier tax id digits extracted when no match (#277 Fase F)
+
     - **`fecha`**
 
       `string`, format: `date-time`
@@ -47803,6 +47907,10 @@ Originating invoice header (selected columns)
 
       `integer`
 
+    - **`rsocialExtracted`**
+
+      `string` — Supplier name hint from OCR/LLM (#277 Fase F)
+
     - **`tipo`**
 
       `object`
@@ -47868,6 +47976,8 @@ Originating invoice header (selected columns)
     "estado": "procesando",
     "datosExtraidos": {
       "proveedorId": 1,
+      "cuitExtracted": "",
+      "rsocialExtracted": "",
       "fecha": "",
       "vencimiento": "",
       "tipo": "A",
@@ -48048,6 +48158,10 @@ Originating invoice header (selected columns)
 
         `string`, format: `date-time`
 
+      - **`cuitExtracted`**
+
+        `string` — Supplier tax id digits extracted when no match (#277 Fase F)
+
       - **`fecha`**
 
         `string`, format: `date-time`
@@ -48117,6 +48231,10 @@ Originating invoice header (selected columns)
       - **`proveedorId`**
 
         `integer`
+
+      - **`rsocialExtracted`**
+
+        `string` — Supplier name hint from OCR/LLM (#277 Fase F)
 
       - **`tipo`**
 
@@ -48189,6 +48307,8 @@ Originating invoice header (selected columns)
       "estado": "procesando",
       "datosExtraidos": {
         "proveedorId": 1,
+        "cuitExtracted": "",
+        "rsocialExtracted": "",
         "fecha": "",
         "vencimiento": "",
         "tipo": "A",

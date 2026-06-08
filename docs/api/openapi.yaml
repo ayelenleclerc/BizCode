@@ -8953,6 +8953,14 @@ components:
         proveedorId:
           type: integer
           nullable: true
+        cuitExtracted:
+          type: string
+          nullable: true
+          description: Supplier tax id digits extracted when no match (#277 Fase F)
+        rsocialExtracted:
+          type: string
+          nullable: true
+          description: Supplier name hint from OCR/LLM (#277 Fase F)
         fecha:
           type: string
           format: date-time
