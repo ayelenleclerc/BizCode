@@ -50,6 +50,7 @@ With module **`finance.ledger`** enabled, a **Accounting — VAT sales book** se
 With **`finance.ledger`**, an **Accounting — VAT purchases book** section appears below sales:
 
 1. Use the **Register purchase voucher** form (supplier, date, tipo A/B/C, point of sale, number, netos, IVA, total; optional CAE). The API `POST /api/comprobantes-compra` remains available for integrations.
+2. **Import purchase document** (#277): upload a PDF or image (up to 20 files per batch). Extraction tiers run locally in order: AFIP/ARCA QR (Tier 1), digital PDF text + YAML templates (Tier 2), image OCR + templates (Tier 3), optional Ollama when `OLLAMA_URL` is set (Tier 4). Review the preview queue, then confirm to create `ComprobanteCompra`. APIs: `POST /api/documentos-compra/procesar`, `POST /api/documentos-compra/procesar-lote`, `GET /api/documentos-compra/cola`, `POST /api/documentos-compra/confirmar`. Tenant custom templates: `GET`/`POST /api/documentos-compra/templates` (save requires `settings.fiscal.manage`).
 2. Select **period** and review **preview** (CBTU / ALICUOTAS counts). See [ADR-0014](../adr/ADR-0014-libro-iva-compras.md).
 3. **Download ARCA (ZIP)** — `CBTU.txt` + `ALICUOTAS.txt`.
 4. **Download Excel** — internal review only.

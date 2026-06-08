@@ -1524,26 +1524,47 @@ export const reciboPagoBodySchema = z
     }
   })
 
-export const comprobanteCompraBodySchema = z
-  .object({
-    fecha: z.string(),
-    tipo: z.enum(['A', 'B', 'C'], {
-      required_error: 'tipo must be A, B or C',
-      invalid_type_error: 'tipo must be A, B or C',
-    }),
-    prefijo: z.string().min(1).max(4),
-    numero: z.number().int().min(1),
-    proveedorId: z.number().int().min(1),
-    ordenCompraId: z.number().int().min(1).optional(),
-    neto1: z.number().min(0),
-    neto2: z.number().min(0),
-    neto3: z.number().min(0),
-    iva1: z.number().min(0),
-    iva2: z.number().min(0),
-    total: z.number().min(0),
-    cae: z.string().max(20).optional(),
-    caeVto: z.string().optional(),
-    vencimiento: z.string().optional(),
+const comprobanteCompraFieldsSchema = z.object({
+  fecha: z.string(),
+  tipo: z.enum(['A', 'B', 'C'], {
+    required_error: 'tipo must be A, B or C',
+    invalid_type_error: 'tipo must be A, B or C',
+  }),
+  prefijo: z.string().min(1).max(4),
+  numero: z.number().int().min(1),
+  proveedorId: z.number().int().min(1),
+  ordenCompraId: z.number().int().min(1).optional(),
+  neto1: z.number().min(0),
+  neto2: z.number().min(0),
+  neto3: z.number().min(0),
+  iva1: z.number().min(0),
+  iva2: z.number().min(0),
+  total: z.number().min(0),
+  cae: z.string().max(20).optional(),
+  caeVto: z.string().optional(),
+  vencimiento: z.string().optional(),
+})
+
+export const comprobanteCompraBodySchema = comprobanteCompraFieldsSchema.superRefine((data, ctx) => {
+  const f = data.fecha.trim()
+  if (f.length === 0) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'fecha is required', path: ['fecha'] })
+  }
+})
+
+export const documentoCompraItemPreviewSchema = z.object({
+  descripcion: z.string().min(1),
+  cantidad: z.number().positive(),
+  precioUnitario: z.number().min(0),
+  subtotal: z.number().min(0),
+  articuloId: z.number().int().min(1).nullable().optional(),
+  confianza: z.number().min(0).max(1).optional(),
+})
+
+export const documentoCompraConfirmBodySchema = comprobanteCompraFieldsSchema
+  .extend({
+    documentoId: z.number().int().min(1),
+    items: z.array(documentoCompraItemPreviewSchema).optional(),
   })
   .superRefine((data, ctx) => {
     const f = data.fecha.trim()
@@ -1551,6 +1572,10 @@ export const comprobanteCompraBodySchema = z
       ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'fecha is required', path: ['fecha'] })
     }
   })
+
+export const documentoCompraTemplateBodySchema = z.object({
+  content: z.string().min(20, 'YAML template content is required'),
+})
 
 export const facturaPendienteEstadoSchema = z.enum([
   'pendiente',

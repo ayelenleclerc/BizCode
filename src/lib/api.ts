@@ -1821,6 +1821,168 @@ export type ComprobanteCompraInputDTO = {
   vencimiento?: string
 }
 
+export type DocumentoCompraItemPreviewDTO = {
+  descripcion: string
+  cantidad: number
+  precioUnitario: number
+  subtotal: number
+  articuloId?: number | null
+  confianza?: number
+}
+
+export type DocumentoCompraPreviewDataDTO = {
+  proveedorId: number | null
+  fecha: string | null
+  vencimiento: string | null
+  tipo: 'A' | 'B' | 'C' | null
+  prefijo: string | null
+  numero: number | null
+  neto1: number
+  neto2: number
+  neto3: number
+  iva1: number
+  iva2: number
+  total: number | null
+  cae: string | null
+  caeVto: string | null
+  items: DocumentoCompraItemPreviewDTO[]
+  fieldConfidence: Record<string, number>
+}
+
+export type DocumentoCompraImportadoRow = {
+  id: number
+  tenantId: number
+  usuarioId: number
+  archivoNombre: string
+  archivoMime: string
+  archivoPath: string
+  tipoArchivo: string
+  tier: number
+  confianza: string | number
+  estado: string
+  datosExtraidos: DocumentoCompraPreviewDataDTO
+  comprobanteCompraId: number | null
+  errores: unknown
+  createdAt: string
+  updatedAt: string
+}
+
+export type DocumentoCompraConfirmInputDTO = ComprobanteCompraInputDTO & {
+  documentoId: number
+  items?: DocumentoCompraItemPreviewDTO[]
+}
+
+export type DocumentoCompraColaEstadoDTO = {
+  procesando: number
+  pendiente_revision: number
+  confirmado: number
+  descartado: number
+  documentos: DocumentoCompraImportadoRow[]
+}
+
+export type DocumentoCompraTemplateSummaryDTO = {
+  issuer: string
+  keywords: string[]
+  source: 'bundled' | 'custom'
+}
+
+export type DocumentoCompraTemplateDTO = {
+  issuer: string
+  keywords: string[]
+  fields: Record<string, unknown>
+}
+
+export const documentosCompraAPI = {
+  procesar: async (file: File): Promise<DocumentoCompraImportadoRow> => {
+    try {
+      const form = new FormData()
+      form.append('file', file)
+      const response = await api.post<{ success: boolean; data: DocumentoCompraImportadoRow }>(
+        '/documentos-compra/procesar',
+        form,
+        { headers: { 'Content-Type': 'multipart/form-data' } },
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  confirmar: async (
+    body: DocumentoCompraConfirmInputDTO,
+  ): Promise<{ documento: DocumentoCompraImportadoRow; comprobanteCompra: { id: number } }> => {
+    try {
+      const response = await api.post<{
+        success: boolean
+        data: { documento: DocumentoCompraImportadoRow; comprobanteCompra: { id: number } }
+      }>('/documentos-compra/confirmar', body)
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  procesarLote: async (files: File[]): Promise<DocumentoCompraImportadoRow[]> => {
+    try {
+      const form = new FormData()
+      for (const file of files) {
+        form.append('files', file)
+      }
+      const response = await api.post<{ success: boolean; data: DocumentoCompraImportadoRow[] }>(
+        '/documentos-compra/procesar-lote',
+        form,
+        { headers: { 'Content-Type': 'multipart/form-data' } },
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  getCola: async (): Promise<DocumentoCompraColaEstadoDTO> => {
+    try {
+      const response = await api.get<{ success: boolean; data: DocumentoCompraColaEstadoDTO }>(
+        '/documentos-compra/cola',
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  listTemplates: async (): Promise<DocumentoCompraTemplateSummaryDTO[]> => {
+    try {
+      const response = await api.get<{ success: boolean; data: DocumentoCompraTemplateSummaryDTO[] }>(
+        '/documentos-compra/templates',
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  saveTemplate: async (content: string): Promise<DocumentoCompraTemplateDTO> => {
+    try {
+      const response = await api.post<{ success: boolean; data: DocumentoCompraTemplateDTO }>(
+        '/documentos-compra/templates',
+        { content },
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  downloadOriginal: async (id: number): Promise<Blob> => {
+    try {
+      const response = await api.get(`/documentos-compra/${id}/original`, { responseType: 'blob' })
+      return response.data as Blob
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+}
+
 export type FacturaPendienteEstado =
   | 'pendiente'
   | 'proxima_vencer'

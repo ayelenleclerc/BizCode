@@ -3,9 +3,9 @@
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
   "version": 1,
-  "serialNumber": "urn:uuid:317f1a3b-4dd8-41c3-90e4-aae476f9e74c",
+  "serialNumber": "urn:uuid:3817ca56-2a73-401a-a751-f073d70bcc2b",
   "metadata": {
-    "timestamp": "2026-06-08T13:26:33.684Z",
+    "timestamp": "2026-06-08T15:45:56.967Z",
     "tools": {
       "components": [
         {
@@ -1361,6 +1361,40 @@
     },
     {
       "type": "library",
+      "name": "jsqr",
+      "version": "1.4.0",
+      "bom-ref": "bizcode@0.1.0|jsqr@1.4.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/jsqr@1.4.0",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/jsqr/-/jsqr-1.4.0.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "7712e86fbabae578360efb2d624469918b662a6dac3c9f68161ae19ae753d5d66f34515396ba1a8b70164a92decbfc39bcc70b057460389b1b5e974df47cd4fc"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/jsqr"
+        }
+      ]
+    },
+    {
+      "type": "library",
       "name": "leaflet",
       "version": "1.9.4",
       "bom-ref": "bizcode@0.1.0|leaflet@1.9.4",
@@ -1941,6 +1975,40 @@
     },
     {
       "type": "library",
+      "name": "sharp",
+      "version": "0.34.5",
+      "bom-ref": "bizcode@0.1.0|sharp@0.34.5",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/sharp@0.34.5",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/sharp/-/sharp-0.34.5.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "3aef48e45b7d58d7026d7ad4f5c3203c17022bc2e2c0ba9c6f2c16dede280d5dfb9f5a73a6e34bb1888057c78e0e78dbb509520f067671411e433e04e781e5b6"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/sharp"
+        }
+      ]
+    },
+    {
+      "type": "library",
       "name": "swagger-ui-express",
       "version": "5.0.1",
       "bom-ref": "bizcode@0.1.0|swagger-ui-express@5.0.1",
@@ -1970,6 +2038,40 @@
         {
           "name": "cdx:npm:package:path",
           "value": "node_modules/swagger-ui-express"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "tesseract.js",
+      "version": "7.0.0",
+      "bom-ref": "bizcode@0.1.0|tesseract.js@7.0.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/tesseract.js@7.0.0",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/tesseract.js/-/tesseract.js-7.0.0.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "7b13c191dfb3fb033506e324c7f063bf8dce78b07184be64296b33ffd258f835dc5dd8818e201c874578f50477a0026a09a2f9a94444d2fc7d128f86e5813b98"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/tesseract.js"
         }
       ]
     },
@@ -2074,6 +2176,40 @@
               "value": "node_modules/twilio/node_modules/agent-base"
             }
           ]
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "unpdf",
+      "version": "1.6.2",
+      "bom-ref": "bizcode@0.1.0|unpdf@1.6.2",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/unpdf@1.6.2",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/unpdf/-/unpdf-1.6.2.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "cd0f34c92a0fb8f1ceb2f228469fe727242df13394a13875f9604219c06f95d7503602832d1c26d00637c7c437e48efe9088914a0a8cc7e31ada997d31c229ec"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/unpdf"
         }
       ]
     },
@@ -5556,6 +5692,965 @@
     },
     {
       "type": "library",
+      "name": "colour",
+      "group": "@img",
+      "version": "1.1.0",
+      "bom-ref": "bizcode@0.1.0|@img/colour@1.1.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/%40img/colour@1.1.0",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/@img/colour/-/colour-1.1.0.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "4ddefaabb8f9ee8fed2d57604bbe3a7180117d2cb193c8847d1c5ec0bf61e0e3336216d6e1301ca69974993e1ecaa5dd761e8bfe3c2833be66a3b8b16bfa4279"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/@img/colour"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "sharp-darwin-arm64",
+      "group": "@img",
+      "version": "0.34.5",
+      "bom-ref": "bizcode@0.1.0|@img/sharp-darwin-arm64@0.34.5",
+      "scope": "optional",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/%40img/sharp-darwin-arm64@0.34.5",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/@img/sharp-darwin-arm64/-/sharp-darwin-arm64-0.34.5.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "8a6b50dd63095db318e1fc5bfcd769e87053355b5609423459da1bca17867f9f9a77ac57f152033bcbb6c44e2a73f7ebd3c08a1bfedd0ec785b67e8cea0febdf"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/@img/sharp-darwin-arm64"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "sharp-darwin-x64",
+      "group": "@img",
+      "version": "0.34.5",
+      "bom-ref": "bizcode@0.1.0|@img/sharp-darwin-x64@0.34.5",
+      "scope": "optional",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/%40img/sharp-darwin-x64@0.34.5",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/@img/sharp-darwin-x64/-/sharp-darwin-x64-0.34.5.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "60d105005ff8290fcf796d0dfabf9a555b28218d3fab1c62905d9259da7e351926301ef2f4b059015a90e328460a6fc7dc7dbbd0e4b292a99030a2c184124313"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/@img/sharp-darwin-x64"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "sharp-libvips-darwin-arm64",
+      "group": "@img",
+      "version": "1.2.4",
+      "bom-ref": "bizcode@0.1.0|@img/sharp-libvips-darwin-arm64@1.2.4",
+      "scope": "optional",
+      "licenses": [
+        {
+          "license": {
+            "id": "LGPL-3.0-or-later",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/%40img/sharp-libvips-darwin-arm64@1.2.4",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/@img/sharp-libvips-darwin-arm64/-/sharp-libvips-darwin-arm64-1.2.4.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "cea8e3a3b45ab457c5a0fd0c910e758dfb856419d5136a5189ac9d289d46feb1d9be7b2b1c039c4002c88bdb00e5ca39c5e9d0753ba00afb5bd5cb9fefc55fe2"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/@img/sharp-libvips-darwin-arm64"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "sharp-libvips-darwin-x64",
+      "group": "@img",
+      "version": "1.2.4",
+      "bom-ref": "bizcode@0.1.0|@img/sharp-libvips-darwin-x64@1.2.4",
+      "scope": "optional",
+      "licenses": [
+        {
+          "license": {
+            "id": "LGPL-3.0-or-later",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/%40img/sharp-libvips-darwin-x64@1.2.4",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/@img/sharp-libvips-darwin-x64/-/sharp-libvips-darwin-x64-1.2.4.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "d4839de717d58651b05fecd7bf637dde4d3230e36f52500dca56c9c357936a1f0afc9b698b5e4a0be59289a5ff9c199b9b61f144cd606749d27634acad96c62a"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/@img/sharp-libvips-darwin-x64"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "sharp-libvips-linux-arm",
+      "group": "@img",
+      "version": "1.2.4",
+      "bom-ref": "bizcode@0.1.0|@img/sharp-libvips-linux-arm@1.2.4",
+      "scope": "optional",
+      "licenses": [
+        {
+          "license": {
+            "id": "LGPL-3.0-or-later",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/%40img/sharp-libvips-linux-arm@1.2.4",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/@img/sharp-libvips-linux-arm/-/sharp-libvips-linux-arm-1.2.4.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "6c523bc5c28510b762342568bfc7b8e086b8bb66f203e9775edb008fe43cb5f0b03ba050f220e88d876fa0f32ab0a0e4ba83a8f97e87640d2cd2ad7500d310f0"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/@img/sharp-libvips-linux-arm"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "sharp-libvips-linux-arm64",
+      "group": "@img",
+      "version": "1.2.4",
+      "bom-ref": "bizcode@0.1.0|@img/sharp-libvips-linux-arm64@1.2.4",
+      "scope": "optional",
+      "licenses": [
+        {
+          "license": {
+            "id": "LGPL-3.0-or-later",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/%40img/sharp-libvips-linux-arm64@1.2.4",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/@img/sharp-libvips-linux-arm64/-/sharp-libvips-linux-arm64-1.2.4.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "7b17235fc0dfb08709d74c752b3af845c59ed5e742f4faae0d144fc776150af42ff94e69ed88a7dacdf67edce2917a236f53c815cffd32ddbcff2fa2464964af"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/@img/sharp-libvips-linux-arm64"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "sharp-libvips-linux-ppc64",
+      "group": "@img",
+      "version": "1.2.4",
+      "bom-ref": "bizcode@0.1.0|@img/sharp-libvips-linux-ppc64@1.2.4",
+      "scope": "optional",
+      "licenses": [
+        {
+          "license": {
+            "id": "LGPL-3.0-or-later",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/%40img/sharp-libvips-linux-ppc64@1.2.4",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/@img/sharp-libvips-linux-ppc64/-/sharp-libvips-linux-ppc64-1.2.4.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "14cbaf1a28cb0d81ba956f9bfd4bf28a5516bb9032bbedebd9dd52f27a2d886088c9853fefa7a283551f326919eefc203abccace541b152b907e09bb19850fa4"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/@img/sharp-libvips-linux-ppc64"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "sharp-libvips-linux-riscv64",
+      "group": "@img",
+      "version": "1.2.4",
+      "bom-ref": "bizcode@0.1.0|@img/sharp-libvips-linux-riscv64@1.2.4",
+      "scope": "optional",
+      "licenses": [
+        {
+          "license": {
+            "id": "LGPL-3.0-or-later",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/%40img/sharp-libvips-linux-riscv64@1.2.4",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/@img/sharp-libvips-linux-riscv64/-/sharp-libvips-linux-riscv64-1.2.4.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "a150db711e33502d1c7bcdad7ae6d29bec7a1138b1b4a64187fa9b44420e708ddc50bcc3c9bd7c4abfd6732c7b35141e4333a21d335b6451755303d2dac73218"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/@img/sharp-libvips-linux-riscv64"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "sharp-libvips-linux-s390x",
+      "group": "@img",
+      "version": "1.2.4",
+      "bom-ref": "bizcode@0.1.0|@img/sharp-libvips-linux-s390x@1.2.4",
+      "scope": "optional",
+      "licenses": [
+        {
+          "license": {
+            "id": "LGPL-3.0-or-later",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/%40img/sharp-libvips-linux-s390x@1.2.4",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/@img/sharp-libvips-linux-s390x/-/sharp-libvips-linux-s390x-1.2.4.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "aa6a7d56bce03e0328199c8fbeb407aa4d36bb28c0d3f42b4cedba4ea93a978655d0c3d6216e8b4e4a8e228bfe275c84bbb31b150683a7077024a85b26fb91c5"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/@img/sharp-libvips-linux-s390x"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "sharp-libvips-linux-x64",
+      "group": "@img",
+      "version": "1.2.4",
+      "bom-ref": "bizcode@0.1.0|@img/sharp-libvips-linux-x64@1.2.4",
+      "scope": "optional",
+      "licenses": [
+        {
+          "license": {
+            "id": "LGPL-3.0-or-later",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/%40img/sharp-libvips-linux-x64@1.2.4",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/@img/sharp-libvips-linux-x64/-/sharp-libvips-linux-x64-1.2.4.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "b49c6288bb261dcf40c756f3de868e6015114d718844338306a86f7951e89eb1c9f7ffa4f3da9b2e5d1b7099ecf9ee2de2bbda341c5a119b05b527c076ab8faf"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/@img/sharp-libvips-linux-x64"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "sharp-libvips-linuxmusl-arm64",
+      "group": "@img",
+      "version": "1.2.4",
+      "bom-ref": "bizcode@0.1.0|@img/sharp-libvips-linuxmusl-arm64@1.2.4",
+      "scope": "optional",
+      "licenses": [
+        {
+          "license": {
+            "id": "LGPL-3.0-or-later",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/%40img/sharp-libvips-linuxmusl-arm64@1.2.4",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/@img/sharp-libvips-linuxmusl-arm64/-/sharp-libvips-linuxmusl-arm64-1.2.4.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "155407bb0c75208b8da30f5001b614cc9f849fc29c566f4b939fae1944091da66630409998e962c7d1e71fb9f54d1917312d291b1209a2421507d4aea991865f"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/@img/sharp-libvips-linuxmusl-arm64"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "sharp-libvips-linuxmusl-x64",
+      "group": "@img",
+      "version": "1.2.4",
+      "bom-ref": "bizcode@0.1.0|@img/sharp-libvips-linuxmusl-x64@1.2.4",
+      "scope": "optional",
+      "licenses": [
+        {
+          "license": {
+            "id": "LGPL-3.0-or-later",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/%40img/sharp-libvips-linuxmusl-x64@1.2.4",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/@img/sharp-libvips-linuxmusl-x64/-/sharp-libvips-linuxmusl-x64-1.2.4.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "f8ba72064ecbe386485f0cff5587e095a5ffa24c5ecc449ce94c434a8ca8d8ab3a27173863bb068e9814f6ce0f320aa08e3d60642ca54e278d6a6a80d4c17b0e"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/@img/sharp-libvips-linuxmusl-x64"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "sharp-linux-arm",
+      "group": "@img",
+      "version": "0.34.5",
+      "bom-ref": "bizcode@0.1.0|@img/sharp-linux-arm@0.34.5",
+      "scope": "optional",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/%40img/sharp-linux-arm@0.34.5",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/@img/sharp-linux-arm/-/sharp-linux-arm-0.34.5.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "f5d2eab2fc2d835bae5c11992acc5e9bde7de7eba3bf4b09e958bcc1c4c0352169c15fc638d6ade5e0a4cd0a3fd4eeb3448921d26ffcfb9063ad1afb8c351267"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/@img/sharp-linux-arm"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "sharp-linux-arm64",
+      "group": "@img",
+      "version": "0.34.5",
+      "bom-ref": "bizcode@0.1.0|@img/sharp-linux-arm64@0.34.5",
+      "scope": "optional",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/%40img/sharp-linux-arm64@0.34.5",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/@img/sharp-linux-arm64/-/sharp-linux-arm64-0.34.5.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "6ca433689458fdb90f397c8ac79115ba9eea91aa231021ba34b62cc2092d3998da5de71201e096899c308857f7fd8f8ed47adaba2137155b06c4583c736e2b66"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/@img/sharp-linux-arm64"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "sharp-linux-ppc64",
+      "group": "@img",
+      "version": "0.34.5",
+      "bom-ref": "bizcode@0.1.0|@img/sharp-linux-ppc64@0.34.5",
+      "scope": "optional",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/%40img/sharp-linux-ppc64@0.34.5",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/@img/sharp-linux-ppc64/-/sharp-linux-ppc64-0.34.5.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "ef3ce7c0d6aa5ba62db1fac618303a05190848a000135268d107693585cd307bb6fb4753acf7e54cb364a5cf25ecc50fe4cd7a649714bf2b15596acc79f66ab8"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/@img/sharp-linux-ppc64"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "sharp-linux-riscv64",
+      "group": "@img",
+      "version": "0.34.5",
+      "bom-ref": "bizcode@0.1.0|@img/sharp-linux-riscv64@0.34.5",
+      "scope": "optional",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/%40img/sharp-linux-riscv64@0.34.5",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/@img/sharp-linux-riscv64/-/sharp-linux-riscv64-0.34.5.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "e75809b8b3d329aee98983da56cf06981ca8eff53bffb4d93aaf9c9d72481d929abc844700fefb7b73761c49777608aa743ff0d3251f8899c823becfb830c577"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/@img/sharp-linux-riscv64"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "sharp-linux-s390x",
+      "group": "@img",
+      "version": "0.34.5",
+      "bom-ref": "bizcode@0.1.0|@img/sharp-linux-s390x@0.34.5",
+      "scope": "optional",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/%40img/sharp-linux-s390x@0.34.5",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/@img/sharp-linux-s390x/-/sharp-linux-s390x-0.34.5.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "9d0b429343dd29f868dde0b932b6d0a22809da07750a075d50c91a6d48feac17afb3cb59d9c50b3b1e3a13ba325fed385867c006023098c0b456a89e4e24788e"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/@img/sharp-linux-s390x"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "sharp-linux-x64",
+      "group": "@img",
+      "version": "0.34.5",
+      "bom-ref": "bizcode@0.1.0|@img/sharp-linux-x64@0.34.5",
+      "scope": "optional",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/%40img/sharp-linux-x64@0.34.5",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/@img/sharp-linux-x64/-/sharp-linux-x64-0.34.5.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "304cddf073cac55c557a7c006be2513f0102ed0163a0f5ae4b93599c1b7a077a6eec41b619ed22775a0b1d9a4f25d9f73902be0500e2c3dcd2b621c14c941041"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/@img/sharp-linux-x64"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "sharp-linuxmusl-arm64",
+      "group": "@img",
+      "version": "0.34.5",
+      "bom-ref": "bizcode@0.1.0|@img/sharp-linuxmusl-arm64@0.34.5",
+      "scope": "optional",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/%40img/sharp-linuxmusl-arm64@0.34.5",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/@img/sharp-linuxmusl-arm64/-/sharp-linuxmusl-arm64-0.34.5.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "7e9ac947a1ad46c32de8ac9fab8e08b0285565e18df7b8130f7df5c1e4757b1d5cd6bca90c400137a4e6db16b5c04ea561be437449e4d373593ea03b21ddb5ca"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/@img/sharp-linuxmusl-arm64"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "sharp-linuxmusl-x64",
+      "group": "@img",
+      "version": "0.34.5",
+      "bom-ref": "bizcode@0.1.0|@img/sharp-linuxmusl-x64@0.34.5",
+      "scope": "optional",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/%40img/sharp-linuxmusl-x64@0.34.5",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/@img/sharp-linuxmusl-x64/-/sharp-linuxmusl-x64-0.34.5.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "260f30353d4c53322f841171562aab1215831b3ab29a8dec57bcfb66c6966d93432d7449668446ae3ba5a7ad1862d578c1f63c54829c5a2763a2394b716addf1"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/@img/sharp-linuxmusl-x64"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "sharp-wasm32",
+      "group": "@img",
+      "version": "0.34.5",
+      "bom-ref": "bizcode@0.1.0|@img/sharp-wasm32@0.34.5",
+      "scope": "optional",
+      "licenses": [
+        {
+          "expression": "Apache-2.0 AND LGPL-3.0-or-later AND MIT",
+          "acknowledgement": "declared"
+        }
+      ],
+      "purl": "pkg:npm/%40img/sharp-wasm32@0.34.5",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/@img/sharp-wasm32/-/sharp-wasm32-0.34.5.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "39d5931225646363c7c2a91b048f1fac5c504057a41da492914209930cdc95665eeb83b55f8525523aaaa8b68f6d4a4c39093a141bbf1ed9465cd6e522cd21bb"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/@img/sharp-wasm32"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "sharp-win32-arm64",
+      "group": "@img",
+      "version": "0.34.5",
+      "bom-ref": "bizcode@0.1.0|@img/sharp-win32-arm64@0.34.5",
+      "scope": "optional",
+      "licenses": [
+        {
+          "expression": "Apache-2.0 AND LGPL-3.0-or-later",
+          "acknowledgement": "declared"
+        }
+      ],
+      "purl": "pkg:npm/%40img/sharp-win32-arm64@0.34.5",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/@img/sharp-win32-arm64/-/sharp-win32-arm64-0.34.5.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "590dc08160966126f6cadf881bc9a70ba25d93d5a1b3b3b4831a616e5b0bbdd852a524ed9aeebd646d4691be8dbafc6c3400b088f57a70d499373b7428fb30ee"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/@img/sharp-win32-arm64"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "sharp-win32-ia32",
+      "group": "@img",
+      "version": "0.34.5",
+      "bom-ref": "bizcode@0.1.0|@img/sharp-win32-ia32@0.34.5",
+      "scope": "optional",
+      "licenses": [
+        {
+          "expression": "Apache-2.0 AND LGPL-3.0-or-later",
+          "acknowledgement": "declared"
+        }
+      ],
+      "purl": "pkg:npm/%40img/sharp-win32-ia32@0.34.5",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/@img/sharp-win32-ia32/-/sharp-win32-ia32-0.34.5.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "155f66ffb3667829921c30f98f8fb8a4d23c0a9dda5be26f2e85dc4d4a3422aca349f01927c7485268a3c75a9a26c22253e1e8b30eb13392a28c05912424a036"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/@img/sharp-win32-ia32"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "sharp-win32-x64",
+      "group": "@img",
+      "version": "0.34.5",
+      "bom-ref": "bizcode@0.1.0|@img/sharp-win32-x64@0.34.5",
+      "scope": "optional",
+      "licenses": [
+        {
+          "expression": "Apache-2.0 AND LGPL-3.0-or-later",
+          "acknowledgement": "declared"
+        }
+      ],
+      "purl": "pkg:npm/%40img/sharp-win32-x64@0.34.5",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/@img/sharp-win32-x64/-/sharp-win32-x64-0.34.5.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "fb6f5832ca98dbff5e144896f777aa5a7b8b71672e7e8c177b0c123484fa53065d5140ab337a058cc587fd9ebf4cc99be219457a799f0156e959eba9da3af20b"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/@img/sharp-win32-x64"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "detect-libc",
+      "version": "2.1.2",
+      "bom-ref": "bizcode@0.1.0|detect-libc@2.1.2",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/detect-libc@2.1.2",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/detect-libc/-/detect-libc-2.1.2.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "06d8f604e38ef37a375b21f9f5ef0c817b3111055c6ab9143a9118aee6c1d2eaf09cdd74c90dfae2bb22072535d67665a966199b4e62fe87fb8a8e26ce2841b5"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/detect-libc"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "semver",
+      "version": "7.7.4",
+      "bom-ref": "bizcode@0.1.0|semver@7.7.4",
+      "licenses": [
+        {
+          "license": {
+            "id": "ISC",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/semver@7.7.4",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/semver/-/semver-7.7.4.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "bc5282d8812d427561a53efc875629f30cf0adff0233e33328c1c62597c1b738593727111675ec1e4e84e53c4892432c80d4bb99d5f700607bc7640cd9d8b894"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/semver"
+        }
+      ]
+    },
+    {
+      "type": "library",
       "name": "swagger-ui-dist",
       "version": "5.32.1",
       "bom-ref": "bizcode@0.1.0|swagger-ui-dist@5.32.1",
@@ -5585,6 +6680,416 @@
         {
           "name": "cdx:npm:package:path",
           "value": "node_modules/swagger-ui-dist"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "bmp-js",
+      "version": "0.1.0",
+      "bom-ref": "bizcode@0.1.0|bmp-js@0.1.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/bmp-js@0.1.0",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/bmp-js/-/bmp-js-0.1.0.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "bc7752d7d0a763787088d7646aa93ddc3be354b7db11c23c9b2b38523b96ae55f585a0e6ae8a3ca38c42ce1e300fa0c657a1f1442c9abb084746a3137c446d8f"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/bmp-js"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "idb-keyval",
+      "version": "6.2.5",
+      "bom-ref": "bizcode@0.1.0|idb-keyval@6.2.5",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/idb-keyval@6.2.5",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/idb-keyval/-/idb-keyval-6.2.5.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "78a4244e74b4ade958b12398a26c7ca3321b99db1008a51d872b88690d836602ae6b1b72410324c83ff096740ddf6a4edf2bad3756f52fcbaac1c0ca68977bfd"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/idb-keyval"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "is-url",
+      "version": "1.2.4",
+      "bom-ref": "bizcode@0.1.0|is-url@1.2.4",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/is-url@1.2.4",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/is-url/-/is-url-1.2.4.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "213bc68a6f058518987b8210e6e1d2923ee955a3c3ac24e435ddf2ab7715ee26407097474d430f3041dca923b2f7167da857a7402be2fb6c231fd6b59d7a87c3"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/is-url"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "node-fetch",
+      "version": "2.7.0",
+      "bom-ref": "bizcode@0.1.0|node-fetch@2.7.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/node-fetch@2.7.0",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/node-fetch/-/node-fetch-2.7.0.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "7381517d49bf75b71667b53ed56ab40300b214bfb79edd9b130d39c1fc52cfe0d6a56b22b609928189b2d9d41d5b2282d7af7810b3ea32cfd8cd448da332edf0"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/node-fetch"
+        }
+      ],
+      "components": [
+        {
+          "type": "library",
+          "name": "whatwg-url",
+          "version": "5.0.0",
+          "bom-ref": "bizcode@0.1.0|node-fetch@2.7.0|whatwg-url@5.0.0",
+          "licenses": [
+            {
+              "license": {
+                "id": "MIT",
+                "acknowledgement": "declared"
+              }
+            }
+          ],
+          "purl": "pkg:npm/whatwg-url@5.0.0",
+          "externalReferences": [
+            {
+              "url": "https://registry.npmjs.org/whatwg-url/-/whatwg-url-5.0.0.tgz",
+              "type": "distribution",
+              "hashes": [
+                {
+                  "alg": "SHA-512",
+                  "content": "b1a139ee7ba9c64eafdc7637e7e8f307061ad2b292cb45d1f094b164fc202ebef2b34201ce11af880d7f4d41892e6495aacf296fd027bc809712e3872e9ad84f"
+                }
+              ],
+              "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+            }
+          ],
+          "properties": [
+            {
+              "name": "cdx:npm:package:path",
+              "value": "node_modules/node-fetch/node_modules/whatwg-url"
+            }
+          ]
+        },
+        {
+          "type": "library",
+          "name": "tr46",
+          "version": "0.0.3",
+          "bom-ref": "bizcode@0.1.0|node-fetch@2.7.0|tr46@0.0.3",
+          "licenses": [
+            {
+              "license": {
+                "id": "MIT",
+                "acknowledgement": "declared"
+              }
+            }
+          ],
+          "purl": "pkg:npm/tr46@0.0.3",
+          "externalReferences": [
+            {
+              "url": "https://registry.npmjs.org/tr46/-/tr46-0.0.3.tgz",
+              "type": "distribution",
+              "hashes": [
+                {
+                  "alg": "SHA-512",
+                  "content": "37758cb2ea95eba953df40ab5cd6c48f1e06130968c37bfaaebe2609cbfaa6b9dfc214b4d6b920c857633cd05877d6ebecba57575f849a1d357c79ead86760af"
+                }
+              ],
+              "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+            }
+          ],
+          "properties": [
+            {
+              "name": "cdx:npm:package:path",
+              "value": "node_modules/node-fetch/node_modules/tr46"
+            }
+          ]
+        },
+        {
+          "type": "library",
+          "name": "webidl-conversions",
+          "version": "3.0.1",
+          "bom-ref": "bizcode@0.1.0|node-fetch@2.7.0|webidl-conversions@3.0.1",
+          "licenses": [
+            {
+              "license": {
+                "id": "BSD-2-Clause",
+                "acknowledgement": "declared"
+              }
+            }
+          ],
+          "purl": "pkg:npm/webidl-conversions@3.0.1",
+          "externalReferences": [
+            {
+              "url": "https://registry.npmjs.org/webidl-conversions/-/webidl-conversions-3.0.1.tgz",
+              "type": "distribution",
+              "hashes": [
+                {
+                  "alg": "SHA-512",
+                  "content": "d89027df3f0047aae32bc4a6f28ad10b487f6dc97f0ea2fbb513dd199e08d428dd17e11a30b998c411f25ee28bf38f5eb9c3c586f068c4cb1f95f39bf24c5a79"
+                }
+              ],
+              "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+            }
+          ],
+          "properties": [
+            {
+              "name": "cdx:npm:package:path",
+              "value": "node_modules/node-fetch/node_modules/webidl-conversions"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "opencollective-postinstall",
+      "version": "2.0.3",
+      "bom-ref": "bizcode@0.1.0|opencollective-postinstall@2.0.3",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/opencollective-postinstall@2.0.3",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/opencollective-postinstall/-/opencollective-postinstall-2.0.3.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "f0057fb02b6ecd4793a3c8102b9a83673011aee941dde82d2f3160b5ea81dad713e0cc3b07c2adec97031e696d8f3e853801ecbd37af93bd206446e1338652f5"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/opencollective-postinstall"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "regenerator-runtime",
+      "version": "0.13.11",
+      "bom-ref": "bizcode@0.1.0|regenerator-runtime@0.13.11",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/regenerator-runtime@0.13.11",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/regenerator-runtime/-/regenerator-runtime-0.13.11.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "918d40655af645afadfa9895689e20c5a15a45e6551f8d0028da3b5025fa5be744c01a3fda8649cea7ee375a8bab5a0be39a39e9c3da4d710bc2b4e1f05a6082"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/regenerator-runtime"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "tesseract.js-core",
+      "version": "7.0.0",
+      "bom-ref": "bizcode@0.1.0|tesseract.js-core@7.0.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/tesseract.js-core@7.0.0",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/tesseract.js-core/-/tesseract.js-core-7.0.0.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "5a7347e75f0dce66d2abdce04cf7a817c73ec668a54bcac5225d5829b93fa6dbae73ba7a70b3442cdb8f033726b18c38e7471ae9b2daf23dedd1502dab8df957"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/tesseract.js-core"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "wasm-feature-detect",
+      "version": "1.8.0",
+      "bom-ref": "bizcode@0.1.0|wasm-feature-detect@1.8.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/wasm-feature-detect@1.8.0",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/wasm-feature-detect/-/wasm-feature-detect-1.8.0.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "ce4b1a2ca3367d59670798d0403a8a5d7c181cb414547f5eb3ee5338e1f018e54938279104288f8f04a0fb7b4dd807530b38e0962e238a3087dbdd245dbff359"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/wasm-feature-detect"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "zlibjs",
+      "version": "0.3.1",
+      "bom-ref": "bizcode@0.1.0|zlibjs@0.3.1",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/zlibjs@0.3.1",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/zlibjs/-/zlibjs-0.3.1.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "f89f51ae04ca3a69711520c7a34a48d7133a04b554bfea34653f4036d0b11a48c8542094771f5a95417c1a6f9d18b29b9249227562071436470cca5f213b78fb"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/zlibjs"
         }
       ]
     },
@@ -8979,6 +10484,42 @@
     },
     {
       "type": "library",
+      "name": "runtime",
+      "group": "@emnapi",
+      "version": "1.11.0",
+      "bom-ref": "bizcode@0.1.0|@emnapi/runtime@1.11.0",
+      "scope": "optional",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/%40emnapi/runtime@1.11.0",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/@emnapi/runtime/-/runtime-1.11.0.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "e7972878e14a1efd72c047145c9b565397fe26bfd6e6d643bd98a0f032ca4b050dd49a51390e2b93f48d3908855a6691fd5285e33b85c96d41f0976e392bfa3e"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/@emnapi/runtime"
+        }
+      ]
+    },
+    {
+      "type": "library",
       "name": "scarf",
       "group": "@scarf",
       "version": "1.4.0",
@@ -9009,6 +10550,86 @@
         {
           "name": "cdx:npm:package:path",
           "value": "node_modules/@scarf/scarf"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "encoding",
+      "version": "0.1.13",
+      "bom-ref": "bizcode@0.1.0|encoding@0.1.13",
+      "scope": "optional",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/encoding@0.1.13",
+      "externalReferences": [
+        {
+          "url": "https://registry.npmjs.org/encoding/-/encoding-0.1.13.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "11305aba8c354f7e58fd664c922a3d8e2334679c631c7989e179a364eab597f757cf796bdac467f3b9c9cb6d11ba9a928751769b71c73d2a7c4a120f409ac9dc"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:development",
+          "value": "true"
+        },
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/encoding"
+        }
+      ],
+      "components": [
+        {
+          "type": "library",
+          "name": "iconv-lite",
+          "version": "0.6.3",
+          "bom-ref": "bizcode@0.1.0|encoding@0.1.13|iconv-lite@0.6.3",
+          "scope": "optional",
+          "licenses": [
+            {
+              "license": {
+                "id": "MIT",
+                "acknowledgement": "declared"
+              }
+            }
+          ],
+          "purl": "pkg:npm/iconv-lite@0.6.3",
+          "externalReferences": [
+            {
+              "url": "https://registry.npmjs.org/iconv-lite/-/iconv-lite-0.6.3.tgz",
+              "type": "distribution",
+              "hashes": [
+                {
+                  "alg": "SHA-512",
+                  "content": "e1f0a4efdc2c84c773329dab1f4eaa5ab244e22a25a8b842507f8e8ae22053ef91074fbde0d9432fcd5ab4eec65f9e6e50ab9ea34b711cdb6f13223a0fb59d33"
+                }
+              ],
+              "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+            }
+          ],
+          "properties": [
+            {
+              "name": "cdx:npm:package:development",
+              "value": "true"
+            },
+            {
+              "name": "cdx:npm:package:path",
+              "value": "node_modules/encoding/node_modules/iconv-lite"
+            }
+          ]
         }
       ]
     },
@@ -9281,40 +10902,6 @@
         {
           "name": "cdx:npm:package:path",
           "value": "node_modules/lodash.once"
-        }
-      ]
-    },
-    {
-      "type": "library",
-      "name": "semver",
-      "version": "7.7.4",
-      "bom-ref": "bizcode@0.1.0|semver@7.7.4",
-      "licenses": [
-        {
-          "license": {
-            "id": "ISC",
-            "acknowledgement": "declared"
-          }
-        }
-      ],
-      "purl": "pkg:npm/semver@7.7.4",
-      "externalReferences": [
-        {
-          "url": "https://registry.npmjs.org/semver/-/semver-7.7.4.tgz",
-          "type": "distribution",
-          "hashes": [
-            {
-              "alg": "SHA-512",
-              "content": "bc5282d8812d427561a53efc875629f30cf0adff0233e33328c1c62597c1b738593727111675ec1e4e84e53c4892432c80d4bb99d5f700607bc7640cd9d8b894"
-            }
-          ],
-          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
-        }
-      ],
-      "properties": [
-        {
-          "name": "cdx:npm:package:path",
-          "value": "node_modules/semver"
         }
       ]
     },
@@ -12240,6 +13827,7 @@
         "bizcode@0.1.0|express@5.2.1",
         "bizcode@0.1.0|helmet@8.2.0",
         "bizcode@0.1.0|i18next@26.0.3",
+        "bizcode@0.1.0|jsqr@1.4.0",
         "bizcode@0.1.0|leaflet@1.9.4",
         "bizcode@0.1.0|multer@2.1.1",
         "bizcode@0.1.0|nodemailer@8.0.5",
@@ -12253,8 +13841,11 @@
         "bizcode@0.1.0|react-router-dom@6.30.3",
         "bizcode@0.1.0|react@18.3.1",
         "bizcode@0.1.0|recharts@3.8.1",
+        "bizcode@0.1.0|sharp@0.34.5",
         "bizcode@0.1.0|swagger-ui-express@5.0.1",
+        "bizcode@0.1.0|tesseract.js@7.0.0",
         "bizcode@0.1.0|twilio@5.13.1",
+        "bizcode@0.1.0|unpdf@1.6.2",
         "bizcode@0.1.0|yaml@2.8.3",
         "bizcode@0.1.0|zod@3.25.76",
         "bizcode@0.1.0|zustand@4.5.7"
@@ -12547,6 +14138,9 @@
       ]
     },
     {
+      "ref": "bizcode@0.1.0|jsqr@1.4.0"
+    },
+    {
       "ref": "bizcode@0.1.0|leaflet@1.9.4"
     },
     {
@@ -12683,10 +14277,56 @@
       ]
     },
     {
+      "ref": "bizcode@0.1.0|sharp@0.34.5",
+      "dependsOn": [
+        "bizcode@0.1.0|@img/colour@1.1.0",
+        "bizcode@0.1.0|@img/sharp-darwin-arm64@0.34.5",
+        "bizcode@0.1.0|@img/sharp-darwin-x64@0.34.5",
+        "bizcode@0.1.0|@img/sharp-libvips-darwin-arm64@1.2.4",
+        "bizcode@0.1.0|@img/sharp-libvips-darwin-x64@1.2.4",
+        "bizcode@0.1.0|@img/sharp-libvips-linux-arm@1.2.4",
+        "bizcode@0.1.0|@img/sharp-libvips-linux-arm64@1.2.4",
+        "bizcode@0.1.0|@img/sharp-libvips-linux-ppc64@1.2.4",
+        "bizcode@0.1.0|@img/sharp-libvips-linux-riscv64@1.2.4",
+        "bizcode@0.1.0|@img/sharp-libvips-linux-s390x@1.2.4",
+        "bizcode@0.1.0|@img/sharp-libvips-linux-x64@1.2.4",
+        "bizcode@0.1.0|@img/sharp-libvips-linuxmusl-arm64@1.2.4",
+        "bizcode@0.1.0|@img/sharp-libvips-linuxmusl-x64@1.2.4",
+        "bizcode@0.1.0|@img/sharp-linux-arm@0.34.5",
+        "bizcode@0.1.0|@img/sharp-linux-arm64@0.34.5",
+        "bizcode@0.1.0|@img/sharp-linux-ppc64@0.34.5",
+        "bizcode@0.1.0|@img/sharp-linux-riscv64@0.34.5",
+        "bizcode@0.1.0|@img/sharp-linux-s390x@0.34.5",
+        "bizcode@0.1.0|@img/sharp-linux-x64@0.34.5",
+        "bizcode@0.1.0|@img/sharp-linuxmusl-arm64@0.34.5",
+        "bizcode@0.1.0|@img/sharp-linuxmusl-x64@0.34.5",
+        "bizcode@0.1.0|@img/sharp-wasm32@0.34.5",
+        "bizcode@0.1.0|@img/sharp-win32-arm64@0.34.5",
+        "bizcode@0.1.0|@img/sharp-win32-ia32@0.34.5",
+        "bizcode@0.1.0|@img/sharp-win32-x64@0.34.5",
+        "bizcode@0.1.0|detect-libc@2.1.2",
+        "bizcode@0.1.0|semver@7.7.4"
+      ]
+    },
+    {
       "ref": "bizcode@0.1.0|swagger-ui-express@5.0.1",
       "dependsOn": [
         "bizcode@0.1.0|express@5.2.1",
         "bizcode@0.1.0|swagger-ui-dist@5.32.1"
+      ]
+    },
+    {
+      "ref": "bizcode@0.1.0|tesseract.js@7.0.0",
+      "dependsOn": [
+        "bizcode@0.1.0|bmp-js@0.1.0",
+        "bizcode@0.1.0|idb-keyval@6.2.5",
+        "bizcode@0.1.0|is-url@1.2.4",
+        "bizcode@0.1.0|node-fetch@2.7.0",
+        "bizcode@0.1.0|opencollective-postinstall@2.0.3",
+        "bizcode@0.1.0|regenerator-runtime@0.13.11",
+        "bizcode@0.1.0|tesseract.js-core@7.0.0",
+        "bizcode@0.1.0|wasm-feature-detect@1.8.0",
+        "bizcode@0.1.0|zlibjs@0.3.1"
       ]
     },
     {
@@ -12713,6 +14353,9 @@
       "dependsOn": [
         "bizcode@0.1.0|debug@4.4.3"
       ]
+    },
+    {
+      "ref": "bizcode@0.1.0|unpdf@1.6.2"
     },
     {
       "ref": "bizcode@0.1.0|yaml@2.8.3"
@@ -13263,10 +14906,168 @@
       ]
     },
     {
+      "ref": "bizcode@0.1.0|@img/colour@1.1.0"
+    },
+    {
+      "ref": "bizcode@0.1.0|@img/sharp-darwin-arm64@0.34.5",
+      "dependsOn": [
+        "bizcode@0.1.0|@img/sharp-libvips-darwin-arm64@1.2.4"
+      ]
+    },
+    {
+      "ref": "bizcode@0.1.0|@img/sharp-darwin-x64@0.34.5",
+      "dependsOn": [
+        "bizcode@0.1.0|@img/sharp-libvips-darwin-x64@1.2.4"
+      ]
+    },
+    {
+      "ref": "bizcode@0.1.0|@img/sharp-libvips-darwin-arm64@1.2.4"
+    },
+    {
+      "ref": "bizcode@0.1.0|@img/sharp-libvips-darwin-x64@1.2.4"
+    },
+    {
+      "ref": "bizcode@0.1.0|@img/sharp-libvips-linux-arm@1.2.4"
+    },
+    {
+      "ref": "bizcode@0.1.0|@img/sharp-libvips-linux-arm64@1.2.4"
+    },
+    {
+      "ref": "bizcode@0.1.0|@img/sharp-libvips-linux-ppc64@1.2.4"
+    },
+    {
+      "ref": "bizcode@0.1.0|@img/sharp-libvips-linux-riscv64@1.2.4"
+    },
+    {
+      "ref": "bizcode@0.1.0|@img/sharp-libvips-linux-s390x@1.2.4"
+    },
+    {
+      "ref": "bizcode@0.1.0|@img/sharp-libvips-linux-x64@1.2.4"
+    },
+    {
+      "ref": "bizcode@0.1.0|@img/sharp-libvips-linuxmusl-arm64@1.2.4"
+    },
+    {
+      "ref": "bizcode@0.1.0|@img/sharp-libvips-linuxmusl-x64@1.2.4"
+    },
+    {
+      "ref": "bizcode@0.1.0|@img/sharp-linux-arm@0.34.5",
+      "dependsOn": [
+        "bizcode@0.1.0|@img/sharp-libvips-linux-arm@1.2.4"
+      ]
+    },
+    {
+      "ref": "bizcode@0.1.0|@img/sharp-linux-arm64@0.34.5",
+      "dependsOn": [
+        "bizcode@0.1.0|@img/sharp-libvips-linux-arm64@1.2.4"
+      ]
+    },
+    {
+      "ref": "bizcode@0.1.0|@img/sharp-linux-ppc64@0.34.5",
+      "dependsOn": [
+        "bizcode@0.1.0|@img/sharp-libvips-linux-ppc64@1.2.4"
+      ]
+    },
+    {
+      "ref": "bizcode@0.1.0|@img/sharp-linux-riscv64@0.34.5",
+      "dependsOn": [
+        "bizcode@0.1.0|@img/sharp-libvips-linux-riscv64@1.2.4"
+      ]
+    },
+    {
+      "ref": "bizcode@0.1.0|@img/sharp-linux-s390x@0.34.5",
+      "dependsOn": [
+        "bizcode@0.1.0|@img/sharp-libvips-linux-s390x@1.2.4"
+      ]
+    },
+    {
+      "ref": "bizcode@0.1.0|@img/sharp-linux-x64@0.34.5",
+      "dependsOn": [
+        "bizcode@0.1.0|@img/sharp-libvips-linux-x64@1.2.4"
+      ]
+    },
+    {
+      "ref": "bizcode@0.1.0|@img/sharp-linuxmusl-arm64@0.34.5",
+      "dependsOn": [
+        "bizcode@0.1.0|@img/sharp-libvips-linuxmusl-arm64@1.2.4"
+      ]
+    },
+    {
+      "ref": "bizcode@0.1.0|@img/sharp-linuxmusl-x64@0.34.5",
+      "dependsOn": [
+        "bizcode@0.1.0|@img/sharp-libvips-linuxmusl-x64@1.2.4"
+      ]
+    },
+    {
+      "ref": "bizcode@0.1.0|@img/sharp-wasm32@0.34.5",
+      "dependsOn": [
+        "bizcode@0.1.0|@emnapi/runtime@1.11.0"
+      ]
+    },
+    {
+      "ref": "bizcode@0.1.0|@img/sharp-win32-arm64@0.34.5"
+    },
+    {
+      "ref": "bizcode@0.1.0|@img/sharp-win32-ia32@0.34.5"
+    },
+    {
+      "ref": "bizcode@0.1.0|@img/sharp-win32-x64@0.34.5"
+    },
+    {
+      "ref": "bizcode@0.1.0|detect-libc@2.1.2"
+    },
+    {
+      "ref": "bizcode@0.1.0|semver@7.7.4"
+    },
+    {
       "ref": "bizcode@0.1.0|swagger-ui-dist@5.32.1",
       "dependsOn": [
         "bizcode@0.1.0|@scarf/scarf@1.4.0"
       ]
+    },
+    {
+      "ref": "bizcode@0.1.0|bmp-js@0.1.0"
+    },
+    {
+      "ref": "bizcode@0.1.0|idb-keyval@6.2.5"
+    },
+    {
+      "ref": "bizcode@0.1.0|is-url@1.2.4"
+    },
+    {
+      "ref": "bizcode@0.1.0|node-fetch@2.7.0",
+      "dependsOn": [
+        "bizcode@0.1.0|encoding@0.1.13",
+        "bizcode@0.1.0|node-fetch@2.7.0|whatwg-url@5.0.0"
+      ]
+    },
+    {
+      "ref": "bizcode@0.1.0|node-fetch@2.7.0|whatwg-url@5.0.0",
+      "dependsOn": [
+        "bizcode@0.1.0|node-fetch@2.7.0|tr46@0.0.3",
+        "bizcode@0.1.0|node-fetch@2.7.0|webidl-conversions@3.0.1"
+      ]
+    },
+    {
+      "ref": "bizcode@0.1.0|node-fetch@2.7.0|tr46@0.0.3"
+    },
+    {
+      "ref": "bizcode@0.1.0|node-fetch@2.7.0|webidl-conversions@3.0.1"
+    },
+    {
+      "ref": "bizcode@0.1.0|opencollective-postinstall@2.0.3"
+    },
+    {
+      "ref": "bizcode@0.1.0|regenerator-runtime@0.13.11"
+    },
+    {
+      "ref": "bizcode@0.1.0|tesseract.js-core@7.0.0"
+    },
+    {
+      "ref": "bizcode@0.1.0|wasm-feature-detect@1.8.0"
+    },
+    {
+      "ref": "bizcode@0.1.0|zlibjs@0.3.1"
     },
     {
       "ref": "bizcode@0.1.0|jsonwebtoken@9.0.3",
@@ -13781,7 +15582,25 @@
       "ref": "bizcode@0.1.0|d3-timer@3.0.1"
     },
     {
+      "ref": "bizcode@0.1.0|@emnapi/runtime@1.11.0",
+      "dependsOn": [
+        "bizcode@0.1.0|tslib@2.8.1"
+      ]
+    },
+    {
       "ref": "bizcode@0.1.0|@scarf/scarf@1.4.0"
+    },
+    {
+      "ref": "bizcode@0.1.0|encoding@0.1.13",
+      "dependsOn": [
+        "bizcode@0.1.0|encoding@0.1.13|iconv-lite@0.6.3"
+      ]
+    },
+    {
+      "ref": "bizcode@0.1.0|encoding@0.1.13|iconv-lite@0.6.3",
+      "dependsOn": [
+        "bizcode@0.1.0|safer-buffer@2.1.2"
+      ]
     },
     {
       "ref": "bizcode@0.1.0|jws@4.0.1",
@@ -13810,9 +15629,6 @@
     },
     {
       "ref": "bizcode@0.1.0|lodash.once@4.1.1"
-    },
-    {
-      "ref": "bizcode@0.1.0|semver@7.7.4"
     },
     {
       "ref": "bizcode@0.1.0|@types/prop-types@15.7.15"

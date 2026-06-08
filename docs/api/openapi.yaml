@@ -3675,6 +3675,243 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
 
+  /api/documentos-compra/procesar:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    post:
+      tags: [contabilidad]
+      summary: Upload purchase document for extraction preview (#277)
+      description: |
+        Stores the original PDF/image on local filesystem and returns an editable preview.
+        **Tier 1:** decodes AFIP/ARCA FE QR locally from embedded PDF URL text or image scan (`jsQR` + `sharp`) — no portal/API verification.
+        **Tier 2:** extracts text from digital PDF (`unpdf`) and applies bundled YAML regex templates (Argentina `generic-afip-ar`) when confidence ≥ 0.7.
+        **Tier 3:** preprocesses images (`sharp`) and runs local OCR (`tesseract.js`, `spa+eng`), then applies the same templates when confidence ≥ 0.6.
+        **Tier 4:** optional local Ollama (`OLLAMA_URL`, model `OLLAMA_MODEL` default `nuextract`) when tiers 1–3 fail.
+        Falls back to empty manual preview (tier 0) when extraction fails.
+        Requires modules `finance.ledger` and `logistics.purchases`, permission `reports.financial.read`.
+        Multipart field `file` — pdf, jpg, png, webp, heic (max 10 MB).
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '201':
+          description: Document stored; preview pending review
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentoCompraImportadoEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/documentos-compra/procesar-lote:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    post:
+      tags: [contabilidad]
+      summary: Batch upload purchase documents for extraction (#277 Phase E)
+      description: |
+        Processes up to 20 PDF/image files sequentially (same tier pipeline as `procesar`).
+        Multipart field `files` — pdf, jpg, png, webp, heic (max 10 MB each).
+        Requires `finance.ledger`, `logistics.purchases`, `reports.financial.read`.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [files]
+              properties:
+                files:
+                  type: array
+                  maxItems: 20
+                  items:
+                    type: string
+                    format: binary
+      responses:
+        '201':
+          description: All documents stored; previews pending review
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentoCompraImportadoListEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/documentos-compra/cola:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [contabilidad]
+      summary: Purchase document import queue status (#277 Phase E)
+      description: |
+        Returns counts by estado and the 20 most recent import rows for the current user.
+        Requires `finance.ledger`, `logistics.purchases`, `reports.financial.read`.
+      responses:
+        '200':
+          description: Queue snapshot
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentoCompraColaEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/documentos-compra/templates:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [contabilidad]
+      summary: List purchase document extraction templates (#277 Phase E)
+      description: |
+        Bundled Argentina templates plus tenant custom YAML under `data/documentos-compra-templates/{tenantId}/`.
+        Requires `finance.ledger`, `logistics.purchases`, `reports.financial.read`.
+      responses:
+        '200':
+          description: Template catalog
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentoCompraTemplateListEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    post:
+      tags: [contabilidad]
+      summary: Save tenant custom extraction template (#277 Phase E)
+      description: |
+        Persists invoice2data-style YAML for the current tenant. Requires `settings.fiscal.manage`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DocumentoCompraTemplateInput'
+      responses:
+        '201':
+          description: Template saved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentoCompraTemplateEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/documentos-compra/confirmar:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    post:
+      tags: [contabilidad]
+      summary: Confirm imported document and create ComprobanteCompra (#277 Phase A)
+      description: |
+        Persists `ComprobanteCompra` from reviewed preview and links the import record.
+        Duplicate `tipo` + `prefijo` + `numero` returns 409.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DocumentoCompraConfirmInput'
+      responses:
+        '201':
+          description: Confirmed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentoCompraConfirmEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '409':
+          $ref: '#/components/responses/ConflictError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/documentos-compra/{id}/original:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    get:
+      tags: [contabilidad]
+      summary: Download original imported purchase document (#277 Phase A)
+      description: Returns the stored PDF/image bytes. Requires `finance.ledger`, `logistics.purchases`, `reports.financial.read`.
+      responses:
+        '200':
+          description: Original file
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+            image/jpeg:
+              schema:
+                type: string
+                format: binary
+            image/png:
+              schema:
+                type: string
+                format: binary
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
   /api/formas-pago:
     parameters:
       - $ref: '#/components/parameters/BizcodeChannelHeader'
@@ -8643,6 +8880,282 @@ components:
           const: true
         data:
           $ref: '#/components/schemas/ComprobanteCompra'
+
+    DocumentoCompraItemPreview:
+      type: object
+      required: [descripcion, cantidad, precioUnitario, subtotal]
+      properties:
+        descripcion:
+          type: string
+        cantidad:
+          type: number
+        precioUnitario:
+          type: number
+        subtotal:
+          type: number
+        articuloId:
+          type: integer
+          nullable: true
+        confianza:
+          type: number
+          minimum: 0
+          maximum: 1
+
+    DocumentoCompraPreviewData:
+      type: object
+      properties:
+        proveedorId:
+          type: integer
+          nullable: true
+        fecha:
+          type: string
+          format: date-time
+          nullable: true
+        vencimiento:
+          type: string
+          format: date-time
+          nullable: true
+        tipo:
+          anyOf:
+            - type: string
+              enum: [A, B, C]
+            - type: 'null'
+        prefijo:
+          type: string
+          nullable: true
+        numero:
+          type: integer
+          nullable: true
+        neto1:
+          type: number
+        neto2:
+          type: number
+        neto3:
+          type: number
+        iva1:
+          type: number
+        iva2:
+          type: number
+        total:
+          type: number
+          nullable: true
+        cae:
+          type: string
+          nullable: true
+        caeVto:
+          type: string
+          format: date-time
+          nullable: true
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/DocumentoCompraItemPreview'
+        fieldConfidence:
+          type: object
+          additionalProperties:
+            type: number
+
+    DocumentoCompraImportado:
+      type: object
+      required:
+        - id
+        - tenantId
+        - usuarioId
+        - archivoNombre
+        - archivoMime
+        - archivoPath
+        - tipoArchivo
+        - tier
+        - confianza
+        - estado
+        - datosExtraidos
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: integer
+        tenantId:
+          type: integer
+        usuarioId:
+          type: integer
+        archivoNombre:
+          type: string
+        archivoMime:
+          type: string
+        archivoPath:
+          type: string
+        tipoArchivo:
+          type: string
+        tier:
+          type: integer
+        confianza:
+          type: number
+        estado:
+          type: string
+          enum: [procesando, pendiente_revision, confirmado, descartado]
+        datosExtraidos:
+          $ref: '#/components/schemas/DocumentoCompraPreviewData'
+        comprobanteCompraId:
+          type: integer
+          nullable: true
+        errores:
+          type: object
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    DocumentoCompraImportadoEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/DocumentoCompraImportado'
+
+    DocumentoCompraImportadoListEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/DocumentoCompraImportado'
+
+    DocumentoCompraColaEstado:
+      type: object
+      required:
+        - procesando
+        - pendiente_revision
+        - confirmado
+        - descartado
+        - documentos
+      properties:
+        procesando:
+          type: integer
+          minimum: 0
+        pendiente_revision:
+          type: integer
+          minimum: 0
+        confirmado:
+          type: integer
+          minimum: 0
+        descartado:
+          type: integer
+          minimum: 0
+        documentos:
+          type: array
+          items:
+            $ref: '#/components/schemas/DocumentoCompraImportado'
+
+    DocumentoCompraColaEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/DocumentoCompraColaEstado'
+
+    DocumentoCompraTemplateSummary:
+      type: object
+      required: [issuer, keywords, source]
+      properties:
+        issuer:
+          type: string
+        keywords:
+          type: array
+          items:
+            type: string
+        source:
+          type: string
+          enum: [bundled, custom]
+
+    DocumentoCompraTemplateListEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/DocumentoCompraTemplateSummary'
+
+    DocumentoCompraTemplateInput:
+      type: object
+      required: [content]
+      properties:
+        content:
+          type: string
+          minLength: 20
+
+    DocumentoCompraTemplate:
+      type: object
+      required: [issuer, keywords, fields]
+      properties:
+        issuer:
+          type: string
+        keywords:
+          type: array
+          items:
+            type: string
+        fields:
+          type: object
+          additionalProperties: true
+
+    DocumentoCompraTemplateEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/DocumentoCompraTemplate'
+
+    DocumentoCompraConfirmInput:
+      allOf:
+        - $ref: '#/components/schemas/ComprobanteCompraInput'
+        - type: object
+          required: [documentoId]
+          properties:
+            documentoId:
+              type: integer
+              minimum: 1
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/DocumentoCompraItemPreview'
+
+    DocumentoCompraConfirmResult:
+      type: object
+      required: [documento, comprobanteCompra]
+      properties:
+        documento:
+          $ref: '#/components/schemas/DocumentoCompraImportado'
+        comprobanteCompra:
+          $ref: '#/components/schemas/ComprobanteCompra'
+
+    DocumentoCompraConfirmEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/DocumentoCompraConfirmResult'
 
     FacturaVoidResult:
       type: object

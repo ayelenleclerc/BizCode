@@ -1,10 +1,11 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { CanAccess } from '@/components/CanAccess'
 import ErrorBoundary from '@/components/ErrorBoundary'
 import AsyncWrapper from '@/components/shared/AsyncWrapper'
 import IfModule from '@/components/IfModule'
 import ComprobanteCompraRegisterForm from '@/pages/finanzas/ComprobanteCompraRegisterForm'
+import DocumentoCompraImportSection from '@/pages/finanzas/DocumentoCompraImportSection'
 import {
   ApiRequestFailedError,
   cobranzasAPI,
@@ -452,6 +453,117 @@ function currentMonthPeriodo(): string {
   return `${y}-${m}`
 }
 
+const LIBRO_IVA_YEAR_MIN = 2020
+
+const libroIvaSelectClass =
+  'border border-slate-300 dark:border-slate-600 rounded px-2 py-1 bg-white dark:bg-slate-800'
+
+function parseLibroIvaPeriodo(periodo: string): { year: number; month: number } {
+  const match = /^(\d{4})-(\d{2})$/.exec(periodo)
+  if (!match) {
+    return parseLibroIvaPeriodo(currentMonthPeriodo())
+  }
+  const year = Number.parseInt(match[1], 10)
+  const month = Number.parseInt(match[2], 10)
+  if (month < 1 || month > 12) {
+    return parseLibroIvaPeriodo(currentMonthPeriodo())
+  }
+  return { year, month }
+}
+
+function formatLibroIvaPeriodo(year: number, month: number): string {
+  return `${year}-${String(month).padStart(2, '0')}`
+}
+
+function libroIvaYearOptions(): number[] {
+  const maxYear = new Date().getFullYear() + 1
+  const years: number[] = []
+  for (let y = LIBRO_IVA_YEAR_MIN; y <= maxYear; y += 1) {
+    years.push(y)
+  }
+  return years
+}
+
+function libroIvaMonthLabel(month: number, locale: string): string {
+  return new Date(2000, month - 1, 1).toLocaleDateString(locale, { month: 'long' })
+}
+
+interface LibroIvaPeriodoFieldProps {
+  legend: string
+  monthAriaLabel: string
+  yearAriaLabel: string
+  value: string
+  onChange: (periodo: string) => void
+  locale: string
+  testId: string
+}
+
+/**
+ * @en Cross-browser month period (YYYY-MM) via native selects — `input[type=month]` lacks Firefox/Safari support.
+ * @es Período mensual (YYYY-MM) con selects nativos — `input[type=month]` no está soportado en Firefox/Safari.
+ * @pt-BR Período mensal (YYYY-MM) com selects nativos — `input[type=month]` não é suportado no Firefox/Safari.
+ */
+function LibroIvaPeriodoField({
+  legend,
+  monthAriaLabel,
+  yearAriaLabel,
+  value,
+  onChange,
+  locale,
+  testId,
+}: LibroIvaPeriodoFieldProps) {
+  const monthRef = useRef<HTMLSelectElement>(null)
+  const yearRef = useRef<HTMLSelectElement>(null)
+  const years = useMemo(() => libroIvaYearOptions(), [])
+  const { year, month } = parseLibroIvaPeriodo(value)
+
+  // Microsoft Edge Tools (webhint) flags dynamic `id` in JSX when uniqueness cannot be proven statically.
+  useLayoutEffect(() => {
+    monthRef.current?.setAttribute('id', `${testId}-month`)
+    yearRef.current?.setAttribute('id', `${testId}-year`)
+  }, [testId])
+
+  return (
+    <fieldset className="border-0 p-0 m-0 min-w-0" data-testid={testId}>
+      <legend className="block text-xs text-slate-500 mb-1">{legend}</legend>
+      <div className="flex flex-wrap gap-2">
+        <select
+          ref={monthRef}
+          className={libroIvaSelectClass}
+          value={month}
+          aria-label={monthAriaLabel}
+          data-testid={`${testId}-month`}
+          onChange={(e) => {
+            onChange(formatLibroIvaPeriodo(year, Number(e.target.value)))
+          }}
+        >
+          {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
+            <option key={m} value={m}>
+              {libroIvaMonthLabel(m, locale)}
+            </option>
+          ))}
+        </select>
+        <select
+          ref={yearRef}
+          className={libroIvaSelectClass}
+          value={year}
+          aria-label={yearAriaLabel}
+          data-testid={`${testId}-year`}
+          onChange={(e) => {
+            onChange(formatLibroIvaPeriodo(Number(e.target.value), month))
+          }}
+        >
+          {years.map((y) => (
+            <option key={y} value={y}>
+              {y}
+            </option>
+          ))}
+        </select>
+      </div>
+    </fieldset>
+  )
+}
+
 function downloadBlob(blob: Blob, filename: string): void {
   const url = URL.createObjectURL(blob)
   const anchor = document.createElement('a')
@@ -462,7 +574,7 @@ function downloadBlob(blob: Blob, filename: string): void {
 }
 
 function FinanzasLibroIvaVentasSection() {
-  const { t } = useTranslation('finanzas')
+  const { t, i18n } = useTranslation('finanzas')
   const [periodo, setPeriodo] = useState(currentMonthPeriodo)
   const [preview, setPreview] = useState<LibroIvaVentasPreviewDTO | null>(null)
   const [loading, setLoading] = useState(false)
@@ -512,18 +624,15 @@ function FinanzasLibroIvaVentasSection() {
       </h2>
       <p className="text-sm text-slate-500 dark:text-slate-400 mb-3">{t('libroIva.hint')}</p>
       <div className="mb-3 flex flex-wrap items-end gap-3" data-testid="finanzas-libro-iva-controls">
-        <div>
-          <label htmlFor="finanzas-libro-iva-periodo" className="block text-xs text-slate-500 mb-1">
-            {t('libroIva.periodo')}
-          </label>
-          <input
-            id="finanzas-libro-iva-periodo"
-            type="month"
-            className="border border-slate-300 dark:border-slate-600 rounded px-2 py-1 bg-white dark:bg-slate-800"
-            value={periodo}
-            onChange={(e) => setPeriodo(e.target.value)}
-          />
-        </div>
+        <LibroIvaPeriodoField
+          testId="finanzas-libro-iva-periodo"
+          legend={t('libroIva.periodo')}
+          monthAriaLabel={t('periodoMonth')}
+          yearAriaLabel={t('periodoYear')}
+          value={periodo}
+          onChange={setPeriodo}
+          locale={i18n.language}
+        />
         <button
           type="button"
           className="px-4 py-1 rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50"
@@ -609,7 +718,7 @@ function FinanzasLibroIvaVentasSection() {
 }
 
 function FinanzasLibroIvaComprasSection() {
-  const { t } = useTranslation('finanzas')
+  const { t, i18n } = useTranslation('finanzas')
   const [periodo, setPeriodo] = useState(currentMonthPeriodo)
   const [preview, setPreview] = useState<LibroIvaComprasPreviewDTO | null>(null)
   const [loading, setLoading] = useState(false)
@@ -661,20 +770,18 @@ function FinanzasLibroIvaComprasSection() {
         {t('libroIvaCompras.title')}
       </h2>
       <p className="text-sm text-slate-500 dark:text-slate-400 mb-3">{t('libroIvaCompras.hint')}</p>
+      <DocumentoCompraImportSection onConfirmed={() => void loadPreview()} />
       <ComprobanteCompraRegisterForm onRegistered={() => void loadPreview()} />
       <div className="mb-3 flex flex-wrap items-end gap-3" data-testid="finanzas-libro-iva-compras-controls">
-        <div>
-          <label htmlFor="finanzas-libro-iva-compras-periodo" className="block text-xs text-slate-500 mb-1">
-            {t('libroIvaCompras.periodo')}
-          </label>
-          <input
-            id="finanzas-libro-iva-compras-periodo"
-            type="month"
-            className="border border-slate-300 dark:border-slate-600 rounded px-2 py-1 bg-white dark:bg-slate-800"
-            value={periodo}
-            onChange={(e) => setPeriodo(e.target.value)}
-          />
-        </div>
+        <LibroIvaPeriodoField
+          testId="finanzas-libro-iva-compras-periodo"
+          legend={t('libroIvaCompras.periodo')}
+          monthAriaLabel={t('periodoMonth')}
+          yearAriaLabel={t('periodoYear')}
+          value={periodo}
+          onChange={setPeriodo}
+          locale={i18n.language}
+        />
         <button
           type="button"
           className="px-4 py-1 rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50"

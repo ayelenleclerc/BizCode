@@ -253,11 +253,38 @@ model ComprobanteCompra {
   movimientoCuentaCorriente MovimientoProveedorCC?
   reciboPagoFacturas       ReciboPagoFactura[]
   alertasProveedor         AlertaProveedorLog[]
+  documentoImportado       DocumentoCompraImportado?
 
   @@unique([tenantId, tipo, prefijo, numero])
   @@index([tenantId, fecha])
   @@index([tenantId, proveedorId])
   @@index([tenantId, estado, fecha])
+}
+
+/// Imported purchase document (PDF/image) pending review (#277).
+model DocumentoCompraImportado {
+  id                  Int                @id @default(autoincrement())
+  tenantId            Int
+  tenant              Tenant             @relation(fields: [tenantId], references: [id])
+  usuarioId           Int
+  usuario             AppUser            @relation(fields: [usuarioId], references: [id])
+  archivoNombre       String             @db.VarChar(255)
+  archivoMime         String             @db.VarChar(100)
+  archivoPath         String             @db.VarChar(500)
+  tipoArchivo         String             @db.VarChar(10)
+  tier                Int                @default(0)
+  confianza           Decimal            @db.Decimal(3, 2) @default(0)
+  /// procesando | pendiente_revision | confirmado | descartado
+  estado              String             @db.VarChar(30)
+  datosExtraidos      Json
+  comprobanteCompraId Int?               @unique
+  comprobanteCompra   ComprobanteCompra? @relation(fields: [comprobanteCompraId], references: [id])
+  errores             Json?
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @updatedAt
+
+  @@index([tenantId, estado])
+  @@index([tenantId, usuarioId])
 }
 
 model OrdenCompraItem {
@@ -521,6 +548,7 @@ model Tenant {
   alertaProveedorConfig    AlertaProveedorConfig?
   alertasProveedorLog      AlertaProveedorLog[]
   proveedorArticulos       ProveedorArticulo[]
+  documentosCompraImportados DocumentoCompraImportado[]
   facturas       Factura[]
   notasCredito   NotaCredito[]
   pedidos        Pedido[]
@@ -742,6 +770,7 @@ model AppUser {
   notasCreditoCreated  NotaCredito[] @relation("NotaCreditoCreatedBy")
   movimientosProveedorCC MovimientoProveedorCC[]
   recibosPago            ReciboPago[]
+  documentosCompraImportados DocumentoCompraImportado[]
 
   @@unique([tenantId, username])
 }

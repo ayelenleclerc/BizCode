@@ -1,20 +1,20 @@
 # ComprobanteCompra Schema
 
 ```txt
-undefined#/properties/data
+undefined#/properties/comprobanteCompra
 ```
 
 
 
-| Abstract            | Extensible | Status         | Identifiable | Custom Properties | Additional Properties | Access Restrictions | Defined In                                                                                                             |
-| :------------------ | :--------- | :------------- | :----------- | :---------------- | :-------------------- | :------------------ | :--------------------------------------------------------------------------------------------------------------------- |
-| Can be instantiated | No         | Unknown status | No           | Forbidden         | Allowed               | none                | [ComprobanteCompraEnvelope.schema.json\*](../schema-json/ComprobanteCompraEnvelope.schema.json "open original schema") |
+| Abstract            | Extensible | Status         | Identifiable | Custom Properties | Additional Properties | Access Restrictions | Defined In                                                                                                                   |
+| :------------------ | :--------- | :------------- | :----------- | :---------------- | :-------------------- | :------------------ | :--------------------------------------------------------------------------------------------------------------------------- |
+| Can be instantiated | No         | Unknown status | No           | Forbidden         | Allowed               | none                | [DocumentoCompraConfirmResult.schema.json\*](../schema-json/DocumentoCompraConfirmResult.schema.json "open original schema") |
 
-## data Type
+## comprobanteCompra Type
 
 `object` ([ComprobanteCompra](comprobantecompra.md))
 
-# data Properties
+# comprobanteCompra Properties
 
 | Property                        | Type      | Required | Nullable       | Defined by                                                                                               |
 | :------------------------------ | :-------- | :------- | :------------- | :------------------------------------------------------------------------------------------------------- |
