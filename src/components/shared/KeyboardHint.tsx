@@ -29,7 +29,7 @@ export default function KeyboardHint({ shortcuts, className = '' }: KeyboardHint
             <kbd className="px-2 py-1 bg-white dark:bg-slate-600 border border-slate-300 dark:border-slate-500 rounded text-xs font-mono font-semibold text-slate-900 dark:text-slate-100">
               {shortcut.key}
             </kbd>
-            <span className="text-slate-500 dark:text-slate-400">{shortcut.description}</span>
+            <span className="text-slate-600 dark:text-slate-200">{shortcut.description}</span>
           </div>
         ))}
       </div>
