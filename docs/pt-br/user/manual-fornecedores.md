@@ -69,6 +69,21 @@ Em fornecedores **existentes**, aba **Histórico** (`finance.ledger`, `suppliers
 
 **API:** `GET /api/proveedores/{id}/historial`, `GET /api/proveedores/{id}/articulos?dias=` — [OpenAPI](../../api/openapi.yaml).
 
+## Catálogo por fornecedor (GitHub #273)
+
+Em fornecedores **existentes**, aba **Catálogo** (`logistics.purchases`, `suppliers.read`):
+
+- Cada fornecedor pode ter **códigos, descrições e preços de lista** próprios por artigo interno.
+- **Tabela:** código do fornecedor, código interno do artigo, descrições, preço de lista (com data), unidade de compra, múltiplo e status ativo.
+- **Indicador de preço:** amarelo se o preço tem mais de **30** dias sem atualização; vermelho se passa de **90** dias.
+- **Inclusão** (`suppliers.manage`): código interno (busca por `Articulo.codigo`), código do fornecedor, descrição opcional, preço, unidade e múltiplo.
+- **Edição inline** dos mesmos campos e do status ativo.
+- **Importação CSV** com cabeçalho fixo: `codigo_proveedor`, `codigo_interno`, `precio`, `unidad` (`codigo_interno` = código numérico do artigo no tenant).
+
+Auditoria: `proveedor_catalogo_create`, `proveedor_catalogo_update`, `proveedor_catalogo_import`.
+
+**API:** `GET /api/proveedores/{id}/catalogo`, `POST .../catalogo`, `PUT .../catalogo/{articuloId}`, `POST .../catalogo/import` — [OpenAPI](../../api/openapi.yaml).
+
 ## Desativação (exclusão lógica)
 
 **Desativar** define `activo: false` sem apagar o registro. Use o filtro de inativos para revisar.

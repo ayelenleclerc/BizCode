@@ -1570,6 +1570,178 @@ export const proveedorHistorialQuerySchema = z.object({
   }).optional(),
 })
 
+export type ProveedorArticuloInput = {
+  articuloId: number
+  codigoProveedor: string
+  descripcion?: string | null
+  precioLista?: number | null
+  unidadCompra?: string | null
+  multiplo?: number
+  activo?: boolean
+}
+
+export type ProveedorArticuloUpdateInput = {
+  codigoProveedor?: string
+  descripcion?: string | null
+  precioLista?: number | null
+  unidadCompra?: string | null
+  multiplo?: number
+  activo?: boolean
+}
+
+export const proveedorArticuloBodySchema = z
+  .object({
+    articuloId: z.number(),
+    codigoProveedor: z.string(),
+    descripcion: z.union([z.string(), z.null(), z.undefined()]).optional(),
+    precioLista: z.union([z.number(), z.null(), z.undefined()]).optional(),
+    unidadCompra: z.union([z.string(), z.null(), z.undefined()]).optional(),
+    multiplo: z.union([z.number(), z.undefined()]).optional(),
+    activo: z.union([z.boolean(), z.undefined()]).optional(),
+  })
+  .superRefine((data, ctx) => {
+    if (!Number.isInteger(data.articuloId) || data.articuloId < 1) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'articuloId must be a positive integer',
+        path: ['articuloId'],
+      })
+    }
+    const code = data.codigoProveedor.trim()
+    if (code.length < 1 || code.length > 50) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'codigoProveedor must be between 1 and 50 characters',
+        path: ['codigoProveedor'],
+      })
+    }
+    if (data.descripcion != null && typeof data.descripcion === 'string' && data.descripcion.length > 120) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'descripcion must be at most 120 characters',
+        path: ['descripcion'],
+      })
+    }
+    if (data.unidadCompra != null && typeof data.unidadCompra === 'string' && data.unidadCompra.length > 30) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'unidadCompra must be at most 30 characters',
+        path: ['unidadCompra'],
+      })
+    }
+    if (data.precioLista != null && (typeof data.precioLista !== 'number' || Number.isNaN(data.precioLista) || data.precioLista < 0)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'precioLista must be >= 0',
+        path: ['precioLista'],
+      })
+    }
+    if (data.multiplo !== undefined && (typeof data.multiplo !== 'number' || Number.isNaN(data.multiplo) || data.multiplo <= 0)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'multiplo must be > 0',
+        path: ['multiplo'],
+      })
+    }
+  })
+  .transform((data): ProveedorArticuloInput => {
+    const trimOrNull = (v: unknown): string | null | undefined => {
+      if (v === undefined) return undefined
+      if (v === null) return null
+      if (typeof v !== 'string') return undefined
+      const t = v.trim()
+      return t === '' ? null : t
+    }
+    const out: ProveedorArticuloInput = {
+      articuloId: data.articuloId,
+      codigoProveedor: data.codigoProveedor.trim(),
+    }
+    const desc = trimOrNull(data.descripcion)
+    if (desc !== undefined) out.descripcion = desc
+    if (data.precioLista !== undefined) out.precioLista = data.precioLista
+    const unidad = trimOrNull(data.unidadCompra)
+    if (unidad !== undefined) out.unidadCompra = unidad
+    if (data.multiplo !== undefined) out.multiplo = data.multiplo
+    if (data.activo !== undefined) out.activo = data.activo
+    return out
+  })
+
+export const proveedorArticuloUpdateBodySchema = z
+  .object({
+    codigoProveedor: z.union([z.string(), z.undefined()]).optional(),
+    descripcion: z.union([z.string(), z.null(), z.undefined()]).optional(),
+    precioLista: z.union([z.number(), z.null(), z.undefined()]).optional(),
+    unidadCompra: z.union([z.string(), z.null(), z.undefined()]).optional(),
+    multiplo: z.union([z.number(), z.undefined()]).optional(),
+    activo: z.union([z.boolean(), z.undefined()]).optional(),
+  })
+  .superRefine((data, ctx) => {
+    if (data.codigoProveedor !== undefined) {
+      const code = data.codigoProveedor.trim()
+      if (code.length < 1 || code.length > 50) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'codigoProveedor must be between 1 and 50 characters',
+          path: ['codigoProveedor'],
+        })
+      }
+    }
+    if (data.descripcion != null && typeof data.descripcion === 'string' && data.descripcion.length > 120) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'descripcion must be at most 120 characters',
+        path: ['descripcion'],
+      })
+    }
+    if (data.unidadCompra != null && typeof data.unidadCompra === 'string' && data.unidadCompra.length > 30) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'unidadCompra must be at most 30 characters',
+        path: ['unidadCompra'],
+      })
+    }
+    if (data.precioLista != null && (typeof data.precioLista !== 'number' || Number.isNaN(data.precioLista) || data.precioLista < 0)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'precioLista must be >= 0',
+        path: ['precioLista'],
+      })
+    }
+    if (data.multiplo !== undefined && (typeof data.multiplo !== 'number' || Number.isNaN(data.multiplo) || data.multiplo <= 0)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'multiplo must be > 0',
+        path: ['multiplo'],
+      })
+    }
+  })
+  .transform((data): ProveedorArticuloUpdateInput => {
+    const trimOrNull = (v: unknown): string | null | undefined => {
+      if (v === undefined) return undefined
+      if (v === null) return null
+      if (typeof v !== 'string') return undefined
+      const t = v.trim()
+      return t === '' ? null : t
+    }
+    const out: ProveedorArticuloUpdateInput = {}
+    if (data.codigoProveedor !== undefined) out.codigoProveedor = data.codigoProveedor.trim()
+    const desc = trimOrNull(data.descripcion)
+    if (desc !== undefined) out.descripcion = desc
+    if (data.precioLista !== undefined) out.precioLista = data.precioLista
+    const unidad = trimOrNull(data.unidadCompra)
+    if (unidad !== undefined) out.unidadCompra = unidad
+    if (data.multiplo !== undefined) out.multiplo = data.multiplo
+    if (data.activo !== undefined) out.activo = data.activo
+    return out
+  })
+
+export const proveedorArticuloImportRowSchema = z.object({
+  codigo_proveedor: z.string().min(1).max(50),
+  codigo_interno: z.coerce.number().int().positive(),
+  precio: z.union([z.coerce.number().nonnegative(), z.literal(''), z.null()]).optional(),
+  unidad: z.union([z.string().max(30), z.literal(''), z.null()]).optional(),
+})
+
 export const alertaProveedorConfigBodySchema = z
   .object({
     diasPrevioAviso: z.number().int().min(0).max(90).optional(),

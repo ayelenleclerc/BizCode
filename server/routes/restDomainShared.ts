@@ -77,6 +77,13 @@ export const ARTICULO_IMPORT_CSV_HEADERS = [
   'activo',
 ] as const
 
+export const PROVEEDOR_CATALOGO_IMPORT_CSV_HEADERS = [
+  'codigo_proveedor',
+  'codigo_interno',
+  'precio',
+  'unidad',
+] as const
+
 export const PROVEEDOR_IMPORT_CSV_HEADERS = [
   'codigo',
   'rsocial',

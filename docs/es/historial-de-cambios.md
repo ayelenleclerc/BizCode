@@ -10,6 +10,8 @@ Versionado: [Semantic Versioning](https://semver.org/lang/es/).
 
 ### Agregado
 
+- **Catálogo de productos por proveedor (GitHub #273):** modelo `ProveedorArticulo` y migración; `GET/POST /api/proveedores/{id}/catalogo`, `PUT .../catalogo/{articuloId}`, `POST .../catalogo/import` (módulo `logistics.purchases`); códigos, descripciones y precios de lista por proveedor e importación CSV; pestaña **Catálogo** en ficha con indicadores de antigüedad del precio; auditoría `proveedor_catalogo_*`; OpenAPI, pruebas y manuales trilingües.
+
 - **Historial de compras de proveedor (GitHub #272):** `GET /api/proveedores/{id}/historial` y `GET /api/proveedores/{id}/articulos` con períodos móviles (30/90/180/365 días); métricas desde OC recibidas y comprobantes (total, frecuencia, top artículos, PPP); pestaña **Historial** en ficha de proveedor; OpenAPI, pruebas y manuales trilingües.
 
 - **Alertas de vencimiento a proveedor (GitHub #275):** `vencimiento` opcional en `ComprobanteCompra`; `AlertaProveedorConfig` + `AlertaProveedorLog`; `GET /api/proveedores/facturas-pendientes`, `GET/PATCH /api/configuracion/alertas-proveedores`; job diario `scripts/proveedor-alertas-job.ts`; widget en inicio y UI en Finanzas; alerta de límite de crédito al registrar comprobante; OpenAPI, pruebas y manuales trilingües.

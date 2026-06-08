@@ -8881,6 +8881,936 @@ PPP and price evolution from received purchase-order lines in the selected perio
 }
 ```
 
+### PARAMETERS /api/proveedores/{id}/catalogo
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/proveedores/{id}/catalogo`
+
+### Supplier catalog — article codes and list prices (#273)
+
+- **Method:** `GET`
+- **Path:** `/api/proveedores/{id}/catalogo`
+- **Tags:** proveedores
+
+Requires module `logistics.purchases` and permission `suppliers.read`.
+
+#### Responses
+
+##### Status: 200 Catalog items for the supplier
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`items` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`activo` (required)**
+
+      `boolean`
+
+    - **`articulo` (required)**
+
+      `object`
+
+      - **`codigo` (required)**
+
+        `integer`
+
+      - **`descripcion` (required)**
+
+        `string`
+
+      - **`id` (required)**
+
+        `integer`
+
+    - **`articuloId` (required)**
+
+      `integer`
+
+    - **`codigoProveedor` (required)**
+
+      `string`
+
+    - **`descripcion` (required)**
+
+      `string`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`multiplo` (required)**
+
+      `string`
+
+    - **`precioLista` (required)**
+
+      `string`
+
+    - **`precioListaFecha` (required)**
+
+      `string`, format: `date-time`
+
+    - **`unidadCompra` (required)**
+
+      `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "items": [
+      {
+        "id": 1,
+        "articuloId": 1,
+        "codigoProveedor": "",
+        "descripcion": "",
+        "precioLista": "",
+        "precioListaFecha": "",
+        "unidadCompra": "",
+        "multiplo": "",
+        "activo": true,
+        "articulo": {
+          "id": 1,
+          "codigo": 1,
+          "descripcion": ""
+        }
+      }
+    ]
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Add article to supplier catalog (#273)
+
+- **Method:** `POST`
+- **Path:** `/api/proveedores/{id}/catalogo`
+- **Tags:** proveedores
+
+Requires module `logistics.purchases` and permission `suppliers.manage`.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`articuloId` (required)**
+
+  `integer`
+
+- **`codigoProveedor` (required)**
+
+  `string`
+
+- **`activo`**
+
+  `boolean`
+
+- **`descripcion`**
+
+  `string`
+
+- **`multiplo`**
+
+  `number`
+
+- **`precioLista`**
+
+  `number`
+
+- **`unidadCompra`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "articuloId": 1,
+  "codigoProveedor": "",
+  "descripcion": "",
+  "precioLista": 0,
+  "unidadCompra": "",
+  "multiplo": 1,
+  "activo": true
+}
+```
+
+#### Responses
+
+##### Status: 201 Catalog entry created
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`activo` (required)**
+
+    `boolean`
+
+  - **`articulo` (required)**
+
+    `object`
+
+    - **`codigo` (required)**
+
+      `integer`
+
+    - **`descripcion` (required)**
+
+      `string`
+
+    - **`id` (required)**
+
+      `integer`
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`codigoProveedor` (required)**
+
+    `string`
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`multiplo` (required)**
+
+    `string`
+
+  - **`precioLista` (required)**
+
+    `string`
+
+  - **`precioListaFecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`unidadCompra` (required)**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "articuloId": 1,
+    "codigoProveedor": "",
+    "descripcion": "",
+    "precioLista": "",
+    "precioListaFecha": "",
+    "unidadCompra": "",
+    "multiplo": "",
+    "activo": true,
+    "articulo": {
+      "id": 1,
+      "codigo": 1,
+      "descripcion": ""
+    }
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 409 Resource conflict
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/proveedores/{id}/catalogo/import
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/proveedores/{id}/catalogo/import`
+
+### Import supplier catalog from CSV (#273)
+
+- **Method:** `POST`
+- **Path:** `/api/proveedores/{id}/catalogo/import`
+- **Tags:** proveedores
+
+CSV columns: `codigo_proveedor`, `codigo_interno` (article `codigo`), optional `precio`, `unidad`. Requires module `logistics.purchases` and permission `suppliers.manage`.
+
+#### Request Body
+
+##### Content-Type: multipart/form-data
+
+- **`file` (required)**
+
+  `string`, format: `binary`
+
+**Example:**
+
+```json
+{
+  "file": {}
+}
+```
+
+#### Responses
+
+##### Status: 200 Import summary
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`created` (required)**
+
+    `integer`
+
+  - **`errors` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`message` (required)**
+
+      `string`
+
+    - **`row` (required)**
+
+      `integer`
+
+  - **`skipped` (required)**
+
+    `integer`
+
+  - **`updated` (required)**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "created": 1,
+    "updated": 1,
+    "skipped": 1,
+    "errors": [
+      {
+        "row": 1,
+        "message": ""
+      }
+    ]
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/proveedores/{id}/catalogo/{articuloId}
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/proveedores/{id}/catalogo/{articuloId}`
+
+### Update supplier catalog entry (#273)
+
+- **Method:** `PUT`
+- **Path:** `/api/proveedores/{id}/catalogo/{articuloId}`
+- **Tags:** proveedores
+
+Requires module `logistics.purchases` and permission `suppliers.manage`.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`activo`**
+
+  `boolean`
+
+- **`codigoProveedor`**
+
+  `string`
+
+- **`descripcion`**
+
+  `string`
+
+- **`multiplo`**
+
+  `number`
+
+- **`precioLista`**
+
+  `number`
+
+- **`unidadCompra`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "codigoProveedor": "",
+  "descripcion": "",
+  "precioLista": 0,
+  "unidadCompra": "",
+  "multiplo": 1,
+  "activo": true
+}
+```
+
+#### Responses
+
+##### Status: 200 Updated catalog entry
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`activo` (required)**
+
+    `boolean`
+
+  - **`articulo` (required)**
+
+    `object`
+
+    - **`codigo` (required)**
+
+      `integer`
+
+    - **`descripcion` (required)**
+
+      `string`
+
+    - **`id` (required)**
+
+      `integer`
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`codigoProveedor` (required)**
+
+    `string`
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`multiplo` (required)**
+
+    `string`
+
+  - **`precioLista` (required)**
+
+    `string`
+
+  - **`precioListaFecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`unidadCompra` (required)**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "articuloId": 1,
+    "codigoProveedor": "",
+    "descripcion": "",
+    "precioLista": "",
+    "precioListaFecha": "",
+    "unidadCompra": "",
+    "multiplo": "",
+    "activo": true,
+    "articulo": {
+      "id": 1,
+      "codigo": 1,
+      "descripcion": ""
+    }
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 409 Resource conflict
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ### PARAMETERS /api/proveedores/{id}/cuenta-corriente
 
 - **Method:** `PARAMETERS`
@@ -35188,6 +36118,593 @@ true
             "cantidad": 1
           }
         ]
+      }
+    ]
+  }
+}
+```
+
+### ProveedorCatalogoArticuloRef
+
+- **Type:**`object`
+
+* **`codigo` (required)**
+
+  `integer`
+
+* **`descripcion` (required)**
+
+  `string`
+
+* **`id` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "codigo": 1,
+  "descripcion": ""
+}
+```
+
+### ProveedorCatalogoRow
+
+- **Type:**`object`
+
+* **`activo` (required)**
+
+  `boolean`
+
+* **`articulo` (required)**
+
+  `object`
+
+  - **`codigo` (required)**
+
+    `integer`
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`id` (required)**
+
+    `integer`
+
+* **`articuloId` (required)**
+
+  `integer`
+
+* **`codigoProveedor` (required)**
+
+  `string`
+
+* **`descripcion` (required)**
+
+  `string`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`multiplo` (required)**
+
+  `string`
+
+* **`precioLista` (required)**
+
+  `string`
+
+* **`precioListaFecha` (required)**
+
+  `string`, format: `date-time`
+
+* **`unidadCompra` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "articuloId": 1,
+  "codigoProveedor": "",
+  "descripcion": "",
+  "precioLista": "",
+  "precioListaFecha": "",
+  "unidadCompra": "",
+  "multiplo": "",
+  "activo": true,
+  "articulo": {
+    "id": 1,
+    "codigo": 1,
+    "descripcion": ""
+  }
+}
+```
+
+### ProveedorCatalogoListData
+
+- **Type:**`object`
+
+* **`items` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`activo` (required)**
+
+    `boolean`
+
+  - **`articulo` (required)**
+
+    `object`
+
+    - **`codigo` (required)**
+
+      `integer`
+
+    - **`descripcion` (required)**
+
+      `string`
+
+    - **`id` (required)**
+
+      `integer`
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`codigoProveedor` (required)**
+
+    `string`
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`multiplo` (required)**
+
+    `string`
+
+  - **`precioLista` (required)**
+
+    `string`
+
+  - **`precioListaFecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`unidadCompra` (required)**
+
+    `string`
+
+**Example:**
+
+```json
+{
+  "items": [
+    {
+      "id": 1,
+      "articuloId": 1,
+      "codigoProveedor": "",
+      "descripcion": "",
+      "precioLista": "",
+      "precioListaFecha": "",
+      "unidadCompra": "",
+      "multiplo": "",
+      "activo": true,
+      "articulo": {
+        "id": 1,
+        "codigo": 1,
+        "descripcion": ""
+      }
+    }
+  ]
+}
+```
+
+### ProveedorCatalogoListEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`items` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`activo` (required)**
+
+      `boolean`
+
+    - **`articulo` (required)**
+
+      `object`
+
+      - **`codigo` (required)**
+
+        `integer`
+
+      - **`descripcion` (required)**
+
+        `string`
+
+      - **`id` (required)**
+
+        `integer`
+
+    - **`articuloId` (required)**
+
+      `integer`
+
+    - **`codigoProveedor` (required)**
+
+      `string`
+
+    - **`descripcion` (required)**
+
+      `string`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`multiplo` (required)**
+
+      `string`
+
+    - **`precioLista` (required)**
+
+      `string`
+
+    - **`precioListaFecha` (required)**
+
+      `string`, format: `date-time`
+
+    - **`unidadCompra` (required)**
+
+      `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "items": [
+      {
+        "id": 1,
+        "articuloId": 1,
+        "codigoProveedor": "",
+        "descripcion": "",
+        "precioLista": "",
+        "precioListaFecha": "",
+        "unidadCompra": "",
+        "multiplo": "",
+        "activo": true,
+        "articulo": {
+          "id": 1,
+          "codigo": 1,
+          "descripcion": ""
+        }
+      }
+    ]
+  }
+}
+```
+
+### ProveedorCatalogoEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`activo` (required)**
+
+    `boolean`
+
+  - **`articulo` (required)**
+
+    `object`
+
+    - **`codigo` (required)**
+
+      `integer`
+
+    - **`descripcion` (required)**
+
+      `string`
+
+    - **`id` (required)**
+
+      `integer`
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`codigoProveedor` (required)**
+
+    `string`
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`multiplo` (required)**
+
+    `string`
+
+  - **`precioLista` (required)**
+
+    `string`
+
+  - **`precioListaFecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`unidadCompra` (required)**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "articuloId": 1,
+    "codigoProveedor": "",
+    "descripcion": "",
+    "precioLista": "",
+    "precioListaFecha": "",
+    "unidadCompra": "",
+    "multiplo": "",
+    "activo": true,
+    "articulo": {
+      "id": 1,
+      "codigo": 1,
+      "descripcion": ""
+    }
+  }
+}
+```
+
+### ProveedorCatalogoInput
+
+- **Type:**`object`
+
+* **`articuloId` (required)**
+
+  `integer`
+
+* **`codigoProveedor` (required)**
+
+  `string`
+
+* **`activo`**
+
+  `boolean`
+
+* **`descripcion`**
+
+  `string`
+
+* **`multiplo`**
+
+  `number`
+
+* **`precioLista`**
+
+  `number`
+
+* **`unidadCompra`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "articuloId": 1,
+  "codigoProveedor": "",
+  "descripcion": "",
+  "precioLista": 0,
+  "unidadCompra": "",
+  "multiplo": 1,
+  "activo": true
+}
+```
+
+### ProveedorCatalogoUpdateInput
+
+- **Type:**`object`
+
+* **`activo`**
+
+  `boolean`
+
+* **`codigoProveedor`**
+
+  `string`
+
+* **`descripcion`**
+
+  `string`
+
+* **`multiplo`**
+
+  `number`
+
+* **`precioLista`**
+
+  `number`
+
+* **`unidadCompra`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "codigoProveedor": "",
+  "descripcion": "",
+  "precioLista": 0,
+  "unidadCompra": "",
+  "multiplo": 1,
+  "activo": true
+}
+```
+
+### ProveedorCatalogoImportError
+
+- **Type:**`object`
+
+* **`message` (required)**
+
+  `string`
+
+* **`row` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "row": 1,
+  "message": ""
+}
+```
+
+### ProveedorCatalogoImportData
+
+- **Type:**`object`
+
+* **`created` (required)**
+
+  `integer`
+
+* **`errors` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`message` (required)**
+
+    `string`
+
+  - **`row` (required)**
+
+    `integer`
+
+* **`skipped` (required)**
+
+  `integer`
+
+* **`updated` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "created": 1,
+  "updated": 1,
+  "skipped": 1,
+  "errors": [
+    {
+      "row": 1,
+      "message": ""
+    }
+  ]
+}
+```
+
+### ProveedorCatalogoImportEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`created` (required)**
+
+    `integer`
+
+  - **`errors` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`message` (required)**
+
+      `string`
+
+    - **`row` (required)**
+
+      `integer`
+
+  - **`skipped` (required)**
+
+    `integer`
+
+  - **`updated` (required)**
+
+    `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "created": 1,
+    "updated": 1,
+    "skipped": 1,
+    "errors": [
+      {
+        "row": 1,
+        "message": ""
       }
     ]
   }

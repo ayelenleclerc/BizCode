@@ -71,6 +71,21 @@ Metrics use received purchase orders (`OrdenCompraItem.cantidadRecibida`) and ac
 
 **API:** `GET /api/proveedores/{id}/historial`, `GET /api/proveedores/{id}/articulos?dias=` — see [OpenAPI](../../api/openapi.yaml).
 
+## Supplier product catalog (GitHub #273)
+
+For **existing** suppliers, open the **Catalog** tab (`logistics.purchases`, `suppliers.read`):
+
+- Each supplier may define **supplier-specific codes, descriptions, and list prices** per internal product.
+- **Table:** supplier code, internal product code, descriptions, list price (with date), purchase unit, order multiple, and active flag.
+- **Price age indicator:** yellow when the list price is older than **30** days; red when older than **90** days.
+- **Add** (`suppliers.manage`): internal code (lookup by `Articulo.codigo`), supplier code, optional description, price, unit, and multiple.
+- **Inline edit** for the same fields plus active status.
+- **CSV import** with fixed header: `codigo_proveedor`, `codigo_interno`, `precio`, `unidad` (`codigo_interno` is the tenant’s numeric product code).
+
+Audit actions: `proveedor_catalogo_create`, `proveedor_catalogo_update`, `proveedor_catalogo_import`.
+
+**API:** `GET /api/proveedores/{id}/catalogo`, `POST .../catalogo`, `PUT .../catalogo/{articuloId}`, `POST .../catalogo/import` — see [OpenAPI](../../api/openapi.yaml).
+
 ## Deactivate (logical delete)
 
 Select a row and **Deactivate**. The record stays in the database (`activo: false`) for purchase orders and purchase vouchers already linked. Use the inactive filter to review deactivated suppliers.

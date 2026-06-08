@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "activo": {
+      "type": "boolean"
+    },
+    "articulo": {
+      "$ref": "./ProveedorCatalogoArticuloRef.schema.json"
+    },
+    "articuloId": {
+      "type": "integer"
+    },
+    "codigoProveedor": {
+      "type": "string"
+    },
+    "descripcion": {
+      "nullable": true,
+      "type": "string"
+    },
+    "id": {
+      "type": "integer"
+    },
+    "multiplo": {
+      "type": "string"
+    },
+    "precioLista": {
+      "nullable": true,
+      "type": "string"
+    },
+    "precioListaFecha": {
+      "format": "date-time",
+      "nullable": true,
+      "type": "string"
+    },
+    "unidadCompra": {
+      "nullable": true,
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "articuloId",
+    "codigoProveedor",
+    "descripcion",
+    "precioLista",
+    "precioListaFecha",
+    "unidadCompra",
+    "multiplo",
+    "activo",
+    "articulo"
+  ],
+  "title": "ProveedorCatalogoRow",
+  "type": "object"
+}

@@ -1506,6 +1506,149 @@ paths:
         '403':
           $ref: '#/components/responses/ForbiddenError'
 
+  /api/proveedores/{id}/catalogo:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    get:
+      tags: [proveedores]
+      summary: Supplier catalog — article codes and list prices (#273)
+      description: Requires module `logistics.purchases` and permission `suppliers.read`.
+      responses:
+        '200':
+          description: Catalog items for the supplier
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProveedorCatalogoListEnvelope'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+    post:
+      tags: [proveedores]
+      summary: Add article to supplier catalog (#273)
+      description: Requires module `logistics.purchases` and permission `suppliers.manage`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProveedorCatalogoInput'
+      responses:
+        '201':
+          description: Catalog entry created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProveedorCatalogoEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '409':
+          $ref: '#/components/responses/ConflictError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /api/proveedores/{id}/catalogo/import:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    post:
+      tags: [proveedores]
+      summary: Import supplier catalog from CSV (#273)
+      description: |
+        CSV columns: `codigo_proveedor`, `codigo_interno` (article `codigo`), optional `precio`, `unidad`.
+        Requires module `logistics.purchases` and permission `suppliers.manage`.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Import summary
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProveedorCatalogoImportEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /api/proveedores/{id}/catalogo/{articuloId}:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: articuloId
+        in: path
+        required: true
+        schema:
+          type: integer
+    put:
+      tags: [proveedores]
+      summary: Update supplier catalog entry (#273)
+      description: Requires module `logistics.purchases` and permission `suppliers.manage`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProveedorCatalogoUpdateInput'
+      responses:
+        '200':
+          description: Updated catalog entry
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProveedorCatalogoEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '409':
+          $ref: '#/components/responses/ConflictError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
   /api/proveedores/{id}/cuenta-corriente:
     parameters:
       - $ref: '#/components/parameters/BizcodeChannelHeader'
@@ -6400,6 +6543,174 @@ components:
           const: true
         data:
           $ref: '#/components/schemas/ProveedorArticulosHistorialData'
+
+    ProveedorCatalogoArticuloRef:
+      type: object
+      required: [id, codigo, descripcion]
+      properties:
+        id:
+          type: integer
+        codigo:
+          type: integer
+        descripcion:
+          type: string
+
+    ProveedorCatalogoRow:
+      type: object
+      required:
+        - id
+        - articuloId
+        - codigoProveedor
+        - descripcion
+        - precioLista
+        - precioListaFecha
+        - unidadCompra
+        - multiplo
+        - activo
+        - articulo
+      properties:
+        id:
+          type: integer
+        articuloId:
+          type: integer
+        codigoProveedor:
+          type: string
+        descripcion:
+          type: string
+          nullable: true
+        precioLista:
+          type: string
+          nullable: true
+        precioListaFecha:
+          type: string
+          format: date-time
+          nullable: true
+        unidadCompra:
+          type: string
+          nullable: true
+        multiplo:
+          type: string
+        activo:
+          type: boolean
+        articulo:
+          $ref: '#/components/schemas/ProveedorCatalogoArticuloRef'
+
+    ProveedorCatalogoListData:
+      type: object
+      required: [items]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProveedorCatalogoRow'
+
+    ProveedorCatalogoListEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/ProveedorCatalogoListData'
+
+    ProveedorCatalogoEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/ProveedorCatalogoRow'
+
+    ProveedorCatalogoInput:
+      type: object
+      required: [articuloId, codigoProveedor]
+      properties:
+        articuloId:
+          type: integer
+          minimum: 1
+        codigoProveedor:
+          type: string
+          minLength: 1
+          maxLength: 50
+        descripcion:
+          type: string
+          maxLength: 120
+          nullable: true
+        precioLista:
+          type: number
+          minimum: 0
+          nullable: true
+        unidadCompra:
+          type: string
+          maxLength: 30
+          nullable: true
+        multiplo:
+          type: number
+          exclusiveMinimum: 0
+        activo:
+          type: boolean
+
+    ProveedorCatalogoUpdateInput:
+      type: object
+      properties:
+        codigoProveedor:
+          type: string
+          minLength: 1
+          maxLength: 50
+        descripcion:
+          type: string
+          maxLength: 120
+          nullable: true
+        precioLista:
+          type: number
+          minimum: 0
+          nullable: true
+        unidadCompra:
+          type: string
+          maxLength: 30
+          nullable: true
+        multiplo:
+          type: number
+          exclusiveMinimum: 0
+        activo:
+          type: boolean
+
+    ProveedorCatalogoImportError:
+      type: object
+      required: [row, message]
+      properties:
+        row:
+          type: integer
+        message:
+          type: string
+
+    ProveedorCatalogoImportData:
+      type: object
+      required: [created, updated, skipped, errors]
+      properties:
+        created:
+          type: integer
+        updated:
+          type: integer
+        skipped:
+          type: integer
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProveedorCatalogoImportError'
+
+    ProveedorCatalogoImportEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/ProveedorCatalogoImportData'
 
     ProveedorCuentaCorrienteEnvelope:
       type: object

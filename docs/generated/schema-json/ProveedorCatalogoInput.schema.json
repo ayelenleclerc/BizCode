@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "activo": {
+      "type": "boolean"
+    },
+    "articuloId": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "codigoProveedor": {
+      "maxLength": 50,
+      "minLength": 1,
+      "type": "string"
+    },
+    "descripcion": {
+      "maxLength": 120,
+      "nullable": true,
+      "type": "string"
+    },
+    "multiplo": {
+      "exclusiveMinimum": 0,
+      "type": "number"
+    },
+    "precioLista": {
+      "minimum": 0,
+      "nullable": true,
+      "type": "number"
+    },
+    "unidadCompra": {
+      "maxLength": 30,
+      "nullable": true,
+      "type": "string"
+    }
+  },
+  "required": [
+    "articuloId",
+    "codigoProveedor"
+  ],
+  "title": "ProveedorCatalogoInput",
+  "type": "object"
+}

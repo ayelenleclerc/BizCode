@@ -6,6 +6,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import request from 'supertest'
 import type { PrismaClient } from '@prisma/client'
+import { Decimal } from '@prisma/client/runtime/library'
 import { createApp } from '../../server/createApp'
 
 const CLIENTE_ROW = {
@@ -151,7 +152,7 @@ function basePrismaForMutations(): {
   prisma.formaPago = { findMany: vi.fn().mockResolvedValue([]) }
   prisma.proveedor = {
     findMany: vi.fn().mockResolvedValue([]),
-    findFirst: vi.fn().mockResolvedValue(null),
+    findFirst: vi.fn().mockResolvedValue({ id: 5, tenantId: 1 }),
     findUnique: vi.fn().mockResolvedValue(null),
     create: vi.fn().mockResolvedValue({ id: 5, codigo: 4001, rsocial: 'P', condIva: 'RI', activo: true }),
     update: vi.fn().mockResolvedValue({
@@ -160,6 +161,34 @@ function basePrismaForMutations(): {
       rsocial: 'Proveedor Audit SA',
       condIva: 'RI',
       activo: true,
+    }),
+  }
+  prisma.proveedorArticulo = {
+    findMany: vi.fn().mockResolvedValue([]),
+    findFirst: vi.fn().mockResolvedValue(null),
+    create: vi.fn().mockResolvedValue({
+      id: 11,
+      articuloId: 2,
+      codigoProveedor: 'CAT-1',
+      descripcion: null,
+      precioLista: new Decimal(100),
+      precioListaFecha: new Date(),
+      unidadCompra: null,
+      multiplo: new Decimal(1),
+      activo: true,
+      articulo: { id: 2, codigo: 100, descripcion: 'Art' },
+    }),
+    update: vi.fn().mockResolvedValue({
+      id: 11,
+      articuloId: 2,
+      codigoProveedor: 'CAT-1',
+      descripcion: null,
+      precioLista: new Decimal(110),
+      precioListaFecha: new Date(),
+      unidadCompra: null,
+      multiplo: new Decimal(1),
+      activo: true,
+      articulo: { id: 2, codigo: 100, descripcion: 'Art' },
     }),
   }
   const facturaCreated = {
@@ -470,6 +499,48 @@ describe('HTTP mutations emit AuditEvent (coverage matrix)', () => {
     expect(auditCreate).toHaveBeenCalledWith(
       expect.objectContaining({
         data: expect.objectContaining({ action: 'proveedor_update', resource: 'proveedor', resourceId: '5' }),
+      }),
+    )
+  })
+
+  it('POST /api/proveedores/:id/catalogo → proveedor_catalogo_create', async () => {
+    const { prisma, auditCreate } = basePrismaForMutations()
+    const app = createApp(prisma)
+
+    await request(app)
+      .post('/api/proveedores/5/catalogo')
+      .send({ articuloId: 2, codigoProveedor: 'CAT-1', precioLista: 100 })
+      .expect(201)
+
+    expect(auditCreate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          action: 'proveedor_catalogo_create',
+          resource: 'proveedor_articulo',
+          resourceId: '11',
+        }),
+      }),
+    )
+  })
+
+  it('PUT /api/proveedores/:id/catalogo/:articuloId → proveedor_catalogo_update', async () => {
+    const { prisma, auditCreate } = basePrismaForMutations()
+    vi.mocked(prisma.proveedorArticulo.findFirst).mockResolvedValue({ id: 11, tenantId: 1, proveedorId: 5, articuloId: 2 } as never)
+
+    const app = createApp(prisma)
+
+    await request(app)
+      .put('/api/proveedores/5/catalogo/2')
+      .send({ precioLista: 110 })
+      .expect(200)
+
+    expect(auditCreate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          action: 'proveedor_catalogo_update',
+          resource: 'proveedor_articulo',
+          resourceId: '11',
+        }),
       }),
     )
   })

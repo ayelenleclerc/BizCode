@@ -25,6 +25,7 @@ const TEST_DEFAULT_MODULES: ModuleKey[] = [
   'billing.credit_notes',
   'billing.afip_cae',
   'finance.ledger',
+  'logistics.purchases',
 ]
 
 /**

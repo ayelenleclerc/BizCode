@@ -50,6 +50,7 @@
     "tabDatos": "Datos",
     "tabCuentaCorriente": "Cuenta corriente",
     "tabHistorial": "Historial",
+    "tabCatalogo": "Catálogo",
     "sections": {
       "general": "Datos generales",
       "banking": "Datos bancarios",
@@ -190,6 +191,46 @@
     "estado": {
       "emitido": "Emitido",
       "anulado": "Anulado"
+    }
+  },
+  "catalogo": {
+    "empty": "No hay artículos en el catálogo de este proveedor.",
+    "tableCaption": "Catálogo de artículos del proveedor",
+    "addOpen": "Agregar artículo",
+    "addCancel": "Cerrar formulario",
+    "addTitle": "Nuevo artículo en catálogo",
+    "addSubmit": "Agregar al catálogo",
+    "edit": "Editar",
+    "colCodigoProveedor": "Código proveedor",
+    "colCodigoInterno": "Código interno",
+    "colDescripcionInterna": "Descripción interna",
+    "colDescripcionProveedor": "Descripción proveedor",
+    "colPrecioLista": "Precio de lista",
+    "colUnidad": "Unidad de compra",
+    "colMultiplo": "Múltiplo",
+    "colActivo": "Activo",
+    "colAcciones": "Acciones",
+    "precioStaleWarning": "Precio actualizado hace más de 30 días",
+    "precioStaleDanger": "Precio actualizado hace más de 90 días",
+    "errors": {
+      "articuloNotFound": "No se encontró un artículo con ese código interno",
+      "codigoProveedorRequired": "El código del proveedor es obligatorio",
+      "precioInvalid": "El precio debe ser un número mayor o igual a cero",
+      "multiploInvalid": "El múltiplo debe ser mayor a cero"
+    },
+    "import": {
+      "button": "Importar CSV",
+      "title": "Importar catálogo desde CSV",
+      "description": "Columnas: código_proveedor, código_interno, precio, unidad. La primera fila debe ser la cabecera.",
+      "downloadTemplate": "Descargar plantilla CSV",
+      "chooseFile": "Elegir archivo .csv",
+      "submit": "Importar",
+      "close": "Cerrar",
+      "loading": "Importando…",
+      "successSummary": "Importación: {{created}} creados, {{updated}} actualizados, {{skipped}} omitidos.",
+      "row": "Fila",
+      "message": "Mensaje",
+      "errorGeneric": "No se pudo importar el catálogo."
     }
   },
   "historial": {

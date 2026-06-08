@@ -71,6 +71,21 @@ Las métricas usan `OrdenCompraItem.cantidadRecibida` y comprobantes activos; no
 
 **API:** `GET /api/proveedores/{id}/historial`, `GET /api/proveedores/{id}/articulos?dias=` — [OpenAPI](../../api/openapi.yaml).
 
+## Catálogo por proveedor (GitHub #273)
+
+En proveedores **existentes**, pestaña **Catálogo** (`logistics.purchases`, `suppliers.read`):
+
+- Cada proveedor puede tener **códigos, descripciones y precios de lista** propios por artículo interno.
+- **Tabla:** código proveedor, código interno del artículo, descripciones, precio de lista (con fecha), unidad de compra, múltiplo y estado activo.
+- **Indicador de precio:** amarillo si el precio tiene más de **30** días sin actualizar; rojo si supera **90** días.
+- **Alta** (`suppliers.manage`): código interno (lookup por `Articulo.codigo`), código proveedor, descripción opcional, precio, unidad y múltiplo.
+- **Edición inline** del mismo conjunto de campos y estado activo.
+- **Importación CSV** con cabecera fija: `codigo_proveedor`, `codigo_interno`, `precio`, `unidad` (`codigo_interno` = código numérico del artículo en el tenant).
+
+Auditoría: `proveedor_catalogo_create`, `proveedor_catalogo_update`, `proveedor_catalogo_import`.
+
+**API:** `GET /api/proveedores/{id}/catalogo`, `POST .../catalogo`, `PUT .../catalogo/{articuloId}`, `POST .../catalogo/import` — [OpenAPI](../../api/openapi.yaml).
+
 ## Baja lógica
 
 **Dar de baja** pone `activo: false` sin borrar el registro (órdenes de compra y comprobantes existentes siguen referenciando al proveedor). Usá el filtro de inactivos para revisarlos.
