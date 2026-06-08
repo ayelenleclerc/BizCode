@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "confirmado": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "descartado": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "documentos": {
+      "items": {
+        "$ref": "./DocumentoCompraImportado.schema.json"
+      },
+      "type": "array"
+    },
+    "pendiente_revision": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "procesando": {
+      "minimum": 0,
+      "type": "integer"
+    }
+  },
+  "required": [
+    "procesando",
+    "pendiente_revision",
+    "confirmado",
+    "descartado",
+    "documentos"
+  ],
+  "title": "DocumentoCompraColaEstado",
+  "type": "object"
+}

@@ -2,6 +2,8 @@
   "title": "Finanzas",
   "subtitle": "Cuentas por cobrar, aging y cuenta corriente",
   "forbidden": "No tenés permiso para ver reportes financieros.",
+  "periodoMonth": "Mes",
+  "periodoYear": "Año",
   "summary": {
     "totalDebt": "Deuda total",
     "overdue": "Deuda vencida",
@@ -163,6 +165,40 @@
       "numeroInvalid": "El número debe ser un entero mayor a cero.",
       "prefijoRequired": "Ingresá el punto de venta.",
       "saveFailed": "No se pudo guardar el comprobante."
+    }
+  },
+  "documentoCompra": {
+    "title": "Importar documento de compra",
+    "hint": "Subí un PDF o imagen (jpg, png, webp, heic). Si el documento tiene QR AFIP/ARCA, los datos principales se completan solos. Revisá antes de confirmar.",
+    "batchHint": "Podés subir hasta 20 archivos a la vez. Si tiers 1–3 fallan y Ollama local está configurado (OLLAMA_URL), se intenta extracción Tier 4.",
+    "dropHint": "Arrastrá un archivo aquí o usá el botón para seleccionarlo.",
+    "dropHintBatch": "Arrastrá uno o más archivos (máx. 20) o usá el botón para seleccionarlos.",
+    "selectFile": "Seleccionar archivo",
+    "uploading": "Subiendo…",
+    "previewTitle": "Revisá el documento antes de confirmar",
+    "confidence": "Confianza de extracción: {{pct}}% (nivel {{tier}})",
+    "manualReview": "completá los campos manualmente",
+    "tier1Hint": "QR AFIP/ARCA decodificado localmente (sin verificación en portal)",
+    "tier2Hint": "texto PDF + plantilla Argentina (regex YAML)",
+    "tier3Hint": "OCR local (Tesseract) + plantilla — revisá campos en amarillo",
+    "tier4Hint": "Ollama local (opcional) — revisá todos los campos",
+    "queueTitle": "Cola de importación",
+    "queueProcesando": "Procesando: {{count}}",
+    "queuePendiente": "Pendiente revisión: {{count}}",
+    "queueConfirmado": "Importados: {{count}}",
+    "queueEmpty": "No hay documentos pendientes de revisión.",
+    "queueLoading": "Actualizando cola…",
+    "review": "Revisar",
+    "batchUploaded": "{{count}} documentos subidos — revisá cada uno antes de confirmar.",
+    "proveedorNotMatched": "No encontramos un proveedor con el CUIT del emisor. Seleccioná o creá el proveedor antes de confirmar.",
+    "confirm": "Confirmar e importar",
+    "confirming": "Confirmando…",
+    "cancel": "Cancelar",
+    "confirmed": "Documento #{{docId}} importado — comprobante #{{comprobanteId}} creado.",
+    "errors": {
+      "uploadFailed": "No se pudo procesar el archivo.",
+      "confirmFailed": "No se pudo confirmar la importación.",
+      "totalRequired": "El total debe ser mayor a cero."
     }
   }
 }

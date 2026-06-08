@@ -42,6 +42,10 @@ Com o módulo **`finance.ledger`**, a seção **Contabilidade — Livro IVA Vend
 
 ## Livro IVA Compras (`finance.ledger`, #306)
 
-Abaixo de vendas, **Contabilidade — Livro IVA Compras**: use o formulário **Cadastro de comprovante de compra** (fornecedor, data, tipo A/B/C, PV, número, líquidos, IVA, total; CAE opcional). A API `POST /api/comprobantes-compra` permanece para integrações. Escolha o **período**, pré-visualize (CBTU / ALICUOTAS) e baixe ZIP ou Excel ([ADR-0014](../adr/ADR-0014-libro-iva-compras.md)). Ordens de compra não substituem comprovantes fiscais de fornecedor.
+Abaixo de vendas, **Contabilidade — Livro IVA Compras**: use o formulário **Cadastro de comprovante de compra** (fornecedor, data, tipo A/B/C, PV, número, líquidos, IVA, total; CAE opcional). A API `POST /api/comprobantes-compra` permanece para integrações.
+
+**Importar documento de compra** (#277): envie PDF ou imagem (até 20 arquivos por lote). Tiers locais: QR AFIP/ARCA (Tier 1), texto PDF + templates YAML (Tier 2), OCR + templates (Tier 3), Ollama opcional com `OLLAMA_URL` (Tier 4). Revise a fila de preview e confirme para criar `ComprobanteCompra`. APIs: `POST /api/documentos-compra/procesar`, `POST /api/documentos-compra/procesar-lote`, `GET /api/documentos-compra/cola`, `POST /api/documentos-compra/confirmar`. Templates custom do tenant: `GET`/`POST /api/documentos-compra/templates` (salvar exige `settings.fiscal.manage`).
+
+Escolha o **período**, pré-visualize (CBTU / ALICUOTAS) e baixe ZIP ou Excel ([ADR-0014](../adr/ADR-0014-libro-iva-compras.md)). Ordens de compra não substituem comprovantes fiscais de fornecedor.
 
 **Outros idiomas:** [English](../../en/user/manual-finance.md) · [Español](../../es/user/manual-finanzas.md)

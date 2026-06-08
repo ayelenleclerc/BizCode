@@ -22644,6 +22644,2027 @@ Persists a supplier fiscal voucher with netos/IVA breakdown for Libro IVA Compra
 }
 ```
 
+### PARAMETERS /api/documentos-compra/procesar
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/documentos-compra/procesar`
+
+### Upload purchase document for extraction preview (#277)
+
+- **Method:** `POST`
+- **Path:** `/api/documentos-compra/procesar`
+- **Tags:** contabilidad
+
+Stores the original PDF/image on local filesystem and returns an editable preview. **Tier 1:** decodes AFIP/ARCA FE QR locally from embedded PDF URL text or image scan (`jsQR` + `sharp`) — no portal/API verification. **Tier 2:** extracts text from digital PDF (`unpdf`) and applies bundled YAML regex templates (Argentina `generic-afip-ar`) when confidence ≥ 0.7. **Tier 3:** preprocesses images (`sharp`) and runs local OCR (`tesseract.js`, `spa+eng`), then applies the same templates when confidence ≥ 0.6. **Tier 4:** optional local Ollama (`OLLAMA_URL`, model `OLLAMA_MODEL` default `nuextract`) when tiers 1–3 fail. Falls back to empty manual preview (tier 0) when extraction fails. Requires modules `finance.ledger` and `logistics.purchases`, permission `reports.financial.read`. Multipart field `file` — pdf, jpg, png, webp, heic (max 10 MB).
+
+#### Request Body
+
+##### Content-Type: multipart/form-data
+
+- **`file` (required)**
+
+  `string`, format: `binary`
+
+**Example:**
+
+```json
+{
+  "file": {}
+}
+```
+
+#### Responses
+
+##### Status: 201 Document stored; preview pending review
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`archivoMime` (required)**
+
+    `string`
+
+  - **`archivoNombre` (required)**
+
+    `string`
+
+  - **`archivoPath` (required)**
+
+    `string`
+
+  - **`confianza` (required)**
+
+    `number`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`datosExtraidos` (required)**
+
+    `object`
+
+    - **`cae`**
+
+      `string`
+
+    - **`caeVto`**
+
+      `string`, format: `date-time`
+
+    - **`fecha`**
+
+      `string`, format: `date-time`
+
+    - **`fieldConfidence`**
+
+      `object`
+
+    - **`items`**
+
+      `array`
+
+      **Items:**
+
+      - **`cantidad` (required)**
+
+        `number`
+
+      - **`descripcion` (required)**
+
+        `string`
+
+      - **`precioUnitario` (required)**
+
+        `number`
+
+      - **`subtotal` (required)**
+
+        `number`
+
+      - **`articuloId`**
+
+        `integer`
+
+      - **`confianza`**
+
+        `number`
+
+    - **`iva1`**
+
+      `number`
+
+    - **`iva2`**
+
+      `number`
+
+    - **`neto1`**
+
+      `number`
+
+    - **`neto2`**
+
+      `number`
+
+    - **`neto3`**
+
+      `number`
+
+    - **`numero`**
+
+      `integer`
+
+    - **`prefijo`**
+
+      `string`
+
+    - **`proveedorId`**
+
+      `integer`
+
+    - **`tipo`**
+
+      `object`
+
+    - **`total`**
+
+      `number`
+
+    - **`vencimiento`**
+
+      `string`, format: `date-time`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"procesando", "pendiente_revision", "confirmado", "descartado"`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`tier` (required)**
+
+    `integer`
+
+  - **`tipoArchivo` (required)**
+
+    `string`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`usuarioId` (required)**
+
+    `integer`
+
+  - **`comprobanteCompraId`**
+
+    `integer`
+
+  - **`errores`**
+
+    `object`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "usuarioId": 1,
+    "archivoNombre": "",
+    "archivoMime": "",
+    "archivoPath": "",
+    "tipoArchivo": "",
+    "tier": 1,
+    "confianza": 1,
+    "estado": "procesando",
+    "datosExtraidos": {
+      "proveedorId": 1,
+      "fecha": "",
+      "vencimiento": "",
+      "tipo": "A",
+      "prefijo": "",
+      "numero": 1,
+      "neto1": 1,
+      "neto2": 1,
+      "neto3": 1,
+      "iva1": 1,
+      "iva2": 1,
+      "total": 1,
+      "cae": "",
+      "caeVto": "",
+      "items": [
+        {
+          "descripcion": "",
+          "cantidad": 1,
+          "precioUnitario": 1,
+          "subtotal": 1,
+          "articuloId": 1,
+          "confianza": 0
+        }
+      ],
+      "fieldConfidence": {
+        "additionalProperty": 1
+      }
+    },
+    "comprobanteCompraId": 1,
+    "errores": {},
+    "createdAt": "",
+    "updatedAt": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/documentos-compra/procesar-lote
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/documentos-compra/procesar-lote`
+
+### Batch upload purchase documents for extraction (#277 Phase E)
+
+- **Method:** `POST`
+- **Path:** `/api/documentos-compra/procesar-lote`
+- **Tags:** contabilidad
+
+Processes up to 20 PDF/image files sequentially (same tier pipeline as `procesar`). Multipart field `files` — pdf, jpg, png, webp, heic (max 10 MB each). Requires `finance.ledger`, `logistics.purchases`, `reports.financial.read`.
+
+#### Request Body
+
+##### Content-Type: multipart/form-data
+
+- **`files` (required)**
+
+  `array`
+
+  **Items:**
+
+  `string`, format: `binary`
+
+**Example:**
+
+```json
+{
+  "files": [
+    {}
+  ]
+}
+```
+
+#### Responses
+
+##### Status: 201 All documents stored; previews pending review
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`archivoMime` (required)**
+
+    `string`
+
+  - **`archivoNombre` (required)**
+
+    `string`
+
+  - **`archivoPath` (required)**
+
+    `string`
+
+  - **`confianza` (required)**
+
+    `number`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`datosExtraidos` (required)**
+
+    `object`
+
+    - **`cae`**
+
+      `string`
+
+    - **`caeVto`**
+
+      `string`, format: `date-time`
+
+    - **`fecha`**
+
+      `string`, format: `date-time`
+
+    - **`fieldConfidence`**
+
+      `object`
+
+    - **`items`**
+
+      `array`
+
+      **Items:**
+
+      - **`cantidad` (required)**
+
+        `number`
+
+      - **`descripcion` (required)**
+
+        `string`
+
+      - **`precioUnitario` (required)**
+
+        `number`
+
+      - **`subtotal` (required)**
+
+        `number`
+
+      - **`articuloId`**
+
+        `integer`
+
+      - **`confianza`**
+
+        `number`
+
+    - **`iva1`**
+
+      `number`
+
+    - **`iva2`**
+
+      `number`
+
+    - **`neto1`**
+
+      `number`
+
+    - **`neto2`**
+
+      `number`
+
+    - **`neto3`**
+
+      `number`
+
+    - **`numero`**
+
+      `integer`
+
+    - **`prefijo`**
+
+      `string`
+
+    - **`proveedorId`**
+
+      `integer`
+
+    - **`tipo`**
+
+      `object`
+
+    - **`total`**
+
+      `number`
+
+    - **`vencimiento`**
+
+      `string`, format: `date-time`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"procesando", "pendiente_revision", "confirmado", "descartado"`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`tier` (required)**
+
+    `integer`
+
+  - **`tipoArchivo` (required)**
+
+    `string`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`usuarioId` (required)**
+
+    `integer`
+
+  - **`comprobanteCompraId`**
+
+    `integer`
+
+  - **`errores`**
+
+    `object`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "usuarioId": 1,
+      "archivoNombre": "",
+      "archivoMime": "",
+      "archivoPath": "",
+      "tipoArchivo": "",
+      "tier": 1,
+      "confianza": 1,
+      "estado": "procesando",
+      "datosExtraidos": {
+        "proveedorId": 1,
+        "fecha": "",
+        "vencimiento": "",
+        "tipo": "A",
+        "prefijo": "",
+        "numero": 1,
+        "neto1": 1,
+        "neto2": 1,
+        "neto3": 1,
+        "iva1": 1,
+        "iva2": 1,
+        "total": 1,
+        "cae": "",
+        "caeVto": "",
+        "items": [
+          {
+            "descripcion": "",
+            "cantidad": 1,
+            "precioUnitario": 1,
+            "subtotal": 1,
+            "articuloId": 1,
+            "confianza": 0
+          }
+        ],
+        "fieldConfidence": {
+          "additionalProperty": 1
+        }
+      },
+      "comprobanteCompraId": 1,
+      "errores": {},
+      "createdAt": "",
+      "updatedAt": ""
+    }
+  ]
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/documentos-compra/cola
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/documentos-compra/cola`
+
+### Purchase document import queue status (#277 Phase E)
+
+- **Method:** `GET`
+- **Path:** `/api/documentos-compra/cola`
+- **Tags:** contabilidad
+
+Returns counts by estado and the 20 most recent import rows for the current user. Requires `finance.ledger`, `logistics.purchases`, `reports.financial.read`.
+
+#### Responses
+
+##### Status: 200 Queue snapshot
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`confirmado` (required)**
+
+    `integer`
+
+  - **`descartado` (required)**
+
+    `integer`
+
+  - **`documentos` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`archivoMime` (required)**
+
+      `string`
+
+    - **`archivoNombre` (required)**
+
+      `string`
+
+    - **`archivoPath` (required)**
+
+      `string`
+
+    - **`confianza` (required)**
+
+      `number`
+
+    - **`createdAt` (required)**
+
+      `string`, format: `date-time`
+
+    - **`datosExtraidos` (required)**
+
+      `object`
+
+      - **`cae`**
+
+        `string`
+
+      - **`caeVto`**
+
+        `string`, format: `date-time`
+
+      - **`fecha`**
+
+        `string`, format: `date-time`
+
+      - **`fieldConfidence`**
+
+        `object`
+
+      - **`items`**
+
+        `array`
+
+        **Items:**
+
+        - **`cantidad` (required)**
+
+          `number`
+
+        - **`descripcion` (required)**
+
+          `string`
+
+        - **`precioUnitario` (required)**
+
+          `number`
+
+        - **`subtotal` (required)**
+
+          `number`
+
+        - **`articuloId`**
+
+          `integer`
+
+        - **`confianza`**
+
+          `number`
+
+      - **`iva1`**
+
+        `number`
+
+      - **`iva2`**
+
+        `number`
+
+      - **`neto1`**
+
+        `number`
+
+      - **`neto2`**
+
+        `number`
+
+      - **`neto3`**
+
+        `number`
+
+      - **`numero`**
+
+        `integer`
+
+      - **`prefijo`**
+
+        `string`
+
+      - **`proveedorId`**
+
+        `integer`
+
+      - **`tipo`**
+
+        `object`
+
+      - **`total`**
+
+        `number`
+
+      - **`vencimiento`**
+
+        `string`, format: `date-time`
+
+    - **`estado` (required)**
+
+      `string`, possible values: `"procesando", "pendiente_revision", "confirmado", "descartado"`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`tenantId` (required)**
+
+      `integer`
+
+    - **`tier` (required)**
+
+      `integer`
+
+    - **`tipoArchivo` (required)**
+
+      `string`
+
+    - **`updatedAt` (required)**
+
+      `string`, format: `date-time`
+
+    - **`usuarioId` (required)**
+
+      `integer`
+
+    - **`comprobanteCompraId`**
+
+      `integer`
+
+    - **`errores`**
+
+      `object`
+
+  - **`pendiente_revision` (required)**
+
+    `integer`
+
+  - **`procesando` (required)**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "procesando": 0,
+    "pendiente_revision": 0,
+    "confirmado": 0,
+    "descartado": 0,
+    "documentos": [
+      {
+        "id": 1,
+        "tenantId": 1,
+        "usuarioId": 1,
+        "archivoNombre": "",
+        "archivoMime": "",
+        "archivoPath": "",
+        "tipoArchivo": "",
+        "tier": 1,
+        "confianza": 1,
+        "estado": "procesando",
+        "datosExtraidos": {
+          "proveedorId": 1,
+          "fecha": "",
+          "vencimiento": "",
+          "tipo": "A",
+          "prefijo": "",
+          "numero": 1,
+          "neto1": 1,
+          "neto2": 1,
+          "neto3": 1,
+          "iva1": 1,
+          "iva2": 1,
+          "total": 1,
+          "cae": "",
+          "caeVto": "",
+          "items": [
+            {
+              "descripcion": "",
+              "cantidad": 1,
+              "precioUnitario": 1,
+              "subtotal": 1,
+              "articuloId": 1,
+              "confianza": 0
+            }
+          ],
+          "fieldConfidence": {
+            "additionalProperty": 1
+          }
+        },
+        "comprobanteCompraId": 1,
+        "errores": {},
+        "createdAt": "",
+        "updatedAt": ""
+      }
+    ]
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/documentos-compra/templates
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/documentos-compra/templates`
+
+### List purchase document extraction templates (#277 Phase E)
+
+- **Method:** `GET`
+- **Path:** `/api/documentos-compra/templates`
+- **Tags:** contabilidad
+
+Bundled Argentina templates plus tenant custom YAML under `data/documentos-compra-templates/{tenantId}/`. Requires `finance.ledger`, `logistics.purchases`, `reports.financial.read`.
+
+#### Responses
+
+##### Status: 200 Template catalog
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`issuer` (required)**
+
+    `string`
+
+  - **`keywords` (required)**
+
+    `array`
+
+    **Items:**
+
+    `string`
+
+  - **`source` (required)**
+
+    `string`, possible values: `"bundled", "custom"`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "issuer": "",
+      "keywords": [
+        ""
+      ],
+      "source": "bundled"
+    }
+  ]
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Save tenant custom extraction template (#277 Phase E)
+
+- **Method:** `POST`
+- **Path:** `/api/documentos-compra/templates`
+- **Tags:** contabilidad
+
+Persists invoice2data-style YAML for the current tenant. Requires `settings.fiscal.manage`.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`content` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "content": ""
+}
+```
+
+#### Responses
+
+##### Status: 201 Template saved
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`fields` (required)**
+
+    `object`
+
+  - **`issuer` (required)**
+
+    `string`
+
+  - **`keywords` (required)**
+
+    `array`
+
+    **Items:**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "issuer": "",
+    "keywords": [
+      ""
+    ],
+    "fields": {
+      "additionalProperty": "anything"
+    }
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/documentos-compra/confirmar
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/documentos-compra/confirmar`
+
+### Confirm imported document and create ComprobanteCompra (#277 Phase A)
+
+- **Method:** `POST`
+- **Path:** `/api/documentos-compra/confirmar`
+- **Tags:** contabilidad
+
+Persists `ComprobanteCompra` from reviewed preview and links the import record. Duplicate `tipo` + `prefijo` + `numero` returns 409.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+**All of:**
+
+- **`fecha` (required)**
+
+  `string`, format: `date-time`
+
+- **`iva1` (required)**
+
+  `number`
+
+- **`iva2` (required)**
+
+  `number`
+
+- **`neto1` (required)**
+
+  `number`
+
+- **`neto2` (required)**
+
+  `number`
+
+- **`neto3` (required)**
+
+  `number`
+
+- **`numero` (required)**
+
+  `integer`
+
+- **`prefijo` (required)**
+
+  `string`
+
+- **`proveedorId` (required)**
+
+  `integer`
+
+- **`tipo` (required)**
+
+  `string`, possible values: `"A", "B", "C"`
+
+- **`total` (required)**
+
+  `number`
+
+- **`cae`**
+
+  `string`
+
+- **`caeVto`**
+
+  `string`, format: `date-time`
+
+- **`ordenCompraId`**
+
+  `integer`
+
+- **`vencimiento`**
+
+  `string`, format: `date-time` — Explicit due date; when omitted, derived from supplier payment terms (#275).
+
+* **`documentoId` (required)**
+
+  `integer`
+
+* **`items`**
+
+  `array`
+
+  **Items:**
+
+  - **`cantidad` (required)**
+
+    `number`
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`precioUnitario` (required)**
+
+    `number`
+
+  - **`subtotal` (required)**
+
+    `number`
+
+  - **`articuloId`**
+
+    `integer`
+
+  - **`confianza`**
+
+    `number`
+
+**Example:**
+
+```json
+{
+  "fecha": "",
+  "tipo": "A",
+  "prefijo": "",
+  "numero": 1,
+  "proveedorId": 1,
+  "ordenCompraId": 1,
+  "neto1": 0,
+  "neto2": 0,
+  "neto3": 0,
+  "iva1": 0,
+  "iva2": 0,
+  "total": 0,
+  "cae": "",
+  "caeVto": "",
+  "vencimiento": "",
+  "documentoId": 1,
+  "items": [
+    {
+      "descripcion": "",
+      "cantidad": 1,
+      "precioUnitario": 1,
+      "subtotal": 1,
+      "articuloId": 1,
+      "confianza": 0
+    }
+  ]
+}
+```
+
+#### Responses
+
+##### Status: 201 Confirmed
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`comprobanteCompra` (required)**
+
+    `object`
+
+    - **`createdAt` (required)**
+
+      `string`, format: `date-time`
+
+    - **`estado` (required)**
+
+      `string`
+
+    - **`fecha` (required)**
+
+      `string`, format: `date-time`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`iva1` (required)**
+
+      `number`
+
+    - **`iva2` (required)**
+
+      `number`
+
+    - **`neto1` (required)**
+
+      `number`
+
+    - **`neto2` (required)**
+
+      `number`
+
+    - **`neto3` (required)**
+
+      `number`
+
+    - **`numero` (required)**
+
+      `integer`
+
+    - **`prefijo` (required)**
+
+      `string`
+
+    - **`proveedorId` (required)**
+
+      `integer`
+
+    - **`tenantId` (required)**
+
+      `integer`
+
+    - **`tipo` (required)**
+
+      `string`
+
+    - **`total` (required)**
+
+      `number`
+
+    - **`updatedAt` (required)**
+
+      `string`, format: `date-time`
+
+    - **`cae`**
+
+      `string`
+
+    - **`caeVto`**
+
+      `string`, format: `date-time`
+
+    - **`ordenCompraId`**
+
+      `integer`
+
+  - **`documento` (required)**
+
+    `object`
+
+    - **`archivoMime` (required)**
+
+      `string`
+
+    - **`archivoNombre` (required)**
+
+      `string`
+
+    - **`archivoPath` (required)**
+
+      `string`
+
+    - **`confianza` (required)**
+
+      `number`
+
+    - **`createdAt` (required)**
+
+      `string`, format: `date-time`
+
+    - **`datosExtraidos` (required)**
+
+      `object`
+
+      - **`cae`**
+
+        `string`
+
+      - **`caeVto`**
+
+        `string`, format: `date-time`
+
+      - **`fecha`**
+
+        `string`, format: `date-time`
+
+      - **`fieldConfidence`**
+
+        `object`
+
+      - **`items`**
+
+        `array`
+
+        **Items:**
+
+        - **`cantidad` (required)**
+
+          `number`
+
+        - **`descripcion` (required)**
+
+          `string`
+
+        - **`precioUnitario` (required)**
+
+          `number`
+
+        - **`subtotal` (required)**
+
+          `number`
+
+        - **`articuloId`**
+
+          `integer`
+
+        - **`confianza`**
+
+          `number`
+
+      - **`iva1`**
+
+        `number`
+
+      - **`iva2`**
+
+        `number`
+
+      - **`neto1`**
+
+        `number`
+
+      - **`neto2`**
+
+        `number`
+
+      - **`neto3`**
+
+        `number`
+
+      - **`numero`**
+
+        `integer`
+
+      - **`prefijo`**
+
+        `string`
+
+      - **`proveedorId`**
+
+        `integer`
+
+      - **`tipo`**
+
+        `object`
+
+      - **`total`**
+
+        `number`
+
+      - **`vencimiento`**
+
+        `string`, format: `date-time`
+
+    - **`estado` (required)**
+
+      `string`, possible values: `"procesando", "pendiente_revision", "confirmado", "descartado"`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`tenantId` (required)**
+
+      `integer`
+
+    - **`tier` (required)**
+
+      `integer`
+
+    - **`tipoArchivo` (required)**
+
+      `string`
+
+    - **`updatedAt` (required)**
+
+      `string`, format: `date-time`
+
+    - **`usuarioId` (required)**
+
+      `integer`
+
+    - **`comprobanteCompraId`**
+
+      `integer`
+
+    - **`errores`**
+
+      `object`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "documento": {
+      "id": 1,
+      "tenantId": 1,
+      "usuarioId": 1,
+      "archivoNombre": "",
+      "archivoMime": "",
+      "archivoPath": "",
+      "tipoArchivo": "",
+      "tier": 1,
+      "confianza": 1,
+      "estado": "procesando",
+      "datosExtraidos": {
+        "proveedorId": 1,
+        "fecha": "",
+        "vencimiento": "",
+        "tipo": "A",
+        "prefijo": "",
+        "numero": 1,
+        "neto1": 1,
+        "neto2": 1,
+        "neto3": 1,
+        "iva1": 1,
+        "iva2": 1,
+        "total": 1,
+        "cae": "",
+        "caeVto": "",
+        "items": [
+          {
+            "descripcion": "",
+            "cantidad": 1,
+            "precioUnitario": 1,
+            "subtotal": 1,
+            "articuloId": 1,
+            "confianza": 0
+          }
+        ],
+        "fieldConfidence": {
+          "additionalProperty": 1
+        }
+      },
+      "comprobanteCompraId": 1,
+      "errores": {},
+      "createdAt": "",
+      "updatedAt": ""
+    },
+    "comprobanteCompra": {
+      "id": 1,
+      "tenantId": 1,
+      "proveedorId": 1,
+      "ordenCompraId": 1,
+      "fecha": "",
+      "tipo": "",
+      "prefijo": "",
+      "numero": 1,
+      "neto1": 1,
+      "neto2": 1,
+      "neto3": 1,
+      "iva1": 1,
+      "iva2": 1,
+      "total": 1,
+      "cae": "",
+      "caeVto": "",
+      "estado": "",
+      "createdAt": "",
+      "updatedAt": ""
+    }
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 409 Resource conflict
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/documentos-compra/{id}/original
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/documentos-compra/{id}/original`
+
+### Download original imported purchase document (#277 Phase A)
+
+- **Method:** `GET`
+- **Path:** `/api/documentos-compra/{id}/original`
+- **Tags:** contabilidad
+
+Returns the stored PDF/image bytes. Requires `finance.ledger`, `logistics.purchases`, `reports.financial.read`.
+
+#### Responses
+
+##### Status: 200 Original file
+
+###### Content-Type: application/pdf
+
+`string`, format: `binary`
+
+**Example:**
+
+```json
+{}
+```
+
+###### Content-Type: image/jpeg
+
+`string`, format: `binary`
+
+**Example:**
+
+```json
+{}
+```
+
+###### Content-Type: image/png
+
+`string`, format: `binary`
+
+**Example:**
+
+```json
+{}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ### PARAMETERS /api/formas-pago
 
 - **Method:** `PARAMETERS`
@@ -43890,6 +45911,2105 @@ Originating invoice header (selected columns)
     "estado": "",
     "createdAt": "",
     "updatedAt": ""
+  }
+}
+```
+
+### DocumentoCompraItemPreview
+
+- **Type:**`object`
+
+* **`cantidad` (required)**
+
+  `number`
+
+* **`descripcion` (required)**
+
+  `string`
+
+* **`precioUnitario` (required)**
+
+  `number`
+
+* **`subtotal` (required)**
+
+  `number`
+
+* **`articuloId`**
+
+  `integer`
+
+* **`confianza`**
+
+  `number`
+
+**Example:**
+
+```json
+{
+  "descripcion": "",
+  "cantidad": 1,
+  "precioUnitario": 1,
+  "subtotal": 1,
+  "articuloId": 1,
+  "confianza": 0
+}
+```
+
+### DocumentoCompraPreviewData
+
+- **Type:**`object`
+
+* **`cae`**
+
+  `string`
+
+* **`caeVto`**
+
+  `string`, format: `date-time`
+
+* **`fecha`**
+
+  `string`, format: `date-time`
+
+* **`fieldConfidence`**
+
+  `object`
+
+* **`items`**
+
+  `array`
+
+  **Items:**
+
+  - **`cantidad` (required)**
+
+    `number`
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`precioUnitario` (required)**
+
+    `number`
+
+  - **`subtotal` (required)**
+
+    `number`
+
+  - **`articuloId`**
+
+    `integer`
+
+  - **`confianza`**
+
+    `number`
+
+* **`iva1`**
+
+  `number`
+
+* **`iva2`**
+
+  `number`
+
+* **`neto1`**
+
+  `number`
+
+* **`neto2`**
+
+  `number`
+
+* **`neto3`**
+
+  `number`
+
+* **`numero`**
+
+  `integer`
+
+* **`prefijo`**
+
+  `string`
+
+* **`proveedorId`**
+
+  `integer`
+
+* **`tipo`**
+
+  `object`
+
+* **`total`**
+
+  `number`
+
+* **`vencimiento`**
+
+  `string`, format: `date-time`
+
+**Example:**
+
+```json
+{
+  "proveedorId": 1,
+  "fecha": "",
+  "vencimiento": "",
+  "tipo": "A",
+  "prefijo": "",
+  "numero": 1,
+  "neto1": 1,
+  "neto2": 1,
+  "neto3": 1,
+  "iva1": 1,
+  "iva2": 1,
+  "total": 1,
+  "cae": "",
+  "caeVto": "",
+  "items": [
+    {
+      "descripcion": "",
+      "cantidad": 1,
+      "precioUnitario": 1,
+      "subtotal": 1,
+      "articuloId": 1,
+      "confianza": 0
+    }
+  ],
+  "fieldConfidence": {
+    "additionalProperty": 1
+  }
+}
+```
+
+### DocumentoCompraImportado
+
+- **Type:**`object`
+
+* **`archivoMime` (required)**
+
+  `string`
+
+* **`archivoNombre` (required)**
+
+  `string`
+
+* **`archivoPath` (required)**
+
+  `string`
+
+* **`confianza` (required)**
+
+  `number`
+
+* **`createdAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`datosExtraidos` (required)**
+
+  `object`
+
+  - **`cae`**
+
+    `string`
+
+  - **`caeVto`**
+
+    `string`, format: `date-time`
+
+  - **`fecha`**
+
+    `string`, format: `date-time`
+
+  - **`fieldConfidence`**
+
+    `object`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+    - **`cantidad` (required)**
+
+      `number`
+
+    - **`descripcion` (required)**
+
+      `string`
+
+    - **`precioUnitario` (required)**
+
+      `number`
+
+    - **`subtotal` (required)**
+
+      `number`
+
+    - **`articuloId`**
+
+      `integer`
+
+    - **`confianza`**
+
+      `number`
+
+  - **`iva1`**
+
+    `number`
+
+  - **`iva2`**
+
+    `number`
+
+  - **`neto1`**
+
+    `number`
+
+  - **`neto2`**
+
+    `number`
+
+  - **`neto3`**
+
+    `number`
+
+  - **`numero`**
+
+    `integer`
+
+  - **`prefijo`**
+
+    `string`
+
+  - **`proveedorId`**
+
+    `integer`
+
+  - **`tipo`**
+
+    `object`
+
+  - **`total`**
+
+    `number`
+
+  - **`vencimiento`**
+
+    `string`, format: `date-time`
+
+* **`estado` (required)**
+
+  `string`, possible values: `"procesando", "pendiente_revision", "confirmado", "descartado"`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`tenantId` (required)**
+
+  `integer`
+
+* **`tier` (required)**
+
+  `integer`
+
+* **`tipoArchivo` (required)**
+
+  `string`
+
+* **`updatedAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`usuarioId` (required)**
+
+  `integer`
+
+* **`comprobanteCompraId`**
+
+  `integer`
+
+* **`errores`**
+
+  `object`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "tenantId": 1,
+  "usuarioId": 1,
+  "archivoNombre": "",
+  "archivoMime": "",
+  "archivoPath": "",
+  "tipoArchivo": "",
+  "tier": 1,
+  "confianza": 1,
+  "estado": "procesando",
+  "datosExtraidos": {
+    "proveedorId": 1,
+    "fecha": "",
+    "vencimiento": "",
+    "tipo": "A",
+    "prefijo": "",
+    "numero": 1,
+    "neto1": 1,
+    "neto2": 1,
+    "neto3": 1,
+    "iva1": 1,
+    "iva2": 1,
+    "total": 1,
+    "cae": "",
+    "caeVto": "",
+    "items": [
+      {
+        "descripcion": "",
+        "cantidad": 1,
+        "precioUnitario": 1,
+        "subtotal": 1,
+        "articuloId": 1,
+        "confianza": 0
+      }
+    ],
+    "fieldConfidence": {
+      "additionalProperty": 1
+    }
+  },
+  "comprobanteCompraId": 1,
+  "errores": {},
+  "createdAt": "",
+  "updatedAt": ""
+}
+```
+
+### DocumentoCompraImportadoEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`archivoMime` (required)**
+
+    `string`
+
+  - **`archivoNombre` (required)**
+
+    `string`
+
+  - **`archivoPath` (required)**
+
+    `string`
+
+  - **`confianza` (required)**
+
+    `number`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`datosExtraidos` (required)**
+
+    `object`
+
+    - **`cae`**
+
+      `string`
+
+    - **`caeVto`**
+
+      `string`, format: `date-time`
+
+    - **`fecha`**
+
+      `string`, format: `date-time`
+
+    - **`fieldConfidence`**
+
+      `object`
+
+    - **`items`**
+
+      `array`
+
+      **Items:**
+
+      - **`cantidad` (required)**
+
+        `number`
+
+      - **`descripcion` (required)**
+
+        `string`
+
+      - **`precioUnitario` (required)**
+
+        `number`
+
+      - **`subtotal` (required)**
+
+        `number`
+
+      - **`articuloId`**
+
+        `integer`
+
+      - **`confianza`**
+
+        `number`
+
+    - **`iva1`**
+
+      `number`
+
+    - **`iva2`**
+
+      `number`
+
+    - **`neto1`**
+
+      `number`
+
+    - **`neto2`**
+
+      `number`
+
+    - **`neto3`**
+
+      `number`
+
+    - **`numero`**
+
+      `integer`
+
+    - **`prefijo`**
+
+      `string`
+
+    - **`proveedorId`**
+
+      `integer`
+
+    - **`tipo`**
+
+      `object`
+
+    - **`total`**
+
+      `number`
+
+    - **`vencimiento`**
+
+      `string`, format: `date-time`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"procesando", "pendiente_revision", "confirmado", "descartado"`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`tier` (required)**
+
+    `integer`
+
+  - **`tipoArchivo` (required)**
+
+    `string`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`usuarioId` (required)**
+
+    `integer`
+
+  - **`comprobanteCompraId`**
+
+    `integer`
+
+  - **`errores`**
+
+    `object`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "usuarioId": 1,
+    "archivoNombre": "",
+    "archivoMime": "",
+    "archivoPath": "",
+    "tipoArchivo": "",
+    "tier": 1,
+    "confianza": 1,
+    "estado": "procesando",
+    "datosExtraidos": {
+      "proveedorId": 1,
+      "fecha": "",
+      "vencimiento": "",
+      "tipo": "A",
+      "prefijo": "",
+      "numero": 1,
+      "neto1": 1,
+      "neto2": 1,
+      "neto3": 1,
+      "iva1": 1,
+      "iva2": 1,
+      "total": 1,
+      "cae": "",
+      "caeVto": "",
+      "items": [
+        {
+          "descripcion": "",
+          "cantidad": 1,
+          "precioUnitario": 1,
+          "subtotal": 1,
+          "articuloId": 1,
+          "confianza": 0
+        }
+      ],
+      "fieldConfidence": {
+        "additionalProperty": 1
+      }
+    },
+    "comprobanteCompraId": 1,
+    "errores": {},
+    "createdAt": "",
+    "updatedAt": ""
+  }
+}
+```
+
+### DocumentoCompraImportadoListEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`archivoMime` (required)**
+
+    `string`
+
+  - **`archivoNombre` (required)**
+
+    `string`
+
+  - **`archivoPath` (required)**
+
+    `string`
+
+  - **`confianza` (required)**
+
+    `number`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`datosExtraidos` (required)**
+
+    `object`
+
+    - **`cae`**
+
+      `string`
+
+    - **`caeVto`**
+
+      `string`, format: `date-time`
+
+    - **`fecha`**
+
+      `string`, format: `date-time`
+
+    - **`fieldConfidence`**
+
+      `object`
+
+    - **`items`**
+
+      `array`
+
+      **Items:**
+
+      - **`cantidad` (required)**
+
+        `number`
+
+      - **`descripcion` (required)**
+
+        `string`
+
+      - **`precioUnitario` (required)**
+
+        `number`
+
+      - **`subtotal` (required)**
+
+        `number`
+
+      - **`articuloId`**
+
+        `integer`
+
+      - **`confianza`**
+
+        `number`
+
+    - **`iva1`**
+
+      `number`
+
+    - **`iva2`**
+
+      `number`
+
+    - **`neto1`**
+
+      `number`
+
+    - **`neto2`**
+
+      `number`
+
+    - **`neto3`**
+
+      `number`
+
+    - **`numero`**
+
+      `integer`
+
+    - **`prefijo`**
+
+      `string`
+
+    - **`proveedorId`**
+
+      `integer`
+
+    - **`tipo`**
+
+      `object`
+
+    - **`total`**
+
+      `number`
+
+    - **`vencimiento`**
+
+      `string`, format: `date-time`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"procesando", "pendiente_revision", "confirmado", "descartado"`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`tier` (required)**
+
+    `integer`
+
+  - **`tipoArchivo` (required)**
+
+    `string`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`usuarioId` (required)**
+
+    `integer`
+
+  - **`comprobanteCompraId`**
+
+    `integer`
+
+  - **`errores`**
+
+    `object`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "usuarioId": 1,
+      "archivoNombre": "",
+      "archivoMime": "",
+      "archivoPath": "",
+      "tipoArchivo": "",
+      "tier": 1,
+      "confianza": 1,
+      "estado": "procesando",
+      "datosExtraidos": {
+        "proveedorId": 1,
+        "fecha": "",
+        "vencimiento": "",
+        "tipo": "A",
+        "prefijo": "",
+        "numero": 1,
+        "neto1": 1,
+        "neto2": 1,
+        "neto3": 1,
+        "iva1": 1,
+        "iva2": 1,
+        "total": 1,
+        "cae": "",
+        "caeVto": "",
+        "items": [
+          {
+            "descripcion": "",
+            "cantidad": 1,
+            "precioUnitario": 1,
+            "subtotal": 1,
+            "articuloId": 1,
+            "confianza": 0
+          }
+        ],
+        "fieldConfidence": {
+          "additionalProperty": 1
+        }
+      },
+      "comprobanteCompraId": 1,
+      "errores": {},
+      "createdAt": "",
+      "updatedAt": ""
+    }
+  ]
+}
+```
+
+### DocumentoCompraColaEstado
+
+- **Type:**`object`
+
+* **`confirmado` (required)**
+
+  `integer`
+
+* **`descartado` (required)**
+
+  `integer`
+
+* **`documentos` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`archivoMime` (required)**
+
+    `string`
+
+  - **`archivoNombre` (required)**
+
+    `string`
+
+  - **`archivoPath` (required)**
+
+    `string`
+
+  - **`confianza` (required)**
+
+    `number`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`datosExtraidos` (required)**
+
+    `object`
+
+    - **`cae`**
+
+      `string`
+
+    - **`caeVto`**
+
+      `string`, format: `date-time`
+
+    - **`fecha`**
+
+      `string`, format: `date-time`
+
+    - **`fieldConfidence`**
+
+      `object`
+
+    - **`items`**
+
+      `array`
+
+      **Items:**
+
+      - **`cantidad` (required)**
+
+        `number`
+
+      - **`descripcion` (required)**
+
+        `string`
+
+      - **`precioUnitario` (required)**
+
+        `number`
+
+      - **`subtotal` (required)**
+
+        `number`
+
+      - **`articuloId`**
+
+        `integer`
+
+      - **`confianza`**
+
+        `number`
+
+    - **`iva1`**
+
+      `number`
+
+    - **`iva2`**
+
+      `number`
+
+    - **`neto1`**
+
+      `number`
+
+    - **`neto2`**
+
+      `number`
+
+    - **`neto3`**
+
+      `number`
+
+    - **`numero`**
+
+      `integer`
+
+    - **`prefijo`**
+
+      `string`
+
+    - **`proveedorId`**
+
+      `integer`
+
+    - **`tipo`**
+
+      `object`
+
+    - **`total`**
+
+      `number`
+
+    - **`vencimiento`**
+
+      `string`, format: `date-time`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"procesando", "pendiente_revision", "confirmado", "descartado"`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`tier` (required)**
+
+    `integer`
+
+  - **`tipoArchivo` (required)**
+
+    `string`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`usuarioId` (required)**
+
+    `integer`
+
+  - **`comprobanteCompraId`**
+
+    `integer`
+
+  - **`errores`**
+
+    `object`
+
+* **`pendiente_revision` (required)**
+
+  `integer`
+
+* **`procesando` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "procesando": 0,
+  "pendiente_revision": 0,
+  "confirmado": 0,
+  "descartado": 0,
+  "documentos": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "usuarioId": 1,
+      "archivoNombre": "",
+      "archivoMime": "",
+      "archivoPath": "",
+      "tipoArchivo": "",
+      "tier": 1,
+      "confianza": 1,
+      "estado": "procesando",
+      "datosExtraidos": {
+        "proveedorId": 1,
+        "fecha": "",
+        "vencimiento": "",
+        "tipo": "A",
+        "prefijo": "",
+        "numero": 1,
+        "neto1": 1,
+        "neto2": 1,
+        "neto3": 1,
+        "iva1": 1,
+        "iva2": 1,
+        "total": 1,
+        "cae": "",
+        "caeVto": "",
+        "items": [
+          {
+            "descripcion": "",
+            "cantidad": 1,
+            "precioUnitario": 1,
+            "subtotal": 1,
+            "articuloId": 1,
+            "confianza": 0
+          }
+        ],
+        "fieldConfidence": {
+          "additionalProperty": 1
+        }
+      },
+      "comprobanteCompraId": 1,
+      "errores": {},
+      "createdAt": "",
+      "updatedAt": ""
+    }
+  ]
+}
+```
+
+### DocumentoCompraColaEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`confirmado` (required)**
+
+    `integer`
+
+  - **`descartado` (required)**
+
+    `integer`
+
+  - **`documentos` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`archivoMime` (required)**
+
+      `string`
+
+    - **`archivoNombre` (required)**
+
+      `string`
+
+    - **`archivoPath` (required)**
+
+      `string`
+
+    - **`confianza` (required)**
+
+      `number`
+
+    - **`createdAt` (required)**
+
+      `string`, format: `date-time`
+
+    - **`datosExtraidos` (required)**
+
+      `object`
+
+      - **`cae`**
+
+        `string`
+
+      - **`caeVto`**
+
+        `string`, format: `date-time`
+
+      - **`fecha`**
+
+        `string`, format: `date-time`
+
+      - **`fieldConfidence`**
+
+        `object`
+
+      - **`items`**
+
+        `array`
+
+        **Items:**
+
+        - **`cantidad` (required)**
+
+          `number`
+
+        - **`descripcion` (required)**
+
+          `string`
+
+        - **`precioUnitario` (required)**
+
+          `number`
+
+        - **`subtotal` (required)**
+
+          `number`
+
+        - **`articuloId`**
+
+          `integer`
+
+        - **`confianza`**
+
+          `number`
+
+      - **`iva1`**
+
+        `number`
+
+      - **`iva2`**
+
+        `number`
+
+      - **`neto1`**
+
+        `number`
+
+      - **`neto2`**
+
+        `number`
+
+      - **`neto3`**
+
+        `number`
+
+      - **`numero`**
+
+        `integer`
+
+      - **`prefijo`**
+
+        `string`
+
+      - **`proveedorId`**
+
+        `integer`
+
+      - **`tipo`**
+
+        `object`
+
+      - **`total`**
+
+        `number`
+
+      - **`vencimiento`**
+
+        `string`, format: `date-time`
+
+    - **`estado` (required)**
+
+      `string`, possible values: `"procesando", "pendiente_revision", "confirmado", "descartado"`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`tenantId` (required)**
+
+      `integer`
+
+    - **`tier` (required)**
+
+      `integer`
+
+    - **`tipoArchivo` (required)**
+
+      `string`
+
+    - **`updatedAt` (required)**
+
+      `string`, format: `date-time`
+
+    - **`usuarioId` (required)**
+
+      `integer`
+
+    - **`comprobanteCompraId`**
+
+      `integer`
+
+    - **`errores`**
+
+      `object`
+
+  - **`pendiente_revision` (required)**
+
+    `integer`
+
+  - **`procesando` (required)**
+
+    `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "procesando": 0,
+    "pendiente_revision": 0,
+    "confirmado": 0,
+    "descartado": 0,
+    "documentos": [
+      {
+        "id": 1,
+        "tenantId": 1,
+        "usuarioId": 1,
+        "archivoNombre": "",
+        "archivoMime": "",
+        "archivoPath": "",
+        "tipoArchivo": "",
+        "tier": 1,
+        "confianza": 1,
+        "estado": "procesando",
+        "datosExtraidos": {
+          "proveedorId": 1,
+          "fecha": "",
+          "vencimiento": "",
+          "tipo": "A",
+          "prefijo": "",
+          "numero": 1,
+          "neto1": 1,
+          "neto2": 1,
+          "neto3": 1,
+          "iva1": 1,
+          "iva2": 1,
+          "total": 1,
+          "cae": "",
+          "caeVto": "",
+          "items": [
+            {
+              "descripcion": "",
+              "cantidad": 1,
+              "precioUnitario": 1,
+              "subtotal": 1,
+              "articuloId": 1,
+              "confianza": 0
+            }
+          ],
+          "fieldConfidence": {
+            "additionalProperty": 1
+          }
+        },
+        "comprobanteCompraId": 1,
+        "errores": {},
+        "createdAt": "",
+        "updatedAt": ""
+      }
+    ]
+  }
+}
+```
+
+### DocumentoCompraTemplateSummary
+
+- **Type:**`object`
+
+* **`issuer` (required)**
+
+  `string`
+
+* **`keywords` (required)**
+
+  `array`
+
+  **Items:**
+
+  `string`
+
+* **`source` (required)**
+
+  `string`, possible values: `"bundled", "custom"`
+
+**Example:**
+
+```json
+{
+  "issuer": "",
+  "keywords": [
+    ""
+  ],
+  "source": "bundled"
+}
+```
+
+### DocumentoCompraTemplateListEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`issuer` (required)**
+
+    `string`
+
+  - **`keywords` (required)**
+
+    `array`
+
+    **Items:**
+
+    `string`
+
+  - **`source` (required)**
+
+    `string`, possible values: `"bundled", "custom"`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "issuer": "",
+      "keywords": [
+        ""
+      ],
+      "source": "bundled"
+    }
+  ]
+}
+```
+
+### DocumentoCompraTemplateInput
+
+- **Type:**`object`
+
+* **`content` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "content": ""
+}
+```
+
+### DocumentoCompraTemplate
+
+- **Type:**`object`
+
+* **`fields` (required)**
+
+  `object`
+
+* **`issuer` (required)**
+
+  `string`
+
+* **`keywords` (required)**
+
+  `array`
+
+  **Items:**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "issuer": "",
+  "keywords": [
+    ""
+  ],
+  "fields": {
+    "additionalProperty": "anything"
+  }
+}
+```
+
+### DocumentoCompraTemplateEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`fields` (required)**
+
+    `object`
+
+  - **`issuer` (required)**
+
+    `string`
+
+  - **`keywords` (required)**
+
+    `array`
+
+    **Items:**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "issuer": "",
+    "keywords": [
+      ""
+    ],
+    "fields": {
+      "additionalProperty": "anything"
+    }
+  }
+}
+```
+
+### DocumentoCompraConfirmInput
+
+- **Type:**
+
+**Example:**
+
+### DocumentoCompraConfirmResult
+
+- **Type:**`object`
+
+* **`comprobanteCompra` (required)**
+
+  `object`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`estado` (required)**
+
+    `string`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`iva1` (required)**
+
+    `number`
+
+  - **`iva2` (required)**
+
+    `number`
+
+  - **`neto1` (required)**
+
+    `number`
+
+  - **`neto2` (required)**
+
+    `number`
+
+  - **`neto3` (required)**
+
+    `number`
+
+  - **`numero` (required)**
+
+    `integer`
+
+  - **`prefijo` (required)**
+
+    `string`
+
+  - **`proveedorId` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`tipo` (required)**
+
+    `string`
+
+  - **`total` (required)**
+
+    `number`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`cae`**
+
+    `string`
+
+  - **`caeVto`**
+
+    `string`, format: `date-time`
+
+  - **`ordenCompraId`**
+
+    `integer`
+
+* **`documento` (required)**
+
+  `object`
+
+  - **`archivoMime` (required)**
+
+    `string`
+
+  - **`archivoNombre` (required)**
+
+    `string`
+
+  - **`archivoPath` (required)**
+
+    `string`
+
+  - **`confianza` (required)**
+
+    `number`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`datosExtraidos` (required)**
+
+    `object`
+
+    - **`cae`**
+
+      `string`
+
+    - **`caeVto`**
+
+      `string`, format: `date-time`
+
+    - **`fecha`**
+
+      `string`, format: `date-time`
+
+    - **`fieldConfidence`**
+
+      `object`
+
+    - **`items`**
+
+      `array`
+
+      **Items:**
+
+      - **`cantidad` (required)**
+
+        `number`
+
+      - **`descripcion` (required)**
+
+        `string`
+
+      - **`precioUnitario` (required)**
+
+        `number`
+
+      - **`subtotal` (required)**
+
+        `number`
+
+      - **`articuloId`**
+
+        `integer`
+
+      - **`confianza`**
+
+        `number`
+
+    - **`iva1`**
+
+      `number`
+
+    - **`iva2`**
+
+      `number`
+
+    - **`neto1`**
+
+      `number`
+
+    - **`neto2`**
+
+      `number`
+
+    - **`neto3`**
+
+      `number`
+
+    - **`numero`**
+
+      `integer`
+
+    - **`prefijo`**
+
+      `string`
+
+    - **`proveedorId`**
+
+      `integer`
+
+    - **`tipo`**
+
+      `object`
+
+    - **`total`**
+
+      `number`
+
+    - **`vencimiento`**
+
+      `string`, format: `date-time`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"procesando", "pendiente_revision", "confirmado", "descartado"`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`tier` (required)**
+
+    `integer`
+
+  - **`tipoArchivo` (required)**
+
+    `string`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`usuarioId` (required)**
+
+    `integer`
+
+  - **`comprobanteCompraId`**
+
+    `integer`
+
+  - **`errores`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "documento": {
+    "id": 1,
+    "tenantId": 1,
+    "usuarioId": 1,
+    "archivoNombre": "",
+    "archivoMime": "",
+    "archivoPath": "",
+    "tipoArchivo": "",
+    "tier": 1,
+    "confianza": 1,
+    "estado": "procesando",
+    "datosExtraidos": {
+      "proveedorId": 1,
+      "fecha": "",
+      "vencimiento": "",
+      "tipo": "A",
+      "prefijo": "",
+      "numero": 1,
+      "neto1": 1,
+      "neto2": 1,
+      "neto3": 1,
+      "iva1": 1,
+      "iva2": 1,
+      "total": 1,
+      "cae": "",
+      "caeVto": "",
+      "items": [
+        {
+          "descripcion": "",
+          "cantidad": 1,
+          "precioUnitario": 1,
+          "subtotal": 1,
+          "articuloId": 1,
+          "confianza": 0
+        }
+      ],
+      "fieldConfidence": {
+        "additionalProperty": 1
+      }
+    },
+    "comprobanteCompraId": 1,
+    "errores": {},
+    "createdAt": "",
+    "updatedAt": ""
+  },
+  "comprobanteCompra": {
+    "id": 1,
+    "tenantId": 1,
+    "proveedorId": 1,
+    "ordenCompraId": 1,
+    "fecha": "",
+    "tipo": "",
+    "prefijo": "",
+    "numero": 1,
+    "neto1": 1,
+    "neto2": 1,
+    "neto3": 1,
+    "iva1": 1,
+    "iva2": 1,
+    "total": 1,
+    "cae": "",
+    "caeVto": "",
+    "estado": "",
+    "createdAt": "",
+    "updatedAt": ""
+  }
+}
+```
+
+### DocumentoCompraConfirmEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`comprobanteCompra` (required)**
+
+    `object`
+
+    - **`createdAt` (required)**
+
+      `string`, format: `date-time`
+
+    - **`estado` (required)**
+
+      `string`
+
+    - **`fecha` (required)**
+
+      `string`, format: `date-time`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`iva1` (required)**
+
+      `number`
+
+    - **`iva2` (required)**
+
+      `number`
+
+    - **`neto1` (required)**
+
+      `number`
+
+    - **`neto2` (required)**
+
+      `number`
+
+    - **`neto3` (required)**
+
+      `number`
+
+    - **`numero` (required)**
+
+      `integer`
+
+    - **`prefijo` (required)**
+
+      `string`
+
+    - **`proveedorId` (required)**
+
+      `integer`
+
+    - **`tenantId` (required)**
+
+      `integer`
+
+    - **`tipo` (required)**
+
+      `string`
+
+    - **`total` (required)**
+
+      `number`
+
+    - **`updatedAt` (required)**
+
+      `string`, format: `date-time`
+
+    - **`cae`**
+
+      `string`
+
+    - **`caeVto`**
+
+      `string`, format: `date-time`
+
+    - **`ordenCompraId`**
+
+      `integer`
+
+  - **`documento` (required)**
+
+    `object`
+
+    - **`archivoMime` (required)**
+
+      `string`
+
+    - **`archivoNombre` (required)**
+
+      `string`
+
+    - **`archivoPath` (required)**
+
+      `string`
+
+    - **`confianza` (required)**
+
+      `number`
+
+    - **`createdAt` (required)**
+
+      `string`, format: `date-time`
+
+    - **`datosExtraidos` (required)**
+
+      `object`
+
+      - **`cae`**
+
+        `string`
+
+      - **`caeVto`**
+
+        `string`, format: `date-time`
+
+      - **`fecha`**
+
+        `string`, format: `date-time`
+
+      - **`fieldConfidence`**
+
+        `object`
+
+      - **`items`**
+
+        `array`
+
+        **Items:**
+
+        - **`cantidad` (required)**
+
+          `number`
+
+        - **`descripcion` (required)**
+
+          `string`
+
+        - **`precioUnitario` (required)**
+
+          `number`
+
+        - **`subtotal` (required)**
+
+          `number`
+
+        - **`articuloId`**
+
+          `integer`
+
+        - **`confianza`**
+
+          `number`
+
+      - **`iva1`**
+
+        `number`
+
+      - **`iva2`**
+
+        `number`
+
+      - **`neto1`**
+
+        `number`
+
+      - **`neto2`**
+
+        `number`
+
+      - **`neto3`**
+
+        `number`
+
+      - **`numero`**
+
+        `integer`
+
+      - **`prefijo`**
+
+        `string`
+
+      - **`proveedorId`**
+
+        `integer`
+
+      - **`tipo`**
+
+        `object`
+
+      - **`total`**
+
+        `number`
+
+      - **`vencimiento`**
+
+        `string`, format: `date-time`
+
+    - **`estado` (required)**
+
+      `string`, possible values: `"procesando", "pendiente_revision", "confirmado", "descartado"`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`tenantId` (required)**
+
+      `integer`
+
+    - **`tier` (required)**
+
+      `integer`
+
+    - **`tipoArchivo` (required)**
+
+      `string`
+
+    - **`updatedAt` (required)**
+
+      `string`, format: `date-time`
+
+    - **`usuarioId` (required)**
+
+      `integer`
+
+    - **`comprobanteCompraId`**
+
+      `integer`
+
+    - **`errores`**
+
+      `object`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "documento": {
+      "id": 1,
+      "tenantId": 1,
+      "usuarioId": 1,
+      "archivoNombre": "",
+      "archivoMime": "",
+      "archivoPath": "",
+      "tipoArchivo": "",
+      "tier": 1,
+      "confianza": 1,
+      "estado": "procesando",
+      "datosExtraidos": {
+        "proveedorId": 1,
+        "fecha": "",
+        "vencimiento": "",
+        "tipo": "A",
+        "prefijo": "",
+        "numero": 1,
+        "neto1": 1,
+        "neto2": 1,
+        "neto3": 1,
+        "iva1": 1,
+        "iva2": 1,
+        "total": 1,
+        "cae": "",
+        "caeVto": "",
+        "items": [
+          {
+            "descripcion": "",
+            "cantidad": 1,
+            "precioUnitario": 1,
+            "subtotal": 1,
+            "articuloId": 1,
+            "confianza": 0
+          }
+        ],
+        "fieldConfidence": {
+          "additionalProperty": 1
+        }
+      },
+      "comprobanteCompraId": 1,
+      "errores": {},
+      "createdAt": "",
+      "updatedAt": ""
+    },
+    "comprobanteCompra": {
+      "id": 1,
+      "tenantId": 1,
+      "proveedorId": 1,
+      "ordenCompraId": 1,
+      "fecha": "",
+      "tipo": "",
+      "prefijo": "",
+      "numero": 1,
+      "neto1": 1,
+      "neto2": 1,
+      "neto3": 1,
+      "iva1": 1,
+      "iva2": 1,
+      "total": 1,
+      "cae": "",
+      "caeVto": "",
+      "estado": "",
+      "createdAt": "",
+      "updatedAt": ""
+    }
   }
 }
 ```

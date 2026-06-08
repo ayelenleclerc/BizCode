@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "comprobanteCompra": {
+      "$ref": "./ComprobanteCompra.schema.json"
+    },
+    "documento": {
+      "$ref": "./DocumentoCompraImportado.schema.json"
+    }
+  },
+  "required": [
+    "documento",
+    "comprobanteCompra"
+  ],
+  "title": "DocumentoCompraConfirmResult",
+  "type": "object"
+}

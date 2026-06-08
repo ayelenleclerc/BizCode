@@ -1,0 +1,15 @@
+# Untitled number in DocumentoCompraPreviewData Schema
+
+```txt
+undefined#/properties/iva1
+```
+
+
+
+| Abstract            | Extensible | Status         | Identifiable            | Custom Properties | Additional Properties | Access Restrictions | Defined In                                                                                                               |
+| :------------------ | :--------- | :------------- | :---------------------- | :---------------- | :-------------------- | :------------------ | :----------------------------------------------------------------------------------------------------------------------- |
+| Can be instantiated | No         | Unknown status | Unknown identifiability | Forbidden         | Allowed               | none                | [DocumentoCompraPreviewData.schema.json\*](../schema-json/DocumentoCompraPreviewData.schema.json "open original schema") |
+
+## iva1 Type
+
+`number`

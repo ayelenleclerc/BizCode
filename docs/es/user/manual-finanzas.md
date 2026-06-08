@@ -50,6 +50,7 @@ Con el módulo **`finance.ledger`** habilitado, aparece la sección **Contabilid
 Con **`finance.ledger`**, debajo de ventas aparece **Contabilidad — Libro IVA Compras**:
 
 1. Use el formulario **Alta de comprobante de compra** (proveedor, fecha, tipo A/B/C, punto de venta, número, netos, IVA, total; CAE opcional). La API `POST /api/comprobantes-compra` sigue disponible para integraciones.
+2. **Importar documento de compra** (#277): suba PDF o imagen (hasta 20 archivos por lote). Los tiers de extracción corren en local: QR AFIP/ARCA (Tier 1), texto PDF + plantillas YAML (Tier 2), OCR + plantillas (Tier 3), Ollama opcional con `OLLAMA_URL` (Tier 4). Revise la cola de preview y confirme para crear `ComprobanteCompra`. APIs: `POST /api/documentos-compra/procesar`, `POST /api/documentos-compra/procesar-lote`, `GET /api/documentos-compra/cola`, `POST /api/documentos-compra/confirmar`. Plantillas custom del tenant: `GET`/`POST /api/documentos-compra/templates` (guardar requiere `settings.fiscal.manage`).
 2. Seleccione **período** y revise la **vista previa** (CBTU / ALICUOTAS). Véase [ADR-0014](../adr/ADR-0014-libro-iva-compras.md).
 3. **Descargar ARCA (ZIP)** — `CBTU.txt` + `ALICUOTAS.txt`.
 4. **Descargar Excel** — solo revisión interna.

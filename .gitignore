@@ -1,4 +1,6 @@
 node_modules/
+data/documentos-compra/
+data/documentos-compra-templates/
 dist/
 build/
 

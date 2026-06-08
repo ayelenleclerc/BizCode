@@ -4,6 +4,7 @@ import request from 'supertest'
 import type { PrismaClient } from '@prisma/client'
 import { Decimal } from '@prisma/client/runtime/library'
 import { createApp } from '../../server/createApp'
+import { createEmptyDocumentoCompraPreview } from '../../server/lib/documentoCompraTypes'
 import { assertMatchesOpenApi } from './validate-openapi-response'
 
 const rubroRow = { id: 1, codigo: 1, nombre: 'General' }
@@ -329,8 +330,67 @@ function buildPrisma(): PrismaClient {
       findMany: vi.fn().mockResolvedValue([]),
       findFirst: vi.fn().mockResolvedValue(null),
     },
+    documentoCompraImportado: {
+      count: vi.fn().mockResolvedValue(0),
+      findMany: vi.fn().mockResolvedValue([]),
+      create: vi.fn().mockResolvedValue({
+        id: 1,
+        tenantId: 1,
+        usuarioId: 1,
+        archivoNombre: 'factura.pdf',
+        archivoMime: 'application/pdf',
+        archivoPath: '',
+        tipoArchivo: 'pdf',
+        tier: 0,
+        confianza: 0,
+        estado: 'procesando',
+        datosExtraidos: createEmptyDocumentoCompraPreview(),
+        comprobanteCompraId: null,
+        errores: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      }),
+      update: vi.fn().mockImplementation(({ data }) =>
+        Promise.resolve({
+          id: 1,
+          tenantId: 1,
+          usuarioId: 1,
+          archivoNombre: 'factura.pdf',
+          archivoMime: 'application/pdf',
+          archivoPath: '1/1/factura.pdf',
+          tipoArchivo: 'pdf',
+          tier: 0,
+          confianza: 0,
+          estado: 'confirmado',
+          datosExtraidos: createEmptyDocumentoCompraPreview(),
+          comprobanteCompraId: 1,
+          errores: null,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          ...data,
+        }),
+      ),
+      findFirst: vi.fn().mockResolvedValue({
+        id: 1,
+        tenantId: 1,
+        usuarioId: 1,
+        archivoNombre: 'factura.pdf',
+        archivoMime: 'application/pdf',
+        archivoPath: '1/1/factura.pdf',
+        tipoArchivo: 'pdf',
+        tier: 0,
+        confianza: 0,
+        estado: 'pendiente_revision',
+        datosExtraidos: createEmptyDocumentoCompraPreview(),
+        comprobanteCompraId: null,
+        errores: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      }),
+    },
     comprobanteCompra: {
       findMany: vi.fn().mockResolvedValue([]),
+      findFirst: vi.fn().mockResolvedValue(null),
       create: vi.fn().mockResolvedValue({
         id: 1,
         tenantId: 1,
@@ -1272,6 +1332,65 @@ describe('API — contrato OpenAPI', () => {
       .expect(200)
     await assertMatchesOpenApi('/api/contabilidad/libro-iva-compras', 'get', '200', res.body)
     expect(res.body.data.periodo).toBe('2026-05')
+  })
+
+  it('GET /api/documentos-compra/cola', async () => {
+    const app = createApp(prisma)
+    const res = await request(app).get('/api/documentos-compra/cola').expect(200)
+    await assertMatchesOpenApi('/api/documentos-compra/cola', 'get', '200', res.body)
+    expect(res.body.data.procesando).toBe(0)
+  })
+
+  it('GET /api/documentos-compra/templates', async () => {
+    const app = createApp(prisma)
+    const res = await request(app).get('/api/documentos-compra/templates').expect(200)
+    await assertMatchesOpenApi('/api/documentos-compra/templates', 'get', '200', res.body)
+    expect(Array.isArray(res.body.data)).toBe(true)
+  })
+
+  it('POST /api/documentos-compra/templates', async () => {
+    const app = createApp(prisma)
+    const yaml =
+      'issuer: test-contract-template\nkeywords:\n  - FACTURA\nfields:\n  vat_id:\n    regex: "([0-9]{11})"\n'
+    const res = await request(app)
+      .post('/api/documentos-compra/templates')
+      .send({ content: yaml })
+      .expect(201)
+    await assertMatchesOpenApi('/api/documentos-compra/templates', 'post', '201', res.body)
+    expect(res.body.data.issuer).toBe('test-contract-template')
+  })
+
+  it('POST /api/documentos-compra/procesar-lote', async () => {
+    const app = createApp(prisma)
+    const res = await request(app)
+      .post('/api/documentos-compra/procesar-lote')
+      .attach('files', Buffer.from('%PDF-1.4'), { filename: 'a.pdf', contentType: 'application/pdf' })
+      .attach('files', Buffer.from('%PDF-1.4'), { filename: 'b.pdf', contentType: 'application/pdf' })
+      .expect(201)
+    await assertMatchesOpenApi('/api/documentos-compra/procesar-lote', 'post', '201', res.body)
+    expect(res.body.data).toHaveLength(2)
+  })
+
+  it('POST /api/documentos-compra/confirmar', async () => {
+    const app = createApp(prisma)
+    const res = await request(app)
+      .post('/api/documentos-compra/confirmar')
+      .send({
+        documentoId: 1,
+        fecha: '2026-05-10T12:00:00.000Z',
+        tipo: 'B',
+        prefijo: '0001',
+        numero: 2,
+        proveedorId: 1,
+        neto1: 100,
+        neto2: 0,
+        neto3: 0,
+        iva1: 21,
+        iva2: 0,
+        total: 121,
+      })
+      .expect(201)
+    await assertMatchesOpenApi('/api/documentos-compra/confirmar', 'post', '201', res.body)
   })
 
   it('POST /api/comprobantes-compra', async () => {

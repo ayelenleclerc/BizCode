@@ -160,6 +160,36 @@
 
 * [DeliveryZoneUpdateInput](./deliveryzoneupdateinput.md) – `-`
 
+* [DocumentoCompraColaEnvelope](./documentocompracolaenvelope.md) – `-`
+
+* [DocumentoCompraColaEstado](./documentocompracolaestado.md) – `-`
+
+* [DocumentoCompraConfirmEnvelope](./documentocompraconfirmenvelope.md) – `-`
+
+* [DocumentoCompraConfirmInput](./documentocompraconfirminput.md) – `-`
+
+* [DocumentoCompraConfirmResult](./documentocompraconfirmresult.md) – `-`
+
+* [DocumentoCompraImportado](./documentocompraimportado.md) – `-`
+
+* [DocumentoCompraImportadoEnvelope](./documentocompraimportadoenvelope.md) – `-`
+
+* [DocumentoCompraImportadoListEnvelope](./documentocompraimportadolistenvelope.md) – `-`
+
+* [DocumentoCompraItemPreview](./documentocompraitempreview.md) – `-`
+
+* [DocumentoCompraPreviewData](./documentocomprapreviewdata.md) – `-`
+
+* [DocumentoCompraTemplate](./documentocompratemplate.md) – `-`
+
+* [DocumentoCompraTemplateEnvelope](./documentocompratemplateenvelope.md) – `-`
+
+* [DocumentoCompraTemplateInput](./documentocompratemplateinput.md) – `-`
+
+* [DocumentoCompraTemplateListEnvelope](./documentocompratemplatelistenvelope.md) – `-`
+
+* [DocumentoCompraTemplateSummary](./documentocompratemplatesummary.md) – `-`
+
 * [EmpresaConfig](./empresaconfig.md) – `-`
 
 * [EmpresaEnvelope](./empresaenvelope.md) – `-`
@@ -596,6 +626,14 @@
 
 * [Untitled object in DeliveryZoneListEnvelope](./deliveryzonelistenvelope-allof-0.md) – `undefined#/allOf/0`
 
+* [Untitled object in DocumentoCompraConfirmInput](./documentocompraconfirminput-allof-1.md) – `undefined#/allOf/1`
+
+* [Untitled object in DocumentoCompraImportado](./documentocompraimportado-properties-errores.md) – `undefined#/properties/errores`
+
+* [Untitled object in DocumentoCompraPreviewData](./documentocomprapreviewdata-properties-fieldconfidence.md) – `undefined#/properties/fieldConfidence`
+
+* [Untitled object in DocumentoCompraTemplate](./documentocompratemplate-properties-fields.md) – `undefined#/properties/fields`
+
 * [Untitled object in FacturaInput](./facturainput-properties-items-items.md) – `undefined#/properties/items/items`
 
 * [Untitled object in FacturaListEnvelope](./facturalistenvelope-allof-0.md) – `undefined#/allOf/0`
@@ -753,6 +791,20 @@
 * [Untitled array in DashboardVentasHistorico](./dashboardventashistorico-properties-toparticles.md) – `undefined#/properties/topArticles`
 
 * [Untitled array in DeliveryZoneListEnvelope](./deliveryzonelistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
+
+* [Untitled array in DocumentoCompraColaEstado](./documentocompracolaestado-properties-documentos.md) – `undefined#/properties/documentos`
+
+* [Untitled array in DocumentoCompraConfirmInput](./documentocompraconfirminput-allof-1-properties-items.md) – `undefined#/allOf/1/properties/items`
+
+* [Untitled array in DocumentoCompraImportadoListEnvelope](./documentocompraimportadolistenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled array in DocumentoCompraPreviewData](./documentocomprapreviewdata-properties-items.md) – `undefined#/properties/items`
+
+* [Untitled array in DocumentoCompraTemplate](./documentocompratemplate-properties-keywords.md) – `undefined#/properties/keywords`
+
+* [Untitled array in DocumentoCompraTemplateListEnvelope](./documentocompratemplatelistenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled array in DocumentoCompraTemplateSummary](./documentocompratemplatesummary-properties-keywords.md) – `undefined#/properties/keywords`
 
 * [Untitled array in Factura](./factura-properties-items.md) – `undefined#/properties/items`
 
