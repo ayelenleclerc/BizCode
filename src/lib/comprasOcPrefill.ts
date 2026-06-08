@@ -8,5 +8,7 @@ export type ComprasOcPrefillState = {
     proveedorId: number
     articuloId: number
     costoUnitario?: string | null
+    codigoProveedor?: string | null
+    descripcionProveedor?: string | null
   }
 }

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { CanAccess } from '@/components/CanAccess'
@@ -6,7 +6,7 @@ import ErrorBoundary from '@/components/ErrorBoundary'
 import AsyncWrapper from '@/components/shared/AsyncWrapper'
 import KeyboardHint, { useGlobalListShortcuts } from '@/components/shared/KeyboardHint'
 import { useListKeyboardNav, useListPageHotkeys } from '@/hooks/useListPageKeyboard'
-import { comprasAPI, type OrdenCompra } from '@/lib/api'
+import { comprasAPI, proveedoresAPI, type OrdenCompra, type OrdenCompraItemRow } from '@/lib/api'
 import type { ComprasOcPrefillState } from '@/lib/comprasOcPrefill'
 
 const ESTADOS = ['draft', 'sent', 'received', 'cancelled'] as const
@@ -15,6 +15,16 @@ function formatMoney(value: string): string {
   const n = Number.parseFloat(value)
   if (Number.isNaN(n)) return value
   return n.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' })
+}
+
+function itemCodigoProveedor(item: OrdenCompraItemRow): string {
+  if (item.codigoProveedor?.trim()) return item.codigoProveedor.trim()
+  return String(item.articulo?.codigo ?? item.articuloId)
+}
+
+function itemDescripcionProveedor(item: OrdenCompraItemRow): string {
+  if (item.descripcionProveedor?.trim()) return item.descripcionProveedor.trim()
+  return item.articulo?.descripcion ?? `#${item.articuloId}`
 }
 
 export default function ComprasPage() {
@@ -50,7 +60,10 @@ function ComprasPageContent() {
   const [formArticuloId, setFormArticuloId] = useState('')
   const [formCantidad, setFormCantidad] = useState('1')
   const [formCosto, setFormCosto] = useState('')
+  const formCostoRef = useRef(formCosto)
+  formCostoRef.current = formCosto
   const [formNota, setFormNota] = useState('')
+  const [catalogHint, setCatalogHint] = useState<string | null>(null)
   const [actionLoading, setActionLoading] = useState(false)
   const [selectedRow, setSelectedRow] = useState(0)
   const listShortcuts = useGlobalListShortcuts()
@@ -81,9 +94,45 @@ function ComprasPageContent() {
     setFormCosto(prefill.costoUnitario ?? '')
     setFormCantidad('1')
     setFormNota('')
+    if (prefill.codigoProveedor || prefill.descripcionProveedor) {
+      setCatalogHint(
+        [prefill.codigoProveedor, prefill.descripcionProveedor].filter(Boolean).join(' — '),
+      )
+    } else {
+      setCatalogHint(null)
+    }
     setShowForm(true)
     navigate(location.pathname, { replace: true, state: {} })
   }, [location.pathname, location.state, navigate])
+
+  useEffect(() => {
+    const proveedorId = Number.parseInt(formProveedorId, 10)
+    const articuloId = Number.parseInt(formArticuloId, 10)
+    if (!Number.isInteger(proveedorId) || proveedorId < 1 || !Number.isInteger(articuloId) || articuloId < 1) {
+      return
+    }
+    let cancelled = false
+    void (async () => {
+      try {
+        const entries = await proveedoresAPI.listCatalogo(proveedorId)
+        const entry = entries.find((e) => e.articuloId === articuloId && e.activo)
+        if (cancelled) return
+        if (entry) {
+          setCatalogHint(`${entry.codigoProveedor} — ${entry.descripcion ?? entry.articulo.descripcion}`)
+          if (!formCostoRef.current.trim() && entry.precioLista) {
+            setFormCosto(entry.precioLista)
+          }
+        } else {
+          setCatalogHint(null)
+        }
+      } catch {
+        if (!cancelled) setCatalogHint(null)
+      }
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [formProveedorId, formArticuloId])
 
   const refreshSelected = async (id: number) => {
     const detail = await comprasAPI.get(id)
@@ -182,6 +231,22 @@ function ComprasPageContent() {
       if (updated) setSelected(updated)
       setShowReceive(false)
       await loadList()
+    } finally {
+      setActionLoading(false)
+    }
+  }
+
+  const handleDownloadPdf = async () => {
+    if (!selected) return
+    setActionLoading(true)
+    try {
+      const blob = await comprasAPI.downloadPdf(selected.id)
+      const url = URL.createObjectURL(blob)
+      const anchor = document.createElement('a')
+      anchor.href = url
+      anchor.download = `orden-compra-${selected.id}.pdf`
+      anchor.click()
+      URL.revokeObjectURL(url)
     } finally {
       setActionLoading(false)
     }
@@ -288,7 +353,43 @@ function ComprasPageContent() {
             <p className="text-sm mb-3">
               {t('columns.estado')}: {t(`estado.${selected.estado as (typeof ESTADOS)[number]}`)}
             </p>
+            {selected.items.length > 0 ? (
+              <div className="overflow-x-auto mb-4" data-testid="compras-detail-items">
+                <table className="w-full text-sm border border-slate-200 dark:border-slate-700">
+                  <caption className="sr-only">{t('detail.itemsCaption')}</caption>
+                  <thead>
+                    <tr className="bg-slate-50 dark:bg-slate-800 text-left">
+                      <th scope="col" className="px-2 py-1">{t('detail.colCodigoProveedor')}</th>
+                      <th scope="col" className="px-2 py-1">{t('detail.colDescripcionProveedor')}</th>
+                      <th scope="col" className="px-2 py-1">{t('detail.colCantidad')}</th>
+                      <th scope="col" className="px-2 py-1">{t('detail.colCosto')}</th>
+                      <th scope="col" className="px-2 py-1">{t('detail.colSubtotal')}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {selected.items.map((item) => (
+                      <tr key={item.id} className="border-t border-slate-100 dark:border-slate-800">
+                        <td className="px-2 py-1 font-mono text-xs">{itemCodigoProveedor(item)}</td>
+                        <td className="px-2 py-1">{itemDescripcionProveedor(item)}</td>
+                        <td className="px-2 py-1 font-mono">{item.cantidad}</td>
+                        <td className="px-2 py-1 font-mono">{formatMoney(item.costoUnitario)}</td>
+                        <td className="px-2 py-1 font-mono">{formatMoney(item.subtotal)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : null}
             <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                className="px-3 py-1 rounded border border-slate-300 dark:border-slate-600"
+                data-testid="compras-btn-pdf"
+                disabled={actionLoading}
+                onClick={() => void handleDownloadPdf()}
+              >
+                {t('actions.downloadPdf')}
+              </button>
               <CanAccess permission="suppliers.manage">
                 {selected.estado === 'draft' && (
                   <button
@@ -393,6 +494,11 @@ function ComprasPageContent() {
                     onChange={(e) => setFormCosto(e.target.value)}
                   />
                 </div>
+                {catalogHint ? (
+                  <p className="text-xs text-emerald-700 dark:text-emerald-400" data-testid="compras-catalog-hint">
+                    {t('form.catalogMatch', { label: catalogHint })}
+                  </p>
+                ) : null}
                 <div>
                   <label htmlFor="compras-nota" className="block text-xs mb-1">{t('form.nota')}</label>
                   <input
@@ -443,7 +549,7 @@ function ComprasPageContent() {
                   return (
                     <li key={item.id} className="border-b pb-2">
                       <p className="text-sm font-medium">
-                        {t('receive.item')}: {item.articulo?.descripcion ?? item.articuloId}
+                        {t('receive.item')}: {itemCodigoProveedor(item)} — {itemDescripcionProveedor(item)}
                       </p>
                       <p className="text-xs text-slate-500">
                         {t('receive.pending')}: {pending}

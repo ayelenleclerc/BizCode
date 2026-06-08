@@ -155,6 +155,8 @@ const ordenCompraContractRow = {
       id: 10,
       ordenCompraId: 1,
       articuloId: 1,
+      codigoProveedor: 'PROV-001',
+      descripcionProveedor: 'Prod proveedor',
       cantidad: 2,
       cantidadRecibida: 0,
       costoUnitario: new Decimal(10),
@@ -1751,6 +1753,22 @@ describe('API — contrato OpenAPI', () => {
       .send({ lines: [{ itemId: 10, cantidad: 2 }] })
       .expect(200)
     await assertMatchesOpenApi('/api/compras/{id}/receive', 'post', '200', res.body)
+  })
+
+  it('GET /api/compras/{id}/pdf returns application/pdf', async () => {
+    process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
+    process.env.BIZCODE_TEST_ROLE = 'warehouse_lead'
+    const p = buildPrisma()
+    vi.mocked(p.proveedor.findFirst).mockResolvedValueOnce({
+      id: 1,
+      codigo: 1,
+      rsocial: 'Prov SA',
+      cuit: '30-71234567-8',
+    } as never)
+    const app = createApp(p)
+    const res = await request(app).get('/api/compras/1/pdf').expect(200)
+    expect(res.headers['content-type']).toMatch(/application\/pdf/)
+    expect(res.body.subarray(0, 4).toString()).toBe('%PDF')
   })
 
   it('GET /api/recuentos', async () => {

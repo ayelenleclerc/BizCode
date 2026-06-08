@@ -110,7 +110,9 @@ Abra **Compras** (`/compras`) desde el menú lateral. La ruta depende del módul
 
 **Flujo de estados:** `draft` → `sent` → `received` (cuando todas las líneas se reciben por completo) o `cancelled`. Mientras el estado sea `sent`, puede **recibir cantidades parciales** por línea; cada recepción crea un `StockAjuste` con motivo `compra` y actualiza el stock del artículo en una sola transacción.
 
-Rutas API habituales: `GET/POST /api/compras`, `GET/PUT /api/compras/{id}`, `POST /api/compras/{id}/send`, `POST /api/compras/{id}/cancel`, `POST /api/compras/{id}/receive`.
+Al crear o actualizar un borrador, BizCode resuelve la fila activa del **catálogo del proveedor** (`ProveedorArticulo`, GitHub #273) por línea y guarda un **snapshot** en `OrdenCompraItem` (`codigoProveedor`, `descripcionProveedor`). El detalle de la OC y el PDF imprimible muestran código y descripción del proveedor; si no hay catálogo, la UI y el PDF usan el código y la descripción internos del artículo. Crear una línea desde el **comparador de proveedores** del artículo (GitHub #274) precarga proveedor, artículo, costo unitario y campos de catálogo. **Descargar PDF** usa `GET /api/compras/{id}/pdf` (GitHub #323).
+
+Rutas API habituales: `GET/POST /api/compras`, `GET/PUT /api/compras/{id}`, `GET /api/compras/{id}/pdf`, `POST /api/compras/{id}/send`, `POST /api/compras/{id}/cancel`, `POST /api/compras/{id}/receive`.
 
 ## Recuento físico de inventario
 

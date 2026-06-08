@@ -110,7 +110,9 @@ Abra **Compras** (`/compras`) na barra lateral. A rota depende do módulo do ten
 
 **Fluxo de status:** `draft` → `sent` → `received` (quando todas as linhas forem recebidas por completo) ou `cancelled`. Enquanto o status for `sent`, é possível **receber quantidades parciais** por linha; cada recebimento cria um `StockAjuste` com motivo `compra` e atualiza o estoque do artigo em uma única transação.
 
-Rotas API usuais: `GET/POST /api/compras`, `GET/PUT /api/compras/{id}`, `POST /api/compras/{id}/send`, `POST /api/compras/{id}/cancel`, `POST /api/compras/{id}/receive`.
+Ao criar ou atualizar um rascunho, o BizCode resolve a linha ativa do **catálogo do fornecedor** (`ProveedorArticulo`, GitHub #273) por item e grava um **snapshot** em `OrdenCompraItem` (`codigoProveedor`, `descripcionProveedor`). O detalhe da OC e o PDF imprimível exibem código e descrição do fornecedor; sem catálogo, a UI e o PDF usam o código e a descrição internos do artigo. Criar uma linha pelo **comparador de fornecedores** do produto (GitHub #274) pré-preenche fornecedor, artigo, custo unitário e campos de catálogo. **Baixar PDF** usa `GET /api/compras/{id}/pdf` (GitHub #323).
+
+Rotas API usuais: `GET/POST /api/compras`, `GET/PUT /api/compras/{id}`, `GET /api/compras/{id}/pdf`, `POST /api/compras/{id}/send`, `POST /api/compras/{id}/cancel`, `POST /api/compras/{id}/receive`.
 
 ## Contagem física de inventário
 

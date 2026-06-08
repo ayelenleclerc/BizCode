@@ -21,6 +21,8 @@ function buildOrdenRow(estado: string, cantidadRecibida = 0) {
         id: 10,
         ordenCompraId: 1,
         articuloId: 3,
+        codigoProveedor: null,
+        descripcionProveedor: null,
         cantidad: 5,
         cantidadRecibida,
         costoUnitario: new Decimal(10),
@@ -46,6 +48,7 @@ function buildPrismaMock(overrides: Partial<Record<string, unknown>> = {}): Pris
     rubro: { findMany: vi.fn() },
     formaPago: { findMany: vi.fn() },
     proveedor: { findFirst: vi.fn().mockResolvedValue({ id: 2 }) },
+    proveedorArticulo: { findFirst: vi.fn().mockResolvedValue(null) },
     factura: { findMany: vi.fn(), findFirst: vi.fn(), aggregate: vi.fn() },
     cobro: { count: vi.fn(), findMany: vi.fn(), findFirst: vi.fn(), aggregate: vi.fn() },
     ordenCompra: {
@@ -321,5 +324,28 @@ describe('POST /api/compras/:id/receive', () => {
       .expect(200)
     expect(res.body.data.estado).toBe('sent')
     expect(prisma.stockAjuste.create).toHaveBeenCalled()
+  })
+})
+
+describe('GET /api/compras/:id/pdf', () => {
+  beforeEach(() => {
+    setupComprasAuth()
+  })
+
+  it('returns application/pdf', async () => {
+    const prisma = buildPrismaMock({
+      proveedor: {
+        findFirst: vi.fn().mockResolvedValue({
+          id: 2,
+          codigo: 1,
+          rsocial: 'Prov SA',
+          cuit: '30-71234567-8',
+        }),
+      },
+    })
+    const app = createApp(prisma)
+    const res = await request(app).get('/api/compras/1/pdf').expect(200)
+    expect(res.headers['content-type']).toMatch(/application\/pdf/)
+    expect(res.body.subarray(0, 4).toString()).toBe('%PDF')
   })
 })

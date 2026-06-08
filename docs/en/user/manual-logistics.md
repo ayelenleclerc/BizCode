@@ -110,7 +110,9 @@ Open **Purchasing** (`/compras`) from the sidebar. The route is gated by the ten
 
 **Status flow:** `draft` → `sent` → `received` (when all lines are fully received) or `cancelled`. While status remains `sent`, you may **receive partial quantities** per line; each receipt creates a `StockAjuste` with motivo `compra` and updates article stock in a single transaction.
 
-Typical API paths: `GET/POST /api/compras`, `GET/PUT /api/compras/{id}`, `POST /api/compras/{id}/send`, `POST /api/compras/{id}/cancel`, `POST /api/compras/{id}/receive`.
+When you create or update a draft order, BizCode resolves the active **supplier catalog** entry (`ProveedorArticulo`, GitHub #273) for each line and stores a **snapshot** on `OrdenCompraItem` (`codigoProveedor`, `descripcionProveedor`). The purchase-order detail table and printable PDF show supplier code and description; if no catalog row exists, the UI and PDF fall back to the internal article code and description. Creating a line from the product **supplier comparator** (GitHub #274) pre-fills supplier, article, unit cost, and catalog fields. **Download PDF** uses `GET /api/compras/{id}/pdf` (GitHub #323).
+
+Typical API paths: `GET/POST /api/compras`, `GET/PUT /api/compras/{id}`, `GET /api/compras/{id}/pdf`, `POST /api/compras/{id}/send`, `POST /api/compras/{id}/cancel`, `POST /api/compras/{id}/receive`.
 
 ## Physical inventory count
 
