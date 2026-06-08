@@ -8,7 +8,7 @@ import {
   padPuntoVenta,
 } from '../../../../server/fiscal/ar/libroIvaVentasFormat'
 import { mapLibroIvaVentas } from '../../../../server/fiscal/ar/libroIvaVentasMapper'
-import { TIPO_ANULADO_AFIP } from '../../../../server/fiscal/ar/libroIvaVentasConstants'
+import { TIPO_ANULADO_ARCA } from '../../../../server/fiscal/ar/libroIvaVentasConstants'
 
 describe('libroIvaVentasFormat', () => {
   it('formats amounts with dot decimal and two decimals', () => {
@@ -156,7 +156,7 @@ describe('libroIvaVentasMapper', () => {
       },
     ])
     expect(result.recordCountCbtv).toBe(2)
-    expect(result.cbtvLines.some((l) => l.includes(`,${TIPO_ANULADO_AFIP},`))).toBe(true)
+    expect(result.cbtvLines.some((l) => l.includes(`,${TIPO_ANULADO_ARCA},`))).toBe(true)
     expect(result.cbtvLines.some((l) => l.includes(',008,'))).toBe(true)
   })
 })

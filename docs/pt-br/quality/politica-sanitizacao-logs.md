@@ -25,7 +25,7 @@ Objetos aninhados e headers HTTP usam caminhos wildcard (`*.password`, `req.head
 |------------|-------|------|
 | API Express (`server/*`) | Apenas `logger` estruturado; sem `console.*` | **OK** — linhas de request sem IP/UA por padrão ([#151](observabilidade.md)) |
 | `server/middleware/errorHandler.ts` | Pode registrar `err.stack` no servidor | **Aceito** — stacks só no servidor; respostas API ocultam detalhe em produção |
-| Jobs/cron CLI (`scripts/*-job.ts`, `afip-retry-pending.ts`) | `console.log(JSON.stringify(...))` | **OK** — apenas agregados (`processed`, `issued`, `failed`, `sent`, `skipped`) e `tenantId` |
+| Jobs/cron CLI (`scripts/*-job.ts`, `arca-retry-pending.ts`) | `console.log(JSON.stringify(...))` | **OK** — apenas agregados (`processed`, `issued`, `failed`, `sent`, `skipped`) e `tenantId` |
 | `scripts/bootstrap-superadmin.ts` | Registra username na criação | **OK** — sem senha; bootstrap só operador |
 | `scripts/inspect-dbf*.ts`, `migrate-from-dbf.ts` | **Amostras** DBF legado em stdout | **Isento** — CLI só operador; não faz parte de logs de runtime da API |
 | Ferramentas de plano GitHub (`scripts/github/*`) | Mensagens operacionais | **OK** — sem segredos nos templates |

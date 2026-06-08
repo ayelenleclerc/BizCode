@@ -1,4 +1,4 @@
-# AfipConfigStatusEnvelope Schema
+# ArcaConfigStatusEnvelope Schema
 
 ```txt
 undefined
@@ -8,18 +8,18 @@ undefined
 
 | Abstract            | Extensible | Status         | Identifiable | Custom Properties | Additional Properties | Access Restrictions | Defined In                                                                                                         |
 | :------------------ | :--------- | :------------- | :----------- | :---------------- | :-------------------- | :------------------ | :----------------------------------------------------------------------------------------------------------------- |
-| Can be instantiated | No         | Unknown status | No           | Forbidden         | Allowed               | none                | [AfipConfigStatusEnvelope.schema.json](../schema-json/AfipConfigStatusEnvelope.schema.json "open original schema") |
+| Can be instantiated | No         | Unknown status | No           | Forbidden         | Allowed               | none                | [ArcaConfigStatusEnvelope.schema.json](../schema-json/ArcaConfigStatusEnvelope.schema.json "open original schema") |
 
-## AfipConfigStatusEnvelope Type
+## ArcaConfigStatusEnvelope Type
 
-`object` ([AfipConfigStatusEnvelope](afipconfigstatusenvelope.md))
+`object` ([ArcaConfigStatusEnvelope](afipconfigstatusenvelope.md))
 
-# AfipConfigStatusEnvelope Properties
+# ArcaConfigStatusEnvelope Properties
 
 | Property            | Type      | Required | Nullable       | Defined by                                                                                                 |
 | :------------------ | :-------- | :------- | :------------- | :--------------------------------------------------------------------------------------------------------- |
-| [data](#data)       | `object`  | Required | cannot be null | [AfipConfigStatusEnvelope](afipconfigstatus.md "undefined#/properties/data")                               |
-| [success](#success) | `boolean` | Required | cannot be null | [AfipConfigStatusEnvelope](afipconfigstatusenvelope-properties-success.md "undefined#/properties/success") |
+| [data](#data)       | `object`  | Required | cannot be null | [ArcaConfigStatusEnvelope](afipconfigstatus.md "undefined#/properties/data")                               |
+| [success](#success) | `boolean` | Required | cannot be null | [ArcaConfigStatusEnvelope](afipconfigstatusenvelope-properties-success.md "undefined#/properties/success") |
 
 ## data
 
@@ -29,15 +29,15 @@ undefined
 
 * is required
 
-* Type: `object` ([AfipConfigStatus](afipconfigstatus.md))
+* Type: `object` ([ArcaConfigStatus](afipconfigstatus.md))
 
 * cannot be null
 
-* defined in: [AfipConfigStatusEnvelope](afipconfigstatus.md "undefined#/properties/data")
+* defined in: [ArcaConfigStatusEnvelope](afipconfigstatus.md "undefined#/properties/data")
 
 ### data Type
 
-`object` ([AfipConfigStatus](afipconfigstatus.md))
+`object` ([ArcaConfigStatus](afipconfigstatus.md))
 
 ## success
 
@@ -51,7 +51,7 @@ undefined
 
 * cannot be null
 
-* defined in: [AfipConfigStatusEnvelope](afipconfigstatusenvelope-properties-success.md "undefined#/properties/success")
+* defined in: [ArcaConfigStatusEnvelope](afipconfigstatusenvelope-properties-success.md "undefined#/properties/success")
 
 ### success Type
 

@@ -4,12 +4,14 @@ import { useTranslation } from 'react-i18next'
 import { facturasAPI, clientesAPI, articulosAPI, formasPagoAPI } from '@/lib/api'
 import ErrorBoundary from '@/components/ErrorBoundary'
 import AsyncWrapper from '@/components/shared/AsyncWrapper'
+import KeyboardHint, { useGlobalListShortcuts } from '@/components/shared/KeyboardHint'
 import { Cliente, Articulo, FormaPago, Factura } from '@/types'
 import NuevaFacturaForm from './NuevaFacturaForm'
 import ListadoFacturas from './ListadoFacturas'
 
 export default function FacturacionPage() {
   const { t } = useTranslation('facturacion')
+  const listShortcuts = useGlobalListShortcuts()
   const [view, setView] = useState<'lista' | 'nueva'>('lista')
   const [facturas, setFacturas] = useState<Factura[]>([])
   const [clientes, setClientes] = useState<Cliente[]>([])
@@ -86,6 +88,8 @@ export default function FacturacionPage() {
               onFacturaUpdated={handleFacturaGuardada}
             />
           </AsyncWrapper>
+
+          <KeyboardHint shortcuts={listShortcuts} className="mt-4" />
         </>
       ) : (
         <NuevaFacturaForm

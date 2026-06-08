@@ -5,6 +5,7 @@ import { ApiRequestFailedError, proveedoresAPI, type CsvBulkImportResult, type P
 import { CanAccess } from '@/components/CanAccess'
 import ErrorBoundary from '@/components/ErrorBoundary'
 import AsyncWrapper from '@/components/shared/AsyncWrapper'
+import KeyboardHint, { useGlobalListShortcuts } from '@/components/shared/KeyboardHint'
 import type { Proveedor, ProveedorCategoria } from '@/types'
 import ProveedorForm from '@/pages/proveedores/ProveedorForm'
 
@@ -13,6 +14,7 @@ const CATEGORIAS: ProveedorCategoria[] = ['materia_prima', 'insumos', 'servicios
 export default function ProveedoresPage() {
   const { t } = useTranslation('proveedores')
   const { t: tc } = useTranslation('common')
+  const listShortcuts = useGlobalListShortcuts()
   const [proveedores, setProveedores] = useState<Proveedor[]>([])
   const [filtro, setFiltro] = useState('')
   const [loading, setLoading] = useState(false)
@@ -178,6 +180,7 @@ export default function ProveedoresPage() {
         <div className="mb-6 flex flex-wrap gap-4 items-end">
           <input
             id="search-proveedores"
+            data-testid="search-proveedores"
             type="text"
             placeholder={t('search.placeholder')}
             value={filtro}
@@ -339,6 +342,8 @@ export default function ProveedoresPage() {
             </div>
           </CanAccess>
         )}
+
+        <KeyboardHint shortcuts={listShortcuts} className="mt-4" />
 
         {showForm ? (
           <ProveedorForm

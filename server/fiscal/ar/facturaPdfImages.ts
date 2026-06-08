@@ -1,7 +1,7 @@
 import bwipjs from 'bwip-js'
-import { buildAfipBarcodePayload } from './afipBarcodePayload'
-import { buildAfipQrUrl } from './afipQrPayload'
-import type { AfipFacturaPdfInput } from './afipFiscalPdfTypes'
+import { buildArcaBarcodePayload } from './arcaBarcodePayload'
+import { buildArcaQrUrl } from './arcaQrPayload'
+import type { ArcaFacturaPdfInput } from './arcaFiscalPdfTypes'
 
 export type FacturaPdfImages = {
   barcodePng: Buffer | null
@@ -14,13 +14,13 @@ export type FacturaPdfImages = {
  * @pt-BR Gera imagens de código de barras I2of5 e QR AFIP com CAE emitido.
  */
 export async function buildFacturaPdfImages(
-  input: AfipFacturaPdfInput,
+  input: ArcaFacturaPdfInput,
 ): Promise<FacturaPdfImages> {
   if (input.preview || !input.factura.cae || !input.factura.caeVto) {
     return { barcodePng: null, qrPng: null }
   }
 
-  const barcodeText = buildAfipBarcodePayload({
+  const barcodeText = buildArcaBarcodePayload({
     cuitEmisor: input.empresa.cuit,
     tipo: input.factura.tipo,
     prefijo: input.factura.prefijo,
@@ -28,7 +28,7 @@ export async function buildFacturaPdfImages(
     caeVto: input.factura.caeVto,
   })
 
-  const qrUrl = buildAfipQrUrl({
+  const qrUrl = buildArcaQrUrl({
     fecha: input.factura.fecha,
     cuitEmisor: input.empresa.cuit,
     prefijo: input.factura.prefijo,

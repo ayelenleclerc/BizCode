@@ -1,4 +1,4 @@
-import { normalizeCuitDigits } from './afipComprobanteCodes'
+import { normalizeCuitDigits } from './arcaComprobanteCodes'
 import {
   DOCUMENTO_COMPRA_OLLAMA_TIMEOUT_MS,
   getDocumentoCompraOllamaBaseUrl,

@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import KeyboardHint from '@/components/shared/KeyboardHint'
 import { dashboardAPI, type DashboardSummaryDTO } from '@/lib/api'
 import { useAuth } from '@/contexts/AuthContext'
 import { useFeatureFlags } from '@/contexts/FeatureFlagsContext'
@@ -119,6 +120,11 @@ export default function InicioPage() {
     (claims?.permissions.includes('reports.operational.read') ?? false) &&
     hasModule('analytics.advanced')
 
+  const inicioShortcuts = useMemo(
+    () => [{ key: 'Tab', description: t('common:shortcuts.navigate') }],
+    [t],
+  )
+
   useEffect(() => {
     if (moduleAlert) {
       navigate(location.pathname, { replace: true, state: {} })
@@ -163,6 +169,8 @@ export default function InicioPage() {
           {t('common:errors.moduleNotEnabled', { module: t(moduleI18nKey(moduleAlert)) })}
         </p>
       ) : null}
+
+      <KeyboardHint shortcuts={inicioShortcuts} className="mb-4" />
 
       <div
         role="tablist"

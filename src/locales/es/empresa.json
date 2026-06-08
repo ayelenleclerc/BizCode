@@ -47,14 +47,14 @@
   "success": {
     "saved": "Configuración de empresa guardada"
   },
-  "afip": {
-    "title": "Facturación electrónica AFIP (CAE)",
+  "arca": {
+    "title": "Facturación electrónica ARCA (CAE)",
     "subtitle": "Homologación mock — credenciales cifradas; certificado y clave no se muestran tras guardar.",
-    "loading": "Cargando configuración AFIP…",
+    "loading": "Cargando configuración ARCA…",
     "configuredHint": "Configurado para CUIT {{cuit}} ({{ambiente}}).",
-    "notConfigured": "Aún no hay credenciales AFIP configuradas.",
+    "notConfigured": "Aún no hay credenciales ARCA configuradas.",
     "readOnlyHint": "Puede ver el estado; solo roles con permiso fiscal pueden editar.",
-    "cuit": "CUIT AFIP",
+    "cuit": "CUIT ARCA",
     "certificate": "Certificado X.509 (PEM)",
     "certificatePlaceholder": "Pegue el certificado PEM…",
     "certificatePlaceholderUpdate": "Deje vacío para conservar; pegue PEM para reemplazar.",
@@ -64,16 +64,16 @@
     "ambiente": "Ambiente",
     "ambienteHomologacion": "Homologación (mock)",
     "ambienteProduccion": "Producción (no habilitado en esta versión)",
-    "save": "Guardar credenciales AFIP",
+    "save": "Guardar credenciales ARCA",
     "saving": "Guardando…",
-    "saveSuccess": "Credenciales AFIP guardadas",
+    "saveSuccess": "Credenciales ARCA guardadas",
     "testAuth": "Probar ticket (TA)",
     "authLoading": "Solicitando TA…",
     "authSuccess": "TA mock OK — vence {{expiration}}",
     "errors": {
-      "loadFailed": "No se pudo cargar la configuración AFIP",
-      "saveFailed": "No se pudieron guardar las credenciales AFIP",
-      "authFailed": "No se pudo obtener el ticket AFIP"
+      "loadFailed": "No se pudo cargar la configuración ARCA",
+      "saveFailed": "No se pudieron guardar las credenciales ARCA",
+      "authFailed": "No se pudo obtener el ticket ARCA"
     }
   },
   "printDevices": {

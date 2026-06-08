@@ -3,6 +3,8 @@ import { useTranslation } from 'react-i18next'
 import { CanAccess } from '@/components/CanAccess'
 import ErrorBoundary from '@/components/ErrorBoundary'
 import AsyncWrapper from '@/components/shared/AsyncWrapper'
+import KeyboardHint, { useGlobalListShortcuts } from '@/components/shared/KeyboardHint'
+import { useListKeyboardNav, useListPageHotkeys } from '@/hooks/useListPageKeyboard'
 import { recuentosAPI, type Recuento } from '@/lib/api'
 
 type RecuentoEstadoUi = 'in_progress' | 'closed'
@@ -44,6 +46,8 @@ function RecuentosPageContent() {
   const [physicalQty, setPhysicalQty] = useState<Record<number, string>>({})
   const [actionLoading, setActionLoading] = useState(false)
   const [actionError, setActionError] = useState<string | null>(null)
+  const [selectedRow, setSelectedRow] = useState(0)
+  const listShortcuts = useGlobalListShortcuts()
 
   const openRecuento = useMemo(
     () => recuentos.find((r) => r.estado === 'in_progress') ?? null,
@@ -56,6 +60,7 @@ function RecuentosPageContent() {
     try {
       const res = await recuentosAPI.list()
       setRecuentos(res?.data ?? [])
+      setSelectedRow(0)
     } catch (error) {
       setLoadError(error instanceof Error ? error : new Error(String(error)))
     } finally {
@@ -75,13 +80,13 @@ function RecuentosPageContent() {
     setPhysicalQty(qty)
   }
 
-  const refreshSelected = async (id: number) => {
+  const refreshSelected = useCallback(async (id: number) => {
     const detail = await recuentosAPI.get(id)
     if (detail) {
       setSelected(detail)
       syncPhysicalQty(detail)
     }
-  }
+  }, [])
 
   const handleStart = async () => {
     setActionError(null)
@@ -187,6 +192,25 @@ function RecuentosPageContent() {
     }
   }
 
+  const openRecuentoRow = useCallback(
+    (index: number) => {
+      const r = recuentos[index]
+      if (r) void refreshSelected(r.id)
+    },
+    [recuentos, refreshSelected],
+  )
+
+  const handleKeyDown = useListKeyboardNav({
+    itemCount: recuentos.length,
+    selectedRow,
+    setSelectedRow,
+    onOpenRow: openRecuentoRow,
+  })
+
+  useListPageHotkeys({
+    onNew: !openRecuento ? () => void handleStart() : undefined,
+  })
+
   const countedProgress = selected
     ? {
         counted: selected.items.filter((i) => {
@@ -252,16 +276,25 @@ function RecuentosPageContent() {
                   </tr>
                 </thead>
                 <tbody>
-                  {recuentos.map((r) => (
+                  {recuentos.map((r, idx) => (
                     <tr
                       key={r.id}
-                      className={`border-b border-slate-100 dark:border-slate-800 cursor-pointer ${
-                        selected?.id === r.id ? 'bg-blue-50 dark:bg-slate-800' : ''
+                      role="row"
+                      {...(selectedRow === idx
+                        ? { 'aria-selected': 'true' as const }
+                        : { 'aria-selected': 'false' as const })}
+                      className={`border-b border-slate-100 dark:border-slate-800 cursor-pointer transition ${
+                        selectedRow === idx
+                          ? 'bg-blue-600 text-white'
+                          : 'hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-900 dark:text-slate-100'
                       }`}
                       data-testid={`recuentos-row-${r.id}`}
+                      tabIndex={0}
                       onClick={() => {
+                        setSelectedRow(idx)
                         void refreshSelected(r.id)
                       }}
+                      onKeyDown={(e) => handleKeyDown(e, idx)}
                     >
                       <td className="py-2 pr-2 font-mono">#{r.id}</td>
                       <td className="py-2 pr-2">{formatDate(r.fecha)}</td>
@@ -384,6 +417,8 @@ function RecuentosPageContent() {
             </div>
           </section>
         )}
+
+        <KeyboardHint shortcuts={listShortcuts} className="mt-4" />
       </div>
     </ErrorBoundary>
   )

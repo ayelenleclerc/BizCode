@@ -1,4 +1,4 @@
-# Untitled object in AfipCaeEnvelope Schema
+# Untitled object in ArcaCaeEnvelope Schema
 
 ```txt
 undefined#/properties/data
@@ -8,7 +8,7 @@ undefined#/properties/data
 
 | Abstract            | Extensible | Status         | Identifiable | Custom Properties | Additional Properties | Access Restrictions | Defined In                                                                                         |
 | :------------------ | :--------- | :------------- | :----------- | :---------------- | :-------------------- | :------------------ | :------------------------------------------------------------------------------------------------- |
-| Can be instantiated | No         | Unknown status | No           | Forbidden         | Allowed               | none                | [AfipCaeEnvelope.schema.json\*](../schema-json/AfipCaeEnvelope.schema.json "open original schema") |
+| Can be instantiated | No         | Unknown status | No           | Forbidden         | Allowed               | none                | [ArcaCaeEnvelope.schema.json\*](../schema-json/ArcaCaeEnvelope.schema.json "open original schema") |
 
 ## data Type
 
@@ -18,8 +18,8 @@ undefined#/properties/data
 
 | Property          | Type     | Required | Nullable       | Defined by                                                                                                             |
 | :---------------- | :------- | :------- | :------------- | :--------------------------------------------------------------------------------------------------------------------- |
-| [cae](#cae)       | `string` | Optional | cannot be null | [AfipCaeEnvelope](afipcaeenvelope-properties-data-properties-cae.md "undefined#/properties/data/properties/cae")       |
-| [caeVto](#caevto) | `string` | Optional | cannot be null | [AfipCaeEnvelope](afipcaeenvelope-properties-data-properties-caevto.md "undefined#/properties/data/properties/caeVto") |
+| [cae](#cae)       | `string` | Optional | cannot be null | [ArcaCaeEnvelope](afipcaeenvelope-properties-data-properties-cae.md "undefined#/properties/data/properties/cae")       |
+| [caeVto](#caevto) | `string` | Optional | cannot be null | [ArcaCaeEnvelope](afipcaeenvelope-properties-data-properties-caevto.md "undefined#/properties/data/properties/caeVto") |
 
 ## cae
 
@@ -33,7 +33,7 @@ undefined#/properties/data
 
 * cannot be null
 
-* defined in: [AfipCaeEnvelope](afipcaeenvelope-properties-data-properties-cae.md "undefined#/properties/data/properties/cae")
+* defined in: [ArcaCaeEnvelope](afipcaeenvelope-properties-data-properties-cae.md "undefined#/properties/data/properties/cae")
 
 ### cae Type
 
@@ -51,7 +51,7 @@ undefined#/properties/data
 
 * cannot be null
 
-* defined in: [AfipCaeEnvelope](afipcaeenvelope-properties-data-properties-caevto.md "undefined#/properties/data/properties/caeVto")
+* defined in: [ArcaCaeEnvelope](afipcaeenvelope-properties-data-properties-caevto.md "undefined#/properties/data/properties/caeVto")
 
 ### caeVto Type
 

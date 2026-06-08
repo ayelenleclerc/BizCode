@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useHotkeys } from 'react-hotkeys-hook'
+import KeyboardHint, { useFormShortcuts } from '@/components/shared/KeyboardHint'
 import { useTranslation } from 'react-i18next'
 import { ApiRequestFailedError, articulosAPI, type StockAjusteHistorialRow } from '@/lib/api'
 import { hasPermission } from '@/lib/rbac'
@@ -202,6 +203,7 @@ export default function ArticuloForm({ articulo, rubros, onClose, onGuardado }: 
   const dialogTitle = articulo
     ? t('form.titleEdit', { codigo: articulo.codigo })
     : t('form.titleNew')
+  const formShortcuts = useFormShortcuts()
 
   return (
     <div
@@ -218,6 +220,8 @@ export default function ArticuloForm({ articulo, rubros, onClose, onGuardado }: 
           </h2>
           <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">{t('form.hint')}</p>
         </div>
+
+        <KeyboardHint shortcuts={formShortcuts} className="mx-6 mt-4" />
 
         <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-4" data-testid="articulo-form">
           {error && (

@@ -5,12 +5,14 @@ import { ApiRequestFailedError, clientesAPI, type ClienteImportResult } from '@/
 import { CanAccess } from '@/components/CanAccess'
 import ErrorBoundary from '@/components/ErrorBoundary'
 import AsyncWrapper from '@/components/shared/AsyncWrapper'
+import KeyboardHint, { useGlobalListShortcuts } from '@/components/shared/KeyboardHint'
 import { Cliente } from '@/types'
 import ClienteForm from './ClienteForm'
 
 export default function ClientesPage() {
   const { t } = useTranslation('clientes')
   const { t: tc } = useTranslation('common')
+  const listShortcuts = useGlobalListShortcuts()
   const [clientes, setClientes] = useState<Cliente[]>([])
   const [filtro, setFiltro] = useState('')
   const [loading, setLoading] = useState(false)
@@ -146,6 +148,7 @@ export default function ClientesPage() {
       <div className="mb-6 flex gap-4">
         <input
           id="search-clientes"
+          data-testid="search-clientes"
           type="text"
           placeholder={t('search.placeholder')}
           value={filtro}
@@ -227,6 +230,8 @@ export default function ClientesPage() {
         )}
         </AsyncWrapper>
       </div>
+
+      <KeyboardHint shortcuts={listShortcuts} className="mt-4" />
 
       {showForm && (
         <ClienteForm

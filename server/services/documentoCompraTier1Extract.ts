@@ -1,14 +1,14 @@
 import jsQR from 'jsqr'
 import sharp from 'sharp'
-import type { AfipQrJsonPayload } from '../fiscal/ar/afipQrPayload'
+import type { ArcaQrJsonPayload } from '../fiscal/ar/arcaQrPayload'
 import {
-  extractAfipQrPayloadFromBuffer,
-  parseAfipQrContent,
-  type AfipQrDecodeResult,
-} from '../fiscal/ar/afipQrDecode'
+  extractArcaQrPayloadFromBuffer,
+  parseArcaQrContent,
+  type ArcaQrDecodeResult,
+} from '../fiscal/ar/arcaQrDecode'
 import { isDocumentoCompraImageFile } from '../lib/documentoCompraMedia'
 
-export type DocumentoCompraTier1ExtractResult = AfipQrDecodeResult
+export type DocumentoCompraTier1ExtractResult = ArcaQrDecodeResult
 
 /**
  * @en Tier 1 — local AFIP/ARCA QR decode from PDF URL text or image scan (no portal API).
@@ -20,13 +20,13 @@ export async function tryExtractDocumentoCompraTier1(
   mimeType: string,
   tipoArchivo: string,
 ): Promise<DocumentoCompraTier1ExtractResult | null> {
-  const fromBuffer = extractAfipQrPayloadFromBuffer(buffer)
+  const fromBuffer = extractArcaQrPayloadFromBuffer(buffer)
   if (fromBuffer) {
     return { payload: fromBuffer, source: 'url_param' }
   }
 
   if (isDocumentoCompraImageFile(mimeType, tipoArchivo)) {
-    const fromImage = await tryDecodeAfipQrFromImageBuffer(buffer)
+    const fromImage = await tryDecodeArcaQrFromImageBuffer(buffer)
     if (fromImage) {
       return { payload: fromImage, source: 'image_scan' }
     }
@@ -35,7 +35,7 @@ export async function tryExtractDocumentoCompraTier1(
   return null
 }
 
-async function tryDecodeAfipQrFromImageBuffer(buffer: Buffer): Promise<AfipQrJsonPayload | null> {
+async function tryDecodeArcaQrFromImageBuffer(buffer: Buffer): Promise<ArcaQrJsonPayload | null> {
   try {
     const { data, info } = await sharp(buffer)
       .ensureAlpha()
@@ -44,7 +44,7 @@ async function tryDecodeAfipQrFromImageBuffer(buffer: Buffer): Promise<AfipQrJso
 
     const code = jsQR(new Uint8ClampedArray(data), info.width, info.height)
     if (!code?.data) return null
-    return parseAfipQrContent(code.data)
+    return parseArcaQrContent(code.data)
   } catch {
     return null
   }

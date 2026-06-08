@@ -1,4 +1,4 @@
-# AfipCaeInput Schema
+# ArcaCaeInput Schema
 
 ```txt
 undefined
@@ -8,17 +8,17 @@ undefined
 
 | Abstract            | Extensible | Status         | Identifiable | Custom Properties | Additional Properties | Access Restrictions | Defined In                                                                                 |
 | :------------------ | :--------- | :------------- | :----------- | :---------------- | :-------------------- | :------------------ | :----------------------------------------------------------------------------------------- |
-| Can be instantiated | No         | Unknown status | No           | Forbidden         | Allowed               | none                | [AfipCaeInput.schema.json](../schema-json/AfipCaeInput.schema.json "open original schema") |
+| Can be instantiated | No         | Unknown status | No           | Forbidden         | Allowed               | none                | [ArcaCaeInput.schema.json](../schema-json/ArcaCaeInput.schema.json "open original schema") |
 
-## AfipCaeInput Type
+## ArcaCaeInput Type
 
-`object` ([AfipCaeInput](afipcaeinput.md))
+`object` ([ArcaCaeInput](afipcaeinput.md))
 
-# AfipCaeInput Properties
+# ArcaCaeInput Properties
 
 | Property                | Type      | Required | Nullable       | Defined by                                                                             |
 | :---------------------- | :-------- | :------- | :------------- | :------------------------------------------------------------------------------------- |
-| [facturaId](#facturaid) | `integer` | Required | cannot be null | [AfipCaeInput](afipcaeinput-properties-facturaid.md "undefined#/properties/facturaId") |
+| [facturaId](#facturaid) | `integer` | Required | cannot be null | [ArcaCaeInput](afipcaeinput-properties-facturaid.md "undefined#/properties/facturaId") |
 
 ## facturaId
 
@@ -32,7 +32,7 @@ undefined
 
 * cannot be null
 
-* defined in: [AfipCaeInput](afipcaeinput-properties-facturaid.md "undefined#/properties/facturaId")
+* defined in: [ArcaCaeInput](afipcaeinput-properties-facturaid.md "undefined#/properties/facturaId")
 
 ### facturaId Type
 

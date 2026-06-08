@@ -3,6 +3,7 @@ import { useForm, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useHotkeys } from 'react-hotkeys-hook'
+import KeyboardHint, { useFormShortcuts } from '@/components/shared/KeyboardHint'
 import { useTranslation } from 'react-i18next'
 import { ApiRequestFailedError, usersAPI, type AppUserDTO, type CreateUserBody, type UpdateUserBody } from '@/lib/api'
 import { USER_ROLES, USER_CHANNELS, type UserRole, type UserChannel } from '@/lib/rbac'
@@ -136,6 +137,8 @@ export default function UserForm({ user, onClose, onSaved }: Props) {
 
   useHotkeys('escape', () => onClose(), { enableOnFormTags: true })
 
+  const formShortcuts = useFormShortcuts()
+
   return (
     <div
       role="dialog"
@@ -147,7 +150,8 @@ export default function UserForm({ user, onClose, onSaved }: Props) {
         <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-1">
           {isNew ? t('form.titleNew') : t('form.titleEdit', { username: user?.username })}
         </h2>
-        <p className="text-xs text-slate-500 dark:text-slate-400 mb-5">{t('form.hint')}</p>
+        <p className="text-xs text-slate-500 dark:text-slate-400 mb-3">{t('form.hint')}</p>
+        <KeyboardHint shortcuts={formShortcuts} className="mb-5" />
 
         <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-4">
           {/* Username */}

@@ -10,6 +10,12 @@ Versionado: [Semantic Versioning](https://semver.org/lang/es/).
 
 ### Agregado
 
+- **Accesibilidad por teclado (pantallas):** hooks reutilizables (`useListPageKeyboard`, `KeyboardHint`) y referencias visibles de atajos en listados, formularios, finanzas, logística, login e inicio; política ampliada en `docs/*/accesibilidad.md` (Enter abrir/editar).
+
+### Cambiado
+
+- **Renombrado AFIP → ARCA (breaking):** rutas `/api/arca/*`, módulo `billing.arca_cae`, cliente `arcaAPI`, `ArcaService`, scripts `arca:retry-pending*`; migración Prisma `20260608120000_arca_module_rename`; i18n empresa/finanzas; ADR-0014 renombrado a `legal-arca-invoice-pdf`. URLs literales del portal (`afip.gob.ar`) se conservan en QR/PDF.
+
 - **Comparador de precios por proveedor (GitHub #274):** `ArticuloProveedoresComparadorService`; `GET /api/articulos/{id}/proveedores` y `GET /api/proveedores/comparar?articuloId=` (módulo `logistics.purchases`, `products.read` o `suppliers.read`); filas de catálogo activas con precio de lista, indicador de precio desactualizado (>30 días) y fecha de última OC **recibida**; botón **Ver proveedores** en ficha de artículo con ordenamiento, resaltado del más barato, aviso de precio antiguo y acción **[OC]** (`suppliers.manage`) que precarga el formulario de compras; OpenAPI, pruebas y manuales trilingües.
 
 - **Catálogo de productos por proveedor (GitHub #273):** modelo `ProveedorArticulo` y migración; `GET/POST /api/proveedores/{id}/catalogo`, `PUT .../catalogo/{articuloId}`, `POST .../catalogo/import` (módulo `logistics.purchases`); códigos, descripciones y precios de lista por proveedor e importación CSV; pestaña **Catálogo** en ficha con indicadores de antigüedad del precio; auditoría `proveedor_catalogo_*`; OpenAPI, pruebas y manuales trilingües.
@@ -79,7 +85,7 @@ Versionado: [Semantic Versioning](https://semver.org/lang/es/).
 
 - **Órdenes de compra (GitHub #135):** `OrdenCompra` + `OrdenCompraItem`; CRUD `/api/compras`, `POST .../send`, `POST .../receive` (recepción parcial → `StockAjuste` motivo `compra`); UI `/compras`; RBAC `suppliers.read` / `suppliers.manage` + `inventory.adjust` en recepción; i18n EN/ES/PT-BR.
 - **Recordatorios de mora (GitHub #134):** modelo `CobroRecordatorio`; configuración por tenant en `ParamEmpresa` (`recordatorioDiasGracia`, `timezone` IANA, ventana comercial `recordatorioHoraInicio` / `recordatorioHoraFin`) editable en **Configuración → Empresa**; `GET /api/cobranzas/vencidas` y `POST /api/cobranzas/recordatorios` (`reports.financial.read`); `CobranzasService` con slot 08:00 y horario en hora local del tenant; job multi-tenant `npm run cobranzas:recordatorios` (cron horario `0 * * * *` recomendado); notificaciones `invoice_overdue` enriquecidas; sección en `/finanzas`; auditoría `cobranza_recordatorio_send`; i18n EN/ES/PT-BR.
-- **AFIP CAE (GitHub #133):** `GET /api/afip/config` (solo metadatos), PDF de factura (`GET /api/facturas/:id/pdf`, vista previa con marca de agua), badges CAE y reintento en UI de facturación, sección AFIP en empresa (`billing.afip_cae`), mock WSFE homologación, `npm run afip:retry-pending-job` (cron `*/5`), i18n EN/ES/PT-BR.
+- **AFIP CAE (GitHub #133):** `GET /api/arca/config` (solo metadatos), PDF de factura (`GET /api/facturas/:id/pdf`, vista previa con marca de agua), badges CAE y reintento en UI de facturación, sección AFIP en empresa (`billing.arca_cae`), mock WSFE homologación, `npm run arca:retry-pending-job` (cron `*/5`), i18n EN/ES/PT-BR.
 - **Pedidos comerciales (GitHub #132):** modelos `Pedido` / `PedidoItem`; `GET/POST/PUT/DELETE /api/pedidos` y `POST .../confirm` / `POST .../invoice` (estados y rutas en inglés, ADR-0009); RBAC `orders.create` / `sales.create` / `sales.cancel`; auditoría `pedido_*`; UI listado `/pedidos`; i18n EN/ES/PT-BR. Gating modular: `requireModule('billing.orders')` (#223).
 
 - **Migración DBF catálogo (GitHub #131):** parsers `legacyRubroDbf.ts` / `legacyArticuloDbf.ts`; `POST /api/rubros/migrate-dbf` y `POST /api/articulos/migrate-dbf` (`settings.business.manage`, upsert por código); `npm run migrate:dbf` importa `RUBROS.DBF` / `ARTICULOS.DBF` si existen (fallback `PVAR2`/`PVAR`); fixtures y pruebas de integración.

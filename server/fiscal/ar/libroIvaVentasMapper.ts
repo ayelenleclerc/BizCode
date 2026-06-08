@@ -1,9 +1,9 @@
 import type { Cliente, Factura, NotaCredito } from '@prisma/client'
 import { Decimal } from '@prisma/client/runtime/library'
 import {
-  TIPO_ANULADO_AFIP,
-  TIPO_FACTURA_AFIP,
-  TIPO_NC_AFIP,
+  TIPO_ANULADO_ARCA,
+  TIPO_FACTURA_ARCA,
+  TIPO_NC_ARCA,
 } from './libroIvaVentasConstants'
 import {
   alicuotaCodeForRate,
@@ -39,16 +39,16 @@ function dec(value: Decimal | number | null | undefined): number {
   return Number(value)
 }
 
-function resolveFacturaTipoAfip(tipo: string): string | null {
-  return TIPO_FACTURA_AFIP[tipo.toUpperCase()] ?? null
+function resolveFacturaTipoArca(tipo: string): string | null {
+  return TIPO_FACTURA_ARCA[tipo.toUpperCase()] ?? null
 }
 
-function resolveNcTipoAfip(tipo: string): string | null {
-  return TIPO_NC_AFIP[tipo.toUpperCase()] ?? null
+function resolveNcTipoArca(tipo: string): string | null {
+  return TIPO_NC_ARCA[tipo.toUpperCase()] ?? null
 }
 
 function buildAlicuotaRowsFromFactura(
-  tipoAfip: string,
+  tipoArca: string,
   puntoVenta: string,
   numeroComprobante: string,
   neto1: number,
@@ -59,7 +59,7 @@ function buildAlicuotaRowsFromFactura(
   const rows: LibroIvaAlicuotaRow[] = []
   if (neto1 !== 0 || iva1 !== 0) {
     rows.push({
-      tipoComprobante: tipoAfip,
+      tipoComprobante: tipoArca,
       puntoVenta,
       numeroComprobante,
       netoGravado: neto1,
@@ -69,7 +69,7 @@ function buildAlicuotaRowsFromFactura(
   }
   if (neto2 !== 0 || iva2 !== 0) {
     rows.push({
-      tipoComprobante: tipoAfip,
+      tipoComprobante: tipoArca,
       puntoVenta,
       numeroComprobante,
       netoGravado: neto2,
@@ -110,8 +110,8 @@ export function mapLibroIvaVentas(
   const previewMap = new Map<string, LibroIvaVentasPreviewTotals>()
 
   for (const factura of facturas) {
-    const tipoAfip = resolveFacturaTipoAfip(factura.tipo)
-    if (!tipoAfip) continue
+    const tipoArca = resolveFacturaTipoArca(factura.tipo)
+    if (!tipoArca) continue
 
     const neto1 = dec(factura.neto1)
     const neto2 = dec(factura.neto2)
@@ -123,7 +123,7 @@ export function mapLibroIvaVentas(
     const numero = String(factura.numero)
 
     const alicuotaRows = buildAlicuotaRowsFromFactura(
-      tipoAfip,
+      tipoArca,
       puntoVenta,
       numero,
       neto1,
@@ -135,7 +135,7 @@ export function mapLibroIvaVentas(
     cbtvLines.push(
       buildCbtvLine({
         fecha: factura.fecha,
-        tipoComprobante: tipoAfip,
+        tipoComprobante: tipoArca,
         puntoVenta,
         numeroComprobante: numero,
         buyerName: factura.cliente.rsocial,
@@ -154,7 +154,7 @@ export function mapLibroIvaVentas(
 
   for (const nc of notasCredito) {
     const origen = nc.facturaOrigen
-    const tipoNc = resolveNcTipoAfip(origen.tipo)
+    const tipoNc = resolveNcTipoArca(origen.tipo)
     if (!tipoNc) continue
 
     const neto1 = dec(origen.neto1)
@@ -199,7 +199,7 @@ export function mapLibroIvaVentas(
     cbtvLines.push(
       buildCbtvLine({
         fecha: voidDate,
-        tipoComprobante: TIPO_ANULADO_AFIP,
+        tipoComprobante: TIPO_ANULADO_ARCA,
         puntoVenta,
         numeroComprobante: String(origen.numero),
         buyerName: origen.cliente.rsocial,

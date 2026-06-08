@@ -3,6 +3,7 @@ import { useHotkeys } from 'react-hotkeys-hook'
 import { useTranslation } from 'react-i18next'
 import { usersAPI, type AppUserDTO } from '@/lib/api'
 import { CanAccess } from '@/components/CanAccess'
+import KeyboardHint, { useGlobalListShortcuts } from '@/components/shared/KeyboardHint'
 import { usePlan } from '@/contexts/PlanContext'
 import { isLimitExceeded } from '@/lib/plans'
 import UserForm from './UserForm'
@@ -10,6 +11,7 @@ import UserForm from './UserForm'
 export default function UsersPage() {
   const { t } = useTranslation('users')
   const { t: tc } = useTranslation('common')
+  const listShortcuts = useGlobalListShortcuts()
   const [users, setUsers] = useState<AppUserDTO[]>([])
   const [filtro, setFiltro] = useState('')
   const [loading, setLoading] = useState(false)
@@ -94,6 +96,7 @@ export default function UsersPage() {
       <div className="mb-6 flex gap-4">
         <input
           id="search-users"
+          data-testid="search-users"
           type="text"
           placeholder={t('search.placeholder')}
           value={filtro}
@@ -174,6 +177,8 @@ export default function UsersPage() {
           </table>
         )}
       </div>
+
+      <KeyboardHint shortcuts={listShortcuts} className="mt-4" />
 
       {showForm && (
         <UserForm

@@ -8,6 +8,8 @@ import {
   type DocumentoCompraImportadoRow,
   type DocumentoCompraPreviewDataDTO,
 } from '@/lib/api'
+import KeyboardHint, { useFormShortcuts } from '@/components/shared/KeyboardHint'
+import { useFormPageHotkeys } from '@/hooks/useListPageKeyboard'
 import type { Proveedor } from '@/types'
 
 const TIPOS = ['A', 'B', 'C'] as const
@@ -88,6 +90,7 @@ function fieldClass(status: FieldStatus): string {
  */
 export default function DocumentoCompraImportSection({ onConfirmed }: { onConfirmed: () => void }) {
   const { t } = useTranslation('finanzas')
+  const formShortcuts = useFormShortcuts()
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [proveedores, setProveedores] = useState<Proveedor[]>([])
   const [loadingProveedores, setLoadingProveedores] = useState(false)
@@ -289,6 +292,18 @@ export default function DocumentoCompraImportSection({ onConfirmed }: { onConfir
     }
   }
 
+  const closePreview = useCallback(() => {
+    setShowPreview(false)
+    setDocumento(null)
+  }, [])
+
+  useFormPageHotkeys({
+    onSave: showPreview ? () => void handleConfirm() : undefined,
+    onClose: () => {
+      if (showPreview) closePreview()
+    },
+  })
+
   const extractionConfidence =
     documento != null ? Number(documento.confianza) : 0
   const confidencePct = Math.round(extractionConfidence * 100)
@@ -339,6 +354,7 @@ export default function DocumentoCompraImportSection({ onConfirmed }: { onConfir
       </h3>
       <p className="text-xs text-slate-500 dark:text-slate-400 mb-3">{t('documentoCompra.hint')}</p>
       <p className="text-xs text-slate-500 dark:text-slate-400 mb-3">{t('documentoCompra.batchHint')}</p>
+      <KeyboardHint shortcuts={formShortcuts} className="mb-3" />
 
       {cola && (
         <div
@@ -655,10 +671,7 @@ export default function DocumentoCompraImportSection({ onConfirmed }: { onConfir
                 type="button"
                 className="px-4 py-2 rounded border border-slate-300 dark:border-slate-600"
                 data-testid="documento-compra-preview-cancel"
-                onClick={() => {
-                  setShowPreview(false)
-                  setDocumento(null)
-                }}
+                onClick={closePreview}
                 disabled={confirming}
               >
                 {t('documentoCompra.cancel')}

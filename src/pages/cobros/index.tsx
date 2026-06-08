@@ -5,6 +5,8 @@ import { cobrosAPI } from '@/lib/api'
 import { CanAccess } from '@/components/CanAccess'
 import ErrorBoundary from '@/components/ErrorBoundary'
 import AsyncWrapper from '@/components/shared/AsyncWrapper'
+import KeyboardHint, { useGlobalListShortcuts } from '@/components/shared/KeyboardHint'
+import { useListKeyboardNav, useListPageHotkeys } from '@/hooks/useListPageKeyboard'
 import type { Cobro } from '@/types'
 import CobroForm from './CobroForm'
 
@@ -31,6 +33,8 @@ export default function CobrosPage() {
   const [filterClienteId, setFilterClienteId] = useState(presetClienteId ?? '')
   const [filterDesde, setFilterDesde] = useState('')
   const [filterHasta, setFilterHasta] = useState('')
+  const [selectedRow, setSelectedRow] = useState(0)
+  const listShortcuts = useGlobalListShortcuts()
 
   const loadCobros = useCallback(async () => {
     setLoading(true)
@@ -44,6 +48,7 @@ export default function CobrosPage() {
         hasta: filterHasta || undefined,
       })
       setCobros(res?.data ?? [])
+      setSelectedRow(0)
     } catch (error) {
       setLoadError(error instanceof Error ? error : new Error(String(error)))
     } finally {
@@ -61,6 +66,20 @@ export default function CobrosPage() {
       setShowForm(true)
     }
   }, [presetClienteId])
+
+  const handleKeyDown = useListKeyboardNav({
+    itemCount: cobros.length,
+    selectedRow,
+    setSelectedRow,
+    onOpenRow: () => {},
+  })
+
+  useListPageHotkeys({
+    searchInputId: 'search-cobros-cliente',
+    onNew: () => setShowForm(true),
+    onClose: () => setShowForm(false),
+    isOverlayOpen: showForm,
+  })
 
   return (
     <ErrorBoundary>
@@ -99,9 +118,11 @@ export default function CobrosPage() {
               {t('empty')}
             </p>
           ) : (
-            <CobrosTableView cobros={cobros} t={t} />
+            <CobrosTableView cobros={cobros} t={t} selectedRow={selectedRow} onKeyDown={handleKeyDown} onSelectRow={setSelectedRow} />
           )}
         </AsyncWrapper>
+
+        <KeyboardHint shortcuts={listShortcuts} className="mt-4" />
 
         {showForm && (
           <CobrosModalOverlay onClose={() => setShowForm(false)}>
@@ -144,11 +165,12 @@ function CobrosFiltersBar({
   return (
     <div className="flex flex-wrap gap-3 mb-4 items-end" data-testid="cobros-filters">
       <div>
-        <label htmlFor="filter-cliente" className="block text-xs text-slate-500 dark:text-slate-400 mb-1">
+        <label htmlFor="search-cobros-cliente" className="block text-xs text-slate-500 dark:text-slate-400 mb-1">
           {t('filters.client')}
         </label>
         <input
-          id="filter-cliente"
+          id="search-cobros-cliente"
+          data-testid="search-cobros-cliente"
           type="number"
           min={1}
           placeholder={t('filters.clientPlaceholder')}
@@ -195,7 +217,19 @@ function CobrosFiltersBar({
   )
 }
 
-function CobrosTableView({ cobros, t }: { cobros: Cobro[]; t: (key: string) => string }) {
+function CobrosTableView({
+  cobros,
+  t,
+  selectedRow,
+  onKeyDown,
+  onSelectRow,
+}: {
+  cobros: Cobro[]
+  t: (key: string) => string
+  selectedRow: number
+  onKeyDown: (e: React.KeyboardEvent, index: number) => void
+  onSelectRow: (row: number) => void
+}) {
   return (
     <div className="overflow-x-auto">
       <table className="w-full text-sm" data-testid="cobros-table">
@@ -208,8 +242,22 @@ function CobrosTableView({ cobros, t }: { cobros: Cobro[]; t: (key: string) => s
           </tr>
         </thead>
         <tbody>
-          {cobros.map((c) => (
-            <tr key={c.id} className="border-b border-slate-100 dark:border-slate-800">
+          {cobros.map((c, idx) => (
+            <tr
+              key={c.id}
+              role="row"
+              {...(selectedRow === idx
+                ? { 'aria-selected': 'true' as const }
+                : { 'aria-selected': 'false' as const })}
+              className={`border-b border-slate-100 dark:border-slate-800 cursor-pointer transition ${
+                selectedRow === idx
+                  ? 'bg-blue-600 text-white'
+                  : 'hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-900 dark:text-slate-100'
+              }`}
+              tabIndex={0}
+              onClick={() => onSelectRow(idx)}
+              onKeyDown={(e) => onKeyDown(e, idx)}
+            >
               <td className="py-2 pr-4">{formatDate(c.fecha)}</td>
               <td className="py-2 pr-4">
                 {c.cliente ? `${c.cliente.codigo} — ${c.cliente.rsocial}` : c.clienteId}

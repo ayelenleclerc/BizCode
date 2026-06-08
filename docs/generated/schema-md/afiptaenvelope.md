@@ -1,4 +1,4 @@
-# AfipTaEnvelope Schema
+# ArcaTaEnvelope Schema
 
 ```txt
 undefined
@@ -8,18 +8,18 @@ undefined
 
 | Abstract            | Extensible | Status         | Identifiable | Custom Properties | Additional Properties | Access Restrictions | Defined In                                                                                     |
 | :------------------ | :--------- | :------------- | :----------- | :---------------- | :-------------------- | :------------------ | :--------------------------------------------------------------------------------------------- |
-| Can be instantiated | No         | Unknown status | No           | Forbidden         | Allowed               | none                | [AfipTaEnvelope.schema.json](../schema-json/AfipTaEnvelope.schema.json "open original schema") |
+| Can be instantiated | No         | Unknown status | No           | Forbidden         | Allowed               | none                | [ArcaTaEnvelope.schema.json](../schema-json/ArcaTaEnvelope.schema.json "open original schema") |
 
-## AfipTaEnvelope Type
+## ArcaTaEnvelope Type
 
-`object` ([AfipTaEnvelope](afiptaenvelope.md))
+`object` ([ArcaTaEnvelope](afiptaenvelope.md))
 
-# AfipTaEnvelope Properties
+# ArcaTaEnvelope Properties
 
 | Property            | Type      | Required | Nullable       | Defined by                                                                             |
 | :------------------ | :-------- | :------- | :------------- | :------------------------------------------------------------------------------------- |
-| [data](#data)       | `object`  | Required | cannot be null | [AfipTaEnvelope](afiptaenvelope-properties-data.md "undefined#/properties/data")       |
-| [success](#success) | `boolean` | Required | cannot be null | [AfipTaEnvelope](afiptaenvelope-properties-success.md "undefined#/properties/success") |
+| [data](#data)       | `object`  | Required | cannot be null | [ArcaTaEnvelope](afiptaenvelope-properties-data.md "undefined#/properties/data")       |
+| [success](#success) | `boolean` | Required | cannot be null | [ArcaTaEnvelope](afiptaenvelope-properties-success.md "undefined#/properties/success") |
 
 ## data
 
@@ -33,7 +33,7 @@ undefined
 
 * cannot be null
 
-* defined in: [AfipTaEnvelope](afiptaenvelope-properties-data.md "undefined#/properties/data")
+* defined in: [ArcaTaEnvelope](afiptaenvelope-properties-data.md "undefined#/properties/data")
 
 ### data Type
 
@@ -51,7 +51,7 @@ undefined
 
 * cannot be null
 
-* defined in: [AfipTaEnvelope](afiptaenvelope-properties-success.md "undefined#/properties/success")
+* defined in: [ArcaTaEnvelope](afiptaenvelope-properties-success.md "undefined#/properties/success")
 
 ### success Type
 

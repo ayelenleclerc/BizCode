@@ -1,6 +1,6 @@
 import type { PrismaClient } from '@prisma/client'
 import type { ServiceResult } from '../../services/serviceResults'
-import type { AfipFacturaPdfInput, CondicionIvaCode } from './afipFiscalPdfTypes'
+import type { ArcaFacturaPdfInput, CondicionIvaCode } from './arcaFiscalPdfTypes'
 import { buildFacturaPdfImages } from './facturaPdfImages'
 import { renderFacturaPdfA4, renderFacturaTicket80mm } from './facturaPdfLayout'
 
@@ -50,7 +50,7 @@ function mapFacturaToPdfInput(
     }>
   },
   preview: boolean,
-): AfipFacturaPdfInput {
+): ArcaFacturaPdfInput {
   return {
     preview,
     empresa: {

@@ -24,7 +24,7 @@ describe('documentoCompraTier2Extract', () => {
       'pdf',
     )
     expect(result?.source).toBe('pdf_text_template')
-    expect(result?.issuer).toBe('generic-afip-ar')
+    expect(result?.issuer).toBe('generic-arca-ar')
     expect(result?.confidence).toBeGreaterThanOrEqual(0.7)
     expect(result?.numero).toBe(157)
   })

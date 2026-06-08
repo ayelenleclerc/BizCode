@@ -2633,7 +2633,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ApiErrorEnvelope'
 
-  /api/afip/config:
+  /api/arca/config:
     get:
       tags: [afip]
       summary: AFIP fiscal config status (metadata only)
@@ -2644,7 +2644,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AfipConfigStatusEnvelope'
+                $ref: '#/components/schemas/ArcaConfigStatusEnvelope'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '403':
@@ -2660,14 +2660,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AfipConfigInput'
+              $ref: '#/components/schemas/ArcaConfigInput'
       responses:
         '200':
           description: Config saved
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AfipConfigEnvelope'
+                $ref: '#/components/schemas/ArcaConfigEnvelope'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '403':
@@ -2675,7 +2675,7 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
 
-  /api/afip/auth:
+  /api/arca/auth:
     post:
       tags: [afip]
       summary: Request AFIP TA (ticket de acceso)
@@ -2686,7 +2686,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AfipTaEnvelope'
+                $ref: '#/components/schemas/ArcaTaEnvelope'
         '404':
           description: Fiscal config not found
           content:
@@ -2700,7 +2700,7 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
 
-  /api/afip/cae:
+  /api/arca/cae:
     post:
       tags: [afip]
       summary: Request CAE for a factura
@@ -2710,14 +2710,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AfipCaeInput'
+              $ref: '#/components/schemas/ArcaCaeInput'
       responses:
         '200':
           description: CAE issued
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AfipCaeEnvelope'
+                $ref: '#/components/schemas/ArcaCaeEnvelope'
         '404':
           description: Factura or config not found
           content:
@@ -3684,7 +3684,7 @@ paths:
       description: |
         Stores the original PDF/image on local filesystem and returns an editable preview.
         **Tier 1:** decodes AFIP/ARCA FE QR locally from embedded PDF URL text or image scan (`jsQR` + `sharp`) — no portal/API verification.
-        **Tier 2:** extracts text from digital PDF (`unpdf`) and applies bundled YAML regex templates (Argentina `generic-afip-ar`) when confidence ≥ 0.7.
+        **Tier 2:** extracts text from digital PDF (`unpdf`) and applies bundled YAML regex templates (Argentina `generic-arca-ar`) when confidence ≥ 0.7.
         **Tier 3:** preprocesses images (`sharp`) and runs local OCR (`tesseract.js`, `spa+eng`), then applies the same templates when confidence ≥ 0.6.
         **Tier 4:** optional local Ollama (`OLLAMA_URL`, model `OLLAMA_MODEL` default `nuextract`) when tiers 1–3 fail.
         Falls back to empty manual preview (tier 0) when extraction fails.
@@ -9279,7 +9279,7 @@ components:
         data:
           $ref: '#/components/schemas/PrintingTestResult'
 
-    AfipConfigInput:
+    ArcaConfigInput:
       type: object
       required: [cuit, certificate, privateKey]
       properties:
@@ -9290,7 +9290,7 @@ components:
           type: string
           enum: [homologacion, produccion]
 
-    AfipConfigStatus:
+    ArcaConfigStatus:
       type: object
       required: [configured]
       properties:
@@ -9298,15 +9298,15 @@ components:
         cuit: { type: string }
         ambiente: { type: string }
 
-    AfipConfigStatusEnvelope:
+    ArcaConfigStatusEnvelope:
       type: object
       required: [success, data]
       properties:
         success: { type: boolean, const: true }
         data:
-          $ref: '#/components/schemas/AfipConfigStatus'
+          $ref: '#/components/schemas/ArcaConfigStatus'
 
-    AfipConfigEnvelope:
+    ArcaConfigEnvelope:
       type: object
       required: [success, data]
       properties:
@@ -9316,7 +9316,7 @@ components:
           properties:
             configured: { type: boolean }
 
-    AfipTaEnvelope:
+    ArcaTaEnvelope:
       type: object
       required: [success, data]
       properties:
@@ -9328,13 +9328,13 @@ components:
             sign: { type: string }
             expiration: { type: string, format: date-time }
 
-    AfipCaeInput:
+    ArcaCaeInput:
       type: object
       required: [facturaId]
       properties:
         facturaId: { type: integer, minimum: 1 }
 
-    AfipCaeEnvelope:
+    ArcaCaeEnvelope:
       type: object
       required: [success, data]
       properties:

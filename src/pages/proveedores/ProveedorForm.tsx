@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState, type FormEvent, type ReactNode } from 'react'
 import { useHotkeys } from 'react-hotkeys-hook'
+import KeyboardHint, { useFormShortcuts } from '@/components/shared/KeyboardHint'
 import { useTranslation } from 'react-i18next'
 import { ApiRequestFailedError, proveedoresAPI, type ProveedorInputDTO } from '@/lib/api'
 import { formatCUIT, validateCBU, validateCUIT } from '@/lib/validators'
@@ -220,6 +221,7 @@ export default function ProveedorForm({ proveedorId, onClose, onSaved }: Proveed
 
   const inputClass =
     'w-full px-3 py-2 rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700'
+  const formShortcuts = useFormShortcuts()
 
   return (
     <div
@@ -243,6 +245,7 @@ export default function ProveedorForm({ proveedorId, onClose, onSaved }: Proveed
           {proveedorId != null ? t('form.titleEdit', { codigo: formCodigo || '…' }) : t('form.titleNew')}
         </h2>
         <p className="text-xs text-slate-500 mb-4">{t('form.hint')}</p>
+        <KeyboardHint shortcuts={formShortcuts} className="mb-4" />
         {proveedorId != null && !loading ? (
           <div
             role="tablist"

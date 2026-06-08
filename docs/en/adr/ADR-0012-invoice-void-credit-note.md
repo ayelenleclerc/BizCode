@@ -22,7 +22,7 @@ Global [`writeAuditEvent`](../../../server/audit.ts) swallows errors so other fl
 4. **Transaction** (single `$transaction`): set `Factura.estado` to `N`, decrement `Cliente.balance`, create `NotaCredito`, create `AuditEvent` (`factura_void`, metadata `motivo`, `notaCreditoId`). Any step failure rolls back all.
 5. **Response envelope:** `{ success, data: { factura, notaCredito, updatedCliente } }` — update API client, OpenAPI, tests, and UI in the same delivery phase.
 6. **`NotaCredito.estadoCae` on create:**
-   - If origin `Factura.estadoCae === 'issued'`: set **`pending`**, then async `AfipService.requestCaeForNotaCredito` when `billing.afip_cae` is enabled (homologación mock, #133).
+   - If origin `Factura.estadoCae === 'issued'`: set **`pending`**, then async `ArcaService.requestCaeForNotaCredito` when `billing.arca_cae` is enabled (homologación mock, #133).
    - Otherwise: set **`not_required`** (no AFIP attempt; avoids NC stuck in `pending` forever).
    - Values align with invoice CAE: `pending` | `issued` | `failed` | `not_required`.
 7. **Invoice estado:** keep `A` (active) / `N` (voided); do not add a third `Factura.estado` value — the credit note is a separate entity.

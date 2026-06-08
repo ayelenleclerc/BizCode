@@ -1,4 +1,4 @@
-# AfipConfigInput Schema
+# ArcaConfigInput Schema
 
 ```txt
 undefined
@@ -8,20 +8,20 @@ undefined
 
 | Abstract            | Extensible | Status         | Identifiable | Custom Properties | Additional Properties | Access Restrictions | Defined In                                                                                       |
 | :------------------ | :--------- | :------------- | :----------- | :---------------- | :-------------------- | :------------------ | :----------------------------------------------------------------------------------------------- |
-| Can be instantiated | No         | Unknown status | No           | Forbidden         | Allowed               | none                | [AfipConfigInput.schema.json](../schema-json/AfipConfigInput.schema.json "open original schema") |
+| Can be instantiated | No         | Unknown status | No           | Forbidden         | Allowed               | none                | [ArcaConfigInput.schema.json](../schema-json/ArcaConfigInput.schema.json "open original schema") |
 
-## AfipConfigInput Type
+## ArcaConfigInput Type
 
-`object` ([AfipConfigInput](afipconfiginput.md))
+`object` ([ArcaConfigInput](afipconfiginput.md))
 
-# AfipConfigInput Properties
+# ArcaConfigInput Properties
 
 | Property                    | Type     | Required | Nullable       | Defined by                                                                                       |
 | :-------------------------- | :------- | :------- | :------------- | :----------------------------------------------------------------------------------------------- |
-| [ambiente](#ambiente)       | `string` | Optional | cannot be null | [AfipConfigInput](afipconfiginput-properties-ambiente.md "undefined#/properties/ambiente")       |
-| [certificate](#certificate) | `string` | Required | cannot be null | [AfipConfigInput](afipconfiginput-properties-certificate.md "undefined#/properties/certificate") |
-| [cuit](#cuit)               | `string` | Required | cannot be null | [AfipConfigInput](afipconfiginput-properties-cuit.md "undefined#/properties/cuit")               |
-| [privateKey](#privatekey)   | `string` | Required | cannot be null | [AfipConfigInput](afipconfiginput-properties-privatekey.md "undefined#/properties/privateKey")   |
+| [ambiente](#ambiente)       | `string` | Optional | cannot be null | [ArcaConfigInput](afipconfiginput-properties-ambiente.md "undefined#/properties/ambiente")       |
+| [certificate](#certificate) | `string` | Required | cannot be null | [ArcaConfigInput](afipconfiginput-properties-certificate.md "undefined#/properties/certificate") |
+| [cuit](#cuit)               | `string` | Required | cannot be null | [ArcaConfigInput](afipconfiginput-properties-cuit.md "undefined#/properties/cuit")               |
+| [privateKey](#privatekey)   | `string` | Required | cannot be null | [ArcaConfigInput](afipconfiginput-properties-privatekey.md "undefined#/properties/privateKey")   |
 
 ## ambiente
 
@@ -35,7 +35,7 @@ undefined
 
 * cannot be null
 
-* defined in: [AfipConfigInput](afipconfiginput-properties-ambiente.md "undefined#/properties/ambiente")
+* defined in: [ArcaConfigInput](afipconfiginput-properties-ambiente.md "undefined#/properties/ambiente")
 
 ### ambiente Type
 
@@ -62,7 +62,7 @@ undefined
 
 * cannot be null
 
-* defined in: [AfipConfigInput](afipconfiginput-properties-certificate.md "undefined#/properties/certificate")
+* defined in: [ArcaConfigInput](afipconfiginput-properties-certificate.md "undefined#/properties/certificate")
 
 ### certificate Type
 
@@ -80,7 +80,7 @@ undefined
 
 * cannot be null
 
-* defined in: [AfipConfigInput](afipconfiginput-properties-cuit.md "undefined#/properties/cuit")
+* defined in: [ArcaConfigInput](afipconfiginput-properties-cuit.md "undefined#/properties/cuit")
 
 ### cuit Type
 
@@ -98,7 +98,7 @@ undefined
 
 * cannot be null
 
-* defined in: [AfipConfigInput](afipconfiginput-properties-privatekey.md "undefined#/properties/privateKey")
+* defined in: [ArcaConfigInput](afipconfiginput-properties-privatekey.md "undefined#/properties/privateKey")
 
 ### privateKey Type
 

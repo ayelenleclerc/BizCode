@@ -169,7 +169,7 @@
   },
   "documentoCompra": {
     "title": "Import purchase document",
-    "hint": "Upload a PDF or image (jpg, png, webp, heic). When an AFIP/ARCA QR is present, main fields are prefilled locally. Review before confirming.",
+    "hint": "Upload a PDF or image (jpg, png, webp, heic). When an ARCA QR is present, main fields are prefilled locally. Review before confirming.",
     "batchHint": "You can upload up to 20 files at once. If tiers 1–3 fail and local Ollama is configured (OLLAMA_URL), Tier 4 extraction is attempted.",
     "dropHint": "Drag a file here or use the button to select one.",
     "dropHintBatch": "Drag one or more files (max 20) or use the button to select them.",
@@ -178,7 +178,7 @@
     "previewTitle": "Review the document before confirming",
     "confidence": "Extraction confidence: {{pct}}% (tier {{tier}})",
     "manualReview": "complete fields manually",
-    "tier1Hint": "AFIP/ARCA QR decoded locally (no portal verification)",
+    "tier1Hint": "ARCA QR decoded locally (no portal verification)",
     "tier2Hint": "PDF text + Argentina YAML template (regex)",
     "tier3Hint": "local OCR (Tesseract) + template — review yellow fields",
     "tier4Hint": "local Ollama (optional) — review all fields",

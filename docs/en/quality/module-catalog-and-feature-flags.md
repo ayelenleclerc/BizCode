@@ -33,7 +33,7 @@ Dependencies (from [`catalog.ts`](../../../src/lib/modules/catalog.ts)): `logist
 
 ## `requiredInProd` (Argentina)
 
-`billing.afip_cae` has `requiredInProd: true`: it must stay enabled when `deploymentEnv` is `prod`. In `dev`, super_admin may disable it for AFIP-free testing. Core modules (`core.*`) use `required: true` in all environments.
+`billing.arca_cae` has `requiredInProd: true`: it must stay enabled when `deploymentEnv` is `prod`. In `dev`, super_admin may disable it for AFIP-free testing. Core modules (`core.*`) use `required: true` in all environments.
 
 ## Related
 

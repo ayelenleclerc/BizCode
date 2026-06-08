@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
+import KeyboardHint, { useFormShortcuts } from '@/components/shared/KeyboardHint'
+import { useFormPageHotkeys } from '@/hooks/useListPageKeyboard'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useTranslation } from 'react-i18next'
@@ -8,7 +10,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import { hasPermission } from '@/lib/rbac'
 import { validateCUIT } from '@/lib/validators'
 import type { EmpresaConfig } from '@/types'
-import AfipFiscalSection from './AfipFiscalSection'
+import ArcaFiscalSection from './ArcaFiscalSection'
 import PrintDevicesSection from './PrintDevicesSection'
 import ProveedorAlertasConfigSection from './ProveedorAlertasConfigSection'
 
@@ -73,6 +75,7 @@ function configToFormValues(data: EmpresaConfig): EmpresaFormData {
 export default function EmpresaPage() {
   const { t } = useTranslation('empresa')
   const { t: tc } = useTranslation('common')
+  const formShortcuts = useFormShortcuts()
   const { claims } = useAuth()
   const canEdit =
     claims?.role != null && hasPermission(claims.role, 'settings.business.manage')
@@ -138,6 +141,15 @@ export default function EmpresaPage() {
   useEffect(() => {
     void loadConfig()
   }, [loadConfig])
+
+  useFormPageHotkeys({
+    onSave: canEdit ? () => void handleSubmit(onSubmit)() : undefined,
+    onClose: () => {
+      if (document.activeElement instanceof HTMLElement) {
+        document.activeElement.blur()
+      }
+    },
+  })
 
   const onSubmit = async (data: EmpresaFormData) => {
     if (!canEdit) return
@@ -212,6 +224,8 @@ export default function EmpresaPage() {
           {t('readOnlyHint')}
         </p>
       )}
+
+      <KeyboardHint shortcuts={formShortcuts} className="mb-4" />
 
       <form
         data-testid="form-empresa"
@@ -543,7 +557,7 @@ export default function EmpresaPage() {
         )}
       </form>
 
-      <AfipFiscalSection />
+      <ArcaFiscalSection />
       <PrintDevicesSection />
       <ProveedorAlertasConfigSection />
     </div>

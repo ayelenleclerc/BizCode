@@ -82,7 +82,11 @@
     "new": "New",
     "save": "Save",
     "cancel": "Cancel",
-    "navigate": "Navigate"
+    "navigate": "Navigate",
+    "open": "Open / edit",
+    "confirm": "Confirm",
+    "submit": "Submit",
+    "deleteLine": "Delete line"
   },
   "theme": {
     "toggleTitle": "Toggle light or dark theme",

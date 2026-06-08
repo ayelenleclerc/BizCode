@@ -16735,7 +16735,7 @@ Requires all items to have `cantFisica`. For each line with non-zero variance, u
 ### AFIP fiscal config status (metadata only)
 
 - **Method:** `GET`
-- **Path:** `/api/afip/config`
+- **Path:** `/api/arca/config`
 - **Tags:** afip
 
 Requires `settings.fiscal.manage`. Does not return certificate or private key.
@@ -16845,7 +16845,7 @@ Requires `settings.fiscal.manage`. Does not return certificate or private key.
 ### Upsert tenant AFIP credentials
 
 - **Method:** `PUT`
-- **Path:** `/api/afip/config`
+- **Path:** `/api/arca/config`
 - **Tags:** afip
 
 Requires `settings.fiscal.manage`. Certificate and key encrypted at rest.
@@ -16976,7 +16976,7 @@ Requires `settings.fiscal.manage`. Certificate and key encrypted at rest.
 ### Request AFIP TA (ticket de acceso)
 
 - **Method:** `POST`
-- **Path:** `/api/afip/auth`
+- **Path:** `/api/arca/auth`
 - **Tags:** afip
 
 Requires `settings.fiscal.manage`. Homologación mock when AFIP network is not configured.
@@ -17107,7 +17107,7 @@ Requires `settings.fiscal.manage`. Homologación mock when AFIP network is not c
 ### Request CAE for a factura
 
 - **Method:** `POST`
-- **Path:** `/api/afip/cae`
+- **Path:** `/api/arca/cae`
 - **Tags:** afip
 
 Requires `sales.create`.
@@ -22655,7 +22655,7 @@ Persists a supplier fiscal voucher with netos/IVA breakdown for Libro IVA Compra
 - **Path:** `/api/documentos-compra/procesar`
 - **Tags:** contabilidad
 
-Stores the original PDF/image on local filesystem and returns an editable preview. **Tier 1:** decodes AFIP/ARCA FE QR locally from embedded PDF URL text or image scan (`jsQR` + `sharp`) — no portal/API verification. **Tier 2:** extracts text from digital PDF (`unpdf`) and applies bundled YAML regex templates (Argentina `generic-afip-ar`) when confidence ≥ 0.7. **Tier 3:** preprocesses images (`sharp`) and runs local OCR (`tesseract.js`, `spa+eng`), then applies the same templates when confidence ≥ 0.6. **Tier 4:** optional local Ollama (`OLLAMA_URL`, model `OLLAMA_MODEL` default `nuextract`) when tiers 1–3 fail. Falls back to empty manual preview (tier 0) when extraction fails. Requires modules `finance.ledger` and `logistics.purchases`, permission `reports.financial.read`. Multipart field `file` — pdf, jpg, png, webp, heic (max 10 MB).
+Stores the original PDF/image on local filesystem and returns an editable preview. **Tier 1:** decodes AFIP/ARCA FE QR locally from embedded PDF URL text or image scan (`jsQR` + `sharp`) — no portal/API verification. **Tier 2:** extracts text from digital PDF (`unpdf`) and applies bundled YAML regex templates (Argentina `generic-arca-ar`) when confidence ≥ 0.7. **Tier 3:** preprocesses images (`sharp`) and runs local OCR (`tesseract.js`, `spa+eng`), then applies the same templates when confidence ≥ 0.6. **Tier 4:** optional local Ollama (`OLLAMA_URL`, model `OLLAMA_MODEL` default `nuextract`) when tiers 1–3 fail. Falls back to empty manual preview (tier 0) when extraction fails. Requires modules `finance.ledger` and `logistics.purchases`, permission `reports.financial.read`. Multipart field `file` — pdf, jpg, png, webp, heic (max 10 MB).
 
 #### Request Body
 
@@ -48938,7 +48938,7 @@ Originating invoice header (selected columns)
 }
 ```
 
-### AfipConfigInput
+### ArcaConfigInput
 
 - **Type:**`object`
 
@@ -48969,7 +48969,7 @@ Originating invoice header (selected columns)
 }
 ```
 
-### AfipConfigStatus
+### ArcaConfigStatus
 
 - **Type:**`object`
 
@@ -48995,7 +48995,7 @@ Originating invoice header (selected columns)
 }
 ```
 
-### AfipConfigStatusEnvelope
+### ArcaConfigStatusEnvelope
 
 - **Type:**`object`
 
@@ -49032,7 +49032,7 @@ Originating invoice header (selected columns)
 }
 ```
 
-### AfipConfigEnvelope
+### ArcaConfigEnvelope
 
 - **Type:**`object`
 
@@ -49059,7 +49059,7 @@ Originating invoice header (selected columns)
 }
 ```
 
-### AfipTaEnvelope
+### ArcaTaEnvelope
 
 - **Type:**`object`
 
@@ -49096,7 +49096,7 @@ Originating invoice header (selected columns)
 }
 ```
 
-### AfipCaeInput
+### ArcaCaeInput
 
 - **Type:**`object`
 
@@ -49112,7 +49112,7 @@ Originating invoice header (selected columns)
 }
 ```
 
-### AfipCaeEnvelope
+### ArcaCaeEnvelope
 
 - **Type:**`object`
 

@@ -169,7 +169,7 @@
   },
   "documentoCompra": {
     "title": "Importar documento de compra",
-    "hint": "Envie um PDF ou imagem (jpg, png, webp, heic). Com QR AFIP/ARCA, os campos principais são preenchidos localmente. Revise antes de confirmar.",
+    "hint": "Envie um PDF ou imagem (jpg, png, webp, heic). Com QR ARCA, os campos principais são preenchidos localmente. Revise antes de confirmar.",
     "batchHint": "Você pode enviar até 20 arquivos de uma vez. Se os tiers 1–3 falharem e o Ollama local estiver configurado (OLLAMA_URL), a extração Tier 4 é tentada.",
     "dropHint": "Arraste um arquivo aqui ou use o botão para selecionar.",
     "dropHintBatch": "Arraste um ou mais arquivos (máx. 20) ou use o botão para selecioná-los.",
@@ -178,7 +178,7 @@
     "previewTitle": "Revise o documento antes de confirmar",
     "confidence": "Confiança da extração: {{pct}}% (nível {{tier}})",
     "manualReview": "preencha os campos manualmente",
-    "tier1Hint": "QR AFIP/ARCA decodificado localmente (sem verificação no portal)",
+    "tier1Hint": "QR ARCA decodificado localmente (sem verificação no portal)",
     "tier2Hint": "texto PDF + template Argentina (regex YAML)",
     "tier3Hint": "OCR local (Tesseract) + template — revise campos em amarelo",
     "tier4Hint": "Ollama local (opcional) — revise todos os campos",

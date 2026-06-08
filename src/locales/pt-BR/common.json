@@ -82,7 +82,11 @@
     "new": "Novo",
     "save": "Salvar",
     "cancel": "Cancelar",
-    "navigate": "Navegar"
+    "navigate": "Navegar",
+    "open": "Abrir / editar",
+    "confirm": "Confirmar",
+    "submit": "Enviar",
+    "deleteLine": "Excluir linha"
   },
   "theme": {
     "toggleTitle": "Alternar tema claro ou escuro",

@@ -1,6 +1,8 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ApiRequestFailedError, clientesAPI, cobrosAPI, formasPagoAPI, type CobroCreateBody } from '@/lib/api'
+import KeyboardHint, { useFormShortcuts } from '@/components/shared/KeyboardHint'
+import { useFormPageHotkeys } from '@/hooks/useListPageKeyboard'
 import type { Cliente } from '@/types'
 
 type FormaPagoOption = { id: number; descripcion: string }
@@ -21,6 +23,7 @@ const inputClass =
  */
 export default function CobroForm({ initialClienteId, onSaved, onCancel }: CobroFormProps) {
   const { t } = useTranslation('cobros')
+  const formShortcuts = useFormShortcuts()
   const [clientes, setClientes] = useState<Cliente[]>([])
   const [formasPago, setFormasPago] = useState<FormaPagoOption[]>([])
   const [clienteId, setClienteId] = useState(String(initialClienteId ?? ''))
@@ -51,17 +54,16 @@ export default function CobroForm({ initialClienteId, onSaved, onCancel }: Cobro
     }
   }, [initialClienteId])
 
-  const mapError = (err: unknown): string => {
+  const mapError = useCallback((err: unknown): string => {
     if (err instanceof ApiRequestFailedError) {
       if (err.message === 'CLIENT_SUSPENDED') return t('form.errors.suspended')
       if (err.message === 'CLIENT_INACTIVE') return t('form.errors.inactive')
       return err.message.trim() || t('form.errors.generic')
     }
     return t('form.errors.generic')
-  }
+  }, [t])
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const submitForm = useCallback(async () => {
     setError(null)
     const cid = Number.parseInt(clienteId, 10)
     const amount = Number.parseFloat(monto)
@@ -90,10 +92,21 @@ export default function CobroForm({ initialClienteId, onSaved, onCancel }: Cobro
     } finally {
       setSaving(false)
     }
+  }, [clienteId, fecha, formaPagoId, mapError, monto, nota, onSaved, referencia, t])
+
+  useFormPageHotkeys({
+    onSave: () => void submitForm(),
+    onClose: onCancel,
+  })
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    await submitForm()
   }
 
   return (
     <form onSubmit={(e) => void handleSubmit(e)} data-testid="cobro-form" aria-labelledby="cobro-form-title">
+      <KeyboardHint shortcuts={formShortcuts} className="mb-4" />
       <h2 id="cobro-form-title" className="text-lg font-bold text-slate-900 dark:text-slate-100 mb-4">
         {t('form.titleNew')}
       </h2>

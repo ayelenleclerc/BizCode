@@ -102,7 +102,7 @@ describe('PedidosPage', () => {
     const user = userEvent.setup()
     render(<PedidosPage />)
     await screen.findByTestId('pedidos-table')
-    await user.selectOptions(screen.getByTestId('pedidos-filter-estado'), 'confirmed')
+    await user.selectOptions(screen.getByTestId('search-pedidos-estado'), 'confirmed')
     await waitFor(() => {
       expect(pedidosAPI.list).toHaveBeenCalledWith({ estado: 'confirmed' })
     })

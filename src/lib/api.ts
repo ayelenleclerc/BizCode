@@ -2200,33 +2200,33 @@ export const contabilidadAPI = {
   },
 }
 
-export type AfipConfigStatus = {
+export type ArcaConfigStatus = {
   configured: boolean
   cuit?: string
   ambiente?: string
 }
 
-export type AfipConfigInput = {
+export type ArcaConfigInput = {
   cuit: string
   certificate: string
   privateKey: string
   ambiente?: 'homologacion' | 'produccion'
 }
 
-export const afipAPI = {
-  getConfig: async (): Promise<AfipConfigStatus> => {
+export const arcaAPI = {
+  getConfig: async (): Promise<ArcaConfigStatus> => {
     try {
-      const response = await api.get<{ success: boolean; data: AfipConfigStatus }>('/afip/config')
+      const response = await api.get<{ success: boolean; data: ArcaConfigStatus }>('/arca/config')
       return response.data.data
     } catch (error) {
       return handleError(error as AxiosError<ApiErrorPayload>)
     }
   },
 
-  putConfig: async (body: AfipConfigInput): Promise<{ configured: boolean }> => {
+  putConfig: async (body: ArcaConfigInput): Promise<{ configured: boolean }> => {
     try {
       const response = await api.put<{ success: boolean; data: { configured: boolean } }>(
-        '/afip/config',
+        '/arca/config',
         body,
       )
       return response.data.data
@@ -2240,7 +2240,7 @@ export const afipAPI = {
       const response = await api.post<{
         success: boolean
         data: { token: string; sign: string; expiration: string }
-      }>('/afip/auth')
+      }>('/arca/auth')
       return response.data.data
     } catch (error) {
       return handleError(error as AxiosError<ApiErrorPayload>)
@@ -2252,7 +2252,7 @@ export const afipAPI = {
       const response = await api.post<{
         success: boolean
         data: { cae: string; caeVto: string }
-      }>('/afip/cae', { facturaId })
+      }>('/arca/cae', { facturaId })
       return response.data.data
     } catch (error) {
       return handleError(error as AxiosError<ApiErrorPayload>)

@@ -64,8 +64,8 @@
     "cobranzas:recordatorios": "tsx scripts/cobranzas-recordatorios-job.ts",
     "modules:trial-expire": "tsx scripts/module-trial-expire-job.ts",
     "reparto-ubicacion:purge": "tsx scripts/reparto-ubicacion-purge-job.ts",
-    "afip:retry-pending": "tsx scripts/afip-retry-pending.ts",
-    "afip:retry-pending-job": "tsx scripts/afip-retry-pending-job.ts",
+    "arca:retry-pending": "tsx scripts/arca-retry-pending.ts",
+    "arca:retry-pending-job": "tsx scripts/arca-retry-pending-job.ts",
     "inspect:dbf-all": "tsx scripts/inspect-dbf-all.ts",
     "release": "semantic-release"
   },

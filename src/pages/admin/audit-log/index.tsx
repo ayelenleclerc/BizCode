@@ -2,6 +2,8 @@ import { useEffect, useId, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { auditEventsAPI, type AuditEventDTO, type AuditEventListResult } from '@/lib/api'
 import { CanAccess } from '@/components/CanAccess'
+import KeyboardHint, { useGlobalListShortcuts } from '@/components/shared/KeyboardHint'
+import { useListKeyboardNav, useListPageHotkeys } from '@/hooks/useListPageKeyboard'
 
 const PAGE_SIZE = 50
 
@@ -10,7 +12,6 @@ export default function AuditLogPage() {
   const { t: tc } = useTranslation('common')
   const baseId = useId()
   const idUser = `${baseId}-user`
-  const idAction = `${baseId}-action`
   const idResource = `${baseId}-resource`
   const idStart = `${baseId}-start`
   const idEnd = `${baseId}-end`
@@ -24,6 +25,8 @@ export default function AuditLogPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(false)
   const [result, setResult] = useState<AuditEventListResult | null>(null)
+  const [selectedRow, setSelectedRow] = useState(0)
+  const listShortcuts = useGlobalListShortcuts()
 
   type FilterFields = {
     userIdStr: string
@@ -48,6 +51,7 @@ export default function AuditLogPage() {
         ...(f.endStr.trim() ? { endDate: f.endStr.trim() } : {}),
       })
       setResult(res)
+      setSelectedRow(0)
     } catch {
       setResult(null)
       setError(true)
@@ -95,6 +99,18 @@ export default function AuditLogPage() {
 
   const total = result?.total ?? 0
   const rows = result?.data ?? []
+
+  const handleKeyDown = useListKeyboardNav({
+    itemCount: rows.length,
+    selectedRow,
+    setSelectedRow,
+    onOpenRow: () => {},
+  })
+
+  useListPageHotkeys({
+    searchInputId: 'search-audit-log',
+  })
+
   const from = total === 0 ? 0 : offset + 1
   const to = offset + rows.length
   const canPrev = offset > 0
@@ -154,11 +170,12 @@ export default function AuditLogPage() {
               />
             </div>
             <div>
-              <label htmlFor={idAction} className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">
+              <label htmlFor="search-audit-log" className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">
                 {t('filters.action')}
               </label>
               <input
-                id={idAction}
+                id="search-audit-log"
+                data-testid="search-audit-log"
                 type="text"
                 autoComplete="off"
                 placeholder={t('filters.actionPlaceholder')}
@@ -313,10 +330,21 @@ export default function AuditLogPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {rows.map((row) => (
+                  {rows.map((row, idx) => (
                     <tr
                       key={row.id}
-                      className="border-t border-slate-200 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700/40"
+                      role="row"
+                      {...(selectedRow === idx
+                        ? { 'aria-selected': 'true' as const }
+                        : { 'aria-selected': 'false' as const })}
+                      className={`border-t border-slate-200 dark:border-slate-600 cursor-pointer transition ${
+                        selectedRow === idx
+                          ? 'bg-blue-600 text-white'
+                          : 'hover:bg-slate-50 dark:hover:bg-slate-700/40'
+                      }`}
+                      tabIndex={0}
+                      onClick={() => setSelectedRow(idx)}
+                      onKeyDown={(e) => handleKeyDown(e, idx)}
                     >
                       <td className="px-3 py-2 whitespace-nowrap font-mono text-xs">
                         {new Date(row.createdAt).toLocaleString()}
@@ -337,6 +365,8 @@ export default function AuditLogPage() {
             </div>
           </>
         ) : null}
+
+        <KeyboardHint shortcuts={listShortcuts} className="mt-4" />
       </div>
     </CanAccess>
   )

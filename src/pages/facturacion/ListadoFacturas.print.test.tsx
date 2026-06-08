@@ -37,7 +37,7 @@ vi.mock('@/lib/api', () => ({
     status: vi.fn(),
     test: vi.fn(),
   },
-  afipAPI: { requestCae: vi.fn() },
+  arcaAPI: { requestCae: vi.fn() },
 }))
 
 const clientes: Cliente[] = [

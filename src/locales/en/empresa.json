@@ -47,14 +47,14 @@
   "success": {
     "saved": "Company settings saved"
   },
-  "afip": {
-    "title": "AFIP electronic invoicing (CAE)",
+  "arca": {
+    "title": "ARCA electronic invoicing (CAE)",
     "subtitle": "Homologación mock — credentials encrypted at rest; certificate and key are never shown after save.",
-    "loading": "Loading AFIP settings…",
+    "loading": "Loading ARCA settings…",
     "configuredHint": "Configured for CUIT {{cuit}} ({{ambiente}}).",
-    "notConfigured": "AFIP credentials are not configured yet.",
+    "notConfigured": "ARCA credentials are not configured yet.",
     "readOnlyHint": "You can view status; only roles with fiscal settings permission can edit.",
-    "cuit": "AFIP CUIT",
+    "cuit": "ARCA CUIT",
     "certificate": "X.509 certificate (PEM)",
     "certificatePlaceholder": "Paste certificate PEM…",
     "certificatePlaceholderUpdate": "Leave blank to keep current certificate; paste PEM to replace.",
@@ -64,16 +64,16 @@
     "ambiente": "Environment",
     "ambienteHomologacion": "Homologación (mock)",
     "ambienteProduccion": "Production (not enabled in this build)",
-    "save": "Save AFIP credentials",
+    "save": "Save ARCA credentials",
     "saving": "Saving…",
-    "saveSuccess": "AFIP credentials saved",
+    "saveSuccess": "ARCA credentials saved",
     "testAuth": "Test ticket (TA)",
     "authLoading": "Requesting TA…",
     "authSuccess": "Mock TA OK — expires {{expiration}}",
     "errors": {
-      "loadFailed": "Could not load AFIP settings",
-      "saveFailed": "Could not save AFIP credentials",
-      "authFailed": "Could not obtain AFIP ticket"
+      "loadFailed": "Could not load ARCA settings",
+      "saveFailed": "Could not save ARCA credentials",
+      "authFailed": "Could not obtain ARCA ticket"
     }
   },
   "printDevices": {

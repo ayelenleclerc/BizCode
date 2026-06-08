@@ -10,6 +10,12 @@ Versionamento: [Semantic Versioning](https://semver.org/).
 
 ### Adicionado
 
+- **Acessibilidade por teclado (telas):** hooks reutilizáveis (`useListPageKeyboard`, `KeyboardHint`) e referências visíveis de atalhos em listagens, formulários, finanças, logística, login e início; política ampliada em `docs/*/acessibilidade.md` (Enter abrir/editar).
+
+### Alterado
+
+- **Renomeação AFIP → ARCA (breaking):** rotas `/api/arca/*`, módulo `billing.arca_cae`, cliente `arcaAPI`, `ArcaService`, scripts `arca:retry-pending*`; migração Prisma `20260608120000_arca_module_rename`; i18n empresa/finanzas; ADR-0014 renomeado para `legal-arca-invoice-pdf`. URLs literais do portal (`afip.gob.ar`) mantidas em QR/PDF.
+
 - **Comparador de preços por fornecedor (GitHub #274):** `ArticuloProveedoresComparadorService`; `GET /api/articulos/{id}/proveedores` e `GET /api/proveedores/comparar?articuloId=` (módulo `logistics.purchases`, `products.read` ou `suppliers.read`); linhas de catálogo ativas com preço de lista, indicador de preço desatualizado (>30 dias) e data da última OC **recebida**; botão **Ver fornecedores** na ficha do produto com ordenação, destaque do mais barato, aviso de preço antigo e ação **[OC]** (`suppliers.manage`) que pré-preenche o formulário de compras; OpenAPI, testes e manuais trilíngues.
 
 - **Catálogo de produtos por fornecedor (GitHub #273):** modelo `ProveedorArticulo` e migração; `GET/POST /api/proveedores/{id}/catalogo`, `PUT .../catalogo/{articuloId}`, `POST .../catalogo/import` (módulo `logistics.purchases`); códigos, descrições e preços de lista por fornecedor e importação CSV; aba **Catálogo** na ficha com indicadores de idade do preço; auditoria `proveedor_catalogo_*`; OpenAPI, testes e manuais trilíngues.
@@ -77,7 +83,7 @@ Versionamento: [Semantic Versioning](https://semver.org/).
 
 - **Ordens de compra (GitHub #135):** `OrdenCompra` + `OrdenCompraItem`; CRUD `/api/compras`, `POST .../send`, `POST .../receive` (recebimento parcial → `StockAjuste` motivo `compra`); UI `/compras`; RBAC `suppliers.read` / `suppliers.manage` + `inventory.adjust` na recepção; i18n EN/ES/PT-BR.
 - **Lembretes de inadimplência (GitHub #134):** modelo `CobroRecordatorio`; configuração por tenant em `ParamEmpresa` (`recordatorioDiasGracia`, `timezone` IANA, janela comercial `recordatorioHoraInicio` / `recordatorioHoraFin`) editável em **Configurações → Empresa**; `GET /api/cobranzas/vencidas` e `POST /api/cobranzas/recordatorios` (`reports.financial.read`); `CobranzasService` com slot 08:00 e horário no fuso do tenant; job multi-tenant `npm run cobranzas:recordatorios` (cron horário `0 * * * *` recomendado); notificações `invoice_overdue` enriquecidas; seção em `/finanzas`; auditoria `cobranza_recordatorio_send`; i18n EN/ES/PT-BR.
-- **AFIP CAE (GitHub #133):** `GET /api/afip/config` (somente metadados), PDF da fatura (`GET /api/facturas/:id/pdf`, pré-visualização com marca d'água), badges CAE e reprocessamento na UI de faturamento, seção AFIP em empresa (`billing.afip_cae`), mock WSFE homologação, `npm run afip:retry-pending-job` (cron `*/5`), i18n EN/ES/PT-BR.
+- **AFIP CAE (GitHub #133):** `GET /api/arca/config` (somente metadados), PDF da fatura (`GET /api/facturas/:id/pdf`, pré-visualização com marca d'água), badges CAE e reprocessamento na UI de faturamento, seção AFIP em empresa (`billing.arca_cae`), mock WSFE homologação, `npm run arca:retry-pending-job` (cron `*/5`), i18n EN/ES/PT-BR.
 - **Pedidos comerciais (GitHub #132):** modelos `Pedido` / `PedidoItem`; `GET/POST/PUT/DELETE /api/pedidos` e `POST .../confirm` / `POST .../invoice` (estados e rotas em inglês, ADR-0009); RBAC `orders.create` / `sales.create` / `sales.cancel`; auditoria `pedido_*`; UI de listagem `/pedidos`; i18n EN/ES/PT-BR. Gating modular: `requireModule('billing.orders')` (#223).
 
 - **Migração DBF de catálogo (GitHub #131):** parsers `legacyRubroDbf.ts` / `legacyArticuloDbf.ts`; `POST /api/rubros/migrate-dbf` e `POST /api/articulos/migrate-dbf` (`settings.business.manage`, upsert por código); `npm run migrate:dbf` importa `RUBROS.DBF` / `ARTICULOS.DBF` quando existirem (fallback `PVAR2`/`PVAR`); fixtures e testes de integração.

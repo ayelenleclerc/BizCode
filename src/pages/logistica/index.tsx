@@ -2,6 +2,8 @@ import { useCallback, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import ErrorBoundary from '@/components/ErrorBoundary'
+import KeyboardHint, { useGlobalListShortcuts } from '@/components/shared/KeyboardHint'
+import { useListKeyboardNav, useListPageHotkeys } from '@/hooks/useListPageKeyboard'
 import { CanAccess } from '@/components/CanAccess'
 import { useAuth } from '@/contexts/AuthContext'
 import { useFeatureFlags } from '@/contexts/FeatureFlagsContext'
@@ -64,6 +66,7 @@ type LogisticaPageTab = 'ordenes' | 'reportes'
 
 function LogisticaPageContent() {
   const { t } = useTranslation('logistica')
+  const listShortcuts = useGlobalListShortcuts()
   const { t: tReportes } = useTranslation('logisticaReportes')
   const { t: tRepartos } = useTranslation('repartos')
   const { t: tSeguimiento } = useTranslation('seguimiento')
@@ -103,6 +106,7 @@ function LogisticaPageContent() {
   const [formDriverId, setFormDriverId] = useState('')
   const [formNota, setFormNota] = useState('')
   const [saving, setSaving] = useState(false)
+  const [selectedRow, setSelectedRow] = useState(0)
 
   const loadZonas = useCallback(async () => {
     if (isDriver) return
@@ -130,6 +134,7 @@ function LogisticaPageContent() {
       }
       const res = await ordenesEntregaAPI.list(params)
       setOrdenes(res?.data ?? [])
+      setSelectedRow(0)
     } catch {
       setError(t('errors.load'))
       setOrdenes([])
@@ -180,6 +185,20 @@ function LogisticaPageContent() {
   }
 
   const pageTitle = isDriver ? t('driverView.title') : t('title')
+
+  const handleKeyDown = useListKeyboardNav({
+    itemCount: ordenes.length,
+    selectedRow,
+    setSelectedRow,
+    onOpenRow: () => {},
+  })
+
+  useListPageHotkeys({
+    searchInputId: 'search-logistica',
+    onNew: canCreate && !isDriver ? () => setShowForm(true) : undefined,
+    onClose: () => setShowForm(false),
+    isOverlayOpen: showForm,
+  })
 
   return (
     <div className="p-8 max-w-6xl mx-auto" data-testid="logistica-page">
@@ -245,6 +264,8 @@ function LogisticaPageContent() {
         </div>
       </div>
 
+      {pageTab === 'ordenes' && <KeyboardHint shortcuts={listShortcuts} className="mb-4" />}
+
       {showReportesTab && (
         <div
           className="flex gap-2 mb-6 border-b border-slate-200 dark:border-slate-700"
@@ -300,6 +321,7 @@ function LogisticaPageContent() {
         <label className="text-sm">
           <span className="block text-slate-600 dark:text-slate-400 mb-1">{t('filters.fecha')}</span>
           <input
+            id="search-logistica"
             type="date"
             value={fecha}
             onChange={(e) => setFecha(e.target.value)}
@@ -365,8 +387,22 @@ function LogisticaPageContent() {
               </tr>
             </thead>
             <tbody>
-              {ordenes.map((orden) => (
-                <tr key={orden.id} className="border-t border-slate-200 dark:border-slate-700">
+              {ordenes.map((orden, idx) => (
+                <tr
+                  key={orden.id}
+                  role="row"
+                  tabIndex={0}
+                  {...(selectedRow === idx
+                    ? { 'aria-selected': 'true' as const }
+                    : { 'aria-selected': 'false' as const })}
+                  onClick={() => setSelectedRow(idx)}
+                  onKeyDown={(e) => handleKeyDown(e, idx)}
+                  className={`border-t border-slate-200 dark:border-slate-700 cursor-pointer transition ${
+                    selectedRow === idx
+                      ? 'bg-blue-600 text-white'
+                      : 'hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-900 dark:text-slate-100'
+                  }`}
+                >
                   <td className="px-3 py-2">
                     {orden.cliente?.rsocial ?? `#${orden.clienteId}`}
                   </td>

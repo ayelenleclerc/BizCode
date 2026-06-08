@@ -25,7 +25,7 @@ Nested objects and HTTP headers use wildcard paths (`*.password`, `req.headers.a
 |---------|------|--------|
 | Express API (`server/*`) | Structured `logger` only; no `console.*` | **OK** — request lines omit IP/UA by default ([#151](observability.md)) |
 | `server/middleware/errorHandler.ts` | May log `err.stack` server-side | **Accepted** — stacks stay server-side; API responses hide details in production |
-| Cron/CLI jobs (`scripts/*-job.ts`, `afip-retry-pending.ts`) | `console.log(JSON.stringify(...))` | **OK** — only aggregate counters (`processed`, `issued`, `failed`, `sent`, `skipped`) and `tenantId` |
+| Cron/CLI jobs (`scripts/*-job.ts`, `arca-retry-pending.ts`) | `console.log(JSON.stringify(...))` | **OK** — only aggregate counters (`processed`, `issued`, `failed`, `sent`, `skipped`) and `tenantId` |
 | `scripts/bootstrap-superadmin.ts` | Logs username on create | **OK** — no password; bootstrap is operator-only |
 | `scripts/inspect-dbf*.ts`, `migrate-from-dbf.ts` | Legacy DBF **samples** to stdout | **Exempt** — operator-only CLI; not part of runtime API logs |
 | GitHub plan tooling (`scripts/github/*`) | Operational messages | **OK** — no secrets in templates |
