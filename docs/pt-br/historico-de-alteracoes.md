@@ -10,6 +10,8 @@ Versionamento: [Semantic Versioning](https://semver.org/).
 
 ### Adicionado
 
+- **Histórico de compras de fornecedor (GitHub #272):** `GET /api/proveedores/{id}/historial` e `GET /api/proveedores/{id}/articulos` com períodos móveis (30/90/180/365 dias); métricas de OC recebidas e comprovantes (total, frequência, top artigos, PMP); aba **Histórico** na ficha do fornecedor; OpenAPI, testes e manuais trilíngues.
+
 - **Recibo de pagamento a fornecedor (GitHub #271):** modelos `ReciboPago` + `ReciboPagoFactura`; `GET/POST /api/proveedores/{id}/pagos`, helper de comprovantes pendentes, anulação e PDF; movimento `pago` automático na CC; UI na aba conta corrente; módulo `finance.receipts`; OpenAPI, testes e manuais trilíngues.
 
 - **Conta corrente de fornecedor (GitHub #270):** modelo `MovimientoProveedorCC` com saldo corrido; `GET/POST` em `/api/proveedores/{id}/cuenta-corriente`; movimento automático ao criar comprovante de compra; aba UI com saldo, alerta de limite, gráfico 6 meses e ajuste manual auditado; OpenAPI, testes e manuais trilíngues.

@@ -49,6 +49,7 @@
     "tabsLabel": "Seções da ficha",
     "tabDatos": "Dados",
     "tabCuentaCorriente": "Conta corrente",
+    "tabHistorial": "Histórico",
     "sections": {
       "general": "Dados gerais",
       "banking": "Dados bancários",
@@ -189,6 +190,44 @@
     "estado": {
       "emitido": "Emitido",
       "anulado": "Anulado"
+    }
+  },
+  "historial": {
+    "empty": "Não foi possível carregar o histórico de compras.",
+    "periodo": "Período",
+    "periodoDias": "Últimos {{dias}} dias",
+    "totalComprado": "Total comprado",
+    "frecuencia": "Frequência de compra",
+    "frecuenciaValor": "A cada {{dias}} dias",
+    "frecuenciaNa": "Dados insuficientes",
+    "cantidadCompras": "Compras no período",
+    "articuloTop": "Artigo mais comprado",
+    "sinDatos": "—",
+    "comprasTitle": "Ordens e comprovantes",
+    "comprasEmpty": "Não há compras no período selecionado.",
+    "comprasCaption": "Histórico de ordens de compra e comprovantes",
+    "articulosTitle": "Artigos e preço médio ponderado",
+    "articulosEmpty": "Não há linhas recebidas no período.",
+    "articulosCaption": "Artigos comprados com PMP",
+    "colFecha": "Data",
+    "colReferencia": "Referência",
+    "colTipo": "Tipo",
+    "colTotal": "Total",
+    "colEstadoPago": "Status de pagamento",
+    "colCodigo": "Código",
+    "colDescripcion": "Descrição",
+    "colCantidad": "Quantidade",
+    "colPpp": "PMP",
+    "colMonto": "Valor",
+    "tipo": {
+      "orden_compra": "Ordem de compra",
+      "comprobante": "Comprovante"
+    },
+    "estadoPago": {
+      "pendiente": "Pendente",
+      "parcial": "Parcial",
+      "pagada": "Paga",
+      "n_a": "N/A"
     }
   }
 }

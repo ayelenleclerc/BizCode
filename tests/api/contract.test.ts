@@ -1009,6 +1009,42 @@ describe('API — contrato OpenAPI', () => {
     await assertMatchesOpenApi('/api/proveedores/{id}/cuenta-corriente/ajuste', 'post', '201', res.body)
   })
 
+  it('GET /api/proveedores/{id}/historial', async () => {
+    vi.mocked(prisma.comprobanteCompra.findMany).mockResolvedValueOnce([
+      {
+        id: 1,
+        fecha: new Date('2026-06-01'),
+        tipo: 'B',
+        prefijo: '0001',
+        numero: 1,
+        total: new Decimal(100),
+        ordenCompraId: null,
+      },
+    ] as never)
+    vi.mocked(prisma.ordenCompra.findMany).mockResolvedValue([])
+    const app = createApp(prisma)
+    const res = await request(app).get('/api/proveedores/1/historial?dias=90').expect(200)
+    await assertMatchesOpenApi('/api/proveedores/{id}/historial', 'get', '200', res.body)
+  })
+
+  it('GET /api/proveedores/{id}/articulos', async () => {
+    vi.mocked(prisma.ordenCompra.findMany).mockResolvedValueOnce([
+      {
+        updatedAt: new Date('2026-06-05'),
+        items: [
+          {
+            cantidadRecibida: 2,
+            costoUnitario: new Decimal(50),
+            articulo: { id: 1, codigo: 100, descripcion: 'Item A' },
+          },
+        ],
+      },
+    ] as never)
+    const app = createApp(prisma)
+    const res = await request(app).get('/api/proveedores/1/articulos?dias=30').expect(200)
+    await assertMatchesOpenApi('/api/proveedores/{id}/articulos', 'get', '200', res.body)
+  })
+
   it('GET /api/proveedores/{id}/pagos/comprobantes-pendientes', async () => {
     vi.mocked(prisma.comprobanteCompra.findMany).mockResolvedValueOnce([
       {

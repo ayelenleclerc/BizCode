@@ -1,10 +1,11 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState, type FormEvent, type ReactNode } from 'react'
 import { useHotkeys } from 'react-hotkeys-hook'
 import { useTranslation } from 'react-i18next'
 import { ApiRequestFailedError, proveedoresAPI, type ProveedorInputDTO } from '@/lib/api'
 import { formatCUIT, validateCBU, validateCUIT } from '@/lib/validators'
 import type { Proveedor, ProveedorCategoria, ProveedorCondicionPago, ProveedorTipoCuenta } from '@/types'
 import ProveedorCuentaCorrienteSection from './ProveedorCuentaCorrienteSection'
+import ProveedorHistorialSection from './ProveedorHistorialSection'
 
 const COND_IVA = ['RI', 'Mono', 'CF', 'Exento'] as const
 const TIPOS_CUENTA: ProveedorTipoCuenta[] = ['cc', 'ca']
@@ -22,6 +23,38 @@ function parseOptionalNumber(value: string): number | null {
   if (t === '') return null
   const n = Number.parseFloat(t)
   return Number.isFinite(n) ? n : null
+}
+
+function ProveedorDatosFormShell({
+  wrapAsTabPanel,
+  activeTab,
+  onSubmit,
+  children,
+}: {
+  wrapAsTabPanel: boolean
+  activeTab: 'datos' | 'cc' | 'historial'
+  onSubmit: (event: FormEvent<HTMLFormElement>) => void
+  children: ReactNode
+}) {
+  const form = (
+    <form className="space-y-4" onSubmit={onSubmit}>
+      {children}
+    </form>
+  )
+  if (!wrapAsTabPanel) {
+    return form
+  }
+  return (
+    <div
+      role="tabpanel"
+      id="proveedor-tabpanel-datos"
+      aria-labelledby="proveedor-tab-datos"
+      hidden={activeTab !== 'datos'}
+      data-testid="proveedor-tabpanel-datos"
+    >
+      {form}
+    </div>
+  )
 }
 
 /**
@@ -58,7 +91,7 @@ export default function ProveedorForm({ proveedorId, onClose, onSaved }: Proveed
   const [formSaving, setFormSaving] = useState(false)
   const [formError, setFormError] = useState<string | null>(null)
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
-  const [activeTab, setActiveTab] = useState<'datos' | 'cc'>('datos')
+  const [activeTab, setActiveTab] = useState<'datos' | 'cc' | 'historial'>('datos')
 
   const applyProveedor = useCallback((p: Proveedor) => {
     setFormCodigo(String(p.codigo))
@@ -219,7 +252,9 @@ export default function ProveedorForm({ proveedorId, onClose, onSaved }: Proveed
               type="button"
               role="tab"
               id="proveedor-tab-datos"
-              aria-selected={activeTab === 'datos'}
+              {...(activeTab === 'datos'
+                ? { 'aria-selected': 'true' as const }
+                : { 'aria-selected': 'false' as const })}
               aria-controls="proveedor-tabpanel-datos"
               data-testid="proveedor-tab-datos"
               className={`px-3 py-2 text-sm font-medium border-b-2 -mb-px ${
@@ -235,7 +270,9 @@ export default function ProveedorForm({ proveedorId, onClose, onSaved }: Proveed
               type="button"
               role="tab"
               id="proveedor-tab-cc"
-              aria-selected={activeTab === 'cc'}
+              {...(activeTab === 'cc'
+                ? { 'aria-selected': 'true' as const }
+                : { 'aria-selected': 'false' as const })}
               aria-controls="proveedor-tabpanel-cc"
               data-testid="proveedor-tab-cc"
               className={`px-3 py-2 text-sm font-medium border-b-2 -mb-px ${
@@ -246,6 +283,24 @@ export default function ProveedorForm({ proveedorId, onClose, onSaved }: Proveed
               onClick={() => setActiveTab('cc')}
             >
               {t('form.tabCuentaCorriente')}
+            </button>
+            <button
+              type="button"
+              role="tab"
+              id="proveedor-tab-historial"
+              {...(activeTab === 'historial'
+                ? { 'aria-selected': 'true' as const }
+                : { 'aria-selected': 'false' as const })}
+              aria-controls="proveedor-tabpanel-historial"
+              data-testid="proveedor-tab-historial"
+              className={`px-3 py-2 text-sm font-medium border-b-2 -mb-px ${
+                activeTab === 'historial'
+                  ? 'border-blue-600 text-blue-700 dark:text-blue-300'
+                  : 'border-transparent text-slate-600 dark:text-slate-400'
+              }`}
+              onClick={() => setActiveTab('historial')}
+            >
+              {t('form.tabHistorial')}
             </button>
           </div>
         ) : null}
@@ -270,12 +325,19 @@ export default function ProveedorForm({ proveedorId, onClose, onSaved }: Proveed
                 <ProveedorCuentaCorrienteSection proveedorId={proveedorId} />
               </div>
             ) : null}
-            <form
-              role={proveedorId != null ? 'tabpanel' : undefined}
-              id={proveedorId != null ? 'proveedor-tabpanel-datos' : undefined}
-              aria-labelledby={proveedorId != null ? 'proveedor-tab-datos' : undefined}
-              hidden={proveedorId != null && activeTab === 'cc'}
-              className="space-y-4"
+            {proveedorId != null && activeTab === 'historial' ? (
+              <div
+                role="tabpanel"
+                id="proveedor-tabpanel-historial"
+                aria-labelledby="proveedor-tab-historial"
+                data-testid="proveedor-tabpanel-historial"
+              >
+                <ProveedorHistorialSection proveedorId={proveedorId} />
+              </div>
+            ) : null}
+            <ProveedorDatosFormShell
+              wrapAsTabPanel={proveedorId != null}
+              activeTab={activeTab}
               onSubmit={(e) => {
                 e.preventDefault()
                 void submitForm()
@@ -296,7 +358,7 @@ export default function ProveedorForm({ proveedorId, onClose, onSaved }: Proveed
                       value={formCodigo}
                       onChange={(e) => setFormCodigo(e.target.value)}
                       className={inputClass}
-                      aria-invalid={fieldErrors.codigo ? true : undefined}
+                      {...(fieldErrors.codigo ? { 'aria-invalid': 'true' as const } : {})}
                     />
                     {fieldErrors.codigo ? (
                       <p className="text-xs text-red-600 mt-1" role="alert">
@@ -334,7 +396,7 @@ export default function ProveedorForm({ proveedorId, onClose, onSaved }: Proveed
                       value={formRsocial}
                       onChange={(e) => setFormRsocial(e.target.value)}
                       className={inputClass}
-                      aria-invalid={fieldErrors.rsocial ? true : undefined}
+                      {...(fieldErrors.rsocial ? { 'aria-invalid': 'true' as const } : {})}
                     />
                     {fieldErrors.rsocial ? (
                       <p className="text-xs text-red-600 mt-1" role="alert">
@@ -370,7 +432,7 @@ export default function ProveedorForm({ proveedorId, onClose, onSaved }: Proveed
                         if (v && validateCUIT(v)) setFormCuit(formatCUIT(v))
                       }}
                       className={inputClass}
-                      aria-invalid={fieldErrors.cuit ? true : undefined}
+                      {...(fieldErrors.cuit ? { 'aria-invalid': 'true' as const } : {})}
                     />
                     {fieldErrors.cuit ? (
                       <p className="text-xs text-red-600 mt-1" role="alert">
@@ -453,7 +515,7 @@ export default function ProveedorForm({ proveedorId, onClose, onSaved }: Proveed
                       value={formCbu}
                       onChange={(e) => setFormCbu(e.target.value)}
                       className={inputClass}
-                      aria-invalid={fieldErrors.cbu ? true : undefined}
+                      {...(fieldErrors.cbu ? { 'aria-invalid': 'true' as const } : {})}
                     />
                     {fieldErrors.cbu ? (
                       <p className="text-xs text-red-600 mt-1" role="alert">
@@ -672,7 +734,7 @@ export default function ProveedorForm({ proveedorId, onClose, onSaved }: Proveed
                   {formSaving ? tc('actions.saving') : tc('actions.save')}
                 </button>
               </div>
-            </form>
+            </ProveedorDatosFormShell>
           </>
         )}
       </div>

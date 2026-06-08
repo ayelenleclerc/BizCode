@@ -49,6 +49,7 @@
     "tabsLabel": "Secciones de la ficha",
     "tabDatos": "Datos",
     "tabCuentaCorriente": "Cuenta corriente",
+    "tabHistorial": "Historial",
     "sections": {
       "general": "Datos generales",
       "banking": "Datos bancarios",
@@ -189,6 +190,44 @@
     "estado": {
       "emitido": "Emitido",
       "anulado": "Anulado"
+    }
+  },
+  "historial": {
+    "empty": "No se pudo cargar el historial de compras.",
+    "periodo": "Período",
+    "periodoDias": "Últimos {{dias}} días",
+    "totalComprado": "Total comprado",
+    "frecuencia": "Frecuencia de compra",
+    "frecuenciaValor": "Cada {{dias}} días",
+    "frecuenciaNa": "Sin datos suficientes",
+    "cantidadCompras": "Compras en el período",
+    "articuloTop": "Artículo más comprado",
+    "sinDatos": "—",
+    "comprasTitle": "Órdenes y comprobantes",
+    "comprasEmpty": "No hay compras en el período seleccionado.",
+    "comprasCaption": "Historial de órdenes de compra y comprobantes",
+    "articulosTitle": "Artículos y precio promedio ponderado",
+    "articulosEmpty": "No hay líneas de recepción en el período.",
+    "articulosCaption": "Artículos comprados con PPP",
+    "colFecha": "Fecha",
+    "colReferencia": "Referencia",
+    "colTipo": "Tipo",
+    "colTotal": "Total",
+    "colEstadoPago": "Estado de pago",
+    "colCodigo": "Código",
+    "colDescripcion": "Descripción",
+    "colCantidad": "Cantidad",
+    "colPpp": "PPP",
+    "colMonto": "Monto",
+    "tipo": {
+      "orden_compra": "Orden de compra",
+      "comprobante": "Comprobante"
+    },
+    "estadoPago": {
+      "pendiente": "Pendiente",
+      "parcial": "Parcial",
+      "pagada": "Pagada",
+      "n_a": "N/A"
     }
   }
 }

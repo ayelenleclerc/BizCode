@@ -1,5 +1,7 @@
 import { createHmac, randomBytes } from 'node:crypto'
+import express from 'express'
 import type { NextFunction, Request, Response } from 'express'
+import { authRouterHttpRateLimiter } from './middleware/routeRateLimit'
 import type { PrismaClient } from '@prisma/client'
 import type { ModuleKey } from '../src/lib/modules'
 import type { TenantPlanSnapshot } from '../src/lib/plans'
@@ -372,7 +374,10 @@ async function recordLoginAttempt(
 }
 
 export function registerAuthRoutes(app: import('express').Application, prisma: PrismaClient): void {
-  app.post('/api/auth/setup-owner', async (req: Request, res: Response) => {
+  const authRouter = express.Router()
+  authRouter.use(authRouterHttpRateLimiter)
+
+  authRouter.post('/setup-owner', async (req: Request, res: Response) => {
     const body = (req.body ?? {}) as SetupOwnerBody
     if (
       !isNonEmptyString(body.tenantName) ||
@@ -454,7 +459,7 @@ export function registerAuthRoutes(app: import('express').Application, prisma: P
     })
   })
 
-  app.post('/api/auth/login', async (req: Request, res: Response) => {
+  authRouter.post('/login', async (req: Request, res: Response) => {
     const body = (req.body ?? {}) as LoginBody
     if (!isNonEmptyString(body.tenantSlug) || !isNonEmptyString(body.username) || !isNonEmptyString(body.password)) {
       res.status(400).json({ success: false, error: 'tenantSlug, username and password are required' })
@@ -537,7 +542,7 @@ export function registerAuthRoutes(app: import('express').Application, prisma: P
     })
   })
 
-  app.post('/api/auth/logout', async (req: AuthenticatedRequest, res: Response) => {
+  authRouter.post('/logout', async (req: AuthenticatedRequest, res: Response) => {
     const token = getCookieValue(req.headers.cookie, SESSION_COOKIE_NAME)
     if (token) {
       await prisma.appSession.updateMany({
@@ -565,11 +570,13 @@ export function registerAuthRoutes(app: import('express').Application, prisma: P
     res.json({ success: true, data: { loggedOut: true } })
   })
 
-  app.get('/api/auth/me', (req: AuthenticatedRequest, res: Response) => {
+  authRouter.get('/me', (req: AuthenticatedRequest, res: Response) => {
     if (!req.auth) {
       res.status(401).json({ success: false, error: 'Authentication required' })
       return
     }
     res.json({ success: true, data: req.auth.claims })
   })
+
+  app.use('/api/auth', authRouter)
 }

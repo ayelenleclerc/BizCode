@@ -42,11 +42,13 @@ describe('routeHttpRateLimiter', () => {
     process.env.HTTP_RATE_LIMIT_AUTH_PER_MINUTE = '2'
     vi.resetModules()
 
-    const { routeHttpRateLimiter } = await import('../../server/middleware/routeRateLimit')
+    const { authRouterHttpRateLimiter } = await import('../../server/middleware/routeRateLimit')
 
     const app = express()
-    app.use(routeHttpRateLimiter)
-    app.post('/api/auth/login', (_req, res) => res.status(200).json({ ok: true }))
+    const authRouter = express.Router()
+    authRouter.use(authRouterHttpRateLimiter)
+    authRouter.post('/login', (_req, res) => res.status(200).json({ ok: true }))
+    app.use('/api/auth', authRouter)
 
     await request(app).post('/api/auth/login').expect(200)
     await request(app).post('/api/auth/login').expect(200)

@@ -49,6 +49,7 @@
     "tabsLabel": "Profile sections",
     "tabDatos": "Details",
     "tabCuentaCorriente": "Accounts payable",
+    "tabHistorial": "History",
     "sections": {
       "general": "General",
       "banking": "Banking",
@@ -189,6 +190,44 @@
     "estado": {
       "emitido": "Issued",
       "anulado": "Voided"
+    }
+  },
+  "historial": {
+    "empty": "Could not load purchase history.",
+    "periodo": "Period",
+    "periodoDias": "Last {{dias}} days",
+    "totalComprado": "Total purchased",
+    "frecuencia": "Purchase frequency",
+    "frecuenciaValor": "Every {{dias}} days",
+    "frecuenciaNa": "Not enough data",
+    "cantidadCompras": "Purchases in period",
+    "articuloTop": "Top purchased item",
+    "sinDatos": "—",
+    "comprasTitle": "Orders and vouchers",
+    "comprasEmpty": "No purchases in the selected period.",
+    "comprasCaption": "Purchase order and voucher history",
+    "articulosTitle": "Items and weighted average price",
+    "articulosEmpty": "No received lines in the period.",
+    "articulosCaption": "Purchased items with WAP",
+    "colFecha": "Date",
+    "colReferencia": "Reference",
+    "colTipo": "Type",
+    "colTotal": "Total",
+    "colEstadoPago": "Payment status",
+    "colCodigo": "Code",
+    "colDescripcion": "Description",
+    "colCantidad": "Quantity",
+    "colPpp": "WAP",
+    "colMonto": "Amount",
+    "tipo": {
+      "orden_compra": "Purchase order",
+      "comprobante": "Voucher"
+    },
+    "estadoPago": {
+      "pendiente": "Pending",
+      "parcial": "Partial",
+      "pagada": "Paid",
+      "n_a": "N/A"
     }
   }
 }

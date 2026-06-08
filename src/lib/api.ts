@@ -1150,6 +1150,36 @@ export const proveedoresAPI = {
     }
   },
 
+  historial: async (
+    id: number,
+    params?: { dias?: ProveedorHistorialPeriodoDias },
+  ): Promise<ProveedorHistorialResumen> => {
+    try {
+      const response = await api.get<{ success: boolean; data: ProveedorHistorialResumen }>(
+        `/proveedores/${id}/historial`,
+        { params },
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  articulosHistorial: async (
+    id: number,
+    params?: { dias?: ProveedorHistorialPeriodoDias },
+  ): Promise<ProveedorArticulosHistorialData> => {
+    try {
+      const response = await api.get<{ success: boolean; data: ProveedorArticulosHistorialData }>(
+        `/proveedores/${id}/articulos`,
+        { params },
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
   importFromCsv: async (file: File): Promise<CsvBulkImportResult> => {
     try {
       const body = new FormData()
@@ -1740,6 +1770,58 @@ export type AlertaProveedorConfigDTO = {
   diasCritico: number
   notifEmail: boolean
   notifInApp: boolean
+}
+
+export type ProveedorHistorialPeriodoDias = 30 | 90 | 180 | 365
+
+export type ProveedorCompraEstadoPago = 'pendiente' | 'parcial' | 'pagada' | 'n_a'
+
+export type ProveedorCompraRow = {
+  tipo: 'orden_compra' | 'comprobante'
+  id: number
+  fecha: string
+  referencia: string
+  total: string
+  estadoPago: ProveedorCompraEstadoPago
+  ordenCompraId?: number
+  estado?: string
+}
+
+export type ProveedorHistorialTopArticulo = {
+  articuloId: number
+  codigo: string
+  descripcion: string
+  cantidadTotal: number
+  montoTotal: string
+}
+
+export type ProveedorHistorialResumen = {
+  periodoDias: ProveedorHistorialPeriodoDias
+  totalComprado: string
+  frecuenciaCompraDias: number | null
+  cantidadCompras: number
+  topArticulos: ProveedorHistorialTopArticulo[]
+  compras: ProveedorCompraRow[]
+}
+
+export type ProveedorArticuloPrecioPunto = {
+  fecha: string
+  precioUnitario: string
+  cantidad: number
+}
+
+export type ProveedorArticuloHistorialRow = {
+  articuloId: number
+  codigo: string
+  descripcion: string
+  cantidadTotal: number
+  precioPromedioPonderado: string
+  montoTotal: string
+  evolucionPrecios: ProveedorArticuloPrecioPunto[]
+}
+
+export type ProveedorArticulosHistorialData = {
+  articulos: ProveedorArticuloHistorialRow[]
 }
 
 export const contabilidadAPI = {

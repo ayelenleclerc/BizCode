@@ -58,6 +58,19 @@ Módulo `finance.ledger`, permiso `suppliers.read`:
 
 **API:** `GET/PATCH /api/configuracion/alertas-proveedores` — [OpenAPI](../../api/openapi.yaml).
 
+## Historial de compras (GitHub #272)
+
+En proveedores **existentes**, pestaña **Historial** (`finance.ledger`, `suppliers.read`):
+
+- Período móvil: **30 / 90 / 180 / 365** días.
+- **Tarjetas:** total comprado, frecuencia media entre compras, cantidad de compras, artículo más comprado por monto.
+- **Tabla** de órdenes de compra y comprobantes con estado de pago.
+- **Tabla de artículos** con precio promedio ponderado (PPP) desde líneas de OC **recibidas**.
+
+Las métricas usan `OrdenCompraItem.cantidadRecibida` y comprobantes activos; no se duplica el total cuando el comprobante está vinculado a una OC.
+
+**API:** `GET /api/proveedores/{id}/historial`, `GET /api/proveedores/{id}/articulos?dias=` — [OpenAPI](../../api/openapi.yaml).
+
 ## Baja lógica
 
 **Dar de baja** pone `activo: false` sin borrar el registro (órdenes de compra y comprobantes existentes siguen referenciando al proveedor). Usá el filtro de inactivos para revisarlos.

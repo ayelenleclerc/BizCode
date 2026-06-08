@@ -1430,6 +1430,82 @@ paths:
         '403':
           $ref: '#/components/responses/ForbiddenError'
 
+  /api/proveedores/{id}/historial:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    get:
+      tags: [proveedores]
+      summary: Supplier purchase history summary (#272)
+      description: Aggregated purchase metrics, top articles, and OC/comprobante list for a rolling period.
+      parameters:
+        - name: dias
+          in: query
+          description: Rolling period length in days (default 90)
+          schema:
+            type: integer
+            enum: [30, 90, 180, 365]
+            default: 90
+      responses:
+        '200':
+          description: History summary
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProveedorHistorialEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /api/proveedores/{id}/articulos:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    get:
+      tags: [proveedores]
+      summary: Supplier purchased articles with weighted average price (#272)
+      description: PPP and price evolution from received purchase-order lines in the selected period.
+      parameters:
+        - name: dias
+          in: query
+          description: Rolling period length in days (default 90)
+          schema:
+            type: integer
+            enum: [30, 90, 180, 365]
+            default: 90
+      responses:
+        '200':
+          description: Article metrics
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProveedorArticulosHistorialEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
   /api/proveedores/{id}/cuenta-corriente:
     parameters:
       - $ref: '#/components/parameters/BizcodeChannelHeader'
@@ -6183,6 +6259,147 @@ components:
         motivo:
           type: string
           maxLength: 500
+
+    ProveedorCompraEstadoPago:
+      type: string
+      enum: [pendiente, parcial, pagada, n_a]
+
+    ProveedorCompraRow:
+      type: object
+      required: [tipo, id, fecha, referencia, total, estadoPago]
+      properties:
+        tipo:
+          type: string
+          enum: [orden_compra, comprobante]
+        id:
+          type: integer
+        fecha:
+          type: string
+          format: date-time
+        referencia:
+          type: string
+        total:
+          type: string
+        estadoPago:
+          $ref: '#/components/schemas/ProveedorCompraEstadoPago'
+        ordenCompraId:
+          type: integer
+        estado:
+          type: string
+          description: OC lifecycle state when tipo is orden_compra
+
+    ProveedorHistorialTopArticulo:
+      type: object
+      required: [articuloId, codigo, descripcion, cantidadTotal, montoTotal]
+      properties:
+        articuloId:
+          type: integer
+        codigo:
+          type: string
+        descripcion:
+          type: string
+        cantidadTotal:
+          type: integer
+        montoTotal:
+          type: string
+
+    ProveedorHistorialResumen:
+      type: object
+      required:
+        - periodoDias
+        - totalComprado
+        - frecuenciaCompraDias
+        - cantidadCompras
+        - topArticulos
+        - compras
+      properties:
+        periodoDias:
+          type: integer
+          enum: [30, 90, 180, 365]
+        totalComprado:
+          type: string
+        frecuenciaCompraDias:
+          type: integer
+          nullable: true
+        cantidadCompras:
+          type: integer
+        topArticulos:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProveedorHistorialTopArticulo'
+        compras:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProveedorCompraRow'
+
+    ProveedorHistorialEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/ProveedorHistorialResumen'
+
+    ProveedorArticuloPrecioPunto:
+      type: object
+      required: [fecha, precioUnitario, cantidad]
+      properties:
+        fecha:
+          type: string
+          format: date-time
+        precioUnitario:
+          type: string
+        cantidad:
+          type: integer
+
+    ProveedorArticuloHistorialRow:
+      type: object
+      required:
+        - articuloId
+        - codigo
+        - descripcion
+        - cantidadTotal
+        - precioPromedioPonderado
+        - montoTotal
+        - evolucionPrecios
+      properties:
+        articuloId:
+          type: integer
+        codigo:
+          type: string
+        descripcion:
+          type: string
+        cantidadTotal:
+          type: integer
+        precioPromedioPonderado:
+          type: string
+        montoTotal:
+          type: string
+        evolucionPrecios:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProveedorArticuloPrecioPunto'
+
+    ProveedorArticulosHistorialData:
+      type: object
+      required: [articulos]
+      properties:
+        articulos:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProveedorArticuloHistorialRow'
+
+    ProveedorArticulosHistorialEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/ProveedorArticulosHistorialData'
 
     ProveedorCuentaCorrienteEnvelope:
       type: object

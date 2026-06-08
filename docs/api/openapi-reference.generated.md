@@ -8427,6 +8427,460 @@ Sets `activo` to false. Does not remove rows referenced by purchase orders or vo
 }
 ```
 
+### PARAMETERS /api/proveedores/{id}/historial
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/proveedores/{id}/historial`
+
+### Supplier purchase history summary (#272)
+
+- **Method:** `GET`
+- **Path:** `/api/proveedores/{id}/historial`
+- **Tags:** proveedores
+
+Aggregated purchase metrics, top articles, and OC/comprobante list for a rolling period.
+
+#### Responses
+
+##### Status: 200 History summary
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`cantidadCompras` (required)**
+
+    `integer`
+
+  - **`compras` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`estadoPago` (required)**
+
+      `string`, possible values: `"pendiente", "parcial", "pagada", "n_a"`
+
+    - **`fecha` (required)**
+
+      `string`, format: `date-time`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`referencia` (required)**
+
+      `string`
+
+    - **`tipo` (required)**
+
+      `string`, possible values: `"orden_compra", "comprobante"`
+
+    - **`total` (required)**
+
+      `string`
+
+    - **`estado`**
+
+      `string` — OC lifecycle state when tipo is orden\_compra
+
+    - **`ordenCompraId`**
+
+      `integer`
+
+  - **`frecuenciaCompraDias` (required)**
+
+    `integer`
+
+  - **`periodoDias` (required)**
+
+    `integer`, possible values: `30, 90, 180, 365`
+
+  - **`topArticulos` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId` (required)**
+
+      `integer`
+
+    - **`cantidadTotal` (required)**
+
+      `integer`
+
+    - **`codigo` (required)**
+
+      `string`
+
+    - **`descripcion` (required)**
+
+      `string`
+
+    - **`montoTotal` (required)**
+
+      `string`
+
+  - **`totalComprado` (required)**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "periodoDias": 30,
+    "totalComprado": "",
+    "frecuenciaCompraDias": 1,
+    "cantidadCompras": 1,
+    "topArticulos": [
+      {
+        "articuloId": 1,
+        "codigo": "",
+        "descripcion": "",
+        "cantidadTotal": 1,
+        "montoTotal": ""
+      }
+    ],
+    "compras": [
+      {
+        "tipo": "orden_compra",
+        "id": 1,
+        "fecha": "",
+        "referencia": "",
+        "total": "",
+        "estadoPago": "pendiente",
+        "ordenCompraId": 1,
+        "estado": ""
+      }
+    ]
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/proveedores/{id}/articulos
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/proveedores/{id}/articulos`
+
+### Supplier purchased articles with weighted average price (#272)
+
+- **Method:** `GET`
+- **Path:** `/api/proveedores/{id}/articulos`
+- **Tags:** proveedores
+
+PPP and price evolution from received purchase-order lines in the selected period.
+
+#### Responses
+
+##### Status: 200 Article metrics
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`articulos` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId` (required)**
+
+      `integer`
+
+    - **`cantidadTotal` (required)**
+
+      `integer`
+
+    - **`codigo` (required)**
+
+      `string`
+
+    - **`descripcion` (required)**
+
+      `string`
+
+    - **`evolucionPrecios` (required)**
+
+      `array`
+
+      **Items:**
+
+      - **`cantidad` (required)**
+
+        `integer`
+
+      - **`fecha` (required)**
+
+        `string`, format: `date-time`
+
+      - **`precioUnitario` (required)**
+
+        `string`
+
+    - **`montoTotal` (required)**
+
+      `string`
+
+    - **`precioPromedioPonderado` (required)**
+
+      `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "articulos": [
+      {
+        "articuloId": 1,
+        "codigo": "",
+        "descripcion": "",
+        "cantidadTotal": 1,
+        "precioPromedioPonderado": "",
+        "montoTotal": "",
+        "evolucionPrecios": [
+          {
+            "fecha": "",
+            "precioUnitario": "",
+            "cantidad": 1
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ### PARAMETERS /api/proveedores/{id}/cuenta-corriente
 
 - **Method:** `PARAMETERS`
@@ -34146,6 +34600,597 @@ true
 {
   "monto": 1,
   "motivo": ""
+}
+```
+
+### ProveedorCompraEstadoPago
+
+- **Type:**`string`
+
+**Example:**
+
+### ProveedorCompraRow
+
+- **Type:**`object`
+
+* **`estadoPago` (required)**
+
+  `string`, possible values: `"pendiente", "parcial", "pagada", "n_a"`
+
+* **`fecha` (required)**
+
+  `string`, format: `date-time`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`referencia` (required)**
+
+  `string`
+
+* **`tipo` (required)**
+
+  `string`, possible values: `"orden_compra", "comprobante"`
+
+* **`total` (required)**
+
+  `string`
+
+* **`estado`**
+
+  `string` — OC lifecycle state when tipo is orden\_compra
+
+* **`ordenCompraId`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "tipo": "orden_compra",
+  "id": 1,
+  "fecha": "",
+  "referencia": "",
+  "total": "",
+  "estadoPago": "pendiente",
+  "ordenCompraId": 1,
+  "estado": ""
+}
+```
+
+### ProveedorHistorialTopArticulo
+
+- **Type:**`object`
+
+* **`articuloId` (required)**
+
+  `integer`
+
+* **`cantidadTotal` (required)**
+
+  `integer`
+
+* **`codigo` (required)**
+
+  `string`
+
+* **`descripcion` (required)**
+
+  `string`
+
+* **`montoTotal` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "articuloId": 1,
+  "codigo": "",
+  "descripcion": "",
+  "cantidadTotal": 1,
+  "montoTotal": ""
+}
+```
+
+### ProveedorHistorialResumen
+
+- **Type:**`object`
+
+* **`cantidadCompras` (required)**
+
+  `integer`
+
+* **`compras` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`estadoPago` (required)**
+
+    `string`, possible values: `"pendiente", "parcial", "pagada", "n_a"`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`referencia` (required)**
+
+    `string`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"orden_compra", "comprobante"`
+
+  - **`total` (required)**
+
+    `string`
+
+  - **`estado`**
+
+    `string` — OC lifecycle state when tipo is orden\_compra
+
+  - **`ordenCompraId`**
+
+    `integer`
+
+* **`frecuenciaCompraDias` (required)**
+
+  `integer`
+
+* **`periodoDias` (required)**
+
+  `integer`, possible values: `30, 90, 180, 365`
+
+* **`topArticulos` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`cantidadTotal` (required)**
+
+    `integer`
+
+  - **`codigo` (required)**
+
+    `string`
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`montoTotal` (required)**
+
+    `string`
+
+* **`totalComprado` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "periodoDias": 30,
+  "totalComprado": "",
+  "frecuenciaCompraDias": 1,
+  "cantidadCompras": 1,
+  "topArticulos": [
+    {
+      "articuloId": 1,
+      "codigo": "",
+      "descripcion": "",
+      "cantidadTotal": 1,
+      "montoTotal": ""
+    }
+  ],
+  "compras": [
+    {
+      "tipo": "orden_compra",
+      "id": 1,
+      "fecha": "",
+      "referencia": "",
+      "total": "",
+      "estadoPago": "pendiente",
+      "ordenCompraId": 1,
+      "estado": ""
+    }
+  ]
+}
+```
+
+### ProveedorHistorialEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`cantidadCompras` (required)**
+
+    `integer`
+
+  - **`compras` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`estadoPago` (required)**
+
+      `string`, possible values: `"pendiente", "parcial", "pagada", "n_a"`
+
+    - **`fecha` (required)**
+
+      `string`, format: `date-time`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`referencia` (required)**
+
+      `string`
+
+    - **`tipo` (required)**
+
+      `string`, possible values: `"orden_compra", "comprobante"`
+
+    - **`total` (required)**
+
+      `string`
+
+    - **`estado`**
+
+      `string` — OC lifecycle state when tipo is orden\_compra
+
+    - **`ordenCompraId`**
+
+      `integer`
+
+  - **`frecuenciaCompraDias` (required)**
+
+    `integer`
+
+  - **`periodoDias` (required)**
+
+    `integer`, possible values: `30, 90, 180, 365`
+
+  - **`topArticulos` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId` (required)**
+
+      `integer`
+
+    - **`cantidadTotal` (required)**
+
+      `integer`
+
+    - **`codigo` (required)**
+
+      `string`
+
+    - **`descripcion` (required)**
+
+      `string`
+
+    - **`montoTotal` (required)**
+
+      `string`
+
+  - **`totalComprado` (required)**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "periodoDias": 30,
+    "totalComprado": "",
+    "frecuenciaCompraDias": 1,
+    "cantidadCompras": 1,
+    "topArticulos": [
+      {
+        "articuloId": 1,
+        "codigo": "",
+        "descripcion": "",
+        "cantidadTotal": 1,
+        "montoTotal": ""
+      }
+    ],
+    "compras": [
+      {
+        "tipo": "orden_compra",
+        "id": 1,
+        "fecha": "",
+        "referencia": "",
+        "total": "",
+        "estadoPago": "pendiente",
+        "ordenCompraId": 1,
+        "estado": ""
+      }
+    ]
+  }
+}
+```
+
+### ProveedorArticuloPrecioPunto
+
+- **Type:**`object`
+
+* **`cantidad` (required)**
+
+  `integer`
+
+* **`fecha` (required)**
+
+  `string`, format: `date-time`
+
+* **`precioUnitario` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "fecha": "",
+  "precioUnitario": "",
+  "cantidad": 1
+}
+```
+
+### ProveedorArticuloHistorialRow
+
+- **Type:**`object`
+
+* **`articuloId` (required)**
+
+  `integer`
+
+* **`cantidadTotal` (required)**
+
+  `integer`
+
+* **`codigo` (required)**
+
+  `string`
+
+* **`descripcion` (required)**
+
+  `string`
+
+* **`evolucionPrecios` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`cantidad` (required)**
+
+    `integer`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`precioUnitario` (required)**
+
+    `string`
+
+* **`montoTotal` (required)**
+
+  `string`
+
+* **`precioPromedioPonderado` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "articuloId": 1,
+  "codigo": "",
+  "descripcion": "",
+  "cantidadTotal": 1,
+  "precioPromedioPonderado": "",
+  "montoTotal": "",
+  "evolucionPrecios": [
+    {
+      "fecha": "",
+      "precioUnitario": "",
+      "cantidad": 1
+    }
+  ]
+}
+```
+
+### ProveedorArticulosHistorialData
+
+- **Type:**`object`
+
+* **`articulos` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`cantidadTotal` (required)**
+
+    `integer`
+
+  - **`codigo` (required)**
+
+    `string`
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`evolucionPrecios` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`cantidad` (required)**
+
+      `integer`
+
+    - **`fecha` (required)**
+
+      `string`, format: `date-time`
+
+    - **`precioUnitario` (required)**
+
+      `string`
+
+  - **`montoTotal` (required)**
+
+    `string`
+
+  - **`precioPromedioPonderado` (required)**
+
+    `string`
+
+**Example:**
+
+```json
+{
+  "articulos": [
+    {
+      "articuloId": 1,
+      "codigo": "",
+      "descripcion": "",
+      "cantidadTotal": 1,
+      "precioPromedioPonderado": "",
+      "montoTotal": "",
+      "evolucionPrecios": [
+        {
+          "fecha": "",
+          "precioUnitario": "",
+          "cantidad": 1
+        }
+      ]
+    }
+  ]
+}
+```
+
+### ProveedorArticulosHistorialEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`articulos` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId` (required)**
+
+      `integer`
+
+    - **`cantidadTotal` (required)**
+
+      `integer`
+
+    - **`codigo` (required)**
+
+      `string`
+
+    - **`descripcion` (required)**
+
+      `string`
+
+    - **`evolucionPrecios` (required)**
+
+      `array`
+
+      **Items:**
+
+      - **`cantidad` (required)**
+
+        `integer`
+
+      - **`fecha` (required)**
+
+        `string`, format: `date-time`
+
+      - **`precioUnitario` (required)**
+
+        `string`
+
+    - **`montoTotal` (required)**
+
+      `string`
+
+    - **`precioPromedioPonderado` (required)**
+
+      `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "articulos": [
+      {
+        "articuloId": 1,
+        "codigo": "",
+        "descripcion": "",
+        "cantidadTotal": 1,
+        "precioPromedioPonderado": "",
+        "montoTotal": "",
+        "evolucionPrecios": [
+          {
+            "fecha": "",
+            "precioUnitario": "",
+            "cantidad": 1
+          }
+        ]
+      }
+    ]
+  }
 }
 ```
 

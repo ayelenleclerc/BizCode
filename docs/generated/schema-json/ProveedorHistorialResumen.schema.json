@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "cantidadCompras": {
+      "type": "integer"
+    },
+    "compras": {
+      "items": {
+        "$ref": "./ProveedorCompraRow.schema.json"
+      },
+      "type": "array"
+    },
+    "frecuenciaCompraDias": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "periodoDias": {
+      "enum": [
+        30,
+        90,
+        180,
+        365
+      ],
+      "type": "integer"
+    },
+    "topArticulos": {
+      "items": {
+        "$ref": "./ProveedorHistorialTopArticulo.schema.json"
+      },
+      "type": "array"
+    },
+    "totalComprado": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "periodoDias",
+    "totalComprado",
+    "frecuenciaCompraDias",
+    "cantidadCompras",
+    "topArticulos",
+    "compras"
+  ],
+  "title": "ProveedorHistorialResumen",
+  "type": "object"
+}
