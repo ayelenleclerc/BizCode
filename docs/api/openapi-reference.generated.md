@@ -21161,7 +21161,7 @@ Requires `sales.create`. Pedido must be `confirmed`. Creates invoice via Factura
 
 #### Responses
 
-##### Status: 201
+##### Status: 201 Draft remito created from pedido
 
 ###### Content-Type: application/json
 
@@ -24509,7 +24509,7 @@ Paginated list. Requires module `fiscal.remito`.
 
 #### Responses
 
-##### Status: 200
+##### Status: 200 Delivery note detail
 
 ###### Content-Type: application/json
 
@@ -24693,7 +24693,7 @@ Paginated list. Requires module `fiscal.remito`.
 
 #### Responses
 
-##### Status: 200
+##### Status: 200 Updated draft delivery note
 
 ###### Content-Type: application/json
 
@@ -24826,7 +24826,7 @@ Paginated list. Requires module `fiscal.remito`.
 
 #### Responses
 
-##### Status: 200
+##### Status: 200 Issued delivery note
 
 ###### Content-Type: application/json
 
@@ -24959,7 +24959,7 @@ Paginated list. Requires module `fiscal.remito`.
 
 #### Responses
 
-##### Status: 200
+##### Status: 200 Delivered delivery note
 
 ###### Content-Type: application/json
 
@@ -25071,7 +25071,7 @@ Paginated list. Requires module `fiscal.remito`.
 
 #### Responses
 
-##### Status: 200
+##### Status: 200 Voided delivery note
 
 ###### Content-Type: application/json
 
