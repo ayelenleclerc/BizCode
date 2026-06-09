@@ -50,6 +50,6 @@ Escolha o **período**, pré-visualize (CBTU / ALICUOTAS) e baixe ZIP ou Excel (
 
 ## Retenções e percepções (`finance.retenciones`, #228)
 
-Configure regimes e flags de agente em **Configurações → Empresa → Retenções e percepções** (`settings.fiscal.manage`). APIs: `GET/POST/PUT /api/fiscal/regimenes`, `GET/PUT /api/fiscal/config-retenciones`, `GET /api/fiscal/retenciones` (histórico), `GET /api/fiscal/retenciones/preview` (vazio até #229). A condição IVA de clientes/fornecedores usa `condIva` do cadastro; consulta Padrão AFIP (#192) não implementada nesta entrega.
+Configure regimes e flags de agente em **Configurações → Empresa → Retenções e percepções** (`settings.fiscal.manage`). APIs: `GET/POST/PUT /api/fiscal/regimenes`, `GET/PUT /api/fiscal/config-retenciones`, `GET /api/fiscal/retenciones` (histórico), `GET /api/fiscal/retenciones/preview` (sugestões em pagamento a fornecedor #276; fatura/cobrança em #229). A condição IVA de clientes/fornecedores usa `condIva` do cadastro; consulta Padrão AFIP (#192) não implementada nesta entrega.
 
 **Outros idiomas:** [English](../../en/user/manual-finance.md) · [Español](../../es/user/manual-finanzas.md)

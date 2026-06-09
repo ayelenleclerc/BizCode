@@ -440,6 +440,10 @@
 
 * [ReciboPagoListEnvelope](./recibopagolistenvelope.md) – `-`
 
+* [ReciboPagoRetencion](./recibopagoretencion.md) – `-`
+
+* [ReciboPagoRetencionInput](./recibopagoretencioninput.md) – `-`
+
 * [Recuento](./recuento.md) – `-`
 
 * [RecuentoEnvelope](./recuentoenvelope.md) – `-`
@@ -912,7 +916,11 @@
 
 * [Untitled array in ReciboPago](./recibopago-properties-facturas.md) – `undefined#/properties/facturas`
 
+* [Untitled array in ReciboPago](./recibopago-properties-retenciones.md) – `undefined#/properties/retenciones`
+
 * [Untitled array in ReciboPagoInput](./recibopagoinput-properties-facturas.md) – `undefined#/properties/facturas`
+
+* [Untitled array in ReciboPagoInput](./recibopagoinput-properties-retenciones.md) – `undefined#/properties/retenciones`
 
 * [Untitled array in ReciboPagoListEnvelope](./recibopagolistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
 

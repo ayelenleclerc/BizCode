@@ -1125,6 +1125,12 @@ export const proveedoresAPI = {
       referencia?: string | null
       notas?: string | null
       facturas: { comprobanteCompraId?: number | null; facturaRef: string; monto: number }[]
+      retenciones?: {
+        regimenId: number
+        baseImponible: number
+        alicuota: number
+        importe: number
+      }[]
     },
   ) => {
     try {
@@ -1132,6 +1138,17 @@ export const proveedoresAPI = {
       return response.data.data
     } catch (error) {
       handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  listPagoRetenciones: async (proveedorId: number, reciboId: number): Promise<ReciboPagoRetencionDTO[]> => {
+    try {
+      const response = await api.get<{ success: boolean; data: ReciboPagoRetencionDTO[] }>(
+        `/proveedores/${proveedorId}/pagos/${reciboId}/retenciones`,
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
     }
   },
 
@@ -2061,6 +2078,32 @@ export type RegimenRetencionDTO = {
   updatedAt: string
 }
 
+export type FiscalRetencionesConfigDTO = {
+  esAgenteRetencionGanancias: boolean
+  esAgenteRetencionIVA: boolean
+  esAgenteRetencionIIBB: boolean
+}
+
+export type RetencionPreviewLineDTO = {
+  regimenId: number
+  nombre: string
+  tipo: string
+  alicuota: string
+  baseImponible: string
+  importe: string
+}
+
+export type ReciboPagoRetencionDTO = {
+  id: number
+  regimenId: number
+  regimenNombre: string
+  tipo: string
+  baseImponible: string
+  alicuota: string
+  importe: string
+  constanciaNum: string | null
+}
+
 export type RegimenRetencionInputDTO = {
   tipo: 'ganancias' | 'iva' | 'iibb'
   subtipo: 'retencion' | 'percepcion'
@@ -2077,12 +2120,6 @@ export type RegimenRetencionUpdateDTO = {
   alicuotaMin?: number | null
   provincia?: string | null
   activo?: boolean
-}
-
-export type FiscalRetencionesConfigDTO = {
-  esAgenteRetencionGanancias: boolean
-  esAgenteRetencionIVA: boolean
-  esAgenteRetencionIIBB: boolean
 }
 
 export type ProveedorHistorialPeriodoDias = 30 | 90 | 180 | 365
@@ -2505,6 +2542,49 @@ export const fiscalRetencionesAPI = {
         body,
       )
       return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  previewRetenciones: async (params: {
+    entidadTipo: 'cliente' | 'proveedor'
+    entidadId: number
+    monto: number
+  }): Promise<RetencionPreviewLineDTO[]> => {
+    try {
+      const response = await api.get<{ success: boolean; data: { retenciones: RetencionPreviewLineDTO[] } }>(
+        '/fiscal/retenciones/preview',
+        { params },
+      )
+      return response.data.data.retenciones
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  downloadConstanciaPdf: async (retencionId: number): Promise<Blob> => {
+    try {
+      const response = await api.get<Blob>(`/fiscal/retenciones/${retencionId}/comprobante/pdf`, {
+        responseType: 'blob',
+      })
+      return response.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  exportRetencionesTxt: async (params: {
+    format: 'sicore' | 'sifere'
+    from?: string
+    to?: string
+  }): Promise<Blob> => {
+    try {
+      const response = await api.get<Blob>('/fiscal/retenciones/export', {
+        params,
+        responseType: 'blob',
+      })
+      return response.data
     } catch (error) {
       return handleError(error as AxiosError<ApiErrorPayload>)
     }

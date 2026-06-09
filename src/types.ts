@@ -111,12 +111,24 @@ export interface ReciboPagoFactura {
   monto: string
 }
 
+export interface ReciboPagoRetencion {
+  id: number
+  regimenId: number
+  regimenNombre: string
+  tipo: string
+  baseImponible: string
+  alicuota: string
+  importe: string
+  constanciaNum: string | null
+}
+
 export interface ReciboPago {
   id: number
   numero: number
   proveedorId: number
   fecha: string
   total: string
+  totalBruto: string
   metodoPago: ReciboPagoMetodo
   cbu: string | null
   referencia: string | null
@@ -126,6 +138,7 @@ export interface ReciboPago {
   proveedor: { id: number; codigo: number; rsocial: string; cuit: string | null }
   usuario: { id: number; username: string }
   facturas: ReciboPagoFactura[]
+  retenciones: ReciboPagoRetencion[]
   createdAt: string
 }
 

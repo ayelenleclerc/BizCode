@@ -570,8 +570,9 @@ model Tenant {
   moduleTrials   TenantModuleTrial[]
   tenantPlan     TenantPlan?
   fiscalRetencionesConfig FiscalRetencionesConfig?
-  regimenesRetencion      RegimenRetencion[]
-  retencionesAplicadas    RetencionAplicada[]
+  regimenesRetencion            RegimenRetencion[]
+  retencionesAplicadas          RetencionAplicada[]
+  retencionConstanciaSequences  RetencionConstanciaSequence[]
 }
 
 model Plan {
@@ -1020,6 +1021,20 @@ model RetencionAplicada {
   @@index([tenantId, createdAt])
   @@index([tenantId, entidadTipo, entidadId])
   @@index([tenantId, tipo])
+}
+
+/// Correlative certificate numbers per withholding type (#276).
+model RetencionConstanciaSequence {
+  id        Int    @id @default(autoincrement())
+  tenantId  Int
+  tenant    Tenant @relation(fields: [tenantId], references: [id])
+  /// ganancias | iva | iibb
+  tipo      String @db.VarChar(20)
+  /// Empty string when not province-specific (Ganancias/IVA).
+  provincia String @default("") @db.VarChar(10)
+  lastNum   Int    @default(0)
+
+  @@unique([tenantId, tipo, provincia])
 }
 
 model LoginAttempt {

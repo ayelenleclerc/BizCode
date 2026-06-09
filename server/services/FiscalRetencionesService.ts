@@ -1,10 +1,14 @@
 import type { Prisma, PrismaClient } from '@prisma/client'
+import { NotFoundAppError } from '../errors/AppError'
 import type { FiscalRetencionesConfigInput } from '../createApp.types'
+import { previewRetencionesProveedorPago } from '../fiscal/ar/retencionesProveedorPago'
 import {
   previewRetencionesStub,
   type RetencionPreviewInput,
   type RetencionPreviewLine,
 } from '../fiscal/ar/retencionesPreviewStub'
+import { buildSicoreRetencionesExport } from '../fiscal/ar/sicoreRetencionesExport'
+import { buildSifereRetencionesExport } from '../fiscal/ar/sifereRetencionesExport'
 
 export type FiscalRetencionesConfigDto = {
   esAgenteRetencionGanancias: boolean
@@ -41,10 +45,17 @@ export type RetencionAplicadaListFilters = {
   tipo?: string
 }
 
+export type RetencionConstanciaPdfData = {
+  retencion: RetencionAplicadaDto
+  empresa: { nombre: string; cuit: string; domicilio: string | null }
+  proveedor: { rsocial: string; cuit: string | null }
+  fechaPago: string
+}
+
 /**
- * @en Tenant withholding config, applied history and preview stub (#228).
- * @es Config de agente de retención, historial y preview stub (#228).
- * @pt-BR Config de agente de retenção, histórico e preview stub (#228).
+ * @en Tenant withholding config, applied history and preview (#228, #276).
+ * @es Config de agente de retención, historial y preview (#228, #276).
+ * @pt-BR Config de agente de retenção, histórico e preview (#228, #276).
  */
 export class FiscalRetencionesService {
   constructor(private readonly prisma: PrismaClient) {}
@@ -96,7 +107,10 @@ export class FiscalRetencionesService {
     take: number,
     skip: number,
   ): Promise<{ total: number; items: RetencionAplicadaDto[] }> {
-    const where: Prisma.RetencionAplicadaWhereInput = { tenantId }
+    const where: Prisma.RetencionAplicadaWhereInput = {
+      tenantId,
+      OR: [{ reciboPagoId: null }, { reciboPago: { estado: 'emitido' } }],
+    }
     if (filters.tipo != null && filters.tipo.trim().length > 0) {
       where.tipo = filters.tipo.trim()
     }
@@ -136,7 +150,151 @@ export class FiscalRetencionesService {
     }
   }
 
-  preview(input: RetencionPreviewInput): { retenciones: RetencionPreviewLine[] } {
+  async preview(
+    tenantId: number,
+    input: RetencionPreviewInput,
+  ): Promise<{ retenciones: RetencionPreviewLine[] }> {
+    if (input.entidadTipo === 'proveedor') {
+      const proveedor = await this.prisma.proveedor.findFirst({
+        where: { id: input.entidadId, tenantId },
+        select: { condIva: true },
+      })
+      if (proveedor == null) {
+        throw new NotFoundAppError('Proveedor not found')
+      }
+      const [config, regimenes] = await Promise.all([
+        this.prisma.fiscalRetencionesConfig.findUnique({ where: { tenantId } }),
+        this.prisma.regimenRetencion.findMany({
+          where: { tenantId, activo: true, subtipo: 'retencion' },
+        }),
+      ])
+      return {
+        retenciones: previewRetencionesProveedorPago({
+          proveedor,
+          config,
+          regimenes,
+          montoBruto: input.monto,
+        }),
+      }
+    }
     return { retenciones: previewRetencionesStub(input) }
+  }
+
+  async getConstanciaPdfData(
+    tenantId: number,
+    retencionId: number,
+  ): Promise<RetencionConstanciaPdfData | null> {
+    const row = await this.prisma.retencionAplicada.findFirst({
+      where: {
+        id: retencionId,
+        tenantId,
+        OR: [{ reciboPagoId: null }, { reciboPago: { estado: 'emitido' } }],
+      },
+      include: {
+        regimen: { select: { nombre: true, tipo: true } },
+        reciboPago: { select: { fecha: true, proveedorId: true } },
+      },
+    })
+    if (row == null || row.entidadTipo !== 'proveedor') return null
+
+    const [empresa, proveedor] = await Promise.all([
+      this.prisma.paramEmpresa.findFirst({
+        where: { tenantId },
+        select: { nombre: true, cuit: true, domicilio: true },
+      }),
+      this.prisma.proveedor.findFirst({
+        where: { id: row.entidadId, tenantId },
+        select: { rsocial: true, cuit: true },
+      }),
+    ])
+    if (proveedor == null) return null
+
+    const dto: RetencionAplicadaDto = {
+      id: row.id,
+      regimenId: row.regimenId,
+      regimenNombre: row.regimen.nombre,
+      tipo: row.regimen.tipo,
+      entidadTipo: row.entidadTipo,
+      entidadId: row.entidadId,
+      facturaId: row.facturaId,
+      cobroId: row.cobroId,
+      reciboPagoId: row.reciboPagoId,
+      baseImponible: row.baseImponible.toString(),
+      alicuota: row.alicuota.toString(),
+      importe: row.importe.toString(),
+      constanciaNum: row.constanciaNum,
+      createdAt: row.createdAt.toISOString(),
+    }
+
+    return {
+      retencion: dto,
+      empresa: {
+        nombre: empresa?.nombre ?? 'Empresa',
+        cuit: empresa?.cuit ?? '',
+        domicilio: empresa?.domicilio ?? null,
+      },
+      proveedor,
+      fechaPago: (row.reciboPago?.fecha ?? row.createdAt).toISOString(),
+    }
+  }
+
+  async buildExportTxt(
+    tenantId: number,
+    format: 'sicore' | 'sifere',
+    from?: Date,
+    to?: Date,
+  ): Promise<string> {
+    const where: Prisma.RetencionAplicadaWhereInput = {
+      tenantId,
+      entidadTipo: 'proveedor',
+      tipo: 'retencion',
+      OR: [{ reciboPagoId: null }, { reciboPago: { estado: 'emitido' } }],
+    }
+    if (from != null || to != null) {
+      where.createdAt = {}
+      if (from != null) where.createdAt.gte = from
+      if (to != null) where.createdAt.lte = to
+    }
+
+    const empresa = await this.prisma.paramEmpresa.findFirst({
+      where: { tenantId },
+      select: { cuit: true },
+    })
+    const cuitRetenedor = (empresa?.cuit ?? '').replace(/\D/g, '')
+
+    const rows = await this.prisma.retencionAplicada.findMany({
+      where,
+      include: {
+        regimen: { select: { tipo: true, provincia: true, nombre: true } },
+        reciboPago: { select: { fecha: true } },
+      },
+      orderBy: { createdAt: 'asc' },
+    })
+
+    const proveedorIds = [...new Set(rows.map((r) => r.entidadId))]
+    const proveedores = await this.prisma.proveedor.findMany({
+      where: { tenantId, id: { in: proveedorIds } },
+      select: { id: true, cuit: true },
+    })
+    const cuitByProveedor = new Map(proveedores.map((p) => [p.id, (p.cuit ?? '').replace(/\D/g, '')]))
+
+    const exportRows = rows
+      .filter((r) => (format === 'sicore' ? r.regimen.tipo !== 'iibb' : r.regimen.tipo === 'iibb'))
+      .map((r) => ({
+        fecha: r.reciboPago?.fecha ?? r.createdAt,
+        cuitRetenedor,
+        cuitRetenido: cuitByProveedor.get(r.entidadId) ?? '',
+        regimenTipo: r.regimen.tipo,
+        provincia: r.regimen.provincia,
+        baseImponible: r.baseImponible.toNumber(),
+        alicuota: r.alicuota.toNumber(),
+        importe: r.importe.toNumber(),
+        constanciaNum: r.constanciaNum ?? '',
+      }))
+
+    if (format === 'sicore') {
+      return buildSicoreRetencionesExport(exportRows)
+    }
+    return buildSifereRetencionesExport(exportRows)
   }
 }

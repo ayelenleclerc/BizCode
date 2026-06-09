@@ -10,6 +10,8 @@ Versionamento: [Semantic Versioning](https://semver.org/).
 
 ### Adicionado
 
+- **Retenções no pagamento a fornecedor (#276):** `retenciones[]` opcional em `POST /api/proveedores/{id}/pagos` (`total` líquido = Σ faturas − retenções; CC com bruto); persistência `RetencionAplicada` com `constanciaNum` correlativo; `GET /api/proveedores/{id}/pagos/{reciboId}/retenciones`; preview fornecedor em `GET /api/fiscal/retenciones/preview`; PDF certificado `GET /api/fiscal/retenciones/{id}/comprobante/pdf`; export TXT SICORE/SIFERE `GET /api/fiscal/retenciones/export`; UI no formulário de pagamento; OpenAPI, testes, manuais trilíngues. Validar export contra layouts oficiais manualmente.
+
 - **Modelo de retenções/percepções (#228):** Prisma `RegimenRetencion`, `RetencionAplicada`, `FiscalRetencionesConfig`; API `GET/POST/PUT /api/fiscal/regimenes`, `GET/PUT /api/fiscal/config-retenciones`, `GET /api/fiscal/retenciones`, `GET /api/fiscal/retenciones/preview` (stub até #229); UI em **Configurações → Empresa** (`finance.retenciones`, `settings.fiscal.manage`); OpenAPI, testes de contrato/API, i18n empresa trilíngue.
 
 - **Scanner de documentos de compra — Fase G (GitHub #277):**** verificação de duplicados por fornecedor (`GET /api/documentos-compra/verificar-duplicado`, alerta proativa na UI, confirmação bloqueada com 409), mapeamento de linhas com buscar/criar/ignorar artigo, OCR `spa+eng+por`, UI de templates YAML (`settings.fiscal.manage`); armazenamento local e estoque em remito diferidos documentados nos manuais.

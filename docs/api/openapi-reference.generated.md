@@ -11133,7 +11133,49 @@ Requires module `finance.receipts` and permission `suppliers.read`.
 
     `integer`
 
+  - **`retenciones` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`alicuota` (required)**
+
+      `string`
+
+    - **`baseImponible` (required)**
+
+      `string`
+
+    - **`constanciaNum` (required)**
+
+      `string`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`importe` (required)**
+
+      `string`
+
+    - **`regimenId` (required)**
+
+      `integer`
+
+    - **`regimenNombre` (required)**
+
+      `string`
+
+    - **`tipo` (required)**
+
+      `string`
+
   - **`total` (required)**
+
+    `string`
+
+  - **`totalBruto` (required)**
 
     `string`
 
@@ -11193,6 +11235,7 @@ Requires module `finance.receipts` and permission `suppliers.read`.
       "proveedorId": 1,
       "fecha": "",
       "total": "",
+      "totalBruto": "",
       "metodoPago": "transferencia",
       "cbu": "",
       "referencia": "",
@@ -11215,6 +11258,18 @@ Requires module `finance.receipts` and permission `suppliers.read`.
           "comprobanteCompraId": 1,
           "facturaRef": "",
           "monto": ""
+        }
+      ],
+      "retenciones": [
+        {
+          "id": 1,
+          "regimenId": 1,
+          "regimenNombre": "",
+          "tipo": "",
+          "baseImponible": "",
+          "alicuota": "",
+          "importe": "",
+          "constanciaNum": ""
         }
       ],
       "createdAt": ""
@@ -11337,7 +11392,7 @@ Requires module `finance.receipts` and permission `suppliers.read`.
 - **Path:** `/api/proveedores/{id}/pagos`
 - **Tags:** proveedores
 
-Creates `ReciboPago` with tenant-correlative `numero`, posts `pago` ledger movement (negative monto), and audit event `recibo_pago_create`. Requires module `finance.receipts` and `suppliers.manage`.
+Creates `ReciboPago` with tenant-correlative `numero`, posts `pago` ledger movement (negative monto = sum of facturas/bruto), optional `RetencionAplicada` rows (#276), and audit event `recibo_pago_create`. `total` is net cash (sum facturas − sum retenciones). Requires module `finance.receipts` and `suppliers.manage`.
 
 #### Request Body
 
@@ -11385,6 +11440,28 @@ Creates `ReciboPago` with tenant-correlative `numero`, posts `pago` ledger movem
 
   `string`
 
+- **`retenciones`**
+
+  `array`
+
+  **Items:**
+
+  - **`alicuota` (required)**
+
+    `number`
+
+  - **`baseImponible` (required)**
+
+    `number`
+
+  - **`importe` (required)**
+
+    `number`
+
+  - **`regimenId` (required)**
+
+    `integer`
+
 **Example:**
 
 ```json
@@ -11400,6 +11477,14 @@ Creates `ReciboPago` with tenant-correlative `numero`, posts `pago` ledger movem
       "comprobanteCompraId": 1,
       "facturaRef": "",
       "monto": 1
+    }
+  ],
+  "retenciones": [
+    {
+      "regimenId": 1,
+      "baseImponible": 1,
+      "alicuota": 0,
+      "importe": 1
     }
   ]
 }
@@ -11485,7 +11570,49 @@ Creates `ReciboPago` with tenant-correlative `numero`, posts `pago` ledger movem
 
     `integer`
 
+  - **`retenciones` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`alicuota` (required)**
+
+      `string`
+
+    - **`baseImponible` (required)**
+
+      `string`
+
+    - **`constanciaNum` (required)**
+
+      `string`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`importe` (required)**
+
+      `string`
+
+    - **`regimenId` (required)**
+
+      `integer`
+
+    - **`regimenNombre` (required)**
+
+      `string`
+
+    - **`tipo` (required)**
+
+      `string`
+
   - **`total` (required)**
+
+    `string`
+
+  - **`totalBruto` (required)**
 
     `string`
 
@@ -11532,6 +11659,7 @@ Creates `ReciboPago` with tenant-correlative `numero`, posts `pago` ledger movem
     "proveedorId": 1,
     "fecha": "",
     "total": "",
+    "totalBruto": "",
     "metodoPago": "transferencia",
     "cbu": "",
     "referencia": "",
@@ -11554,6 +11682,18 @@ Creates `ReciboPago` with tenant-correlative `numero`, posts `pago` ledger movem
         "comprobanteCompraId": 1,
         "facturaRef": "",
         "monto": ""
+      }
+    ],
+    "retenciones": [
+      {
+        "id": 1,
+        "regimenId": 1,
+        "regimenNombre": "",
+        "tipo": "",
+        "baseImponible": "",
+        "alicuota": "",
+        "importe": "",
+        "constanciaNum": ""
       }
     ],
     "createdAt": ""
@@ -11759,7 +11899,49 @@ Sets estado `anulado` and posts compensating ledger movement. Audit `recibo_pago
 
     `integer`
 
+  - **`retenciones` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`alicuota` (required)**
+
+      `string`
+
+    - **`baseImponible` (required)**
+
+      `string`
+
+    - **`constanciaNum` (required)**
+
+      `string`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`importe` (required)**
+
+      `string`
+
+    - **`regimenId` (required)**
+
+      `integer`
+
+    - **`regimenNombre` (required)**
+
+      `string`
+
+    - **`tipo` (required)**
+
+      `string`
+
   - **`total` (required)**
+
+    `string`
+
+  - **`totalBruto` (required)**
 
     `string`
 
@@ -11806,6 +11988,7 @@ Sets estado `anulado` and posts compensating ledger movement. Audit `recibo_pago
     "proveedorId": 1,
     "fecha": "",
     "total": "",
+    "totalBruto": "",
     "metodoPago": "transferencia",
     "cbu": "",
     "referencia": "",
@@ -11828,6 +12011,18 @@ Sets estado `anulado` and posts compensating ledger movement. Audit `recibo_pago
         "comprobanteCompraId": 1,
         "facturaRef": "",
         "monto": ""
+      }
+    ],
+    "retenciones": [
+      {
+        "id": 1,
+        "regimenId": 1,
+        "regimenNombre": "",
+        "tipo": "",
+        "baseImponible": "",
+        "alicuota": "",
+        "importe": "",
+        "constanciaNum": ""
       }
     ],
     "createdAt": ""
@@ -12397,6 +12592,192 @@ Requires module finance.ledger and permission suppliers.manage (#275).
 ```
 
 ##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/proveedores/{id}/pagos/{reciboId}/retenciones
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/proveedores/{id}/pagos/{reciboId}/retenciones`
+
+### List withholdings applied to a payment receipt (#276)
+
+- **Method:** `GET`
+- **Path:** `/api/proveedores/{id}/pagos/{reciboId}/retenciones`
+- **Tags:** proveedores
+
+Requires module `finance.receipts` and permission `suppliers.read`.
+
+#### Responses
+
+##### Status: 200 Applied withholdings
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`alicuota` (required)**
+
+    `string`
+
+  - **`baseImponible` (required)**
+
+    `string`
+
+  - **`constanciaNum` (required)**
+
+    `string`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`importe` (required)**
+
+    `string`
+
+  - **`regimenId` (required)**
+
+    `integer`
+
+  - **`regimenNombre` (required)**
+
+    `string`
+
+  - **`tipo` (required)**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "regimenId": 1,
+      "regimenNombre": "",
+      "tipo": "",
+      "baseImponible": "",
+      "alicuota": "",
+      "importe": "",
+      "constanciaNum": ""
+    }
+  ]
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
 
 ###### Content-Type: application/json
 
@@ -18546,13 +18927,13 @@ Requires `finance.retenciones`, `reports.financial.read`. Paginated list.
 - **Method:** `PARAMETERS`
 - **Path:** `/api/fiscal/retenciones/preview`
 
-### Preview withholdings stub (#228; calculation in
+### Preview withholdings (#228,
 
 - **Method:** `GET`
 - **Path:** `/api/fiscal/retenciones/preview`
 - **Tags:** contabilidad
 
-Requires `finance.retenciones`, `reports.financial.read`. Returns empty list until
+Requires `finance.retenciones`, `reports.financial.read`. For `entidadTipo=proveedor`, returns suggested withholdings from active regimens (#276). Other entity types return empty until #229.
 
 #### Responses
 
@@ -18661,6 +19042,249 @@ Requires `finance.retenciones`, `reports.financial.read`. Returns empty list unt
 ```
 
 ##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/fiscal/retenciones/export
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/fiscal/retenciones/export`
+
+### Export applied withholdings TXT (#276)
+
+- **Method:** `GET`
+- **Path:** `/api/fiscal/retenciones/export`
+- **Tags:** contabilidad
+
+Requires `finance.retenciones`, `reports.financial.read`. `format=sicore` for Ganancias/IVA; `format=sifere` for IIBB. Excludes voided payment receipts.
+
+#### Responses
+
+##### Status: 200 TXT export
+
+###### Content-Type: text/plain
+
+`string`
+
+**Example:**
+
+```json
+true
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/fiscal/retenciones/{id}/comprobante/pdf
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/fiscal/retenciones/{id}/comprobante/pdf`
+
+### Download withholding certificate PDF (#276)
+
+- **Method:** `GET`
+- **Path:** `/api/fiscal/retenciones/{id}/comprobante/pdf`
+- **Tags:** contabilidad
+
+Requires `finance.retenciones`, `reports.financial.read`.
+
+#### Responses
+
+##### Status: 200 PDF certificate
+
+###### Content-Type: application/pdf
+
+`string`, format: `binary`
+
+**Example:**
+
+```json
+{}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
 
 ###### Content-Type: application/json
 
@@ -41367,7 +41991,49 @@ true
 
   `integer`
 
+* **`retenciones` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`alicuota` (required)**
+
+    `string`
+
+  - **`baseImponible` (required)**
+
+    `string`
+
+  - **`constanciaNum` (required)**
+
+    `string`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`importe` (required)**
+
+    `string`
+
+  - **`regimenId` (required)**
+
+    `integer`
+
+  - **`regimenNombre` (required)**
+
+    `string`
+
+  - **`tipo` (required)**
+
+    `string`
+
 * **`total` (required)**
+
+  `string`
+
+* **`totalBruto` (required)**
 
   `string`
 
@@ -41408,6 +42074,7 @@ true
   "proveedorId": 1,
   "fecha": "",
   "total": "",
+  "totalBruto": "",
   "metodoPago": "transferencia",
   "cbu": "",
   "referencia": "",
@@ -41430,6 +42097,18 @@ true
       "comprobanteCompraId": 1,
       "facturaRef": "",
       "monto": ""
+    }
+  ],
+  "retenciones": [
+    {
+      "id": 1,
+      "regimenId": 1,
+      "regimenNombre": "",
+      "tipo": "",
+      "baseImponible": "",
+      "alicuota": "",
+      "importe": "",
+      "constanciaNum": ""
     }
   ],
   "createdAt": ""
@@ -41482,6 +42161,28 @@ true
 
   `string`
 
+* **`retenciones`**
+
+  `array`
+
+  **Items:**
+
+  - **`alicuota` (required)**
+
+    `number`
+
+  - **`baseImponible` (required)**
+
+    `number`
+
+  - **`importe` (required)**
+
+    `number`
+
+  - **`regimenId` (required)**
+
+    `integer`
+
 **Example:**
 
 ```json
@@ -41498,7 +42199,97 @@ true
       "facturaRef": "",
       "monto": 1
     }
+  ],
+  "retenciones": [
+    {
+      "regimenId": 1,
+      "baseImponible": 1,
+      "alicuota": 0,
+      "importe": 1
+    }
   ]
+}
+```
+
+### ReciboPagoRetencionInput
+
+- **Type:**`object`
+
+* **`alicuota` (required)**
+
+  `number`
+
+* **`baseImponible` (required)**
+
+  `number`
+
+* **`importe` (required)**
+
+  `number`
+
+* **`regimenId` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "regimenId": 1,
+  "baseImponible": 1,
+  "alicuota": 0,
+  "importe": 1
+}
+```
+
+### ReciboPagoRetencion
+
+- **Type:**`object`
+
+* **`alicuota` (required)**
+
+  `string`
+
+* **`baseImponible` (required)**
+
+  `string`
+
+* **`constanciaNum` (required)**
+
+  `string`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`importe` (required)**
+
+  `string`
+
+* **`regimenId` (required)**
+
+  `integer`
+
+* **`regimenNombre` (required)**
+
+  `string`
+
+* **`tipo` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "regimenId": 1,
+  "regimenNombre": "",
+  "tipo": "",
+  "baseImponible": "",
+  "alicuota": "",
+  "importe": "",
+  "constanciaNum": ""
 }
 ```
 
@@ -41627,7 +42418,49 @@ true
 
     `integer`
 
+  - **`retenciones` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`alicuota` (required)**
+
+      `string`
+
+    - **`baseImponible` (required)**
+
+      `string`
+
+    - **`constanciaNum` (required)**
+
+      `string`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`importe` (required)**
+
+      `string`
+
+    - **`regimenId` (required)**
+
+      `integer`
+
+    - **`regimenNombre` (required)**
+
+      `string`
+
+    - **`tipo` (required)**
+
+      `string`
+
   - **`total` (required)**
+
+    `string`
+
+  - **`totalBruto` (required)**
 
     `string`
 
@@ -41674,6 +42507,7 @@ true
     "proveedorId": 1,
     "fecha": "",
     "total": "",
+    "totalBruto": "",
     "metodoPago": "transferencia",
     "cbu": "",
     "referencia": "",
@@ -41696,6 +42530,18 @@ true
         "comprobanteCompraId": 1,
         "facturaRef": "",
         "monto": ""
+      }
+    ],
+    "retenciones": [
+      {
+        "id": 1,
+        "regimenId": 1,
+        "regimenNombre": "",
+        "tipo": "",
+        "baseImponible": "",
+        "alicuota": "",
+        "importe": "",
+        "constanciaNum": ""
       }
     ],
     "createdAt": ""

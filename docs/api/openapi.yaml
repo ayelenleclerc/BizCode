@@ -1916,8 +1916,9 @@ paths:
       tags: [proveedores]
       summary: Register supplier payment
       description: |
-        Creates `ReciboPago` with tenant-correlative `numero`, posts `pago` ledger movement (negative monto),
-        and audit event `recibo_pago_create`. Requires module `finance.receipts` and `suppliers.manage`.
+        Creates `ReciboPago` with tenant-correlative `numero`, posts `pago` ledger movement (negative monto = sum of facturas/bruto),
+        optional `RetencionAplicada` rows (#276), and audit event `recibo_pago_create`.
+        `total` is net cash (sum facturas − sum retenciones). Requires module `finance.receipts` and `suppliers.manage`.
       requestBody:
         required: true
         content:
@@ -2051,6 +2052,50 @@ paths:
                 $ref: '#/components/schemas/AlertaProveedorConfigEnvelope'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/proveedores/{id}/pagos/{reciboId}/retenciones:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: reciboId
+        in: path
+        required: true
+        schema:
+          type: integer
+    get:
+      tags: [proveedores]
+      summary: List withholdings applied to a payment receipt (#276)
+      description: Requires module `finance.receipts` and permission `suppliers.read`.
+      responses:
+        '200':
+          description: Applied withholdings
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [success, data]
+                properties:
+                  success:
+                    type: boolean
+                    const: true
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ReciboPagoRetencion'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '403':
@@ -2974,8 +3019,11 @@ paths:
           exclusiveMinimum: 0
     get:
       tags: [contabilidad]
-      summary: Preview withholdings stub (#228; calculation in #229)
-      description: Requires `finance.retenciones`, `reports.financial.read`. Returns empty list until #229.
+      summary: Preview withholdings (#228, #276 proveedor)
+      description: |
+        Requires `finance.retenciones`, `reports.financial.read`.
+        For `entidadTipo=proveedor`, returns suggested withholdings from active regimens (#276).
+        Other entity types return empty until #229.
       responses:
         '200':
           description: Preview result (stub)
@@ -2985,6 +3033,79 @@ paths:
                 $ref: '#/components/schemas/RetencionesPreviewEnvelope'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/fiscal/retenciones/export:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: format
+        in: query
+        required: true
+        schema:
+          type: string
+          enum: [sicore, sifere]
+      - name: from
+        in: query
+        schema:
+          type: string
+          format: date-time
+      - name: to
+        in: query
+        schema:
+          type: string
+          format: date-time
+    get:
+      tags: [contabilidad]
+      summary: Export applied withholdings TXT (#276)
+      description: |
+        Requires `finance.retenciones`, `reports.financial.read`.
+        `format=sicore` for Ganancias/IVA; `format=sifere` for IIBB. Excludes voided payment receipts.
+      responses:
+        '200':
+          description: TXT export
+          content:
+            text/plain:
+              schema:
+                type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/fiscal/retenciones/{id}/comprobante/pdf:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    get:
+      tags: [contabilidad]
+      summary: Download withholding certificate PDF (#276)
+      description: Requires `finance.retenciones`, `reports.financial.read`.
+      responses:
+        '200':
+          description: PDF certificate
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '403':
@@ -7473,6 +7594,8 @@ components:
         - proveedor
         - usuario
         - facturas
+        - retenciones
+        - totalBruto
         - createdAt
       properties:
         id:
@@ -7485,6 +7608,8 @@ components:
           type: string
           format: date-time
         total:
+          type: string
+        totalBruto:
           type: string
         metodoPago:
           type: string
@@ -7528,6 +7653,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ReciboPagoFactura'
+        retenciones:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReciboPagoRetencion'
         createdAt:
           type: string
           format: date-time
@@ -7571,6 +7700,58 @@ components:
               monto:
                 type: number
                 exclusiveMinimum: 0
+        retenciones:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReciboPagoRetencionInput'
+
+    ReciboPagoRetencionInput:
+      type: object
+      required: [regimenId, baseImponible, alicuota, importe]
+      properties:
+        regimenId:
+          type: integer
+          minimum: 1
+        baseImponible:
+          type: number
+          exclusiveMinimum: 0
+        alicuota:
+          type: number
+          minimum: 0
+          maximum: 100
+        importe:
+          type: number
+          exclusiveMinimum: 0
+
+    ReciboPagoRetencion:
+      type: object
+      required:
+        - id
+        - regimenId
+        - regimenNombre
+        - tipo
+        - baseImponible
+        - alicuota
+        - importe
+        - constanciaNum
+      properties:
+        id:
+          type: integer
+        regimenId:
+          type: integer
+        regimenNombre:
+          type: string
+        tipo:
+          type: string
+        baseImponible:
+          type: string
+        alicuota:
+          type: string
+        importe:
+          type: string
+        constanciaNum:
+          type: string
+          nullable: true
 
     ComprobantePendiente:
       type: object

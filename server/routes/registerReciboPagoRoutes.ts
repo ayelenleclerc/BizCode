@@ -159,6 +159,31 @@ export function registerReciboPagoRoutes(app: Application, ctx: RestRouteContext
   )
 
   app.get(
+    '/api/proveedores/:id/pagos/:reciboId/retenciones',
+    receiptsModule,
+    requirePermission('suppliers.read'),
+    async (req: Request, res: Response) => {
+      const proveedorId = parsePositiveIntParam(String(req.params.id))
+      const reciboId = parsePositiveIntParam(String(req.params.reciboId))
+      if (proveedorId === null || reciboId === null) {
+        res.status(400).json({ success: false, error: 'id must be a positive integer' })
+        return
+      }
+      try {
+        const tenantId = getTenantId(req)
+        const data = await reciboPago.listRetencionesByRecibo(tenantId, proveedorId, reciboId)
+        if (data == null) {
+          res.status(404).json({ success: false, error: 'Recibo not found' })
+          return
+        }
+        res.json({ success: true, data })
+      } catch (err: unknown) {
+        res.status(500).json({ success: false, error: errorMessage(err) })
+      }
+    },
+  )
+
+  app.get(
     '/api/proveedores/:id/pagos/:reciboId/pdf',
     receiptsModule,
     requirePermission('suppliers.read'),

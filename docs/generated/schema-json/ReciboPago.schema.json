@@ -75,7 +75,16 @@
       "nullable": true,
       "type": "string"
     },
+    "retenciones": {
+      "items": {
+        "$ref": "./ReciboPagoRetencion.schema.json"
+      },
+      "type": "array"
+    },
     "total": {
+      "type": "string"
+    },
+    "totalBruto": {
       "type": "string"
     },
     "usuario": {
@@ -109,6 +118,8 @@
     "proveedor",
     "usuario",
     "facturas",
+    "retenciones",
+    "totalBruto",
     "createdAt"
   ],
   "title": "ReciboPago",

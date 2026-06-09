@@ -67,8 +67,33 @@ function buildReciboRow(overrides: Partial<Record<string, unknown>> = {}) {
         monto: new Decimal(100),
       },
     ],
+    retencionesAplicadas: [],
     ...overrides,
   }
+}
+
+const regimenGanancias = {
+  id: 1,
+  tenantId: 1,
+  tipo: 'ganancias',
+  subtipo: 'retencion',
+  nombre: 'Ganancias servicios',
+  alicuota: new Decimal(4.5),
+  alicuotaMin: null,
+  provincia: null,
+  activo: true,
+}
+
+const regimenIibb = {
+  id: 2,
+  tenantId: 1,
+  tipo: 'iibb',
+  subtipo: 'retencion',
+  nombre: 'IIBB CABA',
+  alicuota: new Decimal(3),
+  alicuotaMin: null,
+  provincia: 'CABA',
+  activo: true,
 }
 
 function buildPrisma(overrides: Partial<Record<string, unknown>> = {}): PrismaClient {
@@ -120,6 +145,23 @@ function buildPrisma(overrides: Partial<Record<string, unknown>> = {}): PrismaCl
         logoUrl: null,
       }),
     },
+    fiscalRetencionesConfig: {
+      findUnique: vi.fn().mockResolvedValue({
+        esAgenteRetencionGanancias: true,
+        esAgenteRetencionIVA: true,
+        esAgenteRetencionIIBB: true,
+      }),
+    },
+    regimenRetencion: {
+      findMany: vi.fn().mockResolvedValue([regimenGanancias, regimenIibb]),
+    },
+    retencionConstanciaSequence: {
+      findUnique: vi.fn().mockResolvedValue(null),
+      upsert: vi.fn().mockResolvedValue({ lastNum: 1 }),
+    },
+    retencionAplicada: {
+      create: vi.fn().mockResolvedValue({ id: 1 }),
+    },
     formaPago: { findMany: vi.fn().mockResolvedValue([]) },
     factura: { findMany: vi.fn().mockResolvedValue([]) },
     notification: {
@@ -150,8 +192,16 @@ function buildPrisma(overrides: Partial<Record<string, unknown>> = {}): PrismaCl
         const tx = {
           reciboPago: {
             findFirst: vi.fn().mockResolvedValue(null),
+            findFirstOrThrow: vi.fn().mockResolvedValue(buildReciboRow()),
             create: reciboCreate,
             update: vi.fn().mockImplementation(async () => buildReciboRow({ estado: 'anulado' })),
+          },
+          retencionAplicada: {
+            create: vi.fn().mockResolvedValue({ id: 1 }),
+          },
+          retencionConstanciaSequence: {
+            findUnique: vi.fn().mockResolvedValue(null),
+            upsert: vi.fn().mockResolvedValue({ lastNum: 1 }),
           },
           movimientoProveedorCC: {
             findFirst: vi.fn().mockResolvedValue(null),
@@ -237,6 +287,59 @@ describe('Recibo pago proveedor API (#271)', () => {
         facturas: [{ comprobanteCompraId: 10, facturaRef: 'B-0001-50', monto: 80 }],
       })
       .expect(400)
+  })
+
+  it('POST pagos with multiple retenciones validates net and creates records (#276)', async () => {
+    prisma = buildPrisma({
+      regimenRetencion: {
+        findMany: vi.fn().mockResolvedValue([regimenGanancias, regimenIibb]),
+      },
+    })
+    const app = createApp(prisma)
+    const res = await request(app)
+      .post('/api/proveedores/1/pagos')
+      .send({
+        fecha: '2026-06-03',
+        total: 92.5,
+        metodoPago: 'transferencia',
+        facturas: [{ comprobanteCompraId: 10, facturaRef: 'B-0001-50', monto: 100 }],
+        retenciones: [
+          { regimenId: 1, baseImponible: 100, alicuota: 4.5, importe: 4.5 },
+          { regimenId: 2, baseImponible: 100, alicuota: 3, importe: 3 },
+        ],
+      })
+      .expect(201)
+    expect(res.body.success).toBe(true)
+    expect(prisma.$transaction).toHaveBeenCalled()
+  })
+
+  it('GET pagos retenciones lists applied rows', async () => {
+    prisma = buildPrisma({
+      reciboPago: {
+        count: vi.fn().mockResolvedValue(1),
+        findMany: vi.fn().mockResolvedValue([buildReciboRow()]),
+        findFirst: vi.fn().mockResolvedValue(
+          buildReciboRow({
+            retencionesAplicadas: [
+              {
+                id: 5,
+                regimenId: 1,
+                tipo: 'retencion',
+                baseImponible: new Decimal(100),
+                alicuota: new Decimal(4.5),
+                importe: new Decimal(4.5),
+                constanciaNum: 'ganancias-00001',
+                regimen: { nombre: 'Ganancias servicios' },
+              },
+            ],
+          }),
+        ),
+      },
+    })
+    const app = createApp(prisma)
+    const res = await request(app).get('/api/proveedores/1/pagos/1/retenciones').expect(200)
+    expect(res.body.data).toHaveLength(1)
+    expect(res.body.data[0].constanciaNum).toBe('ganancias-00001')
   })
 
   it('POST anular voids receipt and posts compensating movement', async () => {

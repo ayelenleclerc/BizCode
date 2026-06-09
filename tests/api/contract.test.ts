@@ -447,6 +447,7 @@ function buildPrisma(): PrismaClient {
     retencionAplicada: {
       count: vi.fn().mockResolvedValue(0),
       findMany: vi.fn().mockResolvedValue([]),
+      findFirst: vi.fn().mockResolvedValue(null),
     },
     comprobanteCompra: {
       findMany: vi.fn().mockResolvedValue([]),
@@ -523,6 +524,7 @@ function buildPrisma(): PrismaClient {
               monto: new Decimal(100),
             },
           ],
+          retencionesAplicadas: [],
         },
       ]),
       findFirst: vi.fn().mockImplementation(async (args?: { where?: Record<string, unknown> }) => {
@@ -552,6 +554,7 @@ function buildPrisma(): PrismaClient {
               monto: new Decimal(100),
             },
           ],
+          retencionesAplicadas: [],
         }
       }),
       create: vi.fn().mockResolvedValue({
@@ -579,6 +582,7 @@ function buildPrisma(): PrismaClient {
             monto: new Decimal(100),
           },
         ],
+        retencionesAplicadas: [],
       }),
       update: vi.fn().mockResolvedValue({
         id: 1,
@@ -605,6 +609,7 @@ function buildPrisma(): PrismaClient {
             monto: new Decimal(100),
           },
         ],
+        retencionesAplicadas: [],
       }),
     },
     cobro: {
@@ -824,6 +829,33 @@ function buildPrisma(): PrismaClient {
           },
           reciboPago: {
             findFirst: vi.fn().mockResolvedValue(null),
+            findFirstOrThrow: vi.fn().mockResolvedValue({
+              id: 1,
+              tenantId: 1,
+              numero: 1,
+              proveedorId: 1,
+              fecha: new Date('2026-06-01T12:00:00.000Z'),
+              total: new Decimal(100),
+              metodoPago: 'transferencia',
+              cbu: null,
+              referencia: 'TRX-1',
+              estado: 'emitido',
+              notas: null,
+              usuarioId: 1,
+              createdAt: new Date(),
+              updatedAt: new Date(),
+              proveedor: { id: 1, codigo: 5001, rsocial: 'Proveedor API SA', cuit: null },
+              usuario: { id: 1, username: 'owner1' },
+              facturas: [
+                {
+                  id: 1,
+                  comprobanteCompraId: 1,
+                  facturaRef: 'B-0001-1',
+                  monto: new Decimal(100),
+                },
+              ],
+              retencionesAplicadas: [],
+            }),
             create: vi.fn().mockResolvedValue({
               id: 1,
               tenantId: 1,
@@ -849,6 +881,7 @@ function buildPrisma(): PrismaClient {
                   monto: new Decimal(100),
                 },
               ],
+              retencionesAplicadas: [],
             }),
             update: vi.fn().mockResolvedValue({
               id: 1,
@@ -875,6 +908,7 @@ function buildPrisma(): PrismaClient {
                   monto: new Decimal(100),
                 },
               ],
+              retencionesAplicadas: [],
             }),
           },
           stockAjuste: {
@@ -1454,7 +1488,48 @@ describe('API — contrato OpenAPI', () => {
       .query({ entidadTipo: 'proveedor', entidadId: 1, monto: 1000 })
       .expect(200)
     await assertMatchesOpenApi('/api/fiscal/retenciones/preview', 'get', '200', res.body)
-    expect(res.body.data.retenciones).toEqual([])
+  })
+
+  it('GET /api/proveedores/{id}/pagos/{reciboId}/retenciones', async () => {
+    const app = createApp(prisma)
+    const res = await request(app).get('/api/proveedores/1/pagos/1/retenciones').expect(200)
+    await assertMatchesOpenApi('/api/proveedores/{id}/pagos/{reciboId}/retenciones', 'get', '200', res.body)
+  })
+
+  it('GET /api/fiscal/retenciones/export returns text/plain', async () => {
+    const app = createApp(prisma)
+    const res = await request(app).get('/api/fiscal/retenciones/export?format=sicore').expect(200)
+    expect(res.headers['content-type']).toMatch(/text\/plain/)
+  })
+
+  it('GET /api/fiscal/retenciones/{id}/comprobante/pdf returns application/pdf', async () => {
+    vi.mocked(prisma.retencionAplicada.findFirst).mockResolvedValueOnce({
+      id: 1,
+      tenantId: 1,
+      regimenId: 1,
+      tipo: 'retencion',
+      entidadTipo: 'proveedor',
+      entidadId: 1,
+      facturaId: null,
+      cobroId: null,
+      reciboPagoId: 1,
+      baseImponible: new Decimal(100),
+      alicuota: new Decimal(4.5),
+      importe: new Decimal(4.5),
+      constanciaNum: 'ganancias-00001',
+      createdAt: new Date(),
+      regimen: { nombre: 'Ganancias', tipo: 'ganancias' },
+      reciboPago: { fecha: new Date(), proveedorId: 1, estado: 'emitido' },
+    } as never)
+    vi.mocked(prisma.proveedor.findFirst).mockResolvedValueOnce({
+      ...proveedorRow,
+      rsocial: 'Proveedor API SA',
+      cuit: '30-12345678-9',
+    } as never)
+    const app = createApp(prisma)
+    const res = await request(app).get('/api/fiscal/retenciones/1/comprobante/pdf').expect(200)
+    expect(res.headers['content-type']).toMatch(/application\/pdf/)
+    expect(res.body.subarray(0, 4).toString()).toBe('%PDF')
   })
 
   it('GET /api/documentos-compra/templates', async () => {

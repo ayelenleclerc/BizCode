@@ -81,6 +81,14 @@ export type ReciboPagoFacturaInput = {
   monto: number
 }
 
+/** @en Withholding line on supplier payment (#276). @es Línea de retención en pago a proveedor (#276). @pt-BR Linha de retenção em pagamento (#276). */
+export type ReciboPagoRetencionInput = {
+  regimenId: number
+  baseImponible: number
+  alicuota: number
+  importe: number
+}
+
 export type ReciboPagoInput = {
   fecha: string
   total: number
@@ -89,6 +97,7 @@ export type ReciboPagoInput = {
   referencia?: string | null
   notas?: string | null
   facturas: ReciboPagoFacturaInput[]
+  retenciones?: ReciboPagoRetencionInput[]
 }
 
 export type FacturaItemInput = {

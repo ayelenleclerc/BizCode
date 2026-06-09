@@ -39,10 +39,11 @@ Na aba **Conta corrente**, o bloco **Recibos de pagamento** registra pagamentos 
 
 1. **Registrar pagamento** — comprovantes pendentes (mais antigos primeiro); selecione linhas e valores (parcial ou total).
 2. Data, forma (transferência, cheque, dinheiro, eCheq), CBU/referência/notas opcionais.
-3. Ao salvar: número correlativo por tenant, movimento `pago` na CC (valor negativo) e auditoria `recibo_pago_create`.
-4. **Baixar PDF** por recibo; **Anular** (`recibo_pago_void`) reverte o saldo com movimento compensatório.
+3. Ao salvar: número correlativo por tenant, movimento `pago` na CC (valor negativo = bruto imputado) e auditoria `recibo_pago_create`.
+4. **Retenções (#276):** com `finance.retenciones` e agente configurado, aplique retenções sugeridas (preview), confirme valores e registre `RetencionAplicada` com certificado correlativo; **líquido a transferir** = bruto − retenções.
+5. **Baixar PDF** do recibo; **Certificado** PDF por retenção; **Anular** (`recibo_pago_void`) reverte o saldo com movimento compensatório (bruto imputado).
 
-**API:** `GET /api/proveedores/{id}/pagos/comprobantes-pendientes`, `GET/POST /api/proveedores/{id}/pagos`, `POST .../pagos/{reciboId}/anular`, `GET .../pagos/{reciboId}/pdf` — [OpenAPI](../../api/openapi.yaml).
+**API:** `GET /api/proveedores/{id}/pagos/comprobantes-pendientes`, `GET/POST /api/proveedores/{id}/pagos`, `GET .../pagos/{reciboId}/retenciones`, `POST .../pagos/{reciboId}/anular`, `GET .../pagos/{reciboId}/pdf`, `GET /api/fiscal/retenciones/preview`, `GET /api/fiscal/retenciones/{id}/comprobante/pdf`, `GET /api/fiscal/retenciones/export?format=sicore|sifere` — [OpenAPI](../../api/openapi.yaml). Exportação TXT: validar layouts oficiais manualmente.
 
 ## Alertas de vencimento a pagar (GitHub #275)
 
