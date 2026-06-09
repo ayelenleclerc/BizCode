@@ -23536,6 +23536,137 @@ Processes up to 20 PDF/image files sequentially (same tier pipeline as `procesar
 }
 ```
 
+### PARAMETERS /api/documentos-compra/verificar-duplicado
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/documentos-compra/verificar-duplicado`
+
+### Check duplicate purchase voucher for supplier (#277 Fase G)
+
+- **Method:** `GET`
+- **Path:** `/api/documentos-compra/verificar-duplicado`
+- **Tags:** contabilidad
+
+Returns whether an active `ComprobanteCompra` already exists for the same supplier, tipo, prefijo and numero. Requires `finance.ledger`, `logistics.purchases`, `reports.financial.read`.
+
+#### Responses
+
+##### Status: 200 Duplicate check result
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`comprobanteCompraId` (required)**
+
+    `integer | null`
+
+  - **`duplicado` (required)**
+
+    `boolean`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "duplicado": true,
+    "comprobanteCompraId": null
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ### PARAMETERS /api/documentos-compra/cola
 
 - **Method:** `PARAMETERS`
@@ -24160,7 +24291,7 @@ Persists invoice2data-style YAML for the current tenant. Requires `settings.fisc
 - **Path:** `/api/documentos-compra/confirmar`
 - **Tags:** contabilidad
 
-Persists `ComprobanteCompra` from reviewed preview and links the import record. Duplicate `tipo` + `prefijo` + `numero` returns 409.
+Persists `ComprobanteCompra` from reviewed preview and links the import record. Duplicate `proveedorId` + `tipo` + `prefijo` + `numero` returns 409.
 
 #### Request Body
 
@@ -47529,6 +47660,59 @@ Originating invoice header (selected columns)
         "updatedAt": ""
       }
     ]
+  }
+}
+```
+
+### DocumentoCompraDuplicadoResult
+
+- **Type:**`object`
+
+* **`comprobanteCompraId` (required)**
+
+  `integer | null`
+
+* **`duplicado` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "duplicado": true,
+  "comprobanteCompraId": null
+}
+```
+
+### DocumentoCompraDuplicadoEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`comprobanteCompraId` (required)**
+
+    `integer | null`
+
+  - **`duplicado` (required)**
+
+    `boolean`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "duplicado": true,
+    "comprobanteCompraId": null
   }
 }
 ```

@@ -363,17 +363,37 @@ export class DocumentoCompraImportService {
     return doc ? toRow(doc) : null
   }
 
+  /**
+   * @en Checks whether an active purchase voucher already exists for supplier + number (#277 Fase G).
+   * @es Verifica si ya existe un comprobante de compra activo para proveedor + número (#277 Fase G).
+   * @pt-BR Verifica se já existe comprovante de compra ativo para fornecedor + número (#277 Fase G).
+   */
+  async verificarDuplicado(
+    tenantId: number,
+    proveedorId: number,
+    tipo: string,
+    prefijo: string,
+    numero: number,
+  ): Promise<{ duplicado: boolean; comprobanteCompraId: number | null }> {
+    const existing = await this.prisma.comprobanteCompra.findFirst({
+      where: { tenantId, proveedorId, tipo, prefijo, numero, estado: 'A' },
+      select: { id: true },
+    })
+    return {
+      duplicado: existing != null,
+      comprobanteCompraId: existing?.id ?? null,
+    }
+  }
+
   async checkDuplicateComprobante(
     tenantId: number,
+    proveedorId: number,
     tipo: string,
     prefijo: string,
     numero: number,
   ): Promise<boolean> {
-    const existing = await this.prisma.comprobanteCompra.findFirst({
-      where: { tenantId, tipo, prefijo, numero, estado: 'A' },
-      select: { id: true },
-    })
-    return existing != null
+    const result = await this.verificarDuplicado(tenantId, proveedorId, tipo, prefijo, numero)
+    return result.duplicado
   }
 
   async confirmar(
@@ -392,12 +412,15 @@ export class DocumentoCompraImportService {
 
     const isDuplicate = await this.checkDuplicateComprobante(
       tenantId,
+      input.proveedorId,
       input.tipo,
       input.prefijo,
       input.numero,
     )
     if (isDuplicate) {
-      throw new ConflictAppError('Comprobante compra already exists for tipo/prefijo/numero')
+      throw new ConflictAppError(
+        'Comprobante compra already exists for proveedor/tipo/prefijo/numero',
+      )
     }
 
     const confirmedItems = input.items ?? []

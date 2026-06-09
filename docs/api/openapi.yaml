@@ -3795,6 +3795,55 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
 
+  /api/documentos-compra/verificar-duplicado:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: proveedorId
+        in: query
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+      - name: tipo
+        in: query
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      - name: prefijo
+        in: query
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      - name: numero
+        in: query
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    get:
+      tags: [contabilidad]
+      summary: Check duplicate purchase voucher for supplier (#277 Fase G)
+      description: |
+        Returns whether an active `ComprobanteCompra` already exists for the same supplier, tipo, prefijo and numero.
+        Requires `finance.ledger`, `logistics.purchases`, `reports.financial.read`.
+      responses:
+        '200':
+          description: Duplicate check result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentoCompraDuplicadoEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
   /api/documentos-compra/cola:
     parameters:
       - $ref: '#/components/parameters/BizcodeChannelHeader'
@@ -3875,7 +3924,7 @@ paths:
       summary: Confirm imported document and create ComprobanteCompra (#277 Phase A)
       description: |
         Persists `ComprobanteCompra` from reviewed preview and links the import record.
-        Duplicate `tipo` + `prefijo` + `numero` returns 409.
+        Duplicate `proveedorId` + `tipo` + `prefijo` + `numero` returns 409.
       requestBody:
         required: true
         content:
@@ -9119,6 +9168,26 @@ components:
           const: true
         data:
           $ref: '#/components/schemas/DocumentoCompraColaEstado'
+
+    DocumentoCompraDuplicadoResult:
+      type: object
+      required: [duplicado, comprobanteCompraId]
+      properties:
+        duplicado:
+          type: boolean
+        comprobanteCompraId:
+          type: ['integer', 'null']
+          minimum: 1
+
+    DocumentoCompraDuplicadoEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/DocumentoCompraDuplicadoResult'
 
     DocumentoCompraTemplateSummary:
       type: object

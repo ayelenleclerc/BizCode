@@ -157,6 +157,51 @@ describe('documentos-compra API', () => {
     expect(res.body.data.documento.datosExtraidos.items[0].articuloId).toBe(3)
   })
 
+  it('GET /api/documentos-compra/verificar-duplicado detects existing comprobante', async () => {
+    prisma.comprobanteCompra.findFirst = vi.fn().mockResolvedValue({ id: 42 })
+    const app = createApp(prisma as never)
+    const res = await request(app)
+      .get('/api/documentos-compra/verificar-duplicado')
+      .query({ proveedorId: 1, tipo: 'B', prefijo: '0001', numero: 7 })
+      .expect(200)
+    expect(res.body.data.duplicado).toBe(true)
+    expect(res.body.data.comprobanteCompraId).toBe(42)
+  })
+
+  it('GET /api/documentos-compra/verificar-duplicado returns false when not found', async () => {
+    prisma.comprobanteCompra.findFirst = vi.fn().mockResolvedValue(null)
+    const app = createApp(prisma as never)
+    const res = await request(app)
+      .get('/api/documentos-compra/verificar-duplicado')
+      .query({ proveedorId: 1, tipo: 'B', prefijo: '0001', numero: 99 })
+      .expect(200)
+    expect(res.body.data.duplicado).toBe(false)
+    expect(res.body.data.comprobanteCompraId).toBeNull()
+  })
+
+  it('POST /api/documentos-compra/confirmar returns 409 on duplicate', async () => {
+    prisma.comprobanteCompra.findFirst = vi.fn().mockResolvedValue({ id: 42 })
+    const app = createApp(prisma as never)
+    const res = await request(app)
+      .post('/api/documentos-compra/confirmar')
+      .send({
+        documentoId: 1,
+        fecha: '2026-05-10T12:00:00.000Z',
+        tipo: 'B',
+        prefijo: '0001',
+        numero: 7,
+        proveedorId: 1,
+        neto1: 100,
+        neto2: 0,
+        neto3: 0,
+        iva1: 21,
+        iva2: 0,
+        total: 121,
+      })
+      .expect(409)
+    expect(res.body.success).toBe(false)
+  })
+
   it('GET /api/documentos-compra/cola returns queue snapshot', async () => {
     const app = createApp(prisma as never)
     const res = await request(app).get('/api/documentos-compra/cola').expect(200)
