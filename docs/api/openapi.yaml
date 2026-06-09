@@ -3404,6 +3404,7 @@ paths:
       summary: Create delivery note from confirmed pedido
       responses:
         '201':
+          description: Draft remito created from pedido
           content:
             application/json:
               schema:
@@ -4001,6 +4002,7 @@ paths:
       summary: Get delivery note
       responses:
         '200':
+          description: Delivery note detail
           content:
             application/json:
               schema:
@@ -4018,6 +4020,7 @@ paths:
               $ref: '#/components/schemas/RemitoUpdateInput'
       responses:
         '200':
+          description: Updated draft delivery note
           content:
             application/json:
               schema:
@@ -4042,6 +4045,7 @@ paths:
       summary: Issue delivery note (assign correlativo)
       responses:
         '200':
+          description: Issued delivery note
           content:
             application/json:
               schema:
@@ -4066,6 +4070,7 @@ paths:
               $ref: '#/components/schemas/RemitoEntregarInput'
       responses:
         '200':
+          description: Delivered delivery note
           content:
             application/json:
               schema:
@@ -4084,6 +4089,7 @@ paths:
       summary: Void issued delivery note
       responses:
         '200':
+          description: Voided delivery note
           content:
             application/json:
               schema:
