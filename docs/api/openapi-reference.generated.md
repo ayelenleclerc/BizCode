@@ -16932,11 +16932,33 @@ Requires all items to have `cantFisica`. For each line with non-zero variance, u
 
 - **`total` (required)**
 
-  `number`
+  `number` — Must equal netos + IVA + sum(percepciones) when percepciones are sent (#229).
 
 - **`formaPagoId`**
 
   `integer`
+
+- **`percepciones`**
+
+  `array`
+
+  **Items:**
+
+  - **`alicuota` (required)**
+
+    `number`
+
+  - **`baseImponible` (required)**
+
+    `number`
+
+  - **`importe` (required)**
+
+    `number`
+
+  - **`regimenId` (required)**
+
+    `integer`
 
 - **`prefijo`**
 
@@ -16958,6 +16980,14 @@ Requires all items to have `cantFisica`. For each line with non-zero variance, u
   "iva1": 1,
   "iva2": 1,
   "total": 1,
+  "percepciones": [
+    {
+      "regimenId": 1,
+      "baseImponible": 1,
+      "alicuota": 0,
+      "importe": 1
+    }
+  ],
   "items": [
     {
       "articuloId": 1,
@@ -18927,13 +18957,13 @@ Requires `finance.retenciones`, `reports.financial.read`. Paginated list.
 - **Method:** `PARAMETERS`
 - **Path:** `/api/fiscal/retenciones/preview`
 
-### Preview withholdings (#228,
+### Preview withholdings/perceptions (#228,
 
 - **Method:** `GET`
 - **Path:** `/api/fiscal/retenciones/preview`
 - **Tags:** contabilidad
 
-Requires `finance.retenciones`, `reports.financial.read`. For `entidadTipo=proveedor`, returns suggested withholdings from active regimens (#276). Other entity types return empty until #229.
+Requires `finance.retenciones`, `reports.financial.read`. `entidadTipo=proveedor` — suggested withholdings on supplier payment (#276). `entidadTipo=cliente` with `contexto=factura` — perceptions on invoice (neto1+neto2+neto3 base). `entidadTipo=cliente` with `contexto=cobro` — customer withholdings on collection (`monto` = bruto).
 
 #### Responses
 
@@ -21327,7 +21357,7 @@ Requires `sales.create`. Pedido must be `confirmed`. Creates invoice via Factura
 - **Path:** `/api/cobros`
 - **Tags:** cobros
 
-Decrements `Cliente.balance` by `monto` in the same transaction. When the customer has at least one active invoice (`estado: A`), adjusts `Cliente.score` from the oldest active invoice due date (`factura.fecha + creditDays`) vs payment date: on-time +5; 1–10 days late −3; 11–30 −7; >30 −15. No score change when there is no active invoice (on-account payment). Audit metadata includes `scoreBefore`, `scoreAfter`, `delta`. Requires `sales.create`.
+Decrements `Cliente.balance` by bruto (`monto` neto + sum of `retenciones[]` when present) in the same transaction (#229). When the customer has at least one active invoice (`estado: A`), adjusts `Cliente.score` from the oldest active invoice due date (`factura.fecha + creditDays`) vs payment date: on-time +5; 1–10 days late −3; 11–30 −7; >30 −15. No score change when there is no active invoice (on-account payment). Audit metadata includes `scoreBefore`, `scoreAfter`, `delta`. Requires `sales.create`.
 
 #### Request Body
 
@@ -21343,7 +21373,7 @@ Decrements `Cliente.balance` by `monto` in the same transaction. When the custom
 
 - **`monto` (required)**
 
-  `number`
+  `number` — Net amount received (#229); CC decremented by bruto when retenciones present.
 
 - **`formaPagoId`**
 
@@ -21357,6 +21387,28 @@ Decrements `Cliente.balance` by `monto` in the same transaction. When the custom
 
   `string`
 
+- **`retenciones`**
+
+  `array`
+
+  **Items:**
+
+  - **`alicuota` (required)**
+
+    `number`
+
+  - **`baseImponible` (required)**
+
+    `number`
+
+  - **`importe` (required)**
+
+    `number`
+
+  - **`regimenId` (required)**
+
+    `integer`
+
 **Example:**
 
 ```json
@@ -21366,7 +21418,15 @@ Decrements `Cliente.balance` by `monto` in the same transaction. When the custom
   "monto": 1,
   "formaPagoId": 1,
   "referencia": "",
-  "nota": ""
+  "nota": "",
+  "retenciones": [
+    {
+      "regimenId": 1,
+      "baseImponible": 1,
+      "alicuota": 0,
+      "importe": 1
+    }
+  ]
 }
 ```
 
@@ -21432,6 +21492,48 @@ Decrements `Cliente.balance` by `monto` in the same transaction. When the custom
 
       `integer`
 
+  - **`montoBruto` (required)**
+
+    `string` — Bruto applied to customer balance (neto + retenciones).
+
+  - **`retenciones` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`alicuota` (required)**
+
+      `string`
+
+    - **`baseImponible` (required)**
+
+      `string`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`importe` (required)**
+
+      `string`
+
+    - **`regimenId` (required)**
+
+      `integer`
+
+    - **`regimenNombre` (required)**
+
+      `string`
+
+    - **`tipo` (required)**
+
+      `string`
+
+    - **`constanciaNum`**
+
+      `string`
+
   - **`updatedCliente` (required)**
 
     `object`
@@ -21490,7 +21592,20 @@ Decrements `Cliente.balance` by `monto` in the same transaction. When the custom
       "creditLimit": 1,
       "score": 0,
       "additionalProperty": "anything"
-    }
+    },
+    "retenciones": [
+      {
+        "id": 1,
+        "regimenId": 1,
+        "regimenNombre": "",
+        "tipo": "",
+        "baseImponible": "",
+        "alicuota": "",
+        "importe": "",
+        "constanciaNum": ""
+      }
+    ],
+    "montoBruto": ""
   }
 }
 ```
@@ -21762,6 +21877,192 @@ Decrements `Cliente.balance` by `monto` in the same transaction. When the custom
 ```
 
 ##### Status: 404 Payment not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/cobros/{id}/retenciones
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/cobros/{id}/retenciones`
+
+### List withholdings applied on a customer payment (#229)
+
+- **Method:** `GET`
+- **Path:** `/api/cobros/{id}/retenciones`
+- **Tags:** cobros
+
+Requires `finance.retenciones`, `reports.financial.read`.
+
+#### Responses
+
+##### Status: 200 Withholding lines linked to the cobro
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`alicuota` (required)**
+
+    `string`
+
+  - **`baseImponible` (required)**
+
+    `string`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`importe` (required)**
+
+    `string`
+
+  - **`regimenId` (required)**
+
+    `integer`
+
+  - **`regimenNombre` (required)**
+
+    `string`
+
+  - **`tipo` (required)**
+
+    `string`
+
+  - **`constanciaNum`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "regimenId": 1,
+      "regimenNombre": "",
+      "tipo": "",
+      "baseImponible": "",
+      "alicuota": "",
+      "importe": "",
+      "constanciaNum": ""
+    }
+  ]
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Cobro not found
 
 ###### Content-Type: application/json
 
@@ -37909,7 +38210,7 @@ true
 
 * **`monto` (required)**
 
-  `number`
+  `number` — Net amount received (#229); CC decremented by bruto when retenciones present.
 
 * **`formaPagoId`**
 
@@ -37923,6 +38224,28 @@ true
 
   `string`
 
+* **`retenciones`**
+
+  `array`
+
+  **Items:**
+
+  - **`alicuota` (required)**
+
+    `number`
+
+  - **`baseImponible` (required)**
+
+    `number`
+
+  - **`importe` (required)**
+
+    `number`
+
+  - **`regimenId` (required)**
+
+    `integer`
+
 **Example:**
 
 ```json
@@ -37932,7 +38255,66 @@ true
   "monto": 1,
   "formaPagoId": 1,
   "referencia": "",
-  "nota": ""
+  "nota": "",
+  "retenciones": [
+    {
+      "regimenId": 1,
+      "baseImponible": 1,
+      "alicuota": 0,
+      "importe": 1
+    }
+  ]
+}
+```
+
+### CobroRetencion
+
+- **Type:**`object`
+
+* **`alicuota` (required)**
+
+  `string`
+
+* **`baseImponible` (required)**
+
+  `string`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`importe` (required)**
+
+  `string`
+
+* **`regimenId` (required)**
+
+  `integer`
+
+* **`regimenNombre` (required)**
+
+  `string`
+
+* **`tipo` (required)**
+
+  `string`
+
+* **`constanciaNum`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "regimenId": 1,
+  "regimenNombre": "",
+  "tipo": "",
+  "baseImponible": "",
+  "alicuota": "",
+  "importe": "",
+  "constanciaNum": ""
 }
 ```
 
@@ -38083,6 +38465,48 @@ true
 
     `integer`
 
+* **`montoBruto` (required)**
+
+  `string` — Bruto applied to customer balance (neto + retenciones).
+
+* **`retenciones` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`alicuota` (required)**
+
+    `string`
+
+  - **`baseImponible` (required)**
+
+    `string`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`importe` (required)**
+
+    `string`
+
+  - **`regimenId` (required)**
+
+    `integer`
+
+  - **`regimenNombre` (required)**
+
+    `string`
+
+  - **`tipo` (required)**
+
+    `string`
+
+  - **`constanciaNum`**
+
+    `string`
+
 * **`updatedCliente` (required)**
 
   `object`
@@ -38135,7 +38559,20 @@ true
     "creditLimit": 1,
     "score": 0,
     "additionalProperty": "anything"
-  }
+  },
+  "retenciones": [
+    {
+      "id": 1,
+      "regimenId": 1,
+      "regimenNombre": "",
+      "tipo": "",
+      "baseImponible": "",
+      "alicuota": "",
+      "importe": "",
+      "constanciaNum": ""
+    }
+  ],
+  "montoBruto": ""
 }
 ```
 
@@ -38199,6 +38636,48 @@ true
 
       `integer`
 
+  - **`montoBruto` (required)**
+
+    `string` — Bruto applied to customer balance (neto + retenciones).
+
+  - **`retenciones` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`alicuota` (required)**
+
+      `string`
+
+    - **`baseImponible` (required)**
+
+      `string`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`importe` (required)**
+
+      `string`
+
+    - **`regimenId` (required)**
+
+      `integer`
+
+    - **`regimenNombre` (required)**
+
+      `string`
+
+    - **`tipo` (required)**
+
+      `string`
+
+    - **`constanciaNum`**
+
+      `string`
+
   - **`updatedCliente` (required)**
 
     `object`
@@ -38257,7 +38736,20 @@ true
       "creditLimit": 1,
       "score": 0,
       "additionalProperty": "anything"
-    }
+    },
+    "retenciones": [
+      {
+        "id": 1,
+        "regimenId": 1,
+        "regimenNombre": "",
+        "tipo": "",
+        "baseImponible": "",
+        "alicuota": "",
+        "importe": "",
+        "constanciaNum": ""
+      }
+    ],
+    "montoBruto": ""
   }
 }
 ```
@@ -47072,11 +47564,33 @@ true
 
 * **`total` (required)**
 
-  `number`
+  `number` — Must equal netos + IVA + sum(percepciones) when percepciones are sent (#229).
 
 * **`formaPagoId`**
 
   `integer`
+
+* **`percepciones`**
+
+  `array`
+
+  **Items:**
+
+  - **`alicuota` (required)**
+
+    `number`
+
+  - **`baseImponible` (required)**
+
+    `number`
+
+  - **`importe` (required)**
+
+    `number`
+
+  - **`regimenId` (required)**
+
+    `integer`
 
 * **`prefijo`**
 
@@ -47098,6 +47612,14 @@ true
   "iva1": 1,
   "iva2": 1,
   "total": 1,
+  "percepciones": [
+    {
+      "regimenId": 1,
+      "baseImponible": 1,
+      "alicuota": 0,
+      "importe": 1
+    }
+  ],
   "items": [
     {
       "articuloId": 1,

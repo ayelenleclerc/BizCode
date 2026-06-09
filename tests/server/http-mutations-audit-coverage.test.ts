@@ -310,6 +310,10 @@ function basePrismaForMutations(): {
     update: vi.fn(),
   }
 
+  prisma.retencionAplicada = {
+    deleteMany: vi.fn().mockResolvedValue({ count: 0 }),
+  }
+
   prisma.$transaction = vi.fn(async (fn: (tx: Tx) => Promise<unknown>) =>
     fn(prisma as unknown as Tx),
   ) as typeof prisma.$transaction

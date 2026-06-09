@@ -118,6 +118,8 @@
 
 * [CobroListEnvelope](./cobrolistenvelope.md) – `-`
 
+* [CobroRetencion](./cobroretencion.md) – `-`
+
 * [ComprobanteCompra](./comprobantecompra.md) – `-`
 
 * [ComprobanteCompraEnvelope](./comprobantecompraenvelope.md) – `-`
@@ -814,6 +816,10 @@
 
 * [Untitled array in CobranzasVencidasEnvelope](./cobranzasvencidasenvelope-properties-data.md) – `undefined#/properties/data`
 
+* [Untitled array in CobroCreateData](./cobrocreatedata-properties-retenciones.md) – `undefined#/properties/retenciones`
+
+* [Untitled array in CobroInput](./cobroinput-properties-retenciones.md) – `undefined#/properties/retenciones`
+
 * [Untitled array in CobroListEnvelope](./cobrolistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
 
 * [Untitled array in ComprobantePendienteListEnvelope](./comprobantependientelistenvelope-properties-data.md) – `undefined#/properties/data`
@@ -845,6 +851,8 @@
 * [Untitled array in Factura](./factura-properties-items.md) – `undefined#/properties/items`
 
 * [Untitled array in FacturaInput](./facturainput-properties-items.md) – `undefined#/properties/items`
+
+* [Untitled array in FacturaInput](./facturainput-properties-percepciones.md) – `undefined#/properties/percepciones`
 
 * [Untitled array in FacturaListEnvelope](./facturalistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
 

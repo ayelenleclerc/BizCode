@@ -3017,13 +3017,35 @@ paths:
         schema:
           type: number
           exclusiveMinimum: 0
+      - name: contexto
+        in: query
+        schema:
+          type: string
+          enum: [factura, cobro]
+        description: For `entidadTipo=cliente`, `factura` previews perceptions; `cobro` previews withholdings (#229).
+      - name: neto1
+        in: query
+        schema:
+          type: number
+          minimum: 0
+      - name: neto2
+        in: query
+        schema:
+          type: number
+          minimum: 0
+      - name: neto3
+        in: query
+        schema:
+          type: number
+          minimum: 0
     get:
       tags: [contabilidad]
-      summary: Preview withholdings (#228, #276 proveedor)
+      summary: Preview withholdings/perceptions (#228, #276, #229)
       description: |
         Requires `finance.retenciones`, `reports.financial.read`.
-        For `entidadTipo=proveedor`, returns suggested withholdings from active regimens (#276).
-        Other entity types return empty until #229.
+        `entidadTipo=proveedor` — suggested withholdings on supplier payment (#276).
+        `entidadTipo=cliente` with `contexto=factura` — perceptions on invoice (neto1+neto2+neto3 base).
+        `entidadTipo=cliente` with `contexto=cobro` — customer withholdings on collection (`monto` = bruto).
       responses:
         '200':
           description: Preview result (stub)
@@ -3414,8 +3436,8 @@ paths:
       tags: [cobros]
       summary: Register a customer payment
       description: |
-        Decrements `Cliente.balance` by `monto` in the same transaction. When the customer has at least
-        one active invoice (`estado: A`), adjusts `Cliente.score` from the oldest active invoice due date
+        Decrements `Cliente.balance` by bruto (`monto` neto + sum of `retenciones[]` when present) in the same transaction (#229).
+        When the customer has at least one active invoice (`estado: A`), adjusts `Cliente.score` from the oldest active invoice due date
         (`factura.fecha + creditDays`) vs payment date: on-time +5; 1–10 days late −3; 11–30 −7; >30 −15.
         No score change when there is no active invoice (on-account payment). Audit metadata includes
         `scoreBefore`, `scoreAfter`, `delta`. Requires `sales.create`.
@@ -3474,6 +3496,50 @@ paths:
           $ref: '#/components/responses/ForbiddenError'
         '404':
           description: Payment not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/cobros/{id}/retenciones:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    get:
+      tags: [cobros]
+      summary: List withholdings applied on a customer payment (#229)
+      description: Requires `finance.retenciones`, `reports.financial.read`.
+      responses:
+        '200':
+          description: Withholding lines linked to the cobro
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [success, data]
+                properties:
+                  success:
+                    type: boolean
+                    const: true
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CobroRetencion'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Cobro not found
           content:
             application/json:
               schema:
@@ -6459,6 +6525,7 @@ components:
         monto:
           type: number
           exclusiveMinimum: 0
+          description: Net amount received (#229); CC decremented by bruto when retenciones present.
         formaPagoId:
           type: integer
           nullable: true
@@ -6468,6 +6535,32 @@ components:
         nota:
           type: string
           maxLength: 200
+        retenciones:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReciboPagoRetencionInput'
+
+    CobroRetencion:
+      type: object
+      required: [id, regimenId, regimenNombre, tipo, baseImponible, alicuota, importe]
+      properties:
+        id:
+          type: integer
+        regimenId:
+          type: integer
+        regimenNombre:
+          type: string
+        tipo:
+          type: string
+        baseImponible:
+          type: string
+        alicuota:
+          type: string
+        importe:
+          type: string
+        constanciaNum:
+          type: string
+          nullable: true
 
     CobroListEnvelope:
       allOf:
@@ -6495,7 +6588,7 @@ components:
 
     CobroCreateData:
       type: object
-      required: [cobro, updatedCliente]
+      required: [cobro, updatedCliente, retenciones, montoBruto]
       properties:
         cobro:
           $ref: '#/components/schemas/Cobro'
@@ -6517,6 +6610,13 @@ components:
               type: integer
               minimum: 0
               maximum: 100
+        retenciones:
+          type: array
+          items:
+            $ref: '#/components/schemas/CobroRetencion'
+        montoBruto:
+          type: string
+          description: Bruto applied to customer balance (neto + retenciones).
 
     CobroCreateEnvelope:
       type: object
@@ -8952,6 +9052,11 @@ components:
           type: number
         total:
           type: number
+          description: Must equal netos + IVA + sum(percepciones) when percepciones are sent (#229).
+        percepciones:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReciboPagoRetencionInput'
         items:
           type: array
           items:

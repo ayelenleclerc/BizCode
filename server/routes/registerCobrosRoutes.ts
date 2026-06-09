@@ -1,11 +1,18 @@
 import type { Application, Request, Response } from 'express'
 import { requirePermission, type AuthenticatedRequest } from '../auth'
+import { requireModule } from '../middleware/requireModule'
 import { validateBody } from '../middleware/validateBody'
 import { cobroBodySchema } from '../schemas/domain'
 import type { CobroInput } from '../createApp.types'
 import { paginatedListJson, parseListPagination } from '../services/listPagination'
 import type { RestRouteContext } from './restRouteTypes'
 import { errorMessage, facturaFechaToPrismaDate, getTenantId } from './restDomainShared'
+
+function parsePositiveIntParam(value: string): number | null {
+  const n = Number.parseInt(value, 10)
+  if (!Number.isInteger(n) || n < 1) return null
+  return n
+}
 
 function parseOptionalDateQuery(value: unknown): Date | undefined {
   if (typeof value !== 'string' || value.trim().length === 0) {
@@ -85,7 +92,7 @@ export function registerCobrosRoutes(app: Application, ctx: RestRouteContext): v
           return
         }
 
-        const { cobro: created, updatedCliente, scoreChange } = result.data
+        const { cobro: created, updatedCliente, scoreChange, retenciones, montoBruto } = result.data
         await writeAudit(req as AuthenticatedRequest, 'cobro_create', 'cobro', String(created.id), {
           scoreBefore: scoreChange.scoreBefore,
           scoreAfter: scoreChange.scoreAfter,
@@ -93,8 +100,34 @@ export function registerCobrosRoutes(app: Application, ctx: RestRouteContext): v
         })
         res.json({
           success: true,
-          data: { cobro: created, updatedCliente },
+          data: { cobro: created, updatedCliente, retenciones, montoBruto },
         })
+      } catch (err: unknown) {
+        res.status(500).json({ success: false, error: errorMessage(err) })
+      }
+    },
+  )
+
+  const retencionesModule = requireModule('finance.retenciones')
+
+  app.get(
+    '/api/cobros/:id/retenciones',
+    retencionesModule,
+    requirePermission('reports.financial.read'),
+    async (req: Request, res: Response) => {
+      const cobroId = parsePositiveIntParam(String(req.params.id))
+      if (cobroId == null) {
+        res.status(400).json({ success: false, error: 'id must be a positive integer' })
+        return
+      }
+      try {
+        const tenantId = getTenantId(req)
+        const data = await cobro.listRetencionesByCobro(tenantId, cobroId)
+        if (data == null) {
+          res.status(404).json({ success: false, error: 'Cobro not found' })
+          return
+        }
+        res.json({ success: true, data })
       } catch (err: unknown) {
         res.status(500).json({ success: false, error: errorMessage(err) })
       }

@@ -408,6 +408,16 @@ export const proveedorBodySchema = z
     return out
   })
 
+const retencionPercepcionLineSchema = z.object({
+  regimenId: z.number().int().min(1),
+  baseImponible: z.number().positive('baseImponible must be positive'),
+  alicuota: z.number().min(0).max(100),
+  importe: z.number().positive('importe must be positive'),
+})
+
+export const facturaPercepcionLineSchema = retencionPercepcionLineSchema
+export const cobroRetencionLineSchema = retencionPercepcionLineSchema
+
 export const facturaBodySchema = z
   .object({
     fecha: z.string(),
@@ -423,6 +433,7 @@ export const facturaBodySchema = z
     iva2: z.number(),
     total: z.number(),
     items: z.array(z.unknown()),
+    percepciones: z.array(facturaPercepcionLineSchema).optional(),
   })
   .superRefine((data, ctx) => {
     const f = data.fecha.trim()
@@ -536,6 +547,9 @@ export const facturaBodySchema = z
       iva2: data.iva2,
       total: data.total,
       items,
+      ...(data.percepciones != null && data.percepciones.length > 0
+        ? { percepciones: data.percepciones }
+        : {}),
     }
     return out
   })
@@ -672,6 +686,7 @@ export const cobroBodySchema = z
     formaPagoId: z.union([z.number(), z.null(), z.undefined()]).optional(),
     referencia: z.string().optional(),
     nota: z.string().optional(),
+    retenciones: z.array(cobroRetencionLineSchema).optional(),
   })
   .superRefine((data, ctx) => {
     if (!Number.isInteger(data.clienteId) || data.clienteId < 1) {
@@ -713,6 +728,9 @@ export const cobroBodySchema = z
       formaPagoId: data.formaPagoId ?? null,
       referencia: ref && ref.length > 0 ? ref : null,
       nota: note && note.length > 0 ? note : null,
+      ...(data.retenciones != null && data.retenciones.length > 0
+        ? { retenciones: data.retenciones }
+        : {}),
     }
   })
 
@@ -1480,12 +1498,7 @@ export { movimientoProveedorCCTipoSchema }
 
 const reciboPagoMetodoSchema = z.enum(['transferencia', 'cheque', 'efectivo', 'echeq'])
 
-const reciboPagoRetencionLineSchema = z.object({
-  regimenId: z.number().int().min(1),
-  baseImponible: z.number().positive('baseImponible must be positive'),
-  alicuota: z.number().min(0).max(100),
-  importe: z.number().positive('importe must be positive'),
-})
+const reciboPagoRetencionLineSchema = retencionPercepcionLineSchema
 
 /** @en Supplier payment receipt body (#271, #276 retenciones). */
 export const reciboPagoBodySchema = z
@@ -1852,6 +1865,10 @@ export const retencionesPreviewQuerySchema = z.object({
   entidadTipo: z.enum(['cliente', 'proveedor']),
   entidadId: z.coerce.number().int().min(1),
   monto: z.coerce.number().positive(),
+  contexto: z.enum(['factura', 'cobro']).optional(),
+  neto1: z.coerce.number().min(0).optional(),
+  neto2: z.coerce.number().min(0).optional(),
+  neto3: z.coerce.number().min(0).optional(),
 })
 
 export function safeParseBodySchema<S extends z.ZodTypeAny>(schema: S, raw: unknown): SafeParseBodyResult<z.output<S>> {

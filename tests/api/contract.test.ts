@@ -614,6 +614,7 @@ function buildPrisma(): PrismaClient {
     },
     cobro: {
       findMany: vi.fn().mockResolvedValue([]),
+      findFirst: vi.fn().mockResolvedValue(null),
     },
     ordenCompra: {
       count: vi.fn().mockResolvedValue(1),
@@ -1494,6 +1495,14 @@ describe('API — contrato OpenAPI', () => {
     const app = createApp(prisma)
     const res = await request(app).get('/api/proveedores/1/pagos/1/retenciones').expect(200)
     await assertMatchesOpenApi('/api/proveedores/{id}/pagos/{reciboId}/retenciones', 'get', '200', res.body)
+  })
+
+  it('GET /api/cobros/{id}/retenciones', async () => {
+    vi.mocked(prisma.cobro.findFirst).mockResolvedValueOnce({ id: 1, tenantId: 1 } as never)
+    vi.mocked(prisma.retencionAplicada.findMany).mockResolvedValueOnce([])
+    const app = createApp(prisma)
+    const res = await request(app).get('/api/cobros/1/retenciones').expect(200)
+    await assertMatchesOpenApi('/api/cobros/{id}/retenciones', 'get', '200', res.body)
   })
 
   it('GET /api/fiscal/retenciones/export returns text/plain', async () => {

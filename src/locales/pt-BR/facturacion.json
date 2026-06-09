@@ -35,6 +35,18 @@
     "iva": "Impostos",
     "total": "TOTAL"
   },
+  "percepciones": {
+    "apply": "Aplicar percepções",
+    "loading": "Calculando percepções sugeridas…",
+    "empty": "Não há percepções sugeridas para esta fatura.",
+    "caption": "Percepções a incluir",
+    "colSelect": "Incluir",
+    "colRegimen": "Regime",
+    "colBase": "Base",
+    "colAlicuota": "Alíquota",
+    "colImporte": "Valor",
+    "sum": "Total percepções"
+  },
   "creditLimitWarning": {
     "title": "Aviso: limite de crédito excedido",
     "detail": "Saldo atual: ${{balance}} + esta NF = ${{projected}} (limite: ${{limit}})",

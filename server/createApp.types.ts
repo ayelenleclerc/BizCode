@@ -108,6 +108,13 @@ export type FacturaItemInput = {
   subtotal: number
 }
 
+export type FacturaPercepcionInput = {
+  regimenId: number
+  baseImponible: number
+  alicuota: number
+  importe: number
+}
+
 export type FacturaInput = {
   fecha: string
   tipo: 'A' | 'B'
@@ -122,6 +129,14 @@ export type FacturaInput = {
   iva2: number
   total: number
   items: FacturaItemInput[]
+  percepciones?: FacturaPercepcionInput[]
+}
+
+export type CobroRetencionInput = {
+  regimenId: number
+  baseImponible: number
+  alicuota: number
+  importe: number
 }
 
 export type FacturaPrintInput = {
@@ -139,6 +154,7 @@ export type CobroInput = {
   formaPagoId?: number | null
   referencia?: string | null
   nota?: string | null
+  retenciones?: CobroRetencionInput[]
 }
 
 export type DeliveryZoneCreateParsed = {

@@ -1,4 +1,5 @@
 ﻿import type { Cliente, Factura, NotaCredito, Prisma, PrismaClient } from '@prisma/client'
+import { Decimal } from '@prisma/client/runtime/library'
 import type { FacturaInput } from '../createApp.types'
 import { assertNoOpenRecuento } from '../lib/recuentoStockGuard'
 import { facturaFechaToPrismaDate } from '../routes/restDomainShared'
@@ -9,6 +10,7 @@ import {
   type StockBelowMinimumAlert,
 } from './facturaStock'
 import { ArcaService } from '../fiscal/ar/ArcaService'
+import { validateFacturaPercepciones } from './RetencionFacturaValidation'
 
 type FacturaWithRelations = Prisma.FacturaGetPayload<{ include: { cliente: true; items: true } }>
 
@@ -98,6 +100,21 @@ export class FacturaService {
       return recuentoBlock
     }
 
+    const percepcionValidation = await validateFacturaPercepciones(this.prisma, tenantId, {
+      neto1: factura.neto1,
+      neto2: factura.neto2,
+      neto3: factura.neto3,
+      iva1: factura.iva1,
+      iva2: factura.iva2,
+      total: factura.total,
+      percepciones: input.percepciones,
+    })
+    if (!percepcionValidation.ok) {
+      return { ok: false, status: percepcionValidation.status, error: percepcionValidation.error }
+    }
+
+    const validatedPercepciones = percepcionValidation.lines
+
     const [newFactura, updatedCliente] = await this.prisma.$transaction(async (tx) => {
       const created = await tx.factura.create({
         data: {
@@ -108,6 +125,23 @@ export class FacturaService {
         } as Parameters<typeof this.prisma.factura.create>[0]['data'],
         include: { items: true, cliente: true },
       })
+
+      for (const line of validatedPercepciones) {
+        await tx.retencionAplicada.create({
+          data: {
+            tenantId,
+            regimenId: line.regimenId,
+            tipo: line.subtipo,
+            entidadTipo: 'cliente',
+            entidadId: clienteId,
+            facturaId: created.id,
+            baseImponible: new Decimal(line.baseImponible),
+            alicuota: new Decimal(line.alicuota),
+            importe: new Decimal(line.importe),
+            constanciaNum: null,
+          },
+        })
+      }
 
       const updated = await tx.cliente.update({
         where: { id: clienteId },
@@ -176,6 +210,10 @@ export class FacturaService {
       const voided = await tx.factura.update({
         where: { id },
         data: { estado: 'N' },
+      })
+
+      await tx.retencionAplicada.deleteMany({
+        where: { tenantId, facturaId: id },
       })
 
       const updatedCliente = await tx.cliente.update({

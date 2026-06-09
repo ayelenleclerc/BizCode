@@ -41,6 +41,10 @@ export type ArcaFacturaPdfInput = {
       subtotal: number
       descripcion: string
     }>
+    percepciones: Array<{
+      nombre: string
+      importe: number
+    }>
   }
   preview: boolean
 }
