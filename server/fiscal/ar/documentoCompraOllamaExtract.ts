@@ -4,10 +4,19 @@ import {
   getDocumentoCompraOllamaBaseUrl,
   getDocumentoCompraOllamaModel,
 } from './documentoCompraOllamaConfig'
+import type { DocumentoCompraItemPreview } from '../../lib/documentoCompraTypes'
 import type { DocumentoCompraTemplateExtractResult } from './documentoCompraTemplateTypes'
+
+export type DocumentoCompraOllamaItemFields = {
+  descripcion?: string | null
+  cantidad?: number | null
+  precio_unitario?: number | null
+  subtotal?: number | null
+}
 
 export type DocumentoCompraOllamaFields = {
   proveedor_cuit?: string | null
+  proveedor_nombre?: string | null
   tipo_comprobante?: string | null
   prefijo?: string | null
   numero?: number | null
@@ -17,6 +26,7 @@ export type DocumentoCompraOllamaFields = {
   neto?: number | null
   iva?: number | null
   confianza?: number | null
+  items?: DocumentoCompraOllamaItemFields[] | null
 }
 
 const OLLAMA_JSON_SCHEMA = {
@@ -32,6 +42,20 @@ const OLLAMA_JSON_SCHEMA = {
     neto: { type: ['number', 'null'] },
     iva: { type: ['number', 'null'] },
     confianza: { type: ['number', 'null'] },
+    proveedor_nombre: { type: ['string', 'null'] },
+    items: {
+      type: ['array', 'null'],
+      items: {
+        type: 'object',
+        properties: {
+          descripcion: { type: ['string', 'null'] },
+          cantidad: { type: ['number', 'null'] },
+          precio_unitario: { type: ['number', 'null'] },
+          subtotal: { type: ['number', 'null'] },
+        },
+        additionalProperties: false,
+      },
+    },
   },
   additionalProperties: false,
 }
@@ -121,6 +145,36 @@ export function mapOllamaFieldsToTemplateExtract(
   if (total == null && numero == null && cuitDigits == null) return null
   if (confidence < 0.3) return null
 
+  const items: DocumentoCompraItemPreview[] = []
+  if (Array.isArray(fields.items)) {
+    for (const row of fields.items) {
+      const descripcion = row.descripcion?.trim() ?? ''
+      const cantidad = row.cantidad
+      const precioUnitario = row.precio_unitario
+      const subtotal = row.subtotal
+      if (
+        descripcion.length < 2 ||
+        cantidad == null ||
+        !Number.isFinite(cantidad) ||
+        cantidad <= 0 ||
+        precioUnitario == null ||
+        !Number.isFinite(precioUnitario) ||
+        subtotal == null ||
+        !Number.isFinite(subtotal)
+      ) {
+        continue
+      }
+      items.push({
+        descripcion,
+        cantidad,
+        precioUnitario,
+        subtotal,
+        articuloId: null,
+        confianza: Math.min(confidence, 0.69),
+      })
+    }
+  }
+
   return {
     issuer: 'ollama-local',
     matches: [],
@@ -132,6 +186,8 @@ export function mapOllamaFieldsToTemplateExtract(
     fechaIso,
     total,
     cae,
+    items,
+    rsocialExtracted: fields.proveedor_nombre?.trim() || null,
   }
 }
 
@@ -160,8 +216,9 @@ export async function extractDocumentoCompraWithOllama(
   const model = getDocumentoCompraOllamaModel()
   const prompt =
     'Extract purchase invoice fields from the text below. Return JSON only with keys: ' +
-    'proveedor_cuit, tipo_comprobante (A|B|C), prefijo, numero, fecha_emision (YYYY-MM-DD), ' +
-    'total, cae, neto, iva, confianza (0-1). Use null when unknown.\n\n' +
+    'proveedor_cuit, proveedor_nombre, tipo_comprobante (A|B|C), prefijo, numero, fecha_emision (YYYY-MM-DD), ' +
+    'total, cae, neto, iva, confianza (0-1), items (array of descripcion, cantidad, precio_unitario, subtotal). ' +
+    'Use null when unknown.\n\n' +
     text.slice(0, 12_000)
 
   const controller = new AbortController()

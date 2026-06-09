@@ -17,6 +17,10 @@ export type DocumentoCompraItemPreview = {
 
 export type DocumentoCompraPreviewData = {
   proveedorId: number | null
+  /** @en CUIT/CNPJ/RUT digits extracted when supplier was not matched (#277 Fase F). */
+  cuitExtracted?: string | null
+  /** @en Supplier name hint from OCR/LLM when available (#277 Fase F). */
+  rsocialExtracted?: string | null
   fecha: string | null
   vencimiento: string | null
   tipo: 'A' | 'B' | 'C' | null
@@ -48,6 +52,8 @@ export type DocumentoCompraImportEstado =
 export function createEmptyDocumentoCompraPreview(): DocumentoCompraPreviewData {
   return {
     proveedorId: null,
+    cuitExtracted: null,
+    rsocialExtracted: null,
     fecha: null,
     vencimiento: null,
     tipo: null,

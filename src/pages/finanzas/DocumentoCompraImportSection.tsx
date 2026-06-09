@@ -6,8 +6,11 @@ import {
   proveedoresAPI,
   type DocumentoCompraColaEstadoDTO,
   type DocumentoCompraImportadoRow,
+  type DocumentoCompraItemPreviewDTO,
   type DocumentoCompraPreviewDataDTO,
 } from '@/lib/api'
+import DocumentoCompraItemsTable from './DocumentoCompraItemsTable'
+import DocumentoCompraProveedorInlineDialog from './DocumentoCompraProveedorInlineDialog'
 import KeyboardHint, { useFormShortcuts } from '@/components/shared/KeyboardHint'
 import { useFormPageHotkeys } from '@/hooks/useListPageKeyboard'
 import type { Proveedor } from '@/types'
@@ -92,6 +95,7 @@ export default function DocumentoCompraImportSection({ onConfirmed }: { onConfir
   const { t } = useTranslation('finanzas')
   const formShortcuts = useFormShortcuts()
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const cameraInputRef = useRef<HTMLInputElement>(null)
   const [proveedores, setProveedores] = useState<Proveedor[]>([])
   const [loadingProveedores, setLoadingProveedores] = useState(false)
   const [uploading, setUploading] = useState(false)
@@ -119,6 +123,8 @@ export default function DocumentoCompraImportSection({ onConfirmed }: { onConfir
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
   const [cola, setCola] = useState<DocumentoCompraColaEstadoDTO | null>(null)
   const [loadingCola, setLoadingCola] = useState(false)
+  const [previewItems, setPreviewItems] = useState<DocumentoCompraItemPreviewDTO[]>([])
+  const [showInlineProveedor, setShowInlineProveedor] = useState(false)
 
   const loadCola = useCallback(async () => {
     setLoadingCola(true)
@@ -171,6 +177,7 @@ export default function DocumentoCompraImportSection({ onConfirmed }: { onConfir
     setTouched({})
     setShowErrors(false)
     setConfirmError(null)
+    setPreviewItems([])
   }
 
   const openDocumentoForReview = (row: DocumentoCompraImportadoRow) => {
@@ -192,6 +199,11 @@ export default function DocumentoCompraImportSection({ onConfirmed }: { onConfir
       setCae,
       setCaeVto,
     })
+    setPreviewItems(
+      Array.isArray(row.datosExtraidos.items)
+        ? row.datosExtraidos.items.map((item) => ({ ...item }))
+        : [],
+    )
     setShowPreview(true)
   }
 
@@ -270,6 +282,18 @@ export default function DocumentoCompraImportSection({ onConfirmed }: { onConfir
         ...(vencimiento.trim()
           ? { vencimiento: new Date(`${vencimiento}T12:00:00.000Z`).toISOString() }
           : {}),
+        ...(previewItems.length > 0
+          ? {
+              items: previewItems.map((item) => ({
+                descripcion: item.descripcion.trim(),
+                cantidad: item.cantidad,
+                precioUnitario: item.precioUnitario,
+                subtotal: item.subtotal,
+                articuloId: item.articuloId ?? null,
+                confianza: item.confianza,
+              })),
+            }
+          : {}),
       })
       setSuccessMessage(
         t('documentoCompra.confirmed', {
@@ -331,14 +355,14 @@ export default function DocumentoCompraImportSection({ onConfirmed }: { onConfir
     fieldConfidence.total,
   )
   const proveedorMismatch =
-    (documento?.tier === 1 ||
-      documento?.tier === 2 ||
-      documento?.tier === 3 ||
-      documento?.tier === 4) &&
-    documento.datosExtraidos.proveedorId == null &&
-    documento.errores != null &&
-    typeof documento.errores === 'object' &&
-    'proveedorId' in (documento.errores as Record<string, unknown>)
+    documento != null &&
+    !proveedorId &&
+    Boolean(
+      documento.datosExtraidos.cuitExtracted ||
+        (documento.errores != null &&
+          typeof documento.errores === 'object' &&
+          'proveedorId' in (documento.errores as Record<string, unknown>)),
+    )
 
   return (
     <section
@@ -416,15 +440,26 @@ export default function DocumentoCompraImportSection({ onConfirmed }: { onConfir
         }}
       >
         <p className="text-sm text-slate-600 dark:text-slate-300 mb-2">{t('documentoCompra.dropHintBatch')}</p>
-        <button
-          type="button"
-          className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded disabled:opacity-50"
-          disabled={uploading}
-          data-testid="documento-compra-btn-select"
-          onClick={() => fileInputRef.current?.click()}
-        >
-          {uploading ? t('documentoCompra.uploading') : t('documentoCompra.selectFile')}
-        </button>
+        <div className="flex flex-wrap justify-center gap-2">
+          <button
+            type="button"
+            className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded disabled:opacity-50"
+            disabled={uploading}
+            data-testid="documento-compra-btn-select"
+            onClick={() => fileInputRef.current?.click()}
+          >
+            {uploading ? t('documentoCompra.uploading') : t('documentoCompra.selectFile')}
+          </button>
+          <button
+            type="button"
+            className="px-4 py-2 bg-slate-600 hover:bg-slate-700 text-white rounded disabled:opacity-50"
+            disabled={uploading}
+            data-testid="documento-compra-btn-camera"
+            onClick={() => cameraInputRef.current?.click()}
+          >
+            {t('documentoCompra.takePhoto')}
+          </button>
+        </div>
         <input
           ref={fileInputRef}
           type="file"
@@ -433,6 +468,16 @@ export default function DocumentoCompraImportSection({ onConfirmed }: { onConfir
           accept=".pdf,.jpg,.jpeg,.png,.webp,.heic,.heif,application/pdf,image/*"
           aria-label={t('documentoCompra.selectFile')}
           data-testid="documento-compra-file-input"
+          onChange={(e) => void handleFiles(e.target.files)}
+        />
+        <input
+          ref={cameraInputRef}
+          type="file"
+          accept="image/*"
+          capture="environment"
+          className="sr-only"
+          aria-label={t('documentoCompra.takePhoto')}
+          data-testid="documento-compra-camera-input"
           onChange={(e) => void handleFiles(e.target.files)}
         />
       </div>
@@ -471,13 +516,24 @@ export default function DocumentoCompraImportSection({ onConfirmed }: { onConfir
                 : null}
             </p>
             {proveedorMismatch ? (
-              <p
-                role="status"
-                className="text-sm text-amber-700 dark:text-amber-400 mb-4"
-                data-testid="documento-compra-proveedor-mismatch"
-              >
-                {t('documentoCompra.proveedorNotMatched')}
-              </p>
+              <div className="mb-4 flex flex-wrap items-center gap-2">
+                <p
+                  role="status"
+                  className="text-sm text-amber-700 dark:text-amber-400"
+                  data-testid="documento-compra-proveedor-mismatch"
+                >
+                  {t('documentoCompra.proveedorNotMatched')}
+                </p>
+                <button
+                  type="button"
+                  className="text-sm text-blue-600 dark:text-blue-400 underline"
+                  data-testid="documento-compra-create-proveedor-btn"
+                  onClick={() => setShowInlineProveedor(true)}
+                  disabled={confirming}
+                >
+                  {t('documentoCompra.createProveedor')}
+                </button>
+              </div>
             ) : (
               <div className="mb-4" />
             )}
@@ -660,6 +716,13 @@ export default function DocumentoCompraImportSection({ onConfirmed }: { onConfir
               </div>
             </div>
 
+            <DocumentoCompraItemsTable
+              items={previewItems}
+              onChange={setPreviewItems}
+              proveedorId={proveedorId}
+              disabled={confirming}
+            />
+
             {confirmError && (
               <p role="alert" className="mt-3 text-sm text-red-600" data-testid="documento-compra-preview-error">
                 {confirmError}
@@ -689,6 +752,20 @@ export default function DocumentoCompraImportSection({ onConfirmed }: { onConfir
           </div>
         </div>
       )}
+
+      <DocumentoCompraProveedorInlineDialog
+        open={showInlineProveedor}
+        initialCuit={documento?.datosExtraidos.cuitExtracted ?? ''}
+        initialRsocial={documento?.datosExtraidos.rsocialExtracted ?? ''}
+        proveedores={proveedores}
+        onClose={() => setShowInlineProveedor(false)}
+        onCreated={(created) => {
+          setProveedores((prev) => [...prev, created])
+          setProveedorId(String(created.id))
+          setShowInlineProveedor(false)
+          markTouched('proveedorId')
+        }}
+      />
     </section>
   )
 }

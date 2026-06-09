@@ -1,0 +1,16 @@
+# Uruguay — DGI style purchase invoice (#277 Fase F).
+issuer: generic-dgi-uruguay
+keywords:
+  - RUT
+  - DGI
+fields:
+  invoice_number: 'N[°º\.\s]+(\d+)'
+  date: 'Fecha\s+(\d{2}/\d{2}/\d{4})'
+  amount: 'TOTAL\s+\$?\s*([\d.,]+)'
+  vat_id: 'RUT[:\s]+([\d-]+)'
+options:
+  currency: UYU
+  date_formats:
+    - '%d/%m/%Y'
+  decimal_separator: ','
+  thousands_separator: '.'

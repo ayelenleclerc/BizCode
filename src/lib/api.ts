@@ -1843,6 +1843,8 @@ export type DocumentoCompraItemPreviewDTO = {
 
 export type DocumentoCompraPreviewDataDTO = {
   proveedorId: number | null
+  cuitExtracted?: string | null
+  rsocialExtracted?: string | null
   fecha: string | null
   vencimiento: string | null
   tipo: 'A' | 'B' | 'C' | null

@@ -123,6 +123,40 @@ describe('documentos-compra API', () => {
     expect(res.body.data.documento.estado).toBe('confirmado')
   })
 
+  it('POST /api/documentos-compra/confirmar persists items in datosExtraidos', async () => {
+    const app = createApp(prisma as never)
+    const res = await request(app)
+      .post('/api/documentos-compra/confirmar')
+      .send({
+        documentoId: 1,
+        fecha: '2026-05-10T12:00:00.000Z',
+        tipo: 'B',
+        prefijo: '0001',
+        numero: 7,
+        proveedorId: 1,
+        neto1: 100,
+        neto2: 0,
+        neto3: 0,
+        iva1: 21,
+        iva2: 0,
+        total: 121,
+        items: [
+          {
+            descripcion: 'Aceite 1L',
+            cantidad: 2,
+            precioUnitario: 50,
+            subtotal: 100,
+            articuloId: 3,
+            confianza: 0.9,
+          },
+        ],
+      })
+      .expect(201)
+
+    expect(res.body.data.documento.datosExtraidos.items).toHaveLength(1)
+    expect(res.body.data.documento.datosExtraidos.items[0].articuloId).toBe(3)
+  })
+
   it('GET /api/documentos-compra/cola returns queue snapshot', async () => {
     const app = createApp(prisma as never)
     const res = await request(app).get('/api/documentos-compra/cola').expect(200)
@@ -144,6 +178,8 @@ describe('documentos-compra API', () => {
     const app = createApp(prisma as never)
     const res = await request(app).get('/api/documentos-compra/templates').expect(200)
     expect(res.body.data.some((t: { issuer: string }) => t.issuer === 'generic-arca-ar')).toBe(true)
+    expect(res.body.data.some((t: { issuer: string }) => t.issuer === 'generic-nfe-brasil')).toBe(true)
+    expect(res.body.data.some((t: { issuer: string }) => t.issuer === 'generic-dgi-uruguay')).toBe(true)
   })
 
   it('GET /api/documentos-compra/:id/original returns file bytes', async () => {

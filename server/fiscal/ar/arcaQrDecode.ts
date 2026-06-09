@@ -169,8 +169,12 @@ export function mapArcaQrToDocumentoCompraPreview(
     iva1: tipo === 'B' ? 0.7 : 0.3,
   }
 
+  const cuitExtracted = arcaQrEmisorCuitDigits(payload)
+
   return {
     proveedorId,
+    cuitExtracted: cuitExtracted.length >= 10 ? cuitExtracted : null,
+    rsocialExtracted: null,
     fecha: fechaIso,
     vencimiento: null,
     tipo,

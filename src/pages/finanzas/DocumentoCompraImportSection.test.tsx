@@ -6,15 +6,29 @@ import DocumentoCompraImportSection from './DocumentoCompraImportSection'
 const mockProcesar = vi.hoisted(() => vi.fn())
 const mockConfirmar = vi.hoisted(() => vi.fn())
 const mockProveedoresList = vi.hoisted(() => vi.fn())
+const mockProveedoresListCatalogo = vi.hoisted(() => vi.fn())
+const mockArticulosGet = vi.hoisted(() => vi.fn())
 
 vi.mock('@/lib/api', () => ({
   documentosCompraAPI: {
     procesar: mockProcesar,
     confirmar: mockConfirmar,
+    getCola: vi.fn().mockResolvedValue({
+      procesando: 0,
+      pendiente_revision: 0,
+      confirmado: 0,
+      descartado: 0,
+      documentos: [],
+    }),
     downloadOriginal: vi.fn(),
   },
   proveedoresAPI: {
     list: mockProveedoresList,
+    listCatalogo: mockProveedoresListCatalogo,
+    create: vi.fn(),
+  },
+  articulosAPI: {
+    get: mockArticulosGet,
   },
   ApiRequestFailedError: class ApiRequestFailedError extends Error {},
 }))
@@ -58,6 +72,8 @@ describe('DocumentoCompraImportSection', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     mockProveedoresList.mockResolvedValue([{ id: 1, codigo: 10, rsocial: 'Proveedor SA' }])
+    mockProveedoresListCatalogo.mockResolvedValue([])
+    mockArticulosGet.mockResolvedValue({ id: 1, descripcion: 'Artículo demo' })
     mockProcesar.mockResolvedValue(sampleDoc)
     mockConfirmar.mockResolvedValue({
       documento: { ...sampleDoc, estado: 'confirmado' },
@@ -93,6 +109,35 @@ describe('DocumentoCompraImportSection', () => {
     expect(await screen.findByTestId('documento-compra-preview-proveedor')).toHaveValue('1')
     expect(screen.getByTestId('documento-compra-preview-numero')).toHaveValue(157)
     expect(screen.getByTestId('documento-compra-confidence')).toHaveTextContent(/1/)
+  })
+
+  it('renders items table when preview includes lines', async () => {
+    mockProcesar.mockResolvedValue({
+      ...sampleDoc,
+      tier: 2,
+      confianza: 0.8,
+      datosExtraidos: {
+        ...sampleDoc.datosExtraidos,
+        proveedorId: 1,
+        total: 100,
+        items: [
+          {
+            descripcion: 'Aceite 1L',
+            cantidad: 2,
+            precioUnitario: 50,
+            subtotal: 100,
+            articuloId: null,
+            confianza: 0.75,
+          },
+        ],
+      },
+    })
+    const user = userEvent.setup()
+    render(<DocumentoCompraImportSection onConfirmed={vi.fn()} />)
+    const file = new File(['%PDF'], 'factura.pdf', { type: 'application/pdf' })
+    await user.upload(screen.getByTestId('documento-compra-file-input'), file)
+    expect(await screen.findByTestId('documento-compra-items-table')).toBeInTheDocument()
+    expect(screen.getByTestId('documento-compra-item-desc-0')).toHaveValue('Aceite 1L')
   })
 
   it('renders drop zone and opens preview after upload', async () => {

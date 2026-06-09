@@ -9,6 +9,7 @@ import type {
   DocumentoCompraTemplateFieldMatch,
 } from './documentoCompraTemplateTypes'
 import type { DocumentoCompraPreviewData } from '../../lib/documentoCompraTypes'
+import { parseDocumentoCompraLineItemsFromText } from './documentoCompraLineItems'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const BUNDLED_TEMPLATES_DIR = path.join(__dirname, 'documento-compra-templates')
@@ -128,12 +129,18 @@ function parseTemplateDate(raw: string, formats: string[]): string | null {
 }
 
 function parseInvoiceNumber(raw: string): { prefijo: string; numero: number } | null {
-  const match = raw.match(/(\d{4,5})\s*[-–]\s*(\d{1,8})/)
-  if (!match) return null
-  const prefijo = match[1].padStart(4, '0').slice(-4)
-  const numero = Number.parseInt(match[2], 10)
+  const compound = raw.match(/(\d{4,5})\s*[-–]\s*(\d{1,8})/)
+  if (compound) {
+    const prefijo = compound[1].padStart(4, '0').slice(-4)
+    const numero = Number.parseInt(compound[2], 10)
+    if (!Number.isFinite(numero) || numero < 1) return null
+    return { prefijo, numero }
+  }
+  const digits = raw.replace(/\D/g, '')
+  if (!digits) return null
+  const numero = Number.parseInt(digits, 10)
   if (!Number.isFinite(numero) || numero < 1) return null
-  return { prefijo, numero }
+  return { prefijo: '0000', numero }
 }
 
 function computeTemplateConfidence(matches: DocumentoCompraTemplateFieldMatch[]): number {
@@ -182,6 +189,8 @@ export function extractWithDocumentoCompraTemplates(
     const confidence = computeTemplateConfidence(matches)
     if (confidence < 0.5) continue
 
+    const items = parseDocumentoCompraLineItemsFromText(text, confidence)
+
     return {
       issuer: template.issuer,
       matches,
@@ -193,6 +202,7 @@ export function extractWithDocumentoCompraTemplates(
       fechaIso,
       total,
       cae,
+      items,
     }
   }
 
@@ -242,8 +252,15 @@ export function mapTemplateExtractToDocumentoCompraPreview(
     iva1: tipo === 'B' ? Math.min(extracted.confidence, 0.75) : 0.3,
   }
 
+  const items =
+    extracted.items && extracted.items.length > 0
+      ? extracted.items
+      : []
+
   return {
     proveedorId,
+    cuitExtracted: extracted.cuitDigits,
+    rsocialExtracted: extracted.rsocialExtracted ?? null,
     fecha: extracted.fechaIso,
     vencimiento: null,
     tipo,
@@ -253,7 +270,7 @@ export function mapTemplateExtractToDocumentoCompraPreview(
     total,
     cae: extracted.cae,
     caeVto: null,
-    items: [],
+    items,
     fieldConfidence,
   }
 }
