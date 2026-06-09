@@ -20,7 +20,7 @@ export function buildRetencionConstanciaPdfBuffer(data: RetencionConstanciaPdfDa
     doc.on('end', () => resolve(Buffer.concat(chunks)))
     doc.on('error', reject)
 
-    const { retencion, empresa, proveedor, fechaPago } = data
+    const { retencion, empresa, contraparte, fechaPago } = data
     const fechaStr = new Date(fechaPago).toLocaleDateString('es-AR')
     const tipoLabel = TIPO_LABELS[retencion.tipo] ?? retencion.regimenNombre
 
@@ -38,8 +38,8 @@ export function buildRetencionConstanciaPdfBuffer(data: RetencionConstanciaPdfDa
     doc.text(`Régimen: ${tipoLabel} — ${retencion.regimenNombre}`)
     doc.moveDown(0.5)
 
-    doc.text(`Sujeto retenido: ${proveedor.rsocial}`)
-    if (proveedor.cuit) doc.text(`CUIT: ${proveedor.cuit}`)
+    doc.text(`Sujeto retenido: ${contraparte.rsocial}`)
+    if (contraparte.cuit) doc.text(`CUIT: ${contraparte.cuit}`)
     doc.moveDown()
 
     doc.fontSize(11).text('Detalle', { underline: true })

@@ -4,7 +4,7 @@
 undefined#/properties/total
 ```
 
-
+Must equal netos + IVA + sum(percepciones) when percepciones are sent (#229).
 
 | Abstract            | Extensible | Status         | Identifiable            | Custom Properties | Additional Properties | Access Restrictions | Defined In                                                                                   |
 | :------------------ | :--------- | :------------- | :---------------------- | :---------------- | :-------------------- | :------------------ | :------------------------------------------------------------------------------------------- |

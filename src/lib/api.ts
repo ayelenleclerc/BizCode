@@ -1325,6 +1325,24 @@ export type CobroListParams = {
   offset?: number
 }
 
+export type CobroRetencionInputDTO = {
+  regimenId: number
+  baseImponible: number
+  alicuota: number
+  importe: number
+}
+
+export type CobroRetencionDTO = {
+  id: number
+  regimenId: number
+  regimenNombre: string
+  tipo: string
+  baseImponible: string
+  alicuota: string
+  importe: string
+  constanciaNum: string | null
+}
+
 export type CobroCreateBody = {
   clienteId: number
   fecha: string
@@ -1332,6 +1350,7 @@ export type CobroCreateBody = {
   formaPagoId?: number | null
   referencia?: string | null
   nota?: string | null
+  retenciones?: CobroRetencionInputDTO[]
 }
 
 export const cobrosAPI = {
@@ -1365,9 +1384,22 @@ export const cobrosAPI = {
       return response.data.data as {
         cobro: Cobro
         updatedCliente: Pick<Cliente, 'id' | 'rsocial' | 'balance' | 'creditLimit' | 'score'>
+        retenciones: CobroRetencionDTO[]
+        montoBruto: string
       }
     } catch (error) {
       handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  listRetenciones: async (cobroId: number): Promise<CobroRetencionDTO[]> => {
+    try {
+      const response = await api.get<{ success: boolean; data: CobroRetencionDTO[] }>(
+        `/cobros/${cobroId}/retenciones`,
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
     }
   },
 }
@@ -2551,6 +2583,10 @@ export const fiscalRetencionesAPI = {
     entidadTipo: 'cliente' | 'proveedor'
     entidadId: number
     monto: number
+    contexto?: 'factura' | 'cobro'
+    neto1?: number
+    neto2?: number
+    neto3?: number
   }): Promise<RetencionPreviewLineDTO[]> => {
     try {
       const response = await api.get<{ success: boolean; data: { retenciones: RetencionPreviewLineDTO[] } }>(

@@ -81,6 +81,7 @@ describe('FacturaService', () => {
         update: vi.fn().mockResolvedValue({ id: 3, rsocial: 'C', balance: 0, creditLimit: null }),
       },
       notaCredito: { create: vi.fn().mockResolvedValue(notaRow) },
+      retencionAplicada: { deleteMany: vi.fn().mockResolvedValue({ count: 0 }) },
       auditEvent: { create: vi.fn().mockResolvedValue({ id: 1 }) },
     }
     vi.mocked(prisma.factura.findFirst).mockResolvedValue(facturaRow as never)

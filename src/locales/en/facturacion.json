@@ -35,6 +35,18 @@
     "iva": "VAT",
     "total": "TOTAL"
   },
+  "percepciones": {
+    "apply": "Apply perceptions",
+    "loading": "Calculating suggested perceptions…",
+    "empty": "No perceptions suggested for this invoice.",
+    "caption": "Perceptions to include",
+    "colSelect": "Include",
+    "colRegimen": "Regime",
+    "colBase": "Base",
+    "colAlicuota": "Rate",
+    "colImporte": "Amount",
+    "sum": "Total perceptions"
+  },
   "creditLimitWarning": {
     "title": "Warning: credit limit exceeded",
     "detail": "Current balance: ${{balance}} + this invoice = ${{projected}} (limit: ${{limit}})",

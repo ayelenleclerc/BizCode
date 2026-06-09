@@ -14,6 +14,7 @@
       "type": "integer"
     },
     "monto": {
+      "description": "Net amount received (#229); CC decremented by bruto when retenciones present.",
       "exclusiveMinimum": 0,
       "type": "number"
     },
@@ -24,6 +25,12 @@
     "referencia": {
       "maxLength": 60,
       "type": "string"
+    },
+    "retenciones": {
+      "items": {
+        "$ref": "./ReciboPagoRetencionInput.schema.json"
+      },
+      "type": "array"
     }
   },
   "required": [

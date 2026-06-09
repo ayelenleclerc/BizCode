@@ -24,6 +24,7 @@ undefined
 | [monto](#monto)             | `number`  | Required | cannot be null | [CobroInput](cobroinput-properties-monto.md "undefined#/properties/monto")             |
 | [nota](#nota)               | `string`  | Optional | cannot be null | [CobroInput](cobroinput-properties-nota.md "undefined#/properties/nota")               |
 | [referencia](#referencia)   | `string`  | Optional | cannot be null | [CobroInput](cobroinput-properties-referencia.md "undefined#/properties/referencia")   |
+| [retenciones](#retenciones) | `array`   | Optional | cannot be null | [CobroInput](cobroinput-properties-retenciones.md "undefined#/properties/retenciones") |
 
 ## clienteId
 
@@ -85,7 +86,7 @@ YYYY-MM-DD or ISO-8601
 
 ## monto
 
-
+Net amount received (#229); CC decremented by bruto when retenciones present.
 
 `monto`
 
@@ -148,3 +149,21 @@ YYYY-MM-DD or ISO-8601
 ### referencia Constraints
 
 **maximum length**: the maximum number of characters for this string is: `60`
+
+## retenciones
+
+
+
+`retenciones`
+
+* is optional
+
+* Type: `object[]` ([ReciboPagoRetencionInput](recibopagoretencioninput.md))
+
+* cannot be null
+
+* defined in: [CobroInput](cobroinput-properties-retenciones.md "undefined#/properties/retenciones")
+
+### retenciones Type
+
+`object[]` ([ReciboPagoRetencionInput](recibopagoretencioninput.md))

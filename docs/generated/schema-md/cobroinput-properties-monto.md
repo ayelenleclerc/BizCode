@@ -4,7 +4,7 @@
 undefined#/properties/monto
 ```
 
-
+Net amount received (#229); CC decremented by bruto when retenciones present.
 
 | Abstract            | Extensible | Status         | Identifiable            | Custom Properties | Additional Properties | Access Restrictions | Defined In                                                                               |
 | :------------------ | :--------- | :------------- | :---------------------- | :---------------- | :-------------------- | :------------------ | :--------------------------------------------------------------------------------------- |

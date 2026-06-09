@@ -17,7 +17,7 @@
     "client": "Cliente",
     "clientPlaceholder": "Selecionar cliente",
     "date": "Data",
-    "amount": "Valor",
+    "amount": "Valor líquido recebido",
     "paymentMethod": "Forma de pagamento",
     "paymentMethodNone": "Não especificado",
     "reference": "Referência",
@@ -30,6 +30,17 @@
       "generic": "Não foi possível registrar o pagamento",
       "suspended": "Cliente está suspenso",
       "inactive": "Cliente está inativo"
+    },
+    "retenciones": {
+      "apply": "Cliente aplicou retenções",
+      "loading": "Calculando retenções sugeridas…",
+      "empty": "Não há retenções sugeridas para este recebimento.",
+      "caption": "Retenções do cliente",
+      "colSelect": "Incluir",
+      "colRegimen": "Regime",
+      "colImporte": "Valor",
+      "bruto": "Bruto CC",
+      "neto": "Líquido recebido"
     }
   },
   "filters": {
