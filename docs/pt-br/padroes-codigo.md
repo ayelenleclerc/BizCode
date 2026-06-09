@@ -47,9 +47,17 @@ Ver [acessibilidade.md](acessibilidade.md). ESLint `jsx-a11y` em CI com `--max-w
 - **100%** de cobertura no escopo acordado: `src/lib/**/*.ts`, `server/createApp.ts` e `server.ts` (ver [TESTING_STRATEGY](quality/estrategia-testes.md), [ADR-0003](adr/ADR-0003-api-contract-testing.md) e [ADR-0005](adr/ADR-0005-vitest-coverage-server-bootstrap.md)).
 - Mock de HTTP com `vi.mock('axios')`; botões principais com `data-testid`.
 
+## Servidor / validação da API REST (Zod)
+
+- **Schemas canônicos:** [`server/schemas/domain.ts`](../../../server/schemas/domain.ts) — pipelines Zod alinhados a [`server/createApp.types.ts`](../../../server/createApp.types.ts).
+- **JSON:** [`server/middleware/validateBody.ts`](../../../server/middleware/validateBody.ts) — `validateBody(schema)` em `req.body`.
+- **Importação CSV:** os mesmos `*BodySchema` via **`safeParseBodySchema`** após `csvRowToRaw*` em [`server/routes/restDomainShared.ts`](../../../server/routes/restDomainShared.ts); rotas em `server/routes/register*Routes.ts`.
+- **Testes:** [`tests/schemas/domain.test.ts`](../../../tests/schemas/domain.test.ts), [`tests/schemas/safeParseBodySchema.test.ts`](../../../tests/schemas/safeParseBodySchema.test.ts); import em [`tests/api/`](../../../tests/api/).
+- **Regra Cursor:** [`.cursor/rules/backend-standards.mdc`](../../../.cursor/rules/backend-standards.mdc).
+
 ## Comentários no código (trilíngue)
 
-Para lógica não óbvia, use JSDoc com as três etiquetas obrigatórias `@en`, `@es`, `@pt-BR`. Exemplo completo em [inglês](../en/padroes-codigo.md#code-comments-trilingual). Não documentar comportamento sem evidência no código.
+Para lógica não óbvia, use JSDoc com as três etiquetas obrigatórias `@en`, `@es`, `@pt-BR`. Exemplo completo em [inglês](../en/coding-standards.md#code-comments-trilingual). Não documentar comportamento sem evidência no código.
 
 Exemplo no código: `validateCUIT` em [`src/lib/validators.ts`](../../../src/lib/validators.ts).
 
@@ -57,4 +65,4 @@ Exemplo no código: `validateCUIT` em [`src/lib/validators.ts`](../../../src/lib
 
 Documentação de produto e qualidade em `docs/` nos diretórios `docs/en/`, `docs/es/`, `docs/pt-br/`. Ver [I18N_DOCUMENTATION.md](../I18N_DOCUMENTATION.md).
 
-**Outros idiomas:** [English](../en/padroes-codigo.md) · [Español](../es/padroes-codigo.md)
+**Outros idiomas:** [English](../en/coding-standards.md) · [Español](../es/estandares-codigo.md)

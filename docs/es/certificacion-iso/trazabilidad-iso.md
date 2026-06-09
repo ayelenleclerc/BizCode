@@ -10,7 +10,10 @@ Esta matriz relaciona los artefactos de calidad de BizCode con cláusulas de nor
 | **accesibilidad.md** + jsx-a11y + `App.a11y.test.tsx` | §8.1 | — | — | Usabilidad §4.2.4 | — |
 | **estrategia-i18n.md** + check-i18n en CI | §8.1 | — | — | Portabilidad §4.2.8 | — |
 | **seguridad.md** | §8.1 | §6.3.8 | A.8.x | Seguridad §4.2.6 | — |
+| **quality/observabilidad.md** + `server/middleware/observability.ts` + `GET /api/metrics` (`audit.read`) | §8.1 | §6.3.2, §6.4.9 | A.8.15 (registro), A.8.16 (monitorización) | Confiabilidad §4.2.2, Seguridad §4.2.6 | 29119-2 |
 | **docs/api/openapi.yaml** + `tests/api/contract.test.ts` | §8.3 | §6.3.2 | — | Idoneidad funcional §4.2.1 | 29119-2 |
+| **ADR-0012 / notas de crédito (#146)** — `PUT /api/facturas/{id}/void`, `GET /api/notas-credito`, UI facturación / finanzas, `tests/api/notas-credito.test.ts`, `tests/api/facturas-void.test.ts` | §8.3 | §6.3.2 | — | Idoneidad funcional §4.2.1 | 29119-2 |
+| **ADR-0013 / Libro IVA Ventas Fase 1 (#147)** — `GET /api/contabilidad/libro-iva-ventas`, UI finanzas, `tests/api/libro-iva-ventas.test.ts`, `tests/server/fiscal/ar/libroIvaVentas.test.ts` | §8.3 | §6.3.2 | — | Idoneidad funcional §4.2.1 | 29119-2 |
 | **plan-swagger-openapi-ui.md** (espejos EN/PT) — checklist Swagger UI, política OpenAPI agentes | §7.5, §8.3 | §6.3.2, §6.4.12 | — | Idoneidad funcional §4.2.1 | 29119-2 |
 | **ADR-0003** | §8.3.3 | §6.3.6 | — | Mantenibilidad §4.2.7 | — |
 | **vision-producto-y-despliegue.md** (espejos EN/PT, **PROD-VISION-001**) — dirección escritorio/SaaS, modularidad fiscal | §7.5, §8.3 | §6.3.2 | — | Portabilidad §4.2.8 | — |
@@ -19,7 +22,10 @@ Esta matriz relaciona los artefactos de calidad de BizCode con cláusulas de nor
 | **manual-calidad.md** | §4.4, §10.2 | §6.1 | — | — | — |
 | **ADR-0001**, **ADR-0002** | §8.3.3 | §6.3.2 | — | — | — |
 | **mapa-datos-personales.md** | §8.1 | — | A.5.12, A.5.33 | — | — |
-| **Manuales de usuario** | §7.5 | §6.4.12 | — | Usabilidad §4.2.4 | — |
+| **Manuales de usuario** (clientes, artículos, facturación, apariencia, cobros, finanzas, reportes, logística) | §7.5 | §6.4.12 | — | Usabilidad §4.2.4 | — |
+| **API de cobros** + `tests/api/cobros.test.ts` | §8.3 | §6.3.2 | — | Idoneidad funcional | 29119-2 |
+| **Logística** (#140–#145): manuales + `tests/api/repartos.test.ts`, `tests/api/ordenes-entrega.test.ts`, `tests/api/logistica-reportes.test.ts`, `repartoUbicacionService.test.ts`, `logisticaReportesService.test.ts`, OpenAPI repartos/GPS/rutas logística | §8.3 | §6.3.2 | A.5.12 (ubicación si `logistics.gps`) | Idoneidad funcional | 29119-2 |
+| **documentacion-generada.md** + `npm run docs:generate` | §7.5 | §6.4.12 | A.8.31 (SBOM) | Mantenibilidad | — |
 | **temas-interfaz.md** | §8.3 | §6.4.12 | — | Usabilidad §4.2.4 | — |
 | **CONTRIBUTING.md** Definition of Done | §8.5.1 | §6.3.6 | A.8.25 | — | 29119-2 §7 |
 | **plantillas-registros.md** | §10.2.2 | §6.7.1 | A.5.33 | — | 29119-3 |

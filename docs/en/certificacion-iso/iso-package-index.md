@@ -212,6 +212,7 @@ This register is the **single master index** for ISO-oriented controlled documen
 | Testing strategy | [../quality/testing-strategy.md](../quality/testing-strategy.md) |
 | CI/CD | [../quality/ci-cd.md](../quality/ci-cd.md) |
 | Swagger / OpenAPI UI plan | [../quality/swagger-openapi-ui-plan.md](../quality/swagger-openapi-ui-plan.md) |
+| Generated documentation | [../quality/generated-documentation.md](../quality/generated-documentation.md) |
 
 ## Product specifications and API
 
@@ -219,6 +220,10 @@ This register is the **single master index** for ISO-oriented controlled documen
 |----------|------|
 | OpenAPI contract | [../../api/openapi.yaml](../../api/openapi.yaml) |
 | Specs index | [../specs/index.md](../specs/index.md) |
+| User manual: Collections | [../user/manual-collections.md](../user/manual-collections.md) |
+| User manual: Finance | [../user/manual-finance.md](../user/manual-finance.md) |
+| User manual: Reports | [../user/manual-reports.md](../user/manual-reports.md) |
+| User manual: Logistics | [../user/manual-logistics.md](../user/manual-logistics.md) |
 
 ## Supply chain evidence (SBOM)
 

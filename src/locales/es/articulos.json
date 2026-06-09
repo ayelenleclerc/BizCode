@@ -14,6 +14,40 @@
     "activo": "Activo"
   },
   "empty": "No hay artículos. Crea uno con F3.",
+  "importRubros": {
+    "button": "Importar rubros CSV",
+    "title": "Importar rubros desde CSV",
+    "description": "Descargá la plantilla, completá las filas y exportá como CSV UTF-8. La primera fila debe coincidir con la plantilla.",
+    "downloadTemplate": "Descargar plantilla CSV",
+    "chooseFile": "Elegir archivo .csv",
+    "submit": "Importar",
+    "close": "Cerrar",
+    "loading": "Importando…",
+    "successSummary": "Importación finalizada: {{created}} creados, {{skipped}} omitidos.",
+    "errorsHeading": "Filas con error",
+    "row": "Fila",
+    "message": "Mensaje",
+    "errorNetwork": "No se pudo completar la importación. Comprobá la conexión.",
+    "errorGeneric": "No se pudo importar. Verificá el archivo.",
+    "hintFormat": "Solo .csv. Máx. 1 MB y hasta 2000 filas de datos."
+  },
+  "importArticulos": {
+    "button": "Importar artículos CSV",
+    "title": "Importar artículos desde CSV",
+    "description": "La columna rubroCodigo debe coincidir con el código de un rubro existente. Descargá la plantilla y no modifiquéis la fila de encabezados.",
+    "downloadTemplate": "Descargar plantilla CSV",
+    "chooseFile": "Elegir archivo .csv",
+    "submit": "Importar",
+    "close": "Cerrar",
+    "loading": "Importando…",
+    "successSummary": "Importación finalizada: {{created}} creados, {{skipped}} omitidos.",
+    "errorsHeading": "Filas con error",
+    "row": "Fila",
+    "message": "Mensaje",
+    "errorNetwork": "No se pudo completar la importación. Comprobá la conexión.",
+    "errorGeneric": "No se pudo importar. Verificá el archivo.",
+    "hintFormat": "Solo .csv. Máx. 1 MB y hasta 2000 filas de datos."
+  },
   "iva": {
     "1": "21%",
     "2": "10.5%",
@@ -44,5 +78,58 @@
     "errors": {
       "generic": "Error al guardar artículo"
     }
+  },
+  "stockAdjust": {
+    "button": "Ajustar stock",
+    "title": "Ajuste manual de stock",
+    "readonlyHint": "El stock solo se modifica con ajustes auditados (no desde este formulario).",
+    "cantidad": "Cantidad (+ ingreso / − egreso)",
+    "cantidadHint": "Use números negativos para salidas.",
+    "motivo": "Motivo",
+    "submit": "Aplicar ajuste",
+    "errors": {
+      "cantidad": "Indique una cantidad distinta de cero.",
+      "motivo": "El motivo es obligatorio.",
+      "insufficient": "Stock insuficiente para este ajuste.",
+      "generic": "No se pudo aplicar el ajuste."
+    }
+  },
+  "stockHistory": {
+    "title": "Historial de ajustes",
+    "loading": "Cargando historial…",
+    "empty": "Sin ajustes registrados.",
+    "total": "Total de registros: {{count}}",
+    "columns": {
+      "date": "Fecha",
+      "qty": "Cantidad",
+      "reason": "Motivo",
+      "user": "Usuario"
+    }
+  },
+  "comparador": {
+    "view": "Ver proveedores",
+    "hide": "Ocultar proveedores",
+    "title": "Comparador de proveedores",
+    "subtitle": "Artículo {{codigo}} — {{descripcion}}",
+    "empty": "Ningún proveedor activo con este artículo en catálogo.",
+    "tableCaption": "Precios de lista por proveedor",
+    "colProveedor": "Proveedor",
+    "colCodigoProveedor": "Cód. proveedor",
+    "colPrecioLista": "Precio lista",
+    "colUltActualiz": "Últ. actualiz.",
+    "colUltCompra": "Últ. compra",
+    "colAcciones": "Acciones",
+    "accionOc": "OC",
+    "masBarato": "Proveedor más barato",
+    "sinPrecio": "Sin precio",
+    "precioDesactualizado": "Precio desactualizado ({{dias}} días)",
+    "diasAtras": "hace {{dias}} días",
+    "sortBy": "Ordenar por",
+    "sortDir": "Dirección",
+    "sortPrecio": "Precio lista",
+    "sortPrecioFecha": "Fecha de precio",
+    "sortUltimaCompra": "Última compra",
+    "sortAsc": "Ascendente",
+    "sortDesc": "Descendente"
   }
 }

@@ -8,18 +8,31 @@ import request from 'supertest'
 import type { Application } from 'express'
 import { PrismaClient } from '@prisma/client'
 import { createApp } from '../../server/createApp'
+import { buildArticuloCreateBody, createIntegrationRubro } from '../fixtures/catalogFactories'
 
 async function truncateAll(prisma: PrismaClient): Promise<void> {
   // Use Prisma model operations to avoid coupling tests to physical table naming/casing.
   await prisma.$transaction([
+    prisma.notaCredito.deleteMany(),
     prisma.facturaItem.deleteMany(),
+    prisma.pedido.deleteMany(),
     prisma.factura.deleteMany(),
     prisma.articulo.deleteMany(),
     prisma.cliente.deleteMany(),
     prisma.rubro.deleteMany(),
+    prisma.proveedor.deleteMany(),
     prisma.formaPago.deleteMany(),
     prisma.paramEmpresa.deleteMany(),
   ])
+}
+
+/** Ensures row id=1 exists for BIZCODE_TEST_AUTH_BYPASS (see server/auth.ts). */
+async function ensureBypassTenant(prisma: PrismaClient): Promise<void> {
+  await prisma.tenant.upsert({
+    where: { id: 1 },
+    create: { id: 1, name: 'Integration tenant', slug: 'integration-tenant-1', active: true },
+    update: { active: true },
+  })
 }
 
 describe('API — integración PostgreSQL (Prisma real)', () => {
@@ -32,9 +45,13 @@ describe('API — integración PostgreSQL (Prisma real)', () => {
         'DATABASE_URL no está definida. Para pruebas locales: configura .env o exporta DATABASE_URL apuntando a tu PostgreSQL (p. ej. Docker).',
       )
     }
+    // Tras `dotenv/config`, un .env local puede fijar NODE_ENV=development y desactivar el bypass de auth en tests.
+    process.env.NODE_ENV = 'test'
+    process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
     prisma = new PrismaClient()
     app = createApp(prisma)
     await prisma.$connect()
+    await ensureBypassTenant(prisma)
   })
 
   afterAll(async () => {
@@ -55,6 +72,7 @@ describe('API — integración PostgreSQL (Prisma real)', () => {
     const res = await request(app).get('/api/clientes').expect(200)
     expect(res.body.success).toBe(true)
     expect(res.body.data).toEqual([])
+    expect(res.body).toMatchObject({ total: 0, limit: 100, offset: 0 })
   })
 
   it('POST /api/clientes persiste y GET /api/clientes/:id lee desde PostgreSQL', async () => {
@@ -64,7 +82,7 @@ describe('API — integración PostgreSQL (Prisma real)', () => {
       .send({
         codigo: 42,
         rsocial: 'Cliente integración SA',
-        condIva: 'R',
+        condIva: 'RI',
         activo: true,
       })
       .expect(200)
@@ -79,7 +97,66 @@ describe('API — integración PostgreSQL (Prisma real)', () => {
       id,
       codigo: 42,
       rsocial: 'Cliente integración SA',
-      condIva: 'R',
+      condIva: 'RI',
     })
+  })
+
+  it('GET /api/articulos con tabla vacía devuelve lista vacía', async () => {
+    const res = await request(app).get('/api/articulos').expect(200)
+    expect(res.body.success).toBe(true)
+    expect(res.body.data).toEqual([])
+    expect(res.body).toMatchObject({ total: 0, limit: 100, offset: 0 })
+  })
+
+  it('POST /api/articulos persiste y GET /api/articulos/:id lee desde PostgreSQL', async () => {
+    const rubro = await createIntegrationRubro(prisma, { codigo: 9101, nombre: 'Rubro E2E int' })
+    const body = buildArticuloCreateBody(rubro.id, 4301)
+
+    const createRes = await request(app).post('/api/articulos').send(body).expect(200)
+    expect(createRes.body.success).toBe(true)
+    const id = createRes.body.data.id as number
+    expect(id).toBeGreaterThan(0)
+
+    const getRes = await request(app).get(`/api/articulos/${id}`).expect(200)
+    expect(getRes.body.success).toBe(true)
+    expect(getRes.body.data).toMatchObject({
+      id,
+      codigo: 4301,
+      descripcion: 'Artículo integración',
+      rubroId: rubro.id,
+    })
+  })
+
+  it('GET /api/rubros incluye rubros creados en la misma transacción de prueba', async () => {
+    await createIntegrationRubro(prisma, { codigo: 9202, nombre: 'Rubro list int' })
+    const res = await request(app).get('/api/rubros').expect(200)
+    expect(res.body.success).toBe(true)
+    expect(Array.isArray(res.body.data)).toBe(true)
+    const codes = (res.body.data as { codigo: number }[]).map((r) => r.codigo)
+    expect(codes).toContain(9202)
+  })
+
+  it('no expone entidades de otro tenant en listados y lecturas por id', async () => {
+    const other = await prisma.tenant.create({
+      data: { name: 'Tenant B', slug: `tenant-b-${Date.now()}`, active: true },
+    })
+    const otherCliente = await prisma.cliente.create({
+      data: {
+        tenantId: other.id,
+        codigo: 66001,
+        rsocial: 'Cliente otro tenant SA'.slice(0, 30),
+        condIva: 'RI',
+        activo: true,
+      },
+    })
+
+    const listRes = await request(app).get('/api/clientes').expect(200)
+    expect(listRes.body.success).toBe(true)
+    expect(typeof listRes.body.total).toBe('number')
+    expect((listRes.body.data as { id: number }[]).some((c) => c.id === otherCliente.id)).toBe(false)
+
+    const getRes = await request(app).get(`/api/clientes/${otherCliente.id}`).expect(200)
+    expect(getRes.body.success).toBe(true)
+    expect(getRes.body.data).toBeNull()
   })
 })

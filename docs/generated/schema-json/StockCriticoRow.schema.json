@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "articulo": {
+      "$ref": "./StockCriticoArticulo.schema.json"
+    },
+    "deficit": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "minimo": {
+      "type": "integer"
+    },
+    "stock": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "articulo",
+    "stock",
+    "minimo",
+    "deficit"
+  ],
+  "title": "StockCriticoRow",
+  "type": "object"
+}

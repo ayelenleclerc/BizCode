@@ -31,6 +31,8 @@
 
 ## Quick Start
 
+See [docs/en/quality/local-development-setup.md](docs/en/quality/local-development-setup.md) (ES/PT-BR paths in [docs/DOCUMENT_LOCALE_MAP.md](docs/DOCUMENT_LOCALE_MAP.md)) for the full contributor setup. Summary:
+
 ```bash
 # 1. Clone the repository
 git clone <repo-url>
@@ -87,6 +89,11 @@ Automated tests cover the seed logic via [`tests/scripts/seed-superadmin.test.ts
 | `npm run check:docs-map` | Verify paths in `docs/DOCUMENT_LOCALE_MAP.md` exist |
 | `npm run bootstrap:superadmin` | Optional one-off SuperAdmin creation (see table above; uses `BIZCODE_BOOTSTRAP_*` env vars) |
 | `npm run migrate:dbf` | Migración desde DBF (script `scripts/migrate-from-dbf.ts`) |
+| `npm run reparto-ubicacion:purge` | Purge GPS location samples older than 7 days (`logistics.gps`; see [privacy data map](docs/en/privacy-data-map.md)) |
+
+### Logistics (issues #140–#145)
+
+When tenant modules are enabled: **delivery orders** (`/logistica`), **picking** (`logistics.picking`), **routes** (`logistics.dispatches`), **driver POD** (`logistics.pod`), **live GPS** (`logistics.gps`, map at `/logistica/seguimiento`), and **KPIs/reports** (tab on `/logistica`, #145). Operator manual (EN): [docs/en/user/manual-logistics.md](docs/en/user/manual-logistics.md) · ES/PT-BR paths in [docs/DOCUMENT_LOCALE_MAP.md](docs/DOCUMENT_LOCALE_MAP.md).
 
 ### Environment Variables
 

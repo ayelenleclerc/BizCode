@@ -24,7 +24,9 @@
     "subtotal": "Subtotal",
     "empty": "No items. Press Ins to add.",
     "addItem": "➕ Add Item (Ins)",
-    "selectArticulo": "Select..."
+    "selectArticulo": "Select...",
+    "rowAria": "Item {{n}}, click to select this row",
+    "rowAriaSelected": "Item {{n}}, row selected"
   },
   "totals": {
     "neto21": "Net 21%",
@@ -32,6 +34,11 @@
     "netoExento": "Net Exempt",
     "iva": "VAT",
     "total": "TOTAL"
+  },
+  "creditLimitWarning": {
+    "title": "Warning: credit limit exceeded",
+    "detail": "Current balance: ${{balance}} + this invoice = ${{projected}} (limit: ${{limit}})",
+    "hint": "You may continue recording the sale or cancel it."
   },
   "errors": {
     "noCliente": "Please select a customer",
@@ -59,6 +66,55 @@
     "iva21": "VAT 21%",
     "iva105": "VAT 10.5%"
   },
+  "void": {
+    "button": "Void invoice",
+    "confirmTitle": "Confirm void?",
+    "motivoLabel": "Reason for voiding",
+    "motivoPlaceholder": "E.g.: Wrong price, returned by customer…",
+    "motivoRequired": "Reason is required",
+    "motivoMinLength": "Reason must be at least 10 characters",
+    "confirm": "Confirm void",
+    "cancel": "Cancel",
+    "loading": "Voiding…",
+    "error": "Could not void the invoice"
+  },
   "save": "✓ Save Invoice (F5)",
-  "cancel": "Cancel (Esc)"
+  "cancel": "Cancel (Esc)",
+  "cae": {
+    "column": "CAE",
+    "pending": "CAE pending",
+    "issued": "CAE issued",
+    "failed": "CAE failed",
+    "retry": "Retry CAE",
+    "retryLoading": "Requesting CAE…",
+    "retryError": "Could not request CAE",
+    "previewPdf": "Preview PDF",
+    "downloadPdf": "Download PDF",
+    "pdfLoading": "Generating PDF…",
+    "pdfError": "Could not generate PDF",
+    "caeNumber": "CAE: {{cae}}",
+    "caeVto": "Expires: {{date}}"
+  },
+  "pdfModal": {
+    "title": "PDF — {{filename}}",
+    "close": "Close",
+    "download": "Download PDF",
+    "print": "Print / preview",
+    "ticket": "80mm ticket",
+    "previewFrameTitle": "Invoice PDF preview",
+    "actions": "PDF actions"
+  },
+  "print": {
+    "actionsGroup": "Print with device",
+    "thermal": "80mm thermal (mock)",
+    "fiscal": "Fiscal printer (mock)",
+    "legalPdf": "Legal PDF",
+    "loading": "Sending print job…",
+    "feedback": {
+      "mockSuccess": "Mock print job sent (job {{jobId}}).",
+      "fiscalFallbackPdf": "Fiscal disabled: opened legal PDF.",
+      "thermalFallbackPdf": "Thermal disabled: opened legal PDF.",
+      "error": "Could not print with the selected device"
+    }
+  }
 }

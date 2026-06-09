@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "lat": {
+      "type": "number"
+    },
+    "lng": {
+      "type": "number"
+    },
+    "recordedAt": {
+      "format": "date-time",
+      "type": "string"
+    }
+  },
+  "required": [
+    "lat",
+    "lng",
+    "recordedAt"
+  ],
+  "title": "RepartoUbicacion",
+  "type": "object"
+}

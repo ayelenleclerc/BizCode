@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "esAgenteRetencionGanancias": {
+      "type": "boolean"
+    },
+    "esAgenteRetencionIIBB": {
+      "type": "boolean"
+    },
+    "esAgenteRetencionIVA": {
+      "type": "boolean"
+    }
+  },
+  "title": "FiscalRetencionesConfigInput",
+  "type": "object"
+}

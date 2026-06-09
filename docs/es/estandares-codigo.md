@@ -52,10 +52,18 @@ Ver [accesibilidad.md](accesibilidad.md). ESLint `jsx-a11y` en CI con `--max-war
 - **100%** de cobertura en `src/lib/**/*.ts`, `server/createApp.ts` y `server.ts` (véase [TESTING_STRATEGY](quality/estrategia-pruebas.md), [ADR-0003](adr/ADR-0003-api-contract-testing.md) y [ADR-0005](adr/ADR-0005-vitest-coverage-server-bootstrap.md)).
 - Mock de HTTP con `vi.mock('axios')`; botones principales con `data-testid`.
 
+## Servidor / validación API REST (Zod)
+
+- **Esquemas canónicos:** [`server/schemas/domain.ts`](../../../server/schemas/domain.ts) — tuberías Zod (`.superRefine` / `.transform`) alineadas con [`server/createApp.types.ts`](../../../server/createApp.types.ts).
+- **JSON:** [`server/middleware/validateBody.ts`](../../../server/middleware/validateBody.ts) — `validateBody(esquema)` sobre `req.body`.
+- **Importación CSV:** mismos `*BodySchema` vía **`safeParseBodySchema`** tras `csvRowToRaw*` en [`server/routes/restDomainShared.ts`](../../../server/routes/restDomainShared.ts); rutas en `server/routes/register*Routes.ts` (clientes, artículos, rubros, proveedores).
+- **Pruebas:** [`tests/schemas/domain.test.ts`](../../../tests/schemas/domain.test.ts), [`tests/schemas/safeParseBodySchema.test.ts`](../../../tests/schemas/safeParseBodySchema.test.ts); import en [`tests/api/`](../../../tests/api/).
+- **Regla Cursor:** [`.cursor/rules/backend-standards.mdc`](../../../.cursor/rules/backend-standards.mdc).
+
 ## Comentarios en código (trilingües)
 
-Para lógica no obvia, use JSDoc con las tres etiquetas **obligatorias** `@en`, `@es`, `@pt-BR` (una frase cada una). Véase el ejemplo en [inglés](../en/estandares-codigo.md#code-comments-trilingual). No documentar comportamiento no evidenciado en el código.
+Para lógica no obvia, use JSDoc con las tres etiquetas **obligatorias** `@en`, `@es`, `@pt-BR` (una frase cada una). Véase el ejemplo en [inglés](../en/coding-standards.md#code-comments-trilingual). No documentar comportamiento no evidenciado en el código.
 
 Ejemplo en código: `validateCUIT` en [`src/lib/validators.ts`](../../../src/lib/validators.ts).
 
-**Otros idiomas:** [English](../en/estandares-codigo.md) · [Português](../pt-br/padroes-codigo.md)
+**Otros idiomas:** [English](../en/coding-standards.md) · [Português](../pt-br/padroes-codigo.md)

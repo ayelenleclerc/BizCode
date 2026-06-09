@@ -1,25 +1,28 @@
 # Factura Schema
 
 ```txt
-undefined#/properties/data/items
+undefined#/properties/factura
 ```
 
 
 
-| Abstract            | Extensible | Status         | Identifiable | Custom Properties | Additional Properties | Access Restrictions | Defined In                                                                                                 |
-| :------------------ | :--------- | :------------- | :----------- | :---------------- | :-------------------- | :------------------ | :--------------------------------------------------------------------------------------------------------- |
-| Can be instantiated | No         | Unknown status | No           | Forbidden         | Allowed               | none                | [FacturaListEnvelope.schema.json\*](../schema-json/FacturaListEnvelope.schema.json "open original schema") |
+| Abstract            | Extensible | Status         | Identifiable | Custom Properties | Additional Properties | Access Restrictions | Defined In                                                                                             |
+| :------------------ | :--------- | :------------- | :----------- | :---------------- | :-------------------- | :------------------ | :----------------------------------------------------------------------------------------------------- |
+| Can be instantiated | No         | Unknown status | No           | Forbidden         | Allowed               | none                | [FacturaVoidResult.schema.json\*](../schema-json/FacturaVoidResult.schema.json "open original schema") |
 
-## items Type
+## factura Type
 
 `object` ([Factura](factura.md))
 
-# items Properties
+# factura Properties
 
 | Property                    | Type      | Required | Nullable       | Defined by                                                                       |
 | :-------------------------- | :-------- | :------- | :------------- | :------------------------------------------------------------------------------- |
+| [cae](#cae)                 | `string`  | Optional | cannot be null | [Factura](factura-properties-cae.md "undefined#/properties/cae")                 |
+| [caeVto](#caevto)           | `string`  | Optional | cannot be null | [Factura](factura-properties-caevto.md "undefined#/properties/caeVto")           |
 | [clienteId](#clienteid)     | `integer` | Optional | cannot be null | [Factura](factura-properties-clienteid.md "undefined#/properties/clienteId")     |
 | [estado](#estado)           | `string`  | Optional | cannot be null | [Factura](factura-properties-estado.md "undefined#/properties/estado")           |
+| [estadoCae](#estadocae)     | `string`  | Optional | cannot be null | [Factura](factura-properties-estadocae.md "undefined#/properties/estadoCae")     |
 | [fecha](#fecha)             | `string`  | Optional | cannot be null | [Factura](factura-properties-fecha.md "undefined#/properties/fecha")             |
 | [formaPagoId](#formapagoid) | `integer` | Optional | cannot be null | [Factura](factura-properties-formapagoid.md "undefined#/properties/formaPagoId") |
 | [id](#id)                   | `integer` | Optional | cannot be null | [Factura](factura-properties-id.md "undefined#/properties/id")                   |
@@ -34,6 +37,46 @@ undefined#/properties/data/items
 | [tipo](#tipo)               | `string`  | Optional | cannot be null | [Factura](factura-properties-tipo.md "undefined#/properties/tipo")               |
 | [total](#total)             | `number`  | Optional | cannot be null | [Factura](factura-properties-total.md "undefined#/properties/total")             |
 | Additional Properties       | Any       | Optional | can be null    |                                                                                  |
+
+## cae
+
+
+
+`cae`
+
+* is optional
+
+* Type: `string`
+
+* cannot be null
+
+* defined in: [Factura](factura-properties-cae.md "undefined#/properties/cae")
+
+### cae Type
+
+`string`
+
+## caeVto
+
+
+
+`caeVto`
+
+* is optional
+
+* Type: `string`
+
+* cannot be null
+
+* defined in: [Factura](factura-properties-caevto.md "undefined#/properties/caeVto")
+
+### caeVto Type
+
+`string`
+
+### caeVto Constraints
+
+**date time**: the string must be a date time string, according to [RFC 3339, section 5.6](https://tools.ietf.org/html/rfc3339 "check the specification")
 
 ## clienteId
 
@@ -70,6 +113,34 @@ undefined#/properties/data/items
 ### estado Type
 
 `string`
+
+## estadoCae
+
+
+
+`estadoCae`
+
+* is optional
+
+* Type: `string`
+
+* cannot be null
+
+* defined in: [Factura](factura-properties-estadocae.md "undefined#/properties/estadoCae")
+
+### estadoCae Type
+
+`string`
+
+### estadoCae Constraints
+
+**enum**: the value of this property must be equal to one of the following values:
+
+| Value       | Explanation |
+| :---------- | :---------- |
+| `"pending"` |             |
+| `"issued"`  |             |
+| `"failed"`  |             |
 
 ## fecha
 

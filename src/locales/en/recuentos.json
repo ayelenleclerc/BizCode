@@ -1,0 +1,39 @@
+{
+  "title": "Inventory count",
+  "subtitle": "Physical count and stock adjustment for variances",
+  "noAccess": "You do not have permission to run inventory counts.",
+  "empty": "No inventory counts recorded.",
+  "stockBlocked": "A count is in progress: stock-changing operations are blocked until it is closed.",
+  "estado": {
+    "in_progress": "In progress",
+    "closed": "Closed"
+  },
+  "columns": {
+    "id": "No.",
+    "fecha": "Date",
+    "operador": "Operator",
+    "estado": "Status",
+    "items": "Items"
+  },
+  "actions": {
+    "start": "Start count",
+    "saveCounts": "Save counts",
+    "close": "Close count",
+    "pdf": "View variance PDF",
+    "closeDialog": "Close"
+  },
+  "detail": {
+    "title": "Count #{{id}}",
+    "progress": "{{counted}} of {{total}} items counted",
+    "codigo": "Code",
+    "descripcion": "Description",
+    "sistema": "System",
+    "fisico": "Physical",
+    "diff": "Variance",
+    "pending": "Pending"
+  },
+  "errors": {
+    "alreadyOpen": "An inventory count is already in progress.",
+    "incomplete": "Count all items before closing."
+  }
+}

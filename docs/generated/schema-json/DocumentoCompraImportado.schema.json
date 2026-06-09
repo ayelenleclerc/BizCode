@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "archivoMime": {
+      "type": "string"
+    },
+    "archivoNombre": {
+      "type": "string"
+    },
+    "archivoPath": {
+      "type": "string"
+    },
+    "comprobanteCompraId": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "confianza": {
+      "type": "number"
+    },
+    "createdAt": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "datosExtraidos": {
+      "$ref": "./DocumentoCompraPreviewData.schema.json"
+    },
+    "errores": {
+      "nullable": true,
+      "type": "object"
+    },
+    "estado": {
+      "enum": [
+        "procesando",
+        "pendiente_revision",
+        "confirmado",
+        "descartado"
+      ],
+      "type": "string"
+    },
+    "id": {
+      "type": "integer"
+    },
+    "tenantId": {
+      "type": "integer"
+    },
+    "tier": {
+      "type": "integer"
+    },
+    "tipoArchivo": {
+      "type": "string"
+    },
+    "updatedAt": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "usuarioId": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "id",
+    "tenantId",
+    "usuarioId",
+    "archivoNombre",
+    "archivoMime",
+    "archivoPath",
+    "tipoArchivo",
+    "tier",
+    "confianza",
+    "estado",
+    "datosExtraidos",
+    "createdAt",
+    "updatedAt"
+  ],
+  "title": "DocumentoCompraImportado",
+  "type": "object"
+}

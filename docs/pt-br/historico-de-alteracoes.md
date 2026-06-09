@@ -8,12 +8,106 @@ Versionamento: [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Adicionado
+
+- **Modelo de retenções/percepções (#228):** Prisma `RegimenRetencion`, `RetencionAplicada`, `FiscalRetencionesConfig`; API `GET/POST/PUT /api/fiscal/regimenes`, `GET/PUT /api/fiscal/config-retenciones`, `GET /api/fiscal/retenciones`, `GET /api/fiscal/retenciones/preview` (stub até #229); UI em **Configurações → Empresa** (`finance.retenciones`, `settings.fiscal.manage`); OpenAPI, testes de contrato/API, i18n empresa trilíngue.
+
+- **Scanner de documentos de compra — Fase G (GitHub #277):**** verificação de duplicados por fornecedor (`GET /api/documentos-compra/verificar-duplicado`, alerta proativa na UI, confirmação bloqueada com 409), mapeamento de linhas com buscar/criar/ignorar artigo, OCR `spa+eng+por`, UI de templates YAML (`settings.fiscal.manage`); armazenamento local e estoque em remito diferidos documentados nos manuais.
+
+- **Scanner de documentos de compra — Fase F (GitHub #277):** extração de itens (Tier 4 Ollama + parsing em templates), tabela de itens no preview com indicadores de confiança e mapeamento `articuloId`, API confirmar persiste `items[]` em `datosExtraidos`, criação inline de fornecedor a partir de CUIT/CNPJ/RUT extraído, templates YAML Brasil (`generic-nfe-brasil`) e Uruguai (`generic-dgi-uruguay`), captura por câmera no celular; OpenAPI, testes API/UI, manuais de finanças trilíngues.
+
+- **Snapshot de catálogo na OC e PDF (GitHub #323):** `OrdenCompraItem.codigoProveedor` e `descripcionProveedor` como snapshot de `ProveedorArticulo` ativo ao criar/atualizar; `GET /api/compras/{id}/pdf` imprimível com cabeçalho do fornecedor e colunas de catálogo (fallback para dados internos do artigo); tabela de itens na UI Compras, pré-preenchimento do catálogo, extensão do comparador e botão **Baixar PDF**; OpenAPI, testes e manuais trilíngues.
+
+- **Acessibilidade por teclado (telas):** hooks reutilizáveis (`useListPageKeyboard`, `KeyboardHint`) e referências visíveis de atalhos em listagens, formulários, finanças, logística, login e início; política ampliada em `docs/*/acessibilidade.md` (Enter abrir/editar).
+
+### Alterado
+
+- **Renomeação AFIP → ARCA (breaking):** rotas `/api/arca/*`, módulo `billing.arca_cae`, cliente `arcaAPI`, `ArcaService`, scripts `arca:retry-pending*`; migração Prisma `20260608120000_arca_module_rename`; i18n empresa/finanzas; ADR-0014 renomeado para `legal-arca-invoice-pdf`. URLs literais do portal (`afip.gob.ar`) mantidas em QR/PDF.
+
+- **Comparador de preços por fornecedor (GitHub #274):** `ArticuloProveedoresComparadorService`; `GET /api/articulos/{id}/proveedores` e `GET /api/proveedores/comparar?articuloId=` (módulo `logistics.purchases`, `products.read` ou `suppliers.read`); linhas de catálogo ativas com preço de lista, indicador de preço desatualizado (>30 dias) e data da última OC **recebida**; botão **Ver fornecedores** na ficha do produto com ordenação, destaque do mais barato, aviso de preço antigo e ação **[OC]** (`suppliers.manage`) que pré-preenche o formulário de compras; OpenAPI, testes e manuais trilíngues.
+
+- **Catálogo de produtos por fornecedor (GitHub #273):** modelo `ProveedorArticulo` e migração; `GET/POST /api/proveedores/{id}/catalogo`, `PUT .../catalogo/{articuloId}`, `POST .../catalogo/import` (módulo `logistics.purchases`); códigos, descrições e preços de lista por fornecedor e importação CSV; aba **Catálogo** na ficha com indicadores de idade do preço; auditoria `proveedor_catalogo_*`; OpenAPI, testes e manuais trilíngues.
+
+- **Histórico de compras de fornecedor (GitHub #272):** `GET /api/proveedores/{id}/historial` e `GET /api/proveedores/{id}/articulos` com períodos móveis (30/90/180/365 dias); métricas de OC recebidas e comprovantes (total, frequência, top artigos, PMP); aba **Histórico** na ficha do fornecedor; OpenAPI, testes e manuais trilíngues.
+
+- **Recibo de pagamento a fornecedor (GitHub #271):** modelos `ReciboPago` + `ReciboPagoFactura`; `GET/POST /api/proveedores/{id}/pagos`, helper de comprovantes pendentes, anulação e PDF; movimento `pago` automático na CC; UI na aba conta corrente; módulo `finance.receipts`; OpenAPI, testes e manuais trilíngues.
+
+- **Conta corrente de fornecedor (GitHub #270):** modelo `MovimientoProveedorCC` com saldo corrido; `GET/POST` em `/api/proveedores/{id}/cuenta-corriente`; movimento automático ao criar comprovante de compra; aba UI com saldo, alerta de limite, gráfico 6 meses e ajuste manual auditado; OpenAPI, testes e manuais trilíngues.
+- **Ficha completa de fornecedor (GitHub #269):** modelo `Proveedor` ampliado (bancário, comercial, contato); filtros `activo`/`categoria` em `GET /api/proveedores`; `DELETE /api/proveedores/{id}` desativação lógica; validação CBU/CUIT; UI Fornecedores com seções recolhíveis; manuais trilíngues e OpenAPI.
+
+- **Livro IVA Compras (GitHub #306):** modelo `ComprobanteCompra` para comprovantes fiscais de fornecedor; `POST /api/comprobantes-compra`; `GET /api/contabilidad/libro-iva-compras` (`reports.financial.read`, módulo `finance.ledger`) com `format=preview|txt|xlsx` (ZIP `CBTU.txt` + `ALICUOTAS.txt`); seção de exportação em **Finanças**; ADR-0014; OpenAPI e testes (EN/ES/PT-BR).
+
+- **Impressão POS opcional (hardware opt-in):** `THERMAL_PRINTER_ENABLED` (desligado por padrão) alinhado ao fiscal; `GET /api/printing/status` expõe `thermalPrinterEnabled`; impressão de fatura com fallback para PDF legal; UI oculta ações fiscal/térmica se desabilitadas; doc trilíngue [impressao-pos-opcional.md](pt-br/quality/impressao-pos-opcional.md). Drivers físicos permanecem opcionais por cliente (#153 Fase 2).
+
+- **Endurecimento de sanitização de logs (GitHub #218):** catálogo ampliado `LOGGER_REDACT_PATHS` em [`server/logRedaction.ts`](../../server/logRedaction.ts), auditoria de superfícies de log e política de retenção/acesso (EN/ES/PT-BR), e guardrail `npm run check:logs` integrado em `docs:validate`. Complementa o #151 sem duplicar o MVP de observabilidade.
+
+- **Headers HTTP de segurança (GitHub #214):** middleware `helmet` na API REST ([`server/middleware/securityHeaders.ts`](../../server/middleware/securityHeaders.ts)) com `X-Frame-Options: DENY`, `X-Content-Type-Options`, CSP, `Referrer-Policy` e HSTS em produção; testes em [`tests/server/security-headers.test.ts`](../../tests/server/security-headers.test.ts). CORS permanece via `CORS_ORIGINS`.
+
+- **Baseline de observabilidade MVP (GitHub #151):** logs estruturados do servidor com redação em Pino (`password`, `token`, `authorization`, `cookie`, `session`, `secret`, `privateKey`, `certificate`), correlação de requests por `X-Request-Id`, endpoint técnico em memória `GET /api/metrics` protegido com `audit.read`, diagnóstico aditivo em `/api/health` (checagem DB + latência, uptime, versão), atualização de OpenAPI/testes e documentação trilíngue de observabilidade. Prometheus/Grafana/Loki/Datadog/Sentry e alertas reais permanecem fora de escopo.
+
+- **Baseline Docker produtivo + workflow de deploy (GitHub #149):** adicionados `Dockerfile` (backend), `Dockerfile.frontend` (build Vite + runtime Nginx), `docker-compose.prod.yml` (server + frontend + PostgreSQL com health checks), configuração de proxy interno Nginx para API (`deploy/nginx/default.conf`), `.dockerignore`, atualização de referência de variáveis em `.env.example` e workflow `.github/workflows/deploy.yml` com build/test sempre, publicação condicional no GHCR e deploy condicional por SSH (exige secrets). Valores reais de host/domínio/certificados ficam fora do repositório.
+
+- **PDF legal AFIP (GitHub #148):** `GET /api/facturas/{id}/pdf` (PDF fiscal com CAE emitido), `/pdf/preview` (não fiscal), `/ticket` (80 mm operacional); layout alinhado RG 4291, QR e código de barras I2of5; campos emitente em `ParamEmpresa`; modal pré-visualização/impressão em Faturamento; ADR-0014. Validação manual no portal AFIP pendente.
+
+- **Livro IVA Vendas — Fase 1 (GitHub #147):** `GET /api/contabilidad/libro-iva-ventas` (`reports.financial.read`, módulo `finance.ledger`) exporta vendas a partir de `Factura`; `format=preview|txt|xlsx` (ZIP `CBTV.txt` + `ALICUOTAS.txt`); NC e anulações tipo `999` conforme ADR-0013; seção **Contabilidade** em **Finanças**; **Livro IVA Compras fora de escopo** (issue posterior). OpenAPI, testes, manuais (EN/ES/PT-BR).
+
+- **Anulação de fatura e notas de crédito (GitHub #146):** `PUT /api/facturas/{id}/void` (`sales.cancel`, módulo `billing.credit_notes`, motivo mín. 10 caracteres) devolve fatura atualizada, `NotaCredito` emitida e saldo do cliente; `GET /api/notas-credito`, `GET /api/notas-credito/{id}` (`reports.financial.read` ou `reports.operational.read`); fluxo AFIP conforme ADR-0012; **Finanças** lista notas por intervalo (UI com módulo); **Faturamento** ação anular condicionada a `billing.credit_notes`; OpenAPI, testes (`notas-credito`, `facturas-void`), manuais e specs (EN/ES/PT-BR).
+
+- **KPIs e relatórios logísticos (GitHub #145):** `dispatchedAt` / `dispatchTimestampSource` em `OrdenEntrega` (ADR-0011); `GET /api/logistica/kpis`, `reporte-choferes`, `reporte-zonas` (`logistics.read`, módulo `logistics.dispatches`, agregados no DB); aba **Relatórios** em `/logistica` com cards KPI, ranking de motoristas, tabela por zona, export CSV; i18n, OpenAPI, testes e manual (EN/ES/PT-BR).
+
+- **Rastreamento GPS em tempo real (GitHub #144):** modelo `RepartoUbicacion`; `POST /api/repartos/{id}/ubicacion` (`orders.deliver.confirm`, motorista na própria rota `on_route`, módulo `logistics.gps`); `GET /api/repartos/activos` e `GET .../ubicacion/ultima` (`logistics.read`, papéis `owner`/`manager`/`logistics_planner`); purga de localizações com mais de 7 dias; UI `/logistica/seguimiento` (mapa Leaflet, polling 60 s); app motorista envia posição a cada 2 min (opcional se geolocalização negada); script `npm run reparto-ubicacion:purge`; OpenAPI, testes e manual (EN/ES/PT-BR).
+
+- **Picking no depósito (GitHub #143):** estados `picking` / `ready` / `cancelled` em `OrdenEntrega`; campos `pickerUserId`, `pickingIniciadoAt`, `pickingListoAt`; `POST /api/ordenes-entrega/{id}/iniciar-picking` e `POST .../lista` (`orders.pick`, módulo `logistics.picking`); `GET /api/ordenes-entrega` também com `orders.pick`; repartos (#140) só aceitam OEs `ready`; UI `/logistica/picking`; OpenAPI, testes e manual (EN/ES/PT-BR).
+
+- **Comprovante de entrega (POD) em itens de reparto (GitHub #142):** campos em `RepartoItem` (receptor, notas, `motivoNoEntrega`, `podMedia` JSON); `PUT /api/repartos/{id}/items/{itemId}` (`orders.deliver.confirm`, motorista na própria rota `on_route`) e `GET .../pod` (`logistics.read`, papéis `owner`/`manager`/`logistics_planner`); listagens com `hasPod` sem blobs; UI motorista `/logistica/repartos/chofer` (módulo `logistics.pod`, wizard 4 etapas); badge e diálogo no back-office; OpenAPI, testes e manual (EN/ES/PT-BR).
+
+- **Repartos / rotas de entrega (GitHub #140):** modelos `Reparto` / `RepartoItem`; API `GET/POST /api/repartos`, `GET /api/repartos/{id}`, `POST .../iniciar`, `POST .../cerrar`; leitura `logistics.read`, mutações `orders.dispatch`; agrupa OEs pendentes, inicia rota (`on_route`), ao fechar itens pendentes `not_delivered` e OEs `failed`; UI `/logistica/repartos` (módulo `logistics.dispatches`, reordenação por arrastar); OpenAPI, testes e manual de logística (EN/ES/PT-BR).
+
+- **Análise avançada do dashboard (GitHub #138):** `GET /api/dashboard/ventas-historico` (agregação PostgreSQL, JSON + CSV); aba **Análise** em **Início** com gráficos linha/barras/pizza (recharts), presets 30/90/365 dias, filtros vendedor e zona; exige `reports.operational.read` e módulo `analytics.advanced`; índice `Factura_tenantId_estado_fecha_idx`; OpenAPI, testes e manual de relatórios (EN/ES/PT-BR).
+
+- **Contagem física de inventário (GitHub #136):** modelos `Recuento` / `RecuentoItem`; API `GET/POST /api/recuentos`, `GET /api/recuentos/{id}`, `PUT .../items`, `POST .../close`, `GET .../pdf`; permissão `inventory.count`; bloqueio de estoque `RECUENTO_IN_PROGRESS` em ajustes, recebimento de compras e faturamento; UI `/recuentos` (módulo `inventory.count`); OpenAPI, testes e manual de logística (EN/ES/PT-BR).
+
+- **Migração DBF de clientes (GitHub #51):** `npm run migrate:dbf` importa clientes de `CLIENTES.DBF` quando o arquivo existe com linhas (`legacyClienteDbf.ts`, `clienteBodySchema`, relatório de rejeições); placeholders `91001`–`91010` apenas sem mestre populado; ver [Testes de migração DBF](guides/testes-migracao-dbf.md) e `scripts/MIGRACION_PROGRAMA_VIEJO.md`. Carga em massa no app via importação CSV (#58).
+
+- **Planos SaaS e limites por tenant (GitHub #181):** modelos `Plan` / `TenantPlan`; `GET /api/planes`, `GET /api/me/plan`, `POST /api/superadmin/tenants/:id/plan`; `requirePlanFeature`; limites em `POST /api/users` e `POST /api/facturas`; `PlanProvider`, `PlanGate`, seletor no detalhe SuperAdmin; i18n EN/ES/PT-BR.
+
+- **Pricing e trials de módulos SuperAdmin (GitHub #226):** `GET /api/superadmin/tenants/:id/pricing`, `GET/POST/DELETE .../trials`; modelo `TenantModuleTrial`; `src/lib/modules/pricing.ts`, `TenantPricingService`, `TenantTrialService`; `npm run modules:trial-expire`; notificação `module_trial_expiring`; UI pricing/trial em `/superadmin/tenants/:id/modules`; OpenAPI e testes API; i18n EN/ES/PT-BR (sync billing adiado para #181).
+
+- **UI de módulos SuperAdmin (GitHub #225):** página `/superadmin/tenants/:id/modules` com toggles, motivo obrigatório, modelos e histórico; clientes `superadminAPI` (config) e `modulesCatalogAPI` em `src/lib/api.ts`; testes `TenantModulesPage.test.tsx`; i18n `common.superadmin.modules.*` (EN/ES/PT-BR).
+
+- **Painel SuperAdmin multi-tenant (GitHub #137):** API `GET/POST/PATCH /api/superadmin/tenants`, `GET /api/superadmin/tenants/:id`, `GET /api/superadmin/stats` com `requireSuperAdmin` e `platform.tenants.manage`; serviço `SuperadminTenantService`; UI `/superadmin` (lista, detalhe, suspender/reativar) e link placeholder para módulos (`#225`); OpenAPI e `tests/api/superadmin-tenants.test.ts`; i18n EN/ES/PT-BR em `common.superadmin.*`.
+
+- **Feature flags no frontend (GitHub #224):** `FeatureFlagsContext` / `useFeatureFlags`; `GET /api/me/features` via `featuresAPI`; `IfModule`, `ModuleRoute`, `FeatureFlagsGate`; nav e rotas condicionais (`navSections.ts`, `Layout`, `App.tsx`); alerta acessível em `/inicio`; i18n `modules.*`; testes em `FeatureFlagsContext.test.tsx`, `IfModule.test.tsx`, `Layout.nav-modules.test.tsx`.
+
+- **Feature flags por tenant (GitHub #223):** modelos `TenantConfig` / `TenantConfigHistory`; `GET /api/me/features`; middleware `requireModule` (ex.: `billing.orders` em `/api/pedidos`); API SuperAdmin `GET/PUT /api/superadmin/tenants/:id/config`, histórico e `POST .../apply-template`; `TenantConfig` no `setup-owner` e seed; cache em processo (sem Redis); i18n `errors.moduleNotEnabled`; testes em `tests/api/me-features.test.ts`, `tests/api/superadmin-tenant-config.test.ts`, `tests/server/require-module.test.ts`.
+
 ### Corrigido
+
+- **Filtros de cobranças (a11y):** campos de filtro em `/cobros` com rótulo visível e `aria-label` / `placeholder`; [`src/pages/cobros/index.tsx`](../../src/pages/cobros/index.tsx).
 
 - **CORS + cookie de sessão:** `cors` no Express usa `credentials: true` e allowlist de origens (`http://localhost:5173`, `http://127.0.0.1:5173`, mais `CORS_ORIGINS` em CSV) para o SPA (Axios `withCredentials`) receber e enviar cookies de sessão entre origens; [`server/createApp.ts`](../../server/createApp.ts), [`.env.example`](../../.env.example), [`tests/server/cors.test.ts`](../../tests/server/cors.test.ts); [seguranca.md](seguranca.md) atualizado.
 
 ### Adicionado
 
+- **Ordens de compra (GitHub #135):** `OrdenCompra` + `OrdenCompraItem`; CRUD `/api/compras`, `POST .../send`, `POST .../receive` (recebimento parcial → `StockAjuste` motivo `compra`); UI `/compras`; RBAC `suppliers.read` / `suppliers.manage` + `inventory.adjust` na recepção; i18n EN/ES/PT-BR.
+- **Lembretes de inadimplência (GitHub #134):** modelo `CobroRecordatorio`; configuração por tenant em `ParamEmpresa` (`recordatorioDiasGracia`, `timezone` IANA, janela comercial `recordatorioHoraInicio` / `recordatorioHoraFin`) editável em **Configurações → Empresa**; `GET /api/cobranzas/vencidas` e `POST /api/cobranzas/recordatorios` (`reports.financial.read`); `CobranzasService` com slot 08:00 e horário no fuso do tenant; job multi-tenant `npm run cobranzas:recordatorios` (cron horário `0 * * * *` recomendado); notificações `invoice_overdue` enriquecidas; seção em `/finanzas`; auditoria `cobranza_recordatorio_send`; i18n EN/ES/PT-BR.
+- **AFIP CAE (GitHub #133):** `GET /api/arca/config` (somente metadados), PDF da fatura (`GET /api/facturas/:id/pdf`, pré-visualização com marca d'água), badges CAE e reprocessamento na UI de faturamento, seção AFIP em empresa (`billing.arca_cae`), mock WSFE homologação, `npm run arca:retry-pending-job` (cron `*/5`), i18n EN/ES/PT-BR.
+- **Pedidos comerciais (GitHub #132):** modelos `Pedido` / `PedidoItem`; `GET/POST/PUT/DELETE /api/pedidos` e `POST .../confirm` / `POST .../invoice` (estados e rotas em inglês, ADR-0009); RBAC `orders.create` / `sales.create` / `sales.cancel`; auditoria `pedido_*`; UI de listagem `/pedidos`; i18n EN/ES/PT-BR. Gating modular: `requireModule('billing.orders')` (#223).
+
+- **Migração DBF de catálogo (GitHub #131):** parsers `legacyRubroDbf.ts` / `legacyArticuloDbf.ts`; `POST /api/rubros/migrate-dbf` e `POST /api/articulos/migrate-dbf` (`settings.business.manage`, upsert por código); `npm run migrate:dbf` importa `RUBROS.DBF` / `ARTICULOS.DBF` quando existirem (fallback `PVAR2`/`PVAR`); fixtures e testes de integração.
+
+- **Ajustes de estoque (GitHub #128):** modelo `StockAjuste` e migração; `POST /api/articulos/:id/stock-ajuste` (`inventory.adjust`) e `GET /api/articulos/:id/stock-historial`; ao criar fatura decrementa estoque e notifica `stock_below_minimum`; auditoria `stock_adjust`; i18n EN/ES/PT-BR.
+
+- **Documentação (sincronização ISO-ready):** pacote specs v0.2 (RF-011–RF-015); manuais de cobranças, finanças, relatórios e logística (EN/ES/PT-BR); fluxo operacional MVP; rastreabilidade ISO e stubs REQ-007, TST-003, TST-005, ARC-004; pós-processamento TypeDoc [`scripts/patch-typedoc-html-noopener.mjs`](../../scripts/patch-typedoc-html-noopener.mjs); [`DOCUMENT_LOCALE_MAP.md`](../DOCUMENT_LOCALE_MAP.md).
+- **Configuração da empresa (GitHub #127):** `ParamEmpresa` por tenant com `GET/PUT /api/empresa`; `puntoVenta` define `prefijoFactura` de 4 dígitos; UI em `/configuracion/empresa` (edição com `settings.business.manage`); formulário de nova fatura pré-preenche prefixo e tipo padrão; i18n EN/ES/PT-BR.
+- **Score de pagamento (GitHub #130):** Recálculo automático de `Cliente.score` em `POST /api/cobros` pelos dias em atraso vs fatura ativa mais antiga (+5 / −3 / −7 / −15); sem alteração sem fatura ativa; `metadata` de auditoria com `scoreBefore`, `scoreAfter`, `delta`; resposta inclui `updatedCliente`; tooltip na ficha do cliente; i18n EN/ES/PT-BR.
+- **Ordens de entrega (GitHub #126):** modelo `OrdenEntrega` e migração; API `GET/POST/PUT /api/ordenes-entrega` com RBAC; listagem restrita ao motorista; auditoria em mudanças de status (`entrega_confirmed`); UI `/logistica` planner e motorista; i18n EN/ES/PT-BR.
+- **Relatórios (GitHub #129):** Relatórios operacionais em `/reportes` — `GET /api/reportes/ventas`, `GET /api/reportes/stock-critico`, `GET /api/reportes/cobranzas` com exportação JSON ou `Accept: text/csv`; permissões `reports.operational.read` / `reports.financial.read`; i18n EN/ES/PT-BR.
+- **Finanças (GitHub #125):** Módulo real em `/finanzas` — `GET /api/reportes/aging` e `GET /api/reportes/cuenta-corriente/:clienteId` (aging por `creditDays`, extrato com saldo acumulado); `facturasVencidas` do dashboard com a mesma regra de vencimento; i18n EN/ES/PT-BR.
+
+- **Cobranças (GitHub #124):** Registro de pagamentos de clientes — modelo `Cobro`, API REST (`POST/GET /api/cobros`), UI `/cobros`, recebimentos recentes na ficha do cliente, widget `cobrosHoy` do dashboard com dados reais; i18n EN/ES/PT-BR.
+
+- **Backend (GitHub #79):** importação CSV usa os mesmos esquemas Zod `*BodySchema` que o corpo JSON do REST (`safeParseBodySchema` em [`server/schemas/domain.ts`](../../server/schemas/domain.ts)); restrições **CHECK** no PostgreSQL para `Articulo.stock`, `Articulo.minimo` e `Cliente.creditLimit` (migração `prisma/migrations/20260505130000_nonneg_entity_checks`); documentação em [padroes-codigo.md](padroes-codigo.md) e [`.cursor/rules/backend-standards.mdc`](../../.cursor/rules/backend-standards.mdc); manuais do usuário citam erros de importação com nome do campo.
 - **Gestão de usuários (issue #25):** `GET/POST /api/users`, `PUT /api/users/:id`, `POST /api/auth/change-password`; página Usuários (`src/pages/users/`) com DataTable + modal criação/edição, atalhos de teclado (F2/F3/F5/Esc), restrição de hierarquia de perfis; componente `<CanAccess permission="..." />` para renderização condicional por permissão; link na sidebar visível somente para titulares de `users.manage`; i18n em EN/ES/PT-BR; 17 novos testes de integração; OpenAPI atualizado; docs trilingues em `docs/*/quality/`.
 
 ### Added

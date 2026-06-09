@@ -1,0 +1,1135 @@
+# QA Standards for BizCode
+
+**Purpose:** Establish comprehensive testing strategies, quality gates, and testing best practices for BizCode production deployment.
+**Scope:** Unit, integration, E2E, component, visual, accessibility, performance, security, and manual testing.
+**Status:** Production-ready QA standards for 6-8 week implementation.
+
+---
+
+## 1. TEST STRATEGY & COVERAGE
+
+### Standard: Comprehensive multi-layer testing with clear coverage targets
+
+**Testing Pyramid:**
+```
+       Manual Testing (5%)
+      ┌─────────────────┐
+      │  E2E Tests      │  5-10% of tests
+      │  (Playwright)   │  Validate critical paths
+      │                 │  Time: slow, high value
+      └────────┬────────┘
+    Integration Tests (15-20%)
+    ┌──────────────────────┐
+    │  Integration Tests   │  15-20% of tests
+    │  (Vitest + DB)       │  API, database, services
+    │                      │  Time: medium, good value
+    └──────────┬───────────┘
+  Unit Tests (70-80%)
+  ┌──────────────────────────┐
+  │     Unit Tests           │  70-80% of tests
+  │     (Vitest)             │  Individual functions
+  │                          │  Time: fast, isolation
+  └──────────────────────────┘
+```
+
+**Coverage Targets:**
+- **Unit Tests:** ≥90% coverage for src/lib/*, server/* critical paths
+- **Integration Tests:** ≥75% coverage for API routes, database operations
+- **E2E Tests:** ≥6 critical user flows (login, create, edit, delete, error handling, RBAC)
+- **Component Tests:** ≥75% coverage for interactive components
+- **Visual Regression:** ≥95% of pages captured and baseline matched
+- **Accessibility:** 100% automated a11y checks pass, zero critical violations
+- **Performance:** P95 response time <500ms, error rate <0.1%
+- **Security:** 100% SAST scan pass, DAST coverage on critical paths
+
+**Coverage Calculation:**
+```
+Total Coverage = (Lines Covered / Lines Executable) × 100%
+
+Acceptable:
+├── src/lib/**         ≥90% (utilities, validation, helpers)
+├── server/routes/**   ≥85% (API endpoints)
+├── server/services/** ≥85% (business logic)
+├── src/components/**  ≥75% (UI components)
+├── src/pages/**       ≥60% (page orchestration)
+└── src/contexts/**    ≥90% (state management)
+
+NOT acceptable:
+├── < 60% on any critical module
+├── Test files (exclude from coverage)
+└── Generated files (exclude from coverage)
+```
+
+**Validation Checklist:**
+```
+✓ `npm run test` runs all unit tests
+✓ `npm run test:integration` runs API + database tests
+✓ `npm run test:e2e` runs Playwright critical paths
+✓ Coverage report generated in coverage/index.html
+✓ No coverage decrease allowed in PRs
+✓ All tests pass on CI before merge
+```
+
+---
+
+## 2. UNIT TESTING
+
+### Standard: Vitest with comprehensive assertions and clear test structure
+
+**Test File Organization:**
+```
+src/
+├── lib/
+│   ├── validators.ts
+│   └── validators.test.ts     (same folder, .test.ts suffix)
+├── components/
+│   ├── Button.tsx
+│   └── Button.test.tsx
+└── contexts/
+    ├── AuthContext.tsx
+    └── AuthContext.test.tsx
+
+tests/
+├── unit/                       (if tests in separate folder)
+│   ├── lib/
+│   │   └── validators.test.ts
+│   └── utils/
+│       └── formatting.test.ts
+├── integration/
+│   └── api/
+└── e2e/
+    └── critical-paths.spec.ts
+```
+
+**Test Structure:**
+```typescript
+import { describe, it, expect, beforeEach, afterEach } from 'vitest'
+import { validateCUIT } from '../validators'
+
+describe('validateCUIT', () => {
+  describe('valid inputs', () => {
+    it('should accept valid CUIT', () => {
+      const result = validateCUIT('20123456789')
+      expect(result).toBe(true)
+    })
+
+    it('should accept CUIT with spaces', () => {
+      const result = validateCUIT('20 123 456 789')
+      expect(result).toBe(true)
+    })
+  })
+
+  describe('invalid inputs', () => {
+    it('should reject CUIT with invalid checksum', () => {
+      const result = validateCUIT('20123456780')
+      expect(result).toBe(false)
+    })
+
+    it('should reject non-numeric CUIT', () => {
+      const result = validateCUIT('20ABC456789')
+      expect(result).toBe(false)
+    })
+
+    it('should reject null/undefined', () => {
+      expect(validateCUIT(null)).toBe(false)
+      expect(validateCUIT(undefined)).toBe(false)
+    })
+  })
+
+  describe('edge cases', () => {
+    it('should handle empty string', () => {
+      const result = validateCUIT('')
+      expect(result).toBe(false)
+    })
+  })
+})
+```
+
+**Best Practices:**
+- ✅ One assertion per test (or tightly related)
+- ✅ Descriptive test names (what should happen)
+- ✅ Arrange-Act-Assert pattern
+- ✅ Test behavior, not implementation
+- ✅ Mock external dependencies
+- ✅ Use fixtures for complex data
+- ❌ Don't test third-party libraries
+- ❌ Don't have shared state between tests
+- ❌ Don't use magic numbers (use named constants)
+
+**Coverage Enforcement:**
+```javascript
+// vitest.config.ts
+export default defineConfig({
+  test: {
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'html', 'json'],
+      lines: 90,
+      functions: 90,
+      branches: 90,
+      statements: 90,
+      exclude: [
+        'node_modules/',
+        'dist/',
+        'tests/',
+        '**/*.test.ts',
+        '**/*.spec.ts',
+        '**/types.ts'
+      ]
+    }
+  }
+})
+```
+
+---
+
+## 3. INTEGRATION TESTING
+
+### Standard: Vitest + real database testing with proper cleanup
+
+**Integration Test Structure:**
+```typescript
+// tests/integration/api/clientes.test.ts
+import { describe, it, expect, beforeEach, afterEach } from 'vitest'
+import { PrismaClient } from '@prisma/client'
+import { createApp } from '../../../server/createApp'
+
+const prisma = new PrismaClient()
+
+describe('POST /api/clientes', () => {
+  let app: any
+  let testTenantId: string
+  let testUserId: string
+
+  beforeEach(async () => {
+    // Create test app instance
+    app = createApp(process.env.DATABASE_URL)
+    
+    // Seed test data
+    const tenant = await prisma.tenant.create({
+      data: { name: 'Test Tenant' }
+    })
+    testTenantId = tenant.id
+
+    const user = await prisma.appUser.create({
+      data: {
+        tenantId: testTenantId,
+        email: 'test@test.com',
+        passwordHash: '<bcrypt-fixture-use-hashPassword-in-real-tests>',
+        role: 'ADMIN'
+      }
+    })
+    testUserId = user.id
+  })
+
+  afterEach(async () => {
+    // Clean up test data
+    await prisma.cliente.deleteMany({ where: { tenantId: testTenantId } })
+    await prisma.appUser.deleteMany({ where: { tenantId: testTenantId } })
+    await prisma.tenant.deleteMany({ where: { id: testTenantId } })
+  })
+
+  it('should create client with valid data', async () => {
+    const response = await app.request('POST', '/api/clientes', {
+      headers: { 'X-Tenant-ID': testTenantId, 'X-User-ID': testUserId },
+      body: {
+        nombre: 'Test Client',
+        cuit: '20123456789',
+        email: 'client@test.com'
+      }
+    })
+
+    expect(response.status).toBe(201)
+    expect(response.body.data.id).toBeDefined()
+    expect(response.body.data.nombre).toBe('Test Client')
+
+    // Verify in database
+    const client = await prisma.cliente.findUnique({
+      where: { id: response.body.data.id }
+    })
+    expect(client).toBeDefined()
+  })
+
+  it('should reject invalid CUIT', async () => {
+    const response = await app.request('POST', '/api/clientes', {
+      headers: { 'X-Tenant-ID': testTenantId, 'X-User-ID': testUserId },
+      body: {
+        nombre: 'Test Client',
+        cuit: 'INVALID',
+        email: 'client@test.com'
+      }
+    })
+
+    expect(response.status).toBe(400)
+    expect(response.body.error.code).toBe('INVALID_CUIT')
+  })
+
+  it('should enforce multi-tenant isolation', async () => {
+    // Create client in tenant A
+    const otherTenant = await prisma.tenant.create({
+      data: { name: 'Other Tenant' }
+    })
+
+    const client = await prisma.cliente.create({
+      data: {
+        tenantId: otherTenant.id,
+        nombre: 'Other Tenant Client',
+        cuit: '30123456789'
+      }
+    })
+
+    // Try to access from tenant B
+    const response = await app.request('GET', `/api/clientes/${client.id}`, {
+      headers: { 'X-Tenant-ID': testTenantId, 'X-User-ID': testUserId }
+    })
+
+    expect(response.status).toBe(403)
+  })
+})
+```
+
+**Best Practices:**
+- ✅ Use real database (not mocks)
+- ✅ Isolate each test (no interdependencies)
+- ✅ Clean up after each test
+- ✅ Test both success and failure paths
+- ✅ Verify database state, not just API response
+- ✅ Test error handling and edge cases
+- ❌ Don't depend on test execution order
+- ❌ Don't share database state between tests
+
+---
+
+## 4. END-TO-END (E2E) TESTING
+
+### Standard: Playwright with critical path focus and real browser testing
+
+**Critical Paths to Test:**
+```
+1. Authentication
+   ├── Login with valid credentials
+   ├── Login with invalid credentials
+   ├── Logout
+   ├── Session timeout
+   └── Password reset
+
+2. Client Management
+   ├── Create client
+   ├── Edit client
+   ├── Delete client
+   ├── Search client
+   ├── CSV import
+   └── Validate CUIT
+
+3. Invoicing (Most Critical)
+   ├── Create invoice
+   ├── Select client (auto-fill)
+   ├── Add line items
+   ├── Calculate totals
+   ├── Apply taxes (IVA)
+   ├── Save invoice
+   ├── Print invoice
+   ├── Cancel invoice
+   └── Verify audit trail
+
+4. Permissions (RBAC)
+   ├── User A cannot see User B data
+   ├── Admin can approve invoices
+   ├── Sales cannot access admin functions
+   └── Tenant A data isolated from Tenant B
+
+5. Error Handling
+   ├── Network timeout
+   ├── Server error (500)
+   ├── Validation error (400)
+   ├── Not found error (404)
+   └── Unauthorized error (401)
+```
+
+**E2E Test Example:**
+```typescript
+// tests/e2e/critical-paths.spec.ts
+import { test, expect } from '@playwright/test'
+
+test.describe('Critical User Paths', () => {
+  test.beforeEach(async ({ page }) => {
+    // Navigate to login page
+    await page.goto('/login')
+  })
+
+  test('Login → Create Client → Create Invoice', async ({ page }) => {
+    // Step 1: Login
+    await page.fill('input[name="email"]', 'user@test.com')
+    await page.fill('input[name="password"]', process.env.E2E_LOGIN_PASSWORD ?? '')
+    await page.click('button[type="submit"]')
+    
+    // Verify redirect
+    await expect(page).toHaveURL('/dashboard')
+
+    // Step 2: Navigate to clients
+    await page.click('text=Clientes')
+
+    // Step 3: Create new client
+    await page.click('button:has-text("Nuevo Cliente")')
+    await page.fill('input[name="nombre"]', 'Test Client')
+    await page.fill('input[name="cuit"]', '20123456789')
+    await page.click('button:has-text("Guardar")')
+
+    // Verify client created
+    await expect(page.locator('text=Test Client')).toBeVisible()
+
+    // Step 4: Navigate to invoicing
+    await page.click('text=Facturación')
+    await page.click('button:has-text("Nueva Factura")')
+
+    // Step 5: Select client
+    await page.fill('input[placeholder="Buscar cliente"]', 'Test Client')
+    await page.click('text=Test Client')
+
+    // Step 6: Add line item
+    await page.click('button:has-text("Agregar Línea")')
+    await page.fill('input[placeholder="Producto"]', 'Test Product')
+    await page.fill('input[placeholder="Cantidad"]', '2')
+    await page.fill('input[placeholder="Precio"]', '100')
+
+    // Step 7: Verify calculation (2 × 100 = 200, + 20% IVA = 240)
+    const total = await page.locator('text=/Total.*240/').textContent()
+    expect(total).toBeDefined()
+
+    // Step 8: Save invoice
+    await page.click('button:has-text("Guardar")')
+
+    // Verify success
+    await expect(page.locator('text=Factura creada')).toBeVisible()
+  })
+
+  test('RBAC: Regular user cannot access admin panel', async ({ page }) => {
+    // Login as regular user
+    await page.fill('input[name="email"]', 'user@test.com')
+    await page.fill('input[name="password"]', process.env.E2E_LOGIN_PASSWORD ?? '')
+    await page.click('button[type="submit"]')
+
+    // Try to access admin panel
+    await page.goto('/admin')
+
+    // Verify access denied
+    expect(page.url()).not.toContain('/admin')
+    await expect(page.locator('text=Access Denied')).toBeVisible()
+  })
+
+  test('Error handling: Validation error shows message', async ({ page }) => {
+    await page.fill('input[name="email"]', 'user@test.com')
+    await page.fill('input[name="password"]', process.env.E2E_LOGIN_PASSWORD ?? '')
+    await page.click('button[type="submit"]')
+
+    // Create client with invalid CUIT
+    await page.click('text=Clientes')
+    await page.click('button:has-text("Nuevo Cliente")')
+    await page.fill('input[name="nombre"]', 'Test')
+    await page.fill('input[name="cuit"]', 'INVALID')
+    await page.click('button:has-text("Guardar")')
+
+    // Verify error message
+    await expect(page.locator('text=CUIT inválido')).toBeVisible()
+  })
+})
+```
+
+**Best Practices:**
+- ✅ Test complete user workflows (not just individual screens)
+- ✅ Use realistic test data
+- ✅ Wait for elements explicitly (no arbitrary sleeps)
+- ✅ Test across browsers (Chrome, Firefox, Safari)
+- ✅ Verify both UI and API state
+- ✅ Test error scenarios
+- ✅ Test RBAC and multi-tenant isolation
+- ❌ Don't test third-party components
+- ❌ Don't use hardcoded delays (use waitFor)
+- ❌ Don't test CSS (visual regression for that)
+
+---
+
+## 5. COMPONENT & HOOK TESTING
+
+### Standard: Vitest + React Testing Library for interactive components
+
+**Component Test Example:**
+```typescript
+// src/components/Button.test.tsx
+import { describe, it, expect, vi } from 'vitest'
+import { render, screen } from '@testing-library/react'
+import { Button } from './Button'
+
+describe('Button Component', () => {
+  it('should render button with text', () => {
+    render(<Button>Click me</Button>)
+    expect(screen.getByRole('button', { name: /click me/i })).toBeInTheDocument()
+  })
+
+  it('should call onClick when clicked', async () => {
+    const handleClick = vi.fn()
+    render(<Button onClick={handleClick}>Click</Button>)
+    
+    const button = screen.getByRole('button')
+    await button.click()
+    
+    expect(handleClick).toHaveBeenCalledOnce()
+  })
+
+  it('should be disabled when disabled prop is true', () => {
+    render(<Button disabled>Disabled</Button>)
+    expect(screen.getByRole('button')).toBeDisabled()
+  })
+
+  it('should apply custom className', () => {
+    render(<Button className="custom-class">Button</Button>)
+    expect(screen.getByRole('button')).toHaveClass('custom-class')
+  })
+})
+```
+
+**Custom Hook Test Example:**
+```typescript
+// src/hooks/useFetch.test.ts
+import { describe, it, expect } from 'vitest'
+import { renderHook, waitFor } from '@testing-library/react'
+import { useFetch } from './useFetch'
+
+describe('useFetch Hook', () => {
+  it('should fetch data on mount', async () => {
+    const { result } = renderHook(() => useFetch('/api/clientes'))
+
+    expect(result.current.loading).toBe(true)
+    expect(result.current.data).toBeNull()
+
+    await waitFor(() => {
+      expect(result.current.loading).toBe(false)
+    })
+
+    expect(result.current.data).toBeDefined()
+  })
+
+  it('should handle error', async () => {
+    const { result } = renderHook(() => useFetch('/api/invalid'))
+
+    await waitFor(() => {
+      expect(result.current.loading).toBe(false)
+    })
+
+    expect(result.current.error).toBeDefined()
+  })
+})
+```
+
+---
+
+## 6. ACCESSIBILITY TESTING
+
+### Standard: 100% automated a11y checks + manual keyboard navigation
+
+**Automated A11y with axe-core:**
+```typescript
+// tests/a11y/accessibility.spec.ts
+import { test, expect } from '@playwright/test'
+import { injectAxe, checkA11y, getViolations } from 'axe-playwright'
+
+test.describe('Accessibility Tests', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/login')
+    await injectAxe(page)
+  })
+
+  test('login page has no a11y violations', async ({ page }) => {
+    await checkA11y(page, null, {
+      detailedReport: true,
+      detailedReportOptions: { html: true }
+    })
+  })
+
+  test('form inputs have associated labels', async ({ page }) => {
+    const violations = await getViolations(page)
+    const labelViolations = violations.filter(v => v.id === 'label')
+    expect(labelViolations).toHaveLength(0)
+  })
+
+  test('color contrast is sufficient', async ({ page }) => {
+    const violations = await getViolations(page)
+    const contrastViolations = violations.filter(v => v.id === 'color-contrast')
+    expect(contrastViolations).toHaveLength(0)
+  })
+
+  test('keyboard navigation works', async ({ page }) => {
+    // Tab to first input
+    await page.press('body', 'Tab')
+    const emailInput = page.locator('input[name="email"]')
+    await expect(emailInput).toBeFocused()
+
+    // Tab to password input
+    await page.press('body', 'Tab')
+    const passwordInput = page.locator('input[name="password"]')
+    await expect(passwordInput).toBeFocused()
+
+    // Tab to submit button
+    await page.press('body', 'Tab')
+    const submitButton = page.locator('button[type="submit"]')
+    await expect(submitButton).toBeFocused()
+
+    // Submit with Enter
+    await page.press('body', 'Enter')
+    await expect(page).toHaveURL('/dashboard')
+  })
+
+  test('screen reader announces form errors', async ({ page }) => {
+    // Fill with invalid data
+    await page.fill('input[name="email"]', 'invalid-email')
+    await page.click('button[type="submit"]')
+
+    // Check for ARIA alert or aria-live region
+    const errorAlert = page.locator('[role="alert"]')
+    await expect(errorAlert).toBeVisible()
+    expect(await errorAlert.textContent()).toContain('invalid')
+  })
+})
+```
+
+**Validation Checklist:**
+```
+✓ All form inputs have <label> elements
+✓ All buttons have descriptive text (not just icons)
+✓ Color contrast ratio ≥ 4.5:1 for normal text
+✓ No color used as only means of conveying information
+✓ Keyboard navigation works (Tab, Enter, Escape)
+✓ Focus indicator visible
+✓ Images have alt text
+✓ Form errors announced to screen readers
+✓ Loading states announced
+✓ Modal dialogs properly marked with role="dialog"
+```
+
+---
+
+## 7. VISUAL REGRESSION TESTING
+
+### Standard: Automated screenshot comparison with baseline management
+
+**Playwright Snapshots:**
+```typescript
+// tests/visual/visual-regression.spec.ts
+import { test, expect } from '@playwright/test'
+
+test.describe('Visual Regression Tests', () => {
+  test('login page matches baseline', async ({ page }) => {
+    await page.goto('/login')
+    await page.waitForLoadState('networkidle')
+    expect(await page.screenshot()).toMatchSnapshot('login-page.png')
+  })
+
+  test('form inputs match baseline', async ({ page }) => {
+    await page.goto('/clientes/nuevo')
+    expect(await page.locator('form').screenshot()).toMatchSnapshot('cliente-form.png')
+  })
+
+  test('table layout matches baseline', async ({ page }) => {
+    await page.goto('/facturas')
+    await page.waitForLoadState('networkidle')
+    expect(await page.locator('table').screenshot()).toMatchSnapshot('invoice-table.png')
+  })
+
+  test('responsive design: mobile view', async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 667 })
+    await page.goto('/dashboard')
+    expect(await page.screenshot()).toMatchSnapshot('dashboard-mobile.png')
+  })
+
+  test('dark mode matches baseline', async ({ page }) => {
+    await page.emulateMedia({ colorScheme: 'dark' })
+    await page.goto('/dashboard')
+    expect(await page.screenshot()).toMatchSnapshot('dashboard-dark.png')
+  })
+})
+```
+
+**Best Practices:**
+- ✅ Update baselines intentionally (after code review)
+- ✅ Test multiple screen sizes (mobile, tablet, desktop)
+- ✅ Test light and dark modes
+- ✅ Test across browsers if styling differs
+- ❌ Don't commit baseline changes without review
+- ❌ Don't update baselines automatically
+
+---
+
+## 8. PERFORMANCE TESTING
+
+### Standard: Load testing with k6, baseline tracking, and alert thresholds
+
+**Load Test Script (k6):**
+```javascript
+// tests/performance/api-load.js
+import http from 'k6/http'
+import { check, sleep, group } from 'k6'
+import { Rate, Trend, Counter } from 'k6/metrics'
+
+// Custom metrics
+const errorRate = new Rate('errors')
+const duration = new Trend('duration')
+const successCount = new Counter('success')
+
+export const options = {
+  stages: [
+    { duration: '30s', target: 10 },   // Ramp up
+    { duration: '5m', target: 10 },    // Stay at load
+    { duration: '30s', target: 0 }     // Ramp down
+  ],
+  thresholds: {
+    'http_req_duration': ['p(95)<500', 'p(99)<1000'],
+    'http_req_failed': ['rate<0.001'],
+    'errors': ['rate<0.01']
+  }
+}
+
+export default function() {
+  group('GET /clientes', () => {
+    const res = http.get('http://localhost:3000/api/clientes')
+    
+    const success = check(res, {
+      'status is 200': (r) => r.status === 200,
+      'response time < 200ms': (r) => r.timings.duration < 200,
+      'has data': (r) => JSON.parse(r.body).data !== undefined
+    })
+
+    errorRate.add(!success)
+    duration.add(res.timings.duration)
+    if (success) successCount.add(1)
+  })
+
+  group('POST /clientes', () => {
+    const res = http.post('http://localhost:3000/api/clientes', {
+      nombre: 'Test Client',
+      cuit: '20123456789',
+      email: 'test@test.com'
+    })
+
+    check(res, {
+      'status is 201': (r) => r.status === 201,
+      'response time < 500ms': (r) => r.timings.duration < 500
+    })
+  })
+
+  sleep(1)
+}
+```
+
+**Performance Targets:**
+```
+API Endpoints:
+├── GET /clientes:     <200ms (p95)
+├── GET /articulos:    <200ms (p95)
+├── GET /facturas:     <300ms (p95)
+├── POST /clientes:    <500ms (p95)
+├── POST /articulos:   <500ms (p95)
+├── POST /facturas:    <1000ms (p95)
+└── GET /health:       <50ms (p95)
+
+Error Rate:
+├── P95 latency:       <500ms
+├── P99 latency:       <1000ms
+└── Error rate:        <0.1%
+
+Load Profile:
+├── 10 concurrent users minimum
+├── Ramp up: 0 → 10 in 30 seconds
+├── Maintain: 10 users for 5 minutes
+└── Ramp down: 10 → 0 in 30 seconds
+```
+
+---
+
+## 9. SECURITY TESTING
+
+### Standard: Automated SAST + manual DAST + dependency scanning
+
+**SAST (Static Application Security Testing):**
+```bash
+# Check for hardcoded secrets
+git-secrets --scan
+
+# ESLint security plugin
+eslint --ext .ts,.tsx src/
+
+# Dependency vulnerability scanning
+npm audit
+snyk test
+
+# Type checking (catches some security issues)
+tsc --noEmit
+```
+
+**API Security Tests:**
+```typescript
+// tests/security/api-security.spec.ts
+import { test, expect } from '@playwright/test'
+
+test.describe('API Security', () => {
+  test('GET /api/clientes requires authentication', async ({ request }) => {
+    const res = await request.get('/api/clientes')
+    expect(res.status()).toBe(401)
+  })
+
+  test('XSS prevention: HTML escaped in responses', async ({ request }) => {
+    const res = await request.post('/api/clientes', {
+      data: {
+        nombre: '<script>alert("XSS")</script>'
+      }
+    })
+    
+    const body = await res.json()
+    expect(body.nombre).not.toContain('<script>')
+  })
+
+  test('SQL injection prevented (parameterized queries)', async ({ request }) => {
+    const res = await request.get('/api/clientes?search="; DROP TABLE clientes; --')
+    expect(res.status()).toBe(200)
+    
+    // Verify database still has data
+    const clientes = await request.get('/api/clientes')
+    const clientesData = await clientes.json()
+    expect(clientesData.data.length).toBeGreaterThan(0)
+  })
+
+  test('Rate limiting: 100 requests/min enforced', async ({ request }) => {
+    // Fire 101 requests
+    for (let i = 0; i < 101; i++) {
+      const res = await request.get('/api/clientes')
+      if (i === 100) {
+        expect(res.status()).toBe(429) // Too Many Requests
+      }
+    }
+  })
+
+  test('CSRF tokens validated', async ({ request }) => {
+    // POST without CSRF token
+    const res = await request.post('/api/clientes', {
+      data: { nombre: 'Test' }
+    })
+    
+    expect(res.status()).toBeGreaterThanOrEqual(400)
+  })
+})
+```
+
+---
+
+## 10. TEST DATA MANAGEMENT
+
+### Standard: Fixtures, factories, and database seeding
+
+**Test Fixtures:**
+```typescript
+// tests/fixtures/test-data.ts
+export const testTenant = {
+  id: 'tenant-test',
+  name: 'Test Tenant'
+}
+
+export const testUser = {
+  id: 'user-test',
+  email: 'test@test.com',
+  role: 'ADMIN',
+  tenantId: testTenant.id
+}
+
+export const testClient = {
+  id: 'client-1',
+  tenantId: testTenant.id,
+  nombre: 'Test Client',
+  cuit: '20123456789',
+  email: 'client@test.com',
+  condicion: 'RESPONSABLE_INSCRIPTO'
+}
+
+export const testArticle = {
+  id: 'articulo-1',
+  tenantId: testTenant.id,
+  codigo: 'TEST-001',
+  descripcion: 'Test Article',
+  precio: 100,
+  stock: 50
+}
+
+export const testInvoice = {
+  id: 'invoice-1',
+  tenantId: testTenant.id,
+  clienteId: testClient.id,
+  numeroFactura: 'A000000001',
+  total: 120,
+  subtotal: 100,
+  iva: 20
+}
+```
+
+**Test Setup/Teardown:**
+```typescript
+// tests/setup.ts
+import { PrismaClient } from '@prisma/client'
+import { testTenant, testUser, testClient, testArticle } from './fixtures/test-data'
+
+const prisma = new PrismaClient()
+
+beforeEach(async () => {
+  // Create test tenant
+  await prisma.tenant.create({ data: testTenant })
+  
+  // Create test user
+  await prisma.appUser.create({ data: testUser })
+  
+  // Create test data
+  await prisma.cliente.create({ data: testClient })
+  await prisma.articulo.create({ data: testArticle })
+})
+
+afterEach(async () => {
+  // Clean up in reverse order (respect foreign keys)
+  await prisma.facturaItem.deleteMany({ where: { tenantId: testTenant.id } })
+  await prisma.factura.deleteMany({ where: { tenantId: testTenant.id } })
+  await prisma.articulo.deleteMany({ where: { tenantId: testTenant.id } })
+  await prisma.cliente.deleteMany({ where: { tenantId: testTenant.id } })
+  await prisma.appUser.deleteMany({ where: { tenantId: testTenant.id } })
+  await prisma.tenant.deleteMany({ where: { id: testTenant.id } })
+  
+  await prisma.$disconnect()
+})
+```
+
+---
+
+## 11. TEST ENVIRONMENTS
+
+### Standard: Separate test environments with isolated data
+
+**Environment Tiers:**
+
+1. **Local Development**
+   - PostgreSQL in Docker
+   - Fresh database per test run
+   - Seed with test fixtures
+   - Reset after each test
+
+2. **Staging**
+   - Cloud PostgreSQL (AWS RDS or similar)
+   - Separate test tenant
+   - Production-like data volume
+   - Smoke tests run nightly
+   - E2E tests run daily
+
+3. **Production**
+   - No automated tests (read-only monitoring only)
+   - Manual testing in staging only
+   - Canary testing before rollout
+
+**Environment Configuration:**
+```bash
+# .env.test
+# Postgres local de prueba con trust o contraseña en variable de entorno (no user:pass en texto fijo).
+DATABASE_URL=postgresql://test@localhost:5432/bizcode_test
+NODE_ENV=test
+LOG_LEVEL=error
+API_URL=http://localhost:3000
+
+# GitHub Actions: usar un secret cifrado para la URL de base de datos de staging (sin pegar credenciales en el repositorio).
+```
+
+---
+
+## 12. TEST REPORTING & METRICS
+
+### Standard: Coverage reports, dashboards, and trend tracking
+
+**Test Report Artifacts:**
+```
+tests/results/
+├── coverage/
+│   ├── index.html           (interactive coverage report)
+│   ├── coverage-summary.json (JSON data)
+│   └── coverage.xml         (COBERTURA format for CI)
+├── e2e/
+│   ├── index.html           (Playwright HTML report)
+│   ├── trace.zip            (debugging traces)
+│   └── videos/              (test recordings)
+├── performance/
+│   ├── load-test-results.json
+│   └── performance-report.html
+└── accessibility/
+    └── a11y-violations.json
+```
+
+**Test Dashboard Metrics:**
+```
+Real-time Dashboard:
+├── Total Tests Run: 500
+├── Pass Rate: 98% (490 pass, 10 fail)
+├── Flaky Tests: 3 (need investigation)
+├── Execution Time: 12 minutes
+├── Code Coverage: 75%
+├── Performance P95: 450ms
+├── Error Rate: 0.08%
+└── Trend: ↑ Coverage (was 70% last month)
+```
+
+**Coverage Trends:**
+```
+├── Trend tracking: Compare coverage over time
+├── Alert: If coverage decreases
+├── Target: Maintain or increase each sprint
+└── Dashboard: Visual representation of trends
+```
+
+---
+
+## 13. CI/CD TEST GATES
+
+### Standard: Progressive testing gates from pre-commit to production
+
+**Pre-commit Hook (Developer):**
+```bash
+npm run lint      # 0 warnings
+npm run type-check # 0 errors
+npm run test      # All unit tests pass
+```
+
+**Pull Request (CI/CD):**
+```bash
+npm run lint              # Code quality
+npm run type-check       # Type safety
+npm run test             # Unit tests
+npm run test:integration # API + DB tests
+npm run test:e2e         # Critical paths (subset)
+coverage check           # No decrease
+npm audit               # No vulnerabilities
+```
+
+**Pre-Release (Staging):**
+```bash
+npm run test:e2e         # Full E2E suite
+npm run test:a11y        # Full accessibility
+npm run test:visual      # Visual regression
+npm run test:performance # Load testing
+Manual QA sign-off       # Checklist completion
+```
+
+**Production Release:**
+```bash
+Canary deployment        # 1% traffic
+Monitor for 24 hours     # No errors/crashes
+Gradual rollout          # 25% → 50% → 100%
+Smoke tests on live      # Basic functionality
+Incident response ready  # On-call team ready
+```
+
+---
+
+## 14. FLAKY TEST MANAGEMENT
+
+### Standard: Detection, quarantine, and remediation
+
+**Flaky Test Process:**
+
+1. **Detection**
+   - Run tests 5 times
+   - If inconsistent results → flaky test
+   - Log test name and failure pattern
+
+2. **Quarantine**
+   - Skip in CI (add `@flaky` tag)
+   - Create GitHub issue
+   - Assign to developer
+
+3. **Remediation**
+   - Fix root cause (race conditions, timeouts)
+   - Remove `@flaky` tag
+   - Re-enable test
+
+**Example:**
+```typescript
+test.skip('should create invoice', async ({ page }) => {
+  // @flaky - intermittent timing issue
+  // TODO: Fix race condition in async state update
+  // Issue: #XXX
+})
+```
+
+---
+
+## 15. MANUAL TESTING
+
+### Standard: Documented procedures with sign-off
+
+**Pre-Release Manual Testing:**
+
+```
+Smoke Test (30 minutes):
+☐ Login with valid credentials
+☐ Navigate to all main sections
+☐ Create client (complete form)
+☐ Create invoice (complete flow)
+☐ Download/print PDF
+☐ Logout
+Status: PASS / FAIL
+Tester: _______
+Date: _______
+
+Regression Test (2 hours):
+☐ Run all critical paths
+☐ Verify no UI regressions
+☐ Check error handling
+☐ Verify RBAC enforcement
+Status: PASS / FAIL
+Tester: _______
+Date: _______
+
+UAT (4 hours):
+☐ Business user reviews features
+☐ Verify business requirements met
+☐ Confirm calculations correct
+☐ Check invoice compliance
+Status: APPROVED / REJECTED
+By: Business Owner
+Date: _______
+```
+
+---
+
+## 16. ANTI-PATTERNS TO AVOID
+
+- ❌ Testing implementation details (test behavior)
+- ❌ Too many assertions per test (one per test)
+- ❌ Hardcoded test data (use fixtures)
+- ❌ Shared state between tests (isolate each test)
+- ❌ Sleeping in tests (use waitFor/expect)
+- ❌ Skipped tests without issues (track and fix)
+- ❌ 100% coverage target (realistic 80-90%)
+- ❌ Testing third-party libraries (assume they work)
+- ❌ No test data cleanup (causes cascading failures)
+- ❌ Tests that depend on execution order (random order)
+
+---
+
+## 17. DEFINITIONS & VALIDATION CRITERIA
+
+**Test Readiness Checklist:**
+
+| Item | Target | Validation |
+|------|--------|-----------|
+| Unit Coverage | ≥90% | npm run test:coverage |
+| Integration Tests | ≥6 critical APIs | npm run test:integration pass |
+| E2E Coverage | ≥6 critical paths | npm run test:e2e pass |
+| Component Testing | ≥75% | npm run test pass |
+| Visual Regression | ≥95% baseline | npm run test:visual pass |
+| Accessibility | 100% pass | npm run test:a11y pass |
+| Performance | P95 <500ms | npm run test:performance pass |
+| Security | 100% SAST pass | npm audit zero critical |
+| Manual QA | Checklist signed | QA sign-off in PR |
+
+---
+
+**This document is the source of truth for QA standards. All deviations require testing plan documentation.**

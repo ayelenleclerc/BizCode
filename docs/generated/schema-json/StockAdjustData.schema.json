@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "properties": {
+    "ajuste": {
+      "$ref": "./StockAjuste.schema.json"
+    },
+    "articulo": {
+      "additionalProperties": true,
+      "type": "object"
+    },
+    "stockAfter": {
+      "type": "integer"
+    },
+    "stockBefore": {
+      "type": "integer"
+    }
+  },
+  "title": "StockAdjustData",
+  "type": "object"
+}

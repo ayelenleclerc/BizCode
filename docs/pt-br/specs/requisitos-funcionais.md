@@ -19,5 +19,16 @@
 | RF-008 | Persistir tema em `localStorage` e classe em `<html>`. | `temas-interface.md`, `Layout.tsx`, `index.html` |
 | RF-009 | Idioma de UI `es`/`en`/`pt-BR` com paridade `check:i18n`. | [estrategia-i18n.md](../estrategia-i18n.md), `src/locales/` |
 | RF-010 | `GET /api/health`. | `createApp.ts`, OpenAPI |
+| RF-011 | Registrar cobranças; listar e filtrar por cliente e datas. | `src/pages/cobros/`, `POST/GET /api/cobros` |
+| RF-012 | Em `POST /api/cobros`, atualizar `Cliente.balance` e `Cliente.score` conforme OpenAPI. | `CobroService.ts`, OpenAPI |
+| RF-013 | Aging de saldos e extrato por cliente. | `src/pages/finanzas/`, `GET /api/reportes/aging` |
+| RF-014 | Relatórios operacionais/financeiros com exportação CSV opcional. | `src/pages/reportes/`, `/api/reportes/*` |
+| RF-015 | Ordens de entrega: listar, criar e atualizar estado (planejador/motorista conforme RBAC). | `src/pages/logistica/`, `/api/ordenes-entrega` |
+| RF-016 | Picking no depósito: fila, iniciar picking, checklist, marcar pronto (`logistics.picking`). | `src/pages/logistica/picking/`, `POST .../iniciar-picking`, `POST .../lista` |
+| RF-017 | Repartos: planejar, iniciar e fechar; sequência de OE em `ready`. | `src/pages/logistica/repartos/`, `GET/POST /api/repartos` |
+| RF-018 | POD em itens de reparto: wizard motorista; comprovante no back-office. | `src/pages/logistica/repartos/chofer/`, `PUT .../items/{itemId}`, `GET .../pod` |
+| RF-019 | Rastreamento GPS ao vivo: mapa do planejador; motorista envia localização a cada 2 min (`logistics.gps`). | `src/pages/logistica/seguimiento/`, `GET /api/repartos/activos`, `POST .../ubicacion` |
+| RF-020 | KPIs/relatórios logísticos: taxa 1ª visita, tempos, devoluções, tabelas motorista/zona, CSV (`logistics.dispatches`, `dispatchedAt`). | `src/pages/logistica/LogisticaReportesPanel.tsx`, `GET /api/logistica/kpis`, `reporte-choferes`, `reporte-zonas` |
+| RF-021 | Anulação de fatura ativa com motivo documentado (`billing.credit_notes`, `sales.cancel`); listar/obter notas de crédito por período. | `PUT /api/facturas/{id}/void`, `GET /api/notas-credito`, `GET /api/notas-credito/{id}`, `ListadoFacturas.tsx`, `src/pages/finanzas/index.tsx`, [ADR-0012](../adr/ADR-0012-anulacao-fatura-nota-credito.md), `tests/api/notas-credito.test.ts`, `tests/api/facturas-void.test.ts` |
 
 **Outros idiomas:** [English](../../en/specs/functional-requirements.md) · [Español](../../es/specs/functional-requirements.md)

@@ -10,6 +10,24 @@ Exibe as notas emitidas com: **Data**, **Tipo** (**NF-e Tipo A** / **NF-e Tipo B
 
 **Detalhe:** clique numa linha para expandir itens e discriminação de impostos.
 
+## PDF e impressão (módulo CAE AFIP)
+
+Com **`billing.arca_cae`** e permissão **`reports.operational.read`**:
+
+| Ação | API | Notas |
+|------|-----|--------|
+| Pré-visualização PDF | `GET /api/facturas/{id}/pdf/preview` | Marca d'água, **não fiscal** (sem CAE). |
+| PDF legal | `GET /api/facturas/{id}/pdf` | Exige **CAE emitido**; layout fiscal com QR e código de barras ([ADR-0014](../adr/ADR-0014-legal-arca-invoice-pdf.md)). |
+| Ticket 80 mm | `GET /api/facturas/{id}/ticket` | Balcão; **não fiscal** sem CAE emitido. |
+
+No detalhe da nota: pré-visualização, imprimir (modal com download alternativo), download legal e ticket. Configure o emitente em **Configurações → Empresa** (`condicionIva`, inscrição em gross income, início das atividades).
+
+Validação no portal AFIP pode permanecer manual em homologação.
+
+## Cancelamento com nota de crédito (módulo)
+
+Com o módulo do tenant **`billing.credit_notes`** ativo e permissão **`sales.cancel`**, abra o detalhe de uma nota **ativa** e use **Cancelar nota fiscal**. É obrigatório informar um **motivo** com pelo menos **10** caracteres (validação no servidor). A operação chama `PUT /api/facturas/{id}/void`; o sistema registra uma **nota de crédito** ligada à nota original (veja [ADR-0012](../adr/ADR-0012-anulacao-fatura-nota-credito.md)). Listagem no app: página **Finanças**, mesmo módulo (API `GET /api/notas-credito`).
+
 ## Nova nota fiscal
 
 1. **F3** ou **➕ Nova Nota Fiscal (F3)**.

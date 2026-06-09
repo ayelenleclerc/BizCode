@@ -2,7 +2,7 @@ name: Docs governance guard
 
 on:
   pull_request:
-    branches: [main]
+    branches: [main, develop]
 
 jobs:
   docs-governance:
@@ -51,9 +51,15 @@ jobs:
             "docs/en/specs/",
             "docs/es/specs/",
             "docs/pt-br/specs/",
+            "docs/en/user/",
+            "docs/es/user/",
+            "docs/pt-br/user/",
             "docs/en/adr/",
             "docs/es/adr/",
             "docs/pt-br/adr/",
+            "docs/en/changelog.md",
+            "docs/es/historial-de-cambios.md",
+            "docs/pt-br/historico-de-alteracoes.md",
             "docs/api/openapi.yaml",
             "Certificación-ISO/",
           )
@@ -72,7 +78,7 @@ jobs:
           pt_changed = any(p.startswith("docs/pt-br/") for p in controlled_changed)
 
           localized_area_pattern = re.compile(
-            r"^docs/(en|es|pt-br)/(quality|certificacion-iso|processes|specs|adr)/"
+            r"^docs/(en|es|pt-br)/(quality|certificacion-iso|processes|specs|adr|user)/"
           )
           localized_changes = [p for p in controlled_changed if localized_area_pattern.match(p)]
 

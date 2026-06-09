@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "motivo": {
+      "description": "Reason for voiding the invoice (persisted on credit note and AuditEvent metadata).",
+      "maxLength": 500,
+      "minLength": 10,
+      "type": "string"
+    }
+  },
+  "required": [
+    "motivo"
+  ],
+  "title": "VoidInput",
+  "type": "object"
+}

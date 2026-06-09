@@ -16,6 +16,26 @@ stateDiagram-v2
   Collected --> [*]
 ```
 
+## Canonical implementation states (BP1-1 / GitHub #65)
+
+The diagram above uses **user-facing lifecycle names**. When persisting a `Pedido` entity (future BP1-1), OpenAPI and Prisma should use the **stable English keys** below so issues, ADRs, and code stay aligned.
+
+| Implementation key | Maps from diagram | Meaning |
+|--------------------|--------------------|---------|
+| `draft` | Created | Order captured; editable; not yet committed to fulfillment. |
+| `confirmed` | Assigned | Committed for planning; warehouse/route assignment may proceed. |
+| `packed` | Picking / Packed | Stock prepared / ready for dispatch (may stay a single state in MVP). |
+| `shipped` | Dispatched | Handed to carrier or driver leg. |
+| `delivered` | Delivered | Receipt confirmed. |
+| `invoiced` | (implicit before collection) | Linked invoice issued (`Factura`); financial record exists. |
+| `collected` | Collected | Payment / settlement closed for the order line. |
+
+**Transitions (normative):** invalid jumps (e.g. `draft` → `collected` without intermediate states) must be rejected by the future API. Cancellations: only from `draft` or `confirmed` unless a separate `cancelled` terminal state is added in the implementation ADR.
+
+**Integrations (unchanged intent):** `Cliente.creditLimit`, `Articulo.stock`, `DeliveryZone`, and channel scope (`x-bizcode-channel` / `AuthScope.channels`) apply at the same gates described in the RACI table.
+
+**Sketches (no migrations):** Prisma/OpenAPI **draft** artifacts for BP1-1 live in [order-domain-implementation-sketch.md](order-domain-implementation-sketch.md) (EN; ES/PT-BR in locale map).
+
 | State (concept) | Meaning |
 |-----------------|--------|
 | Created | Order captured (sales / backoffice). |
@@ -49,8 +69,16 @@ Empty cells mean no direct RBAC permission names the step; the role may still pa
 |------|---------------------|----------------------|
 | Customers / products / categories | REST under `/api/clientes`, `/api/articulos`, `/api/rubros` with auth | Extend as needed |
 | Invoicing | `/api/facturas`, `/api/formas-pago` | Same stack |
-| Order entity `pedido` | **Not evidenced** in Prisma or OpenAPI | Model, states, and APIs when backlog BP1-1 is executed |
-| Permissions `orders.*` | Defined in RBAC; not wired to a domain entity yet | Enforce on new routes when implemented |
+| Collections / payments | `Cobro` model; `POST/GET /api/cobros`; UI `/cobros`; dashboard `cobrosHoy`; recent payments on customer form | Tie to order entity when BP1-1 exists |
+| AR / finance UI | `/finanzas`; `GET /api/reportes/aging`, `GET /api/reportes/cuenta-corriente/:clienteId` | Dunning workflows per backlog |
+| Reports | `/reportes`; `GET /api/reportes/ventas`, `stock-critico`, `cobranzas` (JSON or CSV) | Additional report types |
+| Logistics | `/logistica`, `/logistica/picking` (#143); `OrdenEntrega`; `GET/POST/PUT /api/ordenes-entrega`, `POST .../iniciar-picking`, `POST .../lista` | OE: `pending` → `picking` → `ready` → `assigned` (route) → `in_transit` → `delivered` \| `failed` \| `cancelled` |
+| GPS tracking | `/logistica/seguimiento` (#144); `RepartoUbicacion`; `GET /api/repartos/activos`, `POST /api/repartos/{id}/ubicacion` | Driver on `on_route` route; planner sees last position; 7-day retention |
+| Logistics KPIs | `/logistica` Reports tab (#145); `dispatchedAt` on `in_transit`; `GET /api/logistica/kpis`, `reporte-choferes`, `reporte-zonas` | Planner/manager; DB aggregates; CSV export |
+| Order entity `pedido` | `Pedido`/`PedidoItem` models, `/api/pedidos`, UI `/pedidos` (#132); `requireModule('billing.orders')` (#223) | States `packed`…`collected` and generic transitions (#65 / full BP1-1) |
+| Permissions `orders.*` | Defined in RBAC; enforced on `/api/ordenes-entrega` | Extend when `pedido` entity ships |
+
+The diagram state **Collected** is partially covered today by **payment registration** (`Cobro`), not by a `pedido` record.
 
 ## Related documents
 

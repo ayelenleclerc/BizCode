@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "count": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "label": {
+      "enum": [
+        "0-30d",
+        "31-60d",
+        "61-90d",
+        ">90d"
+      ],
+      "type": "string"
+    },
+    "total": {
+      "description": "Decimal amount as string (two fractional digits)",
+      "type": "string"
+    }
+  },
+  "required": [
+    "label",
+    "count",
+    "total"
+  ],
+  "title": "AgingBucket",
+  "type": "object"
+}

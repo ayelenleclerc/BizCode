@@ -12,20 +12,27 @@ BizCode visa conformidade **WCAG 2.2 nível AA**.
 
 | Tecla | Ação |
 |---|---|
-| F2 | Focar busca |
+| F2 | Focar busca ou filtro ativo |
 | F3 | Abrir formulário “Novo” |
 | F5 | Salvar formulário |
 | Ins | Adicionar linha (fatura) |
 | Del | Remover linha selecionada |
-| ↑ / ↓ | Navegar linhas da tabela |
-| Enter | Abrir linha para edição |
+| ↑ / ↓ | Navegar linhas ou listas laterais |
+| Enter | Abrir linha / confirmar diálogo |
 | Esc | Fechar / cancelar |
+| Tab | Navegar controles (início, login) |
+
+Telas com atalhos extras exibem cartão **Atalhos** (`KeyboardHint`) abaixo do cabeçalho global.
 
 ## Padrões ARIA
 
 Modais: `role="dialog"`, `aria-modal="true"`, `aria-labelledby` no título.  
 Formulários: `label`/`htmlFor`/`id`, erros com `role="alert"` e `aria-describedby`.  
 Tabelas: `aria-label`, linhas com `role="row"` e `aria-selected` quando aplicável.
+
+## Mapas (GPS logística)
+
+A vista do planejador em `/logistica/seguimiento` incorpora mapa **Leaflet** (teselas OpenStreetMap). Marcadores e lista lateral usam rótulos i18n; teselas são decorativas para leitores de tela quando a lista está disponível. Priorizar controles por teclado no painel lateral; não usar `aria-pressed` redundante nem `aria-checked` em `<input type="checkbox">` nativo (`logistica/picking`, `logistica/seguimiento`).
 
 ## Verificação
 

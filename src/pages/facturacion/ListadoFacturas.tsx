@@ -1,28 +1,318 @@
-import { useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { arcaAPI, facturasAPI, printingAPI } from '@/lib/api'
+import KeyboardHint from '@/components/shared/KeyboardHint'
+import { useListKeyboardNav, useListPageHotkeys } from '@/hooks/useListPageKeyboard'
+import { CanAccess } from '@/components/CanAccess'
+import IfModule from '@/components/IfModule'
 import { Factura, Cliente } from '@/types'
+import FacturaPdfPreviewDialog from './FacturaPdfPreviewDialog'
 
 interface ListadoFacturasProps {
   facturas: Factura[]
   clientes: Cliente[]
+  onFacturaVoided?: () => void
+  onFacturaUpdated?: () => void
 }
 
-export default function ListadoFacturas({ facturas, clientes }: ListadoFacturasProps) {
+function triggerBlobDownload(blob: Blob, filename: string): void {
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = filename
+  link.click()
+  URL.revokeObjectURL(url)
+}
+
+/** @see server/schemas/domain.ts factura void body — motivo min length */
+const FACTURA_VOID_MOTIVO_MIN_LEN = 10 as const
+
+function CaeBadge({ estado }: { estado: Factura['estadoCae'] }) {
   const { t } = useTranslation('facturacion')
+  if (!estado) return null
+  const label =
+    estado === 'issued' ? t('cae.issued') : estado === 'failed' ? t('cae.failed') : t('cae.pending')
+  const className =
+    estado === 'issued'
+      ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-300'
+      : estado === 'failed'
+        ? 'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-300'
+        : 'bg-amber-100 dark:bg-amber-900 text-amber-800 dark:text-amber-300'
+  return (
+    <span
+      data-testid={`factura-cae-badge-${estado}`}
+      className={`inline-block px-2 py-1 rounded text-xs font-semibold ${className}`}
+    >
+      {label}
+    </span>
+  )
+}
+
+export default function ListadoFacturas({
+  facturas,
+  clientes,
+  onFacturaVoided,
+  onFacturaUpdated,
+}: ListadoFacturasProps) {
+  const { t } = useTranslation('facturacion')
+  const { t: tc } = useTranslation('common')
+  const listShortcuts = useMemo(
+    () => [
+      { key: '↑↓', description: tc('shortcuts.navigate') },
+      { key: 'Enter', description: tc('shortcuts.open') },
+      { key: 'Esc', description: tc('shortcuts.cancel') },
+    ],
+    [tc],
+  )
   const [expandedId, setExpandedId] = useState<number | null>(null)
+  const [selectedRow, setSelectedRow] = useState(0)
+  const [voidingId, setVoidingId] = useState<number | null>(null)
+  const [motivo, setMotivo] = useState('')
+  const [voidLoading, setVoidLoading] = useState(false)
+  const [voidError, setVoidError] = useState<string | null>(null)
+  const [caeLoadingId, setCaeLoadingId] = useState<number | null>(null)
+  const [caeError, setCaeError] = useState<string | null>(null)
+  const [pdfLoadingId, setPdfLoadingId] = useState<number | null>(null)
+  const [pdfError, setPdfError] = useState<string | null>(null)
+  const [pdfPreviewUrl, setPdfPreviewUrl] = useState<string | null>(null)
+  const [pdfPreviewFilename, setPdfPreviewFilename] = useState('factura.pdf')
+  const [printLoadingId, setPrintLoadingId] = useState<number | null>(null)
+  const [printError, setPrintError] = useState<string | null>(null)
+  const [printFeedback, setPrintFeedback] = useState<string | null>(null)
+  const [fiscalPrinterEnabled, setFiscalPrinterEnabled] = useState(false)
+  const [thermalPrinterEnabled, setThermalPrinterEnabled] = useState(false)
+
+  useEffect(() => {
+    setSelectedRow(0)
+  }, [facturas])
+
+  useEffect(() => {
+    return () => {
+      if (pdfPreviewUrl) URL.revokeObjectURL(pdfPreviewUrl)
+    }
+  }, [pdfPreviewUrl])
+
+  const onOpenRow = useCallback(
+    (index: number) => {
+      const factura = facturas[index]
+      if (factura) setExpandedId(factura.id)
+    },
+    [facturas],
+  )
+
+  const handleKeyDown = useListKeyboardNav({
+    itemCount: facturas.length,
+    selectedRow,
+    setSelectedRow,
+    onOpenRow,
+  })
+
+  useEffect(() => {
+    printingAPI
+      .status()
+      .then((data) => {
+        setFiscalPrinterEnabled(data.fiscalPrinterEnabled)
+        setThermalPrinterEnabled(data.thermalPrinterEnabled)
+      })
+      .catch(() => {
+        setFiscalPrinterEnabled(false)
+        setThermalPrinterEnabled(false)
+      })
+  }, [])
 
   const getClienteName = (clienteId: number) => {
     return clientes.find((c) => c.id === clienteId)?.rsocial || `Cliente #${clienteId}`
   }
 
+  const handleVoid = async (facturaId: number) => {
+    const motivoTrim = motivo.trim()
+    if (!motivoTrim) {
+      setVoidError(t('void.motivoRequired'))
+      return
+    }
+    if (motivoTrim.length < FACTURA_VOID_MOTIVO_MIN_LEN) {
+      setVoidError(t('void.motivoMinLength'))
+      return
+    }
+    setVoidLoading(true)
+    setVoidError(null)
+    try {
+      await facturasAPI.void(facturaId, motivoTrim)
+      setVoidingId(null)
+      setMotivo('')
+      setExpandedId(null)
+      onFacturaVoided?.()
+    } catch (err: unknown) {
+      setVoidError((err as Error).message || t('void.error'))
+    } finally {
+      setVoidLoading(false)
+    }
+  }
+
+  const handleRetryCae = async (facturaId: number) => {
+    setCaeLoadingId(facturaId)
+    setCaeError(null)
+    try {
+      await arcaAPI.requestCae(facturaId)
+      onFacturaUpdated?.()
+    } catch (err: unknown) {
+      setCaeError((err as Error).message || t('cae.retryError'))
+    } finally {
+      setCaeLoadingId(null)
+    }
+  }
+
+  const openPdfPreview = (blob: Blob, filename: string) => {
+    if (pdfPreviewUrl) URL.revokeObjectURL(pdfPreviewUrl)
+    const url = URL.createObjectURL(blob)
+    setPdfPreviewUrl(url)
+    setPdfPreviewFilename(filename)
+  }
+
+  const closePdfPreview = () => {
+    if (pdfPreviewUrl) URL.revokeObjectURL(pdfPreviewUrl)
+    setPdfPreviewUrl(null)
+  }
+
+  const isOverlayOpen = expandedId !== null || pdfPreviewUrl !== null || voidingId !== null
+
+  useListPageHotkeys({
+    onClose: () => {
+      if (pdfPreviewUrl) closePdfPreview()
+      else if (voidingId !== null) {
+        setVoidingId(null)
+        setMotivo('')
+        setVoidError(null)
+      } else {
+        setExpandedId(null)
+      }
+    },
+    isOverlayOpen,
+  })
+
+  const handlePdfDownload = async (facturaId: number, preview: boolean) => {
+    setPdfLoadingId(facturaId)
+    setPdfError(null)
+    try {
+      const blob = preview
+        ? await facturasAPI.downloadPdfPreview(facturaId)
+        : await facturasAPI.downloadPdf(facturaId)
+      const name = preview ? `factura-${facturaId}-preview.pdf` : `factura-${facturaId}.pdf`
+      triggerBlobDownload(blob, name)
+    } catch (err: unknown) {
+      setPdfError((err as Error).message || t('cae.pdfError'))
+    } finally {
+      setPdfLoadingId(null)
+    }
+  }
+
+  const handlePdfPreview = async (facturaId: number, preview: boolean) => {
+    setPdfLoadingId(facturaId)
+    setPdfError(null)
+    try {
+      const blob = preview
+        ? await facturasAPI.downloadPdfPreview(facturaId)
+        : await facturasAPI.downloadPdf(facturaId)
+      const name = preview ? `factura-${facturaId}-preview.pdf` : `factura-${facturaId}.pdf`
+      openPdfPreview(blob, name)
+    } catch (err: unknown) {
+      setPdfError((err as Error).message || t('cae.pdfError'))
+    } finally {
+      setPdfLoadingId(null)
+    }
+  }
+
+  const handleDevicePrint = async (
+    facturaId: number,
+    device: 'pdf' | 'fiscal' | 'thermal',
+    canDownloadPdf: boolean,
+  ) => {
+    setPrintLoadingId(facturaId)
+    setPrintError(null)
+    setPrintFeedback(null)
+    try {
+      const result = await facturasAPI.print(facturaId, device)
+      if (result.fallbackToPdf && result.downloadPath) {
+        setPdfLoadingId(facturaId)
+        try {
+          const blob = canDownloadPdf
+            ? await facturasAPI.downloadPdf(facturaId)
+            : await facturasAPI.downloadPdfPreview(facturaId)
+          const name = canDownloadPdf ? `factura-${facturaId}.pdf` : `factura-${facturaId}-preview.pdf`
+          if (canDownloadPdf) {
+            triggerBlobDownload(blob, name)
+          } else {
+            openPdfPreview(blob, name)
+          }
+        } catch (err: unknown) {
+          setPrintError((err as Error).message || t('cae.pdfError'))
+        } finally {
+          setPdfLoadingId(null)
+        }
+        setPrintFeedback(
+          device === 'thermal'
+            ? t('print.feedback.thermalFallbackPdf')
+            : t('print.feedback.fiscalFallbackPdf'),
+        )
+        return
+      }
+      if (device === 'pdf' && result.downloadPath) {
+        setPdfLoadingId(facturaId)
+        try {
+          const blob = canDownloadPdf
+            ? await facturasAPI.downloadPdf(facturaId)
+            : await facturasAPI.downloadPdfPreview(facturaId)
+          const name = canDownloadPdf ? `factura-${facturaId}.pdf` : `factura-${facturaId}-preview.pdf`
+          if (canDownloadPdf) {
+            triggerBlobDownload(blob, name)
+          } else {
+            openPdfPreview(blob, name)
+          }
+        } catch (err: unknown) {
+          setPrintError((err as Error).message || t('cae.pdfError'))
+        } finally {
+          setPdfLoadingId(null)
+        }
+        return
+      }
+      if (result.jobId) {
+        setPrintFeedback(t('print.feedback.mockSuccess', { jobId: result.jobId }))
+      }
+    } catch (err: unknown) {
+      setPrintError((err as Error).message || t('print.feedback.error'))
+    } finally {
+      setPrintLoadingId(null)
+    }
+  }
+
+  const handleTicket = async (facturaId: number, downloadOnly: boolean) => {
+    setPdfLoadingId(facturaId)
+    setPdfError(null)
+    try {
+      const blob = await facturasAPI.downloadTicket(facturaId)
+      const name = `factura-${facturaId}-ticket.pdf`
+      if (downloadOnly) {
+        triggerBlobDownload(blob, name)
+      } else {
+        openPdfPreview(blob, name)
+      }
+    } catch (err: unknown) {
+      setPdfError((err as Error).message || t('cae.pdfError'))
+    } finally {
+      setPdfLoadingId(null)
+    }
+  }
+
   return (
     <div className="flex-1 overflow-auto">
+      {facturas.length > 0 && <KeyboardHint shortcuts={listShortcuts} className="mb-4" />}
       {facturas.length === 0 ? (
         <div className="text-center py-12 text-slate-500 dark:text-slate-400">
           {t('list.empty')}
         </div>
       ) : (
         <table
+          data-testid="facturas-table"
           className="w-full border-collapse bg-white dark:bg-slate-800 rounded border border-slate-200 dark:border-slate-700"
           aria-label={t('listTitle')}
         >
@@ -35,11 +325,14 @@ export default function ListadoFacturas({ facturas, clientes }: ListadoFacturasP
               <th className="px-4 py-3 text-right text-slate-700 dark:text-slate-300 font-semibold">{t('list.neto')}</th>
               <th className="px-4 py-3 text-right text-slate-700 dark:text-slate-300 font-semibold">{t('list.iva')}</th>
               <th className="px-4 py-3 text-right text-slate-700 dark:text-slate-300 font-semibold">{t('list.total')}</th>
+              <IfModule flag="billing.arca_cae">
+                <th className="px-4 py-3 text-center text-slate-700 dark:text-slate-300 font-semibold">{t('cae.column')}</th>
+              </IfModule>
               <th className="px-4 py-3 text-center text-slate-700 dark:text-slate-300 font-semibold">{t('list.estado')}</th>
             </tr>
           </thead>
           <tbody>
-            {facturas.map((factura) => {
+            {facturas.map((factura, idx) => {
               const neto = (Number(factura.neto1) + Number(factura.neto2) + Number(factura.neto3)).toFixed(2)
               const iva = (Number(factura.iva1) + Number(factura.iva2)).toFixed(2)
 
@@ -47,8 +340,20 @@ export default function ListadoFacturas({ facturas, clientes }: ListadoFacturasP
                 <tr
                   key={factura.id}
                   role="row"
-                  onClick={() => setExpandedId(expandedId === factura.id ? null : factura.id)}
-                  className="border-b border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer transition text-slate-900 dark:text-slate-100"
+                  tabIndex={0}
+                  {...(selectedRow === idx
+                    ? { 'aria-selected': 'true' as const }
+                    : { 'aria-selected': 'false' as const })}
+                  onClick={() => {
+                    setSelectedRow(idx)
+                    setExpandedId(expandedId === factura.id ? null : factura.id)
+                  }}
+                  onKeyDown={(e) => handleKeyDown(e, idx)}
+                  className={`border-b border-slate-200 dark:border-slate-700 cursor-pointer transition ${
+                    selectedRow === idx
+                      ? 'bg-blue-600 text-white'
+                      : 'hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-900 dark:text-slate-100'
+                  }`}
                 >
                   <td className="px-4 py-3">
                     {new Date(factura.fecha).toLocaleDateString('es-AR')}
@@ -63,6 +368,11 @@ export default function ListadoFacturas({ facturas, clientes }: ListadoFacturasP
                   <td className="px-4 py-3 text-right font-mono font-semibold text-green-700 dark:text-green-400">
                     ${Number(factura.total).toFixed(2)}
                   </td>
+                  <IfModule flag="billing.arca_cae">
+                    <td className="px-4 py-3 text-center" onClick={(e) => e.stopPropagation()}>
+                      <CaeBadge estado={factura.estadoCae} />
+                    </td>
+                  </IfModule>
                   <td className="px-4 py-3 text-center">
                     {factura.estado === 'A' ? (
                       <span className="inline-block px-2 py-1 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-300 rounded text-xs font-semibold">
@@ -93,6 +403,10 @@ export default function ListadoFacturas({ facturas, clientes }: ListadoFacturasP
               const factura = facturas.find((f) => f.id === expandedId)
               if (!factura) return null
 
+              const canRetryCae =
+                factura.estadoCae === 'pending' || factura.estadoCae === 'failed'
+              const canDownloadPdf = factura.estadoCae === 'issued' && !!factura.cae
+
               return (
                 <>
                   <div className="bg-slate-200 dark:bg-slate-700 px-6 py-4 border-b border-slate-300 dark:border-slate-600">
@@ -106,6 +420,18 @@ export default function ListadoFacturas({ facturas, clientes }: ListadoFacturasP
                     <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
                       {new Date(factura.fecha).toLocaleDateString('es-AR')} — {getClienteName(factura.clienteId)}
                     </p>
+                    <IfModule flag="billing.arca_cae">
+                      <div className="mt-2">
+                        <CaeBadge estado={factura.estadoCae} />
+                        {factura.cae && (
+                          <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
+                            {t('cae.caeNumber', { cae: factura.cae })}
+                            {factura.caeVto &&
+                              ` — ${t('cae.caeVto', { date: new Date(factura.caeVto).toLocaleDateString('es-AR') })}`}
+                          </p>
+                        )}
+                      </div>
+                    </IfModule>
                   </div>
 
                   <div className="p-6 space-y-4">
@@ -156,6 +482,173 @@ export default function ListadoFacturas({ facturas, clientes }: ListadoFacturasP
                       </div>
                     </div>
 
+                    <IfModule flag="billing.arca_cae">
+                      <div className="flex flex-wrap gap-2" role="group" aria-label={t('cae.column')}>
+                        <CanAccess permission="reports.operational.read">
+                          <button
+                            type="button"
+                            data-testid="btn-factura-pdf-preview"
+                            disabled={pdfLoadingId === factura.id}
+                            onClick={() => void handlePdfPreview(factura.id, true)}
+                            className="px-3 py-2 text-sm bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-900 dark:text-slate-100 rounded transition disabled:opacity-50"
+                          >
+                            {pdfLoadingId === factura.id ? t('cae.pdfLoading') : t('cae.previewPdf')}
+                          </button>
+                          {canDownloadPdf && (
+                            <>
+                              <button
+                                type="button"
+                                data-testid="btn-factura-pdf-print"
+                                disabled={pdfLoadingId === factura.id}
+                                onClick={() => void handlePdfPreview(factura.id, false)}
+                                className="px-3 py-2 text-sm bg-indigo-600 hover:bg-indigo-700 text-white rounded transition disabled:opacity-50"
+                              >
+                                {pdfLoadingId === factura.id ? t('cae.pdfLoading') : t('pdfModal.print')}
+                              </button>
+                              <button
+                                type="button"
+                                data-testid="btn-factura-pdf-download"
+                                disabled={pdfLoadingId === factura.id}
+                                onClick={() => void handlePdfDownload(factura.id, false)}
+                                className="px-3 py-2 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded transition disabled:opacity-50"
+                              >
+                                {pdfLoadingId === factura.id ? t('cae.pdfLoading') : t('cae.downloadPdf')}
+                              </button>
+                            </>
+                          )}
+                          <button
+                            type="button"
+                            data-testid="btn-factura-ticket"
+                            disabled={pdfLoadingId === factura.id}
+                            onClick={() => void handleTicket(factura.id, false)}
+                            className="px-3 py-2 text-sm bg-slate-100 hover:bg-slate-200 dark:bg-slate-600 dark:hover:bg-slate-500 text-slate-900 dark:text-slate-100 rounded transition disabled:opacity-50"
+                          >
+                            {pdfLoadingId === factura.id ? t('cae.pdfLoading') : t('pdfModal.ticket')}
+                          </button>
+                        </CanAccess>
+                        {canRetryCae && (
+                          <CanAccess permission="sales.create">
+                            <button
+                              type="button"
+                              data-testid="btn-factura-retry-cae"
+                              disabled={caeLoadingId === factura.id}
+                              onClick={() => void handleRetryCae(factura.id)}
+                              className="px-3 py-2 text-sm bg-amber-100 hover:bg-amber-200 dark:bg-amber-900/40 text-amber-900 dark:text-amber-200 rounded transition disabled:opacity-50"
+                            >
+                              {caeLoadingId === factura.id ? t('cae.retryLoading') : t('cae.retry')}
+                            </button>
+                          </CanAccess>
+                        )}
+                      </div>
+                      {(caeError || pdfError) && (
+                        <p className="text-sm text-red-600 dark:text-red-400" role="alert" aria-live="polite">
+                          {caeError ?? pdfError}
+                        </p>
+                      )}
+                    </IfModule>
+
+                    <CanAccess permission="reports.operational.read">
+                      <div
+                        className="flex flex-wrap gap-2 mt-2"
+                        role="group"
+                        aria-label={t('print.actionsGroup')}
+                      >
+                        <button
+                          type="button"
+                          data-testid="btn-factura-print-pdf"
+                          disabled={printLoadingId === factura.id || pdfLoadingId === factura.id}
+                          onClick={() => void handleDevicePrint(factura.id, 'pdf', canDownloadPdf)}
+                          className="px-3 py-2 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded transition disabled:opacity-50"
+                        >
+                          {printLoadingId === factura.id ? t('print.loading') : t('print.legalPdf')}
+                        </button>
+                        {thermalPrinterEnabled ? (
+                          <button
+                            type="button"
+                            data-testid="btn-factura-print-thermal"
+                            disabled={printLoadingId === factura.id}
+                            onClick={() => void handleDevicePrint(factura.id, 'thermal', canDownloadPdf)}
+                            className="px-3 py-2 text-sm bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-900 dark:text-slate-100 rounded transition disabled:opacity-50"
+                          >
+                            {printLoadingId === factura.id ? t('print.loading') : t('print.thermal')}
+                          </button>
+                        ) : null}
+                        {fiscalPrinterEnabled ? (
+                          <button
+                            type="button"
+                            data-testid="btn-factura-print-fiscal"
+                            disabled={printLoadingId === factura.id}
+                            onClick={() => void handleDevicePrint(factura.id, 'fiscal', canDownloadPdf)}
+                            className="px-3 py-2 text-sm bg-indigo-600 hover:bg-indigo-700 text-white rounded transition disabled:opacity-50"
+                          >
+                            {printLoadingId === factura.id ? t('print.loading') : t('print.fiscal')}
+                          </button>
+                        ) : null}
+                      </div>
+                      {(printError || printFeedback) && (
+                        <p
+                          data-testid="factura-print-feedback"
+                          className={`text-sm mt-2 ${printError ? 'text-red-600 dark:text-red-400' : 'text-green-700 dark:text-green-300'}`}
+                          role="alert"
+                          aria-live="polite"
+                        >
+                          {printError ?? printFeedback}
+                        </p>
+                      )}
+                    </CanAccess>
+
+                    {factura.estado === 'A' && (
+                      <IfModule flag="billing.credit_notes">
+                        <CanAccess permission="sales.cancel">
+                          {voidingId === factura.id ? (
+                            <div className="border border-red-300 dark:border-red-700 rounded p-4 bg-red-50 dark:bg-red-900/20">
+                              <p className="text-sm font-semibold text-red-800 dark:text-red-300 mb-2">
+                                {t('void.confirmTitle')}
+                              </p>
+                              <label className="block text-xs text-red-700 dark:text-red-400 mb-1">
+                                {t('void.motivoLabel')} <span aria-hidden="true">*</span>
+                              </label>
+                              <input
+                                type="text"
+                                value={motivo}
+                                onChange={(e) => setMotivo(e.target.value)}
+                                placeholder={t('void.motivoPlaceholder')}
+                                className="w-full px-3 py-1.5 text-sm border border-red-300 dark:border-red-600 rounded bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 mb-2"
+                              />
+                              {voidError && (
+                                <p className="text-xs text-red-600 dark:text-red-400 mb-2">{voidError}</p>
+                              )}
+                              <div className="flex gap-2">
+                                <button
+                                  type="button"
+                                  onClick={() => handleVoid(factura.id)}
+                                  disabled={voidLoading}
+                                  className="px-3 py-1.5 text-sm bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white rounded font-semibold transition"
+                                >
+                                  {voidLoading ? t('void.loading') : t('void.confirm')}
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => { setVoidingId(null); setMotivo(''); setVoidError(null) }}
+                                  className="px-3 py-1.5 text-sm bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-800 dark:text-slate-200 rounded transition"
+                                >
+                                  {t('void.cancel')}
+                                </button>
+                              </div>
+                            </div>
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={() => { setVoidingId(factura.id); setMotivo(''); setVoidError(null) }}
+                              className="w-full px-4 py-2 bg-red-100 hover:bg-red-200 dark:bg-red-900/30 dark:hover:bg-red-900/50 text-red-800 dark:text-red-300 border border-red-300 dark:border-red-700 rounded font-semibold transition text-sm"
+                            >
+                              {t('void.button')}
+                            </button>
+                          )}
+                        </CanAccess>
+                      </IfModule>
+                    )}
+
                     <button
                       type="button"
                       onClick={() => setExpandedId(null)}
@@ -170,6 +663,20 @@ export default function ListadoFacturas({ facturas, clientes }: ListadoFacturasP
           </div>
         </div>
       )}
+
+      <FacturaPdfPreviewDialog
+        open={pdfPreviewUrl != null}
+        blobUrl={pdfPreviewUrl}
+        filename={pdfPreviewFilename}
+        onClose={closePdfPreview}
+        onDownload={() => {
+          if (!pdfPreviewUrl) return
+          void fetch(pdfPreviewUrl)
+            .then((r) => r.blob())
+            .then((blob) => triggerBlobDownload(blob, pdfPreviewFilename))
+            .catch(() => setPdfError(t('cae.pdfError')))
+        }}
+      />
     </div>
   )
 }

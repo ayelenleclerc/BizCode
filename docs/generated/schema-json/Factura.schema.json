@@ -2,10 +2,28 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": true,
   "properties": {
+    "cae": {
+      "nullable": true,
+      "type": "string"
+    },
+    "caeVto": {
+      "format": "date-time",
+      "nullable": true,
+      "type": "string"
+    },
     "clienteId": {
       "type": "integer"
     },
     "estado": {
+      "type": "string"
+    },
+    "estadoCae": {
+      "enum": [
+        "pending",
+        "issued",
+        "failed"
+      ],
+      "nullable": true,
       "type": "string"
     },
     "fecha": {

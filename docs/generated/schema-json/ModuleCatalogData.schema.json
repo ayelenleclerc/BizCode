@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "deploymentEnv": {
+      "enum": [
+        "dev",
+        "prod"
+      ],
+      "type": "string"
+    },
+    "modules": {
+      "items": {
+        "$ref": "./ModuleCatalogEntry.schema.json"
+      },
+      "type": "array"
+    },
+    "presets": {
+      "additionalProperties": {
+        "$ref": "./ModuleCatalogPreset.schema.json"
+      },
+      "type": "object"
+    }
+  },
+  "required": [
+    "deploymentEnv",
+    "modules",
+    "presets"
+  ],
+  "title": "ModuleCatalogData",
+  "type": "object"
+}

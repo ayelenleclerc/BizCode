@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "condicionIva": {
+      "enum": [
+        "RI",
+        "Mono",
+        "CF",
+        "Exento"
+      ],
+      "type": "string"
+    },
+    "cuit": {
+      "maxLength": 14,
+      "type": "string"
+    },
+    "domicilio": {
+      "maxLength": 40,
+      "nullable": true,
+      "type": "string"
+    },
+    "fechaInicioActividades": {
+      "format": "date",
+      "nullable": true,
+      "type": "string"
+    },
+    "ingresosBrutos": {
+      "maxLength": 30,
+      "nullable": true,
+      "type": "string"
+    },
+    "logoUrl": {
+      "maxLength": 255,
+      "nullable": true,
+      "type": "string"
+    },
+    "nombre": {
+      "maxLength": 40,
+      "type": "string"
+    },
+    "puntoVenta": {
+      "maximum": 9999,
+      "minimum": 1,
+      "type": "integer"
+    },
+    "recordatorioDiasGracia": {
+      "maximum": 365,
+      "minimum": 0,
+      "type": "integer"
+    },
+    "recordatorioHoraFin": {
+      "maximum": 24,
+      "minimum": 1,
+      "type": "integer"
+    },
+    "recordatorioHoraInicio": {
+      "maximum": 23,
+      "minimum": 0,
+      "type": "integer"
+    },
+    "timezone": {
+      "maxLength": 64,
+      "type": "string"
+    },
+    "tipoFactura": {
+      "enum": [
+        "A",
+        "B",
+        "C"
+      ],
+      "type": "string"
+    }
+  },
+  "required": [
+    "nombre",
+    "cuit",
+    "puntoVenta",
+    "tipoFactura"
+  ],
+  "title": "EmpresaInput",
+  "type": "object"
+}

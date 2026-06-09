@@ -1,7 +1,10 @@
-import { createHash, randomBytes } from 'node:crypto'
+import { createHmac, randomBytes } from 'node:crypto'
+import express from 'express'
 import type { NextFunction, Request, Response } from 'express'
-import rateLimit from 'express-rate-limit'
-import { Prisma, type PrismaClient } from '@prisma/client'
+import { authRouterHttpRateLimiter } from './middleware/routeRateLimit'
+import type { PrismaClient } from '@prisma/client'
+import type { ModuleKey } from '../src/lib/modules'
+import type { TenantPlanSnapshot } from '../src/lib/plans'
 import {
   ROLE_PERMISSIONS,
   USER_CHANNELS,
@@ -14,20 +17,27 @@ import {
   type UserRole,
 } from '../src/lib/rbac'
 import { hashPassword, verifyPassword } from './passwordHash'
+import { writeAuditEvent } from './audit'
+import { getAppConfig } from './config/env'
+import { NEW_TENANT_MODULES } from '../src/lib/modules/tenantDefaults'
 
 const SESSION_COOKIE_NAME = 'bizcode_session'
 const SESSION_DURATION_MS = 1000 * 60 * 60 * 8
 
 const LOGIN_WINDOW_MS = 15 * 60 * 1000 // 15 minutes
-const LOGIN_MAX_FAILURES = 5            // consecutive failures before lockout
-const LOGIN_RATE_LIMIT = 20             // requests per window per IP
+const LOGIN_MAX_FAILURES = 5 // consecutive failures before lockout
 
 export type RequestAuthContext = {
   claims: AuthClaims
   sessionId?: number
 }
 
-export type AuthenticatedRequest = Request & { auth?: RequestAuthContext }
+export type AuthenticatedRequest = Request & {
+  auth?: RequestAuthContext
+  tenantId?: number
+  tenantModules?: readonly ModuleKey[]
+  tenantPlan?: TenantPlanSnapshot
+}
 
 function getCookieValue(rawCookieHeader: string | undefined, key: string): string | null {
   if (!rawCookieHeader) {
@@ -48,7 +58,7 @@ function createSessionToken(): string {
 }
 
 function hashToken(token: string): string {
-  return createHash('sha256').update(token).digest('hex')
+  return createHmac('sha256', getAppConfig().JWT_SECRET).update(token).digest('hex')
 }
 
 function normalizeRole(value: string): UserRole | null {
@@ -63,6 +73,23 @@ function normalizeChannels(values: string[]): UserChannel[] {
     }
   }
   return [...unique]
+}
+
+function normalizeChannel(value: string): UserChannel | null {
+  return USER_CHANNELS.includes(value as UserChannel) ? (value as UserChannel) : null
+}
+
+function getRequestedChannel(req: Request): UserChannel | null | 'invalid' {
+  const rawHeader = req.headers['x-bizcode-channel']
+  if (!rawHeader) {
+    return null
+  }
+  const rawValue = Array.isArray(rawHeader) ? rawHeader[0] : rawHeader
+  const trimmed = rawValue.trim().toLowerCase()
+  if (!trimmed) {
+    return null
+  }
+  return normalizeChannel(trimmed) ?? 'invalid'
 }
 
 function createScope(raw: {
@@ -118,37 +145,15 @@ function clearSessionCookie(res: Response): void {
   )
 }
 
-async function writeAuditEvent(args: {
-  prisma: PrismaClient
-  tenantId: number
-  userId?: number
-  action: string
-  resource: string
-  resourceId?: string
-  ipAddress?: string
-  metadata?: Prisma.InputJsonValue
-}): Promise<void> {
-  await args.prisma.auditEvent.create({
-    data: {
-      tenantId: args.tenantId,
-      userId: args.userId,
-      action: args.action,
-      resource: args.resource,
-      resourceId: args.resourceId,
-      ipAddress: args.ipAddress,
-      metadata: args.metadata,
-    },
-  })
-}
-
 export function resolveSession(prisma: PrismaClient) {
   return async (req: AuthenticatedRequest, _res: Response, next: NextFunction): Promise<void> => {
     const bypassEnabled = process.env.NODE_ENV === 'test' && process.env.BIZCODE_TEST_AUTH_BYPASS !== 'false'
     if (bypassEnabled) {
       const bypassRole = normalizeRole(process.env.BIZCODE_TEST_ROLE ?? 'owner') ?? 'owner'
+      const bypassUserId = parseInt(process.env.BIZCODE_TEST_USER_ID ?? '0', 10)
       req.auth = {
         claims: buildClaims({
-          userId: 0,
+          userId: Number.isInteger(bypassUserId) ? bypassUserId : 0,
           username: 'test-owner',
           tenantId: 1,
           role: bypassRole,
@@ -213,6 +218,22 @@ export function resolveSession(prisma: PrismaClient) {
   }
 }
 
+function enforceChannelScope(req: AuthenticatedRequest, res: Response): boolean {
+  const requestedChannel = getRequestedChannel(req)
+  if (requestedChannel === 'invalid') {
+    res.status(400).json({
+      success: false,
+      error: `Invalid x-bizcode-channel header. Allowed values: ${USER_CHANNELS.join(', ')}`,
+    })
+    return false
+  }
+  if (requestedChannel !== null && !req.auth!.claims.scope.channels.includes(requestedChannel)) {
+    res.status(403).json({ success: false, error: `Missing channel scope: ${requestedChannel}` })
+    return false
+  }
+  return true
+}
+
 export function requirePermission(permission: Permission) {
   return (req: AuthenticatedRequest, res: Response, next: NextFunction): void => {
     if (!req.auth) {
@@ -221,6 +242,50 @@ export function requirePermission(permission: Permission) {
     }
     if (!hasPermission(req.auth.claims.role, permission)) {
       res.status(403).json({ success: false, error: `Missing permission: ${permission}` })
+      return
+    }
+    if (!enforceChannelScope(req, res)) {
+      return
+    }
+    next()
+  }
+}
+
+/** @en Requires at least one of the listed permissions (channel scope still enforced). */
+export function requireAnyPermission(...permissions: Permission[]) {
+  return (req: AuthenticatedRequest, res: Response, next: NextFunction): void => {
+    if (!req.auth) {
+      res.status(401).json({ success: false, error: 'Authentication required' })
+      return
+    }
+    const allowed = permissions.some((p) => hasPermission(req.auth!.claims.role, p))
+    if (!allowed) {
+      res.status(403).json({
+        success: false,
+        error: `Missing one of permissions: ${permissions.join(', ')}`,
+      })
+      return
+    }
+    if (!enforceChannelScope(req, res)) {
+      return
+    }
+    next()
+  }
+}
+
+/**
+ * @en Requires `super_admin` role (platform operations).
+ * @es Exige rol `super_admin` (operaciones de plataforma).
+ * @pt-BR Exige papel `super_admin` (operações de plataforma).
+ */
+export function requireSuperAdmin() {
+  return (req: AuthenticatedRequest, res: Response, next: NextFunction): void => {
+    if (!req.auth) {
+      res.status(401).json({ success: false, error: 'Authentication required' })
+      return
+    }
+    if (req.auth.claims.role !== 'super_admin') {
+      res.status(403).json({ success: false, error: 'Super admin role required' })
       return
     }
     next()
@@ -269,6 +334,18 @@ async function countConsecutiveFailures(
   return count
 }
 
+function setLoginRateLimitHeaders(res: Response, failureCount: number): void {
+  const remaining = Math.max(0, LOGIN_MAX_FAILURES - failureCount)
+  res.setHeader('X-RateLimit-Limit', String(LOGIN_MAX_FAILURES))
+  res.setHeader('X-RateLimit-Remaining', String(remaining))
+  res.setHeader('X-RateLimit-Reset', new Date(Date.now() + LOGIN_WINDOW_MS).toISOString())
+}
+
+function respondAccountLocked(res: Response, failureCount: number): void {
+  setLoginRateLimitHeaders(res, failureCount)
+  res.status(429).json({ success: false, error: 'ACCOUNT_LOCKED' })
+}
+
 /**
  * @en Records a login attempt and, when failures reach the threshold, locks the user account.
  * @es Registra un intento de login y, cuando las fallas alcanzan el umbral, bloquea la cuenta.
@@ -297,7 +374,10 @@ async function recordLoginAttempt(
 }
 
 export function registerAuthRoutes(app: import('express').Application, prisma: PrismaClient): void {
-  app.post('/api/auth/setup-owner', async (req: Request, res: Response) => {
+  const authRouter = express.Router()
+  authRouter.use(authRouterHttpRateLimiter)
+
+  authRouter.post('/setup-owner', async (req: Request, res: Response) => {
     const body = (req.body ?? {}) as SetupOwnerBody
     if (
       !isNonEmptyString(body.tenantName) ||
@@ -336,6 +416,27 @@ export function registerAuthRoutes(app: import('express').Application, prisma: P
           scopeChannels: [...USER_CHANNELS],
         },
       })
+      const starterPlan = await tx.plan.findUnique({ where: { key: 'starter' } })
+      await tx.tenantConfig.create({
+        data: {
+          tenantId: tenant.id,
+          businessType: 'ambos',
+          rubros: [],
+          plan: 'starter',
+          modules: [...NEW_TENANT_MODULES],
+          integrations: [],
+        },
+      })
+      if (starterPlan) {
+        await tx.tenantPlan.create({
+          data: {
+            tenantId: tenant.id,
+            planId: starterPlan.id,
+            status: 'active',
+            changedById: user.id,
+          },
+        })
+      }
       await writeAuditEvent({
         prisma: tx as unknown as PrismaClient,
         tenantId: tenant.id,
@@ -358,18 +459,7 @@ export function registerAuthRoutes(app: import('express').Application, prisma: P
     })
   })
 
-  const loginRateLimiter = rateLimit({
-    windowMs: LOGIN_WINDOW_MS,
-    max: LOGIN_RATE_LIMIT,
-    standardHeaders: true,
-    legacyHeaders: false,
-    skip: () => process.env.NODE_ENV === 'test',
-    handler: (_req: Request, res: Response) => {
-      res.status(429).json({ success: false, error: 'TOO_MANY_REQUESTS' })
-    },
-  })
-
-  app.post('/api/auth/login', loginRateLimiter, async (req: Request, res: Response) => {
+  authRouter.post('/login', async (req: Request, res: Response) => {
     const body = (req.body ?? {}) as LoginBody
     if (!isNonEmptyString(body.tenantSlug) || !isNonEmptyString(body.username) || !isNonEmptyString(body.password)) {
       res.status(400).json({ success: false, error: 'tenantSlug, username and password are required' })
@@ -388,7 +478,7 @@ export function registerAuthRoutes(app: import('express').Application, prisma: P
     // Check consecutive failures BEFORE looking up the user (no enumeration).
     const priorFailures = await countConsecutiveFailures(prisma, tenant.id, username)
     if (priorFailures >= LOGIN_MAX_FAILURES) {
-      res.status(401).json({ success: false, error: 'ACCOUNT_LOCKED' })
+      respondAccountLocked(res, priorFailures)
       return
     }
 
@@ -404,8 +494,9 @@ export function registerAuthRoutes(app: import('express').Application, prisma: P
       // Re-count so we return ACCOUNT_LOCKED on the exact threshold attempt.
       const newFailures = await countConsecutiveFailures(prisma, tenant.id, username)
       if (newFailures >= LOGIN_MAX_FAILURES) {
-        res.status(401).json({ success: false, error: 'ACCOUNT_LOCKED' })
+        respondAccountLocked(res, newFailures)
       } else {
+        setLoginRateLimitHeaders(res, newFailures)
         res.status(401).json({ success: false, error: 'Invalid credentials' })
       }
       return
@@ -451,7 +542,7 @@ export function registerAuthRoutes(app: import('express').Application, prisma: P
     })
   })
 
-  app.post('/api/auth/logout', async (req: AuthenticatedRequest, res: Response) => {
+  authRouter.post('/logout', async (req: AuthenticatedRequest, res: Response) => {
     const token = getCookieValue(req.headers.cookie, SESSION_COOKIE_NAME)
     if (token) {
       await prisma.appSession.updateMany({
@@ -479,11 +570,13 @@ export function registerAuthRoutes(app: import('express').Application, prisma: P
     res.json({ success: true, data: { loggedOut: true } })
   })
 
-  app.get('/api/auth/me', (req: AuthenticatedRequest, res: Response) => {
+  authRouter.get('/me', (req: AuthenticatedRequest, res: Response) => {
     if (!req.auth) {
       res.status(401).json({ success: false, error: 'Authentication required' })
       return
     }
     res.json({ success: true, data: req.auth.claims })
   })
+
+  app.use('/api/auth', authRouter)
 }

@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "lastMessage": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "properties": {
+            "createdAt": {
+              "format": "date-time",
+              "type": "string"
+            },
+            "fromUserId": {
+              "type": "integer"
+            },
+            "id": {
+              "type": "integer"
+            },
+            "preview": {
+              "type": "string"
+            },
+            "toUserId": {
+              "type": "integer"
+            }
+          },
+          "type": "object"
+        }
+      ]
+    },
+    "unreadCount": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "user": {
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "role": {
+          "type": "string"
+        },
+        "username": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    }
+  },
+  "title": "ChatConversation",
+  "type": "object"
+}

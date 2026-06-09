@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "days": {
+      "default": 30,
+      "maximum": 365,
+      "minimum": 1,
+      "type": "integer"
+    },
+    "moduleKey": {
+      "type": "string"
+    },
+    "reason": {
+      "maxLength": 500,
+      "type": "string"
+    }
+  },
+  "required": [
+    "moduleKey"
+  ],
+  "title": "TenantModuleTrialActivateBody",
+  "type": "object"
+}

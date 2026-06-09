@@ -1,6 +1,15 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import KeyboardHint from '@/components/shared/KeyboardHint'
 import { dashboardAPI, type DashboardSummaryDTO } from '@/lib/api'
+import { useAuth } from '@/contexts/AuthContext'
+import { useFeatureFlags } from '@/contexts/FeatureFlagsContext'
+import type { ModuleDisabledLocationState } from '@/components/ModuleRoute'
+import { MODULE_KEYS, moduleI18nKey, type ModuleKey } from '@/lib/modules'
+import InicioAnalyticsTab from './InicioAnalyticsTab'
+
+type InicioTab = 'summary' | 'analytics'
 
 // ─── KPI Card ────────────────────────────────────────────────────────────────
 
@@ -38,9 +47,9 @@ function KpiCard({ title, count, total, icon, color, note, pending }: KpiCardPro
     <div className={`rounded-lg border-l-4 p-5 shadow-sm ${colorMap[color]}`}>
       <div className="flex items-start justify-between">
         <div>
-          <p className="text-xs font-medium uppercase tracking-wide opacity-70">{title}</p>
+          <p className="text-xs font-medium uppercase tracking-wide text-inherit opacity-90">{title}</p>
           {pending ? (
-            <p className="mt-2 text-sm opacity-60">{t('dashboard.pendingFeature')}</p>
+            <p className="mt-2 text-sm text-green-900 dark:text-green-100">{t('dashboard.pendingFeature')}</p>
           ) : (
             <>
               <p className="mt-1 text-3xl font-bold">
@@ -52,7 +61,7 @@ function KpiCard({ title, count, total, icon, color, note, pending }: KpiCardPro
             </>
           )}
           {note && !pending && (
-            <p className="mt-2 text-xs opacity-50 italic">{note}</p>
+            <p className="mt-2 text-xs italic text-red-900 dark:text-red-100">{note}</p>
           )}
         </div>
         <span className="text-3xl" aria-hidden="true">{icon}</span>
@@ -61,8 +70,6 @@ function KpiCard({ title, count, total, icon, color, note, pending }: KpiCardPro
   )
 }
 
-// ─── Alert Card for alertasActivas ──────────────────────────────────────────
-
 function AlertCard({ count, pending }: { count: number; pending: boolean }) {
   const { t } = useTranslation('common')
 
@@ -70,11 +77,11 @@ function AlertCard({ count, pending }: { count: number; pending: boolean }) {
     <div className="rounded-lg border-l-4 border-orange-500 bg-orange-50 dark:bg-orange-950 text-orange-700 dark:text-orange-300 p-5 shadow-sm">
       <div className="flex items-start justify-between">
         <div>
-          <p className="text-xs font-medium uppercase tracking-wide opacity-70">
+          <p className="text-xs font-medium uppercase tracking-wide text-inherit opacity-90">
             {t('dashboard.alertasActivas')}
           </p>
           {pending ? (
-            <p className="mt-2 text-sm opacity-60">{t('dashboard.pendingFeature')}</p>
+            <p className="mt-2 text-sm text-orange-900 dark:text-orange-100">{t('dashboard.pendingFeature')}</p>
           ) : (
             <p className="mt-1 text-3xl font-bold">{count}</p>
           )}
@@ -85,18 +92,44 @@ function AlertCard({ count, pending }: { count: number; pending: boolean }) {
   )
 }
 
-// ─── Main Page ────────────────────────────────────────────────────────────────
+function parseModuleDisabledState(state: unknown): ModuleKey | null {
+  if (!state || typeof state !== 'object') return null
+  const key = (state as ModuleDisabledLocationState).moduleDisabled
+  if (typeof key !== 'string') return null
+  return (MODULE_KEYS as readonly string[]).includes(key) ? (key as ModuleKey) : null
+}
 
 /**
- * @en Dashboard home page — displays today's KPIs from GET /api/dashboard/summary.
- * @es Página de inicio — muestra los KPIs del día de GET /api/dashboard/summary.
- * @pt-BR Página inicial — exibe os KPIs do dia de GET /api/dashboard/summary.
+ * @en Dashboard home — KPI summary and advanced analytics tab (#138).
+ * @es Inicio — resumen KPI y pestaña de analítica avanzada (#138).
+ * @pt-BR Início — resumo KPI e aba de análise avançada (#138).
  */
 export default function InicioPage() {
-  const { t } = useTranslation('common')
+  const { t } = useTranslation(['common', 'dashboardAnalytics'])
+  const location = useLocation()
+  const navigate = useNavigate()
+  const { claims } = useAuth()
+  const { hasModule } = useFeatureFlags()
+  const [moduleAlert] = useState<ModuleKey | null>(() => parseModuleDisabledState(location.state))
+  const [activeTab, setActiveTab] = useState<InicioTab>('summary')
   const [data, setData] = useState<DashboardSummaryDTO | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+
+  const canAnalytics =
+    (claims?.permissions.includes('reports.operational.read') ?? false) &&
+    hasModule('analytics.advanced')
+
+  const inicioShortcuts = useMemo(
+    () => [{ key: 'Tab', description: t('common:shortcuts.navigate') }],
+    [t],
+  )
+
+  useEffect(() => {
+    if (moduleAlert) {
+      navigate(location.pathname, { replace: true, state: {} })
+    }
+  }, [moduleAlert, location.pathname, navigate])
 
   useEffect(() => {
     let cancelled = false
@@ -119,50 +152,162 @@ export default function InicioPage() {
     }
   }, [])
 
+  const tabListId = 'inicio-tablist'
+
   return (
-    <div className="p-8">
+    <div className="p-4 sm:p-8">
       <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-6">
-        {t('dashboard.title')}
+        {t('common:dashboard.title')}
       </h1>
 
-      {loading && (
-        <p className="text-slate-500 dark:text-slate-400" role="status" aria-busy="true">
-          {t('status.loading')}
+      {moduleAlert ? (
+        <p
+          role="alert"
+          className="mb-4 rounded border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900 dark:border-amber-700 dark:bg-amber-950 dark:text-amber-100"
+          data-testid="module-disabled-alert"
+        >
+          {t('common:errors.moduleNotEnabled', { module: t(moduleI18nKey(moduleAlert)) })}
         </p>
-      )}
+      ) : null}
 
-      {error && (
-        <p role="alert" className="text-red-600 dark:text-red-400 text-sm">
-          {error}
-        </p>
-      )}
+      <KeyboardHint shortcuts={inicioShortcuts} className="mb-4" />
 
-      {!loading && !error && data && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
-          <KpiCard
-            title={t('dashboard.ventasHoy')}
-            count={data.ventasHoy.count}
-            total={data.ventasHoy.total}
-            icon="💰"
-            color="blue"
-          />
-          <KpiCard
-            title={t('dashboard.facturasVencidas')}
-            count={data.facturasVencidas.count}
-            total={data.facturasVencidas.total}
-            icon="⚠️"
-            color="red"
-            note={t('dashboard.overdueNote')}
-          />
-          <KpiCard
-            title={t('dashboard.cobrosHoy')}
-            count={data.cobrosHoy.count}
-            total={data.cobrosHoy.total}
-            icon="💳"
-            color="green"
-            pending={true}
-          />
-          <AlertCard count={data.alertasActivas} pending={data.alertasActivas === 0} />
+      <div
+        role="tablist"
+        id={tabListId}
+        aria-label={t('common:dashboard.title')}
+        className="mb-6 flex flex-wrap gap-2 border-b border-slate-200 dark:border-slate-700"
+        data-testid="inicio-tabs"
+      >
+        <button
+          type="button"
+          role="tab"
+          id="inicio-tab-summary"
+          {...(activeTab === 'summary'
+            ? { 'aria-selected': 'true' as const }
+            : { 'aria-selected': 'false' as const })}
+          aria-controls="inicio-panel-summary"
+          className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px ${
+            activeTab === 'summary'
+              ? 'border-indigo-600 text-indigo-700 dark:text-indigo-300'
+              : 'border-transparent text-slate-600 dark:text-slate-400'
+          }`}
+          onClick={() => setActiveTab('summary')}
+          data-testid="inicio-tab-summary"
+        >
+          {t('dashboardAnalytics:tabSummary')}
+        </button>
+        <button
+          type="button"
+          role="tab"
+          id="inicio-tab-analytics"
+          {...(activeTab === 'analytics'
+            ? { 'aria-selected': 'true' as const }
+            : { 'aria-selected': 'false' as const })}
+          aria-controls="inicio-panel-analytics"
+          className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px ${
+            activeTab === 'analytics'
+              ? 'border-indigo-600 text-indigo-700 dark:text-indigo-300'
+              : 'border-transparent text-slate-600 dark:text-slate-400'
+          }`}
+          onClick={() => setActiveTab('analytics')}
+          data-testid="inicio-tab-analytics"
+        >
+          {t('dashboardAnalytics:tabAnalytics')}
+        </button>
+      </div>
+
+      {activeTab === 'summary' ? (
+        <div
+          role="tabpanel"
+          id="inicio-panel-summary"
+          aria-labelledby="inicio-tab-summary"
+          data-testid="inicio-panel-summary"
+        >
+          {loading && (
+            <p className="text-slate-500 dark:text-slate-400" role="status" aria-busy="true">
+              {t('common:status.loading')}
+            </p>
+          )}
+
+          {error && (
+            <p role="alert" className="text-red-600 dark:text-red-400 text-sm">
+              {error}
+            </p>
+          )}
+
+          {!loading && !error && data && (
+            <div className="space-y-5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
+                <KpiCard
+                  title={t('common:dashboard.ventasHoy')}
+                  count={data.ventasHoy.count}
+                  total={data.ventasHoy.total}
+                  icon="💰"
+                  color="blue"
+                />
+                <KpiCard
+                  title={t('common:dashboard.facturasVencidas')}
+                  count={data.facturasVencidas.count}
+                  total={data.facturasVencidas.total}
+                  icon="⚠️"
+                  color="red"
+                  note={t('common:dashboard.overdueNote')}
+                />
+                <KpiCard
+                  title={t('common:dashboard.cobrosHoy')}
+                  count={data.cobrosHoy.count}
+                  total={data.cobrosHoy.total}
+                  icon="💳"
+                  color="green"
+                  pending={true}
+                />
+                <AlertCard count={data.alertasActivas} pending={data.alertasActivas === 0} />
+              </div>
+              {hasModule('finance.ledger') && data.facturasPagar && (
+                <div
+                  className="grid grid-cols-1 sm:grid-cols-2 gap-5"
+                  data-testid="inicio-facturas-pagar-widgets"
+                >
+                  <KpiCard
+                    title={t('common:dashboard.facturasPagarVencidas')}
+                    count={data.facturasPagar.vencido.count}
+                    total={data.facturasPagar.vencido.total}
+                    icon="📋"
+                    color="red"
+                  />
+                  <KpiCard
+                    title={t('common:dashboard.facturasPagarProximas')}
+                    count={data.facturasPagar.proximoVencer.count}
+                    total={data.facturasPagar.proximoVencer.total}
+                    icon="📅"
+                    color="yellow"
+                  />
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      ) : (
+        <div
+          role="tabpanel"
+          id="inicio-panel-analytics"
+          aria-labelledby="inicio-tab-analytics"
+          data-testid="inicio-panel-analytics"
+        >
+          {!canAnalytics ? (
+            <p
+              role="status"
+              className="text-sm text-slate-600 dark:text-slate-400"
+              data-testid="inicio-analytics-forbidden"
+            >
+              {!(claims?.permissions.includes('reports.operational.read') ?? false)
+                ? t('dashboardAnalytics:permissionRequired')
+                : t('dashboardAnalytics:moduleRequired')}
+            </p>
+          ) : (
+            <InicioAnalyticsTab />
+          )}
         </div>
       )}
     </div>

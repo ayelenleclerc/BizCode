@@ -1,0 +1,35 @@
+{
+  "title": "Picking no depósito",
+  "forbidden": "Você não tem permissão para separar ordens no depósito.",
+  "queue": {
+    "title": "Fila de picking",
+    "empty": "Não há ordens pendentes de separação.",
+    "loading": "Carregando fila…",
+    "selectHint": "Selecione uma ordem para ver os detalhes."
+  },
+  "detail": {
+    "cliente": "Cliente",
+    "fecha": "Data de compromisso",
+    "zona": "Zona",
+    "horario": "Horário da zona",
+    "picker": "Separador",
+    "noItems": "Esta ordem não tem itens de fatura. Confirme que o pacote está completo antes de marcar como pronta.",
+    "checklistTitle": "Itens a separar",
+    "markReady": "Marcar como pronta",
+    "starting": "Assumindo ordem…",
+    "saving": "Salvando…"
+  },
+  "lead": {
+    "title": "Prontas para despacho",
+    "empty": "Não há ordens prontas para incluir em uma rota.",
+    "cta": "Planejar rota",
+    "hint": "Ordens no status «Pronta» podem ser adicionadas ao criar uma rota em Repartos."
+  },
+  "errors": {
+    "load": "Não foi possível carregar a fila de picking.",
+    "start": "Não foi possível iniciar o picking desta ordem.",
+    "ready": "Não foi possível marcar a ordem como pronta.",
+    "locked": "Outra pessoa está separando esta ordem.",
+    "checklist": "Marque todos os itens antes de continuar."
+  }
+}

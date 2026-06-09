@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "active": {
+      "type": "boolean"
+    },
+    "createdAt": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "facturaCount": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "id": {
+      "type": "integer"
+    },
+    "name": {
+      "type": "string"
+    },
+    "plan": {
+      "nullable": true,
+      "type": "string"
+    },
+    "slug": {
+      "type": "string"
+    },
+    "userCount": {
+      "minimum": 0,
+      "type": "integer"
+    }
+  },
+  "required": [
+    "id",
+    "name",
+    "slug",
+    "active",
+    "plan",
+    "userCount",
+    "facturaCount",
+    "createdAt"
+  ],
+  "title": "SuperadminTenantListRow",
+  "type": "object"
+}

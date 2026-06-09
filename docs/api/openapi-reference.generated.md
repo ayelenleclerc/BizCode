@@ -5,7 +5,7 @@
 - **OpenAPI Version:** `3.1.0`
 - **API Version:** `0.1.0`
 
-REST API for BizCode commercial management system. Runs as an Express 5 sidecar on localhost:3001. Responses use a JSON envelope `{ success: true, data: ... }` except `/api/health`. Session authentication is required for protected resources. Interactive documentation (Swagger UI): <http://localhost:3001/api-docs/> (same contract as this file).
+REST API for BizCode commercial management system. Runs as an Express 5 sidecar on localhost:3001. Responses use a JSON envelope `{ success: true, data: ... }` except `/api/health`. Session authentication is required for protected resources. Protected endpoints can optionally receive `x-bizcode-channel` to enforce channel scope authorization. All routes accept optional `X-Request-Id` (max 128 characters); invalid or empty values are ignored and a UUID is assigned. The effective id is echoed on every response (`X-Request-Id`; see runtime middleware `correlationId`). Interactive documentation (Swagger UI): <http://localhost:3001/api-docs/> (same contract as this file).
 
 ## Servers
 
@@ -231,7 +231,28 @@ One-time endpoint to create initial tenant and owner user.
 }
 ```
 
-##### Status: 401 Authentication required or invalid credentials
+##### Status: 401 Invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 429 Account locked after too many failed login attempts
 
 ###### Content-Type: application/json
 
@@ -444,14 +465,2891 @@ One-time endpoint to create initial tenant and owner user.
 
   `string`, format: `date-time`
 
+- **`db`**
+
+  `object`
+
+  - **`latencyMs` (required)**
+
+    `number`
+
+  - **`ok` (required)**
+
+    `boolean`
+
+- **`uptimeSeconds`**
+
+  `number`
+
+- **`version`**
+
+  `string`
+
 **Example:**
 
 ```json
 {
   "status": "ok",
-  "timestamp": ""
+  "timestamp": "",
+  "db": {
+    "ok": true,
+    "latencyMs": 0
+  },
+  "uptimeSeconds": 0,
+  "version": ""
 }
 ```
+
+### In-memory observability metrics
+
+- **Method:** `GET`
+- **Path:** `/api/metrics`
+- **Tags:** health
+
+Returns aggregated technical counters kept in process memory. This endpoint excludes tenant/user identifiers and client hints.
+
+#### Responses
+
+##### Status: 200 Aggregated in-memory metrics
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`appEnv` (required)**
+
+    `string`
+
+  - **`requestsByMethod` (required)**
+
+    `object`
+
+  - **`requestsByRoute` (required)**
+
+    `object`
+
+  - **`responsesByStatus` (required)**
+
+    `object`
+
+  - **`startedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`totals` (required)**
+
+    `object`
+
+    - **`averageDurationMs` (required)**
+
+      `number`
+
+    - **`errors4xx` (required)**
+
+      `integer`
+
+    - **`errors5xx` (required)**
+
+      `integer`
+
+    - **`requests` (required)**
+
+      `integer`
+
+  - **`uptimeSeconds` (required)**
+
+    `integer`
+
+  - **`appVersion`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "startedAt": "",
+    "uptimeSeconds": 0,
+    "appEnv": "",
+    "appVersion": "",
+    "totals": {
+      "requests": 0,
+      "errors4xx": 0,
+      "errors5xx": 0,
+      "averageDurationMs": 0
+    },
+    "requestsByMethod": {
+      "additionalProperty": 0
+    },
+    "responsesByStatus": {
+      "additionalProperty": 0
+    },
+    "requestsByRoute": {
+      "additionalProperty": 0
+    }
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Metrics endpoint disabled
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Module catalog (feature flags metadata)
+
+- **Method:** `GET`
+- **Path:** `/api/modules/catalog`
+- **Tags:** modules
+
+Returns the full module catalog with dependency graph metadata, deployment environment, and business presets. Does not include tenant-specific enabled modules (see `/api/me/features`).
+
+#### Responses
+
+##### Status: 200 Module catalog
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`deploymentEnv` (required)**
+
+    `string`, possible values: `"dev", "prod"`
+
+  - **`modules` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`canDeactivate` (required)**
+
+      `boolean`
+
+    - **`dependencies` (required)**
+
+      `array`
+
+      **Items:**
+
+      `string`
+
+    - **`key` (required)**
+
+      `string`
+
+    - **`label` (required)**
+
+      `string`
+
+    - **`plan` (required)**
+
+      `string`, possible values: `"starter", "pro", "enterprise"`
+
+    - **`price` (required)**
+
+      `number`
+
+    - **`required` (required)**
+
+      `boolean`
+
+    - **`requiredInProd` (required)**
+
+      `boolean`
+
+  - **`presets` (required)**
+
+    `object`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "deploymentEnv": "dev",
+    "modules": [
+      {
+        "key": "",
+        "label": "",
+        "required": true,
+        "requiredInProd": true,
+        "dependencies": [
+          ""
+        ],
+        "plan": "starter",
+        "price": 1,
+        "canDeactivate": true
+      }
+    ],
+    "presets": {
+      "additionalProperty": {
+        "modules": [
+          ""
+        ]
+      }
+    }
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Enabled modules for current tenant
+
+- **Method:** `GET`
+- **Path:** `/api/me/features`
+- **Tags:** modules
+
+Returns module and integration keys enabled for the authenticated user's tenant.
+
+#### Responses
+
+##### Status: 200 Tenant feature flags
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`integrations` (required)**
+
+    `array`
+
+    **Items:**
+
+    `string`
+
+  - **`modules` (required)**
+
+    `array`
+
+    **Items:**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "modules": [
+      ""
+    ],
+    "integrations": [
+      ""
+    ]
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Public SaaS plan catalog
+
+- **Method:** `GET`
+- **Path:** `/api/planes`
+- **Tags:** platform
+
+Lists active subscription plans with limits and feature keys (no authentication required).
+
+#### Responses
+
+##### Status: 200 Plan catalog
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`currency` (required)**
+
+    `string`
+
+  - **`features` (required)**
+
+    `array`
+
+    **Items:**
+
+    `string`
+
+  - **`key` (required)**
+
+    `string`
+
+  - **`maxInvoicesPerMonth` (required)**
+
+    `integer`
+
+  - **`maxUsers` (required)**
+
+    `integer`
+
+  - **`monthlyPrice` (required)**
+
+    `integer`
+
+  - **`name` (required)**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "key": "",
+      "name": "",
+      "monthlyPrice": 1,
+      "currency": "",
+      "maxUsers": 1,
+      "maxInvoicesPerMonth": 1,
+      "features": [
+        ""
+      ]
+    }
+  ]
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Current tenant SaaS plan and usage
+
+- **Method:** `GET`
+- **Path:** `/api/me/plan`
+- **Tags:** platform
+
+Returns plan limits, enabled plan features, and current usage for the authenticated tenant.
+
+#### Responses
+
+##### Status: 200 Tenant plan snapshot
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`currency` (required)**
+
+    `string`
+
+  - **`features` (required)**
+
+    `array`
+
+    **Items:**
+
+    `string`
+
+  - **`maxInvoicesPerMonth` (required)**
+
+    `integer`
+
+  - **`maxUsers` (required)**
+
+    `integer`
+
+  - **`monthlyPrice` (required)**
+
+    `integer`
+
+  - **`planKey` (required)**
+
+    `string`
+
+  - **`planName` (required)**
+
+    `string`
+
+  - **`status` (required)**
+
+    `string`
+
+  - **`usage` (required)**
+
+    `object`
+
+    - **`invoicesUsed` (required)**
+
+      `integer`
+
+    - **`usersUsed` (required)**
+
+      `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "planKey": "",
+    "planName": "",
+    "monthlyPrice": 1,
+    "currency": "",
+    "maxUsers": 1,
+    "maxInvoicesPerMonth": 1,
+    "features": [
+      ""
+    ],
+    "status": "",
+    "usage": {
+      "usersUsed": 1,
+      "invoicesUsed": 1
+    }
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Platform-wide tenant statistics (super admin)
+
+- **Method:** `GET`
+- **Path:** `/api/superadmin/stats`
+- **Tags:** platform
+
+#### Responses
+
+##### Status: 200 Global platform stats (metadata only)
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`activeTenants` (required)**
+
+    `integer`
+
+  - **`facturasToday` (required)**
+
+    `integer`
+
+  - **`inactiveTenants` (required)**
+
+    `integer`
+
+  - **`totalTenants` (required)**
+
+    `integer`
+
+  - **`totalUsers` (required)**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "activeTenants": 0,
+    "totalTenants": 0,
+    "inactiveTenants": 0,
+    "facturasToday": 0,
+    "totalUsers": 0
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### List tenants (super admin)
+
+- **Method:** `GET`
+- **Path:** `/api/superadmin/tenants`
+- **Tags:** platform
+
+#### Responses
+
+##### Status: 200 Tenant list with aggregate counts
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`active` (required)**
+
+    `boolean`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`facturaCount` (required)**
+
+    `integer`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`name` (required)**
+
+    `string`
+
+  - **`plan` (required)**
+
+    `string`
+
+  - **`slug` (required)**
+
+    `string`
+
+  - **`userCount` (required)**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "name": "",
+      "slug": "",
+      "active": true,
+      "plan": "",
+      "userCount": 0,
+      "facturaCount": 0,
+      "createdAt": ""
+    }
+  ]
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Create tenant with default module config (super admin)
+
+- **Method:** `POST`
+- **Path:** `/api/superadmin/tenants`
+- **Tags:** platform
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`name` (required)**
+
+  `string`
+
+- **`slug` (required)**
+
+  `string`
+
+- **`ownerPassword`**
+
+  `string`, format: `password`
+
+- **`ownerUsername`**
+
+  `string`
+
+- **`plan`**
+
+  `string`, possible values: `"starter", "pro", "enterprise"`
+
+**Example:**
+
+```json
+{
+  "name": "",
+  "slug": "",
+  "plan": "starter",
+  "ownerUsername": "",
+  "ownerPassword": ""
+}
+```
+
+#### Responses
+
+##### Status: 201 Tenant created
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`ownerUserId` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "tenantId": 1,
+    "ownerUserId": 1
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 409 Slug already exists
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/superadmin/tenants/{tenantId}
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/superadmin/tenants/{tenantId}`
+
+### Tenant detail with platform stats (super admin)
+
+- **Method:** `GET`
+- **Path:** `/api/superadmin/tenants/{tenantId}`
+- **Tags:** platform
+
+#### Responses
+
+##### Status: 200 Tenant metadata and aggregate stats
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`active` (required)**
+
+    `boolean`
+
+  - **`configUpdatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`lastActivityAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`modulesCount` (required)**
+
+    `integer`
+
+  - **`name` (required)**
+
+    `string`
+
+  - **`plan` (required)**
+
+    `string`
+
+  - **`slug` (required)**
+
+    `string`
+
+  - **`stats` (required)**
+
+    `object`
+
+    - **`clienteCount` (required)**
+
+      `integer`
+
+    - **`facturaCount` (required)**
+
+      `integer`
+
+    - **`pedidoCount` (required)**
+
+      `integer`
+
+    - **`userCount` (required)**
+
+      `integer`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "name": "",
+    "slug": "",
+    "active": true,
+    "createdAt": "",
+    "updatedAt": "",
+    "plan": "",
+    "modulesCount": 0,
+    "configUpdatedAt": "",
+    "stats": {
+      "userCount": 0,
+      "facturaCount": 0,
+      "pedidoCount": 0,
+      "clienteCount": 0
+    },
+    "lastActivityAt": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Tenant not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Suspend or reactivate tenant (super admin)
+
+- **Method:** `PATCH`
+- **Path:** `/api/superadmin/tenants/{tenantId}`
+- **Tags:** platform
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`active` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "active": true
+}
+```
+
+#### Responses
+
+##### Status: 200 Updated tenant
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`active` (required)**
+
+    `boolean`
+
+  - **`configUpdatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`lastActivityAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`modulesCount` (required)**
+
+    `integer`
+
+  - **`name` (required)**
+
+    `string`
+
+  - **`plan` (required)**
+
+    `string`
+
+  - **`slug` (required)**
+
+    `string`
+
+  - **`stats` (required)**
+
+    `object`
+
+    - **`clienteCount` (required)**
+
+      `integer`
+
+    - **`facturaCount` (required)**
+
+      `integer`
+
+    - **`pedidoCount` (required)**
+
+      `integer`
+
+    - **`userCount` (required)**
+
+      `integer`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "name": "",
+    "slug": "",
+    "active": true,
+    "createdAt": "",
+    "updatedAt": "",
+    "plan": "",
+    "modulesCount": 0,
+    "configUpdatedAt": "",
+    "stats": {
+      "userCount": 0,
+      "facturaCount": 0,
+      "pedidoCount": 0,
+      "clienteCount": 0
+    },
+    "lastActivityAt": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Tenant not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/superadmin/tenants/{tenantId}/config
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/superadmin/tenants/{tenantId}/config`
+
+### Get tenant module configuration (super admin)
+
+- **Method:** `GET`
+- **Path:** `/api/superadmin/tenants/{tenantId}/config`
+- **Tags:** platform
+
+#### Responses
+
+##### Status: 200 Tenant configuration
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`businessType` (required)**
+
+    `string`, possible values: `"mayorista", "minorista", "ambos"`
+
+  - **`integrations` (required)**
+
+    `array`
+
+    **Items:**
+
+    `string`
+
+  - **`modules` (required)**
+
+    `array`
+
+    **Items:**
+
+    `string`
+
+  - **`plan` (required)**
+
+    `string`, possible values: `"starter", "pro", "enterprise"`
+
+  - **`rubros` (required)**
+
+    `array`
+
+    **Items:**
+
+    `string`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "tenantId": 1,
+    "businessType": "mayorista",
+    "rubros": [
+      ""
+    ],
+    "plan": "starter",
+    "modules": [
+      ""
+    ],
+    "integrations": [
+      ""
+    ],
+    "updatedAt": ""
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Tenant not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Update tenant module configuration (super admin)
+
+- **Method:** `PUT`
+- **Path:** `/api/superadmin/tenants/{tenantId}/config`
+- **Tags:** platform
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`modules` (required)**
+
+  `array`
+
+  **Items:**
+
+  `string`
+
+- **`reason` (required)**
+
+  `string`
+
+- **`businessType`**
+
+  `string`, possible values: `"mayorista", "minorista", "ambos"`
+
+- **`integrations`**
+
+  `array`
+
+  **Items:**
+
+  `string`
+
+- **`plan`**
+
+  `string`, possible values: `"starter", "pro", "enterprise"`
+
+- **`rubros`**
+
+  `array`
+
+  **Items:**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "businessType": "mayorista",
+  "rubros": [
+    ""
+  ],
+  "plan": "starter",
+  "modules": [
+    ""
+  ],
+  "integrations": [
+    ""
+  ],
+  "reason": ""
+}
+```
+
+#### Responses
+
+##### Status: 200 Updated configuration
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`businessType` (required)**
+
+    `string`, possible values: `"mayorista", "minorista", "ambos"`
+
+  - **`integrations` (required)**
+
+    `array`
+
+    **Items:**
+
+    `string`
+
+  - **`modules` (required)**
+
+    `array`
+
+    **Items:**
+
+    `string`
+
+  - **`plan` (required)**
+
+    `string`, possible values: `"starter", "pro", "enterprise"`
+
+  - **`rubros` (required)**
+
+    `array`
+
+    **Items:**
+
+    `string`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "tenantId": 1,
+    "businessType": "mayorista",
+    "rubros": [
+      ""
+    ],
+    "plan": "starter",
+    "modules": [
+      ""
+    ],
+    "integrations": [
+      ""
+    ],
+    "updatedAt": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/superadmin/tenants/{tenantId}/config/history
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/superadmin/tenants/{tenantId}/config/history`
+
+### Tenant configuration change history (super admin)
+
+- **Method:** `GET`
+- **Path:** `/api/superadmin/tenants/{tenantId}/config/history`
+- **Tags:** platform
+
+#### Responses
+
+##### Status: 200 History entries
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`items` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`after` (required)**
+
+      `object`
+
+    - **`before` (required)**
+
+      `object`
+
+    - **`changedById` (required)**
+
+      `integer`
+
+    - **`createdAt` (required)**
+
+      `string`, format: `date-time`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`reason`**
+
+      `string`
+
+  - **`total` (required)**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "total": 1,
+    "items": [
+      {
+        "id": 1,
+        "changedById": 1,
+        "before": {
+          "additionalProperty": "anything"
+        },
+        "after": {
+          "additionalProperty": "anything"
+        },
+        "reason": "",
+        "createdAt": ""
+      }
+    ]
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/superadmin/tenants/{tenantId}/config/apply-template
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/superadmin/tenants/{tenantId}/config/apply-template`
+
+### Apply module preset to tenant (super admin)
+
+- **Method:** `POST`
+- **Path:** `/api/superadmin/tenants/{tenantId}/config/apply-template`
+- **Tags:** platform
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`preset` (required)**
+
+  `string`
+
+- **`reason`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "preset": "",
+  "reason": ""
+}
+```
+
+#### Responses
+
+##### Status: 200 Configuration after preset
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`businessType` (required)**
+
+    `string`, possible values: `"mayorista", "minorista", "ambos"`
+
+  - **`integrations` (required)**
+
+    `array`
+
+    **Items:**
+
+    `string`
+
+  - **`modules` (required)**
+
+    `array`
+
+    **Items:**
+
+    `string`
+
+  - **`plan` (required)**
+
+    `string`, possible values: `"starter", "pro", "enterprise"`
+
+  - **`rubros` (required)**
+
+    `array`
+
+    **Items:**
+
+    `string`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "tenantId": 1,
+    "businessType": "mayorista",
+    "rubros": [
+      ""
+    ],
+    "plan": "starter",
+    "modules": [
+      ""
+    ],
+    "integrations": [
+      ""
+    ],
+    "updatedAt": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/superadmin/tenants/{tenantId}/plan
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/superadmin/tenants/{tenantId}/plan`
+
+### Change tenant SaaS plan (super admin)
+
+- **Method:** `POST`
+- **Path:** `/api/superadmin/tenants/{tenantId}/plan`
+- **Tags:** platform
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`planKey` (required)**
+
+  `string`, possible values: `"starter", "pro", "enterprise", "trial"`
+
+- **`reason` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "planKey": "starter",
+  "reason": ""
+}
+```
+
+#### Responses
+
+##### Status: 200 Updated tenant plan
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`currency` (required)**
+
+    `string`
+
+  - **`features` (required)**
+
+    `array`
+
+    **Items:**
+
+    `string`
+
+  - **`maxInvoicesPerMonth` (required)**
+
+    `integer`
+
+  - **`maxUsers` (required)**
+
+    `integer`
+
+  - **`monthlyPrice` (required)**
+
+    `integer`
+
+  - **`planKey` (required)**
+
+    `string`
+
+  - **`planName` (required)**
+
+    `string`
+
+  - **`status` (required)**
+
+    `string`
+
+  - **`usage` (required)**
+
+    `object`
+
+    - **`invoicesUsed` (required)**
+
+      `integer`
+
+    - **`usersUsed` (required)**
+
+      `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "planKey": "",
+    "planName": "",
+    "monthlyPrice": 1,
+    "currency": "",
+    "maxUsers": 1,
+    "maxInvoicesPerMonth": 1,
+    "features": [
+      ""
+    ],
+    "status": "",
+    "usage": {
+      "usersUsed": 1,
+      "invoicesUsed": 1
+    }
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Tenant not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/superadmin/tenants/{tenantId}/pricing
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/superadmin/tenants/{tenantId}/pricing`
+
+### Estimated monthly pricing for tenant (super admin)
+
+- **Method:** `GET`
+- **Path:** `/api/superadmin/tenants/{tenantId}/pricing`
+- **Tags:** platform
+
+#### Responses
+
+##### Status: 200 Pricing breakdown
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`addons` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`moduleKey` (required)**
+
+      `string`
+
+    - **`price` (required)**
+
+      `number`
+
+  - **`basePrice` (required)**
+
+    `number`
+
+  - **`plan` (required)**
+
+    `string`
+
+  - **`totalMonthly` (required)**
+
+    `number`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "plan": "",
+    "basePrice": 0,
+    "addons": [
+      {
+        "moduleKey": "",
+        "price": 0
+      }
+    ],
+    "totalMonthly": 0
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Tenant not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/superadmin/tenants/{tenantId}/trials
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/superadmin/tenants/{tenantId}/trials`
+
+### List active module trials for tenant (super admin)
+
+- **Method:** `GET`
+- **Path:** `/api/superadmin/tenants/{tenantId}/trials`
+- **Tags:** platform
+
+#### Responses
+
+##### Status: 200 Active trials
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`active` (required)**
+
+    `boolean`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`daysRemaining` (required)**
+
+    `integer`
+
+  - **`expiresAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`moduleKey` (required)**
+
+    `string`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "moduleKey": "",
+      "expiresAt": "",
+      "active": true,
+      "daysRemaining": 0,
+      "createdAt": ""
+    }
+  ]
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Tenant not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Activate or extend module trial (super admin)
+
+- **Method:** `POST`
+- **Path:** `/api/superadmin/tenants/{tenantId}/trials`
+- **Tags:** platform
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`moduleKey` (required)**
+
+  `string`
+
+- **`days`**
+
+  `integer`, default: `30`
+
+- **`reason`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "moduleKey": "",
+  "days": 30,
+  "reason": ""
+}
+```
+
+#### Responses
+
+##### Status: 201 Trial activated
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`active` (required)**
+
+    `boolean`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`daysRemaining` (required)**
+
+    `integer`
+
+  - **`expiresAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`moduleKey` (required)**
+
+    `string`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "moduleKey": "",
+    "expiresAt": "",
+    "active": true,
+    "daysRemaining": 0,
+    "createdAt": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Tenant not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/superadmin/tenants/{tenantId}/trials/{moduleKey}
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/superadmin/tenants/{tenantId}/trials/{moduleKey}`
+
+### Deactivate module trial (super admin)
+
+- **Method:** `DELETE`
+- **Path:** `/api/superadmin/tenants/{tenantId}/trials/{moduleKey}`
+- **Tags:** platform
+
+#### Responses
+
+##### Status: 200 Trial deactivated
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`active` (required)**
+
+    `boolean`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`daysRemaining` (required)**
+
+    `integer`
+
+  - **`expiresAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`moduleKey` (required)**
+
+    `string`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "moduleKey": "",
+    "expiresAt": "",
+    "active": true,
+    "daysRemaining": 0,
+    "createdAt": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Trial not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/clientes
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/clientes`
 
 ### List customers
 
@@ -464,6 +3362,8 @@ One-time endpoint to create initial tenant and owner user.
 ##### Status: 200 List of customers
 
 ###### Content-Type: application/json
+
+**All of:**
 
 - **`data` (required)**
 
@@ -551,6 +3451,18 @@ One-time endpoint to create initial tenant and owner user.
 
   `boolean`
 
+* **`limit` (required)**
+
+  `integer` — Effective page size (same semantics as query \`limit\`)
+
+* **`offset` (required)**
+
+  `integer` — Effective skip (same semantics as query \`offset\`)
+
+* **`total` (required)**
+
+  `integer` — Row count matching the list filter (before limit/offset)
+
 **Example:**
 
 ```json
@@ -579,7 +3491,10 @@ One-time endpoint to create initial tenant and owner user.
       "deliveryZoneId": 1,
       "additionalProperty": "anything"
     }
-  ]
+  ],
+  "total": 0,
+  "limit": 1,
+  "offset": 0
 }
 ```
 
@@ -858,6 +3773,27 @@ One-time endpoint to create initial tenant and owner user.
 }
 ```
 
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ##### Status: 401 Authentication required or invalid credentials
 
 ###### Content-Type: application/json
@@ -920,6 +3856,248 @@ One-time endpoint to create initial tenant and owner user.
   "error": ""
 }
 ```
+
+### PARAMETERS /api/clientes/import/template
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/clientes/import/template`
+
+### Download UTF-8 CSV template for bulk customer import
+
+- **Method:** `GET`
+- **Path:** `/api/clientes/import/template`
+- **Tags:** clientes
+
+#### Responses
+
+##### Status: 200 CSV with fixed header row and one example data row (UTF-8 BOM)
+
+###### Content-Type: text/csv
+
+`string`, format: `binary`
+
+**Example:**
+
+```json
+{}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/clientes/import
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/clientes/import`
+
+### Import customers from a CSV file
+
+- **Method:** `POST`
+- **Path:** `/api/clientes/import`
+- **Tags:** clientes
+
+#### Request Body
+
+##### Content-Type: multipart/form-data
+
+- **`file` (required)**
+
+  `string`, format: `binary` — UTF-8 CSV; first row must match the template headers exactly
+
+**Example:**
+
+```json
+{
+  "file": {}
+}
+```
+
+#### Responses
+
+##### Status: 200 Import summary (rows created vs skipped with per-row errors)
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`created` (required)**
+
+    `integer`
+
+  - **`errors` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`message` (required)**
+
+      `string`
+
+    - **`row` (required)**
+
+      `integer` — Data row number in the file (row 1 is the header)
+
+  - **`skipped` (required)**
+
+    `integer`
+
+  - **`updated`**
+
+    `integer` — Rows updated via upsert (legacy DBF migration endpoints)
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "created": 0,
+    "updated": 0,
+    "skipped": 0,
+    "errors": [
+      {
+        "row": 2,
+        "message": ""
+      }
+    ]
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/clientes/{id}
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/clientes/{id}`
 
 ### Get customer by id
 
@@ -1246,6 +4424,27 @@ One-time endpoint to create initial tenant and owner user.
 }
 ```
 
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ##### Status: 401 Authentication required or invalid credentials
 
 ###### Content-Type: application/json
@@ -1309,6 +4508,11 @@ One-time endpoint to create initial tenant and owner user.
 }
 ```
 
+### PARAMETERS /api/articulos
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/articulos`
+
 ### List products
 
 - **Method:** `GET`
@@ -1320,6 +4524,8 @@ One-time endpoint to create initial tenant and owner user.
 ##### Status: 200 List of products
 
 ###### Content-Type: application/json
+
+**All of:**
 
 - **`data` (required)**
 
@@ -1395,6 +4601,18 @@ One-time endpoint to create initial tenant and owner user.
 
   `boolean`
 
+* **`limit` (required)**
+
+  `integer` — Effective page size (same semantics as query \`limit\`)
+
+* **`offset` (required)**
+
+  `integer` — Effective skip (same semantics as query \`offset\`)
+
+* **`total` (required)**
+
+  `integer` — Row count matching the list filter (before limit/offset)
+
 **Example:**
 
 ```json
@@ -1422,7 +4640,10 @@ One-time endpoint to create initial tenant and owner user.
       "activo": true,
       "additionalProperty": "anything"
     }
-  ]
+  ],
+  "total": 0,
+  "limit": 1,
+  "offset": 0
 }
 ```
 
@@ -1668,6 +4889,27 @@ One-time endpoint to create initial tenant and owner user.
 }
 ```
 
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ##### Status: 401 Authentication required or invalid credentials
 
 ###### Content-Type: application/json
@@ -1730,6 +4972,11 @@ One-time endpoint to create initial tenant and owner user.
   "error": ""
 }
 ```
+
+### PARAMETERS /api/articulos/{id}
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/articulos/{id}`
 
 ### Get product by id
 
@@ -2022,6 +5269,27 @@ One-time endpoint to create initial tenant and owner user.
 }
 ```
 
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ##### Status: 401 Authentication required or invalid credentials
 
 ###### Content-Type: application/json
@@ -2085,6 +5353,1082 @@ One-time endpoint to create initial tenant and owner user.
 }
 ```
 
+### PARAMETERS /api/articulos/{id}/stock-historial
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/articulos/{id}/stock-historial`
+
+### List manual stock adjustments for a product
+
+- **Method:** `GET`
+- **Path:** `/api/articulos/{id}/stock-historial`
+- **Tags:** articulos
+
+#### Responses
+
+##### Status: 200 Paginated adjustment history
+
+###### Content-Type: application/json
+
+**All of:**
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`articuloId`**
+
+    `integer`
+
+  - **`cantidad`**
+
+    `integer`
+
+  - **`createdAt`**
+
+    `string`, format: `date-time`
+
+  - **`id`**
+
+    `integer`
+
+  - **`motivo`**
+
+    `string`
+
+  - **`user`**
+
+    `object`
+
+    - **`id`**
+
+      `integer`
+
+    - **`username`**
+
+      `string`
+
+  - **`userId`**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+* **`limit` (required)**
+
+  `integer` — Effective page size (same semantics as query \`limit\`)
+
+* **`offset` (required)**
+
+  `integer` — Effective skip (same semantics as query \`offset\`)
+
+* **`total` (required)**
+
+  `integer` — Row count matching the list filter (before limit/offset)
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "articuloId": 1,
+      "cantidad": 1,
+      "motivo": "",
+      "userId": 1,
+      "createdAt": "",
+      "user": {
+        "id": 1,
+        "username": ""
+      },
+      "additionalProperty": "anything"
+    }
+  ],
+  "total": 0,
+  "limit": 1,
+  "offset": 0
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Product not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/articulos/{id}/proveedores
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/articulos/{id}/proveedores`
+
+### Compare supplier catalog prices for a product (#274)
+
+- **Method:** `GET`
+- **Path:** `/api/articulos/{id}/proveedores`
+- **Tags:** articulos
+
+Lists active suppliers with an active catalog entry for the article, including list price, price age, and last received purchase order date. Requires module `logistics.purchases` and permission `products.read` or `suppliers.read`.
+
+#### Responses
+
+##### Status: 200 Supplier price comparison for the article
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`articuloCodigo` (required)**
+
+    `integer`
+
+  - **`articuloDescripcion` (required)**
+
+    `string`
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`proveedores` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`codigoProveedor` (required)**
+
+      `string`
+
+    - **`descripcionProveedor` (required)**
+
+      `string`
+
+    - **`esMasBarato` (required)**
+
+      `boolean`
+
+    - **`precioDesactualizado` (required)**
+
+      `boolean`
+
+    - **`precioLista` (required)**
+
+      `string`
+
+    - **`precioListaFecha` (required)**
+
+      `string`, format: `date-time`
+
+    - **`proveedorCodigo` (required)**
+
+      `integer`
+
+    - **`proveedorId` (required)**
+
+      `integer`
+
+    - **`proveedorRsocial` (required)**
+
+      `string`
+
+    - **`ultimaCompraFecha` (required)**
+
+      `string`, format: `date-time`
+
+  - **`proveedorMasBaratoId` (required)**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "articuloId": 1,
+    "articuloCodigo": 1,
+    "articuloDescripcion": "",
+    "proveedorMasBaratoId": 1,
+    "proveedores": [
+      {
+        "proveedorId": 1,
+        "proveedorCodigo": 1,
+        "proveedorRsocial": "",
+        "codigoProveedor": "",
+        "descripcionProveedor": "",
+        "precioLista": "",
+        "precioListaFecha": "",
+        "precioDesactualizado": true,
+        "ultimaCompraFecha": "",
+        "esMasBarato": true
+      }
+    ]
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/articulos/{id}/stock-ajuste
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/articulos/{id}/stock-ajuste`
+
+### Apply a manual stock adjustment
+
+- **Method:** `POST`
+- **Path:** `/api/articulos/{id}/stock-ajuste`
+- **Tags:** articulos
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`cantidad` (required)**
+
+  `integer`
+
+- **`motivo` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "cantidad": 1,
+  "motivo": ""
+}
+```
+
+#### Responses
+
+##### Status: 200 Adjustment applied
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`ajuste`**
+
+    `object`
+
+    - **`articuloId`**
+
+      `integer`
+
+    - **`cantidad`**
+
+      `integer`
+
+    - **`createdAt`**
+
+      `string`, format: `date-time`
+
+    - **`id`**
+
+      `integer`
+
+    - **`motivo`**
+
+      `string`
+
+    - **`user`**
+
+      `object`
+
+      - **`id`**
+
+        `integer`
+
+      - **`username`**
+
+        `string`
+
+    - **`userId`**
+
+      `integer`
+
+  - **`articulo`**
+
+    `object`
+
+  - **`stockAfter`**
+
+    `integer`
+
+  - **`stockBefore`**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "ajuste": {
+      "id": 1,
+      "articuloId": 1,
+      "cantidad": 1,
+      "motivo": "",
+      "userId": 1,
+      "createdAt": "",
+      "user": {
+        "id": 1,
+        "username": ""
+      },
+      "additionalProperty": "anything"
+    },
+    "articulo": {
+      "additionalProperty": "anything"
+    },
+    "stockBefore": 1,
+    "stockAfter": 1,
+    "additionalProperty": "anything"
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Product not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 422 Insufficient stock (INSUFFICIENT\_STOCK)
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/articulos/import/template
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/articulos/import/template`
+
+### Download UTF-8 CSV template for bulk product import
+
+- **Method:** `GET`
+- **Path:** `/api/articulos/import/template`
+- **Tags:** articulos
+
+#### Responses
+
+##### Status: 200 CSV with fixed header row and one example row (UTF-8 BOM)
+
+###### Content-Type: text/csv
+
+`string`, format: `binary`
+
+**Example:**
+
+```json
+{}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/articulos/import
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/articulos/import`
+
+### Import products from CSV (rubroCodigo must match an existing Rubro.codigo)
+
+- **Method:** `POST`
+- **Path:** `/api/articulos/import`
+- **Tags:** articulos
+
+#### Request Body
+
+##### Content-Type: multipart/form-data
+
+- **`file` (required)**
+
+  `string`, format: `binary` — UTF-8 CSV; first row must match the template headers exactly
+
+**Example:**
+
+```json
+{
+  "file": {}
+}
+```
+
+#### Responses
+
+##### Status: 200 Import summary
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`created` (required)**
+
+    `integer`
+
+  - **`errors` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`message` (required)**
+
+      `string`
+
+    - **`row` (required)**
+
+      `integer` — Data row number in the file (row 1 is the header)
+
+  - **`skipped` (required)**
+
+    `integer`
+
+  - **`updated`**
+
+    `integer` — Rows updated via upsert (legacy DBF migration endpoints)
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "created": 0,
+    "updated": 0,
+    "skipped": 0,
+    "errors": [
+      {
+        "row": 2,
+        "message": ""
+      }
+    ]
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/articulos/migrate-dbf
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/articulos/migrate-dbf`
+
+### Import products from legacy ARTICULOS.DBF (rubros must exist first)
+
+- **Method:** `POST`
+- **Path:** `/api/articulos/migrate-dbf`
+- **Tags:** articulos
+
+Requires `settings.business.manage`. Import `RUBROS.DBF` before `ARTICULOS.DBF`.
+
+#### Request Body
+
+##### Content-Type: multipart/form-data
+
+- **`file` (required)**
+
+  `string`, format: `binary` — FoxPro DBF file (cp437)
+
+**Example:**
+
+```json
+{
+  "file": {}
+}
+```
+
+#### Responses
+
+##### Status: 200 Import summary (created, updated, per-row errors)
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`created` (required)**
+
+    `integer`
+
+  - **`errors` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`message` (required)**
+
+      `string`
+
+    - **`row` (required)**
+
+      `integer` — Data row number in the file (row 1 is the header)
+
+  - **`skipped` (required)**
+
+    `integer`
+
+  - **`updated`**
+
+    `integer` — Rows updated via upsert (legacy DBF migration endpoints)
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "created": 0,
+    "updated": 0,
+    "skipped": 0,
+    "errors": [
+      {
+        "row": 2,
+        "message": ""
+      }
+    ]
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/rubros
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/rubros`
+
 ### List product categories
 
 - **Method:** `GET`
@@ -2096,6 +6440,8 @@ One-time endpoint to create initial tenant and owner user.
 ##### Status: 200 List of categories
 
 ###### Content-Type: application/json
+
+**All of:**
 
 - **`data` (required)**
 
@@ -2119,6 +6465,18 @@ One-time endpoint to create initial tenant and owner user.
 
   `boolean`
 
+* **`limit` (required)**
+
+  `integer` — Effective page size (same semantics as query \`limit\`)
+
+* **`offset` (required)**
+
+  `integer` — Effective skip (same semantics as query \`offset\`)
+
+* **`total` (required)**
+
+  `integer` — Row count matching the list filter (before limit/offset)
+
 **Example:**
 
 ```json
@@ -2131,7 +6489,10 @@ One-time endpoint to create initial tenant and owner user.
       "nombre": "",
       "additionalProperty": "anything"
     }
-  ]
+  ],
+  "total": 0,
+  "limit": 1,
+  "offset": 0
 }
 ```
 
@@ -2265,6 +6626,27 @@ One-time endpoint to create initial tenant and owner user.
 }
 ```
 
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ##### Status: 401 Authentication required or invalid credentials
 
 ###### Content-Type: application/json
@@ -2328,6 +6710,9443 @@ One-time endpoint to create initial tenant and owner user.
 }
 ```
 
+### PARAMETERS /api/rubros/import/template
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/rubros/import/template`
+
+### Download UTF-8 CSV template for bulk category import
+
+- **Method:** `GET`
+- **Path:** `/api/rubros/import/template`
+- **Tags:** rubros
+
+#### Responses
+
+##### Status: 200 CSV with fixed header row and one example row (UTF-8 BOM)
+
+###### Content-Type: text/csv
+
+`string`, format: `binary`
+
+**Example:**
+
+```json
+{}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/rubros/import
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/rubros/import`
+
+### Import product categories from CSV
+
+- **Method:** `POST`
+- **Path:** `/api/rubros/import`
+- **Tags:** rubros
+
+#### Request Body
+
+##### Content-Type: multipart/form-data
+
+- **`file` (required)**
+
+  `string`, format: `binary`
+
+**Example:**
+
+```json
+{
+  "file": {}
+}
+```
+
+#### Responses
+
+##### Status: 200 Import summary
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`created` (required)**
+
+    `integer`
+
+  - **`errors` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`message` (required)**
+
+      `string`
+
+    - **`row` (required)**
+
+      `integer` — Data row number in the file (row 1 is the header)
+
+  - **`skipped` (required)**
+
+    `integer`
+
+  - **`updated`**
+
+    `integer` — Rows updated via upsert (legacy DBF migration endpoints)
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "created": 0,
+    "updated": 0,
+    "skipped": 0,
+    "errors": [
+      {
+        "row": 2,
+        "message": ""
+      }
+    ]
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/rubros/migrate-dbf
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/rubros/migrate-dbf`
+
+### Import product categories from legacy RUBROS.DBF
+
+- **Method:** `POST`
+- **Path:** `/api/rubros/migrate-dbf`
+- **Tags:** rubros
+
+Requires `settings.business.manage`. Upserts by tenant and codigo.
+
+#### Request Body
+
+##### Content-Type: multipart/form-data
+
+- **`file` (required)**
+
+  `string`, format: `binary` — FoxPro DBF file (cp437)
+
+**Example:**
+
+```json
+{
+  "file": {}
+}
+```
+
+#### Responses
+
+##### Status: 200 Import summary (created, updated, per-row errors)
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`created` (required)**
+
+    `integer`
+
+  - **`errors` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`message` (required)**
+
+      `string`
+
+    - **`row` (required)**
+
+      `integer` — Data row number in the file (row 1 is the header)
+
+  - **`skipped` (required)**
+
+    `integer`
+
+  - **`updated`**
+
+    `integer` — Rows updated via upsert (legacy DBF migration endpoints)
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "created": 0,
+    "updated": 0,
+    "skipped": 0,
+    "errors": [
+      {
+        "row": 2,
+        "message": ""
+      }
+    ]
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/proveedores
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/proveedores`
+
+### List suppliers
+
+- **Method:** `GET`
+- **Path:** `/api/proveedores`
+- **Tags:** proveedores
+
+#### Responses
+
+##### Status: 200 Supplier list
+
+###### Content-Type: application/json
+
+**All of:**
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`activo`**
+
+    `boolean`
+
+  - **`alias`**
+
+    `string`
+
+  - **`banco`**
+
+    `string`
+
+  - **`categoria`**
+
+    `string`
+
+  - **`cbu`**
+
+    `string`
+
+  - **`codigo`**
+
+    `integer`
+
+  - **`condicionPago`**
+
+    `string`
+
+  - **`condIva`**
+
+    `string`
+
+  - **`contactoEmail`**
+
+    `string`
+
+  - **`contactoNombre`**
+
+    `string`
+
+  - **`contactoTel`**
+
+    `string`
+
+  - **`cuit`**
+
+    `string`
+
+  - **`descuentoPct`**
+
+    `number`
+
+  - **`email`**
+
+    `string`
+
+  - **`fantasia`**
+
+    `string`
+
+  - **`id`**
+
+    `integer`
+
+  - **`limiteCredito`**
+
+    `number`
+
+  - **`moneda`**
+
+    `string`
+
+  - **`notas`**
+
+    `string`
+
+  - **`plazoHabitual`**
+
+    `integer`
+
+  - **`rsocial`**
+
+    `string`
+
+  - **`telef`**
+
+    `string`
+
+  - **`tipoCuenta`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+* **`limit` (required)**
+
+  `integer` — Effective page size (same semantics as query \`limit\`)
+
+* **`offset` (required)**
+
+  `integer` — Effective skip (same semantics as query \`offset\`)
+
+* **`total` (required)**
+
+  `integer` — Row count matching the list filter (before limit/offset)
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "codigo": 1,
+      "rsocial": "",
+      "fantasia": "",
+      "cuit": "",
+      "condIva": "",
+      "telef": "",
+      "email": "",
+      "activo": true,
+      "cbu": "",
+      "alias": "",
+      "banco": "",
+      "tipoCuenta": "",
+      "moneda": "",
+      "condicionPago": "",
+      "plazoHabitual": 1,
+      "descuentoPct": 1,
+      "limiteCredito": 1,
+      "categoria": "",
+      "contactoNombre": "",
+      "contactoEmail": "",
+      "contactoTel": "",
+      "notas": "",
+      "additionalProperty": "anything"
+    }
+  ],
+  "total": 0,
+  "limit": 1,
+  "offset": 0
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Create supplier
+
+- **Method:** `POST`
+- **Path:** `/api/proveedores`
+- **Tags:** proveedores
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`activo` (required)**
+
+  `boolean`
+
+- **`codigo` (required)**
+
+  `integer`
+
+- **`condIva` (required)**
+
+  `string`, possible values: `"RI", "Mono", "CF", "Exento"`
+
+- **`rsocial` (required)**
+
+  `string`
+
+- **`alias`**
+
+  `string`
+
+- **`banco`**
+
+  `string`
+
+- **`categoria`**
+
+  `string`, possible values: `"materia_prima", "insumos", "servicios", "logistica"`
+
+- **`cbu`**
+
+  `string`
+
+- **`condicionPago`**
+
+  `string`, possible values: `"contado", "15dias", "30dias", "60dias", "otro"`
+
+- **`contactoEmail`**
+
+  `string`
+
+- **`contactoNombre`**
+
+  `string`
+
+- **`contactoTel`**
+
+  `string`
+
+- **`cuit`**
+
+  `string`
+
+- **`descuentoPct`**
+
+  `number`
+
+- **`email`**
+
+  `string`
+
+- **`fantasia`**
+
+  `string`
+
+- **`limiteCredito`**
+
+  `number`
+
+- **`moneda`**
+
+  `string`, default: `"ARS"`
+
+- **`notas`**
+
+  `string`
+
+- **`plazoHabitual`**
+
+  `integer`
+
+- **`telef`**
+
+  `string`
+
+- **`tipoCuenta`**
+
+  `string`, possible values: `"cc", "ca"`
+
+**Example:**
+
+```json
+{
+  "codigo": 1,
+  "rsocial": "",
+  "fantasia": "",
+  "cuit": "",
+  "condIva": "RI",
+  "telef": "",
+  "email": "",
+  "activo": true,
+  "cbu": "",
+  "alias": "",
+  "banco": "",
+  "tipoCuenta": "cc",
+  "moneda": "ARS",
+  "condicionPago": "contado",
+  "plazoHabitual": 0,
+  "descuentoPct": 1,
+  "limiteCredito": 1,
+  "categoria": "materia_prima",
+  "contactoNombre": "",
+  "contactoEmail": "",
+  "contactoTel": "",
+  "notas": ""
+}
+```
+
+#### Responses
+
+##### Status: 200 Supplier created
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`activo`**
+
+    `boolean`
+
+  - **`alias`**
+
+    `string`
+
+  - **`banco`**
+
+    `string`
+
+  - **`categoria`**
+
+    `string`
+
+  - **`cbu`**
+
+    `string`
+
+  - **`codigo`**
+
+    `integer`
+
+  - **`condicionPago`**
+
+    `string`
+
+  - **`condIva`**
+
+    `string`
+
+  - **`contactoEmail`**
+
+    `string`
+
+  - **`contactoNombre`**
+
+    `string`
+
+  - **`contactoTel`**
+
+    `string`
+
+  - **`cuit`**
+
+    `string`
+
+  - **`descuentoPct`**
+
+    `number`
+
+  - **`email`**
+
+    `string`
+
+  - **`fantasia`**
+
+    `string`
+
+  - **`id`**
+
+    `integer`
+
+  - **`limiteCredito`**
+
+    `number`
+
+  - **`moneda`**
+
+    `string`
+
+  - **`notas`**
+
+    `string`
+
+  - **`plazoHabitual`**
+
+    `integer`
+
+  - **`rsocial`**
+
+    `string`
+
+  - **`telef`**
+
+    `string`
+
+  - **`tipoCuenta`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "codigo": 1,
+    "rsocial": "",
+    "fantasia": "",
+    "cuit": "",
+    "condIva": "",
+    "telef": "",
+    "email": "",
+    "activo": true,
+    "cbu": "",
+    "alias": "",
+    "banco": "",
+    "tipoCuenta": "",
+    "moneda": "",
+    "condicionPago": "",
+    "plazoHabitual": 1,
+    "descuentoPct": 1,
+    "limiteCredito": 1,
+    "categoria": "",
+    "contactoNombre": "",
+    "contactoEmail": "",
+    "contactoTel": "",
+    "notas": "",
+    "additionalProperty": "anything"
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/proveedores/import/template
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/proveedores/import/template`
+
+### Download UTF-8 CSV template for bulk supplier import
+
+- **Method:** `GET`
+- **Path:** `/api/proveedores/import/template`
+- **Tags:** proveedores
+
+#### Responses
+
+##### Status: 200 CSV with fixed header row and one example row (UTF-8 BOM)
+
+###### Content-Type: text/csv
+
+`string`, format: `binary`
+
+**Example:**
+
+```json
+{}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/proveedores/import
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/proveedores/import`
+
+### Import suppliers from CSV
+
+- **Method:** `POST`
+- **Path:** `/api/proveedores/import`
+- **Tags:** proveedores
+
+#### Request Body
+
+##### Content-Type: multipart/form-data
+
+- **`file` (required)**
+
+  `string`, format: `binary`
+
+**Example:**
+
+```json
+{
+  "file": {}
+}
+```
+
+#### Responses
+
+##### Status: 200 Import summary
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`created` (required)**
+
+    `integer`
+
+  - **`errors` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`message` (required)**
+
+      `string`
+
+    - **`row` (required)**
+
+      `integer` — Data row number in the file (row 1 is the header)
+
+  - **`skipped` (required)**
+
+    `integer`
+
+  - **`updated`**
+
+    `integer` — Rows updated via upsert (legacy DBF migration endpoints)
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "created": 0,
+    "updated": 0,
+    "skipped": 0,
+    "errors": [
+      {
+        "row": 2,
+        "message": ""
+      }
+    ]
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/proveedores/comparar
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/proveedores/comparar`
+
+### Compare supplier prices for an article (#274)
+
+- **Method:** `GET`
+- **Path:** `/api/proveedores/comparar`
+- **Tags:** proveedores
+
+Same payload as `GET /api/articulos/{id}/proveedores` with `articuloId` as a query parameter. Requires module `logistics.purchases` and permission `products.read` or `suppliers.read`.
+
+#### Responses
+
+##### Status: 200 Supplier price comparison
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`articuloCodigo` (required)**
+
+    `integer`
+
+  - **`articuloDescripcion` (required)**
+
+    `string`
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`proveedores` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`codigoProveedor` (required)**
+
+      `string`
+
+    - **`descripcionProveedor` (required)**
+
+      `string`
+
+    - **`esMasBarato` (required)**
+
+      `boolean`
+
+    - **`precioDesactualizado` (required)**
+
+      `boolean`
+
+    - **`precioLista` (required)**
+
+      `string`
+
+    - **`precioListaFecha` (required)**
+
+      `string`, format: `date-time`
+
+    - **`proveedorCodigo` (required)**
+
+      `integer`
+
+    - **`proveedorId` (required)**
+
+      `integer`
+
+    - **`proveedorRsocial` (required)**
+
+      `string`
+
+    - **`ultimaCompraFecha` (required)**
+
+      `string`, format: `date-time`
+
+  - **`proveedorMasBaratoId` (required)**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "articuloId": 1,
+    "articuloCodigo": 1,
+    "articuloDescripcion": "",
+    "proveedorMasBaratoId": 1,
+    "proveedores": [
+      {
+        "proveedorId": 1,
+        "proveedorCodigo": 1,
+        "proveedorRsocial": "",
+        "codigoProveedor": "",
+        "descripcionProveedor": "",
+        "precioLista": "",
+        "precioListaFecha": "",
+        "precioDesactualizado": true,
+        "ultimaCompraFecha": "",
+        "esMasBarato": true
+      }
+    ]
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/proveedores/{id}
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/proveedores/{id}`
+
+### Get supplier by id
+
+- **Method:** `GET`
+- **Path:** `/api/proveedores/{id}`
+- **Tags:** proveedores
+
+#### Responses
+
+##### Status: 200 Supplier or null
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "codigo": 1,
+    "rsocial": "",
+    "fantasia": "",
+    "cuit": "",
+    "condIva": "",
+    "telef": "",
+    "email": "",
+    "activo": true,
+    "cbu": "",
+    "alias": "",
+    "banco": "",
+    "tipoCuenta": "",
+    "moneda": "",
+    "condicionPago": "",
+    "plazoHabitual": 1,
+    "descuentoPct": 1,
+    "limiteCredito": 1,
+    "categoria": "",
+    "contactoNombre": "",
+    "contactoEmail": "",
+    "contactoTel": "",
+    "notas": "",
+    "additionalProperty": "anything"
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Update supplier
+
+- **Method:** `PUT`
+- **Path:** `/api/proveedores/{id}`
+- **Tags:** proveedores
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`activo` (required)**
+
+  `boolean`
+
+- **`codigo` (required)**
+
+  `integer`
+
+- **`condIva` (required)**
+
+  `string`, possible values: `"RI", "Mono", "CF", "Exento"`
+
+- **`rsocial` (required)**
+
+  `string`
+
+- **`alias`**
+
+  `string`
+
+- **`banco`**
+
+  `string`
+
+- **`categoria`**
+
+  `string`, possible values: `"materia_prima", "insumos", "servicios", "logistica"`
+
+- **`cbu`**
+
+  `string`
+
+- **`condicionPago`**
+
+  `string`, possible values: `"contado", "15dias", "30dias", "60dias", "otro"`
+
+- **`contactoEmail`**
+
+  `string`
+
+- **`contactoNombre`**
+
+  `string`
+
+- **`contactoTel`**
+
+  `string`
+
+- **`cuit`**
+
+  `string`
+
+- **`descuentoPct`**
+
+  `number`
+
+- **`email`**
+
+  `string`
+
+- **`fantasia`**
+
+  `string`
+
+- **`limiteCredito`**
+
+  `number`
+
+- **`moneda`**
+
+  `string`, default: `"ARS"`
+
+- **`notas`**
+
+  `string`
+
+- **`plazoHabitual`**
+
+  `integer`
+
+- **`telef`**
+
+  `string`
+
+- **`tipoCuenta`**
+
+  `string`, possible values: `"cc", "ca"`
+
+**Example:**
+
+```json
+{
+  "codigo": 1,
+  "rsocial": "",
+  "fantasia": "",
+  "cuit": "",
+  "condIva": "RI",
+  "telef": "",
+  "email": "",
+  "activo": true,
+  "cbu": "",
+  "alias": "",
+  "banco": "",
+  "tipoCuenta": "cc",
+  "moneda": "ARS",
+  "condicionPago": "contado",
+  "plazoHabitual": 0,
+  "descuentoPct": 1,
+  "limiteCredito": 1,
+  "categoria": "materia_prima",
+  "contactoNombre": "",
+  "contactoEmail": "",
+  "contactoTel": "",
+  "notas": ""
+}
+```
+
+#### Responses
+
+##### Status: 200 Supplier updated
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`activo`**
+
+    `boolean`
+
+  - **`alias`**
+
+    `string`
+
+  - **`banco`**
+
+    `string`
+
+  - **`categoria`**
+
+    `string`
+
+  - **`cbu`**
+
+    `string`
+
+  - **`codigo`**
+
+    `integer`
+
+  - **`condicionPago`**
+
+    `string`
+
+  - **`condIva`**
+
+    `string`
+
+  - **`contactoEmail`**
+
+    `string`
+
+  - **`contactoNombre`**
+
+    `string`
+
+  - **`contactoTel`**
+
+    `string`
+
+  - **`cuit`**
+
+    `string`
+
+  - **`descuentoPct`**
+
+    `number`
+
+  - **`email`**
+
+    `string`
+
+  - **`fantasia`**
+
+    `string`
+
+  - **`id`**
+
+    `integer`
+
+  - **`limiteCredito`**
+
+    `number`
+
+  - **`moneda`**
+
+    `string`
+
+  - **`notas`**
+
+    `string`
+
+  - **`plazoHabitual`**
+
+    `integer`
+
+  - **`rsocial`**
+
+    `string`
+
+  - **`telef`**
+
+    `string`
+
+  - **`tipoCuenta`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "codigo": 1,
+    "rsocial": "",
+    "fantasia": "",
+    "cuit": "",
+    "condIva": "",
+    "telef": "",
+    "email": "",
+    "activo": true,
+    "cbu": "",
+    "alias": "",
+    "banco": "",
+    "tipoCuenta": "",
+    "moneda": "",
+    "condicionPago": "",
+    "plazoHabitual": 1,
+    "descuentoPct": 1,
+    "limiteCredito": 1,
+    "categoria": "",
+    "contactoNombre": "",
+    "contactoEmail": "",
+    "contactoTel": "",
+    "notas": "",
+    "additionalProperty": "anything"
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 409 Duplicate codigo for tenant
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Deactivate supplier (logical delete)
+
+- **Method:** `DELETE`
+- **Path:** `/api/proveedores/{id}`
+- **Tags:** proveedores
+
+Sets `activo` to false. Does not remove rows referenced by purchase orders or vouchers.
+
+#### Responses
+
+##### Status: 200 Supplier deactivated
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`activo`**
+
+    `boolean`
+
+  - **`alias`**
+
+    `string`
+
+  - **`banco`**
+
+    `string`
+
+  - **`categoria`**
+
+    `string`
+
+  - **`cbu`**
+
+    `string`
+
+  - **`codigo`**
+
+    `integer`
+
+  - **`condicionPago`**
+
+    `string`
+
+  - **`condIva`**
+
+    `string`
+
+  - **`contactoEmail`**
+
+    `string`
+
+  - **`contactoNombre`**
+
+    `string`
+
+  - **`contactoTel`**
+
+    `string`
+
+  - **`cuit`**
+
+    `string`
+
+  - **`descuentoPct`**
+
+    `number`
+
+  - **`email`**
+
+    `string`
+
+  - **`fantasia`**
+
+    `string`
+
+  - **`id`**
+
+    `integer`
+
+  - **`limiteCredito`**
+
+    `number`
+
+  - **`moneda`**
+
+    `string`
+
+  - **`notas`**
+
+    `string`
+
+  - **`plazoHabitual`**
+
+    `integer`
+
+  - **`rsocial`**
+
+    `string`
+
+  - **`telef`**
+
+    `string`
+
+  - **`tipoCuenta`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "codigo": 1,
+    "rsocial": "",
+    "fantasia": "",
+    "cuit": "",
+    "condIva": "",
+    "telef": "",
+    "email": "",
+    "activo": true,
+    "cbu": "",
+    "alias": "",
+    "banco": "",
+    "tipoCuenta": "",
+    "moneda": "",
+    "condicionPago": "",
+    "plazoHabitual": 1,
+    "descuentoPct": 1,
+    "limiteCredito": 1,
+    "categoria": "",
+    "contactoNombre": "",
+    "contactoEmail": "",
+    "contactoTel": "",
+    "notas": "",
+    "additionalProperty": "anything"
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/proveedores/{id}/historial
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/proveedores/{id}/historial`
+
+### Supplier purchase history summary (#272)
+
+- **Method:** `GET`
+- **Path:** `/api/proveedores/{id}/historial`
+- **Tags:** proveedores
+
+Aggregated purchase metrics, top articles, and OC/comprobante list for a rolling period.
+
+#### Responses
+
+##### Status: 200 History summary
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`cantidadCompras` (required)**
+
+    `integer`
+
+  - **`compras` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`estadoPago` (required)**
+
+      `string`, possible values: `"pendiente", "parcial", "pagada", "n_a"`
+
+    - **`fecha` (required)**
+
+      `string`, format: `date-time`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`referencia` (required)**
+
+      `string`
+
+    - **`tipo` (required)**
+
+      `string`, possible values: `"orden_compra", "comprobante"`
+
+    - **`total` (required)**
+
+      `string`
+
+    - **`estado`**
+
+      `string` — OC lifecycle state when tipo is orden\_compra
+
+    - **`ordenCompraId`**
+
+      `integer`
+
+  - **`frecuenciaCompraDias` (required)**
+
+    `integer`
+
+  - **`periodoDias` (required)**
+
+    `integer`, possible values: `30, 90, 180, 365`
+
+  - **`topArticulos` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId` (required)**
+
+      `integer`
+
+    - **`cantidadTotal` (required)**
+
+      `integer`
+
+    - **`codigo` (required)**
+
+      `string`
+
+    - **`descripcion` (required)**
+
+      `string`
+
+    - **`montoTotal` (required)**
+
+      `string`
+
+  - **`totalComprado` (required)**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "periodoDias": 30,
+    "totalComprado": "",
+    "frecuenciaCompraDias": 1,
+    "cantidadCompras": 1,
+    "topArticulos": [
+      {
+        "articuloId": 1,
+        "codigo": "",
+        "descripcion": "",
+        "cantidadTotal": 1,
+        "montoTotal": ""
+      }
+    ],
+    "compras": [
+      {
+        "tipo": "orden_compra",
+        "id": 1,
+        "fecha": "",
+        "referencia": "",
+        "total": "",
+        "estadoPago": "pendiente",
+        "ordenCompraId": 1,
+        "estado": ""
+      }
+    ]
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/proveedores/{id}/articulos
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/proveedores/{id}/articulos`
+
+### Supplier purchased articles with weighted average price (#272)
+
+- **Method:** `GET`
+- **Path:** `/api/proveedores/{id}/articulos`
+- **Tags:** proveedores
+
+PPP and price evolution from received purchase-order lines in the selected period.
+
+#### Responses
+
+##### Status: 200 Article metrics
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`articulos` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId` (required)**
+
+      `integer`
+
+    - **`cantidadTotal` (required)**
+
+      `integer`
+
+    - **`codigo` (required)**
+
+      `string`
+
+    - **`descripcion` (required)**
+
+      `string`
+
+    - **`evolucionPrecios` (required)**
+
+      `array`
+
+      **Items:**
+
+      - **`cantidad` (required)**
+
+        `integer`
+
+      - **`fecha` (required)**
+
+        `string`, format: `date-time`
+
+      - **`precioUnitario` (required)**
+
+        `string`
+
+    - **`montoTotal` (required)**
+
+      `string`
+
+    - **`precioPromedioPonderado` (required)**
+
+      `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "articulos": [
+      {
+        "articuloId": 1,
+        "codigo": "",
+        "descripcion": "",
+        "cantidadTotal": 1,
+        "precioPromedioPonderado": "",
+        "montoTotal": "",
+        "evolucionPrecios": [
+          {
+            "fecha": "",
+            "precioUnitario": "",
+            "cantidad": 1
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/proveedores/{id}/catalogo
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/proveedores/{id}/catalogo`
+
+### Supplier catalog — article codes and list prices (#273)
+
+- **Method:** `GET`
+- **Path:** `/api/proveedores/{id}/catalogo`
+- **Tags:** proveedores
+
+Requires module `logistics.purchases` and permission `suppliers.read`.
+
+#### Responses
+
+##### Status: 200 Catalog items for the supplier
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`items` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`activo` (required)**
+
+      `boolean`
+
+    - **`articulo` (required)**
+
+      `object`
+
+      - **`codigo` (required)**
+
+        `integer`
+
+      - **`descripcion` (required)**
+
+        `string`
+
+      - **`id` (required)**
+
+        `integer`
+
+    - **`articuloId` (required)**
+
+      `integer`
+
+    - **`codigoProveedor` (required)**
+
+      `string`
+
+    - **`descripcion` (required)**
+
+      `string`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`multiplo` (required)**
+
+      `string`
+
+    - **`precioLista` (required)**
+
+      `string`
+
+    - **`precioListaFecha` (required)**
+
+      `string`, format: `date-time`
+
+    - **`unidadCompra` (required)**
+
+      `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "items": [
+      {
+        "id": 1,
+        "articuloId": 1,
+        "codigoProveedor": "",
+        "descripcion": "",
+        "precioLista": "",
+        "precioListaFecha": "",
+        "unidadCompra": "",
+        "multiplo": "",
+        "activo": true,
+        "articulo": {
+          "id": 1,
+          "codigo": 1,
+          "descripcion": ""
+        }
+      }
+    ]
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Add article to supplier catalog (#273)
+
+- **Method:** `POST`
+- **Path:** `/api/proveedores/{id}/catalogo`
+- **Tags:** proveedores
+
+Requires module `logistics.purchases` and permission `suppliers.manage`.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`articuloId` (required)**
+
+  `integer`
+
+- **`codigoProveedor` (required)**
+
+  `string`
+
+- **`activo`**
+
+  `boolean`
+
+- **`descripcion`**
+
+  `string`
+
+- **`multiplo`**
+
+  `number`
+
+- **`precioLista`**
+
+  `number`
+
+- **`unidadCompra`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "articuloId": 1,
+  "codigoProveedor": "",
+  "descripcion": "",
+  "precioLista": 0,
+  "unidadCompra": "",
+  "multiplo": 1,
+  "activo": true
+}
+```
+
+#### Responses
+
+##### Status: 201 Catalog entry created
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`activo` (required)**
+
+    `boolean`
+
+  - **`articulo` (required)**
+
+    `object`
+
+    - **`codigo` (required)**
+
+      `integer`
+
+    - **`descripcion` (required)**
+
+      `string`
+
+    - **`id` (required)**
+
+      `integer`
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`codigoProveedor` (required)**
+
+    `string`
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`multiplo` (required)**
+
+    `string`
+
+  - **`precioLista` (required)**
+
+    `string`
+
+  - **`precioListaFecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`unidadCompra` (required)**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "articuloId": 1,
+    "codigoProveedor": "",
+    "descripcion": "",
+    "precioLista": "",
+    "precioListaFecha": "",
+    "unidadCompra": "",
+    "multiplo": "",
+    "activo": true,
+    "articulo": {
+      "id": 1,
+      "codigo": 1,
+      "descripcion": ""
+    }
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 409 Resource conflict
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/proveedores/{id}/catalogo/import
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/proveedores/{id}/catalogo/import`
+
+### Import supplier catalog from CSV (#273)
+
+- **Method:** `POST`
+- **Path:** `/api/proveedores/{id}/catalogo/import`
+- **Tags:** proveedores
+
+CSV columns: `codigo_proveedor`, `codigo_interno` (article `codigo`), optional `precio`, `unidad`. Requires module `logistics.purchases` and permission `suppliers.manage`.
+
+#### Request Body
+
+##### Content-Type: multipart/form-data
+
+- **`file` (required)**
+
+  `string`, format: `binary`
+
+**Example:**
+
+```json
+{
+  "file": {}
+}
+```
+
+#### Responses
+
+##### Status: 200 Import summary
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`created` (required)**
+
+    `integer`
+
+  - **`errors` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`message` (required)**
+
+      `string`
+
+    - **`row` (required)**
+
+      `integer`
+
+  - **`skipped` (required)**
+
+    `integer`
+
+  - **`updated` (required)**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "created": 1,
+    "updated": 1,
+    "skipped": 1,
+    "errors": [
+      {
+        "row": 1,
+        "message": ""
+      }
+    ]
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/proveedores/{id}/catalogo/{articuloId}
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/proveedores/{id}/catalogo/{articuloId}`
+
+### Update supplier catalog entry (#273)
+
+- **Method:** `PUT`
+- **Path:** `/api/proveedores/{id}/catalogo/{articuloId}`
+- **Tags:** proveedores
+
+Requires module `logistics.purchases` and permission `suppliers.manage`.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`activo`**
+
+  `boolean`
+
+- **`codigoProveedor`**
+
+  `string`
+
+- **`descripcion`**
+
+  `string`
+
+- **`multiplo`**
+
+  `number`
+
+- **`precioLista`**
+
+  `number`
+
+- **`unidadCompra`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "codigoProveedor": "",
+  "descripcion": "",
+  "precioLista": 0,
+  "unidadCompra": "",
+  "multiplo": 1,
+  "activo": true
+}
+```
+
+#### Responses
+
+##### Status: 200 Updated catalog entry
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`activo` (required)**
+
+    `boolean`
+
+  - **`articulo` (required)**
+
+    `object`
+
+    - **`codigo` (required)**
+
+      `integer`
+
+    - **`descripcion` (required)**
+
+      `string`
+
+    - **`id` (required)**
+
+      `integer`
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`codigoProveedor` (required)**
+
+    `string`
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`multiplo` (required)**
+
+    `string`
+
+  - **`precioLista` (required)**
+
+    `string`
+
+  - **`precioListaFecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`unidadCompra` (required)**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "articuloId": 1,
+    "codigoProveedor": "",
+    "descripcion": "",
+    "precioLista": "",
+    "precioListaFecha": "",
+    "unidadCompra": "",
+    "multiplo": "",
+    "activo": true,
+    "articulo": {
+      "id": 1,
+      "codigo": 1,
+      "descripcion": ""
+    }
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 409 Resource conflict
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/proveedores/{id}/cuenta-corriente
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/proveedores/{id}/cuenta-corriente`
+
+### Supplier accounts-payable statement
+
+- **Method:** `GET`
+- **Path:** `/api/proveedores/{id}/cuenta-corriente`
+- **Tags:** proveedores
+
+Ledger movements, current balance, credit-limit alert, and 6-month debt series (#270).
+
+#### Responses
+
+##### Status: 200 Statement
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`codigo` (required)**
+
+    `integer`
+
+  - **`excedeLimite` (required)**
+
+    `boolean`
+
+  - **`movimientos` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`fecha` (required)**
+
+      `string`, format: `date-time`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`monto` (required)**
+
+      `string`
+
+    - **`saldoPost` (required)**
+
+      `string`
+
+    - **`tipo` (required)**
+
+      `string`, possible values: `"factura_compra", "pago", "nc_proveedor", "ajuste"`
+
+    - **`usuarioId` (required)**
+
+      `integer`
+
+    - **`notas`**
+
+      `string`
+
+    - **`referencia`**
+
+      `string`
+
+  - **`proveedorId` (required)**
+
+    `integer`
+
+  - **`rsocial` (required)**
+
+    `string`
+
+  - **`saldo` (required)**
+
+    `string`
+
+  - **`serie` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`period` (required)**
+
+      `string` — YYYY-MM month bucket
+
+    - **`saldo` (required)**
+
+      `string`
+
+  - **`limiteCredito`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "proveedorId": 1,
+    "codigo": 1,
+    "rsocial": "",
+    "saldo": "",
+    "limiteCredito": "",
+    "excedeLimite": true,
+    "movimientos": [
+      {
+        "id": 1,
+        "tipo": "factura_compra",
+        "referencia": "",
+        "monto": "",
+        "saldoPost": "",
+        "fecha": "",
+        "usuarioId": 1,
+        "notas": ""
+      }
+    ],
+    "serie": [
+      {
+        "period": "",
+        "saldo": ""
+      }
+    ]
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/proveedores/{id}/cuenta-corriente/saldo
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/proveedores/{id}/cuenta-corriente/saldo`
+
+### Supplier accounts-payable balance only
+
+- **Method:** `GET`
+- **Path:** `/api/proveedores/{id}/cuenta-corriente/saldo`
+- **Tags:** proveedores
+
+#### Responses
+
+##### Status: 200 Balance snapshot
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`excedeLimite` (required)**
+
+    `boolean`
+
+  - **`proveedorId` (required)**
+
+    `integer`
+
+  - **`saldo` (required)**
+
+    `string`
+
+  - **`limiteCredito`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "proveedorId": 1,
+    "saldo": "",
+    "limiteCredito": "",
+    "excedeLimite": true
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/proveedores/{id}/cuenta-corriente/ajuste
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/proveedores/{id}/cuenta-corriente/ajuste`
+
+### Manual supplier ledger adjustment
+
+- **Method:** `POST`
+- **Path:** `/api/proveedores/{id}/cuenta-corriente/ajuste`
+- **Tags:** proveedores
+
+Requires suppliers.manage; posts audit event proveedor\_cc\_ajuste.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`monto` (required)**
+
+  `number` — Non-zero; positive increases debt, negative reduces debt
+
+- **`motivo` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "monto": 1,
+  "motivo": ""
+}
+```
+
+#### Responses
+
+##### Status: 201 Movement created
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`monto` (required)**
+
+    `string`
+
+  - **`saldoPost` (required)**
+
+    `string`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_compra", "pago", "nc_proveedor", "ajuste"`
+
+  - **`usuarioId` (required)**
+
+    `integer`
+
+  - **`notas`**
+
+    `string`
+
+  - **`referencia`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tipo": "factura_compra",
+    "referencia": "",
+    "monto": "",
+    "saldoPost": "",
+    "fecha": "",
+    "usuarioId": 1,
+    "notas": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/proveedores/{id}/pagos/comprobantes-pendientes
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/proveedores/{id}/pagos/comprobantes-pendientes`
+
+### Pending purchase vouchers for payment allocation
+
+- **Method:** `GET`
+- **Path:** `/api/proveedores/{id}/pagos/comprobantes-pendientes`
+- **Tags:** proveedores
+
+Active comprobantes with remaining balance for imputation (#271). Requires module `finance.receipts`.
+
+#### Responses
+
+##### Status: 200 Pending vouchers
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`comprobanteCompraId` (required)**
+
+    `integer`
+
+  - **`facturaRef` (required)**
+
+    `string`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`pagado` (required)**
+
+    `string`
+
+  - **`pendiente` (required)**
+
+    `string`
+
+  - **`total` (required)**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "comprobanteCompraId": 1,
+      "facturaRef": "",
+      "fecha": "",
+      "total": "",
+      "pagado": "",
+      "pendiente": ""
+    }
+  ]
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/proveedores/{id}/pagos
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/proveedores/{id}/pagos`
+
+### Supplier payment receipt history
+
+- **Method:** `GET`
+- **Path:** `/api/proveedores/{id}/pagos`
+- **Tags:** proveedores
+
+Requires module `finance.receipts` and permission `suppliers.read`.
+
+#### Responses
+
+##### Status: 200 Paginated payment receipts
+
+###### Content-Type: application/json
+
+**All of:**
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"emitido", "anulado"`
+
+  - **`facturas` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`facturaRef` (required)**
+
+      `string`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`monto` (required)**
+
+      `string`
+
+    - **`comprobanteCompraId`**
+
+      `integer`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`metodoPago` (required)**
+
+    `string`, possible values: `"transferencia", "cheque", "efectivo", "echeq"`
+
+  - **`numero` (required)**
+
+    `integer`
+
+  - **`proveedor` (required)**
+
+    `object`
+
+    - **`codigo` (required)**
+
+      `integer`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`rsocial` (required)**
+
+      `string`
+
+    - **`cuit`**
+
+      `string`
+
+  - **`proveedorId` (required)**
+
+    `integer`
+
+  - **`total` (required)**
+
+    `string`
+
+  - **`usuario` (required)**
+
+    `object`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`username` (required)**
+
+      `string`
+
+  - **`usuarioId` (required)**
+
+    `integer`
+
+  - **`cbu`**
+
+    `string`
+
+  - **`notas`**
+
+    `string`
+
+  - **`referencia`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+* **`limit` (required)**
+
+  `integer` — Effective page size (same semantics as query \`limit\`)
+
+* **`offset` (required)**
+
+  `integer` — Effective skip (same semantics as query \`offset\`)
+
+* **`total` (required)**
+
+  `integer` — Row count matching the list filter (before limit/offset)
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "numero": 1,
+      "proveedorId": 1,
+      "fecha": "",
+      "total": "",
+      "metodoPago": "transferencia",
+      "cbu": "",
+      "referencia": "",
+      "estado": "emitido",
+      "notas": "",
+      "usuarioId": 1,
+      "proveedor": {
+        "id": 1,
+        "codigo": 1,
+        "rsocial": "",
+        "cuit": ""
+      },
+      "usuario": {
+        "id": 1,
+        "username": ""
+      },
+      "facturas": [
+        {
+          "id": 1,
+          "comprobanteCompraId": 1,
+          "facturaRef": "",
+          "monto": ""
+        }
+      ],
+      "createdAt": ""
+    }
+  ],
+  "total": 0,
+  "limit": 1,
+  "offset": 0
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Register supplier payment
+
+- **Method:** `POST`
+- **Path:** `/api/proveedores/{id}/pagos`
+- **Tags:** proveedores
+
+Creates `ReciboPago` with tenant-correlative `numero`, posts `pago` ledger movement (negative monto), and audit event `recibo_pago_create`. Requires module `finance.receipts` and `suppliers.manage`.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`facturas` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`facturaRef` (required)**
+
+    `string`
+
+  - **`monto` (required)**
+
+    `number`
+
+  - **`comprobanteCompraId`**
+
+    `integer`
+
+- **`fecha` (required)**
+
+  `string`
+
+- **`metodoPago` (required)**
+
+  `string`, possible values: `"transferencia", "cheque", "efectivo", "echeq"`
+
+- **`total` (required)**
+
+  `number`
+
+- **`cbu`**
+
+  `string`
+
+- **`notas`**
+
+  `string`
+
+- **`referencia`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "fecha": "",
+  "total": 1,
+  "metodoPago": "transferencia",
+  "cbu": "",
+  "referencia": "",
+  "notas": "",
+  "facturas": [
+    {
+      "comprobanteCompraId": 1,
+      "facturaRef": "",
+      "monto": 1
+    }
+  ]
+}
+```
+
+#### Responses
+
+##### Status: 201 Payment receipt created
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"emitido", "anulado"`
+
+  - **`facturas` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`facturaRef` (required)**
+
+      `string`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`monto` (required)**
+
+      `string`
+
+    - **`comprobanteCompraId`**
+
+      `integer`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`metodoPago` (required)**
+
+    `string`, possible values: `"transferencia", "cheque", "efectivo", "echeq"`
+
+  - **`numero` (required)**
+
+    `integer`
+
+  - **`proveedor` (required)**
+
+    `object`
+
+    - **`codigo` (required)**
+
+      `integer`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`rsocial` (required)**
+
+      `string`
+
+    - **`cuit`**
+
+      `string`
+
+  - **`proveedorId` (required)**
+
+    `integer`
+
+  - **`total` (required)**
+
+    `string`
+
+  - **`usuario` (required)**
+
+    `object`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`username` (required)**
+
+      `string`
+
+  - **`usuarioId` (required)**
+
+    `integer`
+
+  - **`cbu`**
+
+    `string`
+
+  - **`notas`**
+
+    `string`
+
+  - **`referencia`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "numero": 1,
+    "proveedorId": 1,
+    "fecha": "",
+    "total": "",
+    "metodoPago": "transferencia",
+    "cbu": "",
+    "referencia": "",
+    "estado": "emitido",
+    "notas": "",
+    "usuarioId": 1,
+    "proveedor": {
+      "id": 1,
+      "codigo": 1,
+      "rsocial": "",
+      "cuit": ""
+    },
+    "usuario": {
+      "id": 1,
+      "username": ""
+    },
+    "facturas": [
+      {
+        "id": 1,
+        "comprobanteCompraId": 1,
+        "facturaRef": "",
+        "monto": ""
+      }
+    ],
+    "createdAt": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/proveedores/{id}/pagos/{reciboId}/anular
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/proveedores/{id}/pagos/{reciboId}/anular`
+
+### Void supplier payment receipt
+
+- **Method:** `POST`
+- **Path:** `/api/proveedores/{id}/pagos/{reciboId}/anular`
+- **Tags:** proveedores
+
+Sets estado `anulado` and posts compensating ledger movement. Audit `recibo_pago_void`.
+
+#### Responses
+
+##### Status: 200 Receipt voided
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"emitido", "anulado"`
+
+  - **`facturas` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`facturaRef` (required)**
+
+      `string`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`monto` (required)**
+
+      `string`
+
+    - **`comprobanteCompraId`**
+
+      `integer`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`metodoPago` (required)**
+
+    `string`, possible values: `"transferencia", "cheque", "efectivo", "echeq"`
+
+  - **`numero` (required)**
+
+    `integer`
+
+  - **`proveedor` (required)**
+
+    `object`
+
+    - **`codigo` (required)**
+
+      `integer`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`rsocial` (required)**
+
+      `string`
+
+    - **`cuit`**
+
+      `string`
+
+  - **`proveedorId` (required)**
+
+    `integer`
+
+  - **`total` (required)**
+
+    `string`
+
+  - **`usuario` (required)**
+
+    `object`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`username` (required)**
+
+      `string`
+
+  - **`usuarioId` (required)**
+
+    `integer`
+
+  - **`cbu`**
+
+    `string`
+
+  - **`notas`**
+
+    `string`
+
+  - **`referencia`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "numero": 1,
+    "proveedorId": 1,
+    "fecha": "",
+    "total": "",
+    "metodoPago": "transferencia",
+    "cbu": "",
+    "referencia": "",
+    "estado": "emitido",
+    "notas": "",
+    "usuarioId": 1,
+    "proveedor": {
+      "id": 1,
+      "codigo": 1,
+      "rsocial": "",
+      "cuit": ""
+    },
+    "usuario": {
+      "id": 1,
+      "username": ""
+    },
+    "facturas": [
+      {
+        "id": 1,
+        "comprobanteCompraId": 1,
+        "facturaRef": "",
+        "monto": ""
+      }
+    ],
+    "createdAt": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 422 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/proveedores/facturas-pendientes
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/proveedores/facturas-pendientes`
+
+### List unpaid supplier vouchers with due-date alert state
+
+- **Method:** `GET`
+- **Path:** `/api/proveedores/facturas-pendientes`
+- **Tags:** proveedores
+
+Requires module finance.ledger and permission suppliers.read (#275).
+
+#### Responses
+
+##### Status: 200 Pending payable vouchers
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`comprobanteCompraId` (required)**
+
+    `integer`
+
+  - **`diasHastaVencimiento` (required)**
+
+    `integer`
+
+  - **`diasVencido` (required)**
+
+    `integer`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"pendiente", "proxima_vencer", "vencida_hoy", "vencida_critica"`
+
+  - **`facturaRef` (required)**
+
+    `string`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`pagado` (required)**
+
+    `string`
+
+  - **`pendiente` (required)**
+
+    `string`
+
+  - **`proveedorCodigo` (required)**
+
+    `integer`
+
+  - **`proveedorId` (required)**
+
+    `integer`
+
+  - **`proveedorRsocial` (required)**
+
+    `string`
+
+  - **`total` (required)**
+
+    `string`
+
+  - **`vencimiento` (required)**
+
+    `string`, format: `date-time`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "comprobanteCompraId": 1,
+      "proveedorId": 1,
+      "proveedorCodigo": 1,
+      "proveedorRsocial": "",
+      "facturaRef": "",
+      "fecha": "",
+      "vencimiento": "",
+      "total": "",
+      "pagado": "",
+      "pendiente": "",
+      "estado": "pendiente",
+      "diasHastaVencimiento": 1,
+      "diasVencido": 1
+    }
+  ]
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/configuracion/alertas-proveedores
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/configuracion/alertas-proveedores`
+
+### Get supplier payable alert settings
+
+- **Method:** `GET`
+- **Path:** `/api/configuracion/alertas-proveedores`
+- **Tags:** proveedores
+
+Requires module finance.ledger and permission suppliers.read (#275).
+
+#### Responses
+
+##### Status: 200 Alert configuration
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`diasCritico` (required)**
+
+    `integer`
+
+  - **`diasPrevioAviso` (required)**
+
+    `integer`
+
+  - **`notifEmail` (required)**
+
+    `boolean`
+
+  - **`notifInApp` (required)**
+
+    `boolean`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "diasPrevioAviso": 0,
+    "diasCritico": 1,
+    "notifEmail": true,
+    "notifInApp": true
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Update supplier payable alert settings
+
+- **Method:** `PATCH`
+- **Path:** `/api/configuracion/alertas-proveedores`
+- **Tags:** proveedores
+
+Requires module finance.ledger and permission suppliers.manage (#275).
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`diasCritico`**
+
+  `integer`
+
+- **`diasPrevioAviso`**
+
+  `integer`
+
+- **`notifEmail`**
+
+  `boolean`
+
+- **`notifInApp`**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "diasPrevioAviso": 0,
+  "diasCritico": 1,
+  "notifEmail": true,
+  "notifInApp": true
+}
+```
+
+#### Responses
+
+##### Status: 200 Updated configuration
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`diasCritico` (required)**
+
+    `integer`
+
+  - **`diasPrevioAviso` (required)**
+
+    `integer`
+
+  - **`notifEmail` (required)**
+
+    `boolean`
+
+  - **`notifInApp` (required)**
+
+    `boolean`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "diasPrevioAviso": 0,
+    "diasCritico": 1,
+    "notifEmail": true,
+    "notifInApp": true
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/proveedores/{id}/pagos/{reciboId}/pdf
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/proveedores/{id}/pagos/{reciboId}/pdf`
+
+### Download supplier payment receipt PDF
+
+- **Method:** `GET`
+- **Path:** `/api/proveedores/{id}/pagos/{reciboId}/pdf`
+- **Tags:** proveedores
+
+PDF with company header, supplier data, imputed vouchers, payment method (#271).
+
+#### Responses
+
+##### Status: 200 PDF document
+
+###### Content-Type: application/pdf
+
+`string`, format: `binary`
+
+**Example:**
+
+```json
+{}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/compras
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/compras`
+
+### List purchase orders
+
+- **Method:** `GET`
+- **Path:** `/api/compras`
+- **Tags:** compras
+
+#### Responses
+
+##### Status: 200 Paginated purchase orders
+
+###### Content-Type: application/json
+
+**All of:**
+
+- **`limit` (required)**
+
+  `integer` — Effective page size (same semantics as query \`limit\`)
+
+- **`offset` (required)**
+
+  `integer` — Effective skip (same semantics as query \`offset\`)
+
+- **`total` (required)**
+
+  `integer` — Row count matching the list filter (before limit/offset)
+
+* **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"draft", "sent", "received", "cancelled"`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`proveedorId` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`total` (required)**
+
+    `string`
+
+  - **`fechaEstimada`**
+
+    `string`, format: `date-time`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId` (required)**
+
+      `integer`
+
+    - **`cantidad` (required)**
+
+      `integer`
+
+    - **`cantidadRecibida` (required)**
+
+      `integer`
+
+    - **`costoUnitario` (required)**
+
+      `string`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`subtotal` (required)**
+
+      `string`
+
+    - **`articulo`**
+
+      `object`
+
+      - **`codigo`**
+
+        `integer`
+
+      - **`descripcion`**
+
+        `string`
+
+      - **`id`**
+
+        `integer`
+
+    - **`codigoProveedor`**
+
+      `string` — Supplier catalog code snapshot (#323)
+
+    - **`descripcionProveedor`**
+
+      `string` — Supplier catalog description snapshot (#323)
+
+  - **`nota`**
+
+    `string`
+
+  - **`proveedor`**
+
+    `object`
+
+    - **`codigo`**
+
+      `integer`
+
+    - **`id`**
+
+      `integer`
+
+    - **`rsocial`**
+
+      `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "total": 0,
+  "limit": 1,
+  "offset": 0,
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "proveedorId": 1,
+      "estado": "draft",
+      "total": "",
+      "fechaEstimada": "",
+      "nota": "",
+      "proveedor": {
+        "id": 1,
+        "codigo": 1,
+        "rsocial": ""
+      },
+      "items": [
+        {
+          "id": 1,
+          "articuloId": 1,
+          "codigoProveedor": "",
+          "descripcionProveedor": "",
+          "cantidad": 1,
+          "cantidadRecibida": 1,
+          "costoUnitario": "",
+          "subtotal": "",
+          "articulo": {
+            "id": 1,
+            "codigo": 1,
+            "descripcion": ""
+          }
+        }
+      ]
+    }
+  ]
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Create purchase order (draft)
+
+- **Method:** `POST`
+- **Path:** `/api/compras`
+- **Tags:** compras
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`items` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`cantidad` (required)**
+
+    `integer`
+
+  - **`costoUnitario` (required)**
+
+    `number`
+
+- **`proveedorId` (required)**
+
+  `integer`
+
+- **`fechaEstimada`**
+
+  `string`, format: `date`
+
+- **`nota`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "proveedorId": 1,
+  "fechaEstimada": "",
+  "nota": "",
+  "items": [
+    {
+      "articuloId": 1,
+      "cantidad": 1,
+      "costoUnitario": 0
+    }
+  ]
+}
+```
+
+#### Responses
+
+##### Status: 201 Purchase order created
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"draft", "sent", "received", "cancelled"`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`proveedorId` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`total` (required)**
+
+    `string`
+
+  - **`fechaEstimada`**
+
+    `string`, format: `date-time`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId` (required)**
+
+      `integer`
+
+    - **`cantidad` (required)**
+
+      `integer`
+
+    - **`cantidadRecibida` (required)**
+
+      `integer`
+
+    - **`costoUnitario` (required)**
+
+      `string`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`subtotal` (required)**
+
+      `string`
+
+    - **`articulo`**
+
+      `object`
+
+      - **`codigo`**
+
+        `integer`
+
+      - **`descripcion`**
+
+        `string`
+
+      - **`id`**
+
+        `integer`
+
+    - **`codigoProveedor`**
+
+      `string` — Supplier catalog code snapshot (#323)
+
+    - **`descripcionProveedor`**
+
+      `string` — Supplier catalog description snapshot (#323)
+
+  - **`nota`**
+
+    `string`
+
+  - **`proveedor`**
+
+    `object`
+
+    - **`codigo`**
+
+      `integer`
+
+    - **`id`**
+
+      `integer`
+
+    - **`rsocial`**
+
+      `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "proveedorId": 1,
+    "estado": "draft",
+    "total": "",
+    "fechaEstimada": "",
+    "nota": "",
+    "proveedor": {
+      "id": 1,
+      "codigo": 1,
+      "rsocial": ""
+    },
+    "items": [
+      {
+        "id": 1,
+        "articuloId": 1,
+        "codigoProveedor": "",
+        "descripcionProveedor": "",
+        "cantidad": 1,
+        "cantidadRecibida": 1,
+        "costoUnitario": "",
+        "subtotal": "",
+        "articulo": {
+          "id": 1,
+          "codigo": 1,
+          "descripcion": ""
+        }
+      }
+    ]
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Supplier not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 422 Invalid article line
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/compras/{id}/pdf
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/compras/{id}/pdf`
+
+### Download purchase order PDF (#323)
+
+- **Method:** `GET`
+- **Path:** `/api/compras/{id}/pdf`
+- **Tags:** compras
+
+Returns a PDF with supplier catalog code and description per line when snapshotted. Requires module `logistics.purchases` and permission `suppliers.read`.
+
+#### Responses
+
+##### Status: 200 Purchase order PDF
+
+###### Content-Type: application/pdf
+
+`string`, format: `binary`
+
+**Example:**
+
+```json
+{}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/compras/{id}
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/compras/{id}`
+
+### Get purchase order by id
+
+- **Method:** `GET`
+- **Path:** `/api/compras/{id}`
+- **Tags:** compras
+
+#### Responses
+
+##### Status: 200 Purchase order detail
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"draft", "sent", "received", "cancelled"`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`proveedorId` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`total` (required)**
+
+    `string`
+
+  - **`fechaEstimada`**
+
+    `string`, format: `date-time`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId` (required)**
+
+      `integer`
+
+    - **`cantidad` (required)**
+
+      `integer`
+
+    - **`cantidadRecibida` (required)**
+
+      `integer`
+
+    - **`costoUnitario` (required)**
+
+      `string`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`subtotal` (required)**
+
+      `string`
+
+    - **`articulo`**
+
+      `object`
+
+      - **`codigo`**
+
+        `integer`
+
+      - **`descripcion`**
+
+        `string`
+
+      - **`id`**
+
+        `integer`
+
+    - **`codigoProveedor`**
+
+      `string` — Supplier catalog code snapshot (#323)
+
+    - **`descripcionProveedor`**
+
+      `string` — Supplier catalog description snapshot (#323)
+
+  - **`nota`**
+
+    `string`
+
+  - **`proveedor`**
+
+    `object`
+
+    - **`codigo`**
+
+      `integer`
+
+    - **`id`**
+
+      `integer`
+
+    - **`rsocial`**
+
+      `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "proveedorId": 1,
+    "estado": "draft",
+    "total": "",
+    "fechaEstimada": "",
+    "nota": "",
+    "proveedor": {
+      "id": 1,
+      "codigo": 1,
+      "rsocial": ""
+    },
+    "items": [
+      {
+        "id": 1,
+        "articuloId": 1,
+        "codigoProveedor": "",
+        "descripcionProveedor": "",
+        "cantidad": 1,
+        "cantidadRecibida": 1,
+        "costoUnitario": "",
+        "subtotal": "",
+        "articulo": {
+          "id": 1,
+          "codigo": 1,
+          "descripcion": ""
+        }
+      }
+    ]
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Update draft purchase order
+
+- **Method:** `PUT`
+- **Path:** `/api/compras/{id}`
+- **Tags:** compras
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`fechaEstimada`**
+
+  `string`, format: `date`
+
+- **`items`**
+
+  `array`
+
+  **Items:**
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`cantidad` (required)**
+
+    `integer`
+
+  - **`costoUnitario` (required)**
+
+    `number`
+
+- **`nota`**
+
+  `string`
+
+- **`proveedorId`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "proveedorId": 1,
+  "fechaEstimada": "",
+  "nota": "",
+  "items": [
+    {
+      "articuloId": 1,
+      "cantidad": 1,
+      "costoUnitario": 0
+    }
+  ]
+}
+```
+
+#### Responses
+
+##### Status: 200 Updated
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"draft", "sent", "received", "cancelled"`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`proveedorId` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`total` (required)**
+
+    `string`
+
+  - **`fechaEstimada`**
+
+    `string`, format: `date-time`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId` (required)**
+
+      `integer`
+
+    - **`cantidad` (required)**
+
+      `integer`
+
+    - **`cantidadRecibida` (required)**
+
+      `integer`
+
+    - **`costoUnitario` (required)**
+
+      `string`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`subtotal` (required)**
+
+      `string`
+
+    - **`articulo`**
+
+      `object`
+
+      - **`codigo`**
+
+        `integer`
+
+      - **`descripcion`**
+
+        `string`
+
+      - **`id`**
+
+        `integer`
+
+    - **`codigoProveedor`**
+
+      `string` — Supplier catalog code snapshot (#323)
+
+    - **`descripcionProveedor`**
+
+      `string` — Supplier catalog description snapshot (#323)
+
+  - **`nota`**
+
+    `string`
+
+  - **`proveedor`**
+
+    `object`
+
+    - **`codigo`**
+
+      `integer`
+
+    - **`id`**
+
+      `integer`
+
+    - **`rsocial`**
+
+      `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "proveedorId": 1,
+    "estado": "draft",
+    "total": "",
+    "fechaEstimada": "",
+    "nota": "",
+    "proveedor": {
+      "id": 1,
+      "codigo": 1,
+      "rsocial": ""
+    },
+    "items": [
+      {
+        "id": 1,
+        "articuloId": 1,
+        "codigoProveedor": "",
+        "descripcionProveedor": "",
+        "cantidad": 1,
+        "cantidadRecibida": 1,
+        "costoUnitario": "",
+        "subtotal": "",
+        "articulo": {
+          "id": 1,
+          "codigo": 1,
+          "descripcion": ""
+        }
+      }
+    ]
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 422 Not editable or invalid lines
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/compras/{id}/send
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/compras/{id}/send`
+
+### Mark purchase order as sent
+
+- **Method:** `POST`
+- **Path:** `/api/compras/{id}/send`
+- **Tags:** compras
+
+#### Responses
+
+##### Status: 200 Sent
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"draft", "sent", "received", "cancelled"`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`proveedorId` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`total` (required)**
+
+    `string`
+
+  - **`fechaEstimada`**
+
+    `string`, format: `date-time`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId` (required)**
+
+      `integer`
+
+    - **`cantidad` (required)**
+
+      `integer`
+
+    - **`cantidadRecibida` (required)**
+
+      `integer`
+
+    - **`costoUnitario` (required)**
+
+      `string`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`subtotal` (required)**
+
+      `string`
+
+    - **`articulo`**
+
+      `object`
+
+      - **`codigo`**
+
+        `integer`
+
+      - **`descripcion`**
+
+        `string`
+
+      - **`id`**
+
+        `integer`
+
+    - **`codigoProveedor`**
+
+      `string` — Supplier catalog code snapshot (#323)
+
+    - **`descripcionProveedor`**
+
+      `string` — Supplier catalog description snapshot (#323)
+
+  - **`nota`**
+
+    `string`
+
+  - **`proveedor`**
+
+    `object`
+
+    - **`codigo`**
+
+      `integer`
+
+    - **`id`**
+
+      `integer`
+
+    - **`rsocial`**
+
+      `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "proveedorId": 1,
+    "estado": "draft",
+    "total": "",
+    "fechaEstimada": "",
+    "nota": "",
+    "proveedor": {
+      "id": 1,
+      "codigo": 1,
+      "rsocial": ""
+    },
+    "items": [
+      {
+        "id": 1,
+        "articuloId": 1,
+        "codigoProveedor": "",
+        "descripcionProveedor": "",
+        "cantidad": 1,
+        "cantidadRecibida": 1,
+        "costoUnitario": "",
+        "subtotal": "",
+        "articulo": {
+          "id": 1,
+          "codigo": 1,
+          "descripcion": ""
+        }
+      }
+    ]
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 422 Invalid state
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/compras/{id}/cancel
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/compras/{id}/cancel`
+
+### Cancel purchase order
+
+- **Method:** `POST`
+- **Path:** `/api/compras/{id}/cancel`
+- **Tags:** compras
+
+#### Responses
+
+##### Status: 200 Cancelled
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"draft", "sent", "received", "cancelled"`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`proveedorId` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`total` (required)**
+
+    `string`
+
+  - **`fechaEstimada`**
+
+    `string`, format: `date-time`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId` (required)**
+
+      `integer`
+
+    - **`cantidad` (required)**
+
+      `integer`
+
+    - **`cantidadRecibida` (required)**
+
+      `integer`
+
+    - **`costoUnitario` (required)**
+
+      `string`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`subtotal` (required)**
+
+      `string`
+
+    - **`articulo`**
+
+      `object`
+
+      - **`codigo`**
+
+        `integer`
+
+      - **`descripcion`**
+
+        `string`
+
+      - **`id`**
+
+        `integer`
+
+    - **`codigoProveedor`**
+
+      `string` — Supplier catalog code snapshot (#323)
+
+    - **`descripcionProveedor`**
+
+      `string` — Supplier catalog description snapshot (#323)
+
+  - **`nota`**
+
+    `string`
+
+  - **`proveedor`**
+
+    `object`
+
+    - **`codigo`**
+
+      `integer`
+
+    - **`id`**
+
+      `integer`
+
+    - **`rsocial`**
+
+      `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "proveedorId": 1,
+    "estado": "draft",
+    "total": "",
+    "fechaEstimada": "",
+    "nota": "",
+    "proveedor": {
+      "id": 1,
+      "codigo": 1,
+      "rsocial": ""
+    },
+    "items": [
+      {
+        "id": 1,
+        "articuloId": 1,
+        "codigoProveedor": "",
+        "descripcionProveedor": "",
+        "cantidad": 1,
+        "cantidadRecibida": 1,
+        "costoUnitario": "",
+        "subtotal": "",
+        "articulo": {
+          "id": 1,
+          "codigo": 1,
+          "descripcion": ""
+        }
+      }
+    ]
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 422 Invalid state
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/compras/{id}/receive
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/compras/{id}/receive`
+
+### Receive goods (partial allowed)
+
+- **Method:** `POST`
+- **Path:** `/api/compras/{id}/receive`
+- **Tags:** compras
+
+Requires `suppliers.manage` and `inventory.adjust`. Creates `StockAjuste` rows with motivo `compra` per line in a single transaction.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`lines` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`cantidad` (required)**
+
+    `integer`
+
+  - **`itemId` (required)**
+
+    `integer`
+
+**Example:**
+
+```json
+{
+  "lines": [
+    {
+      "itemId": 1,
+      "cantidad": 1
+    }
+  ]
+}
+```
+
+#### Responses
+
+##### Status: 200 Received (full or partial)
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"draft", "sent", "received", "cancelled"`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`proveedorId` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`total` (required)**
+
+    `string`
+
+  - **`fechaEstimada`**
+
+    `string`, format: `date-time`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId` (required)**
+
+      `integer`
+
+    - **`cantidad` (required)**
+
+      `integer`
+
+    - **`cantidadRecibida` (required)**
+
+      `integer`
+
+    - **`costoUnitario` (required)**
+
+      `string`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`subtotal` (required)**
+
+      `string`
+
+    - **`articulo`**
+
+      `object`
+
+      - **`codigo`**
+
+        `integer`
+
+      - **`descripcion`**
+
+        `string`
+
+      - **`id`**
+
+        `integer`
+
+    - **`codigoProveedor`**
+
+      `string` — Supplier catalog code snapshot (#323)
+
+    - **`descripcionProveedor`**
+
+      `string` — Supplier catalog description snapshot (#323)
+
+  - **`nota`**
+
+    `string`
+
+  - **`proveedor`**
+
+    `object`
+
+    - **`codigo`**
+
+      `integer`
+
+    - **`id`**
+
+      `integer`
+
+    - **`rsocial`**
+
+      `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "proveedorId": 1,
+    "estado": "draft",
+    "total": "",
+    "fechaEstimada": "",
+    "nota": "",
+    "proveedor": {
+      "id": 1,
+      "codigo": 1,
+      "rsocial": ""
+    },
+    "items": [
+      {
+        "id": 1,
+        "articuloId": 1,
+        "codigoProveedor": "",
+        "descripcionProveedor": "",
+        "cantidad": 1,
+        "cantidadRecibida": 1,
+        "costoUnitario": "",
+        "subtotal": "",
+        "articulo": {
+          "id": 1,
+          "codigo": 1,
+          "descripcion": ""
+        }
+      }
+    ]
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 422 Not receivable or quantity exceeds pending
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/recuentos
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/recuentos`
+
+### List physical inventory counts
+
+- **Method:** `GET`
+- **Path:** `/api/recuentos`
+- **Tags:** recuentos
+
+#### Responses
+
+##### Status: 200 Paginated inventory counts
+
+###### Content-Type: application/json
+
+**All of:**
+
+- **`limit` (required)**
+
+  `integer` — Effective page size (same semantics as query \`limit\`)
+
+- **`offset` (required)**
+
+  `integer` — Effective skip (same semantics as query \`offset\`)
+
+- **`total` (required)**
+
+  `integer` — Row count matching the list filter (before limit/offset)
+
+* **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"in_progress", "closed"`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`items` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId` (required)**
+
+      `integer`
+
+    - **`cantSistema` (required)**
+
+      `integer`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`articulo`**
+
+      `object`
+
+      - **`codigo`**
+
+        `integer`
+
+      - **`descripcion`**
+
+        `string`
+
+      - **`id`**
+
+        `integer`
+
+    - **`cantFisica`**
+
+      `integer`
+
+  - **`operadorId` (required)**
+
+    `integer`
+
+  - **`closedAt`**
+
+    `string`, format: `date-time`
+
+  - **`operador`**
+
+    `object`
+
+    - **`id`**
+
+      `integer`
+
+    - **`username`**
+
+      `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "total": 0,
+  "limit": 1,
+  "offset": 0,
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "operadorId": 1,
+      "estado": "in_progress",
+      "fecha": "",
+      "closedAt": "",
+      "operador": {
+        "id": 1,
+        "username": ""
+      },
+      "items": [
+        {
+          "id": 1,
+          "articuloId": 1,
+          "cantSistema": 1,
+          "cantFisica": 1,
+          "articulo": {
+            "id": 1,
+            "codigo": 1,
+            "descripcion": ""
+          }
+        }
+      ]
+    }
+  ]
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Start inventory count (snapshot active articles)
+
+- **Method:** `POST`
+- **Path:** `/api/recuentos`
+- **Tags:** recuentos
+
+Requires `inventory.count`. Only one `in_progress` count per tenant.
+
+#### Responses
+
+##### Status: 201 Count started
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"in_progress", "closed"`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`items` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId` (required)**
+
+      `integer`
+
+    - **`cantSistema` (required)**
+
+      `integer`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`articulo`**
+
+      `object`
+
+      - **`codigo`**
+
+        `integer`
+
+      - **`descripcion`**
+
+        `string`
+
+      - **`id`**
+
+        `integer`
+
+    - **`cantFisica`**
+
+      `integer`
+
+  - **`operadorId` (required)**
+
+    `integer`
+
+  - **`closedAt`**
+
+    `string`, format: `date-time`
+
+  - **`operador`**
+
+    `object`
+
+    - **`id`**
+
+      `integer`
+
+    - **`username`**
+
+      `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "operadorId": 1,
+    "estado": "in_progress",
+    "fecha": "",
+    "closedAt": "",
+    "operador": {
+      "id": 1,
+      "username": ""
+    },
+    "items": [
+      {
+        "id": 1,
+        "articuloId": 1,
+        "cantSistema": 1,
+        "cantFisica": 1,
+        "articulo": {
+          "id": 1,
+          "codigo": 1,
+          "descripcion": ""
+        }
+      }
+    ]
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 422 Count already in progress
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/recuentos/{id}
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/recuentos/{id}`
+
+### Get inventory count by id
+
+- **Method:** `GET`
+- **Path:** `/api/recuentos/{id}`
+- **Tags:** recuentos
+
+#### Responses
+
+##### Status: 200 Count detail with items
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"in_progress", "closed"`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`items` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId` (required)**
+
+      `integer`
+
+    - **`cantSistema` (required)**
+
+      `integer`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`articulo`**
+
+      `object`
+
+      - **`codigo`**
+
+        `integer`
+
+      - **`descripcion`**
+
+        `string`
+
+      - **`id`**
+
+        `integer`
+
+    - **`cantFisica`**
+
+      `integer`
+
+  - **`operadorId` (required)**
+
+    `integer`
+
+  - **`closedAt`**
+
+    `string`, format: `date-time`
+
+  - **`operador`**
+
+    `object`
+
+    - **`id`**
+
+      `integer`
+
+    - **`username`**
+
+      `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "operadorId": 1,
+    "estado": "in_progress",
+    "fecha": "",
+    "closedAt": "",
+    "operador": {
+      "id": 1,
+      "username": ""
+    },
+    "items": [
+      {
+        "id": 1,
+        "articuloId": 1,
+        "cantSistema": 1,
+        "cantFisica": 1,
+        "articulo": {
+          "id": 1,
+          "codigo": 1,
+          "descripcion": ""
+        }
+      }
+    ]
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/recuentos/{id}/items
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/recuentos/{id}/items`
+
+### Update physical quantities (partial allowed)
+
+- **Method:** `PUT`
+- **Path:** `/api/recuentos/{id}/items`
+- **Tags:** recuentos
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`lines` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`cantFisica` (required)**
+
+    `integer`
+
+**Example:**
+
+```json
+{
+  "lines": [
+    {
+      "articuloId": 1,
+      "cantFisica": 0
+    }
+  ]
+}
+```
+
+#### Responses
+
+##### Status: 200 Updated count
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"in_progress", "closed"`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`items` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId` (required)**
+
+      `integer`
+
+    - **`cantSistema` (required)**
+
+      `integer`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`articulo`**
+
+      `object`
+
+      - **`codigo`**
+
+        `integer`
+
+      - **`descripcion`**
+
+        `string`
+
+      - **`id`**
+
+        `integer`
+
+    - **`cantFisica`**
+
+      `integer`
+
+  - **`operadorId` (required)**
+
+    `integer`
+
+  - **`closedAt`**
+
+    `string`, format: `date-time`
+
+  - **`operador`**
+
+    `object`
+
+    - **`id`**
+
+      `integer`
+
+    - **`username`**
+
+      `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "operadorId": 1,
+    "estado": "in_progress",
+    "fecha": "",
+    "closedAt": "",
+    "operador": {
+      "id": 1,
+      "username": ""
+    },
+    "items": [
+      {
+        "id": 1,
+        "articuloId": 1,
+        "cantSistema": 1,
+        "cantFisica": 1,
+        "articulo": {
+          "id": 1,
+          "codigo": 1,
+          "descripcion": ""
+        }
+      }
+    ]
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 422 Not editable or invalid line
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/recuentos/{id}/close
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/recuentos/{id}/close`
+
+### Close inventory count and apply stock adjustments
+
+- **Method:** `POST`
+- **Path:** `/api/recuentos/{id}/close`
+- **Tags:** recuentos
+
+Requires all items to have `cantFisica`. For each line with non-zero variance, updates article stock and creates `StockAjuste` with motivo `recuento`. Lines with zero variance do not create adjustments.
+
+#### Responses
+
+##### Status: 200 Count closed
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"in_progress", "closed"`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`items` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId` (required)**
+
+      `integer`
+
+    - **`cantSistema` (required)**
+
+      `integer`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`articulo`**
+
+      `object`
+
+      - **`codigo`**
+
+        `integer`
+
+      - **`descripcion`**
+
+        `string`
+
+      - **`id`**
+
+        `integer`
+
+    - **`cantFisica`**
+
+      `integer`
+
+  - **`operadorId` (required)**
+
+    `integer`
+
+  - **`closedAt`**
+
+    `string`, format: `date-time`
+
+  - **`operador`**
+
+    `object`
+
+    - **`id`**
+
+      `integer`
+
+    - **`username`**
+
+      `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "operadorId": 1,
+    "estado": "in_progress",
+    "fecha": "",
+    "closedAt": "",
+    "operador": {
+      "id": 1,
+      "username": ""
+    },
+    "items": [
+      {
+        "id": 1,
+        "articuloId": 1,
+        "cantSistema": 1,
+        "cantFisica": 1,
+        "articulo": {
+          "id": 1,
+          "codigo": 1,
+          "descripcion": ""
+        }
+      }
+    ]
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 422 Incomplete items, not closable, or insufficient stock
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/recuentos/{id}/pdf
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/recuentos/{id}/pdf`
+
+### Download variance PDF (closed counts only)
+
+- **Method:** `GET`
+- **Path:** `/api/recuentos/{id}/pdf`
+- **Tags:** recuentos
+
+#### Responses
+
+##### Status: 200 PDF document
+
+###### Content-Type: application/pdf
+
+`string`, format: `binary`
+
+**Example:**
+
+```json
+{}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 422 Count not closed
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/facturas
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/facturas`
+
 ### List invoices
 
 - **Method:** `GET`
@@ -2340,11 +16159,21 @@ One-time endpoint to create initial tenant and owner user.
 
 ###### Content-Type: application/json
 
+**All of:**
+
 - **`data` (required)**
 
   `array`
 
   **Items:**
+
+  - **`cae`**
+
+    `string`
+
+  - **`caeVto`**
+
+    `string`, format: `date-time`
 
   - **`clienteId`**
 
@@ -2353,6 +16182,10 @@ One-time endpoint to create initial tenant and owner user.
   - **`estado`**
 
     `string`
+
+  - **`estadoCae`**
+
+    `string`, possible values: `"pending", "issued", "failed"`
 
   - **`fecha`**
 
@@ -2504,6 +16337,18 @@ One-time endpoint to create initial tenant and owner user.
 
   `boolean`
 
+* **`limit` (required)**
+
+  `integer` — Effective page size (same semantics as query \`limit\`)
+
+* **`offset` (required)**
+
+  `integer` — Effective skip (same semantics as query \`offset\`)
+
+* **`total` (required)**
+
+  `integer` — Row count matching the list filter (before limit/offset)
+
 **Example:**
 
 ```json
@@ -2525,6 +16370,9 @@ One-time endpoint to create initial tenant and owner user.
       "iva2": 1,
       "total": 1,
       "estado": "",
+      "cae": "",
+      "caeVto": "",
+      "estadoCae": "pending",
       "items": [
         {
           "id": 1,
@@ -2559,7 +16407,10 @@ One-time endpoint to create initial tenant and owner user.
       ],
       "additionalProperty": "anything"
     }
-  ]
+  ],
+  "total": 0,
+  "limit": 1,
+  "offset": 0
 }
 ```
 
@@ -2748,6 +16599,14 @@ One-time endpoint to create initial tenant and owner user.
 
   `object`
 
+  - **`cae`**
+
+    `string`
+
+  - **`caeVto`**
+
+    `string`, format: `date-time`
+
   - **`clienteId`**
 
     `integer`
@@ -2755,6 +16614,10 @@ One-time endpoint to create initial tenant and owner user.
   - **`estado`**
 
     `string`
+
+  - **`estadoCae`**
+
+    `string`, possible values: `"pending", "issued", "failed"`
 
   - **`fecha`**
 
@@ -2926,6 +16789,9 @@ One-time endpoint to create initial tenant and owner user.
     "iva2": 1,
     "total": 1,
     "estado": "",
+    "cae": "",
+    "caeVto": "",
+    "estadoCae": "pending",
     "items": [
       {
         "id": 1,
@@ -2959,6 +16825,158 @@ One-time endpoint to create initial tenant and owner user.
       }
     ],
     "additionalProperty": "anything"
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 422 Client suspended, insufficient stock, or other business rule
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### AFIP fiscal config status (metadata only)
+
+- **Method:** `GET`
+- **Path:** `/api/arca/config`
+- **Tags:** afip
+
+Requires `settings.fiscal.manage`. Does not return certificate or private key.
+
+#### Responses
+
+##### Status: 200 Config status
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`configured` (required)**
+
+    `boolean`
+
+  - **`ambiente`**
+
+    `string`
+
+  - **`cuit`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "configured": true,
+    "cuit": "",
+    "ambiente": ""
   }
 }
 ```
@@ -3025,6 +17043,9238 @@ One-time endpoint to create initial tenant and owner user.
   "error": ""
 }
 ```
+
+### Upsert tenant AFIP credentials
+
+- **Method:** `PUT`
+- **Path:** `/api/arca/config`
+- **Tags:** afip
+
+Requires `settings.fiscal.manage`. Certificate and key encrypted at rest.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`certificate` (required)**
+
+  `string`
+
+- **`cuit` (required)**
+
+  `string`
+
+- **`privateKey` (required)**
+
+  `string`
+
+- **`ambiente`**
+
+  `string`, possible values: `"homologacion", "produccion"`
+
+**Example:**
+
+```json
+{
+  "cuit": "",
+  "certificate": "",
+  "privateKey": "",
+  "ambiente": "homologacion"
+}
+```
+
+#### Responses
+
+##### Status: 200 Config saved
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`configured`**
+
+    `boolean`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "configured": true
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Request AFIP TA (ticket de acceso)
+
+- **Method:** `POST`
+- **Path:** `/api/arca/auth`
+- **Tags:** afip
+
+Requires `settings.fiscal.manage`. Homologación mock when AFIP network is not configured.
+
+#### Responses
+
+##### Status: 200 TA issued
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`expiration`**
+
+    `string`, format: `date-time`
+
+  - **`sign`**
+
+    `string`
+
+  - **`token`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "token": "",
+    "sign": "",
+    "expiration": ""
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Fiscal config not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Request CAE for a factura
+
+- **Method:** `POST`
+- **Path:** `/api/arca/cae`
+- **Tags:** afip
+
+Requires `sales.create`.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`facturaId` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "facturaId": 1
+}
+```
+
+#### Responses
+
+##### Status: 200 CAE issued
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`cae`**
+
+    `string`
+
+  - **`caeVto`**
+
+    `string`, format: `date-time`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "cae": "",
+    "caeVto": ""
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Factura or config not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 502 AFIP request failed
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/fiscal/regimenes
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/fiscal/regimenes`
+
+### List withholding/perception regimes (#228)
+
+- **Method:** `GET`
+- **Path:** `/api/fiscal/regimenes`
+- **Tags:** contabilidad
+
+Requires `finance.retenciones`, `reports.financial.read`.
+
+#### Responses
+
+##### Status: 200 Regime list
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`activo` (required)**
+
+    `boolean`
+
+  - **`alicuota` (required)**
+
+    `string`
+
+  - **`alicuotaMin` (required)**
+
+    `string | null`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`nombre` (required)**
+
+    `string`
+
+  - **`provincia` (required)**
+
+    `string | null`
+
+  - **`subtipo` (required)**
+
+    `string`, possible values: `"retencion", "percepcion"`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"ganancias", "iva", "iibb"`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "tipo": "ganancias",
+      "subtipo": "retencion",
+      "nombre": "",
+      "alicuota": "",
+      "alicuotaMin": null,
+      "provincia": null,
+      "activo": true,
+      "createdAt": "",
+      "updatedAt": ""
+    }
+  ]
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Create withholding/perception regime (#228)
+
+- **Method:** `POST`
+- **Path:** `/api/fiscal/regimenes`
+- **Tags:** contabilidad
+
+Requires `finance.retenciones`, `settings.fiscal.manage`.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`alicuota` (required)**
+
+  `number`
+
+- **`nombre` (required)**
+
+  `string`
+
+- **`subtipo` (required)**
+
+  `string`, possible values: `"retencion", "percepcion"`
+
+- **`tipo` (required)**
+
+  `string`, possible values: `"ganancias", "iva", "iibb"`
+
+- **`activo`**
+
+  `boolean`
+
+- **`alicuotaMin`**
+
+  `number | null`
+
+- **`provincia`**
+
+  `string | null`
+
+**Example:**
+
+```json
+{
+  "tipo": "ganancias",
+  "subtipo": "retencion",
+  "nombre": "",
+  "alicuota": 0,
+  "alicuotaMin": null,
+  "provincia": null,
+  "activo": true
+}
+```
+
+#### Responses
+
+##### Status: 201 Regime created
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`activo` (required)**
+
+    `boolean`
+
+  - **`alicuota` (required)**
+
+    `string`
+
+  - **`alicuotaMin` (required)**
+
+    `string | null`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`nombre` (required)**
+
+    `string`
+
+  - **`provincia` (required)**
+
+    `string | null`
+
+  - **`subtipo` (required)**
+
+    `string`, possible values: `"retencion", "percepcion"`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"ganancias", "iva", "iibb"`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "tipo": "ganancias",
+    "subtipo": "retencion",
+    "nombre": "",
+    "alicuota": "",
+    "alicuotaMin": null,
+    "provincia": null,
+    "activo": true,
+    "createdAt": "",
+    "updatedAt": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/fiscal/regimenes/{id}
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/fiscal/regimenes/{id}`
+
+### Update withholding/perception regime (#228)
+
+- **Method:** `PUT`
+- **Path:** `/api/fiscal/regimenes/{id}`
+- **Tags:** contabilidad
+
+Requires `finance.retenciones`, `settings.fiscal.manage`.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`activo`**
+
+  `boolean`
+
+- **`alicuota`**
+
+  `number`
+
+- **`alicuotaMin`**
+
+  `number | null`
+
+- **`nombre`**
+
+  `string`
+
+- **`provincia`**
+
+  `string | null`
+
+**Example:**
+
+```json
+{
+  "nombre": "",
+  "alicuota": 0,
+  "alicuotaMin": null,
+  "provincia": null,
+  "activo": true
+}
+```
+
+#### Responses
+
+##### Status: 200 Regime updated
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`activo` (required)**
+
+    `boolean`
+
+  - **`alicuota` (required)**
+
+    `string`
+
+  - **`alicuotaMin` (required)**
+
+    `string | null`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`nombre` (required)**
+
+    `string`
+
+  - **`provincia` (required)**
+
+    `string | null`
+
+  - **`subtipo` (required)**
+
+    `string`, possible values: `"retencion", "percepcion"`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"ganancias", "iva", "iibb"`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "tipo": "ganancias",
+    "subtipo": "retencion",
+    "nombre": "",
+    "alicuota": "",
+    "alicuotaMin": null,
+    "provincia": null,
+    "activo": true,
+    "createdAt": "",
+    "updatedAt": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Regime not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/fiscal/config-retenciones
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/fiscal/config-retenciones`
+
+### Tenant withholding agent flags (#228)
+
+- **Method:** `GET`
+- **Path:** `/api/fiscal/config-retenciones`
+- **Tags:** contabilidad
+
+Requires `finance.retenciones`, `settings.fiscal.manage`.
+
+#### Responses
+
+##### Status: 200 Agent config
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`esAgenteRetencionGanancias` (required)**
+
+    `boolean`
+
+  - **`esAgenteRetencionIIBB` (required)**
+
+    `boolean`
+
+  - **`esAgenteRetencionIVA` (required)**
+
+    `boolean`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "esAgenteRetencionGanancias": true,
+    "esAgenteRetencionIVA": true,
+    "esAgenteRetencionIIBB": true
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Upsert tenant withholding agent flags (#228)
+
+- **Method:** `PUT`
+- **Path:** `/api/fiscal/config-retenciones`
+- **Tags:** contabilidad
+
+Requires `finance.retenciones`, `settings.fiscal.manage`.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`esAgenteRetencionGanancias`**
+
+  `boolean`
+
+- **`esAgenteRetencionIIBB`**
+
+  `boolean`
+
+- **`esAgenteRetencionIVA`**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "esAgenteRetencionGanancias": true,
+  "esAgenteRetencionIVA": true,
+  "esAgenteRetencionIIBB": true
+}
+```
+
+#### Responses
+
+##### Status: 200 Config saved
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`esAgenteRetencionGanancias` (required)**
+
+    `boolean`
+
+  - **`esAgenteRetencionIIBB` (required)**
+
+    `boolean`
+
+  - **`esAgenteRetencionIVA` (required)**
+
+    `boolean`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "esAgenteRetencionGanancias": true,
+    "esAgenteRetencionIVA": true,
+    "esAgenteRetencionIIBB": true
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/fiscal/retenciones
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/fiscal/retenciones`
+
+### Applied withholdings/perceptions history (#228)
+
+- **Method:** `GET`
+- **Path:** `/api/fiscal/retenciones`
+- **Tags:** contabilidad
+
+Requires `finance.retenciones`, `reports.financial.read`. Paginated list.
+
+#### Responses
+
+##### Status: 200 Paginated applied withholdings
+
+###### Content-Type: application/json
+
+**All of:**
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`alicuota` (required)**
+
+    `string`
+
+  - **`baseImponible` (required)**
+
+    `string`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`entidadId` (required)**
+
+    `integer`
+
+  - **`entidadTipo` (required)**
+
+    `string`, possible values: `"cliente", "proveedor"`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`importe` (required)**
+
+    `string`
+
+  - **`regimenId` (required)**
+
+    `integer`
+
+  - **`regimenNombre` (required)**
+
+    `string`
+
+  - **`tipo` (required)**
+
+    `string`
+
+  - **`cobroId`**
+
+    `integer | null`
+
+  - **`constanciaNum`**
+
+    `string | null`
+
+  - **`facturaId`**
+
+    `integer | null`
+
+  - **`reciboPagoId`**
+
+    `integer | null`
+
+- **`success` (required)**
+
+  `boolean`
+
+* **`limit` (required)**
+
+  `integer` — Effective page size (same semantics as query \`limit\`)
+
+* **`offset` (required)**
+
+  `integer` — Effective skip (same semantics as query \`offset\`)
+
+* **`total` (required)**
+
+  `integer` — Row count matching the list filter (before limit/offset)
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "regimenId": 1,
+      "regimenNombre": "",
+      "tipo": "",
+      "entidadTipo": "cliente",
+      "entidadId": 1,
+      "facturaId": null,
+      "cobroId": null,
+      "reciboPagoId": null,
+      "baseImponible": "",
+      "alicuota": "",
+      "importe": "",
+      "constanciaNum": null,
+      "createdAt": ""
+    }
+  ],
+  "total": 0,
+  "limit": 1,
+  "offset": 0
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/fiscal/retenciones/preview
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/fiscal/retenciones/preview`
+
+### Preview withholdings stub (#228; calculation in
+
+- **Method:** `GET`
+- **Path:** `/api/fiscal/retenciones/preview`
+- **Tags:** contabilidad
+
+Requires `finance.retenciones`, `reports.financial.read`. Returns empty list until
+
+#### Responses
+
+##### Status: 200 Preview result (stub)
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`retenciones` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`alicuota` (required)**
+
+      `string`
+
+    - **`baseImponible` (required)**
+
+      `string`
+
+    - **`importe` (required)**
+
+      `string`
+
+    - **`nombre` (required)**
+
+      `string`
+
+    - **`regimenId` (required)**
+
+      `integer`
+
+    - **`tipo` (required)**
+
+      `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "retenciones": [
+      {
+        "regimenId": 1,
+        "nombre": "",
+        "tipo": "",
+        "alicuota": "",
+        "baseImponible": "",
+        "importe": ""
+      }
+    ]
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/pedidos
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/pedidos`
+
+### List commercial orders / quotes
+
+- **Method:** `GET`
+- **Path:** `/api/pedidos`
+- **Tags:** pedidos
+
+Requires `orders.create` or `reports.operational.read`.
+
+#### Responses
+
+##### Status: 200 Paginated pedidos
+
+###### Content-Type: application/json
+
+**All of:**
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`createdAt`**
+
+    `string`, format: `date-time`
+
+  - **`estado`**
+
+    `string`, possible values: `"draft", "confirmed", "invoiced", "cancelled"`
+
+  - **`facturaId`**
+
+    `integer`
+
+  - **`id`**
+
+    `integer`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId`**
+
+      `integer`
+
+    - **`cantidad`**
+
+      `integer`
+
+    - **`dscto`**
+
+      `number`
+
+    - **`id`**
+
+      `integer`
+
+    - **`precio`**
+
+      `number`
+
+    - **`subtotal`**
+
+      `number`
+
+  - **`tenantId`**
+
+    `integer`
+
+  - **`total`**
+
+    `number`
+
+  - **`updatedAt`**
+
+    `string`, format: `date-time`
+
+  - **`validUntil`**
+
+    `string`, format: `date-time`
+
+  - **`vendedorId`**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+* **`limit` (required)**
+
+  `integer` — Effective page size (same semantics as query \`limit\`)
+
+* **`offset` (required)**
+
+  `integer` — Effective skip (same semantics as query \`offset\`)
+
+* **`total` (required)**
+
+  `integer` — Row count matching the list filter (before limit/offset)
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "clienteId": 1,
+      "vendedorId": 1,
+      "estado": "draft",
+      "total": 1,
+      "validUntil": "",
+      "facturaId": 1,
+      "items": [
+        {
+          "id": 1,
+          "articuloId": 1,
+          "cantidad": 1,
+          "precio": 1,
+          "dscto": 1,
+          "subtotal": 1,
+          "additionalProperty": "anything"
+        }
+      ],
+      "createdAt": "",
+      "updatedAt": "",
+      "additionalProperty": "anything"
+    }
+  ],
+  "total": 0,
+  "limit": 1,
+  "offset": 0
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Create pedido (draft)
+
+- **Method:** `POST`
+- **Path:** `/api/pedidos`
+- **Tags:** pedidos
+
+Requires `orders.create`. Initial estado is `draft`.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`clienteId` (required)**
+
+  `integer`
+
+- **`items` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`cantidad` (required)**
+
+    `integer`
+
+  - **`precio` (required)**
+
+    `number`
+
+  - **`dscto`**
+
+    `number`
+
+- **`validUntil`**
+
+  `string`
+
+- **`vendedorId`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "clienteId": 1,
+  "vendedorId": 1,
+  "validUntil": "",
+  "items": [
+    {
+      "articuloId": 1,
+      "cantidad": 1,
+      "precio": 0,
+      "dscto": 0
+    }
+  ]
+}
+```
+
+#### Responses
+
+##### Status: 201 Pedido created
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`createdAt`**
+
+    `string`, format: `date-time`
+
+  - **`estado`**
+
+    `string`, possible values: `"draft", "confirmed", "invoiced", "cancelled"`
+
+  - **`facturaId`**
+
+    `integer`
+
+  - **`id`**
+
+    `integer`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId`**
+
+      `integer`
+
+    - **`cantidad`**
+
+      `integer`
+
+    - **`dscto`**
+
+      `number`
+
+    - **`id`**
+
+      `integer`
+
+    - **`precio`**
+
+      `number`
+
+    - **`subtotal`**
+
+      `number`
+
+  - **`tenantId`**
+
+    `integer`
+
+  - **`total`**
+
+    `number`
+
+  - **`updatedAt`**
+
+    `string`, format: `date-time`
+
+  - **`validUntil`**
+
+    `string`, format: `date-time`
+
+  - **`vendedorId`**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "clienteId": 1,
+    "vendedorId": 1,
+    "estado": "draft",
+    "total": 1,
+    "validUntil": "",
+    "facturaId": 1,
+    "items": [
+      {
+        "id": 1,
+        "articuloId": 1,
+        "cantidad": 1,
+        "precio": 1,
+        "dscto": 1,
+        "subtotal": 1,
+        "additionalProperty": "anything"
+      }
+    ],
+    "createdAt": "",
+    "updatedAt": "",
+    "additionalProperty": "anything"
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 422 Client suspended or business rule
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/pedidos/{id}
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/pedidos/{id}`
+
+### Get pedido by id
+
+- **Method:** `GET`
+- **Path:** `/api/pedidos/{id}`
+- **Tags:** pedidos
+
+Requires `orders.create` or `reports.operational.read`.
+
+#### Responses
+
+##### Status: 200 Pedido detail
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`createdAt`**
+
+    `string`, format: `date-time`
+
+  - **`estado`**
+
+    `string`, possible values: `"draft", "confirmed", "invoiced", "cancelled"`
+
+  - **`facturaId`**
+
+    `integer`
+
+  - **`id`**
+
+    `integer`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId`**
+
+      `integer`
+
+    - **`cantidad`**
+
+      `integer`
+
+    - **`dscto`**
+
+      `number`
+
+    - **`id`**
+
+      `integer`
+
+    - **`precio`**
+
+      `number`
+
+    - **`subtotal`**
+
+      `number`
+
+  - **`tenantId`**
+
+    `integer`
+
+  - **`total`**
+
+    `number`
+
+  - **`updatedAt`**
+
+    `string`, format: `date-time`
+
+  - **`validUntil`**
+
+    `string`, format: `date-time`
+
+  - **`vendedorId`**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "clienteId": 1,
+    "vendedorId": 1,
+    "estado": "draft",
+    "total": 1,
+    "validUntil": "",
+    "facturaId": 1,
+    "items": [
+      {
+        "id": 1,
+        "articuloId": 1,
+        "cantidad": 1,
+        "precio": 1,
+        "dscto": 1,
+        "subtotal": 1,
+        "additionalProperty": "anything"
+      }
+    ],
+    "createdAt": "",
+    "updatedAt": "",
+    "additionalProperty": "anything"
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Pedido not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Update pedido (draft only)
+
+- **Method:** `PUT`
+- **Path:** `/api/pedidos/{id}`
+- **Tags:** pedidos
+
+Requires `orders.create`.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`clienteId` (required)**
+
+  `integer`
+
+- **`items` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`cantidad` (required)**
+
+    `integer`
+
+  - **`precio` (required)**
+
+    `number`
+
+  - **`dscto`**
+
+    `number`
+
+- **`validUntil`**
+
+  `string`
+
+- **`vendedorId`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "clienteId": 1,
+  "vendedorId": 1,
+  "validUntil": "",
+  "items": [
+    {
+      "articuloId": 1,
+      "cantidad": 1,
+      "precio": 0,
+      "dscto": 0
+    }
+  ]
+}
+```
+
+#### Responses
+
+##### Status: 200 Pedido updated
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`createdAt`**
+
+    `string`, format: `date-time`
+
+  - **`estado`**
+
+    `string`, possible values: `"draft", "confirmed", "invoiced", "cancelled"`
+
+  - **`facturaId`**
+
+    `integer`
+
+  - **`id`**
+
+    `integer`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId`**
+
+      `integer`
+
+    - **`cantidad`**
+
+      `integer`
+
+    - **`dscto`**
+
+      `number`
+
+    - **`id`**
+
+      `integer`
+
+    - **`precio`**
+
+      `number`
+
+    - **`subtotal`**
+
+      `number`
+
+  - **`tenantId`**
+
+    `integer`
+
+  - **`total`**
+
+    `number`
+
+  - **`updatedAt`**
+
+    `string`, format: `date-time`
+
+  - **`validUntil`**
+
+    `string`, format: `date-time`
+
+  - **`vendedorId`**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "clienteId": 1,
+    "vendedorId": 1,
+    "estado": "draft",
+    "total": 1,
+    "validUntil": "",
+    "facturaId": 1,
+    "items": [
+      {
+        "id": 1,
+        "articuloId": 1,
+        "cantidad": 1,
+        "precio": 1,
+        "dscto": 1,
+        "subtotal": 1,
+        "additionalProperty": "anything"
+      }
+    ],
+    "createdAt": "",
+    "updatedAt": "",
+    "additionalProperty": "anything"
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Pedido not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 409 Not in draft state
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Cancel pedido (soft)
+
+- **Method:** `DELETE`
+- **Path:** `/api/pedidos/{id}`
+- **Tags:** pedidos
+
+Requires `sales.cancel`. Sets estado to `cancelled` (not allowed when invoiced).
+
+#### Responses
+
+##### Status: 200 Pedido cancelled
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`createdAt`**
+
+    `string`, format: `date-time`
+
+  - **`estado`**
+
+    `string`, possible values: `"draft", "confirmed", "invoiced", "cancelled"`
+
+  - **`facturaId`**
+
+    `integer`
+
+  - **`id`**
+
+    `integer`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId`**
+
+      `integer`
+
+    - **`cantidad`**
+
+      `integer`
+
+    - **`dscto`**
+
+      `number`
+
+    - **`id`**
+
+      `integer`
+
+    - **`precio`**
+
+      `number`
+
+    - **`subtotal`**
+
+      `number`
+
+  - **`tenantId`**
+
+    `integer`
+
+  - **`total`**
+
+    `number`
+
+  - **`updatedAt`**
+
+    `string`, format: `date-time`
+
+  - **`validUntil`**
+
+    `string`, format: `date-time`
+
+  - **`vendedorId`**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "clienteId": 1,
+    "vendedorId": 1,
+    "estado": "draft",
+    "total": 1,
+    "validUntil": "",
+    "facturaId": 1,
+    "items": [
+      {
+        "id": 1,
+        "articuloId": 1,
+        "cantidad": 1,
+        "precio": 1,
+        "dscto": 1,
+        "subtotal": 1,
+        "additionalProperty": "anything"
+      }
+    ],
+    "createdAt": "",
+    "updatedAt": "",
+    "additionalProperty": "anything"
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Pedido not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 409 Invalid state
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/pedidos/{id}/confirm
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/pedidos/{id}/confirm`
+
+### Confirm pedido (draft → confirmed)
+
+- **Method:** `POST`
+- **Path:** `/api/pedidos/{id}/confirm`
+- **Tags:** pedidos
+
+Requires `orders.create`.
+
+#### Responses
+
+##### Status: 200 Pedido confirmed
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`createdAt`**
+
+    `string`, format: `date-time`
+
+  - **`estado`**
+
+    `string`, possible values: `"draft", "confirmed", "invoiced", "cancelled"`
+
+  - **`facturaId`**
+
+    `integer`
+
+  - **`id`**
+
+    `integer`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId`**
+
+      `integer`
+
+    - **`cantidad`**
+
+      `integer`
+
+    - **`dscto`**
+
+      `number`
+
+    - **`id`**
+
+      `integer`
+
+    - **`precio`**
+
+      `number`
+
+    - **`subtotal`**
+
+      `number`
+
+  - **`tenantId`**
+
+    `integer`
+
+  - **`total`**
+
+    `number`
+
+  - **`updatedAt`**
+
+    `string`, format: `date-time`
+
+  - **`validUntil`**
+
+    `string`, format: `date-time`
+
+  - **`vendedorId`**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "clienteId": 1,
+    "vendedorId": 1,
+    "estado": "draft",
+    "total": 1,
+    "validUntil": "",
+    "facturaId": 1,
+    "items": [
+      {
+        "id": 1,
+        "articuloId": 1,
+        "cantidad": 1,
+        "precio": 1,
+        "dscto": 1,
+        "subtotal": 1,
+        "additionalProperty": "anything"
+      }
+    ],
+    "createdAt": "",
+    "updatedAt": "",
+    "additionalProperty": "anything"
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Pedido not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 409 Invalid state transition
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/pedidos/{id}/invoice
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/pedidos/{id}/invoice`
+
+### Invoice pedido (creates Factura)
+
+- **Method:** `POST`
+- **Path:** `/api/pedidos/{id}/invoice`
+- **Tags:** pedidos
+
+Requires `sales.create`. Pedido must be `confirmed`. Creates invoice via FacturaService (no CAE in this release).
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`fecha` (required)**
+
+  `string`
+
+- **`numero` (required)**
+
+  `integer`
+
+- **`tipo` (required)**
+
+  `string`, possible values: `"A", "B"`
+
+- **`formaPagoId`**
+
+  `integer`
+
+- **`prefijo`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "fecha": "",
+  "tipo": "A",
+  "numero": 1,
+  "prefijo": "",
+  "formaPagoId": 1
+}
+```
+
+#### Responses
+
+##### Status: 200 Pedido invoiced
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`createdAt`**
+
+    `string`, format: `date-time`
+
+  - **`estado`**
+
+    `string`, possible values: `"draft", "confirmed", "invoiced", "cancelled"`
+
+  - **`facturaId`**
+
+    `integer`
+
+  - **`id`**
+
+    `integer`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId`**
+
+      `integer`
+
+    - **`cantidad`**
+
+      `integer`
+
+    - **`dscto`**
+
+      `number`
+
+    - **`id`**
+
+      `integer`
+
+    - **`precio`**
+
+      `number`
+
+    - **`subtotal`**
+
+      `number`
+
+  - **`tenantId`**
+
+    `integer`
+
+  - **`total`**
+
+    `number`
+
+  - **`updatedAt`**
+
+    `string`, format: `date-time`
+
+  - **`validUntil`**
+
+    `string`, format: `date-time`
+
+  - **`vendedorId`**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "clienteId": 1,
+    "vendedorId": 1,
+    "estado": "draft",
+    "total": 1,
+    "validUntil": "",
+    "facturaId": 1,
+    "items": [
+      {
+        "id": 1,
+        "articuloId": 1,
+        "cantidad": 1,
+        "precio": 1,
+        "dscto": 1,
+        "subtotal": 1,
+        "additionalProperty": "anything"
+      }
+    ],
+    "createdAt": "",
+    "updatedAt": "",
+    "additionalProperty": "anything"
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Pedido not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 409 Invalid state transition
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 422 Client suspended, insufficient stock
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/cobros
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/cobros`
+
+### List customer payments
+
+- **Method:** `GET`
+- **Path:** `/api/cobros`
+- **Tags:** cobros
+
+#### Responses
+
+##### Status: 200 Paginated list of payments
+
+###### Content-Type: application/json
+
+**All of:**
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`cliente`**
+
+    `object`
+
+    - **`codigo`**
+
+      `integer`
+
+    - **`id`**
+
+      `integer`
+
+    - **`rsocial`**
+
+      `string`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`fecha`**
+
+    `string`, format: `date-time`
+
+  - **`formaPagoId`**
+
+    `integer`
+
+  - **`id`**
+
+    `integer`
+
+  - **`monto`**
+
+    `number`
+
+  - **`nota`**
+
+    `string`
+
+  - **`referencia`**
+
+    `string`
+
+  - **`tenantId`**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+* **`limit` (required)**
+
+  `integer` — Effective page size (same semantics as query \`limit\`)
+
+* **`offset` (required)**
+
+  `integer` — Effective skip (same semantics as query \`offset\`)
+
+* **`total` (required)**
+
+  `integer` — Row count matching the list filter (before limit/offset)
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "clienteId": 1,
+      "fecha": "",
+      "monto": 1,
+      "formaPagoId": 1,
+      "referencia": "",
+      "nota": "",
+      "cliente": {
+        "id": 1,
+        "codigo": 1,
+        "rsocial": "",
+        "additionalProperty": "anything"
+      },
+      "additionalProperty": "anything"
+    }
+  ],
+  "total": 0,
+  "limit": 1,
+  "offset": 0
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Register a customer payment
+
+- **Method:** `POST`
+- **Path:** `/api/cobros`
+- **Tags:** cobros
+
+Decrements `Cliente.balance` by `monto` in the same transaction. When the customer has at least one active invoice (`estado: A`), adjusts `Cliente.score` from the oldest active invoice due date (`factura.fecha + creditDays`) vs payment date: on-time +5; 1–10 days late −3; 11–30 −7; >30 −15. No score change when there is no active invoice (on-account payment). Audit metadata includes `scoreBefore`, `scoreAfter`, `delta`. Requires `sales.create`.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`clienteId` (required)**
+
+  `integer`
+
+- **`fecha` (required)**
+
+  `string` — YYYY-MM-DD or ISO-8601
+
+- **`monto` (required)**
+
+  `number`
+
+- **`formaPagoId`**
+
+  `integer`
+
+- **`nota`**
+
+  `string`
+
+- **`referencia`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "clienteId": 1,
+  "fecha": "",
+  "monto": 1,
+  "formaPagoId": 1,
+  "referencia": "",
+  "nota": ""
+}
+```
+
+#### Responses
+
+##### Status: 200 Payment registered
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`cobro` (required)**
+
+    `object`
+
+    - **`cliente`**
+
+      `object`
+
+      - **`codigo`**
+
+        `integer`
+
+      - **`id`**
+
+        `integer`
+
+      - **`rsocial`**
+
+        `string`
+
+    - **`clienteId`**
+
+      `integer`
+
+    - **`fecha`**
+
+      `string`, format: `date-time`
+
+    - **`formaPagoId`**
+
+      `integer`
+
+    - **`id`**
+
+      `integer`
+
+    - **`monto`**
+
+      `number`
+
+    - **`nota`**
+
+      `string`
+
+    - **`referencia`**
+
+      `string`
+
+    - **`tenantId`**
+
+      `integer`
+
+  - **`updatedCliente` (required)**
+
+    `object`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`score` (required)**
+
+      `integer`
+
+    - **`balance`**
+
+      `number`
+
+    - **`creditLimit`**
+
+      `number`
+
+    - **`rsocial`**
+
+      `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "cobro": {
+      "id": 1,
+      "tenantId": 1,
+      "clienteId": 1,
+      "fecha": "",
+      "monto": 1,
+      "formaPagoId": 1,
+      "referencia": "",
+      "nota": "",
+      "cliente": {
+        "id": 1,
+        "codigo": 1,
+        "rsocial": "",
+        "additionalProperty": "anything"
+      },
+      "additionalProperty": "anything"
+    },
+    "updatedCliente": {
+      "id": 1,
+      "rsocial": "",
+      "balance": 1,
+      "creditLimit": 1,
+      "score": 0,
+      "additionalProperty": "anything"
+    }
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 422 Client suspended or inactive
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/cobros/{id}
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/cobros/{id}`
+
+### Get payment by id
+
+- **Method:** `GET`
+- **Path:** `/api/cobros/{id}`
+- **Tags:** cobros
+
+#### Responses
+
+##### Status: 200 Payment detail
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`cliente`**
+
+    `object`
+
+    - **`codigo`**
+
+      `integer`
+
+    - **`id`**
+
+      `integer`
+
+    - **`rsocial`**
+
+      `string`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`fecha`**
+
+    `string`, format: `date-time`
+
+  - **`formaPagoId`**
+
+    `integer`
+
+  - **`id`**
+
+    `integer`
+
+  - **`monto`**
+
+    `number`
+
+  - **`nota`**
+
+    `string`
+
+  - **`referencia`**
+
+    `string`
+
+  - **`tenantId`**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "clienteId": 1,
+    "fecha": "",
+    "monto": 1,
+    "formaPagoId": 1,
+    "referencia": "",
+    "nota": "",
+    "cliente": {
+      "id": 1,
+      "codigo": 1,
+      "rsocial": "",
+      "additionalProperty": "anything"
+    },
+    "additionalProperty": "anything"
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Payment not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/cobranzas/vencidas
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/cobranzas/vencidas`
+
+### List overdue active invoices
+
+- **Method:** `GET`
+- **Path:** `/api/cobranzas/vencidas`
+- **Tags:** cobranzas
+
+Returns active invoices (`estado` A) past due per customer `creditDays`, minus `ParamEmpresa.recordatorioDiasGracia`. Requires `reports.financial.read`.
+
+#### Responses
+
+##### Status: 200 Overdue invoices
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`clienteId` (required)**
+
+    `integer`
+
+  - **`diasMora` (required)**
+
+    `integer`
+
+  - **`facturaId` (required)**
+
+    `integer`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`rsocial` (required)**
+
+    `string`
+
+  - **`total` (required)**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "facturaId": 1,
+      "clienteId": 1,
+      "rsocial": "",
+      "total": "",
+      "fecha": "",
+      "diasMora": 1
+    }
+  ]
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/cobranzas/recordatorios
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/cobranzas/recordatorios`
+
+### Send overdue payment reminder
+
+- **Method:** `POST`
+- **Path:** `/api/cobranzas/recordatorios`
+- **Tags:** cobranzas
+
+Persists `CobroRecordatorio`, dispatches `invoice_overdue` notification, and audits `cobranza_recordatorio_send`. At most one successful send per invoice per calendar day.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`facturaId` (required)**
+
+  `integer`
+
+- **`canal`**
+
+  `string`, default: `"email"`
+
+**Example:**
+
+```json
+{
+  "facturaId": 1,
+  "canal": "email"
+}
+```
+
+#### Responses
+
+##### Status: 201 Reminder sent
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`id` (required)**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Invoice not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 409 Reminder already sent today
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 422 Invoice not overdue
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/facturas/{id}/ticket
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/facturas/{id}/ticket`
+
+### Download 80mm ticket PDF (operational; non-fiscal without issued CAE)
+
+- **Method:** `GET`
+- **Path:** `/api/facturas/{id}/ticket`
+- **Tags:** facturas
+
+Requires `reports.operational.read`. Thermal-style ticket for counter use. When `estadoCae` is not `issued` or CAE is missing, the PDF is explicitly **non-fiscal** (quotation/preview). Does not replace the legal fiscal PDF at `/api/facturas/{id}/pdf`.
+
+#### Responses
+
+##### Status: 200 Ticket PDF
+
+###### Content-Type: application/pdf
+
+`string`, format: `binary`
+
+**Example:**
+
+```json
+{}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Invoice not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/facturas/{id}/print
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/facturas/{id}/print`
+
+### Print invoice using selected device (phase 1 mock)
+
+- **Method:** `POST`
+- **Path:** `/api/facturas/{id}/print`
+- **Tags:** facturas
+
+Requires `reports.operational.read`. Phase 1 endpoint for device selection with mocked channels.
+
+- `pdf`: returns download path for legal PDF.
+- `fiscal`: if `FISCAL_PRINTER_ENABLED=false`, automatically falls back to PDF.
+- `thermal`: executes mock thermal channel (`mock-serial`) without real hardware dependency.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`device` (required)**
+
+  `string`, possible values: `"pdf", "fiscal", "thermal"`
+
+**Example:**
+
+```json
+{
+  "device": "pdf"
+}
+```
+
+#### Responses
+
+##### Status: 200 Printing workflow executed (or PDF fallback resolved)
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`channel` (required)**
+
+    `string`, possible values: `"pdf", "fiscal_mock", "thermal_mock"`
+
+  - **`device` (required)**
+
+    `string`, possible values: `"pdf", "fiscal", "thermal"`
+
+  - **`fallbackToPdf` (required)**
+
+    `boolean`
+
+  - **`downloadPath`**
+
+    `string`
+
+  - **`jobId`**
+
+    `string`
+
+  - **`transport`**
+
+    `string`, possible values: `"mock-serial"`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "device": "pdf",
+    "channel": "pdf",
+    "fallbackToPdf": true,
+    "downloadPath": "",
+    "jobId": "",
+    "transport": "mock-serial"
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Invoice not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/printing/status
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/printing/status`
+
+### Printing device status (phase 1 mock)
+
+- **Method:** `GET`
+- **Path:** `/api/printing/status`
+- **Tags:** printing
+
+Requires `settings.business.manage`. Returns opt-in flags from server env (`FISCAL_PRINTER_ENABLED`, `THERMAL_PRINTER_ENABLED`; default false) and mock channel modes. PDF/legal billing does not require hardware.
+
+#### Responses
+
+##### Status: 200 Printing status
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`fiscalMode` (required)**
+
+    `string`, possible values: `"mock"`
+
+  - **`fiscalPrinterEnabled` (required)**
+
+    `boolean` — Opt-in fiscal controller (RS-232/USB); false uses PDF fallback.
+
+  - **`thermalMode` (required)**
+
+    `string`, possible values: `"mock"`
+
+  - **`thermalPrinterEnabled` (required)**
+
+    `boolean` — Opt-in 80mm thermal ESC/POS path; false uses PDF fallback.
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "fiscalPrinterEnabled": true,
+    "thermalPrinterEnabled": true,
+    "fiscalMode": "mock",
+    "thermalMode": "mock"
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/printing/test
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/printing/test`
+
+### Test mock printing device
+
+- **Method:** `POST`
+- **Path:** `/api/printing/test`
+- **Tags:** printing
+
+Requires `settings.business.manage`. Runs phase-1 mock adapters with a fixed test payload (no invoice id). When `device` is `fiscal` and `FISCAL_PRINTER_ENABLED` is not `true`, or `device` is `thermal` and `THERMAL_PRINTER_ENABLED` is not `true`, returns HTTP 200 with `fallbackToPdf: true`.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`device` (required)**
+
+  `string`, possible values: `"fiscal", "thermal"`
+
+**Example:**
+
+```json
+{
+  "device": "fiscal"
+}
+```
+
+#### Responses
+
+##### Status: 200 Mock test executed (or fiscal PDF fallback flag)
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`channel` (required)**
+
+    `string`, possible values: `"pdf", "fiscal_mock", "thermal_mock"`
+
+  - **`device` (required)**
+
+    `string`, possible values: `"fiscal", "thermal"`
+
+  - **`fallbackToPdf` (required)**
+
+    `boolean`
+
+  - **`jobId`**
+
+    `string`
+
+  - **`transport`**
+
+    `string`, possible values: `"mock-serial"`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "device": "fiscal",
+    "channel": "pdf",
+    "fallbackToPdf": true,
+    "jobId": "",
+    "transport": "mock-serial"
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/facturas/{id}/pdf
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/facturas/{id}/pdf`
+
+### Download legal fiscal invoice PDF (requires issued CAE)
+
+- **Method:** `GET`
+- **Path:** `/api/facturas/{id}/pdf`
+- **Tags:** facturas
+
+Requires `reports.operational.read`. **Legal fiscal voucher** (RG 4291-aligned layout; manual AFIP validation pending per ADR-0014). Returns 422 when `estadoCae` is not `issued` or CAE is missing. Use `/pdf/preview` for non-fiscal preview.
+
+#### Responses
+
+##### Status: 200 PDF file
+
+###### Content-Type: application/pdf
+
+`string`, format: `binary`
+
+**Example:**
+
+```json
+{}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Invoice not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 422 CAE not issued
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/facturas/{id}/pdf/preview
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/facturas/{id}/pdf/preview`
+
+### Preview invoice PDF (watermarked, non-fiscal)
+
+- **Method:** `GET`
+- **Path:** `/api/facturas/{id}/pdf/preview`
+- **Tags:** facturas
+
+Requires `reports.operational.read`. Non-fiscal preview without CAE; no valid AFIP QR/barcode.
+
+#### Responses
+
+##### Status: 200 PDF preview
+
+###### Content-Type: application/pdf
+
+`string`, format: `binary`
+
+**Example:**
+
+```json
+{}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Invoice not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/facturas/{id}/void
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/facturas/{id}/void`
+
+### Void an invoice
+
+- **Method:** `PUT`
+- **Path:** `/api/facturas/{id}/void`
+- **Tags:** facturas
+
+Sets `estado` to `N` (anulada), reverses the customer balance by the invoice total, creates a tenant-scoped `NotaCredito`, and records `AuditEvent` `factura_void` with motivo and `notaCreditoId` in metadata — all in one database transaction. Requires `sales.cancel` and module `billing.credit_notes`. When the source invoice has `estadoCae === issued`, the credit note CAE is requested asynchronously via AFIP adapter.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`motivo` (required)**
+
+  `string` — Reason for voiding the invoice (persisted on credit note and AuditEvent metadata).
+
+**Example:**
+
+```json
+{
+  "motivo": ""
+}
+```
+
+#### Responses
+
+##### Status: 200 Invoice voided with credit note and updated customer balance snapshot
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`factura` (required)**
+
+    `object`
+
+    - **`cae`**
+
+      `string`
+
+    - **`caeVto`**
+
+      `string`, format: `date-time`
+
+    - **`clienteId`**
+
+      `integer`
+
+    - **`estado`**
+
+      `string`
+
+    - **`estadoCae`**
+
+      `string`, possible values: `"pending", "issued", "failed"`
+
+    - **`fecha`**
+
+      `string`, format: `date-time`
+
+    - **`formaPagoId`**
+
+      `integer`
+
+    - **`id`**
+
+      `integer`
+
+    - **`items`**
+
+      `array`
+
+      **Items:**
+
+      - **`articulo`**
+
+        `object`
+
+        - **`activo`**
+
+          `boolean`
+
+        - **`codigo`**
+
+          `integer`
+
+        - **`condIva`**
+
+          `string`
+
+        - **`costo`**
+
+          `number`
+
+        - **`descripcion`**
+
+          `string`
+
+        - **`id`**
+
+          `integer`
+
+        - **`minimo`**
+
+          `integer`
+
+        - **`precioLista1`**
+
+          `number`
+
+        - **`precioLista2`**
+
+          `number`
+
+        - **`rubro`**
+
+          `object`
+
+          - **`codigo`**
+
+            `integer`
+
+          - **`id`**
+
+            `integer`
+
+          - **`nombre`**
+
+            `string`
+
+        - **`rubroId`**
+
+          `integer`
+
+        - **`stock`**
+
+          `integer`
+
+        - **`umedida`**
+
+          `string`
+
+      - **`articuloId`**
+
+        `integer`
+
+      - **`cantidad`**
+
+        `number`
+
+      - **`dscto`**
+
+        `number`
+
+      - **`id`**
+
+        `integer`
+
+      - **`precio`**
+
+        `number`
+
+      - **`subtotal`**
+
+        `number`
+
+    - **`iva1`**
+
+      `number`
+
+    - **`iva2`**
+
+      `number`
+
+    - **`neto1`**
+
+      `number`
+
+    - **`neto2`**
+
+      `number`
+
+    - **`neto3`**
+
+      `number`
+
+    - **`numero`**
+
+      `integer`
+
+    - **`prefijo`**
+
+      `string`
+
+    - **`tipo`**
+
+      `string`
+
+    - **`total`**
+
+      `number`
+
+  - **`notaCredito` (required)**
+
+    `object`
+
+    - **`createdAt` (required)**
+
+      `string`, format: `date-time`
+
+    - **`estadoCae` (required)**
+
+      `string`, possible values: `"pending", "issued", "failed", "not_required"`
+
+    - **`facturaOrigenId` (required)**
+
+      `integer`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`monto` (required)**
+
+      `object`
+
+    - **`motivo` (required)**
+
+      `string`
+
+    - **`tenantId` (required)**
+
+      `integer`
+
+    - **`cae`**
+
+      `string`
+
+    - **`caeVto`**
+
+      `string`, format: `date-time`
+
+    - **`createdById`**
+
+      `integer`
+
+  - **`updatedCliente` (required)**
+
+    `object`
+
+    - **`balance` (required)**
+
+      `object` — Customer balance after decrement (Prisma Decimal may serialize as string in JSON)
+
+    - **`creditLimit` (required)**
+
+      `number`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`rsocial` (required)**
+
+      `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "factura": {
+      "id": 1,
+      "fecha": "",
+      "tipo": "",
+      "prefijo": "",
+      "numero": 1,
+      "clienteId": 1,
+      "formaPagoId": 1,
+      "neto1": 1,
+      "neto2": 1,
+      "neto3": 1,
+      "iva1": 1,
+      "iva2": 1,
+      "total": 1,
+      "estado": "",
+      "cae": "",
+      "caeVto": "",
+      "estadoCae": "pending",
+      "items": [
+        {
+          "id": 1,
+          "articuloId": 1,
+          "articulo": {
+            "id": 1,
+            "codigo": 1,
+            "descripcion": "",
+            "rubroId": 1,
+            "rubro": {
+              "id": 1,
+              "codigo": 1,
+              "nombre": "",
+              "additionalProperty": "anything"
+            },
+            "condIva": "",
+            "umedida": "",
+            "precioLista1": 1,
+            "precioLista2": 1,
+            "costo": 1,
+            "stock": 1,
+            "minimo": 1,
+            "activo": true,
+            "additionalProperty": "anything"
+          },
+          "cantidad": 1,
+          "precio": 1,
+          "dscto": 1,
+          "subtotal": 1,
+          "additionalProperty": "anything"
+        }
+      ],
+      "additionalProperty": "anything"
+    },
+    "notaCredito": {
+      "id": 1,
+      "tenantId": 1,
+      "facturaOrigenId": 1,
+      "motivo": "",
+      "monto": 1,
+      "cae": "",
+      "caeVto": "",
+      "estadoCae": "pending",
+      "createdById": 1,
+      "createdAt": "",
+      "additionalProperty": "anything"
+    },
+    "updatedCliente": {
+      "id": 1,
+      "rsocial": "",
+      "balance": 1,
+      "creditLimit": 1
+    }
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Invoice not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 409 Invoice already voided
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/notas-credito
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/notas-credito`
+
+### List credit notes
+
+- **Method:** `GET`
+- **Path:** `/api/notas-credito`
+- **Tags:** notasCredito
+
+Paginated list filtered by `createdAt` in `[from, to]` (inclusive calendar days, server local timezone). Optional `clienteId` filters by the originating invoice's customer. Requires module `billing.credit_notes` and one of `reports.financial.read`, `reports.operational.read`.
+
+#### Responses
+
+##### Status: 200 Paginated credit notes with originating invoice header
+
+###### Content-Type: application/json
+
+**All of:**
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`estadoCae` (required)**
+
+    `string`, possible values: `"pending", "issued", "failed", "not_required"`
+
+  - **`facturaOrigen` (required)**
+
+    `object` — Originating invoice header (selected columns)
+
+    - **`clienteId`**
+
+      `integer`
+
+    - **`estado`**
+
+      `string`
+
+    - **`fecha`**
+
+      `string`, format: `date-time`
+
+    - **`id`**
+
+      `integer`
+
+    - **`numero`**
+
+      `integer`
+
+    - **`prefijo`**
+
+      `string`
+
+    - **`tipo`**
+
+      `string`
+
+    - **`total`**
+
+      `object`
+
+  - **`facturaOrigenId` (required)**
+
+    `integer`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`monto` (required)**
+
+    `object`
+
+  - **`motivo` (required)**
+
+    `string`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`cae`**
+
+    `string`
+
+  - **`caeVto`**
+
+    `string`, format: `date-time`
+
+  - **`createdById`**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+* **`limit` (required)**
+
+  `integer` — Effective page size (same semantics as query \`limit\`)
+
+* **`offset` (required)**
+
+  `integer` — Effective skip (same semantics as query \`offset\`)
+
+* **`total` (required)**
+
+  `integer` — Row count matching the list filter (before limit/offset)
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "facturaOrigenId": 1,
+      "motivo": "",
+      "monto": 1,
+      "cae": "",
+      "caeVto": "",
+      "estadoCae": "pending",
+      "createdById": 1,
+      "createdAt": "",
+      "facturaOrigen": {
+        "id": 1,
+        "tipo": "",
+        "prefijo": "",
+        "numero": 1,
+        "clienteId": 1,
+        "fecha": "",
+        "total": 1,
+        "estado": "",
+        "additionalProperty": "anything"
+      },
+      "additionalProperty": "anything"
+    }
+  ],
+  "total": 0,
+  "limit": 1,
+  "offset": 0
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/notas-credito/{id}
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/notas-credito/{id}`
+
+### Get credit note by id
+
+- **Method:** `GET`
+- **Path:** `/api/notas-credito/{id}`
+- **Tags:** notasCredito
+
+Returns a credit note with originating invoice header for the current tenant. Requires module `billing.credit_notes` and one of `reports.financial.read`, `reports.operational.read`.
+
+#### Responses
+
+##### Status: 200 Credit note row
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`estadoCae` (required)**
+
+    `string`, possible values: `"pending", "issued", "failed", "not_required"`
+
+  - **`facturaOrigen` (required)**
+
+    `object` — Originating invoice header (selected columns)
+
+    - **`clienteId`**
+
+      `integer`
+
+    - **`estado`**
+
+      `string`
+
+    - **`fecha`**
+
+      `string`, format: `date-time`
+
+    - **`id`**
+
+      `integer`
+
+    - **`numero`**
+
+      `integer`
+
+    - **`prefijo`**
+
+      `string`
+
+    - **`tipo`**
+
+      `string`
+
+    - **`total`**
+
+      `object`
+
+  - **`facturaOrigenId` (required)**
+
+    `integer`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`monto` (required)**
+
+    `object`
+
+  - **`motivo` (required)**
+
+    `string`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`cae`**
+
+    `string`
+
+  - **`caeVto`**
+
+    `string`, format: `date-time`
+
+  - **`createdById`**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "facturaOrigenId": 1,
+    "motivo": "",
+    "monto": 1,
+    "cae": "",
+    "caeVto": "",
+    "estadoCae": "pending",
+    "createdById": 1,
+    "createdAt": "",
+    "facturaOrigen": {
+      "id": 1,
+      "tipo": "",
+      "prefijo": "",
+      "numero": 1,
+      "clienteId": 1,
+      "fecha": "",
+      "total": 1,
+      "estado": "",
+      "additionalProperty": "anything"
+    },
+    "additionalProperty": "anything"
+  }
+}
+```
+
+##### Status: 400 Invalid path id
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/contabilidad/libro-iva-ventas
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/contabilidad/libro-iva-ventas`
+
+### Libro IVA Ventas export (ARCA RG 3685 — Fase 1)
+
+- **Method:** `GET`
+- **Path:** `/api/contabilidad/libro-iva-ventas`
+- **Tags:** contabilidad
+
+Generates **Libro IVA Ventas** from persisted `Factura` fiscal fields (types A/B/C, netos, IVA, total, estado). Includes credit notes and voided vouchers (`tipo 999`) per ADR-0013 when `NotaCredito` falls in the period. Requires module `finance.ledger` and permission `reports.financial.read`. Purchases book: see `GET /api/contabilidad/libro-iva-compras` (#306).
+
+- `format=preview` (default): JSON totals and record counts.
+- `format=txt`: ZIP download with `CBTV.txt` + `ALICUOTAS.txt` (comma-separated, RG 3685 layout).
+- `format=xlsx`: internal review workbook (not an ARCA substitute). ARCA validator confirmation may be pending; structural consistency is covered by tests.
+
+#### Responses
+
+##### Status: 200 Preview JSON or file download
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`arcaValidationPending` (required)**
+
+    `boolean`
+
+  - **`periodo` (required)**
+
+    `string`
+
+  - **`recordCountAlicuotas` (required)**
+
+    `integer`
+
+  - **`recordCountCbtv` (required)**
+
+    `integer`
+
+  - **`totalExento` (required)**
+
+    `number`
+
+  - **`totalGeneral` (required)**
+
+    `number`
+
+  - **`totalIva` (required)**
+
+    `number`
+
+  - **`totalNeto` (required)**
+
+    `number`
+
+  - **`totalsByAlicuota` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`alicuotaCode` (required)**
+
+      `string`
+
+    - **`iva` (required)**
+
+      `number`
+
+    - **`neto` (required)**
+
+      `number`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "periodo": "",
+    "recordCountCbtv": 0,
+    "recordCountAlicuotas": 0,
+    "totalsByAlicuota": [
+      {
+        "alicuotaCode": "",
+        "neto": 1,
+        "iva": 1
+      }
+    ],
+    "totalNeto": 1,
+    "totalIva": 1,
+    "totalExento": 1,
+    "totalGeneral": 1,
+    "arcaValidationPending": true
+  }
+}
+```
+
+###### Content-Type: application/zip
+
+`string`, format: `binary`
+
+**Example:**
+
+```json
+{}
+```
+
+###### Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+
+`string`, format: `binary`
+
+**Example:**
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/contabilidad/libro-iva-compras
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/contabilidad/libro-iva-compras`
+
+### Libro IVA Compras export (ARCA RG 3685 —
+
+- **Method:** `GET`
+- **Path:** `/api/contabilidad/libro-iva-compras`
+- **Tags:** contabilidad
+
+Generates **Libro IVA Compras** from persisted `ComprobanteCompra` fiscal fields (types A/B/C, netos, IVA, total, estado). Requires module `finance.ledger` and permission `reports.financial.read`. Data entry: `POST /api/comprobantes-compra` (supplier fiscal voucher).
+
+- `format=preview` (default): JSON totals and record counts.
+- `format=txt`: ZIP download with `CBTU.txt` + `ALICUOTAS.txt` (comma-separated, RG 3685 layout).
+- `format=xlsx`: internal review workbook (not an ARCA substitute).
+
+#### Responses
+
+##### Status: 200 Preview JSON or file download
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`arcaValidationPending` (required)**
+
+    `boolean`
+
+  - **`periodo` (required)**
+
+    `string`
+
+  - **`recordCountAlicuotas` (required)**
+
+    `integer`
+
+  - **`recordCountCbtu` (required)**
+
+    `integer`
+
+  - **`totalExento` (required)**
+
+    `number`
+
+  - **`totalGeneral` (required)**
+
+    `number`
+
+  - **`totalIva` (required)**
+
+    `number`
+
+  - **`totalNeto` (required)**
+
+    `number`
+
+  - **`totalsByAlicuota` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`alicuotaCode` (required)**
+
+      `string`
+
+    - **`iva` (required)**
+
+      `number`
+
+    - **`neto` (required)**
+
+      `number`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "periodo": "",
+    "recordCountCbtu": 0,
+    "recordCountAlicuotas": 0,
+    "totalsByAlicuota": [
+      {
+        "alicuotaCode": "",
+        "neto": 1,
+        "iva": 1
+      }
+    ],
+    "totalNeto": 1,
+    "totalIva": 1,
+    "totalExento": 1,
+    "totalGeneral": 1,
+    "arcaValidationPending": true
+  }
+}
+```
+
+###### Content-Type: application/zip
+
+`string`, format: `binary`
+
+**Example:**
+
+```json
+{}
+```
+
+###### Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+
+`string`, format: `binary`
+
+**Example:**
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/comprobantes-compra
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/comprobantes-compra`
+
+### Register supplier fiscal purchase voucher (#306)
+
+- **Method:** `POST`
+- **Path:** `/api/comprobantes-compra`
+- **Tags:** contabilidad
+
+Persists a supplier fiscal voucher with netos/IVA breakdown for Libro IVA Compras. Requires module `finance.ledger` and permission `reports.financial.read`. Unique per tenant on `tipo` + `prefijo` + `numero`.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`fecha` (required)**
+
+  `string`, format: `date-time`
+
+- **`iva1` (required)**
+
+  `number`
+
+- **`iva2` (required)**
+
+  `number`
+
+- **`neto1` (required)**
+
+  `number`
+
+- **`neto2` (required)**
+
+  `number`
+
+- **`neto3` (required)**
+
+  `number`
+
+- **`numero` (required)**
+
+  `integer`
+
+- **`prefijo` (required)**
+
+  `string`
+
+- **`proveedorId` (required)**
+
+  `integer`
+
+- **`tipo` (required)**
+
+  `string`, possible values: `"A", "B", "C"`
+
+- **`total` (required)**
+
+  `number`
+
+- **`cae`**
+
+  `string`
+
+- **`caeVto`**
+
+  `string`, format: `date-time`
+
+- **`ordenCompraId`**
+
+  `integer`
+
+- **`vencimiento`**
+
+  `string`, format: `date-time` — Explicit due date; when omitted, derived from supplier payment terms (#275).
+
+**Example:**
+
+```json
+{
+  "fecha": "",
+  "tipo": "A",
+  "prefijo": "",
+  "numero": 1,
+  "proveedorId": 1,
+  "ordenCompraId": 1,
+  "neto1": 0,
+  "neto2": 0,
+  "neto3": 0,
+  "iva1": 0,
+  "iva2": 0,
+  "total": 0,
+  "cae": "",
+  "caeVto": "",
+  "vencimiento": ""
+}
+```
+
+#### Responses
+
+##### Status: 201 Created
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`estado` (required)**
+
+    `string`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`iva1` (required)**
+
+    `number`
+
+  - **`iva2` (required)**
+
+    `number`
+
+  - **`neto1` (required)**
+
+    `number`
+
+  - **`neto2` (required)**
+
+    `number`
+
+  - **`neto3` (required)**
+
+    `number`
+
+  - **`numero` (required)**
+
+    `integer`
+
+  - **`prefijo` (required)**
+
+    `string`
+
+  - **`proveedorId` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`tipo` (required)**
+
+    `string`
+
+  - **`total` (required)**
+
+    `number`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`cae`**
+
+    `string`
+
+  - **`caeVto`**
+
+    `string`, format: `date-time`
+
+  - **`ordenCompraId`**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "proveedorId": 1,
+    "ordenCompraId": 1,
+    "fecha": "",
+    "tipo": "",
+    "prefijo": "",
+    "numero": 1,
+    "neto1": 1,
+    "neto2": 1,
+    "neto3": 1,
+    "iva1": 1,
+    "iva2": 1,
+    "total": 1,
+    "cae": "",
+    "caeVto": "",
+    "estado": "",
+    "createdAt": "",
+    "updatedAt": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 409 Resource conflict
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/documentos-compra/procesar
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/documentos-compra/procesar`
+
+### Upload purchase document for extraction preview (#277)
+
+- **Method:** `POST`
+- **Path:** `/api/documentos-compra/procesar`
+- **Tags:** contabilidad
+
+Stores the original PDF/image on local filesystem and returns an editable preview. **Tier 1:** decodes AFIP/ARCA FE QR locally from embedded PDF URL text or image scan (`jsQR` + `sharp`) — no portal/API verification. **Tier 2:** extracts text from digital PDF (`unpdf`) and applies bundled YAML regex templates (Argentina `generic-arca-ar`) when confidence ≥ 0.7. **Tier 3:** preprocesses images (`sharp`) and runs local OCR (`tesseract.js`, `spa+eng`), then applies the same templates when confidence ≥ 0.6. **Tier 4:** optional local Ollama (`OLLAMA_URL`, model `OLLAMA_MODEL` default `nuextract`) when tiers 1–3 fail. Falls back to empty manual preview (tier 0) when extraction fails. Requires modules `finance.ledger` and `logistics.purchases`, permission `reports.financial.read`. Multipart field `file` — pdf, jpg, png, webp, heic (max 10 MB).
+
+#### Request Body
+
+##### Content-Type: multipart/form-data
+
+- **`file` (required)**
+
+  `string`, format: `binary`
+
+**Example:**
+
+```json
+{
+  "file": {}
+}
+```
+
+#### Responses
+
+##### Status: 201 Document stored; preview pending review
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`archivoMime` (required)**
+
+    `string`
+
+  - **`archivoNombre` (required)**
+
+    `string`
+
+  - **`archivoPath` (required)**
+
+    `string`
+
+  - **`confianza` (required)**
+
+    `number`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`datosExtraidos` (required)**
+
+    `object`
+
+    - **`cae`**
+
+      `string`
+
+    - **`caeVto`**
+
+      `string`, format: `date-time`
+
+    - **`cuitExtracted`**
+
+      `string` — Supplier tax id digits extracted when no match (#277 Fase F)
+
+    - **`fecha`**
+
+      `string`, format: `date-time`
+
+    - **`fieldConfidence`**
+
+      `object`
+
+    - **`items`**
+
+      `array`
+
+      **Items:**
+
+      - **`cantidad` (required)**
+
+        `number`
+
+      - **`descripcion` (required)**
+
+        `string`
+
+      - **`precioUnitario` (required)**
+
+        `number`
+
+      - **`subtotal` (required)**
+
+        `number`
+
+      - **`articuloId`**
+
+        `integer`
+
+      - **`confianza`**
+
+        `number`
+
+    - **`iva1`**
+
+      `number`
+
+    - **`iva2`**
+
+      `number`
+
+    - **`neto1`**
+
+      `number`
+
+    - **`neto2`**
+
+      `number`
+
+    - **`neto3`**
+
+      `number`
+
+    - **`numero`**
+
+      `integer`
+
+    - **`prefijo`**
+
+      `string`
+
+    - **`proveedorId`**
+
+      `integer`
+
+    - **`rsocialExtracted`**
+
+      `string` — Supplier name hint from OCR/LLM (#277 Fase F)
+
+    - **`tipo`**
+
+      `object`
+
+    - **`total`**
+
+      `number`
+
+    - **`vencimiento`**
+
+      `string`, format: `date-time`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"procesando", "pendiente_revision", "confirmado", "descartado"`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`tier` (required)**
+
+    `integer`
+
+  - **`tipoArchivo` (required)**
+
+    `string`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`usuarioId` (required)**
+
+    `integer`
+
+  - **`comprobanteCompraId`**
+
+    `integer`
+
+  - **`errores`**
+
+    `object`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "usuarioId": 1,
+    "archivoNombre": "",
+    "archivoMime": "",
+    "archivoPath": "",
+    "tipoArchivo": "",
+    "tier": 1,
+    "confianza": 1,
+    "estado": "procesando",
+    "datosExtraidos": {
+      "proveedorId": 1,
+      "cuitExtracted": "",
+      "rsocialExtracted": "",
+      "fecha": "",
+      "vencimiento": "",
+      "tipo": "A",
+      "prefijo": "",
+      "numero": 1,
+      "neto1": 1,
+      "neto2": 1,
+      "neto3": 1,
+      "iva1": 1,
+      "iva2": 1,
+      "total": 1,
+      "cae": "",
+      "caeVto": "",
+      "items": [
+        {
+          "descripcion": "",
+          "cantidad": 1,
+          "precioUnitario": 1,
+          "subtotal": 1,
+          "articuloId": 1,
+          "confianza": 0
+        }
+      ],
+      "fieldConfidence": {
+        "additionalProperty": 1
+      }
+    },
+    "comprobanteCompraId": 1,
+    "errores": {},
+    "createdAt": "",
+    "updatedAt": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/documentos-compra/procesar-lote
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/documentos-compra/procesar-lote`
+
+### Batch upload purchase documents for extraction (#277 Phase E)
+
+- **Method:** `POST`
+- **Path:** `/api/documentos-compra/procesar-lote`
+- **Tags:** contabilidad
+
+Processes up to 20 PDF/image files sequentially (same tier pipeline as `procesar`). Multipart field `files` — pdf, jpg, png, webp, heic (max 10 MB each). Requires `finance.ledger`, `logistics.purchases`, `reports.financial.read`.
+
+#### Request Body
+
+##### Content-Type: multipart/form-data
+
+- **`files` (required)**
+
+  `array`
+
+  **Items:**
+
+  `string`, format: `binary`
+
+**Example:**
+
+```json
+{
+  "files": [
+    {}
+  ]
+}
+```
+
+#### Responses
+
+##### Status: 201 All documents stored; previews pending review
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`archivoMime` (required)**
+
+    `string`
+
+  - **`archivoNombre` (required)**
+
+    `string`
+
+  - **`archivoPath` (required)**
+
+    `string`
+
+  - **`confianza` (required)**
+
+    `number`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`datosExtraidos` (required)**
+
+    `object`
+
+    - **`cae`**
+
+      `string`
+
+    - **`caeVto`**
+
+      `string`, format: `date-time`
+
+    - **`cuitExtracted`**
+
+      `string` — Supplier tax id digits extracted when no match (#277 Fase F)
+
+    - **`fecha`**
+
+      `string`, format: `date-time`
+
+    - **`fieldConfidence`**
+
+      `object`
+
+    - **`items`**
+
+      `array`
+
+      **Items:**
+
+      - **`cantidad` (required)**
+
+        `number`
+
+      - **`descripcion` (required)**
+
+        `string`
+
+      - **`precioUnitario` (required)**
+
+        `number`
+
+      - **`subtotal` (required)**
+
+        `number`
+
+      - **`articuloId`**
+
+        `integer`
+
+      - **`confianza`**
+
+        `number`
+
+    - **`iva1`**
+
+      `number`
+
+    - **`iva2`**
+
+      `number`
+
+    - **`neto1`**
+
+      `number`
+
+    - **`neto2`**
+
+      `number`
+
+    - **`neto3`**
+
+      `number`
+
+    - **`numero`**
+
+      `integer`
+
+    - **`prefijo`**
+
+      `string`
+
+    - **`proveedorId`**
+
+      `integer`
+
+    - **`rsocialExtracted`**
+
+      `string` — Supplier name hint from OCR/LLM (#277 Fase F)
+
+    - **`tipo`**
+
+      `object`
+
+    - **`total`**
+
+      `number`
+
+    - **`vencimiento`**
+
+      `string`, format: `date-time`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"procesando", "pendiente_revision", "confirmado", "descartado"`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`tier` (required)**
+
+    `integer`
+
+  - **`tipoArchivo` (required)**
+
+    `string`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`usuarioId` (required)**
+
+    `integer`
+
+  - **`comprobanteCompraId`**
+
+    `integer`
+
+  - **`errores`**
+
+    `object`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "usuarioId": 1,
+      "archivoNombre": "",
+      "archivoMime": "",
+      "archivoPath": "",
+      "tipoArchivo": "",
+      "tier": 1,
+      "confianza": 1,
+      "estado": "procesando",
+      "datosExtraidos": {
+        "proveedorId": 1,
+        "cuitExtracted": "",
+        "rsocialExtracted": "",
+        "fecha": "",
+        "vencimiento": "",
+        "tipo": "A",
+        "prefijo": "",
+        "numero": 1,
+        "neto1": 1,
+        "neto2": 1,
+        "neto3": 1,
+        "iva1": 1,
+        "iva2": 1,
+        "total": 1,
+        "cae": "",
+        "caeVto": "",
+        "items": [
+          {
+            "descripcion": "",
+            "cantidad": 1,
+            "precioUnitario": 1,
+            "subtotal": 1,
+            "articuloId": 1,
+            "confianza": 0
+          }
+        ],
+        "fieldConfidence": {
+          "additionalProperty": 1
+        }
+      },
+      "comprobanteCompraId": 1,
+      "errores": {},
+      "createdAt": "",
+      "updatedAt": ""
+    }
+  ]
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/documentos-compra/verificar-duplicado
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/documentos-compra/verificar-duplicado`
+
+### Check duplicate purchase voucher for supplier (#277 Fase G)
+
+- **Method:** `GET`
+- **Path:** `/api/documentos-compra/verificar-duplicado`
+- **Tags:** contabilidad
+
+Returns whether an active `ComprobanteCompra` already exists for the same supplier, tipo, prefijo and numero. Requires `finance.ledger`, `logistics.purchases`, `reports.financial.read`.
+
+#### Responses
+
+##### Status: 200 Duplicate check result
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`comprobanteCompraId` (required)**
+
+    `integer | null`
+
+  - **`duplicado` (required)**
+
+    `boolean`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "duplicado": true,
+    "comprobanteCompraId": null
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/documentos-compra/cola
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/documentos-compra/cola`
+
+### Purchase document import queue status (#277 Phase E)
+
+- **Method:** `GET`
+- **Path:** `/api/documentos-compra/cola`
+- **Tags:** contabilidad
+
+Returns counts by estado and the 20 most recent import rows for the current user. Requires `finance.ledger`, `logistics.purchases`, `reports.financial.read`.
+
+#### Responses
+
+##### Status: 200 Queue snapshot
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`confirmado` (required)**
+
+    `integer`
+
+  - **`descartado` (required)**
+
+    `integer`
+
+  - **`documentos` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`archivoMime` (required)**
+
+      `string`
+
+    - **`archivoNombre` (required)**
+
+      `string`
+
+    - **`archivoPath` (required)**
+
+      `string`
+
+    - **`confianza` (required)**
+
+      `number`
+
+    - **`createdAt` (required)**
+
+      `string`, format: `date-time`
+
+    - **`datosExtraidos` (required)**
+
+      `object`
+
+      - **`cae`**
+
+        `string`
+
+      - **`caeVto`**
+
+        `string`, format: `date-time`
+
+      - **`cuitExtracted`**
+
+        `string` — Supplier tax id digits extracted when no match (#277 Fase F)
+
+      - **`fecha`**
+
+        `string`, format: `date-time`
+
+      - **`fieldConfidence`**
+
+        `object`
+
+      - **`items`**
+
+        `array`
+
+        **Items:**
+
+        - **`cantidad` (required)**
+
+          `number`
+
+        - **`descripcion` (required)**
+
+          `string`
+
+        - **`precioUnitario` (required)**
+
+          `number`
+
+        - **`subtotal` (required)**
+
+          `number`
+
+        - **`articuloId`**
+
+          `integer`
+
+        - **`confianza`**
+
+          `number`
+
+      - **`iva1`**
+
+        `number`
+
+      - **`iva2`**
+
+        `number`
+
+      - **`neto1`**
+
+        `number`
+
+      - **`neto2`**
+
+        `number`
+
+      - **`neto3`**
+
+        `number`
+
+      - **`numero`**
+
+        `integer`
+
+      - **`prefijo`**
+
+        `string`
+
+      - **`proveedorId`**
+
+        `integer`
+
+      - **`rsocialExtracted`**
+
+        `string` — Supplier name hint from OCR/LLM (#277 Fase F)
+
+      - **`tipo`**
+
+        `object`
+
+      - **`total`**
+
+        `number`
+
+      - **`vencimiento`**
+
+        `string`, format: `date-time`
+
+    - **`estado` (required)**
+
+      `string`, possible values: `"procesando", "pendiente_revision", "confirmado", "descartado"`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`tenantId` (required)**
+
+      `integer`
+
+    - **`tier` (required)**
+
+      `integer`
+
+    - **`tipoArchivo` (required)**
+
+      `string`
+
+    - **`updatedAt` (required)**
+
+      `string`, format: `date-time`
+
+    - **`usuarioId` (required)**
+
+      `integer`
+
+    - **`comprobanteCompraId`**
+
+      `integer`
+
+    - **`errores`**
+
+      `object`
+
+  - **`pendiente_revision` (required)**
+
+    `integer`
+
+  - **`procesando` (required)**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "procesando": 0,
+    "pendiente_revision": 0,
+    "confirmado": 0,
+    "descartado": 0,
+    "documentos": [
+      {
+        "id": 1,
+        "tenantId": 1,
+        "usuarioId": 1,
+        "archivoNombre": "",
+        "archivoMime": "",
+        "archivoPath": "",
+        "tipoArchivo": "",
+        "tier": 1,
+        "confianza": 1,
+        "estado": "procesando",
+        "datosExtraidos": {
+          "proveedorId": 1,
+          "cuitExtracted": "",
+          "rsocialExtracted": "",
+          "fecha": "",
+          "vencimiento": "",
+          "tipo": "A",
+          "prefijo": "",
+          "numero": 1,
+          "neto1": 1,
+          "neto2": 1,
+          "neto3": 1,
+          "iva1": 1,
+          "iva2": 1,
+          "total": 1,
+          "cae": "",
+          "caeVto": "",
+          "items": [
+            {
+              "descripcion": "",
+              "cantidad": 1,
+              "precioUnitario": 1,
+              "subtotal": 1,
+              "articuloId": 1,
+              "confianza": 0
+            }
+          ],
+          "fieldConfidence": {
+            "additionalProperty": 1
+          }
+        },
+        "comprobanteCompraId": 1,
+        "errores": {},
+        "createdAt": "",
+        "updatedAt": ""
+      }
+    ]
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/documentos-compra/templates
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/documentos-compra/templates`
+
+### List purchase document extraction templates (#277 Phase E)
+
+- **Method:** `GET`
+- **Path:** `/api/documentos-compra/templates`
+- **Tags:** contabilidad
+
+Bundled Argentina templates plus tenant custom YAML under `data/documentos-compra-templates/{tenantId}/`. Requires `finance.ledger`, `logistics.purchases`, `reports.financial.read`.
+
+#### Responses
+
+##### Status: 200 Template catalog
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`issuer` (required)**
+
+    `string`
+
+  - **`keywords` (required)**
+
+    `array`
+
+    **Items:**
+
+    `string`
+
+  - **`source` (required)**
+
+    `string`, possible values: `"bundled", "custom"`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "issuer": "",
+      "keywords": [
+        ""
+      ],
+      "source": "bundled"
+    }
+  ]
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Save tenant custom extraction template (#277 Phase E)
+
+- **Method:** `POST`
+- **Path:** `/api/documentos-compra/templates`
+- **Tags:** contabilidad
+
+Persists invoice2data-style YAML for the current tenant. Requires `settings.fiscal.manage`.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`content` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "content": ""
+}
+```
+
+#### Responses
+
+##### Status: 201 Template saved
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`fields` (required)**
+
+    `object`
+
+  - **`issuer` (required)**
+
+    `string`
+
+  - **`keywords` (required)**
+
+    `array`
+
+    **Items:**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "issuer": "",
+    "keywords": [
+      ""
+    ],
+    "fields": {
+      "additionalProperty": "anything"
+    }
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/documentos-compra/confirmar
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/documentos-compra/confirmar`
+
+### Confirm imported document and create ComprobanteCompra (#277 Phase A)
+
+- **Method:** `POST`
+- **Path:** `/api/documentos-compra/confirmar`
+- **Tags:** contabilidad
+
+Persists `ComprobanteCompra` from reviewed preview and links the import record. Duplicate `proveedorId` + `tipo` + `prefijo` + `numero` returns 409.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+**All of:**
+
+- **`fecha` (required)**
+
+  `string`, format: `date-time`
+
+- **`iva1` (required)**
+
+  `number`
+
+- **`iva2` (required)**
+
+  `number`
+
+- **`neto1` (required)**
+
+  `number`
+
+- **`neto2` (required)**
+
+  `number`
+
+- **`neto3` (required)**
+
+  `number`
+
+- **`numero` (required)**
+
+  `integer`
+
+- **`prefijo` (required)**
+
+  `string`
+
+- **`proveedorId` (required)**
+
+  `integer`
+
+- **`tipo` (required)**
+
+  `string`, possible values: `"A", "B", "C"`
+
+- **`total` (required)**
+
+  `number`
+
+- **`cae`**
+
+  `string`
+
+- **`caeVto`**
+
+  `string`, format: `date-time`
+
+- **`ordenCompraId`**
+
+  `integer`
+
+- **`vencimiento`**
+
+  `string`, format: `date-time` — Explicit due date; when omitted, derived from supplier payment terms (#275).
+
+* **`documentoId` (required)**
+
+  `integer`
+
+* **`items`**
+
+  `array`
+
+  **Items:**
+
+  - **`cantidad` (required)**
+
+    `number`
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`precioUnitario` (required)**
+
+    `number`
+
+  - **`subtotal` (required)**
+
+    `number`
+
+  - **`articuloId`**
+
+    `integer`
+
+  - **`confianza`**
+
+    `number`
+
+**Example:**
+
+```json
+{
+  "fecha": "",
+  "tipo": "A",
+  "prefijo": "",
+  "numero": 1,
+  "proveedorId": 1,
+  "ordenCompraId": 1,
+  "neto1": 0,
+  "neto2": 0,
+  "neto3": 0,
+  "iva1": 0,
+  "iva2": 0,
+  "total": 0,
+  "cae": "",
+  "caeVto": "",
+  "vencimiento": "",
+  "documentoId": 1,
+  "items": [
+    {
+      "descripcion": "",
+      "cantidad": 1,
+      "precioUnitario": 1,
+      "subtotal": 1,
+      "articuloId": 1,
+      "confianza": 0
+    }
+  ]
+}
+```
+
+#### Responses
+
+##### Status: 201 Confirmed
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`comprobanteCompra` (required)**
+
+    `object`
+
+    - **`createdAt` (required)**
+
+      `string`, format: `date-time`
+
+    - **`estado` (required)**
+
+      `string`
+
+    - **`fecha` (required)**
+
+      `string`, format: `date-time`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`iva1` (required)**
+
+      `number`
+
+    - **`iva2` (required)**
+
+      `number`
+
+    - **`neto1` (required)**
+
+      `number`
+
+    - **`neto2` (required)**
+
+      `number`
+
+    - **`neto3` (required)**
+
+      `number`
+
+    - **`numero` (required)**
+
+      `integer`
+
+    - **`prefijo` (required)**
+
+      `string`
+
+    - **`proveedorId` (required)**
+
+      `integer`
+
+    - **`tenantId` (required)**
+
+      `integer`
+
+    - **`tipo` (required)**
+
+      `string`
+
+    - **`total` (required)**
+
+      `number`
+
+    - **`updatedAt` (required)**
+
+      `string`, format: `date-time`
+
+    - **`cae`**
+
+      `string`
+
+    - **`caeVto`**
+
+      `string`, format: `date-time`
+
+    - **`ordenCompraId`**
+
+      `integer`
+
+  - **`documento` (required)**
+
+    `object`
+
+    - **`archivoMime` (required)**
+
+      `string`
+
+    - **`archivoNombre` (required)**
+
+      `string`
+
+    - **`archivoPath` (required)**
+
+      `string`
+
+    - **`confianza` (required)**
+
+      `number`
+
+    - **`createdAt` (required)**
+
+      `string`, format: `date-time`
+
+    - **`datosExtraidos` (required)**
+
+      `object`
+
+      - **`cae`**
+
+        `string`
+
+      - **`caeVto`**
+
+        `string`, format: `date-time`
+
+      - **`cuitExtracted`**
+
+        `string` — Supplier tax id digits extracted when no match (#277 Fase F)
+
+      - **`fecha`**
+
+        `string`, format: `date-time`
+
+      - **`fieldConfidence`**
+
+        `object`
+
+      - **`items`**
+
+        `array`
+
+        **Items:**
+
+        - **`cantidad` (required)**
+
+          `number`
+
+        - **`descripcion` (required)**
+
+          `string`
+
+        - **`precioUnitario` (required)**
+
+          `number`
+
+        - **`subtotal` (required)**
+
+          `number`
+
+        - **`articuloId`**
+
+          `integer`
+
+        - **`confianza`**
+
+          `number`
+
+      - **`iva1`**
+
+        `number`
+
+      - **`iva2`**
+
+        `number`
+
+      - **`neto1`**
+
+        `number`
+
+      - **`neto2`**
+
+        `number`
+
+      - **`neto3`**
+
+        `number`
+
+      - **`numero`**
+
+        `integer`
+
+      - **`prefijo`**
+
+        `string`
+
+      - **`proveedorId`**
+
+        `integer`
+
+      - **`rsocialExtracted`**
+
+        `string` — Supplier name hint from OCR/LLM (#277 Fase F)
+
+      - **`tipo`**
+
+        `object`
+
+      - **`total`**
+
+        `number`
+
+      - **`vencimiento`**
+
+        `string`, format: `date-time`
+
+    - **`estado` (required)**
+
+      `string`, possible values: `"procesando", "pendiente_revision", "confirmado", "descartado"`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`tenantId` (required)**
+
+      `integer`
+
+    - **`tier` (required)**
+
+      `integer`
+
+    - **`tipoArchivo` (required)**
+
+      `string`
+
+    - **`updatedAt` (required)**
+
+      `string`, format: `date-time`
+
+    - **`usuarioId` (required)**
+
+      `integer`
+
+    - **`comprobanteCompraId`**
+
+      `integer`
+
+    - **`errores`**
+
+      `object`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "documento": {
+      "id": 1,
+      "tenantId": 1,
+      "usuarioId": 1,
+      "archivoNombre": "",
+      "archivoMime": "",
+      "archivoPath": "",
+      "tipoArchivo": "",
+      "tier": 1,
+      "confianza": 1,
+      "estado": "procesando",
+      "datosExtraidos": {
+        "proveedorId": 1,
+        "cuitExtracted": "",
+        "rsocialExtracted": "",
+        "fecha": "",
+        "vencimiento": "",
+        "tipo": "A",
+        "prefijo": "",
+        "numero": 1,
+        "neto1": 1,
+        "neto2": 1,
+        "neto3": 1,
+        "iva1": 1,
+        "iva2": 1,
+        "total": 1,
+        "cae": "",
+        "caeVto": "",
+        "items": [
+          {
+            "descripcion": "",
+            "cantidad": 1,
+            "precioUnitario": 1,
+            "subtotal": 1,
+            "articuloId": 1,
+            "confianza": 0
+          }
+        ],
+        "fieldConfidence": {
+          "additionalProperty": 1
+        }
+      },
+      "comprobanteCompraId": 1,
+      "errores": {},
+      "createdAt": "",
+      "updatedAt": ""
+    },
+    "comprobanteCompra": {
+      "id": 1,
+      "tenantId": 1,
+      "proveedorId": 1,
+      "ordenCompraId": 1,
+      "fecha": "",
+      "tipo": "",
+      "prefijo": "",
+      "numero": 1,
+      "neto1": 1,
+      "neto2": 1,
+      "neto3": 1,
+      "iva1": 1,
+      "iva2": 1,
+      "total": 1,
+      "cae": "",
+      "caeVto": "",
+      "estado": "",
+      "createdAt": "",
+      "updatedAt": ""
+    }
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 409 Resource conflict
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/documentos-compra/{id}/original
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/documentos-compra/{id}/original`
+
+### Download original imported purchase document (#277 Phase A)
+
+- **Method:** `GET`
+- **Path:** `/api/documentos-compra/{id}/original`
+- **Tags:** contabilidad
+
+Returns the stored PDF/image bytes. Requires `finance.ledger`, `logistics.purchases`, `reports.financial.read`.
+
+#### Responses
+
+##### Status: 200 Original file
+
+###### Content-Type: application/pdf
+
+`string`, format: `binary`
+
+**Example:**
+
+```json
+{}
+```
+
+###### Content-Type: image/jpeg
+
+`string`, format: `binary`
+
+**Example:**
+
+```json
+{}
+```
+
+###### Content-Type: image/png
+
+`string`, format: `binary`
+
+**Example:**
+
+```json
+{}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/formas-pago
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/formas-pago`
 
 ### List payment methods
 
@@ -3101,6 +26351,11 @@ One-time endpoint to create initial tenant and owner user.
   "error": ""
 }
 ```
+
+### PARAMETERS /api/users
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/users`
 
 ### List users for the current tenant
 
@@ -3561,6 +26816,11 @@ Creates a new user in the current tenant. Requires `users.manage` and `roles.ass
 }
 ```
 
+### PARAMETERS /api/users/{id}
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/users/{id}`
+
 ### Update a user
 
 - **Method:** `PUT`
@@ -3837,6 +27097,11 @@ Updates role, active flag, or scope for a user in the current tenant. Requires `
 }
 ```
 
+### PARAMETERS /api/auth/change-password
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/auth/change-password`
+
 ### Change own password
 
 - **Method:** `POST`
@@ -3958,6 +27223,1762 @@ Allows the authenticated user to change their password by supplying the current 
 }
 ```
 
+### PARAMETERS /api/reportes/aging
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/reportes/aging`
+
+### Accounts receivable aging report
+
+- **Method:** `GET`
+- **Path:** `/api/reportes/aging`
+- **Tags:** reportes
+
+Groups active invoices (`estado = A`) into aging buckets using each customer's `creditDays`. Due date = invoice `fecha` + `creditDays`; days past due drive the bucket assignment. Each invoice contributes its full `total` to exactly one bucket (no payment allocation per invoice). Requires permission `reports.financial.read`.
+
+#### Responses
+
+##### Status: 200 AR aging buckets and executive summary
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`buckets` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`count` (required)**
+
+      `integer`
+
+    - **`label` (required)**
+
+      `string`, possible values: `"0-30d", "31-60d", "61-90d", ">90d"`
+
+    - **`total` (required)**
+
+      `string` — Decimal amount as string (two fractional digits)
+
+  - **`resumen` (required)**
+
+    `object`
+
+    - **`clientesSuspendidos` (required)**
+
+      `integer`
+
+    - **`deudaPorVencer` (required)**
+
+      `string`
+
+    - **`deudaVencida` (required)**
+
+      `string`
+
+    - **`porcentajeMora` (required)**
+
+      `string`
+
+  - **`totalDeuda` (required)**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "buckets": [
+      {
+        "label": "0-30d",
+        "count": 0,
+        "total": ""
+      }
+    ],
+    "totalDeuda": "",
+    "resumen": {
+      "deudaVencida": "",
+      "deudaPorVencer": "",
+      "porcentajeMora": "",
+      "clientesSuspendidos": 0
+    }
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/reportes/cuenta-corriente/{clienteId}
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/reportes/cuenta-corriente/{clienteId}`
+
+### Customer account statement (running balance)
+
+- **Method:** `GET`
+- **Path:** `/api/reportes/cuenta-corriente/{clienteId}`
+- **Tags:** reportes
+
+Chronological list of opening balance (if non-zero), active invoices (debit), and payments (credit) with a running `saldo`. Requires permission `reports.financial.read`.
+
+#### Responses
+
+##### Status: 200 Account statement lines
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`balanceActual` (required)**
+
+    `string`
+
+  - **`clienteId` (required)**
+
+    `integer`
+
+  - **`codigo` (required)**
+
+    `integer`
+
+  - **`lineas` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`credito` (required)**
+
+      `string`
+
+    - **`debito` (required)**
+
+      `string`
+
+    - **`fecha` (required)**
+
+      `string` — ISO-8601 timestamp (empty for saldo\_inicial)
+
+    - **`referencia` (required)**
+
+      `string`
+
+    - **`saldo` (required)**
+
+      `string`
+
+    - **`tipo` (required)**
+
+      `string`, possible values: `"factura", "cobro", "saldo_inicial"`
+
+    - **`cobroId`**
+
+      `integer`
+
+    - **`facturaId`**
+
+      `integer`
+
+  - **`rsocial` (required)**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "clienteId": 1,
+    "codigo": 1,
+    "rsocial": "",
+    "balanceActual": "",
+    "lineas": [
+      {
+        "tipo": "factura",
+        "fecha": "",
+        "referencia": "",
+        "debito": "",
+        "credito": "",
+        "saldo": "",
+        "facturaId": 1,
+        "cobroId": 1
+      }
+    ]
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Customer not found for tenant
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/reportes/ventas
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/reportes/ventas`
+
+### Sales by period
+
+- **Method:** `GET`
+- **Path:** `/api/reportes/ventas`
+- **Tags:** reportes
+
+Aggregates active invoices (`estado = A`) in the date range using server local calendar. Grouping `agrupar`: `dia` (YYYY-MM-DD), `semana` (Monday of week as YYYY-MM-DD), `mes` (YYYY-MM). Requires permission `reports.operational.read`. Send `Accept: text/csv` for CSV export (raw CSV body, not JSON envelope).
+
+#### Responses
+
+##### Status: 200 Sales rows or CSV export
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`count` (required)**
+
+    `integer`
+
+  - **`iva1` (required)**
+
+    `string`
+
+  - **`iva2` (required)**
+
+    `string`
+
+  - **`neto1` (required)**
+
+    `string`
+
+  - **`neto2` (required)**
+
+    `string`
+
+  - **`periodo` (required)**
+
+    `string` — Bucket key (YYYY-MM-DD, YYYY-MM, or week Monday date)
+
+  - **`total` (required)**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "periodo": "",
+      "count": 0,
+      "total": "",
+      "neto1": "",
+      "neto2": "",
+      "iva1": "",
+      "iva2": ""
+    }
+  ]
+}
+```
+
+###### Content-Type: text/csv
+
+`string`
+
+**Example:**
+
+```json
+true
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/reportes/stock-critico
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/reportes/stock-critico`
+
+### Critical stock (stock at or below minimum)
+
+- **Method:** `GET`
+- **Path:** `/api/reportes/stock-critico`
+- **Tags:** reportes
+
+Active articles with `stock <= minimo`. `deficit = minimo - stock`. Requires permission `reports.operational.read`. Send `Accept: text/csv` for CSV export.
+
+#### Responses
+
+##### Status: 200 Critical stock rows or CSV export
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`articulo` (required)**
+
+    `object`
+
+    - **`codigo` (required)**
+
+      `integer`
+
+    - **`descripcion` (required)**
+
+      `string`
+
+    - **`id` (required)**
+
+      `integer`
+
+  - **`deficit` (required)**
+
+    `integer`
+
+  - **`minimo` (required)**
+
+    `integer`
+
+  - **`stock` (required)**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "articulo": {
+        "id": 1,
+        "codigo": 1,
+        "descripcion": ""
+      },
+      "stock": 1,
+      "minimo": 1,
+      "deficit": 0
+    }
+  ]
+}
+```
+
+###### Content-Type: text/csv
+
+`string`
+
+**Example:**
+
+```json
+true
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/reportes/cobranzas
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/reportes/cobranzas`
+
+### Collections by period
+
+- **Method:** `GET`
+- **Path:** `/api/reportes/cobranzas`
+- **Tags:** reportes
+
+Customer payments grouped by calendar day with breakdown by payment method. Requires permission `reports.financial.read`. Send `Accept: text/csv` for CSV export.
+
+#### Responses
+
+##### Status: 200 Collections rows or CSV export
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`count` (required)**
+
+    `integer`
+
+  - **`fecha` (required)**
+
+    `string` — Calendar day YYYY-MM-DD (server local)
+
+  - **`porFormaPago` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`descripcion` (required)**
+
+      `string`
+
+    - **`total` (required)**
+
+      `string`
+
+    - **`formaPagoId`**
+
+      `integer`
+
+  - **`total` (required)**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "fecha": "",
+      "count": 0,
+      "total": "",
+      "porFormaPago": [
+        {
+          "formaPagoId": 1,
+          "descripcion": "",
+          "total": ""
+        }
+      ]
+    }
+  ]
+}
+```
+
+###### Content-Type: text/csv
+
+`string`
+
+**Example:**
+
+```json
+true
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Dashboard operational summary
+
+- **Method:** `GET`
+- **Path:** `/api/dashboard/summary`
+- **Tags:** dashboard
+
+#### Responses
+
+##### Status: 200 Aggregated dashboard metrics for the authenticated tenant
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`alertasActivas` (required)**
+
+    `integer`
+
+  - **`cobrosHoy` (required)**
+
+    `object`
+
+    - **`count` (required)**
+
+      `integer`
+
+    - **`total` (required)**
+
+      `string`
+
+  - **`facturasPagar` (required)**
+
+    `object`
+
+    - **`proximoVencer` (required)**
+
+      `object`
+
+      - **`count` (required)**
+
+        `integer`
+
+      - **`total` (required)**
+
+        `string`
+
+    - **`vencido` (required)**
+
+      `object`
+
+      - **`count` (required)**
+
+        `integer`
+
+      - **`total` (required)**
+
+        `string`
+
+  - **`facturasVencidas` (required)**
+
+    `object`
+
+    - **`count` (required)**
+
+      `integer`
+
+    - **`total` (required)**
+
+      `string`
+
+  - **`ventasHoy` (required)**
+
+    `object`
+
+    - **`count` (required)**
+
+      `integer`
+
+    - **`total` (required)**
+
+      `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "ventasHoy": {
+      "count": 1,
+      "total": ""
+    },
+    "facturasVencidas": {
+      "count": 1,
+      "total": ""
+    },
+    "cobrosHoy": {
+      "count": 1,
+      "total": ""
+    },
+    "alertasActivas": 1,
+    "facturasPagar": {
+      "vencido": {
+        "count": 1,
+        "total": ""
+      },
+      "proximoVencer": {
+        "count": 1,
+        "total": ""
+      }
+    }
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Historical sales analytics for charts and CSV export (#138)
+
+- **Method:** `GET`
+- **Path:** `/api/dashboard/ventas-historico`
+- **Tags:** dashboard
+
+Aggregates active invoices (`estado = A`) in PostgreSQL by period, top 10 articles, and sales by seller (via linked `Pedido`). Requires permission `reports.operational.read`. JSON by default; send `Accept: text/csv` for period series export.
+
+#### Responses
+
+##### Status: 200 Aggregated analytics or CSV series
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`bySeller` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`count` (required)**
+
+      `integer`
+
+    - **`total` (required)**
+
+      `string`
+
+    - **`username` (required)**
+
+      `string`
+
+    - **`vendedorId` (required)**
+
+      `integer`
+
+  - **`series` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`count` (required)**
+
+      `integer`
+
+    - **`period` (required)**
+
+      `string`
+
+    - **`total` (required)**
+
+      `string`
+
+  - **`topArticles` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId` (required)**
+
+      `integer`
+
+    - **`codigo` (required)**
+
+      `integer`
+
+    - **`descripcion` (required)**
+
+      `string`
+
+    - **`quantity` (required)**
+
+      `integer`
+
+    - **`total` (required)**
+
+      `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "series": [
+      {
+        "period": "",
+        "count": 1,
+        "total": ""
+      }
+    ],
+    "topArticles": [
+      {
+        "articuloId": 1,
+        "codigo": 1,
+        "descripcion": "",
+        "quantity": 1,
+        "total": ""
+      }
+    ],
+    "bySeller": [
+      {
+        "vendedorId": 1,
+        "username": "",
+        "count": 1,
+        "total": ""
+      }
+    ]
+  }
+}
+```
+
+###### Content-Type: text/csv
+
+`string`
+
+**Example:**
+
+```json
+true
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### List audit events for the authenticated tenant
+
+- **Method:** `GET`
+- **Path:** `/api/audit-events`
+- **Tags:** audit
+
+Read-only list scoped to the session tenant. Requires permission `audit.read`. Default page size is **50** rows (maximum **500**). Optional filters restrict by actor, action, resource type, and `createdAt` bounds (`startDate` / `endDate` as ISO-8601 timestamps; inclusive range).
+
+#### Responses
+
+##### Status: 200 Paginated audit events, newest first
+
+###### Content-Type: application/json
+
+**All of:**
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`action` (required)**
+
+    `string`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`resource` (required)**
+
+    `string`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`ipAddress`**
+
+    `string`
+
+  - **`metadata`**
+
+    `object` — Optional structured details for the event
+
+  - **`resourceId`**
+
+    `string`
+
+  - **`userId`**
+
+    `integer`
+
+  - **`username`**
+
+    `string` — Username of the actor when resolved; otherwise null
+
+- **`success` (required)**
+
+  `boolean`
+
+* **`limit` (required)**
+
+  `integer` — Effective page size (same semantics as query \`limit\`)
+
+* **`offset` (required)**
+
+  `integer` — Effective skip (same semantics as query \`offset\`)
+
+* **`total` (required)**
+
+  `integer` — Row count matching the list filter (before limit/offset)
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "userId": 1,
+      "username": "",
+      "action": "",
+      "resource": "",
+      "resourceId": "",
+      "ipAddress": "",
+      "metadata": {
+        "additionalProperty": "anything"
+      },
+      "createdAt": ""
+    }
+  ],
+  "total": 0,
+  "limit": 1,
+  "offset": 0
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### List unread notifications for the authenticated user
+
+- **Method:** `GET`
+- **Path:** `/api/notifications`
+- **Tags:** notifications
+
+#### Responses
+
+##### Status: 200 Unread notifications, newest first
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`payload` (required)**
+
+    `object`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`type` (required)**
+
+    `string`
+
+  - **`userId` (required)**
+
+    `integer`
+
+  - **`readAt`**
+
+    `string`, format: `date-time`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "userId": 1,
+      "type": "",
+      "payload": {
+        "additionalProperty": "anything"
+      },
+      "readAt": "",
+      "createdAt": ""
+    }
+  ]
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Mark all unread notifications as read
+
+- **Method:** `PUT`
+- **Path:** `/api/notifications/read-all`
+- **Tags:** notifications
+
+#### Responses
+
+##### Status: 200 Updated notification count
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`updated` (required)**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "updated": 1
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Mark a single notification as read
+
+- **Method:** `PUT`
+- **Path:** `/api/notifications/{id}/read`
+- **Tags:** notifications
+
+#### Responses
+
+##### Status: 200 Updated notification
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`payload` (required)**
+
+    `object`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`type` (required)**
+
+    `string`
+
+  - **`userId` (required)**
+
+    `integer`
+
+  - **`readAt`**
+
+    `string`, format: `date-time`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "userId": 1,
+    "type": "",
+    "payload": {
+      "additionalProperty": "anything"
+    },
+    "readAt": "",
+    "createdAt": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Notification not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/notifications/channels
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/notifications/channels`
+
 ### Report which external notification channels are configured
 
 - **Method:** `GET`
@@ -4026,6 +29047,854 @@ Returns boolean flags for each channel. No sensitive values are exposed.
 }
 ```
 
+### List chat conversations for authenticated user
+
+- **Method:** `GET`
+- **Path:** `/api/chat/conversations`
+- **Tags:** chat
+
+#### Responses
+
+##### Status: 200 Conversations with unread counts
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`lastMessage`**
+
+    `object`
+
+  - **`unreadCount`**
+
+    `integer`
+
+  - **`user`**
+
+    `object`
+
+    - **`id`**
+
+      `integer`
+
+    - **`role`**
+
+      `string`
+
+    - **`username`**
+
+      `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "user": {
+        "id": 1,
+        "username": "",
+        "role": ""
+      },
+      "unreadCount": 0,
+      "lastMessage": {
+        "id": 1,
+        "fromUserId": 1,
+        "toUserId": 1,
+        "preview": "",
+        "createdAt": ""
+      }
+    }
+  ]
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Send a chat message to another user
+
+- **Method:** `POST`
+- **Path:** `/api/chat/messages`
+- **Tags:** chat
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`content` (required)**
+
+  `string`
+
+- **`toUserId` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "toUserId": 1,
+  "content": ""
+}
+```
+
+#### Responses
+
+##### Status: 201 Message created
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`content`**
+
+    `string`
+
+  - **`createdAt`**
+
+    `string`, format: `date-time`
+
+  - **`fromUserId`**
+
+    `integer`
+
+  - **`id`**
+
+    `integer`
+
+  - **`tenantId`**
+
+    `integer`
+
+  - **`toUserId`**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "fromUserId": 1,
+    "toUserId": 1,
+    "content": "",
+    "createdAt": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Recipient not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Get paginated message history with a user
+
+- **Method:** `GET`
+- **Path:** `/api/chat/messages/{userId}`
+- **Tags:** chat
+
+#### Responses
+
+##### Status: 200 Conversation history
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`content`**
+
+    `string`
+
+  - **`createdAt`**
+
+    `string`, format: `date-time`
+
+  - **`fromUserId`**
+
+    `integer`
+
+  - **`id`**
+
+    `integer`
+
+  - **`tenantId`**
+
+    `integer`
+
+  - **`toUserId`**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "fromUserId": 1,
+      "toUserId": 1,
+      "content": "",
+      "createdAt": ""
+    }
+  ]
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 User not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/empresa
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/empresa`
+
+### Get company settings for the authenticated tenant
+
+- **Method:** `GET`
+- **Path:** `/api/empresa`
+- **Tags:** settings
+
+#### Responses
+
+##### Status: 200 Company settings (persisted row or tenant defaults)
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`cuit` (required)**
+
+    `string`
+
+  - **`nombre` (required)**
+
+    `string`
+
+  - **`prefijoFactura` (required)**
+
+    `string` — Four-digit invoice prefix derived from puntoVenta.
+
+  - **`puntoVenta` (required)**
+
+    `integer`
+
+  - **`tipoFactura` (required)**
+
+    `string`, possible values: `"A", "B", "C"`
+
+  - **`condicionIva`**
+
+    `string`, possible values: `"RI", "Mono", "CF", "Exento"` — Issuer VAT condition for legal invoice PDF header (#148).
+
+  - **`domicilio`**
+
+    `string`
+
+  - **`fechaInicioActividades`**
+
+    `string`, format: `date` — Activity start date (YYYY-MM-DD).
+
+  - **`id`**
+
+    `integer` — Null when settings have not been saved yet (defaults only).
+
+  - **`ingresosBrutos`**
+
+    `string`
+
+  - **`logoUrl`**
+
+    `string`
+
+  - **`recordatorioDiasGracia`**
+
+    `integer` — Grace days after due date before an invoice is eligible for collection reminders.
+
+  - **`recordatorioHoraFin`**
+
+    `integer` — Business-hour window end (tenant local hour, exclusive).
+
+  - **`recordatorioHoraInicio`**
+
+    `integer` — Business-hour window start (tenant local hour, inclusive).
+
+  - **`timezone`**
+
+    `string` — IANA time zone for the daily reminder job and business-hour window.
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "nombre": "",
+    "cuit": "",
+    "domicilio": "",
+    "puntoVenta": 1,
+    "tipoFactura": "A",
+    "logoUrl": "",
+    "prefijoFactura": "",
+    "recordatorioDiasGracia": 0,
+    "timezone": "America/Argentina/Buenos_Aires",
+    "recordatorioHoraInicio": 0,
+    "recordatorioHoraFin": 1,
+    "condicionIva": "RI",
+    "ingresosBrutos": "",
+    "fechaInicioActividades": ""
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Update company settings
+
+- **Method:** `PUT`
+- **Path:** `/api/empresa`
+- **Tags:** settings
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`cuit` (required)**
+
+  `string`
+
+- **`nombre` (required)**
+
+  `string`
+
+- **`puntoVenta` (required)**
+
+  `integer`
+
+- **`tipoFactura` (required)**
+
+  `string`, possible values: `"A", "B", "C"`
+
+- **`condicionIva`**
+
+  `string`, possible values: `"RI", "Mono", "CF", "Exento"`
+
+- **`domicilio`**
+
+  `string`
+
+- **`fechaInicioActividades`**
+
+  `string`, format: `date`
+
+- **`ingresosBrutos`**
+
+  `string`
+
+- **`logoUrl`**
+
+  `string`
+
+- **`recordatorioDiasGracia`**
+
+  `integer`
+
+- **`recordatorioHoraFin`**
+
+  `integer`
+
+- **`recordatorioHoraInicio`**
+
+  `integer`
+
+- **`timezone`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "nombre": "",
+  "cuit": "",
+  "domicilio": "",
+  "puntoVenta": 1,
+  "tipoFactura": "A",
+  "logoUrl": "",
+  "recordatorioDiasGracia": 0,
+  "timezone": "",
+  "recordatorioHoraInicio": 0,
+  "recordatorioHoraFin": 1,
+  "condicionIva": "RI",
+  "ingresosBrutos": "",
+  "fechaInicioActividades": ""
+}
+```
+
+#### Responses
+
+##### Status: 200 Settings updated
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`cuit` (required)**
+
+    `string`
+
+  - **`nombre` (required)**
+
+    `string`
+
+  - **`prefijoFactura` (required)**
+
+    `string` — Four-digit invoice prefix derived from puntoVenta.
+
+  - **`puntoVenta` (required)**
+
+    `integer`
+
+  - **`tipoFactura` (required)**
+
+    `string`, possible values: `"A", "B", "C"`
+
+  - **`condicionIva`**
+
+    `string`, possible values: `"RI", "Mono", "CF", "Exento"` — Issuer VAT condition for legal invoice PDF header (#148).
+
+  - **`domicilio`**
+
+    `string`
+
+  - **`fechaInicioActividades`**
+
+    `string`, format: `date` — Activity start date (YYYY-MM-DD).
+
+  - **`id`**
+
+    `integer` — Null when settings have not been saved yet (defaults only).
+
+  - **`ingresosBrutos`**
+
+    `string`
+
+  - **`logoUrl`**
+
+    `string`
+
+  - **`recordatorioDiasGracia`**
+
+    `integer` — Grace days after due date before an invoice is eligible for collection reminders.
+
+  - **`recordatorioHoraFin`**
+
+    `integer` — Business-hour window end (tenant local hour, exclusive).
+
+  - **`recordatorioHoraInicio`**
+
+    `integer` — Business-hour window start (tenant local hour, inclusive).
+
+  - **`timezone`**
+
+    `string` — IANA time zone for the daily reminder job and business-hour window.
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "nombre": "",
+    "cuit": "",
+    "domicilio": "",
+    "puntoVenta": 1,
+    "tipoFactura": "A",
+    "logoUrl": "",
+    "prefijoFactura": "",
+    "recordatorioDiasGracia": 0,
+    "timezone": "America/Argentina/Buenos_Aires",
+    "recordatorioHoraInicio": 0,
+    "recordatorioHoraFin": 1,
+    "condicionIva": "RI",
+    "ingresosBrutos": "",
+    "fechaInicioActividades": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/zonas-entrega
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/zonas-entrega`
+
 ### List delivery zones for the authenticated tenant
 
 - **Method:** `GET`
@@ -4037,6 +29906,8 @@ Returns boolean flags for each channel. No sensitive values are exposed.
 ##### Status: 200 List of delivery zones
 
 ###### Content-Type: application/json
+
+**All of:**
 
 - **`data` (required)**
 
@@ -4084,6 +29955,18 @@ Returns boolean flags for each channel. No sensitive values are exposed.
 
   `boolean`
 
+* **`limit` (required)**
+
+  `integer` — Effective page size (same semantics as query \`limit\`)
+
+* **`offset` (required)**
+
+  `integer` — Effective skip (same semantics as query \`offset\`)
+
+* **`total` (required)**
+
+  `integer` — Row count matching the list filter (before limit/offset)
+
 **Example:**
 
 ```json
@@ -4102,7 +29985,10 @@ Returns boolean flags for each channel. No sensitive values are exposed.
       "updatedAt": "",
       "additionalProperty": "anything"
     }
-  ]
+  ],
+  "total": 0,
+  "limit": 1,
+  "offset": 0
 }
 ```
 
@@ -4360,6 +30246,11 @@ Returns boolean flags for each channel. No sensitive values are exposed.
 }
 ```
 
+### PARAMETERS /api/zonas-entrega/{id}
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/zonas-entrega/{id}`
+
 ### Update a delivery zone
 
 - **Method:** `PUT`
@@ -4577,6 +30468,5488 @@ Returns boolean flags for each channel. No sensitive values are exposed.
 }
 ```
 
+### PARAMETERS /api/ordenes-entrega
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/ordenes-entrega`
+
+### List delivery orders
+
+- **Method:** `GET`
+- **Path:** `/api/ordenes-entrega`
+- **Tags:** logistics
+
+Requires `logistics.read`, `orders.deliver.confirm`, or `orders.pick`. Drivers only see their own orders (`driverId` forced to session user).
+
+#### Responses
+
+##### Status: 200 Paginated delivery orders
+
+###### Content-Type: application/json
+
+**All of:**
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`cliente`**
+
+    `object`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`dispatchedAt`**
+
+    `string`, format: `date-time` — When the order entered in\_transit (ADR-0011).
+
+  - **`dispatchTimestampSource`**
+
+    `string`, possible values: `"event", "estimated"` — How dispatchedAt was derived (audit event vs estimated from updatedAt).
+
+  - **`driver`**
+
+    `object`
+
+  - **`driverId`**
+
+    `integer`
+
+  - **`estado`**
+
+    `string`, possible values: `"pending", "picking", "ready", "assigned", "in_transit", "delivered", "failed", "cancelled"`
+
+  - **`factura`**
+
+    `object`
+
+  - **`facturaId`**
+
+    `integer`
+
+  - **`fecha`**
+
+    `string`, format: `date-time`
+
+  - **`id`**
+
+    `integer`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+    - **`articulo` (required)**
+
+      `object`
+
+      - **`codigo` (required)**
+
+        `integer`
+
+      - **`descripcion` (required)**
+
+        `string`
+
+      - **`id` (required)**
+
+        `integer`
+
+    - **`cantidad` (required)**
+
+      `integer`
+
+    - **`id` (required)**
+
+      `integer`
+
+  - **`nota`**
+
+    `string`
+
+  - **`picker`**
+
+    `object`
+
+  - **`pickerUserId`**
+
+    `integer`
+
+  - **`pickingIniciadoAt`**
+
+    `string`, format: `date-time`
+
+  - **`pickingListoAt`**
+
+    `string`, format: `date-time`
+
+  - **`tenantId`**
+
+    `integer`
+
+  - **`zona`**
+
+    `object`
+
+  - **`zonaId`**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "facturaId": 1,
+      "clienteId": 1,
+      "zonaId": 1,
+      "driverId": 1,
+      "pickerUserId": 1,
+      "pickingIniciadoAt": "",
+      "pickingListoAt": "",
+      "fecha": "",
+      "estado": "pending",
+      "nota": "",
+      "dispatchedAt": "",
+      "dispatchTimestampSource": "event",
+      "items": [
+        {
+          "id": 1,
+          "cantidad": 1,
+          "articulo": {
+            "id": 1,
+            "codigo": 1,
+            "descripcion": ""
+          }
+        }
+      ],
+      "cliente": {
+        "additionalProperty": "anything"
+      },
+      "zona": {
+        "additionalProperty": "anything"
+      },
+      "driver": {
+        "additionalProperty": "anything"
+      },
+      "factura": {
+        "additionalProperty": "anything"
+      },
+      "picker": {
+        "additionalProperty": "anything"
+      },
+      "additionalProperty": "anything"
+    }
+  ]
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Create a delivery order
+
+- **Method:** `POST`
+- **Path:** `/api/ordenes-entrega`
+- **Tags:** logistics
+
+Requires `orders.create`. Initial estado is `pending`, or `assigned` when `driverId` is set.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`clienteId` (required)**
+
+  `integer`
+
+- **`fecha` (required)**
+
+  `string`
+
+- **`driverId`**
+
+  `integer`
+
+- **`facturaId`**
+
+  `integer`
+
+- **`nota`**
+
+  `string`
+
+- **`zonaId`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "clienteId": 1,
+  "fecha": "",
+  "facturaId": 1,
+  "zonaId": 1,
+  "driverId": 1,
+  "nota": ""
+}
+```
+
+#### Responses
+
+##### Status: 201 Order created
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`cliente`**
+
+    `object`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`dispatchedAt`**
+
+    `string`, format: `date-time` — When the order entered in\_transit (ADR-0011).
+
+  - **`dispatchTimestampSource`**
+
+    `string`, possible values: `"event", "estimated"` — How dispatchedAt was derived (audit event vs estimated from updatedAt).
+
+  - **`driver`**
+
+    `object`
+
+  - **`driverId`**
+
+    `integer`
+
+  - **`estado`**
+
+    `string`, possible values: `"pending", "picking", "ready", "assigned", "in_transit", "delivered", "failed", "cancelled"`
+
+  - **`factura`**
+
+    `object`
+
+  - **`facturaId`**
+
+    `integer`
+
+  - **`fecha`**
+
+    `string`, format: `date-time`
+
+  - **`id`**
+
+    `integer`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+    - **`articulo` (required)**
+
+      `object`
+
+      - **`codigo` (required)**
+
+        `integer`
+
+      - **`descripcion` (required)**
+
+        `string`
+
+      - **`id` (required)**
+
+        `integer`
+
+    - **`cantidad` (required)**
+
+      `integer`
+
+    - **`id` (required)**
+
+      `integer`
+
+  - **`nota`**
+
+    `string`
+
+  - **`picker`**
+
+    `object`
+
+  - **`pickerUserId`**
+
+    `integer`
+
+  - **`pickingIniciadoAt`**
+
+    `string`, format: `date-time`
+
+  - **`pickingListoAt`**
+
+    `string`, format: `date-time`
+
+  - **`tenantId`**
+
+    `integer`
+
+  - **`zona`**
+
+    `object`
+
+  - **`zonaId`**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "facturaId": 1,
+    "clienteId": 1,
+    "zonaId": 1,
+    "driverId": 1,
+    "pickerUserId": 1,
+    "pickingIniciadoAt": "",
+    "pickingListoAt": "",
+    "fecha": "",
+    "estado": "pending",
+    "nota": "",
+    "dispatchedAt": "",
+    "dispatchTimestampSource": "event",
+    "items": [
+      {
+        "id": 1,
+        "cantidad": 1,
+        "articulo": {
+          "id": 1,
+          "codigo": 1,
+          "descripcion": ""
+        }
+      }
+    ],
+    "cliente": {
+      "additionalProperty": "anything"
+    },
+    "zona": {
+      "additionalProperty": "anything"
+    },
+    "driver": {
+      "additionalProperty": "anything"
+    },
+    "factura": {
+      "additionalProperty": "anything"
+    },
+    "picker": {
+      "additionalProperty": "anything"
+    },
+    "additionalProperty": "anything"
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/ordenes-entrega/{id}
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/ordenes-entrega/{id}`
+
+### Update delivery order status
+
+- **Method:** `PUT`
+- **Path:** `/api/ordenes-entrega/{id}`
+- **Tags:** logistics
+
+Requires `orders.dispatch` for transitions to `assigned`, `in_transit`, or `failed`, and `orders.deliver.confirm` for `delivered`. Drivers may only confirm their own `in_transit` orders.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`estado` (required)**
+
+  `string`, possible values: `"pending", "picking", "ready", "assigned", "in_transit", "delivered", "failed", "cancelled"`
+
+- **`driverId`**
+
+  `integer`
+
+- **`nota`**
+
+  `string`
+
+- **`zonaId`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "estado": "pending",
+  "driverId": 1,
+  "zonaId": 1,
+  "nota": ""
+}
+```
+
+#### Responses
+
+##### Status: 200 Order updated
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`cliente`**
+
+    `object`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`dispatchedAt`**
+
+    `string`, format: `date-time` — When the order entered in\_transit (ADR-0011).
+
+  - **`dispatchTimestampSource`**
+
+    `string`, possible values: `"event", "estimated"` — How dispatchedAt was derived (audit event vs estimated from updatedAt).
+
+  - **`driver`**
+
+    `object`
+
+  - **`driverId`**
+
+    `integer`
+
+  - **`estado`**
+
+    `string`, possible values: `"pending", "picking", "ready", "assigned", "in_transit", "delivered", "failed", "cancelled"`
+
+  - **`factura`**
+
+    `object`
+
+  - **`facturaId`**
+
+    `integer`
+
+  - **`fecha`**
+
+    `string`, format: `date-time`
+
+  - **`id`**
+
+    `integer`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+    - **`articulo` (required)**
+
+      `object`
+
+      - **`codigo` (required)**
+
+        `integer`
+
+      - **`descripcion` (required)**
+
+        `string`
+
+      - **`id` (required)**
+
+        `integer`
+
+    - **`cantidad` (required)**
+
+      `integer`
+
+    - **`id` (required)**
+
+      `integer`
+
+  - **`nota`**
+
+    `string`
+
+  - **`picker`**
+
+    `object`
+
+  - **`pickerUserId`**
+
+    `integer`
+
+  - **`pickingIniciadoAt`**
+
+    `string`, format: `date-time`
+
+  - **`pickingListoAt`**
+
+    `string`, format: `date-time`
+
+  - **`tenantId`**
+
+    `integer`
+
+  - **`zona`**
+
+    `object`
+
+  - **`zonaId`**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "facturaId": 1,
+    "clienteId": 1,
+    "zonaId": 1,
+    "driverId": 1,
+    "pickerUserId": 1,
+    "pickingIniciadoAt": "",
+    "pickingListoAt": "",
+    "fecha": "",
+    "estado": "pending",
+    "nota": "",
+    "dispatchedAt": "",
+    "dispatchTimestampSource": "event",
+    "items": [
+      {
+        "id": 1,
+        "cantidad": 1,
+        "articulo": {
+          "id": 1,
+          "codigo": 1,
+          "descripcion": ""
+        }
+      }
+    ],
+    "cliente": {
+      "additionalProperty": "anything"
+    },
+    "zona": {
+      "additionalProperty": "anything"
+    },
+    "driver": {
+      "additionalProperty": "anything"
+    },
+    "factura": {
+      "additionalProperty": "anything"
+    },
+    "picker": {
+      "additionalProperty": "anything"
+    },
+    "additionalProperty": "anything"
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Order not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 422 Invalid state transition
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/ordenes-entrega/{id}/iniciar-picking
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/ordenes-entrega/{id}/iniciar-picking`
+
+### Start warehouse picking for a delivery order
+
+- **Method:** `POST`
+- **Path:** `/api/ordenes-entrega/{id}/iniciar-picking`
+- **Tags:** logistics
+
+Requires `orders.pick` and tenant module `logistics.picking`. Transitions `pending` → `picking` and assigns the session user as picker. Returns 409 when another user already holds the order in picking.
+
+#### Responses
+
+##### Status: 200 Picking started (or idempotent for same picker)
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`cliente`**
+
+    `object`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`dispatchedAt`**
+
+    `string`, format: `date-time` — When the order entered in\_transit (ADR-0011).
+
+  - **`dispatchTimestampSource`**
+
+    `string`, possible values: `"event", "estimated"` — How dispatchedAt was derived (audit event vs estimated from updatedAt).
+
+  - **`driver`**
+
+    `object`
+
+  - **`driverId`**
+
+    `integer`
+
+  - **`estado`**
+
+    `string`, possible values: `"pending", "picking", "ready", "assigned", "in_transit", "delivered", "failed", "cancelled"`
+
+  - **`factura`**
+
+    `object`
+
+  - **`facturaId`**
+
+    `integer`
+
+  - **`fecha`**
+
+    `string`, format: `date-time`
+
+  - **`id`**
+
+    `integer`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+    - **`articulo` (required)**
+
+      `object`
+
+      - **`codigo` (required)**
+
+        `integer`
+
+      - **`descripcion` (required)**
+
+        `string`
+
+      - **`id` (required)**
+
+        `integer`
+
+    - **`cantidad` (required)**
+
+      `integer`
+
+    - **`id` (required)**
+
+      `integer`
+
+  - **`nota`**
+
+    `string`
+
+  - **`picker`**
+
+    `object`
+
+  - **`pickerUserId`**
+
+    `integer`
+
+  - **`pickingIniciadoAt`**
+
+    `string`, format: `date-time`
+
+  - **`pickingListoAt`**
+
+    `string`, format: `date-time`
+
+  - **`tenantId`**
+
+    `integer`
+
+  - **`zona`**
+
+    `object`
+
+  - **`zonaId`**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "facturaId": 1,
+    "clienteId": 1,
+    "zonaId": 1,
+    "driverId": 1,
+    "pickerUserId": 1,
+    "pickingIniciadoAt": "",
+    "pickingListoAt": "",
+    "fecha": "",
+    "estado": "pending",
+    "nota": "",
+    "dispatchedAt": "",
+    "dispatchTimestampSource": "event",
+    "items": [
+      {
+        "id": 1,
+        "cantidad": 1,
+        "articulo": {
+          "id": 1,
+          "codigo": 1,
+          "descripcion": ""
+        }
+      }
+    ],
+    "cliente": {
+      "additionalProperty": "anything"
+    },
+    "zona": {
+      "additionalProperty": "anything"
+    },
+    "driver": {
+      "additionalProperty": "anything"
+    },
+    "factura": {
+      "additionalProperty": "anything"
+    },
+    "picker": {
+      "additionalProperty": "anything"
+    },
+    "additionalProperty": "anything"
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Order not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 409 Order is being picked by another user
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 422 Invalid state transition
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/ordenes-entrega/{id}/lista
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/ordenes-entrega/{id}/lista`
+
+### Mark delivery order ready after picking
+
+- **Method:** `POST`
+- **Path:** `/api/ordenes-entrega/{id}/lista`
+- **Tags:** logistics
+
+Requires `orders.pick` and tenant module `logistics.picking`. Transitions `picking` → `ready`. Only the assigned picker may complete, except `warehouse_lead` who may override.
+
+#### Responses
+
+##### Status: 200 Order marked ready for dispatch
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`cliente`**
+
+    `object`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`dispatchedAt`**
+
+    `string`, format: `date-time` — When the order entered in\_transit (ADR-0011).
+
+  - **`dispatchTimestampSource`**
+
+    `string`, possible values: `"event", "estimated"` — How dispatchedAt was derived (audit event vs estimated from updatedAt).
+
+  - **`driver`**
+
+    `object`
+
+  - **`driverId`**
+
+    `integer`
+
+  - **`estado`**
+
+    `string`, possible values: `"pending", "picking", "ready", "assigned", "in_transit", "delivered", "failed", "cancelled"`
+
+  - **`factura`**
+
+    `object`
+
+  - **`facturaId`**
+
+    `integer`
+
+  - **`fecha`**
+
+    `string`, format: `date-time`
+
+  - **`id`**
+
+    `integer`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+    - **`articulo` (required)**
+
+      `object`
+
+      - **`codigo` (required)**
+
+        `integer`
+
+      - **`descripcion` (required)**
+
+        `string`
+
+      - **`id` (required)**
+
+        `integer`
+
+    - **`cantidad` (required)**
+
+      `integer`
+
+    - **`id` (required)**
+
+      `integer`
+
+  - **`nota`**
+
+    `string`
+
+  - **`picker`**
+
+    `object`
+
+  - **`pickerUserId`**
+
+    `integer`
+
+  - **`pickingIniciadoAt`**
+
+    `string`, format: `date-time`
+
+  - **`pickingListoAt`**
+
+    `string`, format: `date-time`
+
+  - **`tenantId`**
+
+    `integer`
+
+  - **`zona`**
+
+    `object`
+
+  - **`zonaId`**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "facturaId": 1,
+    "clienteId": 1,
+    "zonaId": 1,
+    "driverId": 1,
+    "pickerUserId": 1,
+    "pickingIniciadoAt": "",
+    "pickingListoAt": "",
+    "fecha": "",
+    "estado": "pending",
+    "nota": "",
+    "dispatchedAt": "",
+    "dispatchTimestampSource": "event",
+    "items": [
+      {
+        "id": 1,
+        "cantidad": 1,
+        "articulo": {
+          "id": 1,
+          "codigo": 1,
+          "descripcion": ""
+        }
+      }
+    ],
+    "cliente": {
+      "additionalProperty": "anything"
+    },
+    "zona": {
+      "additionalProperty": "anything"
+    },
+    "driver": {
+      "additionalProperty": "anything"
+    },
+    "factura": {
+      "additionalProperty": "anything"
+    },
+    "picker": {
+      "additionalProperty": "anything"
+    },
+    "additionalProperty": "anything"
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Order not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 409 Order is assigned to another picker
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 422 Invalid state transition
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/repartos
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/repartos`
+
+### List delivery routes
+
+- **Method:** `GET`
+- **Path:** `/api/repartos`
+- **Tags:** repartos
+
+Requires `logistics.read`. Filter by `fecha`, `choferId`, `estado`.
+
+#### Responses
+
+##### Status: 200 Paginated delivery routes
+
+###### Content-Type: application/json
+
+**All of:**
+
+- **`limit` (required)**
+
+  `integer` — Effective page size (same semantics as query \`limit\`)
+
+- **`offset` (required)**
+
+  `integer` — Effective skip (same semantics as query \`offset\`)
+
+- **`total` (required)**
+
+  `integer` — Row count matching the list filter (before limit/offset)
+
+* **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`choferId` (required)**
+
+    `integer`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"planned", "on_route", "completed", "cancelled"`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`items` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`estado` (required)**
+
+      `string`, possible values: `"pending", "delivered", "not_delivered", "returned"`
+
+    - **`hasPod` (required)**
+
+      `boolean`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`ordenEntrega` (required)**
+
+      `object`
+
+      - **`cliente`**
+
+        `object`
+
+      - **`clienteId`**
+
+        `integer`
+
+      - **`dispatchedAt`**
+
+        `string`, format: `date-time` — When the order entered in\_transit (ADR-0011).
+
+      - **`dispatchTimestampSource`**
+
+        `string`, possible values: `"event", "estimated"` — How dispatchedAt was derived (audit event vs estimated from updatedAt).
+
+      - **`driver`**
+
+        `object`
+
+      - **`driverId`**
+
+        `integer`
+
+      - **`estado`**
+
+        `string`, possible values: `"pending", "picking", "ready", "assigned", "in_transit", "delivered", "failed", "cancelled"`
+
+      - **`factura`**
+
+        `object`
+
+      - **`facturaId`**
+
+        `integer`
+
+      - **`fecha`**
+
+        `string`, format: `date-time`
+
+      - **`id`**
+
+        `integer`
+
+      - **`items`**
+
+        `array`
+
+        **Items:**
+
+        - **`articulo` (required)**
+
+          `object`
+
+          - **`codigo` (required)**
+
+            `integer`
+
+          - **`descripcion` (required)**
+
+            `string`
+
+          - **`id` (required)**
+
+            `integer`
+
+        - **`cantidad` (required)**
+
+          `integer`
+
+        - **`id` (required)**
+
+          `integer`
+
+      - **`nota`**
+
+        `string`
+
+      - **`picker`**
+
+        `object`
+
+      - **`pickerUserId`**
+
+        `integer`
+
+      - **`pickingIniciadoAt`**
+
+        `string`, format: `date-time`
+
+      - **`pickingListoAt`**
+
+        `string`, format: `date-time`
+
+      - **`tenantId`**
+
+        `integer`
+
+      - **`zona`**
+
+        `object`
+
+      - **`zonaId`**
+
+        `integer`
+
+    - **`ordenEntregaId` (required)**
+
+      `integer`
+
+    - **`secuencia` (required)**
+
+      `integer`
+
+    - **`entregadoAt`**
+
+      `string`, format: `date-time`
+
+    - **`motivoNoEntrega`**
+
+      `string`
+
+    - **`notasEntrega`**
+
+      `string`
+
+    - **`receptorDni`**
+
+      `string`
+
+    - **`receptorNombre`**
+
+      `string`
+
+  - **`progress` (required)**
+
+    `object`
+
+    - **`delivered` (required)**
+
+      `integer`
+
+    - **`pending` (required)**
+
+      `integer`
+
+    - **`total` (required)**
+
+      `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`chofer`**
+
+    `object`
+
+    - **`id`**
+
+      `integer`
+
+    - **`role`**
+
+      `string`
+
+    - **`username`**
+
+      `string`
+
+  - **`closedAt`**
+
+    `string`, format: `date-time`
+
+  - **`observaciones`**
+
+    `string`
+
+  - **`vehiculo`**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "total": 0,
+  "limit": 1,
+  "offset": 0,
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "fecha": "",
+      "choferId": 1,
+      "estado": "planned",
+      "vehiculo": "",
+      "observaciones": "",
+      "closedAt": "",
+      "chofer": {
+        "id": 1,
+        "username": "",
+        "role": ""
+      },
+      "items": [
+        {
+          "id": 1,
+          "ordenEntregaId": 1,
+          "secuencia": 1,
+          "estado": "pending",
+          "entregadoAt": "",
+          "motivoNoEntrega": "",
+          "receptorNombre": "",
+          "receptorDni": "",
+          "notasEntrega": "",
+          "hasPod": true,
+          "ordenEntrega": {
+            "id": 1,
+            "tenantId": 1,
+            "facturaId": 1,
+            "clienteId": 1,
+            "zonaId": 1,
+            "driverId": 1,
+            "pickerUserId": 1,
+            "pickingIniciadoAt": "",
+            "pickingListoAt": "",
+            "fecha": "",
+            "estado": "pending",
+            "nota": "",
+            "dispatchedAt": "",
+            "dispatchTimestampSource": "event",
+            "items": [
+              {
+                "id": 1,
+                "cantidad": 1,
+                "articulo": {
+                  "id": 1,
+                  "codigo": 1,
+                  "descripcion": ""
+                }
+              }
+            ],
+            "cliente": {
+              "additionalProperty": "anything"
+            },
+            "zona": {
+              "additionalProperty": "anything"
+            },
+            "driver": {
+              "additionalProperty": "anything"
+            },
+            "factura": {
+              "additionalProperty": "anything"
+            },
+            "picker": {
+              "additionalProperty": "anything"
+            },
+            "additionalProperty": "anything"
+          }
+        }
+      ],
+      "progress": {
+        "total": 0,
+        "delivered": 0,
+        "pending": 0
+      }
+    }
+  ]
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Create delivery route
+
+- **Method:** `POST`
+- **Path:** `/api/repartos`
+- **Tags:** repartos
+
+Requires `orders.dispatch`. Groups delivery orders in estado `ready`; assigns driver and sets OEs to `assigned`. Rejects when an OE is already on an active route (`planned` or `on_route`).
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`choferId` (required)**
+
+  `integer`
+
+- **`fecha` (required)**
+
+  `string`, format: `date`
+
+- **`ordenEntregaIds` (required)**
+
+  `array`
+
+  **Items:**
+
+  `integer`
+
+- **`observaciones`**
+
+  `string`
+
+- **`vehiculo`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "fecha": "",
+  "choferId": 1,
+  "vehiculo": "",
+  "observaciones": "",
+  "ordenEntregaIds": [
+    1
+  ]
+}
+```
+
+#### Responses
+
+##### Status: 201 Route created
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`choferId` (required)**
+
+    `integer`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"planned", "on_route", "completed", "cancelled"`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`items` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`estado` (required)**
+
+      `string`, possible values: `"pending", "delivered", "not_delivered", "returned"`
+
+    - **`hasPod` (required)**
+
+      `boolean`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`ordenEntrega` (required)**
+
+      `object`
+
+      - **`cliente`**
+
+        `object`
+
+      - **`clienteId`**
+
+        `integer`
+
+      - **`dispatchedAt`**
+
+        `string`, format: `date-time` — When the order entered in\_transit (ADR-0011).
+
+      - **`dispatchTimestampSource`**
+
+        `string`, possible values: `"event", "estimated"` — How dispatchedAt was derived (audit event vs estimated from updatedAt).
+
+      - **`driver`**
+
+        `object`
+
+      - **`driverId`**
+
+        `integer`
+
+      - **`estado`**
+
+        `string`, possible values: `"pending", "picking", "ready", "assigned", "in_transit", "delivered", "failed", "cancelled"`
+
+      - **`factura`**
+
+        `object`
+
+      - **`facturaId`**
+
+        `integer`
+
+      - **`fecha`**
+
+        `string`, format: `date-time`
+
+      - **`id`**
+
+        `integer`
+
+      - **`items`**
+
+        `array`
+
+        **Items:**
+
+        - **`articulo` (required)**
+
+          `object`
+
+          - **`codigo` (required)**
+
+            `integer`
+
+          - **`descripcion` (required)**
+
+            `string`
+
+          - **`id` (required)**
+
+            `integer`
+
+        - **`cantidad` (required)**
+
+          `integer`
+
+        - **`id` (required)**
+
+          `integer`
+
+      - **`nota`**
+
+        `string`
+
+      - **`picker`**
+
+        `object`
+
+      - **`pickerUserId`**
+
+        `integer`
+
+      - **`pickingIniciadoAt`**
+
+        `string`, format: `date-time`
+
+      - **`pickingListoAt`**
+
+        `string`, format: `date-time`
+
+      - **`tenantId`**
+
+        `integer`
+
+      - **`zona`**
+
+        `object`
+
+      - **`zonaId`**
+
+        `integer`
+
+    - **`ordenEntregaId` (required)**
+
+      `integer`
+
+    - **`secuencia` (required)**
+
+      `integer`
+
+    - **`entregadoAt`**
+
+      `string`, format: `date-time`
+
+    - **`motivoNoEntrega`**
+
+      `string`
+
+    - **`notasEntrega`**
+
+      `string`
+
+    - **`receptorDni`**
+
+      `string`
+
+    - **`receptorNombre`**
+
+      `string`
+
+  - **`progress` (required)**
+
+    `object`
+
+    - **`delivered` (required)**
+
+      `integer`
+
+    - **`pending` (required)**
+
+      `integer`
+
+    - **`total` (required)**
+
+      `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`chofer`**
+
+    `object`
+
+    - **`id`**
+
+      `integer`
+
+    - **`role`**
+
+      `string`
+
+    - **`username`**
+
+      `string`
+
+  - **`closedAt`**
+
+    `string`, format: `date-time`
+
+  - **`observaciones`**
+
+    `string`
+
+  - **`vehiculo`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "fecha": "",
+    "choferId": 1,
+    "estado": "planned",
+    "vehiculo": "",
+    "observaciones": "",
+    "closedAt": "",
+    "chofer": {
+      "id": 1,
+      "username": "",
+      "role": ""
+    },
+    "items": [
+      {
+        "id": 1,
+        "ordenEntregaId": 1,
+        "secuencia": 1,
+        "estado": "pending",
+        "entregadoAt": "",
+        "motivoNoEntrega": "",
+        "receptorNombre": "",
+        "receptorDni": "",
+        "notasEntrega": "",
+        "hasPod": true,
+        "ordenEntrega": {
+          "id": 1,
+          "tenantId": 1,
+          "facturaId": 1,
+          "clienteId": 1,
+          "zonaId": 1,
+          "driverId": 1,
+          "pickerUserId": 1,
+          "pickingIniciadoAt": "",
+          "pickingListoAt": "",
+          "fecha": "",
+          "estado": "pending",
+          "nota": "",
+          "dispatchedAt": "",
+          "dispatchTimestampSource": "event",
+          "items": [
+            {
+              "id": 1,
+              "cantidad": 1,
+              "articulo": {
+                "id": 1,
+                "codigo": 1,
+                "descripcion": ""
+              }
+            }
+          ],
+          "cliente": {
+            "additionalProperty": "anything"
+          },
+          "zona": {
+            "additionalProperty": "anything"
+          },
+          "driver": {
+            "additionalProperty": "anything"
+          },
+          "factura": {
+            "additionalProperty": "anything"
+          },
+          "picker": {
+            "additionalProperty": "anything"
+          },
+          "additionalProperty": "anything"
+        }
+      }
+    ],
+    "progress": {
+      "total": 0,
+      "delivered": 0,
+      "pending": 0
+    }
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 422 Invalid line item or OE already on active route
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/repartos/activos
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/repartos/activos`
+
+### List on-route deliveries with last GPS position
+
+- **Method:** `GET`
+- **Path:** `/api/repartos/activos`
+- **Tags:** repartos
+
+Requires tenant module `logistics.gps`, permission `logistics.read`, and role `owner`, `manager`, or `logistics_planner`. Returns repartos in estado `on_route` with `ultimaUbicacion`, `progress`, and `currentStop` (first pending item).
+
+#### Responses
+
+##### Status: 200 Active routes for live tracking
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`chofer` (required)**
+
+    `object`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`role` (required)**
+
+      `string`
+
+    - **`username` (required)**
+
+      `string`
+
+  - **`choferId` (required)**
+
+    `integer`
+
+  - **`currentStop` (required)**
+
+    `object`
+
+  - **`estado` (required)**
+
+    `string`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`progress` (required)**
+
+    `object`
+
+    - **`delivered` (required)**
+
+      `integer`
+
+    - **`pending` (required)**
+
+      `integer`
+
+    - **`total` (required)**
+
+      `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`ultimaUbicacion` (required)**
+
+    `object`
+
+  - **`observaciones`**
+
+    `string`
+
+  - **`vehiculo`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "fecha": "",
+      "choferId": 1,
+      "estado": "",
+      "vehiculo": "",
+      "observaciones": "",
+      "chofer": {
+        "id": 1,
+        "username": "",
+        "role": ""
+      },
+      "progress": {
+        "total": 0,
+        "delivered": 0,
+        "pending": 0
+      },
+      "ultimaUbicacion": {
+        "lat": 1,
+        "lng": 1,
+        "recordedAt": ""
+      },
+      "currentStop": {
+        "secuencia": 1,
+        "cliente": {
+          "id": 1,
+          "codigo": 1,
+          "rsocial": "",
+          "domicilio": ""
+        },
+        "zona": {
+          "id": 1,
+          "nombre": ""
+        }
+      }
+    }
+  ]
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/repartos/{id}
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/repartos/{id}`
+
+### Get delivery route by id
+
+- **Method:** `GET`
+- **Path:** `/api/repartos/{id}`
+- **Tags:** repartos
+
+Requires `logistics.read`.
+
+#### Responses
+
+##### Status: 200 Route detail with ordered items
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`choferId` (required)**
+
+    `integer`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"planned", "on_route", "completed", "cancelled"`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`items` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`estado` (required)**
+
+      `string`, possible values: `"pending", "delivered", "not_delivered", "returned"`
+
+    - **`hasPod` (required)**
+
+      `boolean`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`ordenEntrega` (required)**
+
+      `object`
+
+      - **`cliente`**
+
+        `object`
+
+      - **`clienteId`**
+
+        `integer`
+
+      - **`dispatchedAt`**
+
+        `string`, format: `date-time` — When the order entered in\_transit (ADR-0011).
+
+      - **`dispatchTimestampSource`**
+
+        `string`, possible values: `"event", "estimated"` — How dispatchedAt was derived (audit event vs estimated from updatedAt).
+
+      - **`driver`**
+
+        `object`
+
+      - **`driverId`**
+
+        `integer`
+
+      - **`estado`**
+
+        `string`, possible values: `"pending", "picking", "ready", "assigned", "in_transit", "delivered", "failed", "cancelled"`
+
+      - **`factura`**
+
+        `object`
+
+      - **`facturaId`**
+
+        `integer`
+
+      - **`fecha`**
+
+        `string`, format: `date-time`
+
+      - **`id`**
+
+        `integer`
+
+      - **`items`**
+
+        `array`
+
+        **Items:**
+
+        - **`articulo` (required)**
+
+          `object`
+
+          - **`codigo` (required)**
+
+            `integer`
+
+          - **`descripcion` (required)**
+
+            `string`
+
+          - **`id` (required)**
+
+            `integer`
+
+        - **`cantidad` (required)**
+
+          `integer`
+
+        - **`id` (required)**
+
+          `integer`
+
+      - **`nota`**
+
+        `string`
+
+      - **`picker`**
+
+        `object`
+
+      - **`pickerUserId`**
+
+        `integer`
+
+      - **`pickingIniciadoAt`**
+
+        `string`, format: `date-time`
+
+      - **`pickingListoAt`**
+
+        `string`, format: `date-time`
+
+      - **`tenantId`**
+
+        `integer`
+
+      - **`zona`**
+
+        `object`
+
+      - **`zonaId`**
+
+        `integer`
+
+    - **`ordenEntregaId` (required)**
+
+      `integer`
+
+    - **`secuencia` (required)**
+
+      `integer`
+
+    - **`entregadoAt`**
+
+      `string`, format: `date-time`
+
+    - **`motivoNoEntrega`**
+
+      `string`
+
+    - **`notasEntrega`**
+
+      `string`
+
+    - **`receptorDni`**
+
+      `string`
+
+    - **`receptorNombre`**
+
+      `string`
+
+  - **`progress` (required)**
+
+    `object`
+
+    - **`delivered` (required)**
+
+      `integer`
+
+    - **`pending` (required)**
+
+      `integer`
+
+    - **`total` (required)**
+
+      `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`chofer`**
+
+    `object`
+
+    - **`id`**
+
+      `integer`
+
+    - **`role`**
+
+      `string`
+
+    - **`username`**
+
+      `string`
+
+  - **`closedAt`**
+
+    `string`, format: `date-time`
+
+  - **`observaciones`**
+
+    `string`
+
+  - **`vehiculo`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "fecha": "",
+    "choferId": 1,
+    "estado": "planned",
+    "vehiculo": "",
+    "observaciones": "",
+    "closedAt": "",
+    "chofer": {
+      "id": 1,
+      "username": "",
+      "role": ""
+    },
+    "items": [
+      {
+        "id": 1,
+        "ordenEntregaId": 1,
+        "secuencia": 1,
+        "estado": "pending",
+        "entregadoAt": "",
+        "motivoNoEntrega": "",
+        "receptorNombre": "",
+        "receptorDni": "",
+        "notasEntrega": "",
+        "hasPod": true,
+        "ordenEntrega": {
+          "id": 1,
+          "tenantId": 1,
+          "facturaId": 1,
+          "clienteId": 1,
+          "zonaId": 1,
+          "driverId": 1,
+          "pickerUserId": 1,
+          "pickingIniciadoAt": "",
+          "pickingListoAt": "",
+          "fecha": "",
+          "estado": "pending",
+          "nota": "",
+          "dispatchedAt": "",
+          "dispatchTimestampSource": "event",
+          "items": [
+            {
+              "id": 1,
+              "cantidad": 1,
+              "articulo": {
+                "id": 1,
+                "codigo": 1,
+                "descripcion": ""
+              }
+            }
+          ],
+          "cliente": {
+            "additionalProperty": "anything"
+          },
+          "zona": {
+            "additionalProperty": "anything"
+          },
+          "driver": {
+            "additionalProperty": "anything"
+          },
+          "factura": {
+            "additionalProperty": "anything"
+          },
+          "picker": {
+            "additionalProperty": "anything"
+          },
+          "additionalProperty": "anything"
+        }
+      }
+    ],
+    "progress": {
+      "total": 0,
+      "delivered": 0,
+      "pending": 0
+    }
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Route not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/repartos/{id}/iniciar
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/repartos/{id}/iniciar`
+
+### Start delivery route
+
+- **Method:** `POST`
+- **Path:** `/api/repartos/{id}/iniciar`
+- **Tags:** repartos
+
+Requires `orders.dispatch`. `planned` → `on_route`; pending items' OEs → `in_transit`.
+
+#### Responses
+
+##### Status: 200 Route started
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`choferId` (required)**
+
+    `integer`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"planned", "on_route", "completed", "cancelled"`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`items` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`estado` (required)**
+
+      `string`, possible values: `"pending", "delivered", "not_delivered", "returned"`
+
+    - **`hasPod` (required)**
+
+      `boolean`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`ordenEntrega` (required)**
+
+      `object`
+
+      - **`cliente`**
+
+        `object`
+
+      - **`clienteId`**
+
+        `integer`
+
+      - **`dispatchedAt`**
+
+        `string`, format: `date-time` — When the order entered in\_transit (ADR-0011).
+
+      - **`dispatchTimestampSource`**
+
+        `string`, possible values: `"event", "estimated"` — How dispatchedAt was derived (audit event vs estimated from updatedAt).
+
+      - **`driver`**
+
+        `object`
+
+      - **`driverId`**
+
+        `integer`
+
+      - **`estado`**
+
+        `string`, possible values: `"pending", "picking", "ready", "assigned", "in_transit", "delivered", "failed", "cancelled"`
+
+      - **`factura`**
+
+        `object`
+
+      - **`facturaId`**
+
+        `integer`
+
+      - **`fecha`**
+
+        `string`, format: `date-time`
+
+      - **`id`**
+
+        `integer`
+
+      - **`items`**
+
+        `array`
+
+        **Items:**
+
+        - **`articulo` (required)**
+
+          `object`
+
+          - **`codigo` (required)**
+
+            `integer`
+
+          - **`descripcion` (required)**
+
+            `string`
+
+          - **`id` (required)**
+
+            `integer`
+
+        - **`cantidad` (required)**
+
+          `integer`
+
+        - **`id` (required)**
+
+          `integer`
+
+      - **`nota`**
+
+        `string`
+
+      - **`picker`**
+
+        `object`
+
+      - **`pickerUserId`**
+
+        `integer`
+
+      - **`pickingIniciadoAt`**
+
+        `string`, format: `date-time`
+
+      - **`pickingListoAt`**
+
+        `string`, format: `date-time`
+
+      - **`tenantId`**
+
+        `integer`
+
+      - **`zona`**
+
+        `object`
+
+      - **`zonaId`**
+
+        `integer`
+
+    - **`ordenEntregaId` (required)**
+
+      `integer`
+
+    - **`secuencia` (required)**
+
+      `integer`
+
+    - **`entregadoAt`**
+
+      `string`, format: `date-time`
+
+    - **`motivoNoEntrega`**
+
+      `string`
+
+    - **`notasEntrega`**
+
+      `string`
+
+    - **`receptorDni`**
+
+      `string`
+
+    - **`receptorNombre`**
+
+      `string`
+
+  - **`progress` (required)**
+
+    `object`
+
+    - **`delivered` (required)**
+
+      `integer`
+
+    - **`pending` (required)**
+
+      `integer`
+
+    - **`total` (required)**
+
+      `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`chofer`**
+
+    `object`
+
+    - **`id`**
+
+      `integer`
+
+    - **`role`**
+
+      `string`
+
+    - **`username`**
+
+      `string`
+
+  - **`closedAt`**
+
+    `string`, format: `date-time`
+
+  - **`observaciones`**
+
+    `string`
+
+  - **`vehiculo`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "fecha": "",
+    "choferId": 1,
+    "estado": "planned",
+    "vehiculo": "",
+    "observaciones": "",
+    "closedAt": "",
+    "chofer": {
+      "id": 1,
+      "username": "",
+      "role": ""
+    },
+    "items": [
+      {
+        "id": 1,
+        "ordenEntregaId": 1,
+        "secuencia": 1,
+        "estado": "pending",
+        "entregadoAt": "",
+        "motivoNoEntrega": "",
+        "receptorNombre": "",
+        "receptorDni": "",
+        "notasEntrega": "",
+        "hasPod": true,
+        "ordenEntrega": {
+          "id": 1,
+          "tenantId": 1,
+          "facturaId": 1,
+          "clienteId": 1,
+          "zonaId": 1,
+          "driverId": 1,
+          "pickerUserId": 1,
+          "pickingIniciadoAt": "",
+          "pickingListoAt": "",
+          "fecha": "",
+          "estado": "pending",
+          "nota": "",
+          "dispatchedAt": "",
+          "dispatchTimestampSource": "event",
+          "items": [
+            {
+              "id": 1,
+              "cantidad": 1,
+              "articulo": {
+                "id": 1,
+                "codigo": 1,
+                "descripcion": ""
+              }
+            }
+          ],
+          "cliente": {
+            "additionalProperty": "anything"
+          },
+          "zona": {
+            "additionalProperty": "anything"
+          },
+          "driver": {
+            "additionalProperty": "anything"
+          },
+          "factura": {
+            "additionalProperty": "anything"
+          },
+          "picker": {
+            "additionalProperty": "anything"
+          },
+          "additionalProperty": "anything"
+        }
+      }
+    ],
+    "progress": {
+      "total": 0,
+      "delivered": 0,
+      "pending": 0
+    }
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Route not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 422 Invalid state
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/repartos/{id}/ubicacion
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/repartos/{id}/ubicacion`
+
+### Record driver GPS position
+
+- **Method:** `POST`
+- **Path:** `/api/repartos/{id}/ubicacion`
+- **Tags:** repartos
+
+Requires tenant module `logistics.gps` and permission `orders.deliver.confirm`. Only the assigned driver on a reparto in estado `on_route`. Purges locations older than 7 days.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`lat` (required)**
+
+  `number`
+
+- **`lng` (required)**
+
+  `number`
+
+**Example:**
+
+```json
+{
+  "lat": -90,
+  "lng": -180
+}
+```
+
+#### Responses
+
+##### Status: 200 Location recorded
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`lat` (required)**
+
+    `number`
+
+  - **`lng` (required)**
+
+    `number`
+
+  - **`recordedAt` (required)**
+
+    `string`, format: `date-time`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "lat": 1,
+    "lng": 1,
+    "recordedAt": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Route not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 422 Invalid state
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/repartos/{id}/ubicacion/ultima
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/repartos/{id}/ubicacion/ultima`
+
+### Get last GPS position for a route
+
+- **Method:** `GET`
+- **Path:** `/api/repartos/{id}/ubicacion/ultima`
+- **Tags:** repartos
+
+Requires tenant module `logistics.gps` and permission `logistics.read`. Planners (`owner`, `manager`, `logistics_planner`) on any route; drivers only on their own route.
+
+#### Responses
+
+##### Status: 200 Last recorded position or null
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "lat": 1,
+    "lng": 1,
+    "recordedAt": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Route not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/repartos/{id}/cerrar
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/repartos/{id}/cerrar`
+
+### Close delivery route
+
+- **Method:** `POST`
+- **Path:** `/api/repartos/{id}/cerrar`
+- **Tags:** repartos
+
+Requires `orders.dispatch`. `on_route` → `completed`; pending items → `not_delivered` and OEs → `failed`.
+
+#### Responses
+
+##### Status: 200 Route closed with summary
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`choferId` (required)**
+
+    `integer`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"planned", "on_route", "completed", "cancelled"`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`items` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`estado` (required)**
+
+      `string`, possible values: `"pending", "delivered", "not_delivered", "returned"`
+
+    - **`hasPod` (required)**
+
+      `boolean`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`ordenEntrega` (required)**
+
+      `object`
+
+      - **`cliente`**
+
+        `object`
+
+      - **`clienteId`**
+
+        `integer`
+
+      - **`dispatchedAt`**
+
+        `string`, format: `date-time` — When the order entered in\_transit (ADR-0011).
+
+      - **`dispatchTimestampSource`**
+
+        `string`, possible values: `"event", "estimated"` — How dispatchedAt was derived (audit event vs estimated from updatedAt).
+
+      - **`driver`**
+
+        `object`
+
+      - **`driverId`**
+
+        `integer`
+
+      - **`estado`**
+
+        `string`, possible values: `"pending", "picking", "ready", "assigned", "in_transit", "delivered", "failed", "cancelled"`
+
+      - **`factura`**
+
+        `object`
+
+      - **`facturaId`**
+
+        `integer`
+
+      - **`fecha`**
+
+        `string`, format: `date-time`
+
+      - **`id`**
+
+        `integer`
+
+      - **`items`**
+
+        `array`
+
+        **Items:**
+
+        - **`articulo` (required)**
+
+          `object`
+
+          - **`codigo` (required)**
+
+            `integer`
+
+          - **`descripcion` (required)**
+
+            `string`
+
+          - **`id` (required)**
+
+            `integer`
+
+        - **`cantidad` (required)**
+
+          `integer`
+
+        - **`id` (required)**
+
+          `integer`
+
+      - **`nota`**
+
+        `string`
+
+      - **`picker`**
+
+        `object`
+
+      - **`pickerUserId`**
+
+        `integer`
+
+      - **`pickingIniciadoAt`**
+
+        `string`, format: `date-time`
+
+      - **`pickingListoAt`**
+
+        `string`, format: `date-time`
+
+      - **`tenantId`**
+
+        `integer`
+
+      - **`zona`**
+
+        `object`
+
+      - **`zonaId`**
+
+        `integer`
+
+    - **`ordenEntregaId` (required)**
+
+      `integer`
+
+    - **`secuencia` (required)**
+
+      `integer`
+
+    - **`entregadoAt`**
+
+      `string`, format: `date-time`
+
+    - **`motivoNoEntrega`**
+
+      `string`
+
+    - **`notasEntrega`**
+
+      `string`
+
+    - **`receptorDni`**
+
+      `string`
+
+    - **`receptorNombre`**
+
+      `string`
+
+  - **`progress` (required)**
+
+    `object`
+
+    - **`delivered` (required)**
+
+      `integer`
+
+    - **`pending` (required)**
+
+      `integer`
+
+    - **`total` (required)**
+
+      `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`chofer`**
+
+    `object`
+
+    - **`id`**
+
+      `integer`
+
+    - **`role`**
+
+      `string`
+
+    - **`username`**
+
+      `string`
+
+  - **`closedAt`**
+
+    `string`, format: `date-time`
+
+  - **`observaciones`**
+
+    `string`
+
+  - **`vehiculo`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`summary` (required)**
+
+  `object`
+
+  - **`delivered` (required)**
+
+    `integer`
+
+  - **`notDelivered` (required)**
+
+    `integer`
+
+  - **`pendingClosed` (required)**
+
+    `integer`
+
+  - **`returned` (required)**
+
+    `integer`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "fecha": "",
+    "choferId": 1,
+    "estado": "planned",
+    "vehiculo": "",
+    "observaciones": "",
+    "closedAt": "",
+    "chofer": {
+      "id": 1,
+      "username": "",
+      "role": ""
+    },
+    "items": [
+      {
+        "id": 1,
+        "ordenEntregaId": 1,
+        "secuencia": 1,
+        "estado": "pending",
+        "entregadoAt": "",
+        "motivoNoEntrega": "",
+        "receptorNombre": "",
+        "receptorDni": "",
+        "notasEntrega": "",
+        "hasPod": true,
+        "ordenEntrega": {
+          "id": 1,
+          "tenantId": 1,
+          "facturaId": 1,
+          "clienteId": 1,
+          "zonaId": 1,
+          "driverId": 1,
+          "pickerUserId": 1,
+          "pickingIniciadoAt": "",
+          "pickingListoAt": "",
+          "fecha": "",
+          "estado": "pending",
+          "nota": "",
+          "dispatchedAt": "",
+          "dispatchTimestampSource": "event",
+          "items": [
+            {
+              "id": 1,
+              "cantidad": 1,
+              "articulo": {
+                "id": 1,
+                "codigo": 1,
+                "descripcion": ""
+              }
+            }
+          ],
+          "cliente": {
+            "additionalProperty": "anything"
+          },
+          "zona": {
+            "additionalProperty": "anything"
+          },
+          "driver": {
+            "additionalProperty": "anything"
+          },
+          "factura": {
+            "additionalProperty": "anything"
+          },
+          "picker": {
+            "additionalProperty": "anything"
+          },
+          "additionalProperty": "anything"
+        }
+      }
+    ],
+    "progress": {
+      "total": 0,
+      "delivered": 0,
+      "pending": 0
+    }
+  },
+  "summary": {
+    "pendingClosed": 0,
+    "delivered": 0,
+    "notDelivered": 0,
+    "returned": 0
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Route not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 422 Invalid state
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/repartos/{id}/items/{itemId}
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/repartos/{id}/items/{itemId}`
+
+### Record delivery proof (POD) for a route item
+
+- **Method:** `PUT`
+- **Path:** `/api/repartos/{id}/items/{itemId}`
+- **Tags:** repartos
+
+Requires `orders.deliver.confirm`. Route must be `on_route`; item `pending`. Driver may only update items on their own route. Delivered outcome requires `receptorNombre` and non-empty `firmaBase64` within size limits.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`outcome` (required)**
+
+  `string`, possible values: `"delivered", "not_delivered"`
+
+- **`firmaBase64`**
+
+  `string` — Data URL or base64 signature; max \~50KB decoded when delivered.
+
+- **`fotoBase64`**
+
+  `string` — Data URL or base64 photo; max \~200KB decoded.
+
+- **`motivoNoEntrega`**
+
+  `string`, possible values: `"ausente", "rechazo", "domicilio_incorrecto", "producto_dañado", "otro"`
+
+- **`notasEntrega`**
+
+  `string`
+
+- **`receptorDni`**
+
+  `string`
+
+- **`receptorNombre`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "outcome": "delivered",
+  "receptorNombre": "",
+  "receptorDni": "",
+  "firmaBase64": "",
+  "fotoBase64": "",
+  "notasEntrega": "",
+  "motivoNoEntrega": "ausente"
+}
+```
+
+#### Responses
+
+##### Status: 200 Item updated (public fields only; no pod blobs)
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"pending", "delivered", "not_delivered", "returned"`
+
+  - **`hasPod` (required)**
+
+    `boolean`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`ordenEntrega` (required)**
+
+    `object`
+
+    - **`cliente`**
+
+      `object`
+
+    - **`clienteId`**
+
+      `integer`
+
+    - **`dispatchedAt`**
+
+      `string`, format: `date-time` — When the order entered in\_transit (ADR-0011).
+
+    - **`dispatchTimestampSource`**
+
+      `string`, possible values: `"event", "estimated"` — How dispatchedAt was derived (audit event vs estimated from updatedAt).
+
+    - **`driver`**
+
+      `object`
+
+    - **`driverId`**
+
+      `integer`
+
+    - **`estado`**
+
+      `string`, possible values: `"pending", "picking", "ready", "assigned", "in_transit", "delivered", "failed", "cancelled"`
+
+    - **`factura`**
+
+      `object`
+
+    - **`facturaId`**
+
+      `integer`
+
+    - **`fecha`**
+
+      `string`, format: `date-time`
+
+    - **`id`**
+
+      `integer`
+
+    - **`items`**
+
+      `array`
+
+      **Items:**
+
+      - **`articulo` (required)**
+
+        `object`
+
+        - **`codigo` (required)**
+
+          `integer`
+
+        - **`descripcion` (required)**
+
+          `string`
+
+        - **`id` (required)**
+
+          `integer`
+
+      - **`cantidad` (required)**
+
+        `integer`
+
+      - **`id` (required)**
+
+        `integer`
+
+    - **`nota`**
+
+      `string`
+
+    - **`picker`**
+
+      `object`
+
+    - **`pickerUserId`**
+
+      `integer`
+
+    - **`pickingIniciadoAt`**
+
+      `string`, format: `date-time`
+
+    - **`pickingListoAt`**
+
+      `string`, format: `date-time`
+
+    - **`tenantId`**
+
+      `integer`
+
+    - **`zona`**
+
+      `object`
+
+    - **`zonaId`**
+
+      `integer`
+
+  - **`ordenEntregaId` (required)**
+
+    `integer`
+
+  - **`secuencia` (required)**
+
+    `integer`
+
+  - **`entregadoAt`**
+
+    `string`, format: `date-time`
+
+  - **`motivoNoEntrega`**
+
+    `string`
+
+  - **`notasEntrega`**
+
+    `string`
+
+  - **`receptorDni`**
+
+    `string`
+
+  - **`receptorNombre`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "ordenEntregaId": 1,
+    "secuencia": 1,
+    "estado": "pending",
+    "entregadoAt": "",
+    "motivoNoEntrega": "",
+    "receptorNombre": "",
+    "receptorDni": "",
+    "notasEntrega": "",
+    "hasPod": true,
+    "ordenEntrega": {
+      "id": 1,
+      "tenantId": 1,
+      "facturaId": 1,
+      "clienteId": 1,
+      "zonaId": 1,
+      "driverId": 1,
+      "pickerUserId": 1,
+      "pickingIniciadoAt": "",
+      "pickingListoAt": "",
+      "fecha": "",
+      "estado": "pending",
+      "nota": "",
+      "dispatchedAt": "",
+      "dispatchTimestampSource": "event",
+      "items": [
+        {
+          "id": 1,
+          "cantidad": 1,
+          "articulo": {
+            "id": 1,
+            "codigo": 1,
+            "descripcion": ""
+          }
+        }
+      ],
+      "cliente": {
+        "additionalProperty": "anything"
+      },
+      "zona": {
+        "additionalProperty": "anything"
+      },
+      "driver": {
+        "additionalProperty": "anything"
+      },
+      "factura": {
+        "additionalProperty": "anything"
+      },
+      "picker": {
+        "additionalProperty": "anything"
+      },
+      "additionalProperty": "anything"
+    }
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Route or item not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 422 Invalid state, signature, or motivo
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/repartos/{id}/items/{itemId}/pod
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/repartos/{id}/items/{itemId}/pod`
+
+### Get full delivery proof for a route item
+
+- **Method:** `GET`
+- **Path:** `/api/repartos/{id}/items/{itemId}/pod`
+- **Tags:** repartos
+
+Requires `logistics.read` and role `owner`, `manager`, or `logistics_planner` (not `driver`). Returns signature/photo blobs in `podMedia`.
+
+#### Responses
+
+##### Status: 200 Full POD detail
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "ordenEntregaId": 1,
+    "secuencia": 1,
+    "estado": "pending",
+    "entregadoAt": "",
+    "motivoNoEntrega": "",
+    "receptorNombre": "",
+    "receptorDni": "",
+    "notasEntrega": "",
+    "hasPod": true,
+    "ordenEntrega": {
+      "id": 1,
+      "tenantId": 1,
+      "facturaId": 1,
+      "clienteId": 1,
+      "zonaId": 1,
+      "driverId": 1,
+      "pickerUserId": 1,
+      "pickingIniciadoAt": "",
+      "pickingListoAt": "",
+      "fecha": "",
+      "estado": "pending",
+      "nota": "",
+      "dispatchedAt": "",
+      "dispatchTimestampSource": "event",
+      "items": [
+        {
+          "id": 1,
+          "cantidad": 1,
+          "articulo": {
+            "id": 1,
+            "codigo": 1,
+            "descripcion": ""
+          }
+        }
+      ],
+      "cliente": {
+        "additionalProperty": "anything"
+      },
+      "zona": {
+        "additionalProperty": "anything"
+      },
+      "driver": {
+        "additionalProperty": "anything"
+      },
+      "factura": {
+        "additionalProperty": "anything"
+      },
+      "picker": {
+        "additionalProperty": "anything"
+      },
+      "additionalProperty": "anything"
+    },
+    "podMedia": {
+      "firmaBase64": "",
+      "fotoBase64": ""
+    }
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Item not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/logistica/kpis
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/logistica/kpis`
+
+### Logistics KPIs for a date range
+
+- **Method:** `GET`
+- **Path:** `/api/logistica/kpis`
+- **Tags:** logistica
+
+Aggregated logistics metrics using DB-side queries (#145). Requires tenant module `logistics.dispatches` and permission `logistics.read`. Optional `choferId` filters all metrics to one driver. Uses `OrdenEntrega.dispatchedAt` (ADR-0011) as dispatch baseline.
+
+#### Responses
+
+##### Status: 200 KPI aggregate object
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`avgDeliveryMinutes` (required)**
+
+    `number`
+
+  - **`dispatchedCount` (required)**
+
+    `integer`
+
+  - **`firstVisitDeliveredCount` (required)**
+
+    `integer`
+
+  - **`firstVisitRate` (required)**
+
+    `number`
+
+  - **`overdueCount` (required)**
+
+    `integer`
+
+  - **`returnsByReason` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`count` (required)**
+
+      `integer`
+
+    - **`motivo` (required)**
+
+      `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "dispatchedCount": 0,
+    "firstVisitDeliveredCount": 0,
+    "firstVisitRate": 0,
+    "avgDeliveryMinutes": 1,
+    "returnsByReason": [
+      {
+        "motivo": "",
+        "count": 0
+      }
+    ],
+    "overdueCount": 0
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/logistica/reporte-choferes
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/logistica/reporte-choferes`
+
+### Driver productivity report
+
+- **Method:** `GET`
+- **Path:** `/api/logistica/reporte-choferes`
+- **Tags:** logistica
+
+Rows grouped by driver and dispatch day. Requires `logistics.dispatches` and `logistics.read`. Send `Accept: text/csv` for CSV export.
+
+#### Responses
+
+##### Status: 200 Driver rows or CSV
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`choferId` (required)**
+
+    `integer`
+
+  - **`choferUsername` (required)**
+
+    `string`
+
+  - **`day` (required)**
+
+    `string`, format: `date`
+
+  - **`delivered` (required)**
+
+    `integer`
+
+  - **`dispatched` (required)**
+
+    `integer`
+
+  - **`notDelivered` (required)**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "choferId": 1,
+      "choferUsername": "",
+      "day": "",
+      "dispatched": 0,
+      "delivered": 0,
+      "notDelivered": 0
+    }
+  ]
+}
+```
+
+###### Content-Type: text/csv
+
+`string`
+
+**Example:**
+
+```json
+true
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/logistica/reporte-zonas
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/logistica/reporte-zonas`
+
+### Delivery coverage by zone
+
+- **Method:** `GET`
+- **Path:** `/api/logistica/reporte-zonas`
+- **Tags:** logistica
+
+Rows grouped by delivery zone. Requires `logistics.dispatches` and `logistics.read`. Send `Accept: text/csv` for CSV export.
+
+#### Responses
+
+##### Status: 200 Zone rows or CSV
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`delivered` (required)**
+
+    `integer`
+
+  - **`dispatched` (required)**
+
+    `integer`
+
+  - **`notDelivered` (required)**
+
+    `integer`
+
+  - **`zonaId` (required)**
+
+    `integer`
+
+  - **`zonaNombre` (required)**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "zonaId": 1,
+      "zonaNombre": "",
+      "dispatched": 0,
+      "delivered": 0,
+      "notDelivered": 0
+    }
+  ]
+}
+```
+
+###### Content-Type: text/csv
+
+`string`
+
+**Example:**
+
+```json
+true
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ## Schemas
 
 ### HealthResponse
@@ -4591,12 +35964,205 @@ Returns boolean flags for each channel. No sensitive values are exposed.
 
   `string`, format: `date-time`
 
+* **`db`**
+
+  `object`
+
+  - **`latencyMs` (required)**
+
+    `number`
+
+  - **`ok` (required)**
+
+    `boolean`
+
+* **`uptimeSeconds`**
+
+  `number`
+
+* **`version`**
+
+  `string`
+
 **Example:**
 
 ```json
 {
   "status": "ok",
-  "timestamp": ""
+  "timestamp": "",
+  "db": {
+    "ok": true,
+    "latencyMs": 0
+  },
+  "uptimeSeconds": 0,
+  "version": ""
+}
+```
+
+### MetricsEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`appEnv` (required)**
+
+    `string`
+
+  - **`requestsByMethod` (required)**
+
+    `object`
+
+  - **`requestsByRoute` (required)**
+
+    `object`
+
+  - **`responsesByStatus` (required)**
+
+    `object`
+
+  - **`startedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`totals` (required)**
+
+    `object`
+
+    - **`averageDurationMs` (required)**
+
+      `number`
+
+    - **`errors4xx` (required)**
+
+      `integer`
+
+    - **`errors5xx` (required)**
+
+      `integer`
+
+    - **`requests` (required)**
+
+      `integer`
+
+  - **`uptimeSeconds` (required)**
+
+    `integer`
+
+  - **`appVersion`**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "startedAt": "",
+    "uptimeSeconds": 0,
+    "appEnv": "",
+    "appVersion": "",
+    "totals": {
+      "requests": 0,
+      "errors4xx": 0,
+      "errors5xx": 0,
+      "averageDurationMs": 0
+    },
+    "requestsByMethod": {
+      "additionalProperty": 0
+    },
+    "responsesByStatus": {
+      "additionalProperty": 0
+    },
+    "requestsByRoute": {
+      "additionalProperty": 0
+    }
+  }
+}
+```
+
+### MetricsSnapshot
+
+- **Type:**`object`
+
+* **`appEnv` (required)**
+
+  `string`
+
+* **`requestsByMethod` (required)**
+
+  `object`
+
+* **`requestsByRoute` (required)**
+
+  `object`
+
+* **`responsesByStatus` (required)**
+
+  `object`
+
+* **`startedAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`totals` (required)**
+
+  `object`
+
+  - **`averageDurationMs` (required)**
+
+    `number`
+
+  - **`errors4xx` (required)**
+
+    `integer`
+
+  - **`errors5xx` (required)**
+
+    `integer`
+
+  - **`requests` (required)**
+
+    `integer`
+
+* **`uptimeSeconds` (required)**
+
+  `integer`
+
+* **`appVersion`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "startedAt": "",
+  "uptimeSeconds": 0,
+  "appEnv": "",
+  "appVersion": "",
+  "totals": {
+    "requests": 0,
+    "errors4xx": 0,
+    "errors5xx": 0,
+    "averageDurationMs": 0
+  },
+  "requestsByMethod": {
+    "additionalProperty": 0
+  },
+  "responsesByStatus": {
+    "additionalProperty": 0
+  },
+  "requestsByRoute": {
+    "additionalProperty": 0
+  }
 }
 ```
 
@@ -5315,91 +36881,106 @@ Returns boolean flags for each channel. No sensitive values are exposed.
 }
 ```
 
-### ClienteListEnvelope
+### ClienteImportRowError
 
 - **Type:**`object`
 
-* **`data` (required)**
+* **`message` (required)**
+
+  `string`
+
+* **`row` (required)**
+
+  `integer` — Data row number in the file (row 1 is the header)
+
+**Example:**
+
+```json
+{
+  "row": 2,
+  "message": ""
+}
+```
+
+### ClienteImportResult
+
+- **Type:**`object`
+
+* **`created` (required)**
+
+  `integer`
+
+* **`errors` (required)**
 
   `array`
 
   **Items:**
 
-  - **`activo`**
+  - **`message` (required)**
 
-    `boolean`
+    `string`
 
-  - **`balance`**
+  - **`row` (required)**
 
-    `number`, default: `0` — Accumulated balance (incremented on each new factura).
+    `integer` — Data row number in the file (row 1 is the header)
 
-  - **`balanceInicial`**
+* **`skipped` (required)**
 
-    `number`, default: `0` — Opening balance at migration time.
+  `integer`
 
-  - **`codigo`**
+* **`updated`**
+
+  `integer` — Rows updated via upsert (legacy DBF migration endpoints)
+
+**Example:**
+
+```json
+{
+  "created": 0,
+  "updated": 0,
+  "skipped": 0,
+  "errors": [
+    {
+      "row": 2,
+      "message": ""
+    }
+  ]
+}
+```
+
+### ClienteImportEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`created` (required)**
 
     `integer`
 
-  - **`condIva`**
+  - **`errors` (required)**
 
-    `string`
+    `array`
 
-  - **`cpost`**
+    **Items:**
 
-    `string`
+    - **`message` (required)**
 
-  - **`creditDays`**
+      `string`
 
-    `integer`, default: `0` — Usual credit days for this customer.
+    - **`row` (required)**
 
-  - **`creditLimit`**
+      `integer` — Data row number in the file (row 1 is the header)
 
-    `number` — Credit limit in ARS. null = no limit.
-
-  - **`cuit`**
-
-    `string`
-
-  - **`deliveryZoneId`**
-
-    `integer` — FK to DeliveryZone. Assign a delivery zone to this customer.
-
-  - **`domicilio`**
-
-    `string`
-
-  - **`email`**
-
-    `string`
-
-  - **`fantasia`**
-
-    `string`
-
-  - **`id`**
+  - **`skipped` (required)**
 
     `integer`
 
-  - **`localidad`**
+  - **`updated`**
 
-    `string`
-
-  - **`rsocial`**
-
-    `string`
-
-  - **`score`**
-
-    `integer`, default: `50` — Payment score 0-100 (50=neutral, 0=high risk, 100=perfect).
-
-  - **`suspended`**
-
-    `boolean`, default: `false` — When true, POST /api/facturas returns 422 CLIENT\_SUSPENDED.
-
-  - **`telef`**
-
-    `string`
+    `integer` — Rows updated via upsert (legacy DBF migration endpoints)
 
 * **`success` (required)**
 
@@ -5410,32 +36991,51 @@ Returns boolean flags for each channel. No sensitive values are exposed.
 ```json
 {
   "success": true,
-  "data": [
-    {
-      "id": 1,
-      "codigo": 1,
-      "rsocial": "",
-      "fantasia": "",
-      "cuit": "",
-      "condIva": "",
-      "domicilio": "",
-      "localidad": "",
-      "cpost": "",
-      "telef": "",
-      "email": "",
-      "activo": true,
-      "creditLimit": 1,
-      "creditDays": 0,
-      "balance": 0,
-      "balanceInicial": 0,
-      "score": 50,
-      "suspended": false,
-      "deliveryZoneId": 1,
-      "additionalProperty": "anything"
-    }
-  ]
+  "data": {
+    "created": 0,
+    "updated": 0,
+    "skipped": 0,
+    "errors": [
+      {
+        "row": 2,
+        "message": ""
+      }
+    ]
+  }
 }
 ```
+
+### ListPaginationMeta
+
+- **Type:**`object`
+
+* **`limit` (required)**
+
+  `integer` — Effective page size (same semantics as query \`limit\`)
+
+* **`offset` (required)**
+
+  `integer` — Effective skip (same semantics as query \`offset\`)
+
+* **`total` (required)**
+
+  `integer` — Row count matching the list filter (before limit/offset)
+
+**Example:**
+
+```json
+{
+  "total": 0,
+  "limit": 1,
+  "offset": 0
+}
+```
+
+### ClienteListEnvelope
+
+- **Type:**
+
+**Example:**
 
 ### ClienteEnvelope
 
@@ -5594,6 +37194,4568 @@ Returns boolean flags for each channel. No sensitive values are exposed.
     "deliveryZoneId": 1,
     "additionalProperty": "anything"
   }
+}
+```
+
+### Cobro
+
+- **Type:**`object`
+
+* **`cliente`**
+
+  `object`
+
+  - **`codigo`**
+
+    `integer`
+
+  - **`id`**
+
+    `integer`
+
+  - **`rsocial`**
+
+    `string`
+
+* **`clienteId`**
+
+  `integer`
+
+* **`fecha`**
+
+  `string`, format: `date-time`
+
+* **`formaPagoId`**
+
+  `integer`
+
+* **`id`**
+
+  `integer`
+
+* **`monto`**
+
+  `number`
+
+* **`nota`**
+
+  `string`
+
+* **`referencia`**
+
+  `string`
+
+* **`tenantId`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "tenantId": 1,
+  "clienteId": 1,
+  "fecha": "",
+  "monto": 1,
+  "formaPagoId": 1,
+  "referencia": "",
+  "nota": "",
+  "cliente": {
+    "id": 1,
+    "codigo": 1,
+    "rsocial": "",
+    "additionalProperty": "anything"
+  },
+  "additionalProperty": "anything"
+}
+```
+
+### CobroInput
+
+- **Type:**`object`
+
+* **`clienteId` (required)**
+
+  `integer`
+
+* **`fecha` (required)**
+
+  `string` — YYYY-MM-DD or ISO-8601
+
+* **`monto` (required)**
+
+  `number`
+
+* **`formaPagoId`**
+
+  `integer`
+
+* **`nota`**
+
+  `string`
+
+* **`referencia`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "clienteId": 1,
+  "fecha": "",
+  "monto": 1,
+  "formaPagoId": 1,
+  "referencia": "",
+  "nota": ""
+}
+```
+
+### CobroListEnvelope
+
+- **Type:**
+
+**Example:**
+
+### CobroEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`cliente`**
+
+    `object`
+
+    - **`codigo`**
+
+      `integer`
+
+    - **`id`**
+
+      `integer`
+
+    - **`rsocial`**
+
+      `string`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`fecha`**
+
+    `string`, format: `date-time`
+
+  - **`formaPagoId`**
+
+    `integer`
+
+  - **`id`**
+
+    `integer`
+
+  - **`monto`**
+
+    `number`
+
+  - **`nota`**
+
+    `string`
+
+  - **`referencia`**
+
+    `string`
+
+  - **`tenantId`**
+
+    `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "clienteId": 1,
+    "fecha": "",
+    "monto": 1,
+    "formaPagoId": 1,
+    "referencia": "",
+    "nota": "",
+    "cliente": {
+      "id": 1,
+      "codigo": 1,
+      "rsocial": "",
+      "additionalProperty": "anything"
+    },
+    "additionalProperty": "anything"
+  }
+}
+```
+
+### CobroCreateData
+
+- **Type:**`object`
+
+* **`cobro` (required)**
+
+  `object`
+
+  - **`cliente`**
+
+    `object`
+
+    - **`codigo`**
+
+      `integer`
+
+    - **`id`**
+
+      `integer`
+
+    - **`rsocial`**
+
+      `string`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`fecha`**
+
+    `string`, format: `date-time`
+
+  - **`formaPagoId`**
+
+    `integer`
+
+  - **`id`**
+
+    `integer`
+
+  - **`monto`**
+
+    `number`
+
+  - **`nota`**
+
+    `string`
+
+  - **`referencia`**
+
+    `string`
+
+  - **`tenantId`**
+
+    `integer`
+
+* **`updatedCliente` (required)**
+
+  `object`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`score` (required)**
+
+    `integer`
+
+  - **`balance`**
+
+    `number`
+
+  - **`creditLimit`**
+
+    `number`
+
+  - **`rsocial`**
+
+    `string`
+
+**Example:**
+
+```json
+{
+  "cobro": {
+    "id": 1,
+    "tenantId": 1,
+    "clienteId": 1,
+    "fecha": "",
+    "monto": 1,
+    "formaPagoId": 1,
+    "referencia": "",
+    "nota": "",
+    "cliente": {
+      "id": 1,
+      "codigo": 1,
+      "rsocial": "",
+      "additionalProperty": "anything"
+    },
+    "additionalProperty": "anything"
+  },
+  "updatedCliente": {
+    "id": 1,
+    "rsocial": "",
+    "balance": 1,
+    "creditLimit": 1,
+    "score": 0,
+    "additionalProperty": "anything"
+  }
+}
+```
+
+### CobroCreateEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`cobro` (required)**
+
+    `object`
+
+    - **`cliente`**
+
+      `object`
+
+      - **`codigo`**
+
+        `integer`
+
+      - **`id`**
+
+        `integer`
+
+      - **`rsocial`**
+
+        `string`
+
+    - **`clienteId`**
+
+      `integer`
+
+    - **`fecha`**
+
+      `string`, format: `date-time`
+
+    - **`formaPagoId`**
+
+      `integer`
+
+    - **`id`**
+
+      `integer`
+
+    - **`monto`**
+
+      `number`
+
+    - **`nota`**
+
+      `string`
+
+    - **`referencia`**
+
+      `string`
+
+    - **`tenantId`**
+
+      `integer`
+
+  - **`updatedCliente` (required)**
+
+    `object`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`score` (required)**
+
+      `integer`
+
+    - **`balance`**
+
+      `number`
+
+    - **`creditLimit`**
+
+      `number`
+
+    - **`rsocial`**
+
+      `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "cobro": {
+      "id": 1,
+      "tenantId": 1,
+      "clienteId": 1,
+      "fecha": "",
+      "monto": 1,
+      "formaPagoId": 1,
+      "referencia": "",
+      "nota": "",
+      "cliente": {
+        "id": 1,
+        "codigo": 1,
+        "rsocial": "",
+        "additionalProperty": "anything"
+      },
+      "additionalProperty": "anything"
+    },
+    "updatedCliente": {
+      "id": 1,
+      "rsocial": "",
+      "balance": 1,
+      "creditLimit": 1,
+      "score": 0,
+      "additionalProperty": "anything"
+    }
+  }
+}
+```
+
+### FacturaVencidaRow
+
+- **Type:**`object`
+
+* **`clienteId` (required)**
+
+  `integer`
+
+* **`diasMora` (required)**
+
+  `integer`
+
+* **`facturaId` (required)**
+
+  `integer`
+
+* **`fecha` (required)**
+
+  `string`, format: `date-time`
+
+* **`rsocial` (required)**
+
+  `string`
+
+* **`total` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "facturaId": 1,
+  "clienteId": 1,
+  "rsocial": "",
+  "total": "",
+  "fecha": "",
+  "diasMora": 1
+}
+```
+
+### CobranzasVencidasEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`clienteId` (required)**
+
+    `integer`
+
+  - **`diasMora` (required)**
+
+    `integer`
+
+  - **`facturaId` (required)**
+
+    `integer`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`rsocial` (required)**
+
+    `string`
+
+  - **`total` (required)**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "facturaId": 1,
+      "clienteId": 1,
+      "rsocial": "",
+      "total": "",
+      "fecha": "",
+      "diasMora": 1
+    }
+  ]
+}
+```
+
+### CobranzaRecordatorioInput
+
+- **Type:**`object`
+
+* **`facturaId` (required)**
+
+  `integer`
+
+* **`canal`**
+
+  `string`, default: `"email"`
+
+**Example:**
+
+```json
+{
+  "facturaId": 1,
+  "canal": "email"
+}
+```
+
+### CobranzaRecordatorioEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`id` (required)**
+
+    `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1
+  }
+}
+```
+
+### OrdenEntrega
+
+- **Type:**`object`
+
+* **`cliente`**
+
+  `object`
+
+* **`clienteId`**
+
+  `integer`
+
+* **`dispatchedAt`**
+
+  `string`, format: `date-time` — When the order entered in\_transit (ADR-0011).
+
+* **`dispatchTimestampSource`**
+
+  `string`, possible values: `"event", "estimated"` — How dispatchedAt was derived (audit event vs estimated from updatedAt).
+
+* **`driver`**
+
+  `object`
+
+* **`driverId`**
+
+  `integer`
+
+* **`estado`**
+
+  `string`, possible values: `"pending", "picking", "ready", "assigned", "in_transit", "delivered", "failed", "cancelled"`
+
+* **`factura`**
+
+  `object`
+
+* **`facturaId`**
+
+  `integer`
+
+* **`fecha`**
+
+  `string`, format: `date-time`
+
+* **`id`**
+
+  `integer`
+
+* **`items`**
+
+  `array`
+
+  **Items:**
+
+  - **`articulo` (required)**
+
+    `object`
+
+    - **`codigo` (required)**
+
+      `integer`
+
+    - **`descripcion` (required)**
+
+      `string`
+
+    - **`id` (required)**
+
+      `integer`
+
+  - **`cantidad` (required)**
+
+    `integer`
+
+  - **`id` (required)**
+
+    `integer`
+
+* **`nota`**
+
+  `string`
+
+* **`picker`**
+
+  `object`
+
+* **`pickerUserId`**
+
+  `integer`
+
+* **`pickingIniciadoAt`**
+
+  `string`, format: `date-time`
+
+* **`pickingListoAt`**
+
+  `string`, format: `date-time`
+
+* **`tenantId`**
+
+  `integer`
+
+* **`zona`**
+
+  `object`
+
+* **`zonaId`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "tenantId": 1,
+  "facturaId": 1,
+  "clienteId": 1,
+  "zonaId": 1,
+  "driverId": 1,
+  "pickerUserId": 1,
+  "pickingIniciadoAt": "",
+  "pickingListoAt": "",
+  "fecha": "",
+  "estado": "pending",
+  "nota": "",
+  "dispatchedAt": "",
+  "dispatchTimestampSource": "event",
+  "items": [
+    {
+      "id": 1,
+      "cantidad": 1,
+      "articulo": {
+        "id": 1,
+        "codigo": 1,
+        "descripcion": ""
+      }
+    }
+  ],
+  "cliente": {
+    "additionalProperty": "anything"
+  },
+  "zona": {
+    "additionalProperty": "anything"
+  },
+  "driver": {
+    "additionalProperty": "anything"
+  },
+  "factura": {
+    "additionalProperty": "anything"
+  },
+  "picker": {
+    "additionalProperty": "anything"
+  },
+  "additionalProperty": "anything"
+}
+```
+
+### OrdenEntregaLineItem
+
+- **Type:**`object`
+
+* **`articulo` (required)**
+
+  `object`
+
+  - **`codigo` (required)**
+
+    `integer`
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`id` (required)**
+
+    `integer`
+
+* **`cantidad` (required)**
+
+  `integer`
+
+* **`id` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "cantidad": 1,
+  "articulo": {
+    "id": 1,
+    "codigo": 1,
+    "descripcion": ""
+  }
+}
+```
+
+### OrdenEntregaCreateInput
+
+- **Type:**`object`
+
+* **`clienteId` (required)**
+
+  `integer`
+
+* **`fecha` (required)**
+
+  `string`
+
+* **`driverId`**
+
+  `integer`
+
+* **`facturaId`**
+
+  `integer`
+
+* **`nota`**
+
+  `string`
+
+* **`zonaId`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "clienteId": 1,
+  "fecha": "",
+  "facturaId": 1,
+  "zonaId": 1,
+  "driverId": 1,
+  "nota": ""
+}
+```
+
+### OrdenEntregaUpdateInput
+
+- **Type:**`object`
+
+* **`estado` (required)**
+
+  `string`, possible values: `"pending", "picking", "ready", "assigned", "in_transit", "delivered", "failed", "cancelled"`
+
+* **`driverId`**
+
+  `integer`
+
+* **`nota`**
+
+  `string`
+
+* **`zonaId`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "estado": "pending",
+  "driverId": 1,
+  "zonaId": 1,
+  "nota": ""
+}
+```
+
+### OrdenEntregaListEnvelope
+
+- **Type:**
+
+**Example:**
+
+### OrdenEntregaEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`cliente`**
+
+    `object`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`dispatchedAt`**
+
+    `string`, format: `date-time` — When the order entered in\_transit (ADR-0011).
+
+  - **`dispatchTimestampSource`**
+
+    `string`, possible values: `"event", "estimated"` — How dispatchedAt was derived (audit event vs estimated from updatedAt).
+
+  - **`driver`**
+
+    `object`
+
+  - **`driverId`**
+
+    `integer`
+
+  - **`estado`**
+
+    `string`, possible values: `"pending", "picking", "ready", "assigned", "in_transit", "delivered", "failed", "cancelled"`
+
+  - **`factura`**
+
+    `object`
+
+  - **`facturaId`**
+
+    `integer`
+
+  - **`fecha`**
+
+    `string`, format: `date-time`
+
+  - **`id`**
+
+    `integer`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+    - **`articulo` (required)**
+
+      `object`
+
+      - **`codigo` (required)**
+
+        `integer`
+
+      - **`descripcion` (required)**
+
+        `string`
+
+      - **`id` (required)**
+
+        `integer`
+
+    - **`cantidad` (required)**
+
+      `integer`
+
+    - **`id` (required)**
+
+      `integer`
+
+  - **`nota`**
+
+    `string`
+
+  - **`picker`**
+
+    `object`
+
+  - **`pickerUserId`**
+
+    `integer`
+
+  - **`pickingIniciadoAt`**
+
+    `string`, format: `date-time`
+
+  - **`pickingListoAt`**
+
+    `string`, format: `date-time`
+
+  - **`tenantId`**
+
+    `integer`
+
+  - **`zona`**
+
+    `object`
+
+  - **`zonaId`**
+
+    `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "facturaId": 1,
+    "clienteId": 1,
+    "zonaId": 1,
+    "driverId": 1,
+    "pickerUserId": 1,
+    "pickingIniciadoAt": "",
+    "pickingListoAt": "",
+    "fecha": "",
+    "estado": "pending",
+    "nota": "",
+    "dispatchedAt": "",
+    "dispatchTimestampSource": "event",
+    "items": [
+      {
+        "id": 1,
+        "cantidad": 1,
+        "articulo": {
+          "id": 1,
+          "codigo": 1,
+          "descripcion": ""
+        }
+      }
+    ],
+    "cliente": {
+      "additionalProperty": "anything"
+    },
+    "zona": {
+      "additionalProperty": "anything"
+    },
+    "driver": {
+      "additionalProperty": "anything"
+    },
+    "factura": {
+      "additionalProperty": "anything"
+    },
+    "picker": {
+      "additionalProperty": "anything"
+    },
+    "additionalProperty": "anything"
+  }
+}
+```
+
+### AgingBucket
+
+- **Type:**`object`
+
+* **`count` (required)**
+
+  `integer`
+
+* **`label` (required)**
+
+  `string`, possible values: `"0-30d", "31-60d", "61-90d", ">90d"`
+
+* **`total` (required)**
+
+  `string` — Decimal amount as string (two fractional digits)
+
+**Example:**
+
+```json
+{
+  "label": "0-30d",
+  "count": 0,
+  "total": ""
+}
+```
+
+### AgingArResumen
+
+- **Type:**`object`
+
+* **`clientesSuspendidos` (required)**
+
+  `integer`
+
+* **`deudaPorVencer` (required)**
+
+  `string`
+
+* **`deudaVencida` (required)**
+
+  `string`
+
+* **`porcentajeMora` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "deudaVencida": "",
+  "deudaPorVencer": "",
+  "porcentajeMora": "",
+  "clientesSuspendidos": 0
+}
+```
+
+### AgingAr
+
+- **Type:**`object`
+
+* **`buckets` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`count` (required)**
+
+    `integer`
+
+  - **`label` (required)**
+
+    `string`, possible values: `"0-30d", "31-60d", "61-90d", ">90d"`
+
+  - **`total` (required)**
+
+    `string` — Decimal amount as string (two fractional digits)
+
+* **`resumen` (required)**
+
+  `object`
+
+  - **`clientesSuspendidos` (required)**
+
+    `integer`
+
+  - **`deudaPorVencer` (required)**
+
+    `string`
+
+  - **`deudaVencida` (required)**
+
+    `string`
+
+  - **`porcentajeMora` (required)**
+
+    `string`
+
+* **`totalDeuda` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "buckets": [
+    {
+      "label": "0-30d",
+      "count": 0,
+      "total": ""
+    }
+  ],
+  "totalDeuda": "",
+  "resumen": {
+    "deudaVencida": "",
+    "deudaPorVencer": "",
+    "porcentajeMora": "",
+    "clientesSuspendidos": 0
+  }
+}
+```
+
+### AgingArEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`buckets` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`count` (required)**
+
+      `integer`
+
+    - **`label` (required)**
+
+      `string`, possible values: `"0-30d", "31-60d", "61-90d", ">90d"`
+
+    - **`total` (required)**
+
+      `string` — Decimal amount as string (two fractional digits)
+
+  - **`resumen` (required)**
+
+    `object`
+
+    - **`clientesSuspendidos` (required)**
+
+      `integer`
+
+    - **`deudaPorVencer` (required)**
+
+      `string`
+
+    - **`deudaVencida` (required)**
+
+      `string`
+
+    - **`porcentajeMora` (required)**
+
+      `string`
+
+  - **`totalDeuda` (required)**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "buckets": [
+      {
+        "label": "0-30d",
+        "count": 0,
+        "total": ""
+      }
+    ],
+    "totalDeuda": "",
+    "resumen": {
+      "deudaVencida": "",
+      "deudaPorVencer": "",
+      "porcentajeMora": "",
+      "clientesSuspendidos": 0
+    }
+  }
+}
+```
+
+### ReporteVentasRow
+
+- **Type:**`object`
+
+* **`count` (required)**
+
+  `integer`
+
+* **`iva1` (required)**
+
+  `string`
+
+* **`iva2` (required)**
+
+  `string`
+
+* **`neto1` (required)**
+
+  `string`
+
+* **`neto2` (required)**
+
+  `string`
+
+* **`periodo` (required)**
+
+  `string` — Bucket key (YYYY-MM-DD, YYYY-MM, or week Monday date)
+
+* **`total` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "periodo": "",
+  "count": 0,
+  "total": "",
+  "neto1": "",
+  "neto2": "",
+  "iva1": "",
+  "iva2": ""
+}
+```
+
+### ReporteVentasListEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`count` (required)**
+
+    `integer`
+
+  - **`iva1` (required)**
+
+    `string`
+
+  - **`iva2` (required)**
+
+    `string`
+
+  - **`neto1` (required)**
+
+    `string`
+
+  - **`neto2` (required)**
+
+    `string`
+
+  - **`periodo` (required)**
+
+    `string` — Bucket key (YYYY-MM-DD, YYYY-MM, or week Monday date)
+
+  - **`total` (required)**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "periodo": "",
+      "count": 0,
+      "total": "",
+      "neto1": "",
+      "neto2": "",
+      "iva1": "",
+      "iva2": ""
+    }
+  ]
+}
+```
+
+### LogisticaReturnReasonRow
+
+- **Type:**`object`
+
+* **`count` (required)**
+
+  `integer`
+
+* **`motivo` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "motivo": "",
+  "count": 0
+}
+```
+
+### LogisticaKpis
+
+- **Type:**`object`
+
+* **`avgDeliveryMinutes` (required)**
+
+  `number`
+
+* **`dispatchedCount` (required)**
+
+  `integer`
+
+* **`firstVisitDeliveredCount` (required)**
+
+  `integer`
+
+* **`firstVisitRate` (required)**
+
+  `number`
+
+* **`overdueCount` (required)**
+
+  `integer`
+
+* **`returnsByReason` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`count` (required)**
+
+    `integer`
+
+  - **`motivo` (required)**
+
+    `string`
+
+**Example:**
+
+```json
+{
+  "dispatchedCount": 0,
+  "firstVisitDeliveredCount": 0,
+  "firstVisitRate": 0,
+  "avgDeliveryMinutes": 1,
+  "returnsByReason": [
+    {
+      "motivo": "",
+      "count": 0
+    }
+  ],
+  "overdueCount": 0
+}
+```
+
+### LogisticaKpisEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`avgDeliveryMinutes` (required)**
+
+    `number`
+
+  - **`dispatchedCount` (required)**
+
+    `integer`
+
+  - **`firstVisitDeliveredCount` (required)**
+
+    `integer`
+
+  - **`firstVisitRate` (required)**
+
+    `number`
+
+  - **`overdueCount` (required)**
+
+    `integer`
+
+  - **`returnsByReason` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`count` (required)**
+
+      `integer`
+
+    - **`motivo` (required)**
+
+      `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "dispatchedCount": 0,
+    "firstVisitDeliveredCount": 0,
+    "firstVisitRate": 0,
+    "avgDeliveryMinutes": 1,
+    "returnsByReason": [
+      {
+        "motivo": "",
+        "count": 0
+      }
+    ],
+    "overdueCount": 0
+  }
+}
+```
+
+### LogisticaChoferRow
+
+- **Type:**`object`
+
+* **`choferId` (required)**
+
+  `integer`
+
+* **`choferUsername` (required)**
+
+  `string`
+
+* **`day` (required)**
+
+  `string`, format: `date`
+
+* **`delivered` (required)**
+
+  `integer`
+
+* **`dispatched` (required)**
+
+  `integer`
+
+* **`notDelivered` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "choferId": 1,
+  "choferUsername": "",
+  "day": "",
+  "dispatched": 0,
+  "delivered": 0,
+  "notDelivered": 0
+}
+```
+
+### LogisticaChoferesListEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`choferId` (required)**
+
+    `integer`
+
+  - **`choferUsername` (required)**
+
+    `string`
+
+  - **`day` (required)**
+
+    `string`, format: `date`
+
+  - **`delivered` (required)**
+
+    `integer`
+
+  - **`dispatched` (required)**
+
+    `integer`
+
+  - **`notDelivered` (required)**
+
+    `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "choferId": 1,
+      "choferUsername": "",
+      "day": "",
+      "dispatched": 0,
+      "delivered": 0,
+      "notDelivered": 0
+    }
+  ]
+}
+```
+
+### LogisticaZonaRow
+
+- **Type:**`object`
+
+* **`delivered` (required)**
+
+  `integer`
+
+* **`dispatched` (required)**
+
+  `integer`
+
+* **`notDelivered` (required)**
+
+  `integer`
+
+* **`zonaId` (required)**
+
+  `integer`
+
+* **`zonaNombre` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "zonaId": 1,
+  "zonaNombre": "",
+  "dispatched": 0,
+  "delivered": 0,
+  "notDelivered": 0
+}
+```
+
+### LogisticaZonasListEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`delivered` (required)**
+
+    `integer`
+
+  - **`dispatched` (required)**
+
+    `integer`
+
+  - **`notDelivered` (required)**
+
+    `integer`
+
+  - **`zonaId` (required)**
+
+    `integer`
+
+  - **`zonaNombre` (required)**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "zonaId": 1,
+      "zonaNombre": "",
+      "dispatched": 0,
+      "delivered": 0,
+      "notDelivered": 0
+    }
+  ]
+}
+```
+
+### StockCriticoArticulo
+
+- **Type:**`object`
+
+* **`codigo` (required)**
+
+  `integer`
+
+* **`descripcion` (required)**
+
+  `string`
+
+* **`id` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "codigo": 1,
+  "descripcion": ""
+}
+```
+
+### StockCriticoRow
+
+- **Type:**`object`
+
+* **`articulo` (required)**
+
+  `object`
+
+  - **`codigo` (required)**
+
+    `integer`
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`id` (required)**
+
+    `integer`
+
+* **`deficit` (required)**
+
+  `integer`
+
+* **`minimo` (required)**
+
+  `integer`
+
+* **`stock` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "articulo": {
+    "id": 1,
+    "codigo": 1,
+    "descripcion": ""
+  },
+  "stock": 1,
+  "minimo": 1,
+  "deficit": 0
+}
+```
+
+### StockCriticoListEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`articulo` (required)**
+
+    `object`
+
+    - **`codigo` (required)**
+
+      `integer`
+
+    - **`descripcion` (required)**
+
+      `string`
+
+    - **`id` (required)**
+
+      `integer`
+
+  - **`deficit` (required)**
+
+    `integer`
+
+  - **`minimo` (required)**
+
+    `integer`
+
+  - **`stock` (required)**
+
+    `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "articulo": {
+        "id": 1,
+        "codigo": 1,
+        "descripcion": ""
+      },
+      "stock": 1,
+      "minimo": 1,
+      "deficit": 0
+    }
+  ]
+}
+```
+
+### CobranzasPorFormaPago
+
+- **Type:**`object`
+
+* **`descripcion` (required)**
+
+  `string`
+
+* **`total` (required)**
+
+  `string`
+
+* **`formaPagoId`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "formaPagoId": 1,
+  "descripcion": "",
+  "total": ""
+}
+```
+
+### ReporteCobranzasRow
+
+- **Type:**`object`
+
+* **`count` (required)**
+
+  `integer`
+
+* **`fecha` (required)**
+
+  `string` — Calendar day YYYY-MM-DD (server local)
+
+* **`porFormaPago` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`total` (required)**
+
+    `string`
+
+  - **`formaPagoId`**
+
+    `integer`
+
+* **`total` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "fecha": "",
+  "count": 0,
+  "total": "",
+  "porFormaPago": [
+    {
+      "formaPagoId": 1,
+      "descripcion": "",
+      "total": ""
+    }
+  ]
+}
+```
+
+### ReporteCobranzasListEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`count` (required)**
+
+    `integer`
+
+  - **`fecha` (required)**
+
+    `string` — Calendar day YYYY-MM-DD (server local)
+
+  - **`porFormaPago` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`descripcion` (required)**
+
+      `string`
+
+    - **`total` (required)**
+
+      `string`
+
+    - **`formaPagoId`**
+
+      `integer`
+
+  - **`total` (required)**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "fecha": "",
+      "count": 0,
+      "total": "",
+      "porFormaPago": [
+        {
+          "formaPagoId": 1,
+          "descripcion": "",
+          "total": ""
+        }
+      ]
+    }
+  ]
+}
+```
+
+### CuentaCorrienteLine
+
+- **Type:**`object`
+
+* **`credito` (required)**
+
+  `string`
+
+* **`debito` (required)**
+
+  `string`
+
+* **`fecha` (required)**
+
+  `string` — ISO-8601 timestamp (empty for saldo\_inicial)
+
+* **`referencia` (required)**
+
+  `string`
+
+* **`saldo` (required)**
+
+  `string`
+
+* **`tipo` (required)**
+
+  `string`, possible values: `"factura", "cobro", "saldo_inicial"`
+
+* **`cobroId`**
+
+  `integer`
+
+* **`facturaId`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "tipo": "factura",
+  "fecha": "",
+  "referencia": "",
+  "debito": "",
+  "credito": "",
+  "saldo": "",
+  "facturaId": 1,
+  "cobroId": 1
+}
+```
+
+### CuentaCorriente
+
+- **Type:**`object`
+
+* **`balanceActual` (required)**
+
+  `string`
+
+* **`clienteId` (required)**
+
+  `integer`
+
+* **`codigo` (required)**
+
+  `integer`
+
+* **`lineas` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`credito` (required)**
+
+    `string`
+
+  - **`debito` (required)**
+
+    `string`
+
+  - **`fecha` (required)**
+
+    `string` — ISO-8601 timestamp (empty for saldo\_inicial)
+
+  - **`referencia` (required)**
+
+    `string`
+
+  - **`saldo` (required)**
+
+    `string`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura", "cobro", "saldo_inicial"`
+
+  - **`cobroId`**
+
+    `integer`
+
+  - **`facturaId`**
+
+    `integer`
+
+* **`rsocial` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "clienteId": 1,
+  "codigo": 1,
+  "rsocial": "",
+  "balanceActual": "",
+  "lineas": [
+    {
+      "tipo": "factura",
+      "fecha": "",
+      "referencia": "",
+      "debito": "",
+      "credito": "",
+      "saldo": "",
+      "facturaId": 1,
+      "cobroId": 1
+    }
+  ]
+}
+```
+
+### CuentaCorrienteEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`balanceActual` (required)**
+
+    `string`
+
+  - **`clienteId` (required)**
+
+    `integer`
+
+  - **`codigo` (required)**
+
+    `integer`
+
+  - **`lineas` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`credito` (required)**
+
+      `string`
+
+    - **`debito` (required)**
+
+      `string`
+
+    - **`fecha` (required)**
+
+      `string` — ISO-8601 timestamp (empty for saldo\_inicial)
+
+    - **`referencia` (required)**
+
+      `string`
+
+    - **`saldo` (required)**
+
+      `string`
+
+    - **`tipo` (required)**
+
+      `string`, possible values: `"factura", "cobro", "saldo_inicial"`
+
+    - **`cobroId`**
+
+      `integer`
+
+    - **`facturaId`**
+
+      `integer`
+
+  - **`rsocial` (required)**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "clienteId": 1,
+    "codigo": 1,
+    "rsocial": "",
+    "balanceActual": "",
+    "lineas": [
+      {
+        "tipo": "factura",
+        "fecha": "",
+        "referencia": "",
+        "debito": "",
+        "credito": "",
+        "saldo": "",
+        "facturaId": 1,
+        "cobroId": 1
+      }
+    ]
+  }
+}
+```
+
+### MovimientoProveedorCC
+
+- **Type:**`object`
+
+* **`fecha` (required)**
+
+  `string`, format: `date-time`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`monto` (required)**
+
+  `string`
+
+* **`saldoPost` (required)**
+
+  `string`
+
+* **`tipo` (required)**
+
+  `string`, possible values: `"factura_compra", "pago", "nc_proveedor", "ajuste"`
+
+* **`usuarioId` (required)**
+
+  `integer`
+
+* **`notas`**
+
+  `string`
+
+* **`referencia`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "tipo": "factura_compra",
+  "referencia": "",
+  "monto": "",
+  "saldoPost": "",
+  "fecha": "",
+  "usuarioId": 1,
+  "notas": ""
+}
+```
+
+### ProveedorCuentaCorrienteChartPoint
+
+- **Type:**`object`
+
+* **`period` (required)**
+
+  `string` — YYYY-MM month bucket
+
+* **`saldo` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "period": "",
+  "saldo": ""
+}
+```
+
+### ProveedorCuentaCorriente
+
+- **Type:**`object`
+
+* **`codigo` (required)**
+
+  `integer`
+
+* **`excedeLimite` (required)**
+
+  `boolean`
+
+* **`movimientos` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`monto` (required)**
+
+    `string`
+
+  - **`saldoPost` (required)**
+
+    `string`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_compra", "pago", "nc_proveedor", "ajuste"`
+
+  - **`usuarioId` (required)**
+
+    `integer`
+
+  - **`notas`**
+
+    `string`
+
+  - **`referencia`**
+
+    `string`
+
+* **`proveedorId` (required)**
+
+  `integer`
+
+* **`rsocial` (required)**
+
+  `string`
+
+* **`saldo` (required)**
+
+  `string`
+
+* **`serie` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`period` (required)**
+
+    `string` — YYYY-MM month bucket
+
+  - **`saldo` (required)**
+
+    `string`
+
+* **`limiteCredito`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "proveedorId": 1,
+  "codigo": 1,
+  "rsocial": "",
+  "saldo": "",
+  "limiteCredito": "",
+  "excedeLimite": true,
+  "movimientos": [
+    {
+      "id": 1,
+      "tipo": "factura_compra",
+      "referencia": "",
+      "monto": "",
+      "saldoPost": "",
+      "fecha": "",
+      "usuarioId": 1,
+      "notas": ""
+    }
+  ],
+  "serie": [
+    {
+      "period": "",
+      "saldo": ""
+    }
+  ]
+}
+```
+
+### ProveedorCuentaCorrienteSaldo
+
+- **Type:**`object`
+
+* **`excedeLimite` (required)**
+
+  `boolean`
+
+* **`proveedorId` (required)**
+
+  `integer`
+
+* **`saldo` (required)**
+
+  `string`
+
+* **`limiteCredito`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "proveedorId": 1,
+  "saldo": "",
+  "limiteCredito": "",
+  "excedeLimite": true
+}
+```
+
+### ProveedorCuentaCorrienteAjusteInput
+
+- **Type:**`object`
+
+* **`monto` (required)**
+
+  `number` — Non-zero; positive increases debt, negative reduces debt
+
+* **`motivo` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "monto": 1,
+  "motivo": ""
+}
+```
+
+### ProveedorCompraEstadoPago
+
+- **Type:**`string`
+
+**Example:**
+
+### ProveedorCompraRow
+
+- **Type:**`object`
+
+* **`estadoPago` (required)**
+
+  `string`, possible values: `"pendiente", "parcial", "pagada", "n_a"`
+
+* **`fecha` (required)**
+
+  `string`, format: `date-time`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`referencia` (required)**
+
+  `string`
+
+* **`tipo` (required)**
+
+  `string`, possible values: `"orden_compra", "comprobante"`
+
+* **`total` (required)**
+
+  `string`
+
+* **`estado`**
+
+  `string` — OC lifecycle state when tipo is orden\_compra
+
+* **`ordenCompraId`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "tipo": "orden_compra",
+  "id": 1,
+  "fecha": "",
+  "referencia": "",
+  "total": "",
+  "estadoPago": "pendiente",
+  "ordenCompraId": 1,
+  "estado": ""
+}
+```
+
+### ProveedorHistorialTopArticulo
+
+- **Type:**`object`
+
+* **`articuloId` (required)**
+
+  `integer`
+
+* **`cantidadTotal` (required)**
+
+  `integer`
+
+* **`codigo` (required)**
+
+  `string`
+
+* **`descripcion` (required)**
+
+  `string`
+
+* **`montoTotal` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "articuloId": 1,
+  "codigo": "",
+  "descripcion": "",
+  "cantidadTotal": 1,
+  "montoTotal": ""
+}
+```
+
+### ProveedorHistorialResumen
+
+- **Type:**`object`
+
+* **`cantidadCompras` (required)**
+
+  `integer`
+
+* **`compras` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`estadoPago` (required)**
+
+    `string`, possible values: `"pendiente", "parcial", "pagada", "n_a"`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`referencia` (required)**
+
+    `string`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"orden_compra", "comprobante"`
+
+  - **`total` (required)**
+
+    `string`
+
+  - **`estado`**
+
+    `string` — OC lifecycle state when tipo is orden\_compra
+
+  - **`ordenCompraId`**
+
+    `integer`
+
+* **`frecuenciaCompraDias` (required)**
+
+  `integer`
+
+* **`periodoDias` (required)**
+
+  `integer`, possible values: `30, 90, 180, 365`
+
+* **`topArticulos` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`cantidadTotal` (required)**
+
+    `integer`
+
+  - **`codigo` (required)**
+
+    `string`
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`montoTotal` (required)**
+
+    `string`
+
+* **`totalComprado` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "periodoDias": 30,
+  "totalComprado": "",
+  "frecuenciaCompraDias": 1,
+  "cantidadCompras": 1,
+  "topArticulos": [
+    {
+      "articuloId": 1,
+      "codigo": "",
+      "descripcion": "",
+      "cantidadTotal": 1,
+      "montoTotal": ""
+    }
+  ],
+  "compras": [
+    {
+      "tipo": "orden_compra",
+      "id": 1,
+      "fecha": "",
+      "referencia": "",
+      "total": "",
+      "estadoPago": "pendiente",
+      "ordenCompraId": 1,
+      "estado": ""
+    }
+  ]
+}
+```
+
+### ProveedorHistorialEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`cantidadCompras` (required)**
+
+    `integer`
+
+  - **`compras` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`estadoPago` (required)**
+
+      `string`, possible values: `"pendiente", "parcial", "pagada", "n_a"`
+
+    - **`fecha` (required)**
+
+      `string`, format: `date-time`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`referencia` (required)**
+
+      `string`
+
+    - **`tipo` (required)**
+
+      `string`, possible values: `"orden_compra", "comprobante"`
+
+    - **`total` (required)**
+
+      `string`
+
+    - **`estado`**
+
+      `string` — OC lifecycle state when tipo is orden\_compra
+
+    - **`ordenCompraId`**
+
+      `integer`
+
+  - **`frecuenciaCompraDias` (required)**
+
+    `integer`
+
+  - **`periodoDias` (required)**
+
+    `integer`, possible values: `30, 90, 180, 365`
+
+  - **`topArticulos` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId` (required)**
+
+      `integer`
+
+    - **`cantidadTotal` (required)**
+
+      `integer`
+
+    - **`codigo` (required)**
+
+      `string`
+
+    - **`descripcion` (required)**
+
+      `string`
+
+    - **`montoTotal` (required)**
+
+      `string`
+
+  - **`totalComprado` (required)**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "periodoDias": 30,
+    "totalComprado": "",
+    "frecuenciaCompraDias": 1,
+    "cantidadCompras": 1,
+    "topArticulos": [
+      {
+        "articuloId": 1,
+        "codigo": "",
+        "descripcion": "",
+        "cantidadTotal": 1,
+        "montoTotal": ""
+      }
+    ],
+    "compras": [
+      {
+        "tipo": "orden_compra",
+        "id": 1,
+        "fecha": "",
+        "referencia": "",
+        "total": "",
+        "estadoPago": "pendiente",
+        "ordenCompraId": 1,
+        "estado": ""
+      }
+    ]
+  }
+}
+```
+
+### ProveedorArticuloPrecioPunto
+
+- **Type:**`object`
+
+* **`cantidad` (required)**
+
+  `integer`
+
+* **`fecha` (required)**
+
+  `string`, format: `date-time`
+
+* **`precioUnitario` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "fecha": "",
+  "precioUnitario": "",
+  "cantidad": 1
+}
+```
+
+### ProveedorArticuloHistorialRow
+
+- **Type:**`object`
+
+* **`articuloId` (required)**
+
+  `integer`
+
+* **`cantidadTotal` (required)**
+
+  `integer`
+
+* **`codigo` (required)**
+
+  `string`
+
+* **`descripcion` (required)**
+
+  `string`
+
+* **`evolucionPrecios` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`cantidad` (required)**
+
+    `integer`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`precioUnitario` (required)**
+
+    `string`
+
+* **`montoTotal` (required)**
+
+  `string`
+
+* **`precioPromedioPonderado` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "articuloId": 1,
+  "codigo": "",
+  "descripcion": "",
+  "cantidadTotal": 1,
+  "precioPromedioPonderado": "",
+  "montoTotal": "",
+  "evolucionPrecios": [
+    {
+      "fecha": "",
+      "precioUnitario": "",
+      "cantidad": 1
+    }
+  ]
+}
+```
+
+### ProveedorArticulosHistorialData
+
+- **Type:**`object`
+
+* **`articulos` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`cantidadTotal` (required)**
+
+    `integer`
+
+  - **`codigo` (required)**
+
+    `string`
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`evolucionPrecios` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`cantidad` (required)**
+
+      `integer`
+
+    - **`fecha` (required)**
+
+      `string`, format: `date-time`
+
+    - **`precioUnitario` (required)**
+
+      `string`
+
+  - **`montoTotal` (required)**
+
+    `string`
+
+  - **`precioPromedioPonderado` (required)**
+
+    `string`
+
+**Example:**
+
+```json
+{
+  "articulos": [
+    {
+      "articuloId": 1,
+      "codigo": "",
+      "descripcion": "",
+      "cantidadTotal": 1,
+      "precioPromedioPonderado": "",
+      "montoTotal": "",
+      "evolucionPrecios": [
+        {
+          "fecha": "",
+          "precioUnitario": "",
+          "cantidad": 1
+        }
+      ]
+    }
+  ]
+}
+```
+
+### ProveedorArticulosHistorialEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`articulos` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId` (required)**
+
+      `integer`
+
+    - **`cantidadTotal` (required)**
+
+      `integer`
+
+    - **`codigo` (required)**
+
+      `string`
+
+    - **`descripcion` (required)**
+
+      `string`
+
+    - **`evolucionPrecios` (required)**
+
+      `array`
+
+      **Items:**
+
+      - **`cantidad` (required)**
+
+        `integer`
+
+      - **`fecha` (required)**
+
+        `string`, format: `date-time`
+
+      - **`precioUnitario` (required)**
+
+        `string`
+
+    - **`montoTotal` (required)**
+
+      `string`
+
+    - **`precioPromedioPonderado` (required)**
+
+      `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "articulos": [
+      {
+        "articuloId": 1,
+        "codigo": "",
+        "descripcion": "",
+        "cantidadTotal": 1,
+        "precioPromedioPonderado": "",
+        "montoTotal": "",
+        "evolucionPrecios": [
+          {
+            "fecha": "",
+            "precioUnitario": "",
+            "cantidad": 1
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+### ProveedorCatalogoArticuloRef
+
+- **Type:**`object`
+
+* **`codigo` (required)**
+
+  `integer`
+
+* **`descripcion` (required)**
+
+  `string`
+
+* **`id` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "codigo": 1,
+  "descripcion": ""
+}
+```
+
+### ProveedorCatalogoRow
+
+- **Type:**`object`
+
+* **`activo` (required)**
+
+  `boolean`
+
+* **`articulo` (required)**
+
+  `object`
+
+  - **`codigo` (required)**
+
+    `integer`
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`id` (required)**
+
+    `integer`
+
+* **`articuloId` (required)**
+
+  `integer`
+
+* **`codigoProveedor` (required)**
+
+  `string`
+
+* **`descripcion` (required)**
+
+  `string`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`multiplo` (required)**
+
+  `string`
+
+* **`precioLista` (required)**
+
+  `string`
+
+* **`precioListaFecha` (required)**
+
+  `string`, format: `date-time`
+
+* **`unidadCompra` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "articuloId": 1,
+  "codigoProveedor": "",
+  "descripcion": "",
+  "precioLista": "",
+  "precioListaFecha": "",
+  "unidadCompra": "",
+  "multiplo": "",
+  "activo": true,
+  "articulo": {
+    "id": 1,
+    "codigo": 1,
+    "descripcion": ""
+  }
+}
+```
+
+### ProveedorCatalogoListData
+
+- **Type:**`object`
+
+* **`items` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`activo` (required)**
+
+    `boolean`
+
+  - **`articulo` (required)**
+
+    `object`
+
+    - **`codigo` (required)**
+
+      `integer`
+
+    - **`descripcion` (required)**
+
+      `string`
+
+    - **`id` (required)**
+
+      `integer`
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`codigoProveedor` (required)**
+
+    `string`
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`multiplo` (required)**
+
+    `string`
+
+  - **`precioLista` (required)**
+
+    `string`
+
+  - **`precioListaFecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`unidadCompra` (required)**
+
+    `string`
+
+**Example:**
+
+```json
+{
+  "items": [
+    {
+      "id": 1,
+      "articuloId": 1,
+      "codigoProveedor": "",
+      "descripcion": "",
+      "precioLista": "",
+      "precioListaFecha": "",
+      "unidadCompra": "",
+      "multiplo": "",
+      "activo": true,
+      "articulo": {
+        "id": 1,
+        "codigo": 1,
+        "descripcion": ""
+      }
+    }
+  ]
+}
+```
+
+### ProveedorCatalogoListEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`items` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`activo` (required)**
+
+      `boolean`
+
+    - **`articulo` (required)**
+
+      `object`
+
+      - **`codigo` (required)**
+
+        `integer`
+
+      - **`descripcion` (required)**
+
+        `string`
+
+      - **`id` (required)**
+
+        `integer`
+
+    - **`articuloId` (required)**
+
+      `integer`
+
+    - **`codigoProveedor` (required)**
+
+      `string`
+
+    - **`descripcion` (required)**
+
+      `string`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`multiplo` (required)**
+
+      `string`
+
+    - **`precioLista` (required)**
+
+      `string`
+
+    - **`precioListaFecha` (required)**
+
+      `string`, format: `date-time`
+
+    - **`unidadCompra` (required)**
+
+      `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "items": [
+      {
+        "id": 1,
+        "articuloId": 1,
+        "codigoProveedor": "",
+        "descripcion": "",
+        "precioLista": "",
+        "precioListaFecha": "",
+        "unidadCompra": "",
+        "multiplo": "",
+        "activo": true,
+        "articulo": {
+          "id": 1,
+          "codigo": 1,
+          "descripcion": ""
+        }
+      }
+    ]
+  }
+}
+```
+
+### ProveedorCatalogoEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`activo` (required)**
+
+    `boolean`
+
+  - **`articulo` (required)**
+
+    `object`
+
+    - **`codigo` (required)**
+
+      `integer`
+
+    - **`descripcion` (required)**
+
+      `string`
+
+    - **`id` (required)**
+
+      `integer`
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`codigoProveedor` (required)**
+
+    `string`
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`multiplo` (required)**
+
+    `string`
+
+  - **`precioLista` (required)**
+
+    `string`
+
+  - **`precioListaFecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`unidadCompra` (required)**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "articuloId": 1,
+    "codigoProveedor": "",
+    "descripcion": "",
+    "precioLista": "",
+    "precioListaFecha": "",
+    "unidadCompra": "",
+    "multiplo": "",
+    "activo": true,
+    "articulo": {
+      "id": 1,
+      "codigo": 1,
+      "descripcion": ""
+    }
+  }
+}
+```
+
+### ProveedorCatalogoInput
+
+- **Type:**`object`
+
+* **`articuloId` (required)**
+
+  `integer`
+
+* **`codigoProveedor` (required)**
+
+  `string`
+
+* **`activo`**
+
+  `boolean`
+
+* **`descripcion`**
+
+  `string`
+
+* **`multiplo`**
+
+  `number`
+
+* **`precioLista`**
+
+  `number`
+
+* **`unidadCompra`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "articuloId": 1,
+  "codigoProveedor": "",
+  "descripcion": "",
+  "precioLista": 0,
+  "unidadCompra": "",
+  "multiplo": 1,
+  "activo": true
+}
+```
+
+### ProveedorCatalogoUpdateInput
+
+- **Type:**`object`
+
+* **`activo`**
+
+  `boolean`
+
+* **`codigoProveedor`**
+
+  `string`
+
+* **`descripcion`**
+
+  `string`
+
+* **`multiplo`**
+
+  `number`
+
+* **`precioLista`**
+
+  `number`
+
+* **`unidadCompra`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "codigoProveedor": "",
+  "descripcion": "",
+  "precioLista": 0,
+  "unidadCompra": "",
+  "multiplo": 1,
+  "activo": true
+}
+```
+
+### ProveedorCatalogoImportError
+
+- **Type:**`object`
+
+* **`message` (required)**
+
+  `string`
+
+* **`row` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "row": 1,
+  "message": ""
+}
+```
+
+### ProveedorCatalogoImportData
+
+- **Type:**`object`
+
+* **`created` (required)**
+
+  `integer`
+
+* **`errors` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`message` (required)**
+
+    `string`
+
+  - **`row` (required)**
+
+    `integer`
+
+* **`skipped` (required)**
+
+  `integer`
+
+* **`updated` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "created": 1,
+  "updated": 1,
+  "skipped": 1,
+  "errors": [
+    {
+      "row": 1,
+      "message": ""
+    }
+  ]
+}
+```
+
+### ProveedorCatalogoImportEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`created` (required)**
+
+    `integer`
+
+  - **`errors` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`message` (required)**
+
+      `string`
+
+    - **`row` (required)**
+
+      `integer`
+
+  - **`skipped` (required)**
+
+    `integer`
+
+  - **`updated` (required)**
+
+    `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "created": 1,
+    "updated": 1,
+    "skipped": 1,
+    "errors": [
+      {
+        "row": 1,
+        "message": ""
+      }
+    ]
+  }
+}
+```
+
+### ArticuloProveedorComparadorRow
+
+- **Type:**`object`
+
+* **`codigoProveedor` (required)**
+
+  `string`
+
+* **`descripcionProveedor` (required)**
+
+  `string`
+
+* **`esMasBarato` (required)**
+
+  `boolean`
+
+* **`precioDesactualizado` (required)**
+
+  `boolean`
+
+* **`precioLista` (required)**
+
+  `string`
+
+* **`precioListaFecha` (required)**
+
+  `string`, format: `date-time`
+
+* **`proveedorCodigo` (required)**
+
+  `integer`
+
+* **`proveedorId` (required)**
+
+  `integer`
+
+* **`proveedorRsocial` (required)**
+
+  `string`
+
+* **`ultimaCompraFecha` (required)**
+
+  `string`, format: `date-time`
+
+**Example:**
+
+```json
+{
+  "proveedorId": 1,
+  "proveedorCodigo": 1,
+  "proveedorRsocial": "",
+  "codigoProveedor": "",
+  "descripcionProveedor": "",
+  "precioLista": "",
+  "precioListaFecha": "",
+  "precioDesactualizado": true,
+  "ultimaCompraFecha": "",
+  "esMasBarato": true
+}
+```
+
+### ArticuloProveedoresComparadorData
+
+- **Type:**`object`
+
+* **`articuloCodigo` (required)**
+
+  `integer`
+
+* **`articuloDescripcion` (required)**
+
+  `string`
+
+* **`articuloId` (required)**
+
+  `integer`
+
+* **`proveedores` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`codigoProveedor` (required)**
+
+    `string`
+
+  - **`descripcionProveedor` (required)**
+
+    `string`
+
+  - **`esMasBarato` (required)**
+
+    `boolean`
+
+  - **`precioDesactualizado` (required)**
+
+    `boolean`
+
+  - **`precioLista` (required)**
+
+    `string`
+
+  - **`precioListaFecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`proveedorCodigo` (required)**
+
+    `integer`
+
+  - **`proveedorId` (required)**
+
+    `integer`
+
+  - **`proveedorRsocial` (required)**
+
+    `string`
+
+  - **`ultimaCompraFecha` (required)**
+
+    `string`, format: `date-time`
+
+* **`proveedorMasBaratoId` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "articuloId": 1,
+  "articuloCodigo": 1,
+  "articuloDescripcion": "",
+  "proveedorMasBaratoId": 1,
+  "proveedores": [
+    {
+      "proveedorId": 1,
+      "proveedorCodigo": 1,
+      "proveedorRsocial": "",
+      "codigoProveedor": "",
+      "descripcionProveedor": "",
+      "precioLista": "",
+      "precioListaFecha": "",
+      "precioDesactualizado": true,
+      "ultimaCompraFecha": "",
+      "esMasBarato": true
+    }
+  ]
+}
+```
+
+### ArticuloProveedoresComparadorEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`articuloCodigo` (required)**
+
+    `integer`
+
+  - **`articuloDescripcion` (required)**
+
+    `string`
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`proveedores` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`codigoProveedor` (required)**
+
+      `string`
+
+    - **`descripcionProveedor` (required)**
+
+      `string`
+
+    - **`esMasBarato` (required)**
+
+      `boolean`
+
+    - **`precioDesactualizado` (required)**
+
+      `boolean`
+
+    - **`precioLista` (required)**
+
+      `string`
+
+    - **`precioListaFecha` (required)**
+
+      `string`, format: `date-time`
+
+    - **`proveedorCodigo` (required)**
+
+      `integer`
+
+    - **`proveedorId` (required)**
+
+      `integer`
+
+    - **`proveedorRsocial` (required)**
+
+      `string`
+
+    - **`ultimaCompraFecha` (required)**
+
+      `string`, format: `date-time`
+
+  - **`proveedorMasBaratoId` (required)**
+
+    `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "articuloId": 1,
+    "articuloCodigo": 1,
+    "articuloDescripcion": "",
+    "proveedorMasBaratoId": 1,
+    "proveedores": [
+      {
+        "proveedorId": 1,
+        "proveedorCodigo": 1,
+        "proveedorRsocial": "",
+        "codigoProveedor": "",
+        "descripcionProveedor": "",
+        "precioLista": "",
+        "precioListaFecha": "",
+        "precioDesactualizado": true,
+        "ultimaCompraFecha": "",
+        "esMasBarato": true
+      }
+    ]
+  }
+}
+```
+
+### ProveedorCuentaCorrienteEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`codigo` (required)**
+
+    `integer`
+
+  - **`excedeLimite` (required)**
+
+    `boolean`
+
+  - **`movimientos` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`fecha` (required)**
+
+      `string`, format: `date-time`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`monto` (required)**
+
+      `string`
+
+    - **`saldoPost` (required)**
+
+      `string`
+
+    - **`tipo` (required)**
+
+      `string`, possible values: `"factura_compra", "pago", "nc_proveedor", "ajuste"`
+
+    - **`usuarioId` (required)**
+
+      `integer`
+
+    - **`notas`**
+
+      `string`
+
+    - **`referencia`**
+
+      `string`
+
+  - **`proveedorId` (required)**
+
+    `integer`
+
+  - **`rsocial` (required)**
+
+    `string`
+
+  - **`saldo` (required)**
+
+    `string`
+
+  - **`serie` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`period` (required)**
+
+      `string` — YYYY-MM month bucket
+
+    - **`saldo` (required)**
+
+      `string`
+
+  - **`limiteCredito`**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "proveedorId": 1,
+    "codigo": 1,
+    "rsocial": "",
+    "saldo": "",
+    "limiteCredito": "",
+    "excedeLimite": true,
+    "movimientos": [
+      {
+        "id": 1,
+        "tipo": "factura_compra",
+        "referencia": "",
+        "monto": "",
+        "saldoPost": "",
+        "fecha": "",
+        "usuarioId": 1,
+        "notas": ""
+      }
+    ],
+    "serie": [
+      {
+        "period": "",
+        "saldo": ""
+      }
+    ]
+  }
+}
+```
+
+### ProveedorCuentaCorrienteSaldoEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`excedeLimite` (required)**
+
+    `boolean`
+
+  - **`proveedorId` (required)**
+
+    `integer`
+
+  - **`saldo` (required)**
+
+    `string`
+
+  - **`limiteCredito`**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "proveedorId": 1,
+    "saldo": "",
+    "limiteCredito": "",
+    "excedeLimite": true
+  }
+}
+```
+
+### MovimientoProveedorCCEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`monto` (required)**
+
+    `string`
+
+  - **`saldoPost` (required)**
+
+    `string`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_compra", "pago", "nc_proveedor", "ajuste"`
+
+  - **`usuarioId` (required)**
+
+    `integer`
+
+  - **`notas`**
+
+    `string`
+
+  - **`referencia`**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tipo": "factura_compra",
+    "referencia": "",
+    "monto": "",
+    "saldoPost": "",
+    "fecha": "",
+    "usuarioId": 1,
+    "notas": ""
+  }
+}
+```
+
+### ReciboPagoFactura
+
+- **Type:**`object`
+
+* **`facturaRef` (required)**
+
+  `string`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`monto` (required)**
+
+  `string`
+
+* **`comprobanteCompraId`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "comprobanteCompraId": 1,
+  "facturaRef": "",
+  "monto": ""
+}
+```
+
+### ReciboPago
+
+- **Type:**`object`
+
+* **`createdAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`estado` (required)**
+
+  `string`, possible values: `"emitido", "anulado"`
+
+* **`facturas` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`facturaRef` (required)**
+
+    `string`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`monto` (required)**
+
+    `string`
+
+  - **`comprobanteCompraId`**
+
+    `integer`
+
+* **`fecha` (required)**
+
+  `string`, format: `date-time`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`metodoPago` (required)**
+
+  `string`, possible values: `"transferencia", "cheque", "efectivo", "echeq"`
+
+* **`numero` (required)**
+
+  `integer`
+
+* **`proveedor` (required)**
+
+  `object`
+
+  - **`codigo` (required)**
+
+    `integer`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`rsocial` (required)**
+
+    `string`
+
+  - **`cuit`**
+
+    `string`
+
+* **`proveedorId` (required)**
+
+  `integer`
+
+* **`total` (required)**
+
+  `string`
+
+* **`usuario` (required)**
+
+  `object`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`username` (required)**
+
+    `string`
+
+* **`usuarioId` (required)**
+
+  `integer`
+
+* **`cbu`**
+
+  `string`
+
+* **`notas`**
+
+  `string`
+
+* **`referencia`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "numero": 1,
+  "proveedorId": 1,
+  "fecha": "",
+  "total": "",
+  "metodoPago": "transferencia",
+  "cbu": "",
+  "referencia": "",
+  "estado": "emitido",
+  "notas": "",
+  "usuarioId": 1,
+  "proveedor": {
+    "id": 1,
+    "codigo": 1,
+    "rsocial": "",
+    "cuit": ""
+  },
+  "usuario": {
+    "id": 1,
+    "username": ""
+  },
+  "facturas": [
+    {
+      "id": 1,
+      "comprobanteCompraId": 1,
+      "facturaRef": "",
+      "monto": ""
+    }
+  ],
+  "createdAt": ""
+}
+```
+
+### ReciboPagoInput
+
+- **Type:**`object`
+
+* **`facturas` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`facturaRef` (required)**
+
+    `string`
+
+  - **`monto` (required)**
+
+    `number`
+
+  - **`comprobanteCompraId`**
+
+    `integer`
+
+* **`fecha` (required)**
+
+  `string`
+
+* **`metodoPago` (required)**
+
+  `string`, possible values: `"transferencia", "cheque", "efectivo", "echeq"`
+
+* **`total` (required)**
+
+  `number`
+
+* **`cbu`**
+
+  `string`
+
+* **`notas`**
+
+  `string`
+
+* **`referencia`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "fecha": "",
+  "total": 1,
+  "metodoPago": "transferencia",
+  "cbu": "",
+  "referencia": "",
+  "notas": "",
+  "facturas": [
+    {
+      "comprobanteCompraId": 1,
+      "facturaRef": "",
+      "monto": 1
+    }
+  ]
+}
+```
+
+### ComprobantePendiente
+
+- **Type:**`object`
+
+* **`comprobanteCompraId` (required)**
+
+  `integer`
+
+* **`facturaRef` (required)**
+
+  `string`
+
+* **`fecha` (required)**
+
+  `string`, format: `date-time`
+
+* **`pagado` (required)**
+
+  `string`
+
+* **`pendiente` (required)**
+
+  `string`
+
+* **`total` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "comprobanteCompraId": 1,
+  "facturaRef": "",
+  "fecha": "",
+  "total": "",
+  "pagado": "",
+  "pendiente": ""
+}
+```
+
+### ReciboPagoListEnvelope
+
+- **Type:**
+
+**Example:**
+
+### ReciboPagoEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"emitido", "anulado"`
+
+  - **`facturas` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`facturaRef` (required)**
+
+      `string`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`monto` (required)**
+
+      `string`
+
+    - **`comprobanteCompraId`**
+
+      `integer`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`metodoPago` (required)**
+
+    `string`, possible values: `"transferencia", "cheque", "efectivo", "echeq"`
+
+  - **`numero` (required)**
+
+    `integer`
+
+  - **`proveedor` (required)**
+
+    `object`
+
+    - **`codigo` (required)**
+
+      `integer`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`rsocial` (required)**
+
+      `string`
+
+    - **`cuit`**
+
+      `string`
+
+  - **`proveedorId` (required)**
+
+    `integer`
+
+  - **`total` (required)**
+
+    `string`
+
+  - **`usuario` (required)**
+
+    `object`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`username` (required)**
+
+      `string`
+
+  - **`usuarioId` (required)**
+
+    `integer`
+
+  - **`cbu`**
+
+    `string`
+
+  - **`notas`**
+
+    `string`
+
+  - **`referencia`**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "numero": 1,
+    "proveedorId": 1,
+    "fecha": "",
+    "total": "",
+    "metodoPago": "transferencia",
+    "cbu": "",
+    "referencia": "",
+    "estado": "emitido",
+    "notas": "",
+    "usuarioId": 1,
+    "proveedor": {
+      "id": 1,
+      "codigo": 1,
+      "rsocial": "",
+      "cuit": ""
+    },
+    "usuario": {
+      "id": 1,
+      "username": ""
+    },
+    "facturas": [
+      {
+        "id": 1,
+        "comprobanteCompraId": 1,
+        "facturaRef": "",
+        "monto": ""
+      }
+    ],
+    "createdAt": ""
+  }
+}
+```
+
+### ComprobantePendienteListEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`comprobanteCompraId` (required)**
+
+    `integer`
+
+  - **`facturaRef` (required)**
+
+    `string`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`pagado` (required)**
+
+    `string`
+
+  - **`pendiente` (required)**
+
+    `string`
+
+  - **`total` (required)**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "comprobanteCompraId": 1,
+      "facturaRef": "",
+      "fecha": "",
+      "total": "",
+      "pagado": "",
+      "pendiente": ""
+    }
+  ]
 }
 ```
 
@@ -5759,112 +41921,9 @@ Returns boolean flags for each channel. No sensitive values are exposed.
 
 ### ArticuloListEnvelope
 
-- **Type:**`object`
-
-* **`data` (required)**
-
-  `array`
-
-  **Items:**
-
-  - **`activo`**
-
-    `boolean`
-
-  - **`codigo`**
-
-    `integer`
-
-  - **`condIva`**
-
-    `string`
-
-  - **`costo`**
-
-    `number`
-
-  - **`descripcion`**
-
-    `string`
-
-  - **`id`**
-
-    `integer`
-
-  - **`minimo`**
-
-    `integer`
-
-  - **`precioLista1`**
-
-    `number`
-
-  - **`precioLista2`**
-
-    `number`
-
-  - **`rubro`**
-
-    `object`
-
-    - **`codigo`**
-
-      `integer`
-
-    - **`id`**
-
-      `integer`
-
-    - **`nombre`**
-
-      `string`
-
-  - **`rubroId`**
-
-    `integer`
-
-  - **`stock`**
-
-    `integer`
-
-  - **`umedida`**
-
-    `string`
-
-* **`success` (required)**
-
-  `boolean`
+- **Type:**
 
 **Example:**
-
-```json
-{
-  "success": true,
-  "data": [
-    {
-      "id": 1,
-      "codigo": 1,
-      "descripcion": "",
-      "rubroId": 1,
-      "rubro": {
-        "id": 1,
-        "codigo": 1,
-        "nombre": "",
-        "additionalProperty": "anything"
-      },
-      "condIva": "",
-      "umedida": "",
-      "precioLista1": 1,
-      "precioLista2": 1,
-      "costo": 1,
-      "stock": 1,
-      "minimo": 1,
-      "activo": true,
-      "additionalProperty": "anything"
-    }
-  ]
-}
-```
 
 ### ArticuloEnvelope
 
@@ -6012,6 +42071,287 @@ Returns boolean flags for each channel. No sensitive values are exposed.
 }
 ```
 
+### StockAjusteInput
+
+- **Type:**`object`
+
+* **`cantidad` (required)**
+
+  `integer`
+
+* **`motivo` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "cantidad": 1,
+  "motivo": ""
+}
+```
+
+### StockAjusteUser
+
+- **Type:**`object`
+
+* **`id`**
+
+  `integer`
+
+* **`username`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "username": ""
+}
+```
+
+### StockAjuste
+
+- **Type:**`object`
+
+* **`articuloId`**
+
+  `integer`
+
+* **`cantidad`**
+
+  `integer`
+
+* **`createdAt`**
+
+  `string`, format: `date-time`
+
+* **`id`**
+
+  `integer`
+
+* **`motivo`**
+
+  `string`
+
+* **`user`**
+
+  `object`
+
+  - **`id`**
+
+    `integer`
+
+  - **`username`**
+
+    `string`
+
+* **`userId`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "articuloId": 1,
+  "cantidad": 1,
+  "motivo": "",
+  "userId": 1,
+  "createdAt": "",
+  "user": {
+    "id": 1,
+    "username": ""
+  },
+  "additionalProperty": "anything"
+}
+```
+
+### StockAdjustData
+
+- **Type:**`object`
+
+* **`ajuste`**
+
+  `object`
+
+  - **`articuloId`**
+
+    `integer`
+
+  - **`cantidad`**
+
+    `integer`
+
+  - **`createdAt`**
+
+    `string`, format: `date-time`
+
+  - **`id`**
+
+    `integer`
+
+  - **`motivo`**
+
+    `string`
+
+  - **`user`**
+
+    `object`
+
+    - **`id`**
+
+      `integer`
+
+    - **`username`**
+
+      `string`
+
+  - **`userId`**
+
+    `integer`
+
+* **`articulo`**
+
+  `object`
+
+* **`stockAfter`**
+
+  `integer`
+
+* **`stockBefore`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "ajuste": {
+    "id": 1,
+    "articuloId": 1,
+    "cantidad": 1,
+    "motivo": "",
+    "userId": 1,
+    "createdAt": "",
+    "user": {
+      "id": 1,
+      "username": ""
+    },
+    "additionalProperty": "anything"
+  },
+  "articulo": {
+    "additionalProperty": "anything"
+  },
+  "stockBefore": 1,
+  "stockAfter": 1,
+  "additionalProperty": "anything"
+}
+```
+
+### StockAdjustEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`ajuste`**
+
+    `object`
+
+    - **`articuloId`**
+
+      `integer`
+
+    - **`cantidad`**
+
+      `integer`
+
+    - **`createdAt`**
+
+      `string`, format: `date-time`
+
+    - **`id`**
+
+      `integer`
+
+    - **`motivo`**
+
+      `string`
+
+    - **`user`**
+
+      `object`
+
+      - **`id`**
+
+        `integer`
+
+      - **`username`**
+
+        `string`
+
+    - **`userId`**
+
+      `integer`
+
+  - **`articulo`**
+
+    `object`
+
+  - **`stockAfter`**
+
+    `integer`
+
+  - **`stockBefore`**
+
+    `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "ajuste": {
+      "id": 1,
+      "articuloId": 1,
+      "cantidad": 1,
+      "motivo": "",
+      "userId": 1,
+      "createdAt": "",
+      "user": {
+        "id": 1,
+        "username": ""
+      },
+      "additionalProperty": "anything"
+    },
+    "articulo": {
+      "additionalProperty": "anything"
+    },
+    "stockBefore": 1,
+    "stockAfter": 1,
+    "additionalProperty": "anything"
+  }
+}
+```
+
+### StockAjusteListEnvelope
+
+- **Type:**
+
+**Example:**
+
 ### Rubro
 
 - **Type:**`object`
@@ -6062,45 +42402,9 @@ Returns boolean flags for each channel. No sensitive values are exposed.
 
 ### RubroListEnvelope
 
-- **Type:**`object`
-
-* **`data` (required)**
-
-  `array`
-
-  **Items:**
-
-  - **`codigo`**
-
-    `integer`
-
-  - **`id`**
-
-    `integer`
-
-  - **`nombre`**
-
-    `string`
-
-* **`success` (required)**
-
-  `boolean`
+- **Type:**
 
 **Example:**
-
-```json
-{
-  "success": true,
-  "data": [
-    {
-      "id": 1,
-      "codigo": 1,
-      "nombre": "",
-      "additionalProperty": "anything"
-    }
-  ]
-}
-```
 
 ### RubroEnvelope
 
@@ -6140,9 +42444,3357 @@ Returns boolean flags for each channel. No sensitive values are exposed.
 }
 ```
 
+### ProveedorInput
+
+- **Type:**`object`
+
+* **`activo` (required)**
+
+  `boolean`
+
+* **`codigo` (required)**
+
+  `integer`
+
+* **`condIva` (required)**
+
+  `string`, possible values: `"RI", "Mono", "CF", "Exento"`
+
+* **`rsocial` (required)**
+
+  `string`
+
+* **`alias`**
+
+  `string`
+
+* **`banco`**
+
+  `string`
+
+* **`categoria`**
+
+  `string`, possible values: `"materia_prima", "insumos", "servicios", "logistica"`
+
+* **`cbu`**
+
+  `string`
+
+* **`condicionPago`**
+
+  `string`, possible values: `"contado", "15dias", "30dias", "60dias", "otro"`
+
+* **`contactoEmail`**
+
+  `string`
+
+* **`contactoNombre`**
+
+  `string`
+
+* **`contactoTel`**
+
+  `string`
+
+* **`cuit`**
+
+  `string`
+
+* **`descuentoPct`**
+
+  `number`
+
+* **`email`**
+
+  `string`
+
+* **`fantasia`**
+
+  `string`
+
+* **`limiteCredito`**
+
+  `number`
+
+* **`moneda`**
+
+  `string`, default: `"ARS"`
+
+* **`notas`**
+
+  `string`
+
+* **`plazoHabitual`**
+
+  `integer`
+
+* **`telef`**
+
+  `string`
+
+* **`tipoCuenta`**
+
+  `string`, possible values: `"cc", "ca"`
+
+**Example:**
+
+```json
+{
+  "codigo": 1,
+  "rsocial": "",
+  "fantasia": "",
+  "cuit": "",
+  "condIva": "RI",
+  "telef": "",
+  "email": "",
+  "activo": true,
+  "cbu": "",
+  "alias": "",
+  "banco": "",
+  "tipoCuenta": "cc",
+  "moneda": "ARS",
+  "condicionPago": "contado",
+  "plazoHabitual": 0,
+  "descuentoPct": 1,
+  "limiteCredito": 1,
+  "categoria": "materia_prima",
+  "contactoNombre": "",
+  "contactoEmail": "",
+  "contactoTel": "",
+  "notas": ""
+}
+```
+
+### Proveedor
+
+- **Type:**`object`
+
+* **`activo`**
+
+  `boolean`
+
+* **`alias`**
+
+  `string`
+
+* **`banco`**
+
+  `string`
+
+* **`categoria`**
+
+  `string`
+
+* **`cbu`**
+
+  `string`
+
+* **`codigo`**
+
+  `integer`
+
+* **`condicionPago`**
+
+  `string`
+
+* **`condIva`**
+
+  `string`
+
+* **`contactoEmail`**
+
+  `string`
+
+* **`contactoNombre`**
+
+  `string`
+
+* **`contactoTel`**
+
+  `string`
+
+* **`cuit`**
+
+  `string`
+
+* **`descuentoPct`**
+
+  `number`
+
+* **`email`**
+
+  `string`
+
+* **`fantasia`**
+
+  `string`
+
+* **`id`**
+
+  `integer`
+
+* **`limiteCredito`**
+
+  `number`
+
+* **`moneda`**
+
+  `string`
+
+* **`notas`**
+
+  `string`
+
+* **`plazoHabitual`**
+
+  `integer`
+
+* **`rsocial`**
+
+  `string`
+
+* **`telef`**
+
+  `string`
+
+* **`tipoCuenta`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "codigo": 1,
+  "rsocial": "",
+  "fantasia": "",
+  "cuit": "",
+  "condIva": "",
+  "telef": "",
+  "email": "",
+  "activo": true,
+  "cbu": "",
+  "alias": "",
+  "banco": "",
+  "tipoCuenta": "",
+  "moneda": "",
+  "condicionPago": "",
+  "plazoHabitual": 1,
+  "descuentoPct": 1,
+  "limiteCredito": 1,
+  "categoria": "",
+  "contactoNombre": "",
+  "contactoEmail": "",
+  "contactoTel": "",
+  "notas": "",
+  "additionalProperty": "anything"
+}
+```
+
+### ProveedorListEnvelope
+
+- **Type:**
+
+**Example:**
+
+### OrdenCompraItemLine
+
+- **Type:**`object`
+
+* **`articuloId` (required)**
+
+  `integer`
+
+* **`cantidad` (required)**
+
+  `integer`
+
+* **`cantidadRecibida` (required)**
+
+  `integer`
+
+* **`costoUnitario` (required)**
+
+  `string`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`subtotal` (required)**
+
+  `string`
+
+* **`articulo`**
+
+  `object`
+
+  - **`codigo`**
+
+    `integer`
+
+  - **`descripcion`**
+
+    `string`
+
+  - **`id`**
+
+    `integer`
+
+* **`codigoProveedor`**
+
+  `string` — Supplier catalog code snapshot (#323)
+
+* **`descripcionProveedor`**
+
+  `string` — Supplier catalog description snapshot (#323)
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "articuloId": 1,
+  "codigoProveedor": "",
+  "descripcionProveedor": "",
+  "cantidad": 1,
+  "cantidadRecibida": 1,
+  "costoUnitario": "",
+  "subtotal": "",
+  "articulo": {
+    "id": 1,
+    "codigo": 1,
+    "descripcion": ""
+  }
+}
+```
+
+### OrdenCompra
+
+- **Type:**`object`
+
+* **`estado` (required)**
+
+  `string`, possible values: `"draft", "sent", "received", "cancelled"`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`proveedorId` (required)**
+
+  `integer`
+
+* **`tenantId` (required)**
+
+  `integer`
+
+* **`total` (required)**
+
+  `string`
+
+* **`fechaEstimada`**
+
+  `string`, format: `date-time`
+
+* **`items`**
+
+  `array`
+
+  **Items:**
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`cantidad` (required)**
+
+    `integer`
+
+  - **`cantidadRecibida` (required)**
+
+    `integer`
+
+  - **`costoUnitario` (required)**
+
+    `string`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`subtotal` (required)**
+
+    `string`
+
+  - **`articulo`**
+
+    `object`
+
+    - **`codigo`**
+
+      `integer`
+
+    - **`descripcion`**
+
+      `string`
+
+    - **`id`**
+
+      `integer`
+
+  - **`codigoProveedor`**
+
+    `string` — Supplier catalog code snapshot (#323)
+
+  - **`descripcionProveedor`**
+
+    `string` — Supplier catalog description snapshot (#323)
+
+* **`nota`**
+
+  `string`
+
+* **`proveedor`**
+
+  `object`
+
+  - **`codigo`**
+
+    `integer`
+
+  - **`id`**
+
+    `integer`
+
+  - **`rsocial`**
+
+    `string`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "tenantId": 1,
+  "proveedorId": 1,
+  "estado": "draft",
+  "total": "",
+  "fechaEstimada": "",
+  "nota": "",
+  "proveedor": {
+    "id": 1,
+    "codigo": 1,
+    "rsocial": ""
+  },
+  "items": [
+    {
+      "id": 1,
+      "articuloId": 1,
+      "codigoProveedor": "",
+      "descripcionProveedor": "",
+      "cantidad": 1,
+      "cantidadRecibida": 1,
+      "costoUnitario": "",
+      "subtotal": "",
+      "articulo": {
+        "id": 1,
+        "codigo": 1,
+        "descripcion": ""
+      }
+    }
+  ]
+}
+```
+
+### OrdenCompraListEnvelope
+
+- **Type:**
+
+**Example:**
+
+### OrdenCompraEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"draft", "sent", "received", "cancelled"`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`proveedorId` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`total` (required)**
+
+    `string`
+
+  - **`fechaEstimada`**
+
+    `string`, format: `date-time`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId` (required)**
+
+      `integer`
+
+    - **`cantidad` (required)**
+
+      `integer`
+
+    - **`cantidadRecibida` (required)**
+
+      `integer`
+
+    - **`costoUnitario` (required)**
+
+      `string`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`subtotal` (required)**
+
+      `string`
+
+    - **`articulo`**
+
+      `object`
+
+      - **`codigo`**
+
+        `integer`
+
+      - **`descripcion`**
+
+        `string`
+
+      - **`id`**
+
+        `integer`
+
+    - **`codigoProveedor`**
+
+      `string` — Supplier catalog code snapshot (#323)
+
+    - **`descripcionProveedor`**
+
+      `string` — Supplier catalog description snapshot (#323)
+
+  - **`nota`**
+
+    `string`
+
+  - **`proveedor`**
+
+    `object`
+
+    - **`codigo`**
+
+      `integer`
+
+    - **`id`**
+
+      `integer`
+
+    - **`rsocial`**
+
+      `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "proveedorId": 1,
+    "estado": "draft",
+    "total": "",
+    "fechaEstimada": "",
+    "nota": "",
+    "proveedor": {
+      "id": 1,
+      "codigo": 1,
+      "rsocial": ""
+    },
+    "items": [
+      {
+        "id": 1,
+        "articuloId": 1,
+        "codigoProveedor": "",
+        "descripcionProveedor": "",
+        "cantidad": 1,
+        "cantidadRecibida": 1,
+        "costoUnitario": "",
+        "subtotal": "",
+        "articulo": {
+          "id": 1,
+          "codigo": 1,
+          "descripcion": ""
+        }
+      }
+    ]
+  }
+}
+```
+
+### OrdenCompraItemInput
+
+- **Type:**`object`
+
+* **`articuloId` (required)**
+
+  `integer`
+
+* **`cantidad` (required)**
+
+  `integer`
+
+* **`costoUnitario` (required)**
+
+  `number`
+
+**Example:**
+
+```json
+{
+  "articuloId": 1,
+  "cantidad": 1,
+  "costoUnitario": 0
+}
+```
+
+### OrdenCompraCreateInput
+
+- **Type:**`object`
+
+* **`items` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`cantidad` (required)**
+
+    `integer`
+
+  - **`costoUnitario` (required)**
+
+    `number`
+
+* **`proveedorId` (required)**
+
+  `integer`
+
+* **`fechaEstimada`**
+
+  `string`, format: `date`
+
+* **`nota`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "proveedorId": 1,
+  "fechaEstimada": "",
+  "nota": "",
+  "items": [
+    {
+      "articuloId": 1,
+      "cantidad": 1,
+      "costoUnitario": 0
+    }
+  ]
+}
+```
+
+### OrdenCompraUpdateInput
+
+- **Type:**`object`
+
+* **`fechaEstimada`**
+
+  `string`, format: `date`
+
+* **`items`**
+
+  `array`
+
+  **Items:**
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`cantidad` (required)**
+
+    `integer`
+
+  - **`costoUnitario` (required)**
+
+    `number`
+
+* **`nota`**
+
+  `string`
+
+* **`proveedorId`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "proveedorId": 1,
+  "fechaEstimada": "",
+  "nota": "",
+  "items": [
+    {
+      "articuloId": 1,
+      "cantidad": 1,
+      "costoUnitario": 0
+    }
+  ]
+}
+```
+
+### OrdenCompraReceiveInput
+
+- **Type:**`object`
+
+* **`lines` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`cantidad` (required)**
+
+    `integer`
+
+  - **`itemId` (required)**
+
+    `integer`
+
+**Example:**
+
+```json
+{
+  "lines": [
+    {
+      "itemId": 1,
+      "cantidad": 1
+    }
+  ]
+}
+```
+
+### RecuentoItemLine
+
+- **Type:**`object`
+
+* **`articuloId` (required)**
+
+  `integer`
+
+* **`cantSistema` (required)**
+
+  `integer`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`articulo`**
+
+  `object`
+
+  - **`codigo`**
+
+    `integer`
+
+  - **`descripcion`**
+
+    `string`
+
+  - **`id`**
+
+    `integer`
+
+* **`cantFisica`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "articuloId": 1,
+  "cantSistema": 1,
+  "cantFisica": 1,
+  "articulo": {
+    "id": 1,
+    "codigo": 1,
+    "descripcion": ""
+  }
+}
+```
+
+### Recuento
+
+- **Type:**`object`
+
+* **`estado` (required)**
+
+  `string`, possible values: `"in_progress", "closed"`
+
+* **`fecha` (required)**
+
+  `string`, format: `date-time`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`items` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`cantSistema` (required)**
+
+    `integer`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`articulo`**
+
+    `object`
+
+    - **`codigo`**
+
+      `integer`
+
+    - **`descripcion`**
+
+      `string`
+
+    - **`id`**
+
+      `integer`
+
+  - **`cantFisica`**
+
+    `integer`
+
+* **`operadorId` (required)**
+
+  `integer`
+
+* **`closedAt`**
+
+  `string`, format: `date-time`
+
+* **`operador`**
+
+  `object`
+
+  - **`id`**
+
+    `integer`
+
+  - **`username`**
+
+    `string`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "operadorId": 1,
+  "estado": "in_progress",
+  "fecha": "",
+  "closedAt": "",
+  "operador": {
+    "id": 1,
+    "username": ""
+  },
+  "items": [
+    {
+      "id": 1,
+      "articuloId": 1,
+      "cantSistema": 1,
+      "cantFisica": 1,
+      "articulo": {
+        "id": 1,
+        "codigo": 1,
+        "descripcion": ""
+      }
+    }
+  ]
+}
+```
+
+### RecuentoListEnvelope
+
+- **Type:**
+
+**Example:**
+
+### RecuentoEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"in_progress", "closed"`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`items` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId` (required)**
+
+      `integer`
+
+    - **`cantSistema` (required)**
+
+      `integer`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`articulo`**
+
+      `object`
+
+      - **`codigo`**
+
+        `integer`
+
+      - **`descripcion`**
+
+        `string`
+
+      - **`id`**
+
+        `integer`
+
+    - **`cantFisica`**
+
+      `integer`
+
+  - **`operadorId` (required)**
+
+    `integer`
+
+  - **`closedAt`**
+
+    `string`, format: `date-time`
+
+  - **`operador`**
+
+    `object`
+
+    - **`id`**
+
+      `integer`
+
+    - **`username`**
+
+      `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "operadorId": 1,
+    "estado": "in_progress",
+    "fecha": "",
+    "closedAt": "",
+    "operador": {
+      "id": 1,
+      "username": ""
+    },
+    "items": [
+      {
+        "id": 1,
+        "articuloId": 1,
+        "cantSistema": 1,
+        "cantFisica": 1,
+        "articulo": {
+          "id": 1,
+          "codigo": 1,
+          "descripcion": ""
+        }
+      }
+    ]
+  }
+}
+```
+
+### RecuentoItemsInput
+
+- **Type:**`object`
+
+* **`lines` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`cantFisica` (required)**
+
+    `integer`
+
+**Example:**
+
+```json
+{
+  "lines": [
+    {
+      "articuloId": 1,
+      "cantFisica": 0
+    }
+  ]
+}
+```
+
+### RepartoProgress
+
+- **Type:**`object`
+
+* **`delivered` (required)**
+
+  `integer`
+
+* **`pending` (required)**
+
+  `integer`
+
+* **`total` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "total": 0,
+  "delivered": 0,
+  "pending": 0
+}
+```
+
+### RepartoItemLine
+
+- **Type:**`object`
+
+* **`estado` (required)**
+
+  `string`, possible values: `"pending", "delivered", "not_delivered", "returned"`
+
+* **`hasPod` (required)**
+
+  `boolean`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`ordenEntrega` (required)**
+
+  `object`
+
+  - **`cliente`**
+
+    `object`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`dispatchedAt`**
+
+    `string`, format: `date-time` — When the order entered in\_transit (ADR-0011).
+
+  - **`dispatchTimestampSource`**
+
+    `string`, possible values: `"event", "estimated"` — How dispatchedAt was derived (audit event vs estimated from updatedAt).
+
+  - **`driver`**
+
+    `object`
+
+  - **`driverId`**
+
+    `integer`
+
+  - **`estado`**
+
+    `string`, possible values: `"pending", "picking", "ready", "assigned", "in_transit", "delivered", "failed", "cancelled"`
+
+  - **`factura`**
+
+    `object`
+
+  - **`facturaId`**
+
+    `integer`
+
+  - **`fecha`**
+
+    `string`, format: `date-time`
+
+  - **`id`**
+
+    `integer`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+    - **`articulo` (required)**
+
+      `object`
+
+      - **`codigo` (required)**
+
+        `integer`
+
+      - **`descripcion` (required)**
+
+        `string`
+
+      - **`id` (required)**
+
+        `integer`
+
+    - **`cantidad` (required)**
+
+      `integer`
+
+    - **`id` (required)**
+
+      `integer`
+
+  - **`nota`**
+
+    `string`
+
+  - **`picker`**
+
+    `object`
+
+  - **`pickerUserId`**
+
+    `integer`
+
+  - **`pickingIniciadoAt`**
+
+    `string`, format: `date-time`
+
+  - **`pickingListoAt`**
+
+    `string`, format: `date-time`
+
+  - **`tenantId`**
+
+    `integer`
+
+  - **`zona`**
+
+    `object`
+
+  - **`zonaId`**
+
+    `integer`
+
+* **`ordenEntregaId` (required)**
+
+  `integer`
+
+* **`secuencia` (required)**
+
+  `integer`
+
+* **`entregadoAt`**
+
+  `string`, format: `date-time`
+
+* **`motivoNoEntrega`**
+
+  `string`
+
+* **`notasEntrega`**
+
+  `string`
+
+* **`receptorDni`**
+
+  `string`
+
+* **`receptorNombre`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "ordenEntregaId": 1,
+  "secuencia": 1,
+  "estado": "pending",
+  "entregadoAt": "",
+  "motivoNoEntrega": "",
+  "receptorNombre": "",
+  "receptorDni": "",
+  "notasEntrega": "",
+  "hasPod": true,
+  "ordenEntrega": {
+    "id": 1,
+    "tenantId": 1,
+    "facturaId": 1,
+    "clienteId": 1,
+    "zonaId": 1,
+    "driverId": 1,
+    "pickerUserId": 1,
+    "pickingIniciadoAt": "",
+    "pickingListoAt": "",
+    "fecha": "",
+    "estado": "pending",
+    "nota": "",
+    "dispatchedAt": "",
+    "dispatchTimestampSource": "event",
+    "items": [
+      {
+        "id": 1,
+        "cantidad": 1,
+        "articulo": {
+          "id": 1,
+          "codigo": 1,
+          "descripcion": ""
+        }
+      }
+    ],
+    "cliente": {
+      "additionalProperty": "anything"
+    },
+    "zona": {
+      "additionalProperty": "anything"
+    },
+    "driver": {
+      "additionalProperty": "anything"
+    },
+    "factura": {
+      "additionalProperty": "anything"
+    },
+    "picker": {
+      "additionalProperty": "anything"
+    },
+    "additionalProperty": "anything"
+  }
+}
+```
+
+### RepartoItemPodInput
+
+- **Type:**`object`
+
+* **`outcome` (required)**
+
+  `string`, possible values: `"delivered", "not_delivered"`
+
+* **`firmaBase64`**
+
+  `string` — Data URL or base64 signature; max \~50KB decoded when delivered.
+
+* **`fotoBase64`**
+
+  `string` — Data URL or base64 photo; max \~200KB decoded.
+
+* **`motivoNoEntrega`**
+
+  `string`, possible values: `"ausente", "rechazo", "domicilio_incorrecto", "producto_dañado", "otro"`
+
+* **`notasEntrega`**
+
+  `string`
+
+* **`receptorDni`**
+
+  `string`
+
+* **`receptorNombre`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "outcome": "delivered",
+  "receptorNombre": "",
+  "receptorDni": "",
+  "firmaBase64": "",
+  "fotoBase64": "",
+  "notasEntrega": "",
+  "motivoNoEntrega": "ausente"
+}
+```
+
+### RepartoItemPodMedia
+
+- **Type:**`object`
+
+* **`firmaBase64`**
+
+  `string`
+
+* **`fotoBase64`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "firmaBase64": "",
+  "fotoBase64": ""
+}
+```
+
+### RepartoItemPod
+
+- **Type:**
+
+**Example:**
+
+### RepartoItemPodEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "ordenEntregaId": 1,
+    "secuencia": 1,
+    "estado": "pending",
+    "entregadoAt": "",
+    "motivoNoEntrega": "",
+    "receptorNombre": "",
+    "receptorDni": "",
+    "notasEntrega": "",
+    "hasPod": true,
+    "ordenEntrega": {
+      "id": 1,
+      "tenantId": 1,
+      "facturaId": 1,
+      "clienteId": 1,
+      "zonaId": 1,
+      "driverId": 1,
+      "pickerUserId": 1,
+      "pickingIniciadoAt": "",
+      "pickingListoAt": "",
+      "fecha": "",
+      "estado": "pending",
+      "nota": "",
+      "dispatchedAt": "",
+      "dispatchTimestampSource": "event",
+      "items": [
+        {
+          "id": 1,
+          "cantidad": 1,
+          "articulo": {
+            "id": 1,
+            "codigo": 1,
+            "descripcion": ""
+          }
+        }
+      ],
+      "cliente": {
+        "additionalProperty": "anything"
+      },
+      "zona": {
+        "additionalProperty": "anything"
+      },
+      "driver": {
+        "additionalProperty": "anything"
+      },
+      "factura": {
+        "additionalProperty": "anything"
+      },
+      "picker": {
+        "additionalProperty": "anything"
+      },
+      "additionalProperty": "anything"
+    },
+    "podMedia": {
+      "firmaBase64": "",
+      "fotoBase64": ""
+    }
+  }
+}
+```
+
+### RepartoItemLineEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"pending", "delivered", "not_delivered", "returned"`
+
+  - **`hasPod` (required)**
+
+    `boolean`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`ordenEntrega` (required)**
+
+    `object`
+
+    - **`cliente`**
+
+      `object`
+
+    - **`clienteId`**
+
+      `integer`
+
+    - **`dispatchedAt`**
+
+      `string`, format: `date-time` — When the order entered in\_transit (ADR-0011).
+
+    - **`dispatchTimestampSource`**
+
+      `string`, possible values: `"event", "estimated"` — How dispatchedAt was derived (audit event vs estimated from updatedAt).
+
+    - **`driver`**
+
+      `object`
+
+    - **`driverId`**
+
+      `integer`
+
+    - **`estado`**
+
+      `string`, possible values: `"pending", "picking", "ready", "assigned", "in_transit", "delivered", "failed", "cancelled"`
+
+    - **`factura`**
+
+      `object`
+
+    - **`facturaId`**
+
+      `integer`
+
+    - **`fecha`**
+
+      `string`, format: `date-time`
+
+    - **`id`**
+
+      `integer`
+
+    - **`items`**
+
+      `array`
+
+      **Items:**
+
+      - **`articulo` (required)**
+
+        `object`
+
+        - **`codigo` (required)**
+
+          `integer`
+
+        - **`descripcion` (required)**
+
+          `string`
+
+        - **`id` (required)**
+
+          `integer`
+
+      - **`cantidad` (required)**
+
+        `integer`
+
+      - **`id` (required)**
+
+        `integer`
+
+    - **`nota`**
+
+      `string`
+
+    - **`picker`**
+
+      `object`
+
+    - **`pickerUserId`**
+
+      `integer`
+
+    - **`pickingIniciadoAt`**
+
+      `string`, format: `date-time`
+
+    - **`pickingListoAt`**
+
+      `string`, format: `date-time`
+
+    - **`tenantId`**
+
+      `integer`
+
+    - **`zona`**
+
+      `object`
+
+    - **`zonaId`**
+
+      `integer`
+
+  - **`ordenEntregaId` (required)**
+
+    `integer`
+
+  - **`secuencia` (required)**
+
+    `integer`
+
+  - **`entregadoAt`**
+
+    `string`, format: `date-time`
+
+  - **`motivoNoEntrega`**
+
+    `string`
+
+  - **`notasEntrega`**
+
+    `string`
+
+  - **`receptorDni`**
+
+    `string`
+
+  - **`receptorNombre`**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "ordenEntregaId": 1,
+    "secuencia": 1,
+    "estado": "pending",
+    "entregadoAt": "",
+    "motivoNoEntrega": "",
+    "receptorNombre": "",
+    "receptorDni": "",
+    "notasEntrega": "",
+    "hasPod": true,
+    "ordenEntrega": {
+      "id": 1,
+      "tenantId": 1,
+      "facturaId": 1,
+      "clienteId": 1,
+      "zonaId": 1,
+      "driverId": 1,
+      "pickerUserId": 1,
+      "pickingIniciadoAt": "",
+      "pickingListoAt": "",
+      "fecha": "",
+      "estado": "pending",
+      "nota": "",
+      "dispatchedAt": "",
+      "dispatchTimestampSource": "event",
+      "items": [
+        {
+          "id": 1,
+          "cantidad": 1,
+          "articulo": {
+            "id": 1,
+            "codigo": 1,
+            "descripcion": ""
+          }
+        }
+      ],
+      "cliente": {
+        "additionalProperty": "anything"
+      },
+      "zona": {
+        "additionalProperty": "anything"
+      },
+      "driver": {
+        "additionalProperty": "anything"
+      },
+      "factura": {
+        "additionalProperty": "anything"
+      },
+      "picker": {
+        "additionalProperty": "anything"
+      },
+      "additionalProperty": "anything"
+    }
+  }
+}
+```
+
+### Reparto
+
+- **Type:**`object`
+
+* **`choferId` (required)**
+
+  `integer`
+
+* **`estado` (required)**
+
+  `string`, possible values: `"planned", "on_route", "completed", "cancelled"`
+
+* **`fecha` (required)**
+
+  `string`, format: `date-time`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`items` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"pending", "delivered", "not_delivered", "returned"`
+
+  - **`hasPod` (required)**
+
+    `boolean`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`ordenEntrega` (required)**
+
+    `object`
+
+    - **`cliente`**
+
+      `object`
+
+    - **`clienteId`**
+
+      `integer`
+
+    - **`dispatchedAt`**
+
+      `string`, format: `date-time` — When the order entered in\_transit (ADR-0011).
+
+    - **`dispatchTimestampSource`**
+
+      `string`, possible values: `"event", "estimated"` — How dispatchedAt was derived (audit event vs estimated from updatedAt).
+
+    - **`driver`**
+
+      `object`
+
+    - **`driverId`**
+
+      `integer`
+
+    - **`estado`**
+
+      `string`, possible values: `"pending", "picking", "ready", "assigned", "in_transit", "delivered", "failed", "cancelled"`
+
+    - **`factura`**
+
+      `object`
+
+    - **`facturaId`**
+
+      `integer`
+
+    - **`fecha`**
+
+      `string`, format: `date-time`
+
+    - **`id`**
+
+      `integer`
+
+    - **`items`**
+
+      `array`
+
+      **Items:**
+
+      - **`articulo` (required)**
+
+        `object`
+
+        - **`codigo` (required)**
+
+          `integer`
+
+        - **`descripcion` (required)**
+
+          `string`
+
+        - **`id` (required)**
+
+          `integer`
+
+      - **`cantidad` (required)**
+
+        `integer`
+
+      - **`id` (required)**
+
+        `integer`
+
+    - **`nota`**
+
+      `string`
+
+    - **`picker`**
+
+      `object`
+
+    - **`pickerUserId`**
+
+      `integer`
+
+    - **`pickingIniciadoAt`**
+
+      `string`, format: `date-time`
+
+    - **`pickingListoAt`**
+
+      `string`, format: `date-time`
+
+    - **`tenantId`**
+
+      `integer`
+
+    - **`zona`**
+
+      `object`
+
+    - **`zonaId`**
+
+      `integer`
+
+  - **`ordenEntregaId` (required)**
+
+    `integer`
+
+  - **`secuencia` (required)**
+
+    `integer`
+
+  - **`entregadoAt`**
+
+    `string`, format: `date-time`
+
+  - **`motivoNoEntrega`**
+
+    `string`
+
+  - **`notasEntrega`**
+
+    `string`
+
+  - **`receptorDni`**
+
+    `string`
+
+  - **`receptorNombre`**
+
+    `string`
+
+* **`progress` (required)**
+
+  `object`
+
+  - **`delivered` (required)**
+
+    `integer`
+
+  - **`pending` (required)**
+
+    `integer`
+
+  - **`total` (required)**
+
+    `integer`
+
+* **`tenantId` (required)**
+
+  `integer`
+
+* **`chofer`**
+
+  `object`
+
+  - **`id`**
+
+    `integer`
+
+  - **`role`**
+
+    `string`
+
+  - **`username`**
+
+    `string`
+
+* **`closedAt`**
+
+  `string`, format: `date-time`
+
+* **`observaciones`**
+
+  `string`
+
+* **`vehiculo`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "tenantId": 1,
+  "fecha": "",
+  "choferId": 1,
+  "estado": "planned",
+  "vehiculo": "",
+  "observaciones": "",
+  "closedAt": "",
+  "chofer": {
+    "id": 1,
+    "username": "",
+    "role": ""
+  },
+  "items": [
+    {
+      "id": 1,
+      "ordenEntregaId": 1,
+      "secuencia": 1,
+      "estado": "pending",
+      "entregadoAt": "",
+      "motivoNoEntrega": "",
+      "receptorNombre": "",
+      "receptorDni": "",
+      "notasEntrega": "",
+      "hasPod": true,
+      "ordenEntrega": {
+        "id": 1,
+        "tenantId": 1,
+        "facturaId": 1,
+        "clienteId": 1,
+        "zonaId": 1,
+        "driverId": 1,
+        "pickerUserId": 1,
+        "pickingIniciadoAt": "",
+        "pickingListoAt": "",
+        "fecha": "",
+        "estado": "pending",
+        "nota": "",
+        "dispatchedAt": "",
+        "dispatchTimestampSource": "event",
+        "items": [
+          {
+            "id": 1,
+            "cantidad": 1,
+            "articulo": {
+              "id": 1,
+              "codigo": 1,
+              "descripcion": ""
+            }
+          }
+        ],
+        "cliente": {
+          "additionalProperty": "anything"
+        },
+        "zona": {
+          "additionalProperty": "anything"
+        },
+        "driver": {
+          "additionalProperty": "anything"
+        },
+        "factura": {
+          "additionalProperty": "anything"
+        },
+        "picker": {
+          "additionalProperty": "anything"
+        },
+        "additionalProperty": "anything"
+      }
+    }
+  ],
+  "progress": {
+    "total": 0,
+    "delivered": 0,
+    "pending": 0
+  }
+}
+```
+
+### RepartoCreateInput
+
+- **Type:**`object`
+
+* **`choferId` (required)**
+
+  `integer`
+
+* **`fecha` (required)**
+
+  `string`, format: `date`
+
+* **`ordenEntregaIds` (required)**
+
+  `array`
+
+  **Items:**
+
+  `integer`
+
+* **`observaciones`**
+
+  `string`
+
+* **`vehiculo`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "fecha": "",
+  "choferId": 1,
+  "vehiculo": "",
+  "observaciones": "",
+  "ordenEntregaIds": [
+    1
+  ]
+}
+```
+
+### RepartoListEnvelope
+
+- **Type:**
+
+**Example:**
+
+### RepartoEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`choferId` (required)**
+
+    `integer`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"planned", "on_route", "completed", "cancelled"`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`items` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`estado` (required)**
+
+      `string`, possible values: `"pending", "delivered", "not_delivered", "returned"`
+
+    - **`hasPod` (required)**
+
+      `boolean`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`ordenEntrega` (required)**
+
+      `object`
+
+      - **`cliente`**
+
+        `object`
+
+      - **`clienteId`**
+
+        `integer`
+
+      - **`dispatchedAt`**
+
+        `string`, format: `date-time` — When the order entered in\_transit (ADR-0011).
+
+      - **`dispatchTimestampSource`**
+
+        `string`, possible values: `"event", "estimated"` — How dispatchedAt was derived (audit event vs estimated from updatedAt).
+
+      - **`driver`**
+
+        `object`
+
+      - **`driverId`**
+
+        `integer`
+
+      - **`estado`**
+
+        `string`, possible values: `"pending", "picking", "ready", "assigned", "in_transit", "delivered", "failed", "cancelled"`
+
+      - **`factura`**
+
+        `object`
+
+      - **`facturaId`**
+
+        `integer`
+
+      - **`fecha`**
+
+        `string`, format: `date-time`
+
+      - **`id`**
+
+        `integer`
+
+      - **`items`**
+
+        `array`
+
+        **Items:**
+
+        - **`articulo` (required)**
+
+          `object`
+
+          - **`codigo` (required)**
+
+            `integer`
+
+          - **`descripcion` (required)**
+
+            `string`
+
+          - **`id` (required)**
+
+            `integer`
+
+        - **`cantidad` (required)**
+
+          `integer`
+
+        - **`id` (required)**
+
+          `integer`
+
+      - **`nota`**
+
+        `string`
+
+      - **`picker`**
+
+        `object`
+
+      - **`pickerUserId`**
+
+        `integer`
+
+      - **`pickingIniciadoAt`**
+
+        `string`, format: `date-time`
+
+      - **`pickingListoAt`**
+
+        `string`, format: `date-time`
+
+      - **`tenantId`**
+
+        `integer`
+
+      - **`zona`**
+
+        `object`
+
+      - **`zonaId`**
+
+        `integer`
+
+    - **`ordenEntregaId` (required)**
+
+      `integer`
+
+    - **`secuencia` (required)**
+
+      `integer`
+
+    - **`entregadoAt`**
+
+      `string`, format: `date-time`
+
+    - **`motivoNoEntrega`**
+
+      `string`
+
+    - **`notasEntrega`**
+
+      `string`
+
+    - **`receptorDni`**
+
+      `string`
+
+    - **`receptorNombre`**
+
+      `string`
+
+  - **`progress` (required)**
+
+    `object`
+
+    - **`delivered` (required)**
+
+      `integer`
+
+    - **`pending` (required)**
+
+      `integer`
+
+    - **`total` (required)**
+
+      `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`chofer`**
+
+    `object`
+
+    - **`id`**
+
+      `integer`
+
+    - **`role`**
+
+      `string`
+
+    - **`username`**
+
+      `string`
+
+  - **`closedAt`**
+
+    `string`, format: `date-time`
+
+  - **`observaciones`**
+
+    `string`
+
+  - **`vehiculo`**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "fecha": "",
+    "choferId": 1,
+    "estado": "planned",
+    "vehiculo": "",
+    "observaciones": "",
+    "closedAt": "",
+    "chofer": {
+      "id": 1,
+      "username": "",
+      "role": ""
+    },
+    "items": [
+      {
+        "id": 1,
+        "ordenEntregaId": 1,
+        "secuencia": 1,
+        "estado": "pending",
+        "entregadoAt": "",
+        "motivoNoEntrega": "",
+        "receptorNombre": "",
+        "receptorDni": "",
+        "notasEntrega": "",
+        "hasPod": true,
+        "ordenEntrega": {
+          "id": 1,
+          "tenantId": 1,
+          "facturaId": 1,
+          "clienteId": 1,
+          "zonaId": 1,
+          "driverId": 1,
+          "pickerUserId": 1,
+          "pickingIniciadoAt": "",
+          "pickingListoAt": "",
+          "fecha": "",
+          "estado": "pending",
+          "nota": "",
+          "dispatchedAt": "",
+          "dispatchTimestampSource": "event",
+          "items": [
+            {
+              "id": 1,
+              "cantidad": 1,
+              "articulo": {
+                "id": 1,
+                "codigo": 1,
+                "descripcion": ""
+              }
+            }
+          ],
+          "cliente": {
+            "additionalProperty": "anything"
+          },
+          "zona": {
+            "additionalProperty": "anything"
+          },
+          "driver": {
+            "additionalProperty": "anything"
+          },
+          "factura": {
+            "additionalProperty": "anything"
+          },
+          "picker": {
+            "additionalProperty": "anything"
+          },
+          "additionalProperty": "anything"
+        }
+      }
+    ],
+    "progress": {
+      "total": 0,
+      "delivered": 0,
+      "pending": 0
+    }
+  }
+}
+```
+
+### RepartoCloseSummary
+
+- **Type:**`object`
+
+* **`delivered` (required)**
+
+  `integer`
+
+* **`notDelivered` (required)**
+
+  `integer`
+
+* **`pendingClosed` (required)**
+
+  `integer`
+
+* **`returned` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "pendingClosed": 0,
+  "delivered": 0,
+  "notDelivered": 0,
+  "returned": 0
+}
+```
+
+### RepartoCloseEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`choferId` (required)**
+
+    `integer`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"planned", "on_route", "completed", "cancelled"`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`items` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`estado` (required)**
+
+      `string`, possible values: `"pending", "delivered", "not_delivered", "returned"`
+
+    - **`hasPod` (required)**
+
+      `boolean`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`ordenEntrega` (required)**
+
+      `object`
+
+      - **`cliente`**
+
+        `object`
+
+      - **`clienteId`**
+
+        `integer`
+
+      - **`dispatchedAt`**
+
+        `string`, format: `date-time` — When the order entered in\_transit (ADR-0011).
+
+      - **`dispatchTimestampSource`**
+
+        `string`, possible values: `"event", "estimated"` — How dispatchedAt was derived (audit event vs estimated from updatedAt).
+
+      - **`driver`**
+
+        `object`
+
+      - **`driverId`**
+
+        `integer`
+
+      - **`estado`**
+
+        `string`, possible values: `"pending", "picking", "ready", "assigned", "in_transit", "delivered", "failed", "cancelled"`
+
+      - **`factura`**
+
+        `object`
+
+      - **`facturaId`**
+
+        `integer`
+
+      - **`fecha`**
+
+        `string`, format: `date-time`
+
+      - **`id`**
+
+        `integer`
+
+      - **`items`**
+
+        `array`
+
+        **Items:**
+
+        - **`articulo` (required)**
+
+          `object`
+
+          - **`codigo` (required)**
+
+            `integer`
+
+          - **`descripcion` (required)**
+
+            `string`
+
+          - **`id` (required)**
+
+            `integer`
+
+        - **`cantidad` (required)**
+
+          `integer`
+
+        - **`id` (required)**
+
+          `integer`
+
+      - **`nota`**
+
+        `string`
+
+      - **`picker`**
+
+        `object`
+
+      - **`pickerUserId`**
+
+        `integer`
+
+      - **`pickingIniciadoAt`**
+
+        `string`, format: `date-time`
+
+      - **`pickingListoAt`**
+
+        `string`, format: `date-time`
+
+      - **`tenantId`**
+
+        `integer`
+
+      - **`zona`**
+
+        `object`
+
+      - **`zonaId`**
+
+        `integer`
+
+    - **`ordenEntregaId` (required)**
+
+      `integer`
+
+    - **`secuencia` (required)**
+
+      `integer`
+
+    - **`entregadoAt`**
+
+      `string`, format: `date-time`
+
+    - **`motivoNoEntrega`**
+
+      `string`
+
+    - **`notasEntrega`**
+
+      `string`
+
+    - **`receptorDni`**
+
+      `string`
+
+    - **`receptorNombre`**
+
+      `string`
+
+  - **`progress` (required)**
+
+    `object`
+
+    - **`delivered` (required)**
+
+      `integer`
+
+    - **`pending` (required)**
+
+      `integer`
+
+    - **`total` (required)**
+
+      `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`chofer`**
+
+    `object`
+
+    - **`id`**
+
+      `integer`
+
+    - **`role`**
+
+      `string`
+
+    - **`username`**
+
+      `string`
+
+  - **`closedAt`**
+
+    `string`, format: `date-time`
+
+  - **`observaciones`**
+
+    `string`
+
+  - **`vehiculo`**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+* **`summary` (required)**
+
+  `object`
+
+  - **`delivered` (required)**
+
+    `integer`
+
+  - **`notDelivered` (required)**
+
+    `integer`
+
+  - **`pendingClosed` (required)**
+
+    `integer`
+
+  - **`returned` (required)**
+
+    `integer`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "fecha": "",
+    "choferId": 1,
+    "estado": "planned",
+    "vehiculo": "",
+    "observaciones": "",
+    "closedAt": "",
+    "chofer": {
+      "id": 1,
+      "username": "",
+      "role": ""
+    },
+    "items": [
+      {
+        "id": 1,
+        "ordenEntregaId": 1,
+        "secuencia": 1,
+        "estado": "pending",
+        "entregadoAt": "",
+        "motivoNoEntrega": "",
+        "receptorNombre": "",
+        "receptorDni": "",
+        "notasEntrega": "",
+        "hasPod": true,
+        "ordenEntrega": {
+          "id": 1,
+          "tenantId": 1,
+          "facturaId": 1,
+          "clienteId": 1,
+          "zonaId": 1,
+          "driverId": 1,
+          "pickerUserId": 1,
+          "pickingIniciadoAt": "",
+          "pickingListoAt": "",
+          "fecha": "",
+          "estado": "pending",
+          "nota": "",
+          "dispatchedAt": "",
+          "dispatchTimestampSource": "event",
+          "items": [
+            {
+              "id": 1,
+              "cantidad": 1,
+              "articulo": {
+                "id": 1,
+                "codigo": 1,
+                "descripcion": ""
+              }
+            }
+          ],
+          "cliente": {
+            "additionalProperty": "anything"
+          },
+          "zona": {
+            "additionalProperty": "anything"
+          },
+          "driver": {
+            "additionalProperty": "anything"
+          },
+          "factura": {
+            "additionalProperty": "anything"
+          },
+          "picker": {
+            "additionalProperty": "anything"
+          },
+          "additionalProperty": "anything"
+        }
+      }
+    ],
+    "progress": {
+      "total": 0,
+      "delivered": 0,
+      "pending": 0
+    }
+  },
+  "summary": {
+    "pendingClosed": 0,
+    "delivered": 0,
+    "notDelivered": 0,
+    "returned": 0
+  }
+}
+```
+
+### RepartoUbicacionInput
+
+- **Type:**`object`
+
+* **`lat` (required)**
+
+  `number`
+
+* **`lng` (required)**
+
+  `number`
+
+**Example:**
+
+```json
+{
+  "lat": -90,
+  "lng": -180
+}
+```
+
+### RepartoUbicacion
+
+- **Type:**`object`
+
+* **`lat` (required)**
+
+  `number`
+
+* **`lng` (required)**
+
+  `number`
+
+* **`recordedAt` (required)**
+
+  `string`, format: `date-time`
+
+**Example:**
+
+```json
+{
+  "lat": 1,
+  "lng": 1,
+  "recordedAt": ""
+}
+```
+
+### RepartoUbicacionEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`lat` (required)**
+
+    `number`
+
+  - **`lng` (required)**
+
+    `number`
+
+  - **`recordedAt` (required)**
+
+    `string`, format: `date-time`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "lat": 1,
+    "lng": 1,
+    "recordedAt": ""
+  }
+}
+```
+
+### RepartoUbicacionNullableEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "lat": 1,
+    "lng": 1,
+    "recordedAt": ""
+  }
+}
+```
+
+### RepartoActivoCurrentStop
+
+- **Type:**`object`
+
+* **`cliente` (required)**
+
+  `object`
+
+  - **`codigo` (required)**
+
+    `integer`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`rsocial` (required)**
+
+    `string`
+
+  - **`domicilio`**
+
+    `string`
+
+* **`secuencia` (required)**
+
+  `integer`
+
+* **`zona`**
+
+  `object`
+
+  - **`id`**
+
+    `integer`
+
+  - **`nombre`**
+
+    `string`
+
+**Example:**
+
+```json
+{
+  "secuencia": 1,
+  "cliente": {
+    "id": 1,
+    "codigo": 1,
+    "rsocial": "",
+    "domicilio": ""
+  },
+  "zona": {
+    "id": 1,
+    "nombre": ""
+  }
+}
+```
+
+### RepartoActivo
+
+- **Type:**`object`
+
+* **`chofer` (required)**
+
+  `object`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`role` (required)**
+
+    `string`
+
+  - **`username` (required)**
+
+    `string`
+
+* **`choferId` (required)**
+
+  `integer`
+
+* **`currentStop` (required)**
+
+  `object`
+
+* **`estado` (required)**
+
+  `string`
+
+* **`fecha` (required)**
+
+  `string`, format: `date-time`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`progress` (required)**
+
+  `object`
+
+  - **`delivered` (required)**
+
+    `integer`
+
+  - **`pending` (required)**
+
+    `integer`
+
+  - **`total` (required)**
+
+    `integer`
+
+* **`tenantId` (required)**
+
+  `integer`
+
+* **`ultimaUbicacion` (required)**
+
+  `object`
+
+* **`observaciones`**
+
+  `string`
+
+* **`vehiculo`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "tenantId": 1,
+  "fecha": "",
+  "choferId": 1,
+  "estado": "",
+  "vehiculo": "",
+  "observaciones": "",
+  "chofer": {
+    "id": 1,
+    "username": "",
+    "role": ""
+  },
+  "progress": {
+    "total": 0,
+    "delivered": 0,
+    "pending": 0
+  },
+  "ultimaUbicacion": {
+    "lat": 1,
+    "lng": 1,
+    "recordedAt": ""
+  },
+  "currentStop": {
+    "secuencia": 1,
+    "cliente": {
+      "id": 1,
+      "codigo": 1,
+      "rsocial": "",
+      "domicilio": ""
+    },
+    "zona": {
+      "id": 1,
+      "nombre": ""
+    }
+  }
+}
+```
+
+### RepartoActivoListEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`chofer` (required)**
+
+    `object`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`role` (required)**
+
+      `string`
+
+    - **`username` (required)**
+
+      `string`
+
+  - **`choferId` (required)**
+
+    `integer`
+
+  - **`currentStop` (required)**
+
+    `object`
+
+  - **`estado` (required)**
+
+    `string`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`progress` (required)**
+
+    `object`
+
+    - **`delivered` (required)**
+
+      `integer`
+
+    - **`pending` (required)**
+
+      `integer`
+
+    - **`total` (required)**
+
+      `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`ultimaUbicacion` (required)**
+
+    `object`
+
+  - **`observaciones`**
+
+    `string`
+
+  - **`vehiculo`**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "fecha": "",
+      "choferId": 1,
+      "estado": "",
+      "vehiculo": "",
+      "observaciones": "",
+      "chofer": {
+        "id": 1,
+        "username": "",
+        "role": ""
+      },
+      "progress": {
+        "total": 0,
+        "delivered": 0,
+        "pending": 0
+      },
+      "ultimaUbicacion": {
+        "lat": 1,
+        "lng": 1,
+        "recordedAt": ""
+      },
+      "currentStop": {
+        "secuencia": 1,
+        "cliente": {
+          "id": 1,
+          "codigo": 1,
+          "rsocial": "",
+          "domicilio": ""
+        },
+        "zona": {
+          "id": 1,
+          "nombre": ""
+        }
+      }
+    }
+  ]
+}
+```
+
+### ProveedorEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`activo`**
+
+    `boolean`
+
+  - **`alias`**
+
+    `string`
+
+  - **`banco`**
+
+    `string`
+
+  - **`categoria`**
+
+    `string`
+
+  - **`cbu`**
+
+    `string`
+
+  - **`codigo`**
+
+    `integer`
+
+  - **`condicionPago`**
+
+    `string`
+
+  - **`condIva`**
+
+    `string`
+
+  - **`contactoEmail`**
+
+    `string`
+
+  - **`contactoNombre`**
+
+    `string`
+
+  - **`contactoTel`**
+
+    `string`
+
+  - **`cuit`**
+
+    `string`
+
+  - **`descuentoPct`**
+
+    `number`
+
+  - **`email`**
+
+    `string`
+
+  - **`fantasia`**
+
+    `string`
+
+  - **`id`**
+
+    `integer`
+
+  - **`limiteCredito`**
+
+    `number`
+
+  - **`moneda`**
+
+    `string`
+
+  - **`notas`**
+
+    `string`
+
+  - **`plazoHabitual`**
+
+    `integer`
+
+  - **`rsocial`**
+
+    `string`
+
+  - **`telef`**
+
+    `string`
+
+  - **`tipoCuenta`**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "codigo": 1,
+    "rsocial": "",
+    "fantasia": "",
+    "cuit": "",
+    "condIva": "",
+    "telef": "",
+    "email": "",
+    "activo": true,
+    "cbu": "",
+    "alias": "",
+    "banco": "",
+    "tipoCuenta": "",
+    "moneda": "",
+    "condicionPago": "",
+    "plazoHabitual": 1,
+    "descuentoPct": 1,
+    "limiteCredito": 1,
+    "categoria": "",
+    "contactoNombre": "",
+    "contactoEmail": "",
+    "contactoTel": "",
+    "notas": "",
+    "additionalProperty": "anything"
+  }
+}
+```
+
+### ProveedorNullableEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "codigo": 1,
+    "rsocial": "",
+    "fantasia": "",
+    "cuit": "",
+    "condIva": "",
+    "telef": "",
+    "email": "",
+    "activo": true,
+    "cbu": "",
+    "alias": "",
+    "banco": "",
+    "tipoCuenta": "",
+    "moneda": "",
+    "condicionPago": "",
+    "plazoHabitual": 1,
+    "descuentoPct": 1,
+    "limiteCredito": 1,
+    "categoria": "",
+    "contactoNombre": "",
+    "contactoEmail": "",
+    "contactoTel": "",
+    "notas": "",
+    "additionalProperty": "anything"
+  }
+}
+```
+
 ### Factura
 
 - **Type:**`object`
+
+* **`cae`**
+
+  `string`
+
+* **`caeVto`**
+
+  `string`, format: `date-time`
 
 * **`clienteId`**
 
@@ -6151,6 +45803,10 @@ Returns boolean flags for each channel. No sensitive values are exposed.
 * **`estado`**
 
   `string`
+
+* **`estadoCae`**
+
+  `string`, possible values: `"pending", "issued", "failed"`
 
 * **`fecha`**
 
@@ -6316,6 +45972,9 @@ Returns boolean flags for each channel. No sensitive values are exposed.
   "iva2": 1,
   "total": 1,
   "estado": "",
+  "cae": "",
+  "caeVto": "",
+  "estadoCae": "pending",
   "items": [
     {
       "id": 1,
@@ -6483,6 +46142,22 @@ Returns boolean flags for each channel. No sensitive values are exposed.
 }
 ```
 
+### VoidInput
+
+- **Type:**`object`
+
+* **`motivo` (required)**
+
+  `string` — Reason for voiding the invoice (persisted on credit note and AuditEvent metadata).
+
+**Example:**
+
+```json
+{
+  "motivo": ""
+}
+```
+
 ### FacturaInput
 
 - **Type:**`object`
@@ -6591,230 +46266,9 @@ Returns boolean flags for each channel. No sensitive values are exposed.
 
 ### FacturaListEnvelope
 
-- **Type:**`object`
-
-* **`data` (required)**
-
-  `array`
-
-  **Items:**
-
-  - **`clienteId`**
-
-    `integer`
-
-  - **`estado`**
-
-    `string`
-
-  - **`fecha`**
-
-    `string`, format: `date-time`
-
-  - **`formaPagoId`**
-
-    `integer`
-
-  - **`id`**
-
-    `integer`
-
-  - **`items`**
-
-    `array`
-
-    **Items:**
-
-    - **`articulo`**
-
-      `object`
-
-      - **`activo`**
-
-        `boolean`
-
-      - **`codigo`**
-
-        `integer`
-
-      - **`condIva`**
-
-        `string`
-
-      - **`costo`**
-
-        `number`
-
-      - **`descripcion`**
-
-        `string`
-
-      - **`id`**
-
-        `integer`
-
-      - **`minimo`**
-
-        `integer`
-
-      - **`precioLista1`**
-
-        `number`
-
-      - **`precioLista2`**
-
-        `number`
-
-      - **`rubro`**
-
-        `object`
-
-        - **`codigo`**
-
-          `integer`
-
-        - **`id`**
-
-          `integer`
-
-        - **`nombre`**
-
-          `string`
-
-      - **`rubroId`**
-
-        `integer`
-
-      - **`stock`**
-
-        `integer`
-
-      - **`umedida`**
-
-        `string`
-
-    - **`articuloId`**
-
-      `integer`
-
-    - **`cantidad`**
-
-      `number`
-
-    - **`dscto`**
-
-      `number`
-
-    - **`id`**
-
-      `integer`
-
-    - **`precio`**
-
-      `number`
-
-    - **`subtotal`**
-
-      `number`
-
-  - **`iva1`**
-
-    `number`
-
-  - **`iva2`**
-
-    `number`
-
-  - **`neto1`**
-
-    `number`
-
-  - **`neto2`**
-
-    `number`
-
-  - **`neto3`**
-
-    `number`
-
-  - **`numero`**
-
-    `integer`
-
-  - **`prefijo`**
-
-    `string`
-
-  - **`tipo`**
-
-    `string`
-
-  - **`total`**
-
-    `number`
-
-* **`success` (required)**
-
-  `boolean`
+- **Type:**
 
 **Example:**
-
-```json
-{
-  "success": true,
-  "data": [
-    {
-      "id": 1,
-      "fecha": "",
-      "tipo": "",
-      "prefijo": "",
-      "numero": 1,
-      "clienteId": 1,
-      "formaPagoId": 1,
-      "neto1": 1,
-      "neto2": 1,
-      "neto3": 1,
-      "iva1": 1,
-      "iva2": 1,
-      "total": 1,
-      "estado": "",
-      "items": [
-        {
-          "id": 1,
-          "articuloId": 1,
-          "articulo": {
-            "id": 1,
-            "codigo": 1,
-            "descripcion": "",
-            "rubroId": 1,
-            "rubro": {
-              "id": 1,
-              "codigo": 1,
-              "nombre": "",
-              "additionalProperty": "anything"
-            },
-            "condIva": "",
-            "umedida": "",
-            "precioLista1": 1,
-            "precioLista2": 1,
-            "costo": 1,
-            "stock": 1,
-            "minimo": 1,
-            "activo": true,
-            "additionalProperty": "anything"
-          },
-          "cantidad": 1,
-          "precio": 1,
-          "dscto": 1,
-          "subtotal": 1,
-          "additionalProperty": "anything"
-        }
-      ],
-      "additionalProperty": "anything"
-    }
-  ]
-}
-```
 
 ### FacturaEnvelope
 
@@ -6824,6 +46278,14 @@ Returns boolean flags for each channel. No sensitive values are exposed.
 
   `object`
 
+  - **`cae`**
+
+    `string`
+
+  - **`caeVto`**
+
+    `string`, format: `date-time`
+
   - **`clienteId`**
 
     `integer`
@@ -6831,6 +46293,10 @@ Returns boolean flags for each channel. No sensitive values are exposed.
   - **`estado`**
 
     `string`
+
+  - **`estadoCae`**
+
+    `string`, possible values: `"pending", "issued", "failed"`
 
   - **`fecha`**
 
@@ -7002,6 +46468,9 @@ Returns boolean flags for each channel. No sensitive values are exposed.
     "iva2": 1,
     "total": 1,
     "estado": "",
+    "cae": "",
+    "caeVto": "",
+    "estadoCae": "pending",
     "items": [
       {
         "id": 1,
@@ -7038,6 +46507,5363 @@ Returns boolean flags for each channel. No sensitive values are exposed.
   }
 }
 ```
+
+### FacturaVoidBalanceCliente
+
+- **Type:**`object`
+
+* **`balance` (required)**
+
+  `object` — Customer balance after decrement (Prisma Decimal may serialize as string in JSON)
+
+* **`creditLimit` (required)**
+
+  `number`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`rsocial` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "rsocial": "",
+  "balance": 1,
+  "creditLimit": 1
+}
+```
+
+### NotaCreditoFacturaOrigen
+
+- **Type:**`object`
+
+Originating invoice header (selected columns)
+
+- **`clienteId`**
+
+  `integer`
+
+- **`estado`**
+
+  `string`
+
+- **`fecha`**
+
+  `string`, format: `date-time`
+
+- **`id`**
+
+  `integer`
+
+- **`numero`**
+
+  `integer`
+
+- **`prefijo`**
+
+  `string`
+
+- **`tipo`**
+
+  `string`
+
+- **`total`**
+
+  `object`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "tipo": "",
+  "prefijo": "",
+  "numero": 1,
+  "clienteId": 1,
+  "fecha": "",
+  "total": 1,
+  "estado": "",
+  "additionalProperty": "anything"
+}
+```
+
+### NotaCredito
+
+- **Type:**`object`
+
+* **`createdAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`estadoCae` (required)**
+
+  `string`, possible values: `"pending", "issued", "failed", "not_required"`
+
+* **`facturaOrigenId` (required)**
+
+  `integer`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`monto` (required)**
+
+  `object`
+
+* **`motivo` (required)**
+
+  `string`
+
+* **`tenantId` (required)**
+
+  `integer`
+
+* **`cae`**
+
+  `string`
+
+* **`caeVto`**
+
+  `string`, format: `date-time`
+
+* **`createdById`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "tenantId": 1,
+  "facturaOrigenId": 1,
+  "motivo": "",
+  "monto": 1,
+  "cae": "",
+  "caeVto": "",
+  "estadoCae": "pending",
+  "createdById": 1,
+  "createdAt": "",
+  "additionalProperty": "anything"
+}
+```
+
+### NotaCreditoDetail
+
+- **Type:**`object`
+
+* **`createdAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`estadoCae` (required)**
+
+  `string`, possible values: `"pending", "issued", "failed", "not_required"`
+
+* **`facturaOrigen` (required)**
+
+  `object` — Originating invoice header (selected columns)
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`estado`**
+
+    `string`
+
+  - **`fecha`**
+
+    `string`, format: `date-time`
+
+  - **`id`**
+
+    `integer`
+
+  - **`numero`**
+
+    `integer`
+
+  - **`prefijo`**
+
+    `string`
+
+  - **`tipo`**
+
+    `string`
+
+  - **`total`**
+
+    `object`
+
+* **`facturaOrigenId` (required)**
+
+  `integer`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`monto` (required)**
+
+  `object`
+
+* **`motivo` (required)**
+
+  `string`
+
+* **`tenantId` (required)**
+
+  `integer`
+
+* **`cae`**
+
+  `string`
+
+* **`caeVto`**
+
+  `string`, format: `date-time`
+
+* **`createdById`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "tenantId": 1,
+  "facturaOrigenId": 1,
+  "motivo": "",
+  "monto": 1,
+  "cae": "",
+  "caeVto": "",
+  "estadoCae": "pending",
+  "createdById": 1,
+  "createdAt": "",
+  "facturaOrigen": {
+    "id": 1,
+    "tipo": "",
+    "prefijo": "",
+    "numero": 1,
+    "clienteId": 1,
+    "fecha": "",
+    "total": 1,
+    "estado": "",
+    "additionalProperty": "anything"
+  },
+  "additionalProperty": "anything"
+}
+```
+
+### NotaCreditoListEnvelope
+
+- **Type:**
+
+**Example:**
+
+### NotaCreditoEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`estadoCae` (required)**
+
+    `string`, possible values: `"pending", "issued", "failed", "not_required"`
+
+  - **`facturaOrigen` (required)**
+
+    `object` — Originating invoice header (selected columns)
+
+    - **`clienteId`**
+
+      `integer`
+
+    - **`estado`**
+
+      `string`
+
+    - **`fecha`**
+
+      `string`, format: `date-time`
+
+    - **`id`**
+
+      `integer`
+
+    - **`numero`**
+
+      `integer`
+
+    - **`prefijo`**
+
+      `string`
+
+    - **`tipo`**
+
+      `string`
+
+    - **`total`**
+
+      `object`
+
+  - **`facturaOrigenId` (required)**
+
+    `integer`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`monto` (required)**
+
+    `object`
+
+  - **`motivo` (required)**
+
+    `string`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`cae`**
+
+    `string`
+
+  - **`caeVto`**
+
+    `string`, format: `date-time`
+
+  - **`createdById`**
+
+    `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "facturaOrigenId": 1,
+    "motivo": "",
+    "monto": 1,
+    "cae": "",
+    "caeVto": "",
+    "estadoCae": "pending",
+    "createdById": 1,
+    "createdAt": "",
+    "facturaOrigen": {
+      "id": 1,
+      "tipo": "",
+      "prefijo": "",
+      "numero": 1,
+      "clienteId": 1,
+      "fecha": "",
+      "total": 1,
+      "estado": "",
+      "additionalProperty": "anything"
+    },
+    "additionalProperty": "anything"
+  }
+}
+```
+
+### LibroIvaVentasAlicuotaTotal
+
+- **Type:**`object`
+
+* **`alicuotaCode` (required)**
+
+  `string`
+
+* **`iva` (required)**
+
+  `number`
+
+* **`neto` (required)**
+
+  `number`
+
+**Example:**
+
+```json
+{
+  "alicuotaCode": "",
+  "neto": 1,
+  "iva": 1
+}
+```
+
+### LibroIvaVentasPreview
+
+- **Type:**`object`
+
+* **`arcaValidationPending` (required)**
+
+  `boolean`
+
+* **`periodo` (required)**
+
+  `string`
+
+* **`recordCountAlicuotas` (required)**
+
+  `integer`
+
+* **`recordCountCbtv` (required)**
+
+  `integer`
+
+* **`totalExento` (required)**
+
+  `number`
+
+* **`totalGeneral` (required)**
+
+  `number`
+
+* **`totalIva` (required)**
+
+  `number`
+
+* **`totalNeto` (required)**
+
+  `number`
+
+* **`totalsByAlicuota` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`alicuotaCode` (required)**
+
+    `string`
+
+  - **`iva` (required)**
+
+    `number`
+
+  - **`neto` (required)**
+
+    `number`
+
+**Example:**
+
+```json
+{
+  "periodo": "",
+  "recordCountCbtv": 0,
+  "recordCountAlicuotas": 0,
+  "totalsByAlicuota": [
+    {
+      "alicuotaCode": "",
+      "neto": 1,
+      "iva": 1
+    }
+  ],
+  "totalNeto": 1,
+  "totalIva": 1,
+  "totalExento": 1,
+  "totalGeneral": 1,
+  "arcaValidationPending": true
+}
+```
+
+### LibroIvaVentasPreviewEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`arcaValidationPending` (required)**
+
+    `boolean`
+
+  - **`periodo` (required)**
+
+    `string`
+
+  - **`recordCountAlicuotas` (required)**
+
+    `integer`
+
+  - **`recordCountCbtv` (required)**
+
+    `integer`
+
+  - **`totalExento` (required)**
+
+    `number`
+
+  - **`totalGeneral` (required)**
+
+    `number`
+
+  - **`totalIva` (required)**
+
+    `number`
+
+  - **`totalNeto` (required)**
+
+    `number`
+
+  - **`totalsByAlicuota` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`alicuotaCode` (required)**
+
+      `string`
+
+    - **`iva` (required)**
+
+      `number`
+
+    - **`neto` (required)**
+
+      `number`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "periodo": "",
+    "recordCountCbtv": 0,
+    "recordCountAlicuotas": 0,
+    "totalsByAlicuota": [
+      {
+        "alicuotaCode": "",
+        "neto": 1,
+        "iva": 1
+      }
+    ],
+    "totalNeto": 1,
+    "totalIva": 1,
+    "totalExento": 1,
+    "totalGeneral": 1,
+    "arcaValidationPending": true
+  }
+}
+```
+
+### LibroIvaComprasPreview
+
+- **Type:**`object`
+
+* **`arcaValidationPending` (required)**
+
+  `boolean`
+
+* **`periodo` (required)**
+
+  `string`
+
+* **`recordCountAlicuotas` (required)**
+
+  `integer`
+
+* **`recordCountCbtu` (required)**
+
+  `integer`
+
+* **`totalExento` (required)**
+
+  `number`
+
+* **`totalGeneral` (required)**
+
+  `number`
+
+* **`totalIva` (required)**
+
+  `number`
+
+* **`totalNeto` (required)**
+
+  `number`
+
+* **`totalsByAlicuota` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`alicuotaCode` (required)**
+
+    `string`
+
+  - **`iva` (required)**
+
+    `number`
+
+  - **`neto` (required)**
+
+    `number`
+
+**Example:**
+
+```json
+{
+  "periodo": "",
+  "recordCountCbtu": 0,
+  "recordCountAlicuotas": 0,
+  "totalsByAlicuota": [
+    {
+      "alicuotaCode": "",
+      "neto": 1,
+      "iva": 1
+    }
+  ],
+  "totalNeto": 1,
+  "totalIva": 1,
+  "totalExento": 1,
+  "totalGeneral": 1,
+  "arcaValidationPending": true
+}
+```
+
+### LibroIvaComprasPreviewEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`arcaValidationPending` (required)**
+
+    `boolean`
+
+  - **`periodo` (required)**
+
+    `string`
+
+  - **`recordCountAlicuotas` (required)**
+
+    `integer`
+
+  - **`recordCountCbtu` (required)**
+
+    `integer`
+
+  - **`totalExento` (required)**
+
+    `number`
+
+  - **`totalGeneral` (required)**
+
+    `number`
+
+  - **`totalIva` (required)**
+
+    `number`
+
+  - **`totalNeto` (required)**
+
+    `number`
+
+  - **`totalsByAlicuota` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`alicuotaCode` (required)**
+
+      `string`
+
+    - **`iva` (required)**
+
+      `number`
+
+    - **`neto` (required)**
+
+      `number`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "periodo": "",
+    "recordCountCbtu": 0,
+    "recordCountAlicuotas": 0,
+    "totalsByAlicuota": [
+      {
+        "alicuotaCode": "",
+        "neto": 1,
+        "iva": 1
+      }
+    ],
+    "totalNeto": 1,
+    "totalIva": 1,
+    "totalExento": 1,
+    "totalGeneral": 1,
+    "arcaValidationPending": true
+  }
+}
+```
+
+### ComprobanteCompraInput
+
+- **Type:**`object`
+
+* **`fecha` (required)**
+
+  `string`, format: `date-time`
+
+* **`iva1` (required)**
+
+  `number`
+
+* **`iva2` (required)**
+
+  `number`
+
+* **`neto1` (required)**
+
+  `number`
+
+* **`neto2` (required)**
+
+  `number`
+
+* **`neto3` (required)**
+
+  `number`
+
+* **`numero` (required)**
+
+  `integer`
+
+* **`prefijo` (required)**
+
+  `string`
+
+* **`proveedorId` (required)**
+
+  `integer`
+
+* **`tipo` (required)**
+
+  `string`, possible values: `"A", "B", "C"`
+
+* **`total` (required)**
+
+  `number`
+
+* **`cae`**
+
+  `string`
+
+* **`caeVto`**
+
+  `string`, format: `date-time`
+
+* **`ordenCompraId`**
+
+  `integer`
+
+* **`vencimiento`**
+
+  `string`, format: `date-time` — Explicit due date; when omitted, derived from supplier payment terms (#275).
+
+**Example:**
+
+```json
+{
+  "fecha": "",
+  "tipo": "A",
+  "prefijo": "",
+  "numero": 1,
+  "proveedorId": 1,
+  "ordenCompraId": 1,
+  "neto1": 0,
+  "neto2": 0,
+  "neto3": 0,
+  "iva1": 0,
+  "iva2": 0,
+  "total": 0,
+  "cae": "",
+  "caeVto": "",
+  "vencimiento": ""
+}
+```
+
+### ComprobanteCompra
+
+- **Type:**`object`
+
+* **`createdAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`estado` (required)**
+
+  `string`
+
+* **`fecha` (required)**
+
+  `string`, format: `date-time`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`iva1` (required)**
+
+  `number`
+
+* **`iva2` (required)**
+
+  `number`
+
+* **`neto1` (required)**
+
+  `number`
+
+* **`neto2` (required)**
+
+  `number`
+
+* **`neto3` (required)**
+
+  `number`
+
+* **`numero` (required)**
+
+  `integer`
+
+* **`prefijo` (required)**
+
+  `string`
+
+* **`proveedorId` (required)**
+
+  `integer`
+
+* **`tenantId` (required)**
+
+  `integer`
+
+* **`tipo` (required)**
+
+  `string`
+
+* **`total` (required)**
+
+  `number`
+
+* **`updatedAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`cae`**
+
+  `string`
+
+* **`caeVto`**
+
+  `string`, format: `date-time`
+
+* **`ordenCompraId`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "tenantId": 1,
+  "proveedorId": 1,
+  "ordenCompraId": 1,
+  "fecha": "",
+  "tipo": "",
+  "prefijo": "",
+  "numero": 1,
+  "neto1": 1,
+  "neto2": 1,
+  "neto3": 1,
+  "iva1": 1,
+  "iva2": 1,
+  "total": 1,
+  "cae": "",
+  "caeVto": "",
+  "estado": "",
+  "createdAt": "",
+  "updatedAt": ""
+}
+```
+
+### ComprobanteCompraEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`estado` (required)**
+
+    `string`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`iva1` (required)**
+
+    `number`
+
+  - **`iva2` (required)**
+
+    `number`
+
+  - **`neto1` (required)**
+
+    `number`
+
+  - **`neto2` (required)**
+
+    `number`
+
+  - **`neto3` (required)**
+
+    `number`
+
+  - **`numero` (required)**
+
+    `integer`
+
+  - **`prefijo` (required)**
+
+    `string`
+
+  - **`proveedorId` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`tipo` (required)**
+
+    `string`
+
+  - **`total` (required)**
+
+    `number`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`cae`**
+
+    `string`
+
+  - **`caeVto`**
+
+    `string`, format: `date-time`
+
+  - **`ordenCompraId`**
+
+    `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "proveedorId": 1,
+    "ordenCompraId": 1,
+    "fecha": "",
+    "tipo": "",
+    "prefijo": "",
+    "numero": 1,
+    "neto1": 1,
+    "neto2": 1,
+    "neto3": 1,
+    "iva1": 1,
+    "iva2": 1,
+    "total": 1,
+    "cae": "",
+    "caeVto": "",
+    "estado": "",
+    "createdAt": "",
+    "updatedAt": ""
+  }
+}
+```
+
+### DocumentoCompraItemPreview
+
+- **Type:**`object`
+
+* **`cantidad` (required)**
+
+  `number`
+
+* **`descripcion` (required)**
+
+  `string`
+
+* **`precioUnitario` (required)**
+
+  `number`
+
+* **`subtotal` (required)**
+
+  `number`
+
+* **`articuloId`**
+
+  `integer`
+
+* **`confianza`**
+
+  `number`
+
+**Example:**
+
+```json
+{
+  "descripcion": "",
+  "cantidad": 1,
+  "precioUnitario": 1,
+  "subtotal": 1,
+  "articuloId": 1,
+  "confianza": 0
+}
+```
+
+### DocumentoCompraPreviewData
+
+- **Type:**`object`
+
+* **`cae`**
+
+  `string`
+
+* **`caeVto`**
+
+  `string`, format: `date-time`
+
+* **`cuitExtracted`**
+
+  `string` — Supplier tax id digits extracted when no match (#277 Fase F)
+
+* **`fecha`**
+
+  `string`, format: `date-time`
+
+* **`fieldConfidence`**
+
+  `object`
+
+* **`items`**
+
+  `array`
+
+  **Items:**
+
+  - **`cantidad` (required)**
+
+    `number`
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`precioUnitario` (required)**
+
+    `number`
+
+  - **`subtotal` (required)**
+
+    `number`
+
+  - **`articuloId`**
+
+    `integer`
+
+  - **`confianza`**
+
+    `number`
+
+* **`iva1`**
+
+  `number`
+
+* **`iva2`**
+
+  `number`
+
+* **`neto1`**
+
+  `number`
+
+* **`neto2`**
+
+  `number`
+
+* **`neto3`**
+
+  `number`
+
+* **`numero`**
+
+  `integer`
+
+* **`prefijo`**
+
+  `string`
+
+* **`proveedorId`**
+
+  `integer`
+
+* **`rsocialExtracted`**
+
+  `string` — Supplier name hint from OCR/LLM (#277 Fase F)
+
+* **`tipo`**
+
+  `object`
+
+* **`total`**
+
+  `number`
+
+* **`vencimiento`**
+
+  `string`, format: `date-time`
+
+**Example:**
+
+```json
+{
+  "proveedorId": 1,
+  "cuitExtracted": "",
+  "rsocialExtracted": "",
+  "fecha": "",
+  "vencimiento": "",
+  "tipo": "A",
+  "prefijo": "",
+  "numero": 1,
+  "neto1": 1,
+  "neto2": 1,
+  "neto3": 1,
+  "iva1": 1,
+  "iva2": 1,
+  "total": 1,
+  "cae": "",
+  "caeVto": "",
+  "items": [
+    {
+      "descripcion": "",
+      "cantidad": 1,
+      "precioUnitario": 1,
+      "subtotal": 1,
+      "articuloId": 1,
+      "confianza": 0
+    }
+  ],
+  "fieldConfidence": {
+    "additionalProperty": 1
+  }
+}
+```
+
+### DocumentoCompraImportado
+
+- **Type:**`object`
+
+* **`archivoMime` (required)**
+
+  `string`
+
+* **`archivoNombre` (required)**
+
+  `string`
+
+* **`archivoPath` (required)**
+
+  `string`
+
+* **`confianza` (required)**
+
+  `number`
+
+* **`createdAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`datosExtraidos` (required)**
+
+  `object`
+
+  - **`cae`**
+
+    `string`
+
+  - **`caeVto`**
+
+    `string`, format: `date-time`
+
+  - **`cuitExtracted`**
+
+    `string` — Supplier tax id digits extracted when no match (#277 Fase F)
+
+  - **`fecha`**
+
+    `string`, format: `date-time`
+
+  - **`fieldConfidence`**
+
+    `object`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+    - **`cantidad` (required)**
+
+      `number`
+
+    - **`descripcion` (required)**
+
+      `string`
+
+    - **`precioUnitario` (required)**
+
+      `number`
+
+    - **`subtotal` (required)**
+
+      `number`
+
+    - **`articuloId`**
+
+      `integer`
+
+    - **`confianza`**
+
+      `number`
+
+  - **`iva1`**
+
+    `number`
+
+  - **`iva2`**
+
+    `number`
+
+  - **`neto1`**
+
+    `number`
+
+  - **`neto2`**
+
+    `number`
+
+  - **`neto3`**
+
+    `number`
+
+  - **`numero`**
+
+    `integer`
+
+  - **`prefijo`**
+
+    `string`
+
+  - **`proveedorId`**
+
+    `integer`
+
+  - **`rsocialExtracted`**
+
+    `string` — Supplier name hint from OCR/LLM (#277 Fase F)
+
+  - **`tipo`**
+
+    `object`
+
+  - **`total`**
+
+    `number`
+
+  - **`vencimiento`**
+
+    `string`, format: `date-time`
+
+* **`estado` (required)**
+
+  `string`, possible values: `"procesando", "pendiente_revision", "confirmado", "descartado"`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`tenantId` (required)**
+
+  `integer`
+
+* **`tier` (required)**
+
+  `integer`
+
+* **`tipoArchivo` (required)**
+
+  `string`
+
+* **`updatedAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`usuarioId` (required)**
+
+  `integer`
+
+* **`comprobanteCompraId`**
+
+  `integer`
+
+* **`errores`**
+
+  `object`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "tenantId": 1,
+  "usuarioId": 1,
+  "archivoNombre": "",
+  "archivoMime": "",
+  "archivoPath": "",
+  "tipoArchivo": "",
+  "tier": 1,
+  "confianza": 1,
+  "estado": "procesando",
+  "datosExtraidos": {
+    "proveedorId": 1,
+    "cuitExtracted": "",
+    "rsocialExtracted": "",
+    "fecha": "",
+    "vencimiento": "",
+    "tipo": "A",
+    "prefijo": "",
+    "numero": 1,
+    "neto1": 1,
+    "neto2": 1,
+    "neto3": 1,
+    "iva1": 1,
+    "iva2": 1,
+    "total": 1,
+    "cae": "",
+    "caeVto": "",
+    "items": [
+      {
+        "descripcion": "",
+        "cantidad": 1,
+        "precioUnitario": 1,
+        "subtotal": 1,
+        "articuloId": 1,
+        "confianza": 0
+      }
+    ],
+    "fieldConfidence": {
+      "additionalProperty": 1
+    }
+  },
+  "comprobanteCompraId": 1,
+  "errores": {},
+  "createdAt": "",
+  "updatedAt": ""
+}
+```
+
+### DocumentoCompraImportadoEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`archivoMime` (required)**
+
+    `string`
+
+  - **`archivoNombre` (required)**
+
+    `string`
+
+  - **`archivoPath` (required)**
+
+    `string`
+
+  - **`confianza` (required)**
+
+    `number`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`datosExtraidos` (required)**
+
+    `object`
+
+    - **`cae`**
+
+      `string`
+
+    - **`caeVto`**
+
+      `string`, format: `date-time`
+
+    - **`cuitExtracted`**
+
+      `string` — Supplier tax id digits extracted when no match (#277 Fase F)
+
+    - **`fecha`**
+
+      `string`, format: `date-time`
+
+    - **`fieldConfidence`**
+
+      `object`
+
+    - **`items`**
+
+      `array`
+
+      **Items:**
+
+      - **`cantidad` (required)**
+
+        `number`
+
+      - **`descripcion` (required)**
+
+        `string`
+
+      - **`precioUnitario` (required)**
+
+        `number`
+
+      - **`subtotal` (required)**
+
+        `number`
+
+      - **`articuloId`**
+
+        `integer`
+
+      - **`confianza`**
+
+        `number`
+
+    - **`iva1`**
+
+      `number`
+
+    - **`iva2`**
+
+      `number`
+
+    - **`neto1`**
+
+      `number`
+
+    - **`neto2`**
+
+      `number`
+
+    - **`neto3`**
+
+      `number`
+
+    - **`numero`**
+
+      `integer`
+
+    - **`prefijo`**
+
+      `string`
+
+    - **`proveedorId`**
+
+      `integer`
+
+    - **`rsocialExtracted`**
+
+      `string` — Supplier name hint from OCR/LLM (#277 Fase F)
+
+    - **`tipo`**
+
+      `object`
+
+    - **`total`**
+
+      `number`
+
+    - **`vencimiento`**
+
+      `string`, format: `date-time`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"procesando", "pendiente_revision", "confirmado", "descartado"`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`tier` (required)**
+
+    `integer`
+
+  - **`tipoArchivo` (required)**
+
+    `string`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`usuarioId` (required)**
+
+    `integer`
+
+  - **`comprobanteCompraId`**
+
+    `integer`
+
+  - **`errores`**
+
+    `object`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "usuarioId": 1,
+    "archivoNombre": "",
+    "archivoMime": "",
+    "archivoPath": "",
+    "tipoArchivo": "",
+    "tier": 1,
+    "confianza": 1,
+    "estado": "procesando",
+    "datosExtraidos": {
+      "proveedorId": 1,
+      "cuitExtracted": "",
+      "rsocialExtracted": "",
+      "fecha": "",
+      "vencimiento": "",
+      "tipo": "A",
+      "prefijo": "",
+      "numero": 1,
+      "neto1": 1,
+      "neto2": 1,
+      "neto3": 1,
+      "iva1": 1,
+      "iva2": 1,
+      "total": 1,
+      "cae": "",
+      "caeVto": "",
+      "items": [
+        {
+          "descripcion": "",
+          "cantidad": 1,
+          "precioUnitario": 1,
+          "subtotal": 1,
+          "articuloId": 1,
+          "confianza": 0
+        }
+      ],
+      "fieldConfidence": {
+        "additionalProperty": 1
+      }
+    },
+    "comprobanteCompraId": 1,
+    "errores": {},
+    "createdAt": "",
+    "updatedAt": ""
+  }
+}
+```
+
+### DocumentoCompraImportadoListEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`archivoMime` (required)**
+
+    `string`
+
+  - **`archivoNombre` (required)**
+
+    `string`
+
+  - **`archivoPath` (required)**
+
+    `string`
+
+  - **`confianza` (required)**
+
+    `number`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`datosExtraidos` (required)**
+
+    `object`
+
+    - **`cae`**
+
+      `string`
+
+    - **`caeVto`**
+
+      `string`, format: `date-time`
+
+    - **`cuitExtracted`**
+
+      `string` — Supplier tax id digits extracted when no match (#277 Fase F)
+
+    - **`fecha`**
+
+      `string`, format: `date-time`
+
+    - **`fieldConfidence`**
+
+      `object`
+
+    - **`items`**
+
+      `array`
+
+      **Items:**
+
+      - **`cantidad` (required)**
+
+        `number`
+
+      - **`descripcion` (required)**
+
+        `string`
+
+      - **`precioUnitario` (required)**
+
+        `number`
+
+      - **`subtotal` (required)**
+
+        `number`
+
+      - **`articuloId`**
+
+        `integer`
+
+      - **`confianza`**
+
+        `number`
+
+    - **`iva1`**
+
+      `number`
+
+    - **`iva2`**
+
+      `number`
+
+    - **`neto1`**
+
+      `number`
+
+    - **`neto2`**
+
+      `number`
+
+    - **`neto3`**
+
+      `number`
+
+    - **`numero`**
+
+      `integer`
+
+    - **`prefijo`**
+
+      `string`
+
+    - **`proveedorId`**
+
+      `integer`
+
+    - **`rsocialExtracted`**
+
+      `string` — Supplier name hint from OCR/LLM (#277 Fase F)
+
+    - **`tipo`**
+
+      `object`
+
+    - **`total`**
+
+      `number`
+
+    - **`vencimiento`**
+
+      `string`, format: `date-time`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"procesando", "pendiente_revision", "confirmado", "descartado"`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`tier` (required)**
+
+    `integer`
+
+  - **`tipoArchivo` (required)**
+
+    `string`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`usuarioId` (required)**
+
+    `integer`
+
+  - **`comprobanteCompraId`**
+
+    `integer`
+
+  - **`errores`**
+
+    `object`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "usuarioId": 1,
+      "archivoNombre": "",
+      "archivoMime": "",
+      "archivoPath": "",
+      "tipoArchivo": "",
+      "tier": 1,
+      "confianza": 1,
+      "estado": "procesando",
+      "datosExtraidos": {
+        "proveedorId": 1,
+        "cuitExtracted": "",
+        "rsocialExtracted": "",
+        "fecha": "",
+        "vencimiento": "",
+        "tipo": "A",
+        "prefijo": "",
+        "numero": 1,
+        "neto1": 1,
+        "neto2": 1,
+        "neto3": 1,
+        "iva1": 1,
+        "iva2": 1,
+        "total": 1,
+        "cae": "",
+        "caeVto": "",
+        "items": [
+          {
+            "descripcion": "",
+            "cantidad": 1,
+            "precioUnitario": 1,
+            "subtotal": 1,
+            "articuloId": 1,
+            "confianza": 0
+          }
+        ],
+        "fieldConfidence": {
+          "additionalProperty": 1
+        }
+      },
+      "comprobanteCompraId": 1,
+      "errores": {},
+      "createdAt": "",
+      "updatedAt": ""
+    }
+  ]
+}
+```
+
+### DocumentoCompraColaEstado
+
+- **Type:**`object`
+
+* **`confirmado` (required)**
+
+  `integer`
+
+* **`descartado` (required)**
+
+  `integer`
+
+* **`documentos` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`archivoMime` (required)**
+
+    `string`
+
+  - **`archivoNombre` (required)**
+
+    `string`
+
+  - **`archivoPath` (required)**
+
+    `string`
+
+  - **`confianza` (required)**
+
+    `number`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`datosExtraidos` (required)**
+
+    `object`
+
+    - **`cae`**
+
+      `string`
+
+    - **`caeVto`**
+
+      `string`, format: `date-time`
+
+    - **`cuitExtracted`**
+
+      `string` — Supplier tax id digits extracted when no match (#277 Fase F)
+
+    - **`fecha`**
+
+      `string`, format: `date-time`
+
+    - **`fieldConfidence`**
+
+      `object`
+
+    - **`items`**
+
+      `array`
+
+      **Items:**
+
+      - **`cantidad` (required)**
+
+        `number`
+
+      - **`descripcion` (required)**
+
+        `string`
+
+      - **`precioUnitario` (required)**
+
+        `number`
+
+      - **`subtotal` (required)**
+
+        `number`
+
+      - **`articuloId`**
+
+        `integer`
+
+      - **`confianza`**
+
+        `number`
+
+    - **`iva1`**
+
+      `number`
+
+    - **`iva2`**
+
+      `number`
+
+    - **`neto1`**
+
+      `number`
+
+    - **`neto2`**
+
+      `number`
+
+    - **`neto3`**
+
+      `number`
+
+    - **`numero`**
+
+      `integer`
+
+    - **`prefijo`**
+
+      `string`
+
+    - **`proveedorId`**
+
+      `integer`
+
+    - **`rsocialExtracted`**
+
+      `string` — Supplier name hint from OCR/LLM (#277 Fase F)
+
+    - **`tipo`**
+
+      `object`
+
+    - **`total`**
+
+      `number`
+
+    - **`vencimiento`**
+
+      `string`, format: `date-time`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"procesando", "pendiente_revision", "confirmado", "descartado"`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`tier` (required)**
+
+    `integer`
+
+  - **`tipoArchivo` (required)**
+
+    `string`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`usuarioId` (required)**
+
+    `integer`
+
+  - **`comprobanteCompraId`**
+
+    `integer`
+
+  - **`errores`**
+
+    `object`
+
+* **`pendiente_revision` (required)**
+
+  `integer`
+
+* **`procesando` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "procesando": 0,
+  "pendiente_revision": 0,
+  "confirmado": 0,
+  "descartado": 0,
+  "documentos": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "usuarioId": 1,
+      "archivoNombre": "",
+      "archivoMime": "",
+      "archivoPath": "",
+      "tipoArchivo": "",
+      "tier": 1,
+      "confianza": 1,
+      "estado": "procesando",
+      "datosExtraidos": {
+        "proveedorId": 1,
+        "cuitExtracted": "",
+        "rsocialExtracted": "",
+        "fecha": "",
+        "vencimiento": "",
+        "tipo": "A",
+        "prefijo": "",
+        "numero": 1,
+        "neto1": 1,
+        "neto2": 1,
+        "neto3": 1,
+        "iva1": 1,
+        "iva2": 1,
+        "total": 1,
+        "cae": "",
+        "caeVto": "",
+        "items": [
+          {
+            "descripcion": "",
+            "cantidad": 1,
+            "precioUnitario": 1,
+            "subtotal": 1,
+            "articuloId": 1,
+            "confianza": 0
+          }
+        ],
+        "fieldConfidence": {
+          "additionalProperty": 1
+        }
+      },
+      "comprobanteCompraId": 1,
+      "errores": {},
+      "createdAt": "",
+      "updatedAt": ""
+    }
+  ]
+}
+```
+
+### DocumentoCompraColaEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`confirmado` (required)**
+
+    `integer`
+
+  - **`descartado` (required)**
+
+    `integer`
+
+  - **`documentos` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`archivoMime` (required)**
+
+      `string`
+
+    - **`archivoNombre` (required)**
+
+      `string`
+
+    - **`archivoPath` (required)**
+
+      `string`
+
+    - **`confianza` (required)**
+
+      `number`
+
+    - **`createdAt` (required)**
+
+      `string`, format: `date-time`
+
+    - **`datosExtraidos` (required)**
+
+      `object`
+
+      - **`cae`**
+
+        `string`
+
+      - **`caeVto`**
+
+        `string`, format: `date-time`
+
+      - **`cuitExtracted`**
+
+        `string` — Supplier tax id digits extracted when no match (#277 Fase F)
+
+      - **`fecha`**
+
+        `string`, format: `date-time`
+
+      - **`fieldConfidence`**
+
+        `object`
+
+      - **`items`**
+
+        `array`
+
+        **Items:**
+
+        - **`cantidad` (required)**
+
+          `number`
+
+        - **`descripcion` (required)**
+
+          `string`
+
+        - **`precioUnitario` (required)**
+
+          `number`
+
+        - **`subtotal` (required)**
+
+          `number`
+
+        - **`articuloId`**
+
+          `integer`
+
+        - **`confianza`**
+
+          `number`
+
+      - **`iva1`**
+
+        `number`
+
+      - **`iva2`**
+
+        `number`
+
+      - **`neto1`**
+
+        `number`
+
+      - **`neto2`**
+
+        `number`
+
+      - **`neto3`**
+
+        `number`
+
+      - **`numero`**
+
+        `integer`
+
+      - **`prefijo`**
+
+        `string`
+
+      - **`proveedorId`**
+
+        `integer`
+
+      - **`rsocialExtracted`**
+
+        `string` — Supplier name hint from OCR/LLM (#277 Fase F)
+
+      - **`tipo`**
+
+        `object`
+
+      - **`total`**
+
+        `number`
+
+      - **`vencimiento`**
+
+        `string`, format: `date-time`
+
+    - **`estado` (required)**
+
+      `string`, possible values: `"procesando", "pendiente_revision", "confirmado", "descartado"`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`tenantId` (required)**
+
+      `integer`
+
+    - **`tier` (required)**
+
+      `integer`
+
+    - **`tipoArchivo` (required)**
+
+      `string`
+
+    - **`updatedAt` (required)**
+
+      `string`, format: `date-time`
+
+    - **`usuarioId` (required)**
+
+      `integer`
+
+    - **`comprobanteCompraId`**
+
+      `integer`
+
+    - **`errores`**
+
+      `object`
+
+  - **`pendiente_revision` (required)**
+
+    `integer`
+
+  - **`procesando` (required)**
+
+    `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "procesando": 0,
+    "pendiente_revision": 0,
+    "confirmado": 0,
+    "descartado": 0,
+    "documentos": [
+      {
+        "id": 1,
+        "tenantId": 1,
+        "usuarioId": 1,
+        "archivoNombre": "",
+        "archivoMime": "",
+        "archivoPath": "",
+        "tipoArchivo": "",
+        "tier": 1,
+        "confianza": 1,
+        "estado": "procesando",
+        "datosExtraidos": {
+          "proveedorId": 1,
+          "cuitExtracted": "",
+          "rsocialExtracted": "",
+          "fecha": "",
+          "vencimiento": "",
+          "tipo": "A",
+          "prefijo": "",
+          "numero": 1,
+          "neto1": 1,
+          "neto2": 1,
+          "neto3": 1,
+          "iva1": 1,
+          "iva2": 1,
+          "total": 1,
+          "cae": "",
+          "caeVto": "",
+          "items": [
+            {
+              "descripcion": "",
+              "cantidad": 1,
+              "precioUnitario": 1,
+              "subtotal": 1,
+              "articuloId": 1,
+              "confianza": 0
+            }
+          ],
+          "fieldConfidence": {
+            "additionalProperty": 1
+          }
+        },
+        "comprobanteCompraId": 1,
+        "errores": {},
+        "createdAt": "",
+        "updatedAt": ""
+      }
+    ]
+  }
+}
+```
+
+### DocumentoCompraDuplicadoResult
+
+- **Type:**`object`
+
+* **`comprobanteCompraId` (required)**
+
+  `integer | null`
+
+* **`duplicado` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "duplicado": true,
+  "comprobanteCompraId": null
+}
+```
+
+### DocumentoCompraDuplicadoEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`comprobanteCompraId` (required)**
+
+    `integer | null`
+
+  - **`duplicado` (required)**
+
+    `boolean`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "duplicado": true,
+    "comprobanteCompraId": null
+  }
+}
+```
+
+### RegimenRetencion
+
+- **Type:**`object`
+
+* **`activo` (required)**
+
+  `boolean`
+
+* **`alicuota` (required)**
+
+  `string`
+
+* **`alicuotaMin` (required)**
+
+  `string | null`
+
+* **`createdAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`nombre` (required)**
+
+  `string`
+
+* **`provincia` (required)**
+
+  `string | null`
+
+* **`subtipo` (required)**
+
+  `string`, possible values: `"retencion", "percepcion"`
+
+* **`tenantId` (required)**
+
+  `integer`
+
+* **`tipo` (required)**
+
+  `string`, possible values: `"ganancias", "iva", "iibb"`
+
+* **`updatedAt` (required)**
+
+  `string`, format: `date-time`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "tenantId": 1,
+  "tipo": "ganancias",
+  "subtipo": "retencion",
+  "nombre": "",
+  "alicuota": "",
+  "alicuotaMin": null,
+  "provincia": null,
+  "activo": true,
+  "createdAt": "",
+  "updatedAt": ""
+}
+```
+
+### RegimenRetencionInput
+
+- **Type:**`object`
+
+* **`alicuota` (required)**
+
+  `number`
+
+* **`nombre` (required)**
+
+  `string`
+
+* **`subtipo` (required)**
+
+  `string`, possible values: `"retencion", "percepcion"`
+
+* **`tipo` (required)**
+
+  `string`, possible values: `"ganancias", "iva", "iibb"`
+
+* **`activo`**
+
+  `boolean`
+
+* **`alicuotaMin`**
+
+  `number | null`
+
+* **`provincia`**
+
+  `string | null`
+
+**Example:**
+
+```json
+{
+  "tipo": "ganancias",
+  "subtipo": "retencion",
+  "nombre": "",
+  "alicuota": 0,
+  "alicuotaMin": null,
+  "provincia": null,
+  "activo": true
+}
+```
+
+### RegimenRetencionUpdateInput
+
+- **Type:**`object`
+
+* **`activo`**
+
+  `boolean`
+
+* **`alicuota`**
+
+  `number`
+
+* **`alicuotaMin`**
+
+  `number | null`
+
+* **`nombre`**
+
+  `string`
+
+* **`provincia`**
+
+  `string | null`
+
+**Example:**
+
+```json
+{
+  "nombre": "",
+  "alicuota": 0,
+  "alicuotaMin": null,
+  "provincia": null,
+  "activo": true
+}
+```
+
+### RegimenRetencionEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`activo` (required)**
+
+    `boolean`
+
+  - **`alicuota` (required)**
+
+    `string`
+
+  - **`alicuotaMin` (required)**
+
+    `string | null`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`nombre` (required)**
+
+    `string`
+
+  - **`provincia` (required)**
+
+    `string | null`
+
+  - **`subtipo` (required)**
+
+    `string`, possible values: `"retencion", "percepcion"`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"ganancias", "iva", "iibb"`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "tipo": "ganancias",
+    "subtipo": "retencion",
+    "nombre": "",
+    "alicuota": "",
+    "alicuotaMin": null,
+    "provincia": null,
+    "activo": true,
+    "createdAt": "",
+    "updatedAt": ""
+  }
+}
+```
+
+### RegimenRetencionListEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`activo` (required)**
+
+    `boolean`
+
+  - **`alicuota` (required)**
+
+    `string`
+
+  - **`alicuotaMin` (required)**
+
+    `string | null`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`nombre` (required)**
+
+    `string`
+
+  - **`provincia` (required)**
+
+    `string | null`
+
+  - **`subtipo` (required)**
+
+    `string`, possible values: `"retencion", "percepcion"`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"ganancias", "iva", "iibb"`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "tipo": "ganancias",
+      "subtipo": "retencion",
+      "nombre": "",
+      "alicuota": "",
+      "alicuotaMin": null,
+      "provincia": null,
+      "activo": true,
+      "createdAt": "",
+      "updatedAt": ""
+    }
+  ]
+}
+```
+
+### FiscalRetencionesConfig
+
+- **Type:**`object`
+
+* **`esAgenteRetencionGanancias` (required)**
+
+  `boolean`
+
+* **`esAgenteRetencionIIBB` (required)**
+
+  `boolean`
+
+* **`esAgenteRetencionIVA` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "esAgenteRetencionGanancias": true,
+  "esAgenteRetencionIVA": true,
+  "esAgenteRetencionIIBB": true
+}
+```
+
+### FiscalRetencionesConfigInput
+
+- **Type:**`object`
+
+* **`esAgenteRetencionGanancias`**
+
+  `boolean`
+
+* **`esAgenteRetencionIIBB`**
+
+  `boolean`
+
+* **`esAgenteRetencionIVA`**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "esAgenteRetencionGanancias": true,
+  "esAgenteRetencionIVA": true,
+  "esAgenteRetencionIIBB": true
+}
+```
+
+### FiscalRetencionesConfigEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`esAgenteRetencionGanancias` (required)**
+
+    `boolean`
+
+  - **`esAgenteRetencionIIBB` (required)**
+
+    `boolean`
+
+  - **`esAgenteRetencionIVA` (required)**
+
+    `boolean`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "esAgenteRetencionGanancias": true,
+    "esAgenteRetencionIVA": true,
+    "esAgenteRetencionIIBB": true
+  }
+}
+```
+
+### RetencionAplicada
+
+- **Type:**`object`
+
+* **`alicuota` (required)**
+
+  `string`
+
+* **`baseImponible` (required)**
+
+  `string`
+
+* **`createdAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`entidadId` (required)**
+
+  `integer`
+
+* **`entidadTipo` (required)**
+
+  `string`, possible values: `"cliente", "proveedor"`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`importe` (required)**
+
+  `string`
+
+* **`regimenId` (required)**
+
+  `integer`
+
+* **`regimenNombre` (required)**
+
+  `string`
+
+* **`tipo` (required)**
+
+  `string`
+
+* **`cobroId`**
+
+  `integer | null`
+
+* **`constanciaNum`**
+
+  `string | null`
+
+* **`facturaId`**
+
+  `integer | null`
+
+* **`reciboPagoId`**
+
+  `integer | null`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "regimenId": 1,
+  "regimenNombre": "",
+  "tipo": "",
+  "entidadTipo": "cliente",
+  "entidadId": 1,
+  "facturaId": null,
+  "cobroId": null,
+  "reciboPagoId": null,
+  "baseImponible": "",
+  "alicuota": "",
+  "importe": "",
+  "constanciaNum": null,
+  "createdAt": ""
+}
+```
+
+### RetencionAplicadaListEnvelope
+
+- **Type:**
+
+**Example:**
+
+### RetencionesPreviewResult
+
+- **Type:**`object`
+
+* **`retenciones` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`alicuota` (required)**
+
+    `string`
+
+  - **`baseImponible` (required)**
+
+    `string`
+
+  - **`importe` (required)**
+
+    `string`
+
+  - **`nombre` (required)**
+
+    `string`
+
+  - **`regimenId` (required)**
+
+    `integer`
+
+  - **`tipo` (required)**
+
+    `string`
+
+**Example:**
+
+```json
+{
+  "retenciones": [
+    {
+      "regimenId": 1,
+      "nombre": "",
+      "tipo": "",
+      "alicuota": "",
+      "baseImponible": "",
+      "importe": ""
+    }
+  ]
+}
+```
+
+### RetencionesPreviewEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`retenciones` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`alicuota` (required)**
+
+      `string`
+
+    - **`baseImponible` (required)**
+
+      `string`
+
+    - **`importe` (required)**
+
+      `string`
+
+    - **`nombre` (required)**
+
+      `string`
+
+    - **`regimenId` (required)**
+
+      `integer`
+
+    - **`tipo` (required)**
+
+      `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "retenciones": [
+      {
+        "regimenId": 1,
+        "nombre": "",
+        "tipo": "",
+        "alicuota": "",
+        "baseImponible": "",
+        "importe": ""
+      }
+    ]
+  }
+}
+```
+
+### DocumentoCompraTemplateSummary
+
+- **Type:**`object`
+
+* **`issuer` (required)**
+
+  `string`
+
+* **`keywords` (required)**
+
+  `array`
+
+  **Items:**
+
+  `string`
+
+* **`source` (required)**
+
+  `string`, possible values: `"bundled", "custom"`
+
+**Example:**
+
+```json
+{
+  "issuer": "",
+  "keywords": [
+    ""
+  ],
+  "source": "bundled"
+}
+```
+
+### DocumentoCompraTemplateListEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`issuer` (required)**
+
+    `string`
+
+  - **`keywords` (required)**
+
+    `array`
+
+    **Items:**
+
+    `string`
+
+  - **`source` (required)**
+
+    `string`, possible values: `"bundled", "custom"`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "issuer": "",
+      "keywords": [
+        ""
+      ],
+      "source": "bundled"
+    }
+  ]
+}
+```
+
+### DocumentoCompraTemplateInput
+
+- **Type:**`object`
+
+* **`content` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "content": ""
+}
+```
+
+### DocumentoCompraTemplate
+
+- **Type:**`object`
+
+* **`fields` (required)**
+
+  `object`
+
+* **`issuer` (required)**
+
+  `string`
+
+* **`keywords` (required)**
+
+  `array`
+
+  **Items:**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "issuer": "",
+  "keywords": [
+    ""
+  ],
+  "fields": {
+    "additionalProperty": "anything"
+  }
+}
+```
+
+### DocumentoCompraTemplateEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`fields` (required)**
+
+    `object`
+
+  - **`issuer` (required)**
+
+    `string`
+
+  - **`keywords` (required)**
+
+    `array`
+
+    **Items:**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "issuer": "",
+    "keywords": [
+      ""
+    ],
+    "fields": {
+      "additionalProperty": "anything"
+    }
+  }
+}
+```
+
+### DocumentoCompraConfirmInput
+
+- **Type:**
+
+**Example:**
+
+### DocumentoCompraConfirmResult
+
+- **Type:**`object`
+
+* **`comprobanteCompra` (required)**
+
+  `object`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`estado` (required)**
+
+    `string`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`iva1` (required)**
+
+    `number`
+
+  - **`iva2` (required)**
+
+    `number`
+
+  - **`neto1` (required)**
+
+    `number`
+
+  - **`neto2` (required)**
+
+    `number`
+
+  - **`neto3` (required)**
+
+    `number`
+
+  - **`numero` (required)**
+
+    `integer`
+
+  - **`prefijo` (required)**
+
+    `string`
+
+  - **`proveedorId` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`tipo` (required)**
+
+    `string`
+
+  - **`total` (required)**
+
+    `number`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`cae`**
+
+    `string`
+
+  - **`caeVto`**
+
+    `string`, format: `date-time`
+
+  - **`ordenCompraId`**
+
+    `integer`
+
+* **`documento` (required)**
+
+  `object`
+
+  - **`archivoMime` (required)**
+
+    `string`
+
+  - **`archivoNombre` (required)**
+
+    `string`
+
+  - **`archivoPath` (required)**
+
+    `string`
+
+  - **`confianza` (required)**
+
+    `number`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`datosExtraidos` (required)**
+
+    `object`
+
+    - **`cae`**
+
+      `string`
+
+    - **`caeVto`**
+
+      `string`, format: `date-time`
+
+    - **`cuitExtracted`**
+
+      `string` — Supplier tax id digits extracted when no match (#277 Fase F)
+
+    - **`fecha`**
+
+      `string`, format: `date-time`
+
+    - **`fieldConfidence`**
+
+      `object`
+
+    - **`items`**
+
+      `array`
+
+      **Items:**
+
+      - **`cantidad` (required)**
+
+        `number`
+
+      - **`descripcion` (required)**
+
+        `string`
+
+      - **`precioUnitario` (required)**
+
+        `number`
+
+      - **`subtotal` (required)**
+
+        `number`
+
+      - **`articuloId`**
+
+        `integer`
+
+      - **`confianza`**
+
+        `number`
+
+    - **`iva1`**
+
+      `number`
+
+    - **`iva2`**
+
+      `number`
+
+    - **`neto1`**
+
+      `number`
+
+    - **`neto2`**
+
+      `number`
+
+    - **`neto3`**
+
+      `number`
+
+    - **`numero`**
+
+      `integer`
+
+    - **`prefijo`**
+
+      `string`
+
+    - **`proveedorId`**
+
+      `integer`
+
+    - **`rsocialExtracted`**
+
+      `string` — Supplier name hint from OCR/LLM (#277 Fase F)
+
+    - **`tipo`**
+
+      `object`
+
+    - **`total`**
+
+      `number`
+
+    - **`vencimiento`**
+
+      `string`, format: `date-time`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"procesando", "pendiente_revision", "confirmado", "descartado"`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`tier` (required)**
+
+    `integer`
+
+  - **`tipoArchivo` (required)**
+
+    `string`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`usuarioId` (required)**
+
+    `integer`
+
+  - **`comprobanteCompraId`**
+
+    `integer`
+
+  - **`errores`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "documento": {
+    "id": 1,
+    "tenantId": 1,
+    "usuarioId": 1,
+    "archivoNombre": "",
+    "archivoMime": "",
+    "archivoPath": "",
+    "tipoArchivo": "",
+    "tier": 1,
+    "confianza": 1,
+    "estado": "procesando",
+    "datosExtraidos": {
+      "proveedorId": 1,
+      "cuitExtracted": "",
+      "rsocialExtracted": "",
+      "fecha": "",
+      "vencimiento": "",
+      "tipo": "A",
+      "prefijo": "",
+      "numero": 1,
+      "neto1": 1,
+      "neto2": 1,
+      "neto3": 1,
+      "iva1": 1,
+      "iva2": 1,
+      "total": 1,
+      "cae": "",
+      "caeVto": "",
+      "items": [
+        {
+          "descripcion": "",
+          "cantidad": 1,
+          "precioUnitario": 1,
+          "subtotal": 1,
+          "articuloId": 1,
+          "confianza": 0
+        }
+      ],
+      "fieldConfidence": {
+        "additionalProperty": 1
+      }
+    },
+    "comprobanteCompraId": 1,
+    "errores": {},
+    "createdAt": "",
+    "updatedAt": ""
+  },
+  "comprobanteCompra": {
+    "id": 1,
+    "tenantId": 1,
+    "proveedorId": 1,
+    "ordenCompraId": 1,
+    "fecha": "",
+    "tipo": "",
+    "prefijo": "",
+    "numero": 1,
+    "neto1": 1,
+    "neto2": 1,
+    "neto3": 1,
+    "iva1": 1,
+    "iva2": 1,
+    "total": 1,
+    "cae": "",
+    "caeVto": "",
+    "estado": "",
+    "createdAt": "",
+    "updatedAt": ""
+  }
+}
+```
+
+### DocumentoCompraConfirmEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`comprobanteCompra` (required)**
+
+    `object`
+
+    - **`createdAt` (required)**
+
+      `string`, format: `date-time`
+
+    - **`estado` (required)**
+
+      `string`
+
+    - **`fecha` (required)**
+
+      `string`, format: `date-time`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`iva1` (required)**
+
+      `number`
+
+    - **`iva2` (required)**
+
+      `number`
+
+    - **`neto1` (required)**
+
+      `number`
+
+    - **`neto2` (required)**
+
+      `number`
+
+    - **`neto3` (required)**
+
+      `number`
+
+    - **`numero` (required)**
+
+      `integer`
+
+    - **`prefijo` (required)**
+
+      `string`
+
+    - **`proveedorId` (required)**
+
+      `integer`
+
+    - **`tenantId` (required)**
+
+      `integer`
+
+    - **`tipo` (required)**
+
+      `string`
+
+    - **`total` (required)**
+
+      `number`
+
+    - **`updatedAt` (required)**
+
+      `string`, format: `date-time`
+
+    - **`cae`**
+
+      `string`
+
+    - **`caeVto`**
+
+      `string`, format: `date-time`
+
+    - **`ordenCompraId`**
+
+      `integer`
+
+  - **`documento` (required)**
+
+    `object`
+
+    - **`archivoMime` (required)**
+
+      `string`
+
+    - **`archivoNombre` (required)**
+
+      `string`
+
+    - **`archivoPath` (required)**
+
+      `string`
+
+    - **`confianza` (required)**
+
+      `number`
+
+    - **`createdAt` (required)**
+
+      `string`, format: `date-time`
+
+    - **`datosExtraidos` (required)**
+
+      `object`
+
+      - **`cae`**
+
+        `string`
+
+      - **`caeVto`**
+
+        `string`, format: `date-time`
+
+      - **`cuitExtracted`**
+
+        `string` — Supplier tax id digits extracted when no match (#277 Fase F)
+
+      - **`fecha`**
+
+        `string`, format: `date-time`
+
+      - **`fieldConfidence`**
+
+        `object`
+
+      - **`items`**
+
+        `array`
+
+        **Items:**
+
+        - **`cantidad` (required)**
+
+          `number`
+
+        - **`descripcion` (required)**
+
+          `string`
+
+        - **`precioUnitario` (required)**
+
+          `number`
+
+        - **`subtotal` (required)**
+
+          `number`
+
+        - **`articuloId`**
+
+          `integer`
+
+        - **`confianza`**
+
+          `number`
+
+      - **`iva1`**
+
+        `number`
+
+      - **`iva2`**
+
+        `number`
+
+      - **`neto1`**
+
+        `number`
+
+      - **`neto2`**
+
+        `number`
+
+      - **`neto3`**
+
+        `number`
+
+      - **`numero`**
+
+        `integer`
+
+      - **`prefijo`**
+
+        `string`
+
+      - **`proveedorId`**
+
+        `integer`
+
+      - **`rsocialExtracted`**
+
+        `string` — Supplier name hint from OCR/LLM (#277 Fase F)
+
+      - **`tipo`**
+
+        `object`
+
+      - **`total`**
+
+        `number`
+
+      - **`vencimiento`**
+
+        `string`, format: `date-time`
+
+    - **`estado` (required)**
+
+      `string`, possible values: `"procesando", "pendiente_revision", "confirmado", "descartado"`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`tenantId` (required)**
+
+      `integer`
+
+    - **`tier` (required)**
+
+      `integer`
+
+    - **`tipoArchivo` (required)**
+
+      `string`
+
+    - **`updatedAt` (required)**
+
+      `string`, format: `date-time`
+
+    - **`usuarioId` (required)**
+
+      `integer`
+
+    - **`comprobanteCompraId`**
+
+      `integer`
+
+    - **`errores`**
+
+      `object`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "documento": {
+      "id": 1,
+      "tenantId": 1,
+      "usuarioId": 1,
+      "archivoNombre": "",
+      "archivoMime": "",
+      "archivoPath": "",
+      "tipoArchivo": "",
+      "tier": 1,
+      "confianza": 1,
+      "estado": "procesando",
+      "datosExtraidos": {
+        "proveedorId": 1,
+        "cuitExtracted": "",
+        "rsocialExtracted": "",
+        "fecha": "",
+        "vencimiento": "",
+        "tipo": "A",
+        "prefijo": "",
+        "numero": 1,
+        "neto1": 1,
+        "neto2": 1,
+        "neto3": 1,
+        "iva1": 1,
+        "iva2": 1,
+        "total": 1,
+        "cae": "",
+        "caeVto": "",
+        "items": [
+          {
+            "descripcion": "",
+            "cantidad": 1,
+            "precioUnitario": 1,
+            "subtotal": 1,
+            "articuloId": 1,
+            "confianza": 0
+          }
+        ],
+        "fieldConfidence": {
+          "additionalProperty": 1
+        }
+      },
+      "comprobanteCompraId": 1,
+      "errores": {},
+      "createdAt": "",
+      "updatedAt": ""
+    },
+    "comprobanteCompra": {
+      "id": 1,
+      "tenantId": 1,
+      "proveedorId": 1,
+      "ordenCompraId": 1,
+      "fecha": "",
+      "tipo": "",
+      "prefijo": "",
+      "numero": 1,
+      "neto1": 1,
+      "neto2": 1,
+      "neto3": 1,
+      "iva1": 1,
+      "iva2": 1,
+      "total": 1,
+      "cae": "",
+      "caeVto": "",
+      "estado": "",
+      "createdAt": "",
+      "updatedAt": ""
+    }
+  }
+}
+```
+
+### FacturaVoidResult
+
+- **Type:**`object`
+
+* **`factura` (required)**
+
+  `object`
+
+  - **`cae`**
+
+    `string`
+
+  - **`caeVto`**
+
+    `string`, format: `date-time`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`estado`**
+
+    `string`
+
+  - **`estadoCae`**
+
+    `string`, possible values: `"pending", "issued", "failed"`
+
+  - **`fecha`**
+
+    `string`, format: `date-time`
+
+  - **`formaPagoId`**
+
+    `integer`
+
+  - **`id`**
+
+    `integer`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+    - **`articulo`**
+
+      `object`
+
+      - **`activo`**
+
+        `boolean`
+
+      - **`codigo`**
+
+        `integer`
+
+      - **`condIva`**
+
+        `string`
+
+      - **`costo`**
+
+        `number`
+
+      - **`descripcion`**
+
+        `string`
+
+      - **`id`**
+
+        `integer`
+
+      - **`minimo`**
+
+        `integer`
+
+      - **`precioLista1`**
+
+        `number`
+
+      - **`precioLista2`**
+
+        `number`
+
+      - **`rubro`**
+
+        `object`
+
+        - **`codigo`**
+
+          `integer`
+
+        - **`id`**
+
+          `integer`
+
+        - **`nombre`**
+
+          `string`
+
+      - **`rubroId`**
+
+        `integer`
+
+      - **`stock`**
+
+        `integer`
+
+      - **`umedida`**
+
+        `string`
+
+    - **`articuloId`**
+
+      `integer`
+
+    - **`cantidad`**
+
+      `number`
+
+    - **`dscto`**
+
+      `number`
+
+    - **`id`**
+
+      `integer`
+
+    - **`precio`**
+
+      `number`
+
+    - **`subtotal`**
+
+      `number`
+
+  - **`iva1`**
+
+    `number`
+
+  - **`iva2`**
+
+    `number`
+
+  - **`neto1`**
+
+    `number`
+
+  - **`neto2`**
+
+    `number`
+
+  - **`neto3`**
+
+    `number`
+
+  - **`numero`**
+
+    `integer`
+
+  - **`prefijo`**
+
+    `string`
+
+  - **`tipo`**
+
+    `string`
+
+  - **`total`**
+
+    `number`
+
+* **`notaCredito` (required)**
+
+  `object`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`estadoCae` (required)**
+
+    `string`, possible values: `"pending", "issued", "failed", "not_required"`
+
+  - **`facturaOrigenId` (required)**
+
+    `integer`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`monto` (required)**
+
+    `object`
+
+  - **`motivo` (required)**
+
+    `string`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`cae`**
+
+    `string`
+
+  - **`caeVto`**
+
+    `string`, format: `date-time`
+
+  - **`createdById`**
+
+    `integer`
+
+* **`updatedCliente` (required)**
+
+  `object`
+
+  - **`balance` (required)**
+
+    `object` — Customer balance after decrement (Prisma Decimal may serialize as string in JSON)
+
+  - **`creditLimit` (required)**
+
+    `number`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`rsocial` (required)**
+
+    `string`
+
+**Example:**
+
+```json
+{
+  "factura": {
+    "id": 1,
+    "fecha": "",
+    "tipo": "",
+    "prefijo": "",
+    "numero": 1,
+    "clienteId": 1,
+    "formaPagoId": 1,
+    "neto1": 1,
+    "neto2": 1,
+    "neto3": 1,
+    "iva1": 1,
+    "iva2": 1,
+    "total": 1,
+    "estado": "",
+    "cae": "",
+    "caeVto": "",
+    "estadoCae": "pending",
+    "items": [
+      {
+        "id": 1,
+        "articuloId": 1,
+        "articulo": {
+          "id": 1,
+          "codigo": 1,
+          "descripcion": "",
+          "rubroId": 1,
+          "rubro": {
+            "id": 1,
+            "codigo": 1,
+            "nombre": "",
+            "additionalProperty": "anything"
+          },
+          "condIva": "",
+          "umedida": "",
+          "precioLista1": 1,
+          "precioLista2": 1,
+          "costo": 1,
+          "stock": 1,
+          "minimo": 1,
+          "activo": true,
+          "additionalProperty": "anything"
+        },
+        "cantidad": 1,
+        "precio": 1,
+        "dscto": 1,
+        "subtotal": 1,
+        "additionalProperty": "anything"
+      }
+    ],
+    "additionalProperty": "anything"
+  },
+  "notaCredito": {
+    "id": 1,
+    "tenantId": 1,
+    "facturaOrigenId": 1,
+    "motivo": "",
+    "monto": 1,
+    "cae": "",
+    "caeVto": "",
+    "estadoCae": "pending",
+    "createdById": 1,
+    "createdAt": "",
+    "additionalProperty": "anything"
+  },
+  "updatedCliente": {
+    "id": 1,
+    "rsocial": "",
+    "balance": 1,
+    "creditLimit": 1
+  }
+}
+```
+
+### FacturaVoidEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`factura` (required)**
+
+    `object`
+
+    - **`cae`**
+
+      `string`
+
+    - **`caeVto`**
+
+      `string`, format: `date-time`
+
+    - **`clienteId`**
+
+      `integer`
+
+    - **`estado`**
+
+      `string`
+
+    - **`estadoCae`**
+
+      `string`, possible values: `"pending", "issued", "failed"`
+
+    - **`fecha`**
+
+      `string`, format: `date-time`
+
+    - **`formaPagoId`**
+
+      `integer`
+
+    - **`id`**
+
+      `integer`
+
+    - **`items`**
+
+      `array`
+
+      **Items:**
+
+      - **`articulo`**
+
+        `object`
+
+        - **`activo`**
+
+          `boolean`
+
+        - **`codigo`**
+
+          `integer`
+
+        - **`condIva`**
+
+          `string`
+
+        - **`costo`**
+
+          `number`
+
+        - **`descripcion`**
+
+          `string`
+
+        - **`id`**
+
+          `integer`
+
+        - **`minimo`**
+
+          `integer`
+
+        - **`precioLista1`**
+
+          `number`
+
+        - **`precioLista2`**
+
+          `number`
+
+        - **`rubro`**
+
+          `object`
+
+          - **`codigo`**
+
+            `integer`
+
+          - **`id`**
+
+            `integer`
+
+          - **`nombre`**
+
+            `string`
+
+        - **`rubroId`**
+
+          `integer`
+
+        - **`stock`**
+
+          `integer`
+
+        - **`umedida`**
+
+          `string`
+
+      - **`articuloId`**
+
+        `integer`
+
+      - **`cantidad`**
+
+        `number`
+
+      - **`dscto`**
+
+        `number`
+
+      - **`id`**
+
+        `integer`
+
+      - **`precio`**
+
+        `number`
+
+      - **`subtotal`**
+
+        `number`
+
+    - **`iva1`**
+
+      `number`
+
+    - **`iva2`**
+
+      `number`
+
+    - **`neto1`**
+
+      `number`
+
+    - **`neto2`**
+
+      `number`
+
+    - **`neto3`**
+
+      `number`
+
+    - **`numero`**
+
+      `integer`
+
+    - **`prefijo`**
+
+      `string`
+
+    - **`tipo`**
+
+      `string`
+
+    - **`total`**
+
+      `number`
+
+  - **`notaCredito` (required)**
+
+    `object`
+
+    - **`createdAt` (required)**
+
+      `string`, format: `date-time`
+
+    - **`estadoCae` (required)**
+
+      `string`, possible values: `"pending", "issued", "failed", "not_required"`
+
+    - **`facturaOrigenId` (required)**
+
+      `integer`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`monto` (required)**
+
+      `object`
+
+    - **`motivo` (required)**
+
+      `string`
+
+    - **`tenantId` (required)**
+
+      `integer`
+
+    - **`cae`**
+
+      `string`
+
+    - **`caeVto`**
+
+      `string`, format: `date-time`
+
+    - **`createdById`**
+
+      `integer`
+
+  - **`updatedCliente` (required)**
+
+    `object`
+
+    - **`balance` (required)**
+
+      `object` — Customer balance after decrement (Prisma Decimal may serialize as string in JSON)
+
+    - **`creditLimit` (required)**
+
+      `number`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`rsocial` (required)**
+
+      `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "factura": {
+      "id": 1,
+      "fecha": "",
+      "tipo": "",
+      "prefijo": "",
+      "numero": 1,
+      "clienteId": 1,
+      "formaPagoId": 1,
+      "neto1": 1,
+      "neto2": 1,
+      "neto3": 1,
+      "iva1": 1,
+      "iva2": 1,
+      "total": 1,
+      "estado": "",
+      "cae": "",
+      "caeVto": "",
+      "estadoCae": "pending",
+      "items": [
+        {
+          "id": 1,
+          "articuloId": 1,
+          "articulo": {
+            "id": 1,
+            "codigo": 1,
+            "descripcion": "",
+            "rubroId": 1,
+            "rubro": {
+              "id": 1,
+              "codigo": 1,
+              "nombre": "",
+              "additionalProperty": "anything"
+            },
+            "condIva": "",
+            "umedida": "",
+            "precioLista1": 1,
+            "precioLista2": 1,
+            "costo": 1,
+            "stock": 1,
+            "minimo": 1,
+            "activo": true,
+            "additionalProperty": "anything"
+          },
+          "cantidad": 1,
+          "precio": 1,
+          "dscto": 1,
+          "subtotal": 1,
+          "additionalProperty": "anything"
+        }
+      ],
+      "additionalProperty": "anything"
+    },
+    "notaCredito": {
+      "id": 1,
+      "tenantId": 1,
+      "facturaOrigenId": 1,
+      "motivo": "",
+      "monto": 1,
+      "cae": "",
+      "caeVto": "",
+      "estadoCae": "pending",
+      "createdById": 1,
+      "createdAt": "",
+      "additionalProperty": "anything"
+    },
+    "updatedCliente": {
+      "id": 1,
+      "rsocial": "",
+      "balance": 1,
+      "creditLimit": 1
+    }
+  }
+}
+```
+
+### FacturaPrintInput
+
+- **Type:**`object`
+
+* **`device` (required)**
+
+  `string`, possible values: `"pdf", "fiscal", "thermal"`
+
+**Example:**
+
+```json
+{
+  "device": "pdf"
+}
+```
+
+### FacturaPrintResult
+
+- **Type:**`object`
+
+* **`channel` (required)**
+
+  `string`, possible values: `"pdf", "fiscal_mock", "thermal_mock"`
+
+* **`device` (required)**
+
+  `string`, possible values: `"pdf", "fiscal", "thermal"`
+
+* **`fallbackToPdf` (required)**
+
+  `boolean`
+
+* **`downloadPath`**
+
+  `string`
+
+* **`jobId`**
+
+  `string`
+
+* **`transport`**
+
+  `string`, possible values: `"mock-serial"`
+
+**Example:**
+
+```json
+{
+  "device": "pdf",
+  "channel": "pdf",
+  "fallbackToPdf": true,
+  "downloadPath": "",
+  "jobId": "",
+  "transport": "mock-serial"
+}
+```
+
+### FacturaPrintEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`channel` (required)**
+
+    `string`, possible values: `"pdf", "fiscal_mock", "thermal_mock"`
+
+  - **`device` (required)**
+
+    `string`, possible values: `"pdf", "fiscal", "thermal"`
+
+  - **`fallbackToPdf` (required)**
+
+    `boolean`
+
+  - **`downloadPath`**
+
+    `string`
+
+  - **`jobId`**
+
+    `string`
+
+  - **`transport`**
+
+    `string`, possible values: `"mock-serial"`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "device": "pdf",
+    "channel": "pdf",
+    "fallbackToPdf": true,
+    "downloadPath": "",
+    "jobId": "",
+    "transport": "mock-serial"
+  }
+}
+```
+
+### PrintingStatus
+
+- **Type:**`object`
+
+* **`fiscalMode` (required)**
+
+  `string`, possible values: `"mock"`
+
+* **`fiscalPrinterEnabled` (required)**
+
+  `boolean` — Opt-in fiscal controller (RS-232/USB); false uses PDF fallback.
+
+* **`thermalMode` (required)**
+
+  `string`, possible values: `"mock"`
+
+* **`thermalPrinterEnabled` (required)**
+
+  `boolean` — Opt-in 80mm thermal ESC/POS path; false uses PDF fallback.
+
+**Example:**
+
+```json
+{
+  "fiscalPrinterEnabled": true,
+  "thermalPrinterEnabled": true,
+  "fiscalMode": "mock",
+  "thermalMode": "mock"
+}
+```
+
+### PrintingStatusEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`fiscalMode` (required)**
+
+    `string`, possible values: `"mock"`
+
+  - **`fiscalPrinterEnabled` (required)**
+
+    `boolean` — Opt-in fiscal controller (RS-232/USB); false uses PDF fallback.
+
+  - **`thermalMode` (required)**
+
+    `string`, possible values: `"mock"`
+
+  - **`thermalPrinterEnabled` (required)**
+
+    `boolean` — Opt-in 80mm thermal ESC/POS path; false uses PDF fallback.
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "fiscalPrinterEnabled": true,
+    "thermalPrinterEnabled": true,
+    "fiscalMode": "mock",
+    "thermalMode": "mock"
+  }
+}
+```
+
+### PrintingTestInput
+
+- **Type:**`object`
+
+* **`device` (required)**
+
+  `string`, possible values: `"fiscal", "thermal"`
+
+**Example:**
+
+```json
+{
+  "device": "fiscal"
+}
+```
+
+### PrintingTestResult
+
+- **Type:**`object`
+
+* **`channel` (required)**
+
+  `string`, possible values: `"pdf", "fiscal_mock", "thermal_mock"`
+
+* **`device` (required)**
+
+  `string`, possible values: `"fiscal", "thermal"`
+
+* **`fallbackToPdf` (required)**
+
+  `boolean`
+
+* **`jobId`**
+
+  `string`
+
+* **`transport`**
+
+  `string`, possible values: `"mock-serial"`
+
+**Example:**
+
+```json
+{
+  "device": "fiscal",
+  "channel": "pdf",
+  "fallbackToPdf": true,
+  "jobId": "",
+  "transport": "mock-serial"
+}
+```
+
+### PrintingTestEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`channel` (required)**
+
+    `string`, possible values: `"pdf", "fiscal_mock", "thermal_mock"`
+
+  - **`device` (required)**
+
+    `string`, possible values: `"fiscal", "thermal"`
+
+  - **`fallbackToPdf` (required)**
+
+    `boolean`
+
+  - **`jobId`**
+
+    `string`
+
+  - **`transport`**
+
+    `string`, possible values: `"mock-serial"`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "device": "fiscal",
+    "channel": "pdf",
+    "fallbackToPdf": true,
+    "jobId": "",
+    "transport": "mock-serial"
+  }
+}
+```
+
+### ArcaConfigInput
+
+- **Type:**`object`
+
+* **`certificate` (required)**
+
+  `string`
+
+* **`cuit` (required)**
+
+  `string`
+
+* **`privateKey` (required)**
+
+  `string`
+
+* **`ambiente`**
+
+  `string`, possible values: `"homologacion", "produccion"`
+
+**Example:**
+
+```json
+{
+  "cuit": "",
+  "certificate": "",
+  "privateKey": "",
+  "ambiente": "homologacion"
+}
+```
+
+### ArcaConfigStatus
+
+- **Type:**`object`
+
+* **`configured` (required)**
+
+  `boolean`
+
+* **`ambiente`**
+
+  `string`
+
+* **`cuit`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "configured": true,
+  "cuit": "",
+  "ambiente": ""
+}
+```
+
+### ArcaConfigStatusEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`configured` (required)**
+
+    `boolean`
+
+  - **`ambiente`**
+
+    `string`
+
+  - **`cuit`**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "configured": true,
+    "cuit": "",
+    "ambiente": ""
+  }
+}
+```
+
+### ArcaConfigEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`configured`**
+
+    `boolean`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "configured": true
+  }
+}
+```
+
+### ArcaTaEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`expiration`**
+
+    `string`, format: `date-time`
+
+  - **`sign`**
+
+    `string`
+
+  - **`token`**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "token": "",
+    "sign": "",
+    "expiration": ""
+  }
+}
+```
+
+### ArcaCaeInput
+
+- **Type:**`object`
+
+* **`facturaId` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "facturaId": 1
+}
+```
+
+### ArcaCaeEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`cae`**
+
+    `string`
+
+  - **`caeVto`**
+
+    `string`, format: `date-time`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "cae": "",
+    "caeVto": ""
+  }
+}
+```
+
+### PedidoItem
+
+- **Type:**`object`
+
+* **`articuloId`**
+
+  `integer`
+
+* **`cantidad`**
+
+  `integer`
+
+* **`dscto`**
+
+  `number`
+
+* **`id`**
+
+  `integer`
+
+* **`precio`**
+
+  `number`
+
+* **`subtotal`**
+
+  `number`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "articuloId": 1,
+  "cantidad": 1,
+  "precio": 1,
+  "dscto": 1,
+  "subtotal": 1,
+  "additionalProperty": "anything"
+}
+```
+
+### Pedido
+
+- **Type:**`object`
+
+* **`clienteId`**
+
+  `integer`
+
+* **`createdAt`**
+
+  `string`, format: `date-time`
+
+* **`estado`**
+
+  `string`, possible values: `"draft", "confirmed", "invoiced", "cancelled"`
+
+* **`facturaId`**
+
+  `integer`
+
+* **`id`**
+
+  `integer`
+
+* **`items`**
+
+  `array`
+
+  **Items:**
+
+  - **`articuloId`**
+
+    `integer`
+
+  - **`cantidad`**
+
+    `integer`
+
+  - **`dscto`**
+
+    `number`
+
+  - **`id`**
+
+    `integer`
+
+  - **`precio`**
+
+    `number`
+
+  - **`subtotal`**
+
+    `number`
+
+* **`tenantId`**
+
+  `integer`
+
+* **`total`**
+
+  `number`
+
+* **`updatedAt`**
+
+  `string`, format: `date-time`
+
+* **`validUntil`**
+
+  `string`, format: `date-time`
+
+* **`vendedorId`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "tenantId": 1,
+  "clienteId": 1,
+  "vendedorId": 1,
+  "estado": "draft",
+  "total": 1,
+  "validUntil": "",
+  "facturaId": 1,
+  "items": [
+    {
+      "id": 1,
+      "articuloId": 1,
+      "cantidad": 1,
+      "precio": 1,
+      "dscto": 1,
+      "subtotal": 1,
+      "additionalProperty": "anything"
+    }
+  ],
+  "createdAt": "",
+  "updatedAt": "",
+  "additionalProperty": "anything"
+}
+```
+
+### PedidoInput
+
+- **Type:**`object`
+
+* **`clienteId` (required)**
+
+  `integer`
+
+* **`items` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`cantidad` (required)**
+
+    `integer`
+
+  - **`precio` (required)**
+
+    `number`
+
+  - **`dscto`**
+
+    `number`
+
+* **`validUntil`**
+
+  `string`
+
+* **`vendedorId`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "clienteId": 1,
+  "vendedorId": 1,
+  "validUntil": "",
+  "items": [
+    {
+      "articuloId": 1,
+      "cantidad": 1,
+      "precio": 0,
+      "dscto": 0
+    }
+  ]
+}
+```
+
+### PedidoInvoiceInput
+
+- **Type:**`object`
+
+* **`fecha` (required)**
+
+  `string`
+
+* **`numero` (required)**
+
+  `integer`
+
+* **`tipo` (required)**
+
+  `string`, possible values: `"A", "B"`
+
+* **`formaPagoId`**
+
+  `integer`
+
+* **`prefijo`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "fecha": "",
+  "tipo": "A",
+  "numero": 1,
+  "prefijo": "",
+  "formaPagoId": 1
+}
+```
+
+### PedidoEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`createdAt`**
+
+    `string`, format: `date-time`
+
+  - **`estado`**
+
+    `string`, possible values: `"draft", "confirmed", "invoiced", "cancelled"`
+
+  - **`facturaId`**
+
+    `integer`
+
+  - **`id`**
+
+    `integer`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId`**
+
+      `integer`
+
+    - **`cantidad`**
+
+      `integer`
+
+    - **`dscto`**
+
+      `number`
+
+    - **`id`**
+
+      `integer`
+
+    - **`precio`**
+
+      `number`
+
+    - **`subtotal`**
+
+      `number`
+
+  - **`tenantId`**
+
+    `integer`
+
+  - **`total`**
+
+    `number`
+
+  - **`updatedAt`**
+
+    `string`, format: `date-time`
+
+  - **`validUntil`**
+
+    `string`, format: `date-time`
+
+  - **`vendedorId`**
+
+    `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "clienteId": 1,
+    "vendedorId": 1,
+    "estado": "draft",
+    "total": 1,
+    "validUntil": "",
+    "facturaId": 1,
+    "items": [
+      {
+        "id": 1,
+        "articuloId": 1,
+        "cantidad": 1,
+        "precio": 1,
+        "dscto": 1,
+        "subtotal": 1,
+        "additionalProperty": "anything"
+      }
+    ],
+    "createdAt": "",
+    "updatedAt": "",
+    "additionalProperty": "anything"
+  }
+}
+```
+
+### PedidoListEnvelope
+
+- **Type:**
+
+**Example:**
 
 ### FormaPago
 
@@ -7560,6 +52386,287 @@ Returns boolean flags for each channel. No sensitive values are exposed.
 }
 ```
 
+### ChatMessage
+
+- **Type:**`object`
+
+* **`content`**
+
+  `string`
+
+* **`createdAt`**
+
+  `string`, format: `date-time`
+
+* **`fromUserId`**
+
+  `integer`
+
+* **`id`**
+
+  `integer`
+
+* **`tenantId`**
+
+  `integer`
+
+* **`toUserId`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "tenantId": 1,
+  "fromUserId": 1,
+  "toUserId": 1,
+  "content": "",
+  "createdAt": ""
+}
+```
+
+### ChatMessageCreateInput
+
+- **Type:**`object`
+
+* **`content` (required)**
+
+  `string`
+
+* **`toUserId` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "toUserId": 1,
+  "content": ""
+}
+```
+
+### ChatConversation
+
+- **Type:**`object`
+
+* **`lastMessage`**
+
+  `object`
+
+* **`unreadCount`**
+
+  `integer`
+
+* **`user`**
+
+  `object`
+
+  - **`id`**
+
+    `integer`
+
+  - **`role`**
+
+    `string`
+
+  - **`username`**
+
+    `string`
+
+**Example:**
+
+```json
+{
+  "user": {
+    "id": 1,
+    "username": "",
+    "role": ""
+  },
+  "unreadCount": 0,
+  "lastMessage": {
+    "id": 1,
+    "fromUserId": 1,
+    "toUserId": 1,
+    "preview": "",
+    "createdAt": ""
+  }
+}
+```
+
+### ChatConversationListEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`lastMessage`**
+
+    `object`
+
+  - **`unreadCount`**
+
+    `integer`
+
+  - **`user`**
+
+    `object`
+
+    - **`id`**
+
+      `integer`
+
+    - **`role`**
+
+      `string`
+
+    - **`username`**
+
+      `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "user": {
+        "id": 1,
+        "username": "",
+        "role": ""
+      },
+      "unreadCount": 0,
+      "lastMessage": {
+        "id": 1,
+        "fromUserId": 1,
+        "toUserId": 1,
+        "preview": "",
+        "createdAt": ""
+      }
+    }
+  ]
+}
+```
+
+### ChatMessageListEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`content`**
+
+    `string`
+
+  - **`createdAt`**
+
+    `string`, format: `date-time`
+
+  - **`fromUserId`**
+
+    `integer`
+
+  - **`id`**
+
+    `integer`
+
+  - **`tenantId`**
+
+    `integer`
+
+  - **`toUserId`**
+
+    `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "fromUserId": 1,
+      "toUserId": 1,
+      "content": "",
+      "createdAt": ""
+    }
+  ]
+}
+```
+
+### ChatMessageEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`content`**
+
+    `string`
+
+  - **`createdAt`**
+
+    `string`, format: `date-time`
+
+  - **`fromUserId`**
+
+    `integer`
+
+  - **`id`**
+
+    `integer`
+
+  - **`tenantId`**
+
+    `integer`
+
+  - **`toUserId`**
+
+    `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "fromUserId": 1,
+    "toUserId": 1,
+    "content": "",
+    "createdAt": ""
+  }
+}
+```
+
 ### DeliveryZone
 
 - **Type:**`object`
@@ -7686,75 +52793,9 @@ Returns boolean flags for each channel. No sensitive values are exposed.
 
 ### DeliveryZoneListEnvelope
 
-- **Type:**`object`
-
-* **`data` (required)**
-
-  `array`
-
-  **Items:**
-
-  - **`activo`**
-
-    `boolean`, default: `true`
-
-  - **`createdAt`**
-
-    `string`, format: `date-time`
-
-  - **`diasEntrega`**
-
-    `string` — Comma-separated delivery day numbers, e.g. "1,3,5"
-
-  - **`horario`**
-
-    `string` — Preferred time window, e.g. "08:00-12:00"
-
-  - **`id`**
-
-    `integer`
-
-  - **`nombre`**
-
-    `string`
-
-  - **`tenantId`**
-
-    `integer`
-
-  - **`tipo`**
-
-    `string`, possible values: `"barrio", "manual", "predefinida"`, default: `"barrio"`
-
-  - **`updatedAt`**
-
-    `string`, format: `date-time`
-
-* **`success` (required)**
-
-  `boolean`
+- **Type:**
 
 **Example:**
-
-```json
-{
-  "success": true,
-  "data": [
-    {
-      "id": 1,
-      "tenantId": 1,
-      "nombre": "",
-      "tipo": "barrio",
-      "diasEntrega": "",
-      "horario": "",
-      "activo": true,
-      "createdAt": "",
-      "updatedAt": "",
-      "additionalProperty": "anything"
-    }
-  ]
-}
-```
 
 ### DeliveryZoneEnvelope
 
@@ -7821,5 +52862,3309 @@ Returns boolean flags for each channel. No sensitive values are exposed.
     "updatedAt": "",
     "additionalProperty": "anything"
   }
+}
+```
+
+### EmpresaConfig
+
+- **Type:**`object`
+
+* **`cuit` (required)**
+
+  `string`
+
+* **`nombre` (required)**
+
+  `string`
+
+* **`prefijoFactura` (required)**
+
+  `string` — Four-digit invoice prefix derived from puntoVenta.
+
+* **`puntoVenta` (required)**
+
+  `integer`
+
+* **`tipoFactura` (required)**
+
+  `string`, possible values: `"A", "B", "C"`
+
+* **`condicionIva`**
+
+  `string`, possible values: `"RI", "Mono", "CF", "Exento"` — Issuer VAT condition for legal invoice PDF header (#148).
+
+* **`domicilio`**
+
+  `string`
+
+* **`fechaInicioActividades`**
+
+  `string`, format: `date` — Activity start date (YYYY-MM-DD).
+
+* **`id`**
+
+  `integer` — Null when settings have not been saved yet (defaults only).
+
+* **`ingresosBrutos`**
+
+  `string`
+
+* **`logoUrl`**
+
+  `string`
+
+* **`recordatorioDiasGracia`**
+
+  `integer` — Grace days after due date before an invoice is eligible for collection reminders.
+
+* **`recordatorioHoraFin`**
+
+  `integer` — Business-hour window end (tenant local hour, exclusive).
+
+* **`recordatorioHoraInicio`**
+
+  `integer` — Business-hour window start (tenant local hour, inclusive).
+
+* **`timezone`**
+
+  `string` — IANA time zone for the daily reminder job and business-hour window.
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "nombre": "",
+  "cuit": "",
+  "domicilio": "",
+  "puntoVenta": 1,
+  "tipoFactura": "A",
+  "logoUrl": "",
+  "prefijoFactura": "",
+  "recordatorioDiasGracia": 0,
+  "timezone": "America/Argentina/Buenos_Aires",
+  "recordatorioHoraInicio": 0,
+  "recordatorioHoraFin": 1,
+  "condicionIva": "RI",
+  "ingresosBrutos": "",
+  "fechaInicioActividades": ""
+}
+```
+
+### EmpresaInput
+
+- **Type:**`object`
+
+* **`cuit` (required)**
+
+  `string`
+
+* **`nombre` (required)**
+
+  `string`
+
+* **`puntoVenta` (required)**
+
+  `integer`
+
+* **`tipoFactura` (required)**
+
+  `string`, possible values: `"A", "B", "C"`
+
+* **`condicionIva`**
+
+  `string`, possible values: `"RI", "Mono", "CF", "Exento"`
+
+* **`domicilio`**
+
+  `string`
+
+* **`fechaInicioActividades`**
+
+  `string`, format: `date`
+
+* **`ingresosBrutos`**
+
+  `string`
+
+* **`logoUrl`**
+
+  `string`
+
+* **`recordatorioDiasGracia`**
+
+  `integer`
+
+* **`recordatorioHoraFin`**
+
+  `integer`
+
+* **`recordatorioHoraInicio`**
+
+  `integer`
+
+* **`timezone`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "nombre": "",
+  "cuit": "",
+  "domicilio": "",
+  "puntoVenta": 1,
+  "tipoFactura": "A",
+  "logoUrl": "",
+  "recordatorioDiasGracia": 0,
+  "timezone": "",
+  "recordatorioHoraInicio": 0,
+  "recordatorioHoraFin": 1,
+  "condicionIva": "RI",
+  "ingresosBrutos": "",
+  "fechaInicioActividades": ""
+}
+```
+
+### EmpresaEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`cuit` (required)**
+
+    `string`
+
+  - **`nombre` (required)**
+
+    `string`
+
+  - **`prefijoFactura` (required)**
+
+    `string` — Four-digit invoice prefix derived from puntoVenta.
+
+  - **`puntoVenta` (required)**
+
+    `integer`
+
+  - **`tipoFactura` (required)**
+
+    `string`, possible values: `"A", "B", "C"`
+
+  - **`condicionIva`**
+
+    `string`, possible values: `"RI", "Mono", "CF", "Exento"` — Issuer VAT condition for legal invoice PDF header (#148).
+
+  - **`domicilio`**
+
+    `string`
+
+  - **`fechaInicioActividades`**
+
+    `string`, format: `date` — Activity start date (YYYY-MM-DD).
+
+  - **`id`**
+
+    `integer` — Null when settings have not been saved yet (defaults only).
+
+  - **`ingresosBrutos`**
+
+    `string`
+
+  - **`logoUrl`**
+
+    `string`
+
+  - **`recordatorioDiasGracia`**
+
+    `integer` — Grace days after due date before an invoice is eligible for collection reminders.
+
+  - **`recordatorioHoraFin`**
+
+    `integer` — Business-hour window end (tenant local hour, exclusive).
+
+  - **`recordatorioHoraInicio`**
+
+    `integer` — Business-hour window start (tenant local hour, inclusive).
+
+  - **`timezone`**
+
+    `string` — IANA time zone for the daily reminder job and business-hour window.
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "nombre": "",
+    "cuit": "",
+    "domicilio": "",
+    "puntoVenta": 1,
+    "tipoFactura": "A",
+    "logoUrl": "",
+    "prefijoFactura": "",
+    "recordatorioDiasGracia": 0,
+    "timezone": "America/Argentina/Buenos_Aires",
+    "recordatorioHoraInicio": 0,
+    "recordatorioHoraFin": 1,
+    "condicionIva": "RI",
+    "ingresosBrutos": "",
+    "fechaInicioActividades": ""
+  }
+}
+```
+
+### FacturaPendienteEstado
+
+- **Type:**`string`
+
+**Example:**
+
+### FacturaPendienteRow
+
+- **Type:**`object`
+
+* **`comprobanteCompraId` (required)**
+
+  `integer`
+
+* **`diasHastaVencimiento` (required)**
+
+  `integer`
+
+* **`diasVencido` (required)**
+
+  `integer`
+
+* **`estado` (required)**
+
+  `string`, possible values: `"pendiente", "proxima_vencer", "vencida_hoy", "vencida_critica"`
+
+* **`facturaRef` (required)**
+
+  `string`
+
+* **`fecha` (required)**
+
+  `string`, format: `date-time`
+
+* **`pagado` (required)**
+
+  `string`
+
+* **`pendiente` (required)**
+
+  `string`
+
+* **`proveedorCodigo` (required)**
+
+  `integer`
+
+* **`proveedorId` (required)**
+
+  `integer`
+
+* **`proveedorRsocial` (required)**
+
+  `string`
+
+* **`total` (required)**
+
+  `string`
+
+* **`vencimiento` (required)**
+
+  `string`, format: `date-time`
+
+**Example:**
+
+```json
+{
+  "comprobanteCompraId": 1,
+  "proveedorId": 1,
+  "proveedorCodigo": 1,
+  "proveedorRsocial": "",
+  "facturaRef": "",
+  "fecha": "",
+  "vencimiento": "",
+  "total": "",
+  "pagado": "",
+  "pendiente": "",
+  "estado": "pendiente",
+  "diasHastaVencimiento": 1,
+  "diasVencido": 1
+}
+```
+
+### FacturasPendientesEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`comprobanteCompraId` (required)**
+
+    `integer`
+
+  - **`diasHastaVencimiento` (required)**
+
+    `integer`
+
+  - **`diasVencido` (required)**
+
+    `integer`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"pendiente", "proxima_vencer", "vencida_hoy", "vencida_critica"`
+
+  - **`facturaRef` (required)**
+
+    `string`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`pagado` (required)**
+
+    `string`
+
+  - **`pendiente` (required)**
+
+    `string`
+
+  - **`proveedorCodigo` (required)**
+
+    `integer`
+
+  - **`proveedorId` (required)**
+
+    `integer`
+
+  - **`proveedorRsocial` (required)**
+
+    `string`
+
+  - **`total` (required)**
+
+    `string`
+
+  - **`vencimiento` (required)**
+
+    `string`, format: `date-time`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "comprobanteCompraId": 1,
+      "proveedorId": 1,
+      "proveedorCodigo": 1,
+      "proveedorRsocial": "",
+      "facturaRef": "",
+      "fecha": "",
+      "vencimiento": "",
+      "total": "",
+      "pagado": "",
+      "pendiente": "",
+      "estado": "pendiente",
+      "diasHastaVencimiento": 1,
+      "diasVencido": 1
+    }
+  ]
+}
+```
+
+### AlertaProveedorConfig
+
+- **Type:**`object`
+
+* **`diasCritico` (required)**
+
+  `integer`
+
+* **`diasPrevioAviso` (required)**
+
+  `integer`
+
+* **`notifEmail` (required)**
+
+  `boolean`
+
+* **`notifInApp` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "diasPrevioAviso": 0,
+  "diasCritico": 1,
+  "notifEmail": true,
+  "notifInApp": true
+}
+```
+
+### AlertaProveedorConfigInput
+
+- **Type:**`object`
+
+* **`diasCritico`**
+
+  `integer`
+
+* **`diasPrevioAviso`**
+
+  `integer`
+
+* **`notifEmail`**
+
+  `boolean`
+
+* **`notifInApp`**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "diasPrevioAviso": 0,
+  "diasCritico": 1,
+  "notifEmail": true,
+  "notifInApp": true
+}
+```
+
+### AlertaProveedorConfigEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`diasCritico` (required)**
+
+    `integer`
+
+  - **`diasPrevioAviso` (required)**
+
+    `integer`
+
+  - **`notifEmail` (required)**
+
+    `boolean`
+
+  - **`notifInApp` (required)**
+
+    `boolean`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "diasPrevioAviso": 0,
+    "diasCritico": 1,
+    "notifEmail": true,
+    "notifInApp": true
+  }
+}
+```
+
+### DashboardFacturasPagarWidget
+
+- **Type:**`object`
+
+* **`proximoVencer` (required)**
+
+  `object`
+
+  - **`count` (required)**
+
+    `integer`
+
+  - **`total` (required)**
+
+    `string`
+
+* **`vencido` (required)**
+
+  `object`
+
+  - **`count` (required)**
+
+    `integer`
+
+  - **`total` (required)**
+
+    `string`
+
+**Example:**
+
+```json
+{
+  "vencido": {
+    "count": 1,
+    "total": ""
+  },
+  "proximoVencer": {
+    "count": 1,
+    "total": ""
+  }
+}
+```
+
+### DashboardSummary
+
+- **Type:**`object`
+
+* **`alertasActivas` (required)**
+
+  `integer`
+
+* **`cobrosHoy` (required)**
+
+  `object`
+
+  - **`count` (required)**
+
+    `integer`
+
+  - **`total` (required)**
+
+    `string`
+
+* **`facturasPagar` (required)**
+
+  `object`
+
+  - **`proximoVencer` (required)**
+
+    `object`
+
+    - **`count` (required)**
+
+      `integer`
+
+    - **`total` (required)**
+
+      `string`
+
+  - **`vencido` (required)**
+
+    `object`
+
+    - **`count` (required)**
+
+      `integer`
+
+    - **`total` (required)**
+
+      `string`
+
+* **`facturasVencidas` (required)**
+
+  `object`
+
+  - **`count` (required)**
+
+    `integer`
+
+  - **`total` (required)**
+
+    `string`
+
+* **`ventasHoy` (required)**
+
+  `object`
+
+  - **`count` (required)**
+
+    `integer`
+
+  - **`total` (required)**
+
+    `string`
+
+**Example:**
+
+```json
+{
+  "ventasHoy": {
+    "count": 1,
+    "total": ""
+  },
+  "facturasVencidas": {
+    "count": 1,
+    "total": ""
+  },
+  "cobrosHoy": {
+    "count": 1,
+    "total": ""
+  },
+  "alertasActivas": 1,
+  "facturasPagar": {
+    "vencido": {
+      "count": 1,
+      "total": ""
+    },
+    "proximoVencer": {
+      "count": 1,
+      "total": ""
+    }
+  }
+}
+```
+
+### DashboardSummaryEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`alertasActivas` (required)**
+
+    `integer`
+
+  - **`cobrosHoy` (required)**
+
+    `object`
+
+    - **`count` (required)**
+
+      `integer`
+
+    - **`total` (required)**
+
+      `string`
+
+  - **`facturasPagar` (required)**
+
+    `object`
+
+    - **`proximoVencer` (required)**
+
+      `object`
+
+      - **`count` (required)**
+
+        `integer`
+
+      - **`total` (required)**
+
+        `string`
+
+    - **`vencido` (required)**
+
+      `object`
+
+      - **`count` (required)**
+
+        `integer`
+
+      - **`total` (required)**
+
+        `string`
+
+  - **`facturasVencidas` (required)**
+
+    `object`
+
+    - **`count` (required)**
+
+      `integer`
+
+    - **`total` (required)**
+
+      `string`
+
+  - **`ventasHoy` (required)**
+
+    `object`
+
+    - **`count` (required)**
+
+      `integer`
+
+    - **`total` (required)**
+
+      `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "ventasHoy": {
+      "count": 1,
+      "total": ""
+    },
+    "facturasVencidas": {
+      "count": 1,
+      "total": ""
+    },
+    "cobrosHoy": {
+      "count": 1,
+      "total": ""
+    },
+    "alertasActivas": 1,
+    "facturasPagar": {
+      "vencido": {
+        "count": 1,
+        "total": ""
+      },
+      "proximoVencer": {
+        "count": 1,
+        "total": ""
+      }
+    }
+  }
+}
+```
+
+### DashboardVentasSeriesRow
+
+- **Type:**`object`
+
+* **`count` (required)**
+
+  `integer`
+
+* **`period` (required)**
+
+  `string`
+
+* **`total` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "period": "",
+  "count": 1,
+  "total": ""
+}
+```
+
+### DashboardTopArticuloRow
+
+- **Type:**`object`
+
+* **`articuloId` (required)**
+
+  `integer`
+
+* **`codigo` (required)**
+
+  `integer`
+
+* **`descripcion` (required)**
+
+  `string`
+
+* **`quantity` (required)**
+
+  `integer`
+
+* **`total` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "articuloId": 1,
+  "codigo": 1,
+  "descripcion": "",
+  "quantity": 1,
+  "total": ""
+}
+```
+
+### DashboardVentasBySellerRow
+
+- **Type:**`object`
+
+* **`count` (required)**
+
+  `integer`
+
+* **`total` (required)**
+
+  `string`
+
+* **`username` (required)**
+
+  `string`
+
+* **`vendedorId` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "vendedorId": 1,
+  "username": "",
+  "count": 1,
+  "total": ""
+}
+```
+
+### DashboardVentasHistorico
+
+- **Type:**`object`
+
+* **`bySeller` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`count` (required)**
+
+    `integer`
+
+  - **`total` (required)**
+
+    `string`
+
+  - **`username` (required)**
+
+    `string`
+
+  - **`vendedorId` (required)**
+
+    `integer`
+
+* **`series` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`count` (required)**
+
+    `integer`
+
+  - **`period` (required)**
+
+    `string`
+
+  - **`total` (required)**
+
+    `string`
+
+* **`topArticles` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`codigo` (required)**
+
+    `integer`
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`quantity` (required)**
+
+    `integer`
+
+  - **`total` (required)**
+
+    `string`
+
+**Example:**
+
+```json
+{
+  "series": [
+    {
+      "period": "",
+      "count": 1,
+      "total": ""
+    }
+  ],
+  "topArticles": [
+    {
+      "articuloId": 1,
+      "codigo": 1,
+      "descripcion": "",
+      "quantity": 1,
+      "total": ""
+    }
+  ],
+  "bySeller": [
+    {
+      "vendedorId": 1,
+      "username": "",
+      "count": 1,
+      "total": ""
+    }
+  ]
+}
+```
+
+### DashboardVentasHistoricoEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`bySeller` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`count` (required)**
+
+      `integer`
+
+    - **`total` (required)**
+
+      `string`
+
+    - **`username` (required)**
+
+      `string`
+
+    - **`vendedorId` (required)**
+
+      `integer`
+
+  - **`series` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`count` (required)**
+
+      `integer`
+
+    - **`period` (required)**
+
+      `string`
+
+    - **`total` (required)**
+
+      `string`
+
+  - **`topArticles` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId` (required)**
+
+      `integer`
+
+    - **`codigo` (required)**
+
+      `integer`
+
+    - **`descripcion` (required)**
+
+      `string`
+
+    - **`quantity` (required)**
+
+      `integer`
+
+    - **`total` (required)**
+
+      `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "series": [
+      {
+        "period": "",
+        "count": 1,
+        "total": ""
+      }
+    ],
+    "topArticles": [
+      {
+        "articuloId": 1,
+        "codigo": 1,
+        "descripcion": "",
+        "quantity": 1,
+        "total": ""
+      }
+    ],
+    "bySeller": [
+      {
+        "vendedorId": 1,
+        "username": "",
+        "count": 1,
+        "total": ""
+      }
+    ]
+  }
+}
+```
+
+### AuditEvent
+
+- **Type:**`object`
+
+* **`action` (required)**
+
+  `string`
+
+* **`createdAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`resource` (required)**
+
+  `string`
+
+* **`tenantId` (required)**
+
+  `integer`
+
+* **`ipAddress`**
+
+  `string`
+
+* **`metadata`**
+
+  `object` — Optional structured details for the event
+
+* **`resourceId`**
+
+  `string`
+
+* **`userId`**
+
+  `integer`
+
+* **`username`**
+
+  `string` — Username of the actor when resolved; otherwise null
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "tenantId": 1,
+  "userId": 1,
+  "username": "",
+  "action": "",
+  "resource": "",
+  "resourceId": "",
+  "ipAddress": "",
+  "metadata": {
+    "additionalProperty": "anything"
+  },
+  "createdAt": ""
+}
+```
+
+### AuditEventListEnvelope
+
+- **Type:**
+
+**Example:**
+
+### Notification
+
+- **Type:**`object`
+
+* **`createdAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`payload` (required)**
+
+  `object`
+
+* **`tenantId` (required)**
+
+  `integer`
+
+* **`type` (required)**
+
+  `string`
+
+* **`userId` (required)**
+
+  `integer`
+
+* **`readAt`**
+
+  `string`, format: `date-time`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "tenantId": 1,
+  "userId": 1,
+  "type": "",
+  "payload": {
+    "additionalProperty": "anything"
+  },
+  "readAt": "",
+  "createdAt": ""
+}
+```
+
+### NotificationListEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`payload` (required)**
+
+    `object`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`type` (required)**
+
+    `string`
+
+  - **`userId` (required)**
+
+    `integer`
+
+  - **`readAt`**
+
+    `string`, format: `date-time`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "userId": 1,
+      "type": "",
+      "payload": {
+        "additionalProperty": "anything"
+      },
+      "readAt": "",
+      "createdAt": ""
+    }
+  ]
+}
+```
+
+### NotificationEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`payload` (required)**
+
+    `object`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`type` (required)**
+
+    `string`
+
+  - **`userId` (required)**
+
+    `integer`
+
+  - **`readAt`**
+
+    `string`, format: `date-time`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "userId": 1,
+    "type": "",
+    "payload": {
+      "additionalProperty": "anything"
+    },
+    "readAt": "",
+    "createdAt": ""
+  }
+}
+```
+
+### NotificationReadAllEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`updated` (required)**
+
+    `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "updated": 1
+  }
+}
+```
+
+### ModuleCatalogEntry
+
+- **Type:**`object`
+
+* **`canDeactivate` (required)**
+
+  `boolean`
+
+* **`dependencies` (required)**
+
+  `array`
+
+  **Items:**
+
+  `string`
+
+* **`key` (required)**
+
+  `string`
+
+* **`label` (required)**
+
+  `string`
+
+* **`plan` (required)**
+
+  `string`, possible values: `"starter", "pro", "enterprise"`
+
+* **`price` (required)**
+
+  `number`
+
+* **`required` (required)**
+
+  `boolean`
+
+* **`requiredInProd` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "key": "",
+  "label": "",
+  "required": true,
+  "requiredInProd": true,
+  "dependencies": [
+    ""
+  ],
+  "plan": "starter",
+  "price": 1,
+  "canDeactivate": true
+}
+```
+
+### ModuleCatalogPreset
+
+- **Type:**`object`
+
+* **`modules` (required)**
+
+  `array`
+
+  **Items:**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "modules": [
+    ""
+  ]
+}
+```
+
+### ModuleCatalogData
+
+- **Type:**`object`
+
+* **`deploymentEnv` (required)**
+
+  `string`, possible values: `"dev", "prod"`
+
+* **`modules` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`canDeactivate` (required)**
+
+    `boolean`
+
+  - **`dependencies` (required)**
+
+    `array`
+
+    **Items:**
+
+    `string`
+
+  - **`key` (required)**
+
+    `string`
+
+  - **`label` (required)**
+
+    `string`
+
+  - **`plan` (required)**
+
+    `string`, possible values: `"starter", "pro", "enterprise"`
+
+  - **`price` (required)**
+
+    `number`
+
+  - **`required` (required)**
+
+    `boolean`
+
+  - **`requiredInProd` (required)**
+
+    `boolean`
+
+* **`presets` (required)**
+
+  `object`
+
+**Example:**
+
+```json
+{
+  "deploymentEnv": "dev",
+  "modules": [
+    {
+      "key": "",
+      "label": "",
+      "required": true,
+      "requiredInProd": true,
+      "dependencies": [
+        ""
+      ],
+      "plan": "starter",
+      "price": 1,
+      "canDeactivate": true
+    }
+  ],
+  "presets": {
+    "additionalProperty": {
+      "modules": [
+        ""
+      ]
+    }
+  }
+}
+```
+
+### ModuleCatalogEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`deploymentEnv` (required)**
+
+    `string`, possible values: `"dev", "prod"`
+
+  - **`modules` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`canDeactivate` (required)**
+
+      `boolean`
+
+    - **`dependencies` (required)**
+
+      `array`
+
+      **Items:**
+
+      `string`
+
+    - **`key` (required)**
+
+      `string`
+
+    - **`label` (required)**
+
+      `string`
+
+    - **`plan` (required)**
+
+      `string`, possible values: `"starter", "pro", "enterprise"`
+
+    - **`price` (required)**
+
+      `number`
+
+    - **`required` (required)**
+
+      `boolean`
+
+    - **`requiredInProd` (required)**
+
+      `boolean`
+
+  - **`presets` (required)**
+
+    `object`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "deploymentEnv": "dev",
+    "modules": [
+      {
+        "key": "",
+        "label": "",
+        "required": true,
+        "requiredInProd": true,
+        "dependencies": [
+          ""
+        ],
+        "plan": "starter",
+        "price": 1,
+        "canDeactivate": true
+      }
+    ],
+    "presets": {
+      "additionalProperty": {
+        "modules": [
+          ""
+        ]
+      }
+    }
+  }
+}
+```
+
+### TenantFeaturesData
+
+- **Type:**`object`
+
+* **`integrations` (required)**
+
+  `array`
+
+  **Items:**
+
+  `string`
+
+* **`modules` (required)**
+
+  `array`
+
+  **Items:**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "modules": [
+    ""
+  ],
+  "integrations": [
+    ""
+  ]
+}
+```
+
+### TenantFeaturesEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`integrations` (required)**
+
+    `array`
+
+    **Items:**
+
+    `string`
+
+  - **`modules` (required)**
+
+    `array`
+
+    **Items:**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "modules": [
+      ""
+    ],
+    "integrations": [
+      ""
+    ]
+  }
+}
+```
+
+### PublicPlan
+
+- **Type:**`object`
+
+* **`currency` (required)**
+
+  `string`
+
+* **`features` (required)**
+
+  `array`
+
+  **Items:**
+
+  `string`
+
+* **`key` (required)**
+
+  `string`
+
+* **`maxInvoicesPerMonth` (required)**
+
+  `integer`
+
+* **`maxUsers` (required)**
+
+  `integer`
+
+* **`monthlyPrice` (required)**
+
+  `integer`
+
+* **`name` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "key": "",
+  "name": "",
+  "monthlyPrice": 1,
+  "currency": "",
+  "maxUsers": 1,
+  "maxInvoicesPerMonth": 1,
+  "features": [
+    ""
+  ]
+}
+```
+
+### PlanCatalogEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`currency` (required)**
+
+    `string`
+
+  - **`features` (required)**
+
+    `array`
+
+    **Items:**
+
+    `string`
+
+  - **`key` (required)**
+
+    `string`
+
+  - **`maxInvoicesPerMonth` (required)**
+
+    `integer`
+
+  - **`maxUsers` (required)**
+
+    `integer`
+
+  - **`monthlyPrice` (required)**
+
+    `integer`
+
+  - **`name` (required)**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "key": "",
+      "name": "",
+      "monthlyPrice": 1,
+      "currency": "",
+      "maxUsers": 1,
+      "maxInvoicesPerMonth": 1,
+      "features": [
+        ""
+      ]
+    }
+  ]
+}
+```
+
+### TenantPlanUsage
+
+- **Type:**`object`
+
+* **`invoicesUsed` (required)**
+
+  `integer`
+
+* **`usersUsed` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "usersUsed": 1,
+  "invoicesUsed": 1
+}
+```
+
+### TenantPlanSnapshot
+
+- **Type:**`object`
+
+* **`currency` (required)**
+
+  `string`
+
+* **`features` (required)**
+
+  `array`
+
+  **Items:**
+
+  `string`
+
+* **`maxInvoicesPerMonth` (required)**
+
+  `integer`
+
+* **`maxUsers` (required)**
+
+  `integer`
+
+* **`monthlyPrice` (required)**
+
+  `integer`
+
+* **`planKey` (required)**
+
+  `string`
+
+* **`planName` (required)**
+
+  `string`
+
+* **`status` (required)**
+
+  `string`
+
+* **`usage` (required)**
+
+  `object`
+
+  - **`invoicesUsed` (required)**
+
+    `integer`
+
+  - **`usersUsed` (required)**
+
+    `integer`
+
+**Example:**
+
+```json
+{
+  "planKey": "",
+  "planName": "",
+  "monthlyPrice": 1,
+  "currency": "",
+  "maxUsers": 1,
+  "maxInvoicesPerMonth": 1,
+  "features": [
+    ""
+  ],
+  "status": "",
+  "usage": {
+    "usersUsed": 1,
+    "invoicesUsed": 1
+  }
+}
+```
+
+### TenantPlanSnapshotEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`currency` (required)**
+
+    `string`
+
+  - **`features` (required)**
+
+    `array`
+
+    **Items:**
+
+    `string`
+
+  - **`maxInvoicesPerMonth` (required)**
+
+    `integer`
+
+  - **`maxUsers` (required)**
+
+    `integer`
+
+  - **`monthlyPrice` (required)**
+
+    `integer`
+
+  - **`planKey` (required)**
+
+    `string`
+
+  - **`planName` (required)**
+
+    `string`
+
+  - **`status` (required)**
+
+    `string`
+
+  - **`usage` (required)**
+
+    `object`
+
+    - **`invoicesUsed` (required)**
+
+      `integer`
+
+    - **`usersUsed` (required)**
+
+      `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "planKey": "",
+    "planName": "",
+    "monthlyPrice": 1,
+    "currency": "",
+    "maxUsers": 1,
+    "maxInvoicesPerMonth": 1,
+    "features": [
+      ""
+    ],
+    "status": "",
+    "usage": {
+      "usersUsed": 1,
+      "invoicesUsed": 1
+    }
+  }
+}
+```
+
+### TenantPlanChangeBody
+
+- **Type:**`object`
+
+* **`planKey` (required)**
+
+  `string`, possible values: `"starter", "pro", "enterprise", "trial"`
+
+* **`reason` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "planKey": "starter",
+  "reason": ""
+}
+```
+
+### PlanLimitErrorEnvelope
+
+- **Type:**`object`
+
+* **`error` (required)**
+
+  `string`, possible values: `"plan_limit_users", "plan_limit_invoices", "plan_feature_required"`
+
+* **`success` (required)**
+
+  `boolean`
+
+* **`currentPlan`**
+
+  `string`
+
+* **`feature`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "plan_limit_users",
+  "feature": "",
+  "currentPlan": ""
+}
+```
+
+### TenantConfig
+
+- **Type:**`object`
+
+* **`businessType` (required)**
+
+  `string`, possible values: `"mayorista", "minorista", "ambos"`
+
+* **`integrations` (required)**
+
+  `array`
+
+  **Items:**
+
+  `string`
+
+* **`modules` (required)**
+
+  `array`
+
+  **Items:**
+
+  `string`
+
+* **`plan` (required)**
+
+  `string`, possible values: `"starter", "pro", "enterprise"`
+
+* **`rubros` (required)**
+
+  `array`
+
+  **Items:**
+
+  `string`
+
+* **`tenantId` (required)**
+
+  `integer`
+
+* **`updatedAt` (required)**
+
+  `string`, format: `date-time`
+
+**Example:**
+
+```json
+{
+  "tenantId": 1,
+  "businessType": "mayorista",
+  "rubros": [
+    ""
+  ],
+  "plan": "starter",
+  "modules": [
+    ""
+  ],
+  "integrations": [
+    ""
+  ],
+  "updatedAt": ""
+}
+```
+
+### TenantConfigEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`businessType` (required)**
+
+    `string`, possible values: `"mayorista", "minorista", "ambos"`
+
+  - **`integrations` (required)**
+
+    `array`
+
+    **Items:**
+
+    `string`
+
+  - **`modules` (required)**
+
+    `array`
+
+    **Items:**
+
+    `string`
+
+  - **`plan` (required)**
+
+    `string`, possible values: `"starter", "pro", "enterprise"`
+
+  - **`rubros` (required)**
+
+    `array`
+
+    **Items:**
+
+    `string`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "tenantId": 1,
+    "businessType": "mayorista",
+    "rubros": [
+      ""
+    ],
+    "plan": "starter",
+    "modules": [
+      ""
+    ],
+    "integrations": [
+      ""
+    ],
+    "updatedAt": ""
+  }
+}
+```
+
+### TenantConfigUpsertBody
+
+- **Type:**`object`
+
+* **`modules` (required)**
+
+  `array`
+
+  **Items:**
+
+  `string`
+
+* **`reason` (required)**
+
+  `string`
+
+* **`businessType`**
+
+  `string`, possible values: `"mayorista", "minorista", "ambos"`
+
+* **`integrations`**
+
+  `array`
+
+  **Items:**
+
+  `string`
+
+* **`plan`**
+
+  `string`, possible values: `"starter", "pro", "enterprise"`
+
+* **`rubros`**
+
+  `array`
+
+  **Items:**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "businessType": "mayorista",
+  "rubros": [
+    ""
+  ],
+  "plan": "starter",
+  "modules": [
+    ""
+  ],
+  "integrations": [
+    ""
+  ],
+  "reason": ""
+}
+```
+
+### TenantConfigApplyTemplateBody
+
+- **Type:**`object`
+
+* **`preset` (required)**
+
+  `string`
+
+* **`reason`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "preset": "",
+  "reason": ""
+}
+```
+
+### TenantConfigHistoryEntry
+
+- **Type:**`object`
+
+* **`after` (required)**
+
+  `object`
+
+* **`before` (required)**
+
+  `object`
+
+* **`changedById` (required)**
+
+  `integer`
+
+* **`createdAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`reason`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "changedById": 1,
+  "before": {
+    "additionalProperty": "anything"
+  },
+  "after": {
+    "additionalProperty": "anything"
+  },
+  "reason": "",
+  "createdAt": ""
+}
+```
+
+### TenantConfigHistoryData
+
+- **Type:**`object`
+
+* **`items` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`after` (required)**
+
+    `object`
+
+  - **`before` (required)**
+
+    `object`
+
+  - **`changedById` (required)**
+
+    `integer`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`reason`**
+
+    `string`
+
+* **`total` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "total": 1,
+  "items": [
+    {
+      "id": 1,
+      "changedById": 1,
+      "before": {
+        "additionalProperty": "anything"
+      },
+      "after": {
+        "additionalProperty": "anything"
+      },
+      "reason": "",
+      "createdAt": ""
+    }
+  ]
+}
+```
+
+### TenantConfigHistoryEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`items` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`after` (required)**
+
+      `object`
+
+    - **`before` (required)**
+
+      `object`
+
+    - **`changedById` (required)**
+
+      `integer`
+
+    - **`createdAt` (required)**
+
+      `string`, format: `date-time`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`reason`**
+
+      `string`
+
+  - **`total` (required)**
+
+    `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "total": 1,
+    "items": [
+      {
+        "id": 1,
+        "changedById": 1,
+        "before": {
+          "additionalProperty": "anything"
+        },
+        "after": {
+          "additionalProperty": "anything"
+        },
+        "reason": "",
+        "createdAt": ""
+      }
+    ]
+  }
+}
+```
+
+### TenantPricingAddon
+
+- **Type:**`object`
+
+* **`moduleKey` (required)**
+
+  `string`
+
+* **`price` (required)**
+
+  `number`
+
+**Example:**
+
+```json
+{
+  "moduleKey": "",
+  "price": 0
+}
+```
+
+### TenantPricingData
+
+- **Type:**`object`
+
+* **`addons` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`moduleKey` (required)**
+
+    `string`
+
+  - **`price` (required)**
+
+    `number`
+
+* **`basePrice` (required)**
+
+  `number`
+
+* **`plan` (required)**
+
+  `string`
+
+* **`totalMonthly` (required)**
+
+  `number`
+
+**Example:**
+
+```json
+{
+  "plan": "",
+  "basePrice": 0,
+  "addons": [
+    {
+      "moduleKey": "",
+      "price": 0
+    }
+  ],
+  "totalMonthly": 0
+}
+```
+
+### TenantPricingEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`addons` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`moduleKey` (required)**
+
+      `string`
+
+    - **`price` (required)**
+
+      `number`
+
+  - **`basePrice` (required)**
+
+    `number`
+
+  - **`plan` (required)**
+
+    `string`
+
+  - **`totalMonthly` (required)**
+
+    `number`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "plan": "",
+    "basePrice": 0,
+    "addons": [
+      {
+        "moduleKey": "",
+        "price": 0
+      }
+    ],
+    "totalMonthly": 0
+  }
+}
+```
+
+### TenantModuleTrial
+
+- **Type:**`object`
+
+* **`active` (required)**
+
+  `boolean`
+
+* **`createdAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`daysRemaining` (required)**
+
+  `integer`
+
+* **`expiresAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`moduleKey` (required)**
+
+  `string`
+
+* **`tenantId` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "tenantId": 1,
+  "moduleKey": "",
+  "expiresAt": "",
+  "active": true,
+  "daysRemaining": 0,
+  "createdAt": ""
+}
+```
+
+### TenantModuleTrialListEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`active` (required)**
+
+    `boolean`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`daysRemaining` (required)**
+
+    `integer`
+
+  - **`expiresAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`moduleKey` (required)**
+
+    `string`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "moduleKey": "",
+      "expiresAt": "",
+      "active": true,
+      "daysRemaining": 0,
+      "createdAt": ""
+    }
+  ]
+}
+```
+
+### TenantModuleTrialEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`active` (required)**
+
+    `boolean`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`daysRemaining` (required)**
+
+    `integer`
+
+  - **`expiresAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`moduleKey` (required)**
+
+    `string`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "moduleKey": "",
+    "expiresAt": "",
+    "active": true,
+    "daysRemaining": 0,
+    "createdAt": ""
+  }
+}
+```
+
+### TenantModuleTrialActivateBody
+
+- **Type:**`object`
+
+* **`moduleKey` (required)**
+
+  `string`
+
+* **`days`**
+
+  `integer`, default: `30`
+
+* **`reason`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "moduleKey": "",
+  "days": 30,
+  "reason": ""
+}
+```
+
+### SuperadminGlobalStats
+
+- **Type:**`object`
+
+* **`activeTenants` (required)**
+
+  `integer`
+
+* **`facturasToday` (required)**
+
+  `integer`
+
+* **`inactiveTenants` (required)**
+
+  `integer`
+
+* **`totalTenants` (required)**
+
+  `integer`
+
+* **`totalUsers` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "activeTenants": 0,
+  "totalTenants": 0,
+  "inactiveTenants": 0,
+  "facturasToday": 0,
+  "totalUsers": 0
+}
+```
+
+### SuperadminGlobalStatsEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`activeTenants` (required)**
+
+    `integer`
+
+  - **`facturasToday` (required)**
+
+    `integer`
+
+  - **`inactiveTenants` (required)**
+
+    `integer`
+
+  - **`totalTenants` (required)**
+
+    `integer`
+
+  - **`totalUsers` (required)**
+
+    `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "activeTenants": 0,
+    "totalTenants": 0,
+    "inactiveTenants": 0,
+    "facturasToday": 0,
+    "totalUsers": 0
+  }
+}
+```
+
+### SuperadminTenantListRow
+
+- **Type:**`object`
+
+* **`active` (required)**
+
+  `boolean`
+
+* **`createdAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`facturaCount` (required)**
+
+  `integer`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`name` (required)**
+
+  `string`
+
+* **`plan` (required)**
+
+  `string`
+
+* **`slug` (required)**
+
+  `string`
+
+* **`userCount` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "name": "",
+  "slug": "",
+  "active": true,
+  "plan": "",
+  "userCount": 0,
+  "facturaCount": 0,
+  "createdAt": ""
+}
+```
+
+### SuperadminTenantListEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`active` (required)**
+
+    `boolean`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`facturaCount` (required)**
+
+    `integer`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`name` (required)**
+
+    `string`
+
+  - **`plan` (required)**
+
+    `string`
+
+  - **`slug` (required)**
+
+    `string`
+
+  - **`userCount` (required)**
+
+    `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "name": "",
+      "slug": "",
+      "active": true,
+      "plan": "",
+      "userCount": 0,
+      "facturaCount": 0,
+      "createdAt": ""
+    }
+  ]
+}
+```
+
+### SuperadminTenantStats
+
+- **Type:**`object`
+
+* **`clienteCount` (required)**
+
+  `integer`
+
+* **`facturaCount` (required)**
+
+  `integer`
+
+* **`pedidoCount` (required)**
+
+  `integer`
+
+* **`userCount` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "userCount": 0,
+  "facturaCount": 0,
+  "pedidoCount": 0,
+  "clienteCount": 0
+}
+```
+
+### SuperadminTenantDetail
+
+- **Type:**`object`
+
+* **`active` (required)**
+
+  `boolean`
+
+* **`configUpdatedAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`createdAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`lastActivityAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`modulesCount` (required)**
+
+  `integer`
+
+* **`name` (required)**
+
+  `string`
+
+* **`plan` (required)**
+
+  `string`
+
+* **`slug` (required)**
+
+  `string`
+
+* **`stats` (required)**
+
+  `object`
+
+  - **`clienteCount` (required)**
+
+    `integer`
+
+  - **`facturaCount` (required)**
+
+    `integer`
+
+  - **`pedidoCount` (required)**
+
+    `integer`
+
+  - **`userCount` (required)**
+
+    `integer`
+
+* **`updatedAt` (required)**
+
+  `string`, format: `date-time`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "name": "",
+  "slug": "",
+  "active": true,
+  "createdAt": "",
+  "updatedAt": "",
+  "plan": "",
+  "modulesCount": 0,
+  "configUpdatedAt": "",
+  "stats": {
+    "userCount": 0,
+    "facturaCount": 0,
+    "pedidoCount": 0,
+    "clienteCount": 0
+  },
+  "lastActivityAt": ""
+}
+```
+
+### SuperadminTenantDetailEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`active` (required)**
+
+    `boolean`
+
+  - **`configUpdatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`lastActivityAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`modulesCount` (required)**
+
+    `integer`
+
+  - **`name` (required)**
+
+    `string`
+
+  - **`plan` (required)**
+
+    `string`
+
+  - **`slug` (required)**
+
+    `string`
+
+  - **`stats` (required)**
+
+    `object`
+
+    - **`clienteCount` (required)**
+
+      `integer`
+
+    - **`facturaCount` (required)**
+
+      `integer`
+
+    - **`pedidoCount` (required)**
+
+      `integer`
+
+    - **`userCount` (required)**
+
+      `integer`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "name": "",
+    "slug": "",
+    "active": true,
+    "createdAt": "",
+    "updatedAt": "",
+    "plan": "",
+    "modulesCount": 0,
+    "configUpdatedAt": "",
+    "stats": {
+      "userCount": 0,
+      "facturaCount": 0,
+      "pedidoCount": 0,
+      "clienteCount": 0
+    },
+    "lastActivityAt": ""
+  }
+}
+```
+
+### SuperadminTenantCreateInput
+
+- **Type:**`object`
+
+* **`name` (required)**
+
+  `string`
+
+* **`slug` (required)**
+
+  `string`
+
+* **`ownerPassword`**
+
+  `string`, format: `password`
+
+* **`ownerUsername`**
+
+  `string`
+
+* **`plan`**
+
+  `string`, possible values: `"starter", "pro", "enterprise"`
+
+**Example:**
+
+```json
+{
+  "name": "",
+  "slug": "",
+  "plan": "starter",
+  "ownerUsername": "",
+  "ownerPassword": ""
+}
+```
+
+### SuperadminTenantCreateResult
+
+- **Type:**`object`
+
+* **`ownerUserId` (required)**
+
+  `integer`
+
+* **`tenantId` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "tenantId": 1,
+  "ownerUserId": 1
+}
+```
+
+### SuperadminTenantCreateEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`ownerUserId` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "tenantId": 1,
+    "ownerUserId": 1
+  }
+}
+```
+
+### SuperadminTenantPatchInput
+
+- **Type:**`object`
+
+* **`active` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "active": true
+}
+```
+
+### ModuleNotEnabledEnvelope
+
+- **Type:**`object`
+
+* **`error` (required)**
+
+  `string`
+
+* **`module` (required)**
+
+  `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "module_not_enabled",
+  "module": ""
 }
 ```

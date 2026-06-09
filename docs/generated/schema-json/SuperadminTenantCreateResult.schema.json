@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "ownerUserId": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "tenantId": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "tenantId",
+    "ownerUserId"
+  ],
+  "title": "SuperadminTenantCreateResult",
+  "type": "object"
+}

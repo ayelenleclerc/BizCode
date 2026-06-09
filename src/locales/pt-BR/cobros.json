@@ -1,0 +1,42 @@
+{
+  "title": "Recebimentos",
+  "subtitle": "Registro de pagamentos de clientes",
+  "newPayment": "Novo recebimento",
+  "registerForClient": "Registrar pagamento",
+  "recentTitle": "Recebimentos recentes",
+  "empty": "Nenhum recebimento registrado",
+  "table": {
+    "date": "Data",
+    "client": "Cliente",
+    "amount": "Valor",
+    "reference": "Referência",
+    "paymentMethod": "Forma de pagamento"
+  },
+  "form": {
+    "titleNew": "Registrar pagamento",
+    "client": "Cliente",
+    "clientPlaceholder": "Selecionar cliente",
+    "date": "Data",
+    "amount": "Valor",
+    "paymentMethod": "Forma de pagamento",
+    "paymentMethodNone": "Não especificado",
+    "reference": "Referência",
+    "note": "Observação",
+    "save": "Salvar pagamento",
+    "cancel": "Cancelar",
+    "errors": {
+      "clientRequired": "Selecione um cliente",
+      "amountRequired": "Informe um valor maior que zero",
+      "generic": "Não foi possível registrar o pagamento",
+      "suspended": "Cliente está suspenso",
+      "inactive": "Cliente está inativo"
+    }
+  },
+  "filters": {
+    "client": "Cliente",
+    "clientPlaceholder": "ID do cliente",
+    "from": "De",
+    "to": "Até",
+    "apply": "Filtrar"
+  }
+}

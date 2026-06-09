@@ -1,0 +1,43 @@
+{
+  "title": "Comprovante de entrega",
+  "wizardTitle": "Confirmar entrega",
+  "stepReceptor": "Receptor",
+  "stepSignature": "Assinatura",
+  "stepPhoto": "Foto",
+  "stepConfirm": "Confirmar",
+  "receptorNombre": "Nome de quem recebe",
+  "receptorDni": "Documento (opcional)",
+  "signatureLabel": "Assinatura do receptor",
+  "signatureClear": "Limpar assinatura",
+  "signatureRequired": "A assinatura é obrigatória para confirmar a entrega.",
+  "photoLabel": "Foto do pacote (opcional)",
+  "photoCapture": "Tirar ou escolher foto",
+  "notas": "Observações",
+  "outcomeDelivered": "Entregue",
+  "outcomeNotDelivered": "Não entregue",
+  "motivoLabel": "Motivo da não entrega",
+  "motivo": {
+    "ausente": "Ausente",
+    "rechazo": "Recusa",
+    "domicilio_incorrecto": "Endereço incorreto",
+    "producto_dañado": "Produto danificado",
+    "otro": "Outro"
+  },
+  "confirm": "Confirmar",
+  "cancel": "Cancelar",
+  "next": "Próximo",
+  "back": "Voltar",
+  "podAvailable": "POD disponível",
+  "viewPod": "Ver comprovante",
+  "downloadHint": "Assinatura e foto armazenadas no sistema.",
+  "noPod": "Sem comprovante registrado.",
+  "choferTitle": "Minha rota",
+  "choferSubtitle": "Pedidos em rota — confirme cada entrega com comprovante.",
+  "noRoute": "Você não tem um reparto em rota ativo.",
+  "forbidden": "Você não tem permissão para registrar comprovantes de entrega.",
+  "errors": {
+    "save": "Não foi possível salvar o comprovante.",
+    "photoTooLarge": "A foto excede o tamanho máximo permitido.",
+    "firmaTooLarge": "A assinatura excede o tamanho máximo permitido."
+  }
+}

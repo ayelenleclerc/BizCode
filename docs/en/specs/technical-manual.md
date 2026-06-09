@@ -2,9 +2,9 @@
 
 | Field | Value |
 |-------|--------|
-| Document version | 0.1 |
-| Revision | 1 |
-| Date | 2026-04-06 |
+| Document version | 0.2 |
+| Revision | 2 |
+| Date | 2026-05-15 |
 | Product reference | BizCode 0.1.0 MVP |
 
 ## Purpose
@@ -30,7 +30,13 @@ This document **does not duplicate** architecture text. It points to **authorita
 
 ## API surface (summary)
 
-Implemented routes in `server/createApp.ts`: `/api/health`, `/api/auth/setup-owner`, `/api/auth/login`, `/api/auth/logout`, `/api/auth/me`, `/api/clientes`, `/api/articulos`, `/api/rubros`, `/api/formas-pago`, `/api/facturas` — details and schemas in OpenAPI.
+Domain REST routes are registered in [`server/registerRestDomainRoutes.ts`](../../../server/registerRestDomainRoutes.ts) (included from `createApp.ts`). Summary (see OpenAPI for parameters and schemas):
+
+- Core: `/api/clientes`, `/api/articulos`, `/api/rubros`, `/api/proveedores`, `/api/formas-pago`, `/api/facturas`
+- Collections: `/api/cobros`, `/api/cobros/:id`
+- Reports: `/api/reportes/aging`, `/api/reportes/cuenta-corriente/:clienteId`, `/api/reportes/ventas`, `/api/reportes/stock-critico`, `/api/reportes/cobranzas`
+- Logistics: `/api/ordenes-entrega`, `/api/ordenes-entrega/:id`, `/api/zonas-entrega` (see OpenAPI)
+- Auth and health: `/api/health`, `/api/auth/*` — details in OpenAPI.
 
 ## Operational bootstrap (super admin)
 

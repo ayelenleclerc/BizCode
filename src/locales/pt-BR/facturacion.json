@@ -24,7 +24,9 @@
     "subtotal": "Subtotal",
     "empty": "Sem itens. Pressione Ins para adicionar.",
     "addItem": "➕ Adicionar Item (Ins)",
-    "selectArticulo": "Selecionar..."
+    "selectArticulo": "Selecionar...",
+    "rowAria": "Item {{n}}, clique para selecionar a linha",
+    "rowAriaSelected": "Item {{n}}, linha selecionada"
   },
   "totals": {
     "neto21": "Base 21%",
@@ -32,6 +34,11 @@
     "netoExento": "Base Isenta",
     "iva": "Impostos",
     "total": "TOTAL"
+  },
+  "creditLimitWarning": {
+    "title": "Aviso: limite de crédito excedido",
+    "detail": "Saldo atual: ${{balance}} + esta NF = ${{projected}} (limite: ${{limit}})",
+    "hint": "Você pode continuar registrando a venda ou cancelá-la."
   },
   "errors": {
     "noCliente": "Selecione um cliente",
@@ -59,6 +66,55 @@
     "iva21": "Imposto 21%",
     "iva105": "Imposto 10,5%"
   },
+  "void": {
+    "button": "Cancelar nota fiscal",
+    "confirmTitle": "Confirmar cancelamento?",
+    "motivoLabel": "Motivo do cancelamento",
+    "motivoPlaceholder": "Ex.: Preço incorreto, devolvido pelo cliente…",
+    "motivoRequired": "O motivo é obrigatório",
+    "motivoMinLength": "O motivo deve ter pelo menos 10 caracteres",
+    "confirm": "Confirmar cancelamento",
+    "cancel": "Cancelar",
+    "loading": "Cancelando…",
+    "error": "Não foi possível cancelar a nota fiscal"
+  },
   "save": "✓ Salvar NF (F5)",
-  "cancel": "Cancelar (Esc)"
+  "cancel": "Cancelar (Esc)",
+  "cae": {
+    "column": "CAE",
+    "pending": "CAE pendente",
+    "issued": "CAE emitido",
+    "failed": "CAE falhou",
+    "retry": "Repetir CAE",
+    "retryLoading": "Solicitando CAE…",
+    "retryError": "Não foi possível solicitar o CAE",
+    "previewPdf": "Pré-visualizar PDF",
+    "downloadPdf": "Baixar PDF",
+    "pdfLoading": "Gerando PDF…",
+    "pdfError": "Não foi possível gerar o PDF",
+    "caeNumber": "CAE: {{cae}}",
+    "caeVto": "Venc.: {{date}}"
+  },
+  "pdfModal": {
+    "title": "PDF — {{filename}}",
+    "close": "Fechar",
+    "download": "Baixar PDF",
+    "print": "Imprimir / visualizar",
+    "ticket": "Ticket 80 mm",
+    "previewFrameTitle": "Pré-visualização do PDF da fatura",
+    "actions": "Ações PDF"
+  },
+  "print": {
+    "actionsGroup": "Imprimir com dispositivo",
+    "thermal": "Térmica 80 mm (mock)",
+    "fiscal": "Impressora fiscal (mock)",
+    "legalPdf": "PDF legal",
+    "loading": "Enviando impressão…",
+    "feedback": {
+      "mockSuccess": "Impressão mock enviada (job {{jobId}}).",
+      "fiscalFallbackPdf": "Fiscal desabilitado: PDF legal aberto.",
+      "thermalFallbackPdf": "Térmica desabilitada: PDF legal aberto.",
+      "error": "Não foi possível imprimir com o dispositivo selecionado"
+    }
+  }
 }

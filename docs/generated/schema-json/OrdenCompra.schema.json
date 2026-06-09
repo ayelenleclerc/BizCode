@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "estado": {
+      "enum": [
+        "draft",
+        "sent",
+        "received",
+        "cancelled"
+      ],
+      "type": "string"
+    },
+    "fechaEstimada": {
+      "format": "date-time",
+      "nullable": true,
+      "type": "string"
+    },
+    "id": {
+      "type": "integer"
+    },
+    "items": {
+      "items": {
+        "$ref": "./OrdenCompraItemLine.schema.json"
+      },
+      "type": "array"
+    },
+    "nota": {
+      "nullable": true,
+      "type": "string"
+    },
+    "proveedor": {
+      "properties": {
+        "codigo": {
+          "type": "integer"
+        },
+        "id": {
+          "type": "integer"
+        },
+        "rsocial": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "proveedorId": {
+      "type": "integer"
+    },
+    "tenantId": {
+      "type": "integer"
+    },
+    "total": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "tenantId",
+    "proveedorId",
+    "estado",
+    "total"
+  ],
+  "title": "OrdenCompra",
+  "type": "object"
+}

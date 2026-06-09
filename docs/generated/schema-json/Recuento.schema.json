@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "closedAt": {
+      "format": "date-time",
+      "nullable": true,
+      "type": "string"
+    },
+    "estado": {
+      "enum": [
+        "in_progress",
+        "closed"
+      ],
+      "type": "string"
+    },
+    "fecha": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "id": {
+      "type": "integer"
+    },
+    "items": {
+      "items": {
+        "$ref": "./RecuentoItemLine.schema.json"
+      },
+      "type": "array"
+    },
+    "operador": {
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "username": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "operadorId": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "id",
+    "operadorId",
+    "estado",
+    "fecha",
+    "items"
+  ],
+  "title": "Recuento",
+  "type": "object"
+}

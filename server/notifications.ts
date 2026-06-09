@@ -1,11 +1,19 @@
 import type { Application, Request, Response } from 'express'
-import type { PrismaClient } from '@prisma/client'
+import type { PrismaClient, Prisma } from '@prisma/client'
 import { type AuthenticatedRequest } from './auth'
+import { writeAuditEvent } from './audit'
 
 export const NOTIFICATION_TYPES = [
   'credit_limit_exceeded',
   'invoice_overdue',
   'invoice_due_soon',
+  'supplier_invoice_due_soon',
+  'supplier_invoice_overdue',
+  'supplier_invoice_overdue_critical',
+  'supplier_credit_limit_exceeded',
+  'chat_message',
+  'stock_below_minimum',
+  'module_trial_expiring',
 ] as const
 
 export type NotificationType = (typeof NOTIFICATION_TYPES)[number]
@@ -13,9 +21,26 @@ export type NotificationType = (typeof NOTIFICATION_TYPES)[number]
 export type NotificationPayload = {
   clienteId?: number
   facturaId?: number
+  proveedorId?: number
+  comprobanteCompraId?: number
+  facturaRef?: string
   rsocial?: string
   amount?: string
+  diasMora?: number
+  diasVencido?: number
+  diasHastaVencimiento?: number
   limit?: string
+  messageId?: number
+  fromUserId?: number
+  preview?: string
+  articuloId?: number
+  codigo?: number
+  descripcion?: string
+  stock?: number
+  minimo?: number
+  moduleKey?: string
+  expiresAt?: string
+  daysRemaining?: number
 }
 
 /**
@@ -59,6 +84,74 @@ export async function notifyManagers(
 
   await prisma.notification.createMany({
     data: managers.map((m) => ({ tenantId, userId: m.id, type, payload })),
+  })
+}
+
+/**
+ * @en Notifies all active owners of a tenant (module trial warnings).
+ * @es Notifica a todos los owners activos de un tenant (avisos de trial de módulo).
+ * @pt-BR Notifica todos os owners ativos de um tenant (avisos de trial de módulo).
+ */
+export async function notifyTenantOwners(
+  prisma: PrismaClient,
+  tenantId: number,
+  type: NotificationType,
+  payload: NotificationPayload,
+): Promise<void> {
+  const owners = await prisma.appUser.findMany({
+    where: {
+      tenantId,
+      active: true,
+      role: 'owner',
+    },
+    select: { id: true },
+  })
+
+  if (owners.length === 0) return
+
+  await prisma.notification.createMany({
+    data: owners.map((o) => ({ tenantId, userId: o.id, type, payload })),
+  })
+}
+
+/**
+ * @en Notifies owner, manager, and warehouse_lead for inventory alerts.
+ * @es Notifica a owner, manager y warehouse_lead para alertas de inventario.
+ * @pt-BR Notifica owner, manager e warehouse_lead para alertas de estoque.
+ */
+/**
+ * @en Notifies finance stakeholders (owner/manager) for supplier payable alerts (#275).
+ * @es Notifica a responsables de finanzas (owner/manager) para alertas de proveedores (#275).
+ * @pt-BR Notifica responsáveis de finanças (owner/manager) para alertas de fornecedores (#275).
+ */
+export async function notifyFinanceStakeholders(
+  prisma: PrismaClient,
+  tenantId: number,
+  type: NotificationType,
+  payload: NotificationPayload,
+): Promise<void> {
+  await notifyManagers(prisma, tenantId, type, payload)
+}
+
+export async function notifyInventoryStakeholders(
+  prisma: PrismaClient,
+  tenantId: number,
+  type: NotificationType,
+  payload: NotificationPayload,
+): Promise<void> {
+  const users = await prisma.appUser.findMany({
+    where: {
+      tenantId,
+      active: true,
+      role: { in: ['owner', 'manager', 'warehouse_lead'] },
+    },
+    select: { id: true },
+  })
+
+  if (users.length === 0) return
+
+  await prisma.notification.createMany({
+    data: users.map((u) => ({ tenantId, userId: u.id, type, payload })),
   })
 }
 
@@ -115,6 +208,15 @@ export function registerNotificationRoutes(app: Application, prisma: PrismaClien
         },
         data: { readAt: now },
       })
+      await writeAuditEvent({
+        prisma,
+        tenantId: authReq.auth.claims.tenantId,
+        userId: authReq.auth.claims.userId,
+        action: 'notification_read_all',
+        resource: 'notification',
+        ipAddress: req.ip,
+        metadata: { updated: result.count } as Prisma.InputJsonValue,
+      })
       res.json({ success: true, data: { updated: result.count } })
     } catch (err: unknown) {
       res.status(500).json({ success: false, error: err instanceof Error ? err.message : String(err) })
@@ -150,6 +252,15 @@ export function registerNotificationRoutes(app: Application, prisma: PrismaClien
       const updated = await prisma.notification.update({
         where: { id },
         data: { readAt: new Date() },
+      })
+      await writeAuditEvent({
+        prisma,
+        tenantId: authReq.auth.claims.tenantId,
+        userId: authReq.auth.claims.userId,
+        action: 'notification_read',
+        resource: 'notification',
+        resourceId: String(id),
+        ipAddress: req.ip,
       })
       res.json({ success: true, data: updated })
     } catch (err: unknown) {

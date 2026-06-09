@@ -9,6 +9,9 @@ vi.mock('@/lib/api', () => ({
     login: vi.fn(),
     logout: vi.fn(),
   },
+  featuresAPI: {
+    get: vi.fn().mockResolvedValue({ modules: ['core.auth', 'billing.orders'], integrations: [] }),
+  },
   clientesAPI: { list: vi.fn() },
   articulosAPI: { list: vi.fn(), get: vi.fn() },
   rubrosAPI: { list: vi.fn() },

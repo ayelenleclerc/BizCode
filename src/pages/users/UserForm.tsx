@@ -3,8 +3,9 @@ import { useForm, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useHotkeys } from 'react-hotkeys-hook'
+import KeyboardHint, { useFormShortcuts } from '@/components/shared/KeyboardHint'
 import { useTranslation } from 'react-i18next'
-import { usersAPI, type AppUserDTO, type CreateUserBody, type UpdateUserBody } from '@/lib/api'
+import { ApiRequestFailedError, usersAPI, type AppUserDTO, type CreateUserBody, type UpdateUserBody } from '@/lib/api'
 import { USER_ROLES, USER_CHANNELS, type UserRole, type UserChannel } from '@/lib/rbac'
 import { useAuth } from '@/contexts/AuthContext'
 
@@ -119,7 +120,9 @@ export default function UserForm({ user, onClose, onSaved }: Props) {
       onSaved(saved)
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err)
-      if (msg.includes('already exists') || msg.includes('Unique')) {
+      if (err instanceof ApiRequestFailedError && err.message === 'plan_limit_users') {
+        setError('root', { message: tc('errors.planLimitUsers') })
+      } else if (msg.includes('already exists') || msg.includes('Unique')) {
         setError('username', { message: t('form.errors.duplicate') })
       } else {
         setError('root', { message: t('form.errors.generic') })
@@ -134,6 +137,8 @@ export default function UserForm({ user, onClose, onSaved }: Props) {
 
   useHotkeys('escape', () => onClose(), { enableOnFormTags: true })
 
+  const formShortcuts = useFormShortcuts()
+
   return (
     <div
       role="dialog"
@@ -145,7 +150,8 @@ export default function UserForm({ user, onClose, onSaved }: Props) {
         <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-1">
           {isNew ? t('form.titleNew') : t('form.titleEdit', { username: user?.username })}
         </h2>
-        <p className="text-xs text-slate-500 dark:text-slate-400 mb-5">{t('form.hint')}</p>
+        <p className="text-xs text-slate-500 dark:text-slate-400 mb-3">{t('form.hint')}</p>
+        <KeyboardHint shortcuts={formShortcuts} className="mb-5" />
 
         <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-4">
           {/* Username */}
@@ -219,7 +225,9 @@ export default function UserForm({ user, onClose, onSaved }: Props) {
                   key={ch}
                   type="button"
                   onClick={() => toggleChannel(ch)}
-                  aria-pressed={selectedChannels.includes(ch)}
+                  {...(selectedChannels.includes(ch)
+                    ? { 'aria-pressed': 'true' as const }
+                    : { 'aria-pressed': 'false' as const })}
                   className={`px-3 py-1 text-xs rounded-full border transition ${
                     selectedChannels.includes(ch)
                       ? 'bg-blue-600 border-blue-600 text-white'

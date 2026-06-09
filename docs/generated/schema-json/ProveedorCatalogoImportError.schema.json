@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "message": {
+      "type": "string"
+    },
+    "row": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "row",
+    "message"
+  ],
+  "title": "ProveedorCatalogoImportError",
+  "type": "object"
+}

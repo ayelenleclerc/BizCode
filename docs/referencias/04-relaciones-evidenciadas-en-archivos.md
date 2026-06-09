@@ -27,7 +27,7 @@ Según [`02-inventario-dbf-indice-maestro.md`](02-inventario-dbf-indice-maestro.
 
 | Archivo | recordCount (aprox.) | Nota |
 |---------|----------------------|------|
-| `CLIENTES.DBF` | 2310 | Tabla de clientes con datos en esta copia (a diferencia del escenario solo-placeholder del script de migración actual). |
+| `CLIENTES.DBF` | 2310 | Tabla de clientes con datos en esta copia; `npm run migrate:dbf` importa filas reales cuando el archivo está presente bajo `PROGRAMA_VIEJO_ROOT` (placeholders `91001`–`91010` solo si no hay maestro con filas; ver #51 / `MIGRACION_PROGRAMA_VIEJO.md`). |
 | `FACT.DBF` | 418354 | Volumen alto; documento comercial agregado o detalle a confirmar leyendo campos en `exports/inventario-dbf-volcado.md`. |
 | `CCTE_V.DBF` | 177399 | Cuenta corriente o vista voluminosa; revisar sección en volcado. |
 | `PVAR.DBF` | 0 | Sin filas en esta copia (coherente con [`scripts/MIGRACION_PROGRAMA_VIEJO.md`](../../scripts/MIGRACION_PROGRAMA_VIEJO.md)). |

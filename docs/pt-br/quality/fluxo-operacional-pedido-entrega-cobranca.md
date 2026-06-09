@@ -16,6 +16,26 @@ stateDiagram-v2
   Cobrado --> [*]
 ```
 
+## Estados canônicos de implementação (BP1-1 / GitHub #65)
+
+O diagrama usa **nomes de ciclo de vida para o usuário**. Quando houver entidade persistida `Pedido`, OpenAPI e Prisma devem usar as **chaves em inglês** abaixo para alinhar issues, ADR e código.
+
+| Chave de implementação | Equivale no diagrama | Significado |
+|------------------------|----------------------|-------------|
+| `draft` | Criado | Pedido registrado; editável; ainda não comprometido com o cumprimento. |
+| `confirmed` | Atribuido | Comprometido para planejamento; pode-se atribuir armazém/rota. |
+| `packed` | Picking / Embalado | Estoque preparado / pronto para despacho (no MVP pode ser um único estado). |
+| `shipped` | Despachado | Entregue à transportadora ou etapa do motorista. |
+| `delivered` | Entregue | Recebimento confirmado. |
+| `invoiced` | (antes da cobrança) | Fatura vinculada (`Factura`) existente. |
+| `collected` | Cobrado | Pagamento / liquidação encerrada para a linha do pedido. |
+
+**Transições:** saltos inválidos (ex.: `draft` → `collected`) devem ser rejeitados na API futura. Cancelamentos: apenas a partir de `draft` ou `confirmed`, salvo ADR de implementação com terminal `cancelled`.
+
+**Integrações:** `Cliente.creditLimit`, `Articulo.stock`, `DeliveryZone` e escopo de canal (`x-bizcode-channel` / `AuthScope.channels`) nos mesmos pontos da tabela RACI.
+
+**Rascunhos (sem migrações):** artefatos Prisma/OpenAPI em [rascunho-implementacao-dominio-pedido.md](rascunho-implementacao-dominio-pedido.md).
+
 | Estado (conceito) | Significado |
 |-------------------|-------------|
 | Criado | Pedido registrado (vendas / backoffice). |
@@ -49,8 +69,16 @@ Células vazias: a etapa não tem permissão RBAC dedicada; o papel pode partici
 |------|---------------------|---------------------------|
 | Clientes / produtos / rubros | REST sob `/api/clientes`, `/api/articulos`, `/api/rubros` com auth | Estender conforme necessidade |
 | Faturamento | `/api/facturas`, `/api/formas-pago` | Mesma base |
-| Entidade pedido (`pedido`) | **Não evidenciada** no Prisma nem OpenAPI | Modelo, estados e APIs ao executar BP1-1 do plano de execução |
-| Permissões `orders.*` | Definidas no RBAC; sem entidade de domínio ainda | Aplicar em novas rotas quando implementadas |
+| Cobranças / pagamentos | Modelo `Cobro`; `POST/GET /api/cobros`; UI `/cobros`; dashboard `cobrosHoy`; cobranças recentes no formulário de cliente | Vincular à entidade pedido quando existir BP1-1 |
+| UI / finanças contas a receber | `/finanzas`; `GET /api/reportes/aging`, `GET /api/reportes/cuenta-corriente/:clienteId` | Fluxos de cobrança conforme backlog |
+| Relatórios | `/reportes`; `GET /api/reportes/ventas`, `stock-critico`, `cobranzas` (JSON ou CSV) | Tipos adicionais de relatório |
+| Logística | `/logistica`, `/logistica/picking` (#143); `OrdenEntrega`; `GET/POST/PUT /api/ordenes-entrega`, `POST .../iniciar-picking`, `POST .../lista` | OE: `pending` → `picking` → `ready` → `assigned` (reparto) → `in_transit` → `delivered` \| `failed` \| `cancelled` |
+| Rastreamento GPS | `/logistica/seguimiento` (#144); `RepartoUbicacion`; `GET /api/repartos/activos`, `POST /api/repartos/{id}/ubicacion` | Motorista em reparto `on_route`; planejador vê última posição; retenção 7 dias |
+| KPIs logística | `/logistica` aba Relatórios (#145); `dispatchedAt`; `GET /api/logistica/kpis`, `reporte-choferes`, `reporte-zonas` | Planejador/gestor; agregados no DB; export CSV |
+| Entidade pedido (`pedido`) | Modelos `Pedido`/`PedidoItem`, `/api/pedidos`, UI `/pedidos` (#132); `requireModule('billing.orders')` (#223) | Estados `packed`…`collected` e transições genéricas (#65 / BP1-1 completo) |
+| Permissões `orders.*` | Definidas no RBAC; aplicadas em `/api/ordenes-entrega` | Estender quando a entidade `pedido` existir |
+
+O estado **Cobrado** do diagrama é coberto hoje em parte pelo **registro de cobranças** (`Cobro`), não por um registro `pedido`.
 
 ## Documentos relacionados
 

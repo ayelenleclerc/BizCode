@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "cobroId": {
+      "type": "integer"
+    },
+    "credito": {
+      "type": "string"
+    },
+    "debito": {
+      "type": "string"
+    },
+    "facturaId": {
+      "type": "integer"
+    },
+    "fecha": {
+      "description": "ISO-8601 timestamp (empty for saldo_inicial)",
+      "type": "string"
+    },
+    "referencia": {
+      "type": "string"
+    },
+    "saldo": {
+      "type": "string"
+    },
+    "tipo": {
+      "enum": [
+        "factura",
+        "cobro",
+        "saldo_inicial"
+      ],
+      "type": "string"
+    }
+  },
+  "required": [
+    "tipo",
+    "fecha",
+    "referencia",
+    "debito",
+    "credito",
+    "saldo"
+  ],
+  "title": "CuentaCorrienteLine",
+  "type": "object"
+}

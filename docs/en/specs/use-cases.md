@@ -2,9 +2,9 @@
 
 | Field | Value |
 |-------|--------|
-| Document version | 0.1 |
-| Revision | 1 |
-| Date | 2026-03-31 |
+| Document version | 0.2 |
+| Revision | 2 |
+| Date | 2026-05-15 |
 | Product reference | BizCode 0.1.0 MVP |
 
 **Actor:** Operator (business user). **System:** BizCode desktop app (React UI + Express API + PostgreSQL).
@@ -16,5 +16,14 @@
 | UC-03 | Manage invoices | List → new invoice → header + line items → save. | `src/pages/facturacion/` |
 | UC-04 | Change appearance | Toggle light/dark theme; persisted locally. | `Layout.tsx`, `theming.md` |
 | UC-05 | Change language | Switch UI language among supported locales. | `src/i18n/` |
+| UC-06 | Register collections | List/filter payments → register payment for customer → optional filters. | `src/pages/cobros/` |
+| UC-07 | Review AR and statements | View aging buckets → load account statement by customer id. | `src/pages/finanzas/` |
+| UC-08 | Run operational reports | Select period/tab → view sales, critical stock, or collections; export CSV. | `src/pages/reportes/` |
+| UC-09 | Manage delivery orders | Filter orders → create or update estado (planner/driver per RBAC). | `src/pages/logistica/` |
+| UC-10 | Warehouse picking | Take OE from queue → checklist → mark ready. | `src/pages/logistica/picking/` |
+| UC-11 | Plan delivery route | Select ready OEs → create route → start → close. | `src/pages/logistica/repartos/` |
+| UC-12 | Driver POD | Confirm delivery per stop with signature. | `src/pages/logistica/repartos/chofer/` |
+| UC-13 | Live GPS tracking | Planner views map; driver sends location on route. | `src/pages/logistica/seguimiento/` |
+| UC-14 | Logistics KPIs and reports | Select period (and optional driver) → view KPIs, driver/zone tables → export CSV. | `src/pages/logistica/LogisticaReportesPanel.tsx`, `/api/logistica/*` |
 
-**Other languages:** [Español](../../es/specs/use-cases.md) · [Português](../../pt-br/specs/use-cases.md)
+**Other languages:** [Español](../../es/specs/casos-de-uso.md) · [Português](../../pt-br/specs/casos-de-uso.md)

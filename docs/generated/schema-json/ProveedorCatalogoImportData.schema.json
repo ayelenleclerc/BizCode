@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "created": {
+      "type": "integer"
+    },
+    "errors": {
+      "items": {
+        "$ref": "./ProveedorCatalogoImportError.schema.json"
+      },
+      "type": "array"
+    },
+    "skipped": {
+      "type": "integer"
+    },
+    "updated": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "created",
+    "updated",
+    "skipped",
+    "errors"
+  ],
+  "title": "ProveedorCatalogoImportData",
+  "type": "object"
+}

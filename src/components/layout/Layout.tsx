@@ -1,72 +1,15 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useLayoutEffect, useRef, useId } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import LanguageSelect from '@/components/LanguageSelect'
 import { useAuth } from '@/contexts/AuthContext'
-import type { UserRole } from '@/lib/rbac'
+import { useFeatureFlags } from '@/contexts/FeatureFlagsContext'
 import { notificationsAPI, type AppNotification } from '@/lib/api'
+import { NAV_SECTIONS } from '@/components/layout/navSections'
 
 interface LayoutProps {
   children: React.ReactNode
 }
-
-/**
- * @en Nav sections and the roles that can see each one.
- *     `null` means visible to every authenticated user.
- * @es Secciones del nav y los roles que pueden verlas.
- *     `null` significa visible para todo usuario autenticado.
- * @pt-BR Seções do nav e os papéis que podem visualizá-las.
- *     `null` significa visível para todo usuário autenticado.
- */
-const NAV_SECTIONS: {
-  key: string
-  path: string
-  icon: string
-  roles: readonly UserRole[] | null
-}[] = [
-  {
-    key: 'inicio',
-    path: '/inicio',
-    icon: '🏠',
-    roles: null,
-  },
-  {
-    key: 'ventas',
-    path: '/facturacion',
-    icon: '💰',
-    roles: ['owner', 'manager', 'seller', 'billing', 'cashier'],
-  },
-  {
-    key: 'clientes',
-    path: '/clientes',
-    icon: '📋',
-    roles: ['owner', 'manager', 'seller', 'backoffice', 'collections', 'finance', 'auditor'],
-  },
-  {
-    key: 'catalogo',
-    path: '/articulos',
-    icon: '📦',
-    roles: ['owner', 'manager', 'seller', 'backoffice', 'warehouse_op', 'warehouse_lead', 'logistics_planner'],
-  },
-  {
-    key: 'logistica',
-    path: '/logistica',
-    icon: '🚚',
-    roles: ['owner', 'manager', 'warehouse_op', 'warehouse_lead', 'logistics_planner', 'driver'],
-  },
-  {
-    key: 'finanzas',
-    path: '/finanzas',
-    icon: '💹',
-    roles: ['owner', 'manager', 'billing', 'cashier', 'collections', 'finance', 'auditor'],
-  },
-  {
-    key: 'configuracion',
-    path: '/configuracion',
-    icon: '⚙️',
-    roles: ['owner', 'manager'],
-  },
-]
 
 const NOTIFICATION_POLL_MS = 30_000
 
@@ -80,6 +23,14 @@ function NotificationBell() {
   const [notifications, setNotifications] = useState<AppNotification[]>([])
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
+  const buttonRef = useRef<HTMLButtonElement>(null)
+  const panelId = useId()
+  const panelTitleId = useId()
+
+  // Microsoft Edge Tools (webhint) flags dynamic `aria-expanded` in JSX; sync the token in the DOM instead.
+  useLayoutEffect(() => {
+    buttonRef.current?.setAttribute('aria-expanded', open ? 'true' : 'false')
+  }, [open])
 
   useEffect(() => {
     let cancelled = false
@@ -124,9 +75,11 @@ function NotificationBell() {
   return (
     <div ref={ref} className="relative" data-testid="notification-bell">
       <button
+        ref={buttonRef}
         type="button"
         aria-label={t('notifications.bell', { count: unread })}
-        aria-expanded={open}
+        aria-controls={panelId}
+        aria-haspopup="true"
         onClick={() => setOpen((o) => !o)}
         className="relative p-2 rounded hover:bg-slate-100 dark:hover:bg-slate-700 transition"
       >
@@ -141,13 +94,15 @@ function NotificationBell() {
         )}
       </button>
 
-      {open && (
-        <div
-          role="menu"
-          className="absolute right-0 mt-1 w-80 max-h-96 overflow-y-auto rounded-lg shadow-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 z-50"
-        >
+      <div
+        id={panelId}
+        role="region"
+        aria-labelledby={panelTitleId}
+        hidden={!open}
+        className="absolute right-0 mt-1 w-80 max-h-96 overflow-y-auto rounded-lg shadow-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 z-50"
+      >
           <div className="flex items-center justify-between px-4 py-2 border-b border-slate-200 dark:border-slate-700">
-            <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+            <span id={panelTitleId} className="text-sm font-semibold text-slate-700 dark:text-slate-300">
               {t('notifications.title')}
             </span>
             {unread > 0 && (
@@ -199,8 +154,7 @@ function NotificationBell() {
               ))}
             </ul>
           )}
-        </div>
-      )}
+      </div>
     </div>
   )
 }
@@ -208,6 +162,7 @@ function NotificationBell() {
 export default function Layout({ children }: LayoutProps) {
   const { t } = useTranslation('common')
   const { logout, status, claims } = useAuth()
+  const { hasModule } = useFeatureFlags()
   const navigate = useNavigate()
   const location = useLocation()
 
@@ -238,9 +193,14 @@ export default function Layout({ children }: LayoutProps) {
     location.pathname === path || location.pathname.startsWith(path + '/')
 
   const userRole = claims?.role ?? null
-  const visibleSections = NAV_SECTIONS.filter(
-    (s) => s.roles === null || (userRole !== null && s.roles.includes(userRole)),
-  )
+  const visibleSections = NAV_SECTIONS.filter((s) => {
+    if (s.roles !== null) {
+      if (userRole === null) return false
+      if (userRole !== 'super_admin' && !s.roles.includes(userRole)) return false
+    }
+    if (s.moduleKey !== null && !hasModule(s.moduleKey)) return false
+    return true
+  })
 
   return (
     <div className="flex h-screen bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100">
@@ -317,15 +277,25 @@ export default function Layout({ children }: LayoutProps) {
             </h2>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
               💡 {t('shortcuts.title')}:{' '}
-              <kbd className="px-1 py-0.5 bg-slate-200 dark:bg-slate-700 rounded text-xs">F2</kbd>{' '}
+              <kbd className="px-1 py-0.5 rounded text-xs font-mono font-medium text-slate-900 bg-slate-200 dark:bg-slate-600 dark:text-slate-100">
+                F2
+              </kbd>{' '}
               {t('shortcuts.search')} •{' '}
-              <kbd className="px-1 py-0.5 bg-slate-200 dark:bg-slate-700 rounded text-xs">F3</kbd>{' '}
+              <kbd className="px-1 py-0.5 rounded text-xs font-mono font-medium text-slate-900 bg-slate-200 dark:bg-slate-600 dark:text-slate-100">
+                F3
+              </kbd>{' '}
               {t('shortcuts.new')} •{' '}
-              <kbd className="px-1 py-0.5 bg-slate-200 dark:bg-slate-700 rounded text-xs">F5</kbd>{' '}
+              <kbd className="px-1 py-0.5 rounded text-xs font-mono font-medium text-slate-900 bg-slate-200 dark:bg-slate-600 dark:text-slate-100">
+                F5
+              </kbd>{' '}
               {t('shortcuts.save')} •{' '}
-              <kbd className="px-1 py-0.5 bg-slate-200 dark:bg-slate-700 rounded text-xs">Esc</kbd>{' '}
+              <kbd className="px-1 py-0.5 rounded text-xs font-mono font-medium text-slate-900 bg-slate-200 dark:bg-slate-600 dark:text-slate-100">
+                Esc
+              </kbd>{' '}
               {t('shortcuts.cancel')} •{' '}
-              <kbd className="px-1 py-0.5 bg-slate-200 dark:bg-slate-700 rounded text-xs">↑↓</kbd>{' '}
+              <kbd className="px-1 py-0.5 rounded text-xs font-mono font-medium text-slate-900 bg-slate-200 dark:bg-slate-600 dark:text-slate-100">
+                ↑↓
+              </kbd>{' '}
               {t('shortcuts.navigate')}
             </p>
           </div>

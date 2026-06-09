@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "articuloId": {
+      "type": "integer"
+    },
+    "cantidadTotal": {
+      "type": "integer"
+    },
+    "codigo": {
+      "type": "string"
+    },
+    "descripcion": {
+      "type": "string"
+    },
+    "evolucionPrecios": {
+      "items": {
+        "$ref": "./ProveedorArticuloPrecioPunto.schema.json"
+      },
+      "type": "array"
+    },
+    "montoTotal": {
+      "type": "string"
+    },
+    "precioPromedioPonderado": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "articuloId",
+    "codigo",
+    "descripcion",
+    "cantidadTotal",
+    "precioPromedioPonderado",
+    "montoTotal",
+    "evolucionPrecios"
+  ],
+  "title": "ProveedorArticuloHistorialRow",
+  "type": "object"
+}

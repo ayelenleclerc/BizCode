@@ -3,11 +3,13 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useHotkeys } from 'react-hotkeys-hook'
+import KeyboardHint, { useFormShortcuts } from '@/components/shared/KeyboardHint'
 import { useTranslation } from 'react-i18next'
 import { clientesAPI, zonasEntregaAPI } from '@/lib/api'
 import { validateCUIT, formatCUIT } from '@/lib/validators'
 import { useAuth } from '@/contexts/AuthContext'
 import { Cliente, DeliveryZone } from '@/types'
+import ClienteCobrosRecientes from './ClienteCobrosRecientes'
 
 const clienteSchema = z.object({
   codigo: z.coerce.number().int().positive('Código debe ser positivo'),
@@ -28,8 +30,13 @@ const clienteSchema = z.object({
   creditLimit: z.coerce.number().positive().optional().nullable(),
   creditDays: z.coerce.number().int().min(0).optional(),
   suspended: z.boolean().optional(),
-  // Logistics (Issue #32)
-  deliveryZoneId: z.coerce.number().int().positive().optional().nullable(),
+  // Logistics (Issue #32) — HTML <select value=""> must not coerce to 0 (would fail .positive() and block submit silently).
+  deliveryZoneId: z.preprocess((val) => {
+    if (val === '' || val === null || val === undefined) return undefined
+    const n = typeof val === 'number' ? val : Number(val)
+    if (!Number.isFinite(n) || n <= 0) return undefined
+    return Math.trunc(n)
+  }, z.number().int().positive().optional().nullable()),
 })
 
 type ClienteFormData = z.infer<typeof clienteSchema>
@@ -38,6 +45,44 @@ interface ClienteFormProps {
   cliente: Cliente | null
   onClose: () => void
   onGuardado: (cliente: Cliente) => void
+}
+
+/** Uso de crédito sin `style` inline (SVG + viewBox). Texto oculto para AT. */
+function ClienteCreditUsageBar({
+  balance,
+  creditLimit,
+  label,
+}: {
+  balance: number
+  creditLimit: number
+  label: string
+}) {
+  const usagePct = Math.min(100, (balance / creditLimit) * 100)
+  const pctRounded = Math.round(usagePct)
+  const fillClass =
+    balance > creditLimit
+      ? 'fill-red-500'
+      : balance / creditLimit > 0.8
+        ? 'fill-yellow-500'
+        : 'fill-green-500'
+
+  return (
+    <div className="mt-1 h-2 w-full overflow-hidden rounded-full" data-testid="cliente-credit-usage-bar">
+      <span className="sr-only">
+        {label}: {pctRounded}%
+      </span>
+      <svg
+        className="block h-2 w-full text-slate-200 dark:text-slate-600"
+        viewBox="0 0 100 2"
+        preserveAspectRatio="none"
+        aria-hidden
+        focusable="false"
+      >
+        <rect x={0} y={0} width={100} height={2} rx={1} className="fill-current" />
+        <rect x={0} y={0} width={usagePct} height={2} rx={1} className={fillClass} />
+      </svg>
+    </div>
+  )
 }
 
 export default function ClienteForm({ cliente, onClose, onGuardado }: ClienteFormProps) {
@@ -121,6 +166,7 @@ export default function ClienteForm({ cliente, onClose, onGuardado }: ClienteFor
   const dialogTitle = cliente
     ? t('form.titleEdit', { codigo: cliente.codigo })
     : t('form.titleNew')
+  const formShortcuts = useFormShortcuts()
 
   return (
     <div
@@ -128,6 +174,7 @@ export default function ClienteForm({ cliente, onClose, onGuardado }: ClienteFor
       role="dialog"
       aria-modal="true"
       aria-labelledby="dialog-cliente-title"
+      data-testid="cliente-form-dialog"
     >
       <div className="bg-white dark:bg-slate-800 rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         <div className="bg-slate-200 dark:bg-slate-700 px-6 py-4 border-b border-slate-300 dark:border-slate-600">
@@ -137,7 +184,9 @@ export default function ClienteForm({ cliente, onClose, onGuardado }: ClienteFor
           <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">{t('form.hint')}</p>
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-4">
+        <KeyboardHint shortcuts={formShortcuts} className="mx-6 mt-4" />
+
+        <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-4" data-testid="cliente-form">
           {error && (
             <div role="alert" className="p-3 bg-red-100 dark:bg-red-900 text-red-900 dark:text-red-100 rounded border border-red-300 dark:border-red-700">
               {error}
@@ -151,6 +200,7 @@ export default function ClienteForm({ cliente, onClose, onGuardado }: ClienteFor
             <input
               id="cliente-codigo"
               type="number"
+              data-testid="cliente-form-codigo"
               {...register('codigo')}
               aria-required="true"
               aria-describedby={errors.codigo ? 'cliente-codigo-error' : undefined}
@@ -169,6 +219,7 @@ export default function ClienteForm({ cliente, onClose, onGuardado }: ClienteFor
             <input
               id="cliente-rsocial"
               type="text"
+              data-testid="cliente-form-rsocial"
               {...register('rsocial')}
               maxLength={30}
               aria-required="true"
@@ -337,6 +388,8 @@ export default function ClienteForm({ cliente, onClose, onGuardado }: ClienteFor
                 {/* Score badge */}
                 {cliente.score != null && (
                   <span
+                    id="cliente-score-badge"
+                    title={t('form.financial.scoreTooltipHelp')}
                     className={`text-xs font-bold px-2 py-1 rounded-full ${
                       (cliente.score ?? 50) >= 71
                         ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
@@ -377,20 +430,11 @@ export default function ClienteForm({ cliente, onClose, onGuardado }: ClienteFor
                     </p>
                     {/* Credit usage bar */}
                     {cliente.creditLimit != null && Number(cliente.creditLimit) > 0 && (
-                      <div className="mt-1 h-2 rounded-full bg-slate-200 dark:bg-slate-600 overflow-hidden">
-                        <div
-                          className={`h-2 rounded-full transition-all ${
-                            Number(cliente.balance) > Number(cliente.creditLimit)
-                              ? 'bg-red-500'
-                              : Number(cliente.balance) / Number(cliente.creditLimit) > 0.8
-                                ? 'bg-yellow-500'
-                                : 'bg-green-500'
-                          }`}
-                          style={{
-                            width: `${Math.min(100, (Number(cliente.balance) / Number(cliente.creditLimit)) * 100)}%`,
-                          }}
-                        />
-                      </div>
+                      <ClienteCreditUsageBar
+                        balance={Number(cliente.balance ?? 0)}
+                        creditLimit={Number(cliente.creditLimit)}
+                        label={t('form.financial.creditLimit')}
+                      />
                     )}
                   </div>
                 )}
@@ -442,6 +486,7 @@ export default function ClienteForm({ cliente, onClose, onGuardado }: ClienteFor
               ) : (
                 <p className="text-xs text-slate-400 italic">{t('form.financial.readOnly')}</p>
               )}
+              <ClienteCobrosRecientes clienteId={cliente.id} />
             </div>
           )}
 

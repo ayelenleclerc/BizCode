@@ -2,20 +2,28 @@ import { useState, useEffect } from 'react'
 import { useHotkeys } from 'react-hotkeys-hook'
 import { useTranslation } from 'react-i18next'
 import { facturasAPI, clientesAPI, articulosAPI, formasPagoAPI } from '@/lib/api'
+import ErrorBoundary from '@/components/ErrorBoundary'
+import AsyncWrapper from '@/components/shared/AsyncWrapper'
+import KeyboardHint, { useGlobalListShortcuts } from '@/components/shared/KeyboardHint'
 import { Cliente, Articulo, FormaPago, Factura } from '@/types'
 import NuevaFacturaForm from './NuevaFacturaForm'
 import ListadoFacturas from './ListadoFacturas'
 
 export default function FacturacionPage() {
   const { t } = useTranslation('facturacion')
+  const listShortcuts = useGlobalListShortcuts()
   const [view, setView] = useState<'lista' | 'nueva'>('lista')
   const [facturas, setFacturas] = useState<Factura[]>([])
   const [clientes, setClientes] = useState<Cliente[]>([])
   const [articulos, setArticulos] = useState<Articulo[]>([])
   const [formasPago, setFormasPago] = useState<FormaPago[]>([])
+  const [loading, setLoading] = useState(false)
+  const [loadError, setLoadError] = useState<Error | null>(null)
 
   useEffect(() => {
     const loadData = async () => {
+      setLoading(true)
+      setLoadError(null)
       try {
         const [fac, cli, art, forma] = await Promise.all([
           facturasAPI.list(),
@@ -28,10 +36,12 @@ export default function FacturacionPage() {
         setArticulos(art || [])
         setFormasPago(forma || [])
       } catch (error) {
-        console.error('Error loading data:', error)
+        setLoadError(error instanceof Error ? error : new Error(String(error)))
+      } finally {
+        setLoading(false)
       }
     }
-    loadData()
+    void loadData()
   }, [])
 
   useHotkeys('f3', () => {
@@ -44,11 +54,16 @@ export default function FacturacionPage() {
 
   const handleFacturaGuardada = async () => {
     setView('lista')
-    const data = await facturasAPI.list()
-    setFacturas(data || [])
+    try {
+      const data = await facturasAPI.list()
+      setFacturas(data || [])
+    } catch (error) {
+      console.error('Error refreshing facturas after save:', error)
+    }
   }
 
   return (
+    <ErrorBoundary>
     <div className="p-8 h-full flex flex-col">
       {view === 'lista' ? (
         <>
@@ -65,7 +80,16 @@ export default function FacturacionPage() {
               ➕ {t('newInvoice')} (F3)
             </button>
           </div>
-          <ListadoFacturas facturas={facturas} clientes={clientes} />
+          <AsyncWrapper loading={loading} error={loadError}>
+            <ListadoFacturas
+              facturas={facturas}
+              clientes={clientes}
+              onFacturaVoided={handleFacturaGuardada}
+              onFacturaUpdated={handleFacturaGuardada}
+            />
+          </AsyncWrapper>
+
+          <KeyboardHint shortcuts={listShortcuts} className="mt-4" />
         </>
       ) : (
         <NuevaFacturaForm
@@ -77,5 +101,6 @@ export default function FacturacionPage() {
         />
       )}
     </div>
+    </ErrorBoundary>
   )
 }

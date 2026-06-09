@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "cae": {
+      "nullable": true,
+      "type": "string"
+    },
+    "caeVto": {
+      "format": "date-time",
+      "nullable": true,
+      "type": "string"
+    },
+    "cuitExtracted": {
+      "description": "Supplier tax id digits extracted when no match (#277 Fase F)",
+      "nullable": true,
+      "type": "string"
+    },
+    "fecha": {
+      "format": "date-time",
+      "nullable": true,
+      "type": "string"
+    },
+    "fieldConfidence": {
+      "additionalProperties": {
+        "type": "number"
+      },
+      "type": "object"
+    },
+    "items": {
+      "items": {
+        "$ref": "./DocumentoCompraItemPreview.schema.json"
+      },
+      "type": "array"
+    },
+    "iva1": {
+      "type": "number"
+    },
+    "iva2": {
+      "type": "number"
+    },
+    "neto1": {
+      "type": "number"
+    },
+    "neto2": {
+      "type": "number"
+    },
+    "neto3": {
+      "type": "number"
+    },
+    "numero": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "prefijo": {
+      "nullable": true,
+      "type": "string"
+    },
+    "proveedorId": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "rsocialExtracted": {
+      "description": "Supplier name hint from OCR/LLM (#277 Fase F)",
+      "nullable": true,
+      "type": "string"
+    },
+    "tipo": {
+      "anyOf": [
+        {
+          "enum": [
+            "A",
+            "B",
+            "C"
+          ],
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "total": {
+      "nullable": true,
+      "type": "number"
+    },
+    "vencimiento": {
+      "format": "date-time",
+      "nullable": true,
+      "type": "string"
+    }
+  },
+  "title": "DocumentoCompraPreviewData",
+  "type": "object"
+}

@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "canDeactivate": {
+      "type": "boolean"
+    },
+    "dependencies": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "key": {
+      "type": "string"
+    },
+    "label": {
+      "type": "string"
+    },
+    "plan": {
+      "enum": [
+        "starter",
+        "pro",
+        "enterprise"
+      ],
+      "type": "string"
+    },
+    "price": {
+      "type": "number"
+    },
+    "required": {
+      "type": "boolean"
+    },
+    "requiredInProd": {
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "key",
+    "label",
+    "required",
+    "requiredInProd",
+    "dependencies",
+    "plan",
+    "price",
+    "canDeactivate"
+  ],
+  "title": "ModuleCatalogEntry",
+  "type": "object"
+}

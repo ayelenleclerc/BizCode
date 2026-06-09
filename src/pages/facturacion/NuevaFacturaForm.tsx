@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useHotkeys } from 'react-hotkeys-hook'
 import { useTranslation } from 'react-i18next'
-import { facturasAPI } from '@/lib/api'
+import { empresaAPI, facturasAPI } from '@/lib/api'
 import { calculateInvoice, calculateItemSubtotal } from '@/lib/invoice'
 import { Cliente, Articulo, FormaPago } from '@/types'
 import KeyboardHint, { useInvoiceShortcuts } from '@/components/shared/KeyboardHint'
@@ -21,7 +21,7 @@ interface NuevaFacturaFormProps {
   articulos: Articulo[]
   formasPago: FormaPago[]
   onCancel: () => void
-  onGuardada: () => void
+  onGuardada: () => void | Promise<void>
 }
 
 export default function NuevaFacturaForm({
@@ -47,6 +47,28 @@ export default function NuevaFacturaForm({
   const [totales, setTotales] = useState({ neto1: 0, neto2: 0, neto3: 0, iva1: 0, iva2: 0, total: 0 })
 
   const cliente = clientes.find((c) => c.id === clienteId)
+
+  useEffect(() => {
+    void empresaAPI.get().then((data) => {
+      if (!data) return
+      setPrefijo((prev) => (prev.trim() === '' ? data.prefijoFactura : prev))
+      if (data.tipoFactura === 'A' || data.tipoFactura === 'B') {
+        setTipo(data.tipoFactura)
+      }
+    }).catch(() => {})
+  }, [])
+
+  // Credit limit warning: shown when balance + this invoice total would exceed the limit
+  const creditLimitWarning = (() => {
+    if (!cliente || cliente.creditLimit === null || cliente.creditLimit === undefined) return null
+    const limit = Number(cliente.creditLimit)
+    if (limit <= 0) return null
+    const balance = Number(cliente.balance ?? 0)
+    if (balance + totales.total > limit) {
+      return { balance, limit, projected: balance + totales.total }
+    }
+    return null
+  })()
 
   useEffect(() => {
     if (lineas.length === 0) {
@@ -155,7 +177,7 @@ export default function NuevaFacturaForm({
       }
 
       await facturasAPI.create(facturaData)
-      onGuardada()
+      await Promise.resolve(onGuardada())
     } catch (err: unknown) {
       setError((err as Error).message || t('errors.generic'))
     } finally {
@@ -164,7 +186,7 @@ export default function NuevaFacturaForm({
   }
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="h-full flex flex-col" data-testid="nueva-factura-form">
       <div className="mb-6">
         <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100">{t('newInvoice')}</h2>
       </div>
@@ -174,6 +196,32 @@ export default function NuevaFacturaForm({
       {error && (
         <div role="alert" className="p-4 bg-red-100 dark:bg-red-900 text-red-900 dark:text-red-100 rounded border border-red-300 dark:border-red-700 mb-4">
           {error}
+        </div>
+      )}
+
+      {creditLimitWarning && (
+        <div
+          data-testid="credit-limit-warning"
+          role="alert"
+          aria-live="polite"
+          className="p-4 bg-amber-50 dark:bg-amber-900/30 border border-amber-300 dark:border-amber-600 rounded mb-4 flex items-start gap-3"
+        >
+          <span className="text-amber-600 dark:text-amber-400 text-xl leading-none" aria-hidden="true">⚠</span>
+          <div className="flex-1">
+            <p className="font-semibold text-amber-800 dark:text-amber-300 text-sm">
+              {t('creditLimitWarning.title')}
+            </p>
+            <p className="text-amber-700 dark:text-amber-400 text-sm mt-0.5">
+              {t('creditLimitWarning.detail', {
+                balance: creditLimitWarning.balance.toFixed(2),
+                limit: creditLimitWarning.limit.toFixed(2),
+                projected: creditLimitWarning.projected.toFixed(2),
+              })}
+            </p>
+            <p className="text-amber-600 dark:text-amber-500 text-xs mt-1">
+              {t('creditLimitWarning.hint')}
+            </p>
+          </div>
         </div>
       )}
 
@@ -214,6 +262,7 @@ export default function NuevaFacturaForm({
           <input
             id="factura-numero"
             type="number"
+            data-testid="factura-form-numero"
             value={numero}
             onChange={(e) => setNumero(e.target.value)}
             aria-required="true"
@@ -240,6 +289,7 @@ export default function NuevaFacturaForm({
           </label>
           <select
             id="factura-clienteId"
+            data-testid="factura-form-clienteId"
             value={clienteId}
             onChange={(e) => setClienteId(parseInt(e.target.value))}
             aria-required="true"
@@ -256,7 +306,11 @@ export default function NuevaFacturaForm({
       </div>
 
       <div className="flex-1 overflow-auto mb-6">
-        <table className="w-full border-collapse bg-white dark:bg-slate-800 rounded border border-slate-200 dark:border-slate-700" aria-label={t('newInvoice')}>
+        <table
+          className="w-full border-collapse bg-white dark:bg-slate-800 rounded border border-slate-200 dark:border-slate-700"
+          aria-label={t('newInvoice')}
+          data-testid="factura-items-table"
+        >
           <thead className="bg-slate-100 dark:bg-slate-700 sticky top-0">
             <tr className="border-b border-slate-200 dark:border-slate-600">
               <th className="px-3 py-2 text-left text-slate-700 dark:text-slate-300 font-semibold text-sm">{t('items.articulo')}</th>
@@ -277,8 +331,11 @@ export default function NuevaFacturaForm({
               lineas.map((linea, idx) => (
                 <tr
                   key={linea.id}
-                  role="row"
-                  aria-selected={selectedLineIdx === idx}
+                  aria-label={
+                    selectedLineIdx === idx
+                      ? t('items.rowAriaSelected', { n: idx + 1 })
+                      : t('items.rowAria', { n: idx + 1 })
+                  }
                   onClick={() => setSelectedLineIdx(idx)}
                   className={`border-b border-slate-200 dark:border-slate-700 transition ${
                     selectedLineIdx === idx
@@ -289,9 +346,11 @@ export default function NuevaFacturaForm({
                   <td className="px-3 py-2 text-sm">
                     <select
                       value={linea.articuloId}
+                      data-testid={`factura-line-${idx}-articulo`}
                       onChange={(e) =>
                         updateLinea(idx, 'articuloId', parseInt(e.target.value))
                       }
+                      aria-label={`${t('items.articulo')} ${idx + 1}`}
                       className="w-full bg-white dark:bg-slate-600 text-slate-900 dark:text-slate-100 rounded border border-slate-300 dark:border-slate-500 px-2 py-1 text-sm"
                     >
                       <option value={0}>{t('items.selectArticulo')}</option>
@@ -309,6 +368,7 @@ export default function NuevaFacturaForm({
                       onChange={(e) =>
                         updateLinea(idx, 'cantidad', parseInt(e.target.value) || 0)
                       }
+                      aria-label={`${t('items.cantidad')} ${idx + 1}`}
                       className="w-full bg-white dark:bg-slate-600 text-slate-900 dark:text-slate-100 rounded border border-slate-300 dark:border-slate-500 px-2 py-1 text-sm text-center"
                     />
                   </td>
@@ -320,6 +380,7 @@ export default function NuevaFacturaForm({
                       onChange={(e) =>
                         updateLinea(idx, 'precio', parseFloat(e.target.value) || 0)
                       }
+                      aria-label={`${t('items.precio')} ${idx + 1}`}
                       className="w-full bg-white dark:bg-slate-600 text-slate-900 dark:text-slate-100 rounded border border-slate-300 dark:border-slate-500 px-2 py-1 text-sm text-right"
                     />
                   </td>
@@ -330,6 +391,7 @@ export default function NuevaFacturaForm({
                       onChange={(e) =>
                         updateLinea(idx, 'dscto', parseFloat(e.target.value) || 0)
                       }
+                      aria-label={`${t('items.descuento')} ${idx + 1}`}
                       className="w-full bg-white dark:bg-slate-600 text-slate-900 dark:text-slate-100 rounded border border-slate-300 dark:border-slate-500 px-2 py-1 text-sm text-center"
                     />
                   </td>
@@ -368,12 +430,15 @@ export default function NuevaFacturaForm({
 
       <div className="flex gap-3">
         <button
+          type="button"
+          data-testid="btn-agregar-linea-factura"
           onClick={agregarLinea}
           className="px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded font-semibold transition"
         >
           {t('items.addItem')}
         </button>
         <button
+          type="button"
           data-testid="btn-save-factura"
           onClick={handleGuardar}
           disabled={loading || lineas.length === 0 || !clienteId}
@@ -382,6 +447,7 @@ export default function NuevaFacturaForm({
           {loading ? tc('actions.saving') : t('save')}
         </button>
         <button
+          type="button"
           onClick={onCancel}
           className="px-6 py-3 bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-900 dark:text-slate-100 rounded font-semibold transition"
         >

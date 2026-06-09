@@ -4,7 +4,7 @@ on:
   push:
     branches: [main, develop]
   pull_request:
-    branches: [main]
+    branches: [main, develop]
 
 jobs:
   quality:
@@ -16,8 +16,8 @@ jobs:
         image: postgres:16-alpine
         env:
           POSTGRES_USER: bizcode
-          POSTGRES_PASSWORD: bizcode
           POSTGRES_DB: bizcode_test
+          POSTGRES_HOST_AUTH_METHOD: trust
         ports:
           - 5432:5432
         options: >-
@@ -27,7 +27,9 @@ jobs:
           --health-retries 5
 
     env:
-      DATABASE_URL: postgresql://bizcode:bizcode@localhost:5432/bizcode_test
+      DATABASE_URL: postgresql://bizcode@localhost:5432/bizcode_test?sslmode=disable
+      NODE_ENV: test
+      JWT_SECRET: ci-test-jwt-secret
 
     steps:
       - name: Checkout
@@ -49,6 +51,9 @@ jobs:
       - name: Generate Prisma client
         run: npx prisma generate
 
+      - name: Validate Prisma schema (sin conectar BD)
+        run: npx prisma validate
+
       - name: Apply database schema
         run: |
           set -euo pipefail
@@ -63,8 +68,20 @@ jobs:
       - name: TypeScript type-check
         run: npm run type-check
 
+      - name: Validate OpenAPI specification
+        run: npm run docs:validate
+
       - name: Generate documentation (TypeDoc, OpenAPI MD, schemas, SBOM)
         run: npm run docs:generate
+
+      - name: Verify TypeDoc HTML post-process
+        run: |
+          set -euo pipefail
+          if grep -rq 'target="_blank">TypeDoc</' docs/generated/typedoc; then
+            echo "::error::TypeDoc footer still uses target=_blank; ensure docs:typedoc runs scripts/patch-typedoc-html-noopener.mjs"
+            exit 1
+          fi
+          echo "TypeDoc footer patch OK"
 
       - name: Verify generated docs match committed files
         run: |
@@ -108,6 +125,9 @@ jobs:
       - name: ESLint (jsx-a11y y TypeScript — cero advertencias)
         run: npm run lint
 
+      - name: API contract tests (OpenAPI / Ajv)
+        run: npx vitest run tests/api/contract.test.ts
+
       - name: Unit tests with coverage
         run: npm run test:coverage
 
@@ -116,6 +136,34 @@ jobs:
 
       - name: Install Playwright Chromium
         run: npx playwright install --with-deps chromium
+
+      - name: Ephemeral SuperAdmin password for E2E
+        run: |
+          E2E_PW="ci$(openssl rand -hex 16)"
+          echo "BIZCODE_SEED_SUPERADMIN_PASSWORD=$E2E_PW" >> $GITHUB_ENV
+          echo "::add-mask::$E2E_PW"
+
+      - name: Seed database for E2E (SuperAdmin login)
+        env:
+          BIZCODE_SEED_FIXTURE_CATALOG: 'true'
+        run: npx prisma db seed
+
+      - name: Start API for E2E (background)
+        env:
+          NODE_ENV: test
+          JWT_SECRET: ci-test-jwt-secret
+          BIZCODE_TEST_AUTH_BYPASS: 'false'
+        run: |
+          npm run server &
+          for i in $(seq 1 45); do
+            if curl -sf http://127.0.0.1:3001/api/health >/dev/null; then
+              echo "API healthy"
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "::error::API did not become healthy in time"
+          exit 1
 
       - name: E2E smoke (Playwright)
         run: npm run test:e2e

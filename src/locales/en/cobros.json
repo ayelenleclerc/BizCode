@@ -1,0 +1,42 @@
+{
+  "title": "Collections",
+  "subtitle": "Customer payment registration",
+  "newPayment": "New payment",
+  "registerForClient": "Record payment",
+  "recentTitle": "Recent payments",
+  "empty": "No payments recorded",
+  "table": {
+    "date": "Date",
+    "client": "Customer",
+    "amount": "Amount",
+    "reference": "Reference",
+    "paymentMethod": "Payment method"
+  },
+  "form": {
+    "titleNew": "Record payment",
+    "client": "Customer",
+    "clientPlaceholder": "Select customer",
+    "date": "Date",
+    "amount": "Amount",
+    "paymentMethod": "Payment method",
+    "paymentMethodNone": "Not specified",
+    "reference": "Reference",
+    "note": "Note",
+    "save": "Save payment",
+    "cancel": "Cancel",
+    "errors": {
+      "clientRequired": "Select a customer",
+      "amountRequired": "Enter an amount greater than zero",
+      "generic": "Could not record payment",
+      "suspended": "Customer is suspended",
+      "inactive": "Customer is inactive"
+    }
+  },
+  "filters": {
+    "client": "Customer",
+    "clientPlaceholder": "Customer ID",
+    "from": "From",
+    "to": "To",
+    "apply": "Filter"
+  }
+}

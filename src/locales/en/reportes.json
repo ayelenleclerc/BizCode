@@ -1,0 +1,51 @@
+{
+  "title": "Reports",
+  "subtitle": "Operational and financial reports with CSV export",
+  "forbidden": "You do not have permission to view reports.",
+  "empty": "No data for the selected filters.",
+  "exportCsv": "Export CSV",
+  "tabs": {
+    "legend": "Report sections",
+    "ventas": "Sales",
+    "stock": "Critical stock",
+    "cobranzas": "Collections"
+  },
+  "period": {
+    "legend": "Date range",
+    "from": "From",
+    "to": "To",
+    "presets": "Quick ranges",
+    "agrupar": "Group by",
+    "agruparDia": "Day",
+    "agruparSemana": "Week",
+    "agruparMes": "Month",
+    "preset": {
+      "today": "Today",
+      "week": "This week",
+      "month": "This month",
+      "quarter": "This quarter"
+    }
+  },
+  "ventas": {
+    "periodo": "Period",
+    "count": "Invoices",
+    "total": "Total",
+    "neto1": "Net 21%",
+    "iva1": "VAT 21%",
+    "chartLabel": "Sales bar chart by period"
+  },
+  "stock": {
+    "codigo": "Code",
+    "descripcion": "Description",
+    "stock": "Stock",
+    "minimo": "Minimum",
+    "deficit": "Deficit"
+  },
+  "cobranzas": {
+    "fecha": "Date",
+    "count": "Payments",
+    "total": "Total",
+    "forma": "Payment method",
+    "fpTotal": "Method total"
+  }
+}

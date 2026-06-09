@@ -32,16 +32,28 @@ vi.mock('twilio', () => ({
 
 const MANAGER_USER = { id: 7 }
 
+const ARTICULO_STOCK_ROW = {
+  id: 1,
+  codigo: 10,
+  descripcion: 'Producto',
+  stock: 100,
+  minimo: 0,
+}
+
 function buildPrismaMock(overrides: Partial<Record<string, unknown>> = {}): PrismaClient {
   return {
     deliveryZone: { findMany: vi.fn().mockResolvedValue([]), findFirst: vi.fn().mockResolvedValue(null), create: vi.fn().mockResolvedValue(null), update: vi.fn().mockResolvedValue(null) },
     cliente: {
       findMany: vi.fn().mockResolvedValue([]),
+      findFirst: vi.fn().mockResolvedValue({ id: 1, suspended: false }),
       findUnique: vi.fn().mockResolvedValue({ email: 'mgr@example.com', telef: '+5491155550000' }),
       create: vi.fn().mockResolvedValue(null),
       update: vi.fn().mockResolvedValue(null),
     },
-    articulo: { findMany: vi.fn().mockResolvedValue([]) },
+    articulo: {
+      findMany: vi.fn().mockResolvedValue([ARTICULO_STOCK_ROW]),
+      update: vi.fn().mockResolvedValue(ARTICULO_STOCK_ROW),
+    },
     rubro: { findMany: vi.fn().mockResolvedValue([]) },
     formaPago: { findMany: vi.fn().mockResolvedValue([]) },
     factura: {
@@ -58,6 +70,7 @@ function buildPrismaMock(overrides: Partial<Record<string, unknown>> = {}): Pris
       updateMany: vi.fn().mockResolvedValue({ count: 0 }),
     },
     auditEvent: { create: vi.fn().mockResolvedValue({ id: 1 }) },
+    recuento: { findFirst: vi.fn().mockResolvedValue(null) },
     appUser: {
       count: vi.fn().mockResolvedValue(1),
       findMany: vi.fn().mockResolvedValue([MANAGER_USER]),
@@ -95,6 +108,7 @@ describe('GET /api/notifications/channels', () => {
     delete process.env.SMTP_USER
     delete process.env.SMTP_PASS
     delete process.env.SMTP_FROM
+    delete process.env.SMTP_URL
     delete process.env.TWILIO_ACCOUNT_SID
     delete process.env.TWILIO_AUTH_TOKEN
     delete process.env.TWILIO_WHATSAPP_FROM
@@ -118,6 +132,14 @@ describe('GET /api/notifications/channels', () => {
     const res = await request(app).get('/api/notifications/channels').expect(200)
     expect(res.body.data.email).toBe(true)
     expect(res.body.data.whatsapp).toBe(false)
+  })
+
+  it('reports email:true when SMTP_URL is set', async () => {
+    process.env.SMTP_URL = 'smtp://user:pass@smtp.example.com:587'
+
+    const app = createApp(buildPrismaMock())
+    const res = await request(app).get('/api/notifications/channels').expect(200)
+    expect(res.body.data.email).toBe(true)
   })
 
   it('reports whatsapp:true when Twilio vars are all set', async () => {
@@ -150,6 +172,7 @@ describe('dispatchNotification — silent fallback when SMTP unconfigured', () =
     delete process.env.SMTP_USER
     delete process.env.SMTP_PASS
     delete process.env.SMTP_FROM
+    delete process.env.SMTP_URL
     delete process.env.TWILIO_ACCOUNT_SID
     delete process.env.TWILIO_AUTH_TOKEN
     delete process.env.TWILIO_WHATSAPP_FROM
@@ -162,6 +185,7 @@ describe('dispatchNotification — silent fallback when SMTP unconfigured', () =
     delete process.env.SMTP_USER
     delete process.env.SMTP_PASS
     delete process.env.SMTP_FROM
+    delete process.env.SMTP_URL
     delete process.env.TWILIO_ACCOUNT_SID
     delete process.env.TWILIO_AUTH_TOKEN
     delete process.env.TWILIO_WHATSAPP_FROM
@@ -205,6 +229,28 @@ describe('dispatchNotification — silent fallback when SMTP unconfigured', () =
     expect(mailArgs.subject).toContain('ACME SA')
   })
 
+  it('calls nodemailer when SMTP_URL is configured', async () => {
+    process.env.SMTP_URL = 'smtp://user:pass@smtp.example.com:587'
+
+    const { dispatchNotification } = await import('../../server/channels')
+    const prisma = buildPrismaMock()
+    await dispatchNotification(prisma, 1, 'credit_limit_exceeded', {
+      clienteId: 1,
+      rsocial: 'URL SA',
+      amount: '20000',
+      limit: '10000',
+    })
+
+    await new Promise((r) => setTimeout(r, 10))
+    expect(mockCreateTransport).toHaveBeenCalledWith({
+      host: 'smtp.example.com',
+      port: 587,
+      secure: false,
+      auth: { user: 'user', pass: 'pass' },
+    })
+    expect(mockSendMail).toHaveBeenCalledOnce()
+  })
+
   it('swallows nodemailer error without throwing', async () => {
     process.env.SMTP_HOST = 'smtp.example.com'
     process.env.SMTP_PORT = '587'
@@ -241,9 +287,8 @@ describe('POST /api/facturas — dispatchNotification failure is swallowed', () 
     const prisma = buildPrismaMock({
       cliente: {
         findMany: vi.fn().mockResolvedValue([]),
-        // findFirst is used for suspension check
         findFirst: vi.fn().mockResolvedValue({ id: 1, suspended: false }),
-        findUnique: vi.fn().mockResolvedValue({ email: null, telef: null }),
+        findUnique: vi.fn().mockResolvedValue({ suspended: false }),
         create: vi.fn().mockResolvedValue(null),
         update: vi.fn().mockResolvedValue(updatedCliente),
       },
@@ -261,11 +306,15 @@ describe('POST /api/facturas — dispatchNotification failure is swallowed', () 
           const inner = buildPrismaMock({
             cliente: {
               findMany: vi.fn().mockResolvedValue([]),
-              findFirst: vi.fn().mockResolvedValue(null),
+              findFirst: vi.fn().mockResolvedValue({ id: 1, suspended: false }),
               findUnique: vi.fn().mockResolvedValue(null),
               create: vi.fn().mockResolvedValue(null),
               update: vi.fn().mockResolvedValue(updatedCliente),
             },
+            articulo: {
+      findMany: vi.fn().mockResolvedValue([ARTICULO_STOCK_ROW]),
+      update: vi.fn().mockResolvedValue(ARTICULO_STOCK_ROW),
+    },
             factura: {
               findMany: vi.fn().mockResolvedValue([]),
               create: vi.fn().mockResolvedValue({ id: 99, total: 20000, items: [] }),
@@ -283,11 +332,19 @@ describe('POST /api/facturas — dispatchNotification failure is swallowed', () 
     const res = await request(app)
       .post('/api/facturas')
       .send({
+        fecha: new Date().toISOString(),
+        tipo: 'B',
+        prefijo: '0001',
+        numero: 1,
         clienteId: 1,
         formaPagoId: 1,
-        items: [{ articuloId: 1, qty: 1, precioUnitario: 20000, subtotal: 20000 }],
-        subtotal: 20000,
+        neto1: 16528.93,
+        neto2: 0,
+        neto3: 0,
+        iva1: 3471.07,
+        iva2: 0,
         total: 20000,
+        items: [{ articuloId: 1, cantidad: 1, precio: 20000, dscto: 0, subtotal: 20000 }],
       })
       .expect(200)
 

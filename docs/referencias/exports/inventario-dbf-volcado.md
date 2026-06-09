@@ -34,7 +34,7 @@
 | CLAS09.DBF | 0 | 99 | *(asignar)* | pendiente |
 | CLAS10.DBF | 0 | 99 | *(asignar)* | pendiente |
 | CLAVES.DBF | 8 | 1242 | *(asignar)* | pendiente |
-| CLIENTES.DBF | 2310 | 2575999 | *(asignar)* | pendiente |
+| CLIENTES.DBF | 2310 | 2575999 | C | cubierto-script |
 | COLORES.DBF | 23 | 2783 | *(asignar)* | pendiente |
 | COMIS.DBF | 96191 | 7022457 | *(asignar)* | pendiente |
 | CONCEPTO.DBF | 5 | 214 | *(asignar)* | pendiente |

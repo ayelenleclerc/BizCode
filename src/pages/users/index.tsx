@@ -3,11 +3,15 @@ import { useHotkeys } from 'react-hotkeys-hook'
 import { useTranslation } from 'react-i18next'
 import { usersAPI, type AppUserDTO } from '@/lib/api'
 import { CanAccess } from '@/components/CanAccess'
+import KeyboardHint, { useGlobalListShortcuts } from '@/components/shared/KeyboardHint'
+import { usePlan } from '@/contexts/PlanContext'
+import { isLimitExceeded } from '@/lib/plans'
 import UserForm from './UserForm'
 
 export default function UsersPage() {
   const { t } = useTranslation('users')
   const { t: tc } = useTranslation('common')
+  const listShortcuts = useGlobalListShortcuts()
   const [users, setUsers] = useState<AppUserDTO[]>([])
   const [filtro, setFiltro] = useState('')
   const [loading, setLoading] = useState(false)
@@ -15,6 +19,9 @@ export default function UsersPage() {
   const [selectedUser, setSelectedUser] = useState<AppUserDTO | null>(null)
   const [selectedRow, setSelectedRow] = useState(0)
   const tableRef = useRef<HTMLTableElement>(null)
+  const { snapshot } = usePlan()
+  const atUserLimit =
+    snapshot !== null && isLimitExceeded(snapshot.usage.usersUsed, snapshot.maxUsers)
 
   const loadUsers = async () => {
     setLoading(true)
@@ -76,9 +83,20 @@ export default function UsersPage() {
         <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100">{t('title')}</h1>
       </div>
 
+      {atUserLimit ? (
+        <div
+          role="alert"
+          className="mb-4 rounded border border-amber-300 bg-amber-50 p-3 text-amber-900 dark:border-amber-700 dark:bg-amber-950 dark:text-amber-100"
+          data-testid="plan-limit-alert-users"
+        >
+          {tc('errors.planLimitUsers')}
+        </div>
+      ) : null}
+
       <div className="mb-6 flex gap-4">
         <input
           id="search-users"
+          data-testid="search-users"
           type="text"
           placeholder={t('search.placeholder')}
           value={filtro}
@@ -123,7 +141,9 @@ export default function UsersPage() {
                 <tr
                   key={user.id}
                   role="row"
-                  aria-selected={selectedRow === idx}
+                  {...(selectedRow === idx
+                    ? { 'aria-selected': 'true' as const }
+                    : { 'aria-selected': 'false' as const })}
                   onClick={() => setSelectedRow(idx)}
                   onDoubleClick={() => {
                     setSelectedUser(user)
@@ -157,6 +177,8 @@ export default function UsersPage() {
           </table>
         )}
       </div>
+
+      <KeyboardHint shortcuts={listShortcuts} className="mt-4" />
 
       {showForm && (
         <UserForm

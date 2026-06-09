@@ -1,0 +1,109 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "properties": {
+    "cliente": {
+      "additionalProperties": true,
+      "type": "object"
+    },
+    "clienteId": {
+      "type": "integer"
+    },
+    "dispatchTimestampSource": {
+      "description": "How dispatchedAt was derived (audit event vs estimated from updatedAt).",
+      "enum": [
+        "event",
+        "estimated"
+      ],
+      "nullable": true,
+      "type": "string"
+    },
+    "dispatchedAt": {
+      "description": "When the order entered in_transit (ADR-0011).",
+      "format": "date-time",
+      "nullable": true,
+      "type": "string"
+    },
+    "driver": {
+      "additionalProperties": true,
+      "nullable": true,
+      "type": "object"
+    },
+    "driverId": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "estado": {
+      "enum": [
+        "pending",
+        "picking",
+        "ready",
+        "assigned",
+        "in_transit",
+        "delivered",
+        "failed",
+        "cancelled"
+      ],
+      "type": "string"
+    },
+    "factura": {
+      "additionalProperties": true,
+      "nullable": true,
+      "type": "object"
+    },
+    "facturaId": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "fecha": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "id": {
+      "type": "integer"
+    },
+    "items": {
+      "items": {
+        "$ref": "./OrdenEntregaLineItem.schema.json"
+      },
+      "type": "array"
+    },
+    "nota": {
+      "nullable": true,
+      "type": "string"
+    },
+    "picker": {
+      "additionalProperties": true,
+      "nullable": true,
+      "type": "object"
+    },
+    "pickerUserId": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "pickingIniciadoAt": {
+      "format": "date-time",
+      "nullable": true,
+      "type": "string"
+    },
+    "pickingListoAt": {
+      "format": "date-time",
+      "nullable": true,
+      "type": "string"
+    },
+    "tenantId": {
+      "type": "integer"
+    },
+    "zona": {
+      "additionalProperties": true,
+      "nullable": true,
+      "type": "object"
+    },
+    "zonaId": {
+      "nullable": true,
+      "type": "integer"
+    }
+  },
+  "title": "OrdenEntrega",
+  "type": "object"
+}

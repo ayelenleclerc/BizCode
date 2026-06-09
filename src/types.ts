@@ -42,10 +42,128 @@ export interface Articulo {
   updatedAt?: Date
 }
 
+export interface Cobro {
+  id: number
+  tenantId?: number
+  clienteId: number
+  fecha: string | Date
+  monto: number | string
+  formaPagoId?: number | null
+  referencia?: string | null
+  nota?: string | null
+  cliente?: Pick<Cliente, 'id' | 'codigo' | 'rsocial'>
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
 export interface Rubro {
   id: number
   codigo: number
   nombre: string
+}
+
+export type ProveedorTipoCuenta = 'cc' | 'ca'
+export type ProveedorCondicionPago = 'contado' | '15dias' | '30dias' | '60dias' | 'otro'
+export type ProveedorCategoria = 'materia_prima' | 'insumos' | 'servicios' | 'logistica'
+
+export type MovimientoProveedorCCTipo = 'factura_compra' | 'pago' | 'nc_proveedor' | 'ajuste'
+
+export interface MovimientoProveedorCC {
+  id: number
+  tipo: MovimientoProveedorCCTipo
+  referencia: string | null
+  monto: string
+  saldoPost: string
+  fecha: string
+  usuarioId: number
+  notas: string | null
+}
+
+export interface ProveedorCuentaCorrienteChartPoint {
+  period: string
+  saldo: string
+}
+
+export interface ProveedorCuentaCorriente {
+  proveedorId: number
+  codigo: number
+  rsocial: string
+  saldo: string
+  limiteCredito: string | null
+  excedeLimite: boolean
+  movimientos: MovimientoProveedorCC[]
+  serie: ProveedorCuentaCorrienteChartPoint[]
+}
+
+export interface ProveedorCuentaCorrienteSaldo {
+  proveedorId: number
+  saldo: string
+  limiteCredito: string | null
+  excedeLimite: boolean
+}
+
+export type ReciboPagoMetodo = 'transferencia' | 'cheque' | 'efectivo' | 'echeq'
+
+export interface ReciboPagoFactura {
+  id: number
+  comprobanteCompraId: number | null
+  facturaRef: string
+  monto: string
+}
+
+export interface ReciboPago {
+  id: number
+  numero: number
+  proveedorId: number
+  fecha: string
+  total: string
+  metodoPago: ReciboPagoMetodo
+  cbu: string | null
+  referencia: string | null
+  estado: string
+  notas: string | null
+  usuarioId: number
+  proveedor: { id: number; codigo: number; rsocial: string; cuit: string | null }
+  usuario: { id: number; username: string }
+  facturas: ReciboPagoFactura[]
+  createdAt: string
+}
+
+export interface ComprobantePendiente {
+  comprobanteCompraId: number
+  facturaRef: string
+  fecha: string
+  total: string
+  pagado: string
+  pendiente: string
+}
+
+export interface Proveedor {
+  id: number
+  codigo: number
+  rsocial: string
+  fantasia?: string | null
+  cuit?: string | null
+  condIva: string
+  telef?: string | null
+  email?: string | null
+  activo: boolean
+  cbu?: string | null
+  alias?: string | null
+  banco?: string | null
+  tipoCuenta?: ProveedorTipoCuenta | null
+  moneda?: string
+  condicionPago?: ProveedorCondicionPago | null
+  plazoHabitual?: number | null
+  descuentoPct?: number | string | null
+  limiteCredito?: number | string | null
+  categoria?: ProveedorCategoria | null
+  contactoNombre?: string | null
+  contactoEmail?: string | null
+  contactoTel?: string | null
+  notas?: string | null
+  createdAt?: Date
+  updatedAt?: Date
 }
 
 export interface FormaPago {
@@ -71,6 +189,9 @@ export interface Factura {
   total: number | string
   formaPagoId?: number
   estado: string // A, N (anulada)
+  cae?: string | null
+  caeVto?: Date | string | null
+  estadoCae?: 'pending' | 'issued' | 'failed' | null
   items?: FacturaItem[]
   createdAt?: Date
   updatedAt?: Date
@@ -101,6 +222,25 @@ export interface DeliveryZone {
   updatedAt?: Date
 }
 
+export interface EmpresaConfig {
+  id: number | null
+  nombre: string
+  cuit: string
+  domicilio: string | null
+  puntoVenta: number
+  tipoFactura: 'A' | 'B' | 'C'
+  logoUrl: string | null
+  prefijoFactura: string
+  recordatorioDiasGracia: number
+  timezone: string
+  recordatorioHoraInicio: number
+  recordatorioHoraFin: number
+  condicionIva: 'RI' | 'Mono' | 'CF' | 'Exento'
+  ingresosBrutos: string | null
+  fechaInicioActividades: string | null
+}
+
+/** @deprecated Use EmpresaConfig — kept for legacy references */
 export interface ParamEmpresa {
   id: number
   nombre: string

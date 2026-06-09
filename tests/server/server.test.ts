@@ -14,6 +14,9 @@ import * as server from '../../server'
 describe('server bootstrap', () => {
   beforeEach(() => {
     vi.spyOn(console, 'log').mockImplementation(() => {})
+    if (!process.env.DATABASE_URL?.trim()) {
+      process.env.DATABASE_URL = 'postgresql://bizcode_test@localhost:5432/bizcode_test_placeholder'
+    }
   })
 
   afterEach(() => {

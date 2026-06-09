@@ -57,6 +57,14 @@ Minimum requirements enforced by ESLint (`jsx-a11y`):
 - Tests must not mock the database; use `vi.mock('axios')` to isolate the HTTP layer.
 - Every primary action button must have a `data-testid` for future E2E use.
 
+## Server / REST API validation (Zod)
+
+- **Canonical schemas:** [`server/schemas/domain.ts`](../../server/schemas/domain.ts) — Zod pipelines (`.superRefine` / `.transform`) produce types aligned with [`server/createApp.types.ts`](../../server/createApp.types.ts).
+- **JSON requests:** [`server/middleware/validateBody.ts`](../../server/middleware/validateBody.ts) — attach `validateBody(mySchema)` before handlers that expect a validated `req.body`.
+- **CSV import (bulk):** routes in [`server/routes/registerClientesRoutes.ts`](../../server/routes/registerClientesRoutes.ts), [`registerArticulosRoutes.ts`](../../server/routes/registerArticulosRoutes.ts), [`registerRubrosRoutes.ts`](../../server/routes/registerRubrosRoutes.ts), and [`registerProveedoresRoutes.ts`](../../server/routes/registerProveedoresRoutes.ts) build a plain object per row (`csvRowToRaw*` in [`server/routes/restDomainShared.ts`](../../server/routes/restDomainShared.ts)) then validate with **`safeParseBodySchema`** and the **same** `*BodySchema` as the REST POST/PUT endpoints.
+- **Tests:** [`tests/schemas/domain.test.ts`](../../tests/schemas/domain.test.ts), [`tests/schemas/safeParseBodySchema.test.ts`](../../tests/schemas/safeParseBodySchema.test.ts); API import tests under [`tests/api/`](../../tests/api/).
+- **Cursor rule:** [`.cursor/rules/backend-standards.mdc`](../../.cursor/rules/backend-standards.mdc) (request validation subsection).
+
 ## Code comments (trilingual)
 
 For non-obvious logic (algorithms, workarounds, invariants), use a JSDoc block on the function or block with **three** tags — all required when the comment explains behaviour:
@@ -72,6 +80,8 @@ For non-obvious logic (algorithms, workarounds, invariants), use a JSDoc block o
 Trivial comments (e.g. `// increment counter`) do not need trilingual text. **Do not** state behaviour that is not evidenced in code.
 
 Live example: `validateCUIT` in [`src/lib/validators.ts`](../../../src/lib/validators.ts).
+
+**Other languages:** [Español](../es/estandares-codigo.md) · [Português](../pt-br/padroes-codigo.md)
 
 ## Repository documentation languages
 

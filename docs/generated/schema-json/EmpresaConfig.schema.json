@@ -1,0 +1,100 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "condicionIva": {
+      "description": "Issuer VAT condition for legal invoice PDF header (#148).",
+      "enum": [
+        "RI",
+        "Mono",
+        "CF",
+        "Exento"
+      ],
+      "type": "string"
+    },
+    "cuit": {
+      "maxLength": 14,
+      "type": "string"
+    },
+    "domicilio": {
+      "maxLength": 40,
+      "nullable": true,
+      "type": "string"
+    },
+    "fechaInicioActividades": {
+      "description": "Activity start date (YYYY-MM-DD).",
+      "format": "date",
+      "nullable": true,
+      "type": "string"
+    },
+    "id": {
+      "description": "Null when settings have not been saved yet (defaults only).",
+      "nullable": true,
+      "type": "integer"
+    },
+    "ingresosBrutos": {
+      "maxLength": 30,
+      "nullable": true,
+      "type": "string"
+    },
+    "logoUrl": {
+      "maxLength": 255,
+      "nullable": true,
+      "type": "string"
+    },
+    "nombre": {
+      "maxLength": 40,
+      "type": "string"
+    },
+    "prefijoFactura": {
+      "description": "Four-digit invoice prefix derived from puntoVenta.",
+      "pattern": "^[0-9]{4}$",
+      "type": "string"
+    },
+    "puntoVenta": {
+      "maximum": 9999,
+      "minimum": 1,
+      "type": "integer"
+    },
+    "recordatorioDiasGracia": {
+      "description": "Grace days after due date before an invoice is eligible for collection reminders.",
+      "maximum": 365,
+      "minimum": 0,
+      "type": "integer"
+    },
+    "recordatorioHoraFin": {
+      "description": "Business-hour window end (tenant local hour, exclusive).",
+      "maximum": 24,
+      "minimum": 1,
+      "type": "integer"
+    },
+    "recordatorioHoraInicio": {
+      "description": "Business-hour window start (tenant local hour, inclusive).",
+      "maximum": 23,
+      "minimum": 0,
+      "type": "integer"
+    },
+    "timezone": {
+      "description": "IANA time zone for the daily reminder job and business-hour window.",
+      "example": "America/Argentina/Buenos_Aires",
+      "maxLength": 64,
+      "type": "string"
+    },
+    "tipoFactura": {
+      "enum": [
+        "A",
+        "B",
+        "C"
+      ],
+      "type": "string"
+    }
+  },
+  "required": [
+    "nombre",
+    "cuit",
+    "puntoVenta",
+    "tipoFactura",
+    "prefijoFactura"
+  ],
+  "title": "EmpresaConfig",
+  "type": "object"
+}

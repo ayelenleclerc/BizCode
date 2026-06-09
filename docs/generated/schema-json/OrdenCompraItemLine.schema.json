@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "articulo": {
+      "properties": {
+        "codigo": {
+          "type": "integer"
+        },
+        "descripcion": {
+          "type": "string"
+        },
+        "id": {
+          "type": "integer"
+        }
+      },
+      "type": "object"
+    },
+    "articuloId": {
+      "type": "integer"
+    },
+    "cantidad": {
+      "type": "integer"
+    },
+    "cantidadRecibida": {
+      "type": "integer"
+    },
+    "codigoProveedor": {
+      "description": "Supplier catalog code snapshot (#323)",
+      "nullable": true,
+      "type": "string"
+    },
+    "costoUnitario": {
+      "type": "string"
+    },
+    "descripcionProveedor": {
+      "description": "Supplier catalog description snapshot (#323)",
+      "nullable": true,
+      "type": "string"
+    },
+    "id": {
+      "type": "integer"
+    },
+    "subtotal": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "articuloId",
+    "cantidad",
+    "cantidadRecibida",
+    "costoUnitario",
+    "subtotal"
+  ],
+  "title": "OrdenCompraItemLine",
+  "type": "object"
+}

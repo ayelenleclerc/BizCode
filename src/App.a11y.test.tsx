@@ -27,12 +27,15 @@ vi.mock('@/lib/api', () => ({
     login: vi.fn(),
     logout: vi.fn().mockResolvedValue({ loggedOut: true }),
   },
+  featuresAPI: {
+    get: vi.fn().mockResolvedValue({ modules: ['core.auth', 'billing.orders'], integrations: [] }),
+  },
   clientesAPI: { list: vi.fn().mockResolvedValue([]) },
   articulosAPI: { list: vi.fn(), get: vi.fn() },
   rubrosAPI: { list: vi.fn() },
   formasPagoAPI: { list: vi.fn() },
   facturasAPI: { list: vi.fn(), create: vi.fn() },
-  dashboardAPI: { summary: vi.fn().mockResolvedValue({ ventasHoy: { count: 0, total: '0' }, facturasVencidas: { count: 0, total: '0' }, cobrosHoy: { count: 0, total: '0' }, alertasActivas: 0 }) },
+  dashboardAPI: { summary: vi.fn().mockResolvedValue({ ventasHoy: { count: 0, total: '0' }, facturasVencidas: { count: 0, total: '0' }, cobrosHoy: { count: 0, total: '0' }, alertasActivas: 0, facturasPagar: { vencido: { count: 0, total: '0' }, proximoVencer: { count: 0, total: '0' } } }) },
   notificationsAPI: { list: vi.fn().mockResolvedValue([]), markRead: vi.fn(), markAllRead: vi.fn() },
   checkAPI: vi.fn().mockResolvedValue({ status: 'ok' }),
 }))

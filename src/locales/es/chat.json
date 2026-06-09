@@ -1,0 +1,20 @@
+{
+  "title": "Chat interno",
+  "conversations": "Conversaciones",
+  "emptyConversations": "No hay conversaciones disponibles.",
+  "noMessages": "Sin mensajes",
+  "unread": "{{count}} sin leer",
+  "withUser": "Chat con {{username}}",
+  "selectConversation": "Selecciona una conversación",
+  "loading": "Cargando mensajes...",
+  "emptyMessages": "No hay mensajes todavía.",
+  "messagePlaceholder": "Escribe un mensaje...",
+  "send": "Enviar",
+  "sending": "Enviando...",
+  "errors": {
+    "loadConversations": "No se pudieron cargar las conversaciones.",
+    "loadMessages": "No se pudieron cargar los mensajes.",
+    "send": "No se pudo enviar el mensaje."
+  }
+}
+

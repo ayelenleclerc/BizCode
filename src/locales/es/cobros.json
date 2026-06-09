@@ -1,0 +1,42 @@
+{
+  "title": "Cobros",
+  "subtitle": "Registro de pagos de clientes",
+  "newPayment": "Nuevo cobro",
+  "registerForClient": "Registrar cobro",
+  "recentTitle": "Cobros recientes",
+  "empty": "No hay cobros registrados",
+  "table": {
+    "date": "Fecha",
+    "client": "Cliente",
+    "amount": "Monto",
+    "reference": "Referencia",
+    "paymentMethod": "Forma de pago"
+  },
+  "form": {
+    "titleNew": "Registrar cobro",
+    "client": "Cliente",
+    "clientPlaceholder": "Seleccionar cliente",
+    "date": "Fecha",
+    "amount": "Monto",
+    "paymentMethod": "Forma de pago",
+    "paymentMethodNone": "Sin especificar",
+    "reference": "Referencia",
+    "note": "Nota",
+    "save": "Guardar cobro",
+    "cancel": "Cancelar",
+    "errors": {
+      "clientRequired": "Seleccione un cliente",
+      "amountRequired": "Ingrese un monto mayor a cero",
+      "generic": "No se pudo registrar el cobro",
+      "suspended": "El cliente está suspendido",
+      "inactive": "El cliente está inactivo"
+    }
+  },
+  "filters": {
+    "client": "Cliente",
+    "clientPlaceholder": "ID de cliente",
+    "from": "Desde",
+    "to": "Hasta",
+    "apply": "Filtrar"
+  }
+}

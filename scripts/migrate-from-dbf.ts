@@ -6,10 +6,15 @@
  * Ejecutar: npm run migrate:dbf
  */
 import 'dotenv/config'
+import fs from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { PrismaClient } from '@prisma/client'
 import { DBFFile } from 'dbffile'
+import { dbfRowToRawCliente, mapLegacyCondToCondIva } from '../src/lib/migration/legacyClienteDbf'
+import type { ClienteInput } from '../server/createApp.types'
+import { ImportService } from '../server/services/ImportService'
+import { clienteBodySchema, safeParseBodySchema } from '../server/schemas/domain'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -25,18 +30,40 @@ function programaViejoRoot(): string {
   return path.isAbsolute(fromEnv) ? fromEnv : path.resolve(process.cwd(), fromEnv)
 }
 
-const SISTEMA = path.join(
-  programaViejoRoot(),
-  '16-07-2025 completa',
-  'sistema'
-)
+/** Resuelve en tiempo de ejecución para que tests/CI puedan fijar `PROGRAMA_VIEJO_ROOT` antes de importar o entre llamadas. */
+function sistemaDir(): string {
+  return path.join(programaViejoRoot(), '16-07-2025 completa', 'sistema')
+}
 
 const ENCODING = 'cp437' as const
 const PLACEHOLDER_CLIENT_BASE = 91001
 const PLACEHOLDER_CLIENT_COUNT = 10
 const ARTICULOS_A_IMPORTAR = 10
+const CLIENTES_BATCH_SIZE = 100
+
+type ClienteMigrationReport = {
+  created: number
+  rejected: Array<{ codigo: number | null; message: string }>
+  skippedExisting: number
+  skippedDuplicateInFile: number
+}
 
 const prisma = new PrismaClient()
+
+async function resolveMigrationTenantId(): Promise<number> {
+  const raw = process.env.BIZCODE_MIGRATION_TENANT_ID?.trim()
+  if (raw) {
+    const id = parseInt(raw, 10)
+    if (!Number.isNaN(id) && id > 0) return id
+  }
+  const first = await prisma.tenant.findFirst({ orderBy: { id: 'asc' } })
+  if (!first) {
+    throw new Error(
+      'migrate-from-dbf: no Tenant row found. Run `npx prisma db seed` or set BIZCODE_MIGRATION_TENANT_ID.',
+    )
+  }
+  return first.id
+}
 
 type Pvar2Agg = {
   importe: number
@@ -58,7 +85,7 @@ function dec2(n: number): string {
 
 async function loadPvarDescriptions(): Promise<Map<number, string>> {
   const map = new Map<number, string>()
-  const filePath = path.join(SISTEMA, 'PVAR.DBF')
+  const filePath = path.join(sistemaDir(), 'PVAR.DBF')
   const dbf = await DBFFile.open(filePath, { readMode: 'loose', encoding: ENCODING })
   if (dbf.recordCount === 0) return map
   for await (const raw of dbf) {
@@ -74,7 +101,7 @@ async function loadPvarDescriptions(): Promise<Map<number, string>> {
 
 async function aggregatePvar2ByArtic(): Promise<Map<number, Pvar2Agg>> {
   const byArtic = new Map<number, Pvar2Agg>()
-  const filePath = path.join(SISTEMA, 'PVAR2.DBF')
+  const filePath = path.join(sistemaDir(), 'PVAR2.DBF')
   const dbf = await DBFFile.open(filePath, { readMode: 'loose', encoding: ENCODING })
   for await (const raw of dbf) {
     const r = raw as Record<string, unknown>
@@ -102,23 +129,168 @@ async function aggregatePvar2ByArtic(): Promise<Map<number, Pvar2Agg>> {
 }
 
 async function listCliIsMetadataOnly(): Promise<boolean> {
-  const filePath = path.join(SISTEMA, 'LIST_CLI.DBF')
+  const filePath = path.join(sistemaDir(), 'LIST_CLI.DBF')
   const dbf = await DBFFile.open(filePath, { readMode: 'loose', encoding: ENCODING })
   const rows = await dbf.readRecords(1)
   const r = rows[0] as Record<string, unknown> | undefined
   return r != null && Object.prototype.hasOwnProperty.call(r, 'FIELD_NAME')
 }
 
-async function ensureRubroGeneral(): Promise<number> {
+async function dbfFileHasRecords(fileName: string): Promise<boolean> {
+  const filePath = path.join(sistemaDir(), fileName)
+  try {
+    await fs.access(filePath)
+  } catch {
+    return false
+  }
+  const dbf = await DBFFile.open(filePath, { readMode: 'loose', encoding: ENCODING })
+  return dbf.recordCount > 0
+}
+
+async function clientesDbfHasRecords(): Promise<boolean> {
+  return dbfFileHasRecords('CLIENTES.DBF')
+}
+
+async function readAllDbfRows(fileName: string): Promise<Record<string, unknown>[]> {
+  const filePath = path.join(sistemaDir(), fileName)
+  const dbf = await DBFFile.open(filePath, { readMode: 'loose', encoding: ENCODING })
+  const rows: Record<string, unknown>[] = []
+  for await (const raw of dbf) {
+    rows.push(raw as Record<string, unknown>)
+  }
+  return rows
+}
+
+async function migrateRubrosFromDbf(tenantId: number): Promise<boolean> {
+  if (!(await dbfFileHasRecords('RUBROS.DBF'))) {
+    return false
+  }
+  console.log('[migrate-from-dbf] RUBROS.DBF detectado; importando rubros.')
+  const importService = new ImportService(prisma)
+  const rows = await readAllDbfRows('RUBROS.DBF')
+  const result = await importService.importRubrosFromDbf(tenantId, rows)
+  console.log(
+    `[migrate-from-dbf] Rubros: creados=${result.created}, actualizados=${result.updated ?? 0}, errores=${result.errors.length}.`,
+  )
+  for (const err of result.errors) {
+    console.error(`[migrate-from-dbf] rubro fila=${err.row}: ${err.message}`)
+  }
+  return true
+}
+
+async function migrateArticulosFromDbf(tenantId: number): Promise<boolean> {
+  if (!(await dbfFileHasRecords('ARTICULOS.DBF'))) {
+    return false
+  }
+  console.log('[migrate-from-dbf] ARTICULOS.DBF detectado; importando artículos.')
+  const importService = new ImportService(prisma)
+  const rows = await readAllDbfRows('ARTICULOS.DBF')
+  const result = await importService.importArticulosFromDbf(tenantId, rows)
+  console.log(
+    `[migrate-from-dbf] Artículos: creados=${result.created}, actualizados=${result.updated ?? 0}, errores=${result.errors.length}.`,
+  )
+  for (const err of result.errors) {
+    console.error(`[migrate-from-dbf] articulo fila=${err.row}: ${err.message}`)
+  }
+  return true
+}
+
+function logClienteMigrationReport(report: ClienteMigrationReport): void {
+  console.log(
+    `[migrate-from-dbf] Clientes: insertados=${report.created}, rechazados=${report.rejected.length}, omitidos_existentes=${report.skippedExisting}, duplicados_archivo=${report.skippedDuplicateInFile}.`
+  )
+  for (const rejection of report.rejected) {
+    const codeLabel = rejection.codigo == null ? '?' : String(rejection.codigo)
+    console.error(`[migrate-from-dbf] CRITICAL cliente codigo=${codeLabel}: ${rejection.message}`)
+  }
+}
+
+async function migrateClientesFromDbf(tenantId: number): Promise<ClienteMigrationReport> {
+  const filePath = path.join(sistemaDir(), 'CLIENTES.DBF')
+  const dbf = await DBFFile.open(filePath, { readMode: 'loose', encoding: ENCODING })
+  const report: ClienteMigrationReport = {
+    created: 0,
+    rejected: [],
+    skippedExisting: 0,
+    skippedDuplicateInFile: 0,
+  }
+  const seenInFile = new Set<number>()
+  const pending: Array<ClienteInput & { tenantId: number }> = []
+
+  const flushPending = async () => {
+    if (pending.length === 0) return
+    const codigos = pending.map((row) => row.codigo)
+    const existing = new Set(
+      (
+        await prisma.cliente.findMany({
+          where: { tenantId, codigo: { in: codigos } },
+          select: { codigo: true },
+        })
+      ).map((row) => row.codigo),
+    )
+    const toCreate = pending.filter((row) => {
+      if (existing.has(row.codigo)) {
+        report.skippedExisting += 1
+        return false
+      }
+      return true
+    })
+    pending.length = 0
+    if (toCreate.length === 0) return
+    const result = await prisma.cliente.createMany({ data: toCreate, skipDuplicates: true })
+    report.created += result.count
+  }
+
+  for await (const rawRow of dbf) {
+    const row = rawRow as Record<string, unknown>
+    const codigoRaw = Math.round(Number(row.CODIG))
+    const codigo = Number.isFinite(codigoRaw) ? codigoRaw : null
+    const cond = String(row.COND ?? '').trim()
+    const condIva = mapLegacyCondToCondIva(cond)
+    if (condIva === null) {
+      report.rejected.push({
+        codigo,
+        message: `COND invalid or empty: "${cond}"`,
+      })
+      continue
+    }
+
+    const raw = dbfRowToRawCliente(row)
+    const parsed = safeParseBodySchema(clienteBodySchema, raw)
+    if (!parsed.ok) {
+      report.rejected.push({
+        codigo,
+        message: parsed.error,
+      })
+      continue
+    }
+
+    const parsedCodigo = parsed.value.codigo
+    if (seenInFile.has(parsedCodigo)) {
+      report.skippedDuplicateInFile += 1
+      continue
+    }
+    seenInFile.add(parsedCodigo)
+    pending.push({ ...parsed.value, tenantId })
+    if (pending.length >= CLIENTES_BATCH_SIZE) {
+      await flushPending()
+    }
+  }
+
+  await flushPending()
+  return report
+}
+
+async function ensureRubroGeneral(tenantId: number): Promise<number> {
   const rubro = await prisma.rubro.upsert({
-    where: { codigo: 1 },
-    create: { codigo: 1, nombre: 'General' },
+    where: { tenantId_codigo: { tenantId, codigo: 1 } },
+    create: { tenantId, codigo: 1, nombre: 'General' },
     update: { nombre: 'General' },
   })
   return rubro.id
 }
 
-async function migrateArticulos(rubroId: number, descrFromPvar: Map<number, string>) {
+async function migrateArticulos(tenantId: number, rubroId: number, descrFromPvar: Map<number, string>) {
   const agg = await aggregatePvar2ByArtic()
   const codes = [...agg.keys()].sort((a, b) => a - b).slice(0, ARTICULOS_A_IMPORTAR)
   if (codes.length < ARTICULOS_A_IMPORTAR) {
@@ -129,7 +301,7 @@ async function migrateArticulos(rubroId: number, descrFromPvar: Map<number, stri
   const existing = new Set(
     (
       await prisma.articulo.findMany({
-        where: { codigo: { in: codes } },
+        where: { tenantId, codigo: { in: codes } },
         select: { codigo: true },
       })
     ).map((a) => a.codigo)
@@ -143,6 +315,7 @@ async function migrateArticulos(rubroId: number, descrFromPvar: Map<number, stri
       const precio = dec2(row.importe)
       const costo = dec2(row.costoN)
       return {
+        tenantId,
         codigo,
         descripcion,
         rubroId,
@@ -164,7 +337,7 @@ async function migrateArticulos(rubroId: number, descrFromPvar: Map<number, stri
   console.log(`[migrate-from-dbf] Artículos insertados: ${result.count}`)
 }
 
-async function migrateClientesPlaceholder() {
+async function migrateClientesPlaceholder(tenantId: number) {
   const meta = await listCliIsMetadataOnly()
   if (meta) {
     console.log(
@@ -179,9 +352,10 @@ async function migrateClientesPlaceholder() {
     const n = String(i + 1).padStart(2, '0')
     const rsocial = `Cliente legado ${n}`.slice(0, 30)
     return {
+      tenantId,
       codigo,
       rsocial,
-      condIva: 'R',
+      condIva: 'RI',
       activo: true,
     }
   })
@@ -189,7 +363,7 @@ async function migrateClientesPlaceholder() {
   const existing = new Set(
     (
       await prisma.cliente.findMany({
-        where: { codigo: { in: codes } },
+        where: { tenantId, codigo: { in: codes } },
         select: { codigo: true },
       })
     ).map((c) => c.codigo)
@@ -203,23 +377,42 @@ async function migrateClientesPlaceholder() {
   console.log(`[migrate-from-dbf] Clientes insertados: ${result.count}`)
 }
 
-async function main() {
+export async function runDbfMigration() {
   if (!process.env.DATABASE_URL) {
     console.error('DATABASE_URL no está definida. Configura .env en la raíz del proyecto.')
     process.exit(1)
   }
-  const rubroId = await ensureRubroGeneral()
+  const tenantId = await resolveMigrationTenantId()
   const descrFromPvar = await loadPvarDescriptions()
-  await migrateClientesPlaceholder()
-  await migrateArticulos(rubroId, descrFromPvar)
+  if (await clientesDbfHasRecords()) {
+    console.log('[migrate-from-dbf] CLIENTES.DBF detectado con registros; importando clientes reales.')
+    const report = await migrateClientesFromDbf(tenantId)
+    logClienteMigrationReport(report)
+  } else {
+    await migrateClientesPlaceholder(tenantId)
+  }
+
+  const rubrosFromDbf = await migrateRubrosFromDbf(tenantId)
+  if (!rubrosFromDbf) {
+    await ensureRubroGeneral(tenantId)
+  }
+
+  const articulosFromDbf = await migrateArticulosFromDbf(tenantId)
+  if (!articulosFromDbf) {
+    const rubroId = await ensureRubroGeneral(tenantId)
+    await migrateArticulos(tenantId, rubroId, descrFromPvar)
+  }
+
   console.log('[migrate-from-dbf] Listo.')
 }
 
-main()
-  .catch((e) => {
-    console.error(e)
-    process.exit(1)
-  })
-  .finally(async () => {
-    await prisma.$disconnect()
-  })
+if (import.meta.url === `file://${process.argv[1]}`) {
+  runDbfMigration()
+    .catch((e) => {
+      console.error(e)
+      process.exit(1)
+    })
+    .finally(async () => {
+      await prisma.$disconnect()
+    })
+}

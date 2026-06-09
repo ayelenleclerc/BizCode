@@ -10,7 +10,10 @@ Mapa dos artefactos de qualidade do BizCode para cláusulas ISO. Documentação 
 | ACCESSIBILITY + jsx-a11y | §8.1 | — | — | Usabilidade | — |
 | I18N_STRATEGY + check-i18n | §8.1 | — | — | Portabilidade | — |
 | SECURITY | §8.1 | §6.3.8 | A.8.x | Segurança | — |
+| **quality/observabilidade.md** + `server/middleware/observability.ts` + `GET /api/metrics` (`audit.read`) | §8.1 | §6.3.2, §6.4.9 | A.8.15 (logging), A.8.16 (monitoramento) | Confiabilidade, Segurança | 29119-2 |
 | openapi.yaml + contract tests | §8.3 | §6.3.2 | — | Adequação funcional | 29119-2 |
+| **ADR-0012 / notas de crédito (#146)** — `PUT /api/facturas/{id}/void`, `GET /api/notas-credito`, UI faturamento / finanças, `tests/api/notas-credito.test.ts`, `tests/api/facturas-void.test.ts` | §8.3 | §6.3.2 | — | Adequação funcional | 29119-2 |
+| **ADR-0013 / Livro IVA Vendas Fase 1 (#147)** — `GET /api/contabilidad/libro-iva-ventas`, UI finanças, `tests/api/libro-iva-ventas.test.ts`, `tests/server/fiscal/ar/libroIvaVentas.test.ts` | §8.3 | §6.3.2 | — | Adequação funcional | 29119-2 |
 | plano-swagger-openapi-ui.md (espelhos EN/ES) — checklist Swagger UI, política OpenAPI agentes | §7.5, §8.3 | §6.3.2, §6.4.12 | — | Adequação funcional | 29119-2 |
 | ADR-0003 (contrato API) | §8.3.3 | §6.3.6 | — | Manutenibilidade | — |
 | **visao-produto-e-implantacao.md** (espelhos EN/ES, **PROD-VISION-001**) — direção desktop/SaaS, modularidade fiscal | §7.5, §8.3 | §6.3.2 | — | Portabilidade §4.2.8 | — |
@@ -19,7 +22,10 @@ Mapa dos artefactos de qualidade do BizCode para cláusulas ISO. Documentação 
 | QUALITY_MANUAL | §4.4, §10.2 | §6.1 | — | — | — |
 | ADR-0001, ADR-0002 | §8.3.3 | §6.3.2 | — | — | — |
 | PRIVACY_DATA_MAP | §8.1 | — | A.5.x | — | — |
-| Manuais do usuário | §7.5 | §6.4.12 | — | Usabilidade | — |
+| Manuais do usuário (clientes, produtos, faturamento, aparência, cobranças, finanças, relatórios, logística) | §7.5 | §6.4.12 | — | Usabilidade | — |
+| API de cobranças + `tests/api/cobros.test.ts` | §8.3 | §6.3.2 | — | Adequação funcional | 29119-2 |
+| **Logística** (#140–#145): manuais + `tests/api/repartos.test.ts`, `tests/api/ordenes-entrega.test.ts`, `tests/api/logistica-reportes.test.ts`, `repartoUbicacionService.test.ts`, `logisticaReportesService.test.ts`, OpenAPI repartos/GPS/rotas logística | §8.3 | §6.3.2 | A.5.12 (localização se `logistics.gps`) | Adequação funcional | 29119-2 |
+| documentacao-gerada.md + `npm run docs:generate` | §7.5 | §6.4.12 | A.8.31 (SBOM) | Manutenibilidade | — |
 | THEMING | §8.3 | §6.4.12 | — | Usabilidade | — |
 | CONTRIBUTING DoD | §8.5.1 | §6.3.6 | A.8.25 | — | 29119-2 §7 |
 | RECORDS_TEMPLATE | §10.2.2 | §6.7.1 | A.5.33 | — | 29119-3 |

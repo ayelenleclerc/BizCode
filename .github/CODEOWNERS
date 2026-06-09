@@ -1,0 +1,47 @@
+# Code Owners for BizCode
+
+# Global fallback
+* @ayelenleclerc
+
+# Backend
+/server/ @ayelenleclerc
+/src/lib/api.ts @ayelenleclerc
+/src/lib/rbac.ts @ayelenleclerc
+/tests/server/ @ayelenleclerc
+/tests/api/ @ayelenleclerc
+/tests/integration/ @ayelenleclerc
+
+# Frontend
+/src/pages/ @ayelenleclerc
+/src/components/ @ayelenleclerc
+/src/hooks/ @ayelenleclerc
+/src/locales/ @ayelenleclerc
+/tests/ @ayelenleclerc
+
+# DevOps / Docker
+/Dockerfile @ayelenleclerc
+/docker-compose.yml @ayelenleclerc
+/.github/workflows/ @ayelenleclerc
+
+# Infrastructure / Terraform
+/terraform/ @ayelenleclerc
+
+# Documentation
+/docs/ @ayelenleclerc
+/.cursor/rules/ @ayelenleclerc
+
+# Database
+/prisma/ @ayelenleclerc
+
+# Configuration
+/tsconfig.json @ayelenleclerc
+/eslint.config.mjs @ayelenleclerc
+/vitest.config.ts @ayelenleclerc
+/playwright.config.ts @ayelenleclerc
+/package.json @ayelenleclerc
+/package-lock.json @ayelenleclerc
+
+# Quality & Governance
+PROGRESS.md @ayelenleclerc
+.husky/ @ayelenleclerc
+.github/CODEOWNERS @ayelenleclerc

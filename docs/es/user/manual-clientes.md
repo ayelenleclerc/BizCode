@@ -60,6 +60,27 @@ El sistema verifica automáticamente que el CUIT sea correcto. Si el dígito ver
 
 Edite el cliente y desmarque la casilla **Activo**. El cliente quedará inactivo pero sus facturas históricas se conservan.
 
+## Importación masiva (CSV)
+
+Quienes tengan permiso de gestión de clientes pueden cargar muchos registros desde un archivo **CSV en UTF-8**.
+
+1. En el listado, abra **Importar CSV** (o el botón equivalente).
+2. Descargue la **plantilla** desde el mismo diálogo: incluye la fila de cabeceras obligatorias y un ejemplo.
+3. No modifique los nombres ni el orden de las columnas de la primera fila. Guarde el archivo como `.csv` (UTF-8).
+4. Adjunte el archivo y confirme la importación. El sistema muestra cuántas filas se crearon y, si hubo errores de validación o duplicados, el detalle **por fila** (el número de fila cuenta desde la primera fila de datos; la fila 1 es el encabezado). Las reglas coinciden con la API REST de alta/edición; cada mensaje incluye la **ruta del campo** (p. ej. `rsocial: …`) cuando el servidor rechaza una fila.
+
+**Política de duplicados:** si el **código** de cliente ya existe en la base de datos, o aparece repetido dentro del mismo archivo, esa fila se rechaza y no se inserta.
+
+**Límites:** tamaño máximo de archivo y cantidad máxima de filas de datos están definidos en la API (véase documentación OpenAPI en `/api-docs`). Si el archivo supera el límite, recibirá un error.
+
+## Cobros recientes
+
+Al editar un cliente existente, el formulario muestra **cobros recientes** cargados desde `GET /api/cobros?clienteId=…`. Use el enlace para abrir **Cobros** filtrado por ese cliente o registrar un cobro nuevo.
+
+## Score de cobranza
+
+El formulario de cliente muestra el **score de cobranza** (0–100) cuando está disponible, con un tooltip que describe cómo cambia el score al registrar cobros contra facturas activas. Las reglas están documentadas en OpenAPI para `POST /api/cobros`.
+
 ## Atajos de Teclado
 
 | Tecla | Acción |
@@ -69,4 +90,4 @@ Edite el cliente y desmarque la casilla **Activo**. El cliente quedará inactivo
 | F5 | Guardar formulario |
 | ↑ / ↓ | Navegar filas de la tabla |
 | Enter | Abrir cliente seleccionado |
-| Esc | Cerrar formulario sin guardar |
+| Esc | Cerrar formulario o diálogo de importación sin guardar |

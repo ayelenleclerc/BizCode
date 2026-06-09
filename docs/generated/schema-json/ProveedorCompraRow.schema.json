@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "estado": {
+      "description": "OC lifecycle state when tipo is orden_compra",
+      "type": "string"
+    },
+    "estadoPago": {
+      "$ref": "./ProveedorCompraEstadoPago.schema.json"
+    },
+    "fecha": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "id": {
+      "type": "integer"
+    },
+    "ordenCompraId": {
+      "type": "integer"
+    },
+    "referencia": {
+      "type": "string"
+    },
+    "tipo": {
+      "enum": [
+        "orden_compra",
+        "comprobante"
+      ],
+      "type": "string"
+    },
+    "total": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "tipo",
+    "id",
+    "fecha",
+    "referencia",
+    "total",
+    "estadoPago"
+  ],
+  "title": "ProveedorCompraRow",
+  "type": "object"
+}

@@ -20,15 +20,19 @@ import {
   ApiRequestFailedError,
   authAPI,
   articulosAPI,
+  chatAPI,
   checkAPI,
   clientesAPI,
   facturasAPI,
   formasPagoAPI,
   getAuthErrorI18nKey,
+  notasCreditoAPI,
   notifChannelsAPI,
+  proveedoresAPI,
   rubrosAPI,
   usersAPI,
   zonasEntregaAPI,
+  logisticaReportesAPI,
 } from './api'
 
 beforeEach(() => {
@@ -42,6 +46,18 @@ describe('getAuthErrorI18nKey', () => {
     expect(
       getAuthErrorI18nKey(new ApiRequestFailedError('Invalid credentials', { hasResponse: true })),
     ).toBe('auth.errors.invalidCredentials')
+  })
+
+  it('mapea ACCOUNT_LOCKED', () => {
+    expect(
+      getAuthErrorI18nKey(new ApiRequestFailedError('ACCOUNT_LOCKED', { hasResponse: true, httpStatus: 429 })),
+    ).toBe('auth.errors.accountLocked')
+  })
+
+  it('mapea 429 Too many requests', () => {
+    expect(
+      getAuthErrorI18nKey(new ApiRequestFailedError('Too many requests', { hasResponse: true, httpStatus: 429 })),
+    ).toBe('auth.errors.tooManyRequests')
   })
 
   it('mapea Error genérico con mensaje Invalid credentials (legacy)', () => {
@@ -155,6 +171,21 @@ describe('authAPI', () => {
         axiosCode: 'ERR_NETWORK',
         hasResponse: false,
       })
+    })
+
+    it('respuesta con error no string usa mensaje de Axios', async () => {
+      const err = new Error('Request failed') as Error & {
+        response: { data: { error: { code: number } }; status: number }
+        code: string
+        isAxiosError: boolean
+      }
+      err.response = { data: { error: { code: 400 } }, status: 400 }
+      err.code = 'ERR_BAD_REQUEST'
+      err.isAxiosError = true
+      mockPost.mockRejectedValueOnce(err)
+      await expect(authAPI.login({ tenantSlug: 'd', username: 'u', password: 'p' })).rejects.toThrow(
+        'Request failed',
+      )
     })
   })
 
@@ -290,6 +321,40 @@ describe('clientesAPI', () => {
       await expect(clientesAPI.update(1, {})).rejects.toThrow('Error de actualización')
     })
   })
+
+  describe('downloadImportTemplate', () => {
+    it('retorna Blob en el happy path', async () => {
+      mockGet.mockResolvedValueOnce({ data: new Blob(['a,b']) })
+      const blob = await clientesAPI.downloadImportTemplate()
+      expect(blob).toBeInstanceOf(Blob)
+      expect(mockGet).toHaveBeenCalledWith('/clientes/import/template', { responseType: 'blob' })
+    })
+
+    it('lanza ApiRequestFailedError en fallo', async () => {
+      mockGet.mockRejectedValueOnce(axiosErrorWithResponse('Forbidden'))
+      await expect(clientesAPI.downloadImportTemplate()).rejects.toThrow('Forbidden')
+    })
+  })
+
+  describe('importFromCsv', () => {
+    it('envía FormData con timeout extendido', async () => {
+      mockPost.mockResolvedValueOnce({
+        data: { data: { created: 2, skipped: 1, errors: [{ row: 3, message: 'x' }] } },
+      })
+      const file = new File(['csv'], 'c.csv', { type: 'text/csv' })
+      const result = await clientesAPI.importFromCsv(file)
+      expect(result).toEqual({ created: 2, skipped: 1, errors: [{ row: 3, message: 'x' }] })
+      expect(mockPost).toHaveBeenCalledWith('/clientes/import', expect.any(FormData), {
+        timeout: 120000,
+      })
+    })
+
+    it('lanza ApiRequestFailedError en fallo', async () => {
+      mockPost.mockRejectedValueOnce(axiosErrorWithResponse('Invalid CSV'))
+      const file = new File(['x'], 'bad.csv')
+      await expect(clientesAPI.importFromCsv(file)).rejects.toThrow('Invalid CSV')
+    })
+  })
 })
 
 // ════════════════════════════════════════════════════════════
@@ -349,6 +414,36 @@ describe('articulosAPI', () => {
       await expect(articulosAPI.update(3, {})).rejects.toThrow('Update error')
     })
   })
+
+  describe('downloadImportTemplate', () => {
+    it('retorna Blob en el happy path', async () => {
+      mockGet.mockResolvedValueOnce({ data: new Blob(['h']) })
+      const blob = await articulosAPI.downloadImportTemplate()
+      expect(blob).toBeInstanceOf(Blob)
+      expect(mockGet).toHaveBeenCalledWith('/articulos/import/template', { responseType: 'blob' })
+    })
+
+    it('lanza error del servidor', async () => {
+      mockGet.mockRejectedValueOnce(axiosErrorWithResponse('No template'))
+      await expect(articulosAPI.downloadImportTemplate()).rejects.toThrow('No template')
+    })
+  })
+
+  describe('importFromCsv', () => {
+    it('retorna resumen de importación', async () => {
+      mockPost.mockResolvedValueOnce({ data: { data: { created: 1, skipped: 0, errors: [] } } })
+      const file = new File(['a'], 'a.csv')
+      expect(await articulosAPI.importFromCsv(file)).toEqual({ created: 1, skipped: 0, errors: [] })
+      expect(mockPost).toHaveBeenCalledWith('/articulos/import', expect.any(FormData), {
+        timeout: 120000,
+      })
+    })
+
+    it('lanza error del servidor', async () => {
+      mockPost.mockRejectedValueOnce(axiosErrorWithResponse('Bad file'))
+      await expect(articulosAPI.importFromCsv(new File([], 'x.csv'))).rejects.toThrow('Bad file')
+    })
+  })
 })
 
 // ════════════════════════════════════════════════════════════
@@ -376,6 +471,127 @@ describe('rubrosAPI', () => {
     it('lanza error del servidor', async () => {
       mockPost.mockRejectedValueOnce(axiosErrorWithResponse('Rubro duplicado'))
       await expect(rubrosAPI.create({})).rejects.toThrow('Rubro duplicado')
+    })
+  })
+
+  describe('downloadImportTemplate', () => {
+    it('retorna Blob en el happy path', async () => {
+      mockGet.mockResolvedValueOnce({ data: new Blob(['t']) })
+      expect(await rubrosAPI.downloadImportTemplate()).toBeInstanceOf(Blob)
+      expect(mockGet).toHaveBeenCalledWith('/rubros/import/template', { responseType: 'blob' })
+    })
+
+    it('lanza error del servidor', async () => {
+      mockGet.mockRejectedValueOnce(axiosErrorWithResponse('Denied'))
+      await expect(rubrosAPI.downloadImportTemplate()).rejects.toThrow('Denied')
+    })
+  })
+
+  describe('importFromCsv', () => {
+    it('retorna resumen de importación', async () => {
+      mockPost.mockResolvedValueOnce({ data: { data: { created: 0, skipped: 2, errors: [] } } })
+      const file = new File(['r'], 'r.csv')
+      expect(await rubrosAPI.importFromCsv(file)).toEqual({ created: 0, skipped: 2, errors: [] })
+    })
+
+    it('lanza error del servidor', async () => {
+      mockPost.mockRejectedValueOnce(axiosErrorWithResponse('Parse error'))
+      await expect(rubrosAPI.importFromCsv(new File([], 'e.csv'))).rejects.toThrow('Parse error')
+    })
+  })
+})
+
+// ════════════════════════════════════════════════════════════
+// proveedoresAPI
+// ════════════════════════════════════════════════════════════
+describe('proveedoresAPI', () => {
+  describe('list', () => {
+    it('retorna datos en el happy path', async () => {
+      mockGet.mockResolvedValueOnce({ data: { data: [{ id: 1 }] } })
+      expect(await proveedoresAPI.list()).toEqual([{ id: 1 }])
+      expect(mockGet).toHaveBeenCalledWith('/proveedores', { params: { q: undefined } })
+    })
+
+    it('aplica filtro q', async () => {
+      mockGet.mockResolvedValueOnce({ data: { data: [] } })
+      await proveedoresAPI.list('acme')
+      expect(mockGet).toHaveBeenCalledWith('/proveedores', { params: { q: 'acme' } })
+    })
+
+    it('lanza error del servidor', async () => {
+      mockGet.mockRejectedValueOnce(axiosErrorWithResponse('DB error'))
+      await expect(proveedoresAPI.list()).rejects.toThrow('DB error')
+    })
+  })
+
+  describe('get', () => {
+    it('retorna proveedor por id', async () => {
+      mockGet.mockResolvedValueOnce({ data: { data: { id: 9, rsocial: 'P' } } })
+      expect(await proveedoresAPI.get(9)).toEqual({ id: 9, rsocial: 'P' })
+    })
+
+    it('lanza error del servidor', async () => {
+      mockGet.mockRejectedValueOnce(axiosErrorWithResponse('Not found'))
+      await expect(proveedoresAPI.get(1)).rejects.toThrow('Not found')
+    })
+  })
+
+  describe('create', () => {
+    it('retorna proveedor creado', async () => {
+      mockPost.mockResolvedValueOnce({ data: { data: { id: 2 } } })
+      expect(
+        await proveedoresAPI.create({ codigo: 1, rsocial: 'New', condIva: 'RI', activo: true }),
+      ).toEqual({ id: 2 })
+    })
+
+    it('lanza error del servidor', async () => {
+      mockPost.mockRejectedValueOnce(axiosErrorWithResponse('Duplicate'))
+      await expect(
+        proveedoresAPI.create({ codigo: 1, rsocial: 'New', condIva: 'RI', activo: true }),
+      ).rejects.toThrow('Duplicate')
+    })
+  })
+
+  describe('update', () => {
+    it('retorna proveedor actualizado', async () => {
+      mockPut.mockResolvedValueOnce({ data: { data: { id: 1, rsocial: 'Up' } } })
+      expect(
+        await proveedoresAPI.update(1, { codigo: 1, rsocial: 'Up', condIva: 'RI', activo: true }),
+      ).toEqual({ id: 1, rsocial: 'Up' })
+    })
+
+    it('lanza error del servidor', async () => {
+      mockPut.mockRejectedValueOnce(axiosErrorWithResponse('Conflict'))
+      await expect(
+        proveedoresAPI.update(1, { codigo: 1, rsocial: 'Up', condIva: 'RI', activo: true }),
+      ).rejects.toThrow('Conflict')
+    })
+  })
+
+  describe('downloadImportTemplate', () => {
+    it('retorna Blob en el happy path', async () => {
+      mockGet.mockResolvedValueOnce({ data: new Blob(['z']) })
+      expect(await proveedoresAPI.downloadImportTemplate()).toBeInstanceOf(Blob)
+    })
+
+    it('lanza error del servidor', async () => {
+      mockGet.mockRejectedValueOnce(axiosErrorWithResponse('Nope'))
+      await expect(proveedoresAPI.downloadImportTemplate()).rejects.toThrow('Nope')
+    })
+  })
+
+  describe('importFromCsv', () => {
+    it('retorna resumen', async () => {
+      mockPost.mockResolvedValueOnce({ data: { data: { created: 1, skipped: 0, errors: [] } } })
+      await proveedoresAPI.importFromCsv(new File([''], 'p.csv'))
+      expect(mockPost).toHaveBeenCalledWith('/proveedores/import', expect.any(FormData), {
+        timeout: 120000,
+      })
+    })
+
+    it('lanza error del servidor', async () => {
+      mockPost.mockRejectedValueOnce(axiosErrorWithResponse('Bad CSV'))
+      await expect(proveedoresAPI.importFromCsv(new File([], 'x.csv'))).rejects.toThrow('Bad CSV')
     })
   })
 })
@@ -423,6 +639,110 @@ describe('facturasAPI', () => {
     it('lanza error del servidor', async () => {
       mockPost.mockRejectedValueOnce(axiosErrorWithResponse('Número duplicado'))
       await expect(facturasAPI.create({})).rejects.toThrow('Número duplicado')
+    })
+  })
+
+  describe('void', () => {
+    it('retorna resultado con factura, nota de crédito y cliente actualizado', async () => {
+      const motivo = 'xxxxxxxxxx'
+      const envelope = {
+        factura: { id: 1, estado: 'N', total: 5000 },
+        notaCredito: {
+          id: 99,
+          tenantId: 1,
+          facturaOrigenId: 1,
+          motivo,
+          monto: 5000,
+          cae: null,
+          caeVto: null,
+          estadoCae: 'not_required' as const,
+          createdById: null,
+          createdAt: '2026-01-01T00:00:00.000Z',
+        },
+        updatedCliente: { id: 3, rsocial: 'ACME', balance: '0', creditLimit: null },
+      }
+      mockPut.mockResolvedValueOnce({ data: { success: true, data: envelope } })
+      expect(await facturasAPI.void(1, motivo)).toEqual(envelope)
+      expect(mockPut).toHaveBeenCalledWith('/facturas/1/void', { motivo })
+    })
+
+    it('lanza ApiRequestFailedError en fallo', async () => {
+      mockPut.mockRejectedValueOnce(axiosErrorWithResponse('Already voided'))
+      await expect(facturasAPI.void(1, 'xxxxxxxxxx')).rejects.toThrow('Already voided')
+    })
+  })
+})
+
+// ════════════════════════════════════════════════════════════
+// notasCreditoAPI
+// ════════════════════════════════════════════════════════════
+describe('notasCreditoAPI', () => {
+  describe('list', () => {
+    it('retorna filas paginadas', async () => {
+      const row = {
+        id: 1,
+        tenantId: 1,
+        facturaOrigenId: 10,
+        motivo: 'xxxxxxxxxx',
+        monto: 100,
+        cae: null,
+        caeVto: null,
+        estadoCae: 'pending' as const,
+        createdById: 1,
+        createdAt: '2026-01-15T12:00:00.000Z',
+        facturaOrigen: {
+          id: 10,
+          tipo: 'B',
+          prefijo: '0001',
+          numero: 5,
+          clienteId: 3,
+          fecha: '2026-01-10T00:00:00.000Z',
+          total: 100,
+          estado: 'N',
+        },
+      }
+      mockGet.mockResolvedValueOnce({
+        data: { success: true, data: [row], total: 1, limit: 100, offset: 0 },
+      })
+      expect(await notasCreditoAPI.list({ from: '2026-01-01', to: '2026-01-31' })).toEqual({
+        data: [row],
+        total: 1,
+        limit: 100,
+        offset: 0,
+      })
+      expect(mockGet).toHaveBeenCalledWith('/notas-credito', {
+        params: { from: '2026-01-01', to: '2026-01-31' },
+      })
+    })
+  })
+
+  describe('getById', () => {
+    it('retorna detalle', async () => {
+      const row = {
+        id: 2,
+        tenantId: 1,
+        facturaOrigenId: 11,
+        motivo: 'yyyyyyyyyy',
+        monto: 50,
+        cae: null,
+        caeVto: null,
+        estadoCae: 'issued' as const,
+        createdById: 1,
+        createdAt: '2026-01-16T12:00:00.000Z',
+        facturaOrigen: {
+          id: 11,
+          tipo: 'A',
+          prefijo: '0001',
+          numero: 1,
+          clienteId: 4,
+          fecha: '2026-01-11T00:00:00.000Z',
+          total: 50,
+          estado: 'N',
+        },
+      }
+      mockGet.mockResolvedValueOnce({ data: { success: true, data: row } })
+      expect(await notasCreditoAPI.getById(2)).toEqual(row)
+      expect(mockGet).toHaveBeenCalledWith('/notas-credito/2')
     })
   })
 })
@@ -502,7 +822,13 @@ describe('usersAPI', () => {
 // ════════════════════════════════════════════════════════════
 describe('dashboardAPI', () => {
   it('retorna el resumen del dashboard en el happy path', async () => {
-    const summary = { ventasHoy: { count: 1, total: '100' }, facturasVencidas: { count: 0, total: '0' }, cobrosHoy: { count: 0, total: '0' }, alertasActivas: 0 }
+    const summary = {
+      ventasHoy: { count: 1, total: '100' },
+      facturasVencidas: { count: 0, total: '0' },
+      cobrosHoy: { count: 0, total: '0' },
+      alertasActivas: 0,
+      facturasPagar: { vencido: { count: 0, total: '0' }, proximoVencer: { count: 0, total: '0' } },
+    }
     mockGet.mockResolvedValueOnce({ data: { success: true, data: summary } })
     const { dashboardAPI } = await import('./api')
     expect(await dashboardAPI.summary()).toEqual(summary)
@@ -589,6 +915,72 @@ describe('notifChannelsAPI', () => {
 })
 
 // ════════════════════════════════════════════════════════════
+// chatAPI
+// ════════════════════════════════════════════════════════════
+describe('chatAPI', () => {
+  const SAMPLE_CONV = [
+    {
+      user: { id: 1, username: 'a', role: 'seller' },
+      unreadCount: 0,
+      lastMessage: null,
+    },
+  ]
+  const SAMPLE_MSG = {
+    id: 1,
+    tenantId: 1,
+    fromUserId: 1,
+    toUserId: 2,
+    content: 'hola',
+    createdAt: '2026-01-01',
+  }
+
+  describe('conversations', () => {
+    it('usa límite por defecto', async () => {
+      mockGet.mockResolvedValueOnce({ data: { success: true, data: SAMPLE_CONV } })
+      expect(await chatAPI.conversations()).toEqual(SAMPLE_CONV)
+      expect(mockGet).toHaveBeenCalledWith('/chat/conversations', { params: { limit: 20 } })
+    })
+
+    it('permite override de limit', async () => {
+      mockGet.mockResolvedValueOnce({ data: { success: true, data: [] } })
+      await chatAPI.conversations(5)
+      expect(mockGet).toHaveBeenCalledWith('/chat/conversations', { params: { limit: 5 } })
+    })
+
+    it('lanza ApiRequestFailedError en fallo', async () => {
+      mockGet.mockRejectedValueOnce(axiosErrorWithResponse('No chat'))
+      await expect(chatAPI.conversations()).rejects.toThrow('No chat')
+    })
+  })
+
+  describe('messages', () => {
+    it('pasa params opcionales', async () => {
+      mockGet.mockResolvedValueOnce({ data: { success: true, data: [SAMPLE_MSG] } })
+      expect(await chatAPI.messages(2, { limit: 10, before: 99 })).toEqual([SAMPLE_MSG])
+      expect(mockGet).toHaveBeenCalledWith('/chat/messages/2', { params: { limit: 10, before: 99 } })
+    })
+
+    it('lanza error del servidor', async () => {
+      mockGet.mockRejectedValueOnce(axiosErrorWithResponse('Forbidden'))
+      await expect(chatAPI.messages(3)).rejects.toThrow('Forbidden')
+    })
+  })
+
+  describe('send', () => {
+    it('retorna mensaje enviado', async () => {
+      mockPost.mockResolvedValueOnce({ data: { success: true, data: SAMPLE_MSG } })
+      expect(await chatAPI.send(2, 'hola')).toEqual(SAMPLE_MSG)
+      expect(mockPost).toHaveBeenCalledWith('/chat/messages', { toUserId: 2, content: 'hola' })
+    })
+
+    it('lanza error del servidor', async () => {
+      mockPost.mockRejectedValueOnce(axiosErrorWithResponse('Empty content'))
+      await expect(chatAPI.send(1, '')).rejects.toThrow('Empty content')
+    })
+  })
+})
+
+// ════════════════════════════════════════════════════════════
 // zonasEntregaAPI
 // ════════════════════════════════════════════════════════════
 describe('zonasEntregaAPI', () => {
@@ -638,6 +1030,88 @@ describe('zonasEntregaAPI', () => {
       )
       await expect(zonasEntregaAPI.update(99, {})).rejects.toThrow('Not Found')
     })
+  })
+})
+
+// ════════════════════════════════════════════════════════════
+// logisticaReportesAPI (#145)
+// ════════════════════════════════════════════════════════════
+describe('logisticaReportesAPI', () => {
+  const params = { from: '2026-05-01', to: '2026-05-31', choferId: 2 }
+  const kpis = {
+    dispatchedCount: 1,
+    firstVisitDeliveredCount: 1,
+    firstVisitRate: 1,
+    avgDeliveryMinutes: 5,
+    returnsByReason: [],
+    overdueCount: 0,
+  }
+
+  it('kpis returns payload', async () => {
+    mockGet.mockResolvedValueOnce({ data: { success: true, data: kpis } })
+    expect(await logisticaReportesAPI.kpis(params)).toEqual(kpis)
+    expect(mockGet).toHaveBeenCalledWith('/logistica/kpis', { params })
+  })
+
+  it('reporteChoferes returns rows', async () => {
+    const rows = [{ choferId: 2, choferUsername: 'd', day: '2026-05-01', dispatched: 1, delivered: 1, notDelivered: 0 }]
+    mockGet.mockResolvedValueOnce({ data: { success: true, data: rows } })
+    expect(await logisticaReportesAPI.reporteChoferes(params)).toEqual(rows)
+    expect(mockGet).toHaveBeenCalledWith('/logistica/reporte-choferes', { params })
+  })
+
+  it('reporteZonas returns rows', async () => {
+    const rows = [{ zonaId: 1, zonaNombre: 'N', dispatched: 1, delivered: 1, notDelivered: 0 }]
+    mockGet.mockResolvedValueOnce({ data: { success: true, data: rows } })
+    expect(await logisticaReportesAPI.reporteZonas(params)).toEqual(rows)
+    expect(mockGet).toHaveBeenCalledWith('/logistica/reporte-zonas', { params })
+  })
+
+  it('exportChoferesCsv returns blob', async () => {
+    const blob = new Blob(['a'])
+    mockGet.mockResolvedValueOnce({ data: blob })
+    expect(await logisticaReportesAPI.exportChoferesCsv(params)).toBe(blob)
+    expect(mockGet).toHaveBeenCalledWith('/logistica/reporte-choferes', {
+      params,
+      headers: { Accept: 'text/csv' },
+      responseType: 'blob',
+    })
+  })
+
+  it('exportZonasCsv returns blob', async () => {
+    const blob = new Blob(['z'])
+    mockGet.mockResolvedValueOnce({ data: blob })
+    expect(await logisticaReportesAPI.exportZonasCsv(params)).toBe(blob)
+    expect(mockGet).toHaveBeenCalledWith('/logistica/reporte-zonas', {
+      params,
+      headers: { Accept: 'text/csv' },
+      responseType: 'blob',
+    })
+  })
+
+  it('kpis propagates server errors', async () => {
+    mockGet.mockRejectedValueOnce(axiosErrorWithResponse('Forbidden'))
+    await expect(logisticaReportesAPI.kpis(params)).rejects.toThrow('Forbidden')
+  })
+
+  it('reporteChoferes propagates server errors', async () => {
+    mockGet.mockRejectedValueOnce(axiosErrorWithResponse('Server error'))
+    await expect(logisticaReportesAPI.reporteChoferes(params)).rejects.toThrow('Server error')
+  })
+
+  it('reporteZonas propagates server errors', async () => {
+    mockGet.mockRejectedValueOnce(axiosErrorWithResponse('Server error'))
+    await expect(logisticaReportesAPI.reporteZonas(params)).rejects.toThrow('Server error')
+  })
+
+  it('exportChoferesCsv propagates server errors', async () => {
+    mockGet.mockRejectedValueOnce(axiosErrorWithResponse('Server error'))
+    await expect(logisticaReportesAPI.exportChoferesCsv(params)).rejects.toThrow('Server error')
+  })
+
+  it('exportZonasCsv propagates server errors', async () => {
+    mockGet.mockRejectedValueOnce(axiosErrorWithResponse('Server error'))
+    await expect(logisticaReportesAPI.exportZonasCsv(params)).rejects.toThrow('Server error')
   })
 })
 

@@ -1,0 +1,156 @@
+name: Backend Quality Validation
+
+permissions:
+  contents: read
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'server/**'
+      - 'prisma/**'
+      - 'package.json'
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - 'server/**'
+      - 'prisma/**'
+
+jobs:
+  backend-quality:
+    name: Backend Code Quality
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: bizcode
+          POSTGRES_DB: bizcode_test
+          POSTGRES_HOST_AUTH_METHOD: trust
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgresql://bizcode@localhost:5432/bizcode_test?sslmode=disable
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate Prisma client
+        run: npx prisma generate
+
+      - name: Validate Prisma schema
+        run: npx prisma validate
+
+      - name: Check for createApp.ts size (Issue #77 ratchet, threshold 1800)
+        run: |
+          LINES=$(wc -l < server/createApp.ts)
+          if [ $LINES -gt 1800 ]; then
+            echo "❌ createApp.ts has grown beyond 1800 lines (Issue #77 — modularize before raising further)"
+            echo "Current: $LINES lines"
+            exit 1
+          fi
+          echo "✅ createApp.ts size: $LINES lines (threshold 1800)"
+
+      - name: Validate error handling patterns (403/409)
+        run: |
+          if grep -rE 'res\.status\((403|409)\)' server --include='*.ts' >/dev/null; then
+            echo "✅ Found explicit HTTP 403/409 responses"
+          else
+            echo "::error::Expected authorization/conflict responses (403/409) somewhere in server/ (Issue #78)"
+            exit 1
+          fi
+
+      - name: Check for AppError class (Issue #78)
+        run: |
+          if grep -q "export class AppError" server/errors/AppError.ts 2>/dev/null; then
+            echo "✅ AppError class exists"
+          else
+            echo "::error::AppError must be exported in server/errors/AppError.ts"
+            exit 1
+          fi
+
+      - name: Validate multi-tenant enforcement (Issue #83)
+        run: |
+          set -euo pipefail
+          TENANT_CHECKS=$(grep -r "claims\.tenantId" server --include='*.ts' | wc -l)
+          echo "✅ Found $TENANT_CHECKS claims.tenantId references in server/"
+          if [ "$TENANT_CHECKS" -lt 5 ]; then
+            echo "::error::Expected at least 5 tenant scoping usages (claims.tenantId) in server/ (Issue #83)"
+            exit 1
+          fi
+
+      - name: Check for Pino logger (Issue #78)
+        run: |
+          if grep -q "from 'pino'" server/logger.ts 2>/dev/null; then
+            echo "✅ Pino logger configured"
+          else
+            echo "::error::Structured logger must import pino in server/logger.ts"
+            exit 1
+          fi
+
+      - name: Verify AuditEvent logging (Issue #84)
+        run: |
+          if grep -q "model AuditEvent" prisma/schema.prisma && grep -q "writeAuditEvent" server/audit.ts; then
+            echo "✅ Audit model + writeAuditEvent present"
+          else
+            echo "::error::AuditEvent model and writeAuditEvent required (Issue #84)"
+            exit 1
+          fi
+
+      - name: Check for health endpoint (Issue #85)
+        run: |
+          if grep -rE "'/api/health'|\"/api/health\"" server --include='*.ts' >/dev/null 2>&1; then
+            echo "✅ Health check endpoint registered"
+          else
+            echo "::error::GET /api/health must be registered under server/ (Issue #85)"
+            exit 1
+          fi
+
+      - name: Validate Zod domain schemas (Issue #79)
+        run: |
+          if grep -q "from 'zod'" server/schemas/domain.ts && grep -qE 'z\.[a-zA-Z]' server/schemas/domain.ts; then
+            echo "✅ Zod in use under server/schemas/domain.ts"
+          else
+            echo "::error::Expect Zod usage in server/schemas/domain.ts (Issue #79)"
+            exit 1
+          fi
+
+      - name: API unit tests (server exercised via mocks)
+        run: npm run test -- tests/api tests/server tests/plan-sync --reporter=verbose
+
+      - name: Migration validation
+        run: |
+          if [ -d prisma/migrations ] && [ -n "$(ls -A prisma/migrations 2>/dev/null)" ]; then
+            echo "✅ Database migrations present"
+            npx prisma migrate deploy
+          fi
+
+      - name: Report Backend Status
+        if: always()
+        run: |
+          echo "## Backend Quality Report" >> $GITHUB_STEP_SUMMARY
+          echo "- createApp.ts refactoring: Issue #77" >> $GITHUB_STEP_SUMMARY
+          echo "- Error handling: Issue #78" >> $GITHUB_STEP_SUMMARY
+          echo "- Request validation: Issue #79" >> $GITHUB_STEP_SUMMARY
+          echo "- Multi-tenant security: Issue #83" >> $GITHUB_STEP_SUMMARY
+          echo "- Audit logging: Issue #84" >> $GITHUB_STEP_SUMMARY
+          echo "- Health endpoint: Issue #85" >> $GITHUB_STEP_SUMMARY
+          echo "- Server testing: Issue #86" >> $GITHUB_STEP_SUMMARY
+          echo "- Rate limiting: Issue #87" >> $GITHUB_STEP_SUMMARY

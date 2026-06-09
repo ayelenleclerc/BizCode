@@ -1,21 +1,28 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "properties": {
-    "data": {
-      "items": {
-        "$ref": "./Factura.schema.json"
+  "allOf": [
+    {
+      "properties": {
+        "data": {
+          "items": {
+            "$ref": "./Factura.schema.json"
+          },
+          "type": "array"
+        },
+        "success": {
+          "const": true,
+          "type": "boolean"
+        }
       },
-      "type": "array"
+      "required": [
+        "success",
+        "data"
+      ],
+      "type": "object"
     },
-    "success": {
-      "const": true,
-      "type": "boolean"
+    {
+      "$ref": "./ListPaginationMeta.schema.json"
     }
-  },
-  "required": [
-    "success",
-    "data"
   ],
-  "title": "FacturaListEnvelope",
-  "type": "object"
+  "title": "FacturaListEnvelope"
 }

@@ -55,6 +55,10 @@
 | [user/manual-products.md](user/manual-products.md) | Products module |
 | [user/manual-invoicing.md](user/manual-invoicing.md) | Invoicing module |
 | [user/manual-appearance.md](user/manual-appearance.md) | Light/dark theme (sidebar button) |
+| [user/manual-collections.md](user/manual-collections.md) | Customer payments (cobros) |
+| [user/manual-finance.md](user/manual-finance.md) | AR aging and account statement |
+| [user/manual-reports.md](user/manual-reports.md) | Operational and financial reports |
+| [user/manual-logistics.md](user/manual-logistics.md) | Delivery orders |
 
 ## Product specifications (ISO-ready MVP)
 

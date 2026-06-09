@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "appEnv": {
+      "type": "string"
+    },
+    "appVersion": {
+      "nullable": true,
+      "type": "string"
+    },
+    "requestsByMethod": {
+      "additionalProperties": {
+        "minimum": 0,
+        "type": "integer"
+      },
+      "type": "object"
+    },
+    "requestsByRoute": {
+      "additionalProperties": {
+        "minimum": 0,
+        "type": "integer"
+      },
+      "type": "object"
+    },
+    "responsesByStatus": {
+      "additionalProperties": {
+        "minimum": 0,
+        "type": "integer"
+      },
+      "type": "object"
+    },
+    "startedAt": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "totals": {
+      "properties": {
+        "averageDurationMs": {
+          "minimum": 0,
+          "type": "number"
+        },
+        "errors4xx": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "errors5xx": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "requests": {
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "requests",
+        "errors4xx",
+        "errors5xx",
+        "averageDurationMs"
+      ],
+      "type": "object"
+    },
+    "uptimeSeconds": {
+      "minimum": 0,
+      "type": "integer"
+    }
+  },
+  "required": [
+    "startedAt",
+    "uptimeSeconds",
+    "appEnv",
+    "totals",
+    "requestsByMethod",
+    "responsesByStatus",
+    "requestsByRoute"
+  ],
+  "title": "MetricsSnapshot",
+  "type": "object"
+}

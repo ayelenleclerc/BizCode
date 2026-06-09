@@ -7,15 +7,27 @@
     "main": "Navegación principal",
     "inicio": "Inicio",
     "ventas": "Ventas",
+    "pedidos": "Pedidos",
     "clientes": "Clientes",
-    "catalogo": "Catálogo",
+    "catalogo": "Artículos",
+    "proveedores": "Proveedores",
+    "compras": "Compras",
+    "recuentos": "Recuentos",
     "logistica": "Logística",
+    "picking": "Picking",
+    "seguimiento": "Seguimiento",
     "finanzas": "Finanzas",
+    "reportes": "Reportes",
+    "cobros": "Cobros",
+    "chat": "Chat",
     "configuracion": "Configuración",
     "articulos": "Artículos",
     "facturacion": "Facturación",
     "users": "Usuarios",
-    "zonasEntrega": "Zonas de entrega"
+    "zonasEntrega": "Zonas de entrega",
+    "empresa": "Empresa",
+    "auditLog": "Registro de auditoría",
+    "superadmin": "SuperAdmin"
   },
   "language": {
     "legend": "Idioma de la interfaz",
@@ -56,6 +68,9 @@
       "network": "No hay conexión con el servidor. Compruebe que el API está en marcha (p. ej. puerto 3001) y vuelva a intentarlo.",
       "timeout": "La petición tardó demasiado. Inténtelo de nuevo.",
       "offline": "Sin conexión. Compruebe su red e inténtelo de nuevo."
+    },
+    "lockout": {
+      "retryIn": "Podrá intentarlo de nuevo en {{time}}"
     }
   },
   "session": {
@@ -67,7 +82,11 @@
     "new": "Nuevo",
     "save": "Guardar",
     "cancel": "Cancelar",
-    "navigate": "Navegar"
+    "navigate": "Navegar",
+    "open": "Abrir / editar",
+    "confirm": "Confirmar",
+    "submit": "Enviar",
+    "deleteLine": "Eliminar línea"
   },
   "theme": {
     "toggleTitle": "Alternar tema claro u oscuro",
@@ -78,13 +97,22 @@
     "save": "Guardar",
     "cancel": "Cancelar",
     "saving": "Guardando...",
-    "new": "Nuevo"
+    "new": "Nuevo",
+    "search": "Buscar",
+    "retry": "Reintentar"
   },
   "status": {
     "loading": "Cargando...",
     "active": "Activo",
     "inactive": "Inactivo",
     "comingSoon": "Próximamente disponible en v0.2.0"
+  },
+  "async": {
+    "loadFailed": "No se pudieron cargar los datos"
+  },
+  "errorBoundary": {
+    "title": "Algo salió mal",
+    "message": "La pantalla no pudo mostrarse. Recargue la página o vuelva a intentarlo."
   },
   "errors": {
     "generic": "Error al guardar",
@@ -100,7 +128,8 @@
     "types": {
       "credit_limit_exceeded": "Límite de crédito superado",
       "invoice_overdue": "Factura vencida",
-      "invoice_due_soon": "Factura por vencer"
+      "invoice_due_soon": "Factura por vencer",
+      "chat_message": "Mensaje nuevo"
     }
   },
   "notifChannels": {
@@ -113,10 +142,166 @@
     "inactive": "No configurado",
     "loadError": "No se pudo cargar el estado de los canales"
   },
+  "errors": {
+    "moduleNotEnabled": "El módulo «{{module}}» no está habilitado para su empresa. Contacte al administrador.",
+    "planLimitUsers": "Alcanzó el límite de usuarios de su plan. Actualice el plan para agregar más usuarios.",
+    "planLimitInvoices": "Alcanzó el límite de facturas del mes de su plan. Actualice el plan para continuar facturando.",
+    "planFeatureRequired": "La función «{{feature}}» no está incluida en el plan «{{plan}}». Actualice su plan para habilitarla."
+  },
+  "plans": {
+    "upgradeTitle": "Función no disponible en su plan",
+    "upgradeCta": "Contacte al administrador de su empresa o a soporte para actualizar el plan.",
+    "names": {
+      "starter": "Starter",
+      "pro": "Pro",
+      "enterprise": "Enterprise",
+      "trial": "Prueba"
+    }
+  },
+  "modules": {
+    "core_invoicing": "Facturación base",
+    "core_clients": "Clientes",
+    "core_catalog": "Catálogo",
+    "billing_orders": "Pedidos",
+    "logistics_purchases": "Órdenes de compra",
+    "logistics_dispatches": "Repartos",
+    "finance_collections": "Cobranzas",
+    "analytics_dashboard": "Dashboard",
+    "admin_audit_log": "Log de auditoría",
+    "comms_chat": "Chat interno"
+  },
+  "superadmin": {
+    "title": "Panel SuperAdmin",
+    "subtitle": "Gestión de tenants de la plataforma (solo metadatos)",
+    "statsSection": "Estadísticas de plataforma",
+    "tenantsSection": "Tenants",
+    "searchLabel": "Buscar por nombre o slug",
+    "emptyTenants": "No hay tenants que coincidan con el filtro.",
+    "viewDetail": "Ver detalle",
+    "backToList": "Volver al listado",
+    "backToDetail": "Volver al detalle",
+    "suspend": "Suspender tenant",
+    "reactivate": "Reactivar tenant",
+    "manageModules": "Gestionar módulos",
+    "plan": {
+      "sectionTitle": "Plan SaaS",
+      "selectLabel": "Plan",
+      "reasonLabel": "Motivo del cambio (obligatorio)",
+      "save": "Aplicar plan",
+      "saveSuccess": "Plan actualizado correctamente.",
+      "errors": {
+        "reasonRequired": "Indique el motivo del cambio de plan.",
+        "saveFailed": "No se pudo actualizar el plan."
+      }
+    },
+    "modules": {
+      "title": "Módulos del tenant",
+      "deploymentEnv": "Ambiente de despliegue: {{env}}",
+      "modulesSection": "Módulos habilitados",
+      "saveSection": "Guardar cambios",
+      "reasonLabel": "Motivo del cambio (obligatorio)",
+      "save": "Guardar configuración",
+      "saveSuccess": "Configuración guardada correctamente.",
+      "presetSection": "Plantilla de negocio",
+      "presetLabel": "Plantilla",
+      "presetPlaceholder": "Elegir plantilla…",
+      "applyPreset": "Aplicar plantilla",
+      "confirmApplyPreset": "¿Aplicar la plantilla «{{preset}}»? Se reemplazará el conjunto de módulos activos.",
+      "presetReason": "apply_template:{{preset}}",
+      "historySection": "Historial de cambios",
+      "historyEmpty": "Sin entradas de historial.",
+      "historyDate": "Fecha",
+      "historyReason": "Motivo",
+      "historyUser": "Usuario",
+      "historyTruncated": "Mostrando {{shown}} de {{total}} entradas.",
+      "dependsOn": "Depende de: {{deps}}",
+      "missingDeps": "Active primero: {{deps}}",
+      "cannotDeactivate": "No se puede desactivar en este ambiente.",
+      "presets": {
+        "MAYORISTA_ALIMENTOS": "Mayorista alimentos",
+        "MINORISTA_ROPA": "Minorista ropa",
+        "MAYORISTA_GENERAL": "Mayorista general",
+        "MINORISTA_ALIMENTOS": "Minorista alimentos",
+        "EMPRESA_SERVICIOS": "Empresa servicios",
+        "RETAIL_POS": "Retail POS"
+      },
+      "pricing": {
+        "title": "Precio estimado mensual",
+        "plan": "Plan: {{plan}}",
+        "base": "Base del plan: {{amount}}",
+        "noAddons": "Sin módulos de pago activos.",
+        "total": "Total estimado: {{amount}} / mes",
+        "disclaimer": "Estimación sin facturación; la sincronización con suscripción estará disponible más adelante."
+      },
+      "trial": {
+        "section": "Modo trial",
+        "moduleLabel": "Módulo",
+        "modulePlaceholder": "Elegir módulo de pago…",
+        "daysLabel": "Días de trial",
+        "activate": "Activar trial",
+        "deactivate": "Finalizar trial",
+        "badge": "Trial — vence en {{days}} días",
+        "confirmActivate": "¿Activar trial para este módulo? Se habilitará en la configuración del tenant.",
+        "confirmDeactivate": "¿Finalizar el trial de este módulo?",
+        "activateReason": "module_trial_activate:{{module}}",
+        "errors": {
+          "activateFailed": "No se pudo activar el trial.",
+          "deactivateFailed": "No se pudo finalizar el trial."
+        }
+      },
+      "errors": {
+        "loadFailed": "No se pudo cargar la configuración de módulos.",
+        "saveFailed": "No se pudo guardar la configuración.",
+        "presetFailed": "No se pudo aplicar la plantilla.",
+        "reasonRequired": "Indique el motivo del cambio.",
+        "invalidModuleSet": "Conjunto de módulos inválido."
+      }
+    },
+    "status": {
+      "active": "Activo",
+      "suspended": "Suspendido"
+    },
+    "stats": {
+      "activeTenants": "Tenants activos",
+      "totalTenants": "Total tenants",
+      "facturasToday": "Facturas hoy (global)",
+      "totalUsers": "Usuarios totales"
+    },
+    "columns": {
+      "name": "Nombre",
+      "slug": "Slug",
+      "plan": "Plan",
+      "users": "Usuarios",
+      "invoices": "Facturas",
+      "status": "Estado",
+      "actions": "Acciones"
+    },
+    "detail": {
+      "status": "Estado",
+      "plan": "Plan",
+      "modulesCount": "Módulos habilitados",
+      "lastActivity": "Última actividad",
+      "createdAt": "Creado",
+      "configUpdated": "Config actualizada",
+      "statsSection": "Estadísticas agregadas",
+      "statUsers": "{{count}} usuarios",
+      "statInvoices": "{{count}} facturas",
+      "statOrders": "{{count}} pedidos",
+      "statClients": "{{count}} clientes"
+    },
+    "errors": {
+      "loadFailed": "No se pudieron cargar los datos de plataforma.",
+      "patchFailed": "No se pudo actualizar el estado del tenant.",
+      "invalidId": "Identificador de tenant inválido.",
+      "notFound": "Tenant no encontrado."
+    }
+  },
   "dashboard": {
     "title": "Resumen del día",
     "ventasHoy": "Ventas del día",
     "facturasVencidas": "Facturas vencidas",
+    "facturasPagarVencidas": "A pagar — vencidas",
+    "facturasPagarProximas": "A pagar — próximas",
     "cobrosHoy": "Cobros del día",
     "alertasActivas": "Alertas activas",
     "invoices": "{{count}} factura",

@@ -42,18 +42,21 @@ model DeliveryZone {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  clientes Cliente[]
+  clientes      Cliente[]
+  ordenesEntrega OrdenEntrega[]
 
   @@index([tenantId])
 }
 
 model Cliente {
   id             Int      @id @default(autoincrement())
-  codigo         Int      @unique
+  tenantId       Int
+  tenant         Tenant   @relation(fields: [tenantId], references: [id])
+  codigo         Int
   rsocial        String   @db.VarChar(30)
   fantasia       String?  @db.VarChar(30)
   cuit           String?  @db.VarChar(14)
-  condIva        String   @db.VarChar(1) // RI, Mono, CF, Exento
+  condIva        String   @db.VarChar(10) // RI, Mono, CF, Exento (aligned with clienteBodySchema / Zod)
   domicilio      String?  @db.VarChar(40)
   localidad      String?  @db.VarChar(25)
   cpost          String?  @db.VarChar(8)
@@ -62,7 +65,7 @@ model Cliente {
   formaPago      Int?     // FK a FormaPago.id
   activo         Boolean  @default(true)
   // ── Financial fields (Issue #31) ──────────────────────────────────────────
-  creditLimit    Decimal? @db.Decimal(14, 2)         // null = sin límite
+  creditLimit    Decimal? @db.Decimal(14, 2)         // null = sin límite; DB: Cliente_creditLimit_nonneg_check
   creditDays     Int      @default(0)                 // días de plazo habituales
   balance        Decimal  @db.Decimal(14, 2) @default(0)  // saldo acumulado
   balanceInicial Decimal  @db.Decimal(14, 2) @default(0)  // saldo al migrar datos
@@ -75,20 +78,35 @@ model Cliente {
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
-  facturas Factura[]
+  facturas       Factura[]
+  pedidos        Pedido[]
+  cobros         Cobro[]
+  ordenesEntrega OrdenEntrega[]
+
+  @@unique([tenantId, codigo])
+  @@index([tenantId])
+  @@index([tenantId, codigo])
 }
 
 model Rubro {
-  id    Int    @id @default(autoincrement())
-  codigo Int   @unique
-  nombre String @db.VarChar(20)
+  id       Int    @id @default(autoincrement())
+  tenantId Int
+  tenant   Tenant @relation(fields: [tenantId], references: [id])
+  codigo   Int
+  nombre   String @db.VarChar(20)
 
   articulos Articulo[]
+
+  @@unique([tenantId, codigo])
+  @@index([tenantId])
+  @@index([tenantId, codigo])
 }
 
 model Articulo {
   id           Int    @id @default(autoincrement())
-  codigo       Int    @unique
+  tenantId     Int
+  tenant       Tenant @relation(fields: [tenantId], references: [id])
+  codigo       Int
   descripcion  String @db.VarChar(30)
   rubroId      Int
   rubro        Rubro  @relation(fields: [rubroId], references: [id])
@@ -97,24 +115,273 @@ model Articulo {
   precioLista1 Decimal @db.Decimal(14, 2)
   precioLista2 Decimal @db.Decimal(14, 2)
   costo        Decimal @db.Decimal(13, 2)
-  stock        Int    @default(0)
-  minimo       Int    @default(0)
+  stock        Int    @default(0) // DB: Articulo_stock_nonneg_check
+  minimo       Int    @default(0) // DB: Articulo_minimo_nonneg_check
   activo       Boolean @default(true)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  facturaItems FacturaItem[]
+  facturaItems     FacturaItem[]
+  pedidoItems      PedidoItem[]
+  stockAjustes     StockAjuste[]
+  ordenCompraItems     OrdenCompraItem[]
+  recuentoItems        RecuentoItem[]
+  proveedorArticulos   ProveedorArticulo[]
+
+  @@unique([tenantId, codigo])
+  @@index([tenantId])
+  @@index([tenantId, codigo])
+  @@index([tenantId, rubroId])
+}
+
+model Proveedor {
+  id        Int      @id @default(autoincrement())
+  tenantId  Int
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+  codigo    Int
+  rsocial   String   @db.VarChar(30)
+  fantasia  String?  @db.VarChar(30)
+  cuit      String?  @db.VarChar(14)
+  condIva   String   @db.VarChar(10)
+  telef     String?  @db.VarChar(25)
+  email     String?  @db.VarChar(50)
+  activo    Boolean  @default(true)
+  cbu            String?  @db.VarChar(22)
+  alias          String?  @db.VarChar(20)
+  banco          String?  @db.VarChar(50)
+  tipoCuenta     String?  @db.VarChar(2)
+  moneda         String   @default("ARS") @db.VarChar(3)
+  condicionPago  String?  @db.VarChar(10)
+  plazoHabitual  Int?
+  descuentoPct   Decimal? @db.Decimal(5, 2)
+  limiteCredito  Decimal? @db.Decimal(14, 2)
+  categoria      String?  @db.VarChar(20)
+  contactoNombre String?  @db.VarChar(50)
+  contactoEmail  String?  @db.VarChar(50)
+  contactoTel    String?  @db.VarChar(25)
+  notas          String?  @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  ordenesCompra            OrdenCompra[]
+  comprobantesCompra       ComprobanteCompra[]
+  movimientosCuentaCorriente MovimientoProveedorCC[]
+  recibosPago              ReciboPago[]
+  catalogoArticulos        ProveedorArticulo[]
+
+  @@unique([tenantId, codigo])
+  @@index([tenantId])
+  @@index([tenantId, codigo])
+  @@index([tenantId, activo])
+  @@index([tenantId, categoria])
+}
+
+/// Supplier-specific product codes and list prices (#273).
+model ProveedorArticulo {
+  id               Int       @id @default(autoincrement())
+  tenantId         Int
+  tenant           Tenant    @relation(fields: [tenantId], references: [id])
+  proveedorId      Int
+  proveedor        Proveedor @relation(fields: [proveedorId], references: [id])
+  articuloId       Int
+  articulo         Articulo  @relation(fields: [articuloId], references: [id])
+  codigoProveedor  String    @db.VarChar(50)
+  descripcion      String?   @db.VarChar(120)
+  precioLista      Decimal?  @db.Decimal(14, 2)
+  precioListaFecha DateTime?
+  unidadCompra     String?   @db.VarChar(30)
+  multiplo         Decimal   @default(1) @db.Decimal(10, 2)
+  activo           Boolean   @default(true)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  @@unique([tenantId, proveedorId, articuloId])
+  @@unique([tenantId, proveedorId, codigoProveedor])
+  @@index([tenantId, proveedorId])
+  @@index([tenantId, articuloId])
+}
+
+model OrdenCompra {
+  id            Int      @id @default(autoincrement())
+  tenantId      Int
+  tenant        Tenant   @relation(fields: [tenantId], references: [id])
+  proveedorId   Int
+  proveedor     Proveedor @relation(fields: [proveedorId], references: [id])
+  /// draft | sent | received | cancelled
+  estado        String   @db.VarChar(20) @default("draft")
+  total         Decimal  @db.Decimal(14, 2) @default(0)
+  fechaEstimada DateTime?
+  nota          String?  @db.VarChar(200)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  items              OrdenCompraItem[]
+  comprobantesCompra ComprobanteCompra[]
+
+  @@index([tenantId, estado])
+  @@index([tenantId, proveedorId])
+}
+
+/// Supplier fiscal voucher for Libro IVA Compras (#306, ADR-0014).
+model ComprobanteCompra {
+  id            Int         @id @default(autoincrement())
+  tenantId      Int
+  tenant        Tenant      @relation(fields: [tenantId], references: [id])
+  proveedorId   Int
+  proveedor     Proveedor   @relation(fields: [proveedorId], references: [id])
+  ordenCompraId Int?
+  ordenCompra   OrdenCompra? @relation(fields: [ordenCompraId], references: [id])
+  fecha         DateTime
+  /// Explicit due date; when null, derived from proveedor plazo (#275).
+  vencimiento   DateTime?
+  tipo          String      @db.VarChar(1)
+  prefijo       String      @db.VarChar(4)
+  numero        Int
+  neto1         Decimal     @db.Decimal(14, 2) @default(0)
+  neto2         Decimal     @db.Decimal(14, 2) @default(0)
+  neto3         Decimal     @db.Decimal(14, 2) @default(0)
+  iva1          Decimal     @db.Decimal(14, 2) @default(0)
+  iva2          Decimal     @db.Decimal(14, 2) @default(0)
+  total         Decimal     @db.Decimal(14, 2) @default(0)
+  cae           String?     @db.VarChar(20)
+  caeVto        DateTime?
+  /// A=active (included in libro compras)
+  estado        String      @db.VarChar(1) @default("A")
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  movimientoCuentaCorriente MovimientoProveedorCC?
+  reciboPagoFacturas       ReciboPagoFactura[]
+  alertasProveedor         AlertaProveedorLog[]
+  documentoImportado       DocumentoCompraImportado?
+
+  @@unique([tenantId, tipo, prefijo, numero])
+  @@index([tenantId, fecha])
+  @@index([tenantId, proveedorId])
+  @@index([tenantId, estado, fecha])
+}
+
+/// Imported purchase document (PDF/image) pending review (#277).
+model DocumentoCompraImportado {
+  id                  Int                @id @default(autoincrement())
+  tenantId            Int
+  tenant              Tenant             @relation(fields: [tenantId], references: [id])
+  usuarioId           Int
+  usuario             AppUser            @relation(fields: [usuarioId], references: [id])
+  archivoNombre       String             @db.VarChar(255)
+  archivoMime         String             @db.VarChar(100)
+  archivoPath         String             @db.VarChar(500)
+  tipoArchivo         String             @db.VarChar(10)
+  tier                Int                @default(0)
+  confianza           Decimal            @db.Decimal(3, 2) @default(0)
+  /// procesando | pendiente_revision | confirmado | descartado
+  estado              String             @db.VarChar(30)
+  datosExtraidos      Json
+  comprobanteCompraId Int?               @unique
+  comprobanteCompra   ComprobanteCompra? @relation(fields: [comprobanteCompraId], references: [id])
+  errores             Json?
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @updatedAt
+
+  @@index([tenantId, estado])
+  @@index([tenantId, usuarioId])
+}
+
+model OrdenCompraItem {
+  id                   Int         @id @default(autoincrement())
+  ordenCompraId        Int
+  ordenCompra          OrdenCompra @relation(fields: [ordenCompraId], references: [id], onDelete: Cascade)
+  articuloId           Int
+  articulo             Articulo    @relation(fields: [articuloId], references: [id])
+  /// Supplier catalog code snapshot at PO create/update (#323).
+  codigoProveedor      String?     @db.VarChar(50)
+  /// Supplier catalog description snapshot at PO create/update (#323).
+  descripcionProveedor String?     @db.VarChar(120)
+  cantidad             Int
+  cantidadRecibida     Int         @default(0)
+  costoUnitario        Decimal     @db.Decimal(14, 2)
+  subtotal             Decimal     @db.Decimal(14, 2)
+
+  @@index([ordenCompraId])
+  @@index([articuloId])
+}
+
+model Recuento {
+  id         Int       @id @default(autoincrement())
+  tenantId   Int
+  tenant     Tenant    @relation(fields: [tenantId], references: [id])
+  operadorId Int
+  operador   AppUser   @relation("RecuentoOperador", fields: [operadorId], references: [id])
+  /// in_progress | closed
+  estado     String    @db.VarChar(20) @default("in_progress")
+  fecha      DateTime  @default(now())
+  closedAt   DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  items RecuentoItem[]
+
+  @@index([tenantId, estado])
+}
+
+model RecuentoItem {
+  id          Int      @id @default(autoincrement())
+  recuentoId  Int
+  recuento    Recuento @relation(fields: [recuentoId], references: [id], onDelete: Cascade)
+  articuloId  Int
+  articulo    Articulo @relation(fields: [articuloId], references: [id])
+  cantSistema Int
+  cantFisica  Int?
+
+  @@unique([recuentoId, articuloId])
+  @@index([recuentoId])
+  @@index([articuloId])
 }
 
 model FormaPago {
-  id    Int    @id @default(autoincrement())
-  codigo Int   @unique
-  descripcion String @db.VarChar(25)
-  vto_dias Int  @default(0)
+  id          Int     @id @default(autoincrement())
+  codigo      Int     @unique
+  descripcion String  @db.VarChar(25)
+  vto_dias    Int     @default(0)
+  cobros      Cobro[]
+}
+
+model Cobro {
+  id          Int       @id @default(autoincrement())
+  tenantId    Int
+  tenant      Tenant    @relation(fields: [tenantId], references: [id])
+  clienteId   Int
+  cliente     Cliente   @relation(fields: [clienteId], references: [id])
+  fecha       DateTime
+  monto       Decimal   @db.Decimal(14, 2)
+  formaPagoId Int?
+  formaPago   FormaPago? @relation(fields: [formaPagoId], references: [id])
+  referencia  String?   @db.VarChar(60)
+  nota        String?   @db.VarChar(200)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  retencionesAplicadas RetencionAplicada[]
+
+  @@index([tenantId, clienteId])
+  @@index([tenantId, fecha])
+}
+
+model CobroRecordatorio {
+  id        Int      @id @default(autoincrement())
+  tenantId  Int
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+  facturaId Int
+  factura   Factura  @relation(fields: [facturaId], references: [id])
+  canal     String   @db.VarChar(20)
+  enviadoAt DateTime @default(now())
+
+  @@index([tenantId, facturaId, enviadoAt])
 }
 
 model Factura {
   id        Int       @id @default(autoincrement())
+  tenantId  Int
+  tenant    Tenant    @relation(fields: [tenantId], references: [id])
   fecha     DateTime
   tipo      String    @db.VarChar(1) // A, B, C, X
   prefijo   String    @db.VarChar(4)
@@ -130,13 +397,84 @@ model Factura {
   total     Decimal   @db.Decimal(14, 2) @default(0)
 
   formaPagoId Int?
+  cae           String?   @db.VarChar(20)
+  caeVto        DateTime?
+  estadoCae     String    @db.VarChar(20) @default("pending")
   estado    String    @db.VarChar(1) @default("A") // A=activa, A=anulada
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 
-  items FacturaItem[]
+  items          FacturaItem[]
+  ordenesEntrega OrdenEntrega[]
+  recordatorios  CobroRecordatorio[]
+  pedido         Pedido?
+  notasCredito   NotaCredito[]
+  retencionesAplicadas RetencionAplicada[]
 
-  @@unique([tipo, prefijo, numero])
+  @@unique([tenantId, tipo, prefijo, numero])
+  @@index([tenantId])
+  @@index([tenantId, fecha])
+  @@index([tenantId, estado, fecha])
+  @@index([tenantId, clienteId])
+}
+
+
+/// Credit note issued when voiding an invoice (GitHub #146, ADR-0012).
+model NotaCredito {
+  id              Int       @id @default(autoincrement())
+  tenantId        Int
+  tenant          Tenant    @relation(fields: [tenantId], references: [id])
+  facturaOrigenId Int
+  facturaOrigen   Factura   @relation(fields: [facturaOrigenId], references: [id])
+  motivo          String    @db.VarChar(500)
+  monto           Decimal   @db.Decimal(14, 2)
+  cae             String?   @db.VarChar(20)
+  caeVto          DateTime?
+  /// pending | issued | failed | not_required (ADR-0012)
+  estadoCae       String    @db.VarChar(20) @default("pending")
+  createdById     Int?
+  createdBy       AppUser?  @relation("NotaCreditoCreatedBy", fields: [createdById], references: [id])
+  createdAt       DateTime  @default(now())
+
+  @@unique([tenantId, facturaOrigenId])
+  @@index([tenantId, createdAt])
+  @@index([tenantId, facturaOrigenId])
+}
+
+model Pedido {
+  id          Int       @id @default(autoincrement())
+  tenantId    Int
+  tenant      Tenant    @relation(fields: [tenantId], references: [id])
+  clienteId   Int
+  cliente     Cliente   @relation(fields: [clienteId], references: [id])
+  vendedorId  Int?
+  vendedor    AppUser?  @relation(fields: [vendedorId], references: [id])
+  /// draft | confirmed | invoiced | cancelled (ADR-0009)
+  estado      String    @db.VarChar(20)
+  total       Decimal   @db.Decimal(14, 2) @default(0)
+  validUntil  DateTime?
+  facturaId   Int?      @unique
+  factura     Factura?  @relation(fields: [facturaId], references: [id])
+  items       PedidoItem[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([tenantId, estado])
+  @@index([tenantId, clienteId])
+}
+
+model PedidoItem {
+  id         Int     @id @default(autoincrement())
+  pedidoId   Int
+  pedido     Pedido  @relation(fields: [pedidoId], references: [id], onDelete: Cascade)
+  articuloId Int
+  articulo   Articulo @relation(fields: [articuloId], references: [id])
+  cantidad   Int     @default(1)
+  precio     Decimal @db.Decimal(14, 2)
+  dscto      Decimal @db.Decimal(5, 2) @default(0)
+  subtotal   Decimal @db.Decimal(14, 2)
+
+  createdAt DateTime @default(now())
 }
 
 model FacturaItem {
@@ -156,10 +494,40 @@ model FacturaItem {
 }
 
 model ParamEmpresa {
-  id        Int     @id @default(autoincrement())
-  nombre    String  @db.VarChar(40)
-  cuit      String  @db.VarChar(14)
-  domicilio String? @db.VarChar(40)
+  id          Int     @id @default(autoincrement())
+  tenantId    Int     @unique
+  tenant      Tenant  @relation(fields: [tenantId], references: [id])
+  nombre      String  @db.VarChar(40)
+  cuit        String  @db.VarChar(14)
+  domicilio   String? @db.VarChar(40)
+  puntoVenta  Int     @default(1)
+  tipoFactura String  @db.VarChar(1) @default("B")
+  logoUrl     String? @db.VarChar(255)
+  recordatorioDiasGracia Int @default(0)
+  /// IANA timezone for collection reminders (e.g. America/Argentina/Buenos_Aires)
+  timezone    String  @default("America/Argentina/Buenos_Aires") @db.VarChar(64)
+  /// Business-hour window start (0–23, tenant local) for reminder job
+  recordatorioHoraInicio Int @default(8)
+  /// Business-hour window end exclusive (1–24, tenant local)
+  recordatorioHoraFin    Int @default(18)
+  /// Issuer VAT condition (RI, Mono, CF, Exento) — invoice PDF header (#148)
+  condicionIva           String   @default("RI") @db.VarChar(10)
+  /// Gross income registration (optional, PDF header)
+  ingresosBrutos         String?  @db.VarChar(30)
+  /// Activity start date (optional, PDF header)
+  fechaInicioActividades DateTime? @db.Date
+}
+
+model TenantFiscalConfig {
+  id            Int      @id @default(autoincrement())
+  tenantId      Int      @unique
+  tenant        Tenant   @relation(fields: [tenantId], references: [id])
+  cuit          String   @db.VarChar(14)
+  certEncrypted String   @db.Text
+  keyEncrypted  String   @db.Text
+  ambiente      String   @db.VarChar(20) @default("homologacion")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
 
 model Tenant {
@@ -175,6 +543,208 @@ model Tenant {
   notifications  Notification[]
   deliveryZones  DeliveryZone[]
   chatMessages   ChatMessage[]
+  clientes       Cliente[]
+  rubros         Rubro[]
+  articulos      Articulo[]
+  proveedores         Proveedor[]
+  ordenesCompra       OrdenCompra[]
+  comprobantesCompra       ComprobanteCompra[]
+  movimientosProveedorCC   MovimientoProveedorCC[]
+  recibosPago              ReciboPago[]
+  alertaProveedorConfig    AlertaProveedorConfig?
+  alertasProveedorLog      AlertaProveedorLog[]
+  proveedorArticulos       ProveedorArticulo[]
+  documentosCompraImportados DocumentoCompraImportado[]
+  facturas       Factura[]
+  notasCredito   NotaCredito[]
+  pedidos        Pedido[]
+  cobros         Cobro[]
+  cobroRecordatorios CobroRecordatorio[]
+  ordenesEntrega OrdenEntrega[]
+  repartos       Reparto[]
+  paramEmpresa   ParamEmpresa?
+  fiscalConfig   TenantFiscalConfig?
+  stockAjustes   StockAjuste[]
+  recuentos      Recuento[]
+  tenantConfig   TenantConfig?
+  moduleTrials   TenantModuleTrial[]
+  tenantPlan     TenantPlan?
+  fiscalRetencionesConfig FiscalRetencionesConfig?
+  regimenesRetencion      RegimenRetencion[]
+  retencionesAplicadas    RetencionAplicada[]
+}
+
+model Plan {
+  id                  Int      @id @default(autoincrement())
+  key                 String   @unique @db.VarChar(20)
+  name                String   @db.VarChar(80)
+  monthlyPrice        Int      @default(0)
+  currency            String   @db.VarChar(3) @default("ARS")
+  maxUsers            Int?
+  maxInvoicesPerMonth Int?
+  features            Json     @default("[]")
+  active              Boolean  @default(true)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  tenantPlans TenantPlan[]
+}
+
+model TenantPlan {
+  id          Int       @id @default(autoincrement())
+  tenantId    Int       @unique
+  tenant      Tenant    @relation(fields: [tenantId], references: [id])
+  planId      Int
+  plan        Plan      @relation(fields: [planId], references: [id])
+  status      String    @db.VarChar(20) @default("active")
+  startedAt   DateTime  @default(now())
+  endsAt      DateTime?
+  changedById Int?
+  changedBy   AppUser?  @relation("TenantPlanChangedBy", fields: [changedById], references: [id])
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([tenantId])
+  @@index([planId])
+}
+
+model TenantConfig {
+  id            Int      @id @default(autoincrement())
+  tenantId      Int      @unique
+  tenant        Tenant   @relation(fields: [tenantId], references: [id])
+  businessType  String   @db.VarChar(20) @default("ambos")
+  rubros        String[] @default([])
+  plan          String   @db.VarChar(20) @default("starter")
+  modules       String[]
+  integrations  String[] @default([])
+  updatedById   Int?
+  updatedBy     AppUser? @relation("TenantConfigUpdatedBy", fields: [updatedById], references: [id])
+  updatedAt     DateTime @updatedAt
+  createdAt     DateTime @default(now())
+
+  @@index([tenantId])
+}
+
+model TenantModuleTrial {
+  id        Int      @id @default(autoincrement())
+  tenantId  Int
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+  moduleKey String   @db.VarChar(80)
+  expiresAt DateTime
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  @@unique([tenantId, moduleKey])
+  @@index([tenantId, active, expiresAt])
+}
+
+model TenantConfigHistory {
+  id          Int      @id @default(autoincrement())
+  tenantId    Int
+  changedById Int
+  changedBy   AppUser  @relation("TenantConfigHistoryChangedBy", fields: [changedById], references: [id])
+  before      Json
+  after       Json
+  reason      String?  @db.VarChar(500)
+  createdAt   DateTime @default(now())
+
+  @@index([tenantId, createdAt])
+}
+
+model OrdenEntrega {
+  id        Int       @id @default(autoincrement())
+  tenantId  Int
+  tenant    Tenant    @relation(fields: [tenantId], references: [id])
+  facturaId Int?
+  factura   Factura?  @relation(fields: [facturaId], references: [id])
+  clienteId Int
+  cliente   Cliente   @relation(fields: [clienteId], references: [id])
+  zonaId    Int?
+  zona      DeliveryZone? @relation(fields: [zonaId], references: [id])
+  driverId  Int?
+  driver    AppUser?  @relation("OrdenEntregaDriver", fields: [driverId], references: [id])
+  pickerUserId      Int?
+  picker            AppUser?  @relation("OrdenEntregaPicker", fields: [pickerUserId], references: [id])
+  pickingIniciadoAt DateTime?
+  pickingListoAt    DateTime?
+  /// Set when OE transitions to in_transit (physical dispatch); see ADR-0011 (#145).
+  dispatchedAt      DateTime?
+  /// event | estimated — estimated only from legacy backfill (#145).
+  dispatchTimestampSource String? @db.VarChar(20)
+  fecha     DateTime
+  /// pending | picking | ready | assigned | in_transit | delivered | failed | cancelled
+  estado    String    @db.VarChar(20) @default("pending")
+  nota      String?   @db.VarChar(200)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  repartoItems RepartoItem[]
+
+  @@index([tenantId, estado])
+  @@index([tenantId, fecha])
+  @@index([tenantId, driverId])
+  @@index([tenantId, pickerUserId])
+  @@index([tenantId, dispatchedAt])
+}
+
+/// Delivery route grouping delivery orders (#140).
+model Reparto {
+  id            Int       @id @default(autoincrement())
+  tenantId      Int
+  tenant        Tenant    @relation(fields: [tenantId], references: [id])
+  fecha         DateTime
+  choferId      Int
+  chofer        AppUser   @relation("RepartoChofer", fields: [choferId], references: [id])
+  /// planned | on_route | completed | cancelled
+  estado        String    @db.VarChar(20) @default("planned")
+  vehiculo      String?   @db.VarChar(60)
+  observaciones String?   @db.VarChar(500)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  closedAt      DateTime?
+
+  items RepartoItem[]
+  ubicaciones RepartoUbicacion[]
+
+  @@index([tenantId, fecha])
+  @@index([tenantId, estado])
+  @@index([tenantId, choferId])
+}
+
+/// Driver GPS samples for active routes (#144).
+model RepartoUbicacion {
+  id         Int      @id @default(autoincrement())
+  tenantId   Int
+  repartoId  Int
+  reparto    Reparto  @relation(fields: [repartoId], references: [id], onDelete: Cascade)
+  lat        Decimal  @db.Decimal(10, 7)
+  lng        Decimal  @db.Decimal(10, 7)
+  recordedAt DateTime @default(now())
+
+  @@index([repartoId, recordedAt])
+  @@index([tenantId, recordedAt])
+}
+
+model RepartoItem {
+  id               Int          @id @default(autoincrement())
+  repartoId        Int
+  reparto          Reparto      @relation(fields: [repartoId], references: [id], onDelete: Cascade)
+  ordenEntregaId   Int
+  ordenEntrega     OrdenEntrega @relation(fields: [ordenEntregaId], references: [id])
+  secuencia        Int
+  /// pending | delivered | not_delivered | returned
+  estado           String       @db.VarChar(20) @default("pending")
+  entregadoAt      DateTime?
+  /// ausente | rechazo | domicilio_incorrecto | producto_dañado | otro
+  motivoNoEntrega  String?      @db.VarChar(30)
+  receptorNombre   String?      @db.VarChar(120)
+  receptorDni      String?      @db.VarChar(20)
+  notasEntrega     String?      @db.VarChar(500)
+  /// { firmaBase64?, fotoBase64? } — MVP POD media (#142)
+  podMedia         Json?
+
+  @@index([repartoId])
+  @@index([ordenEntregaId])
 }
 
 model AppUser {
@@ -195,9 +765,136 @@ model AppUser {
   sessions      AppSession[]
   auditEvents   AuditEvent[]
   notifications Notification[]
-  chatMessages  ChatMessage[]
+  chatMessagesSent     ChatMessage[] @relation("ChatMessageSender")
+  chatMessagesReceived ChatMessage[] @relation("ChatMessageRecipient")
+  ordenesEntregaDriver OrdenEntrega[] @relation("OrdenEntregaDriver")
+  ordenesEntregaPicker OrdenEntrega[] @relation("OrdenEntregaPicker")
+  repartosChofer       Reparto[]      @relation("RepartoChofer")
+  pedidosVendedor      Pedido[]
+  stockAjustes         StockAjuste[]
+  recuentosOperados    Recuento[]     @relation("RecuentoOperador")
+  tenantConfigsUpdated TenantConfig[] @relation("TenantConfigUpdatedBy")
+  tenantConfigHistory  TenantConfigHistory[] @relation("TenantConfigHistoryChangedBy")
+  tenantPlansChanged   TenantPlan[] @relation("TenantPlanChangedBy")
+  notasCreditoCreated  NotaCredito[] @relation("NotaCreditoCreatedBy")
+  movimientosProveedorCC MovimientoProveedorCC[]
+  recibosPago            ReciboPago[]
+  documentosCompraImportados DocumentoCompraImportado[]
 
   @@unique([tenantId, username])
+}
+
+/// Supplier payable alert settings per tenant (#275).
+model AlertaProveedorConfig {
+  id              Int      @id @default(autoincrement())
+  tenantId        Int      @unique
+  tenant          Tenant   @relation(fields: [tenantId], references: [id])
+  diasPrevioAviso Int      @default(3)
+  diasCritico     Int      @default(7)
+  notifEmail      Boolean  @default(true)
+  notifInApp      Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+/// Dedup log for supplier payable alerts (#275).
+model AlertaProveedorLog {
+  id                  Int               @id @default(autoincrement())
+  tenantId            Int
+  tenant              Tenant            @relation(fields: [tenantId], references: [id])
+  comprobanteCompraId Int
+  comprobanteCompra   ComprobanteCompra @relation(fields: [comprobanteCompraId], references: [id])
+  /// proxima_vencer | vencida_hoy | vencida_critica | limite_credito
+  tipo                String            @db.VarChar(30)
+  enviadoAt           DateTime          @default(now())
+
+  @@index([tenantId, comprobanteCompraId, tipo, enviadoAt])
+}
+
+/// Supplier payment receipt (#271).
+model ReciboPago {
+  id          Int      @id @default(autoincrement())
+  tenantId    Int
+  tenant      Tenant   @relation(fields: [tenantId], references: [id])
+  numero      Int
+  proveedorId Int
+  proveedor   Proveedor @relation(fields: [proveedorId], references: [id])
+  fecha       DateTime
+  total       Decimal  @db.Decimal(14, 2)
+  /// transferencia | cheque | efectivo | echeq
+  metodoPago  String   @db.VarChar(20)
+  cbu         String?  @db.VarChar(22)
+  referencia  String?  @db.VarChar(60)
+  /// emitido | anulado
+  estado      String   @db.VarChar(20) @default("emitido")
+  notas       String?  @db.VarChar(500)
+  usuarioId   Int
+  usuario     AppUser  @relation(fields: [usuarioId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  facturas    ReciboPagoFactura[]
+  movimiento  MovimientoProveedorCC?
+  retencionesAplicadas RetencionAplicada[]
+
+  @@unique([tenantId, numero])
+  @@index([tenantId, proveedorId])
+  @@index([tenantId, proveedorId, fecha])
+}
+
+model ReciboPagoFactura {
+  id                  Int              @id @default(autoincrement())
+  reciboPagoId        Int
+  reciboPago          ReciboPago       @relation(fields: [reciboPagoId], references: [id], onDelete: Cascade)
+  comprobanteCompraId Int?
+  comprobanteCompra   ComprobanteCompra? @relation(fields: [comprobanteCompraId], references: [id])
+  facturaRef          String           @db.VarChar(40)
+  monto               Decimal          @db.Decimal(14, 2)
+
+  @@index([reciboPagoId])
+}
+
+/// Supplier accounts-payable ledger (#270).
+model MovimientoProveedorCC {
+  id                  Int               @id @default(autoincrement())
+  tenantId            Int
+  tenant              Tenant            @relation(fields: [tenantId], references: [id])
+  proveedorId         Int
+  proveedor           Proveedor         @relation(fields: [proveedorId], references: [id])
+  /// factura_compra | pago | nc_proveedor | ajuste
+  tipo                String            @db.VarChar(20)
+  referencia          String?           @db.VarChar(40)
+  /// Positive increases debt; negative reduces debt.
+  monto               Decimal           @db.Decimal(14, 2)
+  saldoPost           Decimal           @db.Decimal(14, 2)
+  fecha               DateTime
+  usuarioId           Int
+  usuario             AppUser           @relation(fields: [usuarioId], references: [id])
+  notas               String?           @db.VarChar(500)
+  comprobanteCompraId Int?              @unique
+  comprobanteCompra   ComprobanteCompra? @relation(fields: [comprobanteCompraId], references: [id])
+  reciboPagoId        Int?              @unique
+  reciboPago          ReciboPago?       @relation(fields: [reciboPagoId], references: [id])
+  createdAt           DateTime          @default(now())
+
+  @@index([tenantId, proveedorId, fecha])
+  @@index([tenantId, proveedorId])
+}
+
+model StockAjuste {
+  id         Int      @id @default(autoincrement())
+  tenantId   Int
+  tenant     Tenant   @relation(fields: [tenantId], references: [id])
+  articuloId Int
+  articulo   Articulo @relation(fields: [articuloId], references: [id])
+  cantidad   Int
+  motivo     String   @db.VarChar(100)
+  userId     Int
+  user       AppUser  @relation(fields: [userId], references: [id])
+  createdAt  DateTime @default(now())
+
+  @@index([tenantId, articuloId])
+  @@index([tenantId, articuloId, createdAt])
 }
 
 model AppSession {
@@ -225,6 +922,8 @@ model AuditEvent {
   ipAddress  String?  @db.VarChar(64)
   metadata   Json?
   createdAt  DateTime @default(now())
+
+  @@index([tenantId, createdAt])
 }
 
 model Notification {
@@ -249,11 +948,78 @@ model ChatMessage {
   tenantId     Int
   tenant       Tenant   @relation(fields: [tenantId], references: [id])
   fromUserId   Int
-  fromUser     AppUser  @relation(fields: [fromUserId], references: [id])
+  fromUser     AppUser  @relation("ChatMessageSender", fields: [fromUserId], references: [id])
+  toUserId     Int
+  toUser       AppUser  @relation("ChatMessageRecipient", fields: [toUserId], references: [id])
   content      String   @db.VarChar(1000)
   createdAt    DateTime @default(now())
 
   @@index([tenantId, createdAt])
+  @@index([tenantId, fromUserId, toUserId, id])
+}
+
+/// Tenant withholding/perception agent flags (#228).
+model FiscalRetencionesConfig {
+  id                          Int      @id @default(autoincrement())
+  tenantId                    Int      @unique
+  tenant                      Tenant   @relation(fields: [tenantId], references: [id])
+  esAgenteRetencionGanancias  Boolean  @default(false)
+  esAgenteRetencionIVA        Boolean  @default(false)
+  esAgenteRetencionIIBB       Boolean  @default(false)
+  createdAt                   DateTime @default(now())
+  updatedAt                   DateTime @updatedAt
+}
+
+/// Configurable withholding/perception regime per tenant (#228).
+model RegimenRetencion {
+  id          Int      @id @default(autoincrement())
+  tenantId    Int
+  tenant      Tenant   @relation(fields: [tenantId], references: [id])
+  /// ganancias | iva | iibb
+  tipo        String   @db.VarChar(20)
+  /// retencion | percepcion
+  subtipo     String   @db.VarChar(20)
+  nombre      String   @db.VarChar(80)
+  alicuota    Decimal  @db.Decimal(8, 4)
+  alicuotaMin Decimal? @db.Decimal(14, 2)
+  provincia   String?  @db.VarChar(10)
+  activo      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  retencionesAplicadas RetencionAplicada[]
+
+  @@index([tenantId, activo])
+  @@index([tenantId, tipo, subtipo])
+}
+
+/// Applied withholding/perception snapshot (#228; wired by #229/#276).
+model RetencionAplicada {
+  id            Int              @id @default(autoincrement())
+  tenantId      Int
+  tenant        Tenant           @relation(fields: [tenantId], references: [id])
+  regimenId     Int
+  regimen       RegimenRetencion @relation(fields: [regimenId], references: [id])
+  /// retencion | percepcion
+  tipo          String           @db.VarChar(20)
+  /// cliente | proveedor
+  entidadTipo   String           @db.VarChar(20)
+  entidadId     Int
+  facturaId     Int?
+  factura       Factura?         @relation(fields: [facturaId], references: [id])
+  cobroId       Int?
+  cobro         Cobro?           @relation(fields: [cobroId], references: [id])
+  reciboPagoId  Int?
+  reciboPago    ReciboPago?      @relation(fields: [reciboPagoId], references: [id])
+  baseImponible Decimal          @db.Decimal(14, 2)
+  alicuota      Decimal          @db.Decimal(8, 4)
+  importe       Decimal          @db.Decimal(14, 2)
+  constanciaNum String?          @db.VarChar(30)
+  createdAt     DateTime         @default(now())
+
+  @@index([tenantId, createdAt])
+  @@index([tenantId, entidadTipo, entidadId])
+  @@index([tenantId, tipo])
 }
 
 model LoginAttempt {

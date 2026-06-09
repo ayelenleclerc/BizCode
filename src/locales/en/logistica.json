@@ -1,0 +1,63 @@
+{
+  "title": "Delivery logistics",
+  "tabs": {
+    "label": "Logistics sections",
+    "ordenes": "Orders"
+  },
+  "forbidden": "You do not have permission to view delivery orders.",
+  "filters": {
+    "fecha": "Date",
+    "estado": "Status",
+    "zona": "Zone",
+    "allEstados": "All statuses",
+    "allZonas": "All zones"
+  },
+  "estado": {
+    "pending": "Pending",
+    "picking": "Picking",
+    "ready": "Ready",
+    "assigned": "Assigned",
+    "in_transit": "In transit",
+    "delivered": "Delivered",
+    "failed": "Failed",
+    "cancelled": "Cancelled"
+  },
+  "linkPicking": "Warehouse picking",
+  "table": {
+    "cliente": "Customer",
+    "fecha": "Date",
+    "estado": "Status",
+    "zona": "Zone",
+    "driver": "Driver",
+    "actions": "Actions"
+  },
+  "actions": {
+    "refresh": "Refresh",
+    "newOrder": "New order",
+    "assignTransit": "Mark in transit",
+    "markDelivered": "Confirm delivery",
+    "markFailed": "Mark failed"
+  },
+  "empty": "No delivery orders for the selected filters.",
+  "loading": "Loading orders…",
+  "errors": {
+    "load": "Could not load delivery orders.",
+    "save": "Could not save the order.",
+    "transition": "Could not update order status."
+  },
+  "form": {
+    "title": "New delivery order",
+    "clienteId": "Customer ID",
+    "fecha": "Delivery date",
+    "zonaId": "Zone ID (optional)",
+    "driverId": "Driver user ID (optional)",
+    "nota": "Notes",
+    "submit": "Create order",
+    "cancel": "Cancel"
+  },
+  "driverView": {
+    "title": "My deliveries today",
+    "confirm": "Confirm delivery",
+    "routeLink": "My route in progress"
+  }
+}
