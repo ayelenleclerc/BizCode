@@ -2775,6 +2775,223 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
 
+  /api/fiscal/regimenes:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [contabilidad]
+      summary: List withholding/perception regimes (#228)
+      description: Requires `finance.retenciones`, `reports.financial.read`.
+      parameters:
+        - name: activo
+          in: query
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Regime list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegimenRetencionListEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    post:
+      tags: [contabilidad]
+      summary: Create withholding/perception regime (#228)
+      description: Requires `finance.retenciones`, `settings.fiscal.manage`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegimenRetencionInput'
+      responses:
+        '201':
+          description: Regime created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegimenRetencionEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/fiscal/regimenes/{id}:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    put:
+      tags: [contabilidad]
+      summary: Update withholding/perception regime (#228)
+      description: Requires `finance.retenciones`, `settings.fiscal.manage`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegimenRetencionUpdateInput'
+      responses:
+        '200':
+          description: Regime updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegimenRetencionEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Regime not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/fiscal/config-retenciones:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [contabilidad]
+      summary: Tenant withholding agent flags (#228)
+      description: Requires `finance.retenciones`, `settings.fiscal.manage`.
+      responses:
+        '200':
+          description: Agent config
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FiscalRetencionesConfigEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    put:
+      tags: [contabilidad]
+      summary: Upsert tenant withholding agent flags (#228)
+      description: Requires `finance.retenciones`, `settings.fiscal.manage`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FiscalRetencionesConfigInput'
+      responses:
+        '200':
+          description: Config saved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FiscalRetencionesConfigEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/fiscal/retenciones:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [contabilidad]
+      summary: Applied withholdings/perceptions history (#228)
+      description: Requires `finance.retenciones`, `reports.financial.read`. Paginated list.
+      parameters:
+        - name: from
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: to
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: tipo
+          in: query
+          schema:
+            type: string
+        - $ref: '#/components/parameters/ListLimit'
+        - $ref: '#/components/parameters/ListOffset'
+      responses:
+        '200':
+          description: Paginated applied withholdings
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetencionAplicadaListEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/fiscal/retenciones/preview:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: entidadTipo
+        in: query
+        required: true
+        schema:
+          type: string
+          enum: [cliente, proveedor]
+      - name: entidadId
+        in: query
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+      - name: monto
+        in: query
+        required: true
+        schema:
+          type: number
+          exclusiveMinimum: 0
+    get:
+      tags: [contabilidad]
+      summary: Preview withholdings stub (#228; calculation in #229)
+      description: Requires `finance.retenciones`, `reports.financial.read`. Returns empty list until #229.
+      responses:
+        '200':
+          description: Preview result (stub)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetencionesPreviewEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
   /api/pedidos:
     parameters:
       - $ref: '#/components/parameters/BizcodeChannelHeader'
@@ -9188,6 +9405,251 @@ components:
           const: true
         data:
           $ref: '#/components/schemas/DocumentoCompraDuplicadoResult'
+
+    RegimenRetencion:
+      type: object
+      required:
+        - id
+        - tenantId
+        - tipo
+        - subtipo
+        - nombre
+        - alicuota
+        - alicuotaMin
+        - provincia
+        - activo
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: integer
+          minimum: 1
+        tenantId:
+          type: integer
+          minimum: 1
+        tipo:
+          type: string
+          enum: [ganancias, iva, iibb]
+        subtipo:
+          type: string
+          enum: [retencion, percepcion]
+        nombre:
+          type: string
+        alicuota:
+          type: string
+        alicuotaMin:
+          type: ['string', 'null']
+        provincia:
+          type: ['string', 'null']
+        activo:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    RegimenRetencionInput:
+      type: object
+      required: [tipo, subtipo, nombre, alicuota]
+      properties:
+        tipo:
+          type: string
+          enum: [ganancias, iva, iibb]
+        subtipo:
+          type: string
+          enum: [retencion, percepcion]
+        nombre:
+          type: string
+          minLength: 1
+          maxLength: 80
+        alicuota:
+          type: number
+          minimum: 0
+          maximum: 100
+        alicuotaMin:
+          type: ['number', 'null']
+          minimum: 0
+        provincia:
+          type: ['string', 'null']
+          maxLength: 10
+        activo:
+          type: boolean
+
+    RegimenRetencionUpdateInput:
+      type: object
+      properties:
+        nombre:
+          type: string
+          minLength: 1
+          maxLength: 80
+        alicuota:
+          type: number
+          minimum: 0
+          maximum: 100
+        alicuotaMin:
+          type: ['number', 'null']
+          minimum: 0
+        provincia:
+          type: ['string', 'null']
+          maxLength: 10
+        activo:
+          type: boolean
+
+    RegimenRetencionEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/RegimenRetencion'
+
+    RegimenRetencionListEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/RegimenRetencion'
+
+    FiscalRetencionesConfig:
+      type: object
+      required:
+        - esAgenteRetencionGanancias
+        - esAgenteRetencionIVA
+        - esAgenteRetencionIIBB
+      properties:
+        esAgenteRetencionGanancias:
+          type: boolean
+        esAgenteRetencionIVA:
+          type: boolean
+        esAgenteRetencionIIBB:
+          type: boolean
+
+    FiscalRetencionesConfigInput:
+      type: object
+      properties:
+        esAgenteRetencionGanancias:
+          type: boolean
+        esAgenteRetencionIVA:
+          type: boolean
+        esAgenteRetencionIIBB:
+          type: boolean
+
+    FiscalRetencionesConfigEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/FiscalRetencionesConfig'
+
+    RetencionAplicada:
+      type: object
+      required:
+        - id
+        - regimenId
+        - regimenNombre
+        - tipo
+        - entidadTipo
+        - entidadId
+        - baseImponible
+        - alicuota
+        - importe
+        - createdAt
+      properties:
+        id:
+          type: integer
+          minimum: 1
+        regimenId:
+          type: integer
+          minimum: 1
+        regimenNombre:
+          type: string
+        tipo:
+          type: string
+        entidadTipo:
+          type: string
+          enum: [cliente, proveedor]
+        entidadId:
+          type: integer
+          minimum: 1
+        facturaId:
+          type: ['integer', 'null']
+          minimum: 1
+        cobroId:
+          type: ['integer', 'null']
+          minimum: 1
+        reciboPagoId:
+          type: ['integer', 'null']
+          minimum: 1
+        baseImponible:
+          type: string
+        alicuota:
+          type: string
+        importe:
+          type: string
+        constanciaNum:
+          type: ['string', 'null']
+        createdAt:
+          type: string
+          format: date-time
+
+    RetencionAplicadaListEnvelope:
+      allOf:
+        - type: object
+          required: [success, data]
+          properties:
+            success:
+              type: boolean
+              const: true
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/RetencionAplicada'
+        - $ref: '#/components/schemas/ListPaginationMeta'
+
+    RetencionesPreviewResult:
+      type: object
+      required: [retenciones]
+      properties:
+        retenciones:
+          type: array
+          items:
+            type: object
+            required: [regimenId, nombre, tipo, alicuota, baseImponible, importe]
+            properties:
+              regimenId:
+                type: integer
+              nombre:
+                type: string
+              tipo:
+                type: string
+              alicuota:
+                type: string
+              baseImponible:
+                type: string
+              importe:
+                type: string
+
+    RetencionesPreviewEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/RetencionesPreviewResult'
 
     DocumentoCompraTemplateSummary:
       type: object

@@ -25,6 +25,7 @@ const TEST_DEFAULT_MODULES: ModuleKey[] = [
   'billing.credit_notes',
   'billing.arca_cae',
   'finance.ledger',
+  'finance.retenciones',
   'logistics.purchases',
 ]
 

@@ -390,6 +390,64 @@ function buildPrisma(): PrismaClient {
         updatedAt: new Date(),
       }),
     },
+    regimenRetencion: {
+      findMany: vi.fn().mockResolvedValue([]),
+      create: vi.fn().mockResolvedValue({
+        id: 1,
+        tenantId: 1,
+        tipo: 'ganancias',
+        subtipo: 'retencion',
+        nombre: 'Ganancias',
+        alicuota: new Decimal(4.5),
+        alicuotaMin: null,
+        provincia: null,
+        activo: true,
+        createdAt: new Date('2026-06-01T00:00:00.000Z'),
+        updatedAt: new Date('2026-06-01T00:00:00.000Z'),
+      }),
+      findFirst: vi.fn().mockResolvedValue({
+        id: 1,
+        tenantId: 1,
+        tipo: 'ganancias',
+        subtipo: 'retencion',
+        nombre: 'Ganancias',
+        alicuota: new Decimal(4.5),
+        alicuotaMin: null,
+        provincia: null,
+        activo: true,
+        createdAt: new Date('2026-06-01T00:00:00.000Z'),
+        updatedAt: new Date('2026-06-01T00:00:00.000Z'),
+      }),
+      update: vi.fn().mockResolvedValue({
+        id: 1,
+        tenantId: 1,
+        tipo: 'ganancias',
+        subtipo: 'retencion',
+        nombre: 'Ganancias',
+        alicuota: new Decimal(4.5),
+        alicuotaMin: null,
+        provincia: null,
+        activo: false,
+        createdAt: new Date('2026-06-01T00:00:00.000Z'),
+        updatedAt: new Date('2026-06-01T00:00:00.000Z'),
+      }),
+    },
+    fiscalRetencionesConfig: {
+      findUnique: vi.fn().mockResolvedValue(null),
+      upsert: vi.fn().mockResolvedValue({
+        id: 1,
+        tenantId: 1,
+        esAgenteRetencionGanancias: true,
+        esAgenteRetencionIVA: false,
+        esAgenteRetencionIIBB: false,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      }),
+    },
+    retencionAplicada: {
+      count: vi.fn().mockResolvedValue(0),
+      findMany: vi.fn().mockResolvedValue([]),
+    },
     comprobanteCompra: {
       findMany: vi.fn().mockResolvedValue([]),
       findFirst: vi.fn().mockResolvedValue(null),
@@ -1351,6 +1409,52 @@ describe('API — contrato OpenAPI', () => {
     const res = await request(app).get('/api/documentos-compra/cola').expect(200)
     await assertMatchesOpenApi('/api/documentos-compra/cola', 'get', '200', res.body)
     expect(res.body.data.procesando).toBe(0)
+  })
+
+  it('GET /api/fiscal/regimenes', async () => {
+    const app = createApp(prisma)
+    const res = await request(app).get('/api/fiscal/regimenes').expect(200)
+    await assertMatchesOpenApi('/api/fiscal/regimenes', 'get', '200', res.body)
+    expect(Array.isArray(res.body.data)).toBe(true)
+  })
+
+  it('POST /api/fiscal/regimenes', async () => {
+    const app = createApp(prisma)
+    const res = await request(app)
+      .post('/api/fiscal/regimenes')
+      .send({
+        tipo: 'ganancias',
+        subtipo: 'retencion',
+        nombre: 'Ganancias servicios',
+        alicuota: 4.5,
+      })
+      .expect(201)
+    await assertMatchesOpenApi('/api/fiscal/regimenes', 'post', '201', res.body)
+    expect(res.body.data.id).toBe(1)
+  })
+
+  it('GET /api/fiscal/config-retenciones', async () => {
+    const app = createApp(prisma)
+    const res = await request(app).get('/api/fiscal/config-retenciones').expect(200)
+    await assertMatchesOpenApi('/api/fiscal/config-retenciones', 'get', '200', res.body)
+    expect(res.body.data.esAgenteRetencionGanancias).toBe(false)
+  })
+
+  it('GET /api/fiscal/retenciones', async () => {
+    const app = createApp(prisma)
+    const res = await request(app).get('/api/fiscal/retenciones').expect(200)
+    await assertMatchesOpenApi('/api/fiscal/retenciones', 'get', '200', res.body)
+    expect(res.body.total).toBe(0)
+  })
+
+  it('GET /api/fiscal/retenciones/preview', async () => {
+    const app = createApp(prisma)
+    const res = await request(app)
+      .get('/api/fiscal/retenciones/preview')
+      .query({ entidadTipo: 'proveedor', entidadId: 1, monto: 1000 })
+      .expect(200)
+    await assertMatchesOpenApi('/api/fiscal/retenciones/preview', 'get', '200', res.body)
+    expect(res.body.data.retenciones).toEqual([])
   })
 
   it('GET /api/documentos-compra/templates', async () => {

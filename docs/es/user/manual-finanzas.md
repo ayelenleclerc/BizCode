@@ -57,4 +57,8 @@ Con **`finance.ledger`**, debajo de ventas aparece **Contabilidad — Libro IVA 
 
 Las órdenes de compra (`OrdenCompra`) **no** sustituyen comprobantes fiscales de proveedor.
 
+## Retenciones y percepciones (`finance.retenciones`, #228)
+
+Configure regímenes y flags de agente en **Configuración → Empresa → Retenciones y percepciones** (`settings.fiscal.manage`). APIs: `GET/POST/PUT /api/fiscal/regimenes`, `GET/PUT /api/fiscal/config-retenciones`, `GET /api/fiscal/retenciones` (historial), `GET /api/fiscal/retenciones/preview` (vacío hasta #229). La condición IVA de clientes/proveedores usa `condIva` del maestro; consulta Padrón AFIP (#192) no implementada en esta entrega.
+
 **Otros idiomas:** [English](../../en/user/manual-finance.md) · [Português](../../pt-br/user/manual-financas.md)

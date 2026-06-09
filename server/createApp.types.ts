@@ -290,3 +290,29 @@ export type AlertaProveedorConfigInput = {
   notifEmail?: boolean
   notifInApp?: boolean
 }
+
+/** @en Withholding/perception regime (#228). @es Régimen de retención/percepción (#228). @pt-BR Regime de retenção/percepção (#228). */
+export type RegimenRetencionInput = {
+  tipo: 'ganancias' | 'iva' | 'iibb'
+  subtipo: 'retencion' | 'percepcion'
+  nombre: string
+  alicuota: number
+  alicuotaMin?: number | null
+  provincia?: string | null
+  activo?: boolean
+}
+
+export type RegimenRetencionUpdateInput = {
+  nombre?: string
+  alicuota?: number
+  alicuotaMin?: number | null
+  provincia?: string | null
+  activo?: boolean
+}
+
+/** @en Tenant withholding agent flags (#228). @es Flags agente de retención (#228). @pt-BR Flags agente de retenção (#228). */
+export type FiscalRetencionesConfigInput = {
+  esAgenteRetencionGanancias?: boolean
+  esAgenteRetencionIVA?: boolean
+  esAgenteRetencionIIBB?: boolean
+}

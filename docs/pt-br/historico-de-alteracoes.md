@@ -10,7 +10,9 @@ Versionamento: [Semantic Versioning](https://semver.org/).
 
 ### Adicionado
 
-- **Scanner de documentos de compra — Fase G (GitHub #277):** verificação de duplicados por fornecedor (`GET /api/documentos-compra/verificar-duplicado`, alerta proativa na UI, confirmação bloqueada com 409), mapeamento de linhas com buscar/criar/ignorar artigo, OCR `spa+eng+por`, UI de templates YAML (`settings.fiscal.manage`); armazenamento local e estoque em remito diferidos documentados nos manuais.
+- **Modelo de retenções/percepções (#228):** Prisma `RegimenRetencion`, `RetencionAplicada`, `FiscalRetencionesConfig`; API `GET/POST/PUT /api/fiscal/regimenes`, `GET/PUT /api/fiscal/config-retenciones`, `GET /api/fiscal/retenciones`, `GET /api/fiscal/retenciones/preview` (stub até #229); UI em **Configurações → Empresa** (`finance.retenciones`, `settings.fiscal.manage`); OpenAPI, testes de contrato/API, i18n empresa trilíngue.
+
+- **Scanner de documentos de compra — Fase G (GitHub #277):**** verificação de duplicados por fornecedor (`GET /api/documentos-compra/verificar-duplicado`, alerta proativa na UI, confirmação bloqueada com 409), mapeamento de linhas com buscar/criar/ignorar artigo, OCR `spa+eng+por`, UI de templates YAML (`settings.fiscal.manage`); armazenamento local e estoque em remito diferidos documentados nos manuais.
 
 - **Scanner de documentos de compra — Fase F (GitHub #277):** extração de itens (Tier 4 Ollama + parsing em templates), tabela de itens no preview com indicadores de confiança e mapeamento `articuloId`, API confirmar persiste `items[]` em `datosExtraidos`, criação inline de fornecedor a partir de CUIT/CNPJ/RUT extraído, templates YAML Brasil (`generic-nfe-brasil`) e Uruguai (`generic-dgi-uruguay`), captura por câmera no celular; OpenAPI, testes API/UI, manuais de finanças trilíngues.
 

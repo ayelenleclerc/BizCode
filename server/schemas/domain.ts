@@ -1799,6 +1799,43 @@ export const alertaProveedorConfigBodySchema = z
     }
   })
 
+const regimenTipoSchema = z.enum(['ganancias', 'iva', 'iibb'])
+const regimenSubtipoSchema = z.enum(['retencion', 'percepcion'])
+
+export const regimenRetencionBodySchema = z.object({
+  tipo: regimenTipoSchema,
+  subtipo: regimenSubtipoSchema,
+  nombre: z.string().trim().min(1).max(80),
+  alicuota: z.number().min(0).max(100),
+  alicuotaMin: z.number().min(0).nullable().optional(),
+  provincia: z.string().trim().max(10).nullable().optional(),
+  activo: z.boolean().optional(),
+})
+
+export const regimenRetencionUpdateBodySchema = z
+  .object({
+    nombre: z.string().trim().min(1).max(80).optional(),
+    alicuota: z.number().min(0).max(100).optional(),
+    alicuotaMin: z.number().min(0).nullable().optional(),
+    provincia: z.string().trim().max(10).nullable().optional(),
+    activo: z.boolean().optional(),
+  })
+  .refine((data) => Object.keys(data).length > 0, {
+    message: 'At least one field is required',
+  })
+
+export const fiscalRetencionesConfigBodySchema = z.object({
+  esAgenteRetencionGanancias: z.boolean().optional(),
+  esAgenteRetencionIVA: z.boolean().optional(),
+  esAgenteRetencionIIBB: z.boolean().optional(),
+})
+
+export const retencionesPreviewQuerySchema = z.object({
+  entidadTipo: z.enum(['cliente', 'proveedor']),
+  entidadId: z.coerce.number().int().min(1),
+  monto: z.coerce.number().positive(),
+})
+
 export function safeParseBodySchema<S extends z.ZodTypeAny>(schema: S, raw: unknown): SafeParseBodyResult<z.output<S>> {
   const parsed = schema.safeParse(raw)
   if (!parsed.success) {

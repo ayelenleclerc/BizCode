@@ -360,6 +360,7 @@ model Cobro {
   nota        String?   @db.VarChar(200)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+  retencionesAplicadas RetencionAplicada[]
 
   @@index([tenantId, clienteId])
   @@index([tenantId, fecha])
@@ -408,6 +409,7 @@ model Factura {
   recordatorios  CobroRecordatorio[]
   pedido         Pedido?
   notasCredito   NotaCredito[]
+  retencionesAplicadas RetencionAplicada[]
 
   @@unique([tenantId, tipo, prefijo, numero])
   @@index([tenantId])
@@ -567,6 +569,9 @@ model Tenant {
   tenantConfig   TenantConfig?
   moduleTrials   TenantModuleTrial[]
   tenantPlan     TenantPlan?
+  fiscalRetencionesConfig FiscalRetencionesConfig?
+  regimenesRetencion      RegimenRetencion[]
+  retencionesAplicadas    RetencionAplicada[]
 }
 
 model Plan {
@@ -830,6 +835,7 @@ model ReciboPago {
 
   facturas    ReciboPagoFactura[]
   movimiento  MovimientoProveedorCC?
+  retencionesAplicadas RetencionAplicada[]
 
   @@unique([tenantId, numero])
   @@index([tenantId, proveedorId])
@@ -950,6 +956,70 @@ model ChatMessage {
 
   @@index([tenantId, createdAt])
   @@index([tenantId, fromUserId, toUserId, id])
+}
+
+/// Tenant withholding/perception agent flags (#228).
+model FiscalRetencionesConfig {
+  id                          Int      @id @default(autoincrement())
+  tenantId                    Int      @unique
+  tenant                      Tenant   @relation(fields: [tenantId], references: [id])
+  esAgenteRetencionGanancias  Boolean  @default(false)
+  esAgenteRetencionIVA        Boolean  @default(false)
+  esAgenteRetencionIIBB       Boolean  @default(false)
+  createdAt                   DateTime @default(now())
+  updatedAt                   DateTime @updatedAt
+}
+
+/// Configurable withholding/perception regime per tenant (#228).
+model RegimenRetencion {
+  id          Int      @id @default(autoincrement())
+  tenantId    Int
+  tenant      Tenant   @relation(fields: [tenantId], references: [id])
+  /// ganancias | iva | iibb
+  tipo        String   @db.VarChar(20)
+  /// retencion | percepcion
+  subtipo     String   @db.VarChar(20)
+  nombre      String   @db.VarChar(80)
+  alicuota    Decimal  @db.Decimal(8, 4)
+  alicuotaMin Decimal? @db.Decimal(14, 2)
+  provincia   String?  @db.VarChar(10)
+  activo      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  retencionesAplicadas RetencionAplicada[]
+
+  @@index([tenantId, activo])
+  @@index([tenantId, tipo, subtipo])
+}
+
+/// Applied withholding/perception snapshot (#228; wired by #229/#276).
+model RetencionAplicada {
+  id            Int              @id @default(autoincrement())
+  tenantId      Int
+  tenant        Tenant           @relation(fields: [tenantId], references: [id])
+  regimenId     Int
+  regimen       RegimenRetencion @relation(fields: [regimenId], references: [id])
+  /// retencion | percepcion
+  tipo          String           @db.VarChar(20)
+  /// cliente | proveedor
+  entidadTipo   String           @db.VarChar(20)
+  entidadId     Int
+  facturaId     Int?
+  factura       Factura?         @relation(fields: [facturaId], references: [id])
+  cobroId       Int?
+  cobro         Cobro?           @relation(fields: [cobroId], references: [id])
+  reciboPagoId  Int?
+  reciboPago    ReciboPago?      @relation(fields: [reciboPagoId], references: [id])
+  baseImponible Decimal          @db.Decimal(14, 2)
+  alicuota      Decimal          @db.Decimal(8, 4)
+  importe       Decimal          @db.Decimal(14, 2)
+  constanciaNum String?          @db.VarChar(30)
+  createdAt     DateTime         @default(now())
+
+  @@index([tenantId, createdAt])
+  @@index([tenantId, entidadTipo, entidadId])
+  @@index([tenantId, tipo])
 }
 
 model LoginAttempt {

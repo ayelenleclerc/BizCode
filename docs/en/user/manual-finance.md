@@ -57,4 +57,8 @@ With **`finance.ledger`**, an **Accounting — VAT purchases book** section appe
 
 Purchase orders (`OrdenCompra`) do **not** substitute for supplier fiscal vouchers.
 
+## Withholdings and perceptions (`finance.retenciones`, #228)
+
+Configure tenant regimes and agent flags under **Settings → Company → Withholdings and perceptions** (`settings.fiscal.manage`). APIs: `GET/POST/PUT /api/fiscal/regimenes`, `GET/PUT /api/fiscal/config-retenciones`, `GET /api/fiscal/retenciones` (applied history), `GET /api/fiscal/retenciones/preview` (returns empty until automatic calculation in #229). Customer/supplier VAT condition uses existing `condIva` on master records; AFIP registry lookup (#192) is not implemented in this release.
+
 **Other languages:** [Español](../../es/user/manual-finanzas.md) · [Português](../../pt-br/user/manual-financas.md)

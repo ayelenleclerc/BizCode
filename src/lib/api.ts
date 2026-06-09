@@ -2047,6 +2047,44 @@ export type AlertaProveedorConfigDTO = {
   notifInApp: boolean
 }
 
+export type RegimenRetencionDTO = {
+  id: number
+  tenantId: number
+  tipo: 'ganancias' | 'iva' | 'iibb'
+  subtipo: 'retencion' | 'percepcion'
+  nombre: string
+  alicuota: string
+  alicuotaMin: string | null
+  provincia: string | null
+  activo: boolean
+  createdAt: string
+  updatedAt: string
+}
+
+export type RegimenRetencionInputDTO = {
+  tipo: 'ganancias' | 'iva' | 'iibb'
+  subtipo: 'retencion' | 'percepcion'
+  nombre: string
+  alicuota: number
+  alicuotaMin?: number | null
+  provincia?: string | null
+  activo?: boolean
+}
+
+export type RegimenRetencionUpdateDTO = {
+  nombre?: string
+  alicuota?: number
+  alicuotaMin?: number | null
+  provincia?: string | null
+  activo?: boolean
+}
+
+export type FiscalRetencionesConfigDTO = {
+  esAgenteRetencionGanancias: boolean
+  esAgenteRetencionIVA: boolean
+  esAgenteRetencionIIBB: boolean
+}
+
 export type ProveedorHistorialPeriodoDias = 30 | 90 | 180 | 365
 
 export type ProveedorCompraEstadoPago = 'pendiente' | 'parcial' | 'pagada' | 'n_a'
@@ -2400,6 +2438,70 @@ export const proveedorAlertasAPI = {
     try {
       const response = await api.patch<{ success: boolean; data: AlertaProveedorConfigDTO }>(
         '/configuracion/alertas-proveedores',
+        body,
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+}
+
+export const fiscalRetencionesAPI = {
+  listRegimenes: async (activo?: boolean): Promise<RegimenRetencionDTO[]> => {
+    try {
+      const params = activo != null ? { activo: String(activo) } : undefined
+      const response = await api.get<{ success: boolean; data: RegimenRetencionDTO[] }>(
+        '/fiscal/regimenes',
+        { params },
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  createRegimen: async (body: RegimenRetencionInputDTO): Promise<RegimenRetencionDTO> => {
+    try {
+      const response = await api.post<{ success: boolean; data: RegimenRetencionDTO }>(
+        '/fiscal/regimenes',
+        body,
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  updateRegimen: async (id: number, body: RegimenRetencionUpdateDTO): Promise<RegimenRetencionDTO> => {
+    try {
+      const response = await api.put<{ success: boolean; data: RegimenRetencionDTO }>(
+        `/fiscal/regimenes/${id}`,
+        body,
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  getConfig: async (): Promise<FiscalRetencionesConfigDTO> => {
+    try {
+      const response = await api.get<{ success: boolean; data: FiscalRetencionesConfigDTO }>(
+        '/fiscal/config-retenciones',
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  updateConfig: async (
+    body: Partial<FiscalRetencionesConfigDTO>,
+  ): Promise<FiscalRetencionesConfigDTO> => {
+    try {
+      const response = await api.put<{ success: boolean; data: FiscalRetencionesConfigDTO }>(
+        '/fiscal/config-retenciones',
         body,
       )
       return response.data.data
