@@ -82,6 +82,7 @@ model Cliente {
   pedidos        Pedido[]
   cobros         Cobro[]
   ordenesEntrega OrdenEntrega[]
+  remitos        Remito[]
 
   @@unique([tenantId, codigo])
   @@index([tenantId])
@@ -123,6 +124,7 @@ model Articulo {
 
   facturaItems     FacturaItem[]
   pedidoItems      PedidoItem[]
+  remitoItems      RemitoItem[]
   stockAjustes     StockAjuste[]
   ordenCompraItems     OrdenCompraItem[]
   recuentoItems        RecuentoItem[]
@@ -168,6 +170,7 @@ model Proveedor {
   movimientosCuentaCorriente MovimientoProveedorCC[]
   recibosPago              ReciboPago[]
   catalogoArticulos        ProveedorArticulo[]
+  remitos                  Remito[]
 
   @@unique([tenantId, codigo])
   @@index([tenantId])
@@ -410,6 +413,7 @@ model Factura {
   pedido         Pedido?
   notasCredito   NotaCredito[]
   retencionesAplicadas RetencionAplicada[]
+  remitos        Remito[]
 
   @@unique([tenantId, tipo, prefijo, numero])
   @@index([tenantId])
@@ -455,12 +459,60 @@ model Pedido {
   validUntil  DateTime?
   facturaId   Int?      @unique
   factura     Factura?  @relation(fields: [facturaId], references: [id])
+  remito      Remito?
   items       PedidoItem[]
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
   @@index([tenantId, estado])
   @@index([tenantId, clienteId])
+}
+
+/// Delivery note (remito) — non-fiscal transport document (#230).
+model Remito {
+  id             Int       @id @default(autoincrement())
+  tenantId       Int
+  tenant         Tenant    @relation(fields: [tenantId], references: [id])
+  prefijo        String?   @db.VarChar(4)
+  numero         Int?
+  /// remito_x | remito_ingreso
+  tipo           String    @db.VarChar(20)
+  /// borrador | emitido | entregado | anulado
+  estado         String    @db.VarChar(20) @default("borrador")
+  clienteId      Int?
+  cliente        Cliente?  @relation(fields: [clienteId], references: [id])
+  proveedorId    Int?
+  proveedor      Proveedor? @relation(fields: [proveedorId], references: [id])
+  facturaId      Int?
+  factura        Factura?  @relation(fields: [facturaId], references: [id])
+  pedidoId       Int?      @unique
+  pedido         Pedido?   @relation(fields: [pedidoId], references: [id])
+  ordenEntregaId Int?      @unique
+  ordenEntrega   OrdenEntrega? @relation(fields: [ordenEntregaId], references: [id])
+  fecha          DateTime  @default(now())
+  fechaEntrega   DateTime?
+  observaciones  String?   @db.VarChar(500)
+  firmadoPor     String?   @db.VarChar(120)
+  items          RemitoItem[]
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@unique([tenantId, prefijo, numero])
+  @@index([tenantId, estado])
+  @@index([tenantId, clienteId])
+  @@index([tenantId, fecha])
+}
+
+model RemitoItem {
+  id          Int      @id @default(autoincrement())
+  remitoId    Int
+  remito      Remito   @relation(fields: [remitoId], references: [id], onDelete: Cascade)
+  articuloId  Int
+  articulo    Articulo @relation(fields: [articuloId], references: [id])
+  descripcion String   @db.VarChar(120)
+  cantidad    Int      @default(1)
+  unidad      String   @db.VarChar(6)
+  createdAt   DateTime @default(now())
 }
 
 model PedidoItem {
@@ -561,6 +613,7 @@ model Tenant {
   cobros         Cobro[]
   cobroRecordatorios CobroRecordatorio[]
   ordenesEntrega OrdenEntrega[]
+  remitos        Remito[]
   repartos       Reparto[]
   paramEmpresa   ParamEmpresa?
   fiscalConfig   TenantFiscalConfig?
@@ -680,6 +733,7 @@ model OrdenEntrega {
   updatedAt DateTime  @updatedAt
 
   repartoItems RepartoItem[]
+  remito       Remito?
 
   @@index([tenantId, estado])
   @@index([tenantId, fecha])

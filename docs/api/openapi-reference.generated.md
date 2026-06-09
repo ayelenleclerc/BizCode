@@ -21148,6 +21148,118 @@ Requires `sales.create`. Pedido must be `confirmed`. Creates invoice via Factura
 }
 ```
 
+### PARAMETERS /api/pedidos/{id}/remito
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/pedidos/{id}/remito`
+
+### Create delivery note from confirmed pedido
+
+- **Method:** `POST`
+- **Path:** `/api/pedidos/{id}/remito`
+- **Tags:** pedidos, remitos
+
+#### Responses
+
+##### Status: 201
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`estado`**
+
+    `string`, possible values: `"borrador", "emitido", "entregado", "anulado"`
+
+  - **`facturaId`**
+
+    `integer`
+
+  - **`fecha`**
+
+    `string`, format: `date-time`
+
+  - **`fechaEntrega`**
+
+    `string`, format: `date-time`
+
+  - **`firmadoPor`**
+
+    `string`
+
+  - **`id`**
+
+    `integer`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+  - **`numero`**
+
+    `integer`
+
+  - **`observaciones`**
+
+    `string`
+
+  - **`pedidoId`**
+
+    `integer`
+
+  - **`prefijo`**
+
+    `string`
+
+  - **`referencia`**
+
+    `string`
+
+  - **`tipo`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "referencia": "",
+    "prefijo": "",
+    "numero": 1,
+    "tipo": "",
+    "estado": "borrador",
+    "clienteId": 1,
+    "facturaId": 1,
+    "pedidoId": 1,
+    "fecha": "",
+    "fechaEntrega": "",
+    "observaciones": "",
+    "firmadoPor": "",
+    "items": [
+      {
+        "additionalProperty": "anything"
+      }
+    ],
+    "additionalProperty": "anything"
+  }
+}
+```
+
 ### PARAMETERS /api/cobros
 
 - **Method:** `PARAMETERS`
@@ -23758,6 +23870,1329 @@ Sets `estado` to `N` (anulada), reverses the customer balance by the invoice tot
   "success": false,
   "error": ""
 }
+```
+
+### PARAMETERS /api/facturas/{id}/remito
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/facturas/{id}/remito`
+
+### Create delivery note from invoice
+
+- **Method:** `POST`
+- **Path:** `/api/facturas/{id}/remito`
+- **Tags:** facturas, remitos
+
+Creates a draft `remito_x` copying active invoice lines. Requires module `fiscal.remito` and `sales.create`. Stock is not decremented on the remito (stock remains on invoice creation).
+
+#### Responses
+
+##### Status: 201 Draft remito created
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`estado`**
+
+    `string`, possible values: `"borrador", "emitido", "entregado", "anulado"`
+
+  - **`facturaId`**
+
+    `integer`
+
+  - **`fecha`**
+
+    `string`, format: `date-time`
+
+  - **`fechaEntrega`**
+
+    `string`, format: `date-time`
+
+  - **`firmadoPor`**
+
+    `string`
+
+  - **`id`**
+
+    `integer`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+  - **`numero`**
+
+    `integer`
+
+  - **`observaciones`**
+
+    `string`
+
+  - **`pedidoId`**
+
+    `integer`
+
+  - **`prefijo`**
+
+    `string`
+
+  - **`referencia`**
+
+    `string`
+
+  - **`tipo`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "referencia": "",
+    "prefijo": "",
+    "numero": 1,
+    "tipo": "",
+    "estado": "borrador",
+    "clienteId": 1,
+    "facturaId": 1,
+    "pedidoId": 1,
+    "fecha": "",
+    "fechaEntrega": "",
+    "observaciones": "",
+    "firmadoPor": "",
+    "items": [
+      {
+        "additionalProperty": "anything"
+      }
+    ],
+    "additionalProperty": "anything"
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 409 Invoice already linked to a non-voided remito
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/remitos
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/remitos`
+
+### List delivery notes
+
+- **Method:** `GET`
+- **Path:** `/api/remitos`
+- **Tags:** remitos
+
+Paginated list. Requires module `fiscal.remito`.
+
+#### Responses
+
+##### Status: 200 Paginated remitos
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`estado`**
+
+    `string`, possible values: `"borrador", "emitido", "entregado", "anulado"`
+
+  - **`facturaId`**
+
+    `integer`
+
+  - **`fecha`**
+
+    `string`, format: `date-time`
+
+  - **`fechaEntrega`**
+
+    `string`, format: `date-time`
+
+  - **`firmadoPor`**
+
+    `string`
+
+  - **`id`**
+
+    `integer`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+  - **`numero`**
+
+    `integer`
+
+  - **`observaciones`**
+
+    `string`
+
+  - **`pedidoId`**
+
+    `integer`
+
+  - **`prefijo`**
+
+    `string`
+
+  - **`referencia`**
+
+    `string`
+
+  - **`tipo`**
+
+    `string`
+
+- **`limit` (required)**
+
+  `integer`
+
+- **`offset` (required)**
+
+  `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`total` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "referencia": "",
+      "prefijo": "",
+      "numero": 1,
+      "tipo": "",
+      "estado": "borrador",
+      "clienteId": 1,
+      "facturaId": 1,
+      "pedidoId": 1,
+      "fecha": "",
+      "fechaEntrega": "",
+      "observaciones": "",
+      "firmadoPor": "",
+      "items": [
+        {
+          "additionalProperty": "anything"
+        }
+      ],
+      "additionalProperty": "anything"
+    }
+  ],
+  "total": 1,
+  "limit": 1,
+  "offset": 1
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Create delivery note (draft)
+
+- **Method:** `POST`
+- **Path:** `/api/remitos`
+- **Tags:** remitos
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`items` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`cantidad` (required)**
+
+    `integer`
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`unidad` (required)**
+
+    `string`
+
+- **`tipo` (required)**
+
+  `string`, possible values: `"remito_x", "remito_ingreso"`
+
+- **`clienteId`**
+
+  `integer`
+
+- **`facturaId`**
+
+  `integer`
+
+- **`fecha`**
+
+  `string`, format: `date`
+
+- **`observaciones`**
+
+  `string`
+
+- **`ordenEntregaId`**
+
+  `integer`
+
+- **`pedidoId`**
+
+  `integer`
+
+- **`proveedorId`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "tipo": "remito_x",
+  "clienteId": 1,
+  "proveedorId": 1,
+  "facturaId": 1,
+  "pedidoId": 1,
+  "ordenEntregaId": 1,
+  "fecha": "",
+  "observaciones": "",
+  "items": [
+    {
+      "articuloId": 1,
+      "descripcion": "",
+      "cantidad": 1,
+      "unidad": ""
+    }
+  ]
+}
+```
+
+#### Responses
+
+##### Status: 201 Draft created
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`estado`**
+
+    `string`, possible values: `"borrador", "emitido", "entregado", "anulado"`
+
+  - **`facturaId`**
+
+    `integer`
+
+  - **`fecha`**
+
+    `string`, format: `date-time`
+
+  - **`fechaEntrega`**
+
+    `string`, format: `date-time`
+
+  - **`firmadoPor`**
+
+    `string`
+
+  - **`id`**
+
+    `integer`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+  - **`numero`**
+
+    `integer`
+
+  - **`observaciones`**
+
+    `string`
+
+  - **`pedidoId`**
+
+    `integer`
+
+  - **`prefijo`**
+
+    `string`
+
+  - **`referencia`**
+
+    `string`
+
+  - **`tipo`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "referencia": "",
+    "prefijo": "",
+    "numero": 1,
+    "tipo": "",
+    "estado": "borrador",
+    "clienteId": 1,
+    "facturaId": 1,
+    "pedidoId": 1,
+    "fecha": "",
+    "fechaEntrega": "",
+    "observaciones": "",
+    "firmadoPor": "",
+    "items": [
+      {
+        "additionalProperty": "anything"
+      }
+    ],
+    "additionalProperty": "anything"
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/remitos/{id}
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/remitos/{id}`
+
+### Get delivery note
+
+- **Method:** `GET`
+- **Path:** `/api/remitos/{id}`
+- **Tags:** remitos
+
+#### Responses
+
+##### Status: 200
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`estado`**
+
+    `string`, possible values: `"borrador", "emitido", "entregado", "anulado"`
+
+  - **`facturaId`**
+
+    `integer`
+
+  - **`fecha`**
+
+    `string`, format: `date-time`
+
+  - **`fechaEntrega`**
+
+    `string`, format: `date-time`
+
+  - **`firmadoPor`**
+
+    `string`
+
+  - **`id`**
+
+    `integer`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+  - **`numero`**
+
+    `integer`
+
+  - **`observaciones`**
+
+    `string`
+
+  - **`pedidoId`**
+
+    `integer`
+
+  - **`prefijo`**
+
+    `string`
+
+  - **`referencia`**
+
+    `string`
+
+  - **`tipo`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "referencia": "",
+    "prefijo": "",
+    "numero": 1,
+    "tipo": "",
+    "estado": "borrador",
+    "clienteId": 1,
+    "facturaId": 1,
+    "pedidoId": 1,
+    "fecha": "",
+    "fechaEntrega": "",
+    "observaciones": "",
+    "firmadoPor": "",
+    "items": [
+      {
+        "additionalProperty": "anything"
+      }
+    ],
+    "additionalProperty": "anything"
+  }
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Update draft delivery note
+
+- **Method:** `PUT`
+- **Path:** `/api/remitos/{id}`
+- **Tags:** remitos
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`clienteId`**
+
+  `integer`
+
+- **`items`**
+
+  `array`
+
+  **Items:**
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`cantidad` (required)**
+
+    `integer`
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`unidad` (required)**
+
+    `string`
+
+- **`observaciones`**
+
+  `string`
+
+- **`proveedorId`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "clienteId": 1,
+  "proveedorId": 1,
+  "observaciones": "",
+  "items": [
+    {
+      "articuloId": 1,
+      "descripcion": "",
+      "cantidad": 1,
+      "unidad": ""
+    }
+  ]
+}
+```
+
+#### Responses
+
+##### Status: 200
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`estado`**
+
+    `string`, possible values: `"borrador", "emitido", "entregado", "anulado"`
+
+  - **`facturaId`**
+
+    `integer`
+
+  - **`fecha`**
+
+    `string`, format: `date-time`
+
+  - **`fechaEntrega`**
+
+    `string`, format: `date-time`
+
+  - **`firmadoPor`**
+
+    `string`
+
+  - **`id`**
+
+    `integer`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+  - **`numero`**
+
+    `integer`
+
+  - **`observaciones`**
+
+    `string`
+
+  - **`pedidoId`**
+
+    `integer`
+
+  - **`prefijo`**
+
+    `string`
+
+  - **`referencia`**
+
+    `string`
+
+  - **`tipo`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "referencia": "",
+    "prefijo": "",
+    "numero": 1,
+    "tipo": "",
+    "estado": "borrador",
+    "clienteId": 1,
+    "facturaId": 1,
+    "pedidoId": 1,
+    "fecha": "",
+    "fechaEntrega": "",
+    "observaciones": "",
+    "firmadoPor": "",
+    "items": [
+      {
+        "additionalProperty": "anything"
+      }
+    ],
+    "additionalProperty": "anything"
+  }
+}
+```
+
+##### Status: 409 Only borrador can be updated
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/remitos/{id}/emitir
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/remitos/{id}/emitir`
+
+### Issue delivery note (assign correlativo)
+
+- **Method:** `POST`
+- **Path:** `/api/remitos/{id}/emitir`
+- **Tags:** remitos
+
+#### Responses
+
+##### Status: 200
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`estado`**
+
+    `string`, possible values: `"borrador", "emitido", "entregado", "anulado"`
+
+  - **`facturaId`**
+
+    `integer`
+
+  - **`fecha`**
+
+    `string`, format: `date-time`
+
+  - **`fechaEntrega`**
+
+    `string`, format: `date-time`
+
+  - **`firmadoPor`**
+
+    `string`
+
+  - **`id`**
+
+    `integer`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+  - **`numero`**
+
+    `integer`
+
+  - **`observaciones`**
+
+    `string`
+
+  - **`pedidoId`**
+
+    `integer`
+
+  - **`prefijo`**
+
+    `string`
+
+  - **`referencia`**
+
+    `string`
+
+  - **`tipo`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "referencia": "",
+    "prefijo": "",
+    "numero": 1,
+    "tipo": "",
+    "estado": "borrador",
+    "clienteId": 1,
+    "facturaId": 1,
+    "pedidoId": 1,
+    "fecha": "",
+    "fechaEntrega": "",
+    "observaciones": "",
+    "firmadoPor": "",
+    "items": [
+      {
+        "additionalProperty": "anything"
+      }
+    ],
+    "additionalProperty": "anything"
+  }
+}
+```
+
+### PARAMETERS /api/remitos/{id}/entregar
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/remitos/{id}/entregar`
+
+### Mark delivery note as delivered
+
+- **Method:** `POST`
+- **Path:** `/api/remitos/{id}/entregar`
+- **Tags:** remitos
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`firmadoPor` (required)**
+
+  `string`
+
+- **`fechaEntrega`**
+
+  `string`, format: `date`
+
+**Example:**
+
+```json
+{
+  "firmadoPor": "",
+  "fechaEntrega": ""
+}
+```
+
+#### Responses
+
+##### Status: 200
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`estado`**
+
+    `string`, possible values: `"borrador", "emitido", "entregado", "anulado"`
+
+  - **`facturaId`**
+
+    `integer`
+
+  - **`fecha`**
+
+    `string`, format: `date-time`
+
+  - **`fechaEntrega`**
+
+    `string`, format: `date-time`
+
+  - **`firmadoPor`**
+
+    `string`
+
+  - **`id`**
+
+    `integer`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+  - **`numero`**
+
+    `integer`
+
+  - **`observaciones`**
+
+    `string`
+
+  - **`pedidoId`**
+
+    `integer`
+
+  - **`prefijo`**
+
+    `string`
+
+  - **`referencia`**
+
+    `string`
+
+  - **`tipo`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "referencia": "",
+    "prefijo": "",
+    "numero": 1,
+    "tipo": "",
+    "estado": "borrador",
+    "clienteId": 1,
+    "facturaId": 1,
+    "pedidoId": 1,
+    "fecha": "",
+    "fechaEntrega": "",
+    "observaciones": "",
+    "firmadoPor": "",
+    "items": [
+      {
+        "additionalProperty": "anything"
+      }
+    ],
+    "additionalProperty": "anything"
+  }
+}
+```
+
+### PARAMETERS /api/remitos/{id}/anular
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/remitos/{id}/anular`
+
+### Void issued delivery note
+
+- **Method:** `POST`
+- **Path:** `/api/remitos/{id}/anular`
+- **Tags:** remitos
+
+#### Responses
+
+##### Status: 200
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`estado`**
+
+    `string`, possible values: `"borrador", "emitido", "entregado", "anulado"`
+
+  - **`facturaId`**
+
+    `integer`
+
+  - **`fecha`**
+
+    `string`, format: `date-time`
+
+  - **`fechaEntrega`**
+
+    `string`, format: `date-time`
+
+  - **`firmadoPor`**
+
+    `string`
+
+  - **`id`**
+
+    `integer`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+  - **`numero`**
+
+    `integer`
+
+  - **`observaciones`**
+
+    `string`
+
+  - **`pedidoId`**
+
+    `integer`
+
+  - **`prefijo`**
+
+    `string`
+
+  - **`referencia`**
+
+    `string`
+
+  - **`tipo`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "referencia": "",
+    "prefijo": "",
+    "numero": 1,
+    "tipo": "",
+    "estado": "borrador",
+    "clienteId": 1,
+    "facturaId": 1,
+    "pedidoId": 1,
+    "fecha": "",
+    "fechaEntrega": "",
+    "observaciones": "",
+    "firmadoPor": "",
+    "items": [
+      {
+        "additionalProperty": "anything"
+      }
+    ],
+    "additionalProperty": "anything"
+  }
+}
+```
+
+### PARAMETERS /api/remitos/{id}/pdf
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/remitos/{id}/pdf`
+
+### Download delivery note PDF
+
+- **Method:** `GET`
+- **Path:** `/api/remitos/{id}/pdf`
+- **Tags:** remitos
+
+#### Responses
+
+##### Status: 200 application/pdf
+
+###### Content-Type: application/pdf
+
+`string`, format: `binary`
+
+**Example:**
+
+```json
+{}
 ```
 
 ### PARAMETERS /api/notas-credito
@@ -47477,6 +48912,500 @@ true
   "dscto": 1,
   "subtotal": 1,
   "additionalProperty": "anything"
+}
+```
+
+### RemitoItemInput
+
+- **Type:**`object`
+
+* **`articuloId` (required)**
+
+  `integer`
+
+* **`cantidad` (required)**
+
+  `integer`
+
+* **`descripcion` (required)**
+
+  `string`
+
+* **`unidad` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "articuloId": 1,
+  "descripcion": "",
+  "cantidad": 1,
+  "unidad": ""
+}
+```
+
+### RemitoInput
+
+- **Type:**`object`
+
+* **`items` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`cantidad` (required)**
+
+    `integer`
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`unidad` (required)**
+
+    `string`
+
+* **`tipo` (required)**
+
+  `string`, possible values: `"remito_x", "remito_ingreso"`
+
+* **`clienteId`**
+
+  `integer`
+
+* **`facturaId`**
+
+  `integer`
+
+* **`fecha`**
+
+  `string`, format: `date`
+
+* **`observaciones`**
+
+  `string`
+
+* **`ordenEntregaId`**
+
+  `integer`
+
+* **`pedidoId`**
+
+  `integer`
+
+* **`proveedorId`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "tipo": "remito_x",
+  "clienteId": 1,
+  "proveedorId": 1,
+  "facturaId": 1,
+  "pedidoId": 1,
+  "ordenEntregaId": 1,
+  "fecha": "",
+  "observaciones": "",
+  "items": [
+    {
+      "articuloId": 1,
+      "descripcion": "",
+      "cantidad": 1,
+      "unidad": ""
+    }
+  ]
+}
+```
+
+### RemitoUpdateInput
+
+- **Type:**`object`
+
+* **`clienteId`**
+
+  `integer`
+
+* **`items`**
+
+  `array`
+
+  **Items:**
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`cantidad` (required)**
+
+    `integer`
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`unidad` (required)**
+
+    `string`
+
+* **`observaciones`**
+
+  `string`
+
+* **`proveedorId`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "clienteId": 1,
+  "proveedorId": 1,
+  "observaciones": "",
+  "items": [
+    {
+      "articuloId": 1,
+      "descripcion": "",
+      "cantidad": 1,
+      "unidad": ""
+    }
+  ]
+}
+```
+
+### RemitoEntregarInput
+
+- **Type:**`object`
+
+* **`firmadoPor` (required)**
+
+  `string`
+
+* **`fechaEntrega`**
+
+  `string`, format: `date`
+
+**Example:**
+
+```json
+{
+  "firmadoPor": "",
+  "fechaEntrega": ""
+}
+```
+
+### Remito
+
+- **Type:**`object`
+
+* **`clienteId`**
+
+  `integer`
+
+* **`estado`**
+
+  `string`, possible values: `"borrador", "emitido", "entregado", "anulado"`
+
+* **`facturaId`**
+
+  `integer`
+
+* **`fecha`**
+
+  `string`, format: `date-time`
+
+* **`fechaEntrega`**
+
+  `string`, format: `date-time`
+
+* **`firmadoPor`**
+
+  `string`
+
+* **`id`**
+
+  `integer`
+
+* **`items`**
+
+  `array`
+
+  **Items:**
+
+* **`numero`**
+
+  `integer`
+
+* **`observaciones`**
+
+  `string`
+
+* **`pedidoId`**
+
+  `integer`
+
+* **`prefijo`**
+
+  `string`
+
+* **`referencia`**
+
+  `string`
+
+* **`tipo`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "referencia": "",
+  "prefijo": "",
+  "numero": 1,
+  "tipo": "",
+  "estado": "borrador",
+  "clienteId": 1,
+  "facturaId": 1,
+  "pedidoId": 1,
+  "fecha": "",
+  "fechaEntrega": "",
+  "observaciones": "",
+  "firmadoPor": "",
+  "items": [
+    {
+      "additionalProperty": "anything"
+    }
+  ],
+  "additionalProperty": "anything"
+}
+```
+
+### RemitoEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`estado`**
+
+    `string`, possible values: `"borrador", "emitido", "entregado", "anulado"`
+
+  - **`facturaId`**
+
+    `integer`
+
+  - **`fecha`**
+
+    `string`, format: `date-time`
+
+  - **`fechaEntrega`**
+
+    `string`, format: `date-time`
+
+  - **`firmadoPor`**
+
+    `string`
+
+  - **`id`**
+
+    `integer`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+  - **`numero`**
+
+    `integer`
+
+  - **`observaciones`**
+
+    `string`
+
+  - **`pedidoId`**
+
+    `integer`
+
+  - **`prefijo`**
+
+    `string`
+
+  - **`referencia`**
+
+    `string`
+
+  - **`tipo`**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "referencia": "",
+    "prefijo": "",
+    "numero": 1,
+    "tipo": "",
+    "estado": "borrador",
+    "clienteId": 1,
+    "facturaId": 1,
+    "pedidoId": 1,
+    "fecha": "",
+    "fechaEntrega": "",
+    "observaciones": "",
+    "firmadoPor": "",
+    "items": [
+      {
+        "additionalProperty": "anything"
+      }
+    ],
+    "additionalProperty": "anything"
+  }
+}
+```
+
+### RemitoListEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`estado`**
+
+    `string`, possible values: `"borrador", "emitido", "entregado", "anulado"`
+
+  - **`facturaId`**
+
+    `integer`
+
+  - **`fecha`**
+
+    `string`, format: `date-time`
+
+  - **`fechaEntrega`**
+
+    `string`, format: `date-time`
+
+  - **`firmadoPor`**
+
+    `string`
+
+  - **`id`**
+
+    `integer`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+  - **`numero`**
+
+    `integer`
+
+  - **`observaciones`**
+
+    `string`
+
+  - **`pedidoId`**
+
+    `integer`
+
+  - **`prefijo`**
+
+    `string`
+
+  - **`referencia`**
+
+    `string`
+
+  - **`tipo`**
+
+    `string`
+
+* **`limit` (required)**
+
+  `integer`
+
+* **`offset` (required)**
+
+  `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+* **`total` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "referencia": "",
+      "prefijo": "",
+      "numero": 1,
+      "tipo": "",
+      "estado": "borrador",
+      "clienteId": 1,
+      "facturaId": 1,
+      "pedidoId": 1,
+      "fecha": "",
+      "fechaEntrega": "",
+      "observaciones": "",
+      "firmadoPor": "",
+      "items": [
+        {
+          "additionalProperty": "anything"
+        }
+      ],
+      "additionalProperty": "anything"
+    }
+  ],
+  "total": 1,
+  "limit": 1,
+  "offset": 1
 }
 ```
 

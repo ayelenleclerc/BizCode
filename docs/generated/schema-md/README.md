@@ -466,6 +466,20 @@
 
 * [RegimenRetencionUpdateInput](./regimenretencionupdateinput.md) – `-`
 
+* [Remito](./remito.md) – `-`
+
+* [RemitoEntregarInput](./remitoentregarinput.md) – `-`
+
+* [RemitoEnvelope](./remitoenvelope.md) – `-`
+
+* [RemitoInput](./remitoinput.md) – `-`
+
+* [RemitoItemInput](./remitoiteminput.md) – `-`
+
+* [RemitoListEnvelope](./remitolistenvelope.md) – `-`
+
+* [RemitoUpdateInput](./remitoupdateinput.md) – `-`
+
 * [Reparto](./reparto.md) – `-`
 
 * [RepartoActivo](./repartoactivo.md) – `-`
@@ -734,6 +748,8 @@
 
 * [Untitled object in RecuentoListEnvelope](./recuentolistenvelope-allof-1.md) – `undefined#/allOf/1`
 
+* [Untitled object in Remito](./remito-properties-items-items.md) – `undefined#/properties/items/items`
+
 * [Untitled object in Reparto](./reparto-properties-chofer.md) – `undefined#/properties/chofer`
 
 * [Untitled object in RepartoActivo](./repartoactivo-properties-chofer.md) – `undefined#/properties/chofer`
@@ -939,6 +955,14 @@
 * [Untitled array in RecuentoListEnvelope](./recuentolistenvelope-allof-1-properties-data.md) – `undefined#/allOf/1/properties/data`
 
 * [Untitled array in RegimenRetencionListEnvelope](./regimenretencionlistenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled array in Remito](./remito-properties-items.md) – `undefined#/properties/items`
+
+* [Untitled array in RemitoInput](./remitoinput-properties-items.md) – `undefined#/properties/items`
+
+* [Untitled array in RemitoListEnvelope](./remitolistenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled array in RemitoUpdateInput](./remitoupdateinput-properties-items.md) – `undefined#/properties/items`
 
 * [Untitled array in Reparto](./reparto-properties-items.md) – `undefined#/properties/items`
 

@@ -1,6 +1,7 @@
 import type { Application, Request, Response } from 'express'
 import { requireAnyPermission, requirePermission, type AuthenticatedRequest } from '../auth'
 import { requireModule } from '../middleware/requireModule'
+import { mapRemitoPublic } from '../services/RemitoService'
 import { validateBody } from '../middleware/validateBody'
 import { pedidoBodySchema, pedidoInvoiceBodySchema } from '../schemas/domain'
 import type { PedidoEstado, PedidoInput, PedidoInvoiceInput } from '../createApp.types'
@@ -25,8 +26,9 @@ function parseEstadoQuery(raw: unknown): PedidoEstado | undefined {
  */
 export function registerPedidosRoutes(app: Application, ctx: RestRouteContext): void {
   const { services, writeAudit } = ctx
-  const { pedido } = services
+  const { pedido, remito } = services
   const ordersModule = requireModule('billing.orders')
+  const remitoModule = requireModule('fiscal.remito')
 
   app.get(
     '/api/pedidos',
@@ -163,6 +165,30 @@ export function registerPedidosRoutes(app: Application, ctx: RestRouteContext): 
           facturaId: result.data.factura?.id ?? null,
         })
         res.json({ success: true, data: result.data })
+      } catch (err: unknown) {
+        res.status(500).json({ success: false, error: errorMessage(err) })
+      }
+    },
+  )
+
+  app.post(
+    '/api/pedidos/:id/remito',
+    ordersModule,
+    remitoModule,
+    requirePermission('sales.create'),
+    async (req: Request, res: Response) => {
+      try {
+        const tenantId = getTenantId(req)
+        const id = parseInt(String(req.params.id), 10)
+        const result = await remito.createFromPedido(tenantId, id)
+        if (!result.ok) {
+          res.status(result.status).json({ success: false, error: result.error })
+          return
+        }
+        await writeAudit(req as AuthenticatedRequest, 'remito_from_pedido', 'remito', String(result.data.id), {
+          pedidoId: id,
+        })
+        res.status(201).json({ success: true, data: mapRemitoPublic(result.data) })
       } catch (err: unknown) {
         res.status(500).json({ success: false, error: errorMessage(err) })
       }

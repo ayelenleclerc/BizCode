@@ -157,6 +157,41 @@ export type CobroInput = {
   retenciones?: CobroRetencionInput[]
 }
 
+export type RemitoTipo = 'remito_x' | 'remito_ingreso'
+
+export type RemitoEstado = 'borrador' | 'emitido' | 'entregado' | 'anulado'
+
+export type RemitoItemInput = {
+  articuloId: number
+  descripcion: string
+  cantidad: number
+  unidad: string
+}
+
+export type RemitoInput = {
+  tipo: RemitoTipo
+  clienteId?: number | null
+  proveedorId?: number | null
+  facturaId?: number | null
+  pedidoId?: number | null
+  ordenEntregaId?: number | null
+  fecha?: string
+  observaciones?: string | null
+  items: RemitoItemInput[]
+}
+
+export type RemitoUpdateInput = {
+  clienteId?: number | null
+  proveedorId?: number | null
+  observaciones?: string | null
+  items?: RemitoItemInput[]
+}
+
+export type RemitoEntregarInput = {
+  firmadoPor: string
+  fechaEntrega?: string
+}
+
 export type DeliveryZoneCreateParsed = {
   nombre: string
   tipo: 'barrio' | 'manual' | 'predefinida'

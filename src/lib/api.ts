@@ -1718,6 +1718,139 @@ export type NotasCreditoListResult = {
   offset: number
 }
 
+export type RemitoEstadoDTO = 'borrador' | 'emitido' | 'entregado' | 'anulado'
+
+export type RemitoItemDTO = {
+  id: number
+  articuloId: number
+  descripcion: string
+  cantidad: number
+  unidad: string
+  articulo?: { id: number; codigo: number; descripcion: string; umedida: string }
+}
+
+export type RemitoDTO = {
+  id: number
+  referencia: string
+  prefijo: string | null
+  numero: number | null
+  tipo: 'remito_x' | 'remito_ingreso'
+  estado: RemitoEstadoDTO
+  clienteId: number | null
+  proveedorId: number | null
+  facturaId: number | null
+  pedidoId: number | null
+  ordenEntregaId: number | null
+  fecha: string
+  fechaEntrega: string | null
+  observaciones: string | null
+  firmadoPor: string | null
+  items: RemitoItemDTO[]
+  cliente?: { id: number; codigo: number; rsocial: string; cuit: string | null; domicilio: string | null } | null
+}
+
+export type RemitoItemInputDTO = {
+  articuloId: number
+  descripcion: string
+  cantidad: number
+  unidad: string
+}
+
+export type RemitoCreateBody = {
+  tipo: 'remito_x' | 'remito_ingreso'
+  clienteId?: number | null
+  proveedorId?: number | null
+  facturaId?: number | null
+  pedidoId?: number | null
+  ordenEntregaId?: number | null
+  fecha?: string
+  observaciones?: string | null
+  items: RemitoItemInputDTO[]
+}
+
+export const remitosAPI = {
+  list: async (params?: { estado?: RemitoEstadoDTO; clienteId?: number; limit?: number; offset?: number }) => {
+    try {
+      const response = await api.get('/remitos', { params })
+      return response.data as { data: RemitoDTO[]; total: number }
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  get: async (id: number): Promise<RemitoDTO> => {
+    try {
+      const response = await api.get(`/remitos/${id}`)
+      return response.data.data as RemitoDTO
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  create: async (body: RemitoCreateBody): Promise<RemitoDTO> => {
+    try {
+      const response = await api.post('/remitos', body)
+      return response.data.data as RemitoDTO
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  emitir: async (id: number): Promise<RemitoDTO> => {
+    try {
+      const response = await api.post(`/remitos/${id}/emitir`)
+      return response.data.data as RemitoDTO
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  entregar: async (id: number, firmadoPor: string): Promise<RemitoDTO> => {
+    try {
+      const response = await api.post(`/remitos/${id}/entregar`, { firmadoPor })
+      return response.data.data as RemitoDTO
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  anular: async (id: number): Promise<RemitoDTO> => {
+    try {
+      const response = await api.post(`/remitos/${id}/anular`)
+      return response.data.data as RemitoDTO
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  downloadPdf: async (id: number): Promise<Blob> => {
+    try {
+      const response = await api.get(`/remitos/${id}/pdf`, { responseType: 'blob' })
+      return response.data as Blob
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  createFromPedido: async (pedidoId: number): Promise<RemitoDTO> => {
+    try {
+      const response = await api.post(`/pedidos/${pedidoId}/remito`)
+      return response.data.data as RemitoDTO
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  createFromFactura: async (facturaId: number): Promise<RemitoDTO> => {
+    try {
+      const response = await api.post(`/facturas/${facturaId}/remito`)
+      return response.data.data as RemitoDTO
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+}
+
 export const facturasAPI = {
   list: async () => {
     try {

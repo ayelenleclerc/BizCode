@@ -10,6 +10,8 @@ Versionamento: [Semantic Versioning](https://semver.org/).
 
 ### Adicionado
 
+- **Remessa de entrega (#230):** Prisma `Remito` / `RemitoItem`; CRUD e ciclo (`borrador` → `emitido` → `entregado` / `anulado`); correlativo por tenant; `GET/POST/PUT /api/remitos`, `POST .../emitir|entregar|anular`, `GET .../pdf`; `POST /api/pedidos/{id}/remito` e `POST /api/facturas/{id}/remito`; PDF legal sem preços; UI em faturação e ações em faturas/pedidos; OpenAPI, testes, manuais trilíngues. e-Remito AFIP e estoque no remito fora de escopo.
+
 - **Percepções na fatura e retenções no recebimento (#229):** `percepciones[]` opcional em `POST /api/facturas`; `retenciones[]` opcional em `POST /api/cobros` (valor líquido, CC por bruto, certificado correlativo); preview cliente em `GET /api/fiscal/retenciones/preview` com `contexto`; `GET /api/cobros/{id}/retenciones`; PDF da fatura com percepções; UI em faturação e cobranças; OpenAPI, testes e manuais trilíngues. Regras anuais Ganancias e padrão AFIP (#192) fora de escopo.
 
 - **Retenções no pagamento a fornecedor (#276):** `retenciones[]` opcional em `POST /api/proveedores/{id}/pagos` (`total` líquido = Σ faturas − retenções; CC com bruto); persistência `RetencionAplicada` com `constanciaNum` correlativo; `GET /api/proveedores/{id}/pagos/{reciboId}/retenciones`; preview fornecedor em `GET /api/fiscal/retenciones/preview`; PDF certificado `GET /api/fiscal/retenciones/{id}/comprobante/pdf`; export TXT SICORE/SIFERE `GET /api/fiscal/retenciones/export`; UI no formulário de pagamento; OpenAPI, testes, manuais trilíngues. Validar export contra layouts oficiais manualmente.
