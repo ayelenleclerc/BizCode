@@ -10,7 +10,11 @@ Versioning: [Semantic Versioning](https://semver.org/).
 
 ### Added
 
-- **Purchase document scanner — Phase G (GitHub #277):** duplicate voucher check per supplier (`GET /api/documentos-compra/verificar-duplicado`, proactive UI warning, confirm blocked on 409), product line mapping via search/create/ignore, OCR languages `spa+eng+por`, YAML template management UI (`settings.fiscal.manage`); documents local filesystem storage and deferred stock-on-remito in manuals.
+- **Supplier payment withholdings (#276):** optional `retenciones[]` on `POST /api/proveedores/{id}/pagos` (net `total` = sum facturas − retenciones; CC movement uses gross); `RetencionAplicada` persistence with correlative `constanciaNum`; `GET /api/proveedores/{id}/pagos/{reciboId}/retenciones`; proveedor preview on `GET /api/fiscal/retenciones/preview`; certificate PDF `GET /api/fiscal/retenciones/{id}/comprobante/pdf`; SICORE/SIFERE TXT export `GET /api/fiscal/retenciones/export`; UI in supplier payment form; OpenAPI, tests, trilingual manuals. Validate export layouts against AFIP/provincial specs manually.
+
+- **Withholding/perception model (#228):**** Prisma `RegimenRetencion`, `RetencionAplicada`, `FiscalRetencionesConfig`; API `GET/POST/PUT /api/fiscal/regimenes`, `GET/PUT /api/fiscal/config-retenciones`, `GET /api/fiscal/retenciones`, `GET /api/fiscal/retenciones/preview` (stub until #229); configuration UI under **Settings → Company** (`finance.retenciones`, `settings.fiscal.manage`); OpenAPI, contract/API tests, trilingual empresa i18n.
+
+- **Purchase document scanner — Phase G (GitHub #277):**** duplicate voucher check per supplier (`GET /api/documentos-compra/verificar-duplicado`, proactive UI warning, confirm blocked on 409), product line mapping via search/create/ignore, OCR languages `spa+eng+por`, YAML template management UI (`settings.fiscal.manage`); documents local filesystem storage and deferred stock-on-remito in manuals.
 
 - **Purchase document scanner — Phase F (GitHub #277):** line-item extraction (Tier 4 Ollama + template text parsing), preview items table with confidence indicators and `articuloId` mapping, confirm API persists `items[]` in `datosExtraidos`, inline supplier creation from extracted CUIT/CNPJ/RUT, bundled Brazil (`generic-nfe-brasil`) and Uruguay (`generic-dgi-uruguay`) YAML templates, mobile camera capture on upload; OpenAPI, API/UI tests, trilingual finance manuals.
 

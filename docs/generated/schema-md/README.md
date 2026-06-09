@@ -230,6 +230,12 @@
 
 * [FacturasPendientesEnvelope](./facturaspendientesenvelope.md) – `-`
 
+* [FiscalRetencionesConfig](./fiscalretencionesconfig.md) – `-`
+
+* [FiscalRetencionesConfigEnvelope](./fiscalretencionesconfigenvelope.md) – `-`
+
+* [FiscalRetencionesConfigInput](./fiscalretencionesconfiginput.md) – `-`
+
 * [FormaPago](./formapago.md) – `-`
 
 * [FormaPagoListEnvelope](./formapagolistenvelope.md) – `-`
@@ -434,6 +440,10 @@
 
 * [ReciboPagoListEnvelope](./recibopagolistenvelope.md) – `-`
 
+* [ReciboPagoRetencion](./recibopagoretencion.md) – `-`
+
+* [ReciboPagoRetencionInput](./recibopagoretencioninput.md) – `-`
+
 * [Recuento](./recuento.md) – `-`
 
 * [RecuentoEnvelope](./recuentoenvelope.md) – `-`
@@ -443,6 +453,16 @@
 * [RecuentoItemsInput](./recuentoitemsinput.md) – `-`
 
 * [RecuentoListEnvelope](./recuentolistenvelope.md) – `-`
+
+* [RegimenRetencion](./regimenretencion.md) – `-`
+
+* [RegimenRetencionEnvelope](./regimenretencionenvelope.md) – `-`
+
+* [RegimenRetencionInput](./regimenretencioninput.md) – `-`
+
+* [RegimenRetencionListEnvelope](./regimenretencionlistenvelope.md) – `-`
+
+* [RegimenRetencionUpdateInput](./regimenretencionupdateinput.md) – `-`
 
 * [Reparto](./reparto.md) – `-`
 
@@ -491,6 +511,14 @@
 * [ReporteVentasListEnvelope](./reporteventaslistenvelope.md) – `-`
 
 * [ReporteVentasRow](./reporteventasrow.md) – `-`
+
+* [RetencionAplicada](./retencionaplicada.md) – `-`
+
+* [RetencionAplicadaListEnvelope](./retencionaplicadalistenvelope.md) – `-`
+
+* [RetencionesPreviewEnvelope](./retencionespreviewenvelope.md) – `-`
+
+* [RetencionesPreviewResult](./retencionespreviewresult.md) – `-`
 
 * [Rubro](./rubro.md) – `-`
 
@@ -716,6 +744,10 @@
 
 * [Untitled object in RepartoListEnvelope](./repartolistenvelope-allof-1.md) – `undefined#/allOf/1`
 
+* [Untitled object in RetencionAplicadaListEnvelope](./retencionaplicadalistenvelope-allof-0.md) – `undefined#/allOf/0`
+
+* [Untitled object in RetencionesPreviewResult](./retencionespreviewresult-properties-retenciones-items.md) – `undefined#/properties/retenciones/items`
+
 * [Untitled object in RubroListEnvelope](./rubrolistenvelope-allof-0.md) – `undefined#/allOf/0`
 
 * [Untitled object in StockAdjustData](./stockadjustdata-properties-articulo.md) – `undefined#/properties/articulo`
@@ -884,7 +916,11 @@
 
 * [Untitled array in ReciboPago](./recibopago-properties-facturas.md) – `undefined#/properties/facturas`
 
+* [Untitled array in ReciboPago](./recibopago-properties-retenciones.md) – `undefined#/properties/retenciones`
+
 * [Untitled array in ReciboPagoInput](./recibopagoinput-properties-facturas.md) – `undefined#/properties/facturas`
+
+* [Untitled array in ReciboPagoInput](./recibopagoinput-properties-retenciones.md) – `undefined#/properties/retenciones`
 
 * [Untitled array in ReciboPagoListEnvelope](./recibopagolistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
 
@@ -893,6 +929,8 @@
 * [Untitled array in RecuentoItemsInput](./recuentoitemsinput-properties-lines.md) – `undefined#/properties/lines`
 
 * [Untitled array in RecuentoListEnvelope](./recuentolistenvelope-allof-1-properties-data.md) – `undefined#/allOf/1/properties/data`
+
+* [Untitled array in RegimenRetencionListEnvelope](./regimenretencionlistenvelope-properties-data.md) – `undefined#/properties/data`
 
 * [Untitled array in Reparto](./reparto-properties-items.md) – `undefined#/properties/items`
 
@@ -907,6 +945,10 @@
 * [Untitled array in ReporteCobranzasRow](./reportecobranzasrow-properties-porformapago.md) – `undefined#/properties/porFormaPago`
 
 * [Untitled array in ReporteVentasListEnvelope](./reporteventaslistenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled array in RetencionAplicadaListEnvelope](./retencionaplicadalistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
+
+* [Untitled array in RetencionesPreviewResult](./retencionespreviewresult-properties-retenciones.md) – `undefined#/properties/retenciones`
 
 * [Untitled array in RubroListEnvelope](./rubrolistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
 

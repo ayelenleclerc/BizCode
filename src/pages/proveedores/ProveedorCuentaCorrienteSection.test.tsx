@@ -56,6 +56,14 @@ vi.mock('@/components/CanAccess', () => ({
   CanAccess: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }))
 
+vi.mock('@/contexts/FeatureFlagsContext', () => ({
+  useFeatureFlags: () => ({
+    hasModule: () => false,
+    modules: [],
+    loading: false,
+  }),
+}))
+
 const { mockCuentaCorriente, mockCuentaCorrienteAjuste, mockListPagos } = vi.hoisted(() => ({
   mockCuentaCorriente: vi.fn(),
   mockCuentaCorrienteAjuste: vi.fn(),

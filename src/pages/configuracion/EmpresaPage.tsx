@@ -13,6 +13,7 @@ import type { EmpresaConfig } from '@/types'
 import ArcaFiscalSection from './ArcaFiscalSection'
 import PrintDevicesSection from './PrintDevicesSection'
 import ProveedorAlertasConfigSection from './ProveedorAlertasConfigSection'
+import FiscalRetencionesSection from './FiscalRetencionesSection'
 
 const EMPRESA_TIMEZONE_OPTIONS = [
   'America/Argentina/Buenos_Aires',
@@ -559,6 +560,7 @@ export default function EmpresaPage() {
 
       <ArcaFiscalSection />
       <PrintDevicesSection />
+      <FiscalRetencionesSection />
       <ProveedorAlertasConfigSection />
     </div>
   )

@@ -108,5 +108,39 @@
     "emailNote": "Email externo requer SMTP no servidor; sem destinatário configurado só in-app se aplica.",
     "save": "Salvar alertas",
     "saved": "Configuração salva"
+  },
+  "retenciones": {
+    "title": "Retenções e percepções",
+    "hint": "Regimes configuráveis por tenant. O cálculo automático em pagamentos e faturas virá em #229. A condição IVA de clientes/fornecedores usa o cadastro existente (Padrão AFIP #192 pendente).",
+    "loading": "Carregando configuração fiscal…",
+    "readOnlyHint": "Somente leitura; apenas papéis com permissão fiscal podem editar.",
+    "agentFlagsLegend": "Agente de retenção/percepção",
+    "agentGanancias": "Agente retenção Ganancias",
+    "agentIva": "Agente retenção IVA",
+    "agentIibb": "Agente retenção IIBB",
+    "saveConfig": "Salvar flags de agente",
+    "regimenesTitle": "Regimes",
+    "regimenesEmpty": "Nenhum regime configurado.",
+    "colNombre": "Nome",
+    "colTipo": "Tipo",
+    "colAlicuota": "Alíquota",
+    "colActivo": "Status",
+    "activo": "Ativo",
+    "inactivo": "Inativo",
+    "fieldTipo": "Tipo fiscal",
+    "fieldSubtipo": "Subtipo",
+    "fieldNombre": "Nome",
+    "fieldAlicuota": "Alíquota (%)",
+    "createRegimen": "Adicionar regime",
+    "saved": "Configuração salva",
+    "tipo": {
+      "ganancias": "Ganancias",
+      "iva": "IVA",
+      "iibb": "IIBB"
+    },
+    "subtipo": {
+      "retencion": "Retenção",
+      "percepcion": "Percepção"
+    }
   }
 }

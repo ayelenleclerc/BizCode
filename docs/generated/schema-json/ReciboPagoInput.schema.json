@@ -52,6 +52,12 @@
       "nullable": true,
       "type": "string"
     },
+    "retenciones": {
+      "items": {
+        "$ref": "./ReciboPagoRetencionInput.schema.json"
+      },
+      "type": "array"
+    },
     "total": {
       "exclusiveMinimum": 0,
       "type": "number"

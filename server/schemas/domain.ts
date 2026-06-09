@@ -1480,7 +1480,14 @@ export { movimientoProveedorCCTipoSchema }
 
 const reciboPagoMetodoSchema = z.enum(['transferencia', 'cheque', 'efectivo', 'echeq'])
 
-/** @en Supplier payment receipt body (#271). */
+const reciboPagoRetencionLineSchema = z.object({
+  regimenId: z.number().int().min(1),
+  baseImponible: z.number().positive('baseImponible must be positive'),
+  alicuota: z.number().min(0).max(100),
+  importe: z.number().positive('importe must be positive'),
+})
+
+/** @en Supplier payment receipt body (#271, #276 retenciones). */
 export const reciboPagoBodySchema = z
   .object({
     fecha: z.string(),
@@ -1498,6 +1505,7 @@ export const reciboPagoBodySchema = z
         }),
       )
       .min(1, 'At least one factura allocation is required'),
+    retenciones: z.array(reciboPagoRetencionLineSchema).optional(),
   })
   .superRefine((data, ctx) => {
     const f = data.fecha.trim()
@@ -1521,6 +1529,16 @@ export const reciboPagoBodySchema = z
           path: ['facturas'],
         })
       }
+    }
+    const bruto = data.facturas.reduce((sum, line) => sum + line.monto, 0)
+    const retTotal = (data.retenciones ?? []).reduce((sum, line) => sum + line.importe, 0)
+    const expectedNet = bruto - retTotal
+    if (Math.abs(expectedNet - data.total) > 0.009) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'total must equal sum of facturas minus sum of retenciones',
+        path: ['total'],
+      })
     }
   })
 
@@ -1798,6 +1816,43 @@ export const alertaProveedorConfigBodySchema = z
       })
     }
   })
+
+const regimenTipoSchema = z.enum(['ganancias', 'iva', 'iibb'])
+const regimenSubtipoSchema = z.enum(['retencion', 'percepcion'])
+
+export const regimenRetencionBodySchema = z.object({
+  tipo: regimenTipoSchema,
+  subtipo: regimenSubtipoSchema,
+  nombre: z.string().trim().min(1).max(80),
+  alicuota: z.number().min(0).max(100),
+  alicuotaMin: z.number().min(0).nullable().optional(),
+  provincia: z.string().trim().max(10).nullable().optional(),
+  activo: z.boolean().optional(),
+})
+
+export const regimenRetencionUpdateBodySchema = z
+  .object({
+    nombre: z.string().trim().min(1).max(80).optional(),
+    alicuota: z.number().min(0).max(100).optional(),
+    alicuotaMin: z.number().min(0).nullable().optional(),
+    provincia: z.string().trim().max(10).nullable().optional(),
+    activo: z.boolean().optional(),
+  })
+  .refine((data) => Object.keys(data).length > 0, {
+    message: 'At least one field is required',
+  })
+
+export const fiscalRetencionesConfigBodySchema = z.object({
+  esAgenteRetencionGanancias: z.boolean().optional(),
+  esAgenteRetencionIVA: z.boolean().optional(),
+  esAgenteRetencionIIBB: z.boolean().optional(),
+})
+
+export const retencionesPreviewQuerySchema = z.object({
+  entidadTipo: z.enum(['cliente', 'proveedor']),
+  entidadId: z.coerce.number().int().min(1),
+  monto: z.coerce.number().positive(),
+})
 
 export function safeParseBodySchema<S extends z.ZodTypeAny>(schema: S, raw: unknown): SafeParseBodyResult<z.output<S>> {
   const parsed = schema.safeParse(raw)

@@ -11133,7 +11133,49 @@ Requires module `finance.receipts` and permission `suppliers.read`.
 
     `integer`
 
+  - **`retenciones` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`alicuota` (required)**
+
+      `string`
+
+    - **`baseImponible` (required)**
+
+      `string`
+
+    - **`constanciaNum` (required)**
+
+      `string`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`importe` (required)**
+
+      `string`
+
+    - **`regimenId` (required)**
+
+      `integer`
+
+    - **`regimenNombre` (required)**
+
+      `string`
+
+    - **`tipo` (required)**
+
+      `string`
+
   - **`total` (required)**
+
+    `string`
+
+  - **`totalBruto` (required)**
 
     `string`
 
@@ -11193,6 +11235,7 @@ Requires module `finance.receipts` and permission `suppliers.read`.
       "proveedorId": 1,
       "fecha": "",
       "total": "",
+      "totalBruto": "",
       "metodoPago": "transferencia",
       "cbu": "",
       "referencia": "",
@@ -11215,6 +11258,18 @@ Requires module `finance.receipts` and permission `suppliers.read`.
           "comprobanteCompraId": 1,
           "facturaRef": "",
           "monto": ""
+        }
+      ],
+      "retenciones": [
+        {
+          "id": 1,
+          "regimenId": 1,
+          "regimenNombre": "",
+          "tipo": "",
+          "baseImponible": "",
+          "alicuota": "",
+          "importe": "",
+          "constanciaNum": ""
         }
       ],
       "createdAt": ""
@@ -11337,7 +11392,7 @@ Requires module `finance.receipts` and permission `suppliers.read`.
 - **Path:** `/api/proveedores/{id}/pagos`
 - **Tags:** proveedores
 
-Creates `ReciboPago` with tenant-correlative `numero`, posts `pago` ledger movement (negative monto), and audit event `recibo_pago_create`. Requires module `finance.receipts` and `suppliers.manage`.
+Creates `ReciboPago` with tenant-correlative `numero`, posts `pago` ledger movement (negative monto = sum of facturas/bruto), optional `RetencionAplicada` rows (#276), and audit event `recibo_pago_create`. `total` is net cash (sum facturas − sum retenciones). Requires module `finance.receipts` and `suppliers.manage`.
 
 #### Request Body
 
@@ -11385,6 +11440,28 @@ Creates `ReciboPago` with tenant-correlative `numero`, posts `pago` ledger movem
 
   `string`
 
+- **`retenciones`**
+
+  `array`
+
+  **Items:**
+
+  - **`alicuota` (required)**
+
+    `number`
+
+  - **`baseImponible` (required)**
+
+    `number`
+
+  - **`importe` (required)**
+
+    `number`
+
+  - **`regimenId` (required)**
+
+    `integer`
+
 **Example:**
 
 ```json
@@ -11400,6 +11477,14 @@ Creates `ReciboPago` with tenant-correlative `numero`, posts `pago` ledger movem
       "comprobanteCompraId": 1,
       "facturaRef": "",
       "monto": 1
+    }
+  ],
+  "retenciones": [
+    {
+      "regimenId": 1,
+      "baseImponible": 1,
+      "alicuota": 0,
+      "importe": 1
     }
   ]
 }
@@ -11485,7 +11570,49 @@ Creates `ReciboPago` with tenant-correlative `numero`, posts `pago` ledger movem
 
     `integer`
 
+  - **`retenciones` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`alicuota` (required)**
+
+      `string`
+
+    - **`baseImponible` (required)**
+
+      `string`
+
+    - **`constanciaNum` (required)**
+
+      `string`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`importe` (required)**
+
+      `string`
+
+    - **`regimenId` (required)**
+
+      `integer`
+
+    - **`regimenNombre` (required)**
+
+      `string`
+
+    - **`tipo` (required)**
+
+      `string`
+
   - **`total` (required)**
+
+    `string`
+
+  - **`totalBruto` (required)**
 
     `string`
 
@@ -11532,6 +11659,7 @@ Creates `ReciboPago` with tenant-correlative `numero`, posts `pago` ledger movem
     "proveedorId": 1,
     "fecha": "",
     "total": "",
+    "totalBruto": "",
     "metodoPago": "transferencia",
     "cbu": "",
     "referencia": "",
@@ -11554,6 +11682,18 @@ Creates `ReciboPago` with tenant-correlative `numero`, posts `pago` ledger movem
         "comprobanteCompraId": 1,
         "facturaRef": "",
         "monto": ""
+      }
+    ],
+    "retenciones": [
+      {
+        "id": 1,
+        "regimenId": 1,
+        "regimenNombre": "",
+        "tipo": "",
+        "baseImponible": "",
+        "alicuota": "",
+        "importe": "",
+        "constanciaNum": ""
       }
     ],
     "createdAt": ""
@@ -11759,7 +11899,49 @@ Sets estado `anulado` and posts compensating ledger movement. Audit `recibo_pago
 
     `integer`
 
+  - **`retenciones` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`alicuota` (required)**
+
+      `string`
+
+    - **`baseImponible` (required)**
+
+      `string`
+
+    - **`constanciaNum` (required)**
+
+      `string`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`importe` (required)**
+
+      `string`
+
+    - **`regimenId` (required)**
+
+      `integer`
+
+    - **`regimenNombre` (required)**
+
+      `string`
+
+    - **`tipo` (required)**
+
+      `string`
+
   - **`total` (required)**
+
+    `string`
+
+  - **`totalBruto` (required)**
 
     `string`
 
@@ -11806,6 +11988,7 @@ Sets estado `anulado` and posts compensating ledger movement. Audit `recibo_pago
     "proveedorId": 1,
     "fecha": "",
     "total": "",
+    "totalBruto": "",
     "metodoPago": "transferencia",
     "cbu": "",
     "referencia": "",
@@ -11828,6 +12011,18 @@ Sets estado `anulado` and posts compensating ledger movement. Audit `recibo_pago
         "comprobanteCompraId": 1,
         "facturaRef": "",
         "monto": ""
+      }
+    ],
+    "retenciones": [
+      {
+        "id": 1,
+        "regimenId": 1,
+        "regimenNombre": "",
+        "tipo": "",
+        "baseImponible": "",
+        "alicuota": "",
+        "importe": "",
+        "constanciaNum": ""
       }
     ],
     "createdAt": ""
@@ -12397,6 +12592,192 @@ Requires module finance.ledger and permission suppliers.manage (#275).
 ```
 
 ##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/proveedores/{id}/pagos/{reciboId}/retenciones
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/proveedores/{id}/pagos/{reciboId}/retenciones`
+
+### List withholdings applied to a payment receipt (#276)
+
+- **Method:** `GET`
+- **Path:** `/api/proveedores/{id}/pagos/{reciboId}/retenciones`
+- **Tags:** proveedores
+
+Requires module `finance.receipts` and permission `suppliers.read`.
+
+#### Responses
+
+##### Status: 200 Applied withholdings
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`alicuota` (required)**
+
+    `string`
+
+  - **`baseImponible` (required)**
+
+    `string`
+
+  - **`constanciaNum` (required)**
+
+    `string`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`importe` (required)**
+
+    `string`
+
+  - **`regimenId` (required)**
+
+    `integer`
+
+  - **`regimenNombre` (required)**
+
+    `string`
+
+  - **`tipo` (required)**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "regimenId": 1,
+      "regimenNombre": "",
+      "tipo": "",
+      "baseImponible": "",
+      "alicuota": "",
+      "importe": "",
+      "constanciaNum": ""
+    }
+  ]
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
 
 ###### Content-Type: application/json
 
@@ -17449,6 +17830,1482 @@ Requires `sales.create`.
 ```
 
 ##### Status: 502 AFIP request failed
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/fiscal/regimenes
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/fiscal/regimenes`
+
+### List withholding/perception regimes (#228)
+
+- **Method:** `GET`
+- **Path:** `/api/fiscal/regimenes`
+- **Tags:** contabilidad
+
+Requires `finance.retenciones`, `reports.financial.read`.
+
+#### Responses
+
+##### Status: 200 Regime list
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`activo` (required)**
+
+    `boolean`
+
+  - **`alicuota` (required)**
+
+    `string`
+
+  - **`alicuotaMin` (required)**
+
+    `string | null`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`nombre` (required)**
+
+    `string`
+
+  - **`provincia` (required)**
+
+    `string | null`
+
+  - **`subtipo` (required)**
+
+    `string`, possible values: `"retencion", "percepcion"`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"ganancias", "iva", "iibb"`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "tipo": "ganancias",
+      "subtipo": "retencion",
+      "nombre": "",
+      "alicuota": "",
+      "alicuotaMin": null,
+      "provincia": null,
+      "activo": true,
+      "createdAt": "",
+      "updatedAt": ""
+    }
+  ]
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Create withholding/perception regime (#228)
+
+- **Method:** `POST`
+- **Path:** `/api/fiscal/regimenes`
+- **Tags:** contabilidad
+
+Requires `finance.retenciones`, `settings.fiscal.manage`.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`alicuota` (required)**
+
+  `number`
+
+- **`nombre` (required)**
+
+  `string`
+
+- **`subtipo` (required)**
+
+  `string`, possible values: `"retencion", "percepcion"`
+
+- **`tipo` (required)**
+
+  `string`, possible values: `"ganancias", "iva", "iibb"`
+
+- **`activo`**
+
+  `boolean`
+
+- **`alicuotaMin`**
+
+  `number | null`
+
+- **`provincia`**
+
+  `string | null`
+
+**Example:**
+
+```json
+{
+  "tipo": "ganancias",
+  "subtipo": "retencion",
+  "nombre": "",
+  "alicuota": 0,
+  "alicuotaMin": null,
+  "provincia": null,
+  "activo": true
+}
+```
+
+#### Responses
+
+##### Status: 201 Regime created
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`activo` (required)**
+
+    `boolean`
+
+  - **`alicuota` (required)**
+
+    `string`
+
+  - **`alicuotaMin` (required)**
+
+    `string | null`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`nombre` (required)**
+
+    `string`
+
+  - **`provincia` (required)**
+
+    `string | null`
+
+  - **`subtipo` (required)**
+
+    `string`, possible values: `"retencion", "percepcion"`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"ganancias", "iva", "iibb"`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "tipo": "ganancias",
+    "subtipo": "retencion",
+    "nombre": "",
+    "alicuota": "",
+    "alicuotaMin": null,
+    "provincia": null,
+    "activo": true,
+    "createdAt": "",
+    "updatedAt": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/fiscal/regimenes/{id}
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/fiscal/regimenes/{id}`
+
+### Update withholding/perception regime (#228)
+
+- **Method:** `PUT`
+- **Path:** `/api/fiscal/regimenes/{id}`
+- **Tags:** contabilidad
+
+Requires `finance.retenciones`, `settings.fiscal.manage`.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`activo`**
+
+  `boolean`
+
+- **`alicuota`**
+
+  `number`
+
+- **`alicuotaMin`**
+
+  `number | null`
+
+- **`nombre`**
+
+  `string`
+
+- **`provincia`**
+
+  `string | null`
+
+**Example:**
+
+```json
+{
+  "nombre": "",
+  "alicuota": 0,
+  "alicuotaMin": null,
+  "provincia": null,
+  "activo": true
+}
+```
+
+#### Responses
+
+##### Status: 200 Regime updated
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`activo` (required)**
+
+    `boolean`
+
+  - **`alicuota` (required)**
+
+    `string`
+
+  - **`alicuotaMin` (required)**
+
+    `string | null`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`nombre` (required)**
+
+    `string`
+
+  - **`provincia` (required)**
+
+    `string | null`
+
+  - **`subtipo` (required)**
+
+    `string`, possible values: `"retencion", "percepcion"`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"ganancias", "iva", "iibb"`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "tipo": "ganancias",
+    "subtipo": "retencion",
+    "nombre": "",
+    "alicuota": "",
+    "alicuotaMin": null,
+    "provincia": null,
+    "activo": true,
+    "createdAt": "",
+    "updatedAt": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Regime not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/fiscal/config-retenciones
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/fiscal/config-retenciones`
+
+### Tenant withholding agent flags (#228)
+
+- **Method:** `GET`
+- **Path:** `/api/fiscal/config-retenciones`
+- **Tags:** contabilidad
+
+Requires `finance.retenciones`, `settings.fiscal.manage`.
+
+#### Responses
+
+##### Status: 200 Agent config
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`esAgenteRetencionGanancias` (required)**
+
+    `boolean`
+
+  - **`esAgenteRetencionIIBB` (required)**
+
+    `boolean`
+
+  - **`esAgenteRetencionIVA` (required)**
+
+    `boolean`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "esAgenteRetencionGanancias": true,
+    "esAgenteRetencionIVA": true,
+    "esAgenteRetencionIIBB": true
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Upsert tenant withholding agent flags (#228)
+
+- **Method:** `PUT`
+- **Path:** `/api/fiscal/config-retenciones`
+- **Tags:** contabilidad
+
+Requires `finance.retenciones`, `settings.fiscal.manage`.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`esAgenteRetencionGanancias`**
+
+  `boolean`
+
+- **`esAgenteRetencionIIBB`**
+
+  `boolean`
+
+- **`esAgenteRetencionIVA`**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "esAgenteRetencionGanancias": true,
+  "esAgenteRetencionIVA": true,
+  "esAgenteRetencionIIBB": true
+}
+```
+
+#### Responses
+
+##### Status: 200 Config saved
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`esAgenteRetencionGanancias` (required)**
+
+    `boolean`
+
+  - **`esAgenteRetencionIIBB` (required)**
+
+    `boolean`
+
+  - **`esAgenteRetencionIVA` (required)**
+
+    `boolean`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "esAgenteRetencionGanancias": true,
+    "esAgenteRetencionIVA": true,
+    "esAgenteRetencionIIBB": true
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/fiscal/retenciones
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/fiscal/retenciones`
+
+### Applied withholdings/perceptions history (#228)
+
+- **Method:** `GET`
+- **Path:** `/api/fiscal/retenciones`
+- **Tags:** contabilidad
+
+Requires `finance.retenciones`, `reports.financial.read`. Paginated list.
+
+#### Responses
+
+##### Status: 200 Paginated applied withholdings
+
+###### Content-Type: application/json
+
+**All of:**
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`alicuota` (required)**
+
+    `string`
+
+  - **`baseImponible` (required)**
+
+    `string`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`entidadId` (required)**
+
+    `integer`
+
+  - **`entidadTipo` (required)**
+
+    `string`, possible values: `"cliente", "proveedor"`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`importe` (required)**
+
+    `string`
+
+  - **`regimenId` (required)**
+
+    `integer`
+
+  - **`regimenNombre` (required)**
+
+    `string`
+
+  - **`tipo` (required)**
+
+    `string`
+
+  - **`cobroId`**
+
+    `integer | null`
+
+  - **`constanciaNum`**
+
+    `string | null`
+
+  - **`facturaId`**
+
+    `integer | null`
+
+  - **`reciboPagoId`**
+
+    `integer | null`
+
+- **`success` (required)**
+
+  `boolean`
+
+* **`limit` (required)**
+
+  `integer` — Effective page size (same semantics as query \`limit\`)
+
+* **`offset` (required)**
+
+  `integer` — Effective skip (same semantics as query \`offset\`)
+
+* **`total` (required)**
+
+  `integer` — Row count matching the list filter (before limit/offset)
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "regimenId": 1,
+      "regimenNombre": "",
+      "tipo": "",
+      "entidadTipo": "cliente",
+      "entidadId": 1,
+      "facturaId": null,
+      "cobroId": null,
+      "reciboPagoId": null,
+      "baseImponible": "",
+      "alicuota": "",
+      "importe": "",
+      "constanciaNum": null,
+      "createdAt": ""
+    }
+  ],
+  "total": 0,
+  "limit": 1,
+  "offset": 0
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/fiscal/retenciones/preview
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/fiscal/retenciones/preview`
+
+### Preview withholdings (#228,
+
+- **Method:** `GET`
+- **Path:** `/api/fiscal/retenciones/preview`
+- **Tags:** contabilidad
+
+Requires `finance.retenciones`, `reports.financial.read`. For `entidadTipo=proveedor`, returns suggested withholdings from active regimens (#276). Other entity types return empty until #229.
+
+#### Responses
+
+##### Status: 200 Preview result (stub)
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`retenciones` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`alicuota` (required)**
+
+      `string`
+
+    - **`baseImponible` (required)**
+
+      `string`
+
+    - **`importe` (required)**
+
+      `string`
+
+    - **`nombre` (required)**
+
+      `string`
+
+    - **`regimenId` (required)**
+
+      `integer`
+
+    - **`tipo` (required)**
+
+      `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "retenciones": [
+      {
+        "regimenId": 1,
+        "nombre": "",
+        "tipo": "",
+        "alicuota": "",
+        "baseImponible": "",
+        "importe": ""
+      }
+    ]
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/fiscal/retenciones/export
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/fiscal/retenciones/export`
+
+### Export applied withholdings TXT (#276)
+
+- **Method:** `GET`
+- **Path:** `/api/fiscal/retenciones/export`
+- **Tags:** contabilidad
+
+Requires `finance.retenciones`, `reports.financial.read`. `format=sicore` for Ganancias/IVA; `format=sifere` for IIBB. Excludes voided payment receipts.
+
+#### Responses
+
+##### Status: 200 TXT export
+
+###### Content-Type: text/plain
+
+`string`
+
+**Example:**
+
+```json
+true
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/fiscal/retenciones/{id}/comprobante/pdf
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/fiscal/retenciones/{id}/comprobante/pdf`
+
+### Download withholding certificate PDF (#276)
+
+- **Method:** `GET`
+- **Path:** `/api/fiscal/retenciones/{id}/comprobante/pdf`
+- **Tags:** contabilidad
+
+Requires `finance.retenciones`, `reports.financial.read`.
+
+#### Responses
+
+##### Status: 200 PDF certificate
+
+###### Content-Type: application/pdf
+
+`string`, format: `binary`
+
+**Example:**
+
+```json
+{}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
 
 ###### Content-Type: application/json
 
@@ -40134,7 +41991,49 @@ true
 
   `integer`
 
+* **`retenciones` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`alicuota` (required)**
+
+    `string`
+
+  - **`baseImponible` (required)**
+
+    `string`
+
+  - **`constanciaNum` (required)**
+
+    `string`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`importe` (required)**
+
+    `string`
+
+  - **`regimenId` (required)**
+
+    `integer`
+
+  - **`regimenNombre` (required)**
+
+    `string`
+
+  - **`tipo` (required)**
+
+    `string`
+
 * **`total` (required)**
+
+  `string`
+
+* **`totalBruto` (required)**
 
   `string`
 
@@ -40175,6 +42074,7 @@ true
   "proveedorId": 1,
   "fecha": "",
   "total": "",
+  "totalBruto": "",
   "metodoPago": "transferencia",
   "cbu": "",
   "referencia": "",
@@ -40197,6 +42097,18 @@ true
       "comprobanteCompraId": 1,
       "facturaRef": "",
       "monto": ""
+    }
+  ],
+  "retenciones": [
+    {
+      "id": 1,
+      "regimenId": 1,
+      "regimenNombre": "",
+      "tipo": "",
+      "baseImponible": "",
+      "alicuota": "",
+      "importe": "",
+      "constanciaNum": ""
     }
   ],
   "createdAt": ""
@@ -40249,6 +42161,28 @@ true
 
   `string`
 
+* **`retenciones`**
+
+  `array`
+
+  **Items:**
+
+  - **`alicuota` (required)**
+
+    `number`
+
+  - **`baseImponible` (required)**
+
+    `number`
+
+  - **`importe` (required)**
+
+    `number`
+
+  - **`regimenId` (required)**
+
+    `integer`
+
 **Example:**
 
 ```json
@@ -40265,7 +42199,97 @@ true
       "facturaRef": "",
       "monto": 1
     }
+  ],
+  "retenciones": [
+    {
+      "regimenId": 1,
+      "baseImponible": 1,
+      "alicuota": 0,
+      "importe": 1
+    }
   ]
+}
+```
+
+### ReciboPagoRetencionInput
+
+- **Type:**`object`
+
+* **`alicuota` (required)**
+
+  `number`
+
+* **`baseImponible` (required)**
+
+  `number`
+
+* **`importe` (required)**
+
+  `number`
+
+* **`regimenId` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "regimenId": 1,
+  "baseImponible": 1,
+  "alicuota": 0,
+  "importe": 1
+}
+```
+
+### ReciboPagoRetencion
+
+- **Type:**`object`
+
+* **`alicuota` (required)**
+
+  `string`
+
+* **`baseImponible` (required)**
+
+  `string`
+
+* **`constanciaNum` (required)**
+
+  `string`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`importe` (required)**
+
+  `string`
+
+* **`regimenId` (required)**
+
+  `integer`
+
+* **`regimenNombre` (required)**
+
+  `string`
+
+* **`tipo` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "regimenId": 1,
+  "regimenNombre": "",
+  "tipo": "",
+  "baseImponible": "",
+  "alicuota": "",
+  "importe": "",
+  "constanciaNum": ""
 }
 ```
 
@@ -40394,7 +42418,49 @@ true
 
     `integer`
 
+  - **`retenciones` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`alicuota` (required)**
+
+      `string`
+
+    - **`baseImponible` (required)**
+
+      `string`
+
+    - **`constanciaNum` (required)**
+
+      `string`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`importe` (required)**
+
+      `string`
+
+    - **`regimenId` (required)**
+
+      `integer`
+
+    - **`regimenNombre` (required)**
+
+      `string`
+
+    - **`tipo` (required)**
+
+      `string`
+
   - **`total` (required)**
+
+    `string`
+
+  - **`totalBruto` (required)**
 
     `string`
 
@@ -40441,6 +42507,7 @@ true
     "proveedorId": 1,
     "fecha": "",
     "total": "",
+    "totalBruto": "",
     "metodoPago": "transferencia",
     "cbu": "",
     "referencia": "",
@@ -40463,6 +42530,18 @@ true
         "comprobanteCompraId": 1,
         "facturaRef": "",
         "monto": ""
+      }
+    ],
+    "retenciones": [
+      {
+        "id": 1,
+        "regimenId": 1,
+        "regimenNombre": "",
+        "tipo": "",
+        "baseImponible": "",
+        "alicuota": "",
+        "importe": "",
+        "constanciaNum": ""
       }
     ],
     "createdAt": ""
@@ -47713,6 +49792,601 @@ Originating invoice header (selected columns)
   "data": {
     "duplicado": true,
     "comprobanteCompraId": null
+  }
+}
+```
+
+### RegimenRetencion
+
+- **Type:**`object`
+
+* **`activo` (required)**
+
+  `boolean`
+
+* **`alicuota` (required)**
+
+  `string`
+
+* **`alicuotaMin` (required)**
+
+  `string | null`
+
+* **`createdAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`nombre` (required)**
+
+  `string`
+
+* **`provincia` (required)**
+
+  `string | null`
+
+* **`subtipo` (required)**
+
+  `string`, possible values: `"retencion", "percepcion"`
+
+* **`tenantId` (required)**
+
+  `integer`
+
+* **`tipo` (required)**
+
+  `string`, possible values: `"ganancias", "iva", "iibb"`
+
+* **`updatedAt` (required)**
+
+  `string`, format: `date-time`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "tenantId": 1,
+  "tipo": "ganancias",
+  "subtipo": "retencion",
+  "nombre": "",
+  "alicuota": "",
+  "alicuotaMin": null,
+  "provincia": null,
+  "activo": true,
+  "createdAt": "",
+  "updatedAt": ""
+}
+```
+
+### RegimenRetencionInput
+
+- **Type:**`object`
+
+* **`alicuota` (required)**
+
+  `number`
+
+* **`nombre` (required)**
+
+  `string`
+
+* **`subtipo` (required)**
+
+  `string`, possible values: `"retencion", "percepcion"`
+
+* **`tipo` (required)**
+
+  `string`, possible values: `"ganancias", "iva", "iibb"`
+
+* **`activo`**
+
+  `boolean`
+
+* **`alicuotaMin`**
+
+  `number | null`
+
+* **`provincia`**
+
+  `string | null`
+
+**Example:**
+
+```json
+{
+  "tipo": "ganancias",
+  "subtipo": "retencion",
+  "nombre": "",
+  "alicuota": 0,
+  "alicuotaMin": null,
+  "provincia": null,
+  "activo": true
+}
+```
+
+### RegimenRetencionUpdateInput
+
+- **Type:**`object`
+
+* **`activo`**
+
+  `boolean`
+
+* **`alicuota`**
+
+  `number`
+
+* **`alicuotaMin`**
+
+  `number | null`
+
+* **`nombre`**
+
+  `string`
+
+* **`provincia`**
+
+  `string | null`
+
+**Example:**
+
+```json
+{
+  "nombre": "",
+  "alicuota": 0,
+  "alicuotaMin": null,
+  "provincia": null,
+  "activo": true
+}
+```
+
+### RegimenRetencionEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`activo` (required)**
+
+    `boolean`
+
+  - **`alicuota` (required)**
+
+    `string`
+
+  - **`alicuotaMin` (required)**
+
+    `string | null`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`nombre` (required)**
+
+    `string`
+
+  - **`provincia` (required)**
+
+    `string | null`
+
+  - **`subtipo` (required)**
+
+    `string`, possible values: `"retencion", "percepcion"`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"ganancias", "iva", "iibb"`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "tipo": "ganancias",
+    "subtipo": "retencion",
+    "nombre": "",
+    "alicuota": "",
+    "alicuotaMin": null,
+    "provincia": null,
+    "activo": true,
+    "createdAt": "",
+    "updatedAt": ""
+  }
+}
+```
+
+### RegimenRetencionListEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`activo` (required)**
+
+    `boolean`
+
+  - **`alicuota` (required)**
+
+    `string`
+
+  - **`alicuotaMin` (required)**
+
+    `string | null`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`nombre` (required)**
+
+    `string`
+
+  - **`provincia` (required)**
+
+    `string | null`
+
+  - **`subtipo` (required)**
+
+    `string`, possible values: `"retencion", "percepcion"`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"ganancias", "iva", "iibb"`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "tipo": "ganancias",
+      "subtipo": "retencion",
+      "nombre": "",
+      "alicuota": "",
+      "alicuotaMin": null,
+      "provincia": null,
+      "activo": true,
+      "createdAt": "",
+      "updatedAt": ""
+    }
+  ]
+}
+```
+
+### FiscalRetencionesConfig
+
+- **Type:**`object`
+
+* **`esAgenteRetencionGanancias` (required)**
+
+  `boolean`
+
+* **`esAgenteRetencionIIBB` (required)**
+
+  `boolean`
+
+* **`esAgenteRetencionIVA` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "esAgenteRetencionGanancias": true,
+  "esAgenteRetencionIVA": true,
+  "esAgenteRetencionIIBB": true
+}
+```
+
+### FiscalRetencionesConfigInput
+
+- **Type:**`object`
+
+* **`esAgenteRetencionGanancias`**
+
+  `boolean`
+
+* **`esAgenteRetencionIIBB`**
+
+  `boolean`
+
+* **`esAgenteRetencionIVA`**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "esAgenteRetencionGanancias": true,
+  "esAgenteRetencionIVA": true,
+  "esAgenteRetencionIIBB": true
+}
+```
+
+### FiscalRetencionesConfigEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`esAgenteRetencionGanancias` (required)**
+
+    `boolean`
+
+  - **`esAgenteRetencionIIBB` (required)**
+
+    `boolean`
+
+  - **`esAgenteRetencionIVA` (required)**
+
+    `boolean`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "esAgenteRetencionGanancias": true,
+    "esAgenteRetencionIVA": true,
+    "esAgenteRetencionIIBB": true
+  }
+}
+```
+
+### RetencionAplicada
+
+- **Type:**`object`
+
+* **`alicuota` (required)**
+
+  `string`
+
+* **`baseImponible` (required)**
+
+  `string`
+
+* **`createdAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`entidadId` (required)**
+
+  `integer`
+
+* **`entidadTipo` (required)**
+
+  `string`, possible values: `"cliente", "proveedor"`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`importe` (required)**
+
+  `string`
+
+* **`regimenId` (required)**
+
+  `integer`
+
+* **`regimenNombre` (required)**
+
+  `string`
+
+* **`tipo` (required)**
+
+  `string`
+
+* **`cobroId`**
+
+  `integer | null`
+
+* **`constanciaNum`**
+
+  `string | null`
+
+* **`facturaId`**
+
+  `integer | null`
+
+* **`reciboPagoId`**
+
+  `integer | null`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "regimenId": 1,
+  "regimenNombre": "",
+  "tipo": "",
+  "entidadTipo": "cliente",
+  "entidadId": 1,
+  "facturaId": null,
+  "cobroId": null,
+  "reciboPagoId": null,
+  "baseImponible": "",
+  "alicuota": "",
+  "importe": "",
+  "constanciaNum": null,
+  "createdAt": ""
+}
+```
+
+### RetencionAplicadaListEnvelope
+
+- **Type:**
+
+**Example:**
+
+### RetencionesPreviewResult
+
+- **Type:**`object`
+
+* **`retenciones` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`alicuota` (required)**
+
+    `string`
+
+  - **`baseImponible` (required)**
+
+    `string`
+
+  - **`importe` (required)**
+
+    `string`
+
+  - **`nombre` (required)**
+
+    `string`
+
+  - **`regimenId` (required)**
+
+    `integer`
+
+  - **`tipo` (required)**
+
+    `string`
+
+**Example:**
+
+```json
+{
+  "retenciones": [
+    {
+      "regimenId": 1,
+      "nombre": "",
+      "tipo": "",
+      "alicuota": "",
+      "baseImponible": "",
+      "importe": ""
+    }
+  ]
+}
+```
+
+### RetencionesPreviewEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`retenciones` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`alicuota` (required)**
+
+      `string`
+
+    - **`baseImponible` (required)**
+
+      `string`
+
+    - **`importe` (required)**
+
+      `string`
+
+    - **`nombre` (required)**
+
+      `string`
+
+    - **`regimenId` (required)**
+
+      `integer`
+
+    - **`tipo` (required)**
+
+      `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "retenciones": [
+      {
+        "regimenId": 1,
+        "nombre": "",
+        "tipo": "",
+        "alicuota": "",
+        "baseImponible": "",
+        "importe": ""
+      }
+    ]
   }
 }
 ```

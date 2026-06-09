@@ -108,5 +108,39 @@
     "emailNote": "External email requires server SMTP; without a configured recipient only in-app applies.",
     "save": "Save alerts",
     "saved": "Settings saved"
+  },
+  "retenciones": {
+    "title": "Withholdings and perceptions",
+    "hint": "Tenant-configurable regimes. Automatic calculation on payments and invoices will ship in #229. Customer/supplier VAT condition uses the existing master (AFIP registry #192 pending).",
+    "loading": "Loading fiscal settings…",
+    "readOnlyHint": "Read-only; only roles with fiscal permission can edit.",
+    "agentFlagsLegend": "Withholding/perception agent",
+    "agentGanancias": "Income tax withholding agent",
+    "agentIva": "VAT withholding agent",
+    "agentIibb": "Gross receipts withholding agent",
+    "saveConfig": "Save agent flags",
+    "regimenesTitle": "Regimes",
+    "regimenesEmpty": "No regimes configured.",
+    "colNombre": "Name",
+    "colTipo": "Type",
+    "colAlicuota": "Rate",
+    "colActivo": "Status",
+    "activo": "Active",
+    "inactivo": "Inactive",
+    "fieldTipo": "Tax type",
+    "fieldSubtipo": "Subtype",
+    "fieldNombre": "Name",
+    "fieldAlicuota": "Rate (%)",
+    "createRegimen": "Add regime",
+    "saved": "Settings saved",
+    "tipo": {
+      "ganancias": "Income tax",
+      "iva": "VAT",
+      "iibb": "Gross receipts"
+    },
+    "subtipo": {
+      "retencion": "Withholding",
+      "percepcion": "Perception"
+    }
   }
 }

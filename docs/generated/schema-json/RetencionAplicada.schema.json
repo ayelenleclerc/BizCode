@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "alicuota": {
+      "type": "string"
+    },
+    "baseImponible": {
+      "type": "string"
+    },
+    "cobroId": {
+      "minimum": 1,
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "constanciaNum": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "createdAt": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "entidadId": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "entidadTipo": {
+      "enum": [
+        "cliente",
+        "proveedor"
+      ],
+      "type": "string"
+    },
+    "facturaId": {
+      "minimum": 1,
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "id": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "importe": {
+      "type": "string"
+    },
+    "reciboPagoId": {
+      "minimum": 1,
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "regimenId": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "regimenNombre": {
+      "type": "string"
+    },
+    "tipo": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "regimenId",
+    "regimenNombre",
+    "tipo",
+    "entidadTipo",
+    "entidadId",
+    "baseImponible",
+    "alicuota",
+    "importe",
+    "createdAt"
+  ],
+  "title": "RetencionAplicada",
+  "type": "object"
+}

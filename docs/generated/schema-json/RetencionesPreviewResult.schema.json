@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "retenciones": {
+      "items": {
+        "properties": {
+          "alicuota": {
+            "type": "string"
+          },
+          "baseImponible": {
+            "type": "string"
+          },
+          "importe": {
+            "type": "string"
+          },
+          "nombre": {
+            "type": "string"
+          },
+          "regimenId": {
+            "type": "integer"
+          },
+          "tipo": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "regimenId",
+          "nombre",
+          "tipo",
+          "alicuota",
+          "baseImponible",
+          "importe"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    }
+  },
+  "required": [
+    "retenciones"
+  ],
+  "title": "RetencionesPreviewResult",
+  "type": "object"
+}
