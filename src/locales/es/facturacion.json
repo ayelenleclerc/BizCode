@@ -128,5 +128,28 @@
       "thermalFallbackPdf": "Térmica deshabilitada: se abrió el PDF legal.",
       "error": "No se pudo imprimir con el dispositivo seleccionado"
     }
+  },
+  "remitos": {
+    "title": "Remitos",
+    "empty": "Sin remitos registrados.",
+    "emitir": "Emitir",
+    "anular": "Anular",
+    "pdf": "PDF",
+    "creating": "Creando…",
+    "created": "Remito {{ref}} creado (borrador). Emitilo desde el listado.",
+    "generateFromFactura": "Generar remito",
+    "columns": {
+      "referencia": "Número",
+      "cliente": "Cliente",
+      "estado": "Estado",
+      "fecha": "Fecha",
+      "actions": "Acciones"
+    },
+    "estado": {
+      "borrador": "Borrador",
+      "emitido": "Emitido",
+      "entregado": "Entregado",
+      "anulado": "Anulado"
+    }
   }
 }

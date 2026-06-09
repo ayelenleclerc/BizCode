@@ -128,5 +128,28 @@
       "thermalFallbackPdf": "Thermal disabled: opened legal PDF.",
       "error": "Could not print with the selected device"
     }
+  },
+  "remitos": {
+    "title": "Delivery notes",
+    "empty": "No delivery notes yet.",
+    "emitir": "Issue",
+    "anular": "Void",
+    "pdf": "PDF",
+    "creating": "Creating…",
+    "created": "Delivery note {{ref}} created (draft). Issue it from the list.",
+    "generateFromFactura": "Generate delivery note",
+    "columns": {
+      "referencia": "Number",
+      "cliente": "Customer",
+      "estado": "Status",
+      "fecha": "Date",
+      "actions": "Actions"
+    },
+    "estado": {
+      "borrador": "Draft",
+      "emitido": "Issued",
+      "entregado": "Delivered",
+      "anulado": "Voided"
+    }
   }
 }

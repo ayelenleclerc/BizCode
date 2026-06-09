@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "clienteId": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "facturaId": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "fecha": {
+      "format": "date",
+      "type": "string"
+    },
+    "items": {
+      "items": {
+        "$ref": "./RemitoItemInput.schema.json"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "observaciones": {
+      "nullable": true,
+      "type": "string"
+    },
+    "ordenEntregaId": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "pedidoId": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "proveedorId": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "tipo": {
+      "enum": [
+        "remito_x",
+        "remito_ingreso"
+      ],
+      "type": "string"
+    }
+  },
+  "required": [
+    "tipo",
+    "items"
+  ],
+  "title": "RemitoInput",
+  "type": "object"
+}

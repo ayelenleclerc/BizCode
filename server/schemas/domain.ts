@@ -14,6 +14,10 @@ import type {
   PedidoInput,
   PedidoInvoiceInput,
   PedidoItemInput,
+  RemitoEntregarInput,
+  RemitoInput,
+  RemitoItemInput,
+  RemitoUpdateInput,
   ProveedorInput,
   ProveedorCuentaCorrienteAjusteInput,
   RubroInput,
@@ -1870,6 +1874,99 @@ export const retencionesPreviewQuerySchema = z.object({
   neto2: z.coerce.number().min(0).optional(),
   neto3: z.coerce.number().min(0).optional(),
 })
+
+const remitoItemField = z
+  .array(
+    z.object({
+      articuloId: z.number(),
+      descripcion: z.string(),
+      cantidad: z.number(),
+      unidad: z.string(),
+    }),
+  )
+  .min(1, 'items must contain at least one line')
+  .superRefine((items, ctx) => {
+    items.forEach((it, idx) => {
+      if (!Number.isInteger(it.articuloId) || it.articuloId < 1) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'articuloId must be >= 1', path: [idx, 'articuloId'] })
+      }
+      const desc = it.descripcion.trim()
+      if (desc.length < 1 || desc.length > 120) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'descripcion must be 1-120 characters', path: [idx, 'descripcion'] })
+      }
+      if (!Number.isInteger(it.cantidad) || it.cantidad < 1) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'cantidad must be >= 1', path: [idx, 'cantidad'] })
+      }
+      const unidad = it.unidad.trim()
+      if (unidad.length < 1 || unidad.length > 6) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'unidad must be 1-6 characters', path: [idx, 'unidad'] })
+      }
+    })
+  })
+  .transform((items): RemitoItemInput[] =>
+    items.map((it) => ({
+      articuloId: it.articuloId,
+      descripcion: it.descripcion.trim(),
+      cantidad: it.cantidad,
+      unidad: it.unidad.trim(),
+    })),
+  )
+
+export const remitoBodySchema = z
+  .object({
+    tipo: z.enum(['remito_x', 'remito_ingreso'], {
+      errorMap: () => ({ message: 'tipo must be remito_x or remito_ingreso' }),
+    }),
+    clienteId: z.union([z.number(), z.null()]).optional(),
+    proveedorId: z.union([z.number(), z.null()]).optional(),
+    facturaId: z.union([z.number(), z.null()]).optional(),
+    pedidoId: z.union([z.number(), z.null()]).optional(),
+    ordenEntregaId: z.union([z.number(), z.null()]).optional(),
+    fecha: z.string().optional(),
+    observaciones: z.union([z.string(), z.null()]).optional(),
+    items: remitoItemField,
+  })
+  .transform(
+    (data): RemitoInput => ({
+      tipo: data.tipo,
+      clienteId: data.clienteId,
+      proveedorId: data.proveedorId,
+      facturaId: data.facturaId,
+      pedidoId: data.pedidoId,
+      ordenEntregaId: data.ordenEntregaId,
+      fecha: data.fecha,
+      observaciones: data.observaciones,
+      items: data.items,
+    }),
+  )
+
+export const remitoUpdateBodySchema = z
+  .object({
+    clienteId: z.union([z.number(), z.null()]).optional(),
+    proveedorId: z.union([z.number(), z.null()]).optional(),
+    observaciones: z.union([z.string(), z.null()]).optional(),
+    items: remitoItemField.optional(),
+  })
+  .refine((data) => Object.keys(data).length > 0, { message: 'At least one field is required' })
+  .transform((data): RemitoUpdateInput => data)
+
+export const remitoEntregarBodySchema = z
+  .object({
+    firmadoPor: z.string(),
+    fechaEntrega: z.string().optional(),
+  })
+  .superRefine((data, ctx) => {
+    const name = data.firmadoPor.trim()
+    if (name.length < 2 || name.length > 120) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'firmadoPor must be 2-120 characters', path: ['firmadoPor'] })
+    }
+  })
+  .transform(
+    (data): RemitoEntregarInput => ({
+      firmadoPor: data.firmadoPor.trim(),
+      fechaEntrega: data.fechaEntrega,
+    }),
+  )
 
 export function safeParseBodySchema<S extends z.ZodTypeAny>(schema: S, raw: unknown): SafeParseBodyResult<z.output<S>> {
   const parsed = schema.safeParse(raw)

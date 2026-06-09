@@ -3391,6 +3391,25 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
 
+  /api/pedidos/{id}/remito:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    post:
+      tags: [pedidos, remitos]
+      summary: Create delivery note from confirmed pedido
+      responses:
+        '201':
+          description: Draft remito created from pedido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RemitoEnvelope'
+
   /api/cobros:
     parameters:
       - $ref: '#/components/parameters/BizcodeChannelHeader'
@@ -3881,6 +3900,220 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         '403':
           $ref: '#/components/responses/ForbiddenError'
+
+  /api/facturas/{id}/remito:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    post:
+      tags: [facturas, remitos]
+      summary: Create delivery note from invoice
+      description: |
+        Creates a draft `remito_x` copying active invoice lines. Requires module `fiscal.remito` and `sales.create`.
+        Stock is not decremented on the remito (stock remains on invoice creation).
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '201':
+          description: Draft remito created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RemitoEnvelope'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '409':
+          description: Invoice already linked to a non-voided remito
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /api/remitos:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [remitos]
+      summary: List delivery notes
+      description: Paginated list. Requires module `fiscal.remito`.
+      parameters:
+        - $ref: '#/components/parameters/ListLimit'
+        - $ref: '#/components/parameters/ListOffset'
+        - name: estado
+          in: query
+          schema:
+            type: string
+            enum: [borrador, emitido, entregado, anulado]
+        - name: clienteId
+          in: query
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Paginated remitos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RemitoListEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+    post:
+      tags: [remitos]
+      summary: Create delivery note (draft)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RemitoInput'
+      responses:
+        '201':
+          description: Draft created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RemitoEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /api/remitos/{id}:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    get:
+      tags: [remitos]
+      summary: Get delivery note
+      responses:
+        '200':
+          description: Delivery note detail
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RemitoEnvelope'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+    put:
+      tags: [remitos]
+      summary: Update draft delivery note
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RemitoUpdateInput'
+      responses:
+        '200':
+          description: Updated draft delivery note
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RemitoEnvelope'
+        '409':
+          description: Only borrador can be updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+
+  /api/remitos/{id}/emitir:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    post:
+      tags: [remitos]
+      summary: Issue delivery note (assign correlativo)
+      responses:
+        '200':
+          description: Issued delivery note
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RemitoEnvelope'
+
+  /api/remitos/{id}/entregar:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    post:
+      tags: [remitos]
+      summary: Mark delivery note as delivered
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RemitoEntregarInput'
+      responses:
+        '200':
+          description: Delivered delivery note
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RemitoEnvelope'
+
+  /api/remitos/{id}/anular:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    post:
+      tags: [remitos]
+      summary: Void issued delivery note
+      responses:
+        '200':
+          description: Voided delivery note
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RemitoEnvelope'
+
+  /api/remitos/{id}/pdf:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    get:
+      tags: [remitos]
+      summary: Download delivery note PDF
+      responses:
+        '200':
+          description: application/pdf
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
 
   /api/notas-credito:
     parameters:
@@ -9011,6 +9244,157 @@ components:
           type: number
         subtotal:
           type: number
+
+    RemitoItemInput:
+      type: object
+      required: [articuloId, descripcion, cantidad, unidad]
+      properties:
+        articuloId:
+          type: integer
+        descripcion:
+          type: string
+        cantidad:
+          type: integer
+          minimum: 1
+        unidad:
+          type: string
+
+    RemitoInput:
+      type: object
+      required: [tipo, items]
+      properties:
+        tipo:
+          type: string
+          enum: [remito_x, remito_ingreso]
+        clienteId:
+          type: integer
+          nullable: true
+        proveedorId:
+          type: integer
+          nullable: true
+        facturaId:
+          type: integer
+          nullable: true
+        pedidoId:
+          type: integer
+          nullable: true
+        ordenEntregaId:
+          type: integer
+          nullable: true
+        fecha:
+          type: string
+          format: date
+        observaciones:
+          type: string
+          nullable: true
+        items:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/RemitoItemInput'
+
+    RemitoUpdateInput:
+      type: object
+      properties:
+        clienteId:
+          type: integer
+          nullable: true
+        proveedorId:
+          type: integer
+          nullable: true
+        observaciones:
+          type: string
+          nullable: true
+        items:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/RemitoItemInput'
+
+    RemitoEntregarInput:
+      type: object
+      required: [firmadoPor]
+      properties:
+        firmadoPor:
+          type: string
+          minLength: 2
+          maxLength: 120
+        fechaEntrega:
+          type: string
+          format: date
+
+    Remito:
+      type: object
+      additionalProperties: true
+      properties:
+        id:
+          type: integer
+        referencia:
+          type: string
+        prefijo:
+          type: string
+          nullable: true
+        numero:
+          type: integer
+          nullable: true
+        tipo:
+          type: string
+        estado:
+          type: string
+          enum: [borrador, emitido, entregado, anulado]
+        clienteId:
+          type: integer
+          nullable: true
+        facturaId:
+          type: integer
+          nullable: true
+        pedidoId:
+          type: integer
+          nullable: true
+        fecha:
+          type: string
+          format: date-time
+        fechaEntrega:
+          type: string
+          format: date-time
+          nullable: true
+        observaciones:
+          type: string
+          nullable: true
+        firmadoPor:
+          type: string
+          nullable: true
+        items:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+
+    RemitoEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+        data:
+          $ref: '#/components/schemas/Remito'
+
+    RemitoListEnvelope:
+      type: object
+      required: [success, data, total, limit, offset]
+      properties:
+        success:
+          type: boolean
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Remito'
+        total:
+          type: integer
+        limit:
+          type: integer
+        offset:
+          type: integer
 
     VoidInput:
       type: object

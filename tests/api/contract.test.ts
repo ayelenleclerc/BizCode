@@ -616,6 +616,78 @@ function buildPrisma(): PrismaClient {
       findMany: vi.fn().mockResolvedValue([]),
       findFirst: vi.fn().mockResolvedValue(null),
     },
+    remito: {
+      count: vi.fn().mockResolvedValue(1),
+      findMany: vi.fn().mockResolvedValue([
+        {
+          id: 1,
+          tenantId: 1,
+          prefijo: '0001',
+          numero: 1,
+          tipo: 'remito_x',
+          estado: 'emitido',
+          clienteId: 1,
+          proveedorId: null,
+          facturaId: null,
+          pedidoId: null,
+          ordenEntregaId: null,
+          fecha: new Date('2026-06-10T12:00:00.000Z'),
+          fechaEntrega: null,
+          observaciones: null,
+          firmadoPor: null,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          cliente: { id: 1, codigo: 1, rsocial: 'Cliente SA', cuit: null, domicilio: null },
+          proveedor: null,
+          factura: null,
+          pedido: null,
+          ordenEntrega: null,
+          items: [
+            {
+              id: 1,
+              articuloId: 1,
+              descripcion: 'Articulo',
+              cantidad: 1,
+              unidad: 'UN',
+              articulo: { id: 1, codigo: 1, descripcion: 'Articulo', umedida: 'UN' },
+            },
+          ],
+        },
+      ]),
+      findFirst: vi.fn().mockResolvedValue({
+        id: 1,
+        tenantId: 1,
+        prefijo: '0001',
+        numero: 1,
+        tipo: 'remito_x',
+        estado: 'emitido',
+        clienteId: 1,
+        proveedorId: null,
+        facturaId: null,
+        pedidoId: null,
+        ordenEntregaId: null,
+        fecha: new Date('2026-06-10T12:00:00.000Z'),
+        fechaEntrega: null,
+        observaciones: null,
+        firmadoPor: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        cliente: { id: 1, codigo: 1, rsocial: 'Cliente SA', cuit: null, domicilio: null },
+        proveedor: null,
+        items: [
+          {
+            id: 1,
+            articuloId: 1,
+            descripcion: 'Articulo',
+            cantidad: 1,
+            unidad: 'UN',
+          },
+        ],
+      }),
+      create: vi.fn(),
+      update: vi.fn(),
+    },
+    remitoItem: { deleteMany: vi.fn().mockResolvedValue({ count: 0 }) },
     ordenCompra: {
       count: vi.fn().mockResolvedValue(1),
       findMany: vi.fn().mockResolvedValue([ordenCompraContractRow]),
@@ -1495,6 +1567,12 @@ describe('API — contrato OpenAPI', () => {
     const app = createApp(prisma)
     const res = await request(app).get('/api/proveedores/1/pagos/1/retenciones').expect(200)
     await assertMatchesOpenApi('/api/proveedores/{id}/pagos/{reciboId}/retenciones', 'get', '200', res.body)
+  })
+
+  it('GET /api/remitos', async () => {
+    const app = createApp(prisma)
+    const res = await request(app).get('/api/remitos').expect(200)
+    await assertMatchesOpenApi('/api/remitos', 'get', '200', res.body)
   })
 
   it('GET /api/cobros/{id}/retenciones', async () => {
