@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "lines": {
+      "items": {
+        "properties": {
+          "articuloId": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "cantFisica": {
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "articuloId",
+          "cantFisica"
+        ],
+        "type": "object"
+      },
+      "minItems": 1,
+      "type": "array"
+    }
+  },
+  "required": [
+    "lines"
+  ],
+  "title": "RecuentoItemsInput",
+  "type": "object"
+}

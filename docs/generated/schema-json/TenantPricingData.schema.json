@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "addons": {
+      "items": {
+        "$ref": "./TenantPricingAddon.schema.json"
+      },
+      "type": "array"
+    },
+    "basePrice": {
+      "minimum": 0,
+      "type": "number"
+    },
+    "plan": {
+      "type": "string"
+    },
+    "totalMonthly": {
+      "minimum": 0,
+      "type": "number"
+    }
+  },
+  "required": [
+    "plan",
+    "basePrice",
+    "addons",
+    "totalMonthly"
+  ],
+  "title": "TenantPricingData",
+  "type": "object"
+}

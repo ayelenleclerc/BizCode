@@ -12,14 +12,17 @@ BizCode targets **WCAG 2.2 Level AA** conformance.
 
 | Key | Action |
 |---|---|
-| F2 | Focus search input |
+| F2 | Focus search or active filter |
 | F3 | Open "New record" form |
 | F5 | Save current form |
 | Ins | Add line item (invoice form) |
 | Del | Remove selected line item |
-| ↑ / ↓ | Navigate table rows |
-| Enter | Open selected row for editing |
+| ↑ / ↓ | Navigate table rows or side lists |
+| Enter | Open selected row / confirm dialog |
 | Esc | Close form / cancel |
+| Tab | Move between controls (home, login) |
+
+Screens with extra shortcuts show a **KeyboardHint** card below the global layout header bar.
 
 ## ARIA Patterns
 
@@ -63,6 +66,10 @@ Non-form errors (e.g., API failures) must use `role="alert"`:
   {errorMessage}
 </div>
 ```
+
+## Maps (logistics GPS)
+
+The planner view at `/logistica/seguimiento` embeds a **Leaflet** map (OpenStreetMap tiles). Markers and the route list use text labels from i18n; map tiles are decorative for screen-reader users when the sidebar list is available. Prefer keyboard-operable controls in the list panel; do not add redundant `aria-pressed` on native checkboxes or `aria-checked` on native `<input type="checkbox">` (see `logistica/picking` and `logistica/seguimiento`).
 
 ## Verification
 

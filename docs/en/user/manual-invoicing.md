@@ -10,6 +10,24 @@ Shows all issued invoices with: Date, Type (A/B), Number, Customer, Net, VAT, To
 
 **View detail:** Click an invoice to expand line items and VAT breakdown.
 
+## PDF and printing (AFIP CAE module)
+
+When **`billing.arca_cae`** is enabled and you have **`reports.operational.read`**:
+
+| Action | API | Notes |
+|--------|-----|--------|
+| Preview PDF | `GET /api/facturas/{id}/pdf/preview` | Watermarked, **non-fiscal** (no CAE required). |
+| Legal PDF | `GET /api/facturas/{id}/pdf` | Requires **issued CAE**; fiscal layout with QR and barcode ([ADR-0014](../adr/ADR-0014-legal-arca-invoice-pdf.md)). |
+| 80mm ticket | `GET /api/facturas/{id}/ticket` | Counter ticket; **non-fiscal** if CAE is not issued. |
+
+In invoice detail: **Preview PDF**, **Print / preview** (modal with download fallback), **Download PDF** (legal), and **80mm ticket**. Configure issuer header fields under **Settings → Company** (`condicionIva`, gross income, activity start date).
+
+Official AFIP portal validation of QR/barcode may still be required in homologación.
+
+## Voiding an invoice (credit notes module)
+
+When tenant module **`billing.credit_notes`** is enabled and your role has **`sales.cancel`**, open an **active** invoice detail and use **Void invoice**. You must enter a **reason** with at least **10** characters (server validation). The operation calls `PUT /api/facturas/{id}/void`; the system records a **credit note** linked to the original invoice (see [ADR-0012](../adr/ADR-0012-invoice-void-credit-note.md)). Listing credit notes in the app: **Finance** page, same module (API `GET /api/notas-credito`).
+
 ## Issue a New Invoice
 
 1. Press **F3** or click **➕ Nueva Factura**.

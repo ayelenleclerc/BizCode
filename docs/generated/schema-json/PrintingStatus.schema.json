@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "fiscalMode": {
+      "enum": [
+        "mock"
+      ],
+      "type": "string"
+    },
+    "fiscalPrinterEnabled": {
+      "description": "Opt-in fiscal controller (RS-232/USB); false uses PDF fallback.",
+      "type": "boolean"
+    },
+    "thermalMode": {
+      "enum": [
+        "mock"
+      ],
+      "type": "string"
+    },
+    "thermalPrinterEnabled": {
+      "description": "Opt-in 80mm thermal ESC/POS path; false uses PDF fallback.",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "fiscalPrinterEnabled",
+    "thermalPrinterEnabled",
+    "fiscalMode",
+    "thermalMode"
+  ],
+  "title": "PrintingStatus",
+  "type": "object"
+}

@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "cae": {
+      "maxLength": 20,
+      "type": "string"
+    },
+    "caeVto": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "fecha": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "iva1": {
+      "minimum": 0,
+      "type": "number"
+    },
+    "iva2": {
+      "minimum": 0,
+      "type": "number"
+    },
+    "neto1": {
+      "minimum": 0,
+      "type": "number"
+    },
+    "neto2": {
+      "minimum": 0,
+      "type": "number"
+    },
+    "neto3": {
+      "minimum": 0,
+      "type": "number"
+    },
+    "numero": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "ordenCompraId": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "prefijo": {
+      "maxLength": 4,
+      "type": "string"
+    },
+    "proveedorId": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "tipo": {
+      "enum": [
+        "A",
+        "B",
+        "C"
+      ],
+      "type": "string"
+    },
+    "total": {
+      "minimum": 0,
+      "type": "number"
+    },
+    "vencimiento": {
+      "description": "Explicit due date; when omitted, derived from supplier payment terms (#275).",
+      "format": "date-time",
+      "type": "string"
+    }
+  },
+  "required": [
+    "fecha",
+    "tipo",
+    "prefijo",
+    "numero",
+    "proveedorId",
+    "neto1",
+    "neto2",
+    "neto3",
+    "iva1",
+    "iva2",
+    "total"
+  ],
+  "title": "ComprobanteCompraInput",
+  "type": "object"
+}

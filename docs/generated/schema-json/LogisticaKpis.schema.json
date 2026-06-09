@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "avgDeliveryMinutes": {
+      "nullable": true,
+      "type": "number"
+    },
+    "dispatchedCount": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "firstVisitDeliveredCount": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "firstVisitRate": {
+      "maximum": 1,
+      "minimum": 0,
+      "nullable": true,
+      "type": "number"
+    },
+    "overdueCount": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "returnsByReason": {
+      "items": {
+        "$ref": "./LogisticaReturnReasonRow.schema.json"
+      },
+      "type": "array"
+    }
+  },
+  "required": [
+    "dispatchedCount",
+    "firstVisitDeliveredCount",
+    "firstVisitRate",
+    "avgDeliveryMinutes",
+    "returnsByReason",
+    "overdueCount"
+  ],
+  "title": "LogisticaKpis",
+  "type": "object"
+}

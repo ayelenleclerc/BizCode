@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "delivered": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "notDelivered": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "pendingClosed": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "returned": {
+      "minimum": 0,
+      "type": "integer"
+    }
+  },
+  "required": [
+    "pendingClosed",
+    "delivered",
+    "notDelivered",
+    "returned"
+  ],
+  "title": "RepartoCloseSummary",
+  "type": "object"
+}

@@ -16,6 +16,10 @@ See also [AGENTS.md](AGENTS.md) for the short index.
 - **Install:** run `npm ci` after cloning (respects [`.npmrc`](.npmrc) `legacy-peer-deps`, required for `eslint-plugin-jsx-a11y` with ESLint 10 until upstream peers align).
 - **Lockfile:** commit `package-lock.json` with every dependency change; bump packages in focused steps and run the quality gate locally.
 
+### Local development (PostgreSQL, seed, dev servers)
+
+Trilingual guide: [docs/en/quality/local-development-setup.md](docs/en/quality/local-development-setup.md) (see [DOCUMENT_LOCALE_MAP.md](docs/DOCUMENT_LOCALE_MAP.md) for ES/PT-BR paths). Quick start also lives in [README.md](README.md).
+
 ### Windows: PowerShell and `npm`
 
 If `npm run …` fails with **script execution disabled** / `npm.ps1` / `PSSecurityException`, the `package.json` scripts are fine: **PowerShell is blocking the `npm` shim**, not your project.
@@ -37,6 +41,7 @@ main          ← stable, protected, CI must be green
 
 - Branch from `develop`.
 - Open a Pull Request targeting `develop`.
+- **GitHub Project `BizCode Delivery`:** if the change tracks an issue on that board, the PR description **must** include `Closes #<issue>` (see [pull_request_template.md](.github/pull_request_template.md)) so **Linked pull requests** and board **Status** stay in sync. Optional: set repository variable `PROJECT_PR_ASSOCIATED_FIELD_ID` so CI also fills the custom **PR asociado** field (see [.github/PROJECT_SETUP_PHASE1.md](.github/PROJECT_SETUP_PHASE1.md)).
 - `main` is updated via merge from `develop` after a release.
 - Direct pushes to `main` are prohibited.
 
@@ -108,4 +113,4 @@ npm run test:integration    # HTTP + real Prisma vs PostgreSQL; requires DATABAS
 
 All must exit 0 before opening a PR. If you do not run PostgreSQL locally, rely on CI for `test:integration`; contract + unit coverage do not require a database.
 
-`npm run server` executes `tsx server/main.ts` (API bootstrap is in `server.ts`; see [ADR-0005](docs/en/adr/ADR-0005-vitest-coverage-server-bootstrap.md)). Optional release workflows: [ADR-0006](docs/en/adr/ADR-0006-release-and-tauri-ci-workflows.md).
+`npm run server` executes `tsx server/main.ts` (API bootstrap is in `server.ts`; see [ADR-0005](docs/en/adr/ADR-0005-vitest-coverage-server-bootstrap.md)). Optional release workflows: [ADR-0006](docs/en/adr/ADR-0006-release-and-tauri-ci-workflows.md) (`release.yml`, `tauri-selfhosted.yml`, and tagged desktop builds via `tauri-release.yml` on `v*.*.*` tags).

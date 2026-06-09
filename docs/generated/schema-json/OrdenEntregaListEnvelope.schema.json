@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "allOf": [
+    {
+      "properties": {
+        "data": {
+          "items": {
+            "$ref": "./OrdenEntrega.schema.json"
+          },
+          "type": "array"
+        },
+        "success": {
+          "const": true,
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "success",
+        "data"
+      ],
+      "type": "object"
+    }
+  ],
+  "title": "OrdenEntregaListEnvelope"
+}

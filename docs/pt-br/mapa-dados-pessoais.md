@@ -7,19 +7,40 @@
 | `rsocial` | Cliente | Nome empresarial | Identificação em faturas | Obrigação contratual | Relação comercial + 10 anos (fiscal) |
 | `cuit` | Cliente | ID fiscal AR | Faturamento; conformidade ARCA | Obrigação legal (Res. Gral. 1415, ARCA) | 10 anos |
 | `email` | Cliente | E-mail | Comunicações (opcional) | Consentimento | Até pedido de exclusão |
-| Endereço, telefone | Cliente | Contato | Faturas / contato | Contrato / consentimento | Conforme política |
+| Endereço (`domicilio`, etc.) | Cliente | Endereço postal | Faturas; texto de entrega na UI (sem coordenadas em `Cliente`) | Contrato | Conforme política |
+| `telef` | Cliente | Telefone | Contato (opcional) | Consentimento | Até pedido de exclusão |
+| `receptorNombre`, `receptorDni` | RepartoItem (POD) | Nome do receptor / documento opcional | Comprovante de entrega (`logistics.pod`) | Contrato / interesse legítimo | Conforme reparto / operador |
+| `podMedia` (assinatura / foto JSON) | RepartoItem (POD) | Assinatura; foto opcional | Comprovante de entrega | Contrato | Conforme reparto |
+| `lat`, `lng`, `recordedAt` | RepartoUbicacion | Amostra de geolocalização do motorista | Rastreamento ao vivo (`logistics.gps`) | Interesse legítimo / operação | **7 dias** (purga na aplicação + `npm run reparto-ubicacion:purge`) |
+| `username`, role | AppUser | Conta do motorista / equipe | Autenticação e atribuição | Contrato | Vida da conta |
 
 ## Dados não pessoais
 
-Códigos de produto, preços, totais de fatura — dados comerciais da empresa.
+Códigos de produto, preços, totais de fatura e metadados operacionais de reparto (estado, sequência) — dados comerciais ou logísticos, não pessoais.
+
+## Terceiros e rede (por módulo)
+
+| Fluxo | Quando | O que sai do ambiente do operador |
+|---|---|---|
+| **API própria** | Sempre | Sessão e dados entre cliente e servidor BizCode do operador |
+| **Geolocation API do navegador** | Motorista com `logistics.gps` e permissão | Coordenadas no dispositivo; POST `{ lat, lng }` apenas para **`/api/repartos/{id}/ubicacion`** (opcional; não bloqueia POD) |
+| **Teselas OpenStreetMap** | Planejador em `/logistica/seguimiento` com `logistics.gps` | Navegador baixa teselas (Leaflet + OSM) |
+| **AFIP / e-mail** | Com integrações configuradas | Ver [seguranca.md](seguranca.md) |
+
+`logistics.gps` **não** armazena coordenadas de clientes no esquema atual.
 
 ## Direitos do titular (Lei 25.326 — Argentina)
 
-Acesso, retificação, exclusão quando não houver obrigação legal de manter os dados.
+Acesso, retificação e exclusão quando não houver obrigação legal de manter os dados. O operador deve fornecer canal de contato.
 
 ## Segurança
 
-- PostgreSQL local; sem envio a serviços externos de terceiros.
-- Credenciais em `.env` (não versionado).
+- PostgreSQL sob controle do operador; credenciais em `.env` (não versionado).
+- POD e GPS são dados por tenant; alinhar retenção à política do operador.
 
-**Outros idiomas:** [English](../en/mapa-dados-pessoais.md) · [Español](../es/mapa-dados-pessoais.md)
+## Conformidade
+
+- Mapa e geolocalização só com módulo **`logistics.gps`** e permissão do navegador.
+- Sem cookies de publicidade ou rastreamento cross-site na UI do produto.
+
+**Outros idiomas:** [English](../en/privacy-data-map.md) · [Español](../es/mapa-datos-personales.md)

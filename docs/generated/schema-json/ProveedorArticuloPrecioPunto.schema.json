@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "cantidad": {
+      "type": "integer"
+    },
+    "fecha": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "precioUnitario": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "fecha",
+    "precioUnitario",
+    "cantidad"
+  ],
+  "title": "ProveedorArticuloPrecioPunto",
+  "type": "object"
+}

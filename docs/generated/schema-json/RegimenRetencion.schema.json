@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "activo": {
+      "type": "boolean"
+    },
+    "alicuota": {
+      "type": "string"
+    },
+    "alicuotaMin": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "createdAt": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "id": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "nombre": {
+      "type": "string"
+    },
+    "provincia": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "subtipo": {
+      "enum": [
+        "retencion",
+        "percepcion"
+      ],
+      "type": "string"
+    },
+    "tenantId": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "tipo": {
+      "enum": [
+        "ganancias",
+        "iva",
+        "iibb"
+      ],
+      "type": "string"
+    },
+    "updatedAt": {
+      "format": "date-time",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "tenantId",
+    "tipo",
+    "subtipo",
+    "nombre",
+    "alicuota",
+    "alicuotaMin",
+    "provincia",
+    "activo",
+    "createdAt",
+    "updatedAt"
+  ],
+  "title": "RegimenRetencion",
+  "type": "object"
+}

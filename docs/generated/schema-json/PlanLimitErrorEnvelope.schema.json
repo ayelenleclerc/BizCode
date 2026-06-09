@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "currentPlan": {
+      "type": "string"
+    },
+    "error": {
+      "enum": [
+        "plan_limit_users",
+        "plan_limit_invoices",
+        "plan_feature_required"
+      ],
+      "type": "string"
+    },
+    "feature": {
+      "type": "string"
+    },
+    "success": {
+      "const": false,
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "success",
+    "error"
+  ],
+  "title": "PlanLimitErrorEnvelope",
+  "type": "object"
+}

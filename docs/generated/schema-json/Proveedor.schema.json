@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "properties": {
+    "activo": {
+      "type": "boolean"
+    },
+    "alias": {
+      "nullable": true,
+      "type": "string"
+    },
+    "banco": {
+      "nullable": true,
+      "type": "string"
+    },
+    "categoria": {
+      "nullable": true,
+      "type": "string"
+    },
+    "cbu": {
+      "nullable": true,
+      "type": "string"
+    },
+    "codigo": {
+      "type": "integer"
+    },
+    "condIva": {
+      "type": "string"
+    },
+    "condicionPago": {
+      "nullable": true,
+      "type": "string"
+    },
+    "contactoEmail": {
+      "nullable": true,
+      "type": "string"
+    },
+    "contactoNombre": {
+      "nullable": true,
+      "type": "string"
+    },
+    "contactoTel": {
+      "nullable": true,
+      "type": "string"
+    },
+    "cuit": {
+      "nullable": true,
+      "type": "string"
+    },
+    "descuentoPct": {
+      "nullable": true,
+      "type": "number"
+    },
+    "email": {
+      "nullable": true,
+      "type": "string"
+    },
+    "fantasia": {
+      "nullable": true,
+      "type": "string"
+    },
+    "id": {
+      "type": "integer"
+    },
+    "limiteCredito": {
+      "nullable": true,
+      "type": "number"
+    },
+    "moneda": {
+      "type": "string"
+    },
+    "notas": {
+      "nullable": true,
+      "type": "string"
+    },
+    "plazoHabitual": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "rsocial": {
+      "type": "string"
+    },
+    "telef": {
+      "nullable": true,
+      "type": "string"
+    },
+    "tipoCuenta": {
+      "nullable": true,
+      "type": "string"
+    }
+  },
+  "title": "Proveedor",
+  "type": "object"
+}

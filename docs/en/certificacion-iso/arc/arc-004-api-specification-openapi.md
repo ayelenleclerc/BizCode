@@ -26,3 +26,4 @@ Complete when product or organizational scope is defined. Do not claim certifica
 | Version | Date | Author | Summary of changes |
 |--------------|-----------|-------------|----------------|
 | 0.1 | 2026-04-01 | BizCode | Initial stub |
+| 0.2 | 2026-05-15 | BizCode | `/api/cobros` and reportes paths documented in openapi.yaml |

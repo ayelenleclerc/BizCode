@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "descripcion": {
+      "type": "string"
+    },
+    "formaPagoId": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "total": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "descripcion",
+    "total"
+  ],
+  "title": "CobranzasPorFormaPago",
+  "type": "object"
+}

@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "articuloCodigo": {
+      "type": "integer"
+    },
+    "articuloDescripcion": {
+      "type": "string"
+    },
+    "articuloId": {
+      "type": "integer"
+    },
+    "proveedorMasBaratoId": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "proveedores": {
+      "items": {
+        "$ref": "./ArticuloProveedorComparadorRow.schema.json"
+      },
+      "type": "array"
+    }
+  },
+  "required": [
+    "articuloId",
+    "articuloCodigo",
+    "articuloDescripcion",
+    "proveedorMasBaratoId",
+    "proveedores"
+  ],
+  "title": "ArticuloProveedoresComparadorData",
+  "type": "object"
+}

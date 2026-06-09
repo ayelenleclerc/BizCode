@@ -8,7 +8,7 @@
 |-------|-------------|----------------------------|------------|-------|
 | A | Metadatos/listados | 37 | *parcial* | Ficha: [A-metadatos/LIST_CLI-ficha.md](A-metadatos/LIST_CLI-ficha.md); volcado global |
 | B | Maestros comerciales | 38 | *parcial* | Fichas: [B-maestros/PVAR-ficha.md](B-maestros/PVAR-ficha.md), [B-maestros/PVAR2-ficha.md](B-maestros/PVAR2-ficha.md); volcado global |
-| C | Terceros/operaciones | 11 | *parcial* | [C-terceros/CLIENTES-ficha.md](C-terceros/CLIENTES-ficha.md); volcado global |
+| C | Terceros/operaciones | 11 | *parcial* | [C-terceros/CLIENTES-ficha.md](C-terceros/CLIENTES-ficha.md) — `CLIENTES.DBF` con ETL v1 en script (#51); volcado global |
 | D | Documentos comerciales | 17 | 0% | Volcado global [`exports/inventario-dbf-volcado.md`](../exports/inventario-dbf-volcado.md) |
 | E | Auxiliares/históricos | 4 | 0% | Idem |
 | F | Fuera de sistema/ (DOS, esc) | N/A | — | Principalmente no-DBF |

@@ -22,7 +22,7 @@ Definido en [`prisma/schema.prisma`](../../../prisma/schema.prisma):
 5. **Logout:** `POST /api/auth/logout` revoca sesiones coincidentes por hash de cookie, limpia la cookie y puede escribir `logout` en `AuditEvent` si hay `req.auth`.
 6. **Usuario actual:** `GET /api/auth/me` devuelve `req.auth.claims` o `401` si no hay autenticación.
 
-**No evidenciado en el código actual:** la cabecera HTTP `x-bizcode-channel` no se lee en `server/auth.ts` ni `server/createApp.ts`; los canales vienen solo de `AppUser.scopeChannels` persistido.
+La cabecera `x-bizcode-channel` se procesa en `requirePermission` (`server/auth.ts`) y se valida contra `claims.scope.channels` del usuario autenticado. Valores inválidos devuelven `400`; canales fuera de alcance devuelven `403`.
 
 ## Auditoría en aplicación (mutaciones)
 
@@ -59,7 +59,7 @@ Definido en [`prisma/schema.prisma`](../../../prisma/schema.prisma):
 
 - Sesión y flujos de auth: [`tests/api/auth-session.test.ts`](../../../tests/api/auth-session.test.ts)
 - Autorización (comprobación de permisos): [`tests/api/authz.test.ts`](../../../tests/api/authz.test.ts)
-- **`tests/server/scope-channel.test.ts`:** no existe en el repositorio en la fecha de este documento.
+- Pruebas de enforcement por canal: [`tests/server/scope-channel.test.ts`](../../../tests/server/scope-channel.test.ts)
 
 ## Documentos relacionados
 

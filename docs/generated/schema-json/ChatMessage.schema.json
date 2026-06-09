@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "content": {
+      "type": "string"
+    },
+    "createdAt": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "fromUserId": {
+      "type": "integer"
+    },
+    "id": {
+      "type": "integer"
+    },
+    "tenantId": {
+      "type": "integer"
+    },
+    "toUserId": {
+      "type": "integer"
+    }
+  },
+  "title": "ChatMessage",
+  "type": "object"
+}

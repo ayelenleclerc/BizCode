@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "currency": {
+      "type": "string"
+    },
+    "features": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "maxInvoicesPerMonth": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "maxUsers": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "monthlyPrice": {
+      "type": "integer"
+    },
+    "planKey": {
+      "type": "string"
+    },
+    "planName": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string"
+    },
+    "usage": {
+      "$ref": "./TenantPlanUsage.schema.json"
+    }
+  },
+  "required": [
+    "planKey",
+    "planName",
+    "monthlyPrice",
+    "currency",
+    "maxUsers",
+    "maxInvoicesPerMonth",
+    "features",
+    "status",
+    "usage"
+  ],
+  "title": "TenantPlanSnapshot",
+  "type": "object"
+}

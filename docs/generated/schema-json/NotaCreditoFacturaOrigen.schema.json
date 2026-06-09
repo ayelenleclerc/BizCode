@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "description": "Originating invoice header (selected columns)",
+  "properties": {
+    "clienteId": {
+      "type": "integer"
+    },
+    "estado": {
+      "type": "string"
+    },
+    "fecha": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "id": {
+      "type": "integer"
+    },
+    "numero": {
+      "type": "integer"
+    },
+    "prefijo": {
+      "type": "string"
+    },
+    "tipo": {
+      "type": "string"
+    },
+    "total": {
+      "oneOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "string"
+        }
+      ]
+    }
+  },
+  "title": "NotaCreditoFacturaOrigen",
+  "type": "object"
+}

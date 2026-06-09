@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "createdAt": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "id": {
+      "type": "integer"
+    },
+    "payload": {
+      "additionalProperties": true,
+      "type": "object"
+    },
+    "readAt": {
+      "format": "date-time",
+      "nullable": true,
+      "type": "string"
+    },
+    "tenantId": {
+      "type": "integer"
+    },
+    "type": {
+      "type": "string"
+    },
+    "userId": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "id",
+    "tenantId",
+    "userId",
+    "type",
+    "payload",
+    "createdAt"
+  ],
+  "title": "Notification",
+  "type": "object"
+}

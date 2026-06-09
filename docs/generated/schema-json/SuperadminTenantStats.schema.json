@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "clienteCount": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "facturaCount": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "pedidoCount": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "userCount": {
+      "minimum": 0,
+      "type": "integer"
+    }
+  },
+  "required": [
+    "userCount",
+    "facturaCount",
+    "pedidoCount",
+    "clienteCount"
+  ],
+  "title": "SuperadminTenantStats",
+  "type": "object"
+}

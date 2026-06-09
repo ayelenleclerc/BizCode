@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "articuloId": {
+      "type": "integer"
+    },
+    "cantidad": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "costoUnitario": {
+      "minimum": 0,
+      "type": "number"
+    }
+  },
+  "required": [
+    "articuloId",
+    "cantidad",
+    "costoUnitario"
+  ],
+  "title": "OrdenCompraItemInput",
+  "type": "object"
+}

@@ -60,6 +60,27 @@ O sistema valida o dígito verificador. Em caso de erro, a mensagem é **«CNPJ/
 
 Edite o cliente e desmarque **Ativo**. O registro permanece para histórico de faturas.
 
+## Importação em massa (CSV)
+
+Usuários com permissão de gestão de clientes podem carregar muitos registros a partir de um arquivo **CSV em UTF-8**.
+
+1. Na lista, abra **Importar CSV** (ou o controle equivalente).
+2. **Baixe o modelo** no mesmo diálogo: inclui a linha de cabeçalhos obrigatória e um exemplo.
+3. Não altere os nomes nem a ordem das colunas da primeira linha. Salve como `.csv` (UTF-8).
+4. Anexe o arquivo e confirme. O sistema informa quantas linhas foram criadas e, se houver erros de validação ou duplicados, o detalhe **por linha** (a numeração das linhas de dados começa após o cabeçalho; a linha 1 é o cabeçalho). As regras seguem a mesma API REST de criação/edição; cada mensagem traz o **caminho do campo** (por exemplo `rsocial: …`) quando a linha é rejeitada.
+
+**Política de duplicados:** se o **código** do cliente já existir na base ou estiver repetido no mesmo arquivo, a linha é rejeitada.
+
+**Limites:** tamanho máximo do arquivo e quantidade máxima de linhas são aplicados pela API (veja OpenAPI em `/api-docs`).
+
+## Cobranças recentes
+
+Ao editar um cliente existente, o formulário exibe **cobranças recentes** carregadas de `GET /api/cobros?clienteId=…`. Use o link para abrir **Cobranças** filtrado por esse cliente ou registrar uma nova cobrança.
+
+## Score de cobrança
+
+O formulário de cliente mostra o **score de cobrança** (0–100) quando disponível, com tooltip que descreve como o score muda ao registrar cobranças contra faturas ativas. As regras estão documentadas no OpenAPI para `POST /api/cobros`.
+
 ## Atalhos de teclado
 
 | Tecla | Ação |
@@ -69,6 +90,6 @@ Edite o cliente e desmarque **Ativo**. O registro permanece para histórico de f
 | F5 | Salvar formulário |
 | ↑ / ↓ | Navegar linhas |
 | Enter | Abrir cliente selecionado |
-| Esc | Fechar sem salvar |
+| Esc | Fechar formulário ou diálogo de importação sem salvar |
 
 **Outros idiomas:** [English](../../en/user/manual-customers.md) · [Español](../../es/user/manual-clientes.md)

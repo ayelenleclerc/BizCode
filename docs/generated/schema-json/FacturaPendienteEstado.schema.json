@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "enum": [
+    "pendiente",
+    "proxima_vencer",
+    "vencida_hoy",
+    "vencida_critica"
+  ],
+  "title": "FacturaPendienteEstado",
+  "type": "string"
+}

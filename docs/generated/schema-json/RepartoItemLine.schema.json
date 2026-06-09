@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "entregadoAt": {
+      "format": "date-time",
+      "nullable": true,
+      "type": "string"
+    },
+    "estado": {
+      "enum": [
+        "pending",
+        "delivered",
+        "not_delivered",
+        "returned"
+      ],
+      "type": "string"
+    },
+    "hasPod": {
+      "type": "boolean"
+    },
+    "id": {
+      "type": "integer"
+    },
+    "motivoNoEntrega": {
+      "nullable": true,
+      "type": "string"
+    },
+    "notasEntrega": {
+      "nullable": true,
+      "type": "string"
+    },
+    "ordenEntrega": {
+      "$ref": "./OrdenEntrega.schema.json"
+    },
+    "ordenEntregaId": {
+      "type": "integer"
+    },
+    "receptorDni": {
+      "nullable": true,
+      "type": "string"
+    },
+    "receptorNombre": {
+      "nullable": true,
+      "type": "string"
+    },
+    "secuencia": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "id",
+    "ordenEntregaId",
+    "secuencia",
+    "estado",
+    "hasPod",
+    "ordenEntrega"
+  ],
+  "title": "RepartoItemLine",
+  "type": "object"
+}

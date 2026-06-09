@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "content": {
+      "maxLength": 1000,
+      "minLength": 1,
+      "type": "string"
+    },
+    "toUserId": {
+      "minimum": 1,
+      "type": "integer"
+    }
+  },
+  "required": [
+    "toUserId",
+    "content"
+  ],
+  "title": "ChatMessageCreateInput",
+  "type": "object"
+}

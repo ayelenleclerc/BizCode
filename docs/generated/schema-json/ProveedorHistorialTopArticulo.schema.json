@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "articuloId": {
+      "type": "integer"
+    },
+    "cantidadTotal": {
+      "type": "integer"
+    },
+    "codigo": {
+      "type": "string"
+    },
+    "descripcion": {
+      "type": "string"
+    },
+    "montoTotal": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "articuloId",
+    "codigo",
+    "descripcion",
+    "cantidadTotal",
+    "montoTotal"
+  ],
+  "title": "ProveedorHistorialTopArticulo",
+  "type": "object"
+}

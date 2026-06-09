@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "issuer": {
+      "type": "string"
+    },
+    "keywords": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "source": {
+      "enum": [
+        "bundled",
+        "custom"
+      ],
+      "type": "string"
+    }
+  },
+  "required": [
+    "issuer",
+    "keywords",
+    "source"
+  ],
+  "title": "DocumentoCompraTemplateSummary",
+  "type": "object"
+}

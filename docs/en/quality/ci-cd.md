@@ -18,18 +18,22 @@ push / pull_request
 │  3. npm ci (uses `.npmrc` `legacy-peer-deps` for ESLint peers) │
 │  3b. npm audit (informational, continue-on-error)          │
 │  4. npx prisma generate                                     │
-│  5. npx prisma migrate deploy  ← schema on PostgreSQL       │
-│  6. npm run type-check           ← blocks                   │
-│  6b. npm run docs:generate       ← blocks                   │
-│  6c. git diff (generated docs)   ← blocks                   │
-│  7. npm run lint                 ← blocks                   │
-│  8. npm run test:coverage        ← blocks (Vitest + coverage + API contract + a11y) │
-│  9. npm run check:i18n           ← blocks                   │
-│ 10. npx playwright install --with-deps chromium             │
-│ 11. npm run test:e2e             ← blocks (Playwright smoke; see ADR-0004) │
-│ 12. npm run test:integration     ← blocks (Prisma + PostgreSQL; ADR-0004 B) │
-│ 13. npm run check:docs-map       ← blocks                   │
-│ 14. Upload coverage artifact (always)                       │
+│  5. npx prisma validate       ← schema syntax / metadata (no DB write) │
+│  6. npx prisma migrate deploy  ← schema on PostgreSQL       │
+│  7. npm run type-check                      ← blocks         │
+│  7b. npm run docs:validate                 ← blocks         │
+│  8. npm run docs:generate                  ← blocks         │
+│  9. Verify TypeDoc HTML post-process (no unpatched footer)  ← blocks │
+│ 10. git diff (generated docs / SBOM check) ← blocks         │
+│ 11. npm run lint                           ← blocks         │
+│ 12. API contract tests (tests/api/contract.test.ts) ← blocks │
+│ 13. npm run test:coverage ← blocks (Vitest + v8 thresholds; scope see matrix below) │
+│ 14. npm run check:i18n         ← blocks                        │
+│ 15. npx playwright install --with-deps chromium              │
+│ 16. npm run test:e2e           ← blocks (Playwright smoke; see ADR-0004) │
+│ 17. npm run test:integration   ← blocks (Prisma + PostgreSQL; ADR-0004 B) │
+│ 18. npm run check:docs-map     ← blocks                        │
+│ 19. Upload coverage artifact (always)                       │
 └──────────────────────────────────────────────────────────────┘
 ```
 
@@ -38,20 +42,39 @@ push / pull_request
 | Event | Branches |
 |---|---|
 | `push` | `main`, `develop` |
-| `pull_request` | targeting `main` |
+| `pull_request` | targeting `main` or `develop` |
 
 ## Blocking Conditions
 
 | Step | Blocking condition |
 |---|---|
+| prisma validate | Invalid `schema.prisma` according to Prisma (no PostgreSQL mutation) |
 | type-check | Any TypeScript compilation error |
+| check:openapi | OpenAPI 3.x validation failures for `docs/api/openapi.yaml` (script `npm run check:openapi`) |
 | docs:generate + git diff | Drift between committed files and regenerated docs under `docs/generated/`, `docs/api/openapi-reference.generated.md`, `docs/evidence/sbom-cyclonedx.json` |
+| TypeDoc post-process | No `target="_blank">TypeDoc</` in `docs/generated/typedoc/` (runs via `docs:typedoc` + `scripts/patch-typedoc-html-noopener.mjs`) |
 | lint | Any ESLint error or **warning** (`npm run lint` uses `--max-warnings 0`) |
+| API contract tests | Any failure in `tests/api/contract.test.ts` (OpenAPI paths/schemas vs Ajv) |
 | test:coverage | Any test failure OR any coverage threshold not met |
 | check:i18n | Any locale namespace has missing or extra keys vs. `es` source |
 | test:e2e | Any Playwright failure (includes `vite build` + preview via `playwright.config.ts`) |
 | test:integration | Any Vitest integration failure (`tests/integration/`; real PostgreSQL) |
 | check:docs-map | Any path in `DOCUMENT_LOCALE_MAP.md` missing on disk |
+
+## Verification traceability matrix (PR → `develop` / `main`)
+
+| Surface | Evidence / behavior checked | Typical workflow(s) |
+|---|---|---|
+| TypeScript compilation | Whole repo `tsconfig` include (`src`, `server`, `tests`, `e2e`, …) | `ci.yml` → `npm run type-check` |
+| REST API vs contract | OpenAPI YAML syntax + route sync + regenerated schemas / MD drift | `ci.yml` → `docs:validate`, `docs:generate`, git diff |
+| Database schema lifecycle | Client generation, validated schema file, migrations or `db push`, seed used by runtime tests | `ci.yml` → `prisma generate`, `prisma validate`, migrate/push + `test:integration`; `backend-validation.yml` (paths) adds DB migration smoke |
+| Line / branch metrics (coverage) | **`vitest` v8 thresholds** apply only to **`server/**/*.ts`**, root `server.ts`, and **`src/**/*.{ts,tsx}`**, excluding tests, barrels, typings, and `server/main.ts`/`server/createApp.types.ts`/`src/types.ts` via `coverage.exclude`. **Not everything in repo** (scripts, prisma seed, standalone tools) file: `vitest.config.ts` | `ci.yml`, `frontend-validation.yml`, `qa-validation.yml` → `npm run test:coverage` |
+| Integration with PostgreSQL | Real DB paths in `tests/integration/**`; **explicitly without line-coverage instrumentation** (`vitest.integration.config.ts`) | `ci.yml`, `backend-validation.yml` |
+| Frontend production bundle | `vite build` is executed by Playwright **`webServer`** before UI smoke (`playwright.config.ts`) | `ci.yml`, `frontend-validation.yml` → `test:e2e` |
+| i18n key parity | All locales aligned to source `es` | `npm run check:i18n` |
+| Human docs structure | Locale map completeness | `check:docs-map` |
+| Human docs localization policy | Controlled roots (quality, ISO, specs, **user manuals**, changelogs, ADR, OpenAPI) must stay trilingual EN/ES/PT-BR | `docs-governance.yml` (**PR to `main` and `develop`**) |
+| External links in Markdown (under `docs/`) | HTTP(S) targets alive (**Lychee**; loopback en `.lycheeignore`). Enlaces relativos entre `.md` no se validan aquí (mapa + revisión). | `docs-links.yml` |
 
 ## Services
 
@@ -67,6 +90,8 @@ The job starts a **PostgreSQL 16** service container (`DATABASE_URL` is set). Af
 
 **Tauri desktop build** is excluded from CI (native WebKit/WebView2, display server, Rust toolchain). See workflow comments in `.github/workflows/ci.yml`.
 
+**Manual release gate (desktop binaries):** after `main` is green, invoke **Actions → Tauri self-hosted build** (`tauri-selfhosted.yml`) before shipping installers; tagged releases can also use **Actions → Tauri release** (`tauri-release.yml` on `v*.*.*` tags). See [ADR-0006](../adr/ADR-0006-release-and-tauri-ci-workflows.md).
+
 ## Documentation branch (`documentacion`)
 
 The **orphan** branch `documentacion` contains **no application source** — only a snapshot of documentation suitable for static hosting (e.g. GitHub Pages).
@@ -78,6 +103,82 @@ The **orphan** branch `documentacion` contains **no application source** — onl
 | Manual ref | Optional input `source_ref` (default `main`) to copy from another branch or SHA |
 | Code branches | Unchanged: work on `develop` / `feature/*` / `fix/*`, merge to `main` per [CONTRIBUTING](../../../CONTRIBUTING.md); this job **does not** land app code on `documentacion` |
 
+## Docker production deployment (issue #149)
+
+### Container topology
+
+- `server` (`Dockerfile`): Node 22 container running `npm run server`, health check on `GET /api/health`.
+- `frontend` (`Dockerfile.frontend`): Vite static build served by Nginx, health check on `/`.
+- `postgres`: PostgreSQL 16 with persistent volume.
+- `docker-compose.prod.yml` orchestrates the three services. Existing local parity compose (`docker-compose.postgres.yml`) remains unchanged.
+- Current status is **deploy-ready**: infrastructure is prepared, but real production deploy is pending a defined server.
+
+### Nginx role
+
+- The Nginx container serves frontend static assets.
+- It proxies `/api/*` requests to the backend service (`server:3001`) inside the compose network.
+- This is an internal reverse proxy role within the stack; no external domain/certificate assumptions are embedded in repository files.
+
+### Required deploy environment variables
+
+- Runtime env (`.env` on target host, never committed): `DATABASE_URL`, `POSTGRES_PASSWORD`, `JWT_SECRET`/`SESSION_SECRET`, `APP_ENV`.
+- Optional tuning: `POSTGRES_DB`, `POSTGRES_USER`, `FRONTEND_PORT`, `VITE_API_URL`, `CORS_ORIGINS`, `LOG_LEVEL`, SMTP/Twilio variables.
+- Optional fiscal encryption key: `BIZCODE_FISCAL_ENCRYPTION_KEY`.
+
+### GitHub Actions deployment workflow
+
+Workflow file: `.github/workflows/deploy.yml`.
+
+- `build_and_test` (always-on validation for `push`/`pull_request`/manual):
+  - `npm ci`
+  - `npm run type-check`
+  - `npm run lint`
+  - `npm run test`
+  - `npm run check:i18n`
+  - `npm run check:docs-map`
+  - `npm run docs:validate`
+  - Docker build validation for backend/frontend images
+- `publish_images` (prepared for `main`, release tags, or manual run):
+  - Login to GHCR using `GHCR_TOKEN` when provided, otherwise `GITHUB_TOKEN`
+  - Build/push `ghcr.io/<owner>/bizcode-server` and `ghcr.io/<owner>/bizcode-frontend`
+- `deploy` (real deploy remains blocked unless explicitly enabled):
+  - Runs only on `workflow_dispatch` with input `run_deploy: true` (after `publish_images`)
+  - SSH port via workflow input `deploy_ssh_port` (default `22`); add GitHub Environment `production` with reviewers when a server exists
+  - SSH to host and run `docker compose -f docker-compose.prod.yml pull && up -d`
+  - Feature/develop workflows still pass validation/build without requiring server infrastructure
+
+### Required repository secrets for SSH deploy
+
+- `DEPLOY_HOST`
+- `DEPLOY_USER`
+- `DEPLOY_SSH_KEY`
+- `DEPLOY_PATH`
+- Workflow input `deploy_ssh_port` (optional; default `22`, not a secret)
+- `DATABASE_URL`
+- `POSTGRES_USER`
+- `POSTGRES_PASSWORD`
+- `POSTGRES_DB`
+- `APP_ENV`
+- `VITE_API_URL`
+- `CORS_ORIGINS`
+- `SESSION_SECRET`
+- `GHCR_TOKEN` (optional when `GITHUB_TOKEN` is insufficient)
+
+### Activation checklist (future production server)
+
+1. Define host/domain/networking outside repository.
+2. Create repository secrets listed above (no plaintext in git).
+3. Protect `production` environment with required manual approval.
+4. Run `workflow_dispatch` or publish release tag.
+5. Verify `/api/health` and `/` health checks after deployment.
+
+### Rollback baseline
+
+- Keep previous image tags in GHCR (`sha` and tag-based references are published).
+- On host, rollback by pinning previous image tags in `docker-compose.prod.yml` (or host-level override) and re-running:
+  - `docker compose -f docker-compose.prod.yml pull`
+  - `docker compose -f docker-compose.prod.yml up -d`
+
 ## Optional / follow-up automation
 
 - [x] **Sync `documentacion` orphan branch** from `main` — `.github/workflows/sync-documentacion.yml` (see *Documentation branch* above)
@@ -85,6 +186,7 @@ The **orphan** branch `documentacion` contains **no application source** — onl
 - [x] PostgreSQL-backed integration tests (Phase B, ADR-0004) — `tests/integration/`, `npm run test:integration`
 - [x] **Tauri build on self-hosted runner** — `.github/workflows/tauri-selfhosted.yml` (`workflow_dispatch` only) — [ADR-0006](../adr/ADR-0006-release-and-tauri-ci-workflows.md)
 - [x] **semantic-release** — `release.config.cjs`, `.github/workflows/release.yml` (`workflow_dispatch` on `main`) — [ADR-0006](../adr/ADR-0006-release-and-tauri-ci-workflows.md)
+- [x] **External HTTP(S) links in `docs/`** — `.github/workflows/docs-links.yml`, `.lycheeignore` (Lychee; not relative `.md` cross-links)
 
 ## Project status automation (GitHub)
 
@@ -104,6 +206,8 @@ Implementation:
   - `PROJECT_STATUS_OPTION_IN_PROGRESS`
   - `PROJECT_STATUS_OPTION_DONE`
   - `PROJECT_STATUS_OPTION_BLOCKED` (optional)
+- Optional repository variable:
+  - `PROJECT_PR_ASSOCIATED_FIELD_ID`: GraphQL id of the **PR asociado** text field on the project. When set, the workflow stores the PR URL there for each linked issue it updates.
 - Recommended secret for user-owned Project V2 boards:
   - `PROJECT_AUTOMATION_TOKEN` (`repo`, `project`, `read:project`)
 
@@ -113,14 +217,28 @@ Implementation:
 - **Local sync:** `npm run plan:sync -- --plan <path-to.plan.md> [--repo owner/repo] [--repo-root <dir>] [--dry-run]` upserts one issue per plan todo, links issues to Project v2, sets board status from todo state, and persists mapping under `.github/plan-sync/state/`. Non-dry-run requires `GH_TOKEN` or `GITHUB_TOKEN`, `GITHUB_REPOSITORY` (or `GITHUB_OWNER` + `GITHUB_REPO`, or `--repo`), and the same Project variables as above (`PROJECT_V2_ID`, `PROJECT_STATUS_FIELD_ID`, and the `PROJECT_STATUS_OPTION_*` option IDs). Sync reports are written under `.github/plan-sync/reports/` (gitignored).
 - **Optional approve flow:** `npm run plan:approve -- --plan <path>` archives a copy under `.cursor/plans/` and runs `plan:sync` (see `scripts/github/plan-approve-main.ts`).
 - **Interaction with PR automation:** Once items are on the board, `.github/workflows/project-status-automation.yml` still updates status from PR open/close/merge when issues are linked with `Closes #<issue>`.
+- **Board hygiene:** Keep **Backlog** for work not actively in flight (no open PR). Use **Ready** when committed but no PR yet; **In Progress** when a linked PR is open. Avoid **In Progress** without a PR.
+
+**Post-merge (maintainer):** After merging a PR that links issues with `Closes #…`, verify in GitHub that those issues closed, and confirm the **BizCode Delivery** project columns moved affected items to **Done** when expected (requires secrets/variables documented above for `.github/workflows/project-status-automation.yml`).
 
 Daily usage checklist:
 
 1. Create issue from `Task` template.
 2. Add issue to Project.
 3. Open PR with `Closes #<issue>`.
-4. Verify required checks (`Quality Gate`, `Docs governance`, security checks).
+4. Verify required checks (`Quality Gate`, `Docs governance`, `Documentation links`, security/CodeQL checks as enabled).
 5. Merge only when CI is green.
+
+## Scheduled operational jobs (host cron)
+
+These jobs are **not** run by GitHub Actions in the default pipeline; schedule them on the deployment host (or an orchestrator) with tenant database access.
+
+| Schedule | Command | Purpose |
+|---|---|---|
+| `*/5 * * * *` | `npm run arca:retry-pending-job` | Retry `estadoCae: pending` invoices via homologación WSFE mock (`ArcaService.retryPending`) for every tenant with `TenantFiscalConfig`. |
+| `0 * * * *` (hourly) | `npm run cobranzas:recordatorios` | Overdue collection reminders for every tenant with `ParamEmpresa`; sends at **08:00 tenant local** (minute &lt; 15) within configured business hours. Use `0 8 * * *` only for single–time zone deployments. |
+
+Optional env for a single tenant in dev/staging: `BIZCODE_TENANT_ID=<id>` (applies to `arca:retry-pending-job`, `arca:retry-pending`, and `cobranzas:recordatorios`). Optional `BIZCODE_RECORDATORIO_CANAL` (default `email`).
 
 Documentation governance (Wiki vs controlled docs):
 

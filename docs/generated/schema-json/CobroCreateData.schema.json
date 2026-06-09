@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "cobro": {
+      "$ref": "./Cobro.schema.json"
+    },
+    "updatedCliente": {
+      "additionalProperties": true,
+      "properties": {
+        "balance": {
+          "type": "number"
+        },
+        "creditLimit": {
+          "nullable": true,
+          "type": "number"
+        },
+        "id": {
+          "type": "integer"
+        },
+        "rsocial": {
+          "type": "string"
+        },
+        "score": {
+          "maximum": 100,
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "id",
+        "score"
+      ],
+      "type": "object"
+    }
+  },
+  "required": [
+    "cobro",
+    "updatedCliente"
+  ],
+  "title": "CobroCreateData",
+  "type": "object"
+}

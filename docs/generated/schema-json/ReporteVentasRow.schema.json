@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "count": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "iva1": {
+      "type": "string"
+    },
+    "iva2": {
+      "type": "string"
+    },
+    "neto1": {
+      "type": "string"
+    },
+    "neto2": {
+      "type": "string"
+    },
+    "periodo": {
+      "description": "Bucket key (YYYY-MM-DD, YYYY-MM, or week Monday date)",
+      "type": "string"
+    },
+    "total": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "periodo",
+    "count",
+    "total",
+    "neto1",
+    "neto2",
+    "iva1",
+    "iva2"
+  ],
+  "title": "ReporteVentasRow",
+  "type": "object"
+}

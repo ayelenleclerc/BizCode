@@ -10,7 +10,10 @@ This matrix maps BizCode's quality artefacts to clauses of the applicable ISO st
 | **accessibility.md** + jsx-a11y (`--max-warnings 0`) + `App.a11y.test.tsx` (jest-axe) | §8.1 Operational planning | — | — | Usability §4.2.4 (Accessibility) | — |
 | **i18n-strategy.md** + check-i18n in CI | §8.1 Operational planning | — | — | Portability §4.2.8 (Adaptability) | — |
 | **security.md** (STRIDE model, OWASP mapping) | §8.1 Operational planning | §6.3.8 Software Construction | A.8.1–A.8.34 Technological controls | Security §4.2.6 | — |
+| **quality/observability.md** + `server/middleware/observability.ts` + `GET /api/metrics` (`audit.read`) | §8.1 Operational planning | §6.3.2 Software Design, §6.4.9 Software Qualification Testing | A.8.15 Logging, A.8.16 Monitoring activities | Reliability §4.2.2, Security §4.2.6 | 29119-2 (test design) |
 | **docs/api/openapi.yaml** + `tests/api/contract.test.ts` (Ajv) | §8.3 Design and development | §6.3.2 Software Design | — | Functional suitability §4.2.1 | 29119-2 (test design) |
+| **ADR-0012 / credit notes (#146)** — `PUT /api/facturas/{id}/void`, `GET /api/notas-credito`, UI **Facturación** / **Finanzas**, `tests/api/notas-credito.test.ts`, `tests/api/facturas-void.test.ts` | §8.3 Design and development | §6.3.2 Software Design | — | Functional suitability §4.2.1 | 29119-2 (test design) |
+| **ADR-0013 / Libro IVA Ventas Fase 1 (#147)** — `GET /api/contabilidad/libro-iva-ventas`, UI **Finanzas**, `tests/api/libro-iva-ventas.test.ts`, `tests/server/fiscal/ar/libroIvaVentas.test.ts` | §8.3 Design and development | §6.3.2 Software Design | — | Functional suitability §4.2.1 | 29119-2 (test design) |
 | **swagger-openapi-ui-plan.md** (+ localized mirrors) — Swagger UI mount checklist, agent OpenAPI policy | §7.5 Documented information, §8.3 Design and development | §6.3.2 Software Design, §6.4.12 Software Documentation | — | Functional suitability §4.2.1 | 29119-2 (test design) |
 | **ADR-0003** (API contract) | §8.3.3 Design outputs | §6.3.6 Software Integration | — | Maintainability §4.2.7 | — |
 | **ADR-0005** (Vitest coverage — `server.ts`) | §8.7 | §6.4.9 | — | Maintainability §4.2.7 | 29119-2 |
@@ -22,7 +25,10 @@ This matrix maps BizCode's quality artefacts to clauses of the applicable ISO st
 | **ADR-0001** (REST/Prisma decision) | §8.3.3 Design outputs | §6.3.2 Software Design | — | Maintainability §4.2.7 | — |
 | **ADR-0002** (i18n library decision) | §8.3.3 Design outputs | §6.3.2 Software Design | — | Portability §4.2.8 | — |
 | **privacy-data-map.md** | §8.1 | — | A.5.12 Classification, A.5.33 Protection of records | — | — |
-| **User manuals** (clientes, articulos, facturacion, apariencia) | §7.5 Documented information | §6.4.12 Software Documentation | — | Usability §4.2.4 (User documentation) | — |
+| **User manuals** (customers, products, invoicing, appearance, collections, finance, reports, logistics) | §7.5 Documented information | §6.4.12 Software Documentation | — | Usability §4.2.4 (User documentation) | — |
+| **Collections API** + `tests/api/cobros.test.ts` | §8.3 Design and development | §6.3.2 Software Design | — | Functional suitability §4.2.1 | 29119-2 (test design) |
+| **Logistics** (#140–#145): manuals + `tests/api/repartos.test.ts`, `tests/api/ordenes-entrega.test.ts`, `tests/api/logistica-reportes.test.ts`, `repartoUbicacionService.test.ts`, `logisticaReportesService.test.ts`, OpenAPI repartos/GPS/logistica paths | §8.3 Design and development | §6.3.2 Software Design | A.5.12 (location data when `logistics.gps` enabled) | Functional suitability §4.2.1 | 29119-2 (test design) |
+| **generated-documentation.md** + `npm run docs:generate` (TypeDoc, OpenAPI MD, schema MD, SBOM) | §7.5 Documented information | §6.4.12 Software Documentation | A.8.31 (component inventory via SBOM) | Maintainability §4.2.7 | — |
 | **theming.md** (UI theme, Tailwind, `index.html`) | §8.3 Design and development | §6.4.12 Software Documentation | — | Usability §4.2.4 (User interface aesthetics) | — |
 | **CONTRIBUTING.md** Definition of Done | §8.5.1 Control of production | §6.3.6 Software Integration | A.8.25 | — | 29119-2 §7 (Entry/exit criteria) |
 | **records-template.md** (nonconformity, test records) | §10.2.2 Corrective action records | §6.7.1 Records | A.5.33 | — | 29119-3 (Test documentation) |

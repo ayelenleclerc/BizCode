@@ -35,6 +35,10 @@ Desktop deployments may have **multiple users** (e.g. office/LAN). User, role, a
 | **Clear API boundary** | OpenAPI + contract tests remain the anchor; SaaS must **respect or explicitly version** the public contract. |
 | **Phased delivery** | Ship desktop with clear boundaries first; add hosted deployment without rewriting from scratch. |
 
+## Optional POS printing
+
+Fiscal controllers and 80mm thermal printers are **opt-in per customer** (server env flags; PDF/CAE always available). See [optional-pos-printing.md](optional-pos-printing.md) (EN; ES/PT-BR in [DOCUMENT_LOCALE_MAP.md](../../DOCUMENT_LOCALE_MAP.md)).
+
 ## Optional containers
 
 A **Dockerfile** / **docker-compose** for **API + PostgreSQL** (and optionally static web build) may help **server-side dev and deployment**. It does **not** replace **Tauri** native desktop builds. When introduced, document it under quality/ops alongside [ci-cd.md](ci-cd.md).

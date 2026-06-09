@@ -33,6 +33,35 @@ Exclusiones adicionales del informe de cobertura solo con **ADR** y cambio expl�
 
 Los umbrales los aplica Vitest (`coverage.thresholds`). El CI falla si no se cumplen.
 
+## Objetivos de cobertura (KPI)
+
+| KPI | Objetivo | Dónde se exige |
+|-----|----------|----------------|
+| Líneas / funciones / ramas / sentencias en el alcance normativo (`src/lib/**/*.ts`, `server/createApp.ts`, `server.ts`) | **100%** cada una (política) | Documentado aquí y en ADR-0003/4/5; el **suelo** actual está en `vitest.config.ts` → `coverage.thresholds` |
+| Contrato API vs OpenAPI | Pasan las rutas en `tests/api/contract.test.ts` | `npm run test` |
+| E2E (Playwright) | Smoke + rutas críticas en `e2e/` en Chromium | `npm run test:e2e` |
+| Integración (PostgreSQL) | `tests/integration/**` | `npm run test:integration` |
+| Accesibilidad | Smoke `jest-axe` + `@axe-core/playwright` en superficies críticas + ESLint `jsx-a11y` | `npm run test:a11y`, specs Playwright, `npm run lint` |
+
+## Dónde corre cada suite (local vs CI)
+
+| Suite | Comando local | Workflow CI (evidencia) |
+|-------|---------------|------------------------|
+| Type-check | `npm run type-check` | `.github/workflows/ci.yml` |
+| Lint (incl. jsx-a11y) | `npm run lint` | `ci.yml`, `frontend-validation.yml` |
+| Unitarias + cobertura | `npm run test`, `npm run test:coverage` | `ci.yml`, `qa-validation.yml` (job `unit_tests`) |
+| Contrato API | parte de `npm run test` | `ci.yml` |
+| Sintaxis OpenAPI + sync de rutas | `npm run docs:validate` | `ci.yml` |
+| Integración | `npm run test:integration` (requiere `DATABASE_URL`) | `ci.yml`, `qa-validation.yml` |
+| E2E Playwright | `npm run test:e2e` | `ci.yml`, `qa-validation.yml` |
+| A11y unitaria | `npm run test:a11y` | `qa-validation.yml` (`accessibility_tests`) |
+| Caza de flakes (opcional) | `npm run test:e2e:repeat` | Resumen en job QA |
+| Carga smoke (opcional) | `npm run perf:smoke` (CLI [k6](https://k6.io/docs/get-started/installation/)) | No en CI por defecto |
+
+**Regresión visual (Playwright):** usar `expect(page).toHaveScreenshot()` en un spec dedicado; versionar baselines en una sola plataforma (p. ej. Chromium en Linux en CI) con `snapshotPathTemplate` en `playwright.config.ts`. Aún no hay baselines en el repo; añadirlos en un PR cuando exista captura estable en Linux.
+
+**Paridad de entornos y checklist manual:** [paridad-entornos-pruebas.md](paridad-entornos-pruebas.md) · [lista-verificacion-qa-manual.md](lista-verificacion-qa-manual.md)
+
 ## Herramientas
 
 | Herramienta | Versión | Uso |
@@ -60,9 +89,24 @@ tests/api/contract.test.ts, validate-openapi-response.ts
 tests/server/server.test.ts  ← arranque `server.ts` (Prisma mock; ADR-0005)
 e2e/smoke.spec.ts
 tests/integration/api.integration.test.ts  ← HTTP + Prisma real (`npm run test:integration`; excluido del Vitest por defecto)
+tests/integration/dbf-migration.integration.test.ts  ← genera fixtures DBF mínimos en runtime y valida `scripts/migrate-from-dbf.ts` sobre PostgreSQL
+tests/integration/repartos.integration.test.ts  ← repartos con Prisma real si hay `DATABASE_URL`
+tests/api/repartos.test.ts, ordenes-entrega.test.ts  ← repartos, GPS y picking (Prisma mock)
+tests/server/services/repartoUbicacionService.test.ts  ← retención GPS 7 días y roles
 ```
 
-Vitest **excluye** `e2e/**` (`vitest.config.ts`) para que solo Playwright ejecute esos archivos. **`tests/integration/**`** queda fuera del `npm run test:coverage` (no exige `DATABASE_URL`); integración usa `vitest.integration.config.ts`.
+Vitest **excluye** `e2e/**` (`vitest.config.ts`) para que solo Playwright ejecute esos archivos.
+
+### Evidencia API logística (#140–#145)
+
+| Área | Archivos de prueba | Notas |
+|------|-------------------|--------|
+| Repartos | `tests/api/repartos.test.ts`, `tests/api/contract.test.ts` | CRUD, iniciar/cerrar, POD, contrato OpenAPI |
+| GPS | `repartoUbicacionService.test.ts`, rutas `activos` / `ubicacion` | Módulo `logistics.gps`; `TEST_DEFAULT_MODULES` en `tenantModules.ts` |
+| Picking | `tests/api/ordenes-entrega.test.ts` | Módulo `logistics.picking` |
+| KPIs y reportes (#145) | `tests/api/logistica-reportes.test.ts`, `logisticaReportesService.test.ts`, `LogisticaReportesPanel.test.tsx`, contrato `/api/logistica/kpis`, `reporte-choferes`, `reporte-zonas` | Módulo `logistics.dispatches`; `dispatchedAt` / ADR-0011; `choferId` opcional en los tres endpoints |
+| Matriz auditoría (#84) | `tests/server/http-mutations-audit-coverage.test.ts` | Picking, repartos, GPS, POD |
+| Integración | `tests/integration/repartos.integration.test.ts` | Opcional; PostgreSQL migrado | **`tests/integration/**`** queda fuera del `npm run test:coverage` (no exige `DATABASE_URL`); integración usa `vitest.integration.config.ts`.
 
 ## Estrategia de mocks
 

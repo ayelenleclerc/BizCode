@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "limit": {
+      "description": "Effective page size (same semantics as query `limit`)",
+      "maximum": 500,
+      "minimum": 1,
+      "type": "integer"
+    },
+    "offset": {
+      "description": "Effective skip (same semantics as query `offset`)",
+      "minimum": 0,
+      "type": "integer"
+    },
+    "total": {
+      "description": "Row count matching the list filter (before limit/offset)",
+      "minimum": 0,
+      "type": "integer"
+    }
+  },
+  "required": [
+    "total",
+    "limit",
+    "offset"
+  ],
+  "title": "ListPaginationMeta",
+  "type": "object"
+}

@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "balanceActual": {
+      "type": "string"
+    },
+    "clienteId": {
+      "type": "integer"
+    },
+    "codigo": {
+      "type": "integer"
+    },
+    "lineas": {
+      "items": {
+        "$ref": "./CuentaCorrienteLine.schema.json"
+      },
+      "type": "array"
+    },
+    "rsocial": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "clienteId",
+    "codigo",
+    "rsocial",
+    "balanceActual",
+    "lineas"
+  ],
+  "title": "CuentaCorriente",
+  "type": "object"
+}

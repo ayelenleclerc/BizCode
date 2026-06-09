@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "clienteId": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "driverId": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "facturaId": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "fecha": {
+      "type": "string"
+    },
+    "nota": {
+      "maxLength": 200,
+      "type": "string"
+    },
+    "zonaId": {
+      "nullable": true,
+      "type": "integer"
+    }
+  },
+  "required": [
+    "clienteId",
+    "fecha"
+  ],
+  "title": "OrdenEntregaCreateInput",
+  "type": "object"
+}

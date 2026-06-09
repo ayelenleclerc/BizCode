@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "articuloId": {
+      "type": "integer"
+    },
+    "codigo": {
+      "type": "integer"
+    },
+    "descripcion": {
+      "type": "string"
+    },
+    "quantity": {
+      "type": "integer"
+    },
+    "total": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "articuloId",
+    "codigo",
+    "descripcion",
+    "quantity",
+    "total"
+  ],
+  "title": "DashboardTopArticuloRow",
+  "type": "object"
+}

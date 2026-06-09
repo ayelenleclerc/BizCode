@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "count": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "fecha": {
+      "description": "Calendar day YYYY-MM-DD (server local)",
+      "type": "string"
+    },
+    "porFormaPago": {
+      "items": {
+        "$ref": "./CobranzasPorFormaPago.schema.json"
+      },
+      "type": "array"
+    },
+    "total": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "fecha",
+    "count",
+    "total",
+    "porFormaPago"
+  ],
+  "title": "ReporteCobranzasRow",
+  "type": "object"
+}

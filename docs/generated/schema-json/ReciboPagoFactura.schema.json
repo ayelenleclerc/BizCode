@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "comprobanteCompraId": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "facturaRef": {
+      "type": "string"
+    },
+    "id": {
+      "type": "integer"
+    },
+    "monto": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "facturaRef",
+    "monto"
+  ],
+  "title": "ReciboPagoFactura",
+  "type": "object"
+}

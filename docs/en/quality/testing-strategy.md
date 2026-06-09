@@ -33,6 +33,35 @@ Additional coverage exclusions (bundler entries, `server/main.ts` thin entry, Re
 
 Thresholds are enforced by Vitest's `coverage.thresholds` configuration. The CI pipeline fails if any threshold is not met.
 
+## Coverage targets (KPI summary)
+
+| KPI | Target | Where enforced |
+|-----|--------|----------------|
+| Lines / functions / branches / statements on policy scope (`src/lib/**/*.ts`, `server/createApp.ts`, `server.ts`) | **100%** each (policy) | Documented here and in ADR-0003/4/5; ratchet in `vitest.config.ts` may be lower until the suite reaches 100% — see `coverage.thresholds` for the **current** failing floor |
+| API contract vs OpenAPI | All paths in `tests/api/contract.test.ts` pass | `npm run test` |
+| E2E (Playwright) | Smoke + critical paths in `e2e/` pass on Chromium | `npm run test:e2e` |
+| Integration (PostgreSQL) | `tests/integration/**` pass | `npm run test:integration` |
+| Accessibility | `jest-axe` smoke + `@axe-core/playwright` on critical surfaces + ESLint `jsx-a11y` | `npm run test:a11y`, Playwright specs, `npm run lint` |
+
+## Where suites run (local vs CI)
+
+| Suite | Local command | CI workflow (evidence) |
+|-------|---------------|-------------------------|
+| Type-check | `npm run type-check` | `.github/workflows/ci.yml` |
+| Lint (incl. jsx-a11y) | `npm run lint` | `ci.yml`, `frontend-validation.yml` |
+| Unit + coverage | `npm run test`, `npm run test:coverage` | `ci.yml`, `qa-validation.yml` (`unit_tests`) |
+| API contract | part of `npm run test` | `ci.yml` |
+| OpenAPI syntax + route sync | `npm run docs:validate` | `ci.yml` |
+| Integration | `npm run test:integration` (needs `DATABASE_URL`) | `ci.yml`, `qa-validation.yml` (`integration_tests`) |
+| E2E Playwright | `npm run test:e2e` (uses `playwright.config.ts` webServer) | `ci.yml`, `qa-validation.yml` (`e2e_tests`) |
+| A11y unit smoke | `npm run test:a11y` | `qa-validation.yml` (`accessibility_tests`) |
+| Flake hunt (optional) | `npm run test:e2e:repeat` | Documented in QA job summary |
+| Load smoke (optional) | `npm run perf:smoke` (requires [k6](https://k6.io/docs/get-started/installation/) CLI) | Not in default CI |
+
+**Visual regression (Playwright):** use `expect(page).toHaveScreenshot()` in a dedicated spec; store baselines under revision control using **one** platform (typically Linux Chromium in CI) via `snapshotPathTemplate` in `playwright.config.ts` so paths do not vary by OS. This repository does not commit screenshot baselines yet; add them in a focused PR once a stable Linux baseline is generated in CI or a Linux runner.
+
+**Environment parity (ports, Postgres, seed):** [test-environments-parity.md](test-environments-parity.md) · [Manual QA checklist](manual-qa-checklist.md)
+
 ## Tools
 
 | Tool | Version | Purpose |
@@ -62,15 +91,33 @@ App.a11y.test.tsx       ← axe smoke on initial route (API mocked)
 tests/api/
   contract.test.ts      ← HTTP contract + 500 responses (Prisma mocked)
   validate-openapi-response.ts  ← Ajv against docs/api/openapi.yaml
+  repartos.test.ts      ← Repartos + GPS ubicacion/activos (mocked Prisma)
+  ordenes-entrega.test.ts ← Delivery orders + picking (mocked Prisma)
 tests/server/
   server.test.ts        ← `server.ts` bootstrap (Prisma mocked; see ADR-0005)
+  services/repartoUbicacionService.test.ts ← GPS retention and role gates
 e2e/
   smoke.spec.ts         ← Playwright smoke (production bundle via vite preview)
 tests/integration/
   api.integration.test.ts  ← HTTP + real Prisma against PostgreSQL (`npm run test:integration`; excluded from default Vitest)
+  dbf-migration.integration.test.ts ← Generates minimal DBF fixtures at runtime and validates `scripts/migrate-from-dbf.ts` against PostgreSQL
+  repartos.integration.test.ts ← Delivery routes with real Prisma when `DATABASE_URL` is set
 ```
 
 Vitest **excludes** `e2e/**` (`vitest.config.ts`) so files under `e2e/` are only executed by Playwright. **`tests/integration/**`** is excluded from the default Vitest run (no `DATABASE_URL` required for `npm run test:coverage`); integration tests use `vitest.integration.config.ts`.
+
+### Logistics API evidence (#140–#145)
+
+| Area | Test files | Notes |
+|------|------------|--------|
+| Delivery routes | `tests/api/repartos.test.ts`, `tests/api/contract.test.ts` | CRUD, iniciar/cerrar, POD item, OpenAPI paths |
+| GPS tracking | `tests/api/repartos.test.ts`, `tests/server/services/repartoUbicacionService.test.ts`, contract paths `/api/repartos/activos`, `.../ubicacion` | Module gate `logistics.gps`; `TEST_DEFAULT_MODULES` in [`server/middleware/tenantModules.ts`](../../../server/middleware/tenantModules.ts) |
+| Warehouse picking | `tests/api/ordenes-entrega.test.ts`, contract `iniciar-picking` / `lista` | Module `logistics.picking` |
+| KPIs and reports (#145) | `tests/api/logistica-reportes.test.ts`, `tests/server/services/logisticaReportesService.test.ts`, `src/pages/logistica/LogisticaReportesPanel.test.tsx`, contract `/api/logistica/kpis`, `reporte-choferes`, `reporte-zonas` | Module `logistics.dispatches`; `dispatchedAt` / ADR-0011; optional `choferId` on all three endpoints |
+| Audit matrix (#84) | `tests/server/http-mutations-audit-coverage.test.ts` | Picking, repartos, GPS `ubicacion`, POD `reparto_item_pod_signed` |
+| Integration | `tests/integration/repartos.integration.test.ts` | Optional; requires migrated PostgreSQL |
+
+Contract tests mock Prisma; they validate HTTP status and OpenAPI response shapes. Service unit tests cover purge (7-day retention) and role gates without a database.
 
 ## Mocking Strategy
 

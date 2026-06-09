@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "clienteId": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "fecha": {
+      "description": "YYYY-MM-DD or ISO-8601",
+      "type": "string"
+    },
+    "formaPagoId": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "monto": {
+      "exclusiveMinimum": 0,
+      "type": "number"
+    },
+    "nota": {
+      "maxLength": 200,
+      "type": "string"
+    },
+    "referencia": {
+      "maxLength": 60,
+      "type": "string"
+    }
+  },
+  "required": [
+    "clienteId",
+    "fecha",
+    "monto"
+  ],
+  "title": "CobroInput",
+  "type": "object"
+}

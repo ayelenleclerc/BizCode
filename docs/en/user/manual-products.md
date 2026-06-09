@@ -50,9 +50,33 @@ The product’s VAT condition determines the applicable rate. The customer’s V
 2. Press **Enter** or double-click.
 3. Change the fields and press **F5**.
 
+## Supplier price comparator (GitHub #274)
+
+For **existing** products (`logistics.purchases`, `products.read` or `suppliers.read`):
+
+- Click **View suppliers** below the stock field to expand the comparator.
+- **Table:** supplier name, supplier code, list price, last price update, and last purchase (from **received** purchase orders with received quantity &gt; 0).
+- **Cheapest supplier** row is highlighted among rows that have a list price.
+- **Stale price:** amber highlight when the list-price date is older than **30** days.
+- **Sort** by list price, price date, or last purchase (ascending/descending); null values sort last.
+- **PO** (`suppliers.manage`): opens **Compras** with supplier, product, and unit cost pre-filled in the new order form.
+
+Only **active** suppliers with an **active** catalog entry for the product are listed.
+
+**API:** `GET /api/articulos/{id}/proveedores`, `GET /api/proveedores/comparar?articuloId=` — see [OpenAPI](../../api/openapi.yaml).
+
 ## Categories (Rubros)
 
-Rubros classify products (e.g. "Tools", "Electronics"). To add rubros, contact the system administrator (currently managed directly in the database).
+Rubros classify products (e.g. "Tools", "Electronics"). Users with **product management** permission can **import rubros from CSV** on this screen (“Import rubros CSV”): download the template, keep the header row unchanged, use UTF-8, and review the summary of rows created or skipped.
+
+## CSV import (rubros and products)
+
+With **products.manage**:
+
+- **Rubros:** fixed columns `codigo`, `nombre`. `.csv` file; max file size and row count are shown in the import dialog. Rows are skipped if the category code already exists in the database or is duplicated in the same file.
+- **Products:** columns as in the template; **`rubroCodigo`** must match the **numeric code** of an existing rubro. The same duplicate policy applies to the product `codigo` (within the file and in the database). Row validation matches the REST API; rejected rows show a **field path** prefix in the error text.
+
+**Esc** closes the import dialog when it is open; otherwise it closes the product form.
 
 ## Keyboard Shortcuts
 
@@ -63,4 +87,4 @@ Rubros classify products (e.g. "Tools", "Electronics"). To add rubros, contact t
 | F5 | Save form |
 | ↑ / ↓ | Navigate table rows |
 | Enter | Open selected product |
-| Esc | Close form without saving |
+| Esc | Close CSV import dialog, or close form without saving |

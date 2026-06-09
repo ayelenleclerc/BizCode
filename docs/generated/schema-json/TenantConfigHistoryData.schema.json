@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "items": {
+      "items": {
+        "$ref": "./TenantConfigHistoryEntry.schema.json"
+      },
+      "type": "array"
+    },
+    "total": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "total",
+    "items"
+  ],
+  "title": "TenantConfigHistoryData",
+  "type": "object"
+}

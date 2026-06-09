@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "channel": {
+      "enum": [
+        "pdf",
+        "fiscal_mock",
+        "thermal_mock"
+      ],
+      "type": "string"
+    },
+    "device": {
+      "enum": [
+        "pdf",
+        "fiscal",
+        "thermal"
+      ],
+      "type": "string"
+    },
+    "downloadPath": {
+      "type": "string"
+    },
+    "fallbackToPdf": {
+      "type": "boolean"
+    },
+    "jobId": {
+      "type": "string"
+    },
+    "transport": {
+      "enum": [
+        "mock-serial"
+      ],
+      "type": "string"
+    }
+  },
+  "required": [
+    "device",
+    "channel",
+    "fallbackToPdf"
+  ],
+  "title": "FacturaPrintResult",
+  "type": "object"
+}

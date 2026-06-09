@@ -1,12 +1,35 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "properties": {
+    "db": {
+      "properties": {
+        "latencyMs": {
+          "minimum": 0,
+          "type": "number"
+        },
+        "ok": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "ok",
+        "latencyMs"
+      ],
+      "type": "object"
+    },
     "status": {
       "example": "ok",
       "type": "string"
     },
     "timestamp": {
       "format": "date-time",
+      "type": "string"
+    },
+    "uptimeSeconds": {
+      "minimum": 0,
+      "type": "number"
+    },
+    "version": {
       "type": "string"
     }
   },

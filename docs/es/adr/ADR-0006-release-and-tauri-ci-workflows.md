@@ -15,11 +15,18 @@ El pipeline por defecto ([ciclo-ci-cd.md](../quality/ciclo-ci-cd.md)) no publica
 1. **`npm audit`:** el workflow ejecuta `npm audit --audit-level=high` tras `npm ci` con **`continue-on-error: true`** para visibilidad sin fallar el gate.
 2. **semantic-release:** `release.config.cjs` en la raíz; `.github/workflows/release.yml` solo con **`workflow_dispatch`**, crea GitHub Releases desde commits convencionales en `main` con `GITHUB_TOKEN`. Sin publicación npm (paquete `private`).
 3. **Tauri self-hosted:** `.github/workflows/tauri-selfhosted.yml` solo **`workflow_dispatch`** en **`runs-on: self-hosted`**. El runner debe tener Rust, Node y dependencias WebView nativas — no sustituye el job de calidad en `ubuntu-latest`.
+4. **Releases Tauri por tag:** `.github/workflows/tauri-release.yml` en **`push` de tags `v*.*.*`**, matriz en runners alojados de GitHub y artefactos en borrador de release; firma/notarización opcional vía secrets.
 
 ## Consecuencias
 
 - **Positivo:** automatización opcional documentada y versionada; el gate principal de PR no cambia.
 - **Negativo:** semantic-release y Tauri requieren disparo manual y runner adecuado.
+
+## Checklist de release (operador / escritorio)
+
+1. Verificar **`main`** con **Quality Gate** estándar (`ci.yml`): API, docs regenerados, ESLint, umbrales Vitest según `vitest.config.ts`, Playwright (`vite build` + preview), integración PostgreSQL.
+2. Antes de distribuir **instaladores escritorio**, ejecutar **Actions → build Tauri self-hosted** (`tauri-selfhosted.yml`) en un runner self-hosted con Rust + WebView. **No forma parte del gate de cada PR** y no reemplaza el gate SaaS (véase «Qué NO está en CI» en [ciclo-ci-cd.md](../quality/ciclo-ci-cd.md)).
+3. Si se usan tags con semantic-release, disparar **`release.yml`** (`workflow_dispatch` en `main`) tras validar el punto 2 cuando haga falta artefacto de escritorio etiquetado.
 
 ## Referencias
 

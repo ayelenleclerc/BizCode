@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "excedeLimite": {
+      "type": "boolean"
+    },
+    "limiteCredito": {
+      "nullable": true,
+      "type": "string"
+    },
+    "proveedorId": {
+      "type": "integer"
+    },
+    "saldo": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "proveedorId",
+    "saldo",
+    "excedeLimite"
+  ],
+  "title": "ProveedorCuentaCorrienteSaldo",
+  "type": "object"
+}

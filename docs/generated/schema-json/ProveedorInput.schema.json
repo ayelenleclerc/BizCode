@@ -1,0 +1,125 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "activo": {
+      "type": "boolean"
+    },
+    "alias": {
+      "nullable": true,
+      "type": "string"
+    },
+    "banco": {
+      "nullable": true,
+      "type": "string"
+    },
+    "categoria": {
+      "enum": [
+        "materia_prima",
+        "insumos",
+        "servicios",
+        "logistica"
+      ],
+      "nullable": true,
+      "type": "string"
+    },
+    "cbu": {
+      "maxLength": 22,
+      "nullable": true,
+      "type": "string"
+    },
+    "codigo": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "condIva": {
+      "enum": [
+        "RI",
+        "Mono",
+        "CF",
+        "Exento"
+      ],
+      "type": "string"
+    },
+    "condicionPago": {
+      "enum": [
+        "contado",
+        "15dias",
+        "30dias",
+        "60dias",
+        "otro"
+      ],
+      "nullable": true,
+      "type": "string"
+    },
+    "contactoEmail": {
+      "nullable": true,
+      "type": "string"
+    },
+    "contactoNombre": {
+      "nullable": true,
+      "type": "string"
+    },
+    "contactoTel": {
+      "nullable": true,
+      "type": "string"
+    },
+    "cuit": {
+      "nullable": true,
+      "type": "string"
+    },
+    "descuentoPct": {
+      "nullable": true,
+      "type": "number"
+    },
+    "email": {
+      "nullable": true,
+      "type": "string"
+    },
+    "fantasia": {
+      "nullable": true,
+      "type": "string"
+    },
+    "limiteCredito": {
+      "nullable": true,
+      "type": "number"
+    },
+    "moneda": {
+      "default": "ARS",
+      "type": "string"
+    },
+    "notas": {
+      "nullable": true,
+      "type": "string"
+    },
+    "plazoHabitual": {
+      "minimum": 0,
+      "nullable": true,
+      "type": "integer"
+    },
+    "rsocial": {
+      "maxLength": 30,
+      "minLength": 3,
+      "type": "string"
+    },
+    "telef": {
+      "nullable": true,
+      "type": "string"
+    },
+    "tipoCuenta": {
+      "enum": [
+        "cc",
+        "ca"
+      ],
+      "nullable": true,
+      "type": "string"
+    }
+  },
+  "required": [
+    "codigo",
+    "rsocial",
+    "condIva",
+    "activo"
+  ],
+  "title": "ProveedorInput",
+  "type": "object"
+}

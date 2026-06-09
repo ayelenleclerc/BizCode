@@ -1,0 +1,19 @@
+# Untitled integer in LibroIvaVentasPreview Schema
+
+```txt
+undefined#/properties/recordCountCbtv
+```
+
+
+
+| Abstract            | Extensible | Status         | Identifiable            | Custom Properties | Additional Properties | Access Restrictions | Defined In                                                                                                     |
+| :------------------ | :--------- | :------------- | :---------------------- | :---------------- | :-------------------- | :------------------ | :------------------------------------------------------------------------------------------------------------- |
+| Can be instantiated | No         | Unknown status | Unknown identifiability | Forbidden         | Allowed               | none                | [LibroIvaVentasPreview.schema.json\*](../schema-json/LibroIvaVentasPreview.schema.json "open original schema") |
+
+## recordCountCbtv Type
+
+`integer`
+
+## recordCountCbtv Constraints
+
+**minimum**: the value of this number must greater than or equal to: `0`

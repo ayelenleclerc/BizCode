@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "period": {
+      "description": "YYYY-MM month bucket",
+      "type": "string"
+    },
+    "saldo": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "period",
+    "saldo"
+  ],
+  "title": "ProveedorCuentaCorrienteChartPoint",
+  "type": "object"
+}

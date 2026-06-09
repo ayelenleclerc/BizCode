@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "codigo": {
+      "type": "integer"
+    },
+    "descripcion": {
+      "type": "string"
+    },
+    "id": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "id",
+    "codigo",
+    "descripcion"
+  ],
+  "title": "ProveedorCatalogoArticuloRef",
+  "type": "object"
+}

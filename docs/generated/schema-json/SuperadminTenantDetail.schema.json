@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "active": {
+      "type": "boolean"
+    },
+    "configUpdatedAt": {
+      "format": "date-time",
+      "nullable": true,
+      "type": "string"
+    },
+    "createdAt": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "id": {
+      "type": "integer"
+    },
+    "lastActivityAt": {
+      "format": "date-time",
+      "nullable": true,
+      "type": "string"
+    },
+    "modulesCount": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "name": {
+      "type": "string"
+    },
+    "plan": {
+      "nullable": true,
+      "type": "string"
+    },
+    "slug": {
+      "type": "string"
+    },
+    "stats": {
+      "$ref": "./SuperadminTenantStats.schema.json"
+    },
+    "updatedAt": {
+      "format": "date-time",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "name",
+    "slug",
+    "active",
+    "createdAt",
+    "updatedAt",
+    "plan",
+    "modulesCount",
+    "configUpdatedAt",
+    "stats",
+    "lastActivityAt"
+  ],
+  "title": "SuperadminTenantDetail",
+  "type": "object"
+}

@@ -5,8 +5,8 @@
 ## Corto plazo (técnico)
 
 1. **Validación server-side** de `POST/PUT` en rutas que hoy pasan `req.body` directo a Prisma — coherente con Zod del frontend y OpenAPI.
-2. **Extender ETL** cuando exista tabla real de clientes en DBF (mapear y reemplazar placeholders).
-3. **Tests de integración** de migración con copia mínima de DBF en fixtures (si se acuerda política de datos).
+2. ~~**Extender ETL** cuando exista tabla real de clientes en DBF~~ — **hecho (#51, PR #120):** `CLIENTES.DBF` en `migrate-from-dbf.ts`; ver `scripts/MIGRACION_PROGRAMA_VIEJO.md`.
+3. ~~**Tests de integración** de migración con copia mínima de DBF en fixtures~~ — **hecho (#73):** `tests/integration/dbf-migration.integration.test.ts` y guías en `docs/*/guides/*dbf*`.
 
 ## Medio plazo (dominio)
 

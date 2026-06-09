@@ -16,12 +16,12 @@
 
 | Entidad BizCode | Fuente legacy (evidencia actual) | Estado | Notas |
 |-----------------|----------------------------------|--------|--------|
-| `Rubro` | Semilla fija en script (`codigo=1`, General) | cubierto-script | No sale de un DBF en la migración actual. |
-| `Articulo` | `PVAR2.DBF` (+ `PVAR.DBF` para descripción) | cubierto-script | Límite de códigos importados en script; ver `MIGRACION_PROGRAMA_VIEJO.md`. |
-| `Cliente` | Placeholders `91001`–`91010` en script; existe `CLIENTES.DBF` en copia Suarez (2310 registros) | cubierto-script / **pendiente mapeo** | El ETL actual no lee `CLIENTES.DBF`; hay datos reales en esa copia — ver [`02-inventario-dbf-indice-maestro.md`](02-inventario-dbf-indice-maestro.md). |
+| `Rubro` | `RUBROS.DBF` si existe; si no, semilla **General** `codigo=1` | cubierto-script | Upsert por `[tenantId, codigo]`; API `POST /api/rubros/migrate-dbf`; ver `legacyRubroDbf.ts`. |
+| `Articulo` | `ARTICULOS.DBF` si existe; si no `PVAR2.DBF` (+ `PVAR.DBF`) | cubierto-script | Importar rubros antes que artículos; API `POST /api/articulos/migrate-dbf`; ver `legacyArticuloDbf.ts` y `MIGRACION_PROGRAMA_VIEJO.md`. |
+| `Cliente` | `CLIENTES.DBF` cuando la copia legacy lo incluye (2310 registros en copia Suarez); placeholders `91001`–`91010` si no hay filas | cubierto-script | ETL v1 en `migrate-from-dbf.ts` + `src/lib/migration/legacyClienteDbf.ts`; ver `MIGRACION_PROGRAMA_VIEJO.md`. |
 | `Factura` / `FacturaItem` | `FACT.DBF` y tablas relacionadas (`DET_COMP`, `ENCAB`, …) en inventario | pendiente | `FACT.DBF` tiene 418354 registros en la copia analizada; mapeo por definir tras análisis de campos. |
 | `FormaPago` | — | pendiente | |
-| `ParamEmpresa` | — | pendiente | |
+| `ParamEmpresa` | — | cubierto-api | `GET/PUT /api/empresa`, UI `/configuracion/empresa` (GitHub #127). |
 
 ## Campos `Articulo` (desde `PVAR2` / `PVAR`)
 
@@ -35,6 +35,23 @@
 | `stock` | `CAJA + UNID` (aprox.) | |
 | `umedida` | Fijo `UN` en script | |
 | `rubroId` | Rubro semilla | |
+
+## Campos `Cliente` (desde `CLIENTES.DBF`)
+
+| Campo Prisma | Origen legacy | Notas |
+|--------------|---------------|--------|
+| `codigo` | `CODIG` | Entero > 0 |
+| `rsocial` | `RSOCIAL` | 3–30 caracteres |
+| `fantasia` | `FANTASIA` | Opcional |
+| `domicilio` | `DOMIC` | Opcional |
+| `localidad` | `LOCAL` | Opcional |
+| `cpost` | `CPOST` | Opcional |
+| `telef` | `TELEF` | Opcional |
+| `email` | `EMAIL` | Opcional |
+| `cuit` | `CUIT` | Opcional; validación en schema |
+| `creditLimit` | `CREDITO` | ≥ 0 |
+| `activo` | `BAJA` | Invertido; precede `ACTIVO` |
+| `condIva` | `COND` | Catálogo en `MIGRACION_PROGRAMA_VIEJO.md` |
 
 ---
 
