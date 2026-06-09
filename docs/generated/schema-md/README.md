@@ -170,6 +170,10 @@
 
 * [DocumentoCompraConfirmResult](./documentocompraconfirmresult.md) – `-`
 
+* [DocumentoCompraDuplicadoEnvelope](./documentocompraduplicadoenvelope.md) – `-`
+
+* [DocumentoCompraDuplicadoResult](./documentocompraduplicadoresult.md) – `-`
+
 * [DocumentoCompraImportado](./documentocompraimportado.md) – `-`
 
 * [DocumentoCompraImportadoEnvelope](./documentocompraimportadoenvelope.md) – `-`

@@ -11,6 +11,7 @@ import {
 } from '@/lib/api'
 import DocumentoCompraItemsTable from './DocumentoCompraItemsTable'
 import DocumentoCompraProveedorInlineDialog from './DocumentoCompraProveedorInlineDialog'
+import DocumentoCompraTemplatesSection from './DocumentoCompraTemplatesSection'
 import KeyboardHint, { useFormShortcuts } from '@/components/shared/KeyboardHint'
 import { useFormPageHotkeys } from '@/hooks/useListPageKeyboard'
 import type { Proveedor } from '@/types'
@@ -125,6 +126,11 @@ export default function DocumentoCompraImportSection({ onConfirmed }: { onConfir
   const [loadingCola, setLoadingCola] = useState(false)
   const [previewItems, setPreviewItems] = useState<DocumentoCompraItemPreviewDTO[]>([])
   const [showInlineProveedor, setShowInlineProveedor] = useState(false)
+  const [duplicateCheck, setDuplicateCheck] = useState<{
+    duplicado: boolean
+    comprobanteCompraId: number | null
+  } | null>(null)
+  const [checkingDuplicate, setCheckingDuplicate] = useState(false)
 
   const loadCola = useCallback(async () => {
     setLoadingCola(true)
@@ -154,6 +160,38 @@ export default function DocumentoCompraImportSection({ onConfirmed }: { onConfir
     void loadProveedores()
     void loadCola()
   }, [loadProveedores, loadCola])
+
+  useEffect(() => {
+    if (!showPreview) {
+      setDuplicateCheck(null)
+      return
+    }
+    const provId = Number.parseInt(proveedorId, 10)
+    const num = Number.parseInt(numero, 10)
+    if (!Number.isInteger(provId) || provId < 1 || !prefijo.trim() || !Number.isInteger(num) || num < 1) {
+      setDuplicateCheck(null)
+      return
+    }
+    let cancelled = false
+    const timer = window.setTimeout(() => {
+      setCheckingDuplicate(true)
+      void documentosCompraAPI
+        .verificarDuplicado({ proveedorId: provId, tipo, prefijo: prefijo.trim(), numero: num })
+        .then((result) => {
+          if (!cancelled) setDuplicateCheck(result)
+        })
+        .catch(() => {
+          if (!cancelled) setDuplicateCheck(null)
+        })
+        .finally(() => {
+          if (!cancelled) setCheckingDuplicate(false)
+        })
+    }, 400)
+    return () => {
+      cancelled = true
+      window.clearTimeout(timer)
+    }
+  }, [showPreview, proveedorId, tipo, prefijo, numero])
 
   const markTouched = (field: string) => {
     setTouched((prev) => ({ ...prev, [field]: true }))
@@ -515,6 +553,22 @@ export default function DocumentoCompraImportSection({ onConfirmed }: { onConfir
                 ? ` — ${t('documentoCompra.manualReview')}`
                 : null}
             </p>
+            {duplicateCheck?.duplicado ? (
+              <p
+                role="alert"
+                className="mb-4 text-sm text-red-700 dark:text-red-400 border border-red-300 dark:border-red-700 rounded px-3 py-2"
+                data-testid="documento-compra-duplicate-warning"
+              >
+                {t('documentoCompra.duplicateWarning', {
+                  comprobanteId: duplicateCheck.comprobanteCompraId ?? '—',
+                })}
+              </p>
+            ) : null}
+            {checkingDuplicate && !duplicateCheck?.duplicado ? (
+              <p className="mb-4 text-xs text-slate-500" data-testid="documento-compra-duplicate-checking">
+                {t('documentoCompra.duplicateChecking')}
+              </p>
+            ) : null}
             {proveedorMismatch ? (
               <div className="mb-4 flex flex-wrap items-center gap-2">
                 <p
@@ -744,7 +798,7 @@ export default function DocumentoCompraImportSection({ onConfirmed }: { onConfir
                 className="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50"
                 data-testid="documento-compra-preview-confirm"
                 onClick={() => void handleConfirm()}
-                disabled={confirming}
+                disabled={confirming || duplicateCheck?.duplicado === true}
               >
                 {confirming ? t('documentoCompra.confirming') : t('documentoCompra.confirm')}
               </button>
@@ -766,6 +820,8 @@ export default function DocumentoCompraImportSection({ onConfirmed }: { onConfir
           markTouched('proveedorId')
         }}
       />
+
+      <DocumentoCompraTemplatesSection />
     </section>
   )
 }

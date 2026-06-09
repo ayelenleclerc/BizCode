@@ -1,18 +1,21 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import DocumentoCompraImportSection from './DocumentoCompraImportSection'
 
 const mockProcesar = vi.hoisted(() => vi.fn())
 const mockConfirmar = vi.hoisted(() => vi.fn())
+const mockVerificarDuplicado = vi.hoisted(() => vi.fn())
 const mockProveedoresList = vi.hoisted(() => vi.fn())
 const mockProveedoresListCatalogo = vi.hoisted(() => vi.fn())
 const mockArticulosGet = vi.hoisted(() => vi.fn())
+const mockListTemplates = vi.hoisted(() => vi.fn())
 
 vi.mock('@/lib/api', () => ({
   documentosCompraAPI: {
     procesar: mockProcesar,
     confirmar: mockConfirmar,
+    verificarDuplicado: mockVerificarDuplicado,
     getCola: vi.fn().mockResolvedValue({
       procesando: 0,
       pendiente_revision: 0,
@@ -20,6 +23,7 @@ vi.mock('@/lib/api', () => ({
       descartado: 0,
       documentos: [],
     }),
+    listTemplates: mockListTemplates,
     downloadOriginal: vi.fn(),
   },
   proveedoresAPI: {
@@ -29,8 +33,16 @@ vi.mock('@/lib/api', () => ({
   },
   articulosAPI: {
     get: mockArticulosGet,
+    list: vi.fn().mockResolvedValue([]),
+  },
+  rubrosAPI: {
+    list: vi.fn().mockResolvedValue([{ id: 1, codigo: 1, nombre: 'General' }]),
   },
   ApiRequestFailedError: class ApiRequestFailedError extends Error {},
+}))
+
+vi.mock('@/components/CanAccess', () => ({
+  CanAccess: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }))
 
 const sampleDoc = {
@@ -74,6 +86,8 @@ describe('DocumentoCompraImportSection', () => {
     mockProveedoresList.mockResolvedValue([{ id: 1, codigo: 10, rsocial: 'Proveedor SA' }])
     mockProveedoresListCatalogo.mockResolvedValue([])
     mockArticulosGet.mockResolvedValue({ id: 1, descripcion: 'Artículo demo' })
+    mockVerificarDuplicado.mockResolvedValue({ duplicado: false, comprobanteCompraId: null })
+    mockListTemplates.mockResolvedValue([{ issuer: 'generic-arca-ar', keywords: ['CUIT'], source: 'bundled' }])
     mockProcesar.mockResolvedValue(sampleDoc)
     mockConfirmar.mockResolvedValue({
       documento: { ...sampleDoc, estado: 'confirmado' },
@@ -138,6 +152,30 @@ describe('DocumentoCompraImportSection', () => {
     await user.upload(screen.getByTestId('documento-compra-file-input'), file)
     expect(await screen.findByTestId('documento-compra-items-table')).toBeInTheDocument()
     expect(screen.getByTestId('documento-compra-item-desc-0')).toHaveValue('Aceite 1L')
+    expect(screen.getByTestId('documento-compra-item-search-btn-0')).toBeInTheDocument()
+  })
+
+  it('shows duplicate warning and disables confirm when comprobante exists', async () => {
+    mockProcesar.mockResolvedValue({
+      ...sampleDoc,
+      datosExtraidos: {
+        ...sampleDoc.datosExtraidos,
+        proveedorId: 1,
+        tipo: 'B',
+        prefijo: '0001',
+        numero: 7,
+        total: 121,
+      },
+    })
+    mockVerificarDuplicado.mockResolvedValue({ duplicado: true, comprobanteCompraId: 99 })
+    const user = userEvent.setup()
+    render(<DocumentoCompraImportSection onConfirmed={vi.fn()} />)
+    const file = new File(['%PDF'], 'factura.pdf', { type: 'application/pdf' })
+    await user.upload(screen.getByTestId('documento-compra-file-input'), file)
+    await waitFor(() => {
+      expect(screen.getByTestId('documento-compra-duplicate-warning')).toBeInTheDocument()
+    })
+    expect(screen.getByTestId('documento-compra-preview-confirm')).toBeDisabled()
   })
 
   it('renders drop zone and opens preview after upload', async () => {

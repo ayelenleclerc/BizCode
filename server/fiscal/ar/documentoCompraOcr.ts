@@ -1,7 +1,7 @@
 import { createWorker } from 'tesseract.js'
 
-/** @en OCR languages for purchase documents (#277): Spanish + English. */
-export const DOCUMENTO_COMPRA_OCR_LANG = 'spa+eng'
+/** @en OCR languages for purchase documents (#277 Fase G): Spanish, English, Portuguese. */
+export const DOCUMENTO_COMPRA_OCR_LANG = 'spa+eng+por'
 
 /**
  * @en Runs local Tesseract OCR on a preprocessed image buffer (#277 Tier 3).

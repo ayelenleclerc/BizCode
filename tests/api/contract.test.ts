@@ -1336,6 +1336,16 @@ describe('API — contrato OpenAPI', () => {
     expect(res.body.data.periodo).toBe('2026-05')
   })
 
+  it('GET /api/documentos-compra/verificar-duplicado', async () => {
+    const app = createApp(prisma)
+    const res = await request(app)
+      .get('/api/documentos-compra/verificar-duplicado')
+      .query({ proveedorId: 1, tipo: 'B', prefijo: '0001', numero: 7 })
+      .expect(200)
+    await assertMatchesOpenApi('/api/documentos-compra/verificar-duplicado', 'get', '200', res.body)
+    expect(res.body.data.duplicado).toBe(false)
+  })
+
   it('GET /api/documentos-compra/cola', async () => {
     const app = createApp(prisma)
     const res = await request(app).get('/api/documentos-compra/cola').expect(200)

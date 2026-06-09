@@ -1893,6 +1893,11 @@ export type DocumentoCompraColaEstadoDTO = {
   documentos: DocumentoCompraImportadoRow[]
 }
 
+export type DocumentoCompraDuplicadoResultDTO = {
+  duplicado: boolean
+  comprobanteCompraId: number | null
+}
+
 export type DocumentoCompraTemplateSummaryDTO = {
   issuer: string
   keywords: string[]
@@ -1946,6 +1951,23 @@ export const documentosCompraAPI = {
         form,
         { headers: { 'Content-Type': 'multipart/form-data' } },
       )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  verificarDuplicado: async (params: {
+    proveedorId: number
+    tipo: string
+    prefijo: string
+    numero: number
+  }): Promise<DocumentoCompraDuplicadoResultDTO> => {
+    try {
+      const response = await api.get<{
+        success: boolean
+        data: DocumentoCompraDuplicadoResultDTO
+      }>('/documentos-compra/verificar-duplicado', { params })
       return response.data.data
     } catch (error) {
       return handleError(error as AxiosError<ApiErrorPayload>)

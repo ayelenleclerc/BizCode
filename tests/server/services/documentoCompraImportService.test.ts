@@ -313,6 +313,44 @@ describe('DocumentoCompraImportService', () => {
     delete process.env.DOCUMENTOS_COMPRA_TEMPLATES_PATH
   })
 
+  it('verificarDuplicado returns true only for same proveedor', async () => {
+    const prisma = buildPrisma()
+    vi.mocked(prisma.comprobanteCompra.findFirst)
+      .mockResolvedValueOnce({ id: 55 })
+      .mockResolvedValueOnce(null)
+    const service = new DocumentoCompraImportService(prisma as never)
+
+    const dup = await service.verificarDuplicado(1, 1, 'B', '0001', 10)
+    expect(dup.duplicado).toBe(true)
+    expect(dup.comprobanteCompraId).toBe(55)
+
+    const ok = await service.verificarDuplicado(1, 2, 'B', '0001', 10)
+    expect(ok.duplicado).toBe(false)
+    expect(ok.comprobanteCompraId).toBeNull()
+  })
+
+  it('confirmar rejects duplicate for same proveedor', async () => {
+    const prisma = buildPrisma()
+    vi.mocked(prisma.comprobanteCompra.findFirst).mockResolvedValue({ id: 55 })
+    const service = new DocumentoCompraImportService(prisma as never)
+
+    await expect(
+      service.confirmar(1, 1, 1, {
+        fecha: '2026-05-10T12:00:00.000Z',
+        tipo: 'B',
+        prefijo: '0001',
+        numero: 10,
+        proveedorId: 1,
+        neto1: 100,
+        neto2: 0,
+        neto3: 0,
+        iva1: 21,
+        iva2: 0,
+        total: 121,
+      }),
+    ).rejects.toThrow(/already exists/)
+  })
+
   it('confirmar creates comprobante and links document', async () => {
     const prisma = buildPrisma()
     const storage = new DocumentoCompraStorage(tmpDir)
