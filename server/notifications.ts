@@ -14,6 +14,8 @@ export const NOTIFICATION_TYPES = [
   'chat_message',
   'stock_below_minimum',
   'module_trial_expiring',
+  'cheque_due_soon',
+  'cheque_rechazado',
 ] as const
 
 export type NotificationType = (typeof NOTIFICATION_TYPES)[number]
@@ -41,6 +43,9 @@ export type NotificationPayload = {
   moduleKey?: string
   expiresAt?: string
   daysRemaining?: number
+  chequeId?: number
+  chequeNumero?: string
+  banco?: string
 }
 
 /**

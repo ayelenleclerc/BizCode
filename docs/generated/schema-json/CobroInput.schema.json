@@ -1,6 +1,15 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "properties": {
+    "chequeId": {
+      "description": "Link existing portfolio check (#231).",
+      "nullable": true,
+      "type": "integer"
+    },
+    "chequeNuevo": {
+      "$ref": "./ChequeInput.schema.json",
+      "description": "Create received check when recording collection (#231)."
+    },
     "clienteId": {
       "minimum": 1,
       "type": "integer"

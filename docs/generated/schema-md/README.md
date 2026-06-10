@@ -82,6 +82,20 @@
 
 * [ChatMessageListEnvelope](./chatmessagelistenvelope.md) – `-`
 
+* [Cheque](./cheque.md) – `-`
+
+* [ChequeEnvelope](./chequeenvelope.md) – `-`
+
+* [ChequeInput](./chequeinput.md) – `-`
+
+* [ChequeListEnvelope](./chequelistenvelope.md) – `-`
+
+* [ChequeResumenEnvelope](./chequeresumenenvelope.md) – `-`
+
+* [ChequeTransicionInput](./chequetransicioninput.md) – `-`
+
+* [ChequeUpdateInput](./chequeupdateinput.md) – `-`
+
 * [Cliente](./cliente.md) – `-`
 
 * [ClienteEnvelope](./clienteenvelope.md) – `-`
@@ -652,6 +666,14 @@
 
 * [Untitled object in ChatConversation](./chatconversation-properties-user.md) – `undefined#/properties/user`
 
+* [Untitled object in ChequeResumenEnvelope](./chequeresumenenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled object in ChequeResumenEnvelope](./chequeresumenenvelope-properties-data-properties-encartera.md) – `undefined#/properties/data/properties/enCartera`
+
+* [Untitled object in ChequeResumenEnvelope](./chequeresumenenvelope-properties-data-properties-proximosvencer.md) – `undefined#/properties/data/properties/proximosVencer`
+
+* [Untitled object in ChequeResumenEnvelope](./chequeresumenenvelope-properties-data-properties-rechazados.md) – `undefined#/properties/data/properties/rechazados`
+
 * [Untitled object in ClienteListEnvelope](./clientelistenvelope-allof-0.md) – `undefined#/allOf/0`
 
 * [Untitled object in CobranzaRecordatorioEnvelope](./cobranzarecordatorioenvelope-properties-data.md) – `undefined#/properties/data`
@@ -825,6 +847,8 @@
 * [Untitled array in ChatConversationListEnvelope](./chatconversationlistenvelope-properties-data.md) – `undefined#/properties/data`
 
 * [Untitled array in ChatMessageListEnvelope](./chatmessagelistenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled array in ChequeListEnvelope](./chequelistenvelope-properties-data.md) – `undefined#/properties/data`
 
 * [Untitled array in ClienteImportResult](./clienteimportresult-properties-errors.md) – `undefined#/properties/errors`
 

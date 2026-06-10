@@ -18,6 +18,10 @@ import type {
   RemitoInput,
   RemitoItemInput,
   RemitoUpdateInput,
+  ChequeInput,
+  ChequeTransicionInput,
+  ChequeUpdateInput,
+  CobroInput,
   ProveedorInput,
   ProveedorCuentaCorrienteAjusteInput,
   RubroInput,
@@ -690,6 +694,8 @@ export const cobroBodySchema = z
     formaPagoId: z.union([z.number(), z.null(), z.undefined()]).optional(),
     referencia: z.string().optional(),
     nota: z.string().optional(),
+    chequeId: z.union([z.number(), z.null(), z.undefined()]).optional(),
+    chequeNuevo: z.union([z.object({}).passthrough(), z.null(), z.undefined()]).optional(),
     retenciones: z.array(cobroRetencionLineSchema).optional(),
   })
   .superRefine((data, ctx) => {
@@ -735,8 +741,92 @@ export const cobroBodySchema = z
       ...(data.retenciones != null && data.retenciones.length > 0
         ? { retenciones: data.retenciones }
         : {}),
+      chequeId: data.chequeId ?? null,
+      ...(data.chequeNuevo != null && typeof data.chequeNuevo === 'object'
+        ? { chequeNuevo: data.chequeNuevo as ChequeInput }
+        : {}),
+    } satisfies CobroInput
+  })
+
+const chequeTipoSchema = z.enum(['recibido', 'emitido'])
+const chequeModalidadSchema = z.enum(['fisico', 'echeq'])
+
+export const chequeBodySchema = z
+  .object({
+    tipo: chequeTipoSchema,
+    modalidad: chequeModalidadSchema,
+    numero: z.string(),
+    banco: z.string(),
+    sucursal: z.string().optional(),
+    cbuOrigen: z.string().optional(),
+    libradorNombre: z.string(),
+    libradorCuit: z.string().optional(),
+    monto: z.number(),
+    moneda: z.string().optional(),
+    fechaEmision: z.string(),
+    fechaVencimiento: z.string(),
+    clienteId: z.union([z.number(), z.null(), z.undefined()]).optional(),
+    proveedorId: z.union([z.number(), z.null(), z.undefined()]).optional(),
+    observaciones: z.string().optional(),
+  })
+  .superRefine((data, ctx) => {
+    if (data.numero.trim().length < 1 || data.numero.length > 30) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'numero is required (max 30)', path: ['numero'] })
+    }
+    if (data.banco.trim().length < 1 || data.banco.length > 50) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'banco is required (max 50)', path: ['banco'] })
+    }
+    if (typeof data.monto !== 'number' || data.monto <= 0) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'monto must be > 0', path: ['monto'] })
     }
   })
+  .transform(
+    (data): ChequeInput => ({
+      tipo: data.tipo,
+      modalidad: data.modalidad,
+      numero: data.numero.trim(),
+      banco: data.banco.trim(),
+      sucursal: data.sucursal?.trim() ?? null,
+      cbuOrigen: data.cbuOrigen?.trim() ?? null,
+      libradorNombre: data.libradorNombre.trim(),
+      libradorCuit: data.libradorCuit?.trim() ?? null,
+      monto: data.monto,
+      moneda: data.moneda?.trim() || 'ARS',
+      fechaEmision: data.fechaEmision.trim(),
+      fechaVencimiento: data.fechaVencimiento.trim(),
+      clienteId: data.clienteId ?? null,
+      proveedorId: data.proveedorId ?? null,
+      observaciones: data.observaciones?.trim() ?? null,
+    }),
+  )
+
+export const chequeUpdateBodySchema = z
+  .object({
+    banco: z.string().optional(),
+    sucursal: z.union([z.string(), z.null(), z.undefined()]).optional(),
+    cbuOrigen: z.union([z.string(), z.null(), z.undefined()]).optional(),
+    libradorNombre: z.string().optional(),
+    libradorCuit: z.union([z.string(), z.null(), z.undefined()]).optional(),
+    fechaVencimiento: z.string().optional(),
+    observaciones: z.union([z.string(), z.null(), z.undefined()]).optional(),
+  })
+  .transform((data): ChequeUpdateInput => data)
+
+export const chequeTransicionBodySchema = z
+  .object({
+    destino: z.union([z.string(), z.null(), z.undefined()]).optional(),
+    nota: z.union([z.string(), z.null(), z.undefined()]).optional(),
+    proveedorId: z.union([z.number(), z.null(), z.undefined()]).optional(),
+    monto: z.union([z.number(), z.null(), z.undefined()]).optional(),
+  })
+  .transform(
+    (data): ChequeTransicionInput => ({
+      destino: data.destino?.trim() ?? null,
+      nota: data.nota?.trim() ?? null,
+      proveedorId: data.proveedorId ?? undefined,
+      monto: data.monto ?? null,
+    }),
+  )
 
 const ORDEN_ENTREGA_ESTADOS = [
   'pending',
@@ -1513,6 +1603,7 @@ export const reciboPagoBodySchema = z
     cbu: z.union([z.string(), z.null(), z.undefined()]).optional(),
     referencia: z.union([z.string(), z.null(), z.undefined()]).optional(),
     notas: z.union([z.string(), z.null(), z.undefined()]).optional(),
+    chequeId: z.union([z.number(), z.null(), z.undefined()]).optional(),
     facturas: z
       .array(
         z.object({

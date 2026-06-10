@@ -83,6 +83,7 @@ model Cliente {
   cobros         Cobro[]
   ordenesEntrega OrdenEntrega[]
   remitos        Remito[]
+  cheques        Cheque[]
 
   @@unique([tenantId, codigo])
   @@index([tenantId])
@@ -171,6 +172,7 @@ model Proveedor {
   recibosPago              ReciboPago[]
   catalogoArticulos        ProveedorArticulo[]
   remitos                  Remito[]
+  cheques                  Cheque[]
 
   @@unique([tenantId, codigo])
   @@index([tenantId])
@@ -359,6 +361,8 @@ model Cobro {
   monto       Decimal   @db.Decimal(14, 2)
   formaPagoId Int?
   formaPago   FormaPago? @relation(fields: [formaPagoId], references: [id])
+  chequeId    Int?
+  cheque      Cheque?   @relation(fields: [chequeId], references: [id])
   referencia  String?   @db.VarChar(60)
   nota        String?   @db.VarChar(200)
   createdAt   DateTime  @default(now())
@@ -515,6 +519,61 @@ model RemitoItem {
   createdAt   DateTime @default(now())
 }
 
+/// Check portfolio — received/issued, physical/ECHEQ (#231).
+model Cheque {
+  id               Int       @id @default(autoincrement())
+  tenantId         Int
+  tenant           Tenant    @relation(fields: [tenantId], references: [id])
+  /// recibido | emitido
+  tipo             String    @db.VarChar(20)
+  /// fisico | echeq
+  modalidad        String    @db.VarChar(10)
+  numero           String    @db.VarChar(30)
+  banco            String    @db.VarChar(50)
+  sucursal         String?   @db.VarChar(30)
+  cbuOrigen        String?   @db.VarChar(22)
+  libradorNombre   String    @db.VarChar(80)
+  libradorCuit     String?   @db.VarChar(14)
+  monto            Decimal   @db.Decimal(14, 2)
+  moneda           String    @default("ARS") @db.VarChar(3)
+  fechaEmision     DateTime
+  fechaVencimiento DateTime
+  /// en_cartera | emitido | depositado | endosado | descontado | cobrado | rechazado | anulado
+  estado           String    @db.VarChar(20)
+  clienteId        Int?
+  cliente          Cliente?  @relation(fields: [clienteId], references: [id])
+  proveedorId      Int?
+  proveedor        Proveedor? @relation(fields: [proveedorId], references: [id])
+  observaciones    String?   @db.VarChar(500)
+  movimientos      ChequeMov[]
+  cobros           Cobro[]
+  recibosPago      ReciboPago[]
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  @@unique([tenantId, banco, numero])
+  @@index([tenantId, estado])
+  @@index([tenantId, tipo])
+  @@index([tenantId, fechaVencimiento])
+}
+
+model ChequeMov {
+  id        Int      @id @default(autoincrement())
+  chequeId  Int
+  cheque    Cheque   @relation(fields: [chequeId], references: [id], onDelete: Cascade)
+  /// recepcion | deposito | endoso | descuento | cobro | rechazo
+  tipo      String   @db.VarChar(20)
+  fecha     DateTime @default(now())
+  monto     Decimal? @db.Decimal(14, 2)
+  destino   String?  @db.VarChar(120)
+  nota      String?  @db.VarChar(500)
+  userId    Int
+  usuario   AppUser  @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+
+  @@index([chequeId])
+}
+
 model PedidoItem {
   id         Int     @id @default(autoincrement())
   pedidoId   Int
@@ -614,6 +673,7 @@ model Tenant {
   cobroRecordatorios CobroRecordatorio[]
   ordenesEntrega OrdenEntrega[]
   remitos        Remito[]
+  cheques        Cheque[]
   repartos       Reparto[]
   paramEmpresa   ParamEmpresa?
   fiscalConfig   TenantFiscalConfig?
@@ -835,6 +895,7 @@ model AppUser {
   movimientosProveedorCC MovimientoProveedorCC[]
   recibosPago            ReciboPago[]
   documentosCompraImportados DocumentoCompraImportado[]
+  chequeMovimientos      ChequeMov[]
 
   @@unique([tenantId, username])
 }
@@ -878,6 +939,8 @@ model ReciboPago {
   total       Decimal  @db.Decimal(14, 2)
   /// transferencia | cheque | efectivo | echeq
   metodoPago  String   @db.VarChar(20)
+  chequeId    Int?
+  cheque      Cheque?  @relation(fields: [chequeId], references: [id])
   cbu         String?  @db.VarChar(22)
   referencia  String?  @db.VarChar(60)
   /// emitido | anulado

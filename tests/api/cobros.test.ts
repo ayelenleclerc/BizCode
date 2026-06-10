@@ -216,6 +216,48 @@ describe('POST /api/cobros', () => {
     expect(res.body.success).toBe(false)
   })
 
+  it('creates cobro linked to new cheque in portfolio (#231)', async () => {
+    const chequeCreate = vi.fn().mockResolvedValue({ id: 99 })
+    const chequeMovCreate = vi.fn().mockResolvedValue({ id: 1 })
+    const cobroCreate = vi.fn().mockResolvedValue({ ...COBRO_RESULT, chequeId: 99 })
+    const txPrisma = buildPrismaMock({
+      cobro: { create: cobroCreate },
+      cheque: { create: chequeCreate },
+      chequeMov: { create: chequeMovCreate },
+    })
+    const prisma = buildPrismaMock({
+      $transaction: vi.fn(async (fn: unknown) => {
+        if (typeof fn === 'function') return fn(txPrisma)
+        return fn
+      }),
+    })
+    const app = createApp(prisma)
+    const res = await request(app)
+      .post('/api/cobros')
+      .send({
+        ...COBRO_BODY,
+        chequeNuevo: {
+          tipo: 'recibido',
+          modalidad: 'fisico',
+          numero: '123456',
+          banco: 'Galicia',
+          libradorNombre: 'ACME SA',
+          monto: 250.5,
+          fechaEmision: '2026-05-15',
+          fechaVencimiento: '2026-06-15',
+        },
+      })
+      .expect(200)
+    expect(res.body.success).toBe(true)
+    expect(chequeCreate).toHaveBeenCalled()
+    expect(chequeMovCreate).toHaveBeenCalled()
+    expect(cobroCreate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ chequeId: 99 }),
+      }),
+    )
+  })
+
   it('registers cobro, writes audit with score metadata, returns updatedCliente', async () => {
     const clienteUpdate = vi.fn().mockResolvedValue({
       id: 1,

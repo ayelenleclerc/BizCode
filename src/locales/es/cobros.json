@@ -31,6 +31,18 @@
       "suspended": "El cliente está suspendido",
       "inactive": "El cliente está inactivo"
     },
+    "cheque": {
+      "register": "Registrar cheque en cartera",
+      "numero": "Número de cheque",
+      "banco": "Banco",
+      "vencimiento": "Fecha de vencimiento",
+      "modalidad": "Modalidad",
+      "modalidadFisico": "Cheque físico",
+      "modalidadEcheq": "ECHEQ",
+      "errors": {
+        "required": "Complete número, banco y vencimiento del cheque"
+      }
+    },
     "retenciones": {
       "apply": "El cliente aplicó retenciones",
       "loading": "Calculando retenciones sugeridas…",

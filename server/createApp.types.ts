@@ -93,6 +93,7 @@ export type ReciboPagoInput = {
   fecha: string
   total: number
   metodoPago: ReciboPagoMetodo
+  chequeId?: number | null
   cbu?: string | null
   referencia?: string | null
   notas?: string | null
@@ -152,9 +153,59 @@ export type CobroInput = {
   fecha: string
   monto: number
   formaPagoId?: number | null
+  chequeId?: number | null
+  chequeNuevo?: ChequeInput | null
   referencia?: string | null
   nota?: string | null
   retenciones?: CobroRetencionInput[]
+}
+
+export type ChequeTipo = 'recibido' | 'emitido'
+export type ChequeModalidad = 'fisico' | 'echeq'
+export type ChequeEstado =
+  | 'en_cartera'
+  | 'emitido'
+  | 'depositado'
+  | 'endosado'
+  | 'descontado'
+  | 'cobrado'
+  | 'rechazado'
+  | 'anulado'
+export type ChequeMovTipo = 'recepcion' | 'deposito' | 'endoso' | 'descuento' | 'cobro' | 'rechazo'
+
+export type ChequeInput = {
+  tipo: ChequeTipo
+  modalidad: ChequeModalidad
+  numero: string
+  banco: string
+  sucursal?: string | null
+  cbuOrigen?: string | null
+  libradorNombre: string
+  libradorCuit?: string | null
+  monto: number
+  moneda?: string
+  fechaEmision: string
+  fechaVencimiento: string
+  clienteId?: number | null
+  proveedorId?: number | null
+  observaciones?: string | null
+}
+
+export type ChequeUpdateInput = {
+  banco?: string
+  sucursal?: string | null
+  cbuOrigen?: string | null
+  libradorNombre?: string
+  libradorCuit?: string | null
+  fechaVencimiento?: string
+  observaciones?: string | null
+}
+
+export type ChequeTransicionInput = {
+  destino?: string | null
+  nota?: string | null
+  proveedorId?: number | null
+  monto?: number | null
 }
 
 export type RemitoTipo = 'remito_x' | 'remito_ingreso'

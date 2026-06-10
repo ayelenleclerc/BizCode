@@ -40,6 +40,7 @@ import { registerArcaRoutes } from './routes/registerArcaRoutes'
 import { registerCobranzasRoutes } from './routes/registerCobranzasRoutes'
 import { registerPedidosRoutes } from './routes/registerPedidosRoutes'
 import { registerRemitosRoutes } from './routes/registerRemitosRoutes'
+import { registerChequesRoutes } from './routes/registerChequesRoutes'
 import { registerEmpresaRoutes } from './routes/registerEmpresaRoutes'
 import { registerPrintingRoutes } from './routes/registerPrintingRoutes'
 import { createDomainServices } from './services/createDomainServices'
@@ -87,6 +88,7 @@ export function registerRestDomainRoutes(app: Application, prisma: PrismaClient)
   registerArcaRoutes(app, ctx)
   registerPedidosRoutes(app, ctx)
   registerRemitosRoutes(app, ctx)
+  registerChequesRoutes(app, ctx)
   registerCobrosRoutes(app, ctx)
   registerCobranzasRoutes(app, ctx)
   registerReportesRoutes(app, ctx)

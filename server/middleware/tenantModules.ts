@@ -27,6 +27,7 @@ const TEST_DEFAULT_MODULES: ModuleKey[] = [
   'finance.ledger',
   'finance.retenciones',
   'fiscal.remito',
+  'fiscal.cheques',
   'logistics.purchases',
 ]
 

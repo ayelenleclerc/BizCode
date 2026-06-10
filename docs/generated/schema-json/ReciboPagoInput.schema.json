@@ -6,6 +6,11 @@
       "nullable": true,
       "type": "string"
     },
+    "chequeId": {
+      "description": "Portfolio check to endorse when metodoPago is cheque or echeq (#231).",
+      "nullable": true,
+      "type": "integer"
+    },
     "facturas": {
       "items": {
         "properties": {

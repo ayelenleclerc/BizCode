@@ -157,7 +157,11 @@ export class CobroService {
     })
   }
 
-  async create(tenantId: number, input: CobroInput): Promise<ServiceResult<CobroCreateResult>> {
+  async create(
+    tenantId: number,
+    userId: number,
+    input: CobroInput,
+  ): Promise<ServiceResult<CobroCreateResult>> {
     const cliente = await this.prisma.cliente.findFirst({
       where: { id: input.clienteId, tenantId },
       select: { id: true, rsocial: true, suspended: true, activo: true, score: true, creditDays: true },
@@ -198,6 +202,23 @@ export class CobroService {
     const validatedRetenciones = retencionValidation.lines
     const montoBruto = retencionValidation.montoBruto
 
+    if (input.chequeId != null && input.chequeNuevo) {
+      return { ok: false, status: 400, error: 'Cannot specify both chequeId and chequeNuevo' }
+    }
+
+    if (input.chequeId != null) {
+      const linkedCheque = await this.prisma.cheque.findFirst({
+        where: { id: input.chequeId, tenantId, tipo: 'recibido', estado: 'en_cartera' },
+        select: { id: true, clienteId: true },
+      })
+      if (!linkedCheque) {
+        return { ok: false, status: 400, error: 'chequeId is not valid for portfolio linking' }
+      }
+      if (linkedCheque.clienteId != null && linkedCheque.clienteId !== input.clienteId) {
+        return { ok: false, status: 400, error: 'chequeId does not belong to clienteId' }
+      }
+    }
+
     const oldestFactura = await this.prisma.factura.findFirst({
       where: { tenantId, clienteId: input.clienteId, estado: 'A' },
       orderBy: { fecha: 'asc' },
@@ -212,6 +233,43 @@ export class CobroService {
     )
 
     const result = await this.prisma.$transaction(async (tx) => {
+      let chequeId: number | null = input.chequeId ?? null
+
+      if (input.chequeNuevo) {
+        const nuevo = input.chequeNuevo
+        const chequeRow = await tx.cheque.create({
+          data: {
+            tenantId,
+            tipo: 'recibido',
+            modalidad: nuevo.modalidad,
+            numero: nuevo.numero.trim(),
+            banco: nuevo.banco.trim(),
+            sucursal: nuevo.sucursal?.trim() ?? null,
+            cbuOrigen: nuevo.cbuOrigen?.trim() ?? null,
+            libradorNombre: nuevo.libradorNombre.trim(),
+            libradorCuit: nuevo.libradorCuit?.trim() ?? null,
+            monto: new Decimal(nuevo.monto),
+            moneda: nuevo.moneda?.trim() || 'ARS',
+            fechaEmision: facturaFechaToPrismaDate(nuevo.fechaEmision),
+            fechaVencimiento: facturaFechaToPrismaDate(nuevo.fechaVencimiento),
+            estado: 'en_cartera',
+            clienteId: input.clienteId,
+            proveedorId: null,
+            observaciones: nuevo.observaciones?.trim() ?? null,
+          },
+        })
+        await tx.chequeMov.create({
+          data: {
+            chequeId: chequeRow.id,
+            tipo: 'recepcion',
+            monto: new Decimal(nuevo.monto),
+            userId,
+            nota: nuevo.observaciones?.trim() ?? null,
+          },
+        })
+        chequeId = chequeRow.id
+      }
+
       const cobro = await tx.cobro.create({
         data: {
           tenantId,
@@ -219,6 +277,7 @@ export class CobroService {
           fecha: cobroFecha,
           monto,
           formaPagoId: input.formaPagoId ?? null,
+          chequeId,
           referencia: input.referencia ?? null,
           nota: input.nota ?? null,
         },

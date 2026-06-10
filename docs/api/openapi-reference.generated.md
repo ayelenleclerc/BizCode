@@ -11432,6 +11432,10 @@ Creates `ReciboPago` with tenant-correlative `numero`, posts `pago` ledger movem
 
   `string`
 
+- **`chequeId`**
+
+  `integer` — Portfolio check to endorse when metodoPago is cheque or echeq (#231).
+
 - **`notas`**
 
   `string`
@@ -11472,6 +11476,7 @@ Creates `ReciboPago` with tenant-correlative `numero`, posts `pago` ledger movem
   "cbu": "",
   "referencia": "",
   "notas": "",
+  "chequeId": 1,
   "facturas": [
     {
       "comprobanteCompraId": 1,
@@ -21487,6 +21492,74 @@ Decrements `Cliente.balance` by bruto (`monto` neto + sum of `retenciones[]` whe
 
   `number` — Net amount received (#229); CC decremented by bruto when retenciones present.
 
+- **`chequeId`**
+
+  `integer` — Link existing portfolio check (#231).
+
+- **`chequeNuevo`**
+
+  `object` — Create received check when recording collection (#231).
+
+  - **`banco` (required)**
+
+    `string`
+
+  - **`fechaEmision` (required)**
+
+    `string`, format: `date`
+
+  - **`fechaVencimiento` (required)**
+
+    `string`, format: `date`
+
+  - **`libradorNombre` (required)**
+
+    `string`
+
+  - **`modalidad` (required)**
+
+    `string`, possible values: `"fisico", "echeq"`
+
+  - **`monto` (required)**
+
+    `number`
+
+  - **`numero` (required)**
+
+    `string`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"recibido", "emitido"`
+
+  - **`cbuOrigen`**
+
+    `string`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`libradorCuit`**
+
+    `string`
+
+  - **`moneda`**
+
+    `string`
+
+  - **`observaciones`**
+
+    `string`
+
+  - **`proveedorId`**
+
+    `integer`
+
+  - **`sucursal`**
+
+    `string`
+
 - **`formaPagoId`**
 
   `integer`
@@ -21538,7 +21611,25 @@ Decrements `Cliente.balance` by bruto (`monto` neto + sum of `retenciones[]` whe
       "alicuota": 0,
       "importe": 1
     }
-  ]
+  ],
+  "chequeId": 1,
+  "chequeNuevo": {
+    "tipo": "recibido",
+    "modalidad": "fisico",
+    "numero": "",
+    "banco": "",
+    "sucursal": "",
+    "cbuOrigen": "",
+    "libradorNombre": "",
+    "libradorCuit": "",
+    "monto": 1,
+    "moneda": "",
+    "fechaEmision": "",
+    "fechaVencimiento": "",
+    "clienteId": 1,
+    "proveedorId": 1,
+    "observaciones": ""
+  }
 }
 ```
 
@@ -25193,6 +25284,2026 @@ Paginated list. Requires module `fiscal.remito`.
 
 ```json
 {}
+```
+
+### PARAMETERS /api/cheques/resumen
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/cheques/resumen`
+
+### Check portfolio summary
+
+- **Method:** `GET`
+- **Path:** `/api/cheques/resumen`
+- **Tags:** cheques
+
+Aggregates for in-portfolio, due within 7 days and rejected checks. Requires module `fiscal.cheques`.
+
+#### Responses
+
+##### Status: 200 Portfolio summary totals
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`enCartera` (required)**
+
+    `object`
+
+    - **`count`**
+
+      `integer`
+
+    - **`total`**
+
+      `string`
+
+  - **`proximosVencer` (required)**
+
+    `object`
+
+    - **`count`**
+
+      `integer`
+
+    - **`total`**
+
+      `string`
+
+  - **`rechazados` (required)**
+
+    `object`
+
+    - **`count`**
+
+      `integer`
+
+    - **`total`**
+
+      `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "enCartera": {
+      "count": 1,
+      "total": ""
+    },
+    "proximosVencer": {
+      "count": 1,
+      "total": ""
+    },
+    "rechazados": {
+      "count": 1,
+      "total": ""
+    }
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/cheques
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/cheques`
+
+### List checks
+
+- **Method:** `GET`
+- **Path:** `/api/cheques`
+- **Tags:** cheques
+
+Paginated portfolio list. Requires module `fiscal.cheques`.
+
+#### Responses
+
+##### Status: 200 Paginated checks
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`banco` (required)**
+
+    `string`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"en_cartera", "emitido", "depositado", "endosado", "descontado", "cobrado", "rechazado", "anulado"`
+
+  - **`fechaEmision` (required)**
+
+    `string`, format: `date-time`
+
+  - **`fechaVencimiento` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`libradorNombre` (required)**
+
+    `string`
+
+  - **`modalidad` (required)**
+
+    `string`, possible values: `"fisico", "echeq"`
+
+  - **`moneda` (required)**
+
+    `string`
+
+  - **`monto` (required)**
+
+    `string`
+
+  - **`numero` (required)**
+
+    `string`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"recibido", "emitido"`
+
+  - **`cbuOrigen`**
+
+    `string`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`libradorCuit`**
+
+    `string`
+
+  - **`observaciones`**
+
+    `string`
+
+  - **`proveedorId`**
+
+    `integer`
+
+  - **`sucursal`**
+
+    `string`
+
+- **`limit` (required)**
+
+  `integer`
+
+- **`offset` (required)**
+
+  `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`total` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "tipo": "recibido",
+      "modalidad": "fisico",
+      "numero": "",
+      "banco": "",
+      "sucursal": "",
+      "cbuOrigen": "",
+      "libradorNombre": "",
+      "libradorCuit": "",
+      "monto": "",
+      "moneda": "",
+      "fechaEmision": "",
+      "fechaVencimiento": "",
+      "estado": "en_cartera",
+      "clienteId": 1,
+      "proveedorId": 1,
+      "observaciones": ""
+    }
+  ],
+  "total": 1,
+  "limit": 1,
+  "offset": 1
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Register check in portfolio
+
+- **Method:** `POST`
+- **Path:** `/api/cheques`
+- **Tags:** cheques
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`banco` (required)**
+
+  `string`
+
+- **`fechaEmision` (required)**
+
+  `string`, format: `date`
+
+- **`fechaVencimiento` (required)**
+
+  `string`, format: `date`
+
+- **`libradorNombre` (required)**
+
+  `string`
+
+- **`modalidad` (required)**
+
+  `string`, possible values: `"fisico", "echeq"`
+
+- **`monto` (required)**
+
+  `number`
+
+- **`numero` (required)**
+
+  `string`
+
+- **`tipo` (required)**
+
+  `string`, possible values: `"recibido", "emitido"`
+
+- **`cbuOrigen`**
+
+  `string`
+
+- **`clienteId`**
+
+  `integer`
+
+- **`libradorCuit`**
+
+  `string`
+
+- **`moneda`**
+
+  `string`
+
+- **`observaciones`**
+
+  `string`
+
+- **`proveedorId`**
+
+  `integer`
+
+- **`sucursal`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "tipo": "recibido",
+  "modalidad": "fisico",
+  "numero": "",
+  "banco": "",
+  "sucursal": "",
+  "cbuOrigen": "",
+  "libradorNombre": "",
+  "libradorCuit": "",
+  "monto": 1,
+  "moneda": "",
+  "fechaEmision": "",
+  "fechaVencimiento": "",
+  "clienteId": 1,
+  "proveedorId": 1,
+  "observaciones": ""
+}
+```
+
+#### Responses
+
+##### Status: 201 Check created
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`banco` (required)**
+
+    `string`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"en_cartera", "emitido", "depositado", "endosado", "descontado", "cobrado", "rechazado", "anulado"`
+
+  - **`fechaEmision` (required)**
+
+    `string`, format: `date-time`
+
+  - **`fechaVencimiento` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`libradorNombre` (required)**
+
+    `string`
+
+  - **`modalidad` (required)**
+
+    `string`, possible values: `"fisico", "echeq"`
+
+  - **`moneda` (required)**
+
+    `string`
+
+  - **`monto` (required)**
+
+    `string`
+
+  - **`numero` (required)**
+
+    `string`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"recibido", "emitido"`
+
+  - **`cbuOrigen`**
+
+    `string`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`libradorCuit`**
+
+    `string`
+
+  - **`observaciones`**
+
+    `string`
+
+  - **`proveedorId`**
+
+    `integer`
+
+  - **`sucursal`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tipo": "recibido",
+    "modalidad": "fisico",
+    "numero": "",
+    "banco": "",
+    "sucursal": "",
+    "cbuOrigen": "",
+    "libradorNombre": "",
+    "libradorCuit": "",
+    "monto": "",
+    "moneda": "",
+    "fechaEmision": "",
+    "fechaVencimiento": "",
+    "estado": "en_cartera",
+    "clienteId": 1,
+    "proveedorId": 1,
+    "observaciones": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 409 Duplicate bank/number
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/cheques/{id}
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/cheques/{id}`
+
+### Get check
+
+- **Method:** `GET`
+- **Path:** `/api/cheques/{id}`
+- **Tags:** cheques
+
+#### Responses
+
+##### Status: 200 Check detail
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`banco` (required)**
+
+    `string`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"en_cartera", "emitido", "depositado", "endosado", "descontado", "cobrado", "rechazado", "anulado"`
+
+  - **`fechaEmision` (required)**
+
+    `string`, format: `date-time`
+
+  - **`fechaVencimiento` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`libradorNombre` (required)**
+
+    `string`
+
+  - **`modalidad` (required)**
+
+    `string`, possible values: `"fisico", "echeq"`
+
+  - **`moneda` (required)**
+
+    `string`
+
+  - **`monto` (required)**
+
+    `string`
+
+  - **`numero` (required)**
+
+    `string`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"recibido", "emitido"`
+
+  - **`cbuOrigen`**
+
+    `string`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`libradorCuit`**
+
+    `string`
+
+  - **`observaciones`**
+
+    `string`
+
+  - **`proveedorId`**
+
+    `integer`
+
+  - **`sucursal`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tipo": "recibido",
+    "modalidad": "fisico",
+    "numero": "",
+    "banco": "",
+    "sucursal": "",
+    "cbuOrigen": "",
+    "libradorNombre": "",
+    "libradorCuit": "",
+    "monto": "",
+    "moneda": "",
+    "fechaEmision": "",
+    "fechaVencimiento": "",
+    "estado": "en_cartera",
+    "clienteId": 1,
+    "proveedorId": 1,
+    "observaciones": ""
+  }
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Update check (en\_cartera only)
+
+- **Method:** `PUT`
+- **Path:** `/api/cheques/{id}`
+- **Tags:** cheques
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`banco`**
+
+  `string`
+
+- **`cbuOrigen`**
+
+  `string`
+
+- **`fechaVencimiento`**
+
+  `string`, format: `date`
+
+- **`libradorCuit`**
+
+  `string`
+
+- **`libradorNombre`**
+
+  `string`
+
+- **`observaciones`**
+
+  `string`
+
+- **`sucursal`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "banco": "",
+  "sucursal": "",
+  "cbuOrigen": "",
+  "libradorNombre": "",
+  "libradorCuit": "",
+  "fechaVencimiento": "",
+  "observaciones": ""
+}
+```
+
+#### Responses
+
+##### Status: 200 Updated check
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`banco` (required)**
+
+    `string`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"en_cartera", "emitido", "depositado", "endosado", "descontado", "cobrado", "rechazado", "anulado"`
+
+  - **`fechaEmision` (required)**
+
+    `string`, format: `date-time`
+
+  - **`fechaVencimiento` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`libradorNombre` (required)**
+
+    `string`
+
+  - **`modalidad` (required)**
+
+    `string`, possible values: `"fisico", "echeq"`
+
+  - **`moneda` (required)**
+
+    `string`
+
+  - **`monto` (required)**
+
+    `string`
+
+  - **`numero` (required)**
+
+    `string`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"recibido", "emitido"`
+
+  - **`cbuOrigen`**
+
+    `string`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`libradorCuit`**
+
+    `string`
+
+  - **`observaciones`**
+
+    `string`
+
+  - **`proveedorId`**
+
+    `integer`
+
+  - **`sucursal`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tipo": "recibido",
+    "modalidad": "fisico",
+    "numero": "",
+    "banco": "",
+    "sucursal": "",
+    "cbuOrigen": "",
+    "libradorNombre": "",
+    "libradorCuit": "",
+    "monto": "",
+    "moneda": "",
+    "fechaEmision": "",
+    "fechaVencimiento": "",
+    "estado": "en_cartera",
+    "clienteId": 1,
+    "proveedorId": 1,
+    "observaciones": ""
+  }
+}
+```
+
+##### Status: 409 Only en\_cartera checks can be updated
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/cheques/{id}/depositar
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/cheques/{id}/depositar`
+
+### Deposit check
+
+- **Method:** `POST`
+- **Path:** `/api/cheques/{id}/depositar`
+- **Tags:** cheques
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`destino`**
+
+  `string`
+
+- **`monto`**
+
+  `number`
+
+- **`nota`**
+
+  `string`
+
+- **`proveedorId`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "destino": "",
+  "nota": "",
+  "proveedorId": 1,
+  "monto": 1
+}
+```
+
+#### Responses
+
+##### Status: 200 Deposited check
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`banco` (required)**
+
+    `string`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"en_cartera", "emitido", "depositado", "endosado", "descontado", "cobrado", "rechazado", "anulado"`
+
+  - **`fechaEmision` (required)**
+
+    `string`, format: `date-time`
+
+  - **`fechaVencimiento` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`libradorNombre` (required)**
+
+    `string`
+
+  - **`modalidad` (required)**
+
+    `string`, possible values: `"fisico", "echeq"`
+
+  - **`moneda` (required)**
+
+    `string`
+
+  - **`monto` (required)**
+
+    `string`
+
+  - **`numero` (required)**
+
+    `string`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"recibido", "emitido"`
+
+  - **`cbuOrigen`**
+
+    `string`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`libradorCuit`**
+
+    `string`
+
+  - **`observaciones`**
+
+    `string`
+
+  - **`proveedorId`**
+
+    `integer`
+
+  - **`sucursal`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tipo": "recibido",
+    "modalidad": "fisico",
+    "numero": "",
+    "banco": "",
+    "sucursal": "",
+    "cbuOrigen": "",
+    "libradorNombre": "",
+    "libradorCuit": "",
+    "monto": "",
+    "moneda": "",
+    "fechaEmision": "",
+    "fechaVencimiento": "",
+    "estado": "en_cartera",
+    "clienteId": 1,
+    "proveedorId": 1,
+    "observaciones": ""
+  }
+}
+```
+
+### PARAMETERS /api/cheques/{id}/endosar
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/cheques/{id}/endosar`
+
+### Endorse check to supplier
+
+- **Method:** `POST`
+- **Path:** `/api/cheques/{id}/endosar`
+- **Tags:** cheques
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`destino`**
+
+  `string`
+
+- **`monto`**
+
+  `number`
+
+- **`nota`**
+
+  `string`
+
+- **`proveedorId`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "destino": "",
+  "nota": "",
+  "proveedorId": 1,
+  "monto": 1
+}
+```
+
+#### Responses
+
+##### Status: 200 Endorsed check
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`banco` (required)**
+
+    `string`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"en_cartera", "emitido", "depositado", "endosado", "descontado", "cobrado", "rechazado", "anulado"`
+
+  - **`fechaEmision` (required)**
+
+    `string`, format: `date-time`
+
+  - **`fechaVencimiento` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`libradorNombre` (required)**
+
+    `string`
+
+  - **`modalidad` (required)**
+
+    `string`, possible values: `"fisico", "echeq"`
+
+  - **`moneda` (required)**
+
+    `string`
+
+  - **`monto` (required)**
+
+    `string`
+
+  - **`numero` (required)**
+
+    `string`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"recibido", "emitido"`
+
+  - **`cbuOrigen`**
+
+    `string`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`libradorCuit`**
+
+    `string`
+
+  - **`observaciones`**
+
+    `string`
+
+  - **`proveedorId`**
+
+    `integer`
+
+  - **`sucursal`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tipo": "recibido",
+    "modalidad": "fisico",
+    "numero": "",
+    "banco": "",
+    "sucursal": "",
+    "cbuOrigen": "",
+    "libradorNombre": "",
+    "libradorCuit": "",
+    "monto": "",
+    "moneda": "",
+    "fechaEmision": "",
+    "fechaVencimiento": "",
+    "estado": "en_cartera",
+    "clienteId": 1,
+    "proveedorId": 1,
+    "observaciones": ""
+  }
+}
+```
+
+### PARAMETERS /api/cheques/{id}/descontar
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/cheques/{id}/descontar`
+
+### Discount check
+
+- **Method:** `POST`
+- **Path:** `/api/cheques/{id}/descontar`
+- **Tags:** cheques
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`destino`**
+
+  `string`
+
+- **`monto`**
+
+  `number`
+
+- **`nota`**
+
+  `string`
+
+- **`proveedorId`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "destino": "",
+  "nota": "",
+  "proveedorId": 1,
+  "monto": 1
+}
+```
+
+#### Responses
+
+##### Status: 200 Discounted check
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`banco` (required)**
+
+    `string`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"en_cartera", "emitido", "depositado", "endosado", "descontado", "cobrado", "rechazado", "anulado"`
+
+  - **`fechaEmision` (required)**
+
+    `string`, format: `date-time`
+
+  - **`fechaVencimiento` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`libradorNombre` (required)**
+
+    `string`
+
+  - **`modalidad` (required)**
+
+    `string`, possible values: `"fisico", "echeq"`
+
+  - **`moneda` (required)**
+
+    `string`
+
+  - **`monto` (required)**
+
+    `string`
+
+  - **`numero` (required)**
+
+    `string`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"recibido", "emitido"`
+
+  - **`cbuOrigen`**
+
+    `string`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`libradorCuit`**
+
+    `string`
+
+  - **`observaciones`**
+
+    `string`
+
+  - **`proveedorId`**
+
+    `integer`
+
+  - **`sucursal`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tipo": "recibido",
+    "modalidad": "fisico",
+    "numero": "",
+    "banco": "",
+    "sucursal": "",
+    "cbuOrigen": "",
+    "libradorNombre": "",
+    "libradorCuit": "",
+    "monto": "",
+    "moneda": "",
+    "fechaEmision": "",
+    "fechaVencimiento": "",
+    "estado": "en_cartera",
+    "clienteId": 1,
+    "proveedorId": 1,
+    "observaciones": ""
+  }
+}
+```
+
+### PARAMETERS /api/cheques/{id}/cobrar
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/cheques/{id}/cobrar`
+
+### Mark check as collected
+
+- **Method:** `POST`
+- **Path:** `/api/cheques/{id}/cobrar`
+- **Tags:** cheques
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`destino`**
+
+  `string`
+
+- **`monto`**
+
+  `number`
+
+- **`nota`**
+
+  `string`
+
+- **`proveedorId`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "destino": "",
+  "nota": "",
+  "proveedorId": 1,
+  "monto": 1
+}
+```
+
+#### Responses
+
+##### Status: 200 Collected check
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`banco` (required)**
+
+    `string`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"en_cartera", "emitido", "depositado", "endosado", "descontado", "cobrado", "rechazado", "anulado"`
+
+  - **`fechaEmision` (required)**
+
+    `string`, format: `date-time`
+
+  - **`fechaVencimiento` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`libradorNombre` (required)**
+
+    `string`
+
+  - **`modalidad` (required)**
+
+    `string`, possible values: `"fisico", "echeq"`
+
+  - **`moneda` (required)**
+
+    `string`
+
+  - **`monto` (required)**
+
+    `string`
+
+  - **`numero` (required)**
+
+    `string`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"recibido", "emitido"`
+
+  - **`cbuOrigen`**
+
+    `string`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`libradorCuit`**
+
+    `string`
+
+  - **`observaciones`**
+
+    `string`
+
+  - **`proveedorId`**
+
+    `integer`
+
+  - **`sucursal`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tipo": "recibido",
+    "modalidad": "fisico",
+    "numero": "",
+    "banco": "",
+    "sucursal": "",
+    "cbuOrigen": "",
+    "libradorNombre": "",
+    "libradorCuit": "",
+    "monto": "",
+    "moneda": "",
+    "fechaEmision": "",
+    "fechaVencimiento": "",
+    "estado": "en_cartera",
+    "clienteId": 1,
+    "proveedorId": 1,
+    "observaciones": ""
+  }
+}
+```
+
+### PARAMETERS /api/cheques/{id}/rechazar
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/cheques/{id}/rechazar`
+
+### Reject check
+
+- **Method:** `POST`
+- **Path:** `/api/cheques/{id}/rechazar`
+- **Tags:** cheques
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`destino`**
+
+  `string`
+
+- **`monto`**
+
+  `number`
+
+- **`nota`**
+
+  `string`
+
+- **`proveedorId`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "destino": "",
+  "nota": "",
+  "proveedorId": 1,
+  "monto": 1
+}
+```
+
+#### Responses
+
+##### Status: 200 Rejected check
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`banco` (required)**
+
+    `string`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"en_cartera", "emitido", "depositado", "endosado", "descontado", "cobrado", "rechazado", "anulado"`
+
+  - **`fechaEmision` (required)**
+
+    `string`, format: `date-time`
+
+  - **`fechaVencimiento` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`libradorNombre` (required)**
+
+    `string`
+
+  - **`modalidad` (required)**
+
+    `string`, possible values: `"fisico", "echeq"`
+
+  - **`moneda` (required)**
+
+    `string`
+
+  - **`monto` (required)**
+
+    `string`
+
+  - **`numero` (required)**
+
+    `string`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"recibido", "emitido"`
+
+  - **`cbuOrigen`**
+
+    `string`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`libradorCuit`**
+
+    `string`
+
+  - **`observaciones`**
+
+    `string`
+
+  - **`proveedorId`**
+
+    `integer`
+
+  - **`sucursal`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tipo": "recibido",
+    "modalidad": "fisico",
+    "numero": "",
+    "banco": "",
+    "sucursal": "",
+    "cbuOrigen": "",
+    "libradorNombre": "",
+    "libradorCuit": "",
+    "monto": "",
+    "moneda": "",
+    "fechaEmision": "",
+    "fechaVencimiento": "",
+    "estado": "en_cartera",
+    "clienteId": 1,
+    "proveedorId": 1,
+    "observaciones": ""
+  }
+}
+```
+
+### PARAMETERS /api/cheques/{id}/devolver-cartera
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/cheques/{id}/devolver-cartera`
+
+### Return rejected check to portfolio
+
+- **Method:** `POST`
+- **Path:** `/api/cheques/{id}/devolver-cartera`
+- **Tags:** cheques
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`destino`**
+
+  `string`
+
+- **`monto`**
+
+  `number`
+
+- **`nota`**
+
+  `string`
+
+- **`proveedorId`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "destino": "",
+  "nota": "",
+  "proveedorId": 1,
+  "monto": 1
+}
+```
+
+#### Responses
+
+##### Status: 200 Check returned to portfolio
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`banco` (required)**
+
+    `string`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"en_cartera", "emitido", "depositado", "endosado", "descontado", "cobrado", "rechazado", "anulado"`
+
+  - **`fechaEmision` (required)**
+
+    `string`, format: `date-time`
+
+  - **`fechaVencimiento` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`libradorNombre` (required)**
+
+    `string`
+
+  - **`modalidad` (required)**
+
+    `string`, possible values: `"fisico", "echeq"`
+
+  - **`moneda` (required)**
+
+    `string`
+
+  - **`monto` (required)**
+
+    `string`
+
+  - **`numero` (required)**
+
+    `string`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"recibido", "emitido"`
+
+  - **`cbuOrigen`**
+
+    `string`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`libradorCuit`**
+
+    `string`
+
+  - **`observaciones`**
+
+    `string`
+
+  - **`proveedorId`**
+
+    `integer`
+
+  - **`sucursal`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tipo": "recibido",
+    "modalidad": "fisico",
+    "numero": "",
+    "banco": "",
+    "sucursal": "",
+    "cbuOrigen": "",
+    "libradorNombre": "",
+    "libradorCuit": "",
+    "monto": "",
+    "moneda": "",
+    "fechaEmision": "",
+    "fechaVencimiento": "",
+    "estado": "en_cartera",
+    "clienteId": 1,
+    "proveedorId": 1,
+    "observaciones": ""
+  }
+}
+```
+
+### PARAMETERS /api/cheques/{id}/anular
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/cheques/{id}/anular`
+
+### Void check in portfolio
+
+- **Method:** `POST`
+- **Path:** `/api/cheques/{id}/anular`
+- **Tags:** cheques
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`destino`**
+
+  `string`
+
+- **`monto`**
+
+  `number`
+
+- **`nota`**
+
+  `string`
+
+- **`proveedorId`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "destino": "",
+  "nota": "",
+  "proveedorId": 1,
+  "monto": 1
+}
+```
+
+#### Responses
+
+##### Status: 200 Voided check
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`banco` (required)**
+
+    `string`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"en_cartera", "emitido", "depositado", "endosado", "descontado", "cobrado", "rechazado", "anulado"`
+
+  - **`fechaEmision` (required)**
+
+    `string`, format: `date-time`
+
+  - **`fechaVencimiento` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`libradorNombre` (required)**
+
+    `string`
+
+  - **`modalidad` (required)**
+
+    `string`, possible values: `"fisico", "echeq"`
+
+  - **`moneda` (required)**
+
+    `string`
+
+  - **`monto` (required)**
+
+    `string`
+
+  - **`numero` (required)**
+
+    `string`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"recibido", "emitido"`
+
+  - **`cbuOrigen`**
+
+    `string`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`libradorCuit`**
+
+    `string`
+
+  - **`observaciones`**
+
+    `string`
+
+  - **`proveedorId`**
+
+    `integer`
+
+  - **`sucursal`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tipo": "recibido",
+    "modalidad": "fisico",
+    "numero": "",
+    "banco": "",
+    "sucursal": "",
+    "cbuOrigen": "",
+    "libradorNombre": "",
+    "libradorCuit": "",
+    "monto": "",
+    "moneda": "",
+    "fechaEmision": "",
+    "fechaVencimiento": "",
+    "estado": "en_cartera",
+    "clienteId": 1,
+    "proveedorId": 1,
+    "observaciones": ""
+  }
+}
+```
+
+### PARAMETERS /api/cheques/alertas/run
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/cheques/alertas/run`
+
+### Run due-soon check alerts job
+
+- **Method:** `POST`
+- **Path:** `/api/cheques/alertas/run`
+- **Tags:** cheques
+
+#### Responses
+
+##### Status: 200 Alert job result
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`sent`**
+
+    `integer`
+
+  - **`skipped`**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "sent": 1,
+    "skipped": 1
+  }
+}
 ```
 
 ### PARAMETERS /api/notas-credito
@@ -39647,6 +41758,74 @@ true
 
   `number` — Net amount received (#229); CC decremented by bruto when retenciones present.
 
+* **`chequeId`**
+
+  `integer` — Link existing portfolio check (#231).
+
+* **`chequeNuevo`**
+
+  `object` — Create received check when recording collection (#231).
+
+  - **`banco` (required)**
+
+    `string`
+
+  - **`fechaEmision` (required)**
+
+    `string`, format: `date`
+
+  - **`fechaVencimiento` (required)**
+
+    `string`, format: `date`
+
+  - **`libradorNombre` (required)**
+
+    `string`
+
+  - **`modalidad` (required)**
+
+    `string`, possible values: `"fisico", "echeq"`
+
+  - **`monto` (required)**
+
+    `number`
+
+  - **`numero` (required)**
+
+    `string`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"recibido", "emitido"`
+
+  - **`cbuOrigen`**
+
+    `string`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`libradorCuit`**
+
+    `string`
+
+  - **`moneda`**
+
+    `string`
+
+  - **`observaciones`**
+
+    `string`
+
+  - **`proveedorId`**
+
+    `integer`
+
+  - **`sucursal`**
+
+    `string`
+
 * **`formaPagoId`**
 
   `integer`
@@ -39698,7 +41877,25 @@ true
       "alicuota": 0,
       "importe": 1
     }
-  ]
+  ],
+  "chequeId": 1,
+  "chequeNuevo": {
+    "tipo": "recibido",
+    "modalidad": "fisico",
+    "numero": "",
+    "banco": "",
+    "sucursal": "",
+    "cbuOrigen": "",
+    "libradorNombre": "",
+    "libradorCuit": "",
+    "monto": 1,
+    "moneda": "",
+    "fechaEmision": "",
+    "fechaVencimiento": "",
+    "clienteId": 1,
+    "proveedorId": 1,
+    "observaciones": ""
+  }
 }
 ```
 
@@ -44080,6 +46277,10 @@ true
 
   `string`
 
+* **`chequeId`**
+
+  `integer` — Portfolio check to endorse when metodoPago is cheque or echeq (#231).
+
 * **`notas`**
 
   `string`
@@ -44120,6 +46321,7 @@ true
   "cbu": "",
   "referencia": "",
   "notas": "",
+  "chequeId": 1,
   "facturas": [
     {
       "comprobanteCompraId": 1,
@@ -49406,6 +51608,568 @@ true
   "total": 1,
   "limit": 1,
   "offset": 1
+}
+```
+
+### Cheque
+
+- **Type:**`object`
+
+* **`banco` (required)**
+
+  `string`
+
+* **`estado` (required)**
+
+  `string`, possible values: `"en_cartera", "emitido", "depositado", "endosado", "descontado", "cobrado", "rechazado", "anulado"`
+
+* **`fechaEmision` (required)**
+
+  `string`, format: `date-time`
+
+* **`fechaVencimiento` (required)**
+
+  `string`, format: `date-time`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`libradorNombre` (required)**
+
+  `string`
+
+* **`modalidad` (required)**
+
+  `string`, possible values: `"fisico", "echeq"`
+
+* **`moneda` (required)**
+
+  `string`
+
+* **`monto` (required)**
+
+  `string`
+
+* **`numero` (required)**
+
+  `string`
+
+* **`tipo` (required)**
+
+  `string`, possible values: `"recibido", "emitido"`
+
+* **`cbuOrigen`**
+
+  `string`
+
+* **`clienteId`**
+
+  `integer`
+
+* **`libradorCuit`**
+
+  `string`
+
+* **`observaciones`**
+
+  `string`
+
+* **`proveedorId`**
+
+  `integer`
+
+* **`sucursal`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "tipo": "recibido",
+  "modalidad": "fisico",
+  "numero": "",
+  "banco": "",
+  "sucursal": "",
+  "cbuOrigen": "",
+  "libradorNombre": "",
+  "libradorCuit": "",
+  "monto": "",
+  "moneda": "",
+  "fechaEmision": "",
+  "fechaVencimiento": "",
+  "estado": "en_cartera",
+  "clienteId": 1,
+  "proveedorId": 1,
+  "observaciones": ""
+}
+```
+
+### ChequeInput
+
+- **Type:**`object`
+
+* **`banco` (required)**
+
+  `string`
+
+* **`fechaEmision` (required)**
+
+  `string`, format: `date`
+
+* **`fechaVencimiento` (required)**
+
+  `string`, format: `date`
+
+* **`libradorNombre` (required)**
+
+  `string`
+
+* **`modalidad` (required)**
+
+  `string`, possible values: `"fisico", "echeq"`
+
+* **`monto` (required)**
+
+  `number`
+
+* **`numero` (required)**
+
+  `string`
+
+* **`tipo` (required)**
+
+  `string`, possible values: `"recibido", "emitido"`
+
+* **`cbuOrigen`**
+
+  `string`
+
+* **`clienteId`**
+
+  `integer`
+
+* **`libradorCuit`**
+
+  `string`
+
+* **`moneda`**
+
+  `string`
+
+* **`observaciones`**
+
+  `string`
+
+* **`proveedorId`**
+
+  `integer`
+
+* **`sucursal`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "tipo": "recibido",
+  "modalidad": "fisico",
+  "numero": "",
+  "banco": "",
+  "sucursal": "",
+  "cbuOrigen": "",
+  "libradorNombre": "",
+  "libradorCuit": "",
+  "monto": 1,
+  "moneda": "",
+  "fechaEmision": "",
+  "fechaVencimiento": "",
+  "clienteId": 1,
+  "proveedorId": 1,
+  "observaciones": ""
+}
+```
+
+### ChequeUpdateInput
+
+- **Type:**`object`
+
+* **`banco`**
+
+  `string`
+
+* **`cbuOrigen`**
+
+  `string`
+
+* **`fechaVencimiento`**
+
+  `string`, format: `date`
+
+* **`libradorCuit`**
+
+  `string`
+
+* **`libradorNombre`**
+
+  `string`
+
+* **`observaciones`**
+
+  `string`
+
+* **`sucursal`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "banco": "",
+  "sucursal": "",
+  "cbuOrigen": "",
+  "libradorNombre": "",
+  "libradorCuit": "",
+  "fechaVencimiento": "",
+  "observaciones": ""
+}
+```
+
+### ChequeTransicionInput
+
+- **Type:**`object`
+
+* **`destino`**
+
+  `string`
+
+* **`monto`**
+
+  `number`
+
+* **`nota`**
+
+  `string`
+
+* **`proveedorId`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "destino": "",
+  "nota": "",
+  "proveedorId": 1,
+  "monto": 1
+}
+```
+
+### ChequeEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`banco` (required)**
+
+    `string`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"en_cartera", "emitido", "depositado", "endosado", "descontado", "cobrado", "rechazado", "anulado"`
+
+  - **`fechaEmision` (required)**
+
+    `string`, format: `date-time`
+
+  - **`fechaVencimiento` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`libradorNombre` (required)**
+
+    `string`
+
+  - **`modalidad` (required)**
+
+    `string`, possible values: `"fisico", "echeq"`
+
+  - **`moneda` (required)**
+
+    `string`
+
+  - **`monto` (required)**
+
+    `string`
+
+  - **`numero` (required)**
+
+    `string`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"recibido", "emitido"`
+
+  - **`cbuOrigen`**
+
+    `string`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`libradorCuit`**
+
+    `string`
+
+  - **`observaciones`**
+
+    `string`
+
+  - **`proveedorId`**
+
+    `integer`
+
+  - **`sucursal`**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tipo": "recibido",
+    "modalidad": "fisico",
+    "numero": "",
+    "banco": "",
+    "sucursal": "",
+    "cbuOrigen": "",
+    "libradorNombre": "",
+    "libradorCuit": "",
+    "monto": "",
+    "moneda": "",
+    "fechaEmision": "",
+    "fechaVencimiento": "",
+    "estado": "en_cartera",
+    "clienteId": 1,
+    "proveedorId": 1,
+    "observaciones": ""
+  }
+}
+```
+
+### ChequeListEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`banco` (required)**
+
+    `string`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"en_cartera", "emitido", "depositado", "endosado", "descontado", "cobrado", "rechazado", "anulado"`
+
+  - **`fechaEmision` (required)**
+
+    `string`, format: `date-time`
+
+  - **`fechaVencimiento` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`libradorNombre` (required)**
+
+    `string`
+
+  - **`modalidad` (required)**
+
+    `string`, possible values: `"fisico", "echeq"`
+
+  - **`moneda` (required)**
+
+    `string`
+
+  - **`monto` (required)**
+
+    `string`
+
+  - **`numero` (required)**
+
+    `string`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"recibido", "emitido"`
+
+  - **`cbuOrigen`**
+
+    `string`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`libradorCuit`**
+
+    `string`
+
+  - **`observaciones`**
+
+    `string`
+
+  - **`proveedorId`**
+
+    `integer`
+
+  - **`sucursal`**
+
+    `string`
+
+* **`limit` (required)**
+
+  `integer`
+
+* **`offset` (required)**
+
+  `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+* **`total` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "tipo": "recibido",
+      "modalidad": "fisico",
+      "numero": "",
+      "banco": "",
+      "sucursal": "",
+      "cbuOrigen": "",
+      "libradorNombre": "",
+      "libradorCuit": "",
+      "monto": "",
+      "moneda": "",
+      "fechaEmision": "",
+      "fechaVencimiento": "",
+      "estado": "en_cartera",
+      "clienteId": 1,
+      "proveedorId": 1,
+      "observaciones": ""
+    }
+  ],
+  "total": 1,
+  "limit": 1,
+  "offset": 1
+}
+```
+
+### ChequeResumenEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`enCartera` (required)**
+
+    `object`
+
+    - **`count`**
+
+      `integer`
+
+    - **`total`**
+
+      `string`
+
+  - **`proximosVencer` (required)**
+
+    `object`
+
+    - **`count`**
+
+      `integer`
+
+    - **`total`**
+
+      `string`
+
+  - **`rechazados` (required)**
+
+    `object`
+
+    - **`count`**
+
+      `integer`
+
+    - **`total`**
+
+      `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "enCartera": {
+      "count": 1,
+      "total": ""
+    },
+    "proximosVencer": {
+      "count": 1,
+      "total": ""
+    },
+    "rechazados": {
+      "count": 1,
+      "total": ""
+    }
+  }
 }
 ```
 

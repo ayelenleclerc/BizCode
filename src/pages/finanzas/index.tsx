@@ -9,6 +9,7 @@ import { useListPageHotkeys } from '@/hooks/useListPageKeyboard'
 import IfModule from '@/components/IfModule'
 import ComprobanteCompraRegisterForm from '@/pages/finanzas/ComprobanteCompraRegisterForm'
 import DocumentoCompraImportSection from '@/pages/finanzas/DocumentoCompraImportSection'
+import ChequesSection from '@/pages/finanzas/ChequesSection'
 import {
   ApiRequestFailedError,
   cobranzasAPI,
@@ -282,6 +283,10 @@ function FinanzasPageContent() {
 
         <IfModule flag="billing.credit_notes">
           <FinanzasCreditNotesSection />
+        </IfModule>
+
+        <IfModule flag="fiscal.cheques">
+          <ChequesSection />
         </IfModule>
 
         <IfModule flag="finance.ledger">

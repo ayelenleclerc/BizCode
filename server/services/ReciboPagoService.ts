@@ -282,6 +282,19 @@ export class ReciboPagoService {
     const brutoDec = new Decimal(brutoTotal)
     const validatedRetenciones = retencionValidation.lines
 
+    if (input.chequeId != null) {
+      if (input.metodoPago !== 'cheque' && input.metodoPago !== 'echeq') {
+        return { ok: false, status: 400, error: 'chequeId requires metodoPago cheque or echeq' }
+      }
+      const portfolioCheque = await this.prisma.cheque.findFirst({
+        where: { id: input.chequeId, tenantId, tipo: 'recibido', estado: 'en_cartera' },
+        select: { id: true },
+      })
+      if (!portfolioCheque) {
+        return { ok: false, status: 400, error: 'chequeId is not valid for endoso' }
+      }
+    }
+
     const created = await this.prisma.$transaction(async (tx) => {
       const last = await tx.reciboPago.findFirst({
         where: { tenantId },
@@ -298,6 +311,7 @@ export class ReciboPagoService {
           fecha,
           total: totalDec,
           metodoPago: input.metodoPago,
+          chequeId: input.chequeId ?? null,
           cbu: input.cbu ?? null,
           referencia: input.referencia ?? null,
           notas: input.notas ?? null,
@@ -312,6 +326,27 @@ export class ReciboPagoService {
         },
         include: reciboInclude,
       })
+
+      if (input.chequeId != null) {
+        const chequeRow = await tx.cheque.findFirstOrThrow({
+          where: { id: input.chequeId, tenantId },
+          select: { id: true, monto: true },
+        })
+        await tx.chequeMov.create({
+          data: {
+            chequeId: chequeRow.id,
+            tipo: 'endoso',
+            monto: chequeRow.monto,
+            destino: `Proveedor ${proveedorId}`,
+            nota: input.notas?.trim() ?? null,
+            userId: usuarioId,
+          },
+        })
+        await tx.cheque.update({
+          where: { id: chequeRow.id },
+          data: { estado: 'endosado', proveedorId },
+        })
+      }
 
       if (validatedRetenciones.length > 0) {
         const constanciaService = new RetencionConstanciaService(tx)

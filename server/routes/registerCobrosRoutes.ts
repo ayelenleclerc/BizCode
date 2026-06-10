@@ -83,10 +83,15 @@ export function registerCobrosRoutes(app: Application, ctx: RestRouteContext): v
     requirePermission('sales.create'),
     validateBody(cobroBodySchema),
     async (req: Request, res: Response) => {
+      const authReq = req as AuthenticatedRequest
+      if (!authReq.auth) {
+        res.status(401).json({ success: false, error: 'Authentication required' })
+        return
+      }
       try {
         const tenantId = getTenantId(req)
         const parsedValue = req.body as CobroInput
-        const result = await cobro.create(tenantId, parsedValue)
+        const result = await cobro.create(tenantId, authReq.auth.claims.userId, parsedValue)
         if (!result.ok) {
           res.status(result.status).json({ success: false, error: result.error })
           return

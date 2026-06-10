@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { CanAccess } from '@/components/CanAccess'
 import { useFeatureFlags } from '@/contexts/FeatureFlagsContext'
-import { ApiRequestFailedError, fiscalRetencionesAPI, proveedoresAPI } from '@/lib/api'
+import { ApiRequestFailedError, chequesAPI, fiscalRetencionesAPI, proveedoresAPI, type ChequeDTO } from '@/lib/api'
 import type { RetencionPreviewLineDTO } from '@/lib/api'
 import type { ComprobantePendiente, ReciboPago, ReciboPagoMetodo } from '@/types'
 
@@ -45,6 +45,7 @@ export default function ProveedorReciboPagoSection({ proveedorId, onPaymentRegis
   const { t: tc } = useTranslation('common')
   const { hasModule } = useFeatureFlags()
   const retencionesModule = hasModule('finance.retenciones')
+  const chequesModule = hasModule('fiscal.cheques')
 
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -64,6 +65,8 @@ export default function ProveedorReciboPagoSection({ proveedorId, onPaymentRegis
   const [applyRetenciones, setApplyRetenciones] = useState(false)
   const [retencionRows, setRetencionRows] = useState<RetencionRow[]>([])
   const [previewLoading, setPreviewLoading] = useState(false)
+  const [chequeId, setChequeId] = useState('')
+  const [portfolioCheques, setPortfolioCheques] = useState<ChequeDTO[]>([])
 
   const loadRecibos = useCallback(async () => {
     setLoading(true)
@@ -82,6 +85,18 @@ export default function ProveedorReciboPagoSection({ proveedorId, onPaymentRegis
   useEffect(() => {
     void loadRecibos()
   }, [loadRecibos])
+
+  useEffect(() => {
+    if (!chequesModule || !formOpen || (metodoPago !== 'cheque' && metodoPago !== 'echeq')) {
+      setPortfolioCheques([])
+      setChequeId('')
+      return
+    }
+    void chequesAPI
+      .list({ estado: 'en_cartera', tipo: 'recibido', limit: 100 })
+      .then((res) => setPortfolioCheques(res?.data ?? []))
+      .catch(() => setPortfolioCheques([]))
+  }, [chequesModule, formOpen, metodoPago])
 
   const totalBruto = useMemo(() => {
     return allocations
@@ -128,6 +143,7 @@ export default function ProveedorReciboPagoSection({ proveedorId, onPaymentRegis
     setCbu('')
     setReferencia('')
     setNotas('')
+    setChequeId('')
   }
 
   const openForm = async () => {
@@ -183,6 +199,10 @@ export default function ProveedorReciboPagoSection({ proveedorId, onPaymentRegis
       setFormError(t('pagos.errorNeto'))
       return
     }
+    if (chequesModule && (metodoPago === 'cheque' || metodoPago === 'echeq') && !chequeId) {
+      setFormError(t('pagos.errorChequeRequired'))
+      return
+    }
 
     const retencionesPayload = applyRetenciones
       ? retencionRows
@@ -205,6 +225,7 @@ export default function ProveedorReciboPagoSection({ proveedorId, onPaymentRegis
         cbu: cbu.trim() || null,
         referencia: referencia.trim() || null,
         notas: notas.trim() || null,
+        chequeId: chequeId ? Number.parseInt(chequeId, 10) : null,
         facturas: selected.map((a) => ({
           comprobanteCompraId: a.comprobanteCompraId,
           facturaRef: a.facturaRef,
@@ -490,6 +511,27 @@ export default function ProveedorReciboPagoSection({ proveedorId, onPaymentRegis
                 ))}
               </select>
             </div>
+            {chequesModule && (metodoPago === 'cheque' || metodoPago === 'echeq') ? (
+              <div>
+                <label htmlFor="proveedor-pago-cheque" className="block text-xs font-medium mb-1">
+                  {t('pagos.chequeCartera')}
+                </label>
+                <select
+                  id="proveedor-pago-cheque"
+                  className={inputClass}
+                  value={chequeId}
+                  data-testid="proveedor-pago-cheque"
+                  onChange={(e) => setChequeId(e.target.value)}
+                >
+                  <option value="">{t('pagos.chequePlaceholder')}</option>
+                  {portfolioCheques.map((ch) => (
+                    <option key={ch.id} value={ch.id}>
+                      {ch.banco} — {ch.numero} ({ch.monto})
+                    </option>
+                  ))}
+                </select>
+              </div>
+            ) : null}
             <div>
               <label htmlFor="proveedor-pago-cbu" className="block text-xs font-medium mb-1">
                 {t('pagos.cbu')}

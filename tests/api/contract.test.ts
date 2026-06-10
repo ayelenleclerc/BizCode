@@ -688,6 +688,51 @@ function buildPrisma(): PrismaClient {
       update: vi.fn(),
     },
     remitoItem: { deleteMany: vi.fn().mockResolvedValue({ count: 0 }) },
+    cheque: {
+      count: vi.fn().mockResolvedValue(1),
+      findMany: vi.fn().mockResolvedValue([
+        {
+          id: 1,
+          tenantId: 1,
+          tipo: 'recibido',
+          modalidad: 'fisico',
+          numero: '12345678',
+          banco: 'Galicia',
+          sucursal: null,
+          cbuOrigen: null,
+          libradorNombre: 'Cliente SA',
+          libradorCuit: null,
+          monto: new Decimal(15000),
+          moneda: 'ARS',
+          fechaEmision: new Date('2026-06-01T12:00:00.000Z'),
+          fechaVencimiento: new Date('2026-06-15T12:00:00.000Z'),
+          estado: 'en_cartera',
+          clienteId: 1,
+          proveedorId: null,
+          observaciones: null,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          cliente: { id: 1, codigo: 1, rsocial: 'Cliente SA', cuit: null },
+          proveedor: null,
+          movimientos: [],
+        },
+      ]),
+      findFirst: vi.fn().mockResolvedValue({
+        id: 1,
+        tenantId: 1,
+        tipo: 'recibido',
+        modalidad: 'fisico',
+        numero: '12345678',
+        banco: 'Galicia',
+        monto: new Decimal(15000),
+        estado: 'en_cartera',
+        clienteId: 1,
+      }),
+      aggregate: vi.fn().mockResolvedValue({ _count: { id: 1 }, _sum: { monto: new Decimal(15000) } }),
+      create: vi.fn(),
+      update: vi.fn(),
+    },
+    chequeMov: { create: vi.fn().mockResolvedValue({ id: 1 }) },
     ordenCompra: {
       count: vi.fn().mockResolvedValue(1),
       findMany: vi.fn().mockResolvedValue([ordenCompraContractRow]),
@@ -1573,6 +1618,18 @@ describe('API — contrato OpenAPI', () => {
     const app = createApp(prisma)
     const res = await request(app).get('/api/remitos').expect(200)
     await assertMatchesOpenApi('/api/remitos', 'get', '200', res.body)
+  })
+
+  it('GET /api/cheques', async () => {
+    const app = createApp(prisma)
+    const res = await request(app).get('/api/cheques').expect(200)
+    await assertMatchesOpenApi('/api/cheques', 'get', '200', res.body)
+  })
+
+  it('GET /api/cheques/resumen', async () => {
+    const app = createApp(prisma)
+    const res = await request(app).get('/api/cheques/resumen').expect(200)
+    await assertMatchesOpenApi('/api/cheques/resumen', 'get', '200', res.body)
   })
 
   it('GET /api/cobros/{id}/retenciones', async () => {

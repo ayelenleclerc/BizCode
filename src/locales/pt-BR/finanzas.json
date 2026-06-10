@@ -259,5 +259,47 @@
       "confirmFailed": "Não foi possível confirmar a importação.",
       "totalRequired": "O total deve ser maior que zero."
     }
+  },
+  "cheques": {
+    "title": "Carteira de cheques",
+    "empty": "Não há cheques na carteira.",
+    "dueSoon": "Vence em breve",
+    "colNumero": "Número",
+    "colBanco": "Banco",
+    "colVencimiento": "Vencimento",
+    "colMonto": "Valor",
+    "colEstado": "Status",
+    "colAcciones": "Ações",
+    "filters": {
+      "estado": "Status",
+      "banco": "Banco",
+      "all": "Todos"
+    },
+    "resumen": {
+      "enCartera": "Na carteira",
+      "proximos": "A vencer (7 dias)",
+      "rechazados": "Rejeitados"
+    },
+    "modalidad": {
+      "fisico": "Físico",
+      "echeq": "ECHEQ"
+    },
+    "estado": {
+      "en_cartera": "Na carteira",
+      "emitido": "Emitido",
+      "depositado": "Depositado",
+      "endosado": "Endossado",
+      "descontado": "Descontado",
+      "cobrado": "Compensado",
+      "rechazado": "Rejeitado",
+      "anulado": "Anulado"
+    },
+    "actions": {
+      "depositar": "Depositar",
+      "anular": "Anular",
+      "cobrar": "Compensar",
+      "rechazar": "Rejeitar",
+      "devolver": "Devolver à carteira"
+    }
   }
 }
