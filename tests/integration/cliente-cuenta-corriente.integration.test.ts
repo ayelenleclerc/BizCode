@@ -2,7 +2,7 @@
  * Integración PostgreSQL — secuencia AC #232: factura → recibo parcial → NC → cheque rechazado → saldo.
  */
 import 'dotenv/config'
-import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 import request from 'supertest'
 import type { Application } from 'express'
 import { PrismaClient, UserRole } from '@prisma/client'
@@ -87,6 +87,10 @@ describe('Cliente cuenta corriente — integración PostgreSQL (#232 AC)', () =>
     await truncateClienteCc(prisma)
   })
 
+  afterEach(async () => {
+    await truncateClienteCc(prisma)
+  })
+
   it('factura → recibo parcial → NC → cheque rechazado deja saldo coherente', async () => {
     const cliente = await prisma.cliente.create({
       data: {
@@ -134,7 +138,7 @@ describe('Cliente cuenta corriente — integración PostgreSQL (#232 AC)', () =>
     expect(reciboRes.body.data.totalCobrado).toBe('50.00')
 
     await request(app)
-      .post(`/api/facturas/${factura.id}/void`)
+      .put(`/api/facturas/${factura.id}/void`)
       .send({ motivo: 'Anulación total por integración de prueba' })
       .expect(200)
 
