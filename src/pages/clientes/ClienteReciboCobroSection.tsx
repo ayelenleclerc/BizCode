@@ -486,6 +486,7 @@ export default function ClienteReciboCobroSection({ clienteId, onReciboRegistere
                       setFormas(next)
                     }}
                     className={inputClass}
+                    aria-label={t('recibos.selectCheque')}
                     data-testid="cliente-recibo-cheque"
                   >
                     <option value="">{t('recibos.selectCheque')}</option>
