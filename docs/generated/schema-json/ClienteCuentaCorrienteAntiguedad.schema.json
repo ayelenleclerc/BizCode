@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "buckets": {
+      "items": {
+        "$ref": "./ClienteCuentaCorrienteAntiguedadBucket.schema.json"
+      },
+      "type": "array"
+    },
+    "clienteId": {
+      "type": "integer"
+    },
+    "totalPendiente": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "clienteId",
+    "buckets",
+    "totalPendiente"
+  ],
+  "title": "ClienteCuentaCorrienteAntiguedad",
+  "type": "object"
+}

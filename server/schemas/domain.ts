@@ -24,6 +24,7 @@ import type {
   CobroInput,
   ProveedorInput,
   ProveedorCuentaCorrienteAjusteInput,
+  ClienteCuentaCorrienteAjusteInput,
   RubroInput,
   OrdenCompraCreateInput,
   OrdenCompraItemInput,
@@ -1589,6 +1590,41 @@ export const proveedorCuentaCorrienteAjusteBodySchema = z
   }))
 
 export { movimientoProveedorCCTipoSchema }
+
+/** @en Customer ledger movement type filter (#232). */
+const movimientoClienteCCTipoSchema = z.enum(
+  [
+    'saldo_inicial',
+    'factura',
+    'nota_credito',
+    'cobro',
+    'retencion',
+    'percepcion',
+    'cheque_rechazado',
+    'ajuste',
+  ],
+  { invalid_type_error: 'Invalid cliente cuenta corriente tipo filter' },
+)
+
+/** @en Customer ledger manual adjustment body (#232). */
+export const clienteCuentaCorrienteAjusteBodySchema = z
+  .object({
+    monto: z.number().refine((v) => v !== 0, { message: 'monto must be non-zero' }),
+    motivo: z.string().trim().min(1, 'motivo is required').max(500),
+  })
+  .transform((data): ClienteCuentaCorrienteAjusteInput => ({
+    monto: data.monto,
+    motivo: data.motivo,
+  }))
+
+/** @en Customer account statement email body (#232). */
+export const clienteCuentaCorrienteEnviarBodySchema = z.object({
+  email: z.string().email().max(50).optional(),
+  desde: z.string().optional(),
+  hasta: z.string().optional(),
+})
+
+export { movimientoClienteCCTipoSchema }
 
 const reciboPagoMetodoSchema = z.enum(['transferencia', 'cheque', 'efectivo', 'echeq'])
 

@@ -73,6 +73,21 @@ export type ProveedorCuentaCorrienteAjusteInput = {
   motivo: string
 }
 
+export type MovimientoClienteCCTipo =
+  | 'saldo_inicial'
+  | 'factura'
+  | 'nota_credito'
+  | 'cobro'
+  | 'retencion'
+  | 'percepcion'
+  | 'cheque_rechazado'
+  | 'ajuste'
+
+export type ClienteCuentaCorrienteAjusteInput = {
+  monto: number
+  motivo: string
+}
+
 export type ReciboPagoMetodo = 'transferencia' | 'cheque' | 'efectivo' | 'echeq'
 
 export type ReciboPagoFacturaInput = {

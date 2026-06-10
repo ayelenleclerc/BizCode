@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import request from 'supertest'
 import type { PrismaClient } from '@prisma/client'
 import { createApp } from '../../server/createApp'
+import { createCcTxLayer } from '../helpers/movimientoClienteCcPrismaMock'
 
 const CLIENTE_BASE = { id: 1, codigo: 1001, rsocial: 'ACME SA', suspended: false }
 
@@ -46,13 +47,7 @@ describe('POST /api/facturas — stock', () => {
 
   it('decrements articulo stock in transaction', async () => {
     const articuloUpdate = vi.fn().mockResolvedValue({ ...ARTICULO_STOCK, stock: 7 })
-    const facturaCreate = vi.fn().mockResolvedValue(FACTURA_RESULT)
-    const clienteUpdate = vi.fn().mockResolvedValue({
-      id: 1,
-      rsocial: 'ACME SA',
-      balance: '1000.00',
-      creditLimit: null,
-    })
+    const facturaCreate = vi.fn().mockResolvedValue({ ...FACTURA_RESULT, estado: 'A', clienteId: 1 })
 
     const prisma = {
       deliveryZone: { findFirst: vi.fn().mockResolvedValue(null) },
@@ -77,11 +72,12 @@ describe('POST /api/facturas — stock', () => {
       tenant: { findUnique: vi.fn().mockResolvedValue({ id: 1, name: 'Demo', slug: 'demo', active: true }) },
       $transaction: vi.fn(async (fn: unknown) => {
         if (typeof fn === 'function') {
-          return fn({
-            factura: { create: facturaCreate },
-            cliente: { update: clienteUpdate },
-            articulo: { update: articuloUpdate },
-          })
+          return fn(
+            createCcTxLayer({
+              factura: { create: facturaCreate },
+              articulo: { update: articuloUpdate },
+            }),
+          )
         }
         return fn
       }),
@@ -130,13 +126,7 @@ describe('POST /api/facturas — stock', () => {
 
   it('dispatches stock_below_minimum when stock falls below minimum after sale', async () => {
     const articuloUpdate = vi.fn().mockResolvedValue({ ...ARTICULO_STOCK, stock: 7 })
-    const facturaCreate = vi.fn().mockResolvedValue(FACTURA_RESULT)
-    const clienteUpdate = vi.fn().mockResolvedValue({
-      id: 1,
-      rsocial: 'ACME SA',
-      balance: '1000.00',
-      creditLimit: null,
-    })
+    const facturaCreate = vi.fn().mockResolvedValue({ ...FACTURA_RESULT, estado: 'A', clienteId: 1 })
     const notificationCreateMany = vi.fn().mockResolvedValue({ count: 1 })
 
     const prisma = {
@@ -165,11 +155,12 @@ describe('POST /api/facturas — stock', () => {
       tenant: { findUnique: vi.fn().mockResolvedValue({ id: 1, name: 'Demo', slug: 'demo', active: true }) },
       $transaction: vi.fn(async (fn: unknown) => {
         if (typeof fn === 'function') {
-          return fn({
-            factura: { create: facturaCreate },
-            cliente: { update: clienteUpdate },
-            articulo: { update: articuloUpdate },
-          })
+          return fn(
+            createCcTxLayer({
+              factura: { create: facturaCreate },
+              articulo: { update: articuloUpdate },
+            }),
+          )
         }
         return fn
       }),

@@ -74,5 +74,55 @@
       "suspendedBadge": "SUSPENDED",
       "readOnly": "Read-only — your role cannot modify financial data"
     }
+  },
+  "cc": {
+    "sectionTitle": "Accounts receivable",
+    "saldoActual": "Current balance (debt)",
+    "limiteCredito": "Credit limit: {{limite}}",
+    "excedeLimite": "Balance exceeds the configured credit limit.",
+    "chartTitle": "Debt trend (6 months)",
+    "chartAria": "Customer debt evolution chart",
+    "chartEmpty": "No movements to chart.",
+    "saldo": "Balance",
+    "antiguedadTitle": "Aging buckets",
+    "antiguedad": {
+      "0-30": "0–30 days",
+      "31-60": "31–60 days",
+      "61-90": "61–90 days",
+      "+90": "Over 90 days"
+    },
+    "filterTipo": "Type",
+    "filterTipoAll": "All",
+    "filterFrom": "From",
+    "filterTo": "To",
+    "filterApply": "Apply filters",
+    "descargarPdf": "Download PDF",
+    "enviarPdf": "Send by email",
+    "envioOk": "Statement sent (when SMTP is configured).",
+    "ajusteOpen": "Manual adjustment",
+    "ajusteTitle": "Ledger adjustment",
+    "ajusteMonto": "Amount (+ increases debt, − reduces)",
+    "ajusteMotivo": "Reason (required)",
+    "ajusteSubmit": "Post adjustment",
+    "ajusteMontoInvalid": "Enter a non-zero amount.",
+    "ajusteMotivoRequired": "Reason is required.",
+    "movimientosEmpty": "No movements for the selected filters.",
+    "empty": "Could not load statement.",
+    "tableCaption": "Ledger movements",
+    "colFecha": "Date",
+    "colTipo": "Type",
+    "colReferencia": "Reference",
+    "colMonto": "Amount",
+    "colSaldo": "Balance after",
+    "tipo": {
+      "saldo_inicial": "Opening balance",
+      "factura": "Invoice",
+      "nota_credito": "Credit note",
+      "cobro": "Payment",
+      "retencion": "Withholding",
+      "percepcion": "Perception",
+      "cheque_rechazado": "Rejected cheque",
+      "ajuste": "Manual adjustment"
+    }
   }
 }

@@ -822,6 +822,230 @@ paths:
         '403':
           $ref: '#/components/responses/ForbiddenError'
 
+  /api/clientes/{id}/cuenta-corriente:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    get:
+      tags: [clientes]
+      summary: Customer accounts-receivable statement
+      description: Ledger movements, current balance, credit-limit alert, and 6-month debt series (#232). Requires finance.ledger module.
+      parameters:
+        - name: tipo
+          in: query
+          schema:
+            type: string
+            enum: [saldo_inicial, factura, nota_credito, cobro, retencion, percepcion, cheque_rechazado, ajuste]
+        - name: desde
+          in: query
+          description: ISO-8601 filter start (inclusive)
+          schema:
+            type: string
+            format: date-time
+        - name: hasta
+          in: query
+          description: ISO-8601 filter end (inclusive)
+          schema:
+            type: string
+            format: date-time
+        - $ref: '#/components/parameters/ListLimit'
+        - $ref: '#/components/parameters/ListOffset'
+      responses:
+        '200':
+          description: Statement
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClienteCuentaCorrienteEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /api/clientes/{id}/cuenta-corriente/saldo:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    get:
+      tags: [clientes]
+      summary: Customer accounts-receivable balance only
+      responses:
+        '200':
+          description: Balance snapshot
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClienteCuentaCorrienteSaldoEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /api/clientes/{id}/cuenta-corriente/antiguedad:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    get:
+      tags: [clientes]
+      summary: Customer AR aging buckets
+      parameters:
+        - name: asOf
+          in: query
+          schema:
+            type: string
+            format: date-time
+      responses:
+        '200':
+          description: Aging buckets 0-30, 31-60, 61-90, +90 days
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClienteCuentaCorrienteAntiguedadEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /api/clientes/{id}/cuenta-corriente/estado-de-cuenta/pdf:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    get:
+      tags: [clientes]
+      summary: Download customer account statement PDF
+      parameters:
+        - name: desde
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: hasta
+          in: query
+          schema:
+            type: string
+            format: date-time
+      responses:
+        '200':
+          description: PDF document
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /api/clientes/{id}/cuenta-corriente/estado-de-cuenta/enviar:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    post:
+      tags: [clientes]
+      summary: Email customer account statement PDF
+      description: Uses tenant SMTP when configured; returns success without error when SMTP is absent (#232).
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClienteCuentaCorrienteEnviarInput'
+      responses:
+        '200':
+          description: Send accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClienteCuentaCorrienteEnviarEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /api/clientes/{id}/cuenta-corriente/ajuste:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    post:
+      tags: [clientes]
+      summary: Manual customer ledger adjustment
+      description: Requires sales.create; posts audit event cliente_cc_ajuste.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClienteCuentaCorrienteAjusteInput'
+      responses:
+        '201':
+          description: Adjustment posted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MovimientoClienteCCEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
   /api/articulos:
     parameters:
       - $ref: '#/components/parameters/BizcodeChannelHeader'
@@ -5142,8 +5366,8 @@ paths:
       tags: [reportes]
       summary: Customer account statement (running balance)
       description: |
-        Chronological list of opening balance (if non-zero), active invoices (debit), and payments (credit)
-        with a running `saldo`. Requires permission `reports.financial.read`.
+        Legacy wrapper over the persisted customer ledger (`MovimientoClienteCC`): chronological movements
+        with debit/credit columns and running `saldo`. Requires permission `reports.financial.read`.
       security:
         - cookieSession: []
       parameters:
@@ -7753,6 +7977,147 @@ components:
           type: string
           nullable: true
 
+    MovimientoClienteCC:
+      type: object
+      required: [id, tipo, monto, saldoPost, fecha, usuarioId]
+      properties:
+        id:
+          type: integer
+        tipo:
+          type: string
+          enum: [saldo_inicial, factura, nota_credito, cobro, retencion, percepcion, cheque_rechazado, ajuste]
+        referencia:
+          type: string
+          nullable: true
+        monto:
+          type: string
+        saldoPost:
+          type: string
+        fecha:
+          type: string
+          format: date-time
+        usuarioId:
+          type: integer
+        notas:
+          type: string
+          nullable: true
+        facturaId:
+          type: integer
+          nullable: true
+        cobroId:
+          type: integer
+          nullable: true
+        notaCreditoId:
+          type: integer
+          nullable: true
+        chequeId:
+          type: integer
+          nullable: true
+        retencionAplicadaId:
+          type: integer
+          nullable: true
+
+    ClienteCuentaCorrienteChartPoint:
+      type: object
+      required: [period, saldo]
+      properties:
+        period:
+          type: string
+        saldo:
+          type: string
+
+    ClienteCuentaCorriente:
+      type: object
+      required: [clienteId, codigo, rsocial, saldo, excedeLimite, movimientos, serie, total, limit, offset]
+      properties:
+        clienteId:
+          type: integer
+        codigo:
+          type: integer
+        rsocial:
+          type: string
+        saldo:
+          type: string
+        creditLimit:
+          type: string
+          nullable: true
+        excedeLimite:
+          type: boolean
+        movimientos:
+          type: array
+          items:
+            $ref: '#/components/schemas/MovimientoClienteCC'
+        serie:
+          type: array
+          items:
+            $ref: '#/components/schemas/ClienteCuentaCorrienteChartPoint'
+        total:
+          type: integer
+        limit:
+          type: integer
+        offset:
+          type: integer
+
+    ClienteCuentaCorrienteSaldo:
+      type: object
+      required: [clienteId, saldo, excedeLimite]
+      properties:
+        clienteId:
+          type: integer
+        saldo:
+          type: string
+        creditLimit:
+          type: string
+          nullable: true
+        excedeLimite:
+          type: boolean
+
+    ClienteCuentaCorrienteAntiguedadBucket:
+      type: object
+      required: [label, total]
+      properties:
+        label:
+          type: string
+          enum: ['0-30', '31-60', '61-90', '+90']
+        total:
+          type: string
+
+    ClienteCuentaCorrienteAntiguedad:
+      type: object
+      required: [clienteId, buckets, totalPendiente]
+      properties:
+        clienteId:
+          type: integer
+        buckets:
+          type: array
+          items:
+            $ref: '#/components/schemas/ClienteCuentaCorrienteAntiguedadBucket'
+        totalPendiente:
+          type: string
+
+    ClienteCuentaCorrienteAjusteInput:
+      type: object
+      required: [monto, motivo]
+      properties:
+        monto:
+          type: number
+        motivo:
+          type: string
+          maxLength: 500
+
+    ClienteCuentaCorrienteEnviarInput:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        desde:
+          type: string
+          format: date-time
+        hasta:
+          type: string
+          format: date-time
+
     ProveedorCuentaCorrienteChartPoint:
       type: object
       required: [period, saldo]
@@ -8196,6 +8561,62 @@ components:
           const: true
         data:
           $ref: '#/components/schemas/ArticuloProveedoresComparadorData'
+
+    ClienteCuentaCorrienteEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/ClienteCuentaCorriente'
+
+    ClienteCuentaCorrienteSaldoEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/ClienteCuentaCorrienteSaldo'
+
+    ClienteCuentaCorrienteAntiguedadEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/ClienteCuentaCorrienteAntiguedad'
+
+    MovimientoClienteCCEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/MovimientoClienteCC'
+
+    ClienteCuentaCorrienteEnviarEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: object
+          required: [sent, email]
+          properties:
+            sent:
+              type: boolean
+            email:
+              type: string
 
     ProveedorCuentaCorrienteEnvelope:
       type: object

@@ -68,6 +68,64 @@ export type ProveedorCategoria = 'materia_prima' | 'insumos' | 'servicios' | 'lo
 
 export type MovimientoProveedorCCTipo = 'factura_compra' | 'pago' | 'nc_proveedor' | 'ajuste'
 
+export type MovimientoClienteCCTipo =
+  | 'saldo_inicial'
+  | 'factura'
+  | 'nota_credito'
+  | 'cobro'
+  | 'retencion'
+  | 'percepcion'
+  | 'cheque_rechazado'
+  | 'ajuste'
+
+export interface MovimientoClienteCC {
+  id: number
+  tipo: MovimientoClienteCCTipo
+  referencia: string | null
+  monto: string
+  saldoPost: string
+  fecha: string
+  usuarioId: number
+  notas: string | null
+  facturaId?: number
+  cobroId?: number
+  notaCreditoId?: number
+  chequeId?: number
+  retencionAplicadaId?: number
+}
+
+export interface ClienteCuentaCorrienteChartPoint {
+  period: string
+  saldo: string
+}
+
+export interface ClienteCuentaCorriente {
+  clienteId: number
+  codigo: number
+  rsocial: string
+  saldo: string
+  creditLimit: string | null
+  excedeLimite: boolean
+  movimientos: MovimientoClienteCC[]
+  serie: ClienteCuentaCorrienteChartPoint[]
+  total: number
+  limit: number
+  offset: number
+}
+
+export interface ClienteCuentaCorrienteSaldo {
+  clienteId: number
+  saldo: string
+  creditLimit: string | null
+  excedeLimite: boolean
+}
+
+export interface ClienteCuentaCorrienteAntiguedad {
+  clienteId: number
+  buckets: Array<{ label: '0-30' | '31-60' | '61-90' | '+90'; total: string }>
+  totalPendiente: string
+}
+
 export interface MovimientoProveedorCC {
   id: number
   tipo: MovimientoProveedorCCTipo

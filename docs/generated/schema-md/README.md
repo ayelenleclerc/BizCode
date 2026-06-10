@@ -98,6 +98,28 @@
 
 * [Cliente](./cliente.md) – `-`
 
+* [ClienteCuentaCorriente](./clientecuentacorriente.md) – `-`
+
+* [ClienteCuentaCorrienteAjusteInput](./clientecuentacorrienteajusteinput.md) – `-`
+
+* [ClienteCuentaCorrienteAntiguedad](./clientecuentacorrienteantiguedad.md) – `-`
+
+* [ClienteCuentaCorrienteAntiguedadBucket](./clientecuentacorrienteantiguedadbucket.md) – `-`
+
+* [ClienteCuentaCorrienteAntiguedadEnvelope](./clientecuentacorrienteantiguedadenvelope.md) – `-`
+
+* [ClienteCuentaCorrienteChartPoint](./clientecuentacorrientechartpoint.md) – `-`
+
+* [ClienteCuentaCorrienteEnvelope](./clientecuentacorrienteenvelope.md) – `-`
+
+* [ClienteCuentaCorrienteEnviarEnvelope](./clientecuentacorrienteenviarenvelope.md) – `-`
+
+* [ClienteCuentaCorrienteEnviarInput](./clientecuentacorrienteenviarinput.md) – `-`
+
+* [ClienteCuentaCorrienteSaldo](./clientecuentacorrientesaldo.md) – `-`
+
+* [ClienteCuentaCorrienteSaldoEnvelope](./clientecuentacorrientesaldoenvelope.md) – `-`
+
 * [ClienteEnvelope](./clienteenvelope.md) – `-`
 
 * [ClienteImportEnvelope](./clienteimportenvelope.md) – `-`
@@ -307,6 +329,10 @@
 * [ModuleCatalogPreset](./modulecatalogpreset.md) – `-`
 
 * [ModuleNotEnabledEnvelope](./modulenotenabledenvelope.md) – `-`
+
+* [MovimientoClienteCC](./movimientoclientecc.md) – `-`
+
+* [MovimientoClienteCCEnvelope](./movimientoclienteccenvelope.md) – `-`
 
 * [MovimientoProveedorCC](./movimientoproveedorcc.md) – `-`
 
@@ -674,6 +700,8 @@
 
 * [Untitled object in ChequeResumenEnvelope](./chequeresumenenvelope-properties-data-properties-rechazados.md) – `undefined#/properties/data/properties/rechazados`
 
+* [Untitled object in ClienteCuentaCorrienteEnviarEnvelope](./clientecuentacorrienteenviarenvelope-properties-data.md) – `undefined#/properties/data`
+
 * [Untitled object in ClienteListEnvelope](./clientelistenvelope-allof-0.md) – `undefined#/allOf/0`
 
 * [Untitled object in CobranzaRecordatorioEnvelope](./cobranzarecordatorioenvelope-properties-data.md) – `undefined#/properties/data`
@@ -849,6 +877,12 @@
 * [Untitled array in ChatMessageListEnvelope](./chatmessagelistenvelope-properties-data.md) – `undefined#/properties/data`
 
 * [Untitled array in ChequeListEnvelope](./chequelistenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled array in ClienteCuentaCorriente](./clientecuentacorriente-properties-movimientos.md) – `undefined#/properties/movimientos`
+
+* [Untitled array in ClienteCuentaCorriente](./clientecuentacorriente-properties-serie.md) – `undefined#/properties/serie`
+
+* [Untitled array in ClienteCuentaCorrienteAntiguedad](./clientecuentacorrienteantiguedad-properties-buckets.md) – `undefined#/properties/buckets`
 
 * [Untitled array in ClienteImportResult](./clienteimportresult-properties-errors.md) – `undefined#/properties/errors`
 

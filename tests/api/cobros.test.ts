@@ -3,6 +3,11 @@ import request from 'supertest'
 import type { PrismaClient } from '@prisma/client'
 import { createApp } from '../../server/createApp'
 import {
+  createCcTxLayer,
+  createMovimientoClienteCCPrismaMock,
+  extendClientePrismaForCc,
+} from '../helpers/movimientoClienteCcPrismaMock'
+import {
   computeScoreAfterCobro,
   computeScoreChange,
   computeScoreDelta,
@@ -58,13 +63,14 @@ const COBRO_RESULT = {
 function buildPrismaMock(overrides: Partial<Record<string, unknown>> = {}): PrismaClient {
   return {
     deliveryZone: { findFirst: vi.fn().mockResolvedValue({ id: 1, tenantId: 1 }) },
-    cliente: {
+    cliente: extendClientePrismaForCc({
       findMany: vi.fn().mockResolvedValue([CLIENTE_BASE]),
       findFirst: vi.fn().mockResolvedValue(CLIENTE_BASE),
       findUnique: vi.fn().mockResolvedValue(CLIENTE_BASE),
       create: vi.fn().mockResolvedValue(CLIENTE_BASE),
       update: vi.fn().mockResolvedValue(CLIENTE_BASE),
-    },
+    }),
+    movimientoClienteCC: createMovimientoClienteCCPrismaMock(),
     articulo: { findMany: vi.fn().mockResolvedValue([]) },
     rubro: { findMany: vi.fn().mockResolvedValue([]) },
     formaPago: { findMany: vi.fn().mockResolvedValue([]), findUnique: vi.fn().mockResolvedValue({ id: 1 }) },
@@ -220,11 +226,11 @@ describe('POST /api/cobros', () => {
     const chequeCreate = vi.fn().mockResolvedValue({ id: 99 })
     const chequeMovCreate = vi.fn().mockResolvedValue({ id: 1 })
     const cobroCreate = vi.fn().mockResolvedValue({ ...COBRO_RESULT, chequeId: 99 })
-    const txPrisma = buildPrismaMock({
+    const txPrisma = createCcTxLayer({
       cobro: { create: cobroCreate },
       cheque: { create: chequeCreate },
       chequeMov: { create: chequeMovCreate },
-    })
+    }) as unknown as PrismaClient
     const prisma = buildPrismaMock({
       $transaction: vi.fn(async (fn: unknown) => {
         if (typeof fn === 'function') return fn(txPrisma)
@@ -267,13 +273,13 @@ describe('POST /api/cobros', () => {
       score: 50,
     })
     const cobroCreate = vi.fn().mockResolvedValue(COBRO_RESULT)
-    const txPrisma = buildPrismaMock({
-      cliente: {
+    const txPrisma = createCcTxLayer({
+      cliente: extendClientePrismaForCc({
         findFirst: vi.fn().mockResolvedValue(CLIENTE_BASE),
         update: clienteUpdate,
-      },
+      }),
       cobro: { create: cobroCreate },
-    })
+    }) as unknown as PrismaClient
     const prisma = buildPrismaMock({
       $transaction: vi.fn(async (fn: unknown) => {
         if (typeof fn === 'function') return fn(txPrisma)
@@ -313,13 +319,13 @@ describe('POST /api/cobros', () => {
       score: 55,
     })
     const cobroCreate = vi.fn().mockResolvedValue(COBRO_RESULT)
-    const txPrisma = buildPrismaMock({
-      cliente: {
+    const txPrisma = createCcTxLayer({
+      cliente: extendClientePrismaForCc({
         findFirst: vi.fn().mockResolvedValue(CLIENTE_BASE),
         update: clienteUpdate,
-      },
+      }),
       cobro: { create: cobroCreate },
-    })
+    }) as unknown as PrismaClient
     const prisma = buildPrismaMock({
       factura: {
         findFirst: vi.fn().mockResolvedValue({ fecha: facturaFecha }),
@@ -340,7 +346,6 @@ describe('POST /api/cobros', () => {
     expect(clienteUpdate).toHaveBeenCalledWith(
       expect.objectContaining({
         data: expect.objectContaining({
-          balance: { decrement: 250.5 },
           score: 55,
         }),
       }),

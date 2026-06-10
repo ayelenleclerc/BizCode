@@ -12,8 +12,24 @@ Ao carregar, a página consulta **`GET /api/reportes/aging`** e mostra faixas (r
 
 ## Extrato do cliente
 
+### Ficha do cliente (`finance.ledger`, #232)
+
+Com o módulo **`finance.ledger`** habilitado, a ficha de cada cliente inclui a aba **Conta corrente**:
+
+- Saldo atual, limite de crédito e gráfico de evolução.
+- Tabela de movimentos (fatura, nota de crédito, recebimento, retenção, cheque devolvido, ajuste).
+- Aging por faixas (`0-30`, `31-60`, `61-90`, `+90` dias).
+- Ajuste manual auditado (`POST /api/clientes/{id}/cuenta-corriente/ajuste`, permissão `sales.create`).
+- Download de extrato em PDF e envio por e-mail (`GET` / `POST .../estado-de-cuenta/...`).
+
+API canônica: `GET /api/clientes/{id}/cuenta-corriente`, `.../saldo`, `.../antiguedad`.
+
+Os movimentos são registrados automaticamente ao emitir faturas, anular com nota de crédito, registrar recebimentos (valor bruto) e rejeitar cheques vinculados a recebimentos.
+
+### Consulta rápida em Finanças (compatibilidade)
+
 1. Informe o **id do cliente** (inteiro positivo).
-2. Execute a ação para carregar o extrato (`GET /api/reportes/cuenta-corriente/:clienteId`).
+2. Execute a ação para carregar o extrato (`GET /api/reportes/cuenta-corriente/:clienteId` — delega ao ledger e mantém o formato legado débito/crédito).
 3. Revise as linhas com data, tipo, referência, débito, crédito e saldo acumulado.
 
 Se o cliente não existir, a API retorna 404.
@@ -30,7 +46,7 @@ A configuração do job automático (dias de carência, fuso IANA, horário come
 
 ## Referência API
 
-[`docs/api/openapi.yaml`](../../api/openapi.yaml) — rotas `/api/reportes/aging` e `/api/reportes/cuenta-corriente/{clienteId}`.
+[`docs/api/openapi.yaml`](../../api/openapi.yaml) — rotas `/api/reportes/aging`, `/api/reportes/cuenta-corriente/{clienteId}` e `/api/clientes/{id}/cuenta-corriente/*`.
 
 ## Notas de crédito (`billing.credit_notes`)
 

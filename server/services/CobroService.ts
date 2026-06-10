@@ -5,6 +5,7 @@ import { facturaFechaToPrismaDate } from '../routes/restDomainShared'
 import type { ServiceResult } from './serviceResults'
 import { RetencionConstanciaService } from './RetencionConstanciaService'
 import { validateCobroRetenciones } from './RetencionCobroValidation'
+import { ClienteCuentaCorrienteService } from './ClienteCuentaCorrienteService'
 
 type CobroWithCliente = Prisma.CobroGetPayload<{
   include: { cliente: { select: { id: true; codigo: true; rsocial: true } } }
@@ -321,9 +322,10 @@ export class CobroService {
         }
       }
 
-      const clienteUpdateData: Prisma.ClienteUpdateInput = {
-        balance: { decrement: montoBruto },
-      }
+      const ccService = new ClienteCuentaCorrienteService(tx)
+      await ccService.recordFromCobro(tenantId, cobro, montoBruto, userId)
+
+      const clienteUpdateData: Prisma.ClienteUpdateInput = {}
       if (scoreChange.delta !== 0) {
         clienteUpdateData.score = scoreChange.scoreAfter
       }

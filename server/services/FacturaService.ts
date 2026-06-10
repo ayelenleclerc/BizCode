@@ -11,6 +11,7 @@ import {
 } from './facturaStock'
 import { ArcaService } from '../fiscal/ar/ArcaService'
 import { validateFacturaPercepciones } from './RetencionFacturaValidation'
+import { ClienteCuentaCorrienteService } from './ClienteCuentaCorrienteService'
 
 type FacturaWithRelations = Prisma.FacturaGetPayload<{ include: { cliente: true; items: true } }>
 
@@ -61,7 +62,11 @@ export class FacturaService {
     return { total, facturas }
   }
 
-  async create(tenantId: number, input: FacturaInput): Promise<ServiceResult<FacturaCreateResult>> {
+  async create(
+    tenantId: number,
+    input: FacturaInput,
+    userId: number,
+  ): Promise<ServiceResult<FacturaCreateResult>> {
     const { items, fecha, ...factura } = input
     const clienteId = factura.clienteId
 
@@ -143,9 +148,11 @@ export class FacturaService {
         })
       }
 
-      const updated = await tx.cliente.update({
+      const ccService = new ClienteCuentaCorrienteService(tx)
+      await ccService.recordFromFactura(tenantId, created, userId)
+
+      const updated = await tx.cliente.findFirstOrThrow({
         where: { id: clienteId },
-        data: { balance: { increment: created.total } },
         select: { id: true, rsocial: true, balance: true, creditLimit: true },
       })
 
@@ -193,6 +200,8 @@ export class FacturaService {
         clienteId: true,
         estadoCae: true,
         tipo: true,
+        prefijo: true,
+        numero: true,
       },
     })
 
@@ -216,12 +225,6 @@ export class FacturaService {
         where: { tenantId, facturaId: id },
       })
 
-      const updatedCliente = await tx.cliente.update({
-        where: { id: factura.clienteId },
-        data: { balance: { decrement: factura.total } },
-        select: { id: true, rsocial: true, balance: true, creditLimit: true },
-      })
-
       const notaCredito = await tx.notaCredito.create({
         data: {
           tenantId,
@@ -231,6 +234,21 @@ export class FacturaService {
           estadoCae: notaCreditoEstadoCae,
           createdById: audit.userId,
         },
+      })
+
+      const facturaRef = `${factura.tipo}-${factura.prefijo}-${factura.numero}`
+      const ccService = new ClienteCuentaCorrienteService(tx)
+      await ccService.recordFromNotaCredito(
+        tenantId,
+        notaCredito,
+        factura.clienteId,
+        facturaRef,
+        audit.userId!,
+      )
+
+      const updatedCliente = await tx.cliente.findFirstOrThrow({
+        where: { id: factura.clienteId },
+        select: { id: true, rsocial: true, balance: true, creditLimit: true },
       })
 
       await tx.auditEvent.create({

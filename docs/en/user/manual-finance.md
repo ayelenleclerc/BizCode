@@ -12,8 +12,24 @@ On load, the page fetches **`GET /api/reportes/aging`** and shows buckets (label
 
 ## Account statement
 
+### Customer record (`finance.ledger`, #232)
+
+With module **`finance.ledger`** enabled, each customer record includes a **Account statement** tab:
+
+- Current balance, credit limit, and balance trend chart.
+- Movement table (invoice, credit note, collection, withholding, bounced cheque, manual adjustment).
+- AR aging buckets (`0-30`, `31-60`, `61-90`, `90+` days).
+- Audited manual adjustment (`POST /api/clientes/{id}/cuenta-corriente/ajuste`, permission `sales.create`).
+- PDF statement download and email send (`GET` / `POST .../estado-de-cuenta/...`).
+
+Canonical API: `GET /api/clientes/{id}/cuenta-corriente`, `.../saldo`, `.../antiguedad`.
+
+Movements are posted automatically on invoice issue, void via credit note, collection (gross amount), and bounced cheques linked to collections.
+
+### Quick lookup in Finance (compatibility)
+
 1. Enter a **customer id** (positive integer).
-2. Run the action to load the statement (`GET /api/reportes/cuenta-corriente/:clienteId`).
+2. Run the action to load the statement (`GET /api/reportes/cuenta-corriente/:clienteId` — delegates to the ledger and keeps the legacy debit/credit shape).
 3. Review lines with date, type, reference, debit, credit, and running balance.
 
 If the customer does not exist, the API returns 404.
@@ -30,7 +46,7 @@ Automatic job settings (grace days, IANA time zone, business hours) are under **
 
 ## API reference
 
-[`docs/api/openapi.yaml`](../../api/openapi.yaml) — paths under `/api/reportes/aging` and `/api/reportes/cuenta-corriente/{clienteId}`.
+[`docs/api/openapi.yaml`](../../api/openapi.yaml) — paths under `/api/reportes/aging`, `/api/reportes/cuenta-corriente/{clienteId}`, and `/api/clientes/{id}/cuenta-corriente/*`.
 
 ## Credit notes (`billing.credit_notes`)
 

@@ -25,6 +25,7 @@ import { registerSuperadminTenantPricingTrialsRoutes } from './routes/registerSu
 import { registerSuperadminTenantsRoutes } from './routes/registerSuperadminTenantsRoutes'
 import { registerProveedoresRoutes } from './routes/registerProveedoresRoutes'
 import { registerProveedorCuentaCorrienteRoutes } from './routes/registerProveedorCuentaCorrienteRoutes'
+import { registerClienteCuentaCorrienteRoutes } from './routes/registerClienteCuentaCorrienteRoutes'
 import { registerReciboPagoRoutes } from './routes/registerReciboPagoRoutes'
 import { registerProveedorAlertasRoutes } from './routes/registerProveedorAlertasRoutes'
 import { registerProveedorHistorialRoutes } from './routes/registerProveedorHistorialRoutes'
@@ -71,6 +72,7 @@ export function registerRestDomainRoutes(app: Application, prisma: PrismaClient)
   const ctx: RestRouteContext = { prisma, services: createDomainServices(prisma), writeAudit }
 
   registerClientesRoutes(app, ctx)
+  registerClienteCuentaCorrienteRoutes(app, ctx)
   registerArticulosRoutes(app, ctx)
   registerRubrosRoutes(app, ctx)
   registerProveedorAlertasRoutes(app, ctx)
