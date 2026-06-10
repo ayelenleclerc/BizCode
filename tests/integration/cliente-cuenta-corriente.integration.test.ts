@@ -159,6 +159,7 @@ describe('Cliente cuenta corriente — integración PostgreSQL (#232 AC)', () =>
       },
     })
 
+    await request(app).post(`/api/cheques/${cheque.id}/depositar`).send({}).expect(200)
     await request(app).post(`/api/cheques/${cheque.id}/rechazar`).send({ nota: 'Rechazo integración' }).expect(200)
 
     const saldoRes = await request(app)
