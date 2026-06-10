@@ -106,6 +106,9 @@
     "ajusteSubmit": "Registrar ajuste",
     "ajusteMontoInvalid": "Ingresá un monto distinto de cero.",
     "ajusteMotivoRequired": "El motivo es obligatorio.",
+    "paginationSummary": "Movimientos {{from}}–{{to}} de {{total}}",
+    "paginationPrev": "Anterior",
+    "paginationNext": "Siguiente",
     "movimientosEmpty": "No hay movimientos con los filtros seleccionados.",
     "empty": "No se pudo cargar la cuenta corriente.",
     "tableCaption": "Movimientos de cuenta corriente",
@@ -123,6 +126,41 @@
       "percepcion": "Percepción",
       "cheque_rechazado": "Cheque rechazado",
       "ajuste": "Ajuste manual"
+    }
+  },
+  "recibos": {
+    "title": "Recibos de cobro",
+    "emitir": "Emitir recibo",
+    "empty": "No hay recibos de cobro registrados.",
+    "rowLabel": "Recibo Nº {{numero}} — ${{total}}",
+    "pdf": "PDF",
+    "anular": "Anular",
+    "voidMotivoPrompt": "Motivo de anulación (mín. 3 caracteres):",
+    "formTitle": "Nuevo recibo de cobro",
+    "fecha": "Fecha",
+    "fifo": "Imputación automática (FIFO)",
+    "manual": "Imputación manual",
+    "montoImputacion": "Monto a imputar en {{ref}}",
+    "formaTipo": "Forma de pago",
+    "importe": "Importe",
+    "referencia": "Referencia",
+    "selectCheque": "Seleccionar cheque",
+    "addForma": "Agregar forma de pago",
+    "applyRetenciones": "Aplicar retenciones",
+    "confirmar": "Confirmar recibo",
+    "errorTotal": "El total cobrado debe ser mayor a cero.",
+    "errorFormas": "La suma de formas no coincide con el total neto más retenciones.",
+    "errorFormaImporte": "Cada forma de pago debe tener un importe positivo.",
+    "errorChequeRequired": "Seleccioná un cheque de cartera para la forma cheque.",
+    "errorNoAllocation": "Seleccioná al menos una factura para imputar.",
+    "errorAllocationAmount": "Monto inválido para {{ref}}.",
+    "forma": {
+      "efectivo": "Efectivo",
+      "transferencia": "Transferencia",
+      "cheque": "Cheque",
+      "mercadopago": "Mercado Pago",
+      "tarjeta": "Tarjeta",
+      "otro": "Otro"
     }
   }
 }

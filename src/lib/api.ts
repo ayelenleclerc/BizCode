@@ -680,6 +680,77 @@ export const clientesAPI = {
       handleError(error as AxiosError<ApiErrorPayload>)
     }
   },
+
+  facturasPendientes: async (id: number) => {
+    try {
+      const response = await api.get(`/clientes/${id}/facturas-pendientes`)
+      return response.data.data as import('@/types').FacturaPendienteCliente[]
+    } catch (error) {
+      handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  listRecibos: async (id: number, params?: { limit?: number; offset?: number }) => {
+    try {
+      const response = await api.get(`/clientes/${id}/recibos`, { params })
+      return response.data
+    } catch (error) {
+      handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  createRecibo: async (
+    id: number,
+    body: {
+      fecha: string
+      totalCobrado: number
+      concepto?: string | null
+      fifo?: boolean
+      formas: {
+        tipo: string
+        importe: number
+        chequeId?: number | null
+        referencia?: string | null
+        banco?: string | null
+      }[]
+      imputaciones?: { facturaId: number; importe: number }[]
+      retenciones?: {
+        regimenId: number
+        baseImponible: number
+        alicuota: number
+        importe: number
+      }[]
+    },
+  ) => {
+    try {
+      const response = await api.post(`/clientes/${id}/recibos`, body)
+      return response.data.data as import('@/types').ReciboCobro
+    } catch (error) {
+      handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  anularRecibo: async (clienteId: number, reciboId: number, anulacionMotivo: string) => {
+    try {
+      const response = await api.post(`/clientes/${clienteId}/recibos/${reciboId}/anular`, {
+        anulacionMotivo,
+      })
+      return response.data.data as import('@/types').ReciboCobro
+    } catch (error) {
+      handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  downloadReciboPdf: async (clienteId: number, reciboId: number): Promise<Blob> => {
+    try {
+      const response = await api.get<Blob>(`/clientes/${clienteId}/recibos/${reciboId}/pdf`, {
+        responseType: 'blob',
+      })
+      return response.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
 }
 
 // ============ ARTICULOS ============

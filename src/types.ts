@@ -209,6 +209,73 @@ export interface ComprobantePendiente {
   pendiente: string
 }
 
+export type ReciboCobroFormaTipo =
+  | 'efectivo'
+  | 'transferencia'
+  | 'cheque'
+  | 'mercadopago'
+  | 'tarjeta'
+  | 'otro'
+
+export interface ReciboCobroForma {
+  id: number
+  tipo: ReciboCobroFormaTipo
+  importe: string
+  chequeId: number | null
+  referencia: string | null
+  banco: string | null
+  chequeNumero: string | null
+  chequeBanco: string | null
+}
+
+export interface ReciboCobroImputacion {
+  id: number
+  facturaId: number
+  facturaRef: string
+  importe: string
+  saldoPrevio: string
+  saldoPostPago: string
+}
+
+export interface ReciboCobroRetencion {
+  id: number
+  regimenId: number
+  regimenNombre: string
+  tipo: string
+  baseImponible: string
+  alicuota: string
+  importe: string
+  constanciaNum: string | null
+}
+
+export interface ReciboCobro {
+  id: number
+  numero: number
+  clienteId: number
+  fecha: string
+  totalCobrado: string
+  totalBruto: string
+  concepto: string | null
+  estado: string
+  anulacionMotivo: string | null
+  usuarioId: number
+  cliente: { id: number; codigo: number; rsocial: string; cuit: string | null }
+  usuario: { id: number; username: string }
+  formas: ReciboCobroForma[]
+  imputaciones: ReciboCobroImputacion[]
+  retenciones: ReciboCobroRetencion[]
+  createdAt: string
+}
+
+export interface FacturaPendienteCliente {
+  facturaId: number
+  facturaRef: string
+  fecha: string
+  total: string
+  pagado: string
+  pendiente: string
+}
+
 export interface Proveedor {
   id: number
   codigo: number

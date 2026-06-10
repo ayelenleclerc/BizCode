@@ -80,6 +80,7 @@ function buildPrisma(overrides: Partial<Record<string, unknown>> = {}): PrismaCl
       create: movimientoCreate,
     },
     factura: { findMany: vi.fn().mockResolvedValue([]) },
+    reciboCobroImputacion: { groupBy: vi.fn().mockResolvedValue([]) },
     articulo: { findMany: vi.fn().mockResolvedValue([]) },
     rubro: { findMany: vi.fn().mockResolvedValue([]) },
     formaPago: { findMany: vi.fn().mockResolvedValue([]) },
@@ -147,10 +148,11 @@ describe('Cliente cuenta corriente API (#232)', () => {
     prisma = buildPrisma({
       factura: {
         findMany: vi.fn().mockResolvedValue([
-          { total: new Decimal(80), fecha: new Date('2026-05-01') },
-          { total: new Decimal(41), fecha: new Date('2026-03-01') },
+          { id: 1, total: new Decimal(80), fecha: new Date('2026-05-01') },
+          { id: 2, total: new Decimal(41), fecha: new Date('2026-03-01') },
         ]),
       },
+      reciboCobroImputacion: { groupBy: vi.fn().mockResolvedValue([]) },
     })
     const app = createApp(prisma)
     const res = await request(app).get('/api/clientes/1/cuenta-corriente/antiguedad').expect(200)

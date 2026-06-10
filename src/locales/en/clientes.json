@@ -106,6 +106,9 @@
     "ajusteSubmit": "Post adjustment",
     "ajusteMontoInvalid": "Enter a non-zero amount.",
     "ajusteMotivoRequired": "Reason is required.",
+    "paginationSummary": "Movements {{from}}–{{to}} of {{total}}",
+    "paginationPrev": "Previous",
+    "paginationNext": "Next",
     "movimientosEmpty": "No movements for the selected filters.",
     "empty": "Could not load statement.",
     "tableCaption": "Ledger movements",
@@ -123,6 +126,41 @@
       "percepcion": "Perception",
       "cheque_rechazado": "Rejected cheque",
       "ajuste": "Manual adjustment"
+    }
+  },
+  "recibos": {
+    "title": "Payment receipts",
+    "emitir": "Issue receipt",
+    "empty": "No payment receipts recorded.",
+    "rowLabel": "Receipt #{{numero}} — ${{total}}",
+    "pdf": "PDF",
+    "anular": "Void",
+    "voidMotivoPrompt": "Void reason (min. 3 characters):",
+    "formTitle": "New payment receipt",
+    "fecha": "Date",
+    "fifo": "Automatic allocation (FIFO)",
+    "manual": "Manual allocation",
+    "montoImputacion": "Amount to allocate on {{ref}}",
+    "formaTipo": "Payment method",
+    "importe": "Amount",
+    "referencia": "Reference",
+    "selectCheque": "Select cheque",
+    "addForma": "Add payment method",
+    "applyRetenciones": "Apply withholdings",
+    "confirmar": "Confirm receipt",
+    "errorTotal": "Collected total must be greater than zero.",
+    "errorFormas": "Payment methods total does not match net plus withholdings.",
+    "errorFormaImporte": "Each payment method must have a positive amount.",
+    "errorChequeRequired": "Select a portfolio cheque for cheque payment method.",
+    "errorNoAllocation": "Select at least one invoice to allocate.",
+    "errorAllocationAmount": "Invalid amount for {{ref}}.",
+    "forma": {
+      "efectivo": "Cash",
+      "transferencia": "Transfer",
+      "cheque": "Cheque",
+      "mercadopago": "Mercado Pago",
+      "tarjeta": "Card",
+      "otro": "Other"
     }
   }
 }

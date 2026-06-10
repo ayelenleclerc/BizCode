@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "banco": {
+      "nullable": true,
+      "type": "string"
+    },
+    "chequeBanco": {
+      "nullable": true,
+      "type": "string"
+    },
+    "chequeId": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "chequeNumero": {
+      "nullable": true,
+      "type": "string"
+    },
+    "id": {
+      "type": "integer"
+    },
+    "importe": {
+      "type": "string"
+    },
+    "referencia": {
+      "nullable": true,
+      "type": "string"
+    },
+    "tipo": {
+      "enum": [
+        "efectivo",
+        "transferencia",
+        "cheque",
+        "mercadopago",
+        "tarjeta",
+        "otro"
+      ],
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "tipo",
+    "importe"
+  ],
+  "title": "ReciboCobroForma",
+  "type": "object"
+}

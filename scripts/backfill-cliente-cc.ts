@@ -98,6 +98,47 @@ async function backfillTenant(tenantId: number, dryRun: boolean): Promise<void> 
         await cc.recordFromCobro(tenantId, c, montoBruto, systemUser.id)
       }
 
+      const chequesRechazados = await tx.cheque.findMany({
+        where: {
+          tenantId,
+          clienteId: cliente.id,
+          tipo: 'recibido',
+          estado: 'rechazado',
+        },
+        orderBy: [{ updatedAt: 'asc' }, { id: 'asc' }],
+      })
+      for (const cheque of chequesRechazados) {
+        const existingMov = await tx.movimientoClienteCC.findFirst({
+          where: { tenantId, clienteId: cliente.id, chequeId: cheque.id },
+          select: { id: true },
+        })
+        if (existingMov) continue
+
+        const linkedCobro = await tx.cobro.findFirst({
+          where: { tenantId, chequeId: cheque.id, clienteId: cliente.id },
+          select: {
+            monto: true,
+            retencionesAplicadas: { select: { importe: true } },
+          },
+        })
+        let compensatory = cheque.monto
+        if (linkedCobro) {
+          const retTotal = linkedCobro.retencionesAplicadas.reduce(
+            (sum, r) => sum.add(r.importe),
+            new Decimal(0),
+          )
+          compensatory = linkedCobro.monto.add(retTotal)
+        }
+        await cc.recordChequeRechazado(
+          tenantId,
+          cliente.id,
+          cheque.id,
+          compensatory,
+          `cheque-${cheque.numero}`,
+          systemUser.id,
+        )
+      }
+
       const saldoPost = await cc.getLastSaldo(tenantId, cliente.id)
       await tx.cliente.update({
         where: { id: cliente.id },

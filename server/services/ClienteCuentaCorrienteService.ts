@@ -190,6 +190,7 @@ export class ClienteCuentaCorrienteService {
     notaCreditoId?: number | null
     chequeId?: number | null
     retencionAplicadaId?: number | null
+    reciboCobroId?: number | null
     skipBalanceSync?: boolean
   }): Promise<MovimientoClienteCC> {
     const idempotencyChecks: Array<{ field: keyof MovimientoClienteCC; value: number }> = []
@@ -201,6 +202,9 @@ export class ClienteCuentaCorrienteService {
     if (params.chequeId != null) idempotencyChecks.push({ field: 'chequeId', value: params.chequeId })
     if (params.retencionAplicadaId != null) {
       idempotencyChecks.push({ field: 'retencionAplicadaId', value: params.retencionAplicadaId })
+    }
+    if (params.reciboCobroId != null) {
+      idempotencyChecks.push({ field: 'reciboCobroId', value: params.reciboCobroId })
     }
 
     for (const check of idempotencyChecks) {
@@ -230,6 +234,7 @@ export class ClienteCuentaCorrienteService {
         notaCreditoId: params.notaCreditoId ?? null,
         chequeId: params.chequeId ?? null,
         retencionAplicadaId: params.retencionAplicadaId ?? null,
+        reciboCobroId: params.reciboCobroId ?? null,
       },
     })
 
@@ -295,6 +300,24 @@ export class ClienteCuentaCorrienteService {
       fecha: cobro.fecha,
       usuarioId,
       cobroId: cobro.id,
+    })
+  }
+
+  async recordFromReciboCobro(
+    tenantId: number,
+    recibo: Pick<{ id: number; clienteId: number; fecha: Date; numero: number }, 'id' | 'clienteId' | 'fecha' | 'numero'>,
+    montoBruto: number | Decimal,
+    usuarioId: number,
+  ): Promise<MovimientoClienteCC> {
+    return this.recordMovimiento({
+      tenantId,
+      clienteId: recibo.clienteId,
+      tipo: 'cobro',
+      monto: toDecimal(montoBruto).negated(),
+      referencia: `RC-${recibo.numero}`,
+      fecha: recibo.fecha,
+      usuarioId,
+      reciboCobroId: recibo.id,
     })
   }
 
@@ -498,8 +521,27 @@ export class ClienteCuentaCorrienteService {
 
     const facturas = await this.db.factura.findMany({
       where: { tenantId, clienteId, estado: 'A' },
-      select: { total: true, fecha: true },
+      select: { id: true, total: true, fecha: true },
     })
+
+    const facturaIds = facturas.map((f) => f.id)
+    const allocations =
+      facturaIds.length > 0
+        ? await this.db.reciboCobroImputacion.groupBy({
+            by: ['facturaId'],
+            where: {
+              facturaId: { in: facturaIds },
+              reciboCobro: { tenantId, clienteId, estado: 'emitido' },
+            },
+            _sum: { importe: true },
+          })
+        : []
+    const paidMap = new Map<number, Decimal>()
+    for (const row of allocations) {
+      if (row._sum.importe != null) {
+        paidMap.set(row.facturaId, row._sum.importe)
+      }
+    }
 
     const bucketTotals = new Map<AgingBucketLabel, number>()
     for (const label of AGING_BUCKET_LABELS) {
@@ -508,7 +550,10 @@ export class ClienteCuentaCorrienteService {
 
     let totalPendiente = 0
     for (const inv of facturas) {
-      const amount = inv.total.toNumber()
+      const pagado = paidMap.get(inv.id) ?? new Decimal(0)
+      const pendiente = inv.total.minus(pagado)
+      if (pendiente.lessThanOrEqualTo(0)) continue
+      const amount = pendiente.toNumber()
       totalPendiente += amount
       const days = computeDaysPastDue(inv.fecha, cliente.creditDays, asOf)
       const label = bucketLabelForDaysPastDue(days)

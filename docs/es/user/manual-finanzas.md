@@ -17,14 +17,14 @@ Al cargar, la página consulta **`GET /api/reportes/aging`** y muestra buckets (
 Con el módulo **`finance.ledger`** habilitado, la ficha de cada cliente incluye la pestaña **Cuenta corriente**:
 
 - Saldo actual, límite de crédito y gráfico de evolución.
-- Tabla de movimientos (factura, nota de crédito, cobro, retención, cheque rechazado, ajuste).
+- Tabla de movimientos paginada (factura, nota de crédito, cobro, retención, cheque rechazado, ajuste).
 - Antigüedad de saldos por buckets (`0-30`, `31-60`, `61-90`, `+90` días).
 - Ajuste manual auditado (`POST /api/clientes/{id}/cuenta-corriente/ajuste`, permiso `sales.create`).
 - Descarga de estado de cuenta PDF y envío por email (`GET` / `POST .../estado-de-cuenta/...`).
 
 API canónica: `GET /api/clientes/{id}/cuenta-corriente`, `.../saldo`, `.../antiguedad`.
 
-Los movimientos se registran automáticamente al emitir facturas, anular con nota de crédito, registrar cobros (monto bruto) y rechazar cheques vinculados a cobros.
+Los movimientos se registran automáticamente al emitir facturas, anular con nota de crédito, registrar cobros (monto bruto; las retenciones no generan línea aparte en el ledger) y rechazar cheques vinculados a cobros.
 
 ### Consulta rápida en Finanzas (compatibilidad)
 

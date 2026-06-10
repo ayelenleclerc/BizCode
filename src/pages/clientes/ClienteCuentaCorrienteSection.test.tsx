@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { describe, expect, it, vi, beforeEach } from 'vitest'
 import ClienteCuentaCorrienteSection from './ClienteCuentaCorrienteSection'
 
@@ -14,7 +14,7 @@ vi.mock('recharts', async (importOriginal) => {
 
 vi.mock('react-i18next', () => ({
   useTranslation: (ns?: string) => ({
-    t: (key: string, opts?: { limite?: string }) => {
+    t: (key: string, opts?: { limite?: string; from?: number; to?: number; total?: number }) => {
       if (ns === 'common') {
         const common: Record<string, string> = {
           'status.loading': 'Cargando…',
@@ -42,6 +42,9 @@ vi.mock('react-i18next', () => ({
         'cc.filterApply': 'Aplicar',
         'cc.descargarPdf': 'PDF',
         'cc.enviarPdf': 'Enviar',
+        'cc.paginationSummary': `Movimientos ${opts?.from ?? 0}–${opts?.to ?? 0} de ${opts?.total ?? 0}`,
+        'cc.paginationPrev': 'Anterior',
+        'cc.paginationNext': 'Siguiente',
         'cc.movimientosEmpty': 'Sin movimientos',
         'cc.colFecha': 'Fecha',
         'cc.colTipo': 'Tipo',
@@ -57,6 +60,18 @@ vi.mock('react-i18next', () => ({
 
 vi.mock('@/components/CanAccess', () => ({
   CanAccess: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+}))
+
+vi.mock('@/contexts/FeatureFlagsContext', () => ({
+  useFeatureFlags: () => ({
+    hasModule: () => false,
+    modules: [],
+    loading: false,
+  }),
+}))
+
+vi.mock('./ClienteReciboCobroSection', () => ({
+  default: () => null,
 }))
 
 const { mockCuentaCorriente, mockAntiguedad } = vi.hoisted(() => ({
@@ -118,5 +133,26 @@ describe('ClienteCuentaCorrienteSection', () => {
     })
     expect(screen.getByTestId('cliente-cc-antiguedad')).toBeInTheDocument()
     expect(screen.getByTestId('cliente-cc-row-1')).toBeInTheDocument()
+    expect(screen.getByTestId('cliente-cc-pagination')).toBeInTheDocument()
+  })
+
+  it('pagina movimientos con limit y offset', async () => {
+    mockCuentaCorriente.mockResolvedValue({
+      ...defaultMockCc,
+      total: 30,
+      limit: 25,
+      offset: 0,
+    })
+    render(<ClienteCuentaCorrienteSection clienteId={1} />)
+    await waitFor(() => {
+      expect(screen.getByTestId('cliente-cc-pagination-next')).toBeEnabled()
+    })
+    fireEvent.click(screen.getByTestId('cliente-cc-pagination-next'))
+    await waitFor(() => {
+      expect(mockCuentaCorriente).toHaveBeenLastCalledWith(
+        1,
+        expect.objectContaining({ limit: 25, offset: 25 }),
+      )
+    })
   })
 })

@@ -17,14 +17,14 @@ On load, the page fetches **`GET /api/reportes/aging`** and shows buckets (label
 With module **`finance.ledger`** enabled, each customer record includes a **Account statement** tab:
 
 - Current balance, credit limit, and balance trend chart.
-- Movement table (invoice, credit note, collection, withholding, bounced cheque, manual adjustment).
+- Paginated movement table (invoice, credit note, collection, withholding, bounced cheque, manual adjustment).
 - AR aging buckets (`0-30`, `31-60`, `61-90`, `90+` days).
 - Audited manual adjustment (`POST /api/clientes/{id}/cuenta-corriente/ajuste`, permission `sales.create`).
 - PDF statement download and email send (`GET` / `POST .../estado-de-cuenta/...`).
 
 Canonical API: `GET /api/clientes/{id}/cuenta-corriente`, `.../saldo`, `.../antiguedad`.
 
-Movements are posted automatically on invoice issue, void via credit note, collection (gross amount), and bounced cheques linked to collections.
+Movements are posted automatically on invoice issue, void via credit note, collection (gross amount; withholdings do not create a separate ledger line), and bounced cheques linked to collections.
 
 ### Quick lookup in Finance (compatibility)
 
