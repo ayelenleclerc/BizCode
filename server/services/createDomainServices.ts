@@ -13,6 +13,7 @@ import { DocumentoCompraImportService } from './DocumentoCompraImportService'
 import { ArticuloProveedoresComparadorService } from './ArticuloProveedoresComparadorService'
 import { ProveedorCatalogoService } from './ProveedorCatalogoService'
 import { ProveedorCuentaCorrienteService } from './ProveedorCuentaCorrienteService'
+import { ClienteCuentaCorrienteService } from './ClienteCuentaCorrienteService'
 import { ReciboPagoService } from './ReciboPagoService'
 import { RemitoService } from './RemitoService'
 import { ChequeService } from './ChequeService'
@@ -53,6 +54,7 @@ export type DomainServices = {
   proveedorCatalogo: ProveedorCatalogoService
   articuloProveedoresComparador: ArticuloProveedoresComparadorService
   proveedorCuentaCorriente: ProveedorCuentaCorrienteService
+  clienteCuentaCorriente: ClienteCuentaCorrienteService
   reciboPago: ReciboPagoService
   remito: RemitoService
   cheque: ChequeService
@@ -90,6 +92,7 @@ export function createDomainServices(prisma: PrismaClient): DomainServices {
     proveedorCatalogo: new ProveedorCatalogoService(prisma),
     articuloProveedoresComparador: new ArticuloProveedoresComparadorService(prisma),
     proveedorCuentaCorriente: new ProveedorCuentaCorrienteService(prisma),
+    clienteCuentaCorriente: new ClienteCuentaCorrienteService(prisma),
     reciboPago: new ReciboPagoService(prisma),
     remito: new RemitoService(prisma),
     cheque: new ChequeService(prisma),

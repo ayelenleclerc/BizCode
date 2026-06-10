@@ -66,6 +66,7 @@
     "reparto-ubicacion:purge": "tsx scripts/reparto-ubicacion-purge-job.ts",
     "arca:retry-pending": "tsx scripts/arca-retry-pending.ts",
     "arca:retry-pending-job": "tsx scripts/arca-retry-pending-job.ts",
+    "backfill:cliente-cc": "tsx scripts/backfill-cliente-cc.ts",
     "inspect:dbf-all": "tsx scripts/inspect-dbf-all.ts",
     "release": "semantic-release"
   },

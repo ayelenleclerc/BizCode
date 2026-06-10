@@ -11,6 +11,7 @@ import type {
 import { facturaFechaToPrismaDate } from '../routes/restDomainShared'
 import { notifyFinanceStakeholders } from '../notifications'
 import type { ServiceResult } from './serviceResults'
+import { ClienteCuentaCorrienteService } from './ClienteCuentaCorrienteService'
 
 const chequeInclude = {
   cliente: { select: { id: true, codigo: true, rsocial: true, cuit: true } },
@@ -297,7 +298,7 @@ export class ChequeService {
           userId,
         },
       })
-      return tx.cheque.update({
+      const updated = await tx.cheque.update({
         where: { id },
         data: {
           estado: rule.to,
@@ -305,6 +306,32 @@ export class ChequeService {
         },
         include: chequeInclude,
       })
+
+      if (action === 'rechazar' && existing.clienteId != null) {
+        const linkedCobro = await tx.cobro.findFirst({
+          where: { tenantId, chequeId: id, clienteId: existing.clienteId },
+          select: { id: true, monto: true, retencionesAplicadas: { select: { importe: true } } },
+        })
+        let compensatory = existing.monto
+        if (linkedCobro) {
+          const retTotal = linkedCobro.retencionesAplicadas.reduce(
+            (sum, r) => sum.add(r.importe),
+            new Decimal(0),
+          )
+          compensatory = linkedCobro.monto.add(retTotal)
+        }
+        const ccService = new ClienteCuentaCorrienteService(tx)
+        await ccService.recordChequeRechazado(
+          tenantId,
+          existing.clienteId,
+          id,
+          compensatory,
+          `cheque-${existing.numero}`,
+          userId,
+        )
+      }
+
+      return updated
     })
 
     if (action === 'rechazar' && existing.clienteId) {

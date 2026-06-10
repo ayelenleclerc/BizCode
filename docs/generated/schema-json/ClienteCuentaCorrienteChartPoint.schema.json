@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "period": {
+      "type": "string"
+    },
+    "saldo": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "period",
+    "saldo"
+  ],
+  "title": "ClienteCuentaCorrienteChartPoint",
+  "type": "object"
+}

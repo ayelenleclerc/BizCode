@@ -74,5 +74,55 @@
       "suspendedBadge": "SUSPENDIDO",
       "readOnly": "Solo lectura — tu rol no puede modificar datos financieros"
     }
+  },
+  "cc": {
+    "sectionTitle": "Cuenta corriente",
+    "saldoActual": "Saldo actual (deuda)",
+    "limiteCredito": "Límite de crédito: {{limite}}",
+    "excedeLimite": "El saldo supera el límite de crédito configurado.",
+    "chartTitle": "Evolución de deuda (6 meses)",
+    "chartAria": "Gráfico de evolución de deuda del cliente",
+    "chartEmpty": "Sin movimientos para graficar.",
+    "saldo": "Saldo",
+    "antiguedadTitle": "Antigüedad de saldos",
+    "antiguedad": {
+      "0-30": "0–30 días",
+      "31-60": "31–60 días",
+      "61-90": "61–90 días",
+      "+90": "Más de 90 días"
+    },
+    "filterTipo": "Tipo",
+    "filterTipoAll": "Todos",
+    "filterFrom": "Desde",
+    "filterTo": "Hasta",
+    "filterApply": "Aplicar filtros",
+    "descargarPdf": "Descargar PDF",
+    "enviarPdf": "Enviar por email",
+    "envioOk": "Estado de cuenta enviado (si SMTP está configurado).",
+    "ajusteOpen": "Ajuste manual",
+    "ajusteTitle": "Ajuste de cuenta corriente",
+    "ajusteMonto": "Monto (+ aumenta deuda, − reduce)",
+    "ajusteMotivo": "Motivo (obligatorio)",
+    "ajusteSubmit": "Registrar ajuste",
+    "ajusteMontoInvalid": "Ingresá un monto distinto de cero.",
+    "ajusteMotivoRequired": "El motivo es obligatorio.",
+    "movimientosEmpty": "No hay movimientos con los filtros seleccionados.",
+    "empty": "No se pudo cargar la cuenta corriente.",
+    "tableCaption": "Movimientos de cuenta corriente",
+    "colFecha": "Fecha",
+    "colTipo": "Tipo",
+    "colReferencia": "Referencia",
+    "colMonto": "Monto",
+    "colSaldo": "Saldo después",
+    "tipo": {
+      "saldo_inicial": "Saldo inicial",
+      "factura": "Factura",
+      "nota_credito": "Nota de crédito",
+      "cobro": "Cobro",
+      "retencion": "Retención",
+      "percepcion": "Percepción",
+      "cheque_rechazado": "Cheque rechazado",
+      "ajuste": "Ajuste manual"
+    }
   }
 }

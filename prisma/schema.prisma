@@ -84,6 +84,7 @@ model Cliente {
   ordenesEntrega OrdenEntrega[]
   remitos        Remito[]
   cheques        Cheque[]
+  movimientosCC  MovimientoClienteCC[]
 
   @@unique([tenantId, codigo])
   @@index([tenantId])
@@ -368,6 +369,7 @@ model Cobro {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   retencionesAplicadas RetencionAplicada[]
+  movimientoCC         MovimientoClienteCC?
 
   @@index([tenantId, clienteId])
   @@index([tenantId, fecha])
@@ -418,6 +420,7 @@ model Factura {
   notasCredito   NotaCredito[]
   retencionesAplicadas RetencionAplicada[]
   remitos        Remito[]
+  movimientoCC   MovimientoClienteCC?
 
   @@unique([tenantId, tipo, prefijo, numero])
   @@index([tenantId])
@@ -443,6 +446,7 @@ model NotaCredito {
   createdById     Int?
   createdBy       AppUser?  @relation("NotaCreditoCreatedBy", fields: [createdById], references: [id])
   createdAt       DateTime  @default(now())
+  movimientoCC    MovimientoClienteCC?
 
   @@unique([tenantId, facturaOrigenId])
   @@index([tenantId, createdAt])
@@ -548,6 +552,7 @@ model Cheque {
   movimientos      ChequeMov[]
   cobros           Cobro[]
   recibosPago      ReciboPago[]
+  movimientoCC     MovimientoClienteCC?
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
 
@@ -661,6 +666,7 @@ model Tenant {
   ordenesCompra       OrdenCompra[]
   comprobantesCompra       ComprobanteCompra[]
   movimientosProveedorCC   MovimientoProveedorCC[]
+  movimientosClienteCC     MovimientoClienteCC[]
   recibosPago              ReciboPago[]
   alertaProveedorConfig    AlertaProveedorConfig?
   alertasProveedorLog      AlertaProveedorLog[]
@@ -893,6 +899,7 @@ model AppUser {
   tenantPlansChanged   TenantPlan[] @relation("TenantPlanChangedBy")
   notasCreditoCreated  NotaCredito[] @relation("NotaCreditoCreatedBy")
   movimientosProveedorCC MovimientoProveedorCC[]
+  movimientosClienteCC   MovimientoClienteCC[]
   recibosPago            ReciboPago[]
   documentosCompraImportados DocumentoCompraImportado[]
   chequeMovimientos      ChequeMov[]
@@ -997,6 +1004,39 @@ model MovimientoProveedorCC {
 
   @@index([tenantId, proveedorId, fecha])
   @@index([tenantId, proveedorId])
+}
+
+/// Customer accounts-receivable ledger (#232).
+model MovimientoClienteCC {
+  id                   Int                @id @default(autoincrement())
+  tenantId             Int
+  tenant               Tenant             @relation(fields: [tenantId], references: [id])
+  clienteId            Int
+  cliente              Cliente            @relation(fields: [clienteId], references: [id])
+  /// saldo_inicial | factura | nota_credito | cobro | retencion | percepcion | cheque_rechazado | ajuste
+  tipo                 String             @db.VarChar(20)
+  referencia           String?            @db.VarChar(40)
+  /// Positive increases customer debt; negative reduces debt.
+  monto                Decimal            @db.Decimal(14, 2)
+  saldoPost            Decimal            @db.Decimal(14, 2)
+  fecha                DateTime
+  usuarioId            Int
+  usuario              AppUser            @relation(fields: [usuarioId], references: [id])
+  notas                String?            @db.VarChar(500)
+  facturaId            Int?               @unique
+  factura              Factura?           @relation(fields: [facturaId], references: [id])
+  cobroId              Int?               @unique
+  cobro                Cobro?             @relation(fields: [cobroId], references: [id])
+  notaCreditoId        Int?               @unique
+  notaCredito          NotaCredito?       @relation(fields: [notaCreditoId], references: [id])
+  chequeId             Int?               @unique
+  cheque               Cheque?            @relation(fields: [chequeId], references: [id])
+  retencionAplicadaId  Int?               @unique
+  retencionAplicada    RetencionAplicada? @relation(fields: [retencionAplicadaId], references: [id])
+  createdAt            DateTime           @default(now())
+
+  @@index([tenantId, clienteId, fecha])
+  @@index([tenantId, clienteId])
 }
 
 model StockAjuste {
@@ -1134,6 +1174,7 @@ model RetencionAplicada {
   importe       Decimal          @db.Decimal(14, 2)
   constanciaNum String?          @db.VarChar(30)
   createdAt     DateTime         @default(now())
+  movimientoCC  MovimientoClienteCC?
 
   @@index([tenantId, createdAt])
   @@index([tenantId, entidadTipo, entidadId])

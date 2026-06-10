@@ -60,7 +60,7 @@ export function registerFacturasRoutes(app: Application, ctx: RestRouteContext):
         }
 
         const parsedValue = req.body as FacturaInput
-        const result = await factura.create(tenantId, parsedValue)
+        const result = await factura.create(tenantId, parsedValue, authReq.auth!.claims.userId)
         if (!result.ok) {
           res.status(result.status).json({ success: false, error: result.error })
           return

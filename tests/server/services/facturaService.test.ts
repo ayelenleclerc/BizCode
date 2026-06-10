@@ -1,6 +1,8 @@
 ﻿import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { PrismaClient } from '@prisma/client'
 import { FacturaService } from '../../../server/services/FacturaService'
+import { createCcTxLayer } from '../../helpers/movimientoClienteCcPrismaMock'
+import { Decimal } from '@prisma/client/runtime/library'
 
 const baseFacturaInput = {
   fecha: '2026-05-01',
@@ -43,7 +45,7 @@ describe('FacturaService', () => {
   })
 
   it('rejects create when clienteId is not in tenant', async () => {
-    const result = await service.create(1, baseFacturaInput)
+    const result = await service.create(1, baseFacturaInput, 1)
 
     expect(result.ok).toBe(false)
     if (!result.ok) {
@@ -56,7 +58,7 @@ describe('FacturaService', () => {
   it('rejects create when cliente is suspended', async () => {
     vi.mocked(prisma.cliente.findFirst).mockResolvedValue({ suspended: true } as never)
 
-    const result = await service.create(1, baseFacturaInput)
+    const result = await service.create(1, baseFacturaInput, 1)
 
     expect(result.ok).toBe(false)
     if (!result.ok) {
@@ -69,17 +71,23 @@ describe('FacturaService', () => {
     const facturaRow = {
       id: 1,
       estado: 'A',
-      total: 100,
+      total: new Decimal(100),
       clienteId: 3,
       estadoCae: 'pending',
       tipo: 'B',
+      prefijo: '0001',
+      numero: 1,
     }
-    const notaRow = { id: 9, estadoCae: 'not_required', facturaOrigenId: 1, monto: 100 }
+    const notaRow = {
+      id: 9,
+      estadoCae: 'not_required',
+      facturaOrigenId: 1,
+      monto: new Decimal(100),
+      createdAt: new Date(),
+    }
     const tx = {
+      ...createCcTxLayer(),
       factura: { update: vi.fn().mockResolvedValue({ ...facturaRow, estado: 'N' }) },
-      cliente: {
-        update: vi.fn().mockResolvedValue({ id: 3, rsocial: 'C', balance: 0, creditLimit: null }),
-      },
       notaCredito: { create: vi.fn().mockResolvedValue(notaRow) },
       retencionAplicada: { deleteMany: vi.fn().mockResolvedValue({ count: 0 }) },
       auditEvent: { create: vi.fn().mockResolvedValue({ id: 1 }) },

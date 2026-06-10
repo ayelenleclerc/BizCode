@@ -629,6 +629,57 @@ export const clientesAPI = {
       return handleError(error as AxiosError<ApiErrorPayload>)
     }
   },
+
+  cuentaCorriente: async (
+    id: number,
+    params?: { tipo?: string; desde?: string; hasta?: string; limit?: number; offset?: number },
+  ) => {
+    try {
+      const response = await api.get(`/clientes/${id}/cuenta-corriente`, { params })
+      return response.data.data as import('@/types').ClienteCuentaCorriente
+    } catch (error) {
+      handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  cuentaCorrienteSaldo: async (id: number) => {
+    try {
+      const response = await api.get(`/clientes/${id}/cuenta-corriente/saldo`)
+      return response.data.data as import('@/types').ClienteCuentaCorrienteSaldo
+    } catch (error) {
+      handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  cuentaCorrienteAntiguedad: async (id: number) => {
+    try {
+      const response = await api.get(`/clientes/${id}/cuenta-corriente/antiguedad`)
+      return response.data.data as import('@/types').ClienteCuentaCorrienteAntiguedad
+    } catch (error) {
+      handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  cuentaCorrienteAjuste: async (id: number, body: { monto: number; motivo: string }) => {
+    try {
+      const response = await api.post(`/clientes/${id}/cuenta-corriente/ajuste`, body)
+      return response.data.data as import('@/types').MovimientoClienteCC
+    } catch (error) {
+      handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  cuentaCorrienteEnviar: async (
+    id: number,
+    body: { email?: string; desde?: string; hasta?: string },
+  ) => {
+    try {
+      const response = await api.post(`/clientes/${id}/cuenta-corriente/estado-de-cuenta/enviar`, body)
+      return response.data.data as { sent: boolean; email: string }
+    } catch (error) {
+      handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
 }
 
 // ============ ARTICULOS ============

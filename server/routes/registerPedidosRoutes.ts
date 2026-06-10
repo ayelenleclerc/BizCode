@@ -152,11 +152,17 @@ export function registerPedidosRoutes(app: Application, ctx: RestRouteContext): 
     requirePermission('sales.create'),
     validateBody(pedidoInvoiceBodySchema),
     async (req: Request, res: Response) => {
+      const authReq = req as AuthenticatedRequest
       try {
         const tenantId = getTenantId(req)
         const id = parseInt(String(req.params.id), 10)
         const parsedValue = req.body as PedidoInvoiceInput
-        const result = await pedido.invoice(tenantId, id, parsedValue)
+        const result = await pedido.invoice(
+          tenantId,
+          id,
+          parsedValue,
+          authReq.auth!.claims.userId,
+        )
         if (!result.ok) {
           res.status(result.status).json({ success: false, error: result.error })
           return

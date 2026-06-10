@@ -8,6 +8,10 @@ import request from 'supertest'
 import type { PrismaClient } from '@prisma/client'
 import { Decimal } from '@prisma/client/runtime/library'
 import { createApp } from '../../server/createApp'
+import {
+  createMovimientoClienteCCPrismaMock,
+  extendClientePrismaForCc,
+} from '../helpers/movimientoClienteCcPrismaMock'
 
 const CLIENTE_ROW = {
   id: 1,
@@ -63,10 +67,12 @@ const RUBRO_ROW = {
 const FACTURA_VOID_ROW = {
   id: 7,
   estado: 'A',
-  total: 100,
+  total: new Decimal(100),
   clienteId: 1,
   estadoCae: 'pending',
   tipo: 'B',
+  prefijo: '0001',
+  numero: 42,
 }
 
 const ORDEN_ENTREGA_ROW = {
@@ -297,7 +303,7 @@ function basePrismaForMutations(): {
       tenantId: 1,
       facturaOrigenId: 7,
       motivo: 'Devolución',
-      monto: 100,
+      monto: new Decimal(100),
       estadoCae: 'not_required',
       cae: null,
       caeVto: null,
@@ -314,6 +320,8 @@ function basePrismaForMutations(): {
     deleteMany: vi.fn().mockResolvedValue({ count: 0 }),
   }
 
+  prisma.movimientoClienteCC = createMovimientoClienteCCPrismaMock()
+
   prisma.$transaction = vi.fn(async (fn: (tx: Tx) => Promise<unknown>) =>
     fn(prisma as unknown as Tx),
   ) as typeof prisma.$transaction
@@ -324,7 +332,7 @@ function basePrismaForMutations(): {
   facturaDelegate.create = vi.fn().mockResolvedValue({ ...facturaCreated, items: facturaCreated.items })
 
   prisma.cliente = {
-    ...(prisma.cliente as Record<string, unknown>),
+    ...extendClientePrismaForCc(prisma.cliente as Record<string, unknown>),
     update: vi
       .fn()
       .mockResolvedValue({

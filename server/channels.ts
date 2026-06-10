@@ -304,6 +304,48 @@ export type SupplierNotificationChannels = {
  * @es Despacha alertas de facturas a pagar respetando canales del tenant (#275).
  * @pt-BR Despacha alertas de faturas a pagar respeitando canais do tenant (#275).
  */
+/**
+ * @en Sends customer account statement PDF by email; no-op when SMTP is not configured (#232).
+ * @es Envía PDF de estado de cuenta por email; no-op si SMTP no está configurado (#232).
+ * @pt-BR Envia PDF de extrato por email; no-op se SMTP não estiver configurado (#232).
+ */
+export async function sendClienteEstadoCuentaEmail(
+  to: string,
+  rsocial: string,
+  saldo: string,
+  pdf: Buffer,
+): Promise<void> {
+  if (!isSmtpConfigured()) return
+  const smtp = resolveSmtpTransportConfig()
+  if (!smtp) return
+  try {
+    const transporter = nodemailer.createTransport({
+      host: smtp.host,
+      port: smtp.port,
+      secure: smtp.secure,
+      auth: smtp.auth,
+    })
+    await transporter.sendMail({
+      from: smtp.from,
+      to,
+      subject: `Estado de cuenta — ${rsocial}`,
+      text: `Adjuntamos el estado de cuenta de ${rsocial}. Saldo actual: $ ${saldo}.`,
+      attachments: [
+        {
+          filename: 'estado-de-cuenta.pdf',
+          content: pdf,
+          contentType: 'application/pdf',
+        },
+      ],
+    })
+  } catch (err) {
+    logger.warn(
+      { err: err instanceof Error ? { name: err.name, message: err.message } : String(err) },
+      '[channels] cliente estado cuenta email failed',
+    )
+  }
+}
+
 export async function dispatchSupplierNotification(
   prisma: PrismaClient,
   tenantId: number,

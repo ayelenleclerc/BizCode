@@ -11,6 +11,7 @@ import { buildArticuloCreateBody, createIntegrationRubro } from '../fixtures/cat
 
 async function truncateSalesData(prisma: PrismaClient): Promise<void> {
   await prisma.$transaction([
+    prisma.movimientoClienteCC.deleteMany(),
     prisma.facturaItem.deleteMany(),
     prisma.pedido.deleteMany(),
     prisma.factura.deleteMany(),

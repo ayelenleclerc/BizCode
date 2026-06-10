@@ -31,6 +31,13 @@ function buildPrismaMock(overrides: Partial<Record<string, unknown>> = {}): Pris
       findFirst: vi.fn().mockResolvedValue(null),
       aggregate: vi.fn().mockResolvedValue({ _count: { id: 0 }, _sum: { monto: null } }),
     },
+    movimientoClienteCC: {
+      findFirst: vi.fn().mockResolvedValue(null),
+      findMany: vi.fn().mockResolvedValue([]),
+      count: vi.fn().mockResolvedValue(0),
+      create: vi.fn(),
+    },
+    paramEmpresa: { findFirst: vi.fn().mockResolvedValue(null) },
     notification: {
       findMany: vi.fn().mockResolvedValue([]),
       findFirst: vi.fn().mockResolvedValue(null),
@@ -167,32 +174,35 @@ describe('GET /api/reportes/cuenta-corriente/:clienteId', () => {
         count: vi.fn(),
         findMany: vi.fn(),
       },
-      factura: {
+      movimientoClienteCC: {
+        findFirst: vi.fn().mockResolvedValue({
+          id: 2,
+          saldoPost: new Decimal(750),
+        }),
         findMany: vi.fn().mockResolvedValue([
           {
             id: 1,
+            tipo: 'factura',
+            referencia: 'B-0001-10',
+            monto: new Decimal(1000),
+            saldoPost: new Decimal(1000),
             fecha: new Date('2026-05-01'),
-            tipo: 'B',
-            prefijo: '0001',
-            numero: 10,
-            total: new Decimal(1000),
+            facturaId: 1,
+            cobroId: null,
           },
-        ]),
-        aggregate: vi.fn(),
-        findFirst: vi.fn(),
-      },
-      cobro: {
-        findMany: vi.fn().mockResolvedValue([
           {
-            id: 5,
-            fecha: new Date('2026-05-10'),
-            monto: new Decimal(250),
+            id: 2,
+            tipo: 'cobro',
             referencia: 'REC-1',
+            monto: new Decimal(-250),
+            saldoPost: new Decimal(750),
+            fecha: new Date('2026-05-10'),
+            facturaId: null,
+            cobroId: 5,
           },
         ]),
         count: vi.fn(),
-        findFirst: vi.fn(),
-        aggregate: vi.fn(),
+        create: vi.fn(),
       },
     })
     const app = createApp(prisma)

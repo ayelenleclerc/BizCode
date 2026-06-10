@@ -222,6 +222,7 @@ export class PedidoService {
     tenantId: number,
     id: number,
     invoiceInput: PedidoInvoiceInput,
+    userId: number,
   ): Promise<ServiceResult<PedidoRow>> {
     const pedido = await this.prisma.pedido.findFirst({
       where: { id, tenantId },
@@ -258,16 +259,20 @@ export class PedidoService {
       pedido.cliente.condIva,
     )
 
-    const facturaResult = await this.facturaService.create(tenantId, {
-      fecha: invoiceInput.fecha,
-      tipo: invoiceInput.tipo,
-      prefijo: invoiceInput.prefijo,
-      numero: invoiceInput.numero,
-      clienteId: pedido.clienteId,
-      formaPagoId: invoiceInput.formaPagoId,
-      ...totals,
-      items: facturaItems,
-    })
+    const facturaResult = await this.facturaService.create(
+      tenantId,
+      {
+        fecha: invoiceInput.fecha,
+        tipo: invoiceInput.tipo,
+        prefijo: invoiceInput.prefijo,
+        numero: invoiceInput.numero,
+        clienteId: pedido.clienteId,
+        formaPagoId: invoiceInput.formaPagoId,
+        ...totals,
+        items: facturaItems,
+      },
+      userId,
+    )
     if (!facturaResult.ok) {
       return facturaResult
     }

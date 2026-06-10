@@ -1,6 +1,7 @@
 import type { PrismaClient } from '@prisma/client'
 import { Decimal } from '@prisma/client/runtime/library'
 import { endOfDay } from '../reportesPeriodUtils'
+import { ClienteCuentaCorrienteService } from './ClienteCuentaCorrienteService'
 
 export const AGING_BUCKET_LABELS = ['0-30d', '31-60d', '61-90d', '>90d'] as const
 export type AgingBucketLabel = (typeof AGING_BUCKET_LABELS)[number]
@@ -22,7 +23,15 @@ export type AgingArResult = {
   }
 }
 
-export type CuentaCorrienteLineType = 'factura' | 'cobro' | 'saldo_inicial'
+export type CuentaCorrienteLineType =
+  | 'factura'
+  | 'cobro'
+  | 'saldo_inicial'
+  | 'nota_credito'
+  | 'retencion'
+  | 'percepcion'
+  | 'cheque_rechazado'
+  | 'ajuste'
 
 export type CuentaCorrienteLine = {
   tipo: CuentaCorrienteLineType
@@ -89,11 +98,6 @@ export function bucketLabelForDaysPastDue(daysPastDue: number): AgingBucketLabel
   if (daysPastDue <= 60) return '31-60d'
   if (daysPastDue <= 90) return '61-90d'
   return '>90d'
-}
-
-function decimalToMoneyString(value: Decimal | number): string {
-  const n = value instanceof Decimal ? value.toNumber() : value
-  return n.toFixed(2)
 }
 
 type InvoiceForAging = {
@@ -185,114 +189,8 @@ export class ReportesFinancierosService {
   }
 
   async getCuentaCorriente(tenantId: number, clienteId: number): Promise<CuentaCorrienteResult | null> {
-    const cliente = await this.prisma.cliente.findFirst({
-      where: { id: clienteId, tenantId },
-      select: {
-        id: true,
-        codigo: true,
-        rsocial: true,
-        balance: true,
-        balanceInicial: true,
-      },
-    })
-    if (!cliente) return null
-
-    const [facturas, cobros] = await Promise.all([
-      this.prisma.factura.findMany({
-        where: { tenantId, clienteId, estado: 'A' },
-        select: {
-          id: true,
-          fecha: true,
-          tipo: true,
-          prefijo: true,
-          numero: true,
-          total: true,
-        },
-      }),
-      this.prisma.cobro.findMany({
-        where: { tenantId, clienteId },
-        select: {
-          id: true,
-          fecha: true,
-          monto: true,
-          referencia: true,
-        },
-      }),
-    ])
-
-    type Sortable = {
-      sortKey: number
-      tieId: number
-      line: Omit<CuentaCorrienteLine, 'saldo'>
-    }
-
-    const items: Sortable[] = []
-
-    const balanceInicial = cliente.balanceInicial.toNumber()
-    if (balanceInicial !== 0) {
-      items.push({
-        sortKey: 0,
-        tieId: 0,
-        line: {
-          tipo: 'saldo_inicial',
-          fecha: '',
-          referencia: 'balance_inicial',
-          debito: balanceInicial > 0 ? balanceInicial.toFixed(2) : '0.00',
-          credito: balanceInicial < 0 ? Math.abs(balanceInicial).toFixed(2) : '0.00',
-        },
-      })
-    }
-
-    for (const f of facturas) {
-      items.push({
-        sortKey: f.fecha.getTime(),
-        tieId: f.id,
-        line: {
-          tipo: 'factura',
-          fecha: f.fecha.toISOString(),
-          referencia: `${f.tipo}-${f.prefijo}-${f.numero}`,
-          debito: decimalToMoneyString(f.total),
-          credito: '0.00',
-          facturaId: f.id,
-        },
-      })
-    }
-
-    for (const c of cobros) {
-      items.push({
-        sortKey: c.fecha.getTime(),
-        tieId: c.id,
-        line: {
-          tipo: 'cobro',
-          fecha: c.fecha.toISOString(),
-          referencia: c.referencia?.trim() || `cobro-${c.id}`,
-          debito: '0.00',
-          credito: decimalToMoneyString(c.monto),
-          cobroId: c.id,
-        },
-      })
-    }
-
-    items.sort((a, b) => {
-      if (a.sortKey !== b.sortKey) return a.sortKey - b.sortKey
-      return a.tieId - b.tieId
-    })
-
-    let running = 0
-    const lineas: CuentaCorrienteLine[] = items.map((item) => {
-      const debit = Number.parseFloat(item.line.debito)
-      const credit = Number.parseFloat(item.line.credito)
-      running += debit - credit
-      return { ...item.line, saldo: running.toFixed(2) }
-    })
-
-    return {
-      clienteId: cliente.id,
-      codigo: cliente.codigo,
-      rsocial: cliente.rsocial,
-      balanceActual: decimalToMoneyString(cliente.balance),
-      lineas,
-    }
+    const ccService = new ClienteCuentaCorrienteService(this.prisma)
+    return ccService.getLegacyCuentaCorriente(tenantId, clienteId)
   }
 
   /**

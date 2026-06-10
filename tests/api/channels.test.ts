@@ -8,6 +8,10 @@ import { beforeEach, afterEach, describe, expect, it, vi } from 'vitest'
 import request from 'supertest'
 import type { PrismaClient } from '@prisma/client'
 import { createApp } from '../../server/createApp'
+import {
+  createMovimientoClienteCCPrismaMock,
+  extendClientePrismaForCc,
+} from '../helpers/movimientoClienteCcPrismaMock'
 
 // ─── Hoisted mocks (must be declared before vi.mock factories) ─────────────────
 
@@ -43,13 +47,14 @@ const ARTICULO_STOCK_ROW = {
 function buildPrismaMock(overrides: Partial<Record<string, unknown>> = {}): PrismaClient {
   return {
     deliveryZone: { findMany: vi.fn().mockResolvedValue([]), findFirst: vi.fn().mockResolvedValue(null), create: vi.fn().mockResolvedValue(null), update: vi.fn().mockResolvedValue(null) },
-    cliente: {
+    cliente: extendClientePrismaForCc({
       findMany: vi.fn().mockResolvedValue([]),
       findFirst: vi.fn().mockResolvedValue({ id: 1, suspended: false }),
       findUnique: vi.fn().mockResolvedValue({ email: 'mgr@example.com', telef: '+5491155550000' }),
       create: vi.fn().mockResolvedValue(null),
       update: vi.fn().mockResolvedValue(null),
-    },
+    }),
+    movimientoClienteCC: createMovimientoClienteCCPrismaMock(),
     articulo: {
       findMany: vi.fn().mockResolvedValue([ARTICULO_STOCK_ROW]),
       update: vi.fn().mockResolvedValue(ARTICULO_STOCK_ROW),
@@ -304,22 +309,35 @@ describe('POST /api/facturas — dispatchNotification failure is swallowed', () 
       $transaction: vi.fn(async (fn: unknown) => {
         if (typeof fn === 'function') {
           const inner = buildPrismaMock({
-            cliente: {
+            cliente: extendClientePrismaForCc({
               findMany: vi.fn().mockResolvedValue([]),
               findFirst: vi.fn().mockResolvedValue({ id: 1, suspended: false }),
               findUnique: vi.fn().mockResolvedValue(null),
               create: vi.fn().mockResolvedValue(null),
               update: vi.fn().mockResolvedValue(updatedCliente),
-            },
+            }),
             articulo: {
       findMany: vi.fn().mockResolvedValue([ARTICULO_STOCK_ROW]),
       update: vi.fn().mockResolvedValue(ARTICULO_STOCK_ROW),
     },
             factura: {
               findMany: vi.fn().mockResolvedValue([]),
-              create: vi.fn().mockResolvedValue({ id: 99, total: 20000, items: [] }),
+              create: vi.fn().mockResolvedValue({
+                id: 99,
+                tenantId: 1,
+                clienteId: 1,
+                estado: 'A',
+                tipo: 'B',
+                prefijo: '0001',
+                numero: 1,
+                total: 20000,
+                fecha: new Date(),
+                items: [],
+                cliente: { id: 1 },
+              }),
               aggregate: vi.fn().mockResolvedValue({ _count: { id: 0 }, _sum: { total: null } }),
             },
+            retencionAplicada: { create: vi.fn().mockResolvedValue({ id: 1 }) },
           })
           return fn(inner)
         }

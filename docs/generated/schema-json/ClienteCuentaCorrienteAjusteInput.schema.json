@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "monto": {
+      "type": "number"
+    },
+    "motivo": {
+      "maxLength": 500,
+      "type": "string"
+    }
+  },
+  "required": [
+    "monto",
+    "motivo"
+  ],
+  "title": "ClienteCuentaCorrienteAjusteInput",
+  "type": "object"
+}

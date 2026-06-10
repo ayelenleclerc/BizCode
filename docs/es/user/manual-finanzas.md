@@ -12,8 +12,24 @@ Al cargar, la página consulta **`GET /api/reportes/aging`** y muestra buckets (
 
 ## Cuenta corriente
 
+### Ficha de cliente (`finance.ledger`, #232)
+
+Con el módulo **`finance.ledger`** habilitado, la ficha de cada cliente incluye la pestaña **Cuenta corriente**:
+
+- Saldo actual, límite de crédito y gráfico de evolución.
+- Tabla de movimientos (factura, nota de crédito, cobro, retención, cheque rechazado, ajuste).
+- Antigüedad de saldos por buckets (`0-30`, `31-60`, `61-90`, `+90` días).
+- Ajuste manual auditado (`POST /api/clientes/{id}/cuenta-corriente/ajuste`, permiso `sales.create`).
+- Descarga de estado de cuenta PDF y envío por email (`GET` / `POST .../estado-de-cuenta/...`).
+
+API canónica: `GET /api/clientes/{id}/cuenta-corriente`, `.../saldo`, `.../antiguedad`.
+
+Los movimientos se registran automáticamente al emitir facturas, anular con nota de crédito, registrar cobros (monto bruto) y rechazar cheques vinculados a cobros.
+
+### Consulta rápida en Finanzas (compatibilidad)
+
 1. Ingrese un **id de cliente** (entero positivo).
-2. Ejecute la acción para cargar la cuenta corriente (`GET /api/reportes/cuenta-corriente/:clienteId`).
+2. Ejecute la acción para cargar la cuenta corriente (`GET /api/reportes/cuenta-corriente/:clienteId` — delega al ledger y mantiene formato débito/crédito legacy).
 3. Revise las líneas con fecha, tipo, referencia, débito, crédito y saldo acumulado.
 
 Si el cliente no existe, la API devuelve 404.
@@ -30,7 +46,7 @@ La configuración del job automático (días de gracia, zona horaria IANA, horar
 
 ## Referencia API
 
-[`docs/api/openapi.yaml`](../../api/openapi.yaml) — rutas `/api/reportes/aging` y `/api/reportes/cuenta-corriente/{clienteId}`.
+[`docs/api/openapi.yaml`](../../api/openapi.yaml) — rutas `/api/reportes/aging`, `/api/reportes/cuenta-corriente/{clienteId}` y `/api/clientes/{id}/cuenta-corriente/*`.
 
 ## Notas de crédito (`billing.credit_notes`)
 

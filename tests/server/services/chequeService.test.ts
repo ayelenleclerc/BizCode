@@ -1,6 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { Decimal } from '@prisma/client/runtime/library'
 import { ChequeService } from '../../../server/services/ChequeService'
+import {
+  createMovimientoClienteCCPrismaMock,
+  extendClientePrismaForCc,
+} from '../../helpers/movimientoClienteCcPrismaMock'
 
 function buildPrisma() {
   const cheques: Array<Record<string, unknown>> = []
@@ -50,7 +54,9 @@ function buildPrisma() {
     },
     chequeMov: { create: vi.fn(async () => ({ id: 1 })) },
     proveedor: { findFirst: vi.fn(async () => ({ id: 2 })) },
-    cobro: { updateMany: vi.fn() },
+    cobro: { updateMany: vi.fn(), findFirst: vi.fn(async () => null) },
+    cliente: extendClientePrismaForCc({}),
+    movimientoClienteCC: createMovimientoClienteCCPrismaMock(),
     notification: { createMany: vi.fn() },
     appUser: { findMany: vi.fn(async () => [{ id: 1 }]) },
     $transaction: vi.fn(async (fn: (tx: unknown) => Promise<unknown>) => fn(prisma)),
