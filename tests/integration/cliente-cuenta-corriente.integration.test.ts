@@ -11,19 +11,29 @@ import { createApp } from '../../server/createApp'
 import { ClienteCuentaCorrienteService } from '../../server/services/ClienteCuentaCorrienteService'
 
 async function truncateClienteCc(prisma: PrismaClient): Promise<void> {
+  const tenantId = 1
   await prisma.$transaction([
-    prisma.movimientoClienteCC.deleteMany(),
-    prisma.reciboCobroImputacion.deleteMany(),
-    prisma.reciboCobroForma.deleteMany(),
-    prisma.reciboCobro.deleteMany(),
-    prisma.retencionAplicada.deleteMany(),
-    prisma.chequeMov.deleteMany(),
-    prisma.cheque.deleteMany(),
-    prisma.notaCredito.deleteMany(),
-    prisma.cobro.deleteMany(),
-    prisma.facturaItem.deleteMany(),
-    prisma.factura.deleteMany(),
-    prisma.cliente.deleteMany(),
+    prisma.movimientoClienteCC.deleteMany({ where: { tenantId } }),
+    prisma.reciboCobroImputacion.deleteMany({ where: { reciboCobro: { tenantId } } }),
+    prisma.reciboCobroForma.deleteMany({ where: { reciboCobro: { tenantId } } }),
+    prisma.reciboCobro.deleteMany({ where: { tenantId } }),
+    prisma.retencionAplicada.deleteMany({ where: { tenantId } }),
+    prisma.chequeMov.deleteMany({ where: { cheque: { tenantId } } }),
+    prisma.cheque.deleteMany({ where: { tenantId } }),
+    prisma.notaCredito.deleteMany({ where: { tenantId } }),
+    prisma.cobro.deleteMany({ where: { tenantId } }),
+    prisma.cobroRecordatorio.deleteMany({ where: { factura: { tenantId } } }),
+    prisma.repartoItem.deleteMany({ where: { reparto: { tenantId } } }),
+    prisma.repartoUbicacion.deleteMany({ where: { reparto: { tenantId } } }),
+    prisma.reparto.deleteMany({ where: { tenantId } }),
+    prisma.remitoItem.deleteMany({ where: { remito: { tenantId } } }),
+    prisma.remito.deleteMany({ where: { tenantId } }),
+    prisma.ordenEntrega.deleteMany({ where: { tenantId } }),
+    prisma.pedidoItem.deleteMany({ where: { pedido: { tenantId } } }),
+    prisma.pedido.deleteMany({ where: { tenantId } }),
+    prisma.facturaItem.deleteMany({ where: { factura: { tenantId } } }),
+    prisma.factura.deleteMany({ where: { tenantId } }),
+    prisma.cliente.deleteMany({ where: { tenantId } }),
   ])
 }
 
