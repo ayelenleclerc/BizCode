@@ -5,7 +5,7 @@ import 'dotenv/config'
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 import request from 'supertest'
 import type { Application } from 'express'
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient, UserRole } from '@prisma/client'
 import { Decimal } from '@prisma/client/runtime/library'
 import { createApp } from '../../server/createApp'
 import { ClienteCuentaCorrienteService } from '../../server/services/ClienteCuentaCorrienteService'
@@ -45,9 +45,25 @@ async function ensureBypassTenant(prisma: PrismaClient): Promise<void> {
   })
 }
 
+async function ensureBypassUser(prisma: PrismaClient): Promise<number> {
+  const user = await prisma.appUser.upsert({
+    where: { tenantId_username: { tenantId: 1, username: 'int-owner-cc-232' } },
+    create: {
+      tenantId: 1,
+      username: 'int-owner-cc-232',
+      passwordHash: 'x',
+      role: UserRole.owner,
+      active: true,
+    },
+    update: { active: true, role: UserRole.owner },
+  })
+  return user.id
+}
+
 describe('Cliente cuenta corriente — integración PostgreSQL (#232 AC)', () => {
   let prisma: PrismaClient
   let app: Application
+  let bypassUserId: number
 
   beforeAll(async () => {
     if (!process.env.DATABASE_URL?.trim()) {
@@ -59,6 +75,8 @@ describe('Cliente cuenta corriente — integración PostgreSQL (#232 AC)', () =>
     app = createApp(prisma)
     await prisma.$connect()
     await ensureBypassTenant(prisma)
+    bypassUserId = await ensureBypassUser(prisma)
+    process.env.BIZCODE_TEST_USER_ID = String(bypassUserId)
   })
 
   afterAll(async () => {
@@ -101,7 +119,7 @@ describe('Cliente cuenta corriente — integración PostgreSQL (#232 AC)', () =>
     })
 
     const cc = new ClienteCuentaCorrienteService(prisma)
-    await cc.recordFromFactura(1, factura, 1)
+    await cc.recordFromFactura(1, factura, bypassUserId)
 
     const reciboRes = await request(app)
       .post(`/api/clientes/${cliente.id}/recibos`)
