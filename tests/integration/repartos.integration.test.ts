@@ -10,6 +10,7 @@ import { createApp } from '../../server/createApp'
 
 async function truncateRepartosData(prisma: PrismaClient): Promise<void> {
   await prisma.$transaction([
+    prisma.movimientoClienteCC.deleteMany({ where: { tenantId: 1 } }),
     prisma.repartoItem.deleteMany(),
     prisma.reparto.deleteMany(),
     prisma.ordenEntrega.deleteMany({ where: { tenantId: 1 } }),
