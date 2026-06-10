@@ -50,6 +50,8 @@ tags:
     description: Customer payment collections
   - name: cobranzas
     description: Overdue invoice reminders (#134)
+  - name: cheques
+    description: Check portfolio — physical and ECHEQ (#231, module fiscal.cheques)
   - name: formasPago
     description: Payment methods
   - name: users
@@ -4115,6 +4117,325 @@ paths:
                 type: string
                 format: binary
 
+  /api/cheques/resumen:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [cheques]
+      summary: Check portfolio summary
+      description: Aggregates for in-portfolio, due within 7 days and rejected checks. Requires module `fiscal.cheques`.
+      responses:
+        '200':
+          description: Portfolio summary totals
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChequeResumenEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /api/cheques:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [cheques]
+      summary: List checks
+      description: Paginated portfolio list. Requires module `fiscal.cheques`.
+      parameters:
+        - $ref: '#/components/parameters/ListLimit'
+        - $ref: '#/components/parameters/ListOffset'
+        - name: tipo
+          in: query
+          schema:
+            type: string
+            enum: [recibido, emitido]
+        - name: estado
+          in: query
+          schema:
+            type: string
+            enum: [en_cartera, emitido, depositado, endosado, descontado, cobrado, rechazado, anulado]
+        - name: banco
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Paginated checks
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChequeListEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+    post:
+      tags: [cheques]
+      summary: Register check in portfolio
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChequeInput'
+      responses:
+        '201':
+          description: Check created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChequeEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '409':
+          description: Duplicate bank/number
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+
+  /api/cheques/{id}:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    get:
+      tags: [cheques]
+      summary: Get check
+      responses:
+        '200':
+          description: Check detail
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChequeEnvelope'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+    put:
+      tags: [cheques]
+      summary: Update check (en_cartera only)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChequeUpdateInput'
+      responses:
+        '200':
+          description: Updated check
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChequeEnvelope'
+        '409':
+          description: Only en_cartera checks can be updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+
+  /api/cheques/{id}/depositar:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    post:
+      tags: [cheques]
+      summary: Deposit check
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChequeTransicionInput'
+      responses:
+        '200':
+          description: Deposited check
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChequeEnvelope'
+
+  /api/cheques/{id}/endosar:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    post:
+      tags: [cheques]
+      summary: Endorse check to supplier
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChequeTransicionInput'
+      responses:
+        '200':
+          description: Endorsed check
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChequeEnvelope'
+
+  /api/cheques/{id}/descontar:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    post:
+      tags: [cheques]
+      summary: Discount check
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChequeTransicionInput'
+      responses:
+        '200':
+          description: Discounted check
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChequeEnvelope'
+
+  /api/cheques/{id}/cobrar:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    post:
+      tags: [cheques]
+      summary: Mark check as collected
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChequeTransicionInput'
+      responses:
+        '200':
+          description: Collected check
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChequeEnvelope'
+
+  /api/cheques/{id}/rechazar:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    post:
+      tags: [cheques]
+      summary: Reject check
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChequeTransicionInput'
+      responses:
+        '200':
+          description: Rejected check
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChequeEnvelope'
+
+  /api/cheques/{id}/devolver-cartera:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    post:
+      tags: [cheques]
+      summary: Return rejected check to portfolio
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChequeTransicionInput'
+      responses:
+        '200':
+          description: Check returned to portfolio
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChequeEnvelope'
+
+  /api/cheques/{id}/anular:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    post:
+      tags: [cheques]
+      summary: Void check in portfolio
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChequeTransicionInput'
+      responses:
+        '200':
+          description: Voided check
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChequeEnvelope'
+
+  /api/cheques/alertas/run:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    post:
+      tags: [cheques]
+      summary: Run due-soon check alerts job
+      responses:
+        '200':
+          description: Alert job result
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [success, data]
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      sent:
+                        type: integer
+                      skipped:
+                        type: integer
+
   /api/notas-credito:
     parameters:
       - $ref: '#/components/parameters/BizcodeChannelHeader'
@@ -6772,6 +7093,13 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ReciboPagoRetencionInput'
+        chequeId:
+          type: integer
+          nullable: true
+          description: Link existing portfolio check (#231).
+        chequeNuevo:
+          $ref: '#/components/schemas/ChequeInput'
+          description: Create received check when recording collection (#231).
 
     CobroRetencion:
       type: object
@@ -8018,6 +8346,10 @@ components:
           type: string
           maxLength: 500
           nullable: true
+        chequeId:
+          type: integer
+          nullable: true
+          description: Portfolio check to endorse when metodoPago is cheque or echeq (#231).
         facturas:
           type: array
           minItems: 1
@@ -9395,6 +9727,217 @@ components:
           type: integer
         offset:
           type: integer
+
+    Cheque:
+      type: object
+      required:
+        - id
+        - tipo
+        - modalidad
+        - numero
+        - banco
+        - libradorNombre
+        - monto
+        - moneda
+        - fechaEmision
+        - fechaVencimiento
+        - estado
+      properties:
+        id:
+          type: integer
+        tipo:
+          type: string
+          enum: [recibido, emitido]
+        modalidad:
+          type: string
+          enum: [fisico, echeq]
+        numero:
+          type: string
+        banco:
+          type: string
+        sucursal:
+          type: string
+          nullable: true
+        cbuOrigen:
+          type: string
+          nullable: true
+        libradorNombre:
+          type: string
+        libradorCuit:
+          type: string
+          nullable: true
+        monto:
+          type: string
+        moneda:
+          type: string
+        fechaEmision:
+          type: string
+          format: date-time
+        fechaVencimiento:
+          type: string
+          format: date-time
+        estado:
+          type: string
+          enum: [en_cartera, emitido, depositado, endosado, descontado, cobrado, rechazado, anulado]
+        clienteId:
+          type: integer
+          nullable: true
+        proveedorId:
+          type: integer
+          nullable: true
+        observaciones:
+          type: string
+          nullable: true
+
+    ChequeInput:
+      type: object
+      required:
+        - tipo
+        - modalidad
+        - numero
+        - banco
+        - libradorNombre
+        - monto
+        - fechaEmision
+        - fechaVencimiento
+      properties:
+        tipo:
+          type: string
+          enum: [recibido, emitido]
+        modalidad:
+          type: string
+          enum: [fisico, echeq]
+        numero:
+          type: string
+        banco:
+          type: string
+        sucursal:
+          type: string
+          nullable: true
+        cbuOrigen:
+          type: string
+          nullable: true
+        libradorNombre:
+          type: string
+        libradorCuit:
+          type: string
+          nullable: true
+        monto:
+          type: number
+        moneda:
+          type: string
+        fechaEmision:
+          type: string
+          format: date
+        fechaVencimiento:
+          type: string
+          format: date
+        clienteId:
+          type: integer
+          nullable: true
+        proveedorId:
+          type: integer
+          nullable: true
+        observaciones:
+          type: string
+          nullable: true
+
+    ChequeUpdateInput:
+      type: object
+      properties:
+        banco:
+          type: string
+        sucursal:
+          type: string
+          nullable: true
+        cbuOrigen:
+          type: string
+          nullable: true
+        libradorNombre:
+          type: string
+        libradorCuit:
+          type: string
+          nullable: true
+        fechaVencimiento:
+          type: string
+          format: date
+        observaciones:
+          type: string
+          nullable: true
+
+    ChequeTransicionInput:
+      type: object
+      properties:
+        destino:
+          type: string
+          nullable: true
+        nota:
+          type: string
+          nullable: true
+        proveedorId:
+          type: integer
+          nullable: true
+        monto:
+          type: number
+          nullable: true
+
+    ChequeEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+        data:
+          $ref: '#/components/schemas/Cheque'
+
+    ChequeListEnvelope:
+      type: object
+      required: [success, data, total, limit, offset]
+      properties:
+        success:
+          type: boolean
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Cheque'
+        total:
+          type: integer
+        limit:
+          type: integer
+        offset:
+          type: integer
+
+    ChequeResumenEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          required: [enCartera, proximosVencer, rechazados]
+          properties:
+            enCartera:
+              type: object
+              properties:
+                count:
+                  type: integer
+                total:
+                  type: string
+            proximosVencer:
+              type: object
+              properties:
+                count:
+                  type: integer
+                total:
+                  type: string
+            rechazados:
+              type: object
+              properties:
+                count:
+                  type: integer
+                total:
+                  type: string
 
     VoidInput:
       type: object

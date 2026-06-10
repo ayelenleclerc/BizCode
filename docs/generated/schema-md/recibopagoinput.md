@@ -16,16 +16,17 @@ undefined
 
 # ReciboPagoInput Properties
 
-| Property                    | Type     | Required | Nullable       | Defined by                                                                                       |
-| :-------------------------- | :------- | :------- | :------------- | :----------------------------------------------------------------------------------------------- |
-| [cbu](#cbu)                 | `string` | Optional | cannot be null | [ReciboPagoInput](recibopagoinput-properties-cbu.md "undefined#/properties/cbu")                 |
-| [facturas](#facturas)       | `array`  | Required | cannot be null | [ReciboPagoInput](recibopagoinput-properties-facturas.md "undefined#/properties/facturas")       |
-| [fecha](#fecha)             | `string` | Required | cannot be null | [ReciboPagoInput](recibopagoinput-properties-fecha.md "undefined#/properties/fecha")             |
-| [metodoPago](#metodopago)   | `string` | Required | cannot be null | [ReciboPagoInput](recibopagoinput-properties-metodopago.md "undefined#/properties/metodoPago")   |
-| [notas](#notas)             | `string` | Optional | cannot be null | [ReciboPagoInput](recibopagoinput-properties-notas.md "undefined#/properties/notas")             |
-| [referencia](#referencia)   | `string` | Optional | cannot be null | [ReciboPagoInput](recibopagoinput-properties-referencia.md "undefined#/properties/referencia")   |
-| [retenciones](#retenciones) | `array`  | Optional | cannot be null | [ReciboPagoInput](recibopagoinput-properties-retenciones.md "undefined#/properties/retenciones") |
-| [total](#total)             | `number` | Required | cannot be null | [ReciboPagoInput](recibopagoinput-properties-total.md "undefined#/properties/total")             |
+| Property                    | Type      | Required | Nullable       | Defined by                                                                                       |
+| :-------------------------- | :-------- | :------- | :------------- | :----------------------------------------------------------------------------------------------- |
+| [cbu](#cbu)                 | `string`  | Optional | cannot be null | [ReciboPagoInput](recibopagoinput-properties-cbu.md "undefined#/properties/cbu")                 |
+| [chequeId](#chequeid)       | `integer` | Optional | cannot be null | [ReciboPagoInput](recibopagoinput-properties-chequeid.md "undefined#/properties/chequeId")       |
+| [facturas](#facturas)       | `array`   | Required | cannot be null | [ReciboPagoInput](recibopagoinput-properties-facturas.md "undefined#/properties/facturas")       |
+| [fecha](#fecha)             | `string`  | Required | cannot be null | [ReciboPagoInput](recibopagoinput-properties-fecha.md "undefined#/properties/fecha")             |
+| [metodoPago](#metodopago)   | `string`  | Required | cannot be null | [ReciboPagoInput](recibopagoinput-properties-metodopago.md "undefined#/properties/metodoPago")   |
+| [notas](#notas)             | `string`  | Optional | cannot be null | [ReciboPagoInput](recibopagoinput-properties-notas.md "undefined#/properties/notas")             |
+| [referencia](#referencia)   | `string`  | Optional | cannot be null | [ReciboPagoInput](recibopagoinput-properties-referencia.md "undefined#/properties/referencia")   |
+| [retenciones](#retenciones) | `array`   | Optional | cannot be null | [ReciboPagoInput](recibopagoinput-properties-retenciones.md "undefined#/properties/retenciones") |
+| [total](#total)             | `number`  | Required | cannot be null | [ReciboPagoInput](recibopagoinput-properties-total.md "undefined#/properties/total")             |
 
 ## cbu
 
@@ -48,6 +49,24 @@ undefined
 ### cbu Constraints
 
 **maximum length**: the maximum number of characters for this string is: `22`
+
+## chequeId
+
+Portfolio check to endorse when metodoPago is cheque or echeq (#231).
+
+`chequeId`
+
+* is optional
+
+* Type: `integer`
+
+* cannot be null
+
+* defined in: [ReciboPagoInput](recibopagoinput-properties-chequeid.md "undefined#/properties/chequeId")
+
+### chequeId Type
+
+`integer`
 
 ## facturas
 

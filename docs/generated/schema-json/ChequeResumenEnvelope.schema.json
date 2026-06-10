@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "data": {
+      "properties": {
+        "enCartera": {
+          "properties": {
+            "count": {
+              "type": "integer"
+            },
+            "total": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "proximosVencer": {
+          "properties": {
+            "count": {
+              "type": "integer"
+            },
+            "total": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "rechazados": {
+          "properties": {
+            "count": {
+              "type": "integer"
+            },
+            "total": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "required": [
+        "enCartera",
+        "proximosVencer",
+        "rechazados"
+      ],
+      "type": "object"
+    },
+    "success": {
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "success",
+    "data"
+  ],
+  "title": "ChequeResumenEnvelope",
+  "type": "object"
+}

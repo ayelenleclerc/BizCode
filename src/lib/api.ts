@@ -1124,6 +1124,7 @@ export const proveedoresAPI = {
       cbu?: string | null
       referencia?: string | null
       notas?: string | null
+      chequeId?: number | null
       facturas: { comprobanteCompraId?: number | null; facturaRef: string; monto: number }[]
       retenciones?: {
         regimenId: number
@@ -1343,6 +1344,178 @@ export type CobroRetencionDTO = {
   constanciaNum: string | null
 }
 
+export type ChequeEstadoDTO =
+  | 'en_cartera'
+  | 'emitido'
+  | 'depositado'
+  | 'endosado'
+  | 'descontado'
+  | 'cobrado'
+  | 'rechazado'
+  | 'anulado'
+
+export type ChequeTipoDTO = 'recibido' | 'emitido'
+export type ChequeModalidadDTO = 'fisico' | 'echeq'
+
+export type ChequeDTO = {
+  id: number
+  tipo: ChequeTipoDTO
+  modalidad: ChequeModalidadDTO
+  numero: string
+  banco: string
+  sucursal: string | null
+  cbuOrigen: string | null
+  libradorNombre: string
+  libradorCuit: string | null
+  monto: string | number
+  moneda: string
+  fechaEmision: string
+  fechaVencimiento: string
+  estado: ChequeEstadoDTO
+  clienteId: number | null
+  proveedorId: number | null
+  observaciones: string | null
+  cliente?: { id: number; codigo: number; rsocial: string; cuit: string | null } | null
+}
+
+export type ChequeInputDTO = {
+  tipo: ChequeTipoDTO
+  modalidad: ChequeModalidadDTO
+  numero: string
+  banco: string
+  sucursal?: string | null
+  cbuOrigen?: string | null
+  libradorNombre: string
+  libradorCuit?: string | null
+  monto: number
+  moneda?: string
+  fechaEmision: string
+  fechaVencimiento: string
+  clienteId?: number | null
+  proveedorId?: number | null
+  observaciones?: string | null
+}
+
+export type ChequeTransicionBody = {
+  destino?: string | null
+  nota?: string | null
+  proveedorId?: number | null
+  monto?: number | null
+}
+
+export type ChequeResumenDTO = {
+  enCartera: { count: number; total: string }
+  proximosVencer: { count: number; total: string }
+  rechazados: { count: number; total: string }
+}
+
+export const chequesAPI = {
+  list: async (params?: {
+    tipo?: ChequeTipoDTO
+    estado?: ChequeEstadoDTO
+    banco?: string
+    limit?: number
+    offset?: number
+  }) => {
+    try {
+      const response = await api.get('/cheques', { params })
+      return response.data as { data: ChequeDTO[]; total: number }
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  resumen: async (): Promise<ChequeResumenDTO> => {
+    try {
+      const response = await api.get('/cheques/resumen')
+      return response.data.data as ChequeResumenDTO
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  get: async (id: number): Promise<ChequeDTO> => {
+    try {
+      const response = await api.get(`/cheques/${id}`)
+      return response.data.data as ChequeDTO
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  create: async (body: ChequeInputDTO): Promise<ChequeDTO> => {
+    try {
+      const response = await api.post('/cheques', body)
+      return response.data.data as ChequeDTO
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  depositar: async (id: number, body?: ChequeTransicionBody): Promise<ChequeDTO> => {
+    try {
+      const response = await api.post(`/cheques/${id}/depositar`, body ?? {})
+      return response.data.data as ChequeDTO
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  endosar: async (id: number, body: ChequeTransicionBody): Promise<ChequeDTO> => {
+    try {
+      const response = await api.post(`/cheques/${id}/endosar`, body)
+      return response.data.data as ChequeDTO
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  descontar: async (id: number, body?: ChequeTransicionBody): Promise<ChequeDTO> => {
+    try {
+      const response = await api.post(`/cheques/${id}/descontar`, body ?? {})
+      return response.data.data as ChequeDTO
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  cobrar: async (id: number, body?: ChequeTransicionBody): Promise<ChequeDTO> => {
+    try {
+      const response = await api.post(`/cheques/${id}/cobrar`, body ?? {})
+      return response.data.data as ChequeDTO
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  rechazar: async (id: number, body?: ChequeTransicionBody): Promise<ChequeDTO> => {
+    try {
+      const response = await api.post(`/cheques/${id}/rechazar`, body ?? {})
+      return response.data.data as ChequeDTO
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  devolverACartera: async (id: number, body?: ChequeTransicionBody): Promise<ChequeDTO> => {
+    try {
+      const response = await api.post(`/cheques/${id}/devolver-cartera`, body ?? {})
+      return response.data.data as ChequeDTO
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  anular: async (id: number, body?: ChequeTransicionBody): Promise<ChequeDTO> => {
+    try {
+      const response = await api.post(`/cheques/${id}/anular`, body ?? {})
+      return response.data.data as ChequeDTO
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+}
+
 export type CobroCreateBody = {
   clienteId: number
   fecha: string
@@ -1350,6 +1523,8 @@ export type CobroCreateBody = {
   formaPagoId?: number | null
   referencia?: string | null
   nota?: string | null
+  chequeId?: number | null
+  chequeNuevo?: ChequeInputDTO | null
   retenciones?: CobroRetencionInputDTO[]
 }
 

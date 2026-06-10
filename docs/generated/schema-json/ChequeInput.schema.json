@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "banco": {
+      "type": "string"
+    },
+    "cbuOrigen": {
+      "nullable": true,
+      "type": "string"
+    },
+    "clienteId": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "fechaEmision": {
+      "format": "date",
+      "type": "string"
+    },
+    "fechaVencimiento": {
+      "format": "date",
+      "type": "string"
+    },
+    "libradorCuit": {
+      "nullable": true,
+      "type": "string"
+    },
+    "libradorNombre": {
+      "type": "string"
+    },
+    "modalidad": {
+      "enum": [
+        "fisico",
+        "echeq"
+      ],
+      "type": "string"
+    },
+    "moneda": {
+      "type": "string"
+    },
+    "monto": {
+      "type": "number"
+    },
+    "numero": {
+      "type": "string"
+    },
+    "observaciones": {
+      "nullable": true,
+      "type": "string"
+    },
+    "proveedorId": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "sucursal": {
+      "nullable": true,
+      "type": "string"
+    },
+    "tipo": {
+      "enum": [
+        "recibido",
+        "emitido"
+      ],
+      "type": "string"
+    }
+  },
+  "required": [
+    "tipo",
+    "modalidad",
+    "numero",
+    "banco",
+    "libradorNombre",
+    "monto",
+    "fechaEmision",
+    "fechaVencimiento"
+  ],
+  "title": "ChequeInput",
+  "type": "object"
+}

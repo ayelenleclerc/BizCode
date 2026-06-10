@@ -110,6 +110,26 @@ function buildMessage(type: NotificationType, payload: NotificationPayload): Mes
         text: `El trial del módulo ${moduleKey} vence en ${days} días. Contrate el módulo para mantenerlo activo.`,
       }
     }
+    case 'cheque_due_soon': {
+      const numero = payload.chequeNumero ? ` ${payload.chequeNumero}` : ''
+      const banco = payload.banco ? ` (${payload.banco})` : ''
+      const days =
+        payload.diasHastaVencimiento != null && payload.diasHastaVencimiento >= 0
+          ? ` en ${payload.diasHastaVencimiento} días`
+          : ''
+      return {
+        subject: `[BizCode] Cheque próximo a vencer${numero}`,
+        text: `Un cheque${numero}${banco}${amount ? ` por ${amount}` : ''} vence${days}. Revise la cartera.`,
+      }
+    }
+    case 'cheque_rechazado': {
+      const numero = payload.chequeNumero ? ` ${payload.chequeNumero}` : ''
+      const banco = payload.banco ? ` (${payload.banco})` : ''
+      return {
+        subject: `[BizCode] Cheque rechazado${numero} — ${rsocial}`,
+        text: `El cheque${numero}${banco}${amount ? ` por ${amount}` : ''} de ${rsocial} fue rechazado. Actualice la cuenta corriente del cliente.`,
+      }
+    }
   }
 }
 
