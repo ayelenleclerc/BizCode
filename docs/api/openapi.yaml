@@ -6428,7 +6428,7 @@ paths:
         '404':
           $ref: '#/components/responses/NotFoundError'
         '422':
-          $ref: '#/components/responses/UnprocessableEntity'
+          $ref: '#/components/responses/BadRequest'
         '500':
           $ref: '#/components/responses/ServerError'
 
@@ -14448,6 +14448,23 @@ components:
             $ref: '#/components/schemas/ApiErrorEnvelope'
     NotFoundError:
       description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiErrorEnvelope'
+    TooManyRequests:
+      description: Rate limit exceeded
+      headers:
+        X-RateLimit-Limit:
+          schema:
+            type: integer
+        X-RateLimit-Remaining:
+          schema:
+            type: integer
+        X-RateLimit-Reset:
+          schema:
+            type: string
+            format: date-time
       content:
         application/json:
           schema:
