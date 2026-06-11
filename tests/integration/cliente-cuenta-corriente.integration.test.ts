@@ -34,6 +34,7 @@ async function truncateClienteCc(prisma: PrismaClient): Promise<void> {
     prisma.facturaItem.deleteMany({ where: { factura: { tenantId } } }),
     prisma.factura.deleteMany({ where: { tenantId } }),
     prisma.cliente.deleteMany({ where: { tenantId } }),
+    prisma.notification.deleteMany({ where: { tenantId } }),
   ])
 }
 
