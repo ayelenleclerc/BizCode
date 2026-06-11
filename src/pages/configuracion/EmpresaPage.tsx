@@ -15,7 +15,7 @@ import PrintDevicesSection from './PrintDevicesSection'
 import ProveedorAlertasConfigSection from './ProveedorAlertasConfigSection'
 import FiscalRetencionesSection from './FiscalRetencionesSection'
 import PortalConfigSection from './PortalConfigSection'
-import ModuleRoute from '@/components/ModuleRoute'
+import IfModule from '@/components/IfModule'
 
 const EMPRESA_TIMEZONE_OPTIONS = [
   'America/Argentina/Buenos_Aires',
@@ -564,9 +564,9 @@ export default function EmpresaPage() {
       <PrintDevicesSection />
       <FiscalRetencionesSection />
       <ProveedorAlertasConfigSection />
-      <ModuleRoute moduleKey="clients.portal">
+      <IfModule flag="clients.portal">
         <PortalConfigSection />
-      </ModuleRoute>
+      </IfModule>
     </div>
   )
 }
