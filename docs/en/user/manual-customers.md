@@ -81,6 +81,18 @@ When editing an existing customer, the form shows **recent payments** loaded fro
 
 The customer form displays **payment score** (0–100) when available, with a tooltip describing how score changes when registering payments against active invoices. Rules are documented in OpenAPI for `POST /api/cobros`.
 
+## B2B customer portal (#240)
+
+When the **Customer portal** module (`clients.portal`) is enabled, turn on the portal under **Settings → Company** (*Customer portal* section): branding (logo, color, footer) and optional orders section.
+
+- **Portal URL (MVP):** `/portal/{tenant-slug}` on the same web app (e.g. `http://localhost:5173/portal/my-company`).
+- **Sign-in:** customer enters their registered email; receives a magic link valid for **15 minutes**; session lasts **8 hours**.
+- **Sections:** invoices (PDF and open/overdue/paid status), account statement (balance and PDF), orders (if enabled), and read-only contact details.
+- **Isolation:** each customer only sees their own documents; `clienteId` is never accepted as a trusted query parameter.
+- **Online payment (MercadoPago):** pay button stays disabled until issue #175 is implemented.
+
+Configure server SMTP so magic-link emails are delivered in production.
+
 ## Keyboard Shortcuts
 
 | Key | Action |

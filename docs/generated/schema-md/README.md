@@ -404,6 +404,36 @@
 
 * [PlanLimitErrorEnvelope](./planlimiterrorenvelope.md) – `-`
 
+* [PortalBranding](./portalbranding.md) – `-`
+
+* [PortalBrandingEnvelope](./portalbrandingenvelope.md) – `-`
+
+* [PortalConfig](./portalconfig.md) – `-`
+
+* [PortalConfigEnvelope](./portalconfigenvelope.md) – `-`
+
+* [PortalConfigInput](./portalconfiginput.md) – `-`
+
+* [PortalFacturaListEnvelope](./portalfacturalistenvelope.md) – `-`
+
+* [PortalFacturaRow](./portalfacturarow.md) – `-`
+
+* [PortalLogoutEnvelope](./portallogoutenvelope.md) – `-`
+
+* [PortalMagicLinkInput](./portalmagiclinkinput.md) – `-`
+
+* [PortalMagicLinkSentEnvelope](./portalmagiclinksentenvelope.md) – `-`
+
+* [PortalMe](./portalme.md) – `-`
+
+* [PortalMeEnvelope](./portalmeenvelope.md) – `-`
+
+* [PortalPedidoListEnvelope](./portalpedidolistenvelope.md) – `-`
+
+* [PortalPedidoRow](./portalpedidorow.md) – `-`
+
+* [PortalVerifyEnvelope](./portalverifyenvelope.md) – `-`
+
 * [PresentacionFila](./presentacionfila.md) – `-`
 
 * [PresentacionPreview](./presentacionpreview.md) – `-`
@@ -816,6 +846,20 @@
 
 * [Untitled object in PedidoListEnvelope](./pedidolistenvelope-allof-0.md) – `undefined#/allOf/0`
 
+* [Untitled object in PortalFacturaListEnvelope](./portalfacturalistenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled object in PortalLogoutEnvelope](./portallogoutenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled object in PortalMagicLinkSentEnvelope](./portalmagiclinksentenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled object in PortalMe](./portalme-properties-vendedor.md) – `undefined#/properties/vendedor`
+
+* [Untitled object in PortalMeEnvelope](./portalmeenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled object in PortalPedidoListEnvelope](./portalpedidolistenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled object in PortalVerifyEnvelope](./portalverifyenvelope-properties-data.md) – `undefined#/properties/data`
+
 * [Untitled object in ProveedorListEnvelope](./proveedorlistenvelope-allof-0.md) – `undefined#/allOf/0`
 
 * [Untitled object in ReciboCobro](./recibocobro-properties-cliente.md) – `undefined#/properties/cliente`
@@ -1023,6 +1067,10 @@
 * [Untitled array in PedidoListEnvelope](./pedidolistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
 
 * [Untitled array in PlanCatalogEnvelope](./plancatalogenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled array in PortalFacturaListEnvelope](./portalfacturalistenvelope-properties-data-properties-facturas.md) – `undefined#/properties/data/properties/facturas`
+
+* [Untitled array in PortalPedidoListEnvelope](./portalpedidolistenvelope-properties-data-properties-pedidos.md) – `undefined#/properties/data/properties/pedidos`
 
 * [Untitled array in PresentacionPreview](./presentacionpreview-properties-filas.md) – `undefined#/properties/filas`
 

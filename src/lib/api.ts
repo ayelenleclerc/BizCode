@@ -11,7 +11,7 @@ const api = axios.create({
   withCredentials: true,
 })
 
-type ApiErrorPayload = {
+export type ApiErrorPayload = {
   error?: string
   validation?: { valid: boolean; errors: Array<{ module: string; reason: string }> }
 }
@@ -49,7 +49,7 @@ export class ApiRequestFailedError extends Error {
 }
 
 // Error handler
-const handleError = (error: AxiosError<ApiErrorPayload>): never => {
+export const handleError = (error: AxiosError<ApiErrorPayload>): never => {
   const ax = error
   const hasResponse = !!ax.response
   const data = ax.response?.data
@@ -3921,6 +3921,9 @@ export const zonasEntregaAPI = {
     }
   },
 }
+
+export { portalAPI, portalConfigAPI } from './portalApi'
+export type { PortalBranding, PortalMe, PortalFactura, PortalConfig } from './portalApi'
 
 // ============ HEALTH CHECK ============
 

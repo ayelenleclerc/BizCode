@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "enabled": {
+      "type": "boolean"
+    },
+    "footerText": {
+      "nullable": true,
+      "type": "string"
+    },
+    "logoUrl": {
+      "nullable": true,
+      "type": "string"
+    },
+    "primaryColor": {
+      "nullable": true,
+      "type": "string"
+    },
+    "showPedidos": {
+      "type": "boolean"
+    },
+    "tenantName": {
+      "type": "string"
+    },
+    "tenantSlug": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "tenantName",
+    "tenantSlug",
+    "enabled",
+    "showPedidos",
+    "logoUrl",
+    "primaryColor",
+    "footerText"
+  ],
+  "title": "PortalBranding",
+  "type": "object"
+}

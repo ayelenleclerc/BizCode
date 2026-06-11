@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "enabled": {
+      "type": "boolean"
+    },
+    "footerText": {
+      "nullable": true,
+      "type": "string"
+    },
+    "logoUrl": {
+      "nullable": true,
+      "type": "string"
+    },
+    "primaryColor": {
+      "nullable": true,
+      "type": "string"
+    },
+    "showPedidos": {
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "enabled",
+    "showPedidos",
+    "logoUrl",
+    "primaryColor",
+    "footerText"
+  ],
+  "title": "PortalConfig",
+  "type": "object"
+}

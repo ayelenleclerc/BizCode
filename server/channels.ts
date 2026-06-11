@@ -305,6 +305,40 @@ export type SupplierNotificationChannels = {
  * @pt-BR Despacha alertas de faturas a pagar respeitando canais do tenant (#275).
  */
 /**
+ * @en Sends B2B portal magic-link email; no-op when SMTP is not configured (#240).
+ * @es Envía email con magic link del portal B2B; no-op si SMTP no está configurado (#240).
+ * @pt-BR Envia e-mail com magic link do portal B2B; no-op se SMTP não estiver configurado (#240).
+ */
+export async function sendPortalMagicLinkEmail(
+  to: string,
+  tenantName: string,
+  verifyUrl: string,
+): Promise<void> {
+  if (!isSmtpConfigured()) return
+  const smtp = resolveSmtpTransportConfig()
+  if (!smtp) return
+  try {
+    const transporter = nodemailer.createTransport({
+      host: smtp.host,
+      port: smtp.port,
+      secure: smtp.secure,
+      auth: smtp.auth,
+    })
+    await transporter.sendMail({
+      from: smtp.from,
+      to,
+      subject: `[${tenantName}] Acceso al portal de clientes`,
+      text: `Usá este enlace para ingresar al portal (válido 15 minutos):\n\n${verifyUrl}\n\nSi no solicitaste este acceso, ignorá este mensaje.`,
+    })
+  } catch (err) {
+    logger.warn(
+      { err: err instanceof Error ? { name: err.name, message: err.message } : String(err) },
+      '[channels] portal magic link email failed',
+    )
+  }
+}
+
+/**
  * @en Sends customer account statement PDF by email; no-op when SMTP is not configured (#232).
  * @es Envía PDF de estado de cuenta por email; no-op si SMTP no está configurado (#232).
  * @pt-BR Envia PDF de extrato por email; no-op se SMTP não estiver configurado (#232).

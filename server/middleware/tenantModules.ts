@@ -29,6 +29,7 @@ const TEST_DEFAULT_MODULES: ModuleKey[] = [
   'fiscal.remito',
   'fiscal.cheques',
   'logistics.purchases',
+  'clients.portal',
 ]
 
 /**

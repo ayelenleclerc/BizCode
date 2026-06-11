@@ -86,6 +86,8 @@ model Cliente {
   cheques        Cheque[]
   movimientosCC  MovimientoClienteCC[]
   recibosCobro   ReciboCobro[]
+  portalMagicLinks PortalMagicLink[]
+  portalSessions   PortalSession[]
 
   @@unique([tenantId, codigo])
   @@index([tenantId])
@@ -697,6 +699,54 @@ model Tenant {
   retencionesAplicadas          RetencionAplicada[]
   retencionConstanciaSequences  RetencionConstanciaSequence[]
   presentacionesRetencion       PresentacionRetencion[]
+  portalConfig                  PortalConfig?
+  portalMagicLinks              PortalMagicLink[]
+  portalSessions                PortalSession[]
+}
+
+/// B2B customer portal branding and feature toggles per tenant (#240).
+model PortalConfig {
+  id           Int      @id @default(autoincrement())
+  tenantId     Int      @unique
+  tenant       Tenant   @relation(fields: [tenantId], references: [id])
+  enabled      Boolean  @default(false)
+  showPedidos  Boolean  @default(true)
+  logoUrl      String?  @db.VarChar(255)
+  primaryColor String?  @db.VarChar(7)
+  footerText   String?  @db.VarChar(500)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+/// One-time magic link tokens for portal customer login (#240).
+model PortalMagicLink {
+  id        Int       @id @default(autoincrement())
+  tenantId  Int
+  tenant    Tenant    @relation(fields: [tenantId], references: [id])
+  clienteId Int
+  cliente   Cliente   @relation(fields: [clienteId], references: [id])
+  tokenHash String    @unique @db.VarChar(64)
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([tenantId, clienteId])
+}
+
+/// Portal customer browser sessions (#240).
+model PortalSession {
+  id         Int       @id @default(autoincrement())
+  tenantId   Int
+  tenant     Tenant    @relation(fields: [tenantId], references: [id])
+  clienteId  Int
+  cliente    Cliente   @relation(fields: [clienteId], references: [id])
+  tokenHash  String    @unique @db.VarChar(64)
+  expiresAt  DateTime
+  revokedAt  DateTime?
+  createdAt  DateTime  @default(now())
+  lastSeenAt DateTime  @default(now())
+
+  @@index([tenantId, clienteId])
 }
 
 model Plan {

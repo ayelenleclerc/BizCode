@@ -14,6 +14,8 @@ import ArcaFiscalSection from './ArcaFiscalSection'
 import PrintDevicesSection from './PrintDevicesSection'
 import ProveedorAlertasConfigSection from './ProveedorAlertasConfigSection'
 import FiscalRetencionesSection from './FiscalRetencionesSection'
+import PortalConfigSection from './PortalConfigSection'
+import ModuleRoute from '@/components/ModuleRoute'
 
 const EMPRESA_TIMEZONE_OPTIONS = [
   'America/Argentina/Buenos_Aires',
@@ -562,6 +564,9 @@ export default function EmpresaPage() {
       <PrintDevicesSection />
       <FiscalRetencionesSection />
       <ProveedorAlertasConfigSection />
+      <ModuleRoute moduleKey="clients.portal">
+        <PortalConfigSection />
+      </ModuleRoute>
     </div>
   )
 }
