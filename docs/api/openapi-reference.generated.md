@@ -21949,6 +21949,855 @@ true
 }
 ```
 
+### PARAMETERS /api/fiscal/presentaciones/preview
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/fiscal/presentaciones/preview`
+
+### Preview monthly SICORE/SIFERE presentation (#242)
+
+- **Method:** `GET`
+- **Path:** `/api/fiscal/presentaciones/preview`
+- **Tags:** contabilidad
+
+Requires `finance.retenciones`, `reports.financial.read`. Returns operations for the period with regime totals and CUIT validation warnings.
+
+#### Responses
+
+##### Status: 200 Preview envelope
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`canGenerate` (required)**
+
+    `boolean`
+
+  - **`filas` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`alicuota` (required)**
+
+      `string`
+
+    - **`baseImponible` (required)**
+
+      `string`
+
+    - **`cuit` (required)**
+
+      `string`
+
+    - **`denominacion` (required)**
+
+      `string`
+
+    - **`fecha` (required)**
+
+      `string`, format: `date-time`
+
+    - **`importe` (required)**
+
+      `string`
+
+    - **`incluida` (required)**
+
+      `boolean`
+
+    - **`operacionTipo` (required)**
+
+      `string`, possible values: `"retencion", "percepcion"`
+
+    - **`regimenNombre` (required)**
+
+      `string`
+
+    - **`regimenTipo` (required)**
+
+      `string`
+
+    - **`retencionId` (required)**
+
+      `integer`
+
+    - **`provincia`**
+
+      `string | null`
+
+  - **`formato` (required)**
+
+    `string`, possible values: `"sicore", "sifere"`
+
+  - **`periodo` (required)**
+
+    `string`
+
+  - **`totalesPorRegimen` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`operaciones` (required)**
+
+      `integer`
+
+    - **`regimenNombre` (required)**
+
+      `string`
+
+    - **`totalImporte` (required)**
+
+      `string`
+
+  - **`warnings` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`code` (required)**
+
+      `string`, possible values: `"missing_cuit", "invalid_cuit", "zero_importe_excluded"`
+
+    - **`message` (required)**
+
+      `string`
+
+    - **`retencionId` (required)**
+
+      `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "formato": "sicore",
+    "periodo": "",
+    "filas": [
+      {
+        "retencionId": 1,
+        "fecha": "",
+        "cuit": "",
+        "denominacion": "",
+        "regimenNombre": "",
+        "regimenTipo": "",
+        "operacionTipo": "retencion",
+        "provincia": null,
+        "baseImponible": "",
+        "alicuota": "",
+        "importe": "",
+        "incluida": true
+      }
+    ],
+    "totalesPorRegimen": [
+      {
+        "regimenNombre": "",
+        "operaciones": 0,
+        "totalImporte": ""
+      }
+    ],
+    "warnings": [
+      {
+        "code": "missing_cuit",
+        "retencionId": 1,
+        "message": ""
+      }
+    ],
+    "canGenerate": true
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/fiscal/presentaciones
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/fiscal/presentaciones`
+
+### List generated presentation files (#242)
+
+- **Method:** `GET`
+- **Path:** `/api/fiscal/presentaciones`
+- **Tags:** contabilidad
+
+Requires `finance.retenciones`, `reports.financial.read`.
+
+#### Responses
+
+##### Status: 200 History list
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`formato` (required)**
+
+    `string`, possible values: `"sicore", "sifere"`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`periodo` (required)**
+
+    `string`
+
+  - **`totalImporte` (required)**
+
+    `string`
+
+  - **`totalOperaciones` (required)**
+
+    `integer`
+
+  - **`archivoHash`**
+
+    `string | null`
+
+  - **`presentadoAt`**
+
+    `string | null`, format: `date-time`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "formato": "sicore",
+      "periodo": "",
+      "totalOperaciones": 0,
+      "totalImporte": "",
+      "archivoHash": null,
+      "presentadoAt": null,
+      "createdAt": ""
+    }
+  ]
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Generate and store presentation TXT (#242)
+
+- **Method:** `POST`
+- **Path:** `/api/fiscal/presentaciones`
+- **Tags:** contabilidad
+
+Requires `finance.retenciones`, `reports.financial.read`.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`formato` (required)**
+
+  `string`, possible values: `"sicore", "sifere"`
+
+- **`periodo` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "formato": "sicore",
+  "periodo": ""
+}
+```
+
+#### Responses
+
+##### Status: 201 Created presentation record
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`formato` (required)**
+
+    `string`, possible values: `"sicore", "sifere"`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`periodo` (required)**
+
+    `string`
+
+  - **`totalImporte` (required)**
+
+    `string`
+
+  - **`totalOperaciones` (required)**
+
+    `integer`
+
+  - **`archivoHash`**
+
+    `string | null`
+
+  - **`presentadoAt`**
+
+    `string | null`, format: `date-time`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "formato": "sicore",
+    "periodo": "",
+    "totalOperaciones": 0,
+    "totalImporte": "",
+    "archivoHash": null,
+    "presentadoAt": null,
+    "createdAt": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/fiscal/presentaciones/{id}/archivo
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/fiscal/presentaciones/{id}/archivo`
+
+### Download stored presentation TXT (#242)
+
+- **Method:** `GET`
+- **Path:** `/api/fiscal/presentaciones/{id}/archivo`
+- **Tags:** contabilidad
+
+Requires `finance.retenciones`, `reports.financial.read`.
+
+#### Responses
+
+##### Status: 200 TXT file
+
+###### Content-Type: text/plain
+
+`string`
+
+**Example:**
+
+```json
+true
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/fiscal/presentaciones/{id}/presentado
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/fiscal/presentaciones/{id}/presentado`
+
+### Mark presentation as filed in AFIP (#242)
+
+- **Method:** `PATCH`
+- **Path:** `/api/fiscal/presentaciones/{id}/presentado`
+- **Tags:** contabilidad
+
+Requires `finance.retenciones`, `reports.financial.read`.
+
+#### Responses
+
+##### Status: 200 Updated presentation
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`formato` (required)**
+
+    `string`, possible values: `"sicore", "sifere"`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`periodo` (required)**
+
+    `string`
+
+  - **`totalImporte` (required)**
+
+    `string`
+
+  - **`totalOperaciones` (required)**
+
+    `integer`
+
+  - **`archivoHash`**
+
+    `string | null`
+
+  - **`presentadoAt`**
+
+    `string | null`, format: `date-time`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "formato": "sicore",
+    "periodo": "",
+    "totalOperaciones": 0,
+    "totalImporte": "",
+    "archivoHash": null,
+    "presentadoAt": null,
+    "createdAt": ""
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ### PARAMETERS /api/fiscal/retenciones/{id}/comprobante/pdf
 
 - **Method:** `PARAMETERS`
@@ -59720,6 +60569,632 @@ Originating invoice header (selected columns)
     "esAgenteRetencionIVA": true,
     "esAgenteRetencionIIBB": true
   }
+}
+```
+
+### PresentacionRetencionInput
+
+- **Type:**`object`
+
+* **`formato` (required)**
+
+  `string`, possible values: `"sicore", "sifere"`
+
+* **`periodo` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "formato": "sicore",
+  "periodo": ""
+}
+```
+
+### PresentacionWarning
+
+- **Type:**`object`
+
+* **`code` (required)**
+
+  `string`, possible values: `"missing_cuit", "invalid_cuit", "zero_importe_excluded"`
+
+* **`message` (required)**
+
+  `string`
+
+* **`retencionId` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "code": "missing_cuit",
+  "retencionId": 1,
+  "message": ""
+}
+```
+
+### PresentacionFila
+
+- **Type:**`object`
+
+* **`alicuota` (required)**
+
+  `string`
+
+* **`baseImponible` (required)**
+
+  `string`
+
+* **`cuit` (required)**
+
+  `string`
+
+* **`denominacion` (required)**
+
+  `string`
+
+* **`fecha` (required)**
+
+  `string`, format: `date-time`
+
+* **`importe` (required)**
+
+  `string`
+
+* **`incluida` (required)**
+
+  `boolean`
+
+* **`operacionTipo` (required)**
+
+  `string`, possible values: `"retencion", "percepcion"`
+
+* **`regimenNombre` (required)**
+
+  `string`
+
+* **`regimenTipo` (required)**
+
+  `string`
+
+* **`retencionId` (required)**
+
+  `integer`
+
+* **`provincia`**
+
+  `string | null`
+
+**Example:**
+
+```json
+{
+  "retencionId": 1,
+  "fecha": "",
+  "cuit": "",
+  "denominacion": "",
+  "regimenNombre": "",
+  "regimenTipo": "",
+  "operacionTipo": "retencion",
+  "provincia": null,
+  "baseImponible": "",
+  "alicuota": "",
+  "importe": "",
+  "incluida": true
+}
+```
+
+### PresentacionTotalRegimen
+
+- **Type:**`object`
+
+* **`operaciones` (required)**
+
+  `integer`
+
+* **`regimenNombre` (required)**
+
+  `string`
+
+* **`totalImporte` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "regimenNombre": "",
+  "operaciones": 0,
+  "totalImporte": ""
+}
+```
+
+### PresentacionPreview
+
+- **Type:**`object`
+
+* **`canGenerate` (required)**
+
+  `boolean`
+
+* **`filas` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`alicuota` (required)**
+
+    `string`
+
+  - **`baseImponible` (required)**
+
+    `string`
+
+  - **`cuit` (required)**
+
+    `string`
+
+  - **`denominacion` (required)**
+
+    `string`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`importe` (required)**
+
+    `string`
+
+  - **`incluida` (required)**
+
+    `boolean`
+
+  - **`operacionTipo` (required)**
+
+    `string`, possible values: `"retencion", "percepcion"`
+
+  - **`regimenNombre` (required)**
+
+    `string`
+
+  - **`regimenTipo` (required)**
+
+    `string`
+
+  - **`retencionId` (required)**
+
+    `integer`
+
+  - **`provincia`**
+
+    `string | null`
+
+* **`formato` (required)**
+
+  `string`, possible values: `"sicore", "sifere"`
+
+* **`periodo` (required)**
+
+  `string`
+
+* **`totalesPorRegimen` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`operaciones` (required)**
+
+    `integer`
+
+  - **`regimenNombre` (required)**
+
+    `string`
+
+  - **`totalImporte` (required)**
+
+    `string`
+
+* **`warnings` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`code` (required)**
+
+    `string`, possible values: `"missing_cuit", "invalid_cuit", "zero_importe_excluded"`
+
+  - **`message` (required)**
+
+    `string`
+
+  - **`retencionId` (required)**
+
+    `integer`
+
+**Example:**
+
+```json
+{
+  "formato": "sicore",
+  "periodo": "",
+  "filas": [
+    {
+      "retencionId": 1,
+      "fecha": "",
+      "cuit": "",
+      "denominacion": "",
+      "regimenNombre": "",
+      "regimenTipo": "",
+      "operacionTipo": "retencion",
+      "provincia": null,
+      "baseImponible": "",
+      "alicuota": "",
+      "importe": "",
+      "incluida": true
+    }
+  ],
+  "totalesPorRegimen": [
+    {
+      "regimenNombre": "",
+      "operaciones": 0,
+      "totalImporte": ""
+    }
+  ],
+  "warnings": [
+    {
+      "code": "missing_cuit",
+      "retencionId": 1,
+      "message": ""
+    }
+  ],
+  "canGenerate": true
+}
+```
+
+### PresentacionPreviewEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`canGenerate` (required)**
+
+    `boolean`
+
+  - **`filas` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`alicuota` (required)**
+
+      `string`
+
+    - **`baseImponible` (required)**
+
+      `string`
+
+    - **`cuit` (required)**
+
+      `string`
+
+    - **`denominacion` (required)**
+
+      `string`
+
+    - **`fecha` (required)**
+
+      `string`, format: `date-time`
+
+    - **`importe` (required)**
+
+      `string`
+
+    - **`incluida` (required)**
+
+      `boolean`
+
+    - **`operacionTipo` (required)**
+
+      `string`, possible values: `"retencion", "percepcion"`
+
+    - **`regimenNombre` (required)**
+
+      `string`
+
+    - **`regimenTipo` (required)**
+
+      `string`
+
+    - **`retencionId` (required)**
+
+      `integer`
+
+    - **`provincia`**
+
+      `string | null`
+
+  - **`formato` (required)**
+
+    `string`, possible values: `"sicore", "sifere"`
+
+  - **`periodo` (required)**
+
+    `string`
+
+  - **`totalesPorRegimen` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`operaciones` (required)**
+
+      `integer`
+
+    - **`regimenNombre` (required)**
+
+      `string`
+
+    - **`totalImporte` (required)**
+
+      `string`
+
+  - **`warnings` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`code` (required)**
+
+      `string`, possible values: `"missing_cuit", "invalid_cuit", "zero_importe_excluded"`
+
+    - **`message` (required)**
+
+      `string`
+
+    - **`retencionId` (required)**
+
+      `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "formato": "sicore",
+    "periodo": "",
+    "filas": [
+      {
+        "retencionId": 1,
+        "fecha": "",
+        "cuit": "",
+        "denominacion": "",
+        "regimenNombre": "",
+        "regimenTipo": "",
+        "operacionTipo": "retencion",
+        "provincia": null,
+        "baseImponible": "",
+        "alicuota": "",
+        "importe": "",
+        "incluida": true
+      }
+    ],
+    "totalesPorRegimen": [
+      {
+        "regimenNombre": "",
+        "operaciones": 0,
+        "totalImporte": ""
+      }
+    ],
+    "warnings": [
+      {
+        "code": "missing_cuit",
+        "retencionId": 1,
+        "message": ""
+      }
+    ],
+    "canGenerate": true
+  }
+}
+```
+
+### PresentacionRetencion
+
+- **Type:**`object`
+
+* **`createdAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`formato` (required)**
+
+  `string`, possible values: `"sicore", "sifere"`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`periodo` (required)**
+
+  `string`
+
+* **`totalImporte` (required)**
+
+  `string`
+
+* **`totalOperaciones` (required)**
+
+  `integer`
+
+* **`archivoHash`**
+
+  `string | null`
+
+* **`presentadoAt`**
+
+  `string | null`, format: `date-time`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "formato": "sicore",
+  "periodo": "",
+  "totalOperaciones": 0,
+  "totalImporte": "",
+  "archivoHash": null,
+  "presentadoAt": null,
+  "createdAt": ""
+}
+```
+
+### PresentacionRetencionEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`formato` (required)**
+
+    `string`, possible values: `"sicore", "sifere"`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`periodo` (required)**
+
+    `string`
+
+  - **`totalImporte` (required)**
+
+    `string`
+
+  - **`totalOperaciones` (required)**
+
+    `integer`
+
+  - **`archivoHash`**
+
+    `string | null`
+
+  - **`presentadoAt`**
+
+    `string | null`, format: `date-time`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "formato": "sicore",
+    "periodo": "",
+    "totalOperaciones": 0,
+    "totalImporte": "",
+    "archivoHash": null,
+    "presentadoAt": null,
+    "createdAt": ""
+  }
+}
+```
+
+### PresentacionRetencionListEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`formato` (required)**
+
+    `string`, possible values: `"sicore", "sifere"`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`periodo` (required)**
+
+    `string`
+
+  - **`totalImporte` (required)**
+
+    `string`
+
+  - **`totalOperaciones` (required)**
+
+    `integer`
+
+  - **`archivoHash`**
+
+    `string | null`
+
+  - **`presentadoAt`**
+
+    `string | null`, format: `date-time`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "formato": "sicore",
+      "periodo": "",
+      "totalOperaciones": 0,
+      "totalImporte": "",
+      "archivoHash": null,
+      "presentadoAt": null,
+      "createdAt": ""
+    }
+  ]
 }
 ```
 

@@ -453,6 +453,23 @@ function buildPrisma(): PrismaClient {
       findMany: vi.fn().mockResolvedValue([]),
       findFirst: vi.fn().mockResolvedValue(null),
     },
+    presentacionRetencion: {
+      create: vi.fn().mockResolvedValue({
+        id: 1,
+        tenantId: 1,
+        formato: 'sicore',
+        periodo: '2026-06',
+        totalOperaciones: 0,
+        totalImporte: new Decimal(0),
+        archivoHash: 'hash',
+        archivoContenido: '',
+        presentadoAt: null,
+        createdAt: new Date(),
+      }),
+      findMany: vi.fn().mockResolvedValue([]),
+      findFirst: vi.fn().mockResolvedValue(null),
+      update: vi.fn(),
+    },
     comprobanteCompra: {
       findMany: vi.fn().mockResolvedValue([]),
       findFirst: vi.fn().mockResolvedValue(null),
@@ -2100,6 +2117,20 @@ describe('API — contrato OpenAPI', () => {
     const app = createApp(prisma)
     const res = await request(app).get('/api/fiscal/retenciones/export?format=sicore').expect(200)
     expect(res.headers['content-type']).toMatch(/text\/plain/)
+  })
+
+  it('GET /api/fiscal/presentaciones/preview', async () => {
+    const app = createApp(prisma)
+    const res = await request(app)
+      .get('/api/fiscal/presentaciones/preview?formato=sicore&periodo=2026-06')
+      .expect(200)
+    await assertMatchesOpenApi('/api/fiscal/presentaciones/preview', 'get', '200', res.body)
+  })
+
+  it('GET /api/fiscal/presentaciones', async () => {
+    const app = createApp(prisma)
+    const res = await request(app).get('/api/fiscal/presentaciones').expect(200)
+    await assertMatchesOpenApi('/api/fiscal/presentaciones', 'get', '200', res.body)
   })
 
   it('GET /api/fiscal/retenciones/{id}/comprobante/pdf returns application/pdf', async () => {

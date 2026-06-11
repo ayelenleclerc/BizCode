@@ -5,8 +5,10 @@ import { previewRetencionesClienteCobro } from '../fiscal/ar/retencionesClienteC
 import { previewPercepcionesClienteFactura } from '../fiscal/ar/retencionesClientePercepcion'
 import { previewRetencionesProveedorPago } from '../fiscal/ar/retencionesProveedorPago'
 import type { RetencionPreviewInput, RetencionPreviewLine } from '../fiscal/ar/retencionesPreviewStub'
+import { loadPresentacionRetencionRows } from '../fiscal/ar/presentacionRetencionesLoader'
 import { buildSicoreRetencionesExport } from '../fiscal/ar/sicoreRetencionesExport'
 import { buildSifereRetencionesExport } from '../fiscal/ar/sifereRetencionesExport'
+import { validateCUIT } from '../../src/lib/validators/cuit'
 
 export type FiscalRetencionesConfigDto = {
   esAgenteRetencionGanancias: boolean
@@ -285,57 +287,42 @@ export class FiscalRetencionesService {
     from?: Date,
     to?: Date,
   ): Promise<string> {
-    const where: Prisma.RetencionAplicadaWhereInput = {
+    const rangeFrom = from ?? new Date(0)
+    const rangeTo = to ?? new Date(8640000000000000)
+    const rows = await loadPresentacionRetencionRows(
+      this.prisma,
       tenantId,
-      entidadTipo: 'proveedor',
-      tipo: 'retencion',
-      OR: [{ reciboPagoId: null }, { reciboPago: { estado: 'emitido' } }],
-    }
-    if (from != null || to != null) {
-      where.createdAt = {}
-      if (from != null) where.createdAt.gte = from
-      if (to != null) where.createdAt.lte = to
-    }
-
-    const empresa = await this.prisma.paramEmpresa.findFirst({
-      where: { tenantId },
-      select: { cuit: true },
-    })
-    const cuitRetenedor = (empresa?.cuit ?? '').replace(/\D/g, '')
-
-    const rows = await this.prisma.retencionAplicada.findMany({
-      where,
-      include: {
-        regimen: { select: { tipo: true, provincia: true, nombre: true } },
-        reciboPago: { select: { fecha: true } },
-      },
-      orderBy: { createdAt: 'asc' },
-    })
-
-    const proveedorIds = [...new Set(rows.map((r) => r.entidadId))]
-    const proveedores = await this.prisma.proveedor.findMany({
-      where: { tenantId, id: { in: proveedorIds } },
-      select: { id: true, cuit: true },
-    })
-    const cuitByProveedor = new Map(proveedores.map((p) => [p.id, (p.cuit ?? '').replace(/\D/g, '')]))
-
-    const exportRows = rows
-      .filter((r) => (format === 'sicore' ? r.regimen.tipo !== 'iibb' : r.regimen.tipo === 'iibb'))
-      .map((r) => ({
-        fecha: r.reciboPago?.fecha ?? r.createdAt,
-        cuitRetenedor,
-        cuitRetenido: cuitByProveedor.get(r.entidadId) ?? '',
-        regimenTipo: r.regimen.tipo,
-        provincia: r.regimen.provincia,
-        baseImponible: r.baseImponible.toNumber(),
-        alicuota: r.alicuota.toNumber(),
-        importe: r.importe.toNumber(),
-        constanciaNum: r.constanciaNum ?? '',
-      }))
+      format,
+      rangeFrom,
+      rangeTo,
+    )
+    const validRows = rows.filter(
+      (r) => r.importe !== 0 && r.cuitRetenido && validateCUIT(r.cuitRetenido),
+    )
 
     if (format === 'sicore') {
-      return buildSicoreRetencionesExport(exportRows)
+      return buildSicoreRetencionesExport(
+        validRows.map((r) => ({
+          fecha: r.fecha,
+          cuitRetenido: r.cuitRetenido,
+          denominacion: r.denominacion,
+          regimenTipo: r.regimenTipo,
+          regimenNombre: r.regimenNombre,
+          operacionTipo: r.operacionTipo,
+          baseImponible: r.baseImponible,
+          importe: r.importe,
+        })),
+      )
     }
-    return buildSifereRetencionesExport(exportRows)
+    return buildSifereRetencionesExport(
+      validRows.map((r) => ({
+        fecha: r.fecha,
+        cuitRetenido: r.cuitRetenido,
+        provincia: r.provincia,
+        baseImponible: r.baseImponible,
+        alicuota: r.alicuota,
+        importe: r.importe,
+      })),
+    )
   }
 }

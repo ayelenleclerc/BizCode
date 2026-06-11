@@ -3057,6 +3057,116 @@ export const fiscalRetencionesAPI = {
   },
 }
 
+export type PresentacionWarningDto = {
+  code: 'missing_cuit' | 'invalid_cuit' | 'zero_importe_excluded'
+  retencionId: number
+  message: string
+}
+
+export type PresentacionFilaDto = {
+  retencionId: number
+  fecha: string
+  cuit: string
+  denominacion: string
+  regimenNombre: string
+  regimenTipo: string
+  operacionTipo: 'retencion' | 'percepcion'
+  provincia: string | null
+  baseImponible: string
+  alicuota: string
+  importe: string
+  incluida: boolean
+}
+
+export type PresentacionPreviewDto = {
+  formato: 'sicore' | 'sifere'
+  periodo: string
+  filas: PresentacionFilaDto[]
+  totalesPorRegimen: Array<{
+    regimenNombre: string
+    operaciones: number
+    totalImporte: string
+  }>
+  warnings: PresentacionWarningDto[]
+  canGenerate: boolean
+}
+
+export type PresentacionRetencionDto = {
+  id: number
+  formato: 'sicore' | 'sifere'
+  periodo: string
+  totalOperaciones: number
+  totalImporte: string
+  archivoHash: string | null
+  presentadoAt: string | null
+  createdAt: string
+}
+
+export const fiscalPresentacionesAPI = {
+  preview: async (params: {
+    formato: 'sicore' | 'sifere'
+    periodo: string
+  }): Promise<PresentacionPreviewDto> => {
+    try {
+      const response = await api.get<{ success: boolean; data: PresentacionPreviewDto }>(
+        '/fiscal/presentaciones/preview',
+        { params },
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  generar: async (body: {
+    formato: 'sicore' | 'sifere'
+    periodo: string
+  }): Promise<PresentacionRetencionDto> => {
+    try {
+      const response = await api.post<{ success: boolean; data: PresentacionRetencionDto }>(
+        '/fiscal/presentaciones',
+        body,
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  listar: async (): Promise<PresentacionRetencionDto[]> => {
+    try {
+      const response = await api.get<{ success: boolean; data: PresentacionRetencionDto[] }>(
+        '/fiscal/presentaciones',
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  downloadArchivo: async (id: number): Promise<Blob> => {
+    try {
+      const response = await api.get<Blob>(`/fiscal/presentaciones/${id}/archivo`, {
+        responseType: 'blob',
+      })
+      return response.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  marcarPresentado: async (id: number): Promise<PresentacionRetencionDto> => {
+    try {
+      const response = await api.patch<{ success: boolean; data: PresentacionRetencionDto }>(
+        `/fiscal/presentaciones/${id}/presentado`,
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+}
+
 export type DashboardVentasGroupBy = 'day' | 'week' | 'month'
 
 export type DashboardVentasSeriesRow = {

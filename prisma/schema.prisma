@@ -696,6 +696,7 @@ model Tenant {
   regimenesRetencion            RegimenRetencion[]
   retencionesAplicadas          RetencionAplicada[]
   retencionConstanciaSequences  RetencionConstanciaSequence[]
+  presentacionesRetencion       PresentacionRetencion[]
 }
 
 model Plan {
@@ -908,6 +909,7 @@ model AppUser {
   recibosCobro           ReciboCobro[]
   documentosCompraImportados DocumentoCompraImportado[]
   chequeMovimientos      ChequeMov[]
+  presentacionesRetencion PresentacionRetencion[] @relation("PresentacionRetencionCreatedBy")
 
   @@unique([tenantId, username])
 }
@@ -1260,6 +1262,27 @@ model RetencionConstanciaSequence {
   lastNum   Int    @default(0)
 
   @@unique([tenantId, tipo, provincia])
+}
+
+/// Monthly SICORE/SIFERE file generation history (#242).
+model PresentacionRetencion {
+  id               Int       @id @default(autoincrement())
+  tenantId         Int
+  tenant           Tenant    @relation(fields: [tenantId], references: [id])
+  /// sicore | sifere
+  formato          String    @db.VarChar(10)
+  /// YYYY-MM
+  periodo          String    @db.VarChar(7)
+  totalOperaciones Int
+  totalImporte     Decimal   @db.Decimal(14, 2)
+  archivoHash      String?   @db.VarChar(64)
+  archivoContenido String    @db.Text
+  presentadoAt     DateTime?
+  createdAt        DateTime  @default(now())
+  createdById      Int?
+  createdBy        AppUser?  @relation("PresentacionRetencionCreatedBy", fields: [createdById], references: [id])
+
+  @@index([tenantId, formato, periodo])
 }
 
 model LoginAttempt {

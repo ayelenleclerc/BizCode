@@ -404,6 +404,24 @@
 
 * [PlanLimitErrorEnvelope](./planlimiterrorenvelope.md) – `-`
 
+* [PresentacionFila](./presentacionfila.md) – `-`
+
+* [PresentacionPreview](./presentacionpreview.md) – `-`
+
+* [PresentacionPreviewEnvelope](./presentacionpreviewenvelope.md) – `-`
+
+* [PresentacionRetencion](./presentacionretencion.md) – `-`
+
+* [PresentacionRetencionEnvelope](./presentacionretencionenvelope.md) – `-`
+
+* [PresentacionRetencionInput](./presentacionretencioninput.md) – `-`
+
+* [PresentacionRetencionListEnvelope](./presentacionretencionlistenvelope.md) – `-`
+
+* [PresentacionTotalRegimen](./presentaciontotalregimen.md) – `-`
+
+* [PresentacionWarning](./presentacionwarning.md) – `-`
+
 * [PrintingStatus](./printingstatus.md) – `-`
 
 * [PrintingStatusEnvelope](./printingstatusenvelope.md) – `-`
@@ -1005,6 +1023,14 @@
 * [Untitled array in PedidoListEnvelope](./pedidolistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
 
 * [Untitled array in PlanCatalogEnvelope](./plancatalogenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled array in PresentacionPreview](./presentacionpreview-properties-filas.md) – `undefined#/properties/filas`
+
+* [Untitled array in PresentacionPreview](./presentacionpreview-properties-totalesporregimen.md) – `undefined#/properties/totalesPorRegimen`
+
+* [Untitled array in PresentacionPreview](./presentacionpreview-properties-warnings.md) – `undefined#/properties/warnings`
+
+* [Untitled array in PresentacionRetencionListEnvelope](./presentacionretencionlistenvelope-properties-data.md) – `undefined#/properties/data`
 
 * [Untitled array in ProveedorArticuloHistorialRow](./proveedorarticulohistorialrow-properties-evolucionprecios.md) – `undefined#/properties/evolucionPrecios`
 

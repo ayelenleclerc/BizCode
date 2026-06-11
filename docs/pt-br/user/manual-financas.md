@@ -70,6 +70,8 @@ Configure regimes e flags de agente em **Configurações → Empresa → Retenç
 
 **Cheques (#231):** módulo `fiscal.cheques`; carteira em **Finanças** (`GET /api/cheques`, `GET /api/cheques/resumen`, transições depositar/endossar/compensar/rejeitar/anular). Alta ao registrar recebimento (`chequeNuevo` em `POST /api/cobros`) ou endosso ao pagar fornecedor (`chequeId` em `POST /api/proveedores/{id}/pagos` com `cheque`/`echeq`). Alertas `cheque_due_soon` (≤3 dias) via `POST /api/cheques/alertas/run`; rejeição notifica `cheque_rechazado`. Sem conciliação bancária nem status ECHEQ automático nesta versão.
 
+**Apresentações SICORE/SIFERE (#242):** em **Finanças → Apresentações fiscais** (`finance.retenciones`, `reports.financial.read`): selecione período e formato (SICORE nacional ou SIFERE IIBB), pré-visualização com totais por regime e avisos de CUIT, download TXT (`POST /api/fiscal/presentaciones` + `GET .../{id}/archivo`), histórico e marca «apresentado» após envio à AFIP/COMARB. APIs: `GET /api/fiscal/presentaciones/preview?formato=sicore|sifere&periodo=YYYY-MM`, `POST/GET /api/fiscal/presentaciones`, `PATCH /api/fiscal/presentaciones/{id}/presentado`. Exportação direta legada: `GET /api/fiscal/retenciones/export`. Valide os arquivos em homologação oficial manualmente.
+
 A condição IVA de clientes/fornecedores usa `condIva` do cadastro; consulta Padrão AFIP (#192) não implementada nesta entrega.
 
 **Outros idiomas:** [English](../../en/user/manual-finance.md) · [Español](../../es/user/manual-finanzas.md)
