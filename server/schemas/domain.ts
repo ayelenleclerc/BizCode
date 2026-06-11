@@ -2062,6 +2062,11 @@ export const retencionesPreviewQuerySchema = z.object({
   neto3: z.coerce.number().min(0).optional(),
 })
 
+export const presentacionRetencionBodySchema = z.object({
+  formato: z.enum(['sicore', 'sifere']),
+  periodo: z.string().regex(/^\d{4}-\d{2}$/, 'periodo must be YYYY-MM'),
+})
+
 const remitoItemField = z
   .array(
     z.object({

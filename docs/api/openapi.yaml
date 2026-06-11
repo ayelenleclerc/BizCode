@@ -3499,6 +3499,147 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
 
+  /api/fiscal/presentaciones/preview:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: formato
+        in: query
+        required: true
+        schema:
+          type: string
+          enum: [sicore, sifere]
+      - name: periodo
+        in: query
+        required: true
+        schema:
+          type: string
+          pattern: '^\\d{4}-\\d{2}$'
+    get:
+      tags: [contabilidad]
+      summary: Preview monthly SICORE/SIFERE presentation (#242)
+      description: |
+        Requires `finance.retenciones`, `reports.financial.read`.
+        Returns operations for the period with regime totals and CUIT validation warnings.
+      responses:
+        '200':
+          description: Preview envelope
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PresentacionPreviewEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/fiscal/presentaciones:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [contabilidad]
+      summary: List generated presentation files (#242)
+      description: Requires `finance.retenciones`, `reports.financial.read`.
+      responses:
+        '200':
+          description: History list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PresentacionRetencionListEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    post:
+      tags: [contabilidad]
+      summary: Generate and store presentation TXT (#242)
+      description: Requires `finance.retenciones`, `reports.financial.read`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PresentacionRetencionInput'
+      responses:
+        '201':
+          description: Created presentation record
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PresentacionRetencionEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/fiscal/presentaciones/{id}/archivo:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    get:
+      tags: [contabilidad]
+      summary: Download stored presentation TXT (#242)
+      description: Requires `finance.retenciones`, `reports.financial.read`.
+      responses:
+        '200':
+          description: TXT file
+          content:
+            text/plain:
+              schema:
+                type: string
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/fiscal/presentaciones/{id}/presentado:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    patch:
+      tags: [contabilidad]
+      summary: Mark presentation as filed in AFIP (#242)
+      description: Requires `finance.retenciones`, `reports.financial.read`.
+      responses:
+        '200':
+          description: Updated presentation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PresentacionRetencionEnvelope'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
   /api/fiscal/retenciones/{id}/comprobante/pdf:
     parameters:
       - $ref: '#/components/parameters/BizcodeChannelHeader'
@@ -11597,6 +11738,173 @@ components:
           const: true
         data:
           $ref: '#/components/schemas/FiscalRetencionesConfig'
+
+    PresentacionRetencionInput:
+      type: object
+      required: [formato, periodo]
+      properties:
+        formato:
+          type: string
+          enum: [sicore, sifere]
+        periodo:
+          type: string
+          pattern: '^\\d{4}-\\d{2}$'
+
+    PresentacionWarning:
+      type: object
+      required: [code, retencionId, message]
+      properties:
+        code:
+          type: string
+          enum: [missing_cuit, invalid_cuit, zero_importe_excluded]
+        retencionId:
+          type: integer
+          minimum: 1
+        message:
+          type: string
+
+    PresentacionFila:
+      type: object
+      required:
+        - retencionId
+        - fecha
+        - cuit
+        - denominacion
+        - regimenNombre
+        - regimenTipo
+        - operacionTipo
+        - baseImponible
+        - alicuota
+        - importe
+        - incluida
+      properties:
+        retencionId:
+          type: integer
+          minimum: 1
+        fecha:
+          type: string
+          format: date-time
+        cuit:
+          type: string
+        denominacion:
+          type: string
+        regimenNombre:
+          type: string
+        regimenTipo:
+          type: string
+        operacionTipo:
+          type: string
+          enum: [retencion, percepcion]
+        provincia:
+          type: ['string', 'null']
+        baseImponible:
+          type: string
+        alicuota:
+          type: string
+        importe:
+          type: string
+        incluida:
+          type: boolean
+
+    PresentacionTotalRegimen:
+      type: object
+      required: [regimenNombre, operaciones, totalImporte]
+      properties:
+        regimenNombre:
+          type: string
+        operaciones:
+          type: integer
+          minimum: 0
+        totalImporte:
+          type: string
+
+    PresentacionPreview:
+      type: object
+      required: [formato, periodo, filas, totalesPorRegimen, warnings, canGenerate]
+      properties:
+        formato:
+          type: string
+          enum: [sicore, sifere]
+        periodo:
+          type: string
+        filas:
+          type: array
+          items:
+            $ref: '#/components/schemas/PresentacionFila'
+        totalesPorRegimen:
+          type: array
+          items:
+            $ref: '#/components/schemas/PresentacionTotalRegimen'
+        warnings:
+          type: array
+          items:
+            $ref: '#/components/schemas/PresentacionWarning'
+        canGenerate:
+          type: boolean
+
+    PresentacionPreviewEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/PresentacionPreview'
+
+    PresentacionRetencion:
+      type: object
+      required:
+        - id
+        - formato
+        - periodo
+        - totalOperaciones
+        - totalImporte
+        - createdAt
+      properties:
+        id:
+          type: integer
+          minimum: 1
+        formato:
+          type: string
+          enum: [sicore, sifere]
+        periodo:
+          type: string
+        totalOperaciones:
+          type: integer
+          minimum: 0
+        totalImporte:
+          type: string
+        archivoHash:
+          type: ['string', 'null']
+        presentadoAt:
+          type: ['string', 'null']
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
+
+    PresentacionRetencionEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/PresentacionRetencion'
+
+    PresentacionRetencionListEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/PresentacionRetencion'
 
     RetencionAplicada:
       type: object

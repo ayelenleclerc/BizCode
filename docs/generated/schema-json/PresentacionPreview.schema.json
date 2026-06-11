@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "canGenerate": {
+      "type": "boolean"
+    },
+    "filas": {
+      "items": {
+        "$ref": "./PresentacionFila.schema.json"
+      },
+      "type": "array"
+    },
+    "formato": {
+      "enum": [
+        "sicore",
+        "sifere"
+      ],
+      "type": "string"
+    },
+    "periodo": {
+      "type": "string"
+    },
+    "totalesPorRegimen": {
+      "items": {
+        "$ref": "./PresentacionTotalRegimen.schema.json"
+      },
+      "type": "array"
+    },
+    "warnings": {
+      "items": {
+        "$ref": "./PresentacionWarning.schema.json"
+      },
+      "type": "array"
+    }
+  },
+  "required": [
+    "formato",
+    "periodo",
+    "filas",
+    "totalesPorRegimen",
+    "warnings",
+    "canGenerate"
+  ],
+  "title": "PresentacionPreview",
+  "type": "object"
+}
