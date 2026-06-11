@@ -38449,7 +38449,26 @@ Returns boolean flags for each channel. No sensitive values are exposed.
 }
 ```
 
-##### Status: 429
+##### Status: 429 Rate limit exceeded
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
 
 ##### Status: 500 Internal server error
 
@@ -39168,7 +39187,26 @@ Returns boolean flags for each channel. No sensitive values are exposed.
 }
 ```
 
-##### Status: 422
+##### Status: 422 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
 
 ##### Status: 500 Internal server error
 
