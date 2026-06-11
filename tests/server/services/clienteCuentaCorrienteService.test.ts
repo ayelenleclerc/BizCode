@@ -62,6 +62,9 @@ function buildDb() {
         return row
       }),
     },
+    reciboCobroImputacion: {
+      groupBy: vi.fn(async () => []),
+    },
     cliente: {
       findFirst: vi.fn(async () => ({
         id: 1,
@@ -110,15 +113,18 @@ describe('ClienteCuentaCorrienteService', () => {
     expect(db.cliente.updateMany).toHaveBeenCalled()
   })
 
-  it('getAntiguedad agrupa facturas activas', async () => {
+  it('getAntiguedad usa saldo pendiente por factura con imputaciones (#233)', async () => {
     const db = buildDb()
     db.factura.findMany = vi.fn().mockResolvedValue([
-      { total: new Decimal(100), fecha: new Date('2026-01-01') },
-      { total: new Decimal(50), fecha: new Date('2025-12-01') },
+      { id: 1, total: new Decimal(100), fecha: new Date('2026-01-01') },
+      { id: 2, total: new Decimal(50), fecha: new Date('2025-12-01') },
+    ])
+    ;(db.reciboCobroImputacion.groupBy as ReturnType<typeof vi.fn>).mockResolvedValueOnce([
+      { facturaId: 1, _sum: { importe: new Decimal(40) } },
     ])
     const svc = new ClienteCuentaCorrienteService(db as never)
     const result = await svc.getAntiguedad(1, 1, new Date('2026-06-01'))
-    expect(result?.totalPendiente).toBe('150.00')
+    expect(result?.totalPendiente).toBe('110.00')
     expect(result?.buckets).toHaveLength(4)
   })
 

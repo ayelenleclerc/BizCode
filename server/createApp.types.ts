@@ -116,6 +116,42 @@ export type ReciboPagoInput = {
   retenciones?: ReciboPagoRetencionInput[]
 }
 
+/** @en Customer receipt payment method (#233). @es Medio de pago en recibo de cobro (#233). @pt-BR Meio de pagamento no recibo de cobrança (#233). */
+export type ReciboCobroFormaTipo =
+  | 'efectivo'
+  | 'transferencia'
+  | 'cheque'
+  | 'mercadopago'
+  | 'tarjeta'
+  | 'otro'
+
+/** @en Payment line on customer receipt (#233). @es Línea de forma de pago en recibo de cobro (#233). @pt-BR Linha de forma de pagamento no recibo (#233). */
+export type ReciboCobroFormaInput = {
+  tipo: ReciboCobroFormaTipo
+  importe: number
+  chequeId?: number | null
+  chequeNuevo?: ChequeInput | null
+  referencia?: string | null
+  banco?: string | null
+}
+
+/** @en Invoice allocation on customer receipt (#233). @es Imputación a factura en recibo de cobro (#233). @pt-BR Imputação a fatura no recibo (#233). */
+export type ReciboCobroImputacionInput = {
+  facturaId: number
+  importe: number
+}
+
+/** @en Customer payment receipt body (#233). @es Cuerpo de recibo de cobro (#233). @pt-BR Corpo do recibo de cobrança (#233). */
+export type ReciboCobroInput = {
+  fecha: string
+  totalCobrado: number
+  concepto?: string | null
+  formas: ReciboCobroFormaInput[]
+  imputaciones?: ReciboCobroImputacionInput[]
+  fifo?: boolean
+  retenciones?: CobroRetencionInput[]
+}
+
 export type FacturaItemInput = {
   articuloId: number
   cantidad: number

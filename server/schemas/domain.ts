@@ -1686,6 +1686,66 @@ export const reciboPagoBodySchema = z
     }
   })
 
+const reciboCobroFormaTipoSchema = z.enum([
+  'efectivo',
+  'transferencia',
+  'cheque',
+  'mercadopago',
+  'tarjeta',
+  'otro',
+])
+
+/** @en Customer payment receipt body (#233). */
+export const reciboCobroBodySchema = z
+  .object({
+    fecha: z.string(),
+    totalCobrado: z.number().positive('totalCobrado must be positive'),
+    concepto: z.union([z.string(), z.null(), z.undefined()]).optional(),
+    fifo: z.boolean().optional(),
+    formas: z
+      .array(
+        z.object({
+          tipo: reciboCobroFormaTipoSchema,
+          importe: z.number().positive('importe must be positive'),
+          chequeId: z.union([z.number(), z.null(), z.undefined()]).optional(),
+          chequeNuevo: z.union([z.object({}).passthrough(), z.null(), z.undefined()]).optional(),
+          referencia: z.union([z.string(), z.null(), z.undefined()]).optional(),
+          banco: z.union([z.string(), z.null(), z.undefined()]).optional(),
+        }),
+      )
+      .min(1, 'At least one payment method is required'),
+    imputaciones: z
+      .array(
+        z.object({
+          facturaId: z.number().int().min(1),
+          importe: z.number().positive('importe must be positive'),
+        }),
+      )
+      .optional(),
+    retenciones: z.array(retencionPercepcionLineSchema).optional(),
+  })
+  .superRefine((data, ctx) => {
+    const f = data.fecha.trim()
+    if (f.length === 0) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'fecha is required', path: ['fecha'] })
+    }
+    if (data.concepto != null && data.concepto.length > 500) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'concepto max 500 chars', path: ['concepto'] })
+    }
+    const formasTotal = data.formas.reduce((sum, line) => sum + line.importe, 0)
+    if (Math.abs(formasTotal - data.totalCobrado) > 0.009) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'totalCobrado must equal sum of formas importe',
+        path: ['totalCobrado'],
+      })
+    }
+  })
+
+export const reciboCobroVoidBodySchema = z.object({
+  anulacionMotivo: z.string().trim().min(3, 'anulacionMotivo is required'),
+})
+
 const comprobanteCompraFieldsSchema = z.object({
   fecha: z.string(),
   tipo: z.enum(['A', 'B', 'C'], {

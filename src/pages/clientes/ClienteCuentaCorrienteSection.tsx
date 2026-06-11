@@ -1,9 +1,13 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { CanAccess } from '@/components/CanAccess'
+import IfModule from '@/components/IfModule'
 import { ApiRequestFailedError, clientesAPI } from '@/lib/api'
+import ClienteReciboCobroSection from './ClienteReciboCobroSection'
 import type { ClienteCuentaCorrienteAntiguedad, MovimientoClienteCCTipo } from '@/types'
 import ClienteDeudaChart from './ClienteDeudaChart'
+
+const PAGE_SIZE = 25
 
 const TIPOS: MovimientoClienteCCTipo[] = [
   'saldo_inicial',
@@ -37,6 +41,7 @@ export default function ClienteCuentaCorrienteSection({ clienteId }: Props) {
   const [filterTipo, setFilterTipo] = useState('')
   const [filterFrom, setFilterFrom] = useState('')
   const [filterTo, setFilterTo] = useState('')
+  const [offset, setOffset] = useState(0)
   const [ajusteOpen, setAjusteOpen] = useState(false)
   const [ajusteMonto, setAjusteMonto] = useState('')
   const [ajusteMotivo, setAjusteMotivo] = useState('')
@@ -49,7 +54,13 @@ export default function ClienteCuentaCorrienteSection({ clienteId }: Props) {
     setLoading(true)
     setError(null)
     try {
-      const params: { tipo?: string; desde?: string; hasta?: string } = {}
+      const params: {
+        tipo?: string
+        desde?: string
+        hasta?: string
+        limit?: number
+        offset?: number
+      } = { limit: PAGE_SIZE, offset }
       if (filterTipo) params.tipo = filterTipo
       if (filterFrom) params.desde = new Date(filterFrom).toISOString()
       if (filterTo) params.hasta = new Date(`${filterTo}T23:59:59`).toISOString()
@@ -70,11 +81,21 @@ export default function ClienteCuentaCorrienteSection({ clienteId }: Props) {
     } finally {
       setLoading(false)
     }
-  }, [clienteId, filterFrom, filterTipo, filterTo, tc])
+  }, [clienteId, filterFrom, filterTipo, filterTo, offset, tc])
 
   useEffect(() => {
     void load()
   }, [load])
+
+  useEffect(() => {
+    setOffset(0)
+  }, [filterTipo, filterFrom, filterTo])
+
+  const totalMovimientos = data?.total ?? 0
+  const canPrev = offset > 0
+  const canNext = data != null && offset + PAGE_SIZE < totalMovimientos
+  const pageFrom = totalMovimientos === 0 ? 0 : offset + 1
+  const pageTo = Math.min(offset + PAGE_SIZE, totalMovimientos)
 
   const submitAjuste = async () => {
     const monto = Number.parseFloat(ajusteMonto)
@@ -197,6 +218,10 @@ export default function ClienteCuentaCorrienteSection({ clienteId }: Props) {
       ) : null}
 
       <ClienteDeudaChart serie={data.serie} />
+
+      <IfModule flag="finance.receipts">
+        <ClienteReciboCobroSection clienteId={clienteId} onReciboRegistered={() => void load()} />
+      </IfModule>
 
       <div className="flex flex-wrap gap-2 items-end">
         <div>
@@ -347,7 +372,36 @@ export default function ClienteCuentaCorrienteSection({ clienteId }: Props) {
           {t('cc.movimientosEmpty')}
         </p>
       ) : (
-        <div className="overflow-x-auto">
+        <div className="space-y-2">
+          <div
+            className="flex flex-wrap items-center justify-between gap-2 text-sm"
+            data-testid="cliente-cc-pagination"
+          >
+            <p className="text-slate-600 dark:text-slate-400">
+              {t('cc.paginationSummary', { from: pageFrom, to: pageTo, total: totalMovimientos })}
+            </p>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                className="px-3 py-1 rounded border border-slate-300 dark:border-slate-600 text-sm disabled:opacity-50"
+                disabled={!canPrev}
+                onClick={() => setOffset((prev) => Math.max(0, prev - PAGE_SIZE))}
+                data-testid="cliente-cc-pagination-prev"
+              >
+                {t('cc.paginationPrev')}
+              </button>
+              <button
+                type="button"
+                className="px-3 py-1 rounded border border-slate-300 dark:border-slate-600 text-sm disabled:opacity-50"
+                disabled={!canNext}
+                onClick={() => setOffset((prev) => prev + PAGE_SIZE)}
+                data-testid="cliente-cc-pagination-next"
+              >
+                {t('cc.paginationNext')}
+              </button>
+            </div>
+          </div>
+          <div className="overflow-x-auto">
           <table className="w-full text-sm border-collapse" data-testid="cliente-cc-table">
             <caption className="sr-only">{t('cc.tableCaption')}</caption>
             <thead>
@@ -387,6 +441,7 @@ export default function ClienteCuentaCorrienteSection({ clienteId }: Props) {
               ))}
             </tbody>
           </table>
+          </div>
         </div>
       )}
     </div>

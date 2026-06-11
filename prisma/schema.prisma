@@ -85,6 +85,7 @@ model Cliente {
   remitos        Remito[]
   cheques        Cheque[]
   movimientosCC  MovimientoClienteCC[]
+  recibosCobro   ReciboCobro[]
 
   @@unique([tenantId, codigo])
   @@index([tenantId])
@@ -421,6 +422,7 @@ model Factura {
   retencionesAplicadas RetencionAplicada[]
   remitos        Remito[]
   movimientoCC   MovimientoClienteCC?
+  reciboCobroImputaciones ReciboCobroImputacion[]
 
   @@unique([tenantId, tipo, prefijo, numero])
   @@index([tenantId])
@@ -552,6 +554,7 @@ model Cheque {
   movimientos      ChequeMov[]
   cobros           Cobro[]
   recibosPago      ReciboPago[]
+  reciboCobroFormas ReciboCobroForma[]
   movimientoCC     MovimientoClienteCC?
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
@@ -668,6 +671,7 @@ model Tenant {
   movimientosProveedorCC   MovimientoProveedorCC[]
   movimientosClienteCC     MovimientoClienteCC[]
   recibosPago              ReciboPago[]
+  recibosCobro             ReciboCobro[]
   alertaProveedorConfig    AlertaProveedorConfig?
   alertasProveedorLog      AlertaProveedorLog[]
   proveedorArticulos       ProveedorArticulo[]
@@ -901,6 +905,7 @@ model AppUser {
   movimientosProveedorCC MovimientoProveedorCC[]
   movimientosClienteCC   MovimientoClienteCC[]
   recibosPago            ReciboPago[]
+  recibosCobro           ReciboCobro[]
   documentosCompraImportados DocumentoCompraImportado[]
   chequeMovimientos      ChequeMov[]
 
@@ -1033,10 +1038,70 @@ model MovimientoClienteCC {
   cheque               Cheque?            @relation(fields: [chequeId], references: [id])
   retencionAplicadaId  Int?               @unique
   retencionAplicada    RetencionAplicada? @relation(fields: [retencionAplicadaId], references: [id])
+  reciboCobroId        Int?               @unique
+  reciboCobro          ReciboCobro?       @relation(fields: [reciboCobroId], references: [id])
   createdAt            DateTime           @default(now())
 
   @@index([tenantId, clienteId, fecha])
   @@index([tenantId, clienteId])
+}
+
+/// Customer payment receipt (#233).
+model ReciboCobro {
+  id              Int      @id @default(autoincrement())
+  tenantId        Int
+  tenant          Tenant   @relation(fields: [tenantId], references: [id])
+  numero          Int
+  clienteId       Int
+  cliente         Cliente  @relation(fields: [clienteId], references: [id])
+  fecha           DateTime
+  totalCobrado    Decimal  @db.Decimal(14, 2)
+  concepto        String?  @db.VarChar(500)
+  /// emitido | anulado
+  estado          String   @db.VarChar(20) @default("emitido")
+  anulacionMotivo String?  @db.VarChar(500)
+  usuarioId       Int
+  usuario         AppUser  @relation(fields: [usuarioId], references: [id])
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  formas               ReciboCobroForma[]
+  imputaciones         ReciboCobroImputacion[]
+  movimientoCC         MovimientoClienteCC?
+  retencionesAplicadas RetencionAplicada[]
+
+  @@unique([tenantId, numero])
+  @@index([tenantId, clienteId])
+  @@index([tenantId, clienteId, fecha])
+}
+
+model ReciboCobroForma {
+  id            Int         @id @default(autoincrement())
+  reciboCobroId Int
+  reciboCobro   ReciboCobro @relation(fields: [reciboCobroId], references: [id], onDelete: Cascade)
+  /// efectivo | transferencia | cheque | mercadopago | tarjeta | otro
+  tipo          String      @db.VarChar(20)
+  importe       Decimal     @db.Decimal(14, 2)
+  chequeId      Int?
+  cheque        Cheque?     @relation(fields: [chequeId], references: [id])
+  referencia    String?     @db.VarChar(60)
+  banco         String?     @db.VarChar(50)
+
+  @@index([reciboCobroId])
+}
+
+model ReciboCobroImputacion {
+  id            Int         @id @default(autoincrement())
+  reciboCobroId Int
+  reciboCobro   ReciboCobro @relation(fields: [reciboCobroId], references: [id], onDelete: Cascade)
+  facturaId     Int
+  factura       Factura     @relation(fields: [facturaId], references: [id])
+  importe       Decimal     @db.Decimal(14, 2)
+  saldoPrevio   Decimal     @db.Decimal(14, 2)
+  saldoPostPago Decimal     @db.Decimal(14, 2)
+
+  @@index([reciboCobroId])
+  @@index([facturaId])
 }
 
 model StockAjuste {
@@ -1169,6 +1234,8 @@ model RetencionAplicada {
   cobro         Cobro?           @relation(fields: [cobroId], references: [id])
   reciboPagoId  Int?
   reciboPago    ReciboPago?      @relation(fields: [reciboPagoId], references: [id])
+  reciboCobroId Int?
+  reciboCobro   ReciboCobro?     @relation(fields: [reciboCobroId], references: [id])
   baseImponible Decimal          @db.Decimal(14, 2)
   alicuota      Decimal          @db.Decimal(8, 4)
   importe       Decimal          @db.Decimal(14, 2)

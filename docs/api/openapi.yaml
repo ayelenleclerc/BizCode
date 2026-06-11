@@ -1046,6 +1046,176 @@ paths:
         '403':
           $ref: '#/components/responses/ForbiddenError'
 
+  /api/clientes/{id}/facturas-pendientes:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    get:
+      tags: [clientes]
+      summary: Pending customer invoices for receipt allocation
+      description: Active invoices with remaining balance for imputation (#233). Requires module `finance.receipts`.
+      responses:
+        '200':
+          description: Pending invoices
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FacturaPendienteClienteListEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /api/clientes/{id}/recibos:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    get:
+      tags: [clientes]
+      summary: Customer payment receipt history
+      description: Requires module `finance.receipts` and permission `reports.financial.read`.
+      parameters:
+        - $ref: '#/components/parameters/ListLimit'
+        - $ref: '#/components/parameters/ListOffset'
+      responses:
+        '200':
+          description: Paginated payment receipts
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReciboCobroListEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+    post:
+      tags: [clientes]
+      summary: Register customer payment receipt
+      description: |
+        Creates `ReciboCobro` with tenant-correlative `numero`, posts `cobro` ledger movement (negative monto = bruto),
+        optional `RetencionAplicada` rows, FIFO or manual imputaciones, and audit event `recibo_cobro_create`.
+        Requires module `finance.receipts` and `sales.create`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReciboCobroInput'
+      responses:
+        '201':
+          description: Payment receipt created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReciboCobroEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /api/clientes/{id}/recibos/{reciboId}/anular:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: reciboId
+        in: path
+        required: true
+        schema:
+          type: integer
+    post:
+      tags: [clientes]
+      summary: Void customer payment receipt
+      description: Sets estado `anulado` and posts compensating ledger movement. Audit `recibo_cobro_void`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReciboCobroVoidInput'
+      responses:
+        '200':
+          description: Receipt voided
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReciboCobroEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '422':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/ServerError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /api/clientes/{id}/recibos/{reciboId}/pdf:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: reciboId
+        in: path
+        required: true
+        schema:
+          type: integer
+    get:
+      tags: [clientes]
+      summary: Customer payment receipt PDF
+      description: Returns PDF with amount in words (#233). Requires module `finance.receipts`.
+      responses:
+        '200':
+          description: PDF document
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
   /api/articulos:
     parameters:
       - $ref: '#/components/parameters/BizcodeChannelHeader'
@@ -8870,6 +9040,247 @@ components:
               items:
                 $ref: '#/components/schemas/ReciboPago'
         - $ref: '#/components/schemas/ListPaginationMeta'
+
+    FacturaPendienteCliente:
+      type: object
+      required: [facturaId, facturaRef, fecha, total, pagado, pendiente]
+      properties:
+        facturaId:
+          type: integer
+        facturaRef:
+          type: string
+        fecha:
+          type: string
+          format: date-time
+        total:
+          type: string
+        pagado:
+          type: string
+        pendiente:
+          type: string
+
+    FacturaPendienteClienteListEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/FacturaPendienteCliente'
+
+    ReciboCobroForma:
+      type: object
+      required: [id, tipo, importe]
+      properties:
+        id:
+          type: integer
+        tipo:
+          type: string
+          enum: [efectivo, transferencia, cheque, mercadopago, tarjeta, otro]
+        importe:
+          type: string
+        chequeId:
+          type: integer
+          nullable: true
+        referencia:
+          type: string
+          nullable: true
+        banco:
+          type: string
+          nullable: true
+        chequeNumero:
+          type: string
+          nullable: true
+        chequeBanco:
+          type: string
+          nullable: true
+
+    ReciboCobroImputacion:
+      type: object
+      required: [id, facturaId, facturaRef, importe, saldoPrevio, saldoPostPago]
+      properties:
+        id:
+          type: integer
+        facturaId:
+          type: integer
+        facturaRef:
+          type: string
+        importe:
+          type: string
+        saldoPrevio:
+          type: string
+        saldoPostPago:
+          type: string
+
+    ReciboCobro:
+      type: object
+      required:
+        - id
+        - numero
+        - clienteId
+        - fecha
+        - totalCobrado
+        - totalBruto
+        - estado
+        - usuarioId
+        - cliente
+        - usuario
+        - formas
+        - imputaciones
+        - retenciones
+        - createdAt
+      properties:
+        id:
+          type: integer
+        numero:
+          type: integer
+        clienteId:
+          type: integer
+        fecha:
+          type: string
+          format: date-time
+        totalCobrado:
+          type: string
+        totalBruto:
+          type: string
+        concepto:
+          type: string
+          nullable: true
+        estado:
+          type: string
+          enum: [emitido, anulado]
+        anulacionMotivo:
+          type: string
+          nullable: true
+        usuarioId:
+          type: integer
+        cliente:
+          type: object
+          required: [id, codigo, rsocial]
+          properties:
+            id:
+              type: integer
+            codigo:
+              type: integer
+            rsocial:
+              type: string
+            cuit:
+              type: string
+              nullable: true
+        usuario:
+          type: object
+          required: [id, username]
+          properties:
+            id:
+              type: integer
+            username:
+              type: string
+        formas:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReciboCobroForma'
+        imputaciones:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReciboCobroImputacion'
+        retenciones:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReciboPagoRetencion'
+        createdAt:
+          type: string
+          format: date-time
+
+    ReciboCobroInput:
+      type: object
+      required: [fecha, totalCobrado, formas]
+      properties:
+        fecha:
+          type: string
+        totalCobrado:
+          type: number
+          exclusiveMinimum: 0
+        concepto:
+          type: string
+          maxLength: 500
+          nullable: true
+        fifo:
+          type: boolean
+          default: true
+        formas:
+          type: array
+          minItems: 1
+          items:
+            type: object
+            required: [tipo, importe]
+            properties:
+              tipo:
+                type: string
+                enum: [efectivo, transferencia, cheque, mercadopago, tarjeta, otro]
+              importe:
+                type: number
+                exclusiveMinimum: 0
+              chequeId:
+                type: integer
+                nullable: true
+              referencia:
+                type: string
+                nullable: true
+              banco:
+                type: string
+                nullable: true
+        imputaciones:
+          type: array
+          items:
+            type: object
+            required: [facturaId, importe]
+            properties:
+              facturaId:
+                type: integer
+                minimum: 1
+              importe:
+                type: number
+                exclusiveMinimum: 0
+        retenciones:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReciboPagoRetencionInput'
+
+    ReciboCobroVoidInput:
+      type: object
+      required: [anulacionMotivo]
+      properties:
+        anulacionMotivo:
+          type: string
+          minLength: 3
+          maxLength: 500
+
+    ReciboCobroListEnvelope:
+      allOf:
+        - type: object
+          required: [success, data]
+          properties:
+            success:
+              type: boolean
+              const: true
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/ReciboCobro'
+        - $ref: '#/components/schemas/ListPaginationMeta'
+
+    ReciboCobroEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/ReciboCobro'
 
     ReciboPagoEnvelope:
       type: object

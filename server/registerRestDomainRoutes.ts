@@ -27,6 +27,7 @@ import { registerProveedoresRoutes } from './routes/registerProveedoresRoutes'
 import { registerProveedorCuentaCorrienteRoutes } from './routes/registerProveedorCuentaCorrienteRoutes'
 import { registerClienteCuentaCorrienteRoutes } from './routes/registerClienteCuentaCorrienteRoutes'
 import { registerReciboPagoRoutes } from './routes/registerReciboPagoRoutes'
+import { registerReciboCobroRoutes } from './routes/registerReciboCobroRoutes'
 import { registerProveedorAlertasRoutes } from './routes/registerProveedorAlertasRoutes'
 import { registerProveedorHistorialRoutes } from './routes/registerProveedorHistorialRoutes'
 import { registerProveedorCatalogoRoutes } from './routes/registerProveedorCatalogoRoutes'
@@ -82,6 +83,7 @@ export function registerRestDomainRoutes(app: Application, prisma: PrismaClient)
   registerProveedorHistorialRoutes(app, ctx)
   registerProveedorCatalogoRoutes(app, ctx)
   registerReciboPagoRoutes(app, ctx)
+  registerReciboCobroRoutes(app, ctx)
   registerComprasRoutes(app, ctx)
   registerRecuentosRoutes(app, ctx)
   registerFormasPagoRoutes(app, ctx)

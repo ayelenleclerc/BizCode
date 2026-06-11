@@ -248,6 +248,10 @@
 
 * [FacturaListEnvelope](./facturalistenvelope.md) – `-`
 
+* [FacturaPendienteCliente](./facturapendientecliente.md) – `-`
+
+* [FacturaPendienteClienteListEnvelope](./facturapendienteclientelistenvelope.md) – `-`
+
 * [FacturaPendienteEstado](./facturapendienteestado.md) – `-`
 
 * [FacturaPendienteRow](./facturapendienterow.md) – `-`
@@ -471,6 +475,20 @@
 * [ProveedorNullableEnvelope](./proveedornullableenvelope.md) – `-`
 
 * [PublicPlan](./publicplan.md) – `-`
+
+* [ReciboCobro](./recibocobro.md) – `-`
+
+* [ReciboCobroEnvelope](./recibocobroenvelope.md) – `-`
+
+* [ReciboCobroForma](./recibocobroforma.md) – `-`
+
+* [ReciboCobroImputacion](./recibocobroimputacion.md) – `-`
+
+* [ReciboCobroInput](./recibocobroinput.md) – `-`
+
+* [ReciboCobroListEnvelope](./recibocobrolistenvelope.md) – `-`
+
+* [ReciboCobroVoidInput](./recibocobrovoidinput.md) – `-`
 
 * [ReciboPago](./recibopago.md) – `-`
 
@@ -782,6 +800,16 @@
 
 * [Untitled object in ProveedorListEnvelope](./proveedorlistenvelope-allof-0.md) – `undefined#/allOf/0`
 
+* [Untitled object in ReciboCobro](./recibocobro-properties-cliente.md) – `undefined#/properties/cliente`
+
+* [Untitled object in ReciboCobro](./recibocobro-properties-usuario.md) – `undefined#/properties/usuario`
+
+* [Untitled object in ReciboCobroInput](./recibocobroinput-properties-formas-items.md) – `undefined#/properties/formas/items`
+
+* [Untitled object in ReciboCobroInput](./recibocobroinput-properties-imputaciones-items.md) – `undefined#/properties/imputaciones/items`
+
+* [Untitled object in ReciboCobroListEnvelope](./recibocobrolistenvelope-allof-0.md) – `undefined#/allOf/0`
+
 * [Untitled object in ReciboPago](./recibopago-properties-proveedor.md) – `undefined#/properties/proveedor`
 
 * [Untitled object in ReciboPago](./recibopago-properties-usuario.md) – `undefined#/properties/usuario`
@@ -930,6 +958,8 @@
 
 * [Untitled array in FacturaListEnvelope](./facturalistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
 
+* [Untitled array in FacturaPendienteClienteListEnvelope](./facturapendienteclientelistenvelope-properties-data.md) – `undefined#/properties/data`
+
 * [Untitled array in FacturasPendientesEnvelope](./facturaspendientesenvelope-properties-data.md) – `undefined#/properties/data`
 
 * [Untitled array in FormaPagoListEnvelope](./formapagolistenvelope-properties-data.md) – `undefined#/properties/data`
@@ -995,6 +1025,20 @@
 * [Untitled array in ProveedorListEnvelope](./proveedorlistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
 
 * [Untitled array in PublicPlan](./publicplan-properties-features.md) – `undefined#/properties/features`
+
+* [Untitled array in ReciboCobro](./recibocobro-properties-formas.md) – `undefined#/properties/formas`
+
+* [Untitled array in ReciboCobro](./recibocobro-properties-imputaciones.md) – `undefined#/properties/imputaciones`
+
+* [Untitled array in ReciboCobro](./recibocobro-properties-retenciones.md) – `undefined#/properties/retenciones`
+
+* [Untitled array in ReciboCobroInput](./recibocobroinput-properties-formas.md) – `undefined#/properties/formas`
+
+* [Untitled array in ReciboCobroInput](./recibocobroinput-properties-imputaciones.md) – `undefined#/properties/imputaciones`
+
+* [Untitled array in ReciboCobroInput](./recibocobroinput-properties-retenciones.md) – `undefined#/properties/retenciones`
+
+* [Untitled array in ReciboCobroListEnvelope](./recibocobrolistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
 
 * [Untitled array in ReciboPago](./recibopago-properties-facturas.md) – `undefined#/properties/facturas`
 

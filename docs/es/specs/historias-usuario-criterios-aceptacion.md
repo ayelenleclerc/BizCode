@@ -58,7 +58,7 @@ Formato: los criterios **Given / When / Then** son de verificación **manual** s
 - **Historia:** Como usuario de finanzas quiero antigüedad de saldos y cuenta corriente por cliente para seguir la cartera.
 - **Criterios:**
   - Dado `reports.financial.read`, cuando abro Finanzas, entonces los buckets de antigüedad cargan desde `GET /api/reportes/aging`.
-  - Dado un id de cliente válido, cuando solicito la cuenta corriente, entonces las líneas muestran saldo acumulado desde `GET /api/reportes/cuenta-corriente/:clienteId`.
+  - Dado un id de cliente válido, cuando solicito la cuenta corriente, entonces las líneas muestran saldo acumulado desde `GET /api/clientes/{id}/cuenta-corriente` (o el wrapper legacy `GET /api/reportes/cuenta-corriente/:clienteId`).
 - **Evidencia:** `src/pages/finanzas/`.
 
 ## HU-08 — Reportes

@@ -17,14 +17,14 @@ Ao carregar, a página consulta **`GET /api/reportes/aging`** e mostra faixas (r
 Com o módulo **`finance.ledger`** habilitado, a ficha de cada cliente inclui a aba **Conta corrente**:
 
 - Saldo atual, limite de crédito e gráfico de evolução.
-- Tabela de movimentos (fatura, nota de crédito, recebimento, retenção, cheque devolvido, ajuste).
+- Tabela de movimentos paginada (fatura, nota de crédito, recebimento, retenção, cheque devolvido, ajuste).
 - Aging por faixas (`0-30`, `31-60`, `61-90`, `+90` dias).
 - Ajuste manual auditado (`POST /api/clientes/{id}/cuenta-corriente/ajuste`, permissão `sales.create`).
 - Download de extrato em PDF e envio por e-mail (`GET` / `POST .../estado-de-cuenta/...`).
 
 API canônica: `GET /api/clientes/{id}/cuenta-corriente`, `.../saldo`, `.../antiguedad`.
 
-Os movimentos são registrados automaticamente ao emitir faturas, anular com nota de crédito, registrar recebimentos (valor bruto) e rejeitar cheques vinculados a recebimentos.
+Os movimentos são registrados automaticamente ao emitir faturas, anular com nota de crédito, registrar recebimentos (valor bruto; retenções não geram linha separada no razão) e rejeitar cheques vinculados a recebimentos.
 
 ### Consulta rápida em Finanças (compatibilidade)
 

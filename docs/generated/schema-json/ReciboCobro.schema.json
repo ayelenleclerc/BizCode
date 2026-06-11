@@ -1,0 +1,120 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "anulacionMotivo": {
+      "nullable": true,
+      "type": "string"
+    },
+    "cliente": {
+      "properties": {
+        "codigo": {
+          "type": "integer"
+        },
+        "cuit": {
+          "nullable": true,
+          "type": "string"
+        },
+        "id": {
+          "type": "integer"
+        },
+        "rsocial": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "codigo",
+        "rsocial"
+      ],
+      "type": "object"
+    },
+    "clienteId": {
+      "type": "integer"
+    },
+    "concepto": {
+      "nullable": true,
+      "type": "string"
+    },
+    "createdAt": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "estado": {
+      "enum": [
+        "emitido",
+        "anulado"
+      ],
+      "type": "string"
+    },
+    "fecha": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "formas": {
+      "items": {
+        "$ref": "./ReciboCobroForma.schema.json"
+      },
+      "type": "array"
+    },
+    "id": {
+      "type": "integer"
+    },
+    "imputaciones": {
+      "items": {
+        "$ref": "./ReciboCobroImputacion.schema.json"
+      },
+      "type": "array"
+    },
+    "numero": {
+      "type": "integer"
+    },
+    "retenciones": {
+      "items": {
+        "$ref": "./ReciboPagoRetencion.schema.json"
+      },
+      "type": "array"
+    },
+    "totalBruto": {
+      "type": "string"
+    },
+    "totalCobrado": {
+      "type": "string"
+    },
+    "usuario": {
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "username": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "username"
+      ],
+      "type": "object"
+    },
+    "usuarioId": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "id",
+    "numero",
+    "clienteId",
+    "fecha",
+    "totalCobrado",
+    "totalBruto",
+    "estado",
+    "usuarioId",
+    "cliente",
+    "usuario",
+    "formas",
+    "imputaciones",
+    "retenciones",
+    "createdAt"
+  ],
+  "title": "ReciboCobro",
+  "type": "object"
+}

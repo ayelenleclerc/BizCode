@@ -222,16 +222,29 @@ export default function FiscalRetencionesSection() {
                         </td>
                         <td className="py-2 pr-4">{r.alicuota}%</td>
                         <td className="py-2 pr-4">
-                          <button
-                            type="button"
-                            data-testid={`btn-toggle-regimen-${r.id}`}
-                            disabled={!canEdit}
-                            onClick={() => void toggleRegimenActivo(r)}
-                            className="text-blue-600 dark:text-blue-400 underline disabled:no-underline disabled:opacity-70"
-                            aria-pressed={r.activo}
-                          >
-                            {r.activo ? t('retenciones.activo') : t('retenciones.inactivo')}
-                          </button>
+                          {r.activo ? (
+                            <button
+                              type="button"
+                              data-testid={`btn-toggle-regimen-${r.id}`}
+                              disabled={!canEdit}
+                              onClick={() => void toggleRegimenActivo(r)}
+                              className="text-blue-600 dark:text-blue-400 underline disabled:no-underline disabled:opacity-70"
+                              aria-pressed="true"
+                            >
+                              {t('retenciones.activo')}
+                            </button>
+                          ) : (
+                            <button
+                              type="button"
+                              data-testid={`btn-toggle-regimen-${r.id}`}
+                              disabled={!canEdit}
+                              onClick={() => void toggleRegimenActivo(r)}
+                              className="text-blue-600 dark:text-blue-400 underline disabled:no-underline disabled:opacity-70"
+                              aria-pressed="false"
+                            >
+                              {t('retenciones.inactivo')}
+                            </button>
+                          )}
                         </td>
                       </tr>
                     ))}
