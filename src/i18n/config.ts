@@ -25,6 +25,7 @@ import pickingEs from '@/locales/es/picking.json'
 import seguimientoEs from '@/locales/es/seguimiento.json'
 import logisticaReportesEs from '@/locales/es/logisticaReportes.json'
 import empresaEs from '@/locales/es/empresa.json'
+import portalEs from '@/locales/es/portal.json'
 
 import commonEn from '@/locales/en/common.json'
 import clientesEn from '@/locales/en/clientes.json'
@@ -48,6 +49,7 @@ import pickingEn from '@/locales/en/picking.json'
 import seguimientoEn from '@/locales/en/seguimiento.json'
 import logisticaReportesEn from '@/locales/en/logisticaReportes.json'
 import empresaEn from '@/locales/en/empresa.json'
+import portalEn from '@/locales/en/portal.json'
 
 import commonPt from '@/locales/pt-BR/common.json'
 import clientesPt from '@/locales/pt-BR/clientes.json'
@@ -71,6 +73,7 @@ import pickingPt from '@/locales/pt-BR/picking.json'
 import seguimientoPt from '@/locales/pt-BR/seguimiento.json'
 import logisticaReportesPt from '@/locales/pt-BR/logisticaReportes.json'
 import empresaPt from '@/locales/pt-BR/empresa.json'
+import portalPt from '@/locales/pt-BR/portal.json'
 
 // Persist language preference in localStorage
 const savedLang = typeof localStorage !== 'undefined'
@@ -83,7 +86,7 @@ i18n
     lng: savedLang,
     fallbackLng: 'es',
     defaultNS: 'common',
-    ns: ['common', 'clientes', 'articulos', 'proveedores', 'compras', 'recuentos', 'repartos', 'pod', 'picking', 'seguimiento', 'logisticaReportes', 'facturacion', 'pedidos', 'cobros', 'finanzas', 'reportes', 'dashboardAnalytics', 'logistica', 'zonasEntrega', 'empresa', 'chat', 'audit'],
+    ns: ['common', 'clientes', 'articulos', 'proveedores', 'compras', 'recuentos', 'repartos', 'pod', 'picking', 'seguimiento', 'logisticaReportes', 'facturacion', 'pedidos', 'cobros', 'finanzas', 'reportes', 'dashboardAnalytics', 'logistica', 'zonasEntrega', 'empresa', 'portal', 'chat', 'audit'],
     resources: {
       es: {
         common: commonEs,
@@ -108,6 +111,7 @@ i18n
         seguimiento: seguimientoEs,
         logisticaReportes: logisticaReportesEs,
         empresa: empresaEs,
+        portal: portalEs,
       },
       en: {
         common: commonEn,
@@ -132,6 +136,7 @@ i18n
         seguimiento: seguimientoEn,
         logisticaReportes: logisticaReportesEn,
         empresa: empresaEn,
+        portal: portalEn,
       },
       'pt-BR': {
         common: commonPt,
@@ -156,6 +161,7 @@ i18n
         seguimiento: seguimientoPt,
         logisticaReportes: logisticaReportesPt,
         empresa: empresaPt,
+        portal: portalPt,
       },
     },
     interpolation: {

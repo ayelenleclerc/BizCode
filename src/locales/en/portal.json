@@ -1,0 +1,112 @@
+{
+  "nav": {
+    "aria": "Portal sections",
+    "facturas": "Invoices",
+    "cuentaCorriente": "Account statement",
+    "pedidos": "Orders",
+    "misDatos": "My details"
+  },
+  "actions": {
+    "logout": "Sign out"
+  },
+  "login": {
+    "title": "Customer portal",
+    "subtitle": "Enter your registered email to receive a sign-in link.",
+    "emailLabel": "Email address",
+    "submit": "Send link",
+    "sending": "Sending…",
+    "checkEmail": "Check your inbox. If the email is registered, you will receive a link valid for 15 minutes.",
+    "errorGeneric": "Could not send the link. Please try again.",
+    "portalUnavailable": "The portal is not enabled for this company.",
+    "validation": {
+      "emailRequired": "Email is required",
+      "emailInvalid": "Invalid email"
+    }
+  },
+  "verify": {
+    "loading": "Verifying access…",
+    "missingToken": "Access token is missing.",
+    "invalidToken": "The link is invalid or expired."
+  },
+  "facturas": {
+    "title": "My invoices",
+    "filterEstado": "Status",
+    "filterFrom": "From",
+    "filterTo": "To",
+    "applyFilters": "Apply",
+    "estadoAll": "All",
+    "estadoPendiente": "Open",
+    "estadoVencida": "Overdue",
+    "estadoPagada": "Paid",
+    "estado": {
+      "pendiente": "Open",
+      "vencida": "Overdue",
+      "pagada": "Paid"
+    },
+    "loading": "Loading invoices…",
+    "empty": "No invoices to display.",
+    "errorLoad": "Could not load invoices.",
+    "errorPdf": "Could not download the PDF.",
+    "colRef": "Document",
+    "colFecha": "Date",
+    "colTotal": "Total",
+    "colPendiente": "Balance due",
+    "colEstado": "Status",
+    "colActions": "Actions",
+    "downloadPdf": "PDF",
+    "payOnline": "Pay online",
+    "payOnlineDisabled": "Online payment unavailable (MercadoPago setup pending)",
+    "tableCaption": "Customer invoice list",
+    "totalCount": "{{count}} invoice(s)"
+  },
+  "cc": {
+    "title": "Account statement",
+    "saldo": "Current balance",
+    "downloadPdf": "Download statement PDF",
+    "loading": "Loading entries…",
+    "errorLoad": "Could not load the account statement.",
+    "errorPdf": "Could not download the PDF.",
+    "colFecha": "Date",
+    "colTipo": "Type",
+    "colReferencia": "Reference",
+    "colMonto": "Amount",
+    "colSaldo": "Balance"
+  },
+  "pedidos": {
+    "title": "My orders",
+    "loading": "Loading orders…",
+    "empty": "No orders to display.",
+    "errorLoad": "Could not load orders.",
+    "colId": "No.",
+    "colFecha": "Date",
+    "colEstado": "Status",
+    "colTotal": "Total",
+    "colFactura": "Invoice",
+    "colRemito": "Delivery note"
+  },
+  "misDatos": {
+    "title": "My details",
+    "rsocial": "Legal name",
+    "codigo": "Code",
+    "email": "Email",
+    "telefono": "Phone",
+    "domicilio": "Address",
+    "localidad": "City",
+    "vendedorTitle": "Your sales rep",
+    "vendedorContact": "Assigned contact: {{name}}",
+    "sinVendedor": "No sales rep found on recent orders."
+  },
+  "config": {
+    "title": "Customer portal",
+    "enabled": "Enable B2B portal",
+    "showPedidos": "Show orders section",
+    "logoUrl": "Logo URL",
+    "primaryColor": "Primary color (hex)",
+    "footerText": "Footer text",
+    "save": "Save settings",
+    "saving": "Saving…",
+    "saved": "Settings saved",
+    "error": "Could not save settings",
+    "portalUrlHint": "Portal URL: /portal/{{slug}}"
+  }
+}

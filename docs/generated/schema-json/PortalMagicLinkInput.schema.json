@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "email": {
+      "format": "email",
+      "type": "string"
+    }
+  },
+  "required": [
+    "email"
+  ],
+  "title": "PortalMagicLinkInput",
+  "type": "object"
+}

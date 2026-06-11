@@ -37930,6 +37930,1806 @@ Returns boolean flags for each channel. No sensitive values are exposed.
 }
 ```
 
+### PARAMETERS /api/portal-config
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/portal-config`
+
+### Get B2B portal settings for the authenticated tenant (#240)
+
+- **Method:** `GET`
+- **Path:** `/api/portal-config`
+- **Tags:** portal
+
+#### Responses
+
+##### Status: 200 Portal configuration
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`enabled` (required)**
+
+    `boolean`
+
+  - **`footerText` (required)**
+
+    `string`
+
+  - **`logoUrl` (required)**
+
+    `string`
+
+  - **`primaryColor` (required)**
+
+    `string`
+
+  - **`showPedidos` (required)**
+
+    `boolean`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "enabled": true,
+    "showPedidos": true,
+    "logoUrl": "",
+    "primaryColor": "",
+    "footerText": ""
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Update B2B portal settings (#240)
+
+- **Method:** `PUT`
+- **Path:** `/api/portal-config`
+- **Tags:** portal
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`enabled`**
+
+  `boolean`
+
+- **`footerText`**
+
+  `string`
+
+- **`logoUrl`**
+
+  `string`
+
+- **`primaryColor`**
+
+  `string`
+
+- **`showPedidos`**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "enabled": true,
+  "showPedidos": true,
+  "logoUrl": "",
+  "primaryColor": "",
+  "footerText": ""
+}
+```
+
+#### Responses
+
+##### Status: 200 Portal configuration updated
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`enabled` (required)**
+
+    `boolean`
+
+  - **`footerText` (required)**
+
+    `string`
+
+  - **`logoUrl` (required)**
+
+    `string`
+
+  - **`primaryColor` (required)**
+
+    `string`
+
+  - **`showPedidos` (required)**
+
+    `boolean`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "enabled": true,
+    "showPedidos": true,
+    "logoUrl": "",
+    "primaryColor": "",
+    "footerText": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Public portal branding for login shell (#240)
+
+- **Method:** `GET`
+- **Path:** `/api/portal/{tenantSlug}/branding`
+- **Tags:** portal
+
+#### Responses
+
+##### Status: 200 Branding payload
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`enabled` (required)**
+
+    `boolean`
+
+  - **`footerText` (required)**
+
+    `string`
+
+  - **`logoUrl` (required)**
+
+    `string`
+
+  - **`primaryColor` (required)**
+
+    `string`
+
+  - **`showPedidos` (required)**
+
+    `boolean`
+
+  - **`tenantName` (required)**
+
+    `string`
+
+  - **`tenantSlug` (required)**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "tenantName": "",
+    "tenantSlug": "",
+    "enabled": true,
+    "showPedidos": true,
+    "logoUrl": "",
+    "primaryColor": "",
+    "footerText": ""
+  }
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Request magic-link email for portal login (#240)
+
+- **Method:** `POST`
+- **Path:** `/api/portal/{tenantSlug}/auth/magic-link`
+- **Tags:** portal
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`email` (required)**
+
+  `string`, format: `email`
+
+**Example:**
+
+```json
+{
+  "email": ""
+}
+```
+
+#### Responses
+
+##### Status: 200 Generic success (anti-enumeration)
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`sent` (required)**
+
+    `boolean`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "sent": true
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 429 Rate limit exceeded
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Verify magic link and issue portal session cookie (#240)
+
+- **Method:** `GET`
+- **Path:** `/api/portal/{tenantSlug}/auth/verify`
+- **Tags:** portal
+
+#### Responses
+
+##### Status: 200 Session established
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`me` (required)**
+
+    `object`
+
+    - **`clienteId` (required)**
+
+      `integer`
+
+    - **`codigo` (required)**
+
+      `integer`
+
+    - **`domicilio` (required)**
+
+      `string`
+
+    - **`email` (required)**
+
+      `string`
+
+    - **`fantasia` (required)**
+
+      `string`
+
+    - **`localidad` (required)**
+
+      `string`
+
+    - **`rsocial` (required)**
+
+      `string`
+
+    - **`telef` (required)**
+
+      `string`
+
+    - **`vendedor` (required)**
+
+      `object`
+
+      - **`id`**
+
+        `integer`
+
+      - **`username`**
+
+        `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "me": {
+      "clienteId": 1,
+      "codigo": 1,
+      "rsocial": "",
+      "fantasia": "",
+      "email": "",
+      "telef": "",
+      "domicilio": "",
+      "localidad": "",
+      "vendedor": {
+        "id": 1,
+        "username": ""
+      }
+    }
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Revoke portal session (#240)
+
+- **Method:** `POST`
+- **Path:** `/api/portal/{tenantSlug}/auth/logout`
+- **Tags:** portal
+
+#### Responses
+
+##### Status: 200 Logged out
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`loggedOut` (required)**
+
+    `boolean`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "loggedOut": true
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Current portal customer profile (#240)
+
+- **Method:** `GET`
+- **Path:** `/api/portal/{tenantSlug}/me`
+- **Tags:** portal
+
+#### Responses
+
+##### Status: 200 Customer profile and branding
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`branding` (required)**
+
+    `object`
+
+    - **`enabled` (required)**
+
+      `boolean`
+
+    - **`footerText` (required)**
+
+      `string`
+
+    - **`logoUrl` (required)**
+
+      `string`
+
+    - **`primaryColor` (required)**
+
+      `string`
+
+    - **`showPedidos` (required)**
+
+      `boolean`
+
+    - **`tenantName` (required)**
+
+      `string`
+
+    - **`tenantSlug` (required)**
+
+      `string`
+
+  - **`me` (required)**
+
+    `object`
+
+    - **`clienteId` (required)**
+
+      `integer`
+
+    - **`codigo` (required)**
+
+      `integer`
+
+    - **`domicilio` (required)**
+
+      `string`
+
+    - **`email` (required)**
+
+      `string`
+
+    - **`fantasia` (required)**
+
+      `string`
+
+    - **`localidad` (required)**
+
+      `string`
+
+    - **`rsocial` (required)**
+
+      `string`
+
+    - **`telef` (required)**
+
+      `string`
+
+    - **`vendedor` (required)**
+
+      `object`
+
+      - **`id`**
+
+        `integer`
+
+      - **`username`**
+
+        `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "me": {
+      "clienteId": 1,
+      "codigo": 1,
+      "rsocial": "",
+      "fantasia": "",
+      "email": "",
+      "telef": "",
+      "domicilio": "",
+      "localidad": "",
+      "vendedor": {
+        "id": 1,
+        "username": ""
+      }
+    },
+    "branding": {
+      "tenantName": "",
+      "tenantSlug": "",
+      "enabled": true,
+      "showPedidos": true,
+      "logoUrl": "",
+      "primaryColor": "",
+      "footerText": ""
+    }
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### List customer invoices in portal scope (#240)
+
+- **Method:** `GET`
+- **Path:** `/api/portal/{tenantSlug}/facturas`
+- **Tags:** portal
+
+#### Responses
+
+##### Status: 200 Invoice list
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`facturas` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`estado` (required)**
+
+      `string`, possible values: `"pagada", "pendiente", "vencida"`
+
+    - **`fecha` (required)**
+
+      `string`, format: `date-time`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`pagado` (required)**
+
+      `string`
+
+    - **`pendiente` (required)**
+
+      `string`
+
+    - **`ref` (required)**
+
+      `string`
+
+    - **`total` (required)**
+
+      `string`
+
+  - **`total` (required)**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "facturas": [
+      {
+        "id": 1,
+        "ref": "",
+        "fecha": "",
+        "total": "",
+        "pagado": "",
+        "pendiente": "",
+        "estado": "pagada"
+      }
+    ],
+    "total": 1
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Download invoice PDF (portal scope) (#240)
+
+- **Method:** `GET`
+- **Path:** `/api/portal/{tenantSlug}/facturas/{id}/pdf`
+- **Tags:** portal
+
+#### Responses
+
+##### Status: 200 Invoice PDF
+
+###### Content-Type: application/pdf
+
+`string`, format: `binary`
+
+**Example:**
+
+```json
+{}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 422 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Customer ledger in portal scope (#240)
+
+- **Method:** `GET`
+- **Path:** `/api/portal/{tenantSlug}/cuenta-corriente`
+- **Tags:** portal
+
+#### Responses
+
+##### Status: 200 Ledger statement
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`clienteId` (required)**
+
+    `integer`
+
+  - **`codigo` (required)**
+
+    `integer`
+
+  - **`excedeLimite` (required)**
+
+    `boolean`
+
+  - **`limit` (required)**
+
+    `integer`
+
+  - **`movimientos` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`fecha` (required)**
+
+      `string`, format: `date-time`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`monto` (required)**
+
+      `string`
+
+    - **`saldoPost` (required)**
+
+      `string`
+
+    - **`tipo` (required)**
+
+      `string`, possible values: `"saldo_inicial", "factura", "nota_credito", "cobro", "retencion", "percepcion", "cheque_rechazado", "ajuste"`
+
+    - **`usuarioId` (required)**
+
+      `integer`
+
+    - **`chequeId`**
+
+      `integer`
+
+    - **`cobroId`**
+
+      `integer`
+
+    - **`facturaId`**
+
+      `integer`
+
+    - **`notaCreditoId`**
+
+      `integer`
+
+    - **`notas`**
+
+      `string`
+
+    - **`referencia`**
+
+      `string`
+
+    - **`retencionAplicadaId`**
+
+      `integer`
+
+  - **`offset` (required)**
+
+    `integer`
+
+  - **`rsocial` (required)**
+
+    `string`
+
+  - **`saldo` (required)**
+
+    `string`
+
+  - **`serie` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`period` (required)**
+
+      `string`
+
+    - **`saldo` (required)**
+
+      `string`
+
+  - **`total` (required)**
+
+    `integer`
+
+  - **`creditLimit`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "clienteId": 1,
+    "codigo": 1,
+    "rsocial": "",
+    "saldo": "",
+    "creditLimit": "",
+    "excedeLimite": true,
+    "movimientos": [
+      {
+        "id": 1,
+        "tipo": "saldo_inicial",
+        "referencia": "",
+        "monto": "",
+        "saldoPost": "",
+        "fecha": "",
+        "usuarioId": 1,
+        "notas": "",
+        "facturaId": 1,
+        "cobroId": 1,
+        "notaCreditoId": 1,
+        "chequeId": 1,
+        "retencionAplicadaId": 1
+      }
+    ],
+    "serie": [
+      {
+        "period": "",
+        "saldo": ""
+      }
+    ],
+    "total": 1,
+    "limit": 1,
+    "offset": 1
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Download account statement PDF (#240)
+
+- **Method:** `GET`
+- **Path:** `/api/portal/{tenantSlug}/cuenta-corriente/estado-de-cuenta/pdf`
+- **Tags:** portal
+
+#### Responses
+
+##### Status: 200 Account statement PDF
+
+###### Content-Type: application/pdf
+
+`string`, format: `binary`
+
+**Example:**
+
+```json
+{}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### List customer orders in portal scope (#240)
+
+- **Method:** `GET`
+- **Path:** `/api/portal/{tenantSlug}/pedidos`
+- **Tags:** portal
+
+#### Responses
+
+##### Status: 200 Order list
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`pedidos` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`createdAt` (required)**
+
+      `string`, format: `date-time`
+
+    - **`estado` (required)**
+
+      `string`
+
+    - **`facturaRef` (required)**
+
+      `string`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`remitoEstado` (required)**
+
+      `string`
+
+    - **`total` (required)**
+
+      `string`
+
+    - **`validUntil` (required)**
+
+      `string`, format: `date-time`
+
+  - **`total` (required)**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "pedidos": [
+      {
+        "id": 1,
+        "estado": "",
+        "total": "",
+        "createdAt": "",
+        "validUntil": "",
+        "facturaRef": "",
+        "remitoEstado": ""
+      }
+    ],
+    "total": 1
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ### PARAMETERS /api/zonas-entrega
 
 - **Method:** `PARAMETERS`
@@ -64973,6 +66773,810 @@ Originating invoice header (selected columns)
     "condicionIva": "RI",
     "ingresosBrutos": "",
     "fechaInicioActividades": ""
+  }
+}
+```
+
+### PortalConfig
+
+- **Type:**`object`
+
+* **`enabled` (required)**
+
+  `boolean`
+
+* **`footerText` (required)**
+
+  `string`
+
+* **`logoUrl` (required)**
+
+  `string`
+
+* **`primaryColor` (required)**
+
+  `string`
+
+* **`showPedidos` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "enabled": true,
+  "showPedidos": true,
+  "logoUrl": "",
+  "primaryColor": "",
+  "footerText": ""
+}
+```
+
+### PortalConfigInput
+
+- **Type:**`object`
+
+* **`enabled`**
+
+  `boolean`
+
+* **`footerText`**
+
+  `string`
+
+* **`logoUrl`**
+
+  `string`
+
+* **`primaryColor`**
+
+  `string`
+
+* **`showPedidos`**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "enabled": true,
+  "showPedidos": true,
+  "logoUrl": "",
+  "primaryColor": "",
+  "footerText": ""
+}
+```
+
+### PortalConfigEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`enabled` (required)**
+
+    `boolean`
+
+  - **`footerText` (required)**
+
+    `string`
+
+  - **`logoUrl` (required)**
+
+    `string`
+
+  - **`primaryColor` (required)**
+
+    `string`
+
+  - **`showPedidos` (required)**
+
+    `boolean`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "enabled": true,
+    "showPedidos": true,
+    "logoUrl": "",
+    "primaryColor": "",
+    "footerText": ""
+  }
+}
+```
+
+### PortalBranding
+
+- **Type:**`object`
+
+* **`enabled` (required)**
+
+  `boolean`
+
+* **`footerText` (required)**
+
+  `string`
+
+* **`logoUrl` (required)**
+
+  `string`
+
+* **`primaryColor` (required)**
+
+  `string`
+
+* **`showPedidos` (required)**
+
+  `boolean`
+
+* **`tenantName` (required)**
+
+  `string`
+
+* **`tenantSlug` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "tenantName": "",
+  "tenantSlug": "",
+  "enabled": true,
+  "showPedidos": true,
+  "logoUrl": "",
+  "primaryColor": "",
+  "footerText": ""
+}
+```
+
+### PortalBrandingEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`enabled` (required)**
+
+    `boolean`
+
+  - **`footerText` (required)**
+
+    `string`
+
+  - **`logoUrl` (required)**
+
+    `string`
+
+  - **`primaryColor` (required)**
+
+    `string`
+
+  - **`showPedidos` (required)**
+
+    `boolean`
+
+  - **`tenantName` (required)**
+
+    `string`
+
+  - **`tenantSlug` (required)**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "tenantName": "",
+    "tenantSlug": "",
+    "enabled": true,
+    "showPedidos": true,
+    "logoUrl": "",
+    "primaryColor": "",
+    "footerText": ""
+  }
+}
+```
+
+### PortalMagicLinkInput
+
+- **Type:**`object`
+
+* **`email` (required)**
+
+  `string`, format: `email`
+
+**Example:**
+
+```json
+{
+  "email": ""
+}
+```
+
+### PortalMagicLinkSentEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`sent` (required)**
+
+    `boolean`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "sent": true
+  }
+}
+```
+
+### PortalMe
+
+- **Type:**`object`
+
+* **`clienteId` (required)**
+
+  `integer`
+
+* **`codigo` (required)**
+
+  `integer`
+
+* **`domicilio` (required)**
+
+  `string`
+
+* **`email` (required)**
+
+  `string`
+
+* **`fantasia` (required)**
+
+  `string`
+
+* **`localidad` (required)**
+
+  `string`
+
+* **`rsocial` (required)**
+
+  `string`
+
+* **`telef` (required)**
+
+  `string`
+
+* **`vendedor` (required)**
+
+  `object`
+
+  - **`id`**
+
+    `integer`
+
+  - **`username`**
+
+    `string`
+
+**Example:**
+
+```json
+{
+  "clienteId": 1,
+  "codigo": 1,
+  "rsocial": "",
+  "fantasia": "",
+  "email": "",
+  "telef": "",
+  "domicilio": "",
+  "localidad": "",
+  "vendedor": {
+    "id": 1,
+    "username": ""
+  }
+}
+```
+
+### PortalVerifyEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`me` (required)**
+
+    `object`
+
+    - **`clienteId` (required)**
+
+      `integer`
+
+    - **`codigo` (required)**
+
+      `integer`
+
+    - **`domicilio` (required)**
+
+      `string`
+
+    - **`email` (required)**
+
+      `string`
+
+    - **`fantasia` (required)**
+
+      `string`
+
+    - **`localidad` (required)**
+
+      `string`
+
+    - **`rsocial` (required)**
+
+      `string`
+
+    - **`telef` (required)**
+
+      `string`
+
+    - **`vendedor` (required)**
+
+      `object`
+
+      - **`id`**
+
+        `integer`
+
+      - **`username`**
+
+        `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "me": {
+      "clienteId": 1,
+      "codigo": 1,
+      "rsocial": "",
+      "fantasia": "",
+      "email": "",
+      "telef": "",
+      "domicilio": "",
+      "localidad": "",
+      "vendedor": {
+        "id": 1,
+        "username": ""
+      }
+    }
+  }
+}
+```
+
+### PortalMeEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`branding` (required)**
+
+    `object`
+
+    - **`enabled` (required)**
+
+      `boolean`
+
+    - **`footerText` (required)**
+
+      `string`
+
+    - **`logoUrl` (required)**
+
+      `string`
+
+    - **`primaryColor` (required)**
+
+      `string`
+
+    - **`showPedidos` (required)**
+
+      `boolean`
+
+    - **`tenantName` (required)**
+
+      `string`
+
+    - **`tenantSlug` (required)**
+
+      `string`
+
+  - **`me` (required)**
+
+    `object`
+
+    - **`clienteId` (required)**
+
+      `integer`
+
+    - **`codigo` (required)**
+
+      `integer`
+
+    - **`domicilio` (required)**
+
+      `string`
+
+    - **`email` (required)**
+
+      `string`
+
+    - **`fantasia` (required)**
+
+      `string`
+
+    - **`localidad` (required)**
+
+      `string`
+
+    - **`rsocial` (required)**
+
+      `string`
+
+    - **`telef` (required)**
+
+      `string`
+
+    - **`vendedor` (required)**
+
+      `object`
+
+      - **`id`**
+
+        `integer`
+
+      - **`username`**
+
+        `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "me": {
+      "clienteId": 1,
+      "codigo": 1,
+      "rsocial": "",
+      "fantasia": "",
+      "email": "",
+      "telef": "",
+      "domicilio": "",
+      "localidad": "",
+      "vendedor": {
+        "id": 1,
+        "username": ""
+      }
+    },
+    "branding": {
+      "tenantName": "",
+      "tenantSlug": "",
+      "enabled": true,
+      "showPedidos": true,
+      "logoUrl": "",
+      "primaryColor": "",
+      "footerText": ""
+    }
+  }
+}
+```
+
+### PortalLogoutEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`loggedOut` (required)**
+
+    `boolean`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "loggedOut": true
+  }
+}
+```
+
+### PortalFacturaRow
+
+- **Type:**`object`
+
+* **`estado` (required)**
+
+  `string`, possible values: `"pagada", "pendiente", "vencida"`
+
+* **`fecha` (required)**
+
+  `string`, format: `date-time`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`pagado` (required)**
+
+  `string`
+
+* **`pendiente` (required)**
+
+  `string`
+
+* **`ref` (required)**
+
+  `string`
+
+* **`total` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "ref": "",
+  "fecha": "",
+  "total": "",
+  "pagado": "",
+  "pendiente": "",
+  "estado": "pagada"
+}
+```
+
+### PortalFacturaListEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`facturas` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`estado` (required)**
+
+      `string`, possible values: `"pagada", "pendiente", "vencida"`
+
+    - **`fecha` (required)**
+
+      `string`, format: `date-time`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`pagado` (required)**
+
+      `string`
+
+    - **`pendiente` (required)**
+
+      `string`
+
+    - **`ref` (required)**
+
+      `string`
+
+    - **`total` (required)**
+
+      `string`
+
+  - **`total` (required)**
+
+    `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "facturas": [
+      {
+        "id": 1,
+        "ref": "",
+        "fecha": "",
+        "total": "",
+        "pagado": "",
+        "pendiente": "",
+        "estado": "pagada"
+      }
+    ],
+    "total": 1
+  }
+}
+```
+
+### PortalPedidoRow
+
+- **Type:**`object`
+
+* **`createdAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`estado` (required)**
+
+  `string`
+
+* **`facturaRef` (required)**
+
+  `string`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`remitoEstado` (required)**
+
+  `string`
+
+* **`total` (required)**
+
+  `string`
+
+* **`validUntil` (required)**
+
+  `string`, format: `date-time`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "estado": "",
+  "total": "",
+  "createdAt": "",
+  "validUntil": "",
+  "facturaRef": "",
+  "remitoEstado": ""
+}
+```
+
+### PortalPedidoListEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`pedidos` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`createdAt` (required)**
+
+      `string`, format: `date-time`
+
+    - **`estado` (required)**
+
+      `string`
+
+    - **`facturaRef` (required)**
+
+      `string`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`remitoEstado` (required)**
+
+      `string`
+
+    - **`total` (required)**
+
+      `string`
+
+    - **`validUntil` (required)**
+
+      `string`, format: `date-time`
+
+  - **`total` (required)**
+
+    `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "pedidos": [
+      {
+        "id": 1,
+        "estado": "",
+        "total": "",
+        "createdAt": "",
+        "validUntil": "",
+        "facturaRef": "",
+        "remitoEstado": ""
+      }
+    ],
+    "total": 1
   }
 }
 ```

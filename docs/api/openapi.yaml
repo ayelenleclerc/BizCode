@@ -48,6 +48,8 @@ tags:
     description: Commercial orders and quotes (ADR-0009)
   - name: cobros
     description: Customer payment collections
+  - name: portal
+    description: B2B customer self-service portal (#240)
   - name: cobranzas
     description: Overdue invoice reminders (#134)
   - name: cheques
@@ -6200,6 +6202,305 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
 
+  /api/portal-config:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [portal]
+      summary: Get B2B portal settings for the authenticated tenant (#240)
+      security:
+        - cookieSession: []
+      responses:
+        '200':
+          description: Portal configuration
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PortalConfigEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    put:
+      tags: [portal]
+      summary: Update B2B portal settings (#240)
+      security:
+        - cookieSession: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PortalConfigInput'
+      responses:
+        '200':
+          description: Portal configuration updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PortalConfigEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/portal/{tenantSlug}/branding:
+    get:
+      tags: [portal]
+      summary: Public portal branding for login shell (#240)
+      parameters:
+        - $ref: '#/components/parameters/PortalTenantSlug'
+      responses:
+        '200':
+          description: Branding payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PortalBrandingEnvelope'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/portal/{tenantSlug}/auth/magic-link:
+    post:
+      tags: [portal]
+      summary: Request magic-link email for portal login (#240)
+      parameters:
+        - $ref: '#/components/parameters/PortalTenantSlug'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PortalMagicLinkInput'
+      responses:
+        '200':
+          description: Generic success (anti-enumeration)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PortalMagicLinkSentEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/portal/{tenantSlug}/auth/verify:
+    get:
+      tags: [portal]
+      summary: Verify magic link and issue portal session cookie (#240)
+      parameters:
+        - $ref: '#/components/parameters/PortalTenantSlug'
+        - name: token
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Session established
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PortalVerifyEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/portal/{tenantSlug}/auth/logout:
+    post:
+      tags: [portal]
+      summary: Revoke portal session (#240)
+      parameters:
+        - $ref: '#/components/parameters/PortalTenantSlug'
+      responses:
+        '200':
+          description: Logged out
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PortalLogoutEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/portal/{tenantSlug}/me:
+    get:
+      tags: [portal]
+      summary: Current portal customer profile (#240)
+      parameters:
+        - $ref: '#/components/parameters/PortalTenantSlug'
+      responses:
+        '200':
+          description: Customer profile and branding
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PortalMeEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/portal/{tenantSlug}/facturas:
+    get:
+      tags: [portal]
+      summary: List customer invoices in portal scope (#240)
+      parameters:
+        - $ref: '#/components/parameters/PortalTenantSlug'
+        - name: estado
+          in: query
+          schema:
+            type: string
+            enum: [pagada, pendiente, vencida]
+        - name: from
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: to
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - $ref: '#/components/parameters/ListLimit'
+        - $ref: '#/components/parameters/ListOffset'
+      responses:
+        '200':
+          description: Invoice list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PortalFacturaListEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/portal/{tenantSlug}/facturas/{id}/pdf:
+    get:
+      tags: [portal]
+      summary: Download invoice PDF (portal scope) (#240)
+      parameters:
+        - $ref: '#/components/parameters/PortalTenantSlug'
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Invoice PDF
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '422':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/portal/{tenantSlug}/cuenta-corriente:
+    get:
+      tags: [portal]
+      summary: Customer ledger in portal scope (#240)
+      parameters:
+        - $ref: '#/components/parameters/PortalTenantSlug'
+        - $ref: '#/components/parameters/ListLimit'
+        - $ref: '#/components/parameters/ListOffset'
+      responses:
+        '200':
+          description: Ledger statement
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClienteCuentaCorrienteEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/portal/{tenantSlug}/cuenta-corriente/estado-de-cuenta/pdf:
+    get:
+      tags: [portal]
+      summary: Download account statement PDF (#240)
+      parameters:
+        - $ref: '#/components/parameters/PortalTenantSlug'
+      responses:
+        '200':
+          description: Account statement PDF
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/portal/{tenantSlug}/pedidos:
+    get:
+      tags: [portal]
+      summary: List customer orders in portal scope (#240)
+      parameters:
+        - $ref: '#/components/parameters/PortalTenantSlug'
+        - $ref: '#/components/parameters/ListLimit'
+        - $ref: '#/components/parameters/ListOffset'
+      responses:
+        '200':
+          description: Order list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PortalPedidoListEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
   /api/zonas-entrega:
     parameters:
       - $ref: '#/components/parameters/BizcodeChannelHeader'
@@ -7115,6 +7416,15 @@ components:
         type: integer
         minimum: 0
         default: 0
+
+    PortalTenantSlug:
+      name: tenantSlug
+      in: path
+      required: true
+      description: Tenant slug for portal routes (MVP `/portal/:tenantSlug`)
+      schema:
+        type: string
+        maxLength: 80
 
   schemas:
     HealthResponse:
@@ -12884,6 +13194,267 @@ components:
         data:
           $ref: '#/components/schemas/EmpresaConfig'
 
+    PortalConfig:
+      type: object
+      required: [enabled, showPedidos, logoUrl, primaryColor, footerText]
+      properties:
+        enabled:
+          type: boolean
+        showPedidos:
+          type: boolean
+        logoUrl:
+          type: string
+          nullable: true
+        primaryColor:
+          type: string
+          nullable: true
+        footerText:
+          type: string
+          nullable: true
+
+    PortalConfigInput:
+      type: object
+      properties:
+        enabled:
+          type: boolean
+        showPedidos:
+          type: boolean
+        logoUrl:
+          type: string
+          nullable: true
+        primaryColor:
+          type: string
+          nullable: true
+          pattern: '^#[0-9A-Fa-f]{6}$'
+        footerText:
+          type: string
+          nullable: true
+
+    PortalConfigEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/PortalConfig'
+
+    PortalBranding:
+      type: object
+      required: [tenantName, tenantSlug, enabled, showPedidos, logoUrl, primaryColor, footerText]
+      properties:
+        tenantName:
+          type: string
+        tenantSlug:
+          type: string
+        enabled:
+          type: boolean
+        showPedidos:
+          type: boolean
+        logoUrl:
+          type: string
+          nullable: true
+        primaryColor:
+          type: string
+          nullable: true
+        footerText:
+          type: string
+          nullable: true
+
+    PortalBrandingEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/PortalBranding'
+
+    PortalMagicLinkInput:
+      type: object
+      required: [email]
+      properties:
+        email:
+          type: string
+          format: email
+
+    PortalMagicLinkSentEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: object
+          required: [sent]
+          properties:
+            sent:
+              type: boolean
+              const: true
+
+    PortalMe:
+      type: object
+      required: [clienteId, codigo, rsocial, fantasia, email, telef, domicilio, localidad, vendedor]
+      properties:
+        clienteId:
+          type: integer
+        codigo:
+          type: integer
+        rsocial:
+          type: string
+        fantasia:
+          type: string
+          nullable: true
+        email:
+          type: string
+          nullable: true
+        telef:
+          type: string
+          nullable: true
+        domicilio:
+          type: string
+          nullable: true
+        localidad:
+          type: string
+          nullable: true
+        vendedor:
+          type: object
+          nullable: true
+          properties:
+            id:
+              type: integer
+            username:
+              type: string
+
+    PortalVerifyEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: object
+          required: [me]
+          properties:
+            me:
+              $ref: '#/components/schemas/PortalMe'
+
+    PortalMeEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: object
+          required: [me, branding]
+          properties:
+            me:
+              $ref: '#/components/schemas/PortalMe'
+            branding:
+              $ref: '#/components/schemas/PortalBranding'
+
+    PortalLogoutEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: object
+          required: [loggedOut]
+          properties:
+            loggedOut:
+              type: boolean
+              const: true
+
+    PortalFacturaRow:
+      type: object
+      required: [id, ref, fecha, total, pagado, pendiente, estado]
+      properties:
+        id:
+          type: integer
+        ref:
+          type: string
+        fecha:
+          type: string
+          format: date-time
+        total:
+          type: string
+        pagado:
+          type: string
+        pendiente:
+          type: string
+        estado:
+          type: string
+          enum: [pagada, pendiente, vencida]
+
+    PortalFacturaListEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: object
+          required: [facturas, total]
+          properties:
+            facturas:
+              type: array
+              items:
+                $ref: '#/components/schemas/PortalFacturaRow'
+            total:
+              type: integer
+
+    PortalPedidoRow:
+      type: object
+      required: [id, estado, total, createdAt, validUntil, facturaRef, remitoEstado]
+      properties:
+        id:
+          type: integer
+        estado:
+          type: string
+        total:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        validUntil:
+          type: string
+          format: date-time
+          nullable: true
+        facturaRef:
+          type: string
+          nullable: true
+        remitoEstado:
+          type: string
+          nullable: true
+
+    PortalPedidoListEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: object
+          required: [pedidos, total]
+          properties:
+            pedidos:
+              type: array
+              items:
+                $ref: '#/components/schemas/PortalPedidoRow'
+            total:
+              type: integer
+
     FacturaPendienteEstado:
       type: string
       enum: [pendiente, proxima_vencer, vencida_hoy, vencida_critica]
@@ -13877,6 +14448,23 @@ components:
             $ref: '#/components/schemas/ApiErrorEnvelope'
     NotFoundError:
       description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiErrorEnvelope'
+    TooManyRequests:
+      description: Rate limit exceeded
+      headers:
+        X-RateLimit-Limit:
+          schema:
+            type: integer
+        X-RateLimit-Remaining:
+          schema:
+            type: integer
+        X-RateLimit-Reset:
+          schema:
+            type: string
+            format: date-time
       content:
         application/json:
           schema:

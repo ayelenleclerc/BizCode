@@ -1,0 +1,112 @@
+{
+  "nav": {
+    "aria": "Secciones del portal",
+    "facturas": "Facturas",
+    "cuentaCorriente": "Cuenta corriente",
+    "pedidos": "Pedidos",
+    "misDatos": "Mis datos"
+  },
+  "actions": {
+    "logout": "Cerrar sesión"
+  },
+  "login": {
+    "title": "Portal de clientes",
+    "subtitle": "Ingresá el email registrado para recibir un enlace de acceso.",
+    "emailLabel": "Correo electrónico",
+    "submit": "Enviar enlace",
+    "sending": "Enviando…",
+    "checkEmail": "Revisá tu correo. Si el email está registrado, recibirás un enlace válido por 15 minutos.",
+    "errorGeneric": "No se pudo enviar el enlace. Intentá de nuevo.",
+    "portalUnavailable": "El portal no está habilitado para esta empresa.",
+    "validation": {
+      "emailRequired": "El email es obligatorio",
+      "emailInvalid": "Email inválido"
+    }
+  },
+  "verify": {
+    "loading": "Verificando acceso…",
+    "missingToken": "Falta el token de acceso.",
+    "invalidToken": "El enlace no es válido o expiró."
+  },
+  "facturas": {
+    "title": "Mis facturas",
+    "filterEstado": "Estado",
+    "filterFrom": "Desde",
+    "filterTo": "Hasta",
+    "applyFilters": "Aplicar",
+    "estadoAll": "Todos",
+    "estadoPendiente": "Pendiente",
+    "estadoVencida": "Vencida",
+    "estadoPagada": "Pagada",
+    "estado": {
+      "pendiente": "Pendiente",
+      "vencida": "Vencida",
+      "pagada": "Pagada"
+    },
+    "loading": "Cargando facturas…",
+    "empty": "No hay facturas para mostrar.",
+    "errorLoad": "No se pudieron cargar las facturas.",
+    "errorPdf": "No se pudo descargar el PDF.",
+    "colRef": "Comprobante",
+    "colFecha": "Fecha",
+    "colTotal": "Total",
+    "colPendiente": "Pendiente",
+    "colEstado": "Estado",
+    "colActions": "Acciones",
+    "downloadPdf": "PDF",
+    "payOnline": "Pagar online",
+    "payOnlineDisabled": "Pago online no disponible (MercadoPago pendiente de configuración)",
+    "tableCaption": "Listado de facturas del cliente",
+    "totalCount": "{{count}} factura(s)"
+  },
+  "cc": {
+    "title": "Cuenta corriente",
+    "saldo": "Saldo actual",
+    "downloadPdf": "Descargar estado de cuenta",
+    "loading": "Cargando movimientos…",
+    "errorLoad": "No se pudo cargar la cuenta corriente.",
+    "errorPdf": "No se pudo descargar el PDF.",
+    "colFecha": "Fecha",
+    "colTipo": "Tipo",
+    "colReferencia": "Referencia",
+    "colMonto": "Monto",
+    "colSaldo": "Saldo"
+  },
+  "pedidos": {
+    "title": "Mis pedidos",
+    "loading": "Cargando pedidos…",
+    "empty": "No hay pedidos para mostrar.",
+    "errorLoad": "No se pudieron cargar los pedidos.",
+    "colId": "Nº",
+    "colFecha": "Fecha",
+    "colEstado": "Estado",
+    "colTotal": "Total",
+    "colFactura": "Factura",
+    "colRemito": "Remito"
+  },
+  "misDatos": {
+    "title": "Mis datos",
+    "rsocial": "Razón social",
+    "codigo": "Código",
+    "email": "Email",
+    "telefono": "Teléfono",
+    "domicilio": "Domicilio",
+    "localidad": "Localidad",
+    "vendedorTitle": "Tu vendedor",
+    "vendedorContact": "Contacto asignado: {{name}}",
+    "sinVendedor": "No hay vendedor asignado en pedidos recientes."
+  },
+  "config": {
+    "title": "Portal del cliente",
+    "enabled": "Habilitar portal B2B",
+    "showPedidos": "Mostrar sección de pedidos",
+    "logoUrl": "URL del logo",
+    "primaryColor": "Color principal (hex)",
+    "footerText": "Texto de pie de página",
+    "save": "Guardar configuración",
+    "saving": "Guardando…",
+    "saved": "Configuración guardada",
+    "error": "No se pudo guardar la configuración",
+    "portalUrlHint": "URL del portal: /portal/{{slug}}"
+  }
+}

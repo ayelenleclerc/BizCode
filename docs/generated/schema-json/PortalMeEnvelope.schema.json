@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "data": {
+      "properties": {
+        "branding": {
+          "$ref": "./PortalBranding.schema.json"
+        },
+        "me": {
+          "$ref": "./PortalMe.schema.json"
+        }
+      },
+      "required": [
+        "me",
+        "branding"
+      ],
+      "type": "object"
+    },
+    "success": {
+      "const": true,
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "success",
+    "data"
+  ],
+  "title": "PortalMeEnvelope",
+  "type": "object"
+}
