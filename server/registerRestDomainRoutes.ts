@@ -48,6 +48,7 @@ import { registerEmpresaRoutes } from './routes/registerEmpresaRoutes'
 import { registerPortalRoutes } from './routes/registerPortalRoutes'
 import { registerMercadoPagoRoutes } from './routes/registerMercadoPagoRoutes'
 import { registerMercadoPagoFacturaRoutes } from './routes/registerMercadoPagoFacturaRoutes'
+import { registerMercadoPagoWebhookRoutes } from './routes/registerMercadoPagoWebhookRoutes'
 import { registerPrintingRoutes } from './routes/registerPrintingRoutes'
 import { createDomainServices } from './services/createDomainServices'
 
@@ -76,6 +77,7 @@ export function registerRestDomainRoutes(app: Application, prisma: PrismaClient)
 
   const ctx: RestRouteContext = { prisma, services: createDomainServices(prisma), writeAudit }
 
+  registerMercadoPagoWebhookRoutes(app, ctx)
   registerClientesRoutes(app, ctx)
   registerClienteCuentaCorrienteRoutes(app, ctx)
   registerArticulosRoutes(app, ctx)

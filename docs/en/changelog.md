@@ -10,6 +10,8 @@ Versioning: [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **Mercado Pago payment webhook (#176):** public `POST /api/webhooks/mercadopago` with `x-signature` validation; Prisma `MercadoPagoProcessedPayment` idempotency; fetches payment from MP API; on `approved` creates `ReciboCobro` with `mercadopago` method and invoice allocation, updates `Factura.mpEstado`/`mpPagadoAt`; manager in-app notifications; rate limit; OpenAPI, contract/API/unit tests, trilingual finance manual.
+
 - **Mercado Pago payment link per invoice (#175):** Prisma `Factura` fields `mpPreferenceId`, `mpPaymentLink`, `mpEstado`, `mpPagadoAt`, `mpPreferenceExpiresAt`; API `GET /api/facturas/{id}/mp`, `POST .../mp/preference` (integration `mercadopago`, `reports.financial.read`); Mercado Pago Checkout preference (72h TTL, outstanding balance in ARS); staff UI in invoice detail (`MercadoPagoPaymentLinkModal`, copy/WhatsApp/email share); portal pay button opens active link; `API_PUBLIC_URL` for webhook registration (#176); OpenAPI, contract/API/unit/UI tests, trilingual i18n and finance manual.
 
 - **Mercado Pago tenant credentials (#174):** Prisma `MercadoPagoConfig` (encrypted access token and webhook secret); API `GET/PUT /api/configuracion/mercadopago`, `POST .../test` (integration `mercadopago`, `settings.business.manage`); UI **Settings → Company** (`MercadoPagoConfigSection`, `IfIntegration`); credential test via MP `users/me`; OpenAPI, API/unit/UI tests, trilingual empresa i18n and finance manual.

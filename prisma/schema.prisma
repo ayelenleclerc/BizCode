@@ -431,6 +431,7 @@ model Factura {
   remitos        Remito[]
   movimientoCC   MovimientoClienteCC?
   reciboCobroImputaciones ReciboCobroImputacion[]
+  mercadoPagoProcessedPayments MercadoPagoProcessedPayment[]
 
   @@unique([tenantId, tipo, prefijo, numero])
   @@index([tenantId])
@@ -709,6 +710,25 @@ model Tenant {
   portalMagicLinks              PortalMagicLink[]
   portalSessions                PortalSession[]
   mercadoPagoConfig             MercadoPagoConfig?
+  mercadoPagoProcessedPayments  MercadoPagoProcessedPayment[]
+}
+
+/// Idempotent Mercado Pago payment webhook processing (#176).
+model MercadoPagoProcessedPayment {
+  id            Int          @id @default(autoincrement())
+  tenantId      Int
+  tenant        Tenant       @relation(fields: [tenantId], references: [id])
+  mpPaymentId   String       @db.VarChar(60)
+  facturaId     Int?
+  factura       Factura?     @relation(fields: [facturaId], references: [id])
+  /// approved | rejected | cancelled | pending
+  estado        String       @db.VarChar(20)
+  reciboCobroId Int?
+  reciboCobro   ReciboCobro? @relation(fields: [reciboCobroId], references: [id])
+  processedAt   DateTime     @default(now())
+
+  @@unique([tenantId, mpPaymentId])
+  @@index([tenantId, facturaId])
 }
 
 /// MercadoPago credentials per tenant (#174); access token and webhook secret encrypted at rest.
@@ -1143,6 +1163,7 @@ model ReciboCobro {
   imputaciones         ReciboCobroImputacion[]
   movimientoCC         MovimientoClienteCC?
   retencionesAplicadas RetencionAplicada[]
+  mercadoPagoProcessedPayments MercadoPagoProcessedPayment[]
 
   @@unique([tenantId, numero])
   @@index([tenantId, clienteId])

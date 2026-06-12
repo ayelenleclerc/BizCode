@@ -20,10 +20,15 @@ vi.mock('../../server/integrations/mercadopago/mercadoPagoApiClient', async (imp
   return {
     ...actual,
     createMercadoPagoPreference: vi.fn(),
+    fetchMercadoPagoPayment: vi.fn(),
   }
 })
 
 import { createMercadoPagoPreference } from '../../server/integrations/mercadopago/mercadoPagoApiClient'
+import {
+  buildMercadoPagoSignatureManifest,
+  computeMercadoPagoSignatureHmac,
+} from '../../server/lib/mercadopagoSignature'
 
 function isObjectRecord(value: unknown): value is Record<string, unknown> {
   if (value === undefined || value === null) return false
@@ -1110,6 +1115,11 @@ function buildPrisma(): PrismaClient {
     },
     mercadoPagoConfig: {
       findUnique: vi.fn().mockResolvedValue(null),
+      findMany: vi.fn().mockResolvedValue([]),
+    },
+    mercadoPagoProcessedPayment: {
+      findUnique: vi.fn().mockResolvedValue(null),
+      create: vi.fn().mockResolvedValue({ id: 1 }),
     },
     proveedorArticulo: {
       findMany: vi.fn().mockResolvedValue([proveedorCatalogoRow]),
@@ -2460,6 +2470,43 @@ describe('API — contrato OpenAPI', () => {
     const app = createApp(p)
     const res = await request(app).post('/api/facturas/7/mp/preference').expect(201)
     await assertMatchesOpenApi('/api/facturas/{id}/mp/preference', 'post', '201', res.body)
+  })
+
+  it('POST /api/webhooks/mercadopago returns 400 for invalid signature', async () => {
+    const app = createApp(buildPrisma())
+    const res = await request(app)
+      .post('/api/webhooks/mercadopago')
+      .set('x-signature', 'ts=1,v1=bad')
+      .set('x-request-id', 'req-contract-1')
+      .query({ 'data.id': '12345678' })
+      .send({ type: 'payment', data: { id: '12345678' } })
+      .expect(400)
+    await assertMatchesOpenApi('/api/webhooks/mercadopago', 'post', '400', res.body)
+  })
+
+  it('POST /api/webhooks/mercadopago returns 200 for valid signature', async () => {
+    const secret = 'whsec-contract'
+    const paymentId = '12345678'
+    const requestId = 'req-contract-2'
+    const ts = '1704908010'
+    const manifest = buildMercadoPagoSignatureManifest(paymentId, requestId, ts)
+    const v1 = computeMercadoPagoSignatureHmac(secret, manifest)
+    const p = buildPrisma()
+    vi.mocked(p.mercadoPagoConfig.findMany).mockResolvedValue([
+      {
+        tenantId: 1,
+        webhookSecretEncrypted: encryptFiscalSecret(secret),
+      },
+    ] as never)
+    const app = createApp(p)
+    const res = await request(app)
+      .post('/api/webhooks/mercadopago')
+      .set('x-signature', `ts=${ts},v1=${v1}`)
+      .set('x-request-id', requestId)
+      .query({ 'data.id': paymentId })
+      .send({ type: 'payment', data: { id: paymentId } })
+      .expect(200)
+    await assertMatchesOpenApi('/api/webhooks/mercadopago', 'post', '200', res.body)
   })
 
   it('GET /api/printing/status', async () => {

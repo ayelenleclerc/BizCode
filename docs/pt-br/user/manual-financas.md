@@ -64,7 +64,17 @@ Com Mercado Pago configurado (#174) e ativo, a equipe pode gerar um **link de pa
 
 Clientes do portal veem **Pagar online** quando existe um link ativo para a fatura.
 
-Defina **`API_PUBLIC_URL`** em produção para o Mercado Pago alcançar a URL de webhook registrada em cada preference (handler em #176).
+Defina **`API_PUBLIC_URL`** em produção para o Mercado Pago alcançar a URL de webhook registrada em cada preference.
+
+## Webhook de pagamento Mercado Pago (#176)
+
+O Mercado Pago envia notificações para `POST /api/webhooks/mercadopago` (público, sem sessão). Requisitos:
+
+1. Configurar **`webhookSecret`** em **Configurações → Empresa** (mesmo segredo da aplicação Mercado Pago).
+2. Definir **`API_PUBLIC_URL`** com a URL pública da API.
+3. Quando o cliente paga um link de fatura (#175), o BizCode valida a assinatura, consulta o pagamento no Mercado Pago e, se **approved**, cria um **recibo de cobrança** (`ReciboCobro`) com forma `mercadopago` imputado na fatura; `Factura.mpEstado` passa a `approved`.
+4. Notificações duplicadas do mesmo `mpPaymentId` são ignoradas (idempotente).
+5. Managers recebem notificação in-app ao receber ou falhar um pagamento.
 
 ## Referência API
 

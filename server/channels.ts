@@ -130,6 +130,20 @@ function buildMessage(type: NotificationType, payload: NotificationPayload): Mes
         text: `El cheque${numero}${banco}${amount ? ` por ${amount}` : ''} de ${rsocial} fue rechazado. Actualice la cuenta corriente del cliente.`,
       }
     }
+    case 'mercadopago_payment_received': {
+      const ref = payload.facturaRef ? ` ${payload.facturaRef}` : ''
+      return {
+        subject: `[BizCode] Pago Mercado Pago recibido — ${rsocial}`,
+        text: `${rsocial} pagó la factura${ref}${amount ? ` por ${amount}` : ''} vía Mercado Pago.`,
+      }
+    }
+    case 'mercadopago_payment_failed': {
+      const ref = payload.facturaRef ? ` ${payload.facturaRef}` : ''
+      return {
+        subject: `[BizCode] Pago Mercado Pago rechazado — ${rsocial}`,
+        text: `El pago Mercado Pago de la factura${ref} de ${rsocial} fue rechazado o cancelado.`,
+      }
+    }
   }
 }
 

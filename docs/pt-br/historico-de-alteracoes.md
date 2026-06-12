@@ -10,6 +10,8 @@ Versionamento: [Semantic Versioning](https://semver.org/).
 
 ### Adicionado
 
+- **Webhook de pagamento Mercado Pago (#176):** `POST /api/webhooks/mercadopago` público com validação `x-signature`; Prisma `MercadoPagoProcessedPayment` (idempotência); busca pagamento na API MP; se `approved` cria `ReciboCobro` com forma `mercadopago` e imputação na fatura, atualiza `Factura.mpEstado`/`mpPagadoAt`; notificações in-app para managers; rate limit; OpenAPI, testes contrato/API/unit, manual de finanças trilíngue.
+
 - **Link de pagamento Mercado Pago por fatura (#175):** campos Prisma em `Factura` (`mpPreferenceId`, `mpPaymentLink`, `mpEstado`, `mpPagadoAt`, `mpPreferenceExpiresAt`); API `GET /api/facturas/{id}/mp`, `POST .../mp/preference` (integração `mercadopago`, `reports.financial.read`); preference Checkout MP (TTL 72 h, saldo pendente em ARS); UI staff no detalhe da fatura (`MercadoPagoPaymentLinkModal`, copiar/WhatsApp/e-mail); botão do portal abre link ativo; `API_PUBLIC_URL` para webhook (#176); OpenAPI, testes contrato/API/unit/UI, i18n trilíngue e manual de finanças.
 
 - **Credenciais Mercado Pago por tenant (#174):** Prisma `MercadoPagoConfig` (access token e webhook secret criptografados); API `GET/PUT /api/configuracion/mercadopago`, `POST .../test` (integração `mercadopago`, `settings.business.manage`); UI **Configuração → Empresa** (`MercadoPagoConfigSection`, `IfIntegration`); verificação via MP `users/me`; OpenAPI, testes API/unit/UI, i18n empresa trilíngue e manual de finanças.

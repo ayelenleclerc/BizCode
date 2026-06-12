@@ -64,7 +64,17 @@ When Mercado Pago is configured (#174) and active, staff can generate a **paymen
 
 Portal customers see **Pay online** when an active link exists for their invoice.
 
-Set **`API_PUBLIC_URL`** in production so Mercado Pago can reach the webhook URL registered on each preference (handler in #176).
+Set **`API_PUBLIC_URL`** in production so Mercado Pago can reach the webhook URL registered on each preference.
+
+## Mercado Pago payment webhook (#176)
+
+Mercado Pago sends payment notifications to `POST /api/webhooks/mercadopago` (public, no session). Requirements:
+
+1. Configure **`webhookSecret`** in **Settings → Company** (same secret as in your Mercado Pago application).
+2. Set **`API_PUBLIC_URL`** to your public API base URL.
+3. When a customer pays an invoice link (#175), BizCode validates the signature, fetches the payment from Mercado Pago, and on **approved** status creates a **customer receipt** (`ReciboCobro`) with payment method `mercadopago` allocated to the invoice; `Factura.mpEstado` becomes `approved`.
+4. Duplicate notifications for the same `mpPaymentId` are ignored (idempotent).
+5. Managers receive an in-app notification when a payment is received or fails.
 
 ## API reference
 

@@ -16,6 +16,8 @@ export const NOTIFICATION_TYPES = [
   'module_trial_expiring',
   'cheque_due_soon',
   'cheque_rechazado',
+  'mercadopago_payment_received',
+  'mercadopago_payment_failed',
 ] as const
 
 export type NotificationType = (typeof NOTIFICATION_TYPES)[number]

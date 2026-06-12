@@ -1,5 +1,6 @@
 const MP_USERS_ME_URL = 'https://api.mercadopago.com/users/me'
 const MP_PREFERENCES_URL = 'https://api.mercadopago.com/checkout/preferences'
+const MP_PAYMENTS_URL = 'https://api.mercadopago.com/v1/payments'
 
 export type MercadoPagoUserMe = {
   nickname?: string
@@ -114,6 +115,46 @@ export async function createMercadoPagoPreference(
   const body = (await res.json()) as MercadoPagoPreferenceResult
   if (!body.id || !body.init_point) {
     throw new MercadoPagoApiError(502, 'Invalid Mercado Pago preference response')
+  }
+  return body
+}
+
+export type MercadoPagoPaymentResult = {
+  id: number
+  status: string
+  external_reference?: string | null
+  transaction_amount?: number
+  preference_id?: string | null
+}
+
+/**
+ * @en Fetches a Mercado Pago payment by id (#176).
+ * @es Obtiene un pago de Mercado Pago por id (#176).
+ * @pt-BR Busca um pagamento do Mercado Pago por id (#176).
+ */
+export async function fetchMercadoPagoPayment(
+  accessToken: string,
+  paymentId: string,
+): Promise<MercadoPagoPaymentResult> {
+  const res = await fetch(`${MP_PAYMENTS_URL}/${encodeURIComponent(paymentId)}`, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      Accept: 'application/json',
+    },
+  })
+
+  if (!res.ok) {
+    throw new MercadoPagoApiError(
+      res.status,
+      res.status === 404
+        ? 'Mercado Pago payment not found'
+        : `Mercado Pago API error (${res.status})`,
+    )
+  }
+
+  const body = (await res.json()) as MercadoPagoPaymentResult
+  if (body.id == null || !body.status) {
+    throw new MercadoPagoApiError(502, 'Invalid Mercado Pago payment response')
   }
   return body
 }

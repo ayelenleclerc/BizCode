@@ -26,3 +26,16 @@ export const mercadoPagoFacturaPaymentSchema = z.object({
   amount: z.string().optional(),
   facturaRef: z.string().optional(),
 })
+
+export const mercadoPagoWebhookBodySchema = z.object({
+  action: z.string().optional(),
+  type: z.string().optional(),
+  data: z
+    .object({
+      id: z.union([z.string(), z.number()]),
+    })
+    .optional(),
+  id: z.union([z.string(), z.number()]).optional(),
+  live_mode: z.boolean().optional(),
+  user_id: z.union([z.string(), z.number()]).optional(),
+})
