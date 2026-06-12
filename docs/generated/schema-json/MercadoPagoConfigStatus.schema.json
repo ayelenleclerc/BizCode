@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "accessTokenLast4": {
+      "type": "string"
+    },
+    "activo": {
+      "type": "boolean"
+    },
+    "configured": {
+      "type": "boolean"
+    },
+    "publicKey": {
+      "type": "string"
+    },
+    "sandboxMode": {
+      "type": "boolean"
+    },
+    "webhookSecretSet": {
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "configured"
+  ],
+  "title": "MercadoPagoConfigStatus",
+  "type": "object"
+}

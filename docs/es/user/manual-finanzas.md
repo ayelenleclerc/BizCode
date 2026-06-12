@@ -44,6 +44,16 @@ La misma página **Finanzas** incluye una sección de facturas vencidas (`GET /a
 
 La configuración del job automático (días de gracia, zona horaria IANA, horario comercial) está en **Configuración → Empresa**. El job operativo `npm run cobranzas:recordatorios` recorre todos los tenants con parámetros de empresa y envía a las **08:00 hora local** dentro de la ventana configurada (véase [ciclo CI/CD](../quality/ciclo-ci-cd.md)).
 
+## Credenciales Mercado Pago (#174)
+
+Si el tenant tiene habilitada la integración **`mercadopago`** (config del superadmin), configure las credenciales en **Configuración → Empresa** (sección *MercadoPago*):
+
+- **Access Token**, **Public Key** y **Webhook Secret** opcional (secretos cifrados en reposo; no se muestran tras guardar).
+- Interruptores **Modo sandbox** e **Integración activa**.
+- **Verificar credenciales** llama a `POST /api/configuracion/mercadopago/test` y muestra el nombre de la cuenta MP.
+
+Requiere **`settings.business.manage`**. Los links de pago por factura y el pago online del portal no están disponibles hasta el issue #175.
+
 ## Referencia API
 
 [`docs/api/openapi.yaml`](../../api/openapi.yaml) — rutas `/api/reportes/aging`, `/api/reportes/cuenta-corriente/{clienteId}` y `/api/clientes/{id}/cuenta-corriente/*`.

@@ -44,6 +44,16 @@ The same **Finanzas** page includes an overdue invoices section (`GET /api/cobra
 
 Automatic job settings (grace days, IANA time zone, business hours) are under **Settings → Company**. The operational job `npm run cobranzas:recordatorios` iterates all tenants with company parameters and sends at **08:00 tenant local time** within the configured window (see [CI/CD cycle](../quality/ci-cd.md)).
 
+## Mercado Pago credentials (#174)
+
+When the tenant has the **`mercadopago`** integration enabled (superadmin tenant config), configure credentials under **Settings → Company** (*MercadoPago* section):
+
+- **Access Token**, **Public Key**, optional **Webhook Secret** (secrets encrypted at rest; never shown after save).
+- **Sandbox mode** and **Integration active** toggles.
+- **Verify credentials** calls `POST /api/configuracion/mercadopago/test` and shows the Mercado Pago account name.
+
+Requires **`settings.business.manage`**. Invoice payment links and portal online pay are not available until issue #175.
+
 ## API reference
 
 [`docs/api/openapi.yaml`](../../api/openapi.yaml) — paths under `/api/reportes/aging`, `/api/reportes/cuenta-corriente/{clienteId}`, and `/api/clientes/{id}/cuenta-corriente/*`.

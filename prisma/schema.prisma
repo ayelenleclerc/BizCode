@@ -702,6 +702,22 @@ model Tenant {
   portalConfig                  PortalConfig?
   portalMagicLinks              PortalMagicLink[]
   portalSessions                PortalSession[]
+  mercadoPagoConfig             MercadoPagoConfig?
+}
+
+/// MercadoPago credentials per tenant (#174); access token and webhook secret encrypted at rest.
+model MercadoPagoConfig {
+  id                     Int      @id @default(autoincrement())
+  tenantId               Int      @unique
+  tenant                 Tenant   @relation(fields: [tenantId], references: [id])
+  accessTokenEncrypted   String   @db.Text
+  accessTokenLast4       String   @db.VarChar(4)
+  publicKey              String   @db.VarChar(120)
+  webhookSecretEncrypted String?  @db.Text
+  sandboxMode            Boolean  @default(true)
+  activo                 Boolean  @default(true)
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
 }
 
 /// B2B customer portal branding and feature toggles per tenant (#240).

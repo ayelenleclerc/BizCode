@@ -38228,6 +38228,435 @@ Returns boolean flags for each channel. No sensitive values are exposed.
 }
 ```
 
+### Mercado Pago config status (metadata only) (#174)
+
+- **Method:** `GET`
+- **Path:** `/api/configuracion/mercadopago`
+- **Tags:** mercadopago
+
+Requires `settings.business.manage` and tenant integration `mercadopago`. Does not return access token or webhook secret.
+
+#### Responses
+
+##### Status: 200 Mercado Pago config status
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`configured` (required)**
+
+    `boolean`
+
+  - **`accessTokenLast4`**
+
+    `string`
+
+  - **`activo`**
+
+    `boolean`
+
+  - **`publicKey`**
+
+    `string`
+
+  - **`sandboxMode`**
+
+    `boolean`
+
+  - **`webhookSecretSet`**
+
+    `boolean`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "configured": true,
+    "publicKey": "",
+    "sandboxMode": true,
+    "activo": true,
+    "accessTokenLast4": "",
+    "webhookSecretSet": true
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Upsert tenant Mercado Pago credentials (#174)
+
+- **Method:** `PUT`
+- **Path:** `/api/configuracion/mercadopago`
+- **Tags:** mercadopago
+
+Requires `settings.business.manage` and tenant integration `mercadopago`. Access token and webhook secret encrypted at rest.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`publicKey` (required)**
+
+  `string`
+
+- **`accessToken`**
+
+  `string`
+
+- **`activo`**
+
+  `boolean`
+
+- **`sandboxMode`**
+
+  `boolean`
+
+- **`webhookSecret`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "accessToken": "",
+  "publicKey": "",
+  "webhookSecret": "",
+  "sandboxMode": true,
+  "activo": true
+}
+```
+
+#### Responses
+
+##### Status: 200 Config saved
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`configured`**
+
+    `boolean`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "configured": true
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Verify Mercado Pago credentials (#174)
+
+- **Method:** `POST`
+- **Path:** `/api/configuracion/mercadopago/test`
+- **Tags:** mercadopago
+
+Requires `settings.business.manage` and tenant integration `mercadopago`. Calls Mercado Pago `users/me` with stored access token.
+
+#### Responses
+
+##### Status: 200 Credentials valid
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`accountName` (required)**
+
+    `string`
+
+  - **`email`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "accountName": "",
+    "email": ""
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Mercado Pago not configured
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 422 Invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ### Public portal branding for login shell (#240)
 
 - **Method:** `GET`
@@ -65072,6 +65501,194 @@ Originating invoice header (selected columns)
   "success": true,
   "data": {
     "configured": true
+  }
+}
+```
+
+### MercadoPagoConfigStatus
+
+- **Type:**`object`
+
+* **`configured` (required)**
+
+  `boolean`
+
+* **`accessTokenLast4`**
+
+  `string`
+
+* **`activo`**
+
+  `boolean`
+
+* **`publicKey`**
+
+  `string`
+
+* **`sandboxMode`**
+
+  `boolean`
+
+* **`webhookSecretSet`**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "configured": true,
+  "publicKey": "",
+  "sandboxMode": true,
+  "activo": true,
+  "accessTokenLast4": "",
+  "webhookSecretSet": true
+}
+```
+
+### MercadoPagoConfigInput
+
+- **Type:**`object`
+
+* **`publicKey` (required)**
+
+  `string`
+
+* **`accessToken`**
+
+  `string`
+
+* **`activo`**
+
+  `boolean`
+
+* **`sandboxMode`**
+
+  `boolean`
+
+* **`webhookSecret`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "accessToken": "",
+  "publicKey": "",
+  "webhookSecret": "",
+  "sandboxMode": true,
+  "activo": true
+}
+```
+
+### MercadoPagoConfigStatusEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`configured` (required)**
+
+    `boolean`
+
+  - **`accessTokenLast4`**
+
+    `string`
+
+  - **`activo`**
+
+    `boolean`
+
+  - **`publicKey`**
+
+    `string`
+
+  - **`sandboxMode`**
+
+    `boolean`
+
+  - **`webhookSecretSet`**
+
+    `boolean`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "configured": true,
+    "publicKey": "",
+    "sandboxMode": true,
+    "activo": true,
+    "accessTokenLast4": "",
+    "webhookSecretSet": true
+  }
+}
+```
+
+### MercadoPagoConfigEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`configured`**
+
+    `boolean`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "configured": true
+  }
+}
+```
+
+### MercadoPagoTestEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`accountName` (required)**
+
+    `string`
+
+  - **`email`**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "accountName": "",
+    "email": ""
   }
 }
 ```

@@ -15,6 +15,7 @@ import PrintDevicesSection from './PrintDevicesSection'
 import ProveedorAlertasConfigSection from './ProveedorAlertasConfigSection'
 import FiscalRetencionesSection from './FiscalRetencionesSection'
 import PortalConfigSection from './PortalConfigSection'
+import MercadoPagoConfigSection from './MercadoPagoConfigSection'
 import IfModule from '@/components/IfModule'
 
 const EMPRESA_TIMEZONE_OPTIONS = [
@@ -561,6 +562,7 @@ export default function EmpresaPage() {
       </form>
 
       <ArcaFiscalSection />
+      <MercadoPagoConfigSection />
       <PrintDevicesSection />
       <FiscalRetencionesSection />
       <ProveedorAlertasConfigSection />

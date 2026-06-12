@@ -50,6 +50,8 @@ tags:
     description: Customer payment collections
   - name: portal
     description: B2B customer self-service portal (#240)
+  - name: mercadopago
+    description: Mercado Pago online payments integration (#174+)
   - name: cobranzas
     description: Overdue invoice reminders (#134)
   - name: cheques
@@ -6247,6 +6249,87 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         '403':
           $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/configuracion/mercadopago:
+    get:
+      tags: [mercadopago]
+      summary: Mercado Pago config status (metadata only) (#174)
+      description: Requires `settings.business.manage` and tenant integration `mercadopago`. Does not return access token or webhook secret.
+      security:
+        - cookieSession: []
+      responses:
+        '200':
+          description: Mercado Pago config status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MercadoPagoConfigStatusEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    put:
+      tags: [mercadopago]
+      summary: Upsert tenant Mercado Pago credentials (#174)
+      description: Requires `settings.business.manage` and tenant integration `mercadopago`. Access token and webhook secret encrypted at rest.
+      security:
+        - cookieSession: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MercadoPagoConfigInput'
+      responses:
+        '200':
+          description: Config saved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MercadoPagoConfigEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/configuracion/mercadopago/test:
+    post:
+      tags: [mercadopago]
+      summary: Verify Mercado Pago credentials (#174)
+      description: Requires `settings.business.manage` and tenant integration `mercadopago`. Calls Mercado Pago `users/me` with stored access token.
+      security:
+        - cookieSession: []
+      responses:
+        '200':
+          description: Credentials valid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MercadoPagoTestEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Mercado Pago not configured
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '422':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
         '500':
           $ref: '#/components/responses/ServerError'
 
@@ -12563,6 +12646,57 @@ components:
           type: object
           properties:
             configured: { type: boolean }
+
+    MercadoPagoConfigStatus:
+      type: object
+      required: [configured]
+      properties:
+        configured: { type: boolean }
+        publicKey: { type: string }
+        sandboxMode: { type: boolean }
+        activo: { type: boolean }
+        accessTokenLast4: { type: string }
+        webhookSecretSet: { type: boolean }
+
+    MercadoPagoConfigInput:
+      type: object
+      required: [publicKey]
+      properties:
+        accessToken: { type: string }
+        publicKey: { type: string }
+        webhookSecret: { type: string }
+        sandboxMode: { type: boolean }
+        activo: { type: boolean }
+
+    MercadoPagoConfigStatusEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success: { type: boolean, const: true }
+        data:
+          $ref: '#/components/schemas/MercadoPagoConfigStatus'
+
+    MercadoPagoConfigEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success: { type: boolean, const: true }
+        data:
+          type: object
+          properties:
+            configured: { type: boolean }
+
+    MercadoPagoTestEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success: { type: boolean, const: true }
+        data:
+          type: object
+          required: [accountName]
+          properties:
+            accountName: { type: string }
+            email: { type: string }
 
     ArcaTaEnvelope:
       type: object

@@ -320,6 +320,16 @@
 
 * [LogoutResult](./logoutresult.md) – `-`
 
+* [MercadoPagoConfigEnvelope](./mercadopagoconfigenvelope.md) – `-`
+
+* [MercadoPagoConfigInput](./mercadopagoconfiginput.md) – `-`
+
+* [MercadoPagoConfigStatus](./mercadopagoconfigstatus.md) – `-`
+
+* [MercadoPagoConfigStatusEnvelope](./mercadopagoconfigstatusenvelope.md) – `-`
+
+* [MercadoPagoTestEnvelope](./mercadopagotestenvelope.md) – `-`
+
 * [MetricsEnvelope](./metricsenvelope.md) – `-`
 
 * [MetricsSnapshot](./metricssnapshot.md) – `-`
@@ -803,6 +813,10 @@
 * [Untitled object in FacturaListEnvelope](./facturalistenvelope-allof-0.md) – `undefined#/allOf/0`
 
 * [Untitled object in HealthResponse](./healthresponse-properties-db.md) – `undefined#/properties/db`
+
+* [Untitled object in MercadoPagoConfigEnvelope](./mercadopagoconfigenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled object in MercadoPagoTestEnvelope](./mercadopagotestenvelope-properties-data.md) – `undefined#/properties/data`
 
 * [Untitled object in MetricsSnapshot](./metricssnapshot-properties-requestsbymethod.md) – `undefined#/properties/requestsByMethod`
 

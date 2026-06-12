@@ -2832,6 +2832,60 @@ export const arcaAPI = {
   },
 }
 
+export type MercadoPagoConfigStatus = {
+  configured: boolean
+  publicKey?: string
+  sandboxMode?: boolean
+  activo?: boolean
+  accessTokenLast4?: string
+  webhookSecretSet?: boolean
+}
+
+export type MercadoPagoConfigInput = {
+  accessToken?: string
+  publicKey: string
+  webhookSecret?: string
+  sandboxMode?: boolean
+  activo?: boolean
+}
+
+export const mercadopagoAPI = {
+  getConfig: async (): Promise<MercadoPagoConfigStatus> => {
+    try {
+      const response = await api.get<{ success: boolean; data: MercadoPagoConfigStatus }>(
+        '/configuracion/mercadopago',
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  putConfig: async (body: MercadoPagoConfigInput): Promise<{ configured: boolean }> => {
+    try {
+      const response = await api.put<{ success: boolean; data: { configured: boolean } }>(
+        '/configuracion/mercadopago',
+        body,
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  testCredentials: async (): Promise<{ accountName: string; email?: string }> => {
+    try {
+      const response = await api.post<{
+        success: boolean
+        data: { accountName: string; email?: string }
+      }>('/configuracion/mercadopago/test')
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+}
+
 // ============ USERS ============
 
 export type AppUserDTO = {

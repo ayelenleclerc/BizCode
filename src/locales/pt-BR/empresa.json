@@ -76,6 +76,35 @@
       "authFailed": "Não foi possível obter o ticket ARCA"
     }
   },
+  "mercadopago": {
+    "title": "MercadoPago",
+    "subtitle": "Integração opcional — access token e webhook secret são criptografados e não são exibidos após salvar.",
+    "loading": "Carregando configuração MercadoPago…",
+    "configuredBadge": "Configurado (access token ••••{{last4}})",
+    "notConfiguredBadge": "Não configurado",
+    "webhookSecretSet": "Webhook secret salvo.",
+    "readOnlyHint": "Você pode ver o status; apenas funções com permissão de configuração da empresa podem editar.",
+    "accessToken": "Access Token",
+    "accessTokenPlaceholder": "Cole o access token do MercadoPago…",
+    "accessTokenPlaceholderUpdate": "Deixe em branco para manter; cole um token novo para substituir.",
+    "publicKey": "Public Key",
+    "webhookSecret": "Webhook Secret",
+    "webhookSecretPlaceholder": "Cole o secret do webhook (opcional)…",
+    "webhookSecretPlaceholderUpdate": "Deixe em branco para manter; cole um valor novo para substituir.",
+    "sandboxMode": "Modo sandbox",
+    "activo": "Integração ativa",
+    "save": "Salvar credenciais MercadoPago",
+    "saving": "Salvando…",
+    "saveSuccess": "Credenciais MercadoPago salvas",
+    "testCredentials": "Verificar credenciais",
+    "testLoading": "Verificando…",
+    "testSuccess": "Conta MP: {{accountName}} ({{email}})",
+    "errors": {
+      "loadFailed": "Não foi possível carregar a configuração MercadoPago",
+      "saveFailed": "Não foi possível salvar as credenciais MercadoPago",
+      "testFailed": "Não foi possível verificar as credenciais MercadoPago"
+    }
+  },
   "printDevices": {
     "title": "Dispositivos de impressão",
     "subtitle": "Opcional por cliente: habilite apenas se usar hardware de PDV. PDF e faturação eletrônica funcionam sem impressora.",

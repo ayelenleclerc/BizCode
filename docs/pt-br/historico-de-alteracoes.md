@@ -10,6 +10,8 @@ Versionamento: [Semantic Versioning](https://semver.org/).
 
 ### Adicionado
 
+- **Credenciais Mercado Pago por tenant (#174):** Prisma `MercadoPagoConfig` (access token e webhook secret criptografados); API `GET/PUT /api/configuracion/mercadopago`, `POST .../test` (integração `mercadopago`, `settings.business.manage`); UI **Configuração → Empresa** (`MercadoPagoConfigSection`, `IfIntegration`); verificação via MP `users/me`; OpenAPI, testes API/unit/UI, i18n empresa trilíngue e manual de finanças. Links de pagamento (#175) ainda não incluídos.
+
 - **Portal B2B do cliente (#240):** autenticação magic link (TTL 15 min, cookie de sessão 8 h); Prisma `PortalConfig`, `PortalMagicLink`, `PortalSession`; API `/api/portal/:tenantSlug/*` (faturas, conta corrente, pedidos, PDF) limitada a `portalClienteId`; admin `GET/PUT /api/portal-config`; rotas React `/portal/:tenantSlug` com branding; módulo `clients.portal`; testes de isolamento; botão MercadoPago desabilitado até #175; OpenAPI, i18n e manuais trilíngues.
 
 - **Apresentações SICORE/SIFERE (#242):** builders TXT de largura fixa para SICORE nacional e SIFERE provincial (códigos CABA/PBA); histórico `PresentacionRetencion`; API `GET /api/fiscal/presentaciones/preview`, `POST/GET /api/fiscal/presentaciones`, `GET .../{id}/archivo`, `PATCH .../{id}/presentado`; validação CUIT prévia; UI **Finanças → Apresentações fiscais** (`PresentacionesRetencionesSection`, `finance.retenciones`); `GET /api/fiscal/retenciones/export` usa o layout atualizado; OpenAPI, testes contract/API/unitários e manuais trilíngues. Validar arquivos finais em homologação AFIP/COMARB manualmente.

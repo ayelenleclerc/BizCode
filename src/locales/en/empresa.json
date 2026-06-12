@@ -76,6 +76,35 @@
       "authFailed": "Could not obtain ARCA ticket"
     }
   },
+  "mercadopago": {
+    "title": "MercadoPago",
+    "subtitle": "Optional integration — access token and webhook secret are encrypted and never shown after save.",
+    "loading": "Loading MercadoPago settings…",
+    "configuredBadge": "Configured (access token ••••{{last4}})",
+    "notConfiguredBadge": "Not configured",
+    "webhookSecretSet": "Webhook secret saved.",
+    "readOnlyHint": "You can view status; only roles with company settings permission can edit.",
+    "accessToken": "Access Token",
+    "accessTokenPlaceholder": "Paste your Mercado Pago access token…",
+    "accessTokenPlaceholderUpdate": "Leave blank to keep current token; paste a new token to replace.",
+    "publicKey": "Public Key",
+    "webhookSecret": "Webhook Secret",
+    "webhookSecretPlaceholder": "Paste webhook secret (optional)…",
+    "webhookSecretPlaceholderUpdate": "Leave blank to keep current secret; paste a new value to replace.",
+    "sandboxMode": "Sandbox mode",
+    "activo": "Integration active",
+    "save": "Save MercadoPago credentials",
+    "saving": "Saving…",
+    "saveSuccess": "MercadoPago credentials saved",
+    "testCredentials": "Verify credentials",
+    "testLoading": "Verifying…",
+    "testSuccess": "MP account: {{accountName}} ({{email}})",
+    "errors": {
+      "loadFailed": "Could not load MercadoPago settings",
+      "saveFailed": "Could not save MercadoPago credentials",
+      "testFailed": "Could not verify MercadoPago credentials"
+    }
+  },
   "printDevices": {
     "title": "Print devices",
     "subtitle": "Optional per customer: enable only if you use POS hardware. PDF and electronic invoicing work without any printer.",
