@@ -8,6 +8,7 @@ import {
   type MercadoPagoPaymentResult,
 } from '../integrations/mercadopago/mercadoPagoApiClient'
 import { verifyMercadoPagoWebhookSignature } from '../lib/mercadopagoSignature'
+import { sanitizeLogField } from '../lib/sanitizeLogField'
 import { resolveSystemUserId } from '../lib/systemUserId'
 import { notifyManagers } from '../notifications'
 import { ReciboCobroService } from './ReciboCobroService'
@@ -136,7 +137,13 @@ export class MercadoPagoWebhookService {
     } catch (err: unknown) {
       if (err instanceof MercadoPagoApiError) {
         console.warn(
-          `[mercadopago-webhook] tenant=${tenantId} payment=${paymentId} mp_error=${err.status}`,
+          '[mercadopago-webhook] mp_error',
+          'tenant',
+          tenantId,
+          'payment',
+          sanitizeLogField(paymentId),
+          'status',
+          err.status,
         )
       }
       return
@@ -158,7 +165,11 @@ export class MercadoPagoWebhookService {
           : null
       if (!byPreference) {
         console.warn(
-          `[mercadopago-webhook] tenant=${tenantId} payment=${paymentId} factura_not_found`,
+          '[mercadopago-webhook] factura_not_found',
+          'tenant',
+          tenantId,
+          'payment',
+          sanitizeLogField(paymentId),
         )
         return
       }
@@ -187,7 +198,13 @@ export class MercadoPagoWebhookService {
     })
     if (!factura) {
       console.warn(
-        `[mercadopago-webhook] tenant=${tenantId} payment=${paymentId} factura=${ext.facturaId} missing`,
+        '[mercadopago-webhook] factura_missing',
+        'tenant',
+        tenantId,
+        'payment',
+        sanitizeLogField(paymentId),
+        'facturaId',
+        ext.facturaId,
       )
       return
     }
@@ -281,7 +298,13 @@ export class MercadoPagoWebhookService {
 
       if (!reciboResult.ok) {
         console.warn(
-          `[mercadopago-webhook] tenant=${tenantId} payment=${paymentId} recibo_error=${reciboResult.error}`,
+          '[mercadopago-webhook] recibo_error',
+          'tenant',
+          tenantId,
+          'payment',
+          sanitizeLogField(paymentId),
+          'error',
+          reciboResult.error,
         )
         return
       }

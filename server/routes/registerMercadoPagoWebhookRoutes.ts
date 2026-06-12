@@ -8,6 +8,7 @@ import {
   MercadoPagoWebhookService,
   type MercadoPagoWebhookPayload,
 } from '../services/MercadoPagoWebhookService'
+import { sanitizeLogField } from '../lib/sanitizeLogField'
 import type { RestRouteContext } from './restRouteTypes'
 
 function headerString(value: string | string[] | undefined): string | null {
@@ -53,7 +54,11 @@ export function registerMercadoPagoWebhookRoutes(app: Application, ctx: RestRout
         .then((tenantId) => {
           if (tenantId == null) {
             console.warn(
-              `[mercadopago-webhook] invalid_signature payment=${paymentId ?? dataId} request=${xRequestId}`,
+              '[mercadopago-webhook] invalid_signature',
+              'payment',
+              sanitizeLogField(paymentId ?? dataId),
+              'request',
+              sanitizeLogField(xRequestId),
             )
             if (!res.headersSent) {
               res.status(400).json({ success: false, error: 'Invalid webhook signature' })
@@ -77,7 +82,12 @@ export function registerMercadoPagoWebhookRoutes(app: Application, ctx: RestRout
               .processPaymentNotification(tenantId, paymentId, req.ip ?? null)
               .catch((err: unknown) => {
                 console.warn(
-                  `[mercadopago-webhook] process_error tenant=${tenantId} payment=${paymentId}`,
+                  '[mercadopago-webhook] process_error',
+                  'tenant',
+                  tenantId,
+                  'payment',
+                  sanitizeLogField(paymentId),
+                  'detail',
                   err instanceof Error ? err.message : err,
                 )
               })
