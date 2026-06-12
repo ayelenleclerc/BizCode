@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "alicuota": {
+      "maximum": 100,
+      "minimum": 0,
+      "type": "number"
+    },
+    "baseImponible": {
+      "exclusiveMinimum": 0,
+      "type": "number"
+    },
+    "importe": {
+      "exclusiveMinimum": 0,
+      "type": "number"
+    },
+    "regimenId": {
+      "minimum": 1,
+      "type": "integer"
+    }
+  },
+  "required": [
+    "regimenId",
+    "baseImponible",
+    "alicuota",
+    "importe"
+  ],
+  "title": "ReciboPagoRetencionInput",
+  "type": "object"
+}

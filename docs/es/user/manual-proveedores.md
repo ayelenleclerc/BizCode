@@ -39,10 +39,11 @@ En la pestaña **Cuenta corriente**, el bloque **Recibos de pago** permite regis
 
 1. **Registrar pago** — se listan comprobantes pendientes (más antiguos primero); seleccioná líneas y montos (parcial o total).
 2. Fecha, método (transferencia, cheque, efectivo, eCheq), CBU/referencia/notas opcionales.
-3. Al guardar: número correlativo por tenant, movimiento `pago` en CC (monto negativo) y auditoría `recibo_pago_create`.
-4. **Descargar PDF** por recibo; **Anular** (`recibo_pago_void`) revierte el saldo con movimiento compensatorio.
+3. Al guardar: número correlativo por tenant, movimiento `pago` en CC (monto negativo = bruto imputado) y auditoría `recibo_pago_create`.
+4. **Retenciones (#276):** con módulo `finance.retenciones` y agente configurado, podés aplicar retenciones sugeridas (preview), confirmar importes y registrar `RetencionAplicada` con constancia correlativa; el **neto transferido** = bruto − retenciones.
+5. **Descargar PDF** del recibo; **Constancia** PDF por cada retención; **Anular** (`recibo_pago_void`) revierte el saldo con movimiento compensatorio (bruto imputado).
 
-**API:** `GET /api/proveedores/{id}/pagos/comprobantes-pendientes`, `GET/POST /api/proveedores/{id}/pagos`, `POST .../pagos/{reciboId}/anular`, `GET .../pagos/{reciboId}/pdf` — [OpenAPI](../../api/openapi.yaml).
+**API:** `GET /api/proveedores/{id}/pagos/comprobantes-pendientes`, `GET/POST /api/proveedores/{id}/pagos`, `GET .../pagos/{reciboId}/retenciones`, `POST .../pagos/{reciboId}/anular`, `GET .../pagos/{reciboId}/pdf`, `GET /api/fiscal/retenciones/preview`, `GET /api/fiscal/retenciones/{id}/comprobante/pdf`, `GET /api/fiscal/retenciones/export?format=sicore|sifere` — [OpenAPI](../../api/openapi.yaml). Export TXT: validación manual contra layouts oficiales.
 
 ## Alertas de vencimiento a pagar (GitHub #275)
 

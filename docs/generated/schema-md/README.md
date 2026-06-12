@@ -82,7 +82,43 @@
 
 * [ChatMessageListEnvelope](./chatmessagelistenvelope.md) – `-`
 
+* [Cheque](./cheque.md) – `-`
+
+* [ChequeEnvelope](./chequeenvelope.md) – `-`
+
+* [ChequeInput](./chequeinput.md) – `-`
+
+* [ChequeListEnvelope](./chequelistenvelope.md) – `-`
+
+* [ChequeResumenEnvelope](./chequeresumenenvelope.md) – `-`
+
+* [ChequeTransicionInput](./chequetransicioninput.md) – `-`
+
+* [ChequeUpdateInput](./chequeupdateinput.md) – `-`
+
 * [Cliente](./cliente.md) – `-`
+
+* [ClienteCuentaCorriente](./clientecuentacorriente.md) – `-`
+
+* [ClienteCuentaCorrienteAjusteInput](./clientecuentacorrienteajusteinput.md) – `-`
+
+* [ClienteCuentaCorrienteAntiguedad](./clientecuentacorrienteantiguedad.md) – `-`
+
+* [ClienteCuentaCorrienteAntiguedadBucket](./clientecuentacorrienteantiguedadbucket.md) – `-`
+
+* [ClienteCuentaCorrienteAntiguedadEnvelope](./clientecuentacorrienteantiguedadenvelope.md) – `-`
+
+* [ClienteCuentaCorrienteChartPoint](./clientecuentacorrientechartpoint.md) – `-`
+
+* [ClienteCuentaCorrienteEnvelope](./clientecuentacorrienteenvelope.md) – `-`
+
+* [ClienteCuentaCorrienteEnviarEnvelope](./clientecuentacorrienteenviarenvelope.md) – `-`
+
+* [ClienteCuentaCorrienteEnviarInput](./clientecuentacorrienteenviarinput.md) – `-`
+
+* [ClienteCuentaCorrienteSaldo](./clientecuentacorrientesaldo.md) – `-`
+
+* [ClienteCuentaCorrienteSaldoEnvelope](./clientecuentacorrientesaldoenvelope.md) – `-`
 
 * [ClienteEnvelope](./clienteenvelope.md) – `-`
 
@@ -117,6 +153,8 @@
 * [CobroInput](./cobroinput.md) – `-`
 
 * [CobroListEnvelope](./cobrolistenvelope.md) – `-`
+
+* [CobroRetencion](./cobroretencion.md) – `-`
 
 * [ComprobanteCompra](./comprobantecompra.md) – `-`
 
@@ -210,6 +248,10 @@
 
 * [FacturaListEnvelope](./facturalistenvelope.md) – `-`
 
+* [FacturaPendienteCliente](./facturapendientecliente.md) – `-`
+
+* [FacturaPendienteClienteListEnvelope](./facturapendienteclientelistenvelope.md) – `-`
+
 * [FacturaPendienteEstado](./facturapendienteestado.md) – `-`
 
 * [FacturaPendienteRow](./facturapendienterow.md) – `-`
@@ -278,6 +320,16 @@
 
 * [LogoutResult](./logoutresult.md) – `-`
 
+* [MercadoPagoConfigEnvelope](./mercadopagoconfigenvelope.md) – `-`
+
+* [MercadoPagoConfigInput](./mercadopagoconfiginput.md) – `-`
+
+* [MercadoPagoConfigStatus](./mercadopagoconfigstatus.md) – `-`
+
+* [MercadoPagoConfigStatusEnvelope](./mercadopagoconfigstatusenvelope.md) – `-`
+
+* [MercadoPagoTestEnvelope](./mercadopagotestenvelope.md) – `-`
+
 * [MetricsEnvelope](./metricsenvelope.md) – `-`
 
 * [MetricsSnapshot](./metricssnapshot.md) – `-`
@@ -291,6 +343,10 @@
 * [ModuleCatalogPreset](./modulecatalogpreset.md) – `-`
 
 * [ModuleNotEnabledEnvelope](./modulenotenabledenvelope.md) – `-`
+
+* [MovimientoClienteCC](./movimientoclientecc.md) – `-`
+
+* [MovimientoClienteCCEnvelope](./movimientoclienteccenvelope.md) – `-`
 
 * [MovimientoProveedorCC](./movimientoproveedorcc.md) – `-`
 
@@ -357,6 +413,54 @@
 * [PlanCatalogEnvelope](./plancatalogenvelope.md) – `-`
 
 * [PlanLimitErrorEnvelope](./planlimiterrorenvelope.md) – `-`
+
+* [PortalBranding](./portalbranding.md) – `-`
+
+* [PortalBrandingEnvelope](./portalbrandingenvelope.md) – `-`
+
+* [PortalConfig](./portalconfig.md) – `-`
+
+* [PortalConfigEnvelope](./portalconfigenvelope.md) – `-`
+
+* [PortalConfigInput](./portalconfiginput.md) – `-`
+
+* [PortalFacturaListEnvelope](./portalfacturalistenvelope.md) – `-`
+
+* [PortalFacturaRow](./portalfacturarow.md) – `-`
+
+* [PortalLogoutEnvelope](./portallogoutenvelope.md) – `-`
+
+* [PortalMagicLinkInput](./portalmagiclinkinput.md) – `-`
+
+* [PortalMagicLinkSentEnvelope](./portalmagiclinksentenvelope.md) – `-`
+
+* [PortalMe](./portalme.md) – `-`
+
+* [PortalMeEnvelope](./portalmeenvelope.md) – `-`
+
+* [PortalPedidoListEnvelope](./portalpedidolistenvelope.md) – `-`
+
+* [PortalPedidoRow](./portalpedidorow.md) – `-`
+
+* [PortalVerifyEnvelope](./portalverifyenvelope.md) – `-`
+
+* [PresentacionFila](./presentacionfila.md) – `-`
+
+* [PresentacionPreview](./presentacionpreview.md) – `-`
+
+* [PresentacionPreviewEnvelope](./presentacionpreviewenvelope.md) – `-`
+
+* [PresentacionRetencion](./presentacionretencion.md) – `-`
+
+* [PresentacionRetencionEnvelope](./presentacionretencionenvelope.md) – `-`
+
+* [PresentacionRetencionInput](./presentacionretencioninput.md) – `-`
+
+* [PresentacionRetencionListEnvelope](./presentacionretencionlistenvelope.md) – `-`
+
+* [PresentacionTotalRegimen](./presentaciontotalregimen.md) – `-`
+
+* [PresentacionWarning](./presentacionwarning.md) – `-`
 
 * [PrintingStatus](./printingstatus.md) – `-`
 
@@ -430,6 +534,20 @@
 
 * [PublicPlan](./publicplan.md) – `-`
 
+* [ReciboCobro](./recibocobro.md) – `-`
+
+* [ReciboCobroEnvelope](./recibocobroenvelope.md) – `-`
+
+* [ReciboCobroForma](./recibocobroforma.md) – `-`
+
+* [ReciboCobroImputacion](./recibocobroimputacion.md) – `-`
+
+* [ReciboCobroInput](./recibocobroinput.md) – `-`
+
+* [ReciboCobroListEnvelope](./recibocobrolistenvelope.md) – `-`
+
+* [ReciboCobroVoidInput](./recibocobrovoidinput.md) – `-`
+
 * [ReciboPago](./recibopago.md) – `-`
 
 * [ReciboPagoEnvelope](./recibopagoenvelope.md) – `-`
@@ -439,6 +557,10 @@
 * [ReciboPagoInput](./recibopagoinput.md) – `-`
 
 * [ReciboPagoListEnvelope](./recibopagolistenvelope.md) – `-`
+
+* [ReciboPagoRetencion](./recibopagoretencion.md) – `-`
+
+* [ReciboPagoRetencionInput](./recibopagoretencioninput.md) – `-`
 
 * [Recuento](./recuento.md) – `-`
 
@@ -459,6 +581,20 @@
 * [RegimenRetencionListEnvelope](./regimenretencionlistenvelope.md) – `-`
 
 * [RegimenRetencionUpdateInput](./regimenretencionupdateinput.md) – `-`
+
+* [Remito](./remito.md) – `-`
+
+* [RemitoEntregarInput](./remitoentregarinput.md) – `-`
+
+* [RemitoEnvelope](./remitoenvelope.md) – `-`
+
+* [RemitoInput](./remitoinput.md) – `-`
+
+* [RemitoItemInput](./remitoiteminput.md) – `-`
+
+* [RemitoListEnvelope](./remitolistenvelope.md) – `-`
+
+* [RemitoUpdateInput](./remitoupdateinput.md) – `-`
 
 * [Reparto](./reparto.md) – `-`
 
@@ -632,6 +768,16 @@
 
 * [Untitled object in ChatConversation](./chatconversation-properties-user.md) – `undefined#/properties/user`
 
+* [Untitled object in ChequeResumenEnvelope](./chequeresumenenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled object in ChequeResumenEnvelope](./chequeresumenenvelope-properties-data-properties-encartera.md) – `undefined#/properties/data/properties/enCartera`
+
+* [Untitled object in ChequeResumenEnvelope](./chequeresumenenvelope-properties-data-properties-proximosvencer.md) – `undefined#/properties/data/properties/proximosVencer`
+
+* [Untitled object in ChequeResumenEnvelope](./chequeresumenenvelope-properties-data-properties-rechazados.md) – `undefined#/properties/data/properties/rechazados`
+
+* [Untitled object in ClienteCuentaCorrienteEnviarEnvelope](./clientecuentacorrienteenviarenvelope-properties-data.md) – `undefined#/properties/data`
+
 * [Untitled object in ClienteListEnvelope](./clientelistenvelope-allof-0.md) – `undefined#/allOf/0`
 
 * [Untitled object in CobranzaRecordatorioEnvelope](./cobranzarecordatorioenvelope-properties-data.md) – `undefined#/properties/data`
@@ -667,6 +813,10 @@
 * [Untitled object in FacturaListEnvelope](./facturalistenvelope-allof-0.md) – `undefined#/allOf/0`
 
 * [Untitled object in HealthResponse](./healthresponse-properties-db.md) – `undefined#/properties/db`
+
+* [Untitled object in MercadoPagoConfigEnvelope](./mercadopagoconfigenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled object in MercadoPagoTestEnvelope](./mercadopagotestenvelope-properties-data.md) – `undefined#/properties/data`
 
 * [Untitled object in MetricsSnapshot](./metricssnapshot-properties-requestsbymethod.md) – `undefined#/properties/requestsByMethod`
 
@@ -710,7 +860,31 @@
 
 * [Untitled object in PedidoListEnvelope](./pedidolistenvelope-allof-0.md) – `undefined#/allOf/0`
 
+* [Untitled object in PortalFacturaListEnvelope](./portalfacturalistenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled object in PortalLogoutEnvelope](./portallogoutenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled object in PortalMagicLinkSentEnvelope](./portalmagiclinksentenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled object in PortalMe](./portalme-properties-vendedor.md) – `undefined#/properties/vendedor`
+
+* [Untitled object in PortalMeEnvelope](./portalmeenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled object in PortalPedidoListEnvelope](./portalpedidolistenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled object in PortalVerifyEnvelope](./portalverifyenvelope-properties-data.md) – `undefined#/properties/data`
+
 * [Untitled object in ProveedorListEnvelope](./proveedorlistenvelope-allof-0.md) – `undefined#/allOf/0`
+
+* [Untitled object in ReciboCobro](./recibocobro-properties-cliente.md) – `undefined#/properties/cliente`
+
+* [Untitled object in ReciboCobro](./recibocobro-properties-usuario.md) – `undefined#/properties/usuario`
+
+* [Untitled object in ReciboCobroInput](./recibocobroinput-properties-formas-items.md) – `undefined#/properties/formas/items`
+
+* [Untitled object in ReciboCobroInput](./recibocobroinput-properties-imputaciones-items.md) – `undefined#/properties/imputaciones/items`
+
+* [Untitled object in ReciboCobroListEnvelope](./recibocobrolistenvelope-allof-0.md) – `undefined#/allOf/0`
 
 * [Untitled object in ReciboPago](./recibopago-properties-proveedor.md) – `undefined#/properties/proveedor`
 
@@ -727,6 +901,8 @@
 * [Untitled object in RecuentoItemsInput](./recuentoitemsinput-properties-lines-items.md) – `undefined#/properties/lines/items`
 
 * [Untitled object in RecuentoListEnvelope](./recuentolistenvelope-allof-1.md) – `undefined#/allOf/1`
+
+* [Untitled object in Remito](./remito-properties-items-items.md) – `undefined#/properties/items/items`
 
 * [Untitled object in Reparto](./reparto-properties-chofer.md) – `undefined#/properties/chofer`
 
@@ -804,11 +980,23 @@
 
 * [Untitled array in ChatMessageListEnvelope](./chatmessagelistenvelope-properties-data.md) – `undefined#/properties/data`
 
+* [Untitled array in ChequeListEnvelope](./chequelistenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled array in ClienteCuentaCorriente](./clientecuentacorriente-properties-movimientos.md) – `undefined#/properties/movimientos`
+
+* [Untitled array in ClienteCuentaCorriente](./clientecuentacorriente-properties-serie.md) – `undefined#/properties/serie`
+
+* [Untitled array in ClienteCuentaCorrienteAntiguedad](./clientecuentacorrienteantiguedad-properties-buckets.md) – `undefined#/properties/buckets`
+
 * [Untitled array in ClienteImportResult](./clienteimportresult-properties-errors.md) – `undefined#/properties/errors`
 
 * [Untitled array in ClienteListEnvelope](./clientelistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
 
 * [Untitled array in CobranzasVencidasEnvelope](./cobranzasvencidasenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled array in CobroCreateData](./cobrocreatedata-properties-retenciones.md) – `undefined#/properties/retenciones`
+
+* [Untitled array in CobroInput](./cobroinput-properties-retenciones.md) – `undefined#/properties/retenciones`
 
 * [Untitled array in CobroListEnvelope](./cobrolistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
 
@@ -842,7 +1030,11 @@
 
 * [Untitled array in FacturaInput](./facturainput-properties-items.md) – `undefined#/properties/items`
 
+* [Untitled array in FacturaInput](./facturainput-properties-percepciones.md) – `undefined#/properties/percepciones`
+
 * [Untitled array in FacturaListEnvelope](./facturalistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
+
+* [Untitled array in FacturaPendienteClienteListEnvelope](./facturapendienteclientelistenvelope-properties-data.md) – `undefined#/properties/data`
 
 * [Untitled array in FacturasPendientesEnvelope](./facturaspendientesenvelope-properties-data.md) – `undefined#/properties/data`
 
@@ -890,6 +1082,18 @@
 
 * [Untitled array in PlanCatalogEnvelope](./plancatalogenvelope-properties-data.md) – `undefined#/properties/data`
 
+* [Untitled array in PortalFacturaListEnvelope](./portalfacturalistenvelope-properties-data-properties-facturas.md) – `undefined#/properties/data/properties/facturas`
+
+* [Untitled array in PortalPedidoListEnvelope](./portalpedidolistenvelope-properties-data-properties-pedidos.md) – `undefined#/properties/data/properties/pedidos`
+
+* [Untitled array in PresentacionPreview](./presentacionpreview-properties-filas.md) – `undefined#/properties/filas`
+
+* [Untitled array in PresentacionPreview](./presentacionpreview-properties-totalesporregimen.md) – `undefined#/properties/totalesPorRegimen`
+
+* [Untitled array in PresentacionPreview](./presentacionpreview-properties-warnings.md) – `undefined#/properties/warnings`
+
+* [Untitled array in PresentacionRetencionListEnvelope](./presentacionretencionlistenvelope-properties-data.md) – `undefined#/properties/data`
+
 * [Untitled array in ProveedorArticuloHistorialRow](./proveedorarticulohistorialrow-properties-evolucionprecios.md) – `undefined#/properties/evolucionPrecios`
 
 * [Untitled array in ProveedorArticulosHistorialData](./proveedorarticuloshistorialdata-properties-articulos.md) – `undefined#/properties/articulos`
@@ -910,9 +1114,27 @@
 
 * [Untitled array in PublicPlan](./publicplan-properties-features.md) – `undefined#/properties/features`
 
+* [Untitled array in ReciboCobro](./recibocobro-properties-formas.md) – `undefined#/properties/formas`
+
+* [Untitled array in ReciboCobro](./recibocobro-properties-imputaciones.md) – `undefined#/properties/imputaciones`
+
+* [Untitled array in ReciboCobro](./recibocobro-properties-retenciones.md) – `undefined#/properties/retenciones`
+
+* [Untitled array in ReciboCobroInput](./recibocobroinput-properties-formas.md) – `undefined#/properties/formas`
+
+* [Untitled array in ReciboCobroInput](./recibocobroinput-properties-imputaciones.md) – `undefined#/properties/imputaciones`
+
+* [Untitled array in ReciboCobroInput](./recibocobroinput-properties-retenciones.md) – `undefined#/properties/retenciones`
+
+* [Untitled array in ReciboCobroListEnvelope](./recibocobrolistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
+
 * [Untitled array in ReciboPago](./recibopago-properties-facturas.md) – `undefined#/properties/facturas`
 
+* [Untitled array in ReciboPago](./recibopago-properties-retenciones.md) – `undefined#/properties/retenciones`
+
 * [Untitled array in ReciboPagoInput](./recibopagoinput-properties-facturas.md) – `undefined#/properties/facturas`
+
+* [Untitled array in ReciboPagoInput](./recibopagoinput-properties-retenciones.md) – `undefined#/properties/retenciones`
 
 * [Untitled array in ReciboPagoListEnvelope](./recibopagolistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
 
@@ -923,6 +1145,14 @@
 * [Untitled array in RecuentoListEnvelope](./recuentolistenvelope-allof-1-properties-data.md) – `undefined#/allOf/1/properties/data`
 
 * [Untitled array in RegimenRetencionListEnvelope](./regimenretencionlistenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled array in Remito](./remito-properties-items.md) – `undefined#/properties/items`
+
+* [Untitled array in RemitoInput](./remitoinput-properties-items.md) – `undefined#/properties/items`
+
+* [Untitled array in RemitoListEnvelope](./remitolistenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled array in RemitoUpdateInput](./remitoupdateinput-properties-items.md) – `undefined#/properties/items`
 
 * [Untitled array in Reparto](./reparto-properties-items.md) – `undefined#/properties/items`
 

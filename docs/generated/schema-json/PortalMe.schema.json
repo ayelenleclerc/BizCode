@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "clienteId": {
+      "type": "integer"
+    },
+    "codigo": {
+      "type": "integer"
+    },
+    "domicilio": {
+      "nullable": true,
+      "type": "string"
+    },
+    "email": {
+      "nullable": true,
+      "type": "string"
+    },
+    "fantasia": {
+      "nullable": true,
+      "type": "string"
+    },
+    "localidad": {
+      "nullable": true,
+      "type": "string"
+    },
+    "rsocial": {
+      "type": "string"
+    },
+    "telef": {
+      "nullable": true,
+      "type": "string"
+    },
+    "vendedor": {
+      "nullable": true,
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "username": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    }
+  },
+  "required": [
+    "clienteId",
+    "codigo",
+    "rsocial",
+    "fantasia",
+    "email",
+    "telef",
+    "domicilio",
+    "localidad",
+    "vendedor"
+  ],
+  "title": "PortalMe",
+  "type": "object"
+}

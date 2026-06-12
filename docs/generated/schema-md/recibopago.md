@@ -30,7 +30,9 @@ undefined#/allOf/0/properties/data/items
 | [proveedor](#proveedor)     | `object`  | Required | cannot be null | [ReciboPago](recibopago-properties-proveedor.md "undefined#/properties/proveedor")     |
 | [proveedorId](#proveedorid) | `integer` | Required | cannot be null | [ReciboPago](recibopago-properties-proveedorid.md "undefined#/properties/proveedorId") |
 | [referencia](#referencia)   | `string`  | Optional | cannot be null | [ReciboPago](recibopago-properties-referencia.md "undefined#/properties/referencia")   |
+| [retenciones](#retenciones) | `array`   | Required | cannot be null | [ReciboPago](recibopago-properties-retenciones.md "undefined#/properties/retenciones") |
 | [total](#total)             | `string`  | Required | cannot be null | [ReciboPago](recibopago-properties-total.md "undefined#/properties/total")             |
+| [totalBruto](#totalbruto)   | `string`  | Required | cannot be null | [ReciboPago](recibopago-properties-totalbruto.md "undefined#/properties/totalBruto")   |
 | [usuario](#usuario)         | `object`  | Required | cannot be null | [ReciboPago](recibopago-properties-usuario.md "undefined#/properties/usuario")         |
 | [usuarioId](#usuarioid)     | `integer` | Required | cannot be null | [ReciboPago](recibopago-properties-usuarioid.md "undefined#/properties/usuarioId")     |
 
@@ -278,6 +280,24 @@ undefined#/allOf/0/properties/data/items
 
 `string`
 
+## retenciones
+
+
+
+`retenciones`
+
+* is required
+
+* Type: `object[]` ([ReciboPagoRetencion](recibopagoretencion.md))
+
+* cannot be null
+
+* defined in: [ReciboPago](recibopago-properties-retenciones.md "undefined#/properties/retenciones")
+
+### retenciones Type
+
+`object[]` ([ReciboPagoRetencion](recibopagoretencion.md))
+
 ## total
 
 
@@ -293,6 +313,24 @@ undefined#/allOf/0/properties/data/items
 * defined in: [ReciboPago](recibopago-properties-total.md "undefined#/properties/total")
 
 ### total Type
+
+`string`
+
+## totalBruto
+
+
+
+`totalBruto`
+
+* is required
+
+* Type: `string`
+
+* cannot be null
+
+* defined in: [ReciboPago](recibopago-properties-totalbruto.md "undefined#/properties/totalBruto")
+
+### totalBruto Type
 
 `string`
 

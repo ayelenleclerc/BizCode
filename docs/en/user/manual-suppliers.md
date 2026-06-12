@@ -39,10 +39,11 @@ In the **Accounts payable** tab, the **Payment receipts** block lets you registe
 
 1. **Register payment** — pending purchase vouchers are listed (oldest first); select lines and amounts (partial or full).
 2. Choose payment date, method (transfer, cheque, cash, eCheq), optional CBU/reference/notes.
-3. Saving creates a tenant-correlative receipt number, posts a `pago` ledger movement (negative amount), and audit event `recibo_pago_create`.
-4. **Download PDF** per receipt; **Void** (`recibo_pago_void`) reverses the balance with a compensating movement.
+3. Saving creates a tenant-correlative receipt number, posts a `pago` ledger movement (negative gross allocated amount), and audit event `recibo_pago_create`.
+4. **Withholdings (#276):** with `finance.retenciones` and agent flags enabled, apply suggested withholdings (preview), confirm amounts, and persist `RetencionAplicada` with correlative certificate; **net transfer** = gross − withholdings.
+5. **Download PDF** per receipt; **Certificate** PDF per withholding; **Void** (`recibo_pago_void`) reverses the balance with a compensating movement (gross allocated).
 
-**API:** `GET /api/proveedores/{id}/pagos/comprobantes-pendientes`, `GET/POST /api/proveedores/{id}/pagos`, `POST .../pagos/{reciboId}/anular`, `GET .../pagos/{reciboId}/pdf` — see [OpenAPI](../../api/openapi.yaml).
+**API:** `GET /api/proveedores/{id}/pagos/comprobantes-pendientes`, `GET/POST /api/proveedores/{id}/pagos`, `GET .../pagos/{reciboId}/retenciones`, `POST .../pagos/{reciboId}/anular`, `GET .../pagos/{reciboId}/pdf`, `GET /api/fiscal/retenciones/preview`, `GET /api/fiscal/retenciones/{id}/comprobante/pdf`, `GET /api/fiscal/retenciones/export?format=sicore|sifere` — see [OpenAPI](../../api/openapi.yaml). TXT export: validate against official layouts manually.
 
 ## Payable due-date alerts (GitHub #275)
 

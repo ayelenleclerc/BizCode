@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "formato": {
+      "enum": [
+        "sicore",
+        "sifere"
+      ],
+      "type": "string"
+    },
+    "periodo": {
+      "pattern": "^\\\\d{4}-\\\\d{2}$",
+      "type": "string"
+    }
+  },
+  "required": [
+    "formato",
+    "periodo"
+  ],
+  "title": "PresentacionRetencionInput",
+  "type": "object"
+}

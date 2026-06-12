@@ -4,6 +4,16 @@
     "cobro": {
       "$ref": "./Cobro.schema.json"
     },
+    "montoBruto": {
+      "description": "Bruto applied to customer balance (neto + retenciones).",
+      "type": "string"
+    },
+    "retenciones": {
+      "items": {
+        "$ref": "./CobroRetencion.schema.json"
+      },
+      "type": "array"
+    },
     "updatedCliente": {
       "additionalProperties": true,
       "properties": {
@@ -35,7 +45,9 @@
   },
   "required": [
     "cobro",
-    "updatedCliente"
+    "updatedCliente",
+    "retenciones",
+    "montoBruto"
   ],
   "title": "CobroCreateData",
   "type": "object"

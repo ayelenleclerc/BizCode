@@ -58,7 +58,7 @@ Formato: critérios **Given / When / Then** são de verificação **manual**, sa
 - **História:** Como usuário de finanças, quero aging e extrato por cliente para acompanhar recebíveis.
 - **Critérios:**
   - Dado `reports.financial.read`, quando abro Finanças, então as faixas de aging carregam de `GET /api/reportes/aging`.
-  - Dado um id de cliente válido, quando solicito o extrato, então as linhas mostram saldo acumulado de `GET /api/reportes/cuenta-corriente/:clienteId`.
+  - Dado um id de cliente válido, quando solicito o extrato, então as linhas mostram saldo acumulado de `GET /api/clientes/{id}/cuenta-corriente` (ou wrapper legado `GET /api/reportes/cuenta-corriente/:clienteId`).
 - **Evidência:** `src/pages/finanzas/`.
 
 ## HU-08 — Relatórios

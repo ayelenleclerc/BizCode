@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "alicuota": {
+      "type": "string"
+    },
+    "baseImponible": {
+      "type": "string"
+    },
+    "constanciaNum": {
+      "nullable": true,
+      "type": "string"
+    },
+    "id": {
+      "type": "integer"
+    },
+    "importe": {
+      "type": "string"
+    },
+    "regimenId": {
+      "type": "integer"
+    },
+    "regimenNombre": {
+      "type": "string"
+    },
+    "tipo": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "regimenId",
+    "regimenNombre",
+    "tipo",
+    "baseImponible",
+    "alicuota",
+    "importe"
+  ],
+  "title": "CobroRetencion",
+  "type": "object"
+}

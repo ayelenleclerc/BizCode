@@ -81,6 +81,18 @@ Al editar un cliente existente, el formulario muestra **cobros recientes** carga
 
 El formulario de cliente muestra el **score de cobranza** (0–100) cuando está disponible, con un tooltip que describe cómo cambia el score al registrar cobros contra facturas activas. Las reglas están documentadas en OpenAPI para `POST /api/cobros`.
 
+## Portal B2B del cliente (#240)
+
+Si el tenant tiene habilitado el módulo **Portal del cliente** (`clients.portal`), puede activar el portal en **Configuración → Empresa** (sección *Portal del cliente*): branding (logo, color, pie) y visibilidad de pedidos.
+
+- **URL del portal (MVP):** `/portal/{slug-del-tenant}` en la misma app web (p. ej. `http://localhost:5173/portal/mi-empresa`).
+- **Acceso:** el cliente ingresa su email registrado; recibe un magic link válido **15 minutos**; la sesión dura **8 horas**.
+- **Secciones:** facturas (PDF y estado pendiente/vencida/pagada), cuenta corriente (saldo y PDF), pedidos (si está habilitado) y datos de contacto.
+- **Aislamiento:** cada cliente solo ve sus propios comprobantes; el `clienteId` nunca se acepta como parámetro de confianza en la API.
+- **Pago online (MercadoPago):** el botón aparece deshabilitado hasta que el issue #175 esté implementado.
+
+Configure `SMTP_URL` (o variables SMTP del servidor) para que los magic links lleguen por correo en producción.
+
 ## Atajos de Teclado
 
 | Tecla | Acción |

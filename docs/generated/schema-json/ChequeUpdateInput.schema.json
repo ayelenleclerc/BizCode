@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "banco": {
+      "type": "string"
+    },
+    "cbuOrigen": {
+      "nullable": true,
+      "type": "string"
+    },
+    "fechaVencimiento": {
+      "format": "date",
+      "type": "string"
+    },
+    "libradorCuit": {
+      "nullable": true,
+      "type": "string"
+    },
+    "libradorNombre": {
+      "type": "string"
+    },
+    "observaciones": {
+      "nullable": true,
+      "type": "string"
+    },
+    "sucursal": {
+      "nullable": true,
+      "type": "string"
+    }
+  },
+  "title": "ChequeUpdateInput",
+  "type": "object"
+}

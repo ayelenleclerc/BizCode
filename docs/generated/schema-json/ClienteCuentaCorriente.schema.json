@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "clienteId": {
+      "type": "integer"
+    },
+    "codigo": {
+      "type": "integer"
+    },
+    "creditLimit": {
+      "nullable": true,
+      "type": "string"
+    },
+    "excedeLimite": {
+      "type": "boolean"
+    },
+    "limit": {
+      "type": "integer"
+    },
+    "movimientos": {
+      "items": {
+        "$ref": "./MovimientoClienteCC.schema.json"
+      },
+      "type": "array"
+    },
+    "offset": {
+      "type": "integer"
+    },
+    "rsocial": {
+      "type": "string"
+    },
+    "saldo": {
+      "type": "string"
+    },
+    "serie": {
+      "items": {
+        "$ref": "./ClienteCuentaCorrienteChartPoint.schema.json"
+      },
+      "type": "array"
+    },
+    "total": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "clienteId",
+    "codigo",
+    "rsocial",
+    "saldo",
+    "excedeLimite",
+    "movimientos",
+    "serie",
+    "total",
+    "limit",
+    "offset"
+  ],
+  "title": "ClienteCuentaCorriente",
+  "type": "object"
+}

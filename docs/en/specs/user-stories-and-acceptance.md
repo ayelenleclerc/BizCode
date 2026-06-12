@@ -58,7 +58,7 @@ Format: **Given / When / Then** acceptance checks are **manual** unless linked a
 - **Story:** As a finance user, I want aging and per-customer statements so that I can follow receivables.
 - **Acceptance:**
   - Given `reports.financial.read`, when I open Finanzas, then aging buckets load from `GET /api/reportes/aging`.
-  - Given a valid customer id, when I request a statement, then lines show running balance from `GET /api/reportes/cuenta-corriente/:clienteId`.
+  - Given a valid customer id, when I request a statement, then lines show running balance from `GET /api/clientes/{id}/cuenta-corriente` (or legacy wrapper `GET /api/reportes/cuenta-corriente/:clienteId`).
 - **Evidence:** `src/pages/finanzas/`.
 
 ## US-08 — Reports

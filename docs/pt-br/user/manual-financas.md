@@ -12,8 +12,24 @@ Ao carregar, a página consulta **`GET /api/reportes/aging`** e mostra faixas (r
 
 ## Extrato do cliente
 
+### Ficha do cliente (`finance.ledger`, #232)
+
+Com o módulo **`finance.ledger`** habilitado, a ficha de cada cliente inclui a aba **Conta corrente**:
+
+- Saldo atual, limite de crédito e gráfico de evolução.
+- Tabela de movimentos paginada (fatura, nota de crédito, recebimento, retenção, cheque devolvido, ajuste).
+- Aging por faixas (`0-30`, `31-60`, `61-90`, `+90` dias).
+- Ajuste manual auditado (`POST /api/clientes/{id}/cuenta-corriente/ajuste`, permissão `sales.create`).
+- Download de extrato em PDF e envio por e-mail (`GET` / `POST .../estado-de-cuenta/...`).
+
+API canônica: `GET /api/clientes/{id}/cuenta-corriente`, `.../saldo`, `.../antiguedad`.
+
+Os movimentos são registrados automaticamente ao emitir faturas, anular com nota de crédito, registrar recebimentos (valor bruto; retenções não geram linha separada no razão) e rejeitar cheques vinculados a recebimentos.
+
+### Consulta rápida em Finanças (compatibilidade)
+
 1. Informe o **id do cliente** (inteiro positivo).
-2. Execute a ação para carregar o extrato (`GET /api/reportes/cuenta-corriente/:clienteId`).
+2. Execute a ação para carregar o extrato (`GET /api/reportes/cuenta-corriente/:clienteId` — delega ao ledger e mantém o formato legado débito/crédito).
 3. Revise as linhas com data, tipo, referência, débito, crédito e saldo acumulado.
 
 Se o cliente não existir, a API retorna 404.
@@ -28,9 +44,19 @@ A mesma página **Finanças** inclui uma seção de faturas vencidas (`GET /api/
 
 A configuração do job automático (dias de carência, fuso IANA, horário comercial) está em **Configurações → Empresa**. O job operacional `npm run cobranzas:recordatorios` percorre todos os tenants com parâmetros de empresa e envia às **08:00 horário local** dentro da janela configurada (veja [ciclo CI/CD](../quality/ciclo-ci-cd.md)).
 
+## Credenciais Mercado Pago (#174)
+
+Quando o tenant tem a integração **`mercadopago`** habilitada (config do superadmin), configure as credenciais em **Configurações → Empresa** (seção *MercadoPago*):
+
+- **Access Token**, **Public Key** e **Webhook Secret** opcional (segredos criptografados em repouso; não são exibidos após salvar).
+- Interruptores **Modo sandbox** e **Integração ativa**.
+- **Verificar credenciais** chama `POST /api/configuracion/mercadopago/test` e mostra o nome da conta MP.
+
+Requer **`settings.business.manage`**. Links de pagamento por fatura e pagamento online do portal não estão disponíveis até o issue #175.
+
 ## Referência API
 
-[`docs/api/openapi.yaml`](../../api/openapi.yaml) — rotas `/api/reportes/aging` e `/api/reportes/cuenta-corriente/{clienteId}`.
+[`docs/api/openapi.yaml`](../../api/openapi.yaml) — rotas `/api/reportes/aging`, `/api/reportes/cuenta-corriente/{clienteId}` e `/api/clientes/{id}/cuenta-corriente/*`.
 
 ## Notas de crédito (`billing.credit_notes`)
 
@@ -50,6 +76,12 @@ Escolha o **período**, pré-visualize (CBTU / ALICUOTAS) e baixe ZIP ou Excel (
 
 ## Retenções e percepções (`finance.retenciones`, #228)
 
-Configure regimes e flags de agente em **Configurações → Empresa → Retenções e percepções** (`settings.fiscal.manage`). APIs: `GET/POST/PUT /api/fiscal/regimenes`, `GET/PUT /api/fiscal/config-retenciones`, `GET /api/fiscal/retenciones` (histórico), `GET /api/fiscal/retenciones/preview` (vazio até #229). A condição IVA de clientes/fornecedores usa `condIva` do cadastro; consulta Padrão AFIP (#192) não implementada nesta entrega.
+Configure regimes e flags de agente em **Configurações → Empresa → Retenções e percepções** (`settings.fiscal.manage`). APIs: `GET/POST/PUT /api/fiscal/regimenes`, `GET/PUT /api/fiscal/config-retenciones`, `GET /api/fiscal/retenciones` (histórico), `GET /api/fiscal/retenciones/preview` (`entidadTipo=proveedor` #276; `entidadTipo=cliente` com `contexto=factura` em `POST /api/facturas` ou `contexto=cobro` em `POST /api/cobros` #229); `GET /api/cobros/{id}/retenciones`. **Remessas (#230):** módulo `fiscal.remito`; `GET/POST /api/remitos`, ciclo emitir/entregar/anular, `GET /api/remitos/{id}/pdf`; criação via `POST /api/pedidos/{id}/remito` ou `POST /api/facturas/{id}/remito` (documental; estoque na fatura). e-Remito AFIP não implementado.
+
+**Cheques (#231):** módulo `fiscal.cheques`; carteira em **Finanças** (`GET /api/cheques`, `GET /api/cheques/resumen`, transições depositar/endossar/compensar/rejeitar/anular). Alta ao registrar recebimento (`chequeNuevo` em `POST /api/cobros`) ou endosso ao pagar fornecedor (`chequeId` em `POST /api/proveedores/{id}/pagos` com `cheque`/`echeq`). Alertas `cheque_due_soon` (≤3 dias) via `POST /api/cheques/alertas/run`; rejeição notifica `cheque_rechazado`. Sem conciliação bancária nem status ECHEQ automático nesta versão.
+
+**Apresentações SICORE/SIFERE (#242):** em **Finanças → Apresentações fiscais** (`finance.retenciones`, `reports.financial.read`): selecione período e formato (SICORE nacional ou SIFERE IIBB), pré-visualização com totais por regime e avisos de CUIT, download TXT (`POST /api/fiscal/presentaciones` + `GET .../{id}/archivo`), histórico e marca «apresentado» após envio à AFIP/COMARB. APIs: `GET /api/fiscal/presentaciones/preview?formato=sicore|sifere&periodo=YYYY-MM`, `POST/GET /api/fiscal/presentaciones`, `PATCH /api/fiscal/presentaciones/{id}/presentado`. Exportação direta legada: `GET /api/fiscal/retenciones/export`. Valide os arquivos em homologação oficial manualmente.
+
+A condição IVA de clientes/fornecedores usa `condIva` do cadastro; consulta Padrão AFIP (#192) não implementada nesta entrega.
 
 **Outros idiomas:** [English](../../en/user/manual-finance.md) · [Español](../../es/user/manual-finanzas.md)

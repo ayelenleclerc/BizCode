@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "anulacionMotivo": {
+      "maxLength": 500,
+      "minLength": 3,
+      "type": "string"
+    }
+  },
+  "required": [
+    "anulacionMotivo"
+  ],
+  "title": "ReciboCobroVoidInput",
+  "type": "object"
+}

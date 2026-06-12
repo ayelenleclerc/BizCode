@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "enabled": {
+      "type": "boolean"
+    },
+    "footerText": {
+      "nullable": true,
+      "type": "string"
+    },
+    "logoUrl": {
+      "nullable": true,
+      "type": "string"
+    },
+    "primaryColor": {
+      "nullable": true,
+      "pattern": "^#[0-9A-Fa-f]{6}$",
+      "type": "string"
+    },
+    "showPedidos": {
+      "type": "boolean"
+    }
+  },
+  "title": "PortalConfigInput",
+  "type": "object"
+}

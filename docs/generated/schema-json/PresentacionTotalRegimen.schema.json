@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "operaciones": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "regimenNombre": {
+      "type": "string"
+    },
+    "totalImporte": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "regimenNombre",
+    "operaciones",
+    "totalImporte"
+  ],
+  "title": "PresentacionTotalRegimen",
+  "type": "object"
+}

@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "code": {
+      "enum": [
+        "missing_cuit",
+        "invalid_cuit",
+        "zero_importe_excluded"
+      ],
+      "type": "string"
+    },
+    "message": {
+      "type": "string"
+    },
+    "retencionId": {
+      "minimum": 1,
+      "type": "integer"
+    }
+  },
+  "required": [
+    "code",
+    "retencionId",
+    "message"
+  ],
+  "title": "PresentacionWarning",
+  "type": "object"
+}

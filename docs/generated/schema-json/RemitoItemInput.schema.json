@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "articuloId": {
+      "type": "integer"
+    },
+    "cantidad": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "descripcion": {
+      "type": "string"
+    },
+    "unidad": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "articuloId",
+    "descripcion",
+    "cantidad",
+    "unidad"
+  ],
+  "title": "RemitoItemInput",
+  "type": "object"
+}

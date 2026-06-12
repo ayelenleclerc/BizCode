@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "archivoHash": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "createdAt": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "formato": {
+      "enum": [
+        "sicore",
+        "sifere"
+      ],
+      "type": "string"
+    },
+    "id": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "periodo": {
+      "type": "string"
+    },
+    "presentadoAt": {
+      "format": "date-time",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "totalImporte": {
+      "type": "string"
+    },
+    "totalOperaciones": {
+      "minimum": 0,
+      "type": "integer"
+    }
+  },
+  "required": [
+    "id",
+    "formato",
+    "periodo",
+    "totalOperaciones",
+    "totalImporte",
+    "createdAt"
+  ],
+  "title": "PresentacionRetencion",
+  "type": "object"
+}
