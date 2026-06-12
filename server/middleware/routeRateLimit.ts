@@ -8,6 +8,8 @@ const API_GENERAL_DEFAULT = 100
 const AUTH_DEFAULT = 20
 const IMPORT_DEFAULT = 5
 const PORTAL_MAGIC_LINK_DEFAULT = 5
+const PORTAL_VERIFY_DEFAULT = 30
+const MERCADOPAGO_TEST_DEFAULT = 10
 const FIFTEEN_MINUTES_MS = 15 * MINUTE_MS
 
 function parsePositiveInt(raw: string | undefined, defaultValue: number): number {
@@ -72,6 +74,28 @@ export const authRouterHttpRateLimiter = createRouteLimiter({
 export const portalMagicLinkHttpRateLimiter = createRouteLimiter({
   windowMs: FIFTEEN_MINUTES_MS,
   limit: parsePositiveInt(process.env.HTTP_RATE_LIMIT_PORTAL_MAGIC_LINK, PORTAL_MAGIC_LINK_DEFAULT),
+  skipUnless: () => true,
+})
+
+/**
+ * @en Per-IP rate limit for portal magic-link verify (default 30 req/15 min; `HTTP_RATE_LIMIT_PORTAL_VERIFY`).
+ * @es Límite por IP para verificación magic link del portal (30 req/15 min por defecto; `HTTP_RATE_LIMIT_PORTAL_VERIFY`).
+ * @pt-BR Limite por IP para verificação magic link do portal (30 req/15 min padrão; `HTTP_RATE_LIMIT_PORTAL_VERIFY`).
+ */
+export const portalVerifyHttpRateLimiter = createRouteLimiter({
+  windowMs: FIFTEEN_MINUTES_MS,
+  limit: parsePositiveInt(process.env.HTTP_RATE_LIMIT_PORTAL_VERIFY, PORTAL_VERIFY_DEFAULT),
+  skipUnless: () => true,
+})
+
+/**
+ * @en Per-IP rate limit for Mercado Pago credential test (default 10 req/15 min; `HTTP_RATE_LIMIT_MERCADOPAGO_TEST`).
+ * @es Límite por IP para test de credenciales Mercado Pago (10 req/15 min por defecto; `HTTP_RATE_LIMIT_MERCADOPAGO_TEST`).
+ * @pt-BR Limite por IP para teste de credenciais Mercado Pago (10 req/15 min padrão; `HTTP_RATE_LIMIT_MERCADOPAGO_TEST`).
+ */
+export const mercadopagoTestHttpRateLimiter = createRouteLimiter({
+  windowMs: FIFTEEN_MINUTES_MS,
+  limit: parsePositiveInt(process.env.HTTP_RATE_LIMIT_MERCADOPAGO_TEST, MERCADOPAGO_TEST_DEFAULT),
   skipUnless: () => true,
 })
 

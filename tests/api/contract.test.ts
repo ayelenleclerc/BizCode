@@ -11,6 +11,11 @@ import {
   extendClientePrismaForCc,
 } from '../helpers/movimientoClienteCcPrismaMock'
 
+function isObjectRecord(value: unknown): value is Record<string, unknown> {
+  if (value === undefined || value === null) return false
+  return typeof value === 'object' && !Array.isArray(value)
+}
+
 const rubroRow = { id: 1, codigo: 1, nombre: 'General' }
 
 const clienteRow = {
@@ -250,10 +255,9 @@ function buildPrisma(): PrismaClient {
     cliente: extendClientePrismaForCc({
       count: vi.fn().mockResolvedValue(1),
       findMany: vi.fn((args?: unknown) => {
-        const w =
-          args && typeof args === 'object' && args !== null && 'where' in args
-            ? (args as { where?: { codigo?: { in?: number[] } } }).where
-            : undefined
+        const w = isObjectRecord(args) && 'where' in args
+          ? (args as { where?: { codigo?: { in?: number[] } } }).where
+          : undefined
         if (w?.codigo && typeof w.codigo === 'object' && Array.isArray(w.codigo.in)) {
           return Promise.resolve([])
         }
@@ -267,12 +271,11 @@ function buildPrisma(): PrismaClient {
     articulo: {
       count: vi.fn().mockResolvedValue(1),
       findMany: vi.fn((args?: unknown) => {
-        const w =
-          args && typeof args === 'object' && args !== null && 'where' in args
-            ? (args as {
-                where?: { codigo?: { in?: number[] }; id?: { in?: number[] } }
-              }).where
-            : undefined
+        const w = isObjectRecord(args) && 'where' in args
+          ? (args as {
+              where?: { codigo?: { in?: number[] }; id?: { in?: number[] } }
+            }).where
+          : undefined
         if (w?.id && typeof w.id === 'object' && Array.isArray(w.id.in)) {
           if (w.id.in.length === 0) return Promise.resolve([])
           return Promise.resolve(w.id.in.map((id: number) => ({ id })))
@@ -304,10 +307,9 @@ function buildPrisma(): PrismaClient {
       count: vi.fn().mockResolvedValue(1),
       findFirst: vi.fn().mockResolvedValue(rubroRow),
       findMany: vi.fn().mockImplementation((args?: unknown) => {
-        const a =
-          args && typeof args === 'object' && args !== null
-            ? (args as { where?: { codigo?: { in?: number[] } }; select?: Record<string, boolean> })
-            : {}
+        const a = isObjectRecord(args)
+          ? (args as { where?: { codigo?: { in?: number[] } }; select?: Record<string, boolean> })
+          : {}
         if (a.where?.codigo && typeof a.where.codigo === 'object' && Array.isArray(a.where.codigo.in)) {
           return Promise.resolve([])
         }
@@ -1089,10 +1091,9 @@ function buildPrisma(): PrismaClient {
     proveedor: {
       count: vi.fn().mockResolvedValue(1),
       findMany: vi.fn((args?: unknown) => {
-        const w =
-          args && typeof args === 'object' && args !== null && 'where' in args
-            ? (args as { where?: { codigo?: { in?: number[] } } }).where
-            : undefined
+        const w = isObjectRecord(args) && 'where' in args
+          ? (args as { where?: { codigo?: { in?: number[] } } }).where
+          : undefined
         if (w?.codigo && typeof w.codigo === 'object' && Array.isArray(w.codigo.in)) {
           return Promise.resolve([])
         }

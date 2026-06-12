@@ -1,7 +1,7 @@
 import type { Application, Request, Response } from 'express'
 import { requirePermission, type AuthenticatedRequest } from '../auth'
 import { requireModule } from '../middleware/requireModule'
-import { portalMagicLinkHttpRateLimiter } from '../middleware/routeRateLimit'
+import { portalMagicLinkHttpRateLimiter, portalVerifyHttpRateLimiter } from '../middleware/routeRateLimit'
 import { resolvePortalTenant } from '../middleware/resolvePortalTenant'
 import { requirePortalAuth, resolvePortalSession } from '../middleware/resolvePortalSession'
 import { requirePortalModule } from '../middleware/requirePortalModule'
@@ -136,6 +136,7 @@ export function registerPortalRoutes(app: Application, ctx: RestRouteContext): v
   app.get(
     '/api/portal/:tenantSlug/auth/verify',
     portalTenantMw,
+    portalVerifyHttpRateLimiter,
     async (req: Request, res: Response) => {
       const portalReq = req as PortalRequest
       const tokenParam = req.query.token

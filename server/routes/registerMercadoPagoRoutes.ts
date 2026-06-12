@@ -1,6 +1,7 @@
 import type { Application, Request, Response } from 'express'
 import { requirePermission, type AuthenticatedRequest } from '../auth'
 import { requireMercadoPagoIntegration } from '../middleware/requireMercadoPagoIntegration'
+import { mercadopagoTestHttpRateLimiter } from '../middleware/routeRateLimit'
 import { validateBody } from '../middleware/validateBody'
 import { mercadoPagoConfigUpsertBodySchema } from '../schemas/mercadopago'
 import { MercadoPagoConfigService } from '../services/MercadoPagoConfigService'
@@ -72,6 +73,7 @@ export function registerMercadoPagoRoutes(app: Application, ctx: RestRouteContex
     '/api/configuracion/mercadopago/test',
     requirePermission('settings.business.manage'),
     requireMp,
+    mercadopagoTestHttpRateLimiter,
     async (req: Request, res: Response) => {
       try {
         const result = await mpConfig.testCredentials(getTenantId(req))
