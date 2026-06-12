@@ -413,6 +413,12 @@ model Factura {
   caeVto        DateTime?
   estadoCae     String    @db.VarChar(20) @default("pending")
   estado    String    @db.VarChar(1) @default("A") // A=activa, A=anulada
+  /// Mercado Pago checkout preference (#175)
+  mpPreferenceId        String?   @db.VarChar(60)
+  mpPaymentLink         String?   @db.VarChar(500)
+  mpEstado              String?   @db.VarChar(20)
+  mpPagadoAt            DateTime?
+  mpPreferenceExpiresAt DateTime?
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 

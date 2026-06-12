@@ -179,15 +179,27 @@ export default function PortalFacturasPage() {
                     >
                       {t('facturas.downloadPdf')}
                     </button>
-                    <button
-                      type="button"
-                      disabled
-                      title={t('facturas.payOnlineDisabled')}
-                      className="ml-2 rounded border border-slate-200 px-2 py-1 text-slate-400"
-                      data-testid={`portal-factura-pay-${f.id}`}
-                    >
-                      {t('facturas.payOnline')}
-                    </button>
+                    {f.mpPaymentLink ? (
+                      <a
+                        href={f.mpPaymentLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="ml-2 rounded border border-sky-600 px-2 py-1 text-sky-700 hover:bg-sky-50 dark:border-sky-500 dark:text-sky-300"
+                        data-testid={`portal-factura-pay-${f.id}`}
+                      >
+                        {t('facturas.payOnline')}
+                      </a>
+                    ) : (
+                      <button
+                        type="button"
+                        disabled
+                        title={t('facturas.payOnlineDisabled')}
+                        className="ml-2 rounded border border-slate-200 px-2 py-1 text-slate-400"
+                        data-testid={`portal-factura-pay-${f.id}`}
+                      >
+                        {t('facturas.payOnline')}
+                      </button>
+                    )}
                   </td>
                 </tr>
               ))}

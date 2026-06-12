@@ -52,7 +52,19 @@ Quando o tenant tem a integração **`mercadopago`** habilitada (config do super
 - Interruptores **Modo sandbox** e **Integração ativa**.
 - **Verificar credenciais** chama `POST /api/configuracion/mercadopago/test` e mostra o nome da conta MP.
 
-Requer **`settings.business.manage`**. Links de pagamento por fatura e pagamento online do portal não estão disponíveis até o issue #175.
+Requer **`settings.business.manage`**.
+
+## Links de pagamento Mercado Pago (#175)
+
+Com Mercado Pago configurado (#174) e ativo, a equipe pode gerar um **link de pagamento** no detalhe da fatura (**Cobrar com Mercado Pago**):
+
+1. Abrir uma fatura ativa com saldo pendente.
+2. Gerar o link (`POST /api/facturas/{id}/mp/preference`) — uma preference ativa por fatura (72 horas).
+3. Copiar o link ou compartilhar por WhatsApp / e-mail (telefone e e-mail do cliente).
+
+Clientes do portal veem **Pagar online** quando existe um link ativo para a fatura.
+
+Defina **`API_PUBLIC_URL`** em produção para o Mercado Pago alcançar a URL de webhook registrada em cada preference (handler em #176).
 
 ## Referência API
 

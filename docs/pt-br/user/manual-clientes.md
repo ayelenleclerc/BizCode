@@ -89,7 +89,7 @@ Com o módulo **Portal do cliente** (`clients.portal`) habilitado, ative o porta
 - **Acesso:** o cliente informa o e-mail cadastrado; recebe magic link válido por **15 minutos**; sessão de **8 horas**.
 - **Seções:** faturas (PDF e status), conta corrente (saldo e PDF), pedidos (se habilitado) e dados de contato.
 - **Isolamento:** cada cliente vê apenas seus documentos; `clienteId` não é aceito como parâmetro confiável na API.
-- **Pagamento online (MercadoPago):** botão desabilitado até o issue #175.
+- **Pagamento online (MercadoPago):** quando a equipe gerou um link de pagamento ativo (#175), o botão **Pagar online** do portal abre o checkout do Mercado Pago em uma nova aba.
 
 Configure SMTP no servidor para envio dos magic links em produção.
 

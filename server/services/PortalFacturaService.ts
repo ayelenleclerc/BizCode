@@ -13,6 +13,8 @@ export type PortalFacturaDto = {
   pagado: string
   pendiente: string
   estado: PortalFacturaEstado
+  mpPaymentLink?: string
+  mpEstado?: string
 }
 
 export type PortalFacturaListResult = {
@@ -47,6 +49,22 @@ function computeEstado(pendiente: Decimal, fecha: Date, creditDays: number): Por
 export class PortalFacturaService {
   constructor(private readonly prisma: PrismaClient) {}
 
+  private resolvePortalMpFields(
+    factura: Pick<Factura, 'mpPaymentLink' | 'mpEstado' | 'mpPreferenceExpiresAt'>,
+    now: Date,
+  ): Pick<PortalFacturaDto, 'mpPaymentLink' | 'mpEstado'> {
+    if (factura.mpEstado !== 'pending' || !factura.mpPaymentLink) {
+      return {}
+    }
+    if (factura.mpPreferenceExpiresAt && factura.mpPreferenceExpiresAt.getTime() <= now.getTime()) {
+      return {}
+    }
+    return {
+      mpPaymentLink: factura.mpPaymentLink,
+      mpEstado: factura.mpEstado,
+    }
+  }
+
   async list(
     tenantId: number,
     portalClienteId: number,
@@ -78,6 +96,17 @@ export class PortalFacturaService {
     const facturas = await this.prisma.factura.findMany({
       where,
       orderBy: { fecha: 'desc' },
+      select: {
+        id: true,
+        tipo: true,
+        prefijo: true,
+        numero: true,
+        fecha: true,
+        total: true,
+        mpPaymentLink: true,
+        mpEstado: true,
+        mpPreferenceExpiresAt: true,
+      },
     })
     if (facturas.length === 0) {
       return { facturas: [], total: 0 }
@@ -100,6 +129,7 @@ export class PortalFacturaService {
     }
 
     const mapped: PortalFacturaDto[] = []
+    const now = new Date()
     for (const f of facturas) {
       const pagado = paidMap.get(f.id) ?? new Decimal(0)
       const pendiente = f.total.minus(pagado)
@@ -115,6 +145,7 @@ export class PortalFacturaService {
         pagado: decimalToMoneyString(pagado),
         pendiente: decimalToMoneyString(pendiente),
         estado,
+        ...(this.resolvePortalMpFields(f, now)),
       })
     }
 

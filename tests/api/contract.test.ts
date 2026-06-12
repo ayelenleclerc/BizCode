@@ -10,6 +10,20 @@ import {
   createMovimientoClienteCCPrismaMock,
   extendClientePrismaForCc,
 } from '../helpers/movimientoClienteCcPrismaMock'
+import { encryptFiscalSecret } from '../../server/fiscal/ar/fiscalSecrets'
+import { clearTenantFeaturesCache } from '../../server/services/tenantConfigCache'
+
+vi.mock('../../server/integrations/mercadopago/mercadoPagoApiClient', async (importOriginal) => {
+  const actual = await importOriginal<
+    typeof import('../../server/integrations/mercadopago/mercadoPagoApiClient')
+  >()
+  return {
+    ...actual,
+    createMercadoPagoPreference: vi.fn(),
+  }
+})
+
+import { createMercadoPagoPreference } from '../../server/integrations/mercadopago/mercadoPagoApiClient'
 
 function isObjectRecord(value: unknown): value is Record<string, unknown> {
   if (value === undefined || value === null) return false
@@ -331,6 +345,7 @@ function buildPrisma(): PrismaClient {
       findMany: vi.fn().mockResolvedValue([]),
       findFirst: vi.fn().mockResolvedValue(null),
       create: facturaCreate,
+      update: vi.fn().mockResolvedValue(facturaRow),
       aggregate: vi.fn().mockResolvedValue({ _count: { id: 0 }, _sum: { total: null } }),
     },
     notaCredito: {
@@ -1081,6 +1096,20 @@ function buildPrisma(): PrismaClient {
     },
     tenant: {
       findUnique: vi.fn().mockResolvedValue({ id: 1, name: 'Demo', slug: 'demo', active: true }),
+    },
+    tenantConfig: {
+      findUnique: vi.fn().mockResolvedValue({
+        tenantId: 1,
+        businessType: 'mayorista',
+        rubros: [],
+        plan: 'pro',
+        modules: [],
+        integrations: [],
+        updatedAt: new Date(),
+      }),
+    },
+    mercadoPagoConfig: {
+      findUnique: vi.fn().mockResolvedValue(null),
     },
     proveedorArticulo: {
       findMany: vi.fn().mockResolvedValue([proveedorCatalogoRow]),
@@ -2337,6 +2366,100 @@ describe('API — contrato OpenAPI', () => {
     const app = createApp(p)
     const res = await request(app).post('/api/facturas/7/print').send({ device: 'thermal' }).expect(200)
     await assertMatchesOpenApi('/api/facturas/{id}/print', 'post', '200', res.body)
+  })
+
+  it('GET /api/facturas/:id/mp', async () => {
+    process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
+    process.env.BIZCODE_TEST_ROLE = 'owner'
+    clearTenantFeaturesCache()
+    const p = buildPrisma()
+    vi.mocked(p.tenantConfig.findUnique).mockResolvedValue({
+      tenantId: 1,
+      businessType: 'mayorista',
+      rubros: [],
+      plan: 'pro',
+      modules: [],
+      integrations: ['mercadopago'],
+      updatedAt: new Date(),
+    } as never)
+    vi.mocked(p.mercadoPagoConfig.findUnique).mockResolvedValue({
+      activo: true,
+      sandboxMode: true,
+      accessTokenEncrypted: encryptFiscalSecret('token'),
+    } as never)
+    vi.mocked(p.factura.findFirst).mockResolvedValue({
+      id: 7,
+      clienteId: 1,
+      tipo: 'B',
+      prefijo: '0001',
+      numero: 77,
+      total: new Decimal('1200'),
+      mpPreferenceId: null,
+      mpPaymentLink: null,
+      mpEstado: null,
+      mpPagadoAt: null,
+      mpPreferenceExpiresAt: null,
+    } as never)
+    vi.mocked(p.reciboCobroImputacion.groupBy).mockResolvedValue([])
+    const app = createApp(p)
+    const res = await request(app).get('/api/facturas/7/mp').expect(200)
+    await assertMatchesOpenApi('/api/facturas/{id}/mp', 'get', '200', res.body)
+  })
+
+  it('POST /api/facturas/:id/mp/preference', async () => {
+    process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
+    process.env.BIZCODE_TEST_ROLE = 'owner'
+    clearTenantFeaturesCache()
+    vi.mocked(createMercadoPagoPreference).mockResolvedValue({
+      id: 'pref-contract',
+      init_point: 'https://mp.test/prod',
+      sandbox_init_point: 'https://mp.test/pay',
+    })
+    const p = buildPrisma()
+    vi.mocked(p.tenantConfig.findUnique).mockResolvedValue({
+      tenantId: 1,
+      businessType: 'mayorista',
+      rubros: [],
+      plan: 'pro',
+      modules: [],
+      integrations: ['mercadopago'],
+      updatedAt: new Date(),
+    } as never)
+    vi.mocked(p.mercadoPagoConfig.findUnique).mockResolvedValue({
+      activo: true,
+      sandboxMode: true,
+      accessTokenEncrypted: encryptFiscalSecret('token'),
+    } as never)
+    vi.mocked(p.factura.findFirst).mockResolvedValue({
+      id: 7,
+      tenantId: 1,
+      clienteId: 1,
+      tipo: 'B',
+      prefijo: '0001',
+      numero: 77,
+      total: new Decimal('1200'),
+      estado: 'A',
+      mpPreferenceId: null,
+      mpPaymentLink: null,
+      mpEstado: null,
+      mpPagadoAt: null,
+      mpPreferenceExpiresAt: null,
+      cliente: { rsocial: 'ACME SA' },
+    } as never)
+    vi.mocked(p.factura.update).mockResolvedValue({
+      tipo: 'B',
+      prefijo: '0001',
+      numero: 77,
+      mpPreferenceId: 'pref-contract',
+      mpPaymentLink: 'https://mp.test/pay',
+      mpEstado: 'pending',
+      mpPagadoAt: null,
+      mpPreferenceExpiresAt: new Date(Date.now() + 72 * 60 * 60 * 1000),
+    } as never)
+    vi.mocked(p.reciboCobroImputacion.groupBy).mockResolvedValue([])
+    const app = createApp(p)
+    const res = await request(app).post('/api/facturas/7/mp/preference').expect(201)
+    await assertMatchesOpenApi('/api/facturas/{id}/mp/preference', 'post', '201', res.body)
   })
 
   it('GET /api/printing/status', async () => {

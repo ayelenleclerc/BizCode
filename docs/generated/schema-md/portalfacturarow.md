@@ -16,15 +16,17 @@ undefined
 
 # PortalFacturaRow Properties
 
-| Property                | Type      | Required | Nullable       | Defined by                                                                                     |
-| :---------------------- | :-------- | :------- | :------------- | :--------------------------------------------------------------------------------------------- |
-| [estado](#estado)       | `string`  | Required | cannot be null | [PortalFacturaRow](portalfacturarow-properties-estado.md "undefined#/properties/estado")       |
-| [fecha](#fecha)         | `string`  | Required | cannot be null | [PortalFacturaRow](portalfacturarow-properties-fecha.md "undefined#/properties/fecha")         |
-| [id](#id)               | `integer` | Required | cannot be null | [PortalFacturaRow](portalfacturarow-properties-id.md "undefined#/properties/id")               |
-| [pagado](#pagado)       | `string`  | Required | cannot be null | [PortalFacturaRow](portalfacturarow-properties-pagado.md "undefined#/properties/pagado")       |
-| [pendiente](#pendiente) | `string`  | Required | cannot be null | [PortalFacturaRow](portalfacturarow-properties-pendiente.md "undefined#/properties/pendiente") |
-| [ref](#ref)             | `string`  | Required | cannot be null | [PortalFacturaRow](portalfacturarow-properties-ref.md "undefined#/properties/ref")             |
-| [total](#total)         | `string`  | Required | cannot be null | [PortalFacturaRow](portalfacturarow-properties-total.md "undefined#/properties/total")         |
+| Property                        | Type      | Required | Nullable       | Defined by                                                                                             |
+| :------------------------------ | :-------- | :------- | :------------- | :----------------------------------------------------------------------------------------------------- |
+| [estado](#estado)               | `string`  | Required | cannot be null | [PortalFacturaRow](portalfacturarow-properties-estado.md "undefined#/properties/estado")               |
+| [fecha](#fecha)                 | `string`  | Required | cannot be null | [PortalFacturaRow](portalfacturarow-properties-fecha.md "undefined#/properties/fecha")                 |
+| [id](#id)                       | `integer` | Required | cannot be null | [PortalFacturaRow](portalfacturarow-properties-id.md "undefined#/properties/id")                       |
+| [mpEstado](#mpestado)           | `string`  | Optional | cannot be null | [PortalFacturaRow](portalfacturarow-properties-mpestado.md "undefined#/properties/mpEstado")           |
+| [mpPaymentLink](#mppaymentlink) | `string`  | Optional | cannot be null | [PortalFacturaRow](portalfacturarow-properties-mppaymentlink.md "undefined#/properties/mpPaymentLink") |
+| [pagado](#pagado)               | `string`  | Required | cannot be null | [PortalFacturaRow](portalfacturarow-properties-pagado.md "undefined#/properties/pagado")               |
+| [pendiente](#pendiente)         | `string`  | Required | cannot be null | [PortalFacturaRow](portalfacturarow-properties-pendiente.md "undefined#/properties/pendiente")         |
+| [ref](#ref)                     | `string`  | Required | cannot be null | [PortalFacturaRow](portalfacturarow-properties-ref.md "undefined#/properties/ref")                     |
+| [total](#total)                 | `string`  | Required | cannot be null | [PortalFacturaRow](portalfacturarow-properties-total.md "undefined#/properties/total")                 |
 
 ## estado
 
@@ -93,6 +95,46 @@ undefined
 ### id Type
 
 `integer`
+
+## mpEstado
+
+
+
+`mpEstado`
+
+* is optional
+
+* Type: `string`
+
+* cannot be null
+
+* defined in: [PortalFacturaRow](portalfacturarow-properties-mpestado.md "undefined#/properties/mpEstado")
+
+### mpEstado Type
+
+`string`
+
+## mpPaymentLink
+
+
+
+`mpPaymentLink`
+
+* is optional
+
+* Type: `string`
+
+* cannot be null
+
+* defined in: [PortalFacturaRow](portalfacturarow-properties-mppaymentlink.md "undefined#/properties/mpPaymentLink")
+
+### mpPaymentLink Type
+
+`string`
+
+### mpPaymentLink Constraints
+
+**URI**: the string must be a URI, according to [RFC 3986](https://tools.ietf.org/html/rfc3986 "check the specification")
 
 ## pagado
 

@@ -89,7 +89,7 @@ When the **Customer portal** module (`clients.portal`) is enabled, turn on the p
 - **Sign-in:** customer enters their registered email; receives a magic link valid for **15 minutes**; session lasts **8 hours**.
 - **Sections:** invoices (PDF and open/overdue/paid status), account statement (balance and PDF), orders (if enabled), and read-only contact details.
 - **Isolation:** each customer only sees their own documents; `clienteId` is never accepted as a trusted query parameter.
-- **Online payment (MercadoPago):** pay button stays disabled until issue #175 is implemented.
+- **Online payment (MercadoPago):** when staff generated an active payment link (#175), the portal **Pay online** button opens Mercado Pago checkout in a new tab.
 
 Configure server SMTP so magic-link emails are delivered in production.
 

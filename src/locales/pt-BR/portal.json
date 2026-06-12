@@ -55,7 +55,7 @@
     "colActions": "Ações",
     "downloadPdf": "PDF",
     "payOnline": "Pagar online",
-    "payOnlineDisabled": "Pagamento online indisponível (MercadoPago pendente)",
+    "payOnlineDisabled": "Pagamento online indisponível até o fornecedor gerar um link de pagamento",
     "tableCaption": "Lista de faturas do cliente",
     "totalCount": "{{count}} fatura(s)"
   },
