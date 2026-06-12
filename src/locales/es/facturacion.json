@@ -151,5 +151,41 @@
       "entregado": "Entregado",
       "anulado": "Anulado"
     }
+  },
+  "mercadopago": {
+    "collectButton": "Cobrar con MercadoPago",
+    "modalTitle": "Link de pago Mercado Pago",
+    "modalSubtitle": "Factura {{ref}}",
+    "loading": "Cargando estado del pago…",
+    "creating": "Generando link…",
+    "createLink": "Generar link de pago",
+    "linkLabel": "Link de pago",
+    "expiresAt": "Válido hasta {{date}}",
+    "copy": "Copiar link",
+    "copySuccess": "Link copiado al portapapeles",
+    "copyFailed": "No se pudo copiar el link",
+    "whatsapp": "Enviar por WhatsApp",
+    "whatsappDisabled": "El cliente no tiene teléfono cargado",
+    "email": "Enviar por email",
+    "emailDisabled": "El cliente no tiene email cargado",
+    "shareGroup": "Compartir link de pago",
+    "badgeShort": "MP",
+    "estado": {
+      "none": "Sin link",
+      "pending": "Pendiente",
+      "approved": "Pagado",
+      "rejected": "Rechazado",
+      "cancelled": "Cancelado",
+      "expired": "Vencido"
+    },
+    "share": {
+      "defaultName": "Cliente",
+      "emailSubject": "Link de pago factura {{numero}}",
+      "message": "Hola {{nombre}}, te enviamos el link para pagar la factura #{{numero}} por ${{amount}}: {{link}}\nVálido por 72 horas."
+    },
+    "errors": {
+      "loadFailed": "No se pudo cargar el estado de Mercado Pago",
+      "createFailed": "No se pudo crear el link de pago"
+    }
   }
 }

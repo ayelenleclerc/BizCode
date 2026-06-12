@@ -151,5 +151,41 @@
       "entregado": "Delivered",
       "anulado": "Voided"
     }
+  },
+  "mercadopago": {
+    "collectButton": "Collect with Mercado Pago",
+    "modalTitle": "Mercado Pago payment link",
+    "modalSubtitle": "Invoice {{ref}}",
+    "loading": "Loading payment status…",
+    "creating": "Creating link…",
+    "createLink": "Generate payment link",
+    "linkLabel": "Payment link",
+    "expiresAt": "Valid until {{date}}",
+    "copy": "Copy link",
+    "copySuccess": "Link copied to clipboard",
+    "copyFailed": "Could not copy link",
+    "whatsapp": "Send via WhatsApp",
+    "whatsappDisabled": "Customer phone number is missing",
+    "email": "Send via email",
+    "emailDisabled": "Customer email is missing",
+    "shareGroup": "Share payment link",
+    "badgeShort": "MP",
+    "estado": {
+      "none": "No link",
+      "pending": "Pending",
+      "approved": "Paid",
+      "rejected": "Rejected",
+      "cancelled": "Cancelled",
+      "expired": "Expired"
+    },
+    "share": {
+      "defaultName": "Customer",
+      "emailSubject": "Payment link for invoice {{numero}}",
+      "message": "Hello {{nombre}}, here is the link to pay invoice #{{numero}} for ${{amount}}: {{link}}\nValid for 72 hours."
+    },
+    "errors": {
+      "loadFailed": "Could not load Mercado Pago status",
+      "createFailed": "Could not create payment link"
+    }
   }
 }

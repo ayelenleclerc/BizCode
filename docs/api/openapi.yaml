@@ -4442,6 +4442,94 @@ paths:
         '403':
           $ref: '#/components/responses/ForbiddenError'
 
+  /api/facturas/{id}/mp:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [facturas, mercadopago]
+      summary: Mercado Pago payment status for invoice (#175)
+      description: Requires `reports.financial.read` and tenant integration `mercadopago`. Returns derived estado including `expired` when preference TTL elapsed.
+      security:
+        - cookieSession: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Payment link status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MercadoPagoFacturaPaymentEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Invoice not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/facturas/{id}/mp/preference:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    post:
+      tags: [facturas, mercadopago]
+      summary: Create Mercado Pago checkout preference for invoice (#175)
+      description: |
+        Creates a Mercado Pago Checkout preference for the invoice outstanding balance (ARS), stores `mpPreferenceId` and `mpPaymentLink` on `Factura`.
+        Requires `reports.financial.read` and tenant integration `mercadopago`. Returns 409 when an active non-expired preference already exists.
+      security:
+        - cookieSession: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '201':
+          description: Preference created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MercadoPagoFacturaPaymentEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Invoice or Mercado Pago config not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '409':
+          description: Active preference already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '422':
+          description: Invoice not eligible (voided, paid, or MP API error)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
   /api/facturas/{id}/remito:
     parameters:
       - $ref: '#/components/parameters/BizcodeChannelHeader'
@@ -12698,6 +12786,40 @@ components:
             accountName: { type: string }
             email: { type: string }
 
+    MercadoPagoFacturaEstado:
+      type: string
+      enum: [none, pending, approved, rejected, cancelled, expired]
+
+    MercadoPagoFacturaPayment:
+      type: object
+      required: [estado]
+      properties:
+        estado:
+          $ref: '#/components/schemas/MercadoPagoFacturaEstado'
+        preferenceId:
+          type: string
+        paymentLink:
+          type: string
+          format: uri
+        expiresAt:
+          type: string
+          format: date-time
+        pagadoAt:
+          type: string
+          format: date-time
+        amount:
+          type: string
+        facturaRef:
+          type: string
+
+    MercadoPagoFacturaPaymentEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success: { type: boolean, const: true }
+        data:
+          $ref: '#/components/schemas/MercadoPagoFacturaPayment'
+
     ArcaTaEnvelope:
       type: object
       required: [success, data]
@@ -13528,6 +13650,11 @@ components:
         estado:
           type: string
           enum: [pagada, pendiente, vencida]
+        mpPaymentLink:
+          type: string
+          format: uri
+        mpEstado:
+          type: string
 
     PortalFacturaListEnvelope:
       type: object

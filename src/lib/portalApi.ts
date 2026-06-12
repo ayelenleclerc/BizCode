@@ -43,6 +43,8 @@ export type PortalFactura = {
   pagado: string
   pendiente: string
   estado: 'pagada' | 'pendiente' | 'vencida'
+  mpPaymentLink?: string
+  mpEstado?: string
 }
 
 export type PortalConfig = {

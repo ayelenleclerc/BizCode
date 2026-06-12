@@ -10,6 +10,7 @@ const IMPORT_DEFAULT = 5
 const PORTAL_MAGIC_LINK_DEFAULT = 5
 const PORTAL_VERIFY_DEFAULT = 30
 const MERCADOPAGO_TEST_DEFAULT = 10
+const MERCADOPAGO_PREFERENCE_DEFAULT = 20
 const FIFTEEN_MINUTES_MS = 15 * MINUTE_MS
 
 function parsePositiveInt(raw: string | undefined, defaultValue: number): number {
@@ -96,6 +97,20 @@ export const portalVerifyHttpRateLimiter = createRouteLimiter({
 export const mercadopagoTestHttpRateLimiter = createRouteLimiter({
   windowMs: FIFTEEN_MINUTES_MS,
   limit: parsePositiveInt(process.env.HTTP_RATE_LIMIT_MERCADOPAGO_TEST, MERCADOPAGO_TEST_DEFAULT),
+  skipUnless: () => true,
+})
+
+/**
+ * @en Per-IP rate limit for Mercado Pago preference creation (default 20 req/15 min; `HTTP_RATE_LIMIT_MERCADOPAGO_PREFERENCE`).
+ * @es Límite por IP para creación de preference Mercado Pago (20 req/15 min por defecto; `HTTP_RATE_LIMIT_MERCADOPAGO_PREFERENCE`).
+ * @pt-BR Limite por IP para criação de preference Mercado Pago (20 req/15 min padrão; `HTTP_RATE_LIMIT_MERCADOPAGO_PREFERENCE`).
+ */
+export const mercadopagoPreferenceHttpRateLimiter = createRouteLimiter({
+  windowMs: FIFTEEN_MINUTES_MS,
+  limit: parsePositiveInt(
+    process.env.HTTP_RATE_LIMIT_MERCADOPAGO_PREFERENCE,
+    MERCADOPAGO_PREFERENCE_DEFAULT,
+  ),
   skipUnless: () => true,
 })
 

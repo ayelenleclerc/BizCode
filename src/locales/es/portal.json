@@ -55,7 +55,7 @@
     "colActions": "Acciones",
     "downloadPdf": "PDF",
     "payOnline": "Pagar online",
-    "payOnlineDisabled": "Pago online no disponible (MercadoPago pendiente de configuración)",
+    "payOnlineDisabled": "Pago online no disponible hasta que tu proveedor genere un link de pago",
     "tableCaption": "Listado de facturas del cliente",
     "totalCount": "{{count}} factura(s)"
   },

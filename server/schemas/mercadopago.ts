@@ -7,3 +7,22 @@ export const mercadoPagoConfigUpsertBodySchema = z.object({
   sandboxMode: z.boolean().optional(),
   activo: z.boolean().optional(),
 })
+
+export const mercadoPagoFacturaEstadoSchema = z.enum([
+  'none',
+  'pending',
+  'approved',
+  'rejected',
+  'cancelled',
+  'expired',
+])
+
+export const mercadoPagoFacturaPaymentSchema = z.object({
+  estado: mercadoPagoFacturaEstadoSchema,
+  preferenceId: z.string().optional(),
+  paymentLink: z.string().url().optional(),
+  expiresAt: z.string().datetime().optional(),
+  pagadoAt: z.string().datetime().optional(),
+  amount: z.string().optional(),
+  facturaRef: z.string().optional(),
+})

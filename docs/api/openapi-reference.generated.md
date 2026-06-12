@@ -27532,6 +27532,402 @@ Sets `estado` to `N` (anulada), reverses the customer balance by the invoice tot
 }
 ```
 
+### PARAMETERS /api/facturas/{id}/mp
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/facturas/{id}/mp`
+
+### Mercado Pago payment status for invoice (#175)
+
+- **Method:** `GET`
+- **Path:** `/api/facturas/{id}/mp`
+- **Tags:** facturas, mercadopago
+
+Requires `reports.financial.read` and tenant integration `mercadopago`. Returns derived estado including `expired` when preference TTL elapsed.
+
+#### Responses
+
+##### Status: 200 Payment link status
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"none", "pending", "approved", "rejected", "cancelled", "expired"`
+
+  - **`amount`**
+
+    `string`
+
+  - **`expiresAt`**
+
+    `string`, format: `date-time`
+
+  - **`facturaRef`**
+
+    `string`
+
+  - **`pagadoAt`**
+
+    `string`, format: `date-time`
+
+  - **`paymentLink`**
+
+    `string`, format: `uri`
+
+  - **`preferenceId`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "estado": "none",
+    "preferenceId": "",
+    "paymentLink": "",
+    "expiresAt": "",
+    "pagadoAt": "",
+    "amount": "",
+    "facturaRef": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Invoice not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/facturas/{id}/mp/preference
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/facturas/{id}/mp/preference`
+
+### Create Mercado Pago checkout preference for invoice (#175)
+
+- **Method:** `POST`
+- **Path:** `/api/facturas/{id}/mp/preference`
+- **Tags:** facturas, mercadopago
+
+Creates a Mercado Pago Checkout preference for the invoice outstanding balance (ARS), stores `mpPreferenceId` and `mpPaymentLink` on `Factura`. Requires `reports.financial.read` and tenant integration `mercadopago`. Returns 409 when an active non-expired preference already exists.
+
+#### Responses
+
+##### Status: 201 Preference created
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"none", "pending", "approved", "rejected", "cancelled", "expired"`
+
+  - **`amount`**
+
+    `string`
+
+  - **`expiresAt`**
+
+    `string`, format: `date-time`
+
+  - **`facturaRef`**
+
+    `string`
+
+  - **`pagadoAt`**
+
+    `string`, format: `date-time`
+
+  - **`paymentLink`**
+
+    `string`, format: `uri`
+
+  - **`preferenceId`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "estado": "none",
+    "preferenceId": "",
+    "paymentLink": "",
+    "expiresAt": "",
+    "pagadoAt": "",
+    "amount": "",
+    "facturaRef": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Invoice or Mercado Pago config not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 409 Active preference already exists
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 422 Invoice not eligible (voided, paid, or MP API error)
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ### PARAMETERS /api/facturas/{id}/remito
 
 - **Method:** `PARAMETERS`
@@ -39440,6 +39836,14 @@ Requires `settings.business.manage` and tenant integration `mercadopago`. Calls 
 
       `string`
 
+    - **`mpEstado`**
+
+      `string`
+
+    - **`mpPaymentLink`**
+
+      `string`, format: `uri`
+
   - **`total` (required)**
 
     `integer`
@@ -39462,7 +39866,9 @@ Requires `settings.business.manage` and tenant integration `mercadopago`. Calls 
         "total": "",
         "pagado": "",
         "pendiente": "",
-        "estado": "pagada"
+        "estado": "pagada",
+        "mpPaymentLink": "",
+        "mpEstado": ""
       }
     ],
     "total": 1
@@ -65693,6 +66099,115 @@ Originating invoice header (selected columns)
 }
 ```
 
+### MercadoPagoFacturaEstado
+
+- **Type:**`string`
+
+**Example:**
+
+### MercadoPagoFacturaPayment
+
+- **Type:**`object`
+
+* **`estado` (required)**
+
+  `string`, possible values: `"none", "pending", "approved", "rejected", "cancelled", "expired"`
+
+* **`amount`**
+
+  `string`
+
+* **`expiresAt`**
+
+  `string`, format: `date-time`
+
+* **`facturaRef`**
+
+  `string`
+
+* **`pagadoAt`**
+
+  `string`, format: `date-time`
+
+* **`paymentLink`**
+
+  `string`, format: `uri`
+
+* **`preferenceId`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "estado": "none",
+  "preferenceId": "",
+  "paymentLink": "",
+  "expiresAt": "",
+  "pagadoAt": "",
+  "amount": "",
+  "facturaRef": ""
+}
+```
+
+### MercadoPagoFacturaPaymentEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"none", "pending", "approved", "rejected", "cancelled", "expired"`
+
+  - **`amount`**
+
+    `string`
+
+  - **`expiresAt`**
+
+    `string`, format: `date-time`
+
+  - **`facturaRef`**
+
+    `string`
+
+  - **`pagadoAt`**
+
+    `string`, format: `date-time`
+
+  - **`paymentLink`**
+
+    `string`, format: `uri`
+
+  - **`preferenceId`**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "estado": "none",
+    "preferenceId": "",
+    "paymentLink": "",
+    "expiresAt": "",
+    "pagadoAt": "",
+    "amount": "",
+    "facturaRef": ""
+  }
+}
+```
+
 ### ArcaTaEnvelope
 
 - **Type:**`object`
@@ -67994,6 +68509,14 @@ Originating invoice header (selected columns)
 
   `string`
 
+* **`mpEstado`**
+
+  `string`
+
+* **`mpPaymentLink`**
+
+  `string`, format: `uri`
+
 **Example:**
 
 ```json
@@ -68004,7 +68527,9 @@ Originating invoice header (selected columns)
   "total": "",
   "pagado": "",
   "pendiente": "",
-  "estado": "pagada"
+  "estado": "pagada",
+  "mpPaymentLink": "",
+  "mpEstado": ""
 }
 ```
 
@@ -68050,6 +68575,14 @@ Originating invoice header (selected columns)
 
       `string`
 
+    - **`mpEstado`**
+
+      `string`
+
+    - **`mpPaymentLink`**
+
+      `string`, format: `uri`
+
   - **`total` (required)**
 
     `integer`
@@ -68072,7 +68605,9 @@ Originating invoice header (selected columns)
         "total": "",
         "pagado": "",
         "pendiente": "",
-        "estado": "pagada"
+        "estado": "pagada",
+        "mpPaymentLink": "",
+        "mpEstado": ""
       }
     ],
     "total": 1

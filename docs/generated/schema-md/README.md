@@ -328,6 +328,12 @@
 
 * [MercadoPagoConfigStatusEnvelope](./mercadopagoconfigstatusenvelope.md) – `-`
 
+* [MercadoPagoFacturaEstado](./mercadopagofacturaestado.md) – `-`
+
+* [MercadoPagoFacturaPayment](./mercadopagofacturapayment.md) – `-`
+
+* [MercadoPagoFacturaPaymentEnvelope](./mercadopagofacturapaymentenvelope.md) – `-`
+
 * [MercadoPagoTestEnvelope](./mercadopagotestenvelope.md) – `-`
 
 * [MetricsEnvelope](./metricsenvelope.md) – `-`

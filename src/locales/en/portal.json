@@ -55,7 +55,7 @@
     "colActions": "Actions",
     "downloadPdf": "PDF",
     "payOnline": "Pay online",
-    "payOnlineDisabled": "Online payment unavailable (MercadoPago setup pending)",
+    "payOnlineDisabled": "Online payment unavailable until your supplier sends a payment link",
     "tableCaption": "Customer invoice list",
     "totalCount": "{{count}} invoice(s)"
   },

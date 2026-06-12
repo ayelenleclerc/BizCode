@@ -47,6 +47,7 @@ import { registerChequesRoutes } from './routes/registerChequesRoutes'
 import { registerEmpresaRoutes } from './routes/registerEmpresaRoutes'
 import { registerPortalRoutes } from './routes/registerPortalRoutes'
 import { registerMercadoPagoRoutes } from './routes/registerMercadoPagoRoutes'
+import { registerMercadoPagoFacturaRoutes } from './routes/registerMercadoPagoFacturaRoutes'
 import { registerPrintingRoutes } from './routes/registerPrintingRoutes'
 import { createDomainServices } from './services/createDomainServices'
 
@@ -111,6 +112,7 @@ export function registerRestDomainRoutes(app: Application, prisma: PrismaClient)
   registerEmpresaRoutes(app, ctx)
   registerPortalRoutes(app, ctx)
   registerMercadoPagoRoutes(app, ctx)
+  registerMercadoPagoFacturaRoutes(app, ctx)
   registerPrintingRoutes(app)
   registerHealthRoute(app, ctx)
   registerModulesCatalogRoute(app, ctx)

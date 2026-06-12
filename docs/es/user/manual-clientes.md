@@ -89,7 +89,7 @@ Si el tenant tiene habilitado el módulo **Portal del cliente** (`clients.portal
 - **Acceso:** el cliente ingresa su email registrado; recibe un magic link válido **15 minutos**; la sesión dura **8 horas**.
 - **Secciones:** facturas (PDF y estado pendiente/vencida/pagada), cuenta corriente (saldo y PDF), pedidos (si está habilitado) y datos de contacto.
 - **Aislamiento:** cada cliente solo ve sus propios comprobantes; el `clienteId` nunca se acepta como parámetro de confianza en la API.
-- **Pago online (MercadoPago):** el botón aparece deshabilitado hasta que el issue #175 esté implementado.
+- **Pago online (MercadoPago):** cuando el personal generó un link de pago activo (#175), el botón **Pagar online** del portal abre el checkout de Mercado Pago en una nueva pestaña.
 
 Configure `SMTP_URL` (o variables SMTP del servidor) para que los magic links lleguen por correo en producción.
 

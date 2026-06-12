@@ -16,6 +16,13 @@
     "id": {
       "type": "integer"
     },
+    "mpEstado": {
+      "type": "string"
+    },
+    "mpPaymentLink": {
+      "format": "uri",
+      "type": "string"
+    },
     "pagado": {
       "type": "string"
     },

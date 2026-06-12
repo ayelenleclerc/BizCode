@@ -1,4 +1,5 @@
 const MP_USERS_ME_URL = 'https://api.mercadopago.com/users/me'
+const MP_PREFERENCES_URL = 'https://api.mercadopago.com/checkout/preferences'
 
 export type MercadoPagoUserMe = {
   nickname?: string
@@ -53,4 +54,66 @@ export function mercadoPagoAccountDisplayName(profile: MercadoPagoUserMe): strin
   if (profile.nickname?.trim()) return profile.nickname.trim()
   if (profile.email?.trim()) return profile.email.trim()
   return 'Mercado Pago account'
+}
+
+export type MercadoPagoPreferenceItem = {
+  title: string
+  quantity: number
+  unit_price: number
+  currency_id: string
+}
+
+export type MercadoPagoPreferenceInput = {
+  items: MercadoPagoPreferenceItem[]
+  back_urls: {
+    success: string
+    failure: string
+    pending: string
+  }
+  notification_url: string
+  expires: boolean
+  expiration_date_from: string
+  expiration_date_to: string
+  external_reference: string
+}
+
+export type MercadoPagoPreferenceResult = {
+  id: string
+  init_point: string
+  sandbox_init_point?: string
+}
+
+/**
+ * @en Creates a Mercado Pago Checkout preference (#175).
+ * @es Crea una preference de Checkout Mercado Pago (#175).
+ * @pt-BR Cria uma preference de Checkout Mercado Pago (#175).
+ */
+export async function createMercadoPagoPreference(
+  accessToken: string,
+  input: MercadoPagoPreferenceInput,
+): Promise<MercadoPagoPreferenceResult> {
+  const res = await fetch(MP_PREFERENCES_URL, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(input),
+  })
+
+  if (!res.ok) {
+    throw new MercadoPagoApiError(
+      res.status,
+      res.status === 401 || res.status === 403
+        ? 'Invalid Mercado Pago credentials'
+        : `Mercado Pago API error (${res.status})`,
+    )
+  }
+
+  const body = (await res.json()) as MercadoPagoPreferenceResult
+  if (!body.id || !body.init_point) {
+    throw new MercadoPagoApiError(502, 'Invalid Mercado Pago preference response')
+  }
+  return body
 }

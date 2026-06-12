@@ -2234,6 +2234,28 @@ export const facturasAPI = {
       return handleError(error as AxiosError<ApiErrorPayload>)
     }
   },
+
+  getMpStatus: async (id: number): Promise<MercadoPagoFacturaPaymentDto> => {
+    try {
+      const response = await api.get<{ success: boolean; data: MercadoPagoFacturaPaymentDto }>(
+        `/facturas/${id}/mp`,
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  createMpPreference: async (id: number): Promise<MercadoPagoFacturaPaymentDto> => {
+    try {
+      const response = await api.post<{ success: boolean; data: MercadoPagoFacturaPaymentDto }>(
+        `/facturas/${id}/mp/preference`,
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
 }
 
 export const notasCreditoAPI = {
@@ -2839,6 +2861,24 @@ export type MercadoPagoConfigStatus = {
   activo?: boolean
   accessTokenLast4?: string
   webhookSecretSet?: boolean
+}
+
+export type MercadoPagoFacturaEstado =
+  | 'none'
+  | 'pending'
+  | 'approved'
+  | 'rejected'
+  | 'cancelled'
+  | 'expired'
+
+export type MercadoPagoFacturaPaymentDto = {
+  estado: MercadoPagoFacturaEstado
+  preferenceId?: string
+  paymentLink?: string
+  expiresAt?: string
+  pagadoAt?: string
+  amount?: string
+  facturaRef?: string
 }
 
 export type MercadoPagoConfigInput = {

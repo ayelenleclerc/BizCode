@@ -1,12 +1,14 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { arcaAPI, facturasAPI, printingAPI, remitosAPI } from '@/lib/api'
+import { arcaAPI, facturasAPI, printingAPI, remitosAPI, type MercadoPagoFacturaPaymentDto } from '@/lib/api'
 import KeyboardHint from '@/components/shared/KeyboardHint'
 import { useListKeyboardNav, useListPageHotkeys } from '@/hooks/useListPageKeyboard'
 import { CanAccess } from '@/components/CanAccess'
 import IfModule from '@/components/IfModule'
+import IfIntegration from '@/components/IfIntegration'
 import { Factura, Cliente } from '@/types'
 import FacturaPdfPreviewDialog from './FacturaPdfPreviewDialog'
+import MercadoPagoPaymentLinkModal from './MercadoPagoPaymentLinkModal'
 
 interface ListadoFacturasProps {
   facturas: Factura[]
@@ -48,6 +50,42 @@ function CaeBadge({ estado }: { estado: Factura['estadoCae'] }) {
   )
 }
 
+function deriveMpEstadoFromFactura(factura: Factura): MercadoPagoFacturaPaymentDto['estado'] | null {
+  if (!factura.mpEstado) return null
+  if (factura.mpEstado === 'approved') return 'approved'
+  if (factura.mpEstado === 'rejected') return 'rejected'
+  if (factura.mpEstado === 'cancelled') return 'cancelled'
+  if (factura.mpEstado === 'pending') {
+    const expiresAt = factura.mpPreferenceExpiresAt
+      ? new Date(factura.mpPreferenceExpiresAt).getTime()
+      : null
+    if (expiresAt != null && expiresAt <= Date.now()) return 'expired'
+    return 'pending'
+  }
+  return null
+}
+
+function MpPaymentBadge({ factura }: { factura: Factura }) {
+  const { t } = useTranslation('facturacion')
+  const estado = deriveMpEstadoFromFactura(factura)
+  if (!estado || estado === 'none') return null
+  const className =
+    estado === 'approved'
+      ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-300'
+      : estado === 'expired' || estado === 'rejected'
+        ? 'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-300'
+        : 'bg-sky-100 dark:bg-sky-900 text-sky-800 dark:text-sky-300'
+  return (
+    <span
+      data-testid={`factura-mp-badge-${factura.id}`}
+      className={`ml-1 inline-block rounded px-2 py-0.5 text-xs font-semibold ${className}`}
+      title={t(`mercadopago.estado.${estado}`)}
+    >
+      {t('mercadopago.badgeShort')} {t(`mercadopago.estado.${estado}`)}
+    </span>
+  )
+}
+
 export default function ListadoFacturas({
   facturas,
   clientes,
@@ -83,6 +121,7 @@ export default function ListadoFacturas({
   const [thermalPrinterEnabled, setThermalPrinterEnabled] = useState(false)
   const [remitoLoadingId, setRemitoLoadingId] = useState<number | null>(null)
   const [remitoFeedback, setRemitoFeedback] = useState<string | null>(null)
+  const [mpModalFacturaId, setMpModalFacturaId] = useState<number | null>(null)
 
   useEffect(() => {
     setSelectedRow(0)
@@ -385,6 +424,9 @@ export default function ListadoFacturas({
                         {t('list.anulada')}
                       </span>
                     )}
+                    <IfIntegration id="mercadopago">
+                      <MpPaymentBadge factura={factura} />
+                    </IfIntegration>
                   </td>
                 </tr>
               )
@@ -683,6 +725,21 @@ export default function ListadoFacturas({
                       </IfModule>
                     )}
 
+                    <IfIntegration id="mercadopago">
+                      <CanAccess permission="reports.financial.read">
+                        {factura.estado === 'A' && deriveMpEstadoFromFactura(factura) !== 'approved' && (
+                          <button
+                            type="button"
+                            data-testid="btn-factura-mp-collect"
+                            onClick={() => setMpModalFacturaId(factura.id)}
+                            className="mb-3 w-full rounded bg-sky-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-sky-700"
+                          >
+                            {t('mercadopago.collectButton')}
+                          </button>
+                        )}
+                      </CanAccess>
+                    </IfIntegration>
+
                     <button
                       type="button"
                       onClick={() => setExpandedId(null)}
@@ -697,6 +754,21 @@ export default function ListadoFacturas({
           </div>
         </div>
       )}
+
+      {mpModalFacturaId != null && (() => {
+        const mpFactura = facturas.find((f) => f.id === mpModalFacturaId)
+        if (!mpFactura) return null
+        return (
+          <MercadoPagoPaymentLinkModal
+            factura={mpFactura}
+            cliente={clientes.find((c) => c.id === mpFactura.clienteId)}
+            onClose={() => setMpModalFacturaId(null)}
+            onStatusChange={() => {
+              onFacturaUpdated?.()
+            }}
+          />
+        )
+      })()}
 
       <FacturaPdfPreviewDialog
         open={pdfPreviewUrl != null}

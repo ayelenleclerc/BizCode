@@ -327,6 +327,11 @@ export interface Factura {
   total: number | string
   formaPagoId?: number
   estado: string // A, N (anulada)
+  mpPreferenceId?: string | null
+  mpPaymentLink?: string | null
+  mpEstado?: string | null
+  mpPagadoAt?: Date | string | null
+  mpPreferenceExpiresAt?: Date | string | null
   cae?: string | null
   caeVto?: Date | string | null
   estadoCae?: 'pending' | 'issued' | 'failed' | null

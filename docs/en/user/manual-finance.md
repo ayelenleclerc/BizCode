@@ -52,7 +52,19 @@ When the tenant has the **`mercadopago`** integration enabled (superadmin tenant
 - **Sandbox mode** and **Integration active** toggles.
 - **Verify credentials** calls `POST /api/configuracion/mercadopago/test` and shows the Mercado Pago account name.
 
-Requires **`settings.business.manage`**. Invoice payment links and portal online pay are not available until issue #175.
+Requires **`settings.business.manage`**.
+
+## Mercado Pago payment links (#175)
+
+When Mercado Pago is configured (#174) and active, staff can generate a **payment link** from the invoice detail (**Collect with Mercado Pago**):
+
+1. Open an active invoice with outstanding balance.
+2. Generate the link (`POST /api/facturas/{id}/mp/preference`) — one active preference per invoice (72 hours).
+3. Copy the link or share via WhatsApp / email (customer phone and email from the customer record).
+
+Portal customers see **Pay online** when an active link exists for their invoice.
+
+Set **`API_PUBLIC_URL`** in production so Mercado Pago can reach the webhook URL registered on each preference (handler in #176).
 
 ## API reference
 
