@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "alicuota": {
+      "type": "string"
+    },
+    "baseImponible": {
+      "type": "string"
+    },
+    "cuit": {
+      "type": "string"
+    },
+    "denominacion": {
+      "type": "string"
+    },
+    "fecha": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "importe": {
+      "type": "string"
+    },
+    "incluida": {
+      "type": "boolean"
+    },
+    "operacionTipo": {
+      "enum": [
+        "retencion",
+        "percepcion"
+      ],
+      "type": "string"
+    },
+    "provincia": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "regimenNombre": {
+      "type": "string"
+    },
+    "regimenTipo": {
+      "type": "string"
+    },
+    "retencionId": {
+      "minimum": 1,
+      "type": "integer"
+    }
+  },
+  "required": [
+    "retencionId",
+    "fecha",
+    "cuit",
+    "denominacion",
+    "regimenNombre",
+    "regimenTipo",
+    "operacionTipo",
+    "baseImponible",
+    "alicuota",
+    "importe",
+    "incluida"
+  ],
+  "title": "PresentacionFila",
+  "type": "object"
+}

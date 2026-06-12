@@ -7,6 +7,7 @@ import { runDbfMigration } from '../../scripts/migrate-from-dbf'
 
 export async function truncateMigrationTables(prisma: PrismaClient): Promise<void> {
   await prisma.$transaction([
+    prisma.movimientoClienteCC.deleteMany(),
     prisma.repartoItem.deleteMany(),
     prisma.reparto.deleteMany(),
     prisma.ordenEntrega.deleteMany(),

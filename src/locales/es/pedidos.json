@@ -8,8 +8,11 @@
     "cliente": "Cliente",
     "estado": "Estado",
     "total": "Total",
-    "fecha": "Creado"
+    "fecha": "Creado",
+    "actions": "Acciones"
   },
+  "generateRemito": "Remito",
+  "remitoCreating": "Creando…",
   "estado": {
     "draft": "Borrador",
     "confirmed": "Confirmado",

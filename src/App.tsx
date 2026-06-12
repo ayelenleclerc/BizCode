@@ -23,6 +23,15 @@ import ReportesPage from './pages/reportes'
 import ConfiguracionPage from './pages/configuracion'
 import ZonasEntregaPage from './pages/configuracion/ZonasEntregaPage'
 import EmpresaPage from './pages/configuracion/EmpresaPage'
+import { PortalAuthProvider } from './contexts/PortalAuthContext'
+import PortalLayout from './pages/portal/PortalLayout'
+import PortalLoginPage from './pages/portal/PortalLoginPage'
+import PortalVerifyPage from './pages/portal/PortalVerifyPage'
+import PortalProtectedRoute from './pages/portal/PortalProtectedRoute'
+import PortalFacturasPage from './pages/portal/PortalFacturasPage'
+import PortalCuentaCorrientePage from './pages/portal/PortalCuentaCorrientePage'
+import PortalPedidosPage from './pages/portal/PortalPedidosPage'
+import PortalMisDatosPage from './pages/portal/PortalMisDatosPage'
 import ChatPage from './pages/chat'
 import AuditLogPage from './pages/admin/audit-log'
 import SuperAdminRoute from './components/SuperAdminRoute'
@@ -105,6 +114,24 @@ function AppRoutes() {
   return (
     <Routes>
       <Route path="/login" element={<LoginRoute />} />
+      <Route
+        path="/portal/:tenantSlug"
+        element={
+          <PortalAuthProvider>
+            <PortalLayout />
+          </PortalAuthProvider>
+        }
+      >
+        <Route path="login" element={<PortalLoginPage />} />
+        <Route path="auth/verify" element={<PortalVerifyPage />} />
+        <Route element={<PortalProtectedRoute />}>
+          <Route index element={<Navigate to="facturas" replace />} />
+          <Route path="facturas" element={<PortalFacturasPage />} />
+          <Route path="cuenta-corriente" element={<PortalCuentaCorrientePage />} />
+          <Route path="pedidos" element={<PortalPedidosPage />} />
+          <Route path="mis-datos" element={<PortalMisDatosPage />} />
+        </Route>
+      </Route>
       <Route element={<ProtectedRoute />}>
         <Route
           element={

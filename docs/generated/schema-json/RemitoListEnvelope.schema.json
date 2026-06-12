@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "data": {
+      "items": {
+        "$ref": "./Remito.schema.json"
+      },
+      "type": "array"
+    },
+    "limit": {
+      "type": "integer"
+    },
+    "offset": {
+      "type": "integer"
+    },
+    "success": {
+      "type": "boolean"
+    },
+    "total": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "success",
+    "data",
+    "total",
+    "limit",
+    "offset"
+  ],
+  "title": "RemitoListEnvelope",
+  "type": "object"
+}

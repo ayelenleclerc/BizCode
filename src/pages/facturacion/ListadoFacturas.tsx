@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { arcaAPI, facturasAPI, printingAPI } from '@/lib/api'
+import { arcaAPI, facturasAPI, printingAPI, remitosAPI } from '@/lib/api'
 import KeyboardHint from '@/components/shared/KeyboardHint'
 import { useListKeyboardNav, useListPageHotkeys } from '@/hooks/useListPageKeyboard'
 import { CanAccess } from '@/components/CanAccess'
@@ -81,6 +81,8 @@ export default function ListadoFacturas({
   const [printFeedback, setPrintFeedback] = useState<string | null>(null)
   const [fiscalPrinterEnabled, setFiscalPrinterEnabled] = useState(false)
   const [thermalPrinterEnabled, setThermalPrinterEnabled] = useState(false)
+  const [remitoLoadingId, setRemitoLoadingId] = useState<number | null>(null)
+  const [remitoFeedback, setRemitoFeedback] = useState<string | null>(null)
 
   useEffect(() => {
     setSelectedRow(0)
@@ -545,6 +547,38 @@ export default function ListadoFacturas({
                           {caeError ?? pdfError}
                         </p>
                       )}
+                    </IfModule>
+
+                    <IfModule flag="fiscal.remito">
+                      <CanAccess permission="sales.create">
+                        <div className="flex flex-wrap gap-2 mt-2" role="group" aria-label={t('remitos.title')}>
+                          <button
+                            type="button"
+                            data-testid="btn-factura-generar-remito"
+                            disabled={remitoLoadingId === factura.id || factura.estado !== 'A'}
+                            onClick={async () => {
+                              setRemitoLoadingId(factura.id)
+                              setRemitoFeedback(null)
+                              try {
+                                const remito = await remitosAPI.createFromFactura(factura.id)
+                                setRemitoFeedback(t('remitos.created', { ref: remito.referencia }))
+                              } catch (err) {
+                                setRemitoFeedback(err instanceof Error ? err.message : String(err))
+                              } finally {
+                                setRemitoLoadingId(null)
+                              }
+                            }}
+                            className="px-3 py-2 text-sm bg-teal-600 hover:bg-teal-700 text-white rounded transition disabled:opacity-50"
+                          >
+                            {remitoLoadingId === factura.id ? t('remitos.creating') : t('remitos.generateFromFactura')}
+                          </button>
+                        </div>
+                        {remitoFeedback && (
+                          <p className="text-sm text-slate-600 dark:text-slate-300 mt-1" role="status">
+                            {remitoFeedback}
+                          </p>
+                        )}
+                      </CanAccess>
                     </IfModule>
 
                     <CanAccess permission="reports.operational.read">

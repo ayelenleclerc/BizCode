@@ -1,0 +1,97 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "banco": {
+      "type": "string"
+    },
+    "cbuOrigen": {
+      "nullable": true,
+      "type": "string"
+    },
+    "clienteId": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "estado": {
+      "enum": [
+        "en_cartera",
+        "emitido",
+        "depositado",
+        "endosado",
+        "descontado",
+        "cobrado",
+        "rechazado",
+        "anulado"
+      ],
+      "type": "string"
+    },
+    "fechaEmision": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "fechaVencimiento": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "id": {
+      "type": "integer"
+    },
+    "libradorCuit": {
+      "nullable": true,
+      "type": "string"
+    },
+    "libradorNombre": {
+      "type": "string"
+    },
+    "modalidad": {
+      "enum": [
+        "fisico",
+        "echeq"
+      ],
+      "type": "string"
+    },
+    "moneda": {
+      "type": "string"
+    },
+    "monto": {
+      "type": "string"
+    },
+    "numero": {
+      "type": "string"
+    },
+    "observaciones": {
+      "nullable": true,
+      "type": "string"
+    },
+    "proveedorId": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "sucursal": {
+      "nullable": true,
+      "type": "string"
+    },
+    "tipo": {
+      "enum": [
+        "recibido",
+        "emitido"
+      ],
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "tipo",
+    "modalidad",
+    "numero",
+    "banco",
+    "libradorNombre",
+    "monto",
+    "moneda",
+    "fechaEmision",
+    "fechaVencimiento",
+    "estado"
+  ],
+  "title": "Cheque",
+  "type": "object"
+}

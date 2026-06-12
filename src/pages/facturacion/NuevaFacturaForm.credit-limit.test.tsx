@@ -4,9 +4,25 @@ import '@/i18n/config'
 import NuevaFacturaForm from './NuevaFacturaForm'
 import type { Articulo, Cliente, FormaPago } from '@/types'
 
+vi.mock('@/contexts/FeatureFlagsContext', () => ({
+  useFeatureFlags: () => ({
+    hasModule: () => false,
+    modules: [],
+    loading: false,
+  }),
+}))
+
 vi.mock('@/lib/api', () => ({
   facturasAPI: {
     create: vi.fn().mockResolvedValue({ id: 1 }),
+  },
+  fiscalRetencionesAPI: {
+    getConfig: vi.fn().mockResolvedValue({
+      esAgenteRetencionGanancias: false,
+      esAgenteRetencionIVA: false,
+      esAgenteRetencionIIBB: false,
+    }),
+    previewRetenciones: vi.fn().mockResolvedValue([]),
   },
   empresaAPI: {
     get: vi.fn().mockResolvedValue({

@@ -14,8 +14,17 @@ import type {
   PedidoInput,
   PedidoInvoiceInput,
   PedidoItemInput,
+  RemitoEntregarInput,
+  RemitoInput,
+  RemitoItemInput,
+  RemitoUpdateInput,
+  ChequeInput,
+  ChequeTransicionInput,
+  ChequeUpdateInput,
+  CobroInput,
   ProveedorInput,
   ProveedorCuentaCorrienteAjusteInput,
+  ClienteCuentaCorrienteAjusteInput,
   RubroInput,
   OrdenCompraCreateInput,
   OrdenCompraItemInput,
@@ -408,6 +417,16 @@ export const proveedorBodySchema = z
     return out
   })
 
+const retencionPercepcionLineSchema = z.object({
+  regimenId: z.number().int().min(1),
+  baseImponible: z.number().positive('baseImponible must be positive'),
+  alicuota: z.number().min(0).max(100),
+  importe: z.number().positive('importe must be positive'),
+})
+
+export const facturaPercepcionLineSchema = retencionPercepcionLineSchema
+export const cobroRetencionLineSchema = retencionPercepcionLineSchema
+
 export const facturaBodySchema = z
   .object({
     fecha: z.string(),
@@ -423,6 +442,7 @@ export const facturaBodySchema = z
     iva2: z.number(),
     total: z.number(),
     items: z.array(z.unknown()),
+    percepciones: z.array(facturaPercepcionLineSchema).optional(),
   })
   .superRefine((data, ctx) => {
     const f = data.fecha.trim()
@@ -536,6 +556,9 @@ export const facturaBodySchema = z
       iva2: data.iva2,
       total: data.total,
       items,
+      ...(data.percepciones != null && data.percepciones.length > 0
+        ? { percepciones: data.percepciones }
+        : {}),
     }
     return out
   })
@@ -672,6 +695,9 @@ export const cobroBodySchema = z
     formaPagoId: z.union([z.number(), z.null(), z.undefined()]).optional(),
     referencia: z.string().optional(),
     nota: z.string().optional(),
+    chequeId: z.union([z.number(), z.null(), z.undefined()]).optional(),
+    chequeNuevo: z.union([z.object({}).passthrough(), z.null(), z.undefined()]).optional(),
+    retenciones: z.array(cobroRetencionLineSchema).optional(),
   })
   .superRefine((data, ctx) => {
     if (!Number.isInteger(data.clienteId) || data.clienteId < 1) {
@@ -713,8 +739,95 @@ export const cobroBodySchema = z
       formaPagoId: data.formaPagoId ?? null,
       referencia: ref && ref.length > 0 ? ref : null,
       nota: note && note.length > 0 ? note : null,
+      ...(data.retenciones != null && data.retenciones.length > 0
+        ? { retenciones: data.retenciones }
+        : {}),
+      chequeId: data.chequeId ?? null,
+      ...(data.chequeNuevo != null && typeof data.chequeNuevo === 'object'
+        ? { chequeNuevo: data.chequeNuevo as ChequeInput }
+        : {}),
+    } satisfies CobroInput
+  })
+
+const chequeTipoSchema = z.enum(['recibido', 'emitido'])
+const chequeModalidadSchema = z.enum(['fisico', 'echeq'])
+
+export const chequeBodySchema = z
+  .object({
+    tipo: chequeTipoSchema,
+    modalidad: chequeModalidadSchema,
+    numero: z.string(),
+    banco: z.string(),
+    sucursal: z.string().optional(),
+    cbuOrigen: z.string().optional(),
+    libradorNombre: z.string(),
+    libradorCuit: z.string().optional(),
+    monto: z.number(),
+    moneda: z.string().optional(),
+    fechaEmision: z.string(),
+    fechaVencimiento: z.string(),
+    clienteId: z.union([z.number(), z.null(), z.undefined()]).optional(),
+    proveedorId: z.union([z.number(), z.null(), z.undefined()]).optional(),
+    observaciones: z.string().optional(),
+  })
+  .superRefine((data, ctx) => {
+    if (data.numero.trim().length < 1 || data.numero.length > 30) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'numero is required (max 30)', path: ['numero'] })
+    }
+    if (data.banco.trim().length < 1 || data.banco.length > 50) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'banco is required (max 50)', path: ['banco'] })
+    }
+    if (typeof data.monto !== 'number' || data.monto <= 0) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'monto must be > 0', path: ['monto'] })
     }
   })
+  .transform(
+    (data): ChequeInput => ({
+      tipo: data.tipo,
+      modalidad: data.modalidad,
+      numero: data.numero.trim(),
+      banco: data.banco.trim(),
+      sucursal: data.sucursal?.trim() ?? null,
+      cbuOrigen: data.cbuOrigen?.trim() ?? null,
+      libradorNombre: data.libradorNombre.trim(),
+      libradorCuit: data.libradorCuit?.trim() ?? null,
+      monto: data.monto,
+      moneda: data.moneda?.trim() || 'ARS',
+      fechaEmision: data.fechaEmision.trim(),
+      fechaVencimiento: data.fechaVencimiento.trim(),
+      clienteId: data.clienteId ?? null,
+      proveedorId: data.proveedorId ?? null,
+      observaciones: data.observaciones?.trim() ?? null,
+    }),
+  )
+
+export const chequeUpdateBodySchema = z
+  .object({
+    banco: z.string().optional(),
+    sucursal: z.union([z.string(), z.null(), z.undefined()]).optional(),
+    cbuOrigen: z.union([z.string(), z.null(), z.undefined()]).optional(),
+    libradorNombre: z.string().optional(),
+    libradorCuit: z.union([z.string(), z.null(), z.undefined()]).optional(),
+    fechaVencimiento: z.string().optional(),
+    observaciones: z.union([z.string(), z.null(), z.undefined()]).optional(),
+  })
+  .transform((data): ChequeUpdateInput => data)
+
+export const chequeTransicionBodySchema = z
+  .object({
+    destino: z.union([z.string(), z.null(), z.undefined()]).optional(),
+    nota: z.union([z.string(), z.null(), z.undefined()]).optional(),
+    proveedorId: z.union([z.number(), z.null(), z.undefined()]).optional(),
+    monto: z.union([z.number(), z.null(), z.undefined()]).optional(),
+  })
+  .transform(
+    (data): ChequeTransicionInput => ({
+      destino: data.destino?.trim() ?? null,
+      nota: data.nota?.trim() ?? null,
+      proveedorId: data.proveedorId ?? undefined,
+      monto: data.monto ?? null,
+    }),
+  )
 
 const ORDEN_ENTREGA_ESTADOS = [
   'pending',
@@ -1478,9 +1591,46 @@ export const proveedorCuentaCorrienteAjusteBodySchema = z
 
 export { movimientoProveedorCCTipoSchema }
 
+/** @en Customer ledger movement type filter (#232). */
+const movimientoClienteCCTipoSchema = z.enum(
+  [
+    'saldo_inicial',
+    'factura',
+    'nota_credito',
+    'cobro',
+    'retencion',
+    'percepcion',
+    'cheque_rechazado',
+    'ajuste',
+  ],
+  { invalid_type_error: 'Invalid cliente cuenta corriente tipo filter' },
+)
+
+/** @en Customer ledger manual adjustment body (#232). */
+export const clienteCuentaCorrienteAjusteBodySchema = z
+  .object({
+    monto: z.number().refine((v) => v !== 0, { message: 'monto must be non-zero' }),
+    motivo: z.string().trim().min(1, 'motivo is required').max(500),
+  })
+  .transform((data): ClienteCuentaCorrienteAjusteInput => ({
+    monto: data.monto,
+    motivo: data.motivo,
+  }))
+
+/** @en Customer account statement email body (#232). */
+export const clienteCuentaCorrienteEnviarBodySchema = z.object({
+  email: z.string().email().max(50).optional(),
+  desde: z.string().optional(),
+  hasta: z.string().optional(),
+})
+
+export { movimientoClienteCCTipoSchema }
+
 const reciboPagoMetodoSchema = z.enum(['transferencia', 'cheque', 'efectivo', 'echeq'])
 
-/** @en Supplier payment receipt body (#271). */
+const reciboPagoRetencionLineSchema = retencionPercepcionLineSchema
+
+/** @en Supplier payment receipt body (#271, #276 retenciones). */
 export const reciboPagoBodySchema = z
   .object({
     fecha: z.string(),
@@ -1489,6 +1639,7 @@ export const reciboPagoBodySchema = z
     cbu: z.union([z.string(), z.null(), z.undefined()]).optional(),
     referencia: z.union([z.string(), z.null(), z.undefined()]).optional(),
     notas: z.union([z.string(), z.null(), z.undefined()]).optional(),
+    chequeId: z.union([z.number(), z.null(), z.undefined()]).optional(),
     facturas: z
       .array(
         z.object({
@@ -1498,6 +1649,7 @@ export const reciboPagoBodySchema = z
         }),
       )
       .min(1, 'At least one factura allocation is required'),
+    retenciones: z.array(reciboPagoRetencionLineSchema).optional(),
   })
   .superRefine((data, ctx) => {
     const f = data.fecha.trim()
@@ -1522,7 +1674,77 @@ export const reciboPagoBodySchema = z
         })
       }
     }
+    const bruto = data.facturas.reduce((sum, line) => sum + line.monto, 0)
+    const retTotal = (data.retenciones ?? []).reduce((sum, line) => sum + line.importe, 0)
+    const expectedNet = bruto - retTotal
+    if (Math.abs(expectedNet - data.total) > 0.009) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'total must equal sum of facturas minus sum of retenciones',
+        path: ['total'],
+      })
+    }
   })
+
+const reciboCobroFormaTipoSchema = z.enum([
+  'efectivo',
+  'transferencia',
+  'cheque',
+  'mercadopago',
+  'tarjeta',
+  'otro',
+])
+
+/** @en Customer payment receipt body (#233). */
+export const reciboCobroBodySchema = z
+  .object({
+    fecha: z.string(),
+    totalCobrado: z.number().positive('totalCobrado must be positive'),
+    concepto: z.union([z.string(), z.null(), z.undefined()]).optional(),
+    fifo: z.boolean().optional(),
+    formas: z
+      .array(
+        z.object({
+          tipo: reciboCobroFormaTipoSchema,
+          importe: z.number().positive('importe must be positive'),
+          chequeId: z.union([z.number(), z.null(), z.undefined()]).optional(),
+          chequeNuevo: z.union([z.object({}).passthrough(), z.null(), z.undefined()]).optional(),
+          referencia: z.union([z.string(), z.null(), z.undefined()]).optional(),
+          banco: z.union([z.string(), z.null(), z.undefined()]).optional(),
+        }),
+      )
+      .min(1, 'At least one payment method is required'),
+    imputaciones: z
+      .array(
+        z.object({
+          facturaId: z.number().int().min(1),
+          importe: z.number().positive('importe must be positive'),
+        }),
+      )
+      .optional(),
+    retenciones: z.array(retencionPercepcionLineSchema).optional(),
+  })
+  .superRefine((data, ctx) => {
+    const f = data.fecha.trim()
+    if (f.length === 0) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'fecha is required', path: ['fecha'] })
+    }
+    if (data.concepto != null && data.concepto.length > 500) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'concepto max 500 chars', path: ['concepto'] })
+    }
+    const formasTotal = data.formas.reduce((sum, line) => sum + line.importe, 0)
+    if (Math.abs(formasTotal - data.totalCobrado) > 0.009) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'totalCobrado must equal sum of formas importe',
+        path: ['totalCobrado'],
+      })
+    }
+  })
+
+export const reciboCobroVoidBodySchema = z.object({
+  anulacionMotivo: z.string().trim().min(3, 'anulacionMotivo is required'),
+})
 
 const comprobanteCompraFieldsSchema = z.object({
   fecha: z.string(),
@@ -1834,7 +2056,109 @@ export const retencionesPreviewQuerySchema = z.object({
   entidadTipo: z.enum(['cliente', 'proveedor']),
   entidadId: z.coerce.number().int().min(1),
   monto: z.coerce.number().positive(),
+  contexto: z.enum(['factura', 'cobro']).optional(),
+  neto1: z.coerce.number().min(0).optional(),
+  neto2: z.coerce.number().min(0).optional(),
+  neto3: z.coerce.number().min(0).optional(),
 })
+
+export const presentacionRetencionBodySchema = z.object({
+  formato: z.enum(['sicore', 'sifere']),
+  periodo: z.string().regex(/^\d{4}-\d{2}$/, 'periodo must be YYYY-MM'),
+})
+
+const remitoItemField = z
+  .array(
+    z.object({
+      articuloId: z.number(),
+      descripcion: z.string(),
+      cantidad: z.number(),
+      unidad: z.string(),
+    }),
+  )
+  .min(1, 'items must contain at least one line')
+  .superRefine((items, ctx) => {
+    items.forEach((it, idx) => {
+      if (!Number.isInteger(it.articuloId) || it.articuloId < 1) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'articuloId must be >= 1', path: [idx, 'articuloId'] })
+      }
+      const desc = it.descripcion.trim()
+      if (desc.length < 1 || desc.length > 120) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'descripcion must be 1-120 characters', path: [idx, 'descripcion'] })
+      }
+      if (!Number.isInteger(it.cantidad) || it.cantidad < 1) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'cantidad must be >= 1', path: [idx, 'cantidad'] })
+      }
+      const unidad = it.unidad.trim()
+      if (unidad.length < 1 || unidad.length > 6) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'unidad must be 1-6 characters', path: [idx, 'unidad'] })
+      }
+    })
+  })
+  .transform((items): RemitoItemInput[] =>
+    items.map((it) => ({
+      articuloId: it.articuloId,
+      descripcion: it.descripcion.trim(),
+      cantidad: it.cantidad,
+      unidad: it.unidad.trim(),
+    })),
+  )
+
+export const remitoBodySchema = z
+  .object({
+    tipo: z.enum(['remito_x', 'remito_ingreso'], {
+      errorMap: () => ({ message: 'tipo must be remito_x or remito_ingreso' }),
+    }),
+    clienteId: z.union([z.number(), z.null()]).optional(),
+    proveedorId: z.union([z.number(), z.null()]).optional(),
+    facturaId: z.union([z.number(), z.null()]).optional(),
+    pedidoId: z.union([z.number(), z.null()]).optional(),
+    ordenEntregaId: z.union([z.number(), z.null()]).optional(),
+    fecha: z.string().optional(),
+    observaciones: z.union([z.string(), z.null()]).optional(),
+    items: remitoItemField,
+  })
+  .transform(
+    (data): RemitoInput => ({
+      tipo: data.tipo,
+      clienteId: data.clienteId,
+      proveedorId: data.proveedorId,
+      facturaId: data.facturaId,
+      pedidoId: data.pedidoId,
+      ordenEntregaId: data.ordenEntregaId,
+      fecha: data.fecha,
+      observaciones: data.observaciones,
+      items: data.items,
+    }),
+  )
+
+export const remitoUpdateBodySchema = z
+  .object({
+    clienteId: z.union([z.number(), z.null()]).optional(),
+    proveedorId: z.union([z.number(), z.null()]).optional(),
+    observaciones: z.union([z.string(), z.null()]).optional(),
+    items: remitoItemField.optional(),
+  })
+  .refine((data) => Object.keys(data).length > 0, { message: 'At least one field is required' })
+  .transform((data): RemitoUpdateInput => data)
+
+export const remitoEntregarBodySchema = z
+  .object({
+    firmadoPor: z.string(),
+    fechaEntrega: z.string().optional(),
+  })
+  .superRefine((data, ctx) => {
+    const name = data.firmadoPor.trim()
+    if (name.length < 2 || name.length > 120) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'firmadoPor must be 2-120 characters', path: ['firmadoPor'] })
+    }
+  })
+  .transform(
+    (data): RemitoEntregarInput => ({
+      firmadoPor: data.firmadoPor.trim(),
+      fechaEntrega: data.fechaEntrega,
+    }),
+  )
 
 export function safeParseBodySchema<S extends z.ZodTypeAny>(schema: S, raw: unknown): SafeParseBodyResult<z.output<S>> {
   const parsed = schema.safeParse(raw)

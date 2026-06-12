@@ -73,6 +73,21 @@ export type ProveedorCuentaCorrienteAjusteInput = {
   motivo: string
 }
 
+export type MovimientoClienteCCTipo =
+  | 'saldo_inicial'
+  | 'factura'
+  | 'nota_credito'
+  | 'cobro'
+  | 'retencion'
+  | 'percepcion'
+  | 'cheque_rechazado'
+  | 'ajuste'
+
+export type ClienteCuentaCorrienteAjusteInput = {
+  monto: number
+  motivo: string
+}
+
 export type ReciboPagoMetodo = 'transferencia' | 'cheque' | 'efectivo' | 'echeq'
 
 export type ReciboPagoFacturaInput = {
@@ -81,14 +96,60 @@ export type ReciboPagoFacturaInput = {
   monto: number
 }
 
+/** @en Withholding line on supplier payment (#276). @es Línea de retención en pago a proveedor (#276). @pt-BR Linha de retenção em pagamento (#276). */
+export type ReciboPagoRetencionInput = {
+  regimenId: number
+  baseImponible: number
+  alicuota: number
+  importe: number
+}
+
 export type ReciboPagoInput = {
   fecha: string
   total: number
   metodoPago: ReciboPagoMetodo
+  chequeId?: number | null
   cbu?: string | null
   referencia?: string | null
   notas?: string | null
   facturas: ReciboPagoFacturaInput[]
+  retenciones?: ReciboPagoRetencionInput[]
+}
+
+/** @en Customer receipt payment method (#233). @es Medio de pago en recibo de cobro (#233). @pt-BR Meio de pagamento no recibo de cobrança (#233). */
+export type ReciboCobroFormaTipo =
+  | 'efectivo'
+  | 'transferencia'
+  | 'cheque'
+  | 'mercadopago'
+  | 'tarjeta'
+  | 'otro'
+
+/** @en Payment line on customer receipt (#233). @es Línea de forma de pago en recibo de cobro (#233). @pt-BR Linha de forma de pagamento no recibo (#233). */
+export type ReciboCobroFormaInput = {
+  tipo: ReciboCobroFormaTipo
+  importe: number
+  chequeId?: number | null
+  chequeNuevo?: ChequeInput | null
+  referencia?: string | null
+  banco?: string | null
+}
+
+/** @en Invoice allocation on customer receipt (#233). @es Imputación a factura en recibo de cobro (#233). @pt-BR Imputação a fatura no recibo (#233). */
+export type ReciboCobroImputacionInput = {
+  facturaId: number
+  importe: number
+}
+
+/** @en Customer payment receipt body (#233). @es Cuerpo de recibo de cobro (#233). @pt-BR Corpo do recibo de cobrança (#233). */
+export type ReciboCobroInput = {
+  fecha: string
+  totalCobrado: number
+  concepto?: string | null
+  formas: ReciboCobroFormaInput[]
+  imputaciones?: ReciboCobroImputacionInput[]
+  fifo?: boolean
+  retenciones?: CobroRetencionInput[]
 }
 
 export type FacturaItemInput = {
@@ -97,6 +158,13 @@ export type FacturaItemInput = {
   precio: number
   dscto: number
   subtotal: number
+}
+
+export type FacturaPercepcionInput = {
+  regimenId: number
+  baseImponible: number
+  alicuota: number
+  importe: number
 }
 
 export type FacturaInput = {
@@ -113,6 +181,14 @@ export type FacturaInput = {
   iva2: number
   total: number
   items: FacturaItemInput[]
+  percepciones?: FacturaPercepcionInput[]
+}
+
+export type CobroRetencionInput = {
+  regimenId: number
+  baseImponible: number
+  alicuota: number
+  importe: number
 }
 
 export type FacturaPrintInput = {
@@ -128,8 +204,94 @@ export type CobroInput = {
   fecha: string
   monto: number
   formaPagoId?: number | null
+  chequeId?: number | null
+  chequeNuevo?: ChequeInput | null
   referencia?: string | null
   nota?: string | null
+  retenciones?: CobroRetencionInput[]
+}
+
+export type ChequeTipo = 'recibido' | 'emitido'
+export type ChequeModalidad = 'fisico' | 'echeq'
+export type ChequeEstado =
+  | 'en_cartera'
+  | 'emitido'
+  | 'depositado'
+  | 'endosado'
+  | 'descontado'
+  | 'cobrado'
+  | 'rechazado'
+  | 'anulado'
+export type ChequeMovTipo = 'recepcion' | 'deposito' | 'endoso' | 'descuento' | 'cobro' | 'rechazo'
+
+export type ChequeInput = {
+  tipo: ChequeTipo
+  modalidad: ChequeModalidad
+  numero: string
+  banco: string
+  sucursal?: string | null
+  cbuOrigen?: string | null
+  libradorNombre: string
+  libradorCuit?: string | null
+  monto: number
+  moneda?: string
+  fechaEmision: string
+  fechaVencimiento: string
+  clienteId?: number | null
+  proveedorId?: number | null
+  observaciones?: string | null
+}
+
+export type ChequeUpdateInput = {
+  banco?: string
+  sucursal?: string | null
+  cbuOrigen?: string | null
+  libradorNombre?: string
+  libradorCuit?: string | null
+  fechaVencimiento?: string
+  observaciones?: string | null
+}
+
+export type ChequeTransicionInput = {
+  destino?: string | null
+  nota?: string | null
+  proveedorId?: number | null
+  monto?: number | null
+}
+
+export type RemitoTipo = 'remito_x' | 'remito_ingreso'
+
+export type RemitoEstado = 'borrador' | 'emitido' | 'entregado' | 'anulado'
+
+export type RemitoItemInput = {
+  articuloId: number
+  descripcion: string
+  cantidad: number
+  unidad: string
+}
+
+export type RemitoInput = {
+  tipo: RemitoTipo
+  clienteId?: number | null
+  proveedorId?: number | null
+  facturaId?: number | null
+  pedidoId?: number | null
+  ordenEntregaId?: number | null
+  fecha?: string
+  observaciones?: string | null
+  items: RemitoItemInput[]
+}
+
+export type RemitoUpdateInput = {
+  clienteId?: number | null
+  proveedorId?: number | null
+  observaciones?: string | null
+  items?: RemitoItemInput[]
+}
+
+export type RemitoEntregarInput = {
+  firmadoPor: string
+  fechaEntrega?: string
 }
 
 export type DeliveryZoneCreateParsed = {

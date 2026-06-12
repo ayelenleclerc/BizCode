@@ -259,5 +259,86 @@
       "confirmFailed": "Could not confirm the import.",
       "totalRequired": "Total must be greater than zero."
     }
+  },
+  "cheques": {
+    "title": "Check portfolio",
+    "empty": "No checks in portfolio.",
+    "dueSoon": "Due soon",
+    "colNumero": "Number",
+    "colBanco": "Bank",
+    "colVencimiento": "Due date",
+    "colMonto": "Amount",
+    "colEstado": "Status",
+    "colAcciones": "Actions",
+    "filters": {
+      "estado": "Status",
+      "banco": "Bank",
+      "all": "All"
+    },
+    "resumen": {
+      "enCartera": "In portfolio",
+      "proximos": "Due within 7 days",
+      "rechazados": "Rejected"
+    },
+    "modalidad": {
+      "fisico": "Physical",
+      "echeq": "ECHEQ"
+    },
+    "estado": {
+      "en_cartera": "In portfolio",
+      "emitido": "Issued",
+      "depositado": "Deposited",
+      "endosado": "Endorsed",
+      "descontado": "Discounted",
+      "cobrado": "Collected",
+      "rechazado": "Rejected",
+      "anulado": "Voided"
+    },
+    "actions": {
+      "depositar": "Deposit",
+      "anular": "Void",
+      "cobrar": "Collect",
+      "rechazar": "Reject",
+      "devolver": "Return to portfolio"
+    }
+  },
+  "presentaciones": {
+    "title": "Tax filings",
+    "subtitle": "Generate SICORE and SIFERE files for withholdings and perceptions.",
+    "formatoSicore": "SICORE (national)",
+    "formatoSifere": "SIFERE (gross income)",
+    "periodo": "Period",
+    "preview": "Preview",
+    "download": "Download file",
+    "downloading": "Generating…",
+    "refresh": "Refresh",
+    "history": "History",
+    "historyEmpty": "No generated files yet.",
+    "markedPresented": "Filed",
+    "markPresented": "Mark as filed",
+    "warnings": "Warnings",
+    "warningsEmpty": "No warnings.",
+    "canGenerate": "Ready to generate",
+    "cannotGenerate": "No valid operations for this period.",
+    "colFecha": "Date",
+    "colCuit": "CUIT",
+    "colDenominacion": "Name",
+    "colRegimen": "Regime",
+    "colBase": "Base",
+    "colAlicuota": "Rate",
+    "colImporte": "Amount",
+    "colIncluida": "Included",
+    "colPeriodo": "Period",
+    "colFormato": "Format",
+    "colOperaciones": "Operations",
+    "colTotal": "Total",
+    "colGenerado": "Generated",
+    "colPresentado": "Filed",
+    "colAcciones": "Actions",
+    "totalsByRegimen": "Totals by regime",
+    "yes": "Yes",
+    "no": "No",
+    "loadError": "Could not load presentation.",
+    "generateError": "Could not generate file."
   }
 }

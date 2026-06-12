@@ -8,11 +8,13 @@ import KeyboardHint, { useGlobalListShortcuts } from '@/components/shared/Keyboa
 import { Cliente, Articulo, FormaPago, Factura } from '@/types'
 import NuevaFacturaForm from './NuevaFacturaForm'
 import ListadoFacturas from './ListadoFacturas'
+import RemitosSection from './RemitosSection'
+import IfModule from '@/components/IfModule'
 
 export default function FacturacionPage() {
   const { t } = useTranslation('facturacion')
   const listShortcuts = useGlobalListShortcuts()
-  const [view, setView] = useState<'lista' | 'nueva'>('lista')
+  const [view, setView] = useState<'lista' | 'nueva' | 'remitos'>('lista')
   const [facturas, setFacturas] = useState<Factura[]>([])
   const [clientes, setClientes] = useState<Cliente[]>([])
   const [articulos, setArticulos] = useState<Articulo[]>([])
@@ -65,13 +67,24 @@ export default function FacturacionPage() {
   return (
     <ErrorBoundary>
     <div className="p-8 h-full flex flex-col">
-      {view === 'lista' ? (
+      {view === 'remitos' ? (
+        <>
+          <div className="mb-6 flex gap-3">
+            <button type="button" className="text-blue-600 underline" onClick={() => setView('lista')}>
+              ← {t('listTitle')}
+            </button>
+          </div>
+          <IfModule flag="fiscal.remito">
+            <RemitosSection />
+          </IfModule>
+        </>
+      ) : view === 'lista' ? (
         <>
           <div className="mb-6">
             <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100">{t('title')}</h1>
           </div>
 
-          <div className="mb-6 flex justify-between items-start">
+          <div className="mb-6 flex flex-wrap gap-3 justify-between items-start">
             <button
               data-testid="btn-nueva-factura"
               onClick={() => setView('nueva')}
@@ -79,6 +92,16 @@ export default function FacturacionPage() {
             >
               ➕ {t('newInvoice')} (F3)
             </button>
+            <IfModule flag="fiscal.remito">
+              <button
+                type="button"
+                data-testid="btn-ver-remitos"
+                onClick={() => setView('remitos')}
+                className="px-4 py-2 border border-slate-300 dark:border-slate-600 rounded"
+              >
+                {t('remitos.title')}
+              </button>
+            </IfModule>
           </div>
           <AsyncWrapper loading={loading} error={loadError}>
             <ListadoFacturas

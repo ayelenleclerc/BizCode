@@ -192,8 +192,79 @@ export function registerFiscalRetencionesRoutes(app: Application, ctx: RestRoute
         return
       }
       try {
-        const data = fiscalRetenciones.preview(parsed.value)
+        const tenantId = getTenantId(req)
+        const data = await fiscalRetenciones.preview(tenantId, parsed.value)
         res.json({ success: true, data })
+      } catch (err: unknown) {
+        const msg = errorMessage(err)
+        if (msg.includes('not found') || msg.includes('Not found')) {
+          res.status(404).json({ success: false, error: msg })
+          return
+        }
+        res.status(500).json({ success: false, error: msg })
+      }
+    },
+  )
+
+  app.get(
+    '/api/fiscal/retenciones/:id/comprobante/pdf',
+    retencionesModule,
+    requirePermission('reports.financial.read'),
+    async (req: Request, res: Response) => {
+      const id = parsePositiveIntParam(String(req.params.id))
+      if (id == null) {
+        res.status(400).json({ success: false, error: 'id must be a positive integer' })
+        return
+      }
+      try {
+        const tenantId = getTenantId(req)
+        const pdfData = await fiscalRetenciones.getConstanciaPdfData(tenantId, id)
+        if (pdfData == null) {
+          res.status(404).json({ success: false, error: 'Retencion not found' })
+          return
+        }
+        const { buildRetencionConstanciaPdfBuffer, retencionConstanciaPdfFilename } = await import(
+          '../finance/retencionConstanciaPdf'
+        )
+        const buffer = await buildRetencionConstanciaPdfBuffer(pdfData)
+        res.setHeader('Content-Type', 'application/pdf')
+        res.setHeader(
+          'Content-Disposition',
+          `attachment; filename="${retencionConstanciaPdfFilename(pdfData.retencion.constanciaNum, pdfData.retencion.id)}"`,
+        )
+        res.send(buffer)
+      } catch (err: unknown) {
+        res.status(500).json({ success: false, error: errorMessage(err) })
+      }
+    },
+  )
+
+  app.get(
+    '/api/fiscal/retenciones/export',
+    retencionesModule,
+    requirePermission('reports.financial.read'),
+    async (req: Request, res: Response) => {
+      const formatRaw = String(req.query.format ?? 'sicore').toLowerCase()
+      if (formatRaw !== 'sicore' && formatRaw !== 'sifere') {
+        res.status(400).json({ success: false, error: 'format must be sicore or sifere' })
+        return
+      }
+      try {
+        const tenantId = getTenantId(req)
+        const from = parseOptionalDate(req.query.from)
+        const to = parseOptionalDate(req.query.to)
+        const txt = await fiscalRetenciones.buildExportTxt(
+          tenantId,
+          formatRaw,
+          from,
+          to,
+        )
+        res.setHeader('Content-Type', 'text/plain; charset=utf-8')
+        res.setHeader(
+          'Content-Disposition',
+          `attachment; filename="retenciones-${formatRaw}.txt"`,
+        )
+        res.send(txt)
       } catch (err: unknown) {
         res.status(500).json({ success: false, error: errorMessage(err) })
       }

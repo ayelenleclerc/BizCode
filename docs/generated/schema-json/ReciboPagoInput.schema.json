@@ -6,6 +6,11 @@
       "nullable": true,
       "type": "string"
     },
+    "chequeId": {
+      "description": "Portfolio check to endorse when metodoPago is cheque or echeq (#231).",
+      "nullable": true,
+      "type": "integer"
+    },
     "facturas": {
       "items": {
         "properties": {
@@ -51,6 +56,12 @@
       "maxLength": 60,
       "nullable": true,
       "type": "string"
+    },
+    "retenciones": {
+      "items": {
+        "$ref": "./ReciboPagoRetencionInput.schema.json"
+      },
+      "type": "array"
     },
     "total": {
       "exclusiveMinimum": 0,

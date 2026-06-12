@@ -68,6 +68,64 @@ export type ProveedorCategoria = 'materia_prima' | 'insumos' | 'servicios' | 'lo
 
 export type MovimientoProveedorCCTipo = 'factura_compra' | 'pago' | 'nc_proveedor' | 'ajuste'
 
+export type MovimientoClienteCCTipo =
+  | 'saldo_inicial'
+  | 'factura'
+  | 'nota_credito'
+  | 'cobro'
+  | 'retencion'
+  | 'percepcion'
+  | 'cheque_rechazado'
+  | 'ajuste'
+
+export interface MovimientoClienteCC {
+  id: number
+  tipo: MovimientoClienteCCTipo
+  referencia: string | null
+  monto: string
+  saldoPost: string
+  fecha: string
+  usuarioId: number
+  notas: string | null
+  facturaId?: number
+  cobroId?: number
+  notaCreditoId?: number
+  chequeId?: number
+  retencionAplicadaId?: number
+}
+
+export interface ClienteCuentaCorrienteChartPoint {
+  period: string
+  saldo: string
+}
+
+export interface ClienteCuentaCorriente {
+  clienteId: number
+  codigo: number
+  rsocial: string
+  saldo: string
+  creditLimit: string | null
+  excedeLimite: boolean
+  movimientos: MovimientoClienteCC[]
+  serie: ClienteCuentaCorrienteChartPoint[]
+  total: number
+  limit: number
+  offset: number
+}
+
+export interface ClienteCuentaCorrienteSaldo {
+  clienteId: number
+  saldo: string
+  creditLimit: string | null
+  excedeLimite: boolean
+}
+
+export interface ClienteCuentaCorrienteAntiguedad {
+  clienteId: number
+  buckets: Array<{ label: '0-30' | '31-60' | '61-90' | '+90'; total: string }>
+  totalPendiente: string
+}
+
 export interface MovimientoProveedorCC {
   id: number
   tipo: MovimientoProveedorCCTipo
@@ -111,12 +169,24 @@ export interface ReciboPagoFactura {
   monto: string
 }
 
+export interface ReciboPagoRetencion {
+  id: number
+  regimenId: number
+  regimenNombre: string
+  tipo: string
+  baseImponible: string
+  alicuota: string
+  importe: string
+  constanciaNum: string | null
+}
+
 export interface ReciboPago {
   id: number
   numero: number
   proveedorId: number
   fecha: string
   total: string
+  totalBruto: string
   metodoPago: ReciboPagoMetodo
   cbu: string | null
   referencia: string | null
@@ -126,11 +196,79 @@ export interface ReciboPago {
   proveedor: { id: number; codigo: number; rsocial: string; cuit: string | null }
   usuario: { id: number; username: string }
   facturas: ReciboPagoFactura[]
+  retenciones: ReciboPagoRetencion[]
   createdAt: string
 }
 
 export interface ComprobantePendiente {
   comprobanteCompraId: number
+  facturaRef: string
+  fecha: string
+  total: string
+  pagado: string
+  pendiente: string
+}
+
+export type ReciboCobroFormaTipo =
+  | 'efectivo'
+  | 'transferencia'
+  | 'cheque'
+  | 'mercadopago'
+  | 'tarjeta'
+  | 'otro'
+
+export interface ReciboCobroForma {
+  id: number
+  tipo: ReciboCobroFormaTipo
+  importe: string
+  chequeId: number | null
+  referencia: string | null
+  banco: string | null
+  chequeNumero: string | null
+  chequeBanco: string | null
+}
+
+export interface ReciboCobroImputacion {
+  id: number
+  facturaId: number
+  facturaRef: string
+  importe: string
+  saldoPrevio: string
+  saldoPostPago: string
+}
+
+export interface ReciboCobroRetencion {
+  id: number
+  regimenId: number
+  regimenNombre: string
+  tipo: string
+  baseImponible: string
+  alicuota: string
+  importe: string
+  constanciaNum: string | null
+}
+
+export interface ReciboCobro {
+  id: number
+  numero: number
+  clienteId: number
+  fecha: string
+  totalCobrado: string
+  totalBruto: string
+  concepto: string | null
+  estado: string
+  anulacionMotivo: string | null
+  usuarioId: number
+  cliente: { id: number; codigo: number; rsocial: string; cuit: string | null }
+  usuario: { id: number; username: string }
+  formas: ReciboCobroForma[]
+  imputaciones: ReciboCobroImputacion[]
+  retenciones: ReciboCobroRetencion[]
+  createdAt: string
+}
+
+export interface FacturaPendienteCliente {
+  facturaId: number
   facturaRef: string
   fecha: string
   total: string

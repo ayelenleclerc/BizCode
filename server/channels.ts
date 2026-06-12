@@ -110,6 +110,26 @@ function buildMessage(type: NotificationType, payload: NotificationPayload): Mes
         text: `El trial del módulo ${moduleKey} vence en ${days} días. Contrate el módulo para mantenerlo activo.`,
       }
     }
+    case 'cheque_due_soon': {
+      const numero = payload.chequeNumero ? ` ${payload.chequeNumero}` : ''
+      const banco = payload.banco ? ` (${payload.banco})` : ''
+      const days =
+        payload.diasHastaVencimiento != null && payload.diasHastaVencimiento >= 0
+          ? ` en ${payload.diasHastaVencimiento} días`
+          : ''
+      return {
+        subject: `[BizCode] Cheque próximo a vencer${numero}`,
+        text: `Un cheque${numero}${banco}${amount ? ` por ${amount}` : ''} vence${days}. Revise la cartera.`,
+      }
+    }
+    case 'cheque_rechazado': {
+      const numero = payload.chequeNumero ? ` ${payload.chequeNumero}` : ''
+      const banco = payload.banco ? ` (${payload.banco})` : ''
+      return {
+        subject: `[BizCode] Cheque rechazado${numero} — ${rsocial}`,
+        text: `El cheque${numero}${banco}${amount ? ` por ${amount}` : ''} de ${rsocial} fue rechazado. Actualice la cuenta corriente del cliente.`,
+      }
+    }
   }
 }
 
@@ -284,6 +304,82 @@ export type SupplierNotificationChannels = {
  * @es Despacha alertas de facturas a pagar respetando canales del tenant (#275).
  * @pt-BR Despacha alertas de faturas a pagar respeitando canais do tenant (#275).
  */
+/**
+ * @en Sends B2B portal magic-link email; no-op when SMTP is not configured (#240).
+ * @es Envía email con magic link del portal B2B; no-op si SMTP no está configurado (#240).
+ * @pt-BR Envia e-mail com magic link do portal B2B; no-op se SMTP não estiver configurado (#240).
+ */
+export async function sendPortalMagicLinkEmail(
+  to: string,
+  tenantName: string,
+  verifyUrl: string,
+): Promise<void> {
+  if (!isSmtpConfigured()) return
+  const smtp = resolveSmtpTransportConfig()
+  if (!smtp) return
+  try {
+    const transporter = nodemailer.createTransport({
+      host: smtp.host,
+      port: smtp.port,
+      secure: smtp.secure,
+      auth: smtp.auth,
+    })
+    await transporter.sendMail({
+      from: smtp.from,
+      to,
+      subject: `[${tenantName}] Acceso al portal de clientes`,
+      text: `Usá este enlace para ingresar al portal (válido 15 minutos):\n\n${verifyUrl}\n\nSi no solicitaste este acceso, ignorá este mensaje.`,
+    })
+  } catch (err) {
+    logger.warn(
+      { err: err instanceof Error ? { name: err.name, message: err.message } : String(err) },
+      '[channels] portal magic link email failed',
+    )
+  }
+}
+
+/**
+ * @en Sends customer account statement PDF by email; no-op when SMTP is not configured (#232).
+ * @es Envía PDF de estado de cuenta por email; no-op si SMTP no está configurado (#232).
+ * @pt-BR Envia PDF de extrato por email; no-op se SMTP não estiver configurado (#232).
+ */
+export async function sendClienteEstadoCuentaEmail(
+  to: string,
+  rsocial: string,
+  saldo: string,
+  pdf: Buffer,
+): Promise<void> {
+  if (!isSmtpConfigured()) return
+  const smtp = resolveSmtpTransportConfig()
+  if (!smtp) return
+  try {
+    const transporter = nodemailer.createTransport({
+      host: smtp.host,
+      port: smtp.port,
+      secure: smtp.secure,
+      auth: smtp.auth,
+    })
+    await transporter.sendMail({
+      from: smtp.from,
+      to,
+      subject: `Estado de cuenta — ${rsocial}`,
+      text: `Adjuntamos el estado de cuenta de ${rsocial}. Saldo actual: $ ${saldo}.`,
+      attachments: [
+        {
+          filename: 'estado-de-cuenta.pdf',
+          content: pdf,
+          contentType: 'application/pdf',
+        },
+      ],
+    })
+  } catch (err) {
+    logger.warn(
+      { err: err instanceof Error ? { name: err.name, message: err.message } : String(err) },
+      '[channels] cliente estado cuenta email failed',
+    )
+  }
+}
+
 export async function dispatchSupplierNotification(
   prisma: PrismaClient,
   tenantId: number,

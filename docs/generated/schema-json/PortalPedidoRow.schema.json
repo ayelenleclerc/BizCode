@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "createdAt": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "estado": {
+      "type": "string"
+    },
+    "facturaRef": {
+      "nullable": true,
+      "type": "string"
+    },
+    "id": {
+      "type": "integer"
+    },
+    "remitoEstado": {
+      "nullable": true,
+      "type": "string"
+    },
+    "total": {
+      "type": "string"
+    },
+    "validUntil": {
+      "format": "date-time",
+      "nullable": true,
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "estado",
+    "total",
+    "createdAt",
+    "validUntil",
+    "facturaRef",
+    "remitoEstado"
+  ],
+  "title": "PortalPedidoRow",
+  "type": "object"
+}

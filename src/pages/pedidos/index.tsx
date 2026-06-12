@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { pedidosAPI, type PedidoRow } from '@/lib/api'
+import { pedidosAPI, remitosAPI, type PedidoRow } from '@/lib/api'
 import { CanAccess } from '@/components/CanAccess'
+import IfModule from '@/components/IfModule'
 import ErrorBoundary from '@/components/ErrorBoundary'
 import AsyncWrapper from '@/components/shared/AsyncWrapper'
 import KeyboardHint, { useGlobalListShortcuts } from '@/components/shared/KeyboardHint'
@@ -22,6 +23,7 @@ export default function PedidosPage() {
   const [loadError, setLoadError] = useState<Error | null>(null)
   const [filterEstado, setFilterEstado] = useState('')
   const [selectedRow, setSelectedRow] = useState(0)
+  const [remitoLoadingId, setRemitoLoadingId] = useState<number | null>(null)
   const listShortcuts = useGlobalListShortcuts()
 
   const loadPedidos = useCallback(async () => {
@@ -118,7 +120,8 @@ export default function PedidosPage() {
                     <th className="py-2 pr-4">{t('columns.cliente')}</th>
                     <th className="py-2 pr-4">{t('columns.estado')}</th>
                     <th className="py-2 pr-4">{t('columns.total')}</th>
-                    <th className="py-2">{t('columns.fecha')}</th>
+                    <th className="py-2 pr-4">{t('columns.fecha')}</th>
+                    <th className="py-2">{t('columns.actions')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -143,7 +146,33 @@ export default function PedidosPage() {
                       <td className="py-2 pr-4">{p.cliente?.rsocial ?? p.clienteId}</td>
                       <td className="py-2 pr-4">{t(`estado.${p.estado}`)}</td>
                       <td className="py-2 pr-4">{formatMoney(p.total)}</td>
-                      <td className="py-2">{new Date(p.createdAt).toLocaleDateString()}</td>
+                      <td className="py-2 pr-4">{new Date(p.createdAt).toLocaleDateString()}</td>
+                      <td className="py-2">
+                        {p.estado === 'confirmed' && (
+                          <IfModule flag="fiscal.remito">
+                            <CanAccess permission="sales.create">
+                              <button
+                                type="button"
+                                className="px-2 py-1 text-xs rounded bg-teal-600 text-white disabled:opacity-50"
+                                data-testid={`pedido-remito-${p.id}`}
+                                disabled={remitoLoadingId === p.id}
+                                onClick={async (e) => {
+                                  e.stopPropagation()
+                                  setRemitoLoadingId(p.id)
+                                  try {
+                                    await remitosAPI.createFromPedido(p.id)
+                                    await loadPedidos()
+                                  } finally {
+                                    setRemitoLoadingId(null)
+                                  }
+                                }}
+                              >
+                                {remitoLoadingId === p.id ? t('remitoCreating') : t('generateRemito')}
+                              </button>
+                            </CanAccess>
+                          </IfModule>
+                        )}
+                      </td>
                     </tr>
                   ))}
                 </tbody>

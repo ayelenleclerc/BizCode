@@ -7,16 +7,20 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import request from 'supertest'
 import type { PrismaClient } from '@prisma/client'
 import { createApp } from '../../server/createApp'
+import { createMovimientoClienteCCPrismaMock, extendClientePrismaForCc } from '../helpers/movimientoClienteCcPrismaMock'
+import { Decimal } from '@prisma/client/runtime/library'
 
 // ─── Fixture ──────────────────────────────────────────────────────────────────
 
 const FACTURA_ACTIVA = {
   id: 1,
   estado: 'A',
-  total: 10000,
+  total: new Decimal(10000),
   clienteId: 1,
   estadoCae: 'pending',
   tipo: 'B',
+  prefijo: '0001',
+  numero: 1,
 }
 
 const NOTA_CREDITO = {
@@ -24,7 +28,7 @@ const NOTA_CREDITO = {
   tenantId: 1,
   facturaOrigenId: 1,
   motivo: 'Error en el precio',
-  monto: 10000,
+  monto: new Decimal(10000),
   estadoCae: 'not_required',
   createdById: null,
   createdAt: new Date(),
@@ -45,13 +49,14 @@ function buildPrismaMock(overrides: Partial<Record<string, unknown>> = {}): Pris
       create: vi.fn().mockResolvedValue(null),
       update: vi.fn().mockResolvedValue(null),
     },
-    cliente: {
+    cliente: extendClientePrismaForCc({
       findMany: vi.fn().mockResolvedValue([]),
       findFirst: vi.fn().mockResolvedValue({ id: 1, suspended: false }),
       findUnique: vi.fn().mockResolvedValue(null),
       create: vi.fn().mockResolvedValue(null),
       update: vi.fn().mockResolvedValue({ id: 1, rsocial: 'Cliente', balance: 0, creditLimit: null }),
-    },
+    }),
+    movimientoClienteCC: createMovimientoClienteCCPrismaMock(),
     articulo: { findMany: vi.fn().mockResolvedValue([]) },
     rubro: { findMany: vi.fn().mockResolvedValue([]) },
     formaPago: { findMany: vi.fn().mockResolvedValue([]) },
@@ -72,6 +77,9 @@ function buildPrismaMock(overrides: Partial<Record<string, unknown>> = {}): Pris
     },
     notaCredito: {
       create: vi.fn().mockResolvedValue(NOTA_CREDITO),
+    },
+    retencionAplicada: {
+      deleteMany: vi.fn().mockResolvedValue({ count: 0 }),
     },
     auditEvent: { create: vi.fn().mockResolvedValue({ id: 1 }) },
     appUser: {

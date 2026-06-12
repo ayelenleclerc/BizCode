@@ -17,7 +17,7 @@
     "client": "Customer",
     "clientPlaceholder": "Select customer",
     "date": "Date",
-    "amount": "Amount",
+    "amount": "Net amount received",
     "paymentMethod": "Payment method",
     "paymentMethodNone": "Not specified",
     "reference": "Reference",
@@ -30,6 +30,29 @@
       "generic": "Could not record payment",
       "suspended": "Customer is suspended",
       "inactive": "Customer is inactive"
+    },
+    "cheque": {
+      "register": "Register check in portfolio",
+      "numero": "Check number",
+      "banco": "Bank",
+      "vencimiento": "Due date",
+      "modalidad": "Type",
+      "modalidadFisico": "Physical check",
+      "modalidadEcheq": "ECHEQ",
+      "errors": {
+        "required": "Enter check number, bank and due date"
+      }
+    },
+    "retenciones": {
+      "apply": "Customer applied withholdings",
+      "loading": "Calculating suggested withholdings…",
+      "empty": "No withholdings suggested for this collection.",
+      "caption": "Customer withholdings",
+      "colSelect": "Include",
+      "colRegimen": "Regime",
+      "colImporte": "Amount",
+      "bruto": "Gross AR",
+      "neto": "Net received"
     }
   },
   "filters": {

@@ -16,14 +16,16 @@ import {
 import { requireModule } from '../middleware/requireModule'
 import { errorMessage, getTenantId } from './restDomainShared'
 import { FacturaPrintService } from '../services/FacturaPrintService'
+import { mapRemitoPublic } from '../services/RemitoService'
 
 /**
  * @en Invoice create/list and void routes.
  */
 export function registerFacturasRoutes(app: Application, ctx: RestRouteContext): void {
   const { prisma, services, writeAudit } = ctx
-  const { factura } = services
+  const { factura, remito } = services
   const creditNotesModule = requireModule('billing.credit_notes')
+  const remitoModule = requireModule('fiscal.remito')
 
   app.get('/api/facturas', requirePermission('reports.operational.read'), async (req: Request, res: Response) => {
     try {
@@ -58,7 +60,7 @@ export function registerFacturasRoutes(app: Application, ctx: RestRouteContext):
         }
 
         const parsedValue = req.body as FacturaInput
-        const result = await factura.create(tenantId, parsedValue)
+        const result = await factura.create(tenantId, parsedValue, authReq.auth!.claims.userId)
         if (!result.ok) {
           res.status(result.status).json({ success: false, error: result.error })
           return
@@ -177,6 +179,26 @@ export function registerFacturasRoutes(app: Application, ctx: RestRouteContext):
         res.setHeader('Content-Type', 'application/pdf')
         res.setHeader('Content-Disposition', `attachment; filename="${facturaPdfFilename(id, false)}"`)
         res.send(result.data)
+      } catch (err: unknown) {
+        res.status(500).json({ success: false, error: errorMessage(err) })
+      }
+    },
+  )
+
+  app.post(
+    '/api/facturas/:id/remito',
+    remitoModule,
+    requirePermission('sales.create'),
+    async (req: Request, res: Response) => {
+      try {
+        const tenantId = getTenantId(req)
+        const id = parseInt(String(req.params.id), 10)
+        const result = await remito.createFromFactura(tenantId, id)
+        if (!result.ok) {
+          res.status(result.status).json({ success: false, error: result.error })
+          return
+        }
+        res.status(201).json({ success: true, data: mapRemitoPublic(result.data) })
       } catch (err: unknown) {
         res.status(500).json({ success: false, error: errorMessage(err) })
       }

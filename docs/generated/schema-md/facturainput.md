@@ -16,21 +16,22 @@ undefined
 
 # FacturaInput Properties
 
-| Property                    | Type      | Required | Nullable       | Defined by                                                                                 |
-| :-------------------------- | :-------- | :------- | :------------- | :----------------------------------------------------------------------------------------- |
-| [clienteId](#clienteid)     | `integer` | Required | cannot be null | [FacturaInput](facturainput-properties-clienteid.md "undefined#/properties/clienteId")     |
-| [fecha](#fecha)             | `string`  | Required | cannot be null | [FacturaInput](facturainput-properties-fecha.md "undefined#/properties/fecha")             |
-| [formaPagoId](#formapagoid) | `integer` | Optional | cannot be null | [FacturaInput](facturainput-properties-formapagoid.md "undefined#/properties/formaPagoId") |
-| [items](#items)             | `array`   | Required | cannot be null | [FacturaInput](facturainput-properties-items.md "undefined#/properties/items")             |
-| [iva1](#iva1)               | `number`  | Required | cannot be null | [FacturaInput](facturainput-properties-iva1.md "undefined#/properties/iva1")               |
-| [iva2](#iva2)               | `number`  | Required | cannot be null | [FacturaInput](facturainput-properties-iva2.md "undefined#/properties/iva2")               |
-| [neto1](#neto1)             | `number`  | Required | cannot be null | [FacturaInput](facturainput-properties-neto1.md "undefined#/properties/neto1")             |
-| [neto2](#neto2)             | `number`  | Required | cannot be null | [FacturaInput](facturainput-properties-neto2.md "undefined#/properties/neto2")             |
-| [neto3](#neto3)             | `number`  | Required | cannot be null | [FacturaInput](facturainput-properties-neto3.md "undefined#/properties/neto3")             |
-| [numero](#numero)           | `integer` | Required | cannot be null | [FacturaInput](facturainput-properties-numero.md "undefined#/properties/numero")           |
-| [prefijo](#prefijo)         | `string`  | Optional | cannot be null | [FacturaInput](facturainput-properties-prefijo.md "undefined#/properties/prefijo")         |
-| [tipo](#tipo)               | `string`  | Required | cannot be null | [FacturaInput](facturainput-properties-tipo.md "undefined#/properties/tipo")               |
-| [total](#total)             | `number`  | Required | cannot be null | [FacturaInput](facturainput-properties-total.md "undefined#/properties/total")             |
+| Property                      | Type      | Required | Nullable       | Defined by                                                                                   |
+| :---------------------------- | :-------- | :------- | :------------- | :------------------------------------------------------------------------------------------- |
+| [clienteId](#clienteid)       | `integer` | Required | cannot be null | [FacturaInput](facturainput-properties-clienteid.md "undefined#/properties/clienteId")       |
+| [fecha](#fecha)               | `string`  | Required | cannot be null | [FacturaInput](facturainput-properties-fecha.md "undefined#/properties/fecha")               |
+| [formaPagoId](#formapagoid)   | `integer` | Optional | cannot be null | [FacturaInput](facturainput-properties-formapagoid.md "undefined#/properties/formaPagoId")   |
+| [items](#items)               | `array`   | Required | cannot be null | [FacturaInput](facturainput-properties-items.md "undefined#/properties/items")               |
+| [iva1](#iva1)                 | `number`  | Required | cannot be null | [FacturaInput](facturainput-properties-iva1.md "undefined#/properties/iva1")                 |
+| [iva2](#iva2)                 | `number`  | Required | cannot be null | [FacturaInput](facturainput-properties-iva2.md "undefined#/properties/iva2")                 |
+| [neto1](#neto1)               | `number`  | Required | cannot be null | [FacturaInput](facturainput-properties-neto1.md "undefined#/properties/neto1")               |
+| [neto2](#neto2)               | `number`  | Required | cannot be null | [FacturaInput](facturainput-properties-neto2.md "undefined#/properties/neto2")               |
+| [neto3](#neto3)               | `number`  | Required | cannot be null | [FacturaInput](facturainput-properties-neto3.md "undefined#/properties/neto3")               |
+| [numero](#numero)             | `integer` | Required | cannot be null | [FacturaInput](facturainput-properties-numero.md "undefined#/properties/numero")             |
+| [percepciones](#percepciones) | `array`   | Optional | cannot be null | [FacturaInput](facturainput-properties-percepciones.md "undefined#/properties/percepciones") |
+| [prefijo](#prefijo)           | `string`  | Optional | cannot be null | [FacturaInput](facturainput-properties-prefijo.md "undefined#/properties/prefijo")           |
+| [tipo](#tipo)                 | `string`  | Required | cannot be null | [FacturaInput](facturainput-properties-tipo.md "undefined#/properties/tipo")                 |
+| [total](#total)               | `number`  | Required | cannot be null | [FacturaInput](facturainput-properties-total.md "undefined#/properties/total")               |
 
 ## clienteId
 
@@ -216,6 +217,24 @@ undefined
 
 `integer`
 
+## percepciones
+
+
+
+`percepciones`
+
+* is optional
+
+* Type: `object[]` ([ReciboPagoRetencionInput](recibopagoretencioninput.md))
+
+* cannot be null
+
+* defined in: [FacturaInput](facturainput-properties-percepciones.md "undefined#/properties/percepciones")
+
+### percepciones Type
+
+`object[]` ([ReciboPagoRetencionInput](recibopagoretencioninput.md))
+
 ## prefijo
 
 
@@ -263,7 +282,7 @@ undefined
 
 ## total
 
-
+Must equal netos + IVA + sum(percepciones) when percepciones are sent (#229).
 
 `total`
 

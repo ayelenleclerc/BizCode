@@ -12,8 +12,24 @@ On load, the page fetches **`GET /api/reportes/aging`** and shows buckets (label
 
 ## Account statement
 
+### Customer record (`finance.ledger`, #232)
+
+With module **`finance.ledger`** enabled, each customer record includes a **Account statement** tab:
+
+- Current balance, credit limit, and balance trend chart.
+- Paginated movement table (invoice, credit note, collection, withholding, bounced cheque, manual adjustment).
+- AR aging buckets (`0-30`, `31-60`, `61-90`, `90+` days).
+- Audited manual adjustment (`POST /api/clientes/{id}/cuenta-corriente/ajuste`, permission `sales.create`).
+- PDF statement download and email send (`GET` / `POST .../estado-de-cuenta/...`).
+
+Canonical API: `GET /api/clientes/{id}/cuenta-corriente`, `.../saldo`, `.../antiguedad`.
+
+Movements are posted automatically on invoice issue, void via credit note, collection (gross amount; withholdings do not create a separate ledger line), and bounced cheques linked to collections.
+
+### Quick lookup in Finance (compatibility)
+
 1. Enter a **customer id** (positive integer).
-2. Run the action to load the statement (`GET /api/reportes/cuenta-corriente/:clienteId`).
+2. Run the action to load the statement (`GET /api/reportes/cuenta-corriente/:clienteId` — delegates to the ledger and keeps the legacy debit/credit shape).
 3. Review lines with date, type, reference, debit, credit, and running balance.
 
 If the customer does not exist, the API returns 404.
@@ -28,9 +44,19 @@ The same **Finanzas** page includes an overdue invoices section (`GET /api/cobra
 
 Automatic job settings (grace days, IANA time zone, business hours) are under **Settings → Company**. The operational job `npm run cobranzas:recordatorios` iterates all tenants with company parameters and sends at **08:00 tenant local time** within the configured window (see [CI/CD cycle](../quality/ci-cd.md)).
 
+## Mercado Pago credentials (#174)
+
+When the tenant has the **`mercadopago`** integration enabled (superadmin tenant config), configure credentials under **Settings → Company** (*MercadoPago* section):
+
+- **Access Token**, **Public Key**, optional **Webhook Secret** (secrets encrypted at rest; never shown after save).
+- **Sandbox mode** and **Integration active** toggles.
+- **Verify credentials** calls `POST /api/configuracion/mercadopago/test` and shows the Mercado Pago account name.
+
+Requires **`settings.business.manage`**. Invoice payment links and portal online pay are not available until issue #175.
+
 ## API reference
 
-[`docs/api/openapi.yaml`](../../api/openapi.yaml) — paths under `/api/reportes/aging` and `/api/reportes/cuenta-corriente/{clienteId}`.
+[`docs/api/openapi.yaml`](../../api/openapi.yaml) — paths under `/api/reportes/aging`, `/api/reportes/cuenta-corriente/{clienteId}`, and `/api/clientes/{id}/cuenta-corriente/*`.
 
 ## Credit notes (`billing.credit_notes`)
 
@@ -59,6 +85,12 @@ Purchase orders (`OrdenCompra`) do **not** substitute for supplier fiscal vouche
 
 ## Withholdings and perceptions (`finance.retenciones`, #228)
 
-Configure tenant regimes and agent flags under **Settings → Company → Withholdings and perceptions** (`settings.fiscal.manage`). APIs: `GET/POST/PUT /api/fiscal/regimenes`, `GET/PUT /api/fiscal/config-retenciones`, `GET /api/fiscal/retenciones` (applied history), `GET /api/fiscal/retenciones/preview` (returns empty until automatic calculation in #229). Customer/supplier VAT condition uses existing `condIva` on master records; AFIP registry lookup (#192) is not implemented in this release.
+Configure tenant regimes and agent flags under **Settings → Company → Withholdings and perceptions** (`settings.fiscal.manage`). APIs: `GET/POST/PUT /api/fiscal/regimenes`, `GET/PUT /api/fiscal/config-retenciones`, `GET /api/fiscal/retenciones` (applied history), `GET /api/fiscal/retenciones/preview` (`entidadTipo=proveedor` #276; `entidadTipo=cliente` with `contexto=factura` for perceptions on `POST /api/facturas` or `contexto=cobro` for withholdings on `POST /api/cobros` #229); `GET /api/cobros/{id}/retenciones`. **Delivery notes (#230):** module `fiscal.remito`; `GET/POST /api/remitos`, lifecycle endpoints, `GET /api/remitos/{id}/pdf`; create from `POST /api/pedidos/{id}/remito` or `POST /api/facturas/{id}/remito`. Remito is documentary; stock still decrements on invoice. e-Remito AFIP not implemented.
+
+**Checks (#231):** module `fiscal.cheques`; portfolio on **Finance** (`GET /api/cheques`, `GET /api/cheques/resumen`, transition endpoints). Register on collection (`chequeNuevo` on `POST /api/cobros`) or endorse on supplier payment (`chequeId` on `POST /api/proveedores/{id}/pagos` with `cheque`/`echeq`). Due-soon alerts via `POST /api/cheques/alertas/run`; rejection notifies `cheque_rechazado`. No bank reconciliation or automatic ECHEQ status in this release.
+
+**Tax filings SICORE/SIFERE (#242):** on **Finance → Tax filings** (`finance.retenciones`, `reports.financial.read`): select period and format (SICORE national or SIFERE IIBB), preview operations with regime totals and CUIT warnings, download TXT (`POST /api/fiscal/presentaciones` + `GET .../{id}/archivo`), review history, and mark as filed after AFIP/COMARB upload. APIs: `GET /api/fiscal/presentaciones/preview?formato=sicore|sifere&periodo=YYYY-MM`, `POST/GET /api/fiscal/presentaciones`, `PATCH /api/fiscal/presentaciones/{id}/presentado`. Legacy direct export: `GET /api/fiscal/retenciones/export`. Validate generated files against official homologation tools manually.
+
+Customer/supplier VAT condition uses existing `condIva` on master records; AFIP registry lookup (#192) is not implemented in this release.
 
 **Other languages:** [Español](../../es/user/manual-finanzas.md) · [Português](../../pt-br/user/manual-financas.md)

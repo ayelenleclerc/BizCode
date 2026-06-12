@@ -5,14 +5,23 @@ import type { ReciboPagoInput } from '../createApp.types'
 import { facturaFechaToPrismaDate } from '../routes/restDomainShared'
 import type { ServiceResult } from './serviceResults'
 import { ProveedorCuentaCorrienteService } from './ProveedorCuentaCorrienteService'
+import { RetencionConstanciaService } from './RetencionConstanciaService'
+import { validateReciboPagoRetenciones } from './RetencionPagoValidation'
 
 type ReciboPagoWithRelations = Prisma.ReciboPagoGetPayload<{
-  include: {
-    facturas: true
-    proveedor: { select: { id: true; codigo: true; rsocial: true; cuit: true } }
-    usuario: { select: { id: true; username: true } }
-  }
+  include: typeof reciboInclude
 }>
+
+export type ReciboPagoRetencionDto = {
+  id: number
+  regimenId: number
+  regimenNombre: string
+  tipo: string
+  baseImponible: string
+  alicuota: string
+  importe: string
+  constanciaNum: string | null
+}
 
 export type ReciboPagoFacturaDto = {
   id: number
@@ -27,6 +36,7 @@ export type ReciboPagoDto = {
   proveedorId: number
   fecha: string
   total: string
+  totalBruto: string
   metodoPago: string
   cbu: string | null
   referencia: string | null
@@ -36,6 +46,7 @@ export type ReciboPagoDto = {
   proveedor: { id: number; codigo: number; rsocial: string; cuit: string | null }
   usuario: { id: number; username: string }
   facturas: ReciboPagoFacturaDto[]
+  retenciones: ReciboPagoRetencionDto[]
   createdAt: string
 }
 
@@ -68,12 +79,14 @@ function formatComprobanteRef(comprobante: Pick<ComprobanteCompra, 'tipo' | 'pre
 }
 
 function mapRecibo(row: ReciboPagoWithRelations): ReciboPagoDto {
+  const totalBruto = row.facturas.reduce((sum, f) => sum.add(f.monto), new Decimal(0))
   return {
     id: row.id,
     numero: row.numero,
     proveedorId: row.proveedorId,
     fecha: row.fecha.toISOString(),
     total: decimalToMoneyString(row.total),
+    totalBruto: decimalToMoneyString(totalBruto),
     metodoPago: row.metodoPago,
     cbu: row.cbu,
     referencia: row.referencia,
@@ -88,6 +101,16 @@ function mapRecibo(row: ReciboPagoWithRelations): ReciboPagoDto {
       facturaRef: f.facturaRef,
       monto: decimalToMoneyString(f.monto),
     })),
+    retenciones: row.retencionesAplicadas.map((r) => ({
+      id: r.id,
+      regimenId: r.regimenId,
+      regimenNombre: r.regimen.nombre,
+      tipo: r.tipo,
+      baseImponible: decimalToMoneyString(r.baseImponible),
+      alicuota: r.alicuota.toString(),
+      importe: decimalToMoneyString(r.importe),
+      constanciaNum: r.constanciaNum,
+    })),
     createdAt: row.createdAt.toISOString(),
   }
 }
@@ -96,6 +119,10 @@ const reciboInclude = {
   facturas: true,
   proveedor: { select: { id: true, codigo: true, rsocial: true, cuit: true } },
   usuario: { select: { id: true, username: true } },
+  retencionesAplicadas: {
+    include: { regimen: { select: { nombre: true } } },
+    orderBy: { id: 'asc' as const },
+  },
 } as const
 
 /**
@@ -199,9 +226,22 @@ export class ReciboPagoService {
       return { ok: false, status: 400, error: 'At least one invoice allocation is required' }
     }
 
-    const linesTotal = input.facturas.reduce((sum, line) => sum + line.monto, 0)
-    if (Math.abs(linesTotal - input.total) > 0.009) {
-      return { ok: false, status: 400, error: 'total must equal sum of facturas allocations' }
+    const brutoTotal = input.facturas.reduce((sum, line) => sum + line.monto, 0)
+    const retencionValidation = await validateReciboPagoRetenciones(
+      this.prisma,
+      tenantId,
+      input.retenciones,
+    )
+    if (!retencionValidation.ok) {
+      return retencionValidation
+    }
+    const expectedNet = brutoTotal - retencionValidation.retencionesTotal
+    if (Math.abs(expectedNet - input.total) > 0.009) {
+      return {
+        ok: false,
+        status: 400,
+        error: 'total must equal sum of facturas minus sum of retenciones',
+      }
     }
 
     const comprobanteIds = input.facturas
@@ -239,6 +279,21 @@ export class ReciboPagoService {
 
     const fecha = facturaFechaToPrismaDate(input.fecha)
     const totalDec = new Decimal(input.total)
+    const brutoDec = new Decimal(brutoTotal)
+    const validatedRetenciones = retencionValidation.lines
+
+    if (input.chequeId != null) {
+      if (input.metodoPago !== 'cheque' && input.metodoPago !== 'echeq') {
+        return { ok: false, status: 400, error: 'chequeId requires metodoPago cheque or echeq' }
+      }
+      const portfolioCheque = await this.prisma.cheque.findFirst({
+        where: { id: input.chequeId, tenantId, tipo: 'recibido', estado: 'en_cartera' },
+        select: { id: true },
+      })
+      if (!portfolioCheque) {
+        return { ok: false, status: 400, error: 'chequeId is not valid for endoso' }
+      }
+    }
 
     const created = await this.prisma.$transaction(async (tx) => {
       const last = await tx.reciboPago.findFirst({
@@ -256,6 +311,7 @@ export class ReciboPagoService {
           fecha,
           total: totalDec,
           metodoPago: input.metodoPago,
+          chequeId: input.chequeId ?? null,
           cbu: input.cbu ?? null,
           referencia: input.referencia ?? null,
           notas: input.notas ?? null,
@@ -271,12 +327,58 @@ export class ReciboPagoService {
         include: reciboInclude,
       })
 
+      if (input.chequeId != null) {
+        const chequeRow = await tx.cheque.findFirstOrThrow({
+          where: { id: input.chequeId, tenantId },
+          select: { id: true, monto: true },
+        })
+        await tx.chequeMov.create({
+          data: {
+            chequeId: chequeRow.id,
+            tipo: 'endoso',
+            monto: chequeRow.monto,
+            destino: `Proveedor ${proveedorId}`,
+            nota: input.notas?.trim() ?? null,
+            userId: usuarioId,
+          },
+        })
+        await tx.cheque.update({
+          where: { id: chequeRow.id },
+          data: { estado: 'endosado', proveedorId },
+        })
+      }
+
+      if (validatedRetenciones.length > 0) {
+        const constanciaService = new RetencionConstanciaService(tx)
+        for (const line of validatedRetenciones) {
+          const constanciaNum = await constanciaService.nextConstanciaNum(
+            tenantId,
+            line.tipo,
+            line.provincia,
+          )
+          await tx.retencionAplicada.create({
+            data: {
+              tenantId,
+              regimenId: line.regimenId,
+              tipo: line.subtipo,
+              entidadTipo: 'proveedor',
+              entidadId: proveedorId,
+              reciboPagoId: recibo.id,
+              baseImponible: new Decimal(line.baseImponible),
+              alicuota: new Decimal(line.alicuota),
+              importe: new Decimal(line.importe),
+              constanciaNum,
+            },
+          })
+        }
+      }
+
       const ccService = new ProveedorCuentaCorrienteService(tx)
       await ccService.recordMovimiento({
         tenantId,
         proveedorId,
         tipo: 'pago',
-        monto: totalDec.negated(),
+        monto: brutoDec.negated(),
         referencia: `RP-${numero}`,
         fecha,
         usuarioId,
@@ -284,7 +386,11 @@ export class ReciboPagoService {
         reciboPagoId: recibo.id,
       })
 
-      return recibo
+      const withRetenciones = await tx.reciboPago.findFirstOrThrow({
+        where: { id: recibo.id },
+        include: reciboInclude,
+      })
+      return withRetenciones
     })
 
     return { ok: true, data: mapRecibo(created) }
@@ -307,6 +413,11 @@ export class ReciboPagoService {
       return { ok: false, status: 422, error: 'Recibo is already voided' }
     }
 
+    const brutoDec = existing.facturas.reduce(
+      (sum, f) => sum.add(f.monto),
+      new Decimal(0),
+    )
+
     const updated = await this.prisma.$transaction(async (tx) => {
       const recibo = await tx.reciboPago.update({
         where: { id: reciboId },
@@ -319,7 +430,7 @@ export class ReciboPagoService {
         tenantId,
         proveedorId,
         tipo: 'pago',
-        monto: existing.total,
+        monto: brutoDec,
         referencia: `ANUL-RP-${existing.numero}`,
         fecha: new Date(),
         usuarioId,
@@ -330,6 +441,15 @@ export class ReciboPagoService {
     })
 
     return { ok: true, data: mapRecibo(updated) }
+  }
+
+  async listRetencionesByRecibo(
+    tenantId: number,
+    proveedorId: number,
+    reciboId: number,
+  ): Promise<ReciboPagoRetencionDto[] | null> {
+    const recibo = await this.getById(tenantId, proveedorId, reciboId)
+    return recibo?.retenciones ?? null
   }
 
   async getPdfData(

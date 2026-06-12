@@ -26,7 +26,10 @@ const TEST_DEFAULT_MODULES: ModuleKey[] = [
   'billing.arca_cae',
   'finance.ledger',
   'finance.retenciones',
+  'fiscal.remito',
+  'fiscal.cheques',
   'logistics.purchases',
+  'clients.portal',
 ]
 
 /**

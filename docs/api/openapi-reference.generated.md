@@ -4508,6 +4508,2726 @@ Returns plan limits, enabled plan features, and current usage for the authentica
 }
 ```
 
+### PARAMETERS /api/clientes/{id}/cuenta-corriente
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/clientes/{id}/cuenta-corriente`
+
+### Customer accounts-receivable statement
+
+- **Method:** `GET`
+- **Path:** `/api/clientes/{id}/cuenta-corriente`
+- **Tags:** clientes
+
+Ledger movements, current balance, credit-limit alert, and 6-month debt series (#232). Requires finance.ledger module.
+
+#### Responses
+
+##### Status: 200 Statement
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`clienteId` (required)**
+
+    `integer`
+
+  - **`codigo` (required)**
+
+    `integer`
+
+  - **`excedeLimite` (required)**
+
+    `boolean`
+
+  - **`limit` (required)**
+
+    `integer`
+
+  - **`movimientos` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`fecha` (required)**
+
+      `string`, format: `date-time`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`monto` (required)**
+
+      `string`
+
+    - **`saldoPost` (required)**
+
+      `string`
+
+    - **`tipo` (required)**
+
+      `string`, possible values: `"saldo_inicial", "factura", "nota_credito", "cobro", "retencion", "percepcion", "cheque_rechazado", "ajuste"`
+
+    - **`usuarioId` (required)**
+
+      `integer`
+
+    - **`chequeId`**
+
+      `integer`
+
+    - **`cobroId`**
+
+      `integer`
+
+    - **`facturaId`**
+
+      `integer`
+
+    - **`notaCreditoId`**
+
+      `integer`
+
+    - **`notas`**
+
+      `string`
+
+    - **`referencia`**
+
+      `string`
+
+    - **`retencionAplicadaId`**
+
+      `integer`
+
+  - **`offset` (required)**
+
+    `integer`
+
+  - **`rsocial` (required)**
+
+    `string`
+
+  - **`saldo` (required)**
+
+    `string`
+
+  - **`serie` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`period` (required)**
+
+      `string`
+
+    - **`saldo` (required)**
+
+      `string`
+
+  - **`total` (required)**
+
+    `integer`
+
+  - **`creditLimit`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "clienteId": 1,
+    "codigo": 1,
+    "rsocial": "",
+    "saldo": "",
+    "creditLimit": "",
+    "excedeLimite": true,
+    "movimientos": [
+      {
+        "id": 1,
+        "tipo": "saldo_inicial",
+        "referencia": "",
+        "monto": "",
+        "saldoPost": "",
+        "fecha": "",
+        "usuarioId": 1,
+        "notas": "",
+        "facturaId": 1,
+        "cobroId": 1,
+        "notaCreditoId": 1,
+        "chequeId": 1,
+        "retencionAplicadaId": 1
+      }
+    ],
+    "serie": [
+      {
+        "period": "",
+        "saldo": ""
+      }
+    ],
+    "total": 1,
+    "limit": 1,
+    "offset": 1
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/clientes/{id}/cuenta-corriente/saldo
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/clientes/{id}/cuenta-corriente/saldo`
+
+### Customer accounts-receivable balance only
+
+- **Method:** `GET`
+- **Path:** `/api/clientes/{id}/cuenta-corriente/saldo`
+- **Tags:** clientes
+
+#### Responses
+
+##### Status: 200 Balance snapshot
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`clienteId` (required)**
+
+    `integer`
+
+  - **`excedeLimite` (required)**
+
+    `boolean`
+
+  - **`saldo` (required)**
+
+    `string`
+
+  - **`creditLimit`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "clienteId": 1,
+    "saldo": "",
+    "creditLimit": "",
+    "excedeLimite": true
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/clientes/{id}/cuenta-corriente/antiguedad
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/clientes/{id}/cuenta-corriente/antiguedad`
+
+### Customer AR aging buckets
+
+- **Method:** `GET`
+- **Path:** `/api/clientes/{id}/cuenta-corriente/antiguedad`
+- **Tags:** clientes
+
+#### Responses
+
+##### Status: 200 Aging buckets 0-30, 31-60, 61-90, +90 days
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`buckets` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`label` (required)**
+
+      `string`, possible values: `"0-30", "31-60", "61-90", "+90"`
+
+    - **`total` (required)**
+
+      `string`
+
+  - **`clienteId` (required)**
+
+    `integer`
+
+  - **`totalPendiente` (required)**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "clienteId": 1,
+    "buckets": [
+      {
+        "label": "0-30",
+        "total": ""
+      }
+    ],
+    "totalPendiente": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/clientes/{id}/cuenta-corriente/estado-de-cuenta/pdf
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/clientes/{id}/cuenta-corriente/estado-de-cuenta/pdf`
+
+### Download customer account statement PDF
+
+- **Method:** `GET`
+- **Path:** `/api/clientes/{id}/cuenta-corriente/estado-de-cuenta/pdf`
+- **Tags:** clientes
+
+#### Responses
+
+##### Status: 200 PDF document
+
+###### Content-Type: application/pdf
+
+`string`, format: `binary`
+
+**Example:**
+
+```json
+{}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/clientes/{id}/cuenta-corriente/estado-de-cuenta/enviar
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/clientes/{id}/cuenta-corriente/estado-de-cuenta/enviar`
+
+### Email customer account statement PDF
+
+- **Method:** `POST`
+- **Path:** `/api/clientes/{id}/cuenta-corriente/estado-de-cuenta/enviar`
+- **Tags:** clientes
+
+Uses tenant SMTP when configured; returns success without error when SMTP is absent (#232).
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`desde`**
+
+  `string`, format: `date-time`
+
+- **`email`**
+
+  `string`, format: `email`
+
+- **`hasta`**
+
+  `string`, format: `date-time`
+
+**Example:**
+
+```json
+{
+  "email": "",
+  "desde": "",
+  "hasta": ""
+}
+```
+
+#### Responses
+
+##### Status: 200 Send accepted
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`email` (required)**
+
+    `string`
+
+  - **`sent` (required)**
+
+    `boolean`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "sent": true,
+    "email": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/clientes/{id}/cuenta-corriente/ajuste
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/clientes/{id}/cuenta-corriente/ajuste`
+
+### Manual customer ledger adjustment
+
+- **Method:** `POST`
+- **Path:** `/api/clientes/{id}/cuenta-corriente/ajuste`
+- **Tags:** clientes
+
+Requires sales.create; posts audit event cliente\_cc\_ajuste.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`monto` (required)**
+
+  `number`
+
+- **`motivo` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "monto": 1,
+  "motivo": ""
+}
+```
+
+#### Responses
+
+##### Status: 201 Adjustment posted
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`monto` (required)**
+
+    `string`
+
+  - **`saldoPost` (required)**
+
+    `string`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"saldo_inicial", "factura", "nota_credito", "cobro", "retencion", "percepcion", "cheque_rechazado", "ajuste"`
+
+  - **`usuarioId` (required)**
+
+    `integer`
+
+  - **`chequeId`**
+
+    `integer`
+
+  - **`cobroId`**
+
+    `integer`
+
+  - **`facturaId`**
+
+    `integer`
+
+  - **`notaCreditoId`**
+
+    `integer`
+
+  - **`notas`**
+
+    `string`
+
+  - **`referencia`**
+
+    `string`
+
+  - **`retencionAplicadaId`**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tipo": "saldo_inicial",
+    "referencia": "",
+    "monto": "",
+    "saldoPost": "",
+    "fecha": "",
+    "usuarioId": 1,
+    "notas": "",
+    "facturaId": 1,
+    "cobroId": 1,
+    "notaCreditoId": 1,
+    "chequeId": 1,
+    "retencionAplicadaId": 1
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/clientes/{id}/facturas-pendientes
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/clientes/{id}/facturas-pendientes`
+
+### Pending customer invoices for receipt allocation
+
+- **Method:** `GET`
+- **Path:** `/api/clientes/{id}/facturas-pendientes`
+- **Tags:** clientes
+
+Active invoices with remaining balance for imputation (#233). Requires module `finance.receipts`.
+
+#### Responses
+
+##### Status: 200 Pending invoices
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`facturaId` (required)**
+
+    `integer`
+
+  - **`facturaRef` (required)**
+
+    `string`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`pagado` (required)**
+
+    `string`
+
+  - **`pendiente` (required)**
+
+    `string`
+
+  - **`total` (required)**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "facturaId": 1,
+      "facturaRef": "",
+      "fecha": "",
+      "total": "",
+      "pagado": "",
+      "pendiente": ""
+    }
+  ]
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/clientes/{id}/recibos
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/clientes/{id}/recibos`
+
+### Customer payment receipt history
+
+- **Method:** `GET`
+- **Path:** `/api/clientes/{id}/recibos`
+- **Tags:** clientes
+
+Requires module `finance.receipts` and permission `reports.financial.read`.
+
+#### Responses
+
+##### Status: 200 Paginated payment receipts
+
+###### Content-Type: application/json
+
+**All of:**
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`cliente` (required)**
+
+    `object`
+
+    - **`codigo` (required)**
+
+      `integer`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`rsocial` (required)**
+
+      `string`
+
+    - **`cuit`**
+
+      `string`
+
+  - **`clienteId` (required)**
+
+    `integer`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"emitido", "anulado"`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`formas` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`importe` (required)**
+
+      `string`
+
+    - **`tipo` (required)**
+
+      `string`, possible values: `"efectivo", "transferencia", "cheque", "mercadopago", "tarjeta", "otro"`
+
+    - **`banco`**
+
+      `string`
+
+    - **`chequeBanco`**
+
+      `string`
+
+    - **`chequeId`**
+
+      `integer`
+
+    - **`chequeNumero`**
+
+      `string`
+
+    - **`referencia`**
+
+      `string`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`imputaciones` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`facturaId` (required)**
+
+      `integer`
+
+    - **`facturaRef` (required)**
+
+      `string`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`importe` (required)**
+
+      `string`
+
+    - **`saldoPostPago` (required)**
+
+      `string`
+
+    - **`saldoPrevio` (required)**
+
+      `string`
+
+  - **`numero` (required)**
+
+    `integer`
+
+  - **`retenciones` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`alicuota` (required)**
+
+      `string`
+
+    - **`baseImponible` (required)**
+
+      `string`
+
+    - **`constanciaNum` (required)**
+
+      `string`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`importe` (required)**
+
+      `string`
+
+    - **`regimenId` (required)**
+
+      `integer`
+
+    - **`regimenNombre` (required)**
+
+      `string`
+
+    - **`tipo` (required)**
+
+      `string`
+
+  - **`totalBruto` (required)**
+
+    `string`
+
+  - **`totalCobrado` (required)**
+
+    `string`
+
+  - **`usuario` (required)**
+
+    `object`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`username` (required)**
+
+      `string`
+
+  - **`usuarioId` (required)**
+
+    `integer`
+
+  - **`anulacionMotivo`**
+
+    `string`
+
+  - **`concepto`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+* **`limit` (required)**
+
+  `integer` — Effective page size (same semantics as query \`limit\`)
+
+* **`offset` (required)**
+
+  `integer` — Effective skip (same semantics as query \`offset\`)
+
+* **`total` (required)**
+
+  `integer` — Row count matching the list filter (before limit/offset)
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "numero": 1,
+      "clienteId": 1,
+      "fecha": "",
+      "totalCobrado": "",
+      "totalBruto": "",
+      "concepto": "",
+      "estado": "emitido",
+      "anulacionMotivo": "",
+      "usuarioId": 1,
+      "cliente": {
+        "id": 1,
+        "codigo": 1,
+        "rsocial": "",
+        "cuit": ""
+      },
+      "usuario": {
+        "id": 1,
+        "username": ""
+      },
+      "formas": [
+        {
+          "id": 1,
+          "tipo": "efectivo",
+          "importe": "",
+          "chequeId": 1,
+          "referencia": "",
+          "banco": "",
+          "chequeNumero": "",
+          "chequeBanco": ""
+        }
+      ],
+      "imputaciones": [
+        {
+          "id": 1,
+          "facturaId": 1,
+          "facturaRef": "",
+          "importe": "",
+          "saldoPrevio": "",
+          "saldoPostPago": ""
+        }
+      ],
+      "retenciones": [
+        {
+          "id": 1,
+          "regimenId": 1,
+          "regimenNombre": "",
+          "tipo": "",
+          "baseImponible": "",
+          "alicuota": "",
+          "importe": "",
+          "constanciaNum": ""
+        }
+      ],
+      "createdAt": ""
+    }
+  ],
+  "total": 0,
+  "limit": 1,
+  "offset": 0
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Register customer payment receipt
+
+- **Method:** `POST`
+- **Path:** `/api/clientes/{id}/recibos`
+- **Tags:** clientes
+
+Creates `ReciboCobro` with tenant-correlative `numero`, posts `cobro` ledger movement (negative monto = bruto), optional `RetencionAplicada` rows, FIFO or manual imputaciones, and audit event `recibo_cobro_create`. Requires module `finance.receipts` and `sales.create`.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`fecha` (required)**
+
+  `string`
+
+- **`formas` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`importe` (required)**
+
+    `number`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"efectivo", "transferencia", "cheque", "mercadopago", "tarjeta", "otro"`
+
+  - **`banco`**
+
+    `string`
+
+  - **`chequeId`**
+
+    `integer`
+
+  - **`referencia`**
+
+    `string`
+
+- **`totalCobrado` (required)**
+
+  `number`
+
+- **`concepto`**
+
+  `string`
+
+- **`fifo`**
+
+  `boolean`, default: `true`
+
+- **`imputaciones`**
+
+  `array`
+
+  **Items:**
+
+  - **`facturaId` (required)**
+
+    `integer`
+
+  - **`importe` (required)**
+
+    `number`
+
+- **`retenciones`**
+
+  `array`
+
+  **Items:**
+
+  - **`alicuota` (required)**
+
+    `number`
+
+  - **`baseImponible` (required)**
+
+    `number`
+
+  - **`importe` (required)**
+
+    `number`
+
+  - **`regimenId` (required)**
+
+    `integer`
+
+**Example:**
+
+```json
+{
+  "fecha": "",
+  "totalCobrado": 1,
+  "concepto": "",
+  "fifo": true,
+  "formas": [
+    {
+      "tipo": "efectivo",
+      "importe": 1,
+      "chequeId": 1,
+      "referencia": "",
+      "banco": ""
+    }
+  ],
+  "imputaciones": [
+    {
+      "facturaId": 1,
+      "importe": 1
+    }
+  ],
+  "retenciones": [
+    {
+      "regimenId": 1,
+      "baseImponible": 1,
+      "alicuota": 0,
+      "importe": 1
+    }
+  ]
+}
+```
+
+#### Responses
+
+##### Status: 201 Payment receipt created
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`cliente` (required)**
+
+    `object`
+
+    - **`codigo` (required)**
+
+      `integer`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`rsocial` (required)**
+
+      `string`
+
+    - **`cuit`**
+
+      `string`
+
+  - **`clienteId` (required)**
+
+    `integer`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"emitido", "anulado"`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`formas` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`importe` (required)**
+
+      `string`
+
+    - **`tipo` (required)**
+
+      `string`, possible values: `"efectivo", "transferencia", "cheque", "mercadopago", "tarjeta", "otro"`
+
+    - **`banco`**
+
+      `string`
+
+    - **`chequeBanco`**
+
+      `string`
+
+    - **`chequeId`**
+
+      `integer`
+
+    - **`chequeNumero`**
+
+      `string`
+
+    - **`referencia`**
+
+      `string`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`imputaciones` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`facturaId` (required)**
+
+      `integer`
+
+    - **`facturaRef` (required)**
+
+      `string`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`importe` (required)**
+
+      `string`
+
+    - **`saldoPostPago` (required)**
+
+      `string`
+
+    - **`saldoPrevio` (required)**
+
+      `string`
+
+  - **`numero` (required)**
+
+    `integer`
+
+  - **`retenciones` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`alicuota` (required)**
+
+      `string`
+
+    - **`baseImponible` (required)**
+
+      `string`
+
+    - **`constanciaNum` (required)**
+
+      `string`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`importe` (required)**
+
+      `string`
+
+    - **`regimenId` (required)**
+
+      `integer`
+
+    - **`regimenNombre` (required)**
+
+      `string`
+
+    - **`tipo` (required)**
+
+      `string`
+
+  - **`totalBruto` (required)**
+
+    `string`
+
+  - **`totalCobrado` (required)**
+
+    `string`
+
+  - **`usuario` (required)**
+
+    `object`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`username` (required)**
+
+      `string`
+
+  - **`usuarioId` (required)**
+
+    `integer`
+
+  - **`anulacionMotivo`**
+
+    `string`
+
+  - **`concepto`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "numero": 1,
+    "clienteId": 1,
+    "fecha": "",
+    "totalCobrado": "",
+    "totalBruto": "",
+    "concepto": "",
+    "estado": "emitido",
+    "anulacionMotivo": "",
+    "usuarioId": 1,
+    "cliente": {
+      "id": 1,
+      "codigo": 1,
+      "rsocial": "",
+      "cuit": ""
+    },
+    "usuario": {
+      "id": 1,
+      "username": ""
+    },
+    "formas": [
+      {
+        "id": 1,
+        "tipo": "efectivo",
+        "importe": "",
+        "chequeId": 1,
+        "referencia": "",
+        "banco": "",
+        "chequeNumero": "",
+        "chequeBanco": ""
+      }
+    ],
+    "imputaciones": [
+      {
+        "id": 1,
+        "facturaId": 1,
+        "facturaRef": "",
+        "importe": "",
+        "saldoPrevio": "",
+        "saldoPostPago": ""
+      }
+    ],
+    "retenciones": [
+      {
+        "id": 1,
+        "regimenId": 1,
+        "regimenNombre": "",
+        "tipo": "",
+        "baseImponible": "",
+        "alicuota": "",
+        "importe": "",
+        "constanciaNum": ""
+      }
+    ],
+    "createdAt": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/clientes/{id}/recibos/{reciboId}/anular
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/clientes/{id}/recibos/{reciboId}/anular`
+
+### Void customer payment receipt
+
+- **Method:** `POST`
+- **Path:** `/api/clientes/{id}/recibos/{reciboId}/anular`
+- **Tags:** clientes
+
+Sets estado `anulado` and posts compensating ledger movement. Audit `recibo_cobro_void`.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`anulacionMotivo` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "anulacionMotivo": ""
+}
+```
+
+#### Responses
+
+##### Status: 200 Receipt voided
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`cliente` (required)**
+
+    `object`
+
+    - **`codigo` (required)**
+
+      `integer`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`rsocial` (required)**
+
+      `string`
+
+    - **`cuit`**
+
+      `string`
+
+  - **`clienteId` (required)**
+
+    `integer`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"emitido", "anulado"`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`formas` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`importe` (required)**
+
+      `string`
+
+    - **`tipo` (required)**
+
+      `string`, possible values: `"efectivo", "transferencia", "cheque", "mercadopago", "tarjeta", "otro"`
+
+    - **`banco`**
+
+      `string`
+
+    - **`chequeBanco`**
+
+      `string`
+
+    - **`chequeId`**
+
+      `integer`
+
+    - **`chequeNumero`**
+
+      `string`
+
+    - **`referencia`**
+
+      `string`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`imputaciones` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`facturaId` (required)**
+
+      `integer`
+
+    - **`facturaRef` (required)**
+
+      `string`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`importe` (required)**
+
+      `string`
+
+    - **`saldoPostPago` (required)**
+
+      `string`
+
+    - **`saldoPrevio` (required)**
+
+      `string`
+
+  - **`numero` (required)**
+
+    `integer`
+
+  - **`retenciones` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`alicuota` (required)**
+
+      `string`
+
+    - **`baseImponible` (required)**
+
+      `string`
+
+    - **`constanciaNum` (required)**
+
+      `string`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`importe` (required)**
+
+      `string`
+
+    - **`regimenId` (required)**
+
+      `integer`
+
+    - **`regimenNombre` (required)**
+
+      `string`
+
+    - **`tipo` (required)**
+
+      `string`
+
+  - **`totalBruto` (required)**
+
+    `string`
+
+  - **`totalCobrado` (required)**
+
+    `string`
+
+  - **`usuario` (required)**
+
+    `object`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`username` (required)**
+
+      `string`
+
+  - **`usuarioId` (required)**
+
+    `integer`
+
+  - **`anulacionMotivo`**
+
+    `string`
+
+  - **`concepto`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "numero": 1,
+    "clienteId": 1,
+    "fecha": "",
+    "totalCobrado": "",
+    "totalBruto": "",
+    "concepto": "",
+    "estado": "emitido",
+    "anulacionMotivo": "",
+    "usuarioId": 1,
+    "cliente": {
+      "id": 1,
+      "codigo": 1,
+      "rsocial": "",
+      "cuit": ""
+    },
+    "usuario": {
+      "id": 1,
+      "username": ""
+    },
+    "formas": [
+      {
+        "id": 1,
+        "tipo": "efectivo",
+        "importe": "",
+        "chequeId": 1,
+        "referencia": "",
+        "banco": "",
+        "chequeNumero": "",
+        "chequeBanco": ""
+      }
+    ],
+    "imputaciones": [
+      {
+        "id": 1,
+        "facturaId": 1,
+        "facturaRef": "",
+        "importe": "",
+        "saldoPrevio": "",
+        "saldoPostPago": ""
+      }
+    ],
+    "retenciones": [
+      {
+        "id": 1,
+        "regimenId": 1,
+        "regimenNombre": "",
+        "tipo": "",
+        "baseImponible": "",
+        "alicuota": "",
+        "importe": "",
+        "constanciaNum": ""
+      }
+    ],
+    "createdAt": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 422 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/clientes/{id}/recibos/{reciboId}/pdf
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/clientes/{id}/recibos/{reciboId}/pdf`
+
+### Customer payment receipt PDF
+
+- **Method:** `GET`
+- **Path:** `/api/clientes/{id}/recibos/{reciboId}/pdf`
+- **Tags:** clientes
+
+Returns PDF with amount in words (#233). Requires module `finance.receipts`.
+
+#### Responses
+
+##### Status: 200 PDF document
+
+###### Content-Type: application/pdf
+
+`string`, format: `binary`
+
+**Example:**
+
+```json
+{}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ### PARAMETERS /api/articulos
 
 - **Method:** `PARAMETERS`
@@ -11133,7 +13853,49 @@ Requires module `finance.receipts` and permission `suppliers.read`.
 
     `integer`
 
+  - **`retenciones` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`alicuota` (required)**
+
+      `string`
+
+    - **`baseImponible` (required)**
+
+      `string`
+
+    - **`constanciaNum` (required)**
+
+      `string`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`importe` (required)**
+
+      `string`
+
+    - **`regimenId` (required)**
+
+      `integer`
+
+    - **`regimenNombre` (required)**
+
+      `string`
+
+    - **`tipo` (required)**
+
+      `string`
+
   - **`total` (required)**
+
+    `string`
+
+  - **`totalBruto` (required)**
 
     `string`
 
@@ -11193,6 +13955,7 @@ Requires module `finance.receipts` and permission `suppliers.read`.
       "proveedorId": 1,
       "fecha": "",
       "total": "",
+      "totalBruto": "",
       "metodoPago": "transferencia",
       "cbu": "",
       "referencia": "",
@@ -11215,6 +13978,18 @@ Requires module `finance.receipts` and permission `suppliers.read`.
           "comprobanteCompraId": 1,
           "facturaRef": "",
           "monto": ""
+        }
+      ],
+      "retenciones": [
+        {
+          "id": 1,
+          "regimenId": 1,
+          "regimenNombre": "",
+          "tipo": "",
+          "baseImponible": "",
+          "alicuota": "",
+          "importe": "",
+          "constanciaNum": ""
         }
       ],
       "createdAt": ""
@@ -11337,7 +14112,7 @@ Requires module `finance.receipts` and permission `suppliers.read`.
 - **Path:** `/api/proveedores/{id}/pagos`
 - **Tags:** proveedores
 
-Creates `ReciboPago` with tenant-correlative `numero`, posts `pago` ledger movement (negative monto), and audit event `recibo_pago_create`. Requires module `finance.receipts` and `suppliers.manage`.
+Creates `ReciboPago` with tenant-correlative `numero`, posts `pago` ledger movement (negative monto = sum of facturas/bruto), optional `RetencionAplicada` rows (#276), and audit event `recibo_pago_create`. `total` is net cash (sum facturas − sum retenciones). Requires module `finance.receipts` and `suppliers.manage`.
 
 #### Request Body
 
@@ -11377,6 +14152,10 @@ Creates `ReciboPago` with tenant-correlative `numero`, posts `pago` ledger movem
 
   `string`
 
+- **`chequeId`**
+
+  `integer` — Portfolio check to endorse when metodoPago is cheque or echeq (#231).
+
 - **`notas`**
 
   `string`
@@ -11384,6 +14163,28 @@ Creates `ReciboPago` with tenant-correlative `numero`, posts `pago` ledger movem
 - **`referencia`**
 
   `string`
+
+- **`retenciones`**
+
+  `array`
+
+  **Items:**
+
+  - **`alicuota` (required)**
+
+    `number`
+
+  - **`baseImponible` (required)**
+
+    `number`
+
+  - **`importe` (required)**
+
+    `number`
+
+  - **`regimenId` (required)**
+
+    `integer`
 
 **Example:**
 
@@ -11395,11 +14196,20 @@ Creates `ReciboPago` with tenant-correlative `numero`, posts `pago` ledger movem
   "cbu": "",
   "referencia": "",
   "notas": "",
+  "chequeId": 1,
   "facturas": [
     {
       "comprobanteCompraId": 1,
       "facturaRef": "",
       "monto": 1
+    }
+  ],
+  "retenciones": [
+    {
+      "regimenId": 1,
+      "baseImponible": 1,
+      "alicuota": 0,
+      "importe": 1
     }
   ]
 }
@@ -11485,7 +14295,49 @@ Creates `ReciboPago` with tenant-correlative `numero`, posts `pago` ledger movem
 
     `integer`
 
+  - **`retenciones` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`alicuota` (required)**
+
+      `string`
+
+    - **`baseImponible` (required)**
+
+      `string`
+
+    - **`constanciaNum` (required)**
+
+      `string`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`importe` (required)**
+
+      `string`
+
+    - **`regimenId` (required)**
+
+      `integer`
+
+    - **`regimenNombre` (required)**
+
+      `string`
+
+    - **`tipo` (required)**
+
+      `string`
+
   - **`total` (required)**
+
+    `string`
+
+  - **`totalBruto` (required)**
 
     `string`
 
@@ -11532,6 +14384,7 @@ Creates `ReciboPago` with tenant-correlative `numero`, posts `pago` ledger movem
     "proveedorId": 1,
     "fecha": "",
     "total": "",
+    "totalBruto": "",
     "metodoPago": "transferencia",
     "cbu": "",
     "referencia": "",
@@ -11554,6 +14407,18 @@ Creates `ReciboPago` with tenant-correlative `numero`, posts `pago` ledger movem
         "comprobanteCompraId": 1,
         "facturaRef": "",
         "monto": ""
+      }
+    ],
+    "retenciones": [
+      {
+        "id": 1,
+        "regimenId": 1,
+        "regimenNombre": "",
+        "tipo": "",
+        "baseImponible": "",
+        "alicuota": "",
+        "importe": "",
+        "constanciaNum": ""
       }
     ],
     "createdAt": ""
@@ -11759,7 +14624,49 @@ Sets estado `anulado` and posts compensating ledger movement. Audit `recibo_pago
 
     `integer`
 
+  - **`retenciones` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`alicuota` (required)**
+
+      `string`
+
+    - **`baseImponible` (required)**
+
+      `string`
+
+    - **`constanciaNum` (required)**
+
+      `string`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`importe` (required)**
+
+      `string`
+
+    - **`regimenId` (required)**
+
+      `integer`
+
+    - **`regimenNombre` (required)**
+
+      `string`
+
+    - **`tipo` (required)**
+
+      `string`
+
   - **`total` (required)**
+
+    `string`
+
+  - **`totalBruto` (required)**
 
     `string`
 
@@ -11806,6 +14713,7 @@ Sets estado `anulado` and posts compensating ledger movement. Audit `recibo_pago
     "proveedorId": 1,
     "fecha": "",
     "total": "",
+    "totalBruto": "",
     "metodoPago": "transferencia",
     "cbu": "",
     "referencia": "",
@@ -11828,6 +14736,18 @@ Sets estado `anulado` and posts compensating ledger movement. Audit `recibo_pago
         "comprobanteCompraId": 1,
         "facturaRef": "",
         "monto": ""
+      }
+    ],
+    "retenciones": [
+      {
+        "id": 1,
+        "regimenId": 1,
+        "regimenNombre": "",
+        "tipo": "",
+        "baseImponible": "",
+        "alicuota": "",
+        "importe": "",
+        "constanciaNum": ""
       }
     ],
     "createdAt": ""
@@ -12397,6 +15317,192 @@ Requires module finance.ledger and permission suppliers.manage (#275).
 ```
 
 ##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/proveedores/{id}/pagos/{reciboId}/retenciones
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/proveedores/{id}/pagos/{reciboId}/retenciones`
+
+### List withholdings applied to a payment receipt (#276)
+
+- **Method:** `GET`
+- **Path:** `/api/proveedores/{id}/pagos/{reciboId}/retenciones`
+- **Tags:** proveedores
+
+Requires module `finance.receipts` and permission `suppliers.read`.
+
+#### Responses
+
+##### Status: 200 Applied withholdings
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`alicuota` (required)**
+
+    `string`
+
+  - **`baseImponible` (required)**
+
+    `string`
+
+  - **`constanciaNum` (required)**
+
+    `string`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`importe` (required)**
+
+    `string`
+
+  - **`regimenId` (required)**
+
+    `integer`
+
+  - **`regimenNombre` (required)**
+
+    `string`
+
+  - **`tipo` (required)**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "regimenId": 1,
+      "regimenNombre": "",
+      "tipo": "",
+      "baseImponible": "",
+      "alicuota": "",
+      "importe": "",
+      "constanciaNum": ""
+    }
+  ]
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
 
 ###### Content-Type: application/json
 
@@ -16551,11 +19657,33 @@ Requires all items to have `cantFisica`. For each line with non-zero variance, u
 
 - **`total` (required)**
 
-  `number`
+  `number` — Must equal netos + IVA + sum(percepciones) when percepciones are sent (#229).
 
 - **`formaPagoId`**
 
   `integer`
+
+- **`percepciones`**
+
+  `array`
+
+  **Items:**
+
+  - **`alicuota` (required)**
+
+    `number`
+
+  - **`baseImponible` (required)**
+
+    `number`
+
+  - **`importe` (required)**
+
+    `number`
+
+  - **`regimenId` (required)**
+
+    `integer`
 
 - **`prefijo`**
 
@@ -16577,6 +19705,14 @@ Requires all items to have `cantFisica`. For each line with non-zero variance, u
   "iva1": 1,
   "iva2": 1,
   "total": 1,
+  "percepciones": [
+    {
+      "regimenId": 1,
+      "baseImponible": 1,
+      "alicuota": 0,
+      "importe": 1
+    }
+  ],
   "items": [
     {
       "articuloId": 1,
@@ -18546,13 +21682,13 @@ Requires `finance.retenciones`, `reports.financial.read`. Paginated list.
 - **Method:** `PARAMETERS`
 - **Path:** `/api/fiscal/retenciones/preview`
 
-### Preview withholdings stub (#228; calculation in
+### Preview withholdings/perceptions (#228,
 
 - **Method:** `GET`
 - **Path:** `/api/fiscal/retenciones/preview`
 - **Tags:** contabilidad
 
-Requires `finance.retenciones`, `reports.financial.read`. Returns empty list until
+Requires `finance.retenciones`, `reports.financial.read`. `entidadTipo=proveedor` — suggested withholdings on supplier payment (#276). `entidadTipo=cliente` with `contexto=factura` — perceptions on invoice (neto1+neto2+neto3 base). `entidadTipo=cliente` with `contexto=cobro` — customer withholdings on collection (`monto` = bruto).
 
 #### Responses
 
@@ -18661,6 +21797,1098 @@ Requires `finance.retenciones`, `reports.financial.read`. Returns empty list unt
 ```
 
 ##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/fiscal/retenciones/export
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/fiscal/retenciones/export`
+
+### Export applied withholdings TXT (#276)
+
+- **Method:** `GET`
+- **Path:** `/api/fiscal/retenciones/export`
+- **Tags:** contabilidad
+
+Requires `finance.retenciones`, `reports.financial.read`. `format=sicore` for Ganancias/IVA; `format=sifere` for IIBB. Excludes voided payment receipts.
+
+#### Responses
+
+##### Status: 200 TXT export
+
+###### Content-Type: text/plain
+
+`string`
+
+**Example:**
+
+```json
+true
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/fiscal/presentaciones/preview
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/fiscal/presentaciones/preview`
+
+### Preview monthly SICORE/SIFERE presentation (#242)
+
+- **Method:** `GET`
+- **Path:** `/api/fiscal/presentaciones/preview`
+- **Tags:** contabilidad
+
+Requires `finance.retenciones`, `reports.financial.read`. Returns operations for the period with regime totals and CUIT validation warnings.
+
+#### Responses
+
+##### Status: 200 Preview envelope
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`canGenerate` (required)**
+
+    `boolean`
+
+  - **`filas` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`alicuota` (required)**
+
+      `string`
+
+    - **`baseImponible` (required)**
+
+      `string`
+
+    - **`cuit` (required)**
+
+      `string`
+
+    - **`denominacion` (required)**
+
+      `string`
+
+    - **`fecha` (required)**
+
+      `string`, format: `date-time`
+
+    - **`importe` (required)**
+
+      `string`
+
+    - **`incluida` (required)**
+
+      `boolean`
+
+    - **`operacionTipo` (required)**
+
+      `string`, possible values: `"retencion", "percepcion"`
+
+    - **`regimenNombre` (required)**
+
+      `string`
+
+    - **`regimenTipo` (required)**
+
+      `string`
+
+    - **`retencionId` (required)**
+
+      `integer`
+
+    - **`provincia`**
+
+      `string | null`
+
+  - **`formato` (required)**
+
+    `string`, possible values: `"sicore", "sifere"`
+
+  - **`periodo` (required)**
+
+    `string`
+
+  - **`totalesPorRegimen` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`operaciones` (required)**
+
+      `integer`
+
+    - **`regimenNombre` (required)**
+
+      `string`
+
+    - **`totalImporte` (required)**
+
+      `string`
+
+  - **`warnings` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`code` (required)**
+
+      `string`, possible values: `"missing_cuit", "invalid_cuit", "zero_importe_excluded"`
+
+    - **`message` (required)**
+
+      `string`
+
+    - **`retencionId` (required)**
+
+      `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "formato": "sicore",
+    "periodo": "",
+    "filas": [
+      {
+        "retencionId": 1,
+        "fecha": "",
+        "cuit": "",
+        "denominacion": "",
+        "regimenNombre": "",
+        "regimenTipo": "",
+        "operacionTipo": "retencion",
+        "provincia": null,
+        "baseImponible": "",
+        "alicuota": "",
+        "importe": "",
+        "incluida": true
+      }
+    ],
+    "totalesPorRegimen": [
+      {
+        "regimenNombre": "",
+        "operaciones": 0,
+        "totalImporte": ""
+      }
+    ],
+    "warnings": [
+      {
+        "code": "missing_cuit",
+        "retencionId": 1,
+        "message": ""
+      }
+    ],
+    "canGenerate": true
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/fiscal/presentaciones
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/fiscal/presentaciones`
+
+### List generated presentation files (#242)
+
+- **Method:** `GET`
+- **Path:** `/api/fiscal/presentaciones`
+- **Tags:** contabilidad
+
+Requires `finance.retenciones`, `reports.financial.read`.
+
+#### Responses
+
+##### Status: 200 History list
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`formato` (required)**
+
+    `string`, possible values: `"sicore", "sifere"`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`periodo` (required)**
+
+    `string`
+
+  - **`totalImporte` (required)**
+
+    `string`
+
+  - **`totalOperaciones` (required)**
+
+    `integer`
+
+  - **`archivoHash`**
+
+    `string | null`
+
+  - **`presentadoAt`**
+
+    `string | null`, format: `date-time`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "formato": "sicore",
+      "periodo": "",
+      "totalOperaciones": 0,
+      "totalImporte": "",
+      "archivoHash": null,
+      "presentadoAt": null,
+      "createdAt": ""
+    }
+  ]
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Generate and store presentation TXT (#242)
+
+- **Method:** `POST`
+- **Path:** `/api/fiscal/presentaciones`
+- **Tags:** contabilidad
+
+Requires `finance.retenciones`, `reports.financial.read`.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`formato` (required)**
+
+  `string`, possible values: `"sicore", "sifere"`
+
+- **`periodo` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "formato": "sicore",
+  "periodo": ""
+}
+```
+
+#### Responses
+
+##### Status: 201 Created presentation record
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`formato` (required)**
+
+    `string`, possible values: `"sicore", "sifere"`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`periodo` (required)**
+
+    `string`
+
+  - **`totalImporte` (required)**
+
+    `string`
+
+  - **`totalOperaciones` (required)**
+
+    `integer`
+
+  - **`archivoHash`**
+
+    `string | null`
+
+  - **`presentadoAt`**
+
+    `string | null`, format: `date-time`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "formato": "sicore",
+    "periodo": "",
+    "totalOperaciones": 0,
+    "totalImporte": "",
+    "archivoHash": null,
+    "presentadoAt": null,
+    "createdAt": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/fiscal/presentaciones/{id}/archivo
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/fiscal/presentaciones/{id}/archivo`
+
+### Download stored presentation TXT (#242)
+
+- **Method:** `GET`
+- **Path:** `/api/fiscal/presentaciones/{id}/archivo`
+- **Tags:** contabilidad
+
+Requires `finance.retenciones`, `reports.financial.read`.
+
+#### Responses
+
+##### Status: 200 TXT file
+
+###### Content-Type: text/plain
+
+`string`
+
+**Example:**
+
+```json
+true
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/fiscal/presentaciones/{id}/presentado
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/fiscal/presentaciones/{id}/presentado`
+
+### Mark presentation as filed in AFIP (#242)
+
+- **Method:** `PATCH`
+- **Path:** `/api/fiscal/presentaciones/{id}/presentado`
+- **Tags:** contabilidad
+
+Requires `finance.retenciones`, `reports.financial.read`.
+
+#### Responses
+
+##### Status: 200 Updated presentation
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`formato` (required)**
+
+    `string`, possible values: `"sicore", "sifere"`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`periodo` (required)**
+
+    `string`
+
+  - **`totalImporte` (required)**
+
+    `string`
+
+  - **`totalOperaciones` (required)**
+
+    `integer`
+
+  - **`archivoHash`**
+
+    `string | null`
+
+  - **`presentadoAt`**
+
+    `string | null`, format: `date-time`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "formato": "sicore",
+    "periodo": "",
+    "totalOperaciones": 0,
+    "totalImporte": "",
+    "archivoHash": null,
+    "presentadoAt": null,
+    "createdAt": ""
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/fiscal/retenciones/{id}/comprobante/pdf
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/fiscal/retenciones/{id}/comprobante/pdf`
+
+### Download withholding certificate PDF (#276)
+
+- **Method:** `GET`
+- **Path:** `/api/fiscal/retenciones/{id}/comprobante/pdf`
+- **Tags:** contabilidad
+
+Requires `finance.retenciones`, `reports.financial.read`.
+
+#### Responses
+
+##### Status: 200 PDF certificate
+
+###### Content-Type: application/pdf
+
+`string`, format: `binary`
+
+**Example:**
+
+```json
+{}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
 
 ###### Content-Type: application/json
 
@@ -20494,6 +24722,118 @@ Requires `sales.create`. Pedido must be `confirmed`. Creates invoice via Factura
 }
 ```
 
+### PARAMETERS /api/pedidos/{id}/remito
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/pedidos/{id}/remito`
+
+### Create delivery note from confirmed pedido
+
+- **Method:** `POST`
+- **Path:** `/api/pedidos/{id}/remito`
+- **Tags:** pedidos, remitos
+
+#### Responses
+
+##### Status: 201 Draft remito created from pedido
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`estado`**
+
+    `string`, possible values: `"borrador", "emitido", "entregado", "anulado"`
+
+  - **`facturaId`**
+
+    `integer`
+
+  - **`fecha`**
+
+    `string`, format: `date-time`
+
+  - **`fechaEntrega`**
+
+    `string`, format: `date-time`
+
+  - **`firmadoPor`**
+
+    `string`
+
+  - **`id`**
+
+    `integer`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+  - **`numero`**
+
+    `integer`
+
+  - **`observaciones`**
+
+    `string`
+
+  - **`pedidoId`**
+
+    `integer`
+
+  - **`prefijo`**
+
+    `string`
+
+  - **`referencia`**
+
+    `string`
+
+  - **`tipo`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "referencia": "",
+    "prefijo": "",
+    "numero": 1,
+    "tipo": "",
+    "estado": "borrador",
+    "clienteId": 1,
+    "facturaId": 1,
+    "pedidoId": 1,
+    "fecha": "",
+    "fechaEntrega": "",
+    "observaciones": "",
+    "firmadoPor": "",
+    "items": [
+      {
+        "additionalProperty": "anything"
+      }
+    ],
+    "additionalProperty": "anything"
+  }
+}
+```
+
 ### PARAMETERS /api/cobros
 
 - **Method:** `PARAMETERS`
@@ -20703,7 +25043,7 @@ Requires `sales.create`. Pedido must be `confirmed`. Creates invoice via Factura
 - **Path:** `/api/cobros`
 - **Tags:** cobros
 
-Decrements `Cliente.balance` by `monto` in the same transaction. When the customer has at least one active invoice (`estado: A`), adjusts `Cliente.score` from the oldest active invoice due date (`factura.fecha + creditDays`) vs payment date: on-time +5; 1–10 days late −3; 11–30 −7; >30 −15. No score change when there is no active invoice (on-account payment). Audit metadata includes `scoreBefore`, `scoreAfter`, `delta`. Requires `sales.create`.
+Decrements `Cliente.balance` by bruto (`monto` neto + sum of `retenciones[]` when present) in the same transaction (#229). When the customer has at least one active invoice (`estado: A`), adjusts `Cliente.score` from the oldest active invoice due date (`factura.fecha + creditDays`) vs payment date: on-time +5; 1–10 days late −3; 11–30 −7; >30 −15. No score change when there is no active invoice (on-account payment). Audit metadata includes `scoreBefore`, `scoreAfter`, `delta`. Requires `sales.create`.
 
 #### Request Body
 
@@ -20719,7 +25059,75 @@ Decrements `Cliente.balance` by `monto` in the same transaction. When the custom
 
 - **`monto` (required)**
 
-  `number`
+  `number` — Net amount received (#229); CC decremented by bruto when retenciones present.
+
+- **`chequeId`**
+
+  `integer` — Link existing portfolio check (#231).
+
+- **`chequeNuevo`**
+
+  `object` — Create received check when recording collection (#231).
+
+  - **`banco` (required)**
+
+    `string`
+
+  - **`fechaEmision` (required)**
+
+    `string`, format: `date`
+
+  - **`fechaVencimiento` (required)**
+
+    `string`, format: `date`
+
+  - **`libradorNombre` (required)**
+
+    `string`
+
+  - **`modalidad` (required)**
+
+    `string`, possible values: `"fisico", "echeq"`
+
+  - **`monto` (required)**
+
+    `number`
+
+  - **`numero` (required)**
+
+    `string`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"recibido", "emitido"`
+
+  - **`cbuOrigen`**
+
+    `string`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`libradorCuit`**
+
+    `string`
+
+  - **`moneda`**
+
+    `string`
+
+  - **`observaciones`**
+
+    `string`
+
+  - **`proveedorId`**
+
+    `integer`
+
+  - **`sucursal`**
+
+    `string`
 
 - **`formaPagoId`**
 
@@ -20733,6 +25141,28 @@ Decrements `Cliente.balance` by `monto` in the same transaction. When the custom
 
   `string`
 
+- **`retenciones`**
+
+  `array`
+
+  **Items:**
+
+  - **`alicuota` (required)**
+
+    `number`
+
+  - **`baseImponible` (required)**
+
+    `number`
+
+  - **`importe` (required)**
+
+    `number`
+
+  - **`regimenId` (required)**
+
+    `integer`
+
 **Example:**
 
 ```json
@@ -20742,7 +25172,33 @@ Decrements `Cliente.balance` by `monto` in the same transaction. When the custom
   "monto": 1,
   "formaPagoId": 1,
   "referencia": "",
-  "nota": ""
+  "nota": "",
+  "retenciones": [
+    {
+      "regimenId": 1,
+      "baseImponible": 1,
+      "alicuota": 0,
+      "importe": 1
+    }
+  ],
+  "chequeId": 1,
+  "chequeNuevo": {
+    "tipo": "recibido",
+    "modalidad": "fisico",
+    "numero": "",
+    "banco": "",
+    "sucursal": "",
+    "cbuOrigen": "",
+    "libradorNombre": "",
+    "libradorCuit": "",
+    "monto": 1,
+    "moneda": "",
+    "fechaEmision": "",
+    "fechaVencimiento": "",
+    "clienteId": 1,
+    "proveedorId": 1,
+    "observaciones": ""
+  }
 }
 ```
 
@@ -20808,6 +25264,48 @@ Decrements `Cliente.balance` by `monto` in the same transaction. When the custom
 
       `integer`
 
+  - **`montoBruto` (required)**
+
+    `string` — Bruto applied to customer balance (neto + retenciones).
+
+  - **`retenciones` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`alicuota` (required)**
+
+      `string`
+
+    - **`baseImponible` (required)**
+
+      `string`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`importe` (required)**
+
+      `string`
+
+    - **`regimenId` (required)**
+
+      `integer`
+
+    - **`regimenNombre` (required)**
+
+      `string`
+
+    - **`tipo` (required)**
+
+      `string`
+
+    - **`constanciaNum`**
+
+      `string`
+
   - **`updatedCliente` (required)**
 
     `object`
@@ -20866,7 +25364,20 @@ Decrements `Cliente.balance` by `monto` in the same transaction. When the custom
       "creditLimit": 1,
       "score": 0,
       "additionalProperty": "anything"
-    }
+    },
+    "retenciones": [
+      {
+        "id": 1,
+        "regimenId": 1,
+        "regimenNombre": "",
+        "tipo": "",
+        "baseImponible": "",
+        "alicuota": "",
+        "importe": "",
+        "constanciaNum": ""
+      }
+    ],
+    "montoBruto": ""
   }
 }
 ```
@@ -21138,6 +25649,192 @@ Decrements `Cliente.balance` by `monto` in the same transaction. When the custom
 ```
 
 ##### Status: 404 Payment not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/cobros/{id}/retenciones
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/cobros/{id}/retenciones`
+
+### List withholdings applied on a customer payment (#229)
+
+- **Method:** `GET`
+- **Path:** `/api/cobros/{id}/retenciones`
+- **Tags:** cobros
+
+Requires `finance.retenciones`, `reports.financial.read`.
+
+#### Responses
+
+##### Status: 200 Withholding lines linked to the cobro
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`alicuota` (required)**
+
+    `string`
+
+  - **`baseImponible` (required)**
+
+    `string`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`importe` (required)**
+
+    `string`
+
+  - **`regimenId` (required)**
+
+    `integer`
+
+  - **`regimenNombre` (required)**
+
+    `string`
+
+  - **`tipo` (required)**
+
+    `string`
+
+  - **`constanciaNum`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "regimenId": 1,
+      "regimenNombre": "",
+      "tipo": "",
+      "baseImponible": "",
+      "alicuota": "",
+      "importe": "",
+      "constanciaNum": ""
+    }
+  ]
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Cobro not found
 
 ###### Content-Type: application/json
 
@@ -22832,6 +27529,3349 @@ Sets `estado` to `N` (anulada), reverses the customer balance by the invoice tot
 {
   "success": false,
   "error": ""
+}
+```
+
+### PARAMETERS /api/facturas/{id}/remito
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/facturas/{id}/remito`
+
+### Create delivery note from invoice
+
+- **Method:** `POST`
+- **Path:** `/api/facturas/{id}/remito`
+- **Tags:** facturas, remitos
+
+Creates a draft `remito_x` copying active invoice lines. Requires module `fiscal.remito` and `sales.create`. Stock is not decremented on the remito (stock remains on invoice creation).
+
+#### Responses
+
+##### Status: 201 Draft remito created
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`estado`**
+
+    `string`, possible values: `"borrador", "emitido", "entregado", "anulado"`
+
+  - **`facturaId`**
+
+    `integer`
+
+  - **`fecha`**
+
+    `string`, format: `date-time`
+
+  - **`fechaEntrega`**
+
+    `string`, format: `date-time`
+
+  - **`firmadoPor`**
+
+    `string`
+
+  - **`id`**
+
+    `integer`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+  - **`numero`**
+
+    `integer`
+
+  - **`observaciones`**
+
+    `string`
+
+  - **`pedidoId`**
+
+    `integer`
+
+  - **`prefijo`**
+
+    `string`
+
+  - **`referencia`**
+
+    `string`
+
+  - **`tipo`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "referencia": "",
+    "prefijo": "",
+    "numero": 1,
+    "tipo": "",
+    "estado": "borrador",
+    "clienteId": 1,
+    "facturaId": 1,
+    "pedidoId": 1,
+    "fecha": "",
+    "fechaEntrega": "",
+    "observaciones": "",
+    "firmadoPor": "",
+    "items": [
+      {
+        "additionalProperty": "anything"
+      }
+    ],
+    "additionalProperty": "anything"
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 409 Invoice already linked to a non-voided remito
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/remitos
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/remitos`
+
+### List delivery notes
+
+- **Method:** `GET`
+- **Path:** `/api/remitos`
+- **Tags:** remitos
+
+Paginated list. Requires module `fiscal.remito`.
+
+#### Responses
+
+##### Status: 200 Paginated remitos
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`estado`**
+
+    `string`, possible values: `"borrador", "emitido", "entregado", "anulado"`
+
+  - **`facturaId`**
+
+    `integer`
+
+  - **`fecha`**
+
+    `string`, format: `date-time`
+
+  - **`fechaEntrega`**
+
+    `string`, format: `date-time`
+
+  - **`firmadoPor`**
+
+    `string`
+
+  - **`id`**
+
+    `integer`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+  - **`numero`**
+
+    `integer`
+
+  - **`observaciones`**
+
+    `string`
+
+  - **`pedidoId`**
+
+    `integer`
+
+  - **`prefijo`**
+
+    `string`
+
+  - **`referencia`**
+
+    `string`
+
+  - **`tipo`**
+
+    `string`
+
+- **`limit` (required)**
+
+  `integer`
+
+- **`offset` (required)**
+
+  `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`total` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "referencia": "",
+      "prefijo": "",
+      "numero": 1,
+      "tipo": "",
+      "estado": "borrador",
+      "clienteId": 1,
+      "facturaId": 1,
+      "pedidoId": 1,
+      "fecha": "",
+      "fechaEntrega": "",
+      "observaciones": "",
+      "firmadoPor": "",
+      "items": [
+        {
+          "additionalProperty": "anything"
+        }
+      ],
+      "additionalProperty": "anything"
+    }
+  ],
+  "total": 1,
+  "limit": 1,
+  "offset": 1
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Create delivery note (draft)
+
+- **Method:** `POST`
+- **Path:** `/api/remitos`
+- **Tags:** remitos
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`items` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`cantidad` (required)**
+
+    `integer`
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`unidad` (required)**
+
+    `string`
+
+- **`tipo` (required)**
+
+  `string`, possible values: `"remito_x", "remito_ingreso"`
+
+- **`clienteId`**
+
+  `integer`
+
+- **`facturaId`**
+
+  `integer`
+
+- **`fecha`**
+
+  `string`, format: `date`
+
+- **`observaciones`**
+
+  `string`
+
+- **`ordenEntregaId`**
+
+  `integer`
+
+- **`pedidoId`**
+
+  `integer`
+
+- **`proveedorId`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "tipo": "remito_x",
+  "clienteId": 1,
+  "proveedorId": 1,
+  "facturaId": 1,
+  "pedidoId": 1,
+  "ordenEntregaId": 1,
+  "fecha": "",
+  "observaciones": "",
+  "items": [
+    {
+      "articuloId": 1,
+      "descripcion": "",
+      "cantidad": 1,
+      "unidad": ""
+    }
+  ]
+}
+```
+
+#### Responses
+
+##### Status: 201 Draft created
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`estado`**
+
+    `string`, possible values: `"borrador", "emitido", "entregado", "anulado"`
+
+  - **`facturaId`**
+
+    `integer`
+
+  - **`fecha`**
+
+    `string`, format: `date-time`
+
+  - **`fechaEntrega`**
+
+    `string`, format: `date-time`
+
+  - **`firmadoPor`**
+
+    `string`
+
+  - **`id`**
+
+    `integer`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+  - **`numero`**
+
+    `integer`
+
+  - **`observaciones`**
+
+    `string`
+
+  - **`pedidoId`**
+
+    `integer`
+
+  - **`prefijo`**
+
+    `string`
+
+  - **`referencia`**
+
+    `string`
+
+  - **`tipo`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "referencia": "",
+    "prefijo": "",
+    "numero": 1,
+    "tipo": "",
+    "estado": "borrador",
+    "clienteId": 1,
+    "facturaId": 1,
+    "pedidoId": 1,
+    "fecha": "",
+    "fechaEntrega": "",
+    "observaciones": "",
+    "firmadoPor": "",
+    "items": [
+      {
+        "additionalProperty": "anything"
+      }
+    ],
+    "additionalProperty": "anything"
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/remitos/{id}
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/remitos/{id}`
+
+### Get delivery note
+
+- **Method:** `GET`
+- **Path:** `/api/remitos/{id}`
+- **Tags:** remitos
+
+#### Responses
+
+##### Status: 200 Delivery note detail
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`estado`**
+
+    `string`, possible values: `"borrador", "emitido", "entregado", "anulado"`
+
+  - **`facturaId`**
+
+    `integer`
+
+  - **`fecha`**
+
+    `string`, format: `date-time`
+
+  - **`fechaEntrega`**
+
+    `string`, format: `date-time`
+
+  - **`firmadoPor`**
+
+    `string`
+
+  - **`id`**
+
+    `integer`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+  - **`numero`**
+
+    `integer`
+
+  - **`observaciones`**
+
+    `string`
+
+  - **`pedidoId`**
+
+    `integer`
+
+  - **`prefijo`**
+
+    `string`
+
+  - **`referencia`**
+
+    `string`
+
+  - **`tipo`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "referencia": "",
+    "prefijo": "",
+    "numero": 1,
+    "tipo": "",
+    "estado": "borrador",
+    "clienteId": 1,
+    "facturaId": 1,
+    "pedidoId": 1,
+    "fecha": "",
+    "fechaEntrega": "",
+    "observaciones": "",
+    "firmadoPor": "",
+    "items": [
+      {
+        "additionalProperty": "anything"
+      }
+    ],
+    "additionalProperty": "anything"
+  }
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Update draft delivery note
+
+- **Method:** `PUT`
+- **Path:** `/api/remitos/{id}`
+- **Tags:** remitos
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`clienteId`**
+
+  `integer`
+
+- **`items`**
+
+  `array`
+
+  **Items:**
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`cantidad` (required)**
+
+    `integer`
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`unidad` (required)**
+
+    `string`
+
+- **`observaciones`**
+
+  `string`
+
+- **`proveedorId`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "clienteId": 1,
+  "proveedorId": 1,
+  "observaciones": "",
+  "items": [
+    {
+      "articuloId": 1,
+      "descripcion": "",
+      "cantidad": 1,
+      "unidad": ""
+    }
+  ]
+}
+```
+
+#### Responses
+
+##### Status: 200 Updated draft delivery note
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`estado`**
+
+    `string`, possible values: `"borrador", "emitido", "entregado", "anulado"`
+
+  - **`facturaId`**
+
+    `integer`
+
+  - **`fecha`**
+
+    `string`, format: `date-time`
+
+  - **`fechaEntrega`**
+
+    `string`, format: `date-time`
+
+  - **`firmadoPor`**
+
+    `string`
+
+  - **`id`**
+
+    `integer`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+  - **`numero`**
+
+    `integer`
+
+  - **`observaciones`**
+
+    `string`
+
+  - **`pedidoId`**
+
+    `integer`
+
+  - **`prefijo`**
+
+    `string`
+
+  - **`referencia`**
+
+    `string`
+
+  - **`tipo`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "referencia": "",
+    "prefijo": "",
+    "numero": 1,
+    "tipo": "",
+    "estado": "borrador",
+    "clienteId": 1,
+    "facturaId": 1,
+    "pedidoId": 1,
+    "fecha": "",
+    "fechaEntrega": "",
+    "observaciones": "",
+    "firmadoPor": "",
+    "items": [
+      {
+        "additionalProperty": "anything"
+      }
+    ],
+    "additionalProperty": "anything"
+  }
+}
+```
+
+##### Status: 409 Only borrador can be updated
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/remitos/{id}/emitir
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/remitos/{id}/emitir`
+
+### Issue delivery note (assign correlativo)
+
+- **Method:** `POST`
+- **Path:** `/api/remitos/{id}/emitir`
+- **Tags:** remitos
+
+#### Responses
+
+##### Status: 200 Issued delivery note
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`estado`**
+
+    `string`, possible values: `"borrador", "emitido", "entregado", "anulado"`
+
+  - **`facturaId`**
+
+    `integer`
+
+  - **`fecha`**
+
+    `string`, format: `date-time`
+
+  - **`fechaEntrega`**
+
+    `string`, format: `date-time`
+
+  - **`firmadoPor`**
+
+    `string`
+
+  - **`id`**
+
+    `integer`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+  - **`numero`**
+
+    `integer`
+
+  - **`observaciones`**
+
+    `string`
+
+  - **`pedidoId`**
+
+    `integer`
+
+  - **`prefijo`**
+
+    `string`
+
+  - **`referencia`**
+
+    `string`
+
+  - **`tipo`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "referencia": "",
+    "prefijo": "",
+    "numero": 1,
+    "tipo": "",
+    "estado": "borrador",
+    "clienteId": 1,
+    "facturaId": 1,
+    "pedidoId": 1,
+    "fecha": "",
+    "fechaEntrega": "",
+    "observaciones": "",
+    "firmadoPor": "",
+    "items": [
+      {
+        "additionalProperty": "anything"
+      }
+    ],
+    "additionalProperty": "anything"
+  }
+}
+```
+
+### PARAMETERS /api/remitos/{id}/entregar
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/remitos/{id}/entregar`
+
+### Mark delivery note as delivered
+
+- **Method:** `POST`
+- **Path:** `/api/remitos/{id}/entregar`
+- **Tags:** remitos
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`firmadoPor` (required)**
+
+  `string`
+
+- **`fechaEntrega`**
+
+  `string`, format: `date`
+
+**Example:**
+
+```json
+{
+  "firmadoPor": "",
+  "fechaEntrega": ""
+}
+```
+
+#### Responses
+
+##### Status: 200 Delivered delivery note
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`estado`**
+
+    `string`, possible values: `"borrador", "emitido", "entregado", "anulado"`
+
+  - **`facturaId`**
+
+    `integer`
+
+  - **`fecha`**
+
+    `string`, format: `date-time`
+
+  - **`fechaEntrega`**
+
+    `string`, format: `date-time`
+
+  - **`firmadoPor`**
+
+    `string`
+
+  - **`id`**
+
+    `integer`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+  - **`numero`**
+
+    `integer`
+
+  - **`observaciones`**
+
+    `string`
+
+  - **`pedidoId`**
+
+    `integer`
+
+  - **`prefijo`**
+
+    `string`
+
+  - **`referencia`**
+
+    `string`
+
+  - **`tipo`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "referencia": "",
+    "prefijo": "",
+    "numero": 1,
+    "tipo": "",
+    "estado": "borrador",
+    "clienteId": 1,
+    "facturaId": 1,
+    "pedidoId": 1,
+    "fecha": "",
+    "fechaEntrega": "",
+    "observaciones": "",
+    "firmadoPor": "",
+    "items": [
+      {
+        "additionalProperty": "anything"
+      }
+    ],
+    "additionalProperty": "anything"
+  }
+}
+```
+
+### PARAMETERS /api/remitos/{id}/anular
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/remitos/{id}/anular`
+
+### Void issued delivery note
+
+- **Method:** `POST`
+- **Path:** `/api/remitos/{id}/anular`
+- **Tags:** remitos
+
+#### Responses
+
+##### Status: 200 Voided delivery note
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`estado`**
+
+    `string`, possible values: `"borrador", "emitido", "entregado", "anulado"`
+
+  - **`facturaId`**
+
+    `integer`
+
+  - **`fecha`**
+
+    `string`, format: `date-time`
+
+  - **`fechaEntrega`**
+
+    `string`, format: `date-time`
+
+  - **`firmadoPor`**
+
+    `string`
+
+  - **`id`**
+
+    `integer`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+  - **`numero`**
+
+    `integer`
+
+  - **`observaciones`**
+
+    `string`
+
+  - **`pedidoId`**
+
+    `integer`
+
+  - **`prefijo`**
+
+    `string`
+
+  - **`referencia`**
+
+    `string`
+
+  - **`tipo`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "referencia": "",
+    "prefijo": "",
+    "numero": 1,
+    "tipo": "",
+    "estado": "borrador",
+    "clienteId": 1,
+    "facturaId": 1,
+    "pedidoId": 1,
+    "fecha": "",
+    "fechaEntrega": "",
+    "observaciones": "",
+    "firmadoPor": "",
+    "items": [
+      {
+        "additionalProperty": "anything"
+      }
+    ],
+    "additionalProperty": "anything"
+  }
+}
+```
+
+### PARAMETERS /api/remitos/{id}/pdf
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/remitos/{id}/pdf`
+
+### Download delivery note PDF
+
+- **Method:** `GET`
+- **Path:** `/api/remitos/{id}/pdf`
+- **Tags:** remitos
+
+#### Responses
+
+##### Status: 200 application/pdf
+
+###### Content-Type: application/pdf
+
+`string`, format: `binary`
+
+**Example:**
+
+```json
+{}
+```
+
+### PARAMETERS /api/cheques/resumen
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/cheques/resumen`
+
+### Check portfolio summary
+
+- **Method:** `GET`
+- **Path:** `/api/cheques/resumen`
+- **Tags:** cheques
+
+Aggregates for in-portfolio, due within 7 days and rejected checks. Requires module `fiscal.cheques`.
+
+#### Responses
+
+##### Status: 200 Portfolio summary totals
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`enCartera` (required)**
+
+    `object`
+
+    - **`count`**
+
+      `integer`
+
+    - **`total`**
+
+      `string`
+
+  - **`proximosVencer` (required)**
+
+    `object`
+
+    - **`count`**
+
+      `integer`
+
+    - **`total`**
+
+      `string`
+
+  - **`rechazados` (required)**
+
+    `object`
+
+    - **`count`**
+
+      `integer`
+
+    - **`total`**
+
+      `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "enCartera": {
+      "count": 1,
+      "total": ""
+    },
+    "proximosVencer": {
+      "count": 1,
+      "total": ""
+    },
+    "rechazados": {
+      "count": 1,
+      "total": ""
+    }
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/cheques
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/cheques`
+
+### List checks
+
+- **Method:** `GET`
+- **Path:** `/api/cheques`
+- **Tags:** cheques
+
+Paginated portfolio list. Requires module `fiscal.cheques`.
+
+#### Responses
+
+##### Status: 200 Paginated checks
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`banco` (required)**
+
+    `string`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"en_cartera", "emitido", "depositado", "endosado", "descontado", "cobrado", "rechazado", "anulado"`
+
+  - **`fechaEmision` (required)**
+
+    `string`, format: `date-time`
+
+  - **`fechaVencimiento` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`libradorNombre` (required)**
+
+    `string`
+
+  - **`modalidad` (required)**
+
+    `string`, possible values: `"fisico", "echeq"`
+
+  - **`moneda` (required)**
+
+    `string`
+
+  - **`monto` (required)**
+
+    `string`
+
+  - **`numero` (required)**
+
+    `string`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"recibido", "emitido"`
+
+  - **`cbuOrigen`**
+
+    `string`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`libradorCuit`**
+
+    `string`
+
+  - **`observaciones`**
+
+    `string`
+
+  - **`proveedorId`**
+
+    `integer`
+
+  - **`sucursal`**
+
+    `string`
+
+- **`limit` (required)**
+
+  `integer`
+
+- **`offset` (required)**
+
+  `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`total` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "tipo": "recibido",
+      "modalidad": "fisico",
+      "numero": "",
+      "banco": "",
+      "sucursal": "",
+      "cbuOrigen": "",
+      "libradorNombre": "",
+      "libradorCuit": "",
+      "monto": "",
+      "moneda": "",
+      "fechaEmision": "",
+      "fechaVencimiento": "",
+      "estado": "en_cartera",
+      "clienteId": 1,
+      "proveedorId": 1,
+      "observaciones": ""
+    }
+  ],
+  "total": 1,
+  "limit": 1,
+  "offset": 1
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Register check in portfolio
+
+- **Method:** `POST`
+- **Path:** `/api/cheques`
+- **Tags:** cheques
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`banco` (required)**
+
+  `string`
+
+- **`fechaEmision` (required)**
+
+  `string`, format: `date`
+
+- **`fechaVencimiento` (required)**
+
+  `string`, format: `date`
+
+- **`libradorNombre` (required)**
+
+  `string`
+
+- **`modalidad` (required)**
+
+  `string`, possible values: `"fisico", "echeq"`
+
+- **`monto` (required)**
+
+  `number`
+
+- **`numero` (required)**
+
+  `string`
+
+- **`tipo` (required)**
+
+  `string`, possible values: `"recibido", "emitido"`
+
+- **`cbuOrigen`**
+
+  `string`
+
+- **`clienteId`**
+
+  `integer`
+
+- **`libradorCuit`**
+
+  `string`
+
+- **`moneda`**
+
+  `string`
+
+- **`observaciones`**
+
+  `string`
+
+- **`proveedorId`**
+
+  `integer`
+
+- **`sucursal`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "tipo": "recibido",
+  "modalidad": "fisico",
+  "numero": "",
+  "banco": "",
+  "sucursal": "",
+  "cbuOrigen": "",
+  "libradorNombre": "",
+  "libradorCuit": "",
+  "monto": 1,
+  "moneda": "",
+  "fechaEmision": "",
+  "fechaVencimiento": "",
+  "clienteId": 1,
+  "proveedorId": 1,
+  "observaciones": ""
+}
+```
+
+#### Responses
+
+##### Status: 201 Check created
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`banco` (required)**
+
+    `string`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"en_cartera", "emitido", "depositado", "endosado", "descontado", "cobrado", "rechazado", "anulado"`
+
+  - **`fechaEmision` (required)**
+
+    `string`, format: `date-time`
+
+  - **`fechaVencimiento` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`libradorNombre` (required)**
+
+    `string`
+
+  - **`modalidad` (required)**
+
+    `string`, possible values: `"fisico", "echeq"`
+
+  - **`moneda` (required)**
+
+    `string`
+
+  - **`monto` (required)**
+
+    `string`
+
+  - **`numero` (required)**
+
+    `string`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"recibido", "emitido"`
+
+  - **`cbuOrigen`**
+
+    `string`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`libradorCuit`**
+
+    `string`
+
+  - **`observaciones`**
+
+    `string`
+
+  - **`proveedorId`**
+
+    `integer`
+
+  - **`sucursal`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tipo": "recibido",
+    "modalidad": "fisico",
+    "numero": "",
+    "banco": "",
+    "sucursal": "",
+    "cbuOrigen": "",
+    "libradorNombre": "",
+    "libradorCuit": "",
+    "monto": "",
+    "moneda": "",
+    "fechaEmision": "",
+    "fechaVencimiento": "",
+    "estado": "en_cartera",
+    "clienteId": 1,
+    "proveedorId": 1,
+    "observaciones": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 409 Duplicate bank/number
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/cheques/{id}
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/cheques/{id}`
+
+### Get check
+
+- **Method:** `GET`
+- **Path:** `/api/cheques/{id}`
+- **Tags:** cheques
+
+#### Responses
+
+##### Status: 200 Check detail
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`banco` (required)**
+
+    `string`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"en_cartera", "emitido", "depositado", "endosado", "descontado", "cobrado", "rechazado", "anulado"`
+
+  - **`fechaEmision` (required)**
+
+    `string`, format: `date-time`
+
+  - **`fechaVencimiento` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`libradorNombre` (required)**
+
+    `string`
+
+  - **`modalidad` (required)**
+
+    `string`, possible values: `"fisico", "echeq"`
+
+  - **`moneda` (required)**
+
+    `string`
+
+  - **`monto` (required)**
+
+    `string`
+
+  - **`numero` (required)**
+
+    `string`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"recibido", "emitido"`
+
+  - **`cbuOrigen`**
+
+    `string`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`libradorCuit`**
+
+    `string`
+
+  - **`observaciones`**
+
+    `string`
+
+  - **`proveedorId`**
+
+    `integer`
+
+  - **`sucursal`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tipo": "recibido",
+    "modalidad": "fisico",
+    "numero": "",
+    "banco": "",
+    "sucursal": "",
+    "cbuOrigen": "",
+    "libradorNombre": "",
+    "libradorCuit": "",
+    "monto": "",
+    "moneda": "",
+    "fechaEmision": "",
+    "fechaVencimiento": "",
+    "estado": "en_cartera",
+    "clienteId": 1,
+    "proveedorId": 1,
+    "observaciones": ""
+  }
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Update check (en\_cartera only)
+
+- **Method:** `PUT`
+- **Path:** `/api/cheques/{id}`
+- **Tags:** cheques
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`banco`**
+
+  `string`
+
+- **`cbuOrigen`**
+
+  `string`
+
+- **`fechaVencimiento`**
+
+  `string`, format: `date`
+
+- **`libradorCuit`**
+
+  `string`
+
+- **`libradorNombre`**
+
+  `string`
+
+- **`observaciones`**
+
+  `string`
+
+- **`sucursal`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "banco": "",
+  "sucursal": "",
+  "cbuOrigen": "",
+  "libradorNombre": "",
+  "libradorCuit": "",
+  "fechaVencimiento": "",
+  "observaciones": ""
+}
+```
+
+#### Responses
+
+##### Status: 200 Updated check
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`banco` (required)**
+
+    `string`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"en_cartera", "emitido", "depositado", "endosado", "descontado", "cobrado", "rechazado", "anulado"`
+
+  - **`fechaEmision` (required)**
+
+    `string`, format: `date-time`
+
+  - **`fechaVencimiento` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`libradorNombre` (required)**
+
+    `string`
+
+  - **`modalidad` (required)**
+
+    `string`, possible values: `"fisico", "echeq"`
+
+  - **`moneda` (required)**
+
+    `string`
+
+  - **`monto` (required)**
+
+    `string`
+
+  - **`numero` (required)**
+
+    `string`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"recibido", "emitido"`
+
+  - **`cbuOrigen`**
+
+    `string`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`libradorCuit`**
+
+    `string`
+
+  - **`observaciones`**
+
+    `string`
+
+  - **`proveedorId`**
+
+    `integer`
+
+  - **`sucursal`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tipo": "recibido",
+    "modalidad": "fisico",
+    "numero": "",
+    "banco": "",
+    "sucursal": "",
+    "cbuOrigen": "",
+    "libradorNombre": "",
+    "libradorCuit": "",
+    "monto": "",
+    "moneda": "",
+    "fechaEmision": "",
+    "fechaVencimiento": "",
+    "estado": "en_cartera",
+    "clienteId": 1,
+    "proveedorId": 1,
+    "observaciones": ""
+  }
+}
+```
+
+##### Status: 409 Only en\_cartera checks can be updated
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/cheques/{id}/depositar
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/cheques/{id}/depositar`
+
+### Deposit check
+
+- **Method:** `POST`
+- **Path:** `/api/cheques/{id}/depositar`
+- **Tags:** cheques
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`destino`**
+
+  `string`
+
+- **`monto`**
+
+  `number`
+
+- **`nota`**
+
+  `string`
+
+- **`proveedorId`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "destino": "",
+  "nota": "",
+  "proveedorId": 1,
+  "monto": 1
+}
+```
+
+#### Responses
+
+##### Status: 200 Deposited check
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`banco` (required)**
+
+    `string`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"en_cartera", "emitido", "depositado", "endosado", "descontado", "cobrado", "rechazado", "anulado"`
+
+  - **`fechaEmision` (required)**
+
+    `string`, format: `date-time`
+
+  - **`fechaVencimiento` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`libradorNombre` (required)**
+
+    `string`
+
+  - **`modalidad` (required)**
+
+    `string`, possible values: `"fisico", "echeq"`
+
+  - **`moneda` (required)**
+
+    `string`
+
+  - **`monto` (required)**
+
+    `string`
+
+  - **`numero` (required)**
+
+    `string`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"recibido", "emitido"`
+
+  - **`cbuOrigen`**
+
+    `string`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`libradorCuit`**
+
+    `string`
+
+  - **`observaciones`**
+
+    `string`
+
+  - **`proveedorId`**
+
+    `integer`
+
+  - **`sucursal`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tipo": "recibido",
+    "modalidad": "fisico",
+    "numero": "",
+    "banco": "",
+    "sucursal": "",
+    "cbuOrigen": "",
+    "libradorNombre": "",
+    "libradorCuit": "",
+    "monto": "",
+    "moneda": "",
+    "fechaEmision": "",
+    "fechaVencimiento": "",
+    "estado": "en_cartera",
+    "clienteId": 1,
+    "proveedorId": 1,
+    "observaciones": ""
+  }
+}
+```
+
+### PARAMETERS /api/cheques/{id}/endosar
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/cheques/{id}/endosar`
+
+### Endorse check to supplier
+
+- **Method:** `POST`
+- **Path:** `/api/cheques/{id}/endosar`
+- **Tags:** cheques
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`destino`**
+
+  `string`
+
+- **`monto`**
+
+  `number`
+
+- **`nota`**
+
+  `string`
+
+- **`proveedorId`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "destino": "",
+  "nota": "",
+  "proveedorId": 1,
+  "monto": 1
+}
+```
+
+#### Responses
+
+##### Status: 200 Endorsed check
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`banco` (required)**
+
+    `string`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"en_cartera", "emitido", "depositado", "endosado", "descontado", "cobrado", "rechazado", "anulado"`
+
+  - **`fechaEmision` (required)**
+
+    `string`, format: `date-time`
+
+  - **`fechaVencimiento` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`libradorNombre` (required)**
+
+    `string`
+
+  - **`modalidad` (required)**
+
+    `string`, possible values: `"fisico", "echeq"`
+
+  - **`moneda` (required)**
+
+    `string`
+
+  - **`monto` (required)**
+
+    `string`
+
+  - **`numero` (required)**
+
+    `string`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"recibido", "emitido"`
+
+  - **`cbuOrigen`**
+
+    `string`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`libradorCuit`**
+
+    `string`
+
+  - **`observaciones`**
+
+    `string`
+
+  - **`proveedorId`**
+
+    `integer`
+
+  - **`sucursal`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tipo": "recibido",
+    "modalidad": "fisico",
+    "numero": "",
+    "banco": "",
+    "sucursal": "",
+    "cbuOrigen": "",
+    "libradorNombre": "",
+    "libradorCuit": "",
+    "monto": "",
+    "moneda": "",
+    "fechaEmision": "",
+    "fechaVencimiento": "",
+    "estado": "en_cartera",
+    "clienteId": 1,
+    "proveedorId": 1,
+    "observaciones": ""
+  }
+}
+```
+
+### PARAMETERS /api/cheques/{id}/descontar
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/cheques/{id}/descontar`
+
+### Discount check
+
+- **Method:** `POST`
+- **Path:** `/api/cheques/{id}/descontar`
+- **Tags:** cheques
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`destino`**
+
+  `string`
+
+- **`monto`**
+
+  `number`
+
+- **`nota`**
+
+  `string`
+
+- **`proveedorId`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "destino": "",
+  "nota": "",
+  "proveedorId": 1,
+  "monto": 1
+}
+```
+
+#### Responses
+
+##### Status: 200 Discounted check
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`banco` (required)**
+
+    `string`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"en_cartera", "emitido", "depositado", "endosado", "descontado", "cobrado", "rechazado", "anulado"`
+
+  - **`fechaEmision` (required)**
+
+    `string`, format: `date-time`
+
+  - **`fechaVencimiento` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`libradorNombre` (required)**
+
+    `string`
+
+  - **`modalidad` (required)**
+
+    `string`, possible values: `"fisico", "echeq"`
+
+  - **`moneda` (required)**
+
+    `string`
+
+  - **`monto` (required)**
+
+    `string`
+
+  - **`numero` (required)**
+
+    `string`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"recibido", "emitido"`
+
+  - **`cbuOrigen`**
+
+    `string`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`libradorCuit`**
+
+    `string`
+
+  - **`observaciones`**
+
+    `string`
+
+  - **`proveedorId`**
+
+    `integer`
+
+  - **`sucursal`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tipo": "recibido",
+    "modalidad": "fisico",
+    "numero": "",
+    "banco": "",
+    "sucursal": "",
+    "cbuOrigen": "",
+    "libradorNombre": "",
+    "libradorCuit": "",
+    "monto": "",
+    "moneda": "",
+    "fechaEmision": "",
+    "fechaVencimiento": "",
+    "estado": "en_cartera",
+    "clienteId": 1,
+    "proveedorId": 1,
+    "observaciones": ""
+  }
+}
+```
+
+### PARAMETERS /api/cheques/{id}/cobrar
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/cheques/{id}/cobrar`
+
+### Mark check as collected
+
+- **Method:** `POST`
+- **Path:** `/api/cheques/{id}/cobrar`
+- **Tags:** cheques
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`destino`**
+
+  `string`
+
+- **`monto`**
+
+  `number`
+
+- **`nota`**
+
+  `string`
+
+- **`proveedorId`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "destino": "",
+  "nota": "",
+  "proveedorId": 1,
+  "monto": 1
+}
+```
+
+#### Responses
+
+##### Status: 200 Collected check
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`banco` (required)**
+
+    `string`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"en_cartera", "emitido", "depositado", "endosado", "descontado", "cobrado", "rechazado", "anulado"`
+
+  - **`fechaEmision` (required)**
+
+    `string`, format: `date-time`
+
+  - **`fechaVencimiento` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`libradorNombre` (required)**
+
+    `string`
+
+  - **`modalidad` (required)**
+
+    `string`, possible values: `"fisico", "echeq"`
+
+  - **`moneda` (required)**
+
+    `string`
+
+  - **`monto` (required)**
+
+    `string`
+
+  - **`numero` (required)**
+
+    `string`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"recibido", "emitido"`
+
+  - **`cbuOrigen`**
+
+    `string`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`libradorCuit`**
+
+    `string`
+
+  - **`observaciones`**
+
+    `string`
+
+  - **`proveedorId`**
+
+    `integer`
+
+  - **`sucursal`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tipo": "recibido",
+    "modalidad": "fisico",
+    "numero": "",
+    "banco": "",
+    "sucursal": "",
+    "cbuOrigen": "",
+    "libradorNombre": "",
+    "libradorCuit": "",
+    "monto": "",
+    "moneda": "",
+    "fechaEmision": "",
+    "fechaVencimiento": "",
+    "estado": "en_cartera",
+    "clienteId": 1,
+    "proveedorId": 1,
+    "observaciones": ""
+  }
+}
+```
+
+### PARAMETERS /api/cheques/{id}/rechazar
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/cheques/{id}/rechazar`
+
+### Reject check
+
+- **Method:** `POST`
+- **Path:** `/api/cheques/{id}/rechazar`
+- **Tags:** cheques
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`destino`**
+
+  `string`
+
+- **`monto`**
+
+  `number`
+
+- **`nota`**
+
+  `string`
+
+- **`proveedorId`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "destino": "",
+  "nota": "",
+  "proveedorId": 1,
+  "monto": 1
+}
+```
+
+#### Responses
+
+##### Status: 200 Rejected check
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`banco` (required)**
+
+    `string`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"en_cartera", "emitido", "depositado", "endosado", "descontado", "cobrado", "rechazado", "anulado"`
+
+  - **`fechaEmision` (required)**
+
+    `string`, format: `date-time`
+
+  - **`fechaVencimiento` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`libradorNombre` (required)**
+
+    `string`
+
+  - **`modalidad` (required)**
+
+    `string`, possible values: `"fisico", "echeq"`
+
+  - **`moneda` (required)**
+
+    `string`
+
+  - **`monto` (required)**
+
+    `string`
+
+  - **`numero` (required)**
+
+    `string`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"recibido", "emitido"`
+
+  - **`cbuOrigen`**
+
+    `string`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`libradorCuit`**
+
+    `string`
+
+  - **`observaciones`**
+
+    `string`
+
+  - **`proveedorId`**
+
+    `integer`
+
+  - **`sucursal`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tipo": "recibido",
+    "modalidad": "fisico",
+    "numero": "",
+    "banco": "",
+    "sucursal": "",
+    "cbuOrigen": "",
+    "libradorNombre": "",
+    "libradorCuit": "",
+    "monto": "",
+    "moneda": "",
+    "fechaEmision": "",
+    "fechaVencimiento": "",
+    "estado": "en_cartera",
+    "clienteId": 1,
+    "proveedorId": 1,
+    "observaciones": ""
+  }
+}
+```
+
+### PARAMETERS /api/cheques/{id}/devolver-cartera
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/cheques/{id}/devolver-cartera`
+
+### Return rejected check to portfolio
+
+- **Method:** `POST`
+- **Path:** `/api/cheques/{id}/devolver-cartera`
+- **Tags:** cheques
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`destino`**
+
+  `string`
+
+- **`monto`**
+
+  `number`
+
+- **`nota`**
+
+  `string`
+
+- **`proveedorId`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "destino": "",
+  "nota": "",
+  "proveedorId": 1,
+  "monto": 1
+}
+```
+
+#### Responses
+
+##### Status: 200 Check returned to portfolio
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`banco` (required)**
+
+    `string`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"en_cartera", "emitido", "depositado", "endosado", "descontado", "cobrado", "rechazado", "anulado"`
+
+  - **`fechaEmision` (required)**
+
+    `string`, format: `date-time`
+
+  - **`fechaVencimiento` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`libradorNombre` (required)**
+
+    `string`
+
+  - **`modalidad` (required)**
+
+    `string`, possible values: `"fisico", "echeq"`
+
+  - **`moneda` (required)**
+
+    `string`
+
+  - **`monto` (required)**
+
+    `string`
+
+  - **`numero` (required)**
+
+    `string`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"recibido", "emitido"`
+
+  - **`cbuOrigen`**
+
+    `string`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`libradorCuit`**
+
+    `string`
+
+  - **`observaciones`**
+
+    `string`
+
+  - **`proveedorId`**
+
+    `integer`
+
+  - **`sucursal`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tipo": "recibido",
+    "modalidad": "fisico",
+    "numero": "",
+    "banco": "",
+    "sucursal": "",
+    "cbuOrigen": "",
+    "libradorNombre": "",
+    "libradorCuit": "",
+    "monto": "",
+    "moneda": "",
+    "fechaEmision": "",
+    "fechaVencimiento": "",
+    "estado": "en_cartera",
+    "clienteId": 1,
+    "proveedorId": 1,
+    "observaciones": ""
+  }
+}
+```
+
+### PARAMETERS /api/cheques/{id}/anular
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/cheques/{id}/anular`
+
+### Void check in portfolio
+
+- **Method:** `POST`
+- **Path:** `/api/cheques/{id}/anular`
+- **Tags:** cheques
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`destino`**
+
+  `string`
+
+- **`monto`**
+
+  `number`
+
+- **`nota`**
+
+  `string`
+
+- **`proveedorId`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "destino": "",
+  "nota": "",
+  "proveedorId": 1,
+  "monto": 1
+}
+```
+
+#### Responses
+
+##### Status: 200 Voided check
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`banco` (required)**
+
+    `string`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"en_cartera", "emitido", "depositado", "endosado", "descontado", "cobrado", "rechazado", "anulado"`
+
+  - **`fechaEmision` (required)**
+
+    `string`, format: `date-time`
+
+  - **`fechaVencimiento` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`libradorNombre` (required)**
+
+    `string`
+
+  - **`modalidad` (required)**
+
+    `string`, possible values: `"fisico", "echeq"`
+
+  - **`moneda` (required)**
+
+    `string`
+
+  - **`monto` (required)**
+
+    `string`
+
+  - **`numero` (required)**
+
+    `string`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"recibido", "emitido"`
+
+  - **`cbuOrigen`**
+
+    `string`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`libradorCuit`**
+
+    `string`
+
+  - **`observaciones`**
+
+    `string`
+
+  - **`proveedorId`**
+
+    `integer`
+
+  - **`sucursal`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tipo": "recibido",
+    "modalidad": "fisico",
+    "numero": "",
+    "banco": "",
+    "sucursal": "",
+    "cbuOrigen": "",
+    "libradorNombre": "",
+    "libradorCuit": "",
+    "monto": "",
+    "moneda": "",
+    "fechaEmision": "",
+    "fechaVencimiento": "",
+    "estado": "en_cartera",
+    "clienteId": 1,
+    "proveedorId": 1,
+    "observaciones": ""
+  }
+}
+```
+
+### PARAMETERS /api/cheques/alertas/run
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/cheques/alertas/run`
+
+### Run due-soon check alerts job
+
+- **Method:** `POST`
+- **Path:** `/api/cheques/alertas/run`
+- **Tags:** cheques
+
+#### Responses
+
+##### Status: 200 Alert job result
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`sent`**
+
+    `integer`
+
+  - **`skipped`**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "sent": 1,
+    "skipped": 1
+  }
 }
 ```
 
@@ -27390,7 +35430,7 @@ Groups active invoices (`estado = A`) into aging buckets using each customer's `
 - **Path:** `/api/reportes/cuenta-corriente/{clienteId}`
 - **Tags:** reportes
 
-Chronological list of opening balance (if non-zero), active invoices (debit), and payments (credit) with a running `saldo`. Requires permission `reports.financial.read`.
+Legacy wrapper over the persisted customer ledger (`MovimientoClienteCC`): chronological movements with debit/credit columns and running `saldo`. Requires permission `reports.financial.read`.
 
 #### Responses
 
@@ -29849,6 +37889,2235 @@ Returns boolean flags for each channel. No sensitive values are exposed.
 ```
 
 ##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/portal-config
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/portal-config`
+
+### Get B2B portal settings for the authenticated tenant (#240)
+
+- **Method:** `GET`
+- **Path:** `/api/portal-config`
+- **Tags:** portal
+
+#### Responses
+
+##### Status: 200 Portal configuration
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`enabled` (required)**
+
+    `boolean`
+
+  - **`footerText` (required)**
+
+    `string`
+
+  - **`logoUrl` (required)**
+
+    `string`
+
+  - **`primaryColor` (required)**
+
+    `string`
+
+  - **`showPedidos` (required)**
+
+    `boolean`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "enabled": true,
+    "showPedidos": true,
+    "logoUrl": "",
+    "primaryColor": "",
+    "footerText": ""
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Update B2B portal settings (#240)
+
+- **Method:** `PUT`
+- **Path:** `/api/portal-config`
+- **Tags:** portal
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`enabled`**
+
+  `boolean`
+
+- **`footerText`**
+
+  `string`
+
+- **`logoUrl`**
+
+  `string`
+
+- **`primaryColor`**
+
+  `string`
+
+- **`showPedidos`**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "enabled": true,
+  "showPedidos": true,
+  "logoUrl": "",
+  "primaryColor": "",
+  "footerText": ""
+}
+```
+
+#### Responses
+
+##### Status: 200 Portal configuration updated
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`enabled` (required)**
+
+    `boolean`
+
+  - **`footerText` (required)**
+
+    `string`
+
+  - **`logoUrl` (required)**
+
+    `string`
+
+  - **`primaryColor` (required)**
+
+    `string`
+
+  - **`showPedidos` (required)**
+
+    `boolean`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "enabled": true,
+    "showPedidos": true,
+    "logoUrl": "",
+    "primaryColor": "",
+    "footerText": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Mercado Pago config status (metadata only) (#174)
+
+- **Method:** `GET`
+- **Path:** `/api/configuracion/mercadopago`
+- **Tags:** mercadopago
+
+Requires `settings.business.manage` and tenant integration `mercadopago`. Does not return access token or webhook secret.
+
+#### Responses
+
+##### Status: 200 Mercado Pago config status
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`configured` (required)**
+
+    `boolean`
+
+  - **`accessTokenLast4`**
+
+    `string`
+
+  - **`activo`**
+
+    `boolean`
+
+  - **`publicKey`**
+
+    `string`
+
+  - **`sandboxMode`**
+
+    `boolean`
+
+  - **`webhookSecretSet`**
+
+    `boolean`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "configured": true,
+    "publicKey": "",
+    "sandboxMode": true,
+    "activo": true,
+    "accessTokenLast4": "",
+    "webhookSecretSet": true
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Upsert tenant Mercado Pago credentials (#174)
+
+- **Method:** `PUT`
+- **Path:** `/api/configuracion/mercadopago`
+- **Tags:** mercadopago
+
+Requires `settings.business.manage` and tenant integration `mercadopago`. Access token and webhook secret encrypted at rest.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`publicKey` (required)**
+
+  `string`
+
+- **`accessToken`**
+
+  `string`
+
+- **`activo`**
+
+  `boolean`
+
+- **`sandboxMode`**
+
+  `boolean`
+
+- **`webhookSecret`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "accessToken": "",
+  "publicKey": "",
+  "webhookSecret": "",
+  "sandboxMode": true,
+  "activo": true
+}
+```
+
+#### Responses
+
+##### Status: 200 Config saved
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`configured`**
+
+    `boolean`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "configured": true
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Verify Mercado Pago credentials (#174)
+
+- **Method:** `POST`
+- **Path:** `/api/configuracion/mercadopago/test`
+- **Tags:** mercadopago
+
+Requires `settings.business.manage` and tenant integration `mercadopago`. Calls Mercado Pago `users/me` with stored access token.
+
+#### Responses
+
+##### Status: 200 Credentials valid
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`accountName` (required)**
+
+    `string`
+
+  - **`email`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "accountName": "",
+    "email": ""
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Mercado Pago not configured
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 422 Invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Public portal branding for login shell (#240)
+
+- **Method:** `GET`
+- **Path:** `/api/portal/{tenantSlug}/branding`
+- **Tags:** portal
+
+#### Responses
+
+##### Status: 200 Branding payload
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`enabled` (required)**
+
+    `boolean`
+
+  - **`footerText` (required)**
+
+    `string`
+
+  - **`logoUrl` (required)**
+
+    `string`
+
+  - **`primaryColor` (required)**
+
+    `string`
+
+  - **`showPedidos` (required)**
+
+    `boolean`
+
+  - **`tenantName` (required)**
+
+    `string`
+
+  - **`tenantSlug` (required)**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "tenantName": "",
+    "tenantSlug": "",
+    "enabled": true,
+    "showPedidos": true,
+    "logoUrl": "",
+    "primaryColor": "",
+    "footerText": ""
+  }
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Request magic-link email for portal login (#240)
+
+- **Method:** `POST`
+- **Path:** `/api/portal/{tenantSlug}/auth/magic-link`
+- **Tags:** portal
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`email` (required)**
+
+  `string`, format: `email`
+
+**Example:**
+
+```json
+{
+  "email": ""
+}
+```
+
+#### Responses
+
+##### Status: 200 Generic success (anti-enumeration)
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`sent` (required)**
+
+    `boolean`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "sent": true
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 429 Rate limit exceeded
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Verify magic link and issue portal session cookie (#240)
+
+- **Method:** `GET`
+- **Path:** `/api/portal/{tenantSlug}/auth/verify`
+- **Tags:** portal
+
+#### Responses
+
+##### Status: 200 Session established
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`me` (required)**
+
+    `object`
+
+    - **`clienteId` (required)**
+
+      `integer`
+
+    - **`codigo` (required)**
+
+      `integer`
+
+    - **`domicilio` (required)**
+
+      `string`
+
+    - **`email` (required)**
+
+      `string`
+
+    - **`fantasia` (required)**
+
+      `string`
+
+    - **`localidad` (required)**
+
+      `string`
+
+    - **`rsocial` (required)**
+
+      `string`
+
+    - **`telef` (required)**
+
+      `string`
+
+    - **`vendedor` (required)**
+
+      `object`
+
+      - **`id`**
+
+        `integer`
+
+      - **`username`**
+
+        `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "me": {
+      "clienteId": 1,
+      "codigo": 1,
+      "rsocial": "",
+      "fantasia": "",
+      "email": "",
+      "telef": "",
+      "domicilio": "",
+      "localidad": "",
+      "vendedor": {
+        "id": 1,
+        "username": ""
+      }
+    }
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Revoke portal session (#240)
+
+- **Method:** `POST`
+- **Path:** `/api/portal/{tenantSlug}/auth/logout`
+- **Tags:** portal
+
+#### Responses
+
+##### Status: 200 Logged out
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`loggedOut` (required)**
+
+    `boolean`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "loggedOut": true
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Current portal customer profile (#240)
+
+- **Method:** `GET`
+- **Path:** `/api/portal/{tenantSlug}/me`
+- **Tags:** portal
+
+#### Responses
+
+##### Status: 200 Customer profile and branding
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`branding` (required)**
+
+    `object`
+
+    - **`enabled` (required)**
+
+      `boolean`
+
+    - **`footerText` (required)**
+
+      `string`
+
+    - **`logoUrl` (required)**
+
+      `string`
+
+    - **`primaryColor` (required)**
+
+      `string`
+
+    - **`showPedidos` (required)**
+
+      `boolean`
+
+    - **`tenantName` (required)**
+
+      `string`
+
+    - **`tenantSlug` (required)**
+
+      `string`
+
+  - **`me` (required)**
+
+    `object`
+
+    - **`clienteId` (required)**
+
+      `integer`
+
+    - **`codigo` (required)**
+
+      `integer`
+
+    - **`domicilio` (required)**
+
+      `string`
+
+    - **`email` (required)**
+
+      `string`
+
+    - **`fantasia` (required)**
+
+      `string`
+
+    - **`localidad` (required)**
+
+      `string`
+
+    - **`rsocial` (required)**
+
+      `string`
+
+    - **`telef` (required)**
+
+      `string`
+
+    - **`vendedor` (required)**
+
+      `object`
+
+      - **`id`**
+
+        `integer`
+
+      - **`username`**
+
+        `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "me": {
+      "clienteId": 1,
+      "codigo": 1,
+      "rsocial": "",
+      "fantasia": "",
+      "email": "",
+      "telef": "",
+      "domicilio": "",
+      "localidad": "",
+      "vendedor": {
+        "id": 1,
+        "username": ""
+      }
+    },
+    "branding": {
+      "tenantName": "",
+      "tenantSlug": "",
+      "enabled": true,
+      "showPedidos": true,
+      "logoUrl": "",
+      "primaryColor": "",
+      "footerText": ""
+    }
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### List customer invoices in portal scope (#240)
+
+- **Method:** `GET`
+- **Path:** `/api/portal/{tenantSlug}/facturas`
+- **Tags:** portal
+
+#### Responses
+
+##### Status: 200 Invoice list
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`facturas` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`estado` (required)**
+
+      `string`, possible values: `"pagada", "pendiente", "vencida"`
+
+    - **`fecha` (required)**
+
+      `string`, format: `date-time`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`pagado` (required)**
+
+      `string`
+
+    - **`pendiente` (required)**
+
+      `string`
+
+    - **`ref` (required)**
+
+      `string`
+
+    - **`total` (required)**
+
+      `string`
+
+  - **`total` (required)**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "facturas": [
+      {
+        "id": 1,
+        "ref": "",
+        "fecha": "",
+        "total": "",
+        "pagado": "",
+        "pendiente": "",
+        "estado": "pagada"
+      }
+    ],
+    "total": 1
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Download invoice PDF (portal scope) (#240)
+
+- **Method:** `GET`
+- **Path:** `/api/portal/{tenantSlug}/facturas/{id}/pdf`
+- **Tags:** portal
+
+#### Responses
+
+##### Status: 200 Invoice PDF
+
+###### Content-Type: application/pdf
+
+`string`, format: `binary`
+
+**Example:**
+
+```json
+{}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 422 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Customer ledger in portal scope (#240)
+
+- **Method:** `GET`
+- **Path:** `/api/portal/{tenantSlug}/cuenta-corriente`
+- **Tags:** portal
+
+#### Responses
+
+##### Status: 200 Ledger statement
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`clienteId` (required)**
+
+    `integer`
+
+  - **`codigo` (required)**
+
+    `integer`
+
+  - **`excedeLimite` (required)**
+
+    `boolean`
+
+  - **`limit` (required)**
+
+    `integer`
+
+  - **`movimientos` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`fecha` (required)**
+
+      `string`, format: `date-time`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`monto` (required)**
+
+      `string`
+
+    - **`saldoPost` (required)**
+
+      `string`
+
+    - **`tipo` (required)**
+
+      `string`, possible values: `"saldo_inicial", "factura", "nota_credito", "cobro", "retencion", "percepcion", "cheque_rechazado", "ajuste"`
+
+    - **`usuarioId` (required)**
+
+      `integer`
+
+    - **`chequeId`**
+
+      `integer`
+
+    - **`cobroId`**
+
+      `integer`
+
+    - **`facturaId`**
+
+      `integer`
+
+    - **`notaCreditoId`**
+
+      `integer`
+
+    - **`notas`**
+
+      `string`
+
+    - **`referencia`**
+
+      `string`
+
+    - **`retencionAplicadaId`**
+
+      `integer`
+
+  - **`offset` (required)**
+
+    `integer`
+
+  - **`rsocial` (required)**
+
+    `string`
+
+  - **`saldo` (required)**
+
+    `string`
+
+  - **`serie` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`period` (required)**
+
+      `string`
+
+    - **`saldo` (required)**
+
+      `string`
+
+  - **`total` (required)**
+
+    `integer`
+
+  - **`creditLimit`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "clienteId": 1,
+    "codigo": 1,
+    "rsocial": "",
+    "saldo": "",
+    "creditLimit": "",
+    "excedeLimite": true,
+    "movimientos": [
+      {
+        "id": 1,
+        "tipo": "saldo_inicial",
+        "referencia": "",
+        "monto": "",
+        "saldoPost": "",
+        "fecha": "",
+        "usuarioId": 1,
+        "notas": "",
+        "facturaId": 1,
+        "cobroId": 1,
+        "notaCreditoId": 1,
+        "chequeId": 1,
+        "retencionAplicadaId": 1
+      }
+    ],
+    "serie": [
+      {
+        "period": "",
+        "saldo": ""
+      }
+    ],
+    "total": 1,
+    "limit": 1,
+    "offset": 1
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Download account statement PDF (#240)
+
+- **Method:** `GET`
+- **Path:** `/api/portal/{tenantSlug}/cuenta-corriente/estado-de-cuenta/pdf`
+- **Tags:** portal
+
+#### Responses
+
+##### Status: 200 Account statement PDF
+
+###### Content-Type: application/pdf
+
+`string`, format: `binary`
+
+**Example:**
+
+```json
+{}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### List customer orders in portal scope (#240)
+
+- **Method:** `GET`
+- **Path:** `/api/portal/{tenantSlug}/pedidos`
+- **Tags:** portal
+
+#### Responses
+
+##### Status: 200 Order list
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`pedidos` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`createdAt` (required)**
+
+      `string`, format: `date-time`
+
+    - **`estado` (required)**
+
+      `string`
+
+    - **`facturaRef` (required)**
+
+      `string`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`remitoEstado` (required)**
+
+      `string`
+
+    - **`total` (required)**
+
+      `string`
+
+    - **`validUntil` (required)**
+
+      `string`, format: `date-time`
+
+  - **`total` (required)**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "pedidos": [
+      {
+        "id": 1,
+        "estado": "",
+        "total": "",
+        "createdAt": "",
+        "validUntil": "",
+        "facturaRef": "",
+        "remitoEstado": ""
+      }
+    ],
+    "total": 1
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
 
 ###### Content-Type: application/json
 
@@ -37285,7 +47554,75 @@ true
 
 * **`monto` (required)**
 
-  `number`
+  `number` — Net amount received (#229); CC decremented by bruto when retenciones present.
+
+* **`chequeId`**
+
+  `integer` — Link existing portfolio check (#231).
+
+* **`chequeNuevo`**
+
+  `object` — Create received check when recording collection (#231).
+
+  - **`banco` (required)**
+
+    `string`
+
+  - **`fechaEmision` (required)**
+
+    `string`, format: `date`
+
+  - **`fechaVencimiento` (required)**
+
+    `string`, format: `date`
+
+  - **`libradorNombre` (required)**
+
+    `string`
+
+  - **`modalidad` (required)**
+
+    `string`, possible values: `"fisico", "echeq"`
+
+  - **`monto` (required)**
+
+    `number`
+
+  - **`numero` (required)**
+
+    `string`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"recibido", "emitido"`
+
+  - **`cbuOrigen`**
+
+    `string`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`libradorCuit`**
+
+    `string`
+
+  - **`moneda`**
+
+    `string`
+
+  - **`observaciones`**
+
+    `string`
+
+  - **`proveedorId`**
+
+    `integer`
+
+  - **`sucursal`**
+
+    `string`
 
 * **`formaPagoId`**
 
@@ -37299,6 +47636,28 @@ true
 
   `string`
 
+* **`retenciones`**
+
+  `array`
+
+  **Items:**
+
+  - **`alicuota` (required)**
+
+    `number`
+
+  - **`baseImponible` (required)**
+
+    `number`
+
+  - **`importe` (required)**
+
+    `number`
+
+  - **`regimenId` (required)**
+
+    `integer`
+
 **Example:**
 
 ```json
@@ -37308,7 +47667,84 @@ true
   "monto": 1,
   "formaPagoId": 1,
   "referencia": "",
-  "nota": ""
+  "nota": "",
+  "retenciones": [
+    {
+      "regimenId": 1,
+      "baseImponible": 1,
+      "alicuota": 0,
+      "importe": 1
+    }
+  ],
+  "chequeId": 1,
+  "chequeNuevo": {
+    "tipo": "recibido",
+    "modalidad": "fisico",
+    "numero": "",
+    "banco": "",
+    "sucursal": "",
+    "cbuOrigen": "",
+    "libradorNombre": "",
+    "libradorCuit": "",
+    "monto": 1,
+    "moneda": "",
+    "fechaEmision": "",
+    "fechaVencimiento": "",
+    "clienteId": 1,
+    "proveedorId": 1,
+    "observaciones": ""
+  }
+}
+```
+
+### CobroRetencion
+
+- **Type:**`object`
+
+* **`alicuota` (required)**
+
+  `string`
+
+* **`baseImponible` (required)**
+
+  `string`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`importe` (required)**
+
+  `string`
+
+* **`regimenId` (required)**
+
+  `integer`
+
+* **`regimenNombre` (required)**
+
+  `string`
+
+* **`tipo` (required)**
+
+  `string`
+
+* **`constanciaNum`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "regimenId": 1,
+  "regimenNombre": "",
+  "tipo": "",
+  "baseImponible": "",
+  "alicuota": "",
+  "importe": "",
+  "constanciaNum": ""
 }
 ```
 
@@ -37459,6 +47895,48 @@ true
 
     `integer`
 
+* **`montoBruto` (required)**
+
+  `string` — Bruto applied to customer balance (neto + retenciones).
+
+* **`retenciones` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`alicuota` (required)**
+
+    `string`
+
+  - **`baseImponible` (required)**
+
+    `string`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`importe` (required)**
+
+    `string`
+
+  - **`regimenId` (required)**
+
+    `integer`
+
+  - **`regimenNombre` (required)**
+
+    `string`
+
+  - **`tipo` (required)**
+
+    `string`
+
+  - **`constanciaNum`**
+
+    `string`
+
 * **`updatedCliente` (required)**
 
   `object`
@@ -37511,7 +47989,20 @@ true
     "creditLimit": 1,
     "score": 0,
     "additionalProperty": "anything"
-  }
+  },
+  "retenciones": [
+    {
+      "id": 1,
+      "regimenId": 1,
+      "regimenNombre": "",
+      "tipo": "",
+      "baseImponible": "",
+      "alicuota": "",
+      "importe": "",
+      "constanciaNum": ""
+    }
+  ],
+  "montoBruto": ""
 }
 ```
 
@@ -37575,6 +48066,48 @@ true
 
       `integer`
 
+  - **`montoBruto` (required)**
+
+    `string` — Bruto applied to customer balance (neto + retenciones).
+
+  - **`retenciones` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`alicuota` (required)**
+
+      `string`
+
+    - **`baseImponible` (required)**
+
+      `string`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`importe` (required)**
+
+      `string`
+
+    - **`regimenId` (required)**
+
+      `integer`
+
+    - **`regimenNombre` (required)**
+
+      `string`
+
+    - **`tipo` (required)**
+
+      `string`
+
+    - **`constanciaNum`**
+
+      `string`
+
   - **`updatedCliente` (required)**
 
     `object`
@@ -37633,7 +48166,20 @@ true
       "creditLimit": 1,
       "score": 0,
       "additionalProperty": "anything"
-    }
+    },
+    "retenciones": [
+      {
+        "id": 1,
+        "regimenId": 1,
+        "regimenNombre": "",
+        "tipo": "",
+        "baseImponible": "",
+        "alicuota": "",
+        "importe": "",
+        "constanciaNum": ""
+      }
+    ],
+    "montoBruto": ""
   }
 }
 ```
@@ -39420,6 +49966,394 @@ true
 }
 ```
 
+### MovimientoClienteCC
+
+- **Type:**`object`
+
+* **`fecha` (required)**
+
+  `string`, format: `date-time`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`monto` (required)**
+
+  `string`
+
+* **`saldoPost` (required)**
+
+  `string`
+
+* **`tipo` (required)**
+
+  `string`, possible values: `"saldo_inicial", "factura", "nota_credito", "cobro", "retencion", "percepcion", "cheque_rechazado", "ajuste"`
+
+* **`usuarioId` (required)**
+
+  `integer`
+
+* **`chequeId`**
+
+  `integer`
+
+* **`cobroId`**
+
+  `integer`
+
+* **`facturaId`**
+
+  `integer`
+
+* **`notaCreditoId`**
+
+  `integer`
+
+* **`notas`**
+
+  `string`
+
+* **`referencia`**
+
+  `string`
+
+* **`retencionAplicadaId`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "tipo": "saldo_inicial",
+  "referencia": "",
+  "monto": "",
+  "saldoPost": "",
+  "fecha": "",
+  "usuarioId": 1,
+  "notas": "",
+  "facturaId": 1,
+  "cobroId": 1,
+  "notaCreditoId": 1,
+  "chequeId": 1,
+  "retencionAplicadaId": 1
+}
+```
+
+### ClienteCuentaCorrienteChartPoint
+
+- **Type:**`object`
+
+* **`period` (required)**
+
+  `string`
+
+* **`saldo` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "period": "",
+  "saldo": ""
+}
+```
+
+### ClienteCuentaCorriente
+
+- **Type:**`object`
+
+* **`clienteId` (required)**
+
+  `integer`
+
+* **`codigo` (required)**
+
+  `integer`
+
+* **`excedeLimite` (required)**
+
+  `boolean`
+
+* **`limit` (required)**
+
+  `integer`
+
+* **`movimientos` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`monto` (required)**
+
+    `string`
+
+  - **`saldoPost` (required)**
+
+    `string`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"saldo_inicial", "factura", "nota_credito", "cobro", "retencion", "percepcion", "cheque_rechazado", "ajuste"`
+
+  - **`usuarioId` (required)**
+
+    `integer`
+
+  - **`chequeId`**
+
+    `integer`
+
+  - **`cobroId`**
+
+    `integer`
+
+  - **`facturaId`**
+
+    `integer`
+
+  - **`notaCreditoId`**
+
+    `integer`
+
+  - **`notas`**
+
+    `string`
+
+  - **`referencia`**
+
+    `string`
+
+  - **`retencionAplicadaId`**
+
+    `integer`
+
+* **`offset` (required)**
+
+  `integer`
+
+* **`rsocial` (required)**
+
+  `string`
+
+* **`saldo` (required)**
+
+  `string`
+
+* **`serie` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`period` (required)**
+
+    `string`
+
+  - **`saldo` (required)**
+
+    `string`
+
+* **`total` (required)**
+
+  `integer`
+
+* **`creditLimit`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "clienteId": 1,
+  "codigo": 1,
+  "rsocial": "",
+  "saldo": "",
+  "creditLimit": "",
+  "excedeLimite": true,
+  "movimientos": [
+    {
+      "id": 1,
+      "tipo": "saldo_inicial",
+      "referencia": "",
+      "monto": "",
+      "saldoPost": "",
+      "fecha": "",
+      "usuarioId": 1,
+      "notas": "",
+      "facturaId": 1,
+      "cobroId": 1,
+      "notaCreditoId": 1,
+      "chequeId": 1,
+      "retencionAplicadaId": 1
+    }
+  ],
+  "serie": [
+    {
+      "period": "",
+      "saldo": ""
+    }
+  ],
+  "total": 1,
+  "limit": 1,
+  "offset": 1
+}
+```
+
+### ClienteCuentaCorrienteSaldo
+
+- **Type:**`object`
+
+* **`clienteId` (required)**
+
+  `integer`
+
+* **`excedeLimite` (required)**
+
+  `boolean`
+
+* **`saldo` (required)**
+
+  `string`
+
+* **`creditLimit`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "clienteId": 1,
+  "saldo": "",
+  "creditLimit": "",
+  "excedeLimite": true
+}
+```
+
+### ClienteCuentaCorrienteAntiguedadBucket
+
+- **Type:**`object`
+
+* **`label` (required)**
+
+  `string`, possible values: `"0-30", "31-60", "61-90", "+90"`
+
+* **`total` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "label": "0-30",
+  "total": ""
+}
+```
+
+### ClienteCuentaCorrienteAntiguedad
+
+- **Type:**`object`
+
+* **`buckets` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`label` (required)**
+
+    `string`, possible values: `"0-30", "31-60", "61-90", "+90"`
+
+  - **`total` (required)**
+
+    `string`
+
+* **`clienteId` (required)**
+
+  `integer`
+
+* **`totalPendiente` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "clienteId": 1,
+  "buckets": [
+    {
+      "label": "0-30",
+      "total": ""
+    }
+  ],
+  "totalPendiente": ""
+}
+```
+
+### ClienteCuentaCorrienteAjusteInput
+
+- **Type:**`object`
+
+* **`monto` (required)**
+
+  `number`
+
+* **`motivo` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "monto": 1,
+  "motivo": ""
+}
+```
+
+### ClienteCuentaCorrienteEnviarInput
+
+- **Type:**`object`
+
+* **`desde`**
+
+  `string`, format: `date-time`
+
+* **`email`**
+
+  `string`, format: `email`
+
+* **`hasta`**
+
+  `string`, format: `date-time`
+
+**Example:**
+
+```json
+{
+  "email": "",
+  "desde": "",
+  "hasta": ""
+}
+```
+
 ### ProveedorCuentaCorrienteChartPoint
 
 - **Type:**`object`
@@ -41036,6 +51970,381 @@ true
 }
 ```
 
+### ClienteCuentaCorrienteEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`clienteId` (required)**
+
+    `integer`
+
+  - **`codigo` (required)**
+
+    `integer`
+
+  - **`excedeLimite` (required)**
+
+    `boolean`
+
+  - **`limit` (required)**
+
+    `integer`
+
+  - **`movimientos` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`fecha` (required)**
+
+      `string`, format: `date-time`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`monto` (required)**
+
+      `string`
+
+    - **`saldoPost` (required)**
+
+      `string`
+
+    - **`tipo` (required)**
+
+      `string`, possible values: `"saldo_inicial", "factura", "nota_credito", "cobro", "retencion", "percepcion", "cheque_rechazado", "ajuste"`
+
+    - **`usuarioId` (required)**
+
+      `integer`
+
+    - **`chequeId`**
+
+      `integer`
+
+    - **`cobroId`**
+
+      `integer`
+
+    - **`facturaId`**
+
+      `integer`
+
+    - **`notaCreditoId`**
+
+      `integer`
+
+    - **`notas`**
+
+      `string`
+
+    - **`referencia`**
+
+      `string`
+
+    - **`retencionAplicadaId`**
+
+      `integer`
+
+  - **`offset` (required)**
+
+    `integer`
+
+  - **`rsocial` (required)**
+
+    `string`
+
+  - **`saldo` (required)**
+
+    `string`
+
+  - **`serie` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`period` (required)**
+
+      `string`
+
+    - **`saldo` (required)**
+
+      `string`
+
+  - **`total` (required)**
+
+    `integer`
+
+  - **`creditLimit`**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "clienteId": 1,
+    "codigo": 1,
+    "rsocial": "",
+    "saldo": "",
+    "creditLimit": "",
+    "excedeLimite": true,
+    "movimientos": [
+      {
+        "id": 1,
+        "tipo": "saldo_inicial",
+        "referencia": "",
+        "monto": "",
+        "saldoPost": "",
+        "fecha": "",
+        "usuarioId": 1,
+        "notas": "",
+        "facturaId": 1,
+        "cobroId": 1,
+        "notaCreditoId": 1,
+        "chequeId": 1,
+        "retencionAplicadaId": 1
+      }
+    ],
+    "serie": [
+      {
+        "period": "",
+        "saldo": ""
+      }
+    ],
+    "total": 1,
+    "limit": 1,
+    "offset": 1
+  }
+}
+```
+
+### ClienteCuentaCorrienteSaldoEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`clienteId` (required)**
+
+    `integer`
+
+  - **`excedeLimite` (required)**
+
+    `boolean`
+
+  - **`saldo` (required)**
+
+    `string`
+
+  - **`creditLimit`**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "clienteId": 1,
+    "saldo": "",
+    "creditLimit": "",
+    "excedeLimite": true
+  }
+}
+```
+
+### ClienteCuentaCorrienteAntiguedadEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`buckets` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`label` (required)**
+
+      `string`, possible values: `"0-30", "31-60", "61-90", "+90"`
+
+    - **`total` (required)**
+
+      `string`
+
+  - **`clienteId` (required)**
+
+    `integer`
+
+  - **`totalPendiente` (required)**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "clienteId": 1,
+    "buckets": [
+      {
+        "label": "0-30",
+        "total": ""
+      }
+    ],
+    "totalPendiente": ""
+  }
+}
+```
+
+### MovimientoClienteCCEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`monto` (required)**
+
+    `string`
+
+  - **`saldoPost` (required)**
+
+    `string`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"saldo_inicial", "factura", "nota_credito", "cobro", "retencion", "percepcion", "cheque_rechazado", "ajuste"`
+
+  - **`usuarioId` (required)**
+
+    `integer`
+
+  - **`chequeId`**
+
+    `integer`
+
+  - **`cobroId`**
+
+    `integer`
+
+  - **`facturaId`**
+
+    `integer`
+
+  - **`notaCreditoId`**
+
+    `integer`
+
+  - **`notas`**
+
+    `string`
+
+  - **`referencia`**
+
+    `string`
+
+  - **`retencionAplicadaId`**
+
+    `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tipo": "saldo_inicial",
+    "referencia": "",
+    "monto": "",
+    "saldoPost": "",
+    "fecha": "",
+    "usuarioId": 1,
+    "notas": "",
+    "facturaId": 1,
+    "cobroId": 1,
+    "notaCreditoId": 1,
+    "chequeId": 1,
+    "retencionAplicadaId": 1
+  }
+}
+```
+
+### ClienteCuentaCorrienteEnviarEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`email` (required)**
+
+    `string`
+
+  - **`sent` (required)**
+
+    `boolean`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "sent": true,
+    "email": ""
+  }
+}
+```
+
 ### ProveedorCuentaCorrienteEnvelope
 
 - **Type:**`object`
@@ -41367,7 +52676,49 @@ true
 
   `integer`
 
+* **`retenciones` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`alicuota` (required)**
+
+    `string`
+
+  - **`baseImponible` (required)**
+
+    `string`
+
+  - **`constanciaNum` (required)**
+
+    `string`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`importe` (required)**
+
+    `string`
+
+  - **`regimenId` (required)**
+
+    `integer`
+
+  - **`regimenNombre` (required)**
+
+    `string`
+
+  - **`tipo` (required)**
+
+    `string`
+
 * **`total` (required)**
+
+  `string`
+
+* **`totalBruto` (required)**
 
   `string`
 
@@ -41408,6 +52759,7 @@ true
   "proveedorId": 1,
   "fecha": "",
   "total": "",
+  "totalBruto": "",
   "metodoPago": "transferencia",
   "cbu": "",
   "referencia": "",
@@ -41430,6 +52782,18 @@ true
       "comprobanteCompraId": 1,
       "facturaRef": "",
       "monto": ""
+    }
+  ],
+  "retenciones": [
+    {
+      "id": 1,
+      "regimenId": 1,
+      "regimenNombre": "",
+      "tipo": "",
+      "baseImponible": "",
+      "alicuota": "",
+      "importe": "",
+      "constanciaNum": ""
     }
   ],
   "createdAt": ""
@@ -41474,6 +52838,10 @@ true
 
   `string`
 
+* **`chequeId`**
+
+  `integer` — Portfolio check to endorse when metodoPago is cheque or echeq (#231).
+
 * **`notas`**
 
   `string`
@@ -41481,6 +52849,28 @@ true
 * **`referencia`**
 
   `string`
+
+* **`retenciones`**
+
+  `array`
+
+  **Items:**
+
+  - **`alicuota` (required)**
+
+    `number`
+
+  - **`baseImponible` (required)**
+
+    `number`
+
+  - **`importe` (required)**
+
+    `number`
+
+  - **`regimenId` (required)**
+
+    `integer`
 
 **Example:**
 
@@ -41492,13 +52882,104 @@ true
   "cbu": "",
   "referencia": "",
   "notas": "",
+  "chequeId": 1,
   "facturas": [
     {
       "comprobanteCompraId": 1,
       "facturaRef": "",
       "monto": 1
     }
+  ],
+  "retenciones": [
+    {
+      "regimenId": 1,
+      "baseImponible": 1,
+      "alicuota": 0,
+      "importe": 1
+    }
   ]
+}
+```
+
+### ReciboPagoRetencionInput
+
+- **Type:**`object`
+
+* **`alicuota` (required)**
+
+  `number`
+
+* **`baseImponible` (required)**
+
+  `number`
+
+* **`importe` (required)**
+
+  `number`
+
+* **`regimenId` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "regimenId": 1,
+  "baseImponible": 1,
+  "alicuota": 0,
+  "importe": 1
+}
+```
+
+### ReciboPagoRetencion
+
+- **Type:**`object`
+
+* **`alicuota` (required)**
+
+  `string`
+
+* **`baseImponible` (required)**
+
+  `string`
+
+* **`constanciaNum` (required)**
+
+  `string`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`importe` (required)**
+
+  `string`
+
+* **`regimenId` (required)**
+
+  `integer`
+
+* **`regimenNombre` (required)**
+
+  `string`
+
+* **`tipo` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "regimenId": 1,
+  "regimenNombre": "",
+  "tipo": "",
+  "baseImponible": "",
+  "alicuota": "",
+  "importe": "",
+  "constanciaNum": ""
 }
 ```
 
@@ -41548,6 +53029,840 @@ true
 - **Type:**
 
 **Example:**
+
+### FacturaPendienteCliente
+
+- **Type:**`object`
+
+* **`facturaId` (required)**
+
+  `integer`
+
+* **`facturaRef` (required)**
+
+  `string`
+
+* **`fecha` (required)**
+
+  `string`, format: `date-time`
+
+* **`pagado` (required)**
+
+  `string`
+
+* **`pendiente` (required)**
+
+  `string`
+
+* **`total` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "facturaId": 1,
+  "facturaRef": "",
+  "fecha": "",
+  "total": "",
+  "pagado": "",
+  "pendiente": ""
+}
+```
+
+### FacturaPendienteClienteListEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`facturaId` (required)**
+
+    `integer`
+
+  - **`facturaRef` (required)**
+
+    `string`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`pagado` (required)**
+
+    `string`
+
+  - **`pendiente` (required)**
+
+    `string`
+
+  - **`total` (required)**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "facturaId": 1,
+      "facturaRef": "",
+      "fecha": "",
+      "total": "",
+      "pagado": "",
+      "pendiente": ""
+    }
+  ]
+}
+```
+
+### ReciboCobroForma
+
+- **Type:**`object`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`importe` (required)**
+
+  `string`
+
+* **`tipo` (required)**
+
+  `string`, possible values: `"efectivo", "transferencia", "cheque", "mercadopago", "tarjeta", "otro"`
+
+* **`banco`**
+
+  `string`
+
+* **`chequeBanco`**
+
+  `string`
+
+* **`chequeId`**
+
+  `integer`
+
+* **`chequeNumero`**
+
+  `string`
+
+* **`referencia`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "tipo": "efectivo",
+  "importe": "",
+  "chequeId": 1,
+  "referencia": "",
+  "banco": "",
+  "chequeNumero": "",
+  "chequeBanco": ""
+}
+```
+
+### ReciboCobroImputacion
+
+- **Type:**`object`
+
+* **`facturaId` (required)**
+
+  `integer`
+
+* **`facturaRef` (required)**
+
+  `string`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`importe` (required)**
+
+  `string`
+
+* **`saldoPostPago` (required)**
+
+  `string`
+
+* **`saldoPrevio` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "facturaId": 1,
+  "facturaRef": "",
+  "importe": "",
+  "saldoPrevio": "",
+  "saldoPostPago": ""
+}
+```
+
+### ReciboCobro
+
+- **Type:**`object`
+
+* **`cliente` (required)**
+
+  `object`
+
+  - **`codigo` (required)**
+
+    `integer`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`rsocial` (required)**
+
+    `string`
+
+  - **`cuit`**
+
+    `string`
+
+* **`clienteId` (required)**
+
+  `integer`
+
+* **`createdAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`estado` (required)**
+
+  `string`, possible values: `"emitido", "anulado"`
+
+* **`fecha` (required)**
+
+  `string`, format: `date-time`
+
+* **`formas` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`importe` (required)**
+
+    `string`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"efectivo", "transferencia", "cheque", "mercadopago", "tarjeta", "otro"`
+
+  - **`banco`**
+
+    `string`
+
+  - **`chequeBanco`**
+
+    `string`
+
+  - **`chequeId`**
+
+    `integer`
+
+  - **`chequeNumero`**
+
+    `string`
+
+  - **`referencia`**
+
+    `string`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`imputaciones` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`facturaId` (required)**
+
+    `integer`
+
+  - **`facturaRef` (required)**
+
+    `string`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`importe` (required)**
+
+    `string`
+
+  - **`saldoPostPago` (required)**
+
+    `string`
+
+  - **`saldoPrevio` (required)**
+
+    `string`
+
+* **`numero` (required)**
+
+  `integer`
+
+* **`retenciones` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`alicuota` (required)**
+
+    `string`
+
+  - **`baseImponible` (required)**
+
+    `string`
+
+  - **`constanciaNum` (required)**
+
+    `string`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`importe` (required)**
+
+    `string`
+
+  - **`regimenId` (required)**
+
+    `integer`
+
+  - **`regimenNombre` (required)**
+
+    `string`
+
+  - **`tipo` (required)**
+
+    `string`
+
+* **`totalBruto` (required)**
+
+  `string`
+
+* **`totalCobrado` (required)**
+
+  `string`
+
+* **`usuario` (required)**
+
+  `object`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`username` (required)**
+
+    `string`
+
+* **`usuarioId` (required)**
+
+  `integer`
+
+* **`anulacionMotivo`**
+
+  `string`
+
+* **`concepto`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "numero": 1,
+  "clienteId": 1,
+  "fecha": "",
+  "totalCobrado": "",
+  "totalBruto": "",
+  "concepto": "",
+  "estado": "emitido",
+  "anulacionMotivo": "",
+  "usuarioId": 1,
+  "cliente": {
+    "id": 1,
+    "codigo": 1,
+    "rsocial": "",
+    "cuit": ""
+  },
+  "usuario": {
+    "id": 1,
+    "username": ""
+  },
+  "formas": [
+    {
+      "id": 1,
+      "tipo": "efectivo",
+      "importe": "",
+      "chequeId": 1,
+      "referencia": "",
+      "banco": "",
+      "chequeNumero": "",
+      "chequeBanco": ""
+    }
+  ],
+  "imputaciones": [
+    {
+      "id": 1,
+      "facturaId": 1,
+      "facturaRef": "",
+      "importe": "",
+      "saldoPrevio": "",
+      "saldoPostPago": ""
+    }
+  ],
+  "retenciones": [
+    {
+      "id": 1,
+      "regimenId": 1,
+      "regimenNombre": "",
+      "tipo": "",
+      "baseImponible": "",
+      "alicuota": "",
+      "importe": "",
+      "constanciaNum": ""
+    }
+  ],
+  "createdAt": ""
+}
+```
+
+### ReciboCobroInput
+
+- **Type:**`object`
+
+* **`fecha` (required)**
+
+  `string`
+
+* **`formas` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`importe` (required)**
+
+    `number`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"efectivo", "transferencia", "cheque", "mercadopago", "tarjeta", "otro"`
+
+  - **`banco`**
+
+    `string`
+
+  - **`chequeId`**
+
+    `integer`
+
+  - **`referencia`**
+
+    `string`
+
+* **`totalCobrado` (required)**
+
+  `number`
+
+* **`concepto`**
+
+  `string`
+
+* **`fifo`**
+
+  `boolean`, default: `true`
+
+* **`imputaciones`**
+
+  `array`
+
+  **Items:**
+
+  - **`facturaId` (required)**
+
+    `integer`
+
+  - **`importe` (required)**
+
+    `number`
+
+* **`retenciones`**
+
+  `array`
+
+  **Items:**
+
+  - **`alicuota` (required)**
+
+    `number`
+
+  - **`baseImponible` (required)**
+
+    `number`
+
+  - **`importe` (required)**
+
+    `number`
+
+  - **`regimenId` (required)**
+
+    `integer`
+
+**Example:**
+
+```json
+{
+  "fecha": "",
+  "totalCobrado": 1,
+  "concepto": "",
+  "fifo": true,
+  "formas": [
+    {
+      "tipo": "efectivo",
+      "importe": 1,
+      "chequeId": 1,
+      "referencia": "",
+      "banco": ""
+    }
+  ],
+  "imputaciones": [
+    {
+      "facturaId": 1,
+      "importe": 1
+    }
+  ],
+  "retenciones": [
+    {
+      "regimenId": 1,
+      "baseImponible": 1,
+      "alicuota": 0,
+      "importe": 1
+    }
+  ]
+}
+```
+
+### ReciboCobroVoidInput
+
+- **Type:**`object`
+
+* **`anulacionMotivo` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "anulacionMotivo": ""
+}
+```
+
+### ReciboCobroListEnvelope
+
+- **Type:**
+
+**Example:**
+
+### ReciboCobroEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`cliente` (required)**
+
+    `object`
+
+    - **`codigo` (required)**
+
+      `integer`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`rsocial` (required)**
+
+      `string`
+
+    - **`cuit`**
+
+      `string`
+
+  - **`clienteId` (required)**
+
+    `integer`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"emitido", "anulado"`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`formas` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`importe` (required)**
+
+      `string`
+
+    - **`tipo` (required)**
+
+      `string`, possible values: `"efectivo", "transferencia", "cheque", "mercadopago", "tarjeta", "otro"`
+
+    - **`banco`**
+
+      `string`
+
+    - **`chequeBanco`**
+
+      `string`
+
+    - **`chequeId`**
+
+      `integer`
+
+    - **`chequeNumero`**
+
+      `string`
+
+    - **`referencia`**
+
+      `string`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`imputaciones` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`facturaId` (required)**
+
+      `integer`
+
+    - **`facturaRef` (required)**
+
+      `string`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`importe` (required)**
+
+      `string`
+
+    - **`saldoPostPago` (required)**
+
+      `string`
+
+    - **`saldoPrevio` (required)**
+
+      `string`
+
+  - **`numero` (required)**
+
+    `integer`
+
+  - **`retenciones` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`alicuota` (required)**
+
+      `string`
+
+    - **`baseImponible` (required)**
+
+      `string`
+
+    - **`constanciaNum` (required)**
+
+      `string`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`importe` (required)**
+
+      `string`
+
+    - **`regimenId` (required)**
+
+      `integer`
+
+    - **`regimenNombre` (required)**
+
+      `string`
+
+    - **`tipo` (required)**
+
+      `string`
+
+  - **`totalBruto` (required)**
+
+    `string`
+
+  - **`totalCobrado` (required)**
+
+    `string`
+
+  - **`usuario` (required)**
+
+    `object`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`username` (required)**
+
+      `string`
+
+  - **`usuarioId` (required)**
+
+    `integer`
+
+  - **`anulacionMotivo`**
+
+    `string`
+
+  - **`concepto`**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "numero": 1,
+    "clienteId": 1,
+    "fecha": "",
+    "totalCobrado": "",
+    "totalBruto": "",
+    "concepto": "",
+    "estado": "emitido",
+    "anulacionMotivo": "",
+    "usuarioId": 1,
+    "cliente": {
+      "id": 1,
+      "codigo": 1,
+      "rsocial": "",
+      "cuit": ""
+    },
+    "usuario": {
+      "id": 1,
+      "username": ""
+    },
+    "formas": [
+      {
+        "id": 1,
+        "tipo": "efectivo",
+        "importe": "",
+        "chequeId": 1,
+        "referencia": "",
+        "banco": "",
+        "chequeNumero": "",
+        "chequeBanco": ""
+      }
+    ],
+    "imputaciones": [
+      {
+        "id": 1,
+        "facturaId": 1,
+        "facturaRef": "",
+        "importe": "",
+        "saldoPrevio": "",
+        "saldoPostPago": ""
+      }
+    ],
+    "retenciones": [
+      {
+        "id": 1,
+        "regimenId": 1,
+        "regimenNombre": "",
+        "tipo": "",
+        "baseImponible": "",
+        "alicuota": "",
+        "importe": "",
+        "constanciaNum": ""
+      }
+    ],
+    "createdAt": ""
+  }
+}
+```
 
 ### ReciboPagoEnvelope
 
@@ -41627,7 +53942,49 @@ true
 
     `integer`
 
+  - **`retenciones` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`alicuota` (required)**
+
+      `string`
+
+    - **`baseImponible` (required)**
+
+      `string`
+
+    - **`constanciaNum` (required)**
+
+      `string`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`importe` (required)**
+
+      `string`
+
+    - **`regimenId` (required)**
+
+      `integer`
+
+    - **`regimenNombre` (required)**
+
+      `string`
+
+    - **`tipo` (required)**
+
+      `string`
+
   - **`total` (required)**
+
+    `string`
+
+  - **`totalBruto` (required)**
 
     `string`
 
@@ -41674,6 +54031,7 @@ true
     "proveedorId": 1,
     "fecha": "",
     "total": "",
+    "totalBruto": "",
     "metodoPago": "transferencia",
     "cbu": "",
     "referencia": "",
@@ -41696,6 +54054,18 @@ true
         "comprobanteCompraId": 1,
         "facturaRef": "",
         "monto": ""
+      }
+    ],
+    "retenciones": [
+      {
+        "id": 1,
+        "regimenId": 1,
+        "regimenNombre": "",
+        "tipo": "",
+        "baseImponible": "",
+        "alicuota": "",
+        "importe": "",
+        "constanciaNum": ""
       }
     ],
     "createdAt": ""
@@ -46142,6 +58512,1062 @@ true
 }
 ```
 
+### RemitoItemInput
+
+- **Type:**`object`
+
+* **`articuloId` (required)**
+
+  `integer`
+
+* **`cantidad` (required)**
+
+  `integer`
+
+* **`descripcion` (required)**
+
+  `string`
+
+* **`unidad` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "articuloId": 1,
+  "descripcion": "",
+  "cantidad": 1,
+  "unidad": ""
+}
+```
+
+### RemitoInput
+
+- **Type:**`object`
+
+* **`items` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`cantidad` (required)**
+
+    `integer`
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`unidad` (required)**
+
+    `string`
+
+* **`tipo` (required)**
+
+  `string`, possible values: `"remito_x", "remito_ingreso"`
+
+* **`clienteId`**
+
+  `integer`
+
+* **`facturaId`**
+
+  `integer`
+
+* **`fecha`**
+
+  `string`, format: `date`
+
+* **`observaciones`**
+
+  `string`
+
+* **`ordenEntregaId`**
+
+  `integer`
+
+* **`pedidoId`**
+
+  `integer`
+
+* **`proveedorId`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "tipo": "remito_x",
+  "clienteId": 1,
+  "proveedorId": 1,
+  "facturaId": 1,
+  "pedidoId": 1,
+  "ordenEntregaId": 1,
+  "fecha": "",
+  "observaciones": "",
+  "items": [
+    {
+      "articuloId": 1,
+      "descripcion": "",
+      "cantidad": 1,
+      "unidad": ""
+    }
+  ]
+}
+```
+
+### RemitoUpdateInput
+
+- **Type:**`object`
+
+* **`clienteId`**
+
+  `integer`
+
+* **`items`**
+
+  `array`
+
+  **Items:**
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`cantidad` (required)**
+
+    `integer`
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`unidad` (required)**
+
+    `string`
+
+* **`observaciones`**
+
+  `string`
+
+* **`proveedorId`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "clienteId": 1,
+  "proveedorId": 1,
+  "observaciones": "",
+  "items": [
+    {
+      "articuloId": 1,
+      "descripcion": "",
+      "cantidad": 1,
+      "unidad": ""
+    }
+  ]
+}
+```
+
+### RemitoEntregarInput
+
+- **Type:**`object`
+
+* **`firmadoPor` (required)**
+
+  `string`
+
+* **`fechaEntrega`**
+
+  `string`, format: `date`
+
+**Example:**
+
+```json
+{
+  "firmadoPor": "",
+  "fechaEntrega": ""
+}
+```
+
+### Remito
+
+- **Type:**`object`
+
+* **`clienteId`**
+
+  `integer`
+
+* **`estado`**
+
+  `string`, possible values: `"borrador", "emitido", "entregado", "anulado"`
+
+* **`facturaId`**
+
+  `integer`
+
+* **`fecha`**
+
+  `string`, format: `date-time`
+
+* **`fechaEntrega`**
+
+  `string`, format: `date-time`
+
+* **`firmadoPor`**
+
+  `string`
+
+* **`id`**
+
+  `integer`
+
+* **`items`**
+
+  `array`
+
+  **Items:**
+
+* **`numero`**
+
+  `integer`
+
+* **`observaciones`**
+
+  `string`
+
+* **`pedidoId`**
+
+  `integer`
+
+* **`prefijo`**
+
+  `string`
+
+* **`referencia`**
+
+  `string`
+
+* **`tipo`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "referencia": "",
+  "prefijo": "",
+  "numero": 1,
+  "tipo": "",
+  "estado": "borrador",
+  "clienteId": 1,
+  "facturaId": 1,
+  "pedidoId": 1,
+  "fecha": "",
+  "fechaEntrega": "",
+  "observaciones": "",
+  "firmadoPor": "",
+  "items": [
+    {
+      "additionalProperty": "anything"
+    }
+  ],
+  "additionalProperty": "anything"
+}
+```
+
+### RemitoEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`estado`**
+
+    `string`, possible values: `"borrador", "emitido", "entregado", "anulado"`
+
+  - **`facturaId`**
+
+    `integer`
+
+  - **`fecha`**
+
+    `string`, format: `date-time`
+
+  - **`fechaEntrega`**
+
+    `string`, format: `date-time`
+
+  - **`firmadoPor`**
+
+    `string`
+
+  - **`id`**
+
+    `integer`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+  - **`numero`**
+
+    `integer`
+
+  - **`observaciones`**
+
+    `string`
+
+  - **`pedidoId`**
+
+    `integer`
+
+  - **`prefijo`**
+
+    `string`
+
+  - **`referencia`**
+
+    `string`
+
+  - **`tipo`**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "referencia": "",
+    "prefijo": "",
+    "numero": 1,
+    "tipo": "",
+    "estado": "borrador",
+    "clienteId": 1,
+    "facturaId": 1,
+    "pedidoId": 1,
+    "fecha": "",
+    "fechaEntrega": "",
+    "observaciones": "",
+    "firmadoPor": "",
+    "items": [
+      {
+        "additionalProperty": "anything"
+      }
+    ],
+    "additionalProperty": "anything"
+  }
+}
+```
+
+### RemitoListEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`estado`**
+
+    `string`, possible values: `"borrador", "emitido", "entregado", "anulado"`
+
+  - **`facturaId`**
+
+    `integer`
+
+  - **`fecha`**
+
+    `string`, format: `date-time`
+
+  - **`fechaEntrega`**
+
+    `string`, format: `date-time`
+
+  - **`firmadoPor`**
+
+    `string`
+
+  - **`id`**
+
+    `integer`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+  - **`numero`**
+
+    `integer`
+
+  - **`observaciones`**
+
+    `string`
+
+  - **`pedidoId`**
+
+    `integer`
+
+  - **`prefijo`**
+
+    `string`
+
+  - **`referencia`**
+
+    `string`
+
+  - **`tipo`**
+
+    `string`
+
+* **`limit` (required)**
+
+  `integer`
+
+* **`offset` (required)**
+
+  `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+* **`total` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "referencia": "",
+      "prefijo": "",
+      "numero": 1,
+      "tipo": "",
+      "estado": "borrador",
+      "clienteId": 1,
+      "facturaId": 1,
+      "pedidoId": 1,
+      "fecha": "",
+      "fechaEntrega": "",
+      "observaciones": "",
+      "firmadoPor": "",
+      "items": [
+        {
+          "additionalProperty": "anything"
+        }
+      ],
+      "additionalProperty": "anything"
+    }
+  ],
+  "total": 1,
+  "limit": 1,
+  "offset": 1
+}
+```
+
+### Cheque
+
+- **Type:**`object`
+
+* **`banco` (required)**
+
+  `string`
+
+* **`estado` (required)**
+
+  `string`, possible values: `"en_cartera", "emitido", "depositado", "endosado", "descontado", "cobrado", "rechazado", "anulado"`
+
+* **`fechaEmision` (required)**
+
+  `string`, format: `date-time`
+
+* **`fechaVencimiento` (required)**
+
+  `string`, format: `date-time`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`libradorNombre` (required)**
+
+  `string`
+
+* **`modalidad` (required)**
+
+  `string`, possible values: `"fisico", "echeq"`
+
+* **`moneda` (required)**
+
+  `string`
+
+* **`monto` (required)**
+
+  `string`
+
+* **`numero` (required)**
+
+  `string`
+
+* **`tipo` (required)**
+
+  `string`, possible values: `"recibido", "emitido"`
+
+* **`cbuOrigen`**
+
+  `string`
+
+* **`clienteId`**
+
+  `integer`
+
+* **`libradorCuit`**
+
+  `string`
+
+* **`observaciones`**
+
+  `string`
+
+* **`proveedorId`**
+
+  `integer`
+
+* **`sucursal`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "tipo": "recibido",
+  "modalidad": "fisico",
+  "numero": "",
+  "banco": "",
+  "sucursal": "",
+  "cbuOrigen": "",
+  "libradorNombre": "",
+  "libradorCuit": "",
+  "monto": "",
+  "moneda": "",
+  "fechaEmision": "",
+  "fechaVencimiento": "",
+  "estado": "en_cartera",
+  "clienteId": 1,
+  "proveedorId": 1,
+  "observaciones": ""
+}
+```
+
+### ChequeInput
+
+- **Type:**`object`
+
+* **`banco` (required)**
+
+  `string`
+
+* **`fechaEmision` (required)**
+
+  `string`, format: `date`
+
+* **`fechaVencimiento` (required)**
+
+  `string`, format: `date`
+
+* **`libradorNombre` (required)**
+
+  `string`
+
+* **`modalidad` (required)**
+
+  `string`, possible values: `"fisico", "echeq"`
+
+* **`monto` (required)**
+
+  `number`
+
+* **`numero` (required)**
+
+  `string`
+
+* **`tipo` (required)**
+
+  `string`, possible values: `"recibido", "emitido"`
+
+* **`cbuOrigen`**
+
+  `string`
+
+* **`clienteId`**
+
+  `integer`
+
+* **`libradorCuit`**
+
+  `string`
+
+* **`moneda`**
+
+  `string`
+
+* **`observaciones`**
+
+  `string`
+
+* **`proveedorId`**
+
+  `integer`
+
+* **`sucursal`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "tipo": "recibido",
+  "modalidad": "fisico",
+  "numero": "",
+  "banco": "",
+  "sucursal": "",
+  "cbuOrigen": "",
+  "libradorNombre": "",
+  "libradorCuit": "",
+  "monto": 1,
+  "moneda": "",
+  "fechaEmision": "",
+  "fechaVencimiento": "",
+  "clienteId": 1,
+  "proveedorId": 1,
+  "observaciones": ""
+}
+```
+
+### ChequeUpdateInput
+
+- **Type:**`object`
+
+* **`banco`**
+
+  `string`
+
+* **`cbuOrigen`**
+
+  `string`
+
+* **`fechaVencimiento`**
+
+  `string`, format: `date`
+
+* **`libradorCuit`**
+
+  `string`
+
+* **`libradorNombre`**
+
+  `string`
+
+* **`observaciones`**
+
+  `string`
+
+* **`sucursal`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "banco": "",
+  "sucursal": "",
+  "cbuOrigen": "",
+  "libradorNombre": "",
+  "libradorCuit": "",
+  "fechaVencimiento": "",
+  "observaciones": ""
+}
+```
+
+### ChequeTransicionInput
+
+- **Type:**`object`
+
+* **`destino`**
+
+  `string`
+
+* **`monto`**
+
+  `number`
+
+* **`nota`**
+
+  `string`
+
+* **`proveedorId`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "destino": "",
+  "nota": "",
+  "proveedorId": 1,
+  "monto": 1
+}
+```
+
+### ChequeEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`banco` (required)**
+
+    `string`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"en_cartera", "emitido", "depositado", "endosado", "descontado", "cobrado", "rechazado", "anulado"`
+
+  - **`fechaEmision` (required)**
+
+    `string`, format: `date-time`
+
+  - **`fechaVencimiento` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`libradorNombre` (required)**
+
+    `string`
+
+  - **`modalidad` (required)**
+
+    `string`, possible values: `"fisico", "echeq"`
+
+  - **`moneda` (required)**
+
+    `string`
+
+  - **`monto` (required)**
+
+    `string`
+
+  - **`numero` (required)**
+
+    `string`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"recibido", "emitido"`
+
+  - **`cbuOrigen`**
+
+    `string`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`libradorCuit`**
+
+    `string`
+
+  - **`observaciones`**
+
+    `string`
+
+  - **`proveedorId`**
+
+    `integer`
+
+  - **`sucursal`**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tipo": "recibido",
+    "modalidad": "fisico",
+    "numero": "",
+    "banco": "",
+    "sucursal": "",
+    "cbuOrigen": "",
+    "libradorNombre": "",
+    "libradorCuit": "",
+    "monto": "",
+    "moneda": "",
+    "fechaEmision": "",
+    "fechaVencimiento": "",
+    "estado": "en_cartera",
+    "clienteId": 1,
+    "proveedorId": 1,
+    "observaciones": ""
+  }
+}
+```
+
+### ChequeListEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`banco` (required)**
+
+    `string`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"en_cartera", "emitido", "depositado", "endosado", "descontado", "cobrado", "rechazado", "anulado"`
+
+  - **`fechaEmision` (required)**
+
+    `string`, format: `date-time`
+
+  - **`fechaVencimiento` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`libradorNombre` (required)**
+
+    `string`
+
+  - **`modalidad` (required)**
+
+    `string`, possible values: `"fisico", "echeq"`
+
+  - **`moneda` (required)**
+
+    `string`
+
+  - **`monto` (required)**
+
+    `string`
+
+  - **`numero` (required)**
+
+    `string`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"recibido", "emitido"`
+
+  - **`cbuOrigen`**
+
+    `string`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`libradorCuit`**
+
+    `string`
+
+  - **`observaciones`**
+
+    `string`
+
+  - **`proveedorId`**
+
+    `integer`
+
+  - **`sucursal`**
+
+    `string`
+
+* **`limit` (required)**
+
+  `integer`
+
+* **`offset` (required)**
+
+  `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+* **`total` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "tipo": "recibido",
+      "modalidad": "fisico",
+      "numero": "",
+      "banco": "",
+      "sucursal": "",
+      "cbuOrigen": "",
+      "libradorNombre": "",
+      "libradorCuit": "",
+      "monto": "",
+      "moneda": "",
+      "fechaEmision": "",
+      "fechaVencimiento": "",
+      "estado": "en_cartera",
+      "clienteId": 1,
+      "proveedorId": 1,
+      "observaciones": ""
+    }
+  ],
+  "total": 1,
+  "limit": 1,
+  "offset": 1
+}
+```
+
+### ChequeResumenEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`enCartera` (required)**
+
+    `object`
+
+    - **`count`**
+
+      `integer`
+
+    - **`total`**
+
+      `string`
+
+  - **`proximosVencer` (required)**
+
+    `object`
+
+    - **`count`**
+
+      `integer`
+
+    - **`total`**
+
+      `string`
+
+  - **`rechazados` (required)**
+
+    `object`
+
+    - **`count`**
+
+      `integer`
+
+    - **`total`**
+
+      `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "enCartera": {
+      "count": 1,
+      "total": ""
+    },
+    "proximosVencer": {
+      "count": 1,
+      "total": ""
+    },
+    "rechazados": {
+      "count": 1,
+      "total": ""
+    }
+  }
+}
+```
+
 ### VoidInput
 
 - **Type:**`object`
@@ -46226,11 +59652,33 @@ true
 
 * **`total` (required)**
 
-  `number`
+  `number` — Must equal netos + IVA + sum(percepciones) when percepciones are sent (#229).
 
 * **`formaPagoId`**
 
   `integer`
+
+* **`percepciones`**
+
+  `array`
+
+  **Items:**
+
+  - **`alicuota` (required)**
+
+    `number`
+
+  - **`baseImponible` (required)**
+
+    `number`
+
+  - **`importe` (required)**
+
+    `number`
+
+  - **`regimenId` (required)**
+
+    `integer`
 
 * **`prefijo`**
 
@@ -46252,6 +59700,14 @@ true
   "iva1": 1,
   "iva2": 1,
   "total": 1,
+  "percepciones": [
+    {
+      "regimenId": 1,
+      "baseImponible": 1,
+      "alicuota": 0,
+      "importe": 1
+    }
+  ],
   "items": [
     {
       "articuloId": 1,
@@ -49345,6 +62801,632 @@ Originating invoice header (selected columns)
 }
 ```
 
+### PresentacionRetencionInput
+
+- **Type:**`object`
+
+* **`formato` (required)**
+
+  `string`, possible values: `"sicore", "sifere"`
+
+* **`periodo` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "formato": "sicore",
+  "periodo": ""
+}
+```
+
+### PresentacionWarning
+
+- **Type:**`object`
+
+* **`code` (required)**
+
+  `string`, possible values: `"missing_cuit", "invalid_cuit", "zero_importe_excluded"`
+
+* **`message` (required)**
+
+  `string`
+
+* **`retencionId` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "code": "missing_cuit",
+  "retencionId": 1,
+  "message": ""
+}
+```
+
+### PresentacionFila
+
+- **Type:**`object`
+
+* **`alicuota` (required)**
+
+  `string`
+
+* **`baseImponible` (required)**
+
+  `string`
+
+* **`cuit` (required)**
+
+  `string`
+
+* **`denominacion` (required)**
+
+  `string`
+
+* **`fecha` (required)**
+
+  `string`, format: `date-time`
+
+* **`importe` (required)**
+
+  `string`
+
+* **`incluida` (required)**
+
+  `boolean`
+
+* **`operacionTipo` (required)**
+
+  `string`, possible values: `"retencion", "percepcion"`
+
+* **`regimenNombre` (required)**
+
+  `string`
+
+* **`regimenTipo` (required)**
+
+  `string`
+
+* **`retencionId` (required)**
+
+  `integer`
+
+* **`provincia`**
+
+  `string | null`
+
+**Example:**
+
+```json
+{
+  "retencionId": 1,
+  "fecha": "",
+  "cuit": "",
+  "denominacion": "",
+  "regimenNombre": "",
+  "regimenTipo": "",
+  "operacionTipo": "retencion",
+  "provincia": null,
+  "baseImponible": "",
+  "alicuota": "",
+  "importe": "",
+  "incluida": true
+}
+```
+
+### PresentacionTotalRegimen
+
+- **Type:**`object`
+
+* **`operaciones` (required)**
+
+  `integer`
+
+* **`regimenNombre` (required)**
+
+  `string`
+
+* **`totalImporte` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "regimenNombre": "",
+  "operaciones": 0,
+  "totalImporte": ""
+}
+```
+
+### PresentacionPreview
+
+- **Type:**`object`
+
+* **`canGenerate` (required)**
+
+  `boolean`
+
+* **`filas` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`alicuota` (required)**
+
+    `string`
+
+  - **`baseImponible` (required)**
+
+    `string`
+
+  - **`cuit` (required)**
+
+    `string`
+
+  - **`denominacion` (required)**
+
+    `string`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`importe` (required)**
+
+    `string`
+
+  - **`incluida` (required)**
+
+    `boolean`
+
+  - **`operacionTipo` (required)**
+
+    `string`, possible values: `"retencion", "percepcion"`
+
+  - **`regimenNombre` (required)**
+
+    `string`
+
+  - **`regimenTipo` (required)**
+
+    `string`
+
+  - **`retencionId` (required)**
+
+    `integer`
+
+  - **`provincia`**
+
+    `string | null`
+
+* **`formato` (required)**
+
+  `string`, possible values: `"sicore", "sifere"`
+
+* **`periodo` (required)**
+
+  `string`
+
+* **`totalesPorRegimen` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`operaciones` (required)**
+
+    `integer`
+
+  - **`regimenNombre` (required)**
+
+    `string`
+
+  - **`totalImporte` (required)**
+
+    `string`
+
+* **`warnings` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`code` (required)**
+
+    `string`, possible values: `"missing_cuit", "invalid_cuit", "zero_importe_excluded"`
+
+  - **`message` (required)**
+
+    `string`
+
+  - **`retencionId` (required)**
+
+    `integer`
+
+**Example:**
+
+```json
+{
+  "formato": "sicore",
+  "periodo": "",
+  "filas": [
+    {
+      "retencionId": 1,
+      "fecha": "",
+      "cuit": "",
+      "denominacion": "",
+      "regimenNombre": "",
+      "regimenTipo": "",
+      "operacionTipo": "retencion",
+      "provincia": null,
+      "baseImponible": "",
+      "alicuota": "",
+      "importe": "",
+      "incluida": true
+    }
+  ],
+  "totalesPorRegimen": [
+    {
+      "regimenNombre": "",
+      "operaciones": 0,
+      "totalImporte": ""
+    }
+  ],
+  "warnings": [
+    {
+      "code": "missing_cuit",
+      "retencionId": 1,
+      "message": ""
+    }
+  ],
+  "canGenerate": true
+}
+```
+
+### PresentacionPreviewEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`canGenerate` (required)**
+
+    `boolean`
+
+  - **`filas` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`alicuota` (required)**
+
+      `string`
+
+    - **`baseImponible` (required)**
+
+      `string`
+
+    - **`cuit` (required)**
+
+      `string`
+
+    - **`denominacion` (required)**
+
+      `string`
+
+    - **`fecha` (required)**
+
+      `string`, format: `date-time`
+
+    - **`importe` (required)**
+
+      `string`
+
+    - **`incluida` (required)**
+
+      `boolean`
+
+    - **`operacionTipo` (required)**
+
+      `string`, possible values: `"retencion", "percepcion"`
+
+    - **`regimenNombre` (required)**
+
+      `string`
+
+    - **`regimenTipo` (required)**
+
+      `string`
+
+    - **`retencionId` (required)**
+
+      `integer`
+
+    - **`provincia`**
+
+      `string | null`
+
+  - **`formato` (required)**
+
+    `string`, possible values: `"sicore", "sifere"`
+
+  - **`periodo` (required)**
+
+    `string`
+
+  - **`totalesPorRegimen` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`operaciones` (required)**
+
+      `integer`
+
+    - **`regimenNombre` (required)**
+
+      `string`
+
+    - **`totalImporte` (required)**
+
+      `string`
+
+  - **`warnings` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`code` (required)**
+
+      `string`, possible values: `"missing_cuit", "invalid_cuit", "zero_importe_excluded"`
+
+    - **`message` (required)**
+
+      `string`
+
+    - **`retencionId` (required)**
+
+      `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "formato": "sicore",
+    "periodo": "",
+    "filas": [
+      {
+        "retencionId": 1,
+        "fecha": "",
+        "cuit": "",
+        "denominacion": "",
+        "regimenNombre": "",
+        "regimenTipo": "",
+        "operacionTipo": "retencion",
+        "provincia": null,
+        "baseImponible": "",
+        "alicuota": "",
+        "importe": "",
+        "incluida": true
+      }
+    ],
+    "totalesPorRegimen": [
+      {
+        "regimenNombre": "",
+        "operaciones": 0,
+        "totalImporte": ""
+      }
+    ],
+    "warnings": [
+      {
+        "code": "missing_cuit",
+        "retencionId": 1,
+        "message": ""
+      }
+    ],
+    "canGenerate": true
+  }
+}
+```
+
+### PresentacionRetencion
+
+- **Type:**`object`
+
+* **`createdAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`formato` (required)**
+
+  `string`, possible values: `"sicore", "sifere"`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`periodo` (required)**
+
+  `string`
+
+* **`totalImporte` (required)**
+
+  `string`
+
+* **`totalOperaciones` (required)**
+
+  `integer`
+
+* **`archivoHash`**
+
+  `string | null`
+
+* **`presentadoAt`**
+
+  `string | null`, format: `date-time`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "formato": "sicore",
+  "periodo": "",
+  "totalOperaciones": 0,
+  "totalImporte": "",
+  "archivoHash": null,
+  "presentadoAt": null,
+  "createdAt": ""
+}
+```
+
+### PresentacionRetencionEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`formato` (required)**
+
+    `string`, possible values: `"sicore", "sifere"`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`periodo` (required)**
+
+    `string`
+
+  - **`totalImporte` (required)**
+
+    `string`
+
+  - **`totalOperaciones` (required)**
+
+    `integer`
+
+  - **`archivoHash`**
+
+    `string | null`
+
+  - **`presentadoAt`**
+
+    `string | null`, format: `date-time`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "formato": "sicore",
+    "periodo": "",
+    "totalOperaciones": 0,
+    "totalImporte": "",
+    "archivoHash": null,
+    "presentadoAt": null,
+    "createdAt": ""
+  }
+}
+```
+
+### PresentacionRetencionListEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`formato` (required)**
+
+    `string`, possible values: `"sicore", "sifere"`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`periodo` (required)**
+
+    `string`
+
+  - **`totalImporte` (required)**
+
+    `string`
+
+  - **`totalOperaciones` (required)**
+
+    `integer`
+
+  - **`archivoHash`**
+
+    `string | null`
+
+  - **`presentadoAt`**
+
+    `string | null`, format: `date-time`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "formato": "sicore",
+      "periodo": "",
+      "totalOperaciones": 0,
+      "totalImporte": "",
+      "archivoHash": null,
+      "presentadoAt": null,
+      "createdAt": ""
+    }
+  ]
+}
+```
+
 ### RetencionAplicada
 
 - **Type:**`object`
@@ -51423,6 +65505,194 @@ Originating invoice header (selected columns)
 }
 ```
 
+### MercadoPagoConfigStatus
+
+- **Type:**`object`
+
+* **`configured` (required)**
+
+  `boolean`
+
+* **`accessTokenLast4`**
+
+  `string`
+
+* **`activo`**
+
+  `boolean`
+
+* **`publicKey`**
+
+  `string`
+
+* **`sandboxMode`**
+
+  `boolean`
+
+* **`webhookSecretSet`**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "configured": true,
+  "publicKey": "",
+  "sandboxMode": true,
+  "activo": true,
+  "accessTokenLast4": "",
+  "webhookSecretSet": true
+}
+```
+
+### MercadoPagoConfigInput
+
+- **Type:**`object`
+
+* **`publicKey` (required)**
+
+  `string`
+
+* **`accessToken`**
+
+  `string`
+
+* **`activo`**
+
+  `boolean`
+
+* **`sandboxMode`**
+
+  `boolean`
+
+* **`webhookSecret`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "accessToken": "",
+  "publicKey": "",
+  "webhookSecret": "",
+  "sandboxMode": true,
+  "activo": true
+}
+```
+
+### MercadoPagoConfigStatusEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`configured` (required)**
+
+    `boolean`
+
+  - **`accessTokenLast4`**
+
+    `string`
+
+  - **`activo`**
+
+    `boolean`
+
+  - **`publicKey`**
+
+    `string`
+
+  - **`sandboxMode`**
+
+    `boolean`
+
+  - **`webhookSecretSet`**
+
+    `boolean`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "configured": true,
+    "publicKey": "",
+    "sandboxMode": true,
+    "activo": true,
+    "accessTokenLast4": "",
+    "webhookSecretSet": true
+  }
+}
+```
+
+### MercadoPagoConfigEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`configured`**
+
+    `boolean`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "configured": true
+  }
+}
+```
+
+### MercadoPagoTestEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`accountName` (required)**
+
+    `string`
+
+  - **`email`**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "accountName": "",
+    "email": ""
+  }
+}
+```
+
 ### ArcaTaEnvelope
 
 - **Type:**`object`
@@ -53120,6 +67390,810 @@ Originating invoice header (selected columns)
     "condicionIva": "RI",
     "ingresosBrutos": "",
     "fechaInicioActividades": ""
+  }
+}
+```
+
+### PortalConfig
+
+- **Type:**`object`
+
+* **`enabled` (required)**
+
+  `boolean`
+
+* **`footerText` (required)**
+
+  `string`
+
+* **`logoUrl` (required)**
+
+  `string`
+
+* **`primaryColor` (required)**
+
+  `string`
+
+* **`showPedidos` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "enabled": true,
+  "showPedidos": true,
+  "logoUrl": "",
+  "primaryColor": "",
+  "footerText": ""
+}
+```
+
+### PortalConfigInput
+
+- **Type:**`object`
+
+* **`enabled`**
+
+  `boolean`
+
+* **`footerText`**
+
+  `string`
+
+* **`logoUrl`**
+
+  `string`
+
+* **`primaryColor`**
+
+  `string`
+
+* **`showPedidos`**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "enabled": true,
+  "showPedidos": true,
+  "logoUrl": "",
+  "primaryColor": "",
+  "footerText": ""
+}
+```
+
+### PortalConfigEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`enabled` (required)**
+
+    `boolean`
+
+  - **`footerText` (required)**
+
+    `string`
+
+  - **`logoUrl` (required)**
+
+    `string`
+
+  - **`primaryColor` (required)**
+
+    `string`
+
+  - **`showPedidos` (required)**
+
+    `boolean`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "enabled": true,
+    "showPedidos": true,
+    "logoUrl": "",
+    "primaryColor": "",
+    "footerText": ""
+  }
+}
+```
+
+### PortalBranding
+
+- **Type:**`object`
+
+* **`enabled` (required)**
+
+  `boolean`
+
+* **`footerText` (required)**
+
+  `string`
+
+* **`logoUrl` (required)**
+
+  `string`
+
+* **`primaryColor` (required)**
+
+  `string`
+
+* **`showPedidos` (required)**
+
+  `boolean`
+
+* **`tenantName` (required)**
+
+  `string`
+
+* **`tenantSlug` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "tenantName": "",
+  "tenantSlug": "",
+  "enabled": true,
+  "showPedidos": true,
+  "logoUrl": "",
+  "primaryColor": "",
+  "footerText": ""
+}
+```
+
+### PortalBrandingEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`enabled` (required)**
+
+    `boolean`
+
+  - **`footerText` (required)**
+
+    `string`
+
+  - **`logoUrl` (required)**
+
+    `string`
+
+  - **`primaryColor` (required)**
+
+    `string`
+
+  - **`showPedidos` (required)**
+
+    `boolean`
+
+  - **`tenantName` (required)**
+
+    `string`
+
+  - **`tenantSlug` (required)**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "tenantName": "",
+    "tenantSlug": "",
+    "enabled": true,
+    "showPedidos": true,
+    "logoUrl": "",
+    "primaryColor": "",
+    "footerText": ""
+  }
+}
+```
+
+### PortalMagicLinkInput
+
+- **Type:**`object`
+
+* **`email` (required)**
+
+  `string`, format: `email`
+
+**Example:**
+
+```json
+{
+  "email": ""
+}
+```
+
+### PortalMagicLinkSentEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`sent` (required)**
+
+    `boolean`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "sent": true
+  }
+}
+```
+
+### PortalMe
+
+- **Type:**`object`
+
+* **`clienteId` (required)**
+
+  `integer`
+
+* **`codigo` (required)**
+
+  `integer`
+
+* **`domicilio` (required)**
+
+  `string`
+
+* **`email` (required)**
+
+  `string`
+
+* **`fantasia` (required)**
+
+  `string`
+
+* **`localidad` (required)**
+
+  `string`
+
+* **`rsocial` (required)**
+
+  `string`
+
+* **`telef` (required)**
+
+  `string`
+
+* **`vendedor` (required)**
+
+  `object`
+
+  - **`id`**
+
+    `integer`
+
+  - **`username`**
+
+    `string`
+
+**Example:**
+
+```json
+{
+  "clienteId": 1,
+  "codigo": 1,
+  "rsocial": "",
+  "fantasia": "",
+  "email": "",
+  "telef": "",
+  "domicilio": "",
+  "localidad": "",
+  "vendedor": {
+    "id": 1,
+    "username": ""
+  }
+}
+```
+
+### PortalVerifyEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`me` (required)**
+
+    `object`
+
+    - **`clienteId` (required)**
+
+      `integer`
+
+    - **`codigo` (required)**
+
+      `integer`
+
+    - **`domicilio` (required)**
+
+      `string`
+
+    - **`email` (required)**
+
+      `string`
+
+    - **`fantasia` (required)**
+
+      `string`
+
+    - **`localidad` (required)**
+
+      `string`
+
+    - **`rsocial` (required)**
+
+      `string`
+
+    - **`telef` (required)**
+
+      `string`
+
+    - **`vendedor` (required)**
+
+      `object`
+
+      - **`id`**
+
+        `integer`
+
+      - **`username`**
+
+        `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "me": {
+      "clienteId": 1,
+      "codigo": 1,
+      "rsocial": "",
+      "fantasia": "",
+      "email": "",
+      "telef": "",
+      "domicilio": "",
+      "localidad": "",
+      "vendedor": {
+        "id": 1,
+        "username": ""
+      }
+    }
+  }
+}
+```
+
+### PortalMeEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`branding` (required)**
+
+    `object`
+
+    - **`enabled` (required)**
+
+      `boolean`
+
+    - **`footerText` (required)**
+
+      `string`
+
+    - **`logoUrl` (required)**
+
+      `string`
+
+    - **`primaryColor` (required)**
+
+      `string`
+
+    - **`showPedidos` (required)**
+
+      `boolean`
+
+    - **`tenantName` (required)**
+
+      `string`
+
+    - **`tenantSlug` (required)**
+
+      `string`
+
+  - **`me` (required)**
+
+    `object`
+
+    - **`clienteId` (required)**
+
+      `integer`
+
+    - **`codigo` (required)**
+
+      `integer`
+
+    - **`domicilio` (required)**
+
+      `string`
+
+    - **`email` (required)**
+
+      `string`
+
+    - **`fantasia` (required)**
+
+      `string`
+
+    - **`localidad` (required)**
+
+      `string`
+
+    - **`rsocial` (required)**
+
+      `string`
+
+    - **`telef` (required)**
+
+      `string`
+
+    - **`vendedor` (required)**
+
+      `object`
+
+      - **`id`**
+
+        `integer`
+
+      - **`username`**
+
+        `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "me": {
+      "clienteId": 1,
+      "codigo": 1,
+      "rsocial": "",
+      "fantasia": "",
+      "email": "",
+      "telef": "",
+      "domicilio": "",
+      "localidad": "",
+      "vendedor": {
+        "id": 1,
+        "username": ""
+      }
+    },
+    "branding": {
+      "tenantName": "",
+      "tenantSlug": "",
+      "enabled": true,
+      "showPedidos": true,
+      "logoUrl": "",
+      "primaryColor": "",
+      "footerText": ""
+    }
+  }
+}
+```
+
+### PortalLogoutEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`loggedOut` (required)**
+
+    `boolean`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "loggedOut": true
+  }
+}
+```
+
+### PortalFacturaRow
+
+- **Type:**`object`
+
+* **`estado` (required)**
+
+  `string`, possible values: `"pagada", "pendiente", "vencida"`
+
+* **`fecha` (required)**
+
+  `string`, format: `date-time`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`pagado` (required)**
+
+  `string`
+
+* **`pendiente` (required)**
+
+  `string`
+
+* **`ref` (required)**
+
+  `string`
+
+* **`total` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "ref": "",
+  "fecha": "",
+  "total": "",
+  "pagado": "",
+  "pendiente": "",
+  "estado": "pagada"
+}
+```
+
+### PortalFacturaListEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`facturas` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`estado` (required)**
+
+      `string`, possible values: `"pagada", "pendiente", "vencida"`
+
+    - **`fecha` (required)**
+
+      `string`, format: `date-time`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`pagado` (required)**
+
+      `string`
+
+    - **`pendiente` (required)**
+
+      `string`
+
+    - **`ref` (required)**
+
+      `string`
+
+    - **`total` (required)**
+
+      `string`
+
+  - **`total` (required)**
+
+    `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "facturas": [
+      {
+        "id": 1,
+        "ref": "",
+        "fecha": "",
+        "total": "",
+        "pagado": "",
+        "pendiente": "",
+        "estado": "pagada"
+      }
+    ],
+    "total": 1
+  }
+}
+```
+
+### PortalPedidoRow
+
+- **Type:**`object`
+
+* **`createdAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`estado` (required)**
+
+  `string`
+
+* **`facturaRef` (required)**
+
+  `string`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`remitoEstado` (required)**
+
+  `string`
+
+* **`total` (required)**
+
+  `string`
+
+* **`validUntil` (required)**
+
+  `string`, format: `date-time`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "estado": "",
+  "total": "",
+  "createdAt": "",
+  "validUntil": "",
+  "facturaRef": "",
+  "remitoEstado": ""
+}
+```
+
+### PortalPedidoListEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`pedidos` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`createdAt` (required)**
+
+      `string`, format: `date-time`
+
+    - **`estado` (required)**
+
+      `string`
+
+    - **`facturaRef` (required)**
+
+      `string`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`remitoEstado` (required)**
+
+      `string`
+
+    - **`total` (required)**
+
+      `string`
+
+    - **`validUntil` (required)**
+
+      `string`, format: `date-time`
+
+  - **`total` (required)**
+
+    `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "pedidos": [
+      {
+        "id": 1,
+        "estado": "",
+        "total": "",
+        "createdAt": "",
+        "validUntil": "",
+        "facturaRef": "",
+        "remitoEstado": ""
+      }
+    ],
+    "total": 1
   }
 }
 ```

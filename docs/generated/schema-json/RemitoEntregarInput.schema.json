@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "fechaEntrega": {
+      "format": "date",
+      "type": "string"
+    },
+    "firmadoPor": {
+      "maxLength": 120,
+      "minLength": 2,
+      "type": "string"
+    }
+  },
+  "required": [
+    "firmadoPor"
+  ],
+  "title": "RemitoEntregarInput",
+  "type": "object"
+}

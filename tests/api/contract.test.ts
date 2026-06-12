@@ -6,6 +6,15 @@ import { Decimal } from '@prisma/client/runtime/library'
 import { createApp } from '../../server/createApp'
 import { createEmptyDocumentoCompraPreview } from '../../server/lib/documentoCompraTypes'
 import { assertMatchesOpenApi } from './validate-openapi-response'
+import {
+  createMovimientoClienteCCPrismaMock,
+  extendClientePrismaForCc,
+} from '../helpers/movimientoClienteCcPrismaMock'
+
+function isObjectRecord(value: unknown): value is Record<string, unknown> {
+  if (value === undefined || value === null) return false
+  return typeof value === 'object' && !Array.isArray(value)
+}
 
 const rubroRow = { id: 1, codigo: 1, nombre: 'General' }
 
@@ -243,13 +252,12 @@ function buildPrisma(): PrismaClient {
 
   const p = {
     deliveryZone: { findFirst: vi.fn().mockResolvedValue(null) },
-    cliente: {
+    cliente: extendClientePrismaForCc({
       count: vi.fn().mockResolvedValue(1),
       findMany: vi.fn((args?: unknown) => {
-        const w =
-          args && typeof args === 'object' && args !== null && 'where' in args
-            ? (args as { where?: { codigo?: { in?: number[] } } }).where
-            : undefined
+        const w = isObjectRecord(args) && 'where' in args
+          ? (args as { where?: { codigo?: { in?: number[] } } }).where
+          : undefined
         if (w?.codigo && typeof w.codigo === 'object' && Array.isArray(w.codigo.in)) {
           return Promise.resolve([])
         }
@@ -259,16 +267,15 @@ function buildPrisma(): PrismaClient {
       findUnique: vi.fn().mockResolvedValue(clienteRow),
       create: vi.fn().mockResolvedValue(clienteRow),
       update: vi.fn().mockResolvedValue(clienteRow), // PUT /api/clientes/:id returns full row
-    },
+    }),
     articulo: {
       count: vi.fn().mockResolvedValue(1),
       findMany: vi.fn((args?: unknown) => {
-        const w =
-          args && typeof args === 'object' && args !== null && 'where' in args
-            ? (args as {
-                where?: { codigo?: { in?: number[] }; id?: { in?: number[] } }
-              }).where
-            : undefined
+        const w = isObjectRecord(args) && 'where' in args
+          ? (args as {
+              where?: { codigo?: { in?: number[] }; id?: { in?: number[] } }
+            }).where
+          : undefined
         if (w?.id && typeof w.id === 'object' && Array.isArray(w.id.in)) {
           if (w.id.in.length === 0) return Promise.resolve([])
           return Promise.resolve(w.id.in.map((id: number) => ({ id })))
@@ -300,10 +307,9 @@ function buildPrisma(): PrismaClient {
       count: vi.fn().mockResolvedValue(1),
       findFirst: vi.fn().mockResolvedValue(rubroRow),
       findMany: vi.fn().mockImplementation((args?: unknown) => {
-        const a =
-          args && typeof args === 'object' && args !== null
-            ? (args as { where?: { codigo?: { in?: number[] } }; select?: Record<string, boolean> })
-            : {}
+        const a = isObjectRecord(args)
+          ? (args as { where?: { codigo?: { in?: number[] } }; select?: Record<string, boolean> })
+          : {}
         if (a.where?.codigo && typeof a.where.codigo === 'object' && Array.isArray(a.where.codigo.in)) {
           return Promise.resolve([])
         }
@@ -447,6 +453,24 @@ function buildPrisma(): PrismaClient {
     retencionAplicada: {
       count: vi.fn().mockResolvedValue(0),
       findMany: vi.fn().mockResolvedValue([]),
+      findFirst: vi.fn().mockResolvedValue(null),
+    },
+    presentacionRetencion: {
+      create: vi.fn().mockResolvedValue({
+        id: 1,
+        tenantId: 1,
+        formato: 'sicore',
+        periodo: '2026-06',
+        totalOperaciones: 0,
+        totalImporte: new Decimal(0),
+        archivoHash: 'hash',
+        archivoContenido: '',
+        presentadoAt: null,
+        createdAt: new Date(),
+      }),
+      findMany: vi.fn().mockResolvedValue([]),
+      findFirst: vi.fn().mockResolvedValue(null),
+      update: vi.fn(),
     },
     comprobanteCompra: {
       findMany: vi.fn().mockResolvedValue([]),
@@ -492,6 +516,87 @@ function buildPrisma(): PrismaClient {
         createdAt: new Date(),
       }),
     },
+    movimientoClienteCC: {
+      findFirst: vi.fn().mockResolvedValue({
+        id: 1,
+        saldoPost: new Decimal(100),
+      }),
+      findMany: vi.fn().mockResolvedValue([
+        {
+          id: 1,
+          tenantId: 1,
+          clienteId: 1,
+          tipo: 'factura',
+          referencia: 'A-0001-1',
+          monto: new Decimal(100),
+          saldoPost: new Decimal(100),
+          fecha: new Date('2026-05-10T12:00:00.000Z'),
+          usuarioId: 1,
+          notas: null,
+          facturaId: 1,
+          cobroId: null,
+          notaCreditoId: null,
+          chequeId: null,
+          retencionAplicadaId: null,
+          createdAt: new Date(),
+        },
+      ]),
+      count: vi.fn().mockResolvedValue(1),
+      create: vi.fn().mockResolvedValue({
+        id: 2,
+        tenantId: 1,
+        clienteId: 1,
+        tipo: 'ajuste',
+        referencia: 'ajuste_manual',
+        monto: new Decimal(-10),
+        saldoPost: new Decimal(90),
+        fecha: new Date(),
+        usuarioId: 1,
+        notas: 'test',
+        facturaId: null,
+        cobroId: null,
+        notaCreditoId: null,
+        chequeId: null,
+        retencionAplicadaId: null,
+        createdAt: new Date(),
+      }),
+    },
+    paramEmpresa: {
+      findFirst: vi.fn().mockResolvedValue({
+        nombre: 'Demo Co',
+        cuit: '20-12345678-6',
+        domicilio: 'Calle 1',
+        logoUrl: null,
+      }),
+      findUnique: vi.fn().mockResolvedValue({
+        id: 1,
+        tenantId: 1,
+        nombre: 'Demo Co',
+        cuit: '20-12345678-6',
+        domicilio: null,
+        puntoVenta: 1,
+        tipoFactura: 'B',
+        logoUrl: null,
+        recordatorioDiasGracia: 0,
+        timezone: 'America/Argentina/Buenos_Aires',
+        recordatorioHoraInicio: 8,
+        recordatorioHoraFin: 18,
+      }),
+      upsert: vi.fn().mockResolvedValue({
+        id: 1,
+        tenantId: 1,
+        nombre: 'Demo Co',
+        cuit: '20-12345678-6',
+        domicilio: 'Calle 1',
+        puntoVenta: 2,
+        tipoFactura: 'A',
+        logoUrl: null,
+        recordatorioDiasGracia: 0,
+        timezone: 'America/Argentina/Buenos_Aires',
+        recordatorioHoraInicio: 8,
+        recordatorioHoraFin: 18,
+      }),
+    },
     reciboPagoFactura: {
       groupBy: vi.fn().mockResolvedValue([]),
     },
@@ -523,6 +628,7 @@ function buildPrisma(): PrismaClient {
               monto: new Decimal(100),
             },
           ],
+          retencionesAplicadas: [],
         },
       ]),
       findFirst: vi.fn().mockImplementation(async (args?: { where?: Record<string, unknown> }) => {
@@ -552,6 +658,7 @@ function buildPrisma(): PrismaClient {
               monto: new Decimal(100),
             },
           ],
+          retencionesAplicadas: [],
         }
       }),
       create: vi.fn().mockResolvedValue({
@@ -579,6 +686,7 @@ function buildPrisma(): PrismaClient {
             monto: new Decimal(100),
           },
         ],
+        retencionesAplicadas: [],
       }),
       update: vi.fn().mockResolvedValue({
         id: 1,
@@ -605,11 +713,281 @@ function buildPrisma(): PrismaClient {
             monto: new Decimal(100),
           },
         ],
+        retencionesAplicadas: [],
+      }),
+    },
+    reciboCobroImputacion: {
+      groupBy: vi.fn().mockResolvedValue([]),
+    },
+    reciboCobro: {
+      count: vi.fn().mockResolvedValue(1),
+      findMany: vi.fn().mockResolvedValue([
+        {
+          id: 1,
+          tenantId: 1,
+          numero: 1,
+          clienteId: 1,
+          fecha: new Date('2026-06-01T12:00:00.000Z'),
+          totalCobrado: new Decimal(100),
+          concepto: null,
+          estado: 'emitido',
+          anulacionMotivo: null,
+          usuarioId: 1,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          cliente: { id: 1, codigo: 1, rsocial: 'ACME SA', cuit: null },
+          usuario: { id: 1, username: 'owner1' },
+          formas: [
+            {
+              id: 1,
+              reciboCobroId: 1,
+              tipo: 'efectivo',
+              importe: new Decimal(100),
+              chequeId: null,
+              referencia: null,
+              banco: null,
+              cheque: null,
+            },
+          ],
+          imputaciones: [
+            {
+              id: 1,
+              reciboCobroId: 1,
+              facturaId: 1,
+              importe: new Decimal(100),
+              saldoPrevio: new Decimal(121),
+              saldoPostPago: new Decimal(21),
+              factura: { id: 1, tipo: 'A', prefijo: 'A', numero: 1 },
+            },
+          ],
+          retencionesAplicadas: [],
+        },
+      ]),
+      findFirst: vi.fn().mockImplementation(async (args?: { where?: Record<string, unknown> }) => {
+        if (args?.where && 'numero' in args.where) return null
+        return {
+          id: 1,
+          tenantId: 1,
+          numero: 1,
+          clienteId: 1,
+          fecha: new Date('2026-06-01T12:00:00.000Z'),
+          totalCobrado: new Decimal(100),
+          concepto: null,
+          estado: 'emitido',
+          anulacionMotivo: null,
+          usuarioId: 1,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          cliente: { id: 1, codigo: 1, rsocial: 'ACME SA', cuit: null },
+          usuario: { id: 1, username: 'owner1' },
+          formas: [
+            {
+              id: 1,
+              reciboCobroId: 1,
+              tipo: 'efectivo',
+              importe: new Decimal(100),
+              chequeId: null,
+              referencia: null,
+              banco: null,
+              cheque: null,
+            },
+          ],
+          imputaciones: [
+            {
+              id: 1,
+              reciboCobroId: 1,
+              facturaId: 1,
+              importe: new Decimal(100),
+              saldoPrevio: new Decimal(121),
+              saldoPostPago: new Decimal(21),
+              factura: { id: 1, tipo: 'A', prefijo: 'A', numero: 1 },
+            },
+          ],
+          retencionesAplicadas: [],
+        }
+      }),
+      findFirstOrThrow: vi.fn().mockResolvedValue({
+        id: 1,
+        tenantId: 1,
+        numero: 1,
+        clienteId: 1,
+        fecha: new Date('2026-06-01T12:00:00.000Z'),
+        totalCobrado: new Decimal(100),
+        concepto: null,
+        estado: 'emitido',
+        anulacionMotivo: null,
+        usuarioId: 1,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        cliente: { id: 1, codigo: 1, rsocial: 'ACME SA', cuit: null },
+        usuario: { id: 1, username: 'owner1' },
+        formas: [
+          {
+            id: 1,
+            reciboCobroId: 1,
+            tipo: 'efectivo',
+            importe: new Decimal(100),
+            chequeId: null,
+            referencia: null,
+            banco: null,
+            cheque: null,
+          },
+        ],
+        imputaciones: [
+          {
+            id: 1,
+            reciboCobroId: 1,
+            facturaId: 1,
+            importe: new Decimal(100),
+            saldoPrevio: new Decimal(121),
+            saldoPostPago: new Decimal(21),
+            factura: { id: 1, tipo: 'A', prefijo: 'A', numero: 1 },
+          },
+        ],
+        retencionesAplicadas: [],
+      }),
+      create: vi.fn().mockResolvedValue({ id: 1, numero: 1 }),
+      update: vi.fn().mockResolvedValue({
+        id: 1,
+        tenantId: 1,
+        numero: 1,
+        clienteId: 1,
+        fecha: new Date('2026-06-01T12:00:00.000Z'),
+        totalCobrado: new Decimal(100),
+        concepto: null,
+        estado: 'anulado',
+        anulacionMotivo: 'Contract void',
+        usuarioId: 1,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        cliente: { id: 1, codigo: 1, rsocial: 'ACME SA', cuit: null },
+        usuario: { id: 1, username: 'owner1' },
+        formas: [],
+        imputaciones: [],
+        retencionesAplicadas: [],
       }),
     },
     cobro: {
       findMany: vi.fn().mockResolvedValue([]),
+      findFirst: vi.fn().mockResolvedValue(null),
     },
+    remito: {
+      count: vi.fn().mockResolvedValue(1),
+      findMany: vi.fn().mockResolvedValue([
+        {
+          id: 1,
+          tenantId: 1,
+          prefijo: '0001',
+          numero: 1,
+          tipo: 'remito_x',
+          estado: 'emitido',
+          clienteId: 1,
+          proveedorId: null,
+          facturaId: null,
+          pedidoId: null,
+          ordenEntregaId: null,
+          fecha: new Date('2026-06-10T12:00:00.000Z'),
+          fechaEntrega: null,
+          observaciones: null,
+          firmadoPor: null,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          cliente: { id: 1, codigo: 1, rsocial: 'Cliente SA', cuit: null, domicilio: null },
+          proveedor: null,
+          factura: null,
+          pedido: null,
+          ordenEntrega: null,
+          items: [
+            {
+              id: 1,
+              articuloId: 1,
+              descripcion: 'Articulo',
+              cantidad: 1,
+              unidad: 'UN',
+              articulo: { id: 1, codigo: 1, descripcion: 'Articulo', umedida: 'UN' },
+            },
+          ],
+        },
+      ]),
+      findFirst: vi.fn().mockResolvedValue({
+        id: 1,
+        tenantId: 1,
+        prefijo: '0001',
+        numero: 1,
+        tipo: 'remito_x',
+        estado: 'emitido',
+        clienteId: 1,
+        proveedorId: null,
+        facturaId: null,
+        pedidoId: null,
+        ordenEntregaId: null,
+        fecha: new Date('2026-06-10T12:00:00.000Z'),
+        fechaEntrega: null,
+        observaciones: null,
+        firmadoPor: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        cliente: { id: 1, codigo: 1, rsocial: 'Cliente SA', cuit: null, domicilio: null },
+        proveedor: null,
+        items: [
+          {
+            id: 1,
+            articuloId: 1,
+            descripcion: 'Articulo',
+            cantidad: 1,
+            unidad: 'UN',
+          },
+        ],
+      }),
+      create: vi.fn(),
+      update: vi.fn(),
+    },
+    remitoItem: { deleteMany: vi.fn().mockResolvedValue({ count: 0 }) },
+    cheque: {
+      count: vi.fn().mockResolvedValue(1),
+      findMany: vi.fn().mockResolvedValue([
+        {
+          id: 1,
+          tenantId: 1,
+          tipo: 'recibido',
+          modalidad: 'fisico',
+          numero: '12345678',
+          banco: 'Galicia',
+          sucursal: null,
+          cbuOrigen: null,
+          libradorNombre: 'Cliente SA',
+          libradorCuit: null,
+          monto: new Decimal(15000),
+          moneda: 'ARS',
+          fechaEmision: new Date('2026-06-01T12:00:00.000Z'),
+          fechaVencimiento: new Date('2026-06-15T12:00:00.000Z'),
+          estado: 'en_cartera',
+          clienteId: 1,
+          proveedorId: null,
+          observaciones: null,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          cliente: { id: 1, codigo: 1, rsocial: 'Cliente SA', cuit: null },
+          proveedor: null,
+          movimientos: [],
+        },
+      ]),
+      findFirst: vi.fn().mockResolvedValue({
+        id: 1,
+        tenantId: 1,
+        tipo: 'recibido',
+        modalidad: 'fisico',
+        numero: '12345678',
+        banco: 'Galicia',
+        monto: new Decimal(15000),
+        estado: 'en_cartera',
+        clienteId: 1,
+      }),
+      aggregate: vi.fn().mockResolvedValue({ _count: { id: 1 }, _sum: { monto: new Decimal(15000) } }),
+      create: vi.fn(),
+      update: vi.fn(),
+    },
+    chequeMov: { create: vi.fn().mockResolvedValue({ id: 1 }) },
     ordenCompra: {
       count: vi.fn().mockResolvedValue(1),
       findMany: vi.fn().mockResolvedValue([ordenCompraContractRow]),
@@ -684,42 +1062,6 @@ function buildPrisma(): PrismaClient {
       findUnique: vi.fn().mockResolvedValue(null),
       upsert: vi.fn().mockResolvedValue({ id: 1 }),
     },
-    paramEmpresa: {
-      findFirst: vi.fn().mockResolvedValue({
-        nombre: 'Demo Co',
-        cuit: '20-12345678-6',
-        domicilio: 'Calle 1',
-        logoUrl: null,
-      }),
-      findUnique: vi.fn().mockResolvedValue({
-        id: 1,
-        tenantId: 1,
-        nombre: 'Demo Co',
-        cuit: '20-12345678-6',
-        domicilio: null,
-        puntoVenta: 1,
-        tipoFactura: 'B',
-        logoUrl: null,
-        recordatorioDiasGracia: 0,
-        timezone: 'America/Argentina/Buenos_Aires',
-        recordatorioHoraInicio: 8,
-        recordatorioHoraFin: 18,
-      }),
-      upsert: vi.fn().mockResolvedValue({
-        id: 1,
-        tenantId: 1,
-        nombre: 'Demo Co',
-        cuit: '20-12345678-6',
-        domicilio: 'Calle 1',
-        puntoVenta: 2,
-        tipoFactura: 'A',
-        logoUrl: null,
-        recordatorioDiasGracia: 0,
-        timezone: 'America/Argentina/Buenos_Aires',
-        recordatorioHoraInicio: 8,
-        recordatorioHoraFin: 18,
-      }),
-    },
     cobroRecordatorio: {
       count: vi.fn().mockResolvedValue(0),
       create: vi.fn().mockResolvedValue({ id: 1 }),
@@ -749,10 +1091,9 @@ function buildPrisma(): PrismaClient {
     proveedor: {
       count: vi.fn().mockResolvedValue(1),
       findMany: vi.fn((args?: unknown) => {
-        const w =
-          args && typeof args === 'object' && args !== null && 'where' in args
-            ? (args as { where?: { codigo?: { in?: number[] } } }).where
-            : undefined
+        const w = isObjectRecord(args) && 'where' in args
+          ? (args as { where?: { codigo?: { in?: number[] } } }).where
+          : undefined
         if (w?.codigo && typeof w.codigo === 'object' && Array.isArray(w.codigo.in)) {
           return Promise.resolve([])
         }
@@ -768,7 +1109,18 @@ function buildPrisma(): PrismaClient {
       if (typeof arg === 'function') {
         const tx = {
           factura: { create: facturaCreate },
-          cliente: { update: txClienteUpdate, create: clienteTxCreate },
+          cliente: extendClientePrismaForCc({
+            update: txClienteUpdate,
+            create: clienteTxCreate,
+            findFirstOrThrow: vi.fn().mockResolvedValue({
+              id: 1,
+              rsocial: 'ACME SA',
+              balance: new Decimal(121),
+              creditLimit: null,
+            }),
+          }),
+          movimientoClienteCC: createMovimientoClienteCCPrismaMock(),
+          retencionAplicada: { create: vi.fn().mockResolvedValue({ id: 1 }) },
           rubro: {
             create: rubroTxCreate,
             findUnique: vi.fn().mockResolvedValue(null),
@@ -824,6 +1176,33 @@ function buildPrisma(): PrismaClient {
           },
           reciboPago: {
             findFirst: vi.fn().mockResolvedValue(null),
+            findFirstOrThrow: vi.fn().mockResolvedValue({
+              id: 1,
+              tenantId: 1,
+              numero: 1,
+              proveedorId: 1,
+              fecha: new Date('2026-06-01T12:00:00.000Z'),
+              total: new Decimal(100),
+              metodoPago: 'transferencia',
+              cbu: null,
+              referencia: 'TRX-1',
+              estado: 'emitido',
+              notas: null,
+              usuarioId: 1,
+              createdAt: new Date(),
+              updatedAt: new Date(),
+              proveedor: { id: 1, codigo: 5001, rsocial: 'Proveedor API SA', cuit: null },
+              usuario: { id: 1, username: 'owner1' },
+              facturas: [
+                {
+                  id: 1,
+                  comprobanteCompraId: 1,
+                  facturaRef: 'B-0001-1',
+                  monto: new Decimal(100),
+                },
+              ],
+              retencionesAplicadas: [],
+            }),
             create: vi.fn().mockResolvedValue({
               id: 1,
               tenantId: 1,
@@ -849,6 +1228,7 @@ function buildPrisma(): PrismaClient {
                   monto: new Decimal(100),
                 },
               ],
+              retencionesAplicadas: [],
             }),
             update: vi.fn().mockResolvedValue({
               id: 1,
@@ -875,7 +1255,116 @@ function buildPrisma(): PrismaClient {
                   monto: new Decimal(100),
                 },
               ],
+              retencionesAplicadas: [],
             }),
+          },
+          reciboCobro: {
+            findFirst: vi.fn().mockResolvedValue(null),
+            findFirstOrThrow: vi.fn().mockResolvedValue({
+              id: 1,
+              tenantId: 1,
+              numero: 1,
+              clienteId: 1,
+              fecha: new Date('2026-06-01T12:00:00.000Z'),
+              totalCobrado: new Decimal(100),
+              concepto: null,
+              estado: 'emitido',
+              anulacionMotivo: null,
+              usuarioId: 1,
+              createdAt: new Date(),
+              updatedAt: new Date(),
+              cliente: { id: 1, codigo: 1, rsocial: 'ACME SA', cuit: null },
+              usuario: { id: 1, username: 'owner1' },
+              formas: [
+                {
+                  id: 1,
+                  reciboCobroId: 1,
+                  tipo: 'efectivo',
+                  importe: new Decimal(100),
+                  chequeId: null,
+                  referencia: null,
+                  banco: null,
+                  cheque: null,
+                },
+              ],
+              imputaciones: [
+                {
+                  id: 1,
+                  reciboCobroId: 1,
+                  facturaId: 1,
+                  importe: new Decimal(100),
+                  saldoPrevio: new Decimal(121),
+                  saldoPostPago: new Decimal(21),
+                  factura: { id: 1, tipo: 'A', prefijo: 'A', numero: 1 },
+                },
+              ],
+              retencionesAplicadas: [],
+            }),
+            create: vi.fn().mockResolvedValue({
+              id: 1,
+              tenantId: 1,
+              numero: 1,
+              clienteId: 1,
+              fecha: new Date('2026-06-01T12:00:00.000Z'),
+              totalCobrado: new Decimal(100),
+              concepto: null,
+              estado: 'emitido',
+              anulacionMotivo: null,
+              usuarioId: 1,
+              createdAt: new Date(),
+              updatedAt: new Date(),
+              cliente: { id: 1, codigo: 1, rsocial: 'ACME SA', cuit: null },
+              usuario: { id: 1, username: 'owner1' },
+              formas: [
+                {
+                  id: 1,
+                  reciboCobroId: 1,
+                  tipo: 'efectivo',
+                  importe: new Decimal(100),
+                  chequeId: null,
+                  referencia: null,
+                  banco: null,
+                  cheque: null,
+                },
+              ],
+              imputaciones: [
+                {
+                  id: 1,
+                  reciboCobroId: 1,
+                  facturaId: 1,
+                  importe: new Decimal(100),
+                  saldoPrevio: new Decimal(121),
+                  saldoPostPago: new Decimal(21),
+                  factura: { id: 1, tipo: 'A', prefijo: 'A', numero: 1 },
+                },
+              ],
+              retencionesAplicadas: [],
+            }),
+            update: vi.fn().mockResolvedValue({
+              id: 1,
+              tenantId: 1,
+              numero: 1,
+              clienteId: 1,
+              fecha: new Date('2026-06-01T12:00:00.000Z'),
+              totalCobrado: new Decimal(100),
+              concepto: null,
+              estado: 'anulado',
+              anulacionMotivo: 'Contract void test',
+              usuarioId: 1,
+              createdAt: new Date(),
+              updatedAt: new Date(),
+              cliente: { id: 1, codigo: 1, rsocial: 'ACME SA', cuit: null },
+              usuario: { id: 1, username: 'owner1' },
+              formas: [],
+              imputaciones: [],
+              retencionesAplicadas: [],
+            }),
+          },
+          cheque: { create: vi.fn(), findFirst: vi.fn().mockResolvedValue(null) },
+          chequeMov: { create: vi.fn() },
+          retencionConstanciaSequence: {
+            findUnique: vi.fn().mockResolvedValue(null),
+            upsert: vi.fn().mockResolvedValue({ lastNum: 1 }),
           },
           stockAjuste: {
             create: vi.fn().mockResolvedValue({
@@ -1154,6 +1643,143 @@ describe('API — contrato OpenAPI', () => {
       .send({ monto: -10, motivo: 'Contract test adjustment' })
       .expect(201)
     await assertMatchesOpenApi('/api/proveedores/{id}/cuenta-corriente/ajuste', 'post', '201', res.body)
+  })
+
+  it('GET /api/clientes/{id}/cuenta-corriente', async () => {
+    const app = createApp(prisma)
+    const res = await request(app).get('/api/clientes/1/cuenta-corriente').expect(200)
+    await assertMatchesOpenApi('/api/clientes/{id}/cuenta-corriente', 'get', '200', res.body)
+    expect(res.body.data.serie).toHaveLength(6)
+  })
+
+  it('GET /api/clientes/{id}/cuenta-corriente/saldo', async () => {
+    const app = createApp(prisma)
+    const res = await request(app).get('/api/clientes/1/cuenta-corriente/saldo').expect(200)
+    await assertMatchesOpenApi('/api/clientes/{id}/cuenta-corriente/saldo', 'get', '200', res.body)
+  })
+
+  it('GET /api/clientes/{id}/cuenta-corriente/antiguedad', async () => {
+    vi.mocked(prisma.cliente.findFirst).mockResolvedValueOnce({
+      ...clienteRow,
+      creditDays: 30,
+    } as never)
+    vi.mocked(prisma.factura.findMany).mockResolvedValueOnce([
+      {
+        id: 1,
+        total: new Decimal(121),
+        fecha: new Date('2026-01-01'),
+      },
+    ] as never)
+    const app = createApp(prisma)
+    const res = await request(app).get('/api/clientes/1/cuenta-corriente/antiguedad').expect(200)
+    await assertMatchesOpenApi('/api/clientes/{id}/cuenta-corriente/antiguedad', 'get', '200', res.body)
+  })
+
+  it('POST /api/clientes/{id}/cuenta-corriente/ajuste', async () => {
+    const app = createApp(prisma)
+    const res = await request(app)
+      .post('/api/clientes/1/cuenta-corriente/ajuste')
+      .send({ monto: -10, motivo: 'Contract test adjustment' })
+      .expect(201)
+    await assertMatchesOpenApi('/api/clientes/{id}/cuenta-corriente/ajuste', 'post', '201', res.body)
+  })
+
+  it('GET /api/clientes/{id}/cuenta-corriente/estado-de-cuenta/pdf returns application/pdf', async () => {
+    const app = createApp(prisma)
+    const res = await request(app)
+      .get('/api/clientes/1/cuenta-corriente/estado-de-cuenta/pdf')
+      .expect(200)
+    expect(res.headers['content-type']).toMatch(/application\/pdf/)
+  })
+
+  it('GET /api/clientes/{id}/facturas-pendientes', async () => {
+    vi.mocked(prisma.factura.findMany).mockResolvedValueOnce([
+      {
+        id: 1,
+        tenantId: 1,
+        clienteId: 1,
+        fecha: new Date('2026-05-10T12:00:00.000Z'),
+        tipo: 'A',
+        prefijo: 'A',
+        numero: 1,
+        total: new Decimal(121),
+        estado: 'A',
+      },
+    ] as never)
+    const app = createApp(prisma)
+    const res = await request(app).get('/api/clientes/1/facturas-pendientes').expect(200)
+    await assertMatchesOpenApi('/api/clientes/{id}/facturas-pendientes', 'get', '200', res.body)
+  })
+
+  it('GET /api/clientes/{id}/recibos', async () => {
+    const app = createApp(prisma)
+    const res = await request(app).get('/api/clientes/1/recibos').expect(200)
+    await assertMatchesOpenApi('/api/clientes/{id}/recibos', 'get', '200', res.body)
+  })
+
+  it('POST /api/clientes/{id}/recibos', async () => {
+    vi.mocked(prisma.factura.findMany).mockResolvedValue([
+      {
+        id: 1,
+        tenantId: 1,
+        clienteId: 1,
+        fecha: new Date('2026-05-10T12:00:00.000Z'),
+        tipo: 'A',
+        prefijo: 'A',
+        numero: 1,
+        total: new Decimal(121),
+        estado: 'A',
+      },
+    ] as never)
+    vi.mocked(prisma.cliente.findFirst).mockResolvedValue({
+      ...clienteRow,
+      creditDays: 30,
+      score: 50,
+    } as never)
+    const app = createApp(prisma)
+    const res = await request(app)
+      .post('/api/clientes/1/recibos')
+      .send({
+        fecha: '2026-06-01',
+        totalCobrado: 100,
+        fifo: true,
+        formas: [{ tipo: 'efectivo', importe: 100 }],
+      })
+      .expect(201)
+    await assertMatchesOpenApi('/api/clientes/{id}/recibos', 'post', '201', res.body)
+  })
+
+  it('POST /api/clientes/{id}/recibos/{reciboId}/anular', async () => {
+    const app = createApp(prisma)
+    const res = await request(app)
+      .post('/api/clientes/1/recibos/1/anular')
+      .send({ anulacionMotivo: 'Contract void test' })
+      .expect(200)
+    await assertMatchesOpenApi('/api/clientes/{id}/recibos/{reciboId}/anular', 'post', '200', res.body)
+  })
+
+  it('GET /api/clientes/{id}/recibos/{reciboId}/pdf returns application/pdf', async () => {
+    const app = createApp(prisma)
+    const res = await request(app).get('/api/clientes/1/recibos/1/pdf').expect(200)
+    expect(res.headers['content-type']).toMatch(/application\/pdf/)
+  })
+
+  it('POST /api/clientes/{id}/cuenta-corriente/estado-de-cuenta/enviar', async () => {
+    vi.mocked(prisma.cliente.findFirst).mockResolvedValueOnce({
+      ...clienteRow,
+      email: 'cliente@example.com',
+    } as never)
+    const app = createApp(prisma)
+    const res = await request(app)
+      .post('/api/clientes/1/cuenta-corriente/estado-de-cuenta/enviar')
+      .send({ email: 'cliente@example.com' })
+      .expect(200)
+    await assertMatchesOpenApi(
+      '/api/clientes/{id}/cuenta-corriente/estado-de-cuenta/enviar',
+      'post',
+      '200',
+      res.body,
+    )
   })
 
   it('GET /api/proveedores/{id}/historial', async () => {
@@ -1454,7 +2080,88 @@ describe('API — contrato OpenAPI', () => {
       .query({ entidadTipo: 'proveedor', entidadId: 1, monto: 1000 })
       .expect(200)
     await assertMatchesOpenApi('/api/fiscal/retenciones/preview', 'get', '200', res.body)
-    expect(res.body.data.retenciones).toEqual([])
+  })
+
+  it('GET /api/proveedores/{id}/pagos/{reciboId}/retenciones', async () => {
+    const app = createApp(prisma)
+    const res = await request(app).get('/api/proveedores/1/pagos/1/retenciones').expect(200)
+    await assertMatchesOpenApi('/api/proveedores/{id}/pagos/{reciboId}/retenciones', 'get', '200', res.body)
+  })
+
+  it('GET /api/remitos', async () => {
+    const app = createApp(prisma)
+    const res = await request(app).get('/api/remitos').expect(200)
+    await assertMatchesOpenApi('/api/remitos', 'get', '200', res.body)
+  })
+
+  it('GET /api/cheques', async () => {
+    const app = createApp(prisma)
+    const res = await request(app).get('/api/cheques').expect(200)
+    await assertMatchesOpenApi('/api/cheques', 'get', '200', res.body)
+  })
+
+  it('GET /api/cheques/resumen', async () => {
+    const app = createApp(prisma)
+    const res = await request(app).get('/api/cheques/resumen').expect(200)
+    await assertMatchesOpenApi('/api/cheques/resumen', 'get', '200', res.body)
+  })
+
+  it('GET /api/cobros/{id}/retenciones', async () => {
+    vi.mocked(prisma.cobro.findFirst).mockResolvedValueOnce({ id: 1, tenantId: 1 } as never)
+    vi.mocked(prisma.retencionAplicada.findMany).mockResolvedValueOnce([])
+    const app = createApp(prisma)
+    const res = await request(app).get('/api/cobros/1/retenciones').expect(200)
+    await assertMatchesOpenApi('/api/cobros/{id}/retenciones', 'get', '200', res.body)
+  })
+
+  it('GET /api/fiscal/retenciones/export returns text/plain', async () => {
+    const app = createApp(prisma)
+    const res = await request(app).get('/api/fiscal/retenciones/export?format=sicore').expect(200)
+    expect(res.headers['content-type']).toMatch(/text\/plain/)
+  })
+
+  it('GET /api/fiscal/presentaciones/preview', async () => {
+    const app = createApp(prisma)
+    const res = await request(app)
+      .get('/api/fiscal/presentaciones/preview?formato=sicore&periodo=2026-06')
+      .expect(200)
+    await assertMatchesOpenApi('/api/fiscal/presentaciones/preview', 'get', '200', res.body)
+  })
+
+  it('GET /api/fiscal/presentaciones', async () => {
+    const app = createApp(prisma)
+    const res = await request(app).get('/api/fiscal/presentaciones').expect(200)
+    await assertMatchesOpenApi('/api/fiscal/presentaciones', 'get', '200', res.body)
+  })
+
+  it('GET /api/fiscal/retenciones/{id}/comprobante/pdf returns application/pdf', async () => {
+    vi.mocked(prisma.retencionAplicada.findFirst).mockResolvedValueOnce({
+      id: 1,
+      tenantId: 1,
+      regimenId: 1,
+      tipo: 'retencion',
+      entidadTipo: 'proveedor',
+      entidadId: 1,
+      facturaId: null,
+      cobroId: null,
+      reciboPagoId: 1,
+      baseImponible: new Decimal(100),
+      alicuota: new Decimal(4.5),
+      importe: new Decimal(4.5),
+      constanciaNum: 'ganancias-00001',
+      createdAt: new Date(),
+      regimen: { nombre: 'Ganancias', tipo: 'ganancias' },
+      reciboPago: { fecha: new Date(), proveedorId: 1, estado: 'emitido' },
+    } as never)
+    vi.mocked(prisma.proveedor.findFirst).mockResolvedValueOnce({
+      ...proveedorRow,
+      rsocial: 'Proveedor API SA',
+      cuit: '30-12345678-9',
+    } as never)
+    const app = createApp(prisma)
+    const res = await request(app).get('/api/fiscal/retenciones/1/comprobante/pdf').expect(200)
+    expect(res.headers['content-type']).toMatch(/application\/pdf/)
+    expect(res.body.subarray(0, 4).toString()).toBe('%PDF')
   })
 
   it('GET /api/documentos-compra/templates', async () => {

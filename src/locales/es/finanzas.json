@@ -259,5 +259,86 @@
       "confirmFailed": "No se pudo confirmar la importación.",
       "totalRequired": "El total debe ser mayor a cero."
     }
+  },
+  "cheques": {
+    "title": "Cartera de cheques",
+    "empty": "No hay cheques en cartera.",
+    "dueSoon": "Vence pronto",
+    "colNumero": "Número",
+    "colBanco": "Banco",
+    "colVencimiento": "Vencimiento",
+    "colMonto": "Monto",
+    "colEstado": "Estado",
+    "colAcciones": "Acciones",
+    "filters": {
+      "estado": "Estado",
+      "banco": "Banco",
+      "all": "Todos"
+    },
+    "resumen": {
+      "enCartera": "En cartera",
+      "proximos": "A vencer (7 días)",
+      "rechazados": "Rechazados"
+    },
+    "modalidad": {
+      "fisico": "Físico",
+      "echeq": "ECHEQ"
+    },
+    "estado": {
+      "en_cartera": "En cartera",
+      "emitido": "Emitido",
+      "depositado": "Depositado",
+      "endosado": "Endosado",
+      "descontado": "Descontado",
+      "cobrado": "Cobrado",
+      "rechazado": "Rechazado",
+      "anulado": "Anulado"
+    },
+    "actions": {
+      "depositar": "Depositar",
+      "anular": "Anular",
+      "cobrar": "Cobrar",
+      "rechazar": "Rechazar",
+      "devolver": "Devolver a cartera"
+    }
+  },
+  "presentaciones": {
+    "title": "Presentaciones impositivas",
+    "subtitle": "Generá archivos SICORE y SIFERE para presentar retenciones y percepciones.",
+    "formatoSicore": "SICORE (nacional)",
+    "formatoSifere": "SIFERE (IIBB)",
+    "periodo": "Período",
+    "preview": "Vista previa",
+    "download": "Descargar archivo",
+    "downloading": "Generando…",
+    "refresh": "Actualizar",
+    "history": "Historial",
+    "historyEmpty": "No hay archivos generados.",
+    "markedPresented": "Presentado",
+    "markPresented": "Marcar como presentado",
+    "warnings": "Advertencias",
+    "warningsEmpty": "Sin advertencias.",
+    "canGenerate": "Listo para generar",
+    "cannotGenerate": "No hay operaciones válidas para este período.",
+    "colFecha": "Fecha",
+    "colCuit": "CUIT",
+    "colDenominacion": "Denominación",
+    "colRegimen": "Régimen",
+    "colBase": "Base",
+    "colAlicuota": "Alícuota",
+    "colImporte": "Importe",
+    "colIncluida": "Incluida",
+    "colPeriodo": "Período",
+    "colFormato": "Formato",
+    "colOperaciones": "Operaciones",
+    "colTotal": "Total",
+    "colGenerado": "Generado",
+    "colPresentado": "Presentado",
+    "colAcciones": "Acciones",
+    "totalsByRegimen": "Totales por régimen",
+    "yes": "Sí",
+    "no": "No",
+    "loadError": "No se pudo cargar la presentación.",
+    "generateError": "No se pudo generar el archivo."
   }
 }

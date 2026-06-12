@@ -3,10 +3,16 @@
  * @es Vista previa de retenciones placeholder — cálculo completo en #229.
  * @pt-BR Pré-visualização de retenções placeholder — cálculo completo em #229.
  */
+export type RetencionPreviewContexto = 'factura' | 'cobro'
+
 export type RetencionPreviewInput = {
   entidadTipo: 'cliente' | 'proveedor'
   entidadId: number
   monto: number
+  contexto?: RetencionPreviewContexto
+  neto1?: number
+  neto2?: number
+  neto3?: number
 }
 
 export type RetencionPreviewLine = {

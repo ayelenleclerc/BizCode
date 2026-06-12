@@ -48,6 +48,10 @@ function mapFacturaToPdfInput(
       subtotal: { toString: () => string }
       articulo: { descripcion: string } | null
     }>
+    retencionesAplicadas?: Array<{
+      importe: { toString: () => string }
+      regimen: { nombre: string }
+    }>
   },
   preview: boolean,
 ): ArcaFacturaPdfInput {
@@ -82,6 +86,10 @@ function mapFacturaToPdfInput(
         subtotal: Number(item.subtotal),
         descripcion: item.articulo?.descripcion ?? '—',
       })),
+      percepciones: (factura.retencionesAplicadas ?? []).map((row) => ({
+        nombre: row.regimen.nombre,
+        importe: Number(row.importe),
+      })),
     },
   }
 }
@@ -102,6 +110,10 @@ export async function buildFacturaPdfBuffer(
     include: {
       cliente: true,
       items: { include: { articulo: true } },
+      retencionesAplicadas: {
+        where: { tipo: 'percepcion' },
+        include: { regimen: { select: { nombre: true } } },
+      },
     },
   })
   if (!factura) {
@@ -137,6 +149,10 @@ export async function buildFacturaTicketPdfBuffer(
     include: {
       cliente: true,
       items: { include: { articulo: true } },
+      retencionesAplicadas: {
+        where: { tipo: 'percepcion' },
+        include: { regimen: { select: { nombre: true } } },
+      },
     },
   })
   if (!factura) {

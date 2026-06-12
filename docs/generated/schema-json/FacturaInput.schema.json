@@ -60,6 +60,12 @@
     "numero": {
       "type": "integer"
     },
+    "percepciones": {
+      "items": {
+        "$ref": "./ReciboPagoRetencionInput.schema.json"
+      },
+      "type": "array"
+    },
     "prefijo": {
       "type": "string"
     },
@@ -71,6 +77,7 @@
       "type": "string"
     },
     "total": {
+      "description": "Must equal netos + IVA + sum(percepciones) when percepciones are sent (#229).",
       "type": "number"
     }
   },

@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "properties": {
+    "clienteId": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "estado": {
+      "enum": [
+        "borrador",
+        "emitido",
+        "entregado",
+        "anulado"
+      ],
+      "type": "string"
+    },
+    "facturaId": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "fecha": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "fechaEntrega": {
+      "format": "date-time",
+      "nullable": true,
+      "type": "string"
+    },
+    "firmadoPor": {
+      "nullable": true,
+      "type": "string"
+    },
+    "id": {
+      "type": "integer"
+    },
+    "items": {
+      "items": {
+        "additionalProperties": true,
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "numero": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "observaciones": {
+      "nullable": true,
+      "type": "string"
+    },
+    "pedidoId": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "prefijo": {
+      "nullable": true,
+      "type": "string"
+    },
+    "referencia": {
+      "type": "string"
+    },
+    "tipo": {
+      "type": "string"
+    }
+  },
+  "title": "Remito",
+  "type": "object"
+}

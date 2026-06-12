@@ -11,7 +11,7 @@ const api = axios.create({
   withCredentials: true,
 })
 
-type ApiErrorPayload = {
+export type ApiErrorPayload = {
   error?: string
   validation?: { valid: boolean; errors: Array<{ module: string; reason: string }> }
 }
@@ -49,7 +49,7 @@ export class ApiRequestFailedError extends Error {
 }
 
 // Error handler
-const handleError = (error: AxiosError<ApiErrorPayload>): never => {
+export const handleError = (error: AxiosError<ApiErrorPayload>): never => {
   const ax = error
   const hasResponse = !!ax.response
   const data = ax.response?.data
@@ -629,6 +629,128 @@ export const clientesAPI = {
       return handleError(error as AxiosError<ApiErrorPayload>)
     }
   },
+
+  cuentaCorriente: async (
+    id: number,
+    params?: { tipo?: string; desde?: string; hasta?: string; limit?: number; offset?: number },
+  ) => {
+    try {
+      const response = await api.get(`/clientes/${id}/cuenta-corriente`, { params })
+      return response.data.data as import('@/types').ClienteCuentaCorriente
+    } catch (error) {
+      handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  cuentaCorrienteSaldo: async (id: number) => {
+    try {
+      const response = await api.get(`/clientes/${id}/cuenta-corriente/saldo`)
+      return response.data.data as import('@/types').ClienteCuentaCorrienteSaldo
+    } catch (error) {
+      handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  cuentaCorrienteAntiguedad: async (id: number) => {
+    try {
+      const response = await api.get(`/clientes/${id}/cuenta-corriente/antiguedad`)
+      return response.data.data as import('@/types').ClienteCuentaCorrienteAntiguedad
+    } catch (error) {
+      handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  cuentaCorrienteAjuste: async (id: number, body: { monto: number; motivo: string }) => {
+    try {
+      const response = await api.post(`/clientes/${id}/cuenta-corriente/ajuste`, body)
+      return response.data.data as import('@/types').MovimientoClienteCC
+    } catch (error) {
+      handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  cuentaCorrienteEnviar: async (
+    id: number,
+    body: { email?: string; desde?: string; hasta?: string },
+  ) => {
+    try {
+      const response = await api.post(`/clientes/${id}/cuenta-corriente/estado-de-cuenta/enviar`, body)
+      return response.data.data as { sent: boolean; email: string }
+    } catch (error) {
+      handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  facturasPendientes: async (id: number) => {
+    try {
+      const response = await api.get(`/clientes/${id}/facturas-pendientes`)
+      return response.data.data as import('@/types').FacturaPendienteCliente[]
+    } catch (error) {
+      handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  listRecibos: async (id: number, params?: { limit?: number; offset?: number }) => {
+    try {
+      const response = await api.get(`/clientes/${id}/recibos`, { params })
+      return response.data
+    } catch (error) {
+      handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  createRecibo: async (
+    id: number,
+    body: {
+      fecha: string
+      totalCobrado: number
+      concepto?: string | null
+      fifo?: boolean
+      formas: {
+        tipo: string
+        importe: number
+        chequeId?: number | null
+        referencia?: string | null
+        banco?: string | null
+      }[]
+      imputaciones?: { facturaId: number; importe: number }[]
+      retenciones?: {
+        regimenId: number
+        baseImponible: number
+        alicuota: number
+        importe: number
+      }[]
+    },
+  ) => {
+    try {
+      const response = await api.post(`/clientes/${id}/recibos`, body)
+      return response.data.data as import('@/types').ReciboCobro
+    } catch (error) {
+      handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  anularRecibo: async (clienteId: number, reciboId: number, anulacionMotivo: string) => {
+    try {
+      const response = await api.post(`/clientes/${clienteId}/recibos/${reciboId}/anular`, {
+        anulacionMotivo,
+      })
+      return response.data.data as import('@/types').ReciboCobro
+    } catch (error) {
+      handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  downloadReciboPdf: async (clienteId: number, reciboId: number): Promise<Blob> => {
+    try {
+      const response = await api.get<Blob>(`/clientes/${clienteId}/recibos/${reciboId}/pdf`, {
+        responseType: 'blob',
+      })
+      return response.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
 }
 
 // ============ ARTICULOS ============
@@ -1124,7 +1246,14 @@ export const proveedoresAPI = {
       cbu?: string | null
       referencia?: string | null
       notas?: string | null
+      chequeId?: number | null
       facturas: { comprobanteCompraId?: number | null; facturaRef: string; monto: number }[]
+      retenciones?: {
+        regimenId: number
+        baseImponible: number
+        alicuota: number
+        importe: number
+      }[]
     },
   ) => {
     try {
@@ -1132,6 +1261,17 @@ export const proveedoresAPI = {
       return response.data.data
     } catch (error) {
       handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  listPagoRetenciones: async (proveedorId: number, reciboId: number): Promise<ReciboPagoRetencionDTO[]> => {
+    try {
+      const response = await api.get<{ success: boolean; data: ReciboPagoRetencionDTO[] }>(
+        `/proveedores/${proveedorId}/pagos/${reciboId}/retenciones`,
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
     }
   },
 
@@ -1308,6 +1448,196 @@ export type CobroListParams = {
   offset?: number
 }
 
+export type CobroRetencionInputDTO = {
+  regimenId: number
+  baseImponible: number
+  alicuota: number
+  importe: number
+}
+
+export type CobroRetencionDTO = {
+  id: number
+  regimenId: number
+  regimenNombre: string
+  tipo: string
+  baseImponible: string
+  alicuota: string
+  importe: string
+  constanciaNum: string | null
+}
+
+export type ChequeEstadoDTO =
+  | 'en_cartera'
+  | 'emitido'
+  | 'depositado'
+  | 'endosado'
+  | 'descontado'
+  | 'cobrado'
+  | 'rechazado'
+  | 'anulado'
+
+export type ChequeTipoDTO = 'recibido' | 'emitido'
+export type ChequeModalidadDTO = 'fisico' | 'echeq'
+
+export type ChequeDTO = {
+  id: number
+  tipo: ChequeTipoDTO
+  modalidad: ChequeModalidadDTO
+  numero: string
+  banco: string
+  sucursal: string | null
+  cbuOrigen: string | null
+  libradorNombre: string
+  libradorCuit: string | null
+  monto: string | number
+  moneda: string
+  fechaEmision: string
+  fechaVencimiento: string
+  estado: ChequeEstadoDTO
+  clienteId: number | null
+  proveedorId: number | null
+  observaciones: string | null
+  cliente?: { id: number; codigo: number; rsocial: string; cuit: string | null } | null
+}
+
+export type ChequeInputDTO = {
+  tipo: ChequeTipoDTO
+  modalidad: ChequeModalidadDTO
+  numero: string
+  banco: string
+  sucursal?: string | null
+  cbuOrigen?: string | null
+  libradorNombre: string
+  libradorCuit?: string | null
+  monto: number
+  moneda?: string
+  fechaEmision: string
+  fechaVencimiento: string
+  clienteId?: number | null
+  proveedorId?: number | null
+  observaciones?: string | null
+}
+
+export type ChequeTransicionBody = {
+  destino?: string | null
+  nota?: string | null
+  proveedorId?: number | null
+  monto?: number | null
+}
+
+export type ChequeResumenDTO = {
+  enCartera: { count: number; total: string }
+  proximosVencer: { count: number; total: string }
+  rechazados: { count: number; total: string }
+}
+
+export const chequesAPI = {
+  list: async (params?: {
+    tipo?: ChequeTipoDTO
+    estado?: ChequeEstadoDTO
+    banco?: string
+    limit?: number
+    offset?: number
+  }) => {
+    try {
+      const response = await api.get('/cheques', { params })
+      return response.data as { data: ChequeDTO[]; total: number }
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  resumen: async (): Promise<ChequeResumenDTO> => {
+    try {
+      const response = await api.get('/cheques/resumen')
+      return response.data.data as ChequeResumenDTO
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  get: async (id: number): Promise<ChequeDTO> => {
+    try {
+      const response = await api.get(`/cheques/${id}`)
+      return response.data.data as ChequeDTO
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  create: async (body: ChequeInputDTO): Promise<ChequeDTO> => {
+    try {
+      const response = await api.post('/cheques', body)
+      return response.data.data as ChequeDTO
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  depositar: async (id: number, body?: ChequeTransicionBody): Promise<ChequeDTO> => {
+    try {
+      const response = await api.post(`/cheques/${id}/depositar`, body ?? {})
+      return response.data.data as ChequeDTO
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  endosar: async (id: number, body: ChequeTransicionBody): Promise<ChequeDTO> => {
+    try {
+      const response = await api.post(`/cheques/${id}/endosar`, body)
+      return response.data.data as ChequeDTO
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  descontar: async (id: number, body?: ChequeTransicionBody): Promise<ChequeDTO> => {
+    try {
+      const response = await api.post(`/cheques/${id}/descontar`, body ?? {})
+      return response.data.data as ChequeDTO
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  cobrar: async (id: number, body?: ChequeTransicionBody): Promise<ChequeDTO> => {
+    try {
+      const response = await api.post(`/cheques/${id}/cobrar`, body ?? {})
+      return response.data.data as ChequeDTO
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  rechazar: async (id: number, body?: ChequeTransicionBody): Promise<ChequeDTO> => {
+    try {
+      const response = await api.post(`/cheques/${id}/rechazar`, body ?? {})
+      return response.data.data as ChequeDTO
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  devolverACartera: async (id: number, body?: ChequeTransicionBody): Promise<ChequeDTO> => {
+    try {
+      const response = await api.post(`/cheques/${id}/devolver-cartera`, body ?? {})
+      return response.data.data as ChequeDTO
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  anular: async (id: number, body?: ChequeTransicionBody): Promise<ChequeDTO> => {
+    try {
+      const response = await api.post(`/cheques/${id}/anular`, body ?? {})
+      return response.data.data as ChequeDTO
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+}
+
 export type CobroCreateBody = {
   clienteId: number
   fecha: string
@@ -1315,6 +1645,9 @@ export type CobroCreateBody = {
   formaPagoId?: number | null
   referencia?: string | null
   nota?: string | null
+  chequeId?: number | null
+  chequeNuevo?: ChequeInputDTO | null
+  retenciones?: CobroRetencionInputDTO[]
 }
 
 export const cobrosAPI = {
@@ -1348,9 +1681,22 @@ export const cobrosAPI = {
       return response.data.data as {
         cobro: Cobro
         updatedCliente: Pick<Cliente, 'id' | 'rsocial' | 'balance' | 'creditLimit' | 'score'>
+        retenciones: CobroRetencionDTO[]
+        montoBruto: string
       }
     } catch (error) {
       handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  listRetenciones: async (cobroId: number): Promise<CobroRetencionDTO[]> => {
+    try {
+      const response = await api.get<{ success: boolean; data: CobroRetencionDTO[] }>(
+        `/cobros/${cobroId}/retenciones`,
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
     }
   },
 }
@@ -1667,6 +2013,139 @@ export type NotasCreditoListResult = {
   total: number
   limit: number
   offset: number
+}
+
+export type RemitoEstadoDTO = 'borrador' | 'emitido' | 'entregado' | 'anulado'
+
+export type RemitoItemDTO = {
+  id: number
+  articuloId: number
+  descripcion: string
+  cantidad: number
+  unidad: string
+  articulo?: { id: number; codigo: number; descripcion: string; umedida: string }
+}
+
+export type RemitoDTO = {
+  id: number
+  referencia: string
+  prefijo: string | null
+  numero: number | null
+  tipo: 'remito_x' | 'remito_ingreso'
+  estado: RemitoEstadoDTO
+  clienteId: number | null
+  proveedorId: number | null
+  facturaId: number | null
+  pedidoId: number | null
+  ordenEntregaId: number | null
+  fecha: string
+  fechaEntrega: string | null
+  observaciones: string | null
+  firmadoPor: string | null
+  items: RemitoItemDTO[]
+  cliente?: { id: number; codigo: number; rsocial: string; cuit: string | null; domicilio: string | null } | null
+}
+
+export type RemitoItemInputDTO = {
+  articuloId: number
+  descripcion: string
+  cantidad: number
+  unidad: string
+}
+
+export type RemitoCreateBody = {
+  tipo: 'remito_x' | 'remito_ingreso'
+  clienteId?: number | null
+  proveedorId?: number | null
+  facturaId?: number | null
+  pedidoId?: number | null
+  ordenEntregaId?: number | null
+  fecha?: string
+  observaciones?: string | null
+  items: RemitoItemInputDTO[]
+}
+
+export const remitosAPI = {
+  list: async (params?: { estado?: RemitoEstadoDTO; clienteId?: number; limit?: number; offset?: number }) => {
+    try {
+      const response = await api.get('/remitos', { params })
+      return response.data as { data: RemitoDTO[]; total: number }
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  get: async (id: number): Promise<RemitoDTO> => {
+    try {
+      const response = await api.get(`/remitos/${id}`)
+      return response.data.data as RemitoDTO
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  create: async (body: RemitoCreateBody): Promise<RemitoDTO> => {
+    try {
+      const response = await api.post('/remitos', body)
+      return response.data.data as RemitoDTO
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  emitir: async (id: number): Promise<RemitoDTO> => {
+    try {
+      const response = await api.post(`/remitos/${id}/emitir`)
+      return response.data.data as RemitoDTO
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  entregar: async (id: number, firmadoPor: string): Promise<RemitoDTO> => {
+    try {
+      const response = await api.post(`/remitos/${id}/entregar`, { firmadoPor })
+      return response.data.data as RemitoDTO
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  anular: async (id: number): Promise<RemitoDTO> => {
+    try {
+      const response = await api.post(`/remitos/${id}/anular`)
+      return response.data.data as RemitoDTO
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  downloadPdf: async (id: number): Promise<Blob> => {
+    try {
+      const response = await api.get(`/remitos/${id}/pdf`, { responseType: 'blob' })
+      return response.data as Blob
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  createFromPedido: async (pedidoId: number): Promise<RemitoDTO> => {
+    try {
+      const response = await api.post(`/pedidos/${pedidoId}/remito`)
+      return response.data.data as RemitoDTO
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  createFromFactura: async (facturaId: number): Promise<RemitoDTO> => {
+    try {
+      const response = await api.post(`/facturas/${facturaId}/remito`)
+      return response.data.data as RemitoDTO
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
 }
 
 export const facturasAPI = {
@@ -2061,6 +2540,32 @@ export type RegimenRetencionDTO = {
   updatedAt: string
 }
 
+export type FiscalRetencionesConfigDTO = {
+  esAgenteRetencionGanancias: boolean
+  esAgenteRetencionIVA: boolean
+  esAgenteRetencionIIBB: boolean
+}
+
+export type RetencionPreviewLineDTO = {
+  regimenId: number
+  nombre: string
+  tipo: string
+  alicuota: string
+  baseImponible: string
+  importe: string
+}
+
+export type ReciboPagoRetencionDTO = {
+  id: number
+  regimenId: number
+  regimenNombre: string
+  tipo: string
+  baseImponible: string
+  alicuota: string
+  importe: string
+  constanciaNum: string | null
+}
+
 export type RegimenRetencionInputDTO = {
   tipo: 'ganancias' | 'iva' | 'iibb'
   subtipo: 'retencion' | 'percepcion'
@@ -2077,12 +2582,6 @@ export type RegimenRetencionUpdateDTO = {
   alicuotaMin?: number | null
   provincia?: string | null
   activo?: boolean
-}
-
-export type FiscalRetencionesConfigDTO = {
-  esAgenteRetencionGanancias: boolean
-  esAgenteRetencionIVA: boolean
-  esAgenteRetencionIIBB: boolean
 }
 
 export type ProveedorHistorialPeriodoDias = 30 | 90 | 180 | 365
@@ -2333,6 +2832,60 @@ export const arcaAPI = {
   },
 }
 
+export type MercadoPagoConfigStatus = {
+  configured: boolean
+  publicKey?: string
+  sandboxMode?: boolean
+  activo?: boolean
+  accessTokenLast4?: string
+  webhookSecretSet?: boolean
+}
+
+export type MercadoPagoConfigInput = {
+  accessToken?: string
+  publicKey: string
+  webhookSecret?: string
+  sandboxMode?: boolean
+  activo?: boolean
+}
+
+export const mercadopagoAPI = {
+  getConfig: async (): Promise<MercadoPagoConfigStatus> => {
+    try {
+      const response = await api.get<{ success: boolean; data: MercadoPagoConfigStatus }>(
+        '/configuracion/mercadopago',
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  putConfig: async (body: MercadoPagoConfigInput): Promise<{ configured: boolean }> => {
+    try {
+      const response = await api.put<{ success: boolean; data: { configured: boolean } }>(
+        '/configuracion/mercadopago',
+        body,
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  testCredentials: async (): Promise<{ accountName: string; email?: string }> => {
+    try {
+      const response = await api.post<{
+        success: boolean
+        data: { accountName: string; email?: string }
+      }>('/configuracion/mercadopago/test')
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+}
+
 // ============ USERS ============
 
 export type AppUserDTO = {
@@ -2503,6 +3056,163 @@ export const fiscalRetencionesAPI = {
       const response = await api.put<{ success: boolean; data: FiscalRetencionesConfigDTO }>(
         '/fiscal/config-retenciones',
         body,
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  previewRetenciones: async (params: {
+    entidadTipo: 'cliente' | 'proveedor'
+    entidadId: number
+    monto: number
+    contexto?: 'factura' | 'cobro'
+    neto1?: number
+    neto2?: number
+    neto3?: number
+  }): Promise<RetencionPreviewLineDTO[]> => {
+    try {
+      const response = await api.get<{ success: boolean; data: { retenciones: RetencionPreviewLineDTO[] } }>(
+        '/fiscal/retenciones/preview',
+        { params },
+      )
+      return response.data.data.retenciones
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  downloadConstanciaPdf: async (retencionId: number): Promise<Blob> => {
+    try {
+      const response = await api.get<Blob>(`/fiscal/retenciones/${retencionId}/comprobante/pdf`, {
+        responseType: 'blob',
+      })
+      return response.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  exportRetencionesTxt: async (params: {
+    format: 'sicore' | 'sifere'
+    from?: string
+    to?: string
+  }): Promise<Blob> => {
+    try {
+      const response = await api.get<Blob>('/fiscal/retenciones/export', {
+        params,
+        responseType: 'blob',
+      })
+      return response.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+}
+
+export type PresentacionWarningDto = {
+  code: 'missing_cuit' | 'invalid_cuit' | 'zero_importe_excluded'
+  retencionId: number
+  message: string
+}
+
+export type PresentacionFilaDto = {
+  retencionId: number
+  fecha: string
+  cuit: string
+  denominacion: string
+  regimenNombre: string
+  regimenTipo: string
+  operacionTipo: 'retencion' | 'percepcion'
+  provincia: string | null
+  baseImponible: string
+  alicuota: string
+  importe: string
+  incluida: boolean
+}
+
+export type PresentacionPreviewDto = {
+  formato: 'sicore' | 'sifere'
+  periodo: string
+  filas: PresentacionFilaDto[]
+  totalesPorRegimen: Array<{
+    regimenNombre: string
+    operaciones: number
+    totalImporte: string
+  }>
+  warnings: PresentacionWarningDto[]
+  canGenerate: boolean
+}
+
+export type PresentacionRetencionDto = {
+  id: number
+  formato: 'sicore' | 'sifere'
+  periodo: string
+  totalOperaciones: number
+  totalImporte: string
+  archivoHash: string | null
+  presentadoAt: string | null
+  createdAt: string
+}
+
+export const fiscalPresentacionesAPI = {
+  preview: async (params: {
+    formato: 'sicore' | 'sifere'
+    periodo: string
+  }): Promise<PresentacionPreviewDto> => {
+    try {
+      const response = await api.get<{ success: boolean; data: PresentacionPreviewDto }>(
+        '/fiscal/presentaciones/preview',
+        { params },
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  generar: async (body: {
+    formato: 'sicore' | 'sifere'
+    periodo: string
+  }): Promise<PresentacionRetencionDto> => {
+    try {
+      const response = await api.post<{ success: boolean; data: PresentacionRetencionDto }>(
+        '/fiscal/presentaciones',
+        body,
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  listar: async (): Promise<PresentacionRetencionDto[]> => {
+    try {
+      const response = await api.get<{ success: boolean; data: PresentacionRetencionDto[] }>(
+        '/fiscal/presentaciones',
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  downloadArchivo: async (id: number): Promise<Blob> => {
+    try {
+      const response = await api.get<Blob>(`/fiscal/presentaciones/${id}/archivo`, {
+        responseType: 'blob',
+      })
+      return response.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  marcarPresentado: async (id: number): Promise<PresentacionRetencionDto> => {
+    try {
+      const response = await api.patch<{ success: boolean; data: PresentacionRetencionDto }>(
+        `/fiscal/presentaciones/${id}/presentado`,
       )
       return response.data.data
     } catch (error) {
@@ -3265,6 +3975,9 @@ export const zonasEntregaAPI = {
     }
   },
 }
+
+export { portalAPI, portalConfigAPI } from './portalApi'
+export type { PortalBranding, PortalMe, PortalFactura, PortalConfig } from './portalApi'
 
 // ============ HEALTH CHECK ============
 

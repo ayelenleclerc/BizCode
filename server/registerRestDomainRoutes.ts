@@ -13,6 +13,7 @@ import { registerNotasCreditoRoutes } from './routes/registerNotasCreditoRoutes'
 import { registerComprobanteCompraRoutes } from './routes/registerComprobanteCompraRoutes'
 import { registerDocumentoCompraRoutes } from './routes/registerDocumentoCompraRoutes'
 import { registerFiscalRetencionesRoutes } from './routes/registerFiscalRetencionesRoutes'
+import { registerFiscalPresentacionesRoutes } from './routes/registerFiscalPresentacionesRoutes'
 import { registerContabilidadRoutes } from './routes/registerContabilidadRoutes'
 import { registerFormasPagoRoutes } from './routes/registerFormasPagoRoutes'
 import { registerHealthRoute } from './routes/registerHealthRoute'
@@ -25,7 +26,9 @@ import { registerSuperadminTenantPricingTrialsRoutes } from './routes/registerSu
 import { registerSuperadminTenantsRoutes } from './routes/registerSuperadminTenantsRoutes'
 import { registerProveedoresRoutes } from './routes/registerProveedoresRoutes'
 import { registerProveedorCuentaCorrienteRoutes } from './routes/registerProveedorCuentaCorrienteRoutes'
+import { registerClienteCuentaCorrienteRoutes } from './routes/registerClienteCuentaCorrienteRoutes'
 import { registerReciboPagoRoutes } from './routes/registerReciboPagoRoutes'
+import { registerReciboCobroRoutes } from './routes/registerReciboCobroRoutes'
 import { registerProveedorAlertasRoutes } from './routes/registerProveedorAlertasRoutes'
 import { registerProveedorHistorialRoutes } from './routes/registerProveedorHistorialRoutes'
 import { registerProveedorCatalogoRoutes } from './routes/registerProveedorCatalogoRoutes'
@@ -39,7 +42,11 @@ import { registerRepartosRoutes } from './routes/registerRepartosRoutes'
 import { registerArcaRoutes } from './routes/registerArcaRoutes'
 import { registerCobranzasRoutes } from './routes/registerCobranzasRoutes'
 import { registerPedidosRoutes } from './routes/registerPedidosRoutes'
+import { registerRemitosRoutes } from './routes/registerRemitosRoutes'
+import { registerChequesRoutes } from './routes/registerChequesRoutes'
 import { registerEmpresaRoutes } from './routes/registerEmpresaRoutes'
+import { registerPortalRoutes } from './routes/registerPortalRoutes'
+import { registerMercadoPagoRoutes } from './routes/registerMercadoPagoRoutes'
 import { registerPrintingRoutes } from './routes/registerPrintingRoutes'
 import { createDomainServices } from './services/createDomainServices'
 
@@ -69,6 +76,7 @@ export function registerRestDomainRoutes(app: Application, prisma: PrismaClient)
   const ctx: RestRouteContext = { prisma, services: createDomainServices(prisma), writeAudit }
 
   registerClientesRoutes(app, ctx)
+  registerClienteCuentaCorrienteRoutes(app, ctx)
   registerArticulosRoutes(app, ctx)
   registerRubrosRoutes(app, ctx)
   registerProveedorAlertasRoutes(app, ctx)
@@ -78,6 +86,7 @@ export function registerRestDomainRoutes(app: Application, prisma: PrismaClient)
   registerProveedorHistorialRoutes(app, ctx)
   registerProveedorCatalogoRoutes(app, ctx)
   registerReciboPagoRoutes(app, ctx)
+  registerReciboCobroRoutes(app, ctx)
   registerComprasRoutes(app, ctx)
   registerRecuentosRoutes(app, ctx)
   registerFormasPagoRoutes(app, ctx)
@@ -85,18 +94,23 @@ export function registerRestDomainRoutes(app: Application, prisma: PrismaClient)
   registerNotasCreditoRoutes(app, ctx)
   registerArcaRoutes(app, ctx)
   registerPedidosRoutes(app, ctx)
+  registerRemitosRoutes(app, ctx)
+  registerChequesRoutes(app, ctx)
   registerCobrosRoutes(app, ctx)
   registerCobranzasRoutes(app, ctx)
   registerReportesRoutes(app, ctx)
   registerComprobanteCompraRoutes(app, ctx)
   registerDocumentoCompraRoutes(app, ctx)
   registerFiscalRetencionesRoutes(app, ctx)
+  registerFiscalPresentacionesRoutes(app, ctx)
   registerContabilidadRoutes(app, ctx)
   registerZonasEntregaRoutes(app, ctx)
   registerOrdenesEntregaRoutes(app, ctx)
   registerRepartosRoutes(app, ctx)
   registerLogisticaReportesRoutes(app, ctx)
   registerEmpresaRoutes(app, ctx)
+  registerPortalRoutes(app, ctx)
+  registerMercadoPagoRoutes(app, ctx)
   registerPrintingRoutes(app)
   registerHealthRoute(app, ctx)
   registerModulesCatalogRoute(app, ctx)

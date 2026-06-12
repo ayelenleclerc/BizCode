@@ -1,8 +1,18 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ApiRequestFailedError, clientesAPI, cobrosAPI, formasPagoAPI, type CobroCreateBody } from '@/lib/api'
+import {
+  ApiRequestFailedError,
+  clientesAPI,
+  cobrosAPI,
+  fiscalRetencionesAPI,
+  formasPagoAPI,
+  type ChequeModalidadDTO,
+  type CobroCreateBody,
+  type RetencionPreviewLineDTO,
+} from '@/lib/api'
 import KeyboardHint, { useFormShortcuts } from '@/components/shared/KeyboardHint'
 import { useFormPageHotkeys } from '@/hooks/useListPageKeyboard'
+import { useFeatureFlags } from '@/contexts/FeatureFlagsContext'
 import type { Cliente } from '@/types'
 
 type FormaPagoOption = { id: number; descripcion: string }
@@ -34,6 +44,38 @@ export default function CobroForm({ initialClienteId, onSaved, onCancel }: Cobro
   const [nota, setNota] = useState('')
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [agenteRetencion, setAgenteRetencion] = useState(false)
+  const [applyRetenciones, setApplyRetenciones] = useState(false)
+  const [retencionRows, setRetencionRows] = useState<Array<RetencionPreviewLineDTO & { selected: boolean }>>([])
+  const [previewLoading, setPreviewLoading] = useState(false)
+  const { hasModule } = useFeatureFlags()
+  const retencionesModule = hasModule('finance.retenciones')
+  const chequesModule = hasModule('fiscal.cheques')
+  const [registerCheque, setRegisterCheque] = useState(false)
+  const [chequeNumero, setChequeNumero] = useState('')
+  const [chequeBanco, setChequeBanco] = useState('')
+  const [chequeVencimiento, setChequeVencimiento] = useState('')
+  const [chequeModalidad, setChequeModalidad] = useState<ChequeModalidadDTO>('fisico')
+
+  const montoNeto = Number.parseFloat(monto)
+  const retencionesTotal = useMemo(
+    () =>
+      applyRetenciones
+        ? retencionRows
+            .filter((r) => r.selected)
+            .reduce((sum, r) => sum + Number.parseFloat(r.importe), 0)
+        : 0,
+    [applyRetenciones, retencionRows],
+  )
+  const montoBruto = Number.isFinite(montoNeto) ? montoNeto + retencionesTotal : 0
+
+  const isChequePayment = useMemo(() => {
+    if (!chequesModule) return false
+    if (registerCheque) return true
+    if (!formaPagoId) return false
+    const fp = formasPago.find((f) => f.id === Number.parseInt(formaPagoId, 10))
+    return fp?.descripcion.toLowerCase().includes('cheque') ?? false
+  }, [chequesModule, formaPagoId, formasPago, registerCheque])
 
   useEffect(() => {
     void (async () => {
@@ -53,6 +95,46 @@ export default function CobroForm({ initialClienteId, onSaved, onCancel }: Cobro
       setClienteId(String(initialClienteId))
     }
   }, [initialClienteId])
+
+  useEffect(() => {
+    if (!retencionesModule) return
+    void fiscalRetencionesAPI
+      .getConfig()
+      .then((config) => {
+        setAgenteRetencion(
+          config.esAgenteRetencionGanancias ||
+            config.esAgenteRetencionIVA ||
+            config.esAgenteRetencionIIBB,
+        )
+      })
+      .catch(() => setAgenteRetencion(false))
+  }, [retencionesModule])
+
+  const loadRetencionesPreview = useCallback(async () => {
+    const cid = Number.parseInt(clienteId, 10)
+    if (!applyRetenciones || !agenteRetencion || !Number.isFinite(cid) || cid < 1 || montoBruto <= 0) {
+      setRetencionRows([])
+      return
+    }
+    setPreviewLoading(true)
+    try {
+      const lines = await fiscalRetencionesAPI.previewRetenciones({
+        entidadTipo: 'cliente',
+        entidadId: cid,
+        monto: montoBruto,
+        contexto: 'cobro',
+      })
+      setRetencionRows(lines.map((line) => ({ ...line, selected: true })))
+    } catch {
+      setRetencionRows([])
+    } finally {
+      setPreviewLoading(false)
+    }
+  }, [agenteRetencion, applyRetenciones, clienteId, montoBruto])
+
+  useEffect(() => {
+    void loadRetencionesPreview()
+  }, [loadRetencionesPreview])
 
   const mapError = useCallback((err: unknown): string => {
     if (err instanceof ApiRequestFailedError) {
@@ -75,6 +157,25 @@ export default function CobroForm({ initialClienteId, onSaved, onCancel }: Cobro
       setError(t('form.errors.amountRequired'))
       return
     }
+    const retencionesPayload = applyRetenciones
+      ? retencionRows
+          .filter((r) => r.selected)
+          .map((r) => ({
+            regimenId: r.regimenId,
+            baseImponible: Number.parseFloat(r.baseImponible),
+            alicuota: Number.parseFloat(r.alicuota),
+            importe: Number.parseFloat(r.importe),
+          }))
+      : undefined
+
+    const clienteRsocial = clientes.find((c) => c.id === cid)?.rsocial ?? 'Cliente'
+    if (isChequePayment) {
+      if (!chequeNumero.trim() || !chequeBanco.trim() || !chequeVencimiento.trim()) {
+        setError(t('form.cheque.errors.required'))
+        return
+      }
+    }
+
     const body: CobroCreateBody = {
       clienteId: cid,
       fecha,
@@ -82,6 +183,24 @@ export default function CobroForm({ initialClienteId, onSaved, onCancel }: Cobro
       formaPagoId: formaPagoId ? Number.parseInt(formaPagoId, 10) : null,
       referencia: referencia.trim() || null,
       nota: nota.trim() || null,
+      ...(retencionesPayload != null && retencionesPayload.length > 0
+        ? { retenciones: retencionesPayload }
+        : {}),
+      ...(isChequePayment
+        ? {
+            chequeNuevo: {
+              tipo: 'recibido',
+              modalidad: chequeModalidad,
+              numero: chequeNumero.trim(),
+              banco: chequeBanco.trim(),
+              libradorNombre: clienteRsocial,
+              monto: montoBruto > 0 ? montoBruto : amount,
+              fechaEmision: fecha,
+              fechaVencimiento: chequeVencimiento,
+              clienteId: cid,
+            },
+          }
+        : {}),
     }
     setSaving(true)
     try {
@@ -92,7 +211,26 @@ export default function CobroForm({ initialClienteId, onSaved, onCancel }: Cobro
     } finally {
       setSaving(false)
     }
-  }, [clienteId, fecha, formaPagoId, mapError, monto, nota, onSaved, referencia, t])
+  }, [
+    applyRetenciones,
+    clienteId,
+    fecha,
+    formaPagoId,
+    mapError,
+    monto,
+    nota,
+    onSaved,
+    chequeBanco,
+    chequeModalidad,
+    chequeNumero,
+    chequeVencimiento,
+    clientes,
+    isChequePayment,
+    referencia,
+    retencionRows,
+    montoBruto,
+    t,
+  ])
 
   useFormPageHotkeys({
     onSave: () => void submitForm(),
@@ -133,6 +271,133 @@ export default function CobroForm({ initialClienteId, onSaved, onCancel }: Cobro
         nota={nota}
         setNota={setNota}
       />
+      {chequesModule ? (
+        <div className="mt-4 space-y-3 rounded border border-slate-200 dark:border-slate-600 p-3" data-testid="cobro-cheque-section">
+          <label className="flex items-center gap-2 text-sm font-medium">
+            <input
+              type="checkbox"
+              checked={registerCheque}
+              onChange={(e) => setRegisterCheque(e.target.checked)}
+              data-testid="cobro-register-cheque"
+            />
+            {t('form.cheque.register')}
+          </label>
+          {isChequePayment ? (
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div>
+                <label htmlFor="cobro-cheque-numero" className="block text-sm mb-1">
+                  {t('form.cheque.numero')}
+                </label>
+                <input
+                  id="cobro-cheque-numero"
+                  className={inputClass}
+                  value={chequeNumero}
+                  onChange={(e) => setChequeNumero(e.target.value)}
+                  data-testid="cobro-cheque-numero"
+                />
+              </div>
+              <div>
+                <label htmlFor="cobro-cheque-banco" className="block text-sm mb-1">
+                  {t('form.cheque.banco')}
+                </label>
+                <input
+                  id="cobro-cheque-banco"
+                  className={inputClass}
+                  value={chequeBanco}
+                  onChange={(e) => setChequeBanco(e.target.value)}
+                  data-testid="cobro-cheque-banco"
+                />
+              </div>
+              <div>
+                <label htmlFor="cobro-cheque-vencimiento" className="block text-sm mb-1">
+                  {t('form.cheque.vencimiento')}
+                </label>
+                <input
+                  id="cobro-cheque-vencimiento"
+                  type="date"
+                  className={inputClass}
+                  value={chequeVencimiento}
+                  onChange={(e) => setChequeVencimiento(e.target.value)}
+                  data-testid="cobro-cheque-vencimiento"
+                />
+              </div>
+              <div>
+                <label htmlFor="cobro-cheque-modalidad" className="block text-sm mb-1">
+                  {t('form.cheque.modalidad')}
+                </label>
+                <select
+                  id="cobro-cheque-modalidad"
+                  className={inputClass}
+                  value={chequeModalidad}
+                  onChange={(e) => setChequeModalidad(e.target.value as ChequeModalidadDTO)}
+                  data-testid="cobro-cheque-modalidad"
+                >
+                  <option value="fisico">{t('form.cheque.modalidadFisico')}</option>
+                  <option value="echeq">{t('form.cheque.modalidadEcheq')}</option>
+                </select>
+              </div>
+            </div>
+          ) : null}
+        </div>
+      ) : null}
+      {retencionesModule && agenteRetencion && Number.isFinite(montoNeto) && montoNeto > 0 ? (
+        <div className="mt-4 rounded border border-slate-200 dark:border-slate-600 p-3 space-y-3" data-testid="cobro-retenciones-section">
+          <label className="flex items-center gap-2 text-sm font-medium">
+            <input
+              type="checkbox"
+              checked={applyRetenciones}
+              onChange={(e) => setApplyRetenciones(e.target.checked)}
+              data-testid="cobro-apply-retenciones"
+            />
+            {t('form.retenciones.apply')}
+          </label>
+          {applyRetenciones ? (
+            previewLoading ? (
+              <p className="text-sm text-slate-500">{t('form.retenciones.loading')}</p>
+            ) : retencionRows.length === 0 ? (
+              <p className="text-sm text-slate-500">{t('form.retenciones.empty')}</p>
+            ) : (
+              <table className="w-full text-sm" data-testid="cobro-retenciones-table">
+                <caption className="sr-only">{t('form.retenciones.caption')}</caption>
+                <thead>
+                  <tr className="border-b border-slate-200 dark:border-slate-600 text-left">
+                    <th scope="col" className="py-1 pr-2">{t('form.retenciones.colSelect')}</th>
+                    <th scope="col" className="py-1 pr-2">{t('form.retenciones.colRegimen')}</th>
+                    <th scope="col" className="py-1 text-right">{t('form.retenciones.colImporte')}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {retencionRows.map((row, idx) => (
+                    <tr key={row.regimenId} className="border-b border-slate-100 dark:border-slate-700">
+                      <td className="py-1 pr-2">
+                        <input
+                          type="checkbox"
+                          checked={row.selected}
+                          aria-label={row.nombre}
+                          onChange={(e) => {
+                            const checked = e.target.checked
+                            setRetencionRows((prev) =>
+                              prev.map((r, i) => (i === idx ? { ...r, selected: checked } : r)),
+                            )
+                          }}
+                        />
+                      </td>
+                      <td className="py-1 pr-2">{row.nombre}</td>
+                      <td className="py-1 text-right tabular-nums">{row.importe}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )
+          ) : null}
+          {retencionesTotal > 0 ? (
+            <p className="text-sm text-slate-700 dark:text-slate-300" data-testid="cobro-monto-bruto">
+              {t('form.retenciones.bruto')}: ${montoBruto.toFixed(2)} · {t('form.retenciones.neto')}: $
+              {montoNeto.toFixed(2)}
+            </p>
+          ) : null}
+        </div>
+      ) : null}
       <div className="flex gap-2 mt-6 justify-end">
         <button
           type="button"

@@ -82,6 +82,12 @@ model Cliente {
   pedidos        Pedido[]
   cobros         Cobro[]
   ordenesEntrega OrdenEntrega[]
+  remitos        Remito[]
+  cheques        Cheque[]
+  movimientosCC  MovimientoClienteCC[]
+  recibosCobro   ReciboCobro[]
+  portalMagicLinks PortalMagicLink[]
+  portalSessions   PortalSession[]
 
   @@unique([tenantId, codigo])
   @@index([tenantId])
@@ -123,6 +129,7 @@ model Articulo {
 
   facturaItems     FacturaItem[]
   pedidoItems      PedidoItem[]
+  remitoItems      RemitoItem[]
   stockAjustes     StockAjuste[]
   ordenCompraItems     OrdenCompraItem[]
   recuentoItems        RecuentoItem[]
@@ -168,6 +175,8 @@ model Proveedor {
   movimientosCuentaCorriente MovimientoProveedorCC[]
   recibosPago              ReciboPago[]
   catalogoArticulos        ProveedorArticulo[]
+  remitos                  Remito[]
+  cheques                  Cheque[]
 
   @@unique([tenantId, codigo])
   @@index([tenantId])
@@ -356,11 +365,14 @@ model Cobro {
   monto       Decimal   @db.Decimal(14, 2)
   formaPagoId Int?
   formaPago   FormaPago? @relation(fields: [formaPagoId], references: [id])
+  chequeId    Int?
+  cheque      Cheque?   @relation(fields: [chequeId], references: [id])
   referencia  String?   @db.VarChar(60)
   nota        String?   @db.VarChar(200)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   retencionesAplicadas RetencionAplicada[]
+  movimientoCC         MovimientoClienteCC?
 
   @@index([tenantId, clienteId])
   @@index([tenantId, fecha])
@@ -410,6 +422,9 @@ model Factura {
   pedido         Pedido?
   notasCredito   NotaCredito[]
   retencionesAplicadas RetencionAplicada[]
+  remitos        Remito[]
+  movimientoCC   MovimientoClienteCC?
+  reciboCobroImputaciones ReciboCobroImputacion[]
 
   @@unique([tenantId, tipo, prefijo, numero])
   @@index([tenantId])
@@ -435,6 +450,7 @@ model NotaCredito {
   createdById     Int?
   createdBy       AppUser?  @relation("NotaCreditoCreatedBy", fields: [createdById], references: [id])
   createdAt       DateTime  @default(now())
+  movimientoCC    MovimientoClienteCC?
 
   @@unique([tenantId, facturaOrigenId])
   @@index([tenantId, createdAt])
@@ -455,12 +471,117 @@ model Pedido {
   validUntil  DateTime?
   facturaId   Int?      @unique
   factura     Factura?  @relation(fields: [facturaId], references: [id])
+  remito      Remito?
   items       PedidoItem[]
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
   @@index([tenantId, estado])
   @@index([tenantId, clienteId])
+}
+
+/// Delivery note (remito) — non-fiscal transport document (#230).
+model Remito {
+  id             Int       @id @default(autoincrement())
+  tenantId       Int
+  tenant         Tenant    @relation(fields: [tenantId], references: [id])
+  prefijo        String?   @db.VarChar(4)
+  numero         Int?
+  /// remito_x | remito_ingreso
+  tipo           String    @db.VarChar(20)
+  /// borrador | emitido | entregado | anulado
+  estado         String    @db.VarChar(20) @default("borrador")
+  clienteId      Int?
+  cliente        Cliente?  @relation(fields: [clienteId], references: [id])
+  proveedorId    Int?
+  proveedor      Proveedor? @relation(fields: [proveedorId], references: [id])
+  facturaId      Int?
+  factura        Factura?  @relation(fields: [facturaId], references: [id])
+  pedidoId       Int?      @unique
+  pedido         Pedido?   @relation(fields: [pedidoId], references: [id])
+  ordenEntregaId Int?      @unique
+  ordenEntrega   OrdenEntrega? @relation(fields: [ordenEntregaId], references: [id])
+  fecha          DateTime  @default(now())
+  fechaEntrega   DateTime?
+  observaciones  String?   @db.VarChar(500)
+  firmadoPor     String?   @db.VarChar(120)
+  items          RemitoItem[]
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@unique([tenantId, prefijo, numero])
+  @@index([tenantId, estado])
+  @@index([tenantId, clienteId])
+  @@index([tenantId, fecha])
+}
+
+model RemitoItem {
+  id          Int      @id @default(autoincrement())
+  remitoId    Int
+  remito      Remito   @relation(fields: [remitoId], references: [id], onDelete: Cascade)
+  articuloId  Int
+  articulo    Articulo @relation(fields: [articuloId], references: [id])
+  descripcion String   @db.VarChar(120)
+  cantidad    Int      @default(1)
+  unidad      String   @db.VarChar(6)
+  createdAt   DateTime @default(now())
+}
+
+/// Check portfolio — received/issued, physical/ECHEQ (#231).
+model Cheque {
+  id               Int       @id @default(autoincrement())
+  tenantId         Int
+  tenant           Tenant    @relation(fields: [tenantId], references: [id])
+  /// recibido | emitido
+  tipo             String    @db.VarChar(20)
+  /// fisico | echeq
+  modalidad        String    @db.VarChar(10)
+  numero           String    @db.VarChar(30)
+  banco            String    @db.VarChar(50)
+  sucursal         String?   @db.VarChar(30)
+  cbuOrigen        String?   @db.VarChar(22)
+  libradorNombre   String    @db.VarChar(80)
+  libradorCuit     String?   @db.VarChar(14)
+  monto            Decimal   @db.Decimal(14, 2)
+  moneda           String    @default("ARS") @db.VarChar(3)
+  fechaEmision     DateTime
+  fechaVencimiento DateTime
+  /// en_cartera | emitido | depositado | endosado | descontado | cobrado | rechazado | anulado
+  estado           String    @db.VarChar(20)
+  clienteId        Int?
+  cliente          Cliente?  @relation(fields: [clienteId], references: [id])
+  proveedorId      Int?
+  proveedor        Proveedor? @relation(fields: [proveedorId], references: [id])
+  observaciones    String?   @db.VarChar(500)
+  movimientos      ChequeMov[]
+  cobros           Cobro[]
+  recibosPago      ReciboPago[]
+  reciboCobroFormas ReciboCobroForma[]
+  movimientoCC     MovimientoClienteCC?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  @@unique([tenantId, banco, numero])
+  @@index([tenantId, estado])
+  @@index([tenantId, tipo])
+  @@index([tenantId, fechaVencimiento])
+}
+
+model ChequeMov {
+  id        Int      @id @default(autoincrement())
+  chequeId  Int
+  cheque    Cheque   @relation(fields: [chequeId], references: [id], onDelete: Cascade)
+  /// recepcion | deposito | endoso | descuento | cobro | rechazo
+  tipo      String   @db.VarChar(20)
+  fecha     DateTime @default(now())
+  monto     Decimal? @db.Decimal(14, 2)
+  destino   String?  @db.VarChar(120)
+  nota      String?  @db.VarChar(500)
+  userId    Int
+  usuario   AppUser  @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+
+  @@index([chequeId])
 }
 
 model PedidoItem {
@@ -550,7 +671,9 @@ model Tenant {
   ordenesCompra       OrdenCompra[]
   comprobantesCompra       ComprobanteCompra[]
   movimientosProveedorCC   MovimientoProveedorCC[]
+  movimientosClienteCC     MovimientoClienteCC[]
   recibosPago              ReciboPago[]
+  recibosCobro             ReciboCobro[]
   alertaProveedorConfig    AlertaProveedorConfig?
   alertasProveedorLog      AlertaProveedorLog[]
   proveedorArticulos       ProveedorArticulo[]
@@ -561,6 +684,8 @@ model Tenant {
   cobros         Cobro[]
   cobroRecordatorios CobroRecordatorio[]
   ordenesEntrega OrdenEntrega[]
+  remitos        Remito[]
+  cheques        Cheque[]
   repartos       Reparto[]
   paramEmpresa   ParamEmpresa?
   fiscalConfig   TenantFiscalConfig?
@@ -570,8 +695,74 @@ model Tenant {
   moduleTrials   TenantModuleTrial[]
   tenantPlan     TenantPlan?
   fiscalRetencionesConfig FiscalRetencionesConfig?
-  regimenesRetencion      RegimenRetencion[]
-  retencionesAplicadas    RetencionAplicada[]
+  regimenesRetencion            RegimenRetencion[]
+  retencionesAplicadas          RetencionAplicada[]
+  retencionConstanciaSequences  RetencionConstanciaSequence[]
+  presentacionesRetencion       PresentacionRetencion[]
+  portalConfig                  PortalConfig?
+  portalMagicLinks              PortalMagicLink[]
+  portalSessions                PortalSession[]
+  mercadoPagoConfig             MercadoPagoConfig?
+}
+
+/// MercadoPago credentials per tenant (#174); access token and webhook secret encrypted at rest.
+model MercadoPagoConfig {
+  id                     Int      @id @default(autoincrement())
+  tenantId               Int      @unique
+  tenant                 Tenant   @relation(fields: [tenantId], references: [id])
+  accessTokenEncrypted   String   @db.Text
+  accessTokenLast4       String   @db.VarChar(4)
+  publicKey              String   @db.VarChar(120)
+  webhookSecretEncrypted String?  @db.Text
+  sandboxMode            Boolean  @default(true)
+  activo                 Boolean  @default(true)
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+}
+
+/// B2B customer portal branding and feature toggles per tenant (#240).
+model PortalConfig {
+  id           Int      @id @default(autoincrement())
+  tenantId     Int      @unique
+  tenant       Tenant   @relation(fields: [tenantId], references: [id])
+  enabled      Boolean  @default(false)
+  showPedidos  Boolean  @default(true)
+  logoUrl      String?  @db.VarChar(255)
+  primaryColor String?  @db.VarChar(7)
+  footerText   String?  @db.VarChar(500)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+/// One-time magic link tokens for portal customer login (#240).
+model PortalMagicLink {
+  id        Int       @id @default(autoincrement())
+  tenantId  Int
+  tenant    Tenant    @relation(fields: [tenantId], references: [id])
+  clienteId Int
+  cliente   Cliente   @relation(fields: [clienteId], references: [id])
+  tokenHash String    @unique @db.VarChar(64)
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([tenantId, clienteId])
+}
+
+/// Portal customer browser sessions (#240).
+model PortalSession {
+  id         Int       @id @default(autoincrement())
+  tenantId   Int
+  tenant     Tenant    @relation(fields: [tenantId], references: [id])
+  clienteId  Int
+  cliente    Cliente   @relation(fields: [clienteId], references: [id])
+  tokenHash  String    @unique @db.VarChar(64)
+  expiresAt  DateTime
+  revokedAt  DateTime?
+  createdAt  DateTime  @default(now())
+  lastSeenAt DateTime  @default(now())
+
+  @@index([tenantId, clienteId])
 }
 
 model Plan {
@@ -679,6 +870,7 @@ model OrdenEntrega {
   updatedAt DateTime  @updatedAt
 
   repartoItems RepartoItem[]
+  remito       Remito?
 
   @@index([tenantId, estado])
   @@index([tenantId, fecha])
@@ -778,8 +970,12 @@ model AppUser {
   tenantPlansChanged   TenantPlan[] @relation("TenantPlanChangedBy")
   notasCreditoCreated  NotaCredito[] @relation("NotaCreditoCreatedBy")
   movimientosProveedorCC MovimientoProveedorCC[]
+  movimientosClienteCC   MovimientoClienteCC[]
   recibosPago            ReciboPago[]
+  recibosCobro           ReciboCobro[]
   documentosCompraImportados DocumentoCompraImportado[]
+  chequeMovimientos      ChequeMov[]
+  presentacionesRetencion PresentacionRetencion[] @relation("PresentacionRetencionCreatedBy")
 
   @@unique([tenantId, username])
 }
@@ -823,6 +1019,8 @@ model ReciboPago {
   total       Decimal  @db.Decimal(14, 2)
   /// transferencia | cheque | efectivo | echeq
   metodoPago  String   @db.VarChar(20)
+  chequeId    Int?
+  cheque      Cheque?  @relation(fields: [chequeId], references: [id])
   cbu         String?  @db.VarChar(22)
   referencia  String?  @db.VarChar(60)
   /// emitido | anulado
@@ -879,6 +1077,99 @@ model MovimientoProveedorCC {
 
   @@index([tenantId, proveedorId, fecha])
   @@index([tenantId, proveedorId])
+}
+
+/// Customer accounts-receivable ledger (#232).
+model MovimientoClienteCC {
+  id                   Int                @id @default(autoincrement())
+  tenantId             Int
+  tenant               Tenant             @relation(fields: [tenantId], references: [id])
+  clienteId            Int
+  cliente              Cliente            @relation(fields: [clienteId], references: [id])
+  /// saldo_inicial | factura | nota_credito | cobro | retencion | percepcion | cheque_rechazado | ajuste
+  tipo                 String             @db.VarChar(20)
+  referencia           String?            @db.VarChar(40)
+  /// Positive increases customer debt; negative reduces debt.
+  monto                Decimal            @db.Decimal(14, 2)
+  saldoPost            Decimal            @db.Decimal(14, 2)
+  fecha                DateTime
+  usuarioId            Int
+  usuario              AppUser            @relation(fields: [usuarioId], references: [id])
+  notas                String?            @db.VarChar(500)
+  facturaId            Int?               @unique
+  factura              Factura?           @relation(fields: [facturaId], references: [id])
+  cobroId              Int?               @unique
+  cobro                Cobro?             @relation(fields: [cobroId], references: [id])
+  notaCreditoId        Int?               @unique
+  notaCredito          NotaCredito?       @relation(fields: [notaCreditoId], references: [id])
+  chequeId             Int?               @unique
+  cheque               Cheque?            @relation(fields: [chequeId], references: [id])
+  retencionAplicadaId  Int?               @unique
+  retencionAplicada    RetencionAplicada? @relation(fields: [retencionAplicadaId], references: [id])
+  reciboCobroId        Int?               @unique
+  reciboCobro          ReciboCobro?       @relation(fields: [reciboCobroId], references: [id])
+  createdAt            DateTime           @default(now())
+
+  @@index([tenantId, clienteId, fecha])
+  @@index([tenantId, clienteId])
+}
+
+/// Customer payment receipt (#233).
+model ReciboCobro {
+  id              Int      @id @default(autoincrement())
+  tenantId        Int
+  tenant          Tenant   @relation(fields: [tenantId], references: [id])
+  numero          Int
+  clienteId       Int
+  cliente         Cliente  @relation(fields: [clienteId], references: [id])
+  fecha           DateTime
+  totalCobrado    Decimal  @db.Decimal(14, 2)
+  concepto        String?  @db.VarChar(500)
+  /// emitido | anulado
+  estado          String   @db.VarChar(20) @default("emitido")
+  anulacionMotivo String?  @db.VarChar(500)
+  usuarioId       Int
+  usuario         AppUser  @relation(fields: [usuarioId], references: [id])
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  formas               ReciboCobroForma[]
+  imputaciones         ReciboCobroImputacion[]
+  movimientoCC         MovimientoClienteCC?
+  retencionesAplicadas RetencionAplicada[]
+
+  @@unique([tenantId, numero])
+  @@index([tenantId, clienteId])
+  @@index([tenantId, clienteId, fecha])
+}
+
+model ReciboCobroForma {
+  id            Int         @id @default(autoincrement())
+  reciboCobroId Int
+  reciboCobro   ReciboCobro @relation(fields: [reciboCobroId], references: [id], onDelete: Cascade)
+  /// efectivo | transferencia | cheque | mercadopago | tarjeta | otro
+  tipo          String      @db.VarChar(20)
+  importe       Decimal     @db.Decimal(14, 2)
+  chequeId      Int?
+  cheque        Cheque?     @relation(fields: [chequeId], references: [id])
+  referencia    String?     @db.VarChar(60)
+  banco         String?     @db.VarChar(50)
+
+  @@index([reciboCobroId])
+}
+
+model ReciboCobroImputacion {
+  id            Int         @id @default(autoincrement())
+  reciboCobroId Int
+  reciboCobro   ReciboCobro @relation(fields: [reciboCobroId], references: [id], onDelete: Cascade)
+  facturaId     Int
+  factura       Factura     @relation(fields: [facturaId], references: [id])
+  importe       Decimal     @db.Decimal(14, 2)
+  saldoPrevio   Decimal     @db.Decimal(14, 2)
+  saldoPostPago Decimal     @db.Decimal(14, 2)
+
+  @@index([reciboCobroId])
+  @@index([facturaId])
 }
 
 model StockAjuste {
@@ -1011,15 +1302,53 @@ model RetencionAplicada {
   cobro         Cobro?           @relation(fields: [cobroId], references: [id])
   reciboPagoId  Int?
   reciboPago    ReciboPago?      @relation(fields: [reciboPagoId], references: [id])
+  reciboCobroId Int?
+  reciboCobro   ReciboCobro?     @relation(fields: [reciboCobroId], references: [id])
   baseImponible Decimal          @db.Decimal(14, 2)
   alicuota      Decimal          @db.Decimal(8, 4)
   importe       Decimal          @db.Decimal(14, 2)
   constanciaNum String?          @db.VarChar(30)
   createdAt     DateTime         @default(now())
+  movimientoCC  MovimientoClienteCC?
 
   @@index([tenantId, createdAt])
   @@index([tenantId, entidadTipo, entidadId])
   @@index([tenantId, tipo])
+}
+
+/// Correlative certificate numbers per withholding type (#276).
+model RetencionConstanciaSequence {
+  id        Int    @id @default(autoincrement())
+  tenantId  Int
+  tenant    Tenant @relation(fields: [tenantId], references: [id])
+  /// ganancias | iva | iibb
+  tipo      String @db.VarChar(20)
+  /// Empty string when not province-specific (Ganancias/IVA).
+  provincia String @default("") @db.VarChar(10)
+  lastNum   Int    @default(0)
+
+  @@unique([tenantId, tipo, provincia])
+}
+
+/// Monthly SICORE/SIFERE file generation history (#242).
+model PresentacionRetencion {
+  id               Int       @id @default(autoincrement())
+  tenantId         Int
+  tenant           Tenant    @relation(fields: [tenantId], references: [id])
+  /// sicore | sifere
+  formato          String    @db.VarChar(10)
+  /// YYYY-MM
+  periodo          String    @db.VarChar(7)
+  totalOperaciones Int
+  totalImporte     Decimal   @db.Decimal(14, 2)
+  archivoHash      String?   @db.VarChar(64)
+  archivoContenido String    @db.Text
+  presentadoAt     DateTime?
+  createdAt        DateTime  @default(now())
+  createdById      Int?
+  createdBy        AppUser?  @relation("PresentacionRetencionCreatedBy", fields: [createdById], references: [id])
+
+  @@index([tenantId, formato, periodo])
 }
 
 model LoginAttempt {

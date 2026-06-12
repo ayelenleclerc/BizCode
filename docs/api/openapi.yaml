@@ -48,8 +48,14 @@ tags:
     description: Commercial orders and quotes (ADR-0009)
   - name: cobros
     description: Customer payment collections
+  - name: portal
+    description: B2B customer self-service portal (#240)
+  - name: mercadopago
+    description: Mercado Pago online payments integration (#174+)
   - name: cobranzas
     description: Overdue invoice reminders (#134)
+  - name: cheques
+    description: Check portfolio — physical and ECHEQ (#231, module fiscal.cheques)
   - name: formasPago
     description: Payment methods
   - name: users
@@ -813,6 +819,400 @@ paths:
                 $ref: '#/components/schemas/ClienteEnvelope'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/ServerError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /api/clientes/{id}/cuenta-corriente:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    get:
+      tags: [clientes]
+      summary: Customer accounts-receivable statement
+      description: Ledger movements, current balance, credit-limit alert, and 6-month debt series (#232). Requires finance.ledger module.
+      parameters:
+        - name: tipo
+          in: query
+          schema:
+            type: string
+            enum: [saldo_inicial, factura, nota_credito, cobro, retencion, percepcion, cheque_rechazado, ajuste]
+        - name: desde
+          in: query
+          description: ISO-8601 filter start (inclusive)
+          schema:
+            type: string
+            format: date-time
+        - name: hasta
+          in: query
+          description: ISO-8601 filter end (inclusive)
+          schema:
+            type: string
+            format: date-time
+        - $ref: '#/components/parameters/ListLimit'
+        - $ref: '#/components/parameters/ListOffset'
+      responses:
+        '200':
+          description: Statement
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClienteCuentaCorrienteEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /api/clientes/{id}/cuenta-corriente/saldo:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    get:
+      tags: [clientes]
+      summary: Customer accounts-receivable balance only
+      responses:
+        '200':
+          description: Balance snapshot
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClienteCuentaCorrienteSaldoEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /api/clientes/{id}/cuenta-corriente/antiguedad:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    get:
+      tags: [clientes]
+      summary: Customer AR aging buckets
+      parameters:
+        - name: asOf
+          in: query
+          schema:
+            type: string
+            format: date-time
+      responses:
+        '200':
+          description: Aging buckets 0-30, 31-60, 61-90, +90 days
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClienteCuentaCorrienteAntiguedadEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /api/clientes/{id}/cuenta-corriente/estado-de-cuenta/pdf:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    get:
+      tags: [clientes]
+      summary: Download customer account statement PDF
+      parameters:
+        - name: desde
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: hasta
+          in: query
+          schema:
+            type: string
+            format: date-time
+      responses:
+        '200':
+          description: PDF document
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /api/clientes/{id}/cuenta-corriente/estado-de-cuenta/enviar:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    post:
+      tags: [clientes]
+      summary: Email customer account statement PDF
+      description: Uses tenant SMTP when configured; returns success without error when SMTP is absent (#232).
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClienteCuentaCorrienteEnviarInput'
+      responses:
+        '200':
+          description: Send accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClienteCuentaCorrienteEnviarEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /api/clientes/{id}/cuenta-corriente/ajuste:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    post:
+      tags: [clientes]
+      summary: Manual customer ledger adjustment
+      description: Requires sales.create; posts audit event cliente_cc_ajuste.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClienteCuentaCorrienteAjusteInput'
+      responses:
+        '201':
+          description: Adjustment posted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MovimientoClienteCCEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /api/clientes/{id}/facturas-pendientes:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    get:
+      tags: [clientes]
+      summary: Pending customer invoices for receipt allocation
+      description: Active invoices with remaining balance for imputation (#233). Requires module `finance.receipts`.
+      responses:
+        '200':
+          description: Pending invoices
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FacturaPendienteClienteListEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /api/clientes/{id}/recibos:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    get:
+      tags: [clientes]
+      summary: Customer payment receipt history
+      description: Requires module `finance.receipts` and permission `reports.financial.read`.
+      parameters:
+        - $ref: '#/components/parameters/ListLimit'
+        - $ref: '#/components/parameters/ListOffset'
+      responses:
+        '200':
+          description: Paginated payment receipts
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReciboCobroListEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+    post:
+      tags: [clientes]
+      summary: Register customer payment receipt
+      description: |
+        Creates `ReciboCobro` with tenant-correlative `numero`, posts `cobro` ledger movement (negative monto = bruto),
+        optional `RetencionAplicada` rows, FIFO or manual imputaciones, and audit event `recibo_cobro_create`.
+        Requires module `finance.receipts` and `sales.create`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReciboCobroInput'
+      responses:
+        '201':
+          description: Payment receipt created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReciboCobroEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /api/clientes/{id}/recibos/{reciboId}/anular:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: reciboId
+        in: path
+        required: true
+        schema:
+          type: integer
+    post:
+      tags: [clientes]
+      summary: Void customer payment receipt
+      description: Sets estado `anulado` and posts compensating ledger movement. Audit `recibo_cobro_void`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReciboCobroVoidInput'
+      responses:
+        '200':
+          description: Receipt voided
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReciboCobroEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '422':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/ServerError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /api/clientes/{id}/recibos/{reciboId}/pdf:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: reciboId
+        in: path
+        required: true
+        schema:
+          type: integer
+    get:
+      tags: [clientes]
+      summary: Customer payment receipt PDF
+      description: Returns PDF with amount in words (#233). Requires module `finance.receipts`.
+      responses:
+        '200':
+          description: PDF document
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        '404':
+          $ref: '#/components/responses/NotFoundError'
         '500':
           $ref: '#/components/responses/ServerError'
         '401':
@@ -1916,8 +2316,9 @@ paths:
       tags: [proveedores]
       summary: Register supplier payment
       description: |
-        Creates `ReciboPago` with tenant-correlative `numero`, posts `pago` ledger movement (negative monto),
-        and audit event `recibo_pago_create`. Requires module `finance.receipts` and `suppliers.manage`.
+        Creates `ReciboPago` with tenant-correlative `numero`, posts `pago` ledger movement (negative monto = sum of facturas/bruto),
+        optional `RetencionAplicada` rows (#276), and audit event `recibo_pago_create`.
+        `total` is net cash (sum facturas − sum retenciones). Requires module `finance.receipts` and `suppliers.manage`.
       requestBody:
         required: true
         content:
@@ -2051,6 +2452,50 @@ paths:
                 $ref: '#/components/schemas/AlertaProveedorConfigEnvelope'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/proveedores/{id}/pagos/{reciboId}/retenciones:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: reciboId
+        in: path
+        required: true
+        schema:
+          type: integer
+    get:
+      tags: [proveedores]
+      summary: List withholdings applied to a payment receipt (#276)
+      description: Requires module `finance.receipts` and permission `suppliers.read`.
+      responses:
+        '200':
+          description: Applied withholdings
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [success, data]
+                properties:
+                  success:
+                    type: boolean
+                    const: true
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ReciboPagoRetencion'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '403':
@@ -2972,10 +3417,35 @@ paths:
         schema:
           type: number
           exclusiveMinimum: 0
+      - name: contexto
+        in: query
+        schema:
+          type: string
+          enum: [factura, cobro]
+        description: For `entidadTipo=cliente`, `factura` previews perceptions; `cobro` previews withholdings (#229).
+      - name: neto1
+        in: query
+        schema:
+          type: number
+          minimum: 0
+      - name: neto2
+        in: query
+        schema:
+          type: number
+          minimum: 0
+      - name: neto3
+        in: query
+        schema:
+          type: number
+          minimum: 0
     get:
       tags: [contabilidad]
-      summary: Preview withholdings stub (#228; calculation in #229)
-      description: Requires `finance.retenciones`, `reports.financial.read`. Returns empty list until #229.
+      summary: Preview withholdings/perceptions (#228, #276, #229)
+      description: |
+        Requires `finance.retenciones`, `reports.financial.read`.
+        `entidadTipo=proveedor` — suggested withholdings on supplier payment (#276).
+        `entidadTipo=cliente` with `contexto=factura` — perceptions on invoice (neto1+neto2+neto3 base).
+        `entidadTipo=cliente` with `contexto=cobro` — customer withholdings on collection (`monto` = bruto).
       responses:
         '200':
           description: Preview result (stub)
@@ -2985,6 +3455,220 @@ paths:
                 $ref: '#/components/schemas/RetencionesPreviewEnvelope'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/fiscal/retenciones/export:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: format
+        in: query
+        required: true
+        schema:
+          type: string
+          enum: [sicore, sifere]
+      - name: from
+        in: query
+        schema:
+          type: string
+          format: date-time
+      - name: to
+        in: query
+        schema:
+          type: string
+          format: date-time
+    get:
+      tags: [contabilidad]
+      summary: Export applied withholdings TXT (#276)
+      description: |
+        Requires `finance.retenciones`, `reports.financial.read`.
+        `format=sicore` for Ganancias/IVA; `format=sifere` for IIBB. Excludes voided payment receipts.
+      responses:
+        '200':
+          description: TXT export
+          content:
+            text/plain:
+              schema:
+                type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/fiscal/presentaciones/preview:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: formato
+        in: query
+        required: true
+        schema:
+          type: string
+          enum: [sicore, sifere]
+      - name: periodo
+        in: query
+        required: true
+        schema:
+          type: string
+          pattern: '^\\d{4}-\\d{2}$'
+    get:
+      tags: [contabilidad]
+      summary: Preview monthly SICORE/SIFERE presentation (#242)
+      description: |
+        Requires `finance.retenciones`, `reports.financial.read`.
+        Returns operations for the period with regime totals and CUIT validation warnings.
+      responses:
+        '200':
+          description: Preview envelope
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PresentacionPreviewEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/fiscal/presentaciones:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [contabilidad]
+      summary: List generated presentation files (#242)
+      description: Requires `finance.retenciones`, `reports.financial.read`.
+      responses:
+        '200':
+          description: History list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PresentacionRetencionListEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    post:
+      tags: [contabilidad]
+      summary: Generate and store presentation TXT (#242)
+      description: Requires `finance.retenciones`, `reports.financial.read`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PresentacionRetencionInput'
+      responses:
+        '201':
+          description: Created presentation record
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PresentacionRetencionEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/fiscal/presentaciones/{id}/archivo:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    get:
+      tags: [contabilidad]
+      summary: Download stored presentation TXT (#242)
+      description: Requires `finance.retenciones`, `reports.financial.read`.
+      responses:
+        '200':
+          description: TXT file
+          content:
+            text/plain:
+              schema:
+                type: string
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/fiscal/presentaciones/{id}/presentado:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    patch:
+      tags: [contabilidad]
+      summary: Mark presentation as filed in AFIP (#242)
+      description: Requires `finance.retenciones`, `reports.financial.read`.
+      responses:
+        '200':
+          description: Updated presentation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PresentacionRetencionEnvelope'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/fiscal/retenciones/{id}/comprobante/pdf:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    get:
+      tags: [contabilidad]
+      summary: Download withholding certificate PDF (#276)
+      description: Requires `finance.retenciones`, `reports.financial.read`.
+      responses:
+        '200':
+          description: PDF certificate
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '403':
@@ -3248,6 +3932,25 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
 
+  /api/pedidos/{id}/remito:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    post:
+      tags: [pedidos, remitos]
+      summary: Create delivery note from confirmed pedido
+      responses:
+        '201':
+          description: Draft remito created from pedido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RemitoEnvelope'
+
   /api/cobros:
     parameters:
       - $ref: '#/components/parameters/BizcodeChannelHeader'
@@ -3293,8 +3996,8 @@ paths:
       tags: [cobros]
       summary: Register a customer payment
       description: |
-        Decrements `Cliente.balance` by `monto` in the same transaction. When the customer has at least
-        one active invoice (`estado: A`), adjusts `Cliente.score` from the oldest active invoice due date
+        Decrements `Cliente.balance` by bruto (`monto` neto + sum of `retenciones[]` when present) in the same transaction (#229).
+        When the customer has at least one active invoice (`estado: A`), adjusts `Cliente.score` from the oldest active invoice due date
         (`factura.fecha + creditDays`) vs payment date: on-time +5; 1–10 days late −3; 11–30 −7; >30 −15.
         No score change when there is no active invoice (on-account payment). Audit metadata includes
         `scoreBefore`, `scoreAfter`, `delta`. Requires `sales.create`.
@@ -3353,6 +4056,50 @@ paths:
           $ref: '#/components/responses/ForbiddenError'
         '404':
           description: Payment not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/cobros/{id}/retenciones:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    get:
+      tags: [cobros]
+      summary: List withholdings applied on a customer payment (#229)
+      description: Requires `finance.retenciones`, `reports.financial.read`.
+      responses:
+        '200':
+          description: Withholding lines linked to the cobro
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [success, data]
+                properties:
+                  success:
+                    type: boolean
+                    const: true
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CobroRetencion'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Cobro not found
           content:
             application/json:
               schema:
@@ -3694,6 +4441,539 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         '403':
           $ref: '#/components/responses/ForbiddenError'
+
+  /api/facturas/{id}/remito:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    post:
+      tags: [facturas, remitos]
+      summary: Create delivery note from invoice
+      description: |
+        Creates a draft `remito_x` copying active invoice lines. Requires module `fiscal.remito` and `sales.create`.
+        Stock is not decremented on the remito (stock remains on invoice creation).
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '201':
+          description: Draft remito created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RemitoEnvelope'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '409':
+          description: Invoice already linked to a non-voided remito
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /api/remitos:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [remitos]
+      summary: List delivery notes
+      description: Paginated list. Requires module `fiscal.remito`.
+      parameters:
+        - $ref: '#/components/parameters/ListLimit'
+        - $ref: '#/components/parameters/ListOffset'
+        - name: estado
+          in: query
+          schema:
+            type: string
+            enum: [borrador, emitido, entregado, anulado]
+        - name: clienteId
+          in: query
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Paginated remitos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RemitoListEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+    post:
+      tags: [remitos]
+      summary: Create delivery note (draft)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RemitoInput'
+      responses:
+        '201':
+          description: Draft created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RemitoEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /api/remitos/{id}:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    get:
+      tags: [remitos]
+      summary: Get delivery note
+      responses:
+        '200':
+          description: Delivery note detail
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RemitoEnvelope'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+    put:
+      tags: [remitos]
+      summary: Update draft delivery note
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RemitoUpdateInput'
+      responses:
+        '200':
+          description: Updated draft delivery note
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RemitoEnvelope'
+        '409':
+          description: Only borrador can be updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+
+  /api/remitos/{id}/emitir:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    post:
+      tags: [remitos]
+      summary: Issue delivery note (assign correlativo)
+      responses:
+        '200':
+          description: Issued delivery note
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RemitoEnvelope'
+
+  /api/remitos/{id}/entregar:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    post:
+      tags: [remitos]
+      summary: Mark delivery note as delivered
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RemitoEntregarInput'
+      responses:
+        '200':
+          description: Delivered delivery note
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RemitoEnvelope'
+
+  /api/remitos/{id}/anular:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    post:
+      tags: [remitos]
+      summary: Void issued delivery note
+      responses:
+        '200':
+          description: Voided delivery note
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RemitoEnvelope'
+
+  /api/remitos/{id}/pdf:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    get:
+      tags: [remitos]
+      summary: Download delivery note PDF
+      responses:
+        '200':
+          description: application/pdf
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+
+  /api/cheques/resumen:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [cheques]
+      summary: Check portfolio summary
+      description: Aggregates for in-portfolio, due within 7 days and rejected checks. Requires module `fiscal.cheques`.
+      responses:
+        '200':
+          description: Portfolio summary totals
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChequeResumenEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /api/cheques:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [cheques]
+      summary: List checks
+      description: Paginated portfolio list. Requires module `fiscal.cheques`.
+      parameters:
+        - $ref: '#/components/parameters/ListLimit'
+        - $ref: '#/components/parameters/ListOffset'
+        - name: tipo
+          in: query
+          schema:
+            type: string
+            enum: [recibido, emitido]
+        - name: estado
+          in: query
+          schema:
+            type: string
+            enum: [en_cartera, emitido, depositado, endosado, descontado, cobrado, rechazado, anulado]
+        - name: banco
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Paginated checks
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChequeListEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+    post:
+      tags: [cheques]
+      summary: Register check in portfolio
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChequeInput'
+      responses:
+        '201':
+          description: Check created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChequeEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '409':
+          description: Duplicate bank/number
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+
+  /api/cheques/{id}:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    get:
+      tags: [cheques]
+      summary: Get check
+      responses:
+        '200':
+          description: Check detail
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChequeEnvelope'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+    put:
+      tags: [cheques]
+      summary: Update check (en_cartera only)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChequeUpdateInput'
+      responses:
+        '200':
+          description: Updated check
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChequeEnvelope'
+        '409':
+          description: Only en_cartera checks can be updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+
+  /api/cheques/{id}/depositar:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    post:
+      tags: [cheques]
+      summary: Deposit check
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChequeTransicionInput'
+      responses:
+        '200':
+          description: Deposited check
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChequeEnvelope'
+
+  /api/cheques/{id}/endosar:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    post:
+      tags: [cheques]
+      summary: Endorse check to supplier
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChequeTransicionInput'
+      responses:
+        '200':
+          description: Endorsed check
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChequeEnvelope'
+
+  /api/cheques/{id}/descontar:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    post:
+      tags: [cheques]
+      summary: Discount check
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChequeTransicionInput'
+      responses:
+        '200':
+          description: Discounted check
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChequeEnvelope'
+
+  /api/cheques/{id}/cobrar:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    post:
+      tags: [cheques]
+      summary: Mark check as collected
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChequeTransicionInput'
+      responses:
+        '200':
+          description: Collected check
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChequeEnvelope'
+
+  /api/cheques/{id}/rechazar:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    post:
+      tags: [cheques]
+      summary: Reject check
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChequeTransicionInput'
+      responses:
+        '200':
+          description: Rejected check
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChequeEnvelope'
+
+  /api/cheques/{id}/devolver-cartera:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    post:
+      tags: [cheques]
+      summary: Return rejected check to portfolio
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChequeTransicionInput'
+      responses:
+        '200':
+          description: Check returned to portfolio
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChequeEnvelope'
+
+  /api/cheques/{id}/anular:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    post:
+      tags: [cheques]
+      summary: Void check in portfolio
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChequeTransicionInput'
+      responses:
+        '200':
+          description: Voided check
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChequeEnvelope'
+
+  /api/cheques/alertas/run:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    post:
+      tags: [cheques]
+      summary: Run due-soon check alerts job
+      responses:
+        '200':
+          description: Alert job result
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [success, data]
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      sent:
+                        type: integer
+                      skipped:
+                        type: integer
 
   /api/notas-credito:
     parameters:
@@ -4401,8 +5681,8 @@ paths:
       tags: [reportes]
       summary: Customer account statement (running balance)
       description: |
-        Chronological list of opening balance (if non-zero), active invoices (debit), and payments (credit)
-        with a running `saldo`. Requires permission `reports.financial.read`.
+        Legacy wrapper over the persisted customer ledger (`MovimientoClienteCC`): chronological movements
+        with debit/credit columns and running `saldo`. Requires permission `reports.financial.read`.
       security:
         - cookieSession: []
       parameters:
@@ -4921,6 +6201,386 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         '403':
           $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/portal-config:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [portal]
+      summary: Get B2B portal settings for the authenticated tenant (#240)
+      security:
+        - cookieSession: []
+      responses:
+        '200':
+          description: Portal configuration
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PortalConfigEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    put:
+      tags: [portal]
+      summary: Update B2B portal settings (#240)
+      security:
+        - cookieSession: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PortalConfigInput'
+      responses:
+        '200':
+          description: Portal configuration updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PortalConfigEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/configuracion/mercadopago:
+    get:
+      tags: [mercadopago]
+      summary: Mercado Pago config status (metadata only) (#174)
+      description: Requires `settings.business.manage` and tenant integration `mercadopago`. Does not return access token or webhook secret.
+      security:
+        - cookieSession: []
+      responses:
+        '200':
+          description: Mercado Pago config status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MercadoPagoConfigStatusEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    put:
+      tags: [mercadopago]
+      summary: Upsert tenant Mercado Pago credentials (#174)
+      description: Requires `settings.business.manage` and tenant integration `mercadopago`. Access token and webhook secret encrypted at rest.
+      security:
+        - cookieSession: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MercadoPagoConfigInput'
+      responses:
+        '200':
+          description: Config saved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MercadoPagoConfigEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/configuracion/mercadopago/test:
+    post:
+      tags: [mercadopago]
+      summary: Verify Mercado Pago credentials (#174)
+      description: Requires `settings.business.manage` and tenant integration `mercadopago`. Calls Mercado Pago `users/me` with stored access token.
+      security:
+        - cookieSession: []
+      responses:
+        '200':
+          description: Credentials valid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MercadoPagoTestEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Mercado Pago not configured
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '422':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/portal/{tenantSlug}/branding:
+    get:
+      tags: [portal]
+      summary: Public portal branding for login shell (#240)
+      parameters:
+        - $ref: '#/components/parameters/PortalTenantSlug'
+      responses:
+        '200':
+          description: Branding payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PortalBrandingEnvelope'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/portal/{tenantSlug}/auth/magic-link:
+    post:
+      tags: [portal]
+      summary: Request magic-link email for portal login (#240)
+      parameters:
+        - $ref: '#/components/parameters/PortalTenantSlug'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PortalMagicLinkInput'
+      responses:
+        '200':
+          description: Generic success (anti-enumeration)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PortalMagicLinkSentEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/portal/{tenantSlug}/auth/verify:
+    get:
+      tags: [portal]
+      summary: Verify magic link and issue portal session cookie (#240)
+      parameters:
+        - $ref: '#/components/parameters/PortalTenantSlug'
+        - name: token
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Session established
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PortalVerifyEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/portal/{tenantSlug}/auth/logout:
+    post:
+      tags: [portal]
+      summary: Revoke portal session (#240)
+      parameters:
+        - $ref: '#/components/parameters/PortalTenantSlug'
+      responses:
+        '200':
+          description: Logged out
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PortalLogoutEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/portal/{tenantSlug}/me:
+    get:
+      tags: [portal]
+      summary: Current portal customer profile (#240)
+      parameters:
+        - $ref: '#/components/parameters/PortalTenantSlug'
+      responses:
+        '200':
+          description: Customer profile and branding
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PortalMeEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/portal/{tenantSlug}/facturas:
+    get:
+      tags: [portal]
+      summary: List customer invoices in portal scope (#240)
+      parameters:
+        - $ref: '#/components/parameters/PortalTenantSlug'
+        - name: estado
+          in: query
+          schema:
+            type: string
+            enum: [pagada, pendiente, vencida]
+        - name: from
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: to
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - $ref: '#/components/parameters/ListLimit'
+        - $ref: '#/components/parameters/ListOffset'
+      responses:
+        '200':
+          description: Invoice list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PortalFacturaListEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/portal/{tenantSlug}/facturas/{id}/pdf:
+    get:
+      tags: [portal]
+      summary: Download invoice PDF (portal scope) (#240)
+      parameters:
+        - $ref: '#/components/parameters/PortalTenantSlug'
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Invoice PDF
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '422':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/portal/{tenantSlug}/cuenta-corriente:
+    get:
+      tags: [portal]
+      summary: Customer ledger in portal scope (#240)
+      parameters:
+        - $ref: '#/components/parameters/PortalTenantSlug'
+        - $ref: '#/components/parameters/ListLimit'
+        - $ref: '#/components/parameters/ListOffset'
+      responses:
+        '200':
+          description: Ledger statement
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClienteCuentaCorrienteEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/portal/{tenantSlug}/cuenta-corriente/estado-de-cuenta/pdf:
+    get:
+      tags: [portal]
+      summary: Download account statement PDF (#240)
+      parameters:
+        - $ref: '#/components/parameters/PortalTenantSlug'
+      responses:
+        '200':
+          description: Account statement PDF
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/portal/{tenantSlug}/pedidos:
+    get:
+      tags: [portal]
+      summary: List customer orders in portal scope (#240)
+      parameters:
+        - $ref: '#/components/parameters/PortalTenantSlug'
+        - $ref: '#/components/parameters/ListLimit'
+        - $ref: '#/components/parameters/ListOffset'
+      responses:
+        '200':
+          description: Order list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PortalPedidoListEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
         '500':
           $ref: '#/components/responses/ServerError'
 
@@ -5840,6 +7500,15 @@ components:
         minimum: 0
         default: 0
 
+    PortalTenantSlug:
+      name: tenantSlug
+      in: path
+      required: true
+      description: Tenant slug for portal routes (MVP `/portal/:tenantSlug`)
+      schema:
+        type: string
+        maxLength: 80
+
   schemas:
     HealthResponse:
       type: object
@@ -6338,6 +8007,7 @@ components:
         monto:
           type: number
           exclusiveMinimum: 0
+          description: Net amount received (#229); CC decremented by bruto when retenciones present.
         formaPagoId:
           type: integer
           nullable: true
@@ -6347,6 +8017,39 @@ components:
         nota:
           type: string
           maxLength: 200
+        retenciones:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReciboPagoRetencionInput'
+        chequeId:
+          type: integer
+          nullable: true
+          description: Link existing portfolio check (#231).
+        chequeNuevo:
+          $ref: '#/components/schemas/ChequeInput'
+          description: Create received check when recording collection (#231).
+
+    CobroRetencion:
+      type: object
+      required: [id, regimenId, regimenNombre, tipo, baseImponible, alicuota, importe]
+      properties:
+        id:
+          type: integer
+        regimenId:
+          type: integer
+        regimenNombre:
+          type: string
+        tipo:
+          type: string
+        baseImponible:
+          type: string
+        alicuota:
+          type: string
+        importe:
+          type: string
+        constanciaNum:
+          type: string
+          nullable: true
 
     CobroListEnvelope:
       allOf:
@@ -6374,7 +8077,7 @@ components:
 
     CobroCreateData:
       type: object
-      required: [cobro, updatedCliente]
+      required: [cobro, updatedCliente, retenciones, montoBruto]
       properties:
         cobro:
           $ref: '#/components/schemas/Cobro'
@@ -6396,6 +8099,13 @@ components:
               type: integer
               minimum: 0
               maximum: 100
+        retenciones:
+          type: array
+          items:
+            $ref: '#/components/schemas/CobroRetencion'
+        montoBruto:
+          type: string
+          description: Bruto applied to customer balance (neto + retenciones).
 
     CobroCreateEnvelope:
       type: object
@@ -6971,6 +8681,147 @@ components:
           type: string
           nullable: true
 
+    MovimientoClienteCC:
+      type: object
+      required: [id, tipo, monto, saldoPost, fecha, usuarioId]
+      properties:
+        id:
+          type: integer
+        tipo:
+          type: string
+          enum: [saldo_inicial, factura, nota_credito, cobro, retencion, percepcion, cheque_rechazado, ajuste]
+        referencia:
+          type: string
+          nullable: true
+        monto:
+          type: string
+        saldoPost:
+          type: string
+        fecha:
+          type: string
+          format: date-time
+        usuarioId:
+          type: integer
+        notas:
+          type: string
+          nullable: true
+        facturaId:
+          type: integer
+          nullable: true
+        cobroId:
+          type: integer
+          nullable: true
+        notaCreditoId:
+          type: integer
+          nullable: true
+        chequeId:
+          type: integer
+          nullable: true
+        retencionAplicadaId:
+          type: integer
+          nullable: true
+
+    ClienteCuentaCorrienteChartPoint:
+      type: object
+      required: [period, saldo]
+      properties:
+        period:
+          type: string
+        saldo:
+          type: string
+
+    ClienteCuentaCorriente:
+      type: object
+      required: [clienteId, codigo, rsocial, saldo, excedeLimite, movimientos, serie, total, limit, offset]
+      properties:
+        clienteId:
+          type: integer
+        codigo:
+          type: integer
+        rsocial:
+          type: string
+        saldo:
+          type: string
+        creditLimit:
+          type: string
+          nullable: true
+        excedeLimite:
+          type: boolean
+        movimientos:
+          type: array
+          items:
+            $ref: '#/components/schemas/MovimientoClienteCC'
+        serie:
+          type: array
+          items:
+            $ref: '#/components/schemas/ClienteCuentaCorrienteChartPoint'
+        total:
+          type: integer
+        limit:
+          type: integer
+        offset:
+          type: integer
+
+    ClienteCuentaCorrienteSaldo:
+      type: object
+      required: [clienteId, saldo, excedeLimite]
+      properties:
+        clienteId:
+          type: integer
+        saldo:
+          type: string
+        creditLimit:
+          type: string
+          nullable: true
+        excedeLimite:
+          type: boolean
+
+    ClienteCuentaCorrienteAntiguedadBucket:
+      type: object
+      required: [label, total]
+      properties:
+        label:
+          type: string
+          enum: ['0-30', '31-60', '61-90', '+90']
+        total:
+          type: string
+
+    ClienteCuentaCorrienteAntiguedad:
+      type: object
+      required: [clienteId, buckets, totalPendiente]
+      properties:
+        clienteId:
+          type: integer
+        buckets:
+          type: array
+          items:
+            $ref: '#/components/schemas/ClienteCuentaCorrienteAntiguedadBucket'
+        totalPendiente:
+          type: string
+
+    ClienteCuentaCorrienteAjusteInput:
+      type: object
+      required: [monto, motivo]
+      properties:
+        monto:
+          type: number
+        motivo:
+          type: string
+          maxLength: 500
+
+    ClienteCuentaCorrienteEnviarInput:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        desde:
+          type: string
+          format: date-time
+        hasta:
+          type: string
+          format: date-time
+
     ProveedorCuentaCorrienteChartPoint:
       type: object
       required: [period, saldo]
@@ -7415,6 +9266,62 @@ components:
         data:
           $ref: '#/components/schemas/ArticuloProveedoresComparadorData'
 
+    ClienteCuentaCorrienteEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/ClienteCuentaCorriente'
+
+    ClienteCuentaCorrienteSaldoEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/ClienteCuentaCorrienteSaldo'
+
+    ClienteCuentaCorrienteAntiguedadEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/ClienteCuentaCorrienteAntiguedad'
+
+    MovimientoClienteCCEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/MovimientoClienteCC'
+
+    ClienteCuentaCorrienteEnviarEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: object
+          required: [sent, email]
+          properties:
+            sent:
+              type: boolean
+            email:
+              type: string
+
     ProveedorCuentaCorrienteEnvelope:
       type: object
       required: [success, data]
@@ -7473,6 +9380,8 @@ components:
         - proveedor
         - usuario
         - facturas
+        - retenciones
+        - totalBruto
         - createdAt
       properties:
         id:
@@ -7485,6 +9394,8 @@ components:
           type: string
           format: date-time
         total:
+          type: string
+        totalBruto:
           type: string
         metodoPago:
           type: string
@@ -7528,6 +9439,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ReciboPagoFactura'
+        retenciones:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReciboPagoRetencion'
         createdAt:
           type: string
           format: date-time
@@ -7556,6 +9471,10 @@ components:
           type: string
           maxLength: 500
           nullable: true
+        chequeId:
+          type: integer
+          nullable: true
+          description: Portfolio check to endorse when metodoPago is cheque or echeq (#231).
         facturas:
           type: array
           minItems: 1
@@ -7571,6 +9490,58 @@ components:
               monto:
                 type: number
                 exclusiveMinimum: 0
+        retenciones:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReciboPagoRetencionInput'
+
+    ReciboPagoRetencionInput:
+      type: object
+      required: [regimenId, baseImponible, alicuota, importe]
+      properties:
+        regimenId:
+          type: integer
+          minimum: 1
+        baseImponible:
+          type: number
+          exclusiveMinimum: 0
+        alicuota:
+          type: number
+          minimum: 0
+          maximum: 100
+        importe:
+          type: number
+          exclusiveMinimum: 0
+
+    ReciboPagoRetencion:
+      type: object
+      required:
+        - id
+        - regimenId
+        - regimenNombre
+        - tipo
+        - baseImponible
+        - alicuota
+        - importe
+        - constanciaNum
+      properties:
+        id:
+          type: integer
+        regimenId:
+          type: integer
+        regimenNombre:
+          type: string
+        tipo:
+          type: string
+        baseImponible:
+          type: string
+        alicuota:
+          type: string
+        importe:
+          type: string
+        constanciaNum:
+          type: string
+          nullable: true
 
     ComprobantePendiente:
       type: object
@@ -7603,6 +9574,247 @@ components:
               items:
                 $ref: '#/components/schemas/ReciboPago'
         - $ref: '#/components/schemas/ListPaginationMeta'
+
+    FacturaPendienteCliente:
+      type: object
+      required: [facturaId, facturaRef, fecha, total, pagado, pendiente]
+      properties:
+        facturaId:
+          type: integer
+        facturaRef:
+          type: string
+        fecha:
+          type: string
+          format: date-time
+        total:
+          type: string
+        pagado:
+          type: string
+        pendiente:
+          type: string
+
+    FacturaPendienteClienteListEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/FacturaPendienteCliente'
+
+    ReciboCobroForma:
+      type: object
+      required: [id, tipo, importe]
+      properties:
+        id:
+          type: integer
+        tipo:
+          type: string
+          enum: [efectivo, transferencia, cheque, mercadopago, tarjeta, otro]
+        importe:
+          type: string
+        chequeId:
+          type: integer
+          nullable: true
+        referencia:
+          type: string
+          nullable: true
+        banco:
+          type: string
+          nullable: true
+        chequeNumero:
+          type: string
+          nullable: true
+        chequeBanco:
+          type: string
+          nullable: true
+
+    ReciboCobroImputacion:
+      type: object
+      required: [id, facturaId, facturaRef, importe, saldoPrevio, saldoPostPago]
+      properties:
+        id:
+          type: integer
+        facturaId:
+          type: integer
+        facturaRef:
+          type: string
+        importe:
+          type: string
+        saldoPrevio:
+          type: string
+        saldoPostPago:
+          type: string
+
+    ReciboCobro:
+      type: object
+      required:
+        - id
+        - numero
+        - clienteId
+        - fecha
+        - totalCobrado
+        - totalBruto
+        - estado
+        - usuarioId
+        - cliente
+        - usuario
+        - formas
+        - imputaciones
+        - retenciones
+        - createdAt
+      properties:
+        id:
+          type: integer
+        numero:
+          type: integer
+        clienteId:
+          type: integer
+        fecha:
+          type: string
+          format: date-time
+        totalCobrado:
+          type: string
+        totalBruto:
+          type: string
+        concepto:
+          type: string
+          nullable: true
+        estado:
+          type: string
+          enum: [emitido, anulado]
+        anulacionMotivo:
+          type: string
+          nullable: true
+        usuarioId:
+          type: integer
+        cliente:
+          type: object
+          required: [id, codigo, rsocial]
+          properties:
+            id:
+              type: integer
+            codigo:
+              type: integer
+            rsocial:
+              type: string
+            cuit:
+              type: string
+              nullable: true
+        usuario:
+          type: object
+          required: [id, username]
+          properties:
+            id:
+              type: integer
+            username:
+              type: string
+        formas:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReciboCobroForma'
+        imputaciones:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReciboCobroImputacion'
+        retenciones:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReciboPagoRetencion'
+        createdAt:
+          type: string
+          format: date-time
+
+    ReciboCobroInput:
+      type: object
+      required: [fecha, totalCobrado, formas]
+      properties:
+        fecha:
+          type: string
+        totalCobrado:
+          type: number
+          exclusiveMinimum: 0
+        concepto:
+          type: string
+          maxLength: 500
+          nullable: true
+        fifo:
+          type: boolean
+          default: true
+        formas:
+          type: array
+          minItems: 1
+          items:
+            type: object
+            required: [tipo, importe]
+            properties:
+              tipo:
+                type: string
+                enum: [efectivo, transferencia, cheque, mercadopago, tarjeta, otro]
+              importe:
+                type: number
+                exclusiveMinimum: 0
+              chequeId:
+                type: integer
+                nullable: true
+              referencia:
+                type: string
+                nullable: true
+              banco:
+                type: string
+                nullable: true
+        imputaciones:
+          type: array
+          items:
+            type: object
+            required: [facturaId, importe]
+            properties:
+              facturaId:
+                type: integer
+                minimum: 1
+              importe:
+                type: number
+                exclusiveMinimum: 0
+        retenciones:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReciboPagoRetencionInput'
+
+    ReciboCobroVoidInput:
+      type: object
+      required: [anulacionMotivo]
+      properties:
+        anulacionMotivo:
+          type: string
+          minLength: 3
+          maxLength: 500
+
+    ReciboCobroListEnvelope:
+      allOf:
+        - type: object
+          required: [success, data]
+          properties:
+            success:
+              type: boolean
+              const: true
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/ReciboCobro'
+        - $ref: '#/components/schemas/ListPaginationMeta'
+
+    ReciboCobroEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/ReciboCobro'
 
     ReciboPagoEnvelope:
       type: object
@@ -8731,6 +10943,368 @@ components:
         subtotal:
           type: number
 
+    RemitoItemInput:
+      type: object
+      required: [articuloId, descripcion, cantidad, unidad]
+      properties:
+        articuloId:
+          type: integer
+        descripcion:
+          type: string
+        cantidad:
+          type: integer
+          minimum: 1
+        unidad:
+          type: string
+
+    RemitoInput:
+      type: object
+      required: [tipo, items]
+      properties:
+        tipo:
+          type: string
+          enum: [remito_x, remito_ingreso]
+        clienteId:
+          type: integer
+          nullable: true
+        proveedorId:
+          type: integer
+          nullable: true
+        facturaId:
+          type: integer
+          nullable: true
+        pedidoId:
+          type: integer
+          nullable: true
+        ordenEntregaId:
+          type: integer
+          nullable: true
+        fecha:
+          type: string
+          format: date
+        observaciones:
+          type: string
+          nullable: true
+        items:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/RemitoItemInput'
+
+    RemitoUpdateInput:
+      type: object
+      properties:
+        clienteId:
+          type: integer
+          nullable: true
+        proveedorId:
+          type: integer
+          nullable: true
+        observaciones:
+          type: string
+          nullable: true
+        items:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/RemitoItemInput'
+
+    RemitoEntregarInput:
+      type: object
+      required: [firmadoPor]
+      properties:
+        firmadoPor:
+          type: string
+          minLength: 2
+          maxLength: 120
+        fechaEntrega:
+          type: string
+          format: date
+
+    Remito:
+      type: object
+      additionalProperties: true
+      properties:
+        id:
+          type: integer
+        referencia:
+          type: string
+        prefijo:
+          type: string
+          nullable: true
+        numero:
+          type: integer
+          nullable: true
+        tipo:
+          type: string
+        estado:
+          type: string
+          enum: [borrador, emitido, entregado, anulado]
+        clienteId:
+          type: integer
+          nullable: true
+        facturaId:
+          type: integer
+          nullable: true
+        pedidoId:
+          type: integer
+          nullable: true
+        fecha:
+          type: string
+          format: date-time
+        fechaEntrega:
+          type: string
+          format: date-time
+          nullable: true
+        observaciones:
+          type: string
+          nullable: true
+        firmadoPor:
+          type: string
+          nullable: true
+        items:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+
+    RemitoEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+        data:
+          $ref: '#/components/schemas/Remito'
+
+    RemitoListEnvelope:
+      type: object
+      required: [success, data, total, limit, offset]
+      properties:
+        success:
+          type: boolean
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Remito'
+        total:
+          type: integer
+        limit:
+          type: integer
+        offset:
+          type: integer
+
+    Cheque:
+      type: object
+      required:
+        - id
+        - tipo
+        - modalidad
+        - numero
+        - banco
+        - libradorNombre
+        - monto
+        - moneda
+        - fechaEmision
+        - fechaVencimiento
+        - estado
+      properties:
+        id:
+          type: integer
+        tipo:
+          type: string
+          enum: [recibido, emitido]
+        modalidad:
+          type: string
+          enum: [fisico, echeq]
+        numero:
+          type: string
+        banco:
+          type: string
+        sucursal:
+          type: string
+          nullable: true
+        cbuOrigen:
+          type: string
+          nullable: true
+        libradorNombre:
+          type: string
+        libradorCuit:
+          type: string
+          nullable: true
+        monto:
+          type: string
+        moneda:
+          type: string
+        fechaEmision:
+          type: string
+          format: date-time
+        fechaVencimiento:
+          type: string
+          format: date-time
+        estado:
+          type: string
+          enum: [en_cartera, emitido, depositado, endosado, descontado, cobrado, rechazado, anulado]
+        clienteId:
+          type: integer
+          nullable: true
+        proveedorId:
+          type: integer
+          nullable: true
+        observaciones:
+          type: string
+          nullable: true
+
+    ChequeInput:
+      type: object
+      required:
+        - tipo
+        - modalidad
+        - numero
+        - banco
+        - libradorNombre
+        - monto
+        - fechaEmision
+        - fechaVencimiento
+      properties:
+        tipo:
+          type: string
+          enum: [recibido, emitido]
+        modalidad:
+          type: string
+          enum: [fisico, echeq]
+        numero:
+          type: string
+        banco:
+          type: string
+        sucursal:
+          type: string
+          nullable: true
+        cbuOrigen:
+          type: string
+          nullable: true
+        libradorNombre:
+          type: string
+        libradorCuit:
+          type: string
+          nullable: true
+        monto:
+          type: number
+        moneda:
+          type: string
+        fechaEmision:
+          type: string
+          format: date
+        fechaVencimiento:
+          type: string
+          format: date
+        clienteId:
+          type: integer
+          nullable: true
+        proveedorId:
+          type: integer
+          nullable: true
+        observaciones:
+          type: string
+          nullable: true
+
+    ChequeUpdateInput:
+      type: object
+      properties:
+        banco:
+          type: string
+        sucursal:
+          type: string
+          nullable: true
+        cbuOrigen:
+          type: string
+          nullable: true
+        libradorNombre:
+          type: string
+        libradorCuit:
+          type: string
+          nullable: true
+        fechaVencimiento:
+          type: string
+          format: date
+        observaciones:
+          type: string
+          nullable: true
+
+    ChequeTransicionInput:
+      type: object
+      properties:
+        destino:
+          type: string
+          nullable: true
+        nota:
+          type: string
+          nullable: true
+        proveedorId:
+          type: integer
+          nullable: true
+        monto:
+          type: number
+          nullable: true
+
+    ChequeEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+        data:
+          $ref: '#/components/schemas/Cheque'
+
+    ChequeListEnvelope:
+      type: object
+      required: [success, data, total, limit, offset]
+      properties:
+        success:
+          type: boolean
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Cheque'
+        total:
+          type: integer
+        limit:
+          type: integer
+        offset:
+          type: integer
+
+    ChequeResumenEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          required: [enCartera, proximosVencer, rechazados]
+          properties:
+            enCartera:
+              type: object
+              properties:
+                count:
+                  type: integer
+                total:
+                  type: string
+            proximosVencer:
+              type: object
+              properties:
+                count:
+                  type: integer
+                total:
+                  type: string
+            rechazados:
+              type: object
+              properties:
+                count:
+                  type: integer
+                total:
+                  type: string
+
     VoidInput:
       type: object
       required: [motivo]
@@ -8771,6 +11345,11 @@ components:
           type: number
         total:
           type: number
+          description: Must equal netos + IVA + sum(percepciones) when percepciones are sent (#229).
+        percepciones:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReciboPagoRetencionInput'
         items:
           type: array
           items:
@@ -9553,6 +12132,173 @@ components:
         data:
           $ref: '#/components/schemas/FiscalRetencionesConfig'
 
+    PresentacionRetencionInput:
+      type: object
+      required: [formato, periodo]
+      properties:
+        formato:
+          type: string
+          enum: [sicore, sifere]
+        periodo:
+          type: string
+          pattern: '^\\d{4}-\\d{2}$'
+
+    PresentacionWarning:
+      type: object
+      required: [code, retencionId, message]
+      properties:
+        code:
+          type: string
+          enum: [missing_cuit, invalid_cuit, zero_importe_excluded]
+        retencionId:
+          type: integer
+          minimum: 1
+        message:
+          type: string
+
+    PresentacionFila:
+      type: object
+      required:
+        - retencionId
+        - fecha
+        - cuit
+        - denominacion
+        - regimenNombre
+        - regimenTipo
+        - operacionTipo
+        - baseImponible
+        - alicuota
+        - importe
+        - incluida
+      properties:
+        retencionId:
+          type: integer
+          minimum: 1
+        fecha:
+          type: string
+          format: date-time
+        cuit:
+          type: string
+        denominacion:
+          type: string
+        regimenNombre:
+          type: string
+        regimenTipo:
+          type: string
+        operacionTipo:
+          type: string
+          enum: [retencion, percepcion]
+        provincia:
+          type: ['string', 'null']
+        baseImponible:
+          type: string
+        alicuota:
+          type: string
+        importe:
+          type: string
+        incluida:
+          type: boolean
+
+    PresentacionTotalRegimen:
+      type: object
+      required: [regimenNombre, operaciones, totalImporte]
+      properties:
+        regimenNombre:
+          type: string
+        operaciones:
+          type: integer
+          minimum: 0
+        totalImporte:
+          type: string
+
+    PresentacionPreview:
+      type: object
+      required: [formato, periodo, filas, totalesPorRegimen, warnings, canGenerate]
+      properties:
+        formato:
+          type: string
+          enum: [sicore, sifere]
+        periodo:
+          type: string
+        filas:
+          type: array
+          items:
+            $ref: '#/components/schemas/PresentacionFila'
+        totalesPorRegimen:
+          type: array
+          items:
+            $ref: '#/components/schemas/PresentacionTotalRegimen'
+        warnings:
+          type: array
+          items:
+            $ref: '#/components/schemas/PresentacionWarning'
+        canGenerate:
+          type: boolean
+
+    PresentacionPreviewEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/PresentacionPreview'
+
+    PresentacionRetencion:
+      type: object
+      required:
+        - id
+        - formato
+        - periodo
+        - totalOperaciones
+        - totalImporte
+        - createdAt
+      properties:
+        id:
+          type: integer
+          minimum: 1
+        formato:
+          type: string
+          enum: [sicore, sifere]
+        periodo:
+          type: string
+        totalOperaciones:
+          type: integer
+          minimum: 0
+        totalImporte:
+          type: string
+        archivoHash:
+          type: ['string', 'null']
+        presentadoAt:
+          type: ['string', 'null']
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
+
+    PresentacionRetencionEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/PresentacionRetencion'
+
+    PresentacionRetencionListEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/PresentacionRetencion'
+
     RetencionAplicada:
       type: object
       required:
@@ -9900,6 +12646,57 @@ components:
           type: object
           properties:
             configured: { type: boolean }
+
+    MercadoPagoConfigStatus:
+      type: object
+      required: [configured]
+      properties:
+        configured: { type: boolean }
+        publicKey: { type: string }
+        sandboxMode: { type: boolean }
+        activo: { type: boolean }
+        accessTokenLast4: { type: string }
+        webhookSecretSet: { type: boolean }
+
+    MercadoPagoConfigInput:
+      type: object
+      required: [publicKey]
+      properties:
+        accessToken: { type: string }
+        publicKey: { type: string }
+        webhookSecret: { type: string }
+        sandboxMode: { type: boolean }
+        activo: { type: boolean }
+
+    MercadoPagoConfigStatusEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success: { type: boolean, const: true }
+        data:
+          $ref: '#/components/schemas/MercadoPagoConfigStatus'
+
+    MercadoPagoConfigEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success: { type: boolean, const: true }
+        data:
+          type: object
+          properties:
+            configured: { type: boolean }
+
+    MercadoPagoTestEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success: { type: boolean, const: true }
+        data:
+          type: object
+          required: [accountName]
+          properties:
+            accountName: { type: string }
+            email: { type: string }
 
     ArcaTaEnvelope:
       type: object
@@ -10530,6 +13327,267 @@ components:
           const: true
         data:
           $ref: '#/components/schemas/EmpresaConfig'
+
+    PortalConfig:
+      type: object
+      required: [enabled, showPedidos, logoUrl, primaryColor, footerText]
+      properties:
+        enabled:
+          type: boolean
+        showPedidos:
+          type: boolean
+        logoUrl:
+          type: string
+          nullable: true
+        primaryColor:
+          type: string
+          nullable: true
+        footerText:
+          type: string
+          nullable: true
+
+    PortalConfigInput:
+      type: object
+      properties:
+        enabled:
+          type: boolean
+        showPedidos:
+          type: boolean
+        logoUrl:
+          type: string
+          nullable: true
+        primaryColor:
+          type: string
+          nullable: true
+          pattern: '^#[0-9A-Fa-f]{6}$'
+        footerText:
+          type: string
+          nullable: true
+
+    PortalConfigEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/PortalConfig'
+
+    PortalBranding:
+      type: object
+      required: [tenantName, tenantSlug, enabled, showPedidos, logoUrl, primaryColor, footerText]
+      properties:
+        tenantName:
+          type: string
+        tenantSlug:
+          type: string
+        enabled:
+          type: boolean
+        showPedidos:
+          type: boolean
+        logoUrl:
+          type: string
+          nullable: true
+        primaryColor:
+          type: string
+          nullable: true
+        footerText:
+          type: string
+          nullable: true
+
+    PortalBrandingEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/PortalBranding'
+
+    PortalMagicLinkInput:
+      type: object
+      required: [email]
+      properties:
+        email:
+          type: string
+          format: email
+
+    PortalMagicLinkSentEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: object
+          required: [sent]
+          properties:
+            sent:
+              type: boolean
+              const: true
+
+    PortalMe:
+      type: object
+      required: [clienteId, codigo, rsocial, fantasia, email, telef, domicilio, localidad, vendedor]
+      properties:
+        clienteId:
+          type: integer
+        codigo:
+          type: integer
+        rsocial:
+          type: string
+        fantasia:
+          type: string
+          nullable: true
+        email:
+          type: string
+          nullable: true
+        telef:
+          type: string
+          nullable: true
+        domicilio:
+          type: string
+          nullable: true
+        localidad:
+          type: string
+          nullable: true
+        vendedor:
+          type: object
+          nullable: true
+          properties:
+            id:
+              type: integer
+            username:
+              type: string
+
+    PortalVerifyEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: object
+          required: [me]
+          properties:
+            me:
+              $ref: '#/components/schemas/PortalMe'
+
+    PortalMeEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: object
+          required: [me, branding]
+          properties:
+            me:
+              $ref: '#/components/schemas/PortalMe'
+            branding:
+              $ref: '#/components/schemas/PortalBranding'
+
+    PortalLogoutEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: object
+          required: [loggedOut]
+          properties:
+            loggedOut:
+              type: boolean
+              const: true
+
+    PortalFacturaRow:
+      type: object
+      required: [id, ref, fecha, total, pagado, pendiente, estado]
+      properties:
+        id:
+          type: integer
+        ref:
+          type: string
+        fecha:
+          type: string
+          format: date-time
+        total:
+          type: string
+        pagado:
+          type: string
+        pendiente:
+          type: string
+        estado:
+          type: string
+          enum: [pagada, pendiente, vencida]
+
+    PortalFacturaListEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: object
+          required: [facturas, total]
+          properties:
+            facturas:
+              type: array
+              items:
+                $ref: '#/components/schemas/PortalFacturaRow'
+            total:
+              type: integer
+
+    PortalPedidoRow:
+      type: object
+      required: [id, estado, total, createdAt, validUntil, facturaRef, remitoEstado]
+      properties:
+        id:
+          type: integer
+        estado:
+          type: string
+        total:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        validUntil:
+          type: string
+          format: date-time
+          nullable: true
+        facturaRef:
+          type: string
+          nullable: true
+        remitoEstado:
+          type: string
+          nullable: true
+
+    PortalPedidoListEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: object
+          required: [pedidos, total]
+          properties:
+            pedidos:
+              type: array
+              items:
+                $ref: '#/components/schemas/PortalPedidoRow'
+            total:
+              type: integer
 
     FacturaPendienteEstado:
       type: string
@@ -11524,6 +14582,23 @@ components:
             $ref: '#/components/schemas/ApiErrorEnvelope'
     NotFoundError:
       description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiErrorEnvelope'
+    TooManyRequests:
+      description: Rate limit exceeded
+      headers:
+        X-RateLimit-Limit:
+          schema:
+            type: integer
+        X-RateLimit-Remaining:
+          schema:
+            type: integer
+        X-RateLimit-Reset:
+          schema:
+            type: string
+            format: date-time
       content:
         application/json:
           schema:

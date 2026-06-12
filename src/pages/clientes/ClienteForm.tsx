@@ -10,6 +10,8 @@ import { validateCUIT, formatCUIT } from '@/lib/validators'
 import { useAuth } from '@/contexts/AuthContext'
 import { Cliente, DeliveryZone } from '@/types'
 import ClienteCobrosRecientes from './ClienteCobrosRecientes'
+import ClienteCuentaCorrienteSection from './ClienteCuentaCorrienteSection'
+import IfModule from '@/components/IfModule'
 
 const clienteSchema = z.object({
   codigo: z.coerce.number().int().positive('Código debe ser positivo'),
@@ -487,6 +489,12 @@ export default function ClienteForm({ cliente, onClose, onGuardado }: ClienteFor
                 <p className="text-xs text-slate-400 italic">{t('form.financial.readOnly')}</p>
               )}
               <ClienteCobrosRecientes clienteId={cliente.id} />
+              <IfModule flag="finance.ledger">
+                <div className="mt-4 pt-4 border-t border-slate-200 dark:border-slate-600">
+                  <h3 className="text-sm font-semibold mb-2">{t('cc.sectionTitle')}</h3>
+                  <ClienteCuentaCorrienteSection clienteId={cliente.id} />
+                </div>
+              </IfModule>
             </div>
           )}
 

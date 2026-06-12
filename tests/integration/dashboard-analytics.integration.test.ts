@@ -10,16 +10,22 @@ import { createApp } from '../../server/createApp'
 import { buildArticuloCreateBody, createIntegrationRubro } from '../fixtures/catalogFactories'
 
 async function truncateSalesData(prisma: PrismaClient): Promise<void> {
+  const tenantId = 1
   await prisma.$transaction([
-    prisma.facturaItem.deleteMany(),
-    prisma.pedido.deleteMany(),
-    prisma.factura.deleteMany(),
-    prisma.articulo.deleteMany(),
-    prisma.cliente.deleteMany(),
-    prisma.rubro.deleteMany(),
+    prisma.movimientoClienteCC.deleteMany({ where: { tenantId } }),
+    prisma.reciboCobroImputacion.deleteMany({ where: { reciboCobro: { tenantId } } }),
+    prisma.reciboCobroForma.deleteMany({ where: { reciboCobro: { tenantId } } }),
+    prisma.reciboCobro.deleteMany({ where: { tenantId } }),
+    prisma.facturaItem.deleteMany({ where: { factura: { tenantId } } }),
+    prisma.pedido.deleteMany({ where: { tenantId } }),
+    prisma.factura.deleteMany({ where: { tenantId } }),
+    prisma.articulo.deleteMany({ where: { tenantId } }),
+    prisma.cliente.deleteMany({ where: { tenantId } }),
+    prisma.rubro.deleteMany({ where: { tenantId } }),
     prisma.formaPago.deleteMany(),
-    prisma.deliveryZone.deleteMany(),
-    prisma.appUser.deleteMany({ where: { id: { gt: 1 } } }),
+    prisma.deliveryZone.deleteMany({ where: { tenantId } }),
+    prisma.notification.deleteMany({ where: { tenantId } }),
+    prisma.appUser.deleteMany({ where: { tenantId, id: { gt: 1 } } }),
   ])
 }
 

@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "facturaId": {
+      "type": "integer"
+    },
+    "facturaRef": {
+      "type": "string"
+    },
+    "id": {
+      "type": "integer"
+    },
+    "importe": {
+      "type": "string"
+    },
+    "saldoPostPago": {
+      "type": "string"
+    },
+    "saldoPrevio": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "facturaId",
+    "facturaRef",
+    "importe",
+    "saldoPrevio",
+    "saldoPostPago"
+  ],
+  "title": "ReciboCobroImputacion",
+  "type": "object"
+}

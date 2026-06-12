@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { useHotkeys } from 'react-hotkeys-hook'
 import { useTranslation } from 'react-i18next'
-import { empresaAPI, facturasAPI } from '@/lib/api'
+import { empresaAPI, facturasAPI, fiscalRetencionesAPI, type RetencionPreviewLineDTO } from '@/lib/api'
 import { calculateInvoice, calculateItemSubtotal } from '@/lib/invoice'
 import { Cliente, Articulo, FormaPago } from '@/types'
 import KeyboardHint, { useInvoiceShortcuts } from '@/components/shared/KeyboardHint'
+import { useFeatureFlags } from '@/contexts/FeatureFlagsContext'
 
 interface LineaFactura {
   id: string
@@ -45,8 +46,26 @@ export default function NuevaFacturaForm({
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [totales, setTotales] = useState({ neto1: 0, neto2: 0, neto3: 0, iva1: 0, iva2: 0, total: 0 })
+  const [agentePercepcion, setAgentePercepcion] = useState(false)
+  const [applyPercepciones, setApplyPercepciones] = useState(false)
+  const [percepcionRows, setPercepcionRows] = useState<Array<RetencionPreviewLineDTO & { selected: boolean }>>([])
+  const [percepcionesLoading, setPercepcionesLoading] = useState(false)
+  const { hasModule } = useFeatureFlags()
+  const retencionesModule = hasModule('finance.retenciones')
 
   const cliente = clientes.find((c) => c.id === clienteId)
+
+  const percepcionesTotal = useMemo(
+    () =>
+      applyPercepciones
+        ? percepcionRows
+            .filter((r) => r.selected)
+            .reduce((sum, r) => sum + Number.parseFloat(r.importe), 0)
+        : 0,
+    [applyPercepciones, percepcionRows],
+  )
+
+  const totalConPercepciones = totales.total + percepcionesTotal
 
   useEffect(() => {
     void empresaAPI.get().then((data) => {
@@ -64,8 +83,8 @@ export default function NuevaFacturaForm({
     const limit = Number(cliente.creditLimit)
     if (limit <= 0) return null
     const balance = Number(cliente.balance ?? 0)
-    if (balance + totales.total > limit) {
-      return { balance, limit, projected: balance + totales.total }
+    if (balance + totalConPercepciones > limit) {
+      return { balance, limit, projected: balance + totalConPercepciones }
     }
     return null
   })()
@@ -86,6 +105,48 @@ export default function NuevaFacturaForm({
     const newTotales = calculateInvoice(itemsForCalc, cliente?.condIva || 'RI')
     setTotales(newTotales)
   }, [lineas, cliente])
+
+  useEffect(() => {
+    if (!retencionesModule) return
+    void fiscalRetencionesAPI
+      .getConfig()
+      .then((config) => {
+        setAgentePercepcion(
+          config.esAgenteRetencionGanancias ||
+            config.esAgenteRetencionIVA ||
+            config.esAgenteRetencionIIBB,
+        )
+      })
+      .catch(() => setAgentePercepcion(false))
+  }, [retencionesModule])
+
+  const loadPercepcionesPreview = useCallback(async () => {
+    if (!applyPercepciones || !agentePercepcion || !clienteId || totales.neto1 + totales.neto2 + totales.neto3 <= 0) {
+      setPercepcionRows([])
+      return
+    }
+    setPercepcionesLoading(true)
+    try {
+      const lines = await fiscalRetencionesAPI.previewRetenciones({
+        entidadTipo: 'cliente',
+        entidadId: clienteId,
+        monto: 1,
+        contexto: 'factura',
+        neto1: totales.neto1,
+        neto2: totales.neto2,
+        neto3: totales.neto3,
+      })
+      setPercepcionRows(lines.map((line) => ({ ...line, selected: true })))
+    } catch {
+      setPercepcionRows([])
+    } finally {
+      setPercepcionesLoading(false)
+    }
+  }, [agentePercepcion, applyPercepciones, clienteId, totales.neto1, totales.neto2, totales.neto3])
+
+  useEffect(() => {
+    void loadPercepcionesPreview()
+  }, [loadPercepcionesPreview])
 
   useHotkeys('f5', () => handleGuardar())
   useHotkeys('escape', onCancel)
@@ -154,6 +215,17 @@ export default function NuevaFacturaForm({
     setError(null)
 
     try {
+      const percepcionesPayload = applyPercepciones
+        ? percepcionRows
+            .filter((r) => r.selected)
+            .map((r) => ({
+              regimenId: r.regimenId,
+              baseImponible: Number.parseFloat(r.baseImponible),
+              alicuota: Number.parseFloat(r.alicuota),
+              importe: Number.parseFloat(r.importe),
+            }))
+        : undefined
+
       const facturaData = {
         fecha,
         tipo,
@@ -166,7 +238,7 @@ export default function NuevaFacturaForm({
         neto3: totales.neto3,
         iva1: totales.iva1,
         iva2: totales.iva2,
-        total: totales.total,
+        total: totalConPercepciones,
         items: lineas.map((l) => ({
           articuloId: l.articuloId,
           cantidad: l.cantidad,
@@ -174,6 +246,9 @@ export default function NuevaFacturaForm({
           dscto: l.dscto,
           subtotal: l.subtotal,
         })),
+        ...(percepcionesPayload != null && percepcionesPayload.length > 0
+          ? { percepciones: percepcionesPayload }
+          : {}),
       }
 
       await facturasAPI.create(facturaData)
@@ -424,9 +499,73 @@ export default function NuevaFacturaForm({
         </div>
         <div className="text-center bg-green-100 dark:bg-green-900 rounded p-2 border border-green-200 dark:border-green-800">
           <p className="text-slate-600 dark:text-slate-400 text-sm">{t('totals.total')}</p>
-          <p className="text-green-800 dark:text-green-300 text-lg font-bold">${totales.total.toFixed(2)}</p>
+          <p className="text-green-800 dark:text-green-300 text-lg font-bold" data-testid="factura-total-con-percepciones">
+            ${totalConPercepciones.toFixed(2)}
+          </p>
         </div>
       </div>
+
+      {retencionesModule && agentePercepcion && totales.neto1 + totales.neto2 + totales.neto3 > 0 ? (
+        <div className="mb-6 rounded border border-slate-200 dark:border-slate-600 p-4 space-y-3" data-testid="factura-percepciones-section">
+          <label className="flex items-center gap-2 text-sm font-medium">
+            <input
+              type="checkbox"
+              checked={applyPercepciones}
+              onChange={(e) => setApplyPercepciones(e.target.checked)}
+              data-testid="factura-apply-percepciones"
+            />
+            {t('percepciones.apply')}
+          </label>
+          {applyPercepciones ? (
+            percepcionesLoading ? (
+              <p className="text-sm text-slate-500">{t('percepciones.loading')}</p>
+            ) : percepcionRows.length === 0 ? (
+              <p className="text-sm text-slate-500">{t('percepciones.empty')}</p>
+            ) : (
+              <table className="w-full text-sm" data-testid="factura-percepciones-table">
+                <caption className="sr-only">{t('percepciones.caption')}</caption>
+                <thead>
+                  <tr className="border-b border-slate-200 dark:border-slate-600 text-left">
+                    <th scope="col" className="py-1 pr-2">{t('percepciones.colSelect')}</th>
+                    <th scope="col" className="py-1 pr-2">{t('percepciones.colRegimen')}</th>
+                    <th scope="col" className="py-1 pr-2 text-right">{t('percepciones.colBase')}</th>
+                    <th scope="col" className="py-1 pr-2 text-right">{t('percepciones.colAlicuota')}</th>
+                    <th scope="col" className="py-1 text-right">{t('percepciones.colImporte')}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {percepcionRows.map((row, idx) => (
+                    <tr key={row.regimenId} className="border-b border-slate-100 dark:border-slate-700">
+                      <td className="py-1 pr-2">
+                        <input
+                          type="checkbox"
+                          checked={row.selected}
+                          aria-label={row.nombre}
+                          onChange={(e) => {
+                            const checked = e.target.checked
+                            setPercepcionRows((prev) =>
+                              prev.map((r, i) => (i === idx ? { ...r, selected: checked } : r)),
+                            )
+                          }}
+                        />
+                      </td>
+                      <td className="py-1 pr-2">{row.nombre}</td>
+                      <td className="py-1 pr-2 text-right tabular-nums">{row.baseImponible}</td>
+                      <td className="py-1 pr-2 text-right tabular-nums">{row.alicuota}%</td>
+                      <td className="py-1 text-right tabular-nums">{row.importe}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )
+          ) : null}
+          {percepcionesTotal > 0 ? (
+            <p className="text-sm text-slate-700 dark:text-slate-300">
+              {t('percepciones.sum')}: ${percepcionesTotal.toFixed(2)}
+            </p>
+          ) : null}
+        </div>
+      ) : null}
 
       <div className="flex gap-3">
         <button

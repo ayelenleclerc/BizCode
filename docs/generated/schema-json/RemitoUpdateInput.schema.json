@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "clienteId": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "items": {
+      "items": {
+        "$ref": "./RemitoItemInput.schema.json"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "observaciones": {
+      "nullable": true,
+      "type": "string"
+    },
+    "proveedorId": {
+      "nullable": true,
+      "type": "integer"
+    }
+  },
+  "title": "RemitoUpdateInput",
+  "type": "object"
+}

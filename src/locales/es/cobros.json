@@ -17,7 +17,7 @@
     "client": "Cliente",
     "clientPlaceholder": "Seleccionar cliente",
     "date": "Fecha",
-    "amount": "Monto",
+    "amount": "Monto neto recibido",
     "paymentMethod": "Forma de pago",
     "paymentMethodNone": "Sin especificar",
     "reference": "Referencia",
@@ -30,6 +30,29 @@
       "generic": "No se pudo registrar el cobro",
       "suspended": "El cliente está suspendido",
       "inactive": "El cliente está inactivo"
+    },
+    "cheque": {
+      "register": "Registrar cheque en cartera",
+      "numero": "Número de cheque",
+      "banco": "Banco",
+      "vencimiento": "Fecha de vencimiento",
+      "modalidad": "Modalidad",
+      "modalidadFisico": "Cheque físico",
+      "modalidadEcheq": "ECHEQ",
+      "errors": {
+        "required": "Complete número, banco y vencimiento del cheque"
+      }
+    },
+    "retenciones": {
+      "apply": "El cliente aplicó retenciones",
+      "loading": "Calculando retenciones sugeridas…",
+      "empty": "No hay retenciones sugeridas para este cobro.",
+      "caption": "Retenciones del cliente",
+      "colSelect": "Incluir",
+      "colRegimen": "Régimen",
+      "colImporte": "Importe",
+      "bruto": "Bruto CC",
+      "neto": "Neto recibido"
     }
   },
   "filters": {

@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "chequeId": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "cobroId": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "facturaId": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "fecha": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "id": {
+      "type": "integer"
+    },
+    "monto": {
+      "type": "string"
+    },
+    "notaCreditoId": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "notas": {
+      "nullable": true,
+      "type": "string"
+    },
+    "referencia": {
+      "nullable": true,
+      "type": "string"
+    },
+    "retencionAplicadaId": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "saldoPost": {
+      "type": "string"
+    },
+    "tipo": {
+      "enum": [
+        "saldo_inicial",
+        "factura",
+        "nota_credito",
+        "cobro",
+        "retencion",
+        "percepcion",
+        "cheque_rechazado",
+        "ajuste"
+      ],
+      "type": "string"
+    },
+    "usuarioId": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "id",
+    "tipo",
+    "monto",
+    "saldoPost",
+    "fecha",
+    "usuarioId"
+  ],
+  "title": "MovimientoClienteCC",
+  "type": "object"
+}

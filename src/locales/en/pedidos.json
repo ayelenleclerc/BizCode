@@ -8,8 +8,11 @@
     "cliente": "Customer",
     "estado": "Status",
     "total": "Total",
-    "fecha": "Created"
+    "fecha": "Created",
+    "actions": "Actions"
   },
+  "generateRemito": "Delivery note",
+  "remitoCreating": "Creating…",
   "estado": {
     "draft": "Draft",
     "confirmed": "Confirmed",

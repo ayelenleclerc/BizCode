@@ -93,6 +93,9 @@ export function renderFacturaPdfA4(
     if (factura.neto3 > 0) doc.text(`Exento: ${formatMoney(factura.neto3)}`)
     if (factura.iva1 > 0) doc.text(`IVA 21%: ${formatMoney(factura.iva1)}`)
     if (factura.iva2 > 0) doc.text(`IVA 10,5%: ${formatMoney(factura.iva2)}`)
+    for (const percepcion of factura.percepciones) {
+      doc.text(`${percepcion.nombre}: ${formatMoney(percepcion.importe)}`)
+    }
     doc.fontSize(12).text(`Importe total: ${formatMoney(factura.total)}`, { underline: true })
 
     if (!preview && factura.cae) {

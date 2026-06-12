@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "concepto": {
+      "maxLength": 500,
+      "nullable": true,
+      "type": "string"
+    },
+    "fecha": {
+      "type": "string"
+    },
+    "fifo": {
+      "default": true,
+      "type": "boolean"
+    },
+    "formas": {
+      "items": {
+        "properties": {
+          "banco": {
+            "nullable": true,
+            "type": "string"
+          },
+          "chequeId": {
+            "nullable": true,
+            "type": "integer"
+          },
+          "importe": {
+            "exclusiveMinimum": 0,
+            "type": "number"
+          },
+          "referencia": {
+            "nullable": true,
+            "type": "string"
+          },
+          "tipo": {
+            "enum": [
+              "efectivo",
+              "transferencia",
+              "cheque",
+              "mercadopago",
+              "tarjeta",
+              "otro"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "tipo",
+          "importe"
+        ],
+        "type": "object"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "imputaciones": {
+      "items": {
+        "properties": {
+          "facturaId": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "importe": {
+            "exclusiveMinimum": 0,
+            "type": "number"
+          }
+        },
+        "required": [
+          "facturaId",
+          "importe"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "retenciones": {
+      "items": {
+        "$ref": "./ReciboPagoRetencionInput.schema.json"
+      },
+      "type": "array"
+    },
+    "totalCobrado": {
+      "exclusiveMinimum": 0,
+      "type": "number"
+    }
+  },
+  "required": [
+    "fecha",
+    "totalCobrado",
+    "formas"
+  ],
+  "title": "ReciboCobroInput",
+  "type": "object"
+}

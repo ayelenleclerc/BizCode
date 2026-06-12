@@ -1,7 +1,11 @@
 import type { Cliente, Prisma, PrismaClient } from '@prisma/client'
+import { Decimal } from '@prisma/client/runtime/library'
 import type { CobroInput } from '../createApp.types'
 import { facturaFechaToPrismaDate } from '../routes/restDomainShared'
 import type { ServiceResult } from './serviceResults'
+import { RetencionConstanciaService } from './RetencionConstanciaService'
+import { validateCobroRetenciones } from './RetencionCobroValidation'
+import { ClienteCuentaCorrienteService } from './ClienteCuentaCorrienteService'
 
 type CobroWithCliente = Prisma.CobroGetPayload<{
   include: { cliente: { select: { id: true; codigo: true; rsocial: true } } }
@@ -18,11 +22,28 @@ export type ScoreChange = {
   delta: number
 }
 
+export type CobroRetencionDto = {
+  id: number
+  regimenId: number
+  regimenNombre: string
+  tipo: string
+  baseImponible: string
+  alicuota: string
+  importe: string
+  constanciaNum: string | null
+}
+
 export type CobroCreateResult = {
   cobro: CobroWithCliente
   updatedCliente: Pick<Cliente, 'id' | 'rsocial' | 'balance' | 'creditLimit' | 'score'>
   scoreChange: ScoreChange
+  retenciones: CobroRetencionDto[]
+  montoBruto: string
 }
+
+const cobroRetencionInclude = {
+  regimen: { select: { nombre: true, tipo: true } },
+} as const
 
 function clampScore(value: number): number {
   return Math.min(100, Math.max(0, value))
@@ -137,7 +158,11 @@ export class CobroService {
     })
   }
 
-  async create(tenantId: number, input: CobroInput): Promise<ServiceResult<CobroCreateResult>> {
+  async create(
+    tenantId: number,
+    userId: number,
+    input: CobroInput,
+  ): Promise<ServiceResult<CobroCreateResult>> {
     const cliente = await this.prisma.cliente.findFirst({
       where: { id: input.clienteId, tenantId },
       select: { id: true, rsocial: true, suspended: true, activo: true, score: true, creditDays: true },
@@ -165,6 +190,36 @@ export class CobroService {
     const cobroFecha = facturaFechaToPrismaDate(input.fecha)
     const monto = input.monto
 
+    const retencionValidation = await validateCobroRetenciones(
+      this.prisma,
+      tenantId,
+      monto,
+      input.retenciones,
+    )
+    if (!retencionValidation.ok) {
+      return { ok: false, status: retencionValidation.status, error: retencionValidation.error }
+    }
+
+    const validatedRetenciones = retencionValidation.lines
+    const montoBruto = retencionValidation.montoBruto
+
+    if (input.chequeId != null && input.chequeNuevo) {
+      return { ok: false, status: 400, error: 'Cannot specify both chequeId and chequeNuevo' }
+    }
+
+    if (input.chequeId != null) {
+      const linkedCheque = await this.prisma.cheque.findFirst({
+        where: { id: input.chequeId, tenantId, tipo: 'recibido', estado: 'en_cartera' },
+        select: { id: true, clienteId: true },
+      })
+      if (!linkedCheque) {
+        return { ok: false, status: 400, error: 'chequeId is not valid for portfolio linking' }
+      }
+      if (linkedCheque.clienteId != null && linkedCheque.clienteId !== input.clienteId) {
+        return { ok: false, status: 400, error: 'chequeId does not belong to clienteId' }
+      }
+    }
+
     const oldestFactura = await this.prisma.factura.findFirst({
       where: { tenantId, clienteId: input.clienteId, estado: 'A' },
       orderBy: { fecha: 'asc' },
@@ -179,6 +234,43 @@ export class CobroService {
     )
 
     const result = await this.prisma.$transaction(async (tx) => {
+      let chequeId: number | null = input.chequeId ?? null
+
+      if (input.chequeNuevo) {
+        const nuevo = input.chequeNuevo
+        const chequeRow = await tx.cheque.create({
+          data: {
+            tenantId,
+            tipo: 'recibido',
+            modalidad: nuevo.modalidad,
+            numero: nuevo.numero.trim(),
+            banco: nuevo.banco.trim(),
+            sucursal: nuevo.sucursal?.trim() ?? null,
+            cbuOrigen: nuevo.cbuOrigen?.trim() ?? null,
+            libradorNombre: nuevo.libradorNombre.trim(),
+            libradorCuit: nuevo.libradorCuit?.trim() ?? null,
+            monto: new Decimal(nuevo.monto),
+            moneda: nuevo.moneda?.trim() || 'ARS',
+            fechaEmision: facturaFechaToPrismaDate(nuevo.fechaEmision),
+            fechaVencimiento: facturaFechaToPrismaDate(nuevo.fechaVencimiento),
+            estado: 'en_cartera',
+            clienteId: input.clienteId,
+            proveedorId: null,
+            observaciones: nuevo.observaciones?.trim() ?? null,
+          },
+        })
+        await tx.chequeMov.create({
+          data: {
+            chequeId: chequeRow.id,
+            tipo: 'recepcion',
+            monto: new Decimal(nuevo.monto),
+            userId,
+            nota: nuevo.observaciones?.trim() ?? null,
+          },
+        })
+        chequeId = chequeRow.id
+      }
+
       const cobro = await tx.cobro.create({
         data: {
           tenantId,
@@ -186,15 +278,54 @@ export class CobroService {
           fecha: cobroFecha,
           monto,
           formaPagoId: input.formaPagoId ?? null,
+          chequeId,
           referencia: input.referencia ?? null,
           nota: input.nota ?? null,
         },
         include: { cliente: { select: { id: true, codigo: true, rsocial: true } } },
       })
 
-      const clienteUpdateData: Prisma.ClienteUpdateInput = {
-        balance: { decrement: monto },
+      const retencionRows: CobroRetencionDto[] = []
+      if (validatedRetenciones.length > 0) {
+        const constanciaService = new RetencionConstanciaService(tx)
+        for (const line of validatedRetenciones) {
+          const constanciaNum = await constanciaService.nextConstanciaNum(
+            tenantId,
+            line.tipo,
+            line.provincia,
+          )
+          const row = await tx.retencionAplicada.create({
+            data: {
+              tenantId,
+              regimenId: line.regimenId,
+              tipo: line.subtipo,
+              entidadTipo: 'cliente',
+              entidadId: input.clienteId,
+              cobroId: cobro.id,
+              baseImponible: new Decimal(line.baseImponible),
+              alicuota: new Decimal(line.alicuota),
+              importe: new Decimal(line.importe),
+              constanciaNum,
+            },
+            include: cobroRetencionInclude,
+          })
+          retencionRows.push({
+            id: row.id,
+            regimenId: row.regimenId,
+            regimenNombre: row.regimen.nombre,
+            tipo: row.regimen.tipo,
+            baseImponible: row.baseImponible.toString(),
+            alicuota: row.alicuota.toString(),
+            importe: row.importe.toString(),
+            constanciaNum: row.constanciaNum,
+          })
+        }
       }
+
+      const ccService = new ClienteCuentaCorrienteService(tx)
+      await ccService.recordFromCobro(tenantId, cobro, montoBruto, userId)
+
+      const clienteUpdateData: Prisma.ClienteUpdateInput = {}
       if (scoreChange.delta !== 0) {
         clienteUpdateData.score = scoreChange.scoreAfter
       }
@@ -205,9 +336,43 @@ export class CobroService {
         select: { id: true, rsocial: true, balance: true, creditLimit: true, score: true },
       })
 
-      return { cobro, updatedCliente, scoreChange }
+      return {
+        cobro,
+        updatedCliente,
+        scoreChange,
+        retenciones: retencionRows,
+        montoBruto: montoBruto.toFixed(2),
+      }
     })
 
     return { ok: true, data: result }
+  }
+
+  async listRetencionesByCobro(
+    tenantId: number,
+    cobroId: number,
+  ): Promise<CobroRetencionDto[] | null> {
+    const cobro = await this.prisma.cobro.findFirst({
+      where: { id: cobroId, tenantId },
+      select: { id: true },
+    })
+    if (cobro == null) return null
+
+    const rows = await this.prisma.retencionAplicada.findMany({
+      where: { tenantId, cobroId, tipo: 'retencion' },
+      include: cobroRetencionInclude,
+      orderBy: { id: 'asc' },
+    })
+
+    return rows.map((row) => ({
+      id: row.id,
+      regimenId: row.regimenId,
+      regimenNombre: row.regimen.nombre,
+      tipo: row.regimen.tipo,
+      baseImponible: row.baseImponible.toString(),
+      alicuota: row.alicuota.toString(),
+      importe: row.importe.toString(),
+      constanciaNum: row.constanciaNum,
+    }))
   }
 }

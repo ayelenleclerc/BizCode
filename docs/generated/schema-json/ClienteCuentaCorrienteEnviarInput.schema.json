@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "desde": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "email": {
+      "format": "email",
+      "type": "string"
+    },
+    "hasta": {
+      "format": "date-time",
+      "type": "string"
+    }
+  },
+  "title": "ClienteCuentaCorrienteEnviarInput",
+  "type": "object"
+}
