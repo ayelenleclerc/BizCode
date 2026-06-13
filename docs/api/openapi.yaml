@@ -4530,6 +4530,58 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
 
+  /api/webhooks/mercadopago:
+    post:
+      tags: [mercadopago]
+      summary: Mercado Pago payment webhook (#176)
+      description: |
+        Public IPN endpoint (no JWT). Validates `x-signature` with the tenant `webhookSecret` from Mercado Pago configuration (#174).
+        Responds `200` immediately and processes the payment asynchronously: on `approved`, creates a customer receipt (`ReciboCobro`) with `mercadopago` payment method and invoice allocation; updates `Factura.mpEstado`.
+        Idempotent per `mpPaymentId` (`MercadoPagoProcessedPayment`). Rate-limited per IP.
+      security: []
+      parameters:
+        - name: data.id
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Payment id from Mercado Pago (also present in JSON body `data.id`).
+        - name: type
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: x-signature
+          in: header
+          required: true
+          schema:
+            type: string
+          description: Mercado Pago HMAC signature (`ts=...;v1=...`).
+        - name: x-request-id
+          in: header
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MercadoPagoWebhookBody'
+      responses:
+        '200':
+          description: Notification accepted (processing may continue asynchronously)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MercadoPagoWebhookAckEnvelope'
+        '400':
+          description: Invalid signature or payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+
   /api/facturas/{id}/remito:
     parameters:
       - $ref: '#/components/parameters/BizcodeChannelHeader'
@@ -12819,6 +12871,34 @@ components:
         success: { type: boolean, const: true }
         data:
           $ref: '#/components/schemas/MercadoPagoFacturaPayment'
+
+    MercadoPagoWebhookBody:
+      type: object
+      properties:
+        action: { type: string }
+        type: { type: string }
+        data:
+          type: object
+          properties:
+            id:
+              oneOf:
+                - type: string
+                - type: integer
+        id:
+          oneOf:
+            - type: string
+            - type: integer
+        live_mode: { type: boolean }
+        user_id:
+          oneOf:
+            - type: string
+            - type: integer
+
+    MercadoPagoWebhookAckEnvelope:
+      type: object
+      required: [success]
+      properties:
+        success: { type: boolean, const: true }
 
     ArcaTaEnvelope:
       type: object

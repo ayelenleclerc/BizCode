@@ -336,6 +336,10 @@
 
 * [MercadoPagoTestEnvelope](./mercadopagotestenvelope.md) – `-`
 
+* [MercadoPagoWebhookAckEnvelope](./mercadopagowebhookackenvelope.md) – `-`
+
+* [MercadoPagoWebhookBody](./mercadopagowebhookbody.md) – `-`
+
 * [MetricsEnvelope](./metricsenvelope.md) – `-`
 
 * [MetricsSnapshot](./metricssnapshot.md) – `-`
@@ -823,6 +827,8 @@
 * [Untitled object in MercadoPagoConfigEnvelope](./mercadopagoconfigenvelope-properties-data.md) – `undefined#/properties/data`
 
 * [Untitled object in MercadoPagoTestEnvelope](./mercadopagotestenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled object in MercadoPagoWebhookBody](./mercadopagowebhookbody-properties-data.md) – `undefined#/properties/data`
 
 * [Untitled object in MetricsSnapshot](./metricssnapshot-properties-requestsbymethod.md) – `undefined#/properties/requestsByMethod`
 

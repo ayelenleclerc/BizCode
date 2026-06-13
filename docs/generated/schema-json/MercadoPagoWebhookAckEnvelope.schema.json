@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "success": {
+      "const": true,
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "success"
+  ],
+  "title": "MercadoPagoWebhookAckEnvelope",
+  "type": "object"
+}

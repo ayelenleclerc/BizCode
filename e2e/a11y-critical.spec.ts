@@ -14,7 +14,8 @@ test.describe('Accessibility — axe (critical surfaces)', () => {
 
   test('inicio after login has no axe violations', async ({ page }) => {
     await loginAsTestUser(page, TEST_PASSWORD)
-    await page.goto('/inicio', { waitUntil: 'load' })
+    await page.getByTestId('inicio-tabs').waitFor({ state: 'visible' })
+    await page.locator('main').waitFor({ state: 'visible' })
     const { violations } = await new AxeBuilder({ page }).analyze()
     expect(violations, JSON.stringify(violations, null, 2)).toHaveLength(0)
   })

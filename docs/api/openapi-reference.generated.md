@@ -27928,6 +27928,100 @@ Creates a Mercado Pago Checkout preference for the invoice outstanding balance (
 }
 ```
 
+### Mercado Pago payment webhook (#176)
+
+- **Method:** `POST`
+- **Path:** `/api/webhooks/mercadopago`
+- **Tags:** mercadopago
+
+Public IPN endpoint (no JWT). Validates `x-signature` with the tenant `webhookSecret` from Mercado Pago configuration (#174). Responds `200` immediately and processes the payment asynchronously: on `approved`, creates a customer receipt (`ReciboCobro`) with `mercadopago` payment method and invoice allocation; updates `Factura.mpEstado`. Idempotent per `mpPaymentId` (`MercadoPagoProcessedPayment`). Rate-limited per IP.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`action`**
+
+  `string`
+
+- **`data`**
+
+  `object`
+
+  - **`id`**
+
+    `object`
+
+- **`id`**
+
+  `object`
+
+- **`live_mode`**
+
+  `boolean`
+
+- **`type`**
+
+  `string`
+
+- **`user_id`**
+
+  `object`
+
+**Example:**
+
+```json
+{
+  "action": "",
+  "type": "",
+  "data": {
+    "id": ""
+  },
+  "id": "",
+  "live_mode": true,
+  "user_id": ""
+}
+```
+
+#### Responses
+
+##### Status: 200 Notification accepted (processing may continue asynchronously)
+
+###### Content-Type: application/json
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true
+}
+```
+
+##### Status: 400 Invalid signature or payload
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ### PARAMETERS /api/facturas/{id}/remito
 
 - **Method:** `PARAMETERS`
@@ -66205,6 +66299,69 @@ Originating invoice header (selected columns)
     "amount": "",
     "facturaRef": ""
   }
+}
+```
+
+### MercadoPagoWebhookBody
+
+- **Type:**`object`
+
+* **`action`**
+
+  `string`
+
+* **`data`**
+
+  `object`
+
+  - **`id`**
+
+    `object`
+
+* **`id`**
+
+  `object`
+
+* **`live_mode`**
+
+  `boolean`
+
+* **`type`**
+
+  `string`
+
+* **`user_id`**
+
+  `object`
+
+**Example:**
+
+```json
+{
+  "action": "",
+  "type": "",
+  "data": {
+    "id": ""
+  },
+  "id": "",
+  "live_mode": true,
+  "user_id": ""
+}
+```
+
+### MercadoPagoWebhookAckEnvelope
+
+- **Type:**`object`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true
 }
 ```
 
