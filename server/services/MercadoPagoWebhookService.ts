@@ -14,6 +14,7 @@ import { sanitizeLogField } from '../lib/sanitizeLogField'
 import { resolveSystemUserId } from '../lib/systemUserId'
 import { notifyManagers } from '../notifications'
 import { ReciboCobroService } from './ReciboCobroService'
+import { MercadoPagoChargebackService } from './MercadoPagoChargebackService'
 
 export type MercadoPagoWebhookPayload = {
   action?: string
@@ -28,11 +29,21 @@ function formatFacturaRef(factura: { tipo: string; prefijo: string; numero: numb
   return `${factura.tipo}-${prefijo}-${numero}`
 }
 
-function extractPaymentIdFromPayload(body: MercadoPagoWebhookPayload): string | null {
+function extractResourceIdFromPayload(body: MercadoPagoWebhookPayload): string | null {
   const raw = body.data?.id ?? body.id
   if (raw == null) return null
   const id = String(raw).trim()
   return id.length > 0 ? id : null
+}
+
+function extractPaymentIdFromPayload(body: MercadoPagoWebhookPayload): string | null {
+  return extractResourceIdFromPayload(body)
+}
+
+function isChargebackWebhook(body: MercadoPagoWebhookPayload): boolean {
+  const type = body.type?.toLowerCase() ?? ''
+  const action = body.action?.toLowerCase() ?? ''
+  return type === 'chargebacks' || action.includes('chargeback')
 }
 
 function extractDataIdFromQuery(query: Record<string, unknown>): string | null {
@@ -61,9 +72,11 @@ function mapMpPaymentStatus(status: string): 'approved' | 'rejected' | 'cancelle
  */
 export class MercadoPagoWebhookService {
   private readonly reciboCobro: ReciboCobroService
+  private readonly chargeback: MercadoPagoChargebackService
 
   constructor(private readonly prisma: PrismaClient) {
     this.reciboCobro = new ReciboCobroService(prisma)
+    this.chargeback = new MercadoPagoChargebackService(prisma)
   }
 
   /**
@@ -360,6 +373,20 @@ export class MercadoPagoWebhookService {
       },
     })
   }
+
+  async processChargebackNotification(
+    tenantId: number,
+    chargebackId: string,
+    payload: MercadoPagoWebhookPayload,
+    ipAddress?: string | null,
+  ): Promise<void> {
+    await this.chargeback.processChargebackNotification(
+      tenantId,
+      chargebackId,
+      payload as unknown as import('@prisma/client').Prisma.InputJsonValue,
+      ipAddress,
+    )
+  }
 }
 
-export { extractPaymentIdFromPayload, extractDataIdFromQuery }
+export { extractPaymentIdFromPayload, extractDataIdFromQuery, isChargebackWebhook }

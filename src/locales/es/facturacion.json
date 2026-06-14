@@ -176,7 +176,8 @@
       "approved": "Pagado",
       "rejected": "Rechazado",
       "cancelled": "Cancelado",
-      "expired": "Vencido"
+      "expired": "Vencido",
+      "refunded": "Reembolsado"
     },
     "share": {
       "defaultName": "Cliente",
@@ -202,6 +203,32 @@
       "errors": {
         "loadFailed": "No se pudo cargar el estado del QR",
         "createFailed": "No se pudo generar el QR de cobro"
+      }
+    },
+    "refund": {
+      "button": "Reembolsar pago MP",
+      "modalTitle": "Reembolso Mercado Pago",
+      "modalSubtitle": "Factura {{ref}}",
+      "loading": "Cargando estado del reembolso…",
+      "timelineTitle": "Estado del reembolso",
+      "timelineEstado": "Estado",
+      "timelineMonto": "Monto",
+      "motivoLabel": "Motivo del reembolso",
+      "motivoPlaceholder": "Mínimo 10 caracteres",
+      "submit": "Confirmar reembolso total",
+      "submitting": "Procesando reembolso…",
+      "close": "Cerrar",
+      "success": "Reembolso completado correctamente.",
+      "estado": {
+        "iniciado": "Iniciado",
+        "procesando": "Procesando",
+        "completado": "Completado",
+        "fallido": "Fallido"
+      },
+      "errors": {
+        "loadFailed": "No se pudo cargar el estado del reembolso",
+        "submitFailed": "No se pudo procesar el reembolso",
+        "partialNotSupported": "El reembolso parcial no está disponible aún. Solo se admite reembolso total."
       }
     }
   }

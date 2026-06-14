@@ -1,0 +1,19 @@
+# Untitled number in MercadoPagoRefundInput Schema
+
+```txt
+undefined#/properties/monto
+```
+
+Optional; must match full refundable amount. Partial refunds return 422.
+
+| Abstract            | Extensible | Status         | Identifiable            | Custom Properties | Additional Properties | Access Restrictions | Defined In                                                                                                       |
+| :------------------ | :--------- | :------------- | :---------------------- | :---------------- | :-------------------- | :------------------ | :--------------------------------------------------------------------------------------------------------------- |
+| Can be instantiated | No         | Unknown status | Unknown identifiability | Forbidden         | Allowed               | none                | [MercadoPagoRefundInput.schema.json\*](../schema-json/MercadoPagoRefundInput.schema.json "open original schema") |
+
+## monto Type
+
+`number`
+
+## monto Constraints
+
+**minimum (exclusive)**: the value of this number must be greater than: `0`

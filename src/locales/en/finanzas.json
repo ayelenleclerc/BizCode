@@ -380,6 +380,30 @@
       "ignoreError": "Could not ignore payment.",
       "jobSuccess": "Job finished: processed {{processed}}, auto-reconciled {{autoReconciled}}, queued {{queued}}, skipped {{skipped}}.",
       "jobError": "Could not run reconciliation job."
+    },
+    "chargeback": {
+      "title": "Mercado Pago chargebacks",
+      "subtitle": "Chargebacks received via webhook. Manual review required; no automatic credit note.",
+      "linkTitle": "Mercado Pago chargebacks",
+      "linkHint": "Mercado Pago chargebacks appear here for staff follow-up.",
+      "openPage": "Open chargeback queue",
+      "backToFinance": "Back to Finance",
+      "loading": "Loading chargebacks…",
+      "integrationDisabled": "Mercado Pago integration is not enabled for this tenant.",
+      "refresh": "Refresh",
+      "refreshing": "Refreshing…",
+      "empty": "No pending chargebacks.",
+      "colDate": "Date",
+      "colChargebackId": "Chargeback ID",
+      "colPaymentId": "MP payment ID",
+      "colFactura": "Invoice",
+      "colActions": "Actions",
+      "resolve": "Mark resolved",
+      "ignore": "Ignore",
+      "loadError": "Could not load chargebacks.",
+      "resolveSuccess": "Chargeback #{{id}} marked as resolved.",
+      "ignoreSuccess": "Chargeback #{{id}} ignored.",
+      "actionError": "Could not update chargeback."
     }
   }
 }

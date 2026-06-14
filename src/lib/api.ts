@@ -2267,6 +2267,32 @@ export const facturasAPI = {
       return handleError(error as AxiosError<ApiErrorPayload>)
     }
   },
+
+  getMpRefund: async (id: number): Promise<MercadoPagoRefundDto | null> => {
+    try {
+      const response = await api.get<{ success: boolean; data: MercadoPagoRefundDto | null }>(
+        `/facturas/${id}/mp/reembolso`,
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  refundMp: async (
+    id: number,
+    body: { motivo: string; monto?: number },
+  ): Promise<MercadoPagoRefundDto> => {
+    try {
+      const response = await api.post<{ success: boolean; data: MercadoPagoRefundDto }>(
+        `/facturas/${id}/mp/reembolso`,
+        body,
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
 }
 
 export const notasCreditoAPI = {
@@ -2884,6 +2910,7 @@ export type MercadoPagoFacturaEstado =
   | 'rejected'
   | 'cancelled'
   | 'expired'
+  | 'refunded'
 
 export type MercadoPagoPaymentChannel = 'none' | 'link' | 'qr'
 
@@ -2931,6 +2958,32 @@ export type MercadoPagoReconciliationJobSummary = {
   autoReconciled: number
   queued: number
   skipped: number
+}
+
+export type MercadoPagoRefundDto = {
+  id: number
+  facturaId: number
+  mpPaymentId: string
+  mpRefundId: string | null
+  monto: string
+  motivo: string
+  estado: 'iniciado' | 'procesando' | 'completado' | 'fallido'
+  notaCreditoId: number | null
+  reciboCobroId: number | null
+  errorMessage: string | null
+  createdAt: string
+  updatedAt: string
+}
+
+export type MercadoPagoChargebackEntry = {
+  id: number
+  mpChargebackId: string
+  mpPaymentId: string | null
+  facturaId: number | null
+  estado: 'pendiente' | 'resuelto' | 'ignorado'
+  notifiedAt: string | null
+  resolvedAt: string | null
+  createdAt: string
 }
 
 export const mercadopagoAPI = {
@@ -3014,6 +3067,33 @@ export const mercadopagoAPI = {
         success: boolean
         data: MercadoPagoReconciliationJobSummary
       }>('/mercadopago/reconciliacion/run')
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  listChargebacks: async (): Promise<MercadoPagoChargebackEntry[]> => {
+    try {
+      const response = await api.get<{
+        success: boolean
+        data: MercadoPagoChargebackEntry[]
+      }>('/mercadopago/contracargos')
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  updateChargeback: async (
+    id: number,
+    estado: 'resuelto' | 'ignorado',
+  ): Promise<MercadoPagoChargebackEntry> => {
+    try {
+      const response = await api.patch<{
+        success: boolean
+        data: MercadoPagoChargebackEntry
+      }>(`/mercadopago/contracargos/${id}`, { estado })
       return response.data.data
     } catch (error) {
       return handleError(error as AxiosError<ApiErrorPayload>)

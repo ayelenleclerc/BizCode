@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "estado": {
+      "enum": [
+        "resuelto",
+        "ignorado"
+      ],
+      "type": "string"
+    }
+  },
+  "required": [
+    "estado"
+  ],
+  "title": "MercadoPagoChargebackPatchInput",
+  "type": "object"
+}

@@ -1,0 +1,9 @@
+{
+  "action": "chargeback.created",
+  "type": "chargebacks",
+  "data": {
+    "id": "cb-90001"
+  },
+  "live_mode": false,
+  "user_id": 123456789
+}

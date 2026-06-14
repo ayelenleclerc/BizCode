@@ -107,6 +107,7 @@ undefined#/properties/data
 | `"rejected"`  |             |
 | `"cancelled"` |             |
 | `"expired"`   |             |
+| `"refunded"`  |             |
 
 ## expiresAt
 

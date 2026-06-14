@@ -144,6 +144,14 @@ function buildMessage(type: NotificationType, payload: NotificationPayload): Mes
         text: `El pago Mercado Pago de la factura${ref} de ${rsocial} fue rechazado o cancelado.`,
       }
     }
+    case 'mercadopago_chargeback': {
+      const ref = payload.facturaRef ? ` ${payload.facturaRef}` : ''
+      const payment = payload.mpPaymentId ? ` (pago MP #${payload.mpPaymentId})` : ''
+      return {
+        subject: `[BizCode] URGENTE: Contracargo Mercado Pago — ${rsocial}`,
+        text: `Se registró un contracargo${payment} para la factura${ref} de ${rsocial}${amount ? ` por ${amount}` : ''}. Requiere revisión manual.`,
+      }
+    }
   }
 }
 

@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "createdAt": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "errorMessage": {
+      "nullable": true,
+      "type": "string"
+    },
+    "estado": {
+      "enum": [
+        "iniciado",
+        "procesando",
+        "completado",
+        "fallido"
+      ],
+      "type": "string"
+    },
+    "facturaId": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "id": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "monto": {
+      "type": "string"
+    },
+    "motivo": {
+      "type": "string"
+    },
+    "mpPaymentId": {
+      "type": "string"
+    },
+    "mpRefundId": {
+      "nullable": true,
+      "type": "string"
+    },
+    "notaCreditoId": {
+      "minimum": 1,
+      "nullable": true,
+      "type": "integer"
+    },
+    "reciboCobroId": {
+      "minimum": 1,
+      "nullable": true,
+      "type": "integer"
+    },
+    "updatedAt": {
+      "format": "date-time",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "facturaId",
+    "mpPaymentId",
+    "monto",
+    "motivo",
+    "estado",
+    "createdAt",
+    "updatedAt"
+  ],
+  "title": "MercadoPagoRefund",
+  "type": "object"
+}

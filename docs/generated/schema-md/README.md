@@ -320,6 +320,14 @@
 
 * [LogoutResult](./logoutresult.md) – `-`
 
+* [MercadoPagoChargeback](./mercadopagochargeback.md) – `-`
+
+* [MercadoPagoChargebackEnvelope](./mercadopagochargebackenvelope.md) – `-`
+
+* [MercadoPagoChargebackListEnvelope](./mercadopagochargebacklistenvelope.md) – `-`
+
+* [MercadoPagoChargebackPatchInput](./mercadopagochargebackpatchinput.md) – `-`
+
 * [MercadoPagoConfigEnvelope](./mercadopagoconfigenvelope.md) – `-`
 
 * [MercadoPagoConfigInput](./mercadopagoconfiginput.md) – `-`
@@ -351,6 +359,14 @@
 * [MercadoPagoReconciliationJobSummary](./mercadopagoreconciliationjobsummary.md) – `-`
 
 * [MercadoPagoReconciliationListEnvelope](./mercadopagoreconciliationlistenvelope.md) – `-`
+
+* [MercadoPagoRefund](./mercadopagorefund.md) – `-`
+
+* [MercadoPagoRefundEnvelope](./mercadopagorefundenvelope.md) – `-`
+
+* [MercadoPagoRefundInput](./mercadopagorefundinput.md) – `-`
+
+* [MercadoPagoRefundNullableEnvelope](./mercadopagorefundnullableenvelope.md) – `-`
 
 * [MercadoPagoStaticQr](./mercadopagostaticqr.md) – `-`
 
@@ -1083,6 +1099,8 @@
 * [Untitled array in LogisticaKpis](./logisticakpis-properties-returnsbyreason.md) – `undefined#/properties/returnsByReason`
 
 * [Untitled array in LogisticaZonasListEnvelope](./logisticazonaslistenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled array in MercadoPagoChargebackListEnvelope](./mercadopagochargebacklistenvelope-properties-data.md) – `undefined#/properties/data`
 
 * [Untitled array in MercadoPagoReconciliationListEnvelope](./mercadopagoreconciliationlistenvelope-properties-data.md) – `undefined#/properties/data`
 

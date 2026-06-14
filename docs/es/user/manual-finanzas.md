@@ -97,6 +97,14 @@ Algunos pagos llegan a Mercado Pago sin preference ni orden QR vinculada (transf
 3. **Cola manual:** **Finanzas → Reconciliación Mercado Pago** (`/finanzas/reconciliacion-mp`, integración `mercadopago`, `reports.financial.read`): lista pagos pendientes; cargá facturas abiertas por ID de cliente; **Reconciliar** (`POST /api/mercadopago/reconciliar`) o **Ignorar** (`POST /api/mercadopago/ignorar`).
 4. **Job bajo demanda:** el staff puede ejecutar `POST /api/mercadopago/reconciliacion/run` desde la UI.
 
+## Reembolsos y contracargos Mercado Pago (#179)
+
+**Solo reembolso total** en esta versión; el reembolso parcial queda en el issue #344.
+
+1. **Reembolso:** En **Facturación → detalle de factura**, cuando `mpEstado` es **approved**, usuarios con **`sales.cancel`** y módulo **`billing.credit_notes`** ven **Reembolsar pago MP**. Confirma con motivo (mín. 10 caracteres); llama `POST /api/facturas/{id}/mp/reembolso`. BizCode solicita reembolso total en MP, anula el `ReciboCobro` vinculado, anula la factura con nota de crédito total (#146) y marca `mpEstado: refunded`. Montos menores al pago devuelven `422 partial_refund_not_supported`.
+2. **Timeline de reembolso:** `GET /api/facturas/{id}/mp/reembolso` y el diálogo muestran estado (`iniciado` → `procesando` → `completado` / `fallido`).
+3. **Contracargos:** el webhook `type: chargebacks` crea `MercadoPagoChargeback` (`pendiente`) y notifica a managers. **Sin void ni NC automática** — el staff resuelve manualmente. Cola: **Finanzas → Contracargos Mercado Pago** (`/finanzas/contracargos-mp`, `reports.financial.read`); marcar **Resuelto** o **Ignorar** con `PATCH /api/mercadopago/contracargos/{id}`.
+
 ## Referencia API
 
 [`docs/api/openapi.yaml`](../../api/openapi.yaml) — rutas `/api/reportes/aging`, `/api/reportes/cuenta-corriente/{clienteId}` y `/api/clientes/{id}/cuenta-corriente/*`.

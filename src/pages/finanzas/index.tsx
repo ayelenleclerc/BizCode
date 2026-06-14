@@ -280,6 +280,27 @@ function FinanzasPageContent() {
           </section>
         </IfIntegration>
 
+        <IfIntegration id="mercadopago">
+          <section className="mb-8" aria-labelledby="finanzas-mp-chargeback-heading">
+            <h2
+              id="finanzas-mp-chargeback-heading"
+              className="text-lg font-semibold mb-2 text-slate-900 dark:text-slate-100"
+            >
+              {t('mercadopago.chargeback.linkTitle')}
+            </h2>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mb-2">
+              {t('mercadopago.chargeback.linkHint')}
+            </p>
+            <Link
+              to="/finanzas/contracargos-mp"
+              className="inline-flex px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700 text-sm"
+              data-testid="finanzas-contracargos-mp-link"
+            >
+              {t('mercadopago.chargeback.openPage')}
+            </Link>
+          </section>
+        </IfIntegration>
+
         <AsyncWrapper loading={loading} error={loadError}>
           {aging && <FinanzasResumenCards aging={aging} t={t} />}
         </AsyncWrapper>
