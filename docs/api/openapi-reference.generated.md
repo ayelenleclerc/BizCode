@@ -40678,7 +40678,26 @@ Requires `sales.cancel`, tenant integration `mercadopago`, and module `billing.c
 }
 ```
 
-##### Status: 422
+##### Status: 422 Partial refund not supported or invoice not eligible
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
 
 ##### Status: 429 Rate limit exceeded
 
@@ -40726,9 +40745,21 @@ Requires `sales.cancel`, tenant integration `mercadopago`, and module `billing.c
 
 ###### Content-Type: application/json
 
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
 **Example:**
 
-```
+```json
+{
+  "success": false,
+  "error": ""
+}
 ```
 
 ### List pending Mercado Pago chargebacks (#179)
