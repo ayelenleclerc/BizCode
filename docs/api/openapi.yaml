@@ -4589,7 +4589,8 @@ paths:
       description: |
         Public IPN endpoint (no JWT). Validates `x-signature` with the tenant `webhookSecret` from Mercado Pago configuration (#174).
         Responds `200` immediately and processes the payment asynchronously: on `approved`, creates a customer receipt (`ReciboCobro`) with `mercadopago` payment method and invoice allocation; updates `Factura.mpEstado`.
-        Idempotent per `mpPaymentId` (`MercadoPagoProcessedPayment`). Rate-limited per IP.
+        Chargeback notifications (`type: chargebacks`) enqueue `MercadoPagoChargeback` and notify managers; no automatic credit note (#179).
+        Idempotent per `mpPaymentId` (`MercadoPagoProcessedPayment`) for payment events. Rate-limited per IP.
       security: []
       parameters:
         - name: data.id
@@ -6665,6 +6666,152 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         '403':
           $ref: '#/components/responses/ForbiddenError'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/facturas/{id}/mp/reembolso:
+    get:
+      tags: [facturas, mercadopago]
+      summary: Get Mercado Pago refund status for invoice (#179)
+      description: Requires `sales.cancel`, tenant integration `mercadopago`, and module `billing.credit_notes`. Returns latest refund record or `null`.
+      security:
+        - cookieSession: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Refund timeline
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MercadoPagoRefundNullableEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    post:
+      tags: [facturas, mercadopago]
+      summary: Request total Mercado Pago refund (#179)
+      description: |
+        Requires `sales.cancel`, tenant integration `mercadopago`, and module `billing.credit_notes`.
+        Only **full** refunds are supported in MVP. Partial amounts return `422` with `partial_refund_not_supported`.
+        On success: MP refund API, void receipt, invoice void with credit note (#146), `mpEstado: refunded`.
+      security:
+        - cookieSession: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MercadoPagoRefundInput'
+      responses:
+        '201':
+          description: Refund completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MercadoPagoRefundEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '409':
+          $ref: '#/components/responses/ConflictError'
+        '422':
+          description: Partial refund not supported or invoice not eligible
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '502':
+          description: Mercado Pago refund API error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/mercadopago/contracargos:
+    get:
+      tags: [mercadopago]
+      summary: List pending Mercado Pago chargebacks (#179)
+      description: Requires `reports.financial.read` and tenant integration `mercadopago`.
+      security:
+        - cookieSession: []
+      responses:
+        '200':
+          description: Pending chargeback queue
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MercadoPagoChargebackListEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/mercadopago/contracargos/{id}:
+    patch:
+      tags: [mercadopago]
+      summary: Update Mercado Pago chargeback status (#179)
+      description: Requires `reports.financial.read` and tenant integration `mercadopago`. Mark `resuelto` or `ignorado`.
+      security:
+        - cookieSession: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MercadoPagoChargebackPatchInput'
+      responses:
+        '200':
+          description: Updated chargeback
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MercadoPagoChargebackEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '409':
+          $ref: '#/components/responses/ConflictError'
         '429':
           $ref: '#/components/responses/TooManyRequests'
         '500':
@@ -13043,7 +13190,7 @@ components:
 
     MercadoPagoFacturaEstado:
       type: string
-      enum: [none, pending, approved, rejected, cancelled, expired]
+      enum: [none, pending, approved, rejected, cancelled, expired, refunded]
 
     MercadoPagoFacturaPayment:
       type: object
@@ -13180,6 +13327,97 @@ components:
         success: { type: boolean, const: true }
         data:
           $ref: '#/components/schemas/MercadoPagoReconciliationJobSummary'
+
+    MercadoPagoRefundInput:
+      type: object
+      required: [motivo]
+      properties:
+        motivo:
+          type: string
+          minLength: 10
+          maxLength: 500
+        monto:
+          type: number
+          exclusiveMinimum: 0
+          description: Optional; must match full refundable amount. Partial refunds return 422.
+
+    MercadoPagoRefund:
+      type: object
+      required: [id, facturaId, mpPaymentId, monto, motivo, estado, createdAt, updatedAt]
+      properties:
+        id: { type: integer, minimum: 1 }
+        facturaId: { type: integer, minimum: 1 }
+        mpPaymentId: { type: string }
+        mpRefundId: { type: string, nullable: true }
+        monto: { type: string }
+        motivo: { type: string }
+        estado:
+          type: string
+          enum: [iniciado, procesando, completado, fallido]
+        notaCreditoId: { type: integer, minimum: 1, nullable: true }
+        reciboCobroId: { type: integer, minimum: 1, nullable: true }
+        errorMessage: { type: string, nullable: true }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+
+    MercadoPagoRefundEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success: { type: boolean, const: true }
+        data:
+          $ref: '#/components/schemas/MercadoPagoRefund'
+
+    MercadoPagoRefundNullableEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success: { type: boolean, const: true }
+        data:
+          oneOf:
+            - $ref: '#/components/schemas/MercadoPagoRefund'
+            - type: 'null'
+
+    MercadoPagoChargeback:
+      type: object
+      required: [id, mpChargebackId, estado, createdAt]
+      properties:
+        id: { type: integer, minimum: 1 }
+        mpChargebackId: { type: string }
+        mpPaymentId: { type: string, nullable: true }
+        facturaId: { type: integer, minimum: 1, nullable: true }
+        estado:
+          type: string
+          enum: [pendiente, resuelto, ignorado]
+        notifiedAt: { type: string, format: date-time, nullable: true }
+        resolvedAt: { type: string, format: date-time, nullable: true }
+        createdAt: { type: string, format: date-time }
+
+    MercadoPagoChargebackListEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success: { type: boolean, const: true }
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/MercadoPagoChargeback'
+
+    MercadoPagoChargebackEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success: { type: boolean, const: true }
+        data:
+          $ref: '#/components/schemas/MercadoPagoChargeback'
+
+    MercadoPagoChargebackPatchInput:
+      type: object
+      required: [estado]
+      properties:
+        estado:
+          type: string
+          enum: [resuelto, ignorado]
 
     MercadoPagoFacturaPaymentEnvelope:
       type: object

@@ -18,6 +18,7 @@ import PickingPage from './pages/logistica/picking'
 import SeguimientoPage from './pages/logistica/seguimiento'
 import FinanzasPage from './pages/finanzas'
 import ReconciliacionMpPage from './pages/finanzas/ReconciliacionMpPage'
+import ContracargosMpPage from './pages/finanzas/ContracargosMpPage'
 import CobrosPage from './pages/cobros'
 import PedidosPage from './pages/pedidos'
 import ReportesPage from './pages/reportes'
@@ -224,6 +225,14 @@ function AppRoutes() {
             element={
               <ModuleRoute moduleKey="finance.collections">
                 <ReconciliacionMpPage />
+              </ModuleRoute>
+            }
+          />
+          <Route
+            path="finanzas/contracargos-mp"
+            element={
+              <ModuleRoute moduleKey="finance.collections">
+                <ContracargosMpPage />
               </ModuleRoute>
             }
           />

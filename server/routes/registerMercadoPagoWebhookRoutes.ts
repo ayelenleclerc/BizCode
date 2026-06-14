@@ -5,6 +5,7 @@ import { mercadoPagoWebhookBodySchema } from '../schemas/mercadopago'
 import {
   extractDataIdFromQuery,
   extractPaymentIdFromPayload,
+  isChargebackWebhook,
   MercadoPagoWebhookService,
   type MercadoPagoWebhookPayload,
 } from '../services/MercadoPagoWebhookService'
@@ -36,9 +37,11 @@ export function registerMercadoPagoWebhookRoutes(app: Application, ctx: RestRout
       const xSignature = headerString(req.headers['x-signature'])
       const xRequestId = headerString(req.headers['x-request-id'])
       const body = req.body as MercadoPagoWebhookPayload
-      const paymentId = extractPaymentIdFromPayload(body)
+      const isChargeback = isChargebackWebhook(body)
+      const paymentId = isChargeback ? null : extractPaymentIdFromPayload(body)
       const queryDataId = extractDataIdFromQuery(req.query as Record<string, unknown>)
-      const dataId = queryDataId ?? paymentId
+      const resourceId = extractPaymentIdFromPayload(body)
+      const dataId = queryDataId ?? resourceId
 
       if (!xSignature || !xRequestId || !dataId) {
         res.status(400).json({ success: false, error: 'Invalid webhook headers or payload' })
@@ -66,7 +69,7 @@ export function registerMercadoPagoWebhookRoutes(app: Application, ctx: RestRout
             return
           }
 
-          if (!paymentId) {
+          if (!resourceId) {
             if (!res.headersSent) {
               res.status(200).json({ success: true })
             }
@@ -78,19 +81,26 @@ export function registerMercadoPagoWebhookRoutes(app: Application, ctx: RestRout
           }
 
           setImmediate(() => {
-            void webhookService
-              .processPaymentNotification(tenantId, paymentId, req.ip ?? null)
-              .catch((err: unknown) => {
-                console.warn(
-                  '[mercadopago-webhook] process_error',
-                  'tenant',
+            const processPromise = isChargeback
+              ? webhookService.processChargebackNotification(
                   tenantId,
-                  'payment',
-                  sanitizeLogField(paymentId),
-                  'detail',
-                  err instanceof Error ? err.message : err,
+                  resourceId,
+                  body,
+                  req.ip ?? null,
                 )
-              })
+              : webhookService.processPaymentNotification(tenantId, resourceId, req.ip ?? null)
+
+            void processPromise.catch((err: unknown) => {
+              console.warn(
+                '[mercadopago-webhook] process_error',
+                'tenant',
+                tenantId,
+                isChargeback ? 'chargeback' : 'payment',
+                sanitizeLogField(resourceId),
+                'detail',
+                err instanceof Error ? err.message : err,
+              )
+            })
           })
         })
         .catch(() => {

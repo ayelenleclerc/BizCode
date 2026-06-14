@@ -380,6 +380,30 @@
       "ignoreError": "Não foi possível ignorar o pagamento.",
       "jobSuccess": "Job concluído: processados {{processed}}, auto-reconciliados {{autoReconciled}}, na fila {{queued}}, ignorados {{skipped}}.",
       "jobError": "Não foi possível executar o job de reconciliação."
+    },
+    "chargeback": {
+      "title": "Chargebacks Mercado Pago",
+      "subtitle": "Chargebacks recebidos via webhook. Requer revisão manual; sem nota de crédito automática.",
+      "linkTitle": "Chargebacks Mercado Pago",
+      "linkHint": "Chargebacks do Mercado Pago aparecem aqui para acompanhamento da equipe.",
+      "openPage": "Abrir fila de chargebacks",
+      "backToFinance": "Voltar a Finanças",
+      "loading": "Carregando chargebacks…",
+      "integrationDisabled": "A integração Mercado Pago não está habilitada para este tenant.",
+      "refresh": "Atualizar",
+      "refreshing": "Atualizando…",
+      "empty": "Não há chargebacks pendentes.",
+      "colDate": "Data",
+      "colChargebackId": "ID chargeback",
+      "colPaymentId": "ID pagamento MP",
+      "colFactura": "Fatura",
+      "colActions": "Ações",
+      "resolve": "Marcar resolvido",
+      "ignore": "Ignorar",
+      "loadError": "Não foi possível carregar os chargebacks.",
+      "resolveSuccess": "Chargeback #{{id}} marcado como resolvido.",
+      "ignoreSuccess": "Chargeback #{{id}} ignorado.",
+      "actionError": "Não foi possível atualizar o chargeback."
     }
   }
 }

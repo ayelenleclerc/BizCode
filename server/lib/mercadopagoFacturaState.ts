@@ -7,6 +7,7 @@ export type MercadoPagoFacturaEstado =
   | 'rejected'
   | 'cancelled'
   | 'expired'
+  | 'refunded'
 
 export type MercadoPagoPaymentChannel = 'none' | 'link' | 'qr'
 
@@ -57,6 +58,7 @@ export function deriveMercadoPagoEstado(
 ): MercadoPagoFacturaEstado {
   if (!mpEstado) return 'none'
   if (mpEstado === 'approved') return 'approved'
+  if (mpEstado === 'refunded') return 'refunded'
   if (mpEstado === 'rejected') return 'rejected'
   if (mpEstado === 'cancelled') return 'cancelled'
   if (mpEstado === 'pending') {

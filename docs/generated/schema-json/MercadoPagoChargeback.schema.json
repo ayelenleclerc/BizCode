@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "createdAt": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "estado": {
+      "enum": [
+        "pendiente",
+        "resuelto",
+        "ignorado"
+      ],
+      "type": "string"
+    },
+    "facturaId": {
+      "minimum": 1,
+      "nullable": true,
+      "type": "integer"
+    },
+    "id": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "mpChargebackId": {
+      "type": "string"
+    },
+    "mpPaymentId": {
+      "nullable": true,
+      "type": "string"
+    },
+    "notifiedAt": {
+      "format": "date-time",
+      "nullable": true,
+      "type": "string"
+    },
+    "resolvedAt": {
+      "format": "date-time",
+      "nullable": true,
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "mpChargebackId",
+    "estado",
+    "createdAt"
+  ],
+  "title": "MercadoPagoChargeback",
+  "type": "object"
+}

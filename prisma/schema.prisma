@@ -437,6 +437,8 @@ model Factura {
   reciboCobroImputaciones ReciboCobroImputacion[]
   mercadoPagoProcessedPayments MercadoPagoProcessedPayment[]
   mercadoPagoReconciliationEntries MercadoPagoReconciliationEntry[]
+  mercadoPagoRefunds           MercadoPagoRefund[]
+  mercadoPagoChargebacks       MercadoPagoChargeback[]
 
   @@unique([tenantId, tipo, prefijo, numero])
   @@index([tenantId])
@@ -463,6 +465,7 @@ model NotaCredito {
   createdBy       AppUser?  @relation("NotaCreditoCreatedBy", fields: [createdById], references: [id])
   createdAt       DateTime  @default(now())
   movimientoCC    MovimientoClienteCC?
+  mercadoPagoRefunds MercadoPagoRefund[]
 
   @@unique([tenantId, facturaOrigenId])
   @@index([tenantId, createdAt])
@@ -717,6 +720,8 @@ model Tenant {
   mercadoPagoConfig             MercadoPagoConfig?
   mercadoPagoProcessedPayments  MercadoPagoProcessedPayment[]
   mercadoPagoReconciliationEntries MercadoPagoReconciliationEntry[]
+  mercadoPagoRefunds            MercadoPagoRefund[]
+  mercadoPagoChargebacks        MercadoPagoChargeback[]
 }
 
 /// Idempotent Mercado Pago payment webhook processing (#176).
@@ -768,6 +773,57 @@ model MercadoPagoReconciliationEntry {
   @@unique([tenantId, mpPaymentId])
   @@index([tenantId, estado])
   @@index([tenantId, paymentDate])
+}
+
+/// Mercado Pago refund records (#179).
+model MercadoPagoRefund {
+  id              Int          @id @default(autoincrement())
+  tenantId        Int
+  tenant          Tenant       @relation(fields: [tenantId], references: [id])
+  facturaId       Int
+  factura         Factura      @relation(fields: [facturaId], references: [id])
+  mpPaymentId     String       @db.VarChar(60)
+  mpRefundId      String?      @db.VarChar(60)
+  monto           Decimal      @db.Decimal(14, 2)
+  motivo          String       @db.VarChar(500)
+  /// iniciado | procesando | completado | fallido
+  estado          String       @db.VarChar(20)
+  notaCreditoId   Int?
+  notaCredito     NotaCredito? @relation(fields: [notaCreditoId], references: [id])
+  reciboCobroId   Int?
+  reciboCobro     ReciboCobro? @relation(fields: [reciboCobroId], references: [id])
+  errorMessage    String?      @db.VarChar(500)
+  createdByUserId Int?
+  createdBy       AppUser?     @relation("MercadoPagoRefundCreatedBy", fields: [createdByUserId], references: [id])
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  @@index([tenantId, facturaId])
+  @@index([tenantId, estado])
+  @@index([tenantId, mpPaymentId])
+}
+
+/// Mercado Pago chargeback queue (#179).
+model MercadoPagoChargeback {
+  id               Int       @id @default(autoincrement())
+  tenantId         Int
+  tenant           Tenant    @relation(fields: [tenantId], references: [id])
+  mpChargebackId   String    @db.VarChar(60)
+  mpPaymentId      String?   @db.VarChar(60)
+  facturaId        Int?
+  factura          Factura?  @relation(fields: [facturaId], references: [id])
+  /// pendiente | resuelto | ignorado
+  estado           String    @db.VarChar(20)
+  payload          Json
+  notifiedAt       DateTime?
+  resolvedByUserId Int?
+  resolvedBy       AppUser?  @relation("MercadoPagoChargebackResolvedBy", fields: [resolvedByUserId], references: [id])
+  resolvedAt       DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  @@unique([tenantId, mpChargebackId])
+  @@index([tenantId, estado])
 }
 
 /// MercadoPago credentials per tenant (#174); access token and webhook secret encrypted at rest.
@@ -1045,6 +1101,8 @@ model AppUser {
   documentosCompraImportados DocumentoCompraImportado[]
   chequeMovimientos      ChequeMov[]
   presentacionesRetencion PresentacionRetencion[] @relation("PresentacionRetencionCreatedBy")
+  mercadoPagoRefundsCreated MercadoPagoRefund[] @relation("MercadoPagoRefundCreatedBy")
+  mercadoPagoChargebacksResolved MercadoPagoChargeback[] @relation("MercadoPagoChargebackResolvedBy")
 
   @@unique([tenantId, username])
 }
@@ -1208,6 +1266,7 @@ model ReciboCobro {
   retencionesAplicadas RetencionAplicada[]
   mercadoPagoProcessedPayments MercadoPagoProcessedPayment[]
   mercadoPagoReconciliationEntries MercadoPagoReconciliationEntry[]
+  mercadoPagoRefunds           MercadoPagoRefund[]
 
   @@unique([tenantId, numero])
   @@index([tenantId, clienteId])

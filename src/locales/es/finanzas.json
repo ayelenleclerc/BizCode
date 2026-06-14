@@ -380,6 +380,30 @@
       "ignoreError": "No se pudo ignorar el pago.",
       "jobSuccess": "Job finalizado: procesados {{processed}}, auto-reconciliados {{autoReconciled}}, en cola {{queued}}, omitidos {{skipped}}.",
       "jobError": "No se pudo ejecutar el job de reconciliación."
+    },
+    "chargeback": {
+      "title": "Contracargos Mercado Pago",
+      "subtitle": "Contracargos recibidos vía webhook. Requieren revisión manual; no se genera nota de crédito automática.",
+      "linkTitle": "Contracargos Mercado Pago",
+      "linkHint": "Los contracargos de Mercado Pago aparecen acá para seguimiento del equipo.",
+      "openPage": "Abrir cola de contracargos",
+      "backToFinance": "Volver a Finanzas",
+      "loading": "Cargando contracargos…",
+      "integrationDisabled": "La integración Mercado Pago no está habilitada para este tenant.",
+      "refresh": "Actualizar",
+      "refreshing": "Actualizando…",
+      "empty": "No hay contracargos pendientes.",
+      "colDate": "Fecha",
+      "colChargebackId": "ID contracargo",
+      "colPaymentId": "ID pago MP",
+      "colFactura": "Factura",
+      "colActions": "Acciones",
+      "resolve": "Marcar resuelto",
+      "ignore": "Ignorar",
+      "loadError": "No se pudieron cargar los contracargos.",
+      "resolveSuccess": "Contracargo #{{id}} marcado como resuelto.",
+      "ignoreSuccess": "Contracargo #{{id}} ignorado.",
+      "actionError": "No se pudo actualizar el contracargo."
     }
   }
 }

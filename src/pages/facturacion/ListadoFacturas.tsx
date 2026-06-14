@@ -10,6 +10,7 @@ import { Factura, Cliente } from '@/types'
 import FacturaPdfPreviewDialog from './FacturaPdfPreviewDialog'
 import MercadoPagoPaymentLinkModal from './MercadoPagoPaymentLinkModal'
 import MercadoPagoQrModal from './MercadoPagoQrModal'
+import MercadoPagoRefundDialog from './MercadoPagoRefundDialog'
 
 interface ListadoFacturasProps {
   facturas: Factura[]
@@ -54,6 +55,7 @@ function CaeBadge({ estado }: { estado: Factura['estadoCae'] }) {
 function deriveMpEstadoFromFactura(factura: Factura): MercadoPagoFacturaPaymentDto['estado'] | null {
   if (!factura.mpEstado) return null
   if (factura.mpEstado === 'approved') return 'approved'
+  if (factura.mpEstado === 'refunded') return 'refunded'
   if (factura.mpEstado === 'rejected') return 'rejected'
   if (factura.mpEstado === 'cancelled') return 'cancelled'
   if (factura.mpEstado === 'pending') {
@@ -73,6 +75,8 @@ function MpPaymentBadge({ factura }: { factura: Factura }) {
   const className =
     estado === 'approved'
       ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-300'
+      : estado === 'refunded'
+        ? 'bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-300'
       : estado === 'expired' || estado === 'rejected'
         ? 'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-300'
         : 'bg-sky-100 dark:bg-sky-900 text-sky-800 dark:text-sky-300'
@@ -124,6 +128,7 @@ export default function ListadoFacturas({
   const [remitoFeedback, setRemitoFeedback] = useState<string | null>(null)
   const [mpModalFacturaId, setMpModalFacturaId] = useState<number | null>(null)
   const [mpQrModalFacturaId, setMpQrModalFacturaId] = useState<number | null>(null)
+  const [mpRefundModalFacturaId, setMpRefundModalFacturaId] = useState<number | null>(null)
 
   useEffect(() => {
     setSelectedRow(0)
@@ -750,6 +755,20 @@ export default function ListadoFacturas({
                           </button>
                         )}
                       </CanAccess>
+                      <CanAccess permission="sales.cancel">
+                            <IfModule flag="billing.credit_notes">
+                          {factura.estado === 'A' && deriveMpEstadoFromFactura(factura) === 'approved' && (
+                            <button
+                              type="button"
+                              data-testid="btn-factura-mp-refund"
+                              onClick={() => setMpRefundModalFacturaId(factura.id)}
+                              className="mb-3 w-full rounded border border-red-600 px-4 py-2 text-sm font-semibold text-red-700 transition hover:bg-red-50 dark:text-red-300 dark:hover:bg-red-950"
+                            >
+                              {t('mercadopago.refund.button')}
+                            </button>
+                          )}
+                        </IfModule>
+                      </CanAccess>
                     </IfIntegration>
 
                     <button
@@ -790,6 +809,20 @@ export default function ListadoFacturas({
             factura={mpFactura}
             onClose={() => setMpQrModalFacturaId(null)}
             onStatusChange={() => {
+              onFacturaUpdated?.()
+            }}
+          />
+        )
+      })()}
+
+      {mpRefundModalFacturaId != null && (() => {
+        const mpFactura = facturas.find((f) => f.id === mpRefundModalFacturaId)
+        if (!mpFactura) return null
+        return (
+          <MercadoPagoRefundDialog
+            factura={mpFactura}
+            onClose={() => setMpRefundModalFacturaId(null)}
+            onRefunded={() => {
               onFacturaUpdated?.()
             }}
           />

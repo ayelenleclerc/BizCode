@@ -176,7 +176,8 @@
       "approved": "Paid",
       "rejected": "Rejected",
       "cancelled": "Cancelled",
-      "expired": "Expired"
+      "expired": "Expired",
+      "refunded": "Refunded"
     },
     "share": {
       "defaultName": "Customer",
@@ -202,6 +203,32 @@
       "errors": {
         "loadFailed": "Could not load QR status",
         "createFailed": "Could not generate payment QR"
+      }
+    },
+    "refund": {
+      "button": "Refund MP payment",
+      "modalTitle": "Mercado Pago refund",
+      "modalSubtitle": "Invoice {{ref}}",
+      "loading": "Loading refund status…",
+      "timelineTitle": "Refund status",
+      "timelineEstado": "Status",
+      "timelineMonto": "Amount",
+      "motivoLabel": "Refund reason",
+      "motivoPlaceholder": "Minimum 10 characters",
+      "submit": "Confirm full refund",
+      "submitting": "Processing refund…",
+      "close": "Close",
+      "success": "Refund completed successfully.",
+      "estado": {
+        "iniciado": "Started",
+        "procesando": "Processing",
+        "completado": "Completed",
+        "fallido": "Failed"
+      },
+      "errors": {
+        "loadFailed": "Could not load refund status",
+        "submitFailed": "Could not process refund",
+        "partialNotSupported": "Partial refunds are not available yet. Only full refunds are supported."
       }
     }
   }

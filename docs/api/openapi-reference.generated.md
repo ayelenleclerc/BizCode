@@ -27557,7 +27557,7 @@ Requires `reports.financial.read` and tenant integration `mercadopago`. Returns 
 
   - **`estado` (required)**
 
-    `string`, possible values: `"none", "pending", "approved", "rejected", "cancelled", "expired"`
+    `string`, possible values: `"none", "pending", "approved", "rejected", "cancelled", "expired", "refunded"`
 
   - **`amount`**
 
@@ -27759,7 +27759,7 @@ Creates a Mercado Pago Checkout preference for the invoice outstanding balance (
 
   - **`estado` (required)**
 
-    `string`, possible values: `"none", "pending", "approved", "rejected", "cancelled", "expired"`
+    `string`, possible values: `"none", "pending", "approved", "rejected", "cancelled", "expired", "refunded"`
 
   - **`amount`**
 
@@ -28003,7 +28003,7 @@ Creates a Mercado Pago instore dynamic QR for the invoice outstanding balance (A
 
   - **`estado` (required)**
 
-    `string`, possible values: `"none", "pending", "approved", "rejected", "cancelled", "expired"`
+    `string`, possible values: `"none", "pending", "approved", "rejected", "cancelled", "expired", "refunded"`
 
   - **`amount`**
 
@@ -28228,7 +28228,7 @@ Creates a Mercado Pago instore dynamic QR for the invoice outstanding balance (A
 - **Path:** `/api/webhooks/mercadopago`
 - **Tags:** mercadopago
 
-Public IPN endpoint (no JWT). Validates `x-signature` with the tenant `webhookSecret` from Mercado Pago configuration (#174). Responds `200` immediately and processes the payment asynchronously: on `approved`, creates a customer receipt (`ReciboCobro`) with `mercadopago` payment method and invoice allocation; updates `Factura.mpEstado`. Idempotent per `mpPaymentId` (`MercadoPagoProcessedPayment`). Rate-limited per IP.
+Public IPN endpoint (no JWT). Validates `x-signature` with the tenant `webhookSecret` from Mercado Pago configuration (#174). Responds `200` immediately and processes the payment asynchronously: on `approved`, creates a customer receipt (`ReciboCobro`) with `mercadopago` payment method and invoice allocation; updates `Factura.mpEstado`. Chargeback notifications (`type: chargebacks`) enqueue `MercadoPagoChargeback` and notify managers; no automatic credit note (#179). Idempotent per `mpPaymentId` (`MercadoPagoProcessedPayment`) for payment events. Rate-limited per IP.
 
 #### Request Body
 
@@ -40270,6 +40270,779 @@ Requires `reports.financial.read` and tenant integration `mercadopago`. Forces r
 ```
 
 ##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 429 Rate limit exceeded
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Get Mercado Pago refund status for invoice (#179)
+
+- **Method:** `GET`
+- **Path:** `/api/facturas/{id}/mp/reembolso`
+- **Tags:** facturas, mercadopago
+
+Requires `sales.cancel`, tenant integration `mercadopago`, and module `billing.credit_notes`. Returns latest refund record or `null`.
+
+#### Responses
+
+##### Status: 200 Refund timeline
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "facturaId": 1,
+    "mpPaymentId": "",
+    "mpRefundId": "",
+    "monto": "",
+    "motivo": "",
+    "estado": "iniciado",
+    "notaCreditoId": 1,
+    "reciboCobroId": 1,
+    "errorMessage": "",
+    "createdAt": "",
+    "updatedAt": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Request total Mercado Pago refund (#179)
+
+- **Method:** `POST`
+- **Path:** `/api/facturas/{id}/mp/reembolso`
+- **Tags:** facturas, mercadopago
+
+Requires `sales.cancel`, tenant integration `mercadopago`, and module `billing.credit_notes`. Only **full** refunds are supported in MVP. Partial amounts return `422` with `partial_refund_not_supported`. On success: MP refund API, void receipt, invoice void with credit note (#146), `mpEstado: refunded`.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`motivo` (required)**
+
+  `string`
+
+- **`monto`**
+
+  `number` — Optional; must match full refundable amount. Partial refunds return 422.
+
+**Example:**
+
+```json
+{
+  "motivo": "",
+  "monto": 1
+}
+```
+
+#### Responses
+
+##### Status: 201 Refund completed
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"iniciado", "procesando", "completado", "fallido"`
+
+  - **`facturaId` (required)**
+
+    `integer`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`monto` (required)**
+
+    `string`
+
+  - **`motivo` (required)**
+
+    `string`
+
+  - **`mpPaymentId` (required)**
+
+    `string`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`errorMessage`**
+
+    `string`
+
+  - **`mpRefundId`**
+
+    `string`
+
+  - **`notaCreditoId`**
+
+    `integer`
+
+  - **`reciboCobroId`**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "facturaId": 1,
+    "mpPaymentId": "",
+    "mpRefundId": "",
+    "monto": "",
+    "motivo": "",
+    "estado": "iniciado",
+    "notaCreditoId": 1,
+    "reciboCobroId": 1,
+    "errorMessage": "",
+    "createdAt": "",
+    "updatedAt": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 409 Resource conflict
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 422
+
+##### Status: 429 Rate limit exceeded
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 502 Mercado Pago refund API error
+
+###### Content-Type: application/json
+
+**Example:**
+
+```
+```
+
+### List pending Mercado Pago chargebacks (#179)
+
+- **Method:** `GET`
+- **Path:** `/api/mercadopago/contracargos`
+- **Tags:** mercadopago
+
+Requires `reports.financial.read` and tenant integration `mercadopago`.
+
+#### Responses
+
+##### Status: 200 Pending chargeback queue
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"pendiente", "resuelto", "ignorado"`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`mpChargebackId` (required)**
+
+    `string`
+
+  - **`facturaId`**
+
+    `integer`
+
+  - **`mpPaymentId`**
+
+    `string`
+
+  - **`notifiedAt`**
+
+    `string`, format: `date-time`
+
+  - **`resolvedAt`**
+
+    `string`, format: `date-time`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "mpChargebackId": "",
+      "mpPaymentId": "",
+      "facturaId": 1,
+      "estado": "pendiente",
+      "notifiedAt": "",
+      "resolvedAt": "",
+      "createdAt": ""
+    }
+  ]
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Update Mercado Pago chargeback status (#179)
+
+- **Method:** `PATCH`
+- **Path:** `/api/mercadopago/contracargos/{id}`
+- **Tags:** mercadopago
+
+Requires `reports.financial.read` and tenant integration `mercadopago`. Mark `resuelto` or `ignorado`.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`estado` (required)**
+
+  `string`, possible values: `"resuelto", "ignorado"`
+
+**Example:**
+
+```json
+{
+  "estado": "resuelto"
+}
+```
+
+#### Responses
+
+##### Status: 200 Updated chargeback
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"pendiente", "resuelto", "ignorado"`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`mpChargebackId` (required)**
+
+    `string`
+
+  - **`facturaId`**
+
+    `integer`
+
+  - **`mpPaymentId`**
+
+    `string`
+
+  - **`notifiedAt`**
+
+    `string`, format: `date-time`
+
+  - **`resolvedAt`**
+
+    `string`, format: `date-time`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "mpChargebackId": "",
+    "mpPaymentId": "",
+    "facturaId": 1,
+    "estado": "pendiente",
+    "notifiedAt": "",
+    "resolvedAt": "",
+    "createdAt": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 409 Resource conflict
 
 ###### Content-Type: application/json
 
@@ -67435,7 +68208,7 @@ Originating invoice header (selected columns)
 
 * **`estado` (required)**
 
-  `string`, possible values: `"none", "pending", "approved", "rejected", "cancelled", "expired"`
+  `string`, possible values: `"none", "pending", "approved", "rejected", "cancelled", "expired", "refunded"`
 
 * **`amount`**
 
@@ -67915,6 +68688,409 @@ Originating invoice header (selected columns)
 }
 ```
 
+### MercadoPagoRefundInput
+
+- **Type:**`object`
+
+* **`motivo` (required)**
+
+  `string`
+
+* **`monto`**
+
+  `number` — Optional; must match full refundable amount. Partial refunds return 422.
+
+**Example:**
+
+```json
+{
+  "motivo": "",
+  "monto": 1
+}
+```
+
+### MercadoPagoRefund
+
+- **Type:**`object`
+
+* **`createdAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`estado` (required)**
+
+  `string`, possible values: `"iniciado", "procesando", "completado", "fallido"`
+
+* **`facturaId` (required)**
+
+  `integer`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`monto` (required)**
+
+  `string`
+
+* **`motivo` (required)**
+
+  `string`
+
+* **`mpPaymentId` (required)**
+
+  `string`
+
+* **`updatedAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`errorMessage`**
+
+  `string`
+
+* **`mpRefundId`**
+
+  `string`
+
+* **`notaCreditoId`**
+
+  `integer`
+
+* **`reciboCobroId`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "facturaId": 1,
+  "mpPaymentId": "",
+  "mpRefundId": "",
+  "monto": "",
+  "motivo": "",
+  "estado": "iniciado",
+  "notaCreditoId": 1,
+  "reciboCobroId": 1,
+  "errorMessage": "",
+  "createdAt": "",
+  "updatedAt": ""
+}
+```
+
+### MercadoPagoRefundEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"iniciado", "procesando", "completado", "fallido"`
+
+  - **`facturaId` (required)**
+
+    `integer`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`monto` (required)**
+
+    `string`
+
+  - **`motivo` (required)**
+
+    `string`
+
+  - **`mpPaymentId` (required)**
+
+    `string`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`errorMessage`**
+
+    `string`
+
+  - **`mpRefundId`**
+
+    `string`
+
+  - **`notaCreditoId`**
+
+    `integer`
+
+  - **`reciboCobroId`**
+
+    `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "facturaId": 1,
+    "mpPaymentId": "",
+    "mpRefundId": "",
+    "monto": "",
+    "motivo": "",
+    "estado": "iniciado",
+    "notaCreditoId": 1,
+    "reciboCobroId": 1,
+    "errorMessage": "",
+    "createdAt": "",
+    "updatedAt": ""
+  }
+}
+```
+
+### MercadoPagoRefundNullableEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "facturaId": 1,
+    "mpPaymentId": "",
+    "mpRefundId": "",
+    "monto": "",
+    "motivo": "",
+    "estado": "iniciado",
+    "notaCreditoId": 1,
+    "reciboCobroId": 1,
+    "errorMessage": "",
+    "createdAt": "",
+    "updatedAt": ""
+  }
+}
+```
+
+### MercadoPagoChargeback
+
+- **Type:**`object`
+
+* **`createdAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`estado` (required)**
+
+  `string`, possible values: `"pendiente", "resuelto", "ignorado"`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`mpChargebackId` (required)**
+
+  `string`
+
+* **`facturaId`**
+
+  `integer`
+
+* **`mpPaymentId`**
+
+  `string`
+
+* **`notifiedAt`**
+
+  `string`, format: `date-time`
+
+* **`resolvedAt`**
+
+  `string`, format: `date-time`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "mpChargebackId": "",
+  "mpPaymentId": "",
+  "facturaId": 1,
+  "estado": "pendiente",
+  "notifiedAt": "",
+  "resolvedAt": "",
+  "createdAt": ""
+}
+```
+
+### MercadoPagoChargebackListEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"pendiente", "resuelto", "ignorado"`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`mpChargebackId` (required)**
+
+    `string`
+
+  - **`facturaId`**
+
+    `integer`
+
+  - **`mpPaymentId`**
+
+    `string`
+
+  - **`notifiedAt`**
+
+    `string`, format: `date-time`
+
+  - **`resolvedAt`**
+
+    `string`, format: `date-time`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "mpChargebackId": "",
+      "mpPaymentId": "",
+      "facturaId": 1,
+      "estado": "pendiente",
+      "notifiedAt": "",
+      "resolvedAt": "",
+      "createdAt": ""
+    }
+  ]
+}
+```
+
+### MercadoPagoChargebackEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"pendiente", "resuelto", "ignorado"`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`mpChargebackId` (required)**
+
+    `string`
+
+  - **`facturaId`**
+
+    `integer`
+
+  - **`mpPaymentId`**
+
+    `string`
+
+  - **`notifiedAt`**
+
+    `string`, format: `date-time`
+
+  - **`resolvedAt`**
+
+    `string`, format: `date-time`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "mpChargebackId": "",
+    "mpPaymentId": "",
+    "facturaId": 1,
+    "estado": "pendiente",
+    "notifiedAt": "",
+    "resolvedAt": "",
+    "createdAt": ""
+  }
+}
+```
+
+### MercadoPagoChargebackPatchInput
+
+- **Type:**`object`
+
+* **`estado` (required)**
+
+  `string`, possible values: `"resuelto", "ignorado"`
+
+**Example:**
+
+```json
+{
+  "estado": "resuelto"
+}
+```
+
 ### MercadoPagoFacturaPaymentEnvelope
 
 - **Type:**`object`
@@ -67925,7 +69101,7 @@ Originating invoice header (selected columns)
 
   - **`estado` (required)**
 
-    `string`, possible values: `"none", "pending", "approved", "rejected", "cancelled", "expired"`
+    `string`, possible values: `"none", "pending", "approved", "rejected", "cancelled", "expired", "refunded"`
 
   - **`amount`**
 

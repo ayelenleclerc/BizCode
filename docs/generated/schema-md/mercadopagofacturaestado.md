@@ -26,3 +26,4 @@ undefined#/properties/estado
 | `"rejected"`  |             |
 | `"cancelled"` |             |
 | `"expired"`   |             |
+| `"refunded"`  |             |

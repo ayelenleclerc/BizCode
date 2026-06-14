@@ -97,6 +97,14 @@ Some Mercado Pago payments arrive without a linked preference or QR order (direc
 3. **Manual queue:** **Finance → Mercado Pago reconciliation** (`/finanzas/reconciliacion-mp`, integration `mercadopago`, `reports.financial.read`): list pending payments; load open invoices by customer ID; **Reconcile** (`POST /api/mercadopago/reconciliar`) or **Ignore** (`POST /api/mercadopago/ignorar`).
 4. **On-demand job:** staff can run `POST /api/mercadopago/reconciliacion/run` from the UI.
 
+## Mercado Pago refunds and chargebacks (#179)
+
+**Total refunds only** in this release; partial refunds are tracked in issue #344.
+
+1. **Refund:** In **Invoicing → invoice detail**, when `mpEstado` is **approved**, users with **`sales.cancel`** and module **`billing.credit_notes`** see **Refund MP payment**. Confirms with motivo (min. 10 chars); calls `POST /api/facturas/{id}/mp/reembolso`. BizCode requests a full MP refund, voids the linked `ReciboCobro`, voids the invoice with a total credit note (#146), and sets `mpEstado: refunded`. Amounts below the full payment return `422 partial_refund_not_supported`.
+2. **Refund timeline:** `GET /api/facturas/{id}/mp/reembolso` and the refund dialog show estado (`iniciado` → `procesando` → `completado` / `fallido`).
+3. **Chargebacks:** Webhook `type: chargebacks` creates `MercadoPagoChargeback` (`pendiente`) and notifies managers. **No automatic void or credit note** — staff resolves manually. Queue: **Finance → Mercado Pago chargebacks** (`/finanzas/contracargos-mp`, `reports.financial.read`); mark **Resolved** or **Ignore** via `PATCH /api/mercadopago/contracargos/{id}`.
+
 ## API reference
 
 [`docs/api/openapi.yaml`](../../api/openapi.yaml) — paths under `/api/reportes/aging`, `/api/reportes/cuenta-corriente/{clienteId}`, and `/api/clientes/{id}/cuenta-corriente/*`.

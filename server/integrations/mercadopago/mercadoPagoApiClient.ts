@@ -224,6 +224,53 @@ export async function searchMercadoPagoPayments(
   return body
 }
 
+export type MercadoPagoRefundResult = {
+  id: number
+  payment_id: number
+  amount: number
+  status: string
+}
+
+/**
+ * @en Creates a Mercado Pago payment refund (#179).
+ * @es Crea un reembolso de pago Mercado Pago (#179).
+ * @pt-BR Cria um reembolso de pagamento Mercado Pago (#179).
+ */
+export async function createMercadoPagoRefund(
+  accessToken: string,
+  paymentId: string,
+  input?: { amount?: number },
+): Promise<MercadoPagoRefundResult> {
+  const body: { amount?: number } = {}
+  if (input?.amount != null) {
+    body.amount = input.amount
+  }
+  const res = await fetch(`${MP_PAYMENTS_URL}/${encodeURIComponent(paymentId)}/refunds`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(body),
+  })
+
+  if (!res.ok) {
+    throw new MercadoPagoApiError(
+      res.status,
+      res.status === 401 || res.status === 403
+        ? 'Invalid Mercado Pago credentials'
+        : `Mercado Pago refund error (${res.status})`,
+    )
+  }
+
+  const parsed = (await res.json()) as MercadoPagoRefundResult
+  if (parsed.id == null || parsed.payment_id == null) {
+    throw new MercadoPagoApiError(502, 'Invalid Mercado Pago refund response')
+  }
+  return parsed
+}
+
 export type MercadoPagoInstoreQrItem = {
   sku_number?: string
   category?: string

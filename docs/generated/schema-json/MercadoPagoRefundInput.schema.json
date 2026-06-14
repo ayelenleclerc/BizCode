@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "monto": {
+      "description": "Optional; must match full refundable amount. Partial refunds return 422.",
+      "exclusiveMinimum": 0,
+      "type": "number"
+    },
+    "motivo": {
+      "maxLength": 500,
+      "minLength": 10,
+      "type": "string"
+    }
+  },
+  "required": [
+    "motivo"
+  ],
+  "title": "MercadoPagoRefundInput",
+  "type": "object"
+}

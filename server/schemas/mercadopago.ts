@@ -20,6 +20,7 @@ export const mercadoPagoFacturaEstadoSchema = z.enum([
   'rejected',
   'cancelled',
   'expired',
+  'refunded',
 ])
 
 export const mercadoPagoFacturaPaymentSchema = z.object({
@@ -82,4 +83,39 @@ export const mercadoPagoWebhookBodySchema = z.object({
   id: z.union([z.string(), z.number()]).optional(),
   live_mode: z.boolean().optional(),
   user_id: z.union([z.string(), z.number()]).optional(),
+})
+
+export const mercadoPagoRefundBodySchema = z.object({
+  motivo: z.string().trim().min(10).max(500),
+  monto: z.number().positive().optional(),
+})
+
+export const mercadoPagoRefundEntrySchema = z.object({
+  id: z.number().int().positive(),
+  facturaId: z.number().int().positive(),
+  mpPaymentId: z.string(),
+  mpRefundId: z.string().nullable(),
+  monto: z.string(),
+  motivo: z.string(),
+  estado: z.enum(['iniciado', 'procesando', 'completado', 'fallido']),
+  notaCreditoId: z.number().int().positive().nullable(),
+  reciboCobroId: z.number().int().positive().nullable(),
+  errorMessage: z.string().nullable(),
+  createdAt: z.string().datetime(),
+  updatedAt: z.string().datetime(),
+})
+
+export const mercadoPagoChargebackEntrySchema = z.object({
+  id: z.number().int().positive(),
+  mpChargebackId: z.string(),
+  mpPaymentId: z.string().nullable(),
+  facturaId: z.number().int().positive().nullable(),
+  estado: z.enum(['pendiente', 'resuelto', 'ignorado']),
+  notifiedAt: z.string().datetime().nullable(),
+  resolvedAt: z.string().datetime().nullable(),
+  createdAt: z.string().datetime(),
+})
+
+export const mercadoPagoChargebackPatchBodySchema = z.object({
+  estado: z.enum(['resuelto', 'ignorado']),
 })
