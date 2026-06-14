@@ -5,7 +5,17 @@ import {
   createMercadoPagoPreference,
   MercadoPagoApiError,
 } from '../integrations/mercadopago/mercadoPagoApiClient'
+import {
+  deriveMercadoPagoChannel,
+  deriveMercadoPagoEstado,
+  isActivePreference,
+  isActiveQr,
+  type MercadoPagoFacturaEstado,
+  type MercadoPagoFacturaPaymentDto,
+  type MercadoPagoPaymentChannel,
+} from '../lib/mercadopagoFacturaState'
 import { MP_PREFERENCE_TTL_HOURS } from '../lib/mercadopagoPreferenceConstants'
+import { mercadoPagoQrPayloadToBase64 } from '../lib/mercadopagoQrImage'
 import {
   resolveMercadoPagoBackUrls,
   resolveMercadoPagoNotificationUrl,
@@ -13,22 +23,10 @@ import {
 import { MercadoPagoConfigService } from './MercadoPagoConfigService'
 import type { ServiceResult } from './serviceResults'
 
-export type MercadoPagoFacturaEstado =
-  | 'none'
-  | 'pending'
-  | 'approved'
-  | 'rejected'
-  | 'cancelled'
-  | 'expired'
-
-export type MercadoPagoFacturaPaymentDto = {
-  estado: MercadoPagoFacturaEstado
-  preferenceId?: string
-  paymentLink?: string
-  expiresAt?: string
-  pagadoAt?: string
-  amount?: string
-  facturaRef?: string
+export type {
+  MercadoPagoFacturaEstado,
+  MercadoPagoFacturaPaymentDto,
+  MercadoPagoPaymentChannel,
 }
 
 function formatFacturaRef(factura: Pick<Factura, 'tipo' | 'prefijo' | 'numero'>): string {
@@ -45,6 +43,21 @@ function toIsoOrUndefined(value: Date | null | undefined): string | undefined {
   return value ? value.toISOString() : undefined
 }
 
+type FacturaMpFields = Pick<
+  Factura,
+  | 'tipo'
+  | 'prefijo'
+  | 'numero'
+  | 'mpPreferenceId'
+  | 'mpPaymentLink'
+  | 'mpEstado'
+  | 'mpPagadoAt'
+  | 'mpPreferenceExpiresAt'
+  | 'mpQrData'
+  | 'mpQrOrderId'
+  | 'mpQrExpiresAt'
+>
+
 /**
  * @en Mercado Pago checkout preference per invoice (#175).
  * @es Preference de checkout Mercado Pago por factura (#175).
@@ -55,22 +68,6 @@ export class MercadoPagoPreferenceService {
 
   constructor(private readonly prisma: PrismaClient) {
     this.mpConfig = new MercadoPagoConfigService(prisma)
-  }
-
-  private deriveEstado(
-    mpEstado: string | null | undefined,
-    expiresAt: Date | null | undefined,
-    now = new Date(),
-  ): MercadoPagoFacturaEstado {
-    if (!mpEstado) return 'none'
-    if (mpEstado === 'approved') return 'approved'
-    if (mpEstado === 'rejected') return 'rejected'
-    if (mpEstado === 'cancelled') return 'cancelled'
-    if (mpEstado === 'pending' && expiresAt && expiresAt.getTime() <= now.getTime()) {
-      return 'expired'
-    }
-    if (mpEstado === 'pending') return 'pending'
-    return 'none'
   }
 
   private async computePendiente(
@@ -90,24 +87,42 @@ export class MercadoPagoPreferenceService {
     return factura.total.minus(pagado)
   }
 
-  private mapToDto(
-    factura: Pick<
-      Factura,
-      'tipo' | 'prefijo' | 'numero' | 'mpPreferenceId' | 'mpPaymentLink' | 'mpEstado' | 'mpPagadoAt' | 'mpPreferenceExpiresAt'
-    >,
+  private async mapToDto(
+    factura: FacturaMpFields,
     pendiente: Decimal,
     now = new Date(),
-  ): MercadoPagoFacturaPaymentDto {
-    const estado = this.deriveEstado(factura.mpEstado, factura.mpPreferenceExpiresAt, now)
-    return {
+  ): Promise<MercadoPagoFacturaPaymentDto> {
+    const estado = deriveMercadoPagoEstado(
+      factura.mpEstado,
+      factura.mpPreferenceExpiresAt,
+      factura.mpQrExpiresAt,
+      now,
+    )
+    const channel = deriveMercadoPagoChannel(factura, estado, now)
+    const dto: MercadoPagoFacturaPaymentDto = {
       estado,
+      channel,
       preferenceId: factura.mpPreferenceId ?? undefined,
-      paymentLink: estado === 'expired' ? undefined : factura.mpPaymentLink ?? undefined,
+      paymentLink:
+        channel === 'link' && estado !== 'expired' ? factura.mpPaymentLink ?? undefined : undefined,
       expiresAt: toIsoOrUndefined(factura.mpPreferenceExpiresAt),
       pagadoAt: toIsoOrUndefined(factura.mpPagadoAt),
       amount: decimalToMoneyString(pendiente),
       facturaRef: formatFacturaRef(factura),
+      qrExpiresAt: toIsoOrUndefined(factura.mpQrExpiresAt),
+      qrOrderId: factura.mpQrOrderId ?? undefined,
     }
+
+    if (channel === 'qr' && estado !== 'expired' && factura.mpQrData) {
+      dto.qrData = factura.mpQrData
+      try {
+        dto.qrImageBase64 = await mercadoPagoQrPayloadToBase64(factura.mpQrData)
+      } catch {
+        // QR payload present but image render failed — still return qrData.
+      }
+    }
+
+    return dto
   }
 
   async getStatus(
@@ -128,6 +143,9 @@ export class MercadoPagoPreferenceService {
         mpEstado: true,
         mpPagadoAt: true,
         mpPreferenceExpiresAt: true,
+        mpQrData: true,
+        mpQrOrderId: true,
+        mpQrExpiresAt: true,
       },
     })
     if (!factura) {
@@ -135,7 +153,7 @@ export class MercadoPagoPreferenceService {
     }
 
     const pendiente = await this.computePendiente(tenantId, factura.clienteId, factura)
-    return { ok: true, data: this.mapToDto(factura, pendiente) }
+    return { ok: true, data: await this.mapToDto(factura, pendiente) }
   }
 
   async createPreference(
@@ -159,12 +177,12 @@ export class MercadoPagoPreferenceService {
     }
 
     const now = new Date()
-    if (
-      factura.mpEstado === 'pending' &&
-      factura.mpPreferenceExpiresAt &&
-      factura.mpPreferenceExpiresAt.getTime() > now.getTime()
-    ) {
+    if (isActivePreference(factura, now)) {
       return { ok: false, status: 409, error: 'MP_PREFERENCE_ALREADY_ACTIVE' }
+    }
+
+    if (isActiveQr(factura, now)) {
+      return { ok: false, status: 409, error: 'MP_QR_ALREADY_ACTIVE' }
     }
 
     const pendiente = await this.computePendiente(tenantId, factura.clienteId, factura)
@@ -225,6 +243,9 @@ export class MercadoPagoPreferenceService {
           mpEstado: 'pending',
           mpPagadoAt: null,
           mpPreferenceExpiresAt: expiresAt,
+          mpQrData: null,
+          mpQrOrderId: null,
+          mpQrExpiresAt: null,
         },
         select: {
           tipo: true,
@@ -235,10 +256,13 @@ export class MercadoPagoPreferenceService {
           mpEstado: true,
           mpPagadoAt: true,
           mpPreferenceExpiresAt: true,
+          mpQrData: true,
+          mpQrOrderId: true,
+          mpQrExpiresAt: true,
         },
       })
 
-      return { ok: true, data: this.mapToDto(updated, pendiente, now) }
+      return { ok: true, data: await this.mapToDto(updated, pendiente, now) }
     } catch (err: unknown) {
       if (err instanceof MercadoPagoApiError) {
         return { ok: false, status: 422, error: err.message }

@@ -3,6 +3,7 @@ import { requirePermission, type AuthenticatedRequest } from '../auth'
 import { requireMercadoPagoIntegration } from '../middleware/requireMercadoPagoIntegration'
 import { mercadopagoPreferenceHttpRateLimiter } from '../middleware/routeRateLimit'
 import { MercadoPagoPreferenceService } from '../services/MercadoPagoPreferenceService'
+import { MercadoPagoQrService } from '../services/MercadoPagoQrService'
 import type { RestRouteContext } from './restRouteTypes'
 import { errorMessage, getTenantId } from './restDomainShared'
 
@@ -19,6 +20,7 @@ function parseFacturaIdParam(raw: string): number | null {
 export function registerMercadoPagoFacturaRoutes(app: Application, ctx: RestRouteContext): void {
   const { prisma, writeAudit } = ctx
   const mpPreference = new MercadoPagoPreferenceService(prisma)
+  const mpQr = new MercadoPagoQrService(prisma)
   const requireMp = requireMercadoPagoIntegration(prisma)
 
   app.get(
@@ -68,6 +70,38 @@ export function registerMercadoPagoFacturaRoutes(app: Application, ctx: RestRout
           'factura',
           String(facturaId),
           { preferenceId: result.data.preferenceId },
+        )
+        res.status(201).json({ success: true, data: result.data })
+      } catch (err: unknown) {
+        res.status(500).json({ success: false, error: errorMessage(err) })
+      }
+    },
+  )
+
+  app.post(
+    '/api/facturas/:id/mp/qr',
+    requirePermission('reports.financial.read'),
+    requireMp,
+    mercadopagoPreferenceHttpRateLimiter,
+    async (req: Request, res: Response) => {
+      try {
+        const facturaId = parseFacturaIdParam(String(req.params.id))
+        if (facturaId === null) {
+          res.status(400).json({ success: false, error: 'id must be a positive integer' })
+          return
+        }
+        const tenantId = getTenantId(req)
+        const result = await mpQr.createDynamicQr(tenantId, facturaId)
+        if (!result.ok) {
+          res.status(result.status).json({ success: false, error: result.error })
+          return
+        }
+        await writeAudit(
+          req as AuthenticatedRequest,
+          'mercadopago_qr_create',
+          'factura',
+          String(facturaId),
+          { qrOrderId: result.data.qrOrderId },
         )
         res.status(201).json({ success: true, data: result.data })
       } catch (err: unknown) {

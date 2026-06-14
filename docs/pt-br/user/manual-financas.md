@@ -76,6 +76,18 @@ O Mercado Pago envia notificações para `POST /api/webhooks/mercadopago` (públ
 4. Notificações duplicadas do mesmo `mpPaymentId` são ignoradas (idempotente).
 5. Managers recebem notificação in-app ao receber ou falhar um pagamento.
 
+## QR de cobrança presencial Mercado Pago (#177)
+
+Para cobrança no balcão (web) com Mercado Pago configurado (#174) e ativo:
+
+1. Abrir uma fatura ativa com saldo pendente.
+2. Escolher **Cobrar com QR** — gera um QR dinâmico instore (`POST /api/facturas/{id}/mp/qr`, TTL 10 minutos).
+3. Exibir o QR para o cliente escanear com o app Mercado Pago; a UI consulta `GET /api/facturas/{id}/mp` a cada 3 segundos até `approved`.
+4. A confirmação usa o mesmo webhook do #176 (`external_reference` = `{tenantId}:{facturaId}`).
+5. Opcional em **Configurações → Empresa**: **ID do POS** (`externalPosId`) e **payload QR estático** (`staticQrData`); staff com `settings.business.manage` pode ler o QR estático via `GET /api/configuracion/mercadopago/qr-estatico`.
+
+A extensão no App Repartidor fica para o issue #162 (cobranças na entrega).
+
 ## Referência API
 
 [`docs/api/openapi.yaml`](../../api/openapi.yaml) — rotas `/api/reportes/aging`, `/api/reportes/cuenta-corriente/{clienteId}` e `/api/clientes/{id}/cuenta-corriente/*`.

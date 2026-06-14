@@ -27537,13 +27537,13 @@ Sets `estado` to `N` (anulada), reverses the customer balance by the invoice tot
 - **Method:** `PARAMETERS`
 - **Path:** `/api/facturas/{id}/mp`
 
-### Mercado Pago payment status for invoice (#175)
+### Mercado Pago payment status for invoice (#175,
 
 - **Method:** `GET`
 - **Path:** `/api/facturas/{id}/mp`
 - **Tags:** facturas, mercadopago
 
-Requires `reports.financial.read` and tenant integration `mercadopago`. Returns derived estado including `expired` when preference TTL elapsed.
+Requires `reports.financial.read` and tenant integration `mercadopago`. Returns derived estado including `expired` when preference or QR TTL elapsed; includes active link or QR channel.
 
 #### Responses
 
@@ -27562,6 +27562,10 @@ Requires `reports.financial.read` and tenant integration `mercadopago`. Returns 
   - **`amount`**
 
     `string`
+
+  - **`channel`**
+
+    `string`, possible values: `"none", "link", "qr"`
 
   - **`expiresAt`**
 
@@ -27583,6 +27587,22 @@ Requires `reports.financial.read` and tenant integration `mercadopago`. Returns 
 
     `string`
 
+  - **`qrData`**
+
+    `string`
+
+  - **`qrExpiresAt`**
+
+    `string`, format: `date-time`
+
+  - **`qrImageBase64`**
+
+    `string`
+
+  - **`qrOrderId`**
+
+    `string`
+
 - **`success` (required)**
 
   `boolean`
@@ -27594,12 +27614,17 @@ Requires `reports.financial.read` and tenant integration `mercadopago`. Returns 
   "success": true,
   "data": {
     "estado": "none",
+    "channel": "none",
     "preferenceId": "",
     "paymentLink": "",
     "expiresAt": "",
     "pagadoAt": "",
     "amount": "",
-    "facturaRef": ""
+    "facturaRef": "",
+    "qrData": "",
+    "qrImageBase64": "",
+    "qrExpiresAt": "",
+    "qrOrderId": ""
   }
 }
 ```
@@ -27720,7 +27745,7 @@ Requires `reports.financial.read` and tenant integration `mercadopago`. Returns 
 - **Path:** `/api/facturas/{id}/mp/preference`
 - **Tags:** facturas, mercadopago
 
-Creates a Mercado Pago Checkout preference for the invoice outstanding balance (ARS), stores `mpPreferenceId` and `mpPaymentLink` on `Factura`. Requires `reports.financial.read` and tenant integration `mercadopago`. Returns 409 when an active non-expired preference already exists.
+Creates a Mercado Pago Checkout preference for the invoice outstanding balance (ARS), stores `mpPreferenceId` and `mpPaymentLink` on `Factura`. Requires `reports.financial.read` and tenant integration `mercadopago`. Returns 409 when an active non-expired preference or QR already exists.
 
 #### Responses
 
@@ -27739,6 +27764,10 @@ Creates a Mercado Pago Checkout preference for the invoice outstanding balance (
   - **`amount`**
 
     `string`
+
+  - **`channel`**
+
+    `string`, possible values: `"none", "link", "qr"`
 
   - **`expiresAt`**
 
@@ -27760,6 +27789,22 @@ Creates a Mercado Pago Checkout preference for the invoice outstanding balance (
 
     `string`
 
+  - **`qrData`**
+
+    `string`
+
+  - **`qrExpiresAt`**
+
+    `string`, format: `date-time`
+
+  - **`qrImageBase64`**
+
+    `string`
+
+  - **`qrOrderId`**
+
+    `string`
+
 - **`success` (required)**
 
   `boolean`
@@ -27771,12 +27816,17 @@ Creates a Mercado Pago Checkout preference for the invoice outstanding balance (
   "success": true,
   "data": {
     "estado": "none",
+    "channel": "none",
     "preferenceId": "",
     "paymentLink": "",
     "expiresAt": "",
     "pagadoAt": "",
     "amount": "",
-    "facturaRef": ""
+    "facturaRef": "",
+    "qrData": "",
+    "qrImageBase64": "",
+    "qrExpiresAt": "",
+    "qrOrderId": ""
   }
 }
 ```
@@ -27865,7 +27915,251 @@ Creates a Mercado Pago Checkout preference for the invoice outstanding balance (
 }
 ```
 
-##### Status: 409 Active preference already exists
+##### Status: 409 Active preference or QR already exists
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 422 Invoice not eligible (voided, paid, or MP API error)
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/facturas/{id}/mp/qr
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/facturas/{id}/mp/qr`
+
+### Create Mercado Pago instore dynamic QR for invoice (#177)
+
+- **Method:** `POST`
+- **Path:** `/api/facturas/{id}/mp/qr`
+- **Tags:** facturas, mercadopago
+
+Creates a Mercado Pago instore dynamic QR for the invoice outstanding balance (ARS), stores `mpQrData`, `mpQrOrderId` and `mpQrExpiresAt` on `Factura` (10 minute TTL). Requires `reports.financial.read` and tenant integration `mercadopago`. Returns 409 when an active non-expired preference or QR already exists. Payment confirmation uses the same webhook as #176 (`external_reference` = `{tenantId}:{facturaId}`).
+
+#### Responses
+
+##### Status: 201 Dynamic QR created
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"none", "pending", "approved", "rejected", "cancelled", "expired"`
+
+  - **`amount`**
+
+    `string`
+
+  - **`channel`**
+
+    `string`, possible values: `"none", "link", "qr"`
+
+  - **`expiresAt`**
+
+    `string`, format: `date-time`
+
+  - **`facturaRef`**
+
+    `string`
+
+  - **`pagadoAt`**
+
+    `string`, format: `date-time`
+
+  - **`paymentLink`**
+
+    `string`, format: `uri`
+
+  - **`preferenceId`**
+
+    `string`
+
+  - **`qrData`**
+
+    `string`
+
+  - **`qrExpiresAt`**
+
+    `string`, format: `date-time`
+
+  - **`qrImageBase64`**
+
+    `string`
+
+  - **`qrOrderId`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "estado": "none",
+    "channel": "none",
+    "preferenceId": "",
+    "paymentLink": "",
+    "expiresAt": "",
+    "pagadoAt": "",
+    "amount": "",
+    "facturaRef": "",
+    "qrData": "",
+    "qrImageBase64": "",
+    "qrExpiresAt": "",
+    "qrOrderId": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Invoice or Mercado Pago config not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 409 Active preference or QR already exists
 
 ###### Content-Type: application/json
 
@@ -38748,11 +39042,23 @@ Requires `settings.business.manage` and tenant integration `mercadopago`. Does n
 
     `boolean`
 
+  - **`collectorId`**
+
+    `string`
+
+  - **`externalPosId`**
+
+    `string`
+
   - **`publicKey`**
 
     `string`
 
   - **`sandboxMode`**
+
+    `boolean`
+
+  - **`staticQrConfigured`**
 
     `boolean`
 
@@ -38775,7 +39081,10 @@ Requires `settings.business.manage` and tenant integration `mercadopago`. Does n
     "sandboxMode": true,
     "activo": true,
     "accessTokenLast4": "",
-    "webhookSecretSet": true
+    "webhookSecretSet": true,
+    "collectorId": "",
+    "externalPosId": "",
+    "staticQrConfigured": true
   }
 }
 ```
@@ -38867,9 +39176,21 @@ Requires `settings.business.manage` and tenant integration `mercadopago`. Access
 
   `boolean`
 
+- **`collectorId`**
+
+  `string`
+
+- **`externalPosId`**
+
+  `string`
+
 - **`sandboxMode`**
 
   `boolean`
+
+- **`staticQrData`**
+
+  `string`
 
 - **`webhookSecret`**
 
@@ -38883,7 +39204,10 @@ Requires `settings.business.manage` and tenant integration `mercadopago`. Access
   "publicKey": "",
   "webhookSecret": "",
   "sandboxMode": true,
-  "activo": true
+  "activo": true,
+  "collectorId": "",
+  "externalPosId": "",
+  "staticQrData": ""
 }
 ```
 
@@ -39106,6 +39430,132 @@ Requires `settings.business.manage` and tenant integration `mercadopago`. Calls 
 ```
 
 ##### Status: 422 Invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Tenant static Mercado Pago QR (#177)
+
+- **Method:** `GET`
+- **Path:** `/api/configuracion/mercadopago/qr-estatico`
+- **Tags:** mercadopago
+
+Requires `settings.business.manage` and tenant integration `mercadopago`. Returns configured static QR payload and PNG base64 when `staticQrData` is set on `MercadoPagoConfig`.
+
+#### Responses
+
+##### Status: 200 Static QR data
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`qrData` (required)**
+
+    `string`
+
+  - **`qrImageBase64` (required)**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "qrData": "",
+    "qrImageBase64": ""
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Static QR not configured
 
 ###### Content-Type: application/json
 
@@ -66021,11 +66471,23 @@ Originating invoice header (selected columns)
 
   `boolean`
 
+* **`collectorId`**
+
+  `string`
+
+* **`externalPosId`**
+
+  `string`
+
 * **`publicKey`**
 
   `string`
 
 * **`sandboxMode`**
+
+  `boolean`
+
+* **`staticQrConfigured`**
 
   `boolean`
 
@@ -66042,7 +66504,10 @@ Originating invoice header (selected columns)
   "sandboxMode": true,
   "activo": true,
   "accessTokenLast4": "",
-  "webhookSecretSet": true
+  "webhookSecretSet": true,
+  "collectorId": "",
+  "externalPosId": "",
+  "staticQrConfigured": true
 }
 ```
 
@@ -66062,9 +66527,21 @@ Originating invoice header (selected columns)
 
   `boolean`
 
+* **`collectorId`**
+
+  `string`
+
+* **`externalPosId`**
+
+  `string`
+
 * **`sandboxMode`**
 
   `boolean`
+
+* **`staticQrData`**
+
+  `string`
 
 * **`webhookSecret`**
 
@@ -66078,7 +66555,10 @@ Originating invoice header (selected columns)
   "publicKey": "",
   "webhookSecret": "",
   "sandboxMode": true,
-  "activo": true
+  "activo": true,
+  "collectorId": "",
+  "externalPosId": "",
+  "staticQrData": ""
 }
 ```
 
@@ -66102,11 +66582,23 @@ Originating invoice header (selected columns)
 
     `boolean`
 
+  - **`collectorId`**
+
+    `string`
+
+  - **`externalPosId`**
+
+    `string`
+
   - **`publicKey`**
 
     `string`
 
   - **`sandboxMode`**
+
+    `boolean`
+
+  - **`staticQrConfigured`**
 
     `boolean`
 
@@ -66129,7 +66621,10 @@ Originating invoice header (selected columns)
     "sandboxMode": true,
     "activo": true,
     "accessTokenLast4": "",
-    "webhookSecretSet": true
+    "webhookSecretSet": true,
+    "collectorId": "",
+    "externalPosId": "",
+    "staticQrConfigured": true
   }
 }
 ```
@@ -66211,6 +66706,10 @@ Originating invoice header (selected columns)
 
   `string`
 
+* **`channel`**
+
+  `string`, possible values: `"none", "link", "qr"`
+
 * **`expiresAt`**
 
   `string`, format: `date-time`
@@ -66231,17 +66730,91 @@ Originating invoice header (selected columns)
 
   `string`
 
+* **`qrData`**
+
+  `string`
+
+* **`qrExpiresAt`**
+
+  `string`, format: `date-time`
+
+* **`qrImageBase64`**
+
+  `string`
+
+* **`qrOrderId`**
+
+  `string`
+
 **Example:**
 
 ```json
 {
   "estado": "none",
+  "channel": "none",
   "preferenceId": "",
   "paymentLink": "",
   "expiresAt": "",
   "pagadoAt": "",
   "amount": "",
-  "facturaRef": ""
+  "facturaRef": "",
+  "qrData": "",
+  "qrImageBase64": "",
+  "qrExpiresAt": "",
+  "qrOrderId": ""
+}
+```
+
+### MercadoPagoStaticQr
+
+- **Type:**`object`
+
+* **`qrData` (required)**
+
+  `string`
+
+* **`qrImageBase64` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "qrData": "",
+  "qrImageBase64": ""
+}
+```
+
+### MercadoPagoStaticQrEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`qrData` (required)**
+
+    `string`
+
+  - **`qrImageBase64` (required)**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "qrData": "",
+    "qrImageBase64": ""
+  }
 }
 ```
 
@@ -66260,6 +66833,10 @@ Originating invoice header (selected columns)
   - **`amount`**
 
     `string`
+
+  - **`channel`**
+
+    `string`, possible values: `"none", "link", "qr"`
 
   - **`expiresAt`**
 
@@ -66281,6 +66858,22 @@ Originating invoice header (selected columns)
 
     `string`
 
+  - **`qrData`**
+
+    `string`
+
+  - **`qrExpiresAt`**
+
+    `string`, format: `date-time`
+
+  - **`qrImageBase64`**
+
+    `string`
+
+  - **`qrOrderId`**
+
+    `string`
+
 * **`success` (required)**
 
   `boolean`
@@ -66292,12 +66885,17 @@ Originating invoice header (selected columns)
   "success": true,
   "data": {
     "estado": "none",
+    "channel": "none",
     "preferenceId": "",
     "paymentLink": "",
     "expiresAt": "",
     "pagadoAt": "",
     "amount": "",
-    "facturaRef": ""
+    "facturaRef": "",
+    "qrData": "",
+    "qrImageBase64": "",
+    "qrExpiresAt": "",
+    "qrOrderId": ""
   }
 }
 ```

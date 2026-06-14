@@ -9,6 +9,7 @@ import IfIntegration from '@/components/IfIntegration'
 import { Factura, Cliente } from '@/types'
 import FacturaPdfPreviewDialog from './FacturaPdfPreviewDialog'
 import MercadoPagoPaymentLinkModal from './MercadoPagoPaymentLinkModal'
+import MercadoPagoQrModal from './MercadoPagoQrModal'
 
 interface ListadoFacturasProps {
   facturas: Factura[]
@@ -122,6 +123,7 @@ export default function ListadoFacturas({
   const [remitoLoadingId, setRemitoLoadingId] = useState<number | null>(null)
   const [remitoFeedback, setRemitoFeedback] = useState<string | null>(null)
   const [mpModalFacturaId, setMpModalFacturaId] = useState<number | null>(null)
+  const [mpQrModalFacturaId, setMpQrModalFacturaId] = useState<number | null>(null)
 
   useEffect(() => {
     setSelectedRow(0)
@@ -737,6 +739,16 @@ export default function ListadoFacturas({
                             {t('mercadopago.collectButton')}
                           </button>
                         )}
+                        {factura.estado === 'A' && deriveMpEstadoFromFactura(factura) !== 'approved' && (
+                          <button
+                            type="button"
+                            data-testid="btn-factura-mp-qr"
+                            onClick={() => setMpQrModalFacturaId(factura.id)}
+                            className="mb-3 w-full rounded border border-sky-600 px-4 py-2 text-sm font-semibold text-sky-700 transition hover:bg-sky-50 dark:text-sky-300 dark:hover:bg-sky-950"
+                          >
+                            {t('mercadopago.qr.collectButton')}
+                          </button>
+                        )}
                       </CanAccess>
                     </IfIntegration>
 
@@ -763,6 +775,20 @@ export default function ListadoFacturas({
             factura={mpFactura}
             cliente={clientes.find((c) => c.id === mpFactura.clienteId)}
             onClose={() => setMpModalFacturaId(null)}
+            onStatusChange={() => {
+              onFacturaUpdated?.()
+            }}
+          />
+        )
+      })()}
+
+      {mpQrModalFacturaId != null && (() => {
+        const mpFactura = facturas.find((f) => f.id === mpQrModalFacturaId)
+        if (!mpFactura) return null
+        return (
+          <MercadoPagoQrModal
+            factura={mpFactura}
+            onClose={() => setMpQrModalFacturaId(null)}
             onStatusChange={() => {
               onFacturaUpdated?.()
             }}

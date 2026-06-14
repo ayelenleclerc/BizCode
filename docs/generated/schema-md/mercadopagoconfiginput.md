@@ -20,8 +20,11 @@ undefined
 | :------------------------------ | :-------- | :------- | :------------- | :----------------------------------------------------------------------------------------------------------------- |
 | [accessToken](#accesstoken)     | `string`  | Optional | cannot be null | [MercadoPagoConfigInput](mercadopagoconfiginput-properties-accesstoken.md "undefined#/properties/accessToken")     |
 | [activo](#activo)               | `boolean` | Optional | cannot be null | [MercadoPagoConfigInput](mercadopagoconfiginput-properties-activo.md "undefined#/properties/activo")               |
+| [collectorId](#collectorid)     | `string`  | Optional | cannot be null | [MercadoPagoConfigInput](mercadopagoconfiginput-properties-collectorid.md "undefined#/properties/collectorId")     |
+| [externalPosId](#externalposid) | `string`  | Optional | cannot be null | [MercadoPagoConfigInput](mercadopagoconfiginput-properties-externalposid.md "undefined#/properties/externalPosId") |
 | [publicKey](#publickey)         | `string`  | Required | cannot be null | [MercadoPagoConfigInput](mercadopagoconfiginput-properties-publickey.md "undefined#/properties/publicKey")         |
 | [sandboxMode](#sandboxmode)     | `boolean` | Optional | cannot be null | [MercadoPagoConfigInput](mercadopagoconfiginput-properties-sandboxmode.md "undefined#/properties/sandboxMode")     |
+| [staticQrData](#staticqrdata)   | `string`  | Optional | cannot be null | [MercadoPagoConfigInput](mercadopagoconfiginput-properties-staticqrdata.md "undefined#/properties/staticQrData")   |
 | [webhookSecret](#webhooksecret) | `string`  | Optional | cannot be null | [MercadoPagoConfigInput](mercadopagoconfiginput-properties-webhooksecret.md "undefined#/properties/webhookSecret") |
 
 ## accessToken
@@ -60,6 +63,42 @@ undefined
 
 `boolean`
 
+## collectorId
+
+
+
+`collectorId`
+
+* is optional
+
+* Type: `string`
+
+* cannot be null
+
+* defined in: [MercadoPagoConfigInput](mercadopagoconfiginput-properties-collectorid.md "undefined#/properties/collectorId")
+
+### collectorId Type
+
+`string`
+
+## externalPosId
+
+
+
+`externalPosId`
+
+* is optional
+
+* Type: `string`
+
+* cannot be null
+
+* defined in: [MercadoPagoConfigInput](mercadopagoconfiginput-properties-externalposid.md "undefined#/properties/externalPosId")
+
+### externalPosId Type
+
+`string`
+
 ## publicKey
 
 
@@ -95,6 +134,24 @@ undefined
 ### sandboxMode Type
 
 `boolean`
+
+## staticQrData
+
+
+
+`staticQrData`
+
+* is optional
+
+* Type: `string`
+
+* cannot be null
+
+* defined in: [MercadoPagoConfigInput](mercadopagoconfiginput-properties-staticqrdata.md "undefined#/properties/staticQrData")
+
+### staticQrData Type
+
+`string`
 
 ## webhookSecret
 

@@ -24,6 +24,9 @@ export default function MercadoPagoConfigSection() {
   const [webhookSecret, setWebhookSecret] = useState('')
   const [sandboxMode, setSandboxMode] = useState(true)
   const [activo, setActivo] = useState(true)
+  const [externalPosId, setExternalPosId] = useState('')
+  const [staticQrData, setStaticQrData] = useState('')
+  const [staticQrConfigured, setStaticQrConfigured] = useState(false)
   const [saveError, setSaveError] = useState<string | null>(null)
   const [saveSuccess, setSaveSuccess] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -41,6 +44,8 @@ export default function MercadoPagoConfigSection() {
       if (status.publicKey) setPublicKey(status.publicKey)
       if (status.sandboxMode !== undefined) setSandboxMode(status.sandboxMode)
       if (status.activo !== undefined) setActivo(status.activo)
+      if (status.externalPosId) setExternalPosId(status.externalPosId)
+      setStaticQrConfigured(Boolean(status.staticQrConfigured))
     } catch {
       setSaveError(t('mercadopago.errors.loadFailed'))
     } finally {
@@ -75,6 +80,8 @@ export default function MercadoPagoConfigSection() {
       }
       if (accessToken.trim()) body.accessToken = accessToken.trim()
       if (webhookSecret.trim()) body.webhookSecret = webhookSecret.trim()
+      if (externalPosId.trim()) body.externalPosId = externalPosId.trim()
+      if (staticQrData.trim()) body.staticQrData = staticQrData.trim()
       await mercadopagoAPI.putConfig(body)
       setAccessToken('')
       setWebhookSecret('')
@@ -146,6 +153,12 @@ export default function MercadoPagoConfigSection() {
               </p>
             )}
 
+            {configured && staticQrConfigured && (
+              <p className="text-sm text-slate-600 dark:text-slate-400" role="status">
+                {t('mercadopago.staticQrConfigured')}
+              </p>
+            )}
+
             {!canEdit && (
               <p className="text-sm text-amber-800 dark:text-amber-200 bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800 rounded px-3 py-2">
                 {t('mercadopago.readOnlyHint')}
@@ -202,6 +215,36 @@ export default function MercadoPagoConfigSection() {
                   disabled={!canEdit}
                   className={inputClass}
                   placeholder={configured ? t('mercadopago.webhookSecretPlaceholderUpdate') : t('mercadopago.webhookSecretPlaceholder')}
+                />
+              </div>
+
+              <div>
+                <label htmlFor="mp-external-pos-id" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                  {t('mercadopago.externalPosId')}
+                </label>
+                <input
+                  id="mp-external-pos-id"
+                  data-testid="input-mp-external-pos-id"
+                  value={externalPosId}
+                  onChange={(e) => setExternalPosId(e.target.value)}
+                  disabled={!canEdit}
+                  className={inputClass}
+                  placeholder={t('mercadopago.externalPosIdPlaceholder')}
+                />
+              </div>
+              <div>
+                <label htmlFor="mp-static-qr-data" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                  {t('mercadopago.staticQrData')}
+                </label>
+                <textarea
+                  id="mp-static-qr-data"
+                  data-testid="input-mp-static-qr-data"
+                  value={staticQrData}
+                  onChange={(e) => setStaticQrData(e.target.value)}
+                  disabled={!canEdit}
+                  rows={3}
+                  className={inputClass}
+                  placeholder={t('mercadopago.staticQrDataPlaceholder')}
                 />
               </div>
 

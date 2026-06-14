@@ -10,6 +10,8 @@ Versionado: [Semantic Versioning](https://semver.org/lang/es/).
 
 ### Agregado
 
+- **QR de cobro presencial Mercado Pago (#177):** campos Prisma en `Factura` (`mpQrData`, `mpQrOrderId`, `mpQrExpiresAt`); en `MercadoPagoConfig` (`collectorId`, `externalPosId`, `staticQrData`); API `POST /api/facturas/{id}/mp/qr`, `GET /api/configuracion/mercadopago/qr-estatico`; QR dinámico instore (TTL 10 min) reutiliza webhook #176; UI staff `MercadoPagoQrModal` con polling; configuración POS/QR estático; OpenAPI, pruebas contrato/API/unit/UI, manual de finanzas trilingüe.
+
 - **Webhook de pago Mercado Pago (#176):** `POST /api/webhooks/mercadopago` público con validación `x-signature`; Prisma `MercadoPagoProcessedPayment` (idempotencia); consulta pago en API MP; si `approved` crea `ReciboCobro` con forma `mercadopago` e imputación a factura, actualiza `Factura.mpEstado`/`mpPagadoAt`; notificaciones in-app a managers; rate limit; OpenAPI, pruebas contrato/API/unit, manual de finanzas trilingüe.
 
 - **Link de pago Mercado Pago por factura (#175):** campos Prisma en `Factura` (`mpPreferenceId`, `mpPaymentLink`, `mpEstado`, `mpPagadoAt`, `mpPreferenceExpiresAt`); API `GET /api/facturas/{id}/mp`, `POST .../mp/preference` (integración `mercadopago`, `reports.financial.read`); preference Checkout MP (TTL 72 h, saldo pendiente en ARS); UI staff en detalle de factura (`MercadoPagoPaymentLinkModal`, copiar/WhatsApp/email); botón portal abre link activo; `API_PUBLIC_URL` para webhook (#176); OpenAPI, pruebas contrato/API/unit/UI, i18n trilingüe y manual de finanzas.

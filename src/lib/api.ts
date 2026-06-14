@@ -2256,6 +2256,17 @@ export const facturasAPI = {
       return handleError(error as AxiosError<ApiErrorPayload>)
     }
   },
+
+  createMpQr: async (id: number): Promise<MercadoPagoFacturaPaymentDto> => {
+    try {
+      const response = await api.post<{ success: boolean; data: MercadoPagoFacturaPaymentDto }>(
+        `/facturas/${id}/mp/qr`,
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
 }
 
 export const notasCreditoAPI = {
@@ -2861,6 +2872,9 @@ export type MercadoPagoConfigStatus = {
   activo?: boolean
   accessTokenLast4?: string
   webhookSecretSet?: boolean
+  collectorId?: string
+  externalPosId?: string
+  staticQrConfigured?: boolean
 }
 
 export type MercadoPagoFacturaEstado =
@@ -2871,14 +2885,21 @@ export type MercadoPagoFacturaEstado =
   | 'cancelled'
   | 'expired'
 
+export type MercadoPagoPaymentChannel = 'none' | 'link' | 'qr'
+
 export type MercadoPagoFacturaPaymentDto = {
   estado: MercadoPagoFacturaEstado
+  channel?: MercadoPagoPaymentChannel
   preferenceId?: string
   paymentLink?: string
   expiresAt?: string
   pagadoAt?: string
   amount?: string
   facturaRef?: string
+  qrData?: string
+  qrImageBase64?: string
+  qrExpiresAt?: string
+  qrOrderId?: string
 }
 
 export type MercadoPagoConfigInput = {
@@ -2887,6 +2908,9 @@ export type MercadoPagoConfigInput = {
   webhookSecret?: string
   sandboxMode?: boolean
   activo?: boolean
+  collectorId?: string
+  externalPosId?: string
+  staticQrData?: string
 }
 
 export const mercadopagoAPI = {

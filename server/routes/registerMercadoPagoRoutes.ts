@@ -5,6 +5,7 @@ import { mercadopagoTestHttpRateLimiter } from '../middleware/routeRateLimit'
 import { validateBody } from '../middleware/validateBody'
 import { mercadoPagoConfigUpsertBodySchema } from '../schemas/mercadopago'
 import { MercadoPagoConfigService } from '../services/MercadoPagoConfigService'
+import { MercadoPagoQrService } from '../services/MercadoPagoQrService'
 import type { RestRouteContext } from './restRouteTypes'
 import { errorMessage, getTenantId } from './restDomainShared'
 
@@ -16,6 +17,7 @@ import { errorMessage, getTenantId } from './restDomainShared'
 export function registerMercadoPagoRoutes(app: Application, ctx: RestRouteContext): void {
   const { prisma, writeAudit } = ctx
   const mpConfig = new MercadoPagoConfigService(prisma)
+  const mpQr = new MercadoPagoQrService(prisma)
   const requireMp = requireMercadoPagoIntegration(prisma)
 
   app.get(
@@ -45,6 +47,9 @@ export function registerMercadoPagoRoutes(app: Application, ctx: RestRouteContex
           webhookSecret?: string
           sandboxMode?: boolean
           activo?: boolean
+          collectorId?: string
+          externalPosId?: string
+          staticQrData?: string
         }
         const result = await mpConfig.upsert(getTenantId(req), body)
         if (!result.ok) {
@@ -77,6 +82,24 @@ export function registerMercadoPagoRoutes(app: Application, ctx: RestRouteContex
     async (req: Request, res: Response) => {
       try {
         const result = await mpConfig.testCredentials(getTenantId(req))
+        if (!result.ok) {
+          res.status(result.status).json({ success: false, error: result.error })
+          return
+        }
+        res.json({ success: true, data: result.data })
+      } catch (err: unknown) {
+        res.status(500).json({ success: false, error: errorMessage(err) })
+      }
+    },
+  )
+
+  app.get(
+    '/api/configuracion/mercadopago/qr-estatico',
+    requirePermission('settings.business.manage'),
+    requireMp,
+    async (req: Request, res: Response) => {
+      try {
+        const result = await mpQr.getStaticQr(getTenantId(req))
         if (!result.ok) {
           res.status(result.status).json({ success: false, error: result.error })
           return

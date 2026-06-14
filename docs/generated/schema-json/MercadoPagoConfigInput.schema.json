@@ -7,11 +7,20 @@
     "activo": {
       "type": "boolean"
     },
+    "collectorId": {
+      "type": "string"
+    },
+    "externalPosId": {
+      "type": "string"
+    },
     "publicKey": {
       "type": "string"
     },
     "sandboxMode": {
       "type": "boolean"
+    },
+    "staticQrData": {
+      "type": "string"
     },
     "webhookSecret": {
       "type": "string"

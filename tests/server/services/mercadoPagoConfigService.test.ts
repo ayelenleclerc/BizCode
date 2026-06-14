@@ -61,6 +61,9 @@ describe('MercadoPagoConfigService', () => {
       activo: true,
       accessTokenLast4: '1234',
       webhookSecretSet: true,
+      collectorId: undefined,
+      externalPosId: undefined,
+      staticQrConfigured: false,
     })
     expect(status).not.toHaveProperty('accessTokenEncrypted')
   })

@@ -186,6 +186,23 @@
     "errors": {
       "loadFailed": "Não foi possível carregar o status do Mercado Pago",
       "createFailed": "Não foi possível criar o link de pagamento"
+    },
+    "qr": {
+      "collectButton": "Cobrar com QR",
+      "modalTitle": "Pagamento com QR Mercado Pago",
+      "modalSubtitle": "Fatura {{ref}}",
+      "loading": "Carregando status do QR…",
+      "creating": "Gerando QR…",
+      "createQr": "Gerar QR de pagamento",
+      "imageAlt": "Código QR de pagamento Mercado Pago",
+      "amountLabel": "Valor: R${{amount}}",
+      "expiresAt": "Válido até {{date}}",
+      "scanHint": "Peça ao cliente para escanear com o app Mercado Pago",
+      "paidSuccess": "Pagamento confirmado",
+      "errors": {
+        "loadFailed": "Não foi possível carregar o status do QR",
+        "createFailed": "Não foi possível gerar o QR de pagamento"
+      }
     }
   }
 }

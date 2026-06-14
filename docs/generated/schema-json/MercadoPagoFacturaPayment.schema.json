@@ -4,6 +4,14 @@
     "amount": {
       "type": "string"
     },
+    "channel": {
+      "enum": [
+        "none",
+        "link",
+        "qr"
+      ],
+      "type": "string"
+    },
     "estado": {
       "$ref": "./MercadoPagoFacturaEstado.schema.json"
     },
@@ -23,6 +31,19 @@
       "type": "string"
     },
     "preferenceId": {
+      "type": "string"
+    },
+    "qrData": {
+      "type": "string"
+    },
+    "qrExpiresAt": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "qrImageBase64": {
+      "type": "string"
+    },
+    "qrOrderId": {
       "type": "string"
     }
   },
