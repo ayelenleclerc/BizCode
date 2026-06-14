@@ -44,7 +44,7 @@ export function registerMercadoPagoRefundRoutes(app: Application, ctx: RestRoute
           res.status(400).json({ success: false, error: 'id must be a positive integer' })
           return
         }
-        const data = await refundService.getByFactura(getTenantId(req), facturaId)
+        const data = await refundService.getStatusByFactura(getTenantId(req), facturaId)
         res.json({ success: true, data })
       } catch (err: unknown) {
         res.status(500).json({ success: false, error: errorMessage(err) })

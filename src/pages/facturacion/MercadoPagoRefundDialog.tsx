@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useId, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { facturasAPI, type MercadoPagoRefundDto } from '@/lib/api'
+import { facturasAPI, type MercadoPagoRefundDto, type MercadoPagoRefundStatusDto } from '@/lib/api'
 import type { Factura } from '@/types'
 
 type Props = {
@@ -15,20 +15,29 @@ function formatFacturaRef(factura: Factura): string {
   return `${factura.tipo}-${prefijo}-${numero}`
 }
 
+function hasRefundInProgress(status: MercadoPagoRefundStatusDto): boolean {
+  return status.refunds.some((r) => r.estado === 'iniciado' || r.estado === 'procesando')
+}
+
+function isFullyRefunded(status: MercadoPagoRefundStatusDto): boolean {
+  return Number.parseFloat(status.refundableBalance) <= 0 && status.refunds.some((r) => r.estado === 'completado')
+}
+
 /**
- * @en Dialog to request a total Mercado Pago refund (#179).
- * @es Diálogo para solicitar reembolso total Mercado Pago (#179).
- * @pt-BR Diálogo para solicitar reembolso total Mercado Pago (#179).
+ * @en Dialog to request Mercado Pago refunds — total (#179) and partial (#344).
+ * @es Diálogo para solicitar reembolsos Mercado Pago — total (#179) y parcial (#344).
+ * @pt-BR Diálogo para solicitar reembolsos Mercado Pago — total (#179) e parcial (#344).
  */
 export default function MercadoPagoRefundDialog({ factura, onClose, onRefunded }: Props) {
   const { t } = useTranslation('facturacion')
   const titleId = useId()
   const feedbackId = useId()
   const closeButtonRef = useRef<HTMLButtonElement>(null)
-  const [refund, setRefund] = useState<MercadoPagoRefundDto | null>(null)
+  const [status, setStatus] = useState<MercadoPagoRefundStatusDto | null>(null)
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
   const [motivo, setMotivo] = useState('')
+  const [monto, setMonto] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [feedback, setFeedback] = useState<string | null>(null)
 
@@ -37,7 +46,8 @@ export default function MercadoPagoRefundDialog({ factura, onClose, onRefunded }
     setError(null)
     try {
       const data = await facturasAPI.getMpRefund(factura.id)
-      setRefund(data)
+      setStatus(data)
+      setMonto(data.refundableBalance !== '0.00' ? data.refundableBalance : '')
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : t('mercadopago.refund.errors.loadFailed'))
     } finally {
@@ -50,19 +60,33 @@ export default function MercadoPagoRefundDialog({ factura, onClose, onRefunded }
     closeButtonRef.current?.focus()
   }, [loadRefund])
 
+  const refundableBalance = status ? Number.parseFloat(status.refundableBalance) : 0
+  const parsedMonto = Number.parseFloat(monto)
+  const montoValid =
+    Number.isFinite(parsedMonto) && parsedMonto > 0 && parsedMonto <= refundableBalance
+
   const handleSubmit = async () => {
     setSubmitting(true)
     setError(null)
     setFeedback(null)
     try {
-      const data = await facturasAPI.refundMp(factura.id, { motivo: motivo.trim() })
-      setRefund(data)
-      setFeedback(t('mercadopago.refund.success'))
+      const body: { motivo: string; monto?: number } = { motivo: motivo.trim() }
+      if (montoValid && parsedMonto < refundableBalance) {
+        body.monto = parsedMonto
+      } else if (montoValid && parsedMonto === refundableBalance) {
+        body.monto = parsedMonto
+      }
+      const data = await facturasAPI.refundMp(factura.id, body)
+      await loadRefund()
+      const isPartial = parsedMonto < refundableBalance
+      setFeedback(
+        isPartial ? t('mercadopago.refund.successPartial', { monto: data.monto }) : t('mercadopago.refund.success'),
+      )
       onRefunded?.()
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : t('mercadopago.refund.errors.submitFailed')
-      if (message === 'partial_refund_not_supported') {
-        setError(t('mercadopago.refund.errors.partialNotSupported'))
+      if (message === 'exceeds_refundable_balance') {
+        setError(t('mercadopago.refund.errors.exceedsBalance'))
       } else {
         setError(message)
       }
@@ -71,7 +95,13 @@ export default function MercadoPagoRefundDialog({ factura, onClose, onRefunded }
     }
   }
 
-  const canSubmit = motivo.trim().length >= 10 && !submitting && refund?.estado !== 'completado'
+  const canSubmit =
+    motivo.trim().length >= 10 &&
+    montoValid &&
+    !submitting &&
+    status != null &&
+    !hasRefundInProgress(status) &&
+    !isFullyRefunded(status)
 
   return (
     <div
@@ -103,7 +133,7 @@ export default function MercadoPagoRefundDialog({ factura, onClose, onRefunded }
           </p>
         ) : (
           <>
-            {refund && (
+            {status && (
               <div
                 className="mt-4 rounded border border-slate-200 p-3 text-sm dark:border-slate-600"
                 data-testid="mp-refund-timeline"
@@ -111,35 +141,66 @@ export default function MercadoPagoRefundDialog({ factura, onClose, onRefunded }
                 <p className="font-medium text-slate-800 dark:text-slate-200">
                   {t('mercadopago.refund.timelineTitle')}
                 </p>
-                <ul className="mt-2 space-y-1 text-slate-600 dark:text-slate-300">
-                  <li>
-                    {t('mercadopago.refund.timelineEstado')}:{' '}
-                    <span data-testid="mp-refund-estado">{t(`mercadopago.refund.estado.${refund.estado}`)}</span>
-                  </li>
-                  <li>
-                    {t('mercadopago.refund.timelineMonto')}: {refund.monto}
-                  </li>
-                  {refund.errorMessage && (
-                    <li className="text-red-600 dark:text-red-400">{refund.errorMessage}</li>
-                  )}
-                </ul>
+                <p className="mt-1 text-slate-600 dark:text-slate-300" data-testid="mp-refund-balance">
+                  {t('mercadopago.refund.refundableBalance', { amount: status.refundableBalance })}
+                </p>
+                {status.refunds.length > 0 ? (
+                  <ul className="mt-2 space-y-2 text-slate-600 dark:text-slate-300">
+                    {status.refunds.map((refund: MercadoPagoRefundDto) => (
+                      <li key={refund.id} data-testid={`mp-refund-entry-${refund.id}`}>
+                        <span data-testid="mp-refund-estado">
+                          {t(`mercadopago.refund.estado.${refund.estado}`)}
+                        </span>
+                        {' — '}
+                        {refund.monto}
+                        {refund.errorMessage && (
+                          <span className="block text-red-600 dark:text-red-400">{refund.errorMessage}</span>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="mt-2 text-slate-500">{t('mercadopago.refund.noRefundsYet')}</p>
+                )}
               </div>
             )}
 
-            {refund?.estado !== 'completado' && (
-              <div className="mt-4">
-                <label htmlFor="mp-refund-motivo" className="block text-sm font-medium text-slate-700 dark:text-slate-300">
-                  {t('mercadopago.refund.motivoLabel')} <span aria-hidden="true">*</span>
-                </label>
-                <input
-                  id="mp-refund-motivo"
-                  type="text"
-                  value={motivo}
-                  onChange={(e) => setMotivo(e.target.value)}
-                  placeholder={t('mercadopago.refund.motivoPlaceholder')}
-                  className="mt-1 w-full rounded border border-slate-300 px-3 py-2 text-sm dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100"
-                  data-testid="mp-refund-motivo-input"
-                />
+            {status && !hasRefundInProgress(status) && !isFullyRefunded(status) && (
+              <div className="mt-4 space-y-3">
+                <div>
+                  <label
+                    htmlFor="mp-refund-monto"
+                    className="block text-sm font-medium text-slate-700 dark:text-slate-300"
+                  >
+                    {t('mercadopago.refund.montoLabel')}
+                  </label>
+                  <input
+                    id="mp-refund-monto"
+                    type="number"
+                    min={0.01}
+                    step={0.01}
+                    max={refundableBalance}
+                    value={monto}
+                    onChange={(e) => setMonto(e.target.value)}
+                    className="mt-1 w-full rounded border border-slate-300 px-3 py-2 text-sm dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100"
+                    data-testid="mp-refund-monto-input"
+                  />
+                  <p className="mt-1 text-xs text-slate-500">{t('mercadopago.refund.montoHint')}</p>
+                </div>
+                <div>
+                  <label htmlFor="mp-refund-motivo" className="block text-sm font-medium text-slate-700 dark:text-slate-300">
+                    {t('mercadopago.refund.motivoLabel')} <span aria-hidden="true">*</span>
+                  </label>
+                  <input
+                    id="mp-refund-motivo"
+                    type="text"
+                    value={motivo}
+                    onChange={(e) => setMotivo(e.target.value)}
+                    placeholder={t('mercadopago.refund.motivoPlaceholder')}
+                    className="mt-1 w-full rounded border border-slate-300 px-3 py-2 text-sm dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100"
+                    data-testid="mp-refund-motivo-input"
+                  />
+                </div>
               </div>
             )}
 
@@ -164,7 +225,7 @@ export default function MercadoPagoRefundDialog({ factura, onClose, onRefunded }
         )}
 
         <div className="mt-6 flex justify-end gap-2">
-          {refund?.estado !== 'completado' && (
+          {status && !hasRefundInProgress(status) && !isFullyRefunded(status) && (
             <button
               type="button"
               onClick={() => void handleSubmit()}

@@ -35,6 +35,11 @@ export type FacturaVoidResult = {
   notaCredito: NotaCredito
   updatedCliente: Pick<Cliente, 'id' | 'rsocial' | 'balance' | 'creditLimit'>
 }
+
+export type FacturaPartialCreditNoteResult = {
+  notaCredito: NotaCredito
+  updatedCliente: Pick<Cliente, 'id' | 'rsocial' | 'balance' | 'creditLimit'>
+}
 /**
  * @en Invoice domain operations (list, create, void).
  * @es Operaciones de dominio de facturas (listado, alta, anulaciÃ³n).
@@ -215,6 +220,16 @@ export class FacturaService {
 
     const notaCreditoEstadoCae = factura.estadoCae === 'issued' ? 'pending' : 'not_required'
 
+    const existingNcSum = await this.prisma.notaCredito.aggregate({
+      where: { tenantId, facturaOrigenId: id },
+      _sum: { monto: true },
+    })
+    const creditedSoFar = existingNcSum._sum.monto ?? new Decimal(0)
+    const ncMonto = factura.total.sub(creditedSoFar)
+    if (ncMonto.lessThanOrEqualTo(0)) {
+      return { ok: false, status: 422, error: 'Invoice already fully credited' }
+    }
+
     const result = await this.prisma.$transaction(async (tx) => {
       const voided = await tx.factura.update({
         where: { id },
@@ -230,7 +245,7 @@ export class FacturaService {
           tenantId,
           facturaOrigenId: id,
           motivo,
-          monto: factura.total,
+          monto: ncMonto,
           estadoCae: notaCreditoEstadoCae,
           createdById: audit.userId,
         },
@@ -264,6 +279,110 @@ export class FacturaService {
       })
 
       return { factura: voided, notaCredito, updatedCliente }
+    })
+
+    if (factura.estadoCae === 'issued') {
+      void this.arca.requestCaeForNotaCredito(tenantId, result.notaCredito.id).catch(() => {
+        /* homologación mock; retry job may be added later */
+      })
+    }
+
+    return { ok: true, data: result }
+  }
+
+  /**
+   * @en Issues a partial credit note for an active invoice without voiding it (#344).
+   * @es Emite nota de crédito parcial sobre factura vigente sin anularla (#344).
+   * @pt-BR Emite nota de crédito parcial sobre fatura ativa sem anulá-la (#344).
+   */
+  async createPartialCreditNote(
+    tenantId: number,
+    id: number,
+    monto: Decimal,
+    motivo: string,
+    audit: FacturaVoidAuditContext,
+  ): Promise<ServiceResult<FacturaPartialCreditNoteResult>> {
+    const factura = await this.prisma.factura.findFirst({
+      where: { id, tenantId },
+      select: {
+        id: true,
+        estado: true,
+        total: true,
+        clienteId: true,
+        estadoCae: true,
+        tipo: true,
+        prefijo: true,
+        numero: true,
+      },
+    })
+
+    if (!factura) {
+      return { ok: false, status: 404, error: 'Factura not found' }
+    }
+
+    if (factura.estado !== 'A') {
+      return { ok: false, status: 409, error: 'Factura is not active' }
+    }
+
+    const montoDec = monto instanceof Decimal ? monto : new Decimal(monto)
+    if (montoDec.lessThanOrEqualTo(0)) {
+      return { ok: false, status: 422, error: 'Credit note amount must be positive' }
+    }
+    if (montoDec.greaterThan(factura.total)) {
+      return { ok: false, status: 422, error: 'Credit note amount exceeds invoice total' }
+    }
+
+    const existingNcSum = await this.prisma.notaCredito.aggregate({
+      where: { tenantId, facturaOrigenId: id },
+      _sum: { monto: true },
+    })
+    const creditedSoFar = existingNcSum._sum.monto ?? new Decimal(0)
+    if (creditedSoFar.add(montoDec).greaterThan(factura.total)) {
+      return { ok: false, status: 422, error: 'Total credit notes would exceed invoice total' }
+    }
+
+    const notaCreditoEstadoCae = factura.estadoCae === 'issued' ? 'pending' : 'not_required'
+
+    const result = await this.prisma.$transaction(async (tx) => {
+      const notaCredito = await tx.notaCredito.create({
+        data: {
+          tenantId,
+          facturaOrigenId: id,
+          motivo,
+          monto: montoDec,
+          estadoCae: notaCreditoEstadoCae,
+          createdById: audit.userId,
+        },
+      })
+
+      const facturaRef = `${factura.tipo}-${factura.prefijo}-${factura.numero}`
+      const ccService = new ClienteCuentaCorrienteService(tx)
+      await ccService.recordFromNotaCredito(
+        tenantId,
+        notaCredito,
+        factura.clienteId,
+        facturaRef,
+        audit.userId!,
+      )
+
+      const updatedCliente = await tx.cliente.findFirstOrThrow({
+        where: { id: factura.clienteId },
+        select: { id: true, rsocial: true, balance: true, creditLimit: true },
+      })
+
+      await tx.auditEvent.create({
+        data: {
+          tenantId,
+          userId: audit.userId,
+          action: 'factura_partial_credit_note',
+          resource: 'factura',
+          resourceId: String(id),
+          ipAddress: audit.ipAddress,
+          metadata: { motivo, notaCreditoId: notaCredito.id, monto: montoDec.toFixed(2) },
+        },
+      })
+
+      return { notaCredito, updatedCliente }
     })
 
     if (factura.estadoCae === 'issued') {

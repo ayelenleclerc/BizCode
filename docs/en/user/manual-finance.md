@@ -97,12 +97,12 @@ Some Mercado Pago payments arrive without a linked preference or QR order (direc
 3. **Manual queue:** **Finance → Mercado Pago reconciliation** (`/finanzas/reconciliacion-mp`, integration `mercadopago`, `reports.financial.read`): list pending payments; load open invoices by customer ID; **Reconcile** (`POST /api/mercadopago/reconciliar`) or **Ignore** (`POST /api/mercadopago/ignorar`).
 4. **On-demand job:** staff can run `POST /api/mercadopago/reconciliacion/run` from the UI.
 
-## Mercado Pago refunds and chargebacks (#179)
+## Mercado Pago refunds and chargebacks (#179, #344)
 
-**Total refunds only** in this release; partial refunds are tracked in issue #344.
+**Full and partial refunds** are supported when `mpEstado` is **approved** and a linked Mercado Pago receipt exists.
 
-1. **Refund:** In **Invoicing → invoice detail**, when `mpEstado` is **approved**, users with **`sales.cancel`** and module **`billing.credit_notes`** see **Refund MP payment**. Confirms with motivo (min. 10 chars); calls `POST /api/facturas/{id}/mp/reembolso`. BizCode requests a full MP refund, voids the linked `ReciboCobro`, voids the invoice with a total credit note (#146), and sets `mpEstado: refunded`. Amounts below the full payment return `422 partial_refund_not_supported`.
-2. **Refund timeline:** `GET /api/facturas/{id}/mp/reembolso` and the refund dialog show estado (`iniciado` → `procesando` → `completado` / `fallido`).
+1. **Refund:** In **Invoicing → invoice detail**, users with **`sales.cancel`** and module **`billing.credit_notes`** see **Refund MP payment**. Enter motivo (min. 10 chars) and optionally a **partial amount** (defaults to remaining refundable balance). `POST /api/facturas/{id}/mp/reembolso` calls the MP refund API. **Partial:** partial credit note (#344) + receipt reversal; invoice stays active. **Full** (remaining balance): voids receipt, voids invoice with credit note (#146, remaining NC amount if prior partials exist), `mpEstado: refunded`. Amounts above refundable balance return `422 exceeds_refundable_balance`.
+2. **Refund status:** `GET /api/facturas/{id}/mp/reembolso` returns `refundableBalance`, `originalPaymentAmount`, and refund history; the dialog shows each refund estado (`iniciado` → `procesando` → `completado` / `fallido`).
 3. **Chargebacks:** Webhook `type: chargebacks` creates `MercadoPagoChargeback` (`pendiente`) and notifies managers. **No automatic void or credit note** — staff resolves manually. Queue: **Finance → Mercado Pago chargebacks** (`/finanzas/contracargos-mp`, `reports.financial.read`); mark **Resolved** or **Ignore** via `PATCH /api/mercadopago/contracargos/{id}`.
 
 ## API reference

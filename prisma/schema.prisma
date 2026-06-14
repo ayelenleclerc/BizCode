@@ -467,7 +467,6 @@ model NotaCredito {
   movimientoCC    MovimientoClienteCC?
   mercadoPagoRefunds MercadoPagoRefund[]
 
-  @@unique([tenantId, facturaOrigenId])
   @@index([tenantId, createdAt])
   @@index([tenantId, facturaOrigenId])
 }

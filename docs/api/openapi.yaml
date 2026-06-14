@@ -6674,8 +6674,8 @@ paths:
   /api/facturas/{id}/mp/reembolso:
     get:
       tags: [facturas, mercadopago]
-      summary: Get Mercado Pago refund status for invoice (#179)
-      description: Requires `sales.cancel`, tenant integration `mercadopago`, and module `billing.credit_notes`. Returns latest refund record or `null`.
+      summary: Get Mercado Pago refund status for invoice (#179, #344)
+      description: Requires `sales.cancel`, tenant integration `mercadopago`, and module `billing.credit_notes`. Returns refundable balance and refund history.
       security:
         - cookieSession: []
       parameters:
@@ -6690,7 +6690,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MercadoPagoRefundNullableEnvelope'
+                $ref: '#/components/schemas/MercadoPagoRefundStatusEnvelope'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -6701,11 +6701,12 @@ paths:
           $ref: '#/components/responses/ServerError'
     post:
       tags: [facturas, mercadopago]
-      summary: Request total Mercado Pago refund (#179)
+      summary: Request Mercado Pago refund (#179, #344)
       description: |
         Requires `sales.cancel`, tenant integration `mercadopago`, and module `billing.credit_notes`.
-        Only **full** refunds are supported in MVP. Partial amounts return `422` with `partial_refund_not_supported`.
-        On success: MP refund API, void receipt, invoice void with credit note (#146), `mpEstado: refunded`.
+        Supports **full** and **partial** refunds. Omit `monto` to refund the remaining refundable balance.
+        Partial refunds create a partial credit note (#344) without voiding the invoice.
+        Full refunds void receipt, invoice, and credit note (#146), setting `mpEstado: refunded`.
       security:
         - cookieSession: []
       parameters:
@@ -13339,7 +13340,26 @@ components:
         monto:
           type: number
           exclusiveMinimum: 0
-          description: Optional; must match full refundable amount. Partial refunds return 422.
+          description: Optional partial amount; defaults to remaining refundable balance.
+
+    MercadoPagoRefundStatus:
+      type: object
+      required: [originalPaymentAmount, refundableBalance, refunds]
+      properties:
+        originalPaymentAmount: { type: string }
+        refundableBalance: { type: string }
+        refunds:
+          type: array
+          items:
+            $ref: '#/components/schemas/MercadoPagoRefund'
+
+    MercadoPagoRefundStatusEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success: { type: boolean, const: true }
+        data:
+          $ref: '#/components/schemas/MercadoPagoRefundStatus'
 
     MercadoPagoRefund:
       type: object

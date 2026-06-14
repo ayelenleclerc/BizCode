@@ -105,6 +105,12 @@ export const mercadoPagoRefundEntrySchema = z.object({
   updatedAt: z.string().datetime(),
 })
 
+export const mercadoPagoRefundStatusSchema = z.object({
+  originalPaymentAmount: z.string(),
+  refundableBalance: z.string(),
+  refunds: z.array(mercadoPagoRefundEntrySchema),
+})
+
 export const mercadoPagoChargebackEntrySchema = z.object({
   id: z.number().int().positive(),
   mpChargebackId: z.string(),

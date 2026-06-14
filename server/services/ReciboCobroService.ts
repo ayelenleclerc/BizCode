@@ -566,6 +566,62 @@ export class ReciboCobroService {
     return { ok: true, data: mapRecibo(updated) }
   }
 
+  /**
+   * @en Records a partial reversal of a receipt payment for MP partial refunds (#344).
+   * @es Registra reversión parcial de cobro en recibo para reembolsos MP parciales (#344).
+   * @pt-BR Registra reversão parcial de cobrança no recibo para reembolsos MP parciais (#344).
+   */
+  async recordPartialRefundReversal(
+    tenantId: number,
+    clienteId: number,
+    reciboId: number,
+    usuarioId: number,
+    monto: Decimal,
+    motivo: string,
+    refundId: number,
+  ): Promise<ServiceResult<ReciboCobroDto>> {
+    const existing = await this.prisma.reciboCobro.findFirst({
+      where: { id: reciboId, tenantId, clienteId },
+      include: reciboInclude,
+    })
+    if (!existing) {
+      return { ok: false, status: 404, error: 'Recibo not found' }
+    }
+    if (existing.estado !== 'emitido') {
+      return { ok: false, status: 422, error: 'Recibo is not active' }
+    }
+
+    const montoDec = monto instanceof Decimal ? monto : new Decimal(monto)
+    if (montoDec.lessThanOrEqualTo(0)) {
+      return { ok: false, status: 422, error: 'Reversal amount must be positive' }
+    }
+    if (montoDec.greaterThan(existing.totalCobrado)) {
+      return { ok: false, status: 422, error: 'Reversal amount exceeds receipt total' }
+    }
+
+    const updated = await this.prisma.$transaction(async (tx) => {
+      const ccService = new ClienteCuentaCorrienteService(tx)
+      await ccService.recordMovimiento({
+        tenantId,
+        clienteId,
+        tipo: 'cobro',
+        monto: montoDec,
+        referencia: `REEMB-MP-RC-${existing.numero}-${refundId}`,
+        fecha: new Date(),
+        usuarioId,
+        notas: `Reembolso parcial MP: ${motivo.trim()}`.slice(0, 500),
+      })
+
+      const recibo = await tx.reciboCobro.findFirstOrThrow({
+        where: { id: reciboId },
+        include: reciboInclude,
+      })
+      return recibo
+    })
+
+    return { ok: true, data: mapRecibo(updated) }
+  }
+
   async getPdfData(
     tenantId: number,
     clienteId: number,

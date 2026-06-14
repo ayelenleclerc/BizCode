@@ -2268,9 +2268,9 @@ export const facturasAPI = {
     }
   },
 
-  getMpRefund: async (id: number): Promise<MercadoPagoRefundDto | null> => {
+  getMpRefund: async (id: number): Promise<MercadoPagoRefundStatusDto> => {
     try {
-      const response = await api.get<{ success: boolean; data: MercadoPagoRefundDto | null }>(
+      const response = await api.get<{ success: boolean; data: MercadoPagoRefundStatusDto }>(
         `/facturas/${id}/mp/reembolso`,
       )
       return response.data.data
@@ -2973,6 +2973,12 @@ export type MercadoPagoRefundDto = {
   errorMessage: string | null
   createdAt: string
   updatedAt: string
+}
+
+export type MercadoPagoRefundStatusDto = {
+  originalPaymentAmount: string
+  refundableBalance: string
+  refunds: MercadoPagoRefundDto[]
 }
 
 export type MercadoPagoChargebackEntry = {

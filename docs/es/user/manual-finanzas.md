@@ -97,12 +97,12 @@ Algunos pagos llegan a Mercado Pago sin preference ni orden QR vinculada (transf
 3. **Cola manual:** **Finanzas → Reconciliación Mercado Pago** (`/finanzas/reconciliacion-mp`, integración `mercadopago`, `reports.financial.read`): lista pagos pendientes; cargá facturas abiertas por ID de cliente; **Reconciliar** (`POST /api/mercadopago/reconciliar`) o **Ignorar** (`POST /api/mercadopago/ignorar`).
 4. **Job bajo demanda:** el staff puede ejecutar `POST /api/mercadopago/reconciliacion/run` desde la UI.
 
-## Reembolsos y contracargos Mercado Pago (#179)
+## Reembolsos y contracargos Mercado Pago (#179, #344)
 
-**Solo reembolso total** en esta versión; el reembolso parcial queda en el issue #344.
+**Reembolso total y parcial** cuando `mpEstado` es **approved** y existe recibo MP vinculado.
 
-1. **Reembolso:** En **Facturación → detalle de factura**, cuando `mpEstado` es **approved**, usuarios con **`sales.cancel`** y módulo **`billing.credit_notes`** ven **Reembolsar pago MP**. Confirma con motivo (mín. 10 caracteres); llama `POST /api/facturas/{id}/mp/reembolso`. BizCode solicita reembolso total en MP, anula el `ReciboCobro` vinculado, anula la factura con nota de crédito total (#146) y marca `mpEstado: refunded`. Montos menores al pago devuelven `422 partial_refund_not_supported`.
-2. **Timeline de reembolso:** `GET /api/facturas/{id}/mp/reembolso` y el diálogo muestran estado (`iniciado` → `procesando` → `completado` / `fallido`).
+1. **Reembolso:** En **Facturación → detalle de factura**, usuarios con **`sales.cancel`** y módulo **`billing.credit_notes`** ven **Reembolsar pago MP**. Motivo (mín. 10 caracteres) y opcionalmente **monto parcial** (por defecto el saldo reembolsable restante). `POST /api/facturas/{id}/mp/reembolso`. **Parcial:** nota de crédito parcial (#344) + reversión parcial del recibo; la factura sigue activa. **Total** (saldo restante): anula recibo, anula factura con NC (#146, monto NC restante si hubo parciales previos), `mpEstado: refunded`. Montos mayores al saldo reembolsable: `422 exceeds_refundable_balance`.
+2. **Estado de reembolsos:** `GET /api/facturas/{id}/mp/reembolso` devuelve `refundableBalance`, `originalPaymentAmount` e historial; el diálogo lista cada reembolso (`iniciado` → `procesando` → `completado` / `fallido`).
 3. **Contracargos:** el webhook `type: chargebacks` crea `MercadoPagoChargeback` (`pendiente`) y notifica a managers. **Sin void ni NC automática** — el staff resuelve manualmente. Cola: **Finanzas → Contracargos Mercado Pago** (`/finanzas/contracargos-mp`, `reports.financial.read`); marcar **Resuelto** o **Ignorar** con `PATCH /api/mercadopago/contracargos/{id}`.
 
 ## Referencia API
