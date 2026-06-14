@@ -39,6 +39,9 @@ describe('FacturaService', () => {
         create: vi.fn(),
         update: vi.fn(),
       },
+      notaCredito: {
+        aggregate: vi.fn().mockResolvedValue({ _sum: { monto: null } }),
+      },
       $transaction: vi.fn(),
     } as unknown as PrismaClient
     service = new FacturaService(prisma)

@@ -310,6 +310,7 @@ function basePrismaForMutations(): {
       createdById: null,
       createdAt: new Date(),
     }),
+    aggregate: vi.fn().mockResolvedValue({ _sum: { monto: null } }),
     findFirst: vi.fn().mockResolvedValue(null),
     findMany: vi.fn().mockResolvedValue([]),
     count: vi.fn().mockResolvedValue(0),

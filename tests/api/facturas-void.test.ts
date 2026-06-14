@@ -77,6 +77,7 @@ function buildPrismaMock(overrides: Partial<Record<string, unknown>> = {}): Pris
     },
     notaCredito: {
       create: vi.fn().mockResolvedValue(NOTA_CREDITO),
+      aggregate: vi.fn().mockResolvedValue({ _sum: { monto: null } }),
     },
     retencionAplicada: {
       deleteMany: vi.fn().mockResolvedValue({ count: 0 }),
