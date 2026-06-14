@@ -42,6 +42,35 @@ export const mercadoPagoStaticQrSchema = z.object({
   qrImageBase64: z.string(),
 })
 
+export const mercadoPagoReconciliationEntrySchema = z.object({
+  mpPaymentId: z.string(),
+  transactionAmount: z.string(),
+  currencyId: z.string(),
+  paymentDate: z.string().datetime(),
+  payerName: z.string().nullable(),
+  payerEmail: z.string().nullable(),
+  payerIdentification: z.string().nullable(),
+  preferenceId: z.string().nullable(),
+  externalReference: z.string().nullable(),
+  createdAt: z.string().datetime(),
+})
+
+export const mercadoPagoReconcileBodySchema = z.object({
+  mpPaymentId: z.string().trim().min(1).max(60),
+  facturaId: z.number().int().positive(),
+})
+
+export const mercadoPagoIgnoreBodySchema = z.object({
+  mpPaymentId: z.string().trim().min(1).max(60),
+})
+
+export const mercadoPagoReconciliationJobSummarySchema = z.object({
+  processed: z.number().int().nonnegative(),
+  autoReconciled: z.number().int().nonnegative(),
+  queued: z.number().int().nonnegative(),
+  skipped: z.number().int().nonnegative(),
+})
+
 export const mercadoPagoWebhookBodySchema = z.object({
   action: z.string().optional(),
   type: z.string().optional(),

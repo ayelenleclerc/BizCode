@@ -22,6 +22,10 @@ vi.mock('../../server/integrations/mercadopago/mercadoPagoApiClient', async (imp
     createMercadoPagoPreference: vi.fn(),
     createMercadoPagoInstoreQr: vi.fn(),
     fetchMercadoPagoPayment: vi.fn(),
+    searchMercadoPagoPayments: vi.fn().mockResolvedValue({
+      paging: { total: 0, limit: 50, offset: 0 },
+      results: [],
+    }),
   }
 })
 
@@ -1125,6 +1129,13 @@ function buildPrisma(): PrismaClient {
     mercadoPagoProcessedPayment: {
       findUnique: vi.fn().mockResolvedValue(null),
       create: vi.fn().mockResolvedValue({ id: 1 }),
+    },
+    mercadoPagoReconciliationEntry: {
+      findMany: vi.fn().mockResolvedValue([]),
+      findUnique: vi.fn().mockResolvedValue(null),
+      upsert: vi.fn().mockResolvedValue({}),
+      update: vi.fn().mockResolvedValue({}),
+      findUniqueOrThrow: vi.fn(),
     },
     proveedorArticulo: {
       findMany: vi.fn().mockResolvedValue([proveedorCatalogoRow]),
@@ -2567,6 +2578,100 @@ describe('API — contrato OpenAPI', () => {
     const app = createApp(p)
     const res = await request(app).get('/api/configuracion/mercadopago/qr-estatico').expect(200)
     await assertMatchesOpenApi('/api/configuracion/mercadopago/qr-estatico', 'get', '200', res.body)
+  })
+
+  it('GET /api/mercadopago/pagos-sin-reconciliar', async () => {
+    process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
+    process.env.BIZCODE_TEST_ROLE = 'owner'
+    clearTenantFeaturesCache()
+    const p = buildPrisma()
+    vi.mocked(p.tenantConfig.findUnique).mockResolvedValue({
+      tenantId: 1,
+      businessType: 'mayorista',
+      rubros: [],
+      plan: 'pro',
+      modules: [],
+      integrations: ['mercadopago'],
+      updatedAt: new Date(),
+    } as never)
+    vi.mocked(p.mercadoPagoReconciliationEntry.findMany).mockResolvedValue([
+      {
+        mpPaymentId: '9001',
+        transactionAmount: new Decimal('1500.00'),
+        currencyId: 'ARS',
+        paymentDate: new Date('2026-06-10T12:00:00.000Z'),
+        payerName: 'Juan Perez',
+        payerEmail: 'payer@example.com',
+        payerIdentification: '20123456789',
+        preferenceId: null,
+        externalReference: null,
+        createdAt: new Date('2026-06-10T12:00:00.000Z'),
+      },
+    ] as never)
+    const app = createApp(p)
+    const res = await request(app).get('/api/mercadopago/pagos-sin-reconciliar').expect(200)
+    await assertMatchesOpenApi('/api/mercadopago/pagos-sin-reconciliar', 'get', '200', res.body)
+  })
+
+  it('POST /api/mercadopago/reconciliacion/run', async () => {
+    process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
+    process.env.BIZCODE_TEST_ROLE = 'owner'
+    clearTenantFeaturesCache()
+    const p = buildPrisma()
+    vi.mocked(p.tenantConfig.findUnique).mockResolvedValue({
+      tenantId: 1,
+      businessType: 'mayorista',
+      rubros: [],
+      plan: 'pro',
+      modules: [],
+      integrations: ['mercadopago'],
+      updatedAt: new Date(),
+    } as never)
+    vi.mocked(p.mercadoPagoConfig.findUnique).mockResolvedValue({
+      activo: true,
+      accessTokenEncrypted: encryptFiscalSecret('TEST-access-token'),
+    } as never)
+    vi.mocked(p.paramEmpresa.findUnique).mockResolvedValue({
+      timezone: 'America/Argentina/Buenos_Aires',
+    } as never)
+    const app = createApp(p)
+    const res = await request(app).post('/api/mercadopago/reconciliacion/run').expect(200)
+    await assertMatchesOpenApi('/api/mercadopago/reconciliacion/run', 'post', '200', res.body)
+  })
+
+  it('POST /api/mercadopago/ignorar', async () => {
+    process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
+    process.env.BIZCODE_TEST_ROLE = 'owner'
+    clearTenantFeaturesCache()
+    const p = buildPrisma()
+    vi.mocked(p.tenantConfig.findUnique).mockResolvedValue({
+      tenantId: 1,
+      businessType: 'mayorista',
+      rubros: [],
+      plan: 'pro',
+      modules: [],
+      integrations: ['mercadopago'],
+      updatedAt: new Date(),
+    } as never)
+    vi.mocked(p.mercadoPagoReconciliationEntry.findUnique).mockResolvedValue({
+      mpPaymentId: '9001',
+      estado: 'pending',
+      transactionAmount: new Decimal('1500.00'),
+      currencyId: 'ARS',
+      paymentDate: new Date('2026-06-10T12:00:00.000Z'),
+      payerName: 'Juan Perez',
+      payerEmail: 'payer@example.com',
+      payerIdentification: '20123456789',
+      preferenceId: null,
+      externalReference: null,
+      createdAt: new Date('2026-06-10T12:00:00.000Z'),
+    } as never)
+    const app = createApp(p)
+    const res = await request(app)
+      .post('/api/mercadopago/ignorar')
+      .send({ mpPaymentId: '9001' })
+      .expect(200)
+    await assertMatchesOpenApi('/api/mercadopago/ignorar', 'post', '200', res.body)
   })
 
   it('POST /api/webhooks/mercadopago returns 400 for invalid signature', async () => {

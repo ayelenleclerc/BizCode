@@ -237,8 +237,9 @@ These jobs are **not** run by GitHub Actions in the default pipeline; schedule t
 |---|---|---|
 | `*/5 * * * *` | `npm run arca:retry-pending-job` | Retry `estadoCae: pending` invoices via homologación WSFE mock (`ArcaService.retryPending`) for every tenant with `TenantFiscalConfig`. |
 | `0 * * * *` (hourly) | `npm run cobranzas:recordatorios` | Overdue collection reminders for every tenant with `ParamEmpresa`; sends at **08:00 tenant local** (minute &lt; 15) within configured business hours. Use `0 8 * * *` only for single–time zone deployments. |
+| `0 * * * *` (hourly) | `npm run mercadopago:reconciliacion` | Mercado Pago payment reconciliation for every tenant with `MercadoPagoConfig` active; runs at **02:00 tenant local** (minute &lt; 15). Use `0 2 * * *` only for single–time zone deployments. |
 
-Optional env for a single tenant in dev/staging: `BIZCODE_TENANT_ID=<id>` (applies to `arca:retry-pending-job`, `arca:retry-pending`, and `cobranzas:recordatorios`). Optional `BIZCODE_RECORDATORIO_CANAL` (default `email`).
+Optional env for a single tenant in dev/staging: `BIZCODE_TENANT_ID=<id>` (applies to `arca:retry-pending-job`, `arca:retry-pending`, `cobranzas:recordatorios`, and `mercadopago:reconciliacion`). Optional `BIZCODE_RECORDATORIO_CANAL` (default `email`).
 
 Documentation governance (Wiki vs controlled docs):
 

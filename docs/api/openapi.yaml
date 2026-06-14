@@ -6552,6 +6552,124 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
 
+  /api/mercadopago/pagos-sin-reconciliar:
+    get:
+      tags: [mercadopago]
+      summary: List unreconciled Mercado Pago payments (#178)
+      description: Requires `reports.financial.read` and tenant integration `mercadopago`. Returns pending reconciliation queue entries.
+      security:
+        - cookieSession: []
+      responses:
+        '200':
+          description: Pending payments
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MercadoPagoReconciliationListEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/mercadopago/reconciliar:
+    post:
+      tags: [mercadopago]
+      summary: Manually reconcile Mercado Pago payment (#178)
+      description: Requires `reports.financial.read` and tenant integration `mercadopago`. Payment amount must match invoice open balance exactly.
+      security:
+        - cookieSession: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MercadoPagoReconcileBody'
+      responses:
+        '200':
+          description: Payment reconciled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MercadoPagoReconciliationEntryEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '409':
+          $ref: '#/components/responses/ConflictError'
+        '422':
+          description: Amount mismatch or validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/mercadopago/ignorar:
+    post:
+      tags: [mercadopago]
+      summary: Ignore unreconciled Mercado Pago payment (#178)
+      description: Requires `reports.financial.read` and tenant integration `mercadopago`. Marks a pending payment as not reconciliable.
+      security:
+        - cookieSession: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MercadoPagoIgnoreBody'
+      responses:
+        '200':
+          description: Payment ignored
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MercadoPagoIgnoreEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/mercadopago/reconciliacion/run:
+    post:
+      tags: [mercadopago]
+      summary: Run Mercado Pago reconciliation job (#178)
+      description: Requires `reports.financial.read` and tenant integration `mercadopago`. Forces reconciliation scan for the current tenant (ignores daily time slot).
+      security:
+        - cookieSession: []
+      responses:
+        '200':
+          description: Job summary
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MercadoPagoReconciliationJobEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
   /api/portal/{tenantSlug}/branding:
     get:
       tags: [portal]
@@ -12975,6 +13093,93 @@ components:
         success: { type: boolean, const: true }
         data:
           $ref: '#/components/schemas/MercadoPagoStaticQr'
+
+    MercadoPagoReconciliationEntry:
+      type: object
+      required:
+        - mpPaymentId
+        - transactionAmount
+        - currencyId
+        - paymentDate
+        - payerName
+        - payerEmail
+        - payerIdentification
+        - preferenceId
+        - externalReference
+        - createdAt
+      properties:
+        mpPaymentId: { type: string }
+        transactionAmount: { type: string }
+        currencyId: { type: string }
+        paymentDate: { type: string, format: date-time }
+        payerName: { type: string, nullable: true }
+        payerEmail: { type: string, nullable: true }
+        payerIdentification: { type: string, nullable: true }
+        preferenceId: { type: string, nullable: true }
+        externalReference: { type: string, nullable: true }
+        createdAt: { type: string, format: date-time }
+
+    MercadoPagoReconciliationListEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success: { type: boolean, const: true }
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/MercadoPagoReconciliationEntry'
+
+    MercadoPagoReconciliationEntryEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success: { type: boolean, const: true }
+        data:
+          $ref: '#/components/schemas/MercadoPagoReconciliationEntry'
+
+    MercadoPagoReconcileBody:
+      type: object
+      required: [mpPaymentId, facturaId]
+      properties:
+        mpPaymentId: { type: string, minLength: 1, maxLength: 60 }
+        facturaId: { type: integer, minimum: 1 }
+
+    MercadoPagoIgnoreBody:
+      type: object
+      required: [mpPaymentId]
+      properties:
+        mpPaymentId: { type: string, minLength: 1, maxLength: 60 }
+
+    MercadoPagoIgnoreResult:
+      type: object
+      required: [mpPaymentId]
+      properties:
+        mpPaymentId: { type: string }
+
+    MercadoPagoIgnoreEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success: { type: boolean, const: true }
+        data:
+          $ref: '#/components/schemas/MercadoPagoIgnoreResult'
+
+    MercadoPagoReconciliationJobSummary:
+      type: object
+      required: [processed, autoReconciled, queued, skipped]
+      properties:
+        processed: { type: integer, minimum: 0 }
+        autoReconciled: { type: integer, minimum: 0 }
+        queued: { type: integer, minimum: 0 }
+        skipped: { type: integer, minimum: 0 }
+
+    MercadoPagoReconciliationJobEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success: { type: boolean, const: true }
+        data:
+          $ref: '#/components/schemas/MercadoPagoReconciliationJobSummary'
 
     MercadoPagoFacturaPaymentEnvelope:
       type: object

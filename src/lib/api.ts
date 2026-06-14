@@ -2913,6 +2913,26 @@ export type MercadoPagoConfigInput = {
   staticQrData?: string
 }
 
+export type MercadoPagoReconciliationEntry = {
+  mpPaymentId: string
+  transactionAmount: string
+  currencyId: string
+  paymentDate: string
+  payerName: string | null
+  payerEmail: string | null
+  payerIdentification: string | null
+  preferenceId: string | null
+  externalReference: string | null
+  createdAt: string
+}
+
+export type MercadoPagoReconciliationJobSummary = {
+  processed: number
+  autoReconciled: number
+  queued: number
+  skipped: number
+}
+
 export const mercadopagoAPI = {
   getConfig: async (): Promise<MercadoPagoConfigStatus> => {
     try {
@@ -2943,6 +2963,57 @@ export const mercadopagoAPI = {
         success: boolean
         data: { accountName: string; email?: string }
       }>('/configuracion/mercadopago/test')
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  listUnreconciled: async (): Promise<MercadoPagoReconciliationEntry[]> => {
+    try {
+      const response = await api.get<{
+        success: boolean
+        data: MercadoPagoReconciliationEntry[]
+      }>('/mercadopago/pagos-sin-reconciliar')
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  reconcile: async (body: {
+    mpPaymentId: string
+    facturaId: number
+  }): Promise<MercadoPagoReconciliationEntry> => {
+    try {
+      const response = await api.post<{
+        success: boolean
+        data: MercadoPagoReconciliationEntry
+      }>('/mercadopago/reconciliar', body)
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  ignore: async (mpPaymentId: string): Promise<{ mpPaymentId: string }> => {
+    try {
+      const response = await api.post<{
+        success: boolean
+        data: { mpPaymentId: string }
+      }>('/mercadopago/ignorar', { mpPaymentId })
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  runReconciliationJob: async (): Promise<MercadoPagoReconciliationJobSummary> => {
+    try {
+      const response = await api.post<{
+        success: boolean
+        data: MercadoPagoReconciliationJobSummary
+      }>('/mercadopago/reconciliacion/run')
       return response.data.data
     } catch (error) {
       return handleError(error as AxiosError<ApiErrorPayload>)

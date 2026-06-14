@@ -120,12 +120,27 @@ export async function createMercadoPagoPreference(
   return body
 }
 
+export type MercadoPagoPaymentPayer = {
+  email?: string | null
+  first_name?: string | null
+  last_name?: string | null
+  identification?: { type?: string | null; number?: string | null } | null
+}
+
 export type MercadoPagoPaymentResult = {
   id: number
   status: string
   external_reference?: string | null
   transaction_amount?: number
   preference_id?: string | null
+  currency_id?: string | null
+  date_created?: string | null
+  payer?: MercadoPagoPaymentPayer | null
+}
+
+export type MercadoPagoPaymentSearchPage = {
+  paging: { total: number; limit: number; offset: number }
+  results: MercadoPagoPaymentResult[]
 }
 
 /**
@@ -156,6 +171,55 @@ export async function fetchMercadoPagoPayment(
   const body = (await res.json()) as MercadoPagoPaymentResult
   if (body.id == null || !body.status) {
     throw new MercadoPagoApiError(502, 'Invalid Mercado Pago payment response')
+  }
+  return body
+}
+
+export type MercadoPagoPaymentSearchInput = {
+  beginDate: string
+  endDate: string
+  offset?: number
+  limit?: number
+}
+
+/**
+ * @en Searches Mercado Pago payments in a date range (#178).
+ * @es Busca pagos de Mercado Pago en un rango de fechas (#178).
+ * @pt-BR Busca pagamentos do Mercado Pago em um intervalo de datas (#178).
+ */
+export async function searchMercadoPagoPayments(
+  accessToken: string,
+  input: MercadoPagoPaymentSearchInput,
+): Promise<MercadoPagoPaymentSearchPage> {
+  const params = new URLSearchParams({
+    sort: 'date_created',
+    criteria: 'desc',
+    range: 'date_created',
+    begin_date: input.beginDate,
+    end_date: input.endDate,
+    status: 'approved',
+    limit: String(input.limit ?? 50),
+    offset: String(input.offset ?? 0),
+  })
+  const res = await fetch(`${MP_PAYMENTS_URL}/search?${params.toString()}`, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      Accept: 'application/json',
+    },
+  })
+
+  if (!res.ok) {
+    throw new MercadoPagoApiError(
+      res.status,
+      res.status === 401 || res.status === 403
+        ? 'Invalid Mercado Pago credentials'
+        : `Mercado Pago API error (${res.status})`,
+    )
+  }
+
+  const body = (await res.json()) as MercadoPagoPaymentSearchPage
+  if (!Array.isArray(body.results) || !body.paging) {
+    throw new MercadoPagoApiError(502, 'Invalid Mercado Pago payment search response')
   }
   return body
 }

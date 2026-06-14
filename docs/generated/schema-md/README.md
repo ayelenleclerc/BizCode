@@ -334,6 +334,24 @@
 
 * [MercadoPagoFacturaPaymentEnvelope](./mercadopagofacturapaymentenvelope.md) – `-`
 
+* [MercadoPagoIgnoreBody](./mercadopagoignorebody.md) – `-`
+
+* [MercadoPagoIgnoreEnvelope](./mercadopagoignoreenvelope.md) – `-`
+
+* [MercadoPagoIgnoreResult](./mercadopagoignoreresult.md) – `-`
+
+* [MercadoPagoReconcileBody](./mercadopagoreconcilebody.md) – `-`
+
+* [MercadoPagoReconciliationEntry](./mercadopagoreconciliationentry.md) – `-`
+
+* [MercadoPagoReconciliationEntryEnvelope](./mercadopagoreconciliationentryenvelope.md) – `-`
+
+* [MercadoPagoReconciliationJobEnvelope](./mercadopagoreconciliationjobenvelope.md) – `-`
+
+* [MercadoPagoReconciliationJobSummary](./mercadopagoreconciliationjobsummary.md) – `-`
+
+* [MercadoPagoReconciliationListEnvelope](./mercadopagoreconciliationlistenvelope.md) – `-`
+
 * [MercadoPagoStaticQr](./mercadopagostaticqr.md) – `-`
 
 * [MercadoPagoStaticQrEnvelope](./mercadopagostaticqrenvelope.md) – `-`
@@ -1065,6 +1083,8 @@
 * [Untitled array in LogisticaKpis](./logisticakpis-properties-returnsbyreason.md) – `undefined#/properties/returnsByReason`
 
 * [Untitled array in LogisticaZonasListEnvelope](./logisticazonaslistenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled array in MercadoPagoReconciliationListEnvelope](./mercadopagoreconciliationlistenvelope-properties-data.md) – `undefined#/properties/data`
 
 * [Untitled array in ModuleCatalogData](./modulecatalogdata-properties-modules.md) – `undefined#/properties/modules`
 
