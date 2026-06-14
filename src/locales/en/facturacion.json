@@ -186,6 +186,23 @@
     "errors": {
       "loadFailed": "Could not load Mercado Pago status",
       "createFailed": "Could not create payment link"
+    },
+    "qr": {
+      "collectButton": "Collect with QR",
+      "modalTitle": "Mercado Pago QR payment",
+      "modalSubtitle": "Invoice {{ref}}",
+      "loading": "Loading QR status…",
+      "creating": "Generating QR…",
+      "createQr": "Generate payment QR",
+      "imageAlt": "Mercado Pago payment QR code",
+      "amountLabel": "Amount: ${{amount}}",
+      "expiresAt": "Valid until {{date}}",
+      "scanHint": "Ask the customer to scan with the Mercado Pago app",
+      "paidSuccess": "Payment confirmed",
+      "errors": {
+        "loadFailed": "Could not load QR status",
+        "createFailed": "Could not generate payment QR"
+      }
     }
   }
 }

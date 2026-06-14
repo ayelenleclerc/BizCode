@@ -20,11 +20,16 @@ vi.mock('../../server/integrations/mercadopago/mercadoPagoApiClient', async (imp
   return {
     ...actual,
     createMercadoPagoPreference: vi.fn(),
+    createMercadoPagoInstoreQr: vi.fn(),
     fetchMercadoPagoPayment: vi.fn(),
   }
 })
 
-import { createMercadoPagoPreference } from '../../server/integrations/mercadopago/mercadoPagoApiClient'
+vi.mock('../../server/lib/mercadopagoQrImage', () => ({
+  mercadoPagoQrPayloadToBase64: vi.fn().mockResolvedValue('base64png'),
+}))
+
+import { createMercadoPagoInstoreQr, createMercadoPagoPreference } from '../../server/integrations/mercadopago/mercadoPagoApiClient'
 import {
   buildMercadoPagoSignatureManifest,
   computeMercadoPagoSignatureHmac,
@@ -2409,6 +2414,9 @@ describe('API — contrato OpenAPI', () => {
       mpEstado: null,
       mpPagadoAt: null,
       mpPreferenceExpiresAt: null,
+      mpQrData: null,
+      mpQrOrderId: null,
+      mpQrExpiresAt: null,
     } as never)
     vi.mocked(p.reciboCobroImputacion.groupBy).mockResolvedValue([])
     const app = createApp(p)
@@ -2465,11 +2473,100 @@ describe('API — contrato OpenAPI', () => {
       mpEstado: 'pending',
       mpPagadoAt: null,
       mpPreferenceExpiresAt: new Date(Date.now() + 72 * 60 * 60 * 1000),
+      mpQrData: null,
+      mpQrOrderId: null,
+      mpQrExpiresAt: null,
     } as never)
     vi.mocked(p.reciboCobroImputacion.groupBy).mockResolvedValue([])
     const app = createApp(p)
     const res = await request(app).post('/api/facturas/7/mp/preference').expect(201)
     await assertMatchesOpenApi('/api/facturas/{id}/mp/preference', 'post', '201', res.body)
+  })
+
+  it('POST /api/facturas/:id/mp/qr', async () => {
+    process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
+    process.env.BIZCODE_TEST_ROLE = 'owner'
+    clearTenantFeaturesCache()
+    vi.mocked(createMercadoPagoInstoreQr).mockResolvedValue({
+      qr_data: '000201010212',
+      in_store_order_id: 'order-contract',
+    })
+    const p = buildPrisma()
+    vi.mocked(p.tenantConfig.findUnique).mockResolvedValue({
+      tenantId: 1,
+      businessType: 'mayorista',
+      rubros: [],
+      plan: 'pro',
+      modules: [],
+      integrations: ['mercadopago'],
+      updatedAt: new Date(),
+    } as never)
+    vi.mocked(p.mercadoPagoConfig.findUnique).mockResolvedValue({
+      activo: true,
+      sandboxMode: true,
+      accessTokenEncrypted: encryptFiscalSecret('token'),
+      collectorId: '12345',
+      externalPosId: 'pos-demo',
+    } as never)
+    vi.mocked(p.factura.findFirst).mockResolvedValue({
+      id: 7,
+      tenantId: 1,
+      clienteId: 1,
+      tipo: 'B',
+      prefijo: '0001',
+      numero: 77,
+      total: new Decimal('1200'),
+      estado: 'A',
+      mpPreferenceId: null,
+      mpPaymentLink: null,
+      mpEstado: null,
+      mpPagadoAt: null,
+      mpPreferenceExpiresAt: null,
+      mpQrData: null,
+      mpQrOrderId: null,
+      mpQrExpiresAt: null,
+      cliente: { rsocial: 'ACME SA' },
+    } as never)
+    vi.mocked(p.factura.update).mockResolvedValue({
+      tipo: 'B',
+      prefijo: '0001',
+      numero: 77,
+      mpPreferenceId: null,
+      mpPaymentLink: null,
+      mpEstado: 'pending',
+      mpPagadoAt: null,
+      mpPreferenceExpiresAt: null,
+      mpQrData: '000201010212',
+      mpQrOrderId: 'order-contract',
+      mpQrExpiresAt: new Date(Date.now() + 10 * 60 * 1000),
+    } as never)
+    vi.mocked(p.reciboCobroImputacion.groupBy).mockResolvedValue([])
+    const app = createApp(p)
+    const res = await request(app).post('/api/facturas/7/mp/qr').expect(201)
+    await assertMatchesOpenApi('/api/facturas/{id}/mp/qr', 'post', '201', res.body)
+  })
+
+  it('GET /api/configuracion/mercadopago/qr-estatico', async () => {
+    process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
+    process.env.BIZCODE_TEST_ROLE = 'owner'
+    clearTenantFeaturesCache()
+    const p = buildPrisma()
+    vi.mocked(p.tenantConfig.findUnique).mockResolvedValue({
+      tenantId: 1,
+      businessType: 'mayorista',
+      rubros: [],
+      plan: 'pro',
+      modules: [],
+      integrations: ['mercadopago'],
+      updatedAt: new Date(),
+    } as never)
+    vi.mocked(p.mercadoPagoConfig.findUnique).mockResolvedValue({
+      activo: true,
+      staticQrData: '000201010212',
+    } as never)
+    const app = createApp(p)
+    const res = await request(app).get('/api/configuracion/mercadopago/qr-estatico').expect(200)
+    await assertMatchesOpenApi('/api/configuracion/mercadopago/qr-estatico', 'get', '200', res.body)
   })
 
   it('POST /api/webhooks/mercadopago returns 400 for invalid signature', async () => {

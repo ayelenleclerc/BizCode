@@ -419,6 +419,10 @@ model Factura {
   mpEstado              String?   @db.VarChar(20)
   mpPagadoAt            DateTime?
   mpPreferenceExpiresAt DateTime?
+  /// Mercado Pago instore dynamic QR (#177)
+  mpQrData              String?   @db.Text
+  mpQrOrderId           String?   @db.VarChar(60)
+  mpQrExpiresAt         DateTime?
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 
@@ -742,6 +746,10 @@ model MercadoPagoConfig {
   webhookSecretEncrypted String?  @db.Text
   sandboxMode            Boolean  @default(true)
   activo                 Boolean  @default(true)
+  /// Mercado Pago instore POS (#177)
+  collectorId            String?  @db.VarChar(30)
+  externalPosId          String?  @db.VarChar(60)
+  staticQrData           String?  @db.Text
   createdAt              DateTime @default(now())
   updatedAt              DateTime @updatedAt
 }

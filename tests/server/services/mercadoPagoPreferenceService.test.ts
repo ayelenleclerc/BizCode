@@ -35,6 +35,9 @@ const baseFactura = {
   mpEstado: null,
   mpPagadoAt: null,
   mpPreferenceExpiresAt: null,
+  mpQrData: null,
+  mpQrOrderId: null,
+  mpQrExpiresAt: null,
   cliente: { rsocial: 'ACME SA' },
 }
 
@@ -51,6 +54,9 @@ function buildPrismaMock(overrides: Partial<Record<string, unknown>> = {}): Pris
         mpEstado: 'pending',
         mpPagadoAt: null,
         mpPreferenceExpiresAt: new Date(Date.now() + 72 * 60 * 60 * 1000),
+        mpQrData: null,
+        mpQrOrderId: null,
+        mpQrExpiresAt: null,
       }),
     },
     reciboCobroImputacion: {
@@ -116,6 +122,7 @@ describe('MercadoPagoPreferenceService', () => {
         findFirst: vi.fn().mockResolvedValue({
           ...baseFactura,
           mpEstado: 'pending',
+          mpPreferenceId: 'pref-active',
           mpPreferenceExpiresAt: new Date(Date.now() + 60_000),
         }),
         update: vi.fn(),

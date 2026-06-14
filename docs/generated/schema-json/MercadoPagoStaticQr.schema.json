@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "qrData": {
+      "type": "string"
+    },
+    "qrImageBase64": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "qrData",
+    "qrImageBase64"
+  ],
+  "title": "MercadoPagoStaticQr",
+  "type": "object"
+}

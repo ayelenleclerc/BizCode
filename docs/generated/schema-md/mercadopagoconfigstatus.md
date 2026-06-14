@@ -16,14 +16,17 @@ undefined#/properties/data
 
 # data Properties
 
-| Property                              | Type      | Required | Nullable       | Defined by                                                                                                                 |
-| :------------------------------------ | :-------- | :------- | :------------- | :------------------------------------------------------------------------------------------------------------------------- |
-| [accessTokenLast4](#accesstokenlast4) | `string`  | Optional | cannot be null | [MercadoPagoConfigStatus](mercadopagoconfigstatus-properties-accesstokenlast4.md "undefined#/properties/accessTokenLast4") |
-| [activo](#activo)                     | `boolean` | Optional | cannot be null | [MercadoPagoConfigStatus](mercadopagoconfigstatus-properties-activo.md "undefined#/properties/activo")                     |
-| [configured](#configured)             | `boolean` | Required | cannot be null | [MercadoPagoConfigStatus](mercadopagoconfigstatus-properties-configured.md "undefined#/properties/configured")             |
-| [publicKey](#publickey)               | `string`  | Optional | cannot be null | [MercadoPagoConfigStatus](mercadopagoconfigstatus-properties-publickey.md "undefined#/properties/publicKey")               |
-| [sandboxMode](#sandboxmode)           | `boolean` | Optional | cannot be null | [MercadoPagoConfigStatus](mercadopagoconfigstatus-properties-sandboxmode.md "undefined#/properties/sandboxMode")           |
-| [webhookSecretSet](#webhooksecretset) | `boolean` | Optional | cannot be null | [MercadoPagoConfigStatus](mercadopagoconfigstatus-properties-webhooksecretset.md "undefined#/properties/webhookSecretSet") |
+| Property                                  | Type      | Required | Nullable       | Defined by                                                                                                                     |
+| :---------------------------------------- | :-------- | :------- | :------------- | :----------------------------------------------------------------------------------------------------------------------------- |
+| [accessTokenLast4](#accesstokenlast4)     | `string`  | Optional | cannot be null | [MercadoPagoConfigStatus](mercadopagoconfigstatus-properties-accesstokenlast4.md "undefined#/properties/accessTokenLast4")     |
+| [activo](#activo)                         | `boolean` | Optional | cannot be null | [MercadoPagoConfigStatus](mercadopagoconfigstatus-properties-activo.md "undefined#/properties/activo")                         |
+| [collectorId](#collectorid)               | `string`  | Optional | cannot be null | [MercadoPagoConfigStatus](mercadopagoconfigstatus-properties-collectorid.md "undefined#/properties/collectorId")               |
+| [configured](#configured)                 | `boolean` | Required | cannot be null | [MercadoPagoConfigStatus](mercadopagoconfigstatus-properties-configured.md "undefined#/properties/configured")                 |
+| [externalPosId](#externalposid)           | `string`  | Optional | cannot be null | [MercadoPagoConfigStatus](mercadopagoconfigstatus-properties-externalposid.md "undefined#/properties/externalPosId")           |
+| [publicKey](#publickey)                   | `string`  | Optional | cannot be null | [MercadoPagoConfigStatus](mercadopagoconfigstatus-properties-publickey.md "undefined#/properties/publicKey")                   |
+| [sandboxMode](#sandboxmode)               | `boolean` | Optional | cannot be null | [MercadoPagoConfigStatus](mercadopagoconfigstatus-properties-sandboxmode.md "undefined#/properties/sandboxMode")               |
+| [staticQrConfigured](#staticqrconfigured) | `boolean` | Optional | cannot be null | [MercadoPagoConfigStatus](mercadopagoconfigstatus-properties-staticqrconfigured.md "undefined#/properties/staticQrConfigured") |
+| [webhookSecretSet](#webhooksecretset)     | `boolean` | Optional | cannot be null | [MercadoPagoConfigStatus](mercadopagoconfigstatus-properties-webhooksecretset.md "undefined#/properties/webhookSecretSet")     |
 
 ## accessTokenLast4
 
@@ -61,6 +64,24 @@ undefined#/properties/data
 
 `boolean`
 
+## collectorId
+
+
+
+`collectorId`
+
+* is optional
+
+* Type: `string`
+
+* cannot be null
+
+* defined in: [MercadoPagoConfigStatus](mercadopagoconfigstatus-properties-collectorid.md "undefined#/properties/collectorId")
+
+### collectorId Type
+
+`string`
+
 ## configured
 
 
@@ -78,6 +99,24 @@ undefined#/properties/data
 ### configured Type
 
 `boolean`
+
+## externalPosId
+
+
+
+`externalPosId`
+
+* is optional
+
+* Type: `string`
+
+* cannot be null
+
+* defined in: [MercadoPagoConfigStatus](mercadopagoconfigstatus-properties-externalposid.md "undefined#/properties/externalPosId")
+
+### externalPosId Type
+
+`string`
 
 ## publicKey
 
@@ -112,6 +151,24 @@ undefined#/properties/data
 * defined in: [MercadoPagoConfigStatus](mercadopagoconfigstatus-properties-sandboxmode.md "undefined#/properties/sandboxMode")
 
 ### sandboxMode Type
+
+`boolean`
+
+## staticQrConfigured
+
+
+
+`staticQrConfigured`
+
+* is optional
+
+* Type: `boolean`
+
+* cannot be null
+
+* defined in: [MercadoPagoConfigStatus](mercadopagoconfigstatus-properties-staticqrconfigured.md "undefined#/properties/staticQrConfigured")
+
+### staticQrConfigured Type
 
 `boolean`
 

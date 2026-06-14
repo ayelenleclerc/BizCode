@@ -13,6 +13,9 @@ export type MercadoPagoConfigInput = {
   webhookSecret?: string
   sandboxMode?: boolean
   activo?: boolean
+  collectorId?: string
+  externalPosId?: string
+  staticQrData?: string
 }
 
 export type MercadoPagoConfigStatus = {
@@ -22,6 +25,9 @@ export type MercadoPagoConfigStatus = {
   activo?: boolean
   accessTokenLast4?: string
   webhookSecretSet?: boolean
+  collectorId?: string
+  externalPosId?: string
+  staticQrConfigured?: boolean
 }
 
 export type MercadoPagoTestResult = {
@@ -51,6 +57,9 @@ export class MercadoPagoConfigService {
         activo: true,
         accessTokenLast4: true,
         webhookSecretEncrypted: true,
+        collectorId: true,
+        externalPosId: true,
+        staticQrData: true,
       },
     })
     if (!row) {
@@ -63,6 +72,9 @@ export class MercadoPagoConfigService {
       activo: row.activo,
       accessTokenLast4: row.accessTokenLast4,
       webhookSecretSet: Boolean(row.webhookSecretEncrypted),
+      collectorId: row.collectorId ?? undefined,
+      externalPosId: row.externalPosId ?? undefined,
+      staticQrConfigured: Boolean(row.staticQrData?.trim()),
     }
   }
 
@@ -88,6 +100,9 @@ export class MercadoPagoConfigService {
       accessTokenEncrypted?: string
       accessTokenLast4?: string
       webhookSecretEncrypted?: string | null
+      collectorId?: string | null
+      externalPosId?: string | null
+      staticQrData?: string | null
     } = {
       publicKey,
     }
@@ -106,6 +121,18 @@ export class MercadoPagoConfigService {
       const secret = input.webhookSecret.trim()
       updateData.webhookSecretEncrypted = secret ? encryptFiscalSecret(secret) : null
     }
+    if (input.collectorId !== undefined) {
+      const collectorId = input.collectorId.trim()
+      updateData.collectorId = collectorId || null
+    }
+    if (input.externalPosId !== undefined) {
+      const externalPosId = input.externalPosId.trim()
+      updateData.externalPosId = externalPosId || null
+    }
+    if (input.staticQrData !== undefined) {
+      const staticQrData = input.staticQrData.trim()
+      updateData.staticQrData = staticQrData || null
+    }
 
     if (existing) {
       await this.prisma.mercadoPagoConfig.update({
@@ -122,6 +149,9 @@ export class MercadoPagoConfigService {
           webhookSecretEncrypted: updateData.webhookSecretEncrypted ?? null,
           sandboxMode: input.sandboxMode ?? true,
           activo: input.activo ?? true,
+          collectorId: updateData.collectorId ?? null,
+          externalPosId: updateData.externalPosId ?? null,
+          staticQrData: updateData.staticQrData ?? null,
         },
       })
     }

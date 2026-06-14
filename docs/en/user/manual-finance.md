@@ -76,6 +76,18 @@ Mercado Pago sends payment notifications to `POST /api/webhooks/mercadopago` (pu
 4. Duplicate notifications for the same `mpPaymentId` are ignored (idempotent).
 5. Managers receive an in-app notification when a payment is received or fails.
 
+## Mercado Pago instore QR (#177)
+
+For counter (web app) collection with Mercado Pago configured (#174) and active:
+
+1. Open an active invoice with outstanding balance.
+2. Choose **Collect with QR** — generates a dynamic instore QR (`POST /api/facturas/{id}/mp/qr`, 10-minute TTL).
+3. Display the QR for the customer to scan with the Mercado Pago app; the UI polls `GET /api/facturas/{id}/mp` every 3 seconds until `approved`.
+4. Payment confirmation uses the same webhook as #176 (`external_reference` = `{tenantId}:{facturaId}`).
+5. Optional **Settings → Company**: set **POS ID** (`externalPosId`) and **static QR payload** (`staticQrData`); staff with `settings.business.manage` can read the static QR via `GET /api/configuracion/mercadopago/qr-estatico`.
+
+App Repartidor QR collection is deferred until issue #162 (driver collections).
+
 ## API reference
 
 [`docs/api/openapi.yaml`](../../api/openapi.yaml) — paths under `/api/reportes/aging`, `/api/reportes/cuenta-corriente/{clienteId}`, and `/api/clientes/{id}/cuenta-corriente/*`.

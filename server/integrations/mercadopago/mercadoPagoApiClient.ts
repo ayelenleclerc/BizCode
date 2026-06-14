@@ -3,6 +3,7 @@ const MP_PREFERENCES_URL = 'https://api.mercadopago.com/checkout/preferences'
 const MP_PAYMENTS_URL = 'https://api.mercadopago.com/v1/payments'
 
 export type MercadoPagoUserMe = {
+  id?: number
   nickname?: string
   email?: string
   first_name?: string
@@ -155,6 +156,72 @@ export async function fetchMercadoPagoPayment(
   const body = (await res.json()) as MercadoPagoPaymentResult
   if (body.id == null || !body.status) {
     throw new MercadoPagoApiError(502, 'Invalid Mercado Pago payment response')
+  }
+  return body
+}
+
+export type MercadoPagoInstoreQrItem = {
+  sku_number?: string
+  category?: string
+  title: string
+  description?: string
+  unit_price: number
+  quantity: number
+  unit_measure?: string
+  total_amount: number
+}
+
+export type MercadoPagoInstoreQrInput = {
+  external_reference: string
+  title: string
+  description: string
+  notification_url: string
+  total_amount: number
+  items: MercadoPagoInstoreQrItem[]
+}
+
+export type MercadoPagoInstoreQrResult = {
+  qr_data: string
+  in_store_order_id: string
+}
+
+/**
+ * @en Creates a Mercado Pago instore dynamic QR for a POS (#177).
+ * @es Crea un QR dinámico instore de Mercado Pago para un POS (#177).
+ * @pt-BR Cria um QR dinâmico instore do Mercado Pago para um POS (#177).
+ */
+export async function createMercadoPagoInstoreQr(
+  accessToken: string,
+  collectorUserId: string,
+  externalPosId: string,
+  input: MercadoPagoInstoreQrInput,
+): Promise<MercadoPagoInstoreQrResult> {
+  const url = `https://api.mercadopago.com/instore/orders/qr/seller/collectors/${encodeURIComponent(collectorUserId)}/pos/${encodeURIComponent(externalPosId)}/qrs`
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      ...input,
+      cash_out: { amount: 0 },
+    }),
+  })
+
+  if (!res.ok) {
+    throw new MercadoPagoApiError(
+      res.status,
+      res.status === 401 || res.status === 403
+        ? 'Invalid Mercado Pago credentials'
+        : `Mercado Pago API error (${res.status})`,
+    )
+  }
+
+  const body = (await res.json()) as MercadoPagoInstoreQrResult
+  if (!body.qr_data?.trim() || !body.in_store_order_id?.trim()) {
+    throw new MercadoPagoApiError(502, 'Invalid Mercado Pago instore QR response')
   }
   return body
 }

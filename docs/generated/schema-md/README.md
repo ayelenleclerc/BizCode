@@ -334,6 +334,10 @@
 
 * [MercadoPagoFacturaPaymentEnvelope](./mercadopagofacturapaymentenvelope.md) – `-`
 
+* [MercadoPagoStaticQr](./mercadopagostaticqr.md) – `-`
+
+* [MercadoPagoStaticQrEnvelope](./mercadopagostaticqrenvelope.md) – `-`
+
 * [MercadoPagoTestEnvelope](./mercadopagotestenvelope.md) – `-`
 
 * [MercadoPagoWebhookAckEnvelope](./mercadopagowebhookackenvelope.md) – `-`
