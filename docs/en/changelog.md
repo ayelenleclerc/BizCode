@@ -10,6 +10,8 @@ Versioning: [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **Mercado Pago payment reconciliation (#178):** Prisma `MercadoPagoReconciliationEntry` queue (`pending`/`reconciled`/`ignored`); `searchMercadoPagoPayments` (2-day lookback); `MercadoPagoReconciliationService` with idempotent daily job (02:00 local slot via hourly cron), exact-amount auto-match by payer tax ID + unique open invoice, manual queue otherwise; API `GET /api/mercadopago/pagos-sin-reconciliar`, `POST .../reconciliar`, `POST .../ignorar`, `POST .../reconciliacion/run`; CLI `npm run mercadopago:reconciliacion`; staff UI `/finanzas/reconciliacion-mp` (`ReconciliacionMpPage`); OpenAPI, contract/API/unit/UI/integration tests, trilingual finance manual and CI/CD cron docs.
+
 - **Mercado Pago instore QR payments (#177):** Prisma `Factura` fields `mpQrData`, `mpQrOrderId`, `mpQrExpiresAt`; `MercadoPagoConfig` fields `collectorId`, `externalPosId`, `staticQrData`; API `POST /api/facturas/{id}/mp/qr`, `GET /api/configuracion/mercadopago/qr-estatico`; instore dynamic QR (10 min TTL) reuses webhook #176; staff UI `MercadoPagoQrModal` with polling; settings for POS/static QR; OpenAPI, contract/API/unit/UI tests, trilingual finance manual.
 
 - **Mercado Pago payment webhook (#176):** public `POST /api/webhooks/mercadopago` with `x-signature` validation; Prisma `MercadoPagoProcessedPayment` idempotency; fetches payment from MP API; on `approved` creates `ReciboCobro` with `mercadopago` method and invoice allocation, updates `Factura.mpEstado`/`mpPagadoAt`; manager in-app notifications; rate limit; OpenAPI, contract/API/unit tests, trilingual finance manual.

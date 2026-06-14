@@ -10,6 +10,8 @@ Versionamento: [Semantic Versioning](https://semver.org/).
 
 ### Adicionado
 
+- **Reconciliação de pagamentos Mercado Pago (#178):** fila Prisma `MercadoPagoReconciliationEntry` (`pending`/`reconciled`/`ignored`); `searchMercadoPagoPayments` (janela de 2 dias); `MercadoPagoReconciliationService` com job diário idempotente (slot 02:00 horário local via cron horário), auto-match por valor exato + CNPJ/CPF do pagador + fatura em aberto única, demais na fila manual; API `GET /api/mercadopago/pagos-sin-reconciliar`, `POST .../reconciliar`, `POST .../ignorar`, `POST .../reconciliacion/run`; CLI `npm run mercadopago:reconciliacion`; UI staff `/finanzas/reconciliacion-mp` (`ReconciliacionMpPage`); OpenAPI, testes contrato/API/unit/UI/integração, manual de finanças trilíngue e cron em CI/CD.
+
 - **QR de pagamento presencial Mercado Pago (#177):** campos Prisma em `Factura` (`mpQrData`, `mpQrOrderId`, `mpQrExpiresAt`); em `MercadoPagoConfig` (`collectorId`, `externalPosId`, `staticQrData`); API `POST /api/facturas/{id}/mp/qr`, `GET /api/configuracion/mercadopago/qr-estatico`; QR dinâmico instore (TTL 10 min) reutiliza webhook #176; UI staff `MercadoPagoQrModal` com polling; configuração POS/QR estático; OpenAPI, testes contrato/API/unit/UI, manual de finanças trilíngue.
 
 - **Webhook de pagamento Mercado Pago (#176):** `POST /api/webhooks/mercadopago` público com validação `x-signature`; Prisma `MercadoPagoProcessedPayment` (idempotência); busca pagamento na API MP; se `approved` cria `ReciboCobro` com forma `mercadopago` e imputação na fatura, atualiza `Factura.mpEstado`/`mpPagadoAt`; notificações in-app para managers; rate limit; OpenAPI, testes contrato/API/unit, manual de finanças trilíngue.

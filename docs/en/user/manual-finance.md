@@ -88,6 +88,15 @@ For counter (web app) collection with Mercado Pago configured (#174) and active:
 
 App Repartidor QR collection is deferred until issue #162 (driver collections).
 
+## Mercado Pago payment reconciliation (#178)
+
+Some Mercado Pago payments arrive without a linked preference or QR order (direct transfer, static QR scan). BizCode detects them and reconciles with open invoices automatically or with staff review.
+
+1. **Daily job** (`npm run mercadopago:reconciliacion`, recommended cron `0 * * * *` for 02:00 local per tenant): searches approved MP payments from the last 2 days; skips payments already recorded in `MercadoPagoProcessedPayment`.
+2. **Auto-match:** when payer tax ID matches a customer `cuit` and exactly one open invoice has the same outstanding balance → creates `ReciboCobro` and marks the entry `reconciled`. Partial amounts or ambiguous matches stay in the manual queue.
+3. **Manual queue:** **Finance → Mercado Pago reconciliation** (`/finanzas/reconciliacion-mp`, integration `mercadopago`, `reports.financial.read`): list pending payments; load open invoices by customer ID; **Reconcile** (`POST /api/mercadopago/reconciliar`) or **Ignore** (`POST /api/mercadopago/ignorar`).
+4. **On-demand job:** staff can run `POST /api/mercadopago/reconciliacion/run` from the UI.
+
 ## API reference
 
 [`docs/api/openapi.yaml`](../../api/openapi.yaml) — paths under `/api/reportes/aging`, `/api/reportes/cuenta-corriente/{clienteId}`, and `/api/clientes/{id}/cuenta-corriente/*`.

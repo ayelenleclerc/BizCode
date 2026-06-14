@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "facturaId": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "mpPaymentId": {
+      "maxLength": 60,
+      "minLength": 1,
+      "type": "string"
+    }
+  },
+  "required": [
+    "mpPaymentId",
+    "facturaId"
+  ],
+  "title": "MercadoPagoReconcileBody",
+  "type": "object"
+}

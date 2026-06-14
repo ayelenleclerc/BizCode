@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "createdAt": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "currencyId": {
+      "type": "string"
+    },
+    "externalReference": {
+      "nullable": true,
+      "type": "string"
+    },
+    "mpPaymentId": {
+      "type": "string"
+    },
+    "payerEmail": {
+      "nullable": true,
+      "type": "string"
+    },
+    "payerIdentification": {
+      "nullable": true,
+      "type": "string"
+    },
+    "payerName": {
+      "nullable": true,
+      "type": "string"
+    },
+    "paymentDate": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "preferenceId": {
+      "nullable": true,
+      "type": "string"
+    },
+    "transactionAmount": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "mpPaymentId",
+    "transactionAmount",
+    "currencyId",
+    "paymentDate",
+    "payerName",
+    "payerEmail",
+    "payerIdentification",
+    "preferenceId",
+    "externalReference",
+    "createdAt"
+  ],
+  "title": "MercadoPagoReconciliationEntry",
+  "type": "object"
+}

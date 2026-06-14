@@ -436,6 +436,7 @@ model Factura {
   movimientoCC   MovimientoClienteCC?
   reciboCobroImputaciones ReciboCobroImputacion[]
   mercadoPagoProcessedPayments MercadoPagoProcessedPayment[]
+  mercadoPagoReconciliationEntries MercadoPagoReconciliationEntry[]
 
   @@unique([tenantId, tipo, prefijo, numero])
   @@index([tenantId])
@@ -715,6 +716,7 @@ model Tenant {
   portalSessions                PortalSession[]
   mercadoPagoConfig             MercadoPagoConfig?
   mercadoPagoProcessedPayments  MercadoPagoProcessedPayment[]
+  mercadoPagoReconciliationEntries MercadoPagoReconciliationEntry[]
 }
 
 /// Idempotent Mercado Pago payment webhook processing (#176).
@@ -733,6 +735,39 @@ model MercadoPagoProcessedPayment {
 
   @@unique([tenantId, mpPaymentId])
   @@index([tenantId, facturaId])
+}
+
+/// Mercado Pago payments awaiting or completed reconciliation (#178).
+model MercadoPagoReconciliationEntry {
+  id                  Int          @id @default(autoincrement())
+  tenantId            Int
+  tenant              Tenant       @relation(fields: [tenantId], references: [id])
+  mpPaymentId         String       @db.VarChar(60)
+  /// pending | reconciled | ignored
+  estado              String       @db.VarChar(20)
+  transactionAmount   Decimal      @db.Decimal(14, 2)
+  currencyId          String       @default("ARS") @db.VarChar(3)
+  paymentDate         DateTime
+  payerName           String?      @db.VarChar(120)
+  payerEmail          String?      @db.VarChar(120)
+  payerIdentification String?      @db.VarChar(20)
+  preferenceId        String?      @db.VarChar(60)
+  externalReference   String?      @db.VarChar(120)
+  facturaId           Int?
+  factura             Factura?     @relation(fields: [facturaId], references: [id])
+  reciboCobroId       Int?
+  reciboCobro         ReciboCobro? @relation(fields: [reciboCobroId], references: [id])
+  autoMatched         Boolean      @default(false)
+  reconciledByUserId  Int?
+  ignoredByUserId     Int?
+  reconciledAt        DateTime?
+  ignoredAt           DateTime?
+  createdAt           DateTime     @default(now())
+  updatedAt           DateTime     @updatedAt
+
+  @@unique([tenantId, mpPaymentId])
+  @@index([tenantId, estado])
+  @@index([tenantId, paymentDate])
 }
 
 /// MercadoPago credentials per tenant (#174); access token and webhook secret encrypted at rest.
@@ -1172,6 +1207,7 @@ model ReciboCobro {
   movimientoCC         MovimientoClienteCC?
   retencionesAplicadas RetencionAplicada[]
   mercadoPagoProcessedPayments MercadoPagoProcessedPayment[]
+  mercadoPagoReconciliationEntries MercadoPagoReconciliationEntry[]
 
   @@unique([tenantId, numero])
   @@index([tenantId, clienteId])

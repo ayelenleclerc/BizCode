@@ -7,6 +7,8 @@ import {
   MercadoPagoApiError,
   type MercadoPagoPaymentResult,
 } from '../integrations/mercadopago/mercadoPagoApiClient'
+import { computeFacturaPendiente } from '../lib/mercadopagoFacturaPendiente'
+import { parseMercadoPagoExternalReference } from '../lib/mercadopagoExternalReference'
 import { verifyMercadoPagoWebhookSignature } from '../lib/mercadopagoSignature'
 import { sanitizeLogField } from '../lib/sanitizeLogField'
 import { resolveSystemUserId } from '../lib/systemUserId'
@@ -40,14 +42,7 @@ function extractDataIdFromQuery(query: Record<string, unknown>): string | null {
 }
 
 function parseExternalReference(ref: string | null | undefined): { tenantId: number; facturaId: number } | null {
-  if (!ref?.trim()) return null
-  const [tenantPart, facturaPart] = ref.split(':')
-  const tenantId = Number.parseInt(tenantPart ?? '', 10)
-  const facturaId = Number.parseInt(facturaPart ?? '', 10)
-  if (!Number.isInteger(tenantId) || tenantId < 1 || !Number.isInteger(facturaId) || facturaId < 1) {
-    return null
-  }
-  return { tenantId, facturaId }
+  return parseMercadoPagoExternalReference(ref)
 }
 
 function mapMpPaymentStatus(status: string): 'approved' | 'rejected' | 'cancelled' | 'pending' | null {
@@ -219,24 +214,6 @@ export class MercadoPagoWebhookService {
     })
   }
 
-  private async computePendiente(
-    tenantId: number,
-    clienteId: number,
-    facturaId: number,
-    total: Decimal,
-  ): Promise<Decimal> {
-    const allocations = await this.prisma.reciboCobroImputacion.groupBy({
-      by: ['facturaId'],
-      where: {
-        facturaId,
-        reciboCobro: { tenantId, clienteId, estado: 'emitido' },
-      },
-      _sum: { importe: true },
-    })
-    const pagado = allocations[0]?._sum.importe ?? new Decimal(0)
-    return total.minus(pagado)
-  }
-
   private async applyPaymentOutcome(input: {
     tenantId: number
     paymentId: string
@@ -258,12 +235,12 @@ export class MercadoPagoWebhookService {
     let reciboCobroId: number | null = null
 
     if (mapped === 'approved') {
-      const pendiente = await this.computePendiente(
+      const pendiente = await computeFacturaPendiente(this.prisma, {
         tenantId,
-        factura.clienteId,
-        factura.id,
-        factura.total,
-      )
+        clienteId: factura.clienteId,
+        facturaId: factura.id,
+        total: factura.total,
+      })
       if (pendiente.lessThanOrEqualTo(0)) {
         await this.prisma.mercadoPagoProcessedPayment.create({
           data: {

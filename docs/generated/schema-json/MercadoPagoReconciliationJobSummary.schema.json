@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "autoReconciled": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "processed": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "queued": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "skipped": {
+      "minimum": 0,
+      "type": "integer"
+    }
+  },
+  "required": [
+    "processed",
+    "autoReconciled",
+    "queued",
+    "skipped"
+  ],
+  "title": "MercadoPagoReconciliationJobSummary",
+  "type": "object"
+}

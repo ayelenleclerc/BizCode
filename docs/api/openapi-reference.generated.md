@@ -39597,6 +39597,741 @@ Requires `settings.business.manage` and tenant integration `mercadopago`. Return
 }
 ```
 
+### List unreconciled Mercado Pago payments (#178)
+
+- **Method:** `GET`
+- **Path:** `/api/mercadopago/pagos-sin-reconciliar`
+- **Tags:** mercadopago
+
+Requires `reports.financial.read` and tenant integration `mercadopago`. Returns pending reconciliation queue entries.
+
+#### Responses
+
+##### Status: 200 Pending payments
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`currencyId` (required)**
+
+    `string`
+
+  - **`externalReference` (required)**
+
+    `string`
+
+  - **`mpPaymentId` (required)**
+
+    `string`
+
+  - **`payerEmail` (required)**
+
+    `string`
+
+  - **`payerIdentification` (required)**
+
+    `string`
+
+  - **`payerName` (required)**
+
+    `string`
+
+  - **`paymentDate` (required)**
+
+    `string`, format: `date-time`
+
+  - **`preferenceId` (required)**
+
+    `string`
+
+  - **`transactionAmount` (required)**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "mpPaymentId": "",
+      "transactionAmount": "",
+      "currencyId": "",
+      "paymentDate": "",
+      "payerName": "",
+      "payerEmail": "",
+      "payerIdentification": "",
+      "preferenceId": "",
+      "externalReference": "",
+      "createdAt": ""
+    }
+  ]
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Manually reconcile Mercado Pago payment (#178)
+
+- **Method:** `POST`
+- **Path:** `/api/mercadopago/reconciliar`
+- **Tags:** mercadopago
+
+Requires `reports.financial.read` and tenant integration `mercadopago`. Payment amount must match invoice open balance exactly.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`facturaId` (required)**
+
+  `integer`
+
+- **`mpPaymentId` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "mpPaymentId": "",
+  "facturaId": 1
+}
+```
+
+#### Responses
+
+##### Status: 200 Payment reconciled
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`currencyId` (required)**
+
+    `string`
+
+  - **`externalReference` (required)**
+
+    `string`
+
+  - **`mpPaymentId` (required)**
+
+    `string`
+
+  - **`payerEmail` (required)**
+
+    `string`
+
+  - **`payerIdentification` (required)**
+
+    `string`
+
+  - **`payerName` (required)**
+
+    `string`
+
+  - **`paymentDate` (required)**
+
+    `string`, format: `date-time`
+
+  - **`preferenceId` (required)**
+
+    `string`
+
+  - **`transactionAmount` (required)**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "mpPaymentId": "",
+    "transactionAmount": "",
+    "currencyId": "",
+    "paymentDate": "",
+    "payerName": "",
+    "payerEmail": "",
+    "payerIdentification": "",
+    "preferenceId": "",
+    "externalReference": "",
+    "createdAt": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 409 Resource conflict
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 422 Amount mismatch or validation error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 429 Rate limit exceeded
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Ignore unreconciled Mercado Pago payment (#178)
+
+- **Method:** `POST`
+- **Path:** `/api/mercadopago/ignorar`
+- **Tags:** mercadopago
+
+Requires `reports.financial.read` and tenant integration `mercadopago`. Marks a pending payment as not reconciliable.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`mpPaymentId` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "mpPaymentId": ""
+}
+```
+
+#### Responses
+
+##### Status: 200 Payment ignored
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`mpPaymentId` (required)**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "mpPaymentId": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 429 Rate limit exceeded
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Run Mercado Pago reconciliation job (#178)
+
+- **Method:** `POST`
+- **Path:** `/api/mercadopago/reconciliacion/run`
+- **Tags:** mercadopago
+
+Requires `reports.financial.read` and tenant integration `mercadopago`. Forces reconciliation scan for the current tenant (ignores daily time slot).
+
+#### Responses
+
+##### Status: 200 Job summary
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`autoReconciled` (required)**
+
+    `integer`
+
+  - **`processed` (required)**
+
+    `integer`
+
+  - **`queued` (required)**
+
+    `integer`
+
+  - **`skipped` (required)**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "processed": 0,
+    "autoReconciled": 0,
+    "queued": 0,
+    "skipped": 0
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 429 Rate limit exceeded
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ### Public portal branding for login shell (#240)
 
 - **Method:** `GET`
@@ -66814,6 +67549,368 @@ Originating invoice header (selected columns)
   "data": {
     "qrData": "",
     "qrImageBase64": ""
+  }
+}
+```
+
+### MercadoPagoReconciliationEntry
+
+- **Type:**`object`
+
+* **`createdAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`currencyId` (required)**
+
+  `string`
+
+* **`externalReference` (required)**
+
+  `string`
+
+* **`mpPaymentId` (required)**
+
+  `string`
+
+* **`payerEmail` (required)**
+
+  `string`
+
+* **`payerIdentification` (required)**
+
+  `string`
+
+* **`payerName` (required)**
+
+  `string`
+
+* **`paymentDate` (required)**
+
+  `string`, format: `date-time`
+
+* **`preferenceId` (required)**
+
+  `string`
+
+* **`transactionAmount` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "mpPaymentId": "",
+  "transactionAmount": "",
+  "currencyId": "",
+  "paymentDate": "",
+  "payerName": "",
+  "payerEmail": "",
+  "payerIdentification": "",
+  "preferenceId": "",
+  "externalReference": "",
+  "createdAt": ""
+}
+```
+
+### MercadoPagoReconciliationListEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`currencyId` (required)**
+
+    `string`
+
+  - **`externalReference` (required)**
+
+    `string`
+
+  - **`mpPaymentId` (required)**
+
+    `string`
+
+  - **`payerEmail` (required)**
+
+    `string`
+
+  - **`payerIdentification` (required)**
+
+    `string`
+
+  - **`payerName` (required)**
+
+    `string`
+
+  - **`paymentDate` (required)**
+
+    `string`, format: `date-time`
+
+  - **`preferenceId` (required)**
+
+    `string`
+
+  - **`transactionAmount` (required)**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "mpPaymentId": "",
+      "transactionAmount": "",
+      "currencyId": "",
+      "paymentDate": "",
+      "payerName": "",
+      "payerEmail": "",
+      "payerIdentification": "",
+      "preferenceId": "",
+      "externalReference": "",
+      "createdAt": ""
+    }
+  ]
+}
+```
+
+### MercadoPagoReconciliationEntryEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`currencyId` (required)**
+
+    `string`
+
+  - **`externalReference` (required)**
+
+    `string`
+
+  - **`mpPaymentId` (required)**
+
+    `string`
+
+  - **`payerEmail` (required)**
+
+    `string`
+
+  - **`payerIdentification` (required)**
+
+    `string`
+
+  - **`payerName` (required)**
+
+    `string`
+
+  - **`paymentDate` (required)**
+
+    `string`, format: `date-time`
+
+  - **`preferenceId` (required)**
+
+    `string`
+
+  - **`transactionAmount` (required)**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "mpPaymentId": "",
+    "transactionAmount": "",
+    "currencyId": "",
+    "paymentDate": "",
+    "payerName": "",
+    "payerEmail": "",
+    "payerIdentification": "",
+    "preferenceId": "",
+    "externalReference": "",
+    "createdAt": ""
+  }
+}
+```
+
+### MercadoPagoReconcileBody
+
+- **Type:**`object`
+
+* **`facturaId` (required)**
+
+  `integer`
+
+* **`mpPaymentId` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "mpPaymentId": "",
+  "facturaId": 1
+}
+```
+
+### MercadoPagoIgnoreBody
+
+- **Type:**`object`
+
+* **`mpPaymentId` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "mpPaymentId": ""
+}
+```
+
+### MercadoPagoIgnoreResult
+
+- **Type:**`object`
+
+* **`mpPaymentId` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "mpPaymentId": ""
+}
+```
+
+### MercadoPagoIgnoreEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`mpPaymentId` (required)**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "mpPaymentId": ""
+  }
+}
+```
+
+### MercadoPagoReconciliationJobSummary
+
+- **Type:**`object`
+
+* **`autoReconciled` (required)**
+
+  `integer`
+
+* **`processed` (required)**
+
+  `integer`
+
+* **`queued` (required)**
+
+  `integer`
+
+* **`skipped` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "processed": 0,
+  "autoReconciled": 0,
+  "queued": 0,
+  "skipped": 0
+}
+```
+
+### MercadoPagoReconciliationJobEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`autoReconciled` (required)**
+
+    `integer`
+
+  - **`processed` (required)**
+
+    `integer`
+
+  - **`queued` (required)**
+
+    `integer`
+
+  - **`skipped` (required)**
+
+    `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "processed": 0,
+    "autoReconciled": 0,
+    "queued": 0,
+    "skipped": 0
   }
 }
 ```

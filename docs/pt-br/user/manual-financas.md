@@ -88,6 +88,15 @@ Para cobrança no balcão (web) com Mercado Pago configurado (#174) e ativo:
 
 A extensão no App Repartidor fica para o issue #162 (cobranças na entrega).
 
+## Reconciliação de pagamentos Mercado Pago (#178)
+
+Alguns pagamentos chegam ao Mercado Pago sem preference ou pedido QR vinculado (transferência direta, QR estático). O BizCode detecta e reconcilia com faturas em aberto de forma automática ou assistida.
+
+1. **Job diário** (`npm run mercadopago:reconciliacion`, cron recomendado `0 * * * *` para 02:00 horário local por tenant): busca pagamentos `approved` dos últimos 2 dias; ignora pagamentos já registrados em `MercadoPagoProcessedPayment`.
+2. **Auto-match:** quando o CNPJ/CPF do pagador coincide com um cliente e há uma única fatura em aberto com o mesmo saldo pendente exato → cria `ReciboCobro` e marca a entrada `reconciled`. Valores parciais ou matches ambíguos ficam na fila manual.
+3. **Fila manual:** **Finanças → Reconciliação Mercado Pago** (`/finanzas/reconciliacion-mp`, integração `mercadopago`, `reports.financial.read`): lista pagamentos pendentes; carregue faturas em aberto por ID do cliente; **Reconciliar** (`POST /api/mercadopago/reconciliar`) ou **Ignorar** (`POST /api/mercadopago/ignorar`).
+4. **Job sob demanda:** a equipe pode executar `POST /api/mercadopago/reconciliacion/run` pela UI.
+
 ## Referência API
 
 [`docs/api/openapi.yaml`](../../api/openapi.yaml) — rotas `/api/reportes/aging`, `/api/reportes/cuenta-corriente/{clienteId}` e `/api/clientes/{id}/cuenta-corriente/*`.

@@ -88,6 +88,15 @@ Para cobrar en mostrador (web) con Mercado Pago configurado (#174) y activo:
 
 La extensión en App Repartidor queda para el issue #162 (cobros en entrega).
 
+## Reconciliación de pagos Mercado Pago (#178)
+
+Algunos pagos llegan a Mercado Pago sin preference ni orden QR vinculada (transferencia directa, QR estático). BizCode los detecta y los reconcilia con facturas abiertas de forma automática o asistida.
+
+1. **Job diario** (`npm run mercadopago:reconciliacion`, cron recomendado `0 * * * *` para las 02:00 hora local por tenant): busca pagos `approved` de los últimos 2 días; omite pagos ya registrados en `MercadoPagoProcessedPayment`.
+2. **Auto-match:** si el CUIT del pagador coincide con un cliente y hay una sola factura abierta con el mismo saldo pendiente exacto → crea `ReciboCobro` y marca la entrada `reconciled`. Montos parciales o matches ambiguos quedan en cola manual.
+3. **Cola manual:** **Finanzas → Reconciliación Mercado Pago** (`/finanzas/reconciliacion-mp`, integración `mercadopago`, `reports.financial.read`): lista pagos pendientes; cargá facturas abiertas por ID de cliente; **Reconciliar** (`POST /api/mercadopago/reconciliar`) o **Ignorar** (`POST /api/mercadopago/ignorar`).
+4. **Job bajo demanda:** el staff puede ejecutar `POST /api/mercadopago/reconciliacion/run` desde la UI.
+
 ## Referencia API
 
 [`docs/api/openapi.yaml`](../../api/openapi.yaml) — rutas `/api/reportes/aging`, `/api/reportes/cuenta-corriente/{clienteId}` y `/api/clientes/{id}/cuenta-corriente/*`.
