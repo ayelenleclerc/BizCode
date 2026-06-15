@@ -21,23 +21,57 @@
           └──────────────────────────────┘
 ```
 
-## Política de cobertura
+## Política de cobertura (três níveis)
 
-| Escopo | Linhas | Funções | Ramos | Sentenças |
-|---|---|---|---|---|
-| **`src/lib/**/*.ts`** (exceto `*.test.ts`) | **100%** | **100%** | **100%** | **100%** |
-| **`server/createApp.ts`** | **100%** | **100%** | **100%** | **100%** |
-| **`server.ts`** (bootstrap: `createServerInstance`, `bindHttpServer`, `startServer`; entrada `server/main.ts`) | **100%** | **100%** | **100%** | **100%** |
+O BizCode distingue **meta normativa**, **piso de CI** e **teto realista**. Não tratar «100% unit tests» como um único número sobre todo o repositório.
 
-Exclusões adicionais só com **ADR** e alteração explícita em `vitest.config.ts` — ver [ADR-0003](../adr/ADR-0003-api-contract-testing.md), [ADR-0004](../adr/ADR-0004-e2e-playwright-integration-roadmap.md) e [ADR-0005](../adr/ADR-0005-vitest-coverage-server-bootstrap.md).
+### Nível 1 — 100% normativo (obrigatório ao alterar código)
 
-Os limiares são aplicados pelo Vitest (`coverage.thresholds`). O CI falha se não forem atingidos.
+| Escopo | Linhas / funções / ramos / sentenças | Notas |
+|---|---|---|
+| **`server/createApp.ts`** | **100%** | Verificado no CI (relatório de cobertura). |
+| **`server.ts`** | **100%** | Apenas bootstrap; `server/main.ts` excluído ([ADR-0005](../adr/ADR-0005-vitest-coverage-server-bootstrap.md)). |
+| **Módulos puros em `src/lib/**`** | **100%** | Validadores, faturamento, RBAC, migração DBF, planos/módulos, etc. |
+| **`src/lib/api.ts`**, **`src/lib/portalApi.ts`** | **Ratchet até 100%** | Clientes HTTP grandes; mudanças exigem testes; preferir dividir em módulos. |
+
+**Regra de PR:** alterações no Nível 1 devem incluir testes unitários que mantenham **100% linhas** nos arquivos tocados (ou aumentem cobertura em `api.ts` / `portalApi.ts` quando alterados).
+
+### Nível 2 — Piso global de CI (`vitest.config.ts`)
+
+O Vitest mede `coverage.include`: `server/**/*.ts`, `server.ts`, `src/**/*.{ts,tsx}`.
+
+| Métrica | Piso atual (ratchet) | Onde |
+|---|---|---|
+| Linhas | **66%** | `npm run test:coverage` no CI |
+| Sentenças | **64%** | Idem |
+| Funções | **55%** | Idem |
+| Ramos | **44%** | Idem |
+
+**Não reduzir** esses pisos sem **ADR** e atualização trilíngue desta estratégia. **Não diminuir** cobertura em um PR. Subir o ratchet exige a mesma governança.
+
+Expandir `coverage.include` além do Nível 1 requer **ADR** ([ADR-0004](../adr/ADR-0004-e2e-playwright-integration-roadmap.md)).
+
+### Nível 3 — Teto realista com o `include` atual
+
+| Camada | Faixa típica (linhas) | Teto prático |
+|---|---|---|
+| `server/createApp.ts`, `server.ts` | **100%** | **100%** |
+| `server/services/**` | ~75–80% | ~85–90% |
+| `server/routes/**` | ~65–70% | ~80–85% |
+| `src/pages/**` | ~15–80% | ~70–80% em módulos com testes UI |
+| **Global (`include` configurado)** | ~**66%** (baseline CI) | ~**80–88%** com esforço sustentado |
+
+**100% linhas em todo o `include` não é meta de curto/médio prazo.** Páginas React e ramos pouco usados são cobertos por **testes de componente**, **contrato API**, **integração** (`tests/integration/`) e **smoke E2E**.
+
+Exclusões adicionais só com **ADR** e alteração em `vitest.config.ts` — ver [ADR-0003](../adr/ADR-0003-api-contract-testing.md), [ADR-0004](../adr/ADR-0004-e2e-playwright-integration-roadmap.md) e [ADR-0005](../adr/ADR-0005-vitest-coverage-server-bootstrap.md).
 
 ## Metas de cobertura (KPI)
 
 | KPI | Meta | Onde é aplicado |
 |-----|------|-----------------|
-| Linhas / funções / ramos / sentenças no escopo (`src/lib/**/*.ts`, `server/createApp.ts`, `server.ts`) | **100%** cada (política) | Documentado aqui e em ADR-0003/4/5; o **piso** atual está em `vitest.config.ts` → `coverage.thresholds` |
+| Nível 1 (`createApp.ts`, `server.ts`, `src/lib` puro) | **100%** linhas nos arquivos tocados | Esta estratégia + `npm run test:coverage` |
+| Nível 2 piso global | Ver `vitest.config.ts` → `coverage.thresholds` | Quality gates CI |
+| Nível 3 teto | Apenas ratchet ascendente; sem expandir `include` em silêncio | ADR + estratégia |
 | Contrato API vs OpenAPI | Rotas em `tests/api/contract.test.ts` passam | `npm run test` |
 | E2E (Playwright) | Smoke + caminhos críticos em `e2e/` no Chromium | `npm run test:e2e` |
 | Integração (PostgreSQL) | `tests/integration/**` | `npm run test:integration` |

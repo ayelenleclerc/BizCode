@@ -40,7 +40,11 @@ Estas reglas prevalecen sobre instrucciones genéricas del modelo cuando entren 
 
 ## Pruebas
 
-- Mantener umbrales de cobertura en `vitest.config.ts` y `docs/en/quality/testing-strategy.md`; no bajarlos sin **ADR** o actualización explícita de la estrategia.
+- Política de cobertura en tres niveles: [testing-strategy.md](docs/en/quality/testing-strategy.md) (mapa ES/PT-BR en `docs/DOCUMENT_LOCALE_MAP.md`).
+  - **Nivel 1 (100% normativo):** `server/createApp.ts`, `server.ts`, módulos puros en `src/lib/**`; ratchet en `api.ts` / `portalApi.ts`.
+  - **Nivel 2 (suelo CI):** `vitest.config.ts` → `coverage.thresholds` sobre el `include` actual; no bajar sin **ADR** ni actualización trilingüe de la estrategia; no disminuir cobertura en PR.
+  - **Nivel 3 (techo realista):** ~80–88% líneas global con el `include` actual; 100% en todo el repo no es objetivo a corto plazo.
+- Código nuevo o modificado en servicios/backend: tests unitarios que cubran ramas y errores; al tocar Nivel 1, mantener **100% líneas** en archivos afectados.
 
 ## Validación (completitud / correctitud / funcionalidad)
 

@@ -32,33 +32,19 @@
   └──────────────────────────┘
 ```
 
-**Coverage Targets:**
-- **Unit Tests:** ≥90% coverage for src/lib/*, server/* critical paths
-- **Integration Tests:** ≥75% coverage for API routes, database operations
-- **E2E Tests:** ≥6 critical user flows (login, create, edit, delete, error handling, RBAC)
-- **Component Tests:** ≥75% coverage for interactive components
-- **Visual Regression:** ≥95% of pages captured and baseline matched
-- **Accessibility:** 100% automated a11y checks pass, zero critical violations
-- **Performance:** P95 response time <500ms, error rate <0.1%
-- **Security:** 100% SAST scan pass, DAST coverage on critical paths
+**Coverage policy (align with [testing-strategy.md](../../docs/en/quality/testing-strategy.md)):**
 
-**Coverage Calculation:**
-```
-Total Coverage = (Lines Covered / Lines Executable) × 100%
+| Tier | Scope | Target |
+|------|--------|--------|
+| **1 — Normative** | `server/createApp.ts`, `server.ts`, pure `src/lib/**` | **100%** lines on touched files |
+| **1 — Ratchet** | `src/lib/api.ts`, `src/lib/portalApi.ts` | Increase coverage per change; split modules over time |
+| **2 — CI floor** | `vitest.config.ts` `coverage.include` (global) | Current ratchet: **66%** lines (see config); never decrease in PR |
+| **3 — Ceiling** | Full `include` as configured | ~**80–88%** lines realistic; 100% global not short-term |
 
-Acceptable:
-├── src/lib/**         ≥90% (utilities, validation, helpers)
-├── server/routes/**   ≥85% (API endpoints)
-├── server/services/** ≥85% (business logic)
-├── src/components/**  ≥75% (UI components)
-├── src/pages/**       ≥60% (page orchestration)
-└── src/contexts/**    ≥90% (state management)
-
-NOT acceptable:
-├── < 60% on any critical module
-├── Test files (exclude from coverage)
-└── Generated files (exclude from coverage)
-```
+**NOT acceptable:**
+- Lowering `coverage.thresholds` without ADR + trilingual strategy update
+- Coverage decrease in PRs
+- Untested Tier-1 file changes
 
 **Validation Checklist:**
 ```
@@ -156,30 +142,16 @@ describe('validateCUIT', () => {
 - ❌ Don't have shared state between tests
 - ❌ Don't use magic numbers (use named constants)
 
-**Coverage Enforcement:**
+**Coverage Enforcement (Tier 2 CI floor — see `vitest.config.ts`):**
 ```javascript
-// vitest.config.ts
-export default defineConfig({
-  test: {
-    coverage: {
-      provider: 'v8',
-      reporter: ['text', 'html', 'json'],
-      lines: 90,
-      functions: 90,
-      branches: 90,
-      statements: 90,
-      exclude: [
-        'node_modules/',
-        'dist/',
-        'tests/',
-        '**/*.test.ts',
-        '**/*.spec.ts',
-        '**/types.ts'
-      ]
-    }
-  }
-})
+thresholds: {
+  lines: 66,      // ratchet upward only (ADR + strategy)
+  functions: 55,
+  branches: 44,
+  statements: 64,
+}
 ```
+Tier 1 files require **100% lines** when changed; verify with `npm run test:coverage`.
 
 ---
 
@@ -1107,7 +1079,8 @@ Date: _______
 - ❌ Shared state between tests (isolate each test)
 - ❌ Sleeping in tests (use waitFor/expect)
 - ❌ Skipped tests without issues (track and fix)
-- ❌ 100% coverage target (realistic 80-90%)
+- ❌ Lowering coverage thresholds without ADR
+- ❌ Claiming 100% global unit coverage as a repo-wide goal (see three-tier policy)
 - ❌ Testing third-party libraries (assume they work)
 - ❌ No test data cleanup (causes cascading failures)
 - ❌ Tests that depend on execution order (random order)
@@ -1120,7 +1093,8 @@ Date: _______
 
 | Item | Target | Validation |
 |------|--------|-----------|
-| Unit Coverage | ≥90% | npm run test:coverage |
+| Unit Coverage (Tier 2 floor) | ≥66% lines global | `npm run test:coverage` |
+| Unit Coverage (Tier 1 on change) | 100% lines on touched normative files | `npm run test:coverage` + review |
 | Integration Tests | ≥6 critical APIs | npm run test:integration pass |
 | E2E Coverage | ≥6 critical paths | npm run test:e2e pass |
 | Component Testing | ≥75% | npm run test pass |
