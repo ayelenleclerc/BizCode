@@ -23,12 +23,13 @@ describe('Mercado Pago refund/chargeback — integración PostgreSQL (#179)', ()
     await prisma.$disconnect()
   })
 
-  it('MercadoPagoRefund table exists and getByFactura returns null when empty', async () => {
+  it('MercadoPagoRefund table exists and getStatusByFactura returns empty history', async () => {
     const tenant = await prisma.tenant.findFirst({ select: { id: true } })
     expect(tenant?.id).toBeTruthy()
     const service = new MercadoPagoRefundService(prisma)
-    const row = await service.getByFactura(tenant!.id, 999999)
-    expect(row).toBeNull()
+    const status = await service.getStatusByFactura(tenant!.id, 999999)
+    expect(status.refunds).toEqual([])
+    expect(status.refundableBalance).toBe('0.00')
   })
 
   it('MercadoPagoChargeback table exists and listPending returns array', async () => {

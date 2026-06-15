@@ -213,12 +213,17 @@
       "timelineTitle": "Refund status",
       "timelineEstado": "Status",
       "timelineMonto": "Amount",
+      "refundableBalance": "Refundable balance: {{amount}}",
+      "noRefundsYet": "No refunds recorded yet.",
+      "montoLabel": "Refund amount",
+      "montoHint": "Enter a partial amount or keep the full refundable balance.",
       "motivoLabel": "Refund reason",
       "motivoPlaceholder": "Minimum 10 characters",
-      "submit": "Confirm full refund",
+      "submit": "Confirm refund",
       "submitting": "Processing refund…",
       "close": "Close",
       "success": "Refund completed successfully.",
+      "successPartial": "Partial refund of {{monto}} completed successfully.",
       "estado": {
         "iniciado": "Started",
         "procesando": "Processing",
@@ -228,7 +233,7 @@
       "errors": {
         "loadFailed": "Could not load refund status",
         "submitFailed": "Could not process refund",
-        "partialNotSupported": "Partial refunds are not available yet. Only full refunds are supported."
+        "exceedsBalance": "Amount exceeds the refundable balance."
       }
     }
   }

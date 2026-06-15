@@ -368,6 +368,10 @@
 
 * [MercadoPagoRefundNullableEnvelope](./mercadopagorefundnullableenvelope.md) – `-`
 
+* [MercadoPagoRefundStatus](./mercadopagorefundstatus.md) – `-`
+
+* [MercadoPagoRefundStatusEnvelope](./mercadopagorefundstatusenvelope.md) – `-`
+
 * [MercadoPagoStaticQr](./mercadopagostaticqr.md) – `-`
 
 * [MercadoPagoStaticQrEnvelope](./mercadopagostaticqrenvelope.md) – `-`
@@ -1103,6 +1107,8 @@
 * [Untitled array in MercadoPagoChargebackListEnvelope](./mercadopagochargebacklistenvelope-properties-data.md) – `undefined#/properties/data`
 
 * [Untitled array in MercadoPagoReconciliationListEnvelope](./mercadopagoreconciliationlistenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled array in MercadoPagoRefundStatus](./mercadopagorefundstatus-properties-refunds.md) – `undefined#/properties/refunds`
 
 * [Untitled array in ModuleCatalogData](./modulecatalogdata-properties-modules.md) – `undefined#/properties/modules`
 

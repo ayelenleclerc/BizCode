@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "properties": {
     "monto": {
-      "description": "Optional; must match full refundable amount. Partial refunds return 422.",
+      "description": "Optional partial amount; defaults to remaining refundable balance.",
       "exclusiveMinimum": 0,
       "type": "number"
     },

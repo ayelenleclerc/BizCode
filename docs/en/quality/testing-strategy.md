@@ -21,23 +21,57 @@
           └──────────────────────────┘
 ```
 
-## Coverage Policy
+## Coverage policy (three tiers)
 
-| Scope | Lines | Functions | Branches | Statements |
-|---|---|---|---|---|
-| **`src/lib/**/*.ts`** (excludes `*.test.ts`) | **100%** | **100%** | **100%** | **100%** |
-| **`server/createApp.ts`** (Express API; injected Prisma) | **100%** | **100%** | **100%** | **100%** |
-| **`server.ts`** (bootstrap: `createServerInstance`, `bindHttpServer`, `startServer`; entry `server/main.ts`) | **100%** | **100%** | **100%** | **100%** |
+BizCode distinguishes **normative targets**, **CI floors**, and **realistic ceilings**. Do not treat “100% unit tests” as a single global number over the whole repository.
 
-Additional coverage exclusions (bundler entries, `server/main.ts` thin entry, React pages, etc.) only with an **ADR** and explicit `vitest.config.ts` change — see [ADR-0003](../adr/ADR-0003-api-contract-testing.md), [ADR-0004](../adr/ADR-0004-e2e-playwright-integration-roadmap.md), and [ADR-0005](../adr/ADR-0005-vitest-coverage-server-bootstrap.md).
+### Tier 1 — Normative 100% (mandatory on change)
 
-Thresholds are enforced by Vitest's `coverage.thresholds` configuration. The CI pipeline fails if any threshold is not met.
+| Scope | Lines / functions / branches / statements | Notes |
+|---|---|---|
+| **`server/createApp.ts`** | **100%** | Enforced in CI today (see coverage report). |
+| **`server.ts`** | **100%** | Bootstrap only; `server/main.ts` excluded from coverage ([ADR-0005](../adr/ADR-0005-vitest-coverage-server-bootstrap.md)). |
+| **`src/lib/**` pure modules** | **100%** | Validators, invoice math, RBAC, migration helpers, plans/modules catalog, etc. |
+| **`src/lib/api.ts`**, **`src/lib/portalApi.ts`** | **Ratchet toward 100%** | Large HTTP clients; new/changed endpoints need tests; prefer splitting into smaller modules over time. |
+
+**PR rule:** any production change under Tier 1 must add or extend unit tests so touched files stay at **100% lines** (or improve `api.ts` / `portalApi.ts` coverage when those files change).
+
+### Tier 2 — CI global floor (`vitest.config.ts`)
+
+Vitest measures `coverage.include`: `server/**/*.ts`, `server.ts`, `src/**/*.{ts,tsx}` (see `vitest.config.ts`).
+
+| Metric | Current floor (ratchet) | Enforcement |
+|---|---|---|
+| Lines | **66%** | `npm run test:coverage` in CI (`ci.yml`, `qa-validation.yml`, `frontend-validation.yml`) |
+| Statements | **64%** | Same |
+| Functions | **55%** | Same |
+| Branches | **44%** | Same |
+
+**Do not lower** these floors without an **ADR** and an update to this document (EN/ES/PT-BR). **Do not decrease** coverage in a PR. Raising the ratchet requires the same governance.
+
+Widening `coverage.include` beyond Tier 1 paths requires an **ADR** ([ADR-0004](../adr/ADR-0004-e2e-playwright-integration-roadmap.md)).
+
+### Tier 3 — Realistic ceiling on the current `include`
+
+| Layer | Typical measured range (lines) | Practical ceiling |
+|---|---|---|
+| `server/createApp.ts`, `server.ts` | **100%** | **100%** |
+| `server/services/**` | ~75–80% | ~85–90% with service unit tests |
+| `server/routes/**` | ~65–70% | ~80–85% with contract + route tests |
+| `src/pages/**` | ~15–80% (module-dependent) | ~70–80% on modules with UI tests |
+| **Global (`include` as configured)** | ~**66%** (CI baseline) | ~**80–88%** with sustained effort |
+
+**100% lines on the full `include` is not a short- or medium-term goal.** React pages, thin glue, and rarely exercised branches are covered by **component tests where valuable**, **API contract tests**, **integration tests** (`tests/integration/`), and **E2E smoke** — not solely by Vitest line coverage.
+
+Additional coverage exclusions (bundler entries, `server/main.ts`, etc.) only with an **ADR** and explicit `vitest.config.ts` change — see [ADR-0003](../adr/ADR-0003-api-contract-testing.md), [ADR-0004](../adr/ADR-0004-e2e-playwright-integration-roadmap.md), and [ADR-0005](../adr/ADR-0005-vitest-coverage-server-bootstrap.md).
 
 ## Coverage targets (KPI summary)
 
 | KPI | Target | Where enforced |
 |-----|--------|----------------|
-| Lines / functions / branches / statements on policy scope (`src/lib/**/*.ts`, `server/createApp.ts`, `server.ts`) | **100%** each (policy) | Documented here and in ADR-0003/4/5; ratchet in `vitest.config.ts` may be lower until the suite reaches 100% — see `coverage.thresholds` for the **current** failing floor |
+| Tier 1 files (`createApp.ts`, `server.ts`, pure `src/lib/**`) | **100%** lines on touched files | This document; reviewers + `npm run test:coverage` |
+| Tier 2 global floor | See `vitest.config.ts` → `coverage.thresholds` | CI quality gates |
+| Tier 3 ceiling | Ratchet upward only; no silent widening of `include` | ADR + strategy updates |
 | API contract vs OpenAPI | All paths in `tests/api/contract.test.ts` pass | `npm run test` |
 | E2E (Playwright) | Smoke + critical paths in `e2e/` pass on Chromium | `npm run test:e2e` |
 | Integration (PostgreSQL) | `tests/integration/**` pass | `npm run test:integration` |

@@ -1,20 +1,20 @@
 # MercadoPagoRefund Schema
 
 ```txt
-undefined#/properties/data/oneOf/0
+undefined#/properties/refunds/items
 ```
 
 
 
-| Abstract            | Extensible | Status         | Identifiable | Custom Properties | Additional Properties | Access Restrictions | Defined In                                                                                                                             |
-| :------------------ | :--------- | :------------- | :----------- | :---------------- | :-------------------- | :------------------ | :------------------------------------------------------------------------------------------------------------------------------------- |
-| Can be instantiated | No         | Unknown status | No           | Forbidden         | Allowed               | none                | [MercadoPagoRefundNullableEnvelope.schema.json\*](../schema-json/MercadoPagoRefundNullableEnvelope.schema.json "open original schema") |
+| Abstract            | Extensible | Status         | Identifiable | Custom Properties | Additional Properties | Access Restrictions | Defined In                                                                                                         |
+| :------------------ | :--------- | :------------- | :----------- | :---------------- | :-------------------- | :------------------ | :----------------------------------------------------------------------------------------------------------------- |
+| Can be instantiated | No         | Unknown status | No           | Forbidden         | Allowed               | none                | [MercadoPagoRefundStatus.schema.json\*](../schema-json/MercadoPagoRefundStatus.schema.json "open original schema") |
 
-## 0 Type
+## items Type
 
 `object` ([MercadoPagoRefund](mercadopagorefund.md))
 
-# 0 Properties
+# items Properties
 
 | Property                        | Type      | Required | Nullable       | Defined by                                                                                               |
 | :------------------------------ | :-------- | :------- | :------------- | :------------------------------------------------------------------------------------------------------- |

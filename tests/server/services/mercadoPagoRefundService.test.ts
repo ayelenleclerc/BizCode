@@ -1,6 +1,6 @@
 /**
- * @en Unit tests for Mercado Pago refund service (#179).
- * @es Tests unitarios del servicio de reembolso Mercado Pago (#179).
+ * @en Unit tests for Mercado Pago refund service (#179, #344).
+ * @es Tests unitarios del servicio de reembolso Mercado Pago (#179, #344).
  */
 
 import { beforeEach, describe, expect, it, vi } from 'vitest'
@@ -22,6 +22,10 @@ const voidReciboMock = vi.hoisted(() =>
   vi.fn().mockResolvedValue({ ok: true, data: { id: 50, estado: 'anulado' } }),
 )
 
+const recordPartialRefundReversalMock = vi.hoisted(() =>
+  vi.fn().mockResolvedValue({ ok: true, data: { id: 50, estado: 'emitido' } }),
+)
+
 const voidFacturaMock = vi.hoisted(() =>
   vi.fn().mockResolvedValue({
     ok: true,
@@ -29,15 +33,24 @@ const voidFacturaMock = vi.hoisted(() =>
   }),
 )
 
+const createPartialCreditNoteMock = vi.hoisted(() =>
+  vi.fn().mockResolvedValue({
+    ok: true,
+    data: { notaCredito: { id: 11 } },
+  }),
+)
+
 vi.mock('../../../server/services/ReciboCobroService', () => ({
   ReciboCobroService: class {
     voidRecibo = voidReciboMock
+    recordPartialRefundReversal = recordPartialRefundReversalMock
   },
 }))
 
 vi.mock('../../../server/services/FacturaService', () => ({
   FacturaService: class {
     void = voidFacturaMock
+    createPartialCreditNote = createPartialCreditNoteMock
   },
 }))
 
@@ -83,7 +96,7 @@ function buildPrisma(overrides: Partial<Record<string, unknown>> = {}): PrismaCl
       facturaId: 7,
       mpPaymentId: 'mp-pay-1',
       mpRefundId: storedMpRefundId,
-      monto: new Decimal('1500.00'),
+      monto: data.monto ?? new Decimal('1500.00'),
       motivo: 'Motivo de prueba largo',
       estado: data.estado,
       notaCreditoId: data.notaCreditoId ?? null,
@@ -101,6 +114,8 @@ function buildPrisma(overrides: Partial<Record<string, unknown>> = {}): PrismaCl
     },
     mercadoPagoRefund: {
       findFirst: vi.fn().mockResolvedValue(null),
+      findMany: vi.fn().mockResolvedValue([]),
+      aggregate: vi.fn().mockResolvedValue({ _sum: { monto: new Decimal('0') } }),
       create: refundCreate,
       update: refundUpdate,
     },
@@ -113,6 +128,7 @@ function buildPrisma(overrides: Partial<Record<string, unknown>> = {}): PrismaCl
           totalCobrado: new Decimal('1500.00'),
           estado: 'emitido',
           clienteId: 2,
+          numero: 12,
         },
       }),
     },
@@ -126,10 +142,12 @@ function buildPrisma(overrides: Partial<Record<string, unknown>> = {}): PrismaCl
   } as unknown as PrismaClient
 }
 
-describe('MercadoPagoRefundService (#179)', () => {
+describe('MercadoPagoRefundService (#179, #344)', () => {
   beforeEach(() => {
     voidReciboMock.mockClear()
+    recordPartialRefundReversalMock.mockClear()
     voidFacturaMock.mockClear()
+    createPartialCreditNoteMock.mockClear()
     vi.mocked(createMercadoPagoRefund).mockReset()
     vi.mocked(createMercadoPagoRefund).mockResolvedValue({
       id: 900,
@@ -139,21 +157,27 @@ describe('MercadoPagoRefundService (#179)', () => {
     })
   })
 
-  it('rejects partial refund with partial_refund_not_supported', async () => {
+  it('completes partial refund via MP + reversal + partial NC', async () => {
     const service = new MercadoPagoRefundService(buildPrisma())
     const result = await service.refundTotal(1, 7, 1, {
       motivo: 'Motivo de prueba largo',
       monto: 500,
     })
-    expect(result.ok).toBe(false)
-    if (!result.ok) {
-      expect(result.status).toBe(422)
-      expect(result.error).toBe('partial_refund_not_supported')
+    expect(result.ok).toBe(true)
+    if (result.ok) {
+      expect(result.data.estado).toBe('completado')
+      expect(result.data.notaCreditoId).toBe(11)
     }
-    expect(createMercadoPagoRefund).not.toHaveBeenCalled()
+    expect(createMercadoPagoRefund).toHaveBeenCalledWith(expect.any(String), 'mp-pay-1', {
+      amount: 500,
+    })
+    expect(recordPartialRefundReversalMock).toHaveBeenCalled()
+    expect(createPartialCreditNoteMock).toHaveBeenCalled()
+    expect(voidReciboMock).not.toHaveBeenCalled()
+    expect(voidFacturaMock).not.toHaveBeenCalled()
   })
 
-  it('rejects refund above original amount', async () => {
+  it('rejects refund above refundable balance', async () => {
     const service = new MercadoPagoRefundService(buildPrisma())
     const result = await service.refundTotal(1, 7, 1, {
       motivo: 'Motivo de prueba largo',
@@ -162,7 +186,7 @@ describe('MercadoPagoRefundService (#179)', () => {
     expect(result.ok).toBe(false)
     if (!result.ok) {
       expect(result.status).toBe(422)
-      expect(result.error).toBe('Refund amount exceeds original payment')
+      expect(result.error).toBe('exceeds_refundable_balance')
     }
   })
 
@@ -196,5 +220,38 @@ describe('MercadoPagoRefundService (#179)', () => {
     }
     expect(voidReciboMock).not.toHaveBeenCalled()
     expect(voidFacturaMock).not.toHaveBeenCalled()
+  })
+
+  it('getStatusByFactura returns refundable balance after prior refunds', async () => {
+    const service = new MercadoPagoRefundService(
+      buildPrisma({
+        mercadoPagoRefund: {
+          findFirst: vi.fn().mockResolvedValue(null),
+          findMany: vi.fn().mockResolvedValue([
+            {
+              id: 2,
+              facturaId: 7,
+              mpPaymentId: 'mp-pay-1',
+              mpRefundId: 'r1',
+              monto: new Decimal('500.00'),
+              motivo: 'Motivo de prueba largo',
+              estado: 'completado',
+              notaCreditoId: 11,
+              reciboCobroId: 50,
+              errorMessage: null,
+              createdAt: new Date(),
+              updatedAt: new Date(),
+            },
+          ]),
+          aggregate: vi.fn().mockResolvedValue({ _sum: { monto: new Decimal('500.00') } }),
+          create: vi.fn(),
+          update: vi.fn(),
+        },
+      }),
+    )
+    const status = await service.getStatusByFactura(1, 7)
+    expect(status.refundableBalance).toBe('1000.00')
+    expect(status.originalPaymentAmount).toBe('1500.00')
+    expect(status.refunds).toHaveLength(1)
   })
 })

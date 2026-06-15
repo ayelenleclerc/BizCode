@@ -21,7 +21,9 @@ export default defineConfig({
       provider: 'v8',
       reporter: ['text', 'lcov', 'html'],
       reportsDirectory: './coverage',
-      // Umbrales globales tras ampliar `include` a `server/**` y `src/**` (antes ~88% sólo sobre `src/lib` + entry server). Ratchet ascendente cuando suba la cobertura de páginas React.
+      // Tier 2 CI floor (see docs/en/quality/testing-strategy.md — three-tier coverage policy).
+      // Global include: server/** + src/** (~66% lines baseline; realistic ceiling ~80–88%).
+      // Tier 1 normative 100%: createApp.ts, server.ts, pure src/lib/** (not enforced per-file here).
       thresholds: {
         lines: 66,
         functions: 55,

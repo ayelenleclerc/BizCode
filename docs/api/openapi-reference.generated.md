@@ -40332,13 +40332,13 @@ Requires `reports.financial.read` and tenant integration `mercadopago`. Forces r
 }
 ```
 
-### Get Mercado Pago refund status for invoice (#179)
+### Get Mercado Pago refund status for invoice (#179,
 
 - **Method:** `GET`
 - **Path:** `/api/facturas/{id}/mp/reembolso`
 - **Tags:** facturas, mercadopago
 
-Requires `sales.cancel`, tenant integration `mercadopago`, and module `billing.credit_notes`. Returns latest refund record or `null`.
+Requires `sales.cancel`, tenant integration `mercadopago`, and module `billing.credit_notes`. Returns refundable balance and refund history.
 
 #### Responses
 
@@ -40350,6 +40350,68 @@ Requires `sales.cancel`, tenant integration `mercadopago`, and module `billing.c
 
   `object`
 
+  - **`originalPaymentAmount` (required)**
+
+    `string`
+
+  - **`refundableBalance` (required)**
+
+    `string`
+
+  - **`refunds` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`createdAt` (required)**
+
+      `string`, format: `date-time`
+
+    - **`estado` (required)**
+
+      `string`, possible values: `"iniciado", "procesando", "completado", "fallido"`
+
+    - **`facturaId` (required)**
+
+      `integer`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`monto` (required)**
+
+      `string`
+
+    - **`motivo` (required)**
+
+      `string`
+
+    - **`mpPaymentId` (required)**
+
+      `string`
+
+    - **`updatedAt` (required)**
+
+      `string`, format: `date-time`
+
+    - **`errorMessage`**
+
+      `string`
+
+    - **`mpRefundId`**
+
+      `string`
+
+    - **`notaCreditoId`**
+
+      `integer`
+
+    - **`reciboCobroId`**
+
+      `integer`
+
 - **`success` (required)**
 
   `boolean`
@@ -40360,18 +40422,24 @@ Requires `sales.cancel`, tenant integration `mercadopago`, and module `billing.c
 {
   "success": true,
   "data": {
-    "id": 1,
-    "facturaId": 1,
-    "mpPaymentId": "",
-    "mpRefundId": "",
-    "monto": "",
-    "motivo": "",
-    "estado": "iniciado",
-    "notaCreditoId": 1,
-    "reciboCobroId": 1,
-    "errorMessage": "",
-    "createdAt": "",
-    "updatedAt": ""
+    "originalPaymentAmount": "",
+    "refundableBalance": "",
+    "refunds": [
+      {
+        "id": 1,
+        "facturaId": 1,
+        "mpPaymentId": "",
+        "mpRefundId": "",
+        "monto": "",
+        "motivo": "",
+        "estado": "iniciado",
+        "notaCreditoId": 1,
+        "reciboCobroId": 1,
+        "errorMessage": "",
+        "createdAt": "",
+        "updatedAt": ""
+      }
+    ]
   }
 }
 ```
@@ -40460,13 +40528,13 @@ Requires `sales.cancel`, tenant integration `mercadopago`, and module `billing.c
 }
 ```
 
-### Request total Mercado Pago refund (#179)
+### Request Mercado Pago refund (#179,
 
 - **Method:** `POST`
 - **Path:** `/api/facturas/{id}/mp/reembolso`
 - **Tags:** facturas, mercadopago
 
-Requires `sales.cancel`, tenant integration `mercadopago`, and module `billing.credit_notes`. Only **full** refunds are supported in MVP. Partial amounts return `422` with `partial_refund_not_supported`. On success: MP refund API, void receipt, invoice void with credit note (#146), `mpEstado: refunded`.
+Requires `sales.cancel`, tenant integration `mercadopago`, and module `billing.credit_notes`. Supports **full** and **partial** refunds. Omit `monto` to refund the remaining refundable balance. Partial refunds create a partial credit note (#344) without voiding the invoice. Full refunds void receipt, invoice, and credit note (#146), setting `mpEstado: refunded`.
 
 #### Request Body
 
@@ -40478,7 +40546,7 @@ Requires `sales.cancel`, tenant integration `mercadopago`, and module `billing.c
 
 - **`monto`**
 
-  `number` — Optional; must match full refundable amount. Partial refunds return 422.
+  `number` — Optional partial amount; defaults to remaining refundable balance.
 
 **Example:**
 
@@ -68729,7 +68797,7 @@ Originating invoice header (selected columns)
 
 * **`monto`**
 
-  `number` — Optional; must match full refundable amount. Partial refunds return 422.
+  `number` — Optional partial amount; defaults to remaining refundable balance.
 
 **Example:**
 
@@ -68737,6 +68805,199 @@ Originating invoice header (selected columns)
 {
   "motivo": "",
   "monto": 1
+}
+```
+
+### MercadoPagoRefundStatus
+
+- **Type:**`object`
+
+* **`originalPaymentAmount` (required)**
+
+  `string`
+
+* **`refundableBalance` (required)**
+
+  `string`
+
+* **`refunds` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"iniciado", "procesando", "completado", "fallido"`
+
+  - **`facturaId` (required)**
+
+    `integer`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`monto` (required)**
+
+    `string`
+
+  - **`motivo` (required)**
+
+    `string`
+
+  - **`mpPaymentId` (required)**
+
+    `string`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`errorMessage`**
+
+    `string`
+
+  - **`mpRefundId`**
+
+    `string`
+
+  - **`notaCreditoId`**
+
+    `integer`
+
+  - **`reciboCobroId`**
+
+    `integer`
+
+**Example:**
+
+```json
+{
+  "originalPaymentAmount": "",
+  "refundableBalance": "",
+  "refunds": [
+    {
+      "id": 1,
+      "facturaId": 1,
+      "mpPaymentId": "",
+      "mpRefundId": "",
+      "monto": "",
+      "motivo": "",
+      "estado": "iniciado",
+      "notaCreditoId": 1,
+      "reciboCobroId": 1,
+      "errorMessage": "",
+      "createdAt": "",
+      "updatedAt": ""
+    }
+  ]
+}
+```
+
+### MercadoPagoRefundStatusEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`originalPaymentAmount` (required)**
+
+    `string`
+
+  - **`refundableBalance` (required)**
+
+    `string`
+
+  - **`refunds` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`createdAt` (required)**
+
+      `string`, format: `date-time`
+
+    - **`estado` (required)**
+
+      `string`, possible values: `"iniciado", "procesando", "completado", "fallido"`
+
+    - **`facturaId` (required)**
+
+      `integer`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`monto` (required)**
+
+      `string`
+
+    - **`motivo` (required)**
+
+      `string`
+
+    - **`mpPaymentId` (required)**
+
+      `string`
+
+    - **`updatedAt` (required)**
+
+      `string`, format: `date-time`
+
+    - **`errorMessage`**
+
+      `string`
+
+    - **`mpRefundId`**
+
+      `string`
+
+    - **`notaCreditoId`**
+
+      `integer`
+
+    - **`reciboCobroId`**
+
+      `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "originalPaymentAmount": "",
+    "refundableBalance": "",
+    "refunds": [
+      {
+        "id": 1,
+        "facturaId": 1,
+        "mpPaymentId": "",
+        "mpRefundId": "",
+        "monto": "",
+        "motivo": "",
+        "estado": "iniciado",
+        "notaCreditoId": 1,
+        "reciboCobroId": 1,
+        "errorMessage": "",
+        "createdAt": "",
+        "updatedAt": ""
+      }
+    ]
+  }
 }
 ```
 

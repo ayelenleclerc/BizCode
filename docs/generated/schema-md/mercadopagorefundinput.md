@@ -23,7 +23,7 @@ undefined
 
 ## monto
 
-Optional; must match full refundable amount. Partial refunds return 422.
+Optional partial amount; defaults to remaining refundable balance.
 
 `monto`
 

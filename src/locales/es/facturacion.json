@@ -213,12 +213,17 @@
       "timelineTitle": "Estado del reembolso",
       "timelineEstado": "Estado",
       "timelineMonto": "Monto",
+      "refundableBalance": "Saldo reembolsable: {{amount}}",
+      "noRefundsYet": "Aún no hay reembolsos registrados.",
+      "montoLabel": "Monto a reembolsar",
+      "montoHint": "Ingresá un monto parcial o dejá el saldo reembolsable completo.",
       "motivoLabel": "Motivo del reembolso",
       "motivoPlaceholder": "Mínimo 10 caracteres",
-      "submit": "Confirmar reembolso total",
+      "submit": "Confirmar reembolso",
       "submitting": "Procesando reembolso…",
       "close": "Cerrar",
       "success": "Reembolso completado correctamente.",
+      "successPartial": "Reembolso parcial de {{monto}} completado correctamente.",
       "estado": {
         "iniciado": "Iniciado",
         "procesando": "Procesando",
@@ -228,7 +233,7 @@
       "errors": {
         "loadFailed": "No se pudo cargar el estado del reembolso",
         "submitFailed": "No se pudo procesar el reembolso",
-        "partialNotSupported": "El reembolso parcial no está disponible aún. Solo se admite reembolso total."
+        "exceedsBalance": "El monto supera el saldo reembolsable."
       }
     }
   }
