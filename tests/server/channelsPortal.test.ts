@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { sendPortalMagicLinkEmail } from '../../server/channels'
+import { sendPortalMagicLinkEmail } from '../../apps/server/channels'
 
 describe('sendPortalMagicLinkEmail (#240)', () => {
   it('no-ops when SMTP is not configured', async () => {

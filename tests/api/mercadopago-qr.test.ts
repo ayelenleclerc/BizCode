@@ -7,23 +7,23 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import request from 'supertest'
 import type { PrismaClient } from '@prisma/client'
 import { Decimal } from '@prisma/client/runtime/library'
-import { createApp } from '../../server/createApp'
-import { encryptFiscalSecret } from '../../server/fiscal/ar/fiscalSecrets'
-import { clearTenantFeaturesCache } from '../../server/services/tenantConfigCache'
+import { createApp } from '../../apps/server/createApp'
+import { encryptFiscalSecret } from '../../apps/server/fiscal/ar/fiscalSecrets'
+import { clearTenantFeaturesCache } from '../../apps/server/services/tenantConfigCache'
 
-vi.mock('../../server/integrations/mercadopago/mercadoPagoApiClient', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('../../server/integrations/mercadopago/mercadoPagoApiClient')>()
+vi.mock('../../apps/server/integrations/mercadopago/mercadoPagoApiClient', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../../apps/server/integrations/mercadopago/mercadoPagoApiClient')>()
   return {
     ...actual,
     createMercadoPagoInstoreQr: vi.fn(),
   }
 })
 
-vi.mock('../../server/lib/mercadopagoQrImage', () => ({
+vi.mock('../../apps/server/lib/mercadopagoQrImage', () => ({
   mercadoPagoQrPayloadToBase64: vi.fn().mockResolvedValue('base64png'),
 }))
 
-import { createMercadoPagoInstoreQr } from '../../server/integrations/mercadopago/mercadoPagoApiClient'
+import { createMercadoPagoInstoreQr } from '../../apps/server/integrations/mercadopago/mercadoPagoApiClient'
 
 const futureQrExpiry = new Date(Date.now() + 10 * 60 * 1000)
 

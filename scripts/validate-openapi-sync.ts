@@ -13,7 +13,7 @@ import {
 
 const dir = path.dirname(fileURLToPath(import.meta.url))
 const repoRoot = path.resolve(dir, '..')
-const serverRoot = path.join(repoRoot, 'server')
+const serverRoot = path.join(repoRoot, 'apps', 'server')
 const specPath = path.join(repoRoot, 'docs', 'api', 'openapi.yaml')
 
 const expressRoutes = scanExpressApiRoutes(serverRoot)

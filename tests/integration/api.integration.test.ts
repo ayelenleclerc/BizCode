@@ -7,7 +7,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 import request from 'supertest'
 import type { Application } from 'express'
 import { PrismaClient } from '@prisma/client'
-import { createApp } from '../../server/createApp'
+import { createApp } from '../../apps/server/createApp'
 import { buildArticuloCreateBody, createIntegrationRubro } from '../fixtures/catalogFactories'
 
 async function truncateAll(prisma: PrismaClient): Promise<void> {

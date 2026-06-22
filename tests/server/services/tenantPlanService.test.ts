@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { PrismaClient } from '@prisma/client'
-import { TenantPlanService } from '../../../server/services/TenantPlanService'
-import { clearTenantPlanCache } from '../../../server/services/tenantPlanCache'
+import { TenantPlanService } from '../../../apps/server/services/TenantPlanService'
+import { clearTenantPlanCache } from '../../../apps/server/services/tenantPlanCache'
 
 function buildPrisma(): PrismaClient {
   return {

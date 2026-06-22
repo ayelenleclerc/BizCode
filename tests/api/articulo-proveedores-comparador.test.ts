@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import request from 'supertest'
 import type { PrismaClient } from '@prisma/client'
 import { Decimal } from '@prisma/client/runtime/library'
-import { createApp } from '../../server/createApp'
+import { createApp } from '../../apps/server/createApp'
 
 const articulo = { id: 10, codigo: 1001, descripcion: 'Aceite 1L' }
 

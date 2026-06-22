@@ -5,7 +5,7 @@ import {
   parseSifereLine,
   SIFERE_FIELD_LENGTHS,
   type SifereRetencionExportRow,
-} from '../../../../server/fiscal/ar/sifereRetencionesExport'
+} from '../../../../apps/server/fiscal/ar/sifereRetencionesExport'
 
 const ROWS: SifereRetencionExportRow[] = [
   {

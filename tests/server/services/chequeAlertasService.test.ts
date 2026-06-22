@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { Decimal } from '@prisma/client/runtime/library'
-import { ChequeAlertasService } from '../../../server/services/ChequeAlertasService'
+import { ChequeAlertasService } from '../../../apps/server/services/ChequeAlertasService'
 
 describe('ChequeAlertasService (#231)', () => {
   let prisma: {

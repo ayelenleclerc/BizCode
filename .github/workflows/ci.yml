@@ -35,18 +35,23 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.30.2
+
       - name: Setup Node.js 22
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-          cache: 'npm'
+          cache: 'pnpm'
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
-      - name: npm audit (informational, non-blocking)
+      - name: pnpm audit (informational, non-blocking)
         continue-on-error: true
-        run: npm audit --audit-level=high
+        run: pnpm audit --audit-level=high
 
       - name: Generate Prisma client
         run: npx prisma generate
@@ -66,13 +71,13 @@ jobs:
           fi
 
       - name: TypeScript type-check
-        run: npm run type-check
+        run: pnpm run type-check
 
       - name: Validate OpenAPI specification
-        run: npm run docs:validate
+        run: pnpm run docs:validate
 
       - name: Generate documentation (TypeDoc, OpenAPI MD, schemas, SBOM)
-        run: npm run docs:generate
+        run: pnpm run docs:generate
 
       - name: Verify TypeDoc HTML post-process
         run: |
@@ -123,16 +128,16 @@ jobs:
           NODE
 
       - name: ESLint (jsx-a11y y TypeScript — cero advertencias)
-        run: npm run lint
+        run: pnpm run lint
 
       - name: API contract tests (OpenAPI / Ajv)
         run: npx vitest run tests/api/contract.test.ts
 
       - name: Unit tests with coverage
-        run: npm run test:coverage
+        run: pnpm run test:coverage
 
       - name: i18n parity check
-        run: npm run check:i18n
+        run: pnpm run check:i18n
 
       - name: Install Playwright Chromium
         run: npx playwright install --with-deps chromium
@@ -154,7 +159,7 @@ jobs:
           JWT_SECRET: ci-test-jwt-secret
           BIZCODE_TEST_AUTH_BYPASS: 'false'
         run: |
-          npm run server &
+          pnpm run server &
           for i in $(seq 1 45); do
             if curl -sf http://127.0.0.1:3001/api/health >/dev/null; then
               echo "API healthy"
@@ -166,13 +171,13 @@ jobs:
           exit 1
 
       - name: E2E smoke (Playwright)
-        run: npm run test:e2e
+        run: pnpm run test:e2e
 
       - name: Integration tests (PostgreSQL + Prisma)
-        run: npm run test:integration
+        run: pnpm run test:integration
 
       - name: Documentation locale map check
-        run: npm run check:docs-map
+        run: pnpm run check:docs-map
 
       - name: Upload coverage report
         if: always()

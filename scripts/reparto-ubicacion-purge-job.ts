@@ -5,7 +5,7 @@
  */
 import 'dotenv/config'
 import { PrismaClient } from '@prisma/client'
-import { RepartoUbicacionService } from '../server/services/RepartoUbicacionService'
+import { RepartoUbicacionService } from '../apps/server/services/RepartoUbicacionService'
 
 async function main(): Promise<void> {
   const prisma = new PrismaClient()

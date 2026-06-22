@@ -2,31 +2,31 @@ import fs from 'node:fs/promises'
 import os from 'node:os'
 import path from 'node:path'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { buildArcaQrUrl } from '../../../server/fiscal/ar/arcaQrPayload'
-import { DocumentoCompraImportService } from '../../../server/services/DocumentoCompraImportService'
+import { buildArcaQrUrl } from '../../../apps/server/fiscal/ar/arcaQrPayload'
+import { DocumentoCompraImportService } from '../../../apps/server/services/DocumentoCompraImportService'
 
 const mockExtractPdf = vi.hoisted(() => vi.fn())
 const mockPreprocess = vi.hoisted(() => vi.fn())
 const mockOcr = vi.hoisted(() => vi.fn())
 const mockTier4 = vi.hoisted(() => vi.fn())
 
-vi.mock('../../../server/fiscal/ar/documentoCompraPdfText', () => ({
+vi.mock('../../../apps/server/fiscal/ar/documentoCompraPdfText', () => ({
   extractPdfPlainText: mockExtractPdf,
 }))
 
-vi.mock('../../../server/fiscal/ar/documentoCompraImagePreprocess', () => ({
+vi.mock('../../../apps/server/fiscal/ar/documentoCompraImagePreprocess', () => ({
   preprocessDocumentoCompraImage: mockPreprocess,
 }))
 
-vi.mock('../../../server/fiscal/ar/documentoCompraOcr', () => ({
+vi.mock('../../../apps/server/fiscal/ar/documentoCompraOcr', () => ({
   runDocumentoCompraOcr: mockOcr,
 }))
 
-vi.mock('../../../server/services/documentoCompraTier4Extract', () => ({
+vi.mock('../../../apps/server/services/documentoCompraTier4Extract', () => ({
   tryExtractDocumentoCompraTier4: mockTier4,
 }))
-import { DocumentoCompraStorage } from '../../../server/services/DocumentoCompraStorage'
-import { createEmptyDocumentoCompraPreview } from '../../../server/lib/documentoCompraTypes'
+import { DocumentoCompraStorage } from '../../../apps/server/services/DocumentoCompraStorage'
+import { createEmptyDocumentoCompraPreview } from '../../../apps/server/lib/documentoCompraTypes'
 
 const preview = createEmptyDocumentoCompraPreview()
 

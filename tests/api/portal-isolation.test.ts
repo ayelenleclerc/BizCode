@@ -1,8 +1,8 @@
 import { Decimal } from '@prisma/client/runtime/library'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import request from 'supertest'
-import { createApp } from '../../server/createApp'
-import { initializeAppConfig, resetAppConfigCache } from '../../server/config/env'
+import { createApp } from '../../apps/server/createApp'
+import { initializeAppConfig, resetAppConfigCache } from '../../apps/server/config/env'
 import {
   createPortalPrismaMock,
   PORTAL_TEST_CLIENTE_A_ID,

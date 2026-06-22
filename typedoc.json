@@ -1,7 +1,7 @@
 {
   "$schema": "https://typedoc.org/schema.json",
   "name": "BizCode",
-  "entryPoints": ["src", "server", "server.ts"],
+  "entryPoints": ["apps/web/src", "apps/server", "apps/server/server.ts"],
   "entryPointStrategy": "expand",
   "out": "docs/generated/typedoc",
   "exclude": [

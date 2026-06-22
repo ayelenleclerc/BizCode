@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { DOCUMENTO_COMPRA_OCR_LANG } from '../../../../server/fiscal/ar/documentoCompraOcr'
+import { DOCUMENTO_COMPRA_OCR_LANG } from '../../../../apps/server/fiscal/ar/documentoCompraOcr'
 
 describe('documentoCompraOcr', () => {
   it('includes Spanish, English and Portuguese OCR languages (#277 Fase G)', () => {

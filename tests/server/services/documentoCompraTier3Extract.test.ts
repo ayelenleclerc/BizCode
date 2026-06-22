@@ -2,16 +2,16 @@ import { describe, expect, it, vi, beforeEach } from 'vitest'
 import {
   DOCUMENTO_COMPRA_TIER3_CONFIDENCE_FACTOR,
   tryExtractDocumentoCompraTier3,
-} from '../../../server/services/documentoCompraTier3Extract'
+} from '../../../apps/server/services/documentoCompraTier3Extract'
 
 const mockPreprocess = vi.hoisted(() => vi.fn())
 const mockOcr = vi.hoisted(() => vi.fn())
 
-vi.mock('../../../server/fiscal/ar/documentoCompraImagePreprocess', () => ({
+vi.mock('../../../apps/server/fiscal/ar/documentoCompraImagePreprocess', () => ({
   preprocessDocumentoCompraImage: mockPreprocess,
 }))
 
-vi.mock('../../../server/fiscal/ar/documentoCompraOcr', () => ({
+vi.mock('../../../apps/server/fiscal/ar/documentoCompraOcr', () => ({
   runDocumentoCompraOcr: mockOcr,
 }))
 

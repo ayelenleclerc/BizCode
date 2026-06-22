@@ -3,7 +3,7 @@ import request from 'supertest'
 import type { PrismaClient } from '@prisma/client'
 import { Decimal } from '@prisma/client/runtime/library'
 import { Prisma } from '@prisma/client'
-import { createApp } from '../../server/createApp'
+import { createApp } from '../../apps/server/createApp'
 
 /** Aggregate result shape returned by prisma.factura.aggregate */
 type FacturaAggregateResult = { _count: { id: number }; _sum: { total: string | null } }

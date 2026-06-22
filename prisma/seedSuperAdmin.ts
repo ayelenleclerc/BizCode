@@ -1,7 +1,7 @@
 import type { PrismaClient } from '@prisma/client'
-import { hashPassword } from '../server/passwordHash'
-import { NEW_TENANT_MODULES } from '../src/lib/modules/tenantDefaults'
-import { USER_CHANNELS } from '../src/lib/rbac'
+import { hashPassword } from '../apps/server/passwordHash'
+import { NEW_TENANT_MODULES } from '../apps/web/src/lib/modules/tenantDefaults'
+import { USER_CHANNELS } from '../packages/types/src/rbac'
 
 export const SUPERADMIN_SEED_TENANT_SLUG = 'platform'
 export const SUPERADMIN_SEED_TENANT_NAME = 'Platform'

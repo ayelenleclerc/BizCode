@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { PrismaClient } from '@prisma/client'
 import { Decimal } from '@prisma/client/runtime/library'
-import { ProveedorHistorialService } from '../../../server/services/ProveedorHistorialService'
+import { ProveedorHistorialService } from '../../../apps/server/services/ProveedorHistorialService'
 
 function buildPrisma(overrides: Partial<Record<string, unknown>> = {}): PrismaClient {
   return {

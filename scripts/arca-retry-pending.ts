@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client'
-import { ArcaService } from '../server/fiscal/ar/ArcaService'
+import { ArcaService } from '../apps/server/fiscal/ar/ArcaService'
 
 async function main(): Promise<void> {
   const tenantIdRaw = process.env.BIZCODE_TENANT_ID

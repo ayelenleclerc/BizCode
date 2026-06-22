@@ -1,11 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { PrismaClient } from '@prisma/client'
 import { Decimal } from '@prisma/client/runtime/library'
-import { dispatchNotification } from '../../../server/channels'
-import { CobranzasService } from '../../../server/services/CobranzasService'
-import type { CobranzasReminderSettings } from '../../../server/lib/cobranzasReminderDefaults'
+import { dispatchNotification } from '../../../apps/server/channels'
+import { CobranzasService } from '../../../apps/server/services/CobranzasService'
+import type { CobranzasReminderSettings } from '../../../apps/server/lib/cobranzasReminderDefaults'
 
-vi.mock('../../../server/channels', () => ({
+vi.mock('../../../apps/server/channels', () => ({
   dispatchNotification: vi.fn().mockResolvedValue(undefined),
 }))
 

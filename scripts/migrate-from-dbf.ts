@@ -11,10 +11,10 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { PrismaClient } from '@prisma/client'
 import { DBFFile } from 'dbffile'
-import { dbfRowToRawCliente, mapLegacyCondToCondIva } from '../src/lib/migration/legacyClienteDbf'
-import type { ClienteInput } from '../server/createApp.types'
-import { ImportService } from '../server/services/ImportService'
-import { clienteBodySchema, safeParseBodySchema } from '../server/schemas/domain'
+import { dbfRowToRawCliente, mapLegacyCondToCondIva } from '../apps/web/src/lib/migration/legacyClienteDbf'
+import type { ClienteInput } from '../apps/server/createApp.types'
+import { ImportService } from '../apps/server/services/ImportService'
+import { clienteBodySchema, safeParseBodySchema } from '../apps/server/schemas/domain'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 

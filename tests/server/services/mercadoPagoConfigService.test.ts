@@ -5,19 +5,19 @@
 
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { PrismaClient } from '@prisma/client'
-import { encryptFiscalSecret } from '../../../server/fiscal/ar/fiscalSecrets'
-import { MercadoPagoApiError } from '../../../server/integrations/mercadopago/mercadoPagoApiClient'
-import { MercadoPagoConfigService } from '../../../server/services/MercadoPagoConfigService'
+import { encryptFiscalSecret } from '../../../apps/server/fiscal/ar/fiscalSecrets'
+import { MercadoPagoApiError } from '../../../apps/server/integrations/mercadopago/mercadoPagoApiClient'
+import { MercadoPagoConfigService } from '../../../apps/server/services/MercadoPagoConfigService'
 
-vi.mock('../../../server/integrations/mercadopago/mercadoPagoApiClient', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('../../../server/integrations/mercadopago/mercadoPagoApiClient')>()
+vi.mock('../../../apps/server/integrations/mercadopago/mercadoPagoApiClient', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../../../apps/server/integrations/mercadopago/mercadoPagoApiClient')>()
   return {
     ...actual,
     fetchMercadoPagoUserMe: vi.fn(),
   }
 })
 
-import { fetchMercadoPagoUserMe } from '../../../server/integrations/mercadopago/mercadoPagoApiClient'
+import { fetchMercadoPagoUserMe } from '../../../apps/server/integrations/mercadopago/mercadoPagoApiClient'
 
 function buildPrismaMock(overrides: Partial<Record<string, unknown>> = {}): PrismaClient {
   return {

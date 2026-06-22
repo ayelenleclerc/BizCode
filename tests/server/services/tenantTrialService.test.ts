@@ -1,11 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { PrismaClient } from '@prisma/client'
-import { DEFAULT_MODULES } from '../../../src/lib/modules'
-import { TenantTrialService } from '../../../server/services/TenantTrialService'
-import type { TenantConfigService } from '../../../server/services/TenantConfigService'
-import { notifyTenantOwners } from '../../../server/notifications'
+import { DEFAULT_MODULES } from '../../../apps/web/src/lib/modules'
+import { TenantTrialService } from '../../../apps/server/services/TenantTrialService'
+import type { TenantConfigService } from '../../../apps/server/services/TenantConfigService'
+import { notifyTenantOwners } from '../../../apps/server/notifications'
 
-vi.mock('../../../server/notifications', () => ({
+vi.mock('../../../apps/server/notifications', () => ({
   notifyTenantOwners: vi.fn().mockResolvedValue(undefined),
 }))
 

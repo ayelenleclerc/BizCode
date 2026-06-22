@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { PrismaClient } from '@prisma/client'
-import { RecuentoService } from '../../../server/services/RecuentoService'
+import { RecuentoService } from '../../../apps/server/services/RecuentoService'
 
 function buildRecuentoRow(estado: 'in_progress' | 'closed', cantFisica: number | null = null) {
   return {

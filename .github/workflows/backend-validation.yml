@@ -7,14 +7,22 @@ on:
   push:
     branches: [main, develop]
     paths:
-      - 'server/**'
+      - 'apps/server/**'
+      - 'packages/**'
       - 'prisma/**'
       - 'package.json'
+      - 'pnpm-workspace.yaml'
+      - 'pnpm-lock.yaml'
+      - 'turbo.json'
   pull_request:
     branches: [main, develop]
     paths:
-      - 'server/**'
+      - 'apps/server/**'
+      - 'packages/**'
       - 'prisma/**'
+      - 'pnpm-workspace.yaml'
+      - 'pnpm-lock.yaml'
+      - 'turbo.json'
 
 jobs:
   backend-quality:
@@ -43,14 +51,19 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.30.2
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-          cache: 'npm'
+          cache: 'pnpm'
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
       - name: Generate Prisma client
         run: npx prisma generate
@@ -60,7 +73,7 @@ jobs:
 
       - name: Check for createApp.ts size (Issue #77 ratchet, threshold 1800)
         run: |
-          LINES=$(wc -l < server/createApp.ts)
+          LINES=$(wc -l < apps/server/createApp.ts)
           if [ $LINES -gt 1800 ]; then
             echo "❌ createApp.ts has grown beyond 1800 lines (Issue #77 — modularize before raising further)"
             echo "Current: $LINES lines"
@@ -70,44 +83,44 @@ jobs:
 
       - name: Validate error handling patterns (403/409)
         run: |
-          if grep -rE 'res\.status\((403|409)\)' server --include='*.ts' >/dev/null; then
+          if grep -rE 'res\.status\((403|409)\)' apps/server --include='*.ts' >/dev/null; then
             echo "✅ Found explicit HTTP 403/409 responses"
           else
-            echo "::error::Expected authorization/conflict responses (403/409) somewhere in server/ (Issue #78)"
+            echo "::error::Expected authorization/conflict responses (403/409) somewhere in apps/server/ (Issue #78)"
             exit 1
           fi
 
       - name: Check for AppError class (Issue #78)
         run: |
-          if grep -q "export class AppError" server/errors/AppError.ts 2>/dev/null; then
+          if grep -q "export class AppError" apps/server/errors/AppError.ts 2>/dev/null; then
             echo "✅ AppError class exists"
           else
-            echo "::error::AppError must be exported in server/errors/AppError.ts"
+            echo "::error::AppError must be exported in apps/server/errors/AppError.ts"
             exit 1
           fi
 
       - name: Validate multi-tenant enforcement (Issue #83)
         run: |
           set -euo pipefail
-          TENANT_CHECKS=$(grep -r "claims\.tenantId" server --include='*.ts' | wc -l)
-          echo "✅ Found $TENANT_CHECKS claims.tenantId references in server/"
+          TENANT_CHECKS=$(grep -r "claims\.tenantId" apps/server --include='*.ts' | wc -l)
+          echo "✅ Found $TENANT_CHECKS claims.tenantId references in apps/server/"
           if [ "$TENANT_CHECKS" -lt 5 ]; then
-            echo "::error::Expected at least 5 tenant scoping usages (claims.tenantId) in server/ (Issue #83)"
+            echo "::error::Expected at least 5 tenant scoping usages (claims.tenantId) in apps/server/ (Issue #83)"
             exit 1
           fi
 
       - name: Check for Pino logger (Issue #78)
         run: |
-          if grep -q "from 'pino'" server/logger.ts 2>/dev/null; then
+          if grep -q "from 'pino'" apps/server/logger.ts 2>/dev/null; then
             echo "✅ Pino logger configured"
           else
-            echo "::error::Structured logger must import pino in server/logger.ts"
+            echo "::error::Structured logger must import pino in apps/server/logger.ts"
             exit 1
           fi
 
       - name: Verify AuditEvent logging (Issue #84)
         run: |
-          if grep -q "model AuditEvent" prisma/schema.prisma && grep -q "writeAuditEvent" server/audit.ts; then
+          if grep -q "model AuditEvent" prisma/schema.prisma && grep -q "writeAuditEvent" apps/server/audit.ts; then
             echo "✅ Audit model + writeAuditEvent present"
           else
             echo "::error::AuditEvent model and writeAuditEvent required (Issue #84)"
@@ -116,24 +129,24 @@ jobs:
 
       - name: Check for health endpoint (Issue #85)
         run: |
-          if grep -rE "'/api/health'|\"/api/health\"" server --include='*.ts' >/dev/null 2>&1; then
+          if grep -rE "'/api/health'|\"/api/health\"" apps/server --include='*.ts' >/dev/null 2>&1; then
             echo "✅ Health check endpoint registered"
           else
-            echo "::error::GET /api/health must be registered under server/ (Issue #85)"
+            echo "::error::GET /api/health must be registered under apps/server/ (Issue #85)"
             exit 1
           fi
 
       - name: Validate Zod domain schemas (Issue #79)
         run: |
-          if grep -q "from 'zod'" server/schemas/domain.ts && grep -qE 'z\.[a-zA-Z]' server/schemas/domain.ts; then
-            echo "✅ Zod in use under server/schemas/domain.ts"
+          if grep -q "from 'zod'" apps/server/schemas/domain.ts && grep -qE 'z\.[a-zA-Z]' apps/server/schemas/domain.ts; then
+            echo "✅ Zod in use under apps/server/schemas/domain.ts"
           else
-            echo "::error::Expect Zod usage in server/schemas/domain.ts (Issue #79)"
+            echo "::error::Expect Zod usage in apps/server/schemas/domain.ts (Issue #79)"
             exit 1
           fi
 
       - name: API unit tests (server exercised via mocks)
-        run: npm run test -- tests/api tests/server tests/plan-sync --reporter=verbose
+        run: pnpm run test -- tests/api tests/server tests/plan-sync --reporter=verbose
 
       - name: Migration validation
         run: |

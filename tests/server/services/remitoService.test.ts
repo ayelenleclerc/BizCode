@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { RemitoService, mapRemitoPublic } from '../../../server/services/RemitoService'
+import { RemitoService, mapRemitoPublic } from '../../../apps/server/services/RemitoService'
 
 function buildPrisma() {
   const remitoRows: Array<Record<string, unknown>> = []

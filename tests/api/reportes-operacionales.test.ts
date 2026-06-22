@@ -2,9 +2,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import request from 'supertest'
 import type { PrismaClient } from '@prisma/client'
 import { Decimal } from '@prisma/client/runtime/library'
-import { createApp } from '../../server/createApp'
-import { periodKeyForDate } from '../../server/reportesPeriodUtils'
-import { ReportesOperacionalesService } from '../../server/services/ReportesOperacionalesService'
+import { createApp } from '../../apps/server/createApp'
+import { periodKeyForDate } from '../../apps/server/reportesPeriodUtils'
+import { ReportesOperacionalesService } from '../../apps/server/services/ReportesOperacionalesService'
 
 function buildPrismaMock(overrides: Partial<Record<string, unknown>> = {}): PrismaClient {
   return {

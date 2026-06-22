@@ -7,9 +7,9 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import request from 'supertest'
 import type { PrismaClient } from '@prisma/client'
 import { Decimal } from '@prisma/client/runtime/library'
-import { createApp } from '../../server/createApp'
-import { encryptFiscalSecret } from '../../server/fiscal/ar/fiscalSecrets'
-import { clearTenantFeaturesCache } from '../../server/services/tenantConfigCache'
+import { createApp } from '../../apps/server/createApp'
+import { encryptFiscalSecret } from '../../apps/server/fiscal/ar/fiscalSecrets'
+import { clearTenantFeaturesCache } from '../../apps/server/services/tenantConfigCache'
 
 const MODULES =
   'core.auth,billing.credit_notes,billing.arca_cae,finance.ledger,billing.orders,logistics.dispatches,logistics.picking,logistics.gps'
@@ -163,9 +163,9 @@ function buildPrismaMock(overrides: Partial<Record<string, unknown>> = {}): Pris
   return mock as unknown as PrismaClient
 }
 
-vi.mock('../../server/integrations/mercadopago/mercadoPagoApiClient', async (importOriginal) => {
+vi.mock('../../apps/server/integrations/mercadopago/mercadoPagoApiClient', async (importOriginal) => {
   const actual = await importOriginal<
-    typeof import('../../server/integrations/mercadopago/mercadoPagoApiClient')
+    typeof import('../../apps/server/integrations/mercadopago/mercadoPagoApiClient')
   >()
   return {
     ...actual,
@@ -178,14 +178,14 @@ vi.mock('../../server/integrations/mercadopago/mercadoPagoApiClient', async (imp
   }
 })
 
-vi.mock('../../server/services/ReciboCobroService', () => ({
+vi.mock('../../apps/server/services/ReciboCobroService', () => ({
   ReciboCobroService: class {
     voidRecibo = vi.fn().mockResolvedValue({ ok: true, data: { id: 50 } })
     recordPartialRefundReversal = vi.fn().mockResolvedValue({ ok: true, data: { id: 50 } })
   },
 }))
 
-vi.mock('../../server/services/FacturaService', () => ({
+vi.mock('../../apps/server/services/FacturaService', () => ({
   FacturaService: class {
     void = vi.fn().mockResolvedValue({ ok: true, data: { notaCredito: { id: 10 } } })
     createPartialCreditNote = vi.fn().mockResolvedValue({ ok: true, data: { notaCredito: { id: 11 } } })

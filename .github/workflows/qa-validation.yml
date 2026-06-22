@@ -10,28 +10,36 @@ on:
   push:
     branches: [main, develop]
     paths:
-      - 'src/**'
+      - 'apps/web/src/**'
       - 'tests/**'
       - 'e2e/**'
-      - 'server/**'
+      - 'apps/server/**'
+      - 'packages/**'
       - 'perf/**'
       - 'prisma/**'
       - 'docker-compose.postgres.yml'
       - 'vitest.config.ts'
       - 'playwright.config.ts'
+      - 'pnpm-workspace.yaml'
+      - 'pnpm-lock.yaml'
+      - 'turbo.json'
       - '.github/workflows/qa-validation.yml'
   pull_request:
     branches: [main, develop]
     paths:
-      - 'src/**'
+      - 'apps/web/src/**'
       - 'tests/**'
       - 'e2e/**'
-      - 'server/**'
+      - 'apps/server/**'
+      - 'packages/**'
       - 'perf/**'
       - 'prisma/**'
       - 'docker-compose.postgres.yml'
       - 'vitest.config.ts'
       - 'playwright.config.ts'
+      - 'pnpm-workspace.yaml'
+      - 'pnpm-lock.yaml'
+      - 'turbo.json'
       - '.github/workflows/qa-validation.yml'
 
 jobs:
@@ -41,22 +49,26 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.30.2
+
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-          cache: 'npm'
+          cache: 'pnpm'
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
       - name: Generate Prisma client
         run: npx prisma generate
 
       - name: Run unit tests
-        run: npm run test 2>&1 | tee test-results.log
+        run: pnpm run test 2>&1 | tee test-results.log
 
       - name: Generate coverage report
-        run: npm run test:coverage 2>&1
+        run: pnpm run test:coverage 2>&1
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
@@ -103,13 +115,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.30.2
+
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-          cache: 'npm'
+          cache: 'pnpm'
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
       - name: Generate Prisma client
         run: npx prisma generate
@@ -123,7 +139,7 @@ jobs:
         env:
           DATABASE_URL: postgresql://test@localhost:5432/bizcode_test?sslmode=disable
           NODE_ENV: test
-        run: npm run test:integration
+        run: pnpm run test:integration
 
   e2e_tests:
     name: E2E Tests (Subset)
@@ -146,13 +162,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.30.2
+
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-          cache: 'npm'
+          cache: 'pnpm'
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
       - name: Install Playwright (Chromium + OS deps)
         run: npx playwright install --with-deps chromium
@@ -179,7 +199,7 @@ jobs:
           JWT_SECRET: ci-test-jwt-secret
           BIZCODE_TEST_AUTH_BYPASS: 'false'
         run: |
-          npm run server &
+          pnpm run server &
           for i in $(seq 1 45); do
             if curl -sf http://127.0.0.1:3001/api/health >/dev/null; then
               echo "API healthy"
@@ -193,14 +213,14 @@ jobs:
       - name: Run E2E tests (critical paths only)
         env:
           DATABASE_URL: postgresql://test@localhost:5432/bizcode_test?sslmode=disable
-        run: npm run test:e2e
+        run: pnpm run test:e2e
 
       - name: Flaky test detection hint
         if: always()
         run: |
           {
             echo "### Flaky tests"
-            echo "Locally run npm run test:e2e:repeat to execute each Playwright spec three times."
+            echo "Locally run pnpm run test:e2e:repeat to execute each Playwright spec three times."
             echo "CI uses retries on Chromium when CI is set (see playwright.config.ts)."
           } >> "$GITHUB_STEP_SUMMARY"
 
@@ -218,22 +238,26 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.30.2
+
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-          cache: 'npm'
+          cache: 'pnpm'
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
       - name: Install Playwright (Chromium + OS deps)
         run: npx playwright install --with-deps chromium
 
       - name: Run accessibility tests (Vitest + jest-axe)
-        run: npm run test:a11y
+        run: pnpm run test:a11y
 
       - name: Check ESLint (same as CI, jsx-a11y + TS, zero warnings)
-        run: npm run lint
+        run: pnpm run lint
 
   test_coverage:
     name: Coverage Report
@@ -243,19 +267,23 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.30.2
+
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-          cache: 'npm'
+          cache: 'pnpm'
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
       - name: Generate Prisma client
         run: npx prisma generate
 
       - name: Generate coverage report
-        run: npm run test:coverage
+        run: pnpm run test:coverage
 
       - name: Parse coverage metrics
         run: |

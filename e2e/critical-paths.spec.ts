@@ -1,26 +1,10 @@
 import { test, expect } from '@playwright/test'
-import { loginAsTestUser } from './helpers/auth'
-
-/**
- * E2E Critical Paths Tests
- *
- * Tests the most critical user workflows:
- * 1. Create a new client (cliente)
- * 2. Create a new article (artículo)
- * 3. Create a new invoice (factura)
- * 4. Full workflow: client → article → invoice
- *
- * These tests validate the core business processes of BizCode.
- * They run against http://127.0.0.1:4173 (Vite production preview).
- *
- * Auth: Login uses credentials from BIZCODE_SEED_SUPERADMIN_PASSWORD env var (no fallback in repo; set in CI secrets or local .env).
- */
-
-const TEST_PASSWORD = (process.env.BIZCODE_SEED_SUPERADMIN_PASSWORD ?? '').trim()
+import { E2E_AUTH_STATE_PATH } from './helpers/auth'
 
 test.describe('Critical Paths — Core Business Workflows', () => {
-  /** Invoice test needs cliente + artículo from prior tests in this block (fullyParallel can reorder without this). */
   test.describe.configure({ mode: 'serial' })
+
+  test.use({ storageState: E2E_AUTH_STATE_PATH })
 
   // Helper to generate unique values for each test run
   const generateId = () => Math.random().toString(36).substring(7).toUpperCase()
@@ -34,16 +18,14 @@ test.describe('Critical Paths — Core Business Workflows', () => {
     await expect(page.locator('#root')).toBeVisible()
     await expect(page).toHaveTitle(/BizCode/i)
 
-    // Should redirect to login or home based on auth status
+    // RootRedirect resolves auth then navigates to /login or /inicio
+    await page.waitForURL(/\/(login|inicio)(\/|$)/, { timeout: 15_000 })
     const url = page.url()
     expect(url).toMatch(/login|inicio/)
   })
 
   // Test 2: Navigate to Clientes page
   test('Navigate to Clientes page', async ({ page }) => {
-    await loginAsTestUser(page, TEST_PASSWORD)
-
-    // Navigate to clientes
     await page.goto('/clientes', { waitUntil: 'load' })
 
     // Page should load
@@ -52,7 +34,6 @@ test.describe('Critical Paths — Core Business Workflows', () => {
 
   // Test 3: Navigate to Artículos page
   test('Navigate to Artículos page', async ({ page }) => {
-    await loginAsTestUser(page, TEST_PASSWORD)
     await page.goto('/articulos', { waitUntil: 'load' })
 
     await expect(page.locator('#root')).toBeVisible()
@@ -60,7 +41,6 @@ test.describe('Critical Paths — Core Business Workflows', () => {
 
   // Test 4: Navigate to Facturación page
   test('Navigate to Facturación page', async ({ page }) => {
-    await loginAsTestUser(page, TEST_PASSWORD)
     await page.goto('/facturacion', { waitUntil: 'load' })
 
     await expect(page.locator('#root')).toBeVisible()
@@ -68,8 +48,6 @@ test.describe('Critical Paths — Core Business Workflows', () => {
 
   // Test 5: Full workflow — Create cliente (stable data-testid selectors, BP1-2 / #66)
   test('Create a new cliente (customer)', async ({ page }) => {
-    await loginAsTestUser(page, TEST_PASSWORD)
-
     const codigo = generateNumericCodigo()
     const razonSocial = `E2E Cliente ${generateId()}`
 
@@ -91,7 +69,6 @@ test.describe('Critical Paths — Core Business Workflows', () => {
 
   // Test 6: Full workflow — Create artículo (stable data-testid selectors, BP1-2 / #66)
   test('Create a new artículo (product)', async ({ page }) => {
-    await loginAsTestUser(page, TEST_PASSWORD)
     const id = generateId()
     const codigo = generateNumericCodigo()
     const descripcion = `E2E Artículo ${id}`
@@ -123,7 +100,6 @@ test.describe('Critical Paths — Core Business Workflows', () => {
 
   // Test 7: Full workflow — Create factura (depends on cliente + artículo above; BP1-2 / #66)
   test('Create a new factura (invoice)', async ({ page }) => {
-    await loginAsTestUser(page, TEST_PASSWORD)
     const invoiceNum = Math.floor(100_000 + Math.random() * 899_999)
 
     await page.goto('/facturacion', { waitUntil: 'load' })
@@ -170,7 +146,6 @@ test.describe('Critical Paths — Core Business Workflows', () => {
 
   // Test 8: Navigation between all main modules
   test('Navigate through all main modules', async ({ page }) => {
-    await loginAsTestUser(page, TEST_PASSWORD)
     const modules = [
       { path: '/inicio', name: 'Inicio' },
       { path: '/clientes', name: 'Clientes' },
@@ -190,7 +165,6 @@ test.describe('Critical Paths — Core Business Workflows', () => {
 
   // Test 9: Keyboard shortcuts work (F3 = New, F5 = Save)
   test('Keyboard shortcuts (F3=New, F5=Save, Esc=Cancel)', async ({ page }) => {
-    await loginAsTestUser(page, TEST_PASSWORD)
     await page.goto('/clientes', { waitUntil: 'load' })
     await page.waitForTimeout(300)
 
@@ -213,7 +187,6 @@ test.describe('Critical Paths — Core Business Workflows', () => {
 
   // Test 10: Responsive — App works on mobile viewport
   test('App is responsive on mobile viewport', async ({ page }) => {
-    await loginAsTestUser(page, TEST_PASSWORD)
     // Set mobile viewport
     await page.setViewportSize({ width: 375, height: 812 })
 
@@ -235,9 +208,10 @@ test.describe('Critical Paths — Core Business Workflows', () => {
  * database state or API behavior.
  */
 test.describe('Critical Paths — Data Validation', () => {
+  test.use({ storageState: E2E_AUTH_STATE_PATH })
+
   // Test: CUIT validation (Argentine tax ID)
   test('Cliente creation validates CUIT format', async ({ page }) => {
-    await loginAsTestUser(page, TEST_PASSWORD)
     await page.goto('/clientes', { waitUntil: 'load' })
     await page.waitForTimeout(500)
 
@@ -271,7 +245,6 @@ test.describe('Critical Paths — Data Validation', () => {
 
   // Test: Precio validation (must be positive)
   test('Artículo creation validates prices', async ({ page }) => {
-    await loginAsTestUser(page, TEST_PASSWORD)
     await page.goto('/articulos', { waitUntil: 'load' })
     await page.waitForTimeout(500)
 

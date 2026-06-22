@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { PrismaClient } from '@prisma/client'
-import { buildRemitoPdfBuffer, remitoPdfFilename } from '../../../../server/fiscal/ar/remitoPdf'
+import { buildRemitoPdfBuffer, remitoPdfFilename } from '../../../../apps/server/fiscal/ar/remitoPdf'
 
 const remitoBase = {
   id: 3,

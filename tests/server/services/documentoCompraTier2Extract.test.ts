@@ -1,9 +1,9 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest'
-import { tryExtractDocumentoCompraTier2 } from '../../../server/services/documentoCompraTier2Extract'
+import { tryExtractDocumentoCompraTier2 } from '../../../apps/server/services/documentoCompraTier2Extract'
 
 const mockExtractPdf = vi.hoisted(() => vi.fn())
 
-vi.mock('../../../server/fiscal/ar/documentoCompraPdfText', () => ({
+vi.mock('../../../apps/server/fiscal/ar/documentoCompraPdfText', () => ({
   extractPdfPlainText: mockExtractPdf,
 }))
 

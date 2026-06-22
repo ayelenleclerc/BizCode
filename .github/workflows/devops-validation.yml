@@ -4,7 +4,11 @@ on:
   push:
     branches: [main, develop]
     paths:
-      - 'server/**'
+      - 'apps/server/**'
+      - 'packages/**'
+      - 'pnpm-workspace.yaml'
+      - 'pnpm-lock.yaml'
+      - 'turbo.json'
       - 'Dockerfile*'
       - 'docker-compose*'
       - '.env*'
@@ -12,7 +16,11 @@ on:
   pull_request:
     branches: [main, develop]
     paths:
-      - 'server/**'
+      - 'apps/server/**'
+      - 'packages/**'
+      - 'pnpm-workspace.yaml'
+      - 'pnpm-lock.yaml'
+      - 'turbo.json'
       - 'Dockerfile*'
       - 'docker-compose*'
       - '.env*'
@@ -27,11 +35,16 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.30.2
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-          cache: 'npm'
+          cache: 'pnpm'
 
       - name: Check for Dockerfile (Issue #201)
         run: |
@@ -51,7 +64,7 @@ jobs:
 
       - name: Check environment validation (Issue #203)
         run: |
-          if grep -r "zod\|joi\|joi-schema" server/ 2>/dev/null | grep -q env; then
+          if grep -r "zod\|joi\|joi-schema" apps/server/ 2>/dev/null | grep -q env; then
             echo "✅ Environment validation found"
           else
             echo "⚠️ Environment validation not implemented (Issue #203)"
@@ -59,7 +72,7 @@ jobs:
 
       - name: Check health endpoint (Issue #204)
         run: |
-          if grep -r "GET.*health\|/health" server/ --include="*.ts" 2>/dev/null | grep -q health; then
+          if grep -r "GET.*health\|/health" apps/server/ --include="*.ts" 2>/dev/null | grep -q health; then
             echo "✅ Health endpoint exists"
           else
             echo "⚠️ Health endpoint not found (Issue #204)"
@@ -82,7 +95,7 @@ jobs:
 
       - name: Check for logging (Issue #209)
         run: |
-          PINO=$(grep -r "import.*pino" server/lib/logger.ts 2>/dev/null | wc -l)
+          PINO=$(grep -r "import.*pino" apps/server/lib/logger.ts 2>/dev/null | wc -l)
           if [ $PINO -gt 0 ]; then
             echo "✅ Structured logging (Pino) configured"
           else
@@ -91,7 +104,7 @@ jobs:
 
       - name: Check for request tracing (Issue #211)
         run: |
-          TRACING=$(grep -r "requestId\|correlation" server/middleware 2>/dev/null | wc -l)
+          TRACING=$(grep -r "requestId\|correlation" apps/server/middleware 2>/dev/null | wc -l)
           if [ $TRACING -gt 0 ]; then
             echo "✅ Request tracing middleware found"
           else
@@ -100,7 +113,7 @@ jobs:
 
       - name: Check for error handler (Issue #208)
         run: |
-          if grep -r "errorHandler\|Sentry" server/ --include="*.ts" 2>/dev/null | grep -q error; then
+          if grep -r "errorHandler\|Sentry" apps/server/ --include="*.ts" 2>/dev/null | grep -q error; then
             echo "✅ Error handler/tracking found"
           else
             echo "⚠️ Centralized error handler not found (Issue #208)"
@@ -108,7 +121,7 @@ jobs:
 
       - name: Check database connection pooling (Issue #210)
         run: |
-          if grep -r "connection.*pool\|PgBouncer\|pooling" prisma/ server/ 2>/dev/null | grep -q pool; then
+          if grep -r "connection.*pool\|PgBouncer\|pooling" prisma/ apps/server/ 2>/dev/null | grep -q pool; then
             echo "✅ Connection pooling configured"
           else
             echo "⚠️ Connection pooling not configured (Issue #210)"

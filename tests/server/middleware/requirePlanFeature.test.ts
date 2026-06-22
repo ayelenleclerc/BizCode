@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import type { Response } from 'express'
-import type { AuthenticatedRequest } from '../../../server/auth'
-import { requirePlanFeature } from '../../../server/middleware/requirePlanFeature'
+import type { AuthenticatedRequest } from '../../../apps/server/auth'
+import { requirePlanFeature } from '../../../apps/server/middleware/requirePlanFeature'
 
 describe('requirePlanFeature', () => {
   it('returns 402 when feature missing', () => {

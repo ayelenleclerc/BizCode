@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   extractDocumentoCompraWithOllama,
   mapOllamaFieldsToTemplateExtract,
-} from '../../../../server/fiscal/ar/documentoCompraOllamaExtract'
+} from '../../../../apps/server/fiscal/ar/documentoCompraOllamaExtract'
 
 describe('documentoCompraOllamaExtract', () => {
   const originalFetch = globalThis.fetch

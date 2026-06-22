@@ -4,7 +4,7 @@
  * @pt-BR Job multi-tenant de alertas de faturas a pagar — agendar a cada hora para 07:00 por TZ (#275).
  */
 import { PrismaClient } from '@prisma/client'
-import { ProveedorAlertasService } from '../server/services/ProveedorAlertasService'
+import { ProveedorAlertasService } from '../apps/server/services/ProveedorAlertasService'
 
 async function main(): Promise<void> {
   const tenantIdRaw = process.env.BIZCODE_TENANT_ID

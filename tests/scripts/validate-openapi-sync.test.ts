@@ -65,7 +65,7 @@ describe('openapi sync compareRoutes', () => {
   })
 
   it('discovers Express /api routes from server source', () => {
-    const routes = scanExpressApiRoutes('server')
+    const routes = scanExpressApiRoutes('apps/server')
     expect(
       routes.some(
         (route) => route.method === 'get' && route.openApiPath === '/api/dashboard/summary',

@@ -3,19 +3,19 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import request from 'supertest'
 import type { PrismaClient } from '@prisma/client'
 import { Decimal } from '@prisma/client/runtime/library'
-import { createApp } from '../../server/createApp'
-import { createEmptyDocumentoCompraPreview } from '../../server/lib/documentoCompraTypes'
+import { createApp } from '../../apps/server/createApp'
+import { createEmptyDocumentoCompraPreview } from '../../apps/server/lib/documentoCompraTypes'
 import { assertMatchesOpenApi } from './validate-openapi-response'
 import {
   createMovimientoClienteCCPrismaMock,
   extendClientePrismaForCc,
 } from '../helpers/movimientoClienteCcPrismaMock'
-import { encryptFiscalSecret } from '../../server/fiscal/ar/fiscalSecrets'
-import { clearTenantFeaturesCache } from '../../server/services/tenantConfigCache'
+import { encryptFiscalSecret } from '../../apps/server/fiscal/ar/fiscalSecrets'
+import { clearTenantFeaturesCache } from '../../apps/server/services/tenantConfigCache'
 
-vi.mock('../../server/integrations/mercadopago/mercadoPagoApiClient', async (importOriginal) => {
+vi.mock('../../apps/server/integrations/mercadopago/mercadoPagoApiClient', async (importOriginal) => {
   const actual = await importOriginal<
-    typeof import('../../server/integrations/mercadopago/mercadoPagoApiClient')
+    typeof import('../../apps/server/integrations/mercadopago/mercadoPagoApiClient')
   >()
   return {
     ...actual,
@@ -29,15 +29,15 @@ vi.mock('../../server/integrations/mercadopago/mercadoPagoApiClient', async (imp
   }
 })
 
-vi.mock('../../server/lib/mercadopagoQrImage', () => ({
+vi.mock('../../apps/server/lib/mercadopagoQrImage', () => ({
   mercadoPagoQrPayloadToBase64: vi.fn().mockResolvedValue('base64png'),
 }))
 
-import { createMercadoPagoInstoreQr, createMercadoPagoPreference } from '../../server/integrations/mercadopago/mercadoPagoApiClient'
+import { createMercadoPagoInstoreQr, createMercadoPagoPreference } from '../../apps/server/integrations/mercadopago/mercadoPagoApiClient'
 import {
   buildMercadoPagoSignatureManifest,
   computeMercadoPagoSignatureHmac,
-} from '../../server/lib/mercadopagoSignature'
+} from '../../apps/server/lib/mercadopagoSignature'
 
 function isObjectRecord(value: unknown): value is Record<string, unknown> {
   if (value === undefined || value === null) return false

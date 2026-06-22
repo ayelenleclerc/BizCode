@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { Decimal } from '@prisma/client/runtime/library'
-import { ChequeService } from '../../../server/services/ChequeService'
+import { ChequeService } from '../../../apps/server/services/ChequeService'
 import {
   createMovimientoClienteCCPrismaMock,
   extendClientePrismaForCc,

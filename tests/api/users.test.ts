@@ -7,7 +7,7 @@ import { randomBytes } from 'node:crypto'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import request from 'supertest'
 import type { PrismaClient } from '@prisma/client'
-import { createApp } from '../../server/createApp'
+import { createApp } from '../../apps/server/createApp'
 
 /** Generate a random password-length token that won't match any real credential pattern. */
 function rndPass(): string {

@@ -4,7 +4,7 @@ import {
   computeMercadoPagoSignatureHmac,
   parseMercadoPagoSignatureHeader,
   verifyMercadoPagoWebhookSignature,
-} from '../../../server/lib/mercadopagoSignature'
+} from '../../../apps/server/lib/mercadopagoSignature'
 
 describe('mercadopagoSignature (#176)', () => {
   it('parses x-signature header', () => {

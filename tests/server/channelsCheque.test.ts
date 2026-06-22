@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { dispatchNotification } from '../../server/channels'
+import { dispatchNotification } from '../../apps/server/channels'
 
 describe('channels cheque notifications (#231)', () => {
   it('dispatchNotification cheque_due_soon completes without error', async () => {

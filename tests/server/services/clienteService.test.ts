@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { PrismaClient } from '@prisma/client'
-import { ClienteService } from '../../../server/services/ClienteService'
+import { ClienteService } from '../../../apps/server/services/ClienteService'
 
 describe('ClienteService', () => {
   let prisma: PrismaClient

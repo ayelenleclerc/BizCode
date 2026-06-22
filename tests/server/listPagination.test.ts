@@ -1,6 +1,6 @@
 import type { Request } from 'express'
 import { describe, expect, it } from 'vitest'
-import { LIST_PAGE_DEFAULT, LIST_PAGE_MAX, paginatedListJson, parseListPagination } from '../../server/services/listPagination'
+import { LIST_PAGE_DEFAULT, LIST_PAGE_MAX, paginatedListJson, parseListPagination } from '../../apps/server/services/listPagination'
 
 describe('parseListPagination', () => {
   it('applies default limit and zero offset when query omitted', () => {

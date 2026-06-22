@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import request from 'supertest'
 import type { PrismaClient } from '@prisma/client'
-import { createApp } from '../../server/createApp'
-import { resetObservabilityStateForTests } from '../../server/middleware/observability'
+import { createApp } from '../../apps/server/createApp'
+import { resetObservabilityStateForTests } from '../../apps/server/middleware/observability'
 
 function buildPrismaMock(): PrismaClient {
   return {

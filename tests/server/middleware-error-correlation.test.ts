@@ -4,10 +4,10 @@
 import express, { type NextFunction, type Request, type Response } from 'express'
 import request from 'supertest'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { ConflictAppError, NotFoundAppError, ValidationAppError } from '../../server/errors/AppError'
-import { correlationId } from '../../server/middleware/correlationId'
-import { errorHandler } from '../../server/middleware/errorHandler'
-import * as loggerMod from '../../server/logger'
+import { ConflictAppError, NotFoundAppError, ValidationAppError } from '../../apps/server/errors/AppError'
+import { correlationId } from '../../apps/server/middleware/correlationId'
+import { errorHandler } from '../../apps/server/middleware/errorHandler'
+import * as loggerMod from '../../apps/server/logger'
 
 describe('correlationId middleware', () => {
   const app = express()

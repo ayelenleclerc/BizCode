@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import request from 'supertest'
-import { createApp } from '../../server/createApp'
+import { createApp } from '../../apps/server/createApp'
 
 const remitoRow = {
   id: 1,

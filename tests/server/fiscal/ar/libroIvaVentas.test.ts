@@ -6,9 +6,9 @@ import {
   formatLibroIvaAmount,
   formatLibroIvaDate,
   padPuntoVenta,
-} from '../../../../server/fiscal/ar/libroIvaVentasFormat'
-import { mapLibroIvaVentas } from '../../../../server/fiscal/ar/libroIvaVentasMapper'
-import { TIPO_ANULADO_ARCA } from '../../../../server/fiscal/ar/libroIvaVentasConstants'
+} from '../../../../apps/server/fiscal/ar/libroIvaVentasFormat'
+import { mapLibroIvaVentas } from '../../../../apps/server/fiscal/ar/libroIvaVentasMapper'
+import { TIPO_ANULADO_ARCA } from '../../../../apps/server/fiscal/ar/libroIvaVentasConstants'
 
 describe('libroIvaVentasFormat', () => {
   it('formats amounts with dot decimal and two decimals', () => {

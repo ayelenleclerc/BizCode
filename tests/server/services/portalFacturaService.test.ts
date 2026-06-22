@@ -1,9 +1,9 @@
 import { describe, expect, it, vi } from 'vitest'
 import { Decimal } from '@prisma/client/runtime/library'
 import type { PrismaClient } from '@prisma/client'
-import { PortalFacturaService } from '../../../server/services/PortalFacturaService'
+import { PortalFacturaService } from '../../../apps/server/services/PortalFacturaService'
 
-vi.mock('../../../server/fiscal/ar/facturaPdf', () => ({
+vi.mock('../../../apps/server/fiscal/ar/facturaPdf', () => ({
   buildFacturaPdfBuffer: vi.fn().mockResolvedValue({ ok: true, data: Buffer.from('pdf') }),
 }))
 

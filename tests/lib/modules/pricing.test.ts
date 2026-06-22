@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   PLAN_BASE_MONTHLY_ARS,
   estimateTenantMonthlyPrice,
-} from '../../../src/lib/modules/pricing'
+} from '../../../apps/web/src/lib/modules/pricing'
 describe('estimateTenantMonthlyPrice', () => {
   it('uses plan base and sums paid addons from catalog', () => {
     const modules = ['core.auth', 'billing.orders', 'billing.pos']

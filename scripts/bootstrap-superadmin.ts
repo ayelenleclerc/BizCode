@@ -4,7 +4,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import type { PrismaClient } from '@prisma/client'
 import { PrismaClient as PrismaClientImpl } from '@prisma/client'
-import { USER_CHANNELS } from '../src/lib/rbac'
+import { USER_CHANNELS } from '../packages/types/src/rbac'
 
 const prisma = new PrismaClientImpl()
 const TENANT_SLUG = 'platform'

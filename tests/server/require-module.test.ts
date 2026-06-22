@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import type { NextFunction, Response } from 'express'
-import type { AuthenticatedRequest } from '../../server/auth'
-import { requireModule } from '../../server/middleware/requireModule'
+import type { AuthenticatedRequest } from '../../apps/server/auth'
+import { requireModule } from '../../apps/server/middleware/requireModule'
 
 type MockResponse = Response & { statusCode: number; body: unknown }
 

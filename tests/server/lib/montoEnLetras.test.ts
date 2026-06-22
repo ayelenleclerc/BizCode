@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { montoEnLetrasArs } from '../../../server/lib/montoEnLetras'
+import { montoEnLetrasArs } from '../../../apps/server/lib/montoEnLetras'
 
 describe('montoEnLetrasArs (#233)', () => {
   it('converts zero', () => {

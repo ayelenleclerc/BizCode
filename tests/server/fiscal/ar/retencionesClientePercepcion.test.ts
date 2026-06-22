@@ -1,6 +1,6 @@
 import { Decimal } from '@prisma/client/runtime/library'
 import { describe, expect, it } from 'vitest'
-import { previewPercepcionesClienteFactura } from '../../../../server/fiscal/ar/retencionesClientePercepcion'
+import { previewPercepcionesClienteFactura } from '../../../../apps/server/fiscal/ar/retencionesClientePercepcion'
 
 const regimenIibb = {
   id: 2,

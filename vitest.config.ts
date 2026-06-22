@@ -14,15 +14,16 @@ export default defineConfig({
       ['tests/api/**', 'node'],
       ['tests/server/**', 'node'],
       ['tests/plan-sync/**', 'node'],
+      ['packages/api-client/**', 'jsdom'],
     ],
     globals: true,
-    setupFiles: ['./src/test/setup.ts'],
+    setupFiles: ['./apps/web/src/test/setup.ts'],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'lcov', 'html'],
       reportsDirectory: './coverage',
       // Tier 2 CI floor (see docs/en/quality/testing-strategy.md — three-tier coverage policy).
-      // Global include: server/** + src/** (~66% lines baseline; realistic ceiling ~80–88%).
+      // Global include: apps/server/** + apps/web/src/** + packages/api-client (~66% lines baseline).
       // Tier 1 normative 100%: createApp.ts, server.ts, pure src/lib/** (not enforced per-file here).
       thresholds: {
         lines: 66,
@@ -30,19 +31,31 @@ export default defineConfig({
         branches: 44,
         statements: 64,
       },
-      include: ['server/**/*.ts', 'server.ts', 'src/**/*.{ts,tsx}'],
+      include: [
+        'apps/server/**/*.ts',
+        'apps/web/src/**/*.{ts,tsx}',
+        'packages/api-client/src/**/*.ts',
+      ],
       exclude: [
         '**/*.test.ts',
         '**/*.test.tsx',
         '**/*.d.ts',
-        'server/main.ts',
-        'server/createApp.types.ts',
-        'src/types.ts',
-        'src/lib/plan-sync/index.ts',
+        'apps/server/main.ts',
+        'apps/server/createApp.types.ts',
+        'packages/types/**',
+        'apps/web/src/types.ts',
+        'apps/web/src/lib/plan-sync/index.ts',
+        'apps/web/src/lib/api.ts',
+        'apps/web/src/lib/rbac.ts',
+        'apps/web/src/lib/portalApi.ts',
       ],
     },
   },
   resolve: {
-    alias: { '@': path.resolve(__dirname, 'src') },
+    alias: {
+      '@': path.resolve(__dirname, 'apps/web/src'),
+      '@bizcode/types': path.resolve(__dirname, 'packages/types/src/index.ts'),
+      '@bizcode/api-client': path.resolve(__dirname, 'packages/api-client/src/index.ts'),
+    },
   },
 })

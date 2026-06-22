@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { Prisma } from '@prisma/client'
 import type { PrismaClient } from '@prisma/client'
-import { RepartoUbicacionService, UBICACION_RETENTION_DAYS } from '../../../server/services/RepartoUbicacionService'
+import { RepartoUbicacionService, UBICACION_RETENTION_DAYS } from '../../../apps/server/services/RepartoUbicacionService'
 
 const onRouteReparto = {
   id: 1,

@@ -4,7 +4,7 @@
  * @pt-BR Job diário de expiração de trials e avisos a owners em 7 dias (#226).
  */
 import { PrismaClient } from '@prisma/client'
-import { TenantTrialService } from '../server/services/TenantTrialService'
+import { TenantTrialService } from '../apps/server/services/TenantTrialService'
 
 async function main(): Promise<void> {
   const tenantIdRaw = process.env.BIZCODE_TENANT_ID

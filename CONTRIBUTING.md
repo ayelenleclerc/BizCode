@@ -13,8 +13,9 @@ See also [AGENTS.md](AGENTS.md) for the short index.
 ## Node.js and dependencies
 
 - **Node.js:** use **22 LTS** locally (see [`.nvmrc`](.nvmrc)). The minimum version is declared in [`package.json`](package.json) under `engines`.
-- **Install:** run `npm ci` after cloning (respects [`.npmrc`](.npmrc) `legacy-peer-deps`, required for `eslint-plugin-jsx-a11y` with ESLint 10 until upstream peers align).
-- **Lockfile:** commit `package-lock.json` with every dependency change; bump packages in focused steps and run the quality gate locally.
+- **pnpm:** use **10.x** (see root `packageManager`). Enable with `corepack enable`, then run `pnpm install --frozen-lockfile` after cloning.
+- **Lockfile:** commit `pnpm-lock.yaml` with every dependency change; bump packages in focused steps and run the quality gate locally.
+- **Monorepo:** application code lives under `apps/web`, `apps/server`, and shared packages under `packages/*`; orchestration scripts run from the repository root.
 
 ### Local development (PostgreSQL, seed, dev servers)
 

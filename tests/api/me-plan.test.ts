@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import request from 'supertest'
-import { createApp } from '../../server/createApp'
+import { createApp } from '../../apps/server/createApp'
 import { buildPrismaMock } from './me-features.test'
 import { assertMatchesOpenApi } from './validate-openapi-response'
 

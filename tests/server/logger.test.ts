@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import pino from 'pino'
-import { LOGGER_REDACT_PATHS, SENSITIVE_LOG_FIELD_NAMES } from '../../server/logger'
+import { LOGGER_REDACT_PATHS, SENSITIVE_LOG_FIELD_NAMES } from '../../apps/server/logger'
 
 describe('logger redaction policy', () => {
   it('includes mandatory sensitive keys from #151 and extended catalog (#218)', () => {

@@ -10,6 +10,8 @@ Versionamento: [Semantic Versioning](https://semver.org/).
 
 ### Adicionado
 
+- **Monorepo (pnpm workspaces + Turborepo, #154):** `apps/web` (React/Vite), `apps/server` (API Express), `packages/types`, `packages/api-client`; orquestração na raiz com `pnpm` e `turbo`; CI com `pnpm install --frozen-lockfile`; `prisma/` permanece na raiz do repositório; sem mudanças funcionais de produto.
+
 - **Reembolso parcial Mercado Pago (#344):** Várias notas de crédito por fatura (Prisma remove unique de `facturaOrigenId` em `NotaCredito`); `FacturaService.createPartialCreditNote` e `ReciboCobroService.recordPartialRefundReversal`; `MercadoPagoRefundService` suporta reembolsos parciais com NC parcial e ajuste de CC; saldo restante total ainda anula recibo/fatura (#179); `GET /api/facturas/{id}/mp/reembolso` retorna `refundableBalance` e histórico; campo valor em `MercadoPagoRefundDialog`; OpenAPI, testes, manual de finanças trilíngue.
 
 - **Reembolsos e chargebacks Mercado Pago MVP (#179):** Prisma `MercadoPagoRefund` e `MercadoPagoChargeback`; cliente API `createMercadoPagoRefund`; `MercadoPagoRefundService` (reembolso total: refund MP → anular recibo → void fatura/NC #146, `mpEstado: refunded`); webhook de chargebacks (`type: chargebacks`) enfileira pendentes e notificação urgente aos managers (`mercadopago_chargeback`) sem NC automática; API `GET/POST /api/facturas/{id}/mp/reembolso` (`sales.cancel`, `billing.credit_notes`), `GET/PATCH /api/mercadopago/contracargos`; UI botão Reembolsar + timeline (`MercadoPagoRefundDialog`), fila `/finanzas/contracargos-mp`; OpenAPI, testes contrato/API/unit/UI/integração, docs trilíngues.

@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { PrismaClient } from '@prisma/client'
-import { ArcaService } from '../../../server/fiscal/ar/ArcaService'
-import { encryptFiscalSecret } from '../../../server/fiscal/ar/fiscalSecrets'
+import { ArcaService } from '../../../apps/server/fiscal/ar/ArcaService'
+import { encryptFiscalSecret } from '../../../apps/server/fiscal/ar/fiscalSecrets'
 
 describe('ArcaService', () => {
   let prisma: PrismaClient

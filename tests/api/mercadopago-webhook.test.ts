@@ -10,16 +10,16 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import request from 'supertest'
 import type { PrismaClient } from '@prisma/client'
 import { Decimal } from '@prisma/client/runtime/library'
-import { createApp } from '../../server/createApp'
-import { encryptFiscalSecret } from '../../server/fiscal/ar/fiscalSecrets'
+import { createApp } from '../../apps/server/createApp'
+import { encryptFiscalSecret } from '../../apps/server/fiscal/ar/fiscalSecrets'
 import {
   buildMercadoPagoSignatureManifest,
   computeMercadoPagoSignatureHmac,
-} from '../../server/lib/mercadopagoSignature'
+} from '../../apps/server/lib/mercadopagoSignature'
 
-vi.mock('../../server/integrations/mercadopago/mercadoPagoApiClient', async (importOriginal) => {
+vi.mock('../../apps/server/integrations/mercadopago/mercadoPagoApiClient', async (importOriginal) => {
   const actual = await importOriginal<
-    typeof import('../../server/integrations/mercadopago/mercadoPagoApiClient')
+    typeof import('../../apps/server/integrations/mercadopago/mercadoPagoApiClient')
   >()
   return {
     ...actual,
@@ -48,13 +48,13 @@ const reciboCreateMock = vi.hoisted(() =>
   }),
 )
 
-vi.mock('../../server/services/ReciboCobroService', () => ({
+vi.mock('../../apps/server/services/ReciboCobroService', () => ({
   ReciboCobroService: class {
     create = reciboCreateMock
   },
 }))
 
-import { fetchMercadoPagoPayment } from '../../server/integrations/mercadopago/mercadoPagoApiClient'
+import { fetchMercadoPagoPayment } from '../../apps/server/integrations/mercadopago/mercadoPagoApiClient'
 
 const WEBHOOK_SECRET = 'whsec-api-test'
 const PAYMENT_ID = '12345678'

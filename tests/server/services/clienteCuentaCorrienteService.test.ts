@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { Decimal } from '@prisma/client/runtime/library'
-import { ClienteCuentaCorrienteService } from '../../../server/services/ClienteCuentaCorrienteService'
-import { ValidationAppError } from '../../../server/errors/AppError'
+import { ClienteCuentaCorrienteService } from '../../../apps/server/services/ClienteCuentaCorrienteService'
+import { ValidationAppError } from '../../../apps/server/errors/AppError'
 
 function buildDb() {
   const movimientos: Array<{

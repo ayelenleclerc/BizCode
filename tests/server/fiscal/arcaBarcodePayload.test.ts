@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { buildArcaBarcodePayload } from '../../../server/fiscal/ar/arcaBarcodePayload'
+import { buildArcaBarcodePayload } from '../../../apps/server/fiscal/ar/arcaBarcodePayload'
 
 describe('arcaBarcodePayload', () => {
   it('builds 39-digit Interleaved 2 of 5 payload', () => {

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { buildEstadoCuentaClientePdfBuffer } from '../../../server/finance/estadoCuentaClientePdf'
+import { buildEstadoCuentaClientePdfBuffer } from '../../../apps/server/finance/estadoCuentaClientePdf'
 
 describe('buildEstadoCuentaClientePdfBuffer', () => {
   it('genera un buffer PDF válido', async () => {

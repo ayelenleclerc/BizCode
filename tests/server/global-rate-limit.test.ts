@@ -24,7 +24,7 @@ describe('routeHttpRateLimiter', () => {
     process.env.HTTP_RATE_LIMIT_PER_MINUTE = '2'
     vi.resetModules()
 
-    const { routeHttpRateLimiter } = await import('../../server/middleware/routeRateLimit')
+    const { routeHttpRateLimiter } = await import('../../apps/server/middleware/routeRateLimit')
 
     const app = express()
     app.use(routeHttpRateLimiter)
@@ -42,7 +42,7 @@ describe('routeHttpRateLimiter', () => {
     process.env.HTTP_RATE_LIMIT_AUTH_PER_MINUTE = '2'
     vi.resetModules()
 
-    const { authRouterHttpRateLimiter } = await import('../../server/middleware/routeRateLimit')
+    const { authRouterHttpRateLimiter } = await import('../../apps/server/middleware/routeRateLimit')
 
     const app = express()
     const authRouter = express.Router()
@@ -62,7 +62,7 @@ describe('routeHttpRateLimiter', () => {
     process.env.HTTP_RATE_LIMIT_IMPORT_PER_HOUR = '2'
     vi.resetModules()
 
-    const { routeHttpRateLimiter } = await import('../../server/middleware/routeRateLimit')
+    const { routeHttpRateLimiter } = await import('../../apps/server/middleware/routeRateLimit')
 
     const app = express()
     app.use(routeHttpRateLimiter)
@@ -82,7 +82,7 @@ describe('routeHttpRateLimiter', () => {
       process.env.HTTP_RATE_LIMIT_PER_MINUTE = '1'
       vi.resetModules()
 
-      const { routeHttpRateLimiter } = await import('../../server/middleware/routeRateLimit')
+      const { routeHttpRateLimiter } = await import('../../apps/server/middleware/routeRateLimit')
 
       const app = express()
       app.use(routeHttpRateLimiter)
