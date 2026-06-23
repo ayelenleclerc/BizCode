@@ -1,8 +1,10 @@
+import { readFileSync } from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import OpenAPIParser from '@apidevtools/swagger-parser'
 import Ajv from 'ajv'
 import addFormats from 'ajv-formats'
+import { parse as parseYaml } from 'yaml'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -19,7 +21,13 @@ addFormats(ajv)
 
 async function loadDereferenced() {
   if (!dereferenced) {
-    dereferenced = (await OpenAPIParser.dereference(SPEC_PATH)) as Record<string, unknown>
+    const yamlText = readFileSync(SPEC_PATH, 'utf-8')
+    const parsed = parseYaml(yamlText)
+    // Parse YAML in-process so swagger-parser does not resolve the spec path as an HTTP URL
+    // (vitest/jsdom sets location to localhost:3000 and breaks contract tests in CI).
+    dereferenced = (await OpenAPIParser.dereference(
+      parsed as Parameters<typeof OpenAPIParser.dereference>[0],
+    )) as Record<string, unknown>
   }
   return dereferenced
 }

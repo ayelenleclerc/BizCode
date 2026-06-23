@@ -3,9 +3,9 @@
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
   "version": 1,
-  "serialNumber": "urn:uuid:28f13c5f-c731-4cba-931d-33685ca625c8",
+  "serialNumber": "urn:uuid:a9365ad6-7522-42e0-9d3b-4705262c58d1",
   "metadata": {
-    "timestamp": "2026-06-22T15:58:36.373Z",
+    "timestamp": "2026-06-23T10:40:38.468Z",
     "tools": {
       "components": [
         {
@@ -357,11 +357,6 @@
           "url": "https://github.com/archiverjs/node-archiver/issues",
           "type": "issue-tracker",
           "comment": "as detected from PackageJson property \"bugs.url\""
-        },
-        {
-          "url": "https://registry.npmjs.org/archiver/-/archiver-8.0.0.tgz",
-          "type": "distribution",
-          "comment": "as detected from npm-ls property \"resolved\""
         }
       ],
       "properties": [
@@ -409,11 +404,6 @@
               "url": "https://github.com/brianloveswords/buffer-crc32/issues",
               "type": "issue-tracker",
               "comment": "as detected from PackageJson property \"bugs.url\""
-            },
-            {
-              "url": "https://registry.npmjs.org/buffer-crc32/-/buffer-crc32-1.0.0.tgz",
-              "type": "distribution",
-              "comment": "as detected from npm-ls property \"resolved\""
             }
           ],
           "properties": [
@@ -460,11 +450,6 @@
               "url": "https://github.com/nodejs/readable-stream/issues",
               "type": "issue-tracker",
               "comment": "as detected from PackageJson property \"bugs.url\""
-            },
-            {
-              "url": "https://registry.npmjs.org/readable-stream/-/readable-stream-4.7.0.tgz",
-              "type": "distribution",
-              "comment": "as detected from npm-ls property \"resolved\""
             }
           ],
           "properties": [
@@ -505,11 +490,6 @@
               "url": "https://github.com/mafintosh/tar-stream/issues",
               "type": "issue-tracker",
               "comment": "as detected from PackageJson property \"bugs.url\""
-            },
-            {
-              "url": "https://registry.npmjs.org/tar-stream/-/tar-stream-3.2.0.tgz",
-              "type": "distribution",
-              "comment": "as detected from npm-ls property \"resolved\""
             }
           ],
           "properties": [
@@ -592,11 +572,6 @@
               "url": "https://github.com/TooTallNate/node-https-proxy-agent/issues",
               "type": "issue-tracker",
               "comment": "as detected from PackageJson property \"bugs.url\""
-            },
-            {
-              "url": "https://registry.npmjs.org/https-proxy-agent/-/https-proxy-agent-5.0.1.tgz",
-              "type": "distribution",
-              "comment": "as detected from npm-ls property \"resolved\""
             }
           ],
           "properties": [
@@ -637,11 +612,6 @@
               "url": "https://github.com/TooTallNate/node-agent-base/issues",
               "type": "issue-tracker",
               "comment": "as detected from PackageJson property \"bugs.url\""
-            },
-            {
-              "url": "https://registry.npmjs.org/agent-base/-/agent-base-6.0.2.tgz",
-              "type": "distribution",
-              "comment": "as detected from npm-ls property \"resolved\""
             }
           ],
           "properties": [
@@ -1207,11 +1177,6 @@
           "url": "https://github.com/expressjs/express/issues",
           "type": "issue-tracker",
           "comment": "as detected from PackageJson property \"bugs.url\""
-        },
-        {
-          "url": "https://registry.npmjs.org/express/-/express-5.2.1.tgz",
-          "type": "distribution",
-          "comment": "as detected from npm-ls property \"resolved\""
         }
       ],
       "properties": [
@@ -1252,11 +1217,6 @@
               "url": "https://github.com/jshttp/content-type/issues",
               "type": "issue-tracker",
               "comment": "as detected from PackageJson property \"bugs.url\""
-            },
-            {
-              "url": "https://registry.npmjs.org/content-type/-/content-type-1.0.5.tgz",
-              "type": "distribution",
-              "comment": "as detected from npm-ls property \"resolved\""
             }
           ],
           "properties": [
@@ -1456,11 +1416,6 @@
           "url": "https://github.com/expressjs/multer/issues",
           "type": "issue-tracker",
           "comment": "as detected from PackageJson property \"bugs.url\""
-        },
-        {
-          "url": "https://registry.npmjs.org/multer/-/multer-2.2.0.tgz",
-          "type": "distribution",
-          "comment": "as detected from npm-ls property \"resolved\""
         }
       ],
       "properties": [
@@ -1500,11 +1455,6 @@
               "url": "https://github.com/jshttp/type-is/issues",
               "type": "issue-tracker",
               "comment": "as detected from PackageJson property \"bugs.url\""
-            },
-            {
-              "url": "https://registry.npmjs.org/type-is/-/type-is-1.6.18.tgz",
-              "type": "distribution",
-              "comment": "as detected from npm-ls property \"resolved\""
             }
           ],
           "properties": [
@@ -1545,11 +1495,6 @@
               "url": "https://github.com/jshttp/media-typer/issues",
               "type": "issue-tracker",
               "comment": "as detected from PackageJson property \"bugs.url\""
-            },
-            {
-              "url": "https://registry.npmjs.org/media-typer/-/media-typer-0.3.0.tgz",
-              "type": "distribution",
-              "comment": "as detected from npm-ls property \"resolved\""
             }
           ],
           "properties": [
@@ -1589,11 +1534,6 @@
               "url": "https://github.com/jshttp/mime-types/issues",
               "type": "issue-tracker",
               "comment": "as detected from PackageJson property \"bugs.url\""
-            },
-            {
-              "url": "https://registry.npmjs.org/mime-types/-/mime-types-2.1.35.tgz",
-              "type": "distribution",
-              "comment": "as detected from npm-ls property \"resolved\""
             }
           ],
           "properties": [
@@ -1716,11 +1656,6 @@
           "url": "https://github.com/pinojs/pino/issues",
           "type": "issue-tracker",
           "comment": "as detected from PackageJson property \"bugs.url\""
-        },
-        {
-          "url": "https://registry.npmjs.org/pino/-/pino-10.3.1.tgz",
-          "type": "distribution",
-          "comment": "as detected from npm-ls property \"resolved\""
         }
       ],
       "properties": [
@@ -1761,11 +1696,6 @@
           "url": "https://github.com/soldair/node-qrcode/issues",
           "type": "issue-tracker",
           "comment": "as detected from PackageJson property \"bugs.url\""
-        },
-        {
-          "url": "https://registry.npmjs.org/qrcode/-/qrcode-1.5.4.tgz",
-          "type": "distribution",
-          "comment": "as detected from npm-ls property \"resolved\""
         }
       ],
       "properties": [
@@ -1805,11 +1735,6 @@
               "url": "https://github.com/yargs/yargs/issues",
               "type": "issue-tracker",
               "comment": "as detected from PackageJson property \"bugs.url\""
-            },
-            {
-              "url": "https://registry.npmjs.org/yargs/-/yargs-15.4.1.tgz",
-              "type": "distribution",
-              "comment": "as detected from npm-ls property \"resolved\""
             }
           ],
           "properties": [
@@ -1850,11 +1775,6 @@
               "url": "https://github.com/sindresorhus/find-up/issues",
               "type": "issue-tracker",
               "comment": "as detected from PackageJson property \"bugs.url\""
-            },
-            {
-              "url": "https://registry.npmjs.org/find-up/-/find-up-4.1.0.tgz",
-              "type": "distribution",
-              "comment": "as detected from npm-ls property \"resolved\""
             }
           ],
           "properties": [
@@ -1895,11 +1815,6 @@
               "url": "https://github.com/yargs/y18n/issues",
               "type": "issue-tracker",
               "comment": "as detected from PackageJson property \"bugs.url\""
-            },
-            {
-              "url": "https://registry.npmjs.org/y18n/-/y18n-4.0.3.tgz",
-              "type": "distribution",
-              "comment": "as detected from npm-ls property \"resolved\""
             }
           ],
           "properties": [
@@ -1940,11 +1855,6 @@
               "url": "https://github.com/sindresorhus/locate-path/issues",
               "type": "issue-tracker",
               "comment": "as detected from PackageJson property \"bugs.url\""
-            },
-            {
-              "url": "https://registry.npmjs.org/locate-path/-/locate-path-5.0.0.tgz",
-              "type": "distribution",
-              "comment": "as detected from npm-ls property \"resolved\""
             }
           ],
           "properties": [
@@ -1985,11 +1895,6 @@
               "url": "https://github.com/sindresorhus/p-locate/issues",
               "type": "issue-tracker",
               "comment": "as detected from PackageJson property \"bugs.url\""
-            },
-            {
-              "url": "https://registry.npmjs.org/p-locate/-/p-locate-4.1.0.tgz",
-              "type": "distribution",
-              "comment": "as detected from npm-ls property \"resolved\""
             }
           ],
           "properties": [
@@ -2030,11 +1935,6 @@
               "url": "https://github.com/sindresorhus/p-limit/issues",
               "type": "issue-tracker",
               "comment": "as detected from PackageJson property \"bugs.url\""
-            },
-            {
-              "url": "https://registry.npmjs.org/p-limit/-/p-limit-2.3.0.tgz",
-              "type": "distribution",
-              "comment": "as detected from npm-ls property \"resolved\""
             }
           ],
           "properties": [
@@ -2394,11 +2294,6 @@
           "url": "https://github.com/recharts/recharts/issues",
           "type": "issue-tracker",
           "comment": "as detected from PackageJson property \"bugs.url\""
-        },
-        {
-          "url": "https://registry.npmjs.org/recharts/-/recharts-3.8.1.tgz",
-          "type": "distribution",
-          "comment": "as detected from npm-ls property \"resolved\""
         }
       ],
       "properties": [
@@ -2439,11 +2334,6 @@
               "url": "https://github.com/immerjs/immer/issues",
               "type": "issue-tracker",
               "comment": "as detected from PackageJson property \"bugs.url\""
-            },
-            {
-              "url": "https://registry.npmjs.org/immer/-/immer-10.2.0.tgz",
-              "type": "distribution",
-              "comment": "as detected from npm-ls property \"resolved\""
             }
           ],
           "properties": [
@@ -2645,11 +2535,6 @@
               "url": "https://github.com/TooTallNate/node-https-proxy-agent/issues",
               "type": "issue-tracker",
               "comment": "as detected from PackageJson property \"bugs.url\""
-            },
-            {
-              "url": "https://registry.npmjs.org/https-proxy-agent/-/https-proxy-agent-5.0.1.tgz",
-              "type": "distribution",
-              "comment": "as detected from npm-ls property \"resolved\""
             }
           ],
           "properties": [
@@ -2690,11 +2575,6 @@
               "url": "https://github.com/TooTallNate/node-agent-base/issues",
               "type": "issue-tracker",
               "comment": "as detected from PackageJson property \"bugs.url\""
-            },
-            {
-              "url": "https://registry.npmjs.org/agent-base/-/agent-base-6.0.2.tgz",
-              "type": "distribution",
-              "comment": "as detected from npm-ls property \"resolved\""
             }
           ],
           "properties": [
@@ -3099,11 +2979,6 @@
           "url": "https://github.com/jpommerening/node-lazystream/issues",
           "type": "issue-tracker",
           "comment": "as detected from PackageJson property \"bugs.url\""
-        },
-        {
-          "url": "https://registry.npmjs.org/lazystream/-/lazystream-1.0.1.tgz",
-          "type": "distribution",
-          "comment": "as detected from npm-ls property \"resolved\""
         }
       ],
       "properties": [
@@ -3143,11 +3018,6 @@
               "url": "https://github.com/nodejs/readable-stream/issues",
               "type": "issue-tracker",
               "comment": "as detected from PackageJson property \"bugs.url\""
-            },
-            {
-              "url": "https://registry.npmjs.org/readable-stream/-/readable-stream-2.3.8.tgz",
-              "type": "distribution",
-              "comment": "as detected from npm-ls property \"resolved\""
             }
           ],
           "properties": [
@@ -3188,11 +3058,6 @@
               "url": "https://github.com/juliangruber/isarray/issues",
               "type": "issue-tracker",
               "comment": "as detected from PackageJson property \"bugs.url\""
-            },
-            {
-              "url": "https://registry.npmjs.org/isarray/-/isarray-1.0.0.tgz",
-              "type": "distribution",
-              "comment": "as detected from npm-ls property \"resolved\""
             }
           ],
           "properties": [
@@ -3233,11 +3098,6 @@
               "url": "https://github.com/feross/safe-buffer/issues",
               "type": "issue-tracker",
               "comment": "as detected from PackageJson property \"bugs.url\""
-            },
-            {
-              "url": "https://registry.npmjs.org/safe-buffer/-/safe-buffer-5.1.2.tgz",
-              "type": "distribution",
-              "comment": "as detected from npm-ls property \"resolved\""
             }
           ],
           "properties": [
@@ -3277,11 +3137,6 @@
               "url": "https://github.com/nodejs/string_decoder/issues",
               "type": "issue-tracker",
               "comment": "as detected from PackageJson property \"bugs.url\""
-            },
-            {
-              "url": "https://registry.npmjs.org/string_decoder/-/string_decoder-1.1.1.tgz",
-              "type": "distribution",
-              "comment": "as detected from npm-ls property \"resolved\""
             }
           ],
           "properties": [
@@ -3404,11 +3259,6 @@
           "url": "https://github.com/archiverjs/node-zip-stream/issues",
           "type": "issue-tracker",
           "comment": "as detected from PackageJson property \"bugs.url\""
-        },
-        {
-          "url": "https://registry.npmjs.org/zip-stream/-/zip-stream-7.0.5.tgz",
-          "type": "distribution",
-          "comment": "as detected from npm-ls property \"resolved\""
         }
       ],
       "properties": [
@@ -3455,11 +3305,6 @@
               "url": "https://github.com/nodejs/readable-stream/issues",
               "type": "issue-tracker",
               "comment": "as detected from PackageJson property \"bugs.url\""
-            },
-            {
-              "url": "https://registry.npmjs.org/readable-stream/-/readable-stream-4.7.0.tgz",
-              "type": "distribution",
-              "comment": "as detected from npm-ls property \"resolved\""
             }
           ],
           "properties": [
@@ -3542,11 +3387,6 @@
           "url": "https://github.com/form-data/form-data/issues",
           "type": "issue-tracker",
           "comment": "as detected from PackageJson property \"bugs.url\""
-        },
-        {
-          "url": "https://registry.npmjs.org/form-data/-/form-data-4.0.6.tgz",
-          "type": "distribution",
-          "comment": "as detected from npm-ls property \"resolved\""
         }
       ],
       "properties": [
@@ -3586,11 +3426,6 @@
               "url": "https://github.com/jshttp/mime-types/issues",
               "type": "issue-tracker",
               "comment": "as detected from PackageJson property \"bugs.url\""
-            },
-            {
-              "url": "https://registry.npmjs.org/mime-types/-/mime-types-2.1.35.tgz",
-              "type": "distribution",
-              "comment": "as detected from npm-ls property \"resolved\""
             }
           ],
           "properties": [
@@ -16468,11 +16303,6 @@
           "url": "https://github.com/sindresorhus/p-try/issues",
           "type": "issue-tracker",
           "comment": "as detected from PackageJson property \"bugs.url\""
-        },
-        {
-          "url": "https://registry.npmjs.org/p-try/-/p-try-2.2.0.tgz",
-          "type": "distribution",
-          "comment": "as detected from npm-ls property \"resolved\""
         }
       ],
       "properties": [
