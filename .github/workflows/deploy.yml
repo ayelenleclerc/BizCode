@@ -6,10 +6,40 @@ on:
       - main
       - develop
       - 'feature/**'
+    paths:
+      - 'apps/**'
+      - 'packages/**'
+      - 'prisma/**'
+      - 'Dockerfile'
+      - 'Dockerfile.frontend'
+      - 'docker-compose*.yml'
+      - 'package.json'
+      - 'pnpm-workspace.yaml'
+      - 'pnpm-lock.yaml'
+      - 'turbo.json'
+      - 'tsconfig.json'
+      - 'eslint.config.mjs'
+      - 'vitest.config.ts'
+      - '.github/workflows/deploy.yml'
   pull_request:
     branches:
       - main
       - develop
+    paths:
+      - 'apps/**'
+      - 'packages/**'
+      - 'prisma/**'
+      - 'Dockerfile'
+      - 'Dockerfile.frontend'
+      - 'docker-compose*.yml'
+      - 'package.json'
+      - 'pnpm-workspace.yaml'
+      - 'pnpm-lock.yaml'
+      - 'turbo.json'
+      - 'tsconfig.json'
+      - 'eslint.config.mjs'
+      - 'vitest.config.ts'
+      - '.github/workflows/deploy.yml'
   workflow_dispatch:
     inputs:
       run_deploy:
@@ -35,6 +65,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Install pnpm
         uses: pnpm/action-setup@v4
@@ -47,6 +79,9 @@ jobs:
           node-version: '22'
           cache: 'pnpm'
 
+      - name: Restore Turborepo cache
+        uses: ./.github/actions/turbo-cache
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
@@ -57,7 +92,7 @@ jobs:
         run: pnpm run type-check
 
       - name: Run lint
-        run: pnpm run lint
+        run: pnpm exec turbo run lint
 
       - name: Run tests
         run: pnpm run test

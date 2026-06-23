@@ -1,7 +1,11 @@
 node_modules/
+.pnpm-store/
+.turbo/
+package-lock.json
 data/documentos-compra/
 data/documentos-compra-templates/
 dist/
+packages/*/dist/
 build/
 
 # Local legacy / reference copy (not part of the repo tree; match casing on disk / Git)

@@ -34,6 +34,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Install pnpm
         uses: pnpm/action-setup@v4
@@ -45,6 +47,9 @@ jobs:
         with:
           node-version: '22'
           cache: 'pnpm'
+
+      - name: Restore Turborepo cache
+        uses: ./.github/actions/turbo-cache
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -143,7 +148,7 @@ jobs:
           NODE
 
       - name: ESLint (jsx-a11y y TypeScript — cero advertencias)
-        run: pnpm run lint
+        run: pnpm exec turbo run lint
 
       - name: API contract tests (OpenAPI / Ajv)
         run: npx vitest run tests/api/contract.test.ts
