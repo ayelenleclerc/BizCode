@@ -35,6 +35,7 @@ export {
   validateModuleSet,
 } from './validation'
 
+import type { ModuleCatalogEntry } from '@bizcode/types'
 export type { ModuleCatalogEntry } from '@bizcode/types'
 
 /**
