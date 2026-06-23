@@ -100,15 +100,30 @@ jobs:
           const { execSync } = require('node:child_process')
           const { readFileSync } = require('node:fs')
 
-          function normalizeSbom(raw) {
+          function isPlatformNativeOptional(component) {
+            const name = String(component.name ?? '')
+            const purl = String(component.purl ?? '')
+            const hay = `${name}|${purl}`
+            if (/fsevents\b/.test(hay)) return true
+            if (/@esbuild\/(darwin|linux|win32|android|freebsd|netbsd|openbsd|sunos)/.test(hay)) return true
+            if (/@rollup\/rollup-(darwin|linux|win32|android|freebsd)/.test(hay)) return true
+            if (/@img\/sharp-(darwin|linux|win32)/.test(hay)) return true
+            if (/lightningcss-(darwin|linux|win32|freebsd)/.test(hay)) return true
+            if (/@tauri-apps\/cli-(darwin|linux|win32|android)/.test(hay)) return true
+            if (/turbo-(darwin|linux|windows)/.test(hay)) return true
+            return false
+          }
+
+          function comparableComponents(raw) {
             const json = JSON.parse(raw)
-            delete json.serialNumber
-            if (json.metadata && typeof json.metadata === 'object') {
-              delete json.metadata.timestamp
-              // npm version embedded in tools.components varies across environments.
-              delete json.metadata.tools
-            }
-            return JSON.stringify(json, null, 2)
+            return (json.components ?? [])
+              .filter((component) => !isPlatformNativeOptional(component))
+              .map(
+                (component) =>
+                  `${component.type ?? ''}|${component.name ?? ''}|${component.version ?? ''}|${component.purl ?? ''}`
+              )
+              .sort()
+              .join('\n')
           }
 
           const generatedRaw = readFileSync('docs/evidence/sbom-cyclonedx.json', 'utf8')
@@ -116,12 +131,12 @@ jobs:
             encoding: 'utf8',
           })
 
-          const generated = normalizeSbom(generatedRaw)
-          const committed = normalizeSbom(committedRaw)
+          const generatedComponents = comparableComponents(generatedRaw)
+          const committedComponents = comparableComponents(committedRaw)
 
-          if (generated !== committed) {
+          if (generatedComponents !== committedComponents) {
             console.error(
-              'SBOM drift detected (excluding volatile fields: serialNumber, metadata.timestamp).'
+              'SBOM drift detected (dependency components differ after excluding platform-native optional binaries).'
             )
             process.exit(1)
           }

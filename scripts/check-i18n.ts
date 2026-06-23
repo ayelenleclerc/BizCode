@@ -7,7 +7,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
 
-const LOCALES_DIR = path.resolve('src/locales')
+const LOCALES_DIR = path.resolve('apps/web/src/locales')
 const SOURCE_LANG = 'es'
 const TARGET_LANGS = ['en', 'pt-BR']
 const NAMESPACES = ['common', 'clientes', 'articulos', 'facturacion']
