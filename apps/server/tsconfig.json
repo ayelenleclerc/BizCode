@@ -3,17 +3,7 @@
   "compilerOptions": {
     "lib": ["ES2020"],
     "jsx": "preserve",
-    "forceConsistentCasingInFileNames": true,
-    "paths": {
-      "@/*": ["../web/src/*"],
-      "@components/*": ["../web/src/components/*"],
-      "@pages/*": ["../web/src/pages/*"],
-      "@lib/*": ["../web/src/lib/*"],
-      "@hooks/*": ["../web/src/hooks/*"],
-      "@store/*": ["../web/src/store/*"],
-      "@bizcode/types": ["../../packages/types/src/index.ts"],
-      "@bizcode/api-client": ["../../packages/api-client/src/index.ts"]
-    }
+    "forceConsistentCasingInFileNames": true
   },
   "include": ["./**/*.ts"]
 }
