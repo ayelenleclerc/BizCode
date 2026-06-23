@@ -32,6 +32,8 @@
     "build": "tauri build",
     "preview": "pnpm --filter @bizcode/web preview",
     "type-check": "tsc --noEmit",
+    "type-check:workspaces": "turbo run type-check",
+    "lint:workspaces": "turbo run lint",
     "check:openapi": "tsx scripts/check-openapi.ts",
     "check:openapi-sync": "tsx scripts/validate-openapi-sync.ts",
     "check:logs": "tsx scripts/check-log-sanitization.ts",

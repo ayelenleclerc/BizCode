@@ -4,6 +4,25 @@
 
 BizCode usa GitHub Actions. Definição: `.github/workflows/ci.yml`.
 
+## Monorepo e CI seletiva com Turborepo (#158)
+
+BizCode é um **workspace pnpm** (`apps/web`, `apps/server`, `packages/types`, `packages/api-client`) orquestrado por **Turborepo** (`turbo.json`).
+
+| Mecanismo | Propósito |
+|---|---|
+| `inputs` / `outputs` em `turbo.json` | Cache local de tarefas em `.turbo/` |
+| `.github/actions/turbo-cache` | Cache no GitHub Actions com chave `pnpm-lock.yaml` |
+| `pnpm exec turbo run lint` | ESLint por workspace (Quality Gate, deploy) |
+| `turbo run type-check lint --filter=@bizcode/web...` | Validação frontend sem o workspace server |
+| `turbo run type-check lint --filter=@bizcode/server...` | Validação backend (server + dependências dos packages) |
+| Filtros `paths:` nos workflows | Pular jobs quando só mudam caminhos irrelevantes |
+| `pnpm run type-check` na raiz | `tsc --noEmit` de todo o repositório (tests, scripts, e2e) — **inalterado** no Quality Gate |
+| Vitest / Playwright | Na raiz; seletividade via `paths:` do workflow, não `turbo run test --filter` |
+
+`deploy.yml` roda em `push`/`pull_request` apenas quando mudam caminhos de app, packages, Docker ou lockfile; gatilhos `workflow_dispatch` e `release` permanecem iguais.
+
+**Limitação:** a regeneração do SBOM é omitida no CI (`scripts/docs-generate.mjs`); o `docs/evidence/sbom-cyclonedx.json` commitado não é verificado por drift no CI.
+
 ## Estágios
 
 ```

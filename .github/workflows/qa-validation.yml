@@ -48,6 +48,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - uses: pnpm/action-setup@v4
         with:
@@ -57,6 +59,9 @@ jobs:
         with:
           node-version: '22'
           cache: 'pnpm'
+
+      - name: Restore Turborepo cache
+        uses: ./.github/actions/turbo-cache
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -114,6 +119,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - uses: pnpm/action-setup@v4
         with:
@@ -123,6 +130,9 @@ jobs:
         with:
           node-version: '22'
           cache: 'pnpm'
+
+      - name: Restore Turborepo cache
+        uses: ./.github/actions/turbo-cache
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -161,6 +171,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - uses: pnpm/action-setup@v4
         with:
@@ -170,6 +182,9 @@ jobs:
         with:
           node-version: '22'
           cache: 'pnpm'
+
+      - name: Restore Turborepo cache
+        uses: ./.github/actions/turbo-cache
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -237,6 +252,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - uses: pnpm/action-setup@v4
         with:
@@ -246,6 +263,9 @@ jobs:
         with:
           node-version: '22'
           cache: 'pnpm'
+
+      - name: Restore Turborepo cache
+        uses: ./.github/actions/turbo-cache
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -266,6 +286,8 @@ jobs:
     if: always()
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - uses: pnpm/action-setup@v4
         with:
@@ -275,6 +297,9 @@ jobs:
         with:
           node-version: '22'
           cache: 'pnpm'
+
+      - name: Restore Turborepo cache
+        uses: ./.github/actions/turbo-cache
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile

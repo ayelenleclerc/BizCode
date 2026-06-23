@@ -9,6 +9,11 @@
     "type-check": "tsc --noEmit -p tsconfig.json",
     "lint": "eslint . --ext .ts --max-warnings 0"
   },
+  "turbo": {
+    "type-check": {
+      "outputs": []
+    }
+  },
   "dependencies": {
     "@bizcode/types": "workspace:*"
   }

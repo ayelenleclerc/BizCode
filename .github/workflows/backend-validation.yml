@@ -50,6 +50,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Install pnpm
         uses: pnpm/action-setup@v4
@@ -62,11 +64,17 @@ jobs:
           node-version: '22'
           cache: 'pnpm'
 
+      - name: Restore Turborepo cache
+        uses: ./.github/actions/turbo-cache
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
       - name: Generate Prisma client
         run: npx prisma generate
+
+      - name: TypeScript type-check and lint (server workspace)
+        run: pnpm exec turbo run type-check lint --filter=@bizcode/server...
 
       - name: Validate Prisma schema
         run: npx prisma validate

@@ -9,7 +9,6 @@ on:
     branches: [main, develop]
     paths:
       - 'apps/web/src/**'
-      - 'apps/server/**'
       - 'packages/**'
       - 'prisma/**'
       - 'tests/**'
@@ -23,7 +22,6 @@ on:
     branches: [main, develop]
     paths:
       - 'apps/web/src/**'
-      - 'apps/server/**'
       - 'packages/**'
       - 'prisma/**'
       - 'tests/**'
@@ -62,6 +60,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Install pnpm
         uses: pnpm/action-setup@v4
@@ -74,17 +74,20 @@ jobs:
           node-version: '22'
           cache: 'pnpm'
 
+      - name: Restore Turborepo cache
+        uses: ./.github/actions/turbo-cache
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
       - name: Generate Prisma client
         run: npx prisma generate
 
-      - name: TypeScript type-check
-        run: pnpm run type-check
+      - name: TypeScript type-check (web workspace)
+        run: pnpm exec turbo run type-check --filter=@bizcode/web...
 
-      - name: ESLint with jsx-a11y
-        run: pnpm run lint
+      - name: ESLint with jsx-a11y (web workspace)
+        run: pnpm exec turbo run lint --filter=@bizcode/web...
 
       - name: Unit tests with coverage
         run: pnpm run test:coverage

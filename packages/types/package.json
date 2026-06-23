@@ -7,7 +7,12 @@
     ".": "./src/index.ts"
   },
   "scripts": {
-    "type-check": "tsc --noEmit -p tsconfig.json",
+    "type-check": "tsc -b --pretty false",
     "lint": "eslint src --ext .ts --max-warnings 0"
+  },
+  "turbo": {
+    "type-check": {
+      "outputs": ["dist/**", "tsconfig.tsbuildinfo"]
+    }
   }
 }
