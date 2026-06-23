@@ -1,4 +1,4 @@
-import type { TenantPlanSnapshot } from '../../web/src/lib/plans'
+import type { TenantPlanSnapshot } from '@bizcode/types'
 
 type CacheEntry = {
   snapshot: TenantPlanSnapshot

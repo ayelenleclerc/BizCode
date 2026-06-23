@@ -1,6 +1,6 @@
 import type { PrismaClient } from '@prisma/client'
-import { NEW_TENANT_MODULES } from '../../web/src/lib/modules/tenantDefaults'
-import { USER_CHANNELS } from '../../web/src/lib/rbac'
+import { NEW_TENANT_MODULES } from '@bizcode/types'
+import { USER_CHANNELS } from '@bizcode/types'
 import { hashPassword } from '../passwordHash'
 
 export type SuperadminTenantListRow = {

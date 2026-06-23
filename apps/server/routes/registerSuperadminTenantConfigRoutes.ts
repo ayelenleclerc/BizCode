@@ -1,6 +1,6 @@
 import type { Application, Request, Response } from 'express'
 import type { PrismaClient } from '@prisma/client'
-import { MODULE_PRESET_KEYS, MODULE_KEYS, type ModuleKey, type ModulePresetKey } from '../../web/src/lib/modules'
+import { MODULE_PRESET_KEYS, MODULE_KEYS, type ModuleKey, type ModulePresetKey } from '@bizcode/types'
 import { requirePermission, requireSuperAdmin, type AuthenticatedRequest } from '../auth'
 import { TenantConfigService } from '../services/TenantConfigService'
 

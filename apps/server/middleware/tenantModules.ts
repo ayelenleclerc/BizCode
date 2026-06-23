@@ -1,6 +1,6 @@
 import type { NextFunction, Response } from 'express'
 import type { PrismaClient } from '@prisma/client'
-import { NEW_TENANT_MODULES, type ModuleKey } from '../../web/src/lib/modules'
+import { NEW_TENANT_MODULES, type ModuleKey } from '@bizcode/types'
 import type { AuthenticatedRequest } from '../auth'
 import { TenantConfigService } from '../services/TenantConfigService'
 

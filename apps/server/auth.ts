@@ -3,8 +3,8 @@ import express from 'express'
 import type { NextFunction, Request, Response } from 'express'
 import { authRouterHttpRateLimiter } from './middleware/routeRateLimit'
 import type { PrismaClient } from '@prisma/client'
-import type { ModuleKey } from '../web/src/lib/modules'
-import type { TenantPlanSnapshot } from '../web/src/lib/plans'
+import type { ModuleKey } from '@bizcode/types'
+import type { TenantPlanSnapshot } from '@bizcode/types'
 import {
   ROLE_PERMISSIONS,
   USER_CHANNELS,
@@ -15,11 +15,11 @@ import {
   type Permission,
   type UserChannel,
   type UserRole,
-} from '../web/src/lib/rbac'
+} from '@bizcode/types'
 import { hashPassword, verifyPassword } from './passwordHash'
 import { writeAuditEvent } from './audit'
 import { getAppConfig } from './config/env'
-import { NEW_TENANT_MODULES } from '../web/src/lib/modules/tenantDefaults'
+import { NEW_TENANT_MODULES } from '@bizcode/types'
 
 const SESSION_COOKIE_NAME = 'bizcode_session'
 const SESSION_DURATION_MS = 1000 * 60 * 60 * 8

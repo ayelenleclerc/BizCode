@@ -6,7 +6,7 @@ import {
   NEW_TENANT_MODULES,
   type ModuleKey,
   type ModulePresetKey,
-} from '../../web/src/lib/modules'
+} from '@bizcode/types'
 import { resolveDeploymentEnv } from '../../web/src/lib/modules/env'
 import { validateModuleSet } from '../../web/src/lib/modules/validation'
 import {

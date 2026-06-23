@@ -1,6 +1,6 @@
 import type { Application, Request, Response } from 'express'
 import type { PrismaClient } from '@prisma/client'
-import { USER_ROLES, USER_CHANNELS, hasPermission, type UserRole, type UserChannel } from '../web/src/lib/rbac'
+import { USER_ROLES, USER_CHANNELS, hasPermission, type UserRole, type UserChannel } from '@bizcode/types'
 import { hashPassword, verifyPassword } from './passwordHash'
 import { requirePermission, type AuthenticatedRequest } from './auth'
 import { writeAuditEvent } from './audit'

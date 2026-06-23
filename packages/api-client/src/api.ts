@@ -1,6 +1,70 @@
 import axios, { AxiosError } from 'axios'
 import type { AuthClaims, Cliente, Cobro, Factura } from '@bizcode/types'
 
+export type {
+  ApiErrorPayload,
+  AppNotification,
+  AppUserDTO,
+  AuditEventDTO,
+  AuditEventListResult,
+  AuditEventsListParams,
+  ChatConversation,
+  ChatMessageDTO,
+  CreateUserBody,
+  JsonRecord,
+  MotivoNoEntrega,
+  OrdenCompra,
+  OrdenCompraItemRow,
+  OrdenEntrega,
+  OrdenEntregaEstado,
+  OrdenEntregaLineItem,
+  OrdenEntregaListParams,
+  PedidoEstado,
+  PedidoListResponse,
+  PedidoRow,
+  Recuento,
+  RecuentoItemRow,
+  Reparto,
+  RepartoActivo,
+  RepartoCloseSummary,
+  RepartoEstado,
+  RepartoItemEstado,
+  RepartoItemPodDetail,
+  RepartoItemPodInput,
+  RepartoItemRow,
+  RepartoUbicacionPoint,
+  UpdateUserBody,
+} from '@bizcode/types'
+
+import type {
+  ApiErrorPayload,
+  AppNotification,
+  AppUserDTO,
+  AuditEventDTO,
+  AuditEventListResult,
+  AuditEventsListParams,
+  ChatConversation,
+  ChatMessageDTO,
+  CreateUserBody,
+  JsonRecord,
+  OrdenCompra,
+  OrdenEntrega,
+  OrdenEntregaEstado,
+  OrdenEntregaListParams,
+  PedidoListResponse,
+  PedidoRow,
+  Recuento,
+  Reparto,
+  RepartoActivo,
+  RepartoCloseSummary,
+  RepartoEstado,
+  RepartoItemPodDetail,
+  RepartoItemPodInput,
+  RepartoItemRow,
+  RepartoUbicacionPoint,
+  UpdateUserBody,
+} from '@bizcode/types'
+
 const envApiBase = import.meta.env.VITE_API_URL?.trim()
 const API_BASE = envApiBase && envApiBase.length > 0 ? envApiBase : 'http://localhost:3001/api'
 
@@ -9,11 +73,6 @@ const api = axios.create({
   timeout: 10000,
   withCredentials: true,
 })
-
-export type ApiErrorPayload = {
-  error?: string
-  validation?: { valid: boolean; errors: Array<{ module: string; reason: string }> }
-}
 
 /**
  * @en Thrown by the API client when a request fails; preserves Axios `code` and whether a response existed (for i18n mapping on login).
@@ -116,8 +175,6 @@ export function getAuthErrorI18nKey(error: unknown): string {
 }
 
 /** Payload genérico para creación/actualización vía API REST (cuerpo JSON). */
-export type JsonRecord = Record<string, unknown>
-
 export type LoginBody = {
   tenantSlug: string
   username: string
@@ -923,47 +980,6 @@ export const rubrosAPI = {
 }
 
 // ============ PROVEEDORES ============
-
-export type OrdenCompraItemRow = {
-  id: number
-  articuloId: number
-  codigoProveedor?: string | null
-  descripcionProveedor?: string | null
-  cantidad: number
-  cantidadRecibida: number
-  costoUnitario: string
-  subtotal: string
-  articulo?: { id: number; codigo: number; descripcion: string }
-}
-
-export type OrdenCompra = {
-  id: number
-  proveedorId: number
-  estado: string
-  total: string
-  fechaEstimada?: string | null
-  nota?: string | null
-  proveedor?: { id: number; codigo: number; rsocial: string }
-  items: OrdenCompraItemRow[]
-}
-
-export type RecuentoItemRow = {
-  id: number
-  articuloId: number
-  cantSistema: number
-  cantFisica: number | null
-  articulo?: { id: number; codigo: number; descripcion: string }
-}
-
-export type Recuento = {
-  id: number
-  operadorId: number
-  estado: 'in_progress' | 'closed'
-  fecha: string
-  closedAt?: string | null
-  operador?: { id: number; username: string }
-  items: RecuentoItemRow[]
-}
 
 export const recuentosAPI = {
   list: async (params?: { limit?: number; offset?: number }) => {
@@ -1864,30 +1880,6 @@ export const reportesAPI = {
 }
 
 // ============ PEDIDOS ============
-
-export type PedidoEstado = 'draft' | 'confirmed' | 'invoiced' | 'cancelled'
-
-export type PedidoRow = {
-  id: number
-  clienteId: number
-  vendedorId: number | null
-  estado: PedidoEstado
-  total: number | string
-  validUntil: string | null
-  facturaId: number | null
-  createdAt: string
-  updatedAt: string
-  cliente?: { id: number; codigo: number; rsocial: string }
-  items?: unknown[]
-}
-
-export type PedidoListResponse = {
-  success: boolean
-  data: PedidoRow[]
-  total: number
-  take: number
-  skip: number
-}
 
 export const pedidosAPI = {
   list: async (params?: { estado?: string; clienteId?: number }): Promise<PedidoListResponse> => {
@@ -3108,39 +3100,6 @@ export const mercadopagoAPI = {
 
 // ============ USERS ============
 
-export type AppUserDTO = {
-  id: number
-  username: string
-  role: string
-  active: boolean
-  scopeChannels: string[]
-  scopeBranchIds: number[]
-  scopeWarehouseIds: number[]
-  scopeRouteIds: number[]
-  createdAt: string
-  updatedAt?: string
-}
-
-export type CreateUserBody = {
-  username: string
-  password: string
-  role: string
-  active?: boolean
-  scopeChannels?: string[]
-  scopeBranchIds?: number[]
-  scopeWarehouseIds?: number[]
-  scopeRouteIds?: number[]
-}
-
-export type UpdateUserBody = {
-  role?: string
-  active?: boolean
-  scopeChannels?: string[]
-  scopeBranchIds?: number[]
-  scopeWarehouseIds?: number[]
-  scopeRouteIds?: number[]
-}
-
 export const usersAPI = {
   list: async (): Promise<AppUserDTO[]> => {
     try {
@@ -3520,16 +3479,6 @@ export const dashboardAPI = {
 
 // ============ NOTIFICATIONS ============
 
-export type AppNotification = {
-  id: number
-  tenantId: number
-  userId: number
-  type: string
-  payload: Record<string, unknown>
-  readAt: string | null
-  createdAt: string
-}
-
 export const notificationsAPI = {
   list: async (): Promise<AppNotification[]> => {
     try {
@@ -3578,31 +3527,6 @@ export const notifChannelsAPI = {
 
 // ============ CHAT ============
 
-export type ChatConversation = {
-  user: {
-    id: number
-    username: string
-    role: string
-  }
-  unreadCount: number
-  lastMessage: {
-    id: number
-    fromUserId: number
-    toUserId: number
-    preview: string
-    createdAt: string
-  } | null
-}
-
-export type ChatMessageDTO = {
-  id: number
-  tenantId: number
-  fromUserId: number
-  toUserId: number
-  content: string
-  createdAt: string
-}
-
 export const chatAPI = {
   conversations: async (limit = 20): Promise<ChatConversation[]> => {
     try {
@@ -3639,36 +3563,6 @@ export const chatAPI = {
 
 // ============ AUDIT EVENTS ============
 
-export type AuditEventDTO = {
-  id: number
-  tenantId: number
-  userId: number | null
-  username: string | null
-  action: string
-  resource: string
-  resourceId: string | null
-  ipAddress: string | null
-  metadata: JsonRecord | null
-  createdAt: string
-}
-
-export type AuditEventsListParams = {
-  userId?: number
-  action?: string
-  resource?: string
-  startDate?: string
-  endDate?: string
-  limit?: number
-  offset?: number
-}
-
-export type AuditEventListResult = {
-  data: AuditEventDTO[]
-  total: number
-  limit: number
-  offset: number
-}
-
 export const auditEventsAPI = {
   list: async (params?: AuditEventsListParams): Promise<AuditEventListResult> => {
     try {
@@ -3688,136 +3582,6 @@ export const auditEventsAPI = {
 }
 
 // ============ ZONAS DE ENTREGA ============
-
-export type OrdenEntregaEstado =
-  | 'pending'
-  | 'picking'
-  | 'ready'
-  | 'assigned'
-  | 'in_transit'
-  | 'delivered'
-  | 'failed'
-  | 'cancelled'
-
-export type OrdenEntregaLineItem = {
-  id: number
-  cantidad: number
-  articulo: { id: number; codigo: number; descripcion: string }
-}
-
-export type OrdenEntrega = {
-  id: number
-  tenantId: number
-  facturaId: number | null
-  clienteId: number
-  zonaId: number | null
-  driverId: number | null
-  pickerUserId: number | null
-  pickingIniciadoAt: string | null
-  pickingListoAt: string | null
-  fecha: string
-  estado: OrdenEntregaEstado
-  nota: string | null
-  items: OrdenEntregaLineItem[]
-  cliente?: { id: number; codigo: number; rsocial: string }
-  zona?: { id: number; nombre: string; horario?: string | null } | null
-  driver?: { id: number; username: string; role: string } | null
-  picker?: { id: number; username: string; role: string } | null
-  factura?: { id: number; tipo: string; prefijo: string; numero: number } | null
-}
-
-export type OrdenEntregaListParams = {
-  estado?: OrdenEntregaEstado
-  zonaId?: number
-  driverId?: number
-  fecha?: string
-  limit?: number
-  offset?: number
-}
-
-export type RepartoEstado = 'planned' | 'on_route' | 'completed' | 'cancelled'
-
-export type RepartoItemEstado = 'pending' | 'delivered' | 'not_delivered' | 'returned'
-
-export type MotivoNoEntrega =
-  | 'ausente'
-  | 'rechazo'
-  | 'domicilio_incorrecto'
-  | 'producto_dañado'
-  | 'otro'
-
-export type RepartoItemRow = {
-  id: number
-  ordenEntregaId: number
-  secuencia: number
-  estado: RepartoItemEstado
-  entregadoAt: string | null
-  motivoNoEntrega: MotivoNoEntrega | null
-  receptorNombre: string | null
-  receptorDni: string | null
-  notasEntrega: string | null
-  hasPod: boolean
-  ordenEntrega: OrdenEntrega
-}
-
-export type RepartoItemPodDetail = RepartoItemRow & {
-  podMedia: { firmaBase64?: string; fotoBase64?: string } | null
-}
-
-export type RepartoItemPodInput = {
-  outcome: 'delivered' | 'not_delivered'
-  receptorNombre?: string | null
-  receptorDni?: string | null
-  firmaBase64?: string | null
-  fotoBase64?: string | null
-  notasEntrega?: string | null
-  motivoNoEntrega?: MotivoNoEntrega | null
-}
-
-export type Reparto = {
-  id: number
-  tenantId: number
-  fecha: string
-  choferId: number
-  estado: RepartoEstado
-  vehiculo: string | null
-  observaciones: string | null
-  closedAt: string | null
-  chofer: { id: number; username: string; role: string }
-  items: RepartoItemRow[]
-  progress: { total: number; delivered: number; pending: number }
-}
-
-export type RepartoCloseSummary = {
-  pendingClosed: number
-  delivered: number
-  notDelivered: number
-  returned: number
-}
-
-export type RepartoUbicacionPoint = {
-  lat: number
-  lng: number
-  recordedAt: string
-}
-
-export type RepartoActivo = {
-  id: number
-  tenantId: number
-  fecha: string
-  choferId: number
-  estado: RepartoEstado
-  vehiculo: string | null
-  observaciones: string | null
-  chofer: { id: number; username: string; role: string }
-  progress: { total: number; delivered: number; pending: number }
-  ultimaUbicacion: RepartoUbicacionPoint | null
-  currentStop: {
-    secuencia: number
-    cliente: { id: number; codigo: number; rsocial: string; domicilio: string | null }
-    zona: { id: number; nombre: string } | null
-  } | null
-}
 
 export type LogisticaKpis = {
   dispatchedCount: number

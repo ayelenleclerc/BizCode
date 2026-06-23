@@ -1,5 +1,5 @@
 import type { NextFunction, Response } from 'express'
-import type { ModuleKey } from '../../web/src/lib/modules'
+import type { ModuleKey } from '@bizcode/types'
 import { modulesInclude } from '../services/TenantConfigService'
 import type { PortalRequest } from '../portal/portalTypes'
 

@@ -1,28 +1,13 @@
-import { MODULE_CATALOG, MODULE_KEYS, type ModuleKey } from './catalog'
-import type { ModulePlan } from './types'
+import {
+  MODULE_CATALOG,
+  MODULE_KEYS,
+  PLAN_BASE_MONTHLY_ARS,
+  type ModuleKey,
+  type TenantMonthlyPriceEstimate,
+  type TenantPricingAddon,
+} from '@bizcode/types'
 
-/**
- * @en Monthly SaaS base price per plan in ARS (#226 product decision; not in MODULE_CATALOG).
- * @es Precio base mensual SaaS por plan en ARS (decisión producto #226; no está en MODULE_CATALOG).
- * @pt-BR Preço base mensal SaaS por plano em ARS (decisão de produto #226; não está em MODULE_CATALOG).
- */
-export const PLAN_BASE_MONTHLY_ARS: Record<ModulePlan, number> = {
-  starter: 0,
-  pro: 15000,
-  enterprise: 45000,
-}
-
-export type TenantPricingAddon = {
-  moduleKey: ModuleKey
-  price: number
-}
-
-export type TenantMonthlyPriceEstimate = {
-  plan: string
-  basePrice: number
-  addons: TenantPricingAddon[]
-  totalMonthly: number
-}
+export { PLAN_BASE_MONTHLY_ARS, type TenantMonthlyPriceEstimate, type TenantPricingAddon } from '@bizcode/types'
 
 function isModuleKey(value: string): value is ModuleKey {
   return (MODULE_KEYS as readonly string[]).includes(value)

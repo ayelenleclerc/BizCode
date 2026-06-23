@@ -1,6 +1,6 @@
 import type { PrismaClient } from '@prisma/client'
 import { modulesInclude } from './TenantConfigService'
-import type { ModuleKey } from '../../web/src/lib/modules'
+import type { ModuleKey } from '@bizcode/types'
 
 export type PortalPedidoDto = {
   id: number

@@ -1,5 +1,5 @@
 import type { Request } from 'express'
-import type { ModuleKey } from '../../web/src/lib/modules'
+import type { ModuleKey } from '@bizcode/types'
 
 export type PortalBrandingDto = {
   tenantName: string

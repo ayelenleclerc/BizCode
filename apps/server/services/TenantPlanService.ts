@@ -7,7 +7,7 @@ import {
   type PlanFeatureKey,
   type PlanKey,
   type TenantPlanSnapshot,
-} from '../../web/src/lib/plans'
+} from '@bizcode/types'
 import { invalidateTenantFeaturesCache } from './tenantConfigCache'
 import {
   getCachedTenantPlan,

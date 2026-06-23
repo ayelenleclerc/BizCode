@@ -1,6 +1,6 @@
 import type { NextFunction, Response } from 'express'
-import type { PlanFeatureKey } from '../../web/src/lib/plans'
-import { planIncludesFeature } from '../../web/src/lib/plans'
+import type { PlanFeatureKey } from '@bizcode/types'
+import { planIncludesFeature } from '@bizcode/types'
 import type { AuthenticatedRequest } from '../auth'
 import { planErrorBody } from '../services/TenantPlanService'
 
