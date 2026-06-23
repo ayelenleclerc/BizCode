@@ -24,7 +24,7 @@
     "seed": "tsx prisma/seed.ts"
   },
   "scripts": {
-    "server": "tsx --env-file=.env apps/server/main.ts",
+    "server": "tsx apps/server/main.ts",
     "dev:vite": "pnpm --filter @bizcode/web dev",
     "dev": "tauri dev",
     "dev:full": "concurrently \"pnpm run server\" \"pnpm run dev\"",
@@ -181,5 +181,18 @@
   },
   "engines": {
     "node": ">=22.0.0"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@prisma/client",
+      "@prisma/engines",
+      "@scarf/scarf",
+      "esbuild",
+      "libxmljs2",
+      "prisma",
+      "sharp",
+      "tesseract.js",
+      "vue-demi"
+    ]
   }
 }

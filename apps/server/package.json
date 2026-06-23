@@ -4,8 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "tsx --env-file=../../.env --tsconfig ../../tsconfig.json main.ts",
-    "start": "tsx --env-file=../../.env --tsconfig ../../tsconfig.json main.ts",
+    "dev": "tsx --tsconfig ../../tsconfig.json main.ts",
+    "start": "tsx --tsconfig ../../tsconfig.json main.ts",
     "type-check": "tsc --noEmit -p tsconfig.json",
     "lint": "eslint . --ext .ts --max-warnings 0"
   },

@@ -1,10 +1,8 @@
-import { readFileSync } from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import OpenAPIParser from '@apidevtools/swagger-parser'
 import Ajv from 'ajv'
 import addFormats from 'ajv-formats'
-import { parse as parseYaml } from 'yaml'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -21,9 +19,7 @@ addFormats(ajv)
 
 async function loadDereferenced() {
   if (!dereferenced) {
-    const yamlText = readFileSync(SPEC_PATH, 'utf-8')
-    const parsed = parseYaml(yamlText) as Record<string, unknown>
-    dereferenced = (await OpenAPIParser.dereference(parsed)) as Record<string, unknown>
+    dereferenced = (await OpenAPIParser.dereference(SPEC_PATH)) as Record<string, unknown>
   }
   return dereferenced
 }
