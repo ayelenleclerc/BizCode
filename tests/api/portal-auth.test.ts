@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import request from 'supertest'
-import { createApp } from '../../server/createApp'
-import { initializeAppConfig, resetAppConfigCache } from '../../server/config/env'
+import { createApp } from '../../apps/server/createApp'
+import { initializeAppConfig, resetAppConfigCache } from '../../apps/server/config/env'
 import {
   createPortalMagicToken,
   createPortalPrismaMock,
@@ -10,8 +10,8 @@ import {
   PORTAL_TEST_TENANT_SLUG,
 } from '../helpers/portalPrismaMock'
 
-vi.mock('../../server/channels', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('../../server/channels')>()
+vi.mock('../../apps/server/channels', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../../apps/server/channels')>()
   return {
     ...actual,
     sendPortalMagicLinkEmail: vi.fn().mockResolvedValue(undefined),

@@ -9,6 +9,7 @@
     "allowSyntheticDefaultImports": true,
     "jsx": "react-jsx",
     "strict": true,
+    "forceConsistentCasingInFileNames": true,
     "noEmit": true,
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
@@ -18,22 +19,24 @@
     "noFallthroughCasesInSwitch": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"],
-      "@components/*": ["src/components/*"],
-      "@pages/*": ["src/pages/*"],
-      "@lib/*": ["src/lib/*"],
-      "@hooks/*": ["src/hooks/*"],
-      "@store/*": ["src/store/*"]
+      "@/*": ["apps/web/src/*"],
+      "@components/*": ["apps/web/src/components/*"],
+      "@pages/*": ["apps/web/src/pages/*"],
+      "@lib/*": ["apps/web/src/lib/*"],
+      "@hooks/*": ["apps/web/src/hooks/*"],
+      "@store/*": ["apps/web/src/store/*"],
+      "@bizcode/types": ["packages/types/src/index.ts"],
+      "@bizcode/api-client": ["packages/api-client/src/index.ts"]
     }
   },
   "include": [
-    "src",
-    "server",
+    "apps/web/src",
+    "apps/server",
+    "packages/types/src",
+    "packages/api-client/src",
     "tests",
     "e2e",
-    "server.ts",
     "playwright.config.ts",
     "scripts/github/**/*.ts"
-  ],
-  "references": [{ "path": "./tsconfig.node.json" }]
+  ]
 }

@@ -6,7 +6,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 import request from 'supertest'
 import type { Application } from 'express'
 import { PrismaClient, UserRole } from '@prisma/client'
-import { createApp } from '../../server/createApp'
+import { createApp } from '../../apps/server/createApp'
 
 async function truncateRepartosData(prisma: PrismaClient): Promise<void> {
   await prisma.$transaction([

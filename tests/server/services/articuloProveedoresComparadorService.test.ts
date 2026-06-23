@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { PrismaClient } from '@prisma/client'
 import { Decimal } from '@prisma/client/runtime/library'
-import { ArticuloProveedoresComparadorService } from '../../../server/services/ArticuloProveedoresComparadorService'
+import { ArticuloProveedoresComparadorService } from '../../../apps/server/services/ArticuloProveedoresComparadorService'
 
 const articulo = { id: 10, codigo: 1001, descripcion: 'Aceite 1L' }
 

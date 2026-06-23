@@ -7,7 +7,7 @@ import {
   itemHasPod,
   parsePodMediaJson,
   validatePodMediaSizes,
-} from '../../../server/lib/podMediaValidation'
+} from '../../../apps/server/lib/podMediaValidation'
 
 const TINY_PNG =
   'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=='

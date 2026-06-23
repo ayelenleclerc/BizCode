@@ -9,7 +9,8 @@ Programa_Viejo/
 programa_viejo/
 
 .env
-.env.local
+e2e/.auth/
+*.tsbuildinfo
 *.log
 .DS_Store
 .claude/

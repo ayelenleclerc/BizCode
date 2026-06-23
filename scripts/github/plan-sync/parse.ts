@@ -8,8 +8,8 @@ import {
   parsePlanFrontmatterYaml,
   splitPlanFrontmatter,
   todoContentHash,
-} from '../../../src/lib/plan-sync'
-import type { PlanDocument, PlanTodo } from '../../../src/lib/plan-sync'
+} from '../../../apps/web/src/lib/plan-sync'
+import type { PlanDocument, PlanTodo } from '../../../apps/web/src/lib/plan-sync'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 

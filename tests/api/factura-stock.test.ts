@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import request from 'supertest'
 import type { PrismaClient } from '@prisma/client'
-import { createApp } from '../../server/createApp'
+import { createApp } from '../../apps/server/createApp'
 import { createCcTxLayer } from '../helpers/movimientoClienteCcPrismaMock'
 
 const CLIENTE_BASE = { id: 1, codigo: 1001, rsocial: 'ACME SA', suspended: false }

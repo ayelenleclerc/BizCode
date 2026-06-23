@@ -1,12 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import request from 'supertest'
 import type { PrismaClient } from '@prisma/client'
-import { createApp } from '../../server/createApp'
+import { createApp } from '../../apps/server/createApp'
 import {
   bucketLabelForDaysPastDue,
   buildAgingFromInvoices,
   computeDaysPastDue,
-} from '../../server/services/ReportesFinancierosService'
+} from '../../apps/server/services/ReportesFinancierosService'
 import { Decimal } from '@prisma/client/runtime/library'
 
 function buildPrismaMock(overrides: Partial<Record<string, unknown>> = {}): PrismaClient {

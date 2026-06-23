@@ -9,7 +9,7 @@ vi.mock('@prisma/client', () => ({
   },
 }))
 
-import * as server from '../../server'
+import * as server from '../../apps/server/server'
 
 describe('server bootstrap', () => {
   beforeEach(() => {

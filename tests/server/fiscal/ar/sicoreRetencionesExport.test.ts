@@ -5,7 +5,7 @@ import {
   parseSicoreLine,
   SICORE_FIELD_LENGTHS,
   type SicoreRetencionExportRow,
-} from '../../../../server/fiscal/ar/sicoreRetencionesExport'
+} from '../../../../apps/server/fiscal/ar/sicoreRetencionesExport'
 
 const ROWS: SicoreRetencionExportRow[] = [
   {

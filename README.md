@@ -25,7 +25,7 @@
 - **Node.js** ≥ 22 LTS (see `package.json` `engines` and `.nvmrc`)
 - **Rust** ≥ 1.77 (stable toolchain) — for Tauri builds
 - **Docker** (optional) — easiest way to run PostgreSQL
-- **PostgreSQL** 15 or 16
+- **pnpm** 10.x (`corepack enable`; see root `packageManager`)
 
 ---
 
@@ -39,7 +39,8 @@ git clone <repo-url>
 cd BizCode
 
 # 2. Install dependencies
-npm install --legacy-peer-deps
+corepack enable
+pnpm install --frozen-lockfile
 
 # 3. Configure environment variables
 cp .env.example .env
@@ -50,16 +51,16 @@ npx prisma migrate dev
 npx prisma db seed   # creates tenant `platform` + SuperAdmin `ayelen` — set `BIZCODE_SEED_SUPERADMIN_PASSWORD` in `.env` first (≥ 8 chars; see `.env.example`)
 
 # 5. Start the full-stack dev server (API + Vite)
-npm run dev:full
+ppnpm run dev:full
 ```
 
 **Login (after seed):** tenant slug `platform`, username `ayelen`, password is the value you set in `BIZCODE_SEED_SUPERADMIN_PASSWORD` (local `.env` only; never commit). Re-running the seed resets that user’s password hash to match the current env value. The `super_admin` role includes all ERP permissions plus platform permissions ([`src/lib/rbac.ts`](src/lib/rbac.ts)).
 
-#### SuperAdmin: `npx prisma db seed` vs `npm run bootstrap:superadmin`
+#### SuperAdmin: `npx prisma db seed` vs `pnpm run bootstrap:superadmin`
 
 Use **one** path per environment; for day-to-day local setup, prefer **`npx prisma db seed`** after migrations.
 
-| | `npx prisma db seed` | `npm run bootstrap:superadmin` |
+| | `npx prisma db seed` | `pnpm run bootstrap:superadmin` |
 |---|---|---|
 | Entry | [`prisma/seed.ts`](prisma/seed.ts) (logic in [`prisma/seedSuperAdmin.ts`](prisma/seedSuperAdmin.ts)) | [`scripts/bootstrap-superadmin.ts`](scripts/bootstrap-superadmin.ts) |
 | Password env | `BIZCODE_SEED_SUPERADMIN_PASSWORD` (required; ≥ 8 characters) | `BIZCODE_BOOTSTRAP_SUPERADMIN_PASSWORD` (required) |
@@ -68,28 +69,28 @@ Use **one** path per environment; for day-to-day local setup, prefer **`npx pris
 
 Automated tests cover the seed logic via [`tests/scripts/seed-superadmin.test.ts`](tests/scripts/seed-superadmin.test.ts) (`runSuperAdminSeed`).
 
-**Troubleshooting (web login):** If login fails with a “cannot reach the server” style message (localized in the UI), start the API on port 3001 (`npm run server` or `npm run dev:full`) and inspect the browser **Network** tab for `POST …/api/auth/login`.
+**Troubleshooting (web login):** If login fails with a “cannot reach the server” style message (localized in the UI), start the API on port 3001 (`pnpm run server` or `ppnpm run dev:full`) and inspect the browser **Network** tab for `POST …/api/auth/login`.
 
 ### Available Scripts
 
 | Script | Purpose |
 |---|---|
-| `npm run dev:full` | Start Express API + Vite dev server concurrently |
-| `npm run dev:vite` | Vite dev server only |
-| `npm run server` | Express API server only (port 3001) |
-| `npm run build:web` | Production Vite build |
-| `npm run type-check` | TypeScript type check (no emit) |
-| `npm run lint` | ESLint + jsx-a11y (cero advertencias; falla CI si hay warnings) |
-| `npm run lint:fix` | ESLint with auto-fix |
-| `npm run test` | Run unit tests + API contract tests (OpenAPI + supertest) |
-| `npm run test:watch` | Run tests in watch mode |
-| `npm run test:coverage` | Run tests with V8 coverage report |
-| `npm run test:e2e` | Playwright smoke against Vite preview (`e2e/`; see ADR-0004) |
-| `npm run check:i18n` | Verify i18n key parity across locales |
-| `npm run check:docs-map` | Verify paths in `docs/DOCUMENT_LOCALE_MAP.md` exist |
-| `npm run bootstrap:superadmin` | Optional one-off SuperAdmin creation (see table above; uses `BIZCODE_BOOTSTRAP_*` env vars) |
-| `npm run migrate:dbf` | Migración desde DBF (script `scripts/migrate-from-dbf.ts`) |
-| `npm run reparto-ubicacion:purge` | Purge GPS location samples older than 7 days (`logistics.gps`; see [privacy data map](docs/en/privacy-data-map.md)) |
+| `ppnpm run dev:full` | Start Express API + Vite dev server concurrently |
+| `pnpm run dev:vite` | Vite dev server only |
+| `pnpm run server` | Express API server only (port 3001) |
+| `pnpm run build:web` | Production Vite build |
+| `pnpm run type-check` | TypeScript type check (no emit) |
+| `pnpm run lint` | ESLint + jsx-a11y (cero advertencias; falla CI si hay warnings) |
+| `pnpm run lint:fix` | ESLint with auto-fix |
+| `pnpm run test` | Run unit tests + API contract tests (OpenAPI + supertest) |
+| `pnpm run test:watch` | Run tests in watch mode |
+| `pnpm run test:coverage` | Run tests with V8 coverage report |
+| `pnpm run test:e2e` | Playwright smoke against Vite preview (`e2e/`; see ADR-0004) |
+| `pnpm run check:i18n` | Verify i18n key parity across locales |
+| `pnpm run check:docs-map` | Verify paths in `docs/DOCUMENT_LOCALE_MAP.md` exist |
+| `pnpm run bootstrap:superadmin` | Optional one-off SuperAdmin creation (see table above; uses `BIZCODE_BOOTSTRAP_*` env vars) |
+| `pnpm run migrate:dbf` | Migración desde DBF (script `scripts/migrate-from-dbf.ts`) |
+| `pnpm run reparto-ubicacion:purge` | Purge GPS location samples older than 7 days (`logistics.gps`; see [privacy data map](docs/en/privacy-data-map.md)) |
 
 ### Logistics (issues #140–#145)
 
@@ -123,7 +124,7 @@ All product and quality Markdown is maintained in **English**, **Spanish**, and 
 | [CONTRIBUTING.md](CONTRIBUTING.md) | Branch workflow, commit convention, Definition of Done |
 | [`.cursor/rules/bizcode.mdc`](.cursor/rules/bizcode.mdc) | Mandatory Cursor/AI rules (always on); see also [`bizcode-documentation.mdc`](.cursor/rules/bizcode-documentation.mdc) for `docs/**` |
 | [docs/api/openapi.yaml](docs/api/openapi.yaml) | OpenAPI 3.1 API specification (single file, not translated) |
-| Swagger UI | `http://localhost:3001/api-docs/` when the API server is running (`npm run server`; same spec as OpenAPI) |
+| Swagger UI | `http://localhost:3001/api-docs/` when the API server is running (`pnpm run server`; same spec as OpenAPI) |
 | [docs/en/quality/swagger-openapi-ui-plan.md](docs/en/quality/swagger-openapi-ui-plan.md) | Swagger UI + OpenAPI implementation plan (mirrored in [es](docs/es/quality/plan-swagger-openapi-ui.md) / [pt-BR](docs/pt-br/quality/plano-swagger-openapi-ui.md); versioned; see [DOCUMENT_LOCALE_MAP.md](docs/DOCUMENT_LOCALE_MAP.md)) |
 
 Root-level files under `docs/*.md` (except the hub above) are **redirect stubs** to the three locale copies — use the language you need from [docs/README.md](docs/README.md).

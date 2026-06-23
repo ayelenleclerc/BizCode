@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 import type { PrismaClient } from '@prisma/client'
-import { LogisticaReportesService } from '../../../server/services/LogisticaReportesService'
+import { LogisticaReportesService } from '../../../apps/server/services/LogisticaReportesService'
 
 function buildPrisma(): PrismaClient {
   return {

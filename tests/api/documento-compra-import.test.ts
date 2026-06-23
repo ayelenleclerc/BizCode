@@ -3,8 +3,8 @@ import os from 'node:os'
 import path from 'node:path'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import request from 'supertest'
-import { createApp } from '../../server/createApp'
-import { createEmptyDocumentoCompraPreview } from '../../server/lib/documentoCompraTypes'
+import { createApp } from '../../apps/server/createApp'
+import { createEmptyDocumentoCompraPreview } from '../../apps/server/lib/documentoCompraTypes'
 
 const preview = createEmptyDocumentoCompraPreview()
 

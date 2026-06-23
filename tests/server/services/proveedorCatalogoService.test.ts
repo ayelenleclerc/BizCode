@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { PrismaClient } from '@prisma/client'
 import { Decimal } from '@prisma/client/runtime/library'
-import { ConflictAppError, NotFoundAppError } from '../../../server/errors/AppError'
-import { ProveedorCatalogoService } from '../../../server/services/ProveedorCatalogoService'
+import { ConflictAppError, NotFoundAppError } from '../../../apps/server/errors/AppError'
+import { ProveedorCatalogoService } from '../../../apps/server/services/ProveedorCatalogoService'
 
 const articuloRef = { id: 10, codigo: 1001, descripcion: 'Aceite 1L' }
 

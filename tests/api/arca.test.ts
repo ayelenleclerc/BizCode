@@ -6,8 +6,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import request from 'supertest'
 import type { PrismaClient } from '@prisma/client'
-import { createApp } from '../../server/createApp'
-import { encryptFiscalSecret } from '../../server/fiscal/ar/fiscalSecrets'
+import { createApp } from '../../apps/server/createApp'
+import { encryptFiscalSecret } from '../../apps/server/fiscal/ar/fiscalSecrets'
 
 function buildPrismaMock(overrides: Partial<Record<string, unknown>> = {}): PrismaClient {
   return {

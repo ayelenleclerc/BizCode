@@ -4,8 +4,8 @@ import {
   extractArcaQrPayloadFromBuffer,
   mapArcaQrToDocumentoCompraPreview,
   parseArcaQrFechaToIso,
-} from '../../../server/fiscal/ar/arcaQrDecode'
-import { buildArcaQrJsonPayload, buildArcaQrUrl, encodeArcaQrParam } from '../../../server/fiscal/ar/arcaQrPayload'
+} from '../../../apps/server/fiscal/ar/arcaQrDecode'
+import { buildArcaQrJsonPayload, buildArcaQrUrl, encodeArcaQrParam } from '../../../apps/server/fiscal/ar/arcaQrPayload'
 
 const base = {
   fecha: new Date('2026-01-10T12:00:00.000Z'),

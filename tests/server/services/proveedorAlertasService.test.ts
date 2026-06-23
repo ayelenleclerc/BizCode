@@ -1,10 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { PrismaClient } from '@prisma/client'
 import { Decimal } from '@prisma/client/runtime/library'
-import { dispatchSupplierNotification } from '../../../server/channels'
-import { ProveedorAlertasService } from '../../../server/services/ProveedorAlertasService'
+import { dispatchSupplierNotification } from '../../../apps/server/channels'
+import { ProveedorAlertasService } from '../../../apps/server/services/ProveedorAlertasService'
 
-vi.mock('../../../server/channels', () => ({
+vi.mock('../../../apps/server/channels', () => ({
   dispatchSupplierNotification: vi.fn().mockResolvedValue(undefined),
   isSmtpConfigured: vi.fn().mockReturnValue(false),
 }))

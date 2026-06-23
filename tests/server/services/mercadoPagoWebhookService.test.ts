@@ -1,18 +1,18 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { Decimal } from '@prisma/client/runtime/library'
-import { encryptFiscalSecret } from '../../../server/fiscal/ar/fiscalSecrets'
+import { encryptFiscalSecret } from '../../../apps/server/fiscal/ar/fiscalSecrets'
 import {
   buildMercadoPagoSignatureManifest,
   computeMercadoPagoSignatureHmac,
-} from '../../../server/lib/mercadopagoSignature'
+} from '../../../apps/server/lib/mercadopagoSignature'
 import {
   extractPaymentIdFromPayload,
   MercadoPagoWebhookService,
-} from '../../../server/services/MercadoPagoWebhookService'
+} from '../../../apps/server/services/MercadoPagoWebhookService'
 
-vi.mock('../../../server/integrations/mercadopago/mercadoPagoApiClient', async (importOriginal) => {
+vi.mock('../../../apps/server/integrations/mercadopago/mercadoPagoApiClient', async (importOriginal) => {
   const actual = await importOriginal<
-    typeof import('../../../server/integrations/mercadopago/mercadoPagoApiClient')
+    typeof import('../../../apps/server/integrations/mercadopago/mercadoPagoApiClient')
   >()
   return {
     ...actual,
@@ -27,18 +27,18 @@ const reciboCreateMock = vi.hoisted(() =>
   }),
 )
 
-vi.mock('../../../server/services/ReciboCobroService', () => ({
+vi.mock('../../../apps/server/services/ReciboCobroService', () => ({
   ReciboCobroService: class {
     create = reciboCreateMock
   },
 }))
 
-vi.mock('../../../server/notifications', () => ({
+vi.mock('../../../apps/server/notifications', () => ({
   notifyManagers: vi.fn().mockResolvedValue(undefined),
 }))
 
-import { fetchMercadoPagoPayment } from '../../../server/integrations/mercadopago/mercadoPagoApiClient'
-import { notifyManagers } from '../../../server/notifications'
+import { fetchMercadoPagoPayment } from '../../../apps/server/integrations/mercadopago/mercadoPagoApiClient'
+import { notifyManagers } from '../../../apps/server/notifications'
 
 const WEBHOOK_SECRET = 'whsec-unit-test'
 

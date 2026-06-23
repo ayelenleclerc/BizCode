@@ -8,7 +8,7 @@ import {
   proveedorBodySchema,
   rubroBodySchema,
   stockAjusteBodySchema,
-} from '../../server/schemas/domain'
+} from '../../apps/server/schemas/domain'
 
 const validArticuloPayload = {
   codigo: 10,

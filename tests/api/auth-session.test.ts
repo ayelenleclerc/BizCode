@@ -2,8 +2,8 @@ import { createHmac, randomBytes, scryptSync } from 'node:crypto'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import request from 'supertest'
 import type { PrismaClient } from '@prisma/client'
-import { createApp } from '../../server/createApp'
-import { initializeAppConfig, resetAppConfigCache } from '../../server/config/env'
+import { createApp } from '../../apps/server/createApp'
+import { initializeAppConfig, resetAppConfigCache } from '../../apps/server/config/env'
 
 function hashPassword(password: string): string {
   const salt = randomBytes(16).toString('hex')

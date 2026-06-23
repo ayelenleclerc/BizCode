@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { Decimal } from '@prisma/client/runtime/library'
-import { buildOrdenCompraPdfBuffer } from '../../../server/logistics/ordenCompraPdf'
-import type { OrdenCompraRow } from '../../../server/services/CompraService'
+import { buildOrdenCompraPdfBuffer } from '../../../apps/server/logistics/ordenCompraPdf'
+import type { OrdenCompraRow } from '../../../apps/server/services/CompraService'
 
 function buildOrden(): OrdenCompraRow {
   return {

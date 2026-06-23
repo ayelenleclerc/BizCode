@@ -7,7 +7,7 @@
  */
 import { PrismaClient } from '@prisma/client'
 import { Decimal } from '@prisma/client/runtime/library'
-import { ClienteCuentaCorrienteService } from '../server/services/ClienteCuentaCorrienteService'
+import { ClienteCuentaCorrienteService } from '../apps/server/services/ClienteCuentaCorrienteService'
 
 const prisma = new PrismaClient()
 

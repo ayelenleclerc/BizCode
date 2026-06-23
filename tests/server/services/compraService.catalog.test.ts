@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { PrismaClient } from '@prisma/client'
-import { CompraService } from '../../../server/services/CompraService'
-import type { ProveedorCatalogoService } from '../../../server/services/ProveedorCatalogoService'
+import { CompraService } from '../../../apps/server/services/CompraService'
+import type { ProveedorCatalogoService } from '../../../apps/server/services/ProveedorCatalogoService'
 
 function buildPrisma(): PrismaClient {
   const createdItems: Array<Record<string, unknown>> = []

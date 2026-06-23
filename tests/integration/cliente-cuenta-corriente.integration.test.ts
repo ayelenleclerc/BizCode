@@ -7,8 +7,8 @@ import request from 'supertest'
 import type { Application } from 'express'
 import { PrismaClient, UserRole } from '@prisma/client'
 import { Decimal } from '@prisma/client/runtime/library'
-import { createApp } from '../../server/createApp'
-import { ClienteCuentaCorrienteService } from '../../server/services/ClienteCuentaCorrienteService'
+import { createApp } from '../../apps/server/createApp'
+import { ClienteCuentaCorrienteService } from '../../apps/server/services/ClienteCuentaCorrienteService'
 
 async function truncateClienteCc(prisma: PrismaClient): Promise<void> {
   const tenantId = 1

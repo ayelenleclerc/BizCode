@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { PrismaClient } from '@prisma/client'
-import { RepartoService } from '../../../server/services/RepartoService'
-import { POD_MAX_FIRMA_BYTES } from '../../../server/lib/podMediaValidation'
+import { RepartoService } from '../../../apps/server/services/RepartoService'
+import { POD_MAX_FIRMA_BYTES } from '../../../apps/server/lib/podMediaValidation'
 
 const TEST_FIRMA =
   'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=='

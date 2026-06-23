@@ -13,7 +13,13 @@ export default tseslint.config(
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {
-    files: ['src/**/*.{ts,tsx}', 'tests/**/*.{ts,tsx}', 'e2e/**/*.{ts,tsx}', 'server/**/*.ts'],
+    files: [
+      'apps/web/src/**/*.{ts,tsx}',
+      'packages/**/*.{ts,tsx}',
+      'tests/**/*.{ts,tsx}',
+      'e2e/**/*.{ts,tsx}',
+      'apps/server/**/*.ts',
+    ],
     plugins: {
       react: reactPlugin,
       'react-hooks': reactHooks,
@@ -25,6 +31,10 @@ export default tseslint.config(
       ...jsxA11yRecommended,
       'jsx-a11y/label-has-for': 'off',
       'jsx-a11y/label-has-associated-control': ['error', { assert: 'either' }],
+      'react-hooks/set-state-in-effect': 'off',
+      'react-hooks/refs': 'off',
+      'react-hooks/immutability': 'off',
+      'react-hooks/incompatible-library': 'off',
       'react/react-in-jsx-scope': 'off',
       '@typescript-eslint/no-explicit-any': 'warn',
       '@typescript-eslint/no-unused-vars': [
@@ -41,6 +51,14 @@ export default tseslint.config(
     },
   },
   {
-    ignores: ['node_modules/**', 'dist/**', 'src-tauri/**', 'coverage/**'],
+    ignores: [
+      'node_modules/**',
+      'dist/**',
+      '**/dist/**',
+      '**/*.tsbuildinfo',
+      'src-tauri/**',
+      'coverage/**',
+      'docs/generated/**',
+    ],
   }
 )

@@ -2,8 +2,8 @@ import { describe, expect, it } from 'vitest'
 import {
   extractWithDocumentoCompraTemplates,
   mapTemplateExtractToDocumentoCompraPreview,
-} from '../../../../server/fiscal/ar/documentoCompraTemplateEngine'
-import type { DocumentoCompraTemplate } from '../../../../server/fiscal/ar/documentoCompraTemplateTypes'
+} from '../../../../apps/server/fiscal/ar/documentoCompraTemplateEngine'
+import type { DocumentoCompraTemplate } from '../../../../apps/server/fiscal/ar/documentoCompraTemplateTypes'
 
 const arTemplate: DocumentoCompraTemplate = {
   issuer: 'generic-arca-ar-test',

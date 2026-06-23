@@ -1,6 +1,6 @@
 import { Decimal } from '@prisma/client/runtime/library'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { RegimenRetencionService } from '../../../server/services/RegimenRetencionService'
+import { RegimenRetencionService } from '../../../apps/server/services/RegimenRetencionService'
 
 function buildPrisma() {
   const regimenRow = {

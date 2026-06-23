@@ -5,7 +5,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import request from 'supertest'
 import { DBFFile } from 'dbffile'
 import type { PrismaClient } from '@prisma/client'
-import { createApp } from '../../server/createApp'
+import { createApp } from '../../apps/server/createApp'
 import { assertMatchesOpenApi } from './validate-openapi-response'
 
 const rubroRow = { id: 1, codigo: 7, nombre: 'DBF Rubro' }

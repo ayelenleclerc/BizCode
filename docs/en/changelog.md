@@ -10,6 +10,8 @@ Versioning: [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **Monorepo (pnpm workspaces + Turborepo, #154):** `apps/web` (React/Vite), `apps/server` (Express API), `packages/types`, `packages/api-client`; root orchestration via `pnpm` and `turbo`; CI uses `pnpm install --frozen-lockfile`; `prisma/` remains at repo root; no functional product changes.
+
 - **Mercado Pago partial refunds (#344):** Multiple credit notes per invoice (Prisma drops `NotaCredito` unique on `facturaOrigenId`); `FacturaService.createPartialCreditNote` and `ReciboCobroService.recordPartialRefundReversal`; `MercadoPagoRefundService` supports partial MP refunds with partial NC + CC adjustment; full remaining balance still voids receipt/invoice (#179); `GET /api/facturas/{id}/mp/reembolso` returns `refundableBalance` and refund history; `MercadoPagoRefundDialog` amount field; OpenAPI, tests, trilingual finance manual.
 
 - **Mercado Pago refunds and chargebacks MVP (#179):** Prisma `MercadoPagoRefund` and `MercadoPagoChargeback`; `createMercadoPagoRefund` API client; `MercadoPagoRefundService` (total refund: MP refund → void receipt → invoice void/credit note #146, `mpEstado: refunded`); chargeback webhook (`type: chargebacks`) enqueues pending items and sends urgent manager notification (`mercadopago_chargeback`) without automatic credit note; API `GET/POST /api/facturas/{id}/mp/reembolso` (`sales.cancel`, `billing.credit_notes`), `GET/PATCH /api/mercadopago/contracargos`; staff UI refund button + timeline (`MercadoPagoRefundDialog`), chargeback queue `/finanzas/contracargos-mp`; OpenAPI, contract/API/unit/UI/integration tests, trilingual docs.

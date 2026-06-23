@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from 'vitest'
-import { resolveSmtpTransportConfig } from '../../server/config/smtpTransport'
+import { resolveSmtpTransportConfig } from '../../apps/server/config/smtpTransport'
 
 describe('server/config/smtpTransport', () => {
   const prevEnv = { ...process.env }

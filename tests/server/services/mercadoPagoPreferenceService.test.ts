@@ -6,19 +6,19 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { PrismaClient } from '@prisma/client'
 import { Decimal } from '@prisma/client/runtime/library'
-import { encryptFiscalSecret } from '../../../server/fiscal/ar/fiscalSecrets'
-import { MercadoPagoApiError } from '../../../server/integrations/mercadopago/mercadoPagoApiClient'
-import { MercadoPagoPreferenceService } from '../../../server/services/MercadoPagoPreferenceService'
+import { encryptFiscalSecret } from '../../../apps/server/fiscal/ar/fiscalSecrets'
+import { MercadoPagoApiError } from '../../../apps/server/integrations/mercadopago/mercadoPagoApiClient'
+import { MercadoPagoPreferenceService } from '../../../apps/server/services/MercadoPagoPreferenceService'
 
-vi.mock('../../../server/integrations/mercadopago/mercadoPagoApiClient', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('../../../server/integrations/mercadopago/mercadoPagoApiClient')>()
+vi.mock('../../../apps/server/integrations/mercadopago/mercadoPagoApiClient', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../../../apps/server/integrations/mercadopago/mercadoPagoApiClient')>()
   return {
     ...actual,
     createMercadoPagoPreference: vi.fn(),
   }
 })
 
-import { createMercadoPagoPreference } from '../../../server/integrations/mercadopago/mercadoPagoApiClient'
+import { createMercadoPagoPreference } from '../../../apps/server/integrations/mercadopago/mercadoPagoApiClient'
 
 const baseFactura = {
   id: 7,

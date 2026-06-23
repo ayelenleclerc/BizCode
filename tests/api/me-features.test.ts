@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import request from 'supertest'
 import type { PrismaClient } from '@prisma/client'
-import { createApp } from '../../server/createApp'
-import { DEFAULT_MODULES } from '../../src/lib/modules'
+import { createApp } from '../../apps/server/createApp'
+import { DEFAULT_MODULES } from '../../apps/web/src/lib/modules'
 import { assertMatchesOpenApi } from './validate-openapi-response'
 
 export function buildPrismaMock(): PrismaClient {

@@ -1,5 +1,5 @@
 import { describe, it, expect, afterEach } from 'vitest'
-import { initializeAppConfig, loadAppConfig, resetAppConfigCache } from '../../server/config/env'
+import { initializeAppConfig, loadAppConfig, resetAppConfigCache } from '../../apps/server/config/env'
 
 const validEnv = {
   DATABASE_URL: 'postgresql://bizcode@localhost:5432/bizcode_test',

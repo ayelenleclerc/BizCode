@@ -8,22 +8,30 @@ on:
   push:
     branches: [main, develop]
     paths:
-      - 'src/**'
-      - 'server/**'
+      - 'apps/web/src/**'
+      - 'apps/server/**'
+      - 'packages/**'
       - 'prisma/**'
       - 'tests/**'
       - 'e2e/**'
       - 'playwright.config.ts'
+      - 'pnpm-workspace.yaml'
+      - 'pnpm-lock.yaml'
+      - 'turbo.json'
       - '.github/workflows/frontend-validation.yml'
   pull_request:
     branches: [main, develop]
     paths:
-      - 'src/**'
-      - 'server/**'
+      - 'apps/web/src/**'
+      - 'apps/server/**'
+      - 'packages/**'
       - 'prisma/**'
       - 'tests/**'
       - 'e2e/**'
       - 'playwright.config.ts'
+      - 'pnpm-workspace.yaml'
+      - 'pnpm-lock.yaml'
+      - 'turbo.json'
       - '.github/workflows/frontend-validation.yml'
 
 jobs:
@@ -55,30 +63,35 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.30.2
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-          cache: 'npm'
+          cache: 'pnpm'
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
       - name: Generate Prisma client
         run: npx prisma generate
 
       - name: TypeScript type-check
-        run: npm run type-check
+        run: pnpm run type-check
 
       - name: ESLint with jsx-a11y
-        run: npm run lint
+        run: pnpm run lint
 
       - name: Unit tests with coverage
-        run: npm run test:coverage
+        run: pnpm run test:coverage
 
       - name: Check component sizes (Issue #102)
         run: |
-          LARGE=$(find src/pages -name "*.tsx" -exec wc -l {} + | awk '$1 > 200 {print $2 " (" $1 " lines)"}')
+          LARGE=$(find apps/web/src/pages -name "*.tsx" -exec wc -l {} + | awk '$1 > 200 {print $2 " (" $1 " lines)"}')
           if [ ! -z "$LARGE" ]; then
             echo "⚠️ Large page components found (Issue #102):"
             echo "$LARGE"
@@ -86,7 +99,7 @@ jobs:
 
       - name: Check for error boundaries (Issue #101)
         run: |
-          if grep -r "ErrorBoundary" src/App.tsx > /dev/null; then
+          if grep -r "ErrorBoundary" apps/web/src/App.tsx > /dev/null; then
             echo "✅ ErrorBoundary found in App"
           else
             echo "⚠️ ErrorBoundary not implemented (Issue #101)"
@@ -95,8 +108,8 @@ jobs:
       - name: Check for custom hooks (Issue #103)
         run: |
           HOOKS=0
-          if [ -d src/hooks ]; then
-            HOOKS=$(find src/hooks -name "*.ts" -print | wc -l)
+          if [ -d apps/web/src/hooks ]; then
+            HOOKS=$(find apps/web/src/hooks -name "*.ts" -print | wc -l)
           fi
           echo "✅ Found $HOOKS custom hooks"
           if [ $HOOKS -lt 3 ]; then
@@ -106,8 +119,8 @@ jobs:
       - name: Check for UI components (Issue #102)
         run: |
           COMPONENTS=0
-          if [ -d src/components/ui ]; then
-            COMPONENTS=$(find src/components/ui -name "*.tsx" -print | wc -l)
+          if [ -d apps/web/src/components/ui ]; then
+            COMPONENTS=$(find apps/web/src/components/ui -name "*.tsx" -print | wc -l)
           fi
           echo "✅ Found $COMPONENTS UI components"
           if [ $COMPONENTS -lt 8 ]; then
@@ -116,7 +129,7 @@ jobs:
 
       - name: Check for loading states (Issue #105)
         run: |
-          SKELETONS=$( { grep -r "Skeleton\|LoadingSpinner" src/pages --include="*.tsx" 2>/dev/null || true; } | wc -l )
+          SKELETONS=$( { grep -r "Skeleton\|LoadingSpinner" apps/web/src/pages --include="*.tsx" 2>/dev/null || true; } | wc -l )
           echo "✅ Found $SKELETONS loading state implementations"
           if [ $SKELETONS -lt 5 ]; then
             echo "⚠️ Low loading state coverage (Issue #105)"
@@ -124,11 +137,11 @@ jobs:
 
       - name: Check for error handling (Issue #101)
         run: |
-          HANDLERS=$( { grep -r "catch.*error\|try.*{" src/pages --include="*.tsx" 2>/dev/null || true; } | wc -l )
+          HANDLERS=$( { grep -r "catch.*error\|try.*{" apps/web/src/pages --include="*.tsx" 2>/dev/null || true; } | wc -l )
           echo "✅ Found $HANDLERS error handling blocks"
 
       - name: Verify i18n coverage
-        run: npm run check:i18n
+        run: pnpm run check:i18n
 
       - name: Install Playwright
         run: npx playwright install --with-deps chromium
@@ -153,7 +166,7 @@ jobs:
           JWT_SECRET: ci-test-jwt-secret
           BIZCODE_TEST_AUTH_BYPASS: 'false'
         run: |
-          npm run server &
+          pnpm run server &
           for i in $(seq 1 45); do
             if curl -sf http://127.0.0.1:3001/api/health >/dev/null; then
               echo "API healthy"
@@ -165,7 +178,7 @@ jobs:
           exit 1
 
       - name: E2E tests
-        run: npm run test:e2e
+        run: pnpm run test:e2e
 
       - name: Upload coverage report
         if: always()

@@ -1,6 +1,6 @@
 import { describe, it, expect, afterEach } from 'vitest'
 import request from 'supertest'
-import { createApp } from '../../server/createApp'
+import { createApp } from '../../apps/server/createApp'
 import {
   DEFAULT_MODULES,
   MODULE_CATALOG,
@@ -11,7 +11,7 @@ import {
   detectCatalogDependencyCycles,
   findUnknownCatalogDependencies,
   validateModuleSet,
-} from '../../src/lib/modules'
+} from '../../apps/web/src/lib/modules'
 
 describe('module catalog', () => {
   it('defines at least 45 modules', () => {

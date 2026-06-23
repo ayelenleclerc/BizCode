@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { parseDocumentoCompraLineItemsFromText } from '../../../../server/fiscal/ar/documentoCompraLineItems'
+import { parseDocumentoCompraLineItemsFromText } from '../../../../apps/server/fiscal/ar/documentoCompraLineItems'
 
 describe('parseDocumentoCompraLineItemsFromText', () => {
   it('parses line items from multiline invoice text', () => {

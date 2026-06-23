@@ -22,8 +22,12 @@ addFormats(ajv)
 async function loadDereferenced() {
   if (!dereferenced) {
     const yamlText = readFileSync(SPEC_PATH, 'utf-8')
-    const parsed = parseYaml(yamlText) as Record<string, unknown>
-    dereferenced = (await OpenAPIParser.dereference(parsed)) as Record<string, unknown>
+    const parsed = parseYaml(yamlText)
+    // Parse YAML in-process so swagger-parser does not resolve the spec path as an HTTP URL
+    // (vitest/jsdom sets location to localhost:3000 and breaks contract tests in CI).
+    dereferenced = (await OpenAPIParser.dereference(
+      parsed as Parameters<typeof OpenAPIParser.dereference>[0],
+    )) as Record<string, unknown>
   }
   return dereferenced
 }

@@ -1,5 +1,5 @@
 import path from 'node:path'
-import type { PlanDocument, PlanTodo } from '../../../src/lib/plan-sync'
+import type { PlanDocument, PlanTodo } from '../../../apps/web/src/lib/plan-sync'
 import { allLabelsForTodo, todoContentHash } from './parse'
 import type { PlanSyncStateFile, SyncStateTodo } from './types'
 import {

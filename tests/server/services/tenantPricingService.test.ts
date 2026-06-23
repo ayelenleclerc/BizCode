@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { PrismaClient } from '@prisma/client'
-import { DEFAULT_MODULES } from '../../../src/lib/modules'
-import { TenantPricingService } from '../../../server/services/TenantPricingService'
-import type { TenantConfigService } from '../../../server/services/TenantConfigService'
+import { DEFAULT_MODULES } from '../../../apps/web/src/lib/modules'
+import { TenantPricingService } from '../../../apps/server/services/TenantPricingService'
+import type { TenantConfigService } from '../../../apps/server/services/TenantConfigService'
 
 function buildPrisma(): PrismaClient {
   return {

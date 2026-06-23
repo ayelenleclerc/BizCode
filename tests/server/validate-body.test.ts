@@ -5,9 +5,9 @@ import express from 'express'
 import request from 'supertest'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { z } from 'zod'
-import { errorHandler } from '../../server/middleware/errorHandler'
-import { validateBody } from '../../server/middleware/validateBody'
-import * as loggerMod from '../../server/logger'
+import { errorHandler } from '../../apps/server/middleware/errorHandler'
+import { validateBody } from '../../apps/server/middleware/validateBody'
+import * as loggerMod from '../../apps/server/logger'
 
 const sampleBodySchema = z.object({
   name: z.string().min(3, 'name must be at least 3 characters'),

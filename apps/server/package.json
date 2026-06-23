@@ -1,0 +1,15 @@
+{
+  "name": "@bizcode/server",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx --tsconfig ../../tsconfig.json main.ts",
+    "start": "tsx --tsconfig ../../tsconfig.json main.ts",
+    "type-check": "tsc --noEmit -p tsconfig.json",
+    "lint": "eslint . --ext .ts --max-warnings 0"
+  },
+  "dependencies": {
+    "@bizcode/types": "workspace:*"
+  }
+}

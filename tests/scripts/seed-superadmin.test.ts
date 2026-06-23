@@ -6,8 +6,8 @@ import {
   SUPERADMIN_SEED_TENANT_NAME,
   SUPERADMIN_SEED_USERNAME,
 } from '../../prisma/seedSuperAdmin'
-import { verifyPassword } from '../../server/passwordHash'
-import { USER_CHANNELS } from '../../src/lib/rbac'
+import { verifyPassword } from '../../apps/server/passwordHash'
+import { USER_CHANNELS } from '../../apps/web/src/lib/rbac'
 
 function buildPrismaMock(tenantId = 7): PrismaClient {
   const tenant = {

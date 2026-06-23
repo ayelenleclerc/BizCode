@@ -5,8 +5,8 @@
 import 'dotenv/config'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { PrismaClient } from '@prisma/client'
-import { MercadoPagoChargebackService } from '../../server/services/MercadoPagoChargebackService'
-import { MercadoPagoRefundService } from '../../server/services/MercadoPagoRefundService'
+import { MercadoPagoChargebackService } from '../../apps/server/services/MercadoPagoChargebackService'
+import { MercadoPagoRefundService } from '../../apps/server/services/MercadoPagoRefundService'
 
 describe('Mercado Pago refund/chargeback — integración PostgreSQL (#179)', () => {
   let prisma: PrismaClient

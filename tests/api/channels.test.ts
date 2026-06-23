@@ -7,7 +7,7 @@
 import { beforeEach, afterEach, describe, expect, it, vi } from 'vitest'
 import request from 'supertest'
 import type { PrismaClient } from '@prisma/client'
-import { createApp } from '../../server/createApp'
+import { createApp } from '../../apps/server/createApp'
 import {
   createMovimientoClienteCCPrismaMock,
   extendClientePrismaForCc,
@@ -198,7 +198,7 @@ describe('dispatchNotification — silent fallback when SMTP unconfigured', () =
 
   it('does not call nodemailer when SMTP is not configured', async () => {
     // dispatchNotification is called internally by POST /api/facturas when balance > creditLimit
-    const { dispatchNotification } = await import('../../server/channels')
+    const { dispatchNotification } = await import('../../apps/server/channels')
     const prisma = buildPrismaMock()
     await dispatchNotification(prisma, 1, 'credit_limit_exceeded', {
       clienteId: 1,
@@ -217,7 +217,7 @@ describe('dispatchNotification — silent fallback when SMTP unconfigured', () =
     process.env.SMTP_PASS = 'pass'
     process.env.SMTP_FROM = 'no-reply@example.com'
 
-    const { dispatchNotification } = await import('../../server/channels')
+    const { dispatchNotification } = await import('../../apps/server/channels')
     const prisma = buildPrismaMock()
     await dispatchNotification(prisma, 1, 'credit_limit_exceeded', {
       clienteId: 1,
@@ -237,7 +237,7 @@ describe('dispatchNotification — silent fallback when SMTP unconfigured', () =
   it('calls nodemailer when SMTP_URL is configured', async () => {
     process.env.SMTP_URL = 'smtp://user:pass@smtp.example.com:587'
 
-    const { dispatchNotification } = await import('../../server/channels')
+    const { dispatchNotification } = await import('../../apps/server/channels')
     const prisma = buildPrismaMock()
     await dispatchNotification(prisma, 1, 'credit_limit_exceeded', {
       clienteId: 1,
@@ -265,7 +265,7 @@ describe('dispatchNotification — silent fallback when SMTP unconfigured', () =
 
     mockSendMail.mockRejectedValueOnce(new Error('SMTP connection refused'))
 
-    const { dispatchNotification } = await import('../../server/channels')
+    const { dispatchNotification } = await import('../../apps/server/channels')
     const prisma = buildPrismaMock()
 
     // Must resolve without throwing

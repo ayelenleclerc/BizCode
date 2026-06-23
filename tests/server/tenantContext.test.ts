@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import type { Response } from 'express'
-import type { AuthenticatedRequest } from '../../server/auth'
-import { tenantContext } from '../../server/middleware/tenantContext'
+import type { AuthenticatedRequest } from '../../apps/server/auth'
+import { tenantContext } from '../../apps/server/middleware/tenantContext'
 
 describe('tenantContext middleware', () => {
   it('sets req.tenantId from authenticated session claims', () => {

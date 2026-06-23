@@ -2,7 +2,7 @@
 import { describe, it, expect } from 'vitest'
 import request from 'supertest'
 import type { PrismaClient } from '@prisma/client'
-import { createApp } from '../../server/createApp'
+import { createApp } from '../../apps/server/createApp'
 
 /** Prisma is unused for /api-docs; minimal stub satisfies createApp. */
 const prismaStub = {} as unknown as PrismaClient

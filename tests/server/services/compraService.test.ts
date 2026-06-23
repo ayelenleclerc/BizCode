@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { PrismaClient } from '@prisma/client'
 import { Decimal } from '@prisma/client/runtime/library'
-import { CompraService } from '../../../server/services/CompraService'
+import { CompraService } from '../../../apps/server/services/CompraService'
 
 function buildPrisma(overrides: Partial<Record<string, unknown>> = {}): PrismaClient {
   const ordenRow = {

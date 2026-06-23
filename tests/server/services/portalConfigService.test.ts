@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 import type { PrismaClient } from '@prisma/client'
-import { PortalConfigService } from '../../../server/services/PortalConfigService'
+import { PortalConfigService } from '../../../apps/server/services/PortalConfigService'
 
 function buildPrisma(): PrismaClient {
   const portalConfig = {

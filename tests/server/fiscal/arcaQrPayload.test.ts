@@ -4,7 +4,7 @@ import {
   buildArcaQrJsonPayload,
   buildArcaQrUrl,
   encodeArcaQrParam,
-} from '../../../server/fiscal/ar/arcaQrPayload'
+} from '../../../apps/server/fiscal/ar/arcaQrPayload'
 
 describe('arcaQrPayload', () => {
   const base = {

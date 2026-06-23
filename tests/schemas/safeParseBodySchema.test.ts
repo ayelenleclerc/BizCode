@@ -5,7 +5,7 @@ import {
   proveedorBodySchema,
   rubroBodySchema,
   safeParseBodySchema,
-} from '../../server/schemas/domain'
+} from '../../apps/server/schemas/domain'
 
 describe('safeParseBodySchema', () => {
   it('accepts cliente raw shaped like csvRowToRawCliente output', () => {

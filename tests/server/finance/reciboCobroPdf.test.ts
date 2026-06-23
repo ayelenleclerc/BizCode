@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { buildReciboCobroPdfBuffer } from '../../../server/finance/reciboCobroPdf'
-import type { ReciboCobroPdfData } from '../../../server/services/ReciboCobroService'
+import { buildReciboCobroPdfBuffer } from '../../../apps/server/finance/reciboCobroPdf'
+import type { ReciboCobroPdfData } from '../../../apps/server/services/ReciboCobroService'
 
 const sampleData: ReciboCobroPdfData = {
   empresa: {

@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { PrismaClient } from '@prisma/client'
-import { PedidoService } from '../../../server/services/PedidoService'
+import { PedidoService } from '../../../apps/server/services/PedidoService'
 
 const basePedidoInput = {
   clienteId: 3,

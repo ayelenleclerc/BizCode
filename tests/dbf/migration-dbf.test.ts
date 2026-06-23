@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { clienteBodySchema } from '../../server/schemas/domain'
+import { clienteBodySchema } from '../../apps/server/schemas/domain'
 import { edgeClienteSamples, invalidClienteSamples, validClienteSamples } from '../fixtures/dbf-samples'
 
 function mapClienteDbfToBody(row: { CODIGO: number; RSOCIAL: string; CUIT?: string; COND?: string }) {

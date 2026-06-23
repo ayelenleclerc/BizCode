@@ -3,7 +3,7 @@ import type { PrismaClient } from '@prisma/client'
 import {
   buildFacturaPdfBuffer,
   buildFacturaTicketPdfBuffer,
-} from '../../../server/fiscal/ar/facturaPdf'
+} from '../../../apps/server/fiscal/ar/facturaPdf'
 
 const facturaBase = {
   id: 7,

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { Decimal } from '@prisma/client/runtime/library'
-import { mapLibroIvaCompras } from '../../../../server/fiscal/ar/libroIvaComprasMapper'
+import { mapLibroIvaCompras } from '../../../../apps/server/fiscal/ar/libroIvaComprasMapper'
 
 describe('libroIvaComprasMapper', () => {
   const proveedor = {

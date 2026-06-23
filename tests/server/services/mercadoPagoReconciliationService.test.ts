@@ -6,26 +6,26 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { PrismaClient } from '@prisma/client'
 import { Decimal } from '@prisma/client/runtime/library'
-import { encryptFiscalSecret } from '../../../server/fiscal/ar/fiscalSecrets'
+import { encryptFiscalSecret } from '../../../apps/server/fiscal/ar/fiscalSecrets'
 
-vi.mock('../../../server/integrations/mercadopago/mercadoPagoApiClient', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('../../../server/integrations/mercadopago/mercadoPagoApiClient')>()
+vi.mock('../../../apps/server/integrations/mercadopago/mercadoPagoApiClient', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../../../apps/server/integrations/mercadopago/mercadoPagoApiClient')>()
   return {
     ...actual,
     searchMercadoPagoPayments: vi.fn(),
   }
 })
 
-vi.mock('../../../server/lib/systemUserId', () => ({
+vi.mock('../../../apps/server/lib/systemUserId', () => ({
   resolveSystemUserId: vi.fn().mockReturnValue(99),
 }))
 
-vi.mock('../../../server/notifications', () => ({
+vi.mock('../../../apps/server/notifications', () => ({
   notifyManagers: vi.fn().mockResolvedValue(undefined),
 }))
 
-import { searchMercadoPagoPayments } from '../../../server/integrations/mercadopago/mercadoPagoApiClient'
-import { MercadoPagoReconciliationService } from '../../../server/services/MercadoPagoReconciliationService'
+import { searchMercadoPagoPayments } from '../../../apps/server/integrations/mercadopago/mercadoPagoApiClient'
+import { MercadoPagoReconciliationService } from '../../../apps/server/services/MercadoPagoReconciliationService'
 
 const approvedPayment = {
   id: 9001,

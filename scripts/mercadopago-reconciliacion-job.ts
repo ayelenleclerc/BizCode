@@ -4,7 +4,7 @@
  * @pt-BR Job multi-tenant de reconciliação Mercado Pago — agendar a cada hora para 02:00 por TZ (#178).
  */
 import { PrismaClient } from '@prisma/client'
-import { MercadoPagoReconciliationService } from '../server/services/MercadoPagoReconciliationService'
+import { MercadoPagoReconciliationService } from '../apps/server/services/MercadoPagoReconciliationService'
 
 async function main(): Promise<void> {
   const tenantIdRaw = process.env.BIZCODE_TENANT_ID

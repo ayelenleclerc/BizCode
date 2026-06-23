@@ -6,11 +6,11 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { PrismaClient } from '@prisma/client'
 import { Decimal } from '@prisma/client/runtime/library'
-import { encryptFiscalSecret } from '../../../server/fiscal/ar/fiscalSecrets'
+import { encryptFiscalSecret } from '../../../apps/server/fiscal/ar/fiscalSecrets'
 
-vi.mock('../../../server/integrations/mercadopago/mercadoPagoApiClient', async (importOriginal) => {
+vi.mock('../../../apps/server/integrations/mercadopago/mercadoPagoApiClient', async (importOriginal) => {
   const actual = await importOriginal<
-    typeof import('../../../server/integrations/mercadopago/mercadoPagoApiClient')
+    typeof import('../../../apps/server/integrations/mercadopago/mercadoPagoApiClient')
   >()
   return {
     ...actual,
@@ -40,26 +40,26 @@ const createPartialCreditNoteMock = vi.hoisted(() =>
   }),
 )
 
-vi.mock('../../../server/services/ReciboCobroService', () => ({
+vi.mock('../../../apps/server/services/ReciboCobroService', () => ({
   ReciboCobroService: class {
     voidRecibo = voidReciboMock
     recordPartialRefundReversal = recordPartialRefundReversalMock
   },
 }))
 
-vi.mock('../../../server/services/FacturaService', () => ({
+vi.mock('../../../apps/server/services/FacturaService', () => ({
   FacturaService: class {
     void = voidFacturaMock
     createPartialCreditNote = createPartialCreditNoteMock
   },
 }))
 
-vi.mock('../../../server/audit', () => ({
+vi.mock('../../../apps/server/audit', () => ({
   writeAuditEvent: vi.fn().mockResolvedValue(undefined),
 }))
 
-import { createMercadoPagoRefund } from '../../../server/integrations/mercadopago/mercadoPagoApiClient'
-import { MercadoPagoRefundService } from '../../../server/services/MercadoPagoRefundService'
+import { createMercadoPagoRefund } from '../../../apps/server/integrations/mercadopago/mercadoPagoApiClient'
+import { MercadoPagoRefundService } from '../../../apps/server/services/MercadoPagoRefundService'
 
 const FACTURA = {
   id: 7,

@@ -10,8 +10,8 @@ import {
   hashPortalToken,
   resolvePortalPublicBaseUrl,
   setPortalSessionCookie,
-} from '../../server/portal/portalTokens'
-import { initializeAppConfig, resetAppConfigCache } from '../../server/config/env'
+} from '../../apps/server/portal/portalTokens'
+import { initializeAppConfig, resetAppConfigCache } from '../../apps/server/config/env'
 
 describe('portalTokens', () => {
   beforeEach(() => {

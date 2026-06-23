@@ -5,7 +5,7 @@
 import 'dotenv/config'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { PrismaClient } from '@prisma/client'
-import { MercadoPagoReconciliationService } from '../../server/services/MercadoPagoReconciliationService'
+import { MercadoPagoReconciliationService } from '../../apps/server/services/MercadoPagoReconciliationService'
 
 describe('Mercado Pago reconciliation — integración PostgreSQL (#178)', () => {
   let prisma: PrismaClient

@@ -16,6 +16,10 @@ export default defineConfig({
     hookTimeout: 30_000,
   },
   resolve: {
-    alias: { '@': path.resolve(__dirname, './src') },
+    alias: {
+      '@': path.resolve(__dirname, './apps/web/src'),
+      '@bizcode/types': path.resolve(__dirname, './packages/types/src/index.ts'),
+      '@bizcode/api-client': path.resolve(__dirname, './packages/api-client/src/index.ts'),
+    },
   },
 })

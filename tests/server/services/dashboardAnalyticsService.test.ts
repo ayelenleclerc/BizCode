@@ -3,7 +3,7 @@ import { Prisma } from '@prisma/client'
 import {
   DashboardAnalyticsService,
   dashboardVentasSeriesToCsv,
-} from '../../../server/services/DashboardAnalyticsService'
+} from '../../../apps/server/services/DashboardAnalyticsService'
 
 function buildPrismaMock(seriesRows: unknown[], topRows: unknown[], sellerRows: unknown[]) {
   const queryRaw = vi

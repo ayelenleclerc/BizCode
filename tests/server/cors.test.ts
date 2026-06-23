@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import request from 'supertest'
 import type { PrismaClient } from '@prisma/client'
-import { createApp, getCorsAllowedOrigins, parseCorsOriginsFromEnv } from '../../server/createApp'
+import { createApp, getCorsAllowedOrigins, parseCorsOriginsFromEnv } from '../../apps/server/createApp'
 
 function buildPrismaMock(): PrismaClient {
   return {

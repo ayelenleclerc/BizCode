@@ -4,7 +4,7 @@ import {
   PLAN_CATALOG,
   isLimitExceeded,
   planIncludesFeature,
-} from '../../../src/lib/plans'
+} from '../../../apps/web/src/lib/plans'
 
 describe('plans catalog', () => {
   it('exposes starter/pro/enterprise/trial', () => {

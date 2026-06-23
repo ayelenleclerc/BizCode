@@ -1,10 +1,10 @@
-﻿/**
+/**
  * @en API tests for GET /api/notas-credito and GET /api/notas-credito/:id (#146).
  */
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import request from 'supertest'
 import type { PrismaClient } from '@prisma/client'
-import { createApp } from '../../server/createApp'
+import { createApp } from '../../apps/server/createApp'
 
 const ROW = {
   id: 1,

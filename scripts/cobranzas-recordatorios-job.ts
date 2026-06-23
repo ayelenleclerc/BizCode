@@ -4,7 +4,7 @@
  * @pt-BR Job multi-tenant de lembretes — agendar a cada hora (`0 * * * *`) para atingir 08:00 por TZ.
  */
 import { PrismaClient } from '@prisma/client'
-import { CobranzasService } from '../server/services/CobranzasService'
+import { CobranzasService } from '../apps/server/services/CobranzasService'
 
 async function main(): Promise<void> {
   const tenantIdRaw = process.env.BIZCODE_TENANT_ID

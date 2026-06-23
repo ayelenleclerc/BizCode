@@ -1,15 +1,15 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { PrismaClient } from '@prisma/client'
-import { PortalAuthService } from '../../../server/services/PortalAuthService'
-import { PortalConfigService } from '../../../server/services/PortalConfigService'
-import { initializeAppConfig, resetAppConfigCache } from '../../../server/config/env'
-import { createPortalToken, hashPortalToken } from '../../../server/portal/portalTokens'
+import { PortalAuthService } from '../../../apps/server/services/PortalAuthService'
+import { PortalConfigService } from '../../../apps/server/services/PortalConfigService'
+import { initializeAppConfig, resetAppConfigCache } from '../../../apps/server/config/env'
+import { createPortalToken, hashPortalToken } from '../../../apps/server/portal/portalTokens'
 
-vi.mock('../../../server/channels', () => ({
+vi.mock('../../../apps/server/channels', () => ({
   sendPortalMagicLinkEmail: vi.fn().mockResolvedValue(undefined),
 }))
 
-import { sendPortalMagicLinkEmail } from '../../../server/channels'
+import { sendPortalMagicLinkEmail } from '../../../apps/server/channels'
 
 function buildPrisma(): PrismaClient {
   return {
