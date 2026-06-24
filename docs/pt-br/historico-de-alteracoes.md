@@ -10,6 +10,8 @@ Versionamento: [Semantic Versioning](https://semver.org/).
 
 ### Adicionado
 
+- **Refator `@bizcode/api-client` (#156):** factory `createApiClient` / `configureApiClients`, módulos por domínio em `packages/api-client/src/modules/`, erros e config separados; bootstrap web com `initApiClientFromEnv()` (`VITE_API_URL`); sem `import.meta` no pacote (pronto para RN); `api.ts` como barrel de reexportação; portal em `modules/portal.ts`.
+
 - **Monorepo (pnpm workspaces + Turborepo, #154):** `apps/web` (React/Vite), `apps/server` (API Express), `packages/types`, `packages/api-client`; orquestração na raiz com `pnpm` e `turbo`; CI com `pnpm install --frozen-lockfile`; `prisma/` permanece na raiz do repositório; sem mudanças funcionais de produto.
 
 - **Reembolso parcial Mercado Pago (#344):** Várias notas de crédito por fatura (Prisma remove unique de `facturaOrigenId` em `NotaCredito`); `FacturaService.createPartialCreditNote` e `ReciboCobroService.recordPartialRefundReversal`; `MercadoPagoRefundService` suporta reembolsos parciais com NC parcial e ajuste de CC; saldo restante total ainda anula recibo/fatura (#179); `GET /api/facturas/{id}/mp/reembolso` retorna `refundableBalance` e histórico; campo valor em `MercadoPagoRefundDialog`; OpenAPI, testes, manual de finanças trilíngue.

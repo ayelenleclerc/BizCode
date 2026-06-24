@@ -17,6 +17,14 @@ BizCode usa **pnpm workspaces** e **Turborepo** (#154):
 
 Instale e execute comandos a partir da **raiz do repositório**.
 
+### Cliente API (`@bizcode/api-client`)
+
+O cliente HTTP compartilhado fica em `packages/api-client/`. Ele não lê mais variáveis do Vite diretamente (pronto para React Native): `apps/web` chama `initApiClientFromEnv()` de `apps/web/src/lib/api-config.ts` em `main.tsx` antes do render, vinculando `VITE_API_URL` via `configureApiClients()`. URL base padrão quando ausente: `http://localhost:3001/api`. APIs por domínio em `packages/api-client/src/modules/`; `createApiClient()` / `createPortalApiClient()` aceitam base URL opcional para outros hosts.
+
+Opcional em `.env` para o app web:
+
+- `VITE_API_URL` — base completa da API incluindo `/api` (ex.: `http://localhost:3001/api`)
+
 ## Requisitos
 
 - **Node.js** ≥ 22 (`package.json` `engines`, [`.nvmrc`](../../../.nvmrc))
