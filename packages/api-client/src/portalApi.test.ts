@@ -22,7 +22,7 @@ vi.mock('axios', () => ({
   AxiosError: AxiosErrorMock,
 }))
 
-import { portalAPI, portalConfigAPI } from './portalApi'
+import { portalAPI, portalConfigAPI } from './modules/portal'
 import { ApiRequestFailedError } from './api'
 
 beforeEach(() => {

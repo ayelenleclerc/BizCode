@@ -10,6 +10,8 @@ Versioning: [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **`@bizcode/api-client` refactor (#156):** `createApiClient` / `configureApiClients` factory, domain modules under `packages/api-client/src/modules/`, errors and config split; web bootstrap via `initApiClientFromEnv()` (`VITE_API_URL`); no `import.meta` in the package (RN-ready); `api.ts` is a re-export barrel; portal client in `modules/portal.ts`.
+
 - **Monorepo (pnpm workspaces + Turborepo, #154):** `apps/web` (React/Vite), `apps/server` (Express API), `packages/types`, `packages/api-client`; root orchestration via `pnpm` and `turbo`; CI uses `pnpm install --frozen-lockfile`; `prisma/` remains at repo root; no functional product changes.
 
 - **Mercado Pago partial refunds (#344):** Multiple credit notes per invoice (Prisma drops `NotaCredito` unique on `facturaOrigenId`); `FacturaService.createPartialCreditNote` and `ReciboCobroService.recordPartialRefundReversal`; `MercadoPagoRefundService` supports partial MP refunds with partial NC + CC adjustment; full remaining balance still voids receipt/invoice (#179); `GET /api/facturas/{id}/mp/reembolso` returns `refundableBalance` and refund history; `MercadoPagoRefundDialog` amount field; OpenAPI, tests, trilingual finance manual.

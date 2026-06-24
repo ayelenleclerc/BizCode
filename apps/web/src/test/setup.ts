@@ -1,3 +1,4 @@
+import './axios-vitest-mock'
 import '@testing-library/jest-dom'
 
 if (!process.env.DATABASE_URL?.trim()) {
