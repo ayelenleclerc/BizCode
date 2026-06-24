@@ -1,2 +1,18 @@
 export * from './domain'
 export * from './rbac'
+export * from './api-contracts'
+export * from './modules'
+export * from './modules-catalog'
+export * from './modules-presets'
+export * from './modules-tenant-defaults'
+export * from './plans'
+export * from './plan-pricing'
+export * from './plans-catalog'
+export * from './pedidos'
+export * from './logistics'
+export * from './operations'
+export * from './iam'
+export * from './comms'
+
+/** @deprecated Use AuthClaims from rbac — alias for issue #155 JWT naming */
+export type { AuthClaims as JWTClaims } from './rbac'

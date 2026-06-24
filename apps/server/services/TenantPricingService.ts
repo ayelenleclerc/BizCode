@@ -3,7 +3,7 @@ import {
   estimateTenantMonthlyPrice,
   type TenantMonthlyPriceEstimate,
 } from '../../web/src/lib/modules/pricing'
-import { MODULE_KEYS, type ModuleKey } from '../../web/src/lib/modules'
+import { MODULE_KEYS, type ModuleKey } from '@bizcode/types'
 import { TenantConfigService } from './TenantConfigService'
 
 function isModuleKey(value: string): value is ModuleKey {

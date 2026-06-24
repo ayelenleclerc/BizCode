@@ -17,7 +17,6 @@ export {
   type TenantMonthlyPriceEstimate,
   type TenantPricingAddon,
 } from './pricing'
-import type { ModulePlan } from './types'
 export {
   DEPLOYMENT_ENVS,
   MODULE_PLANS,
@@ -36,16 +35,8 @@ export {
   validateModuleSet,
 } from './validation'
 
-export type ModuleCatalogEntry = {
-  key: ModuleKey
-  label: string
-  required: boolean
-  requiredInProd: boolean
-  dependencies: readonly ModuleKey[]
-  plan: ModulePlan
-  price: number
-  canDeactivate: boolean
-}
+import type { ModuleCatalogEntry } from '@bizcode/types'
+export type { ModuleCatalogEntry } from '@bizcode/types'
 
 /**
  * @en Serializes catalog metadata for API consumers (no tenant-specific state).

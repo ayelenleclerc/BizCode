@@ -1,5 +1,5 @@
 import type { PrismaClient } from '@prisma/client'
-import { MODULE_KEYS, type ModuleKey } from '../../web/src/lib/modules'
+import { MODULE_KEYS, type ModuleKey } from '@bizcode/types'
 import { notifyTenantOwners } from '../notifications'
 import { TenantConfigService } from './TenantConfigService'
 

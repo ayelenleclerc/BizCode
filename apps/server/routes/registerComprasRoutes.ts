@@ -1,5 +1,5 @@
 import type { Application, NextFunction, Request, Response } from 'express'
-import { hasPermission, type Permission } from '../../web/src/lib/rbac'
+import { hasPermission, type Permission } from '@bizcode/types'
 import { requirePermission, type AuthenticatedRequest } from '../auth'
 import {
   buildOrdenCompraPdfBuffer,

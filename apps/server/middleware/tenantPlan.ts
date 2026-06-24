@@ -1,6 +1,6 @@
 import type { NextFunction, Response } from 'express'
 import type { PrismaClient } from '@prisma/client'
-import { PLAN_CATALOG, DEFAULT_PLAN_KEY, type TenantPlanSnapshot } from '../../web/src/lib/plans'
+import { PLAN_CATALOG, DEFAULT_PLAN_KEY, type TenantPlanSnapshot } from '@bizcode/types'
 import type { AuthenticatedRequest } from '../auth'
 import { TenantPlanService } from '../services/TenantPlanService'
 
