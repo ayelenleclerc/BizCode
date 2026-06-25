@@ -65,7 +65,7 @@ push / pull_request → job quality (ubuntu-latest):
 | TypeScript compilando | Projeto inteiro segundo `tsconfig` (`src`, `server`, `tests`, `e2e`, …) | `ci.yml` → `npm run type-check` |
 | API × contrato | Sintaxe OpenAPI + sync de rotas + artefatos regenerados consistentes | `ci.yml` → `docs:validate`, `docs:generate`, git diff |
 | Esquema de BD | `prisma generate`, `prisma validate`, migrations ou `db push`, seeds usados nos testes | `ci.yml`; `backend-validation.yml` (filtros de caminho) reforço de migrations |
-| Cobertura de linhas/ramificações | Vitest v8 apenas em **`server/**/*.ts`**, `server.ts` e **`src/**/*.{ts,tsx}`**, com exclusões em `coverage.exclude` de `vitest.config.ts`; **nem todo arquivo** da raiz está instrumentado | `ci.yml`, `frontend-validation.yml`, `qa-validation.yml` → `test:coverage` |
+| Cobertura de linhas/ramificações | Vitest v8 apenas em **`server/**/*.ts`**, `server.ts` e **`src/**/*.{ts,tsx}`**, com exclusões em `coverage.exclude` de `vitest.config.ts` (`server/main.ts`, `packages/types/src/server-inputs.ts`, `src/types.ts`); **nem todo arquivo** da raiz está instrumentado | `ci.yml`, `frontend-validation.yml`, `qa-validation.yml` → `test:coverage` |
 | Integração PostgreSQL | `tests/integration/**`, **sem instrumentação de linhas** (`vitest.integration.config.ts`) | `ci.yml`, `backend-validation.yml` |
 | Bundle web | `vite build` via **`webServer`** do Playwright | `ci.yml`, `frontend-validation.yml` → `test:e2e` |
 | i18n | Paridade de namespaces vs. fonte `es` | `check:i18n` |

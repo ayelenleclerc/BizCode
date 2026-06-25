@@ -67,7 +67,7 @@ Un paso bloquea el pipeline (código de salida ≠ 0) cuando:
 | Compilación TypeScript | Árbol completo del `tsconfig` (`src`, `server`, `tests`, `e2e`, …) | `ci.yml` → `npm run type-check` |
 | API vs contrato | Sintaxis OpenAPI + sync de rutas + drift de esquemas / MD generados | `ci.yml` → `docs:validate`, `docs:generate`, `git diff` |
 | Ciclo de vida del esquema BD | `prisma generate`, `prisma validate`, migraciones o `db push`, seed usado en pruebas | `ci.yml`; `backend-validation.yml` (rutas) refuerzo de migraciones |
-| Cobertura de líneas/ramas (Vitest/v8) | Umbrales sobre **`server/**/*.ts`**, `server.ts` y **`src/**/*.{ts,tsx}`**, excluyendo tests, barrels solo re-export y tipados (`coverage.exclude` en `vitest.config.ts`). **No todo el repo** (scripts auxiliares, seed aislado, etc.) no entra | `ci.yml`, `frontend-validation.yml`, `qa-validation.yml` → `test:coverage` |
+| Cobertura de líneas/ramas (Vitest/v8) | Umbrales sobre **`server/**/*.ts`**, `server.ts` y **`src/**/*.{ts,tsx}`**, excluyendo tests, barrels solo re-export y tipados (`server/main.ts`, `packages/types/src/server-inputs.ts`, `src/types.ts` vía `coverage.exclude` en `vitest.config.ts`). **No todo el repo** (scripts auxiliares, seed aislado, etc.) no entra | `ci.yml`, `frontend-validation.yml`, `qa-validation.yml` → `test:coverage` |
 | Integración PostgreSQL | `tests/integration/**` **sin instrumentación de cobertura de líneas** (`vitest.integration.config.ts`) | `ci.yml`, `backend-validation.yml` |
 | Bundle web producción | `vite build` vía `webServer` de Playwright antes del smoke UI | `ci.yml`, `frontend-validation.yml` → `test:e2e` |
 | Paridad i18n | Claves coherentes entre locales respecto de `es` | `npm run check:i18n` |
