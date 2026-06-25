@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { CanAccess } from '@/components/CanAccess'
 import { ApiRequestFailedError, proveedoresAPI } from '@/lib/api'
-import type { MovimientoProveedorCCTipo, ProveedorCuentaCorriente } from '@/types'
+import type { MovimientoProveedorCCTipo, ProveedorCuentaCorriente } from '@bizcode/types'
 import ProveedorDeudaChart from './ProveedorDeudaChart'
 import ProveedorReciboPagoSection from './ProveedorReciboPagoSection'
 

@@ -5,7 +5,7 @@ import { facturasAPI, clientesAPI, articulosAPI, formasPagoAPI } from '@/lib/api
 import ErrorBoundary from '@/components/ErrorBoundary'
 import AsyncWrapper from '@/components/shared/AsyncWrapper'
 import KeyboardHint, { useGlobalListShortcuts } from '@/components/shared/KeyboardHint'
-import { Cliente, Articulo, FormaPago, Factura } from '@/types'
+import { Cliente, Articulo, FormaPago, Factura } from '@bizcode/types'
 import NuevaFacturaForm from './NuevaFacturaForm'
 import ListadoFacturas from './ListadoFacturas'
 import RemitosSection from './RemitosSection'

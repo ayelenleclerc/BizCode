@@ -2,7 +2,7 @@ import { describe, expect, it, vi, beforeEach } from 'vitest'
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import '@/i18n/config'
 import ListadoFacturas from './ListadoFacturas'
-import type { Cliente, Factura } from '@/types'
+import type { Cliente, Factura } from '@bizcode/types'
 import { facturasAPI, printingAPI } from '@/lib/api'
 
 vi.mock('@/contexts/FeatureFlagsContext', () => ({

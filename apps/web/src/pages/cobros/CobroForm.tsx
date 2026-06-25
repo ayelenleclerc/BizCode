@@ -13,7 +13,7 @@ import {
 import KeyboardHint, { useFormShortcuts } from '@/components/shared/KeyboardHint'
 import { useFormPageHotkeys } from '@/hooks/useListPageKeyboard'
 import { useFeatureFlags } from '@/contexts/FeatureFlagsContext'
-import type { Cliente } from '@/types'
+import type { Cliente } from '@bizcode/types'
 
 type FormaPagoOption = { id: number; descripcion: string }
 

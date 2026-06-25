@@ -49,7 +49,7 @@ Ver [acessibilidade.md](acessibilidade.md). ESLint `jsx-a11y` em CI com `--max-w
 
 ## Servidor / validação da API REST (Zod)
 
-- **Schemas canônicos:** [`server/schemas/domain.ts`](../../../server/schemas/domain.ts) — pipelines Zod alinhados a [`server/createApp.types.ts`](../../../server/createApp.types.ts).
+- **Schemas canônicos:** [`server/schemas/domain.ts`](../../../server/schemas/domain.ts) — pipelines Zod alinhados a [`@bizcode/types`](../../../packages/types/src/server-inputs.ts) (`server-inputs.ts`).
 - **JSON:** [`server/middleware/validateBody.ts`](../../../server/middleware/validateBody.ts) — `validateBody(schema)` em `req.body`.
 - **Importação CSV:** os mesmos `*BodySchema` via **`safeParseBodySchema`** após `csvRowToRaw*` em [`server/routes/restDomainShared.ts`](../../../server/routes/restDomainShared.ts); rotas em `server/routes/register*Routes.ts`.
 - **Testes:** [`tests/schemas/domain.test.ts`](../../../tests/schemas/domain.test.ts), [`tests/schemas/safeParseBodySchema.test.ts`](../../../tests/schemas/safeParseBodySchema.test.ts); import em [`tests/api/`](../../../tests/api/).

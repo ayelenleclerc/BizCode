@@ -6,7 +6,7 @@ import type {
   RemitoItemInput,
   RemitoTipo,
   RemitoUpdateInput,
-} from '../createApp.types'
+} from '@bizcode/types'
 import { facturaFechaToPrismaDate } from '../routes/restDomainShared'
 import type { ServiceResult } from './serviceResults'
 

@@ -2,7 +2,7 @@ import type { Application, Request, Response } from 'express'
 import { requirePermission } from '../auth'
 import { validateBody } from '../middleware/validateBody'
 import { printingTestBodySchema } from '../schemas/domain'
-import type { PrintingTestInput } from '../createApp.types'
+import type { PrintingTestInput } from '@bizcode/types'
 import {
   getPrintingStatus,
   runPrintingTest,

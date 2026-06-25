@@ -6,7 +6,7 @@ import type {
   OrdenCompraItemInput,
   OrdenCompraReceiveLineInput,
   OrdenCompraUpdateInput,
-} from '../createApp.types'
+} from '@bizcode/types'
 import { assertNoOpenRecuento } from '../lib/recuentoStockGuard'
 import { facturaFechaToPrismaDate } from '../routes/restDomainShared'
 import type { ServiceResult } from './serviceResults'

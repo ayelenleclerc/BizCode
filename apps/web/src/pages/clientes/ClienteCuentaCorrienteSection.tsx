@@ -4,7 +4,7 @@ import { CanAccess } from '@/components/CanAccess'
 import IfModule from '@/components/IfModule'
 import { ApiRequestFailedError, clientesAPI } from '@/lib/api'
 import ClienteReciboCobroSection from './ClienteReciboCobroSection'
-import type { ClienteCuentaCorrienteAntiguedad, MovimientoClienteCCTipo } from '@/types'
+import type { ClienteCuentaCorrienteAntiguedad, MovimientoClienteCCTipo } from '@bizcode/types'
 import ClienteDeudaChart from './ClienteDeudaChart'
 
 const PAGE_SIZE = 25

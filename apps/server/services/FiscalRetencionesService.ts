@@ -1,6 +1,6 @@
 import type { Prisma, PrismaClient } from '@prisma/client'
 import { NotFoundAppError } from '../errors/AppError'
-import type { FiscalRetencionesConfigInput } from '../createApp.types'
+import type { FiscalRetencionesConfigInput } from '@bizcode/types'
 import { previewRetencionesClienteCobro } from '../fiscal/ar/retencionesClienteCobro'
 import { previewPercepcionesClienteFactura } from '../fiscal/ar/retencionesClientePercepcion'
 import { previewRetencionesProveedorPago } from '../fiscal/ar/retencionesProveedorPago'

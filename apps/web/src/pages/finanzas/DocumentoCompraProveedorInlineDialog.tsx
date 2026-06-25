@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { proveedoresAPI, type ProveedorInputDTO } from '@/lib/api'
-import type { Proveedor } from '@/types'
+import type { Proveedor } from '@bizcode/types'
 
 type Props = {
   open: boolean

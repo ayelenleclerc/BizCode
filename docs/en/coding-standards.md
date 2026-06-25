@@ -59,7 +59,7 @@ Minimum requirements enforced by ESLint (`jsx-a11y`):
 
 ## Server / REST API validation (Zod)
 
-- **Canonical schemas:** [`server/schemas/domain.ts`](../../server/schemas/domain.ts) — Zod pipelines (`.superRefine` / `.transform`) produce types aligned with [`server/createApp.types.ts`](../../server/createApp.types.ts).
+- **Canonical schemas:** [`server/schemas/domain.ts`](../../server/schemas/domain.ts) — Zod pipelines (`.superRefine` / `.transform`) produce types aligned with [`@bizcode/types`](../../packages/types/src/server-inputs.ts) (`server-inputs.ts`).
 - **JSON requests:** [`server/middleware/validateBody.ts`](../../server/middleware/validateBody.ts) — attach `validateBody(mySchema)` before handlers that expect a validated `req.body`.
 - **CSV import (bulk):** routes in [`server/routes/registerClientesRoutes.ts`](../../server/routes/registerClientesRoutes.ts), [`registerArticulosRoutes.ts`](../../server/routes/registerArticulosRoutes.ts), [`registerRubrosRoutes.ts`](../../server/routes/registerRubrosRoutes.ts), and [`registerProveedoresRoutes.ts`](../../server/routes/registerProveedoresRoutes.ts) build a plain object per row (`csvRowToRaw*` in [`server/routes/restDomainShared.ts`](../../server/routes/restDomainShared.ts)) then validate with **`safeParseBodySchema`** and the **same** `*BodySchema` as the REST POST/PUT endpoints.
 - **Tests:** [`tests/schemas/domain.test.ts`](../../tests/schemas/domain.test.ts), [`tests/schemas/safeParseBodySchema.test.ts`](../../tests/schemas/safeParseBodySchema.test.ts); API import tests under [`tests/api/`](../../tests/api/).

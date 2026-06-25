@@ -1,4 +1,4 @@
-﻿import type { Request } from 'express'
+import type { Request } from 'express'
 import { csvImportUploadSingle } from '../csvImport'
 import { dbfImportUploadSingle } from '../dbfImport'
 import type { AuthenticatedRequest } from '../auth'
@@ -105,7 +105,7 @@ export function buildClienteImportTemplateCsv(): string {
     '',
     '20-12345678-9',
     'Calle 123',
-    'CÃ³rdoba',
+    'Córdoba',
     '5000',
     '351-5550100',
     'contacto@example.com',
@@ -126,7 +126,7 @@ export function optionalTrimmedCsv(value: string | undefined): string | undefine
 export function parseCsvBooleanCell(value: string): boolean | null | undefined {
   const v = value.trim().toLowerCase()
   if (v === '') return undefined
-  if (['true', '1', 'yes', 'sÃ­', 'si'].includes(v)) return true
+  if (['true', '1', 'yes', 'sí', 'si'].includes(v)) return true
   if (['false', '0', 'no'].includes(v)) return false
   return null
 }

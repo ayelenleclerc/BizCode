@@ -1,5 +1,5 @@
 import { Prisma, type Articulo, type PrismaClient } from '@prisma/client'
-import type { ArticuloInput } from '../createApp.types'
+import type { ArticuloInput } from '@bizcode/types'
 import type { ServiceResult } from './serviceResults'
 
 type ArticuloWithRubro = Prisma.ArticuloGetPayload<{ include: { rubro: true } }>

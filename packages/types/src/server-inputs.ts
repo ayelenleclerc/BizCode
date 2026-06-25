@@ -1,4 +1,37 @@
-/** Shared REST body types used by [`createApp`](./createApp.ts) and [`schemas/domain`](./schemas/domain.ts). */
+/**
+ * @en REST request body types for Express routes and Zod schemas in apps/server.
+ * @es Tipos de cuerpo REST para rutas Express y esquemas Zod en apps/server.
+ * @pt-BR Tipos de corpo REST para rotas Express e schemas Zod em apps/server.
+ */
+
+import type {
+  MovimientoClienteCCTipo,
+  MovimientoProveedorCCTipo,
+  ProveedorCategoria,
+  ProveedorCondicionPago,
+  ProveedorTipoCuenta,
+  ReciboCobroFormaTipo,
+  ReciboPagoMetodo,
+} from './domain'
+import type { OrdenEntregaEstado, RepartoEstado, RepartoItemEstado, RepartoItemPodInput } from './logistics'
+import type { RecuentoEstado } from './operations'
+import type { PedidoEstado } from './pedidos'
+
+export type {
+  MovimientoClienteCCTipo,
+  MovimientoProveedorCCTipo,
+  OrdenEntregaEstado,
+  PedidoEstado,
+  ProveedorCategoria,
+  ProveedorCondicionPago,
+  ProveedorTipoCuenta,
+  ReciboCobroFormaTipo,
+  ReciboPagoMetodo,
+  RecuentoEstado,
+  RepartoEstado,
+  RepartoItemEstado,
+  RepartoItemPodInput,
+}
 
 export type ClienteInput = {
   codigo: number
@@ -37,10 +70,6 @@ export type RubroInput = {
   nombre: string
 }
 
-export type ProveedorTipoCuenta = 'cc' | 'ca'
-export type ProveedorCondicionPago = 'contado' | '15dias' | '30dias' | '60dias' | 'otro'
-export type ProveedorCategoria = 'materia_prima' | 'insumos' | 'servicios' | 'logistica'
-
 export type ProveedorInput = {
   codigo: number
   rsocial: string
@@ -66,29 +95,15 @@ export type ProveedorInput = {
   notas?: string | null
 }
 
-export type MovimientoProveedorCCTipo = 'factura_compra' | 'pago' | 'nc_proveedor' | 'ajuste'
-
 export type ProveedorCuentaCorrienteAjusteInput = {
   monto: number
   motivo: string
 }
 
-export type MovimientoClienteCCTipo =
-  | 'saldo_inicial'
-  | 'factura'
-  | 'nota_credito'
-  | 'cobro'
-  | 'retencion'
-  | 'percepcion'
-  | 'cheque_rechazado'
-  | 'ajuste'
-
 export type ClienteCuentaCorrienteAjusteInput = {
   monto: number
   motivo: string
 }
-
-export type ReciboPagoMetodo = 'transferencia' | 'cheque' | 'efectivo' | 'echeq'
 
 export type ReciboPagoFacturaInput = {
   comprobanteCompraId?: number | null
@@ -115,15 +130,6 @@ export type ReciboPagoInput = {
   facturas: ReciboPagoFacturaInput[]
   retenciones?: ReciboPagoRetencionInput[]
 }
-
-/** @en Customer receipt payment method (#233). @es Medio de pago en recibo de cobro (#233). @pt-BR Meio de pagamento no recibo de cobrança (#233). */
-export type ReciboCobroFormaTipo =
-  | 'efectivo'
-  | 'transferencia'
-  | 'cheque'
-  | 'mercadopago'
-  | 'tarjeta'
-  | 'otro'
 
 /** @en Payment line on customer receipt (#233). @es Línea de forma de pago en recibo de cobro (#233). @pt-BR Linha de forma de pagamento no recibo (#233). */
 export type ReciboCobroFormaInput = {
@@ -309,16 +315,6 @@ export type DeliveryZoneUpdateParsed = {
   activo?: boolean
 }
 
-export type OrdenEntregaEstado =
-  | 'pending'
-  | 'picking'
-  | 'ready'
-  | 'assigned'
-  | 'in_transit'
-  | 'delivered'
-  | 'failed'
-  | 'cancelled'
-
 export type OrdenEntregaCreateInput = {
   clienteId: number
   fecha: string
@@ -335,28 +331,12 @@ export type OrdenEntregaUpdateBody = {
   nota?: string | null
 }
 
-export type RepartoEstado = 'planned' | 'on_route' | 'completed' | 'cancelled'
-
-export type RepartoItemEstado = 'pending' | 'delivered' | 'not_delivered' | 'returned'
-
 export type RepartoCreateInput = {
   fecha: string
   choferId: number
   vehiculo?: string | null
   observaciones?: string | null
   ordenEntregaIds: number[]
-}
-
-export type RepartoItemPodOutcome = 'delivered' | 'not_delivered'
-
-export type RepartoItemPodInput = {
-  outcome: RepartoItemPodOutcome
-  receptorNombre?: string | null
-  receptorDni?: string | null
-  firmaBase64?: string | null
-  fotoBase64?: string | null
-  notasEntrega?: string | null
-  motivoNoEntrega?: string | null
 }
 
 export type RepartoUbicacionInput = {
@@ -396,8 +376,6 @@ export type OrdenCompraReceiveLineInput = {
   cantidad: number
 }
 
-export type RecuentoEstado = 'in_progress' | 'closed'
-
 export type RecuentoItemLineInput = {
   articuloId: number
   cantFisica: number
@@ -418,9 +396,6 @@ export type EmpresaInput = {
   ingresosBrutos?: string | null
   fechaInicioActividades?: string | null
 }
-
-/** @en Commercial order lifecycle (ADR-0009). @es Ciclo de pedido comercial. @pt-BR Ciclo do pedido comercial. */
-export type PedidoEstado = 'draft' | 'confirmed' | 'invoiced' | 'cancelled'
 
 export type PedidoItemInput = {
   articuloId: number

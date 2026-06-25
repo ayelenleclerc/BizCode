@@ -13,7 +13,7 @@ import type {
   FiscalRetencionesConfigInput,
   RegimenRetencionInput,
   RegimenRetencionUpdateInput,
-} from '../createApp.types'
+} from '@bizcode/types'
 import { FiscalRetencionesService } from '../services/FiscalRetencionesService'
 import { RegimenRetencionService } from '../services/RegimenRetencionService'
 import { paginatedListJson, parseListPagination } from '../services/listPagination'

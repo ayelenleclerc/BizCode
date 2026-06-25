@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { zonasEntregaAPI } from '@/lib/api'
-import type { DeliveryZone } from '@/types'
+import type { DeliveryZone } from '@bizcode/types'
 import { CanAccess } from '@/components/CanAccess'
 
 const schema = z.object({

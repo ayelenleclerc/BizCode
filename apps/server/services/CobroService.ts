@@ -1,6 +1,6 @@
 import type { Cliente, Prisma, PrismaClient } from '@prisma/client'
 import { Decimal } from '@prisma/client/runtime/library'
-import type { CobroInput } from '../createApp.types'
+import type { CobroInput } from '@bizcode/types'
 import { facturaFechaToPrismaDate } from '../routes/restDomainShared'
 import type { ServiceResult } from './serviceResults'
 import { RetencionConstanciaService } from './RetencionConstanciaService'

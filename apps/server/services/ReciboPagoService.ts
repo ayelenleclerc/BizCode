@@ -1,7 +1,7 @@
 import type { ComprobanteCompra, Prisma, PrismaClient } from '@prisma/client'
 import { Decimal } from '@prisma/client/runtime/library'
 import { NotFoundAppError } from '../errors/AppError'
-import type { ReciboPagoInput } from '../createApp.types'
+import type { ReciboPagoInput } from '@bizcode/types'
 import { facturaFechaToPrismaDate } from '../routes/restDomainShared'
 import type { ServiceResult } from './serviceResults'
 import { ProveedorCuentaCorrienteService } from './ProveedorCuentaCorrienteService'

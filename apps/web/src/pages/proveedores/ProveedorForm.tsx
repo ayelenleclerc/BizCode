@@ -4,7 +4,7 @@ import KeyboardHint, { useFormShortcuts } from '@/components/shared/KeyboardHint
 import { useTranslation } from 'react-i18next'
 import { ApiRequestFailedError, proveedoresAPI, type ProveedorInputDTO } from '@/lib/api'
 import { formatCUIT, validateCBU, validateCUIT } from '@/lib/validators'
-import type { Proveedor, ProveedorCategoria, ProveedorCondicionPago, ProveedorTipoCuenta } from '@/types'
+import type { Proveedor, ProveedorCategoria, ProveedorCondicionPago, ProveedorTipoCuenta } from '@bizcode/types'
 import ProveedorCatalogoSection from './ProveedorCatalogoSection'
 import ProveedorCuentaCorrienteSection from './ProveedorCuentaCorrienteSection'
 import ProveedorHistorialSection from './ProveedorHistorialSection'

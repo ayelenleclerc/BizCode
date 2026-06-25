@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen } from '@testing-library/react'
 import '@/i18n/config'
 import ListadoFacturas from './ListadoFacturas'
-import type { Cliente, Factura } from '@/types'
+import type { Cliente, Factura } from '@bizcode/types'
 
 vi.mock('@/contexts/FeatureFlagsContext', () => ({
   useFeatureFlags: vi.fn(),

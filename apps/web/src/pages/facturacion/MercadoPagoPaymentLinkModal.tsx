@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useId, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { facturasAPI, type MercadoPagoFacturaPaymentDto } from '@/lib/api'
-import type { Cliente, Factura } from '@/types'
+import type { Cliente, Factura } from '@bizcode/types'
 
 type Props = {
   factura: Factura

@@ -1,5 +1,5 @@
 import type { Prisma, PrismaClient } from '@prisma/client'
-import type { RecuentoItemLineInput } from '../createApp.types'
+import type { RecuentoItemLineInput } from '@bizcode/types'
 import type { ServiceResult } from './serviceResults'
 
 export const RECUENTO_ESTADOS = ['in_progress', 'closed'] as const

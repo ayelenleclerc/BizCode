@@ -1,5 +1,5 @@
 import type { Articulo, Prisma, PrismaClient } from '@prisma/client'
-import type { StockAjusteInput } from '../createApp.types'
+import type { StockAjusteInput } from '@bizcode/types'
 import { assertNoOpenRecuento } from '../lib/recuentoStockGuard'
 import type { ServiceResult } from './serviceResults'
 

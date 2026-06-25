@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen } from '@testing-library/react'
 import '@/i18n/config'
 import NuevaFacturaForm from './NuevaFacturaForm'
-import type { Articulo, Cliente, FormaPago } from '@/types'
+import type { Articulo, Cliente, FormaPago } from '@bizcode/types'
 
 vi.mock('@/contexts/FeatureFlagsContext', () => ({
   useFeatureFlags: () => ({

@@ -6,7 +6,7 @@ import {
   DEFAULT_RECORDATORIO_HORA_INICIO,
 } from '../lib/cobranzasReminderDefaults'
 import { DEFAULT_TENANT_TIMEZONE } from '../lib/tenantLocalTime'
-import type { EmpresaInput } from '../createApp.types'
+import type { EmpresaInput } from '@bizcode/types'
 
 export type EmpresaConfigDto = {
   id: number | null

@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi, beforeEach } from 'vitest'
 import MercadoPagoPaymentLinkModal from './MercadoPagoPaymentLinkModal'
 import { facturasAPI } from '@/lib/api'
-import type { Factura } from '@/types'
+import type { Factura } from '@bizcode/types'
 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({

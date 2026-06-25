@@ -14,7 +14,7 @@ import DocumentoCompraProveedorInlineDialog from './DocumentoCompraProveedorInli
 import DocumentoCompraTemplatesSection from './DocumentoCompraTemplatesSection'
 import KeyboardHint, { useFormShortcuts } from '@/components/shared/KeyboardHint'
 import { useFormPageHotkeys } from '@/hooks/useListPageKeyboard'
-import type { Proveedor } from '@/types'
+import type { Proveedor } from '@bizcode/types'
 
 const TIPOS = ['A', 'B', 'C'] as const
 const CONFIDENCE_REVIEW_THRESHOLD = 0.7

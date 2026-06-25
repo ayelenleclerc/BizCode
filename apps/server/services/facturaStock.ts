@@ -1,4 +1,4 @@
-import type { FacturaItemInput } from '../createApp.types'
+import type { FacturaItemInput } from '@bizcode/types'
 
 export type ArticuloStockSnapshot = {
   id: number

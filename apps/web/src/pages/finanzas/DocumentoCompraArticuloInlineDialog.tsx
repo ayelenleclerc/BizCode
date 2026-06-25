@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { articulosAPI, rubrosAPI } from '@/lib/api'
-import type { Rubro } from '@/types'
+import type { Rubro } from '@bizcode/types'
 
 type Props = {
   open: boolean

@@ -7,7 +7,7 @@ import ErrorBoundary from '@/components/ErrorBoundary'
 import AsyncWrapper from '@/components/shared/AsyncWrapper'
 import KeyboardHint, { useGlobalListShortcuts } from '@/components/shared/KeyboardHint'
 import { useListKeyboardNav, useListPageHotkeys } from '@/hooks/useListPageKeyboard'
-import type { Cobro } from '@/types'
+import type { Cobro } from '@bizcode/types'
 import CobroForm from './CobroForm'
 
 function formatMoney(value: number | string): string {

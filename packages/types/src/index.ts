@@ -13,6 +13,8 @@ export * from './logistics'
 export * from './operations'
 export * from './iam'
 export * from './comms'
+export * from './server-inputs'
+export * from './api-dtos'
 
 /** @deprecated Use AuthClaims from rbac — alias for issue #155 JWT naming */
 export type { AuthClaims as JWTClaims } from './rbac'

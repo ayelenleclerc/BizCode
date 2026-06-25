@@ -1,6 +1,6 @@
-﻿import type { Cliente, Factura, NotaCredito, Prisma, PrismaClient } from '@prisma/client'
+import type { Cliente, Factura, NotaCredito, Prisma, PrismaClient } from '@prisma/client'
 import { Decimal } from '@prisma/client/runtime/library'
-import type { FacturaInput } from '../createApp.types'
+import type { FacturaInput } from '@bizcode/types'
 import { assertNoOpenRecuento } from '../lib/recuentoStockGuard'
 import { facturaFechaToPrismaDate } from '../routes/restDomainShared'
 import type { ServiceResult } from './serviceResults'
@@ -42,8 +42,8 @@ export type FacturaPartialCreditNoteResult = {
 }
 /**
  * @en Invoice domain operations (list, create, void).
- * @es Operaciones de dominio de facturas (listado, alta, anulaciÃ³n).
- * @pt-BR OperaÃ§Ãµes de domÃ­nio de faturas (listagem, criaÃ§Ã£o, anulaÃ§Ã£o).
+ * @es Operaciones de dominio de facturas (listado, alta, anulación).
+ * @pt-BR Operações de domínio de faturas (listagem, criação, anulação).
  */
 export class FacturaService {
   private readonly arca: ArcaService
@@ -187,8 +187,8 @@ export class FacturaService {
 
   /**
    * @en Voids an active invoice, creates a credit note, reverses balance, and records audit in one transaction.
-   * @es Anula factura vigente, crea nota de crédito, revierte saldo y audita en una transacción.
-   * @pt-BR Anula fatura ativa, cria nota de crédito, reverte saldo e audita em uma transação.
+   * @es Anula factura vigente, crea nota de cr�dito, revierte saldo y audita en una transacci�n.
+   * @pt-BR Anula fatura ativa, cria nota de cr�dito, reverte saldo e audita em uma transa��o.
    */
   async void(
     tenantId: number,
@@ -283,7 +283,7 @@ export class FacturaService {
 
     if (factura.estadoCae === 'issued') {
       void this.arca.requestCaeForNotaCredito(tenantId, result.notaCredito.id).catch(() => {
-        /* homologación mock; retry job may be added later */
+        /* homologaci�n mock; retry job may be added later */
       })
     }
 
@@ -292,8 +292,8 @@ export class FacturaService {
 
   /**
    * @en Issues a partial credit note for an active invoice without voiding it (#344).
-   * @es Emite nota de crédito parcial sobre factura vigente sin anularla (#344).
-   * @pt-BR Emite nota de crédito parcial sobre fatura ativa sem anulá-la (#344).
+   * @es Emite nota de cr�dito parcial sobre factura vigente sin anularla (#344).
+   * @pt-BR Emite nota de cr�dito parcial sobre fatura ativa sem anul�-la (#344).
    */
   async createPartialCreditNote(
     tenantId: number,
@@ -387,7 +387,7 @@ export class FacturaService {
 
     if (factura.estadoCae === 'issued') {
       void this.arca.requestCaeForNotaCredito(tenantId, result.notaCredito.id).catch(() => {
-        /* homologación mock; retry job may be added later */
+        /* homologaci�n mock; retry job may be added later */
       })
     }
 

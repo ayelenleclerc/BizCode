@@ -6,7 +6,7 @@ import { CanAccess } from '@/components/CanAccess'
 import ErrorBoundary from '@/components/ErrorBoundary'
 import AsyncWrapper from '@/components/shared/AsyncWrapper'
 import KeyboardHint, { useGlobalListShortcuts } from '@/components/shared/KeyboardHint'
-import { Cliente } from '@/types'
+import { Cliente } from '@bizcode/types'
 import ClienteForm from './ClienteForm'
 
 export default function ClientesPage() {

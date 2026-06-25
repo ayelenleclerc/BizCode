@@ -7,7 +7,7 @@ import {
   chequeTransicionBodySchema,
   chequeUpdateBodySchema,
 } from '../schemas/domain'
-import type { ChequeEstado, ChequeInput, ChequeTipo, ChequeTransicionInput, ChequeUpdateInput } from '../createApp.types'
+import type { ChequeEstado, ChequeInput, ChequeTipo, ChequeTransicionInput, ChequeUpdateInput } from '@bizcode/types'
 import { ChequeAlertasService } from '../services/ChequeAlertasService'
 import { paginatedListJson, parseListPagination } from '../services/listPagination'
 import type { RestRouteContext } from './restRouteTypes'

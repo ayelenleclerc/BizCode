@@ -4,7 +4,7 @@ import { CanAccess } from '@/components/CanAccess'
 import { useFeatureFlags } from '@/contexts/FeatureFlagsContext'
 import { ApiRequestFailedError, chequesAPI, fiscalRetencionesAPI, proveedoresAPI, type ChequeDTO } from '@/lib/api'
 import type { RetencionPreviewLineDTO } from '@/lib/api'
-import type { ComprobantePendiente, ReciboPago, ReciboPagoMetodo } from '@/types'
+import type { ComprobantePendiente, ReciboPago, ReciboPagoMetodo } from '@bizcode/types'
 
 const METODOS: ReciboPagoMetodo[] = ['transferencia', 'cheque', 'efectivo', 'echeq']
 

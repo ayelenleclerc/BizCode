@@ -1,6 +1,6 @@
 import type { Prisma, PrismaClient } from '@prisma/client'
 import { calculateInvoice, calculateItemSubtotal } from '../../web/src/lib/invoice'
-import type { PedidoEstado, PedidoInput, PedidoInvoiceInput } from '../createApp.types'
+import type { PedidoEstado, PedidoInput, PedidoInvoiceInput } from '@bizcode/types'
 import { FacturaService } from './FacturaService'
 import type { ServiceResult } from './serviceResults'
 
