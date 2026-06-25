@@ -3,7 +3,7 @@ import { hasPermission, type Permission } from '@bizcode/types'
 import { requirePermission, type AuthenticatedRequest } from '../auth'
 import { requireModule } from '../middleware/requireModule'
 import { validateBody } from '../middleware/validateBody'
-import type { OrdenEntregaCreateInput, OrdenEntregaEstado, OrdenEntregaUpdateBody } from '../createApp.types'
+import type { OrdenEntregaCreateInput, OrdenEntregaEstado, OrdenEntregaUpdateBody } from '@bizcode/types'
 import {
   ORDEN_ENTREGA_ESTADOS,
   type OrdenEntregaService,

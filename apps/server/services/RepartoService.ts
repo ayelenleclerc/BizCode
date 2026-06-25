@@ -1,5 +1,5 @@
 import { Prisma, type PrismaClient } from '@prisma/client'
-import type { RepartoCreateInput, RepartoItemPodInput } from '../createApp.types'
+import type { RepartoCreateInput, RepartoItemPodInput } from '@bizcode/types'
 import { assertOrdenNotInActiveReparto } from '../lib/repartoActiveGuard'
 import {
   MOTIVO_NO_ENTREGA_VALUES,

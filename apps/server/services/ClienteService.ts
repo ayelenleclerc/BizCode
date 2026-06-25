@@ -1,5 +1,5 @@
 import { Prisma, type Cliente, type PrismaClient } from '@prisma/client'
-import type { ClienteInput } from '../createApp.types'
+import type { ClienteInput } from '@bizcode/types'
 import type { ServiceResult } from './serviceResults'
 
 export type ClienteListResult = {

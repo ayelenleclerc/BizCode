@@ -9,7 +9,7 @@ import {
   XAxis,
   YAxis,
 } from 'recharts'
-import type { ClienteCuentaCorrienteChartPoint } from '@/types'
+import type { ClienteCuentaCorrienteChartPoint } from '@bizcode/types'
 
 type Props = {
   serie: ClienteCuentaCorrienteChartPoint[]

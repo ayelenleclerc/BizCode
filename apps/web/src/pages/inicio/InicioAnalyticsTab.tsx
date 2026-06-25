@@ -8,7 +8,7 @@ import {
   type DashboardVentasGroupBy,
   type DashboardVentasHistoricoDTO,
 } from '@/lib/api'
-import type { DeliveryZone } from '@/types'
+import type { DeliveryZone } from '@bizcode/types'
 import { downloadCsvBlob } from '@/pages/reportes/reportesExport'
 import { resolveInicioAnalyticsPreset } from './inicioDatePresets'
 import InicioTopArticulosChart from './InicioTopArticulosChart'

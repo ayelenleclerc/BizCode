@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import type { ClienteCuentaCorriente } from '@/types'
+import type { ClienteCuentaCorriente } from '@bizcode/types'
 import { portalAPI } from '@/lib/portalApi'
 import { usePortalAuth } from '@/contexts/PortalAuthContext'
 

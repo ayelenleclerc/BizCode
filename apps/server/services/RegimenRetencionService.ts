@@ -1,7 +1,7 @@
 import type { Prisma, PrismaClient } from '@prisma/client'
 import { Decimal } from '@prisma/client/runtime/library'
 import { NotFoundAppError } from '../errors/AppError'
-import type { RegimenRetencionInput, RegimenRetencionUpdateInput } from '../createApp.types'
+import type { RegimenRetencionInput, RegimenRetencionUpdateInput } from '@bizcode/types'
 
 export type RegimenRetencionDto = {
   id: number

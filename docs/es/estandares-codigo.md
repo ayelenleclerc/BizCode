@@ -54,7 +54,7 @@ Ver [accesibilidad.md](accesibilidad.md). ESLint `jsx-a11y` en CI con `--max-war
 
 ## Servidor / validación API REST (Zod)
 
-- **Esquemas canónicos:** [`server/schemas/domain.ts`](../../../server/schemas/domain.ts) — tuberías Zod (`.superRefine` / `.transform`) alineadas con [`server/createApp.types.ts`](../../../server/createApp.types.ts).
+- **Esquemas canónicos:** [`server/schemas/domain.ts`](../../../server/schemas/domain.ts) — tuberías Zod (`.superRefine` / `.transform`) alineadas con [`@bizcode/types`](../../../packages/types/src/server-inputs.ts) (`server-inputs.ts`).
 - **JSON:** [`server/middleware/validateBody.ts`](../../../server/middleware/validateBody.ts) — `validateBody(esquema)` sobre `req.body`.
 - **Importación CSV:** mismos `*BodySchema` vía **`safeParseBodySchema`** tras `csvRowToRaw*` en [`server/routes/restDomainShared.ts`](../../../server/routes/restDomainShared.ts); rutas en `server/routes/register*Routes.ts` (clientes, artículos, rubros, proveedores).
 - **Pruebas:** [`tests/schemas/domain.test.ts`](../../../tests/schemas/domain.test.ts), [`tests/schemas/safeParseBodySchema.test.ts`](../../../tests/schemas/safeParseBodySchema.test.ts); import en [`tests/api/`](../../../tests/api/).

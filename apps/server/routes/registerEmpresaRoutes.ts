@@ -2,7 +2,7 @@ import type { Application, Request, Response } from 'express'
 import { requirePermission, type AuthenticatedRequest } from '../auth'
 import { validateBody } from '../middleware/validateBody'
 import { empresaUpdateBodySchema } from '../schemas/domain'
-import type { EmpresaInput } from '../createApp.types'
+import type { EmpresaInput } from '@bizcode/types'
 import type { RestRouteContext } from './restRouteTypes'
 import { errorMessage, getTenantId } from './restDomainShared'
 

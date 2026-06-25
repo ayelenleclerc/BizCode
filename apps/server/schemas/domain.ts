@@ -32,7 +32,7 @@ import type {
   OrdenCompraUpdateInput,
   RecuentoItemLineInput,
   StockAjusteInput,
-} from '../createApp.types'
+} from '@bizcode/types'
 
 /** @see server/createApp.ts FACTURA_VOID_MOTIVO_MAX_LEN */
 export const FACTURA_VOID_MOTIVO_MAX_LEN = 500 as const

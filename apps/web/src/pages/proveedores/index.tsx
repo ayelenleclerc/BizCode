@@ -6,7 +6,7 @@ import { CanAccess } from '@/components/CanAccess'
 import ErrorBoundary from '@/components/ErrorBoundary'
 import AsyncWrapper from '@/components/shared/AsyncWrapper'
 import KeyboardHint, { useGlobalListShortcuts } from '@/components/shared/KeyboardHint'
-import type { Proveedor, ProveedorCategoria } from '@/types'
+import type { Proveedor, ProveedorCategoria } from '@bizcode/types'
 import ProveedorForm from '@/pages/proveedores/ProveedorForm'
 
 const CATEGORIAS: ProveedorCategoria[] = ['materia_prima', 'insumos', 'servicios', 'logistica']

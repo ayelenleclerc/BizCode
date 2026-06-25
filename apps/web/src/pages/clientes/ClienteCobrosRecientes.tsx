@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { cobrosAPI } from '@/lib/api'
 import { CanAccess } from '@/components/CanAccess'
-import type { Cobro } from '@/types'
+import type { Cobro } from '@bizcode/types'
 
 type Props = {
   clienteId: number

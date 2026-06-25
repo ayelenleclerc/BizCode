@@ -9,7 +9,7 @@ import { ApiRequestFailedError, articulosAPI, type StockAjusteHistorialRow } fro
 import { hasPermission } from '@/lib/rbac'
 import { CanAccess } from '@/components/CanAccess'
 import { useAuth } from '@/contexts/AuthContext'
-import { Articulo, Rubro } from '@/types'
+import { Articulo, Rubro } from '@bizcode/types'
 import ArticuloProveedoresComparadorSection from './ArticuloProveedoresComparadorSection'
 
 const articuloSchema = z.object({

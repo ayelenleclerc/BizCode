@@ -3,7 +3,7 @@ import { useHotkeys } from 'react-hotkeys-hook'
 import { useTranslation } from 'react-i18next'
 import { empresaAPI, facturasAPI, fiscalRetencionesAPI, type RetencionPreviewLineDTO } from '@/lib/api'
 import { calculateInvoice, calculateItemSubtotal } from '@/lib/invoice'
-import { Cliente, Articulo, FormaPago } from '@/types'
+import { Cliente, Articulo, FormaPago } from '@bizcode/types'
 import KeyboardHint, { useInvoiceShortcuts } from '@/components/shared/KeyboardHint'
 import { useFeatureFlags } from '@/contexts/FeatureFlagsContext'
 

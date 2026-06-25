@@ -16,7 +16,7 @@ import type {
   OrdenCompraCreateInput,
   OrdenCompraEstado,
   OrdenCompraUpdateInput,
-} from '../createApp.types'
+} from '@bizcode/types'
 import { ORDEN_COMPRA_ESTADOS, type CompraService } from '../services/CompraService'
 import { paginatedListJson, parseListPagination } from '../services/listPagination'
 import type { RestRouteContext } from './restRouteTypes'

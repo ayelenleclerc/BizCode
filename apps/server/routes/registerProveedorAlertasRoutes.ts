@@ -7,7 +7,7 @@ import {
   facturasPendientesQuerySchema,
   safeParseBodySchema,
 } from '../schemas/domain'
-import type { AlertaProveedorConfigInput } from '../createApp.types'
+import type { AlertaProveedorConfigInput } from '@bizcode/types'
 import { ProveedorAlertasService } from '../services/ProveedorAlertasService'
 import type { RestRouteContext } from './restRouteTypes'
 import { errorMessage, getTenantId } from './restDomainShared'

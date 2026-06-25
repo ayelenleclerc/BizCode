@@ -1,4 +1,4 @@
-ï»¿import type { NotaCredito, Prisma, PrismaClient } from '@prisma/client'
+import type { NotaCredito, Prisma, PrismaClient } from '@prisma/client'
 import { endOfDay, parseIsoDateParam } from '../reportesPeriodUtils'
 
 export type NotaCreditoListFilter = {
@@ -29,8 +29,8 @@ export type NotaCreditoListResult = {
 
 /**
  * @en Tenant-scoped credit note list/detail (GitHub #146).
- * @es Listado y detalle de notas de crÃ©dito por tenant (#146).
- * @pt-BR Listagem e detalhe de notas de crÃ©dito por tenant (#146).
+ * @es Listado y detalle de notas de crédito por tenant (#146).
+ * @pt-BR Listagem e detalhe de notas de crédito por tenant (#146).
  */
 export class NotaCreditoService {
   constructor(private readonly prisma: PrismaClient) {}

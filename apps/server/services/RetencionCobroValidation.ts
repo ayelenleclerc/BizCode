@@ -1,5 +1,5 @@
 import type { PrismaClient } from '@prisma/client'
-import type { CobroRetencionInput } from '../createApp.types'
+import type { CobroRetencionInput } from '@bizcode/types'
 import {
   type ValidatedRetencionLine,
   validateRetencionLines,

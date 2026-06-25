@@ -10,7 +10,7 @@ import {
   type ChequeDTO,
 } from '@/lib/api'
 import type { RetencionPreviewLineDTO } from '@/lib/api'
-import type { ReciboCobro, ReciboCobroFormaTipo } from '@/types'
+import type { ReciboCobro, ReciboCobroFormaTipo } from '@bizcode/types'
 
 const FORMA_TIPOS: ReciboCobroFormaTipo[] = [
   'efectivo',

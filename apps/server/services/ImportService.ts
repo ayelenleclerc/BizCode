@@ -1,5 +1,5 @@
 import type { PrismaClient } from '@prisma/client'
-import type { ArticuloInput, ClienteInput, RubroInput } from '../createApp.types'
+import type { ArticuloInput, ClienteInput, RubroInput } from '@bizcode/types'
 import { articuloBodySchema, clienteBodySchema, rubroBodySchema, safeParseBodySchema } from '../schemas/domain'
 import { csvRowToRawArticulo, csvRowToRawCliente } from '../routes/restDomainShared'
 import { dbfRowToRawArticulo } from '../../web/src/lib/migration/legacyArticuloDbf'

@@ -7,7 +7,7 @@ import {
   remitoEntregarBodySchema,
   remitoUpdateBodySchema,
 } from '../schemas/domain'
-import type { RemitoEntregarInput, RemitoEstado, RemitoInput, RemitoUpdateInput } from '../createApp.types'
+import type { RemitoEntregarInput, RemitoEstado, RemitoInput, RemitoUpdateInput } from '@bizcode/types'
 import { buildRemitoPdfBuffer, remitoPdfFilename } from '../fiscal/ar/remitoPdf'
 import { mapRemitoPublic } from '../services/RemitoService'
 import { paginatedListJson, parseListPagination } from '../services/listPagination'

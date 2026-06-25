@@ -1,6 +1,6 @@
 import type { PrismaClient } from '@prisma/client'
 import { Decimal } from '@prisma/client/runtime/library'
-import type { ReciboPagoRetencionInput } from '../createApp.types'
+import type { ReciboPagoRetencionInput } from '@bizcode/types'
 import {
   type ValidatedRetencionLine,
   validateRetencionLines,

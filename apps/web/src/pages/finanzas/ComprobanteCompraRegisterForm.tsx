@@ -8,7 +8,7 @@ import {
 } from '@/lib/api'
 import KeyboardHint, { useFormShortcuts } from '@/components/shared/KeyboardHint'
 import { useFormPageHotkeys } from '@/hooks/useListPageKeyboard'
-import type { Proveedor } from '@/types'
+import type { Proveedor } from '@bizcode/types'
 
 type ComprobanteCompraRegisterFormProps = {
   onRegistered: () => void

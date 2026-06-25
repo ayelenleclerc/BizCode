@@ -12,7 +12,7 @@ import { fileURLToPath } from 'node:url'
 import { PrismaClient } from '@prisma/client'
 import { DBFFile } from 'dbffile'
 import { dbfRowToRawCliente, mapLegacyCondToCondIva } from '../apps/web/src/lib/migration/legacyClienteDbf'
-import type { ClienteInput } from '../apps/server/createApp.types'
+import type { ClienteInput } from '@bizcode/types'
 import { ImportService } from '../apps/server/services/ImportService'
 import { clienteBodySchema, safeParseBodySchema } from '../apps/server/schemas/domain'
 

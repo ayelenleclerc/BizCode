@@ -6,7 +6,7 @@ import { CanAccess } from '@/components/CanAccess'
 import ErrorBoundary from '@/components/ErrorBoundary'
 import AsyncWrapper from '@/components/shared/AsyncWrapper'
 import KeyboardHint, { useGlobalListShortcuts } from '@/components/shared/KeyboardHint'
-import { Articulo, Rubro } from '@/types'
+import { Articulo, Rubro } from '@bizcode/types'
 import ArticuloForm from './ArticuloForm'
 
 type ImportDialogKind = 'rubros' | 'articulos'

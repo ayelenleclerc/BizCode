@@ -8,7 +8,7 @@ import {
   type FacturaPendienteEstado,
 } from '../lib/proveedorVencimiento'
 import { getLocalHour, getLocalMinute } from '../lib/tenantLocalTime'
-import type { AlertaProveedorConfigInput } from '../createApp.types'
+import type { AlertaProveedorConfigInput } from '@bizcode/types'
 import type { NotificationType } from '../notifications'
 import { ProveedorCuentaCorrienteService } from './ProveedorCuentaCorrienteService'
 

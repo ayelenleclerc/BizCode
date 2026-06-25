@@ -7,7 +7,7 @@ import type {
   ChequeTipo,
   ChequeTransicionInput,
   ChequeUpdateInput,
-} from '../createApp.types'
+} from '@bizcode/types'
 import { facturaFechaToPrismaDate } from '../routes/restDomainShared'
 import { notifyFinanceStakeholders } from '../notifications'
 import type { ServiceResult } from './serviceResults'

@@ -6,7 +6,7 @@ import { useListKeyboardNav, useListPageHotkeys } from '@/hooks/useListPageKeybo
 import { CanAccess } from '@/components/CanAccess'
 import IfModule from '@/components/IfModule'
 import IfIntegration from '@/components/IfIntegration'
-import { Factura, Cliente } from '@/types'
+import { Factura, Cliente } from '@bizcode/types'
 import FacturaPdfPreviewDialog from './FacturaPdfPreviewDialog'
 import MercadoPagoPaymentLinkModal from './MercadoPagoPaymentLinkModal'
 import MercadoPagoQrModal from './MercadoPagoQrModal'

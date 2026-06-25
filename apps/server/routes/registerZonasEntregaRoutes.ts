@@ -5,7 +5,7 @@ import {
   deliveryZoneCreateBodySchema,
   deliveryZoneUpdateBodySchema,
 } from '../schemas/domain'
-import type { DeliveryZoneCreateParsed, DeliveryZoneUpdateParsed } from '../createApp.types'
+import type { DeliveryZoneCreateParsed, DeliveryZoneUpdateParsed } from '@bizcode/types'
 import { paginatedListJson, parseListPagination } from '../services/listPagination'
 import type { RestRouteContext } from './restRouteTypes'
 import { errorMessage } from './restDomainShared'

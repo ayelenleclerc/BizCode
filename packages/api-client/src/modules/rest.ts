@@ -1,5 +1,6 @@
 ﻿import type { AxiosError } from 'axios'
 import type {
+  AlertaProveedorConfigDTO,
   ApiErrorPayload,
   AppNotification,
   AppUserDTO,
@@ -9,9 +10,25 @@ import type {
   ChatConversation,
   ChatMessageDTO,
   CreateUserBody,
+  DashboardSummaryDTO,
   JsonRecord,
+  ModuleCatalogDataDTO,
   OrdenCompra,
+  PublicPlanDTO,
   Recuento,
+  SuperadminGlobalStats,
+  SuperadminTenantCreateInput,
+  SuperadminTenantDetail,
+  SuperadminTenantListRow,
+  TenantConfigApplyTemplateInput,
+  TenantConfigDTO,
+  TenantConfigHistoryData,
+  TenantConfigUpsertInput,
+  TenantFeaturesData,
+  TenantModuleTrialActivateInput,
+  TenantModuleTrialDTO,
+  TenantPlanSnapshotDTO,
+  TenantPricingData,
   UpdateUserBody,
 } from '@bizcode/types'
 import type { CsvBulkImportResult } from './clientes'
@@ -19,10 +36,29 @@ import { api } from '../default-client'
 import { handleError } from '../errors'
 // ============ FEATURE FLAGS (TENANT) ============
 
-export type TenantFeaturesData = {
-  modules: string[]
-  integrations: string[]
-}
+export type {
+  TenantFeaturesData,
+  PublicPlanDTO,
+  TenantPlanSnapshotDTO,
+  SuperadminTenantListRow,
+  SuperadminTenantDetail,
+  SuperadminGlobalStats,
+  SuperadminTenantCreateInput,
+  TenantPricingData,
+  TenantModuleTrialDTO,
+  TenantModuleTrialActivateInput,
+  TenantConfigDTO,
+  TenantConfigUpsertInput,
+  TenantConfigApplyTemplateInput,
+  TenantConfigHistoryEntry,
+  TenantConfigHistoryData,
+  ModuleCatalogEntryDTO,
+  ModuleCatalogDataDTO,
+  DashboardWidget,
+  DashboardFacturasPagarDTO,
+  DashboardSummaryDTO,
+  AlertaProveedorConfigDTO,
+} from '@bizcode/types'
 
 export const featuresAPI = {
   get: async (): Promise<TenantFeaturesData> => {
@@ -33,31 +69,6 @@ export const featuresAPI = {
       return handleError(error as AxiosError<ApiErrorPayload>)
     }
   },
-}
-
-export type PublicPlanDTO = {
-  key: string
-  name: string
-  monthlyPrice: number
-  currency: string
-  maxUsers: number | null
-  maxInvoicesPerMonth: number | null
-  features: string[]
-}
-
-export type TenantPlanSnapshotDTO = {
-  planKey: string
-  planName: string
-  monthlyPrice: number
-  currency: string
-  maxUsers: number | null
-  maxInvoicesPerMonth: number | null
-  features: string[]
-  status: string
-  usage: {
-    usersUsed: number
-    invoicesUsed: number
-  }
 }
 
 export const planAPI = {
@@ -81,52 +92,6 @@ export const planAPI = {
 }
 
 // ============ SUPERADMIN (PLATFORM) ============
-
-export type SuperadminTenantListRow = {
-  id: number
-  name: string
-  slug: string
-  active: boolean
-  plan: string | null
-  userCount: number
-  facturaCount: number
-  createdAt: string
-}
-
-export type SuperadminTenantDetail = {
-  id: number
-  name: string
-  slug: string
-  active: boolean
-  createdAt: string
-  updatedAt: string
-  plan: string | null
-  modulesCount: number
-  configUpdatedAt: string | null
-  stats: {
-    userCount: number
-    facturaCount: number
-    pedidoCount: number
-    clienteCount: number
-  }
-  lastActivityAt: string | null
-}
-
-export type SuperadminGlobalStats = {
-  activeTenants: number
-  totalTenants: number
-  inactiveTenants: number
-  facturasToday: number
-  totalUsers: number
-}
-
-export type SuperadminTenantCreateInput = {
-  name: string
-  slug: string
-  plan?: string
-  ownerUsername?: string
-  ownerPassword?: string
-}
 
 export const superadminAPI = {
   getStats: async (): Promise<SuperadminGlobalStats> => {
@@ -312,89 +277,6 @@ export const superadminAPI = {
       return handleError(error as AxiosError<ApiErrorPayload>)
     }
   },
-}
-
-export type TenantPricingAddon = {
-  moduleKey: string
-  price: number
-}
-
-export type TenantPricingData = {
-  plan: string
-  basePrice: number
-  addons: TenantPricingAddon[]
-  totalMonthly: number
-}
-
-export type TenantModuleTrialDTO = {
-  id: number
-  tenantId: number
-  moduleKey: string
-  expiresAt: string
-  active: boolean
-  daysRemaining: number
-  createdAt: string
-}
-
-export type TenantModuleTrialActivateInput = {
-  moduleKey: string
-  days?: number
-  reason?: string
-}
-
-export type TenantConfigDTO = {
-  tenantId: number
-  businessType: string
-  rubros: string[]
-  plan: string
-  modules: string[]
-  integrations: string[]
-  updatedAt: string
-}
-
-export type TenantConfigUpsertInput = {
-  modules: string[]
-  reason: string
-  businessType?: string
-  rubros?: string[]
-  plan?: string
-  integrations?: string[]
-}
-
-export type TenantConfigApplyTemplateInput = {
-  preset: string
-  reason?: string
-}
-
-export type TenantConfigHistoryEntry = {
-  id: number
-  changedById: number
-  before: Record<string, unknown>
-  after: Record<string, unknown>
-  reason: string | null
-  createdAt: string
-}
-
-export type TenantConfigHistoryData = {
-  total: number
-  items: TenantConfigHistoryEntry[]
-}
-
-export type ModuleCatalogEntryDTO = {
-  key: string
-  label: string
-  required: boolean
-  requiredInProd: boolean
-  dependencies: string[]
-  plan: string
-  price: number
-  canDeactivate: boolean
-}
-
-export type ModuleCatalogDataDTO = {
-  deploymentEnv: 'dev' | 'prod'
-  modules: ModuleCatalogEntryDTO[]
-  presets: Record<string, { modules: string[] }>
 }
 
 export const modulesCatalogAPI = {
@@ -1680,12 +1562,6 @@ export type FacturaPendienteRow = {
   diasVencido: number
 }
 
-export type AlertaProveedorConfigDTO = {
-  diasPrevioAviso: number
-  diasCritico: number
-  notifEmail: boolean
-  notifInApp: boolean
-}
 
 export type RegimenRetencionDTO = {
   id: number
@@ -2201,23 +2077,6 @@ export const usersAPI = {
   },
 }
 
-// ============ DASHBOARD ============
-
-export type DashboardWidget = { count: number; total: string }
-
-export type DashboardFacturasPagarDTO = {
-  vencido: DashboardWidget
-  proximoVencer: DashboardWidget
-}
-
-export type DashboardSummaryDTO = {
-  ventasHoy: DashboardWidget
-  facturasVencidas: DashboardWidget
-  cobrosHoy: DashboardWidget
-  alertasActivas: number
-  facturasPagar: DashboardFacturasPagarDTO
-}
-
 export const proveedorAlertasAPI = {
   getConfig: async (): Promise<AlertaProveedorConfigDTO> => {
     try {
@@ -2500,6 +2359,8 @@ export type DashboardVentasHistoricoParams = {
   vendedorId?: number
   deliveryZoneId?: number
 }
+
+// ============ DASHBOARD ============
 
 export const dashboardAPI = {
   summary: async (): Promise<DashboardSummaryDTO> => {

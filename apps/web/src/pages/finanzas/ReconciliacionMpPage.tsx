@@ -10,7 +10,7 @@ import {
   mercadopagoAPI,
   type MercadoPagoReconciliationEntry,
 } from '@/lib/api'
-import type { FacturaPendienteCliente } from '@/types'
+import type { FacturaPendienteCliente } from '@bizcode/types'
 
 function formatMoney(value: number | string, currency = 'ARS'): string {
   const n = typeof value === 'number' ? value : Number.parseFloat(String(value))
