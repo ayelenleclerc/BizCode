@@ -26,6 +26,7 @@
       "type": "string"
     },
     "minimo": {
+      "description": "Must be 0 when tipo is servicio (#244).",
       "minimum": 0,
       "type": "integer"
     },
@@ -41,12 +42,34 @@
       "type": "integer"
     },
     "stock": {
+      "description": "Must be 0 when tipo is servicio (#244).",
       "minimum": 0,
       "type": "integer"
+    },
+    "tipo": {
+      "default": "articulo",
+      "enum": [
+        "articulo",
+        "servicio"
+      ],
+      "type": "string"
     },
     "umedida": {
       "maxLength": 6,
       "minLength": 2,
+      "type": "string"
+    },
+    "unidadServicio": {
+      "enum": [
+        "hora",
+        "dia",
+        "mes",
+        "proyecto",
+        "km",
+        "unidad",
+        "otro"
+      ],
+      "nullable": true,
       "type": "string"
     }
   },

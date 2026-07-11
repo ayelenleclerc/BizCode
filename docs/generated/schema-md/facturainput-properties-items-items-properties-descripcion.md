@@ -1,7 +1,7 @@
-# Untitled integer in FacturaInput Schema
+# Untitled string in FacturaInput Schema
 
 ```txt
-undefined#/properties/items/items/properties/articuloId
+undefined#/properties/items/items/properties/descripcion
 ```
 
 
@@ -10,10 +10,12 @@ undefined#/properties/items/items/properties/articuloId
 | :------------------ | :--------- | :------------- | :---------------------- | :---------------- | :-------------------- | :------------------ | :------------------------------------------------------------------------------------------- |
 | Can be instantiated | No         | Unknown status | Unknown identifiability | Forbidden         | Allowed               | none                | [FacturaInput.schema.json\*](../schema-json/FacturaInput.schema.json "open original schema") |
 
-## articuloId Type
+## descripcion Type
 
-`integer`
+`string`
 
-## articuloId Constraints
+## descripcion Constraints
 
-**minimum**: the value of this number must greater than or equal to: `1`
+**maximum length**: the maximum number of characters for this string is: `120`
+
+**minimum length**: the minimum number of characters for this string is: `1`

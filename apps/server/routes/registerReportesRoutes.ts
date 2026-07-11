@@ -171,6 +171,31 @@ export function registerReportesRoutes(app: Application, ctx: RestRouteContext):
   )
 
   app.get(
+    '/api/reportes/ventas-por-tipo',
+    requirePermission('reports.operational.read'),
+    async (req: Request, res: Response) => {
+      const parsed = safeParseBodySchema(reportesPeriodQuerySchema, req.query)
+      if (!parsed.ok) {
+        res.status(400).json({ success: false, error: parsed.error })
+        return
+      }
+      const fromDate = parseIsoDateParam(parsed.value.from)
+      const toDate = parseIsoDateParam(parsed.value.to)
+      if (!fromDate || !toDate) {
+        res.status(400).json({ success: false, error: 'Invalid from or to date' })
+        return
+      }
+      try {
+        const tenantId = getTenantId(req)
+        const data = await reportesOperacionales.getVentasPorTipo(tenantId, fromDate, toDate)
+        res.json({ success: true, data })
+      } catch (err: unknown) {
+        res.status(500).json({ success: false, error: errorMessage(err) })
+      }
+    },
+  )
+
+  app.get(
     '/api/reportes/cobranzas',
     requirePermission('reports.financial.read'),
     async (req: Request, res: Response) => {

@@ -12,6 +12,9 @@ const ARTICULO_STOCK = {
   descripcion: 'Producto',
   stock: 10,
   minimo: 8,
+  tipo: 'articulo',
+  condIva: '1',
+  unidadServicio: null,
 }
 
 const FACTURA_BODY = {
@@ -181,6 +184,230 @@ describe('POST /api/facturas — stock', () => {
             }),
           }),
         ],
+      }),
+    )
+  })
+
+  it('does not decrement stock for catalog servicio lines (#244)', async () => {
+    const servicio = {
+      id: 2,
+      codigo: 20,
+      descripcion: 'Hora soporte',
+      stock: 0,
+      minimo: 0,
+      tipo: 'servicio',
+      condIva: '1',
+      unidadServicio: 'hora',
+    }
+    const articuloUpdate = vi.fn()
+    const facturaCreate = vi.fn().mockResolvedValue({
+      id: 100,
+      ...FACTURA_BODY,
+      items: [{ id: 1, facturaId: 100, articuloId: 2, cantidad: 5, precio: 200, dscto: 0, subtotal: 1000 }],
+      cliente: CLIENTE_BASE,
+      estado: 'A',
+      clienteId: 1,
+    })
+
+    const prisma = {
+      deliveryZone: { findFirst: vi.fn().mockResolvedValue(null) },
+      cliente: {
+        findMany: vi.fn().mockResolvedValue([]),
+        findFirst: vi.fn().mockResolvedValue(CLIENTE_BASE),
+      },
+      articulo: {
+        findMany: vi.fn().mockResolvedValue([servicio]),
+        update: articuloUpdate,
+      },
+      rubro: { findMany: vi.fn().mockResolvedValue([]) },
+      formaPago: { findMany: vi.fn().mockResolvedValue([]) },
+      factura: { findMany: vi.fn().mockResolvedValue([]) },
+      cobro: { findMany: vi.fn().mockResolvedValue([]) },
+      ordenEntrega: { count: vi.fn().mockResolvedValue(0), findMany: vi.fn().mockResolvedValue([]) },
+      paramEmpresa: { findUnique: vi.fn().mockResolvedValue(null) },
+      notification: { findMany: vi.fn().mockResolvedValue([]), createMany: vi.fn().mockResolvedValue({ count: 0 }) },
+      auditEvent: { create: vi.fn().mockResolvedValue({ id: 1 }) },
+      recuento: { findFirst: vi.fn().mockResolvedValue(null) },
+      appUser: { count: vi.fn().mockResolvedValue(0), findMany: vi.fn().mockResolvedValue([]) },
+      tenant: { findUnique: vi.fn().mockResolvedValue({ id: 1, name: 'Demo', slug: 'demo', active: true }) },
+      $transaction: vi.fn(async (fn: unknown) => {
+        if (typeof fn === 'function') {
+          return fn(
+            createCcTxLayer({
+              factura: { create: facturaCreate },
+              articulo: { update: articuloUpdate },
+            }),
+          )
+        }
+        return fn
+      }),
+    } as unknown as PrismaClient
+
+    await request(createApp(prisma))
+      .post('/api/facturas')
+      .send({
+        ...FACTURA_BODY,
+        items: [{ articuloId: 2, cantidad: 5, precio: 200, dscto: 0, subtotal: 1000 }],
+      })
+      .expect(200)
+
+    expect(articuloUpdate).not.toHaveBeenCalled()
+  })
+
+  it('accepts ad-hoc service line without articuloId (#244)', async () => {
+    const articuloUpdate = vi.fn()
+    const facturaCreate = vi.fn().mockResolvedValue({
+      id: 101,
+      ...FACTURA_BODY,
+      items: [
+        {
+          id: 1,
+          facturaId: 101,
+          articuloId: null,
+          descripcion: 'Sprint desarrollo pagos',
+          condIva: '1',
+          cantidad: 40,
+          precio: 12000,
+          dscto: 0,
+          subtotal: 480000,
+        },
+      ],
+      cliente: CLIENTE_BASE,
+      estado: 'A',
+      clienteId: 1,
+    })
+
+    const prisma = {
+      deliveryZone: { findFirst: vi.fn().mockResolvedValue(null) },
+      cliente: {
+        findMany: vi.fn().mockResolvedValue([]),
+        findFirst: vi.fn().mockResolvedValue(CLIENTE_BASE),
+      },
+      articulo: {
+        findMany: vi.fn().mockResolvedValue([]),
+        update: articuloUpdate,
+      },
+      rubro: { findMany: vi.fn().mockResolvedValue([]) },
+      formaPago: { findMany: vi.fn().mockResolvedValue([]) },
+      factura: { findMany: vi.fn().mockResolvedValue([]) },
+      cobro: { findMany: vi.fn().mockResolvedValue([]) },
+      ordenEntrega: { count: vi.fn().mockResolvedValue(0), findMany: vi.fn().mockResolvedValue([]) },
+      paramEmpresa: { findUnique: vi.fn().mockResolvedValue(null) },
+      notification: { findMany: vi.fn().mockResolvedValue([]), createMany: vi.fn().mockResolvedValue({ count: 0 }) },
+      auditEvent: { create: vi.fn().mockResolvedValue({ id: 1 }) },
+      recuento: { findFirst: vi.fn().mockResolvedValue(null) },
+      appUser: { count: vi.fn().mockResolvedValue(0), findMany: vi.fn().mockResolvedValue([]) },
+      tenant: { findUnique: vi.fn().mockResolvedValue({ id: 1, name: 'Demo', slug: 'demo', active: true }) },
+      $transaction: vi.fn(async (fn: unknown) => {
+        if (typeof fn === 'function') {
+          return fn(
+            createCcTxLayer({
+              factura: { create: facturaCreate },
+              articulo: { update: articuloUpdate },
+            }),
+          )
+        }
+        return fn
+      }),
+    } as unknown as PrismaClient
+
+    await request(createApp(prisma))
+      .post('/api/facturas')
+      .send({
+        ...FACTURA_BODY,
+        neto1: 396694.21,
+        iva1: 83305.79,
+        total: 480000,
+        items: [
+          {
+            articuloId: null,
+            descripcion: 'Sprint desarrollo pagos',
+            condIva: '1',
+            unidadServicio: 'hora',
+            cantidad: 40,
+            precio: 12000,
+            dscto: 0,
+            subtotal: 480000,
+          },
+        ],
+      })
+      .expect(200)
+
+    expect(articuloUpdate).not.toHaveBeenCalled()
+    expect(facturaCreate).toHaveBeenCalled()
+  })
+
+  it('mixed invoice decrements stock only for physical articulo (#244)', async () => {
+    const servicio = {
+      id: 2,
+      codigo: 20,
+      descripcion: 'Instalacion',
+      stock: 0,
+      minimo: 0,
+      tipo: 'servicio',
+      condIva: '1',
+      unidadServicio: 'hora',
+    }
+    const articuloUpdate = vi.fn().mockResolvedValue({ ...ARTICULO_STOCK, stock: 9 })
+    const facturaCreate = vi.fn().mockResolvedValue({
+      id: 102,
+      ...FACTURA_BODY,
+      items: [],
+      cliente: CLIENTE_BASE,
+      estado: 'A',
+      clienteId: 1,
+    })
+
+    const prisma = {
+      deliveryZone: { findFirst: vi.fn().mockResolvedValue(null) },
+      cliente: {
+        findMany: vi.fn().mockResolvedValue([]),
+        findFirst: vi.fn().mockResolvedValue(CLIENTE_BASE),
+      },
+      articulo: {
+        findMany: vi.fn().mockResolvedValue([ARTICULO_STOCK, servicio]),
+        update: articuloUpdate,
+      },
+      rubro: { findMany: vi.fn().mockResolvedValue([]) },
+      formaPago: { findMany: vi.fn().mockResolvedValue([]) },
+      factura: { findMany: vi.fn().mockResolvedValue([]) },
+      cobro: { findMany: vi.fn().mockResolvedValue([]) },
+      ordenEntrega: { count: vi.fn().mockResolvedValue(0), findMany: vi.fn().mockResolvedValue([]) },
+      paramEmpresa: { findUnique: vi.fn().mockResolvedValue(null) },
+      notification: { findMany: vi.fn().mockResolvedValue([]), createMany: vi.fn().mockResolvedValue({ count: 0 }) },
+      auditEvent: { create: vi.fn().mockResolvedValue({ id: 1 }) },
+      recuento: { findFirst: vi.fn().mockResolvedValue(null) },
+      appUser: { count: vi.fn().mockResolvedValue(0), findMany: vi.fn().mockResolvedValue([]) },
+      tenant: { findUnique: vi.fn().mockResolvedValue({ id: 1, name: 'Demo', slug: 'demo', active: true }) },
+      $transaction: vi.fn(async (fn: unknown) => {
+        if (typeof fn === 'function') {
+          return fn(
+            createCcTxLayer({
+              factura: { create: facturaCreate },
+              articulo: { update: articuloUpdate },
+            }),
+          )
+        }
+        return fn
+      }),
+    } as unknown as PrismaClient
+
+    await request(createApp(prisma))
+      .post('/api/facturas')
+      .send({
+        ...FACTURA_BODY,
+        items: [
+          { articuloId: 1, cantidad: 1, precio: 500, dscto: 0, subtotal: 500 },
+          { articuloId: 2, cantidad: 8, precio: 62.5, dscto: 0, subtotal: 500 },
+        ],
+      })
+      .expect(200)
+
+    expect(articuloUpdate).toHaveBeenCalledTimes(1)
+    expect(articuloUpdate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { id: 1 },
+        data: { stock: { decrement: 1 } },
       }),
     )
   })

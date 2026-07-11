@@ -141,6 +141,7 @@ export class DashboardAnalyticsService {
         AND f.estado = 'A'
         AND f.fecha >= ${filters.from}
         AND f.fecha <= ${filters.to}
+        AND a.tipo = 'articulo'
         ${optional}
       GROUP BY a.id, a.codigo, a.descripcion
       ORDER BY SUM(fi.subtotal) DESC

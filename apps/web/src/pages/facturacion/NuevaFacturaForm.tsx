@@ -9,8 +9,12 @@ import { useFeatureFlags } from '@/contexts/FeatureFlagsContext'
 
 interface LineaFactura {
   id: string
-  articuloId: number
+  mode: 'catalog' | 'adhoc'
+  articuloId: number | null
   articulo?: Articulo
+  descripcion: string
+  condIva: '1' | '2' | '3'
+  unidadServicio: 'hora' | 'dia' | 'mes' | 'proyecto' | 'km' | 'unidad' | 'otro' | null
   cantidad: number
   precio: number
   dscto: number
@@ -99,7 +103,7 @@ export default function NuevaFacturaForm({
       cantidad: l.cantidad,
       precio: l.precio,
       dscto: l.dscto,
-      articuloIva: (l.articulo?.condIva ?? '3') as '1' | '2' | '3',
+      articuloIva: (l.mode === 'adhoc' ? l.condIva : l.articulo?.condIva ?? l.condIva) as '1' | '2' | '3',
     }))
 
     const newTotales = calculateInvoice(itemsForCalc, cliente?.condIva || 'RI')
@@ -153,13 +157,17 @@ export default function NuevaFacturaForm({
   useHotkeys('ins', () => agregarLinea())
   useHotkeys('delete', () => eliminarLinea(selectedLineIdx))
 
-  const agregarLinea = () => {
+  const agregarLinea = (mode: 'catalog' | 'adhoc' = 'catalog') => {
     const newId = Math.random().toString()
     setLineas([
       ...lineas,
       {
         id: newId,
-        articuloId: 0,
+        mode,
+        articuloId: null,
+        descripcion: '',
+        condIva: '1',
+        unidadServicio: mode === 'adhoc' ? 'hora' : null,
         cantidad: 1,
         precio: 0,
         dscto: 0,
@@ -194,7 +202,19 @@ export default function NuevaFacturaForm({
       const art = articulos.find((a) => a.id === value)
       if (art) {
         newLineas[idx].articulo = art
+        newLineas[idx].articuloId = art.id
+        newLineas[idx].descripcion = art.descripcion
+        newLineas[idx].condIva = (art.condIva as '1' | '2' | '3') || '1'
+        newLineas[idx].unidadServicio =
+          art.tipo === 'servicio'
+            ? ((art.unidadServicio as LineaFactura['unidadServicio']) ?? null)
+            : null
         newLineas[idx].precio = Number(art.precioLista1)
+        newLineas[idx].subtotal = calculateItemSubtotal(
+          newLineas[idx].cantidad,
+          newLineas[idx].precio,
+          newLineas[idx].dscto,
+        )
       }
     }
 
@@ -209,6 +229,16 @@ export default function NuevaFacturaForm({
     if (lineas.length === 0) {
       setError(t('errors.noItems'))
       return
+    }
+    for (const l of lineas) {
+      if (l.mode === 'catalog' && (l.articuloId == null || l.articuloId < 1)) {
+        setError(t('errors.noArticulo'))
+        return
+      }
+      if (l.mode === 'adhoc' && l.descripcion.trim().length < 1) {
+        setError(t('errors.noDescripcionServicio'))
+        return
+      }
     }
 
     setLoading(true)
@@ -239,13 +269,26 @@ export default function NuevaFacturaForm({
         iva1: totales.iva1,
         iva2: totales.iva2,
         total: totalConPercepciones,
-        items: lineas.map((l) => ({
-          articuloId: l.articuloId,
-          cantidad: l.cantidad,
-          precio: l.precio,
-          dscto: l.dscto,
-          subtotal: l.subtotal,
-        })),
+        items: lineas.map((l) =>
+          l.mode === 'adhoc'
+            ? {
+                articuloId: null,
+                descripcion: l.descripcion.trim(),
+                condIva: l.condIva,
+                unidadServicio: l.unidadServicio,
+                cantidad: l.cantidad,
+                precio: l.precio,
+                dscto: l.dscto,
+                subtotal: l.subtotal,
+              }
+            : {
+                articuloId: l.articuloId as number,
+                cantidad: l.cantidad,
+                precio: l.precio,
+                dscto: l.dscto,
+                subtotal: l.subtotal,
+              },
+        ),
         ...(percepcionesPayload != null && percepcionesPayload.length > 0
           ? { percepciones: percepcionesPayload }
           : {}),
@@ -419,22 +462,74 @@ export default function NuevaFacturaForm({
                   }`}
                 >
                   <td className="px-3 py-2 text-sm">
-                    <select
-                      value={linea.articuloId}
-                      data-testid={`factura-line-${idx}-articulo`}
-                      onChange={(e) =>
-                        updateLinea(idx, 'articuloId', parseInt(e.target.value))
-                      }
-                      aria-label={`${t('items.articulo')} ${idx + 1}`}
-                      className="w-full bg-white dark:bg-slate-600 text-slate-900 dark:text-slate-100 rounded border border-slate-300 dark:border-slate-500 px-2 py-1 text-sm"
-                    >
-                      <option value={0}>{t('items.selectArticulo')}</option>
-                      {articulos.map((a) => (
-                        <option key={a.id} value={a.id}>
-                          {a.codigo} - {a.descripcion}
-                        </option>
-                      ))}
-                    </select>
+                    {linea.mode === 'adhoc' ? (
+                      <div className="space-y-1">
+                        <input
+                          type="text"
+                          value={linea.descripcion}
+                          data-testid={`factura-line-${idx}-descripcion`}
+                          onChange={(e) => updateLinea(idx, 'descripcion', e.target.value)}
+                          aria-label={`${t('items.descripcionServicio')} ${idx + 1}`}
+                          maxLength={120}
+                          placeholder={t('items.descripcionServicioPlaceholder')}
+                          className="w-full bg-white dark:bg-slate-600 text-slate-900 dark:text-slate-100 rounded border border-slate-300 dark:border-slate-500 px-2 py-1 text-sm"
+                        />
+                        <div className="flex gap-2">
+                          <select
+                            value={linea.condIva}
+                            data-testid={`factura-line-${idx}-condIva`}
+                            onChange={(e) =>
+                              updateLinea(idx, 'condIva', e.target.value as '1' | '2' | '3')
+                            }
+                            aria-label={`${t('items.condIva')} ${idx + 1}`}
+                            className="bg-white dark:bg-slate-600 text-slate-900 dark:text-slate-100 rounded border border-slate-300 dark:border-slate-500 px-2 py-1 text-xs"
+                          >
+                            <option value="1">21%</option>
+                            <option value="2">10.5%</option>
+                            <option value="3">{t('items.exento')}</option>
+                          </select>
+                          <select
+                            value={linea.unidadServicio ?? 'hora'}
+                            data-testid={`factura-line-${idx}-unidadServicio`}
+                            onChange={(e) =>
+                              updateLinea(
+                                idx,
+                                'unidadServicio',
+                                e.target.value as LineaFactura['unidadServicio'],
+                              )
+                            }
+                            aria-label={`${t('items.unidadServicio')} ${idx + 1}`}
+                            className="bg-white dark:bg-slate-600 text-slate-900 dark:text-slate-100 rounded border border-slate-300 dark:border-slate-500 px-2 py-1 text-xs"
+                          >
+                            {(['hora', 'dia', 'mes', 'proyecto', 'km', 'unidad', 'otro'] as const).map(
+                              (u) => (
+                                <option key={u} value={u}>
+                                  {t(`items.unidadServicioOptions.${u}`)}
+                                </option>
+                              ),
+                            )}
+                          </select>
+                        </div>
+                      </div>
+                    ) : (
+                      <select
+                        value={linea.articuloId ?? 0}
+                        data-testid={`factura-line-${idx}-articulo`}
+                        onChange={(e) =>
+                          updateLinea(idx, 'articuloId', parseInt(e.target.value, 10))
+                        }
+                        aria-label={`${t('items.articulo')} ${idx + 1}`}
+                        className="w-full bg-white dark:bg-slate-600 text-slate-900 dark:text-slate-100 rounded border border-slate-300 dark:border-slate-500 px-2 py-1 text-sm"
+                      >
+                        <option value={0}>{t('items.selectArticulo')}</option>
+                        {articulos.map((a) => (
+                          <option key={a.id} value={a.id}>
+                            {a.codigo} - {a.descripcion}
+                            {a.tipo === 'servicio' ? ` (${t('items.badgeServicio')})` : ''}
+                          </option>
+                        ))}
+                      </select>
+                    )}
                   </td>
                   <td className="px-3 py-2">
                     <input
@@ -570,11 +665,19 @@ export default function NuevaFacturaForm({
       <div className="flex gap-3">
         <button
           type="button"
-          data-testid="btn-agregar-linea-factura"
-          onClick={agregarLinea}
+          onClick={() => agregarLinea('catalog')}
+          data-testid="btn-add-factura-item"
           className="px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded font-semibold transition"
         >
           {t('items.addItem')}
+        </button>
+        <button
+          type="button"
+          onClick={() => agregarLinea('adhoc')}
+          data-testid="btn-add-factura-servicio-libre"
+          className="px-4 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded font-semibold transition"
+        >
+          {t('items.addServicioLibre')}
         </button>
         <button
           type="button"

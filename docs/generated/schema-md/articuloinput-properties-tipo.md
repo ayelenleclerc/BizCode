@@ -1,19 +1,32 @@
-# Untitled integer in ArticuloInput Schema
+# Untitled string in ArticuloInput Schema
 
 ```txt
-undefined#/properties/minimo
+undefined#/properties/tipo
 ```
 
-Must be 0 when tipo is servicio (#244).
+
 
 | Abstract            | Extensible | Status         | Identifiable            | Custom Properties | Additional Properties | Access Restrictions | Defined In                                                                                     |
 | :------------------ | :--------- | :------------- | :---------------------- | :---------------- | :-------------------- | :------------------ | :--------------------------------------------------------------------------------------------- |
 | Can be instantiated | No         | Unknown status | Unknown identifiability | Forbidden         | Allowed               | none                | [ArticuloInput.schema.json\*](../schema-json/ArticuloInput.schema.json "open original schema") |
 
-## minimo Type
+## tipo Type
 
-`integer`
+`string`
 
-## minimo Constraints
+## tipo Constraints
 
-**minimum**: the value of this number must greater than or equal to: `0`
+**enum**: the value of this property must be equal to one of the following values:
+
+| Value        | Explanation |
+| :----------- | :---------- |
+| `"articulo"` |             |
+| `"servicio"` |             |
+
+## tipo Default Value
+
+The default value is:
+
+```json
+"articulo"
+```

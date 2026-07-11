@@ -860,7 +860,7 @@
 
 * [Untitled object in DocumentoCompraTemplate](./documentocompratemplate-properties-fields.md) – `undefined#/properties/fields`
 
-* [Untitled object in FacturaInput](./facturainput-properties-items-items.md) – `undefined#/properties/items/items`
+* [Untitled object in FacturaInput](./facturainput-properties-items-items.md "Catalog line requires articuloId") – `undefined#/properties/items/items`
 
 * [Untitled object in FacturaListEnvelope](./facturalistenvelope-allof-0.md) – `undefined#/allOf/0`
 
@@ -910,7 +910,7 @@
 
 * [Untitled object in OrdenEntregaListEnvelope](./ordenentregalistenvelope-allof-0.md) – `undefined#/allOf/0`
 
-* [Untitled object in PedidoInput](./pedidoinput-properties-items-items.md) – `undefined#/properties/items/items`
+* [Untitled object in PedidoInput](./pedidoinput-properties-items-items.md "Catalog line requires articuloId") – `undefined#/properties/items/items`
 
 * [Untitled object in PedidoListEnvelope](./pedidolistenvelope-allof-0.md) – `undefined#/allOf/0`
 

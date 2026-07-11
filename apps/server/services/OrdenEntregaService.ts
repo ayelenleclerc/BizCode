@@ -75,11 +75,13 @@ export type OrdenEntregaListResult = {
 function mapLineItems(row: OrdenEntregaRow): OrdenEntregaLineItem[] {
   const facturaItems = row.factura?.items
   if (!facturaItems?.length) return []
-  return facturaItems.map((item) => ({
-    id: item.id,
-    cantidad: item.cantidad,
-    articulo: item.articulo,
-  }))
+  return facturaItems
+    .filter((item): item is typeof item & { articulo: NonNullable<typeof item.articulo> } => item.articulo != null)
+    .map((item) => ({
+      id: item.id,
+      cantidad: item.cantidad,
+      articulo: item.articulo,
+    }))
 }
 
 export function mapOrdenEntregaPublic(row: OrdenEntregaRow): OrdenEntregaPublic {

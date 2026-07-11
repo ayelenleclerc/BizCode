@@ -69,6 +69,23 @@
     "stock": "Estoque",
     "minimo": "Mínimo",
     "activo": "Ativo",
+    "tipo": "Tipo",
+    "tipoOptions": {
+      "articulo": "Produto (com estoque)",
+      "servicio": "Serviço (sem estoque)"
+    },
+    "unidadServicio": "Unidade de serviço",
+    "selectUnidadServicio": "Selecionar…",
+    "unidadServicioOptions": {
+      "hora": "Hora",
+      "dia": "Dia",
+      "mes": "Mês",
+      "proyecto": "Projeto",
+      "km": "Km",
+      "unidad": "Unidade",
+      "otro": "Outro"
+    },
+    "servicioNoStockHint": "Serviços não usam estoque nem mínimos de inventário.",
     "selectRubro": "Selecionar...",
     "condIvaOptions": {
       "1": "21%",

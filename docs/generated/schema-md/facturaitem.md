@@ -16,16 +16,19 @@ undefined
 
 # FacturaItem Properties
 
-| Property                  | Type      | Required | Nullable       | Defined by                                                                             |
-| :------------------------ | :-------- | :------- | :------------- | :------------------------------------------------------------------------------------- |
-| [articulo](#articulo)     | `object`  | Optional | cannot be null | [FacturaItem](articulo.md "undefined#/properties/articulo")                            |
-| [articuloId](#articuloid) | `integer` | Optional | cannot be null | [FacturaItem](facturaitem-properties-articuloid.md "undefined#/properties/articuloId") |
-| [cantidad](#cantidad)     | `number`  | Optional | cannot be null | [FacturaItem](facturaitem-properties-cantidad.md "undefined#/properties/cantidad")     |
-| [dscto](#dscto)           | `number`  | Optional | cannot be null | [FacturaItem](facturaitem-properties-dscto.md "undefined#/properties/dscto")           |
-| [id](#id)                 | `integer` | Optional | cannot be null | [FacturaItem](facturaitem-properties-id.md "undefined#/properties/id")                 |
-| [precio](#precio)         | `number`  | Optional | cannot be null | [FacturaItem](facturaitem-properties-precio.md "undefined#/properties/precio")         |
-| [subtotal](#subtotal)     | `number`  | Optional | cannot be null | [FacturaItem](facturaitem-properties-subtotal.md "undefined#/properties/subtotal")     |
-| Additional Properties     | Any       | Optional | can be null    |                                                                                        |
+| Property                          | Type      | Required | Nullable       | Defined by                                                                                     |
+| :-------------------------------- | :-------- | :------- | :------------- | :--------------------------------------------------------------------------------------------- |
+| [articulo](#articulo)             | `object`  | Optional | cannot be null | [FacturaItem](articulo.md "undefined#/properties/articulo")                                    |
+| [articuloId](#articuloid)         | `integer` | Optional | cannot be null | [FacturaItem](facturaitem-properties-articuloid.md "undefined#/properties/articuloId")         |
+| [cantidad](#cantidad)             | `number`  | Optional | cannot be null | [FacturaItem](facturaitem-properties-cantidad.md "undefined#/properties/cantidad")             |
+| [condIva](#condiva)               | `string`  | Optional | cannot be null | [FacturaItem](facturaitem-properties-condiva.md "undefined#/properties/condIva")               |
+| [descripcion](#descripcion)       | `string`  | Optional | cannot be null | [FacturaItem](facturaitem-properties-descripcion.md "undefined#/properties/descripcion")       |
+| [dscto](#dscto)                   | `number`  | Optional | cannot be null | [FacturaItem](facturaitem-properties-dscto.md "undefined#/properties/dscto")                   |
+| [id](#id)                         | `integer` | Optional | cannot be null | [FacturaItem](facturaitem-properties-id.md "undefined#/properties/id")                         |
+| [precio](#precio)                 | `number`  | Optional | cannot be null | [FacturaItem](facturaitem-properties-precio.md "undefined#/properties/precio")                 |
+| [subtotal](#subtotal)             | `number`  | Optional | cannot be null | [FacturaItem](facturaitem-properties-subtotal.md "undefined#/properties/subtotal")             |
+| [unidadServicio](#unidadservicio) | `string`  | Optional | cannot be null | [FacturaItem](facturaitem-properties-unidadservicio.md "undefined#/properties/unidadServicio") |
+| Additional Properties             | Any       | Optional | can be null    |                                                                                                |
 
 ## articulo
 
@@ -47,7 +50,7 @@ undefined
 
 ## articuloId
 
-
+Null for ad-hoc service lines (#244).
 
 `articuloId`
 
@@ -80,6 +83,56 @@ undefined
 ### cantidad Type
 
 `number`
+
+## condIva
+
+
+
+`condIva`
+
+* is optional
+
+* Type: `string`
+
+* cannot be null
+
+* defined in: [FacturaItem](facturaitem-properties-condiva.md "undefined#/properties/condIva")
+
+### condIva Type
+
+`string`
+
+### condIva Constraints
+
+**enum**: the value of this property must be equal to one of the following values:
+
+| Value | Explanation |
+| :---- | :---------- |
+| `"1"` |             |
+| `"2"` |             |
+| `"3"` |             |
+
+## descripcion
+
+Line snapshot (catalog or free-text) (#244).
+
+`descripcion`
+
+* is optional
+
+* Type: `string`
+
+* cannot be null
+
+* defined in: [FacturaItem](facturaitem-properties-descripcion.md "undefined#/properties/descripcion")
+
+### descripcion Type
+
+`string`
+
+### descripcion Constraints
+
+**maximum length**: the maximum number of characters for this string is: `120`
 
 ## dscto
 
@@ -152,6 +205,38 @@ undefined
 ### subtotal Type
 
 `number`
+
+## unidadServicio
+
+
+
+`unidadServicio`
+
+* is optional
+
+* Type: `string`
+
+* cannot be null
+
+* defined in: [FacturaItem](facturaitem-properties-unidadservicio.md "undefined#/properties/unidadServicio")
+
+### unidadServicio Type
+
+`string`
+
+### unidadServicio Constraints
+
+**enum**: the value of this property must be equal to one of the following values:
+
+| Value        | Explanation |
+| :----------- | :---------- |
+| `"hora"`     |             |
+| `"dia"`      |             |
+| `"mes"`      |             |
+| `"proyecto"` |             |
+| `"km"`       |             |
+| `"unidad"`   |             |
+| `"otro"`     |             |
 
 ## Additional Properties
 

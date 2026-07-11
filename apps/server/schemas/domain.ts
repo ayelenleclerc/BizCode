@@ -188,6 +188,11 @@ export const articuloBodySchema = z
     rubroId: z.number(),
     condIva: z.enum(['1', '2', '3'], { errorMap: () => ({ message: 'condIva must be one of: 1, 2, 3' }) }),
     umedida: z.string(),
+    tipo: z.enum(['articulo', 'servicio']).optional(),
+    unidadServicio: z
+      .enum(['hora', 'dia', 'mes', 'proyecto', 'km', 'unidad', 'otro'])
+      .nullable()
+      .optional(),
     precioLista1: z.number(),
     precioLista2: z.number(),
     costo: z.number(),
@@ -225,29 +230,58 @@ export const articuloBodySchema = z
     if (typeof data.costo !== 'number' || data.costo < 0.01) {
       ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'costo must be >= 0.01', path: ['costo'] })
     }
-    if (!Number.isInteger(data.stock) || data.stock < 0) {
-      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'stock must be an integer', path: ['stock'] })
-      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'stock must be >= 0', path: ['stock'] })
-    }
-    if (!Number.isInteger(data.minimo) || data.minimo < 0) {
-      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'minimo must be an integer', path: ['minimo'] })
-      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'minimo must be >= 0', path: ['minimo'] })
+    const tipo = data.tipo ?? 'articulo'
+    if (tipo === 'servicio') {
+      if (data.unidadServicio == null) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'unidadServicio is required when tipo is servicio',
+          path: ['unidadServicio'],
+        })
+      }
+      if (!Number.isInteger(data.stock) || data.stock !== 0) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'stock must be 0 for servicio', path: ['stock'] })
+      }
+      if (!Number.isInteger(data.minimo) || data.minimo !== 0) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'minimo must be 0 for servicio', path: ['minimo'] })
+      }
+    } else {
+      if (data.unidadServicio != null) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'unidadServicio must be null when tipo is articulo',
+          path: ['unidadServicio'],
+        })
+      }
+      if (!Number.isInteger(data.stock) || data.stock < 0) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'stock must be an integer', path: ['stock'] })
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'stock must be >= 0', path: ['stock'] })
+      }
+      if (!Number.isInteger(data.minimo) || data.minimo < 0) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'minimo must be an integer', path: ['minimo'] })
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'minimo must be >= 0', path: ['minimo'] })
+      }
     }
   })
   .transform(
-    (data): ArticuloInput => ({
-      codigo: data.codigo,
-      descripcion: data.descripcion.trim(),
-      rubroId: data.rubroId,
-      condIva: data.condIva,
-      umedida: data.umedida.trim(),
-      precioLista1: data.precioLista1,
-      precioLista2: data.precioLista2,
-      costo: data.costo,
-      stock: data.stock,
-      minimo: data.minimo,
-      activo: data.activo,
-    }),
+    (data): ArticuloInput => {
+      const tipo = data.tipo ?? 'articulo'
+      return {
+        codigo: data.codigo,
+        descripcion: data.descripcion.trim(),
+        rubroId: data.rubroId,
+        condIva: data.condIva,
+        umedida: data.umedida.trim(),
+        tipo,
+        unidadServicio: tipo === 'servicio' ? (data.unidadServicio ?? null) : null,
+        precioLista1: data.precioLista1,
+        precioLista2: data.precioLista2,
+        costo: data.costo,
+        stock: tipo === 'servicio' ? 0 : data.stock,
+        minimo: tipo === 'servicio' ? 0 : data.minimo,
+        activo: data.activo,
+      }
+    },
   )
 
 export const rubroBodySchema = z
@@ -495,31 +529,71 @@ export const facturaBodySchema = z
         return
       }
       const e = entry as Record<string, unknown>
-      const pathLabel = (fname: keyof FacturaItemInput): string => `items[${index}].${String(fname)}`
+      const pathLabel = (fname: string): string => `items[${index}].${fname}`
 
       type ItemCheck = { ok: false; message: string } | { ok: true; value: number }
       const check = (
-        fname: keyof FacturaItemInput,
+        fname: string,
         run: (raw: unknown, pathLabel: string) => ItemCheck,
       ): void => {
         const pl = pathLabel(fname)
-        const co = run(e[String(fname)], pl)
+        const co = run(e[fname], pl)
         if (!co.ok) {
           ctx.addIssue({ code: z.ZodIssueCode.custom, message: co.message,
-            path: ['items', index, String(fname)],
+            path: ['items', index, fname],
           })
         }
       }
 
-      check('articuloId', (raw, pl) => {
-        if (typeof raw !== 'number' || !Number.isInteger(raw)) {
-          return { ok: false, message: `${pl} must be an integer` }
+      const rawArticuloId = e.articuloId
+      const hasArticuloId =
+        rawArticuloId !== undefined && rawArticuloId !== null && rawArticuloId !== ''
+      if (hasArticuloId) {
+        check('articuloId', (raw, pl) => {
+          if (typeof raw !== 'number' || !Number.isInteger(raw)) {
+            return { ok: false, message: `${pl} must be an integer` }
+          }
+          if (raw < 1) {
+            return { ok: false, message: `${pl} must be >= 1` }
+          }
+          return { ok: true, value: raw }
+        })
+      } else {
+        const desc = typeof e.descripcion === 'string' ? e.descripcion.trim() : ''
+        if (desc.length < 1 || desc.length > 120) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: `${pathLabel('descripcion')} is required (1–120 chars) for ad-hoc lines`,
+            path: ['items', index, 'descripcion'],
+          })
         }
-        if (raw < 1) {
-          return { ok: false, message: `${pl} must be >= 1` }
+        const iva = e.condIva
+        if (iva !== '1' && iva !== '2' && iva !== '3') {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: `${pathLabel('condIva')} must be one of: 1, 2, 3 for ad-hoc lines`,
+            path: ['items', index, 'condIva'],
+          })
         }
-        return { ok: true, value: raw }
-      })
+        const us = e.unidadServicio
+        if (
+          us !== undefined &&
+          us !== null &&
+          us !== 'hora' &&
+          us !== 'dia' &&
+          us !== 'mes' &&
+          us !== 'proyecto' &&
+          us !== 'km' &&
+          us !== 'unidad' &&
+          us !== 'otro'
+        ) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: `${pathLabel('unidadServicio')} is invalid`,
+            path: ['items', index, 'unidadServicio'],
+          })
+        }
+      }
 
       for (const fname of ['cantidad', 'precio', 'dscto', 'subtotal'] as const) {
         check(fname, (raw, pl) => {
@@ -536,10 +610,40 @@ export const facturaBodySchema = z
   })
   .transform((data): FacturaInput => {
     const items: FacturaItemInput[] = Array.isArray(data.items)
-      ? data.items.map(
-          (entry) =>
-            entry as FacturaItemInput /* validated in superRefine */,
-        )
+      ? data.items.map((entry) => {
+          const e = entry as Record<string, unknown>
+          const articuloId =
+            e.articuloId === undefined || e.articuloId === null
+              ? null
+              : (e.articuloId as number)
+          const item: FacturaItemInput = {
+            articuloId,
+            cantidad: e.cantidad as number,
+            precio: e.precio as number,
+            dscto: e.dscto as number,
+            subtotal: e.subtotal as number,
+          }
+          if (typeof e.descripcion === 'string') {
+            item.descripcion = e.descripcion.trim()
+          }
+          if (e.condIva === '1' || e.condIva === '2' || e.condIva === '3') {
+            item.condIva = e.condIva
+          }
+          if (
+            e.unidadServicio === 'hora' ||
+            e.unidadServicio === 'dia' ||
+            e.unidadServicio === 'mes' ||
+            e.unidadServicio === 'proyecto' ||
+            e.unidadServicio === 'km' ||
+            e.unidadServicio === 'unidad' ||
+            e.unidadServicio === 'otro'
+          ) {
+            item.unidadServicio = e.unidadServicio
+          } else if (e.unidadServicio === null) {
+            item.unidadServicio = null
+          }
+          return item
+        })
       : []
 
     const out: FacturaInput = {
@@ -1142,14 +1246,39 @@ export const empresaUpdateBodySchema = z
 
 const pedidoItemLineSchema = z
   .object({
-    articuloId: z.number(),
+    articuloId: z.number().nullable().optional(),
+    descripcion: z.string().optional(),
+    condIva: z.enum(['1', '2', '3']).optional(),
+    unidadServicio: z
+      .enum(['hora', 'dia', 'mes', 'proyecto', 'km', 'unidad', 'otro'])
+      .nullable()
+      .optional(),
     cantidad: z.number(),
     precio: z.number(),
     dscto: z.number().optional(),
   })
   .superRefine((data, ctx) => {
-    if (!Number.isInteger(data.articuloId) || data.articuloId < 1) {
-      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'articuloId must be >= 1', path: ['articuloId'] })
+    const hasArticuloId = data.articuloId != null
+    if (hasArticuloId) {
+      if (!Number.isInteger(data.articuloId) || (data.articuloId as number) < 1) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'articuloId must be >= 1', path: ['articuloId'] })
+      }
+    } else {
+      const desc = (data.descripcion ?? '').trim()
+      if (desc.length < 1 || desc.length > 120) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'descripcion is required (1–120 chars) for ad-hoc lines',
+          path: ['descripcion'],
+        })
+      }
+      if (data.condIva !== '1' && data.condIva !== '2' && data.condIva !== '3') {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'condIva must be one of: 1, 2, 3 for ad-hoc lines',
+          path: ['condIva'],
+        })
+      }
     }
     if (!Number.isInteger(data.cantidad) || data.cantidad < 1) {
       ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'cantidad must be >= 1', path: ['cantidad'] })
@@ -1169,13 +1298,23 @@ function mapPedidoItemLine(
   const dscto = data.dscto ?? 0
   const subtotal =
     Math.round((data.cantidad * data.precio - (data.cantidad * data.precio * dscto) / 100) * 100) / 100
-  return {
-    articuloId: data.articuloId,
+  const item: PedidoItemInput = {
+    articuloId: data.articuloId ?? null,
     cantidad: data.cantidad,
     precio: data.precio,
     dscto,
     subtotal,
   }
+  if (data.descripcion !== undefined) {
+    item.descripcion = data.descripcion.trim()
+  }
+  if (data.condIva !== undefined) {
+    item.condIva = data.condIva
+  }
+  if (data.unidadServicio !== undefined) {
+    item.unidadServicio = data.unidadServicio
+  }
+  return item
 }
 
 const pedidoItemsField = z

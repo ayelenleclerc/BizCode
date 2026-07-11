@@ -6,6 +6,8 @@ export type ArticuloStockSnapshot = {
   descripcion: string
   stock: number
   minimo: number
+  /** @en articulo | servicio (#244). @es articulo | servicio (#244). @pt-BR articulo | serviço (#244). */
+  tipo: string
 }
 
 export type StockBelowMinimumAlert = {
@@ -17,14 +19,20 @@ export type StockBelowMinimumAlert = {
 }
 
 /**
- * @en Aggregates invoice line quantities per articuloId.
- * @es Agrupa cantidades de líneas de factura por articuloId.
- * @pt-BR Agrega quantidades de linhas de fatura por articuloId.
+ * @en Aggregates invoice line quantities for physical catalog articles only (#244).
+ * @es Agrupa cantidades solo para artículos físicos del catálogo (#244).
+ * @pt-BR Agrega quantidades só para artigos físicos do catálogo (#244).
  */
-export function aggregateItemQuantities(items: FacturaItemInput[]): Map<number, number> {
+export function aggregateItemQuantities(
+  items: FacturaItemInput[],
+  articuloTipoById?: Map<number, string>,
+): Map<number, number> {
   const qtyByArticulo = new Map<number, number>()
   for (const item of items) {
-    qtyByArticulo.set(item.articuloId, (qtyByArticulo.get(item.articuloId) ?? 0) + item.cantidad)
+    const id = item.articuloId
+    if (id == null || id < 1) continue
+    if (articuloTipoById && articuloTipoById.get(id) === 'servicio') continue
+    qtyByArticulo.set(id, (qtyByArticulo.get(id) ?? 0) + item.cantidad)
   }
   return qtyByArticulo
 }
@@ -44,6 +52,7 @@ export function evaluateStockForInvoice(
   for (const [articuloId, qty] of qtyByArticulo) {
     const art = byId.get(articuloId)
     if (!art) continue
+    if (art.tipo === 'servicio') continue
     const stockAfter = art.stock - qty
     if (stockAfter < 0) {
       return { insufficient: true, alerts: [] }

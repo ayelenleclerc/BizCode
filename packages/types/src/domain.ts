@@ -32,6 +32,9 @@ export interface Articulo {
   rubro?: Rubro
   condIva: string // 1=21%, 2=10.5%, 3=Exento
   umedida: string
+  /** @en articulo | servicio (#244). @es articulo | servicio (#244). @pt-BR articulo | serviço (#244). */
+  tipo?: 'articulo' | 'servicio'
+  unidadServicio?: string | null
   precioLista1: number | string
   precioLista2: number | string
   costo: number | string

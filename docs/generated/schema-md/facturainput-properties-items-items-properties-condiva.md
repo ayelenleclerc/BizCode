@@ -1,7 +1,7 @@
-# Untitled integer in FacturaInput Schema
+# Untitled string in FacturaInput Schema
 
 ```txt
-undefined#/properties/items/items/properties/articuloId
+undefined#/properties/items/items/properties/condIva
 ```
 
 
@@ -10,10 +10,16 @@ undefined#/properties/items/items/properties/articuloId
 | :------------------ | :--------- | :------------- | :---------------------- | :---------------- | :-------------------- | :------------------ | :------------------------------------------------------------------------------------------- |
 | Can be instantiated | No         | Unknown status | Unknown identifiability | Forbidden         | Allowed               | none                | [FacturaInput.schema.json\*](../schema-json/FacturaInput.schema.json "open original schema") |
 
-## articuloId Type
+## condIva Type
 
-`integer`
+`string`
 
-## articuloId Constraints
+## condIva Constraints
 
-**minimum**: the value of this number must greater than or equal to: `1`
+**enum**: the value of this property must be equal to one of the following values:
+
+| Value | Explanation |
+| :---- | :---------- |
+| `"1"` |             |
+| `"2"` |             |
+| `"3"` |             |

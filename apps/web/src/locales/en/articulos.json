@@ -69,6 +69,23 @@
     "stock": "Stock",
     "minimo": "Minimum",
     "activo": "Active",
+    "tipo": "Type",
+    "tipoOptions": {
+      "articulo": "Product (with stock)",
+      "servicio": "Service (no stock)"
+    },
+    "unidadServicio": "Service unit",
+    "selectUnidadServicio": "Select…",
+    "unidadServicioOptions": {
+      "hora": "Hour",
+      "dia": "Day",
+      "mes": "Month",
+      "proyecto": "Project",
+      "km": "Km",
+      "unidad": "Unit",
+      "otro": "Other"
+    },
+    "servicioNoStockHint": "Services do not use inventory stock or minimums.",
     "selectRubro": "Select...",
     "condIvaOptions": {
       "1": "21%",

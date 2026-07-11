@@ -38,7 +38,29 @@
     "stock": {
       "type": "integer"
     },
+    "tipo": {
+      "description": "Catalog item kind (#244). Default articulo.",
+      "enum": [
+        "articulo",
+        "servicio"
+      ],
+      "type": "string"
+    },
     "umedida": {
+      "type": "string"
+    },
+    "unidadServicio": {
+      "description": "Required when tipo is servicio (#244).",
+      "enum": [
+        "hora",
+        "dia",
+        "mes",
+        "proyecto",
+        "km",
+        "unidad",
+        "otro"
+      ],
+      "nullable": true,
       "type": "string"
     }
   },

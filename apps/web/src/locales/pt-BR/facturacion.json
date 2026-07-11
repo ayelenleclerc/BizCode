@@ -24,7 +24,23 @@
     "subtotal": "Subtotal",
     "empty": "Sem itens. Pressione Ins para adicionar.",
     "addItem": "➕ Adicionar Item (Ins)",
+    "addServicioLibre": "Serviço livre",
     "selectArticulo": "Selecionar...",
+    "descripcionServicio": "Descrição do serviço",
+    "descripcionServicioPlaceholder": "Descrição livre…",
+    "condIva": "Imposto",
+    "exento": "Isento",
+    "unidadServicio": "Unidade",
+    "badgeServicio": "serviço",
+    "unidadServicioOptions": {
+      "hora": "Hora",
+      "dia": "Dia",
+      "mes": "Mês",
+      "proyecto": "Projeto",
+      "km": "Km",
+      "unidad": "Unidade",
+      "otro": "Outro"
+    },
     "rowAria": "Item {{n}}, clique para selecionar a linha",
     "rowAriaSelected": "Item {{n}}, linha selecionada"
   },
@@ -55,6 +71,8 @@
   "errors": {
     "noCliente": "Selecione um cliente",
     "noItems": "Adicione pelo menos um produto",
+    "noArticulo": "Selecione um produto do catálogo em cada linha de catálogo",
+    "noDescripcionServicio": "Informe a descrição do serviço livre",
     "generic": "Erro ao salvar nota fiscal"
   },
   "list": {

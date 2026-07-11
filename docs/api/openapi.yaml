@@ -5965,7 +5965,8 @@ paths:
       tags: [reportes]
       summary: Critical stock (stock at or below minimum)
       description: |
-        Active articles with `stock <= minimo`. `deficit = minimo - stock`.
+        Active physical articles (`tipo=articulo`) with `stock <= minimo`. Services are excluded (#244).
+        `deficit = minimo - stock`.
         Requires permission `reports.operational.read`.
         Send `Accept: text/csv` for CSV export.
       security:
@@ -5980,6 +5981,60 @@ paths:
             text/csv:
               schema:
                 type: string
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/reportes/ventas-por-tipo:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [reportes]
+      summary: Sales totals by item tipo (product vs service)
+      description: |
+        Sums invoice line subtotals for active invoices in the date range, split into
+        `productos` (catalog tipo=articulo) and `servicios` (catalog tipo=servicio or ad-hoc lines) (#244).
+        Requires permission `reports.operational.read`.
+      security:
+        - cookieSession: []
+      parameters:
+        - name: from
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+        - name: to
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Product vs service sales totals
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [success, data]
+                properties:
+                  success:
+                    type: boolean
+                    const: true
+                  data:
+                    type: object
+                    required: [productos, servicios]
+                    properties:
+                      productos:
+                        type: string
+                      servicios:
+                        type: string
+        '400':
+          $ref: '#/components/responses/BadRequestError'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '403':
@@ -10341,6 +10396,15 @@ components:
           type: string
         umedida:
           type: string
+        tipo:
+          type: string
+          enum: [articulo, servicio]
+          description: Catalog item kind (#244). Default articulo.
+        unidadServicio:
+          type: string
+          enum: [hora, dia, mes, proyecto, km, unidad, otro]
+          nullable: true
+          description: Required when tipo is servicio (#244).
         precioLista1:
           type: number
         precioLista2:
@@ -10374,6 +10438,14 @@ components:
           type: string
           minLength: 2
           maxLength: 6
+        tipo:
+          type: string
+          enum: [articulo, servicio]
+          default: articulo
+        unidadServicio:
+          type: string
+          enum: [hora, dia, mes, proyecto, km, unidad, otro]
+          nullable: true
         precioLista1:
           type: number
           minimum: 0.01
@@ -10386,9 +10458,11 @@ components:
         stock:
           type: integer
           minimum: 0
+          description: Must be 0 when tipo is servicio (#244).
         minimo:
           type: integer
           minimum: 0
+          description: Must be 0 when tipo is servicio (#244).
         activo:
           type: boolean
 
@@ -11417,6 +11491,19 @@ components:
           type: integer
         articuloId:
           type: integer
+          nullable: true
+          description: Null for ad-hoc service lines (#244).
+        descripcion:
+          type: string
+          maxLength: 120
+          description: Line snapshot (catalog or free-text) (#244).
+        condIva:
+          type: string
+          enum: ['1', '2', '3']
+        unidadServicio:
+          type: string
+          enum: [hora, dia, mes, proyecto, km, unidad, otro]
+          nullable: true
         articulo:
           $ref: '#/components/schemas/Articulo'
         cantidad:
@@ -11839,10 +11926,26 @@ components:
           type: array
           items:
             type: object
-            required: [articuloId, cantidad, precio, dscto, subtotal]
+            required: [cantidad, precio, dscto, subtotal]
+            description: |
+              Catalog line requires articuloId. Ad-hoc service line omits articuloId and requires
+              descripcion + condIva (#244).
             properties:
               articuloId:
                 type: integer
+                nullable: true
+                minimum: 1
+              descripcion:
+                type: string
+                minLength: 1
+                maxLength: 120
+              condIva:
+                type: string
+                enum: ['1', '2', '3']
+              unidadServicio:
+                type: string
+                enum: [hora, dia, mes, proyecto, km, unidad, otro]
+                nullable: true
               cantidad:
                 type: number
               precio:
@@ -13575,11 +13678,26 @@ components:
           minItems: 1
           items:
             type: object
-            required: [articuloId, cantidad, precio]
+            required: [cantidad, precio]
+            description: |
+              Catalog line requires articuloId. Ad-hoc service line omits articuloId and requires
+              descripcion + condIva (#244).
             properties:
               articuloId:
                 type: integer
+                nullable: true
                 minimum: 1
+              descripcion:
+                type: string
+                minLength: 1
+                maxLength: 120
+              condIva:
+                type: string
+                enum: ['1', '2', '3']
+              unidadServicio:
+                type: string
+                enum: [hora, dia, mes, proyecto, km, unidad, otro]
+                nullable: true
               cantidad:
                 type: integer
                 minimum: 1

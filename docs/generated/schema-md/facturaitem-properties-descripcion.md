@@ -1,15 +1,19 @@
-# Untitled integer in FacturaItem Schema
+# Untitled string in FacturaItem Schema
 
 ```txt
-undefined#/properties/articuloId
+undefined#/properties/descripcion
 ```
 
-Null for ad-hoc service lines (#244).
+Line snapshot (catalog or free-text) (#244).
 
 | Abstract            | Extensible | Status         | Identifiable            | Custom Properties | Additional Properties | Access Restrictions | Defined In                                                                                 |
 | :------------------ | :--------- | :------------- | :---------------------- | :---------------- | :-------------------- | :------------------ | :----------------------------------------------------------------------------------------- |
 | Can be instantiated | No         | Unknown status | Unknown identifiability | Forbidden         | Allowed               | none                | [FacturaItem.schema.json\*](../schema-json/FacturaItem.schema.json "open original schema") |
 
-## articuloId Type
+## descripcion Type
 
-`integer`
+`string`
+
+## descripcion Constraints
+
+**maximum length**: the maximum number of characters for this string is: `120`

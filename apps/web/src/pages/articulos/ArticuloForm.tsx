@@ -12,25 +12,38 @@ import { useAuth } from '@/contexts/AuthContext'
 import { Articulo, Rubro } from '@bizcode/types'
 import ArticuloProveedoresComparadorSection from './ArticuloProveedoresComparadorSection'
 
-const articuloSchema = z.object({
-  codigo: z.coerce.number().int().positive('Código debe ser positivo'),
-  descripcion: z.string().min(3, 'Mínimo 3 caracteres').max(30),
-  // Rubro — HTML <select value=""> must not coerce to 0 (would fail .positive() and block submit).
-  rubroId: z.preprocess((val) => {
-    if (val === '' || val === null || val === undefined) return undefined
-    const n = typeof val === 'number' ? val : Number(val)
-    if (!Number.isFinite(n) || n <= 0) return undefined
-    return Math.trunc(n)
-  }, z.number().int().positive('Seleccione un rubro')),
-  condIva: z.enum(['1', '2', '3']), // 1=21%, 2=10.5%, 3=Exento
-  umedida: z.string().min(2).max(6),
-  precioLista1: z.coerce.number().positive('Precio debe ser positivo'),
-  precioLista2: z.coerce.number().positive('Precio debe ser positivo'),
-  costo: z.coerce.number().positive('Costo debe ser positivo'),
-  stock: z.coerce.number().int().nonnegative('Stock no puede ser negativo'),
-  minimo: z.coerce.number().int().nonnegative('Mínimo no puede ser negativo'),
-  activo: z.boolean(),
-})
+const articuloSchema = z
+  .object({
+    codigo: z.coerce.number().int().positive('Código debe ser positivo'),
+    descripcion: z.string().min(3, 'Mínimo 3 caracteres').max(30),
+    // Rubro — HTML <select value=""> must not coerce to 0 (would fail .positive() and block submit).
+    rubroId: z.preprocess((val) => {
+      if (val === '' || val === null || val === undefined) return undefined
+      const n = typeof val === 'number' ? val : Number(val)
+      if (!Number.isFinite(n) || n <= 0) return undefined
+      return Math.trunc(n)
+    }, z.number().int().positive('Seleccione un rubro')),
+    condIva: z.enum(['1', '2', '3']), // 1=21%, 2=10.5%, 3=Exento
+    umedida: z.string().min(2).max(6),
+    tipo: z.enum(['articulo', 'servicio']).default('articulo'),
+    unidadServicio: z
+      .enum(['hora', 'dia', 'mes', 'proyecto', 'km', 'unidad', 'otro'])
+      .nullable()
+      .optional(),
+    precioLista1: z.coerce.number().positive('Precio debe ser positivo'),
+    precioLista2: z.coerce.number().positive('Precio debe ser positivo'),
+    costo: z.coerce.number().positive('Costo debe ser positivo'),
+    stock: z.coerce.number().int().nonnegative('Stock no puede ser negativo'),
+    minimo: z.coerce.number().int().nonnegative('Mínimo no puede ser negativo'),
+    activo: z.boolean(),
+  })
+  .superRefine((data, ctx) => {
+    if (data.tipo === 'servicio') {
+      if (data.unidadServicio == null) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'Required', path: ['unidadServicio'] })
+      }
+    }
+  })
 
 type ArticuloFormData = z.infer<typeof articuloSchema>
 
@@ -87,6 +100,7 @@ export default function ArticuloForm({ articulo, rubros, onClose, onGuardado }: 
     handleSubmit,
     formState: { errors },
     setValue,
+    watch,
   } = useForm<ArticuloFormData>({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     resolver: zodResolver(articuloSchema) as any,
@@ -94,10 +108,15 @@ export default function ArticuloForm({ articulo, rubros, onClose, onGuardado }: 
       condIva: '1',
       // Must be length ≥2 (zod + server/createApp.ts); single "U" blocked submit without surfacing umedida in E2E.
       umedida: 'UN',
+      tipo: 'articulo',
+      unidadServicio: null,
       minimo: 0,
+      stock: 0,
       activo: true,
     }) as ArticuloFormData,
   })
+
+  const tipoWatch = watch('tipo')
 
   useEffect(() => {
     if (articulo) {
@@ -107,6 +126,11 @@ export default function ArticuloForm({ articulo, rubros, onClose, onGuardado }: 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       setValue('condIva', articulo.condIva as any)
       setValue('umedida', articulo.umedida)
+      setValue('tipo', (articulo.tipo as 'articulo' | 'servicio') || 'articulo')
+      setValue(
+        'unidadServicio',
+        (articulo.unidadServicio as ArticuloFormData['unidadServicio']) ?? null,
+      )
       setValue('precioLista1', Number(articulo.precioLista1))
       setValue('precioLista2', Number(articulo.precioLista2))
       setValue('costo', Number(articulo.costo))
@@ -116,6 +140,13 @@ export default function ArticuloForm({ articulo, rubros, onClose, onGuardado }: 
       setStockDisplay(articulo.stock)
     }
   }, [articulo, setValue])
+
+  useEffect(() => {
+    if (tipoWatch === 'servicio') {
+      setValue('stock', 0)
+      setValue('minimo', 0)
+    }
+  }, [tipoWatch, setValue])
 
   const loadHistorial = useCallback(async () => {
     if (!articulo) return
@@ -149,13 +180,17 @@ export default function ArticuloForm({ articulo, rubros, onClose, onGuardado }: 
     setError(null)
 
     try {
+      const normalized =
+        data.tipo === 'servicio'
+          ? { ...data, stock: 0, minimo: 0, unidadServicio: data.unidadServicio ?? null }
+          : { ...data, unidadServicio: null }
       let result: Articulo
       if (articulo) {
-        const { stock: _omitStock, ...payload } = data
+        const { stock: _omitStock, ...payload } = normalized
         void _omitStock
         result = await articulosAPI.update(articulo.id, payload)
       } else {
-        result = await articulosAPI.create(data)
+        result = await articulosAPI.create(normalized)
       }
       onGuardado(result)
     } catch (err: unknown) {
@@ -312,6 +347,54 @@ export default function ArticuloForm({ articulo, rubros, onClose, onGuardado }: 
             </div>
           </div>
 
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label htmlFor="articulo-tipo" className="block text-slate-700 dark:text-slate-300 font-semibold mb-1">
+                {t('form.tipo')} *
+              </label>
+              <select
+                id="articulo-tipo"
+                data-testid="articulo-form-tipo"
+                {...register('tipo')}
+                aria-required="true"
+                className="w-full px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 rounded border border-slate-300 dark:border-slate-600 focus:border-blue-500 focus:outline-none"
+              >
+                <option value="articulo">{t('form.tipoOptions.articulo')}</option>
+                <option value="servicio">{t('form.tipoOptions.servicio')}</option>
+              </select>
+            </div>
+            {tipoWatch === 'servicio' && (
+              <div>
+                <label
+                  htmlFor="articulo-unidadServicio"
+                  className="block text-slate-700 dark:text-slate-300 font-semibold mb-1"
+                >
+                  {t('form.unidadServicio')} *
+                </label>
+                <select
+                  id="articulo-unidadServicio"
+                  data-testid="articulo-form-unidadServicio"
+                  {...register('unidadServicio')}
+                  aria-required="true"
+                  aria-describedby={errors.unidadServicio ? 'articulo-unidadServicio-error' : undefined}
+                  className="w-full px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 rounded border border-slate-300 dark:border-slate-600 focus:border-blue-500 focus:outline-none"
+                >
+                  <option value="">{t('form.selectUnidadServicio')}</option>
+                  {(['hora', 'dia', 'mes', 'proyecto', 'km', 'unidad', 'otro'] as const).map((u) => (
+                    <option key={u} value={u}>
+                      {t(`form.unidadServicioOptions.${u}`)}
+                    </option>
+                  ))}
+                </select>
+                {errors.unidadServicio && (
+                  <p id="articulo-unidadServicio-error" className="text-red-400 text-sm mt-1">
+                    {errors.unidadServicio.message}
+                  </p>
+                )}
+              </div>
+            )}
+          </div>
+
           <div>
             <label htmlFor="articulo-condIva" className="block text-slate-700 dark:text-slate-300 font-semibold mb-1">
               {t('form.condIva')} *
@@ -385,6 +468,7 @@ export default function ArticuloForm({ articulo, rubros, onClose, onGuardado }: 
             </div>
           </div>
 
+          {tipoWatch !== 'servicio' ? (
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label htmlFor="articulo-stock" className="block text-slate-700 dark:text-slate-300 font-semibold mb-1">
@@ -457,6 +541,11 @@ export default function ArticuloForm({ articulo, rubros, onClose, onGuardado }: 
               )}
             </div>
           </div>
+          ) : (
+            <p className="text-sm text-slate-600 dark:text-slate-400" data-testid="articulo-form-servicio-hint">
+              {t('form.servicioNoStockHint')}
+            </p>
+          )}
 
           {showComparador && articulo && showComparadorAccess && (
             <ArticuloProveedoresComparadorSection articuloId={articulo.id} />

@@ -290,7 +290,11 @@ export class RemitoService {
     const pedido = await this.prisma.pedido.findFirst({
       where: { id: pedidoId, tenantId },
       include: {
-        items: { include: { articulo: { select: { id: true, descripcion: true, umedida: true } } } },
+        items: {
+          include: {
+            articulo: { select: { id: true, descripcion: true, umedida: true, tipo: true } },
+          },
+        },
         remito: { select: { id: true } },
       },
     })
@@ -300,12 +304,17 @@ export class RemitoService {
     }
     if (pedido.remito) return { ok: false, status: 409, error: 'PEDIDO_ALREADY_HAS_REMITO' }
 
-    const items: RemitoItemInput[] = pedido.items.map((it) => ({
-      articuloId: it.articuloId,
-      descripcion: it.articulo.descripcion,
-      cantidad: it.cantidad,
-      unidad: it.articulo.umedida,
-    }))
+    const items: RemitoItemInput[] = pedido.items
+      .filter((it) => it.articuloId != null && it.articulo != null && it.articulo.tipo !== 'servicio')
+      .map((it) => ({
+        articuloId: it.articuloId as number,
+        descripcion: it.descripcion || it.articulo!.descripcion,
+        cantidad: it.cantidad,
+        unidad: it.articulo!.umedida,
+      }))
+    if (items.length === 0) {
+      return { ok: false, status: 422, error: 'NO_PHYSICAL_ITEMS_FOR_REMITO' }
+    }
 
     return this.create(tenantId, {
       tipo: 'remito_x',
@@ -319,7 +328,11 @@ export class RemitoService {
     const factura = await this.prisma.factura.findFirst({
       where: { id: facturaId, tenantId, estado: 'A' },
       include: {
-        items: { include: { articulo: { select: { id: true, descripcion: true, umedida: true } } } },
+        items: {
+          include: {
+            articulo: { select: { id: true, descripcion: true, umedida: true, tipo: true } },
+          },
+        },
         remitos: { where: { estado: { not: 'anulado' } }, select: { id: true } },
       },
     })
@@ -328,12 +341,17 @@ export class RemitoService {
       return { ok: false, status: 409, error: 'FACTURA_ALREADY_HAS_REMITO' }
     }
 
-    const items: RemitoItemInput[] = factura.items.map((it) => ({
-      articuloId: it.articuloId,
-      descripcion: it.articulo.descripcion,
-      cantidad: it.cantidad,
-      unidad: it.articulo.umedida,
-    }))
+    const items: RemitoItemInput[] = factura.items
+      .filter((it) => it.articuloId != null && it.articulo != null && it.articulo.tipo !== 'servicio')
+      .map((it) => ({
+        articuloId: it.articuloId as number,
+        descripcion: it.descripcion || it.articulo!.descripcion,
+        cantidad: it.cantidad,
+        unidad: it.articulo!.umedida,
+      }))
+    if (items.length === 0) {
+      return { ok: false, status: 422, error: 'NO_PHYSICAL_ITEMS_FOR_REMITO' }
+    }
 
     return this.create(tenantId, {
       tipo: 'remito_x',
