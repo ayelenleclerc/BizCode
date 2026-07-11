@@ -4,7 +4,7 @@
 undefined#/properties/articuloId
 ```
 
-
+Null for ad-hoc service lines (#244).
 
 | Abstract            | Extensible | Status         | Identifiable            | Custom Properties | Additional Properties | Access Restrictions | Defined In                                                                                 |
 | :------------------ | :--------- | :------------- | :---------------------- | :---------------- | :-------------------- | :------------------ | :----------------------------------------------------------------------------------------- |

@@ -7,7 +7,21 @@ import type { ServiceResult } from './serviceResults'
 const pedidoInclude = {
   cliente: { select: { id: true, codigo: true, rsocial: true, condIva: true } },
   vendedor: { select: { id: true, username: true, role: true } },
-  items: { include: { articulo: { select: { id: true, codigo: true, descripcion: true, condIva: true } } } },
+  items: {
+    include: {
+      articulo: {
+        select: {
+          id: true,
+          codigo: true,
+          descripcion: true,
+          condIva: true,
+          tipo: true,
+          unidadServicio: true,
+          umedida: true,
+        },
+      },
+    },
+  },
   factura: { select: { id: true, tipo: true, prefijo: true, numero: true, total: true } },
 } satisfies Prisma.PedidoInclude
 
@@ -32,6 +46,78 @@ function parseValidUntil(value: string | null | undefined): Date | null {
 function computePedidoTotal(items: PedidoInput['items']): number {
   const sum = items.reduce((acc, it) => acc + it.subtotal, 0)
   return Math.round(sum * 100) / 100
+}
+
+type ResolvedPedidoLine = {
+  articuloId: number | null
+  descripcion: string
+  condIva: string
+  unidadServicio: string | null
+  cantidad: number
+  precio: number
+  dscto: number
+  subtotal: number
+}
+
+async function resolvePedidoLines(
+  prisma: PrismaClient,
+  tenantId: number,
+  items: PedidoInput['items'],
+): Promise<ServiceResult<ResolvedPedidoLine[]>> {
+  const catalogIds = [
+    ...new Set(
+      items
+        .map((it) => it.articuloId)
+        .filter((id): id is number => typeof id === 'number' && id >= 1),
+    ),
+  ]
+  const articulos =
+    catalogIds.length > 0
+      ? await prisma.articulo.findMany({
+          where: { tenantId, id: { in: catalogIds } },
+          select: {
+            id: true,
+            descripcion: true,
+            condIva: true,
+            tipo: true,
+            unidadServicio: true,
+          },
+        })
+      : []
+  if (articulos.length !== catalogIds.length) {
+    return {
+      ok: false,
+      status: 400,
+      error: 'One or more articuloId values are not valid for this tenant',
+    }
+  }
+  const byId = new Map(articulos.map((a) => [a.id, a]))
+  const resolved = items.map((it): ResolvedPedidoLine => {
+    if (it.articuloId != null && it.articuloId >= 1) {
+      const art = byId.get(it.articuloId)!
+      return {
+        articuloId: it.articuloId,
+        descripcion: art.descripcion.slice(0, 120),
+        condIva: art.condIva,
+        unidadServicio: art.tipo === 'servicio' ? art.unidadServicio : null,
+        cantidad: it.cantidad,
+        precio: it.precio,
+        dscto: it.dscto,
+        subtotal: it.subtotal,
+      }
+    }
+    return {
+      articuloId: null,
+      descripcion: (it.descripcion ?? '').trim().slice(0, 120),
+      condIva: it.condIva ?? '1',
+      unidadServicio: it.unidadServicio ?? null,
+      cantidad: it.cantidad,
+      precio: it.precio,
+      dscto: it.dscto,
+      subtotal: it.subtotal,
+    }
+  })
+  return { ok: true, data: resolved }
 }
 
 /**
@@ -110,16 +196,24 @@ export class PedidoService {
       }
     }
 
-    const articuloIds = [...new Set(items.map((it) => it.articuloId))]
-    const articulos = await this.prisma.articulo.findMany({
-      where: { tenantId, id: { in: articuloIds } },
-      select: { id: true },
-    })
-    if (articulos.length !== articuloIds.length) {
-      return {
-        ok: false,
-        status: 400,
-        error: 'One or more articuloId values are not valid for this tenant',
+    const articuloIds = [
+      ...new Set(
+        items
+          .map((it) => it.articuloId)
+          .filter((id): id is number => typeof id === 'number' && id >= 1),
+      ),
+    ]
+    if (articuloIds.length > 0) {
+      const articulos = await this.prisma.articulo.findMany({
+        where: { tenantId, id: { in: articuloIds } },
+        select: { id: true },
+      })
+      if (articulos.length !== articuloIds.length) {
+        return {
+          ok: false,
+          status: 400,
+          error: 'One or more articuloId values are not valid for this tenant',
+        }
       }
     }
 
@@ -132,6 +226,11 @@ export class PedidoService {
       return check
     }
 
+    const resolved = await resolvePedidoLines(this.prisma, tenantId, input.items)
+    if (!resolved.ok) {
+      return resolved
+    }
+
     const total = computePedidoTotal(input.items)
     const pedido = await this.prisma.pedido.create({
       data: {
@@ -142,13 +241,7 @@ export class PedidoService {
         total,
         validUntil: parseValidUntil(input.validUntil),
         items: {
-          create: input.items.map((it) => ({
-            articuloId: it.articuloId,
-            cantidad: it.cantidad,
-            precio: it.precio,
-            dscto: it.dscto,
-            subtotal: it.subtotal,
-          })),
+          create: resolved.data,
         },
       },
       include: pedidoInclude,
@@ -173,6 +266,11 @@ export class PedidoService {
       return check
     }
 
+    const resolved = await resolvePedidoLines(this.prisma, tenantId, input.items)
+    if (!resolved.ok) {
+      return resolved
+    }
+
     const total = computePedidoTotal(input.items)
     const pedido = await this.prisma.$transaction(async (tx) => {
       await tx.pedidoItem.deleteMany({ where: { pedidoId: id } })
@@ -184,13 +282,7 @@ export class PedidoService {
           total,
           validUntil: parseValidUntil(input.validUntil),
           items: {
-            create: input.items.map((it) => ({
-              articuloId: it.articuloId,
-              cantidad: it.cantidad,
-              precio: it.precio,
-              dscto: it.dscto,
-              subtotal: it.subtotal,
-            })),
+            create: resolved.data,
           },
         },
         include: pedidoInclude,
@@ -227,7 +319,7 @@ export class PedidoService {
     const pedido = await this.prisma.pedido.findFirst({
       where: { id, tenantId },
       include: {
-        items: { include: { articulo: { select: { id: true, condIva: true } } } },
+        items: true,
         cliente: { select: { id: true, condIva: true, suspended: true } },
       },
     })
@@ -243,6 +335,9 @@ export class PedidoService {
 
     const facturaItems = pedido.items.map((it) => ({
       articuloId: it.articuloId,
+      descripcion: it.descripcion,
+      condIva: it.condIva as '1' | '2' | '3',
+      unidadServicio: it.unidadServicio as PedidoInput['items'][number]['unidadServicio'],
       cantidad: it.cantidad,
       precio: Number(it.precio),
       dscto: Number(it.dscto),
@@ -254,7 +349,7 @@ export class PedidoService {
         cantidad: it.cantidad,
         precio: Number(it.precio),
         dscto: Number(it.dscto),
-        articuloIva: it.articulo.condIva as '1' | '2' | '3',
+        articuloIva: it.condIva as '1' | '2' | '3',
       })),
       pedido.cliente.condIva,
     )
@@ -314,10 +409,24 @@ export class PedidoService {
 
 /** @en Builds line subtotals for API input normalization. */
 export function mapPedidoItemsWithSubtotals(
-  items: Array<{ articuloId: number; cantidad: number; precio: number; dscto: number }>,
+  items: Array<{
+    articuloId?: number | null
+    descripcion?: string
+    condIva?: '1' | '2' | '3'
+    unidadServicio?: PedidoInput['items'][number]['unidadServicio']
+    cantidad: number
+    precio: number
+    dscto: number
+  }>,
 ): PedidoInput['items'] {
   return items.map((it) => ({
-    ...it,
+    articuloId: it.articuloId ?? null,
+    descripcion: it.descripcion,
+    condIva: it.condIva,
+    unidadServicio: it.unidadServicio,
+    cantidad: it.cantidad,
+    precio: it.precio,
+    dscto: it.dscto,
     subtotal: calculateItemSubtotal(it.cantidad, it.precio, it.dscto),
   }))
 }

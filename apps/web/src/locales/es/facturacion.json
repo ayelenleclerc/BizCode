@@ -24,7 +24,23 @@
     "subtotal": "Subtotal",
     "empty": "Sin ítems. Presione Ins para agregar.",
     "addItem": "➕ Agregar Ítem (Ins)",
+    "addServicioLibre": "Servicio libre",
     "selectArticulo": "Seleccionar...",
+    "descripcionServicio": "Descripción del servicio",
+    "descripcionServicioPlaceholder": "Descripción libre…",
+    "condIva": "IVA",
+    "exento": "Exento",
+    "unidadServicio": "Unidad",
+    "badgeServicio": "servicio",
+    "unidadServicioOptions": {
+      "hora": "Hora",
+      "dia": "Día",
+      "mes": "Mes",
+      "proyecto": "Proyecto",
+      "km": "Km",
+      "unidad": "Unidad",
+      "otro": "Otro"
+    },
     "rowAria": "Ítem {{n}}, pulse para seleccionar la fila",
     "rowAriaSelected": "Ítem {{n}}, fila seleccionada"
   },
@@ -55,6 +71,8 @@
   "errors": {
     "noCliente": "Seleccione un cliente",
     "noItems": "Agregue al menos un artículo",
+    "noArticulo": "Seleccione un artículo en cada línea de catálogo",
+    "noDescripcionServicio": "Ingrese la descripción del servicio libre",
     "generic": "Error al guardar factura"
   },
   "list": {

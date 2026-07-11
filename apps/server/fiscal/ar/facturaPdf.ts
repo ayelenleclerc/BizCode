@@ -46,6 +46,7 @@ function mapFacturaToPdfInput(
       precio: { toString: () => string }
       dscto: { toString: () => string }
       subtotal: { toString: () => string }
+      descripcion?: string | null
       articulo: { descripcion: string } | null
     }>
     retencionesAplicadas?: Array<{
@@ -84,7 +85,10 @@ function mapFacturaToPdfInput(
         precio: Number(item.precio),
         dscto: Number(item.dscto),
         subtotal: Number(item.subtotal),
-        descripcion: item.articulo?.descripcion ?? '—',
+        descripcion:
+          (item.descripcion && item.descripcion.trim()) ||
+          item.articulo?.descripcion ||
+          '—',
       })),
       percepciones: (factura.retencionesAplicadas ?? []).map((row) => ({
         nombre: row.regimen.nombre,

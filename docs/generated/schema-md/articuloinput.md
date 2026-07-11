@@ -16,19 +16,21 @@ undefined
 
 # ArticuloInput Properties
 
-| Property                      | Type      | Required | Nullable       | Defined by                                                                                     |
-| :---------------------------- | :-------- | :------- | :------------- | :--------------------------------------------------------------------------------------------- |
-| [activo](#activo)             | `boolean` | Required | cannot be null | [ArticuloInput](articuloinput-properties-activo.md "undefined#/properties/activo")             |
-| [codigo](#codigo)             | `integer` | Required | cannot be null | [ArticuloInput](articuloinput-properties-codigo.md "undefined#/properties/codigo")             |
-| [condIva](#condiva)           | `string`  | Required | cannot be null | [ArticuloInput](articuloinput-properties-condiva.md "undefined#/properties/condIva")           |
-| [costo](#costo)               | `number`  | Required | cannot be null | [ArticuloInput](articuloinput-properties-costo.md "undefined#/properties/costo")               |
-| [descripcion](#descripcion)   | `string`  | Required | cannot be null | [ArticuloInput](articuloinput-properties-descripcion.md "undefined#/properties/descripcion")   |
-| [minimo](#minimo)             | `integer` | Required | cannot be null | [ArticuloInput](articuloinput-properties-minimo.md "undefined#/properties/minimo")             |
-| [precioLista1](#preciolista1) | `number`  | Required | cannot be null | [ArticuloInput](articuloinput-properties-preciolista1.md "undefined#/properties/precioLista1") |
-| [precioLista2](#preciolista2) | `number`  | Required | cannot be null | [ArticuloInput](articuloinput-properties-preciolista2.md "undefined#/properties/precioLista2") |
-| [rubroId](#rubroid)           | `integer` | Required | cannot be null | [ArticuloInput](articuloinput-properties-rubroid.md "undefined#/properties/rubroId")           |
-| [stock](#stock)               | `integer` | Required | cannot be null | [ArticuloInput](articuloinput-properties-stock.md "undefined#/properties/stock")               |
-| [umedida](#umedida)           | `string`  | Required | cannot be null | [ArticuloInput](articuloinput-properties-umedida.md "undefined#/properties/umedida")           |
+| Property                          | Type      | Required | Nullable       | Defined by                                                                                         |
+| :-------------------------------- | :-------- | :------- | :------------- | :------------------------------------------------------------------------------------------------- |
+| [activo](#activo)                 | `boolean` | Required | cannot be null | [ArticuloInput](articuloinput-properties-activo.md "undefined#/properties/activo")                 |
+| [codigo](#codigo)                 | `integer` | Required | cannot be null | [ArticuloInput](articuloinput-properties-codigo.md "undefined#/properties/codigo")                 |
+| [condIva](#condiva)               | `string`  | Required | cannot be null | [ArticuloInput](articuloinput-properties-condiva.md "undefined#/properties/condIva")               |
+| [costo](#costo)                   | `number`  | Required | cannot be null | [ArticuloInput](articuloinput-properties-costo.md "undefined#/properties/costo")                   |
+| [descripcion](#descripcion)       | `string`  | Required | cannot be null | [ArticuloInput](articuloinput-properties-descripcion.md "undefined#/properties/descripcion")       |
+| [minimo](#minimo)                 | `integer` | Required | cannot be null | [ArticuloInput](articuloinput-properties-minimo.md "undefined#/properties/minimo")                 |
+| [precioLista1](#preciolista1)     | `number`  | Required | cannot be null | [ArticuloInput](articuloinput-properties-preciolista1.md "undefined#/properties/precioLista1")     |
+| [precioLista2](#preciolista2)     | `number`  | Required | cannot be null | [ArticuloInput](articuloinput-properties-preciolista2.md "undefined#/properties/precioLista2")     |
+| [rubroId](#rubroid)               | `integer` | Required | cannot be null | [ArticuloInput](articuloinput-properties-rubroid.md "undefined#/properties/rubroId")               |
+| [stock](#stock)                   | `integer` | Required | cannot be null | [ArticuloInput](articuloinput-properties-stock.md "undefined#/properties/stock")                   |
+| [tipo](#tipo)                     | `string`  | Optional | cannot be null | [ArticuloInput](articuloinput-properties-tipo.md "undefined#/properties/tipo")                     |
+| [umedida](#umedida)               | `string`  | Required | cannot be null | [ArticuloInput](articuloinput-properties-umedida.md "undefined#/properties/umedida")               |
+| [unidadServicio](#unidadservicio) | `string`  | Optional | cannot be null | [ArticuloInput](articuloinput-properties-unidadservicio.md "undefined#/properties/unidadServicio") |
 
 ## activo
 
@@ -146,7 +148,7 @@ undefined
 
 ## minimo
 
-
+Must be 0 when tipo is servicio (#244).
 
 `minimo`
 
@@ -230,7 +232,7 @@ undefined
 
 ## stock
 
-
+Must be 0 when tipo is servicio (#244).
 
 `stock`
 
@@ -249,6 +251,41 @@ undefined
 ### stock Constraints
 
 **minimum**: the value of this number must greater than or equal to: `0`
+
+## tipo
+
+
+
+`tipo`
+
+* is optional
+
+* Type: `string`
+
+* cannot be null
+
+* defined in: [ArticuloInput](articuloinput-properties-tipo.md "undefined#/properties/tipo")
+
+### tipo Type
+
+`string`
+
+### tipo Constraints
+
+**enum**: the value of this property must be equal to one of the following values:
+
+| Value        | Explanation |
+| :----------- | :---------- |
+| `"articulo"` |             |
+| `"servicio"` |             |
+
+### tipo Default Value
+
+The default value is:
+
+```json
+"articulo"
+```
 
 ## umedida
 
@@ -273,3 +310,35 @@ undefined
 **maximum length**: the maximum number of characters for this string is: `6`
 
 **minimum length**: the minimum number of characters for this string is: `2`
+
+## unidadServicio
+
+
+
+`unidadServicio`
+
+* is optional
+
+* Type: `string`
+
+* cannot be null
+
+* defined in: [ArticuloInput](articuloinput-properties-unidadservicio.md "undefined#/properties/unidadServicio")
+
+### unidadServicio Type
+
+`string`
+
+### unidadServicio Constraints
+
+**enum**: the value of this property must be equal to one of the following values:
+
+| Value        | Explanation |
+| :----------- | :---------- |
+| `"hora"`     |             |
+| `"dia"`      |             |
+| `"mes"`      |             |
+| `"proyecto"` |             |
+| `"km"`       |             |
+| `"unidad"`   |             |
+| `"otro"`     |             |

@@ -10,6 +10,8 @@ Versioning: [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **Service items without stock (#244):** `Articulo.tipo` (`articulo` \| `servicio`) and `unidadServicio`; invoice/order line snapshots with nullable `articuloId` for ad-hoc services; stock validation/decrement only for physical catalog lines; remitos exclude services; `GET /api/reportes/ventas-por-tipo`; stock-critical excludes services; UI catalog tipo + free-text service line on new invoice; OpenAPI, tests, i18n EN/ES/PT-BR.
+
 - **`@bizcode/api-client` refactor (#156):** `createApiClient` / `configureApiClients` factory, domain modules under `packages/api-client/src/modules/`, errors and config split; web bootstrap via `initApiClientFromEnv()` (`VITE_API_URL`); no `import.meta` in the package (RN-ready); `api.ts` is a re-export barrel; portal client in `modules/portal.ts`.
 
 - **Monorepo (pnpm workspaces + Turborepo, #154):** `apps/web` (React/Vite), `apps/server` (Express API), `packages/types`, `packages/api-client`; root orchestration via `pnpm` and `turbo`; CI uses `pnpm install --frozen-lockfile`; `prisma/` remains at repo root; no functional product changes.

@@ -4,7 +4,7 @@
 undefined#/properties/minimo
 ```
 
-
+Must be 0 when tipo is servicio (#244).
 
 | Abstract            | Extensible | Status         | Identifiable            | Custom Properties | Additional Properties | Access Restrictions | Defined In                                                                                     |
 | :------------------ | :--------- | :------------- | :---------------------- | :---------------- | :-------------------- | :------------------ | :--------------------------------------------------------------------------------------------- |

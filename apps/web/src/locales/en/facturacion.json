@@ -24,7 +24,23 @@
     "subtotal": "Subtotal",
     "empty": "No items. Press Ins to add.",
     "addItem": "➕ Add Item (Ins)",
+    "addServicioLibre": "Free-text service",
     "selectArticulo": "Select...",
+    "descripcionServicio": "Service description",
+    "descripcionServicioPlaceholder": "Free description…",
+    "condIva": "VAT",
+    "exento": "Exempt",
+    "unidadServicio": "Unit",
+    "badgeServicio": "service",
+    "unidadServicioOptions": {
+      "hora": "Hour",
+      "dia": "Day",
+      "mes": "Month",
+      "proyecto": "Project",
+      "km": "Km",
+      "unidad": "Unit",
+      "otro": "Other"
+    },
     "rowAria": "Item {{n}}, click to select this row",
     "rowAriaSelected": "Item {{n}}, row selected"
   },
@@ -55,6 +71,8 @@
   "errors": {
     "noCliente": "Please select a customer",
     "noItems": "Please add at least one item",
+    "noArticulo": "Select a catalog product on each catalog line",
+    "noDescripcionServicio": "Enter a free-text service description",
     "generic": "Error saving invoice"
   },
   "list": {

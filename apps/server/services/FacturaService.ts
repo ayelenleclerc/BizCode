@@ -42,8 +42,8 @@ export type FacturaPartialCreditNoteResult = {
 }
 /**
  * @en Invoice domain operations (list, create, void).
- * @es Operaciones de dominio de facturas (listado, alta, anulaciÃ³n).
- * @pt-BR OperaÃ§Ãµes de domÃ­nio de faturas (listagem, criaÃ§Ã£o, anulaÃ§Ã£o).
+ * @es Operaciones de dominio de facturas (listado, alta, anulaci?n).
+ * @pt-BR Opera??es de dom?nio de faturas (listagem, cria??o, anula??o).
  */
 export class FacturaService {
   private readonly arca: ArcaService
@@ -75,12 +75,30 @@ export class FacturaService {
     const { items, fecha, ...factura } = input
     const clienteId = factura.clienteId
 
-    const articuloIds = [...new Set(items.map((it) => it.articuloId))]
-    const articulos = await this.prisma.articulo.findMany({
-      where: { tenantId, id: { in: articuloIds } },
-      select: { id: true, codigo: true, descripcion: true, stock: true, minimo: true },
-    })
-    if (articulos.length !== articuloIds.length) {
+    const catalogIds = [
+      ...new Set(
+        items
+          .map((it) => it.articuloId)
+          .filter((id): id is number => typeof id === 'number' && id >= 1),
+      ),
+    ]
+    const articulos =
+      catalogIds.length > 0
+        ? await this.prisma.articulo.findMany({
+            where: { tenantId, id: { in: catalogIds } },
+            select: {
+              id: true,
+              codigo: true,
+              descripcion: true,
+              stock: true,
+              minimo: true,
+              tipo: true,
+              condIva: true,
+              unidadServicio: true,
+            },
+          })
+        : []
+    if (articulos.length !== catalogIds.length) {
       return {
         ok: false,
         status: 400,
@@ -88,11 +106,8 @@ export class FacturaService {
       }
     }
 
-    const qtyByArticulo = aggregateItemQuantities(items)
-    const stockEval = evaluateStockForInvoice(articulos, qtyByArticulo)
-    if (stockEval.insufficient) {
-      return { ok: false, status: 422, error: 'INSUFFICIENT_STOCK' }
-    }
+    const articuloById = new Map(articulos.map((a) => [a.id, a]))
+    const tipoById = new Map(articulos.map((a) => [a.id, a.tipo]))
 
     const clienteCheck = await this.prisma.cliente.findFirst({
       where: { id: clienteId, tenantId },
@@ -103,6 +118,38 @@ export class FacturaService {
     }
     if (clienteCheck.suspended) {
       return { ok: false, status: 422, error: 'CLIENT_SUSPENDED' }
+    }
+
+    const resolvedItems = items.map((it) => {
+      if (it.articuloId != null && it.articuloId >= 1) {
+        const art = articuloById.get(it.articuloId)!
+        return {
+          articuloId: it.articuloId,
+          descripcion: (art.descripcion ?? '').slice(0, 120),
+          condIva: art.condIva ?? '1',
+          unidadServicio: art.tipo === 'servicio' ? art.unidadServicio : null,
+          cantidad: it.cantidad,
+          precio: it.precio,
+          dscto: it.dscto,
+          subtotal: it.subtotal,
+        }
+      }
+      return {
+        articuloId: null as number | null,
+        descripcion: (it.descripcion ?? '').trim().slice(0, 120),
+        condIva: it.condIva ?? '1',
+        unidadServicio: it.unidadServicio ?? null,
+        cantidad: it.cantidad,
+        precio: it.precio,
+        dscto: it.dscto,
+        subtotal: it.subtotal,
+      }
+    })
+
+    const qtyByArticulo = aggregateItemQuantities(items, tipoById)
+    const stockEval = evaluateStockForInvoice(articulos, qtyByArticulo)
+    if (stockEval.insufficient) {
+      return { ok: false, status: 422, error: 'INSUFFICIENT_STOCK' }
     }
 
     const recuentoBlock = await assertNoOpenRecuento(this.prisma, tenantId)
@@ -131,7 +178,7 @@ export class FacturaService {
           ...factura,
           fecha: facturaFechaToPrismaDate(fecha),
           tenantId,
-          items: { create: items },
+          items: { create: resolvedItems },
         } as Parameters<typeof this.prisma.factura.create>[0]['data'],
         include: { items: true, cliente: true },
       })
@@ -187,8 +234,8 @@ export class FacturaService {
 
   /**
    * @en Voids an active invoice, creates a credit note, reverses balance, and records audit in one transaction.
-   * @es Anula factura vigente, crea nota de crédito, revierte saldo y audita en una transacción.
-   * @pt-BR Anula fatura ativa, cria nota de crédito, reverte saldo e audita em uma transação.
+   * @es Anula factura vigente, crea nota de crÿdito, revierte saldo y audita en una transacciÿn.
+   * @pt-BR Anula fatura ativa, cria nota de crÿdito, reverte saldo e audita em uma transaÿÿo.
    */
   async void(
     tenantId: number,
@@ -283,7 +330,7 @@ export class FacturaService {
 
     if (factura.estadoCae === 'issued') {
       void this.arca.requestCaeForNotaCredito(tenantId, result.notaCredito.id).catch(() => {
-        /* homologación mock; retry job may be added later */
+        /* homologaciÿn mock; retry job may be added later */
       })
     }
 
@@ -292,8 +339,8 @@ export class FacturaService {
 
   /**
    * @en Issues a partial credit note for an active invoice without voiding it (#344).
-   * @es Emite nota de crédito parcial sobre factura vigente sin anularla (#344).
-   * @pt-BR Emite nota de crédito parcial sobre fatura ativa sem anulá-la (#344).
+   * @es Emite nota de crÿdito parcial sobre factura vigente sin anularla (#344).
+   * @pt-BR Emite nota de crÿdito parcial sobre fatura ativa sem anulÿ-la (#344).
    */
   async createPartialCreditNote(
     tenantId: number,
@@ -387,7 +434,7 @@ export class FacturaService {
 
     if (factura.estadoCae === 'issued') {
       void this.arca.requestCaeForNotaCredito(tenantId, result.notaCredito.id).catch(() => {
-        /* homologación mock; retry job may be added later */
+        /* homologaciÿn mock; retry job may be added later */
       })
     }
 

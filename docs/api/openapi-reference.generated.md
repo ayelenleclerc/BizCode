@@ -7313,9 +7313,17 @@ Returns PDF with amount in words (#233). Requires module `finance.receipts`.
 
     `integer`
 
+  - **`tipo`**
+
+    `string`, possible values: `"articulo", "servicio"` — Catalog item kind (#244). Default articulo.
+
   - **`umedida`**
 
     `string`
+
+  - **`unidadServicio`**
+
+    `string`, possible values: `"hora", "dia", "mes", "proyecto", "km", "unidad", "otro"` — Required when tipo is servicio (#244).
 
 - **`success` (required)**
 
@@ -7352,6 +7360,8 @@ Returns PDF with amount in words (#233). Requires module `finance.receipts`.
       },
       "condIva": "",
       "umedida": "",
+      "tipo": "articulo",
+      "unidadServicio": "hora",
       "precioLista1": 1,
       "precioLista2": 1,
       "costo": 1,
@@ -7462,7 +7472,7 @@ Returns PDF with amount in words (#233). Requires module `finance.receipts`.
 
 - **`minimo` (required)**
 
-  `integer`
+  `integer` — Must be 0 when tipo is servicio (#244).
 
 - **`precioLista1` (required)**
 
@@ -7478,11 +7488,19 @@ Returns PDF with amount in words (#233). Requires module `finance.receipts`.
 
 - **`stock` (required)**
 
-  `integer`
+  `integer` — Must be 0 when tipo is servicio (#244).
 
 - **`umedida` (required)**
 
   `string`
+
+- **`tipo`**
+
+  `string`, possible values: `"articulo", "servicio"`, default: `"articulo"`
+
+- **`unidadServicio`**
+
+  `string`, possible values: `"hora", "dia", "mes", "proyecto", "km", "unidad", "otro"`
 
 **Example:**
 
@@ -7493,6 +7511,8 @@ Returns PDF with amount in words (#233). Requires module `finance.receipts`.
   "rubroId": 1,
   "condIva": "1",
   "umedida": "",
+  "tipo": "articulo",
+  "unidadServicio": "hora",
   "precioLista1": 0.01,
   "precioLista2": 0.01,
   "costo": 0.01,
@@ -7572,9 +7592,17 @@ Returns PDF with amount in words (#233). Requires module `finance.receipts`.
 
     `integer`
 
+  - **`tipo`**
+
+    `string`, possible values: `"articulo", "servicio"` — Catalog item kind (#244). Default articulo.
+
   - **`umedida`**
 
     `string`
+
+  - **`unidadServicio`**
+
+    `string`, possible values: `"hora", "dia", "mes", "proyecto", "km", "unidad", "otro"` — Required when tipo is servicio (#244).
 
 - **`success` (required)**
 
@@ -7598,6 +7626,8 @@ Returns PDF with amount in words (#233). Requires module `finance.receipts`.
     },
     "condIva": "",
     "umedida": "",
+    "tipo": "articulo",
+    "unidadServicio": "hora",
     "precioLista1": 1,
     "precioLista2": 1,
     "costo": 1,
@@ -7736,6 +7766,8 @@ Returns PDF with amount in words (#233). Requires module `finance.receipts`.
     },
     "condIva": "",
     "umedida": "",
+    "tipo": "articulo",
+    "unidadServicio": "hora",
     "precioLista1": 1,
     "precioLista2": 1,
     "costo": 1,
@@ -7842,7 +7874,7 @@ Returns PDF with amount in words (#233). Requires module `finance.receipts`.
 
 - **`minimo` (required)**
 
-  `integer`
+  `integer` — Must be 0 when tipo is servicio (#244).
 
 - **`precioLista1` (required)**
 
@@ -7858,11 +7890,19 @@ Returns PDF with amount in words (#233). Requires module `finance.receipts`.
 
 - **`stock` (required)**
 
-  `integer`
+  `integer` — Must be 0 when tipo is servicio (#244).
 
 - **`umedida` (required)**
 
   `string`
+
+- **`tipo`**
+
+  `string`, possible values: `"articulo", "servicio"`, default: `"articulo"`
+
+- **`unidadServicio`**
+
+  `string`, possible values: `"hora", "dia", "mes", "proyecto", "km", "unidad", "otro"`
 
 **Example:**
 
@@ -7873,6 +7913,8 @@ Returns PDF with amount in words (#233). Requires module `finance.receipts`.
   "rubroId": 1,
   "condIva": "1",
   "umedida": "",
+  "tipo": "articulo",
+  "unidadServicio": "hora",
   "precioLista1": 0.01,
   "precioLista2": 0.01,
   "costo": 0.01,
@@ -7952,9 +7994,17 @@ Returns PDF with amount in words (#233). Requires module `finance.receipts`.
 
     `integer`
 
+  - **`tipo`**
+
+    `string`, possible values: `"articulo", "servicio"` — Catalog item kind (#244). Default articulo.
+
   - **`umedida`**
 
     `string`
+
+  - **`unidadServicio`**
+
+    `string`, possible values: `"hora", "dia", "mes", "proyecto", "km", "unidad", "otro"` — Required when tipo is servicio (#244).
 
 - **`success` (required)**
 
@@ -7978,6 +8028,8 @@ Returns PDF with amount in words (#233). Requires module `finance.receipts`.
     },
     "condIva": "",
     "umedida": "",
+    "tipo": "articulo",
+    "unidadServicio": "hora",
     "precioLista1": 1,
     "precioLista2": 1,
     "costo": 1,
@@ -19375,17 +19427,33 @@ Requires all items to have `cantFisica`. For each line with non-zero variance, u
 
         `integer`
 
+      - **`tipo`**
+
+        `string`, possible values: `"articulo", "servicio"` — Catalog item kind (#244). Default articulo.
+
       - **`umedida`**
 
         `string`
 
+      - **`unidadServicio`**
+
+        `string`, possible values: `"hora", "dia", "mes", "proyecto", "km", "unidad", "otro"` — Required when tipo is servicio (#244).
+
     - **`articuloId`**
 
-      `integer`
+      `integer` — Null for ad-hoc service lines (#244).
 
     - **`cantidad`**
 
       `number`
+
+    - **`condIva`**
+
+      `string`, possible values: `"1", "2", "3"`
+
+    - **`descripcion`**
+
+      `string` — Line snapshot (catalog or free-text) (#244).
 
     - **`dscto`**
 
@@ -19402,6 +19470,10 @@ Requires all items to have `cantFisica`. For each line with non-zero variance, u
     - **`subtotal`**
 
       `number`
+
+    - **`unidadServicio`**
+
+      `string`, possible values: `"hora", "dia", "mes", "proyecto", "km", "unidad", "otro"`
 
   - **`iva1`**
 
@@ -19483,6 +19555,9 @@ Requires all items to have `cantFisica`. For each line with non-zero variance, u
         {
           "id": 1,
           "articuloId": 1,
+          "descripcion": "",
+          "condIva": "1",
+          "unidadServicio": "hora",
           "articulo": {
             "id": 1,
             "codigo": 1,
@@ -19496,6 +19571,8 @@ Requires all items to have `cantFisica`. For each line with non-zero variance, u
             },
             "condIva": "",
             "umedida": "",
+            "tipo": "articulo",
+            "unidadServicio": "hora",
             "precioLista1": 1,
             "precioLista2": 1,
             "costo": 1,
@@ -19607,10 +19684,6 @@ Requires all items to have `cantFisica`. For each line with non-zero variance, u
 
   **Items:**
 
-  - **`articuloId` (required)**
-
-    `integer`
-
   - **`cantidad` (required)**
 
     `number`
@@ -19626,6 +19699,22 @@ Requires all items to have `cantFisica`. For each line with non-zero variance, u
   - **`subtotal` (required)**
 
     `number`
+
+  - **`articuloId`**
+
+    `integer`
+
+  - **`condIva`**
+
+    `string`, possible values: `"1", "2", "3"`
+
+  - **`descripcion`**
+
+    `string`
+
+  - **`unidadServicio`**
+
+    `string`, possible values: `"hora", "dia", "mes", "proyecto", "km", "unidad", "otro"`
 
 - **`iva1` (required)**
 
@@ -19716,6 +19805,9 @@ Requires all items to have `cantFisica`. For each line with non-zero variance, u
   "items": [
     {
       "articuloId": 1,
+      "descripcion": "",
+      "condIva": "1",
+      "unidadServicio": "hora",
       "cantidad": 1,
       "precio": 1,
       "dscto": 1,
@@ -19837,17 +19929,33 @@ Requires all items to have `cantFisica`. For each line with non-zero variance, u
 
         `integer`
 
+      - **`tipo`**
+
+        `string`, possible values: `"articulo", "servicio"` — Catalog item kind (#244). Default articulo.
+
       - **`umedida`**
 
         `string`
 
+      - **`unidadServicio`**
+
+        `string`, possible values: `"hora", "dia", "mes", "proyecto", "km", "unidad", "otro"` — Required when tipo is servicio (#244).
+
     - **`articuloId`**
 
-      `integer`
+      `integer` — Null for ad-hoc service lines (#244).
 
     - **`cantidad`**
 
       `number`
+
+    - **`condIva`**
+
+      `string`, possible values: `"1", "2", "3"`
+
+    - **`descripcion`**
+
+      `string` — Line snapshot (catalog or free-text) (#244).
 
     - **`dscto`**
 
@@ -19864,6 +19972,10 @@ Requires all items to have `cantFisica`. For each line with non-zero variance, u
     - **`subtotal`**
 
       `number`
+
+    - **`unidadServicio`**
+
+      `string`, possible values: `"hora", "dia", "mes", "proyecto", "km", "unidad", "otro"`
 
   - **`iva1`**
 
@@ -19932,6 +20044,9 @@ Requires all items to have `cantFisica`. For each line with non-zero variance, u
       {
         "id": 1,
         "articuloId": 1,
+        "descripcion": "",
+        "condIva": "1",
+        "unidadServicio": "hora",
         "articulo": {
           "id": 1,
           "codigo": 1,
@@ -19945,6 +20060,8 @@ Requires all items to have `cantFisica`. For each line with non-zero variance, u
           },
           "condIva": "",
           "umedida": "",
+          "tipo": "articulo",
+          "unidadServicio": "hora",
           "precioLista1": 1,
           "precioLista2": 1,
           "costo": 1,
@@ -23165,10 +23282,6 @@ Requires `orders.create`. Initial estado is `draft`.
 
   **Items:**
 
-  - **`articuloId` (required)**
-
-    `integer`
-
   - **`cantidad` (required)**
 
     `integer`
@@ -23177,9 +23290,25 @@ Requires `orders.create`. Initial estado is `draft`.
 
     `number`
 
+  - **`articuloId`**
+
+    `integer`
+
+  - **`condIva`**
+
+    `string`, possible values: `"1", "2", "3"`
+
+  - **`descripcion`**
+
+    `string`
+
   - **`dscto`**
 
     `number`
+
+  - **`unidadServicio`**
+
+    `string`, possible values: `"hora", "dia", "mes", "proyecto", "km", "unidad", "otro"`
 
 - **`validUntil`**
 
@@ -23199,6 +23328,9 @@ Requires `orders.create`. Initial estado is `draft`.
   "items": [
     {
       "articuloId": 1,
+      "descripcion": "",
+      "condIva": "1",
+      "unidadServicio": "hora",
       "cantidad": 1,
       "precio": 0,
       "dscto": 0
@@ -23663,10 +23795,6 @@ Requires `orders.create`.
 
   **Items:**
 
-  - **`articuloId` (required)**
-
-    `integer`
-
   - **`cantidad` (required)**
 
     `integer`
@@ -23675,9 +23803,25 @@ Requires `orders.create`.
 
     `number`
 
+  - **`articuloId`**
+
+    `integer`
+
+  - **`condIva`**
+
+    `string`, possible values: `"1", "2", "3"`
+
+  - **`descripcion`**
+
+    `string`
+
   - **`dscto`**
 
     `number`
+
+  - **`unidadServicio`**
+
+    `string`, possible values: `"hora", "dia", "mes", "proyecto", "km", "unidad", "otro"`
 
 - **`validUntil`**
 
@@ -23697,6 +23841,9 @@ Requires `orders.create`.
   "items": [
     {
       "articuloId": 1,
+      "descripcion": "",
+      "condIva": "1",
+      "unidadServicio": "hora",
       "cantidad": 1,
       "precio": 0,
       "dscto": 0
@@ -27193,17 +27340,33 @@ Sets `estado` to `N` (anulada), reverses the customer balance by the invoice tot
 
           `integer`
 
+        - **`tipo`**
+
+          `string`, possible values: `"articulo", "servicio"` — Catalog item kind (#244). Default articulo.
+
         - **`umedida`**
 
           `string`
 
+        - **`unidadServicio`**
+
+          `string`, possible values: `"hora", "dia", "mes", "proyecto", "km", "unidad", "otro"` — Required when tipo is servicio (#244).
+
       - **`articuloId`**
 
-        `integer`
+        `integer` — Null for ad-hoc service lines (#244).
 
       - **`cantidad`**
 
         `number`
+
+      - **`condIva`**
+
+        `string`, possible values: `"1", "2", "3"`
+
+      - **`descripcion`**
+
+        `string` — Line snapshot (catalog or free-text) (#244).
 
       - **`dscto`**
 
@@ -27220,6 +27383,10 @@ Sets `estado` to `N` (anulada), reverses the customer balance by the invoice tot
       - **`subtotal`**
 
         `number`
+
+      - **`unidadServicio`**
+
+        `string`, possible values: `"hora", "dia", "mes", "proyecto", "km", "unidad", "otro"`
 
     - **`iva1`**
 
@@ -27353,6 +27520,9 @@ Sets `estado` to `N` (anulada), reverses the customer balance by the invoice tot
         {
           "id": 1,
           "articuloId": 1,
+          "descripcion": "",
+          "condIva": "1",
+          "unidadServicio": "hora",
           "articulo": {
             "id": 1,
             "codigo": 1,
@@ -27366,6 +27536,8 @@ Sets `estado` to `N` (anulada), reverses the customer balance by the invoice tot
             },
             "condIva": "",
             "umedida": "",
+            "tipo": "articulo",
+            "unidadServicio": "hora",
             "precioLista1": 1,
             "precioLista2": 1,
             "costo": 1,
@@ -36596,7 +36768,7 @@ true
 - **Path:** `/api/reportes/stock-critico`
 - **Tags:** reportes
 
-Active articles with `stock <= minimo`. `deficit = minimo - stock`. Requires permission `reports.operational.read`. Send `Accept: text/csv` for CSV export.
+Active physical articles (`tipo=articulo`) with `stock <= minimo`. Services are excluded (#244). `deficit = minimo - stock`. Requires permission `reports.operational.read`. Send `Accept: text/csv` for CSV export.
 
 #### Responses
 
@@ -36670,6 +36842,137 @@ Active articles with `stock <= minimo`. `deficit = minimo - stock`. Requires per
 
 ```json
 true
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/reportes/ventas-por-tipo
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/reportes/ventas-por-tipo`
+
+### Sales totals by item tipo (product vs service)
+
+- **Method:** `GET`
+- **Path:** `/api/reportes/ventas-por-tipo`
+- **Tags:** reportes
+
+Sums invoice line subtotals for active invoices in the date range, split into `productos` (catalog tipo=articulo) and `servicios` (catalog tipo=servicio or ad-hoc lines) (#244). Requires permission `reports.operational.read`.
+
+#### Responses
+
+##### Status: 200 Product vs service sales totals
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`productos` (required)**
+
+    `string`
+
+  - **`servicios` (required)**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "productos": "",
+    "servicios": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
 ```
 
 ##### Status: 401 Authentication required or invalid credentials
@@ -56750,9 +57053,17 @@ true
 
   `integer`
 
+* **`tipo`**
+
+  `string`, possible values: `"articulo", "servicio"` — Catalog item kind (#244). Default articulo.
+
 * **`umedida`**
 
   `string`
+
+* **`unidadServicio`**
+
+  `string`, possible values: `"hora", "dia", "mes", "proyecto", "km", "unidad", "otro"` — Required when tipo is servicio (#244).
 
 **Example:**
 
@@ -56770,6 +57081,8 @@ true
   },
   "condIva": "",
   "umedida": "",
+  "tipo": "articulo",
+  "unidadServicio": "hora",
   "precioLista1": 1,
   "precioLista2": 1,
   "costo": 1,
@@ -56806,7 +57119,7 @@ true
 
 * **`minimo` (required)**
 
-  `integer`
+  `integer` — Must be 0 when tipo is servicio (#244).
 
 * **`precioLista1` (required)**
 
@@ -56822,11 +57135,19 @@ true
 
 * **`stock` (required)**
 
-  `integer`
+  `integer` — Must be 0 when tipo is servicio (#244).
 
 * **`umedida` (required)**
 
   `string`
+
+* **`tipo`**
+
+  `string`, possible values: `"articulo", "servicio"`, default: `"articulo"`
+
+* **`unidadServicio`**
+
+  `string`, possible values: `"hora", "dia", "mes", "proyecto", "km", "unidad", "otro"`
 
 **Example:**
 
@@ -56837,6 +57158,8 @@ true
   "rubroId": 1,
   "condIva": "1",
   "umedida": "",
+  "tipo": "articulo",
+  "unidadServicio": "hora",
   "precioLista1": 0.01,
   "precioLista2": 0.01,
   "costo": 0.01,
@@ -56920,9 +57243,17 @@ true
 
     `integer`
 
+  - **`tipo`**
+
+    `string`, possible values: `"articulo", "servicio"` — Catalog item kind (#244). Default articulo.
+
   - **`umedida`**
 
     `string`
+
+  - **`unidadServicio`**
+
+    `string`, possible values: `"hora", "dia", "mes", "proyecto", "km", "unidad", "otro"` — Required when tipo is servicio (#244).
 
 * **`success` (required)**
 
@@ -56946,6 +57277,8 @@ true
     },
     "condIva": "",
     "umedida": "",
+    "tipo": "articulo",
+    "unidadServicio": "hora",
     "precioLista1": 1,
     "precioLista2": 1,
     "costo": 1,
@@ -56987,6 +57320,8 @@ true
     },
     "condIva": "",
     "umedida": "",
+    "tipo": "articulo",
+    "unidadServicio": "hora",
     "precioLista1": 1,
     "precioLista2": 1,
     "costo": 1,
@@ -60817,17 +61152,33 @@ true
 
       `integer`
 
+    - **`tipo`**
+
+      `string`, possible values: `"articulo", "servicio"` — Catalog item kind (#244). Default articulo.
+
     - **`umedida`**
 
       `string`
 
+    - **`unidadServicio`**
+
+      `string`, possible values: `"hora", "dia", "mes", "proyecto", "km", "unidad", "otro"` — Required when tipo is servicio (#244).
+
   - **`articuloId`**
 
-    `integer`
+    `integer` — Null for ad-hoc service lines (#244).
 
   - **`cantidad`**
 
     `number`
+
+  - **`condIva`**
+
+    `string`, possible values: `"1", "2", "3"`
+
+  - **`descripcion`**
+
+    `string` — Line snapshot (catalog or free-text) (#244).
 
   - **`dscto`**
 
@@ -60844,6 +61195,10 @@ true
   - **`subtotal`**
 
     `number`
+
+  - **`unidadServicio`**
+
+    `string`, possible values: `"hora", "dia", "mes", "proyecto", "km", "unidad", "otro"`
 
 * **`iva1`**
 
@@ -60906,6 +61261,9 @@ true
     {
       "id": 1,
       "articuloId": 1,
+      "descripcion": "",
+      "condIva": "1",
+      "unidadServicio": "hora",
       "articulo": {
         "id": 1,
         "codigo": 1,
@@ -60919,6 +61277,8 @@ true
         },
         "condIva": "",
         "umedida": "",
+        "tipo": "articulo",
+        "unidadServicio": "hora",
         "precioLista1": 1,
         "precioLista2": 1,
         "costo": 1,
@@ -61006,17 +61366,33 @@ true
 
     `integer`
 
+  - **`tipo`**
+
+    `string`, possible values: `"articulo", "servicio"` — Catalog item kind (#244). Default articulo.
+
   - **`umedida`**
 
     `string`
 
+  - **`unidadServicio`**
+
+    `string`, possible values: `"hora", "dia", "mes", "proyecto", "km", "unidad", "otro"` — Required when tipo is servicio (#244).
+
 * **`articuloId`**
 
-  `integer`
+  `integer` — Null for ad-hoc service lines (#244).
 
 * **`cantidad`**
 
   `number`
+
+* **`condIva`**
+
+  `string`, possible values: `"1", "2", "3"`
+
+* **`descripcion`**
+
+  `string` — Line snapshot (catalog or free-text) (#244).
 
 * **`dscto`**
 
@@ -61034,12 +61410,19 @@ true
 
   `number`
 
+* **`unidadServicio`**
+
+  `string`, possible values: `"hora", "dia", "mes", "proyecto", "km", "unidad", "otro"`
+
 **Example:**
 
 ```json
 {
   "id": 1,
   "articuloId": 1,
+  "descripcion": "",
+  "condIva": "1",
+  "unidadServicio": "hora",
   "articulo": {
     "id": 1,
     "codigo": 1,
@@ -61053,6 +61436,8 @@ true
     },
     "condIva": "",
     "umedida": "",
+    "tipo": "articulo",
+    "unidadServicio": "hora",
     "precioLista1": 1,
     "precioLista2": 1,
     "costo": 1,
@@ -62159,10 +62544,6 @@ true
 
   **Items:**
 
-  - **`articuloId` (required)**
-
-    `integer`
-
   - **`cantidad` (required)**
 
     `number`
@@ -62178,6 +62559,22 @@ true
   - **`subtotal` (required)**
 
     `number`
+
+  - **`articuloId`**
+
+    `integer`
+
+  - **`condIva`**
+
+    `string`, possible values: `"1", "2", "3"`
+
+  - **`descripcion`**
+
+    `string`
+
+  - **`unidadServicio`**
+
+    `string`, possible values: `"hora", "dia", "mes", "proyecto", "km", "unidad", "otro"`
 
 * **`iva1` (required)**
 
@@ -62268,6 +62665,9 @@ true
   "items": [
     {
       "articuloId": 1,
+      "descripcion": "",
+      "condIva": "1",
+      "unidadServicio": "hora",
       "cantidad": 1,
       "precio": 1,
       "dscto": 1,
@@ -62393,17 +62793,33 @@ true
 
         `integer`
 
+      - **`tipo`**
+
+        `string`, possible values: `"articulo", "servicio"` — Catalog item kind (#244). Default articulo.
+
       - **`umedida`**
 
         `string`
 
+      - **`unidadServicio`**
+
+        `string`, possible values: `"hora", "dia", "mes", "proyecto", "km", "unidad", "otro"` — Required when tipo is servicio (#244).
+
     - **`articuloId`**
 
-      `integer`
+      `integer` — Null for ad-hoc service lines (#244).
 
     - **`cantidad`**
 
       `number`
+
+    - **`condIva`**
+
+      `string`, possible values: `"1", "2", "3"`
+
+    - **`descripcion`**
+
+      `string` — Line snapshot (catalog or free-text) (#244).
 
     - **`dscto`**
 
@@ -62420,6 +62836,10 @@ true
     - **`subtotal`**
 
       `number`
+
+    - **`unidadServicio`**
+
+      `string`, possible values: `"hora", "dia", "mes", "proyecto", "km", "unidad", "otro"`
 
   - **`iva1`**
 
@@ -62488,6 +62908,9 @@ true
       {
         "id": 1,
         "articuloId": 1,
+        "descripcion": "",
+        "condIva": "1",
+        "unidadServicio": "hora",
         "articulo": {
           "id": 1,
           "codigo": 1,
@@ -62501,6 +62924,8 @@ true
           },
           "condIva": "",
           "umedida": "",
+          "tipo": "articulo",
+          "unidadServicio": "hora",
           "precioLista1": 1,
           "precioLista2": 1,
           "costo": 1,
@@ -67127,17 +67552,33 @@ Originating invoice header (selected columns)
 
         `integer`
 
+      - **`tipo`**
+
+        `string`, possible values: `"articulo", "servicio"` — Catalog item kind (#244). Default articulo.
+
       - **`umedida`**
 
         `string`
 
+      - **`unidadServicio`**
+
+        `string`, possible values: `"hora", "dia", "mes", "proyecto", "km", "unidad", "otro"` — Required when tipo is servicio (#244).
+
     - **`articuloId`**
 
-      `integer`
+      `integer` — Null for ad-hoc service lines (#244).
 
     - **`cantidad`**
 
       `number`
+
+    - **`condIva`**
+
+      `string`, possible values: `"1", "2", "3"`
+
+    - **`descripcion`**
+
+      `string` — Line snapshot (catalog or free-text) (#244).
 
     - **`dscto`**
 
@@ -67154,6 +67595,10 @@ Originating invoice header (selected columns)
     - **`subtotal`**
 
       `number`
+
+    - **`unidadServicio`**
+
+      `string`, possible values: `"hora", "dia", "mes", "proyecto", "km", "unidad", "otro"`
 
   - **`iva1`**
 
@@ -67281,6 +67726,9 @@ Originating invoice header (selected columns)
       {
         "id": 1,
         "articuloId": 1,
+        "descripcion": "",
+        "condIva": "1",
+        "unidadServicio": "hora",
         "articulo": {
           "id": 1,
           "codigo": 1,
@@ -67294,6 +67742,8 @@ Originating invoice header (selected columns)
           },
           "condIva": "",
           "umedida": "",
+          "tipo": "articulo",
+          "unidadServicio": "hora",
           "precioLista1": 1,
           "precioLista2": 1,
           "costo": 1,
@@ -67447,17 +67897,33 @@ Originating invoice header (selected columns)
 
           `integer`
 
+        - **`tipo`**
+
+          `string`, possible values: `"articulo", "servicio"` — Catalog item kind (#244). Default articulo.
+
         - **`umedida`**
 
           `string`
 
+        - **`unidadServicio`**
+
+          `string`, possible values: `"hora", "dia", "mes", "proyecto", "km", "unidad", "otro"` — Required when tipo is servicio (#244).
+
       - **`articuloId`**
 
-        `integer`
+        `integer` — Null for ad-hoc service lines (#244).
 
       - **`cantidad`**
 
         `number`
+
+      - **`condIva`**
+
+        `string`, possible values: `"1", "2", "3"`
+
+      - **`descripcion`**
+
+        `string` — Line snapshot (catalog or free-text) (#244).
 
       - **`dscto`**
 
@@ -67474,6 +67940,10 @@ Originating invoice header (selected columns)
       - **`subtotal`**
 
         `number`
+
+      - **`unidadServicio`**
+
+        `string`, possible values: `"hora", "dia", "mes", "proyecto", "km", "unidad", "otro"`
 
     - **`iva1`**
 
@@ -67607,6 +68077,9 @@ Originating invoice header (selected columns)
         {
           "id": 1,
           "articuloId": 1,
+          "descripcion": "",
+          "condIva": "1",
+          "unidadServicio": "hora",
           "articulo": {
             "id": 1,
             "codigo": 1,
@@ -67620,6 +68093,8 @@ Originating invoice header (selected columns)
             },
             "condIva": "",
             "umedida": "",
+            "tipo": "articulo",
+            "unidadServicio": "hora",
             "precioLista1": 1,
             "precioLista2": 1,
             "costo": 1,
@@ -69772,10 +70247,6 @@ Originating invoice header (selected columns)
 
   **Items:**
 
-  - **`articuloId` (required)**
-
-    `integer`
-
   - **`cantidad` (required)**
 
     `integer`
@@ -69784,9 +70255,25 @@ Originating invoice header (selected columns)
 
     `number`
 
+  - **`articuloId`**
+
+    `integer`
+
+  - **`condIva`**
+
+    `string`, possible values: `"1", "2", "3"`
+
+  - **`descripcion`**
+
+    `string`
+
   - **`dscto`**
 
     `number`
+
+  - **`unidadServicio`**
+
+    `string`, possible values: `"hora", "dia", "mes", "proyecto", "km", "unidad", "otro"`
 
 * **`validUntil`**
 
@@ -69806,6 +70293,9 @@ Originating invoice header (selected columns)
   "items": [
     {
       "articuloId": 1,
+      "descripcion": "",
+      "condIva": "1",
+      "unidadServicio": "hora",
       "cantidad": 1,
       "precio": 0,
       "dscto": 0

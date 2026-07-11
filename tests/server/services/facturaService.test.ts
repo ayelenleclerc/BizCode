@@ -26,7 +26,18 @@ describe('FacturaService', () => {
   beforeEach(() => {
     prisma = {
       articulo: {
-        findMany: vi.fn().mockResolvedValue([{ id: 7 }]),
+        findMany: vi.fn().mockResolvedValue([
+          {
+            id: 7,
+            codigo: 7,
+            descripcion: 'Art',
+            stock: 10,
+            minimo: 0,
+            tipo: 'articulo',
+            condIva: '1',
+            unidadServicio: null,
+          },
+        ]),
       },
       cliente: {
         findFirst: vi.fn().mockResolvedValue(null),

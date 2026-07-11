@@ -51,12 +51,21 @@ export type ClienteInput = {
   deliveryZoneId?: number | null
 }
 
+/** @en Catalog item kind (#244). @es Tipo de ítem de catálogo (#244). @pt-BR Tipo de item de catálogo (#244). */
+export type ArticuloTipo = 'articulo' | 'servicio'
+
+/** @en Service unit when tipo=servicio (#244). @es Unidad de servicio (#244). @pt-BR Unidade de serviço (#244). */
+export type UnidadServicio = 'hora' | 'dia' | 'mes' | 'proyecto' | 'km' | 'unidad' | 'otro'
+
 export type ArticuloInput = {
   codigo: number
   descripcion: string
   rubroId: number
   condIva: '1' | '2' | '3'
   umedida: string
+  /** @en Defaults to articulo when omitted. @es Por defecto articulo. @pt-BR Padrão articulo. */
+  tipo?: ArticuloTipo
+  unidadServicio?: UnidadServicio | null
   precioLista1: number
   precioLista2: number
   costo: number
@@ -159,7 +168,12 @@ export type ReciboCobroInput = {
 }
 
 export type FacturaItemInput = {
-  articuloId: number
+  /** Null/omitted for ad-hoc service lines (#244). */
+  articuloId?: number | null
+  /** Required for ad-hoc lines; server fills from catalog when articuloId is set. */
+  descripcion?: string
+  condIva?: '1' | '2' | '3'
+  unidadServicio?: UnidadServicio | null
   cantidad: number
   precio: number
   dscto: number
@@ -398,7 +412,11 @@ export type EmpresaInput = {
 }
 
 export type PedidoItemInput = {
-  articuloId: number
+  /** Null/omitted for ad-hoc service lines (#244). */
+  articuloId?: number | null
+  descripcion?: string
+  condIva?: '1' | '2' | '3'
+  unidadServicio?: UnidadServicio | null
   cantidad: number
   precio: number
   dscto: number

@@ -13,3 +13,7 @@ undefined#/properties/items/items/properties/articuloId
 ## articuloId Type
 
 `integer`
+
+## articuloId Constraints
+
+**minimum**: the value of this number must greater than or equal to: `1`

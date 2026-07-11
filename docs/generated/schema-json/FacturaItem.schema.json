@@ -6,10 +6,25 @@
       "$ref": "./Articulo.schema.json"
     },
     "articuloId": {
+      "description": "Null for ad-hoc service lines (#244).",
+      "nullable": true,
       "type": "integer"
     },
     "cantidad": {
       "type": "number"
+    },
+    "condIva": {
+      "enum": [
+        "1",
+        "2",
+        "3"
+      ],
+      "type": "string"
+    },
+    "descripcion": {
+      "description": "Line snapshot (catalog or free-text) (#244).",
+      "maxLength": 120,
+      "type": "string"
     },
     "dscto": {
       "type": "number"
@@ -22,6 +37,19 @@
     },
     "subtotal": {
       "type": "number"
+    },
+    "unidadServicio": {
+      "enum": [
+        "hora",
+        "dia",
+        "mes",
+        "proyecto",
+        "km",
+        "unidad",
+        "otro"
+      ],
+      "nullable": true,
+      "type": "string"
     }
   },
   "title": "FacturaItem",

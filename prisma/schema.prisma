@@ -118,6 +118,14 @@ model Articulo {
   rubro        Rubro  @relation(fields: [rubroId], references: [id])
   condIva      String @db.VarChar(1) // IVA %: 1=21%, 2=10.5%, 3=Exento
   umedida      String @db.VarChar(6)
+  /// @en Catalog item kind: physical article vs service without stock (#244).
+  /// @es Tipo de ítem de catálogo: artículo físico vs servicio sin stock (#244).
+  /// @pt-BR Tipo de item de catálogo: artigo físico vs serviço sem estoque (#244).
+  tipo         String @default("articulo") @db.VarChar(10) // articulo | servicio
+  /// @en Service unit when tipo=servicio (hora, dia, mes, …).
+  /// @es Unidad de servicio cuando tipo=servicio (hora, dia, mes, …).
+  /// @pt-BR Unidade de serviço quando tipo=serviço (hora, dia, mes, …).
+  unidadServicio String? @db.VarChar(12)
   precioLista1 Decimal @db.Decimal(14, 2)
   precioLista2 Decimal @db.Decimal(14, 2)
   costo        Decimal @db.Decimal(13, 2)
@@ -139,6 +147,7 @@ model Articulo {
   @@index([tenantId])
   @@index([tenantId, codigo])
   @@index([tenantId, rubroId])
+  @@index([tenantId, tipo])
 }
 
 model Proveedor {
@@ -602,8 +611,13 @@ model PedidoItem {
   id         Int     @id @default(autoincrement())
   pedidoId   Int
   pedido     Pedido  @relation(fields: [pedidoId], references: [id], onDelete: Cascade)
-  articuloId Int
-  articulo   Articulo @relation(fields: [articuloId], references: [id])
+  /// Null for ad-hoc service lines (#244).
+  articuloId Int?
+  articulo   Articulo? @relation(fields: [articuloId], references: [id], onDelete: Restrict)
+  /// Line snapshot for PDF/reports (catalog or free-text service).
+  descripcion String @default("") @db.VarChar(120)
+  condIva     String @default("1") @db.VarChar(1)
+  unidadServicio String? @db.VarChar(12)
   cantidad   Int     @default(1)
   precio     Decimal @db.Decimal(14, 2)
   dscto      Decimal @db.Decimal(5, 2) @default(0)
@@ -617,8 +631,14 @@ model FacturaItem {
   facturaId Int
   factura   Factura @relation(fields: [facturaId], references: [id], onDelete: Cascade)
 
-  articuloId Int
-  articulo   Articulo @relation(fields: [articuloId], references: [id])
+  /// Null for ad-hoc service lines (#244).
+  articuloId Int?
+  articulo   Articulo? @relation(fields: [articuloId], references: [id], onDelete: Restrict)
+
+  /// Line snapshot for PDF/reports (catalog or free-text service).
+  descripcion String @default("") @db.VarChar(120)
+  condIva     String @default("1") @db.VarChar(1)
+  unidadServicio String? @db.VarChar(12)
 
   cantidad  Int       @default(1)
   precio    Decimal   @db.Decimal(14, 2)

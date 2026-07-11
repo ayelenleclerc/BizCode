@@ -35,10 +35,13 @@ export class StockAjusteService {
   ): Promise<ServiceResult<StockAdjustResult>> {
     const articulo = await this.prisma.articulo.findFirst({
       where: { id: articuloId, tenantId },
-      select: { id: true, codigo: true, descripcion: true, stock: true, minimo: true },
+      select: { id: true, codigo: true, descripcion: true, stock: true, minimo: true, tipo: true },
     })
     if (!articulo) {
       return { ok: false, status: 404, error: 'Articulo not found' }
+    }
+    if (articulo.tipo === 'servicio') {
+      return { ok: false, status: 422, error: 'SERVICE_NO_STOCK' }
     }
 
     const recuentoBlock = await assertNoOpenRecuento(this.prisma, tenantId)
