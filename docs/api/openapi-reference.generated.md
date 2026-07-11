@@ -36954,7 +36954,26 @@ Sums invoice line subtotals for active invoices in the date range, split into `p
 }
 ```
 
-##### Status: 400
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
 
 ##### Status: 401 Authentication required or invalid credentials
 
