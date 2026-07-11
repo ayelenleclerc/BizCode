@@ -117,7 +117,7 @@ test.describe('Critical Paths — Core Business Workflows', () => {
     expect(clienteValue, 'Se espera un cliente creado en el test anterior (E2E Cliente…)').toBeTruthy()
     await clienteSelect.selectOption(clienteValue!)
 
-    await page.getByTestId('btn-agregar-linea-factura').click()
+    await page.getByTestId('btn-add-factura-item').click()
     const lineArticulo = page.getByTestId('factura-line-0-articulo')
     await expect(lineArticulo.locator('option')).not.toHaveCount(1, { timeout: 15_000 })
     const articuloValue = await lineArticulo.locator('option').filter({ hasText: 'E2E Artículo' }).first().getAttribute('value')
