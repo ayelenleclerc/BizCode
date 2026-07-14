@@ -35,6 +35,8 @@ export type {
   PedidoEstado,
   PedidoListResponse,
   PedidoRow,
+  ContratoListResponse,
+  ContratoRow,
   PublicPlanDTO,
   Recuento,
   RecuentoItemRow,
