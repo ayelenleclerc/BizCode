@@ -11,6 +11,10 @@ import type {
   FacturaPrintInput,
   PrintingTestInput,
   FacturaItemInput,
+  ContratoAjusteManualInput,
+  ContratoInput,
+  ContratoItemInput,
+  ContratoUpdateInput,
   PedidoInput,
   PedidoInvoiceInput,
   PedidoItemInput,
@@ -1372,6 +1376,226 @@ export const pedidoInvoiceBodySchema = z
       formaPagoId: data.formaPagoId,
     }),
   )
+
+const contratoFrecuenciaSchema = z.enum(['mensual', 'bimestral', 'trimestral', 'semestral', 'anual'], {
+  errorMap: () => ({
+    message: 'frecuencia must be one of: mensual, bimestral, trimestral, semestral, anual',
+  }),
+})
+
+const contratoItemLineSchema = z
+  .object({
+    articuloId: z.number().nullable().optional(),
+    descripcion: z.string(),
+    condIva: z.enum(['1', '2', '3']).optional(),
+    unidadServicio: z
+      .enum(['hora', 'dia', 'mes', 'proyecto', 'km', 'unidad', 'otro'])
+      .nullable()
+      .optional(),
+    cantidad: z.number(),
+    precioUnit: z.number(),
+    dscto: z.number().optional(),
+  })
+  .superRefine((data, ctx) => {
+    const desc = data.descripcion.trim()
+    if (desc.length < 1 || desc.length > 120) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'descripcion must be 1–120 chars',
+        path: ['descripcion'],
+      })
+    }
+    const hasArticuloId = data.articuloId != null
+    if (hasArticuloId) {
+      if (!Number.isInteger(data.articuloId) || (data.articuloId as number) < 1) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'articuloId must be >= 1', path: ['articuloId'] })
+      }
+    } else if (data.condIva !== '1' && data.condIva !== '2' && data.condIva !== '3') {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'condIva must be one of: 1, 2, 3 for ad-hoc lines',
+        path: ['condIva'],
+      })
+    }
+    if (!Number.isInteger(data.cantidad) || data.cantidad < 1) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'cantidad must be >= 1', path: ['cantidad'] })
+    }
+    if (typeof data.precioUnit !== 'number' || Number.isNaN(data.precioUnit) || data.precioUnit < 0) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'precioUnit must be >= 0', path: ['precioUnit'] })
+    }
+    const ds = data.dscto ?? 0
+    if (typeof ds !== 'number' || Number.isNaN(ds) || ds < 0 || ds > 100) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'dscto must be between 0 and 100', path: ['dscto'] })
+    }
+  })
+  .transform(
+    (data): ContratoItemInput => ({
+      articuloId: data.articuloId ?? null,
+      descripcion: data.descripcion.trim(),
+      condIva: data.condIva,
+      unidadServicio: data.unidadServicio,
+      cantidad: data.cantidad,
+      precioUnit: data.precioUnit,
+      dscto: data.dscto ?? 0,
+    }),
+  )
+
+const contratoAjusteSchema = z
+  .object({
+    tipo: z.enum(['porcentaje_fijo', 'manual'], {
+      errorMap: () => ({ message: 'tipo must be porcentaje_fijo or manual' }),
+    }),
+    porcentaje: z.union([z.number(), z.null()]).optional(),
+    frecuenciaAjuste: contratoFrecuenciaSchema,
+    proximoAjuste: z.string(),
+  })
+  .superRefine((data, ctx) => {
+    if (data.proximoAjuste.trim().length === 0) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'proximoAjuste is required', path: ['proximoAjuste'] })
+    }
+    if (data.tipo === 'porcentaje_fijo') {
+      if (typeof data.porcentaje !== 'number' || Number.isNaN(data.porcentaje) || data.porcentaje <= 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'porcentaje must be > 0 for porcentaje_fijo',
+          path: ['porcentaje'],
+        })
+      }
+    }
+  })
+
+function refineContratoBody(
+  data: {
+    clienteId: number
+    nombre: string
+    diaDelMes: number
+    fechaInicio: string
+    items: unknown[]
+  },
+  ctx: z.RefinementCtx,
+): void {
+  if (!Number.isInteger(data.clienteId) || data.clienteId < 1) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'clienteId must be >= 1', path: ['clienteId'] })
+  }
+  if (data.nombre.trim().length < 1 || data.nombre.trim().length > 120) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'nombre must be 1–120 chars', path: ['nombre'] })
+  }
+  if (!Number.isInteger(data.diaDelMes) || data.diaDelMes < 1 || data.diaDelMes > 31) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'diaDelMes must be 1–31', path: ['diaDelMes'] })
+  }
+  if (data.fechaInicio.trim().length === 0) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'fechaInicio is required', path: ['fechaInicio'] })
+  }
+  if (!Array.isArray(data.items) || data.items.length < 1) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'items must contain at least one line', path: ['items'] })
+  }
+}
+
+const contratoBodyObject = z.object({
+  clienteId: z.number(),
+  nombre: z.string(),
+  descripcion: z.union([z.string(), z.null()]).optional(),
+  frecuencia: contratoFrecuenciaSchema,
+  diaDelMes: z.number(),
+  fechaInicio: z.string(),
+  fechaFin: z.union([z.string(), z.null()]).optional(),
+  proximaFact: z.string().optional(),
+  moneda: z.string().optional(),
+  incluyeIVA: z.boolean().optional(),
+  ivaAlicuota: z.number().optional(),
+  modoEmision: z.enum(['auto', 'revision']).optional(),
+  tipoFactura: z.enum(['A', 'B']).optional(),
+  prefijo: z.string().optional(),
+  items: z.array(contratoItemLineSchema).min(1),
+  ajuste: contratoAjusteSchema.nullable().optional(),
+})
+
+export const contratoBodySchema = contratoBodyObject.superRefine(refineContratoBody).transform(
+  (data): ContratoInput => ({
+    clienteId: data.clienteId,
+    nombre: data.nombre.trim(),
+    descripcion:
+      data.descripcion === undefined || data.descripcion === null
+        ? data.descripcion ?? null
+        : data.descripcion.trim().slice(0, 500),
+    frecuencia: data.frecuencia,
+    diaDelMes: data.diaDelMes,
+    fechaInicio: data.fechaInicio.trim(),
+    fechaFin:
+      data.fechaFin === undefined || data.fechaFin === null ? data.fechaFin ?? null : data.fechaFin.trim(),
+    proximaFact: data.proximaFact?.trim(),
+    moneda: data.moneda?.trim() || 'ARS',
+    incluyeIVA: data.incluyeIVA,
+    ivaAlicuota: data.ivaAlicuota,
+    modoEmision: data.modoEmision,
+    tipoFactura: data.tipoFactura,
+    prefijo: data.prefijo?.trim(),
+    items: data.items,
+    ajuste:
+      data.ajuste === undefined || data.ajuste === null
+        ? data.ajuste ?? null
+        : {
+            tipo: data.ajuste.tipo,
+            porcentaje: data.ajuste.porcentaje,
+            frecuenciaAjuste: data.ajuste.frecuenciaAjuste,
+            proximoAjuste: data.ajuste.proximoAjuste.trim(),
+          },
+  }),
+)
+
+export const contratoUpdateBodySchema = contratoBodyObject
+  .extend({
+    estado: z.enum(['activo', 'pausado', 'finalizado', 'cancelado']).optional(),
+  })
+  .superRefine(refineContratoBody)
+  .transform(
+    (data): ContratoUpdateInput => ({
+      clienteId: data.clienteId,
+      nombre: data.nombre.trim(),
+      descripcion:
+        data.descripcion === undefined || data.descripcion === null
+          ? data.descripcion ?? null
+          : data.descripcion.trim().slice(0, 500),
+      frecuencia: data.frecuencia,
+      diaDelMes: data.diaDelMes,
+      fechaInicio: data.fechaInicio.trim(),
+      fechaFin:
+        data.fechaFin === undefined || data.fechaFin === null ? data.fechaFin ?? null : data.fechaFin.trim(),
+      proximaFact: data.proximaFact?.trim(),
+      moneda: data.moneda?.trim() || 'ARS',
+      incluyeIVA: data.incluyeIVA,
+      ivaAlicuota: data.ivaAlicuota,
+      modoEmision: data.modoEmision,
+      tipoFactura: data.tipoFactura,
+      prefijo: data.prefijo?.trim(),
+      items: data.items,
+      estado: data.estado,
+      ajuste:
+        data.ajuste === undefined || data.ajuste === null
+          ? data.ajuste ?? null
+          : {
+              tipo: data.ajuste.tipo,
+              porcentaje: data.ajuste.porcentaje,
+              frecuenciaAjuste: data.ajuste.frecuenciaAjuste,
+              proximoAjuste: data.ajuste.proximoAjuste.trim(),
+            },
+    }),
+  )
+
+export const contratoAjusteManualBodySchema = z
+  .object({
+    porcentaje: z.number(),
+  })
+  .superRefine((data, ctx) => {
+    if (typeof data.porcentaje !== 'number' || Number.isNaN(data.porcentaje) || data.porcentaje === 0) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'porcentaje must be a non-zero number',
+        path: ['porcentaje'],
+      })
+    }
+  })
+  .transform((data): ContratoAjusteManualInput => ({ porcentaje: data.porcentaje }))
 
 /** Resultado de validar un objeto arbitrario (p. ej. fila CSV → raw) con un schema Zod de dominio. */
 export type SafeParseBodyResult<T> = { ok: true; value: T } | { ok: false; error: string }

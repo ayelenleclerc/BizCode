@@ -1,0 +1,55 @@
+{
+  "title": "Contratos",
+  "subtitle": "Contratos de servicio y facturación recurrente",
+  "newContract": "Nuevo contrato",
+  "empty": "No hay contratos para mostrar.",
+  "loadError": "No se pudieron cargar los contratos.",
+  "createError": "No se pudo crear el contrato.",
+  "actionError": "No se pudo actualizar el contrato.",
+  "columns": {
+    "numero": "N.º",
+    "nombre": "Nombre",
+    "cliente": "Cliente",
+    "estado": "Estado",
+    "proximaFact": "Próx. factura",
+    "monto": "Monto base",
+    "modo": "Emisión",
+    "actions": "Acciones"
+  },
+  "estado": {
+    "activo": "Activo",
+    "pausado": "Pausado",
+    "finalizado": "Finalizado",
+    "cancelado": "Cancelado"
+  },
+  "modo": {
+    "auto": "Automática",
+    "revision": "Revisión"
+  },
+  "pause": "Pausar",
+  "resume": "Reanudar",
+  "viewInvoices": "Facturas",
+  "form": {
+    "title": "Alta de contrato",
+    "clienteId": "ID de cliente",
+    "nombre": "Nombre",
+    "frecuencia": "Frecuencia",
+    "diaDelMes": "Día del mes",
+    "fechaInicio": "Fecha de inicio",
+    "modoEmision": "Modo de emisión",
+    "itemDesc": "Descripción del ítem",
+    "precioUnit": "Precio unitario",
+    "submit": "Guardar",
+    "cancel": "Cancelar"
+  },
+  "frecuencia": {
+    "mensual": "Mensual",
+    "bimestral": "Bimestral",
+    "trimestral": "Trimestral",
+    "semestral": "Semestral",
+    "anual": "Anual"
+  },
+  "invoicesTitle": "Facturas del contrato",
+  "invoicesEmpty": "Aún no hay facturas generadas.",
+  "close": "Cerrar"
+}

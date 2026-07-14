@@ -10,6 +10,8 @@ Versionamento: [Semantic Versioning](https://semver.org/).
 
 ### Adicionado
 
+- **Contratos de serviço recorrentes (#245):** Prisma `Contrato` / `ContratoItem` / `ContratoAjuste` e `Factura.contratoId`; API CRUD com módulo `service.contracts` (`modoEmision` `auto` \| `revision`); job diário `npm run contratos:facturacion` gera faturas via `FacturaService` com catch-up e idempotência; reajustes fixo/manual (IPC/ICL HTTP diferido); notificações in-app para managers; UI listagem/CRUD com pausa/retomada; OpenAPI, testes e i18n EN/ES/PT-BR.
+
 - **Itens de serviço sem estoque (#244):** `Articulo.tipo` (`articulo` \| `servicio`) e `unidadServicio`; snapshots em linhas de fatura/pedido com `articuloId` nullable para serviço livre; validação/decremento de estoque só em artigos físicos; remitos excluem serviços; `GET /api/reportes/ventas-por-tipo`; estoque crítico sem serviços; UI de tipo no catálogo + linha de serviço livre na fatura; OpenAPI, testes e i18n EN/ES/PT-BR.
 
 - **Refator `@bizcode/api-client` (#156):** factory `createApiClient` / `configureApiClients`, módulos por domínio em `packages/api-client/src/modules/`, erros e config separados; bootstrap web com `initApiClientFromEnv()` (`VITE_API_URL`); sem `import.meta` no pacote (pronto para RN); `api.ts` como barrel de reexportação; portal em `modules/portal.ts`.

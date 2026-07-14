@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "properties": {
+    "clienteId": {
+      "type": "integer"
+    },
+    "createdAt": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "descripcion": {
+      "nullable": true,
+      "type": "string"
+    },
+    "diaDelMes": {
+      "maximum": 31,
+      "minimum": 1,
+      "type": "integer"
+    },
+    "estado": {
+      "$ref": "./ContratoEstado.schema.json"
+    },
+    "fechaFin": {
+      "format": "date-time",
+      "nullable": true,
+      "type": "string"
+    },
+    "fechaInicio": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "frecuencia": {
+      "$ref": "./ContratoFrecuencia.schema.json"
+    },
+    "id": {
+      "type": "integer"
+    },
+    "items": {
+      "items": {
+        "$ref": "./ContratoItem.schema.json"
+      },
+      "type": "array"
+    },
+    "modoEmision": {
+      "enum": [
+        "auto",
+        "revision"
+      ],
+      "type": "string"
+    },
+    "moneda": {
+      "type": "string"
+    },
+    "montoBase": {
+      "type": "number"
+    },
+    "nombre": {
+      "type": "string"
+    },
+    "numero": {
+      "type": "integer"
+    },
+    "prefijo": {
+      "type": "string"
+    },
+    "proximaFact": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "tenantId": {
+      "type": "integer"
+    },
+    "tipoFactura": {
+      "enum": [
+        "A",
+        "B"
+      ],
+      "type": "string"
+    },
+    "updatedAt": {
+      "format": "date-time",
+      "type": "string"
+    }
+  },
+  "title": "Contrato",
+  "type": "object"
+}

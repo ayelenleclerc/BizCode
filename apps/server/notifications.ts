@@ -19,6 +19,8 @@ export const NOTIFICATION_TYPES = [
   'mercadopago_payment_received',
   'mercadopago_payment_failed',
   'mercadopago_chargeback',
+  'contract_invoice_generated',
+  'contract_adjustment_due',
 ] as const
 
 export type NotificationType = (typeof NOTIFICATION_TYPES)[number]
@@ -51,6 +53,8 @@ export type NotificationPayload = {
   banco?: string
   mpPaymentId?: string
   mpChargebackId?: string
+  contratoId?: number
+  contratoNumero?: number
 }
 
 /**

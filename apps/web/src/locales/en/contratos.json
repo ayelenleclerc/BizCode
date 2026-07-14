@@ -1,0 +1,55 @@
+{
+  "title": "Contracts",
+  "subtitle": "Service contracts and recurring billing",
+  "newContract": "New contract",
+  "empty": "No contracts to display.",
+  "loadError": "Could not load contracts.",
+  "createError": "Could not create the contract.",
+  "actionError": "Could not update the contract.",
+  "columns": {
+    "numero": "No.",
+    "nombre": "Name",
+    "cliente": "Customer",
+    "estado": "Status",
+    "proximaFact": "Next invoice",
+    "monto": "Base amount",
+    "modo": "Issuance",
+    "actions": "Actions"
+  },
+  "estado": {
+    "activo": "Active",
+    "pausado": "Paused",
+    "finalizado": "Ended",
+    "cancelado": "Cancelled"
+  },
+  "modo": {
+    "auto": "Automatic",
+    "revision": "Review"
+  },
+  "pause": "Pause",
+  "resume": "Resume",
+  "viewInvoices": "Invoices",
+  "form": {
+    "title": "Create contract",
+    "clienteId": "Customer ID",
+    "nombre": "Name",
+    "frecuencia": "Frequency",
+    "diaDelMes": "Day of month",
+    "fechaInicio": "Start date",
+    "modoEmision": "Issuance mode",
+    "itemDesc": "Line description",
+    "precioUnit": "Unit price",
+    "submit": "Save",
+    "cancel": "Cancel"
+  },
+  "frecuencia": {
+    "mensual": "Monthly",
+    "bimestral": "Bimonthly",
+    "trimestral": "Quarterly",
+    "semestral": "Semiannual",
+    "anual": "Annual"
+  },
+  "invoicesTitle": "Contract invoices",
+  "invoicesEmpty": "No invoices generated yet.",
+  "close": "Close"
+}

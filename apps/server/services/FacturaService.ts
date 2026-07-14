@@ -40,6 +40,11 @@ export type FacturaPartialCreditNoteResult = {
   notaCredito: NotaCredito
   updatedCliente: Pick<Cliente, 'id' | 'rsocial' | 'balance' | 'creditLimit'>
 }
+
+export type FacturaCreateOptions = {
+  skipArcaCae?: boolean
+  contratoId?: number | null
+}
 /**
  * @en Invoice domain operations (list, create, void).
  * @es Operaciones de dominio de facturas (listado, alta, anulaci?n).
@@ -71,6 +76,7 @@ export class FacturaService {
     tenantId: number,
     input: FacturaInput,
     userId: number,
+    options?: FacturaCreateOptions,
   ): Promise<ServiceResult<FacturaCreateResult>> {
     const { items, fecha, ...factura } = input
     const clienteId = factura.clienteId
@@ -178,6 +184,7 @@ export class FacturaService {
           ...factura,
           fecha: facturaFechaToPrismaDate(fecha),
           tenantId,
+          ...(options?.contratoId !== undefined ? { contratoId: options.contratoId } : {}),
           items: { create: resolvedItems },
         } as Parameters<typeof this.prisma.factura.create>[0]['data'],
         include: { items: true, cliente: true },
@@ -218,9 +225,11 @@ export class FacturaService {
       return [created, updated] as const
     })
 
-    void this.arca.requestCaeForFactura(tenantId, newFactura.id).catch(() => {
-      /* retry: npm run arca:retry-pending */
-    })
+    if (options?.skipArcaCae !== true) {
+      void this.arca.requestCaeForFactura(tenantId, newFactura.id).catch(() => {
+        /* retry: npm run arca:retry-pending */
+      })
+    }
 
     return {
       ok: true,

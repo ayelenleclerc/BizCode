@@ -29,6 +29,8 @@ import { StockAjusteService } from './StockAjusteService'
 import { RecuentoService } from './RecuentoService'
 import { RepartoService } from './RepartoService'
 import { RepartoUbicacionService } from './RepartoUbicacionService'
+import { ContratoService } from './ContratoService'
+import { ContratoBillingService } from './ContratoBillingService'
 
 export type DomainServices = {
   cliente: ClienteService
@@ -61,6 +63,8 @@ export type DomainServices = {
   remito: RemitoService
   cheque: ChequeService
   import: ImportService
+  contrato: ContratoService
+  contratoBilling: ContratoBillingService
 }
 
 /**
@@ -100,5 +104,7 @@ export function createDomainServices(prisma: PrismaClient): DomainServices {
     remito: new RemitoService(prisma),
     cheque: new ChequeService(prisma),
     import: new ImportService(prisma),
+    contrato: new ContratoService(prisma),
+    contratoBilling: new ContratoBillingService(prisma),
   }
 }

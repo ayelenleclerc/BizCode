@@ -46,6 +46,8 @@ tags:
     description: Argentina AFIP electronic invoicing (CAE; homologación mock in dev)
   - name: pedidos
     description: Commercial orders and quotes (ADR-0009)
+  - name: contratos
+    description: Recurring service contracts and scheduled invoicing (#245, module service.contracts)
   - name: cobros
     description: Customer payment collections
   - name: portal
@@ -3950,6 +3952,277 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RemitoEnvelope'
+
+  /api/contratos:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [contratos]
+      summary: List recurring service contracts
+      description: Requires module `service.contracts` and `sales.create` or `reports.operational.read`.
+      parameters:
+        - $ref: '#/components/parameters/ListLimit'
+        - $ref: '#/components/parameters/ListOffset'
+      responses:
+        '200':
+          description: Paginated contratos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContratoListEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    post:
+      tags: [contratos]
+      summary: Create recurring contract
+      description: Requires module `service.contracts` and `sales.create`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContratoInput'
+      responses:
+        '201':
+          description: Contrato created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContratoEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '422':
+          description: Client suspended or business rule
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/contratos/{id}:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    get:
+      tags: [contratos]
+      summary: Get contrato by id
+      description: Requires module `service.contracts` and `sales.create` or `reports.operational.read`.
+      responses:
+        '200':
+          description: Contrato detail
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContratoEnvelope'
+        '404':
+          description: Contrato not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    put:
+      tags: [contratos]
+      summary: Update contrato
+      description: Requires module `service.contracts` and `sales.create`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContratoUpdateInput'
+      responses:
+        '200':
+          description: Contrato updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContratoEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          description: Contrato not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/contratos/{id}/facturas:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    get:
+      tags: [contratos]
+      summary: List invoices generated for a contract
+      description: Requires module `service.contracts` and `sales.create` or `reports.operational.read`.
+      responses:
+        '200':
+          description: Facturas linked to the contrato
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContratoFacturasEnvelope'
+        '404':
+          description: Contrato not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/contratos/{id}/pause:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    post:
+      tags: [contratos]
+      summary: Pause an active contract
+      description: Requires module `service.contracts` and `sales.create`. Transitions `activo` → `pausado`.
+      responses:
+        '200':
+          description: Contrato paused
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContratoEnvelope'
+        '404':
+          description: Contrato not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '409':
+          description: Invalid state transition
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/contratos/{id}/resume:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    post:
+      tags: [contratos]
+      summary: Resume a paused contract
+      description: Requires module `service.contracts` and `sales.create`. Transitions `pausado` → `activo`.
+      responses:
+        '200':
+          description: Contrato resumed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContratoEnvelope'
+        '404':
+          description: Contrato not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '409':
+          description: Invalid state transition
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/contratos/{id}/ajuste-manual:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    post:
+      tags: [contratos]
+      summary: Apply a manual percentage price adjustment
+      description: Requires module `service.contracts` and `sales.create`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContratoAjusteManualInput'
+      responses:
+        '200':
+          description: Adjustment applied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContratoEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          description: Contrato not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
 
   /api/cobros:
     parameters:
@@ -13750,6 +14023,256 @@ components:
               items:
                 $ref: '#/components/schemas/Pedido'
         - $ref: '#/components/schemas/ListPaginationMeta'
+
+    ContratoFrecuencia:
+      type: string
+      enum: [mensual, bimestral, trimestral, semestral, anual]
+
+    ContratoEstado:
+      type: string
+      enum: [activo, pausado, finalizado, cancelado]
+
+    ContratoItem:
+      type: object
+      additionalProperties: true
+      properties:
+        id:
+          type: integer
+        articuloId:
+          type: integer
+          nullable: true
+        descripcion:
+          type: string
+        condIva:
+          type: string
+          enum: ['1', '2', '3']
+        unidadServicio:
+          type: string
+          nullable: true
+        cantidad:
+          type: integer
+          minimum: 1
+        precioUnit:
+          type: number
+        dscto:
+          type: number
+
+    Contrato:
+      type: object
+      additionalProperties: true
+      properties:
+        id:
+          type: integer
+        tenantId:
+          type: integer
+        numero:
+          type: integer
+        clienteId:
+          type: integer
+        nombre:
+          type: string
+        descripcion:
+          type: string
+          nullable: true
+        estado:
+          $ref: '#/components/schemas/ContratoEstado'
+        frecuencia:
+          $ref: '#/components/schemas/ContratoFrecuencia'
+        diaDelMes:
+          type: integer
+          minimum: 1
+          maximum: 31
+        fechaInicio:
+          type: string
+          format: date-time
+        fechaFin:
+          type: string
+          format: date-time
+          nullable: true
+        proximaFact:
+          type: string
+          format: date-time
+        montoBase:
+          type: number
+        moneda:
+          type: string
+        modoEmision:
+          type: string
+          enum: [auto, revision]
+        tipoFactura:
+          type: string
+          enum: [A, B]
+        prefijo:
+          type: string
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContratoItem'
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    ContratoInput:
+      type: object
+      required: [clienteId, nombre, frecuencia, diaDelMes, fechaInicio, items]
+      properties:
+        clienteId:
+          type: integer
+          minimum: 1
+        nombre:
+          type: string
+          minLength: 1
+          maxLength: 120
+        descripcion:
+          type: string
+          nullable: true
+          maxLength: 500
+        frecuencia:
+          $ref: '#/components/schemas/ContratoFrecuencia'
+        diaDelMes:
+          type: integer
+          minimum: 1
+          maximum: 31
+        fechaInicio:
+          type: string
+        fechaFin:
+          type: string
+          nullable: true
+        proximaFact:
+          type: string
+        moneda:
+          type: string
+          default: ARS
+        incluyeIVA:
+          type: boolean
+        ivaAlicuota:
+          type: number
+        modoEmision:
+          type: string
+          enum: [auto, revision]
+        tipoFactura:
+          type: string
+          enum: [A, B]
+        prefijo:
+          type: string
+        items:
+          type: array
+          minItems: 1
+          items:
+            type: object
+            required: [descripcion, cantidad, precioUnit]
+            properties:
+              articuloId:
+                type: integer
+                nullable: true
+                minimum: 1
+              descripcion:
+                type: string
+                minLength: 1
+                maxLength: 120
+              condIva:
+                type: string
+                enum: ['1', '2', '3']
+              unidadServicio:
+                type: string
+                nullable: true
+              cantidad:
+                type: integer
+                minimum: 1
+              precioUnit:
+                type: number
+                minimum: 0
+              dscto:
+                type: number
+                minimum: 0
+                maximum: 100
+        ajuste:
+          type: object
+          nullable: true
+          required: [tipo, frecuenciaAjuste, proximoAjuste]
+          properties:
+            tipo:
+              type: string
+              enum: [porcentaje_fijo, manual]
+            porcentaje:
+              type: number
+              nullable: true
+            frecuenciaAjuste:
+              $ref: '#/components/schemas/ContratoFrecuencia'
+            proximoAjuste:
+              type: string
+
+    ContratoUpdateInput:
+      allOf:
+        - $ref: '#/components/schemas/ContratoInput'
+        - type: object
+          properties:
+            estado:
+              $ref: '#/components/schemas/ContratoEstado'
+
+    ContratoAjusteManualInput:
+      type: object
+      required: [porcentaje]
+      properties:
+        porcentaje:
+          type: number
+          description: Non-zero percentage to apply to all line unit prices
+
+    ContratoEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/Contrato'
+
+    ContratoListEnvelope:
+      allOf:
+        - type: object
+          required: [success, data]
+          properties:
+            success:
+              type: boolean
+              const: true
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/Contrato'
+        - $ref: '#/components/schemas/ListPaginationMeta'
+
+    ContratoFacturasEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+            properties:
+              id:
+                type: integer
+              fecha:
+                type: string
+                format: date-time
+              tipo:
+                type: string
+              prefijo:
+                type: string
+              numero:
+                type: integer
+              total:
+                type: number
+              estadoCae:
+                type: string
 
     FormaPago:
       type: object

@@ -32,6 +32,13 @@ export const NAV_SECTIONS: readonly NavSection[] = [
     moduleKey: 'billing.orders',
   },
   {
+    key: 'contratos',
+    path: '/contratos',
+    icon: '📑',
+    roles: ['owner', 'manager', 'seller', 'billing', 'backoffice'],
+    moduleKey: 'service.contracts',
+  },
+  {
     key: 'clientes',
     path: '/clientes',
     icon: '📋',
@@ -146,6 +153,7 @@ export const NAV_SECTIONS: readonly NavSection[] = [
 /** @en Paths guarded by ModuleRoute in App.tsx. @es Rutas con ModuleRoute en App.tsx. @pt-BR Rotas com ModuleRoute em App.tsx. */
 export const ROUTE_MODULE_GUARDS: ReadonlyArray<{ path: string; moduleKey: ModuleKey }> = [
   { path: 'pedidos', moduleKey: 'billing.orders' },
+  { path: 'contratos', moduleKey: 'service.contracts' },
   { path: 'logistica', moduleKey: 'logistics.dispatches' },
   { path: 'logistica/picking', moduleKey: 'logistics.picking' },
   { path: 'logistica/seguimiento', moduleKey: 'logistics.gps' },
