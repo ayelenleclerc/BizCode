@@ -24981,6 +24981,2465 @@ Requires `sales.create`. Pedido must be `confirmed`. Creates invoice via Factura
 }
 ```
 
+### PARAMETERS /api/contratos
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/contratos`
+
+### List recurring service contracts
+
+- **Method:** `GET`
+- **Path:** `/api/contratos`
+- **Tags:** contratos
+
+Requires module `service.contracts` and `sales.create` or `reports.operational.read`.
+
+#### Responses
+
+##### Status: 200 Paginated contratos
+
+###### Content-Type: application/json
+
+**All of:**
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`createdAt`**
+
+    `string`, format: `date-time`
+
+  - **`descripcion`**
+
+    `string`
+
+  - **`diaDelMes`**
+
+    `integer`
+
+  - **`estado`**
+
+    `string`, possible values: `"activo", "pausado", "finalizado", "cancelado"`
+
+  - **`fechaFin`**
+
+    `string`, format: `date-time`
+
+  - **`fechaInicio`**
+
+    `string`, format: `date-time`
+
+  - **`frecuencia`**
+
+    `string`, possible values: `"mensual", "bimestral", "trimestral", "semestral", "anual"`
+
+  - **`id`**
+
+    `integer`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId`**
+
+      `integer`
+
+    - **`cantidad`**
+
+      `integer`
+
+    - **`condIva`**
+
+      `string`, possible values: `"1", "2", "3"`
+
+    - **`descripcion`**
+
+      `string`
+
+    - **`dscto`**
+
+      `number`
+
+    - **`id`**
+
+      `integer`
+
+    - **`precioUnit`**
+
+      `number`
+
+    - **`unidadServicio`**
+
+      `string`
+
+  - **`modoEmision`**
+
+    `string`, possible values: `"auto", "revision"`
+
+  - **`moneda`**
+
+    `string`
+
+  - **`montoBase`**
+
+    `number`
+
+  - **`nombre`**
+
+    `string`
+
+  - **`numero`**
+
+    `integer`
+
+  - **`prefijo`**
+
+    `string`
+
+  - **`proximaFact`**
+
+    `string`, format: `date-time`
+
+  - **`tenantId`**
+
+    `integer`
+
+  - **`tipoFactura`**
+
+    `string`, possible values: `"A", "B"`
+
+  - **`updatedAt`**
+
+    `string`, format: `date-time`
+
+- **`success` (required)**
+
+  `boolean`
+
+* **`limit` (required)**
+
+  `integer` — Effective page size (same semantics as query \`limit\`)
+
+* **`offset` (required)**
+
+  `integer` — Effective skip (same semantics as query \`offset\`)
+
+* **`total` (required)**
+
+  `integer` — Row count matching the list filter (before limit/offset)
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "numero": 1,
+      "clienteId": 1,
+      "nombre": "",
+      "descripcion": "",
+      "estado": "activo",
+      "frecuencia": "mensual",
+      "diaDelMes": 1,
+      "fechaInicio": "",
+      "fechaFin": "",
+      "proximaFact": "",
+      "montoBase": 1,
+      "moneda": "",
+      "modoEmision": "auto",
+      "tipoFactura": "A",
+      "prefijo": "",
+      "items": [
+        {
+          "id": 1,
+          "articuloId": 1,
+          "descripcion": "",
+          "condIva": "1",
+          "unidadServicio": "",
+          "cantidad": 1,
+          "precioUnit": 1,
+          "dscto": 1,
+          "additionalProperty": "anything"
+        }
+      ],
+      "createdAt": "",
+      "updatedAt": "",
+      "additionalProperty": "anything"
+    }
+  ],
+  "total": 0,
+  "limit": 1,
+  "offset": 0
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Create recurring contract
+
+- **Method:** `POST`
+- **Path:** `/api/contratos`
+- **Tags:** contratos
+
+Requires module `service.contracts` and `sales.create`.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`clienteId` (required)**
+
+  `integer`
+
+- **`diaDelMes` (required)**
+
+  `integer`
+
+- **`fechaInicio` (required)**
+
+  `string`
+
+- **`frecuencia` (required)**
+
+  `string`, possible values: `"mensual", "bimestral", "trimestral", "semestral", "anual"`
+
+- **`items` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`cantidad` (required)**
+
+    `integer`
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`precioUnit` (required)**
+
+    `number`
+
+  - **`articuloId`**
+
+    `integer`
+
+  - **`condIva`**
+
+    `string`, possible values: `"1", "2", "3"`
+
+  - **`dscto`**
+
+    `number`
+
+  - **`unidadServicio`**
+
+    `string`
+
+- **`nombre` (required)**
+
+  `string`
+
+- **`ajuste`**
+
+  `object`
+
+  - **`frecuenciaAjuste` (required)**
+
+    `string`, possible values: `"mensual", "bimestral", "trimestral", "semestral", "anual"`
+
+  - **`proximoAjuste` (required)**
+
+    `string`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"porcentaje_fijo", "manual"`
+
+  - **`porcentaje`**
+
+    `number`
+
+- **`descripcion`**
+
+  `string`
+
+- **`fechaFin`**
+
+  `string`
+
+- **`incluyeIVA`**
+
+  `boolean`
+
+- **`ivaAlicuota`**
+
+  `number`
+
+- **`modoEmision`**
+
+  `string`, possible values: `"auto", "revision"`
+
+- **`moneda`**
+
+  `string`, default: `"ARS"`
+
+- **`prefijo`**
+
+  `string`
+
+- **`proximaFact`**
+
+  `string`
+
+- **`tipoFactura`**
+
+  `string`, possible values: `"A", "B"`
+
+**Example:**
+
+```json
+{
+  "clienteId": 1,
+  "nombre": "",
+  "descripcion": "",
+  "frecuencia": "mensual",
+  "diaDelMes": 1,
+  "fechaInicio": "",
+  "fechaFin": "",
+  "proximaFact": "",
+  "moneda": "ARS",
+  "incluyeIVA": true,
+  "ivaAlicuota": 1,
+  "modoEmision": "auto",
+  "tipoFactura": "A",
+  "prefijo": "",
+  "items": [
+    {
+      "articuloId": 1,
+      "descripcion": "",
+      "condIva": "1",
+      "unidadServicio": "",
+      "cantidad": 1,
+      "precioUnit": 0,
+      "dscto": 0
+    }
+  ],
+  "ajuste": {
+    "tipo": "porcentaje_fijo",
+    "porcentaje": 1,
+    "frecuenciaAjuste": "mensual",
+    "proximoAjuste": ""
+  }
+}
+```
+
+#### Responses
+
+##### Status: 201 Contrato created
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`createdAt`**
+
+    `string`, format: `date-time`
+
+  - **`descripcion`**
+
+    `string`
+
+  - **`diaDelMes`**
+
+    `integer`
+
+  - **`estado`**
+
+    `string`, possible values: `"activo", "pausado", "finalizado", "cancelado"`
+
+  - **`fechaFin`**
+
+    `string`, format: `date-time`
+
+  - **`fechaInicio`**
+
+    `string`, format: `date-time`
+
+  - **`frecuencia`**
+
+    `string`, possible values: `"mensual", "bimestral", "trimestral", "semestral", "anual"`
+
+  - **`id`**
+
+    `integer`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId`**
+
+      `integer`
+
+    - **`cantidad`**
+
+      `integer`
+
+    - **`condIva`**
+
+      `string`, possible values: `"1", "2", "3"`
+
+    - **`descripcion`**
+
+      `string`
+
+    - **`dscto`**
+
+      `number`
+
+    - **`id`**
+
+      `integer`
+
+    - **`precioUnit`**
+
+      `number`
+
+    - **`unidadServicio`**
+
+      `string`
+
+  - **`modoEmision`**
+
+    `string`, possible values: `"auto", "revision"`
+
+  - **`moneda`**
+
+    `string`
+
+  - **`montoBase`**
+
+    `number`
+
+  - **`nombre`**
+
+    `string`
+
+  - **`numero`**
+
+    `integer`
+
+  - **`prefijo`**
+
+    `string`
+
+  - **`proximaFact`**
+
+    `string`, format: `date-time`
+
+  - **`tenantId`**
+
+    `integer`
+
+  - **`tipoFactura`**
+
+    `string`, possible values: `"A", "B"`
+
+  - **`updatedAt`**
+
+    `string`, format: `date-time`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "numero": 1,
+    "clienteId": 1,
+    "nombre": "",
+    "descripcion": "",
+    "estado": "activo",
+    "frecuencia": "mensual",
+    "diaDelMes": 1,
+    "fechaInicio": "",
+    "fechaFin": "",
+    "proximaFact": "",
+    "montoBase": 1,
+    "moneda": "",
+    "modoEmision": "auto",
+    "tipoFactura": "A",
+    "prefijo": "",
+    "items": [
+      {
+        "id": 1,
+        "articuloId": 1,
+        "descripcion": "",
+        "condIva": "1",
+        "unidadServicio": "",
+        "cantidad": 1,
+        "precioUnit": 1,
+        "dscto": 1,
+        "additionalProperty": "anything"
+      }
+    ],
+    "createdAt": "",
+    "updatedAt": "",
+    "additionalProperty": "anything"
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 422 Client suspended or business rule
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/contratos/{id}
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/contratos/{id}`
+
+### Get contrato by id
+
+- **Method:** `GET`
+- **Path:** `/api/contratos/{id}`
+- **Tags:** contratos
+
+Requires module `service.contracts` and `sales.create` or `reports.operational.read`.
+
+#### Responses
+
+##### Status: 200 Contrato detail
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`createdAt`**
+
+    `string`, format: `date-time`
+
+  - **`descripcion`**
+
+    `string`
+
+  - **`diaDelMes`**
+
+    `integer`
+
+  - **`estado`**
+
+    `string`, possible values: `"activo", "pausado", "finalizado", "cancelado"`
+
+  - **`fechaFin`**
+
+    `string`, format: `date-time`
+
+  - **`fechaInicio`**
+
+    `string`, format: `date-time`
+
+  - **`frecuencia`**
+
+    `string`, possible values: `"mensual", "bimestral", "trimestral", "semestral", "anual"`
+
+  - **`id`**
+
+    `integer`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId`**
+
+      `integer`
+
+    - **`cantidad`**
+
+      `integer`
+
+    - **`condIva`**
+
+      `string`, possible values: `"1", "2", "3"`
+
+    - **`descripcion`**
+
+      `string`
+
+    - **`dscto`**
+
+      `number`
+
+    - **`id`**
+
+      `integer`
+
+    - **`precioUnit`**
+
+      `number`
+
+    - **`unidadServicio`**
+
+      `string`
+
+  - **`modoEmision`**
+
+    `string`, possible values: `"auto", "revision"`
+
+  - **`moneda`**
+
+    `string`
+
+  - **`montoBase`**
+
+    `number`
+
+  - **`nombre`**
+
+    `string`
+
+  - **`numero`**
+
+    `integer`
+
+  - **`prefijo`**
+
+    `string`
+
+  - **`proximaFact`**
+
+    `string`, format: `date-time`
+
+  - **`tenantId`**
+
+    `integer`
+
+  - **`tipoFactura`**
+
+    `string`, possible values: `"A", "B"`
+
+  - **`updatedAt`**
+
+    `string`, format: `date-time`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "numero": 1,
+    "clienteId": 1,
+    "nombre": "",
+    "descripcion": "",
+    "estado": "activo",
+    "frecuencia": "mensual",
+    "diaDelMes": 1,
+    "fechaInicio": "",
+    "fechaFin": "",
+    "proximaFact": "",
+    "montoBase": 1,
+    "moneda": "",
+    "modoEmision": "auto",
+    "tipoFactura": "A",
+    "prefijo": "",
+    "items": [
+      {
+        "id": 1,
+        "articuloId": 1,
+        "descripcion": "",
+        "condIva": "1",
+        "unidadServicio": "",
+        "cantidad": 1,
+        "precioUnit": 1,
+        "dscto": 1,
+        "additionalProperty": "anything"
+      }
+    ],
+    "createdAt": "",
+    "updatedAt": "",
+    "additionalProperty": "anything"
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Contrato not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Update contrato
+
+- **Method:** `PUT`
+- **Path:** `/api/contratos/{id}`
+- **Tags:** contratos
+
+Requires module `service.contracts` and `sales.create`.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+**All of:**
+
+- **`clienteId` (required)**
+
+  `integer`
+
+- **`diaDelMes` (required)**
+
+  `integer`
+
+- **`fechaInicio` (required)**
+
+  `string`
+
+- **`frecuencia` (required)**
+
+  `string`, possible values: `"mensual", "bimestral", "trimestral", "semestral", "anual"`
+
+- **`items` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`cantidad` (required)**
+
+    `integer`
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`precioUnit` (required)**
+
+    `number`
+
+  - **`articuloId`**
+
+    `integer`
+
+  - **`condIva`**
+
+    `string`, possible values: `"1", "2", "3"`
+
+  - **`dscto`**
+
+    `number`
+
+  - **`unidadServicio`**
+
+    `string`
+
+- **`nombre` (required)**
+
+  `string`
+
+- **`ajuste`**
+
+  `object`
+
+  - **`frecuenciaAjuste` (required)**
+
+    `string`, possible values: `"mensual", "bimestral", "trimestral", "semestral", "anual"`
+
+  - **`proximoAjuste` (required)**
+
+    `string`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"porcentaje_fijo", "manual"`
+
+  - **`porcentaje`**
+
+    `number`
+
+- **`descripcion`**
+
+  `string`
+
+- **`fechaFin`**
+
+  `string`
+
+- **`incluyeIVA`**
+
+  `boolean`
+
+- **`ivaAlicuota`**
+
+  `number`
+
+- **`modoEmision`**
+
+  `string`, possible values: `"auto", "revision"`
+
+- **`moneda`**
+
+  `string`, default: `"ARS"`
+
+- **`prefijo`**
+
+  `string`
+
+- **`proximaFact`**
+
+  `string`
+
+- **`tipoFactura`**
+
+  `string`, possible values: `"A", "B"`
+
+* **`estado`**
+
+  `string`, possible values: `"activo", "pausado", "finalizado", "cancelado"`
+
+**Example:**
+
+```json
+{
+  "clienteId": 1,
+  "nombre": "",
+  "descripcion": "",
+  "frecuencia": "mensual",
+  "diaDelMes": 1,
+  "fechaInicio": "",
+  "fechaFin": "",
+  "proximaFact": "",
+  "moneda": "ARS",
+  "incluyeIVA": true,
+  "ivaAlicuota": 1,
+  "modoEmision": "auto",
+  "tipoFactura": "A",
+  "prefijo": "",
+  "items": [
+    {
+      "articuloId": 1,
+      "descripcion": "",
+      "condIva": "1",
+      "unidadServicio": "",
+      "cantidad": 1,
+      "precioUnit": 0,
+      "dscto": 0
+    }
+  ],
+  "ajuste": {
+    "tipo": "porcentaje_fijo",
+    "porcentaje": 1,
+    "frecuenciaAjuste": "mensual",
+    "proximoAjuste": ""
+  },
+  "estado": "activo"
+}
+```
+
+#### Responses
+
+##### Status: 200 Contrato updated
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`createdAt`**
+
+    `string`, format: `date-time`
+
+  - **`descripcion`**
+
+    `string`
+
+  - **`diaDelMes`**
+
+    `integer`
+
+  - **`estado`**
+
+    `string`, possible values: `"activo", "pausado", "finalizado", "cancelado"`
+
+  - **`fechaFin`**
+
+    `string`, format: `date-time`
+
+  - **`fechaInicio`**
+
+    `string`, format: `date-time`
+
+  - **`frecuencia`**
+
+    `string`, possible values: `"mensual", "bimestral", "trimestral", "semestral", "anual"`
+
+  - **`id`**
+
+    `integer`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId`**
+
+      `integer`
+
+    - **`cantidad`**
+
+      `integer`
+
+    - **`condIva`**
+
+      `string`, possible values: `"1", "2", "3"`
+
+    - **`descripcion`**
+
+      `string`
+
+    - **`dscto`**
+
+      `number`
+
+    - **`id`**
+
+      `integer`
+
+    - **`precioUnit`**
+
+      `number`
+
+    - **`unidadServicio`**
+
+      `string`
+
+  - **`modoEmision`**
+
+    `string`, possible values: `"auto", "revision"`
+
+  - **`moneda`**
+
+    `string`
+
+  - **`montoBase`**
+
+    `number`
+
+  - **`nombre`**
+
+    `string`
+
+  - **`numero`**
+
+    `integer`
+
+  - **`prefijo`**
+
+    `string`
+
+  - **`proximaFact`**
+
+    `string`, format: `date-time`
+
+  - **`tenantId`**
+
+    `integer`
+
+  - **`tipoFactura`**
+
+    `string`, possible values: `"A", "B"`
+
+  - **`updatedAt`**
+
+    `string`, format: `date-time`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "numero": 1,
+    "clienteId": 1,
+    "nombre": "",
+    "descripcion": "",
+    "estado": "activo",
+    "frecuencia": "mensual",
+    "diaDelMes": 1,
+    "fechaInicio": "",
+    "fechaFin": "",
+    "proximaFact": "",
+    "montoBase": 1,
+    "moneda": "",
+    "modoEmision": "auto",
+    "tipoFactura": "A",
+    "prefijo": "",
+    "items": [
+      {
+        "id": 1,
+        "articuloId": 1,
+        "descripcion": "",
+        "condIva": "1",
+        "unidadServicio": "",
+        "cantidad": 1,
+        "precioUnit": 1,
+        "dscto": 1,
+        "additionalProperty": "anything"
+      }
+    ],
+    "createdAt": "",
+    "updatedAt": "",
+    "additionalProperty": "anything"
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Contrato not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/contratos/{id}/facturas
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/contratos/{id}/facturas`
+
+### List invoices generated for a contract
+
+- **Method:** `GET`
+- **Path:** `/api/contratos/{id}/facturas`
+- **Tags:** contratos
+
+Requires module `service.contracts` and `sales.create` or `reports.operational.read`.
+
+#### Responses
+
+##### Status: 200 Facturas linked to the contrato
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`estadoCae`**
+
+    `string`
+
+  - **`fecha`**
+
+    `string`, format: `date-time`
+
+  - **`id`**
+
+    `integer`
+
+  - **`numero`**
+
+    `integer`
+
+  - **`prefijo`**
+
+    `string`
+
+  - **`tipo`**
+
+    `string`
+
+  - **`total`**
+
+    `number`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "fecha": "",
+      "tipo": "",
+      "prefijo": "",
+      "numero": 1,
+      "total": 1,
+      "estadoCae": "",
+      "additionalProperty": "anything"
+    }
+  ]
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Contrato not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/contratos/{id}/pause
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/contratos/{id}/pause`
+
+### Pause an active contract
+
+- **Method:** `POST`
+- **Path:** `/api/contratos/{id}/pause`
+- **Tags:** contratos
+
+Requires module `service.contracts` and `sales.create`. Transitions `activo` → `pausado`.
+
+#### Responses
+
+##### Status: 200 Contrato paused
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`createdAt`**
+
+    `string`, format: `date-time`
+
+  - **`descripcion`**
+
+    `string`
+
+  - **`diaDelMes`**
+
+    `integer`
+
+  - **`estado`**
+
+    `string`, possible values: `"activo", "pausado", "finalizado", "cancelado"`
+
+  - **`fechaFin`**
+
+    `string`, format: `date-time`
+
+  - **`fechaInicio`**
+
+    `string`, format: `date-time`
+
+  - **`frecuencia`**
+
+    `string`, possible values: `"mensual", "bimestral", "trimestral", "semestral", "anual"`
+
+  - **`id`**
+
+    `integer`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId`**
+
+      `integer`
+
+    - **`cantidad`**
+
+      `integer`
+
+    - **`condIva`**
+
+      `string`, possible values: `"1", "2", "3"`
+
+    - **`descripcion`**
+
+      `string`
+
+    - **`dscto`**
+
+      `number`
+
+    - **`id`**
+
+      `integer`
+
+    - **`precioUnit`**
+
+      `number`
+
+    - **`unidadServicio`**
+
+      `string`
+
+  - **`modoEmision`**
+
+    `string`, possible values: `"auto", "revision"`
+
+  - **`moneda`**
+
+    `string`
+
+  - **`montoBase`**
+
+    `number`
+
+  - **`nombre`**
+
+    `string`
+
+  - **`numero`**
+
+    `integer`
+
+  - **`prefijo`**
+
+    `string`
+
+  - **`proximaFact`**
+
+    `string`, format: `date-time`
+
+  - **`tenantId`**
+
+    `integer`
+
+  - **`tipoFactura`**
+
+    `string`, possible values: `"A", "B"`
+
+  - **`updatedAt`**
+
+    `string`, format: `date-time`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "numero": 1,
+    "clienteId": 1,
+    "nombre": "",
+    "descripcion": "",
+    "estado": "activo",
+    "frecuencia": "mensual",
+    "diaDelMes": 1,
+    "fechaInicio": "",
+    "fechaFin": "",
+    "proximaFact": "",
+    "montoBase": 1,
+    "moneda": "",
+    "modoEmision": "auto",
+    "tipoFactura": "A",
+    "prefijo": "",
+    "items": [
+      {
+        "id": 1,
+        "articuloId": 1,
+        "descripcion": "",
+        "condIva": "1",
+        "unidadServicio": "",
+        "cantidad": 1,
+        "precioUnit": 1,
+        "dscto": 1,
+        "additionalProperty": "anything"
+      }
+    ],
+    "createdAt": "",
+    "updatedAt": "",
+    "additionalProperty": "anything"
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Contrato not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 409 Invalid state transition
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/contratos/{id}/resume
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/contratos/{id}/resume`
+
+### Resume a paused contract
+
+- **Method:** `POST`
+- **Path:** `/api/contratos/{id}/resume`
+- **Tags:** contratos
+
+Requires module `service.contracts` and `sales.create`. Transitions `pausado` → `activo`.
+
+#### Responses
+
+##### Status: 200 Contrato resumed
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`createdAt`**
+
+    `string`, format: `date-time`
+
+  - **`descripcion`**
+
+    `string`
+
+  - **`diaDelMes`**
+
+    `integer`
+
+  - **`estado`**
+
+    `string`, possible values: `"activo", "pausado", "finalizado", "cancelado"`
+
+  - **`fechaFin`**
+
+    `string`, format: `date-time`
+
+  - **`fechaInicio`**
+
+    `string`, format: `date-time`
+
+  - **`frecuencia`**
+
+    `string`, possible values: `"mensual", "bimestral", "trimestral", "semestral", "anual"`
+
+  - **`id`**
+
+    `integer`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId`**
+
+      `integer`
+
+    - **`cantidad`**
+
+      `integer`
+
+    - **`condIva`**
+
+      `string`, possible values: `"1", "2", "3"`
+
+    - **`descripcion`**
+
+      `string`
+
+    - **`dscto`**
+
+      `number`
+
+    - **`id`**
+
+      `integer`
+
+    - **`precioUnit`**
+
+      `number`
+
+    - **`unidadServicio`**
+
+      `string`
+
+  - **`modoEmision`**
+
+    `string`, possible values: `"auto", "revision"`
+
+  - **`moneda`**
+
+    `string`
+
+  - **`montoBase`**
+
+    `number`
+
+  - **`nombre`**
+
+    `string`
+
+  - **`numero`**
+
+    `integer`
+
+  - **`prefijo`**
+
+    `string`
+
+  - **`proximaFact`**
+
+    `string`, format: `date-time`
+
+  - **`tenantId`**
+
+    `integer`
+
+  - **`tipoFactura`**
+
+    `string`, possible values: `"A", "B"`
+
+  - **`updatedAt`**
+
+    `string`, format: `date-time`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "numero": 1,
+    "clienteId": 1,
+    "nombre": "",
+    "descripcion": "",
+    "estado": "activo",
+    "frecuencia": "mensual",
+    "diaDelMes": 1,
+    "fechaInicio": "",
+    "fechaFin": "",
+    "proximaFact": "",
+    "montoBase": 1,
+    "moneda": "",
+    "modoEmision": "auto",
+    "tipoFactura": "A",
+    "prefijo": "",
+    "items": [
+      {
+        "id": 1,
+        "articuloId": 1,
+        "descripcion": "",
+        "condIva": "1",
+        "unidadServicio": "",
+        "cantidad": 1,
+        "precioUnit": 1,
+        "dscto": 1,
+        "additionalProperty": "anything"
+      }
+    ],
+    "createdAt": "",
+    "updatedAt": "",
+    "additionalProperty": "anything"
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Contrato not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 409 Invalid state transition
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/contratos/{id}/ajuste-manual
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/contratos/{id}/ajuste-manual`
+
+### Apply a manual percentage price adjustment
+
+- **Method:** `POST`
+- **Path:** `/api/contratos/{id}/ajuste-manual`
+- **Tags:** contratos
+
+Requires module `service.contracts` and `sales.create`.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`porcentaje` (required)**
+
+  `number` — Non-zero percentage to apply to all line unit prices
+
+**Example:**
+
+```json
+{
+  "porcentaje": 1
+}
+```
+
+#### Responses
+
+##### Status: 200 Adjustment applied
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`createdAt`**
+
+    `string`, format: `date-time`
+
+  - **`descripcion`**
+
+    `string`
+
+  - **`diaDelMes`**
+
+    `integer`
+
+  - **`estado`**
+
+    `string`, possible values: `"activo", "pausado", "finalizado", "cancelado"`
+
+  - **`fechaFin`**
+
+    `string`, format: `date-time`
+
+  - **`fechaInicio`**
+
+    `string`, format: `date-time`
+
+  - **`frecuencia`**
+
+    `string`, possible values: `"mensual", "bimestral", "trimestral", "semestral", "anual"`
+
+  - **`id`**
+
+    `integer`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId`**
+
+      `integer`
+
+    - **`cantidad`**
+
+      `integer`
+
+    - **`condIva`**
+
+      `string`, possible values: `"1", "2", "3"`
+
+    - **`descripcion`**
+
+      `string`
+
+    - **`dscto`**
+
+      `number`
+
+    - **`id`**
+
+      `integer`
+
+    - **`precioUnit`**
+
+      `number`
+
+    - **`unidadServicio`**
+
+      `string`
+
+  - **`modoEmision`**
+
+    `string`, possible values: `"auto", "revision"`
+
+  - **`moneda`**
+
+    `string`
+
+  - **`montoBase`**
+
+    `number`
+
+  - **`nombre`**
+
+    `string`
+
+  - **`numero`**
+
+    `integer`
+
+  - **`prefijo`**
+
+    `string`
+
+  - **`proximaFact`**
+
+    `string`, format: `date-time`
+
+  - **`tenantId`**
+
+    `integer`
+
+  - **`tipoFactura`**
+
+    `string`, possible values: `"A", "B"`
+
+  - **`updatedAt`**
+
+    `string`, format: `date-time`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "numero": 1,
+    "clienteId": 1,
+    "nombre": "",
+    "descripcion": "",
+    "estado": "activo",
+    "frecuencia": "mensual",
+    "diaDelMes": 1,
+    "fechaInicio": "",
+    "fechaFin": "",
+    "proximaFact": "",
+    "montoBase": 1,
+    "moneda": "",
+    "modoEmision": "auto",
+    "tipoFactura": "A",
+    "prefijo": "",
+    "items": [
+      {
+        "id": 1,
+        "articuloId": 1,
+        "descripcion": "",
+        "condIva": "1",
+        "unidadServicio": "",
+        "cantidad": 1,
+        "precioUnit": 1,
+        "dscto": 1,
+        "additionalProperty": "anything"
+      }
+    ],
+    "createdAt": "",
+    "updatedAt": "",
+    "additionalProperty": "anything"
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Contrato not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ### PARAMETERS /api/cobros
 
 - **Method:** `PARAMETERS`
@@ -70459,6 +72918,639 @@ Originating invoice header (selected columns)
 - **Type:**
 
 **Example:**
+
+### ContratoFrecuencia
+
+- **Type:**`string`
+
+**Example:**
+
+### ContratoEstado
+
+- **Type:**`string`
+
+**Example:**
+
+### ContratoItem
+
+- **Type:**`object`
+
+* **`articuloId`**
+
+  `integer`
+
+* **`cantidad`**
+
+  `integer`
+
+* **`condIva`**
+
+  `string`, possible values: `"1", "2", "3"`
+
+* **`descripcion`**
+
+  `string`
+
+* **`dscto`**
+
+  `number`
+
+* **`id`**
+
+  `integer`
+
+* **`precioUnit`**
+
+  `number`
+
+* **`unidadServicio`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "articuloId": 1,
+  "descripcion": "",
+  "condIva": "1",
+  "unidadServicio": "",
+  "cantidad": 1,
+  "precioUnit": 1,
+  "dscto": 1,
+  "additionalProperty": "anything"
+}
+```
+
+### Contrato
+
+- **Type:**`object`
+
+* **`clienteId`**
+
+  `integer`
+
+* **`createdAt`**
+
+  `string`, format: `date-time`
+
+* **`descripcion`**
+
+  `string`
+
+* **`diaDelMes`**
+
+  `integer`
+
+* **`estado`**
+
+  `string`, possible values: `"activo", "pausado", "finalizado", "cancelado"`
+
+* **`fechaFin`**
+
+  `string`, format: `date-time`
+
+* **`fechaInicio`**
+
+  `string`, format: `date-time`
+
+* **`frecuencia`**
+
+  `string`, possible values: `"mensual", "bimestral", "trimestral", "semestral", "anual"`
+
+* **`id`**
+
+  `integer`
+
+* **`items`**
+
+  `array`
+
+  **Items:**
+
+  - **`articuloId`**
+
+    `integer`
+
+  - **`cantidad`**
+
+    `integer`
+
+  - **`condIva`**
+
+    `string`, possible values: `"1", "2", "3"`
+
+  - **`descripcion`**
+
+    `string`
+
+  - **`dscto`**
+
+    `number`
+
+  - **`id`**
+
+    `integer`
+
+  - **`precioUnit`**
+
+    `number`
+
+  - **`unidadServicio`**
+
+    `string`
+
+* **`modoEmision`**
+
+  `string`, possible values: `"auto", "revision"`
+
+* **`moneda`**
+
+  `string`
+
+* **`montoBase`**
+
+  `number`
+
+* **`nombre`**
+
+  `string`
+
+* **`numero`**
+
+  `integer`
+
+* **`prefijo`**
+
+  `string`
+
+* **`proximaFact`**
+
+  `string`, format: `date-time`
+
+* **`tenantId`**
+
+  `integer`
+
+* **`tipoFactura`**
+
+  `string`, possible values: `"A", "B"`
+
+* **`updatedAt`**
+
+  `string`, format: `date-time`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "tenantId": 1,
+  "numero": 1,
+  "clienteId": 1,
+  "nombre": "",
+  "descripcion": "",
+  "estado": "activo",
+  "frecuencia": "mensual",
+  "diaDelMes": 1,
+  "fechaInicio": "",
+  "fechaFin": "",
+  "proximaFact": "",
+  "montoBase": 1,
+  "moneda": "",
+  "modoEmision": "auto",
+  "tipoFactura": "A",
+  "prefijo": "",
+  "items": [
+    {
+      "id": 1,
+      "articuloId": 1,
+      "descripcion": "",
+      "condIva": "1",
+      "unidadServicio": "",
+      "cantidad": 1,
+      "precioUnit": 1,
+      "dscto": 1,
+      "additionalProperty": "anything"
+    }
+  ],
+  "createdAt": "",
+  "updatedAt": "",
+  "additionalProperty": "anything"
+}
+```
+
+### ContratoInput
+
+- **Type:**`object`
+
+* **`clienteId` (required)**
+
+  `integer`
+
+* **`diaDelMes` (required)**
+
+  `integer`
+
+* **`fechaInicio` (required)**
+
+  `string`
+
+* **`frecuencia` (required)**
+
+  `string`, possible values: `"mensual", "bimestral", "trimestral", "semestral", "anual"`
+
+* **`items` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`cantidad` (required)**
+
+    `integer`
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`precioUnit` (required)**
+
+    `number`
+
+  - **`articuloId`**
+
+    `integer`
+
+  - **`condIva`**
+
+    `string`, possible values: `"1", "2", "3"`
+
+  - **`dscto`**
+
+    `number`
+
+  - **`unidadServicio`**
+
+    `string`
+
+* **`nombre` (required)**
+
+  `string`
+
+* **`ajuste`**
+
+  `object`
+
+  - **`frecuenciaAjuste` (required)**
+
+    `string`, possible values: `"mensual", "bimestral", "trimestral", "semestral", "anual"`
+
+  - **`proximoAjuste` (required)**
+
+    `string`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"porcentaje_fijo", "manual"`
+
+  - **`porcentaje`**
+
+    `number`
+
+* **`descripcion`**
+
+  `string`
+
+* **`fechaFin`**
+
+  `string`
+
+* **`incluyeIVA`**
+
+  `boolean`
+
+* **`ivaAlicuota`**
+
+  `number`
+
+* **`modoEmision`**
+
+  `string`, possible values: `"auto", "revision"`
+
+* **`moneda`**
+
+  `string`, default: `"ARS"`
+
+* **`prefijo`**
+
+  `string`
+
+* **`proximaFact`**
+
+  `string`
+
+* **`tipoFactura`**
+
+  `string`, possible values: `"A", "B"`
+
+**Example:**
+
+```json
+{
+  "clienteId": 1,
+  "nombre": "",
+  "descripcion": "",
+  "frecuencia": "mensual",
+  "diaDelMes": 1,
+  "fechaInicio": "",
+  "fechaFin": "",
+  "proximaFact": "",
+  "moneda": "ARS",
+  "incluyeIVA": true,
+  "ivaAlicuota": 1,
+  "modoEmision": "auto",
+  "tipoFactura": "A",
+  "prefijo": "",
+  "items": [
+    {
+      "articuloId": 1,
+      "descripcion": "",
+      "condIva": "1",
+      "unidadServicio": "",
+      "cantidad": 1,
+      "precioUnit": 0,
+      "dscto": 0
+    }
+  ],
+  "ajuste": {
+    "tipo": "porcentaje_fijo",
+    "porcentaje": 1,
+    "frecuenciaAjuste": "mensual",
+    "proximoAjuste": ""
+  }
+}
+```
+
+### ContratoUpdateInput
+
+- **Type:**
+
+**Example:**
+
+### ContratoAjusteManualInput
+
+- **Type:**`object`
+
+* **`porcentaje` (required)**
+
+  `number` — Non-zero percentage to apply to all line unit prices
+
+**Example:**
+
+```json
+{
+  "porcentaje": 1
+}
+```
+
+### ContratoEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`createdAt`**
+
+    `string`, format: `date-time`
+
+  - **`descripcion`**
+
+    `string`
+
+  - **`diaDelMes`**
+
+    `integer`
+
+  - **`estado`**
+
+    `string`, possible values: `"activo", "pausado", "finalizado", "cancelado"`
+
+  - **`fechaFin`**
+
+    `string`, format: `date-time`
+
+  - **`fechaInicio`**
+
+    `string`, format: `date-time`
+
+  - **`frecuencia`**
+
+    `string`, possible values: `"mensual", "bimestral", "trimestral", "semestral", "anual"`
+
+  - **`id`**
+
+    `integer`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId`**
+
+      `integer`
+
+    - **`cantidad`**
+
+      `integer`
+
+    - **`condIva`**
+
+      `string`, possible values: `"1", "2", "3"`
+
+    - **`descripcion`**
+
+      `string`
+
+    - **`dscto`**
+
+      `number`
+
+    - **`id`**
+
+      `integer`
+
+    - **`precioUnit`**
+
+      `number`
+
+    - **`unidadServicio`**
+
+      `string`
+
+  - **`modoEmision`**
+
+    `string`, possible values: `"auto", "revision"`
+
+  - **`moneda`**
+
+    `string`
+
+  - **`montoBase`**
+
+    `number`
+
+  - **`nombre`**
+
+    `string`
+
+  - **`numero`**
+
+    `integer`
+
+  - **`prefijo`**
+
+    `string`
+
+  - **`proximaFact`**
+
+    `string`, format: `date-time`
+
+  - **`tenantId`**
+
+    `integer`
+
+  - **`tipoFactura`**
+
+    `string`, possible values: `"A", "B"`
+
+  - **`updatedAt`**
+
+    `string`, format: `date-time`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "numero": 1,
+    "clienteId": 1,
+    "nombre": "",
+    "descripcion": "",
+    "estado": "activo",
+    "frecuencia": "mensual",
+    "diaDelMes": 1,
+    "fechaInicio": "",
+    "fechaFin": "",
+    "proximaFact": "",
+    "montoBase": 1,
+    "moneda": "",
+    "modoEmision": "auto",
+    "tipoFactura": "A",
+    "prefijo": "",
+    "items": [
+      {
+        "id": 1,
+        "articuloId": 1,
+        "descripcion": "",
+        "condIva": "1",
+        "unidadServicio": "",
+        "cantidad": 1,
+        "precioUnit": 1,
+        "dscto": 1,
+        "additionalProperty": "anything"
+      }
+    ],
+    "createdAt": "",
+    "updatedAt": "",
+    "additionalProperty": "anything"
+  }
+}
+```
+
+### ContratoListEnvelope
+
+- **Type:**
+
+**Example:**
+
+### ContratoFacturasEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`estadoCae`**
+
+    `string`
+
+  - **`fecha`**
+
+    `string`, format: `date-time`
+
+  - **`id`**
+
+    `integer`
+
+  - **`numero`**
+
+    `integer`
+
+  - **`prefijo`**
+
+    `string`
+
+  - **`tipo`**
+
+    `string`
+
+  - **`total`**
+
+    `number`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "fecha": "",
+      "tipo": "",
+      "prefijo": "",
+      "numero": 1,
+      "total": 1,
+      "estadoCae": "",
+      "additionalProperty": "anything"
+    }
+  ]
+}
+```
 
 ### FormaPago
 

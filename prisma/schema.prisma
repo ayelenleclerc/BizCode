@@ -80,6 +80,7 @@ model Cliente {
 
   facturas       Factura[]
   pedidos        Pedido[]
+  contratos      Contrato[]
   cobros         Cobro[]
   ordenesEntrega OrdenEntrega[]
   remitos        Remito[]
@@ -137,6 +138,7 @@ model Articulo {
 
   facturaItems     FacturaItem[]
   pedidoItems      PedidoItem[]
+  contratoItems    ContratoItem[]
   remitoItems      RemitoItem[]
   stockAjustes     StockAjuste[]
   ordenCompraItems     OrdenCompraItem[]
@@ -435,6 +437,10 @@ model Factura {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 
+  /// Recurring contract that generated this invoice (#245); null for ad-hoc sales.
+  contratoId  Int?
+  contrato    Contrato? @relation(fields: [contratoId], references: [id], onDelete: SetNull)
+
   items          FacturaItem[]
   ordenesEntrega OrdenEntrega[]
   recordatorios  CobroRecordatorio[]
@@ -454,6 +460,78 @@ model Factura {
   @@index([tenantId, fecha])
   @@index([tenantId, estado, fecha])
   @@index([tenantId, clienteId])
+  @@index([tenantId, contratoId])
+}
+
+/// Recurring service contract with scheduled invoicing (#245).
+model Contrato {
+  id          Int      @id @default(autoincrement())
+  tenantId    Int
+  tenant      Tenant   @relation(fields: [tenantId], references: [id])
+  numero      Int
+  clienteId   Int
+  cliente     Cliente  @relation(fields: [clienteId], references: [id])
+  nombre      String   @db.VarChar(120)
+  descripcion String?  @db.VarChar(500)
+  /// activo | pausado | finalizado | cancelado
+  estado      String   @db.VarChar(20) @default("activo")
+  /// mensual | bimestral | trimestral | semestral | anual
+  frecuencia  String   @db.VarChar(20) @default("mensual")
+  diaDelMes   Int      @default(1)
+  fechaInicio DateTime
+  fechaFin    DateTime?
+  proximaFact DateTime
+  montoBase   Decimal  @db.Decimal(14, 2) @default(0)
+  moneda      String   @default("ARS") @db.VarChar(3)
+  incluyeIVA  Boolean  @default(false)
+  ivaAlicuota Decimal  @db.Decimal(5, 2) @default(21)
+  /// auto = create invoice + current CAE flow; revision = create invoice without ARCA (#245).
+  modoEmision String   @default("revision") @db.VarChar(20)
+  tipoFactura String   @default("B") @db.VarChar(1)
+  prefijo     String   @default("0001") @db.VarChar(4)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  items    ContratoItem[]
+  ajuste   ContratoAjuste?
+  facturas Factura[]
+
+  @@unique([tenantId, numero])
+  @@index([tenantId, estado])
+  @@index([tenantId, proximaFact])
+  @@index([tenantId, clienteId])
+}
+
+model ContratoItem {
+  id             Int       @id @default(autoincrement())
+  contratoId     Int
+  contrato       Contrato  @relation(fields: [contratoId], references: [id], onDelete: Cascade)
+  articuloId     Int?
+  articulo       Articulo? @relation(fields: [articuloId], references: [id], onDelete: Restrict)
+  descripcion    String    @db.VarChar(120)
+  condIva        String    @default("1") @db.VarChar(1)
+  unidadServicio String?   @db.VarChar(12)
+  cantidad       Int       @default(1)
+  precioUnit     Decimal   @db.Decimal(14, 2)
+  dscto          Decimal   @db.Decimal(5, 2) @default(0)
+  createdAt      DateTime  @default(now())
+
+  @@index([contratoId])
+}
+
+/// Price adjustment schedule for a contract (#245). IPC/ICL HTTP deferred; porcentaje_fijo | manual only.
+model ContratoAjuste {
+  id               Int      @id @default(autoincrement())
+  contratoId       Int      @unique
+  contrato         Contrato @relation(fields: [contratoId], references: [id], onDelete: Cascade)
+  /// porcentaje_fijo | manual
+  tipo             String   @db.VarChar(20)
+  porcentaje       Decimal? @db.Decimal(8, 4)
+  /// mensual | bimestral | trimestral | semestral | anual
+  frecuenciaAjuste String   @db.VarChar(20)
+  proximoAjuste    DateTime
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 }
 
 
@@ -715,6 +793,7 @@ model Tenant {
   facturas       Factura[]
   notasCredito   NotaCredito[]
   pedidos        Pedido[]
+  contratos      Contrato[]
   cobros         Cobro[]
   cobroRecordatorios CobroRecordatorio[]
   ordenesEntrega OrdenEntrega[]

@@ -30,6 +30,7 @@ const TEST_DEFAULT_MODULES: ModuleKey[] = [
   'fiscal.cheques',
   'logistics.purchases',
   'clients.portal',
+  'service.contracts',
 ]
 
 /**

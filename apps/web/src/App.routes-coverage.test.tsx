@@ -120,6 +120,16 @@ vi.mock('@/lib/api', async () => {
       invoice: vi.fn(),
       cancel: vi.fn(),
     },
+    contratosAPI: {
+      list: vi.fn().mockResolvedValue({ success: true, data: [], total: 0, limit: 100, offset: 0 }),
+      get: vi.fn(),
+      create: vi.fn(),
+      update: vi.fn(),
+      pause: vi.fn(),
+      resume: vi.fn(),
+      listFacturas: vi.fn().mockResolvedValue([]),
+      applyManualAdjustment: vi.fn(),
+    },
     facturasAPI: {
       list: vi.fn().mockResolvedValue([]),
       create: vi.fn(),

@@ -166,6 +166,26 @@
 
 * [ComprobantePendienteListEnvelope](./comprobantependientelistenvelope.md) – `-`
 
+* [Contrato](./contrato.md) – `-`
+
+* [ContratoAjusteManualInput](./contratoajustemanualinput.md) – `-`
+
+* [ContratoEnvelope](./contratoenvelope.md) – `-`
+
+* [ContratoEstado](./contratoestado.md) – `-`
+
+* [ContratoFacturasEnvelope](./contratofacturasenvelope.md) – `-`
+
+* [ContratoFrecuencia](./contratofrecuencia.md) – `-`
+
+* [ContratoInput](./contratoinput.md) – `-`
+
+* [ContratoItem](./contratoitem.md) – `-`
+
+* [ContratoListEnvelope](./contratolistenvelope.md) – `-`
+
+* [ContratoUpdateInput](./contratoupdateinput.md) – `-`
+
 * [CuentaCorriente](./cuentacorriente.md) – `-`
 
 * [CuentaCorrienteEnvelope](./cuentacorrienteenvelope.md) – `-`
@@ -840,6 +860,16 @@
 
 * [Untitled object in CobroListEnvelope](./cobrolistenvelope-allof-0.md) – `undefined#/allOf/0`
 
+* [Untitled object in ContratoFacturasEnvelope](./contratofacturasenvelope-properties-data-items.md) – `undefined#/properties/data/items`
+
+* [Untitled object in ContratoInput](./contratoinput-properties-ajuste.md) – `undefined#/properties/ajuste`
+
+* [Untitled object in ContratoInput](./contratoinput-properties-items-items.md) – `undefined#/properties/items/items`
+
+* [Untitled object in ContratoListEnvelope](./contratolistenvelope-allof-0.md) – `undefined#/allOf/0`
+
+* [Untitled object in ContratoUpdateInput](./contratoupdateinput-allof-1.md) – `undefined#/allOf/1`
+
 * [Untitled object in DashboardFacturasPagarWidget](./dashboardfacturaspagarwidget-properties-proximovencer.md) – `undefined#/properties/proximoVencer`
 
 * [Untitled object in DashboardFacturasPagarWidget](./dashboardfacturaspagarwidget-properties-vencido.md) – `undefined#/properties/vencido`
@@ -1055,6 +1085,14 @@
 * [Untitled array in CobroListEnvelope](./cobrolistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
 
 * [Untitled array in ComprobantePendienteListEnvelope](./comprobantependientelistenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled array in Contrato](./contrato-properties-items.md) – `undefined#/properties/items`
+
+* [Untitled array in ContratoFacturasEnvelope](./contratofacturasenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled array in ContratoInput](./contratoinput-properties-items.md) – `undefined#/properties/items`
+
+* [Untitled array in ContratoListEnvelope](./contratolistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
 
 * [Untitled array in CuentaCorriente](./cuentacorriente-properties-lineas.md) – `undefined#/properties/lineas`
 

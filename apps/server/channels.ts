@@ -152,6 +152,21 @@ function buildMessage(type: NotificationType, payload: NotificationPayload): Mes
         text: `Se registró un contracargo${payment} para la factura${ref} de ${rsocial}${amount ? ` por ${amount}` : ''}. Requiere revisión manual.`,
       }
     }
+    case 'contract_invoice_generated': {
+      const numero = payload.contratoNumero != null ? ` #${payload.contratoNumero}` : ''
+      const facturaRef = payload.facturaId != null ? ` (factura #${payload.facturaId})` : ''
+      return {
+        subject: `[BizCode] Factura generada por contrato${numero}`,
+        text: `Se generó una factura automática para el contrato${numero}${facturaRef}.`,
+      }
+    }
+    case 'contract_adjustment_due': {
+      const numero = payload.contratoNumero != null ? ` #${payload.contratoNumero}` : ''
+      return {
+        subject: `[BizCode] Ajuste de precio aplicado — contrato${numero}`,
+        text: `Se aplicó un ajuste de precio programado al contrato${numero}.`,
+      }
+    }
   }
 }
 

@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "properties": {
+    "articuloId": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "cantidad": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "condIva": {
+      "enum": [
+        "1",
+        "2",
+        "3"
+      ],
+      "type": "string"
+    },
+    "descripcion": {
+      "type": "string"
+    },
+    "dscto": {
+      "type": "number"
+    },
+    "id": {
+      "type": "integer"
+    },
+    "precioUnit": {
+      "type": "number"
+    },
+    "unidadServicio": {
+      "nullable": true,
+      "type": "string"
+    }
+  },
+  "title": "ContratoItem",
+  "type": "object"
+}

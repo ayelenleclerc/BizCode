@@ -8,6 +8,7 @@
     "inicio": "Início",
     "ventas": "Vendas",
     "pedidos": "Pedidos",
+    "contratos": "Contratos",
     "clientes": "Clientes",
     "catalogo": "Artigos",
     "proveedores": "Fornecedores",
@@ -129,7 +130,9 @@
       "credit_limit_exceeded": "Limite de crédito excedido",
       "invoice_overdue": "Fatura vencida",
       "invoice_due_soon": "Fatura a vencer",
-      "chat_message": "Nova mensagem"
+      "chat_message": "Nova mensagem",
+      "contract_invoice_generated": "Fatura gerada por contrato",
+      "contract_adjustment_due": "Reajuste de preço do contrato aplicado"
     }
   },
   "notifChannels": {

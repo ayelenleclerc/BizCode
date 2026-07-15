@@ -8,6 +8,7 @@
     "inicio": "Home",
     "ventas": "Sales",
     "pedidos": "Orders",
+    "contratos": "Contracts",
     "clientes": "Customers",
     "catalogo": "Products",
     "proveedores": "Suppliers",
@@ -129,7 +130,9 @@
       "credit_limit_exceeded": "Credit limit exceeded",
       "invoice_overdue": "Invoice overdue",
       "invoice_due_soon": "Invoice due soon",
-      "chat_message": "New message"
+      "chat_message": "New message",
+      "contract_invoice_generated": "Invoice generated from contract",
+      "contract_adjustment_due": "Contract price adjustment applied"
     }
   },
   "notifChannels": {

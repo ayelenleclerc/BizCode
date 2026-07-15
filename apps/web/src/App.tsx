@@ -21,6 +21,7 @@ import ReconciliacionMpPage from './pages/finanzas/ReconciliacionMpPage'
 import ContracargosMpPage from './pages/finanzas/ContracargosMpPage'
 import CobrosPage from './pages/cobros'
 import PedidosPage from './pages/pedidos'
+import ContratosPage from './pages/contratos'
 import ReportesPage from './pages/reportes'
 import ConfiguracionPage from './pages/configuracion'
 import ZonasEntregaPage from './pages/configuracion/ZonasEntregaPage'
@@ -168,6 +169,14 @@ function AppRoutes() {
             element={
               <ModuleRoute moduleKey="billing.orders">
                 <PedidosPage />
+              </ModuleRoute>
+            }
+          />
+          <Route
+            path="contratos"
+            element={
+              <ModuleRoute moduleKey="service.contracts">
+                <ContratosPage />
               </ModuleRoute>
             }
           />
