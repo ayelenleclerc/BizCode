@@ -119,4 +119,52 @@ describe('ContratoService', () => {
       }),
     )
   })
+
+  it('lists contratos and returns not found for missing id', async () => {
+    vi.mocked(prisma.contrato.count).mockResolvedValue(1)
+    vi.mocked(prisma.contrato.findMany).mockResolvedValue([{ id: 1 }] as never)
+    vi.mocked(prisma.contrato.findFirst).mockResolvedValue(null)
+
+    await expect(service.list(1, 10, 0)).resolves.toEqual({ total: 1, contratos: [{ id: 1 }] })
+    await expect(service.getById(1, 99)).resolves.toEqual({
+      ok: false,
+      status: 404,
+      error: 'Contrato not found',
+    })
+  })
+
+  it('applies a manual percentage adjustment to line prices', async () => {
+    vi.mocked(prisma.contrato.findFirst).mockResolvedValue({
+      id: 4,
+      items: [{ id: 1, cantidad: 1, dscto: new Decimal(0), precioUnit: new Decimal(100) }],
+    } as never)
+    const tx = {
+      contratoItem: { update: vi.fn() },
+      contrato: { update: vi.fn().mockResolvedValue({ id: 4, montoBase: new Decimal(110) }) },
+    }
+    vi.mocked(prisma.$transaction).mockImplementation(async (callback) => {
+      if (typeof callback === 'function') return callback(tx as never)
+      return callback
+    })
+
+    const result = await service.applyManualAdjustment(1, 4, { porcentaje: 10 })
+
+    expect(result.ok).toBe(true)
+    expect(tx.contratoItem.update).toHaveBeenCalledWith({
+      where: { id: 1 },
+      data: { precioUnit: new Decimal(110) },
+    })
+  })
+
+  it('pauses an active contract', async () => {
+    vi.mocked(prisma.contrato.findFirst).mockResolvedValue({ estado: 'activo' } as never)
+    vi.mocked(prisma.contrato.update).mockResolvedValue({ id: 4, estado: 'pausado' } as never)
+
+    const result = await service.pause(1, 4)
+
+    expect(result.ok).toBe(true)
+    expect(prisma.contrato.update).toHaveBeenCalledWith(
+      expect.objectContaining({ data: { estado: 'pausado' } }),
+    )
+  })
 })

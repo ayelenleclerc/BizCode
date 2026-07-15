@@ -79,7 +79,7 @@ describe('ContratoBillingService', () => {
       (async (args: unknown) => {
         const where = (args as { where?: { contratoId?: number } } | undefined)?.where
         return (where?.contratoId ? null : { numero: 40 }) as never
-      }) as typeof prisma.factura.findFirst,
+      }) as unknown as typeof prisma.factura.findFirst,
     )
 
     const summary = await service.runDailyJob(1, new Date('2026-03-15T10:00:00.000Z'))
@@ -131,5 +131,54 @@ describe('ContratoBillingService', () => {
       where: { id: 8 },
       data: { proximaFact: new Date('2026-04-15T00:00:00.000Z') },
     })
+  })
+
+  it('applies porcentaje_fijo when proximoAjuste is due', async () => {
+    const dueContract = {
+      ...contract,
+      proximaFact: new Date('2026-03-15T00:00:00.000Z'),
+      ajuste: {
+        id: 1,
+        contratoId: 8,
+        tipo: 'porcentaje_fijo',
+        porcentaje: new Decimal(10),
+        frecuenciaAjuste: 'mensual',
+        proximoAjuste: new Date('2026-03-01T00:00:00.000Z'),
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+    }
+    vi.mocked(prisma.contrato.findMany).mockResolvedValue([dueContract] as never)
+    vi.mocked(prisma.factura.findFirst).mockResolvedValue({ id: 99 } as never)
+    const tx = {
+      contratoItem: { update: vi.fn() },
+      contrato: { update: vi.fn() },
+      contratoAjuste: { update: vi.fn() },
+    }
+    vi.mocked(prisma.$transaction).mockImplementation(async (callback) => {
+      if (typeof callback === 'function') return callback(tx as never)
+      return callback
+    })
+
+    const summary = await service.runDailyJob(1, new Date('2026-03-15T10:00:00.000Z'))
+
+    expect(summary.processed).toBe(1)
+    expect(summary.adjustmentsApplied).toBe(1)
+    expect(tx.contratoItem.update).toHaveBeenCalled()
+    expect(tx.contratoAjuste.update).toHaveBeenCalledWith({
+      where: { contratoId: 8 },
+      data: { proximoAjuste: new Date('2026-04-01T00:00:00.000Z') },
+    })
+  })
+
+  it('runs for all paramEmpresa tenants when tenantId is omitted', async () => {
+    vi.mocked(prisma.paramEmpresa.findMany).mockResolvedValue([{ tenantId: 1 }, { tenantId: 2 }] as never)
+    vi.mocked(prisma.contrato.findMany).mockResolvedValue([])
+
+    const summary = await service.runDailyJob(undefined, new Date('2026-03-15T10:00:00.000Z'))
+
+    expect(prisma.paramEmpresa.findMany).toHaveBeenCalled()
+    expect(prisma.contrato.findMany).toHaveBeenCalledTimes(2)
+    expect(summary.processed).toBe(0)
   })
 })
