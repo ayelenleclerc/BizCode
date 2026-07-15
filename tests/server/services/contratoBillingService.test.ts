@@ -75,10 +75,12 @@ describe('ContratoBillingService', () => {
 
   it('creates every missed period and requests revision invoices without CAE', async () => {
     vi.mocked(prisma.contrato.findMany).mockResolvedValue([contract] as never)
-    vi.mocked(prisma.factura.findFirst).mockImplementation((async (args) => {
-      const where = (args as { where: { contratoId?: number } }).where
-      return (where.contratoId ? null : { numero: 40 }) as never
-    }) as never)
+    vi.mocked(prisma.factura.findFirst).mockImplementation(
+      (async (args: unknown) => {
+        const where = (args as { where?: { contratoId?: number } } | undefined)?.where
+        return (where?.contratoId ? null : { numero: 40 }) as never
+      }) as typeof prisma.factura.findFirst,
+    )
 
     const summary = await service.runDailyJob(1, new Date('2026-03-15T10:00:00.000Z'))
 
