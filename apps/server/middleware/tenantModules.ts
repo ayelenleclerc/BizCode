@@ -33,6 +33,8 @@ const TEST_DEFAULT_MODULES: ModuleKey[] = [
   'service.contracts',
   'service.orders',
   'service.warranties',
+  'billing.pos',
+  'pos.cashier',
 ]
 
 /**

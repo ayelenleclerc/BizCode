@@ -20,6 +20,7 @@ undefined#/properties/data/items
 | :-------------------------- | :-------- | :------- | :------------- | :----------------------------------------------------------------------------------- |
 | [codigo](#codigo)           | `integer` | Optional | cannot be null | [FormaPago](formapago-properties-codigo.md "undefined#/properties/codigo")           |
 | [descripcion](#descripcion) | `string`  | Optional | cannot be null | [FormaPago](formapago-properties-descripcion.md "undefined#/properties/descripcion") |
+| [esEfectivo](#esefectivo)   | `boolean` | Optional | cannot be null | [FormaPago](formapago-properties-esefectivo.md "undefined#/properties/esEfectivo")   |
 | [id](#id)                   | `integer` | Optional | cannot be null | [FormaPago](formapago-properties-id.md "undefined#/properties/id")                   |
 | [vto\_dias](#vto_dias)      | `integer` | Optional | cannot be null | [FormaPago](formapago-properties-vto_dias.md "undefined#/properties/vto_dias")       |
 | Additional Properties       | Any       | Optional | can be null    |                                                                                      |
@@ -59,6 +60,24 @@ undefined#/properties/data/items
 ### descripcion Type
 
 `string`
+
+## esEfectivo
+
+When true, posts MovimientoCaja on open cash shift (#247).
+
+`esEfectivo`
+
+* is optional
+
+* Type: `boolean`
+
+* cannot be null
+
+* defined in: [FormaPago](formapago-properties-esefectivo.md "undefined#/properties/esEfectivo")
+
+### esEfectivo Type
+
+`boolean`
 
 ## id
 

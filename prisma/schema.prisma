@@ -371,6 +371,8 @@ model FormaPago {
   codigo      Int     @unique
   descripcion String  @db.VarChar(25)
   vto_dias    Int     @default(0)
+  /// When true, Cobro/Factura with this form auto-posts MovimientoCaja on open shift (#247).
+  esEfectivo  Boolean @default(false)
   cobros      Cobro[]
 }
 
@@ -647,6 +649,98 @@ model GarantiaUso {
   @@index([garantiaId])
   @@index([otId])
   @@index([userId])
+}
+
+/// Cash register drawer for POS shifts (#247).
+model Caja {
+  id        Int      @id @default(autoincrement())
+  tenantId  Int
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+  nombre    String   @db.VarChar(80)
+  activa    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  turnos    TurnoCaja[]
+
+  @@unique([tenantId, nombre])
+  @@index([tenantId, activa])
+}
+
+/// Cashier shift on a drawer (#247).
+model TurnoCaja {
+  id                    Int       @id @default(autoincrement())
+  tenantId              Int
+  tenant                Tenant    @relation(fields: [tenantId], references: [id])
+  cajaId                Int
+  caja                  Caja      @relation(fields: [cajaId], references: [id], onDelete: Restrict)
+  cajeroId              Int
+  cajero                AppUser   @relation("TurnoCajaCajero", fields: [cajeroId], references: [id], onDelete: Restrict)
+  /// abierto | cerrado
+  estado                String    @db.VarChar(12)
+  montoApertura         Decimal   @db.Decimal(14, 2)
+  fechaApertura         DateTime  @default(now())
+  fechaCierre           DateTime?
+  totalVentasEfectivo   Decimal?  @db.Decimal(14, 2)
+  totalVentasTarjeta    Decimal?  @db.Decimal(14, 2)
+  totalVentasMP         Decimal?  @db.Decimal(14, 2)
+  totalVentasTransf     Decimal?  @db.Decimal(14, 2)
+  totalEgresos          Decimal?  @db.Decimal(14, 2)
+  totalIngresosExtra    Decimal?  @db.Decimal(14, 2)
+  efectivoEsperado      Decimal?  @db.Decimal(14, 2)
+  efectivoContado       Decimal?  @db.Decimal(14, 2)
+  diferencia            Decimal?  @db.Decimal(14, 2)
+  observaciones         String?   @db.VarChar(500)
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  conteo                ConteoEfectivo?
+  movimientos           MovimientoCaja[]
+
+  @@index([tenantId, estado])
+  @@index([tenantId, cajaId])
+  @@index([tenantId, cajeroId])
+  @@index([tenantId, fechaApertura])
+}
+
+/// Physical cash count by ARS denomination at shift close (#247).
+model ConteoEfectivo {
+  id      Int       @id @default(autoincrement())
+  turnoId Int       @unique
+  turno   TurnoCaja @relation(fields: [turnoId], references: [id], onDelete: Cascade)
+  b1000   Int       @default(0)
+  b500    Int       @default(0)
+  b200    Int       @default(0)
+  b100    Int       @default(0)
+  b50     Int       @default(0)
+  b20     Int       @default(0)
+  b10     Int       @default(0)
+  m10     Int       @default(0)
+  m5      Int       @default(0)
+  m2      Int       @default(0)
+  m1      Int       @default(0)
+  total   Decimal   @db.Decimal(14, 2)
+}
+
+/// Cash drawer movement during a shift (#247).
+model MovimientoCaja {
+  id             Int       @id @default(autoincrement())
+  turnoId        Int
+  turno          TurnoCaja @relation(fields: [turnoId], references: [id], onDelete: Cascade)
+  /// venta | cobro | egreso | ingreso_extra
+  tipo           String    @db.VarChar(20)
+  /// efectivo | tarjeta | mp | transferencia | otro
+  formaPago      String    @db.VarChar(20)
+  importe        Decimal   @db.Decimal(14, 2)
+  concepto       String?   @db.VarChar(200)
+  /// factura | cobro | recibo_cobro
+  referenciaTipo String?   @db.VarChar(20)
+  referenciaId   Int?
+  userId         Int
+  user           AppUser   @relation("MovimientoCajaUser", fields: [userId], references: [id], onDelete: Restrict)
+  fecha          DateTime  @default(now())
+
+  @@index([turnoId])
+  @@index([userId])
+  @@index([referenciaTipo, referenciaId])
 }
 
 model OrdenTrabajoItem {
@@ -932,6 +1026,8 @@ model Tenant {
   contratos      Contrato[]
   ordenesTrabajo OrdenTrabajo[]
   garantias      Garantia[]
+  cajas          Caja[]
+  turnosCaja     TurnoCaja[]
   cobros         Cobro[]
   cobroRecordatorios CobroRecordatorio[]
   ordenesEntrega OrdenEntrega[]
@@ -1341,6 +1437,8 @@ model AppUser {
   mercadoPagoChargebacksResolved MercadoPagoChargeback[] @relation("MercadoPagoChargebackResolvedBy")
   ordenesTrabajoTecnico  OrdenTrabajo[] @relation("OrdenTrabajoTecnico")
   garantiaUsos           GarantiaUso[]  @relation("GarantiaUsoUser")
+  turnosCajaCajero       TurnoCaja[]    @relation("TurnoCajaCajero")
+  movimientosCaja        MovimientoCaja[] @relation("MovimientoCajaUser")
 
   @@unique([tenantId, username])
 }

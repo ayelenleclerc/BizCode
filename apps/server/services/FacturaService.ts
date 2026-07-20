@@ -13,6 +13,7 @@ import { ArcaService } from '../fiscal/ar/ArcaService'
 import { validateFacturaPercepciones } from './RetencionFacturaValidation'
 import { ClienteCuentaCorrienteService } from './ClienteCuentaCorrienteService'
 import { GarantiaService } from './GarantiaService'
+import { TurnoCajaService } from './TurnoCajaService'
 
 type FacturaWithRelations = Prisma.FacturaGetPayload<{ include: { cliente: true; items: true } }>
 
@@ -54,10 +55,12 @@ export type FacturaCreateOptions = {
 export class FacturaService {
   private readonly arca: ArcaService
   private readonly garantiaService: GarantiaService
+  private readonly turnoCajaService: TurnoCajaService
 
   constructor(private readonly prisma: PrismaClient) {
     this.arca = new ArcaService(prisma)
     this.garantiaService = new GarantiaService(prisma)
+    this.turnoCajaService = new TurnoCajaService(prisma)
   }
 
   async list(tenantId: number, take: number, skip: number): Promise<FacturaListResult> {
@@ -250,6 +253,30 @@ export class FacturaService {
       )
     } catch {
       /* Warranty registration must not fail invoice create */
+    }
+
+    try {
+      const formaPagoId = newFactura.formaPagoId
+      if (formaPagoId != null) {
+        const fp = await this.prisma.formaPago.findUnique({
+          where: { id: formaPagoId },
+          select: { esEfectivo: true },
+        })
+        if (fp?.esEfectivo) {
+          await this.turnoCajaService.tryRecordAutoMovement({
+            tenantId,
+            userId,
+            tipo: 'venta',
+            formaPago: 'efectivo',
+            importe: Number(newFactura.total.toString()),
+            concepto: `${newFactura.tipo}-${newFactura.prefijo}-${newFactura.numero}`,
+            referenciaTipo: 'factura',
+            referenciaId: newFactura.id,
+          })
+        }
+      }
+    } catch {
+      /* Cash drawer posting must not fail invoice create */
     }
 
     return {

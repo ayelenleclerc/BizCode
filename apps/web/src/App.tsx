@@ -24,6 +24,7 @@ import PedidosPage from './pages/pedidos'
 import ContratosPage from './pages/contratos'
 import OrdenesTrabajoPage from './pages/ordenes-trabajo'
 import GarantiasPage from './pages/garantias'
+import CajaPage from './pages/caja'
 import ReportesPage from './pages/reportes'
 import ConfiguracionPage from './pages/configuracion'
 import ZonasEntregaPage from './pages/configuracion/ZonasEntregaPage'
@@ -195,6 +196,14 @@ function AppRoutes() {
             element={
               <ModuleRoute moduleKey="service.warranties">
                 <GarantiasPage />
+              </ModuleRoute>
+            }
+          />
+          <Route
+            path="caja"
+            element={
+              <ModuleRoute moduleKey="pos.cashier">
+                <CajaPage />
               </ModuleRoute>
             }
           />

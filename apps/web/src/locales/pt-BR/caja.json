@@ -1,0 +1,40 @@
+{
+  "title": "Caixa e turnos",
+  "loadError": "Não foi possível carregar a caixa",
+  "cajas": "Caixas",
+  "nuevaCaja": "Nova caixa",
+  "nombreCaja": "Nome",
+  "crearCaja": "Criar",
+  "abrirTurno": "Abrir turno",
+  "montoApertura": "Valor de abertura",
+  "cerrarTurno": "Fechar turno",
+  "egreso": "Saída",
+  "ingresoExtra": "Entrada extra",
+  "importe": "Valor",
+  "concepto": "Conceito",
+  "registrar": "Registrar",
+  "conteo": "Contagem física",
+  "observaciones": "Observações (obrigatórias se houver diferença)",
+  "pdf": "PDF fechamento",
+  "counts": {
+    "abiertos": "Turnos abertos",
+    "cerradosHoy": "Fechados hoje",
+    "diferenciaHoy": "Diferença hoje"
+  },
+  "columns": {
+    "caja": "Caixa",
+    "cajero": "Caixa",
+    "estado": "Estado",
+    "apertura": "Abertura",
+    "esperado": "Esperado",
+    "contado": "Contado",
+    "diferencia": "Diferença"
+  },
+  "estado": {
+    "abierto": "Aberto",
+    "cerrado": "Fechado"
+  },
+  "empty": "Nenhum turno",
+  "formasPagoTitle": "Formas de pagamento (dinheiro)",
+  "esEfectivo": "É dinheiro (auto-caixa)"
+}

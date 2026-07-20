@@ -934,6 +934,14 @@ export const formasPagoAPI = {
       handleError(error as AxiosError<ApiErrorPayload>)
     }
   },
+  patch: async (id: number, body: { esEfectivo: boolean }) => {
+    try {
+      const response = await api.patch(`/formas-pago/${id}`, body)
+      return response.data.data
+    } catch (error) {
+      handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
 }
 
 // ============ REPORTES ============

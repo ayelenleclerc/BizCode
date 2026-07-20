@@ -10,6 +10,8 @@ Versionado: [Semantic Versioning](https://semver.org/lang/es/).
 
 ### Agregado
 
+- **Arqueo de caja y turnos POS (#247):** Prisma `Caja` / `TurnoCaja` / `ConteoEfectivo` / `MovimientoCaja` y `FormaPago.esEfectivo`; API `/api/cajas` y `/api/turnos-caja` (apertura/cierre, movimientos manuales, PDF de cierre) con módulo `pos.cashier`; movimientos automáticos en factura/cobro/recibo en efectivo si hay turno abierto (no bloquea ventas sin turno); UI `/caja` con dashboard y flag de efectivo en formas de pago; OpenAPI, pruebas e i18n EN/ES/PT-BR.
+
 - **Garantías de servicio (#251):** Prisma `Garantia` / `GarantiaUso` y `Articulo.mesesGarantia`; alta automática al crear factura; API `/api/garantias` (listado, lookup por serie/IMEI, detalle, anular, usos) con módulo `service.warranties`; OT consulta `Garantia` y registra `GarantiaUso`; UI `/garantias` + campo en artículos + feedback de serie en OT; OpenAPI, pruebas e i18n EN/ES/PT-BR.
 
 - **Órdenes de trabajo (#246):** Prisma `OrdenTrabajo` / `OrdenTrabajoItem` con máquina de estados (recibido → facturado); CRUD + transiciones auditadas en `AuditEvent`; facturación en un click vía `FacturaService` (repuestos descuentan stock; mano de obra/servicio no); garantía básica por número de serie; notificaciones `ot_presupuestado` / `ot_listo`; dashboard de taller con módulo `service.orders`; OpenAPI, pruebas e i18n EN/ES/PT-BR.

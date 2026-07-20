@@ -68,6 +68,12 @@
 
 * [AuthScope](./authscope.md) – `-`
 
+* [Caja](./caja.md) – `-`
+
+* [CajaEnvelope](./cajaenvelope.md) – `-`
+
+* [CajaListEnvelope](./cajalistenvelope.md) – `-`
+
 * [ChangePasswordInput](./changepasswordinput.md) – `-`
 
 * [ChatConversation](./chatconversation.md) – `-`
@@ -300,7 +306,11 @@
 
 * [FormaPago](./formapago.md) – `-`
 
+* [FormaPagoEnvelope](./formapagoenvelope.md) – `-`
+
 * [FormaPagoListEnvelope](./formapagolistenvelope.md) – `-`
+
+* [FormaPagoPatchInput](./formapagopatchinput.md) – `-`
 
 * [Garantia](./garantia.md) – `-`
 
@@ -431,6 +441,8 @@
 * [ModuleCatalogPreset](./modulecatalogpreset.md) – `-`
 
 * [ModuleNotEnabledEnvelope](./modulenotenabledenvelope.md) – `-`
+
+* [MovimientoCajaManualInput](./movimientocajamanualinput.md) – `-`
 
 * [MovimientoClienteCC](./movimientoclientecc.md) – `-`
 
@@ -858,6 +870,16 @@
 
 * [TenantPricingEnvelope](./tenantpricingenvelope.md) – `-`
 
+* [TurnoCaja](./turnocaja.md) – `-`
+
+* [TurnoCajaCloseInput](./turnocajacloseinput.md) – `-`
+
+* [TurnoCajaEnvelope](./turnocajaenvelope.md) – `-`
+
+* [TurnoCajaListEnvelope](./turnocajalistenvelope.md) – `-`
+
+* [TurnoCajaOpenInput](./turnocajaopeninput.md) – `-`
+
 * [VoidInput](./voidinput.md) – `-`
 
 ## Other Schemas
@@ -1068,6 +1090,12 @@
 
 * [Untitled object in TenantConfigHistoryEntry](./tenantconfighistoryentry-properties-before.md) – `undefined#/properties/before`
 
+* [Untitled object in TurnoCajaCloseInput](./turnocajacloseinput-properties-conteo.md) – `undefined#/properties/conteo`
+
+* [Untitled object in TurnoCajaListEnvelope](./turnocajalistenvelope-allof-0.md) – `undefined#/allOf/0`
+
+* [Untitled object in TurnoCajaListEnvelope](./turnocajalistenvelope-allof-0-properties-counts.md) – `undefined#/allOf/0/properties/counts`
+
 ### Arrays
 
 * [Untitled array in AgingAr](./agingar-properties-buckets.md) – `undefined#/properties/buckets`
@@ -1113,6 +1141,8 @@
 * [Untitled array in AuthScope](./authscope-properties-routeids.md) – `undefined#/properties/routeIds`
 
 * [Untitled array in AuthScope](./authscope-properties-warehouseids.md) – `undefined#/properties/warehouseIds`
+
+* [Untitled array in CajaListEnvelope](./cajalistenvelope-properties-data.md) – `undefined#/properties/data`
 
 * [Untitled array in ChatConversationListEnvelope](./chatconversationlistenvelope-properties-data.md) – `undefined#/properties/data`
 
@@ -1367,6 +1397,8 @@
 * [Untitled array in TenantPlanSnapshot](./tenantplansnapshot-properties-features.md) – `undefined#/properties/features`
 
 * [Untitled array in TenantPricingData](./tenantpricingdata-properties-addons.md) – `undefined#/properties/addons`
+
+* [Untitled array in TurnoCajaListEnvelope](./turnocajalistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
 
 ## Version Note
 

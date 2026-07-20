@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "concepto": {
+      "nullable": true,
+      "type": "string"
+    },
+    "formaPago": {
+      "enum": [
+        "efectivo",
+        "tarjeta",
+        "mp",
+        "transferencia",
+        "otro"
+      ],
+      "type": "string"
+    },
+    "importe": {
+      "exclusiveMinimum": 0,
+      "type": "number"
+    },
+    "tipo": {
+      "enum": [
+        "egreso",
+        "ingreso_extra"
+      ],
+      "type": "string"
+    }
+  },
+  "required": [
+    "tipo",
+    "importe"
+  ],
+  "title": "MovimientoCajaManualInput",
+  "type": "object"
+}

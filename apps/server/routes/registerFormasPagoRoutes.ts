@@ -1,5 +1,7 @@
 import type { Application, Request, Response } from 'express'
 import { requirePermission } from '../auth'
+import { validateBody } from '../middleware/validateBody'
+import { formaPagoPatchBodySchema } from '../schemas/domain'
 import type { RestRouteContext } from './restRouteTypes'
 import { errorMessage } from './restDomainShared'
 
@@ -19,4 +21,31 @@ export function registerFormasPagoRoutes(app: Application, ctx: RestRouteContext
       res.status(500).json({ success: false, error: errorMessage(err) })
     }
   })
+
+  app.patch(
+    '/api/formas-pago/:id',
+    requirePermission('sales.create'),
+    validateBody(formaPagoPatchBodySchema),
+    async (req: Request, res: Response) => {
+      try {
+        const id = Number.parseInt(String(req.params.id), 10)
+        if (!Number.isFinite(id) || id < 1) {
+          res.status(400).json({ success: false, error: 'Invalid id' })
+          return
+        }
+        const existing = await prisma.formaPago.findUnique({ where: { id } })
+        if (!existing) {
+          res.status(404).json({ success: false, error: 'FormaPago not found' })
+          return
+        }
+        const updated = await prisma.formaPago.update({
+          where: { id },
+          data: { esEfectivo: Boolean(req.body.esEfectivo) },
+        })
+        res.json({ success: true, data: updated })
+      } catch (err: unknown) {
+        res.status(500).json({ success: false, error: errorMessage(err) })
+      }
+    },
+  )
 }

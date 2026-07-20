@@ -8,6 +8,7 @@ import { ClienteCuentaCorrienteService } from './ClienteCuentaCorrienteService'
 import { RetencionConstanciaService } from './RetencionConstanciaService'
 import { validateCobroRetenciones } from './RetencionCobroValidation'
 import { computeScoreChange } from './CobroService'
+import { TurnoCajaService } from './TurnoCajaService'
 
 function decimalToMoneyString(value: Decimal | number): string {
   const n = typeof value === 'number' ? value : value.toNumber()
@@ -513,6 +514,25 @@ export class ReciboCobroService {
       })
       return withRelations
     })
+
+    try {
+      const turnoSvc = new TurnoCajaService(this.prisma)
+      for (const forma of created.formas) {
+        if (forma.tipo !== 'efectivo') continue
+        await turnoSvc.tryRecordAutoMovement({
+          tenantId,
+          userId: usuarioId,
+          tipo: 'cobro',
+          formaPago: 'efectivo',
+          importe: Number(forma.importe.toString()),
+          concepto: created.concepto,
+          referenciaTipo: 'recibo_cobro',
+          referenciaId: created.id,
+        })
+      }
+    } catch {
+      /* Cash drawer posting must not fail recibo create */
+    }
 
     return { ok: true, data: mapRecibo(created) }
   }
