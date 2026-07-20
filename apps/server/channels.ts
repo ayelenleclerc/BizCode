@@ -167,6 +167,22 @@ function buildMessage(type: NotificationType, payload: NotificationPayload): Mes
         text: `Se aplicó un ajuste de precio programado al contrato${numero}.`,
       }
     }
+    case 'ot_presupuestado': {
+      const numero = payload.otNumero != null ? ` OT-${String(payload.otNumero).padStart(5, '0')}` : ''
+      const amount = payload.amount ? ` Presupuesto: $${payload.amount}.` : ''
+      const who = payload.rsocial ? ` ${payload.rsocial}` : ''
+      return {
+        subject: `[BizCode] Presupuesto listo${numero}`,
+        text: `Su equipo está diagnosticado.${amount} Orden${numero}.${who ? ` Cliente:${who}.` : ''} Puede aprobar el presupuesto.`.trim(),
+      }
+    }
+    case 'ot_listo': {
+      const numero = payload.otNumero != null ? ` OT-${String(payload.otNumero).padStart(5, '0')}` : ''
+      return {
+        subject: `[BizCode] Equipo listo para retirar${numero}`,
+        text: `Su equipo está listo para retirar.${numero}.`,
+      }
+    }
   }
 }
 
@@ -303,7 +319,7 @@ export async function dispatchNotification(
     select: { id: true },
   })
 
-  if (managers.length === 0) return
+  if (managers.length === 0 && payload.clienteId == null) return
 
   // Fetch Cliente details for email/phone if available in payload
   const emailRecipients: string[] = []

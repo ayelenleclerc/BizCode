@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "clienteId": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "diagnostico": {
+      "nullable": true,
+      "type": "string"
+    },
+    "enGarantia": {
+      "type": "boolean"
+    },
+    "equipoDescripcion": {
+      "maxLength": 200,
+      "minLength": 1,
+      "type": "string"
+    },
+    "equipoMarca": {
+      "nullable": true,
+      "type": "string"
+    },
+    "equipoModelo": {
+      "nullable": true,
+      "type": "string"
+    },
+    "equipoNroSerie": {
+      "nullable": true,
+      "type": "string"
+    },
+    "fechaPromesa": {
+      "nullable": true,
+      "type": "string"
+    },
+    "garantiaVence": {
+      "nullable": true,
+      "type": "string"
+    },
+    "items": {
+      "items": {
+        "$ref": "./OrdenTrabajoItem.schema.json"
+      },
+      "type": "array"
+    },
+    "observaciones": {
+      "nullable": true,
+      "type": "string"
+    },
+    "otGarantiaId": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "prioridad": {
+      "$ref": "./OrdenTrabajoPrioridad.schema.json"
+    },
+    "sintomaReportado": {
+      "maxLength": 500,
+      "minLength": 1,
+      "type": "string"
+    },
+    "tecnicoId": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "trabajoRealizado": {
+      "nullable": true,
+      "type": "string"
+    }
+  },
+  "required": [
+    "clienteId",
+    "equipoDescripcion",
+    "sintomaReportado"
+  ],
+  "title": "OrdenTrabajoInput",
+  "type": "object"
+}

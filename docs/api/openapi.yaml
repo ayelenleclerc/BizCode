@@ -48,6 +48,8 @@ tags:
     description: Commercial orders and quotes (ADR-0009)
   - name: contratos
     description: Recurring service contracts and scheduled invoicing (#245, module service.contracts)
+  - name: ordenes-trabajo
+    description: Service work orders / repair tickets (#246, module service.orders)
   - name: cobros
     description: Customer payment collections
   - name: portal
@@ -4213,6 +4215,235 @@ paths:
           $ref: '#/components/responses/BadRequest'
         '404':
           description: Contrato not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/ordenes-trabajo:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [ordenes-trabajo]
+      summary: List service work orders
+      description: Requires module `service.orders` and `sales.create` or `reports.operational.read`.
+      parameters:
+        - $ref: '#/components/parameters/ListLimit'
+        - $ref: '#/components/parameters/ListOffset'
+        - name: estado
+          in: query
+          schema:
+            $ref: '#/components/schemas/OrdenTrabajoEstado'
+      responses:
+        '200':
+          description: Paginated work orders with dashboard counts
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrdenTrabajoListEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    post:
+      tags: [ordenes-trabajo]
+      summary: Create work order
+      description: Requires module `service.orders` and `sales.create`. Auto-detects warranty by serial when applicable.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrdenTrabajoInput'
+      responses:
+        '201':
+          description: Work order created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrdenTrabajoEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '422':
+          description: Client suspended
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/ordenes-trabajo/{id}:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    get:
+      tags: [ordenes-trabajo]
+      summary: Get work order by id
+      description: Requires module `service.orders` and `sales.create` or `reports.operational.read`.
+      responses:
+        '200':
+          description: Work order detail
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrdenTrabajoEnvelope'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    put:
+      tags: [ordenes-trabajo]
+      summary: Update work order
+      description: Requires module `service.orders` and `sales.create`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrdenTrabajoUpdateInput'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrdenTrabajoEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '409':
+          description: Invalid state for update
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/ordenes-trabajo/{id}/transicion:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    post:
+      tags: [ordenes-trabajo]
+      summary: Transition work-order state
+      description: Requires module `service.orders` and `sales.create`. Audits previousEstado → estado.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrdenTrabajoTransitionInput'
+      responses:
+        '200':
+          description: Transition applied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrdenTrabajoEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '409':
+          description: Invalid transition
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/ordenes-trabajo/{id}/facturar:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    post:
+      tags: [ordenes-trabajo]
+      summary: Convert work order to invoice
+      description: Requires module `service.orders` and `sales.create`. Parts decrement stock; labor/service do not.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrdenTrabajoFacturarInput'
+      responses:
+        '201':
+          description: Invoice created and OT marked facturado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrdenTrabajoFacturarEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '409':
+          description: Invalid state or already invoiced
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '422':
+          description: Warranty OT cannot be invoiced to customer
           content:
             application/json:
               schema:
@@ -14273,6 +14504,239 @@ components:
                 type: number
               estadoCae:
                 type: string
+
+    OrdenTrabajoEstado:
+      type: string
+      enum:
+        - recibido
+        - diagnosticado
+        - presupuestado
+        - aprobado
+        - en_reparacion
+        - listo
+        - entregado
+        - facturado
+        - cancelado
+        - sin_reparacion
+
+    OrdenTrabajoPrioridad:
+      type: string
+      enum: [baja, normal, alta, urgente]
+
+    OrdenTrabajoItemTipo:
+      type: string
+      enum: [mano_de_obra, repuesto, servicio]
+
+    OrdenTrabajoItem:
+      type: object
+      required: [tipo, descripcion, cantidad, precioUnit]
+      properties:
+        tipo:
+          $ref: '#/components/schemas/OrdenTrabajoItemTipo'
+        descripcion:
+          type: string
+          minLength: 1
+          maxLength: 120
+        articuloId:
+          type: integer
+          nullable: true
+          minimum: 1
+        cantidad:
+          type: number
+          exclusiveMinimum: 0
+        precioUnit:
+          type: number
+          minimum: 0
+        condIva:
+          type: string
+          enum: ['1', '2', '3']
+
+    OrdenTrabajo:
+      type: object
+      additionalProperties: true
+      properties:
+        id:
+          type: integer
+        numero:
+          type: integer
+        clienteId:
+          type: integer
+        tecnicoId:
+          type: integer
+          nullable: true
+        estado:
+          $ref: '#/components/schemas/OrdenTrabajoEstado'
+        prioridad:
+          $ref: '#/components/schemas/OrdenTrabajoPrioridad'
+        equipoDescripcion:
+          type: string
+        sintomaReportado:
+          type: string
+        enGarantia:
+          type: boolean
+        presupuesto:
+          type: number
+          nullable: true
+        facturaId:
+          type: integer
+          nullable: true
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrdenTrabajoItem'
+
+    OrdenTrabajoInput:
+      type: object
+      required: [clienteId, equipoDescripcion, sintomaReportado]
+      properties:
+        clienteId:
+          type: integer
+          minimum: 1
+        tecnicoId:
+          type: integer
+          nullable: true
+        prioridad:
+          $ref: '#/components/schemas/OrdenTrabajoPrioridad'
+        equipoMarca:
+          type: string
+          nullable: true
+        equipoModelo:
+          type: string
+          nullable: true
+        equipoNroSerie:
+          type: string
+          nullable: true
+        equipoDescripcion:
+          type: string
+          minLength: 1
+          maxLength: 200
+        sintomaReportado:
+          type: string
+          minLength: 1
+          maxLength: 500
+        diagnostico:
+          type: string
+          nullable: true
+        trabajoRealizado:
+          type: string
+          nullable: true
+        fechaPromesa:
+          type: string
+          nullable: true
+        observaciones:
+          type: string
+          nullable: true
+        enGarantia:
+          type: boolean
+        garantiaVence:
+          type: string
+          nullable: true
+        otGarantiaId:
+          type: integer
+          nullable: true
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrdenTrabajoItem'
+
+    OrdenTrabajoUpdateInput:
+      allOf:
+        - $ref: '#/components/schemas/OrdenTrabajoInput'
+        - type: object
+          properties:
+            estado:
+              $ref: '#/components/schemas/OrdenTrabajoEstado'
+            fechaEntrega:
+              type: string
+              nullable: true
+            presupuesto:
+              type: number
+              nullable: true
+
+    OrdenTrabajoTransitionInput:
+      type: object
+      required: [estado]
+      properties:
+        estado:
+          $ref: '#/components/schemas/OrdenTrabajoEstado'
+        diagnostico:
+          type: string
+          nullable: true
+        trabajoRealizado:
+          type: string
+          nullable: true
+        fechaPromesa:
+          type: string
+          nullable: true
+        fechaEntrega:
+          type: string
+          nullable: true
+        tecnicoId:
+          type: integer
+          nullable: true
+        observaciones:
+          type: string
+          nullable: true
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrdenTrabajoItem'
+
+    OrdenTrabajoFacturarInput:
+      type: object
+      properties:
+        tipo:
+          type: string
+          enum: [A, B]
+        prefijo:
+          type: string
+        skipArcaCae:
+          type: boolean
+          default: true
+
+    OrdenTrabajoEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/OrdenTrabajo'
+
+    OrdenTrabajoListEnvelope:
+      allOf:
+        - type: object
+          required: [success, data]
+          properties:
+            success:
+              type: boolean
+              const: true
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/OrdenTrabajo'
+            counts:
+              type: object
+              additionalProperties:
+                type: integer
+        - $ref: '#/components/schemas/ListPaginationMeta'
+
+    OrdenTrabajoFacturarEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: object
+          required: [orden, facturaId]
+          properties:
+            orden:
+              $ref: '#/components/schemas/OrdenTrabajo'
+            facturaId:
+              type: integer
 
     FormaPago:
       type: object

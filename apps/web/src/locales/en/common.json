@@ -9,6 +9,7 @@
     "ventas": "Sales",
     "pedidos": "Orders",
     "contratos": "Contracts",
+    "ordenesTrabajo": "Work orders",
     "clientes": "Customers",
     "catalogo": "Products",
     "proveedores": "Suppliers",

@@ -27440,6 +27440,1865 @@ Requires module `service.contracts` and `sales.create`.
 }
 ```
 
+### PARAMETERS /api/ordenes-trabajo
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/ordenes-trabajo`
+
+### List service work orders
+
+- **Method:** `GET`
+- **Path:** `/api/ordenes-trabajo`
+- **Tags:** ordenes-trabajo
+
+Requires module `service.orders` and `sales.create` or `reports.operational.read`.
+
+#### Responses
+
+##### Status: 200 Paginated work orders with dashboard counts
+
+###### Content-Type: application/json
+
+**All of:**
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`enGarantia`**
+
+    `boolean`
+
+  - **`equipoDescripcion`**
+
+    `string`
+
+  - **`estado`**
+
+    `string`, possible values: `"recibido", "diagnosticado", "presupuestado", "aprobado", "en_reparacion", "listo", "entregado", "facturado", "cancelado", "sin_reparacion"`
+
+  - **`facturaId`**
+
+    `integer`
+
+  - **`id`**
+
+    `integer`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+    - **`cantidad` (required)**
+
+      `number`
+
+    - **`descripcion` (required)**
+
+      `string`
+
+    - **`precioUnit` (required)**
+
+      `number`
+
+    - **`tipo` (required)**
+
+      `string`, possible values: `"mano_de_obra", "repuesto", "servicio"`
+
+    - **`articuloId`**
+
+      `integer`
+
+    - **`condIva`**
+
+      `string`, possible values: `"1", "2", "3"`
+
+  - **`numero`**
+
+    `integer`
+
+  - **`presupuesto`**
+
+    `number`
+
+  - **`prioridad`**
+
+    `string`, possible values: `"baja", "normal", "alta", "urgente"`
+
+  - **`sintomaReportado`**
+
+    `string`
+
+  - **`tecnicoId`**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`counts`**
+
+  `object`
+
+* **`limit` (required)**
+
+  `integer` — Effective page size (same semantics as query \`limit\`)
+
+* **`offset` (required)**
+
+  `integer` — Effective skip (same semantics as query \`offset\`)
+
+* **`total` (required)**
+
+  `integer` — Row count matching the list filter (before limit/offset)
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "numero": 1,
+      "clienteId": 1,
+      "tecnicoId": 1,
+      "estado": "recibido",
+      "prioridad": "baja",
+      "equipoDescripcion": "",
+      "sintomaReportado": "",
+      "enGarantia": true,
+      "presupuesto": 1,
+      "facturaId": 1,
+      "items": [
+        {
+          "tipo": "mano_de_obra",
+          "descripcion": "",
+          "articuloId": 1,
+          "cantidad": 1,
+          "precioUnit": 0,
+          "condIva": "1"
+        }
+      ],
+      "additionalProperty": "anything"
+    }
+  ],
+  "counts": {
+    "additionalProperty": 1
+  },
+  "total": 0,
+  "limit": 1,
+  "offset": 0
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Create work order
+
+- **Method:** `POST`
+- **Path:** `/api/ordenes-trabajo`
+- **Tags:** ordenes-trabajo
+
+Requires module `service.orders` and `sales.create`. Auto-detects warranty by serial when applicable.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`clienteId` (required)**
+
+  `integer`
+
+- **`equipoDescripcion` (required)**
+
+  `string`
+
+- **`sintomaReportado` (required)**
+
+  `string`
+
+- **`diagnostico`**
+
+  `string`
+
+- **`enGarantia`**
+
+  `boolean`
+
+- **`equipoMarca`**
+
+  `string`
+
+- **`equipoModelo`**
+
+  `string`
+
+- **`equipoNroSerie`**
+
+  `string`
+
+- **`fechaPromesa`**
+
+  `string`
+
+- **`garantiaVence`**
+
+  `string`
+
+- **`items`**
+
+  `array`
+
+  **Items:**
+
+  - **`cantidad` (required)**
+
+    `number`
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`precioUnit` (required)**
+
+    `number`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"mano_de_obra", "repuesto", "servicio"`
+
+  - **`articuloId`**
+
+    `integer`
+
+  - **`condIva`**
+
+    `string`, possible values: `"1", "2", "3"`
+
+- **`observaciones`**
+
+  `string`
+
+- **`otGarantiaId`**
+
+  `integer`
+
+- **`prioridad`**
+
+  `string`, possible values: `"baja", "normal", "alta", "urgente"`
+
+- **`tecnicoId`**
+
+  `integer`
+
+- **`trabajoRealizado`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "clienteId": 1,
+  "tecnicoId": 1,
+  "prioridad": "baja",
+  "equipoMarca": "",
+  "equipoModelo": "",
+  "equipoNroSerie": "",
+  "equipoDescripcion": "",
+  "sintomaReportado": "",
+  "diagnostico": "",
+  "trabajoRealizado": "",
+  "fechaPromesa": "",
+  "observaciones": "",
+  "enGarantia": true,
+  "garantiaVence": "",
+  "otGarantiaId": 1,
+  "items": [
+    {
+      "tipo": "mano_de_obra",
+      "descripcion": "",
+      "articuloId": 1,
+      "cantidad": 1,
+      "precioUnit": 0,
+      "condIva": "1"
+    }
+  ]
+}
+```
+
+#### Responses
+
+##### Status: 201 Work order created
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`enGarantia`**
+
+    `boolean`
+
+  - **`equipoDescripcion`**
+
+    `string`
+
+  - **`estado`**
+
+    `string`, possible values: `"recibido", "diagnosticado", "presupuestado", "aprobado", "en_reparacion", "listo", "entregado", "facturado", "cancelado", "sin_reparacion"`
+
+  - **`facturaId`**
+
+    `integer`
+
+  - **`id`**
+
+    `integer`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+    - **`cantidad` (required)**
+
+      `number`
+
+    - **`descripcion` (required)**
+
+      `string`
+
+    - **`precioUnit` (required)**
+
+      `number`
+
+    - **`tipo` (required)**
+
+      `string`, possible values: `"mano_de_obra", "repuesto", "servicio"`
+
+    - **`articuloId`**
+
+      `integer`
+
+    - **`condIva`**
+
+      `string`, possible values: `"1", "2", "3"`
+
+  - **`numero`**
+
+    `integer`
+
+  - **`presupuesto`**
+
+    `number`
+
+  - **`prioridad`**
+
+    `string`, possible values: `"baja", "normal", "alta", "urgente"`
+
+  - **`sintomaReportado`**
+
+    `string`
+
+  - **`tecnicoId`**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "numero": 1,
+    "clienteId": 1,
+    "tecnicoId": 1,
+    "estado": "recibido",
+    "prioridad": "baja",
+    "equipoDescripcion": "",
+    "sintomaReportado": "",
+    "enGarantia": true,
+    "presupuesto": 1,
+    "facturaId": 1,
+    "items": [
+      {
+        "tipo": "mano_de_obra",
+        "descripcion": "",
+        "articuloId": 1,
+        "cantidad": 1,
+        "precioUnit": 0,
+        "condIva": "1"
+      }
+    ],
+    "additionalProperty": "anything"
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 422 Client suspended
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/ordenes-trabajo/{id}
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/ordenes-trabajo/{id}`
+
+### Get work order by id
+
+- **Method:** `GET`
+- **Path:** `/api/ordenes-trabajo/{id}`
+- **Tags:** ordenes-trabajo
+
+Requires module `service.orders` and `sales.create` or `reports.operational.read`.
+
+#### Responses
+
+##### Status: 200 Work order detail
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`enGarantia`**
+
+    `boolean`
+
+  - **`equipoDescripcion`**
+
+    `string`
+
+  - **`estado`**
+
+    `string`, possible values: `"recibido", "diagnosticado", "presupuestado", "aprobado", "en_reparacion", "listo", "entregado", "facturado", "cancelado", "sin_reparacion"`
+
+  - **`facturaId`**
+
+    `integer`
+
+  - **`id`**
+
+    `integer`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+    - **`cantidad` (required)**
+
+      `number`
+
+    - **`descripcion` (required)**
+
+      `string`
+
+    - **`precioUnit` (required)**
+
+      `number`
+
+    - **`tipo` (required)**
+
+      `string`, possible values: `"mano_de_obra", "repuesto", "servicio"`
+
+    - **`articuloId`**
+
+      `integer`
+
+    - **`condIva`**
+
+      `string`, possible values: `"1", "2", "3"`
+
+  - **`numero`**
+
+    `integer`
+
+  - **`presupuesto`**
+
+    `number`
+
+  - **`prioridad`**
+
+    `string`, possible values: `"baja", "normal", "alta", "urgente"`
+
+  - **`sintomaReportado`**
+
+    `string`
+
+  - **`tecnicoId`**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "numero": 1,
+    "clienteId": 1,
+    "tecnicoId": 1,
+    "estado": "recibido",
+    "prioridad": "baja",
+    "equipoDescripcion": "",
+    "sintomaReportado": "",
+    "enGarantia": true,
+    "presupuesto": 1,
+    "facturaId": 1,
+    "items": [
+      {
+        "tipo": "mano_de_obra",
+        "descripcion": "",
+        "articuloId": 1,
+        "cantidad": 1,
+        "precioUnit": 0,
+        "condIva": "1"
+      }
+    ],
+    "additionalProperty": "anything"
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Update work order
+
+- **Method:** `PUT`
+- **Path:** `/api/ordenes-trabajo/{id}`
+- **Tags:** ordenes-trabajo
+
+Requires module `service.orders` and `sales.create`.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+**All of:**
+
+- **`clienteId` (required)**
+
+  `integer`
+
+- **`equipoDescripcion` (required)**
+
+  `string`
+
+- **`sintomaReportado` (required)**
+
+  `string`
+
+- **`diagnostico`**
+
+  `string`
+
+- **`enGarantia`**
+
+  `boolean`
+
+- **`equipoMarca`**
+
+  `string`
+
+- **`equipoModelo`**
+
+  `string`
+
+- **`equipoNroSerie`**
+
+  `string`
+
+- **`fechaPromesa`**
+
+  `string`
+
+- **`garantiaVence`**
+
+  `string`
+
+- **`items`**
+
+  `array`
+
+  **Items:**
+
+  - **`cantidad` (required)**
+
+    `number`
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`precioUnit` (required)**
+
+    `number`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"mano_de_obra", "repuesto", "servicio"`
+
+  - **`articuloId`**
+
+    `integer`
+
+  - **`condIva`**
+
+    `string`, possible values: `"1", "2", "3"`
+
+- **`observaciones`**
+
+  `string`
+
+- **`otGarantiaId`**
+
+  `integer`
+
+- **`prioridad`**
+
+  `string`, possible values: `"baja", "normal", "alta", "urgente"`
+
+- **`tecnicoId`**
+
+  `integer`
+
+- **`trabajoRealizado`**
+
+  `string`
+
+* **`estado`**
+
+  `string`, possible values: `"recibido", "diagnosticado", "presupuestado", "aprobado", "en_reparacion", "listo", "entregado", "facturado", "cancelado", "sin_reparacion"`
+
+* **`fechaEntrega`**
+
+  `string`
+
+* **`presupuesto`**
+
+  `number`
+
+**Example:**
+
+```json
+{
+  "clienteId": 1,
+  "tecnicoId": 1,
+  "prioridad": "baja",
+  "equipoMarca": "",
+  "equipoModelo": "",
+  "equipoNroSerie": "",
+  "equipoDescripcion": "",
+  "sintomaReportado": "",
+  "diagnostico": "",
+  "trabajoRealizado": "",
+  "fechaPromesa": "",
+  "observaciones": "",
+  "enGarantia": true,
+  "garantiaVence": "",
+  "otGarantiaId": 1,
+  "items": [
+    {
+      "tipo": "mano_de_obra",
+      "descripcion": "",
+      "articuloId": 1,
+      "cantidad": 1,
+      "precioUnit": 0,
+      "condIva": "1"
+    }
+  ],
+  "estado": "recibido",
+  "fechaEntrega": "",
+  "presupuesto": 1
+}
+```
+
+#### Responses
+
+##### Status: 200 Updated
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`enGarantia`**
+
+    `boolean`
+
+  - **`equipoDescripcion`**
+
+    `string`
+
+  - **`estado`**
+
+    `string`, possible values: `"recibido", "diagnosticado", "presupuestado", "aprobado", "en_reparacion", "listo", "entregado", "facturado", "cancelado", "sin_reparacion"`
+
+  - **`facturaId`**
+
+    `integer`
+
+  - **`id`**
+
+    `integer`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+    - **`cantidad` (required)**
+
+      `number`
+
+    - **`descripcion` (required)**
+
+      `string`
+
+    - **`precioUnit` (required)**
+
+      `number`
+
+    - **`tipo` (required)**
+
+      `string`, possible values: `"mano_de_obra", "repuesto", "servicio"`
+
+    - **`articuloId`**
+
+      `integer`
+
+    - **`condIva`**
+
+      `string`, possible values: `"1", "2", "3"`
+
+  - **`numero`**
+
+    `integer`
+
+  - **`presupuesto`**
+
+    `number`
+
+  - **`prioridad`**
+
+    `string`, possible values: `"baja", "normal", "alta", "urgente"`
+
+  - **`sintomaReportado`**
+
+    `string`
+
+  - **`tecnicoId`**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "numero": 1,
+    "clienteId": 1,
+    "tecnicoId": 1,
+    "estado": "recibido",
+    "prioridad": "baja",
+    "equipoDescripcion": "",
+    "sintomaReportado": "",
+    "enGarantia": true,
+    "presupuesto": 1,
+    "facturaId": 1,
+    "items": [
+      {
+        "tipo": "mano_de_obra",
+        "descripcion": "",
+        "articuloId": 1,
+        "cantidad": 1,
+        "precioUnit": 0,
+        "condIva": "1"
+      }
+    ],
+    "additionalProperty": "anything"
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 409 Invalid state for update
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/ordenes-trabajo/{id}/transicion
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/ordenes-trabajo/{id}/transicion`
+
+### Transition work-order state
+
+- **Method:** `POST`
+- **Path:** `/api/ordenes-trabajo/{id}/transicion`
+- **Tags:** ordenes-trabajo
+
+Requires module `service.orders` and `sales.create`. Audits previousEstado → estado.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`estado` (required)**
+
+  `string`, possible values: `"recibido", "diagnosticado", "presupuestado", "aprobado", "en_reparacion", "listo", "entregado", "facturado", "cancelado", "sin_reparacion"`
+
+- **`diagnostico`**
+
+  `string`
+
+- **`fechaEntrega`**
+
+  `string`
+
+- **`fechaPromesa`**
+
+  `string`
+
+- **`items`**
+
+  `array`
+
+  **Items:**
+
+  - **`cantidad` (required)**
+
+    `number`
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`precioUnit` (required)**
+
+    `number`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"mano_de_obra", "repuesto", "servicio"`
+
+  - **`articuloId`**
+
+    `integer`
+
+  - **`condIva`**
+
+    `string`, possible values: `"1", "2", "3"`
+
+- **`observaciones`**
+
+  `string`
+
+- **`tecnicoId`**
+
+  `integer`
+
+- **`trabajoRealizado`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "estado": "recibido",
+  "diagnostico": "",
+  "trabajoRealizado": "",
+  "fechaPromesa": "",
+  "fechaEntrega": "",
+  "tecnicoId": 1,
+  "observaciones": "",
+  "items": [
+    {
+      "tipo": "mano_de_obra",
+      "descripcion": "",
+      "articuloId": 1,
+      "cantidad": 1,
+      "precioUnit": 0,
+      "condIva": "1"
+    }
+  ]
+}
+```
+
+#### Responses
+
+##### Status: 200 Transition applied
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`enGarantia`**
+
+    `boolean`
+
+  - **`equipoDescripcion`**
+
+    `string`
+
+  - **`estado`**
+
+    `string`, possible values: `"recibido", "diagnosticado", "presupuestado", "aprobado", "en_reparacion", "listo", "entregado", "facturado", "cancelado", "sin_reparacion"`
+
+  - **`facturaId`**
+
+    `integer`
+
+  - **`id`**
+
+    `integer`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+    - **`cantidad` (required)**
+
+      `number`
+
+    - **`descripcion` (required)**
+
+      `string`
+
+    - **`precioUnit` (required)**
+
+      `number`
+
+    - **`tipo` (required)**
+
+      `string`, possible values: `"mano_de_obra", "repuesto", "servicio"`
+
+    - **`articuloId`**
+
+      `integer`
+
+    - **`condIva`**
+
+      `string`, possible values: `"1", "2", "3"`
+
+  - **`numero`**
+
+    `integer`
+
+  - **`presupuesto`**
+
+    `number`
+
+  - **`prioridad`**
+
+    `string`, possible values: `"baja", "normal", "alta", "urgente"`
+
+  - **`sintomaReportado`**
+
+    `string`
+
+  - **`tecnicoId`**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "numero": 1,
+    "clienteId": 1,
+    "tecnicoId": 1,
+    "estado": "recibido",
+    "prioridad": "baja",
+    "equipoDescripcion": "",
+    "sintomaReportado": "",
+    "enGarantia": true,
+    "presupuesto": 1,
+    "facturaId": 1,
+    "items": [
+      {
+        "tipo": "mano_de_obra",
+        "descripcion": "",
+        "articuloId": 1,
+        "cantidad": 1,
+        "precioUnit": 0,
+        "condIva": "1"
+      }
+    ],
+    "additionalProperty": "anything"
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 409 Invalid transition
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/ordenes-trabajo/{id}/facturar
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/ordenes-trabajo/{id}/facturar`
+
+### Convert work order to invoice
+
+- **Method:** `POST`
+- **Path:** `/api/ordenes-trabajo/{id}/facturar`
+- **Tags:** ordenes-trabajo
+
+Requires module `service.orders` and `sales.create`. Parts decrement stock; labor/service do not.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`prefijo`**
+
+  `string`
+
+- **`skipArcaCae`**
+
+  `boolean`, default: `true`
+
+- **`tipo`**
+
+  `string`, possible values: `"A", "B"`
+
+**Example:**
+
+```json
+{
+  "tipo": "A",
+  "prefijo": "",
+  "skipArcaCae": true
+}
+```
+
+#### Responses
+
+##### Status: 201 Invoice created and OT marked facturado
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`facturaId` (required)**
+
+    `integer`
+
+  - **`orden` (required)**
+
+    `object`
+
+    - **`clienteId`**
+
+      `integer`
+
+    - **`enGarantia`**
+
+      `boolean`
+
+    - **`equipoDescripcion`**
+
+      `string`
+
+    - **`estado`**
+
+      `string`, possible values: `"recibido", "diagnosticado", "presupuestado", "aprobado", "en_reparacion", "listo", "entregado", "facturado", "cancelado", "sin_reparacion"`
+
+    - **`facturaId`**
+
+      `integer`
+
+    - **`id`**
+
+      `integer`
+
+    - **`items`**
+
+      `array`
+
+      **Items:**
+
+      - **`cantidad` (required)**
+
+        `number`
+
+      - **`descripcion` (required)**
+
+        `string`
+
+      - **`precioUnit` (required)**
+
+        `number`
+
+      - **`tipo` (required)**
+
+        `string`, possible values: `"mano_de_obra", "repuesto", "servicio"`
+
+      - **`articuloId`**
+
+        `integer`
+
+      - **`condIva`**
+
+        `string`, possible values: `"1", "2", "3"`
+
+    - **`numero`**
+
+      `integer`
+
+    - **`presupuesto`**
+
+      `number`
+
+    - **`prioridad`**
+
+      `string`, possible values: `"baja", "normal", "alta", "urgente"`
+
+    - **`sintomaReportado`**
+
+      `string`
+
+    - **`tecnicoId`**
+
+      `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "orden": {
+      "id": 1,
+      "numero": 1,
+      "clienteId": 1,
+      "tecnicoId": 1,
+      "estado": "recibido",
+      "prioridad": "baja",
+      "equipoDescripcion": "",
+      "sintomaReportado": "",
+      "enGarantia": true,
+      "presupuesto": 1,
+      "facturaId": 1,
+      "items": [
+        {
+          "tipo": "mano_de_obra",
+          "descripcion": "",
+          "articuloId": 1,
+          "cantidad": 1,
+          "precioUnit": 0,
+          "condIva": "1"
+        }
+      ],
+      "additionalProperty": "anything"
+    },
+    "facturaId": 1
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 409 Invalid state or already invoiced
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 422 Warranty OT cannot be invoiced to customer
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ### PARAMETERS /api/cobros
 
 - **Method:** `PARAMETERS`
@@ -73549,6 +75408,669 @@ Originating invoice header (selected columns)
       "additionalProperty": "anything"
     }
   ]
+}
+```
+
+### OrdenTrabajoEstado
+
+- **Type:**`string`
+
+**Example:**
+
+### OrdenTrabajoPrioridad
+
+- **Type:**`string`
+
+**Example:**
+
+### OrdenTrabajoItemTipo
+
+- **Type:**`string`
+
+**Example:**
+
+### OrdenTrabajoItem
+
+- **Type:**`object`
+
+* **`cantidad` (required)**
+
+  `number`
+
+* **`descripcion` (required)**
+
+  `string`
+
+* **`precioUnit` (required)**
+
+  `number`
+
+* **`tipo` (required)**
+
+  `string`, possible values: `"mano_de_obra", "repuesto", "servicio"`
+
+* **`articuloId`**
+
+  `integer`
+
+* **`condIva`**
+
+  `string`, possible values: `"1", "2", "3"`
+
+**Example:**
+
+```json
+{
+  "tipo": "mano_de_obra",
+  "descripcion": "",
+  "articuloId": 1,
+  "cantidad": 1,
+  "precioUnit": 0,
+  "condIva": "1"
+}
+```
+
+### OrdenTrabajo
+
+- **Type:**`object`
+
+* **`clienteId`**
+
+  `integer`
+
+* **`enGarantia`**
+
+  `boolean`
+
+* **`equipoDescripcion`**
+
+  `string`
+
+* **`estado`**
+
+  `string`, possible values: `"recibido", "diagnosticado", "presupuestado", "aprobado", "en_reparacion", "listo", "entregado", "facturado", "cancelado", "sin_reparacion"`
+
+* **`facturaId`**
+
+  `integer`
+
+* **`id`**
+
+  `integer`
+
+* **`items`**
+
+  `array`
+
+  **Items:**
+
+  - **`cantidad` (required)**
+
+    `number`
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`precioUnit` (required)**
+
+    `number`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"mano_de_obra", "repuesto", "servicio"`
+
+  - **`articuloId`**
+
+    `integer`
+
+  - **`condIva`**
+
+    `string`, possible values: `"1", "2", "3"`
+
+* **`numero`**
+
+  `integer`
+
+* **`presupuesto`**
+
+  `number`
+
+* **`prioridad`**
+
+  `string`, possible values: `"baja", "normal", "alta", "urgente"`
+
+* **`sintomaReportado`**
+
+  `string`
+
+* **`tecnicoId`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "numero": 1,
+  "clienteId": 1,
+  "tecnicoId": 1,
+  "estado": "recibido",
+  "prioridad": "baja",
+  "equipoDescripcion": "",
+  "sintomaReportado": "",
+  "enGarantia": true,
+  "presupuesto": 1,
+  "facturaId": 1,
+  "items": [
+    {
+      "tipo": "mano_de_obra",
+      "descripcion": "",
+      "articuloId": 1,
+      "cantidad": 1,
+      "precioUnit": 0,
+      "condIva": "1"
+    }
+  ],
+  "additionalProperty": "anything"
+}
+```
+
+### OrdenTrabajoInput
+
+- **Type:**`object`
+
+* **`clienteId` (required)**
+
+  `integer`
+
+* **`equipoDescripcion` (required)**
+
+  `string`
+
+* **`sintomaReportado` (required)**
+
+  `string`
+
+* **`diagnostico`**
+
+  `string`
+
+* **`enGarantia`**
+
+  `boolean`
+
+* **`equipoMarca`**
+
+  `string`
+
+* **`equipoModelo`**
+
+  `string`
+
+* **`equipoNroSerie`**
+
+  `string`
+
+* **`fechaPromesa`**
+
+  `string`
+
+* **`garantiaVence`**
+
+  `string`
+
+* **`items`**
+
+  `array`
+
+  **Items:**
+
+  - **`cantidad` (required)**
+
+    `number`
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`precioUnit` (required)**
+
+    `number`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"mano_de_obra", "repuesto", "servicio"`
+
+  - **`articuloId`**
+
+    `integer`
+
+  - **`condIva`**
+
+    `string`, possible values: `"1", "2", "3"`
+
+* **`observaciones`**
+
+  `string`
+
+* **`otGarantiaId`**
+
+  `integer`
+
+* **`prioridad`**
+
+  `string`, possible values: `"baja", "normal", "alta", "urgente"`
+
+* **`tecnicoId`**
+
+  `integer`
+
+* **`trabajoRealizado`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "clienteId": 1,
+  "tecnicoId": 1,
+  "prioridad": "baja",
+  "equipoMarca": "",
+  "equipoModelo": "",
+  "equipoNroSerie": "",
+  "equipoDescripcion": "",
+  "sintomaReportado": "",
+  "diagnostico": "",
+  "trabajoRealizado": "",
+  "fechaPromesa": "",
+  "observaciones": "",
+  "enGarantia": true,
+  "garantiaVence": "",
+  "otGarantiaId": 1,
+  "items": [
+    {
+      "tipo": "mano_de_obra",
+      "descripcion": "",
+      "articuloId": 1,
+      "cantidad": 1,
+      "precioUnit": 0,
+      "condIva": "1"
+    }
+  ]
+}
+```
+
+### OrdenTrabajoUpdateInput
+
+- **Type:**
+
+**Example:**
+
+### OrdenTrabajoTransitionInput
+
+- **Type:**`object`
+
+* **`estado` (required)**
+
+  `string`, possible values: `"recibido", "diagnosticado", "presupuestado", "aprobado", "en_reparacion", "listo", "entregado", "facturado", "cancelado", "sin_reparacion"`
+
+* **`diagnostico`**
+
+  `string`
+
+* **`fechaEntrega`**
+
+  `string`
+
+* **`fechaPromesa`**
+
+  `string`
+
+* **`items`**
+
+  `array`
+
+  **Items:**
+
+  - **`cantidad` (required)**
+
+    `number`
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`precioUnit` (required)**
+
+    `number`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"mano_de_obra", "repuesto", "servicio"`
+
+  - **`articuloId`**
+
+    `integer`
+
+  - **`condIva`**
+
+    `string`, possible values: `"1", "2", "3"`
+
+* **`observaciones`**
+
+  `string`
+
+* **`tecnicoId`**
+
+  `integer`
+
+* **`trabajoRealizado`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "estado": "recibido",
+  "diagnostico": "",
+  "trabajoRealizado": "",
+  "fechaPromesa": "",
+  "fechaEntrega": "",
+  "tecnicoId": 1,
+  "observaciones": "",
+  "items": [
+    {
+      "tipo": "mano_de_obra",
+      "descripcion": "",
+      "articuloId": 1,
+      "cantidad": 1,
+      "precioUnit": 0,
+      "condIva": "1"
+    }
+  ]
+}
+```
+
+### OrdenTrabajoFacturarInput
+
+- **Type:**`object`
+
+* **`prefijo`**
+
+  `string`
+
+* **`skipArcaCae`**
+
+  `boolean`, default: `true`
+
+* **`tipo`**
+
+  `string`, possible values: `"A", "B"`
+
+**Example:**
+
+```json
+{
+  "tipo": "A",
+  "prefijo": "",
+  "skipArcaCae": true
+}
+```
+
+### OrdenTrabajoEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`enGarantia`**
+
+    `boolean`
+
+  - **`equipoDescripcion`**
+
+    `string`
+
+  - **`estado`**
+
+    `string`, possible values: `"recibido", "diagnosticado", "presupuestado", "aprobado", "en_reparacion", "listo", "entregado", "facturado", "cancelado", "sin_reparacion"`
+
+  - **`facturaId`**
+
+    `integer`
+
+  - **`id`**
+
+    `integer`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+    - **`cantidad` (required)**
+
+      `number`
+
+    - **`descripcion` (required)**
+
+      `string`
+
+    - **`precioUnit` (required)**
+
+      `number`
+
+    - **`tipo` (required)**
+
+      `string`, possible values: `"mano_de_obra", "repuesto", "servicio"`
+
+    - **`articuloId`**
+
+      `integer`
+
+    - **`condIva`**
+
+      `string`, possible values: `"1", "2", "3"`
+
+  - **`numero`**
+
+    `integer`
+
+  - **`presupuesto`**
+
+    `number`
+
+  - **`prioridad`**
+
+    `string`, possible values: `"baja", "normal", "alta", "urgente"`
+
+  - **`sintomaReportado`**
+
+    `string`
+
+  - **`tecnicoId`**
+
+    `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "numero": 1,
+    "clienteId": 1,
+    "tecnicoId": 1,
+    "estado": "recibido",
+    "prioridad": "baja",
+    "equipoDescripcion": "",
+    "sintomaReportado": "",
+    "enGarantia": true,
+    "presupuesto": 1,
+    "facturaId": 1,
+    "items": [
+      {
+        "tipo": "mano_de_obra",
+        "descripcion": "",
+        "articuloId": 1,
+        "cantidad": 1,
+        "precioUnit": 0,
+        "condIva": "1"
+      }
+    ],
+    "additionalProperty": "anything"
+  }
+}
+```
+
+### OrdenTrabajoListEnvelope
+
+- **Type:**
+
+**Example:**
+
+### OrdenTrabajoFacturarEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`facturaId` (required)**
+
+    `integer`
+
+  - **`orden` (required)**
+
+    `object`
+
+    - **`clienteId`**
+
+      `integer`
+
+    - **`enGarantia`**
+
+      `boolean`
+
+    - **`equipoDescripcion`**
+
+      `string`
+
+    - **`estado`**
+
+      `string`, possible values: `"recibido", "diagnosticado", "presupuestado", "aprobado", "en_reparacion", "listo", "entregado", "facturado", "cancelado", "sin_reparacion"`
+
+    - **`facturaId`**
+
+      `integer`
+
+    - **`id`**
+
+      `integer`
+
+    - **`items`**
+
+      `array`
+
+      **Items:**
+
+      - **`cantidad` (required)**
+
+        `number`
+
+      - **`descripcion` (required)**
+
+        `string`
+
+      - **`precioUnit` (required)**
+
+        `number`
+
+      - **`tipo` (required)**
+
+        `string`, possible values: `"mano_de_obra", "repuesto", "servicio"`
+
+      - **`articuloId`**
+
+        `integer`
+
+      - **`condIva`**
+
+        `string`, possible values: `"1", "2", "3"`
+
+    - **`numero`**
+
+      `integer`
+
+    - **`presupuesto`**
+
+      `number`
+
+    - **`prioridad`**
+
+      `string`, possible values: `"baja", "normal", "alta", "urgente"`
+
+    - **`sintomaReportado`**
+
+      `string`
+
+    - **`tecnicoId`**
+
+      `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "orden": {
+      "id": 1,
+      "numero": 1,
+      "clienteId": 1,
+      "tecnicoId": 1,
+      "estado": "recibido",
+      "prioridad": "baja",
+      "equipoDescripcion": "",
+      "sintomaReportado": "",
+      "enGarantia": true,
+      "presupuesto": 1,
+      "facturaId": 1,
+      "items": [
+        {
+          "tipo": "mano_de_obra",
+          "descripcion": "",
+          "articuloId": 1,
+          "cantidad": 1,
+          "precioUnit": 0,
+          "condIva": "1"
+        }
+      ],
+      "additionalProperty": "anything"
+    },
+    "facturaId": 1
+  }
 }
 ```
 

@@ -1,0 +1,59 @@
+{
+  "title": "Órdenes de trabajo",
+  "subtitle": "Taller — diagnóstico, presupuesto y facturación",
+  "empty": "No hay órdenes de trabajo para mostrar.",
+  "loadError": "No se pudieron cargar las órdenes de trabajo.",
+  "new": "Nueva OT",
+  "create": "Crear",
+  "cancel": "Cancelar",
+  "clienteId": "ID cliente",
+  "equipoDescripcion": "Equipo / elemento",
+  "sintoma": "Síntoma reportado",
+  "nroSerie": "Nº de serie",
+  "prioridad": "Prioridad",
+  "itemTipo": "Tipo de ítem",
+  "itemDesc": "Descripción ítem",
+  "precio": "Precio unitario",
+  "cantidad": "Cantidad",
+  "dashboard": {
+    "enReparacion": "En reparación",
+    "listas": "Listas para entregar",
+    "esperando": "Esperando aprobación"
+  },
+  "columns": {
+    "numero": "OT",
+    "cliente": "Cliente",
+    "equipo": "Equipo",
+    "estado": "Estado",
+    "presupuesto": "Presupuesto",
+    "garantia": "Garantía",
+    "acciones": "Acciones"
+  },
+  "estados": {
+    "recibido": "Recibido",
+    "diagnosticado": "Diagnosticado",
+    "presupuestado": "Presupuestado",
+    "aprobado": "Aprobado",
+    "en_reparacion": "En reparación",
+    "listo": "Listo",
+    "entregado": "Entregado",
+    "facturado": "Facturado",
+    "cancelado": "Cancelado",
+    "sin_reparacion": "Sin reparación"
+  },
+  "actions": {
+    "diagnosticar": "Diagnosticar",
+    "presupuestar": "Presupuestar",
+    "aprobar": "Aprobar",
+    "reparar": "Iniciar reparación",
+    "listo": "Marcar listo",
+    "entregar": "Entregar",
+    "facturar": "Facturar",
+    "cancelar": "Cancelar OT"
+  },
+  "filterAll": "Todos",
+  "warrantyYes": "Sí",
+  "warrantyNo": "No",
+  "invoiceOk": "Factura generada",
+  "invoiceError": "No se pudo facturar la OT"
+}

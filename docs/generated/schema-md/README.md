@@ -470,6 +470,30 @@
 
 * [OrdenEntregaUpdateInput](./ordenentregaupdateinput.md) – `-`
 
+* [OrdenTrabajo](./ordentrabajo.md) – `-`
+
+* [OrdenTrabajoEnvelope](./ordentrabajoenvelope.md) – `-`
+
+* [OrdenTrabajoEstado](./ordentrabajoestado.md) – `-`
+
+* [OrdenTrabajoFacturarEnvelope](./ordentrabajofacturarenvelope.md) – `-`
+
+* [OrdenTrabajoFacturarInput](./ordentrabajofacturarinput.md) – `-`
+
+* [OrdenTrabajoInput](./ordentrabajoinput.md) – `-`
+
+* [OrdenTrabajoItem](./ordentrabajoitem.md) – `-`
+
+* [OrdenTrabajoItemTipo](./ordentrabajoitemtipo.md) – `-`
+
+* [OrdenTrabajoListEnvelope](./ordentrabajolistenvelope.md) – `-`
+
+* [OrdenTrabajoPrioridad](./ordentrabajoprioridad.md) – `-`
+
+* [OrdenTrabajoTransitionInput](./ordentrabajotransitioninput.md) – `-`
+
+* [OrdenTrabajoUpdateInput](./ordentrabajoupdateinput.md) – `-`
+
 * [Pedido](./pedido.md) – `-`
 
 * [PedidoEnvelope](./pedidoenvelope.md) – `-`
@@ -940,6 +964,14 @@
 
 * [Untitled object in OrdenEntregaListEnvelope](./ordenentregalistenvelope-allof-0.md) – `undefined#/allOf/0`
 
+* [Untitled object in OrdenTrabajoFacturarEnvelope](./ordentrabajofacturarenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled object in OrdenTrabajoListEnvelope](./ordentrabajolistenvelope-allof-0.md) – `undefined#/allOf/0`
+
+* [Untitled object in OrdenTrabajoListEnvelope](./ordentrabajolistenvelope-allof-0-properties-counts.md) – `undefined#/allOf/0/properties/counts`
+
+* [Untitled object in OrdenTrabajoUpdateInput](./ordentrabajoupdateinput-allof-1.md) – `undefined#/allOf/1`
+
 * [Untitled object in PedidoInput](./pedidoinput-properties-items-items.md "Catalog line requires articuloId") – `undefined#/properties/items/items`
 
 * [Untitled object in PedidoListEnvelope](./pedidolistenvelope-allof-0.md) – `undefined#/allOf/0`
@@ -1171,6 +1203,14 @@
 * [Untitled array in OrdenEntrega](./ordenentrega-properties-items.md) – `undefined#/properties/items`
 
 * [Untitled array in OrdenEntregaListEnvelope](./ordenentregalistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
+
+* [Untitled array in OrdenTrabajo](./ordentrabajo-properties-items.md) – `undefined#/properties/items`
+
+* [Untitled array in OrdenTrabajoInput](./ordentrabajoinput-properties-items.md) – `undefined#/properties/items`
+
+* [Untitled array in OrdenTrabajoListEnvelope](./ordentrabajolistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
+
+* [Untitled array in OrdenTrabajoTransitionInput](./ordentrabajotransitioninput-properties-items.md) – `undefined#/properties/items`
 
 * [Untitled array in Pedido](./pedido-properties-items.md) – `undefined#/properties/items`
 

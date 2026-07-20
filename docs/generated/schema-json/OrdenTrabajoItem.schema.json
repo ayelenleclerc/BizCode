@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "articuloId": {
+      "minimum": 1,
+      "nullable": true,
+      "type": "integer"
+    },
+    "cantidad": {
+      "exclusiveMinimum": 0,
+      "type": "number"
+    },
+    "condIva": {
+      "enum": [
+        "1",
+        "2",
+        "3"
+      ],
+      "type": "string"
+    },
+    "descripcion": {
+      "maxLength": 120,
+      "minLength": 1,
+      "type": "string"
+    },
+    "precioUnit": {
+      "minimum": 0,
+      "type": "number"
+    },
+    "tipo": {
+      "$ref": "./OrdenTrabajoItemTipo.schema.json"
+    }
+  },
+  "required": [
+    "tipo",
+    "descripcion",
+    "cantidad",
+    "precioUnit"
+  ],
+  "title": "OrdenTrabajoItem",
+  "type": "object"
+}

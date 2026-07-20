@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "prefijo": {
+      "type": "string"
+    },
+    "skipArcaCae": {
+      "default": true,
+      "type": "boolean"
+    },
+    "tipo": {
+      "enum": [
+        "A",
+        "B"
+      ],
+      "type": "string"
+    }
+  },
+  "title": "OrdenTrabajoFacturarInput",
+  "type": "object"
+}

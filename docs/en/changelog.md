@@ -10,6 +10,7 @@ Versioning: [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **Service work orders (#246):** Prisma `OrdenTrabajo` / `OrdenTrabajoItem` with state machine (recibido → facturado); CRUD + transitions audited via `AuditEvent`; one-click invoice via `FacturaService` (parts decrement stock, labor/service do not); basic warranty lookup by serial; client notifications `ot_presupuestado` / `ot_listo`; workshop dashboard UI behind module `service.orders`; OpenAPI, tests, i18n EN/ES/PT-BR.
 - **Recurring service contracts (#245):** Prisma `Contrato` / `ContratoItem` / `ContratoAjuste` and `Factura.contratoId`; CRUD API under module `service.contracts` (`modoEmision` `auto` \| `revision`); daily job `npm run contratos:facturacion` generates invoices via `FacturaService` with catch-up and idempotency; fixed/manual price adjustments (IPC/ICL HTTP deferred); in-app manager notifications; UI list/CRUD with pause/resume; OpenAPI, tests, i18n EN/ES/PT-BR.
 
 - **Service items without stock (#244):** `Articulo.tipo` (`articulo` \| `servicio`) and `unidadServicio`; invoice/order line snapshots with nullable `articuloId` for ad-hoc services; stock validation/decrement only for physical catalog lines; remitos exclude services; `GET /api/reportes/ventas-por-tipo`; stock-critical excludes services; UI catalog tipo + free-text service line on new invoice; OpenAPI, tests, i18n EN/ES/PT-BR.

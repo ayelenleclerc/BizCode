@@ -10,6 +10,7 @@ Versionado: [Semantic Versioning](https://semver.org/lang/es/).
 
 ### Agregado
 
+- **Órdenes de trabajo (#246):** Prisma `OrdenTrabajo` / `OrdenTrabajoItem` con máquina de estados (recibido → facturado); CRUD + transiciones auditadas en `AuditEvent`; facturación en un click vía `FacturaService` (repuestos descuentan stock; mano de obra/servicio no); garantía básica por número de serie; notificaciones `ot_presupuestado` / `ot_listo`; dashboard de taller con módulo `service.orders`; OpenAPI, pruebas e i18n EN/ES/PT-BR.
 - **Contratos de servicio recurrentes (#245):** Prisma `Contrato` / `ContratoItem` / `ContratoAjuste` y `Factura.contratoId`; API CRUD con módulo `service.contracts` (`modoEmision` `auto` \| `revision`); job diario `npm run contratos:facturacion` genera facturas vía `FacturaService` con catch-up e idempotencia; ajustes fijo/manual (IPC/ICL HTTP diferido); notificaciones in-app a managers; UI listado/CRUD con pausa/reanudación; OpenAPI, pruebas e i18n EN/ES/PT-BR.
 
 - **Ítems de servicio sin stock (#244):** `Articulo.tipo` (`articulo` \| `servicio`) y `unidadServicio`; snapshots en líneas de factura/pedido con `articuloId` nullable para servicio libre; validación/decremento de stock solo en artículos físicos; remitos excluyen servicios; `GET /api/reportes/ventas-por-tipo`; stock crítico sin servicios; UI de tipo en catálogo + línea de servicio libre en factura; OpenAPI, pruebas e i18n EN/ES/PT-BR.

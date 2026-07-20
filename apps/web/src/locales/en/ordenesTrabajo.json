@@ -1,0 +1,59 @@
+{
+  "title": "Work orders",
+  "subtitle": "Workshop — diagnosis, quote and invoicing",
+  "empty": "No work orders to show.",
+  "loadError": "Could not load work orders.",
+  "new": "New WO",
+  "create": "Create",
+  "cancel": "Cancel",
+  "clienteId": "Customer ID",
+  "equipoDescripcion": "Equipment / item",
+  "sintoma": "Reported symptom",
+  "nroSerie": "Serial number",
+  "prioridad": "Priority",
+  "itemTipo": "Line type",
+  "itemDesc": "Line description",
+  "precio": "Unit price",
+  "cantidad": "Quantity",
+  "dashboard": {
+    "enReparacion": "In repair",
+    "listas": "Ready for pickup",
+    "esperando": "Awaiting approval"
+  },
+  "columns": {
+    "numero": "WO",
+    "cliente": "Customer",
+    "equipo": "Equipment",
+    "estado": "Status",
+    "presupuesto": "Quote",
+    "garantia": "Warranty",
+    "acciones": "Actions"
+  },
+  "estados": {
+    "recibido": "Received",
+    "diagnosticado": "Diagnosed",
+    "presupuestado": "Quoted",
+    "aprobado": "Approved",
+    "en_reparacion": "In repair",
+    "listo": "Ready",
+    "entregado": "Delivered",
+    "facturado": "Invoiced",
+    "cancelado": "Cancelled",
+    "sin_reparacion": "No repair"
+  },
+  "actions": {
+    "diagnosticar": "Diagnose",
+    "presupuestar": "Quote",
+    "aprobar": "Approve",
+    "reparar": "Start repair",
+    "listo": "Mark ready",
+    "entregar": "Deliver",
+    "facturar": "Invoice",
+    "cancelar": "Cancel WO"
+  },
+  "filterAll": "All",
+  "warrantyYes": "Yes",
+  "warrantyNo": "No",
+  "invoiceOk": "Invoice created",
+  "invoiceError": "Could not invoice the work order"
+}

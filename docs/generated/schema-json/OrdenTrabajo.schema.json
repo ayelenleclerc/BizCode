@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "properties": {
+    "clienteId": {
+      "type": "integer"
+    },
+    "enGarantia": {
+      "type": "boolean"
+    },
+    "equipoDescripcion": {
+      "type": "string"
+    },
+    "estado": {
+      "$ref": "./OrdenTrabajoEstado.schema.json"
+    },
+    "facturaId": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "id": {
+      "type": "integer"
+    },
+    "items": {
+      "items": {
+        "$ref": "./OrdenTrabajoItem.schema.json"
+      },
+      "type": "array"
+    },
+    "numero": {
+      "type": "integer"
+    },
+    "presupuesto": {
+      "nullable": true,
+      "type": "number"
+    },
+    "prioridad": {
+      "$ref": "./OrdenTrabajoPrioridad.schema.json"
+    },
+    "sintomaReportado": {
+      "type": "string"
+    },
+    "tecnicoId": {
+      "nullable": true,
+      "type": "integer"
+    }
+  },
+  "title": "OrdenTrabajo",
+  "type": "object"
+}

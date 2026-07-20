@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "enum": [
+    "recibido",
+    "diagnosticado",
+    "presupuestado",
+    "aprobado",
+    "en_reparacion",
+    "listo",
+    "entregado",
+    "facturado",
+    "cancelado",
+    "sin_reparacion"
+  ],
+  "title": "OrdenTrabajoEstado",
+  "type": "string"
+}
