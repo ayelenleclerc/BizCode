@@ -15,6 +15,11 @@ import type {
   ContratoInput,
   ContratoItemInput,
   ContratoUpdateInput,
+  OrdenTrabajoFacturarInput,
+  OrdenTrabajoInput,
+  OrdenTrabajoItemInput,
+  OrdenTrabajoTransitionInput,
+  OrdenTrabajoUpdateInput,
   PedidoInput,
   PedidoInvoiceInput,
   PedidoItemInput,
@@ -1596,6 +1601,190 @@ export const contratoAjusteManualBodySchema = z
     }
   })
   .transform((data): ContratoAjusteManualInput => ({ porcentaje: data.porcentaje }))
+
+const otEstadoSchema = z.enum([
+  'recibido',
+  'diagnosticado',
+  'presupuestado',
+  'aprobado',
+  'en_reparacion',
+  'listo',
+  'entregado',
+  'facturado',
+  'cancelado',
+  'sin_reparacion',
+])
+
+const otPrioridadSchema = z.enum(['baja', 'normal', 'alta', 'urgente'])
+
+const otItemTipoSchema = z.enum(['mano_de_obra', 'repuesto', 'servicio'])
+
+const otItemSchema = z
+  .object({
+    tipo: otItemTipoSchema,
+    descripcion: z.string(),
+    articuloId: z.union([z.number(), z.null()]).optional(),
+    cantidad: z.number(),
+    precioUnit: z.number(),
+    condIva: z.enum(['1', '2', '3']).optional(),
+  })
+  .superRefine((data, ctx) => {
+    if (data.descripcion.trim().length < 1 || data.descripcion.trim().length > 120) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'descripcion must be 1–120 chars',
+        path: ['descripcion'],
+      })
+    }
+    if (typeof data.cantidad !== 'number' || Number.isNaN(data.cantidad) || data.cantidad <= 0) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'cantidad must be > 0', path: ['cantidad'] })
+    }
+    if (typeof data.precioUnit !== 'number' || Number.isNaN(data.precioUnit) || data.precioUnit < 0) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'precioUnit must be >= 0', path: ['precioUnit'] })
+    }
+    if (data.tipo === 'repuesto') {
+      if (data.articuloId == null || !Number.isInteger(data.articuloId) || data.articuloId < 1) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'articuloId is required for repuesto',
+          path: ['articuloId'],
+        })
+      }
+    }
+  })
+  .transform(
+    (data): OrdenTrabajoItemInput => ({
+      tipo: data.tipo,
+      descripcion: data.descripcion.trim().slice(0, 120),
+      articuloId: data.articuloId ?? null,
+      cantidad: data.cantidad,
+      precioUnit: data.precioUnit,
+      condIva: data.condIva ?? '1',
+    }),
+  )
+
+function refineOtBody(
+  data: {
+    clienteId: number
+    equipoDescripcion: string
+    sintomaReportado: string
+  },
+  ctx: z.RefinementCtx,
+): void {
+  if (!Number.isInteger(data.clienteId) || data.clienteId < 1) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'clienteId must be >= 1', path: ['clienteId'] })
+  }
+  if (data.equipoDescripcion.trim().length < 1 || data.equipoDescripcion.trim().length > 200) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'equipoDescripcion must be 1–200 chars',
+      path: ['equipoDescripcion'],
+    })
+  }
+  if (data.sintomaReportado.trim().length < 1 || data.sintomaReportado.trim().length > 500) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'sintomaReportado must be 1–500 chars',
+      path: ['sintomaReportado'],
+    })
+  }
+}
+
+const otBodyObject = z.object({
+  clienteId: z.number(),
+  tecnicoId: z.union([z.number(), z.null()]).optional(),
+  prioridad: otPrioridadSchema.optional(),
+  equipoMarca: z.union([z.string(), z.null()]).optional(),
+  equipoModelo: z.union([z.string(), z.null()]).optional(),
+  equipoNroSerie: z.union([z.string(), z.null()]).optional(),
+  equipoDescripcion: z.string(),
+  sintomaReportado: z.string(),
+  diagnostico: z.union([z.string(), z.null()]).optional(),
+  trabajoRealizado: z.union([z.string(), z.null()]).optional(),
+  fechaPromesa: z.union([z.string(), z.null()]).optional(),
+  observaciones: z.union([z.string(), z.null()]).optional(),
+  enGarantia: z.boolean().optional(),
+  garantiaVence: z.union([z.string(), z.null()]).optional(),
+  otGarantiaId: z.union([z.number(), z.null()]).optional(),
+  items: z.array(otItemSchema).optional(),
+})
+
+function mapOtBody(data: z.infer<typeof otBodyObject>): OrdenTrabajoInput {
+  return {
+    clienteId: data.clienteId,
+    tecnicoId: data.tecnicoId ?? null,
+    prioridad: data.prioridad,
+    equipoMarca: data.equipoMarca?.trim() || null,
+    equipoModelo: data.equipoModelo?.trim() || null,
+    equipoNroSerie: data.equipoNroSerie?.trim() || null,
+    equipoDescripcion: data.equipoDescripcion.trim().slice(0, 200),
+    sintomaReportado: data.sintomaReportado.trim().slice(0, 500),
+    diagnostico: data.diagnostico?.trim() || null,
+    trabajoRealizado: data.trabajoRealizado?.trim() || null,
+    fechaPromesa: data.fechaPromesa?.trim() || null,
+    observaciones: data.observaciones?.trim() || null,
+    enGarantia: data.enGarantia,
+    garantiaVence: data.garantiaVence?.trim() || null,
+    otGarantiaId: data.otGarantiaId ?? null,
+    items: data.items,
+  }
+}
+
+export const ordenTrabajoBodySchema = otBodyObject.superRefine(refineOtBody).transform(mapOtBody)
+
+export const ordenTrabajoUpdateBodySchema = otBodyObject
+  .extend({
+    estado: otEstadoSchema.optional(),
+    fechaEntrega: z.union([z.string(), z.null()]).optional(),
+    presupuesto: z.union([z.number(), z.null()]).optional(),
+  })
+  .superRefine(refineOtBody)
+  .transform(
+    (data): OrdenTrabajoUpdateInput => ({
+      ...mapOtBody(data),
+      estado: data.estado,
+      fechaEntrega: data.fechaEntrega?.trim() || null,
+      presupuesto: data.presupuesto,
+    }),
+  )
+
+export const ordenTrabajoTransitionBodySchema = z
+  .object({
+    estado: otEstadoSchema,
+    diagnostico: z.union([z.string(), z.null()]).optional(),
+    trabajoRealizado: z.union([z.string(), z.null()]).optional(),
+    fechaPromesa: z.union([z.string(), z.null()]).optional(),
+    fechaEntrega: z.union([z.string(), z.null()]).optional(),
+    tecnicoId: z.union([z.number(), z.null()]).optional(),
+    observaciones: z.union([z.string(), z.null()]).optional(),
+    items: z.array(otItemSchema).optional(),
+  })
+  .transform(
+    (data): OrdenTrabajoTransitionInput => ({
+      estado: data.estado,
+      diagnostico: data.diagnostico?.trim() || null,
+      trabajoRealizado: data.trabajoRealizado?.trim() || null,
+      fechaPromesa: data.fechaPromesa?.trim() || null,
+      fechaEntrega: data.fechaEntrega?.trim() || null,
+      tecnicoId: data.tecnicoId ?? null,
+      observaciones: data.observaciones?.trim() || null,
+      items: data.items,
+    }),
+  )
+
+export const ordenTrabajoFacturarBodySchema = z
+  .object({
+    tipo: z.enum(['A', 'B']).optional(),
+    prefijo: z.string().optional(),
+    skipArcaCae: z.boolean().optional(),
+  })
+  .transform(
+    (data): OrdenTrabajoFacturarInput => ({
+      tipo: data.tipo,
+      prefijo: data.prefijo?.trim(),
+      skipArcaCae: data.skipArcaCae,
+    }),
+  )
 
 /** Resultado de validar un objeto arbitrario (p. ej. fila CSV → raw) con un schema Zod de dominio. */
 export type SafeParseBodyResult<T> = { ok: true; value: T } | { ok: false; error: string }

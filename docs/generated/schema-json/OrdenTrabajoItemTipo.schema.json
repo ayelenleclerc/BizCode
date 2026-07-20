@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "enum": [
+    "mano_de_obra",
+    "repuesto",
+    "servicio"
+  ],
+  "title": "OrdenTrabajoItemTipo",
+  "type": "string"
+}

@@ -39,6 +39,13 @@ export const NAV_SECTIONS: readonly NavSection[] = [
     moduleKey: 'service.contracts',
   },
   {
+    key: 'ordenesTrabajo',
+    path: '/ordenes-trabajo',
+    icon: '🛠️',
+    roles: ['owner', 'manager', 'seller', 'billing', 'backoffice'],
+    moduleKey: 'service.orders',
+  },
+  {
     key: 'clientes',
     path: '/clientes',
     icon: '📋',
@@ -154,6 +161,7 @@ export const NAV_SECTIONS: readonly NavSection[] = [
 export const ROUTE_MODULE_GUARDS: ReadonlyArray<{ path: string; moduleKey: ModuleKey }> = [
   { path: 'pedidos', moduleKey: 'billing.orders' },
   { path: 'contratos', moduleKey: 'service.contracts' },
+  { path: 'ordenes-trabajo', moduleKey: 'service.orders' },
   { path: 'logistica', moduleKey: 'logistics.dispatches' },
   { path: 'logistica/picking', moduleKey: 'logistics.picking' },
   { path: 'logistica/seguimiento', moduleKey: 'logistics.gps' },

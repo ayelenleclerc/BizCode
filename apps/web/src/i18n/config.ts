@@ -18,6 +18,7 @@ import auditEs from '@/locales/es/audit.json'
 import cobrosEs from '@/locales/es/cobros.json'
 import pedidosEs from '@/locales/es/pedidos.json'
 import contratosEs from '@/locales/es/contratos.json'
+import ordenesTrabajoEs from '@/locales/es/ordenesTrabajo.json'
 import finanzasEs from '@/locales/es/finanzas.json'
 import reportesEs from '@/locales/es/reportes.json'
 import dashboardAnalyticsEs from '@/locales/es/dashboard-analytics.json'
@@ -43,6 +44,7 @@ import auditEn from '@/locales/en/audit.json'
 import cobrosEn from '@/locales/en/cobros.json'
 import pedidosEn from '@/locales/en/pedidos.json'
 import contratosEn from '@/locales/en/contratos.json'
+import ordenesTrabajoEn from '@/locales/en/ordenesTrabajo.json'
 import finanzasEn from '@/locales/en/finanzas.json'
 import reportesEn from '@/locales/en/reportes.json'
 import dashboardAnalyticsEn from '@/locales/en/dashboard-analytics.json'
@@ -68,6 +70,7 @@ import auditPt from '@/locales/pt-BR/audit.json'
 import cobrosPt from '@/locales/pt-BR/cobros.json'
 import pedidosPt from '@/locales/pt-BR/pedidos.json'
 import contratosPt from '@/locales/pt-BR/contratos.json'
+import ordenesTrabajoPt from '@/locales/pt-BR/ordenesTrabajo.json'
 import finanzasPt from '@/locales/pt-BR/finanzas.json'
 import reportesPt from '@/locales/pt-BR/reportes.json'
 import dashboardAnalyticsPt from '@/locales/pt-BR/dashboard-analytics.json'
@@ -89,7 +92,7 @@ i18n
     lng: savedLang,
     fallbackLng: 'es',
     defaultNS: 'common',
-    ns: ['common', 'clientes', 'articulos', 'proveedores', 'compras', 'recuentos', 'repartos', 'pod', 'picking', 'seguimiento', 'logisticaReportes', 'facturacion', 'pedidos', 'contratos', 'cobros', 'finanzas', 'reportes', 'dashboardAnalytics', 'logistica', 'zonasEntrega', 'empresa', 'portal', 'chat', 'audit'],
+    ns: ['common', 'clientes', 'articulos', 'proveedores', 'compras', 'recuentos', 'repartos', 'pod', 'picking', 'seguimiento', 'logisticaReportes', 'facturacion', 'pedidos', 'contratos', 'ordenesTrabajo', 'cobros', 'finanzas', 'reportes', 'dashboardAnalytics', 'logistica', 'zonasEntrega', 'empresa', 'portal', 'chat', 'audit'],
     resources: {
       es: {
         common: commonEs,
@@ -103,6 +106,7 @@ i18n
         facturacion: facturacionEs,
         pedidos: pedidosEs,
         contratos: contratosEs,
+        ordenesTrabajo: ordenesTrabajoEs,
         zonasEntrega: zonasEntregaEs,
         chat: chatEs,
         audit: auditEs,
@@ -129,6 +133,7 @@ i18n
         facturacion: facturacionEn,
         pedidos: pedidosEn,
         contratos: contratosEn,
+        ordenesTrabajo: ordenesTrabajoEn,
         zonasEntrega: zonasEntregaEn,
         chat: chatEn,
         audit: auditEn,
@@ -155,6 +160,7 @@ i18n
         facturacion: facturacionPt,
         pedidos: pedidosPt,
         contratos: contratosPt,
+        ordenesTrabajo: ordenesTrabajoPt,
         zonasEntrega: zonasEntregaPt,
         chat: chatPt,
         audit: auditPt,

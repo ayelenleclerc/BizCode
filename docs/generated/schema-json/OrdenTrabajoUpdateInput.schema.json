@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "allOf": [
+    {
+      "$ref": "./OrdenTrabajoInput.schema.json"
+    },
+    {
+      "properties": {
+        "estado": {
+          "$ref": "./OrdenTrabajoEstado.schema.json"
+        },
+        "fechaEntrega": {
+          "nullable": true,
+          "type": "string"
+        },
+        "presupuesto": {
+          "nullable": true,
+          "type": "number"
+        }
+      },
+      "type": "object"
+    }
+  ],
+  "title": "OrdenTrabajoUpdateInput"
+}

@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "diagnostico": {
+      "nullable": true,
+      "type": "string"
+    },
+    "estado": {
+      "$ref": "./OrdenTrabajoEstado.schema.json"
+    },
+    "fechaEntrega": {
+      "nullable": true,
+      "type": "string"
+    },
+    "fechaPromesa": {
+      "nullable": true,
+      "type": "string"
+    },
+    "items": {
+      "items": {
+        "$ref": "./OrdenTrabajoItem.schema.json"
+      },
+      "type": "array"
+    },
+    "observaciones": {
+      "nullable": true,
+      "type": "string"
+    },
+    "tecnicoId": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "trabajoRealizado": {
+      "nullable": true,
+      "type": "string"
+    }
+  },
+  "required": [
+    "estado"
+  ],
+  "title": "OrdenTrabajoTransitionInput",
+  "type": "object"
+}

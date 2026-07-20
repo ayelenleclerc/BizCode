@@ -3,9 +3,9 @@
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
   "version": 1,
-  "serialNumber": "urn:uuid:a9365ad6-7522-42e0-9d3b-4705262c58d1",
+  "serialNumber": "urn:uuid:bef0f971-e480-44d4-89e0-2c1138bd7a9c",
   "metadata": {
-    "timestamp": "2026-06-23T10:40:38.468Z",
+    "timestamp": "2026-07-20T17:45:00.275Z",
     "tools": {
       "components": [
         {
@@ -538,88 +538,6 @@
         {
           "name": "cdx:npm:package:path",
           "value": "node_modules/axios"
-        }
-      ],
-      "components": [
-        {
-          "type": "library",
-          "name": "https-proxy-agent",
-          "version": "5.0.1",
-          "bom-ref": "bizcode@0.1.0|axios@1.18.0|https-proxy-agent@5.0.1",
-          "author": "Nathan Rajlich",
-          "description": "An HTTP(s) proxy `http.Agent` implementation for HTTPS",
-          "licenses": [
-            {
-              "license": {
-                "id": "MIT",
-                "acknowledgement": "declared"
-              }
-            }
-          ],
-          "purl": "pkg:npm/https-proxy-agent@5.0.1",
-          "externalReferences": [
-            {
-              "url": "git://github.com/TooTallNate/node-https-proxy-agent.git",
-              "type": "vcs",
-              "comment": "as detected from PackageJson property \"repository.url\""
-            },
-            {
-              "url": "https://github.com/TooTallNate/node-https-proxy-agent#readme",
-              "type": "website",
-              "comment": "as detected from PackageJson property \"homepage\""
-            },
-            {
-              "url": "https://github.com/TooTallNate/node-https-proxy-agent/issues",
-              "type": "issue-tracker",
-              "comment": "as detected from PackageJson property \"bugs.url\""
-            }
-          ],
-          "properties": [
-            {
-              "name": "cdx:npm:package:path",
-              "value": "node_modules/axios/node_modules/https-proxy-agent"
-            }
-          ]
-        },
-        {
-          "type": "library",
-          "name": "agent-base",
-          "version": "6.0.2",
-          "bom-ref": "bizcode@0.1.0|axios@1.18.0|agent-base@6.0.2",
-          "author": "Nathan Rajlich",
-          "description": "Turn a function into an `http.Agent` instance",
-          "licenses": [
-            {
-              "license": {
-                "id": "MIT",
-                "acknowledgement": "declared"
-              }
-            }
-          ],
-          "purl": "pkg:npm/agent-base@6.0.2",
-          "externalReferences": [
-            {
-              "url": "git://github.com/TooTallNate/node-agent-base.git",
-              "type": "vcs",
-              "comment": "as detected from PackageJson property \"repository.url\""
-            },
-            {
-              "url": "https://github.com/TooTallNate/node-agent-base#readme",
-              "type": "website",
-              "comment": "as detected from PackageJson property \"homepage\""
-            },
-            {
-              "url": "https://github.com/TooTallNate/node-agent-base/issues",
-              "type": "issue-tracker",
-              "comment": "as detected from PackageJson property \"bugs.url\""
-            }
-          ],
-          "properties": [
-            {
-              "name": "cdx:npm:package:path",
-              "value": "node_modules/axios/node_modules/agent-base"
-            }
-          ]
         }
       ]
     },
@@ -1746,46 +1664,6 @@
         },
         {
           "type": "library",
-          "name": "find-up",
-          "version": "4.1.0",
-          "bom-ref": "bizcode@0.1.0|qrcode@1.5.4|find-up@4.1.0",
-          "author": "Sindre Sorhus",
-          "description": "Find a file or directory by walking up parent directories",
-          "licenses": [
-            {
-              "license": {
-                "id": "MIT",
-                "acknowledgement": "declared"
-              }
-            }
-          ],
-          "purl": "pkg:npm/find-up@4.1.0",
-          "externalReferences": [
-            {
-              "url": "git+https://github.com/sindresorhus/find-up.git",
-              "type": "vcs",
-              "comment": "as detected from PackageJson property \"repository.url\""
-            },
-            {
-              "url": "https://github.com/sindresorhus/find-up#readme",
-              "type": "website",
-              "comment": "as detected from PackageJson property \"homepage\""
-            },
-            {
-              "url": "https://github.com/sindresorhus/find-up/issues",
-              "type": "issue-tracker",
-              "comment": "as detected from PackageJson property \"bugs.url\""
-            }
-          ],
-          "properties": [
-            {
-              "name": "cdx:npm:package:path",
-              "value": "node_modules/qrcode/node_modules/find-up"
-            }
-          ]
-        },
-        {
-          "type": "library",
           "name": "y18n",
           "version": "4.0.3",
           "bom-ref": "bizcode@0.1.0|qrcode@1.5.4|y18n@4.0.3",
@@ -1821,126 +1699,6 @@
             {
               "name": "cdx:npm:package:path",
               "value": "node_modules/qrcode/node_modules/y18n"
-            }
-          ]
-        },
-        {
-          "type": "library",
-          "name": "locate-path",
-          "version": "5.0.0",
-          "bom-ref": "bizcode@0.1.0|qrcode@1.5.4|locate-path@5.0.0",
-          "author": "Sindre Sorhus",
-          "description": "Get the first path that exists on disk of multiple paths",
-          "licenses": [
-            {
-              "license": {
-                "id": "MIT",
-                "acknowledgement": "declared"
-              }
-            }
-          ],
-          "purl": "pkg:npm/locate-path@5.0.0",
-          "externalReferences": [
-            {
-              "url": "git+https://github.com/sindresorhus/locate-path.git",
-              "type": "vcs",
-              "comment": "as detected from PackageJson property \"repository.url\""
-            },
-            {
-              "url": "https://github.com/sindresorhus/locate-path#readme",
-              "type": "website",
-              "comment": "as detected from PackageJson property \"homepage\""
-            },
-            {
-              "url": "https://github.com/sindresorhus/locate-path/issues",
-              "type": "issue-tracker",
-              "comment": "as detected from PackageJson property \"bugs.url\""
-            }
-          ],
-          "properties": [
-            {
-              "name": "cdx:npm:package:path",
-              "value": "node_modules/qrcode/node_modules/locate-path"
-            }
-          ]
-        },
-        {
-          "type": "library",
-          "name": "p-locate",
-          "version": "4.1.0",
-          "bom-ref": "bizcode@0.1.0|qrcode@1.5.4|p-locate@4.1.0",
-          "author": "Sindre Sorhus",
-          "description": "Get the first fulfilled promise that satisfies the provided testing function",
-          "licenses": [
-            {
-              "license": {
-                "id": "MIT",
-                "acknowledgement": "declared"
-              }
-            }
-          ],
-          "purl": "pkg:npm/p-locate@4.1.0",
-          "externalReferences": [
-            {
-              "url": "git+https://github.com/sindresorhus/p-locate.git",
-              "type": "vcs",
-              "comment": "as detected from PackageJson property \"repository.url\""
-            },
-            {
-              "url": "https://github.com/sindresorhus/p-locate#readme",
-              "type": "website",
-              "comment": "as detected from PackageJson property \"homepage\""
-            },
-            {
-              "url": "https://github.com/sindresorhus/p-locate/issues",
-              "type": "issue-tracker",
-              "comment": "as detected from PackageJson property \"bugs.url\""
-            }
-          ],
-          "properties": [
-            {
-              "name": "cdx:npm:package:path",
-              "value": "node_modules/qrcode/node_modules/p-locate"
-            }
-          ]
-        },
-        {
-          "type": "library",
-          "name": "p-limit",
-          "version": "2.3.0",
-          "bom-ref": "bizcode@0.1.0|qrcode@1.5.4|p-limit@2.3.0",
-          "author": "Sindre Sorhus",
-          "description": "Run multiple promise-returning & async functions with limited concurrency",
-          "licenses": [
-            {
-              "license": {
-                "id": "MIT",
-                "acknowledgement": "declared"
-              }
-            }
-          ],
-          "purl": "pkg:npm/p-limit@2.3.0",
-          "externalReferences": [
-            {
-              "url": "git+https://github.com/sindresorhus/p-limit.git",
-              "type": "vcs",
-              "comment": "as detected from PackageJson property \"repository.url\""
-            },
-            {
-              "url": "https://github.com/sindresorhus/p-limit#readme",
-              "type": "website",
-              "comment": "as detected from PackageJson property \"homepage\""
-            },
-            {
-              "url": "https://github.com/sindresorhus/p-limit/issues",
-              "type": "issue-tracker",
-              "comment": "as detected from PackageJson property \"bugs.url\""
-            }
-          ],
-          "properties": [
-            {
-              "name": "cdx:npm:package:path",
-              "value": "node_modules/qrcode/node_modules/p-limit"
             }
           ]
         }
@@ -2501,88 +2259,6 @@
         {
           "name": "cdx:npm:package:path",
           "value": "node_modules/twilio"
-        }
-      ],
-      "components": [
-        {
-          "type": "library",
-          "name": "https-proxy-agent",
-          "version": "5.0.1",
-          "bom-ref": "bizcode@0.1.0|twilio@5.13.1|https-proxy-agent@5.0.1",
-          "author": "Nathan Rajlich",
-          "description": "An HTTP(s) proxy `http.Agent` implementation for HTTPS",
-          "licenses": [
-            {
-              "license": {
-                "id": "MIT",
-                "acknowledgement": "declared"
-              }
-            }
-          ],
-          "purl": "pkg:npm/https-proxy-agent@5.0.1",
-          "externalReferences": [
-            {
-              "url": "git://github.com/TooTallNate/node-https-proxy-agent.git",
-              "type": "vcs",
-              "comment": "as detected from PackageJson property \"repository.url\""
-            },
-            {
-              "url": "https://github.com/TooTallNate/node-https-proxy-agent#readme",
-              "type": "website",
-              "comment": "as detected from PackageJson property \"homepage\""
-            },
-            {
-              "url": "https://github.com/TooTallNate/node-https-proxy-agent/issues",
-              "type": "issue-tracker",
-              "comment": "as detected from PackageJson property \"bugs.url\""
-            }
-          ],
-          "properties": [
-            {
-              "name": "cdx:npm:package:path",
-              "value": "node_modules/twilio/node_modules/https-proxy-agent"
-            }
-          ]
-        },
-        {
-          "type": "library",
-          "name": "agent-base",
-          "version": "6.0.2",
-          "bom-ref": "bizcode@0.1.0|twilio@5.13.1|agent-base@6.0.2",
-          "author": "Nathan Rajlich",
-          "description": "Turn a function into an `http.Agent` instance",
-          "licenses": [
-            {
-              "license": {
-                "id": "MIT",
-                "acknowledgement": "declared"
-              }
-            }
-          ],
-          "purl": "pkg:npm/agent-base@6.0.2",
-          "externalReferences": [
-            {
-              "url": "git://github.com/TooTallNate/node-agent-base.git",
-              "type": "vcs",
-              "comment": "as detected from PackageJson property \"repository.url\""
-            },
-            {
-              "url": "https://github.com/TooTallNate/node-agent-base#readme",
-              "type": "website",
-              "comment": "as detected from PackageJson property \"homepage\""
-            },
-            {
-              "url": "https://github.com/TooTallNate/node-agent-base/issues",
-              "type": "issue-tracker",
-              "comment": "as detected from PackageJson property \"bugs.url\""
-            }
-          ],
-          "properties": [
-            {
-              "name": "cdx:npm:package:path",
-              "value": "node_modules/twilio/node_modules/agent-base"
-            }
-          ]
         }
       ]
     },
@@ -3432,6 +3108,88 @@
             {
               "name": "cdx:npm:package:path",
               "value": "node_modules/form-data/node_modules/mime-types"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "https-proxy-agent",
+      "version": "5.0.1",
+      "bom-ref": "bizcode@0.1.0|https-proxy-agent@5.0.1",
+      "author": "Nathan Rajlich",
+      "description": "An HTTP(s) proxy `http.Agent` implementation for HTTPS",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/https-proxy-agent@5.0.1",
+      "externalReferences": [
+        {
+          "url": "git://github.com/TooTallNate/node-https-proxy-agent.git",
+          "type": "vcs",
+          "comment": "as detected from PackageJson property \"repository.url\""
+        },
+        {
+          "url": "https://github.com/TooTallNate/node-https-proxy-agent#readme",
+          "type": "website",
+          "comment": "as detected from PackageJson property \"homepage\""
+        },
+        {
+          "url": "https://github.com/TooTallNate/node-https-proxy-agent/issues",
+          "type": "issue-tracker",
+          "comment": "as detected from PackageJson property \"bugs.url\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/https-proxy-agent"
+        }
+      ],
+      "components": [
+        {
+          "type": "library",
+          "name": "agent-base",
+          "version": "6.0.2",
+          "bom-ref": "bizcode@0.1.0|https-proxy-agent@5.0.1|agent-base@6.0.2",
+          "author": "Nathan Rajlich",
+          "description": "Turn a function into an `http.Agent` instance",
+          "licenses": [
+            {
+              "license": {
+                "id": "MIT",
+                "acknowledgement": "declared"
+              }
+            }
+          ],
+          "purl": "pkg:npm/agent-base@6.0.2",
+          "externalReferences": [
+            {
+              "url": "git://github.com/TooTallNate/node-agent-base.git",
+              "type": "vcs",
+              "comment": "as detected from PackageJson property \"repository.url\""
+            },
+            {
+              "url": "https://github.com/TooTallNate/node-agent-base#readme",
+              "type": "website",
+              "comment": "as detected from PackageJson property \"homepage\""
+            },
+            {
+              "url": "https://github.com/TooTallNate/node-agent-base/issues",
+              "type": "issue-tracker",
+              "comment": "as detected from PackageJson property \"bugs.url\""
+            }
+          ],
+          "properties": [
+            {
+              "name": "cdx:npm:package:path",
+              "value": "node_modules/https-proxy-agent/node_modules/agent-base"
             }
           ]
         }
@@ -7019,22 +6777,65 @@
     },
     {
       "type": "library",
-      "name": "sharp-win32-x64",
+      "name": "sharp-libvips-linux-x64",
       "group": "@img",
-      "version": "0.34.5",
-      "bom-ref": "bizcode@0.1.0|@img/sharp-win32-x64@0.34.5",
+      "version": "1.2.4",
+      "bom-ref": "bizcode@0.1.0|@img/sharp-libvips-linux-x64@1.2.4",
       "author": "Lovell Fuller",
-      "description": "Prebuilt sharp for use with Windows x64",
+      "description": "Prebuilt libvips and dependencies for use with sharp on Linux (glibc) x64",
       "licenses": [
         {
-          "expression": "Apache-2.0 AND LGPL-3.0-or-later",
-          "acknowledgement": "declared"
+          "license": {
+            "id": "LGPL-3.0-or-later",
+            "acknowledgement": "declared"
+          }
         }
       ],
-      "purl": "pkg:npm/%40img/sharp-win32-x64@0.34.5",
+      "purl": "pkg:npm/%40img/sharp-libvips-linux-x64@1.2.4",
       "externalReferences": [
         {
-          "url": "git+https://github.com/lovell/sharp.git#npm/win32-x64",
+          "url": "git+https://github.com/lovell/sharp-libvips.git#npm/linux-x64",
+          "type": "vcs",
+          "comment": "as detected from PackageJson property \"repository.url\" and \"repository.directory\""
+        },
+        {
+          "url": "https://sharp.pixelplumbing.com",
+          "type": "website",
+          "comment": "as detected from PackageJson property \"homepage\""
+        },
+        {
+          "url": "https://github.com/lovell/sharp-libvips/issues",
+          "type": "issue-tracker",
+          "comment": "as detected from PackageJson property \"bugs.url\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/@img/sharp-libvips-linux-x64"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "sharp-linux-x64",
+      "group": "@img",
+      "version": "0.34.5",
+      "bom-ref": "bizcode@0.1.0|@img/sharp-linux-x64@0.34.5",
+      "author": "Lovell Fuller",
+      "description": "Prebuilt sharp for use with Linux (glibc) x64",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/%40img/sharp-linux-x64@0.34.5",
+      "externalReferences": [
+        {
+          "url": "git+https://github.com/lovell/sharp.git#npm/linux-x64",
           "type": "vcs",
           "comment": "as detected from PackageJson property \"repository.url\" and \"repository.directory\""
         },
@@ -7052,7 +6853,7 @@
       "properties": [
         {
           "name": "cdx:npm:package:path",
-          "value": "node_modules/@img/sharp-win32-x64"
+          "value": "node_modules/@img/sharp-linux-x64"
         }
       ]
     },
@@ -11150,6 +10951,46 @@
     },
     {
       "type": "library",
+      "name": "find-up",
+      "version": "4.1.0",
+      "bom-ref": "bizcode@0.1.0|find-up@4.1.0",
+      "author": "Sindre Sorhus",
+      "description": "Find a file or directory by walking up parent directories",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/find-up@4.1.0",
+      "externalReferences": [
+        {
+          "url": "git+https://github.com/sindresorhus/find-up.git",
+          "type": "vcs",
+          "comment": "as detected from PackageJson property \"repository.url\""
+        },
+        {
+          "url": "https://github.com/sindresorhus/find-up#readme",
+          "type": "website",
+          "comment": "as detected from PackageJson property \"homepage\""
+        },
+        {
+          "url": "https://github.com/sindresorhus/find-up/issues",
+          "type": "issue-tracker",
+          "comment": "as detected from PackageJson property \"bugs.url\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/find-up"
+        }
+      ]
+    },
+    {
+      "type": "library",
       "name": "get-caller-file",
       "version": "2.0.5",
       "bom-ref": "bizcode@0.1.0|get-caller-file@2.0.5",
@@ -14874,6 +14715,46 @@
     },
     {
       "type": "library",
+      "name": "locate-path",
+      "version": "5.0.0",
+      "bom-ref": "bizcode@0.1.0|locate-path@5.0.0",
+      "author": "Sindre Sorhus",
+      "description": "Get the first path that exists on disk of multiple paths",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/locate-path@5.0.0",
+      "externalReferences": [
+        {
+          "url": "git+https://github.com/sindresorhus/locate-path.git",
+          "type": "vcs",
+          "comment": "as detected from PackageJson property \"repository.url\""
+        },
+        {
+          "url": "https://github.com/sindresorhus/locate-path#readme",
+          "type": "website",
+          "comment": "as detected from PackageJson property \"homepage\""
+        },
+        {
+          "url": "https://github.com/sindresorhus/locate-path/issues",
+          "type": "issue-tracker",
+          "comment": "as detected from PackageJson property \"bugs.url\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/locate-path"
+        }
+      ]
+    },
+    {
+      "type": "library",
       "name": "path-exists",
       "version": "4.0.0",
       "bom-ref": "bizcode@0.1.0|path-exists@4.0.0",
@@ -15994,6 +15875,46 @@
     },
     {
       "type": "library",
+      "name": "p-locate",
+      "version": "4.1.0",
+      "bom-ref": "bizcode@0.1.0|p-locate@4.1.0",
+      "author": "Sindre Sorhus",
+      "description": "Get the first fulfilled promise that satisfies the provided testing function",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/p-locate@4.1.0",
+      "externalReferences": [
+        {
+          "url": "git+https://github.com/sindresorhus/p-locate.git",
+          "type": "vcs",
+          "comment": "as detected from PackageJson property \"repository.url\""
+        },
+        {
+          "url": "https://github.com/sindresorhus/p-locate#readme",
+          "type": "website",
+          "comment": "as detected from PackageJson property \"homepage\""
+        },
+        {
+          "url": "https://github.com/sindresorhus/p-locate/issues",
+          "type": "issue-tracker",
+          "comment": "as detected from PackageJson property \"bugs.url\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/p-locate"
+        }
+      ]
+    },
+    {
+      "type": "library",
       "name": "buffer-equal-constant-time",
       "version": "1.0.1",
       "bom-ref": "bizcode@0.1.0|buffer-equal-constant-time@1.0.1",
@@ -16189,6 +16110,46 @@
         {
           "name": "cdx:npm:package:path",
           "value": "node_modules/color-convert"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "p-limit",
+      "version": "2.3.0",
+      "bom-ref": "bizcode@0.1.0|p-limit@2.3.0",
+      "author": "Sindre Sorhus",
+      "description": "Run multiple promise-returning & async functions with limited concurrency",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/p-limit@2.3.0",
+      "externalReferences": [
+        {
+          "url": "git+https://github.com/sindresorhus/p-limit.git",
+          "type": "vcs",
+          "comment": "as detected from PackageJson property \"repository.url\""
+        },
+        {
+          "url": "https://github.com/sindresorhus/p-limit#readme",
+          "type": "website",
+          "comment": "as detected from PackageJson property \"homepage\""
+        },
+        {
+          "url": "https://github.com/sindresorhus/p-limit/issues",
+          "type": "issue-tracker",
+          "comment": "as detected from PackageJson property \"bugs.url\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/p-limit"
         }
       ]
     },
@@ -16436,21 +16397,8 @@
       "dependsOn": [
         "bizcode@0.1.0|follow-redirects@1.16.0",
         "bizcode@0.1.0|form-data@4.0.6",
-        "bizcode@0.1.0|axios@1.18.0|https-proxy-agent@5.0.1",
+        "bizcode@0.1.0|https-proxy-agent@5.0.1",
         "bizcode@0.1.0|proxy-from-env@2.1.0"
-      ]
-    },
-    {
-      "ref": "bizcode@0.1.0|axios@1.18.0|https-proxy-agent@5.0.1",
-      "dependsOn": [
-        "bizcode@0.1.0|axios@1.18.0|agent-base@6.0.2",
-        "bizcode@0.1.0|debug@4.4.3"
-      ]
-    },
-    {
-      "ref": "bizcode@0.1.0|axios@1.18.0|agent-base@6.0.2",
-      "dependsOn": [
-        "bizcode@0.1.0|debug@4.4.3"
       ]
     },
     {
@@ -16672,7 +16620,7 @@
       "dependsOn": [
         "bizcode@0.1.0|cliui@6.0.0",
         "bizcode@0.1.0|decamelize@1.2.0",
-        "bizcode@0.1.0|qrcode@1.5.4|find-up@4.1.0",
+        "bizcode@0.1.0|find-up@4.1.0",
         "bizcode@0.1.0|get-caller-file@2.0.5",
         "bizcode@0.1.0|require-directory@2.1.1",
         "bizcode@0.1.0|require-main-filename@2.0.0",
@@ -16684,32 +16632,7 @@
       ]
     },
     {
-      "ref": "bizcode@0.1.0|qrcode@1.5.4|find-up@4.1.0",
-      "dependsOn": [
-        "bizcode@0.1.0|qrcode@1.5.4|locate-path@5.0.0",
-        "bizcode@0.1.0|path-exists@4.0.0"
-      ]
-    },
-    {
       "ref": "bizcode@0.1.0|qrcode@1.5.4|y18n@4.0.3"
-    },
-    {
-      "ref": "bizcode@0.1.0|qrcode@1.5.4|locate-path@5.0.0",
-      "dependsOn": [
-        "bizcode@0.1.0|qrcode@1.5.4|p-locate@4.1.0"
-      ]
-    },
-    {
-      "ref": "bizcode@0.1.0|qrcode@1.5.4|p-locate@4.1.0",
-      "dependsOn": [
-        "bizcode@0.1.0|qrcode@1.5.4|p-limit@2.3.0"
-      ]
-    },
-    {
-      "ref": "bizcode@0.1.0|qrcode@1.5.4|p-limit@2.3.0",
-      "dependsOn": [
-        "bizcode@0.1.0|p-try@2.2.0"
-      ]
     },
     {
       "ref": "bizcode@0.1.0|react-dom@18.3.1",
@@ -16796,7 +16719,8 @@
       "ref": "bizcode@0.1.0|sharp@0.34.5",
       "dependsOn": [
         "bizcode@0.1.0|@img/colour@1.1.0",
-        "bizcode@0.1.0|@img/sharp-win32-x64@0.34.5",
+        "bizcode@0.1.0|@img/sharp-libvips-linux-x64@1.2.4",
+        "bizcode@0.1.0|@img/sharp-linux-x64@0.34.5",
         "bizcode@0.1.0|detect-libc@2.1.2",
         "bizcode@0.1.0|semver@7.8.4"
       ]
@@ -16827,24 +16751,11 @@
       "dependsOn": [
         "bizcode@0.1.0|axios@1.18.0",
         "bizcode@0.1.0|dayjs@1.11.21",
-        "bizcode@0.1.0|twilio@5.13.1|https-proxy-agent@5.0.1",
+        "bizcode@0.1.0|https-proxy-agent@5.0.1",
         "bizcode@0.1.0|jsonwebtoken@9.0.3",
         "bizcode@0.1.0|qs@6.15.2",
         "bizcode@0.1.0|scmp@2.1.0",
         "bizcode@0.1.0|xmlbuilder@13.0.2"
-      ]
-    },
-    {
-      "ref": "bizcode@0.1.0|twilio@5.13.1|https-proxy-agent@5.0.1",
-      "dependsOn": [
-        "bizcode@0.1.0|twilio@5.13.1|agent-base@6.0.2",
-        "bizcode@0.1.0|debug@4.4.3"
-      ]
-    },
-    {
-      "ref": "bizcode@0.1.0|twilio@5.13.1|agent-base@6.0.2",
-      "dependsOn": [
-        "bizcode@0.1.0|debug@4.4.3"
       ]
     },
     {
@@ -16958,6 +16869,19 @@
       "ref": "bizcode@0.1.0|form-data@4.0.6|mime-types@2.1.35",
       "dependsOn": [
         "bizcode@0.1.0|mime-db@1.52.0"
+      ]
+    },
+    {
+      "ref": "bizcode@0.1.0|https-proxy-agent@5.0.1",
+      "dependsOn": [
+        "bizcode@0.1.0|https-proxy-agent@5.0.1|agent-base@6.0.2",
+        "bizcode@0.1.0|debug@4.4.3"
+      ]
+    },
+    {
+      "ref": "bizcode@0.1.0|https-proxy-agent@5.0.1|agent-base@6.0.2",
+      "dependsOn": [
+        "bizcode@0.1.0|debug@4.4.3"
       ]
     },
     {
@@ -17455,7 +17379,13 @@
       "ref": "bizcode@0.1.0|@img/colour@1.1.0"
     },
     {
-      "ref": "bizcode@0.1.0|@img/sharp-win32-x64@0.34.5"
+      "ref": "bizcode@0.1.0|@img/sharp-libvips-linux-x64@1.2.4"
+    },
+    {
+      "ref": "bizcode@0.1.0|@img/sharp-linux-x64@0.34.5",
+      "dependsOn": [
+        "bizcode@0.1.0|@img/sharp-libvips-linux-x64@1.2.4"
+      ]
     },
     {
       "ref": "bizcode@0.1.0|detect-libc@2.1.2"
@@ -17970,6 +17900,13 @@
       "ref": "bizcode@0.1.0|decamelize@1.2.0"
     },
     {
+      "ref": "bizcode@0.1.0|find-up@4.1.0",
+      "dependsOn": [
+        "bizcode@0.1.0|locate-path@5.0.0",
+        "bizcode@0.1.0|path-exists@4.0.0"
+      ]
+    },
+    {
       "ref": "bizcode@0.1.0|get-caller-file@2.0.5"
     },
     {
@@ -18399,6 +18336,12 @@
       ]
     },
     {
+      "ref": "bizcode@0.1.0|locate-path@5.0.0",
+      "dependsOn": [
+        "bizcode@0.1.0|p-locate@4.1.0"
+      ]
+    },
+    {
       "ref": "bizcode@0.1.0|path-exists@4.0.0"
     },
     {
@@ -18516,6 +18459,12 @@
       "ref": "bizcode@0.1.0|ansi-regex@5.0.1"
     },
     {
+      "ref": "bizcode@0.1.0|p-locate@4.1.0",
+      "dependsOn": [
+        "bizcode@0.1.0|p-limit@2.3.0"
+      ]
+    },
+    {
       "ref": "bizcode@0.1.0|buffer-equal-constant-time@1.0.1"
     },
     {
@@ -18539,6 +18488,12 @@
       "ref": "bizcode@0.1.0|color-convert@2.0.1",
       "dependsOn": [
         "bizcode@0.1.0|color-name@1.1.4"
+      ]
+    },
+    {
+      "ref": "bizcode@0.1.0|p-limit@2.3.0",
+      "dependsOn": [
+        "bizcode@0.1.0|p-try@2.2.0"
       ]
     },
     {

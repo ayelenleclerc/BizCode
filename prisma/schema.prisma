@@ -81,6 +81,7 @@ model Cliente {
   facturas       Factura[]
   pedidos        Pedido[]
   contratos      Contrato[]
+  ordenesTrabajo OrdenTrabajo[]
   cobros         Cobro[]
   ordenesEntrega OrdenEntrega[]
   remitos        Remito[]
@@ -139,6 +140,7 @@ model Articulo {
   facturaItems     FacturaItem[]
   pedidoItems      PedidoItem[]
   contratoItems    ContratoItem[]
+  ordenTrabajoItems OrdenTrabajoItem[]
   remitoItems      RemitoItem[]
   stockAjustes     StockAjuste[]
   ordenCompraItems     OrdenCompraItem[]
@@ -443,6 +445,7 @@ model Factura {
 
   items          FacturaItem[]
   ordenesEntrega OrdenEntrega[]
+  ordenesTrabajo OrdenTrabajo[]
   recordatorios  CobroRecordatorio[]
   pedido         Pedido?
   notasCredito   NotaCredito[]
@@ -532,6 +535,71 @@ model ContratoAjuste {
   proximoAjuste    DateTime
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
+}
+
+/// Service work order / repair ticket (#246).
+model OrdenTrabajo {
+  id                 Int       @id @default(autoincrement())
+  tenantId           Int
+  tenant             Tenant    @relation(fields: [tenantId], references: [id])
+  numero             Int
+  clienteId          Int
+  cliente            Cliente   @relation(fields: [clienteId], references: [id])
+  tecnicoId          Int?
+  tecnico            AppUser?  @relation("OrdenTrabajoTecnico", fields: [tecnicoId], references: [id], onDelete: SetNull)
+  /// recibido | diagnosticado | presupuestado | aprobado | en_reparacion | listo | entregado | facturado | cancelado | sin_reparacion
+  estado             String    @default("recibido") @db.VarChar(20)
+  /// baja | normal | alta | urgente
+  prioridad          String    @default("normal") @db.VarChar(12)
+  equipoMarca        String?   @db.VarChar(60)
+  equipoModelo       String?   @db.VarChar(60)
+  equipoNroSerie     String?   @db.VarChar(80)
+  equipoDescripcion  String    @db.VarChar(200)
+  sintomaReportado   String    @db.VarChar(500)
+  diagnostico        String?   @db.VarChar(1000)
+  trabajoRealizado   String?   @db.VarChar(1000)
+  enGarantia         Boolean   @default(false)
+  garantiaVence      DateTime?
+  otGarantiaId       Int?
+  otGarantia         OrdenTrabajo?  @relation("OtGarantiaOrigen", fields: [otGarantiaId], references: [id], onDelete: SetNull)
+  otsEnGarantia      OrdenTrabajo[] @relation("OtGarantiaOrigen")
+  presupuesto        Decimal?  @db.Decimal(14, 2)
+  fechaIngreso       DateTime  @default(now())
+  fechaPromesa       DateTime?
+  fechaEntrega       DateTime?
+  facturaId          Int?
+  factura            Factura?  @relation(fields: [facturaId], references: [id], onDelete: SetNull)
+  observaciones      String?   @db.VarChar(1000)
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  items OrdenTrabajoItem[]
+
+  @@unique([tenantId, numero])
+  @@index([tenantId, estado])
+  @@index([tenantId, clienteId])
+  @@index([tenantId, tecnicoId])
+  @@index([tenantId, equipoNroSerie])
+  @@index([tenantId, facturaId])
+}
+
+model OrdenTrabajoItem {
+  id          Int          @id @default(autoincrement())
+  otId        Int
+  ordenTrabajo OrdenTrabajo @relation(fields: [otId], references: [id], onDelete: Cascade)
+  /// mano_de_obra | repuesto | servicio
+  tipo        String       @db.VarChar(20)
+  descripcion String       @db.VarChar(120)
+  articuloId  Int?
+  articulo    Articulo?    @relation(fields: [articuloId], references: [id], onDelete: Restrict)
+  cantidad    Decimal      @db.Decimal(14, 4)
+  precioUnit  Decimal      @db.Decimal(14, 2)
+  subtotal    Decimal      @db.Decimal(14, 2)
+  condIva     String       @default("1") @db.VarChar(1)
+  createdAt   DateTime     @default(now())
+
+  @@index([otId])
+  @@index([articuloId])
 }
 
 
@@ -794,6 +862,7 @@ model Tenant {
   notasCredito   NotaCredito[]
   pedidos        Pedido[]
   contratos      Contrato[]
+  ordenesTrabajo OrdenTrabajo[]
   cobros         Cobro[]
   cobroRecordatorios CobroRecordatorio[]
   ordenesEntrega OrdenEntrega[]
@@ -1201,6 +1270,7 @@ model AppUser {
   presentacionesRetencion PresentacionRetencion[] @relation("PresentacionRetencionCreatedBy")
   mercadoPagoRefundsCreated MercadoPagoRefund[] @relation("MercadoPagoRefundCreatedBy")
   mercadoPagoChargebacksResolved MercadoPagoChargeback[] @relation("MercadoPagoChargebackResolvedBy")
+  ordenesTrabajoTecnico  OrdenTrabajo[] @relation("OrdenTrabajoTecnico")
 
   @@unique([tenantId, username])
 }

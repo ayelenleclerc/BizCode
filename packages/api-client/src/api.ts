@@ -5,6 +5,7 @@ export * from './modules/clientes'
 export * from './modules/cobros'
 export * from './modules/pedidos'
 export * from './modules/contratos'
+export * from './modules/ordenesTrabajo'
 export * from './modules/facturas'
 export * from './modules/repartos'
 export * from './modules/ordenes-entrega'
@@ -37,6 +38,8 @@ export type {
   PedidoRow,
   ContratoListResponse,
   ContratoRow,
+  OrdenTrabajoRow,
+  OrdenTrabajoListResponse,
   PublicPlanDTO,
   Recuento,
   RecuentoItemRow,
