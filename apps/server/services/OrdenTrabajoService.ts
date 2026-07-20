@@ -237,7 +237,7 @@ export class OrdenTrabajoService {
 
     let enGarantia = input.enGarantia ?? false
     let garantiaVence = parseUtcDate(input.garantiaVence)
-    let otGarantiaId = input.otGarantiaId ?? null
+    const otGarantiaId = input.otGarantiaId ?? null
     let garantiaId = input.garantiaId ?? null
 
     const serial = input.equipoNroSerie?.trim()

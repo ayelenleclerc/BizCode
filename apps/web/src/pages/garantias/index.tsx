@@ -141,7 +141,7 @@ export default function GarantiasPage() {
           </button>
         </form>
 
-        <AsyncWrapper loading={loading} error={loadError} onRetry={() => void load()}>
+        <AsyncWrapper loading={loading} error={loadError}>
           {rows.length === 0 ? (
             <p data-testid="garantias-empty" className="text-slate-400">
               {t('empty')}
