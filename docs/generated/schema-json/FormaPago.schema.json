@@ -8,6 +8,10 @@
     "descripcion": {
       "type": "string"
     },
+    "esEfectivo": {
+      "description": "When true, posts MovimientoCaja on open cash shift (#247).",
+      "type": "boolean"
+    },
     "id": {
       "type": "integer"
     },

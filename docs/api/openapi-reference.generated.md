@@ -30799,6 +30799,1355 @@ Requires module `service.warranties`.
 }
 ```
 
+### PARAMETERS /api/cajas
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/cajas`
+
+### List cash drawers
+
+- **Method:** `GET`
+- **Path:** `/api/cajas`
+- **Tags:** cajas
+
+Requires module `pos.cashier`.
+
+#### Responses
+
+##### Status: 200 Cash drawers
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`activa`**
+
+    `boolean`
+
+  - **`id`**
+
+    `integer`
+
+  - **`nombre`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "nombre": "",
+      "activa": true,
+      "additionalProperty": "anything"
+    }
+  ]
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Create cash drawer
+
+- **Method:** `POST`
+- **Path:** `/api/cajas`
+- **Tags:** cajas
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`nombre` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "nombre": ""
+}
+```
+
+#### Responses
+
+##### Status: 201 Created
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`activa`**
+
+    `boolean`
+
+  - **`id`**
+
+    `integer`
+
+  - **`nombre`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "nombre": "",
+    "activa": true,
+    "additionalProperty": "anything"
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 409 Duplicate nombre
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/turnos-caja
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/turnos-caja`
+
+### List cashier shifts
+
+- **Method:** `GET`
+- **Path:** `/api/turnos-caja`
+- **Tags:** cajas
+
+#### Responses
+
+##### Status: 200 Paginated shifts with counts
+
+###### Content-Type: application/json
+
+**All of:**
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`cajaId`**
+
+    `integer`
+
+  - **`cajeroId`**
+
+    `integer`
+
+  - **`diferencia`**
+
+    `number`
+
+  - **`estado`**
+
+    `string`, possible values: `"abierto", "cerrado"`
+
+  - **`id`**
+
+    `integer`
+
+  - **`montoApertura`**
+
+    `number`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`counts`**
+
+  `object`
+
+* **`limit` (required)**
+
+  `integer` — Effective page size (same semantics as query \`limit\`)
+
+* **`offset` (required)**
+
+  `integer` — Effective skip (same semantics as query \`offset\`)
+
+* **`total` (required)**
+
+  `integer` — Row count matching the list filter (before limit/offset)
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "cajaId": 1,
+      "cajeroId": 1,
+      "estado": "abierto",
+      "montoApertura": 1,
+      "diferencia": 1,
+      "additionalProperty": "anything"
+    }
+  ],
+  "counts": {
+    "additionalProperty": 1
+  },
+  "total": 0,
+  "limit": 1,
+  "offset": 0
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Open cashier shift
+
+- **Method:** `POST`
+- **Path:** `/api/turnos-caja`
+- **Tags:** cajas
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`cajaId` (required)**
+
+  `integer`
+
+- **`montoApertura` (required)**
+
+  `number`
+
+**Example:**
+
+```json
+{
+  "cajaId": 1,
+  "montoApertura": 0
+}
+```
+
+#### Responses
+
+##### Status: 201 Shift opened
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`cajaId`**
+
+    `integer`
+
+  - **`cajeroId`**
+
+    `integer`
+
+  - **`diferencia`**
+
+    `number`
+
+  - **`estado`**
+
+    `string`, possible values: `"abierto", "cerrado"`
+
+  - **`id`**
+
+    `integer`
+
+  - **`montoApertura`**
+
+    `number`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "cajaId": 1,
+    "cajeroId": 1,
+    "estado": "abierto",
+    "montoApertura": 1,
+    "diferencia": 1,
+    "additionalProperty": "anything"
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 409 Caja already open
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/turnos-caja/{id}
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/turnos-caja/{id}`
+
+### Get shift detail
+
+- **Method:** `GET`
+- **Path:** `/api/turnos-caja/{id}`
+- **Tags:** cajas
+
+#### Responses
+
+##### Status: 200 Shift detail
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`cajaId`**
+
+    `integer`
+
+  - **`cajeroId`**
+
+    `integer`
+
+  - **`diferencia`**
+
+    `number`
+
+  - **`estado`**
+
+    `string`, possible values: `"abierto", "cerrado"`
+
+  - **`id`**
+
+    `integer`
+
+  - **`montoApertura`**
+
+    `number`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "cajaId": 1,
+    "cajeroId": 1,
+    "estado": "abierto",
+    "montoApertura": 1,
+    "diferencia": 1,
+    "additionalProperty": "anything"
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/turnos-caja/{id}/movimientos
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/turnos-caja/{id}/movimientos`
+
+### Register manual cash movement
+
+- **Method:** `POST`
+- **Path:** `/api/turnos-caja/{id}/movimientos`
+- **Tags:** cajas
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`importe` (required)**
+
+  `number`
+
+- **`tipo` (required)**
+
+  `string`, possible values: `"egreso", "ingreso_extra"`
+
+- **`concepto`**
+
+  `string`
+
+- **`formaPago`**
+
+  `string`, possible values: `"efectivo", "tarjeta", "mp", "transferencia", "otro"`
+
+**Example:**
+
+```json
+{
+  "tipo": "egreso",
+  "importe": 1,
+  "concepto": "",
+  "formaPago": "efectivo"
+}
+```
+
+#### Responses
+
+##### Status: 201 Movement registered
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`cajaId`**
+
+    `integer`
+
+  - **`cajeroId`**
+
+    `integer`
+
+  - **`diferencia`**
+
+    `number`
+
+  - **`estado`**
+
+    `string`, possible values: `"abierto", "cerrado"`
+
+  - **`id`**
+
+    `integer`
+
+  - **`montoApertura`**
+
+    `number`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "cajaId": 1,
+    "cajeroId": 1,
+    "estado": "abierto",
+    "montoApertura": 1,
+    "diferencia": 1,
+    "additionalProperty": "anything"
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 409 Turno not open
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/turnos-caja/{id}/cerrar
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/turnos-caja/{id}/cerrar`
+
+### Close shift with physical cash count
+
+- **Method:** `POST`
+- **Path:** `/api/turnos-caja/{id}/cerrar`
+- **Tags:** cajas
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`conteo` (required)**
+
+  `object`
+
+- **`observaciones`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "conteo": {
+    "additionalProperty": "anything"
+  },
+  "observaciones": ""
+}
+```
+
+#### Responses
+
+##### Status: 200 Shift closed
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`cajaId`**
+
+    `integer`
+
+  - **`cajeroId`**
+
+    `integer`
+
+  - **`diferencia`**
+
+    `number`
+
+  - **`estado`**
+
+    `string`, possible values: `"abierto", "cerrado"`
+
+  - **`id`**
+
+    `integer`
+
+  - **`montoApertura`**
+
+    `number`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "cajaId": 1,
+    "cajeroId": 1,
+    "estado": "abierto",
+    "montoApertura": 1,
+    "diferencia": 1,
+    "additionalProperty": "anything"
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 409 Turno not open
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/turnos-caja/{id}/pdf
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/turnos-caja/{id}/pdf`
+
+### PDF report for closed shift
+
+- **Method:** `GET`
+- **Path:** `/api/turnos-caja/{id}/pdf`
+- **Tags:** cajas
+
+#### Responses
+
+##### Status: 200 PDF binary
+
+###### Content-Type: application/pdf
+
+`string`, format: `binary`
+
+**Example:**
+
+```json
+{}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 409 Shift not closed
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ### PARAMETERS /api/cobros
 
 - **Method:** `PARAMETERS`
@@ -41121,6 +42470,10 @@ Returns the stored PDF/image bytes. Requires `finance.ledger`, `logistics.purcha
 
     `string`
 
+  - **`esEfectivo`**
+
+    `boolean` — When true, posts MovimientoCaja on open cash shift (#247).
+
   - **`id`**
 
     `integer`
@@ -41144,9 +42497,150 @@ Returns the stored PDF/image bytes. Requires `finance.ledger`, `logistics.purcha
       "codigo": 1,
       "descripcion": "",
       "vto_dias": 1,
+      "esEfectivo": true,
       "additionalProperty": "anything"
     }
   ]
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/formas-pago/{id}
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/formas-pago/{id}`
+
+### Update payment method flags (esEfectivo)
+
+- **Method:** `PATCH`
+- **Path:** `/api/formas-pago/{id}`
+- **Tags:** formasPago
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`esEfectivo` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "esEfectivo": true
+}
+```
+
+#### Responses
+
+##### Status: 200 Updated payment method
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`codigo`**
+
+    `integer`
+
+  - **`descripcion`**
+
+    `string`
+
+  - **`esEfectivo`**
+
+    `boolean` — When true, posts MovimientoCaja on open cash shift (#247).
+
+  - **`id`**
+
+    `integer`
+
+  - **`vto_dias`**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "codigo": 1,
+    "descripcion": "",
+    "vto_dias": 1,
+    "esEfectivo": true,
+    "additionalProperty": "anything"
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
 }
 ```
 
@@ -78135,6 +79629,10 @@ Originating invoice header (selected columns)
 
   `string`
 
+* **`esEfectivo`**
+
+  `boolean` — When true, posts MovimientoCaja on open cash shift (#247).
+
 * **`id`**
 
   `integer`
@@ -78151,7 +79649,24 @@ Originating invoice header (selected columns)
   "codigo": 1,
   "descripcion": "",
   "vto_dias": 1,
+  "esEfectivo": true,
   "additionalProperty": "anything"
+}
+```
+
+### FormaPagoPatchInput
+
+- **Type:**`object`
+
+* **`esEfectivo` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "esEfectivo": true
 }
 ```
 
@@ -78172,6 +79687,10 @@ Originating invoice header (selected columns)
   - **`descripcion`**
 
     `string`
+
+  - **`esEfectivo`**
+
+    `boolean` — When true, posts MovimientoCaja on open cash shift (#247).
 
   - **`id`**
 
@@ -78196,11 +79715,343 @@ Originating invoice header (selected columns)
       "codigo": 1,
       "descripcion": "",
       "vto_dias": 1,
+      "esEfectivo": true,
       "additionalProperty": "anything"
     }
   ]
 }
 ```
+
+### FormaPagoEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`codigo`**
+
+    `integer`
+
+  - **`descripcion`**
+
+    `string`
+
+  - **`esEfectivo`**
+
+    `boolean` — When true, posts MovimientoCaja on open cash shift (#247).
+
+  - **`id`**
+
+    `integer`
+
+  - **`vto_dias`**
+
+    `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "codigo": 1,
+    "descripcion": "",
+    "vto_dias": 1,
+    "esEfectivo": true,
+    "additionalProperty": "anything"
+  }
+}
+```
+
+### Caja
+
+- **Type:**`object`
+
+* **`activa`**
+
+  `boolean`
+
+* **`id`**
+
+  `integer`
+
+* **`nombre`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "nombre": "",
+  "activa": true,
+  "additionalProperty": "anything"
+}
+```
+
+### CajaListEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`activa`**
+
+    `boolean`
+
+  - **`id`**
+
+    `integer`
+
+  - **`nombre`**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "nombre": "",
+      "activa": true,
+      "additionalProperty": "anything"
+    }
+  ]
+}
+```
+
+### CajaEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`activa`**
+
+    `boolean`
+
+  - **`id`**
+
+    `integer`
+
+  - **`nombre`**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "nombre": "",
+    "activa": true,
+    "additionalProperty": "anything"
+  }
+}
+```
+
+### TurnoCaja
+
+- **Type:**`object`
+
+* **`cajaId`**
+
+  `integer`
+
+* **`cajeroId`**
+
+  `integer`
+
+* **`diferencia`**
+
+  `number`
+
+* **`estado`**
+
+  `string`, possible values: `"abierto", "cerrado"`
+
+* **`id`**
+
+  `integer`
+
+* **`montoApertura`**
+
+  `number`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "cajaId": 1,
+  "cajeroId": 1,
+  "estado": "abierto",
+  "montoApertura": 1,
+  "diferencia": 1,
+  "additionalProperty": "anything"
+}
+```
+
+### TurnoCajaOpenInput
+
+- **Type:**`object`
+
+* **`cajaId` (required)**
+
+  `integer`
+
+* **`montoApertura` (required)**
+
+  `number`
+
+**Example:**
+
+```json
+{
+  "cajaId": 1,
+  "montoApertura": 0
+}
+```
+
+### TurnoCajaCloseInput
+
+- **Type:**`object`
+
+* **`conteo` (required)**
+
+  `object`
+
+* **`observaciones`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "conteo": {
+    "additionalProperty": "anything"
+  },
+  "observaciones": ""
+}
+```
+
+### MovimientoCajaManualInput
+
+- **Type:**`object`
+
+* **`importe` (required)**
+
+  `number`
+
+* **`tipo` (required)**
+
+  `string`, possible values: `"egreso", "ingreso_extra"`
+
+* **`concepto`**
+
+  `string`
+
+* **`formaPago`**
+
+  `string`, possible values: `"efectivo", "tarjeta", "mp", "transferencia", "otro"`
+
+**Example:**
+
+```json
+{
+  "tipo": "egreso",
+  "importe": 1,
+  "concepto": "",
+  "formaPago": "efectivo"
+}
+```
+
+### TurnoCajaEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`cajaId`**
+
+    `integer`
+
+  - **`cajeroId`**
+
+    `integer`
+
+  - **`diferencia`**
+
+    `number`
+
+  - **`estado`**
+
+    `string`, possible values: `"abierto", "cerrado"`
+
+  - **`id`**
+
+    `integer`
+
+  - **`montoApertura`**
+
+    `number`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "cajaId": 1,
+    "cajeroId": 1,
+    "estado": "abierto",
+    "montoApertura": 1,
+    "diferencia": 1,
+    "additionalProperty": "anything"
+  }
+}
+```
+
+### TurnoCajaListEnvelope
+
+- **Type:**
+
+**Example:**
 
 ### AppUser
 

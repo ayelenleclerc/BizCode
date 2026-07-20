@@ -6,6 +6,7 @@ import type { ServiceResult } from './serviceResults'
 import { RetencionConstanciaService } from './RetencionConstanciaService'
 import { validateCobroRetenciones } from './RetencionCobroValidation'
 import { ClienteCuentaCorrienteService } from './ClienteCuentaCorrienteService'
+import { TurnoCajaService } from './TurnoCajaService'
 
 type CobroWithCliente = Prisma.CobroGetPayload<{
   include: { cliente: { select: { id: true; codigo: true; rsocial: true } } }
@@ -177,14 +178,16 @@ export class CobroService {
       return { ok: false, status: 422, error: 'CLIENT_SUSPENDED' }
     }
 
+    let formaEsEfectivo = false
     if (input.formaPagoId != null) {
       const fp = await this.prisma.formaPago.findUnique({
         where: { id: input.formaPagoId },
-        select: { id: true },
+        select: { id: true, esEfectivo: true },
       })
       if (!fp) {
         return { ok: false, status: 400, error: 'formaPagoId is not valid' }
       }
+      formaEsEfectivo = fp.esEfectivo
     }
 
     const cobroFecha = facturaFechaToPrismaDate(input.fecha)
@@ -344,6 +347,23 @@ export class CobroService {
         montoBruto: montoBruto.toFixed(2),
       }
     })
+
+    if (formaEsEfectivo) {
+      try {
+        await new TurnoCajaService(this.prisma).tryRecordAutoMovement({
+          tenantId,
+          userId,
+          tipo: 'cobro',
+          formaPago: 'efectivo',
+          importe: Number(result.cobro.monto.toString()),
+          concepto: result.cobro.referencia,
+          referenciaTipo: 'cobro',
+          referenciaId: result.cobro.id,
+        })
+      } catch {
+        /* Cash drawer posting must not fail cobro create */
+      }
+    }
 
     return { ok: true, data: result }
   }

@@ -314,6 +314,7 @@ export interface FormaPago {
   codigo: number
   descripcion: string
   vto_dias: number
+  esEfectivo?: boolean
 }
 
 export interface Factura {

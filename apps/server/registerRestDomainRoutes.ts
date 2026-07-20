@@ -55,6 +55,7 @@ import { registerPrintingRoutes } from './routes/registerPrintingRoutes'
 import { registerContratosRoutes } from './routes/registerContratosRoutes'
 import { registerOrdenTrabajoRoutes } from './routes/registerOrdenTrabajoRoutes'
 import { registerGarantiasRoutes } from './routes/registerGarantiasRoutes'
+import { registerCajaRoutes } from './routes/registerCajaRoutes'
 import { createDomainServices } from './services/createDomainServices'
 
 /**
@@ -105,6 +106,7 @@ export function registerRestDomainRoutes(app: Application, prisma: PrismaClient)
   registerContratosRoutes(app, ctx)
   registerOrdenTrabajoRoutes(app, ctx)
   registerGarantiasRoutes(app, ctx)
+  registerCajaRoutes(app, ctx)
   registerRemitosRoutes(app, ctx)
   registerChequesRoutes(app, ctx)
   registerCobrosRoutes(app, ctx)

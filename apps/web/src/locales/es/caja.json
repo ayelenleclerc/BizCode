@@ -1,0 +1,40 @@
+{
+  "title": "Caja y turnos",
+  "loadError": "No se pudo cargar la caja",
+  "cajas": "Cajas",
+  "nuevaCaja": "Nueva caja",
+  "nombreCaja": "Nombre",
+  "crearCaja": "Crear",
+  "abrirTurno": "Abrir turno",
+  "montoApertura": "Monto apertura",
+  "cerrarTurno": "Cerrar turno",
+  "egreso": "Egreso",
+  "ingresoExtra": "Ingreso extra",
+  "importe": "Importe",
+  "concepto": "Concepto",
+  "registrar": "Registrar",
+  "conteo": "Conteo físico",
+  "observaciones": "Observaciones (obligatorias si hay diferencia)",
+  "pdf": "PDF cierre",
+  "counts": {
+    "abiertos": "Turnos abiertos",
+    "cerradosHoy": "Cerrados hoy",
+    "diferenciaHoy": "Diferencia hoy"
+  },
+  "columns": {
+    "caja": "Caja",
+    "cajero": "Cajero",
+    "estado": "Estado",
+    "apertura": "Apertura",
+    "esperado": "Esperado",
+    "contado": "Contado",
+    "diferencia": "Diferencia"
+  },
+  "estado": {
+    "abierto": "Abierto",
+    "cerrado": "Cerrado"
+  },
+  "empty": "No hay turnos",
+  "formasPagoTitle": "Formas de pago (efectivo)",
+  "esEfectivo": "Es efectivo (auto-caja)"
+}

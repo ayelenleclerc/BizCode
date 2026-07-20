@@ -110,7 +110,7 @@ vi.mock('@/lib/api', async () => {
       cancel: vi.fn(),
       receive: vi.fn(),
     },
-    formasPagoAPI: { list: vi.fn().mockResolvedValue([]) },
+    formasPagoAPI: { list: vi.fn().mockResolvedValue([]), patch: vi.fn() },
     pedidosAPI: {
       list: vi.fn().mockResolvedValue({ success: true, data: [], total: 0, limit: 100, offset: 0 }),
       get: vi.fn(),
@@ -158,6 +158,22 @@ vi.mock('@/lib/api', async () => {
       get: vi.fn(),
       register: vi.fn(),
       anular: vi.fn(),
+    },
+    cajaAPI: {
+      listCajas: vi.fn().mockResolvedValue([]),
+      listTurnos: vi.fn().mockResolvedValue({
+        success: true,
+        data: [],
+        total: 0,
+        take: 100,
+        skip: 0,
+        counts: { abiertos: 0, cerradosHoy: 0, diferenciaHoy: 0 },
+      }),
+      createCaja: vi.fn(),
+      open: vi.fn(),
+      addMovimiento: vi.fn(),
+      close: vi.fn(),
+      pdfUrl: (id: number) => `/turnos-caja/${id}/pdf`,
     },
     facturasAPI: {
       list: vi.fn().mockResolvedValue([]),

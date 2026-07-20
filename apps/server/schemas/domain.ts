@@ -2776,3 +2776,63 @@ export function safeParseBodySchema<S extends z.ZodTypeAny>(schema: S, raw: unkn
   }
   return { ok: true, value: parsed.data }
 }
+
+export const cajaCreateBodySchema = z
+  .object({
+    nombre: z.string().min(1).max(80),
+  })
+  .transform((data) => ({ nombre: data.nombre.trim() }))
+
+export const turnoCajaOpenBodySchema = z
+  .object({
+    cajaId: z.number().int().min(1),
+    montoApertura: z.number().min(0),
+  })
+  .transform((data) => ({
+    cajaId: data.cajaId,
+    montoApertura: data.montoApertura,
+  }))
+
+const conteoEfectivoSchema = z.object({
+  b1000: z.number().int().min(0).optional(),
+  b500: z.number().int().min(0).optional(),
+  b200: z.number().int().min(0).optional(),
+  b100: z.number().int().min(0).optional(),
+  b50: z.number().int().min(0).optional(),
+  b20: z.number().int().min(0).optional(),
+  b10: z.number().int().min(0).optional(),
+  m10: z.number().int().min(0).optional(),
+  m5: z.number().int().min(0).optional(),
+  m2: z.number().int().min(0).optional(),
+  m1: z.number().int().min(0).optional(),
+})
+
+export const turnoCajaCloseBodySchema = z
+  .object({
+    conteo: conteoEfectivoSchema,
+    observaciones: z.union([z.string().max(500), z.null()]).optional(),
+  })
+  .transform((data) => ({
+    conteo: data.conteo,
+    observaciones: data.observaciones?.trim() || null,
+  }))
+
+export const movimientoCajaManualBodySchema = z
+  .object({
+    tipo: z.enum(['egreso', 'ingreso_extra']),
+    importe: z.number().positive(),
+    concepto: z.union([z.string().max(200), z.null()]).optional(),
+    formaPago: z.enum(['efectivo', 'tarjeta', 'mp', 'transferencia', 'otro']).optional(),
+  })
+  .transform((data) => ({
+    tipo: data.tipo,
+    importe: data.importe,
+    concepto: data.concepto?.trim() || null,
+    formaPago: data.formaPago ?? ('efectivo' as const),
+  }))
+
+export const formaPagoPatchBodySchema = z
+  .object({
+    esEfectivo: z.boolean(),
+  })
+  .transform((data) => ({ esEfectivo: data.esEfectivo }))

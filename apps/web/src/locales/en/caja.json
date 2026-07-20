@@ -1,0 +1,40 @@
+{
+  "title": "Cash drawer & shifts",
+  "loadError": "Could not load cash drawer",
+  "cajas": "Drawers",
+  "nuevaCaja": "New drawer",
+  "nombreCaja": "Name",
+  "crearCaja": "Create",
+  "abrirTurno": "Open shift",
+  "montoApertura": "Opening amount",
+  "cerrarTurno": "Close shift",
+  "egreso": "Cash out",
+  "ingresoExtra": "Extra cash in",
+  "importe": "Amount",
+  "concepto": "Concept",
+  "registrar": "Save",
+  "conteo": "Physical count",
+  "observaciones": "Notes (required when difference ≠ 0)",
+  "pdf": "Close PDF",
+  "counts": {
+    "abiertos": "Open shifts",
+    "cerradosHoy": "Closed today",
+    "diferenciaHoy": "Difference today"
+  },
+  "columns": {
+    "caja": "Drawer",
+    "cajero": "Cashier",
+    "estado": "Status",
+    "apertura": "Opened",
+    "esperado": "Expected",
+    "contado": "Counted",
+    "diferencia": "Difference"
+  },
+  "estado": {
+    "abierto": "Open",
+    "cerrado": "Closed"
+  },
+  "empty": "No shifts",
+  "formasPagoTitle": "Payment methods (cash)",
+  "esEfectivo": "Is cash (auto drawer)"
+}

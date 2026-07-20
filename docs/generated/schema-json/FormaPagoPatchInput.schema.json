@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "esEfectivo": {
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "esEfectivo"
+  ],
+  "title": "FormaPagoPatchInput",
+  "type": "object"
+}

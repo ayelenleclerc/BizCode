@@ -10,6 +10,8 @@ Versioning: [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **Cash drawer shifts / POS cashier (#247):** Prisma `Caja` / `TurnoCaja` / `ConteoEfectivo` / `MovimientoCaja` and `FormaPago.esEfectivo`; API `/api/cajas` and `/api/turnos-caja` (open/close, manual movements, close PDF) behind `pos.cashier`; auto cash movements on cash invoice/cobro/recibo when a shift is open (does not block sales without a shift); UI `/caja` with count dashboard and payment-method cash flag; OpenAPI, tests, i18n EN/ES/PT-BR.
+
 - **Service warranties (#251):** Prisma `Garantia` / `GarantiaUso` and `Articulo.mesesGarantia`; auto-register on invoice create; API `/api/garantias` (list, lookup by serial/IMEI, detail, anular, usos) behind `service.warranties`; OT create lookups `Garantia` and records `GarantiaUso`; UI `/garantias` + article form field + OT serial feedback; OpenAPI, tests, i18n EN/ES/PT-BR.
 
 - **Service work orders (#246):** Prisma `OrdenTrabajo` / `OrdenTrabajoItem` with state machine (recibido → facturado); CRUD + transitions audited via `AuditEvent`; one-click invoice via `FacturaService` (parts decrement stock, labor/service do not); basic warranty lookup by serial; client notifications `ot_presupuestado` / `ot_listo`; workshop dashboard UI behind module `service.orders`; OpenAPI, tests, i18n EN/ES/PT-BR.

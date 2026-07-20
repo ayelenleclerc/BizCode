@@ -52,6 +52,8 @@ tags:
     description: Service work orders / repair tickets (#246, module service.orders)
   - name: garantias
     description: Product warranties by serial / IMEI (#251, module service.warranties)
+  - name: cajas
+    description: Cash drawers and cashier shifts (#247, module pos.cashier)
   - name: cobros
     description: Customer payment collections
   - name: portal
@@ -4651,6 +4653,273 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
 
+  /api/cajas:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [cajas]
+      summary: List cash drawers
+      description: Requires module `pos.cashier`.
+      responses:
+        '200':
+          description: Cash drawers
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CajaListEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    post:
+      tags: [cajas]
+      summary: Create cash drawer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [nombre]
+              properties:
+                nombre:
+                  type: string
+                  minLength: 1
+                  maxLength: 80
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CajaEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          description: Duplicate nombre
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/turnos-caja:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [cajas]
+      summary: List cashier shifts
+      parameters:
+        - $ref: '#/components/parameters/ListLimit'
+        - $ref: '#/components/parameters/ListOffset'
+        - name: estado
+          in: query
+          schema:
+            type: string
+            enum: [abierto, cerrado]
+        - name: cajaId
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '200':
+          description: Paginated shifts with counts
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TurnoCajaListEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    post:
+      tags: [cajas]
+      summary: Open cashier shift
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TurnoCajaOpenInput'
+      responses:
+        '201':
+          description: Shift opened
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TurnoCajaEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          description: Caja already open
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/turnos-caja/{id}:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    get:
+      tags: [cajas]
+      summary: Get shift detail
+      responses:
+        '200':
+          description: Shift detail
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TurnoCajaEnvelope'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/turnos-caja/{id}/movimientos:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    post:
+      tags: [cajas]
+      summary: Register manual cash movement
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MovimientoCajaManualInput'
+      responses:
+        '201':
+          description: Movement registered
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TurnoCajaEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '409':
+          description: Turno not open
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/turnos-caja/{id}/cerrar:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    post:
+      tags: [cajas]
+      summary: Close shift with physical cash count
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TurnoCajaCloseInput'
+      responses:
+        '200':
+          description: Shift closed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TurnoCajaEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '409':
+          description: Turno not open
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/turnos-caja/{id}/pdf:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    get:
+      tags: [cajas]
+      summary: PDF report for closed shift
+      responses:
+        '200':
+          description: PDF binary
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '409':
+          description: Shift not closed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
   /api/cobros:
     parameters:
       - $ref: '#/components/parameters/BizcodeChannelHeader'
@@ -6402,6 +6671,38 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/FormaPagoListEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/formas-pago/{id}:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    patch:
+      tags: [formasPago]
+      summary: Update payment method flags (esEfectivo)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FormaPagoPatchInput'
+      responses:
+        '200':
+          description: Updated payment method
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FormaPagoEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
         '500':
           $ref: '#/components/responses/ServerError'
 
@@ -15110,6 +15411,16 @@ components:
           type: string
         vto_dias:
           type: integer
+        esEfectivo:
+          type: boolean
+          description: When true, posts MovimientoCaja on open cash shift (#247).
+
+    FormaPagoPatchInput:
+      type: object
+      required: [esEfectivo]
+      properties:
+        esEfectivo:
+          type: boolean
 
     FormaPagoListEnvelope:
       type: object
@@ -15122,6 +15433,135 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/FormaPago'
+
+    FormaPagoEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/FormaPago'
+
+    Caja:
+      type: object
+      additionalProperties: true
+      properties:
+        id:
+          type: integer
+        nombre:
+          type: string
+        activa:
+          type: boolean
+
+    CajaListEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Caja'
+
+    CajaEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/Caja'
+
+    TurnoCaja:
+      type: object
+      additionalProperties: true
+      properties:
+        id:
+          type: integer
+        cajaId:
+          type: integer
+        cajeroId:
+          type: integer
+        estado:
+          type: string
+          enum: [abierto, cerrado]
+        montoApertura:
+          type: number
+        diferencia:
+          type: number
+          nullable: true
+
+    TurnoCajaOpenInput:
+      type: object
+      required: [cajaId, montoApertura]
+      properties:
+        cajaId:
+          type: integer
+          minimum: 1
+        montoApertura:
+          type: number
+          minimum: 0
+
+    TurnoCajaCloseInput:
+      type: object
+      required: [conteo]
+      properties:
+        conteo:
+          type: object
+          additionalProperties: true
+        observaciones:
+          type: string
+          nullable: true
+
+    MovimientoCajaManualInput:
+      type: object
+      required: [tipo, importe]
+      properties:
+        tipo:
+          type: string
+          enum: [egreso, ingreso_extra]
+        importe:
+          type: number
+          exclusiveMinimum: 0
+        concepto:
+          type: string
+          nullable: true
+        formaPago:
+          type: string
+          enum: [efectivo, tarjeta, mp, transferencia, otro]
+
+    TurnoCajaEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/TurnoCaja'
+
+    TurnoCajaListEnvelope:
+      allOf:
+        - type: object
+          required: [success, data]
+          properties:
+            success:
+              type: boolean
+              const: true
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/TurnoCaja'
+            counts:
+              type: object
+              additionalProperties:
+                type: number
+        - $ref: '#/components/schemas/ListPaginationMeta'
 
     AppUser:
       type: object

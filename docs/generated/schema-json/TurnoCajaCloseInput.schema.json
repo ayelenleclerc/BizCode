@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "conteo": {
+      "additionalProperties": true,
+      "type": "object"
+    },
+    "observaciones": {
+      "nullable": true,
+      "type": "string"
+    }
+  },
+  "required": [
+    "conteo"
+  ],
+  "title": "TurnoCajaCloseInput",
+  "type": "object"
+}
