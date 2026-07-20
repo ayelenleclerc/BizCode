@@ -50,6 +50,8 @@ tags:
     description: Recurring service contracts and scheduled invoicing (#245, module service.contracts)
   - name: ordenes-trabajo
     description: Service work orders / repair tickets (#246, module service.orders)
+  - name: garantias
+    description: Product warranties by serial / IMEI (#251, module service.warranties)
   - name: cobros
     description: Customer payment collections
   - name: portal
@@ -4444,6 +4446,200 @@ paths:
                 $ref: '#/components/schemas/ApiErrorEnvelope'
         '422':
           description: Warranty OT cannot be invoiced to customer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/garantias:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [garantias]
+      summary: List warranties
+      description: Requires module `service.warranties` and `sales.create` or `reports.operational.read`.
+      parameters:
+        - $ref: '#/components/parameters/ListLimit'
+        - $ref: '#/components/parameters/ListOffset'
+        - name: estado
+          in: query
+          schema:
+            $ref: '#/components/schemas/GarantiaEstado'
+        - name: q
+          in: query
+          description: Search by serial, IMEI, or customer name
+          schema:
+            type: string
+        - name: proximas
+          in: query
+          description: When true, only vigentes expiring in the next 3 months
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Paginated warranties with counts
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GarantiaListEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    post:
+      tags: [garantias]
+      summary: Register warranty manually
+      description: Requires module `service.warranties` and `sales.create`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GarantiaRegisterInput'
+      responses:
+        '201':
+          description: Warranty created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GarantiaEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/garantias/lookup:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: serial
+        in: query
+        required: true
+        schema:
+          type: string
+          minLength: 1
+    get:
+      tags: [garantias]
+      summary: Lookup warranty by serial or IMEI
+      description: Requires module `service.warranties`.
+      responses:
+        '200':
+          description: Lookup result (vigente, vencida, or sin_registro)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GarantiaLookupEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/garantias/{id}:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    get:
+      tags: [garantias]
+      summary: Get warranty detail with usage history
+      responses:
+        '200':
+          description: Warranty detail
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GarantiaEnvelope'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/garantias/{id}/anular:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    post:
+      tags: [garantias]
+      summary: Anular warranty
+      responses:
+        '200':
+          description: Warranty anulada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GarantiaEnvelope'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '409':
+          description: Already anulada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/garantias/{id}/usos:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    post:
+      tags: [garantias]
+      summary: Register warranty usage
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GarantiaUsoInput'
+      responses:
+        '201':
+          description: Usage registered
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GarantiaEnvelope'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '409':
+          description: Cannot use vencida or anulada warranty
           content:
             application/json:
               schema:
@@ -10909,6 +11105,11 @@ components:
           enum: [hora, dia, mes, proyecto, km, unidad, otro]
           nullable: true
           description: Required when tipo is servicio (#244).
+        mesesGarantia:
+          type: integer
+          nullable: true
+          minimum: 1
+          description: Warranty months for physical articles; null = no warranty (#251).
         precioLista1:
           type: number
         precioLista2:
@@ -10950,6 +11151,11 @@ components:
           type: string
           enum: [hora, dia, mes, proyecto, km, unidad, otro]
           nullable: true
+        mesesGarantia:
+          type: integer
+          nullable: true
+          minimum: 1
+          description: Warranty months; ignored for servicio (#251).
         precioLista1:
           type: number
           minimum: 0.01
@@ -14737,6 +14943,160 @@ components:
               $ref: '#/components/schemas/OrdenTrabajo'
             facturaId:
               type: integer
+
+    GarantiaEstado:
+      type: string
+      enum: [vigente, vencida, anulada]
+
+    GarantiaUso:
+      type: object
+      additionalProperties: true
+      properties:
+        id:
+          type: integer
+        garantiaId:
+          type: integer
+        otId:
+          type: integer
+          nullable: true
+        descripcion:
+          type: string
+        fecha:
+          type: string
+          format: date-time
+        userId:
+          type: integer
+
+    Garantia:
+      type: object
+      additionalProperties: true
+      properties:
+        id:
+          type: integer
+        articuloId:
+          type: integer
+        facturaId:
+          type: integer
+          nullable: true
+        facturaItemId:
+          type: integer
+          nullable: true
+        nroSerie:
+          type: string
+          nullable: true
+        nroImei:
+          type: string
+          nullable: true
+        descripcionEquipo:
+          type: string
+          nullable: true
+        clienteId:
+          type: integer
+        fechaVenta:
+          type: string
+          format: date-time
+        mesesGarantia:
+          type: integer
+        fechaVencimiento:
+          type: string
+          format: date-time
+        estado:
+          $ref: '#/components/schemas/GarantiaEstado'
+        usos:
+          type: array
+          items:
+            $ref: '#/components/schemas/GarantiaUso'
+
+    GarantiaRegisterInput:
+      type: object
+      required: [articuloId, clienteId]
+      properties:
+        articuloId:
+          type: integer
+          minimum: 1
+        clienteId:
+          type: integer
+          minimum: 1
+        facturaId:
+          type: integer
+          nullable: true
+        facturaItemId:
+          type: integer
+          nullable: true
+        nroSerie:
+          type: string
+          nullable: true
+        nroImei:
+          type: string
+          nullable: true
+        descripcionEquipo:
+          type: string
+          nullable: true
+        fechaVenta:
+          type: string
+          nullable: true
+        mesesGarantia:
+          type: integer
+          minimum: 1
+          nullable: true
+
+    GarantiaUsoInput:
+      type: object
+      required: [descripcion]
+      properties:
+        otId:
+          type: integer
+          nullable: true
+          minimum: 1
+        descripcion:
+          type: string
+          minLength: 1
+          maxLength: 500
+
+    GarantiaEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/Garantia'
+
+    GarantiaListEnvelope:
+      allOf:
+        - type: object
+          required: [success, data]
+          properties:
+            success:
+              type: boolean
+              const: true
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/Garantia'
+            counts:
+              type: object
+              additionalProperties:
+                type: integer
+        - $ref: '#/components/schemas/ListPaginationMeta'
+
+    GarantiaLookupEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: object
+          required: [status]
+          properties:
+            status:
+              type: string
+              enum: [vigente, vencida, sin_registro]
+            garantia:
+              $ref: '#/components/schemas/Garantia'
 
     FormaPago:
       type: object

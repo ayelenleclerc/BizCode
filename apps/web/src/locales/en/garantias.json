@@ -1,0 +1,38 @@
+{
+  "title": "Warranties",
+  "loadError": "Could not load warranties",
+  "searchPlaceholder": "Serial, IMEI or customer…",
+  "search": "Search",
+  "proximas": "Expiring soon",
+  "counts": {
+    "vigente": "Active",
+    "vencida": "Expired",
+    "anulada": "Voided",
+    "vencenEsteMes": "Expire this month",
+    "vencenProximos3Meses": "Next 3 months"
+  },
+  "columns": {
+    "serie": "Serial / IMEI",
+    "cliente": "Customer",
+    "articulo": "Item",
+    "vence": "Expires",
+    "estado": "Status",
+    "usos": "Uses"
+  },
+  "estado": {
+    "vigente": "Active",
+    "vencida": "Expired",
+    "anulada": "Voided"
+  },
+  "actions": {
+    "anular": "Void",
+    "refresh": "Refresh"
+  },
+  "empty": "No warranties found",
+  "lookup": {
+    "loading": "Checking warranty…",
+    "vigente": "Active warranty — expires {{date}}",
+    "vencida": "Expired warranty — expired {{date}}",
+    "sin_registro": "No warranty registered for this serial"
+  }
+}

@@ -66,6 +66,8 @@ export type ArticuloInput = {
   /** @en Defaults to articulo when omitted. @es Por defecto articulo. @pt-BR Padrão articulo. */
   tipo?: ArticuloTipo
   unidadServicio?: UnidadServicio | null
+  /** @en Warranty months; null = no warranty (#251). @es Meses de garantía (#251). @pt-BR Meses de garantia (#251). */
+  mesesGarantia?: number | null
   precioLista1: number
   precioLista2: number
   costo: number
@@ -178,6 +180,10 @@ export type FacturaItemInput = {
   precio: number
   dscto: number
   subtotal: number
+  /** Optional serial for warranty registration when article has mesesGarantia (#251). */
+  nroSerie?: string | null
+  /** Optional IMEI for warranty registration (#251). */
+  nroImei?: string | null
 }
 
 export type FacturaPercepcionInput = {

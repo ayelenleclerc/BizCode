@@ -25,6 +25,12 @@
       "minLength": 3,
       "type": "string"
     },
+    "mesesGarantia": {
+      "description": "Warranty months; ignored for servicio (#251).",
+      "minimum": 1,
+      "nullable": true,
+      "type": "integer"
+    },
     "minimo": {
       "description": "Must be 0 when tipo is servicio (#244).",
       "minimum": 0,

@@ -19,6 +19,7 @@ import cobrosEs from '@/locales/es/cobros.json'
 import pedidosEs from '@/locales/es/pedidos.json'
 import contratosEs from '@/locales/es/contratos.json'
 import ordenesTrabajoEs from '@/locales/es/ordenesTrabajo.json'
+import garantiasEs from '@/locales/es/garantias.json'
 import finanzasEs from '@/locales/es/finanzas.json'
 import reportesEs from '@/locales/es/reportes.json'
 import dashboardAnalyticsEs from '@/locales/es/dashboard-analytics.json'
@@ -45,6 +46,7 @@ import cobrosEn from '@/locales/en/cobros.json'
 import pedidosEn from '@/locales/en/pedidos.json'
 import contratosEn from '@/locales/en/contratos.json'
 import ordenesTrabajoEn from '@/locales/en/ordenesTrabajo.json'
+import garantiasEn from '@/locales/en/garantias.json'
 import finanzasEn from '@/locales/en/finanzas.json'
 import reportesEn from '@/locales/en/reportes.json'
 import dashboardAnalyticsEn from '@/locales/en/dashboard-analytics.json'
@@ -71,6 +73,7 @@ import cobrosPt from '@/locales/pt-BR/cobros.json'
 import pedidosPt from '@/locales/pt-BR/pedidos.json'
 import contratosPt from '@/locales/pt-BR/contratos.json'
 import ordenesTrabajoPt from '@/locales/pt-BR/ordenesTrabajo.json'
+import garantiasPt from '@/locales/pt-BR/garantias.json'
 import finanzasPt from '@/locales/pt-BR/finanzas.json'
 import reportesPt from '@/locales/pt-BR/reportes.json'
 import dashboardAnalyticsPt from '@/locales/pt-BR/dashboard-analytics.json'
@@ -107,6 +110,7 @@ i18n
         pedidos: pedidosEs,
         contratos: contratosEs,
         ordenesTrabajo: ordenesTrabajoEs,
+        garantias: garantiasEs,
         zonasEntrega: zonasEntregaEs,
         chat: chatEs,
         audit: auditEs,
@@ -134,6 +138,7 @@ i18n
         pedidos: pedidosEn,
         contratos: contratosEn,
         ordenesTrabajo: ordenesTrabajoEn,
+        garantias: garantiasEn,
         zonasEntrega: zonasEntregaEn,
         chat: chatEn,
         audit: auditEn,
@@ -161,6 +166,7 @@ i18n
         pedidos: pedidosPt,
         contratos: contratosPt,
         ordenesTrabajo: ordenesTrabajoPt,
+        garantias: garantiasPt,
         zonasEntrega: zonasEntregaPt,
         chat: chatPt,
         audit: auditPt,

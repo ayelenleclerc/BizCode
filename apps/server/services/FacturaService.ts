@@ -12,6 +12,7 @@ import {
 import { ArcaService } from '../fiscal/ar/ArcaService'
 import { validateFacturaPercepciones } from './RetencionFacturaValidation'
 import { ClienteCuentaCorrienteService } from './ClienteCuentaCorrienteService'
+import { GarantiaService } from './GarantiaService'
 
 type FacturaWithRelations = Prisma.FacturaGetPayload<{ include: { cliente: true; items: true } }>
 
@@ -52,9 +53,11 @@ export type FacturaCreateOptions = {
  */
 export class FacturaService {
   private readonly arca: ArcaService
+  private readonly garantiaService: GarantiaService
 
   constructor(private readonly prisma: PrismaClient) {
     this.arca = new ArcaService(prisma)
+    this.garantiaService = new GarantiaService(prisma)
   }
 
   async list(tenantId: number, take: number, skip: number): Promise<FacturaListResult> {
@@ -101,6 +104,7 @@ export class FacturaService {
               tipo: true,
               condIva: true,
               unidadServicio: true,
+              mesesGarantia: true,
             },
           })
         : []
@@ -231,6 +235,23 @@ export class FacturaService {
       })
     }
 
+    try {
+      await this.garantiaService.registerFromFactura(
+        tenantId,
+        newFactura.id,
+        clienteId,
+        newFactura.fecha,
+        newFactura.items.map((fi, index) => ({
+          id: fi.id,
+          articuloId: fi.articuloId,
+          nroSerie: items[index]?.nroSerie,
+          nroImei: items[index]?.nroImei,
+        })),
+      )
+    } catch {
+      /* Warranty registration must not fail invoice create */
+    }
+
     return {
       ok: true,
       data: {
@@ -243,8 +264,8 @@ export class FacturaService {
 
   /**
    * @en Voids an active invoice, creates a credit note, reverses balance, and records audit in one transaction.
-   * @es Anula factura vigente, crea nota de crˇdito, revierte saldo y audita en una transacciˇn.
-   * @pt-BR Anula fatura ativa, cria nota de crˇdito, reverte saldo e audita em uma transaˇˇo.
+   * @es Anula factura vigente, crea nota de crùdito, revierte saldo y audita en una transacciùn.
+   * @pt-BR Anula fatura ativa, cria nota de crùdito, reverte saldo e audita em uma transaùùo.
    */
   async void(
     tenantId: number,
@@ -339,7 +360,7 @@ export class FacturaService {
 
     if (factura.estadoCae === 'issued') {
       void this.arca.requestCaeForNotaCredito(tenantId, result.notaCredito.id).catch(() => {
-        /* homologaciˇn mock; retry job may be added later */
+        /* homologaciùn mock; retry job may be added later */
       })
     }
 
@@ -348,8 +369,8 @@ export class FacturaService {
 
   /**
    * @en Issues a partial credit note for an active invoice without voiding it (#344).
-   * @es Emite nota de crˇdito parcial sobre factura vigente sin anularla (#344).
-   * @pt-BR Emite nota de crˇdito parcial sobre fatura ativa sem anulˇ-la (#344).
+   * @es Emite nota de crùdito parcial sobre factura vigente sin anularla (#344).
+   * @pt-BR Emite nota de crùdito parcial sobre fatura ativa sem anulù-la (#344).
    */
   async createPartialCreditNote(
     tenantId: number,
@@ -443,7 +464,7 @@ export class FacturaService {
 
     if (factura.estadoCae === 'issued') {
       void this.arca.requestCaeForNotaCredito(tenantId, result.notaCredito.id).catch(() => {
-        /* homologaciˇn mock; retry job may be added later */
+        /* homologaciùn mock; retry job may be added later */
       })
     }
 

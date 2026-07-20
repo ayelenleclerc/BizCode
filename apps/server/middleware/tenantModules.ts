@@ -32,6 +32,7 @@ const TEST_DEFAULT_MODULES: ModuleKey[] = [
   'clients.portal',
   'service.contracts',
   'service.orders',
+  'service.warranties',
 ]
 
 /**

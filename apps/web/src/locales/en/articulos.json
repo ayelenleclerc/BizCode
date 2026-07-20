@@ -68,6 +68,8 @@
     "costo": "Cost",
     "stock": "Stock",
     "minimo": "Minimum",
+    "mesesGarantia": "Warranty months",
+    "mesesGarantiaHint": "Empty or 0 = no warranty. Invoicing registers the warranty automatically.",
     "activo": "Active",
     "tipo": "Type",
     "tipoOptions": {

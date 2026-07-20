@@ -46,6 +46,13 @@ export const NAV_SECTIONS: readonly NavSection[] = [
     moduleKey: 'service.orders',
   },
   {
+    key: 'garantias',
+    path: '/garantias',
+    icon: '🛡️',
+    roles: ['owner', 'manager', 'seller', 'billing', 'backoffice'],
+    moduleKey: 'service.warranties',
+  },
+  {
     key: 'clientes',
     path: '/clientes',
     icon: '📋',

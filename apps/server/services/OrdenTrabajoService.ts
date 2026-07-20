@@ -13,6 +13,7 @@ import { calculateInvoice, calculateItemSubtotal } from '../../web/src/lib/invoi
 import { dispatchNotification } from '../channels'
 import type { ServiceResult } from './serviceResults'
 import { FacturaService } from './FacturaService'
+import { GarantiaService } from './GarantiaService'
 
 const ALLOWED_TRANSITIONS: Record<OrdenTrabajoEstado, readonly OrdenTrabajoEstado[]> = {
   recibido: ['diagnosticado', 'cancelado'],
@@ -150,9 +151,11 @@ function mapItems(items: OrdenTrabajoItemInput[]): Prisma.OrdenTrabajoItemCreate
  */
 export class OrdenTrabajoService {
   private readonly facturaService: FacturaService
+  private readonly garantiaService: GarantiaService
 
   constructor(private readonly prisma: PrismaClient) {
     this.facturaService = new FacturaService(prisma)
+    this.garantiaService = new GarantiaService(prisma)
   }
 
   async list(
@@ -208,7 +211,11 @@ export class OrdenTrabajoService {
     return { ok: true, data: mapOrdenTrabajoPublic(orden) }
   }
 
-  async create(tenantId: number, input: OrdenTrabajoInput): Promise<ServiceResult<OrdenTrabajoPublic>> {
+  async create(
+    tenantId: number,
+    input: OrdenTrabajoInput,
+    userId?: number,
+  ): Promise<ServiceResult<OrdenTrabajoPublic>> {
     const cliente = await this.prisma.cliente.findFirst({
       where: { id: input.clienteId, tenantId },
       select: { id: true, suspended: true },
@@ -231,15 +238,26 @@ export class OrdenTrabajoService {
     let enGarantia = input.enGarantia ?? false
     let garantiaVence = parseUtcDate(input.garantiaVence)
     let otGarantiaId = input.otGarantiaId ?? null
+    let garantiaId = input.garantiaId ?? null
 
     const serial = input.equipoNroSerie?.trim()
-    if (serial && input.enGarantia === undefined) {
-      const warranty = await this.findActiveWarrantyBySerial(tenantId, serial)
+    if (serial && input.enGarantia === undefined && garantiaId == null) {
+      const warranty = await this.garantiaService.findActiveBySerial(tenantId, serial)
       if (warranty) {
         enGarantia = true
-        garantiaVence = warranty.garantiaVence
-        otGarantiaId = warranty.id
+        garantiaVence = warranty.fechaVencimiento
+        garantiaId = warranty.id
       }
+    }
+
+    if (garantiaId != null) {
+      const g = await this.prisma.garantia.findFirst({
+        where: { id: garantiaId, tenantId },
+        select: { id: true, fechaVencimiento: true, estado: true },
+      })
+      if (!g) return { ok: false, status: 400, error: 'garantiaId is not valid for this tenant' }
+      enGarantia = true
+      garantiaVence = g.fechaVencimiento
     }
 
     if (otGarantiaId != null) {
@@ -275,6 +293,7 @@ export class OrdenTrabajoService {
         enGarantia,
         garantiaVence,
         otGarantiaId,
+        garantiaId,
         presupuesto,
         fechaPromesa: parseUtcDate(input.fechaPromesa),
         observaciones: input.observaciones ?? null,
@@ -282,6 +301,14 @@ export class OrdenTrabajoService {
       },
       include: otInclude,
     })
+
+    if (garantiaId != null && userId != null && enGarantia) {
+      await this.garantiaService.registrarUso(tenantId, garantiaId, userId, {
+        otId: created.id,
+        descripcion: `OT-${created.numero}: ${created.sintomaReportado}`.slice(0, 500),
+      })
+    }
+
     return { ok: true, data: mapOrdenTrabajoPublic(created) }
   }
 
@@ -531,38 +558,6 @@ export class OrdenTrabajoService {
     })
 
     return { ok: true, data: { orden: mapOrdenTrabajoPublic(updated), facturaId: result.data.factura.id } }
-  }
-
-  private async findActiveWarrantyBySerial(
-    tenantId: number,
-    serial: string,
-  ): Promise<{ id: number; garantiaVence: Date | null } | null> {
-    const now = new Date()
-    const prior = await this.prisma.ordenTrabajo.findFirst({
-      where: {
-        tenantId,
-        equipoNroSerie: serial,
-        OR: [
-          { garantiaVence: { gte: now } },
-          { AND: [{ enGarantia: false }, { estado: 'facturado' }, { garantiaVence: { gte: now } }] },
-        ],
-      },
-      orderBy: { fechaIngreso: 'desc' },
-      select: { id: true, garantiaVence: true },
-    })
-    if (prior) return prior
-
-    // Fallback: prior completed OT with same serial that set a warranty end date
-    return this.prisma.ordenTrabajo.findFirst({
-      where: {
-        tenantId,
-        equipoNroSerie: serial,
-        garantiaVence: { gte: now },
-        estado: { in: ['facturado', 'entregado', 'listo'] },
-      },
-      orderBy: { fechaIngreso: 'desc' },
-      select: { id: true, garantiaVence: true },
-    })
   }
 
   private async validateItemsArticulos(

@@ -68,6 +68,8 @@
     "costo": "Custo",
     "stock": "Estoque",
     "minimo": "Mínimo",
+    "mesesGarantia": "Meses de garantia",
+    "mesesGarantiaHint": "Vazio ou 0 = sem garantia. Ao faturar, a garantia é registrada automaticamente.",
     "activo": "Ativo",
     "tipo": "Tipo",
     "tipoOptions": {

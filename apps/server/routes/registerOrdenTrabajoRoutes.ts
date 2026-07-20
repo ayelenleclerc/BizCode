@@ -77,7 +77,11 @@ export function registerOrdenTrabajoRoutes(app: Application, ctx: RestRouteConte
     validateBody(ordenTrabajoBodySchema),
     async (req: Request, res: Response) => {
       try {
-        const result = await ordenTrabajo.create(getTenantId(req), req.body as OrdenTrabajoInput)
+        const result = await ordenTrabajo.create(
+          getTenantId(req),
+          req.body as OrdenTrabajoInput,
+          (req as AuthenticatedRequest).auth!.claims.userId,
+        )
         if (!result.ok) {
           res.status(result.status).json({ success: false, error: result.error })
           return

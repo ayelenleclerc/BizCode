@@ -23,6 +23,7 @@ undefined
 | [condIva](#condiva)               | `string`  | Required | cannot be null | [ArticuloInput](articuloinput-properties-condiva.md "undefined#/properties/condIva")               |
 | [costo](#costo)                   | `number`  | Required | cannot be null | [ArticuloInput](articuloinput-properties-costo.md "undefined#/properties/costo")                   |
 | [descripcion](#descripcion)       | `string`  | Required | cannot be null | [ArticuloInput](articuloinput-properties-descripcion.md "undefined#/properties/descripcion")       |
+| [mesesGarantia](#mesesgarantia)   | `integer` | Optional | cannot be null | [ArticuloInput](articuloinput-properties-mesesgarantia.md "undefined#/properties/mesesGarantia")   |
 | [minimo](#minimo)                 | `integer` | Required | cannot be null | [ArticuloInput](articuloinput-properties-minimo.md "undefined#/properties/minimo")                 |
 | [precioLista1](#preciolista1)     | `number`  | Required | cannot be null | [ArticuloInput](articuloinput-properties-preciolista1.md "undefined#/properties/precioLista1")     |
 | [precioLista2](#preciolista2)     | `number`  | Required | cannot be null | [ArticuloInput](articuloinput-properties-preciolista2.md "undefined#/properties/precioLista2")     |
@@ -145,6 +146,28 @@ undefined
 **maximum length**: the maximum number of characters for this string is: `30`
 
 **minimum length**: the minimum number of characters for this string is: `3`
+
+## mesesGarantia
+
+Warranty months; ignored for servicio (#251).
+
+`mesesGarantia`
+
+* is optional
+
+* Type: `integer`
+
+* cannot be null
+
+* defined in: [ArticuloInput](articuloinput-properties-mesesgarantia.md "undefined#/properties/mesesGarantia")
+
+### mesesGarantia Type
+
+`integer`
+
+### mesesGarantia Constraints
+
+**minimum**: the value of this number must greater than or equal to: `1`
 
 ## minimo
 

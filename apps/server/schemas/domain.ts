@@ -202,6 +202,7 @@ export const articuloBodySchema = z
       .enum(['hora', 'dia', 'mes', 'proyecto', 'km', 'unidad', 'otro'])
       .nullable()
       .optional(),
+    mesesGarantia: z.union([z.number(), z.null()]).optional(),
     precioLista1: z.number(),
     precioLista2: z.number(),
     costo: z.number(),
@@ -270,6 +271,17 @@ export const articuloBodySchema = z
         ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'minimo must be an integer', path: ['minimo'] })
         ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'minimo must be >= 0', path: ['minimo'] })
       }
+      if (
+        data.mesesGarantia !== undefined &&
+        data.mesesGarantia !== null &&
+        (!Number.isInteger(data.mesesGarantia) || data.mesesGarantia < 1)
+      ) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'mesesGarantia must be an integer >= 1 or null',
+          path: ['mesesGarantia'],
+        })
+      }
     }
   })
   .transform(
@@ -283,6 +295,7 @@ export const articuloBodySchema = z
         umedida: data.umedida.trim(),
         tipo,
         unidadServicio: tipo === 'servicio' ? (data.unidadServicio ?? null) : null,
+        mesesGarantia: tipo === 'servicio' ? null : (data.mesesGarantia ?? null),
         precioLista1: data.precioLista1,
         precioLista2: data.precioLista2,
         costo: data.costo,
@@ -650,6 +663,16 @@ export const facturaBodySchema = z
             item.unidadServicio = e.unidadServicio
           } else if (e.unidadServicio === null) {
             item.unidadServicio = null
+          }
+          if (typeof e.nroSerie === 'string') {
+            item.nroSerie = e.nroSerie.trim() || null
+          } else if (e.nroSerie === null) {
+            item.nroSerie = null
+          }
+          if (typeof e.nroImei === 'string') {
+            item.nroImei = e.nroImei.trim() || null
+          } else if (e.nroImei === null) {
+            item.nroImei = null
           }
           return item
         })
@@ -1785,6 +1808,40 @@ export const ordenTrabajoFacturarBodySchema = z
       skipArcaCae: data.skipArcaCae,
     }),
   )
+
+export const garantiaRegisterBodySchema = z
+  .object({
+    articuloId: z.number().int().min(1),
+    clienteId: z.number().int().min(1),
+    facturaId: z.union([z.number().int().min(1), z.null()]).optional(),
+    facturaItemId: z.union([z.number().int().min(1), z.null()]).optional(),
+    nroSerie: z.union([z.string(), z.null()]).optional(),
+    nroImei: z.union([z.string(), z.null()]).optional(),
+    descripcionEquipo: z.union([z.string(), z.null()]).optional(),
+    fechaVenta: z.union([z.string(), z.null()]).optional(),
+    mesesGarantia: z.union([z.number().int().min(1), z.null()]).optional(),
+  })
+  .transform((data) => ({
+    articuloId: data.articuloId,
+    clienteId: data.clienteId,
+    facturaId: data.facturaId ?? null,
+    facturaItemId: data.facturaItemId ?? null,
+    nroSerie: data.nroSerie?.trim() || null,
+    nroImei: data.nroImei?.trim() || null,
+    descripcionEquipo: data.descripcionEquipo?.trim() || null,
+    fechaVenta: data.fechaVenta?.trim() || undefined,
+    mesesGarantia: data.mesesGarantia ?? undefined,
+  }))
+
+export const garantiaUsoBodySchema = z
+  .object({
+    otId: z.union([z.number().int().min(1), z.null()]).optional(),
+    descripcion: z.string().min(1).max(500),
+  })
+  .transform((data) => ({
+    otId: data.otId ?? null,
+    descripcion: data.descripcion.trim(),
+  }))
 
 /** Resultado de validar un objeto arbitrario (p. ej. fila CSV → raw) con un schema Zod de dominio. */
 export type SafeParseBodyResult<T> = { ok: true; value: T } | { ok: false; error: string }

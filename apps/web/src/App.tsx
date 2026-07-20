@@ -23,6 +23,7 @@ import CobrosPage from './pages/cobros'
 import PedidosPage from './pages/pedidos'
 import ContratosPage from './pages/contratos'
 import OrdenesTrabajoPage from './pages/ordenes-trabajo'
+import GarantiasPage from './pages/garantias'
 import ReportesPage from './pages/reportes'
 import ConfiguracionPage from './pages/configuracion'
 import ZonasEntregaPage from './pages/configuracion/ZonasEntregaPage'
@@ -186,6 +187,14 @@ function AppRoutes() {
             element={
               <ModuleRoute moduleKey="service.orders">
                 <OrdenesTrabajoPage />
+              </ModuleRoute>
+            }
+          />
+          <Route
+            path="garantias"
+            element={
+              <ModuleRoute moduleKey="service.warranties">
+                <GarantiasPage />
               </ModuleRoute>
             }
           />

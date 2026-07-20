@@ -6,6 +6,7 @@ export * from './modules/cobros'
 export * from './modules/pedidos'
 export * from './modules/contratos'
 export * from './modules/ordenesTrabajo'
+export * from './modules/garantias'
 export * from './modules/facturas'
 export * from './modules/repartos'
 export * from './modules/ordenes-entrega'
@@ -40,6 +41,9 @@ export type {
   ContratoRow,
   OrdenTrabajoRow,
   OrdenTrabajoListResponse,
+  GarantiaRow,
+  GarantiaListResponse,
+  GarantiaLookupResult,
   PublicPlanDTO,
   Recuento,
   RecuentoItemRow,

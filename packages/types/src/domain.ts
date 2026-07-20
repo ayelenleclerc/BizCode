@@ -35,6 +35,8 @@ export interface Articulo {
   /** @en articulo | servicio (#244). @es articulo | servicio (#244). @pt-BR articulo | serviço (#244). */
   tipo?: 'articulo' | 'servicio'
   unidadServicio?: string | null
+  /** @en Warranty months (#251). @es Meses de garantía (#251). @pt-BR Meses de garantia (#251). */
+  mesesGarantia?: number | null
   precioLista1: number | string
   precioLista2: number | string
   costo: number | string

@@ -94,6 +94,12 @@ function buildPrismaMock(overrides: Partial<Record<string, unknown>> = {}): Pris
       update: vi.fn().mockResolvedValue({ ...OT_ROW, estado: 'diagnosticado' }),
     },
     ordenTrabajoItem: { deleteMany: vi.fn().mockResolvedValue({ count: 0 }) },
+    garantia: {
+      updateMany: vi.fn().mockResolvedValue({ count: 0 }),
+      findFirst: vi.fn().mockResolvedValue(null),
+      create: vi.fn(),
+    },
+    garantiaUso: { create: vi.fn().mockResolvedValue({ id: 1 }) },
     appUser: { findFirst: vi.fn().mockResolvedValue(null), findMany: vi.fn().mockResolvedValue([]) },
     auditEvent: { create: vi.fn().mockResolvedValue({ id: 1 }) },
     notification: { createMany: vi.fn().mockResolvedValue({ count: 0 }) },

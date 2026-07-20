@@ -302,6 +302,22 @@
 
 * [FormaPagoListEnvelope](./formapagolistenvelope.md) – `-`
 
+* [Garantia](./garantia.md) – `-`
+
+* [GarantiaEnvelope](./garantiaenvelope.md) – `-`
+
+* [GarantiaEstado](./garantiaestado.md) – `-`
+
+* [GarantiaListEnvelope](./garantialistenvelope.md) – `-`
+
+* [GarantiaLookupEnvelope](./garantialookupenvelope.md) – `-`
+
+* [GarantiaRegisterInput](./garantiaregisterinput.md) – `-`
+
+* [GarantiaUso](./garantiauso.md) – `-`
+
+* [GarantiaUsoInput](./garantiausoinput.md) – `-`
+
 * [HealthResponse](./healthresponse.md) – `-`
 
 * [LibroIvaComprasPreview](./libroivacompraspreview.md) – `-`
@@ -918,6 +934,12 @@
 
 * [Untitled object in FacturaListEnvelope](./facturalistenvelope-allof-0.md) – `undefined#/allOf/0`
 
+* [Untitled object in GarantiaListEnvelope](./garantialistenvelope-allof-0.md) – `undefined#/allOf/0`
+
+* [Untitled object in GarantiaListEnvelope](./garantialistenvelope-allof-0-properties-counts.md) – `undefined#/allOf/0/properties/counts`
+
+* [Untitled object in GarantiaLookupEnvelope](./garantialookupenvelope-properties-data.md) – `undefined#/properties/data`
+
 * [Untitled object in HealthResponse](./healthresponse-properties-db.md) – `undefined#/properties/db`
 
 * [Untitled object in MercadoPagoConfigEnvelope](./mercadopagoconfigenvelope-properties-data.md) – `undefined#/properties/data`
@@ -1163,6 +1185,10 @@
 * [Untitled array in FacturasPendientesEnvelope](./facturaspendientesenvelope-properties-data.md) – `undefined#/properties/data`
 
 * [Untitled array in FormaPagoListEnvelope](./formapagolistenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled array in Garantia](./garantia-properties-usos.md) – `undefined#/properties/usos`
+
+* [Untitled array in GarantiaListEnvelope](./garantialistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
 
 * [Untitled array in LibroIvaComprasPreview](./libroivacompraspreview-properties-totalsbyalicuota.md) – `undefined#/properties/totalsByAlicuota`
 

@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "articuloId": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "clienteId": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "descripcionEquipo": {
+      "nullable": true,
+      "type": "string"
+    },
+    "facturaId": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "facturaItemId": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "fechaVenta": {
+      "nullable": true,
+      "type": "string"
+    },
+    "mesesGarantia": {
+      "minimum": 1,
+      "nullable": true,
+      "type": "integer"
+    },
+    "nroImei": {
+      "nullable": true,
+      "type": "string"
+    },
+    "nroSerie": {
+      "nullable": true,
+      "type": "string"
+    }
+  },
+  "required": [
+    "articuloId",
+    "clienteId"
+  ],
+  "title": "GarantiaRegisterInput",
+  "type": "object"
+}

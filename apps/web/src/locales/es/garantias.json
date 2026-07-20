@@ -1,0 +1,38 @@
+{
+  "title": "Garantías",
+  "loadError": "No se pudieron cargar las garantías",
+  "searchPlaceholder": "Serie, IMEI o cliente…",
+  "search": "Buscar",
+  "proximas": "Próximas a vencer",
+  "counts": {
+    "vigente": "Vigentes",
+    "vencida": "Vencidas",
+    "anulada": "Anuladas",
+    "vencenEsteMes": "Vencen este mes",
+    "vencenProximos3Meses": "Próximos 3 meses"
+  },
+  "columns": {
+    "serie": "Serie / IMEI",
+    "cliente": "Cliente",
+    "articulo": "Artículo",
+    "vence": "Vence",
+    "estado": "Estado",
+    "usos": "Usos"
+  },
+  "estado": {
+    "vigente": "Vigente",
+    "vencida": "Vencida",
+    "anulada": "Anulada"
+  },
+  "actions": {
+    "anular": "Anular",
+    "refresh": "Actualizar"
+  },
+  "empty": "No hay garantías",
+  "lookup": {
+    "loading": "Consultando garantía…",
+    "vigente": "Garantía vigente — vence {{date}}",
+    "vencida": "Garantía vencida — venció {{date}}",
+    "sin_registro": "Sin garantía registrada para este número de serie"
+  }
+}

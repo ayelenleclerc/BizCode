@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState, type FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ordenesTrabajoAPI, type OrdenTrabajoRow } from '@/lib/api'
+import { ordenesTrabajoAPI, garantiasAPI, type OrdenTrabajoRow } from '@/lib/api'
+import type { GarantiaLookupResult } from '@bizcode/types'
 import { CanAccess } from '@/components/CanAccess'
 import ErrorBoundary from '@/components/ErrorBoundary'
 import AsyncWrapper from '@/components/shared/AsyncWrapper'
@@ -35,8 +36,16 @@ function formatOtNumero(numero: number): string {
   return `OT-${String(numero).padStart(5, '0')}`
 }
 
+function formatDate(value: string | null | undefined): string {
+  if (!value) return '—'
+  const d = new Date(value)
+  if (Number.isNaN(d.getTime())) return value
+  return d.toLocaleDateString()
+}
+
 export default function OrdenesTrabajoPage() {
   const { t } = useTranslation('ordenesTrabajo')
+  const { t: tg } = useTranslation('garantias')
   const [ordenes, setOrdenes] = useState<OrdenTrabajoRow[]>([])
   const [counts, setCounts] = useState<DashboardCounts>({})
   const [filtroEstado, setFiltroEstado] = useState<string>('')
@@ -45,6 +54,8 @@ export default function OrdenesTrabajoPage() {
   const [showForm, setShowForm] = useState(false)
   const [saving, setSaving] = useState(false)
   const [actionId, setActionId] = useState<number | null>(null)
+  const [warrantyLookup, setWarrantyLookup] = useState<GarantiaLookupResult | null>(null)
+  const [warrantyLookupLoading, setWarrantyLookupLoading] = useState(false)
   const [form, setForm] = useState({
     clienteId: '',
     equipoDescripcion: '',
@@ -75,6 +86,23 @@ export default function OrdenesTrabajoPage() {
     void load()
   }, [load])
 
+  const lookupWarrantyBySerial = useCallback(async (serial: string): Promise<void> => {
+    const trimmed = serial.trim()
+    if (!trimmed) {
+      setWarrantyLookup(null)
+      return
+    }
+    setWarrantyLookupLoading(true)
+    try {
+      const result = await garantiasAPI.lookup(trimmed)
+      setWarrantyLookup(result)
+    } catch {
+      setWarrantyLookup(null)
+    } finally {
+      setWarrantyLookupLoading(false)
+    }
+  }, [])
+
   async function handleCreate(event: FormEvent): Promise<void> {
     event.preventDefault()
     setSaving(true)
@@ -99,6 +127,7 @@ export default function OrdenesTrabajoPage() {
       }
       await ordenesTrabajoAPI.create(body)
       setShowForm(false)
+      setWarrantyLookup(null)
       setForm({
         clienteId: '',
         equipoDescripcion: '',
@@ -270,8 +299,37 @@ export default function OrdenesTrabajoPage() {
                 data-testid="ot-serie"
                 className="rounded border border-slate-300 px-2 py-1 dark:border-slate-600 dark:bg-slate-900"
                 value={form.equipoNroSerie}
-                onChange={(e) => setForm((f) => ({ ...f, equipoNroSerie: e.target.value }))}
+                onChange={(e) => {
+                  const value = e.target.value
+                  setForm((f) => ({ ...f, equipoNroSerie: value }))
+                  if (!value.trim()) setWarrantyLookup(null)
+                }}
+                onBlur={(e) => {
+                  void lookupWarrantyBySerial(e.target.value)
+                }}
+                aria-describedby="ot-serie-warranty-feedback"
               />
+              <span
+                id="ot-serie-warranty-feedback"
+                data-testid="ot-serie-warranty-feedback"
+                role="status"
+                aria-live="polite"
+                className="text-xs text-slate-600 dark:text-slate-400"
+              >
+                {warrantyLookupLoading
+                  ? tg('lookup.loading', { defaultValue: '…' })
+                  : warrantyLookup?.status === 'vigente'
+                    ? tg('lookup.vigente', {
+                        date: formatDate(warrantyLookup.garantia.fechaVencimiento),
+                      })
+                    : warrantyLookup?.status === 'vencida'
+                      ? tg('lookup.vencida', {
+                          date: formatDate(warrantyLookup.garantia.fechaVencimiento),
+                        })
+                      : warrantyLookup?.status === 'sin_registro'
+                        ? tg('lookup.sin_registro')
+                        : null}
+              </span>
             </label>
             <label className="grid gap-1 text-sm">
               {t('itemDesc')}

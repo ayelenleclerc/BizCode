@@ -82,6 +82,7 @@ model Cliente {
   pedidos        Pedido[]
   contratos      Contrato[]
   ordenesTrabajo OrdenTrabajo[]
+  garantias      Garantia[]
   cobros         Cobro[]
   ordenesEntrega OrdenEntrega[]
   remitos        Remito[]
@@ -128,6 +129,10 @@ model Articulo {
   /// @es Unidad de servicio cuando tipo=servicio (hora, dia, mes, …).
   /// @pt-BR Unidade de serviço quando tipo=serviço (hora, dia, mes, …).
   unidadServicio String? @db.VarChar(12)
+  /// @en Warranty months for physical articles; null = no warranty (#251).
+  /// @es Meses de garantía para artículos físicos; null = sin garantía (#251).
+  /// @pt-BR Meses de garantia para artigos físicos; null = sem garantia (#251).
+  mesesGarantia Int?
   precioLista1 Decimal @db.Decimal(14, 2)
   precioLista2 Decimal @db.Decimal(14, 2)
   costo        Decimal @db.Decimal(13, 2)
@@ -146,6 +151,7 @@ model Articulo {
   ordenCompraItems     OrdenCompraItem[]
   recuentoItems        RecuentoItem[]
   proveedorArticulos   ProveedorArticulo[]
+  garantias            Garantia[]
 
   @@unique([tenantId, codigo])
   @@index([tenantId])
@@ -446,6 +452,7 @@ model Factura {
   items          FacturaItem[]
   ordenesEntrega OrdenEntrega[]
   ordenesTrabajo OrdenTrabajo[]
+  garantias      Garantia[]
   recordatorios  CobroRecordatorio[]
   pedido         Pedido?
   notasCredito   NotaCredito[]
@@ -563,6 +570,9 @@ model OrdenTrabajo {
   otGarantiaId       Int?
   otGarantia         OrdenTrabajo?  @relation("OtGarantiaOrigen", fields: [otGarantiaId], references: [id], onDelete: SetNull)
   otsEnGarantia      OrdenTrabajo[] @relation("OtGarantiaOrigen")
+  /// Formal warranty record used for this OT (#251).
+  garantiaId         Int?
+  garantia           Garantia? @relation(fields: [garantiaId], references: [id], onDelete: SetNull)
   presupuesto        Decimal?  @db.Decimal(14, 2)
   fechaIngreso       DateTime  @default(now())
   fechaPromesa       DateTime?
@@ -574,6 +584,7 @@ model OrdenTrabajo {
   updatedAt          DateTime  @updatedAt
 
   items OrdenTrabajoItem[]
+  garantiaUsos GarantiaUso[]
 
   @@unique([tenantId, numero])
   @@index([tenantId, estado])
@@ -581,6 +592,61 @@ model OrdenTrabajo {
   @@index([tenantId, tecnicoId])
   @@index([tenantId, equipoNroSerie])
   @@index([tenantId, facturaId])
+  @@index([tenantId, garantiaId])
+}
+
+/// Product warranty registered at sale (#251).
+model Garantia {
+  id                Int       @id @default(autoincrement())
+  tenantId          Int
+  tenant            Tenant    @relation(fields: [tenantId], references: [id])
+  facturaId         Int?
+  factura           Factura?  @relation(fields: [facturaId], references: [id], onDelete: SetNull)
+  facturaItemId     Int?
+  facturaItem       FacturaItem? @relation(fields: [facturaItemId], references: [id], onDelete: SetNull)
+  articuloId        Int
+  articulo          Articulo  @relation(fields: [articuloId], references: [id], onDelete: Restrict)
+  nroSerie          String?   @db.VarChar(80)
+  nroImei           String?   @db.VarChar(20)
+  descripcionEquipo String?   @db.VarChar(200)
+  clienteId         Int
+  cliente           Cliente   @relation(fields: [clienteId], references: [id], onDelete: Restrict)
+  fechaVenta        DateTime
+  mesesGarantia     Int
+  fechaVencimiento  DateTime
+  /// vigente | vencida | anulada
+  estado            String    @default("vigente") @db.VarChar(12)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  usos          GarantiaUso[]
+  ordenesTrabajo OrdenTrabajo[]
+
+  @@index([tenantId, nroSerie])
+  @@index([tenantId, nroImei])
+  @@index([tenantId, clienteId])
+  @@index([tenantId, fechaVencimiento])
+  @@index([tenantId, estado])
+  @@index([tenantId, articuloId])
+  @@index([facturaId])
+  @@index([facturaItemId])
+}
+
+/// Warranty claim / usage linked to a work order (#251).
+model GarantiaUso {
+  id          Int          @id @default(autoincrement())
+  garantiaId  Int
+  garantia    Garantia     @relation(fields: [garantiaId], references: [id], onDelete: Cascade)
+  otId        Int?
+  ordenTrabajo OrdenTrabajo? @relation(fields: [otId], references: [id], onDelete: SetNull)
+  descripcion String       @db.VarChar(500)
+  fecha       DateTime     @default(now())
+  userId      Int
+  user        AppUser      @relation("GarantiaUsoUser", fields: [userId], references: [id], onDelete: Restrict)
+
+  @@index([garantiaId])
+  @@index([otId])
+  @@index([userId])
 }
 
 model OrdenTrabajoItem {
@@ -792,6 +858,8 @@ model FacturaItem {
   subtotal  Decimal   @db.Decimal(14, 2)
 
   createdAt DateTime  @default(now())
+
+  garantias Garantia[]
 }
 
 model ParamEmpresa {
@@ -863,6 +931,7 @@ model Tenant {
   pedidos        Pedido[]
   contratos      Contrato[]
   ordenesTrabajo OrdenTrabajo[]
+  garantias      Garantia[]
   cobros         Cobro[]
   cobroRecordatorios CobroRecordatorio[]
   ordenesEntrega OrdenEntrega[]
@@ -1271,6 +1340,7 @@ model AppUser {
   mercadoPagoRefundsCreated MercadoPagoRefund[] @relation("MercadoPagoRefundCreatedBy")
   mercadoPagoChargebacksResolved MercadoPagoChargeback[] @relation("MercadoPagoChargebackResolvedBy")
   ordenesTrabajoTecnico  OrdenTrabajo[] @relation("OrdenTrabajoTecnico")
+  garantiaUsos           GarantiaUso[]  @relation("GarantiaUsoUser")
 
   @@unique([tenantId, username])
 }

@@ -7277,6 +7277,10 @@ Returns PDF with amount in words (#233). Requires module `finance.receipts`.
 
     `integer`
 
+  - **`mesesGarantia`**
+
+    `integer` — Warranty months for physical articles; null = no warranty (#251).
+
   - **`minimo`**
 
     `integer`
@@ -7362,6 +7366,7 @@ Returns PDF with amount in words (#233). Requires module `finance.receipts`.
       "umedida": "",
       "tipo": "articulo",
       "unidadServicio": "hora",
+      "mesesGarantia": 1,
       "precioLista1": 1,
       "precioLista2": 1,
       "costo": 1,
@@ -7494,6 +7499,10 @@ Returns PDF with amount in words (#233). Requires module `finance.receipts`.
 
   `string`
 
+- **`mesesGarantia`**
+
+  `integer` — Warranty months; ignored for servicio (#251).
+
 - **`tipo`**
 
   `string`, possible values: `"articulo", "servicio"`, default: `"articulo"`
@@ -7513,6 +7522,7 @@ Returns PDF with amount in words (#233). Requires module `finance.receipts`.
   "umedida": "",
   "tipo": "articulo",
   "unidadServicio": "hora",
+  "mesesGarantia": 1,
   "precioLista1": 0.01,
   "precioLista2": 0.01,
   "costo": 0.01,
@@ -7555,6 +7565,10 @@ Returns PDF with amount in words (#233). Requires module `finance.receipts`.
   - **`id`**
 
     `integer`
+
+  - **`mesesGarantia`**
+
+    `integer` — Warranty months for physical articles; null = no warranty (#251).
 
   - **`minimo`**
 
@@ -7628,6 +7642,7 @@ Returns PDF with amount in words (#233). Requires module `finance.receipts`.
     "umedida": "",
     "tipo": "articulo",
     "unidadServicio": "hora",
+    "mesesGarantia": 1,
     "precioLista1": 1,
     "precioLista2": 1,
     "costo": 1,
@@ -7768,6 +7783,7 @@ Returns PDF with amount in words (#233). Requires module `finance.receipts`.
     "umedida": "",
     "tipo": "articulo",
     "unidadServicio": "hora",
+    "mesesGarantia": 1,
     "precioLista1": 1,
     "precioLista2": 1,
     "costo": 1,
@@ -7896,6 +7912,10 @@ Returns PDF with amount in words (#233). Requires module `finance.receipts`.
 
   `string`
 
+- **`mesesGarantia`**
+
+  `integer` — Warranty months; ignored for servicio (#251).
+
 - **`tipo`**
 
   `string`, possible values: `"articulo", "servicio"`, default: `"articulo"`
@@ -7915,6 +7935,7 @@ Returns PDF with amount in words (#233). Requires module `finance.receipts`.
   "umedida": "",
   "tipo": "articulo",
   "unidadServicio": "hora",
+  "mesesGarantia": 1,
   "precioLista1": 0.01,
   "precioLista2": 0.01,
   "costo": 0.01,
@@ -7957,6 +7978,10 @@ Returns PDF with amount in words (#233). Requires module `finance.receipts`.
   - **`id`**
 
     `integer`
+
+  - **`mesesGarantia`**
+
+    `integer` — Warranty months for physical articles; null = no warranty (#251).
 
   - **`minimo`**
 
@@ -8030,6 +8055,7 @@ Returns PDF with amount in words (#233). Requires module `finance.receipts`.
     "umedida": "",
     "tipo": "articulo",
     "unidadServicio": "hora",
+    "mesesGarantia": 1,
     "precioLista1": 1,
     "precioLista2": 1,
     "costo": 1,
@@ -19391,6 +19417,10 @@ Requires all items to have `cantFisica`. For each line with non-zero variance, u
 
         `integer`
 
+      - **`mesesGarantia`**
+
+        `integer` — Warranty months for physical articles; null = no warranty (#251).
+
       - **`minimo`**
 
         `integer`
@@ -19573,6 +19603,7 @@ Requires all items to have `cantFisica`. For each line with non-zero variance, u
             "umedida": "",
             "tipo": "articulo",
             "unidadServicio": "hora",
+            "mesesGarantia": 1,
             "precioLista1": 1,
             "precioLista2": 1,
             "costo": 1,
@@ -19893,6 +19924,10 @@ Requires all items to have `cantFisica`. For each line with non-zero variance, u
 
         `integer`
 
+      - **`mesesGarantia`**
+
+        `integer` — Warranty months for physical articles; null = no warranty (#251).
+
       - **`minimo`**
 
         `integer`
@@ -20062,6 +20097,7 @@ Requires all items to have `cantFisica`. For each line with non-zero variance, u
           "umedida": "",
           "tipo": "articulo",
           "unidadServicio": "hora",
+          "mesesGarantia": 1,
           "precioLista1": 1,
           "precioLista2": 1,
           "costo": 1,
@@ -29299,6 +29335,1470 @@ Requires module `service.orders` and `sales.create`. Parts decrement stock; labo
 }
 ```
 
+### PARAMETERS /api/garantias
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/garantias`
+
+### List warranties
+
+- **Method:** `GET`
+- **Path:** `/api/garantias`
+- **Tags:** garantias
+
+Requires module `service.warranties` and `sales.create` or `reports.operational.read`.
+
+#### Responses
+
+##### Status: 200 Paginated warranties with counts
+
+###### Content-Type: application/json
+
+**All of:**
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`articuloId`**
+
+    `integer`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`descripcionEquipo`**
+
+    `string`
+
+  - **`estado`**
+
+    `string`, possible values: `"vigente", "vencida", "anulada"`
+
+  - **`facturaId`**
+
+    `integer`
+
+  - **`facturaItemId`**
+
+    `integer`
+
+  - **`fechaVencimiento`**
+
+    `string`, format: `date-time`
+
+  - **`fechaVenta`**
+
+    `string`, format: `date-time`
+
+  - **`id`**
+
+    `integer`
+
+  - **`mesesGarantia`**
+
+    `integer`
+
+  - **`nroImei`**
+
+    `string`
+
+  - **`nroSerie`**
+
+    `string`
+
+  - **`usos`**
+
+    `array`
+
+    **Items:**
+
+    - **`descripcion`**
+
+      `string`
+
+    - **`fecha`**
+
+      `string`, format: `date-time`
+
+    - **`garantiaId`**
+
+      `integer`
+
+    - **`id`**
+
+      `integer`
+
+    - **`otId`**
+
+      `integer`
+
+    - **`userId`**
+
+      `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`counts`**
+
+  `object`
+
+* **`limit` (required)**
+
+  `integer` — Effective page size (same semantics as query \`limit\`)
+
+* **`offset` (required)**
+
+  `integer` — Effective skip (same semantics as query \`offset\`)
+
+* **`total` (required)**
+
+  `integer` — Row count matching the list filter (before limit/offset)
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "articuloId": 1,
+      "facturaId": 1,
+      "facturaItemId": 1,
+      "nroSerie": "",
+      "nroImei": "",
+      "descripcionEquipo": "",
+      "clienteId": 1,
+      "fechaVenta": "",
+      "mesesGarantia": 1,
+      "fechaVencimiento": "",
+      "estado": "vigente",
+      "usos": [
+        {
+          "id": 1,
+          "garantiaId": 1,
+          "otId": 1,
+          "descripcion": "",
+          "fecha": "",
+          "userId": 1,
+          "additionalProperty": "anything"
+        }
+      ],
+      "additionalProperty": "anything"
+    }
+  ],
+  "counts": {
+    "additionalProperty": 1
+  },
+  "total": 0,
+  "limit": 1,
+  "offset": 0
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Register warranty manually
+
+- **Method:** `POST`
+- **Path:** `/api/garantias`
+- **Tags:** garantias
+
+Requires module `service.warranties` and `sales.create`.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`articuloId` (required)**
+
+  `integer`
+
+- **`clienteId` (required)**
+
+  `integer`
+
+- **`descripcionEquipo`**
+
+  `string`
+
+- **`facturaId`**
+
+  `integer`
+
+- **`facturaItemId`**
+
+  `integer`
+
+- **`fechaVenta`**
+
+  `string`
+
+- **`mesesGarantia`**
+
+  `integer`
+
+- **`nroImei`**
+
+  `string`
+
+- **`nroSerie`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "articuloId": 1,
+  "clienteId": 1,
+  "facturaId": 1,
+  "facturaItemId": 1,
+  "nroSerie": "",
+  "nroImei": "",
+  "descripcionEquipo": "",
+  "fechaVenta": "",
+  "mesesGarantia": 1
+}
+```
+
+#### Responses
+
+##### Status: 201 Warranty created
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`articuloId`**
+
+    `integer`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`descripcionEquipo`**
+
+    `string`
+
+  - **`estado`**
+
+    `string`, possible values: `"vigente", "vencida", "anulada"`
+
+  - **`facturaId`**
+
+    `integer`
+
+  - **`facturaItemId`**
+
+    `integer`
+
+  - **`fechaVencimiento`**
+
+    `string`, format: `date-time`
+
+  - **`fechaVenta`**
+
+    `string`, format: `date-time`
+
+  - **`id`**
+
+    `integer`
+
+  - **`mesesGarantia`**
+
+    `integer`
+
+  - **`nroImei`**
+
+    `string`
+
+  - **`nroSerie`**
+
+    `string`
+
+  - **`usos`**
+
+    `array`
+
+    **Items:**
+
+    - **`descripcion`**
+
+      `string`
+
+    - **`fecha`**
+
+      `string`, format: `date-time`
+
+    - **`garantiaId`**
+
+      `integer`
+
+    - **`id`**
+
+      `integer`
+
+    - **`otId`**
+
+      `integer`
+
+    - **`userId`**
+
+      `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "articuloId": 1,
+    "facturaId": 1,
+    "facturaItemId": 1,
+    "nroSerie": "",
+    "nroImei": "",
+    "descripcionEquipo": "",
+    "clienteId": 1,
+    "fechaVenta": "",
+    "mesesGarantia": 1,
+    "fechaVencimiento": "",
+    "estado": "vigente",
+    "usos": [
+      {
+        "id": 1,
+        "garantiaId": 1,
+        "otId": 1,
+        "descripcion": "",
+        "fecha": "",
+        "userId": 1,
+        "additionalProperty": "anything"
+      }
+    ],
+    "additionalProperty": "anything"
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/garantias/lookup
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/garantias/lookup`
+
+### Lookup warranty by serial or IMEI
+
+- **Method:** `GET`
+- **Path:** `/api/garantias/lookup`
+- **Tags:** garantias
+
+Requires module `service.warranties`.
+
+#### Responses
+
+##### Status: 200 Lookup result (vigente, vencida, or sin\_registro)
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`status` (required)**
+
+    `string`, possible values: `"vigente", "vencida", "sin_registro"`
+
+  - **`garantia`**
+
+    `object`
+
+    - **`articuloId`**
+
+      `integer`
+
+    - **`clienteId`**
+
+      `integer`
+
+    - **`descripcionEquipo`**
+
+      `string`
+
+    - **`estado`**
+
+      `string`, possible values: `"vigente", "vencida", "anulada"`
+
+    - **`facturaId`**
+
+      `integer`
+
+    - **`facturaItemId`**
+
+      `integer`
+
+    - **`fechaVencimiento`**
+
+      `string`, format: `date-time`
+
+    - **`fechaVenta`**
+
+      `string`, format: `date-time`
+
+    - **`id`**
+
+      `integer`
+
+    - **`mesesGarantia`**
+
+      `integer`
+
+    - **`nroImei`**
+
+      `string`
+
+    - **`nroSerie`**
+
+      `string`
+
+    - **`usos`**
+
+      `array`
+
+      **Items:**
+
+      - **`descripcion`**
+
+        `string`
+
+      - **`fecha`**
+
+        `string`, format: `date-time`
+
+      - **`garantiaId`**
+
+        `integer`
+
+      - **`id`**
+
+        `integer`
+
+      - **`otId`**
+
+        `integer`
+
+      - **`userId`**
+
+        `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "status": "vigente",
+    "garantia": {
+      "id": 1,
+      "articuloId": 1,
+      "facturaId": 1,
+      "facturaItemId": 1,
+      "nroSerie": "",
+      "nroImei": "",
+      "descripcionEquipo": "",
+      "clienteId": 1,
+      "fechaVenta": "",
+      "mesesGarantia": 1,
+      "fechaVencimiento": "",
+      "estado": "vigente",
+      "usos": [
+        {
+          "id": 1,
+          "garantiaId": 1,
+          "otId": 1,
+          "descripcion": "",
+          "fecha": "",
+          "userId": 1,
+          "additionalProperty": "anything"
+        }
+      ],
+      "additionalProperty": "anything"
+    }
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/garantias/{id}
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/garantias/{id}`
+
+### Get warranty detail with usage history
+
+- **Method:** `GET`
+- **Path:** `/api/garantias/{id}`
+- **Tags:** garantias
+
+#### Responses
+
+##### Status: 200 Warranty detail
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`articuloId`**
+
+    `integer`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`descripcionEquipo`**
+
+    `string`
+
+  - **`estado`**
+
+    `string`, possible values: `"vigente", "vencida", "anulada"`
+
+  - **`facturaId`**
+
+    `integer`
+
+  - **`facturaItemId`**
+
+    `integer`
+
+  - **`fechaVencimiento`**
+
+    `string`, format: `date-time`
+
+  - **`fechaVenta`**
+
+    `string`, format: `date-time`
+
+  - **`id`**
+
+    `integer`
+
+  - **`mesesGarantia`**
+
+    `integer`
+
+  - **`nroImei`**
+
+    `string`
+
+  - **`nroSerie`**
+
+    `string`
+
+  - **`usos`**
+
+    `array`
+
+    **Items:**
+
+    - **`descripcion`**
+
+      `string`
+
+    - **`fecha`**
+
+      `string`, format: `date-time`
+
+    - **`garantiaId`**
+
+      `integer`
+
+    - **`id`**
+
+      `integer`
+
+    - **`otId`**
+
+      `integer`
+
+    - **`userId`**
+
+      `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "articuloId": 1,
+    "facturaId": 1,
+    "facturaItemId": 1,
+    "nroSerie": "",
+    "nroImei": "",
+    "descripcionEquipo": "",
+    "clienteId": 1,
+    "fechaVenta": "",
+    "mesesGarantia": 1,
+    "fechaVencimiento": "",
+    "estado": "vigente",
+    "usos": [
+      {
+        "id": 1,
+        "garantiaId": 1,
+        "otId": 1,
+        "descripcion": "",
+        "fecha": "",
+        "userId": 1,
+        "additionalProperty": "anything"
+      }
+    ],
+    "additionalProperty": "anything"
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/garantias/{id}/anular
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/garantias/{id}/anular`
+
+### Anular warranty
+
+- **Method:** `POST`
+- **Path:** `/api/garantias/{id}/anular`
+- **Tags:** garantias
+
+#### Responses
+
+##### Status: 200 Warranty anulada
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`articuloId`**
+
+    `integer`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`descripcionEquipo`**
+
+    `string`
+
+  - **`estado`**
+
+    `string`, possible values: `"vigente", "vencida", "anulada"`
+
+  - **`facturaId`**
+
+    `integer`
+
+  - **`facturaItemId`**
+
+    `integer`
+
+  - **`fechaVencimiento`**
+
+    `string`, format: `date-time`
+
+  - **`fechaVenta`**
+
+    `string`, format: `date-time`
+
+  - **`id`**
+
+    `integer`
+
+  - **`mesesGarantia`**
+
+    `integer`
+
+  - **`nroImei`**
+
+    `string`
+
+  - **`nroSerie`**
+
+    `string`
+
+  - **`usos`**
+
+    `array`
+
+    **Items:**
+
+    - **`descripcion`**
+
+      `string`
+
+    - **`fecha`**
+
+      `string`, format: `date-time`
+
+    - **`garantiaId`**
+
+      `integer`
+
+    - **`id`**
+
+      `integer`
+
+    - **`otId`**
+
+      `integer`
+
+    - **`userId`**
+
+      `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "articuloId": 1,
+    "facturaId": 1,
+    "facturaItemId": 1,
+    "nroSerie": "",
+    "nroImei": "",
+    "descripcionEquipo": "",
+    "clienteId": 1,
+    "fechaVenta": "",
+    "mesesGarantia": 1,
+    "fechaVencimiento": "",
+    "estado": "vigente",
+    "usos": [
+      {
+        "id": 1,
+        "garantiaId": 1,
+        "otId": 1,
+        "descripcion": "",
+        "fecha": "",
+        "userId": 1,
+        "additionalProperty": "anything"
+      }
+    ],
+    "additionalProperty": "anything"
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 409 Already anulada
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/garantias/{id}/usos
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/garantias/{id}/usos`
+
+### Register warranty usage
+
+- **Method:** `POST`
+- **Path:** `/api/garantias/{id}/usos`
+- **Tags:** garantias
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`descripcion` (required)**
+
+  `string`
+
+- **`otId`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "otId": 1,
+  "descripcion": ""
+}
+```
+
+#### Responses
+
+##### Status: 201 Usage registered
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`articuloId`**
+
+    `integer`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`descripcionEquipo`**
+
+    `string`
+
+  - **`estado`**
+
+    `string`, possible values: `"vigente", "vencida", "anulada"`
+
+  - **`facturaId`**
+
+    `integer`
+
+  - **`facturaItemId`**
+
+    `integer`
+
+  - **`fechaVencimiento`**
+
+    `string`, format: `date-time`
+
+  - **`fechaVenta`**
+
+    `string`, format: `date-time`
+
+  - **`id`**
+
+    `integer`
+
+  - **`mesesGarantia`**
+
+    `integer`
+
+  - **`nroImei`**
+
+    `string`
+
+  - **`nroSerie`**
+
+    `string`
+
+  - **`usos`**
+
+    `array`
+
+    **Items:**
+
+    - **`descripcion`**
+
+      `string`
+
+    - **`fecha`**
+
+      `string`, format: `date-time`
+
+    - **`garantiaId`**
+
+      `integer`
+
+    - **`id`**
+
+      `integer`
+
+    - **`otId`**
+
+      `integer`
+
+    - **`userId`**
+
+      `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "articuloId": 1,
+    "facturaId": 1,
+    "facturaItemId": 1,
+    "nroSerie": "",
+    "nroImei": "",
+    "descripcionEquipo": "",
+    "clienteId": 1,
+    "fechaVenta": "",
+    "mesesGarantia": 1,
+    "fechaVencimiento": "",
+    "estado": "vigente",
+    "usos": [
+      {
+        "id": 1,
+        "garantiaId": 1,
+        "otId": 1,
+        "descripcion": "",
+        "fecha": "",
+        "userId": 1,
+        "additionalProperty": "anything"
+      }
+    ],
+    "additionalProperty": "anything"
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 409 Cannot use vencida or anulada warranty
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ### PARAMETERS /api/cobros
 
 - **Method:** `PARAMETERS`
@@ -31622,6 +33122,10 @@ Sets `estado` to `N` (anulada), reverses the customer balance by the invoice tot
 
           `integer`
 
+        - **`mesesGarantia`**
+
+          `integer` — Warranty months for physical articles; null = no warranty (#251).
+
         - **`minimo`**
 
           `integer`
@@ -31856,6 +33360,7 @@ Sets `estado` to `N` (anulada), reverses the customer balance by the invoice tot
             "umedida": "",
             "tipo": "articulo",
             "unidadServicio": "hora",
+            "mesesGarantia": 1,
             "precioLista1": 1,
             "precioLista2": 1,
             "costo": 1,
@@ -61335,6 +62840,10 @@ true
 
   `integer`
 
+* **`mesesGarantia`**
+
+  `integer` — Warranty months for physical articles; null = no warranty (#251).
+
 * **`minimo`**
 
   `integer`
@@ -61401,6 +62910,7 @@ true
   "umedida": "",
   "tipo": "articulo",
   "unidadServicio": "hora",
+  "mesesGarantia": 1,
   "precioLista1": 1,
   "precioLista2": 1,
   "costo": 1,
@@ -61459,6 +62969,10 @@ true
 
   `string`
 
+* **`mesesGarantia`**
+
+  `integer` — Warranty months; ignored for servicio (#251).
+
 * **`tipo`**
 
   `string`, possible values: `"articulo", "servicio"`, default: `"articulo"`
@@ -61478,6 +62992,7 @@ true
   "umedida": "",
   "tipo": "articulo",
   "unidadServicio": "hora",
+  "mesesGarantia": 1,
   "precioLista1": 0.01,
   "precioLista2": 0.01,
   "costo": 0.01,
@@ -61524,6 +63039,10 @@ true
   - **`id`**
 
     `integer`
+
+  - **`mesesGarantia`**
+
+    `integer` — Warranty months for physical articles; null = no warranty (#251).
 
   - **`minimo`**
 
@@ -61597,6 +63116,7 @@ true
     "umedida": "",
     "tipo": "articulo",
     "unidadServicio": "hora",
+    "mesesGarantia": 1,
     "precioLista1": 1,
     "precioLista2": 1,
     "costo": 1,
@@ -61640,6 +63160,7 @@ true
     "umedida": "",
     "tipo": "articulo",
     "unidadServicio": "hora",
+    "mesesGarantia": 1,
     "precioLista1": 1,
     "precioLista2": 1,
     "costo": 1,
@@ -65434,6 +66955,10 @@ true
 
       `integer`
 
+    - **`mesesGarantia`**
+
+      `integer` — Warranty months for physical articles; null = no warranty (#251).
+
     - **`minimo`**
 
       `integer`
@@ -65597,6 +67122,7 @@ true
         "umedida": "",
         "tipo": "articulo",
         "unidadServicio": "hora",
+        "mesesGarantia": 1,
         "precioLista1": 1,
         "precioLista2": 1,
         "costo": 1,
@@ -65647,6 +67173,10 @@ true
   - **`id`**
 
     `integer`
+
+  - **`mesesGarantia`**
+
+    `integer` — Warranty months for physical articles; null = no warranty (#251).
 
   - **`minimo`**
 
@@ -65756,6 +67286,7 @@ true
     "umedida": "",
     "tipo": "articulo",
     "unidadServicio": "hora",
+    "mesesGarantia": 1,
     "precioLista1": 1,
     "precioLista2": 1,
     "costo": 1,
@@ -67075,6 +68606,10 @@ true
 
         `integer`
 
+      - **`mesesGarantia`**
+
+        `integer` — Warranty months for physical articles; null = no warranty (#251).
+
       - **`minimo`**
 
         `integer`
@@ -67244,6 +68779,7 @@ true
           "umedida": "",
           "tipo": "articulo",
           "unidadServicio": "hora",
+          "mesesGarantia": 1,
           "precioLista1": 1,
           "precioLista2": 1,
           "costo": 1,
@@ -71834,6 +73370,10 @@ Originating invoice header (selected columns)
 
         `integer`
 
+      - **`mesesGarantia`**
+
+        `integer` — Warranty months for physical articles; null = no warranty (#251).
+
       - **`minimo`**
 
         `integer`
@@ -72062,6 +73602,7 @@ Originating invoice header (selected columns)
           "umedida": "",
           "tipo": "articulo",
           "unidadServicio": "hora",
+          "mesesGarantia": 1,
           "precioLista1": 1,
           "precioLista2": 1,
           "costo": 1,
@@ -72178,6 +73719,10 @@ Originating invoice header (selected columns)
         - **`id`**
 
           `integer`
+
+        - **`mesesGarantia`**
+
+          `integer` — Warranty months for physical articles; null = no warranty (#251).
 
         - **`minimo`**
 
@@ -72413,6 +73958,7 @@ Originating invoice header (selected columns)
             "umedida": "",
             "tipo": "articulo",
             "unidadServicio": "hora",
+            "mesesGarantia": 1,
             "precioLista1": 1,
             "precioLista2": 1,
             "costo": 1,
@@ -76070,6 +77616,509 @@ Originating invoice header (selected columns)
       "additionalProperty": "anything"
     },
     "facturaId": 1
+  }
+}
+```
+
+### GarantiaEstado
+
+- **Type:**`string`
+
+**Example:**
+
+### GarantiaUso
+
+- **Type:**`object`
+
+* **`descripcion`**
+
+  `string`
+
+* **`fecha`**
+
+  `string`, format: `date-time`
+
+* **`garantiaId`**
+
+  `integer`
+
+* **`id`**
+
+  `integer`
+
+* **`otId`**
+
+  `integer`
+
+* **`userId`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "garantiaId": 1,
+  "otId": 1,
+  "descripcion": "",
+  "fecha": "",
+  "userId": 1,
+  "additionalProperty": "anything"
+}
+```
+
+### Garantia
+
+- **Type:**`object`
+
+* **`articuloId`**
+
+  `integer`
+
+* **`clienteId`**
+
+  `integer`
+
+* **`descripcionEquipo`**
+
+  `string`
+
+* **`estado`**
+
+  `string`, possible values: `"vigente", "vencida", "anulada"`
+
+* **`facturaId`**
+
+  `integer`
+
+* **`facturaItemId`**
+
+  `integer`
+
+* **`fechaVencimiento`**
+
+  `string`, format: `date-time`
+
+* **`fechaVenta`**
+
+  `string`, format: `date-time`
+
+* **`id`**
+
+  `integer`
+
+* **`mesesGarantia`**
+
+  `integer`
+
+* **`nroImei`**
+
+  `string`
+
+* **`nroSerie`**
+
+  `string`
+
+* **`usos`**
+
+  `array`
+
+  **Items:**
+
+  - **`descripcion`**
+
+    `string`
+
+  - **`fecha`**
+
+    `string`, format: `date-time`
+
+  - **`garantiaId`**
+
+    `integer`
+
+  - **`id`**
+
+    `integer`
+
+  - **`otId`**
+
+    `integer`
+
+  - **`userId`**
+
+    `integer`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "articuloId": 1,
+  "facturaId": 1,
+  "facturaItemId": 1,
+  "nroSerie": "",
+  "nroImei": "",
+  "descripcionEquipo": "",
+  "clienteId": 1,
+  "fechaVenta": "",
+  "mesesGarantia": 1,
+  "fechaVencimiento": "",
+  "estado": "vigente",
+  "usos": [
+    {
+      "id": 1,
+      "garantiaId": 1,
+      "otId": 1,
+      "descripcion": "",
+      "fecha": "",
+      "userId": 1,
+      "additionalProperty": "anything"
+    }
+  ],
+  "additionalProperty": "anything"
+}
+```
+
+### GarantiaRegisterInput
+
+- **Type:**`object`
+
+* **`articuloId` (required)**
+
+  `integer`
+
+* **`clienteId` (required)**
+
+  `integer`
+
+* **`descripcionEquipo`**
+
+  `string`
+
+* **`facturaId`**
+
+  `integer`
+
+* **`facturaItemId`**
+
+  `integer`
+
+* **`fechaVenta`**
+
+  `string`
+
+* **`mesesGarantia`**
+
+  `integer`
+
+* **`nroImei`**
+
+  `string`
+
+* **`nroSerie`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "articuloId": 1,
+  "clienteId": 1,
+  "facturaId": 1,
+  "facturaItemId": 1,
+  "nroSerie": "",
+  "nroImei": "",
+  "descripcionEquipo": "",
+  "fechaVenta": "",
+  "mesesGarantia": 1
+}
+```
+
+### GarantiaUsoInput
+
+- **Type:**`object`
+
+* **`descripcion` (required)**
+
+  `string`
+
+* **`otId`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "otId": 1,
+  "descripcion": ""
+}
+```
+
+### GarantiaEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`articuloId`**
+
+    `integer`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`descripcionEquipo`**
+
+    `string`
+
+  - **`estado`**
+
+    `string`, possible values: `"vigente", "vencida", "anulada"`
+
+  - **`facturaId`**
+
+    `integer`
+
+  - **`facturaItemId`**
+
+    `integer`
+
+  - **`fechaVencimiento`**
+
+    `string`, format: `date-time`
+
+  - **`fechaVenta`**
+
+    `string`, format: `date-time`
+
+  - **`id`**
+
+    `integer`
+
+  - **`mesesGarantia`**
+
+    `integer`
+
+  - **`nroImei`**
+
+    `string`
+
+  - **`nroSerie`**
+
+    `string`
+
+  - **`usos`**
+
+    `array`
+
+    **Items:**
+
+    - **`descripcion`**
+
+      `string`
+
+    - **`fecha`**
+
+      `string`, format: `date-time`
+
+    - **`garantiaId`**
+
+      `integer`
+
+    - **`id`**
+
+      `integer`
+
+    - **`otId`**
+
+      `integer`
+
+    - **`userId`**
+
+      `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "articuloId": 1,
+    "facturaId": 1,
+    "facturaItemId": 1,
+    "nroSerie": "",
+    "nroImei": "",
+    "descripcionEquipo": "",
+    "clienteId": 1,
+    "fechaVenta": "",
+    "mesesGarantia": 1,
+    "fechaVencimiento": "",
+    "estado": "vigente",
+    "usos": [
+      {
+        "id": 1,
+        "garantiaId": 1,
+        "otId": 1,
+        "descripcion": "",
+        "fecha": "",
+        "userId": 1,
+        "additionalProperty": "anything"
+      }
+    ],
+    "additionalProperty": "anything"
+  }
+}
+```
+
+### GarantiaListEnvelope
+
+- **Type:**
+
+**Example:**
+
+### GarantiaLookupEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`status` (required)**
+
+    `string`, possible values: `"vigente", "vencida", "sin_registro"`
+
+  - **`garantia`**
+
+    `object`
+
+    - **`articuloId`**
+
+      `integer`
+
+    - **`clienteId`**
+
+      `integer`
+
+    - **`descripcionEquipo`**
+
+      `string`
+
+    - **`estado`**
+
+      `string`, possible values: `"vigente", "vencida", "anulada"`
+
+    - **`facturaId`**
+
+      `integer`
+
+    - **`facturaItemId`**
+
+      `integer`
+
+    - **`fechaVencimiento`**
+
+      `string`, format: `date-time`
+
+    - **`fechaVenta`**
+
+      `string`, format: `date-time`
+
+    - **`id`**
+
+      `integer`
+
+    - **`mesesGarantia`**
+
+      `integer`
+
+    - **`nroImei`**
+
+      `string`
+
+    - **`nroSerie`**
+
+      `string`
+
+    - **`usos`**
+
+      `array`
+
+      **Items:**
+
+      - **`descripcion`**
+
+        `string`
+
+      - **`fecha`**
+
+        `string`, format: `date-time`
+
+      - **`garantiaId`**
+
+        `integer`
+
+      - **`id`**
+
+        `integer`
+
+      - **`otId`**
+
+        `integer`
+
+      - **`userId`**
+
+        `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "status": "vigente",
+    "garantia": {
+      "id": 1,
+      "articuloId": 1,
+      "facturaId": 1,
+      "facturaItemId": 1,
+      "nroSerie": "",
+      "nroImei": "",
+      "descripcionEquipo": "",
+      "clienteId": 1,
+      "fechaVenta": "",
+      "mesesGarantia": 1,
+      "fechaVencimiento": "",
+      "estado": "vigente",
+      "usos": [
+        {
+          "id": 1,
+          "garantiaId": 1,
+          "otId": 1,
+          "descripcion": "",
+          "fecha": "",
+          "userId": 1,
+          "additionalProperty": "anything"
+        }
+      ],
+      "additionalProperty": "anything"
+    }
   }
 }
 ```

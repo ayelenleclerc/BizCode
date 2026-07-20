@@ -20,6 +20,12 @@
     "id": {
       "type": "integer"
     },
+    "mesesGarantia": {
+      "description": "Warranty months for physical articles; null = no warranty (#251).",
+      "minimum": 1,
+      "nullable": true,
+      "type": "integer"
+    },
     "minimo": {
       "type": "integer"
     },
