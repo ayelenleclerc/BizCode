@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "properties": {
+    "descripcion": {
+      "type": "string"
+    },
+    "fecha": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "garantiaId": {
+      "type": "integer"
+    },
+    "id": {
+      "type": "integer"
+    },
+    "otId": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "userId": {
+      "type": "integer"
+    }
+  },
+  "title": "GarantiaUso",
+  "type": "object"
+}

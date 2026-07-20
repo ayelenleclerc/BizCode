@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "descripcion": {
+      "maxLength": 500,
+      "minLength": 1,
+      "type": "string"
+    },
+    "otId": {
+      "minimum": 1,
+      "nullable": true,
+      "type": "integer"
+    }
+  },
+  "required": [
+    "descripcion"
+  ],
+  "title": "GarantiaUsoInput",
+  "type": "object"
+}

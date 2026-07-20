@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "properties": {
+    "articuloId": {
+      "type": "integer"
+    },
+    "clienteId": {
+      "type": "integer"
+    },
+    "descripcionEquipo": {
+      "nullable": true,
+      "type": "string"
+    },
+    "estado": {
+      "$ref": "./GarantiaEstado.schema.json"
+    },
+    "facturaId": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "facturaItemId": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "fechaVencimiento": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "fechaVenta": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "id": {
+      "type": "integer"
+    },
+    "mesesGarantia": {
+      "type": "integer"
+    },
+    "nroImei": {
+      "nullable": true,
+      "type": "string"
+    },
+    "nroSerie": {
+      "nullable": true,
+      "type": "string"
+    },
+    "usos": {
+      "items": {
+        "$ref": "./GarantiaUso.schema.json"
+      },
+      "type": "array"
+    }
+  },
+  "title": "Garantia",
+  "type": "object"
+}

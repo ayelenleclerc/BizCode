@@ -70,6 +70,18 @@ function buildPrisma(overrides: Record<string, unknown> = {}): PrismaClient {
     factura: {
       findFirst: vi.fn().mockResolvedValue({ numero: 5 }),
     },
+    garantia: {
+      findFirst: vi.fn().mockResolvedValue(null),
+      findMany: vi.fn().mockResolvedValue([]),
+      count: vi.fn().mockResolvedValue(0),
+      create: vi.fn(),
+      update: vi.fn(),
+      updateMany: vi.fn().mockResolvedValue({ count: 0 }),
+      findFirstOrThrow: vi.fn().mockResolvedValue(null),
+    },
+    garantiaUso: {
+      create: vi.fn().mockResolvedValue({ id: 1 }),
+    },
     $transaction: vi.fn(async (fn: (tx: unknown) => unknown) =>
       fn({
         ordenTrabajoItem: { deleteMany: vi.fn().mockResolvedValue({ count: 0 }) },
@@ -186,20 +198,48 @@ describe('OrdenTrabajoService', () => {
     if (!result.ok) expect(result.error).toBe('CLIENT_SUSPENDED')
   })
 
-  it('marks enGarantia when prior OT has active warranty by serial', async () => {
+  it('marks enGarantia when formal Garantia is active by serial', async () => {
     const create = vi.fn().mockResolvedValue({
       ...baseOt,
       id: 8,
+      numero: 8,
       enGarantia: true,
-      otGarantiaId: 3,
+      garantiaId: 3,
+      sintomaReportado: 'Otra falla',
     })
+    const garantiaUsoCreate = vi.fn().mockResolvedValue({ id: 1 })
     const prisma = buildPrisma({
+      garantia: {
+        findFirst: vi.fn().mockResolvedValue({
+          id: 3,
+          fechaVencimiento: new Date('2030-01-01'),
+          estado: 'vigente',
+        }),
+        updateMany: vi.fn().mockResolvedValue({ count: 0 }),
+        findFirstOrThrow: vi.fn().mockResolvedValue({
+          id: 3,
+          articuloId: 10,
+          facturaId: null,
+          facturaItemId: null,
+          nroSerie: 'SN-001',
+          nroImei: null,
+          descripcionEquipo: 'iPhone 12',
+          clienteId: 1,
+          fechaVenta: new Date(),
+          mesesGarantia: 12,
+          fechaVencimiento: new Date('2030-01-01'),
+          estado: 'vigente',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          cliente: { id: 1, codigo: 1, rsocial: 'Cliente' },
+          articulo: { id: 10, codigo: 10, descripcion: 'Art' },
+          factura: null,
+          usos: [{ id: 1, garantiaId: 3, otId: 8, descripcion: 'OT-00008', fecha: new Date(), userId: 9, user: null }],
+        }),
+      },
+      garantiaUso: { create: garantiaUsoCreate },
       ordenTrabajo: {
-        findFirst: vi
-          .fn()
-          .mockResolvedValueOnce({ id: 3, garantiaVence: new Date('2030-01-01') })
-          .mockResolvedValueOnce({ id: 3 })
-          .mockResolvedValueOnce({ numero: 0 }),
+        findFirst: vi.fn().mockResolvedValue({ numero: 7 }),
         create,
         count: vi.fn(),
         findMany: vi.fn(),
@@ -208,16 +248,21 @@ describe('OrdenTrabajoService', () => {
       },
     })
     const service = new OrdenTrabajoService(prisma)
-    const result = await service.create(1, {
-      clienteId: 1,
-      equipoDescripcion: 'iPhone 12',
-      sintomaReportado: 'Otra falla',
-      equipoNroSerie: 'SN-001',
-    })
+    const result = await service.create(
+      1,
+      {
+        clienteId: 1,
+        equipoDescripcion: 'iPhone 12',
+        sintomaReportado: 'Otra falla',
+        equipoNroSerie: 'SN-001',
+      },
+      9,
+    )
     expect(result.ok).toBe(true)
     const data = create.mock.calls[0][0].data
     expect(data.enGarantia).toBe(true)
-    expect(data.otGarantiaId).toBe(3)
+    expect(data.garantiaId).toBe(3)
+    expect(garantiaUsoCreate).toHaveBeenCalled()
   })
 
   it('update rejects facturado OT', async () => {

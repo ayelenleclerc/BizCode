@@ -24,6 +24,7 @@ undefined#/properties/articulo
 | [costo](#costo)                   | `number`  | Optional | cannot be null | [Articulo](articulo-properties-costo.md "undefined#/properties/costo")                   |
 | [descripcion](#descripcion)       | `string`  | Optional | cannot be null | [Articulo](articulo-properties-descripcion.md "undefined#/properties/descripcion")       |
 | [id](#id)                         | `integer` | Optional | cannot be null | [Articulo](articulo-properties-id.md "undefined#/properties/id")                         |
+| [mesesGarantia](#mesesgarantia)   | `integer` | Optional | cannot be null | [Articulo](articulo-properties-mesesgarantia.md "undefined#/properties/mesesGarantia")   |
 | [minimo](#minimo)                 | `integer` | Optional | cannot be null | [Articulo](articulo-properties-minimo.md "undefined#/properties/minimo")                 |
 | [precioLista1](#preciolista1)     | `number`  | Optional | cannot be null | [Articulo](articulo-properties-preciolista1.md "undefined#/properties/precioLista1")     |
 | [precioLista2](#preciolista2)     | `number`  | Optional | cannot be null | [Articulo](articulo-properties-preciolista2.md "undefined#/properties/precioLista2")     |
@@ -142,6 +143,28 @@ undefined#/properties/articulo
 ### id Type
 
 `integer`
+
+## mesesGarantia
+
+Warranty months for physical articles; null = no warranty (#251).
+
+`mesesGarantia`
+
+* is optional
+
+* Type: `integer`
+
+* cannot be null
+
+* defined in: [Articulo](articulo-properties-mesesgarantia.md "undefined#/properties/mesesGarantia")
+
+### mesesGarantia Type
+
+`integer`
+
+### mesesGarantia Constraints
+
+**minimum**: the value of this number must greater than or equal to: `1`
 
 ## minimo
 

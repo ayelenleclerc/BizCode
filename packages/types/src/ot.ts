@@ -42,6 +42,8 @@ export type OrdenTrabajoInput = {
   enGarantia?: boolean
   garantiaVence?: string | null
   otGarantiaId?: number | null
+  /** Formal warranty id when linked (#251). */
+  garantiaId?: number | null
   items?: OrdenTrabajoItemInput[]
 }
 
@@ -97,6 +99,7 @@ export type OrdenTrabajoRow = {
   enGarantia: boolean
   garantiaVence: string | null
   otGarantiaId: number | null
+  garantiaId?: number | null
   presupuesto: number | string | null
   fechaIngreso: string
   fechaPromesa: string | null

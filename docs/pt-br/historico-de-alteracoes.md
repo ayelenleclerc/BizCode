@@ -10,6 +10,8 @@ Versionamento: [Semantic Versioning](https://semver.org/).
 
 ### Adicionado
 
+- **Garantias de serviço (#251):** Prisma `Garantia` / `GarantiaUso` e `Articulo.mesesGarantia`; registro automático ao criar fatura; API `/api/garantias` (lista, lookup por série/IMEI, detalhe, anular, usos) com módulo `service.warranties`; OT consulta `Garantia` e registra `GarantiaUso`; UI `/garantias` + campo em artigos + feedback de série na OT; OpenAPI, testes e i18n EN/ES/PT-BR.
+
 - **Ordens de trabalho (#246):** Prisma `OrdenTrabajo` / `OrdenTrabajoItem` com máquina de estados (recibido → facturado); CRUD + transições auditadas em `AuditEvent`; faturamento em um clique via `FacturaService` (peças baixam estoque; mão de obra/serviço não); garantia básica por número de série; notificações `ot_presupuestado` / `ot_listo`; dashboard de oficina com módulo `service.orders`; OpenAPI, testes e i18n EN/ES/PT-BR.
 - **Contratos de serviço recorrentes (#245):** Prisma `Contrato` / `ContratoItem` / `ContratoAjuste` e `Factura.contratoId`; API CRUD com módulo `service.contracts` (`modoEmision` `auto` \| `revision`); job diário `npm run contratos:facturacion` gera faturas via `FacturaService` com catch-up e idempotência; reajustes fixo/manual (IPC/ICL HTTP diferido); notificações in-app para managers; UI listagem/CRUD com pausa/retomada; OpenAPI, testes e i18n EN/ES/PT-BR.
 

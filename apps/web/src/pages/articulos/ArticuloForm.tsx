@@ -35,6 +35,12 @@ const articuloSchema = z
     costo: z.coerce.number().positive('Costo debe ser positivo'),
     stock: z.coerce.number().int().nonnegative('Stock no puede ser negativo'),
     minimo: z.coerce.number().int().nonnegative('Mínimo no puede ser negativo'),
+    mesesGarantia: z.preprocess((val) => {
+      if (val === '' || val === null || val === undefined) return null
+      const n = typeof val === 'number' ? val : Number(val)
+      if (!Number.isFinite(n) || n <= 0) return null
+      return Math.trunc(n)
+    }, z.number().int().positive().nullable()),
     activo: z.boolean(),
   })
   .superRefine((data, ctx) => {
@@ -112,6 +118,7 @@ export default function ArticuloForm({ articulo, rubros, onClose, onGuardado }: 
       unidadServicio: null,
       minimo: 0,
       stock: 0,
+      mesesGarantia: null,
       activo: true,
     }) as ArticuloFormData,
   })
@@ -136,6 +143,7 @@ export default function ArticuloForm({ articulo, rubros, onClose, onGuardado }: 
       setValue('costo', Number(articulo.costo))
       setValue('stock', articulo.stock)
       setValue('minimo', articulo.minimo)
+      setValue('mesesGarantia', articulo.mesesGarantia ?? null)
       setValue('activo', articulo.activo)
       setStockDisplay(articulo.stock)
     }
@@ -546,6 +554,29 @@ export default function ArticuloForm({ articulo, rubros, onClose, onGuardado }: 
               {t('form.servicioNoStockHint')}
             </p>
           )}
+
+          <div>
+            <label htmlFor="articulo-meses-garantia" className="block text-slate-700 dark:text-slate-300 font-semibold mb-1">
+              {t('form.mesesGarantia')}
+            </label>
+            <input
+              id="articulo-meses-garantia"
+              type="number"
+              min={0}
+              {...register('mesesGarantia')}
+              aria-describedby="articulo-meses-garantia-hint"
+              data-testid="articulo-meses-garantia"
+              className="w-full px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 rounded border border-slate-300 dark:border-slate-600 focus:border-blue-500 focus:outline-none"
+            />
+            <p id="articulo-meses-garantia-hint" className="text-sm text-slate-600 dark:text-slate-400 mt-1">
+              {t('form.mesesGarantiaHint')}
+            </p>
+            {errors.mesesGarantia && (
+              <p id="articulo-meses-garantia-error" className="text-red-400 text-sm mt-1">
+                {errors.mesesGarantia.message}
+              </p>
+            )}
+          </div>
 
           {showComparador && articulo && showComparadorAccess && (
             <ArticuloProveedoresComparadorSection articuloId={articulo.id} />
