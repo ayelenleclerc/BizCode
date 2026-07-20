@@ -42,8 +42,25 @@ const otInclude = {
 
 export type OrdenTrabajoRow = Prisma.OrdenTrabajoGetPayload<{ include: typeof otInclude }>
 
+/**
+ * @en Public OT payload with Prisma Decimals coerced to numbers for JSON/OpenAPI.
+ * @es Payload público de OT con Decimals de Prisma convertidos a number para JSON/OpenAPI.
+ * @pt-BR Payload público de OT com Decimals do Prisma convertidos para number no JSON/OpenAPI.
+ */
+export type OrdenTrabajoPublic = Omit<OrdenTrabajoRow, 'presupuesto' | 'items' | 'factura'> & {
+  presupuesto: number | null
+  items: Array<
+    Omit<OrdenTrabajoRow['items'][number], 'cantidad' | 'precioUnit' | 'subtotal'> & {
+      cantidad: number
+      precioUnit: number
+      subtotal: number
+    }
+  >
+  factura: (Omit<NonNullable<OrdenTrabajoRow['factura']>, 'total'> & { total: number }) | null
+}
+
 export type OrdenTrabajoTransitionResult = {
-  orden: OrdenTrabajoRow
+  orden: OrdenTrabajoPublic
   previousEstado: OrdenTrabajoEstado
   auditAction: string
 }
@@ -63,8 +80,37 @@ export type OrdenTrabajoDashboardCounts = {
 
 export type OrdenTrabajoListResult = {
   total: number
-  ordenes: OrdenTrabajoRow[]
+  ordenes: OrdenTrabajoPublic[]
   counts: OrdenTrabajoDashboardCounts
+}
+
+function decimalToNumber(value: Decimal | number | string): number {
+  if (typeof value === 'number') return value
+  if (typeof value === 'string') return Number(value)
+  return value.toNumber()
+}
+
+export function mapOrdenTrabajoPublic(row: OrdenTrabajoRow): OrdenTrabajoPublic {
+  return {
+    ...row,
+    presupuesto: row.presupuesto == null ? null : decimalToNumber(row.presupuesto),
+    items: row.items.map((item) => ({
+      ...item,
+      cantidad: decimalToNumber(item.cantidad),
+      precioUnit: decimalToNumber(item.precioUnit),
+      subtotal:
+        item.subtotal == null
+          ? Number(
+              (
+                decimalToNumber(item.cantidad) * decimalToNumber(item.precioUnit)
+              ).toFixed(2),
+            )
+          : decimalToNumber(item.subtotal),
+    })),
+    factura: row.factura
+      ? { ...row.factura, total: decimalToNumber(row.factura.total) }
+      : null,
+  }
 }
 
 function parseUtcDate(value: string | null | undefined): Date | null {
@@ -150,19 +196,19 @@ export class OrdenTrabajoService {
       const key = row.estado as keyof OrdenTrabajoDashboardCounts
       if (key in counts) counts[key] = row._count._all
     }
-    return { total, ordenes, counts }
+    return { total, ordenes: ordenes.map(mapOrdenTrabajoPublic), counts }
   }
 
-  async getById(tenantId: number, id: number): Promise<ServiceResult<OrdenTrabajoRow>> {
+  async getById(tenantId: number, id: number): Promise<ServiceResult<OrdenTrabajoPublic>> {
     const orden = await this.prisma.ordenTrabajo.findFirst({
       where: { id, tenantId },
       include: otInclude,
     })
     if (!orden) return { ok: false, status: 404, error: 'Orden de trabajo not found' }
-    return { ok: true, data: orden }
+    return { ok: true, data: mapOrdenTrabajoPublic(orden) }
   }
 
-  async create(tenantId: number, input: OrdenTrabajoInput): Promise<ServiceResult<OrdenTrabajoRow>> {
+  async create(tenantId: number, input: OrdenTrabajoInput): Promise<ServiceResult<OrdenTrabajoPublic>> {
     const cliente = await this.prisma.cliente.findFirst({
       where: { id: input.clienteId, tenantId },
       select: { id: true, suspended: true },
@@ -236,14 +282,14 @@ export class OrdenTrabajoService {
       },
       include: otInclude,
     })
-    return { ok: true, data: created }
+    return { ok: true, data: mapOrdenTrabajoPublic(created) }
   }
 
   async update(
     tenantId: number,
     id: number,
     input: OrdenTrabajoUpdateInput,
-  ): Promise<ServiceResult<OrdenTrabajoRow>> {
+  ): Promise<ServiceResult<OrdenTrabajoPublic>> {
     const existing = await this.prisma.ordenTrabajo.findFirst({
       where: { id, tenantId },
       select: { id: true, estado: true, facturaId: true },
@@ -301,7 +347,7 @@ export class OrdenTrabajoService {
         include: otInclude,
       })
     })
-    return { ok: true, data: updated }
+    return { ok: true, data: mapOrdenTrabajoPublic(updated) }
   }
 
   async transition(
@@ -394,7 +440,7 @@ export class OrdenTrabajoService {
     return {
       ok: true,
       data: {
-        orden,
+        orden: mapOrdenTrabajoPublic(orden),
         previousEstado,
         auditAction: `ot_transition_${nextEstado}`,
       },
@@ -406,7 +452,7 @@ export class OrdenTrabajoService {
     id: number,
     userId: number,
     input: OrdenTrabajoFacturarInput = {},
-  ): Promise<ServiceResult<{ orden: OrdenTrabajoRow; facturaId: number }>> {
+  ): Promise<ServiceResult<{ orden: OrdenTrabajoPublic; facturaId: number }>> {
     const orden = await this.prisma.ordenTrabajo.findFirst({
       where: { id, tenantId },
       include: otInclude,
@@ -484,7 +530,7 @@ export class OrdenTrabajoService {
       include: otInclude,
     })
 
-    return { ok: true, data: { orden: updated, facturaId: result.data.factura.id } }
+    return { ok: true, data: { orden: mapOrdenTrabajoPublic(updated), facturaId: result.data.factura.id } }
   }
 
   private async findActiveWarrantyBySerial(
