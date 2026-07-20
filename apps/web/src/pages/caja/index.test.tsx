@@ -6,11 +6,41 @@ import i18n from '@/i18n/config'
 import { cajaAPI, formasPagoAPI } from '@/lib/api'
 import CajaPage from './index'
 
-const openTurno = {
+type TurnoFixture = {
+  id: number
+  cajaId: number
+  cajeroId: number
+  estado: 'abierto' | 'cerrado'
+  montoApertura: number
+  fechaApertura: string
+  fechaCierre: string | null
+  totalVentasEfectivo: number | null
+  totalVentasTarjeta: number | null
+  totalVentasMP: number | null
+  totalVentasTransf: number | null
+  totalEgresos: number | null
+  totalIngresosExtra: number | null
+  efectivoEsperado: number | null
+  efectivoContado: number | null
+  diferencia: number | null
+  observaciones: string | null
+  createdAt: string
+  updatedAt: string
+  caja: {
+    id: number
+    nombre: string
+    activa: boolean
+    createdAt: string
+    updatedAt: string
+  }
+  cajero: { id: number; username: string }
+}
+
+const openTurno: TurnoFixture = {
   id: 10,
   cajaId: 1,
   cajeroId: 2,
-  estado: 'abierto' as const,
+  estado: 'abierto',
   montoApertura: 1000,
   fechaApertura: '2026-07-20T10:00:00.000Z',
   fechaCierre: null,
@@ -36,10 +66,10 @@ const openTurno = {
   cajero: { id: 2, username: 'cajero' },
 }
 
-const closedTurno = {
+const closedTurno: TurnoFixture = {
   ...openTurno,
   id: 11,
-  estado: 'cerrado' as const,
+  estado: 'cerrado',
   fechaCierre: '2026-07-20T18:00:00.000Z',
   efectivoEsperado: 900,
   efectivoContado: 900,
@@ -66,7 +96,7 @@ vi.mock('@/components/CanAccess', () => ({
   CanAccess: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }))
 
-function mockHappyLoad(turnos = [openTurno]) {
+function mockHappyLoad(turnos: TurnoFixture[] = [openTurno]) {
   vi.mocked(cajaAPI.listCajas).mockResolvedValue([
     {
       id: 1,
