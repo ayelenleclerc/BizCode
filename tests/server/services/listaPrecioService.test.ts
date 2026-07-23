@@ -189,3 +189,172 @@ describe('ListaPrecioService.bulkUpdate (#234)', () => {
     if (!res.ok) expect(res.status).toBe(404)
   })
 })
+
+describe('ListaPrecioService CRUD (#234)', () => {
+  const now = new Date('2026-07-21T12:00:00.000Z')
+
+  function fullLista(overrides: Record<string, unknown> = {}) {
+    return {
+      ...baseLista({
+        createdAt: now,
+        updatedAt: now,
+        items: [],
+        ...overrides,
+      }),
+    }
+  }
+
+  beforeEach(() => vi.clearAllMocks())
+
+  it('lists rows with item and customer counts', async () => {
+    const prisma = buildPrisma({
+      listaPrecio: {
+        count: vi.fn().mockResolvedValue(1),
+        findMany: vi.fn().mockResolvedValue([
+          {
+            ...fullLista(),
+            items: [{ id: 1 }],
+            clientes: [{ id: 9 }],
+          },
+        ]),
+      },
+    })
+    const svc = new ListaPrecioService(prisma)
+    const res = await svc.list(TENANT, 50, 0, { activa: true })
+    expect(res.total).toBe(1)
+    expect(res.rows[0]?._count).toEqual({ items: 1, clientes: 1 })
+  })
+
+  it('gets by id and returns 404 when missing', async () => {
+    const prisma = buildPrisma({
+      listaPrecio: { findFirst: vi.fn().mockResolvedValue(fullLista()) },
+    })
+    const svc = new ListaPrecioService(prisma)
+    const ok = await svc.getById(TENANT, 2)
+    expect(ok.ok).toBe(true)
+
+    const missing = buildPrisma({ listaPrecio: { findFirst: vi.fn().mockResolvedValue(null) } })
+    const notFound = await new ListaPrecioService(missing).getById(TENANT, 99)
+    expect(notFound.ok).toBe(false)
+    if (!notFound.ok) expect(notFound.status).toBe(404)
+  })
+
+  it('creates a default list clearing previous defaults', async () => {
+    const updateMany = vi.fn().mockResolvedValue({ count: 1 })
+    const create = vi.fn().mockResolvedValue(fullLista({ esDefault: true, items: [] }))
+    const prisma = buildPrisma({
+      $transaction: vi.fn(async (fn: unknown) =>
+        (fn as (t: unknown) => unknown)({
+          listaPrecio: { updateMany, create },
+        }),
+      ),
+    })
+    const svc = new ListaPrecioService(prisma)
+    const res = await svc.create(TENANT, {
+      nombre: 'Default',
+      moneda: 'ARS',
+      activa: true,
+      esDefault: true,
+      vigenciaHasta: null,
+    })
+    expect(res.ok).toBe(true)
+    expect(updateMany).toHaveBeenCalled()
+    expect(create).toHaveBeenCalled()
+  })
+
+  it('updates a list and rejects delete when customers are assigned', async () => {
+    const prisma = buildPrisma({
+      listaPrecio: {
+        findFirst: vi
+          .fn()
+          .mockResolvedValueOnce(fullLista())
+          .mockResolvedValueOnce({ ...fullLista(), clientes: [{ id: 1 }] }),
+        update: vi.fn().mockResolvedValue(fullLista({ activa: false, items: [] })),
+        delete: vi.fn(),
+      },
+      $transaction: vi.fn(async (fn: unknown) =>
+        (fn as (t: unknown) => unknown)({
+          listaPrecio: {
+            updateMany: vi.fn(),
+            update: vi.fn().mockResolvedValue(fullLista({ activa: false, items: [] })),
+          },
+        }),
+      ),
+    })
+    const svc = new ListaPrecioService(prisma)
+    const updated = await svc.update(TENANT, 2, { activa: false })
+    expect(updated.ok).toBe(true)
+
+    const blocked = await svc.remove(TENANT, 2)
+    expect(blocked.ok).toBe(false)
+    if (!blocked.ok) expect(blocked.status).toBe(409)
+  })
+
+  it('removes an empty list and upserts then removes an item', async () => {
+    const deleteLista = vi.fn().mockResolvedValue({})
+    const deleteItem = vi.fn().mockResolvedValue({})
+    const createdItem = {
+      id: 11,
+      tenantId: TENANT,
+      listaPrecioId: 2,
+      articuloId: 5,
+      tipoPrecio: 'fijo',
+      precio: new Decimal(80),
+      porcentaje: null,
+      createdAt: now,
+      updatedAt: now,
+      escalonados: [],
+      articulo: { id: 5, codigo: 100, descripcion: 'A' },
+    }
+    const prisma = buildPrisma({
+      listaPrecio: {
+        findFirst: vi
+          .fn()
+          .mockResolvedValueOnce({ ...fullLista(), clientes: [] })
+          .mockResolvedValueOnce(fullLista()),
+        delete: deleteLista,
+      },
+      articulo: { findFirst: vi.fn().mockResolvedValue({ id: 5 }) },
+      listaPrecioItem: {
+        findFirst: vi.fn().mockResolvedValue({ id: 11 }),
+        delete: deleteItem,
+        findUnique: vi.fn().mockResolvedValue(null),
+        create: vi.fn(),
+        update: vi.fn(),
+        findUniqueOrThrow: vi.fn(),
+      },
+      $transaction: vi.fn(async (fn: unknown) =>
+        (fn as (t: unknown) => unknown)({
+          listaPrecioItem: {
+            findUnique: vi.fn().mockResolvedValue(null),
+            create: vi.fn().mockResolvedValue({ id: 11 }),
+            update: vi.fn(),
+            findUniqueOrThrow: vi.fn().mockResolvedValue(createdItem),
+          },
+          precioEscalonado: {
+            deleteMany: vi.fn().mockResolvedValue({ count: 0 }),
+            createMany: vi.fn().mockResolvedValue({ count: 0 }),
+          },
+        }),
+      ),
+    })
+    const svc = new ListaPrecioService(prisma)
+
+    const removed = await svc.remove(TENANT, 2)
+    expect(removed.ok).toBe(true)
+    expect(deleteLista).toHaveBeenCalled()
+
+    const upserted = await svc.upsertItem(TENANT, 2, {
+      articuloId: 5,
+      tipoPrecio: 'fijo',
+      precio: 80,
+      porcentaje: null,
+      escalonados: [],
+    })
+    expect(upserted.ok).toBe(true)
+
+    const itemGone = await svc.removeItem(TENANT, 2, 11)
+    expect(itemGone.ok).toBe(true)
+    expect(deleteItem).toHaveBeenCalled()
+  })
+})
