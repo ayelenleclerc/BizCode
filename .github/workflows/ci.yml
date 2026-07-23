@@ -132,8 +132,10 @@ jobs:
           }
 
           const generatedRaw = readFileSync('docs/evidence/sbom-cyclonedx.json', 'utf8')
+          // SBOM is >1MB; default execSync maxBuffer (~1MB) causes ENOBUFS on `git show`.
           const committedRaw = execSync('git show HEAD:docs/evidence/sbom-cyclonedx.json', {
             encoding: 'utf8',
+            maxBuffer: 32 * 1024 * 1024,
           })
 
           const generatedComponents = comparableComponents(generatedRaw)
