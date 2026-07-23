@@ -36,6 +36,7 @@ const TEST_DEFAULT_MODULES: ModuleKey[] = [
   'billing.pos',
   'pos.cashier',
   'catalog.pricelists',
+  'catalog.variants',
 ]
 
 /**

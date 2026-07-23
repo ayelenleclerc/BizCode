@@ -17,6 +17,10 @@ export type PrecioEfectivoOrigen =
   | 'fijo'
   | 'porcentaje_sobre_base'
   | 'base'
+  | 'oferta'
+  | 'override_variante'
+  | 'precio_subfamilia'
+  | 'precio_familia'
 
 export type PrecioEscalonadoRow = {
   id: number

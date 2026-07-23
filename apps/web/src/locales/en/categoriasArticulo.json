@@ -1,0 +1,39 @@
+{
+  "title": "Article categories",
+  "empty": "No categories yet.",
+  "errors": {
+    "load": "Could not load categories",
+    "save": "Could not save category"
+  },
+  "form": {
+    "nombre": "Name",
+    "codigo": "Code",
+    "padreId": "Parent category",
+    "precioDefault": "Default price",
+    "activo": "Active",
+    "noParent": "— Root (family) —"
+  },
+  "atributos": {
+    "title": "Attributes",
+    "nombre": "Attribute name",
+    "valores": "Values (comma-separated)",
+    "add": "Add attribute",
+    "empty": "No attributes yet."
+  },
+  "actions": {
+    "create": "Create category",
+    "delete": "Delete",
+    "select": "Manage attributes"
+  },
+  "columns": {
+    "nombre": "Name",
+    "codigo": "Code",
+    "precio": "Default price",
+    "estado": "Status",
+    "acciones": "Actions"
+  },
+  "estado": {
+    "activa": "Active",
+    "inactiva": "Inactive"
+  }
+}

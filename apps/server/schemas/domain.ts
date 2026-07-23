@@ -203,6 +203,12 @@ export const articuloBodySchema = z
     codigo: z.number(),
     descripcion: z.string(),
     rubroId: z.number(),
+    categoriaId: z.union([z.number().int().min(1), z.null()]).optional(),
+    esPadre: z.boolean().optional(),
+    padreId: z.union([z.number().int().min(1), z.null()]).optional(),
+    heredaPrecio: z.boolean().optional(),
+    precioOverride: z.union([z.number().min(0), z.null()]).optional(),
+    costoOverride: z.union([z.number().min(0), z.null()]).optional(),
     condIva: z.enum(['1', '2', '3'], { errorMap: () => ({ message: 'condIva must be one of: 1, 2, 3' }) }),
     umedida: z.string(),
     tipo: z.enum(['articulo', 'servicio']).optional(),
@@ -226,8 +232,8 @@ export const articuloBodySchema = z
       }
     }
     const d = data.descripcion.trim()
-    if (d.length < 3 || d.length > 30) {
-      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'descripcion must be a string between 3 and 30 characters', path: ['descripcion'] })
+    if (d.length < 3 || d.length > 120) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'descripcion must be a string between 3 and 120 characters', path: ['descripcion'] })
     }
     if (!Number.isInteger(data.rubroId) || data.rubroId < 1) {
       ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'rubroId must be an integer', path: ['rubroId'] })
@@ -2984,4 +2990,144 @@ export const precioEfectivoQuerySchema = z.object({
   articuloId: requiredPositiveIntQuery,
   listaPrecioId: optionalPositiveIntQuery,
   cantidad: positiveNumberQuery,
+})
+
+// ── Variantes / categorías (#235) ───────────────────────────────────────────
+
+export const categoriaArticuloCreateBodySchema = z
+  .object({
+    nombre: z.string().min(1).max(80),
+    codigo: z.union([z.string().max(20), z.null()]).optional(),
+    padreId: z.union([z.number().int().min(1), z.null()]).optional(),
+    precioDefault: z.union([z.number().min(0), z.null()]).optional(),
+    activo: z.boolean().optional(),
+  })
+  .transform((data) => ({
+    nombre: data.nombre.trim(),
+    codigo: data.codigo === undefined ? null : data.codigo === null ? null : data.codigo.trim() || null,
+    padreId: data.padreId ?? null,
+    precioDefault: data.precioDefault ?? null,
+    activo: data.activo ?? true,
+  }))
+
+export const categoriaArticuloPatchBodySchema = z
+  .object({
+    nombre: z.string().min(1).max(80).optional(),
+    codigo: z.union([z.string().max(20), z.null()]).optional(),
+    padreId: z.union([z.number().int().min(1), z.null()]).optional(),
+    precioDefault: z.union([z.number().min(0), z.null()]).optional(),
+    activo: z.boolean().optional(),
+  })
+  .refine((data) => Object.keys(data).length > 0, { message: 'at least one field is required' })
+  .transform((data) => {
+    const out: {
+      nombre?: string
+      codigo?: string | null
+      padreId?: number | null
+      precioDefault?: number | null
+      activo?: boolean
+    } = {}
+    if (data.nombre !== undefined) out.nombre = data.nombre.trim()
+    if (data.codigo !== undefined) {
+      out.codigo = data.codigo === null ? null : data.codigo.trim() || null
+    }
+    if (data.padreId !== undefined) out.padreId = data.padreId
+    if (data.precioDefault !== undefined) out.precioDefault = data.precioDefault
+    if (data.activo !== undefined) out.activo = data.activo
+    return out
+  })
+
+export const categoriaAtributoCreateBodySchema = z
+  .object({
+    nombre: z.string().min(1).max(40),
+    orden: z.number().int().min(0).optional(),
+    valores: z
+      .array(
+        z.object({
+          valor: z.string().min(1).max(40),
+          orden: z.number().int().min(0).optional(),
+        }),
+      )
+      .optional(),
+  })
+  .transform((data) => ({
+    nombre: data.nombre.trim(),
+    orden: data.orden ?? 0,
+    valores: (data.valores ?? []).map((v, i) => ({
+      valor: v.valor.trim(),
+      orden: v.orden ?? i,
+    })),
+  }))
+
+export const categoriaAtributoPatchBodySchema = z
+  .object({
+    nombre: z.string().min(1).max(40).optional(),
+    orden: z.number().int().min(0).optional(),
+  })
+  .refine((data) => Object.keys(data).length > 0, { message: 'at least one field is required' })
+  .transform((data) => {
+    const out: { nombre?: string; orden?: number } = {}
+    if (data.nombre !== undefined) out.nombre = data.nombre.trim()
+    if (data.orden !== undefined) out.orden = data.orden
+    return out
+  })
+
+export const categoriaAtributoValorCreateBodySchema = z
+  .object({
+    valor: z.string().min(1).max(40),
+    orden: z.number().int().min(0).optional(),
+  })
+  .transform((data) => ({
+    valor: data.valor.trim(),
+    orden: data.orden ?? 0,
+  }))
+
+export const generarVariantesBodySchema = z
+  .object({
+    atributoValorIdsPorAtributo: z.array(z.array(z.number().int().min(1)).min(1)).min(1),
+    codigoInicio: z.number().int().min(1).optional(),
+  })
+  .transform((data) => ({
+    atributoValorIdsPorAtributo: data.atributoValorIdsPorAtributo,
+    codigoInicio: data.codigoInicio,
+  }))
+
+export const articuloOfertaCreateBodySchema = z
+  .object({
+    precioOferta: z.number().min(0),
+    vigenciaDesde: isoDateString,
+    vigenciaHasta: isoDateString,
+    activa: z.boolean().optional(),
+  })
+  .superRefine((data, ctx) => {
+    if (new Date(data.vigenciaHasta).getTime() < new Date(data.vigenciaDesde).getTime()) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'vigenciaHasta must be >= vigenciaDesde',
+        path: ['vigenciaHasta'],
+      })
+    }
+  })
+  .transform((data) => ({
+    precioOferta: data.precioOferta,
+    vigenciaDesde: data.vigenciaDesde,
+    vigenciaHasta: data.vigenciaHasta,
+    activa: data.activa ?? true,
+  }))
+
+export const articuloOfertaPatchBodySchema = z
+  .object({
+    precioOferta: z.number().min(0).optional(),
+    vigenciaDesde: isoDateString.optional(),
+    vigenciaHasta: isoDateString.optional(),
+    activa: z.boolean().optional(),
+  })
+  .refine((data) => Object.keys(data).length > 0, { message: 'at least one field is required' })
+
+export const articuloImagenReorderBodySchema = z.object({
+  ordenIds: z.array(z.number().int().min(1)).min(1),
+})
+
+export const precioCatalogoEfectivoQuerySchema = z.object({
+  articuloId: requiredPositiveIntQuery,
 })

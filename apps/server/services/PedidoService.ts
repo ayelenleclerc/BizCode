@@ -81,6 +81,7 @@ async function resolvePedidoLines(
             condIva: true,
             tipo: true,
             unidadServicio: true,
+            esPadre: true,
           },
         })
       : []
@@ -89,6 +90,13 @@ async function resolvePedidoLines(
       ok: false,
       status: 400,
       error: 'One or more articuloId values are not valid for this tenant',
+    }
+  }
+  if (articulos.some((a) => a.esPadre)) {
+    return {
+      ok: false,
+      status: 400,
+      error: 'Parent articles cannot be sold; select a variant instead',
     }
   }
   const byId = new Map(articulos.map((a) => [a.id, a]))
@@ -206,13 +214,20 @@ export class PedidoService {
     if (articuloIds.length > 0) {
       const articulos = await this.prisma.articulo.findMany({
         where: { tenantId, id: { in: articuloIds } },
-        select: { id: true },
+        select: { id: true, esPadre: true },
       })
       if (articulos.length !== articuloIds.length) {
         return {
           ok: false,
           status: 400,
           error: 'One or more articuloId values are not valid for this tenant',
+        }
+      }
+      if (articulos.some((a) => a.esPadre)) {
+        return {
+          ok: false,
+          status: 400,
+          error: 'Parent articles cannot be sold; select a variant instead',
         }
       }
     }

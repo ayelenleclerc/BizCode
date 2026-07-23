@@ -560,7 +560,9 @@ export default function NuevaFacturaForm({
                         className="w-full bg-white dark:bg-slate-600 text-slate-900 dark:text-slate-100 rounded border border-slate-300 dark:border-slate-500 px-2 py-1 text-sm"
                       >
                         <option value={0}>{t('items.selectArticulo')}</option>
-                        {articulos.map((a) => (
+                        {articulos
+                          .filter((a) => a.esPadre !== true)
+                          .map((a) => (
                           <option key={a.id} value={a.id}>
                             {a.codigo} - {a.descripcion}
                             {a.tipo === 'servicio' ? ` (${t('items.badgeServicio')})` : ''}

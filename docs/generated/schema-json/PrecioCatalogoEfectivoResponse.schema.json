@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "articuloId": {
+      "type": "integer"
+    },
+    "ofertaId": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "origen": {
+      "enum": [
+        "oferta",
+        "override_variante",
+        "precio_subfamilia",
+        "precio_familia",
+        "precio_lista1"
+      ],
+      "type": "string"
+    },
+    "precio": {
+      "type": "number"
+    },
+    "success": {
+      "const": true,
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "success",
+    "articuloId",
+    "precio",
+    "origen",
+    "ofertaId"
+  ],
+  "title": "PrecioCatalogoEfectivoResponse",
+  "type": "object"
+}

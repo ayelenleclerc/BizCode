@@ -62,6 +62,14 @@ export type ArticuloInput = {
   codigo: number
   descripcion: string
   rubroId: number
+  /** @en Optional hierarchical category (#235). @es Categoría jerárquica opcional (#235). @pt-BR Categoria hierárquica opcional (#235). */
+  categoriaId?: number | null
+  /** @en Parent product flag (#235). @es Marca de artículo padre (#235). @pt-BR Marca de artigo pai (#235). */
+  esPadre?: boolean
+  padreId?: number | null
+  heredaPrecio?: boolean
+  precioOverride?: number | null
+  costoOverride?: number | null
   condIva: '1' | '2' | '3'
   umedida: string
   /** @en Defaults to articulo when omitted. @es Por defecto articulo. @pt-BR Padrão articulo. */

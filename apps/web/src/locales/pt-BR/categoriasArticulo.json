@@ -1,0 +1,39 @@
+{
+  "title": "Categorias de artigos",
+  "empty": "Ainda não há categorias.",
+  "errors": {
+    "load": "Não foi possível carregar as categorias",
+    "save": "Não foi possível salvar a categoria"
+  },
+  "form": {
+    "nombre": "Nome",
+    "codigo": "Código",
+    "padreId": "Categoria pai",
+    "precioDefault": "Preço padrão",
+    "activo": "Ativa",
+    "noParent": "— Raiz (família) —"
+  },
+  "atributos": {
+    "title": "Atributos",
+    "nombre": "Nome do atributo",
+    "valores": "Valores (separados por vírgula)",
+    "add": "Adicionar atributo",
+    "empty": "Sem atributos ainda."
+  },
+  "actions": {
+    "create": "Criar categoria",
+    "delete": "Excluir",
+    "select": "Gerenciar atributos"
+  },
+  "columns": {
+    "nombre": "Nome",
+    "codigo": "Código",
+    "precio": "Preço padrão",
+    "estado": "Status",
+    "acciones": "Ações"
+  },
+  "estado": {
+    "activa": "Ativa",
+    "inactiva": "Inativa"
+  }
+}

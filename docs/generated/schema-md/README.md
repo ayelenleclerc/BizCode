@@ -74,6 +74,16 @@
 
 * [CajaListEnvelope](./cajalistenvelope.md) – `-`
 
+* [CategoriaArticulo](./categoriaarticulo.md) – `-`
+
+* [CategoriaArticuloCreateInput](./categoriaarticulocreateinput.md) – `-`
+
+* [CategoriaArticuloEnvelope](./categoriaarticuloenvelope.md) – `-`
+
+* [CategoriaArticuloListEnvelope](./categoriaarticulolistenvelope.md) – `-`
+
+* [CategoriaArticuloPatchInput](./categoriaarticulopatchinput.md) – `-`
+
 * [ChangePasswordInput](./changepasswordinput.md) – `-`
 
 * [ChatConversation](./chatconversation.md) – `-`
@@ -588,6 +598,8 @@
 
 * [PortalVerifyEnvelope](./portalverifyenvelope.md) – `-`
 
+* [PrecioCatalogoEfectivoResponse](./preciocatalogoefectivoresponse.md) – `-`
+
 * [PrecioEfectivoResponse](./precioefectivoresponse.md) – `-`
 
 * [PrecioEscalonado](./precioescalonado.md) – `-`
@@ -922,6 +934,8 @@
 
 * [Untitled object in AuditEventListEnvelope](./auditeventlistenvelope-allof-0.md) – `undefined#/allOf/0`
 
+* [Untitled object in CategoriaArticuloListEnvelope](./categoriaarticulolistenvelope-allof-0.md) – `undefined#/allOf/0`
+
 * [Untitled object in ChatConversation](./chatconversation-properties-lastmessage-anyof-1.md) – `undefined#/properties/lastMessage/anyOf/1`
 
 * [Untitled object in ChatConversation](./chatconversation-properties-user.md) – `undefined#/properties/user`
@@ -1173,6 +1187,8 @@
 * [Untitled array in AuthScope](./authscope-properties-warehouseids.md) – `undefined#/properties/warehouseIds`
 
 * [Untitled array in CajaListEnvelope](./cajalistenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled array in CategoriaArticuloListEnvelope](./categoriaarticulolistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
 
 * [Untitled array in ChatConversationListEnvelope](./chatconversationlistenvelope-properties-data.md) – `undefined#/properties/data`
 

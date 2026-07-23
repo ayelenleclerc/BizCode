@@ -31,6 +31,13 @@ export interface Articulo {
   descripcion: string
   rubroId: number
   rubro?: Rubro
+  /** @en Optional hierarchical category (#235). @es Categoría jerárquica opcional (#235). @pt-BR Categoria hierárquica opcional (#235). */
+  categoriaId?: number | null
+  esPadre?: boolean
+  padreId?: number | null
+  heredaPrecio?: boolean
+  precioOverride?: number | string | null
+  costoOverride?: number | string | null
   condIva: string // 1=21%, 2=10.5%, 3=Exento
   umedida: string
   /** @en articulo | servicio (#244). @es articulo | servicio (#244). @pt-BR articulo | serviço (#244). */

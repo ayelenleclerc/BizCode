@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "minProperties": 1,
+  "properties": {
+    "activo": {
+      "type": "boolean"
+    },
+    "codigo": {
+      "maxLength": 20,
+      "nullable": true,
+      "type": "string"
+    },
+    "nombre": {
+      "maxLength": 80,
+      "type": "string"
+    },
+    "padreId": {
+      "minimum": 1,
+      "nullable": true,
+      "type": "integer"
+    },
+    "precioDefault": {
+      "minimum": 0,
+      "nullable": true,
+      "type": "number"
+    }
+  },
+  "title": "CategoriaArticuloPatchInput",
+  "type": "object"
+}
