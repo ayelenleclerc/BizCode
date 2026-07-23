@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "articuloId": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "escalonados": {
+      "items": {
+        "properties": {
+          "cantidadDesde": {
+            "minimum": 0,
+            "type": "number"
+          },
+          "cantidadHasta": {
+            "exclusiveMinimum": 0,
+            "nullable": true,
+            "type": "number"
+          },
+          "precio": {
+            "minimum": 0,
+            "type": "number"
+          }
+        },
+        "required": [
+          "cantidadDesde",
+          "precio"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "porcentaje": {
+      "nullable": true,
+      "type": "number"
+    },
+    "precio": {
+      "minimum": 0,
+      "nullable": true,
+      "type": "number"
+    },
+    "tipoPrecio": {
+      "enum": [
+        "fijo",
+        "porcentaje_sobre_base"
+      ],
+      "type": "string"
+    }
+  },
+  "required": [
+    "articuloId",
+    "tipoPrecio"
+  ],
+  "title": "ListaPrecioItemInput",
+  "type": "object"
+}

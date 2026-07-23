@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "activa": {
+      "type": "boolean"
+    },
+    "esDefault": {
+      "type": "boolean"
+    },
+    "moneda": {
+      "maxLength": 3,
+      "minLength": 3,
+      "type": "string"
+    },
+    "nombre": {
+      "maxLength": 80,
+      "minLength": 1,
+      "type": "string"
+    },
+    "vigenciaHasta": {
+      "format": "date-time",
+      "nullable": true,
+      "type": "string"
+    }
+  },
+  "required": [
+    "nombre"
+  ],
+  "title": "ListaPrecioCreateInput",
+  "type": "object"
+}

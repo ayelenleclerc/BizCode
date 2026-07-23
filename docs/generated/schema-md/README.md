@@ -342,6 +342,26 @@
 
 * [ListPaginationMeta](./listpaginationmeta.md) – `-`
 
+* [ListaPrecio](./listaprecio.md) – `-`
+
+* [ListaPrecioBulkUpdateInput](./listapreciobulkupdateinput.md) – `-`
+
+* [ListaPrecioBulkUpdateResult](./listapreciobulkupdateresult.md) – `-`
+
+* [ListaPrecioCreateInput](./listapreciocreateinput.md) – `-`
+
+* [ListaPrecioEnvelope](./listaprecioenvelope.md) – `-`
+
+* [ListaPrecioItem](./listaprecioitem.md) – `-`
+
+* [ListaPrecioItemEnvelope](./listaprecioitemenvelope.md) – `-`
+
+* [ListaPrecioItemInput](./listaprecioiteminput.md) – `-`
+
+* [ListaPrecioListEnvelope](./listapreciolistenvelope.md) – `-`
+
+* [ListaPrecioPatchInput](./listapreciopatchinput.md) – `-`
+
 * [LoginEnvelope](./loginenvelope.md) – `-`
 
 * [LoginInput](./logininput.md) – `-`
@@ -567,6 +587,10 @@
 * [PortalPedidoRow](./portalpedidorow.md) – `-`
 
 * [PortalVerifyEnvelope](./portalverifyenvelope.md) – `-`
+
+* [PrecioEfectivoResponse](./precioefectivoresponse.md) – `-`
+
+* [PrecioEscalonado](./precioescalonado.md) – `-`
 
 * [PresentacionFila](./presentacionfila.md) – `-`
 
@@ -964,6 +988,12 @@
 
 * [Untitled object in HealthResponse](./healthresponse-properties-db.md) – `undefined#/properties/db`
 
+* [Untitled object in ListaPrecioBulkUpdateResult](./listapreciobulkupdateresult-properties-ejemplos-items.md) – `undefined#/properties/ejemplos/items`
+
+* [Untitled object in ListaPrecioItemInput](./listaprecioiteminput-properties-escalonados-items.md) – `undefined#/properties/escalonados/items`
+
+* [Untitled object in ListaPrecioListEnvelope](./listapreciolistenvelope-allof-0.md) – `undefined#/allOf/0`
+
 * [Untitled object in MercadoPagoConfigEnvelope](./mercadopagoconfigenvelope-properties-data.md) – `undefined#/properties/data`
 
 * [Untitled object in MercadoPagoTestEnvelope](./mercadopagotestenvelope-properties-data.md) – `undefined#/properties/data`
@@ -1223,6 +1253,16 @@
 * [Untitled array in LibroIvaComprasPreview](./libroivacompraspreview-properties-totalsbyalicuota.md) – `undefined#/properties/totalsByAlicuota`
 
 * [Untitled array in LibroIvaVentasPreview](./libroivaventaspreview-properties-totalsbyalicuota.md) – `undefined#/properties/totalsByAlicuota`
+
+* [Untitled array in ListaPrecio](./listaprecio-properties-items.md) – `undefined#/properties/items`
+
+* [Untitled array in ListaPrecioBulkUpdateResult](./listapreciobulkupdateresult-properties-ejemplos.md) – `undefined#/properties/ejemplos`
+
+* [Untitled array in ListaPrecioItem](./listaprecioitem-properties-escalonados.md) – `undefined#/properties/escalonados`
+
+* [Untitled array in ListaPrecioItemInput](./listaprecioiteminput-properties-escalonados.md) – `undefined#/properties/escalonados`
+
+* [Untitled array in ListaPrecioListEnvelope](./listapreciolistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
 
 * [Untitled array in LogisticaChoferesListEnvelope](./logisticachofereslistenvelope-properties-data.md) – `undefined#/properties/data`
 

@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "properties": {
+    "activa": {
+      "type": "boolean"
+    },
+    "esDefault": {
+      "type": "boolean"
+    },
+    "id": {
+      "type": "integer"
+    },
+    "items": {
+      "items": {
+        "$ref": "./ListaPrecioItem.schema.json"
+      },
+      "type": "array"
+    },
+    "moneda": {
+      "type": "string"
+    },
+    "nombre": {
+      "type": "string"
+    },
+    "tenantId": {
+      "type": "integer"
+    },
+    "vigenciaHasta": {
+      "format": "date-time",
+      "nullable": true,
+      "type": "string"
+    }
+  },
+  "title": "ListaPrecio",
+  "type": "object"
+}
