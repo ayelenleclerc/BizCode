@@ -111,4 +111,38 @@ describe('createDepositosAPI (#236)', () => {
     ).resolves.toMatchObject({ estado: 'recibida' })
     await expect(api.anularTransferencia(9)).resolves.toMatchObject({ estado: 'anulada' })
   })
+
+  it('propagates handleError on failed mutation calls', async () => {
+    const boom = Object.assign(new Error('network'), { isAxiosError: true })
+    const http = {
+      get: vi.fn().mockRejectedValue(boom),
+      post: vi.fn().mockRejectedValue(boom),
+      patch: vi.fn().mockRejectedValue(boom),
+      delete: vi.fn().mockRejectedValue(boom),
+    } as unknown as AxiosInstance
+    const api = createDepositosAPI(http)
+
+    await expect(api.listDepositos()).rejects.toBeTruthy()
+    await expect(api.getDeposito(1)).rejects.toBeTruthy()
+    await expect(
+      api.createDeposito({ nombre: 'X', codigo: 'X', tipo: 'sucursal' }),
+    ).rejects.toBeTruthy()
+    await expect(api.updateDeposito(1, { nombre: 'Y' })).rejects.toBeTruthy()
+    await expect(api.removeDeposito(1)).rejects.toBeTruthy()
+    await expect(api.stockPorArticulo(5)).rejects.toBeTruthy()
+    await expect(api.listTransferencias()).rejects.toBeTruthy()
+    await expect(api.getTransferencia(9)).rejects.toBeTruthy()
+    await expect(
+      api.createTransferencia({
+        origenId: 1,
+        destinoId: 2,
+        items: [{ articuloId: 5, cantidadEnviada: 1 }],
+      }),
+    ).rejects.toBeTruthy()
+    await expect(api.markEnTransito(9)).rejects.toBeTruthy()
+    await expect(
+      api.recibirTransferencia(9, { items: [{ articuloId: 5, cantidadRecibida: 1 }] }),
+    ).rejects.toBeTruthy()
+    await expect(api.anularTransferencia(9)).rejects.toBeTruthy()
+  })
 })
