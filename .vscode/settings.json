@@ -6,5 +6,17 @@
   "[postgres]": {
     "editor.formatOnSave": false
   },
-  "prisma.pinToPrisma6": true
+  "prisma.pinToPrisma6": true,
+  "files.watcherExclude": {
+    "**/node_modules/**": true,
+    "**/.pnpm-store/**": true,
+    "**/dist/**": true,
+    "**/coverage/**": true
+  },
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/.pnpm-store": true,
+    "**/dist": true,
+    "**/coverage": true
+  }
 }

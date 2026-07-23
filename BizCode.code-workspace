@@ -5,6 +5,18 @@
         }
     ],
     "settings": {
-        "terminal.integrated.defaultProfile.windows": "Command Prompt"
+        "terminal.integrated.defaultProfile.windows": "Command Prompt",
+        "files.watcherExclude": {
+            "**/node_modules/**": true,
+            "**/.pnpm-store/**": true,
+            "**/dist/**": true,
+            "**/coverage/**": true
+        },
+        "search.exclude": {
+            "**/node_modules": true,
+            "**/.pnpm-store": true,
+            "**/dist": true,
+            "**/coverage": true
+        }
     }
 }

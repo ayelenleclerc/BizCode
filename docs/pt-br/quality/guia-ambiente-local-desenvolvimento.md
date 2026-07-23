@@ -41,6 +41,16 @@ corepack enable
 pnpm install --frozen-lockfile
 ```
 
+### Notas Windows (pnpm)
+
+Se `pnpm install` falhar com `EPERM` / `ENOENT` ao renomear pacotes em `node_modules`, use o helper do Windows (retries + exclusões opcionais de **caminhos** do Defender só para este repositório e o store do pnpm; **não** desativa a proteção em tempo real):
+
+```bat
+powershell -ExecutionPolicy Bypass -File .\scripts\install-windows.ps1 -FrozenLockfile
+```
+
+As configurações do editor excluem `node_modules` do file watcher (`.vscode/settings.json`). Prefira hardlinks em vez de `package-import-method=copy` (veja `.npmrc` na raiz e [CONTRIBUTING.md](../../../CONTRIBUTING.md)).
+
 ## Variáveis de ambiente
 
 Copie [`.env.example`](../../../.env.example) para `.env` e defina ao menos:
