@@ -190,6 +190,115 @@ describe('ArticuloVarianteService.generarVariantes combinatorial', () => {
   })
 })
 
+describe('ArticuloVarianteService stock and offers', () => {
+  it('aggregates family stock from active variants', async () => {
+    const prisma = buildPrisma({
+      articulo: {
+        findFirst: vi.fn().mockResolvedValue({ id: 10 }),
+        findMany: vi.fn().mockResolvedValue([
+          { id: 11, codigo: 11, descripcion: 'A', stock: 2, activo: true },
+          { id: 12, codigo: 12, descripcion: 'B', stock: 5, activo: true },
+          { id: 13, codigo: 13, descripcion: 'C', stock: 9, activo: false },
+        ]),
+      },
+    })
+    const svc = new ArticuloVarianteService(prisma)
+    const result = await svc.stockFamilia(1, 10)
+    expect(result.ok).toBe(true)
+    if (result.ok) expect(result.data.stockFamilia).toBe(7)
+  })
+
+  it('lists variantes for a parent', async () => {
+    const prisma = buildPrisma({
+      articulo: {
+        findFirst: vi.fn().mockResolvedValue({ id: 10, esPadre: true }),
+        findMany: vi.fn().mockResolvedValue([
+          {
+            id: 11,
+            codigo: 11,
+            descripcion: 'Remera - Roja',
+            padreId: 10,
+            esPadre: false,
+            categoriaId: 1,
+            heredaPrecio: true,
+            precioOverride: null,
+            costoOverride: null,
+            precioLista1: new Decimal(100),
+            costo: new Decimal(40),
+            stock: 1,
+            activo: true,
+            atributoValores: [],
+          },
+        ]),
+      },
+    })
+    const svc = new ArticuloVarianteService(prisma)
+    const result = await svc.listVariantes(1, 10)
+    expect(result.ok).toBe(true)
+    if (result.ok) expect(result.data).toHaveLength(1)
+  })
+
+  it('creates lists and removes ofertas for sellable variants', async () => {
+    const ofertaRow = {
+      id: 7,
+      tenantId: 1,
+      articuloId: 20,
+      precioOferta: new Decimal(80),
+      vigenciaDesde: new Date('2026-07-01T00:00:00.000Z'),
+      vigenciaHasta: new Date('2026-07-31T00:00:00.000Z'),
+      activa: true,
+      createdAt: new Date('2026-07-23T00:00:00.000Z'),
+      updatedAt: new Date('2026-07-23T00:00:00.000Z'),
+    }
+    const prisma = buildPrisma({
+      articulo: {
+        findFirst: vi.fn().mockResolvedValue({ id: 20, esPadre: false }),
+      },
+      articuloOferta: {
+        findMany: vi.fn().mockResolvedValue([ofertaRow]),
+        create: vi.fn().mockResolvedValue(ofertaRow),
+        findFirst: vi.fn().mockResolvedValue(ofertaRow),
+        update: vi.fn().mockResolvedValue({ ...ofertaRow, activa: false }),
+        delete: vi.fn().mockResolvedValue(ofertaRow),
+      },
+    })
+    const svc = new ArticuloVarianteService(prisma)
+    const listed = await svc.listOfertas(1, 20)
+    expect(listed.ok).toBe(true)
+
+    const created = await svc.createOferta(1, 20, {
+      precioOferta: 80,
+      vigenciaDesde: '2026-07-01T00:00:00.000Z',
+      vigenciaHasta: '2026-07-31T00:00:00.000Z',
+      activa: true,
+    })
+    expect(created.ok).toBe(true)
+
+    const updated = await svc.updateOferta(1, 20, 7, { activa: false })
+    expect(updated.ok).toBe(true)
+
+    const removed = await svc.removeOferta(1, 20, 7)
+    expect(removed.ok).toBe(true)
+  })
+
+  it('rejects ofertas on parent articles', async () => {
+    const prisma = buildPrisma({
+      articulo: {
+        findFirst: vi.fn().mockResolvedValue({ id: 10, esPadre: true }),
+      },
+    })
+    const svc = new ArticuloVarianteService(prisma)
+    const created = await svc.createOferta(1, 10, {
+      precioOferta: 80,
+      vigenciaDesde: '2026-07-01T00:00:00.000Z',
+      vigenciaHasta: '2026-07-31T00:00:00.000Z',
+      activa: true,
+    })
+    expect(created.ok).toBe(false)
+    if (!created.ok) expect(created.status).toBe(400)
+  })
+})
+
 describe('FacturaService rejects parent articles', () => {
   it('returns 400 when articuloId is a parent', async () => {
     const prisma = {

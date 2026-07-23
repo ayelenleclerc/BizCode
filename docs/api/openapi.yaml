@@ -5398,6 +5398,142 @@ paths:
         '403':
           $ref: '#/components/responses/ForbiddenError'
 
+  /api/categorias-articulo/{id}/atributos/{atributoId}:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+      - name: atributoId
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    patch:
+      tags: [categorias-articulo]
+      summary: Update category attribute
+      description: Requires module `catalog.variants`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              minProperties: 1
+              properties:
+                nombre:
+                  type: string
+                  maxLength: 40
+                orden:
+                  type: integer
+                  minimum: 0
+      responses:
+        '200':
+          description: Updated attribute
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+    delete:
+      tags: [categorias-articulo]
+      summary: Delete category attribute
+      description: Requires module `catalog.variants`.
+      responses:
+        '200':
+          description: Deleted
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /api/categorias-articulo/{id}/atributos/{atributoId}/valores:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+      - name: atributoId
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    post:
+      tags: [categorias-articulo]
+      summary: Add value to category attribute
+      description: Requires module `catalog.variants`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [valor]
+              properties:
+                valor:
+                  type: string
+                  maxLength: 40
+                orden:
+                  type: integer
+                  minimum: 0
+      responses:
+        '201':
+          description: Created value
+        '409':
+          description: Duplicate value
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /api/categorias-articulo/{id}/atributos/{atributoId}/valores/{valorId}:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+      - name: atributoId
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+      - name: valorId
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    delete:
+      tags: [categorias-articulo]
+      summary: Delete attribute value
+      description: Requires module `catalog.variants`.
+      responses:
+        '200':
+          description: Deleted
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
   /api/articulos/precio-catalogo-efectivo:
     parameters:
       - $ref: '#/components/parameters/BizcodeChannelHeader'
@@ -5574,6 +5710,69 @@ paths:
         '403':
           $ref: '#/components/responses/ForbiddenError'
 
+  /api/articulos/{id}/ofertas/{ofertaId}:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+      - name: ofertaId
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    patch:
+      tags: [articulos]
+      summary: Update temporary offer
+      description: Requires module `catalog.variants`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              minProperties: 1
+              properties:
+                precioOferta:
+                  type: number
+                  minimum: 0
+                vigenciaDesde:
+                  type: string
+                  format: date-time
+                vigenciaHasta:
+                  type: string
+                  format: date-time
+                activa:
+                  type: boolean
+      responses:
+        '200':
+          description: Updated
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+    delete:
+      tags: [articulos]
+      summary: Delete temporary offer
+      description: Requires module `catalog.variants`.
+      responses:
+        '200':
+          description: Deleted
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
   /api/articulos/{id}/imagenes:
     parameters:
       - $ref: '#/components/parameters/BizcodeChannelHeader'
@@ -5616,6 +5815,74 @@ paths:
           description: Uploaded
         '400':
           $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /api/articulos/{id}/imagenes/orden:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    put:
+      tags: [articulos]
+      summary: Reorder article images (first becomes principal)
+      description: Requires module `catalog.variants`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [ordenIds]
+              properties:
+                ordenIds:
+                  type: array
+                  minItems: 1
+                  items:
+                    type: integer
+                    minimum: 1
+      responses:
+        '200':
+          description: Reordered images
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /api/articulos/{id}/imagenes/{imagenId}:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+      - name: imagenId
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    delete:
+      tags: [articulos]
+      summary: Delete article image
+      description: Requires module `catalog.variants`.
+      responses:
+        '200':
+          description: Deleted
         '404':
           $ref: '#/components/responses/NotFoundError'
         '401':
