@@ -70,6 +70,31 @@ describe('stockDepositoSync (#236)', () => {
     await expect(getDefaultDepositoId(prisma, 1)).resolves.toBeNull()
   })
 
+  it('returns default deposito id when present', async () => {
+    const prisma = buildPrisma({
+      deposito: {
+        findFirst: vi.fn().mockResolvedValue({ id: 7 }),
+      },
+    })
+    await expect(getDefaultDepositoId(prisma, 1)).resolves.toBe(7)
+  })
+
+  it('rejects negative stock delta', async () => {
+    const prisma = buildPrisma({
+      stockDeposito: {
+        findUnique: vi.fn().mockResolvedValue({ id: 1, cantidad: 2 }),
+      },
+    })
+    await expect(
+      applyStockDepositoDelta(prisma, {
+        tenantId: 1,
+        articuloId: 5,
+        depositoId: 2,
+        delta: -5,
+      }),
+    ).rejects.toThrow('INSUFFICIENT_DEPOSIT_STOCK')
+  })
+
   it('applies positive delta creating stock row', async () => {
     const prisma = buildPrisma({
       stockDeposito: {
@@ -134,6 +159,87 @@ describe('DepositoService (#236)', () => {
     const result = await svc.remove(1, 1)
     expect(result.ok).toBe(false)
     if (!result.ok) expect(result.error).toBe('CANNOT_DELETE_DEFAULT_DEPOSITO')
+  })
+
+  it('gets deposito by id and stock breakdown', async () => {
+    const row = {
+      id: 1,
+      tenantId: 1,
+      nombre: 'Central',
+      codigo: 'DEFAULT',
+      tipo: 'central',
+      direccion: null,
+      responsableId: null,
+      activo: true,
+      esDefault: true,
+      createdAt: new Date('2026-07-23T00:00:00.000Z'),
+      updatedAt: new Date('2026-07-23T00:00:00.000Z'),
+    }
+    const prisma = buildPrisma({
+      deposito: {
+        findFirst: vi.fn().mockResolvedValue(row),
+      },
+      articulo: {
+        findFirst: vi.fn().mockResolvedValue({ id: 5, stock: 8 }),
+      },
+      stockDeposito: {
+        findMany: vi.fn().mockResolvedValue([
+          {
+            id: 1,
+            tenantId: 1,
+            articuloId: 5,
+            depositoId: 1,
+            cantidad: 8,
+            stockMin: 0,
+            stockMax: null,
+            createdAt: row.createdAt,
+            updatedAt: row.updatedAt,
+            deposito: { codigo: 'DEFAULT', nombre: 'Central' },
+          },
+        ]),
+      },
+      transferenciaDepositoItem: {
+        findMany: vi.fn().mockResolvedValue([{ cantidadEnviada: 1 }]),
+      },
+    })
+    const svc = new DepositoService(prisma)
+    const byId = await svc.getById(1, 1)
+    expect(byId.ok).toBe(true)
+    const stock = await svc.stockPorArticulo(1, 5)
+    expect(stock.ok).toBe(true)
+    if (stock.ok) {
+      expect(stock.data.stockTotal).toBe(8)
+      expect(stock.data.enTransito).toBe(1)
+    }
+  })
+
+  it('updates deposito nombre', async () => {
+    const existing = {
+      id: 2,
+      tenantId: 1,
+      nombre: 'Norte',
+      codigo: 'NORTE',
+      tipo: 'sucursal',
+      direccion: null,
+      responsableId: null,
+      activo: true,
+      esDefault: false,
+      createdAt: new Date('2026-07-23T00:00:00.000Z'),
+      updatedAt: new Date('2026-07-23T00:00:00.000Z'),
+    }
+    const updated = { ...existing, nombre: 'Norte 2' }
+    const prisma = buildPrisma({
+      deposito: {
+        findFirst: vi.fn().mockResolvedValue(existing),
+        update: vi.fn().mockResolvedValue(updated),
+        updateMany: vi.fn(),
+      },
+    })
+    ;(prisma.$transaction as ReturnType<typeof vi.fn>).mockImplementation(async (fn) => fn(prisma))
+    const svc = new DepositoService(prisma)
+    const result = await svc.update(1, 2, { nombre: 'Norte 2' })
+    expect(result.ok).toBe(true)
+    if (result.ok) expect(result.data.nombre).toBe('Norte 2')
   })
 })
 
@@ -314,5 +420,83 @@ describe('TransferenciaDepositoService (#236)', () => {
         }),
       }),
     )
+  })
+
+  it('anuls pendiente without restocking', async () => {
+    const existing = {
+      id: 9,
+      tenantId: 1,
+      origenId: 1,
+      destinoId: 2,
+      estado: 'pendiente',
+      items: [{ id: 1, articuloId: 5, cantidadEnviada: 4 }],
+    }
+    const after = {
+      ...existing,
+      estado: 'anulada',
+      numero: 1,
+      solicitadoPorId: 3,
+      aprobadoPorId: null,
+      fechaEnvio: null,
+      fechaRecepcion: null,
+      nota: null,
+      createdAt: new Date('2026-07-23T00:00:00.000Z'),
+      updatedAt: new Date('2026-07-23T00:00:00.000Z'),
+      origen: { codigo: 'DEFAULT' },
+      destino: { codigo: 'SP' },
+      items: [
+        {
+          id: 1,
+          transferenciaId: 9,
+          articuloId: 5,
+          cantidadEnviada: 4,
+          cantidadRecibida: null,
+          articulo: { codigo: 5, descripcion: 'Remera' },
+        },
+      ],
+    }
+    const prisma = buildPrisma()
+    ;(prisma.transferenciaDeposito.findFirst as ReturnType<typeof vi.fn>)
+      .mockResolvedValueOnce(existing)
+      .mockResolvedValueOnce(after)
+    ;(prisma.$transaction as ReturnType<typeof vi.fn>).mockImplementation(async (fn) => fn(prisma))
+    const svc = new TransferenciaDepositoService(prisma)
+    const result = await svc.anular(1, 9)
+    expect(result.ok).toBe(true)
+    if (result.ok) expect(result.data.estado).toBe('anulada')
+    expect(prisma.stockDeposito.findUnique).not.toHaveBeenCalled()
+  })
+
+  it('lists and gets transferencia by id', async () => {
+    const row = {
+      id: 9,
+      tenantId: 1,
+      numero: 1,
+      origenId: 1,
+      destinoId: 2,
+      estado: 'pendiente',
+      solicitadoPorId: 3,
+      aprobadoPorId: null,
+      fechaEnvio: null,
+      fechaRecepcion: null,
+      nota: null,
+      createdAt: new Date('2026-07-23T00:00:00.000Z'),
+      updatedAt: new Date('2026-07-23T00:00:00.000Z'),
+      origen: { codigo: 'DEFAULT' },
+      destino: { codigo: 'SP' },
+      items: [],
+    }
+    const prisma = buildPrisma({
+      transferenciaDeposito: {
+        count: vi.fn().mockResolvedValue(1),
+        findMany: vi.fn().mockResolvedValue([row]),
+        findFirst: vi.fn().mockResolvedValue(row),
+      },
+    })
+    const svc = new TransferenciaDepositoService(prisma)
+    const listed = await svc.list(1, 50, 0)
+    expect(listed.total).toBe(1)
+    const byId = await svc.getById(1, 9)
+    expect(byId.ok).toBe(true)
   })
 })

@@ -120,4 +120,21 @@ describe('DepositosPage (#236)', () => {
       expect(screen.getByTestId('depositos-empty')).toBeInTheDocument()
     })
   })
+
+  it('shows action error when create fails', async () => {
+    const user = userEvent.setup()
+    vi.mocked(depositosAPI.createDeposito).mockRejectedValue(new Error('boom-create'))
+    render(
+      <I18nextProvider i18n={i18n}>
+        <DepositosPage />
+      </I18nextProvider>,
+    )
+    await waitFor(() => expect(screen.getByTestId('deposito-form')).toBeInTheDocument())
+    await user.type(screen.getByTestId('deposito-nombre'), 'Sur')
+    await user.type(screen.getByTestId('deposito-codigo'), 'SUR')
+    await user.click(screen.getByTestId('deposito-create'))
+    await waitFor(() => {
+      expect(screen.getByTestId('depositos-action-error')).toHaveTextContent('boom-create')
+    })
+  })
 })

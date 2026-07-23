@@ -183,4 +183,18 @@ describe('TransferenciasDepositoPage (#236)', () => {
       })
     })
   })
+
+  it('anuls pendiente transfer', async () => {
+    const user = userEvent.setup()
+    render(
+      <I18nextProvider i18n={i18n}>
+        <TransferenciasDepositoPage />
+      </I18nextProvider>,
+    )
+    await waitFor(() => expect(screen.getByTestId('transf-anular-9')).toBeInTheDocument())
+    await user.click(screen.getByTestId('transf-anular-9'))
+    await waitFor(() => {
+      expect(depositosAPI.anularTransferencia).toHaveBeenCalledWith(9)
+    })
+  })
 })
