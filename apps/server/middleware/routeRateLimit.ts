@@ -151,6 +151,17 @@ export const apiHttpRateLimiter = createRouteLimiter({
   skipUnless: (req) => isGeneralApiPath(req),
 })
 
+/**
+ * @en Per-IP rate limit for deposit/transfer mutations (#236); visible to CodeQL on route handlers.
+ * @es Límite por IP para mutaciones de depósitos/transferencias (#236); visible a CodeQL en los handlers.
+ * @pt-BR Limite por IP para mutações de depósitos/transferências (#236); visível ao CodeQL nos handlers.
+ */
+export const depositosMutationHttpRateLimiter = createRouteLimiter({
+  windowMs: MINUTE_MS,
+  limit: parsePositiveInt(process.env.HTTP_RATE_LIMIT_PER_MINUTE, API_GENERAL_DEFAULT),
+  skipUnless: () => true,
+})
+
 function runLimiterChain(
   req: Request,
   res: Response,

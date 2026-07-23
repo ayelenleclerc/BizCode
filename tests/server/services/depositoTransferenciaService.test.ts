@@ -2,7 +2,7 @@ import { describe, expect, it, vi, beforeEach } from 'vitest'
 import type { PrismaClient } from '@prisma/client'
 import { DepositoService } from '../../../apps/server/services/DepositoService'
 import { TransferenciaDepositoService } from '../../../apps/server/services/TransferenciaDepositoService'
-import { applyStockDepositoDelta, syncArticuloStockFromDepositos } from '../../../apps/server/services/stockDepositoSync'
+import { applyStockDepositoDelta, getDefaultDepositoId, syncArticuloStockFromDepositos } from '../../../apps/server/services/stockDepositoSync'
 
 function buildPrisma(overrides: Record<string, unknown> = {}): PrismaClient {
   return {
@@ -63,6 +63,11 @@ describe('stockDepositoSync (#236)', () => {
       where: { id: 5 },
       data: { stock: 42 },
     })
+  })
+
+  it('returns null from getDefaultDepositoId when deposito delegate is missing', async () => {
+    const prisma = { articulo: { findFirst: vi.fn() } } as unknown as PrismaClient
+    await expect(getDefaultDepositoId(prisma, 1)).resolves.toBeNull()
   })
 
   it('applies positive delta creating stock row', async () => {

@@ -67,15 +67,19 @@ export async function applyStockDepositoDelta(
 }
 
 /**
- * @en Returns the default deposit id for a tenant, or null if none (#236).
- * @es Devuelve el id del depósito default del tenant, o null si no hay (#236).
- * @pt-BR Retorna o id do depósito default do tenant, ou null se não houver (#236).
+ * @en Returns the default deposit id for a tenant, or null if none / unavailable (#236).
+ * @es Devuelve el id del depósito default del tenant, o null si no hay / no está disponible (#236).
+ * @pt-BR Retorna o id do depósito default do tenant, ou null se não houver / indisponível (#236).
  */
 export async function getDefaultDepositoId(
   tx: TxClient,
   tenantId: number,
 ): Promise<number | null> {
-  const row = await tx.deposito.findFirst({
+  const deposito = (tx as { deposito?: PrismaClient['deposito'] }).deposito
+  if (deposito == null || typeof deposito.findFirst !== 'function') {
+    return null
+  }
+  const row = await deposito.findFirst({
     where: { tenantId, esDefault: true, activo: true },
     select: { id: true },
     orderBy: { id: 'asc' },

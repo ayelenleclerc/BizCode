@@ -7,6 +7,7 @@ import type {
 } from '@bizcode/types'
 import { requireAnyPermission, requirePermission, type AuthenticatedRequest } from '../auth'
 import { requireModule } from '../middleware/requireModule'
+import { depositosMutationHttpRateLimiter } from '../middleware/routeRateLimit'
 import { validateBody } from '../middleware/validateBody'
 import {
   depositoCreateBodySchema,
@@ -80,6 +81,7 @@ export function registerDepositosRoutes(app: Application, ctx: RestRouteContext)
 
   app.post(
     '/api/depositos',
+    depositosMutationHttpRateLimiter,
     warehousesModule,
     writePermission,
     validateBody(depositoCreateBodySchema),
@@ -100,6 +102,7 @@ export function registerDepositosRoutes(app: Application, ctx: RestRouteContext)
 
   app.patch(
     '/api/depositos/:id',
+    depositosMutationHttpRateLimiter,
     warehousesModule,
     writePermission,
     validateBody(depositoPatchBodySchema),
@@ -124,6 +127,7 @@ export function registerDepositosRoutes(app: Application, ctx: RestRouteContext)
 
   app.delete(
     '/api/depositos/:id',
+    depositosMutationHttpRateLimiter,
     warehousesModule,
     writePermission,
     async (req: Request, res: Response) => {
@@ -199,6 +203,7 @@ export function registerDepositosRoutes(app: Application, ctx: RestRouteContext)
 
   app.post(
     '/api/transferencias-deposito',
+    depositosMutationHttpRateLimiter,
     warehousesModule,
     writePermission,
     validateBody(transferenciaDepositoCreateBodySchema),
@@ -228,6 +233,7 @@ export function registerDepositosRoutes(app: Application, ctx: RestRouteContext)
 
   app.post(
     '/api/transferencias-deposito/:id/en-transito',
+    depositosMutationHttpRateLimiter,
     warehousesModule,
     writePermission,
     async (req: Request, res: Response) => {
@@ -250,6 +256,7 @@ export function registerDepositosRoutes(app: Application, ctx: RestRouteContext)
 
   app.post(
     '/api/transferencias-deposito/:id/recibir',
+    depositosMutationHttpRateLimiter,
     warehousesModule,
     writePermission,
     validateBody(transferenciaDepositoRecibirBodySchema),
@@ -274,6 +281,7 @@ export function registerDepositosRoutes(app: Application, ctx: RestRouteContext)
 
   app.post(
     '/api/transferencias-deposito/:id/anular',
+    depositosMutationHttpRateLimiter,
     warehousesModule,
     writePermission,
     async (req: Request, res: Response) => {
