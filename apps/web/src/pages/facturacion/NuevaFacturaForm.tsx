@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import { useHotkeys } from 'react-hotkeys-hook'
 import { useTranslation } from 'react-i18next'
-import { empresaAPI, facturasAPI, fiscalRetencionesAPI, type RetencionPreviewLineDTO } from '@/lib/api'
+import { empresaAPI, facturasAPI, fiscalRetencionesAPI, listasPreciosAPI, type RetencionPreviewLineDTO } from '@/lib/api'
 import { calculateInvoice, calculateItemSubtotal } from '@/lib/invoice'
 import { Cliente, Articulo, FormaPago } from '@bizcode/types'
 import KeyboardHint, { useInvoiceShortcuts } from '@/components/shared/KeyboardHint'
@@ -56,6 +56,7 @@ export default function NuevaFacturaForm({
   const [percepcionesLoading, setPercepcionesLoading] = useState(false)
   const { hasModule } = useFeatureFlags()
   const retencionesModule = hasModule('finance.retenciones')
+  const pricelistsModule = hasModule('catalog.pricelists')
 
   const cliente = clientes.find((c) => c.id === clienteId)
 
@@ -186,6 +187,34 @@ export default function NuevaFacturaForm({
     }
   }
 
+  /**
+   * @en Best-effort: prefill the line price from the effective-price endpoint (#234).
+   * @es Best-effort: prefija el precio de la línea con el endpoint de precio efectivo (#234).
+   * @pt-BR Best-effort: preenche o preço da linha via endpoint de preço efetivo (#234).
+   */
+  const resolveSuggestedPrice = useCallback(
+    async (lineId: string, articuloId: number, cantidad: number) => {
+      if (!pricelistsModule) return
+      try {
+        const res = await listasPreciosAPI.getPrecioEfectivo({
+          articuloId,
+          listaPrecioId: cliente?.listaPrecioId ?? undefined,
+          cantidad: cantidad > 0 ? cantidad : 1,
+        })
+        setLineas((prev) =>
+          prev.map((l) =>
+            l.id === lineId
+              ? { ...l, precio: res.precio, subtotal: calculateItemSubtotal(l.cantidad, res.precio, l.dscto) }
+              : l,
+          ),
+        )
+      } catch {
+        // Best-effort: keep the base price already set from precioLista1.
+      }
+    },
+    [pricelistsModule, cliente],
+  )
+
   const updateLinea = (idx: number, field: keyof LineaFactura, value: unknown) => {
     const newLineas = [...lineas]
     newLineas[idx] = { ...newLineas[idx], [field]: value }
@@ -215,7 +244,16 @@ export default function NuevaFacturaForm({
           newLineas[idx].precio,
           newLineas[idx].dscto,
         )
+        void resolveSuggestedPrice(newLineas[idx].id, art.id, newLineas[idx].cantidad)
       }
+    }
+
+    if (field === 'cantidad' && newLineas[idx].mode === 'catalog' && newLineas[idx].articuloId != null) {
+      void resolveSuggestedPrice(
+        newLineas[idx].id,
+        newLineas[idx].articuloId as number,
+        newLineas[idx].cantidad,
+      )
     }
 
     setLineas(newLineas)

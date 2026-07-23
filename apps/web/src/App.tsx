@@ -25,6 +25,7 @@ import ContratosPage from './pages/contratos'
 import OrdenesTrabajoPage from './pages/ordenes-trabajo'
 import GarantiasPage from './pages/garantias'
 import CajaPage from './pages/caja'
+import ListasPreciosPage from './pages/listas-precios'
 import ReportesPage from './pages/reportes'
 import ConfiguracionPage from './pages/configuracion'
 import ZonasEntregaPage from './pages/configuracion/ZonasEntregaPage'
@@ -204,6 +205,14 @@ function AppRoutes() {
             element={
               <ModuleRoute moduleKey="pos.cashier">
                 <CajaPage />
+              </ModuleRoute>
+            }
+          />
+          <Route
+            path="listas-precios"
+            element={
+              <ModuleRoute moduleKey="catalog.pricelists">
+                <ListasPreciosPage />
               </ModuleRoute>
             }
           />

@@ -21,6 +21,22 @@ See also [AGENTS.md](AGENTS.md) for the short index.
 
 Trilingual guide: [docs/en/quality/local-development-setup.md](docs/en/quality/local-development-setup.md) (see [DOCUMENT_LOCALE_MAP.md](docs/DOCUMENT_LOCALE_MAP.md) for ES/PT-BR paths). Quick start also lives in [README.md](README.md).
 
+### Windows: install dependencies (pnpm)
+
+On Windows, antivirus / Search / IDE file watchers can lock files during pnpm’s atomic renames into `node_modules` (`EPERM` / `ENOENT`). The repo mitigates this **without disabling Defender real-time protection**:
+
+1. Prefer hardlinks (default): do **not** set `package-import-method=copy` in `.npmrc` (full copies are slow and still rename).
+2. Cursor / VS Code: [`.vscode/settings.json`](.vscode/settings.json) excludes `node_modules` from the file watcher (`files.watcherExclude`).
+3. Recommended install helper (retries + optional path exclusions for the repo and pnpm store only):
+
+```bat
+powershell -ExecutionPolicy Bypass -File .\scripts\install-windows.ps1 -FrozenLockfile
+```
+
+Accept the UAC prompt if you want Defender **path exclusions** (project folder + pnpm store). The script never turns off real-time protection or Tamper Protection.
+
+If installs still fail with `EPERM`, close other tools watching the folder and re-run the script; as a last resort, run it from an external PowerShell with the IDE closed, then reopen.
+
 ### Windows: PowerShell and `npm`
 
 If `npm run …` fails with **script execution disabled** / `npm.ps1` / `PSSecurityException`, the `package.json` scripts are fine: **PowerShell is blocking the `npm` shim**, not your project.

@@ -20,6 +20,7 @@ export interface Cliente {
   score?: number
   suspended?: boolean
   deliveryZoneId?: number | null
+  listaPrecioId?: number | null
   createdAt: Date
   updatedAt: Date
 }

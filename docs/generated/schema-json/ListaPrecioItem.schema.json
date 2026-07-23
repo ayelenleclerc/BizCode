@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "properties": {
+    "articuloId": {
+      "type": "integer"
+    },
+    "escalonados": {
+      "items": {
+        "$ref": "./PrecioEscalonado.schema.json"
+      },
+      "type": "array"
+    },
+    "id": {
+      "type": "integer"
+    },
+    "listaPrecioId": {
+      "type": "integer"
+    },
+    "porcentaje": {
+      "nullable": true,
+      "type": "number"
+    },
+    "precio": {
+      "nullable": true,
+      "type": "number"
+    },
+    "tenantId": {
+      "type": "integer"
+    },
+    "tipoPrecio": {
+      "enum": [
+        "fijo",
+        "porcentaje_sobre_base"
+      ],
+      "type": "string"
+    }
+  },
+  "title": "ListaPrecioItem",
+  "type": "object"
+}

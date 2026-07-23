@@ -32148,6 +32148,1948 @@ Requires module `pos.cashier`.
 }
 ```
 
+### PARAMETERS /api/listas-precios
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/listas-precios`
+
+### List price lists
+
+- **Method:** `GET`
+- **Path:** `/api/listas-precios`
+- **Tags:** listas-precios
+
+Requires module `catalog.pricelists`.
+
+#### Responses
+
+##### Status: 200 Paginated price lists
+
+###### Content-Type: application/json
+
+**All of:**
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`activa`**
+
+    `boolean`
+
+  - **`esDefault`**
+
+    `boolean`
+
+  - **`id`**
+
+    `integer`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId`**
+
+      `integer`
+
+    - **`escalonados`**
+
+      `array`
+
+      **Items:**
+
+      - **`cantidadDesde`**
+
+        `number`
+
+      - **`cantidadHasta`**
+
+        `number`
+
+      - **`id`**
+
+        `integer`
+
+      - **`listaPrecioItemId`**
+
+        `integer`
+
+      - **`precio`**
+
+        `number`
+
+    - **`id`**
+
+      `integer`
+
+    - **`listaPrecioId`**
+
+      `integer`
+
+    - **`porcentaje`**
+
+      `number`
+
+    - **`precio`**
+
+      `number`
+
+    - **`tenantId`**
+
+      `integer`
+
+    - **`tipoPrecio`**
+
+      `string`, possible values: `"fijo", "porcentaje_sobre_base"`
+
+  - **`moneda`**
+
+    `string`
+
+  - **`nombre`**
+
+    `string`
+
+  - **`tenantId`**
+
+    `integer`
+
+  - **`vigenciaHasta`**
+
+    `string`, format: `date-time`
+
+- **`success` (required)**
+
+  `boolean`
+
+* **`limit` (required)**
+
+  `integer` — Effective page size (same semantics as query \`limit\`)
+
+* **`offset` (required)**
+
+  `integer` — Effective skip (same semantics as query \`offset\`)
+
+* **`total` (required)**
+
+  `integer` — Row count matching the list filter (before limit/offset)
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "nombre": "",
+      "moneda": "",
+      "activa": true,
+      "esDefault": true,
+      "vigenciaHasta": "",
+      "items": [
+        {
+          "id": 1,
+          "tenantId": 1,
+          "listaPrecioId": 1,
+          "articuloId": 1,
+          "tipoPrecio": "fijo",
+          "precio": 1,
+          "porcentaje": 1,
+          "escalonados": [
+            {
+              "id": 1,
+              "listaPrecioItemId": 1,
+              "cantidadDesde": 1,
+              "cantidadHasta": 1,
+              "precio": 1,
+              "additionalProperty": "anything"
+            }
+          ],
+          "additionalProperty": "anything"
+        }
+      ],
+      "additionalProperty": "anything"
+    }
+  ],
+  "total": 0,
+  "limit": 1,
+  "offset": 0
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Create price list
+
+- **Method:** `POST`
+- **Path:** `/api/listas-precios`
+- **Tags:** listas-precios
+
+Requires module `catalog.pricelists`.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`nombre` (required)**
+
+  `string`
+
+- **`activa`**
+
+  `boolean`
+
+- **`esDefault`**
+
+  `boolean`
+
+- **`moneda`**
+
+  `string`
+
+- **`vigenciaHasta`**
+
+  `string`, format: `date-time`
+
+**Example:**
+
+```json
+{
+  "nombre": "",
+  "moneda": "",
+  "activa": true,
+  "esDefault": true,
+  "vigenciaHasta": ""
+}
+```
+
+#### Responses
+
+##### Status: 201 Created
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`activa`**
+
+    `boolean`
+
+  - **`esDefault`**
+
+    `boolean`
+
+  - **`id`**
+
+    `integer`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId`**
+
+      `integer`
+
+    - **`escalonados`**
+
+      `array`
+
+      **Items:**
+
+      - **`cantidadDesde`**
+
+        `number`
+
+      - **`cantidadHasta`**
+
+        `number`
+
+      - **`id`**
+
+        `integer`
+
+      - **`listaPrecioItemId`**
+
+        `integer`
+
+      - **`precio`**
+
+        `number`
+
+    - **`id`**
+
+      `integer`
+
+    - **`listaPrecioId`**
+
+      `integer`
+
+    - **`porcentaje`**
+
+      `number`
+
+    - **`precio`**
+
+      `number`
+
+    - **`tenantId`**
+
+      `integer`
+
+    - **`tipoPrecio`**
+
+      `string`, possible values: `"fijo", "porcentaje_sobre_base"`
+
+  - **`moneda`**
+
+    `string`
+
+  - **`nombre`**
+
+    `string`
+
+  - **`tenantId`**
+
+    `integer`
+
+  - **`vigenciaHasta`**
+
+    `string`, format: `date-time`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "nombre": "",
+    "moneda": "",
+    "activa": true,
+    "esDefault": true,
+    "vigenciaHasta": "",
+    "items": [
+      {
+        "id": 1,
+        "tenantId": 1,
+        "listaPrecioId": 1,
+        "articuloId": 1,
+        "tipoPrecio": "fijo",
+        "precio": 1,
+        "porcentaje": 1,
+        "escalonados": [
+          {
+            "id": 1,
+            "listaPrecioItemId": 1,
+            "cantidadDesde": 1,
+            "cantidadHasta": 1,
+            "precio": 1,
+            "additionalProperty": "anything"
+          }
+        ],
+        "additionalProperty": "anything"
+      }
+    ],
+    "additionalProperty": "anything"
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 409 Duplicate nombre
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/listas-precios/precio-efectivo
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/listas-precios/precio-efectivo`
+
+### Resolve effective price for an article
+
+- **Method:** `GET`
+- **Path:** `/api/listas-precios/precio-efectivo`
+- **Tags:** listas-precios
+
+Requires module `catalog.pricelists`. Resolution cascade: tiered price -> list item (fixed/percent) -> base article price.
+
+#### Responses
+
+##### Status: 200 Effective price
+
+###### Content-Type: application/json
+
+- **`articuloId` (required)**
+
+  `integer`
+
+- **`cantidad` (required)**
+
+  `number`
+
+- **`moneda` (required)**
+
+  `string`
+
+- **`origen` (required)**
+
+  `string`, possible values: `"escalonado", "fijo", "porcentaje_sobre_base", "base"`
+
+- **`precio` (required)**
+
+  `number`
+
+- **`precioBase` (required)**
+
+  `number`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`listaPrecioId`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "articuloId": 1,
+  "listaPrecioId": 1,
+  "cantidad": 1,
+  "precioBase": 1,
+  "precio": 1,
+  "origen": "escalonado",
+  "moneda": ""
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/listas-precios/{id}
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/listas-precios/{id}`
+
+### Get price list with items and tiers
+
+- **Method:** `GET`
+- **Path:** `/api/listas-precios/{id}`
+- **Tags:** listas-precios
+
+Requires module `catalog.pricelists`.
+
+#### Responses
+
+##### Status: 200 Price list detail
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`activa`**
+
+    `boolean`
+
+  - **`esDefault`**
+
+    `boolean`
+
+  - **`id`**
+
+    `integer`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId`**
+
+      `integer`
+
+    - **`escalonados`**
+
+      `array`
+
+      **Items:**
+
+      - **`cantidadDesde`**
+
+        `number`
+
+      - **`cantidadHasta`**
+
+        `number`
+
+      - **`id`**
+
+        `integer`
+
+      - **`listaPrecioItemId`**
+
+        `integer`
+
+      - **`precio`**
+
+        `number`
+
+    - **`id`**
+
+      `integer`
+
+    - **`listaPrecioId`**
+
+      `integer`
+
+    - **`porcentaje`**
+
+      `number`
+
+    - **`precio`**
+
+      `number`
+
+    - **`tenantId`**
+
+      `integer`
+
+    - **`tipoPrecio`**
+
+      `string`, possible values: `"fijo", "porcentaje_sobre_base"`
+
+  - **`moneda`**
+
+    `string`
+
+  - **`nombre`**
+
+    `string`
+
+  - **`tenantId`**
+
+    `integer`
+
+  - **`vigenciaHasta`**
+
+    `string`, format: `date-time`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "nombre": "",
+    "moneda": "",
+    "activa": true,
+    "esDefault": true,
+    "vigenciaHasta": "",
+    "items": [
+      {
+        "id": 1,
+        "tenantId": 1,
+        "listaPrecioId": 1,
+        "articuloId": 1,
+        "tipoPrecio": "fijo",
+        "precio": 1,
+        "porcentaje": 1,
+        "escalonados": [
+          {
+            "id": 1,
+            "listaPrecioItemId": 1,
+            "cantidadDesde": 1,
+            "cantidadHasta": 1,
+            "precio": 1,
+            "additionalProperty": "anything"
+          }
+        ],
+        "additionalProperty": "anything"
+      }
+    ],
+    "additionalProperty": "anything"
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Update price list
+
+- **Method:** `PATCH`
+- **Path:** `/api/listas-precios/{id}`
+- **Tags:** listas-precios
+
+Requires module `catalog.pricelists`.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`activa`**
+
+  `boolean`
+
+- **`esDefault`**
+
+  `boolean`
+
+- **`moneda`**
+
+  `string`
+
+- **`nombre`**
+
+  `string`
+
+- **`vigenciaHasta`**
+
+  `string`, format: `date-time`
+
+**Example:**
+
+```json
+{
+  "nombre": "",
+  "moneda": "",
+  "activa": true,
+  "esDefault": true,
+  "vigenciaHasta": ""
+}
+```
+
+#### Responses
+
+##### Status: 200 Updated
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`activa`**
+
+    `boolean`
+
+  - **`esDefault`**
+
+    `boolean`
+
+  - **`id`**
+
+    `integer`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId`**
+
+      `integer`
+
+    - **`escalonados`**
+
+      `array`
+
+      **Items:**
+
+      - **`cantidadDesde`**
+
+        `number`
+
+      - **`cantidadHasta`**
+
+        `number`
+
+      - **`id`**
+
+        `integer`
+
+      - **`listaPrecioItemId`**
+
+        `integer`
+
+      - **`precio`**
+
+        `number`
+
+    - **`id`**
+
+      `integer`
+
+    - **`listaPrecioId`**
+
+      `integer`
+
+    - **`porcentaje`**
+
+      `number`
+
+    - **`precio`**
+
+      `number`
+
+    - **`tenantId`**
+
+      `integer`
+
+    - **`tipoPrecio`**
+
+      `string`, possible values: `"fijo", "porcentaje_sobre_base"`
+
+  - **`moneda`**
+
+    `string`
+
+  - **`nombre`**
+
+    `string`
+
+  - **`tenantId`**
+
+    `integer`
+
+  - **`vigenciaHasta`**
+
+    `string`, format: `date-time`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "nombre": "",
+    "moneda": "",
+    "activa": true,
+    "esDefault": true,
+    "vigenciaHasta": "",
+    "items": [
+      {
+        "id": 1,
+        "tenantId": 1,
+        "listaPrecioId": 1,
+        "articuloId": 1,
+        "tipoPrecio": "fijo",
+        "precio": 1,
+        "porcentaje": 1,
+        "escalonados": [
+          {
+            "id": 1,
+            "listaPrecioItemId": 1,
+            "cantidadDesde": 1,
+            "cantidadHasta": 1,
+            "precio": 1,
+            "additionalProperty": "anything"
+          }
+        ],
+        "additionalProperty": "anything"
+      }
+    ],
+    "additionalProperty": "anything"
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 409 Duplicate nombre
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Delete price list
+
+- **Method:** `DELETE`
+- **Path:** `/api/listas-precios/{id}`
+- **Tags:** listas-precios
+
+Requires module `catalog.pricelists`.
+
+#### Responses
+
+##### Status: 204 Deleted
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 409 List has customers assigned
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/listas-precios/{id}/items
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/listas-precios/{id}/items`
+
+### Upsert a price-list item (with optional tiers)
+
+- **Method:** `POST`
+- **Path:** `/api/listas-precios/{id}/items`
+- **Tags:** listas-precios
+
+Requires module `catalog.pricelists`.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`articuloId` (required)**
+
+  `integer`
+
+- **`tipoPrecio` (required)**
+
+  `string`, possible values: `"fijo", "porcentaje_sobre_base"`
+
+- **`escalonados`**
+
+  `array`
+
+  **Items:**
+
+  - **`cantidadDesde` (required)**
+
+    `number`
+
+  - **`precio` (required)**
+
+    `number`
+
+  - **`cantidadHasta`**
+
+    `number`
+
+- **`porcentaje`**
+
+  `number`
+
+- **`precio`**
+
+  `number`
+
+**Example:**
+
+```json
+{
+  "articuloId": 1,
+  "tipoPrecio": "fijo",
+  "precio": 0,
+  "porcentaje": 1,
+  "escalonados": [
+    {
+      "cantidadDesde": 0,
+      "cantidadHasta": 1,
+      "precio": 0
+    }
+  ]
+}
+```
+
+#### Responses
+
+##### Status: 200 Item upserted
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`articuloId`**
+
+    `integer`
+
+  - **`escalonados`**
+
+    `array`
+
+    **Items:**
+
+    - **`cantidadDesde`**
+
+      `number`
+
+    - **`cantidadHasta`**
+
+      `number`
+
+    - **`id`**
+
+      `integer`
+
+    - **`listaPrecioItemId`**
+
+      `integer`
+
+    - **`precio`**
+
+      `number`
+
+  - **`id`**
+
+    `integer`
+
+  - **`listaPrecioId`**
+
+    `integer`
+
+  - **`porcentaje`**
+
+    `number`
+
+  - **`precio`**
+
+    `number`
+
+  - **`tenantId`**
+
+    `integer`
+
+  - **`tipoPrecio`**
+
+    `string`, possible values: `"fijo", "porcentaje_sobre_base"`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "listaPrecioId": 1,
+    "articuloId": 1,
+    "tipoPrecio": "fijo",
+    "precio": 1,
+    "porcentaje": 1,
+    "escalonados": [
+      {
+        "id": 1,
+        "listaPrecioItemId": 1,
+        "cantidadDesde": 1,
+        "cantidadHasta": 1,
+        "precio": 1,
+        "additionalProperty": "anything"
+      }
+    ],
+    "additionalProperty": "anything"
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/listas-precios/{id}/items/{itemId}
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/listas-precios/{id}/items/{itemId}`
+
+### Remove a price-list item
+
+- **Method:** `DELETE`
+- **Path:** `/api/listas-precios/{id}/items/{itemId}`
+- **Tags:** listas-precios
+
+Requires module `catalog.pricelists`.
+
+#### Responses
+
+##### Status: 204 Deleted
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/listas-precios/{id}/actualizar-masivo
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/listas-precios/{id}/actualizar-masivo`
+
+### Bulk percentage update over a price list (preview or apply)
+
+- **Method:** `POST`
+- **Path:** `/api/listas-precios/{id}/actualizar-masivo`
+- **Tags:** listas-precios
+
+Requires module `catalog.pricelists`.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`porcentaje` (required)**
+
+  `number`
+
+- **`preview`**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "porcentaje": 1,
+  "preview": true
+}
+```
+
+#### Responses
+
+##### Status: 200 Preview or applied bulk update
+
+###### Content-Type: application/json
+
+- **`afectados` (required)**
+
+  `integer`
+
+- **`ejemplos` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`articuloId`**
+
+    `integer`
+
+  - **`descripcion`**
+
+    `string`
+
+  - **`listaPrecioItemId`**
+
+    `integer`
+
+  - **`precioActual`**
+
+    `number`
+
+  - **`precioNuevo`**
+
+    `number`
+
+- **`preview` (required)**
+
+  `boolean`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "preview": true,
+  "afectados": 1,
+  "ejemplos": [
+    {
+      "listaPrecioItemId": 1,
+      "articuloId": 1,
+      "descripcion": "",
+      "precioActual": 1,
+      "precioNuevo": 1
+    }
+  ]
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ### PARAMETERS /api/cobros
 
 - **Method:** `PARAMETERS`
@@ -80048,6 +81990,756 @@ Originating invoice header (selected columns)
 ```
 
 ### TurnoCajaListEnvelope
+
+- **Type:**
+
+**Example:**
+
+### PrecioEscalonado
+
+- **Type:**`object`
+
+* **`cantidadDesde`**
+
+  `number`
+
+* **`cantidadHasta`**
+
+  `number`
+
+* **`id`**
+
+  `integer`
+
+* **`listaPrecioItemId`**
+
+  `integer`
+
+* **`precio`**
+
+  `number`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "listaPrecioItemId": 1,
+  "cantidadDesde": 1,
+  "cantidadHasta": 1,
+  "precio": 1,
+  "additionalProperty": "anything"
+}
+```
+
+### ListaPrecioItem
+
+- **Type:**`object`
+
+* **`articuloId`**
+
+  `integer`
+
+* **`escalonados`**
+
+  `array`
+
+  **Items:**
+
+  - **`cantidadDesde`**
+
+    `number`
+
+  - **`cantidadHasta`**
+
+    `number`
+
+  - **`id`**
+
+    `integer`
+
+  - **`listaPrecioItemId`**
+
+    `integer`
+
+  - **`precio`**
+
+    `number`
+
+* **`id`**
+
+  `integer`
+
+* **`listaPrecioId`**
+
+  `integer`
+
+* **`porcentaje`**
+
+  `number`
+
+* **`precio`**
+
+  `number`
+
+* **`tenantId`**
+
+  `integer`
+
+* **`tipoPrecio`**
+
+  `string`, possible values: `"fijo", "porcentaje_sobre_base"`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "tenantId": 1,
+  "listaPrecioId": 1,
+  "articuloId": 1,
+  "tipoPrecio": "fijo",
+  "precio": 1,
+  "porcentaje": 1,
+  "escalonados": [
+    {
+      "id": 1,
+      "listaPrecioItemId": 1,
+      "cantidadDesde": 1,
+      "cantidadHasta": 1,
+      "precio": 1,
+      "additionalProperty": "anything"
+    }
+  ],
+  "additionalProperty": "anything"
+}
+```
+
+### ListaPrecio
+
+- **Type:**`object`
+
+* **`activa`**
+
+  `boolean`
+
+* **`esDefault`**
+
+  `boolean`
+
+* **`id`**
+
+  `integer`
+
+* **`items`**
+
+  `array`
+
+  **Items:**
+
+  - **`articuloId`**
+
+    `integer`
+
+  - **`escalonados`**
+
+    `array`
+
+    **Items:**
+
+    - **`cantidadDesde`**
+
+      `number`
+
+    - **`cantidadHasta`**
+
+      `number`
+
+    - **`id`**
+
+      `integer`
+
+    - **`listaPrecioItemId`**
+
+      `integer`
+
+    - **`precio`**
+
+      `number`
+
+  - **`id`**
+
+    `integer`
+
+  - **`listaPrecioId`**
+
+    `integer`
+
+  - **`porcentaje`**
+
+    `number`
+
+  - **`precio`**
+
+    `number`
+
+  - **`tenantId`**
+
+    `integer`
+
+  - **`tipoPrecio`**
+
+    `string`, possible values: `"fijo", "porcentaje_sobre_base"`
+
+* **`moneda`**
+
+  `string`
+
+* **`nombre`**
+
+  `string`
+
+* **`tenantId`**
+
+  `integer`
+
+* **`vigenciaHasta`**
+
+  `string`, format: `date-time`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "tenantId": 1,
+  "nombre": "",
+  "moneda": "",
+  "activa": true,
+  "esDefault": true,
+  "vigenciaHasta": "",
+  "items": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "listaPrecioId": 1,
+      "articuloId": 1,
+      "tipoPrecio": "fijo",
+      "precio": 1,
+      "porcentaje": 1,
+      "escalonados": [
+        {
+          "id": 1,
+          "listaPrecioItemId": 1,
+          "cantidadDesde": 1,
+          "cantidadHasta": 1,
+          "precio": 1,
+          "additionalProperty": "anything"
+        }
+      ],
+      "additionalProperty": "anything"
+    }
+  ],
+  "additionalProperty": "anything"
+}
+```
+
+### ListaPrecioCreateInput
+
+- **Type:**`object`
+
+* **`nombre` (required)**
+
+  `string`
+
+* **`activa`**
+
+  `boolean`
+
+* **`esDefault`**
+
+  `boolean`
+
+* **`moneda`**
+
+  `string`
+
+* **`vigenciaHasta`**
+
+  `string`, format: `date-time`
+
+**Example:**
+
+```json
+{
+  "nombre": "",
+  "moneda": "",
+  "activa": true,
+  "esDefault": true,
+  "vigenciaHasta": ""
+}
+```
+
+### ListaPrecioPatchInput
+
+- **Type:**`object`
+
+* **`activa`**
+
+  `boolean`
+
+* **`esDefault`**
+
+  `boolean`
+
+* **`moneda`**
+
+  `string`
+
+* **`nombre`**
+
+  `string`
+
+* **`vigenciaHasta`**
+
+  `string`, format: `date-time`
+
+**Example:**
+
+```json
+{
+  "nombre": "",
+  "moneda": "",
+  "activa": true,
+  "esDefault": true,
+  "vigenciaHasta": ""
+}
+```
+
+### ListaPrecioItemInput
+
+- **Type:**`object`
+
+* **`articuloId` (required)**
+
+  `integer`
+
+* **`tipoPrecio` (required)**
+
+  `string`, possible values: `"fijo", "porcentaje_sobre_base"`
+
+* **`escalonados`**
+
+  `array`
+
+  **Items:**
+
+  - **`cantidadDesde` (required)**
+
+    `number`
+
+  - **`precio` (required)**
+
+    `number`
+
+  - **`cantidadHasta`**
+
+    `number`
+
+* **`porcentaje`**
+
+  `number`
+
+* **`precio`**
+
+  `number`
+
+**Example:**
+
+```json
+{
+  "articuloId": 1,
+  "tipoPrecio": "fijo",
+  "precio": 0,
+  "porcentaje": 1,
+  "escalonados": [
+    {
+      "cantidadDesde": 0,
+      "cantidadHasta": 1,
+      "precio": 0
+    }
+  ]
+}
+```
+
+### ListaPrecioBulkUpdateInput
+
+- **Type:**`object`
+
+* **`porcentaje` (required)**
+
+  `number`
+
+* **`preview`**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "porcentaje": 1,
+  "preview": true
+}
+```
+
+### ListaPrecioBulkUpdateResult
+
+- **Type:**`object`
+
+* **`afectados` (required)**
+
+  `integer`
+
+* **`ejemplos` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`articuloId`**
+
+    `integer`
+
+  - **`descripcion`**
+
+    `string`
+
+  - **`listaPrecioItemId`**
+
+    `integer`
+
+  - **`precioActual`**
+
+    `number`
+
+  - **`precioNuevo`**
+
+    `number`
+
+* **`preview` (required)**
+
+  `boolean`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "preview": true,
+  "afectados": 1,
+  "ejemplos": [
+    {
+      "listaPrecioItemId": 1,
+      "articuloId": 1,
+      "descripcion": "",
+      "precioActual": 1,
+      "precioNuevo": 1
+    }
+  ]
+}
+```
+
+### PrecioEfectivoResponse
+
+- **Type:**`object`
+
+* **`articuloId` (required)**
+
+  `integer`
+
+* **`cantidad` (required)**
+
+  `number`
+
+* **`moneda` (required)**
+
+  `string`
+
+* **`origen` (required)**
+
+  `string`, possible values: `"escalonado", "fijo", "porcentaje_sobre_base", "base"`
+
+* **`precio` (required)**
+
+  `number`
+
+* **`precioBase` (required)**
+
+  `number`
+
+* **`success` (required)**
+
+  `boolean`
+
+* **`listaPrecioId`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "articuloId": 1,
+  "listaPrecioId": 1,
+  "cantidad": 1,
+  "precioBase": 1,
+  "precio": 1,
+  "origen": "escalonado",
+  "moneda": ""
+}
+```
+
+### ListaPrecioEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`activa`**
+
+    `boolean`
+
+  - **`esDefault`**
+
+    `boolean`
+
+  - **`id`**
+
+    `integer`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId`**
+
+      `integer`
+
+    - **`escalonados`**
+
+      `array`
+
+      **Items:**
+
+      - **`cantidadDesde`**
+
+        `number`
+
+      - **`cantidadHasta`**
+
+        `number`
+
+      - **`id`**
+
+        `integer`
+
+      - **`listaPrecioItemId`**
+
+        `integer`
+
+      - **`precio`**
+
+        `number`
+
+    - **`id`**
+
+      `integer`
+
+    - **`listaPrecioId`**
+
+      `integer`
+
+    - **`porcentaje`**
+
+      `number`
+
+    - **`precio`**
+
+      `number`
+
+    - **`tenantId`**
+
+      `integer`
+
+    - **`tipoPrecio`**
+
+      `string`, possible values: `"fijo", "porcentaje_sobre_base"`
+
+  - **`moneda`**
+
+    `string`
+
+  - **`nombre`**
+
+    `string`
+
+  - **`tenantId`**
+
+    `integer`
+
+  - **`vigenciaHasta`**
+
+    `string`, format: `date-time`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "nombre": "",
+    "moneda": "",
+    "activa": true,
+    "esDefault": true,
+    "vigenciaHasta": "",
+    "items": [
+      {
+        "id": 1,
+        "tenantId": 1,
+        "listaPrecioId": 1,
+        "articuloId": 1,
+        "tipoPrecio": "fijo",
+        "precio": 1,
+        "porcentaje": 1,
+        "escalonados": [
+          {
+            "id": 1,
+            "listaPrecioItemId": 1,
+            "cantidadDesde": 1,
+            "cantidadHasta": 1,
+            "precio": 1,
+            "additionalProperty": "anything"
+          }
+        ],
+        "additionalProperty": "anything"
+      }
+    ],
+    "additionalProperty": "anything"
+  }
+}
+```
+
+### ListaPrecioItemEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`articuloId`**
+
+    `integer`
+
+  - **`escalonados`**
+
+    `array`
+
+    **Items:**
+
+    - **`cantidadDesde`**
+
+      `number`
+
+    - **`cantidadHasta`**
+
+      `number`
+
+    - **`id`**
+
+      `integer`
+
+    - **`listaPrecioItemId`**
+
+      `integer`
+
+    - **`precio`**
+
+      `number`
+
+  - **`id`**
+
+    `integer`
+
+  - **`listaPrecioId`**
+
+    `integer`
+
+  - **`porcentaje`**
+
+    `number`
+
+  - **`precio`**
+
+    `number`
+
+  - **`tenantId`**
+
+    `integer`
+
+  - **`tipoPrecio`**
+
+    `string`, possible values: `"fijo", "porcentaje_sobre_base"`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "listaPrecioId": 1,
+    "articuloId": 1,
+    "tipoPrecio": "fijo",
+    "precio": 1,
+    "porcentaje": 1,
+    "escalonados": [
+      {
+        "id": 1,
+        "listaPrecioItemId": 1,
+        "cantidadDesde": 1,
+        "cantidadHasta": 1,
+        "precio": 1,
+        "additionalProperty": "anything"
+      }
+    ],
+    "additionalProperty": "anything"
+  }
+}
+```
+
+### ListaPrecioListEnvelope
 
 - **Type:**
 

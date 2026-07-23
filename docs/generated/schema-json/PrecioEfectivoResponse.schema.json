@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "articuloId": {
+      "type": "integer"
+    },
+    "cantidad": {
+      "type": "number"
+    },
+    "listaPrecioId": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "moneda": {
+      "type": "string"
+    },
+    "origen": {
+      "enum": [
+        "escalonado",
+        "fijo",
+        "porcentaje_sobre_base",
+        "base"
+      ],
+      "type": "string"
+    },
+    "precio": {
+      "type": "number"
+    },
+    "precioBase": {
+      "type": "number"
+    },
+    "success": {
+      "const": true,
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "success",
+    "articuloId",
+    "cantidad",
+    "precioBase",
+    "precio",
+    "origen",
+    "moneda"
+  ],
+  "title": "PrecioEfectivoResponse",
+  "type": "object"
+}

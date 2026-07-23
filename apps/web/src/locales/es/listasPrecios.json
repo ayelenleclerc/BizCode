@@ -1,0 +1,64 @@
+{
+  "title": "Listas de precios",
+  "empty": "No hay listas de precios cargadas.",
+  "errors": {
+    "load": "No se pudieron cargar las listas de precios"
+  },
+  "form": {
+    "nombre": "Nombre",
+    "moneda": "Moneda",
+    "vigenciaHasta": "Vigente hasta",
+    "esDefault": "Lista por defecto"
+  },
+  "columns": {
+    "nombre": "Nombre",
+    "moneda": "Moneda",
+    "items": "Ítems",
+    "clientes": "Clientes",
+    "estado": "Estado",
+    "acciones": "Acciones"
+  },
+  "badge": {
+    "default": "Por defecto"
+  },
+  "estado": {
+    "activa": "Activa",
+    "inactiva": "Inactiva"
+  },
+  "actions": {
+    "editItems": "Editar ítems",
+    "activate": "Activar",
+    "deactivate": "Desactivar",
+    "delete": "Eliminar",
+    "close": "Cerrar"
+  },
+  "detail": {
+    "title": "Ítems de la lista: {{nombre}}",
+    "loading": "Cargando...",
+    "emptyItems": "Esta lista todavía no tiene ítems."
+  },
+  "item": {
+    "articulo": "Artículo",
+    "tipoPrecio": "Tipo de precio",
+    "precio": "Precio",
+    "porcentaje": "Porcentaje sobre base",
+    "valor": "Valor",
+    "tramos": "Tramos por cantidad",
+    "desde": "Desde",
+    "hasta": "Hasta",
+    "addTramo": "Agregar tramo",
+    "save": "Guardar ítem",
+    "tipo": {
+      "fijo": "Precio fijo",
+      "porcentaje": "% sobre precio base"
+    }
+  },
+  "bulk": {
+    "title": "Actualización masiva",
+    "hint": "Aplica un porcentaje a todos los precios fijos de la lista (ítems y tramos). Previsualice antes de aplicar.",
+    "porcentaje": "Porcentaje",
+    "preview": "Previsualizar",
+    "apply": "Aplicar",
+    "afectados": "Ítems afectados: {{count}}"
+  }
+}

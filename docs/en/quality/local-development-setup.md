@@ -41,6 +41,16 @@ corepack enable
 pnpm install --frozen-lockfile
 ```
 
+### Windows notes (pnpm)
+
+If `pnpm install` fails with `EPERM` / `ENOENT` while renaming packages under `node_modules`, use the Windows helper (retries + optional Defender **path** exclusions for this repo and the pnpm store only; it does **not** disable real-time protection):
+
+```bat
+powershell -ExecutionPolicy Bypass -File .\scripts\install-windows.ps1 -FrozenLockfile
+```
+
+Repo settings exclude `node_modules` from the editor file watcher (`.vscode/settings.json`). Prefer hardlinks over `package-import-method=copy` (see root `.npmrc` and [CONTRIBUTING.md](../../../CONTRIBUTING.md)).
+
 ## Environment
 
 Copy [`.env.example`](../../../.env.example) to `.env` and set at least:

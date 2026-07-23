@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "afectados": {
+      "type": "integer"
+    },
+    "ejemplos": {
+      "items": {
+        "properties": {
+          "articuloId": {
+            "type": "integer"
+          },
+          "descripcion": {
+            "type": "string"
+          },
+          "listaPrecioItemId": {
+            "type": "integer"
+          },
+          "precioActual": {
+            "nullable": true,
+            "type": "number"
+          },
+          "precioNuevo": {
+            "nullable": true,
+            "type": "number"
+          }
+        },
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "preview": {
+      "type": "boolean"
+    },
+    "success": {
+      "const": true,
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "success",
+    "preview",
+    "afectados",
+    "ejemplos"
+  ],
+  "title": "ListaPrecioBulkUpdateResult",
+  "type": "object"
+}

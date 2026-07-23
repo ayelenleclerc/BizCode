@@ -74,6 +74,12 @@ model Cliente {
   // ── Logistics (Issue #32) ─────────────────────────────────────────────────
   deliveryZoneId Int?
   deliveryZone   DeliveryZone? @relation(fields: [deliveryZoneId], references: [id])
+  // ── Pricing (Issue #234) ──────────────────────────────────────────────────
+  /// @en Default price list assigned to this customer; null = base article price (#234).
+  /// @es Lista de precios por defecto del cliente; null = precio base del artículo (#234).
+  /// @pt-BR Lista de preços padrão do cliente; null = preço base do artigo (#234).
+  listaPrecioId  Int?
+  listaPrecio    ListaPrecio? @relation(fields: [listaPrecioId], references: [id])
   // ──────────────────────────────────────────────────────────────────────────
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
@@ -152,12 +158,93 @@ model Articulo {
   recuentoItems        RecuentoItem[]
   proveedorArticulos   ProveedorArticulo[]
   garantias            Garantia[]
+  listaPrecioItems     ListaPrecioItem[]
 
   @@unique([tenantId, codigo])
   @@index([tenantId])
   @@index([tenantId, codigo])
   @@index([tenantId, rubroId])
   @@index([tenantId, tipo])
+}
+
+/// @en Customer price list with optional currency and expiry (#234).
+/// @es Lista de precios de cliente con moneda y vigencia opcionales (#234).
+/// @pt-BR Lista de preços de cliente com moeda e validade opcionais (#234).
+model ListaPrecio {
+  id            Int      @id @default(autoincrement())
+  tenantId      Int
+  tenant        Tenant   @relation(fields: [tenantId], references: [id])
+  nombre        String   @db.VarChar(80)
+  /// @en ISO currency code for the list (default ARS).
+  /// @es Código ISO de moneda de la lista (por defecto ARS).
+  /// @pt-BR Código ISO da moeda da lista (padrão ARS).
+  moneda        String   @default("ARS") @db.VarChar(3)
+  activa        Boolean  @default(true)
+  /// @en Base list used as fallback when a customer has no list assigned.
+  /// @es Lista base usada como respaldo cuando el cliente no tiene lista asignada.
+  /// @pt-BR Lista base usada como fallback quando o cliente não tem lista atribuída.
+  esDefault     Boolean  @default(false)
+  /// @en Expiry date; null = no expiry. Expired lists fall back to base price (#234).
+  /// @es Fecha de vencimiento; null = sin vencimiento. Listas vencidas usan precio base (#234).
+  /// @pt-BR Data de expiração; null = sem expiração. Listas expiradas usam preço base (#234).
+  vigenciaHasta DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  items         ListaPrecioItem[]
+  clientes      Cliente[]
+
+  @@unique([tenantId, nombre])
+  @@index([tenantId])
+  @@index([tenantId, activa])
+}
+
+/// @en Price of one article inside a price list: fixed value or percent over the base article price (#234).
+/// @es Precio de un artículo dentro de una lista: valor fijo o porcentaje sobre el precio base del artículo (#234).
+/// @pt-BR Preço de um artigo dentro de uma lista: valor fixo ou percentual sobre o preço base do artigo (#234).
+model ListaPrecioItem {
+  id            Int         @id @default(autoincrement())
+  tenantId      Int
+  listaPrecioId Int
+  listaPrecio   ListaPrecio @relation(fields: [listaPrecioId], references: [id], onDelete: Cascade)
+  articuloId    Int
+  articulo      Articulo    @relation(fields: [articuloId], references: [id], onDelete: Cascade)
+  /// fijo | porcentaje_sobre_base
+  tipoPrecio    String      @db.VarChar(24)
+  /// @en Fixed price when tipoPrecio=fijo.
+  /// @es Precio fijo cuando tipoPrecio=fijo.
+  /// @pt-BR Preço fixo quando tipoPrecio=fijo.
+  precio        Decimal?    @db.Decimal(14, 2)
+  /// @en Percentage over base price when tipoPrecio=porcentaje_sobre_base (e.g. -15 = 15% discount).
+  /// @es Porcentaje sobre precio base cuando tipoPrecio=porcentaje_sobre_base (ej: -15 = 15% descuento).
+  /// @pt-BR Percentual sobre o preço base quando tipoPrecio=porcentaje_sobre_base (ex.: -15 = 15% desconto).
+  porcentaje    Decimal?    @db.Decimal(7, 2)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  escalonados   PrecioEscalonado[]
+
+  @@unique([listaPrecioId, articuloId])
+  @@index([tenantId])
+  @@index([listaPrecioId])
+  @@index([articuloId])
+}
+
+/// @en Quantity-tiered price for a price-list item; the matching tier overrides the item price (#234).
+/// @es Precio escalonado por cantidad para un ítem de lista; el tramo coincidente pisa el precio del ítem (#234).
+/// @pt-BR Preço escalonado por quantidade para um item de lista; a faixa correspondente sobrepõe o preço do item (#234).
+model PrecioEscalonado {
+  id                Int             @id @default(autoincrement())
+  listaPrecioItemId Int
+  listaPrecioItem   ListaPrecioItem @relation(fields: [listaPrecioItemId], references: [id], onDelete: Cascade)
+  cantidadDesde     Decimal         @db.Decimal(14, 2)
+  /// @en Upper bound (inclusive); null = no upper limit.
+  /// @es Límite superior (inclusive); null = sin límite superior.
+  /// @pt-BR Limite superior (inclusive); null = sem limite superior.
+  cantidadHasta     Decimal?        @db.Decimal(14, 2)
+  precio            Decimal         @db.Decimal(14, 2)
+
+  @@index([listaPrecioItemId])
 }
 
 model Proveedor {
@@ -1009,6 +1096,7 @@ model Tenant {
   clientes       Cliente[]
   rubros         Rubro[]
   articulos      Articulo[]
+  listasPrecios  ListaPrecio[]
   proveedores         Proveedor[]
   ordenesCompra       OrdenCompra[]
   comprobantesCompra       ComprobanteCompra[]

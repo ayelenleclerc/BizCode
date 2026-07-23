@@ -57,6 +57,8 @@
     },
     "deliveryZone": "Delivery zone",
     "deliveryZoneNone": "No zone assigned",
+    "listaPrecio": "Price list",
+    "listaPrecioNone": "Base price (no list)",
     "financial": {
       "section": "Financial status",
       "creditLimit": "Credit limit",

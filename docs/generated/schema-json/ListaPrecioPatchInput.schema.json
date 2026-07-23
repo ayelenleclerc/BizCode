@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "minProperties": 1,
+  "properties": {
+    "activa": {
+      "type": "boolean"
+    },
+    "esDefault": {
+      "type": "boolean"
+    },
+    "moneda": {
+      "maxLength": 3,
+      "minLength": 3,
+      "type": "string"
+    },
+    "nombre": {
+      "maxLength": 80,
+      "minLength": 1,
+      "type": "string"
+    },
+    "vigenciaHasta": {
+      "format": "date-time",
+      "nullable": true,
+      "type": "string"
+    }
+  },
+  "title": "ListaPrecioPatchInput",
+  "type": "object"
+}

@@ -47,6 +47,10 @@ export class ClienteService {
     if (!zoneCheck.ok) {
       return zoneCheck
     }
+    const listaCheck = await this.validateListaPrecio(tenantId, body.listaPrecioId)
+    if (!listaCheck.ok) {
+      return listaCheck
+    }
     const cliente = await this.prisma.cliente.create({
       data: { ...body, tenantId },
     })
@@ -65,6 +69,11 @@ export class ClienteService {
     const zoneCheck = await this.validateDeliveryZone(tenantId, data.deliveryZoneId)
     if (!zoneCheck.ok) {
       return zoneCheck
+    }
+
+    const listaCheck = await this.validateListaPrecio(tenantId, data.listaPrecioId)
+    if (!listaCheck.ok) {
+      return listaCheck
     }
 
     const existingCliente = await this.prisma.cliente.findFirst({ where: { id, tenantId } })
@@ -91,6 +100,22 @@ export class ClienteService {
     })
     if (!zone) {
       return { ok: false, status: 400, error: 'deliveryZoneId does not belong to this tenant' }
+    }
+    return { ok: true, data: null }
+  }
+
+  private async validateListaPrecio(
+    tenantId: number,
+    listaPrecioId: number | null | undefined,
+  ): Promise<ServiceResult<null>> {
+    if (listaPrecioId == null) {
+      return { ok: true, data: null }
+    }
+    const lista = await this.prisma.listaPrecio.findFirst({
+      where: { id: listaPrecioId, tenantId },
+    })
+    if (!lista) {
+      return { ok: false, status: 400, error: 'listaPrecioId does not belong to this tenant' }
     }
     return { ok: true, data: null }
   }

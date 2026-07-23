@@ -77,6 +77,7 @@ describe('libroIvaVentasMapper', () => {
     score: 50,
     suspended: false,
     deliveryZoneId: null,
+    listaPrecioId: null,
     createdAt: new Date(),
     updatedAt: new Date(),
   }
