@@ -1,0 +1,25 @@
+{
+  "title": "Depósitos",
+  "subtitle": "Almacenes y ubicaciones de stock",
+  "create": "Crear depósito",
+  "nombre": "Nombre",
+  "codigo": "Código",
+  "tipo": "Tipo",
+  "direccion": "Dirección",
+  "esDefault": "Por defecto",
+  "activo": "Activo",
+  "empty": "No hay depósitos",
+  "tipos": {
+    "central": "Central",
+    "sucursal": "Sucursal",
+    "externo": "Externo",
+    "picking": "Picking",
+    "transito": "Tránsito"
+  },
+  "errors": {
+    "load": "No se pudieron cargar los depósitos",
+    "save": "No se pudo guardar el depósito",
+    "delete": "No se pudo eliminar el depósito"
+  },
+  "confirmDelete": "¿Eliminar este depósito?"
+}

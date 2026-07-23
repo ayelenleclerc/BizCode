@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "aprobadoPorId": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "createdAt": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "destinoCodigo": {
+      "type": "string"
+    },
+    "destinoId": {
+      "type": "integer"
+    },
+    "estado": {
+      "enum": [
+        "pendiente",
+        "en_transito",
+        "recibida",
+        "anulada"
+      ],
+      "type": "string"
+    },
+    "fechaEnvio": {
+      "format": "date-time",
+      "nullable": true,
+      "type": "string"
+    },
+    "fechaRecepcion": {
+      "format": "date-time",
+      "nullable": true,
+      "type": "string"
+    },
+    "id": {
+      "type": "integer"
+    },
+    "items": {
+      "items": {
+        "$ref": "./TransferenciaDepositoItem.schema.json"
+      },
+      "type": "array"
+    },
+    "nota": {
+      "nullable": true,
+      "type": "string"
+    },
+    "numero": {
+      "type": "integer"
+    },
+    "origenCodigo": {
+      "type": "string"
+    },
+    "origenId": {
+      "type": "integer"
+    },
+    "solicitadoPorId": {
+      "type": "integer"
+    },
+    "tenantId": {
+      "type": "integer"
+    },
+    "updatedAt": {
+      "format": "date-time",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "tenantId",
+    "numero",
+    "origenId",
+    "destinoId",
+    "estado",
+    "solicitadoPorId",
+    "aprobadoPorId",
+    "fechaEnvio",
+    "fechaRecepcion",
+    "nota",
+    "createdAt",
+    "updatedAt"
+  ],
+  "title": "TransferenciaDeposito",
+  "type": "object"
+}

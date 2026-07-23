@@ -1081,6 +1081,7 @@ export const stockAjusteBodySchema = z
   .object({
     cantidad: z.number({ invalid_type_error: 'cantidad must be a number' }),
     motivo: z.string({ invalid_type_error: 'motivo must be a string' }),
+    depositoId: z.union([z.number().int().min(1), z.null()]).optional(),
   })
   .superRefine((data, ctx) => {
     if (!Number.isInteger(data.cantidad) || data.cantidad === 0) {
@@ -1102,6 +1103,7 @@ export const stockAjusteBodySchema = z
   .transform((data): StockAjusteInput => ({
     cantidad: data.cantidad,
     motivo: data.motivo.trim(),
+    depositoId: data.depositoId ?? null,
   }))
 
 const empresaTipoFacturaSchema = z.enum(['A', 'B', 'C'], {
@@ -3130,4 +3132,99 @@ export const articuloImagenReorderBodySchema = z.object({
 
 export const precioCatalogoEfectivoQuerySchema = z.object({
   articuloId: requiredPositiveIntQuery,
+})
+
+// ── Depósitos / transferencias (#236) ───────────────────────────────────────
+
+const depositoTipoSchema = z.enum(['central', 'sucursal', 'externo', 'picking', 'transito'])
+
+export const depositoCreateBodySchema = z
+  .object({
+    nombre: z.string().min(1).max(80),
+    codigo: z.string().min(1).max(20),
+    tipo: depositoTipoSchema,
+    direccion: z.union([z.string().max(200), z.null()]).optional(),
+    responsableId: z.union([z.number().int().min(1), z.null()]).optional(),
+    activo: z.boolean().optional(),
+    esDefault: z.boolean().optional(),
+  })
+  .transform((data) => ({
+    nombre: data.nombre.trim(),
+    codigo: data.codigo.trim().toUpperCase(),
+    tipo: data.tipo,
+    direccion:
+      data.direccion === undefined || data.direccion === null
+        ? null
+        : data.direccion.trim() || null,
+    responsableId: data.responsableId ?? null,
+    activo: data.activo ?? true,
+    esDefault: data.esDefault ?? false,
+  }))
+
+export const depositoPatchBodySchema = z
+  .object({
+    nombre: z.string().min(1).max(80).optional(),
+    codigo: z.string().min(1).max(20).optional(),
+    tipo: depositoTipoSchema.optional(),
+    direccion: z.union([z.string().max(200), z.null()]).optional(),
+    responsableId: z.union([z.number().int().min(1), z.null()]).optional(),
+    activo: z.boolean().optional(),
+    esDefault: z.boolean().optional(),
+  })
+  .refine((data) => Object.keys(data).length > 0, { message: 'at least one field is required' })
+  .transform((data) => {
+    const out: {
+      nombre?: string
+      codigo?: string
+      tipo?: z.infer<typeof depositoTipoSchema>
+      direccion?: string | null
+      responsableId?: number | null
+      activo?: boolean
+      esDefault?: boolean
+    } = {}
+    if (data.nombre !== undefined) out.nombre = data.nombre.trim()
+    if (data.codigo !== undefined) out.codigo = data.codigo.trim().toUpperCase()
+    if (data.tipo !== undefined) out.tipo = data.tipo
+    if (data.direccion !== undefined) {
+      out.direccion = data.direccion === null ? null : data.direccion.trim() || null
+    }
+    if (data.responsableId !== undefined) out.responsableId = data.responsableId
+    if (data.activo !== undefined) out.activo = data.activo
+    if (data.esDefault !== undefined) out.esDefault = data.esDefault
+    return out
+  })
+
+export const transferenciaDepositoCreateBodySchema = z
+  .object({
+    origenId: z.number().int().min(1),
+    destinoId: z.number().int().min(1),
+    nota: z.union([z.string().max(200), z.null()]).optional(),
+    items: z
+      .array(
+        z.object({
+          articuloId: z.number().int().min(1),
+          cantidadEnviada: z.number().int().min(1),
+        }),
+      )
+      .min(1),
+  })
+  .refine((data) => data.origenId !== data.destinoId, {
+    message: 'origenId and destinoId must differ',
+  })
+  .transform((data) => ({
+    origenId: data.origenId,
+    destinoId: data.destinoId,
+    nota: data.nota === undefined || data.nota === null ? null : data.nota.trim() || null,
+    items: data.items,
+  }))
+
+export const transferenciaDepositoRecibirBodySchema = z.object({
+  items: z
+    .array(
+      z.object({
+        articuloId: z.number().int().min(1),
+        cantidadRecibida: z.number().int().min(0),
+      }),
+    )
+    .min(1),
 })

@@ -58,6 +58,8 @@ tags:
     description: Customer price lists with quantity-tiered pricing (#234, module catalog.pricelists)
   - name: categorias-articulo
     description: Hierarchical article categories and attributes for variants (#235, module catalog.variants)
+  - name: depositos
+    description: Multi-warehouse deposits and transfers (#236, module inventory.warehouses)
   - name: cobros
     description: Customer payment collections
   - name: portal
@@ -9956,6 +9958,355 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
 
+  /api/depositos:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [depositos]
+      summary: List deposits
+      description: Requires module `inventory.warehouses`.
+      parameters:
+        - $ref: '#/components/parameters/ListLimit'
+        - $ref: '#/components/parameters/ListOffset'
+        - name: activo
+          in: query
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Paginated deposits
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DepositoListEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    post:
+      tags: [depositos]
+      summary: Create deposit
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DepositoCreateInput'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DepositoEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '409':
+          description: Duplicate codigo
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/depositos/{id}:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    get:
+      tags: [depositos]
+      summary: Get deposit by id
+      responses:
+        '200':
+          description: Deposit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DepositoEnvelope'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    patch:
+      tags: [depositos]
+      summary: Update deposit
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DepositoPatchInput'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DepositoEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    delete:
+      tags: [depositos]
+      summary: Delete deposit
+      responses:
+        '204':
+          description: Deleted
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '422':
+          description: Cannot delete (default or has stock)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/articulos/{id}/stock-depositos:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    get:
+      tags: [depositos]
+      summary: Stock breakdown by deposit for an article
+      description: Requires module `inventory.warehouses`.
+      responses:
+        '200':
+          description: Stock by deposit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArticuloStockPorDepositoResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/transferencias-deposito:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [depositos]
+      summary: List inter-warehouse transfers
+      parameters:
+        - $ref: '#/components/parameters/ListLimit'
+        - $ref: '#/components/parameters/ListOffset'
+        - name: estado
+          in: query
+          schema:
+            type: string
+            enum: [pendiente, en_transito, recibida, anulada]
+      responses:
+        '200':
+          description: Paginated transfers
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransferenciaDepositoListEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    post:
+      tags: [depositos]
+      summary: Create transfer (pendiente)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransferenciaDepositoCreateInput'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransferenciaDepositoEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/transferencias-deposito/{id}:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    get:
+      tags: [depositos]
+      summary: Get transfer by id
+      responses:
+        '200':
+          description: Transfer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransferenciaDepositoEnvelope'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/transferencias-deposito/{id}/en-transito:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    post:
+      tags: [depositos]
+      summary: Mark transfer in transit (debit origin)
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransferenciaDepositoEnvelope'
+        '422':
+          description: Invalid state or insufficient stock
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/transferencias-deposito/{id}/recibir:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    post:
+      tags: [depositos]
+      summary: Receive transfer (credit destination)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransferenciaDepositoRecibirInput'
+      responses:
+        '200':
+          description: Received
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransferenciaDepositoEnvelope'
+        '422':
+          description: Invalid state or quantities
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/transferencias-deposito/{id}/anular:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    post:
+      tags: [depositos]
+      summary: Cancel transfer
+      responses:
+        '200':
+          description: Cancelled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransferenciaDepositoEnvelope'
+        '422':
+          description: Not cancellable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
 components:
   securitySchemes:
     cookieSession:
@@ -16809,6 +17160,297 @@ components:
         updatedAt:
           type: string
           format: date-time
+
+    Deposito:
+      type: object
+      required: [id, tenantId, nombre, codigo, tipo, direccion, responsableId, activo, esDefault, createdAt, updatedAt]
+      properties:
+        id:
+          type: integer
+        tenantId:
+          type: integer
+        nombre:
+          type: string
+        codigo:
+          type: string
+        tipo:
+          type: string
+          enum: [central, sucursal, externo, picking, transito]
+        direccion:
+          type: string
+          nullable: true
+        responsableId:
+          type: integer
+          nullable: true
+        activo:
+          type: boolean
+        esDefault:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    DepositoCreateInput:
+      type: object
+      required: [nombre, codigo, tipo]
+      properties:
+        nombre:
+          type: string
+          maxLength: 80
+        codigo:
+          type: string
+          maxLength: 20
+        tipo:
+          type: string
+          enum: [central, sucursal, externo, picking, transito]
+        direccion:
+          type: string
+          nullable: true
+          maxLength: 200
+        responsableId:
+          type: integer
+          nullable: true
+          minimum: 1
+        activo:
+          type: boolean
+        esDefault:
+          type: boolean
+
+    DepositoPatchInput:
+      type: object
+      properties:
+        nombre:
+          type: string
+          maxLength: 80
+        codigo:
+          type: string
+          maxLength: 20
+        tipo:
+          type: string
+          enum: [central, sucursal, externo, picking, transito]
+        direccion:
+          type: string
+          nullable: true
+        responsableId:
+          type: integer
+          nullable: true
+        activo:
+          type: boolean
+        esDefault:
+          type: boolean
+
+    DepositoEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          enum: [true]
+        data:
+          $ref: '#/components/schemas/Deposito'
+
+    DepositoListEnvelope:
+      allOf:
+        - type: object
+          required: [success, data]
+          properties:
+            success:
+              type: boolean
+              enum: [true]
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/Deposito'
+        - $ref: '#/components/schemas/ListPaginationMeta'
+
+    StockDeposito:
+      type: object
+      required: [id, tenantId, articuloId, depositoId, cantidad, stockMin, stockMax, createdAt, updatedAt]
+      properties:
+        id:
+          type: integer
+        tenantId:
+          type: integer
+        articuloId:
+          type: integer
+        depositoId:
+          type: integer
+        depositoCodigo:
+          type: string
+        depositoNombre:
+          type: string
+        cantidad:
+          type: integer
+        stockMin:
+          type: integer
+        stockMax:
+          type: integer
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    ArticuloStockPorDepositoResponse:
+      type: object
+      required: [success, articuloId, stockTotal, enTransito, depositos]
+      properties:
+        success:
+          type: boolean
+          enum: [true]
+        articuloId:
+          type: integer
+        stockTotal:
+          type: integer
+        enTransito:
+          type: integer
+        depositos:
+          type: array
+          items:
+            $ref: '#/components/schemas/StockDeposito'
+
+    TransferenciaDepositoItem:
+      type: object
+      required: [id, transferenciaId, articuloId, cantidadEnviada, cantidadRecibida]
+      properties:
+        id:
+          type: integer
+        transferenciaId:
+          type: integer
+        articuloId:
+          type: integer
+        cantidadEnviada:
+          type: integer
+        cantidadRecibida:
+          type: integer
+          nullable: true
+        articuloCodigo:
+          type: integer
+        articuloDescripcion:
+          type: string
+
+    TransferenciaDeposito:
+      type: object
+      required: [id, tenantId, numero, origenId, destinoId, estado, solicitadoPorId, aprobadoPorId, fechaEnvio, fechaRecepcion, nota, createdAt, updatedAt]
+      properties:
+        id:
+          type: integer
+        tenantId:
+          type: integer
+        numero:
+          type: integer
+        origenId:
+          type: integer
+        destinoId:
+          type: integer
+        estado:
+          type: string
+          enum: [pendiente, en_transito, recibida, anulada]
+        solicitadoPorId:
+          type: integer
+        aprobadoPorId:
+          type: integer
+          nullable: true
+        fechaEnvio:
+          type: string
+          format: date-time
+          nullable: true
+        fechaRecepcion:
+          type: string
+          format: date-time
+          nullable: true
+        nota:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        origenCodigo:
+          type: string
+        destinoCodigo:
+          type: string
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/TransferenciaDepositoItem'
+
+    TransferenciaDepositoCreateInput:
+      type: object
+      required: [origenId, destinoId, items]
+      properties:
+        origenId:
+          type: integer
+          minimum: 1
+        destinoId:
+          type: integer
+          minimum: 1
+        nota:
+          type: string
+          nullable: true
+          maxLength: 200
+        items:
+          type: array
+          minItems: 1
+          items:
+            type: object
+            required: [articuloId, cantidadEnviada]
+            properties:
+              articuloId:
+                type: integer
+                minimum: 1
+              cantidadEnviada:
+                type: integer
+                minimum: 1
+
+    TransferenciaDepositoRecibirInput:
+      type: object
+      required: [items]
+      properties:
+        items:
+          type: array
+          minItems: 1
+          items:
+            type: object
+            required: [articuloId, cantidadRecibida]
+            properties:
+              articuloId:
+                type: integer
+                minimum: 1
+              cantidadRecibida:
+                type: integer
+                minimum: 0
+
+    TransferenciaDepositoEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          enum: [true]
+        data:
+          $ref: '#/components/schemas/TransferenciaDeposito'
+
+    TransferenciaDepositoListEnvelope:
+      allOf:
+        - type: object
+          required: [success, data]
+          properties:
+            success:
+              type: boolean
+              enum: [true]
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/TransferenciaDeposito'
+        - $ref: '#/components/schemas/ListPaginationMeta'
 
     CategoriaArticuloCreateInput:
       type: object

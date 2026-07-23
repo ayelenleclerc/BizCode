@@ -61,7 +61,11 @@ export function registerRecuentosRoutes(app: Application, ctx: RestRouteContext)
       try {
         const authReq = req as AuthenticatedRequest
         const tenantId = getTenantId(req)
-        const result = await recuentos.start(tenantId, authReq.auth!.claims.userId)
+        const result = await recuentos.start(
+          tenantId,
+          authReq.auth!.claims.userId,
+          typeof req.body?.depositoId === 'number' ? req.body.depositoId : null,
+        )
         if (!result.ok) {
           res.status(result.status).json({ success: false, error: result.error })
           return

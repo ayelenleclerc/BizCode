@@ -255,6 +255,7 @@ export class PedidoService {
         estado: 'draft',
         total,
         validUntil: parseValidUntil(input.validUntil),
+        ...(input.depositoId != null ? { depositoId: input.depositoId } : {}),
         items: {
           create: resolved.data,
         },
@@ -296,6 +297,7 @@ export class PedidoService {
           vendedorId: input.vendedorId ?? null,
           total,
           validUntil: parseValidUntil(input.validUntil),
+          ...(input.depositoId !== undefined ? { depositoId: input.depositoId } : {}),
           items: {
             create: resolved.data,
           },

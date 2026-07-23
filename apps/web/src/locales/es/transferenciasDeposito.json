@@ -1,0 +1,27 @@
+{
+  "title": "Transferencias entre depósitos",
+  "subtitle": "Mover stock entre almacenes",
+  "create": "Nueva transferencia",
+  "origen": "Origen",
+  "destino": "Destino",
+  "articuloId": "Artículo ID",
+  "cantidad": "Cantidad",
+  "addItem": "Agregar ítem",
+  "enviar": "Marcar en tránsito",
+  "recibir": "Recibir",
+  "anular": "Anular",
+  "estado": "Estado",
+  "numero": "Número",
+  "empty": "No hay transferencias",
+  "estados": {
+    "pendiente": "Pendiente",
+    "en_transito": "En tránsito",
+    "recibida": "Recibida",
+    "anulada": "Anulada"
+  },
+  "errors": {
+    "load": "No se pudieron cargar las transferencias",
+    "save": "No se pudo crear la transferencia",
+    "action": "No se pudo completar la acción"
+  }
+}

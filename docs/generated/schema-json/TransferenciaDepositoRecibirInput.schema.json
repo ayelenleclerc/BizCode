@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "items": {
+      "items": {
+        "properties": {
+          "articuloId": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "cantidadRecibida": {
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "articuloId",
+          "cantidadRecibida"
+        ],
+        "type": "object"
+      },
+      "minItems": 1,
+      "type": "array"
+    }
+  },
+  "required": [
+    "items"
+  ],
+  "title": "TransferenciaDepositoRecibirInput",
+  "type": "object"
+}

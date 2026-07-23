@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "articuloId": {
+      "type": "integer"
+    },
+    "depositos": {
+      "items": {
+        "$ref": "./StockDeposito.schema.json"
+      },
+      "type": "array"
+    },
+    "enTransito": {
+      "type": "integer"
+    },
+    "stockTotal": {
+      "type": "integer"
+    },
+    "success": {
+      "enum": [
+        true
+      ],
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "success",
+    "articuloId",
+    "stockTotal",
+    "enTransito",
+    "depositos"
+  ],
+  "title": "ArticuloStockPorDepositoResponse",
+  "type": "object"
+}

@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "articuloCodigo": {
+      "type": "integer"
+    },
+    "articuloDescripcion": {
+      "type": "string"
+    },
+    "articuloId": {
+      "type": "integer"
+    },
+    "cantidadEnviada": {
+      "type": "integer"
+    },
+    "cantidadRecibida": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "id": {
+      "type": "integer"
+    },
+    "transferenciaId": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "id",
+    "transferenciaId",
+    "articuloId",
+    "cantidadEnviada",
+    "cantidadRecibida"
+  ],
+  "title": "TransferenciaDepositoItem",
+  "type": "object"
+}

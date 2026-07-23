@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "activo": {
+      "type": "boolean"
+    },
+    "codigo": {
+      "type": "string"
+    },
+    "createdAt": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "direccion": {
+      "nullable": true,
+      "type": "string"
+    },
+    "esDefault": {
+      "type": "boolean"
+    },
+    "id": {
+      "type": "integer"
+    },
+    "nombre": {
+      "type": "string"
+    },
+    "responsableId": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "tenantId": {
+      "type": "integer"
+    },
+    "tipo": {
+      "enum": [
+        "central",
+        "sucursal",
+        "externo",
+        "picking",
+        "transito"
+      ],
+      "type": "string"
+    },
+    "updatedAt": {
+      "format": "date-time",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "tenantId",
+    "nombre",
+    "codigo",
+    "tipo",
+    "direccion",
+    "responsableId",
+    "activo",
+    "esDefault",
+    "createdAt",
+    "updatedAt"
+  ],
+  "title": "Deposito",
+  "type": "object"
+}

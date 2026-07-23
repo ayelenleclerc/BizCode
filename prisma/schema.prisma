@@ -290,6 +290,8 @@ model Articulo {
   ordenTrabajoItems OrdenTrabajoItem[]
   remitoItems      RemitoItem[]
   stockAjustes     StockAjuste[]
+  stockDepositos   StockDeposito[]
+  transferenciaItems TransferenciaDepositoItem[]
   ordenCompraItems     OrdenCompraItem[]
   recuentoItems        RecuentoItem[]
   proveedorArticulos   ProveedorArticulo[]
@@ -307,6 +309,113 @@ model Articulo {
   @@index([tenantId, padreId])
   @@index([tenantId, categoriaId])
   @@index([tenantId, esPadre])
+}
+
+/// @en Physical warehouse / stock location for a tenant (#236).
+/// @es Depósito / ubicación de stock de un tenant (#236).
+/// @pt-BR Depósito / localização de estoque de um tenant (#236).
+model Deposito {
+  id             Int      @id @default(autoincrement())
+  tenantId       Int
+  tenant         Tenant   @relation(fields: [tenantId], references: [id])
+  nombre         String   @db.VarChar(80)
+  codigo         String   @db.VarChar(20)
+  /// central | sucursal | externo | picking | transito
+  tipo           String   @db.VarChar(20)
+  direccion      String?  @db.VarChar(200)
+  responsableId  Int?
+  responsable    AppUser? @relation("DepositoResponsable", fields: [responsableId], references: [id], onDelete: SetNull)
+  activo         Boolean  @default(true)
+  esDefault      Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  stockRows          StockDeposito[]
+  transferenciasOrigen  TransferenciaDeposito[] @relation("TransfOrigen")
+  transferenciasDestino TransferenciaDeposito[] @relation("TransfDestino")
+  facturas           Factura[]
+  pedidos            Pedido[]
+  ordenesCompra      OrdenCompra[]
+  stockAjustes       StockAjuste[]
+  recuentos          Recuento[]
+  ordenesEntrega     OrdenEntrega[]
+
+  @@unique([tenantId, codigo])
+  @@index([tenantId])
+  @@index([tenantId, activo])
+  @@index([tenantId, esDefault])
+}
+
+/// @en Stock quantity of one article inside one deposit (#236). Articulo.stock is the sum cache.
+/// @es Cantidad de stock de un artículo en un depósito (#236). Articulo.stock es la suma cacheada.
+/// @pt-BR Quantidade de estoque de um artigo em um depósito (#236). Articulo.stock é a soma em cache.
+model StockDeposito {
+  id         Int      @id @default(autoincrement())
+  tenantId   Int
+  tenant     Tenant   @relation(fields: [tenantId], references: [id])
+  articuloId Int
+  articulo   Articulo @relation(fields: [articuloId], references: [id], onDelete: Cascade)
+  depositoId Int
+  deposito   Deposito @relation(fields: [depositoId], references: [id], onDelete: Restrict)
+  cantidad   Int      @default(0)
+  stockMin   Int      @default(0)
+  stockMax   Int?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([articuloId, depositoId])
+  @@index([tenantId])
+  @@index([tenantId, depositoId])
+  @@index([tenantId, articuloId])
+}
+
+/// @en Inter-warehouse transfer header (#236).
+/// @es Cabecera de transferencia entre depósitos (#236).
+/// @pt-BR Cabeçalho de transferência entre depósitos (#236).
+model TransferenciaDeposito {
+  id             Int       @id @default(autoincrement())
+  tenantId       Int
+  tenant         Tenant    @relation(fields: [tenantId], references: [id])
+  numero         Int
+  origenId       Int
+  origen         Deposito  @relation("TransfOrigen", fields: [origenId], references: [id], onDelete: Restrict)
+  destinoId      Int
+  destino        Deposito  @relation("TransfDestino", fields: [destinoId], references: [id], onDelete: Restrict)
+  /// pendiente | en_transito | recibida | anulada
+  estado         String    @db.VarChar(20) @default("pendiente")
+  solicitadoPorId Int
+  solicitadoPor  AppUser   @relation("TransferenciaSolicitadoPor", fields: [solicitadoPorId], references: [id])
+  aprobadoPorId  Int?
+  aprobadoPor    AppUser?  @relation("TransferenciaAprobadoPor", fields: [aprobadoPorId], references: [id])
+  fechaEnvio     DateTime?
+  fechaRecepcion DateTime?
+  nota           String?   @db.VarChar(200)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  items TransferenciaDepositoItem[]
+
+  @@unique([tenantId, numero])
+  @@index([tenantId, estado])
+  @@index([tenantId, origenId])
+  @@index([tenantId, destinoId])
+}
+
+/// @en Line item of an inter-warehouse transfer (#236).
+/// @es Ítem de una transferencia entre depósitos (#236).
+/// @pt-BR Item de uma transferência entre depósitos (#236).
+model TransferenciaDepositoItem {
+  id                Int                   @id @default(autoincrement())
+  transferenciaId   Int
+  transferencia     TransferenciaDeposito @relation(fields: [transferenciaId], references: [id], onDelete: Cascade)
+  articuloId        Int
+  articulo          Articulo              @relation(fields: [articuloId], references: [id], onDelete: Restrict)
+  cantidadEnviada   Int
+  cantidadRecibida  Int?
+
+  @@unique([transferenciaId, articuloId])
+  @@index([transferenciaId])
+  @@index([articuloId])
 }
 
 /// @en Customer price list with optional currency and expiry (#234).
@@ -469,6 +578,11 @@ model OrdenCompra {
   total         Decimal  @db.Decimal(14, 2) @default(0)
   fechaEstimada DateTime?
   nota          String?  @db.VarChar(200)
+  /// @en Destination deposit for goods receipt when inventory.warehouses is enabled (#236).
+  /// @es Depósito destino de la recepción cuando inventory.warehouses está activo (#236).
+  /// @pt-BR Depósito destino da recepção quando inventory.warehouses está ativo (#236).
+  depositoId    Int?
+  deposito      Deposito? @relation(fields: [depositoId], references: [id], onDelete: SetNull)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
@@ -477,6 +591,7 @@ model OrdenCompra {
 
   @@index([tenantId, estado])
   @@index([tenantId, proveedorId])
+  @@index([tenantId, depositoId])
 }
 
 /// Supplier fiscal voucher for Libro IVA Compras (#306, ADR-0014).
@@ -573,12 +688,18 @@ model Recuento {
   estado     String    @db.VarChar(20) @default("in_progress")
   fecha      DateTime  @default(now())
   closedAt   DateTime?
+  /// @en Deposit counted when inventory.warehouses is enabled (#236).
+  /// @es Depósito contado cuando inventory.warehouses está activo (#236).
+  /// @pt-BR Depósito contado quando inventory.warehouses está ativo (#236).
+  depositoId Int?
+  deposito   Deposito? @relation(fields: [depositoId], references: [id], onDelete: SetNull)
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
 
   items RecuentoItem[]
 
   @@index([tenantId, estado])
+  @@index([tenantId, depositoId, estado])
 }
 
 model RecuentoItem {
@@ -673,6 +794,11 @@ model Factura {
   mpQrData              String?   @db.Text
   mpQrOrderId           String?   @db.VarChar(60)
   mpQrExpiresAt         DateTime?
+  /// @en Dispatch deposit when inventory.warehouses is enabled (#236).
+  /// @es Depósito de despacho cuando inventory.warehouses está activo (#236).
+  /// @pt-BR Depósito de despacho quando inventory.warehouses está ativo (#236).
+  depositoId            Int?
+  deposito              Deposito? @relation(fields: [depositoId], references: [id], onDelete: SetNull)
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 
@@ -702,6 +828,7 @@ model Factura {
   @@index([tenantId, estado, fecha])
   @@index([tenantId, clienteId])
   @@index([tenantId, contratoId])
+  @@index([tenantId, depositoId])
 }
 
 /// Recurring service contract with scheduled invoicing (#245).
@@ -1029,6 +1156,11 @@ model Pedido {
   validUntil  DateTime?
   facturaId   Int?      @unique
   factura     Factura?  @relation(fields: [facturaId], references: [id])
+  /// @en Intended dispatch deposit when inventory.warehouses is enabled (#236).
+  /// @es Depósito de despacho previsto cuando inventory.warehouses está activo (#236).
+  /// @pt-BR Depósito de despacho previsto quando inventory.warehouses está ativo (#236).
+  depositoId  Int?
+  deposito    Deposito? @relation(fields: [depositoId], references: [id], onDelete: SetNull)
   remito      Remito?
   items       PedidoItem[]
   createdAt   DateTime  @default(now())
@@ -1036,6 +1168,7 @@ model Pedido {
 
   @@index([tenantId, estado])
   @@index([tenantId, clienteId])
+  @@index([tenantId, depositoId])
 }
 
 /// Delivery note (remito) — non-fiscal transport document (#230).
@@ -1268,6 +1401,9 @@ model Tenant {
   paramEmpresa   ParamEmpresa?
   fiscalConfig   TenantFiscalConfig?
   stockAjustes   StockAjuste[]
+  depositos      Deposito[]
+  stockDepositos StockDeposito[]
+  transferenciasDeposito TransferenciaDeposito[]
   recuentos      Recuento[]
   tenantConfig   TenantConfig?
   moduleTrials   TenantModuleTrial[]
@@ -1550,6 +1686,11 @@ model OrdenEntrega {
   dispatchedAt      DateTime?
   /// event | estimated — estimated only from legacy backfill (#145).
   dispatchTimestampSource String? @db.VarChar(20)
+  /// @en Picking deposit when inventory.warehouses is enabled (#236).
+  /// @es Depósito de picking cuando inventory.warehouses está activo (#236).
+  /// @pt-BR Depósito de picking quando inventory.warehouses está ativo (#236).
+  depositoId Int?
+  deposito   Deposito? @relation(fields: [depositoId], references: [id], onDelete: SetNull)
   fecha     DateTime
   /// pending | picking | ready | assigned | in_transit | delivered | failed | cancelled
   estado    String    @db.VarChar(20) @default("pending")
@@ -1565,6 +1706,7 @@ model OrdenEntrega {
   @@index([tenantId, driverId])
   @@index([tenantId, pickerUserId])
   @@index([tenantId, dispatchedAt])
+  @@index([tenantId, depositoId])
 }
 
 /// Delivery route grouping delivery orders (#140).
@@ -1653,6 +1795,9 @@ model AppUser {
   pedidosVendedor      Pedido[]
   stockAjustes         StockAjuste[]
   recuentosOperados    Recuento[]     @relation("RecuentoOperador")
+  depositosResponsable Deposito[]     @relation("DepositoResponsable")
+  transferenciasSolicitadas TransferenciaDeposito[] @relation("TransferenciaSolicitadoPor")
+  transferenciasAprobadas   TransferenciaDeposito[] @relation("TransferenciaAprobadoPor")
   tenantConfigsUpdated TenantConfig[] @relation("TenantConfigUpdatedBy")
   tenantConfigHistory  TenantConfigHistory[] @relation("TenantConfigHistoryChangedBy")
   tenantPlansChanged   TenantPlan[] @relation("TenantPlanChangedBy")
@@ -1879,10 +2024,16 @@ model StockAjuste {
   motivo     String   @db.VarChar(100)
   userId     Int
   user       AppUser  @relation(fields: [userId], references: [id])
+  /// @en Deposit affected by the adjustment when inventory.warehouses is enabled (#236).
+  /// @es Depósito afectado por el ajuste cuando inventory.warehouses está activo (#236).
+  /// @pt-BR Depósito afetado pelo ajuste quando inventory.warehouses está ativo (#236).
+  depositoId Int?
+  deposito   Deposito? @relation(fields: [depositoId], references: [id], onDelete: SetNull)
   createdAt  DateTime @default(now())
 
   @@index([tenantId, articuloId])
   @@index([tenantId, articuloId, createdAt])
+  @@index([tenantId, depositoId])
 }
 
 model AppSession {

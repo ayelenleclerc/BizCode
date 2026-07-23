@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "destinoId": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "items": {
+      "items": {
+        "properties": {
+          "articuloId": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "cantidadEnviada": {
+            "minimum": 1,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "articuloId",
+          "cantidadEnviada"
+        ],
+        "type": "object"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "nota": {
+      "maxLength": 200,
+      "nullable": true,
+      "type": "string"
+    },
+    "origenId": {
+      "minimum": 1,
+      "type": "integer"
+    }
+  },
+  "required": [
+    "origenId",
+    "destinoId",
+    "items"
+  ],
+  "title": "TransferenciaDepositoCreateInput",
+  "type": "object"
+}

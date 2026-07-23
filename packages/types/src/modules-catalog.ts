@@ -169,6 +169,14 @@ export const MODULE_CATALOG = {
     plan: 'starter',
     price: 1500,
   },
+  'inventory.warehouses': {
+    label: 'Multiples depositos',
+    required: false,
+    requiredInProd: false,
+    dependencies: ['inventory.stock'],
+    plan: 'pro',
+    price: 2500,
+  },
   'inventory.count': {
     label: 'Recuento fisico',
     required: false,
