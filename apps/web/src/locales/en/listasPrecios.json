@@ -1,0 +1,64 @@
+{
+  "title": "Price lists",
+  "empty": "No price lists have been created yet.",
+  "errors": {
+    "load": "Could not load price lists"
+  },
+  "form": {
+    "nombre": "Name",
+    "moneda": "Currency",
+    "vigenciaHasta": "Valid until",
+    "esDefault": "Default list"
+  },
+  "columns": {
+    "nombre": "Name",
+    "moneda": "Currency",
+    "items": "Items",
+    "clientes": "Customers",
+    "estado": "Status",
+    "acciones": "Actions"
+  },
+  "badge": {
+    "default": "Default"
+  },
+  "estado": {
+    "activa": "Active",
+    "inactiva": "Inactive"
+  },
+  "actions": {
+    "editItems": "Edit items",
+    "activate": "Activate",
+    "deactivate": "Deactivate",
+    "delete": "Delete",
+    "close": "Close"
+  },
+  "detail": {
+    "title": "List items: {{nombre}}",
+    "loading": "Loading...",
+    "emptyItems": "This list has no items yet."
+  },
+  "item": {
+    "articulo": "Product",
+    "tipoPrecio": "Price type",
+    "precio": "Price",
+    "porcentaje": "Percentage over base",
+    "valor": "Value",
+    "tramos": "Quantity tiers",
+    "desde": "From",
+    "hasta": "To",
+    "addTramo": "Add tier",
+    "save": "Save item",
+    "tipo": {
+      "fijo": "Fixed price",
+      "porcentaje": "% over base price"
+    }
+  },
+  "bulk": {
+    "title": "Bulk update",
+    "hint": "Applies a percentage to every fixed price in the list (items and tiers). Preview before applying.",
+    "porcentaje": "Percentage",
+    "preview": "Preview",
+    "apply": "Apply",
+    "afectados": "Affected items: {{count}}"
+  }
+}

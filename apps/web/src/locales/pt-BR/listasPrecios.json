@@ -1,0 +1,64 @@
+{
+  "title": "Listas de preços",
+  "empty": "Nenhuma lista de preços cadastrada.",
+  "errors": {
+    "load": "Não foi possível carregar as listas de preços"
+  },
+  "form": {
+    "nombre": "Nome",
+    "moneda": "Moeda",
+    "vigenciaHasta": "Válida até",
+    "esDefault": "Lista padrão"
+  },
+  "columns": {
+    "nombre": "Nome",
+    "moneda": "Moeda",
+    "items": "Itens",
+    "clientes": "Clientes",
+    "estado": "Situação",
+    "acciones": "Ações"
+  },
+  "badge": {
+    "default": "Padrão"
+  },
+  "estado": {
+    "activa": "Ativa",
+    "inactiva": "Inativa"
+  },
+  "actions": {
+    "editItems": "Editar itens",
+    "activate": "Ativar",
+    "deactivate": "Desativar",
+    "delete": "Excluir",
+    "close": "Fechar"
+  },
+  "detail": {
+    "title": "Itens da lista: {{nombre}}",
+    "loading": "Carregando...",
+    "emptyItems": "Esta lista ainda não possui itens."
+  },
+  "item": {
+    "articulo": "Produto",
+    "tipoPrecio": "Tipo de preço",
+    "precio": "Preço",
+    "porcentaje": "Percentual sobre a base",
+    "valor": "Valor",
+    "tramos": "Faixas por quantidade",
+    "desde": "De",
+    "hasta": "Até",
+    "addTramo": "Adicionar faixa",
+    "save": "Salvar item",
+    "tipo": {
+      "fijo": "Preço fixo",
+      "porcentaje": "% sobre o preço base"
+    }
+  },
+  "bulk": {
+    "title": "Atualização em massa",
+    "hint": "Aplica um percentual a todos os preços fixos da lista (itens e faixas). Pré-visualize antes de aplicar.",
+    "porcentaje": "Percentual",
+    "preview": "Pré-visualizar",
+    "apply": "Aplicar",
+    "afectados": "Itens afetados: {{count}}"
+  }
+}

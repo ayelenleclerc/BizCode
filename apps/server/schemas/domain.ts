@@ -86,6 +86,7 @@ export const clienteBodySchema = z
     creditDays: z.union([z.number(), z.null(), z.undefined()]).optional(),
     suspended: z.boolean().optional(),
     deliveryZoneId: z.union([z.number(), z.null(), z.undefined()]).optional(),
+    listaPrecioId: z.union([z.number(), z.null(), z.undefined()]).optional(),
   })
   .superRefine((data, ctx) => {
     if (typeof data.codigo !== 'number' || !Number.isInteger(data.codigo)) {
@@ -124,6 +125,10 @@ export const clienteBodySchema = z
     const dz = data.deliveryZoneId
     if (dz !== undefined && dz !== null && (typeof dz !== 'number' || !Number.isInteger(dz) || dz < 1)) {
       ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'deliveryZoneId must be an integer', path: ['deliveryZoneId'] })
+    }
+    const lp = data.listaPrecioId
+    if (lp !== undefined && lp !== null && (typeof lp !== 'number' || !Number.isInteger(lp) || lp < 1)) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'listaPrecioId must be an integer', path: ['listaPrecioId'] })
     }
   })
   .transform((data): ClienteInput => {
@@ -186,6 +191,9 @@ export const clienteBodySchema = z
     }
     if (data.deliveryZoneId !== undefined) {
       out.deliveryZoneId = data.deliveryZoneId
+    }
+    if (data.listaPrecioId !== undefined) {
+      out.listaPrecioId = data.listaPrecioId
     }
     return out
   })
@@ -2836,3 +2844,144 @@ export const formaPagoPatchBodySchema = z
     esEfectivo: z.boolean(),
   })
   .transform((data) => ({ esEfectivo: data.esEfectivo }))
+
+// ── Listas de precios (Issue #234) ──────────────────────────────────────────
+
+const isoOrNullDate = z.union([isoDateString, z.null()]).optional()
+
+export const listaPrecioCreateBodySchema = z
+  .object({
+    nombre: z.string().min(1).max(80),
+    moneda: z.string().length(3).optional(),
+    activa: z.boolean().optional(),
+    esDefault: z.boolean().optional(),
+    vigenciaHasta: isoOrNullDate,
+  })
+  .transform((data) => ({
+    nombre: data.nombre.trim(),
+    moneda: (data.moneda ?? 'ARS').toUpperCase(),
+    activa: data.activa ?? true,
+    esDefault: data.esDefault ?? false,
+    vigenciaHasta: data.vigenciaHasta ?? null,
+  }))
+
+export const listaPrecioPatchBodySchema = z
+  .object({
+    nombre: z.string().min(1).max(80).optional(),
+    moneda: z.string().length(3).optional(),
+    activa: z.boolean().optional(),
+    esDefault: z.boolean().optional(),
+    vigenciaHasta: isoOrNullDate,
+  })
+  .transform((data) => {
+    const out: {
+      nombre?: string
+      moneda?: string
+      activa?: boolean
+      esDefault?: boolean
+      vigenciaHasta?: string | null
+    } = {}
+    if (data.nombre !== undefined) out.nombre = data.nombre.trim()
+    if (data.moneda !== undefined) out.moneda = data.moneda.toUpperCase()
+    if (data.activa !== undefined) out.activa = data.activa
+    if (data.esDefault !== undefined) out.esDefault = data.esDefault
+    if (data.vigenciaHasta !== undefined) out.vigenciaHasta = data.vigenciaHasta
+    return out
+  })
+  .refine((data) => Object.keys(data).length > 0, {
+    message: 'at least one field is required',
+  })
+
+const precioEscalonadoSchema = z
+  .object({
+    cantidadDesde: z.number().min(0),
+    cantidadHasta: z.union([z.number().positive(), z.null()]).optional(),
+    precio: z.number().min(0),
+  })
+  .superRefine((data, ctx) => {
+    if (
+      data.cantidadHasta !== undefined &&
+      data.cantidadHasta !== null &&
+      data.cantidadHasta <= data.cantidadDesde
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'cantidadHasta must be greater than cantidadDesde',
+        path: ['cantidadHasta'],
+      })
+    }
+  })
+
+export const listaPrecioItemBodySchema = z
+  .object({
+    articuloId: z.number().int().min(1),
+    tipoPrecio: z.enum(['fijo', 'porcentaje_sobre_base']),
+    precio: z.number().min(0).optional(),
+    porcentaje: z.number().optional(),
+    escalonados: z.array(precioEscalonadoSchema).max(50).optional(),
+  })
+  .superRefine((data, ctx) => {
+    if (data.tipoPrecio === 'fijo' && (data.precio === undefined || data.precio === null)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'precio is required when tipoPrecio=fijo',
+        path: ['precio'],
+      })
+    }
+    if (
+      data.tipoPrecio === 'porcentaje_sobre_base' &&
+      (data.porcentaje === undefined || data.porcentaje === null)
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'porcentaje is required when tipoPrecio=porcentaje_sobre_base',
+        path: ['porcentaje'],
+      })
+    }
+  })
+  .transform((data) => ({
+    articuloId: data.articuloId,
+    tipoPrecio: data.tipoPrecio,
+    precio: data.tipoPrecio === 'fijo' ? (data.precio ?? 0) : null,
+    porcentaje: data.tipoPrecio === 'porcentaje_sobre_base' ? (data.porcentaje ?? 0) : null,
+    escalonados: (data.escalonados ?? []).map((e) => ({
+      cantidadDesde: e.cantidadDesde,
+      cantidadHasta: e.cantidadHasta ?? null,
+      precio: e.precio,
+    })),
+  }))
+
+export const listaPrecioBulkUpdateBodySchema = z
+  .object({
+    porcentaje: z.number(),
+    preview: z.boolean().optional(),
+  })
+  .transform((data) => ({
+    porcentaje: data.porcentaje,
+    preview: data.preview ?? false,
+  }))
+
+const requiredPositiveIntQuery = z
+  .string()
+  .min(1)
+  .transform((v) => Number.parseInt(v, 10))
+  .refine((v) => Number.isFinite(v) && v >= 1, {
+    message: 'must be a positive integer',
+  })
+
+const positiveNumberQuery = z
+  .string()
+  .optional()
+  .transform((v) => {
+    if (v === undefined || v === '') return 1
+    return Number.parseFloat(v)
+  })
+  .refine((v) => Number.isFinite(v) && v > 0, {
+    message: 'must be a positive number',
+  })
+
+export const precioEfectivoQuerySchema = z.object({
+  articuloId: requiredPositiveIntQuery,
+  listaPrecioId: optionalPositiveIntQuery,
+  cantidad: positiveNumberQuery,
+})

@@ -54,6 +54,8 @@ tags:
     description: Product warranties by serial / IMEI (#251, module service.warranties)
   - name: cajas
     description: Cash drawers and cashier shifts (#247, module pos.cashier)
+  - name: listas-precios
+    description: Customer price lists with quantity-tiered pricing (#234, module catalog.pricelists)
   - name: cobros
     description: Customer payment collections
   - name: portal
@@ -4913,6 +4915,297 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiErrorEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/listas-precios:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [listas-precios]
+      summary: List price lists
+      description: Requires module `catalog.pricelists`.
+      parameters:
+        - $ref: '#/components/parameters/ListLimit'
+        - $ref: '#/components/parameters/ListOffset'
+        - name: activa
+          in: query
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Paginated price lists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListaPrecioListEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    post:
+      tags: [listas-precios]
+      summary: Create price list
+      description: Requires module `catalog.pricelists`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ListaPrecioCreateInput'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListaPrecioEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          description: Duplicate nombre
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/listas-precios/precio-efectivo:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [listas-precios]
+      summary: Resolve effective price for an article
+      description: >-
+        Requires module `catalog.pricelists`. Resolution cascade:
+        tiered price -> list item (fixed/percent) -> base article price.
+      parameters:
+        - name: articuloId
+          in: query
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+        - name: listaPrecioId
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+        - name: cantidad
+          in: query
+          schema:
+            type: number
+            exclusiveMinimum: 0
+      responses:
+        '200':
+          description: Effective price
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PrecioEfectivoResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/listas-precios/{id}:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    get:
+      tags: [listas-precios]
+      summary: Get price list with items and tiers
+      description: Requires module `catalog.pricelists`.
+      responses:
+        '200':
+          description: Price list detail
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListaPrecioEnvelope'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    patch:
+      tags: [listas-precios]
+      summary: Update price list
+      description: Requires module `catalog.pricelists`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ListaPrecioPatchInput'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListaPrecioEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '409':
+          description: Duplicate nombre
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    delete:
+      tags: [listas-precios]
+      summary: Delete price list
+      description: Requires module `catalog.pricelists`.
+      responses:
+        '204':
+          description: Deleted
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '409':
+          description: List has customers assigned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/listas-precios/{id}/items:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    post:
+      tags: [listas-precios]
+      summary: Upsert a price-list item (with optional tiers)
+      description: Requires module `catalog.pricelists`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ListaPrecioItemInput'
+      responses:
+        '200':
+          description: Item upserted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListaPrecioItemEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/listas-precios/{id}/items/{itemId}:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+      - name: itemId
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    delete:
+      tags: [listas-precios]
+      summary: Remove a price-list item
+      description: Requires module `catalog.pricelists`.
+      responses:
+        '204':
+          description: Deleted
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/listas-precios/{id}/actualizar-masivo:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    post:
+      tags: [listas-precios]
+      summary: Bulk percentage update over a price list (preview or apply)
+      description: Requires module `catalog.pricelists`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ListaPrecioBulkUpdateInput'
+      responses:
+        '200':
+          description: Preview or applied bulk update
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListaPrecioBulkUpdateResult'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '403':
@@ -15561,6 +15854,245 @@ components:
               type: object
               additionalProperties:
                 type: number
+        - $ref: '#/components/schemas/ListPaginationMeta'
+
+    PrecioEscalonado:
+      type: object
+      additionalProperties: true
+      properties:
+        id:
+          type: integer
+        listaPrecioItemId:
+          type: integer
+        cantidadDesde:
+          type: number
+        cantidadHasta:
+          type: number
+          nullable: true
+        precio:
+          type: number
+
+    ListaPrecioItem:
+      type: object
+      additionalProperties: true
+      properties:
+        id:
+          type: integer
+        tenantId:
+          type: integer
+        listaPrecioId:
+          type: integer
+        articuloId:
+          type: integer
+        tipoPrecio:
+          type: string
+          enum: [fijo, porcentaje_sobre_base]
+        precio:
+          type: number
+          nullable: true
+        porcentaje:
+          type: number
+          nullable: true
+        escalonados:
+          type: array
+          items:
+            $ref: '#/components/schemas/PrecioEscalonado'
+
+    ListaPrecio:
+      type: object
+      additionalProperties: true
+      properties:
+        id:
+          type: integer
+        tenantId:
+          type: integer
+        nombre:
+          type: string
+        moneda:
+          type: string
+        activa:
+          type: boolean
+        esDefault:
+          type: boolean
+        vigenciaHasta:
+          type: string
+          format: date-time
+          nullable: true
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ListaPrecioItem'
+
+    ListaPrecioCreateInput:
+      type: object
+      required: [nombre]
+      properties:
+        nombre:
+          type: string
+          minLength: 1
+          maxLength: 80
+        moneda:
+          type: string
+          minLength: 3
+          maxLength: 3
+        activa:
+          type: boolean
+        esDefault:
+          type: boolean
+        vigenciaHasta:
+          type: string
+          format: date-time
+          nullable: true
+
+    ListaPrecioPatchInput:
+      type: object
+      minProperties: 1
+      properties:
+        nombre:
+          type: string
+          minLength: 1
+          maxLength: 80
+        moneda:
+          type: string
+          minLength: 3
+          maxLength: 3
+        activa:
+          type: boolean
+        esDefault:
+          type: boolean
+        vigenciaHasta:
+          type: string
+          format: date-time
+          nullable: true
+
+    ListaPrecioItemInput:
+      type: object
+      required: [articuloId, tipoPrecio]
+      properties:
+        articuloId:
+          type: integer
+          minimum: 1
+        tipoPrecio:
+          type: string
+          enum: [fijo, porcentaje_sobre_base]
+        precio:
+          type: number
+          minimum: 0
+          nullable: true
+        porcentaje:
+          type: number
+          nullable: true
+        escalonados:
+          type: array
+          items:
+            type: object
+            required: [cantidadDesde, precio]
+            properties:
+              cantidadDesde:
+                type: number
+                minimum: 0
+              cantidadHasta:
+                type: number
+                exclusiveMinimum: 0
+                nullable: true
+              precio:
+                type: number
+                minimum: 0
+
+    ListaPrecioBulkUpdateInput:
+      type: object
+      required: [porcentaje]
+      properties:
+        porcentaje:
+          type: number
+        preview:
+          type: boolean
+
+    ListaPrecioBulkUpdateResult:
+      type: object
+      required: [success, preview, afectados, ejemplos]
+      properties:
+        success:
+          type: boolean
+          const: true
+        preview:
+          type: boolean
+        afectados:
+          type: integer
+        ejemplos:
+          type: array
+          items:
+            type: object
+            properties:
+              listaPrecioItemId:
+                type: integer
+              articuloId:
+                type: integer
+              descripcion:
+                type: string
+              precioActual:
+                type: number
+                nullable: true
+              precioNuevo:
+                type: number
+                nullable: true
+
+    PrecioEfectivoResponse:
+      type: object
+      required: [success, articuloId, cantidad, precioBase, precio, origen, moneda]
+      properties:
+        success:
+          type: boolean
+          const: true
+        articuloId:
+          type: integer
+        listaPrecioId:
+          type: integer
+          nullable: true
+        cantidad:
+          type: number
+        precioBase:
+          type: number
+        precio:
+          type: number
+        origen:
+          type: string
+          enum: [escalonado, fijo, porcentaje_sobre_base, base]
+        moneda:
+          type: string
+
+    ListaPrecioEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/ListaPrecio'
+
+    ListaPrecioItemEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/ListaPrecioItem'
+
+    ListaPrecioListEnvelope:
+      allOf:
+        - type: object
+          required: [success, data]
+          properties:
+            success:
+              type: boolean
+              const: true
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/ListaPrecio'
         - $ref: '#/components/schemas/ListPaginationMeta'
 
     AppUser:

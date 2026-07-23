@@ -8,6 +8,7 @@ export * from './modules/contratos'
 export * from './modules/ordenesTrabajo'
 export * from './modules/garantias'
 export * from './modules/caja'
+export * from './modules/listasPrecios'
 export * from './modules/facturas'
 export * from './modules/repartos'
 export * from './modules/ordenes-entrega'
@@ -45,6 +46,17 @@ export type {
   GarantiaRow,
   GarantiaListResponse,
   GarantiaLookupResult,
+  ListaPrecioRow,
+  ListaPrecioItemRow,
+  ListaPrecioListResponse,
+  ListaPrecioCreateInput,
+  ListaPrecioPatchInput,
+  ListaPrecioItemInput,
+  ListaPrecioBulkUpdateInput,
+  ListaPrecioBulkUpdateResult,
+  PrecioEfectivoResponse,
+  PrecioEscalonadoRow,
+  PrecioEscalonadoInput,
   PublicPlanDTO,
   Recuento,
   RecuentoItemRow,

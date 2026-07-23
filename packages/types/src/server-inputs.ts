@@ -49,6 +49,7 @@ export type ClienteInput = {
   creditDays?: number
   suspended?: boolean
   deliveryZoneId?: number | null
+  listaPrecioId?: number | null
 }
 
 /** @en Catalog item kind (#244). @es Tipo de ítem de catálogo (#244). @pt-BR Tipo de item de catálogo (#244). */

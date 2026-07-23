@@ -329,6 +329,14 @@ export const MODULE_CATALOG = {
     plan: 'starter',
     price: 1500,
   },
+  'catalog.pricelists': {
+    label: 'Listas de precios',
+    required: false,
+    requiredInProd: false,
+    dependencies: ['core.catalog'],
+    plan: 'starter',
+    price: 1500,
+  },
   'analytics.ai_demand': {
     label: 'IA Prediccion demanda',
     required: false,

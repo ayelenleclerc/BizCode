@@ -57,6 +57,8 @@
     },
     "deliveryZone": "Zona de entrega",
     "deliveryZoneNone": "Sem zona atribuída",
+    "listaPrecio": "Lista de preços",
+    "listaPrecioNone": "Preço base (sem lista)",
     "financial": {
       "section": "Situação financeira",
       "creditLimit": "Limite de crédito",

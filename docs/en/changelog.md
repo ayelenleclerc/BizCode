@@ -10,6 +10,8 @@ Versioning: [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **Multiple price lists (#234):** Prisma `ListaPrecio` / `ListaPrecioItem` / `PrecioEscalonado` and `Cliente.listaPrecioId`; new module `catalog.pricelists` (depends on `core.catalog`); `ListaPrecioService` with effective-price cascade (tier → list item fixed/percent → base `precioLista1`), bulk percentage update with preview/apply, and expired lists treated as base; API `/api/listas-precios` (CRUD, items with quantity tiers, `POST .../actualizar-masivo`, `GET .../precio-efectivo`) behind `catalog.pricelists`; customer form price-list selector; suggested price prefilled on new invoice lines; UI `/listas-precios`; OpenAPI, tests, i18n EN/ES/PT-BR. Out of scope: bulk-update background job, expiry alerts and customer auto-revert, real multi-currency (#243).
+
 - **Cash drawer shifts / POS cashier (#247):** Prisma `Caja` / `TurnoCaja` / `ConteoEfectivo` / `MovimientoCaja` and `FormaPago.esEfectivo`; API `/api/cajas` and `/api/turnos-caja` (open/close, manual movements, close PDF) behind `pos.cashier`; auto cash movements on cash invoice/cobro/recibo when a shift is open (does not block sales without a shift); UI `/caja` with count dashboard and payment-method cash flag; OpenAPI, tests, i18n EN/ES/PT-BR.
 
 - **Service warranties (#251):** Prisma `Garantia` / `GarantiaUso` and `Articulo.mesesGarantia`; auto-register on invoice create; API `/api/garantias` (list, lookup by serial/IMEI, detail, anular, usos) behind `service.warranties`; OT create lookups `Garantia` and records `GarantiaUso`; UI `/garantias` + article form field + OT serial feedback; OpenAPI, tests, i18n EN/ES/PT-BR.

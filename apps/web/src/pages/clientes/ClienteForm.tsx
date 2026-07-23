@@ -5,10 +5,10 @@ import { z } from 'zod'
 import { useHotkeys } from 'react-hotkeys-hook'
 import KeyboardHint, { useFormShortcuts } from '@/components/shared/KeyboardHint'
 import { useTranslation } from 'react-i18next'
-import { clientesAPI, zonasEntregaAPI } from '@/lib/api'
+import { clientesAPI, listasPreciosAPI, zonasEntregaAPI } from '@/lib/api'
 import { validateCUIT, formatCUIT } from '@/lib/validators'
 import { useAuth } from '@/contexts/AuthContext'
-import { Cliente, DeliveryZone } from '@bizcode/types'
+import { Cliente, DeliveryZone, type ListaPrecioRow } from '@bizcode/types'
 import ClienteCobrosRecientes from './ClienteCobrosRecientes'
 import ClienteCuentaCorrienteSection from './ClienteCuentaCorrienteSection'
 import IfModule from '@/components/IfModule'
@@ -34,6 +34,13 @@ const clienteSchema = z.object({
   suspended: z.boolean().optional(),
   // Logistics (Issue #32) — HTML <select value=""> must not coerce to 0 (would fail .positive() and block submit silently).
   deliveryZoneId: z.preprocess((val) => {
+    if (val === '' || val === null || val === undefined) return undefined
+    const n = typeof val === 'number' ? val : Number(val)
+    if (!Number.isFinite(n) || n <= 0) return undefined
+    return Math.trunc(n)
+  }, z.number().int().positive().optional().nullable()),
+  // Price list (Issue #234) — same empty-string handling as deliveryZoneId.
+  listaPrecioId: z.preprocess((val) => {
     if (val === '' || val === null || val === undefined) return undefined
     const n = typeof val === 'number' ? val : Number(val)
     if (!Number.isFinite(n) || n <= 0) return undefined
@@ -95,6 +102,7 @@ export default function ClienteForm({ cliente, onClose, onGuardado }: ClienteFor
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [zones, setZones] = useState<DeliveryZone[]>([])
+  const [listasPrecios, setListasPrecios] = useState<ListaPrecioRow[]>([])
 
   const {
     register,
@@ -112,6 +120,10 @@ export default function ClienteForm({ cliente, onClose, onGuardado }: ClienteFor
 
   useEffect(() => {
     zonasEntregaAPI.list().then((data) => setZones(data ?? [])).catch(() => {})
+    listasPreciosAPI
+      .list({ activa: true })
+      .then((res) => setListasPrecios(res?.data ?? []))
+      .catch(() => {})
   }, [])
 
   useEffect(() => {
@@ -131,6 +143,7 @@ export default function ClienteForm({ cliente, onClose, onGuardado }: ClienteFor
       setValue('creditDays', cliente.creditDays ?? 0)
       setValue('suspended', cliente.suspended ?? false)
       setValue('deliveryZoneId', cliente.deliveryZoneId ?? null)
+      setValue('listaPrecioId', cliente.listaPrecioId ?? null)
     }
   }, [cliente, setValue])
 
@@ -379,6 +392,26 @@ export default function ClienteForm({ cliente, onClose, onGuardado }: ClienteFor
               ))}
             </select>
           </div>
+
+          {/* ── Price list (Issue #234) ───────────────────────────────────── */}
+          <IfModule flag="catalog.pricelists">
+            <div>
+              <label htmlFor="cliente-listaPrecioId" className="block text-slate-700 dark:text-slate-300 font-semibold mb-1">
+                {t('form.listaPrecio')}
+              </label>
+              <select
+                id="cliente-listaPrecioId"
+                data-testid="cliente-form-listaPrecio"
+                {...register('listaPrecioId')}
+                className="w-full px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 rounded border border-slate-300 dark:border-slate-600 focus:border-blue-500 focus:outline-none"
+              >
+                <option value="">{t('form.listaPrecioNone')}</option>
+                {listasPrecios.map((lp) => (
+                  <option key={lp.id} value={lp.id}>{lp.nombre}</option>
+                ))}
+              </select>
+            </div>
+          </IfModule>
 
           {/* ── Financial section ─────────────────────────────────────────── */}
           {cliente && (

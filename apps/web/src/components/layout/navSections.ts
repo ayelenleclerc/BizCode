@@ -74,6 +74,13 @@ export const NAV_SECTIONS: readonly NavSection[] = [
     moduleKey: 'core.catalog',
   },
   {
+    key: 'listasPrecios',
+    path: '/listas-precios',
+    icon: '🏷️',
+    roles: ['owner', 'manager', 'seller', 'backoffice'],
+    moduleKey: 'catalog.pricelists',
+  },
+  {
     key: 'proveedores',
     path: '/proveedores',
     icon: '\u{1F3ED}',
@@ -178,6 +185,7 @@ export const ROUTE_MODULE_GUARDS: ReadonlyArray<{ path: string; moduleKey: Modul
   { path: 'ordenes-trabajo', moduleKey: 'service.orders' },
   { path: 'garantias', moduleKey: 'service.warranties' },
   { path: 'caja', moduleKey: 'pos.cashier' },
+  { path: 'listas-precios', moduleKey: 'catalog.pricelists' },
   { path: 'logistica', moduleKey: 'logistics.dispatches' },
   { path: 'logistica/picking', moduleKey: 'logistics.picking' },
   { path: 'logistica/seguimiento', moduleKey: 'logistics.gps' },
