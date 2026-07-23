@@ -297,6 +297,66 @@ describe('ArticuloVarianteService stock and offers', () => {
     expect(created.ok).toBe(false)
     if (!created.ok) expect(created.status).toBe(400)
   })
+
+  it('lists, reorders and removes imagenes metadata', async () => {
+    const img = {
+      id: 3,
+      tenantId: 1,
+      articuloId: 20,
+      pathOriginal: '1/20/a-original.webp',
+      pathMedium: '1/20/a-medium.webp',
+      pathThumb: '1/20/a-thumb.webp',
+      orden: 0,
+      esPrincipal: true,
+      createdAt: new Date('2026-07-23T00:00:00.000Z'),
+    }
+    const prisma = buildPrisma({
+      articulo: {
+        findFirst: vi.fn().mockResolvedValue({ id: 20 }),
+      },
+      articuloImagen: {
+        findMany: vi.fn().mockResolvedValue([img]),
+        findFirst: vi.fn().mockResolvedValue(img),
+        update: vi.fn().mockResolvedValue(img),
+        delete: vi.fn().mockResolvedValue(img),
+        count: vi.fn().mockResolvedValue(1),
+        create: vi.fn(),
+      },
+      $transaction: vi.fn(async (ops: unknown) => {
+        if (Array.isArray(ops)) await Promise.all(ops)
+        return ops
+      }),
+    })
+    const svc = new ArticuloVarianteService(prisma)
+    const listed = await svc.listImagenes(1, 20)
+    expect(listed.ok).toBe(true)
+    if (listed.ok) expect(listed.data[0]?.urlThumb).toContain('/uploads/articulos/')
+
+    const reordered = await svc.reorderImagenes(1, 20, [3])
+    expect(reordered.ok).toBe(true)
+
+    const removed = await svc.removeImagen(1, 20, 3)
+    expect(removed.ok).toBe(true)
+  })
+
+  it('rejects upload when image limit is reached', async () => {
+    const prisma = buildPrisma({
+      articulo: {
+        findFirst: vi.fn().mockResolvedValue({ id: 20 }),
+      },
+      articuloImagen: {
+        count: vi.fn().mockResolvedValue(8),
+      },
+    })
+    const svc = new ArticuloVarianteService(prisma)
+    const result = await svc.uploadImagen(1, 20, {
+      buffer: Buffer.from('x'),
+      mimetype: 'image/png',
+      originalname: 'x.png',
+    })
+    expect(result.ok).toBe(false)
+    if (!result.ok) expect(result.status).toBe(400)
+  })
 })
 
 describe('FacturaService rejects parent articles', () => {

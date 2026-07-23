@@ -193,4 +193,50 @@ describe('createCatalogVariantsAPI (#235)', () => {
     await expect(api.reorderImagenes(20, [3])).resolves.toEqual([IMAGEN])
     await expect(api.removeImagen(20, 3)).resolves.toBeUndefined()
   })
+
+  it('propagates API errors through handleError on key methods', async () => {
+    const fail = Object.assign(new Error('fail'), {
+      response: { data: { error: 'Server Error' }, status: 500 },
+      isAxiosError: true,
+    })
+    const http = {
+      get: vi.fn().mockRejectedValue(fail),
+      post: vi.fn().mockRejectedValue(fail),
+      patch: vi.fn().mockRejectedValue(fail),
+      put: vi.fn().mockRejectedValue(fail),
+      delete: vi.fn().mockRejectedValue(fail),
+    } as unknown as AxiosInstance
+    const api = createCatalogVariantsAPI(http)
+
+    await expect(api.listCategorias()).rejects.toThrow('Server Error')
+    await expect(api.getCategoria(1)).rejects.toThrow('Server Error')
+    await expect(api.createCategoria({ nombre: 'X' })).rejects.toThrow('Server Error')
+    await expect(api.updateCategoria(1, { nombre: 'Y' })).rejects.toThrow('Server Error')
+    await expect(api.removeCategoria(1)).rejects.toThrow('Server Error')
+    await expect(api.addAtributo(1, { nombre: 'Color' })).rejects.toThrow('Server Error')
+    await expect(api.patchAtributo(1, 10, { nombre: 'Talle' })).rejects.toThrow('Server Error')
+    await expect(api.removeAtributo(1, 10)).rejects.toThrow('Server Error')
+    await expect(api.addValor(1, 10, { valor: 'Azul' })).rejects.toThrow('Server Error')
+    await expect(api.removeValor(1, 10, 101)).rejects.toThrow('Server Error')
+    await expect(api.listVariantes(5)).rejects.toThrow('Server Error')
+    await expect(
+      api.generarVariantes(5, { atributoValorIdsPorAtributo: [[100]] }),
+    ).rejects.toThrow('Server Error')
+    await expect(api.stockFamilia(5)).rejects.toThrow('Server Error')
+    await expect(api.getPrecioCatalogoEfectivo(20)).rejects.toThrow('Server Error')
+    await expect(api.listOfertas(20)).rejects.toThrow('Server Error')
+    await expect(
+      api.createOferta(20, {
+        precioOferta: 80,
+        vigenciaDesde: OFERTA.vigenciaDesde,
+        vigenciaHasta: OFERTA.vigenciaHasta,
+      }),
+    ).rejects.toThrow('Server Error')
+    await expect(api.updateOferta(20, 7, { activa: false })).rejects.toThrow('Server Error')
+    await expect(api.removeOferta(20, 7)).rejects.toThrow('Server Error')
+    await expect(api.listImagenes(20)).rejects.toThrow('Server Error')
+    await expect(api.uploadImagen(20, new Blob(['x']))).rejects.toThrow('Server Error')
+    await expect(api.reorderImagenes(20, [3])).rejects.toThrow('Server Error')
+    await expect(api.removeImagen(20, 3)).rejects.toThrow('Server Error')
+  })
 })

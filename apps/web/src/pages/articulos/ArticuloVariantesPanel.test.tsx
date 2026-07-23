@@ -1,5 +1,6 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { I18nextProvider } from 'react-i18next'
 import i18n from '@/i18n/config'
 import { catalogVariantsAPI } from '@/lib/api'
@@ -82,6 +83,46 @@ describe('ArticuloVariantesPanel', () => {
       expect(screen.getByTestId('badge-padre')).toBeInTheDocument()
       expect(screen.getByTestId('stock-familia')).toBeInTheDocument()
       expect(screen.getByTestId('variantes-empty')).toBeInTheDocument()
+    })
+  })
+
+  it('shows variant table and allows generating from attributes', async () => {
+    const user = userEvent.setup()
+    vi.mocked(catalogVariantsAPI.listVariantes).mockResolvedValue([
+      {
+        id: 11,
+        codigo: 11,
+        descripcion: 'Remera - Roja',
+        padreId: 5,
+        esPadre: false,
+        categoriaId: 1,
+        heredaPrecio: true,
+        precioOverride: null,
+        costoOverride: null,
+        precioLista1: 100,
+        costo: 40,
+        stock: 2,
+        activo: true,
+        atributoValores: [],
+      },
+    ])
+    vi.mocked(catalogVariantsAPI.generarVariantes).mockResolvedValue({
+      success: true,
+      creadas: 1,
+      variantes: [],
+    })
+
+    render(
+      <I18nextProvider i18n={i18n}>
+        <ArticuloVariantesPanel articuloId={5} categoriaId={1} esPadre />
+      </I18nextProvider>,
+    )
+
+    await waitFor(() => expect(screen.getByTestId('variantes-table')).toBeInTheDocument())
+    await user.click(screen.getByTestId('valor-100'))
+    await user.click(screen.getByTestId('generar-variantes'))
+    await waitFor(() => {
+      expect(catalogVariantsAPI.generarVariantes).toHaveBeenCalled()
     })
   })
 })

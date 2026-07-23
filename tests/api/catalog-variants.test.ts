@@ -130,4 +130,45 @@ describe('Catalog variants API (#235)', () => {
     const res = await request(app).get('/api/categorias-articulo')
     expect(res.status).toBe(403)
   })
+
+  it('GET /api/articulos/:id/variantes and stock-familia', async () => {
+    const prisma = buildPrismaMock({
+      articulo: {
+        findFirst: vi.fn().mockResolvedValue({
+          id: 5,
+          esPadre: true,
+          precioLista1: new Decimal(100),
+          heredaPrecio: true,
+          precioOverride: null,
+          categoria: null,
+          padre: null,
+          ofertas: [],
+        }),
+        findMany: vi.fn().mockResolvedValue([
+          {
+            id: 11,
+            codigo: 11,
+            descripcion: 'Remera - Roja',
+            padreId: 5,
+            esPadre: false,
+            categoriaId: 1,
+            heredaPrecio: true,
+            precioOverride: null,
+            costoOverride: null,
+            precioLista1: new Decimal(100),
+            costo: new Decimal(40),
+            stock: 2,
+            activo: true,
+            atributoValores: [],
+          },
+        ]),
+      },
+    })
+    const app = createApp(prisma)
+    const variantes = await request(app).get('/api/articulos/5/variantes')
+    expect(variantes.status).toBe(200)
+    const stock = await request(app).get('/api/articulos/5/stock-familia')
+    expect(stock.status).toBe(200)
+    expect(stock.body.stockFamilia).toBe(2)
+  })
 })
