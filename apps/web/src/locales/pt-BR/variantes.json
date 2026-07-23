@@ -1,0 +1,37 @@
+{
+  "title": "Variantes",
+  "stockFamilia": "Estoque família: {{stock}}",
+  "empty": "Ainda não há variantes geradas.",
+  "generate": "Gerar variantes",
+  "selectValues": "Selecione valores por atributo",
+  "errors": {
+    "load": "Não foi possível carregar as variantes",
+    "generate": "Não foi possível gerar as variantes",
+    "needCategory": "Atribua uma categoria com atributos antes de gerar variantes.",
+    "needSaved": "Salve o artigo primeiro para gerenciar variantes."
+  },
+  "columns": {
+    "codigo": "Código",
+    "descripcion": "Descrição",
+    "stock": "Estoque",
+    "precio": "Preço",
+    "activo": "Ativo"
+  },
+  "images": {
+    "title": "Imagens",
+    "upload": "Enviar imagem",
+    "empty": "Sem imagens.",
+    "remove": "Remover"
+  },
+  "offers": {
+    "title": "Ofertas",
+    "precio": "Preço oferta",
+    "desde": "De",
+    "hasta": "Até",
+    "add": "Adicionar oferta",
+    "empty": "Sem ofertas.",
+    "remove": "Remover"
+  },
+  "parentBadge": "Pai (não vendável)",
+  "variantBadge": "Variante"
+}

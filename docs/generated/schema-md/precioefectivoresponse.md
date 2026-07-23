@@ -127,6 +127,10 @@ undefined
 | `"fijo"`                  |             |
 | `"porcentaje_sobre_base"` |             |
 | `"base"`                  |             |
+| `"oferta"`                |             |
+| `"override_variante"`     |             |
+| `"precio_subfamilia"`     |             |
+| `"precio_familia"`        |             |
 
 ## precio
 

@@ -117,14 +117,150 @@ model Rubro {
   @@index([tenantId, codigo])
 }
 
+/// @en Hierarchical article category (family/subfamily); coexists with flat Rubro (#235).
+/// @es Categoría jerárquica de artículos (familia/subfamilia); convive con Rubro plano (#235).
+/// @pt-BR Categoria hierárquica de artigos (família/subfamília); convive com Rubro plano (#235).
+model CategoriaArticulo {
+  id            Int      @id @default(autoincrement())
+  tenantId      Int
+  tenant        Tenant   @relation(fields: [tenantId], references: [id])
+  nombre        String   @db.VarChar(80)
+  codigo        String?  @db.VarChar(20)
+  padreId       Int?
+  padre         CategoriaArticulo?  @relation("CategoriaArbol", fields: [padreId], references: [id])
+  hijos         CategoriaArticulo[] @relation("CategoriaArbol")
+  /// @en Optional default list price for category-level inheritance.
+  /// @es Precio de lista opcional por defecto para herencia a nivel categoría.
+  /// @pt-BR Preço de lista opcional padrão para herança em nível de categoria.
+  precioDefault Decimal? @db.Decimal(14, 2)
+  activo        Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  atributos CategoriaAtributo[]
+  articulos Articulo[]
+
+  @@index([tenantId])
+  @@index([tenantId, padreId])
+  @@index([tenantId, activo])
+}
+
+/// @en Variant attribute definition on a category (e.g. Color, Size) (#235).
+/// @es Definición de atributo de variante en una categoría (ej. Color, Talle) (#235).
+/// @pt-BR Definição de atributo de variante em uma categoria (ex.: Cor, Tamanho) (#235).
+model CategoriaAtributo {
+  id          Int               @id @default(autoincrement())
+  tenantId    Int
+  categoriaId Int
+  categoria   CategoriaArticulo @relation(fields: [categoriaId], references: [id], onDelete: Cascade)
+  nombre      String            @db.VarChar(40)
+  orden       Int               @default(0)
+
+  valores CategoriaAtributoValor[]
+
+  @@unique([categoriaId, nombre])
+  @@index([tenantId])
+  @@index([categoriaId])
+}
+
+/// @en Allowed value for a category attribute (e.g. Red, S) (#235).
+/// @es Valor permitido de un atributo de categoría (ej. Rojo, S) (#235).
+/// @pt-BR Valor permitido de um atributo de categoria (ex.: Vermelho, P) (#235).
+model CategoriaAtributoValor {
+  id         Int               @id @default(autoincrement())
+  atributoId Int
+  atributo   CategoriaAtributo @relation(fields: [atributoId], references: [id], onDelete: Cascade)
+  valor      String            @db.VarChar(40)
+  orden      Int               @default(0)
+
+  articuloValores ArticuloAtributoValor[]
+
+  @@unique([atributoId, valor])
+  @@index([atributoId])
+}
+
+/// @en Links a variant article to one selected attribute value (#235).
+/// @es Vincula un artículo variante a un valor de atributo seleccionado (#235).
+/// @pt-BR Vincula um artigo variante a um valor de atributo selecionado (#235).
+model ArticuloAtributoValor {
+  id              Int                   @id @default(autoincrement())
+  articuloId      Int
+  articulo        Articulo              @relation(fields: [articuloId], references: [id], onDelete: Cascade)
+  atributoValorId Int
+  atributoValor   CategoriaAtributoValor @relation(fields: [atributoValorId], references: [id], onDelete: Restrict)
+
+  @@unique([articuloId, atributoValorId])
+  @@index([articuloId])
+  @@index([atributoValorId])
+}
+
+/// @en Local disk image for an article/variant (thumb/medium/original) (#235).
+/// @es Imagen en disco local de un artículo/variante (thumb/medium/original) (#235).
+/// @pt-BR Imagem em disco local de um artigo/variante (thumb/medium/original) (#235).
+model ArticuloImagen {
+  id           Int      @id @default(autoincrement())
+  tenantId     Int
+  articuloId   Int
+  articulo     Articulo @relation(fields: [articuloId], references: [id], onDelete: Cascade)
+  pathOriginal String   @db.VarChar(260)
+  pathMedium   String   @db.VarChar(260)
+  pathThumb    String   @db.VarChar(260)
+  orden        Int      @default(0)
+  esPrincipal  Boolean  @default(false)
+  createdAt    DateTime @default(now())
+
+  @@index([tenantId, articuloId])
+  @@index([articuloId, orden])
+}
+
+/// @en Temporary offer price for a sellable variant (#235).
+/// @es Precio de oferta temporal para una variante vendible (#235).
+/// @pt-BR Preço de oferta temporária para uma variante vendável (#235).
+model ArticuloOferta {
+  id             Int      @id @default(autoincrement())
+  tenantId       Int
+  articuloId     Int
+  articulo       Articulo @relation(fields: [articuloId], references: [id], onDelete: Cascade)
+  precioOferta   Decimal  @db.Decimal(14, 2)
+  vigenciaDesde  DateTime
+  vigenciaHasta  DateTime
+  activa         Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([tenantId, articuloId])
+  @@index([articuloId, activa])
+}
+
 model Articulo {
   id           Int    @id @default(autoincrement())
   tenantId     Int
   tenant       Tenant @relation(fields: [tenantId], references: [id])
   codigo       Int
-  descripcion  String @db.VarChar(30)
+  /// @en Widened for variant labels such as "Remera - Roja - S" (#235).
+  /// @es Ampliado para etiquetas de variante como "Remera - Roja - S" (#235).
+  /// @pt-BR Ampliado para rótulos de variante como "Camiseta - Vermelha - P" (#235).
+  descripcion  String @db.VarChar(120)
   rubroId      Int
   rubro        Rubro  @relation(fields: [rubroId], references: [id])
+  /// @en Optional hierarchical category; Rubro remains required (#235).
+  /// @es Categoría jerárquica opcional; Rubro sigue siendo obligatorio (#235).
+  /// @pt-BR Categoria hierárquica opcional; Rubro continua obrigatório (#235).
+  categoriaId  Int?
+  categoria    CategoriaArticulo? @relation(fields: [categoriaId], references: [id], onDelete: SetNull)
+  /// @en True when this row is a parent that owns generated variants (#235).
+  /// @es True cuando esta fila es un padre que posee variantes generadas (#235).
+  /// @pt-BR True quando esta linha é um pai que possui variantes geradas (#235).
+  esPadre      Boolean @default(false)
+  padreId      Int?
+  padre        Articulo?  @relation("ArticuloVariantes", fields: [padreId], references: [id], onDelete: Restrict)
+  variantes    Articulo[] @relation("ArticuloVariantes")
+  /// @en When true, catalog price inherits from parent/category cascade; when false use precioOverride or materialized precioLista1 (#235).
+  /// @es Si true, el precio de catálogo hereda de padre/categoría; si false usa precioOverride o precioLista1 materializado (#235).
+  /// @pt-BR Se true, o preço de catálogo herda do pai/categoria; se false usa precioOverride ou precioLista1 materializado (#235).
+  heredaPrecio Boolean @default(true)
+  precioOverride Decimal? @db.Decimal(14, 2)
+  costoOverride  Decimal? @db.Decimal(13, 2)
   condIva      String @db.VarChar(1) // IVA %: 1=21%, 2=10.5%, 3=Exento
   umedida      String @db.VarChar(6)
   /// @en Catalog item kind: physical article vs service without stock (#244).
@@ -159,12 +295,18 @@ model Articulo {
   proveedorArticulos   ProveedorArticulo[]
   garantias            Garantia[]
   listaPrecioItems     ListaPrecioItem[]
+  atributoValores      ArticuloAtributoValor[]
+  imagenes             ArticuloImagen[]
+  ofertas              ArticuloOferta[]
 
   @@unique([tenantId, codigo])
   @@index([tenantId])
   @@index([tenantId, codigo])
   @@index([tenantId, rubroId])
   @@index([tenantId, tipo])
+  @@index([tenantId, padreId])
+  @@index([tenantId, categoriaId])
+  @@index([tenantId, esPadre])
 }
 
 /// @en Customer price list with optional currency and expiry (#234).
@@ -1096,6 +1238,7 @@ model Tenant {
   clientes       Cliente[]
   rubros         Rubro[]
   articulos      Articulo[]
+  categoriasArticulo CategoriaArticulo[]
   listasPrecios  ListaPrecio[]
   proveedores         Proveedor[]
   ordenesCompra       OrdenCompra[]

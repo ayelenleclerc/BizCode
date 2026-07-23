@@ -2,6 +2,7 @@ node_modules/
 .pnpm-store/
 .turbo/
 package-lock.json
+uploads/
 data/documentos-compra/
 data/documentos-compra-templates/
 dist/

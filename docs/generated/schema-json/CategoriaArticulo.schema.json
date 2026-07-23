@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "activo": {
+      "type": "boolean"
+    },
+    "codigo": {
+      "nullable": true,
+      "type": "string"
+    },
+    "createdAt": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "id": {
+      "type": "integer"
+    },
+    "nombre": {
+      "type": "string"
+    },
+    "padreId": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "precioDefault": {
+      "nullable": true,
+      "type": "number"
+    },
+    "tenantId": {
+      "type": "integer"
+    },
+    "updatedAt": {
+      "format": "date-time",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "tenantId",
+    "nombre",
+    "padreId",
+    "precioDefault",
+    "activo",
+    "createdAt",
+    "updatedAt"
+  ],
+  "title": "CategoriaArticulo",
+  "type": "object"
+}

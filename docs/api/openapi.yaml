@@ -56,6 +56,8 @@ tags:
     description: Cash drawers and cashier shifts (#247, module pos.cashier)
   - name: listas-precios
     description: Customer price lists with quantity-tiered pricing (#234, module catalog.pricelists)
+  - name: categorias-articulo
+    description: Hierarchical article categories and attributes for variants (#235, module catalog.variants)
   - name: cobros
     description: Customer payment collections
   - name: portal
@@ -5212,6 +5214,681 @@ paths:
           $ref: '#/components/responses/ForbiddenError'
         '500':
           $ref: '#/components/responses/ServerError'
+
+  /api/categorias-articulo:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [categorias-articulo]
+      summary: List hierarchical article categories
+      description: Requires module `catalog.variants`.
+      parameters:
+        - $ref: '#/components/parameters/ListLimit'
+        - $ref: '#/components/parameters/ListOffset'
+        - name: padreId
+          in: query
+          schema:
+            oneOf:
+              - type: integer
+                minimum: 1
+              - type: string
+                enum: [null]
+        - name: activo
+          in: query
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Paginated categories
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoriaArticuloListEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    post:
+      tags: [categorias-articulo]
+      summary: Create article category
+      description: Requires module `catalog.variants`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CategoriaArticuloCreateInput'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoriaArticuloEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/categorias-articulo/{id}:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    get:
+      tags: [categorias-articulo]
+      summary: Get category by id
+      description: Requires module `catalog.variants`.
+      responses:
+        '200':
+          description: Category with attributes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoriaArticuloEnvelope'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+    patch:
+      tags: [categorias-articulo]
+      summary: Update category
+      description: Requires module `catalog.variants`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CategoriaArticuloPatchInput'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoriaArticuloEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+    delete:
+      tags: [categorias-articulo]
+      summary: Delete category
+      description: Requires module `catalog.variants`. Fails if articles or children exist.
+      responses:
+        '200':
+          description: Deleted
+        '409':
+          description: Category in use
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /api/categorias-articulo/{id}/atributos:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    post:
+      tags: [categorias-articulo]
+      summary: Add attribute to category
+      description: Requires module `catalog.variants`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [nombre]
+              properties:
+                nombre:
+                  type: string
+                  maxLength: 40
+                orden:
+                  type: integer
+                  minimum: 0
+                valores:
+                  type: array
+                  items:
+                    type: object
+                    required: [valor]
+                    properties:
+                      valor:
+                        type: string
+                        maxLength: 40
+                      orden:
+                        type: integer
+                        minimum: 0
+      responses:
+        '201':
+          description: Created attribute
+        '409':
+          description: Duplicate name
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /api/categorias-articulo/{id}/atributos/{atributoId}:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+      - name: atributoId
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    patch:
+      tags: [categorias-articulo]
+      summary: Update category attribute
+      description: Requires module `catalog.variants`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              minProperties: 1
+              properties:
+                nombre:
+                  type: string
+                  maxLength: 40
+                orden:
+                  type: integer
+                  minimum: 0
+      responses:
+        '200':
+          description: Updated attribute
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+    delete:
+      tags: [categorias-articulo]
+      summary: Delete category attribute
+      description: Requires module `catalog.variants`.
+      responses:
+        '200':
+          description: Deleted
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /api/categorias-articulo/{id}/atributos/{atributoId}/valores:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+      - name: atributoId
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    post:
+      tags: [categorias-articulo]
+      summary: Add value to category attribute
+      description: Requires module `catalog.variants`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [valor]
+              properties:
+                valor:
+                  type: string
+                  maxLength: 40
+                orden:
+                  type: integer
+                  minimum: 0
+      responses:
+        '201':
+          description: Created value
+        '409':
+          description: Duplicate value
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /api/categorias-articulo/{id}/atributos/{atributoId}/valores/{valorId}:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+      - name: atributoId
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+      - name: valorId
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    delete:
+      tags: [categorias-articulo]
+      summary: Delete attribute value
+      description: Requires module `catalog.variants`.
+      responses:
+        '200':
+          description: Deleted
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /api/articulos/precio-catalogo-efectivo:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [articulos]
+      summary: Resolve catalog effective price (offer/override/category cascade)
+      description: Requires module `catalog.variants`.
+      parameters:
+        - name: articuloId
+          in: query
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '200':
+          description: Catalog effective price
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PrecioCatalogoEfectivoResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /api/articulos/{id}/variantes:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    get:
+      tags: [articulos]
+      summary: List variants of a parent article
+      description: Requires module `catalog.variants`.
+      responses:
+        '200':
+          description: Variant list
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /api/articulos/{id}/variantes/generar:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    post:
+      tags: [articulos]
+      summary: Generate combinatorial variants for a parent article
+      description: Requires module `catalog.variants`. Marks the article as parent.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [atributoValorIdsPorAtributo]
+              properties:
+                atributoValorIdsPorAtributo:
+                  type: array
+                  minItems: 1
+                  items:
+                    type: array
+                    minItems: 1
+                    items:
+                      type: integer
+                      minimum: 1
+                codigoInicio:
+                  type: integer
+                  minimum: 1
+      responses:
+        '201':
+          description: Variants created
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /api/articulos/{id}/stock-familia:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    get:
+      tags: [articulos]
+      summary: Aggregated stock of active variants under a parent
+      description: Requires module `catalog.variants`.
+      responses:
+        '200':
+          description: Family stock aggregate
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /api/articulos/{id}/ofertas:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    get:
+      tags: [articulos]
+      summary: List temporary offers for a variant
+      description: Requires module `catalog.variants`.
+      responses:
+        '200':
+          description: Offers
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+    post:
+      tags: [articulos]
+      summary: Create temporary offer for a sellable variant
+      description: Requires module `catalog.variants`. Rejects parent articles.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [precioOferta, vigenciaDesde, vigenciaHasta]
+              properties:
+                precioOferta:
+                  type: number
+                  minimum: 0
+                vigenciaDesde:
+                  type: string
+                  format: date-time
+                vigenciaHasta:
+                  type: string
+                  format: date-time
+                activa:
+                  type: boolean
+      responses:
+        '201':
+          description: Created
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /api/articulos/{id}/ofertas/{ofertaId}:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+      - name: ofertaId
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    patch:
+      tags: [articulos]
+      summary: Update temporary offer
+      description: Requires module `catalog.variants`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              minProperties: 1
+              properties:
+                precioOferta:
+                  type: number
+                  minimum: 0
+                vigenciaDesde:
+                  type: string
+                  format: date-time
+                vigenciaHasta:
+                  type: string
+                  format: date-time
+                activa:
+                  type: boolean
+      responses:
+        '200':
+          description: Updated
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+    delete:
+      tags: [articulos]
+      summary: Delete temporary offer
+      description: Requires module `catalog.variants`.
+      responses:
+        '200':
+          description: Deleted
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /api/articulos/{id}/imagenes:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    get:
+      tags: [articulos]
+      summary: List article images
+      description: Requires module `catalog.variants`.
+      responses:
+        '200':
+          description: Images
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+    post:
+      tags: [articulos]
+      summary: Upload article image (JPEG/PNG/WebP, max 5MB, max 8 images)
+      description: Requires module `catalog.variants`. Multipart field `file`.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '201':
+          description: Uploaded
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /api/articulos/{id}/imagenes/orden:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    put:
+      tags: [articulos]
+      summary: Reorder article images (first becomes principal)
+      description: Requires module `catalog.variants`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [ordenIds]
+              properties:
+                ordenIds:
+                  type: array
+                  minItems: 1
+                  items:
+                    type: integer
+                    minimum: 1
+      responses:
+        '200':
+          description: Reordered images
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /api/articulos/{id}/imagenes/{imagenId}:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+      - name: imagenId
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    delete:
+      tags: [articulos]
+      summary: Delete article image
+      description: Requires module `catalog.variants`.
+      responses:
+        '200':
+          description: Deleted
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
 
   /api/cobros:
     parameters:
@@ -16057,7 +16734,17 @@ components:
           type: number
         origen:
           type: string
-          enum: [escalonado, fijo, porcentaje_sobre_base, base]
+          enum:
+            [
+              escalonado,
+              fijo,
+              porcentaje_sobre_base,
+              base,
+              oferta,
+              override_variante,
+              precio_subfamilia,
+              precio_familia,
+            ]
         moneda:
           type: string
 
@@ -16094,6 +16781,120 @@ components:
               items:
                 $ref: '#/components/schemas/ListaPrecio'
         - $ref: '#/components/schemas/ListPaginationMeta'
+
+    CategoriaArticulo:
+      type: object
+      required: [id, tenantId, nombre, padreId, precioDefault, activo, createdAt, updatedAt]
+      properties:
+        id:
+          type: integer
+        tenantId:
+          type: integer
+        nombre:
+          type: string
+        codigo:
+          type: string
+          nullable: true
+        padreId:
+          type: integer
+          nullable: true
+        precioDefault:
+          type: number
+          nullable: true
+        activo:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    CategoriaArticuloCreateInput:
+      type: object
+      required: [nombre]
+      properties:
+        nombre:
+          type: string
+          maxLength: 80
+        codigo:
+          type: string
+          maxLength: 20
+          nullable: true
+        padreId:
+          type: integer
+          minimum: 1
+          nullable: true
+        precioDefault:
+          type: number
+          minimum: 0
+          nullable: true
+        activo:
+          type: boolean
+
+    CategoriaArticuloPatchInput:
+      type: object
+      minProperties: 1
+      properties:
+        nombre:
+          type: string
+          maxLength: 80
+        codigo:
+          type: string
+          maxLength: 20
+          nullable: true
+        padreId:
+          type: integer
+          minimum: 1
+          nullable: true
+        precioDefault:
+          type: number
+          minimum: 0
+          nullable: true
+        activo:
+          type: boolean
+
+    CategoriaArticuloEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/CategoriaArticulo'
+
+    CategoriaArticuloListEnvelope:
+      allOf:
+        - type: object
+          required: [success, data]
+          properties:
+            success:
+              type: boolean
+              const: true
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/CategoriaArticulo'
+        - $ref: '#/components/schemas/ListPaginationMeta'
+
+    PrecioCatalogoEfectivoResponse:
+      type: object
+      required: [success, articuloId, precio, origen, ofertaId]
+      properties:
+        success:
+          type: boolean
+          const: true
+        articuloId:
+          type: integer
+        precio:
+          type: number
+        origen:
+          type: string
+          enum: [oferta, override_variante, precio_subfamilia, precio_familia, precio_lista1]
+        ofertaId:
+          type: integer
+          nullable: true
 
     AppUser:
       type: object

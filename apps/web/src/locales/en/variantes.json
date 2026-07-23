@@ -1,0 +1,37 @@
+{
+  "title": "Variants",
+  "stockFamilia": "Family stock: {{stock}}",
+  "empty": "No variants generated yet.",
+  "generate": "Generate variants",
+  "selectValues": "Select values per attribute",
+  "errors": {
+    "load": "Could not load variants",
+    "generate": "Could not generate variants",
+    "needCategory": "Assign a category with attributes before generating variants.",
+    "needSaved": "Save the article first to manage variants."
+  },
+  "columns": {
+    "codigo": "Code",
+    "descripcion": "Description",
+    "stock": "Stock",
+    "precio": "Price",
+    "activo": "Active"
+  },
+  "images": {
+    "title": "Images",
+    "upload": "Upload image",
+    "empty": "No images yet.",
+    "remove": "Remove"
+  },
+  "offers": {
+    "title": "Offers",
+    "precio": "Offer price",
+    "desde": "From",
+    "hasta": "Until",
+    "add": "Add offer",
+    "empty": "No offers.",
+    "remove": "Remove"
+  },
+  "parentBadge": "Parent (not sellable)",
+  "variantBadge": "Variant"
+}

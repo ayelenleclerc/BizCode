@@ -26,6 +26,7 @@ import OrdenesTrabajoPage from './pages/ordenes-trabajo'
 import GarantiasPage from './pages/garantias'
 import CajaPage from './pages/caja'
 import ListasPreciosPage from './pages/listas-precios'
+import CategoriasArticuloPage from './pages/categorias-articulo'
 import ReportesPage from './pages/reportes'
 import ConfiguracionPage from './pages/configuracion'
 import ZonasEntregaPage from './pages/configuracion/ZonasEntregaPage'
@@ -213,6 +214,14 @@ function AppRoutes() {
             element={
               <ModuleRoute moduleKey="catalog.pricelists">
                 <ListasPreciosPage />
+              </ModuleRoute>
+            }
+          />
+          <Route
+            path="categorias-articulo"
+            element={
+              <ModuleRoute moduleKey="catalog.variants">
+                <CategoriasArticuloPage />
               </ModuleRoute>
             }
           />

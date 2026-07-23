@@ -108,6 +108,7 @@ export class FacturaService {
               condIva: true,
               unidadServicio: true,
               mesesGarantia: true,
+              esPadre: true,
             },
           })
         : []
@@ -116,6 +117,13 @@ export class FacturaService {
         ok: false,
         status: 400,
         error: 'One or more articuloId values are not valid for this tenant',
+      }
+    }
+    if (articulos.some((a) => a.esPadre)) {
+      return {
+        ok: false,
+        status: 400,
+        error: 'Parent articles cannot be sold; select a variant instead',
       }
     }
 
@@ -291,8 +299,8 @@ export class FacturaService {
 
   /**
    * @en Voids an active invoice, creates a credit note, reverses balance, and records audit in one transaction.
-   * @es Anula factura vigente, crea nota de crùdito, revierte saldo y audita en una transacciùn.
-   * @pt-BR Anula fatura ativa, cria nota de crùdito, reverte saldo e audita em uma transaùùo.
+   * @es Anula factura vigente, crea nota de cr?dito, revierte saldo y audita en una transacci?n.
+   * @pt-BR Anula fatura ativa, cria nota de cr?dito, reverte saldo e audita em uma transa??o.
    */
   async void(
     tenantId: number,
@@ -387,7 +395,7 @@ export class FacturaService {
 
     if (factura.estadoCae === 'issued') {
       void this.arca.requestCaeForNotaCredito(tenantId, result.notaCredito.id).catch(() => {
-        /* homologaciùn mock; retry job may be added later */
+        /* homologaci?n mock; retry job may be added later */
       })
     }
 
@@ -396,8 +404,8 @@ export class FacturaService {
 
   /**
    * @en Issues a partial credit note for an active invoice without voiding it (#344).
-   * @es Emite nota de crùdito parcial sobre factura vigente sin anularla (#344).
-   * @pt-BR Emite nota de crùdito parcial sobre fatura ativa sem anulù-la (#344).
+   * @es Emite nota de cr?dito parcial sobre factura vigente sin anularla (#344).
+   * @pt-BR Emite nota de cr?dito parcial sobre fatura ativa sem anul?-la (#344).
    */
   async createPartialCreditNote(
     tenantId: number,
@@ -491,7 +499,7 @@ export class FacturaService {
 
     if (factura.estadoCae === 'issued') {
       void this.arca.requestCaeForNotaCredito(tenantId, result.notaCredito.id).catch(() => {
-        /* homologaciùn mock; retry job may be added later */
+        /* homologaci?n mock; retry job may be added later */
       })
     }
 

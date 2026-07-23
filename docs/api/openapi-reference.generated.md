@@ -32711,7 +32711,7 @@ Requires module `catalog.pricelists`. Resolution cascade: tiered price -> list i
 
 - **`origen` (required)**
 
-  `string`, possible values: `"escalonado", "fijo", "porcentaje_sobre_base", "base"`
+  `string`, possible values: `"escalonado", "fijo", "porcentaje_sobre_base", "base", "oferta", "override_variante", "precio_subfamilia", "precio_familia"`
 
 - **`precio` (required)**
 
@@ -34070,6 +34070,2506 @@ Requires module `catalog.pricelists`.
 ```
 
 ##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/categorias-articulo
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/categorias-articulo`
+
+### List hierarchical article categories
+
+- **Method:** `GET`
+- **Path:** `/api/categorias-articulo`
+- **Tags:** categorias-articulo
+
+Requires module `catalog.variants`.
+
+#### Responses
+
+##### Status: 200 Paginated categories
+
+###### Content-Type: application/json
+
+**All of:**
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`activo` (required)**
+
+    `boolean`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`nombre` (required)**
+
+    `string`
+
+  - **`padreId` (required)**
+
+    `integer`
+
+  - **`precioDefault` (required)**
+
+    `number`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`codigo`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+* **`limit` (required)**
+
+  `integer` — Effective page size (same semantics as query \`limit\`)
+
+* **`offset` (required)**
+
+  `integer` — Effective skip (same semantics as query \`offset\`)
+
+* **`total` (required)**
+
+  `integer` — Row count matching the list filter (before limit/offset)
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "nombre": "",
+      "codigo": "",
+      "padreId": 1,
+      "precioDefault": 1,
+      "activo": true,
+      "createdAt": "",
+      "updatedAt": ""
+    }
+  ],
+  "total": 0,
+  "limit": 1,
+  "offset": 0
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Create article category
+
+- **Method:** `POST`
+- **Path:** `/api/categorias-articulo`
+- **Tags:** categorias-articulo
+
+Requires module `catalog.variants`.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`nombre` (required)**
+
+  `string`
+
+- **`activo`**
+
+  `boolean`
+
+- **`codigo`**
+
+  `string`
+
+- **`padreId`**
+
+  `integer`
+
+- **`precioDefault`**
+
+  `number`
+
+**Example:**
+
+```json
+{
+  "nombre": "",
+  "codigo": "",
+  "padreId": 1,
+  "precioDefault": 0,
+  "activo": true
+}
+```
+
+#### Responses
+
+##### Status: 201 Created
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`activo` (required)**
+
+    `boolean`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`nombre` (required)**
+
+    `string`
+
+  - **`padreId` (required)**
+
+    `integer`
+
+  - **`precioDefault` (required)**
+
+    `number`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`codigo`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "nombre": "",
+    "codigo": "",
+    "padreId": 1,
+    "precioDefault": 1,
+    "activo": true,
+    "createdAt": "",
+    "updatedAt": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/categorias-articulo/{id}
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/categorias-articulo/{id}`
+
+### Get category by id
+
+- **Method:** `GET`
+- **Path:** `/api/categorias-articulo/{id}`
+- **Tags:** categorias-articulo
+
+Requires module `catalog.variants`.
+
+#### Responses
+
+##### Status: 200 Category with attributes
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`activo` (required)**
+
+    `boolean`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`nombre` (required)**
+
+    `string`
+
+  - **`padreId` (required)**
+
+    `integer`
+
+  - **`precioDefault` (required)**
+
+    `number`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`codigo`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "nombre": "",
+    "codigo": "",
+    "padreId": 1,
+    "precioDefault": 1,
+    "activo": true,
+    "createdAt": "",
+    "updatedAt": ""
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Update category
+
+- **Method:** `PATCH`
+- **Path:** `/api/categorias-articulo/{id}`
+- **Tags:** categorias-articulo
+
+Requires module `catalog.variants`.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`activo`**
+
+  `boolean`
+
+- **`codigo`**
+
+  `string`
+
+- **`nombre`**
+
+  `string`
+
+- **`padreId`**
+
+  `integer`
+
+- **`precioDefault`**
+
+  `number`
+
+**Example:**
+
+```json
+{
+  "nombre": "",
+  "codigo": "",
+  "padreId": 1,
+  "precioDefault": 0,
+  "activo": true
+}
+```
+
+#### Responses
+
+##### Status: 200 Updated
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`activo` (required)**
+
+    `boolean`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`nombre` (required)**
+
+    `string`
+
+  - **`padreId` (required)**
+
+    `integer`
+
+  - **`precioDefault` (required)**
+
+    `number`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`codigo`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "nombre": "",
+    "codigo": "",
+    "padreId": 1,
+    "precioDefault": 1,
+    "activo": true,
+    "createdAt": "",
+    "updatedAt": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Delete category
+
+- **Method:** `DELETE`
+- **Path:** `/api/categorias-articulo/{id}`
+- **Tags:** categorias-articulo
+
+Requires module `catalog.variants`. Fails if articles or children exist.
+
+#### Responses
+
+##### Status: 200 Deleted
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 409 Category in use
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/categorias-articulo/{id}/atributos
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/categorias-articulo/{id}/atributos`
+
+### Add attribute to category
+
+- **Method:** `POST`
+- **Path:** `/api/categorias-articulo/{id}/atributos`
+- **Tags:** categorias-articulo
+
+Requires module `catalog.variants`.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`nombre` (required)**
+
+  `string`
+
+- **`orden`**
+
+  `integer`
+
+- **`valores`**
+
+  `array`
+
+  **Items:**
+
+  - **`valor` (required)**
+
+    `string`
+
+  - **`orden`**
+
+    `integer`
+
+**Example:**
+
+```json
+{
+  "nombre": "",
+  "orden": 0,
+  "valores": [
+    {
+      "valor": "",
+      "orden": 0
+    }
+  ]
+}
+```
+
+#### Responses
+
+##### Status: 201 Created attribute
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 409 Duplicate name
+
+### PARAMETERS /api/categorias-articulo/{id}/atributos/{atributoId}
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/categorias-articulo/{id}/atributos/{atributoId}`
+
+### Update category attribute
+
+- **Method:** `PATCH`
+- **Path:** `/api/categorias-articulo/{id}/atributos/{atributoId}`
+- **Tags:** categorias-articulo
+
+Requires module `catalog.variants`.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`nombre`**
+
+  `string`
+
+- **`orden`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "nombre": "",
+  "orden": 0
+}
+```
+
+#### Responses
+
+##### Status: 200 Updated attribute
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Delete category attribute
+
+- **Method:** `DELETE`
+- **Path:** `/api/categorias-articulo/{id}/atributos/{atributoId}`
+- **Tags:** categorias-articulo
+
+Requires module `catalog.variants`.
+
+#### Responses
+
+##### Status: 200 Deleted
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/categorias-articulo/{id}/atributos/{atributoId}/valores
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/categorias-articulo/{id}/atributos/{atributoId}/valores`
+
+### Add value to category attribute
+
+- **Method:** `POST`
+- **Path:** `/api/categorias-articulo/{id}/atributos/{atributoId}/valores`
+- **Tags:** categorias-articulo
+
+Requires module `catalog.variants`.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`valor` (required)**
+
+  `string`
+
+- **`orden`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "valor": "",
+  "orden": 0
+}
+```
+
+#### Responses
+
+##### Status: 201 Created value
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 409 Duplicate value
+
+### PARAMETERS /api/categorias-articulo/{id}/atributos/{atributoId}/valores/{valorId}
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/categorias-articulo/{id}/atributos/{atributoId}/valores/{valorId}`
+
+### Delete attribute value
+
+- **Method:** `DELETE`
+- **Path:** `/api/categorias-articulo/{id}/atributos/{atributoId}/valores/{valorId}`
+- **Tags:** categorias-articulo
+
+Requires module `catalog.variants`.
+
+#### Responses
+
+##### Status: 200 Deleted
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/articulos/precio-catalogo-efectivo
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/articulos/precio-catalogo-efectivo`
+
+### Resolve catalog effective price (offer/override/category cascade)
+
+- **Method:** `GET`
+- **Path:** `/api/articulos/precio-catalogo-efectivo`
+- **Tags:** articulos
+
+Requires module `catalog.variants`.
+
+#### Responses
+
+##### Status: 200 Catalog effective price
+
+###### Content-Type: application/json
+
+- **`articuloId` (required)**
+
+  `integer`
+
+- **`ofertaId` (required)**
+
+  `integer`
+
+- **`origen` (required)**
+
+  `string`, possible values: `"oferta", "override_variante", "precio_subfamilia", "precio_familia", "precio_lista1"`
+
+- **`precio` (required)**
+
+  `number`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "articuloId": 1,
+  "precio": 1,
+  "origen": "oferta",
+  "ofertaId": 1
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/articulos/{id}/variantes
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/articulos/{id}/variantes`
+
+### List variants of a parent article
+
+- **Method:** `GET`
+- **Path:** `/api/articulos/{id}/variantes`
+- **Tags:** articulos
+
+Requires module `catalog.variants`.
+
+#### Responses
+
+##### Status: 200 Variant list
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/articulos/{id}/variantes/generar
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/articulos/{id}/variantes/generar`
+
+### Generate combinatorial variants for a parent article
+
+- **Method:** `POST`
+- **Path:** `/api/articulos/{id}/variantes/generar`
+- **Tags:** articulos
+
+Requires module `catalog.variants`. Marks the article as parent.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`atributoValorIdsPorAtributo` (required)**
+
+  `array`
+
+  **Items:**
+
+  **Array of:**
+
+  `integer`
+
+  - Min items: `1`
+
+- **`codigoInicio`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "atributoValorIdsPorAtributo": [
+    [
+      1
+    ]
+  ],
+  "codigoInicio": 1
+}
+```
+
+#### Responses
+
+##### Status: 201 Variants created
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/articulos/{id}/stock-familia
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/articulos/{id}/stock-familia`
+
+### Aggregated stock of active variants under a parent
+
+- **Method:** `GET`
+- **Path:** `/api/articulos/{id}/stock-familia`
+- **Tags:** articulos
+
+Requires module `catalog.variants`.
+
+#### Responses
+
+##### Status: 200 Family stock aggregate
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/articulos/{id}/ofertas
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/articulos/{id}/ofertas`
+
+### List temporary offers for a variant
+
+- **Method:** `GET`
+- **Path:** `/api/articulos/{id}/ofertas`
+- **Tags:** articulos
+
+Requires module `catalog.variants`.
+
+#### Responses
+
+##### Status: 200 Offers
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Create temporary offer for a sellable variant
+
+- **Method:** `POST`
+- **Path:** `/api/articulos/{id}/ofertas`
+- **Tags:** articulos
+
+Requires module `catalog.variants`. Rejects parent articles.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`precioOferta` (required)**
+
+  `number`
+
+- **`vigenciaDesde` (required)**
+
+  `string`, format: `date-time`
+
+- **`vigenciaHasta` (required)**
+
+  `string`, format: `date-time`
+
+- **`activa`**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "precioOferta": 0,
+  "vigenciaDesde": "",
+  "vigenciaHasta": "",
+  "activa": true
+}
+```
+
+#### Responses
+
+##### Status: 201 Created
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/articulos/{id}/ofertas/{ofertaId}
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/articulos/{id}/ofertas/{ofertaId}`
+
+### Update temporary offer
+
+- **Method:** `PATCH`
+- **Path:** `/api/articulos/{id}/ofertas/{ofertaId}`
+- **Tags:** articulos
+
+Requires module `catalog.variants`.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`activa`**
+
+  `boolean`
+
+- **`precioOferta`**
+
+  `number`
+
+- **`vigenciaDesde`**
+
+  `string`, format: `date-time`
+
+- **`vigenciaHasta`**
+
+  `string`, format: `date-time`
+
+**Example:**
+
+```json
+{
+  "precioOferta": 0,
+  "vigenciaDesde": "",
+  "vigenciaHasta": "",
+  "activa": true
+}
+```
+
+#### Responses
+
+##### Status: 200 Updated
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Delete temporary offer
+
+- **Method:** `DELETE`
+- **Path:** `/api/articulos/{id}/ofertas/{ofertaId}`
+- **Tags:** articulos
+
+Requires module `catalog.variants`.
+
+#### Responses
+
+##### Status: 200 Deleted
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/articulos/{id}/imagenes
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/articulos/{id}/imagenes`
+
+### List article images
+
+- **Method:** `GET`
+- **Path:** `/api/articulos/{id}/imagenes`
+- **Tags:** articulos
+
+Requires module `catalog.variants`.
+
+#### Responses
+
+##### Status: 200 Images
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Upload article image (JPEG/PNG/WebP, max 5MB, max 8 images)
+
+- **Method:** `POST`
+- **Path:** `/api/articulos/{id}/imagenes`
+- **Tags:** articulos
+
+Requires module `catalog.variants`. Multipart field `file`.
+
+#### Request Body
+
+##### Content-Type: multipart/form-data
+
+- **`file` (required)**
+
+  `string`, format: `binary`
+
+**Example:**
+
+```json
+{
+  "file": {}
+}
+```
+
+#### Responses
+
+##### Status: 201 Uploaded
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/articulos/{id}/imagenes/orden
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/articulos/{id}/imagenes/orden`
+
+### Reorder article images (first becomes principal)
+
+- **Method:** `PUT`
+- **Path:** `/api/articulos/{id}/imagenes/orden`
+- **Tags:** articulos
+
+Requires module `catalog.variants`.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`ordenIds` (required)**
+
+  `array`
+
+  **Items:**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "ordenIds": [
+    1
+  ]
+}
+```
+
+#### Responses
+
+##### Status: 200 Reordered images
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/articulos/{id}/imagenes/{imagenId}
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/articulos/{id}/imagenes/{imagenId}`
+
+### Delete article image
+
+- **Method:** `DELETE`
+- **Path:** `/api/articulos/{id}/imagenes/{imagenId}`
+- **Tags:** articulos
+
+Requires module `catalog.variants`.
+
+#### Responses
+
+##### Status: 200 Deleted
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
 
 ###### Content-Type: application/json
 
@@ -82472,7 +84972,7 @@ Originating invoice header (selected columns)
 
 * **`origen` (required)**
 
-  `string`, possible values: `"escalonado", "fijo", "porcentaje_sobre_base", "base"`
+  `string`, possible values: `"escalonado", "fijo", "porcentaje_sobre_base", "base", "oferta", "override_variante", "precio_subfamilia", "precio_familia"`
 
 * **`precio` (required)**
 
@@ -82744,6 +85244,243 @@ Originating invoice header (selected columns)
 - **Type:**
 
 **Example:**
+
+### CategoriaArticulo
+
+- **Type:**`object`
+
+* **`activo` (required)**
+
+  `boolean`
+
+* **`createdAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`nombre` (required)**
+
+  `string`
+
+* **`padreId` (required)**
+
+  `integer`
+
+* **`precioDefault` (required)**
+
+  `number`
+
+* **`tenantId` (required)**
+
+  `integer`
+
+* **`updatedAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`codigo`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "tenantId": 1,
+  "nombre": "",
+  "codigo": "",
+  "padreId": 1,
+  "precioDefault": 1,
+  "activo": true,
+  "createdAt": "",
+  "updatedAt": ""
+}
+```
+
+### CategoriaArticuloCreateInput
+
+- **Type:**`object`
+
+* **`nombre` (required)**
+
+  `string`
+
+* **`activo`**
+
+  `boolean`
+
+* **`codigo`**
+
+  `string`
+
+* **`padreId`**
+
+  `integer`
+
+* **`precioDefault`**
+
+  `number`
+
+**Example:**
+
+```json
+{
+  "nombre": "",
+  "codigo": "",
+  "padreId": 1,
+  "precioDefault": 0,
+  "activo": true
+}
+```
+
+### CategoriaArticuloPatchInput
+
+- **Type:**`object`
+
+* **`activo`**
+
+  `boolean`
+
+* **`codigo`**
+
+  `string`
+
+* **`nombre`**
+
+  `string`
+
+* **`padreId`**
+
+  `integer`
+
+* **`precioDefault`**
+
+  `number`
+
+**Example:**
+
+```json
+{
+  "nombre": "",
+  "codigo": "",
+  "padreId": 1,
+  "precioDefault": 0,
+  "activo": true
+}
+```
+
+### CategoriaArticuloEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`activo` (required)**
+
+    `boolean`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`nombre` (required)**
+
+    `string`
+
+  - **`padreId` (required)**
+
+    `integer`
+
+  - **`precioDefault` (required)**
+
+    `number`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`codigo`**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "nombre": "",
+    "codigo": "",
+    "padreId": 1,
+    "precioDefault": 1,
+    "activo": true,
+    "createdAt": "",
+    "updatedAt": ""
+  }
+}
+```
+
+### CategoriaArticuloListEnvelope
+
+- **Type:**
+
+**Example:**
+
+### PrecioCatalogoEfectivoResponse
+
+- **Type:**`object`
+
+* **`articuloId` (required)**
+
+  `integer`
+
+* **`ofertaId` (required)**
+
+  `integer`
+
+* **`origen` (required)**
+
+  `string`, possible values: `"oferta", "override_variante", "precio_subfamilia", "precio_familia", "precio_lista1"`
+
+* **`precio` (required)**
+
+  `number`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "articuloId": 1,
+  "precio": 1,
+  "origen": "oferta",
+  "ofertaId": 1
+}
+```
 
 ### AppUser
 

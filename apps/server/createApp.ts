@@ -98,6 +98,12 @@ export function createApp(prisma: PrismaClient): Application {
     }),
   )
   app.use(express.json())
+  app.use(
+    '/uploads/articulos',
+    express.static(
+      process.env.BIZCODE_ARTICULO_IMAGES_DIR?.trim() || path.join(process.cwd(), 'uploads', 'articulos'),
+    ),
+  )
   app.use(resolveSession(prisma))
   app.use(tenantContext)
   app.use(tenantModules(prisma))

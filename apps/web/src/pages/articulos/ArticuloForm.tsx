@@ -5,17 +5,19 @@ import { z } from 'zod'
 import { useHotkeys } from 'react-hotkeys-hook'
 import KeyboardHint, { useFormShortcuts } from '@/components/shared/KeyboardHint'
 import { useTranslation } from 'react-i18next'
-import { ApiRequestFailedError, articulosAPI, type StockAjusteHistorialRow } from '@/lib/api'
+import { ApiRequestFailedError, articulosAPI, catalogVariantsAPI, type StockAjusteHistorialRow } from '@/lib/api'
 import { hasPermission } from '@/lib/rbac'
 import { CanAccess } from '@/components/CanAccess'
+import IfModule from '@/components/IfModule'
 import { useAuth } from '@/contexts/AuthContext'
-import { Articulo, Rubro } from '@bizcode/types'
+import { Articulo, Rubro, type CategoriaArticuloRow } from '@bizcode/types'
 import ArticuloProveedoresComparadorSection from './ArticuloProveedoresComparadorSection'
+import ArticuloVariantesPanel from './ArticuloVariantesPanel'
 
 const articuloSchema = z
   .object({
     codigo: z.coerce.number().int().positive('Código debe ser positivo'),
-    descripcion: z.string().min(3, 'Mínimo 3 caracteres').max(30),
+    descripcion: z.string().min(3, 'Mínimo 3 caracteres').max(120),
     // Rubro — HTML <select value=""> must not coerce to 0 (would fail .positive() and block submit).
     rubroId: z.preprocess((val) => {
       if (val === '' || val === null || val === undefined) return undefined
@@ -23,6 +25,12 @@ const articuloSchema = z
       if (!Number.isFinite(n) || n <= 0) return undefined
       return Math.trunc(n)
     }, z.number().int().positive('Seleccione un rubro')),
+    categoriaId: z.preprocess((val) => {
+      if (val === '' || val === null || val === undefined) return null
+      const n = typeof val === 'number' ? val : Number(val)
+      if (!Number.isFinite(n) || n <= 0) return null
+      return Math.trunc(n)
+    }, z.number().int().positive().nullable()),
     condIva: z.enum(['1', '2', '3']), // 1=21%, 2=10.5%, 3=Exento
     umedida: z.string().min(2).max(6),
     tipo: z.enum(['articulo', 'servicio']).default('articulo'),
@@ -78,6 +86,7 @@ export default function ArticuloForm({ articulo, rubros, onClose, onGuardado }: 
   const { t: tc } = useTranslation('common')
   const { claims } = useAuth()
   const [loading, setLoading] = useState(false)
+  const [categorias, setCategorias] = useState<CategoriaArticuloRow[]>([])
   const [error, setError] = useState<string | null>(null)
   const [stockDisplay, setStockDisplay] = useState(articulo?.stock ?? 0)
   const [showAdjust, setShowAdjust] = useState(false)
@@ -119,17 +128,27 @@ export default function ArticuloForm({ articulo, rubros, onClose, onGuardado }: 
       minimo: 0,
       stock: 0,
       mesesGarantia: null,
+      categoriaId: null,
       activo: true,
     }) as ArticuloFormData,
   })
 
   const tipoWatch = watch('tipo')
+  const categoriaWatch = watch('categoriaId')
+
+  useEffect(() => {
+    catalogVariantsAPI
+      .listCategorias({ take: 200, activo: true })
+      .then((res) => setCategorias(res?.data ?? []))
+      .catch(() => setCategorias([]))
+  }, [])
 
   useEffect(() => {
     if (articulo) {
       setValue('codigo', articulo.codigo)
       setValue('descripcion', articulo.descripcion)
       setValue('rubroId', articulo.rubroId)
+      setValue('categoriaId', articulo.categoriaId ?? null)
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       setValue('condIva', articulo.condIva as any)
       setValue('umedida', articulo.umedida)
@@ -301,7 +320,7 @@ export default function ArticuloForm({ articulo, rubros, onClose, onGuardado }: 
               type="text"
               data-testid="articulo-form-descripcion"
               {...register('descripcion')}
-              maxLength={30}
+              maxLength={120}
               aria-required="true"
               aria-describedby={errors.descripcion ? 'articulo-descripcion-error' : undefined}
               className="w-full px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 rounded border border-slate-300 dark:border-slate-600 focus:border-blue-500 focus:outline-none"
@@ -335,6 +354,26 @@ export default function ArticuloForm({ articulo, rubros, onClose, onGuardado }: 
                 <p id="articulo-rubroId-error" className="text-red-400 text-sm mt-1">{errors.rubroId.message}</p>
               )}
             </div>
+            <IfModule flag="catalog.variants">
+              <div>
+                <label htmlFor="articulo-categoriaId" className="block text-slate-700 dark:text-slate-300 font-semibold mb-1">
+                  {t('form.categoria', { defaultValue: 'Categoría' })}
+                </label>
+                <select
+                  id="articulo-categoriaId"
+                  data-testid="articulo-form-categoriaId"
+                  {...register('categoriaId')}
+                  className="w-full px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 rounded border border-slate-300 dark:border-slate-600 focus:border-blue-500 focus:outline-none"
+                >
+                  <option value="">{t('form.selectCategoria', { defaultValue: '— Sin categoría —' })}</option>
+                  {categorias.map((cat) => (
+                    <option key={cat.id} value={cat.id}>
+                      {cat.nombre}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </IfModule>
             <div>
               <label htmlFor="articulo-umedida" className="block text-slate-700 dark:text-slate-300 font-semibold mb-1">
                 {t('form.umedida')} *
@@ -655,6 +694,13 @@ export default function ArticuloForm({ articulo, rubros, onClose, onGuardado }: 
             </button>
           </div>
         </form>
+
+        <ArticuloVariantesPanel
+          articuloId={articulo?.id ?? null}
+          categoriaId={categoriaWatch}
+          esPadre={articulo?.esPadre}
+          padreId={articulo?.padreId}
+        />
       </div>
 
       {showAdjust && articulo && (

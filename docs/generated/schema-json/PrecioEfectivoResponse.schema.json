@@ -19,7 +19,11 @@
         "escalonado",
         "fijo",
         "porcentaje_sobre_base",
-        "base"
+        "base",
+        "oferta",
+        "override_variante",
+        "precio_subfamilia",
+        "precio_familia"
       ],
       "type": "string"
     },

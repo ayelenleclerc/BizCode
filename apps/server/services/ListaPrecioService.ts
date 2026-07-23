@@ -384,9 +384,9 @@ export class ListaPrecioService {
   }
 
   /**
-   * @en Resolves the effective unit price: tier -> list item (fixed/percent) -> base article price.
-   * @es Resuelve el precio unitario efectivo: tramo -> ítem de lista (fijo/porcentaje) -> precio base.
-   * @pt-BR Resolve o preço unitário efetivo: faixa -> item de lista (fixo/percentual) -> preço base.
+   * @en Resolves effective unit price: catalog cascade (offer/override/category) then list tiers -> base (#235).
+   * @es Resuelve precio unitario efectivo: cascada de catálogo (oferta/override/categoría) luego tramos de lista -> base (#235).
+   * @pt-BR Resolve preço unitário efetivo: cascata de catálogo (oferta/override/categoria) depois faixas de lista -> base (#235).
    */
   async getPrecioEfectivo(
     tenantId: number,
@@ -396,12 +396,43 @@ export class ListaPrecioService {
   ): Promise<ServiceResult<PrecioEfectivoResponse>> {
     const articulo = await this.prisma.articulo.findFirst({
       where: { id: articuloId, tenantId },
-      select: { id: true, precioLista1: true },
+      include: {
+        categoria: { include: { padre: true } },
+        padre: { include: { categoria: { include: { padre: true } } } },
+        ofertas: {
+          where: {
+            activa: true,
+            vigenciaDesde: { lte: new Date() },
+            vigenciaHasta: { gte: new Date() },
+          },
+          orderBy: { precioOferta: 'asc' },
+          take: 1,
+        },
+      },
     })
     if (!articulo) {
       return { ok: false, status: 404, error: 'Articulo not found' }
     }
-    const precioBase = Number(articulo.precioLista1.toString())
+
+    let precioBase = Number(articulo.precioLista1.toString())
+    let catalogOrigen: PrecioEfectivoOrigen = 'base'
+    const oferta = articulo.ofertas?.[0]
+    if (oferta) {
+      precioBase = round2(Number(oferta.precioOferta.toString()))
+      catalogOrigen = 'oferta'
+    } else if (!articulo.heredaPrecio && articulo.precioOverride != null) {
+      precioBase = round2(Number(articulo.precioOverride.toString()))
+      catalogOrigen = 'override_variante'
+    } else {
+      const categoria = articulo.categoria ?? articulo.padre?.categoria ?? null
+      if (categoria?.precioDefault != null) {
+        precioBase = round2(Number(categoria.precioDefault.toString()))
+        catalogOrigen = categoria.padreId != null ? 'precio_subfamilia' : 'precio_familia'
+      } else if (categoria?.padre?.precioDefault != null) {
+        precioBase = round2(Number(categoria.padre.precioDefault.toString()))
+        catalogOrigen = 'precio_familia'
+      }
+    }
 
     const baseResponse: PrecioEfectivoResponse = {
       success: true,
@@ -410,7 +441,7 @@ export class ListaPrecioService {
       cantidad,
       precioBase,
       precio: precioBase,
-      origen: 'base',
+      origen: catalogOrigen,
       moneda: 'ARS',
     }
 
@@ -437,7 +468,7 @@ export class ListaPrecioService {
     const moneda = lista.moneda
     const item = lista.items[0]
     if (!item) {
-      return { ok: true, data: { ...baseResponse, moneda, origen: 'base' } }
+      return { ok: true, data: { ...baseResponse, moneda } }
     }
 
     const tier = item.escalonados.find((e) => {
@@ -451,8 +482,8 @@ export class ListaPrecioService {
         data: {
           ...baseResponse,
           moneda,
-          precio: Number(tier.precio.toString()),
-          origen: 'escalonado' as PrecioEfectivoOrigen,
+          precio: round2(Number(tier.precio.toString())),
+          origen: 'escalonado',
         },
       }
     }
@@ -463,7 +494,7 @@ export class ListaPrecioService {
         data: {
           ...baseResponse,
           moneda,
-          precio: Number(item.precio.toString()),
+          precio: round2(Number(item.precio.toString())),
           origen: 'fijo',
         },
       }
@@ -482,6 +513,6 @@ export class ListaPrecioService {
       }
     }
 
-    return { ok: true, data: { ...baseResponse, moneda, origen: 'base' } }
+    return { ok: true, data: { ...baseResponse, moneda } }
   }
 }
