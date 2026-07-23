@@ -33,6 +33,8 @@ import portalEs from '@/locales/es/portal.json'
 import listasPreciosEs from '@/locales/es/listasPrecios.json'
 import categoriasArticuloEs from '@/locales/es/categoriasArticulo.json'
 import variantesEs from '@/locales/es/variantes.json'
+import depositosEs from '@/locales/es/depositos.json'
+import transferenciasDepositoEs from '@/locales/es/transferenciasDeposito.json'
 
 import commonEn from '@/locales/en/common.json'
 import clientesEn from '@/locales/en/clientes.json'
@@ -64,6 +66,8 @@ import portalEn from '@/locales/en/portal.json'
 import listasPreciosEn from '@/locales/en/listasPrecios.json'
 import categoriasArticuloEn from '@/locales/en/categoriasArticulo.json'
 import variantesEn from '@/locales/en/variantes.json'
+import depositosEn from '@/locales/en/depositos.json'
+import transferenciasDepositoEn from '@/locales/en/transferenciasDeposito.json'
 
 import commonPt from '@/locales/pt-BR/common.json'
 import clientesPt from '@/locales/pt-BR/clientes.json'
@@ -95,6 +99,8 @@ import portalPt from '@/locales/pt-BR/portal.json'
 import listasPreciosPt from '@/locales/pt-BR/listasPrecios.json'
 import categoriasArticuloPt from '@/locales/pt-BR/categoriasArticulo.json'
 import variantesPt from '@/locales/pt-BR/variantes.json'
+import depositosPt from '@/locales/pt-BR/depositos.json'
+import transferenciasDepositoPt from '@/locales/pt-BR/transferenciasDeposito.json'
 
 // Persist language preference in localStorage
 const savedLang = typeof localStorage !== 'undefined'
@@ -107,7 +113,7 @@ i18n
     lng: savedLang,
     fallbackLng: 'es',
     defaultNS: 'common',
-    ns: ['common', 'clientes', 'articulos', 'proveedores', 'compras', 'recuentos', 'repartos', 'pod', 'picking', 'seguimiento', 'logisticaReportes', 'facturacion', 'pedidos', 'contratos', 'ordenesTrabajo', 'garantias', 'caja', 'cobros', 'finanzas', 'reportes', 'dashboardAnalytics', 'logistica', 'zonasEntrega', 'empresa', 'portal', 'chat', 'audit', 'listasPrecios', 'categoriasArticulo', 'variantes'],
+    ns: ['common', 'clientes', 'articulos', 'proveedores', 'compras', 'recuentos', 'repartos', 'pod', 'picking', 'seguimiento', 'logisticaReportes', 'facturacion', 'pedidos', 'contratos', 'ordenesTrabajo', 'garantias', 'caja', 'cobros', 'finanzas', 'reportes', 'dashboardAnalytics', 'logistica', 'zonasEntrega', 'empresa', 'portal', 'chat', 'audit', 'listasPrecios', 'categoriasArticulo', 'variantes', 'depositos', 'transferenciasDeposito'],
     resources: {
       es: {
         common: commonEs,
@@ -140,6 +146,8 @@ i18n
         listasPrecios: listasPreciosEs,
         categoriasArticulo: categoriasArticuloEs,
         variantes: variantesEs,
+        depositos: depositosEs,
+        transferenciasDeposito: transferenciasDepositoEs,
       },
       en: {
         common: commonEn,
@@ -172,6 +180,8 @@ i18n
         listasPrecios: listasPreciosEn,
         categoriasArticulo: categoriasArticuloEn,
         variantes: variantesEn,
+        depositos: depositosEn,
+        transferenciasDeposito: transferenciasDepositoEn,
       },
       'pt-BR': {
         common: commonPt,
@@ -204,6 +214,8 @@ i18n
         listasPrecios: listasPreciosPt,
         categoriasArticulo: categoriasArticuloPt,
         variantes: variantesPt,
+        depositos: depositosPt,
+        transferenciasDeposito: transferenciasDepositoPt,
       },
     },
     interpolation: {

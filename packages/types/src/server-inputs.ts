@@ -217,6 +217,8 @@ export type FacturaInput = {
   total: number
   items: FacturaItemInput[]
   percepciones?: FacturaPercepcionInput[]
+  /** @en Dispatch deposit (#236). @es Depósito de despacho (#236). @pt-BR Depósito de despacho (#236). */
+  depositoId?: number | null
 }
 
 export type CobroRetencionInput = {
@@ -376,6 +378,8 @@ export type RepartoUbicacionInput = {
 export type StockAjusteInput = {
   cantidad: number
   motivo: string
+  /** @en Deposit for the adjustment (#236). @es Depósito del ajuste (#236). @pt-BR Depósito do ajuste (#236). */
+  depositoId?: number | null
 }
 
 export type OrdenCompraEstado = 'draft' | 'sent' | 'received' | 'cancelled'
@@ -391,6 +395,8 @@ export type OrdenCompraCreateInput = {
   fechaEstimada?: string | null
   nota?: string | null
   items: OrdenCompraItemInput[]
+  /** @en Receipt destination deposit (#236). @es Depósito destino de recepción (#236). @pt-BR Depósito destino da recepção (#236). */
+  depositoId?: number | null
 }
 
 export type OrdenCompraUpdateInput = {
@@ -443,6 +449,8 @@ export type PedidoInput = {
   vendedorId?: number | null
   validUntil?: string | null
   items: PedidoItemInput[]
+  /** @en Intended dispatch deposit (#236). @es Depósito de despacho previsto (#236). @pt-BR Depósito de despacho previsto (#236). */
+  depositoId?: number | null
 }
 
 export type PedidoInvoiceInput = {

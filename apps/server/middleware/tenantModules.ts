@@ -37,6 +37,8 @@ const TEST_DEFAULT_MODULES: ModuleKey[] = [
   'pos.cashier',
   'catalog.pricelists',
   'catalog.variants',
+  'inventory.stock',
+  'inventory.warehouses',
 ]
 
 /**

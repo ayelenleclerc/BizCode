@@ -9,6 +9,7 @@ import {
   evaluateStockForInvoice,
   type StockBelowMinimumAlert,
 } from './facturaStock'
+import { applyStockDepositoDelta, getDefaultDepositoId } from './stockDepositoSync'
 import { ArcaService } from '../fiscal/ar/ArcaService'
 import { validateFacturaPercepciones } from './RetencionFacturaValidation'
 import { ClienteCuentaCorrienteService } from './ClienteCuentaCorrienteService'
@@ -84,7 +85,7 @@ export class FacturaService {
     userId: number,
     options?: FacturaCreateOptions,
   ): Promise<ServiceResult<FacturaCreateResult>> {
-    const { items, fecha, ...factura } = input
+    const { items, fecha, depositoId: inputDepositoId, ...factura } = input
     const clienteId = factura.clienteId
 
     const catalogIds = [
@@ -168,12 +169,67 @@ export class FacturaService {
     })
 
     const qtyByArticulo = aggregateItemQuantities(items, tipoById)
-    const stockEval = evaluateStockForInvoice(articulos, qtyByArticulo)
-    if (stockEval.insufficient) {
-      return { ok: false, status: 422, error: 'INSUFFICIENT_STOCK' }
+
+    const depositoId =
+      inputDepositoId != null
+        ? inputDepositoId
+        : await getDefaultDepositoId(this.prisma, tenantId)
+
+    if (inputDepositoId != null) {
+      const dep = await this.prisma.deposito.findFirst({
+        where: { id: inputDepositoId, tenantId, activo: true },
+        select: { id: true },
+      })
+      if (!dep) {
+        return { ok: false, status: 400, error: 'depositoId is not valid for this tenant' }
+      }
     }
 
-    const recuentoBlock = await assertNoOpenRecuento(this.prisma, tenantId)
+    let stockEval: { insufficient: boolean; alerts: StockBelowMinimumAlert[] }
+    if (depositoId != null && qtyByArticulo.size > 0) {
+      const stockRows = await this.prisma.stockDeposito.findMany({
+        where: {
+          tenantId,
+          depositoId,
+          articuloId: { in: [...qtyByArticulo.keys()] },
+        },
+        select: { articuloId: true, cantidad: true },
+      })
+      const qtyInDeposit = new Map(stockRows.map((r) => [r.articuloId, r.cantidad]))
+      const depositSnapshots = articulos.map((a) => ({
+        ...a,
+        stock: qtyInDeposit.get(a.id) ?? 0,
+      }))
+      stockEval = evaluateStockForInvoice(depositSnapshots, qtyByArticulo)
+      if (stockEval.insufficient) {
+        const elsewhere = await this.prisma.stockDeposito.findMany({
+          where: {
+            tenantId,
+            articuloId: { in: [...qtyByArticulo.keys()] },
+            depositoId: { not: depositoId },
+            cantidad: { gt: 0 },
+          },
+          include: { deposito: { select: { codigo: true, nombre: true } } },
+        })
+        const available = elsewhere
+          .map((r) => `${r.deposito.codigo}:${r.cantidad}`)
+          .join(', ')
+        return {
+          ok: false,
+          status: 422,
+          error: available
+            ? `INSUFFICIENT_STOCK_IN_DEPOSITO; available elsewhere: ${available}`
+            : 'INSUFFICIENT_STOCK',
+        }
+      }
+    } else {
+      stockEval = evaluateStockForInvoice(articulos, qtyByArticulo)
+      if (stockEval.insufficient) {
+        return { ok: false, status: 422, error: 'INSUFFICIENT_STOCK' }
+      }
+    }
+
+    const recuentoBlock = await assertNoOpenRecuento(this.prisma, tenantId, depositoId)
     if (!recuentoBlock.ok) {
       return recuentoBlock
     }
@@ -199,6 +255,7 @@ export class FacturaService {
           ...factura,
           fecha: facturaFechaToPrismaDate(fecha),
           tenantId,
+          ...(depositoId != null ? { depositoId } : {}),
           ...(options?.contratoId !== undefined ? { contratoId: options.contratoId } : {}),
           items: { create: resolvedItems },
         } as Parameters<typeof this.prisma.factura.create>[0]['data'],
@@ -231,10 +288,19 @@ export class FacturaService {
       })
 
       for (const [articuloId, qty] of qtyByArticulo) {
-        await tx.articulo.update({
-          where: { id: articuloId },
-          data: { stock: { decrement: qty } },
-        })
+        if (depositoId != null) {
+          await applyStockDepositoDelta(tx, {
+            tenantId,
+            articuloId,
+            depositoId,
+            delta: -qty,
+          })
+        } else {
+          await tx.articulo.update({
+            where: { id: articuloId },
+            data: { stock: { decrement: qty } },
+          })
+        }
       }
 
       return [created, updated] as const

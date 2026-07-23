@@ -9,9 +9,14 @@ import type { ServiceResult } from '../services/serviceResults'
 export async function assertNoOpenRecuento(
   prisma: PrismaClient,
   tenantId: number,
+  depositoId?: number | null,
 ): Promise<ServiceResult<void>> {
   const open = await prisma.recuento.findFirst({
-    where: { tenantId, estado: 'in_progress' },
+    where: {
+      tenantId,
+      estado: 'in_progress',
+      ...(depositoId != null ? { depositoId } : {}),
+    },
     select: { id: true },
   })
   if (open) {

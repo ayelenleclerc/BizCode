@@ -1,0 +1,25 @@
+{
+  "title": "Depósitos",
+  "subtitle": "Armazéns e locais de estoque",
+  "create": "Criar depósito",
+  "nombre": "Nome",
+  "codigo": "Código",
+  "tipo": "Tipo",
+  "direccion": "Endereço",
+  "esDefault": "Padrão",
+  "activo": "Ativo",
+  "empty": "Não há depósitos",
+  "tipos": {
+    "central": "Central",
+    "sucursal": "Filial",
+    "externo": "Externo",
+    "picking": "Picking",
+    "transito": "Trânsito"
+  },
+  "errors": {
+    "load": "Não foi possível carregar os depósitos",
+    "save": "Não foi possível salvar o depósito",
+    "delete": "Não foi possível excluir o depósito"
+  },
+  "confirmDelete": "Excluir este depósito?"
+}

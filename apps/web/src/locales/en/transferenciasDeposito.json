@@ -1,0 +1,27 @@
+{
+  "title": "Warehouse transfers",
+  "subtitle": "Move stock between warehouses",
+  "create": "New transfer",
+  "origen": "Origin",
+  "destino": "Destination",
+  "articuloId": "Article ID",
+  "cantidad": "Quantity",
+  "addItem": "Add item",
+  "enviar": "Mark in transit",
+  "recibir": "Receive",
+  "anular": "Cancel",
+  "estado": "Status",
+  "numero": "Number",
+  "empty": "No transfers",
+  "estados": {
+    "pendiente": "Pending",
+    "en_transito": "In transit",
+    "recibida": "Received",
+    "anulada": "Cancelled"
+  },
+  "errors": {
+    "load": "Could not load transfers",
+    "save": "Could not create transfer",
+    "action": "Could not complete action"
+  }
+}

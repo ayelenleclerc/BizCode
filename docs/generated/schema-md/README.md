@@ -58,6 +58,8 @@
 
 * [ArticuloProveedoresComparadorEnvelope](./articuloproveedorescomparadorenvelope.md) – `-`
 
+* [ArticuloStockPorDepositoResponse](./articulostockpordepositoresponse.md) – `-`
+
 * [AuditEvent](./auditevent.md) – `-`
 
 * [AuditEventListEnvelope](./auditeventlistenvelope.md) – `-`
@@ -233,6 +235,16 @@
 * [DeliveryZoneListEnvelope](./deliveryzonelistenvelope.md) – `-`
 
 * [DeliveryZoneUpdateInput](./deliveryzoneupdateinput.md) – `-`
+
+* [Deposito](./deposito.md) – `-`
+
+* [DepositoCreateInput](./depositocreateinput.md) – `-`
+
+* [DepositoEnvelope](./depositoenvelope.md) – `-`
+
+* [DepositoListEnvelope](./depositolistenvelope.md) – `-`
+
+* [DepositoPatchInput](./depositopatchinput.md) – `-`
 
 * [DocumentoCompraColaEnvelope](./documentocompracolaenvelope.md) – `-`
 
@@ -844,6 +856,8 @@
 
 * [StockCriticoRow](./stockcriticorow.md) – `-`
 
+* [StockDeposito](./stockdeposito.md) – `-`
+
 * [SuperadminGlobalStats](./superadminglobalstats.md) – `-`
 
 * [SuperadminGlobalStatsEnvelope](./superadminglobalstatsenvelope.md) – `-`
@@ -905,6 +919,18 @@
 * [TenantPricingData](./tenantpricingdata.md) – `-`
 
 * [TenantPricingEnvelope](./tenantpricingenvelope.md) – `-`
+
+* [TransferenciaDeposito](./transferenciadeposito.md) – `-`
+
+* [TransferenciaDepositoCreateInput](./transferenciadepositocreateinput.md) – `-`
+
+* [TransferenciaDepositoEnvelope](./transferenciadepositoenvelope.md) – `-`
+
+* [TransferenciaDepositoItem](./transferenciadepositoitem.md) – `-`
+
+* [TransferenciaDepositoListEnvelope](./transferenciadepositolistenvelope.md) – `-`
+
+* [TransferenciaDepositoRecibirInput](./transferenciadepositorecibirinput.md) – `-`
 
 * [TurnoCaja](./turnocaja.md) – `-`
 
@@ -981,6 +1007,8 @@
 * [Untitled object in DashboardSummary](./dashboardsummary-properties-ventashoy.md) – `undefined#/properties/ventasHoy`
 
 * [Untitled object in DeliveryZoneListEnvelope](./deliveryzonelistenvelope-allof-0.md) – `undefined#/allOf/0`
+
+* [Untitled object in DepositoListEnvelope](./depositolistenvelope-allof-0.md) – `undefined#/allOf/0`
 
 * [Untitled object in DocumentoCompraConfirmInput](./documentocompraconfirminput-allof-1.md) – `undefined#/allOf/1`
 
@@ -1134,6 +1162,12 @@
 
 * [Untitled object in TenantConfigHistoryEntry](./tenantconfighistoryentry-properties-before.md) – `undefined#/properties/before`
 
+* [Untitled object in TransferenciaDepositoCreateInput](./transferenciadepositocreateinput-properties-items-items.md) – `undefined#/properties/items/items`
+
+* [Untitled object in TransferenciaDepositoListEnvelope](./transferenciadepositolistenvelope-allof-0.md) – `undefined#/allOf/0`
+
+* [Untitled object in TransferenciaDepositoRecibirInput](./transferenciadepositorecibirinput-properties-items-items.md) – `undefined#/properties/items/items`
+
 * [Untitled object in TurnoCajaCloseInput](./turnocajacloseinput-properties-conteo.md) – `undefined#/properties/conteo`
 
 * [Untitled object in TurnoCajaListEnvelope](./turnocajalistenvelope-allof-0.md) – `undefined#/allOf/0`
@@ -1173,6 +1207,8 @@
 * [Untitled array in ArticuloListEnvelope](./articulolistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
 
 * [Untitled array in ArticuloProveedoresComparadorData](./articuloproveedorescomparadordata-properties-proveedores.md) – `undefined#/properties/proveedores`
+
+* [Untitled array in ArticuloStockPorDepositoResponse](./articulostockpordepositoresponse-properties-depositos.md) – `undefined#/properties/depositos`
 
 * [Untitled array in AuditEventListEnvelope](./auditeventlistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
 
@@ -1233,6 +1269,8 @@
 * [Untitled array in DashboardVentasHistorico](./dashboardventashistorico-properties-toparticles.md) – `undefined#/properties/topArticles`
 
 * [Untitled array in DeliveryZoneListEnvelope](./deliveryzonelistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
+
+* [Untitled array in DepositoListEnvelope](./depositolistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
 
 * [Untitled array in DocumentoCompraColaEstado](./documentocompracolaestado-properties-documentos.md) – `undefined#/properties/documentos`
 
@@ -1453,6 +1491,14 @@
 * [Untitled array in TenantPlanSnapshot](./tenantplansnapshot-properties-features.md) – `undefined#/properties/features`
 
 * [Untitled array in TenantPricingData](./tenantpricingdata-properties-addons.md) – `undefined#/properties/addons`
+
+* [Untitled array in TransferenciaDeposito](./transferenciadeposito-properties-items.md) – `undefined#/properties/items`
+
+* [Untitled array in TransferenciaDepositoCreateInput](./transferenciadepositocreateinput-properties-items.md) – `undefined#/properties/items`
+
+* [Untitled array in TransferenciaDepositoListEnvelope](./transferenciadepositolistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
+
+* [Untitled array in TransferenciaDepositoRecibirInput](./transferenciadepositorecibirinput-properties-items.md) – `undefined#/properties/items`
 
 * [Untitled array in TurnoCajaListEnvelope](./turnocajalistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
 

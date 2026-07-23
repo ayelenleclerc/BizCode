@@ -16,6 +16,8 @@
     "catalogo": "Products",
     "listasPrecios": "Price lists",
     "categoriasArticulo": "Article categories",
+    "depositos": "Warehouses",
+    "transferenciasDeposito": "Warehouse transfers",
     "proveedores": "Suppliers",
     "compras": "Purchasing",
     "recuentos": "Inventory count",

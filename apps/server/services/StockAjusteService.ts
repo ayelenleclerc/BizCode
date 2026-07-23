@@ -2,6 +2,7 @@ import type { Articulo, Prisma, PrismaClient } from '@prisma/client'
 import type { StockAjusteInput } from '@bizcode/types'
 import { assertNoOpenRecuento } from '../lib/recuentoStockGuard'
 import type { ServiceResult } from './serviceResults'
+import { applyStockDepositoDelta, getDefaultDepositoId } from './stockDepositoSync'
 
 export type StockAjusteRow = Prisma.StockAjusteGetPayload<{
   include: { user: { select: { id: true; username: true } } }
@@ -44,7 +45,22 @@ export class StockAjusteService {
       return { ok: false, status: 422, error: 'SERVICE_NO_STOCK' }
     }
 
-    const recuentoBlock = await assertNoOpenRecuento(this.prisma, tenantId)
+    const depositoId =
+      input.depositoId != null
+        ? input.depositoId
+        : await getDefaultDepositoId(this.prisma, tenantId)
+
+    if (input.depositoId != null) {
+      const dep = await this.prisma.deposito.findFirst({
+        where: { id: input.depositoId, tenantId, activo: true },
+        select: { id: true },
+      })
+      if (!dep) {
+        return { ok: false, status: 400, error: 'depositoId is not valid for this tenant' }
+      }
+    }
+
+    const recuentoBlock = await assertNoOpenRecuento(this.prisma, tenantId, depositoId)
     if (!recuentoBlock.ok) {
       return recuentoBlock
     }
@@ -55,26 +71,55 @@ export class StockAjusteService {
       return { ok: false, status: 422, error: 'INSUFFICIENT_STOCK' }
     }
 
-    const result = await this.prisma.$transaction(async (tx) => {
-      const updated = await tx.articulo.update({
-        where: { id: articuloId },
-        data: { stock: stockAfter },
-        select: { id: true, codigo: true, descripcion: true, stock: true, minimo: true },
+    try {
+      const result = await this.prisma.$transaction(async (tx) => {
+        let updated: Pick<Articulo, 'id' | 'codigo' | 'descripcion' | 'stock' | 'minimo'>
+        if (depositoId != null) {
+          const applied = await applyStockDepositoDelta(tx, {
+            tenantId,
+            articuloId,
+            depositoId,
+            delta: input.cantidad,
+          })
+          updated = await tx.articulo.findFirstOrThrow({
+            where: { id: articuloId },
+            select: { id: true, codigo: true, descripcion: true, stock: true, minimo: true },
+          })
+          if (updated.stock !== applied.stockTotal) {
+            /* sync already set Articulo.stock */
+          }
+        } else {
+          updated = await tx.articulo.update({
+            where: { id: articuloId },
+            data: { stock: stockAfter },
+            select: { id: true, codigo: true, descripcion: true, stock: true, minimo: true },
+          })
+        }
+        const ajuste = await tx.stockAjuste.create({
+          data: {
+            tenantId,
+            articuloId,
+            cantidad: input.cantidad,
+            motivo: input.motivo,
+            userId,
+            ...(depositoId != null ? { depositoId } : {}),
+          },
+          include: { user: { select: { id: true, username: true } } },
+        })
+        return {
+          ajuste,
+          articulo: updated,
+          stockBefore,
+          stockAfter: updated.stock,
+        }
       })
-      const ajuste = await tx.stockAjuste.create({
-        data: {
-          tenantId,
-          articuloId,
-          cantidad: input.cantidad,
-          motivo: input.motivo,
-          userId,
-        },
-        include: { user: { select: { id: true, username: true } } },
-      })
-      return { ajuste, articulo: updated, stockBefore, stockAfter }
-    })
-
-    return { ok: true, data: result }
+      return { ok: true, data: result }
+    } catch (err) {
+      if (err instanceof Error && err.message === 'INSUFFICIENT_DEPOSIT_STOCK') {
+        return { ok: false, status: 422, error: 'INSUFFICIENT_STOCK' }
+      }
+      throw err
+    }
   }
 
   async listHistorial(
@@ -102,7 +147,6 @@ export class StockAjusteService {
         skip,
       }),
     ])
-
     return { ok: true, data: { total, ajustes } }
   }
 }

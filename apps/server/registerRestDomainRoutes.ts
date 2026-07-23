@@ -59,6 +59,7 @@ import { registerCajaRoutes } from './routes/registerCajaRoutes'
 import { registerListasPreciosRoutes } from './routes/registerListasPreciosRoutes'
 import { registerCategoriasArticuloRoutes } from './routes/registerCategoriasArticuloRoutes'
 import { registerArticuloVariantesRoutes } from './routes/registerArticuloVariantesRoutes'
+import { registerDepositosRoutes } from './routes/registerDepositosRoutes'
 import { createDomainServices } from './services/createDomainServices'
 
 /**
@@ -113,6 +114,7 @@ export function registerRestDomainRoutes(app: Application, prisma: PrismaClient)
   registerCajaRoutes(app, ctx)
   registerListasPreciosRoutes(app, ctx)
   registerCategoriasArticuloRoutes(app, ctx)
+  registerDepositosRoutes(app, ctx)
   registerRemitosRoutes(app, ctx)
   registerChequesRoutes(app, ctx)
   registerCobrosRoutes(app, ctx)

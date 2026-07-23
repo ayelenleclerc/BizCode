@@ -10,6 +10,7 @@ import type {
 import { assertNoOpenRecuento } from '../lib/recuentoStockGuard'
 import { facturaFechaToPrismaDate } from '../routes/restDomainShared'
 import type { ServiceResult } from './serviceResults'
+import { applyStockDepositoDelta, getDefaultDepositoId } from './stockDepositoSync'
 import { ProveedorCatalogoService } from './ProveedorCatalogoService'
 
 export const ORDEN_COMPRA_ESTADOS: OrdenCompraEstado[] = ['draft', 'sent', 'received', 'cancelled']
@@ -166,6 +167,7 @@ export class CompraService {
         total,
         fechaEstimada: parseFechaEstimada(input.fechaEstimada),
         nota: input.nota,
+        ...(input.depositoId != null ? { depositoId: input.depositoId } : {}),
         items: {
           create: itemsWithCatalog.map((line) => ({
             articuloId: line.articuloId,
@@ -318,7 +320,10 @@ export class CompraService {
       return { ok: false, status: 422, error: 'ORDER_NOT_RECEIVABLE' }
     }
 
-    const recuentoBlock = await assertNoOpenRecuento(this.prisma, tenantId)
+    const depositoId =
+      orden.depositoId ?? (await getDefaultDepositoId(this.prisma, tenantId))
+
+    const recuentoBlock = await assertNoOpenRecuento(this.prisma, tenantId, depositoId)
     if (!recuentoBlock.ok) {
       return recuentoBlock
     }
@@ -353,11 +358,20 @@ export class CompraService {
           throw new Error('Articulo not found')
         }
 
-        const stockAfter = articulo.stock + line.cantidad
-        await tx.articulo.update({
-          where: { id: articulo.id },
-          data: { stock: stockAfter },
-        })
+        if (depositoId != null) {
+          await applyStockDepositoDelta(tx, {
+            tenantId,
+            articuloId: articulo.id,
+            depositoId,
+            delta: line.cantidad,
+          })
+        } else {
+          const stockAfter = articulo.stock + line.cantidad
+          await tx.articulo.update({
+            where: { id: articulo.id },
+            data: { stock: stockAfter },
+          })
+        }
         await tx.stockAjuste.create({
           data: {
             tenantId,
@@ -365,6 +379,7 @@ export class CompraService {
             cantidad: line.cantidad,
             motivo: PURCHASE_STOCK_MOTIVO,
             userId,
+            ...(depositoId != null ? { depositoId } : {}),
           },
         })
 

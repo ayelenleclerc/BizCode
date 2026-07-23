@@ -1,6 +1,7 @@
 import type { Prisma, PrismaClient } from '@prisma/client'
 import type { RecuentoItemLineInput } from '@bizcode/types'
 import type { ServiceResult } from './serviceResults'
+import { applyStockDepositoDelta, getDefaultDepositoId } from './stockDepositoSync'
 
 export const RECUENTO_ESTADOS = ['in_progress', 'closed'] as const
 export type RecuentoEstado = (typeof RECUENTO_ESTADOS)[number]
@@ -53,9 +54,30 @@ export class RecuentoService {
     })
   }
 
-  async start(tenantId: number, operadorId: number): Promise<ServiceResult<RecuentoRow>> {
+  async start(
+    tenantId: number,
+    operadorId: number,
+    depositoId?: number | null,
+  ): Promise<ServiceResult<RecuentoRow>> {
+    const resolvedDepositoId =
+      depositoId != null ? depositoId : await getDefaultDepositoId(this.prisma, tenantId)
+
+    if (depositoId != null) {
+      const dep = await this.prisma.deposito.findFirst({
+        where: { id: depositoId, tenantId, activo: true },
+        select: { id: true },
+      })
+      if (!dep) {
+        return { ok: false, status: 400, error: 'depositoId is not valid for this tenant' }
+      }
+    }
+
     const open = await this.prisma.recuento.findFirst({
-      where: { tenantId, estado: 'in_progress' },
+      where: {
+        tenantId,
+        estado: 'in_progress',
+        ...(resolvedDepositoId != null ? { depositoId: resolvedDepositoId } : {}),
+      },
       select: { id: true },
     })
     if (open) {
@@ -63,20 +85,35 @@ export class RecuentoService {
     }
 
     const articulos = await this.prisma.articulo.findMany({
-      where: { tenantId, activo: true },
+      where: { tenantId, activo: true, tipo: 'articulo' },
       select: { id: true, stock: true },
       orderBy: { codigo: 'asc' },
     })
+
+    let cantSistemaByArt = new Map(articulos.map((a) => [a.id, a.stock]))
+    if (resolvedDepositoId != null) {
+      const rows = await this.prisma.stockDeposito.findMany({
+        where: {
+          tenantId,
+          depositoId: resolvedDepositoId,
+          articuloId: { in: articulos.map((a) => a.id) },
+        },
+        select: { articuloId: true, cantidad: true },
+      })
+      cantSistemaByArt = new Map(articulos.map((a) => [a.id, 0]))
+      for (const r of rows) cantSistemaByArt.set(r.articuloId, r.cantidad)
+    }
 
     const row = await this.prisma.recuento.create({
       data: {
         tenantId,
         operadorId,
         estado: 'in_progress',
+        ...(resolvedDepositoId != null ? { depositoId: resolvedDepositoId } : {}),
         items: {
           create: articulos.map((a) => ({
             articuloId: a.id,
-            cantSistema: a.stock,
+            cantSistema: cantSistemaByArt.get(a.id) ?? 0,
             cantFisica: null,
           })),
         },
@@ -147,47 +184,68 @@ export class RecuentoService {
       return { ok: false, status: 422, error: 'RECUENTO_ITEMS_INCOMPLETE' }
     }
 
-    await this.prisma.$transaction(async (tx) => {
-      for (const item of recuento.items) {
-        const cantFisica = item.cantFisica!
-        const diff = cantFisica - item.cantSistema
-        if (diff === 0) {
-          continue
+    const depositoId =
+      recuento.depositoId ?? (await getDefaultDepositoId(this.prisma, tenantId))
+
+    try {
+      await this.prisma.$transaction(async (tx) => {
+        for (const item of recuento.items) {
+          const cantFisica = item.cantFisica!
+          const diff = cantFisica - item.cantSistema
+          if (diff === 0) {
+            continue
+          }
+
+          if (depositoId != null) {
+            await applyStockDepositoDelta(tx, {
+              tenantId,
+              articuloId: item.articuloId,
+              depositoId,
+              delta: diff,
+            })
+          } else {
+            const articulo = await tx.articulo.findFirst({
+              where: { id: item.articuloId, tenantId },
+              select: { id: true, stock: true },
+            })
+            if (!articulo) {
+              throw new Error('Articulo not found')
+            }
+            const stockAfter = articulo.stock + diff
+            if (stockAfter < 0) {
+              throw new Error('INSUFFICIENT_STOCK')
+            }
+            await tx.articulo.update({
+              where: { id: articulo.id },
+              data: { stock: stockAfter },
+            })
+          }
+          await tx.stockAjuste.create({
+            data: {
+              tenantId,
+              articuloId: item.articuloId,
+              cantidad: diff,
+              motivo: RECUENTO_STOCK_MOTIVO,
+              userId,
+              ...(depositoId != null ? { depositoId } : {}),
+            },
+          })
         }
 
-        const articulo = await tx.articulo.findFirst({
-          where: { id: item.articuloId, tenantId },
-          select: { id: true, stock: true },
+        await tx.recuento.update({
+          where: { id },
+          data: { estado: 'closed', closedAt: new Date() },
         })
-        if (!articulo) {
-          throw new Error('Articulo not found')
-        }
-
-        const stockAfter = articulo.stock + diff
-        if (stockAfter < 0) {
-          throw new Error('INSUFFICIENT_STOCK')
-        }
-
-        await tx.articulo.update({
-          where: { id: articulo.id },
-          data: { stock: stockAfter },
-        })
-        await tx.stockAjuste.create({
-          data: {
-            tenantId,
-            articuloId: articulo.id,
-            cantidad: diff,
-            motivo: RECUENTO_STOCK_MOTIVO,
-            userId,
-          },
-        })
-      }
-
-      await tx.recuento.update({
-        where: { id },
-        data: { estado: 'closed', closedAt: new Date() },
       })
-    })
+    } catch (err) {
+      if (
+        err instanceof Error &&
+        (err.message === 'INSUFFICIENT_DEPOSIT_STOCK' || err.message === 'INSUFFICIENT_STOCK')
+      ) {
+        return { ok: false, status: 422, error: 'INSUFFICIENT_STOCK' }
+      }
+      throw err
+    }
 
     const updated = await this.getById(tenantId, id)
     if (!updated) {

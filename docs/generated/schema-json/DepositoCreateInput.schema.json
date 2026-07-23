@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "activo": {
+      "type": "boolean"
+    },
+    "codigo": {
+      "maxLength": 20,
+      "type": "string"
+    },
+    "direccion": {
+      "maxLength": 200,
+      "nullable": true,
+      "type": "string"
+    },
+    "esDefault": {
+      "type": "boolean"
+    },
+    "nombre": {
+      "maxLength": 80,
+      "type": "string"
+    },
+    "responsableId": {
+      "minimum": 1,
+      "nullable": true,
+      "type": "integer"
+    },
+    "tipo": {
+      "enum": [
+        "central",
+        "sucursal",
+        "externo",
+        "picking",
+        "transito"
+      ],
+      "type": "string"
+    }
+  },
+  "required": [
+    "nombre",
+    "codigo",
+    "tipo"
+  ],
+  "title": "DepositoCreateInput",
+  "type": "object"
+}

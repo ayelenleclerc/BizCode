@@ -60838,6 +60838,2707 @@ true
 }
 ```
 
+### PARAMETERS /api/depositos
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/depositos`
+
+### List deposits
+
+- **Method:** `GET`
+- **Path:** `/api/depositos`
+- **Tags:** depositos
+
+Requires module `inventory.warehouses`.
+
+#### Responses
+
+##### Status: 200 Paginated deposits
+
+###### Content-Type: application/json
+
+**All of:**
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`activo` (required)**
+
+    `boolean`
+
+  - **`codigo` (required)**
+
+    `string`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`direccion` (required)**
+
+    `string`
+
+  - **`esDefault` (required)**
+
+    `boolean`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`nombre` (required)**
+
+    `string`
+
+  - **`responsableId` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"central", "sucursal", "externo", "picking", "transito"`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+- **`success` (required)**
+
+  `boolean`, possible values: `true`
+
+* **`limit` (required)**
+
+  `integer` — Effective page size (same semantics as query \`limit\`)
+
+* **`offset` (required)**
+
+  `integer` — Effective skip (same semantics as query \`offset\`)
+
+* **`total` (required)**
+
+  `integer` — Row count matching the list filter (before limit/offset)
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "nombre": "",
+      "codigo": "",
+      "tipo": "central",
+      "direccion": "",
+      "responsableId": 1,
+      "activo": true,
+      "esDefault": true,
+      "createdAt": "",
+      "updatedAt": ""
+    }
+  ],
+  "total": 0,
+  "limit": 1,
+  "offset": 0
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Create deposit
+
+- **Method:** `POST`
+- **Path:** `/api/depositos`
+- **Tags:** depositos
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`codigo` (required)**
+
+  `string`
+
+- **`nombre` (required)**
+
+  `string`
+
+- **`tipo` (required)**
+
+  `string`, possible values: `"central", "sucursal", "externo", "picking", "transito"`
+
+- **`activo`**
+
+  `boolean`
+
+- **`direccion`**
+
+  `string`
+
+- **`esDefault`**
+
+  `boolean`
+
+- **`responsableId`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "nombre": "",
+  "codigo": "",
+  "tipo": "central",
+  "direccion": "",
+  "responsableId": 1,
+  "activo": true,
+  "esDefault": true
+}
+```
+
+#### Responses
+
+##### Status: 201 Created
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`activo` (required)**
+
+    `boolean`
+
+  - **`codigo` (required)**
+
+    `string`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`direccion` (required)**
+
+    `string`
+
+  - **`esDefault` (required)**
+
+    `boolean`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`nombre` (required)**
+
+    `string`
+
+  - **`responsableId` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"central", "sucursal", "externo", "picking", "transito"`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+- **`success` (required)**
+
+  `boolean`, possible values: `true`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "nombre": "",
+    "codigo": "",
+    "tipo": "central",
+    "direccion": "",
+    "responsableId": 1,
+    "activo": true,
+    "esDefault": true,
+    "createdAt": "",
+    "updatedAt": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 409 Duplicate codigo
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/depositos/{id}
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/depositos/{id}`
+
+### Get deposit by id
+
+- **Method:** `GET`
+- **Path:** `/api/depositos/{id}`
+- **Tags:** depositos
+
+#### Responses
+
+##### Status: 200 Deposit
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`activo` (required)**
+
+    `boolean`
+
+  - **`codigo` (required)**
+
+    `string`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`direccion` (required)**
+
+    `string`
+
+  - **`esDefault` (required)**
+
+    `boolean`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`nombre` (required)**
+
+    `string`
+
+  - **`responsableId` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"central", "sucursal", "externo", "picking", "transito"`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+- **`success` (required)**
+
+  `boolean`, possible values: `true`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "nombre": "",
+    "codigo": "",
+    "tipo": "central",
+    "direccion": "",
+    "responsableId": 1,
+    "activo": true,
+    "esDefault": true,
+    "createdAt": "",
+    "updatedAt": ""
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Update deposit
+
+- **Method:** `PATCH`
+- **Path:** `/api/depositos/{id}`
+- **Tags:** depositos
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`activo`**
+
+  `boolean`
+
+- **`codigo`**
+
+  `string`
+
+- **`direccion`**
+
+  `string`
+
+- **`esDefault`**
+
+  `boolean`
+
+- **`nombre`**
+
+  `string`
+
+- **`responsableId`**
+
+  `integer`
+
+- **`tipo`**
+
+  `string`, possible values: `"central", "sucursal", "externo", "picking", "transito"`
+
+**Example:**
+
+```json
+{
+  "nombre": "",
+  "codigo": "",
+  "tipo": "central",
+  "direccion": "",
+  "responsableId": 1,
+  "activo": true,
+  "esDefault": true
+}
+```
+
+#### Responses
+
+##### Status: 200 Updated
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`activo` (required)**
+
+    `boolean`
+
+  - **`codigo` (required)**
+
+    `string`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`direccion` (required)**
+
+    `string`
+
+  - **`esDefault` (required)**
+
+    `boolean`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`nombre` (required)**
+
+    `string`
+
+  - **`responsableId` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"central", "sucursal", "externo", "picking", "transito"`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+- **`success` (required)**
+
+  `boolean`, possible values: `true`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "nombre": "",
+    "codigo": "",
+    "tipo": "central",
+    "direccion": "",
+    "responsableId": 1,
+    "activo": true,
+    "esDefault": true,
+    "createdAt": "",
+    "updatedAt": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Delete deposit
+
+- **Method:** `DELETE`
+- **Path:** `/api/depositos/{id}`
+- **Tags:** depositos
+
+#### Responses
+
+##### Status: 204 Deleted
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 422 Cannot delete (default or has stock)
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/articulos/{id}/stock-depositos
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/articulos/{id}/stock-depositos`
+
+### Stock breakdown by deposit for an article
+
+- **Method:** `GET`
+- **Path:** `/api/articulos/{id}/stock-depositos`
+- **Tags:** depositos
+
+Requires module `inventory.warehouses`.
+
+#### Responses
+
+##### Status: 200 Stock by deposit
+
+###### Content-Type: application/json
+
+- **`articuloId` (required)**
+
+  `integer`
+
+- **`depositos` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`cantidad` (required)**
+
+    `integer`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`depositoId` (required)**
+
+    `integer`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`stockMax` (required)**
+
+    `integer`
+
+  - **`stockMin` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`depositoCodigo`**
+
+    `string`
+
+  - **`depositoNombre`**
+
+    `string`
+
+- **`enTransito` (required)**
+
+  `integer`
+
+- **`stockTotal` (required)**
+
+  `integer`
+
+- **`success` (required)**
+
+  `boolean`, possible values: `true`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "articuloId": 1,
+  "stockTotal": 1,
+  "enTransito": 1,
+  "depositos": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "articuloId": 1,
+      "depositoId": 1,
+      "depositoCodigo": "",
+      "depositoNombre": "",
+      "cantidad": 1,
+      "stockMin": 1,
+      "stockMax": 1,
+      "createdAt": "",
+      "updatedAt": ""
+    }
+  ]
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/transferencias-deposito
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/transferencias-deposito`
+
+### List inter-warehouse transfers
+
+- **Method:** `GET`
+- **Path:** `/api/transferencias-deposito`
+- **Tags:** depositos
+
+#### Responses
+
+##### Status: 200 Paginated transfers
+
+###### Content-Type: application/json
+
+**All of:**
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`aprobadoPorId` (required)**
+
+    `integer`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`destinoId` (required)**
+
+    `integer`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"pendiente", "en_transito", "recibida", "anulada"`
+
+  - **`fechaEnvio` (required)**
+
+    `string`, format: `date-time`
+
+  - **`fechaRecepcion` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`nota` (required)**
+
+    `string`
+
+  - **`numero` (required)**
+
+    `integer`
+
+  - **`origenId` (required)**
+
+    `integer`
+
+  - **`solicitadoPorId` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`destinoCodigo`**
+
+    `string`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId` (required)**
+
+      `integer`
+
+    - **`cantidadEnviada` (required)**
+
+      `integer`
+
+    - **`cantidadRecibida` (required)**
+
+      `integer`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`transferenciaId` (required)**
+
+      `integer`
+
+    - **`articuloCodigo`**
+
+      `integer`
+
+    - **`articuloDescripcion`**
+
+      `string`
+
+  - **`origenCodigo`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`, possible values: `true`
+
+* **`limit` (required)**
+
+  `integer` — Effective page size (same semantics as query \`limit\`)
+
+* **`offset` (required)**
+
+  `integer` — Effective skip (same semantics as query \`offset\`)
+
+* **`total` (required)**
+
+  `integer` — Row count matching the list filter (before limit/offset)
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "numero": 1,
+      "origenId": 1,
+      "destinoId": 1,
+      "estado": "pendiente",
+      "solicitadoPorId": 1,
+      "aprobadoPorId": 1,
+      "fechaEnvio": "",
+      "fechaRecepcion": "",
+      "nota": "",
+      "createdAt": "",
+      "updatedAt": "",
+      "origenCodigo": "",
+      "destinoCodigo": "",
+      "items": [
+        {
+          "id": 1,
+          "transferenciaId": 1,
+          "articuloId": 1,
+          "cantidadEnviada": 1,
+          "cantidadRecibida": 1,
+          "articuloCodigo": 1,
+          "articuloDescripcion": ""
+        }
+      ]
+    }
+  ],
+  "total": 0,
+  "limit": 1,
+  "offset": 0
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Create transfer (pendiente)
+
+- **Method:** `POST`
+- **Path:** `/api/transferencias-deposito`
+- **Tags:** depositos
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`destinoId` (required)**
+
+  `integer`
+
+- **`items` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`cantidadEnviada` (required)**
+
+    `integer`
+
+- **`origenId` (required)**
+
+  `integer`
+
+- **`nota`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "origenId": 1,
+  "destinoId": 1,
+  "nota": "",
+  "items": [
+    {
+      "articuloId": 1,
+      "cantidadEnviada": 1
+    }
+  ]
+}
+```
+
+#### Responses
+
+##### Status: 201 Created
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`aprobadoPorId` (required)**
+
+    `integer`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`destinoId` (required)**
+
+    `integer`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"pendiente", "en_transito", "recibida", "anulada"`
+
+  - **`fechaEnvio` (required)**
+
+    `string`, format: `date-time`
+
+  - **`fechaRecepcion` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`nota` (required)**
+
+    `string`
+
+  - **`numero` (required)**
+
+    `integer`
+
+  - **`origenId` (required)**
+
+    `integer`
+
+  - **`solicitadoPorId` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`destinoCodigo`**
+
+    `string`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId` (required)**
+
+      `integer`
+
+    - **`cantidadEnviada` (required)**
+
+      `integer`
+
+    - **`cantidadRecibida` (required)**
+
+      `integer`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`transferenciaId` (required)**
+
+      `integer`
+
+    - **`articuloCodigo`**
+
+      `integer`
+
+    - **`articuloDescripcion`**
+
+      `string`
+
+  - **`origenCodigo`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`, possible values: `true`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "numero": 1,
+    "origenId": 1,
+    "destinoId": 1,
+    "estado": "pendiente",
+    "solicitadoPorId": 1,
+    "aprobadoPorId": 1,
+    "fechaEnvio": "",
+    "fechaRecepcion": "",
+    "nota": "",
+    "createdAt": "",
+    "updatedAt": "",
+    "origenCodigo": "",
+    "destinoCodigo": "",
+    "items": [
+      {
+        "id": 1,
+        "transferenciaId": 1,
+        "articuloId": 1,
+        "cantidadEnviada": 1,
+        "cantidadRecibida": 1,
+        "articuloCodigo": 1,
+        "articuloDescripcion": ""
+      }
+    ]
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/transferencias-deposito/{id}
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/transferencias-deposito/{id}`
+
+### Get transfer by id
+
+- **Method:** `GET`
+- **Path:** `/api/transferencias-deposito/{id}`
+- **Tags:** depositos
+
+#### Responses
+
+##### Status: 200 Transfer
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`aprobadoPorId` (required)**
+
+    `integer`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`destinoId` (required)**
+
+    `integer`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"pendiente", "en_transito", "recibida", "anulada"`
+
+  - **`fechaEnvio` (required)**
+
+    `string`, format: `date-time`
+
+  - **`fechaRecepcion` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`nota` (required)**
+
+    `string`
+
+  - **`numero` (required)**
+
+    `integer`
+
+  - **`origenId` (required)**
+
+    `integer`
+
+  - **`solicitadoPorId` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`destinoCodigo`**
+
+    `string`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId` (required)**
+
+      `integer`
+
+    - **`cantidadEnviada` (required)**
+
+      `integer`
+
+    - **`cantidadRecibida` (required)**
+
+      `integer`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`transferenciaId` (required)**
+
+      `integer`
+
+    - **`articuloCodigo`**
+
+      `integer`
+
+    - **`articuloDescripcion`**
+
+      `string`
+
+  - **`origenCodigo`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`, possible values: `true`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "numero": 1,
+    "origenId": 1,
+    "destinoId": 1,
+    "estado": "pendiente",
+    "solicitadoPorId": 1,
+    "aprobadoPorId": 1,
+    "fechaEnvio": "",
+    "fechaRecepcion": "",
+    "nota": "",
+    "createdAt": "",
+    "updatedAt": "",
+    "origenCodigo": "",
+    "destinoCodigo": "",
+    "items": [
+      {
+        "id": 1,
+        "transferenciaId": 1,
+        "articuloId": 1,
+        "cantidadEnviada": 1,
+        "cantidadRecibida": 1,
+        "articuloCodigo": 1,
+        "articuloDescripcion": ""
+      }
+    ]
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/transferencias-deposito/{id}/en-transito
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/transferencias-deposito/{id}/en-transito`
+
+### Mark transfer in transit (debit origin)
+
+- **Method:** `POST`
+- **Path:** `/api/transferencias-deposito/{id}/en-transito`
+- **Tags:** depositos
+
+#### Responses
+
+##### Status: 200 Updated
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`aprobadoPorId` (required)**
+
+    `integer`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`destinoId` (required)**
+
+    `integer`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"pendiente", "en_transito", "recibida", "anulada"`
+
+  - **`fechaEnvio` (required)**
+
+    `string`, format: `date-time`
+
+  - **`fechaRecepcion` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`nota` (required)**
+
+    `string`
+
+  - **`numero` (required)**
+
+    `integer`
+
+  - **`origenId` (required)**
+
+    `integer`
+
+  - **`solicitadoPorId` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`destinoCodigo`**
+
+    `string`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId` (required)**
+
+      `integer`
+
+    - **`cantidadEnviada` (required)**
+
+      `integer`
+
+    - **`cantidadRecibida` (required)**
+
+      `integer`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`transferenciaId` (required)**
+
+      `integer`
+
+    - **`articuloCodigo`**
+
+      `integer`
+
+    - **`articuloDescripcion`**
+
+      `string`
+
+  - **`origenCodigo`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`, possible values: `true`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "numero": 1,
+    "origenId": 1,
+    "destinoId": 1,
+    "estado": "pendiente",
+    "solicitadoPorId": 1,
+    "aprobadoPorId": 1,
+    "fechaEnvio": "",
+    "fechaRecepcion": "",
+    "nota": "",
+    "createdAt": "",
+    "updatedAt": "",
+    "origenCodigo": "",
+    "destinoCodigo": "",
+    "items": [
+      {
+        "id": 1,
+        "transferenciaId": 1,
+        "articuloId": 1,
+        "cantidadEnviada": 1,
+        "cantidadRecibida": 1,
+        "articuloCodigo": 1,
+        "articuloDescripcion": ""
+      }
+    ]
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 422 Invalid state or insufficient stock
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/transferencias-deposito/{id}/recibir
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/transferencias-deposito/{id}/recibir`
+
+### Receive transfer (credit destination)
+
+- **Method:** `POST`
+- **Path:** `/api/transferencias-deposito/{id}/recibir`
+- **Tags:** depositos
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`items` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`cantidadRecibida` (required)**
+
+    `integer`
+
+**Example:**
+
+```json
+{
+  "items": [
+    {
+      "articuloId": 1,
+      "cantidadRecibida": 0
+    }
+  ]
+}
+```
+
+#### Responses
+
+##### Status: 200 Received
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`aprobadoPorId` (required)**
+
+    `integer`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`destinoId` (required)**
+
+    `integer`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"pendiente", "en_transito", "recibida", "anulada"`
+
+  - **`fechaEnvio` (required)**
+
+    `string`, format: `date-time`
+
+  - **`fechaRecepcion` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`nota` (required)**
+
+    `string`
+
+  - **`numero` (required)**
+
+    `integer`
+
+  - **`origenId` (required)**
+
+    `integer`
+
+  - **`solicitadoPorId` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`destinoCodigo`**
+
+    `string`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId` (required)**
+
+      `integer`
+
+    - **`cantidadEnviada` (required)**
+
+      `integer`
+
+    - **`cantidadRecibida` (required)**
+
+      `integer`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`transferenciaId` (required)**
+
+      `integer`
+
+    - **`articuloCodigo`**
+
+      `integer`
+
+    - **`articuloDescripcion`**
+
+      `string`
+
+  - **`origenCodigo`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`, possible values: `true`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "numero": 1,
+    "origenId": 1,
+    "destinoId": 1,
+    "estado": "pendiente",
+    "solicitadoPorId": 1,
+    "aprobadoPorId": 1,
+    "fechaEnvio": "",
+    "fechaRecepcion": "",
+    "nota": "",
+    "createdAt": "",
+    "updatedAt": "",
+    "origenCodigo": "",
+    "destinoCodigo": "",
+    "items": [
+      {
+        "id": 1,
+        "transferenciaId": 1,
+        "articuloId": 1,
+        "cantidadEnviada": 1,
+        "cantidadRecibida": 1,
+        "articuloCodigo": 1,
+        "articuloDescripcion": ""
+      }
+    ]
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 422 Invalid state or quantities
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/transferencias-deposito/{id}/anular
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/transferencias-deposito/{id}/anular`
+
+### Cancel transfer
+
+- **Method:** `POST`
+- **Path:** `/api/transferencias-deposito/{id}/anular`
+- **Tags:** depositos
+
+#### Responses
+
+##### Status: 200 Cancelled
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`aprobadoPorId` (required)**
+
+    `integer`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`destinoId` (required)**
+
+    `integer`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"pendiente", "en_transito", "recibida", "anulada"`
+
+  - **`fechaEnvio` (required)**
+
+    `string`, format: `date-time`
+
+  - **`fechaRecepcion` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`nota` (required)**
+
+    `string`
+
+  - **`numero` (required)**
+
+    `integer`
+
+  - **`origenId` (required)**
+
+    `integer`
+
+  - **`solicitadoPorId` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`destinoCodigo`**
+
+    `string`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId` (required)**
+
+      `integer`
+
+    - **`cantidadEnviada` (required)**
+
+      `integer`
+
+    - **`cantidadRecibida` (required)**
+
+      `integer`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`transferenciaId` (required)**
+
+      `integer`
+
+    - **`articuloCodigo`**
+
+      `integer`
+
+    - **`articuloDescripcion`**
+
+      `string`
+
+  - **`origenCodigo`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`, possible values: `true`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "numero": 1,
+    "origenId": 1,
+    "destinoId": 1,
+    "estado": "pendiente",
+    "solicitadoPorId": 1,
+    "aprobadoPorId": 1,
+    "fechaEnvio": "",
+    "fechaRecepcion": "",
+    "nota": "",
+    "createdAt": "",
+    "updatedAt": "",
+    "origenCodigo": "",
+    "destinoCodigo": "",
+    "items": [
+      {
+        "id": 1,
+        "transferenciaId": 1,
+        "articuloId": 1,
+        "cantidadEnviada": 1,
+        "cantidadRecibida": 1,
+        "articuloCodigo": 1,
+        "articuloDescripcion": ""
+      }
+    ]
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 422 Not cancellable
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ## Schemas
 
 ### HealthResponse
@@ -85300,6 +88001,811 @@ Originating invoice header (selected columns)
   "updatedAt": ""
 }
 ```
+
+### Deposito
+
+- **Type:**`object`
+
+* **`activo` (required)**
+
+  `boolean`
+
+* **`codigo` (required)**
+
+  `string`
+
+* **`createdAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`direccion` (required)**
+
+  `string`
+
+* **`esDefault` (required)**
+
+  `boolean`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`nombre` (required)**
+
+  `string`
+
+* **`responsableId` (required)**
+
+  `integer`
+
+* **`tenantId` (required)**
+
+  `integer`
+
+* **`tipo` (required)**
+
+  `string`, possible values: `"central", "sucursal", "externo", "picking", "transito"`
+
+* **`updatedAt` (required)**
+
+  `string`, format: `date-time`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "tenantId": 1,
+  "nombre": "",
+  "codigo": "",
+  "tipo": "central",
+  "direccion": "",
+  "responsableId": 1,
+  "activo": true,
+  "esDefault": true,
+  "createdAt": "",
+  "updatedAt": ""
+}
+```
+
+### DepositoCreateInput
+
+- **Type:**`object`
+
+* **`codigo` (required)**
+
+  `string`
+
+* **`nombre` (required)**
+
+  `string`
+
+* **`tipo` (required)**
+
+  `string`, possible values: `"central", "sucursal", "externo", "picking", "transito"`
+
+* **`activo`**
+
+  `boolean`
+
+* **`direccion`**
+
+  `string`
+
+* **`esDefault`**
+
+  `boolean`
+
+* **`responsableId`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "nombre": "",
+  "codigo": "",
+  "tipo": "central",
+  "direccion": "",
+  "responsableId": 1,
+  "activo": true,
+  "esDefault": true
+}
+```
+
+### DepositoPatchInput
+
+- **Type:**`object`
+
+* **`activo`**
+
+  `boolean`
+
+* **`codigo`**
+
+  `string`
+
+* **`direccion`**
+
+  `string`
+
+* **`esDefault`**
+
+  `boolean`
+
+* **`nombre`**
+
+  `string`
+
+* **`responsableId`**
+
+  `integer`
+
+* **`tipo`**
+
+  `string`, possible values: `"central", "sucursal", "externo", "picking", "transito"`
+
+**Example:**
+
+```json
+{
+  "nombre": "",
+  "codigo": "",
+  "tipo": "central",
+  "direccion": "",
+  "responsableId": 1,
+  "activo": true,
+  "esDefault": true
+}
+```
+
+### DepositoEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`activo` (required)**
+
+    `boolean`
+
+  - **`codigo` (required)**
+
+    `string`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`direccion` (required)**
+
+    `string`
+
+  - **`esDefault` (required)**
+
+    `boolean`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`nombre` (required)**
+
+    `string`
+
+  - **`responsableId` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"central", "sucursal", "externo", "picking", "transito"`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+* **`success` (required)**
+
+  `boolean`, possible values: `true`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "nombre": "",
+    "codigo": "",
+    "tipo": "central",
+    "direccion": "",
+    "responsableId": 1,
+    "activo": true,
+    "esDefault": true,
+    "createdAt": "",
+    "updatedAt": ""
+  }
+}
+```
+
+### DepositoListEnvelope
+
+- **Type:**
+
+**Example:**
+
+### StockDeposito
+
+- **Type:**`object`
+
+* **`articuloId` (required)**
+
+  `integer`
+
+* **`cantidad` (required)**
+
+  `integer`
+
+* **`createdAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`depositoId` (required)**
+
+  `integer`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`stockMax` (required)**
+
+  `integer`
+
+* **`stockMin` (required)**
+
+  `integer`
+
+* **`tenantId` (required)**
+
+  `integer`
+
+* **`updatedAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`depositoCodigo`**
+
+  `string`
+
+* **`depositoNombre`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "tenantId": 1,
+  "articuloId": 1,
+  "depositoId": 1,
+  "depositoCodigo": "",
+  "depositoNombre": "",
+  "cantidad": 1,
+  "stockMin": 1,
+  "stockMax": 1,
+  "createdAt": "",
+  "updatedAt": ""
+}
+```
+
+### ArticuloStockPorDepositoResponse
+
+- **Type:**`object`
+
+* **`articuloId` (required)**
+
+  `integer`
+
+* **`depositos` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`cantidad` (required)**
+
+    `integer`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`depositoId` (required)**
+
+    `integer`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`stockMax` (required)**
+
+    `integer`
+
+  - **`stockMin` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`depositoCodigo`**
+
+    `string`
+
+  - **`depositoNombre`**
+
+    `string`
+
+* **`enTransito` (required)**
+
+  `integer`
+
+* **`stockTotal` (required)**
+
+  `integer`
+
+* **`success` (required)**
+
+  `boolean`, possible values: `true`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "articuloId": 1,
+  "stockTotal": 1,
+  "enTransito": 1,
+  "depositos": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "articuloId": 1,
+      "depositoId": 1,
+      "depositoCodigo": "",
+      "depositoNombre": "",
+      "cantidad": 1,
+      "stockMin": 1,
+      "stockMax": 1,
+      "createdAt": "",
+      "updatedAt": ""
+    }
+  ]
+}
+```
+
+### TransferenciaDepositoItem
+
+- **Type:**`object`
+
+* **`articuloId` (required)**
+
+  `integer`
+
+* **`cantidadEnviada` (required)**
+
+  `integer`
+
+* **`cantidadRecibida` (required)**
+
+  `integer`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`transferenciaId` (required)**
+
+  `integer`
+
+* **`articuloCodigo`**
+
+  `integer`
+
+* **`articuloDescripcion`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "transferenciaId": 1,
+  "articuloId": 1,
+  "cantidadEnviada": 1,
+  "cantidadRecibida": 1,
+  "articuloCodigo": 1,
+  "articuloDescripcion": ""
+}
+```
+
+### TransferenciaDeposito
+
+- **Type:**`object`
+
+* **`aprobadoPorId` (required)**
+
+  `integer`
+
+* **`createdAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`destinoId` (required)**
+
+  `integer`
+
+* **`estado` (required)**
+
+  `string`, possible values: `"pendiente", "en_transito", "recibida", "anulada"`
+
+* **`fechaEnvio` (required)**
+
+  `string`, format: `date-time`
+
+* **`fechaRecepcion` (required)**
+
+  `string`, format: `date-time`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`nota` (required)**
+
+  `string`
+
+* **`numero` (required)**
+
+  `integer`
+
+* **`origenId` (required)**
+
+  `integer`
+
+* **`solicitadoPorId` (required)**
+
+  `integer`
+
+* **`tenantId` (required)**
+
+  `integer`
+
+* **`updatedAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`destinoCodigo`**
+
+  `string`
+
+* **`items`**
+
+  `array`
+
+  **Items:**
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`cantidadEnviada` (required)**
+
+    `integer`
+
+  - **`cantidadRecibida` (required)**
+
+    `integer`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`transferenciaId` (required)**
+
+    `integer`
+
+  - **`articuloCodigo`**
+
+    `integer`
+
+  - **`articuloDescripcion`**
+
+    `string`
+
+* **`origenCodigo`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "tenantId": 1,
+  "numero": 1,
+  "origenId": 1,
+  "destinoId": 1,
+  "estado": "pendiente",
+  "solicitadoPorId": 1,
+  "aprobadoPorId": 1,
+  "fechaEnvio": "",
+  "fechaRecepcion": "",
+  "nota": "",
+  "createdAt": "",
+  "updatedAt": "",
+  "origenCodigo": "",
+  "destinoCodigo": "",
+  "items": [
+    {
+      "id": 1,
+      "transferenciaId": 1,
+      "articuloId": 1,
+      "cantidadEnviada": 1,
+      "cantidadRecibida": 1,
+      "articuloCodigo": 1,
+      "articuloDescripcion": ""
+    }
+  ]
+}
+```
+
+### TransferenciaDepositoCreateInput
+
+- **Type:**`object`
+
+* **`destinoId` (required)**
+
+  `integer`
+
+* **`items` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`cantidadEnviada` (required)**
+
+    `integer`
+
+* **`origenId` (required)**
+
+  `integer`
+
+* **`nota`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "origenId": 1,
+  "destinoId": 1,
+  "nota": "",
+  "items": [
+    {
+      "articuloId": 1,
+      "cantidadEnviada": 1
+    }
+  ]
+}
+```
+
+### TransferenciaDepositoRecibirInput
+
+- **Type:**`object`
+
+* **`items` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`cantidadRecibida` (required)**
+
+    `integer`
+
+**Example:**
+
+```json
+{
+  "items": [
+    {
+      "articuloId": 1,
+      "cantidadRecibida": 0
+    }
+  ]
+}
+```
+
+### TransferenciaDepositoEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`aprobadoPorId` (required)**
+
+    `integer`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`destinoId` (required)**
+
+    `integer`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"pendiente", "en_transito", "recibida", "anulada"`
+
+  - **`fechaEnvio` (required)**
+
+    `string`, format: `date-time`
+
+  - **`fechaRecepcion` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`nota` (required)**
+
+    `string`
+
+  - **`numero` (required)**
+
+    `integer`
+
+  - **`origenId` (required)**
+
+    `integer`
+
+  - **`solicitadoPorId` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`destinoCodigo`**
+
+    `string`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId` (required)**
+
+      `integer`
+
+    - **`cantidadEnviada` (required)**
+
+      `integer`
+
+    - **`cantidadRecibida` (required)**
+
+      `integer`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`transferenciaId` (required)**
+
+      `integer`
+
+    - **`articuloCodigo`**
+
+      `integer`
+
+    - **`articuloDescripcion`**
+
+      `string`
+
+  - **`origenCodigo`**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`, possible values: `true`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "numero": 1,
+    "origenId": 1,
+    "destinoId": 1,
+    "estado": "pendiente",
+    "solicitadoPorId": 1,
+    "aprobadoPorId": 1,
+    "fechaEnvio": "",
+    "fechaRecepcion": "",
+    "nota": "",
+    "createdAt": "",
+    "updatedAt": "",
+    "origenCodigo": "",
+    "destinoCodigo": "",
+    "items": [
+      {
+        "id": 1,
+        "transferenciaId": 1,
+        "articuloId": 1,
+        "cantidadEnviada": 1,
+        "cantidadRecibida": 1,
+        "articuloCodigo": 1,
+        "articuloDescripcion": ""
+      }
+    ]
+  }
+}
+```
+
+### TransferenciaDepositoListEnvelope
+
+- **Type:**
+
+**Example:**
 
 ### CategoriaArticuloCreateInput
 

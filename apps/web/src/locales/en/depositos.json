@@ -1,0 +1,25 @@
+{
+  "title": "Warehouses",
+  "subtitle": "Stock locations and warehouses",
+  "create": "Create warehouse",
+  "nombre": "Name",
+  "codigo": "Code",
+  "tipo": "Type",
+  "direccion": "Address",
+  "esDefault": "Default",
+  "activo": "Active",
+  "empty": "No warehouses",
+  "tipos": {
+    "central": "Central",
+    "sucursal": "Branch",
+    "externo": "External",
+    "picking": "Picking",
+    "transito": "In transit"
+  },
+  "errors": {
+    "load": "Could not load warehouses",
+    "save": "Could not save warehouse",
+    "delete": "Could not delete warehouse"
+  },
+  "confirmDelete": "Delete this warehouse?"
+}

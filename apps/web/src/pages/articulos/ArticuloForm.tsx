@@ -13,6 +13,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import { Articulo, Rubro, type CategoriaArticuloRow } from '@bizcode/types'
 import ArticuloProveedoresComparadorSection from './ArticuloProveedoresComparadorSection'
 import ArticuloVariantesPanel from './ArticuloVariantesPanel'
+import ArticuloStockDepositosPanel from './ArticuloStockDepositosPanel'
 
 const articuloSchema = z
   .object({
@@ -701,6 +702,7 @@ export default function ArticuloForm({ articulo, rubros, onClose, onGuardado }: 
           esPadre={articulo?.esPadre}
           padreId={articulo?.padreId}
         />
+        <ArticuloStockDepositosPanel articuloId={articulo?.id ?? null} />
       </div>
 
       {showAdjust && articulo && (

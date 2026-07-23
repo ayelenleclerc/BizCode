@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "activo": {
+      "type": "boolean"
+    },
+    "codigo": {
+      "maxLength": 20,
+      "type": "string"
+    },
+    "direccion": {
+      "nullable": true,
+      "type": "string"
+    },
+    "esDefault": {
+      "type": "boolean"
+    },
+    "nombre": {
+      "maxLength": 80,
+      "type": "string"
+    },
+    "responsableId": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "tipo": {
+      "enum": [
+        "central",
+        "sucursal",
+        "externo",
+        "picking",
+        "transito"
+      ],
+      "type": "string"
+    }
+  },
+  "title": "DepositoPatchInput",
+  "type": "object"
+}

@@ -1,0 +1,27 @@
+{
+  "title": "Transferências entre depósitos",
+  "subtitle": "Mover estoque entre armazéns",
+  "create": "Nova transferência",
+  "origen": "Origem",
+  "destino": "Destino",
+  "articuloId": "Artigo ID",
+  "cantidad": "Quantidade",
+  "addItem": "Adicionar item",
+  "enviar": "Marcar em trânsito",
+  "recibir": "Receber",
+  "anular": "Anular",
+  "estado": "Estado",
+  "numero": "Número",
+  "empty": "Não há transferências",
+  "estados": {
+    "pendiente": "Pendente",
+    "en_transito": "Em trânsito",
+    "recibida": "Recebida",
+    "anulada": "Anulada"
+  },
+  "errors": {
+    "load": "Não foi possível carregar as transferências",
+    "save": "Não foi possível criar a transferência",
+    "action": "Não foi possível concluir a ação"
+  }
+}
