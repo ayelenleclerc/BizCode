@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "activa": {
+      "type": "boolean"
+    },
+    "articulo": {
+      "nullable": true,
+      "type": "object"
+    },
+    "articuloId": {
+      "type": "integer"
+    },
+    "createdAt": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "id": {
+      "type": "integer"
+    },
+    "insumos": {
+      "items": {
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "observaciones": {
+      "nullable": true,
+      "type": "string"
+    },
+    "rendimiento": {
+      "type": "number"
+    },
+    "tenantId": {
+      "type": "integer"
+    },
+    "unidadRendimiento": {
+      "type": "string"
+    },
+    "updatedAt": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "version": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "id",
+    "tenantId",
+    "articuloId",
+    "rendimiento",
+    "unidadRendimiento",
+    "version",
+    "activa",
+    "observaciones",
+    "createdAt",
+    "updatedAt",
+    "insumos"
+  ],
+  "title": "FormulaProduccion",
+  "type": "object"
+}

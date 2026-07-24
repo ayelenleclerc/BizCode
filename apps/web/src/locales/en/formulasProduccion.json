@@ -1,0 +1,90 @@
+{
+  "title": "Production formulas (BOM)",
+  "subtitle": "Manage bill-of-materials formulas, cost and material projection.",
+  "list": {
+    "title": "Formulas",
+    "caption": "Production formulas list"
+  },
+  "create": {
+    "title": "New formula"
+  },
+  "edit": {
+    "title": "New version of selected formula"
+  },
+  "cost": {
+    "title": "Cost",
+    "unitCost": "Unit cost",
+    "salePrice": "Sale price",
+    "marginPct": "Margin %",
+    "inputsCost": "Inputs cost",
+    "loading": "Calculating cost…"
+  },
+  "projection": {
+    "title": "Projection",
+    "units": "Target units",
+    "runs": "Runs",
+    "caption": "Projected input quantities"
+  },
+  "insumos": {
+    "title": "Inputs",
+    "add": "Add input",
+    "remove": "Remove",
+    "optional": "Optional"
+  },
+  "fields": {
+    "articuloId": "Article ID",
+    "rendimiento": "Yield",
+    "observaciones": "Notes",
+    "cantidad": "Quantity",
+    "unidad": "Unit",
+    "version": "Version",
+    "activa": "Active",
+    "articulo": "Article",
+    "esOpcional": "Optional"
+  },
+  "status": {
+    "active": "Active",
+    "inactive": "Inactive"
+  },
+  "units": {
+    "kg": "kg",
+    "g": "g",
+    "l": "l",
+    "ml": "ml",
+    "unidad": "unit",
+    "hora": "hour"
+  },
+  "actions": {
+    "create": "Create formula",
+    "update": "Save new version",
+    "deactivate": "Deactivate",
+    "project": "Project",
+    "select": "Select",
+    "saving": "Saving…",
+    "deactivating": "Deactivating…",
+    "projecting": "Projecting…"
+  },
+  "states": {
+    "loading": "Loading formulas…",
+    "empty": "No formulas registered.",
+    "noSelection": "Select a formula to see cost and projection.",
+    "costLoading": "Loading cost…"
+  },
+  "success": {
+    "create": "The formula was created successfully.",
+    "update": "A new formula version was saved successfully.",
+    "deactivate": "The formula was deactivated successfully."
+  },
+  "errors": {
+    "load": "Formulas could not be loaded. Try again.",
+    "create": "The formula could not be created.",
+    "update": "The new version could not be saved.",
+    "deactivate": "The formula could not be deactivated.",
+    "cost": "Cost could not be calculated.",
+    "projection": "Projection could not be calculated.",
+    "invalidArticulo": "Enter a valid article ID.",
+    "invalidRendimiento": "Enter a yield greater than zero.",
+    "invalidInsumos": "Add at least one input with article ID and quantity greater than zero.",
+    "invalidUnidades": "Enter a number of units greater than zero."
+  }
+}

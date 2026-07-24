@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "data": {
+      "properties": {
+        "articuloId": {
+          "type": "integer"
+        },
+        "costoInsumos": {
+          "type": "number"
+        },
+        "costoUnitario": {
+          "type": "number"
+        },
+        "formulaId": {
+          "type": "integer"
+        },
+        "lineas": {
+          "items": {
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "margenAbsoluto": {
+          "type": "number"
+        },
+        "margenPorcentaje": {
+          "type": "number"
+        },
+        "precioVenta": {
+          "type": "number"
+        },
+        "rendimiento": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "formulaId",
+        "articuloId",
+        "rendimiento",
+        "costoInsumos",
+        "costoUnitario",
+        "precioVenta",
+        "margenAbsoluto",
+        "margenPorcentaje",
+        "lineas"
+      ],
+      "type": "object"
+    },
+    "success": {
+      "enum": [
+        true
+      ],
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "success",
+    "data"
+  ],
+  "title": "FormulaCostoEnvelope",
+  "type": "object"
+}

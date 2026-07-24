@@ -1,0 +1,90 @@
+{
+  "title": "Fórmulas de produção (BOM)",
+  "subtitle": "Gerencie fórmulas de materiais, custo e projeção de insumos.",
+  "list": {
+    "title": "Fórmulas",
+    "caption": "Lista de fórmulas de produção"
+  },
+  "create": {
+    "title": "Nova fórmula"
+  },
+  "edit": {
+    "title": "Nova versão da fórmula selecionada"
+  },
+  "cost": {
+    "title": "Custo",
+    "unitCost": "Custo unitário",
+    "salePrice": "Preço de venda",
+    "marginPct": "Margem %",
+    "inputsCost": "Custo dos insumos",
+    "loading": "Calculando custo…"
+  },
+  "projection": {
+    "title": "Projeção",
+    "units": "Unidades alvo",
+    "runs": "Corridas",
+    "caption": "Quantidades de insumos projetadas"
+  },
+  "insumos": {
+    "title": "Insumos",
+    "add": "Adicionar insumo",
+    "remove": "Remover",
+    "optional": "Opcional"
+  },
+  "fields": {
+    "articuloId": "ID do artigo",
+    "rendimiento": "Rendimento",
+    "observaciones": "Observações",
+    "cantidad": "Quantidade",
+    "unidad": "Unidade",
+    "version": "Versão",
+    "activa": "Ativa",
+    "articulo": "Artigo",
+    "esOpcional": "Opcional"
+  },
+  "status": {
+    "active": "Ativa",
+    "inactive": "Inativa"
+  },
+  "units": {
+    "kg": "kg",
+    "g": "g",
+    "l": "l",
+    "ml": "ml",
+    "unidad": "unidade",
+    "hora": "hora"
+  },
+  "actions": {
+    "create": "Criar fórmula",
+    "update": "Salvar nova versão",
+    "deactivate": "Desativar",
+    "project": "Projetar",
+    "select": "Selecionar",
+    "saving": "Salvando…",
+    "deactivating": "Desativando…",
+    "projecting": "Projetando…"
+  },
+  "states": {
+    "loading": "Carregando fórmulas…",
+    "empty": "Não há fórmulas registradas.",
+    "noSelection": "Selecione uma fórmula para ver custo e projeção.",
+    "costLoading": "Carregando custo…"
+  },
+  "success": {
+    "create": "A fórmula foi criada com sucesso.",
+    "update": "A nova versão da fórmula foi salva com sucesso.",
+    "deactivate": "A fórmula foi desativada com sucesso."
+  },
+  "errors": {
+    "load": "Não foi possível carregar as fórmulas. Tente novamente.",
+    "create": "Não foi possível criar a fórmula.",
+    "update": "Não foi possível salvar a nova versão.",
+    "deactivate": "Não foi possível desativar a fórmula.",
+    "cost": "Não foi possível calcular o custo.",
+    "projection": "Não foi possível calcular a projeção.",
+    "invalidArticulo": "Informe um ID de artigo válido.",
+    "invalidRendimiento": "Informe um rendimento maior que zero.",
+    "invalidInsumos": "Adicione pelo menos um insumo com ID de artigo e quantidade maior que zero.",
+    "invalidUnidades": "Informe uma quantidade de unidades maior que zero."
+  }
+}

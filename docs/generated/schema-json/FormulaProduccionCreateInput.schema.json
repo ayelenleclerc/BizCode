@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "articuloId": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "insumos": {
+      "items": {
+        "$ref": "./FormulaInsumoInput.schema.json"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "observaciones": {
+      "maxLength": 500,
+      "nullable": true,
+      "type": "string"
+    },
+    "rendimiento": {
+      "exclusiveMinimum": 0,
+      "type": "number"
+    },
+    "unidadRendimiento": {
+      "maxLength": 12,
+      "type": "string"
+    }
+  },
+  "required": [
+    "articuloId",
+    "rendimiento",
+    "insumos"
+  ],
+  "title": "FormulaProduccionCreateInput",
+  "type": "object"
+}

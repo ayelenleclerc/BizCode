@@ -34,6 +34,7 @@ import ComisionesLiquidacionesPage from './pages/comisiones/liquidaciones'
 import ComisionesMiasPage from './pages/comisiones/mias'
 import ImportacionesPage from './pages/importaciones'
 import TiposCambioPage from './pages/tipos-cambio'
+import FormulasProduccionPage from './pages/formulas-produccion'
 import ReportesPage from './pages/reportes'
 import ConfiguracionPage from './pages/configuracion'
 import ZonasEntregaPage from './pages/configuracion/ZonasEntregaPage'
@@ -285,6 +286,14 @@ function AppRoutes() {
             element={
               <ModuleRoute moduleKey="catalog.multicurrency">
                 <TiposCambioPage />
+              </ModuleRoute>
+            }
+          />
+          <Route
+            path="formulas-produccion"
+            element={
+              <ModuleRoute moduleKey="production.bom">
+                <FormulasProduccionPage />
               </ModuleRoute>
             }
           />

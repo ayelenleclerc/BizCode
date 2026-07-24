@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "data": {
+      "properties": {
+        "articuloId": {
+          "type": "integer"
+        },
+        "corridas": {
+          "type": "number"
+        },
+        "formulaId": {
+          "type": "integer"
+        },
+        "lineas": {
+          "items": {
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "unidadesObjetivo": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "formulaId",
+        "articuloId",
+        "unidadesObjetivo",
+        "corridas",
+        "lineas"
+      ],
+      "type": "object"
+    },
+    "success": {
+      "enum": [
+        true
+      ],
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "success",
+    "data"
+  ],
+  "title": "FormulaProyeccionEnvelope",
+  "type": "object"
+}

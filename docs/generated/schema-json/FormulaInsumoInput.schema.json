@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "articuloId": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "cantidad": {
+      "exclusiveMinimum": 0,
+      "type": "number"
+    },
+    "esOpcional": {
+      "type": "boolean"
+    },
+    "orden": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "unidad": {
+      "enum": [
+        "kg",
+        "g",
+        "l",
+        "ml",
+        "unidad",
+        "hora"
+      ],
+      "type": "string"
+    }
+  },
+  "required": [
+    "articuloId",
+    "cantidad",
+    "unidad"
+  ],
+  "title": "FormulaInsumoInput",
+  "type": "object"
+}

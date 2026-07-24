@@ -67862,6 +67862,1307 @@ Rate-limited mutation; requires products.manage. USD only.
 }
 ```
 
+### PARAMETERS /api/formulas-produccion
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/formulas-produccion`
+
+### List production BOM formulas (#248)
+
+- **Method:** `GET`
+- **Path:** `/api/formulas-produccion`
+- **Tags:** formulas-produccion
+
+#### Responses
+
+##### Status: 200 Paginated formulas
+
+###### Content-Type: application/json
+
+**All of:**
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`activa` (required)**
+
+    `boolean`
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`insumos` (required)**
+
+    `array`
+
+    **Items:**
+
+  - **`observaciones` (required)**
+
+    `string`
+
+  - **`rendimiento` (required)**
+
+    `number`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`unidadRendimiento` (required)**
+
+    `string`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`version` (required)**
+
+    `integer`
+
+  - **`articulo`**
+
+    `object`
+
+- **`success` (required)**
+
+  `boolean`, possible values: `true`
+
+* **`limit` (required)**
+
+  `integer` — Effective page size (same semantics as query \`limit\`)
+
+* **`offset` (required)**
+
+  `integer` — Effective skip (same semantics as query \`offset\`)
+
+* **`total` (required)**
+
+  `integer` — Row count matching the list filter (before limit/offset)
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "articuloId": 1,
+      "rendimiento": 1,
+      "unidadRendimiento": "",
+      "version": 1,
+      "activa": true,
+      "observaciones": "",
+      "createdAt": "",
+      "updatedAt": "",
+      "articulo": {},
+      "insumos": [
+        {}
+      ]
+    }
+  ],
+  "total": 0,
+  "limit": 1,
+  "offset": 0
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Create active BOM formula for an article (#248)
+
+- **Method:** `POST`
+- **Path:** `/api/formulas-produccion`
+- **Tags:** formulas-produccion
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`articuloId` (required)**
+
+  `integer`
+
+- **`insumos` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`cantidad` (required)**
+
+    `number`
+
+  - **`unidad` (required)**
+
+    `string`, possible values: `"kg", "g", "l", "ml", "unidad", "hora"`
+
+  - **`esOpcional`**
+
+    `boolean`
+
+  - **`orden`**
+
+    `integer`
+
+- **`rendimiento` (required)**
+
+  `number`
+
+- **`observaciones`**
+
+  `string`
+
+- **`unidadRendimiento`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "articuloId": 1,
+  "rendimiento": 1,
+  "unidadRendimiento": "",
+  "observaciones": "",
+  "insumos": [
+    {
+      "articuloId": 1,
+      "cantidad": 1,
+      "unidad": "kg",
+      "esOpcional": true,
+      "orden": 0
+    }
+  ]
+}
+```
+
+#### Responses
+
+##### Status: 201 Created
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`activa` (required)**
+
+    `boolean`
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`insumos` (required)**
+
+    `array`
+
+    **Items:**
+
+  - **`observaciones` (required)**
+
+    `string`
+
+  - **`rendimiento` (required)**
+
+    `number`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`unidadRendimiento` (required)**
+
+    `string`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`version` (required)**
+
+    `integer`
+
+  - **`articulo`**
+
+    `object`
+
+- **`success` (required)**
+
+  `boolean`, possible values: `true`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "articuloId": 1,
+    "rendimiento": 1,
+    "unidadRendimiento": "",
+    "version": 1,
+    "activa": true,
+    "observaciones": "",
+    "createdAt": "",
+    "updatedAt": "",
+    "articulo": {},
+    "insumos": [
+      {}
+    ]
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 409 Active formula already exists
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/formulas-produccion/{id}
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/formulas-produccion/{id}`
+
+### Get BOM formula by id (#248)
+
+- **Method:** `GET`
+- **Path:** `/api/formulas-produccion/{id}`
+- **Tags:** formulas-produccion
+
+#### Responses
+
+##### Status: 200 Formula
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`activa` (required)**
+
+    `boolean`
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`insumos` (required)**
+
+    `array`
+
+    **Items:**
+
+  - **`observaciones` (required)**
+
+    `string`
+
+  - **`rendimiento` (required)**
+
+    `number`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`unidadRendimiento` (required)**
+
+    `string`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`version` (required)**
+
+    `integer`
+
+  - **`articulo`**
+
+    `object`
+
+- **`success` (required)**
+
+  `boolean`, possible values: `true`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "articuloId": 1,
+    "rendimiento": 1,
+    "unidadRendimiento": "",
+    "version": 1,
+    "activa": true,
+    "observaciones": "",
+    "createdAt": "",
+    "updatedAt": "",
+    "articulo": {},
+    "insumos": [
+      {}
+    ]
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Versioned update of active BOM formula (#248)
+
+- **Method:** `PUT`
+- **Path:** `/api/formulas-produccion/{id}`
+- **Tags:** formulas-produccion
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`insumos` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`cantidad` (required)**
+
+    `number`
+
+  - **`unidad` (required)**
+
+    `string`, possible values: `"kg", "g", "l", "ml", "unidad", "hora"`
+
+  - **`esOpcional`**
+
+    `boolean`
+
+  - **`orden`**
+
+    `integer`
+
+- **`rendimiento` (required)**
+
+  `number`
+
+- **`observaciones`**
+
+  `string`
+
+- **`unidadRendimiento`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "rendimiento": 1,
+  "unidadRendimiento": "",
+  "observaciones": "",
+  "insumos": [
+    {
+      "articuloId": 1,
+      "cantidad": 1,
+      "unidad": "kg",
+      "esOpcional": true,
+      "orden": 0
+    }
+  ]
+}
+```
+
+#### Responses
+
+##### Status: 200 New active version
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`activa` (required)**
+
+    `boolean`
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`insumos` (required)**
+
+    `array`
+
+    **Items:**
+
+  - **`observaciones` (required)**
+
+    `string`
+
+  - **`rendimiento` (required)**
+
+    `number`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`unidadRendimiento` (required)**
+
+    `string`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`version` (required)**
+
+    `integer`
+
+  - **`articulo`**
+
+    `object`
+
+- **`success` (required)**
+
+  `boolean`, possible values: `true`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "articuloId": 1,
+    "rendimiento": 1,
+    "unidadRendimiento": "",
+    "version": 1,
+    "activa": true,
+    "observaciones": "",
+    "createdAt": "",
+    "updatedAt": "",
+    "articulo": {},
+    "insumos": [
+      {}
+    ]
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 422 Semantically invalid request
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/formulas-produccion/{id}/costo
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/formulas-produccion/{id}/costo`
+
+### Compute unit cost and margin for a formula (#248)
+
+- **Method:** `GET`
+- **Path:** `/api/formulas-produccion/{id}/costo`
+- **Tags:** formulas-produccion
+
+#### Responses
+
+##### Status: 200 Cost breakdown
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`costoInsumos` (required)**
+
+    `number`
+
+  - **`costoUnitario` (required)**
+
+    `number`
+
+  - **`formulaId` (required)**
+
+    `integer`
+
+  - **`lineas` (required)**
+
+    `array`
+
+    **Items:**
+
+  - **`margenAbsoluto` (required)**
+
+    `number`
+
+  - **`margenPorcentaje` (required)**
+
+    `number`
+
+  - **`precioVenta` (required)**
+
+    `number`
+
+  - **`rendimiento` (required)**
+
+    `number`
+
+- **`success` (required)**
+
+  `boolean`, possible values: `true`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "formulaId": 1,
+    "articuloId": 1,
+    "rendimiento": 1,
+    "costoInsumos": 1,
+    "costoUnitario": 1,
+    "precioVenta": 1,
+    "margenAbsoluto": 1,
+    "margenPorcentaje": 1,
+    "lineas": [
+      {}
+    ]
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/formulas-produccion/{id}/proyeccion
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/formulas-produccion/{id}/proyeccion`
+
+### Project input quantities for N finished units (#248)
+
+- **Method:** `POST`
+- **Path:** `/api/formulas-produccion/{id}/proyeccion`
+- **Tags:** formulas-produccion
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`unidades` (required)**
+
+  `number`
+
+**Example:**
+
+```json
+{
+  "unidades": 1
+}
+```
+
+#### Responses
+
+##### Status: 200 Projection
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`corridas` (required)**
+
+    `number`
+
+  - **`formulaId` (required)**
+
+    `integer`
+
+  - **`lineas` (required)**
+
+    `array`
+
+    **Items:**
+
+  - **`unidadesObjetivo` (required)**
+
+    `number`
+
+- **`success` (required)**
+
+  `boolean`, possible values: `true`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "formulaId": 1,
+    "articuloId": 1,
+    "unidadesObjetivo": 1,
+    "corridas": 1,
+    "lineas": [
+      {}
+    ]
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/formulas-produccion/{id}/desactivar
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/formulas-produccion/{id}/desactivar`
+
+### Deactivate BOM formula (#248)
+
+- **Method:** `POST`
+- **Path:** `/api/formulas-produccion/{id}/desactivar`
+- **Tags:** formulas-produccion
+
+#### Responses
+
+##### Status: 200 Deactivated
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`activa` (required)**
+
+    `boolean`
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`insumos` (required)**
+
+    `array`
+
+    **Items:**
+
+  - **`observaciones` (required)**
+
+    `string`
+
+  - **`rendimiento` (required)**
+
+    `number`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`unidadRendimiento` (required)**
+
+    `string`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`version` (required)**
+
+    `integer`
+
+  - **`articulo`**
+
+    `object`
+
+- **`success` (required)**
+
+  `boolean`, possible values: `true`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "articuloId": 1,
+    "rendimiento": 1,
+    "unidadRendimiento": "",
+    "version": 1,
+    "activa": true,
+    "observaciones": "",
+    "createdAt": "",
+    "updatedAt": "",
+    "articulo": {},
+    "insumos": [
+      {}
+    ]
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ### PARAMETERS /api/transferencias-deposito/{id}/anular
 
 - **Method:** `PARAMETERS`
@@ -95259,6 +96560,458 @@ Originating invoice header (selected columns)
     "moneda": "USD",
     "tipo": "oficial",
     "valor": 1
+  }
+}
+```
+
+### FormulaInsumoInput
+
+- **Type:**`object`
+
+* **`articuloId` (required)**
+
+  `integer`
+
+* **`cantidad` (required)**
+
+  `number`
+
+* **`unidad` (required)**
+
+  `string`, possible values: `"kg", "g", "l", "ml", "unidad", "hora"`
+
+* **`esOpcional`**
+
+  `boolean`
+
+* **`orden`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "articuloId": 1,
+  "cantidad": 1,
+  "unidad": "kg",
+  "esOpcional": true,
+  "orden": 0
+}
+```
+
+### FormulaProduccionCreateInput
+
+- **Type:**`object`
+
+* **`articuloId` (required)**
+
+  `integer`
+
+* **`insumos` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`cantidad` (required)**
+
+    `number`
+
+  - **`unidad` (required)**
+
+    `string`, possible values: `"kg", "g", "l", "ml", "unidad", "hora"`
+
+  - **`esOpcional`**
+
+    `boolean`
+
+  - **`orden`**
+
+    `integer`
+
+* **`rendimiento` (required)**
+
+  `number`
+
+* **`observaciones`**
+
+  `string`
+
+* **`unidadRendimiento`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "articuloId": 1,
+  "rendimiento": 1,
+  "unidadRendimiento": "",
+  "observaciones": "",
+  "insumos": [
+    {
+      "articuloId": 1,
+      "cantidad": 1,
+      "unidad": "kg",
+      "esOpcional": true,
+      "orden": 0
+    }
+  ]
+}
+```
+
+### FormulaProduccionUpdateInput
+
+- **Type:**`object`
+
+* **`insumos` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`cantidad` (required)**
+
+    `number`
+
+  - **`unidad` (required)**
+
+    `string`, possible values: `"kg", "g", "l", "ml", "unidad", "hora"`
+
+  - **`esOpcional`**
+
+    `boolean`
+
+  - **`orden`**
+
+    `integer`
+
+* **`rendimiento` (required)**
+
+  `number`
+
+* **`observaciones`**
+
+  `string`
+
+* **`unidadRendimiento`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "rendimiento": 1,
+  "unidadRendimiento": "",
+  "observaciones": "",
+  "insumos": [
+    {
+      "articuloId": 1,
+      "cantidad": 1,
+      "unidad": "kg",
+      "esOpcional": true,
+      "orden": 0
+    }
+  ]
+}
+```
+
+### FormulaProduccion
+
+- **Type:**`object`
+
+* **`activa` (required)**
+
+  `boolean`
+
+* **`articuloId` (required)**
+
+  `integer`
+
+* **`createdAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`insumos` (required)**
+
+  `array`
+
+  **Items:**
+
+* **`observaciones` (required)**
+
+  `string`
+
+* **`rendimiento` (required)**
+
+  `number`
+
+* **`tenantId` (required)**
+
+  `integer`
+
+* **`unidadRendimiento` (required)**
+
+  `string`
+
+* **`updatedAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`version` (required)**
+
+  `integer`
+
+* **`articulo`**
+
+  `object`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "tenantId": 1,
+  "articuloId": 1,
+  "rendimiento": 1,
+  "unidadRendimiento": "",
+  "version": 1,
+  "activa": true,
+  "observaciones": "",
+  "createdAt": "",
+  "updatedAt": "",
+  "articulo": {},
+  "insumos": [
+    {}
+  ]
+}
+```
+
+### FormulaProduccionEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`activa` (required)**
+
+    `boolean`
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`insumos` (required)**
+
+    `array`
+
+    **Items:**
+
+  - **`observaciones` (required)**
+
+    `string`
+
+  - **`rendimiento` (required)**
+
+    `number`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`unidadRendimiento` (required)**
+
+    `string`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`version` (required)**
+
+    `integer`
+
+  - **`articulo`**
+
+    `object`
+
+* **`success` (required)**
+
+  `boolean`, possible values: `true`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "articuloId": 1,
+    "rendimiento": 1,
+    "unidadRendimiento": "",
+    "version": 1,
+    "activa": true,
+    "observaciones": "",
+    "createdAt": "",
+    "updatedAt": "",
+    "articulo": {},
+    "insumos": [
+      {}
+    ]
+  }
+}
+```
+
+### FormulaProduccionListEnvelope
+
+- **Type:**
+
+**Example:**
+
+### FormulaCostoEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`costoInsumos` (required)**
+
+    `number`
+
+  - **`costoUnitario` (required)**
+
+    `number`
+
+  - **`formulaId` (required)**
+
+    `integer`
+
+  - **`lineas` (required)**
+
+    `array`
+
+    **Items:**
+
+  - **`margenAbsoluto` (required)**
+
+    `number`
+
+  - **`margenPorcentaje` (required)**
+
+    `number`
+
+  - **`precioVenta` (required)**
+
+    `number`
+
+  - **`rendimiento` (required)**
+
+    `number`
+
+* **`success` (required)**
+
+  `boolean`, possible values: `true`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "formulaId": 1,
+    "articuloId": 1,
+    "rendimiento": 1,
+    "costoInsumos": 1,
+    "costoUnitario": 1,
+    "precioVenta": 1,
+    "margenAbsoluto": 1,
+    "margenPorcentaje": 1,
+    "lineas": [
+      {}
+    ]
+  }
+}
+```
+
+### FormulaProyeccionEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`corridas` (required)**
+
+    `number`
+
+  - **`formulaId` (required)**
+
+    `integer`
+
+  - **`lineas` (required)**
+
+    `array`
+
+    **Items:**
+
+  - **`unidadesObjetivo` (required)**
+
+    `number`
+
+* **`success` (required)**
+
+  `boolean`, possible values: `true`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "formulaId": 1,
+    "articuloId": 1,
+    "unidadesObjetivo": 1,
+    "corridas": 1,
+    "lineas": [
+      {}
+    ]
   }
 }
 ```
