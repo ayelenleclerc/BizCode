@@ -102,6 +102,13 @@ export const NAV_SECTIONS: readonly NavSection[] = [
     moduleKey: 'inventory.warehouses',
   },
   {
+    key: 'formulasProduccion',
+    path: '/formulas-produccion',
+    icon: '🧪',
+    roles: ['owner', 'manager', 'warehouse_lead'],
+    moduleKey: 'production.bom',
+  },
+  {
     key: 'comisionesConfig',
     path: '/comisiones/config',
     icon: '💰',
@@ -250,6 +257,7 @@ export const ROUTE_MODULE_GUARDS: ReadonlyArray<{ path: string; moduleKey: Modul
   { path: 'comisiones/mias', moduleKey: 'finance.commissions' },
   { path: 'importaciones', moduleKey: 'platform.data_import' },
   { path: 'tipos-cambio', moduleKey: 'catalog.multicurrency' },
+  { path: 'formulas-produccion', moduleKey: 'production.bom' },
   { path: 'logistica', moduleKey: 'logistics.dispatches' },
   { path: 'logistica/picking', moduleKey: 'logistics.picking' },
   { path: 'logistica/seguimiento', moduleKey: 'logistics.gps' },

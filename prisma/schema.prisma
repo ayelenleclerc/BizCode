@@ -310,6 +310,8 @@ model Articulo {
   atributoValores      ArticuloAtributoValor[]
   imagenes             ArticuloImagen[]
   ofertas              ArticuloOferta[]
+  formulasComoProducto FormulaProduccion[] @relation("FormulaProducto")
+  formulasComoInsumo   FormulaInsumo[]     @relation("FormulaInsumoArticulo")
 
   @@unique([tenantId, codigo])
   @@index([tenantId])
@@ -1454,6 +1456,7 @@ model Tenant {
   liquidacionesComision         LiquidacionComision[]
   importJobs                    ImportJob[]
   tiposCambio                   TipoCambio[]
+  formulasProduccion            FormulaProduccion[]
 }
 
 /// Idempotent Mercado Pago payment webhook processing (#176).
@@ -2201,6 +2204,53 @@ model TipoCambio {
 
   @@index([tenantId, moneda, tipo, fecha])
   @@index([tenantId, fecha])
+}
+
+/// @en Production BOM formula for a finished article (#248).
+/// @es Fórmula BOM de producción para un artículo terminado (#248).
+/// @pt-BR Fórmula BOM de produção para um artigo acabado (#248).
+model FormulaProduccion {
+  id                Int      @id @default(autoincrement())
+  tenantId          Int
+  tenant            Tenant   @relation(fields: [tenantId], references: [id])
+  articuloId        Int
+  articulo          Articulo @relation("FormulaProducto", fields: [articuloId], references: [id], onDelete: Restrict)
+  /// @en Units produced by one formula run.
+  /// @es Unidades producidas por una corrida de la fórmula.
+  /// @pt-BR Unidades produzidas por uma corrida da fórmula.
+  rendimiento       Decimal  @default(1) @db.Decimal(14, 4)
+  unidadRendimiento String   @default("unidad") @db.VarChar(12)
+  version           Int      @default(1)
+  activa            Boolean  @default(true)
+  observaciones     String?  @db.VarChar(500)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  insumos FormulaInsumo[]
+
+  @@index([tenantId])
+  @@index([tenantId, articuloId])
+  @@index([tenantId, articuloId, activa])
+  @@index([tenantId, activa])
+}
+
+/// @en Input line of a production BOM formula (#248).
+/// @es Línea de insumo de una fórmula BOM (#248).
+/// @pt-BR Linha de insumo de uma fórmula BOM (#248).
+model FormulaInsumo {
+  id         Int               @id @default(autoincrement())
+  formulaId  Int
+  formula    FormulaProduccion @relation(fields: [formulaId], references: [id], onDelete: Cascade)
+  articuloId Int
+  articulo   Articulo          @relation("FormulaInsumoArticulo", fields: [articuloId], references: [id], onDelete: Restrict)
+  cantidad   Decimal           @db.Decimal(14, 4)
+  /// kg | g | l | ml | unidad | hora
+  unidad     String            @db.VarChar(12)
+  esOpcional Boolean           @default(false)
+  orden      Int               @default(0)
+
+  @@index([formulaId])
+  @@index([articuloId])
 }
 
 model StockAjuste {

@@ -199,6 +199,17 @@ export const tiposCambioMutationHttpRateLimiter = createRouteLimiter({
   skipUnless: () => true,
 })
 
+/**
+ * @en Per-IP rate limit for BOM formula mutations (#248); visible to CodeQL.
+ * @es Límite por IP para mutaciones de fórmulas BOM (#248); visible a CodeQL.
+ * @pt-BR Limite por IP para mutações de fórmulas BOM (#248); visível ao CodeQL.
+ */
+export const formulasProduccionMutationHttpRateLimiter = createRouteLimiter({
+  windowMs: MINUTE_MS,
+  limit: parsePositiveInt(process.env.HTTP_RATE_LIMIT_PER_MINUTE, API_GENERAL_DEFAULT),
+  skipUnless: () => true,
+})
+
 function runLimiterChain(
   req: Request,
   res: Response,

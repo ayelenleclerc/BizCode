@@ -360,6 +360,22 @@
 
 * [FormaPagoPatchInput](./formapagopatchinput.md) – `-`
 
+* [FormulaCostoEnvelope](./formulacostoenvelope.md) – `-`
+
+* [FormulaInsumoInput](./formulainsumoinput.md) – `-`
+
+* [FormulaProduccion](./formulaproduccion.md) – `-`
+
+* [FormulaProduccionCreateInput](./formulaproduccioncreateinput.md) – `-`
+
+* [FormulaProduccionEnvelope](./formulaproduccionenvelope.md) – `-`
+
+* [FormulaProduccionListEnvelope](./formulaproduccionlistenvelope.md) – `-`
+
+* [FormulaProduccionUpdateInput](./formulaproduccionupdateinput.md) – `-`
+
+* [FormulaProyeccionEnvelope](./formulaproyeccionenvelope.md) – `-`
+
 * [Garantia](./garantia.md) – `-`
 
 * [GarantiaEnvelope](./garantiaenvelope.md) – `-`
@@ -1086,6 +1102,20 @@
 
 * [Untitled object in FacturaListEnvelope](./facturalistenvelope-allof-0.md) – `undefined#/allOf/0`
 
+* [Untitled object in FormulaCostoEnvelope](./formulacostoenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled object in FormulaCostoEnvelope](./formulacostoenvelope-properties-data-properties-lineas-items.md) – `undefined#/properties/data/properties/lineas/items`
+
+* [Untitled object in FormulaProduccion](./formulaproduccion-properties-articulo.md) – `undefined#/properties/articulo`
+
+* [Untitled object in FormulaProduccion](./formulaproduccion-properties-insumos-items.md) – `undefined#/properties/insumos/items`
+
+* [Untitled object in FormulaProduccionListEnvelope](./formulaproduccionlistenvelope-allof-0.md) – `undefined#/allOf/0`
+
+* [Untitled object in FormulaProyeccionEnvelope](./formulaproyeccionenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled object in FormulaProyeccionEnvelope](./formulaproyeccionenvelope-properties-data-properties-lineas-items.md) – `undefined#/properties/data/properties/lineas/items`
+
 * [Untitled object in GarantiaListEnvelope](./garantialistenvelope-allof-0.md) – `undefined#/allOf/0`
 
 * [Untitled object in GarantiaListEnvelope](./garantialistenvelope-allof-0-properties-counts.md) – `undefined#/allOf/0/properties/counts`
@@ -1379,6 +1409,18 @@
 * [Untitled array in FacturasPendientesEnvelope](./facturaspendientesenvelope-properties-data.md) – `undefined#/properties/data`
 
 * [Untitled array in FormaPagoListEnvelope](./formapagolistenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled array in FormulaCostoEnvelope](./formulacostoenvelope-properties-data-properties-lineas.md) – `undefined#/properties/data/properties/lineas`
+
+* [Untitled array in FormulaProduccion](./formulaproduccion-properties-insumos.md) – `undefined#/properties/insumos`
+
+* [Untitled array in FormulaProduccionCreateInput](./formulaproduccioncreateinput-properties-insumos.md) – `undefined#/properties/insumos`
+
+* [Untitled array in FormulaProduccionListEnvelope](./formulaproduccionlistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
+
+* [Untitled array in FormulaProduccionUpdateInput](./formulaproduccionupdateinput-properties-insumos.md) – `undefined#/properties/insumos`
+
+* [Untitled array in FormulaProyeccionEnvelope](./formulaproyeccionenvelope-properties-data-properties-lineas.md) – `undefined#/properties/data/properties/lineas`
 
 * [Untitled array in Garantia](./garantia-properties-usos.md) – `undefined#/properties/usos`
 

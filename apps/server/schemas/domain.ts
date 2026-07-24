@@ -3296,3 +3296,32 @@ export const tipoCambioPreferidoBodySchema = z.object({
 export const tipoCambioSyncBodySchema = z.object({
   moneda: monedaFxSchema.optional(),
 })
+
+const formulaInsumoUnidadSchema = z.enum(['kg', 'g', 'l', 'ml', 'unidad', 'hora'])
+
+export const formulaInsumoBodySchema = z.object({
+  articuloId: z.number().int().min(1),
+  cantidad: z.number().positive(),
+  unidad: formulaInsumoUnidadSchema,
+  esOpcional: z.boolean().optional(),
+  orden: z.number().int().min(0).optional(),
+})
+
+export const formulaProduccionCreateBodySchema = z.object({
+  articuloId: z.number().int().min(1),
+  rendimiento: z.number().positive(),
+  unidadRendimiento: z.string().min(1).max(12).optional(),
+  observaciones: z.string().max(500).nullable().optional(),
+  insumos: z.array(formulaInsumoBodySchema).min(1),
+})
+
+export const formulaProduccionUpdateBodySchema = z.object({
+  rendimiento: z.number().positive(),
+  unidadRendimiento: z.string().min(1).max(12).optional(),
+  observaciones: z.string().max(500).nullable().optional(),
+  insumos: z.array(formulaInsumoBodySchema).min(1),
+})
+
+export const formulaProyeccionBodySchema = z.object({
+  unidades: z.number().positive(),
+})
