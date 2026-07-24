@@ -82,4 +82,70 @@ describe('ImportService', () => {
     expect(result.created).toBe(0)
     expect(result.errors[0]?.message).toContain('Unknown rubro codigo 99')
   })
+
+  it('skips existing clientes when duplicateMode=skip', async () => {
+    prisma = {
+      cliente: {
+        findMany: vi.fn().mockResolvedValue([{ id: 5, codigo: 10 }]),
+        create: vi.fn(),
+        update: vi.fn(),
+      },
+      $transaction: vi.fn(async (callback: (tx: PrismaClient) => Promise<void>) => callback(prisma)),
+    } as unknown as PrismaClient
+    service = new ImportService(prisma)
+
+    const result = await service.importClientes(
+      1,
+      [{ codigo: '10', rsocial: 'Uno', condIva: 'RI', activo: 'true' }],
+      { duplicateMode: 'skip' },
+    )
+    expect(result.skipped).toBe(1)
+    expect(result.created).toBe(0)
+    expect(prisma.cliente.create).not.toHaveBeenCalled()
+  })
+
+  it('updates existing clientes when duplicateMode=update', async () => {
+    prisma = {
+      cliente: {
+        findMany: vi.fn().mockResolvedValue([{ id: 5, codigo: 10 }]),
+        create: vi.fn(),
+        update: vi.fn().mockResolvedValue({ id: 5 }),
+      },
+      $transaction: vi.fn(async (callback: (tx: PrismaClient) => Promise<void>) => callback(prisma)),
+    } as unknown as PrismaClient
+    service = new ImportService(prisma)
+
+    const result = await service.importClientes(
+      1,
+      [{ codigo: '10', rsocial: 'Uno', condIva: 'RI', activo: 'true' }],
+      { duplicateMode: 'update' },
+    )
+    expect(result.updated).toBe(1)
+    expect(prisma.cliente.update).toHaveBeenCalled()
+  })
+
+  it('imports proveedores and aborts todo_o_nada on validation errors', async () => {
+    prisma = {
+      proveedor: {
+        findMany: vi.fn().mockResolvedValue([]),
+        create: vi.fn().mockResolvedValue({ id: 1 }),
+        update: vi.fn(),
+      },
+      $transaction: vi.fn(async (callback: (tx: PrismaClient) => Promise<void>) => callback(prisma)),
+    } as unknown as PrismaClient
+    service = new ImportService(prisma)
+
+    const ok = await service.importProveedores(1, [
+      { codigo: '2001', rsocial: 'Prov', condIva: 'RI', activo: 'true' },
+    ])
+    expect(ok.created).toBe(1)
+
+    const aborted = await service.importProveedores(
+      1,
+      [{ codigo: 'x', rsocial: '', condIva: 'RI', activo: 'true' }],
+      { modo: 'todo_o_nada' },
+    )
+    expect(aborted.created).toBe(0)
+    expect(aborted.errors.length).toBeGreaterThan(0)
+  })
 })

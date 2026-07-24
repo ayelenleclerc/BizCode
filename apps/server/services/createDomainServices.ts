@@ -41,6 +41,8 @@ import { DepositoService } from './DepositoService'
 import { TransferenciaDepositoService } from './TransferenciaDepositoService'
 import { ComisionConfigService } from './ComisionConfigService'
 import { LiquidacionComisionService } from './LiquidacionComisionService'
+import { BulkImportValidateService } from './BulkImportValidateService'
+import { ImportJobService } from './ImportJobService'
 
 export type DomainServices = {
   cliente: ClienteService
@@ -85,6 +87,8 @@ export type DomainServices = {
   transferenciaDeposito: TransferenciaDepositoService
   comisionConfig: ComisionConfigService
   liquidacionComision: LiquidacionComisionService
+  bulkImportValidate: BulkImportValidateService
+  importJob: ImportJobService
 }
 
 /**
@@ -136,5 +140,7 @@ export function createDomainServices(prisma: PrismaClient): DomainServices {
     transferenciaDeposito: new TransferenciaDepositoService(prisma),
     comisionConfig: new ComisionConfigService(prisma),
     liquidacionComision: new LiquidacionComisionService(prisma),
+    bulkImportValidate: new BulkImportValidateService(prisma),
+    importJob: new ImportJobService(prisma),
   }
 }

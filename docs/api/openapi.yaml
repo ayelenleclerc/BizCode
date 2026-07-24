@@ -62,6 +62,8 @@ tags:
     description: Multi-warehouse deposits and transfers (#236, module inventory.warehouses)
   - name: comisiones
     description: Seller commissions configuration and monthly settlements (#237, module finance.commissions)
+  - name: importaciones
+    description: Bulk Excel/CSV import jobs with dry-run and SSE progress (#238, module platform.data_import)
   - name: cobros
     description: Customer payment collections
   - name: portal
@@ -10670,6 +10672,181 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
 
+  /api/importaciones/templates/{entity}:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: entity
+        in: path
+        required: true
+        schema:
+          type: string
+          enum: [articulos, clientes, proveedores, saldos]
+      - name: format
+        in: query
+        schema:
+          type: string
+          enum: [csv, xlsx]
+          default: csv
+    get:
+      tags: [importaciones]
+      summary: Download import template CSV or XLSX (#238)
+      responses:
+        '200':
+          description: Template file
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /api/importaciones/validate:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    post:
+      tags: [importaciones]
+      summary: Dry-run validate import file without persisting (#238)
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file, entity]
+              properties:
+                file:
+                  type: string
+                  format: binary
+                entity:
+                  type: string
+                  enum: [articulos, clientes, proveedores, saldos]
+                duplicateMode:
+                  type: string
+                  enum: [update, skip]
+      responses:
+        '200':
+          description: Validation summary
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BulkImportValidateEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /api/importaciones/jobs:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    post:
+      tags: [importaciones]
+      summary: Start async import job (#238)
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file, entity]
+              properties:
+                file:
+                  type: string
+                  format: binary
+                entity:
+                  type: string
+                  enum: [articulos, clientes, proveedores, saldos]
+                modo:
+                  type: string
+                  enum: [mejores_esfuerzos, todo_o_nada]
+                duplicateMode:
+                  type: string
+                  enum: [update, skip]
+      responses:
+        '201':
+          description: Job created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImportJobEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /api/importaciones/jobs/{id}:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    get:
+      tags: [importaciones]
+      summary: Get import job status (#238)
+      responses:
+        '200':
+          description: Job
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImportJobEnvelope'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /api/importaciones/jobs/{id}/events:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    get:
+      tags: [importaciones]
+      summary: SSE progress stream for import job (#238)
+      responses:
+        '200':
+          description: text/event-stream
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /api/importaciones/jobs/{id}/report:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    get:
+      tags: [importaciones]
+      summary: Download import job report CSV (#238)
+      responses:
+        '200':
+          description: Report CSV
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
   /api/transferencias-deposito/{id}/anular:
     parameters:
       - $ref: '#/components/parameters/BizcodeChannelHeader'
@@ -18183,6 +18360,126 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/LiquidacionComision'
+
+    BulkImportValidateSummary:
+      type: object
+      required: [entity, totalRows, okCount, errorCount, duplicateCount, issues]
+      properties:
+        entity:
+          type: string
+          enum: [articulos, clientes, proveedores, saldos]
+        totalRows:
+          type: integer
+        okCount:
+          type: integer
+        errorCount:
+          type: integer
+        duplicateCount:
+          type: integer
+        issues:
+          type: array
+          items:
+            type: object
+            required: [row, code, message, kind]
+            properties:
+              row:
+                type: integer
+              code:
+                type: string
+              message:
+                type: string
+              kind:
+                type: string
+                enum: [error, duplicate]
+
+    BulkImportValidateEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          enum: [true]
+        data:
+          $ref: '#/components/schemas/BulkImportValidateSummary'
+
+    ImportJob:
+      type: object
+      required:
+        [
+          id,
+          tenantId,
+          entity,
+          estado,
+          modo,
+          duplicateMode,
+          totalRows,
+          processedRows,
+          okCount,
+          errorCount,
+          duplicateCount,
+          createdCount,
+          updatedCount,
+          skippedCount,
+          createdById,
+          createdAt,
+          updatedAt,
+          completedAt,
+        ]
+      properties:
+        id:
+          type: integer
+        tenantId:
+          type: integer
+        entity:
+          type: string
+          enum: [articulos, clientes, proveedores, saldos]
+        estado:
+          type: string
+          enum: [validating, ready, running, completed, failed, cancelled]
+        modo:
+          type: string
+          enum: [mejores_esfuerzos, todo_o_nada]
+        duplicateMode:
+          type: string
+          enum: [update, skip]
+        totalRows:
+          type: integer
+        processedRows:
+          type: integer
+        okCount:
+          type: integer
+        errorCount:
+          type: integer
+        duplicateCount:
+          type: integer
+        createdCount:
+          type: integer
+        updatedCount:
+          type: integer
+        skippedCount:
+          type: integer
+        createdById:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        completedAt:
+          type: string
+          format: date-time
+          nullable: true
+
+    ImportJobEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          enum: [true]
+        data:
+          $ref: '#/components/schemas/ImportJob'
 
     CategoriaArticuloCreateInput:
       type: object

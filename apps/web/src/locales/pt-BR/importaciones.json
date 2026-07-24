@@ -1,0 +1,47 @@
+{
+  "title": "Importação em massa",
+  "subtitle": "Importe artigos, clientes, fornecedores ou saldos iniciais via CSV/Excel.",
+  "entity": "Entidade",
+  "duplicateMode": "Duplicados",
+  "modo": "Modo",
+  "file": "Arquivo",
+  "downloadCsv": "Baixar modelo CSV",
+  "downloadXlsx": "Baixar modelo Excel",
+  "validate": "Validar (sem salvar)",
+  "start": "Importar",
+  "summaryTitle": "Resumo da validação",
+  "summaryLine": "{{ok}} OK | {{errors}} erros | {{duplicates}} duplicados ({{total}} linhas)",
+  "issueLine": "Linha {{row}} ({{kind}}): {{message}}",
+  "jobTitle": "Trabalho #{{id}}",
+  "estado": "Status",
+  "downloadReport": "Baixar relatório",
+  "entities": {
+    "clientes": "Clientes",
+    "articulos": "Artigos",
+    "proveedores": "Fornecedores",
+    "saldos": "Saldos iniciais"
+  },
+  "duplicateModes": {
+    "skip": "Ignorar existentes",
+    "update": "Atualizar existentes"
+  },
+  "modos": {
+    "mejores_esfuerzos": "Melhor esforço",
+    "todo_o_nada": "Tudo ou nada"
+  },
+  "estados": {
+    "validating": "Validando",
+    "ready": "Pronto",
+    "running": "Em andamento",
+    "completed": "Concluído",
+    "failed": "Falhou",
+    "cancelled": "Cancelado"
+  },
+  "errors": {
+    "template": "Não foi possível baixar o modelo",
+    "fileRequired": "Selecione um arquivo",
+    "validate": "Falha na validação",
+    "start": "Não foi possível iniciar a importação",
+    "report": "Não foi possível baixar o relatório"
+  }
+}

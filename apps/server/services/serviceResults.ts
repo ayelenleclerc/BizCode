@@ -18,7 +18,9 @@ export type ImportRowError = {
 
 export type ImportPersistResult = {
   created: number
-  /** @en Rows updated via upsert (DBF migration). */
+  /** @en Rows updated via upsert (DBF migration or duplicateMode=update). */
   updated?: number
+  /** @en Existing rows skipped when duplicateMode=skip (#238). */
+  skipped?: number
   errors: ImportRowError[]
 }

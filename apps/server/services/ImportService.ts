@@ -1,7 +1,24 @@
 import type { PrismaClient } from '@prisma/client'
-import type { ArticuloInput, ClienteInput, RubroInput } from '@bizcode/types'
-import { articuloBodySchema, clienteBodySchema, rubroBodySchema, safeParseBodySchema } from '../schemas/domain'
-import { csvRowToRawArticulo, csvRowToRawCliente } from '../routes/restDomainShared'
+import type {
+  ArticuloInput,
+  ClienteInput,
+  ImportDuplicateMode,
+  ImportModo,
+  ProveedorInput,
+  RubroInput,
+} from '@bizcode/types'
+import {
+  articuloBodySchema,
+  clienteBodySchema,
+  proveedorBodySchema,
+  rubroBodySchema,
+  safeParseBodySchema,
+} from '../schemas/domain'
+import {
+  csvRowToRawArticulo,
+  csvRowToRawCliente,
+  csvRowToRawProveedor,
+} from '../routes/restDomainShared'
 import { dbfRowToRawArticulo } from '../../web/src/lib/migration/legacyArticuloDbf'
 import { dbfRowToRawRubro } from '../../web/src/lib/migration/legacyRubroDbf'
 import type { ImportPersistResult, ImportRowError } from './serviceResults'
@@ -11,15 +28,25 @@ type ValidatedImportRow<T> = {
   input: T
 }
 
+export type ImportPersistOptions = {
+  duplicateMode?: ImportDuplicateMode
+  modo?: ImportModo
+  onProgress?: (processed: number, total: number) => void | Promise<void>
+}
+
 /**
- * @en Bulk CSV import persistence for tenant-scoped catalog entities.
- * @es Persistencia de importaciones CSV masivas para entidades de catálogo por tenant.
- * @pt-BR Persistência de importações CSV em massa para entidades de catálogo por tenant.
+ * @en Bulk CSV/XLSX import persistence for tenant-scoped catalog entities (#238).
+ * @es Persistencia de importaciones CSV/XLSX masivas para entidades de catálogo por tenant (#238).
+ * @pt-BR Persistência de importações CSV/XLSX em massa para entidades de catálogo por tenant (#238).
  */
 export class ImportService {
   constructor(private readonly prisma: PrismaClient) {}
 
-  async importClientes(tenantId: number, records: Record<string, string>[]): Promise<ImportPersistResult> {
+  async importClientes(
+    tenantId: number,
+    records: Record<string, string>[],
+    options: ImportPersistOptions = {},
+  ): Promise<ImportPersistResult> {
     const errors: ImportRowError[] = []
     const seenCodigos = new Map<number, number>()
     const validatedRows: ValidatedImportRow<ClienteInput>[] = []
@@ -45,10 +72,31 @@ export class ImportService {
       validatedRows.push({ row: rowNum, input: parsed.value })
     }
 
-    return this.persistClientesByCodigo(tenantId, validatedRows, errors)
+    return this.persistByCodigo(
+      tenantId,
+      validatedRows,
+      errors,
+      options,
+      'cliente',
+      async (tx, input) => {
+        await tx.cliente.create({ data: { ...input, tenantId } })
+      },
+      async (tx, id, input) => {
+        await tx.cliente.update({ where: { id }, data: { ...input } })
+      },
+      async () =>
+        this.prisma.cliente.findMany({
+          where: { tenantId, codigo: { in: validatedRows.map((r) => r.input.codigo) } },
+          select: { id: true, codigo: true },
+        }),
+    )
   }
 
-  async importArticulos(tenantId: number, records: Record<string, string>[]): Promise<ImportPersistResult> {
+  async importArticulos(
+    tenantId: number,
+    records: Record<string, string>[],
+    options: ImportPersistOptions = {},
+  ): Promise<ImportPersistResult> {
     const rubrosDb = await this.prisma.rubro.findMany({
       where: { tenantId },
       select: { id: true, codigo: true },
@@ -91,7 +139,88 @@ export class ImportService {
       validatedRows.push({ row: rowNum, input: parsed.value })
     }
 
-    return this.persistArticulosByCodigo(tenantId, validatedRows, errors)
+    return this.persistByCodigo(
+      tenantId,
+      validatedRows,
+      errors,
+      options,
+      'articulo',
+      async (tx, input) => {
+        await tx.articulo.create({ data: { ...input, tenantId } })
+      },
+      async (tx, id, input) => {
+        await tx.articulo.update({
+          where: { id },
+          data: {
+            descripcion: input.descripcion,
+            rubroId: input.rubroId,
+            condIva: input.condIva,
+            umedida: input.umedida,
+            precioLista1: input.precioLista1,
+            precioLista2: input.precioLista2,
+            costo: input.costo,
+            stock: input.stock,
+            minimo: input.minimo,
+            activo: input.activo,
+          },
+        })
+      },
+      async () =>
+        this.prisma.articulo.findMany({
+          where: { tenantId, codigo: { in: validatedRows.map((r) => r.input.codigo) } },
+          select: { id: true, codigo: true },
+        }),
+    )
+  }
+
+  async importProveedores(
+    tenantId: number,
+    records: Record<string, string>[],
+    options: ImportPersistOptions = {},
+  ): Promise<ImportPersistResult> {
+    const errors: ImportRowError[] = []
+    const seenCodigos = new Map<number, number>()
+    const validatedRows: ValidatedImportRow<ProveedorInput>[] = []
+
+    for (const [i, row] of records.entries()) {
+      const rowNum = i + 2
+      const raw = csvRowToRawProveedor(row)
+      const parsed = safeParseBodySchema(proveedorBodySchema, raw)
+      if (!parsed.ok) {
+        errors.push({ row: rowNum, message: parsed.error })
+        continue
+      }
+      const codigo = parsed.value.codigo
+      const firstRow = seenCodigos.get(codigo)
+      if (firstRow !== undefined) {
+        errors.push({
+          row: rowNum,
+          message: `Duplicate codigo ${codigo} (first occurrence on row ${firstRow})`,
+        })
+        continue
+      }
+      seenCodigos.set(codigo, rowNum)
+      validatedRows.push({ row: rowNum, input: parsed.value })
+    }
+
+    return this.persistByCodigo(
+      tenantId,
+      validatedRows,
+      errors,
+      options,
+      'proveedor',
+      async (tx, input) => {
+        await tx.proveedor.create({ data: { ...input, tenantId } })
+      },
+      async (tx, id, input) => {
+        await tx.proveedor.update({ where: { id }, data: { ...input } })
+      },
+      async () =>
+        this.prisma.proveedor.findMany({
+          where: { tenantId, codigo: { in: validatedRows.map((r) => r.input.codigo) } },
+          select: { id: true, codigo: true },
+        }),
+    )
   }
 
   /**
@@ -138,11 +267,8 @@ export class ImportService {
           create: { ...input, tenantId },
           update: { nombre: input.nombre },
         })
-        if (existing) {
-          updated += 1
-        } else {
-          created += 1
-        }
+        if (existing) updated += 1
+        else created += 1
       }
     })
 
@@ -224,82 +350,75 @@ export class ImportService {
             activo: input.activo,
           },
         })
-        if (existing) {
-          updated += 1
-        } else {
-          created += 1
-        }
+        if (existing) updated += 1
+        else created += 1
       }
     })
 
     return { created, updated, errors }
   }
 
-  private async persistClientesByCodigo(
-    tenantId: number,
-    validatedRows: ValidatedImportRow<ClienteInput>[],
+  private async persistByCodigo<T extends { codigo: number }>(
+    _tenantId: number,
+    validatedRows: ValidatedImportRow<T>[],
     errors: ImportRowError[],
+    options: ImportPersistOptions,
+    _kind: string,
+    createOne: (tx: PrismaClient, input: T) => Promise<void>,
+    updateOne: (tx: PrismaClient, id: number, input: T) => Promise<void>,
+    loadExisting: () => Promise<Array<{ id: number; codigo: number }>>,
   ): Promise<ImportPersistResult> {
-    const codigos = validatedRows.map((r) => r.input.codigo)
-    const existing =
-      codigos.length === 0
-        ? []
-        : await this.prisma.cliente.findMany({
-            where: { tenantId, codigo: { in: codigos } },
-            select: { codigo: true },
-          })
-    const existingSet = new Set(existing.map((e) => e.codigo))
-    const toInsert: ClienteInput[] = []
+    const duplicateMode = options.duplicateMode
+    const existing = validatedRows.length === 0 ? [] : await loadExisting()
+    const existingByCodigo = new Map(existing.map((e) => [e.codigo, e.id]))
+    const toCreate: ValidatedImportRow<T>[] = []
+    const toUpdate: Array<ValidatedImportRow<T> & { id: number }> = []
+    let skipped = 0
+
     for (const vr of validatedRows) {
-      if (existingSet.has(vr.input.codigo)) {
+      const hasExisting = existingByCodigo.has(vr.input.codigo)
+      const existingId = existingByCodigo.get(vr.input.codigo)
+      if (hasExisting) {
+        if (duplicateMode === 'skip') {
+          skipped += 1
+          continue
+        }
+        if (duplicateMode === 'update') {
+          toUpdate.push({ ...vr, id: existingId as number })
+          continue
+        }
         errors.push({ row: vr.row, message: `codigo ${vr.input.codigo} already exists` })
         continue
       }
-      toInsert.push(vr.input)
+      toCreate.push(vr)
+    }
+
+    if (options.modo === 'todo_o_nada' && errors.length > 0) {
+      return { created: 0, updated: 0, skipped: 0, errors }
     }
 
     let created = 0
-    await this.prisma.$transaction(async (tx) => {
-      for (const data of toInsert) {
-        await tx.cliente.create({ data: { ...data, tenantId } })
+    let updated = 0
+    const total = toCreate.length + toUpdate.length
+    let processed = 0
+
+    const run = async (tx: PrismaClient) => {
+      for (const vr of toCreate) {
+        await createOne(tx, vr.input)
         created += 1
+        processed += 1
+        await options.onProgress?.(processed, total)
       }
-    })
-
-    return { created, errors }
-  }
-
-  private async persistArticulosByCodigo(
-    tenantId: number,
-    validatedRows: ValidatedImportRow<ArticuloInput>[],
-    errors: ImportRowError[],
-  ): Promise<ImportPersistResult> {
-    const codigos = validatedRows.map((r) => r.input.codigo)
-    const existing =
-      codigos.length === 0
-        ? []
-        : await this.prisma.articulo.findMany({
-            where: { tenantId, codigo: { in: codigos } },
-            select: { codigo: true },
-          })
-    const existingSet = new Set(existing.map((e) => e.codigo))
-    const toInsert: ArticuloInput[] = []
-    for (const vr of validatedRows) {
-      if (existingSet.has(vr.input.codigo)) {
-        errors.push({ row: vr.row, message: `codigo ${vr.input.codigo} already exists` })
-        continue
+      for (const vr of toUpdate) {
+        await updateOne(tx, vr.id, vr.input)
+        updated += 1
+        processed += 1
+        await options.onProgress?.(processed, total)
       }
-      toInsert.push(vr.input)
     }
 
-    let created = 0
-    await this.prisma.$transaction(async (tx) => {
-      for (const data of toInsert) {
-        await tx.articulo.create({ data: { ...data, tenantId } })
-        created += 1
-      }
-    })
+    await this.prisma.$transaction(async (tx) => run(tx as unknown as PrismaClient))
 
-    return { created, errors }
+    return { created, updated, skipped, errors }
   }
 }

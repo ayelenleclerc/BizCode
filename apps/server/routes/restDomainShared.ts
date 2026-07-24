@@ -95,6 +95,14 @@ export const PROVEEDOR_IMPORT_CSV_HEADERS = [
   'email',
 ] as const
 
+export const SALDO_IMPORT_CSV_HEADERS = [
+  'codigo',
+  'clienteId',
+  'importe',
+  'fecha',
+  'concepto',
+] as const
+
 export function buildClienteImportTemplateCsv(): string {
   const header = CLIENTE_IMPORT_CSV_HEADERS.join(',')
   const example = [
@@ -290,3 +298,56 @@ export function csvRowToRawProveedor(row: Record<string, string>): Record<string
   if (email !== undefined) raw.email = email
   return raw
 }
+
+export function buildSaldoImportTemplateCsv(): string {
+  const header = SALDO_IMPORT_CSV_HEADERS.join(',')
+  const example = ['1001', '', '1500.50', '2026-01-01', 'Saldo inicial migracion'].join(',')
+  return `\uFEFF${header}\n${example}\n`
+}
+
+export function csvRowToRawSaldo(row: Record<string, string>): Record<string, unknown> {
+  const raw: Record<string, unknown> = {}
+  const codigoStr = (row.codigo ?? '').trim()
+  if (codigoStr !== '') {
+    const n = Number.parseInt(codigoStr, 10)
+    raw.codigo = Number.isNaN(n) ? Number.NaN : n
+  }
+  const idStr = (row.clienteId ?? '').trim()
+  if (idStr !== '') {
+    const n = Number.parseInt(idStr, 10)
+    raw.clienteId = Number.isNaN(n) ? Number.NaN : n
+  }
+  const importeStr = (row.importe ?? '').trim().replace(',', '.')
+  if (importeStr === '') raw.importe = undefined
+  else {
+    const n = Number.parseFloat(importeStr)
+    raw.importe = Number.isNaN(n) ? Number.NaN : n
+  }
+  const fecha = optionalTrimmedCsv(row.fecha)
+  if (fecha !== undefined) raw.fecha = fecha
+  const concepto = optionalTrimmedCsv(row.concepto)
+  if (concepto !== undefined) raw.concepto = concepto
+  return raw
+}
+
+/**
+ * @en Build a minimal XLSX template buffer with header, description and example rows (#238).
+ * @es Construye un buffer XLSX mínimo con header, descripción y fila de ejemplo (#238).
+ * @pt-BR Constrói um buffer XLSX mínimo com header, descrição e linha de exemplo (#238).
+ */
+export async function buildImportTemplateXlsx(
+  headers: readonly string[],
+  descriptions: readonly string[],
+  example: readonly string[],
+): Promise<Buffer> {
+  const ExcelJS = (await import('exceljs')).default
+  const workbook = new ExcelJS.Workbook()
+  const sheet = workbook.addWorksheet('import')
+  sheet.addRow([...headers])
+  sheet.addRow([...descriptions])
+  sheet.addRow([...example])
+  sheet.getRow(1).font = { bold: true }
+  const buf = await workbook.xlsx.writeBuffer()
+  return Buffer.from(buf)
+}
+

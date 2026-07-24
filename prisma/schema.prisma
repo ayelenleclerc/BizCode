@@ -1426,6 +1426,7 @@ model Tenant {
   mercadoPagoChargebacks        MercadoPagoChargeback[]
   configsComision               ConfigComision[]
   liquidacionesComision         LiquidacionComision[]
+  importJobs                    ImportJob[]
 }
 
 /// Idempotent Mercado Pago payment webhook processing (#176).
@@ -1828,6 +1829,7 @@ model AppUser {
   configsComision        ConfigComision[] @relation("ConfigComisionVendedor")
   liquidacionesComision  LiquidacionComision[] @relation("LiquidacionComisionVendedor")
   liquidacionesComisionAprobadas LiquidacionComision[] @relation("LiquidacionComisionAprobadoPor")
+  importJobs             ImportJob[] @relation("ImportJobCreatedBy")
 
   @@unique([tenantId, username])
 }
@@ -2106,6 +2108,41 @@ model LiquidacionComisionDetalle {
   @@index([facturaId])
   @@index([reciboCobroId])
   @@index([imputacionId])
+}
+
+/// @en Async bulk import job for Excel/CSV (#238).
+/// @es Trabajo de importación masiva Excel/CSV (#238).
+/// @pt-BR Trabalho de importação em massa Excel/CSV (#238).
+model ImportJob {
+  id             Int      @id @default(autoincrement())
+  tenantId       Int
+  tenant         Tenant   @relation(fields: [tenantId], references: [id])
+  /// articulos | clientes | proveedores | saldos
+  entity         String   @db.VarChar(20)
+  /// validating | ready | running | completed | failed | cancelled
+  estado         String   @db.VarChar(20) @default("ready")
+  /// mejores_esfuerzos | todo_o_nada
+  modo           String   @db.VarChar(20) @default("mejores_esfuerzos")
+  /// update | skip
+  duplicateMode  String   @db.VarChar(20) @default("skip")
+  totalRows      Int      @default(0)
+  processedRows  Int      @default(0)
+  okCount        Int      @default(0)
+  errorCount     Int      @default(0)
+  duplicateCount Int      @default(0)
+  createdCount   Int      @default(0)
+  updatedCount   Int      @default(0)
+  skippedCount   Int      @default(0)
+  /// Serialized row issues + final report metadata (JSON).
+  reportJson     Json?
+  createdById    Int
+  createdBy      AppUser  @relation("ImportJobCreatedBy", fields: [createdById], references: [id])
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  completedAt    DateTime?
+
+  @@index([tenantId, createdAt])
+  @@index([tenantId, estado])
 }
 
 model StockAjuste {

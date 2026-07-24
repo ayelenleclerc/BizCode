@@ -66022,6 +66022,826 @@ Restricted to the authenticated user (`commissions.self.read`).
 }
 ```
 
+### PARAMETERS /api/importaciones/templates/{entity}
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/importaciones/templates/{entity}`
+
+### Download import template CSV or XLSX (#238)
+
+- **Method:** `GET`
+- **Path:** `/api/importaciones/templates/{entity}`
+- **Tags:** importaciones
+
+#### Responses
+
+##### Status: 200 Template file
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/importaciones/validate
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/importaciones/validate`
+
+### Dry-run validate import file without persisting (#238)
+
+- **Method:** `POST`
+- **Path:** `/api/importaciones/validate`
+- **Tags:** importaciones
+
+#### Request Body
+
+##### Content-Type: multipart/form-data
+
+- **`entity` (required)**
+
+  `string`, possible values: `"articulos", "clientes", "proveedores", "saldos"`
+
+- **`file` (required)**
+
+  `string`, format: `binary`
+
+- **`duplicateMode`**
+
+  `string`, possible values: `"update", "skip"`
+
+**Example:**
+
+```json
+{
+  "file": {},
+  "entity": "articulos",
+  "duplicateMode": "update"
+}
+```
+
+#### Responses
+
+##### Status: 200 Validation summary
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`duplicateCount` (required)**
+
+    `integer`
+
+  - **`entity` (required)**
+
+    `string`, possible values: `"articulos", "clientes", "proveedores", "saldos"`
+
+  - **`errorCount` (required)**
+
+    `integer`
+
+  - **`issues` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`code` (required)**
+
+      `string`
+
+    - **`kind` (required)**
+
+      `string`, possible values: `"error", "duplicate"`
+
+    - **`message` (required)**
+
+      `string`
+
+    - **`row` (required)**
+
+      `integer`
+
+  - **`okCount` (required)**
+
+    `integer`
+
+  - **`totalRows` (required)**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`, possible values: `true`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "entity": "articulos",
+    "totalRows": 1,
+    "okCount": 1,
+    "errorCount": 1,
+    "duplicateCount": 1,
+    "issues": [
+      {
+        "row": 1,
+        "code": "",
+        "message": "",
+        "kind": "error"
+      }
+    ]
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/importaciones/jobs
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/importaciones/jobs`
+
+### Start async import job (#238)
+
+- **Method:** `POST`
+- **Path:** `/api/importaciones/jobs`
+- **Tags:** importaciones
+
+#### Request Body
+
+##### Content-Type: multipart/form-data
+
+- **`entity` (required)**
+
+  `string`, possible values: `"articulos", "clientes", "proveedores", "saldos"`
+
+- **`file` (required)**
+
+  `string`, format: `binary`
+
+- **`duplicateMode`**
+
+  `string`, possible values: `"update", "skip"`
+
+- **`modo`**
+
+  `string`, possible values: `"mejores_esfuerzos", "todo_o_nada"`
+
+**Example:**
+
+```json
+{
+  "file": {},
+  "entity": "articulos",
+  "modo": "mejores_esfuerzos",
+  "duplicateMode": "update"
+}
+```
+
+#### Responses
+
+##### Status: 201 Job created
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`completedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`createdById` (required)**
+
+    `integer`
+
+  - **`createdCount` (required)**
+
+    `integer`
+
+  - **`duplicateCount` (required)**
+
+    `integer`
+
+  - **`duplicateMode` (required)**
+
+    `string`, possible values: `"update", "skip"`
+
+  - **`entity` (required)**
+
+    `string`, possible values: `"articulos", "clientes", "proveedores", "saldos"`
+
+  - **`errorCount` (required)**
+
+    `integer`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"validating", "ready", "running", "completed", "failed", "cancelled"`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`modo` (required)**
+
+    `string`, possible values: `"mejores_esfuerzos", "todo_o_nada"`
+
+  - **`okCount` (required)**
+
+    `integer`
+
+  - **`processedRows` (required)**
+
+    `integer`
+
+  - **`skippedCount` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`totalRows` (required)**
+
+    `integer`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`updatedCount` (required)**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`, possible values: `true`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "entity": "articulos",
+    "estado": "validating",
+    "modo": "mejores_esfuerzos",
+    "duplicateMode": "update",
+    "totalRows": 1,
+    "processedRows": 1,
+    "okCount": 1,
+    "errorCount": 1,
+    "duplicateCount": 1,
+    "createdCount": 1,
+    "updatedCount": 1,
+    "skippedCount": 1,
+    "createdById": 1,
+    "createdAt": "",
+    "updatedAt": "",
+    "completedAt": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/importaciones/jobs/{id}
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/importaciones/jobs/{id}`
+
+### Get import job status (#238)
+
+- **Method:** `GET`
+- **Path:** `/api/importaciones/jobs/{id}`
+- **Tags:** importaciones
+
+#### Responses
+
+##### Status: 200 Job
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`completedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`createdById` (required)**
+
+    `integer`
+
+  - **`createdCount` (required)**
+
+    `integer`
+
+  - **`duplicateCount` (required)**
+
+    `integer`
+
+  - **`duplicateMode` (required)**
+
+    `string`, possible values: `"update", "skip"`
+
+  - **`entity` (required)**
+
+    `string`, possible values: `"articulos", "clientes", "proveedores", "saldos"`
+
+  - **`errorCount` (required)**
+
+    `integer`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"validating", "ready", "running", "completed", "failed", "cancelled"`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`modo` (required)**
+
+    `string`, possible values: `"mejores_esfuerzos", "todo_o_nada"`
+
+  - **`okCount` (required)**
+
+    `integer`
+
+  - **`processedRows` (required)**
+
+    `integer`
+
+  - **`skippedCount` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`totalRows` (required)**
+
+    `integer`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`updatedCount` (required)**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`, possible values: `true`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "entity": "articulos",
+    "estado": "validating",
+    "modo": "mejores_esfuerzos",
+    "duplicateMode": "update",
+    "totalRows": 1,
+    "processedRows": 1,
+    "okCount": 1,
+    "errorCount": 1,
+    "duplicateCount": 1,
+    "createdCount": 1,
+    "updatedCount": 1,
+    "skippedCount": 1,
+    "createdById": 1,
+    "createdAt": "",
+    "updatedAt": "",
+    "completedAt": ""
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/importaciones/jobs/{id}/events
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/importaciones/jobs/{id}/events`
+
+### SSE progress stream for import job (#238)
+
+- **Method:** `GET`
+- **Path:** `/api/importaciones/jobs/{id}/events`
+- **Tags:** importaciones
+
+#### Responses
+
+##### Status: 200 text/event-stream
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/importaciones/jobs/{id}/report
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/importaciones/jobs/{id}/report`
+
+### Download import job report CSV (#238)
+
+- **Method:** `GET`
+- **Path:** `/api/importaciones/jobs/{id}/report`
+- **Tags:** importaciones
+
+#### Responses
+
+##### Status: 200 Report CSV
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ### PARAMETERS /api/transferencias-deposito/{id}/anular
 
 - **Method:** `PARAMETERS`
@@ -92655,6 +93475,362 @@ Originating invoice header (selected columns)
       ]
     }
   ]
+}
+```
+
+### BulkImportValidateSummary
+
+- **Type:**`object`
+
+* **`duplicateCount` (required)**
+
+  `integer`
+
+* **`entity` (required)**
+
+  `string`, possible values: `"articulos", "clientes", "proveedores", "saldos"`
+
+* **`errorCount` (required)**
+
+  `integer`
+
+* **`issues` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`code` (required)**
+
+    `string`
+
+  - **`kind` (required)**
+
+    `string`, possible values: `"error", "duplicate"`
+
+  - **`message` (required)**
+
+    `string`
+
+  - **`row` (required)**
+
+    `integer`
+
+* **`okCount` (required)**
+
+  `integer`
+
+* **`totalRows` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "entity": "articulos",
+  "totalRows": 1,
+  "okCount": 1,
+  "errorCount": 1,
+  "duplicateCount": 1,
+  "issues": [
+    {
+      "row": 1,
+      "code": "",
+      "message": "",
+      "kind": "error"
+    }
+  ]
+}
+```
+
+### BulkImportValidateEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`duplicateCount` (required)**
+
+    `integer`
+
+  - **`entity` (required)**
+
+    `string`, possible values: `"articulos", "clientes", "proveedores", "saldos"`
+
+  - **`errorCount` (required)**
+
+    `integer`
+
+  - **`issues` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`code` (required)**
+
+      `string`
+
+    - **`kind` (required)**
+
+      `string`, possible values: `"error", "duplicate"`
+
+    - **`message` (required)**
+
+      `string`
+
+    - **`row` (required)**
+
+      `integer`
+
+  - **`okCount` (required)**
+
+    `integer`
+
+  - **`totalRows` (required)**
+
+    `integer`
+
+* **`success` (required)**
+
+  `boolean`, possible values: `true`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "entity": "articulos",
+    "totalRows": 1,
+    "okCount": 1,
+    "errorCount": 1,
+    "duplicateCount": 1,
+    "issues": [
+      {
+        "row": 1,
+        "code": "",
+        "message": "",
+        "kind": "error"
+      }
+    ]
+  }
+}
+```
+
+### ImportJob
+
+- **Type:**`object`
+
+* **`completedAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`createdAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`createdById` (required)**
+
+  `integer`
+
+* **`createdCount` (required)**
+
+  `integer`
+
+* **`duplicateCount` (required)**
+
+  `integer`
+
+* **`duplicateMode` (required)**
+
+  `string`, possible values: `"update", "skip"`
+
+* **`entity` (required)**
+
+  `string`, possible values: `"articulos", "clientes", "proveedores", "saldos"`
+
+* **`errorCount` (required)**
+
+  `integer`
+
+* **`estado` (required)**
+
+  `string`, possible values: `"validating", "ready", "running", "completed", "failed", "cancelled"`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`modo` (required)**
+
+  `string`, possible values: `"mejores_esfuerzos", "todo_o_nada"`
+
+* **`okCount` (required)**
+
+  `integer`
+
+* **`processedRows` (required)**
+
+  `integer`
+
+* **`skippedCount` (required)**
+
+  `integer`
+
+* **`tenantId` (required)**
+
+  `integer`
+
+* **`totalRows` (required)**
+
+  `integer`
+
+* **`updatedAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`updatedCount` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "tenantId": 1,
+  "entity": "articulos",
+  "estado": "validating",
+  "modo": "mejores_esfuerzos",
+  "duplicateMode": "update",
+  "totalRows": 1,
+  "processedRows": 1,
+  "okCount": 1,
+  "errorCount": 1,
+  "duplicateCount": 1,
+  "createdCount": 1,
+  "updatedCount": 1,
+  "skippedCount": 1,
+  "createdById": 1,
+  "createdAt": "",
+  "updatedAt": "",
+  "completedAt": ""
+}
+```
+
+### ImportJobEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`completedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`createdById` (required)**
+
+    `integer`
+
+  - **`createdCount` (required)**
+
+    `integer`
+
+  - **`duplicateCount` (required)**
+
+    `integer`
+
+  - **`duplicateMode` (required)**
+
+    `string`, possible values: `"update", "skip"`
+
+  - **`entity` (required)**
+
+    `string`, possible values: `"articulos", "clientes", "proveedores", "saldos"`
+
+  - **`errorCount` (required)**
+
+    `integer`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"validating", "ready", "running", "completed", "failed", "cancelled"`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`modo` (required)**
+
+    `string`, possible values: `"mejores_esfuerzos", "todo_o_nada"`
+
+  - **`okCount` (required)**
+
+    `integer`
+
+  - **`processedRows` (required)**
+
+    `integer`
+
+  - **`skippedCount` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`totalRows` (required)**
+
+    `integer`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`updatedCount` (required)**
+
+    `integer`
+
+* **`success` (required)**
+
+  `boolean`, possible values: `true`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "entity": "articulos",
+    "estado": "validating",
+    "modo": "mejores_esfuerzos",
+    "duplicateMode": "update",
+    "totalRows": 1,
+    "processedRows": 1,
+    "okCount": 1,
+    "errorCount": 1,
+    "duplicateCount": 1,
+    "createdCount": 1,
+    "updatedCount": 1,
+    "skippedCount": 1,
+    "createdById": 1,
+    "createdAt": "",
+    "updatedAt": "",
+    "completedAt": ""
+  }
 }
 ```
 

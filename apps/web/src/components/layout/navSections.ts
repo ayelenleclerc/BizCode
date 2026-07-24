@@ -123,6 +123,13 @@ export const NAV_SECTIONS: readonly NavSection[] = [
     moduleKey: 'finance.commissions',
   },
   {
+    key: 'importaciones',
+    path: '/importaciones',
+    icon: '📥',
+    roles: ['owner', 'manager'],
+    moduleKey: 'platform.data_import',
+  },
+  {
     key: 'proveedores',
     path: '/proveedores',
     icon: '\u{1F3ED}',
@@ -234,6 +241,7 @@ export const ROUTE_MODULE_GUARDS: ReadonlyArray<{ path: string; moduleKey: Modul
   { path: 'comisiones/config', moduleKey: 'finance.commissions' },
   { path: 'comisiones/liquidaciones', moduleKey: 'finance.commissions' },
   { path: 'comisiones/mias', moduleKey: 'finance.commissions' },
+  { path: 'importaciones', moduleKey: 'platform.data_import' },
   { path: 'logistica', moduleKey: 'logistics.dispatches' },
   { path: 'logistica/picking', moduleKey: 'logistics.picking' },
   { path: 'logistica/seguimiento', moduleKey: 'logistics.gps' },

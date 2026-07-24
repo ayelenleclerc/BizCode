@@ -31,7 +31,11 @@ function isAuthPath(path: string): boolean {
 }
 
 function isImportPost(req: Request): boolean {
-  return req.method === 'POST' && /^\/api\/[^/]+\/import$/.test(req.path)
+  if (req.method === 'POST' && /^\/api\/[^/]+\/import$/.test(req.path)) return true
+  return (
+    (req.method === 'POST' || req.method === 'GET') &&
+    req.path.startsWith('/api/importaciones/')
+  )
 }
 
 function isGeneralApiPath(req: Request): boolean {
@@ -168,6 +172,17 @@ export const depositosMutationHttpRateLimiter = createRouteLimiter({
  * @pt-BR Limite por IP para mutações de comissões (#237); visível ao CodeQL nos handlers.
  */
 export const comisionesMutationHttpRateLimiter = createRouteLimiter({
+  windowMs: MINUTE_MS,
+  limit: parsePositiveInt(process.env.HTTP_RATE_LIMIT_PER_MINUTE, API_GENERAL_DEFAULT),
+  skipUnless: () => true,
+})
+
+/**
+ * @en Per-IP rate limit for bulk import mutations and SSE (#238); visible to CodeQL.
+ * @es Límite por IP para mutaciones/SSE de importación masiva (#238); visible a CodeQL.
+ * @pt-BR Limite por IP para mutações/SSE de importação em massa (#238); visível ao CodeQL.
+ */
+export const importacionesMutationHttpRateLimiter = createRouteLimiter({
   windowMs: MINUTE_MS,
   limit: parsePositiveInt(process.env.HTTP_RATE_LIMIT_PER_MINUTE, API_GENERAL_DEFAULT),
   skipUnless: () => true,
