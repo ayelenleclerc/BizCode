@@ -195,4 +195,137 @@ describe('FidelizacionService (#250)', () => {
     expect(call.data.tipo).toBe('acumulacion')
     expect(call.data.puntos).toBe(10)
   })
+
+  it('revertirFromFactura reverses accrual and canje', async () => {
+    const movimientoCreate = vi.fn().mockResolvedValue({})
+    const movimientoUpdate = vi.fn().mockResolvedValue({})
+    const puntosUpdate = vi.fn().mockResolvedValue({ puntos: 0 })
+    const prisma = {
+      configFidelizacion: {
+        findUnique: vi.fn().mockResolvedValue(configRow()),
+      },
+      movimientoPuntos: {
+        findMany: vi.fn().mockResolvedValue([
+          {
+            id: 1,
+            clienteId: 10,
+            tipo: 'acumulacion',
+            puntos: 10,
+          },
+          {
+            id: 2,
+            clienteId: 10,
+            tipo: 'canje',
+            puntos: -5,
+          },
+        ]),
+      },
+      $transaction: vi.fn(async (fn: (tx: unknown) => Promise<unknown>) =>
+        fn({
+          movimientoPuntos: {
+            findFirst: vi.fn().mockResolvedValue(null),
+            create: movimientoCreate,
+            update: movimientoUpdate,
+          },
+          puntosFidelizacion: {
+            findUnique: vi
+              .fn()
+              .mockResolvedValueOnce({ id: 1, clienteId: 10, puntos: 10 })
+              .mockResolvedValueOnce({ id: 1, clienteId: 10, puntos: 0 })
+              .mockResolvedValue({ id: 1, clienteId: 10, puntos: 5 }),
+            update: puntosUpdate,
+            create: vi.fn(),
+          },
+        }),
+      ),
+    } as unknown as PrismaClient
+    const tenantConfig = {
+      getModulesForTenant: vi.fn().mockResolvedValue(['clients.loyalty']),
+    }
+    const svc = new FidelizacionService(prisma, tenantConfig as never)
+
+    await svc.revertirFromFactura(1, 50, 7)
+    expect(prisma.$transaction).toHaveBeenCalled()
+    expect(movimientoCreate).toHaveBeenCalled()
+    expect(movimientoUpdate).toHaveBeenCalled()
+  })
+
+  it('runDailyExpiryJob expires leftover lots', async () => {
+    const movimientoCreate = vi.fn().mockResolvedValue({})
+    const movimientoUpdate = vi.fn().mockResolvedValue({})
+    const puntosUpdate = vi.fn().mockResolvedValue({ puntos: 0 })
+    const prisma = {
+      configFidelizacion: {
+        findUnique: vi.fn().mockResolvedValue(configRow({ mesesVencimiento: 12 })),
+      },
+      movimientoPuntos: {
+        findMany: vi
+          .fn()
+          .mockResolvedValueOnce([]) // dueSoon
+          .mockResolvedValueOnce([
+            {
+              id: 8,
+              clienteId: 10,
+              puntosRestantes: 7,
+              referenciaFacturaId: 3,
+            },
+          ]),
+        update: movimientoUpdate,
+      },
+      $transaction: vi.fn(async (fn: (tx: unknown) => Promise<unknown>) =>
+        fn({
+          movimientoPuntos: {
+            update: movimientoUpdate,
+            create: movimientoCreate,
+          },
+          puntosFidelizacion: {
+            findUnique: vi.fn().mockResolvedValue({ id: 1, clienteId: 10, puntos: 7 }),
+            update: puntosUpdate,
+            create: vi.fn(),
+          },
+        }),
+      ),
+    } as unknown as PrismaClient
+    const tenantConfig = {
+      getModulesForTenant: vi.fn().mockResolvedValue(['clients.loyalty']),
+    }
+    const svc = new FidelizacionService(prisma, tenantConfig as never)
+    const result = await svc.runDailyExpiryJob(1)
+    expect(result.expired).toBe(7)
+    expect(movimientoCreate).toHaveBeenCalled()
+  })
+
+  it('getDashboard aggregates liability and ranking', async () => {
+    const prisma = {
+      configFidelizacion: {
+        findUnique: vi.fn().mockResolvedValue(configRow()),
+        create: vi.fn(),
+      },
+      movimientoPuntos: {
+        groupBy: vi.fn().mockResolvedValue([
+          { tipo: 'acumulacion', _sum: { puntos: 100 } },
+          { tipo: 'canje', _sum: { puntos: -20 } },
+          { tipo: 'vencimiento', _sum: { puntos: -5 } },
+          { tipo: 'ajuste', _sum: { puntos: 0 } },
+        ]),
+      },
+      puntosFidelizacion: {
+        aggregate: vi.fn().mockResolvedValue({ _sum: { puntos: 75 } }),
+        findMany: vi.fn().mockResolvedValue([
+          {
+            clienteId: 10,
+            puntos: 75,
+            cliente: { id: 10, codigo: 1, rsocial: 'Cliente' },
+          },
+        ]),
+      },
+    } as unknown as PrismaClient
+    const svc = new FidelizacionService(prisma)
+    const dash = await svc.getDashboard(1)
+    expect(dash.pasivoPuntos).toBe(75)
+    expect(dash.puntosEmitidos).toBe(100)
+    expect(dash.puntosCanjeados).toBe(20)
+    expect(dash.ranking).toHaveLength(1)
+    expect(dash.ranking[0]?.rsocial).toBe('Cliente')
+  })
 })

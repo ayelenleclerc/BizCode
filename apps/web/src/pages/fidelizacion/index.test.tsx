@@ -59,4 +59,52 @@ describe('FidelizacionPage (#250)', () => {
     expect(await screen.findByTestId('fidelizacion-config-form')).toBeInTheDocument()
     expect(await screen.findByTestId('fidelizacion-pasivo')).toHaveTextContent('80')
   })
+
+  it('saves configuration and refreshes dashboard', async () => {
+    const { fireEvent } = await import('@testing-library/react')
+    vi.mocked(fidelizacionAPI.upsertConfig).mockResolvedValue({
+      id: 1,
+      tenantId: 1,
+      activo: false,
+      nombre: 'Programa de Puntos',
+      pesosPorPunto: 100,
+      puntosPorPeso: 1,
+      mesesVencimiento: 12,
+      montoMinCompra: 0,
+      aplicaEnDescuento: false,
+      createdAt: '2026-07-24T12:00:00.000Z',
+      updatedAt: '2026-07-24T12:00:00.000Z',
+    })
+    vi.mocked(fidelizacionAPI.getDashboard).mockResolvedValue({
+      puntosEmitidos: 100,
+      puntosCanjeados: 20,
+      puntosVencidos: 0,
+      puntosAjustados: 0,
+      pasivoPuntos: 80,
+      pasivoDinero: 80,
+      ranking: [
+        {
+          clienteId: 1,
+          codigo: 10,
+          rsocial: 'Cliente Top',
+          puntos: 50,
+          equivalenteDinero: 50,
+        },
+      ],
+    })
+
+    render(
+      <I18nextProvider i18n={i18n}>
+        <FidelizacionPage />
+      </I18nextProvider>,
+    )
+    await screen.findByTestId('fidelizacion-config-form')
+    fireEvent.click(screen.getByTestId('fidelizacion-config-activo'))
+    fireEvent.click(screen.getByTestId('fidelizacion-config-save'))
+    await waitFor(() => {
+      expect(fidelizacionAPI.upsertConfig).toHaveBeenCalled()
+    })
+    expect(await screen.findByTestId('fidelizacion-config-status')).toBeInTheDocument()
+    expect(await screen.findByTestId('fidelizacion-ranking')).toBeInTheDocument()
+  })
 })

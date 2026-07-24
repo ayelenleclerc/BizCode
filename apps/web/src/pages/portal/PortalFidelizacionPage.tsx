@@ -33,7 +33,7 @@ export default function PortalFidelizacionPage() {
       })
       .catch((err: unknown) => {
         if (!cancelled) {
-          setError(err instanceof Error ? err.message : t('fidelizacion:loadError'))
+          setError(err instanceof Error ? err.message : 'loadError')
         }
       })
       .finally(() => {
@@ -42,7 +42,7 @@ export default function PortalFidelizacionPage() {
     return () => {
       cancelled = true
     }
-  }, [tenantSlug, t])
+  }, [tenantSlug])
 
   return (
     <section aria-labelledby="portal-fidelizacion-title" data-testid="portal-fidelizacion-page">
