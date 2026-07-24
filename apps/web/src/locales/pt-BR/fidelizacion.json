@@ -1,0 +1,57 @@
+{
+  "title": "Fidelização",
+  "loadError": "Não foi possível carregar o programa de fidelização",
+  "saveError": "Não foi possível salvar a configuração",
+  "saveOk": "Configuração salva",
+  "config": {
+    "title": "Configuração do programa",
+    "activo": "Programa ativo",
+    "nombre": "Nome do programa",
+    "pesosPorPunto": "Moeda por ponto (acúmulo)",
+    "puntosPorPeso": "Valor do ponto em moeda (resgate)",
+    "mesesVencimiento": "Meses até o vencimento",
+    "mesesVencimientoHint": "Vazio = não vencem",
+    "montoMinCompra": "Valor mínimo de compra",
+    "aplicaEnDescuento": "Acumular sobre valor com descontos de linha",
+    "save": "Salvar configuração"
+  },
+  "dashboard": {
+    "title": "Passivo de pontos",
+    "emitidos": "Emitidos",
+    "canjeados": "Resgatados",
+    "vencidos": "Vencidos",
+    "ajustados": "Ajustados",
+    "pasivo": "Passivo (pontos)",
+    "pasivoDinero": "Passivo (dinheiro)",
+    "ranking": "Ranking de clientes",
+    "cliente": "Cliente",
+    "puntos": "Pontos",
+    "equivalente": "Equivalente",
+    "emptyRanking": "Sem saldos de pontos"
+  },
+  "cliente": {
+    "title": "Pontos de fidelização",
+    "saldo": "Saldo",
+    "equivalente": "Equivalente",
+    "movimientos": "Movimentos",
+    "empty": "Sem movimentos",
+    "ajuste": "Ajuste manual",
+    "ajustePuntos": "Pontos (+/-)",
+    "ajusteConcepto": "Conceito",
+    "ajusteSubmit": "Aplicar ajuste",
+    "tipo": {
+      "acumulacion": "Acúmulo",
+      "canje": "Resgate",
+      "ajuste": "Ajuste",
+      "vencimiento": "Vencimento",
+      "reverso": "Reverso"
+    }
+  },
+  "factura": {
+    "title": "Resgate de pontos",
+    "saldo": "Saldo disponível: {{puntos}} (≈ {{dinero}})",
+    "puntos": "Pontos a resgatar",
+    "montoEstimado": "Desconto estimado: {{monto}}",
+    "inactive": "Programa inativo ou sem saldo"
+  }
+}

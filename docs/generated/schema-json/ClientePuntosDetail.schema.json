@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "clienteId": {
+      "type": "integer"
+    },
+    "equivalenteDinero": {
+      "type": "number"
+    },
+    "movimientos": {
+      "items": {
+        "$ref": "./MovimientoPuntos.schema.json"
+      },
+      "type": "array"
+    },
+    "puntos": {
+      "type": "integer"
+    },
+    "totalMovimientos": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "clienteId",
+    "puntos",
+    "equivalenteDinero",
+    "movimientos",
+    "totalMovimientos"
+  ],
+  "title": "ClientePuntosDetail",
+  "type": "object"
+}

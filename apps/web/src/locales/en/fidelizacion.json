@@ -1,0 +1,57 @@
+{
+  "title": "Loyalty",
+  "loadError": "Could not load the loyalty program",
+  "saveError": "Could not save configuration",
+  "saveOk": "Configuration saved",
+  "config": {
+    "title": "Program configuration",
+    "activo": "Program active",
+    "nombre": "Program name",
+    "pesosPorPunto": "Currency per point (earn)",
+    "puntosPorPeso": "Point value in currency (redeem)",
+    "mesesVencimiento": "Months until expiry",
+    "mesesVencimientoHint": "Empty = never expire",
+    "montoMinCompra": "Minimum purchase amount",
+    "aplicaEnDescuento": "Earn on amount after line discounts",
+    "save": "Save configuration"
+  },
+  "dashboard": {
+    "title": "Points liability",
+    "emitidos": "Issued",
+    "canjeados": "Redeemed",
+    "vencidos": "Expired",
+    "ajustados": "Adjusted",
+    "pasivo": "Liability (points)",
+    "pasivoDinero": "Liability (money)",
+    "ranking": "Customer ranking",
+    "cliente": "Customer",
+    "puntos": "Points",
+    "equivalente": "Equivalent",
+    "emptyRanking": "No point balances"
+  },
+  "cliente": {
+    "title": "Loyalty points",
+    "saldo": "Balance",
+    "equivalente": "Equivalent",
+    "movimientos": "Movements",
+    "empty": "No movements",
+    "ajuste": "Manual adjustment",
+    "ajustePuntos": "Points (+/-)",
+    "ajusteConcepto": "Concept",
+    "ajusteSubmit": "Apply adjustment",
+    "tipo": {
+      "acumulacion": "Earn",
+      "canje": "Redeem",
+      "ajuste": "Adjustment",
+      "vencimiento": "Expiry",
+      "reverso": "Reversal"
+    }
+  },
+  "factura": {
+    "title": "Redeem points",
+    "saldo": "Available balance: {{puntos}} (≈ {{dinero}})",
+    "puntos": "Points to redeem",
+    "montoEstimado": "Estimated discount: {{monto}}",
+    "inactive": "Program inactive or no balance"
+  }
+}

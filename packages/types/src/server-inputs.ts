@@ -223,6 +223,12 @@ export type FacturaInput = {
   percepciones?: FacturaPercepcionInput[]
   /** @en Dispatch deposit (#236). @es Depósito de despacho (#236). @pt-BR Depósito de despacho (#236). */
   depositoId?: number | null
+  /**
+   * @en Loyalty points to redeem on this invoice (#250).
+   * @es Puntos de fidelización a canjear en esta factura (#250).
+   * @pt-BR Pontos de fidelização a resgatar nesta fatura (#250).
+   */
+  puntosCanje?: number | null
 }
 
 export type CobroRetencionInput = {

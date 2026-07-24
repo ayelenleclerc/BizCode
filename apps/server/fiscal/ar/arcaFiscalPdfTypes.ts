@@ -55,4 +55,10 @@ export type ArcaFacturaPdfInput = {
     tipoCambioFecha?: Date | null
   }
   preview: boolean
+  /**
+   * @en Optional loyalty points legend printed in the footer (#250).
+   * @es Leyenda opcional de puntos de fidelización en el pie (#250).
+   * @pt-BR Legenda opcional de pontos de fidelização no rodapé (#250).
+   */
+  loyaltyFooter?: string | null
 }

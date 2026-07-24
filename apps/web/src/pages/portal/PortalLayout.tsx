@@ -85,6 +85,9 @@ export default function PortalLayout() {
                 {t('nav.pedidos')}
               </NavLink>
             ) : null}
+            <NavLink to={`/portal/${tenantSlug}/fidelizacion`} className={navClassName}>
+              {t('nav.fidelizacion')}
+            </NavLink>
             <NavLink to={`/portal/${tenantSlug}/mis-datos`} className={navClassName}>
               {t('nav.misDatos')}
             </NavLink>

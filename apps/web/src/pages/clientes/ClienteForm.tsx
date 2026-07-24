@@ -11,6 +11,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import { Cliente, DeliveryZone, type ListaPrecioRow } from '@bizcode/types'
 import ClienteCobrosRecientes from './ClienteCobrosRecientes'
 import ClienteCuentaCorrienteSection from './ClienteCuentaCorrienteSection'
+import ClienteFidelizacionSection from './ClienteFidelizacionSection'
 import IfModule from '@/components/IfModule'
 
 const clienteSchema = z.object({
@@ -526,6 +527,11 @@ export default function ClienteForm({ cliente, onClose, onGuardado }: ClienteFor
                 <div className="mt-4 pt-4 border-t border-slate-200 dark:border-slate-600">
                   <h3 className="text-sm font-semibold mb-2">{t('cc.sectionTitle')}</h3>
                   <ClienteCuentaCorrienteSection clienteId={cliente.id} />
+                </div>
+              </IfModule>
+              <IfModule flag="clients.loyalty">
+                <div className="mt-4 pt-4 border-t border-slate-200 dark:border-slate-600">
+                  <ClienteFidelizacionSection clienteId={cliente.id} />
                 </div>
               </IfModule>
             </div>

@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "clienteId": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "concepto": {
+      "maxLength": 200,
+      "nullable": true,
+      "type": "string"
+    },
+    "puntos": {
+      "description": "Non-zero signed integer; positive credits, negative debits",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "clienteId",
+    "puntos"
+  ],
+  "title": "FidelizacionAjusteInput",
+  "type": "object"
+}

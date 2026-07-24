@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "activo": {
+      "type": "boolean"
+    },
+    "aplicaEnDescuento": {
+      "type": "boolean"
+    },
+    "createdAt": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "id": {
+      "type": "integer"
+    },
+    "mesesVencimiento": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "montoMinCompra": {
+      "type": "number"
+    },
+    "nombre": {
+      "type": "string"
+    },
+    "pesosPorPunto": {
+      "type": "number"
+    },
+    "puntosPorPeso": {
+      "type": "number"
+    },
+    "tenantId": {
+      "type": "integer"
+    },
+    "updatedAt": {
+      "format": "date-time",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "tenantId",
+    "activo",
+    "nombre",
+    "pesosPorPunto",
+    "puntosPorPeso",
+    "mesesVencimiento",
+    "montoMinCompra",
+    "aplicaEnDescuento",
+    "createdAt",
+    "updatedAt"
+  ],
+  "title": "ConfigFidelizacion",
+  "type": "object"
+}

@@ -3,6 +3,7 @@ import type { ServiceResult } from '../../services/serviceResults'
 import type { ArcaFacturaPdfInput, CondicionIvaCode } from './arcaFiscalPdfTypes'
 import { buildFacturaPdfImages } from './facturaPdfImages'
 import { renderFacturaPdfA4, renderFacturaTicket80mm } from './facturaPdfLayout'
+import { FidelizacionService } from '../../services/FidelizacionService'
 
 export type FacturaPdfOptions = {
   preview: boolean
@@ -11,6 +12,35 @@ export type FacturaPdfOptions = {
 function parseCondicionIva(value: string | null | undefined): CondicionIvaCode | null {
   if (value === 'RI' || value === 'Mono' || value === 'CF' || value === 'Exento') return value
   return null
+}
+
+async function attachLoyaltyFooter(
+  prisma: PrismaClient,
+  tenantId: number,
+  factura: { id: number; clienteId: number | null },
+  pdfInput: ArcaFacturaPdfInput,
+): Promise<ArcaFacturaPdfInput> {
+  if (factura.clienteId == null) return pdfInput
+  const fidelizacion = new FidelizacionService(prisma)
+  if (!(await fidelizacion.isLoyaltyEnabled(tenantId))) return pdfInput
+  const summary = await fidelizacion.getClientePuntos(tenantId, factura.clienteId, 1, 0)
+  if (!summary.ok) return pdfInput
+  const earned = await prisma.movimientoPuntos.findFirst({
+    where: {
+      tenantId,
+      clienteId: factura.clienteId,
+      referenciaFacturaId: factura.id,
+      tipo: 'acumulacion',
+    },
+    select: { puntos: true },
+  })
+  const earnedPts = earned?.puntos ?? 0
+  const saldo = summary.data.puntos
+  const equivalencia = summary.data.equivalenteDinero
+  return {
+    ...pdfInput,
+    loyaltyFooter: `Puntos: +${earnedPts} | Saldo: ${saldo} (≈ $${equivalencia.toFixed(2)})`,
+  }
 }
 
 function mapFacturaToPdfInput(
@@ -148,7 +178,12 @@ export async function buildFacturaPdfBuffer(
   }
 
   const empresaRow = await prisma.paramEmpresa.findUnique({ where: { tenantId } })
-  const pdfInput = mapFacturaToPdfInput(empresaRow, factura, options.preview)
+  const pdfInput = await attachLoyaltyFooter(
+    prisma,
+    tenantId,
+    factura,
+    mapFacturaToPdfInput(empresaRow, factura, options.preview),
+  )
   const images = await buildFacturaPdfImages(pdfInput)
   const buffer = await renderFacturaPdfA4(pdfInput, images)
 
@@ -182,7 +217,12 @@ export async function buildFacturaTicketPdfBuffer(
 
   const hasIssuedCae = factura.estadoCae === 'issued' && !!factura.cae
   const empresaRow = await prisma.paramEmpresa.findUnique({ where: { tenantId } })
-  const pdfInput = mapFacturaToPdfInput(empresaRow, factura, !hasIssuedCae)
+  const pdfInput = await attachLoyaltyFooter(
+    prisma,
+    tenantId,
+    factura,
+    mapFacturaToPdfInput(empresaRow, factura, !hasIssuedCae),
+  )
   const buffer = await renderFacturaTicket80mm(pdfInput)
 
   return { ok: true, data: buffer }

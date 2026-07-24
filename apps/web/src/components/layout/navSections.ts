@@ -53,6 +53,13 @@ export const NAV_SECTIONS: readonly NavSection[] = [
     moduleKey: 'service.warranties',
   },
   {
+    key: 'fidelizacion',
+    path: '/fidelizacion',
+    icon: '⭐',
+    roles: ['owner', 'manager', 'seller', 'backoffice', 'collections'],
+    moduleKey: 'clients.loyalty',
+  },
+  {
     key: 'caja',
     path: '/caja',
     icon: '💵',
@@ -254,6 +261,7 @@ export const ROUTE_MODULE_GUARDS: ReadonlyArray<{ path: string; moduleKey: Modul
   { path: 'contratos', moduleKey: 'service.contracts' },
   { path: 'ordenes-trabajo', moduleKey: 'service.orders' },
   { path: 'garantias', moduleKey: 'service.warranties' },
+  { path: 'fidelizacion', moduleKey: 'clients.loyalty' },
   { path: 'caja', moduleKey: 'pos.cashier' },
   { path: 'listas-precios', moduleKey: 'catalog.pricelists' },
   { path: 'categorias-articulo', moduleKey: 'catalog.variants' },

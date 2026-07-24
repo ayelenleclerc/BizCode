@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "equivalenteDinero": {
+      "type": "number"
+    },
+    "nombrePrograma": {
+      "nullable": true,
+      "type": "string"
+    },
+    "programaActivo": {
+      "type": "boolean"
+    },
+    "puntos": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "puntos",
+    "equivalenteDinero",
+    "programaActivo",
+    "nombrePrograma"
+  ],
+  "title": "PortalFidelizacionSummary",
+  "type": "object"
+}

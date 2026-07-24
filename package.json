@@ -66,6 +66,7 @@
     "bootstrap:superadmin": "tsx scripts/bootstrap-superadmin.ts",
     "migrate:dbf": "tsx scripts/migrate-from-dbf.ts",
     "cobranzas:recordatorios": "tsx scripts/cobranzas-recordatorios-job.ts",
+    "fidelizacion:vencimiento": "tsx scripts/fidelizacion-vencimiento-job.ts",
     "contratos:facturacion": "tsx scripts/contratos-facturacion-job.ts",
     "tipos-cambio:bcra": "tsx scripts/tipos-cambio-bcra-job.ts",
     "mercadopago:reconciliacion": "tsx scripts/mercadopago-reconciliacion-job.ts",

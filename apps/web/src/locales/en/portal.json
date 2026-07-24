@@ -4,6 +4,7 @@
     "facturas": "Invoices",
     "cuentaCorriente": "Account statement",
     "pedidos": "Orders",
+    "fidelizacion": "Loyalty points",
     "misDatos": "My details"
   },
   "actions": {

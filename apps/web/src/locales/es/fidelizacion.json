@@ -1,0 +1,57 @@
+{
+  "title": "Fidelización",
+  "loadError": "No se pudo cargar el programa de fidelización",
+  "saveError": "No se pudo guardar la configuración",
+  "saveOk": "Configuración guardada",
+  "config": {
+    "title": "Configuración del programa",
+    "activo": "Programa activo",
+    "nombre": "Nombre del programa",
+    "pesosPorPunto": "Pesos por punto (acumulación)",
+    "puntosPorPeso": "Valor del punto en pesos (canje)",
+    "mesesVencimiento": "Meses hasta vencimiento",
+    "mesesVencimientoHint": "Vacío = no vencen",
+    "montoMinCompra": "Monto mínimo de compra",
+    "aplicaEnDescuento": "Acumular sobre monto con descuentos de línea",
+    "save": "Guardar configuración"
+  },
+  "dashboard": {
+    "title": "Pasivo de puntos",
+    "emitidos": "Emitidos",
+    "canjeados": "Canjeados",
+    "vencidos": "Vencidos",
+    "ajustados": "Ajustados",
+    "pasivo": "Pasivo (puntos)",
+    "pasivoDinero": "Pasivo (dinero)",
+    "ranking": "Ranking de clientes",
+    "cliente": "Cliente",
+    "puntos": "Puntos",
+    "equivalente": "Equivalente",
+    "emptyRanking": "Sin saldos de puntos"
+  },
+  "cliente": {
+    "title": "Puntos de fidelización",
+    "saldo": "Saldo",
+    "equivalente": "Equivalente",
+    "movimientos": "Movimientos",
+    "empty": "Sin movimientos",
+    "ajuste": "Ajuste manual",
+    "ajustePuntos": "Puntos (+/-)",
+    "ajusteConcepto": "Concepto",
+    "ajusteSubmit": "Aplicar ajuste",
+    "tipo": {
+      "acumulacion": "Acumulación",
+      "canje": "Canje",
+      "ajuste": "Ajuste",
+      "vencimiento": "Vencimiento",
+      "reverso": "Reverso"
+    }
+  },
+  "factura": {
+    "title": "Canje de puntos",
+    "saldo": "Saldo disponible: {{puntos}} (≈ {{dinero}})",
+    "puntos": "Puntos a canjear",
+    "montoEstimado": "Descuento estimado: {{monto}}",
+    "inactive": "Programa inactivo o sin saldo"
+  }
+}

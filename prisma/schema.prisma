@@ -98,6 +98,8 @@ model Cliente {
   portalMagicLinks PortalMagicLink[]
   portalSessions   PortalSession[]
   configsComision ConfigComision[]
+  puntosFidelizacion PuntosFidelizacion?
+  movimientosPuntos  MovimientoPuntos[]
 
   @@unique([tenantId, codigo])
   @@index([tenantId])
@@ -849,6 +851,7 @@ model Factura {
   mercadoPagoRefunds           MercadoPagoRefund[]
   mercadoPagoChargebacks       MercadoPagoChargeback[]
   liquidacionComisionDetalles  LiquidacionComisionDetalle[]
+  movimientosPuntos            MovimientoPuntos[]
 
   @@unique([tenantId, tipo, prefijo, numero])
   @@index([tenantId])
@@ -1464,6 +1467,9 @@ model Tenant {
   formulasProduccion            FormulaProduccion[]
   ordenesProduccion             OrdenProduccion[]
   reservasProduccion            StockReservaProduccion[]
+  configFidelizacion            ConfigFidelizacion?
+  puntosFidelizacion            PuntosFidelizacion[]
+  movimientosPuntos             MovimientoPuntos[]
 }
 
 /// Idempotent Mercado Pago payment webhook processing (#176).
@@ -1874,6 +1880,7 @@ model AppUser {
   importJobs             ImportJob[] @relation("ImportJobCreatedBy")
   tiposCambio            TipoCambio[] @relation("TipoCambioCreatedBy")
   ordenesProduccion      OrdenProduccion[] @relation("OrdenProduccionOperador")
+  movimientosPuntos      MovimientoPuntos[] @relation("MovimientoPuntosUser")
 
   @@unique([tenantId, username])
 }
@@ -2355,6 +2362,89 @@ model StockReservaProduccion {
   @@index([ordenId])
   @@index([tenantId, articuloId, depositoId, activa])
   @@index([tenantId, activa])
+}
+
+/// @en Loyalty program configuration per tenant (#250).
+/// @es Configuración del programa de fidelización por tenant (#250).
+/// @pt-BR Configuração do programa de fidelização por tenant (#250).
+model ConfigFidelizacion {
+  id                Int      @id @default(autoincrement())
+  tenantId          Int      @unique
+  tenant            Tenant   @relation(fields: [tenantId], references: [id])
+  activo            Boolean  @default(false)
+  nombre            String   @default("Programa de Puntos") @db.VarChar(80)
+  /// @en Currency amount that earns 1 point.
+  /// @es Monto en pesos que otorga 1 punto.
+  /// @pt-BR Valor em pesos que concede 1 ponto.
+  pesosPorPunto     Decimal  @default(100) @db.Decimal(14, 4)
+  /// @en Discount money per redeemed point.
+  /// @es Dinero de descuento por punto canjeado.
+  /// @pt-BR Dinheiro de desconto por ponto resgatado.
+  puntosPorPeso     Decimal  @default(0.01) @db.Decimal(14, 6)
+  /// @en Months until unused accumulation expires; null = never.
+  /// @es Meses hasta que vence la acumulación sin usar; null = no vence.
+  /// @pt-BR Meses até o vencimento da acumulação sem uso; null = não vence.
+  mesesVencimiento  Int?
+  montoMinCompra    Decimal  @default(0) @db.Decimal(14, 2)
+  /// @en When false, line discounts (dscto) are excluded from the accrual base.
+  /// @es Si es false, los descuentos de línea (dscto) se excluyen de la base de acumulación.
+  /// @pt-BR Se for false, os descontos de linha (dscto) são excluídos da base de acumulação.
+  aplicaEnDescuento Boolean  @default(false)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+/// @en Current loyalty points balance per customer (#250).
+/// @es Saldo actual de puntos de fidelización por cliente (#250).
+/// @pt-BR Saldo atual de pontos de fidelização por cliente (#250).
+model PuntosFidelizacion {
+  id        Int      @id @default(autoincrement())
+  tenantId  Int
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+  clienteId Int      @unique
+  cliente   Cliente  @relation(fields: [clienteId], references: [id], onDelete: Cascade)
+  puntos    Int      @default(0)
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+
+  @@unique([tenantId, clienteId])
+  @@index([tenantId])
+  @@index([tenantId, puntos])
+}
+
+/// @en Loyalty points ledger movement (#250).
+/// @es Movimiento del ledger de puntos de fidelización (#250).
+/// @pt-BR Movimento do ledger de pontos de fidelização (#250).
+model MovimientoPuntos {
+  id                  Int       @id @default(autoincrement())
+  tenantId            Int
+  tenant              Tenant    @relation(fields: [tenantId], references: [id])
+  clienteId           Int
+  cliente             Cliente   @relation(fields: [clienteId], references: [id], onDelete: Cascade)
+  /// acumulacion | canje | ajuste | vencimiento | reverso
+  tipo                String    @db.VarChar(20)
+  /// @en Signed delta: positive accrues, negative redeems/expires.
+  /// @es Delta con signo: positivo acumula, negativo canjea/vence.
+  /// @pt-BR Delta com sinal: positivo acumula, negativo resgata/vence.
+  puntos              Int
+  saldoPost           Int
+  /// @en Remaining points of an accumulation lot (FIFO expiry/redemption).
+  /// @es Puntos restantes de un lote de acumulación (FIFO vencimiento/canje).
+  /// @pt-BR Pontos restantes de um lote de acumulação (FIFO vencimento/resgate).
+  puntosRestantes     Int?
+  referenciaFacturaId Int?
+  referenciaFactura   Factura?  @relation(fields: [referenciaFacturaId], references: [id], onDelete: SetNull)
+  venceEn             DateTime?
+  preavisoEnviadoAt   DateTime?
+  concepto            String?   @db.VarChar(200)
+  userId              Int?
+  user                AppUser?  @relation("MovimientoPuntosUser", fields: [userId], references: [id], onDelete: SetNull)
+  createdAt           DateTime  @default(now())
+
+  @@index([tenantId, clienteId, createdAt])
+  @@index([tenantId, tipo, createdAt])
+  @@index([tenantId, referenciaFacturaId])
+  @@index([tenantId, venceEn, tipo])
 }
 
 model StockAjuste {

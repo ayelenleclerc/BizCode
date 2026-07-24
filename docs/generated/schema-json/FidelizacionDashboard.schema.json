@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "pasivoDinero": {
+      "type": "number"
+    },
+    "pasivoPuntos": {
+      "type": "integer"
+    },
+    "puntosAjustados": {
+      "type": "integer"
+    },
+    "puntosCanjeados": {
+      "type": "integer"
+    },
+    "puntosEmitidos": {
+      "type": "integer"
+    },
+    "puntosVencidos": {
+      "type": "integer"
+    },
+    "ranking": {
+      "items": {
+        "properties": {
+          "clienteId": {
+            "type": "integer"
+          },
+          "codigo": {
+            "type": "integer"
+          },
+          "equivalenteDinero": {
+            "type": "number"
+          },
+          "puntos": {
+            "type": "integer"
+          },
+          "rsocial": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "clienteId",
+          "codigo",
+          "rsocial",
+          "puntos",
+          "equivalenteDinero"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    }
+  },
+  "required": [
+    "puntosEmitidos",
+    "puntosCanjeados",
+    "puntosVencidos",
+    "puntosAjustados",
+    "pasivoPuntos",
+    "pasivoDinero",
+    "ranking"
+  ],
+  "title": "FidelizacionDashboard",
+  "type": "object"
+}

@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import { useHotkeys } from 'react-hotkeys-hook'
 import { useTranslation } from 'react-i18next'
-import { empresaAPI, facturasAPI, fiscalRetencionesAPI, listasPreciosAPI, type RetencionPreviewLineDTO } from '@/lib/api'
+import { empresaAPI, facturasAPI, fidelizacionAPI, fiscalRetencionesAPI, listasPreciosAPI, type RetencionPreviewLineDTO } from '@/lib/api'
 import { calculateInvoice, calculateItemSubtotal } from '@/lib/invoice'
 import { Cliente, Articulo, FormaPago } from '@bizcode/types'
 import KeyboardHint, { useInvoiceShortcuts } from '@/components/shared/KeyboardHint'
@@ -57,8 +57,53 @@ export default function NuevaFacturaForm({
   const { hasModule } = useFeatureFlags()
   const retencionesModule = hasModule('finance.retenciones')
   const pricelistsModule = hasModule('catalog.pricelists')
+  const loyaltyModule = hasModule('clients.loyalty')
+  const [puntosCanje, setPuntosCanje] = useState('')
+  const [loyaltySaldo, setLoyaltySaldo] = useState<{
+    puntos: number
+    equivalenteDinero: number
+    puntosPorPeso: number
+  } | null>(null)
+  const { t: tf } = useTranslation('fidelizacion')
 
   const cliente = clientes.find((c) => c.id === clienteId)
+
+  useEffect(() => {
+    if (!loyaltyModule || !clienteId) {
+      setLoyaltySaldo(null)
+      setPuntosCanje('')
+      return
+    }
+    let cancelled = false
+    void Promise.all([
+      fidelizacionAPI.getConfig(),
+      fidelizacionAPI.getClientePuntos(clienteId, { limit: 1, offset: 0 }),
+    ])
+      .then(([cfg, detail]) => {
+        if (cancelled) return
+        if (!cfg.activo) {
+          setLoyaltySaldo(null)
+          return
+        }
+        setLoyaltySaldo({
+          puntos: detail.puntos,
+          equivalenteDinero: detail.equivalenteDinero,
+          puntosPorPeso: cfg.puntosPorPeso,
+        })
+      })
+      .catch(() => {
+        if (!cancelled) setLoyaltySaldo(null)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [loyaltyModule, clienteId])
+
+  const puntosCanjeNum = Number.parseInt(puntosCanje, 10)
+  const canjeMontoEstimado =
+    loyaltySaldo && Number.isInteger(puntosCanjeNum) && puntosCanjeNum > 0
+      ? Math.round(puntosCanjeNum * loyaltySaldo.puntosPorPeso * 100) / 100
+      : 0
 
   const percepcionesTotal = useMemo(
     () =>
@@ -330,6 +375,9 @@ export default function NuevaFacturaForm({
         ...(percepcionesPayload != null && percepcionesPayload.length > 0
           ? { percepciones: percepcionesPayload }
           : {}),
+        ...(Number.isInteger(puntosCanjeNum) && puntosCanjeNum > 0
+          ? { puntosCanje: puntosCanjeNum }
+          : {}),
       }
 
       await facturasAPI.create(facturaData)
@@ -460,6 +508,39 @@ export default function NuevaFacturaForm({
           </select>
         </div>
       </div>
+
+      {loyaltyModule && loyaltySaldo && loyaltySaldo.puntos > 0 ? (
+        <div
+          className="mb-4 rounded border border-amber-200 bg-amber-50 p-3 dark:border-amber-700 dark:bg-amber-900/20"
+          data-testid="factura-loyalty-panel"
+        >
+          <h3 className="text-sm font-semibold mb-2">{tf('factura.title')}</h3>
+          <p className="text-xs text-slate-600 dark:text-slate-300 mb-2">
+            {tf('factura.saldo', {
+              puntos: loyaltySaldo.puntos,
+              dinero: loyaltySaldo.equivalenteDinero.toFixed(2),
+            })}
+          </p>
+          <label htmlFor="factura-puntos-canje" className="block text-sm mb-1">
+            {tf('factura.puntos')}
+          </label>
+          <input
+            id="factura-puntos-canje"
+            type="number"
+            min={1}
+            max={loyaltySaldo.puntos}
+            value={puntosCanje}
+            onChange={(e) => setPuntosCanje(e.target.value)}
+            className="w-40 rounded border px-2 py-1 text-sm"
+            data-testid="factura-puntos-canje"
+          />
+          {canjeMontoEstimado > 0 ? (
+            <p className="text-xs mt-1" data-testid="factura-loyalty-estimado">
+              {tf('factura.montoEstimado', { monto: canjeMontoEstimado.toFixed(2) })}
+            </p>
+          ) : null}
+        </div>
+      ) : null}
 
       <div className="flex-1 overflow-auto mb-6">
         <table

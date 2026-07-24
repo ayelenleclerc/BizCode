@@ -19871,6 +19871,10 @@ Requires all items to have `cantFisica`. For each line with non-zero variance, u
 
   `string`
 
+- **`puntosCanje`**
+
+  `integer` — Optional loyalty points to redeem as a negative invoice line (#250).
+
 **Example:**
 
 ```json
@@ -19906,7 +19910,8 @@ Requires all items to have `cantFisica`. For each line with non-zero variance, u
       "dscto": 1,
       "subtotal": 1
     }
-  ]
+  ],
+  "puntosCanje": 1
 }
 ```
 
@@ -29366,6 +29371,1012 @@ Requires module `service.orders` and `sales.create`. Parts decrement stock; labo
 ```
 
 ##### Status: 422 Warranty OT cannot be invoiced to customer
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/fidelizacion/config
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/fidelizacion/config`
+
+### Get loyalty program configuration (#250)
+
+- **Method:** `GET`
+- **Path:** `/api/fidelizacion/config`
+- **Tags:** fidelizacion
+
+Requires module `clients.loyalty` and `customers.read`.
+
+#### Responses
+
+##### Status: 200 Loyalty config
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`activo` (required)**
+
+    `boolean`
+
+  - **`aplicaEnDescuento` (required)**
+
+    `boolean`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`mesesVencimiento` (required)**
+
+    `integer`
+
+  - **`montoMinCompra` (required)**
+
+    `number`
+
+  - **`nombre` (required)**
+
+    `string`
+
+  - **`pesosPorPunto` (required)**
+
+    `number`
+
+  - **`puntosPorPeso` (required)**
+
+    `number`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "activo": true,
+    "nombre": "",
+    "pesosPorPunto": 1,
+    "puntosPorPeso": 1,
+    "mesesVencimiento": 1,
+    "montoMinCompra": 1,
+    "aplicaEnDescuento": true,
+    "createdAt": "",
+    "updatedAt": ""
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Upsert loyalty program configuration (#250)
+
+- **Method:** `PUT`
+- **Path:** `/api/fidelizacion/config`
+- **Tags:** fidelizacion
+
+Requires module `clients.loyalty` and `customers.manage`.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`activo` (required)**
+
+  `boolean`
+
+- **`pesosPorPunto` (required)**
+
+  `number`
+
+- **`puntosPorPeso` (required)**
+
+  `number`
+
+- **`aplicaEnDescuento`**
+
+  `boolean`
+
+- **`mesesVencimiento`**
+
+  `integer`
+
+- **`montoMinCompra`**
+
+  `number`
+
+- **`nombre`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "activo": true,
+  "nombre": "",
+  "pesosPorPunto": 1,
+  "puntosPorPeso": 1,
+  "mesesVencimiento": 1,
+  "montoMinCompra": 0,
+  "aplicaEnDescuento": true
+}
+```
+
+#### Responses
+
+##### Status: 200 Updated config
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`activo` (required)**
+
+    `boolean`
+
+  - **`aplicaEnDescuento` (required)**
+
+    `boolean`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`mesesVencimiento` (required)**
+
+    `integer`
+
+  - **`montoMinCompra` (required)**
+
+    `number`
+
+  - **`nombre` (required)**
+
+    `string`
+
+  - **`pesosPorPunto` (required)**
+
+    `number`
+
+  - **`puntosPorPeso` (required)**
+
+    `number`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "activo": true,
+    "nombre": "",
+    "pesosPorPunto": 1,
+    "puntosPorPeso": 1,
+    "mesesVencimiento": 1,
+    "montoMinCompra": 1,
+    "aplicaEnDescuento": true,
+    "createdAt": "",
+    "updatedAt": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/fidelizacion/dashboard
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/fidelizacion/dashboard`
+
+### Loyalty points liability dashboard (#250)
+
+- **Method:** `GET`
+- **Path:** `/api/fidelizacion/dashboard`
+- **Tags:** fidelizacion
+
+Requires module `clients.loyalty` and `customers.read`.
+
+#### Responses
+
+##### Status: 200 Dashboard KPIs and ranking
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`pasivoDinero` (required)**
+
+    `number`
+
+  - **`pasivoPuntos` (required)**
+
+    `integer`
+
+  - **`puntosAjustados` (required)**
+
+    `integer`
+
+  - **`puntosCanjeados` (required)**
+
+    `integer`
+
+  - **`puntosEmitidos` (required)**
+
+    `integer`
+
+  - **`puntosVencidos` (required)**
+
+    `integer`
+
+  - **`ranking` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`clienteId` (required)**
+
+      `integer`
+
+    - **`codigo` (required)**
+
+      `integer`
+
+    - **`equivalenteDinero` (required)**
+
+      `number`
+
+    - **`puntos` (required)**
+
+      `integer`
+
+    - **`rsocial` (required)**
+
+      `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "puntosEmitidos": 1,
+    "puntosCanjeados": 1,
+    "puntosVencidos": 1,
+    "puntosAjustados": 1,
+    "pasivoPuntos": 1,
+    "pasivoDinero": 1,
+    "ranking": [
+      {
+        "clienteId": 1,
+        "codigo": 1,
+        "rsocial": "",
+        "puntos": 1,
+        "equivalenteDinero": 1
+      }
+    ]
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/fidelizacion/clientes/{id}
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/fidelizacion/clientes/{id}`
+
+### Customer loyalty balance and movements (#250)
+
+- **Method:** `GET`
+- **Path:** `/api/fidelizacion/clientes/{id}`
+- **Tags:** fidelizacion
+
+Requires module `clients.loyalty` and `customers.read`.
+
+#### Responses
+
+##### Status: 200 Balance and movement history
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`clienteId` (required)**
+
+    `integer`
+
+  - **`equivalenteDinero` (required)**
+
+    `number`
+
+  - **`movimientos` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`clienteId` (required)**
+
+      `integer`
+
+    - **`concepto` (required)**
+
+      `string`
+
+    - **`createdAt` (required)**
+
+      `string`, format: `date-time`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`puntos` (required)**
+
+      `integer`
+
+    - **`puntosRestantes` (required)**
+
+      `integer`
+
+    - **`referenciaFacturaId` (required)**
+
+      `integer`
+
+    - **`saldoPost` (required)**
+
+      `integer`
+
+    - **`tenantId` (required)**
+
+      `integer`
+
+    - **`tipo` (required)**
+
+      `string`, possible values: `"acumulacion", "canje", "ajuste", "vencimiento", "reverso"`
+
+    - **`userId` (required)**
+
+      `integer`
+
+    - **`venceEn` (required)**
+
+      `string`, format: `date-time`
+
+  - **`puntos` (required)**
+
+    `integer`
+
+  - **`totalMovimientos` (required)**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "clienteId": 1,
+    "puntos": 1,
+    "equivalenteDinero": 1,
+    "movimientos": [
+      {
+        "id": 1,
+        "tenantId": 1,
+        "clienteId": 1,
+        "tipo": "acumulacion",
+        "puntos": 1,
+        "saldoPost": 1,
+        "puntosRestantes": 1,
+        "referenciaFacturaId": 1,
+        "venceEn": "",
+        "concepto": "",
+        "userId": 1,
+        "createdAt": ""
+      }
+    ],
+    "totalMovimientos": 1
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/fidelizacion/ajuste
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/fidelizacion/ajuste`
+
+### Manual loyalty points adjustment (#250)
+
+- **Method:** `POST`
+- **Path:** `/api/fidelizacion/ajuste`
+- **Tags:** fidelizacion
+
+Requires module `clients.loyalty` and `customers.manage`.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`clienteId` (required)**
+
+  `integer`
+
+- **`puntos` (required)**
+
+  `integer` — Non-zero signed integer; positive credits, negative debits
+
+- **`concepto`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "clienteId": 1,
+  "puntos": 1,
+  "concepto": ""
+}
+```
+
+#### Responses
+
+##### Status: 200 Updated customer points
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`clienteId` (required)**
+
+    `integer`
+
+  - **`equivalenteDinero` (required)**
+
+    `number`
+
+  - **`movimientos` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`clienteId` (required)**
+
+      `integer`
+
+    - **`concepto` (required)**
+
+      `string`
+
+    - **`createdAt` (required)**
+
+      `string`, format: `date-time`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`puntos` (required)**
+
+      `integer`
+
+    - **`puntosRestantes` (required)**
+
+      `integer`
+
+    - **`referenciaFacturaId` (required)**
+
+      `integer`
+
+    - **`saldoPost` (required)**
+
+      `integer`
+
+    - **`tenantId` (required)**
+
+      `integer`
+
+    - **`tipo` (required)**
+
+      `string`, possible values: `"acumulacion", "canje", "ajuste", "vencimiento", "reverso"`
+
+    - **`userId` (required)**
+
+      `integer`
+
+    - **`venceEn` (required)**
+
+      `string`, format: `date-time`
+
+  - **`puntos` (required)**
+
+    `integer`
+
+  - **`totalMovimientos` (required)**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "clienteId": 1,
+    "puntos": 1,
+    "equivalenteDinero": 1,
+    "movimientos": [
+      {
+        "id": 1,
+        "tenantId": 1,
+        "clienteId": 1,
+        "tipo": "acumulacion",
+        "puntos": 1,
+        "saldoPost": 1,
+        "puntosRestantes": 1,
+        "referenciaFacturaId": 1,
+        "venceEn": "",
+        "concepto": "",
+        "userId": 1,
+        "createdAt": ""
+      }
+    ],
+    "totalMovimientos": 1
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
 
 ###### Content-Type: application/json
 
@@ -54772,6 +55783,142 @@ Requires `reports.financial.read` and tenant integration `mercadopago`. Mark `re
       }
     ],
     "total": 1
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Loyalty points balance for the authenticated portal customer (#250)
+
+- **Method:** `GET`
+- **Path:** `/api/portal/{tenantSlug}/fidelizacion`
+- **Tags:** portal
+
+Requires portal auth and module `clients.loyalty`.
+
+#### Responses
+
+##### Status: 200 Loyalty summary
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`equivalenteDinero` (required)**
+
+    `number`
+
+  - **`nombrePrograma` (required)**
+
+    `string`
+
+  - **`programaActivo` (required)**
+
+    `boolean`
+
+  - **`puntos` (required)**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "puntos": 1,
+    "equivalenteDinero": 1,
+    "programaActivo": true,
+    "nombrePrograma": ""
   }
 }
 ```
@@ -84833,6 +85980,10 @@ Rate-limited mutation; requires products.manage. USD only.
 
   `string`
 
+* **`puntosCanje`**
+
+  `integer` — Optional loyalty points to redeem as a negative invoice line (#250).
+
 **Example:**
 
 ```json
@@ -84868,7 +86019,8 @@ Rate-limited mutation; requires products.manage. USD only.
       "dscto": 1,
       "subtotal": 1
     }
-  ]
+  ],
+  "puntosCanje": 1
 }
 ```
 
@@ -94495,6 +95647,741 @@ Originating invoice header (selected columns)
       ],
       "additionalProperty": "anything"
     }
+  }
+}
+```
+
+### ConfigFidelizacion
+
+- **Type:**`object`
+
+* **`activo` (required)**
+
+  `boolean`
+
+* **`aplicaEnDescuento` (required)**
+
+  `boolean`
+
+* **`createdAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`mesesVencimiento` (required)**
+
+  `integer`
+
+* **`montoMinCompra` (required)**
+
+  `number`
+
+* **`nombre` (required)**
+
+  `string`
+
+* **`pesosPorPunto` (required)**
+
+  `number`
+
+* **`puntosPorPeso` (required)**
+
+  `number`
+
+* **`tenantId` (required)**
+
+  `integer`
+
+* **`updatedAt` (required)**
+
+  `string`, format: `date-time`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "tenantId": 1,
+  "activo": true,
+  "nombre": "",
+  "pesosPorPunto": 1,
+  "puntosPorPeso": 1,
+  "mesesVencimiento": 1,
+  "montoMinCompra": 1,
+  "aplicaEnDescuento": true,
+  "createdAt": "",
+  "updatedAt": ""
+}
+```
+
+### ConfigFidelizacionUpsertInput
+
+- **Type:**`object`
+
+* **`activo` (required)**
+
+  `boolean`
+
+* **`pesosPorPunto` (required)**
+
+  `number`
+
+* **`puntosPorPeso` (required)**
+
+  `number`
+
+* **`aplicaEnDescuento`**
+
+  `boolean`
+
+* **`mesesVencimiento`**
+
+  `integer`
+
+* **`montoMinCompra`**
+
+  `number`
+
+* **`nombre`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "activo": true,
+  "nombre": "",
+  "pesosPorPunto": 1,
+  "puntosPorPeso": 1,
+  "mesesVencimiento": 1,
+  "montoMinCompra": 0,
+  "aplicaEnDescuento": true
+}
+```
+
+### ConfigFidelizacionEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`activo` (required)**
+
+    `boolean`
+
+  - **`aplicaEnDescuento` (required)**
+
+    `boolean`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`mesesVencimiento` (required)**
+
+    `integer`
+
+  - **`montoMinCompra` (required)**
+
+    `number`
+
+  - **`nombre` (required)**
+
+    `string`
+
+  - **`pesosPorPunto` (required)**
+
+    `number`
+
+  - **`puntosPorPeso` (required)**
+
+    `number`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "activo": true,
+    "nombre": "",
+    "pesosPorPunto": 1,
+    "puntosPorPeso": 1,
+    "mesesVencimiento": 1,
+    "montoMinCompra": 1,
+    "aplicaEnDescuento": true,
+    "createdAt": "",
+    "updatedAt": ""
+  }
+}
+```
+
+### MovimientoPuntos
+
+- **Type:**`object`
+
+* **`clienteId` (required)**
+
+  `integer`
+
+* **`concepto` (required)**
+
+  `string`
+
+* **`createdAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`puntos` (required)**
+
+  `integer`
+
+* **`puntosRestantes` (required)**
+
+  `integer`
+
+* **`referenciaFacturaId` (required)**
+
+  `integer`
+
+* **`saldoPost` (required)**
+
+  `integer`
+
+* **`tenantId` (required)**
+
+  `integer`
+
+* **`tipo` (required)**
+
+  `string`, possible values: `"acumulacion", "canje", "ajuste", "vencimiento", "reverso"`
+
+* **`userId` (required)**
+
+  `integer`
+
+* **`venceEn` (required)**
+
+  `string`, format: `date-time`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "tenantId": 1,
+  "clienteId": 1,
+  "tipo": "acumulacion",
+  "puntos": 1,
+  "saldoPost": 1,
+  "puntosRestantes": 1,
+  "referenciaFacturaId": 1,
+  "venceEn": "",
+  "concepto": "",
+  "userId": 1,
+  "createdAt": ""
+}
+```
+
+### ClientePuntosDetail
+
+- **Type:**`object`
+
+* **`clienteId` (required)**
+
+  `integer`
+
+* **`equivalenteDinero` (required)**
+
+  `number`
+
+* **`movimientos` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`clienteId` (required)**
+
+    `integer`
+
+  - **`concepto` (required)**
+
+    `string`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`puntos` (required)**
+
+    `integer`
+
+  - **`puntosRestantes` (required)**
+
+    `integer`
+
+  - **`referenciaFacturaId` (required)**
+
+    `integer`
+
+  - **`saldoPost` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"acumulacion", "canje", "ajuste", "vencimiento", "reverso"`
+
+  - **`userId` (required)**
+
+    `integer`
+
+  - **`venceEn` (required)**
+
+    `string`, format: `date-time`
+
+* **`puntos` (required)**
+
+  `integer`
+
+* **`totalMovimientos` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "clienteId": 1,
+  "puntos": 1,
+  "equivalenteDinero": 1,
+  "movimientos": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "clienteId": 1,
+      "tipo": "acumulacion",
+      "puntos": 1,
+      "saldoPost": 1,
+      "puntosRestantes": 1,
+      "referenciaFacturaId": 1,
+      "venceEn": "",
+      "concepto": "",
+      "userId": 1,
+      "createdAt": ""
+    }
+  ],
+  "totalMovimientos": 1
+}
+```
+
+### ClientePuntosEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`clienteId` (required)**
+
+    `integer`
+
+  - **`equivalenteDinero` (required)**
+
+    `number`
+
+  - **`movimientos` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`clienteId` (required)**
+
+      `integer`
+
+    - **`concepto` (required)**
+
+      `string`
+
+    - **`createdAt` (required)**
+
+      `string`, format: `date-time`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`puntos` (required)**
+
+      `integer`
+
+    - **`puntosRestantes` (required)**
+
+      `integer`
+
+    - **`referenciaFacturaId` (required)**
+
+      `integer`
+
+    - **`saldoPost` (required)**
+
+      `integer`
+
+    - **`tenantId` (required)**
+
+      `integer`
+
+    - **`tipo` (required)**
+
+      `string`, possible values: `"acumulacion", "canje", "ajuste", "vencimiento", "reverso"`
+
+    - **`userId` (required)**
+
+      `integer`
+
+    - **`venceEn` (required)**
+
+      `string`, format: `date-time`
+
+  - **`puntos` (required)**
+
+    `integer`
+
+  - **`totalMovimientos` (required)**
+
+    `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "clienteId": 1,
+    "puntos": 1,
+    "equivalenteDinero": 1,
+    "movimientos": [
+      {
+        "id": 1,
+        "tenantId": 1,
+        "clienteId": 1,
+        "tipo": "acumulacion",
+        "puntos": 1,
+        "saldoPost": 1,
+        "puntosRestantes": 1,
+        "referenciaFacturaId": 1,
+        "venceEn": "",
+        "concepto": "",
+        "userId": 1,
+        "createdAt": ""
+      }
+    ],
+    "totalMovimientos": 1
+  }
+}
+```
+
+### FidelizacionAjusteInput
+
+- **Type:**`object`
+
+* **`clienteId` (required)**
+
+  `integer`
+
+* **`puntos` (required)**
+
+  `integer` — Non-zero signed integer; positive credits, negative debits
+
+* **`concepto`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "clienteId": 1,
+  "puntos": 1,
+  "concepto": ""
+}
+```
+
+### FidelizacionDashboard
+
+- **Type:**`object`
+
+* **`pasivoDinero` (required)**
+
+  `number`
+
+* **`pasivoPuntos` (required)**
+
+  `integer`
+
+* **`puntosAjustados` (required)**
+
+  `integer`
+
+* **`puntosCanjeados` (required)**
+
+  `integer`
+
+* **`puntosEmitidos` (required)**
+
+  `integer`
+
+* **`puntosVencidos` (required)**
+
+  `integer`
+
+* **`ranking` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`clienteId` (required)**
+
+    `integer`
+
+  - **`codigo` (required)**
+
+    `integer`
+
+  - **`equivalenteDinero` (required)**
+
+    `number`
+
+  - **`puntos` (required)**
+
+    `integer`
+
+  - **`rsocial` (required)**
+
+    `string`
+
+**Example:**
+
+```json
+{
+  "puntosEmitidos": 1,
+  "puntosCanjeados": 1,
+  "puntosVencidos": 1,
+  "puntosAjustados": 1,
+  "pasivoPuntos": 1,
+  "pasivoDinero": 1,
+  "ranking": [
+    {
+      "clienteId": 1,
+      "codigo": 1,
+      "rsocial": "",
+      "puntos": 1,
+      "equivalenteDinero": 1
+    }
+  ]
+}
+```
+
+### FidelizacionDashboardEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`pasivoDinero` (required)**
+
+    `number`
+
+  - **`pasivoPuntos` (required)**
+
+    `integer`
+
+  - **`puntosAjustados` (required)**
+
+    `integer`
+
+  - **`puntosCanjeados` (required)**
+
+    `integer`
+
+  - **`puntosEmitidos` (required)**
+
+    `integer`
+
+  - **`puntosVencidos` (required)**
+
+    `integer`
+
+  - **`ranking` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`clienteId` (required)**
+
+      `integer`
+
+    - **`codigo` (required)**
+
+      `integer`
+
+    - **`equivalenteDinero` (required)**
+
+      `number`
+
+    - **`puntos` (required)**
+
+      `integer`
+
+    - **`rsocial` (required)**
+
+      `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "puntosEmitidos": 1,
+    "puntosCanjeados": 1,
+    "puntosVencidos": 1,
+    "puntosAjustados": 1,
+    "pasivoPuntos": 1,
+    "pasivoDinero": 1,
+    "ranking": [
+      {
+        "clienteId": 1,
+        "codigo": 1,
+        "rsocial": "",
+        "puntos": 1,
+        "equivalenteDinero": 1
+      }
+    ]
+  }
+}
+```
+
+### PortalFidelizacionSummary
+
+- **Type:**`object`
+
+* **`equivalenteDinero` (required)**
+
+  `number`
+
+* **`nombrePrograma` (required)**
+
+  `string`
+
+* **`programaActivo` (required)**
+
+  `boolean`
+
+* **`puntos` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "puntos": 1,
+  "equivalenteDinero": 1,
+  "programaActivo": true,
+  "nombrePrograma": ""
+}
+```
+
+### PortalFidelizacionEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`equivalenteDinero` (required)**
+
+    `number`
+
+  - **`nombrePrograma` (required)**
+
+    `string`
+
+  - **`programaActivo` (required)**
+
+    `boolean`
+
+  - **`puntos` (required)**
+
+    `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "puntos": 1,
+    "equivalenteDinero": 1,
+    "programaActivo": true,
+    "nombrePrograma": ""
   }
 }
 ```

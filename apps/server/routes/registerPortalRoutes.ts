@@ -18,6 +18,7 @@ import { PortalConfigService } from '../services/PortalConfigService'
 import { PortalCuentaCorrienteService } from '../services/PortalCuentaCorrienteService'
 import { PortalFacturaService } from '../services/PortalFacturaService'
 import { PortalPedidoService } from '../services/PortalPedidoService'
+import { FidelizacionService } from '../services/FidelizacionService'
 import type { RestRouteContext } from './restRouteTypes'
 import { errorMessage, getTenantId } from './restDomainShared'
 
@@ -63,6 +64,7 @@ export function registerPortalRoutes(app: Application, ctx: RestRouteContext): v
   const portalFactura = new PortalFacturaService(prisma)
   const portalCc = new PortalCuentaCorrienteService(prisma)
   const portalPedido = new PortalPedidoService(prisma)
+  const fidelizacion = new FidelizacionService(prisma)
 
   const portalModule = requireModule('clients.portal')
 
@@ -346,6 +348,24 @@ export function registerPortalRoutes(app: Application, ctx: RestRouteContext): v
           limit,
           offset,
         )
+        res.json({ success: true, data })
+      } catch (err: unknown) {
+        res.status(500).json({ success: false, error: errorMessage(err) })
+      }
+    },
+  )
+
+  app.get(
+    '/api/portal/:tenantSlug/fidelizacion',
+    portalTenantMw,
+    portalSessionMw,
+    requirePortalAuth,
+    requirePortalModule('clients.loyalty'),
+    async (req: Request, res: Response) => {
+      const portalReq = req as PortalRequest
+      const auth = portalReq.portalAuth!
+      try {
+        const data = await fidelizacion.getPortalSummary(auth.tenantId, auth.portalClienteId)
         res.json({ success: true, data })
       } catch (err: unknown) {
         res.status(500).json({ success: false, error: errorMessage(err) })

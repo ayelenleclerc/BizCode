@@ -7,6 +7,7 @@ export * from './modules/pedidos'
 export * from './modules/contratos'
 export * from './modules/ordenesTrabajo'
 export * from './modules/garantias'
+export * from './modules/fidelizacion'
 export * from './modules/caja'
 export * from './modules/listasPrecios'
 export * from './modules/catalogVariants'
@@ -53,6 +54,9 @@ export type {
   GarantiaRow,
   GarantiaListResponse,
   GarantiaLookupResult,
+  ConfigFidelizacionRow,
+  ClientePuntosDetail,
+  FidelizacionDashboard,
   ListaPrecioRow,
   ListaPrecioItemRow,
   ListaPrecioListResponse,
