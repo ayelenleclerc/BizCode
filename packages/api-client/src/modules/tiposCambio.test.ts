@@ -1,4 +1,4 @@
-import type { AxiosInstance } from 'axios'
+import type { AxiosError, AxiosInstance } from 'axios'
 import { describe, expect, it, vi } from 'vitest'
 import { createTiposCambioAPI } from './tiposCambio'
 
@@ -51,5 +51,26 @@ describe('createTiposCambioAPI (#243)', () => {
       api.createManual({ moneda: 'USD', tipo: 'manual', valor: 1250 }),
     ).resolves.toMatchObject({ row: { id: 1 } })
     await expect(api.syncBcra()).resolves.toMatchObject({ recalc: { updatedCount: 2 } })
+  })
+
+  it('propagates Axios errors through handleError for every method', async () => {
+    const boom = {
+      isAxiosError: true,
+      response: { status: 502, data: { success: false, error: 'BCRA down' } },
+      message: 'Request failed',
+    } as AxiosError
+    const http = {
+      get: vi.fn().mockRejectedValue(boom),
+      put: vi.fn().mockRejectedValue(boom),
+      post: vi.fn().mockRejectedValue(boom),
+    } as unknown as AxiosInstance
+    const api = createTiposCambioAPI(http)
+
+    await expect(api.list()).rejects.toBeTruthy()
+    await expect(api.getVigente({ moneda: 'EUR' })).rejects.toBeTruthy()
+    await expect(api.getPreferido()).rejects.toBeTruthy()
+    await expect(api.setPreferido('blue')).rejects.toBeTruthy()
+    await expect(api.createManual({ moneda: 'EUR', tipo: 'ccl', valor: 1 })).rejects.toBeTruthy()
+    await expect(api.syncBcra('USD')).rejects.toBeTruthy()
   })
 })
