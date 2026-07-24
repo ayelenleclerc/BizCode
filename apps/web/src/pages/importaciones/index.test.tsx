@@ -55,4 +55,82 @@ describe('ImportacionesPage (#238)', () => {
       expect(screen.getByTestId('importaciones-summary')).toBeInTheDocument()
     })
   })
+
+  it('downloads templates and starts job with poll fallback', async () => {
+    const user = userEvent.setup()
+    const createObjectURL = vi.fn(() => 'blob:mock')
+    const revokeObjectURL = vi.fn()
+    vi.stubGlobal('URL', { createObjectURL, revokeObjectURL })
+    class FakeEventSource {
+      onmessage: ((ev: MessageEvent) => void) | null = null
+      onerror: (() => void) | null = null
+      close = vi.fn()
+      constructor(_url: string) {
+        throw new Error('SSE unavailable')
+      }
+    }
+    vi.stubGlobal('EventSource', FakeEventSource)
+
+    vi.mocked(importacionesAPI.downloadTemplate).mockResolvedValue(new Blob(['csv']))
+    vi.mocked(importacionesAPI.startJob).mockResolvedValue({
+      id: 5,
+      tenantId: 1,
+      entity: 'clientes',
+      estado: 'running',
+      modo: 'mejores_esfuerzos',
+      duplicateMode: 'skip',
+      totalRows: 1,
+      processedRows: 0,
+      okCount: 1,
+      errorCount: 0,
+      duplicateCount: 0,
+      createdCount: 0,
+      updatedCount: 0,
+      skippedCount: 0,
+      createdById: 1,
+      createdAt: '2026-07-24T00:00:00.000Z',
+      updatedAt: '2026-07-24T00:00:00.000Z',
+      completedAt: null,
+    })
+    vi.mocked(importacionesAPI.getJob).mockResolvedValue({
+      id: 5,
+      tenantId: 1,
+      entity: 'clientes',
+      estado: 'completed',
+      modo: 'mejores_esfuerzos',
+      duplicateMode: 'skip',
+      totalRows: 1,
+      processedRows: 1,
+      okCount: 1,
+      errorCount: 0,
+      duplicateCount: 0,
+      createdCount: 1,
+      updatedCount: 0,
+      skippedCount: 0,
+      createdById: 1,
+      createdAt: '2026-07-24T00:00:00.000Z',
+      updatedAt: '2026-07-24T00:00:00.000Z',
+      completedAt: '2026-07-24T00:00:00.000Z',
+    })
+    vi.mocked(importacionesAPI.downloadReport).mockResolvedValue(new Blob(['report']))
+
+    render(
+      <I18nextProvider i18n={i18n}>
+        <ImportacionesPage />
+      </I18nextProvider>,
+    )
+
+    await user.click(screen.getByTestId('importaciones-template-csv'))
+    await waitFor(() => expect(importacionesAPI.downloadTemplate).toHaveBeenCalled())
+
+    const file = new File(['x'], 'c.csv', { type: 'text/csv' })
+    await user.upload(screen.getByTestId('importaciones-file'), file)
+    await user.click(screen.getByTestId('importaciones-validate'))
+    await waitFor(() => expect(screen.getByTestId('importaciones-summary')).toBeInTheDocument())
+    await user.click(screen.getByTestId('importaciones-start'))
+    await waitFor(() => expect(importacionesAPI.startJob).toHaveBeenCalled())
+    await waitFor(() => expect(importacionesAPI.getJob).toHaveBeenCalled())
+    await user.click(screen.getByTestId('importaciones-report'))
+    await waitFor(() => expect(importacionesAPI.downloadReport).toHaveBeenCalledWith(5))
+  })
 })

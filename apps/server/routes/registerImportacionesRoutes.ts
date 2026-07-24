@@ -5,6 +5,7 @@ import type {
   ImportModo,
 } from '@bizcode/types'
 import { requirePermission, type AuthenticatedRequest } from '../auth'
+import { requireImportUpload } from '../middleware/requireImportUpload'
 import { requireModule } from '../middleware/requireModule'
 import { importacionesMutationHttpRateLimiter } from '../middleware/routeRateLimit'
 import { csvImportUploadSingle } from '../csvImport'
@@ -121,6 +122,7 @@ export function registerImportacionesRoutes(app: Application, ctx: RestRouteCont
     moduleGuard,
     managePermission,
     upload,
+    requireImportUpload,
     async (req: Request, res: Response) => {
       try {
         const entity = parseEntity(req.body?.entity ?? req.query.entity)
@@ -128,11 +130,7 @@ export function registerImportacionesRoutes(app: Application, ctx: RestRouteCont
           res.status(400).json({ success: false, error: 'entity required' })
           return
         }
-        const file = req.file
-        if (!file?.buffer) {
-          res.status(400).json({ success: false, error: 'file required' })
-          return
-        }
+        const file = req.file as Express.Multer.File
         const duplicateMode = (req.body?.duplicateMode ?? 'skip') as ImportDuplicateMode
         const result = await bulkImportValidate.validateFile(
           getTenantId(req),
@@ -158,6 +156,7 @@ export function registerImportacionesRoutes(app: Application, ctx: RestRouteCont
     moduleGuard,
     managePermission,
     upload,
+    requireImportUpload,
     async (req: Request, res: Response) => {
       try {
         const entity = parseEntity(req.body?.entity ?? req.query.entity)
@@ -165,11 +164,7 @@ export function registerImportacionesRoutes(app: Application, ctx: RestRouteCont
           res.status(400).json({ success: false, error: 'entity required' })
           return
         }
-        const file = req.file
-        if (!file?.buffer) {
-          res.status(400).json({ success: false, error: 'file required' })
-          return
-        }
+        const file = req.file as Express.Multer.File
         const modo = (
           req.body?.modo === 'todo_o_nada' ? 'todo_o_nada' : 'mejores_esfuerzos'
         ) as ImportModo
@@ -296,6 +291,7 @@ export function registerImportacionesRoutes(app: Application, ctx: RestRouteCont
 
   app.get(
     '/api/importaciones/jobs/:id/report',
+    importacionesMutationHttpRateLimiter,
     moduleGuard,
     readPermission,
     async (req: Request, res: Response) => {
