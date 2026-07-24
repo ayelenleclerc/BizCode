@@ -108,4 +108,56 @@ describe('Comisiones API (#237)', () => {
     const res = await request(app).get('/api/comisiones/configs')
     expect(res.status).toBe(403)
   })
+
+  it('GET /api/comisiones/mias returns seller estimation', async () => {
+    process.env.BIZCODE_TEST_ROLE = 'seller'
+    const app = createApp(buildPrismaMock())
+    const res = await request(app).get('/api/comisiones/mias').query({ periodo: '2026-07' })
+    expect(res.status).toBe(200)
+    expect(res.body).toMatchObject({ success: true, periodo: '2026-07' })
+    expect(res.body.estimacion).toBeDefined()
+  })
+
+  it('GET /api/comisiones/ranking requires periodo', async () => {
+    const app = createApp(buildPrismaMock())
+    const bad = await request(app).get('/api/comisiones/ranking')
+    expect(bad.status).toBe(400)
+    const ok = await request(app).get('/api/comisiones/ranking').query({ periodo: '2026-07' })
+    expect(ok.status).toBe(200)
+    expect(ok.body.success).toBe(true)
+  })
+
+  it('POST /api/comisiones/liquidaciones/generar creates drafts', async () => {
+    const app = createApp(
+      buildPrismaMock({
+        liquidacionComision: {
+          count: vi.fn().mockResolvedValue(0),
+          findMany: vi.fn().mockResolvedValue([]),
+          findFirst: vi.fn().mockResolvedValue(null),
+          findUnique: vi.fn().mockResolvedValue(null),
+          create: vi.fn().mockResolvedValue({
+            id: 11,
+            tenantId: 1,
+            vendedorId: 3,
+            periodo: '2026-07',
+            totalVentas: 0,
+            totalComision: 0,
+            estado: 'borrador',
+            aprobadoPorId: null,
+            pagadoEn: null,
+            createdAt: now,
+            updatedAt: now,
+            vendedor: { username: 'seller1' },
+            detalles: [],
+          }),
+          update: vi.fn(),
+        },
+      }),
+    )
+    const res = await request(app)
+      .post('/api/comisiones/liquidaciones/generar')
+      .send({ periodo: '2026-07', vendedorId: 3 })
+    expect(res.status).toBe(201)
+    expect(res.body.success).toBe(true)
+  })
 })

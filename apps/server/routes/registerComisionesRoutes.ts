@@ -368,6 +368,7 @@ export function registerComisionesRoutes(app: Application, ctx: RestRouteContext
 
   app.get(
     '/api/comisiones/mias',
+    comisionesMutationHttpRateLimiter,
     moduleGuard,
     selfPermission,
     async (req: Request, res: Response) => {
