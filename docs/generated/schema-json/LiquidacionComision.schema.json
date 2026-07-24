@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "aprobadoPorId": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "createdAt": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "detalle": {
+      "items": {
+        "$ref": "./LiquidacionComisionDetalle.schema.json"
+      },
+      "type": "array"
+    },
+    "estado": {
+      "enum": [
+        "borrador",
+        "aprobada",
+        "pagada"
+      ],
+      "type": "string"
+    },
+    "id": {
+      "type": "integer"
+    },
+    "pagadoEn": {
+      "format": "date-time",
+      "nullable": true,
+      "type": "string"
+    },
+    "periodo": {
+      "pattern": "^\\d{4}-\\d{2}$",
+      "type": "string"
+    },
+    "tenantId": {
+      "type": "integer"
+    },
+    "totalComision": {
+      "type": "number"
+    },
+    "totalVentas": {
+      "type": "number"
+    },
+    "updatedAt": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "vendedorId": {
+      "type": "integer"
+    },
+    "vendedorUsername": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "tenantId",
+    "vendedorId",
+    "periodo",
+    "totalVentas",
+    "totalComision",
+    "estado",
+    "aprobadoPorId",
+    "pagadoEn",
+    "createdAt",
+    "updatedAt"
+  ],
+  "title": "LiquidacionComision",
+  "type": "object"
+}

@@ -63279,6 +63279,2749 @@ Requires module `inventory.warehouses`.
 }
 ```
 
+### PARAMETERS /api/comisiones/settings
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/comisiones/settings`
+
+### Get commission accrual default mode
+
+- **Method:** `GET`
+- **Path:** `/api/comisiones/settings`
+- **Tags:** comisiones
+
+Requires module `finance.commissions`.
+
+#### Responses
+
+##### Status: 200 Settings
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`modoDevengo` (required)**
+
+    `string`, possible values: `"porcentaje_cobrado", "porcentaje_facturado", "importe_fijo_por_venta"`
+
+- **`success` (required)**
+
+  `boolean`, possible values: `true`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "modoDevengo": "porcentaje_cobrado"
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Update commission accrual default mode
+
+- **Method:** `PATCH`
+- **Path:** `/api/comisiones/settings`
+- **Tags:** comisiones
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`modoDevengo` (required)**
+
+  `string`, possible values: `"porcentaje_cobrado", "porcentaje_facturado", "importe_fijo_por_venta"`
+
+**Example:**
+
+```json
+{
+  "modoDevengo": "porcentaje_cobrado"
+}
+```
+
+#### Responses
+
+##### Status: 200 Updated
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`modoDevengo` (required)**
+
+    `string`, possible values: `"porcentaje_cobrado", "porcentaje_facturado", "importe_fijo_por_venta"`
+
+- **`success` (required)**
+
+  `boolean`, possible values: `true`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "modoDevengo": "porcentaje_cobrado"
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/comisiones/configs
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/comisiones/configs`
+
+### List commission configs
+
+- **Method:** `GET`
+- **Path:** `/api/comisiones/configs`
+- **Tags:** comisiones
+
+#### Responses
+
+##### Status: 200 Paginated configs
+
+###### Content-Type: application/json
+
+**All of:**
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`alicuota` (required)**
+
+    `number`
+
+  - **`articuloCategoriaId` (required)**
+
+    `integer`
+
+  - **`clienteId` (required)**
+
+    `integer`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"porcentaje_cobrado", "porcentaje_facturado", "importe_fijo_por_venta"`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`vendedorId` (required)**
+
+    `integer`
+
+  - **`vigenciaDesde` (required)**
+
+    `string`, format: `date-time`
+
+  - **`vigenciaHasta` (required)**
+
+    `string`, format: `date-time`
+
+  - **`vendedorUsername`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`, possible values: `true`
+
+* **`limit` (required)**
+
+  `integer` — Effective page size (same semantics as query \`limit\`)
+
+* **`offset` (required)**
+
+  `integer` — Effective skip (same semantics as query \`offset\`)
+
+* **`total` (required)**
+
+  `integer` — Row count matching the list filter (before limit/offset)
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "vendedorId": 1,
+      "tipo": "porcentaje_cobrado",
+      "alicuota": 1,
+      "vigenciaDesde": "",
+      "vigenciaHasta": "",
+      "articuloCategoriaId": 1,
+      "clienteId": 1,
+      "createdAt": "",
+      "updatedAt": "",
+      "vendedorUsername": ""
+    }
+  ],
+  "total": 0,
+  "limit": 1,
+  "offset": 0
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Create commission config
+
+- **Method:** `POST`
+- **Path:** `/api/comisiones/configs`
+- **Tags:** comisiones
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`alicuota` (required)**
+
+  `number`
+
+- **`tipo` (required)**
+
+  `string`, possible values: `"porcentaje_cobrado", "porcentaje_facturado", "importe_fijo_por_venta"`
+
+- **`vendedorId` (required)**
+
+  `integer`
+
+- **`vigenciaDesde` (required)**
+
+  `string`, format: `date-time`
+
+- **`articuloCategoriaId`**
+
+  `integer`
+
+- **`clienteId`**
+
+  `integer`
+
+- **`vigenciaHasta`**
+
+  `string`, format: `date-time`
+
+**Example:**
+
+```json
+{
+  "vendedorId": 1,
+  "tipo": "porcentaje_cobrado",
+  "alicuota": 0,
+  "vigenciaDesde": "",
+  "vigenciaHasta": "",
+  "articuloCategoriaId": 1,
+  "clienteId": 1
+}
+```
+
+#### Responses
+
+##### Status: 201 Created
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`alicuota` (required)**
+
+    `number`
+
+  - **`articuloCategoriaId` (required)**
+
+    `integer`
+
+  - **`clienteId` (required)**
+
+    `integer`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"porcentaje_cobrado", "porcentaje_facturado", "importe_fijo_por_venta"`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`vendedorId` (required)**
+
+    `integer`
+
+  - **`vigenciaDesde` (required)**
+
+    `string`, format: `date-time`
+
+  - **`vigenciaHasta` (required)**
+
+    `string`, format: `date-time`
+
+  - **`vendedorUsername`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`, possible values: `true`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "vendedorId": 1,
+    "tipo": "porcentaje_cobrado",
+    "alicuota": 1,
+    "vigenciaDesde": "",
+    "vigenciaHasta": "",
+    "articuloCategoriaId": 1,
+    "clienteId": 1,
+    "createdAt": "",
+    "updatedAt": "",
+    "vendedorUsername": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/comisiones/configs/{id}
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/comisiones/configs/{id}`
+
+### Update commission config
+
+- **Method:** `PATCH`
+- **Path:** `/api/comisiones/configs/{id}`
+- **Tags:** comisiones
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`alicuota`**
+
+  `number`
+
+- **`articuloCategoriaId`**
+
+  `integer`
+
+- **`clienteId`**
+
+  `integer`
+
+- **`tipo`**
+
+  `string`, possible values: `"porcentaje_cobrado", "porcentaje_facturado", "importe_fijo_por_venta"`
+
+- **`vendedorId`**
+
+  `integer`
+
+- **`vigenciaDesde`**
+
+  `string`, format: `date-time`
+
+- **`vigenciaHasta`**
+
+  `string`, format: `date-time`
+
+**Example:**
+
+```json
+{
+  "vendedorId": 1,
+  "tipo": "porcentaje_cobrado",
+  "alicuota": 0,
+  "vigenciaDesde": "",
+  "vigenciaHasta": "",
+  "articuloCategoriaId": 1,
+  "clienteId": 1
+}
+```
+
+#### Responses
+
+##### Status: 200 Updated
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`alicuota` (required)**
+
+    `number`
+
+  - **`articuloCategoriaId` (required)**
+
+    `integer`
+
+  - **`clienteId` (required)**
+
+    `integer`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"porcentaje_cobrado", "porcentaje_facturado", "importe_fijo_por_venta"`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`vendedorId` (required)**
+
+    `integer`
+
+  - **`vigenciaDesde` (required)**
+
+    `string`, format: `date-time`
+
+  - **`vigenciaHasta` (required)**
+
+    `string`, format: `date-time`
+
+  - **`vendedorUsername`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`, possible values: `true`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "vendedorId": 1,
+    "tipo": "porcentaje_cobrado",
+    "alicuota": 1,
+    "vigenciaDesde": "",
+    "vigenciaHasta": "",
+    "articuloCategoriaId": 1,
+    "clienteId": 1,
+    "createdAt": "",
+    "updatedAt": "",
+    "vendedorUsername": ""
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Delete commission config
+
+- **Method:** `DELETE`
+- **Path:** `/api/comisiones/configs/{id}`
+- **Tags:** comisiones
+
+#### Responses
+
+##### Status: 204 Deleted
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/comisiones/liquidaciones
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/comisiones/liquidaciones`
+
+### List commission settlements
+
+- **Method:** `GET`
+- **Path:** `/api/comisiones/liquidaciones`
+- **Tags:** comisiones
+
+#### Responses
+
+##### Status: 200 Paginated settlements
+
+###### Content-Type: application/json
+
+**All of:**
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`aprobadoPorId` (required)**
+
+    `integer`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"borrador", "aprobada", "pagada"`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`pagadoEn` (required)**
+
+    `string`, format: `date-time`
+
+  - **`periodo` (required)**
+
+    `string`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`totalComision` (required)**
+
+    `number`
+
+  - **`totalVentas` (required)**
+
+    `number`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`vendedorId` (required)**
+
+    `integer`
+
+  - **`detalle`**
+
+    `array`
+
+    **Items:**
+
+    - **`alicuota` (required)**
+
+      `number`
+
+    - **`comision` (required)**
+
+      `number`
+
+    - **`concepto` (required)**
+
+      `string`
+
+    - **`facturaId` (required)**
+
+      `integer`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`imputacionId` (required)**
+
+      `integer`
+
+    - **`liquidacionId` (required)**
+
+      `integer`
+
+    - **`montoBase` (required)**
+
+      `number`
+
+    - **`reciboCobroId` (required)**
+
+      `integer`
+
+  - **`vendedorUsername`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`, possible values: `true`
+
+* **`limit` (required)**
+
+  `integer` — Effective page size (same semantics as query \`limit\`)
+
+* **`offset` (required)**
+
+  `integer` — Effective skip (same semantics as query \`offset\`)
+
+* **`total` (required)**
+
+  `integer` — Row count matching the list filter (before limit/offset)
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "vendedorId": 1,
+      "periodo": "",
+      "totalVentas": 1,
+      "totalComision": 1,
+      "estado": "borrador",
+      "aprobadoPorId": 1,
+      "pagadoEn": "",
+      "createdAt": "",
+      "updatedAt": "",
+      "vendedorUsername": "",
+      "detalle": [
+        {
+          "id": 1,
+          "liquidacionId": 1,
+          "facturaId": 1,
+          "reciboCobroId": 1,
+          "imputacionId": 1,
+          "montoBase": 1,
+          "alicuota": 1,
+          "comision": 1,
+          "concepto": ""
+        }
+      ]
+    }
+  ],
+  "total": 0,
+  "limit": 1,
+  "offset": 0
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/comisiones/liquidaciones/generar
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/comisiones/liquidaciones/generar`
+
+### Generate draft settlements for a period
+
+- **Method:** `POST`
+- **Path:** `/api/comisiones/liquidaciones/generar`
+- **Tags:** comisiones
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`periodo` (required)**
+
+  `string`
+
+- **`vendedorId`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "periodo": "",
+  "vendedorId": 1
+}
+```
+
+#### Responses
+
+##### Status: 201 Generated
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`created` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`aprobadoPorId` (required)**
+
+      `integer`
+
+    - **`createdAt` (required)**
+
+      `string`, format: `date-time`
+
+    - **`estado` (required)**
+
+      `string`, possible values: `"borrador", "aprobada", "pagada"`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`pagadoEn` (required)**
+
+      `string`, format: `date-time`
+
+    - **`periodo` (required)**
+
+      `string`
+
+    - **`tenantId` (required)**
+
+      `integer`
+
+    - **`totalComision` (required)**
+
+      `number`
+
+    - **`totalVentas` (required)**
+
+      `number`
+
+    - **`updatedAt` (required)**
+
+      `string`, format: `date-time`
+
+    - **`vendedorId` (required)**
+
+      `integer`
+
+    - **`detalle`**
+
+      `array`
+
+      **Items:**
+
+      - **`alicuota` (required)**
+
+        `number`
+
+      - **`comision` (required)**
+
+        `number`
+
+      - **`concepto` (required)**
+
+        `string`
+
+      - **`facturaId` (required)**
+
+        `integer`
+
+      - **`id` (required)**
+
+        `integer`
+
+      - **`imputacionId` (required)**
+
+        `integer`
+
+      - **`liquidacionId` (required)**
+
+        `integer`
+
+      - **`montoBase` (required)**
+
+        `number`
+
+      - **`reciboCobroId` (required)**
+
+        `integer`
+
+    - **`vendedorUsername`**
+
+      `string`
+
+  - **`skipped` (required)**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`, possible values: `true`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "created": [
+      {
+        "id": 1,
+        "tenantId": 1,
+        "vendedorId": 1,
+        "periodo": "",
+        "totalVentas": 1,
+        "totalComision": 1,
+        "estado": "borrador",
+        "aprobadoPorId": 1,
+        "pagadoEn": "",
+        "createdAt": "",
+        "updatedAt": "",
+        "vendedorUsername": "",
+        "detalle": [
+          {
+            "id": 1,
+            "liquidacionId": 1,
+            "facturaId": 1,
+            "reciboCobroId": 1,
+            "imputacionId": 1,
+            "montoBase": 1,
+            "alicuota": 1,
+            "comision": 1,
+            "concepto": ""
+          }
+        ]
+      }
+    ],
+    "skipped": 1
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/comisiones/liquidaciones/{id}
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/comisiones/liquidaciones/{id}`
+
+### Get settlement with detail lines
+
+- **Method:** `GET`
+- **Path:** `/api/comisiones/liquidaciones/{id}`
+- **Tags:** comisiones
+
+#### Responses
+
+##### Status: 200 Settlement
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`aprobadoPorId` (required)**
+
+    `integer`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"borrador", "aprobada", "pagada"`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`pagadoEn` (required)**
+
+    `string`, format: `date-time`
+
+  - **`periodo` (required)**
+
+    `string`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`totalComision` (required)**
+
+    `number`
+
+  - **`totalVentas` (required)**
+
+    `number`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`vendedorId` (required)**
+
+    `integer`
+
+  - **`detalle`**
+
+    `array`
+
+    **Items:**
+
+    - **`alicuota` (required)**
+
+      `number`
+
+    - **`comision` (required)**
+
+      `number`
+
+    - **`concepto` (required)**
+
+      `string`
+
+    - **`facturaId` (required)**
+
+      `integer`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`imputacionId` (required)**
+
+      `integer`
+
+    - **`liquidacionId` (required)**
+
+      `integer`
+
+    - **`montoBase` (required)**
+
+      `number`
+
+    - **`reciboCobroId` (required)**
+
+      `integer`
+
+  - **`vendedorUsername`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`, possible values: `true`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "vendedorId": 1,
+    "periodo": "",
+    "totalVentas": 1,
+    "totalComision": 1,
+    "estado": "borrador",
+    "aprobadoPorId": 1,
+    "pagadoEn": "",
+    "createdAt": "",
+    "updatedAt": "",
+    "vendedorUsername": "",
+    "detalle": [
+      {
+        "id": 1,
+        "liquidacionId": 1,
+        "facturaId": 1,
+        "reciboCobroId": 1,
+        "imputacionId": 1,
+        "montoBase": 1,
+        "alicuota": 1,
+        "comision": 1,
+        "concepto": ""
+      }
+    ]
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/comisiones/liquidaciones/{id}/aprobar
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/comisiones/liquidaciones/{id}/aprobar`
+
+### Approve draft settlement
+
+- **Method:** `POST`
+- **Path:** `/api/comisiones/liquidaciones/{id}/aprobar`
+- **Tags:** comisiones
+
+#### Responses
+
+##### Status: 200 Approved
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`aprobadoPorId` (required)**
+
+    `integer`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"borrador", "aprobada", "pagada"`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`pagadoEn` (required)**
+
+    `string`, format: `date-time`
+
+  - **`periodo` (required)**
+
+    `string`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`totalComision` (required)**
+
+    `number`
+
+  - **`totalVentas` (required)**
+
+    `number`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`vendedorId` (required)**
+
+    `integer`
+
+  - **`detalle`**
+
+    `array`
+
+    **Items:**
+
+    - **`alicuota` (required)**
+
+      `number`
+
+    - **`comision` (required)**
+
+      `number`
+
+    - **`concepto` (required)**
+
+      `string`
+
+    - **`facturaId` (required)**
+
+      `integer`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`imputacionId` (required)**
+
+      `integer`
+
+    - **`liquidacionId` (required)**
+
+      `integer`
+
+    - **`montoBase` (required)**
+
+      `number`
+
+    - **`reciboCobroId` (required)**
+
+      `integer`
+
+  - **`vendedorUsername`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`, possible values: `true`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "vendedorId": 1,
+    "periodo": "",
+    "totalVentas": 1,
+    "totalComision": 1,
+    "estado": "borrador",
+    "aprobadoPorId": 1,
+    "pagadoEn": "",
+    "createdAt": "",
+    "updatedAt": "",
+    "vendedorUsername": "",
+    "detalle": [
+      {
+        "id": 1,
+        "liquidacionId": 1,
+        "facturaId": 1,
+        "reciboCobroId": 1,
+        "imputacionId": 1,
+        "montoBase": 1,
+        "alicuota": 1,
+        "comision": 1,
+        "concepto": ""
+      }
+    ]
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 422 Not draft
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/comisiones/liquidaciones/{id}/pagar
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/comisiones/liquidaciones/{id}/pagar`
+
+### Mark approved settlement as paid
+
+- **Method:** `POST`
+- **Path:** `/api/comisiones/liquidaciones/{id}/pagar`
+- **Tags:** comisiones
+
+#### Responses
+
+##### Status: 200 Paid
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`aprobadoPorId` (required)**
+
+    `integer`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"borrador", "aprobada", "pagada"`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`pagadoEn` (required)**
+
+    `string`, format: `date-time`
+
+  - **`periodo` (required)**
+
+    `string`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`totalComision` (required)**
+
+    `number`
+
+  - **`totalVentas` (required)**
+
+    `number`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`vendedorId` (required)**
+
+    `integer`
+
+  - **`detalle`**
+
+    `array`
+
+    **Items:**
+
+    - **`alicuota` (required)**
+
+      `number`
+
+    - **`comision` (required)**
+
+      `number`
+
+    - **`concepto` (required)**
+
+      `string`
+
+    - **`facturaId` (required)**
+
+      `integer`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`imputacionId` (required)**
+
+      `integer`
+
+    - **`liquidacionId` (required)**
+
+      `integer`
+
+    - **`montoBase` (required)**
+
+      `number`
+
+    - **`reciboCobroId` (required)**
+
+      `integer`
+
+  - **`vendedorUsername`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`, possible values: `true`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "vendedorId": 1,
+    "periodo": "",
+    "totalVentas": 1,
+    "totalComision": 1,
+    "estado": "borrador",
+    "aprobadoPorId": 1,
+    "pagadoEn": "",
+    "createdAt": "",
+    "updatedAt": "",
+    "vendedorUsername": "",
+    "detalle": [
+      {
+        "id": 1,
+        "liquidacionId": 1,
+        "facturaId": 1,
+        "reciboCobroId": 1,
+        "imputacionId": 1,
+        "montoBase": 1,
+        "alicuota": 1,
+        "comision": 1,
+        "concepto": ""
+      }
+    ]
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 422 Not approved
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/comisiones/liquidaciones/{id}/export.csv
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/comisiones/liquidaciones/{id}/export.csv`
+
+### Export settlement CSV
+
+- **Method:** `GET`
+- **Path:** `/api/comisiones/liquidaciones/{id}/export.csv`
+- **Tags:** comisiones
+
+#### Responses
+
+##### Status: 200 CSV file
+
+###### Content-Type: text/csv
+
+`string`
+
+**Example:**
+
+```json
+true
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 422 Still draft
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/comisiones/ranking
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/comisiones/ranking`
+
+### Ranking of sellers by commission for a period
+
+- **Method:** `GET`
+- **Path:** `/api/comisiones/ranking`
+- **Tags:** comisiones
+
+#### Responses
+
+##### Status: 200 Ranking rows
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"borrador", "aprobada", "pagada"`
+
+  - **`liquidacionId` (required)**
+
+    `integer`
+
+  - **`totalComision` (required)**
+
+    `number`
+
+  - **`totalVentas` (required)**
+
+    `number`
+
+  - **`vendedorId` (required)**
+
+    `integer`
+
+  - **`vendedorUsername` (required)**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`, possible values: `true`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "vendedorId": 1,
+      "vendedorUsername": "",
+      "totalVentas": 1,
+      "totalComision": 1,
+      "liquidacionId": 1,
+      "estado": "borrador"
+    }
+  ]
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/comisiones/mias
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/comisiones/mias`
+
+### Current seller estimate and settlement history
+
+- **Method:** `GET`
+- **Path:** `/api/comisiones/mias`
+- **Tags:** comisiones
+
+Restricted to the authenticated user (`commissions.self.read`).
+
+#### Responses
+
+##### Status: 200 Self view
+
+###### Content-Type: application/json
+
+- **`estimacion` (required)**
+
+  `object`
+
+  - **`lineas` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`alicuota` (required)**
+
+      `number`
+
+    - **`comision` (required)**
+
+      `number`
+
+    - **`concepto` (required)**
+
+      `string`
+
+    - **`facturaId` (required)**
+
+      `integer`
+
+    - **`montoBase` (required)**
+
+      `number`
+
+  - **`totalComision` (required)**
+
+    `number`
+
+  - **`totalVentas` (required)**
+
+    `number`
+
+- **`liquidaciones` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`aprobadoPorId` (required)**
+
+    `integer`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"borrador", "aprobada", "pagada"`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`pagadoEn` (required)**
+
+    `string`, format: `date-time`
+
+  - **`periodo` (required)**
+
+    `string`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`totalComision` (required)**
+
+    `number`
+
+  - **`totalVentas` (required)**
+
+    `number`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`vendedorId` (required)**
+
+    `integer`
+
+  - **`detalle`**
+
+    `array`
+
+    **Items:**
+
+    - **`alicuota` (required)**
+
+      `number`
+
+    - **`comision` (required)**
+
+      `number`
+
+    - **`concepto` (required)**
+
+      `string`
+
+    - **`facturaId` (required)**
+
+      `integer`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`imputacionId` (required)**
+
+      `integer`
+
+    - **`liquidacionId` (required)**
+
+      `integer`
+
+    - **`montoBase` (required)**
+
+      `number`
+
+    - **`reciboCobroId` (required)**
+
+      `integer`
+
+  - **`vendedorUsername`**
+
+    `string`
+
+- **`periodo` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`, possible values: `true`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "periodo": "",
+  "estimacion": {
+    "totalVentas": 1,
+    "totalComision": 1,
+    "lineas": [
+      {
+        "concepto": "",
+        "montoBase": 1,
+        "alicuota": 1,
+        "comision": 1,
+        "facturaId": 1
+      }
+    ]
+  },
+  "liquidaciones": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "vendedorId": 1,
+      "periodo": "",
+      "totalVentas": 1,
+      "totalComision": 1,
+      "estado": "borrador",
+      "aprobadoPorId": 1,
+      "pagadoEn": "",
+      "createdAt": "",
+      "updatedAt": "",
+      "vendedorUsername": "",
+      "detalle": [
+        {
+          "id": 1,
+          "liquidacionId": 1,
+          "facturaId": 1,
+          "reciboCobroId": 1,
+          "imputacionId": 1,
+          "montoBase": 1,
+          "alicuota": 1,
+          "comision": 1,
+          "concepto": ""
+        }
+      ]
+    }
+  ]
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ### PARAMETERS /api/transferencias-deposito/{id}/anular
 
 - **Method:** `PARAMETERS`
@@ -88806,6 +91549,1114 @@ Originating invoice header (selected columns)
 - **Type:**
 
 **Example:**
+
+### ComisionTipo
+
+- **Type:**`string`
+
+**Example:**
+
+### ComisionesSettingsInput
+
+- **Type:**`object`
+
+* **`modoDevengo` (required)**
+
+  `string`, possible values: `"porcentaje_cobrado", "porcentaje_facturado", "importe_fijo_por_venta"`
+
+**Example:**
+
+```json
+{
+  "modoDevengo": "porcentaje_cobrado"
+}
+```
+
+### ComisionesSettings
+
+- **Type:**`object`
+
+* **`modoDevengo` (required)**
+
+  `string`, possible values: `"porcentaje_cobrado", "porcentaje_facturado", "importe_fijo_por_venta"`
+
+**Example:**
+
+```json
+{
+  "modoDevengo": "porcentaje_cobrado"
+}
+```
+
+### ComisionesSettingsEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`modoDevengo` (required)**
+
+    `string`, possible values: `"porcentaje_cobrado", "porcentaje_facturado", "importe_fijo_por_venta"`
+
+* **`success` (required)**
+
+  `boolean`, possible values: `true`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "modoDevengo": "porcentaje_cobrado"
+  }
+}
+```
+
+### ConfigComision
+
+- **Type:**`object`
+
+* **`alicuota` (required)**
+
+  `number`
+
+* **`articuloCategoriaId` (required)**
+
+  `integer`
+
+* **`clienteId` (required)**
+
+  `integer`
+
+* **`createdAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`tenantId` (required)**
+
+  `integer`
+
+* **`tipo` (required)**
+
+  `string`, possible values: `"porcentaje_cobrado", "porcentaje_facturado", "importe_fijo_por_venta"`
+
+* **`updatedAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`vendedorId` (required)**
+
+  `integer`
+
+* **`vigenciaDesde` (required)**
+
+  `string`, format: `date-time`
+
+* **`vigenciaHasta` (required)**
+
+  `string`, format: `date-time`
+
+* **`vendedorUsername`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "tenantId": 1,
+  "vendedorId": 1,
+  "tipo": "porcentaje_cobrado",
+  "alicuota": 1,
+  "vigenciaDesde": "",
+  "vigenciaHasta": "",
+  "articuloCategoriaId": 1,
+  "clienteId": 1,
+  "createdAt": "",
+  "updatedAt": "",
+  "vendedorUsername": ""
+}
+```
+
+### ConfigComisionCreateInput
+
+- **Type:**`object`
+
+* **`alicuota` (required)**
+
+  `number`
+
+* **`tipo` (required)**
+
+  `string`, possible values: `"porcentaje_cobrado", "porcentaje_facturado", "importe_fijo_por_venta"`
+
+* **`vendedorId` (required)**
+
+  `integer`
+
+* **`vigenciaDesde` (required)**
+
+  `string`, format: `date-time`
+
+* **`articuloCategoriaId`**
+
+  `integer`
+
+* **`clienteId`**
+
+  `integer`
+
+* **`vigenciaHasta`**
+
+  `string`, format: `date-time`
+
+**Example:**
+
+```json
+{
+  "vendedorId": 1,
+  "tipo": "porcentaje_cobrado",
+  "alicuota": 0,
+  "vigenciaDesde": "",
+  "vigenciaHasta": "",
+  "articuloCategoriaId": 1,
+  "clienteId": 1
+}
+```
+
+### ConfigComisionPatchInput
+
+- **Type:**`object`
+
+* **`alicuota`**
+
+  `number`
+
+* **`articuloCategoriaId`**
+
+  `integer`
+
+* **`clienteId`**
+
+  `integer`
+
+* **`tipo`**
+
+  `string`, possible values: `"porcentaje_cobrado", "porcentaje_facturado", "importe_fijo_por_venta"`
+
+* **`vendedorId`**
+
+  `integer`
+
+* **`vigenciaDesde`**
+
+  `string`, format: `date-time`
+
+* **`vigenciaHasta`**
+
+  `string`, format: `date-time`
+
+**Example:**
+
+```json
+{
+  "vendedorId": 1,
+  "tipo": "porcentaje_cobrado",
+  "alicuota": 0,
+  "vigenciaDesde": "",
+  "vigenciaHasta": "",
+  "articuloCategoriaId": 1,
+  "clienteId": 1
+}
+```
+
+### ConfigComisionEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`alicuota` (required)**
+
+    `number`
+
+  - **`articuloCategoriaId` (required)**
+
+    `integer`
+
+  - **`clienteId` (required)**
+
+    `integer`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"porcentaje_cobrado", "porcentaje_facturado", "importe_fijo_por_venta"`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`vendedorId` (required)**
+
+    `integer`
+
+  - **`vigenciaDesde` (required)**
+
+    `string`, format: `date-time`
+
+  - **`vigenciaHasta` (required)**
+
+    `string`, format: `date-time`
+
+  - **`vendedorUsername`**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`, possible values: `true`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "vendedorId": 1,
+    "tipo": "porcentaje_cobrado",
+    "alicuota": 1,
+    "vigenciaDesde": "",
+    "vigenciaHasta": "",
+    "articuloCategoriaId": 1,
+    "clienteId": 1,
+    "createdAt": "",
+    "updatedAt": "",
+    "vendedorUsername": ""
+  }
+}
+```
+
+### ConfigComisionListEnvelope
+
+- **Type:**
+
+**Example:**
+
+### LiquidacionComisionDetalle
+
+- **Type:**`object`
+
+* **`alicuota` (required)**
+
+  `number`
+
+* **`comision` (required)**
+
+  `number`
+
+* **`concepto` (required)**
+
+  `string`
+
+* **`facturaId` (required)**
+
+  `integer`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`imputacionId` (required)**
+
+  `integer`
+
+* **`liquidacionId` (required)**
+
+  `integer`
+
+* **`montoBase` (required)**
+
+  `number`
+
+* **`reciboCobroId` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "liquidacionId": 1,
+  "facturaId": 1,
+  "reciboCobroId": 1,
+  "imputacionId": 1,
+  "montoBase": 1,
+  "alicuota": 1,
+  "comision": 1,
+  "concepto": ""
+}
+```
+
+### LiquidacionComision
+
+- **Type:**`object`
+
+* **`aprobadoPorId` (required)**
+
+  `integer`
+
+* **`createdAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`estado` (required)**
+
+  `string`, possible values: `"borrador", "aprobada", "pagada"`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`pagadoEn` (required)**
+
+  `string`, format: `date-time`
+
+* **`periodo` (required)**
+
+  `string`
+
+* **`tenantId` (required)**
+
+  `integer`
+
+* **`totalComision` (required)**
+
+  `number`
+
+* **`totalVentas` (required)**
+
+  `number`
+
+* **`updatedAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`vendedorId` (required)**
+
+  `integer`
+
+* **`detalle`**
+
+  `array`
+
+  **Items:**
+
+  - **`alicuota` (required)**
+
+    `number`
+
+  - **`comision` (required)**
+
+    `number`
+
+  - **`concepto` (required)**
+
+    `string`
+
+  - **`facturaId` (required)**
+
+    `integer`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`imputacionId` (required)**
+
+    `integer`
+
+  - **`liquidacionId` (required)**
+
+    `integer`
+
+  - **`montoBase` (required)**
+
+    `number`
+
+  - **`reciboCobroId` (required)**
+
+    `integer`
+
+* **`vendedorUsername`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "tenantId": 1,
+  "vendedorId": 1,
+  "periodo": "",
+  "totalVentas": 1,
+  "totalComision": 1,
+  "estado": "borrador",
+  "aprobadoPorId": 1,
+  "pagadoEn": "",
+  "createdAt": "",
+  "updatedAt": "",
+  "vendedorUsername": "",
+  "detalle": [
+    {
+      "id": 1,
+      "liquidacionId": 1,
+      "facturaId": 1,
+      "reciboCobroId": 1,
+      "imputacionId": 1,
+      "montoBase": 1,
+      "alicuota": 1,
+      "comision": 1,
+      "concepto": ""
+    }
+  ]
+}
+```
+
+### LiquidacionComisionEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`aprobadoPorId` (required)**
+
+    `integer`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"borrador", "aprobada", "pagada"`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`pagadoEn` (required)**
+
+    `string`, format: `date-time`
+
+  - **`periodo` (required)**
+
+    `string`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`totalComision` (required)**
+
+    `number`
+
+  - **`totalVentas` (required)**
+
+    `number`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`vendedorId` (required)**
+
+    `integer`
+
+  - **`detalle`**
+
+    `array`
+
+    **Items:**
+
+    - **`alicuota` (required)**
+
+      `number`
+
+    - **`comision` (required)**
+
+      `number`
+
+    - **`concepto` (required)**
+
+      `string`
+
+    - **`facturaId` (required)**
+
+      `integer`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`imputacionId` (required)**
+
+      `integer`
+
+    - **`liquidacionId` (required)**
+
+      `integer`
+
+    - **`montoBase` (required)**
+
+      `number`
+
+    - **`reciboCobroId` (required)**
+
+      `integer`
+
+  - **`vendedorUsername`**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`, possible values: `true`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "vendedorId": 1,
+    "periodo": "",
+    "totalVentas": 1,
+    "totalComision": 1,
+    "estado": "borrador",
+    "aprobadoPorId": 1,
+    "pagadoEn": "",
+    "createdAt": "",
+    "updatedAt": "",
+    "vendedorUsername": "",
+    "detalle": [
+      {
+        "id": 1,
+        "liquidacionId": 1,
+        "facturaId": 1,
+        "reciboCobroId": 1,
+        "imputacionId": 1,
+        "montoBase": 1,
+        "alicuota": 1,
+        "comision": 1,
+        "concepto": ""
+      }
+    ]
+  }
+}
+```
+
+### LiquidacionComisionListEnvelope
+
+- **Type:**
+
+**Example:**
+
+### LiquidacionGenerarInput
+
+- **Type:**`object`
+
+* **`periodo` (required)**
+
+  `string`
+
+* **`vendedorId`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "periodo": "",
+  "vendedorId": 1
+}
+```
+
+### LiquidacionGenerarEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`created` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`aprobadoPorId` (required)**
+
+      `integer`
+
+    - **`createdAt` (required)**
+
+      `string`, format: `date-time`
+
+    - **`estado` (required)**
+
+      `string`, possible values: `"borrador", "aprobada", "pagada"`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`pagadoEn` (required)**
+
+      `string`, format: `date-time`
+
+    - **`periodo` (required)**
+
+      `string`
+
+    - **`tenantId` (required)**
+
+      `integer`
+
+    - **`totalComision` (required)**
+
+      `number`
+
+    - **`totalVentas` (required)**
+
+      `number`
+
+    - **`updatedAt` (required)**
+
+      `string`, format: `date-time`
+
+    - **`vendedorId` (required)**
+
+      `integer`
+
+    - **`detalle`**
+
+      `array`
+
+      **Items:**
+
+      - **`alicuota` (required)**
+
+        `number`
+
+      - **`comision` (required)**
+
+        `number`
+
+      - **`concepto` (required)**
+
+        `string`
+
+      - **`facturaId` (required)**
+
+        `integer`
+
+      - **`id` (required)**
+
+        `integer`
+
+      - **`imputacionId` (required)**
+
+        `integer`
+
+      - **`liquidacionId` (required)**
+
+        `integer`
+
+      - **`montoBase` (required)**
+
+        `number`
+
+      - **`reciboCobroId` (required)**
+
+        `integer`
+
+    - **`vendedorUsername`**
+
+      `string`
+
+  - **`skipped` (required)**
+
+    `integer`
+
+* **`success` (required)**
+
+  `boolean`, possible values: `true`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "created": [
+      {
+        "id": 1,
+        "tenantId": 1,
+        "vendedorId": 1,
+        "periodo": "",
+        "totalVentas": 1,
+        "totalComision": 1,
+        "estado": "borrador",
+        "aprobadoPorId": 1,
+        "pagadoEn": "",
+        "createdAt": "",
+        "updatedAt": "",
+        "vendedorUsername": "",
+        "detalle": [
+          {
+            "id": 1,
+            "liquidacionId": 1,
+            "facturaId": 1,
+            "reciboCobroId": 1,
+            "imputacionId": 1,
+            "montoBase": 1,
+            "alicuota": 1,
+            "comision": 1,
+            "concepto": ""
+          }
+        ]
+      }
+    ],
+    "skipped": 1
+  }
+}
+```
+
+### ComisionRankingRow
+
+- **Type:**`object`
+
+* **`estado` (required)**
+
+  `string`, possible values: `"borrador", "aprobada", "pagada"`
+
+* **`liquidacionId` (required)**
+
+  `integer`
+
+* **`totalComision` (required)**
+
+  `number`
+
+* **`totalVentas` (required)**
+
+  `number`
+
+* **`vendedorId` (required)**
+
+  `integer`
+
+* **`vendedorUsername` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "vendedorId": 1,
+  "vendedorUsername": "",
+  "totalVentas": 1,
+  "totalComision": 1,
+  "liquidacionId": 1,
+  "estado": "borrador"
+}
+```
+
+### ComisionRankingEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"borrador", "aprobada", "pagada"`
+
+  - **`liquidacionId` (required)**
+
+    `integer`
+
+  - **`totalComision` (required)**
+
+    `number`
+
+  - **`totalVentas` (required)**
+
+    `number`
+
+  - **`vendedorId` (required)**
+
+    `integer`
+
+  - **`vendedorUsername` (required)**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`, possible values: `true`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "vendedorId": 1,
+      "vendedorUsername": "",
+      "totalVentas": 1,
+      "totalComision": 1,
+      "liquidacionId": 1,
+      "estado": "borrador"
+    }
+  ]
+}
+```
+
+### MisComisionesResponse
+
+- **Type:**`object`
+
+* **`estimacion` (required)**
+
+  `object`
+
+  - **`lineas` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`alicuota` (required)**
+
+      `number`
+
+    - **`comision` (required)**
+
+      `number`
+
+    - **`concepto` (required)**
+
+      `string`
+
+    - **`facturaId` (required)**
+
+      `integer`
+
+    - **`montoBase` (required)**
+
+      `number`
+
+  - **`totalComision` (required)**
+
+    `number`
+
+  - **`totalVentas` (required)**
+
+    `number`
+
+* **`liquidaciones` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`aprobadoPorId` (required)**
+
+    `integer`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"borrador", "aprobada", "pagada"`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`pagadoEn` (required)**
+
+    `string`, format: `date-time`
+
+  - **`periodo` (required)**
+
+    `string`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`totalComision` (required)**
+
+    `number`
+
+  - **`totalVentas` (required)**
+
+    `number`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`vendedorId` (required)**
+
+    `integer`
+
+  - **`detalle`**
+
+    `array`
+
+    **Items:**
+
+    - **`alicuota` (required)**
+
+      `number`
+
+    - **`comision` (required)**
+
+      `number`
+
+    - **`concepto` (required)**
+
+      `string`
+
+    - **`facturaId` (required)**
+
+      `integer`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`imputacionId` (required)**
+
+      `integer`
+
+    - **`liquidacionId` (required)**
+
+      `integer`
+
+    - **`montoBase` (required)**
+
+      `number`
+
+    - **`reciboCobroId` (required)**
+
+      `integer`
+
+  - **`vendedorUsername`**
+
+    `string`
+
+* **`periodo` (required)**
+
+  `string`
+
+* **`success` (required)**
+
+  `boolean`, possible values: `true`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "periodo": "",
+  "estimacion": {
+    "totalVentas": 1,
+    "totalComision": 1,
+    "lineas": [
+      {
+        "concepto": "",
+        "montoBase": 1,
+        "alicuota": 1,
+        "comision": 1,
+        "facturaId": 1
+      }
+    ]
+  },
+  "liquidaciones": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "vendedorId": 1,
+      "periodo": "",
+      "totalVentas": 1,
+      "totalComision": 1,
+      "estado": "borrador",
+      "aprobadoPorId": 1,
+      "pagadoEn": "",
+      "createdAt": "",
+      "updatedAt": "",
+      "vendedorUsername": "",
+      "detalle": [
+        {
+          "id": 1,
+          "liquidacionId": 1,
+          "facturaId": 1,
+          "reciboCobroId": 1,
+          "imputacionId": 1,
+          "montoBase": 1,
+          "alicuota": 1,
+          "comision": 1,
+          "concepto": ""
+        }
+      ]
+    }
+  ]
+}
+```
 
 ### CategoriaArticuloCreateInput
 

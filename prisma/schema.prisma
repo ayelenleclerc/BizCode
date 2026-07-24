@@ -97,6 +97,7 @@ model Cliente {
   recibosCobro   ReciboCobro[]
   portalMagicLinks PortalMagicLink[]
   portalSessions   PortalSession[]
+  configsComision ConfigComision[]
 
   @@unique([tenantId, codigo])
   @@index([tenantId])
@@ -139,6 +140,7 @@ model CategoriaArticulo {
 
   atributos CategoriaAtributo[]
   articulos Articulo[]
+  configsComision ConfigComision[]
 
   @@index([tenantId])
   @@index([tenantId, padreId])
@@ -821,6 +823,7 @@ model Factura {
   mercadoPagoReconciliationEntries MercadoPagoReconciliationEntry[]
   mercadoPagoRefunds           MercadoPagoRefund[]
   mercadoPagoChargebacks       MercadoPagoChargeback[]
+  liquidacionComisionDetalles  LiquidacionComisionDetalle[]
 
   @@unique([tenantId, tipo, prefijo, numero])
   @@index([tenantId])
@@ -1421,6 +1424,8 @@ model Tenant {
   mercadoPagoReconciliationEntries MercadoPagoReconciliationEntry[]
   mercadoPagoRefunds            MercadoPagoRefund[]
   mercadoPagoChargebacks        MercadoPagoChargeback[]
+  configsComision               ConfigComision[]
+  liquidacionesComision         LiquidacionComision[]
 }
 
 /// Idempotent Mercado Pago payment webhook processing (#176).
@@ -1632,6 +1637,11 @@ model TenantConfig {
   plan          String   @db.VarChar(20) @default("starter")
   modules       String[]
   integrations  String[] @default([])
+  /// @en Default commission accrual mode for new configs (#237).
+  /// @es Modo de devengo de comisión por defecto para configs nuevas (#237).
+  /// @pt-BR Modo de apropriação de comissão padrão para novas configs (#237).
+  /// porcentaje_cobrado | porcentaje_facturado | importe_fijo_por_venta
+  comisionesModoDevengo String @default("porcentaje_cobrado") @db.VarChar(40)
   updatedById   Int?
   updatedBy     AppUser? @relation("TenantConfigUpdatedBy", fields: [updatedById], references: [id])
   updatedAt     DateTime @updatedAt
@@ -1815,6 +1825,9 @@ model AppUser {
   garantiaUsos           GarantiaUso[]  @relation("GarantiaUsoUser")
   turnosCajaCajero       TurnoCaja[]    @relation("TurnoCajaCajero")
   movimientosCaja        MovimientoCaja[] @relation("MovimientoCajaUser")
+  configsComision        ConfigComision[] @relation("ConfigComisionVendedor")
+  liquidacionesComision  LiquidacionComision[] @relation("LiquidacionComisionVendedor")
+  liquidacionesComisionAprobadas LiquidacionComision[] @relation("LiquidacionComisionAprobadoPor")
 
   @@unique([tenantId, username])
 }
@@ -1979,6 +1992,7 @@ model ReciboCobro {
   mercadoPagoProcessedPayments MercadoPagoProcessedPayment[]
   mercadoPagoReconciliationEntries MercadoPagoReconciliationEntry[]
   mercadoPagoRefunds           MercadoPagoRefund[]
+  liquidacionComisionDetalles  LiquidacionComisionDetalle[]
 
   @@unique([tenantId, numero])
   @@index([tenantId, clienteId])
@@ -2009,9 +2023,89 @@ model ReciboCobroImputacion {
   importe       Decimal     @db.Decimal(14, 2)
   saldoPrevio   Decimal     @db.Decimal(14, 2)
   saldoPostPago Decimal     @db.Decimal(14, 2)
+  liquidacionComisionDetalles LiquidacionComisionDetalle[]
 
   @@index([reciboCobroId])
   @@index([facturaId])
+}
+
+/// @en Seller commission rate configuration with optional client/category overrides (#237).
+/// @es Configuración de alícuota de comisión de vendedor con overrides opcionales por cliente/categoría (#237).
+/// @pt-BR Configuração de alíquota de comissão de vendedor com overrides opcionais por cliente/categoria (#237).
+model ConfigComision {
+  id                  Int       @id @default(autoincrement())
+  tenantId            Int
+  tenant              Tenant    @relation(fields: [tenantId], references: [id])
+  vendedorId          Int
+  vendedor            AppUser   @relation("ConfigComisionVendedor", fields: [vendedorId], references: [id])
+  /// porcentaje_cobrado | porcentaje_facturado | importe_fijo_por_venta
+  tipo                String    @db.VarChar(40)
+  alicuota            Decimal   @db.Decimal(14, 4)
+  vigenciaDesde       DateTime
+  vigenciaHasta       DateTime?
+  articuloCategoriaId Int?
+  articuloCategoria   CategoriaArticulo? @relation(fields: [articuloCategoriaId], references: [id], onDelete: SetNull)
+  clienteId           Int?
+  cliente             Cliente?  @relation(fields: [clienteId], references: [id], onDelete: SetNull)
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  @@index([tenantId, vendedorId])
+  @@index([tenantId, vendedorId, vigenciaDesde])
+  @@index([tenantId, clienteId])
+  @@index([tenantId, articuloCategoriaId])
+}
+
+/// @en Monthly commission settlement for one seller (#237).
+/// @es Liquidación mensual de comisión de un vendedor (#237).
+/// @pt-BR Liquidação mensal de comissão de um vendedor (#237).
+model LiquidacionComision {
+  id             Int       @id @default(autoincrement())
+  tenantId       Int
+  tenant         Tenant    @relation(fields: [tenantId], references: [id])
+  vendedorId     Int
+  vendedor       AppUser   @relation("LiquidacionComisionVendedor", fields: [vendedorId], references: [id])
+  /// YYYY-MM
+  periodo        String    @db.VarChar(7)
+  totalVentas    Decimal   @db.Decimal(14, 2) @default(0)
+  totalComision  Decimal   @db.Decimal(14, 2) @default(0)
+  /// borrador | aprobada | pagada
+  estado         String    @db.VarChar(20) @default("borrador")
+  aprobadoPorId  Int?
+  aprobadoPor    AppUser?  @relation("LiquidacionComisionAprobadoPor", fields: [aprobadoPorId], references: [id])
+  pagadoEn       DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  detalle LiquidacionComisionDetalle[]
+
+  @@unique([tenantId, vendedorId, periodo])
+  @@index([tenantId, periodo])
+  @@index([tenantId, estado])
+}
+
+/// @en Line of a commission settlement (#237).
+/// @es Línea de una liquidación de comisión (#237).
+/// @pt-BR Linha de uma liquidação de comissão (#237).
+model LiquidacionComisionDetalle {
+  id              Int                 @id @default(autoincrement())
+  liquidacionId   Int
+  liquidacion     LiquidacionComision @relation(fields: [liquidacionId], references: [id], onDelete: Cascade)
+  facturaId       Int?
+  factura         Factura?            @relation(fields: [facturaId], references: [id], onDelete: SetNull)
+  reciboCobroId   Int?
+  reciboCobro     ReciboCobro?        @relation(fields: [reciboCobroId], references: [id], onDelete: SetNull)
+  imputacionId    Int?
+  imputacion      ReciboCobroImputacion? @relation(fields: [imputacionId], references: [id], onDelete: SetNull)
+  montoBase       Decimal             @db.Decimal(14, 2)
+  alicuota        Decimal             @db.Decimal(14, 4)
+  comision        Decimal             @db.Decimal(14, 2)
+  concepto        String              @db.VarChar(200)
+
+  @@index([liquidacionId])
+  @@index([facturaId])
+  @@index([reciboCobroId])
+  @@index([imputacionId])
 }
 
 model StockAjuste {

@@ -30,6 +30,7 @@ export const MODULE_PRESETS: Record<ModulePresetKey, readonly ModuleKey[]> = {
     'inventory.fefo',
     'logistics.purchases',
     'apps.driver',
+    'finance.commissions',
   ]),
   MINORISTA_ROPA: mergeModules(DEFAULT_MODULES, [
     'billing.pos',
@@ -46,6 +47,7 @@ export const MODULE_PRESETS: Record<ModulePresetKey, readonly ModuleKey[]> = {
     'inventory.warehouses',
     'finance.bank_reconcile',
     'logistics.purchases',
+    'finance.commissions',
   ]),
   MINORISTA_ALIMENTOS: mergeModules(DEFAULT_MODULES, [
     'billing.pos',
@@ -54,6 +56,7 @@ export const MODULE_PRESETS: Record<ModulePresetKey, readonly ModuleKey[]> = {
     'inventory.warehouses',
     'inventory.fefo',
     'billing.orders',
+    'finance.commissions',
   ]),
   EMPRESA_SERVICIOS: mergeModules(DEFAULT_MODULES, [
     'service.contracts',

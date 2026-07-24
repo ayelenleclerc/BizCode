@@ -162,6 +162,17 @@ export const depositosMutationHttpRateLimiter = createRouteLimiter({
   skipUnless: () => true,
 })
 
+/**
+ * @en Per-IP rate limit for commission mutations (#237); visible to CodeQL on route handlers.
+ * @es Límite por IP para mutaciones de comisiones (#237); visible a CodeQL en los handlers.
+ * @pt-BR Limite por IP para mutações de comissões (#237); visível ao CodeQL nos handlers.
+ */
+export const comisionesMutationHttpRateLimiter = createRouteLimiter({
+  windowMs: MINUTE_MS,
+  limit: parsePositiveInt(process.env.HTTP_RATE_LIMIT_PER_MINUTE, API_GENERAL_DEFAULT),
+  skipUnless: () => true,
+})
+
 function runLimiterChain(
   req: Request,
   res: Response,

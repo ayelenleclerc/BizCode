@@ -45,6 +45,10 @@ export const PERMISSIONS = [
   'settings.business.manage',
   'settings.fiscal.manage',
   'audit.read',
+  'commissions.read',
+  'commissions.manage',
+  'commissions.approve',
+  'commissions.self.read',
   'platform.tenants.manage',
   'platform.support.impersonate',
 ] as const
@@ -93,6 +97,10 @@ export const OWNER_PERMISSIONS = [
   'settings.business.manage',
   'settings.fiscal.manage',
   'audit.read',
+  'commissions.read',
+  'commissions.manage',
+  'commissions.approve',
+  'commissions.self.read',
 ] as const satisfies readonly Permission[]
 
 /** Platform-only permissions (not included in owner). */
@@ -119,6 +127,9 @@ export const ROLE_PERMISSIONS: Record<UserRole, readonly Permission[]> = {
     'logistics.manage',
     'reports.operational.read',
     'audit.read',
+    'commissions.read',
+    'commissions.manage',
+    'commissions.approve',
   ],
   seller: [
     'sales.create',
@@ -128,6 +139,7 @@ export const ROLE_PERMISSIONS: Record<UserRole, readonly Permission[]> = {
     'products.read',
     'suppliers.read',
     'logistics.read',
+    'commissions.self.read',
   ],
   backoffice: [
     'customers.read',
@@ -161,8 +173,14 @@ export const ROLE_PERMISSIONS: Record<UserRole, readonly Permission[]> = {
   driver: ['orders.deliver.confirm'],
   billing: ['sales.create', 'sales.cancel', 'reports.operational.read'],
   cashier: ['sales.create', 'reports.operational.read'],
-  collections: ['reports.operational.read', 'reports.financial.read'],
-  finance: ['reports.financial.read', 'audit.read'],
+  collections: ['reports.operational.read', 'reports.financial.read', 'commissions.read'],
+  finance: [
+    'reports.financial.read',
+    'audit.read',
+    'commissions.read',
+    'commissions.manage',
+    'commissions.approve',
+  ],
   auditor: ['reports.operational.read', 'reports.financial.read', 'audit.read'],
 }
 

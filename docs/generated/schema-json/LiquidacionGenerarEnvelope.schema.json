@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "data": {
+      "properties": {
+        "created": {
+          "items": {
+            "$ref": "./LiquidacionComision.schema.json"
+          },
+          "type": "array"
+        },
+        "skipped": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "created",
+        "skipped"
+      ],
+      "type": "object"
+    },
+    "success": {
+      "enum": [
+        true
+      ],
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "success",
+    "data"
+  ],
+  "title": "LiquidacionGenerarEnvelope",
+  "type": "object"
+}

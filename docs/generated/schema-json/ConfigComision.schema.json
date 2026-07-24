@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "alicuota": {
+      "type": "number"
+    },
+    "articuloCategoriaId": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "clienteId": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "createdAt": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "id": {
+      "type": "integer"
+    },
+    "tenantId": {
+      "type": "integer"
+    },
+    "tipo": {
+      "$ref": "./ComisionTipo.schema.json"
+    },
+    "updatedAt": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "vendedorId": {
+      "type": "integer"
+    },
+    "vendedorUsername": {
+      "type": "string"
+    },
+    "vigenciaDesde": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "vigenciaHasta": {
+      "format": "date-time",
+      "nullable": true,
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "tenantId",
+    "vendedorId",
+    "tipo",
+    "alicuota",
+    "vigenciaDesde",
+    "vigenciaHasta",
+    "articuloCategoriaId",
+    "clienteId",
+    "createdAt",
+    "updatedAt"
+  ],
+  "title": "ConfigComision",
+  "type": "object"
+}

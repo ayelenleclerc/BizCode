@@ -1,0 +1,48 @@
+{
+  "title": "Comisiones",
+  "configTitle": "Configuración de comisiones",
+  "configSubtitle": "Alícuotas por vendedor y vigencia",
+  "liquidacionesTitle": "Liquidaciones",
+  "liquidacionesSubtitle": "Generar, aprobar y pagar comisiones mensuales",
+  "miasTitle": "Mis comisiones",
+  "miasSubtitle": "Estimación del período e historial",
+  "vendedorId": "ID vendedor",
+  "tipo": "Tipo",
+  "alicuota": "Alícuota",
+  "vigenciaDesde": "Vigencia desde",
+  "vigenciaHasta": "Vigencia hasta",
+  "clienteId": "ID cliente (opcional)",
+  "categoriaId": "ID categoría (opcional)",
+  "create": "Crear configuración",
+  "modoDevengo": "Modo de devengo por defecto",
+  "saveSettings": "Guardar modo",
+  "periodo": "Período (YYYY-MM)",
+  "generar": "Generar liquidaciones",
+  "aprobar": "Aprobar",
+  "pagar": "Marcar pagada",
+  "ranking": "Ranking del período",
+  "totalVentas": "Total base",
+  "totalComision": "Total comisión",
+  "estado": "Estado",
+  "emptyConfigs": "No hay configuraciones",
+  "emptyLiquidaciones": "No hay liquidaciones",
+  "emptyEstimacion": "Sin estimación para el período",
+  "estimacion": "Estimación",
+  "historial": "Historial",
+  "tipos": {
+    "porcentaje_cobrado": "% sobre cobrado",
+    "porcentaje_facturado": "% sobre facturado",
+    "importe_fijo_por_venta": "Importe fijo por venta"
+  },
+  "estados": {
+    "borrador": "Borrador",
+    "aprobada": "Aprobada",
+    "pagada": "Pagada"
+  },
+  "errors": {
+    "load": "No se pudieron cargar los datos",
+    "save": "No se pudo guardar",
+    "action": "No se pudo completar la acción"
+  },
+  "confirmDelete": "¿Eliminar esta configuración?"
+}

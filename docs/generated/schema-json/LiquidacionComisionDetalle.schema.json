@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "alicuota": {
+      "type": "number"
+    },
+    "comision": {
+      "type": "number"
+    },
+    "concepto": {
+      "type": "string"
+    },
+    "facturaId": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "id": {
+      "type": "integer"
+    },
+    "imputacionId": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "liquidacionId": {
+      "type": "integer"
+    },
+    "montoBase": {
+      "type": "number"
+    },
+    "reciboCobroId": {
+      "nullable": true,
+      "type": "integer"
+    }
+  },
+  "required": [
+    "id",
+    "liquidacionId",
+    "facturaId",
+    "reciboCobroId",
+    "imputacionId",
+    "montoBase",
+    "alicuota",
+    "comision",
+    "concepto"
+  ],
+  "title": "LiquidacionComisionDetalle",
+  "type": "object"
+}
