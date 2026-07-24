@@ -35,6 +35,10 @@ function mapFacturaToPdfInput(
     iva2: { toString: () => string }
     cae: string | null
     caeVto: Date | null
+    tipoCambioValor?: { toString: () => string } | null
+    tipoCambioMoneda?: string | null
+    tipoCambioTipo?: string | null
+    tipoCambioFecha?: Date | null
     cliente: {
       rsocial: string
       cuit: string | null
@@ -47,6 +51,9 @@ function mapFacturaToPdfInput(
       dscto: { toString: () => string }
       subtotal: { toString: () => string }
       descripcion?: string | null
+      monedaOrigen?: string | null
+      precioOrigen?: { toString: () => string } | null
+      tipoCambioValor?: { toString: () => string } | null
       articulo: { descripcion: string } | null
     }>
     retencionesAplicadas?: Array<{
@@ -89,11 +96,21 @@ function mapFacturaToPdfInput(
           (item.descripcion && item.descripcion.trim()) ||
           item.articulo?.descripcion ||
           '—',
+        monedaOrigen: item.monedaOrigen ?? null,
+        precioOrigen:
+          item.precioOrigen != null ? Number(item.precioOrigen.toString()) : null,
+        tipoCambioValor:
+          item.tipoCambioValor != null ? Number(item.tipoCambioValor.toString()) : null,
       })),
       percepciones: (factura.retencionesAplicadas ?? []).map((row) => ({
         nombre: row.regimen.nombre,
         importe: Number(row.importe),
       })),
+      tipoCambioValor:
+        factura.tipoCambioValor != null ? Number(factura.tipoCambioValor.toString()) : null,
+      tipoCambioMoneda: factura.tipoCambioMoneda ?? null,
+      tipoCambioTipo: factura.tipoCambioTipo ?? null,
+      tipoCambioFecha: factura.tipoCambioFecha ?? null,
     },
   }
 }

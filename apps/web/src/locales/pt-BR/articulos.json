@@ -94,8 +94,15 @@
       "2": "10,5%",
       "3": "Isento"
     },
+    "multicurrency": {
+      "title": "Preço em moeda estrangeira",
+      "currency": "Moeda do preço",
+      "sourcePrice": "Preço na moeda de origem",
+      "sourcePriceHint": "Valor expresso em {{currency}}."
+    },
     "errors": {
-      "generic": "Erro ao salvar produto"
+      "generic": "Erro ao salvar produto",
+      "foreignPriceRequired": "Informe um preço na moeda de origem."
     }
   },
   "stockAdjust": {

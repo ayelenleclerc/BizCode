@@ -80,6 +80,10 @@ export type ArticuloInput = {
   precioLista1: number
   precioLista2: number
   costo: number
+  /** @en Catalog price currency ARS|USD|EUR (#243). @es Moneda de precio (#243). @pt-BR Moeda de preço (#243). */
+  monedaPrecio?: 'ARS' | 'USD' | 'EUR'
+  /** @en Foreign price when monedaPrecio is USD/EUR (#243). @es Precio en moneda origen (#243). @pt-BR Preço na moeda de origem (#243). */
+  precioEnMonedaOrigen?: number | null
   stock: number
   minimo: number
   activo: boolean

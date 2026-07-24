@@ -84,6 +84,19 @@ export function renderFacturaPdfA4(
       doc.text(item.dscto.toFixed(1), 395, y, { width: 40, align: 'right' })
       doc.text(formatMoney(item.subtotal), 450, y, { width: 100, align: 'right' })
       y += 16
+      if (item.monedaOrigen && item.precioOrigen != null && item.tipoCambioValor != null) {
+        doc
+          .fontSize(7)
+          .fillColor('#555555')
+          .text(
+            `Origen ${item.monedaOrigen} ${item.precioOrigen.toFixed(4)} × TC ${item.tipoCambioValor.toFixed(4)}`,
+            40,
+            y,
+            { width: 510 },
+          )
+        doc.fillColor('#000000').fontSize(9)
+        y += 12
+      }
     }
 
     doc.y = y + 8
@@ -97,6 +110,19 @@ export function renderFacturaPdfA4(
       doc.text(`${percepcion.nombre}: ${formatMoney(percepcion.importe)}`)
     }
     doc.fontSize(12).text(`Importe total: ${formatMoney(factura.total)}`, { underline: true })
+    if (
+      factura.tipoCambioValor != null &&
+      factura.tipoCambioMoneda &&
+      factura.tipoCambioTipo
+    ) {
+      doc.moveDown(0.3)
+      const fechaTc = factura.tipoCambioFecha ? formatDate(factura.tipoCambioFecha) : '—'
+      doc
+        .fontSize(9)
+        .text(
+          `Tipo de cambio aplicado: ${factura.tipoCambioMoneda} ${factura.tipoCambioTipo} = ${factura.tipoCambioValor.toFixed(4)} (${fechaTc})`,
+        )
+    }
 
     if (!preview && factura.cae) {
       doc.moveDown()
@@ -163,6 +189,18 @@ export function renderFacturaTicket80mm(input: ArcaFacturaPdfInput): Promise<Buf
 
     doc.moveDown(0.3)
     doc.fontSize(10).text(`TOTAL ${formatMoney(factura.total)}`, { align: 'center' })
+    if (
+      factura.tipoCambioValor != null &&
+      factura.tipoCambioMoneda &&
+      factura.tipoCambioTipo
+    ) {
+      doc
+        .fontSize(7)
+        .text(
+          `TC ${factura.tipoCambioMoneda} ${factura.tipoCambioTipo} ${factura.tipoCambioValor.toFixed(4)}`,
+          { align: 'center' },
+        )
+    }
 
     if (fiscal && factura.cae) {
       doc.fontSize(7).text(`CAE ${factura.cae}`, { align: 'center' })

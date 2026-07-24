@@ -94,8 +94,15 @@
       "2": "10.5%",
       "3": "Exempt"
     },
+    "multicurrency": {
+      "title": "Foreign-currency price",
+      "currency": "Price currency",
+      "sourcePrice": "Price in source currency",
+      "sourcePriceHint": "Amount expressed in {{currency}}."
+    },
     "errors": {
-      "generic": "Error saving product"
+      "generic": "Error saving product",
+      "foreignPriceRequired": "Enter a price in the source currency."
     }
   },
   "stockAdjust": {

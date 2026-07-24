@@ -64,6 +64,8 @@ tags:
     description: Seller commissions configuration and monthly settlements (#237, module finance.commissions)
   - name: importaciones
     description: Bulk Excel/CSV import jobs with dry-run and SSE progress (#238, module platform.data_import)
+  - name: tipos-cambio
+    description: Exchange rates and FX catalog pricing (#243, module catalog.multicurrency)
   - name: cobros
     description: Customer payment collections
   - name: portal
@@ -10847,6 +10849,178 @@ paths:
         '403':
           $ref: '#/components/responses/ForbiddenError'
 
+  /api/tipos-cambio:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: moneda
+        in: query
+        schema:
+          type: string
+          enum: [USD, EUR]
+      - name: tipo
+        in: query
+        schema:
+          type: string
+          enum: [oficial, mep, ccl, blue, manual]
+      - $ref: '#/components/parameters/ListLimit'
+      - $ref: '#/components/parameters/ListOffset'
+    get:
+      tags: [tipos-cambio]
+      summary: List exchange-rate history (#243)
+      description: Requires module catalog.multicurrency and products.read.
+      responses:
+        '200':
+          description: Paginated rates
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TipoCambioListEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /api/tipos-cambio/vigente:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: moneda
+        in: query
+        required: true
+        schema:
+          type: string
+          enum: [USD, EUR]
+      - name: tipo
+        in: query
+        schema:
+          type: string
+          enum: [oficial, mep, ccl, blue, manual]
+    get:
+      tags: [tipos-cambio]
+      summary: Get current exchange rate for currency (#243)
+      responses:
+        '200':
+          description: Current rate
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TipoCambioEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /api/tipos-cambio/preferido:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [tipos-cambio]
+      summary: Get preferred exchange-rate type for tenant (#243)
+      responses:
+        '200':
+          description: Preferred type
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TipoCambioPreferidoEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+    put:
+      tags: [tipos-cambio]
+      summary: Set preferred exchange-rate type (#243)
+      description: Rate-limited mutation; requires settings.business.manage.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TipoCambioPreferidoInput'
+      responses:
+        '200':
+          description: Updated preference
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TipoCambioPreferidoEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /api/tipos-cambio/actualizar-manual:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    post:
+      tags: [tipos-cambio]
+      summary: Create manual exchange rate and optionally recalc FX articles (#243)
+      description: Rate-limited mutation; requires products.manage. MEP/CCL/blue/manual are manual-only in this release.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TipoCambioManualInput'
+      responses:
+        '201':
+          description: Rate created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TipoCambioMutationEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /api/tipos-cambio/sincronizar:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    post:
+      tags: [tipos-cambio]
+      summary: Sync official USD rate from BCRA and recalc FX articles (#243)
+      description: Rate-limited mutation; requires products.manage. USD only.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                moneda:
+                  type: string
+                  enum: [USD]
+                  default: USD
+      responses:
+        '201':
+          description: Rate synced
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TipoCambioMutationEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '502':
+          description: Upstream BCRA failure
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
   /api/transferencias-deposito/{id}/anular:
     parameters:
       - $ref: '#/components/parameters/BizcodeChannelHeader'
@@ -13318,6 +13492,13 @@ components:
           type: integer
         activo:
           type: boolean
+        monedaPrecio:
+          type: string
+          enum: [ARS, USD, EUR]
+          default: ARS
+        precioEnMonedaOrigen:
+          type: number
+          nullable: true
 
     ArticuloInput:
       type: object
@@ -13371,6 +13552,16 @@ components:
           description: Must be 0 when tipo is servicio (#244).
         activo:
           type: boolean
+        monedaPrecio:
+          type: string
+          enum: [ARS, USD, EUR]
+          default: ARS
+          description: Catalog price currency; ARS materializes precioLista1 directly (#243).
+        precioEnMonedaOrigen:
+          type: number
+          nullable: true
+          minimum: 0.0001
+          description: Required when monedaPrecio is USD or EUR; drives ARS precioLista1 via current TC (#243).
 
     ArticuloListEnvelope:
       allOf:
@@ -18480,6 +18671,121 @@ components:
           enum: [true]
         data:
           $ref: '#/components/schemas/ImportJob'
+
+    TipoCambio:
+      type: object
+      required: [id, tenantId, moneda, tipo, valor, fecha, fuente, createdById, createdAt]
+      properties:
+        id:
+          type: integer
+        tenantId:
+          type: integer
+        moneda:
+          type: string
+          enum: [USD, EUR]
+        tipo:
+          type: string
+          enum: [oficial, mep, ccl, blue, manual]
+        valor:
+          type: number
+        fecha:
+          type: string
+          format: date-time
+        fuente:
+          type: string
+          enum: [bcra_api, manual]
+        createdById:
+          type: integer
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+
+    TipoCambioManualInput:
+      type: object
+      required: [moneda, tipo, valor]
+      properties:
+        moneda:
+          type: string
+          enum: [USD, EUR]
+        tipo:
+          type: string
+          enum: [oficial, mep, ccl, blue, manual]
+        valor:
+          type: number
+          exclusiveMinimum: 0
+        fecha:
+          type: string
+          format: date-time
+
+    TipoCambioPreferidoInput:
+      type: object
+      required: [tipoCambioPreferido]
+      properties:
+        tipoCambioPreferido:
+          type: string
+          enum: [oficial, mep, ccl, blue, manual]
+
+    RecalcFxResult:
+      type: object
+      required: [updatedCount, moneda, tipo, valor]
+      properties:
+        updatedCount:
+          type: integer
+        moneda:
+          type: string
+          enum: [USD, EUR]
+        tipo:
+          type: string
+          enum: [oficial, mep, ccl, blue, manual]
+        valor:
+          type: number
+
+    TipoCambioEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          enum: [true]
+        data:
+          $ref: '#/components/schemas/TipoCambio'
+
+    TipoCambioListEnvelope:
+      allOf:
+        - type: object
+          required: [success, data]
+          properties:
+            success:
+              type: boolean
+              enum: [true]
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/TipoCambio'
+        - $ref: '#/components/schemas/ListPaginationMeta'
+
+    TipoCambioPreferidoEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          enum: [true]
+        data:
+          $ref: '#/components/schemas/TipoCambioPreferidoInput'
+
+    TipoCambioMutationEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          enum: [true]
+        data:
+          $ref: '#/components/schemas/TipoCambio'
+        recalc:
+          $ref: '#/components/schemas/RecalcFxResult'
 
     CategoriaArticuloCreateInput:
       type: object

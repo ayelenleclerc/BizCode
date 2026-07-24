@@ -94,8 +94,15 @@
       "2": "10.5%",
       "3": "Exento"
     },
+    "multicurrency": {
+      "title": "Precio en moneda extranjera",
+      "currency": "Moneda del precio",
+      "sourcePrice": "Precio en moneda de origen",
+      "sourcePriceHint": "Importe expresado en {{currency}}."
+    },
     "errors": {
-      "generic": "Error al guardar artículo"
+      "generic": "Error al guardar artículo",
+      "foreignPriceRequired": "Ingresá un precio en la moneda de origen."
     }
   },
   "stockAdjust": {

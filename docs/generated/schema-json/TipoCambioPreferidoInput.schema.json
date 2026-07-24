@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "tipoCambioPreferido": {
+      "enum": [
+        "oficial",
+        "mep",
+        "ccl",
+        "blue",
+        "manual"
+      ],
+      "type": "string"
+    }
+  },
+  "required": [
+    "tipoCambioPreferido"
+  ],
+  "title": "TipoCambioPreferidoInput",
+  "type": "object"
+}

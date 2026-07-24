@@ -43,6 +43,7 @@ import { ComisionConfigService } from './ComisionConfigService'
 import { LiquidacionComisionService } from './LiquidacionComisionService'
 import { BulkImportValidateService } from './BulkImportValidateService'
 import { ImportJobService } from './ImportJobService'
+import { TipoCambioService } from './TipoCambioService'
 
 export type DomainServices = {
   cliente: ClienteService
@@ -89,6 +90,7 @@ export type DomainServices = {
   liquidacionComision: LiquidacionComisionService
   bulkImportValidate: BulkImportValidateService
   importJob: ImportJobService
+  tipoCambio: TipoCambioService
 }
 
 /**
@@ -142,5 +144,6 @@ export function createDomainServices(prisma: PrismaClient): DomainServices {
     liquidacionComision: new LiquidacionComisionService(prisma),
     bulkImportValidate: new BulkImportValidateService(prisma),
     importJob: new ImportJobService(prisma),
+    tipoCambio: new TipoCambioService(prisma),
   }
 }

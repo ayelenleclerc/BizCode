@@ -7285,6 +7285,14 @@ Returns PDF with amount in words (#233). Requires module `finance.receipts`.
 
     `integer`
 
+  - **`monedaPrecio`**
+
+    `string`, possible values: `"ARS", "USD", "EUR"`, default: `"ARS"`
+
+  - **`precioEnMonedaOrigen`**
+
+    `number`
+
   - **`precioLista1`**
 
     `number`
@@ -7373,6 +7381,8 @@ Returns PDF with amount in words (#233). Requires module `finance.receipts`.
       "stock": 1,
       "minimo": 1,
       "activo": true,
+      "monedaPrecio": "ARS",
+      "precioEnMonedaOrigen": 1,
       "additionalProperty": "anything"
     }
   ],
@@ -7503,6 +7513,14 @@ Returns PDF with amount in words (#233). Requires module `finance.receipts`.
 
   `integer` — Warranty months; ignored for servicio (#251).
 
+- **`monedaPrecio`**
+
+  `string`, possible values: `"ARS", "USD", "EUR"`, default: `"ARS"` — Catalog price currency; ARS materializes precioLista1 directly (#243).
+
+- **`precioEnMonedaOrigen`**
+
+  `number` — Required when monedaPrecio is USD or EUR; drives ARS precioLista1 via current TC (#243).
+
 - **`tipo`**
 
   `string`, possible values: `"articulo", "servicio"`, default: `"articulo"`
@@ -7528,7 +7546,9 @@ Returns PDF with amount in words (#233). Requires module `finance.receipts`.
   "costo": 0.01,
   "stock": 0,
   "minimo": 0,
-  "activo": true
+  "activo": true,
+  "monedaPrecio": "ARS",
+  "precioEnMonedaOrigen": 0.0001
 }
 ```
 
@@ -7573,6 +7593,14 @@ Returns PDF with amount in words (#233). Requires module `finance.receipts`.
   - **`minimo`**
 
     `integer`
+
+  - **`monedaPrecio`**
+
+    `string`, possible values: `"ARS", "USD", "EUR"`, default: `"ARS"`
+
+  - **`precioEnMonedaOrigen`**
+
+    `number`
 
   - **`precioLista1`**
 
@@ -7649,6 +7677,8 @@ Returns PDF with amount in words (#233). Requires module `finance.receipts`.
     "stock": 1,
     "minimo": 1,
     "activo": true,
+    "monedaPrecio": "ARS",
+    "precioEnMonedaOrigen": 1,
     "additionalProperty": "anything"
   }
 }
@@ -7790,6 +7820,8 @@ Returns PDF with amount in words (#233). Requires module `finance.receipts`.
     "stock": 1,
     "minimo": 1,
     "activo": true,
+    "monedaPrecio": "ARS",
+    "precioEnMonedaOrigen": 1,
     "additionalProperty": "anything"
   }
 }
@@ -7916,6 +7948,14 @@ Returns PDF with amount in words (#233). Requires module `finance.receipts`.
 
   `integer` — Warranty months; ignored for servicio (#251).
 
+- **`monedaPrecio`**
+
+  `string`, possible values: `"ARS", "USD", "EUR"`, default: `"ARS"` — Catalog price currency; ARS materializes precioLista1 directly (#243).
+
+- **`precioEnMonedaOrigen`**
+
+  `number` — Required when monedaPrecio is USD or EUR; drives ARS precioLista1 via current TC (#243).
+
 - **`tipo`**
 
   `string`, possible values: `"articulo", "servicio"`, default: `"articulo"`
@@ -7941,7 +7981,9 @@ Returns PDF with amount in words (#233). Requires module `finance.receipts`.
   "costo": 0.01,
   "stock": 0,
   "minimo": 0,
-  "activo": true
+  "activo": true,
+  "monedaPrecio": "ARS",
+  "precioEnMonedaOrigen": 0.0001
 }
 ```
 
@@ -7986,6 +8028,14 @@ Returns PDF with amount in words (#233). Requires module `finance.receipts`.
   - **`minimo`**
 
     `integer`
+
+  - **`monedaPrecio`**
+
+    `string`, possible values: `"ARS", "USD", "EUR"`, default: `"ARS"`
+
+  - **`precioEnMonedaOrigen`**
+
+    `number`
 
   - **`precioLista1`**
 
@@ -8062,6 +8112,8 @@ Returns PDF with amount in words (#233). Requires module `finance.receipts`.
     "stock": 1,
     "minimo": 1,
     "activo": true,
+    "monedaPrecio": "ARS",
+    "precioEnMonedaOrigen": 1,
     "additionalProperty": "anything"
   }
 }
@@ -19425,6 +19477,14 @@ Requires all items to have `cantFisica`. For each line with non-zero variance, u
 
         `integer`
 
+      - **`monedaPrecio`**
+
+        `string`, possible values: `"ARS", "USD", "EUR"`, default: `"ARS"`
+
+      - **`precioEnMonedaOrigen`**
+
+        `number`
+
       - **`precioLista1`**
 
         `number`
@@ -19610,6 +19670,8 @@ Requires all items to have `cantFisica`. For each line with non-zero variance, u
             "stock": 1,
             "minimo": 1,
             "activo": true,
+            "monedaPrecio": "ARS",
+            "precioEnMonedaOrigen": 1,
             "additionalProperty": "anything"
           },
           "cantidad": 1,
@@ -19932,6 +19994,14 @@ Requires all items to have `cantFisica`. For each line with non-zero variance, u
 
         `integer`
 
+      - **`monedaPrecio`**
+
+        `string`, possible values: `"ARS", "USD", "EUR"`, default: `"ARS"`
+
+      - **`precioEnMonedaOrigen`**
+
+        `number`
+
       - **`precioLista1`**
 
         `number`
@@ -20104,6 +20174,8 @@ Requires all items to have `cantFisica`. For each line with non-zero variance, u
           "stock": 1,
           "minimo": 1,
           "activo": true,
+          "monedaPrecio": "ARS",
+          "precioEnMonedaOrigen": 1,
           "additionalProperty": "anything"
         },
         "cantidad": 1,
@@ -38921,6 +38993,14 @@ Sets `estado` to `N` (anulada), reverses the customer balance by the invoice tot
 
           `integer`
 
+        - **`monedaPrecio`**
+
+          `string`, possible values: `"ARS", "USD", "EUR"`, default: `"ARS"`
+
+        - **`precioEnMonedaOrigen`**
+
+          `number`
+
         - **`precioLista1`**
 
           `number`
@@ -39158,6 +39238,8 @@ Sets `estado` to `N` (anulada), reverses the customer balance by the invoice tot
             "stock": 1,
             "minimo": 1,
             "activo": true,
+            "monedaPrecio": "ARS",
+            "precioEnMonedaOrigen": 1,
             "additionalProperty": "anything"
           },
           "cantidad": 1,
@@ -66842,6 +66924,944 @@ Restricted to the authenticated user (`commissions.self.read`).
 }
 ```
 
+### PARAMETERS /api/tipos-cambio
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/tipos-cambio`
+
+### List exchange-rate history (#243)
+
+- **Method:** `GET`
+- **Path:** `/api/tipos-cambio`
+- **Tags:** tipos-cambio
+
+Requires module catalog.multicurrency and products.read.
+
+#### Responses
+
+##### Status: 200 Paginated rates
+
+###### Content-Type: application/json
+
+**All of:**
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`createdById` (required)**
+
+    `integer`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`fuente` (required)**
+
+    `string`, possible values: `"bcra_api", "manual"`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`moneda` (required)**
+
+    `string`, possible values: `"USD", "EUR"`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"oficial", "mep", "ccl", "blue", "manual"`
+
+  - **`valor` (required)**
+
+    `number`
+
+- **`success` (required)**
+
+  `boolean`, possible values: `true`
+
+* **`limit` (required)**
+
+  `integer` — Effective page size (same semantics as query \`limit\`)
+
+* **`offset` (required)**
+
+  `integer` — Effective skip (same semantics as query \`offset\`)
+
+* **`total` (required)**
+
+  `integer` — Row count matching the list filter (before limit/offset)
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "moneda": "USD",
+      "tipo": "oficial",
+      "valor": 1,
+      "fecha": "",
+      "fuente": "bcra_api",
+      "createdById": 1,
+      "createdAt": ""
+    }
+  ],
+  "total": 0,
+  "limit": 1,
+  "offset": 0
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/tipos-cambio/vigente
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/tipos-cambio/vigente`
+
+### Get current exchange rate for currency (#243)
+
+- **Method:** `GET`
+- **Path:** `/api/tipos-cambio/vigente`
+- **Tags:** tipos-cambio
+
+#### Responses
+
+##### Status: 200 Current rate
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`createdById` (required)**
+
+    `integer`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`fuente` (required)**
+
+    `string`, possible values: `"bcra_api", "manual"`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`moneda` (required)**
+
+    `string`, possible values: `"USD", "EUR"`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"oficial", "mep", "ccl", "blue", "manual"`
+
+  - **`valor` (required)**
+
+    `number`
+
+- **`success` (required)**
+
+  `boolean`, possible values: `true`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "moneda": "USD",
+    "tipo": "oficial",
+    "valor": 1,
+    "fecha": "",
+    "fuente": "bcra_api",
+    "createdById": 1,
+    "createdAt": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/tipos-cambio/preferido
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/tipos-cambio/preferido`
+
+### Get preferred exchange-rate type for tenant (#243)
+
+- **Method:** `GET`
+- **Path:** `/api/tipos-cambio/preferido`
+- **Tags:** tipos-cambio
+
+#### Responses
+
+##### Status: 200 Preferred type
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`tipoCambioPreferido` (required)**
+
+    `string`, possible values: `"oficial", "mep", "ccl", "blue", "manual"`
+
+- **`success` (required)**
+
+  `boolean`, possible values: `true`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "tipoCambioPreferido": "oficial"
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Set preferred exchange-rate type (#243)
+
+- **Method:** `PUT`
+- **Path:** `/api/tipos-cambio/preferido`
+- **Tags:** tipos-cambio
+
+Rate-limited mutation; requires settings.business.manage.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`tipoCambioPreferido` (required)**
+
+  `string`, possible values: `"oficial", "mep", "ccl", "blue", "manual"`
+
+**Example:**
+
+```json
+{
+  "tipoCambioPreferido": "oficial"
+}
+```
+
+#### Responses
+
+##### Status: 200 Updated preference
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`tipoCambioPreferido` (required)**
+
+    `string`, possible values: `"oficial", "mep", "ccl", "blue", "manual"`
+
+- **`success` (required)**
+
+  `boolean`, possible values: `true`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "tipoCambioPreferido": "oficial"
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/tipos-cambio/actualizar-manual
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/tipos-cambio/actualizar-manual`
+
+### Create manual exchange rate and optionally recalc FX articles (#243)
+
+- **Method:** `POST`
+- **Path:** `/api/tipos-cambio/actualizar-manual`
+- **Tags:** tipos-cambio
+
+Rate-limited mutation; requires products.manage. MEP/CCL/blue/manual are manual-only in this release.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`moneda` (required)**
+
+  `string`, possible values: `"USD", "EUR"`
+
+- **`tipo` (required)**
+
+  `string`, possible values: `"oficial", "mep", "ccl", "blue", "manual"`
+
+- **`valor` (required)**
+
+  `number`
+
+- **`fecha`**
+
+  `string`, format: `date-time`
+
+**Example:**
+
+```json
+{
+  "moneda": "USD",
+  "tipo": "oficial",
+  "valor": 1,
+  "fecha": ""
+}
+```
+
+#### Responses
+
+##### Status: 201 Rate created
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`createdById` (required)**
+
+    `integer`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`fuente` (required)**
+
+    `string`, possible values: `"bcra_api", "manual"`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`moneda` (required)**
+
+    `string`, possible values: `"USD", "EUR"`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"oficial", "mep", "ccl", "blue", "manual"`
+
+  - **`valor` (required)**
+
+    `number`
+
+- **`success` (required)**
+
+  `boolean`, possible values: `true`
+
+- **`recalc`**
+
+  `object`
+
+  - **`moneda` (required)**
+
+    `string`, possible values: `"USD", "EUR"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"oficial", "mep", "ccl", "blue", "manual"`
+
+  - **`updatedCount` (required)**
+
+    `integer`
+
+  - **`valor` (required)**
+
+    `number`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "moneda": "USD",
+    "tipo": "oficial",
+    "valor": 1,
+    "fecha": "",
+    "fuente": "bcra_api",
+    "createdById": 1,
+    "createdAt": ""
+  },
+  "recalc": {
+    "updatedCount": 1,
+    "moneda": "USD",
+    "tipo": "oficial",
+    "valor": 1
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/tipos-cambio/sincronizar
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/tipos-cambio/sincronizar`
+
+### Sync official USD rate from BCRA and recalc FX articles (#243)
+
+- **Method:** `POST`
+- **Path:** `/api/tipos-cambio/sincronizar`
+- **Tags:** tipos-cambio
+
+Rate-limited mutation; requires products.manage. USD only.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`moneda`**
+
+  `string`, possible values: `"USD"`, default: `"USD"`
+
+**Example:**
+
+```json
+{
+  "moneda": "USD"
+}
+```
+
+#### Responses
+
+##### Status: 201 Rate synced
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`createdById` (required)**
+
+    `integer`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`fuente` (required)**
+
+    `string`, possible values: `"bcra_api", "manual"`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`moneda` (required)**
+
+    `string`, possible values: `"USD", "EUR"`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"oficial", "mep", "ccl", "blue", "manual"`
+
+  - **`valor` (required)**
+
+    `number`
+
+- **`success` (required)**
+
+  `boolean`, possible values: `true`
+
+- **`recalc`**
+
+  `object`
+
+  - **`moneda` (required)**
+
+    `string`, possible values: `"USD", "EUR"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"oficial", "mep", "ccl", "blue", "manual"`
+
+  - **`updatedCount` (required)**
+
+    `integer`
+
+  - **`valor` (required)**
+
+    `number`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "moneda": "USD",
+    "tipo": "oficial",
+    "valor": 1,
+    "fecha": "",
+    "fuente": "bcra_api",
+    "createdById": 1,
+    "createdAt": ""
+  },
+  "recalc": {
+    "updatedCount": 1,
+    "moneda": "USD",
+    "tipo": "oficial",
+    "valor": 1
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 502 Upstream BCRA failure
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ### PARAMETERS /api/transferencias-deposito/{id}/anular
 
 - **Method:** `PARAMETERS`
@@ -75048,6 +76068,14 @@ Restricted to the authenticated user (`commissions.self.read`).
 
   `integer`
 
+* **`monedaPrecio`**
+
+  `string`, possible values: `"ARS", "USD", "EUR"`, default: `"ARS"`
+
+* **`precioEnMonedaOrigen`**
+
+  `number`
+
 * **`precioLista1`**
 
   `number`
@@ -75117,6 +76145,8 @@ Restricted to the authenticated user (`commissions.self.read`).
   "stock": 1,
   "minimo": 1,
   "activo": true,
+  "monedaPrecio": "ARS",
+  "precioEnMonedaOrigen": 1,
   "additionalProperty": "anything"
 }
 ```
@@ -75173,6 +76203,14 @@ Restricted to the authenticated user (`commissions.self.read`).
 
   `integer` — Warranty months; ignored for servicio (#251).
 
+* **`monedaPrecio`**
+
+  `string`, possible values: `"ARS", "USD", "EUR"`, default: `"ARS"` — Catalog price currency; ARS materializes precioLista1 directly (#243).
+
+* **`precioEnMonedaOrigen`**
+
+  `number` — Required when monedaPrecio is USD or EUR; drives ARS precioLista1 via current TC (#243).
+
 * **`tipo`**
 
   `string`, possible values: `"articulo", "servicio"`, default: `"articulo"`
@@ -75198,7 +76236,9 @@ Restricted to the authenticated user (`commissions.self.read`).
   "costo": 0.01,
   "stock": 0,
   "minimo": 0,
-  "activo": true
+  "activo": true,
+  "monedaPrecio": "ARS",
+  "precioEnMonedaOrigen": 0.0001
 }
 ```
 
@@ -75247,6 +76287,14 @@ Restricted to the authenticated user (`commissions.self.read`).
   - **`minimo`**
 
     `integer`
+
+  - **`monedaPrecio`**
+
+    `string`, possible values: `"ARS", "USD", "EUR"`, default: `"ARS"`
+
+  - **`precioEnMonedaOrigen`**
+
+    `number`
 
   - **`precioLista1`**
 
@@ -75323,6 +76371,8 @@ Restricted to the authenticated user (`commissions.self.read`).
     "stock": 1,
     "minimo": 1,
     "activo": true,
+    "monedaPrecio": "ARS",
+    "precioEnMonedaOrigen": 1,
     "additionalProperty": "anything"
   }
 }
@@ -75367,6 +76417,8 @@ Restricted to the authenticated user (`commissions.self.read`).
     "stock": 1,
     "minimo": 1,
     "activo": true,
+    "monedaPrecio": "ARS",
+    "precioEnMonedaOrigen": 1,
     "additionalProperty": "anything"
   }
 }
@@ -79163,6 +80215,14 @@ Restricted to the authenticated user (`commissions.self.read`).
 
       `integer`
 
+    - **`monedaPrecio`**
+
+      `string`, possible values: `"ARS", "USD", "EUR"`, default: `"ARS"`
+
+    - **`precioEnMonedaOrigen`**
+
+      `number`
+
     - **`precioLista1`**
 
       `number`
@@ -79329,6 +80389,8 @@ Restricted to the authenticated user (`commissions.self.read`).
         "stock": 1,
         "minimo": 1,
         "activo": true,
+        "monedaPrecio": "ARS",
+        "precioEnMonedaOrigen": 1,
         "additionalProperty": "anything"
       },
       "cantidad": 1,
@@ -79381,6 +80443,14 @@ Restricted to the authenticated user (`commissions.self.read`).
   - **`minimo`**
 
     `integer`
+
+  - **`monedaPrecio`**
+
+    `string`, possible values: `"ARS", "USD", "EUR"`, default: `"ARS"`
+
+  - **`precioEnMonedaOrigen`**
+
+    `number`
 
   - **`precioLista1`**
 
@@ -79493,6 +80563,8 @@ Restricted to the authenticated user (`commissions.self.read`).
     "stock": 1,
     "minimo": 1,
     "activo": true,
+    "monedaPrecio": "ARS",
+    "precioEnMonedaOrigen": 1,
     "additionalProperty": "anything"
   },
   "cantidad": 1,
@@ -80814,6 +81886,14 @@ Restricted to the authenticated user (`commissions.self.read`).
 
         `integer`
 
+      - **`monedaPrecio`**
+
+        `string`, possible values: `"ARS", "USD", "EUR"`, default: `"ARS"`
+
+      - **`precioEnMonedaOrigen`**
+
+        `number`
+
       - **`precioLista1`**
 
         `number`
@@ -80986,6 +82066,8 @@ Restricted to the authenticated user (`commissions.self.read`).
           "stock": 1,
           "minimo": 1,
           "activo": true,
+          "monedaPrecio": "ARS",
+          "precioEnMonedaOrigen": 1,
           "additionalProperty": "anything"
         },
         "cantidad": 1,
@@ -85578,6 +86660,14 @@ Originating invoice header (selected columns)
 
         `integer`
 
+      - **`monedaPrecio`**
+
+        `string`, possible values: `"ARS", "USD", "EUR"`, default: `"ARS"`
+
+      - **`precioEnMonedaOrigen`**
+
+        `number`
+
       - **`precioLista1`**
 
         `number`
@@ -85809,6 +86899,8 @@ Originating invoice header (selected columns)
           "stock": 1,
           "minimo": 1,
           "activo": true,
+          "monedaPrecio": "ARS",
+          "precioEnMonedaOrigen": 1,
           "additionalProperty": "anything"
         },
         "cantidad": 1,
@@ -85927,6 +87019,14 @@ Originating invoice header (selected columns)
         - **`minimo`**
 
           `integer`
+
+        - **`monedaPrecio`**
+
+          `string`, possible values: `"ARS", "USD", "EUR"`, default: `"ARS"`
+
+        - **`precioEnMonedaOrigen`**
+
+          `number`
 
         - **`precioLista1`**
 
@@ -86165,6 +87265,8 @@ Originating invoice header (selected columns)
             "stock": 1,
             "minimo": 1,
             "activo": true,
+            "monedaPrecio": "ARS",
+            "precioEnMonedaOrigen": 1,
             "additionalProperty": "anything"
           },
           "cantidad": 1,
@@ -93830,6 +94932,333 @@ Originating invoice header (selected columns)
     "createdAt": "",
     "updatedAt": "",
     "completedAt": ""
+  }
+}
+```
+
+### TipoCambio
+
+- **Type:**`object`
+
+* **`createdAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`createdById` (required)**
+
+  `integer`
+
+* **`fecha` (required)**
+
+  `string`, format: `date-time`
+
+* **`fuente` (required)**
+
+  `string`, possible values: `"bcra_api", "manual"`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`moneda` (required)**
+
+  `string`, possible values: `"USD", "EUR"`
+
+* **`tenantId` (required)**
+
+  `integer`
+
+* **`tipo` (required)**
+
+  `string`, possible values: `"oficial", "mep", "ccl", "blue", "manual"`
+
+* **`valor` (required)**
+
+  `number`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "tenantId": 1,
+  "moneda": "USD",
+  "tipo": "oficial",
+  "valor": 1,
+  "fecha": "",
+  "fuente": "bcra_api",
+  "createdById": 1,
+  "createdAt": ""
+}
+```
+
+### TipoCambioManualInput
+
+- **Type:**`object`
+
+* **`moneda` (required)**
+
+  `string`, possible values: `"USD", "EUR"`
+
+* **`tipo` (required)**
+
+  `string`, possible values: `"oficial", "mep", "ccl", "blue", "manual"`
+
+* **`valor` (required)**
+
+  `number`
+
+* **`fecha`**
+
+  `string`, format: `date-time`
+
+**Example:**
+
+```json
+{
+  "moneda": "USD",
+  "tipo": "oficial",
+  "valor": 1,
+  "fecha": ""
+}
+```
+
+### TipoCambioPreferidoInput
+
+- **Type:**`object`
+
+* **`tipoCambioPreferido` (required)**
+
+  `string`, possible values: `"oficial", "mep", "ccl", "blue", "manual"`
+
+**Example:**
+
+```json
+{
+  "tipoCambioPreferido": "oficial"
+}
+```
+
+### RecalcFxResult
+
+- **Type:**`object`
+
+* **`moneda` (required)**
+
+  `string`, possible values: `"USD", "EUR"`
+
+* **`tipo` (required)**
+
+  `string`, possible values: `"oficial", "mep", "ccl", "blue", "manual"`
+
+* **`updatedCount` (required)**
+
+  `integer`
+
+* **`valor` (required)**
+
+  `number`
+
+**Example:**
+
+```json
+{
+  "updatedCount": 1,
+  "moneda": "USD",
+  "tipo": "oficial",
+  "valor": 1
+}
+```
+
+### TipoCambioEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`createdById` (required)**
+
+    `integer`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`fuente` (required)**
+
+    `string`, possible values: `"bcra_api", "manual"`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`moneda` (required)**
+
+    `string`, possible values: `"USD", "EUR"`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"oficial", "mep", "ccl", "blue", "manual"`
+
+  - **`valor` (required)**
+
+    `number`
+
+* **`success` (required)**
+
+  `boolean`, possible values: `true`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "moneda": "USD",
+    "tipo": "oficial",
+    "valor": 1,
+    "fecha": "",
+    "fuente": "bcra_api",
+    "createdById": 1,
+    "createdAt": ""
+  }
+}
+```
+
+### TipoCambioListEnvelope
+
+- **Type:**
+
+**Example:**
+
+### TipoCambioPreferidoEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`tipoCambioPreferido` (required)**
+
+    `string`, possible values: `"oficial", "mep", "ccl", "blue", "manual"`
+
+* **`success` (required)**
+
+  `boolean`, possible values: `true`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "tipoCambioPreferido": "oficial"
+  }
+}
+```
+
+### TipoCambioMutationEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`createdById` (required)**
+
+    `integer`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`fuente` (required)**
+
+    `string`, possible values: `"bcra_api", "manual"`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`moneda` (required)**
+
+    `string`, possible values: `"USD", "EUR"`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"oficial", "mep", "ccl", "blue", "manual"`
+
+  - **`valor` (required)**
+
+    `number`
+
+* **`success` (required)**
+
+  `boolean`, possible values: `true`
+
+* **`recalc`**
+
+  `object`
+
+  - **`moneda` (required)**
+
+    `string`, possible values: `"USD", "EUR"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"oficial", "mep", "ccl", "blue", "manual"`
+
+  - **`updatedCount` (required)**
+
+    `integer`
+
+  - **`valor` (required)**
+
+    `number`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "moneda": "USD",
+    "tipo": "oficial",
+    "valor": 1,
+    "fecha": "",
+    "fuente": "bcra_api",
+    "createdById": 1,
+    "createdAt": ""
+  },
+  "recalc": {
+    "updatedCount": 1,
+    "moneda": "USD",
+    "tipo": "oficial",
+    "valor": 1
   }
 }
 ```

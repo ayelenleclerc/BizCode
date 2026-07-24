@@ -29,6 +29,19 @@
     "minimo": {
       "type": "integer"
     },
+    "monedaPrecio": {
+      "default": "ARS",
+      "enum": [
+        "ARS",
+        "USD",
+        "EUR"
+      ],
+      "type": "string"
+    },
+    "precioEnMonedaOrigen": {
+      "nullable": true,
+      "type": "number"
+    },
     "precioLista1": {
       "type": "number"
     },

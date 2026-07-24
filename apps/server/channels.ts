@@ -183,6 +183,14 @@ function buildMessage(type: NotificationType, payload: NotificationPayload): Mes
         text: `Su equipo está listo para retirar.${numero}.`,
       }
     }
+    case 'precios_fx_actualizados': {
+      const count = payload.amount ?? '0'
+      const detail = payload.preview ? ` (${payload.preview})` : ''
+      return {
+        subject: `[BizCode] Precios FX actualizados — ${count} artículos`,
+        text: `Se actualizaron ${count} artículos dolarizados/eurizados tras un cambio de tipo de cambio${detail}.`,
+      }
+    }
   }
 }
 

@@ -280,6 +280,14 @@ model Articulo {
   precioLista1 Decimal @db.Decimal(14, 2)
   precioLista2 Decimal @db.Decimal(14, 2)
   costo        Decimal @db.Decimal(13, 2)
+  /// @en Catalog price currency: ARS | USD | EUR (#243).
+  /// @es Moneda del precio de catálogo: ARS | USD | EUR (#243).
+  /// @pt-BR Moeda do preço de catálogo: ARS | USD | EUR (#243).
+  monedaPrecio String @default("ARS") @db.VarChar(3)
+  /// @en Price in foreign currency when monedaPrecio is USD/EUR; null for ARS (#243).
+  /// @es Precio en moneda extranjera si monedaPrecio es USD/EUR; null para ARS (#243).
+  /// @pt-BR Preço em moeda estrangeira se monedaPrecio for USD/EUR; null para ARS (#243).
+  precioEnMonedaOrigen Decimal? @db.Decimal(14, 4)
   stock        Int    @default(0) // DB: Articulo_stock_nonneg_check
   minimo       Int    @default(0) // DB: Articulo_minimo_nonneg_check
   activo       Boolean @default(true)
@@ -808,6 +816,16 @@ model Factura {
   contratoId  Int?
   contrato    Contrato? @relation(fields: [contratoId], references: [id], onDelete: SetNull)
 
+  /// @en FX snapshot applied at invoice emission (#243).
+  /// @es Snapshot de TC aplicado al emitir la factura (#243).
+  /// @pt-BR Snapshot de câmbio aplicado na emissão da fatura (#243).
+  tipoCambioId     Int?
+  tipoCambio       TipoCambio? @relation(fields: [tipoCambioId], references: [id], onDelete: SetNull)
+  tipoCambioValor  Decimal?  @db.Decimal(14, 4)
+  tipoCambioMoneda String?   @db.VarChar(3)
+  tipoCambioTipo   String?   @db.VarChar(20)
+  tipoCambioFecha  DateTime?
+
   items          FacturaItem[]
   ordenesEntrega OrdenEntrega[]
   ordenesTrabajo OrdenTrabajo[]
@@ -832,6 +850,7 @@ model Factura {
   @@index([tenantId, clienteId])
   @@index([tenantId, contratoId])
   @@index([tenantId, depositoId])
+  @@index([tenantId, tipoCambioId])
 }
 
 /// Recurring service contract with scheduled invoicing (#245).
@@ -1316,6 +1335,13 @@ model FacturaItem {
   dscto     Decimal   @db.Decimal(5, 2) @default(0)
   subtotal  Decimal   @db.Decimal(14, 2)
 
+  /// @en Line FX origin snapshot when the catalog item was priced in USD/EUR (#243).
+  /// @es Snapshot de origen FX de la línea cuando el ítem estaba en USD/EUR (#243).
+  /// @pt-BR Snapshot de origem FX da linha quando o item estava em USD/EUR (#243).
+  monedaOrigen     String?  @db.VarChar(3)
+  precioOrigen     Decimal? @db.Decimal(14, 4)
+  tipoCambioValor  Decimal? @db.Decimal(14, 4)
+
   createdAt DateTime  @default(now())
 
   garantias Garantia[]
@@ -1427,6 +1453,7 @@ model Tenant {
   configsComision               ConfigComision[]
   liquidacionesComision         LiquidacionComision[]
   importJobs                    ImportJob[]
+  tiposCambio                   TipoCambio[]
 }
 
 /// Idempotent Mercado Pago payment webhook processing (#176).
@@ -1643,6 +1670,11 @@ model TenantConfig {
   /// @pt-BR Modo de apropriação de comissão padrão para novas configs (#237).
   /// porcentaje_cobrado | porcentaje_facturado | importe_fijo_por_venta
   comisionesModoDevengo String @default("porcentaje_cobrado") @db.VarChar(40)
+  /// @en Preferred FX rate type for USD/EUR catalog prices (#243).
+  /// @es Tipo de TC preferido para precios USD/EUR de catálogo (#243).
+  /// @pt-BR Tipo de câmbio preferido para preços USD/EUR de catálogo (#243).
+  /// oficial | mep | ccl | blue | manual
+  tipoCambioPreferido String @default("oficial") @db.VarChar(20)
   updatedById   Int?
   updatedBy     AppUser? @relation("TenantConfigUpdatedBy", fields: [updatedById], references: [id])
   updatedAt     DateTime @updatedAt
@@ -1830,6 +1862,7 @@ model AppUser {
   liquidacionesComision  LiquidacionComision[] @relation("LiquidacionComisionVendedor")
   liquidacionesComisionAprobadas LiquidacionComision[] @relation("LiquidacionComisionAprobadoPor")
   importJobs             ImportJob[] @relation("ImportJobCreatedBy")
+  tiposCambio            TipoCambio[] @relation("TipoCambioCreatedBy")
 
   @@unique([tenantId, username])
 }
@@ -2143,6 +2176,31 @@ model ImportJob {
 
   @@index([tenantId, createdAt])
   @@index([tenantId, estado])
+}
+
+/// @en Exchange rate history per tenant for USD/EUR catalog pricing (#243).
+/// @es Historial de tipos de cambio por tenant para precios USD/EUR (#243).
+/// @pt-BR Histórico de câmbio por tenant para preços USD/EUR (#243).
+model TipoCambio {
+  id          Int      @id @default(autoincrement())
+  tenantId    Int
+  tenant      Tenant   @relation(fields: [tenantId], references: [id])
+  /// USD | EUR
+  moneda      String   @db.VarChar(3)
+  /// oficial | mep | ccl | blue | manual
+  tipo        String   @db.VarChar(20)
+  valor       Decimal  @db.Decimal(14, 4)
+  fecha       DateTime @default(now())
+  /// bcra_api | manual
+  fuente      String   @db.VarChar(20)
+  createdById Int?
+  createdBy   AppUser? @relation("TipoCambioCreatedBy", fields: [createdById], references: [id])
+  createdAt   DateTime @default(now())
+
+  facturas Factura[]
+
+  @@index([tenantId, moneda, tipo, fecha])
+  @@index([tenantId, fecha])
 }
 
 model StockAjuste {

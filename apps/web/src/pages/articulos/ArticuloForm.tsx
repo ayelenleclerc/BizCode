@@ -10,7 +10,15 @@ import { hasPermission } from '@/lib/rbac'
 import { CanAccess } from '@/components/CanAccess'
 import IfModule from '@/components/IfModule'
 import { useAuth } from '@/contexts/AuthContext'
-import { Articulo, Rubro, type CategoriaArticuloRow } from '@bizcode/types'
+import { useFeatureFlags } from '@/contexts/FeatureFlagsContext'
+import {
+  Articulo,
+  MONEDAS_PRECIO,
+  Rubro,
+  type ArticuloInput,
+  type CategoriaArticuloRow,
+  type MonedaPrecio,
+} from '@bizcode/types'
 import ArticuloProveedoresComparadorSection from './ArticuloProveedoresComparadorSection'
 import ArticuloVariantesPanel from './ArticuloVariantesPanel'
 import ArticuloStockDepositosPanel from './ArticuloStockDepositosPanel'
@@ -42,6 +50,12 @@ const articuloSchema = z
     precioLista1: z.coerce.number().positive('Precio debe ser positivo'),
     precioLista2: z.coerce.number().positive('Precio debe ser positivo'),
     costo: z.coerce.number().positive('Costo debe ser positivo'),
+    monedaPrecio: z.enum(MONEDAS_PRECIO).default('ARS'),
+    precioEnMonedaOrigen: z.preprocess((val) => {
+      if (val === '' || val === null || val === undefined) return null
+      const n = typeof val === 'number' ? val : Number(val)
+      return Number.isFinite(n) ? n : null
+    }, z.number().min(0.0001).nullable()),
     stock: z.coerce.number().int().nonnegative('Stock no puede ser negativo'),
     minimo: z.coerce.number().int().nonnegative('Mínimo no puede ser negativo'),
     mesesGarantia: z.preprocess((val) => {
@@ -57,6 +71,13 @@ const articuloSchema = z
       if (data.unidadServicio == null) {
         ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'Required', path: ['unidadServicio'] })
       }
+    }
+    if (data.monedaPrecio !== 'ARS' && data.precioEnMonedaOrigen == null) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'form.errors.foreignPriceRequired',
+        path: ['precioEnMonedaOrigen'],
+      })
     }
   })
 
@@ -86,6 +107,8 @@ export default function ArticuloForm({ articulo, rubros, onClose, onGuardado }: 
   const { t } = useTranslation('articulos')
   const { t: tc } = useTranslation('common')
   const { claims } = useAuth()
+  const { hasModule } = useFeatureFlags()
+  const multicurrencyEnabled = hasModule('catalog.multicurrency')
   const [loading, setLoading] = useState(false)
   const [categorias, setCategorias] = useState<CategoriaArticuloRow[]>([])
   const [error, setError] = useState<string | null>(null)
@@ -130,12 +153,15 @@ export default function ArticuloForm({ articulo, rubros, onClose, onGuardado }: 
       stock: 0,
       mesesGarantia: null,
       categoriaId: null,
+      monedaPrecio: 'ARS',
+      precioEnMonedaOrigen: null,
       activo: true,
     }) as ArticuloFormData,
   })
 
   const tipoWatch = watch('tipo')
   const categoriaWatch = watch('categoriaId')
+  const monedaPrecioWatch = watch('monedaPrecio')
 
   useEffect(() => {
     catalogVariantsAPI
@@ -161,13 +187,22 @@ export default function ArticuloForm({ articulo, rubros, onClose, onGuardado }: 
       setValue('precioLista1', Number(articulo.precioLista1))
       setValue('precioLista2', Number(articulo.precioLista2))
       setValue('costo', Number(articulo.costo))
+      const articuloFx = articulo as Articulo & Pick<
+        ArticuloInput,
+        'monedaPrecio' | 'precioEnMonedaOrigen'
+      >
+      setValue('monedaPrecio', multicurrencyEnabled ? (articuloFx.monedaPrecio ?? 'ARS') : 'ARS')
+      setValue(
+        'precioEnMonedaOrigen',
+        multicurrencyEnabled ? (articuloFx.precioEnMonedaOrigen ?? null) : null,
+      )
       setValue('stock', articulo.stock)
       setValue('minimo', articulo.minimo)
       setValue('mesesGarantia', articulo.mesesGarantia ?? null)
       setValue('activo', articulo.activo)
       setStockDisplay(articulo.stock)
     }
-  }, [articulo, setValue])
+  }, [articulo, multicurrencyEnabled, setValue])
 
   useEffect(() => {
     if (tipoWatch === 'servicio') {
@@ -208,10 +243,32 @@ export default function ArticuloForm({ articulo, rubros, onClose, onGuardado }: 
     setError(null)
 
     try {
-      const normalized =
+      const normalizedBase =
         data.tipo === 'servicio'
-          ? { ...data, stock: 0, minimo: 0, unidadServicio: data.unidadServicio ?? null }
-          : { ...data, unidadServicio: null }
+          ? {
+              ...data,
+              stock: 0,
+              minimo: 0,
+              unidadServicio: data.unidadServicio ?? null,
+            }
+          : {
+              ...data,
+              unidadServicio: null,
+            }
+      const {
+        monedaPrecio: _omitMonedaPrecio,
+        precioEnMonedaOrigen: _omitPrecioOrigen,
+        ...normalizedWithoutFx
+      } = normalizedBase
+      void _omitMonedaPrecio
+      void _omitPrecioOrigen
+      const normalized = multicurrencyEnabled
+        ? {
+            ...normalizedBase,
+            precioEnMonedaOrigen:
+              data.monedaPrecio === 'ARS' ? null : data.precioEnMonedaOrigen,
+          }
+        : normalizedWithoutFx
       let result: Articulo
       if (articulo) {
         const { stock: _omitStock, ...payload } = normalized
@@ -515,6 +572,65 @@ export default function ArticuloForm({ articulo, rubros, onClose, onGuardado }: 
               )}
             </div>
           </div>
+
+          {multicurrencyEnabled ? (
+            <section
+              className="grid grid-cols-2 gap-4 rounded border border-slate-200 p-4 dark:border-slate-600"
+              aria-labelledby="articulo-multicurrency-title"
+              data-testid="articulo-form-multicurrency"
+            >
+              <h3 id="articulo-multicurrency-title" className="col-span-2 font-semibold text-slate-900 dark:text-slate-100">
+                {t('form.multicurrency.title')}
+              </h3>
+              <div>
+                <label htmlFor="articulo-monedaPrecio" className="block text-slate-700 dark:text-slate-300 font-semibold mb-1">
+                  {t('form.multicurrency.currency')}
+                </label>
+                <select
+                  id="articulo-monedaPrecio"
+                  data-testid="articulo-form-monedaPrecio"
+                  {...register('monedaPrecio')}
+                  className="w-full px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 rounded border border-slate-300 dark:border-slate-600 focus:border-blue-500 focus:outline-none"
+                >
+                  {MONEDAS_PRECIO.map((currency: MonedaPrecio) => (
+                    <option key={currency} value={currency}>
+                      {currency}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              {monedaPrecioWatch !== 'ARS' ? (
+                <div>
+                  <label htmlFor="articulo-precioEnMonedaOrigen" className="block text-slate-700 dark:text-slate-300 font-semibold mb-1">
+                    {t('form.multicurrency.sourcePrice')} *
+                  </label>
+                  <input
+                    id="articulo-precioEnMonedaOrigen"
+                    type="number"
+                    min="0.0001"
+                    step="0.0001"
+                    data-testid="articulo-form-precioEnMonedaOrigen"
+                    {...register('precioEnMonedaOrigen')}
+                    aria-required="true"
+                    aria-describedby={
+                      errors.precioEnMonedaOrigen
+                        ? 'articulo-precioEnMonedaOrigen-error'
+                        : 'articulo-precioEnMonedaOrigen-hint'
+                    }
+                    className="w-full px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 rounded border border-slate-300 dark:border-slate-600 focus:border-blue-500 focus:outline-none"
+                  />
+                  <p id="articulo-precioEnMonedaOrigen-hint" className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                    {t('form.multicurrency.sourcePriceHint', { currency: monedaPrecioWatch })}
+                  </p>
+                  {errors.precioEnMonedaOrigen ? (
+                    <p id="articulo-precioEnMonedaOrigen-error" className="mt-1 text-sm text-red-600 dark:text-red-400">
+                      {t(errors.precioEnMonedaOrigen.message ?? 'form.errors.foreignPriceRequired')}
+                    </p>
+                  ) : null}
+                </div>
+              ) : null}
+            </section>
+          ) : null}
 
           {tipoWatch !== 'servicio' ? (
           <div className="grid grid-cols-2 gap-4">

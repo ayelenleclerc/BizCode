@@ -36,6 +36,22 @@
       "minimum": 0,
       "type": "integer"
     },
+    "monedaPrecio": {
+      "default": "ARS",
+      "description": "Catalog price currency; ARS materializes precioLista1 directly (#243).",
+      "enum": [
+        "ARS",
+        "USD",
+        "EUR"
+      ],
+      "type": "string"
+    },
+    "precioEnMonedaOrigen": {
+      "description": "Required when monedaPrecio is USD or EUR; drives ARS precioLista1 via current TC (#243).",
+      "minimum": 0.0001,
+      "nullable": true,
+      "type": "number"
+    },
     "precioLista1": {
       "minimum": 0.01,
       "type": "number"
