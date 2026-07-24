@@ -210,6 +210,17 @@ export const formulasProduccionMutationHttpRateLimiter = createRouteLimiter({
   skipUnless: () => true,
 })
 
+/**
+ * @en Per-IP rate limit for production order mutations (#249); visible to CodeQL.
+ * @es Límite por IP para mutaciones de órdenes de producción (#249); visible a CodeQL.
+ * @pt-BR Limite por IP para mutações de ordens de produção (#249); visível ao CodeQL.
+ */
+export const ordenesProduccionMutationHttpRateLimiter = createRouteLimiter({
+  windowMs: MINUTE_MS,
+  limit: parsePositiveInt(process.env.HTTP_RATE_LIMIT_PER_MINUTE, API_GENERAL_DEFAULT),
+  skipUnless: () => true,
+})
+
 function runLimiterChain(
   req: Request,
   res: Response,

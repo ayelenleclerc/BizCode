@@ -1,0 +1,113 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "articulo": {
+      "nullable": true,
+      "type": "object"
+    },
+    "articuloId": {
+      "type": "integer"
+    },
+    "cantidadPlanif": {
+      "type": "number"
+    },
+    "cantidadReal": {
+      "nullable": true,
+      "type": "number"
+    },
+    "costoTotal": {
+      "nullable": true,
+      "type": "number"
+    },
+    "createdAt": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "deposito": {
+      "nullable": true,
+      "type": "object"
+    },
+    "depositoId": {
+      "type": "integer"
+    },
+    "estado": {
+      "enum": [
+        "planificada",
+        "en_proceso",
+        "completada",
+        "cancelada"
+      ],
+      "type": "string"
+    },
+    "fechaFin": {
+      "format": "date-time",
+      "nullable": true,
+      "type": "string"
+    },
+    "fechaInicio": {
+      "format": "date-time",
+      "nullable": true,
+      "type": "string"
+    },
+    "fechaPlanif": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "formula": {
+      "nullable": true,
+      "type": "object"
+    },
+    "formulaId": {
+      "type": "integer"
+    },
+    "id": {
+      "type": "integer"
+    },
+    "insumos": {
+      "items": {
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "numero": {
+      "type": "integer"
+    },
+    "observaciones": {
+      "nullable": true,
+      "type": "string"
+    },
+    "operadorId": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "tenantId": {
+      "type": "integer"
+    },
+    "updatedAt": {
+      "format": "date-time",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "tenantId",
+    "numero",
+    "articuloId",
+    "formulaId",
+    "depositoId",
+    "cantidadPlanif",
+    "cantidadReal",
+    "estado",
+    "fechaPlanif",
+    "fechaInicio",
+    "fechaFin",
+    "costoTotal",
+    "operadorId",
+    "observaciones",
+    "createdAt",
+    "updatedAt",
+    "insumos"
+  ],
+  "title": "OrdenProduccion",
+  "type": "object"
+}

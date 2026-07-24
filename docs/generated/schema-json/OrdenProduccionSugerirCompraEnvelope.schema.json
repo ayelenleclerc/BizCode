@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "data": {
+      "properties": {
+        "items": {
+          "items": {
+            "properties": {
+              "articuloId": {
+                "type": "integer"
+              },
+              "cantidad": {
+                "type": "number"
+              },
+              "costoUnitario": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "articuloId",
+              "cantidad",
+              "costoUnitario"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "ordenCompraId": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "ordenCompraId",
+        "items"
+      ],
+      "type": "object"
+    },
+    "success": {
+      "enum": [
+        true
+      ],
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "success",
+    "data"
+  ],
+  "title": "OrdenProduccionSugerirCompraEnvelope",
+  "type": "object"
+}

@@ -1,0 +1,102 @@
+{
+  "title": "Ordens de produção",
+  "subtitle": "Planeje a produção pela fórmula ativa, reserve insumos e registre o produto acabado.",
+  "list": {
+    "title": "Ordens",
+    "caption": "Lista de ordens de produção"
+  },
+  "create": {
+    "title": "Nova ordem de produção"
+  },
+  "detail": {
+    "title": "Detalhe de {{numero}}"
+  },
+  "availability": {
+    "title": "Disponibilidade de insumos",
+    "caption": "Necessidade de insumos frente ao estoque disponível do depósito",
+    "sufficient": "Há estoque suficiente para concluir a ordem.",
+    "insufficient": "Estoque insuficiente em {{count}} insumo(s). Revise as faltas.",
+    "needed": "Necessário",
+    "available": "Disponível",
+    "missing": "Faltante"
+  },
+  "start": {
+    "title": "Iniciar produção",
+    "help": "Ao iniciar, os insumos obrigatórios ficam reservados sem baixa de estoque."
+  },
+  "complete": {
+    "title": "Concluir produção",
+    "consumption": "Consumo real de insumos",
+    "planned": "planejado"
+  },
+  "purchase": {
+    "title": "Ações da ordem"
+  },
+  "fields": {
+    "numero": "Número",
+    "articulo": "Artigo",
+    "articuloId": "ID do artigo",
+    "cantidadPlanif": "Quantidade planejada",
+    "cantidadReal": "Quantidade real",
+    "depositoId": "ID do depósito",
+    "estado": "Situação",
+    "costoTotal": "Custo total",
+    "observaciones": "Observações",
+    "proveedorId": "ID do fornecedor"
+  },
+  "estados": {
+    "planificada": "Planejada",
+    "en_proceso": "Em processo",
+    "completada": "Concluída",
+    "cancelada": "Cancelada"
+  },
+  "units": {
+    "kg": "kg",
+    "g": "g",
+    "l": "l",
+    "ml": "ml",
+    "unidad": "unidade",
+    "hora": "hora"
+  },
+  "actions": {
+    "create": "Criar ordem",
+    "select": "Selecionar",
+    "start": "Iniciar produção",
+    "complete": "Concluir ordem",
+    "cancel": "Cancelar ordem",
+    "suggestPurchase": "Sugerir ordem de compra",
+    "saving": "Salvando…",
+    "starting": "Iniciando…",
+    "completing": "Concluindo…",
+    "cancelling": "Cancelando…",
+    "suggesting": "Gerando…"
+  },
+  "states": {
+    "loading": "Carregando ordens…",
+    "empty": "Nenhuma ordem de produção registrada.",
+    "noSelection": "Selecione uma ordem para ver disponibilidade e ações.",
+    "detailLoading": "Carregando detalhe…",
+    "pending": "Pendente"
+  },
+  "success": {
+    "create": "A ordem de produção foi criada com sucesso.",
+    "start": "A produção foi iniciada e os insumos ficaram reservados.",
+    "complete": "Ordem concluída: insumos consumidos e produto acabado creditado.",
+    "cancel": "A ordem foi cancelada e as reservas liberadas.",
+    "purchase": "Foi criada a ordem de compra rascunho #{{id}} com os insumos faltantes."
+  },
+  "errors": {
+    "load": "Não foi possível carregar as ordens. Tente novamente.",
+    "detail": "Não foi possível carregar o detalhe da ordem.",
+    "create": "Não foi possível criar a ordem. Verifique se o artigo tem fórmula ativa.",
+    "start": "Não foi possível iniciar a produção. Pode faltar estoque de insumos.",
+    "complete": "Não foi possível concluir a ordem.",
+    "cancel": "Não foi possível cancelar a ordem.",
+    "purchase": "Não foi possível gerar a ordem de compra sugerida.",
+    "invalidArticulo": "Informe um ID de artigo válido.",
+    "invalidCantidad": "Informe uma quantidade planejada maior que zero.",
+    "invalidCantidadReal": "Informe uma quantidade produzida maior que zero.",
+    "invalidDeposito": "Informe um ID de depósito válido.",
+    "invalidProveedor": "Informe um ID de fornecedor válido."
+  }
+}

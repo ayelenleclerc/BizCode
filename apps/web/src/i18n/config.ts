@@ -39,6 +39,7 @@ import comisionesEs from '@/locales/es/comisiones.json'
 import importacionesEs from '@/locales/es/importaciones.json'
 import tiposCambioEs from '@/locales/es/tiposCambio.json'
 import formulasProduccionEs from '@/locales/es/formulasProduccion.json'
+import ordenesProduccionEs from '@/locales/es/ordenesProduccion.json'
 
 import commonEn from '@/locales/en/common.json'
 import clientesEn from '@/locales/en/clientes.json'
@@ -76,6 +77,7 @@ import comisionesEn from '@/locales/en/comisiones.json'
 import importacionesEn from '@/locales/en/importaciones.json'
 import tiposCambioEn from '@/locales/en/tiposCambio.json'
 import formulasProduccionEn from '@/locales/en/formulasProduccion.json'
+import ordenesProduccionEn from '@/locales/en/ordenesProduccion.json'
 
 import commonPt from '@/locales/pt-BR/common.json'
 import clientesPt from '@/locales/pt-BR/clientes.json'
@@ -113,6 +115,7 @@ import comisionesPt from '@/locales/pt-BR/comisiones.json'
 import importacionesPt from '@/locales/pt-BR/importaciones.json'
 import tiposCambioPt from '@/locales/pt-BR/tiposCambio.json'
 import formulasProduccionPt from '@/locales/pt-BR/formulasProduccion.json'
+import ordenesProduccionPt from '@/locales/pt-BR/ordenesProduccion.json'
 
 // Persist language preference in localStorage
 const savedLang = typeof localStorage !== 'undefined'
@@ -125,7 +128,7 @@ i18n
     lng: savedLang,
     fallbackLng: 'es',
     defaultNS: 'common',
-    ns: ['common', 'clientes', 'articulos', 'proveedores', 'compras', 'recuentos', 'repartos', 'pod', 'picking', 'seguimiento', 'logisticaReportes', 'facturacion', 'pedidos', 'contratos', 'ordenesTrabajo', 'garantias', 'caja', 'cobros', 'finanzas', 'reportes', 'dashboardAnalytics', 'logistica', 'zonasEntrega', 'empresa', 'portal', 'chat', 'audit', 'listasPrecios', 'categoriasArticulo', 'variantes', 'depositos', 'transferenciasDeposito', 'comisiones', 'importaciones', 'tiposCambio', 'formulasProduccion'],
+    ns: ['common', 'clientes', 'articulos', 'proveedores', 'compras', 'recuentos', 'repartos', 'pod', 'picking', 'seguimiento', 'logisticaReportes', 'facturacion', 'pedidos', 'contratos', 'ordenesTrabajo', 'garantias', 'caja', 'cobros', 'finanzas', 'reportes', 'dashboardAnalytics', 'logistica', 'zonasEntrega', 'empresa', 'portal', 'chat', 'audit', 'listasPrecios', 'categoriasArticulo', 'variantes', 'depositos', 'transferenciasDeposito', 'comisiones', 'importaciones', 'tiposCambio', 'formulasProduccion', 'ordenesProduccion'],
     resources: {
       es: {
         common: commonEs,
@@ -164,6 +167,7 @@ i18n
         importaciones: importacionesEs,
         tiposCambio: tiposCambioEs,
         formulasProduccion: formulasProduccionEs,
+        ordenesProduccion: ordenesProduccionEs,
       },
       en: {
         common: commonEn,
@@ -202,6 +206,7 @@ i18n
         importaciones: importacionesEn,
         tiposCambio: tiposCambioEn,
         formulasProduccion: formulasProduccionEn,
+        ordenesProduccion: ordenesProduccionEn,
       },
       'pt-BR': {
         common: commonPt,
@@ -240,6 +245,7 @@ i18n
         importaciones: importacionesPt,
         tiposCambio: tiposCambioPt,
         formulasProduccion: formulasProduccionPt,
+        ordenesProduccion: ordenesProduccionPt,
       },
     },
     interpolation: {
