@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "createdAt": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "createdById": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "fecha": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "fuente": {
+      "enum": [
+        "bcra_api",
+        "manual"
+      ],
+      "type": "string"
+    },
+    "id": {
+      "type": "integer"
+    },
+    "moneda": {
+      "enum": [
+        "USD",
+        "EUR"
+      ],
+      "type": "string"
+    },
+    "tenantId": {
+      "type": "integer"
+    },
+    "tipo": {
+      "enum": [
+        "oficial",
+        "mep",
+        "ccl",
+        "blue",
+        "manual"
+      ],
+      "type": "string"
+    },
+    "valor": {
+      "type": "number"
+    }
+  },
+  "required": [
+    "id",
+    "tenantId",
+    "moneda",
+    "tipo",
+    "valor",
+    "fecha",
+    "fuente",
+    "createdById",
+    "createdAt"
+  ],
+  "title": "TipoCambio",
+  "type": "object"
+}

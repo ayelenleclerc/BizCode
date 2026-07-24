@@ -110,6 +110,8 @@ export class FacturaService {
               unidadServicio: true,
               mesesGarantia: true,
               esPadre: true,
+              monedaPrecio: true,
+              precioEnMonedaOrigen: true,
             },
           })
         : []
@@ -131,6 +133,40 @@ export class FacturaService {
     const articuloById = new Map(articulos.map((a) => [a.id, a]))
     const tipoById = new Map(articulos.map((a) => [a.id, a.tipo]))
 
+    const fxMonedas = [
+      ...new Set(
+        articulos
+          .map((a) => a.monedaPrecio)
+          .filter((m): m is string => m === 'USD' || m === 'EUR'),
+      ),
+    ]
+    const fxSnapshotByMoneda = new Map<
+      string,
+      { id: number; valor: number; tipo: string; fecha: Date; moneda: string }
+    >()
+    for (const moneda of fxMonedas) {
+      const preferido = await this.prisma.tenantConfig.findUnique({
+        where: { tenantId },
+        select: { tipoCambioPreferido: true },
+      })
+      const tipo = preferido?.tipoCambioPreferido ?? 'oficial'
+      const rate = await this.prisma.tipoCambio.findFirst({
+        where: { tenantId, moneda, tipo },
+        orderBy: [{ fecha: 'desc' }, { id: 'desc' }],
+      })
+      if (rate) {
+        fxSnapshotByMoneda.set(moneda, {
+          id: rate.id,
+          valor: Number(rate.valor.toString()),
+          tipo: rate.tipo,
+          fecha: rate.fecha,
+          moneda: rate.moneda,
+        })
+      }
+    }
+    const primaryFx =
+      fxSnapshotByMoneda.get('USD') ?? fxSnapshotByMoneda.get('EUR') ?? null
+
     const clienteCheck = await this.prisma.cliente.findFirst({
       where: { id: clienteId, tenantId },
       select: { suspended: true },
@@ -145,6 +181,14 @@ export class FacturaService {
     const resolvedItems = items.map((it) => {
       if (it.articuloId != null && it.articuloId >= 1) {
         const art = articuloById.get(it.articuloId)!
+        const fx =
+          art.monedaPrecio === 'USD' || art.monedaPrecio === 'EUR'
+            ? fxSnapshotByMoneda.get(art.monedaPrecio)
+            : undefined
+        const origen =
+          art.precioEnMonedaOrigen != null
+            ? Number(art.precioEnMonedaOrigen.toString())
+            : null
         return {
           articuloId: it.articuloId,
           descripcion: (art.descripcion ?? '').slice(0, 120),
@@ -154,6 +198,9 @@ export class FacturaService {
           precio: it.precio,
           dscto: it.dscto,
           subtotal: it.subtotal,
+          monedaOrigen: fx && origen != null ? art.monedaPrecio : null,
+          precioOrigen: fx && origen != null ? origen : null,
+          tipoCambioValor: fx && origen != null ? fx.valor : null,
         }
       }
       return {
@@ -165,6 +212,9 @@ export class FacturaService {
         precio: it.precio,
         dscto: it.dscto,
         subtotal: it.subtotal,
+        monedaOrigen: null as string | null,
+        precioOrigen: null as number | null,
+        tipoCambioValor: null as number | null,
       }
     })
 
@@ -257,6 +307,15 @@ export class FacturaService {
           tenantId,
           ...(depositoId != null ? { depositoId } : {}),
           ...(options?.contratoId !== undefined ? { contratoId: options.contratoId } : {}),
+          ...(primaryFx
+            ? {
+                tipoCambioId: primaryFx.id,
+                tipoCambioValor: new Decimal(primaryFx.valor),
+                tipoCambioMoneda: primaryFx.moneda,
+                tipoCambioTipo: primaryFx.tipo,
+                tipoCambioFecha: primaryFx.fecha,
+              }
+            : {}),
           items: { create: resolvedItems },
         } as Parameters<typeof this.prisma.factura.create>[0]['data'],
         include: { items: true, cliente: true },

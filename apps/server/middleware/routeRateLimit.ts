@@ -188,6 +188,17 @@ export const importacionesMutationHttpRateLimiter = createRouteLimiter({
   skipUnless: () => true,
 })
 
+/**
+ * @en Per-IP rate limit for FX rate mutations (#243); visible to CodeQL.
+ * @es Límite por IP para mutaciones de tipo de cambio (#243); visible a CodeQL.
+ * @pt-BR Limite por IP para mutações de câmbio (#243); visível ao CodeQL.
+ */
+export const tiposCambioMutationHttpRateLimiter = createRouteLimiter({
+  windowMs: MINUTE_MS,
+  limit: parsePositiveInt(process.env.HTTP_RATE_LIMIT_PER_MINUTE, API_GENERAL_DEFAULT),
+  skipUnless: () => true,
+})
+
 function runLimiterChain(
   req: Request,
   res: Response,

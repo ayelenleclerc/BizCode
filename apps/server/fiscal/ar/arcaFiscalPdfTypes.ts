@@ -40,11 +40,19 @@ export type ArcaFacturaPdfInput = {
       dscto: number
       subtotal: number
       descripcion: string
+      monedaOrigen?: string | null
+      precioOrigen?: number | null
+      tipoCambioValor?: number | null
     }>
     percepciones: Array<{
       nombre: string
       importe: number
     }>
+    /** @en Invoice-level FX snapshot when FX-priced lines were billed (#243). */
+    tipoCambioValor?: number | null
+    tipoCambioMoneda?: string | null
+    tipoCambioTipo?: string | null
+    tipoCambioFecha?: Date | null
   }
   preview: boolean
 }

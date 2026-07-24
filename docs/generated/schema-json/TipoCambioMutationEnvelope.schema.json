@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "data": {
+      "$ref": "./TipoCambio.schema.json"
+    },
+    "recalc": {
+      "$ref": "./RecalcFxResult.schema.json"
+    },
+    "success": {
+      "enum": [
+        true
+      ],
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "success",
+    "data"
+  ],
+  "title": "TipoCambioMutationEnvelope",
+  "type": "object"
+}

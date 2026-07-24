@@ -37,6 +37,7 @@ import depositosEs from '@/locales/es/depositos.json'
 import transferenciasDepositoEs from '@/locales/es/transferenciasDeposito.json'
 import comisionesEs from '@/locales/es/comisiones.json'
 import importacionesEs from '@/locales/es/importaciones.json'
+import tiposCambioEs from '@/locales/es/tiposCambio.json'
 
 import commonEn from '@/locales/en/common.json'
 import clientesEn from '@/locales/en/clientes.json'
@@ -72,6 +73,7 @@ import depositosEn from '@/locales/en/depositos.json'
 import transferenciasDepositoEn from '@/locales/en/transferenciasDeposito.json'
 import comisionesEn from '@/locales/en/comisiones.json'
 import importacionesEn from '@/locales/en/importaciones.json'
+import tiposCambioEn from '@/locales/en/tiposCambio.json'
 
 import commonPt from '@/locales/pt-BR/common.json'
 import clientesPt from '@/locales/pt-BR/clientes.json'
@@ -107,6 +109,7 @@ import depositosPt from '@/locales/pt-BR/depositos.json'
 import transferenciasDepositoPt from '@/locales/pt-BR/transferenciasDeposito.json'
 import comisionesPt from '@/locales/pt-BR/comisiones.json'
 import importacionesPt from '@/locales/pt-BR/importaciones.json'
+import tiposCambioPt from '@/locales/pt-BR/tiposCambio.json'
 
 // Persist language preference in localStorage
 const savedLang = typeof localStorage !== 'undefined'
@@ -119,7 +122,7 @@ i18n
     lng: savedLang,
     fallbackLng: 'es',
     defaultNS: 'common',
-    ns: ['common', 'clientes', 'articulos', 'proveedores', 'compras', 'recuentos', 'repartos', 'pod', 'picking', 'seguimiento', 'logisticaReportes', 'facturacion', 'pedidos', 'contratos', 'ordenesTrabajo', 'garantias', 'caja', 'cobros', 'finanzas', 'reportes', 'dashboardAnalytics', 'logistica', 'zonasEntrega', 'empresa', 'portal', 'chat', 'audit', 'listasPrecios', 'categoriasArticulo', 'variantes', 'depositos', 'transferenciasDeposito', 'comisiones', 'importaciones'],
+    ns: ['common', 'clientes', 'articulos', 'proveedores', 'compras', 'recuentos', 'repartos', 'pod', 'picking', 'seguimiento', 'logisticaReportes', 'facturacion', 'pedidos', 'contratos', 'ordenesTrabajo', 'garantias', 'caja', 'cobros', 'finanzas', 'reportes', 'dashboardAnalytics', 'logistica', 'zonasEntrega', 'empresa', 'portal', 'chat', 'audit', 'listasPrecios', 'categoriasArticulo', 'variantes', 'depositos', 'transferenciasDeposito', 'comisiones', 'importaciones', 'tiposCambio'],
     resources: {
       es: {
         common: commonEs,
@@ -156,6 +159,7 @@ i18n
         transferenciasDeposito: transferenciasDepositoEs,
         comisiones: comisionesEs,
         importaciones: importacionesEs,
+        tiposCambio: tiposCambioEs,
       },
       en: {
         common: commonEn,
@@ -192,6 +196,7 @@ i18n
         transferenciasDeposito: transferenciasDepositoEn,
         comisiones: comisionesEn,
         importaciones: importacionesEn,
+        tiposCambio: tiposCambioEn,
       },
       'pt-BR': {
         common: commonPt,
@@ -228,6 +233,7 @@ i18n
         transferenciasDeposito: transferenciasDepositoPt,
         comisiones: comisionesPt,
         importaciones: importacionesPt,
+        tiposCambio: tiposCambioPt,
       },
     },
     interpolation: {

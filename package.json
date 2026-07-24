@@ -67,6 +67,7 @@
     "migrate:dbf": "tsx scripts/migrate-from-dbf.ts",
     "cobranzas:recordatorios": "tsx scripts/cobranzas-recordatorios-job.ts",
     "contratos:facturacion": "tsx scripts/contratos-facturacion-job.ts",
+    "tipos-cambio:bcra": "tsx scripts/tipos-cambio-bcra-job.ts",
     "mercadopago:reconciliacion": "tsx scripts/mercadopago-reconciliacion-job.ts",
     "modules:trial-expire": "tsx scripts/module-trial-expire-job.ts",
     "reparto-ubicacion:purge": "tsx scripts/reparto-ubicacion-purge-job.ts",

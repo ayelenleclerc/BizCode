@@ -23,6 +23,7 @@ export const NOTIFICATION_TYPES = [
   'contract_adjustment_due',
   'ot_presupuestado',
   'ot_listo',
+  'precios_fx_actualizados',
 ] as const
 
 export type NotificationType = (typeof NOTIFICATION_TYPES)[number]

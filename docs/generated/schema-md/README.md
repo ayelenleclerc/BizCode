@@ -750,6 +750,8 @@
 
 * [PublicPlan](./publicplan.md) – `-`
 
+* [RecalcFxResult](./recalcfxresult.md) – `-`
+
 * [ReciboCobro](./recibocobro.md) – `-`
 
 * [ReciboCobroEnvelope](./recibocobroenvelope.md) – `-`
@@ -963,6 +965,20 @@
 * [TenantPricingData](./tenantpricingdata.md) – `-`
 
 * [TenantPricingEnvelope](./tenantpricingenvelope.md) – `-`
+
+* [TipoCambio](./tipocambio.md) – `-`
+
+* [TipoCambioEnvelope](./tipocambioenvelope.md) – `-`
+
+* [TipoCambioListEnvelope](./tipocambiolistenvelope.md) – `-`
+
+* [TipoCambioManualInput](./tipocambiomanualinput.md) – `-`
+
+* [TipoCambioMutationEnvelope](./tipocambiomutationenvelope.md) – `-`
+
+* [TipoCambioPreferidoEnvelope](./tipocambiopreferidoenvelope.md) – `-`
+
+* [TipoCambioPreferidoInput](./tipocambiopreferidoinput.md) – `-`
 
 * [TransferenciaDeposito](./transferenciadeposito.md) – `-`
 
@@ -1217,6 +1233,8 @@
 * [Untitled object in TenantConfigHistoryEntry](./tenantconfighistoryentry-properties-after.md) – `undefined#/properties/after`
 
 * [Untitled object in TenantConfigHistoryEntry](./tenantconfighistoryentry-properties-before.md) – `undefined#/properties/before`
+
+* [Untitled object in TipoCambioListEnvelope](./tipocambiolistenvelope-allof-0.md) – `undefined#/allOf/0`
 
 * [Untitled object in TransferenciaDepositoCreateInput](./transferenciadepositocreateinput-properties-items-items.md) – `undefined#/properties/items/items`
 
@@ -1563,6 +1581,8 @@
 * [Untitled array in TenantPlanSnapshot](./tenantplansnapshot-properties-features.md) – `undefined#/properties/features`
 
 * [Untitled array in TenantPricingData](./tenantpricingdata-properties-addons.md) – `undefined#/properties/addons`
+
+* [Untitled array in TipoCambioListEnvelope](./tipocambiolistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
 
 * [Untitled array in TransferenciaDeposito](./transferenciadeposito-properties-items.md) – `undefined#/properties/items`
 

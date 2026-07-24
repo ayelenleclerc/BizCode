@@ -1,0 +1,56 @@
+{
+  "title": "Exchange rates",
+  "subtitle": "Manage the preferred rate, manual rates, and official synchronization.",
+  "preference": {
+    "title": "Preferred exchange rate type",
+    "label": "Default rate"
+  },
+  "manual": {
+    "title": "New manual rate"
+  },
+  "fields": {
+    "currency": "Currency",
+    "type": "Type",
+    "value": "Value",
+    "date": "Date",
+    "source": "Source"
+  },
+  "types": {
+    "oficial": "Official",
+    "mep": "MEP",
+    "ccl": "CCL",
+    "blue": "Blue",
+    "manual": "Manual"
+  },
+  "sources": {
+    "bcra_api": "BCRA",
+    "manual": "Manual"
+  },
+  "actions": {
+    "savePreference": "Save preference",
+    "saveManual": "Save rate",
+    "syncBcra": "Sync BCRA (official USD)",
+    "saving": "Saving…",
+    "syncing": "Syncing…"
+  },
+  "history": {
+    "title": "History",
+    "caption": "Exchange rate history"
+  },
+  "states": {
+    "loading": "Loading exchange rates…",
+    "empty": "No exchange rates recorded."
+  },
+  "success": {
+    "preference": "The preference was saved successfully.",
+    "manual": "The manual rate was saved successfully.",
+    "sync": "The official BCRA rate was synchronized successfully."
+  },
+  "errors": {
+    "load": "Exchange rates could not be loaded. Try again.",
+    "preference": "The preference could not be saved.",
+    "manual": "The manual rate could not be saved.",
+    "sync": "The BCRA rate could not be synchronized.",
+    "invalidValue": "Enter a value greater than zero."
+  }
+}

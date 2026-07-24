@@ -1,0 +1,56 @@
+{
+  "title": "Tipos de cambio",
+  "subtitle": "Administrá la preferencia, las cotizaciones manuales y la sincronización oficial.",
+  "preference": {
+    "title": "Tipo de cambio preferido",
+    "label": "Cotización predeterminada"
+  },
+  "manual": {
+    "title": "Nueva cotización manual"
+  },
+  "fields": {
+    "currency": "Moneda",
+    "type": "Tipo",
+    "value": "Valor",
+    "date": "Fecha",
+    "source": "Fuente"
+  },
+  "types": {
+    "oficial": "Oficial",
+    "mep": "MEP",
+    "ccl": "CCL",
+    "blue": "Blue",
+    "manual": "Manual"
+  },
+  "sources": {
+    "bcra_api": "BCRA",
+    "manual": "Manual"
+  },
+  "actions": {
+    "savePreference": "Guardar preferencia",
+    "saveManual": "Guardar cotización",
+    "syncBcra": "Sincronizar BCRA (USD oficial)",
+    "saving": "Guardando…",
+    "syncing": "Sincronizando…"
+  },
+  "history": {
+    "title": "Historial",
+    "caption": "Historial de tipos de cambio"
+  },
+  "states": {
+    "loading": "Cargando tipos de cambio…",
+    "empty": "No hay tipos de cambio registrados."
+  },
+  "success": {
+    "preference": "La preferencia se guardó correctamente.",
+    "manual": "La cotización manual se guardó correctamente.",
+    "sync": "La cotización oficial del BCRA se sincronizó correctamente."
+  },
+  "errors": {
+    "load": "No se pudieron cargar los tipos de cambio. Volvé a intentarlo.",
+    "preference": "No se pudo guardar la preferencia.",
+    "manual": "No se pudo guardar la cotización manual.",
+    "sync": "No se pudo sincronizar la cotización del BCRA.",
+    "invalidValue": "Ingresá un valor mayor que cero."
+  }
+}

@@ -105,7 +105,7 @@ export const NAV_SECTIONS: readonly NavSection[] = [
     key: 'comisionesConfig',
     path: '/comisiones/config',
     icon: '💰',
-    roles: ['owner', 'manager', 'finance'],
+    roles: ['owner', 'manager'],
     moduleKey: 'finance.commissions',
   },
   {
@@ -128,6 +128,13 @@ export const NAV_SECTIONS: readonly NavSection[] = [
     icon: '📥',
     roles: ['owner', 'manager'],
     moduleKey: 'platform.data_import',
+  },
+  {
+    key: 'tiposCambio',
+    path: '/tipos-cambio',
+    icon: '💱',
+    roles: ['owner', 'manager', 'finance'],
+    moduleKey: 'catalog.multicurrency',
   },
   {
     key: 'proveedores',
@@ -242,6 +249,7 @@ export const ROUTE_MODULE_GUARDS: ReadonlyArray<{ path: string; moduleKey: Modul
   { path: 'comisiones/liquidaciones', moduleKey: 'finance.commissions' },
   { path: 'comisiones/mias', moduleKey: 'finance.commissions' },
   { path: 'importaciones', moduleKey: 'platform.data_import' },
+  { path: 'tipos-cambio', moduleKey: 'catalog.multicurrency' },
   { path: 'logistica', moduleKey: 'logistics.dispatches' },
   { path: 'logistica/picking', moduleKey: 'logistics.picking' },
   { path: 'logistica/seguimiento', moduleKey: 'logistics.gps' },

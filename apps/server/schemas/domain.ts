@@ -220,6 +220,8 @@ export const articuloBodySchema = z
     precioLista1: z.number(),
     precioLista2: z.number(),
     costo: z.number(),
+    monedaPrecio: z.enum(['ARS', 'USD', 'EUR']).optional(),
+    precioEnMonedaOrigen: z.union([z.number().min(0), z.null()]).optional(),
     stock: z.number(),
     minimo: z.number(),
     activo: z.boolean(),
@@ -253,6 +255,16 @@ export const articuloBodySchema = z
     }
     if (typeof data.costo !== 'number' || data.costo < 0.01) {
       ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'costo must be >= 0.01', path: ['costo'] })
+    }
+    const monedaPrecio = data.monedaPrecio ?? 'ARS'
+    if (monedaPrecio !== 'ARS') {
+      if (data.precioEnMonedaOrigen == null || data.precioEnMonedaOrigen < 0.0001) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'precioEnMonedaOrigen is required when monedaPrecio is USD or EUR',
+          path: ['precioEnMonedaOrigen'],
+        })
+      }
     }
     const tipo = data.tipo ?? 'articulo'
     if (tipo === 'servicio') {
@@ -313,6 +325,9 @@ export const articuloBodySchema = z
         precioLista1: data.precioLista1,
         precioLista2: data.precioLista2,
         costo: data.costo,
+        monedaPrecio: data.monedaPrecio ?? 'ARS',
+        precioEnMonedaOrigen:
+          (data.monedaPrecio ?? 'ARS') === 'ARS' ? null : (data.precioEnMonedaOrigen ?? null),
         stock: tipo === 'servicio' ? 0 : data.stock,
         minimo: tipo === 'servicio' ? 0 : data.minimo,
         activo: data.activo,
@@ -3262,4 +3277,22 @@ export const liquidacionGenerarBodySchema = z.object({
 
 export const comisionesSettingsBodySchema = z.object({
   modoDevengo: comisionTipoSchema,
+})
+
+const tipoCambioTipoSchema = z.enum(['oficial', 'mep', 'ccl', 'blue', 'manual'])
+const monedaFxSchema = z.enum(['USD', 'EUR'])
+
+export const tipoCambioManualBodySchema = z.object({
+  moneda: monedaFxSchema,
+  tipo: tipoCambioTipoSchema,
+  valor: z.number().positive(),
+  fecha: z.string().min(1).optional(),
+})
+
+export const tipoCambioPreferidoBodySchema = z.object({
+  tipoCambioPreferido: tipoCambioTipoSchema,
+})
+
+export const tipoCambioSyncBodySchema = z.object({
+  moneda: monedaFxSchema.optional(),
 })

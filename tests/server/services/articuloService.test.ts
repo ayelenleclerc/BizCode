@@ -44,4 +44,55 @@ describe('ArticuloService', () => {
     }
     expect(prisma.articulo.create).not.toHaveBeenCalled()
   })
+
+  it('materializes precioLista1 from FX origin × current rate (#243)', async () => {
+    const { Decimal } = await import('@prisma/client/runtime/library')
+    vi.mocked(prisma.rubro.findFirst).mockResolvedValue({ id: 5 } as never)
+    Object.assign(prisma, {
+      tenantConfig: {
+        findUnique: vi.fn().mockResolvedValue({ tipoCambioPreferido: 'oficial' }),
+      },
+      tipoCambio: {
+        findFirst: vi.fn().mockResolvedValue({
+          id: 1,
+          tenantId: 1,
+          moneda: 'USD',
+          tipo: 'oficial',
+          valor: new Decimal(1100),
+          fecha: new Date('2026-07-24T12:00:00.000Z'),
+          fuente: 'manual',
+          createdById: null,
+          createdAt: new Date('2026-07-24T12:00:00.000Z'),
+        }),
+      },
+    })
+    vi.mocked(prisma.articulo.create).mockResolvedValue({ id: 8 } as never)
+
+    const result = await service.create(1, {
+      codigo: 21,
+      descripcion: 'USD articulo',
+      rubroId: 5,
+      condIva: '1',
+      umedida: 'UN',
+      precioLista1: 1,
+      precioLista2: 1,
+      costo: 1,
+      stock: 1,
+      minimo: 0,
+      activo: true,
+      monedaPrecio: 'USD',
+      precioEnMonedaOrigen: 10,
+    })
+
+    expect(result.ok).toBe(true)
+    expect(prisma.articulo.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          monedaPrecio: 'USD',
+          precioEnMonedaOrigen: 10,
+          precioLista1: 11000,
+        }),
+      }),
+    )
+  })
 })

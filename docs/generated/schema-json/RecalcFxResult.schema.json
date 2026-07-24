@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "moneda": {
+      "enum": [
+        "USD",
+        "EUR"
+      ],
+      "type": "string"
+    },
+    "tipo": {
+      "enum": [
+        "oficial",
+        "mep",
+        "ccl",
+        "blue",
+        "manual"
+      ],
+      "type": "string"
+    },
+    "updatedCount": {
+      "type": "integer"
+    },
+    "valor": {
+      "type": "number"
+    }
+  },
+  "required": [
+    "updatedCount",
+    "moneda",
+    "tipo",
+    "valor"
+  ],
+  "title": "RecalcFxResult",
+  "type": "object"
+}

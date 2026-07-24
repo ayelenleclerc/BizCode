@@ -1,0 +1,56 @@
+{
+  "title": "Taxas de câmbio",
+  "subtitle": "Gerencie a taxa preferida, as cotações manuais e a sincronização oficial.",
+  "preference": {
+    "title": "Tipo de câmbio preferido",
+    "label": "Cotação padrão"
+  },
+  "manual": {
+    "title": "Nova cotação manual"
+  },
+  "fields": {
+    "currency": "Moeda",
+    "type": "Tipo",
+    "value": "Valor",
+    "date": "Data",
+    "source": "Fonte"
+  },
+  "types": {
+    "oficial": "Oficial",
+    "mep": "MEP",
+    "ccl": "CCL",
+    "blue": "Blue",
+    "manual": "Manual"
+  },
+  "sources": {
+    "bcra_api": "BCRA",
+    "manual": "Manual"
+  },
+  "actions": {
+    "savePreference": "Salvar preferência",
+    "saveManual": "Salvar cotação",
+    "syncBcra": "Sincronizar BCRA (USD oficial)",
+    "saving": "Salvando…",
+    "syncing": "Sincronizando…"
+  },
+  "history": {
+    "title": "Histórico",
+    "caption": "Histórico de taxas de câmbio"
+  },
+  "states": {
+    "loading": "Carregando taxas de câmbio…",
+    "empty": "Não há taxas de câmbio registradas."
+  },
+  "success": {
+    "preference": "A preferência foi salva com sucesso.",
+    "manual": "A cotação manual foi salva com sucesso.",
+    "sync": "A cotação oficial do BCRA foi sincronizada com sucesso."
+  },
+  "errors": {
+    "load": "Não foi possível carregar as taxas de câmbio. Tente novamente.",
+    "preference": "Não foi possível salvar a preferência.",
+    "manual": "Não foi possível salvar a cotação manual.",
+    "sync": "Não foi possível sincronizar a cotação do BCRA.",
+    "invalidValue": "Informe um valor maior que zero."
+  }
+}

@@ -16,25 +16,27 @@ undefined#/properties/articulo
 
 # articulo Properties
 
-| Property                          | Type      | Required | Nullable       | Defined by                                                                               |
-| :-------------------------------- | :-------- | :------- | :------------- | :--------------------------------------------------------------------------------------- |
-| [activo](#activo)                 | `boolean` | Optional | cannot be null | [Articulo](articulo-properties-activo.md "undefined#/properties/activo")                 |
-| [codigo](#codigo)                 | `integer` | Optional | cannot be null | [Articulo](articulo-properties-codigo.md "undefined#/properties/codigo")                 |
-| [condIva](#condiva)               | `string`  | Optional | cannot be null | [Articulo](articulo-properties-condiva.md "undefined#/properties/condIva")               |
-| [costo](#costo)                   | `number`  | Optional | cannot be null | [Articulo](articulo-properties-costo.md "undefined#/properties/costo")                   |
-| [descripcion](#descripcion)       | `string`  | Optional | cannot be null | [Articulo](articulo-properties-descripcion.md "undefined#/properties/descripcion")       |
-| [id](#id)                         | `integer` | Optional | cannot be null | [Articulo](articulo-properties-id.md "undefined#/properties/id")                         |
-| [mesesGarantia](#mesesgarantia)   | `integer` | Optional | cannot be null | [Articulo](articulo-properties-mesesgarantia.md "undefined#/properties/mesesGarantia")   |
-| [minimo](#minimo)                 | `integer` | Optional | cannot be null | [Articulo](articulo-properties-minimo.md "undefined#/properties/minimo")                 |
-| [precioLista1](#preciolista1)     | `number`  | Optional | cannot be null | [Articulo](articulo-properties-preciolista1.md "undefined#/properties/precioLista1")     |
-| [precioLista2](#preciolista2)     | `number`  | Optional | cannot be null | [Articulo](articulo-properties-preciolista2.md "undefined#/properties/precioLista2")     |
-| [rubro](#rubro)                   | `object`  | Optional | cannot be null | [Articulo](rubro.md "undefined#/properties/rubro")                                       |
-| [rubroId](#rubroid)               | `integer` | Optional | cannot be null | [Articulo](articulo-properties-rubroid.md "undefined#/properties/rubroId")               |
-| [stock](#stock)                   | `integer` | Optional | cannot be null | [Articulo](articulo-properties-stock.md "undefined#/properties/stock")                   |
-| [tipo](#tipo)                     | `string`  | Optional | cannot be null | [Articulo](articulo-properties-tipo.md "undefined#/properties/tipo")                     |
-| [umedida](#umedida)               | `string`  | Optional | cannot be null | [Articulo](articulo-properties-umedida.md "undefined#/properties/umedida")               |
-| [unidadServicio](#unidadservicio) | `string`  | Optional | cannot be null | [Articulo](articulo-properties-unidadservicio.md "undefined#/properties/unidadServicio") |
-| Additional Properties             | Any       | Optional | can be null    |                                                                                          |
+| Property                                      | Type      | Required | Nullable       | Defined by                                                                                           |
+| :-------------------------------------------- | :-------- | :------- | :------------- | :--------------------------------------------------------------------------------------------------- |
+| [activo](#activo)                             | `boolean` | Optional | cannot be null | [Articulo](articulo-properties-activo.md "undefined#/properties/activo")                             |
+| [codigo](#codigo)                             | `integer` | Optional | cannot be null | [Articulo](articulo-properties-codigo.md "undefined#/properties/codigo")                             |
+| [condIva](#condiva)                           | `string`  | Optional | cannot be null | [Articulo](articulo-properties-condiva.md "undefined#/properties/condIva")                           |
+| [costo](#costo)                               | `number`  | Optional | cannot be null | [Articulo](articulo-properties-costo.md "undefined#/properties/costo")                               |
+| [descripcion](#descripcion)                   | `string`  | Optional | cannot be null | [Articulo](articulo-properties-descripcion.md "undefined#/properties/descripcion")                   |
+| [id](#id)                                     | `integer` | Optional | cannot be null | [Articulo](articulo-properties-id.md "undefined#/properties/id")                                     |
+| [mesesGarantia](#mesesgarantia)               | `integer` | Optional | cannot be null | [Articulo](articulo-properties-mesesgarantia.md "undefined#/properties/mesesGarantia")               |
+| [minimo](#minimo)                             | `integer` | Optional | cannot be null | [Articulo](articulo-properties-minimo.md "undefined#/properties/minimo")                             |
+| [monedaPrecio](#monedaprecio)                 | `string`  | Optional | cannot be null | [Articulo](articulo-properties-monedaprecio.md "undefined#/properties/monedaPrecio")                 |
+| [precioEnMonedaOrigen](#precioenmonedaorigen) | `number`  | Optional | cannot be null | [Articulo](articulo-properties-precioenmonedaorigen.md "undefined#/properties/precioEnMonedaOrigen") |
+| [precioLista1](#preciolista1)                 | `number`  | Optional | cannot be null | [Articulo](articulo-properties-preciolista1.md "undefined#/properties/precioLista1")                 |
+| [precioLista2](#preciolista2)                 | `number`  | Optional | cannot be null | [Articulo](articulo-properties-preciolista2.md "undefined#/properties/precioLista2")                 |
+| [rubro](#rubro)                               | `object`  | Optional | cannot be null | [Articulo](rubro.md "undefined#/properties/rubro")                                                   |
+| [rubroId](#rubroid)                           | `integer` | Optional | cannot be null | [Articulo](articulo-properties-rubroid.md "undefined#/properties/rubroId")                           |
+| [stock](#stock)                               | `integer` | Optional | cannot be null | [Articulo](articulo-properties-stock.md "undefined#/properties/stock")                               |
+| [tipo](#tipo)                                 | `string`  | Optional | cannot be null | [Articulo](articulo-properties-tipo.md "undefined#/properties/tipo")                                 |
+| [umedida](#umedida)                           | `string`  | Optional | cannot be null | [Articulo](articulo-properties-umedida.md "undefined#/properties/umedida")                           |
+| [unidadServicio](#unidadservicio)             | `string`  | Optional | cannot be null | [Articulo](articulo-properties-unidadservicio.md "undefined#/properties/unidadServicio")             |
+| Additional Properties                         | Any       | Optional | can be null    |                                                                                                      |
 
 ## activo
 
@@ -183,6 +185,60 @@ Warranty months for physical articles; null = no warranty (#251).
 ### minimo Type
 
 `integer`
+
+## monedaPrecio
+
+
+
+`monedaPrecio`
+
+* is optional
+
+* Type: `string`
+
+* cannot be null
+
+* defined in: [Articulo](articulo-properties-monedaprecio.md "undefined#/properties/monedaPrecio")
+
+### monedaPrecio Type
+
+`string`
+
+### monedaPrecio Constraints
+
+**enum**: the value of this property must be equal to one of the following values:
+
+| Value   | Explanation |
+| :------ | :---------- |
+| `"ARS"` |             |
+| `"USD"` |             |
+| `"EUR"` |             |
+
+### monedaPrecio Default Value
+
+The default value is:
+
+```json
+"ARS"
+```
+
+## precioEnMonedaOrigen
+
+
+
+`precioEnMonedaOrigen`
+
+* is optional
+
+* Type: `number`
+
+* cannot be null
+
+* defined in: [Articulo](articulo-properties-precioenmonedaorigen.md "undefined#/properties/precioEnMonedaOrigen")
+
+### precioEnMonedaOrigen Type
+
+`number`
 
 ## precioLista1
 
