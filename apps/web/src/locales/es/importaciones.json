@@ -1,0 +1,47 @@
+{
+  "title": "Importación masiva",
+  "subtitle": "Importá artículos, clientes, proveedores o saldos iniciales desde CSV/Excel.",
+  "entity": "Entidad",
+  "duplicateMode": "Duplicados",
+  "modo": "Modo",
+  "file": "Archivo",
+  "downloadCsv": "Descargar plantilla CSV",
+  "downloadXlsx": "Descargar plantilla Excel",
+  "validate": "Validar (sin guardar)",
+  "start": "Importar",
+  "summaryTitle": "Resumen de validación",
+  "summaryLine": "{{ok}} OK | {{errors}} errores | {{duplicates}} duplicados ({{total}} filas)",
+  "issueLine": "Fila {{row}} ({{kind}}): {{message}}",
+  "jobTitle": "Trabajo #{{id}}",
+  "estado": "Estado",
+  "downloadReport": "Descargar reporte",
+  "entities": {
+    "clientes": "Clientes",
+    "articulos": "Artículos",
+    "proveedores": "Proveedores",
+    "saldos": "Saldos iniciales"
+  },
+  "duplicateModes": {
+    "skip": "Ignorar existentes",
+    "update": "Actualizar existentes"
+  },
+  "modos": {
+    "mejores_esfuerzos": "Mejores esfuerzos",
+    "todo_o_nada": "Todo o nada"
+  },
+  "estados": {
+    "validating": "Validando",
+    "ready": "Listo",
+    "running": "En curso",
+    "completed": "Completado",
+    "failed": "Fallido",
+    "cancelled": "Cancelado"
+  },
+  "errors": {
+    "template": "No se pudo descargar la plantilla",
+    "fileRequired": "Seleccioná un archivo",
+    "validate": "Falló la validación",
+    "start": "No se pudo iniciar la importación",
+    "report": "No se pudo descargar el reporte"
+  }
+}

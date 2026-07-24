@@ -1,0 +1,107 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "completedAt": {
+      "format": "date-time",
+      "nullable": true,
+      "type": "string"
+    },
+    "createdAt": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "createdById": {
+      "type": "integer"
+    },
+    "createdCount": {
+      "type": "integer"
+    },
+    "duplicateCount": {
+      "type": "integer"
+    },
+    "duplicateMode": {
+      "enum": [
+        "update",
+        "skip"
+      ],
+      "type": "string"
+    },
+    "entity": {
+      "enum": [
+        "articulos",
+        "clientes",
+        "proveedores",
+        "saldos"
+      ],
+      "type": "string"
+    },
+    "errorCount": {
+      "type": "integer"
+    },
+    "estado": {
+      "enum": [
+        "validating",
+        "ready",
+        "running",
+        "completed",
+        "failed",
+        "cancelled"
+      ],
+      "type": "string"
+    },
+    "id": {
+      "type": "integer"
+    },
+    "modo": {
+      "enum": [
+        "mejores_esfuerzos",
+        "todo_o_nada"
+      ],
+      "type": "string"
+    },
+    "okCount": {
+      "type": "integer"
+    },
+    "processedRows": {
+      "type": "integer"
+    },
+    "skippedCount": {
+      "type": "integer"
+    },
+    "tenantId": {
+      "type": "integer"
+    },
+    "totalRows": {
+      "type": "integer"
+    },
+    "updatedAt": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "updatedCount": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "id",
+    "tenantId",
+    "entity",
+    "estado",
+    "modo",
+    "duplicateMode",
+    "totalRows",
+    "processedRows",
+    "okCount",
+    "errorCount",
+    "duplicateCount",
+    "createdCount",
+    "updatedCount",
+    "skippedCount",
+    "createdById",
+    "createdAt",
+    "updatedAt",
+    "completedAt"
+  ],
+  "title": "ImportJob",
+  "type": "object"
+}

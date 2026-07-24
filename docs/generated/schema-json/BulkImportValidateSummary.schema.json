@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "duplicateCount": {
+      "type": "integer"
+    },
+    "entity": {
+      "enum": [
+        "articulos",
+        "clientes",
+        "proveedores",
+        "saldos"
+      ],
+      "type": "string"
+    },
+    "errorCount": {
+      "type": "integer"
+    },
+    "issues": {
+      "items": {
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "error",
+              "duplicate"
+            ],
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "row": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "row",
+          "code",
+          "message",
+          "kind"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "okCount": {
+      "type": "integer"
+    },
+    "totalRows": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "entity",
+    "totalRows",
+    "okCount",
+    "errorCount",
+    "duplicateCount",
+    "issues"
+  ],
+  "title": "BulkImportValidateSummary",
+  "type": "object"
+}

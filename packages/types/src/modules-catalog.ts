@@ -81,6 +81,14 @@ export const MODULE_CATALOG = {
     plan: 'pro',
     price: 2500,
   },
+  'platform.data_import': {
+    label: 'Importacion masiva Excel/CSV',
+    required: false,
+    requiredInProd: false,
+    dependencies: ['core.clients', 'core.catalog'],
+    plan: 'pro',
+    price: 2000,
+  },
   'finance.receipts': {
     label: 'Recibos de pago',
     required: false,

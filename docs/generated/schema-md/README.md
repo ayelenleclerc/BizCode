@@ -70,6 +70,10 @@
 
 * [AuthScope](./authscope.md) – `-`
 
+* [BulkImportValidateEnvelope](./bulkimportvalidateenvelope.md) – `-`
+
+* [BulkImportValidateSummary](./bulkimportvalidatesummary.md) – `-`
+
 * [Caja](./caja.md) – `-`
 
 * [CajaEnvelope](./cajaenvelope.md) – `-`
@@ -373,6 +377,10 @@
 * [GarantiaUsoInput](./garantiausoinput.md) – `-`
 
 * [HealthResponse](./healthresponse.md) – `-`
+
+* [ImportJob](./importjob.md) – `-`
+
+* [ImportJobEnvelope](./importjobenvelope.md) – `-`
 
 * [LibroIvaComprasPreview](./libroivacompraspreview.md) – `-`
 
@@ -996,6 +1004,8 @@
 
 * [Untitled object in AuditEventListEnvelope](./auditeventlistenvelope-allof-0.md) – `undefined#/allOf/0`
 
+* [Untitled object in BulkImportValidateSummary](./bulkimportvalidatesummary-properties-issues-items.md) – `undefined#/properties/issues/items`
+
 * [Untitled object in CategoriaArticuloListEnvelope](./categoriaarticulolistenvelope-allof-0.md) – `undefined#/allOf/0`
 
 * [Untitled object in ChatConversation](./chatconversation-properties-lastmessage-anyof-1.md) – `undefined#/properties/lastMessage/anyOf/1`
@@ -1267,6 +1277,8 @@
 * [Untitled array in AuthScope](./authscope-properties-routeids.md) – `undefined#/properties/routeIds`
 
 * [Untitled array in AuthScope](./authscope-properties-warehouseids.md) – `undefined#/properties/warehouseIds`
+
+* [Untitled array in BulkImportValidateSummary](./bulkimportvalidatesummary-properties-issues.md) – `undefined#/properties/issues`
 
 * [Untitled array in CajaListEnvelope](./cajalistenvelope-properties-data.md) – `undefined#/properties/data`
 

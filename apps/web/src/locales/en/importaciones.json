@@ -1,0 +1,47 @@
+{
+  "title": "Bulk import",
+  "subtitle": "Import articles, customers, suppliers or opening balances from CSV/Excel.",
+  "entity": "Entity",
+  "duplicateMode": "Duplicates",
+  "modo": "Mode",
+  "file": "File",
+  "downloadCsv": "Download CSV template",
+  "downloadXlsx": "Download Excel template",
+  "validate": "Validate (dry-run)",
+  "start": "Import",
+  "summaryTitle": "Validation summary",
+  "summaryLine": "{{ok}} OK | {{errors}} errors | {{duplicates}} duplicates ({{total}} rows)",
+  "issueLine": "Row {{row}} ({{kind}}): {{message}}",
+  "jobTitle": "Job #{{id}}",
+  "estado": "Status",
+  "downloadReport": "Download report",
+  "entities": {
+    "clientes": "Customers",
+    "articulos": "Articles",
+    "proveedores": "Suppliers",
+    "saldos": "Opening balances"
+  },
+  "duplicateModes": {
+    "skip": "Skip existing",
+    "update": "Update existing"
+  },
+  "modos": {
+    "mejores_esfuerzos": "Best effort",
+    "todo_o_nada": "All or nothing"
+  },
+  "estados": {
+    "validating": "Validating",
+    "ready": "Ready",
+    "running": "Running",
+    "completed": "Completed",
+    "failed": "Failed",
+    "cancelled": "Cancelled"
+  },
+  "errors": {
+    "template": "Could not download template",
+    "fileRequired": "Select a file",
+    "validate": "Validation failed",
+    "start": "Could not start import",
+    "report": "Could not download report"
+  }
+}

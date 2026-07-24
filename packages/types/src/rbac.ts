@@ -49,6 +49,8 @@ export const PERMISSIONS = [
   'commissions.manage',
   'commissions.approve',
   'commissions.self.read',
+  'data_import.read',
+  'data_import.manage',
   'platform.tenants.manage',
   'platform.support.impersonate',
 ] as const
@@ -101,6 +103,8 @@ export const OWNER_PERMISSIONS = [
   'commissions.manage',
   'commissions.approve',
   'commissions.self.read',
+  'data_import.read',
+  'data_import.manage',
 ] as const satisfies readonly Permission[]
 
 /** Platform-only permissions (not included in owner). */
@@ -130,6 +134,8 @@ export const ROLE_PERMISSIONS: Record<UserRole, readonly Permission[]> = {
     'commissions.read',
     'commissions.manage',
     'commissions.approve',
+    'data_import.read',
+    'data_import.manage',
   ],
   seller: [
     'sales.create',
