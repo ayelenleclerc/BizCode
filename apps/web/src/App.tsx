@@ -29,6 +29,9 @@ import ListasPreciosPage from './pages/listas-precios'
 import CategoriasArticuloPage from './pages/categorias-articulo'
 import DepositosPage from './pages/depositos'
 import TransferenciasDepositoPage from './pages/transferencias-deposito'
+import ComisionesConfigPage from './pages/comisiones/config'
+import ComisionesLiquidacionesPage from './pages/comisiones/liquidaciones'
+import ComisionesMiasPage from './pages/comisiones/mias'
 import ReportesPage from './pages/reportes'
 import ConfiguracionPage from './pages/configuracion'
 import ZonasEntregaPage from './pages/configuracion/ZonasEntregaPage'
@@ -240,6 +243,30 @@ function AppRoutes() {
             element={
               <ModuleRoute moduleKey="inventory.warehouses">
                 <TransferenciasDepositoPage />
+              </ModuleRoute>
+            }
+          />
+          <Route
+            path="comisiones/config"
+            element={
+              <ModuleRoute moduleKey="finance.commissions">
+                <ComisionesConfigPage />
+              </ModuleRoute>
+            }
+          />
+          <Route
+            path="comisiones/liquidaciones"
+            element={
+              <ModuleRoute moduleKey="finance.commissions">
+                <ComisionesLiquidacionesPage />
+              </ModuleRoute>
+            }
+          />
+          <Route
+            path="comisiones/mias"
+            element={
+              <ModuleRoute moduleKey="finance.commissions">
+                <ComisionesMiasPage />
               </ModuleRoute>
             }
           />

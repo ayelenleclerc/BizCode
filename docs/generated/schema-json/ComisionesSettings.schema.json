@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "modoDevengo": {
+      "$ref": "./ComisionTipo.schema.json"
+    }
+  },
+  "required": [
+    "modoDevengo"
+  ],
+  "title": "ComisionesSettings",
+  "type": "object"
+}

@@ -3228,3 +3228,38 @@ export const transferenciaDepositoRecibirBodySchema = z.object({
     )
     .min(1),
 })
+
+const comisionTipoSchema = z.enum([
+  'porcentaje_cobrado',
+  'porcentaje_facturado',
+  'importe_fijo_por_venta',
+])
+
+export const configComisionCreateBodySchema = z.object({
+  vendedorId: z.number().int().min(1),
+  tipo: comisionTipoSchema,
+  alicuota: z.number().min(0),
+  vigenciaDesde: z.string().min(1),
+  vigenciaHasta: z.union([z.string().min(1), z.null()]).optional(),
+  articuloCategoriaId: z.union([z.number().int().min(1), z.null()]).optional(),
+  clienteId: z.union([z.number().int().min(1), z.null()]).optional(),
+})
+
+export const configComisionPatchBodySchema = z.object({
+  vendedorId: z.number().int().min(1).optional(),
+  tipo: comisionTipoSchema.optional(),
+  alicuota: z.number().min(0).optional(),
+  vigenciaDesde: z.string().min(1).optional(),
+  vigenciaHasta: z.union([z.string().min(1), z.null()]).optional(),
+  articuloCategoriaId: z.union([z.number().int().min(1), z.null()]).optional(),
+  clienteId: z.union([z.number().int().min(1), z.null()]).optional(),
+})
+
+export const liquidacionGenerarBodySchema = z.object({
+  periodo: z.string().regex(/^\d{4}-\d{2}$/),
+  vendedorId: z.number().int().min(1).optional(),
+})
+
+export const comisionesSettingsBodySchema = z.object({
+  modoDevengo: comisionTipoSchema,
+})

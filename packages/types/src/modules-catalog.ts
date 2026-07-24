@@ -73,6 +73,14 @@ export const MODULE_CATALOG = {
     plan: 'starter',
     price: 2000,
   },
+  'finance.commissions': {
+    label: 'Comisiones de vendedores',
+    required: false,
+    requiredInProd: false,
+    dependencies: ['finance.collections', 'billing.orders'],
+    plan: 'pro',
+    price: 2500,
+  },
   'finance.receipts': {
     label: 'Recibos de pago',
     required: false,

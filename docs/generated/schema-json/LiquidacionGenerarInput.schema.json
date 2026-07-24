@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "periodo": {
+      "pattern": "^\\d{4}-\\d{2}$",
+      "type": "string"
+    },
+    "vendedorId": {
+      "minimum": 1,
+      "type": "integer"
+    }
+  },
+  "required": [
+    "periodo"
+  ],
+  "title": "LiquidacionGenerarInput",
+  "type": "object"
+}

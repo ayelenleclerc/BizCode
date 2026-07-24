@@ -60,6 +60,8 @@ tags:
     description: Hierarchical article categories and attributes for variants (#235, module catalog.variants)
   - name: depositos
     description: Multi-warehouse deposits and transfers (#236, module inventory.warehouses)
+  - name: comisiones
+    description: Seller commissions configuration and monthly settlements (#237, module finance.commissions)
   - name: cobros
     description: Customer payment collections
   - name: portal
@@ -10273,6 +10275,401 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
 
+  /api/comisiones/settings:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [comisiones]
+      summary: Get commission accrual default mode
+      description: Requires module `finance.commissions`.
+      responses:
+        '200':
+          description: Settings
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComisionesSettingsEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    patch:
+      tags: [comisiones]
+      summary: Update commission accrual default mode
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ComisionesSettingsInput'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComisionesSettingsEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/comisiones/configs:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [comisiones]
+      summary: List commission configs
+      parameters:
+        - $ref: '#/components/parameters/ListLimit'
+        - $ref: '#/components/parameters/ListOffset'
+        - name: vendedorId
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '200':
+          description: Paginated configs
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConfigComisionListEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    post:
+      tags: [comisiones]
+      summary: Create commission config
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConfigComisionCreateInput'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConfigComisionEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/comisiones/configs/{id}:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    patch:
+      tags: [comisiones]
+      summary: Update commission config
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConfigComisionPatchInput'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConfigComisionEnvelope'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    delete:
+      tags: [comisiones]
+      summary: Delete commission config
+      responses:
+        '204':
+          description: Deleted
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/comisiones/liquidaciones:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [comisiones]
+      summary: List commission settlements
+      parameters:
+        - $ref: '#/components/parameters/ListLimit'
+        - $ref: '#/components/parameters/ListOffset'
+        - name: periodo
+          in: query
+          schema:
+            type: string
+            pattern: '^\d{4}-\d{2}$'
+        - name: estado
+          in: query
+          schema:
+            type: string
+            enum: [borrador, aprobada, pagada]
+        - name: vendedorId
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '200':
+          description: Paginated settlements
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LiquidacionComisionListEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/comisiones/liquidaciones/generar:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    post:
+      tags: [comisiones]
+      summary: Generate draft settlements for a period
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LiquidacionGenerarInput'
+      responses:
+        '201':
+          description: Generated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LiquidacionGenerarEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/comisiones/liquidaciones/{id}:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    get:
+      tags: [comisiones]
+      summary: Get settlement with detail lines
+      responses:
+        '200':
+          description: Settlement
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LiquidacionComisionEnvelope'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/comisiones/liquidaciones/{id}/aprobar:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    post:
+      tags: [comisiones]
+      summary: Approve draft settlement
+      responses:
+        '200':
+          description: Approved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LiquidacionComisionEnvelope'
+        '422':
+          description: Not draft
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/comisiones/liquidaciones/{id}/pagar:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    post:
+      tags: [comisiones]
+      summary: Mark approved settlement as paid
+      responses:
+        '200':
+          description: Paid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LiquidacionComisionEnvelope'
+        '422':
+          description: Not approved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/comisiones/liquidaciones/{id}/export.csv:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    get:
+      tags: [comisiones]
+      summary: Export settlement CSV
+      responses:
+        '200':
+          description: CSV file
+          content:
+            text/csv:
+              schema:
+                type: string
+        '422':
+          description: Still draft
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/comisiones/ranking:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [comisiones]
+      summary: Ranking of sellers by commission for a period
+      parameters:
+        - name: periodo
+          in: query
+          required: true
+          schema:
+            type: string
+            pattern: '^\d{4}-\d{2}$'
+      responses:
+        '200':
+          description: Ranking rows
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComisionRankingEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/comisiones/mias:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [comisiones]
+      summary: Current seller estimate and settlement history
+      description: Restricted to the authenticated user (`commissions.self.read`).
+      parameters:
+        - name: periodo
+          in: query
+          schema:
+            type: string
+            pattern: '^\d{4}-\d{2}$'
+      responses:
+        '200':
+          description: Self view
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MisComisionesResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
   /api/transferencias-deposito/{id}/anular:
     parameters:
       - $ref: '#/components/parameters/BizcodeChannelHeader'
@@ -17451,6 +17848,341 @@ components:
               items:
                 $ref: '#/components/schemas/TransferenciaDeposito'
         - $ref: '#/components/schemas/ListPaginationMeta'
+
+    ComisionTipo:
+      type: string
+      enum: [porcentaje_cobrado, porcentaje_facturado, importe_fijo_por_venta]
+
+    ComisionesSettingsInput:
+      type: object
+      required: [modoDevengo]
+      properties:
+        modoDevengo:
+          $ref: '#/components/schemas/ComisionTipo'
+
+    ComisionesSettings:
+      type: object
+      required: [modoDevengo]
+      properties:
+        modoDevengo:
+          $ref: '#/components/schemas/ComisionTipo'
+
+    ComisionesSettingsEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          enum: [true]
+        data:
+          $ref: '#/components/schemas/ComisionesSettings'
+
+    ConfigComision:
+      type: object
+      required:
+        [id, tenantId, vendedorId, tipo, alicuota, vigenciaDesde, vigenciaHasta, articuloCategoriaId, clienteId, createdAt, updatedAt]
+      properties:
+        id:
+          type: integer
+        tenantId:
+          type: integer
+        vendedorId:
+          type: integer
+        tipo:
+          $ref: '#/components/schemas/ComisionTipo'
+        alicuota:
+          type: number
+        vigenciaDesde:
+          type: string
+          format: date-time
+        vigenciaHasta:
+          type: string
+          format: date-time
+          nullable: true
+        articuloCategoriaId:
+          type: integer
+          nullable: true
+        clienteId:
+          type: integer
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        vendedorUsername:
+          type: string
+
+    ConfigComisionCreateInput:
+      type: object
+      required: [vendedorId, tipo, alicuota, vigenciaDesde]
+      properties:
+        vendedorId:
+          type: integer
+          minimum: 1
+        tipo:
+          $ref: '#/components/schemas/ComisionTipo'
+        alicuota:
+          type: number
+          minimum: 0
+        vigenciaDesde:
+          type: string
+          format: date-time
+        vigenciaHasta:
+          type: string
+          format: date-time
+          nullable: true
+        articuloCategoriaId:
+          type: integer
+          minimum: 1
+          nullable: true
+        clienteId:
+          type: integer
+          minimum: 1
+          nullable: true
+
+    ConfigComisionPatchInput:
+      type: object
+      properties:
+        vendedorId:
+          type: integer
+          minimum: 1
+        tipo:
+          $ref: '#/components/schemas/ComisionTipo'
+        alicuota:
+          type: number
+          minimum: 0
+        vigenciaDesde:
+          type: string
+          format: date-time
+        vigenciaHasta:
+          type: string
+          format: date-time
+          nullable: true
+        articuloCategoriaId:
+          type: integer
+          minimum: 1
+          nullable: true
+        clienteId:
+          type: integer
+          minimum: 1
+          nullable: true
+
+    ConfigComisionEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          enum: [true]
+        data:
+          $ref: '#/components/schemas/ConfigComision'
+
+    ConfigComisionListEnvelope:
+      allOf:
+        - type: object
+          required: [success, data]
+          properties:
+            success:
+              type: boolean
+              enum: [true]
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/ConfigComision'
+        - $ref: '#/components/schemas/ListPaginationMeta'
+
+    LiquidacionComisionDetalle:
+      type: object
+      required: [id, liquidacionId, facturaId, reciboCobroId, imputacionId, montoBase, alicuota, comision, concepto]
+      properties:
+        id:
+          type: integer
+        liquidacionId:
+          type: integer
+        facturaId:
+          type: integer
+          nullable: true
+        reciboCobroId:
+          type: integer
+          nullable: true
+        imputacionId:
+          type: integer
+          nullable: true
+        montoBase:
+          type: number
+        alicuota:
+          type: number
+        comision:
+          type: number
+        concepto:
+          type: string
+
+    LiquidacionComision:
+      type: object
+      required:
+        [id, tenantId, vendedorId, periodo, totalVentas, totalComision, estado, aprobadoPorId, pagadoEn, createdAt, updatedAt]
+      properties:
+        id:
+          type: integer
+        tenantId:
+          type: integer
+        vendedorId:
+          type: integer
+        periodo:
+          type: string
+          pattern: '^\d{4}-\d{2}$'
+        totalVentas:
+          type: number
+        totalComision:
+          type: number
+        estado:
+          type: string
+          enum: [borrador, aprobada, pagada]
+        aprobadoPorId:
+          type: integer
+          nullable: true
+        pagadoEn:
+          type: string
+          format: date-time
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        vendedorUsername:
+          type: string
+        detalle:
+          type: array
+          items:
+            $ref: '#/components/schemas/LiquidacionComisionDetalle'
+
+    LiquidacionComisionEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          enum: [true]
+        data:
+          $ref: '#/components/schemas/LiquidacionComision'
+
+    LiquidacionComisionListEnvelope:
+      allOf:
+        - type: object
+          required: [success, data]
+          properties:
+            success:
+              type: boolean
+              enum: [true]
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/LiquidacionComision'
+        - $ref: '#/components/schemas/ListPaginationMeta'
+
+    LiquidacionGenerarInput:
+      type: object
+      required: [periodo]
+      properties:
+        periodo:
+          type: string
+          pattern: '^\d{4}-\d{2}$'
+        vendedorId:
+          type: integer
+          minimum: 1
+
+    LiquidacionGenerarEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          enum: [true]
+        data:
+          type: object
+          required: [created, skipped]
+          properties:
+            created:
+              type: array
+              items:
+                $ref: '#/components/schemas/LiquidacionComision'
+            skipped:
+              type: integer
+
+    ComisionRankingRow:
+      type: object
+      required: [vendedorId, vendedorUsername, totalVentas, totalComision, liquidacionId, estado]
+      properties:
+        vendedorId:
+          type: integer
+        vendedorUsername:
+          type: string
+        totalVentas:
+          type: number
+        totalComision:
+          type: number
+        liquidacionId:
+          type: integer
+          nullable: true
+        estado:
+          type: string
+          nullable: true
+          enum: [borrador, aprobada, pagada]
+
+    ComisionRankingEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          enum: [true]
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ComisionRankingRow'
+
+    MisComisionesResponse:
+      type: object
+      required: [success, periodo, estimacion, liquidaciones]
+      properties:
+        success:
+          type: boolean
+          enum: [true]
+        periodo:
+          type: string
+        estimacion:
+          type: object
+          required: [totalVentas, totalComision, lineas]
+          properties:
+            totalVentas:
+              type: number
+            totalComision:
+              type: number
+            lineas:
+              type: array
+              items:
+                type: object
+                required: [concepto, montoBase, alicuota, comision, facturaId]
+                properties:
+                  concepto:
+                    type: string
+                  montoBase:
+                    type: number
+                  alicuota:
+                    type: number
+                  comision:
+                    type: number
+                  facturaId:
+                    type: integer
+                    nullable: true
+        liquidaciones:
+          type: array
+          items:
+            $ref: '#/components/schemas/LiquidacionComision'
 
     CategoriaArticuloCreateInput:
       type: object

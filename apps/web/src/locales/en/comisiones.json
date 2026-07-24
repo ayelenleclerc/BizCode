@@ -1,0 +1,48 @@
+{
+  "title": "Commissions",
+  "configTitle": "Commission settings",
+  "configSubtitle": "Rates by seller and validity",
+  "liquidacionesTitle": "Settlements",
+  "liquidacionesSubtitle": "Generate, approve and pay monthly commissions",
+  "miasTitle": "My commissions",
+  "miasSubtitle": "Period estimate and history",
+  "vendedorId": "Seller ID",
+  "tipo": "Type",
+  "alicuota": "Rate",
+  "vigenciaDesde": "Valid from",
+  "vigenciaHasta": "Valid until",
+  "clienteId": "Customer ID (optional)",
+  "categoriaId": "Category ID (optional)",
+  "create": "Create config",
+  "modoDevengo": "Default accrual mode",
+  "saveSettings": "Save mode",
+  "periodo": "Period (YYYY-MM)",
+  "generar": "Generate settlements",
+  "aprobar": "Approve",
+  "pagar": "Mark paid",
+  "ranking": "Period ranking",
+  "totalVentas": "Base total",
+  "totalComision": "Commission total",
+  "estado": "Status",
+  "emptyConfigs": "No configurations",
+  "emptyLiquidaciones": "No settlements",
+  "emptyEstimacion": "No estimate for this period",
+  "estimacion": "Estimate",
+  "historial": "History",
+  "tipos": {
+    "porcentaje_cobrado": "% on collected",
+    "porcentaje_facturado": "% on invoiced",
+    "importe_fijo_por_venta": "Fixed amount per sale"
+  },
+  "estados": {
+    "borrador": "Draft",
+    "aprobada": "Approved",
+    "pagada": "Paid"
+  },
+  "errors": {
+    "load": "Could not load data",
+    "save": "Could not save",
+    "action": "Could not complete the action"
+  },
+  "confirmDelete": "Delete this configuration?"
+}

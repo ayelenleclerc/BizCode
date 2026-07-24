@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "estado": {
+      "enum": [
+        "borrador",
+        "aprobada",
+        "pagada"
+      ],
+      "nullable": true,
+      "type": "string"
+    },
+    "liquidacionId": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "totalComision": {
+      "type": "number"
+    },
+    "totalVentas": {
+      "type": "number"
+    },
+    "vendedorId": {
+      "type": "integer"
+    },
+    "vendedorUsername": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "vendedorId",
+    "vendedorUsername",
+    "totalVentas",
+    "totalComision",
+    "liquidacionId",
+    "estado"
+  ],
+  "title": "ComisionRankingRow",
+  "type": "object"
+}

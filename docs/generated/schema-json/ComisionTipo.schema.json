@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "enum": [
+    "porcentaje_cobrado",
+    "porcentaje_facturado",
+    "importe_fijo_por_venta"
+  ],
+  "title": "ComisionTipo",
+  "type": "string"
+}

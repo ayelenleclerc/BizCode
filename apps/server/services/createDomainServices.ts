@@ -39,6 +39,8 @@ import { CategoriaArticuloService } from './CategoriaArticuloService'
 import { ArticuloVarianteService } from './ArticuloVarianteService'
 import { DepositoService } from './DepositoService'
 import { TransferenciaDepositoService } from './TransferenciaDepositoService'
+import { ComisionConfigService } from './ComisionConfigService'
+import { LiquidacionComisionService } from './LiquidacionComisionService'
 
 export type DomainServices = {
   cliente: ClienteService
@@ -81,6 +83,8 @@ export type DomainServices = {
   articuloVariante: ArticuloVarianteService
   deposito: DepositoService
   transferenciaDeposito: TransferenciaDepositoService
+  comisionConfig: ComisionConfigService
+  liquidacionComision: LiquidacionComisionService
 }
 
 /**
@@ -130,5 +134,7 @@ export function createDomainServices(prisma: PrismaClient): DomainServices {
     articuloVariante: new ArticuloVarianteService(prisma),
     deposito: new DepositoService(prisma),
     transferenciaDeposito: new TransferenciaDepositoService(prisma),
+    comisionConfig: new ComisionConfigService(prisma),
+    liquidacionComision: new LiquidacionComisionService(prisma),
   }
 }

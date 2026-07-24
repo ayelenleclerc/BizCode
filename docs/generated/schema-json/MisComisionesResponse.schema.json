@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "estimacion": {
+      "properties": {
+        "lineas": {
+          "items": {
+            "properties": {
+              "alicuota": {
+                "type": "number"
+              },
+              "comision": {
+                "type": "number"
+              },
+              "concepto": {
+                "type": "string"
+              },
+              "facturaId": {
+                "nullable": true,
+                "type": "integer"
+              },
+              "montoBase": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "concepto",
+              "montoBase",
+              "alicuota",
+              "comision",
+              "facturaId"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "totalComision": {
+          "type": "number"
+        },
+        "totalVentas": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "totalVentas",
+        "totalComision",
+        "lineas"
+      ],
+      "type": "object"
+    },
+    "liquidaciones": {
+      "items": {
+        "$ref": "./LiquidacionComision.schema.json"
+      },
+      "type": "array"
+    },
+    "periodo": {
+      "type": "string"
+    },
+    "success": {
+      "enum": [
+        true
+      ],
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "success",
+    "periodo",
+    "estimacion",
+    "liquidaciones"
+  ],
+  "title": "MisComisionesResponse",
+  "type": "object"
+}
