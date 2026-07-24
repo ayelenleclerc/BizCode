@@ -35,6 +35,7 @@ import ComisionesMiasPage from './pages/comisiones/mias'
 import ImportacionesPage from './pages/importaciones'
 import TiposCambioPage from './pages/tipos-cambio'
 import FormulasProduccionPage from './pages/formulas-produccion'
+import OrdenesProduccionPage from './pages/ordenes-produccion'
 import ReportesPage from './pages/reportes'
 import ConfiguracionPage from './pages/configuracion'
 import ZonasEntregaPage from './pages/configuracion/ZonasEntregaPage'
@@ -294,6 +295,14 @@ function AppRoutes() {
             element={
               <ModuleRoute moduleKey="production.bom">
                 <FormulasProduccionPage />
+              </ModuleRoute>
+            }
+          />
+          <Route
+            path="ordenes-produccion"
+            element={
+              <ModuleRoute moduleKey="production.orders">
+                <OrdenesProduccionPage />
               </ModuleRoute>
             }
           />

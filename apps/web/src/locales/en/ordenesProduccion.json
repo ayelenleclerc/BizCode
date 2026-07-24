@@ -1,0 +1,102 @@
+{
+  "title": "Production orders",
+  "subtitle": "Plan production from the active formula, reserve inputs and record finished goods.",
+  "list": {
+    "title": "Orders",
+    "caption": "Production order list"
+  },
+  "create": {
+    "title": "New production order"
+  },
+  "detail": {
+    "title": "{{numero}} details"
+  },
+  "availability": {
+    "title": "Input availability",
+    "caption": "Input needs against available deposit stock",
+    "sufficient": "There is enough stock to complete the order.",
+    "insufficient": "Insufficient stock for {{count}} input(s). Review the shortfalls.",
+    "needed": "Needed",
+    "available": "Available",
+    "missing": "Missing"
+  },
+  "start": {
+    "title": "Start production",
+    "help": "Starting reserves mandatory inputs without deducting them from stock yet."
+  },
+  "complete": {
+    "title": "Complete production",
+    "consumption": "Real input consumption",
+    "planned": "planned"
+  },
+  "purchase": {
+    "title": "Order actions"
+  },
+  "fields": {
+    "numero": "Number",
+    "articulo": "Article",
+    "articuloId": "Article ID",
+    "cantidadPlanif": "Planned quantity",
+    "cantidadReal": "Real quantity",
+    "depositoId": "Deposit ID",
+    "estado": "Status",
+    "costoTotal": "Total cost",
+    "observaciones": "Notes",
+    "proveedorId": "Supplier ID"
+  },
+  "estados": {
+    "planificada": "Planned",
+    "en_proceso": "In progress",
+    "completada": "Completed",
+    "cancelada": "Cancelled"
+  },
+  "units": {
+    "kg": "kg",
+    "g": "g",
+    "l": "l",
+    "ml": "ml",
+    "unidad": "unit",
+    "hora": "hour"
+  },
+  "actions": {
+    "create": "Create order",
+    "select": "Select",
+    "start": "Start production",
+    "complete": "Complete order",
+    "cancel": "Cancel order",
+    "suggestPurchase": "Suggest purchase order",
+    "saving": "Saving…",
+    "starting": "Starting…",
+    "completing": "Completing…",
+    "cancelling": "Cancelling…",
+    "suggesting": "Generating…"
+  },
+  "states": {
+    "loading": "Loading orders…",
+    "empty": "No production orders registered.",
+    "noSelection": "Select an order to review availability and actions.",
+    "detailLoading": "Loading details…",
+    "pending": "Pending"
+  },
+  "success": {
+    "create": "The production order was created successfully.",
+    "start": "Production started and inputs were reserved.",
+    "complete": "Order completed: inputs consumed and finished goods credited.",
+    "cancel": "The order was cancelled and reservations released.",
+    "purchase": "Draft purchase order #{{id}} was created with the missing inputs."
+  },
+  "errors": {
+    "load": "Production orders could not be loaded. Please try again.",
+    "detail": "Order details could not be loaded.",
+    "create": "The order could not be created. Check that the article has an active formula.",
+    "start": "Production could not be started. Input stock may be missing.",
+    "complete": "The order could not be completed.",
+    "cancel": "The order could not be cancelled.",
+    "purchase": "The suggested purchase order could not be created.",
+    "invalidArticulo": "Enter a valid article ID.",
+    "invalidCantidad": "Enter a planned quantity greater than zero.",
+    "invalidCantidadReal": "Enter a produced quantity greater than zero.",
+    "invalidDeposito": "Enter a valid deposit ID.",
+    "invalidProveedor": "Enter a valid supplier ID."
+  }
+}

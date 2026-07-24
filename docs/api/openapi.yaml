@@ -68,6 +68,8 @@ tags:
     description: Exchange rates and FX catalog pricing (#243, module catalog.multicurrency)
   - name: formulas-produccion
     description: Production BOM formulas (#248, module production.bom)
+  - name: ordenes-produccion
+    description: Production orders consuming BOM inputs (#249, module production.orders)
   - name: cobros
     description: Customer payment collections
   - name: portal
@@ -11223,6 +11225,255 @@ paths:
         '403':
           $ref: '#/components/responses/ForbiddenError'
 
+  /api/ordenes-produccion:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: estado
+        in: query
+        schema:
+          type: string
+          enum: [planificada, en_proceso, completada, cancelada]
+      - name: articuloId
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+      - name: desde
+        in: query
+        schema:
+          type: string
+          format: date-time
+      - name: hasta
+        in: query
+        schema:
+          type: string
+          format: date-time
+      - $ref: '#/components/parameters/ListLimit'
+      - $ref: '#/components/parameters/ListOffset'
+    get:
+      tags: [ordenes-produccion]
+      summary: List production orders (#249)
+      responses:
+        '200':
+          description: Paginated production orders
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrdenProduccionListEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+    post:
+      tags: [ordenes-produccion]
+      summary: Plan a production order from the active BOM formula (#249)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrdenProduccionCreateInput'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrdenProduccionEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /api/ordenes-produccion/{id}:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    get:
+      tags: [ordenes-produccion]
+      summary: Get production order by id (#249)
+      responses:
+        '200':
+          description: Production order
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrdenProduccionEnvelope'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /api/ordenes-produccion/{id}/disponibilidad:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    get:
+      tags: [ordenes-produccion]
+      summary: Input availability vs deposit stock minus reservations (#249)
+      responses:
+        '200':
+          description: Availability per input line
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrdenProduccionDisponibilidadEnvelope'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /api/ordenes-produccion/{id}/iniciar:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    post:
+      tags: [ordenes-produccion]
+      summary: Start production and reserve mandatory inputs (#249)
+      responses:
+        '200':
+          description: Order in progress
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrdenProduccionEnvelope'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /api/ordenes-produccion/{id}/completar:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    post:
+      tags: [ordenes-produccion]
+      summary: Complete order, consume inputs and credit finished goods (#249)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrdenProduccionCompletarInput'
+      responses:
+        '200':
+          description: Completed order
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrdenProduccionEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /api/ordenes-produccion/{id}/cancelar:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    post:
+      tags: [ordenes-produccion]
+      summary: Cancel order and release reservations (#249)
+      responses:
+        '200':
+          description: Cancelled order
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrdenProduccionEnvelope'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /api/ordenes-produccion/{id}/sugerir-compra:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    post:
+      tags: [ordenes-produccion]
+      summary: Create draft purchase order for missing inputs (#249)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [proveedorId]
+              properties:
+                proveedorId:
+                  type: integer
+                  minimum: 1
+      responses:
+        '201':
+          description: Draft purchase order created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrdenProduccionSugerirCompraEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
   /api/transferencias-deposito/{id}/anular:
     parameters:
       - $ref: '#/components/parameters/BizcodeChannelHeader'
@@ -19189,6 +19440,239 @@ components:
               type: array
               items:
                 type: object
+
+    OrdenProduccionCreateInput:
+      type: object
+      required: [articuloId, cantidadPlanif]
+      properties:
+        articuloId:
+          type: integer
+          minimum: 1
+        cantidadPlanif:
+          type: number
+          exclusiveMinimum: 0
+        depositoId:
+          type: integer
+          minimum: 1
+        fechaPlanif:
+          type: string
+          format: date-time
+        operadorId:
+          type: integer
+          minimum: 1
+          nullable: true
+        observaciones:
+          type: string
+          maxLength: 500
+          nullable: true
+
+    OrdenProduccionCompletarInput:
+      type: object
+      required: [cantidadReal]
+      properties:
+        cantidadReal:
+          type: number
+          exclusiveMinimum: 0
+        insumos:
+          type: array
+          items:
+            type: object
+            required: [articuloId, cantidadReal]
+            properties:
+              articuloId:
+                type: integer
+                minimum: 1
+              cantidadReal:
+                type: number
+                minimum: 0
+
+    OrdenProduccion:
+      type: object
+      required:
+        [
+          id,
+          tenantId,
+          numero,
+          articuloId,
+          formulaId,
+          depositoId,
+          cantidadPlanif,
+          cantidadReal,
+          estado,
+          fechaPlanif,
+          fechaInicio,
+          fechaFin,
+          costoTotal,
+          operadorId,
+          observaciones,
+          createdAt,
+          updatedAt,
+          insumos,
+        ]
+      properties:
+        id:
+          type: integer
+        tenantId:
+          type: integer
+        numero:
+          type: integer
+        articuloId:
+          type: integer
+        formulaId:
+          type: integer
+        depositoId:
+          type: integer
+        cantidadPlanif:
+          type: number
+        cantidadReal:
+          type: number
+          nullable: true
+        estado:
+          type: string
+          enum: [planificada, en_proceso, completada, cancelada]
+        fechaPlanif:
+          type: string
+          format: date-time
+        fechaInicio:
+          type: string
+          format: date-time
+          nullable: true
+        fechaFin:
+          type: string
+          format: date-time
+          nullable: true
+        costoTotal:
+          type: number
+          nullable: true
+        operadorId:
+          type: integer
+          nullable: true
+        observaciones:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        articulo:
+          type: object
+          nullable: true
+        deposito:
+          type: object
+          nullable: true
+        formula:
+          type: object
+          nullable: true
+        insumos:
+          type: array
+          items:
+            type: object
+
+    OrdenProduccionEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          enum: [true]
+        data:
+          $ref: '#/components/schemas/OrdenProduccion'
+
+    OrdenProduccionListEnvelope:
+      allOf:
+        - type: object
+          required: [success, data]
+          properties:
+            success:
+              type: boolean
+              enum: [true]
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/OrdenProduccion'
+        - $ref: '#/components/schemas/ListPaginationMeta'
+
+    OrdenProduccionDisponibilidadEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          enum: [true]
+        data:
+          type: object
+          required: [ordenId, depositoId, suficiente, lineas]
+          properties:
+            ordenId:
+              type: integer
+            depositoId:
+              type: integer
+            suficiente:
+              type: boolean
+            lineas:
+              type: array
+              items:
+                type: object
+                required:
+                  [
+                    articuloId,
+                    codigo,
+                    descripcion,
+                    unidad,
+                    necesario,
+                    disponible,
+                    faltante,
+                    esOpcional,
+                    mueveStock,
+                  ]
+                properties:
+                  articuloId:
+                    type: integer
+                  codigo:
+                    type: integer
+                  descripcion:
+                    type: string
+                  unidad:
+                    type: string
+                    enum: [kg, g, l, ml, unidad, hora]
+                  necesario:
+                    type: number
+                  disponible:
+                    type: number
+                  faltante:
+                    type: number
+                  esOpcional:
+                    type: boolean
+                  mueveStock:
+                    type: boolean
+
+    OrdenProduccionSugerirCompraEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          enum: [true]
+        data:
+          type: object
+          required: [ordenCompraId, items]
+          properties:
+            ordenCompraId:
+              type: integer
+            items:
+              type: array
+              items:
+                type: object
+                required: [articuloId, cantidad, costoUnitario]
+                properties:
+                  articuloId:
+                    type: integer
+                  cantidad:
+                    type: number
+                  costoUnitario:
+                    type: number
 
     CategoriaArticuloCreateInput:
       type: object

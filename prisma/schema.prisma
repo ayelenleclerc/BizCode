@@ -312,6 +312,9 @@ model Articulo {
   ofertas              ArticuloOferta[]
   formulasComoProducto FormulaProduccion[] @relation("FormulaProducto")
   formulasComoInsumo   FormulaInsumo[]     @relation("FormulaInsumoArticulo")
+  ordenesProduccion    OrdenProduccion[]   @relation("OrdenProduccionProducto")
+  ordenProduccionInsumos OrdenProduccionInsumo[] @relation("OrdenProduccionInsumoArticulo")
+  reservasProduccion   StockReservaProduccion[] @relation("StockReservaProduccionArticulo")
 
   @@unique([tenantId, codigo])
   @@index([tenantId])
@@ -351,6 +354,8 @@ model Deposito {
   stockAjustes       StockAjuste[]
   recuentos          Recuento[]
   ordenesEntrega     OrdenEntrega[]
+  ordenesProduccion  OrdenProduccion[]
+  reservasProduccion StockReservaProduccion[]
 
   @@unique([tenantId, codigo])
   @@index([tenantId])
@@ -1457,6 +1462,8 @@ model Tenant {
   importJobs                    ImportJob[]
   tiposCambio                   TipoCambio[]
   formulasProduccion            FormulaProduccion[]
+  ordenesProduccion             OrdenProduccion[]
+  reservasProduccion            StockReservaProduccion[]
 }
 
 /// Idempotent Mercado Pago payment webhook processing (#176).
@@ -1866,6 +1873,7 @@ model AppUser {
   liquidacionesComisionAprobadas LiquidacionComision[] @relation("LiquidacionComisionAprobadoPor")
   importJobs             ImportJob[] @relation("ImportJobCreatedBy")
   tiposCambio            TipoCambio[] @relation("TipoCambioCreatedBy")
+  ordenesProduccion      OrdenProduccion[] @relation("OrdenProduccionOperador")
 
   @@unique([tenantId, username])
 }
@@ -2227,6 +2235,7 @@ model FormulaProduccion {
   updatedAt         DateTime @updatedAt
 
   insumos FormulaInsumo[]
+  ordenesProduccion OrdenProduccion[]
 
   @@index([tenantId])
   @@index([tenantId, articuloId])
@@ -2251,6 +2260,101 @@ model FormulaInsumo {
 
   @@index([formulaId])
   @@index([articuloId])
+}
+
+/// @en Production order that consumes BOM inputs and credits finished goods (#249).
+/// @es Orden de producción que consume insumos BOM y acredita producto terminado (#249).
+/// @pt-BR Ordem de produção que consome insumos BOM e credita produto acabado (#249).
+model OrdenProduccion {
+  id             Int               @id @default(autoincrement())
+  tenantId       Int
+  tenant         Tenant            @relation(fields: [tenantId], references: [id])
+  /// @en Sequential order number per tenant, rendered as OP-00001.
+  /// @es Número secuencial por tenant, mostrado como OP-00001.
+  /// @pt-BR Número sequencial por tenant, exibido como OP-00001.
+  numero         Int
+  articuloId     Int
+  articulo       Articulo          @relation("OrdenProduccionProducto", fields: [articuloId], references: [id], onDelete: Restrict)
+  /// @en Formula version used when the order was planned.
+  /// @es Versión de fórmula usada al planificar la orden.
+  /// @pt-BR Versão da fórmula usada ao planejar a ordem.
+  formulaId      Int
+  formula        FormulaProduccion @relation(fields: [formulaId], references: [id], onDelete: Restrict)
+  depositoId     Int
+  deposito       Deposito          @relation(fields: [depositoId], references: [id], onDelete: Restrict)
+  cantidadPlanif Decimal           @db.Decimal(14, 4)
+  cantidadReal   Decimal?          @db.Decimal(14, 4)
+  /// planificada | en_proceso | completada | cancelada
+  estado         String            @default("planificada") @db.VarChar(20)
+  fechaPlanif    DateTime          @default(now())
+  fechaInicio    DateTime?
+  fechaFin       DateTime?
+  /// @en Real production cost computed when the order is completed.
+  /// @es Costo real de producción calculado al completar la orden.
+  /// @pt-BR Custo real de produção calculado ao concluir a ordem.
+  costoTotal     Decimal?          @db.Decimal(14, 2)
+  operadorId     Int?
+  operador       AppUser?          @relation("OrdenProduccionOperador", fields: [operadorId], references: [id], onDelete: SetNull)
+  observaciones  String?           @db.VarChar(500)
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+
+  insumos  OrdenProduccionInsumo[]
+  reservas StockReservaProduccion[]
+
+  @@unique([tenantId, numero])
+  @@index([tenantId])
+  @@index([tenantId, estado])
+  @@index([tenantId, articuloId])
+  @@index([tenantId, depositoId, estado])
+  @@index([tenantId, fechaPlanif])
+}
+
+/// @en Planned/real input line of a production order, frozen from the BOM (#249).
+/// @es Línea de insumo planificada/real de una orden de producción, congelada del BOM (#249).
+/// @pt-BR Linha de insumo planejada/real de uma ordem de produção, congelada do BOM (#249).
+model OrdenProduccionInsumo {
+  id           Int             @id @default(autoincrement())
+  ordenId      Int
+  orden        OrdenProduccion @relation(fields: [ordenId], references: [id], onDelete: Cascade)
+  articuloId   Int
+  articulo     Articulo        @relation("OrdenProduccionInsumoArticulo", fields: [articuloId], references: [id], onDelete: Restrict)
+  cantidadPlan Decimal         @db.Decimal(14, 4)
+  cantidadReal Decimal?        @db.Decimal(14, 4)
+  /// kg | g | l | ml | unidad | hora
+  unidad       String          @db.VarChar(12)
+  /// @en Unit cost snapshot taken when the order is completed.
+  /// @es Snapshot de costo unitario tomado al completar la orden.
+  /// @pt-BR Snapshot de custo unitário obtido ao concluir a ordem.
+  costo        Decimal?        @db.Decimal(14, 2)
+  esOpcional   Boolean         @default(false)
+  linea        Int             @default(0)
+
+  @@index([ordenId])
+  @@index([articuloId])
+}
+
+/// @en Soft stock reservation held by an in-progress production order (#249).
+/// @es Reserva blanda de stock que mantiene una orden de producción en proceso (#249).
+/// @pt-BR Reserva flexível de estoque mantida por uma ordem de produção em processo (#249).
+model StockReservaProduccion {
+  id         Int             @id @default(autoincrement())
+  tenantId   Int
+  tenant     Tenant          @relation(fields: [tenantId], references: [id])
+  ordenId    Int
+  orden      OrdenProduccion @relation(fields: [ordenId], references: [id], onDelete: Cascade)
+  articuloId Int
+  articulo   Articulo        @relation("StockReservaProduccionArticulo", fields: [articuloId], references: [id], onDelete: Restrict)
+  depositoId Int
+  deposito   Deposito        @relation(fields: [depositoId], references: [id], onDelete: Restrict)
+  cantidad   Decimal         @db.Decimal(14, 4)
+  activa     Boolean         @default(true)
+  createdAt  DateTime        @default(now())
+  releasedAt DateTime?
+
+  @@index([ordenId])
+  @@index([tenantId, articuloId, depositoId, activa])
+  @@index([tenantId, activa])
 }
 
 model StockAjuste {

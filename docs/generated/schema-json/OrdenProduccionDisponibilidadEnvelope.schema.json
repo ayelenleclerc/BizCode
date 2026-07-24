@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "data": {
+      "properties": {
+        "depositoId": {
+          "type": "integer"
+        },
+        "lineas": {
+          "items": {
+            "properties": {
+              "articuloId": {
+                "type": "integer"
+              },
+              "codigo": {
+                "type": "integer"
+              },
+              "descripcion": {
+                "type": "string"
+              },
+              "disponible": {
+                "type": "number"
+              },
+              "esOpcional": {
+                "type": "boolean"
+              },
+              "faltante": {
+                "type": "number"
+              },
+              "mueveStock": {
+                "type": "boolean"
+              },
+              "necesario": {
+                "type": "number"
+              },
+              "unidad": {
+                "enum": [
+                  "kg",
+                  "g",
+                  "l",
+                  "ml",
+                  "unidad",
+                  "hora"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "articuloId",
+              "codigo",
+              "descripcion",
+              "unidad",
+              "necesario",
+              "disponible",
+              "faltante",
+              "esOpcional",
+              "mueveStock"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "ordenId": {
+          "type": "integer"
+        },
+        "suficiente": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "ordenId",
+        "depositoId",
+        "suficiente",
+        "lineas"
+      ],
+      "type": "object"
+    },
+    "success": {
+      "enum": [
+        true
+      ],
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "success",
+    "data"
+  ],
+  "title": "OrdenProduccionDisponibilidadEnvelope",
+  "type": "object"
+}

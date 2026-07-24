@@ -3325,3 +3325,28 @@ export const formulaProduccionUpdateBodySchema = z.object({
 export const formulaProyeccionBodySchema = z.object({
   unidades: z.number().positive(),
 })
+
+export const ordenProduccionCreateBodySchema = z.object({
+  articuloId: z.number().int().min(1),
+  cantidadPlanif: z.number().positive(),
+  depositoId: z.number().int().min(1).optional(),
+  fechaPlanif: z.string().min(1).max(30).optional(),
+  operadorId: z.number().int().min(1).nullable().optional(),
+  observaciones: z.string().max(500).nullable().optional(),
+})
+
+export const ordenProduccionCompletarBodySchema = z.object({
+  cantidadReal: z.number().positive(),
+  insumos: z
+    .array(
+      z.object({
+        articuloId: z.number().int().min(1),
+        cantidadReal: z.number().min(0),
+      }),
+    )
+    .optional(),
+})
+
+export const ordenProduccionSugerirCompraBodySchema = z.object({
+  proveedorId: z.number().int().min(1),
+})

@@ -69163,6 +69163,1779 @@ Rate-limited mutation; requires products.manage. USD only.
 }
 ```
 
+### PARAMETERS /api/ordenes-produccion
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/ordenes-produccion`
+
+### List production orders (#249)
+
+- **Method:** `GET`
+- **Path:** `/api/ordenes-produccion`
+- **Tags:** ordenes-produccion
+
+#### Responses
+
+##### Status: 200 Paginated production orders
+
+###### Content-Type: application/json
+
+**All of:**
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`cantidadPlanif` (required)**
+
+    `number`
+
+  - **`cantidadReal` (required)**
+
+    `number`
+
+  - **`costoTotal` (required)**
+
+    `number`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`depositoId` (required)**
+
+    `integer`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"planificada", "en_proceso", "completada", "cancelada"`
+
+  - **`fechaFin` (required)**
+
+    `string`, format: `date-time`
+
+  - **`fechaInicio` (required)**
+
+    `string`, format: `date-time`
+
+  - **`fechaPlanif` (required)**
+
+    `string`, format: `date-time`
+
+  - **`formulaId` (required)**
+
+    `integer`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`insumos` (required)**
+
+    `array`
+
+    **Items:**
+
+  - **`numero` (required)**
+
+    `integer`
+
+  - **`observaciones` (required)**
+
+    `string`
+
+  - **`operadorId` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`articulo`**
+
+    `object`
+
+  - **`deposito`**
+
+    `object`
+
+  - **`formula`**
+
+    `object`
+
+- **`success` (required)**
+
+  `boolean`, possible values: `true`
+
+* **`limit` (required)**
+
+  `integer` — Effective page size (same semantics as query \`limit\`)
+
+* **`offset` (required)**
+
+  `integer` — Effective skip (same semantics as query \`offset\`)
+
+* **`total` (required)**
+
+  `integer` — Row count matching the list filter (before limit/offset)
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "numero": 1,
+      "articuloId": 1,
+      "formulaId": 1,
+      "depositoId": 1,
+      "cantidadPlanif": 1,
+      "cantidadReal": 1,
+      "estado": "planificada",
+      "fechaPlanif": "",
+      "fechaInicio": "",
+      "fechaFin": "",
+      "costoTotal": 1,
+      "operadorId": 1,
+      "observaciones": "",
+      "createdAt": "",
+      "updatedAt": "",
+      "articulo": {},
+      "deposito": {},
+      "formula": {},
+      "insumos": [
+        {}
+      ]
+    }
+  ],
+  "total": 0,
+  "limit": 1,
+  "offset": 0
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Plan a production order from the active BOM formula (#249)
+
+- **Method:** `POST`
+- **Path:** `/api/ordenes-produccion`
+- **Tags:** ordenes-produccion
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`articuloId` (required)**
+
+  `integer`
+
+- **`cantidadPlanif` (required)**
+
+  `number`
+
+- **`depositoId`**
+
+  `integer`
+
+- **`fechaPlanif`**
+
+  `string`, format: `date-time`
+
+- **`observaciones`**
+
+  `string`
+
+- **`operadorId`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "articuloId": 1,
+  "cantidadPlanif": 1,
+  "depositoId": 1,
+  "fechaPlanif": "",
+  "operadorId": 1,
+  "observaciones": ""
+}
+```
+
+#### Responses
+
+##### Status: 201 Created
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`cantidadPlanif` (required)**
+
+    `number`
+
+  - **`cantidadReal` (required)**
+
+    `number`
+
+  - **`costoTotal` (required)**
+
+    `number`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`depositoId` (required)**
+
+    `integer`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"planificada", "en_proceso", "completada", "cancelada"`
+
+  - **`fechaFin` (required)**
+
+    `string`, format: `date-time`
+
+  - **`fechaInicio` (required)**
+
+    `string`, format: `date-time`
+
+  - **`fechaPlanif` (required)**
+
+    `string`, format: `date-time`
+
+  - **`formulaId` (required)**
+
+    `integer`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`insumos` (required)**
+
+    `array`
+
+    **Items:**
+
+  - **`numero` (required)**
+
+    `integer`
+
+  - **`observaciones` (required)**
+
+    `string`
+
+  - **`operadorId` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`articulo`**
+
+    `object`
+
+  - **`deposito`**
+
+    `object`
+
+  - **`formula`**
+
+    `object`
+
+- **`success` (required)**
+
+  `boolean`, possible values: `true`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "numero": 1,
+    "articuloId": 1,
+    "formulaId": 1,
+    "depositoId": 1,
+    "cantidadPlanif": 1,
+    "cantidadReal": 1,
+    "estado": "planificada",
+    "fechaPlanif": "",
+    "fechaInicio": "",
+    "fechaFin": "",
+    "costoTotal": 1,
+    "operadorId": 1,
+    "observaciones": "",
+    "createdAt": "",
+    "updatedAt": "",
+    "articulo": {},
+    "deposito": {},
+    "formula": {},
+    "insumos": [
+      {}
+    ]
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 422 Semantically invalid request
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/ordenes-produccion/{id}
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/ordenes-produccion/{id}`
+
+### Get production order by id (#249)
+
+- **Method:** `GET`
+- **Path:** `/api/ordenes-produccion/{id}`
+- **Tags:** ordenes-produccion
+
+#### Responses
+
+##### Status: 200 Production order
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`cantidadPlanif` (required)**
+
+    `number`
+
+  - **`cantidadReal` (required)**
+
+    `number`
+
+  - **`costoTotal` (required)**
+
+    `number`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`depositoId` (required)**
+
+    `integer`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"planificada", "en_proceso", "completada", "cancelada"`
+
+  - **`fechaFin` (required)**
+
+    `string`, format: `date-time`
+
+  - **`fechaInicio` (required)**
+
+    `string`, format: `date-time`
+
+  - **`fechaPlanif` (required)**
+
+    `string`, format: `date-time`
+
+  - **`formulaId` (required)**
+
+    `integer`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`insumos` (required)**
+
+    `array`
+
+    **Items:**
+
+  - **`numero` (required)**
+
+    `integer`
+
+  - **`observaciones` (required)**
+
+    `string`
+
+  - **`operadorId` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`articulo`**
+
+    `object`
+
+  - **`deposito`**
+
+    `object`
+
+  - **`formula`**
+
+    `object`
+
+- **`success` (required)**
+
+  `boolean`, possible values: `true`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "numero": 1,
+    "articuloId": 1,
+    "formulaId": 1,
+    "depositoId": 1,
+    "cantidadPlanif": 1,
+    "cantidadReal": 1,
+    "estado": "planificada",
+    "fechaPlanif": "",
+    "fechaInicio": "",
+    "fechaFin": "",
+    "costoTotal": 1,
+    "operadorId": 1,
+    "observaciones": "",
+    "createdAt": "",
+    "updatedAt": "",
+    "articulo": {},
+    "deposito": {},
+    "formula": {},
+    "insumos": [
+      {}
+    ]
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/ordenes-produccion/{id}/disponibilidad
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/ordenes-produccion/{id}/disponibilidad`
+
+### Input availability vs deposit stock minus reservations (#249)
+
+- **Method:** `GET`
+- **Path:** `/api/ordenes-produccion/{id}/disponibilidad`
+- **Tags:** ordenes-produccion
+
+#### Responses
+
+##### Status: 200 Availability per input line
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`depositoId` (required)**
+
+    `integer`
+
+  - **`lineas` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId` (required)**
+
+      `integer`
+
+    - **`codigo` (required)**
+
+      `integer`
+
+    - **`descripcion` (required)**
+
+      `string`
+
+    - **`disponible` (required)**
+
+      `number`
+
+    - **`esOpcional` (required)**
+
+      `boolean`
+
+    - **`faltante` (required)**
+
+      `number`
+
+    - **`mueveStock` (required)**
+
+      `boolean`
+
+    - **`necesario` (required)**
+
+      `number`
+
+    - **`unidad` (required)**
+
+      `string`, possible values: `"kg", "g", "l", "ml", "unidad", "hora"`
+
+  - **`ordenId` (required)**
+
+    `integer`
+
+  - **`suficiente` (required)**
+
+    `boolean`
+
+- **`success` (required)**
+
+  `boolean`, possible values: `true`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "ordenId": 1,
+    "depositoId": 1,
+    "suficiente": true,
+    "lineas": [
+      {
+        "articuloId": 1,
+        "codigo": 1,
+        "descripcion": "",
+        "unidad": "kg",
+        "necesario": 1,
+        "disponible": 1,
+        "faltante": 1,
+        "esOpcional": true,
+        "mueveStock": true
+      }
+    ]
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/ordenes-produccion/{id}/iniciar
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/ordenes-produccion/{id}/iniciar`
+
+### Start production and reserve mandatory inputs (#249)
+
+- **Method:** `POST`
+- **Path:** `/api/ordenes-produccion/{id}/iniciar`
+- **Tags:** ordenes-produccion
+
+#### Responses
+
+##### Status: 200 Order in progress
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`cantidadPlanif` (required)**
+
+    `number`
+
+  - **`cantidadReal` (required)**
+
+    `number`
+
+  - **`costoTotal` (required)**
+
+    `number`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`depositoId` (required)**
+
+    `integer`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"planificada", "en_proceso", "completada", "cancelada"`
+
+  - **`fechaFin` (required)**
+
+    `string`, format: `date-time`
+
+  - **`fechaInicio` (required)**
+
+    `string`, format: `date-time`
+
+  - **`fechaPlanif` (required)**
+
+    `string`, format: `date-time`
+
+  - **`formulaId` (required)**
+
+    `integer`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`insumos` (required)**
+
+    `array`
+
+    **Items:**
+
+  - **`numero` (required)**
+
+    `integer`
+
+  - **`observaciones` (required)**
+
+    `string`
+
+  - **`operadorId` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`articulo`**
+
+    `object`
+
+  - **`deposito`**
+
+    `object`
+
+  - **`formula`**
+
+    `object`
+
+- **`success` (required)**
+
+  `boolean`, possible values: `true`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "numero": 1,
+    "articuloId": 1,
+    "formulaId": 1,
+    "depositoId": 1,
+    "cantidadPlanif": 1,
+    "cantidadReal": 1,
+    "estado": "planificada",
+    "fechaPlanif": "",
+    "fechaInicio": "",
+    "fechaFin": "",
+    "costoTotal": 1,
+    "operadorId": 1,
+    "observaciones": "",
+    "createdAt": "",
+    "updatedAt": "",
+    "articulo": {},
+    "deposito": {},
+    "formula": {},
+    "insumos": [
+      {}
+    ]
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 422 Semantically invalid request
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/ordenes-produccion/{id}/completar
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/ordenes-produccion/{id}/completar`
+
+### Complete order, consume inputs and credit finished goods (#249)
+
+- **Method:** `POST`
+- **Path:** `/api/ordenes-produccion/{id}/completar`
+- **Tags:** ordenes-produccion
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`cantidadReal` (required)**
+
+  `number`
+
+- **`insumos`**
+
+  `array`
+
+  **Items:**
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`cantidadReal` (required)**
+
+    `number`
+
+**Example:**
+
+```json
+{
+  "cantidadReal": 1,
+  "insumos": [
+    {
+      "articuloId": 1,
+      "cantidadReal": 0
+    }
+  ]
+}
+```
+
+#### Responses
+
+##### Status: 200 Completed order
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`cantidadPlanif` (required)**
+
+    `number`
+
+  - **`cantidadReal` (required)**
+
+    `number`
+
+  - **`costoTotal` (required)**
+
+    `number`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`depositoId` (required)**
+
+    `integer`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"planificada", "en_proceso", "completada", "cancelada"`
+
+  - **`fechaFin` (required)**
+
+    `string`, format: `date-time`
+
+  - **`fechaInicio` (required)**
+
+    `string`, format: `date-time`
+
+  - **`fechaPlanif` (required)**
+
+    `string`, format: `date-time`
+
+  - **`formulaId` (required)**
+
+    `integer`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`insumos` (required)**
+
+    `array`
+
+    **Items:**
+
+  - **`numero` (required)**
+
+    `integer`
+
+  - **`observaciones` (required)**
+
+    `string`
+
+  - **`operadorId` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`articulo`**
+
+    `object`
+
+  - **`deposito`**
+
+    `object`
+
+  - **`formula`**
+
+    `object`
+
+- **`success` (required)**
+
+  `boolean`, possible values: `true`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "numero": 1,
+    "articuloId": 1,
+    "formulaId": 1,
+    "depositoId": 1,
+    "cantidadPlanif": 1,
+    "cantidadReal": 1,
+    "estado": "planificada",
+    "fechaPlanif": "",
+    "fechaInicio": "",
+    "fechaFin": "",
+    "costoTotal": 1,
+    "operadorId": 1,
+    "observaciones": "",
+    "createdAt": "",
+    "updatedAt": "",
+    "articulo": {},
+    "deposito": {},
+    "formula": {},
+    "insumos": [
+      {}
+    ]
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 422 Semantically invalid request
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/ordenes-produccion/{id}/cancelar
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/ordenes-produccion/{id}/cancelar`
+
+### Cancel order and release reservations (#249)
+
+- **Method:** `POST`
+- **Path:** `/api/ordenes-produccion/{id}/cancelar`
+- **Tags:** ordenes-produccion
+
+#### Responses
+
+##### Status: 200 Cancelled order
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`cantidadPlanif` (required)**
+
+    `number`
+
+  - **`cantidadReal` (required)**
+
+    `number`
+
+  - **`costoTotal` (required)**
+
+    `number`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`depositoId` (required)**
+
+    `integer`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"planificada", "en_proceso", "completada", "cancelada"`
+
+  - **`fechaFin` (required)**
+
+    `string`, format: `date-time`
+
+  - **`fechaInicio` (required)**
+
+    `string`, format: `date-time`
+
+  - **`fechaPlanif` (required)**
+
+    `string`, format: `date-time`
+
+  - **`formulaId` (required)**
+
+    `integer`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`insumos` (required)**
+
+    `array`
+
+    **Items:**
+
+  - **`numero` (required)**
+
+    `integer`
+
+  - **`observaciones` (required)**
+
+    `string`
+
+  - **`operadorId` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`articulo`**
+
+    `object`
+
+  - **`deposito`**
+
+    `object`
+
+  - **`formula`**
+
+    `object`
+
+- **`success` (required)**
+
+  `boolean`, possible values: `true`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "numero": 1,
+    "articuloId": 1,
+    "formulaId": 1,
+    "depositoId": 1,
+    "cantidadPlanif": 1,
+    "cantidadReal": 1,
+    "estado": "planificada",
+    "fechaPlanif": "",
+    "fechaInicio": "",
+    "fechaFin": "",
+    "costoTotal": 1,
+    "operadorId": 1,
+    "observaciones": "",
+    "createdAt": "",
+    "updatedAt": "",
+    "articulo": {},
+    "deposito": {},
+    "formula": {},
+    "insumos": [
+      {}
+    ]
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 422 Semantically invalid request
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/ordenes-produccion/{id}/sugerir-compra
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/ordenes-produccion/{id}/sugerir-compra`
+
+### Create draft purchase order for missing inputs (#249)
+
+- **Method:** `POST`
+- **Path:** `/api/ordenes-produccion/{id}/sugerir-compra`
+- **Tags:** ordenes-produccion
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`proveedorId` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "proveedorId": 1
+}
+```
+
+#### Responses
+
+##### Status: 201 Draft purchase order created
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`items` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId` (required)**
+
+      `integer`
+
+    - **`cantidad` (required)**
+
+      `number`
+
+    - **`costoUnitario` (required)**
+
+      `number`
+
+  - **`ordenCompraId` (required)**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`, possible values: `true`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "ordenCompraId": 1,
+    "items": [
+      {
+        "articuloId": 1,
+        "cantidad": 1,
+        "costoUnitario": 1
+      }
+    ]
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 422 Semantically invalid request
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ### PARAMETERS /api/transferencias-deposito/{id}/anular
 
 - **Method:** `PARAMETERS`
@@ -97011,6 +98784,484 @@ Originating invoice header (selected columns)
     "corridas": 1,
     "lineas": [
       {}
+    ]
+  }
+}
+```
+
+### OrdenProduccionCreateInput
+
+- **Type:**`object`
+
+* **`articuloId` (required)**
+
+  `integer`
+
+* **`cantidadPlanif` (required)**
+
+  `number`
+
+* **`depositoId`**
+
+  `integer`
+
+* **`fechaPlanif`**
+
+  `string`, format: `date-time`
+
+* **`observaciones`**
+
+  `string`
+
+* **`operadorId`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "articuloId": 1,
+  "cantidadPlanif": 1,
+  "depositoId": 1,
+  "fechaPlanif": "",
+  "operadorId": 1,
+  "observaciones": ""
+}
+```
+
+### OrdenProduccionCompletarInput
+
+- **Type:**`object`
+
+* **`cantidadReal` (required)**
+
+  `number`
+
+* **`insumos`**
+
+  `array`
+
+  **Items:**
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`cantidadReal` (required)**
+
+    `number`
+
+**Example:**
+
+```json
+{
+  "cantidadReal": 1,
+  "insumos": [
+    {
+      "articuloId": 1,
+      "cantidadReal": 0
+    }
+  ]
+}
+```
+
+### OrdenProduccion
+
+- **Type:**`object`
+
+* **`articuloId` (required)**
+
+  `integer`
+
+* **`cantidadPlanif` (required)**
+
+  `number`
+
+* **`cantidadReal` (required)**
+
+  `number`
+
+* **`costoTotal` (required)**
+
+  `number`
+
+* **`createdAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`depositoId` (required)**
+
+  `integer`
+
+* **`estado` (required)**
+
+  `string`, possible values: `"planificada", "en_proceso", "completada", "cancelada"`
+
+* **`fechaFin` (required)**
+
+  `string`, format: `date-time`
+
+* **`fechaInicio` (required)**
+
+  `string`, format: `date-time`
+
+* **`fechaPlanif` (required)**
+
+  `string`, format: `date-time`
+
+* **`formulaId` (required)**
+
+  `integer`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`insumos` (required)**
+
+  `array`
+
+  **Items:**
+
+* **`numero` (required)**
+
+  `integer`
+
+* **`observaciones` (required)**
+
+  `string`
+
+* **`operadorId` (required)**
+
+  `integer`
+
+* **`tenantId` (required)**
+
+  `integer`
+
+* **`updatedAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`articulo`**
+
+  `object`
+
+* **`deposito`**
+
+  `object`
+
+* **`formula`**
+
+  `object`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "tenantId": 1,
+  "numero": 1,
+  "articuloId": 1,
+  "formulaId": 1,
+  "depositoId": 1,
+  "cantidadPlanif": 1,
+  "cantidadReal": 1,
+  "estado": "planificada",
+  "fechaPlanif": "",
+  "fechaInicio": "",
+  "fechaFin": "",
+  "costoTotal": 1,
+  "operadorId": 1,
+  "observaciones": "",
+  "createdAt": "",
+  "updatedAt": "",
+  "articulo": {},
+  "deposito": {},
+  "formula": {},
+  "insumos": [
+    {}
+  ]
+}
+```
+
+### OrdenProduccionEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`cantidadPlanif` (required)**
+
+    `number`
+
+  - **`cantidadReal` (required)**
+
+    `number`
+
+  - **`costoTotal` (required)**
+
+    `number`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`depositoId` (required)**
+
+    `integer`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"planificada", "en_proceso", "completada", "cancelada"`
+
+  - **`fechaFin` (required)**
+
+    `string`, format: `date-time`
+
+  - **`fechaInicio` (required)**
+
+    `string`, format: `date-time`
+
+  - **`fechaPlanif` (required)**
+
+    `string`, format: `date-time`
+
+  - **`formulaId` (required)**
+
+    `integer`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`insumos` (required)**
+
+    `array`
+
+    **Items:**
+
+  - **`numero` (required)**
+
+    `integer`
+
+  - **`observaciones` (required)**
+
+    `string`
+
+  - **`operadorId` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`articulo`**
+
+    `object`
+
+  - **`deposito`**
+
+    `object`
+
+  - **`formula`**
+
+    `object`
+
+* **`success` (required)**
+
+  `boolean`, possible values: `true`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "numero": 1,
+    "articuloId": 1,
+    "formulaId": 1,
+    "depositoId": 1,
+    "cantidadPlanif": 1,
+    "cantidadReal": 1,
+    "estado": "planificada",
+    "fechaPlanif": "",
+    "fechaInicio": "",
+    "fechaFin": "",
+    "costoTotal": 1,
+    "operadorId": 1,
+    "observaciones": "",
+    "createdAt": "",
+    "updatedAt": "",
+    "articulo": {},
+    "deposito": {},
+    "formula": {},
+    "insumos": [
+      {}
+    ]
+  }
+}
+```
+
+### OrdenProduccionListEnvelope
+
+- **Type:**
+
+**Example:**
+
+### OrdenProduccionDisponibilidadEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`depositoId` (required)**
+
+    `integer`
+
+  - **`lineas` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId` (required)**
+
+      `integer`
+
+    - **`codigo` (required)**
+
+      `integer`
+
+    - **`descripcion` (required)**
+
+      `string`
+
+    - **`disponible` (required)**
+
+      `number`
+
+    - **`esOpcional` (required)**
+
+      `boolean`
+
+    - **`faltante` (required)**
+
+      `number`
+
+    - **`mueveStock` (required)**
+
+      `boolean`
+
+    - **`necesario` (required)**
+
+      `number`
+
+    - **`unidad` (required)**
+
+      `string`, possible values: `"kg", "g", "l", "ml", "unidad", "hora"`
+
+  - **`ordenId` (required)**
+
+    `integer`
+
+  - **`suficiente` (required)**
+
+    `boolean`
+
+* **`success` (required)**
+
+  `boolean`, possible values: `true`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "ordenId": 1,
+    "depositoId": 1,
+    "suficiente": true,
+    "lineas": [
+      {
+        "articuloId": 1,
+        "codigo": 1,
+        "descripcion": "",
+        "unidad": "kg",
+        "necesario": 1,
+        "disponible": 1,
+        "faltante": 1,
+        "esOpcional": true,
+        "mueveStock": true
+      }
+    ]
+  }
+}
+```
+
+### OrdenProduccionSugerirCompraEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`items` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId` (required)**
+
+      `integer`
+
+    - **`cantidad` (required)**
+
+      `number`
+
+    - **`costoUnitario` (required)**
+
+      `number`
+
+  - **`ordenCompraId` (required)**
+
+    `integer`
+
+* **`success` (required)**
+
+  `boolean`, possible values: `true`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "ordenCompraId": 1,
+    "items": [
+      {
+        "articuloId": 1,
+        "cantidad": 1,
+        "costoUnitario": 1
+      }
     ]
   }
 }
