@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "diasAlertaVencimiento": {
+      "maximum": 365,
+      "minimum": 1,
+      "type": "integer"
+    }
+  },
+  "required": [
+    "diasAlertaVencimiento"
+  ],
+  "title": "ConfigFefoUpsertInput",
+  "type": "object"
+}

@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "facturas": {
+      "items": {
+        "properties": {
+          "cantidad": {
+            "type": "integer"
+          },
+          "clienteId": {
+            "nullable": true,
+            "type": "integer"
+          },
+          "clienteRsocial": {
+            "nullable": true,
+            "type": "string"
+          },
+          "facturaId": {
+            "type": "integer"
+          },
+          "facturaItemId": {
+            "type": "integer"
+          },
+          "fecha": {
+            "format": "date",
+            "type": "string"
+          },
+          "numero": {
+            "type": "integer"
+          },
+          "prefijo": {
+            "type": "string"
+          },
+          "tipo": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "facturaId",
+          "facturaItemId",
+          "tipo",
+          "prefijo",
+          "numero",
+          "fecha",
+          "cantidad",
+          "clienteId",
+          "clienteRsocial"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "lote": {
+      "$ref": "./Lote.schema.json"
+    }
+  },
+  "required": [
+    "lote",
+    "facturas"
+  ],
+  "title": "LoteTrazabilidad",
+  "type": "object"
+}

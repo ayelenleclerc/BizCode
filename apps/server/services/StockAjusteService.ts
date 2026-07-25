@@ -3,6 +3,7 @@ import type { StockAjusteInput } from '@bizcode/types'
 import { assertNoOpenRecuento } from '../lib/recuentoStockGuard'
 import type { ServiceResult } from './serviceResults'
 import { applyStockDepositoDelta, getDefaultDepositoId } from './stockDepositoSync'
+import { LoteService } from './LoteService'
 
 export type StockAjusteRow = Prisma.StockAjusteGetPayload<{
   include: { user: { select: { id: true; username: true } } }
@@ -26,7 +27,11 @@ export type StockHistorialResult = {
  * @pt-BR Ajustes manuais de estoque e histórico por artigo.
  */
 export class StockAjusteService {
-  constructor(private readonly prisma: PrismaClient) {}
+  private readonly loteService: LoteService
+
+  constructor(private readonly prisma: PrismaClient) {
+    this.loteService = new LoteService(prisma)
+  }
 
   async adjust(
     tenantId: number,
@@ -36,7 +41,15 @@ export class StockAjusteService {
   ): Promise<ServiceResult<StockAdjustResult>> {
     const articulo = await this.prisma.articulo.findFirst({
       where: { id: articuloId, tenantId },
-      select: { id: true, codigo: true, descripcion: true, stock: true, minimo: true, tipo: true },
+      select: {
+        id: true,
+        codigo: true,
+        descripcion: true,
+        stock: true,
+        minimo: true,
+        tipo: true,
+        controlLote: true,
+      },
     })
     if (!articulo) {
       return { ok: false, status: 404, error: 'Articulo not found' }
@@ -60,6 +73,16 @@ export class StockAjusteService {
       }
     }
 
+    const fefoEnabled = await this.loteService.isFefoEnabled(tenantId)
+    if (fefoEnabled && articulo.controlLote) {
+      if (depositoId == null) {
+        return { ok: false, status: 422, error: 'DEPOSITO_REQUIRED_FOR_LOTE' }
+      }
+      if (input.loteId == null) {
+        return { ok: false, status: 422, error: 'LOTE_REQUIRED' }
+      }
+    }
+
     const recuentoBlock = await assertNoOpenRecuento(this.prisma, tenantId, depositoId)
     if (!recuentoBlock.ok) {
       return recuentoBlock
@@ -75,7 +98,7 @@ export class StockAjusteService {
       const result = await this.prisma.$transaction(async (tx) => {
         let updated: Pick<Articulo, 'id' | 'codigo' | 'descripcion' | 'stock' | 'minimo'>
         if (depositoId != null) {
-          const applied = await applyStockDepositoDelta(tx, {
+          await applyStockDepositoDelta(tx, {
             tenantId,
             articuloId,
             depositoId,
@@ -85,9 +108,6 @@ export class StockAjusteService {
             where: { id: articuloId },
             select: { id: true, codigo: true, descripcion: true, stock: true, minimo: true },
           })
-          if (updated.stock !== applied.stockTotal) {
-            /* sync already set Articulo.stock */
-          }
         } else {
           updated = await tx.articulo.update({
             where: { id: articuloId },
@@ -95,6 +115,19 @@ export class StockAjusteService {
             select: { id: true, codigo: true, descripcion: true, stock: true, minimo: true },
           })
         }
+
+        if (fefoEnabled && articulo.controlLote && input.loteId != null && depositoId != null) {
+          const loteAdj = await this.loteService.applyAjuste(tx, tenantId, {
+            loteId: input.loteId,
+            articuloId,
+            depositoId,
+            cantidad: input.cantidad,
+          })
+          if (!loteAdj.ok) {
+            throw new Error(loteAdj.error)
+          }
+        }
+
         const ajuste = await tx.stockAjuste.create({
           data: {
             tenantId,
@@ -103,6 +136,7 @@ export class StockAjusteService {
             motivo: input.motivo,
             userId,
             ...(depositoId != null ? { depositoId } : {}),
+            ...(input.loteId != null ? { loteId: input.loteId } : {}),
           },
           include: { user: { select: { id: true, username: true } } },
         })
@@ -117,6 +151,18 @@ export class StockAjusteService {
     } catch (err) {
       if (err instanceof Error && err.message === 'INSUFFICIENT_DEPOSIT_STOCK') {
         return { ok: false, status: 422, error: 'INSUFFICIENT_STOCK' }
+      }
+      if (
+        err instanceof Error &&
+        ['INSUFFICIENT_LOT_STOCK', 'LOTE_MISMATCH', 'LOTE_INACTIVE', 'Lote not found'].includes(
+          err.message,
+        )
+      ) {
+        return {
+          ok: false,
+          status: err.message === 'Lote not found' ? 404 : 422,
+          error: err.message,
+        }
       }
       throw err
     }

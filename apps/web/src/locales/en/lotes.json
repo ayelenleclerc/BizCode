@@ -1,0 +1,23 @@
+{
+  "title": "Lots & FEFO",
+  "loadError": "Could not load lots",
+  "saveError": "Could not save configuration",
+  "saveOk": "Configuration saved",
+  "tabs": {
+    "list": "All lots",
+    "expiring": "Expiring soon"
+  },
+  "config": {
+    "title": "Expiry alert",
+    "dias": "Days of advance notice",
+    "save": "Save"
+  },
+  "table": {
+    "nroLote": "Lot #",
+    "articulo": "Product",
+    "deposito": "Warehouse",
+    "vencimiento": "Expiry",
+    "stock": "Stock",
+    "empty": "No lots"
+  }
+}

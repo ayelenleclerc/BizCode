@@ -44,6 +44,13 @@
     "rowAria": "Ítem {{n}}, pulse para seleccionar la fila",
     "rowAriaSelected": "Ítem {{n}}, fila seleccionada"
   },
+  "fefoPreview": {
+    "loading": "Calculando asignación FEFO…",
+    "error": "No se pudo calcular la asignación FEFO",
+    "empty": "Sin lotes disponibles para este artículo/depósito",
+    "ariaLabel": "Vista previa de asignación FEFO",
+    "line": "Lote {{nroLote}} (vto. {{fecha}}): {{cantidad}}"
+  },
   "totals": {
     "neto21": "Neto 21%",
     "neto105": "Neto 10.5%",

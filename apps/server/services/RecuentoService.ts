@@ -1,5 +1,6 @@
 import type { Prisma, PrismaClient } from '@prisma/client'
 import type { RecuentoItemLineInput } from '@bizcode/types'
+import { assertNoControlLoteArticles } from '../lib/controlLoteGuard'
 import type { ServiceResult } from './serviceResults'
 import { applyStockDepositoDelta, getDefaultDepositoId } from './stockDepositoSync'
 
@@ -186,6 +187,15 @@ export class RecuentoService {
 
     const depositoId =
       recuento.depositoId ?? (await getDefaultDepositoId(this.prisma, tenantId))
+
+    const lotBlock = await assertNoControlLoteArticles(
+      this.prisma,
+      tenantId,
+      recuento.items.map((i) => i.articuloId),
+    )
+    if (!lotBlock.ok) {
+      return lotBlock
+    }
 
     try {
       await this.prisma.$transaction(async (tx) => {

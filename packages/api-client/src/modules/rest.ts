@@ -583,7 +583,17 @@ export const comprasAPI = {
     }
   },
 
-  receive: async (id: number, lines: { itemId: number; cantidad: number }[]) => {
+  receive: async (
+    id: number,
+    lines: Array<{
+      itemId: number
+      cantidad: number
+      /** @en Manufacturer lot number when article tracks lots (#202). */
+      nroLote?: string
+      /** @en Lot expiry ISO date (YYYY-MM-DD) when article tracks lots (#202). */
+      fechaVencimiento?: string
+    }>,
+  ) => {
     try {
       const response = await api.post(`/compras/${id}/receive`, { lines })
       return response.data.data as OrdenCompra

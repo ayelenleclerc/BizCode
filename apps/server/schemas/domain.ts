@@ -217,6 +217,7 @@ export const articuloBodySchema = z
       .nullable()
       .optional(),
     mesesGarantia: z.union([z.number(), z.null()]).optional(),
+    controlLote: z.boolean().optional(),
     precioLista1: z.number(),
     precioLista2: z.number(),
     costo: z.number(),
@@ -322,6 +323,7 @@ export const articuloBodySchema = z
         tipo,
         unidadServicio: tipo === 'servicio' ? (data.unidadServicio ?? null) : null,
         mesesGarantia: tipo === 'servicio' ? null : (data.mesesGarantia ?? null),
+        controlLote: tipo === 'servicio' ? false : (data.controlLote ?? false),
         precioLista1: data.precioLista1,
         precioLista2: data.precioLista2,
         costo: data.costo,
@@ -1098,6 +1100,7 @@ export const stockAjusteBodySchema = z
     cantidad: z.number({ invalid_type_error: 'cantidad must be a number' }),
     motivo: z.string({ invalid_type_error: 'motivo must be a string' }),
     depositoId: z.union([z.number().int().min(1), z.null()]).optional(),
+    loteId: z.union([z.number().int().min(1), z.null()]).optional(),
   })
   .superRefine((data, ctx) => {
     if (!Number.isInteger(data.cantidad) || data.cantidad === 0) {
@@ -1120,6 +1123,7 @@ export const stockAjusteBodySchema = z
     cantidad: data.cantidad,
     motivo: data.motivo.trim(),
     depositoId: data.depositoId ?? null,
+    loteId: data.loteId ?? null,
   }))
 
 const empresaTipoFacturaSchema = z.enum(['A', 'B', 'C'], {
@@ -2060,6 +2064,8 @@ export const ordenCompraReceiveBodySchema = z
           .object({
             itemId: z.number({ invalid_type_error: 'itemId must be a number' }),
             cantidad: z.number({ invalid_type_error: 'cantidad must be a number' }),
+            nroLote: z.string().trim().min(1).max(60).nullable().optional(),
+            fechaVencimiento: z.string().trim().min(1).nullable().optional(),
           })
           .superRefine((line, ctx) => {
             if (!Number.isInteger(line.itemId) || line.itemId < 1) {
@@ -2076,11 +2082,36 @@ export const ordenCompraReceiveBodySchema = z
                 path: ['cantidad'],
               })
             }
+            const hasLot = Boolean(line.nroLote) || Boolean(line.fechaVencimiento)
+            if (hasLot && (!line.nroLote || !line.fechaVencimiento)) {
+              ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: 'nroLote and fechaVencimiento are required together',
+                path: ['nroLote'],
+              })
+            }
+            if (line.fechaVencimiento) {
+              const d = new Date(line.fechaVencimiento)
+              if (Number.isNaN(d.getTime())) {
+                ctx.addIssue({
+                  code: z.ZodIssueCode.custom,
+                  message: 'fechaVencimiento must be a valid date',
+                  path: ['fechaVencimiento'],
+                })
+              }
+            }
           }),
       )
       .min(1, 'lines must contain at least one entry'),
   })
-  .transform((data): { lines: OrdenCompraReceiveLineInput[] } => ({ lines: data.lines }))
+  .transform((data): { lines: OrdenCompraReceiveLineInput[] } => ({
+    lines: data.lines.map((line) => ({
+      itemId: line.itemId,
+      cantidad: line.cantidad,
+      nroLote: line.nroLote ?? null,
+      fechaVencimiento: line.fechaVencimiento ?? null,
+    })),
+  }))
 
 export const recuentoItemsBodySchema = z
   .object({
@@ -3366,4 +3397,34 @@ export const fidelizacionAjusteBodySchema = z.object({
   clienteId: z.number().int().min(1),
   puntos: z.number().int().refine((v) => v !== 0, { message: 'puntos must be non-zero' }),
   concepto: z.string().max(200).nullable().optional(),
+})
+
+export const configFefoUpsertBodySchema = z.object({
+  diasAlertaVencimiento: z.number().int().min(1).max(365),
+})
+
+export const loteCreateBodySchema = z.object({
+  articuloId: z.number().int().min(1),
+  depositoId: z.number().int().min(1),
+  nroLote: z.string().trim().min(1).max(60),
+  fechaVencimiento: z.string().trim().min(1),
+  proveedorId: z.number().int().min(1).nullable().optional(),
+  stockInicial: z.number().int().min(0).optional(),
+})
+
+export const loteListQuerySchema = z.object({
+  articuloId: z.coerce.number().int().min(1).optional(),
+  depositoId: z.coerce.number().int().min(1).optional(),
+  soloActivos: z
+    .union([z.literal('true'), z.literal('false'), z.boolean()])
+    .optional()
+    .transform((v) => (v === undefined ? true : v === true || v === 'true')),
+  porVencer: z
+    .union([z.literal('true'), z.literal('false'), z.boolean()])
+    .optional()
+    .transform((v) => v === true || v === 'true'),
+})
+
+export const trazabilidadQuerySchema = z.object({
+  loteId: z.coerce.number().int().min(1),
 })

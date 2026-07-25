@@ -44,6 +44,13 @@
     "rowAria": "Item {{n}}, clique para selecionar a linha",
     "rowAriaSelected": "Item {{n}}, linha selecionada"
   },
+  "fefoPreview": {
+    "loading": "Calculando alocação FEFO…",
+    "error": "Não foi possível calcular a alocação FEFO",
+    "empty": "Sem lotes disponíveis para este produto/depósito",
+    "ariaLabel": "Prévia da alocação FEFO",
+    "line": "Lote {{nroLote}} (venc. {{fecha}}): {{cantidad}}"
+  },
   "totals": {
     "neto21": "Base 21%",
     "neto105": "Base 10,5%",

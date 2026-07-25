@@ -56,6 +56,8 @@ function ComprasPageContent() {
   const [showForm, setShowForm] = useState(false)
   const [showReceive, setShowReceive] = useState(false)
   const [receiveQty, setReceiveQty] = useState<Record<number, string>>({})
+  const [receiveLote, setReceiveLote] = useState<Record<number, string>>({})
+  const [receiveVenc, setReceiveVenc] = useState<Record<number, string>>({})
   const [formProveedorId, setFormProveedorId] = useState('')
   const [formArticuloId, setFormArticuloId] = useState('')
   const [formCantidad, setFormCantidad] = useState('1')
@@ -221,15 +223,27 @@ function ComprasPageContent() {
       .map((item) => {
         const cantidad = Number.parseInt(receiveQty[item.id] ?? '', 10)
         if (!Number.isFinite(cantidad) || cantidad < 1) return null
-        return { itemId: item.id, cantidad }
+        const needsLot = item.articulo?.controlLote === true
+        const nroLote = (receiveLote[item.id] ?? '').trim()
+        const fechaVencimiento = (receiveVenc[item.id] ?? '').trim()
+        return {
+          itemId: item.id,
+          cantidad,
+          ...(needsLot && nroLote && fechaVencimiento ? { nroLote, fechaVencimiento } : {}),
+        }
       })
-      .filter((line): line is { itemId: number; cantidad: number } => line !== null)
+      .filter(
+        (line): line is { itemId: number; cantidad: number; nroLote?: string; fechaVencimiento?: string } =>
+          line !== null,
+      )
     if (lines.length === 0) return
     setActionLoading(true)
     try {
       const updated = await comprasAPI.receive(selected.id, lines)
       if (updated) setSelected(updated)
       setShowReceive(false)
+      setReceiveLote({})
+      setReceiveVenc({})
       await loadList()
     } finally {
       setActionLoading(false)
@@ -568,6 +582,42 @@ function ComprasPageContent() {
                           setReceiveQty((prev) => ({ ...prev, [item.id]: e.target.value }))
                         }
                       />
+                      {item.articulo?.controlLote ? (
+                        <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                          <div>
+                            <label htmlFor={`compras-receive-lote-${item.id}`} className="block text-xs mb-1">
+                              {t('receive.nroLote')}
+                            </label>
+                            <input
+                              id={`compras-receive-lote-${item.id}`}
+                              type="text"
+                              required
+                              data-testid={`compras-receive-lote-${item.id}`}
+                              className="w-full border rounded px-2 py-1 dark:bg-slate-800"
+                              value={receiveLote[item.id] ?? ''}
+                              onChange={(e) =>
+                                setReceiveLote((prev) => ({ ...prev, [item.id]: e.target.value }))
+                              }
+                            />
+                          </div>
+                          <div>
+                            <label htmlFor={`compras-receive-venc-${item.id}`} className="block text-xs mb-1">
+                              {t('receive.fechaVencimiento')}
+                            </label>
+                            <input
+                              id={`compras-receive-venc-${item.id}`}
+                              type="date"
+                              required
+                              data-testid={`compras-receive-venc-${item.id}`}
+                              className="w-full border rounded px-2 py-1 dark:bg-slate-800"
+                              value={receiveVenc[item.id] ?? ''}
+                              onChange={(e) =>
+                                setReceiveVenc((prev) => ({ ...prev, [item.id]: e.target.value }))
+                              }
+                            />
+                          </div>
+                        </div>
+                      ) : null}
                     </li>
                   )
                 })}

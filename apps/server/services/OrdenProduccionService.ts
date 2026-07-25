@@ -13,6 +13,7 @@ import type {
   OrdenProduccionSugerirCompraResult,
 } from '@bizcode/types'
 import { assertNoOpenRecuento } from '../lib/recuentoStockGuard'
+import { assertNoControlLoteArticles } from '../lib/controlLoteGuard'
 import { CompraService } from './CompraService'
 import { proyectarInsumos } from './FormulaProduccionService'
 import { parseListPagination } from './listPagination'
@@ -477,6 +478,15 @@ export class OrdenProduccionService {
       return { ok: false, status: 422, error: 'INSUFFICIENT_STOCK' }
     }
 
+    const lotArticleIds = [
+      orden.data.articuloId,
+      ...orden.data.insumos.map((insumo) => insumo.articuloId),
+    ]
+    const lotBlock = await assertNoControlLoteArticles(this.prisma, tenantId, lotArticleIds)
+    if (!lotBlock.ok) {
+      return lotBlock
+    }
+
     const reservables = orden.data.insumos.filter(
       (insumo) => !insumo.esOpcional && insumo.articulo?.tipo !== SERVICE_TIPO,
     )
@@ -531,6 +541,15 @@ export class OrdenProduccionService {
     const recuentoBlock = await assertNoOpenRecuento(this.prisma, tenantId, orden.data.depositoId)
     if (!recuentoBlock.ok) {
       return recuentoBlock
+    }
+
+    const lotArticleIds = [
+      orden.data.articuloId,
+      ...orden.data.insumos.map((insumo) => insumo.articuloId),
+    ]
+    const lotBlock = await assertNoControlLoteArticles(this.prisma, tenantId, lotArticleIds)
+    if (!lotBlock.ok) {
+      return lotBlock
     }
 
     const consumos = resolverConsumos(orden.data, input)

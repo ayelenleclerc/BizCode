@@ -15,6 +15,7 @@ import { validateFacturaPercepciones } from './RetencionFacturaValidation'
 import { ClienteCuentaCorrienteService } from './ClienteCuentaCorrienteService'
 import { GarantiaService } from './GarantiaService'
 import { FidelizacionService } from './FidelizacionService'
+import { LoteService } from './LoteService'
 import { TurnoCajaService } from './TurnoCajaService'
 
 type FacturaWithRelations = Prisma.FacturaGetPayload<{ include: { cliente: true; items: true } }>
@@ -62,12 +63,14 @@ export class FacturaService {
   private readonly arca: ArcaService
   private readonly garantiaService: GarantiaService
   private readonly fidelizacionService: FidelizacionService
+  private readonly loteService: LoteService
   private readonly turnoCajaService: TurnoCajaService
 
   constructor(private readonly prisma: PrismaClient) {
     this.arca = new ArcaService(prisma)
     this.garantiaService = new GarantiaService(prisma)
     this.fidelizacionService = new FidelizacionService(prisma)
+    this.loteService = new LoteService(prisma)
     this.turnoCajaService = new TurnoCajaService(prisma)
   }
 
@@ -129,6 +132,7 @@ export class FacturaService {
               condIva: true,
               unidadServicio: true,
               mesesGarantia: true,
+              controlLote: true,
               esPadre: true,
               monedaPrecio: true,
               precioEnMonedaOrigen: true,
@@ -221,6 +225,7 @@ export class FacturaService {
           monedaOrigen: fx && origen != null ? art.monedaPrecio : null,
           precioOrigen: fx && origen != null ? origen : null,
           tipoCambioValor: fx && origen != null ? fx.valor : null,
+          loteId: null as number | null,
         }
       }
       return {
@@ -235,6 +240,7 @@ export class FacturaService {
         monedaOrigen: null as string | null,
         precioOrigen: null as number | null,
         tipoCambioValor: null as number | null,
+        loteId: null as number | null,
       }
     })
 
@@ -304,6 +310,13 @@ export class FacturaService {
       return recuentoBlock
     }
 
+    const fefoEnabled = await this.loteService.isFefoEnabled(tenantId)
+    const needsLot =
+      fefoEnabled && articulos.some((a) => a.controlLote && a.tipo !== 'servicio')
+    if (needsLot && depositoId == null) {
+      return { ok: false, status: 422, error: 'DEPOSITO_REQUIRED_FOR_LOTE' }
+    }
+
     const percepcionValidation = await validateFacturaPercepciones(this.prisma, tenantId, {
       neto1: facturaTotals.neto1,
       neto2: facturaTotals.neto2,
@@ -319,71 +332,138 @@ export class FacturaService {
 
     const validatedPercepciones = percepcionValidation.lines
 
-    const [newFactura, updatedCliente] = await this.prisma.$transaction(async (tx) => {
-      const created = await tx.factura.create({
-        data: {
-          ...facturaTotals,
-          fecha: facturaFechaToPrismaDate(fecha),
-          tenantId,
-          ...(depositoId != null ? { depositoId } : {}),
-          ...(options?.contratoId !== undefined ? { contratoId: options.contratoId } : {}),
-          ...(primaryFx
-            ? {
-                tipoCambioId: primaryFx.id,
-                tipoCambioValor: new Decimal(primaryFx.valor),
-                tipoCambioMoneda: primaryFx.moneda,
-                tipoCambioTipo: primaryFx.tipo,
-                tipoCambioFecha: primaryFx.fecha,
+    let newFactura: FacturaWithRelations
+    let updatedCliente: Pick<Cliente, 'id' | 'rsocial' | 'balance' | 'creditLimit'>
+
+    try {
+      const txResult = await this.prisma.$transaction(async (tx) => {
+        let itemsForCreate = resolvedItems
+        if (needsLot && depositoId != null) {
+          const expanded: typeof resolvedItems = []
+          for (const line of resolvedItems) {
+            if (line.articuloId == null) {
+              expanded.push(line)
+              continue
+            }
+            const art = articuloById.get(line.articuloId)
+            if (!art || !art.controlLote || art.tipo === 'servicio') {
+              expanded.push(line)
+              continue
+            }
+            const allocated = await this.loteService.allocateFefo(
+              tx,
+              tenantId,
+              line.articuloId,
+              depositoId,
+              line.cantidad,
+            )
+            if (!allocated.ok) {
+              throw new Error(allocated.error)
+            }
+            const outbound = await this.loteService.applyOutbound(tx, tenantId, allocated.data)
+            if (!outbound.ok) {
+              throw new Error(outbound.error)
+            }
+            const n = allocated.data.length
+            for (const alloc of allocated.data) {
+              const share = alloc.cantidad / line.cantidad
+              expanded.push({
+                ...line,
+                cantidad: alloc.cantidad,
+                subtotal: roundMoney(line.subtotal * share),
+                loteId: alloc.loteId,
+              })
+            }
+            if (n > 1) {
+              const sumSub = expanded.slice(-n).reduce((s, it) => s + it.subtotal, 0)
+              const drift = roundMoney(line.subtotal - sumSub)
+              expanded[expanded.length - 1] = {
+                ...expanded[expanded.length - 1],
+                subtotal: roundMoney(expanded[expanded.length - 1].subtotal + drift),
               }
-            : {}),
-          items: { create: resolvedItems },
-        } as Parameters<typeof this.prisma.factura.create>[0]['data'],
-        include: { items: true, cliente: true },
-      })
+            }
+          }
+          itemsForCreate = expanded
+        }
 
-      for (const line of validatedPercepciones) {
-        await tx.retencionAplicada.create({
+        const created = await tx.factura.create({
           data: {
+            ...facturaTotals,
+            fecha: facturaFechaToPrismaDate(fecha),
             tenantId,
-            regimenId: line.regimenId,
-            tipo: line.subtipo,
-            entidadTipo: 'cliente',
-            entidadId: clienteId,
-            facturaId: created.id,
-            baseImponible: new Decimal(line.baseImponible),
-            alicuota: new Decimal(line.alicuota),
-            importe: new Decimal(line.importe),
-            constanciaNum: null,
-          },
+            ...(depositoId != null ? { depositoId } : {}),
+            ...(options?.contratoId !== undefined ? { contratoId: options.contratoId } : {}),
+            ...(primaryFx
+              ? {
+                  tipoCambioId: primaryFx.id,
+                  tipoCambioValor: new Decimal(primaryFx.valor),
+                  tipoCambioMoneda: primaryFx.moneda,
+                  tipoCambioTipo: primaryFx.tipo,
+                  tipoCambioFecha: primaryFx.fecha,
+                }
+              : {}),
+            items: { create: itemsForCreate },
+          } as Parameters<typeof this.prisma.factura.create>[0]['data'],
+          include: { items: true, cliente: true },
         })
-      }
 
-      const ccService = new ClienteCuentaCorrienteService(tx)
-      await ccService.recordFromFactura(tenantId, created, userId)
-
-      const updated = await tx.cliente.findFirstOrThrow({
-        where: { id: clienteId },
-        select: { id: true, rsocial: true, balance: true, creditLimit: true },
-      })
-
-      for (const [articuloId, qty] of qtyByArticulo) {
-        if (depositoId != null) {
-          await applyStockDepositoDelta(tx, {
-            tenantId,
-            articuloId,
-            depositoId,
-            delta: -qty,
-          })
-        } else {
-          await tx.articulo.update({
-            where: { id: articuloId },
-            data: { stock: { decrement: qty } },
+        for (const line of validatedPercepciones) {
+          await tx.retencionAplicada.create({
+            data: {
+              tenantId,
+              regimenId: line.regimenId,
+              tipo: line.subtipo,
+              entidadTipo: 'cliente',
+              entidadId: clienteId,
+              facturaId: created.id,
+              baseImponible: new Decimal(line.baseImponible),
+              alicuota: new Decimal(line.alicuota),
+              importe: new Decimal(line.importe),
+              constanciaNum: null,
+            },
           })
         }
-      }
 
-      return [created, updated] as const
-    })
+        const ccService = new ClienteCuentaCorrienteService(tx)
+        await ccService.recordFromFactura(tenantId, created, userId)
+
+        const updated = await tx.cliente.findFirstOrThrow({
+          where: { id: clienteId },
+          select: { id: true, rsocial: true, balance: true, creditLimit: true },
+        })
+
+        for (const [articuloId, qty] of qtyByArticulo) {
+          if (depositoId != null) {
+            await applyStockDepositoDelta(tx, {
+              tenantId,
+              articuloId,
+              depositoId,
+              delta: -qty,
+            })
+          } else {
+            await tx.articulo.update({
+              where: { id: articuloId },
+              data: { stock: { decrement: qty } },
+            })
+          }
+        }
+
+        return [created, updated] as const
+      })
+      newFactura = txResult[0]
+      updatedCliente = txResult[1]
+    } catch (err) {
+      if (
+        err instanceof Error &&
+        (err.message === 'INSUFFICIENT_LOT_STOCK' || err.message === 'DEPOSITO_REQUIRED_FOR_LOTE')
+      ) {
+        return { ok: false, status: 422, error: err.message }
+      }
+      if (err instanceof Error && err.message === 'INSUFFICIENT_DEPOSIT_STOCK') {
+        return { ok: false, status: 422, error: 'INSUFFICIENT_STOCK' }
+      }
+      throw err
+    }
 
     if (options?.skipArcaCae !== true) {
       void this.arca.requestCaeForFactura(tenantId, newFactura.id).catch(() => {
@@ -463,8 +543,8 @@ export class FacturaService {
 
   /**
    * @en Voids an active invoice, creates a credit note, reverses balance, and records audit in one transaction.
-   * @es Anula factura vigente, crea nota de cr?dito, revierte saldo y audita en una transacci?n.
-   * @pt-BR Anula fatura ativa, cria nota de cr?dito, reverte saldo e audita em uma transa??o.
+   * @es Anula factura vigente, crea nota de crédito, revierte saldo y audita en una transacción.
+   * @pt-BR Anula fatura ativa, cria nota de crédito, reverte saldo e audita em uma transação.
    */
   async void(
     tenantId: number,
@@ -559,7 +639,7 @@ export class FacturaService {
 
     if (factura.estadoCae === 'issued') {
       void this.arca.requestCaeForNotaCredito(tenantId, result.notaCredito.id).catch(() => {
-        /* homologaci?n mock; retry job may be added later */
+        /* homologación mock; retry job may be added later */
       })
     }
 
@@ -574,8 +654,8 @@ export class FacturaService {
 
   /**
    * @en Issues a partial credit note for an active invoice without voiding it (#344).
-   * @es Emite nota de cr?dito parcial sobre factura vigente sin anularla (#344).
-   * @pt-BR Emite nota de cr?dito parcial sobre fatura ativa sem anul?-la (#344).
+   * @es Emite nota de crédito parcial sobre factura vigente sin anularla (#344).
+   * @pt-BR Emite nota de crédito parcial sobre fatura ativa sem anulá-la (#344).
    */
   async createPartialCreditNote(
     tenantId: number,

@@ -64,6 +64,7 @@ const articuloSchema = z
       if (!Number.isFinite(n) || n <= 0) return null
       return Math.trunc(n)
     }, z.number().int().positive().nullable()),
+    controlLote: z.boolean().optional().default(false),
     activo: z.boolean(),
   })
   .superRefine((data, ctx) => {
@@ -109,6 +110,7 @@ export default function ArticuloForm({ articulo, rubros, onClose, onGuardado }: 
   const { claims } = useAuth()
   const { hasModule } = useFeatureFlags()
   const multicurrencyEnabled = hasModule('catalog.multicurrency')
+  const fefoEnabled = hasModule('inventory.fefo')
   const [loading, setLoading] = useState(false)
   const [categorias, setCategorias] = useState<CategoriaArticuloRow[]>([])
   const [error, setError] = useState<string | null>(null)
@@ -152,6 +154,7 @@ export default function ArticuloForm({ articulo, rubros, onClose, onGuardado }: 
       minimo: 0,
       stock: 0,
       mesesGarantia: null,
+      controlLote: false,
       categoriaId: null,
       monedaPrecio: 'ARS',
       precioEnMonedaOrigen: null,
@@ -199,6 +202,7 @@ export default function ArticuloForm({ articulo, rubros, onClose, onGuardado }: 
       setValue('stock', articulo.stock)
       setValue('minimo', articulo.minimo)
       setValue('mesesGarantia', articulo.mesesGarantia ?? null)
+      setValue('controlLote', articulo.controlLote ?? false)
       setValue('activo', articulo.activo)
       setStockDisplay(articulo.stock)
     }
@@ -733,6 +737,24 @@ export default function ArticuloForm({ articulo, rubros, onClose, onGuardado }: 
               </p>
             )}
           </div>
+
+          {fefoEnabled && tipoWatch !== 'servicio' ? (
+            <div className="flex items-start gap-2">
+              <input
+                id="articulo-control-lote"
+                type="checkbox"
+                {...register('controlLote')}
+                data-testid="articulo-control-lote"
+                className="mt-1"
+              />
+              <div>
+                <label htmlFor="articulo-control-lote" className="block text-slate-700 dark:text-slate-300 font-semibold">
+                  {t('form.controlLote')}
+                </label>
+                <p className="text-sm text-slate-600 dark:text-slate-400">{t('form.controlLoteHint')}</p>
+              </div>
+            </div>
+          ) : null}
 
           {showComparador && articulo && showComparadorAccess && (
             <ArticuloProveedoresComparadorSection articuloId={articulo.id} />

@@ -6,6 +6,7 @@ import type {
   TransferenciaDepositoRow,
 } from '@bizcode/types'
 import { assertNoOpenRecuento } from '../lib/recuentoStockGuard'
+import { assertNoControlLoteArticles } from '../lib/controlLoteGuard'
 import type { ServiceResult } from './serviceResults'
 import { applyStockDepositoDelta } from './stockDepositoSync'
 
@@ -163,6 +164,13 @@ export class TransferenciaDepositoService {
     const recuentoBlock = await assertNoOpenRecuento(this.prisma, tenantId, existing.origenId)
     if (!recuentoBlock.ok) return recuentoBlock
 
+    const lotBlock = await assertNoControlLoteArticles(
+      this.prisma,
+      tenantId,
+      existing.items.map((i) => i.articuloId),
+    )
+    if (!lotBlock.ok) return lotBlock
+
     try {
       await this.prisma.$transaction(async (tx) => {
         for (const item of existing.items) {
@@ -223,6 +231,13 @@ export class TransferenciaDepositoService {
 
     const recuentoBlock = await assertNoOpenRecuento(this.prisma, tenantId, existing.destinoId)
     if (!recuentoBlock.ok) return recuentoBlock
+
+    const lotBlock = await assertNoControlLoteArticles(
+      this.prisma,
+      tenantId,
+      existing.items.map((i) => i.articuloId),
+    )
+    if (!lotBlock.ok) return lotBlock
 
     await this.prisma.$transaction(async (tx) => {
       for (const line of input.items) {

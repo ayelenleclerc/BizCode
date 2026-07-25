@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "cantidad": {
+      "type": "integer"
+    },
+    "fechaVencimiento": {
+      "format": "date",
+      "type": "string"
+    },
+    "loteId": {
+      "type": "integer"
+    },
+    "nroLote": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "loteId",
+    "nroLote",
+    "fechaVencimiento",
+    "cantidad"
+  ],
+  "title": "FefoAllocation",
+  "type": "object"
+}

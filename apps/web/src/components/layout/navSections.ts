@@ -102,6 +102,13 @@ export const NAV_SECTIONS: readonly NavSection[] = [
     moduleKey: 'inventory.warehouses',
   },
   {
+    key: 'lotes',
+    path: '/lotes',
+    icon: '📅',
+    roles: ['owner', 'manager', 'warehouse_op', 'warehouse_lead', 'backoffice'],
+    moduleKey: 'inventory.fefo',
+  },
+  {
     key: 'transferenciasDeposito',
     path: '/transferencias-deposito',
     icon: '🔁',
@@ -266,6 +273,7 @@ export const ROUTE_MODULE_GUARDS: ReadonlyArray<{ path: string; moduleKey: Modul
   { path: 'listas-precios', moduleKey: 'catalog.pricelists' },
   { path: 'categorias-articulo', moduleKey: 'catalog.variants' },
   { path: 'depositos', moduleKey: 'inventory.warehouses' },
+  { path: 'lotes', moduleKey: 'inventory.fefo' },
   { path: 'transferencias-deposito', moduleKey: 'inventory.warehouses' },
   { path: 'comisiones/config', moduleKey: 'finance.commissions' },
   { path: 'comisiones/liquidaciones', moduleKey: 'finance.commissions' },

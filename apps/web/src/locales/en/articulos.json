@@ -70,6 +70,8 @@
     "minimo": "Minimum",
     "mesesGarantia": "Warranty months",
     "mesesGarantiaHint": "Empty or 0 = no warranty. Invoicing registers the warranty automatically.",
+    "controlLote": "Lot / FEFO control",
+    "controlLoteHint": "Requires lot and expiry on receive; assigns FEFO when invoicing.",
     "activo": "Active",
     "tipo": "Type",
     "tipoOptions": {

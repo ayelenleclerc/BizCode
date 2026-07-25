@@ -30418,6 +30418,1323 @@ Requires module `clients.loyalty` and `customers.manage`.
 }
 ```
 
+### PARAMETERS /api/fefo/config
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/fefo/config`
+
+### Get FEFO expiry alert configuration (#202)
+
+- **Method:** `GET`
+- **Path:** `/api/fefo/config`
+- **Tags:** lotes
+
+Requires module `inventory.fefo` and `products.read`.
+
+#### Responses
+
+##### Status: 200 FEFO config
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`diasAlertaVencimiento` (required)**
+
+    `integer`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "diasAlertaVencimiento": 1,
+    "createdAt": "",
+    "updatedAt": ""
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Upsert FEFO expiry alert configuration (#202)
+
+- **Method:** `PUT`
+- **Path:** `/api/fefo/config`
+- **Tags:** lotes
+
+Requires module `inventory.fefo` and `inventory.adjust`.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`diasAlertaVencimiento` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "diasAlertaVencimiento": 1
+}
+```
+
+#### Responses
+
+##### Status: 200 Updated config
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`diasAlertaVencimiento` (required)**
+
+    `integer`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "diasAlertaVencimiento": 1,
+    "createdAt": "",
+    "updatedAt": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/lotes
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/lotes`
+
+### List inventory lots (#202)
+
+- **Method:** `GET`
+- **Path:** `/api/lotes`
+- **Tags:** lotes
+
+Requires module `inventory.fefo` and `products.read`.
+
+#### Responses
+
+##### Status: 200 Lots list
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`activo` (required)**
+
+    `boolean`
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`depositoId` (required)**
+
+    `integer`
+
+  - **`fechaIngreso` (required)**
+
+    `string`, format: `date-time`
+
+  - **`fechaVencimiento` (required)**
+
+    `string`, format: `date`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`nroLote` (required)**
+
+    `string`
+
+  - **`stockActual` (required)**
+
+    `integer`
+
+  - **`stockInicial` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`preavisoEnviadoAt`**
+
+    `string`, format: `date-time`
+
+  - **`proveedorId`**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "articuloId": 1,
+      "depositoId": 1,
+      "proveedorId": 1,
+      "nroLote": "",
+      "fechaVencimiento": "",
+      "fechaIngreso": "",
+      "stockInicial": 1,
+      "stockActual": 1,
+      "activo": true,
+      "preavisoEnviadoAt": "",
+      "createdAt": "",
+      "updatedAt": ""
+    }
+  ]
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Create inventory lot (#202)
+
+- **Method:** `POST`
+- **Path:** `/api/lotes`
+- **Tags:** lotes
+
+Requires module `inventory.fefo` and `inventory.adjust`.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`articuloId` (required)**
+
+  `integer`
+
+- **`depositoId` (required)**
+
+  `integer`
+
+- **`fechaVencimiento` (required)**
+
+  `string`
+
+- **`nroLote` (required)**
+
+  `string`
+
+- **`proveedorId`**
+
+  `integer`
+
+- **`stockInicial`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "articuloId": 1,
+  "depositoId": 1,
+  "nroLote": "",
+  "fechaVencimiento": "",
+  "proveedorId": 1,
+  "stockInicial": 0
+}
+```
+
+#### Responses
+
+##### Status: 201 Created lot
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`activo` (required)**
+
+    `boolean`
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`depositoId` (required)**
+
+    `integer`
+
+  - **`fechaIngreso` (required)**
+
+    `string`, format: `date-time`
+
+  - **`fechaVencimiento` (required)**
+
+    `string`, format: `date`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`nroLote` (required)**
+
+    `string`
+
+  - **`stockActual` (required)**
+
+    `integer`
+
+  - **`stockInicial` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`preavisoEnviadoAt`**
+
+    `string`, format: `date-time`
+
+  - **`proveedorId`**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "articuloId": 1,
+    "depositoId": 1,
+    "proveedorId": 1,
+    "nroLote": "",
+    "fechaVencimiento": "",
+    "fechaIngreso": "",
+    "stockInicial": 1,
+    "stockActual": 1,
+    "activo": true,
+    "preavisoEnviadoAt": "",
+    "createdAt": "",
+    "updatedAt": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 409 Resource conflict
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 422 Semantically invalid request
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/lotes/por-vencer
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/lotes/por-vencer`
+
+### List lots expiring within alert window (#202)
+
+- **Method:** `GET`
+- **Path:** `/api/lotes/por-vencer`
+- **Tags:** lotes
+
+Requires module `inventory.fefo` and `products.read`.
+
+#### Responses
+
+##### Status: 200 Expiring lots
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`activo` (required)**
+
+    `boolean`
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`depositoId` (required)**
+
+    `integer`
+
+  - **`fechaIngreso` (required)**
+
+    `string`, format: `date-time`
+
+  - **`fechaVencimiento` (required)**
+
+    `string`, format: `date`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`nroLote` (required)**
+
+    `string`
+
+  - **`stockActual` (required)**
+
+    `integer`
+
+  - **`stockInicial` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`preavisoEnviadoAt`**
+
+    `string`, format: `date-time`
+
+  - **`proveedorId`**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "articuloId": 1,
+      "depositoId": 1,
+      "proveedorId": 1,
+      "nroLote": "",
+      "fechaVencimiento": "",
+      "fechaIngreso": "",
+      "stockInicial": 1,
+      "stockActual": 1,
+      "activo": true,
+      "preavisoEnviadoAt": "",
+      "createdAt": "",
+      "updatedAt": ""
+    }
+  ]
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/lotes/preview-fefo
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/lotes/preview-fefo`
+
+### Preview FEFO lot allocation (#202)
+
+- **Method:** `GET`
+- **Path:** `/api/lotes/preview-fefo`
+- **Tags:** lotes
+
+Requires module `inventory.fefo` and `products.read`.
+
+#### Responses
+
+##### Status: 200 Suggested allocations
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`cantidad` (required)**
+
+    `integer`
+
+  - **`fechaVencimiento` (required)**
+
+    `string`, format: `date`
+
+  - **`loteId` (required)**
+
+    `integer`
+
+  - **`nroLote` (required)**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "loteId": 1,
+      "nroLote": "",
+      "fechaVencimiento": "",
+      "cantidad": 1
+    }
+  ]
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 422 Semantically invalid request
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/articulos/{id}/trazabilidad
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/articulos/{id}/trazabilidad`
+
+### Lot outbound traceability via invoice items (#202)
+
+- **Method:** `GET`
+- **Path:** `/api/articulos/{id}/trazabilidad`
+- **Tags:** lotes
+
+Requires module `inventory.lots` and `products.read`.
+
+#### Responses
+
+##### Status: 200 Lot and related invoice lines
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`facturas` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`cantidad` (required)**
+
+      `integer`
+
+    - **`clienteId` (required)**
+
+      `integer`
+
+    - **`clienteRsocial` (required)**
+
+      `string`
+
+    - **`facturaId` (required)**
+
+      `integer`
+
+    - **`facturaItemId` (required)**
+
+      `integer`
+
+    - **`fecha` (required)**
+
+      `string`, format: `date`
+
+    - **`numero` (required)**
+
+      `integer`
+
+    - **`prefijo` (required)**
+
+      `string`
+
+    - **`tipo` (required)**
+
+      `string`
+
+  - **`lote` (required)**
+
+    `object`
+
+    - **`activo` (required)**
+
+      `boolean`
+
+    - **`articuloId` (required)**
+
+      `integer`
+
+    - **`createdAt` (required)**
+
+      `string`, format: `date-time`
+
+    - **`depositoId` (required)**
+
+      `integer`
+
+    - **`fechaIngreso` (required)**
+
+      `string`, format: `date-time`
+
+    - **`fechaVencimiento` (required)**
+
+      `string`, format: `date`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`nroLote` (required)**
+
+      `string`
+
+    - **`stockActual` (required)**
+
+      `integer`
+
+    - **`stockInicial` (required)**
+
+      `integer`
+
+    - **`tenantId` (required)**
+
+      `integer`
+
+    - **`updatedAt` (required)**
+
+      `string`, format: `date-time`
+
+    - **`preavisoEnviadoAt`**
+
+      `string`, format: `date-time`
+
+    - **`proveedorId`**
+
+      `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "lote": {
+      "id": 1,
+      "tenantId": 1,
+      "articuloId": 1,
+      "depositoId": 1,
+      "proveedorId": 1,
+      "nroLote": "",
+      "fechaVencimiento": "",
+      "fechaIngreso": "",
+      "stockInicial": 1,
+      "stockActual": 1,
+      "activo": true,
+      "preavisoEnviadoAt": "",
+      "createdAt": "",
+      "updatedAt": ""
+    },
+    "facturas": [
+      {
+        "facturaId": 1,
+        "facturaItemId": 1,
+        "tipo": "",
+        "prefijo": "",
+        "numero": 1,
+        "fecha": "",
+        "cantidad": 1,
+        "clienteId": 1,
+        "clienteRsocial": ""
+      }
+    ]
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ### PARAMETERS /api/garantias
 
 - **Method:** `PARAMETERS`
@@ -95836,6 +97153,787 @@ Originating invoice header (selected columns)
     "aplicaEnDescuento": true,
     "createdAt": "",
     "updatedAt": ""
+  }
+}
+```
+
+### ConfigFefo
+
+- **Type:**`object`
+
+* **`createdAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`diasAlertaVencimiento` (required)**
+
+  `integer`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`tenantId` (required)**
+
+  `integer`
+
+* **`updatedAt` (required)**
+
+  `string`, format: `date-time`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "tenantId": 1,
+  "diasAlertaVencimiento": 1,
+  "createdAt": "",
+  "updatedAt": ""
+}
+```
+
+### ConfigFefoUpsertInput
+
+- **Type:**`object`
+
+* **`diasAlertaVencimiento` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "diasAlertaVencimiento": 1
+}
+```
+
+### ConfigFefoEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`diasAlertaVencimiento` (required)**
+
+    `integer`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "diasAlertaVencimiento": 1,
+    "createdAt": "",
+    "updatedAt": ""
+  }
+}
+```
+
+### Lote
+
+- **Type:**`object`
+
+* **`activo` (required)**
+
+  `boolean`
+
+* **`articuloId` (required)**
+
+  `integer`
+
+* **`createdAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`depositoId` (required)**
+
+  `integer`
+
+* **`fechaIngreso` (required)**
+
+  `string`, format: `date-time`
+
+* **`fechaVencimiento` (required)**
+
+  `string`, format: `date`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`nroLote` (required)**
+
+  `string`
+
+* **`stockActual` (required)**
+
+  `integer`
+
+* **`stockInicial` (required)**
+
+  `integer`
+
+* **`tenantId` (required)**
+
+  `integer`
+
+* **`updatedAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`preavisoEnviadoAt`**
+
+  `string`, format: `date-time`
+
+* **`proveedorId`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "tenantId": 1,
+  "articuloId": 1,
+  "depositoId": 1,
+  "proveedorId": 1,
+  "nroLote": "",
+  "fechaVencimiento": "",
+  "fechaIngreso": "",
+  "stockInicial": 1,
+  "stockActual": 1,
+  "activo": true,
+  "preavisoEnviadoAt": "",
+  "createdAt": "",
+  "updatedAt": ""
+}
+```
+
+### LoteCreateInput
+
+- **Type:**`object`
+
+* **`articuloId` (required)**
+
+  `integer`
+
+* **`depositoId` (required)**
+
+  `integer`
+
+* **`fechaVencimiento` (required)**
+
+  `string`
+
+* **`nroLote` (required)**
+
+  `string`
+
+* **`proveedorId`**
+
+  `integer`
+
+* **`stockInicial`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "articuloId": 1,
+  "depositoId": 1,
+  "nroLote": "",
+  "fechaVencimiento": "",
+  "proveedorId": 1,
+  "stockInicial": 0
+}
+```
+
+### LoteEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`activo` (required)**
+
+    `boolean`
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`depositoId` (required)**
+
+    `integer`
+
+  - **`fechaIngreso` (required)**
+
+    `string`, format: `date-time`
+
+  - **`fechaVencimiento` (required)**
+
+    `string`, format: `date`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`nroLote` (required)**
+
+    `string`
+
+  - **`stockActual` (required)**
+
+    `integer`
+
+  - **`stockInicial` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`preavisoEnviadoAt`**
+
+    `string`, format: `date-time`
+
+  - **`proveedorId`**
+
+    `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "articuloId": 1,
+    "depositoId": 1,
+    "proveedorId": 1,
+    "nroLote": "",
+    "fechaVencimiento": "",
+    "fechaIngreso": "",
+    "stockInicial": 1,
+    "stockActual": 1,
+    "activo": true,
+    "preavisoEnviadoAt": "",
+    "createdAt": "",
+    "updatedAt": ""
+  }
+}
+```
+
+### LoteListEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`activo` (required)**
+
+    `boolean`
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`depositoId` (required)**
+
+    `integer`
+
+  - **`fechaIngreso` (required)**
+
+    `string`, format: `date-time`
+
+  - **`fechaVencimiento` (required)**
+
+    `string`, format: `date`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`nroLote` (required)**
+
+    `string`
+
+  - **`stockActual` (required)**
+
+    `integer`
+
+  - **`stockInicial` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`preavisoEnviadoAt`**
+
+    `string`, format: `date-time`
+
+  - **`proveedorId`**
+
+    `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "articuloId": 1,
+      "depositoId": 1,
+      "proveedorId": 1,
+      "nroLote": "",
+      "fechaVencimiento": "",
+      "fechaIngreso": "",
+      "stockInicial": 1,
+      "stockActual": 1,
+      "activo": true,
+      "preavisoEnviadoAt": "",
+      "createdAt": "",
+      "updatedAt": ""
+    }
+  ]
+}
+```
+
+### FefoAllocation
+
+- **Type:**`object`
+
+* **`cantidad` (required)**
+
+  `integer`
+
+* **`fechaVencimiento` (required)**
+
+  `string`, format: `date`
+
+* **`loteId` (required)**
+
+  `integer`
+
+* **`nroLote` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "loteId": 1,
+  "nroLote": "",
+  "fechaVencimiento": "",
+  "cantidad": 1
+}
+```
+
+### FefoAllocationListEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`cantidad` (required)**
+
+    `integer`
+
+  - **`fechaVencimiento` (required)**
+
+    `string`, format: `date`
+
+  - **`loteId` (required)**
+
+    `integer`
+
+  - **`nroLote` (required)**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "loteId": 1,
+      "nroLote": "",
+      "fechaVencimiento": "",
+      "cantidad": 1
+    }
+  ]
+}
+```
+
+### LoteTrazabilidad
+
+- **Type:**`object`
+
+* **`facturas` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`cantidad` (required)**
+
+    `integer`
+
+  - **`clienteId` (required)**
+
+    `integer`
+
+  - **`clienteRsocial` (required)**
+
+    `string`
+
+  - **`facturaId` (required)**
+
+    `integer`
+
+  - **`facturaItemId` (required)**
+
+    `integer`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date`
+
+  - **`numero` (required)**
+
+    `integer`
+
+  - **`prefijo` (required)**
+
+    `string`
+
+  - **`tipo` (required)**
+
+    `string`
+
+* **`lote` (required)**
+
+  `object`
+
+  - **`activo` (required)**
+
+    `boolean`
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`depositoId` (required)**
+
+    `integer`
+
+  - **`fechaIngreso` (required)**
+
+    `string`, format: `date-time`
+
+  - **`fechaVencimiento` (required)**
+
+    `string`, format: `date`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`nroLote` (required)**
+
+    `string`
+
+  - **`stockActual` (required)**
+
+    `integer`
+
+  - **`stockInicial` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`preavisoEnviadoAt`**
+
+    `string`, format: `date-time`
+
+  - **`proveedorId`**
+
+    `integer`
+
+**Example:**
+
+```json
+{
+  "lote": {
+    "id": 1,
+    "tenantId": 1,
+    "articuloId": 1,
+    "depositoId": 1,
+    "proveedorId": 1,
+    "nroLote": "",
+    "fechaVencimiento": "",
+    "fechaIngreso": "",
+    "stockInicial": 1,
+    "stockActual": 1,
+    "activo": true,
+    "preavisoEnviadoAt": "",
+    "createdAt": "",
+    "updatedAt": ""
+  },
+  "facturas": [
+    {
+      "facturaId": 1,
+      "facturaItemId": 1,
+      "tipo": "",
+      "prefijo": "",
+      "numero": 1,
+      "fecha": "",
+      "cantidad": 1,
+      "clienteId": 1,
+      "clienteRsocial": ""
+    }
+  ]
+}
+```
+
+### LoteTrazabilidadEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`facturas` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`cantidad` (required)**
+
+      `integer`
+
+    - **`clienteId` (required)**
+
+      `integer`
+
+    - **`clienteRsocial` (required)**
+
+      `string`
+
+    - **`facturaId` (required)**
+
+      `integer`
+
+    - **`facturaItemId` (required)**
+
+      `integer`
+
+    - **`fecha` (required)**
+
+      `string`, format: `date`
+
+    - **`numero` (required)**
+
+      `integer`
+
+    - **`prefijo` (required)**
+
+      `string`
+
+    - **`tipo` (required)**
+
+      `string`
+
+  - **`lote` (required)**
+
+    `object`
+
+    - **`activo` (required)**
+
+      `boolean`
+
+    - **`articuloId` (required)**
+
+      `integer`
+
+    - **`createdAt` (required)**
+
+      `string`, format: `date-time`
+
+    - **`depositoId` (required)**
+
+      `integer`
+
+    - **`fechaIngreso` (required)**
+
+      `string`, format: `date-time`
+
+    - **`fechaVencimiento` (required)**
+
+      `string`, format: `date`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`nroLote` (required)**
+
+      `string`
+
+    - **`stockActual` (required)**
+
+      `integer`
+
+    - **`stockInicial` (required)**
+
+      `integer`
+
+    - **`tenantId` (required)**
+
+      `integer`
+
+    - **`updatedAt` (required)**
+
+      `string`, format: `date-time`
+
+    - **`preavisoEnviadoAt`**
+
+      `string`, format: `date-time`
+
+    - **`proveedorId`**
+
+      `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "lote": {
+      "id": 1,
+      "tenantId": 1,
+      "articuloId": 1,
+      "depositoId": 1,
+      "proveedorId": 1,
+      "nroLote": "",
+      "fechaVencimiento": "",
+      "fechaIngreso": "",
+      "stockInicial": 1,
+      "stockActual": 1,
+      "activo": true,
+      "preavisoEnviadoAt": "",
+      "createdAt": "",
+      "updatedAt": ""
+    },
+    "facturas": [
+      {
+        "facturaId": 1,
+        "facturaItemId": 1,
+        "tipo": "",
+        "prefijo": "",
+        "numero": 1,
+        "fecha": "",
+        "cantidad": 1,
+        "clienteId": 1,
+        "clienteRsocial": ""
+      }
+    ]
   }
 }
 ```

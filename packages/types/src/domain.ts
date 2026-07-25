@@ -45,6 +45,8 @@ export interface Articulo {
   unidadServicio?: string | null
   /** @en Warranty months (#251). @es Meses de garantía (#251). @pt-BR Meses de garantia (#251). */
   mesesGarantia?: number | null
+  /** @en Lot tracking / FEFO (#202). @es Control de lotes / FEFO (#202). @pt-BR Controle de lotes / FEFO (#202). */
+  controlLote?: boolean
   precioLista1: number | string
   precioLista2: number | string
   costo: number | string

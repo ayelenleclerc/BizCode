@@ -279,6 +279,10 @@ model Articulo {
   /// @es Meses de garantía para artículos físicos; null = sin garantía (#251).
   /// @pt-BR Meses de garantia para artigos físicos; null = sem garantia (#251).
   mesesGarantia Int?
+  /// @en When true, stock movements require lot tracking / FEFO (#202).
+  /// @es Si es true, los movimientos de stock requieren lote / FEFO (#202).
+  /// @pt-BR Se true, os movimentos de estoque exigem lote / FEFO (#202).
+  controlLote  Boolean @default(false)
   precioLista1 Decimal @db.Decimal(14, 2)
   precioLista2 Decimal @db.Decimal(14, 2)
   costo        Decimal @db.Decimal(13, 2)
@@ -317,6 +321,7 @@ model Articulo {
   ordenesProduccion    OrdenProduccion[]   @relation("OrdenProduccionProducto")
   ordenProduccionInsumos OrdenProduccionInsumo[] @relation("OrdenProduccionInsumoArticulo")
   reservasProduccion   StockReservaProduccion[] @relation("StockReservaProduccionArticulo")
+  lotes                Lote[]
 
   @@unique([tenantId, codigo])
   @@index([tenantId])
@@ -358,6 +363,7 @@ model Deposito {
   ordenesEntrega     OrdenEntrega[]
   ordenesProduccion  OrdenProduccion[]
   reservasProduccion StockReservaProduccion[]
+  lotes              Lote[]
 
   @@unique([tenantId, codigo])
   @@index([tenantId])
@@ -553,6 +559,7 @@ model Proveedor {
   catalogoArticulos        ProveedorArticulo[]
   remitos                  Remito[]
   cheques                  Cheque[]
+  lotes                    Lote[]
 
   @@unique([tenantId, codigo])
   @@index([tenantId])
@@ -1322,8 +1329,15 @@ model PedidoItem {
   precio     Decimal @db.Decimal(14, 2)
   dscto      Decimal @db.Decimal(5, 2) @default(0)
   subtotal   Decimal @db.Decimal(14, 2)
+  /// @en Lot consumed for FEFO-tracked articles (#202).
+  /// @es Lote consumido para artículos con FEFO (#202).
+  /// @pt-BR Lote consumido para artigos com FEFO (#202).
+  loteId     Int?
+  lote       Lote?   @relation(fields: [loteId], references: [id], onDelete: SetNull)
 
   createdAt DateTime @default(now())
+
+  @@index([loteId])
 }
 
 model FacturaItem {
@@ -1352,9 +1366,17 @@ model FacturaItem {
   precioOrigen     Decimal? @db.Decimal(14, 4)
   tipoCambioValor  Decimal? @db.Decimal(14, 4)
 
+  /// @en Lot consumed for FEFO-tracked articles (#202).
+  /// @es Lote consumido para artículos con FEFO (#202).
+  /// @pt-BR Lote consumido para artigos com FEFO (#202).
+  loteId     Int?
+  lote       Lote?   @relation(fields: [loteId], references: [id], onDelete: SetNull)
+
   createdAt DateTime  @default(now())
 
   garantias Garantia[]
+
+  @@index([loteId])
 }
 
 model ParamEmpresa {
@@ -1470,6 +1492,8 @@ model Tenant {
   configFidelizacion            ConfigFidelizacion?
   puntosFidelizacion            PuntosFidelizacion[]
   movimientosPuntos             MovimientoPuntos[]
+  configFefo                    ConfigFefo?
+  lotes                         Lote[]
 }
 
 /// Idempotent Mercado Pago payment webhook processing (#176).
@@ -2394,6 +2418,52 @@ model ConfigFidelizacion {
   updatedAt         DateTime @updatedAt
 }
 
+/// @en FEFO / lot expiry alert configuration per tenant (#202).
+/// @es Configuración de alerta de vencimiento FEFO/lotes por tenant (#202).
+/// @pt-BR Configuração de alerta de vencimento FEFO/lotes por tenant (#202).
+model ConfigFefo {
+  id                     Int      @id @default(autoincrement())
+  tenantId               Int      @unique
+  tenant                 Tenant   @relation(fields: [tenantId], references: [id])
+  diasAlertaVencimiento  Int      @default(30)
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+}
+
+/// @en Inventory lot with expiry for FEFO allocation (#202).
+/// @es Lote de inventario con vencimiento para asignación FEFO (#202).
+/// @pt-BR Lote de inventário com vencimento para alocação FEFO (#202).
+model Lote {
+  id               Int       @id @default(autoincrement())
+  tenantId         Int
+  tenant           Tenant    @relation(fields: [tenantId], references: [id])
+  articuloId       Int
+  articulo         Articulo  @relation(fields: [articuloId], references: [id], onDelete: Restrict)
+  depositoId       Int
+  deposito         Deposito  @relation(fields: [depositoId], references: [id], onDelete: Restrict)
+  proveedorId      Int?
+  proveedor        Proveedor? @relation(fields: [proveedorId], references: [id], onDelete: SetNull)
+  nroLote          String    @db.VarChar(60)
+  fechaVencimiento DateTime  @db.Date
+  fechaIngreso     DateTime  @default(now())
+  stockInicial     Int
+  stockActual      Int
+  activo           Boolean   @default(true)
+  preavisoEnviadoAt DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  facturaItems FacturaItem[]
+  pedidoItems  PedidoItem[]
+  stockAjustes StockAjuste[]
+
+  @@unique([tenantId, articuloId, depositoId, nroLote])
+  @@index([tenantId])
+  @@index([tenantId, articuloId, depositoId, fechaVencimiento])
+  @@index([tenantId, fechaVencimiento])
+  @@index([tenantId, activo, stockActual])
+}
+
 /// @en Current loyalty points balance per customer (#250).
 /// @es Saldo actual de puntos de fidelización por cliente (#250).
 /// @pt-BR Saldo atual de pontos de fidelização por cliente (#250).
@@ -2462,11 +2532,17 @@ model StockAjuste {
   /// @pt-BR Depósito afetado pelo ajuste quando inventory.warehouses está ativo (#236).
   depositoId Int?
   deposito   Deposito? @relation(fields: [depositoId], references: [id], onDelete: SetNull)
+  /// @en Lot affected by the adjustment when the article tracks lots (#202).
+  /// @es Lote afectado por el ajuste cuando el artículo controla lotes (#202).
+  /// @pt-BR Lote afetado pelo ajuste quando o artigo controla lotes (#202).
+  loteId     Int?
+  lote       Lote?     @relation(fields: [loteId], references: [id], onDelete: SetNull)
   createdAt  DateTime @default(now())
 
   @@index([tenantId, articuloId])
   @@index([tenantId, articuloId, createdAt])
   @@index([tenantId, depositoId])
+  @@index([loteId])
 }
 
 model AppSession {
