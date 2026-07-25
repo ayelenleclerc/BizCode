@@ -77,6 +77,8 @@ export type ArticuloInput = {
   unidadServicio?: UnidadServicio | null
   /** @en Warranty months; null = no warranty (#251). @es Meses de garantía (#251). @pt-BR Meses de garantia (#251). */
   mesesGarantia?: number | null
+  /** @en Lot control opt-in (#202). @es Opt-in control de lote (#202). @pt-BR Opt-in controle de lote (#202). */
+  controlLote?: boolean
   precioLista1: number
   precioLista2: number
   costo: number
@@ -390,6 +392,8 @@ export type StockAjusteInput = {
   motivo: string
   /** @en Deposit for the adjustment (#236). @es Depósito del ajuste (#236). @pt-BR Depósito do ajuste (#236). */
   depositoId?: number | null
+  /** @en Lot for FEFO-tracked articles (#202). @es Lote para artículos con FEFO (#202). @pt-BR Lote para artigos com FEFO (#202). */
+  loteId?: number | null
 }
 
 export type OrdenCompraEstado = 'draft' | 'sent' | 'received' | 'cancelled'
@@ -419,6 +423,10 @@ export type OrdenCompraUpdateInput = {
 export type OrdenCompraReceiveLineInput = {
   itemId: number
   cantidad: number
+  /** @en Manufacturer lot number when article tracks lots (#202). */
+  nroLote?: string | null
+  /** @en Lot expiry ISO date (YYYY-MM-DD) when article tracks lots (#202). */
+  fechaVencimiento?: string | null
 }
 
 export type RecuentoItemLineInput = {

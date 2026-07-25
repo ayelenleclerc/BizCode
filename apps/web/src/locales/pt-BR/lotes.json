@@ -1,0 +1,23 @@
+{
+  "title": "Lotes e FEFO",
+  "loadError": "Não foi possível carregar os lotes",
+  "saveError": "Não foi possível salvar a configuração",
+  "saveOk": "Configuração salva",
+  "tabs": {
+    "list": "Todos os lotes",
+    "expiring": "A vencer"
+  },
+  "config": {
+    "title": "Alerta de vencimento",
+    "dias": "Dias de antecedência",
+    "save": "Salvar"
+  },
+  "table": {
+    "nroLote": "Nº lote",
+    "articulo": "Artigo",
+    "deposito": "Depósito",
+    "vencimiento": "Vencimento",
+    "stock": "Estoque",
+    "empty": "Sem lotes"
+  }
+}

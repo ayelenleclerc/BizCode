@@ -1,11 +1,12 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import { useHotkeys } from 'react-hotkeys-hook'
 import { useTranslation } from 'react-i18next'
-import { empresaAPI, facturasAPI, fidelizacionAPI, fiscalRetencionesAPI, listasPreciosAPI, type RetencionPreviewLineDTO } from '@/lib/api'
+import { depositosAPI, empresaAPI, facturasAPI, fidelizacionAPI, fiscalRetencionesAPI, listasPreciosAPI, type RetencionPreviewLineDTO } from '@/lib/api'
 import { calculateInvoice, calculateItemSubtotal } from '@/lib/invoice'
 import { Cliente, Articulo, FormaPago } from '@bizcode/types'
 import KeyboardHint, { useInvoiceShortcuts } from '@/components/shared/KeyboardHint'
 import { useFeatureFlags } from '@/contexts/FeatureFlagsContext'
+import FefoPreviewBadge from './FefoPreviewBadge'
 
 interface LineaFactura {
   id: string
@@ -58,6 +59,9 @@ export default function NuevaFacturaForm({
   const retencionesModule = hasModule('finance.retenciones')
   const pricelistsModule = hasModule('catalog.pricelists')
   const loyaltyModule = hasModule('clients.loyalty')
+  const fefoModule = hasModule('inventory.fefo')
+  const warehousesModule = hasModule('inventory.warehouses')
+  const [fefoDefaultDepositoId, setFefoDefaultDepositoId] = useState<number | null>(null)
   const [puntosCanje, setPuntosCanje] = useState('')
   const [loyaltySaldo, setLoyaltySaldo] = useState<{
     puntos: number
@@ -98,6 +102,27 @@ export default function NuevaFacturaForm({
       cancelled = true
     }
   }, [loyaltyModule, clienteId])
+
+  useEffect(() => {
+    if (!fefoModule || !warehousesModule) {
+      setFefoDefaultDepositoId(null)
+      return
+    }
+    let cancelled = false
+    depositosAPI
+      .listDepositos({ activo: true, take: 50 })
+      .then((response) => {
+        if (cancelled) return
+        const deposito = response.data.find((d) => d.esDefault) ?? response.data[0]
+        setFefoDefaultDepositoId(deposito?.id ?? null)
+      })
+      .catch(() => {
+        if (!cancelled) setFefoDefaultDepositoId(null)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [fefoModule, warehousesModule])
 
   const puntosCanjeNum = Number.parseInt(puntosCanje, 10)
   const canjeMontoEstimado =
@@ -651,6 +676,13 @@ export default function NuevaFacturaForm({
                         ))}
                       </select>
                     )}
+                    {linea.mode === 'catalog' && fefoModule && linea.articulo?.controlLote && linea.articuloId ? (
+                      <FefoPreviewBadge
+                        articuloId={linea.articuloId}
+                        depositoId={fefoDefaultDepositoId}
+                        cantidad={linea.cantidad}
+                      />
+                    ) : null}
                   </td>
                   <td className="px-3 py-2">
                     <input

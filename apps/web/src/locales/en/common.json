@@ -18,6 +18,7 @@
     "listasPrecios": "Price lists",
     "categoriasArticulo": "Article categories",
     "depositos": "Warehouses",
+    "lotes": "Lots / FEFO",
     "transferenciasDeposito": "Warehouse transfers",
     "comisionesConfig": "Commissions (config)",
     "comisionesLiquidaciones": "Commissions (settlements)",

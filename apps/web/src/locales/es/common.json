@@ -18,6 +18,7 @@
     "listasPrecios": "Listas de precios",
     "categoriasArticulo": "Categorías de artículos",
     "depositos": "Depósitos",
+    "lotes": "Lotes / FEFO",
     "transferenciasDeposito": "Transferencias de depósito",
     "comisionesConfig": "Comisiones (config)",
     "comisionesLiquidaciones": "Comisiones (liquidaciones)",

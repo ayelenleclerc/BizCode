@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "createdAt": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "diasAlertaVencimiento": {
+      "maximum": 365,
+      "minimum": 1,
+      "type": "integer"
+    },
+    "id": {
+      "type": "integer"
+    },
+    "tenantId": {
+      "type": "integer"
+    },
+    "updatedAt": {
+      "format": "date-time",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "tenantId",
+    "diasAlertaVencimiento",
+    "createdAt",
+    "updatedAt"
+  ],
+  "title": "ConfigFefo",
+  "type": "object"
+}

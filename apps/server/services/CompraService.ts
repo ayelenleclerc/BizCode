@@ -11,6 +11,7 @@ import { assertNoOpenRecuento } from '../lib/recuentoStockGuard'
 import { facturaFechaToPrismaDate } from '../routes/restDomainShared'
 import type { ServiceResult } from './serviceResults'
 import { applyStockDepositoDelta, getDefaultDepositoId } from './stockDepositoSync'
+import { LoteService } from './LoteService'
 import { ProveedorCatalogoService } from './ProveedorCatalogoService'
 
 export const ORDEN_COMPRA_ESTADOS: OrdenCompraEstado[] = ['draft', 'sent', 'received', 'cancelled']
@@ -21,7 +22,7 @@ const ordenInclude = {
   proveedor: { select: { id: true, codigo: true, rsocial: true } },
   items: {
     include: {
-      articulo: { select: { id: true, codigo: true, descripcion: true } },
+      articulo: { select: { id: true, codigo: true, descripcion: true, controlLote: true } },
     },
     orderBy: { id: 'asc' as const },
   },
@@ -59,12 +60,14 @@ function allItemsFullyReceived(items: { cantidad: number; cantidadRecibida: numb
  */
 export class CompraService {
   private readonly catalogo: ProveedorCatalogoService
+  private readonly loteService: LoteService
 
   constructor(
     private readonly prisma: PrismaClient,
     catalogo?: ProveedorCatalogoService,
   ) {
     this.catalogo = catalogo ?? new ProveedorCatalogoService(prisma)
+    this.loteService = new LoteService(prisma)
   }
 
   async resolveItemCatalogSnapshot(
@@ -311,7 +314,13 @@ export class CompraService {
   ): Promise<ServiceResult<OrdenCompraRow>> {
     const orden = await this.prisma.ordenCompra.findFirst({
       where: { id, tenantId },
-      include: { items: true },
+      include: {
+        items: {
+          include: {
+            articulo: { select: { controlLote: true } },
+          },
+        },
+      },
     })
     if (!orden) {
       return { ok: false, status: 404, error: 'OrdenCompra not found' }
@@ -340,64 +349,125 @@ export class CompraService {
       }
     }
 
-    const row = await this.prisma.$transaction(async (tx) => {
+    const hasControlledArticles = lines.some(
+      (line) => itemById.get(line.itemId)?.articulo?.controlLote === true,
+    )
+    const fefoEnabled =
+      hasControlledArticles && (await this.loteService.isFefoEnabled(tenantId))
+
+    if (fefoEnabled) {
       for (const line of lines) {
         const item = itemById.get(line.itemId)!
-        const newRecibida = item.cantidadRecibida + line.cantidad
-
-        await tx.ordenCompraItem.update({
-          where: { id: item.id },
-          data: { cantidadRecibida: newRecibida },
-        })
-
-        const articulo = await tx.articulo.findFirst({
-          where: { id: item.articuloId, tenantId },
-          select: { id: true, stock: true },
-        })
-        if (!articulo) {
-          throw new Error('Articulo not found')
+        if (item.articulo?.controlLote === true) {
+          if (!line.nroLote?.trim() || !line.fechaVencimiento?.trim()) {
+            return { ok: false, status: 422, error: 'LOTE_REQUIRED' }
+          }
+          if (depositoId == null) {
+            return { ok: false, status: 422, error: 'DEPOSITO_REQUIRED_FOR_LOTE' }
+          }
         }
-
-        if (depositoId != null) {
-          await applyStockDepositoDelta(tx, {
-            tenantId,
-            articuloId: articulo.id,
-            depositoId,
-            delta: line.cantidad,
-          })
-        } else {
-          const stockAfter = articulo.stock + line.cantidad
-          await tx.articulo.update({
-            where: { id: articulo.id },
-            data: { stock: stockAfter },
-          })
-        }
-        await tx.stockAjuste.create({
-          data: {
-            tenantId,
-            articuloId: articulo.id,
-            cantidad: line.cantidad,
-            motivo: PURCHASE_STOCK_MOTIVO,
-            userId,
-            ...(depositoId != null ? { depositoId } : {}),
-          },
-        })
-
-        item.cantidadRecibida = newRecibida
       }
+    }
 
-      const updatedItems = orden.items.map((i) => itemById.get(i.id)!)
-      const nextEstado: OrdenCompraEstado = allItemsFullyReceived(updatedItems)
-        ? 'received'
-        : 'sent'
+    try {
+      const row = await this.prisma.$transaction(async (tx) => {
+        for (const line of lines) {
+          const item = itemById.get(line.itemId)!
+          const newRecibida = item.cantidadRecibida + line.cantidad
 
-      return tx.ordenCompra.update({
-        where: { id },
-        data: { estado: nextEstado },
-        include: ordenInclude,
+          await tx.ordenCompraItem.update({
+            where: { id: item.id },
+            data: { cantidadRecibida: newRecibida },
+          })
+
+          const articulo = await tx.articulo.findFirst({
+            where: { id: item.articuloId, tenantId },
+            select: { id: true, stock: true, controlLote: true, tipo: true },
+          })
+          if (!articulo) {
+            throw new Error('Articulo not found')
+          }
+
+          if (depositoId != null) {
+            await applyStockDepositoDelta(tx, {
+              tenantId,
+              articuloId: articulo.id,
+              depositoId,
+              delta: line.cantidad,
+            })
+          } else {
+            const stockAfter = articulo.stock + line.cantidad
+            await tx.articulo.update({
+              where: { id: articulo.id },
+              data: { stock: stockAfter },
+            })
+          }
+
+          let loteId: number | null = null
+          if (
+            fefoEnabled &&
+            articulo.controlLote &&
+            articulo.tipo !== 'servicio' &&
+            depositoId != null &&
+            line.nroLote &&
+            line.fechaVencimiento
+          ) {
+            const inbound = await this.loteService.applyInbound(tx, tenantId, {
+              articuloId: articulo.id,
+              depositoId,
+              nroLote: line.nroLote,
+              fechaVencimiento: line.fechaVencimiento,
+              cantidad: line.cantidad,
+              proveedorId: orden.proveedorId,
+            })
+            if (!inbound.ok) {
+              throw new Error(inbound.error)
+            }
+            loteId = inbound.data.loteId
+          }
+
+          await tx.stockAjuste.create({
+            data: {
+              tenantId,
+              articuloId: articulo.id,
+              cantidad: line.cantidad,
+              motivo: PURCHASE_STOCK_MOTIVO,
+              userId,
+              ...(depositoId != null ? { depositoId } : {}),
+              ...(loteId != null ? { loteId } : {}),
+            },
+          })
+
+          item.cantidadRecibida = newRecibida
+        }
+
+        const updatedItems = orden.items.map((i) => itemById.get(i.id)!)
+        const nextEstado: OrdenCompraEstado = allItemsFullyReceived(updatedItems)
+          ? 'received'
+          : 'sent'
+
+        return tx.ordenCompra.update({
+          where: { id },
+          data: { estado: nextEstado },
+          include: ordenInclude,
+        })
       })
-    })
 
-    return { ok: true, data: row }
+      return { ok: true, data: row }
+    } catch (err) {
+      if (err instanceof Error) {
+        const known = [
+          'LOTE_REQUIRED',
+          'DEPOSITO_REQUIRED_FOR_LOTE',
+          'fechaVencimiento must be a valid date',
+          'nroLote is required',
+          'cantidad must be a positive integer',
+        ]
+        if (known.includes(err.message) || err.message.startsWith('fechaVencimiento')) {
+          return { ok: false, status: 422, error: err.message }
+        }
+      }
+      throw err
+    }
   }
 }

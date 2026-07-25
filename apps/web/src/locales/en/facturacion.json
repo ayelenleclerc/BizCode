@@ -44,6 +44,13 @@
     "rowAria": "Item {{n}}, click to select this row",
     "rowAriaSelected": "Item {{n}}, row selected"
   },
+  "fefoPreview": {
+    "loading": "Calculating FEFO allocation…",
+    "error": "Could not calculate FEFO allocation",
+    "empty": "No lots available for this product/warehouse",
+    "ariaLabel": "FEFO allocation preview",
+    "line": "Lot {{nroLote}} (exp. {{fecha}}): {{cantidad}}"
+  },
   "totals": {
     "neto21": "Net 21%",
     "neto105": "Net 10.5%",

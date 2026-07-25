@@ -48,6 +48,8 @@
     "title": "Recebimento parcial ou total",
     "item": "Item",
     "pending": "Pendente",
-    "cantidad": "Quantidade a receber"
+    "cantidad": "Quantidade a receber",
+    "nroLote": "Nº do lote",
+    "fechaVencimiento": "Data de vencimento"
   }
 }

@@ -54,6 +54,8 @@ tags:
     description: Product warranties by serial / IMEI (#251, module service.warranties)
   - name: fidelizacion
     description: Customer loyalty points program (#250, module clients.loyalty)
+  - name: lotes
+    description: FEFO inventory lots and expiry alerts (#202, modules inventory.fefo / inventory.lots)
   - name: cajas
     description: Cash drawers and cashier shifts (#247, module pos.cashier)
   - name: listas-precios
@@ -4598,6 +4600,220 @@ paths:
                 $ref: '#/components/schemas/ClientePuntosEnvelope'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/fefo/config:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [lotes]
+      summary: Get FEFO expiry alert configuration (#202)
+      description: Requires module `inventory.fefo` and `products.read`.
+      responses:
+        '200':
+          description: FEFO config
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConfigFefoEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    put:
+      tags: [lotes]
+      summary: Upsert FEFO expiry alert configuration (#202)
+      description: Requires module `inventory.fefo` and `inventory.adjust`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConfigFefoUpsertInput'
+      responses:
+        '200':
+          description: Updated config
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConfigFefoEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/lotes:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [lotes]
+      summary: List inventory lots (#202)
+      description: Requires module `inventory.fefo` and `products.read`.
+      parameters:
+        - name: articuloId
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+        - name: depositoId
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+        - name: soloActivos
+          in: query
+          schema:
+            type: boolean
+        - name: porVencer
+          in: query
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Lots list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoteListEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    post:
+      tags: [lotes]
+      summary: Create inventory lot (#202)
+      description: Requires module `inventory.fefo` and `inventory.adjust`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoteCreateInput'
+      responses:
+        '201':
+          description: Created lot
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoteEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '409':
+          $ref: '#/components/responses/ConflictError'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/lotes/por-vencer:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [lotes]
+      summary: List lots expiring within alert window (#202)
+      description: Requires module `inventory.fefo` and `products.read`.
+      responses:
+        '200':
+          description: Expiring lots
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoteListEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/lotes/preview-fefo:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: articuloId
+        in: query
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+      - name: depositoId
+        in: query
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+      - name: quantity
+        in: query
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    get:
+      tags: [lotes]
+      summary: Preview FEFO lot allocation (#202)
+      description: Requires module `inventory.fefo` and `products.read`.
+      responses:
+        '200':
+          description: Suggested allocations
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FefoAllocationListEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/articulos/{id}/trazabilidad:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+      - name: loteId
+        in: query
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    get:
+      tags: [lotes]
+      summary: Lot outbound traceability via invoice items (#202)
+      description: Requires module `inventory.lots` and `products.read`.
+      responses:
+        '200':
+          description: Lot and related invoice lines
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoteTrazabilidadEnvelope'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '403':
@@ -18177,6 +18393,224 @@ components:
           const: true
         data:
           $ref: '#/components/schemas/ConfigFidelizacion'
+
+    ConfigFefo:
+      type: object
+      required: [id, tenantId, diasAlertaVencimiento, createdAt, updatedAt]
+      properties:
+        id:
+          type: integer
+        tenantId:
+          type: integer
+        diasAlertaVencimiento:
+          type: integer
+          minimum: 1
+          maximum: 365
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    ConfigFefoUpsertInput:
+      type: object
+      required: [diasAlertaVencimiento]
+      properties:
+        diasAlertaVencimiento:
+          type: integer
+          minimum: 1
+          maximum: 365
+
+    ConfigFefoEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/ConfigFefo'
+
+    Lote:
+      type: object
+      required:
+        [
+          id,
+          tenantId,
+          articuloId,
+          depositoId,
+          nroLote,
+          fechaVencimiento,
+          fechaIngreso,
+          stockInicial,
+          stockActual,
+          activo,
+          createdAt,
+          updatedAt,
+        ]
+      properties:
+        id:
+          type: integer
+        tenantId:
+          type: integer
+        articuloId:
+          type: integer
+        depositoId:
+          type: integer
+        proveedorId:
+          type: integer
+          nullable: true
+        nroLote:
+          type: string
+        fechaVencimiento:
+          type: string
+          format: date
+        fechaIngreso:
+          type: string
+          format: date-time
+        stockInicial:
+          type: integer
+        stockActual:
+          type: integer
+        activo:
+          type: boolean
+        preavisoEnviadoAt:
+          type: string
+          format: date-time
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    LoteCreateInput:
+      type: object
+      required: [articuloId, depositoId, nroLote, fechaVencimiento]
+      properties:
+        articuloId:
+          type: integer
+          minimum: 1
+        depositoId:
+          type: integer
+          minimum: 1
+        nroLote:
+          type: string
+          minLength: 1
+          maxLength: 60
+        fechaVencimiento:
+          type: string
+        proveedorId:
+          type: integer
+          nullable: true
+        stockInicial:
+          type: integer
+          minimum: 0
+
+    LoteEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/Lote'
+
+    LoteListEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Lote'
+
+    FefoAllocation:
+      type: object
+      required: [loteId, nroLote, fechaVencimiento, cantidad]
+      properties:
+        loteId:
+          type: integer
+        nroLote:
+          type: string
+        fechaVencimiento:
+          type: string
+          format: date
+        cantidad:
+          type: integer
+
+    FefoAllocationListEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/FefoAllocation'
+
+    LoteTrazabilidad:
+      type: object
+      required: [lote, facturas]
+      properties:
+        lote:
+          $ref: '#/components/schemas/Lote'
+        facturas:
+          type: array
+          items:
+            type: object
+            required:
+              [
+                facturaId,
+                facturaItemId,
+                tipo,
+                prefijo,
+                numero,
+                fecha,
+                cantidad,
+                clienteId,
+                clienteRsocial,
+              ]
+            properties:
+              facturaId:
+                type: integer
+              facturaItemId:
+                type: integer
+              tipo:
+                type: string
+              prefijo:
+                type: string
+              numero:
+                type: integer
+              fecha:
+                type: string
+                format: date
+              cantidad:
+                type: integer
+              clienteId:
+                type: integer
+                nullable: true
+              clienteRsocial:
+                type: string
+                nullable: true
+
+    LoteTrazabilidadEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/LoteTrazabilidad'
 
     MovimientoPuntos:
       type: object

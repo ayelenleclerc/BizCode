@@ -70,6 +70,8 @@
     "minimo": "Mínimo",
     "mesesGarantia": "Meses de garantía",
     "mesesGarantiaHint": "Vacío o 0 = sin garantía. Al facturar se registra la garantía automáticamente.",
+    "controlLote": "Control de lote / FEFO",
+    "controlLoteHint": "Exige lote y vencimiento en recepción; asigna FEFO al facturar.",
     "activo": "Activo",
     "tipo": "Tipo",
     "tipoOptions": {

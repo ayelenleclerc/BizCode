@@ -214,6 +214,12 @@
 
 * [ConfigComisionPatchInput](./configcomisionpatchinput.md) – `-`
 
+* [ConfigFefo](./configfefo.md) – `-`
+
+* [ConfigFefoEnvelope](./configfefoenvelope.md) – `-`
+
+* [ConfigFefoUpsertInput](./configfefoupsertinput.md) – `-`
+
 * [ConfigFidelizacion](./configfidelizacion.md) – `-`
 
 * [ConfigFidelizacionEnvelope](./configfidelizacionenvelope.md) – `-`
@@ -356,6 +362,10 @@
 
 * [FacturasPendientesEnvelope](./facturaspendientesenvelope.md) – `-`
 
+* [FefoAllocation](./fefoallocation.md) – `-`
+
+* [FefoAllocationListEnvelope](./fefoallocationlistenvelope.md) – `-`
+
 * [FidelizacionAjusteInput](./fidelizacionajusteinput.md) – `-`
 
 * [FidelizacionDashboard](./fidelizaciondashboard.md) – `-`
@@ -481,6 +491,18 @@
 * [LogoutEnvelope](./logoutenvelope.md) – `-`
 
 * [LogoutResult](./logoutresult.md) – `-`
+
+* [Lote](./lote.md) – `-`
+
+* [LoteCreateInput](./lotecreateinput.md) – `-`
+
+* [LoteEnvelope](./loteenvelope.md) – `-`
+
+* [LoteListEnvelope](./lotelistenvelope.md) – `-`
+
+* [LoteTrazabilidad](./lotetrazabilidad.md) – `-`
+
+* [LoteTrazabilidadEnvelope](./lotetrazabilidadenvelope.md) – `-`
 
 * [MercadoPagoChargeback](./mercadopagochargeback.md) – `-`
 
@@ -1172,6 +1194,8 @@
 
 * [Untitled object in ListaPrecioListEnvelope](./listapreciolistenvelope-allof-0.md) – `undefined#/allOf/0`
 
+* [Untitled object in LoteTrazabilidad](./lotetrazabilidad-properties-facturas-items.md) – `undefined#/properties/facturas/items`
+
 * [Untitled object in MercadoPagoConfigEnvelope](./mercadopagoconfigenvelope-properties-data.md) – `undefined#/properties/data`
 
 * [Untitled object in MercadoPagoTestEnvelope](./mercadopagotestenvelope-properties-data.md) – `undefined#/properties/data`
@@ -1468,6 +1492,8 @@
 
 * [Untitled array in FacturasPendientesEnvelope](./facturaspendientesenvelope-properties-data.md) – `undefined#/properties/data`
 
+* [Untitled array in FefoAllocationListEnvelope](./fefoallocationlistenvelope-properties-data.md) – `undefined#/properties/data`
+
 * [Untitled array in FidelizacionDashboard](./fidelizaciondashboard-properties-ranking.md) – `undefined#/properties/ranking`
 
 * [Untitled array in FormaPagoListEnvelope](./formapagolistenvelope-properties-data.md) – `undefined#/properties/data`
@@ -1513,6 +1539,10 @@
 * [Untitled array in LogisticaKpis](./logisticakpis-properties-returnsbyreason.md) – `undefined#/properties/returnsByReason`
 
 * [Untitled array in LogisticaZonasListEnvelope](./logisticazonaslistenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled array in LoteListEnvelope](./lotelistenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled array in LoteTrazabilidad](./lotetrazabilidad-properties-facturas.md) – `undefined#/properties/facturas`
 
 * [Untitled array in MercadoPagoChargebackListEnvelope](./mercadopagochargebacklistenvelope-properties-data.md) – `undefined#/properties/data`
 

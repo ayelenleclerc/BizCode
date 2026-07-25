@@ -232,6 +232,17 @@ export const fidelizacionMutationHttpRateLimiter = createRouteLimiter({
   skipUnless: () => true,
 })
 
+/**
+ * @en Per-IP rate limit for FEFO config/lote mutations (#202); visible to CodeQL.
+ * @es Límite por IP para mutaciones FEFO/lotes (#202); visible a CodeQL.
+ * @pt-BR Limite por IP para mutações FEFO/lotes (#202); visível ao CodeQL.
+ */
+export const fefoMutationHttpRateLimiter = createRouteLimiter({
+  windowMs: MINUTE_MS,
+  limit: parsePositiveInt(process.env.HTTP_RATE_LIMIT_PER_MINUTE, API_GENERAL_DEFAULT),
+  skipUnless: () => true,
+})
+
 function runLimiterChain(
   req: Request,
   res: Response,

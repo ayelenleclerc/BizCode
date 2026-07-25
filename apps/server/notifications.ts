@@ -25,6 +25,7 @@ export const NOTIFICATION_TYPES = [
   'ot_listo',
   'precios_fx_actualizados',
   'loyalty_points_expiring',
+  'lot_expiring',
 ] as const
 
 export type NotificationType = (typeof NOTIFICATION_TYPES)[number]
@@ -61,6 +62,8 @@ export type NotificationPayload = {
   contratoNumero?: number
   otId?: number
   otNumero?: number
+  loteId?: number
+  nroLote?: string
 }
 
 /**

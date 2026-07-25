@@ -25,6 +25,7 @@ import ContratosPage from './pages/contratos'
 import OrdenesTrabajoPage from './pages/ordenes-trabajo'
 import GarantiasPage from './pages/garantias'
 import FidelizacionPage from './pages/fidelizacion'
+import LotesPage from './pages/lotes'
 import CajaPage from './pages/caja'
 import ListasPreciosPage from './pages/listas-precios'
 import CategoriasArticuloPage from './pages/categorias-articulo'
@@ -218,6 +219,14 @@ function AppRoutes() {
             element={
               <ModuleRoute moduleKey="clients.loyalty">
                 <FidelizacionPage />
+              </ModuleRoute>
+            }
+          />
+          <Route
+            path="lotes"
+            element={
+              <ModuleRoute moduleKey="inventory.fefo">
+                <LotesPage />
               </ModuleRoute>
             }
           />

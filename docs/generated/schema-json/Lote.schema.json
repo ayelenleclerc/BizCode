@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "activo": {
+      "type": "boolean"
+    },
+    "articuloId": {
+      "type": "integer"
+    },
+    "createdAt": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "depositoId": {
+      "type": "integer"
+    },
+    "fechaIngreso": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "fechaVencimiento": {
+      "format": "date",
+      "type": "string"
+    },
+    "id": {
+      "type": "integer"
+    },
+    "nroLote": {
+      "type": "string"
+    },
+    "preavisoEnviadoAt": {
+      "format": "date-time",
+      "nullable": true,
+      "type": "string"
+    },
+    "proveedorId": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "stockActual": {
+      "type": "integer"
+    },
+    "stockInicial": {
+      "type": "integer"
+    },
+    "tenantId": {
+      "type": "integer"
+    },
+    "updatedAt": {
+      "format": "date-time",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "tenantId",
+    "articuloId",
+    "depositoId",
+    "nroLote",
+    "fechaVencimiento",
+    "fechaIngreso",
+    "stockInicial",
+    "stockActual",
+    "activo",
+    "createdAt",
+    "updatedAt"
+  ],
+  "title": "Lote",
+  "type": "object"
+}

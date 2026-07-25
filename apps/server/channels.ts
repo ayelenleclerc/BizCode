@@ -199,6 +199,19 @@ function buildMessage(type: NotificationType, payload: NotificationPayload): Mes
         text: `${rsocial} tiene ${pts} puntos que vencen en ${days} días${payload.expiresAt ? ` (${payload.expiresAt})` : ''}.`,
       }
     }
+    case 'lot_expiring': {
+      const days = payload.daysRemaining ?? 0
+      const nro = payload.nroLote ?? String(payload.loteId ?? '')
+      const art =
+        payload.codigo != null
+          ? `${payload.codigo}${payload.descripcion ? ` — ${payload.descripcion}` : ''}`
+          : (payload.descripcion ?? 'Artículo')
+      const stockPart = payload.stock != null ? ` (stock ${payload.stock})` : ''
+      return {
+        subject: `[BizCode] Lote por vencer — ${nro}`,
+        text: `Lote ${nro} de ${art} vence en ${days} días${payload.expiresAt ? ` (${payload.expiresAt})` : ''}${stockPart}.`,
+      }
+    }
   }
 }
 

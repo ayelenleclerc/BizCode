@@ -7,7 +7,7 @@ export type OrdenCompraItemRow = {
   cantidadRecibida: number
   costoUnitario: string
   subtotal: string
-  articulo?: { id: number; codigo: number; descripcion: string }
+  articulo?: { id: number; codigo: number; descripcion: string; controlLote?: boolean }
 }
 
 export type OrdenCompra = {

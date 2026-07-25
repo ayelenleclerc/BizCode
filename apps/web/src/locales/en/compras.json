@@ -48,6 +48,8 @@
     "title": "Partial or full receipt",
     "item": "Line",
     "pending": "Pending",
-    "cantidad": "Quantity to receive"
+    "cantidad": "Quantity to receive",
+    "nroLote": "Lot number",
+    "fechaVencimiento": "Expiry date"
   }
 }
