@@ -17,9 +17,9 @@ export async function assertNoControlLoteArticles(
   }
   const blocked = await prisma.articulo.findFirst({
     where: { tenantId, id: { in: ids }, controlLote: true },
-    select: { id: true, codigo: true },
+    select: { id: true, codigo: true, controlLote: true },
   })
-  if (blocked) {
+  if (blocked?.controlLote === true) {
     return { ok: false, status: 422, error: 'LOT_CONTROL_UNSUPPORTED' }
   }
   return { ok: true, data: undefined }

@@ -314,7 +314,13 @@ export class CompraService {
   ): Promise<ServiceResult<OrdenCompraRow>> {
     const orden = await this.prisma.ordenCompra.findFirst({
       where: { id, tenantId },
-      include: { items: true },
+      include: {
+        items: {
+          include: {
+            articulo: { select: { controlLote: true } },
+          },
+        },
+      },
     })
     if (!orden) {
       return { ok: false, status: 404, error: 'OrdenCompra not found' }
@@ -343,19 +349,16 @@ export class CompraService {
       }
     }
 
-    const fefoEnabled = await this.loteService.isFefoEnabled(tenantId)
-    const articuloIds = [...new Set(lines.map((l) => itemById.get(l.itemId)!.articuloId))]
-    const articulosMeta = await this.prisma.articulo.findMany({
-      where: { tenantId, id: { in: articuloIds } },
-      select: { id: true, controlLote: true, tipo: true },
-    })
-    const articuloMetaById = new Map(articulosMeta.map((a) => [a.id, a]))
+    const hasControlledArticles = lines.some(
+      (line) => itemById.get(line.itemId)?.articulo?.controlLote === true,
+    )
+    const fefoEnabled =
+      hasControlledArticles && (await this.loteService.isFefoEnabled(tenantId))
 
     if (fefoEnabled) {
       for (const line of lines) {
         const item = itemById.get(line.itemId)!
-        const art = articuloMetaById.get(item.articuloId)
-        if (art?.controlLote && art.tipo !== 'servicio') {
+        if (item.articulo?.controlLote === true) {
           if (!line.nroLote?.trim() || !line.fechaVencimiento?.trim()) {
             return { ok: false, status: 422, error: 'LOTE_REQUIRED' }
           }

@@ -310,9 +310,12 @@ export class FacturaService {
       return recuentoBlock
     }
 
-    const fefoEnabled = await this.loteService.isFefoEnabled(tenantId)
-    const needsLot =
-      fefoEnabled && articulos.some((a) => a.controlLote && a.tipo !== 'servicio')
+    const hasControlledArticles = articulos.some(
+      (a) => a.controlLote === true && a.tipo !== 'servicio',
+    )
+    const fefoEnabled =
+      hasControlledArticles && (await this.loteService.isFefoEnabled(tenantId))
+    const needsLot = fefoEnabled && hasControlledArticles
     if (needsLot && depositoId == null) {
       return { ok: false, status: 422, error: 'DEPOSITO_REQUIRED_FOR_LOTE' }
     }

@@ -12,7 +12,7 @@ describe('assertNoControlLoteArticles (#202)', () => {
   it('returns LOT_CONTROL_UNSUPPORTED when a controlled article is present', async () => {
     const prisma = {
       articulo: {
-        findFirst: vi.fn().mockResolvedValue({ id: 9, codigo: 100 }),
+        findFirst: vi.fn().mockResolvedValue({ id: 9, codigo: 100, controlLote: true }),
       },
     }
     const result = await assertNoControlLoteArticles(prisma as never, 1, [9, 10])

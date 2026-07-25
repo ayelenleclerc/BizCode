@@ -73,8 +73,9 @@ export class StockAjusteService {
       }
     }
 
-    const fefoEnabled = await this.loteService.isFefoEnabled(tenantId)
-    if (fefoEnabled && articulo.controlLote) {
+    const fefoEnabled =
+      articulo.controlLote === true && (await this.loteService.isFefoEnabled(tenantId))
+    if (fefoEnabled) {
       if (depositoId == null) {
         return { ok: false, status: 422, error: 'DEPOSITO_REQUIRED_FOR_LOTE' }
       }
@@ -116,7 +117,7 @@ export class StockAjusteService {
           })
         }
 
-        if (fefoEnabled && articulo.controlLote && input.loteId != null && depositoId != null) {
+        if (fefoEnabled && input.loteId != null && depositoId != null) {
           const loteAdj = await this.loteService.applyAjuste(tx, tenantId, {
             loteId: input.loteId,
             articuloId,

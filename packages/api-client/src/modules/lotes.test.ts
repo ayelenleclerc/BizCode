@@ -89,4 +89,35 @@ describe('createLotesAPI (#202)', () => {
     })
     expect(created.id).toBe(9)
   })
+
+  it('updates configuration and reads lot collections and traceability', async () => {
+    put.mockResolvedValue({
+      data: { success: true, data: { diasAlertaVencimiento: 45 } },
+    })
+    get
+      .mockResolvedValueOnce({ data: { success: true, data: [] } })
+      .mockResolvedValueOnce({ data: { success: true, data: [] } })
+      .mockResolvedValueOnce({
+        data: {
+          success: true,
+          data: { lote: { id: 9 }, facturas: [] },
+        },
+      })
+
+    await expect(api.upsertConfig({ diasAlertaVencimiento: 45 })).resolves.toMatchObject({
+      diasAlertaVencimiento: 45,
+    })
+    await expect(api.list({ articuloId: 1, soloActivos: true })).resolves.toEqual([])
+    await expect(api.listExpiring()).resolves.toEqual([])
+    await expect(api.getTrazabilidad(1, 9)).resolves.toMatchObject({ lote: { id: 9 } })
+
+    expect(put).toHaveBeenCalledWith('/fefo/config', { diasAlertaVencimiento: 45 })
+    expect(get).toHaveBeenNthCalledWith(1, '/lotes', {
+      params: { articuloId: 1, soloActivos: true },
+    })
+    expect(get).toHaveBeenNthCalledWith(2, '/lotes/por-vencer')
+    expect(get).toHaveBeenNthCalledWith(3, '/articulos/1/trazabilidad', {
+      params: { loteId: 9 },
+    })
+  })
 })
