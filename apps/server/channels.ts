@@ -191,6 +191,14 @@ function buildMessage(type: NotificationType, payload: NotificationPayload): Mes
         text: `Se actualizaron ${count} artículos dolarizados/eurizados tras un cambio de tipo de cambio${detail}.`,
       }
     }
+    case 'loyalty_points_expiring': {
+      const days = payload.daysRemaining ?? 7
+      const pts = payload.amount ?? '0'
+      return {
+        subject: `[BizCode] Puntos por vencer — ${rsocial}`,
+        text: `${rsocial} tiene ${pts} puntos que vencen en ${days} días${payload.expiresAt ? ` (${payload.expiresAt})` : ''}.`,
+      }
+    }
   }
 }
 

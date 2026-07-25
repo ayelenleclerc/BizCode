@@ -221,6 +221,17 @@ export const ordenesProduccionMutationHttpRateLimiter = createRouteLimiter({
   skipUnless: () => true,
 })
 
+/**
+ * @en Per-IP rate limit for loyalty config/ajuste mutations (#250); visible to CodeQL.
+ * @es Límite por IP para mutaciones de fidelización (#250); visible a CodeQL.
+ * @pt-BR Limite por IP para mutações de fidelização (#250); visível ao CodeQL.
+ */
+export const fidelizacionMutationHttpRateLimiter = createRouteLimiter({
+  windowMs: MINUTE_MS,
+  limit: parsePositiveInt(process.env.HTTP_RATE_LIMIT_PER_MINUTE, API_GENERAL_DEFAULT),
+  skipUnless: () => true,
+})
+
 function runLimiterChain(
   req: Request,
   res: Response,

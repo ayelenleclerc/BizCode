@@ -47,6 +47,7 @@ describe('PortalLayout', () => {
     expect(screen.getByTestId('portal-logo')).toBeInTheDocument()
     expect(screen.getByTestId('portal-cliente-name')).toHaveTextContent('Cliente Demo')
     expect(screen.getByTestId('portal-nav')).toBeInTheDocument()
+    expect(screen.getByText('nav.fidelizacion')).toBeInTheDocument()
     expect(screen.getByText('Gracias')).toBeInTheDocument()
     expect(screen.getByTestId('outlet')).toBeInTheDocument()
   })

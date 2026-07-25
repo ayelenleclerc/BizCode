@@ -97,6 +97,12 @@
     "prefijo": {
       "type": "string"
     },
+    "puntosCanje": {
+      "description": "Optional loyalty points to redeem as a negative invoice line (#250).",
+      "minimum": 1,
+      "nullable": true,
+      "type": "integer"
+    },
     "tipo": {
       "enum": [
         "A",

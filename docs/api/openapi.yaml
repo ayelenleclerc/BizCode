@@ -52,6 +52,8 @@ tags:
     description: Service work orders / repair tickets (#246, module service.orders)
   - name: garantias
     description: Product warranties by serial / IMEI (#251, module service.warranties)
+  - name: fidelizacion
+    description: Customer loyalty points program (#250, module clients.loyalty)
   - name: cajas
     description: Cash drawers and cashier shifts (#247, module pos.cashier)
   - name: listas-precios
@@ -4472,6 +4474,136 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         '403':
           $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/fidelizacion/config:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [fidelizacion]
+      summary: Get loyalty program configuration (#250)
+      description: Requires module `clients.loyalty` and `customers.read`.
+      responses:
+        '200':
+          description: Loyalty config
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConfigFidelizacionEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    put:
+      tags: [fidelizacion]
+      summary: Upsert loyalty program configuration (#250)
+      description: Requires module `clients.loyalty` and `customers.manage`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConfigFidelizacionUpsertInput'
+      responses:
+        '200':
+          description: Updated config
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConfigFidelizacionEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/fidelizacion/dashboard:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [fidelizacion]
+      summary: Loyalty points liability dashboard (#250)
+      description: Requires module `clients.loyalty` and `customers.read`.
+      responses:
+        '200':
+          description: Dashboard KPIs and ranking
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FidelizacionDashboardEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/fidelizacion/clientes/{id}:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    get:
+      tags: [fidelizacion]
+      summary: Customer loyalty balance and movements (#250)
+      description: Requires module `clients.loyalty` and `customers.read`.
+      parameters:
+        - $ref: '#/components/parameters/ListLimit'
+        - $ref: '#/components/parameters/ListOffset'
+      responses:
+        '200':
+          description: Balance and movement history
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClientePuntosEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/fidelizacion/ajuste:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    post:
+      tags: [fidelizacion]
+      summary: Manual loyalty points adjustment (#250)
+      description: Requires module `clients.loyalty` and `customers.manage`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FidelizacionAjusteInput'
+      responses:
+        '200':
+          description: Updated customer points
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClientePuntosEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
         '500':
           $ref: '#/components/responses/ServerError'
 
@@ -9098,6 +9230,29 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PortalPedidoListEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/portal/{tenantSlug}/fidelizacion:
+    get:
+      tags: [portal]
+      summary: Loyalty points balance for the authenticated portal customer (#250)
+      description: Requires portal auth and module `clients.loyalty`.
+      parameters:
+        - $ref: '#/components/parameters/PortalTenantSlug'
+      responses:
+        '200':
+          description: Loyalty summary
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PortalFidelizacionEnvelope'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '403':
@@ -15504,6 +15659,11 @@ components:
                 type: number
               subtotal:
                 type: number
+        puntosCanje:
+          type: integer
+          minimum: 1
+          nullable: true
+          description: Optional loyalty points to redeem as a negative invoice line (#250).
 
     FacturaListEnvelope:
       allOf:
@@ -17937,6 +18097,255 @@ components:
               enum: [vigente, vencida, sin_registro]
             garantia:
               $ref: '#/components/schemas/Garantia'
+
+    ConfigFidelizacion:
+      type: object
+      required:
+        [
+          id,
+          tenantId,
+          activo,
+          nombre,
+          pesosPorPunto,
+          puntosPorPeso,
+          mesesVencimiento,
+          montoMinCompra,
+          aplicaEnDescuento,
+          createdAt,
+          updatedAt,
+        ]
+      properties:
+        id:
+          type: integer
+        tenantId:
+          type: integer
+        activo:
+          type: boolean
+        nombre:
+          type: string
+        pesosPorPunto:
+          type: number
+        puntosPorPeso:
+          type: number
+        mesesVencimiento:
+          type: integer
+          nullable: true
+        montoMinCompra:
+          type: number
+        aplicaEnDescuento:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    ConfigFidelizacionUpsertInput:
+      type: object
+      required: [activo, pesosPorPunto, puntosPorPeso]
+      properties:
+        activo:
+          type: boolean
+        nombre:
+          type: string
+          minLength: 1
+          maxLength: 80
+        pesosPorPunto:
+          type: number
+          exclusiveMinimum: 0
+        puntosPorPeso:
+          type: number
+          exclusiveMinimum: 0
+        mesesVencimiento:
+          type: integer
+          minimum: 1
+          maximum: 120
+          nullable: true
+        montoMinCompra:
+          type: number
+          minimum: 0
+        aplicaEnDescuento:
+          type: boolean
+
+    ConfigFidelizacionEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/ConfigFidelizacion'
+
+    MovimientoPuntos:
+      type: object
+      required:
+        [
+          id,
+          tenantId,
+          clienteId,
+          tipo,
+          puntos,
+          saldoPost,
+          puntosRestantes,
+          referenciaFacturaId,
+          venceEn,
+          concepto,
+          userId,
+          createdAt,
+        ]
+      properties:
+        id:
+          type: integer
+        tenantId:
+          type: integer
+        clienteId:
+          type: integer
+        tipo:
+          type: string
+          enum: [acumulacion, canje, ajuste, vencimiento, reverso]
+        puntos:
+          type: integer
+        saldoPost:
+          type: integer
+        puntosRestantes:
+          type: integer
+          nullable: true
+        referenciaFacturaId:
+          type: integer
+          nullable: true
+        venceEn:
+          type: string
+          format: date-time
+          nullable: true
+        concepto:
+          type: string
+          nullable: true
+        userId:
+          type: integer
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+
+    ClientePuntosDetail:
+      type: object
+      required: [clienteId, puntos, equivalenteDinero, movimientos, totalMovimientos]
+      properties:
+        clienteId:
+          type: integer
+        puntos:
+          type: integer
+        equivalenteDinero:
+          type: number
+        movimientos:
+          type: array
+          items:
+            $ref: '#/components/schemas/MovimientoPuntos'
+        totalMovimientos:
+          type: integer
+
+    ClientePuntosEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/ClientePuntosDetail'
+
+    FidelizacionAjusteInput:
+      type: object
+      required: [clienteId, puntos]
+      properties:
+        clienteId:
+          type: integer
+          minimum: 1
+        puntos:
+          type: integer
+          description: Non-zero signed integer; positive credits, negative debits
+        concepto:
+          type: string
+          maxLength: 200
+          nullable: true
+
+    FidelizacionDashboard:
+      type: object
+      required:
+        [
+          puntosEmitidos,
+          puntosCanjeados,
+          puntosVencidos,
+          puntosAjustados,
+          pasivoPuntos,
+          pasivoDinero,
+          ranking,
+        ]
+      properties:
+        puntosEmitidos:
+          type: integer
+        puntosCanjeados:
+          type: integer
+        puntosVencidos:
+          type: integer
+        puntosAjustados:
+          type: integer
+        pasivoPuntos:
+          type: integer
+        pasivoDinero:
+          type: number
+        ranking:
+          type: array
+          items:
+            type: object
+            required: [clienteId, codigo, rsocial, puntos, equivalenteDinero]
+            properties:
+              clienteId:
+                type: integer
+              codigo:
+                type: integer
+              rsocial:
+                type: string
+              puntos:
+                type: integer
+              equivalenteDinero:
+                type: number
+
+    FidelizacionDashboardEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/FidelizacionDashboard'
+
+    PortalFidelizacionSummary:
+      type: object
+      required: [puntos, equivalenteDinero, programaActivo, nombrePrograma]
+      properties:
+        puntos:
+          type: integer
+        equivalenteDinero:
+          type: number
+        programaActivo:
+          type: boolean
+        nombrePrograma:
+          type: string
+          nullable: true
+
+    PortalFidelizacionEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/PortalFidelizacionSummary'
 
     FormaPago:
       type: object

@@ -145,6 +145,12 @@ export function renderFacturaPdfA4(
     doc.fontSize(8).fillColor('#666666').text(`Ref. interna: ${numeroStr}`, 40, doc.page.height - 50, {
       align: 'left',
     })
+    if (input.loyaltyFooter) {
+      doc
+        .fontSize(8)
+        .fillColor('#000000')
+        .text(input.loyaltyFooter, 40, doc.page.height - 36, { align: 'left', width: doc.page.width - 80 })
+    }
 
     doc.end()
   })
@@ -204,6 +210,10 @@ export function renderFacturaTicket80mm(input: ArcaFacturaPdfInput): Promise<Buf
 
     if (fiscal && factura.cae) {
       doc.fontSize(7).text(`CAE ${factura.cae}`, { align: 'center' })
+    }
+    if (input.loyaltyFooter) {
+      doc.moveDown(0.3)
+      doc.fontSize(7).text(input.loyaltyFooter, { align: 'center' })
     }
 
     doc.end()

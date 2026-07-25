@@ -24,6 +24,7 @@ import PedidosPage from './pages/pedidos'
 import ContratosPage from './pages/contratos'
 import OrdenesTrabajoPage from './pages/ordenes-trabajo'
 import GarantiasPage from './pages/garantias'
+import FidelizacionPage from './pages/fidelizacion'
 import CajaPage from './pages/caja'
 import ListasPreciosPage from './pages/listas-precios'
 import CategoriasArticuloPage from './pages/categorias-articulo'
@@ -49,6 +50,7 @@ import PortalFacturasPage from './pages/portal/PortalFacturasPage'
 import PortalCuentaCorrientePage from './pages/portal/PortalCuentaCorrientePage'
 import PortalPedidosPage from './pages/portal/PortalPedidosPage'
 import PortalMisDatosPage from './pages/portal/PortalMisDatosPage'
+import PortalFidelizacionPage from './pages/portal/PortalFidelizacionPage'
 import ChatPage from './pages/chat'
 import AuditLogPage from './pages/admin/audit-log'
 import SuperAdminRoute from './components/SuperAdminRoute'
@@ -146,6 +148,7 @@ function AppRoutes() {
           <Route path="facturas" element={<PortalFacturasPage />} />
           <Route path="cuenta-corriente" element={<PortalCuentaCorrientePage />} />
           <Route path="pedidos" element={<PortalPedidosPage />} />
+          <Route path="fidelizacion" element={<PortalFidelizacionPage />} />
           <Route path="mis-datos" element={<PortalMisDatosPage />} />
         </Route>
       </Route>
@@ -207,6 +210,14 @@ function AppRoutes() {
             element={
               <ModuleRoute moduleKey="service.warranties">
                 <GarantiasPage />
+              </ModuleRoute>
+            }
+          />
+          <Route
+            path="fidelizacion"
+            element={
+              <ModuleRoute moduleKey="clients.loyalty">
+                <FidelizacionPage />
               </ModuleRoute>
             }
           />

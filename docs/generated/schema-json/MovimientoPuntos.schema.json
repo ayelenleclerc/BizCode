@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "clienteId": {
+      "type": "integer"
+    },
+    "concepto": {
+      "nullable": true,
+      "type": "string"
+    },
+    "createdAt": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "id": {
+      "type": "integer"
+    },
+    "puntos": {
+      "type": "integer"
+    },
+    "puntosRestantes": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "referenciaFacturaId": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "saldoPost": {
+      "type": "integer"
+    },
+    "tenantId": {
+      "type": "integer"
+    },
+    "tipo": {
+      "enum": [
+        "acumulacion",
+        "canje",
+        "ajuste",
+        "vencimiento",
+        "reverso"
+      ],
+      "type": "string"
+    },
+    "userId": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "venceEn": {
+      "format": "date-time",
+      "nullable": true,
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "tenantId",
+    "clienteId",
+    "tipo",
+    "puntos",
+    "saldoPost",
+    "puntosRestantes",
+    "referenciaFacturaId",
+    "venceEn",
+    "concepto",
+    "userId",
+    "createdAt"
+  ],
+  "title": "MovimientoPuntos",
+  "type": "object"
+}

@@ -528,6 +528,7 @@ export const facturaBodySchema = z
     total: z.number(),
     items: z.array(z.unknown()),
     percepciones: z.array(facturaPercepcionLineSchema).optional(),
+    puntosCanje: z.number().int().min(1).nullable().optional(),
   })
   .superRefine((data, ctx) => {
     const f = data.fecha.trim()
@@ -3349,4 +3350,20 @@ export const ordenProduccionCompletarBodySchema = z.object({
 
 export const ordenProduccionSugerirCompraBodySchema = z.object({
   proveedorId: z.number().int().min(1),
+})
+
+export const configFidelizacionUpsertBodySchema = z.object({
+  activo: z.boolean(),
+  nombre: z.string().trim().min(1).max(80).optional(),
+  pesosPorPunto: z.number().positive(),
+  puntosPorPeso: z.number().positive(),
+  mesesVencimiento: z.number().int().min(1).max(120).nullable().optional(),
+  montoMinCompra: z.number().min(0).optional(),
+  aplicaEnDescuento: z.boolean().optional(),
+})
+
+export const fidelizacionAjusteBodySchema = z.object({
+  clienteId: z.number().int().min(1),
+  puntos: z.number().int().refine((v) => v !== 0, { message: 'puntos must be non-zero' }),
+  concepto: z.string().max(200).nullable().optional(),
 })

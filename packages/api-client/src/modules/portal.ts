@@ -206,6 +206,20 @@ export function createPortalAPI(http: typeof portalHttp) {
         return handleError(error as AxiosError<ApiErrorPayload>)
       }
     },
+
+    getFidelizacion: async (
+      tenantSlug: string,
+    ): Promise<import('@bizcode/types').PortalFidelizacionSummary> => {
+      try {
+        const response = await http.get<{
+          success: boolean
+          data: import('@bizcode/types').PortalFidelizacionSummary
+        }>(portalPath(tenantSlug, '/fidelizacion'))
+        return response.data.data
+      } catch (error) {
+        return handleError(error as AxiosError<ApiErrorPayload>)
+      }
+    },
   }
 }
 

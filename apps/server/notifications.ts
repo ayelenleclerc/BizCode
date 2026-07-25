@@ -24,6 +24,7 @@ export const NOTIFICATION_TYPES = [
   'ot_presupuestado',
   'ot_listo',
   'precios_fx_actualizados',
+  'loyalty_points_expiring',
 ] as const
 
 export type NotificationType = (typeof NOTIFICATION_TYPES)[number]

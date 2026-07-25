@@ -46,6 +46,7 @@ import { ImportJobService } from './ImportJobService'
 import { TipoCambioService } from './TipoCambioService'
 import { FormulaProduccionService } from './FormulaProduccionService'
 import { OrdenProduccionService } from './OrdenProduccionService'
+import { FidelizacionService } from './FidelizacionService'
 
 export type DomainServices = {
   cliente: ClienteService
@@ -95,6 +96,7 @@ export type DomainServices = {
   tipoCambio: TipoCambioService
   formulaProduccion: FormulaProduccionService
   ordenProduccion: OrdenProduccionService
+  fidelizacion: FidelizacionService
 }
 
 /**
@@ -151,5 +153,6 @@ export function createDomainServices(prisma: PrismaClient): DomainServices {
     tipoCambio: new TipoCambioService(prisma),
     formulaProduccion: new FormulaProduccionService(prisma),
     ordenProduccion: new OrdenProduccionService(prisma),
+    fidelizacion: new FidelizacionService(prisma),
   }
 }

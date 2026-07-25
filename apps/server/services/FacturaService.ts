@@ -14,9 +14,14 @@ import { ArcaService } from '../fiscal/ar/ArcaService'
 import { validateFacturaPercepciones } from './RetencionFacturaValidation'
 import { ClienteCuentaCorrienteService } from './ClienteCuentaCorrienteService'
 import { GarantiaService } from './GarantiaService'
+import { FidelizacionService } from './FidelizacionService'
 import { TurnoCajaService } from './TurnoCajaService'
 
 type FacturaWithRelations = Prisma.FacturaGetPayload<{ include: { cliente: true; items: true } }>
+
+function roundMoney(value: number): number {
+  return Math.round((value + Number.EPSILON) * 100) / 100
+}
 
 export type FacturaListResult = {
   total: number
@@ -56,11 +61,13 @@ export type FacturaCreateOptions = {
 export class FacturaService {
   private readonly arca: ArcaService
   private readonly garantiaService: GarantiaService
+  private readonly fidelizacionService: FidelizacionService
   private readonly turnoCajaService: TurnoCajaService
 
   constructor(private readonly prisma: PrismaClient) {
     this.arca = new ArcaService(prisma)
     this.garantiaService = new GarantiaService(prisma)
+    this.fidelizacionService = new FidelizacionService(prisma)
     this.turnoCajaService = new TurnoCajaService(prisma)
   }
 
@@ -85,8 +92,21 @@ export class FacturaService {
     userId: number,
     options?: FacturaCreateOptions,
   ): Promise<ServiceResult<FacturaCreateResult>> {
-    const { items, fecha, depositoId: inputDepositoId, ...factura } = input
+    const { items: inputItems, fecha, depositoId: inputDepositoId, puntosCanje, ...factura } = input
     const clienteId = factura.clienteId
+
+    let items = [...inputItems]
+    let facturaTotals = { ...factura }
+    if (puntosCanje != null && puntosCanje > 0) {
+      const prepared = await this.fidelizacionService.prepareCanje(tenantId, clienteId, puntosCanje)
+      if (!prepared.ok) return prepared
+      items = [...items, prepared.data.item]
+      facturaTotals = {
+        ...facturaTotals,
+        neto3: roundMoney(facturaTotals.neto3 - prepared.data.monto),
+        total: roundMoney(facturaTotals.total - prepared.data.monto),
+      }
+    }
 
     const catalogIds = [
       ...new Set(
@@ -285,12 +305,12 @@ export class FacturaService {
     }
 
     const percepcionValidation = await validateFacturaPercepciones(this.prisma, tenantId, {
-      neto1: factura.neto1,
-      neto2: factura.neto2,
-      neto3: factura.neto3,
-      iva1: factura.iva1,
-      iva2: factura.iva2,
-      total: factura.total,
+      neto1: facturaTotals.neto1,
+      neto2: facturaTotals.neto2,
+      neto3: facturaTotals.neto3,
+      iva1: facturaTotals.iva1,
+      iva2: facturaTotals.iva2,
+      total: facturaTotals.total,
       percepciones: input.percepciones,
     })
     if (!percepcionValidation.ok) {
@@ -302,7 +322,7 @@ export class FacturaService {
     const [newFactura, updatedCliente] = await this.prisma.$transaction(async (tx) => {
       const created = await tx.factura.create({
         data: {
-          ...factura,
+          ...facturaTotals,
           fecha: facturaFechaToPrismaDate(fecha),
           tenantId,
           ...(depositoId != null ? { depositoId } : {}),
@@ -386,6 +406,25 @@ export class FacturaService {
       )
     } catch {
       /* Warranty registration must not fail invoice create */
+    }
+
+    try {
+      await this.fidelizacionService.applyInvoiceEffects(tenantId, {
+        facturaId: newFactura.id,
+        clienteId,
+        total: Number(newFactura.total.toString()),
+        items: newFactura.items.map((fi) => ({
+          cantidad: fi.cantidad,
+          precio: Number(fi.precio.toString()),
+          dscto: Number(fi.dscto.toString()),
+          subtotal: Number(fi.subtotal.toString()),
+          descripcion: fi.descripcion,
+        })),
+        puntosCanje: puntosCanje ?? null,
+        userId,
+      })
+    } catch {
+      /* Loyalty accrual/redemption must not fail invoice create */
     }
 
     try {
@@ -522,6 +561,12 @@ export class FacturaService {
       void this.arca.requestCaeForNotaCredito(tenantId, result.notaCredito.id).catch(() => {
         /* homologaci?n mock; retry job may be added later */
       })
+    }
+
+    try {
+      await this.fidelizacionService.revertirFromFactura(tenantId, id, audit.userId)
+    } catch {
+      /* Loyalty reversal must not fail invoice void */
     }
 
     return { ok: true, data: result }

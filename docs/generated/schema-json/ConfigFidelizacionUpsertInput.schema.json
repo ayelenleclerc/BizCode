@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "activo": {
+      "type": "boolean"
+    },
+    "aplicaEnDescuento": {
+      "type": "boolean"
+    },
+    "mesesVencimiento": {
+      "maximum": 120,
+      "minimum": 1,
+      "nullable": true,
+      "type": "integer"
+    },
+    "montoMinCompra": {
+      "minimum": 0,
+      "type": "number"
+    },
+    "nombre": {
+      "maxLength": 80,
+      "minLength": 1,
+      "type": "string"
+    },
+    "pesosPorPunto": {
+      "exclusiveMinimum": 0,
+      "type": "number"
+    },
+    "puntosPorPeso": {
+      "exclusiveMinimum": 0,
+      "type": "number"
+    }
+  },
+  "required": [
+    "activo",
+    "pesosPorPunto",
+    "puntosPorPeso"
+  ],
+  "title": "ConfigFidelizacionUpsertInput",
+  "type": "object"
+}

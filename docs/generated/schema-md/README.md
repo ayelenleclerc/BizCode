@@ -156,6 +156,10 @@
 
 * [ClienteNullableEnvelope](./clientenullableenvelope.md) – `-`
 
+* [ClientePuntosDetail](./clientepuntosdetail.md) – `-`
+
+* [ClientePuntosEnvelope](./clientepuntosenvelope.md) – `-`
+
 * [CobranzaRecordatorioEnvelope](./cobranzarecordatorioenvelope.md) – `-`
 
 * [CobranzaRecordatorioInput](./cobranzarecordatorioinput.md) – `-`
@@ -209,6 +213,12 @@
 * [ConfigComisionListEnvelope](./configcomisionlistenvelope.md) – `-`
 
 * [ConfigComisionPatchInput](./configcomisionpatchinput.md) – `-`
+
+* [ConfigFidelizacion](./configfidelizacion.md) – `-`
+
+* [ConfigFidelizacionEnvelope](./configfidelizacionenvelope.md) – `-`
+
+* [ConfigFidelizacionUpsertInput](./configfidelizacionupsertinput.md) – `-`
 
 * [Contrato](./contrato.md) – `-`
 
@@ -345,6 +355,12 @@
 * [FacturaVoidResult](./facturavoidresult.md) – `-`
 
 * [FacturasPendientesEnvelope](./facturaspendientesenvelope.md) – `-`
+
+* [FidelizacionAjusteInput](./fidelizacionajusteinput.md) – `-`
+
+* [FidelizacionDashboard](./fidelizaciondashboard.md) – `-`
+
+* [FidelizacionDashboardEnvelope](./fidelizaciondashboardenvelope.md) – `-`
 
 * [FiscalRetencionesConfig](./fiscalretencionesconfig.md) – `-`
 
@@ -554,6 +570,8 @@
 
 * [MovimientoProveedorCCEnvelope](./movimientoproveedorccenvelope.md) – `-`
 
+* [MovimientoPuntos](./movimientopuntos.md) – `-`
+
 * [NotaCredito](./notacredito.md) – `-`
 
 * [NotaCreditoDetail](./notacreditodetail.md) – `-`
@@ -667,6 +685,10 @@
 * [PortalFacturaListEnvelope](./portalfacturalistenvelope.md) – `-`
 
 * [PortalFacturaRow](./portalfacturarow.md) – `-`
+
+* [PortalFidelizacionEnvelope](./portalfidelizacionenvelope.md) – `-`
+
+* [PortalFidelizacionSummary](./portalfidelizacionsummary.md) – `-`
 
 * [PortalLogoutEnvelope](./portallogoutenvelope.md) – `-`
 
@@ -1116,6 +1138,8 @@
 
 * [Untitled object in FacturaListEnvelope](./facturalistenvelope-allof-0.md) – `undefined#/allOf/0`
 
+* [Untitled object in FidelizacionDashboard](./fidelizaciondashboard-properties-ranking-items.md) – `undefined#/properties/ranking/items`
+
 * [Untitled object in FormulaCostoEnvelope](./formulacostoenvelope-properties-data.md) – `undefined#/properties/data`
 
 * [Untitled object in FormulaCostoEnvelope](./formulacostoenvelope-properties-data-properties-lineas-items.md) – `undefined#/properties/data/properties/lineas/items`
@@ -1382,6 +1406,8 @@
 
 * [Untitled array in ClienteListEnvelope](./clientelistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
 
+* [Untitled array in ClientePuntosDetail](./clientepuntosdetail-properties-movimientos.md) – `undefined#/properties/movimientos`
+
 * [Untitled array in CobranzasVencidasEnvelope](./cobranzasvencidasenvelope-properties-data.md) – `undefined#/properties/data`
 
 * [Untitled array in CobroCreateData](./cobrocreatedata-properties-retenciones.md) – `undefined#/properties/retenciones`
@@ -1441,6 +1467,8 @@
 * [Untitled array in FacturaPendienteClienteListEnvelope](./facturapendienteclientelistenvelope-properties-data.md) – `undefined#/properties/data`
 
 * [Untitled array in FacturasPendientesEnvelope](./facturaspendientesenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled array in FidelizacionDashboard](./fidelizaciondashboard-properties-ranking.md) – `undefined#/properties/ranking`
 
 * [Untitled array in FormaPagoListEnvelope](./formapagolistenvelope-properties-data.md) – `undefined#/properties/data`
 
