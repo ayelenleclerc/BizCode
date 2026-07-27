@@ -1,6 +1,7 @@
 import type { Application, Request, Response } from 'express'
 import { requirePermission, type AuthenticatedRequest } from '../auth'
 import { validateBody } from '../middleware/validateBody'
+import { verifyOwnership } from '../middleware/verifyOwnership'
 import { clienteBodySchema } from '../schemas/domain'
 import type { ClienteInput } from '@bizcode/types'
 import { parseCsvWithFixedHeaders, CSV_IMPORT_MAX_ROWS } from '../csvImport'
@@ -18,8 +19,9 @@ import {
  * @en Customer REST routes (`/api/clientes`, CSV import).
  */
 export function registerClientesRoutes(app: Application, ctx: RestRouteContext): void {
-  const { services, writeAudit } = ctx
+  const { prisma, services, writeAudit } = ctx
   const { cliente, import: importService } = services
+  const ownership = verifyOwnership(prisma, 'cliente')
 
   app.get('/api/clientes', requirePermission('customers.read'), async (req: Request, res: Response) => {
     try {
@@ -70,15 +72,20 @@ export function registerClientesRoutes(app: Application, ctx: RestRouteContext):
     })()
   })
 
-  app.get('/api/clientes/:id', requirePermission('customers.read'), async (req: Request, res: Response) => {
-    try {
-      const tenantId = getTenantId(req)
-      const data = await cliente.getById(tenantId, parseInt(String(req.params.id), 10))
-      res.json({ success: true, data })
-    } catch (err: unknown) {
-      res.status(500).json({ success: false, error: errorMessage(err) })
-    }
-  })
+  app.get(
+    '/api/clientes/:id',
+    requirePermission('customers.read'),
+    ownership,
+    async (req: Request, res: Response) => {
+      try {
+        const tenantId = getTenantId(req)
+        const data = await cliente.getById(tenantId, parseInt(String(req.params.id), 10))
+        res.json({ success: true, data })
+      } catch (err: unknown) {
+        res.status(500).json({ success: false, error: errorMessage(err) })
+      }
+    },
+  )
 
   app.post(
     '/api/clientes',
@@ -104,6 +111,7 @@ export function registerClientesRoutes(app: Application, ctx: RestRouteContext):
   app.put(
     '/api/clientes/:id',
     requirePermission('customers.manage'),
+    ownership,
     validateBody(clienteBodySchema),
     async (req: Request, res: Response) => {
       try {

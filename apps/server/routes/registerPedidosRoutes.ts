@@ -1,6 +1,7 @@
 import type { Application, Request, Response } from 'express'
 import { requireAnyPermission, requirePermission, type AuthenticatedRequest } from '../auth'
 import { requireModule } from '../middleware/requireModule'
+import { verifyOwnership } from '../middleware/verifyOwnership'
 import { mapRemitoPublic } from '../services/RemitoService'
 import { validateBody } from '../middleware/validateBody'
 import { pedidoBodySchema, pedidoInvoiceBodySchema } from '../schemas/domain'
@@ -25,10 +26,11 @@ function parseEstadoQuery(raw: unknown): PedidoEstado | undefined {
  * @pt-BR API REST de pedidos/orçamentos comerciais (ADR-0009).
  */
 export function registerPedidosRoutes(app: Application, ctx: RestRouteContext): void {
-  const { services, writeAudit } = ctx
+  const { prisma, services, writeAudit } = ctx
   const { pedido, remito } = services
   const ordersModule = requireModule('billing.orders')
   const remitoModule = requireModule('fiscal.remito')
+  const ownership = verifyOwnership(prisma, 'pedido')
 
   app.get(
     '/api/pedidos',
@@ -64,6 +66,7 @@ export function registerPedidosRoutes(app: Application, ctx: RestRouteContext): 
     '/api/pedidos/:id',
     ordersModule,
     requireAnyPermission('orders.create', 'reports.operational.read'),
+    ownership,
     async (req: Request, res: Response) => {
       try {
         const tenantId = getTenantId(req)
@@ -106,6 +109,7 @@ export function registerPedidosRoutes(app: Application, ctx: RestRouteContext): 
     '/api/pedidos/:id',
     ordersModule,
     requirePermission('orders.create'),
+    ownership,
     validateBody(pedidoBodySchema),
     async (req: Request, res: Response) => {
       try {
@@ -129,6 +133,7 @@ export function registerPedidosRoutes(app: Application, ctx: RestRouteContext): 
     '/api/pedidos/:id/confirm',
     ordersModule,
     requirePermission('orders.create'),
+    ownership,
     async (req: Request, res: Response) => {
       try {
         const tenantId = getTenantId(req)
@@ -150,6 +155,7 @@ export function registerPedidosRoutes(app: Application, ctx: RestRouteContext): 
     '/api/pedidos/:id/invoice',
     ordersModule,
     requirePermission('sales.create'),
+    ownership,
     validateBody(pedidoInvoiceBodySchema),
     async (req: Request, res: Response) => {
       const authReq = req as AuthenticatedRequest
@@ -182,6 +188,7 @@ export function registerPedidosRoutes(app: Application, ctx: RestRouteContext): 
     ordersModule,
     remitoModule,
     requirePermission('sales.create'),
+    ownership,
     async (req: Request, res: Response) => {
       try {
         const tenantId = getTenantId(req)
@@ -205,6 +212,7 @@ export function registerPedidosRoutes(app: Application, ctx: RestRouteContext): 
     '/api/pedidos/:id',
     ordersModule,
     requirePermission('sales.cancel'),
+    ownership,
     async (req: Request, res: Response) => {
       try {
         const tenantId = getTenantId(req)

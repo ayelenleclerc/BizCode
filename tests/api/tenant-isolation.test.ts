@@ -76,27 +76,50 @@ describe('tenant isolation — REST handlers', () => {
     }
   })
 
-  it('GET /api/clientes/:id scopes findFirst by session tenantId', async () => {
+  it('GET /api/clientes/:id returns 404 via verifyOwnership when row is outside tenant', async () => {
     const prisma = buildBasePrisma()
     const app = createApp(prisma)
-    const res = await request(app).get('/api/clientes/99999').expect(200)
+    const res = await request(app).get('/api/clientes/99999').expect(404)
 
-    expect(res.body.success).toBe(true)
-    expect(res.body.data).toBeNull()
+    expect(res.body.success).toBe(false)
+    expect(res.body.error).toBe('Not found')
     expect(prisma.cliente.findFirst).toHaveBeenCalledWith(
       expect.objectContaining({ where: expect.objectContaining({ id: 99999, tenantId: 1 }) }),
     )
   })
 
-  it('GET /api/articulos/:id scopes findFirst by session tenantId', async () => {
+  it('GET /api/articulos/:id returns 404 via verifyOwnership when row is outside tenant', async () => {
     const prisma = buildBasePrisma()
     const app = createApp(prisma)
-    const res = await request(app).get('/api/articulos/42').expect(200)
+    const res = await request(app).get('/api/articulos/42').expect(404)
 
-    expect(res.body.success).toBe(true)
-    expect(res.body.data).toBeNull()
+    expect(res.body.success).toBe(false)
+    expect(res.body.error).toBe('Not found')
     expect(prisma.articulo.findFirst).toHaveBeenCalledWith(
       expect.objectContaining({ where: expect.objectContaining({ id: 42, tenantId: 1 }) }),
+    )
+  })
+
+  it('GET /api/clientes/:id scopes getById after ownership when row exists', async () => {
+    const prisma = buildBasePrisma({
+      cliente: {
+        findFirst: vi
+          .fn()
+          .mockResolvedValueOnce({ id: 5 })
+          .mockResolvedValueOnce({ id: 5, rsocial: 'Acme', tenantId: 1 }),
+        findMany: vi.fn().mockResolvedValue([]),
+        count: vi.fn().mockResolvedValue(0),
+        create: vi.fn(),
+        update: vi.fn(),
+      },
+    })
+    const app = createApp(prisma)
+    const res = await request(app).get('/api/clientes/5').expect(200)
+
+    expect(res.body.success).toBe(true)
+    expect(res.body.data).toEqual(expect.objectContaining({ id: 5 }))
+    expect(prisma.cliente.findFirst).toHaveBeenCalledWith(
+      expect.objectContaining({ where: expect.objectContaining({ id: 5, tenantId: 1 }) }),
     )
   })
 

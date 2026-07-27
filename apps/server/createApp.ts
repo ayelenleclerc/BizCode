@@ -20,6 +20,7 @@ import { observabilityMiddleware } from './middleware/observability'
 import { getSecurityHeadersMiddleware } from './middleware/securityHeaders'
 import { routeHttpRateLimiter } from './middleware/routeRateLimit'
 import { tenantContext } from './middleware/tenantContext'
+import { tenantRlsContext } from './middleware/tenantRlsContext'
 import { tenantModules } from './middleware/tenantModules'
 import { tenantPlan } from './middleware/tenantPlan'
 import { registerRestDomainRoutes } from './registerRestDomainRoutes'
@@ -106,6 +107,7 @@ export function createApp(prisma: PrismaClient): Application {
   )
   app.use(resolveSession(prisma))
   app.use(tenantContext)
+  app.use(tenantRlsContext)
   app.use(tenantModules(prisma))
   app.use(tenantPlan(prisma))
   app.use(observabilityMiddleware)

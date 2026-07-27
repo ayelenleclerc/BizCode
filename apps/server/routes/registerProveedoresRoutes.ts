@@ -2,6 +2,7 @@ import { Prisma } from '@prisma/client'
 import type { Application, Request, Response } from 'express'
 import { requirePermission, type AuthenticatedRequest } from '../auth'
 import { validateBody } from '../middleware/validateBody'
+import { verifyOwnership } from '../middleware/verifyOwnership'
 import { proveedorBodySchema, safeParseBodySchema } from '../schemas/domain'
 import type { ProveedorInput } from '@bizcode/types'
 import { parseCsvWithFixedHeaders, CSV_IMPORT_MAX_ROWS } from '../csvImport'
@@ -21,6 +22,7 @@ import {
  */
 export function registerProveedoresRoutes(app: Application, ctx: RestRouteContext): void {
   const { prisma, writeAudit } = ctx
+  const ownership = verifyOwnership(prisma, 'proveedor')
 
   app.get('/api/proveedores', requirePermission('suppliers.read'), async (req: Request, res: Response) => {
     try {
@@ -150,17 +152,22 @@ export function registerProveedoresRoutes(app: Application, ctx: RestRouteContex
     })()
   })
   
-  app.get('/api/proveedores/:id', requirePermission('suppliers.read'), async (req: Request, res: Response) => {
-    try {
-      const tenantId = getTenantId(req)
-      const proveedor = await prisma.proveedor.findFirst({
-        where: { id: parseInt(String(req.params.id), 10), tenantId },
-      })
-      res.json({ success: true, data: proveedor })
-    } catch (err: unknown) {
-      res.status(500).json({ success: false, error: errorMessage(err) })
-    }
-  })
+  app.get(
+    '/api/proveedores/:id',
+    requirePermission('suppliers.read'),
+    ownership,
+    async (req: Request, res: Response) => {
+      try {
+        const tenantId = getTenantId(req)
+        const proveedor = await prisma.proveedor.findFirst({
+          where: { id: parseInt(String(req.params.id), 10), tenantId },
+        })
+        res.json({ success: true, data: proveedor })
+      } catch (err: unknown) {
+        res.status(500).json({ success: false, error: errorMessage(err) })
+      }
+    },
+  )
   
   app.post(
     '/api/proveedores',
@@ -186,6 +193,7 @@ export function registerProveedoresRoutes(app: Application, ctx: RestRouteContex
   app.put(
     '/api/proveedores/:id',
     requirePermission('suppliers.manage'),
+    ownership,
     validateBody(proveedorBodySchema),
     async (req: Request, res: Response) => {
     try {
@@ -213,7 +221,11 @@ export function registerProveedoresRoutes(app: Application, ctx: RestRouteContex
     },
   )
 
-  app.delete('/api/proveedores/:id', requirePermission('suppliers.manage'), async (req: Request, res: Response) => {
+  app.delete(
+    '/api/proveedores/:id',
+    requirePermission('suppliers.manage'),
+    ownership,
+    async (req: Request, res: Response) => {
     try {
       const tenantId = getTenantId(req)
       const id = parseInt(String(req.params.id), 10)

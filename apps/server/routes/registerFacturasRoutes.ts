@@ -1,6 +1,7 @@
 import type { Application, Request, Response } from 'express'
 import { requirePermission, type AuthenticatedRequest } from '../auth'
 import { validateBody } from '../middleware/validateBody'
+import { verifyOwnership } from '../middleware/verifyOwnership'
 import { facturaBodySchema, facturaPrintBodySchema, facturaVoidBodySchema } from '../schemas/domain'
 import type { FacturaInput, FacturaPrintInput } from '@bizcode/types'
 import { paginatedListJson, parseListPagination } from '../services/listPagination'
@@ -26,6 +27,7 @@ export function registerFacturasRoutes(app: Application, ctx: RestRouteContext):
   const { factura, remito } = services
   const creditNotesModule = requireModule('billing.credit_notes')
   const remitoModule = requireModule('fiscal.remito')
+  const ownership = verifyOwnership(prisma, 'factura')
 
   app.get('/api/facturas', requirePermission('reports.operational.read'), async (req: Request, res: Response) => {
     try {
@@ -99,6 +101,7 @@ export function registerFacturasRoutes(app: Application, ctx: RestRouteContext):
   app.get(
     '/api/facturas/:id/pdf/preview',
     requirePermission('reports.operational.read'),
+    ownership,
     async (req: Request, res: Response) => {
       try {
         const tenantId = getTenantId(req)
@@ -120,6 +123,7 @@ export function registerFacturasRoutes(app: Application, ctx: RestRouteContext):
   app.post(
     '/api/facturas/:id/print',
     requirePermission('reports.operational.read'),
+    ownership,
     validateBody(facturaPrintBodySchema),
     async (req: Request, res: Response) => {
       try {
@@ -146,6 +150,7 @@ export function registerFacturasRoutes(app: Application, ctx: RestRouteContext):
   app.get(
     '/api/facturas/:id/ticket',
     requirePermission('reports.operational.read'),
+    ownership,
     async (req: Request, res: Response) => {
       try {
         const tenantId = getTenantId(req)
@@ -167,6 +172,7 @@ export function registerFacturasRoutes(app: Application, ctx: RestRouteContext):
   app.get(
     '/api/facturas/:id/pdf',
     requirePermission('reports.operational.read'),
+    ownership,
     async (req: Request, res: Response) => {
       try {
         const tenantId = getTenantId(req)
@@ -189,6 +195,7 @@ export function registerFacturasRoutes(app: Application, ctx: RestRouteContext):
     '/api/facturas/:id/remito',
     remitoModule,
     requirePermission('sales.create'),
+    ownership,
     async (req: Request, res: Response) => {
       try {
         const tenantId = getTenantId(req)
@@ -209,6 +216,7 @@ export function registerFacturasRoutes(app: Application, ctx: RestRouteContext):
     '/api/facturas/:id/void',
     creditNotesModule,
     requirePermission('sales.cancel'),
+    ownership,
     validateBody(facturaVoidBodySchema),
     async (req: Request, res: Response) => {
       try {
