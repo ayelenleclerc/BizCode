@@ -1,13 +1,19 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-const { mockCreate, mockDefaults } = vi.hoisted(() => {
+const { mockCreate, mockDefaults, mockUse } = vi.hoisted(() => {
   const mockDefaults = {
     baseURL: '',
     timeout: 0,
     withCredentials: true,
   }
-  const mockCreate = vi.fn(() => ({ defaults: { ...mockDefaults } }))
-  return { mockCreate, mockDefaults }
+  const mockUse = vi.fn()
+  const mockCreate = vi.fn(() => ({
+    defaults: { ...mockDefaults },
+    interceptors: { response: { use: mockUse } },
+    post: vi.fn(),
+    request: vi.fn(),
+  }))
+  return { mockCreate, mockDefaults, mockUse }
 })
 
 vi.mock('axios', () => ({
@@ -27,6 +33,7 @@ import { api, configureApiClients, portalHttp } from './default-client'
 
 beforeEach(() => {
   mockCreate.mockClear()
+  mockUse.mockClear()
   mockDefaults.baseURL = ''
   mockDefaults.timeout = 0
   mockDefaults.withCredentials = true
@@ -68,6 +75,30 @@ describe('createApiClient', () => {
       withCredentials: true,
     })
     expect(client.defaults.baseURL).toBe('')
+    expect(mockUse).toHaveBeenCalled()
+  })
+
+  it('registers a refresh interceptor that retries once on SESSION_EXPIRED', async () => {
+    createApiClient()
+    expect(mockUse).toHaveBeenCalled()
+    const onRejected = mockUse.mock.calls[0]?.[1] as (error: unknown) => Promise<unknown>
+    expect(typeof onRejected).toBe('function')
+
+    const client = mockCreate.mock.results[0]?.value as {
+      post: ReturnType<typeof vi.fn>
+      request: ReturnType<typeof vi.fn>
+    }
+    client.post.mockResolvedValueOnce({ data: { success: true } })
+    client.request.mockResolvedValueOnce({ data: { ok: true } })
+
+    const original = { url: '/clientes', _retry: false }
+    const result = await onRejected({
+      response: { status: 401, data: { error: 'SESSION_EXPIRED' } },
+      config: original,
+    })
+    expect(client.post).toHaveBeenCalledWith('/auth/refresh')
+    expect(client.request).toHaveBeenCalledWith(original)
+    expect(result).toEqual({ data: { ok: true } })
   })
 
   it('honors custom config', () => {
@@ -103,6 +134,9 @@ describe('configureApiClients', () => {
         timeout: 12_000,
         withCredentials: true,
       },
+      interceptors: { response: { use: mockUse } },
+      post: vi.fn(),
+      request: vi.fn(),
     }))
     configureApiClients({ apiBaseUrl: 'https://staging.example.com/api', timeout: 12_000 })
     expect(api.defaults.baseURL).toBe('https://staging.example.com/api')

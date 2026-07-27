@@ -510,8 +510,8 @@ export function registerAuthRoutes(app: import('express').Application, prisma: P
 
   authRouter.post('/refresh', async (req: Request, res: Response) => {
     const rawRefresh = getCookieValue(req.headers.cookie, REFRESH_COOKIE_NAME)
-    if (!rawRefresh) {
-      clearAuthCookies(res)
+    // Missing cookie: reject without mutating cookies (CodeQL js/user-controlled-bypass).
+    if (typeof rawRefresh !== 'string' || rawRefresh.length === 0) {
       res.status(401).json({ success: false, error: SESSION_EXPIRED_ERROR })
       return
     }
