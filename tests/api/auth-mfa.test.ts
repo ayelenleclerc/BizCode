@@ -281,6 +281,54 @@ describe('auth MFA TOTP (#213)', () => {
       .send({ mfaToken: login2.body.data.mfaToken, code: plainBackup })
     expect(again.status).toBe(401)
   })
+
+  it('setup start/confirm enables MFA and returns backup codes', async () => {
+    process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
+    process.env.BIZCODE_TEST_USER_ID = '7'
+    process.env.BIZCODE_TEST_ROLE = 'owner'
+    const app = createApp(buildPrisma())
+
+    const start = await request(app).post('/api/auth/mfa/setup/start')
+    expect(start.status).toBe(200)
+    expect(start.body.data.secret).toBeTruthy()
+    expect(start.body.data.qrDataUrl).toMatch(/^data:image\/png/)
+    expect(totpEncrypted).toBeTruthy()
+
+    const code = currentTotp(start.body.data.secret as string, loginName)
+    const confirm = await request(app).post('/api/auth/mfa/setup/confirm').send({ code })
+    expect(confirm.status).toBe(200)
+    expect(confirm.body.data.mfaEnabled).toBe(true)
+    expect(confirm.body.data.backupCodes).toHaveLength(8)
+    expect(mfaEnabled).toBe(true)
+  })
+
+  it('disable MFA with TOTP clears secret', async () => {
+    process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
+    process.env.BIZCODE_TEST_USER_ID = '7'
+    process.env.BIZCODE_TEST_ROLE = 'owner'
+    mfaEnabled = true
+    totpEncrypted = encryptMfaSecret(totpSecret)
+    const app = createApp(buildPrisma())
+
+    const code = currentTotp(totpSecret, loginName)
+    const res = await request(app).post('/api/auth/mfa/disable').send({ code })
+    expect(res.status).toBe(200)
+    expect(res.body.data.mfaEnabled).toBe(false)
+    expect(mfaEnabled).toBe(false)
+    expect(totpEncrypted).toBeNull()
+  })
+
+  it('/me reports mfaSetupRequired for owner without MFA', async () => {
+    process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
+    process.env.BIZCODE_TEST_USER_ID = '7'
+    process.env.BIZCODE_TEST_ROLE = 'owner'
+    mfaEnabled = false
+    const app = createApp(buildPrisma())
+    const res = await request(app).get('/api/auth/me')
+    expect(res.status).toBe(200)
+    expect(res.body.data.mfaEnabled).toBe(false)
+    expect(res.body.data.mfaSetupRequired).toBe(true)
+  })
 })
 
 // silence unused hashToken if needed for future assertions

@@ -312,3 +312,67 @@ describe('POST /api/auth/change-password', () => {
     expect(refreshUpdateMany).toHaveBeenCalled()
   })
 })
+
+describe('PATCH /api/users/:id/mfa (#213)', () => {
+  beforeEach(() => {
+    process.env.NODE_ENV = 'test'
+    process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
+    process.env.BIZCODE_TEST_ROLE = 'owner'
+    process.env.BIZCODE_TEST_USER_ID = '1'
+    setRefreshTokenBlacklistForTests(createMemoryRefreshTokenBlacklist())
+  })
+
+  it('admin can disable MFA when caller has MFA off', async () => {
+    const deleteMany = vi.fn().mockResolvedValue({ count: 2 })
+    const userUpdate = vi.fn().mockResolvedValue({ id: 2, mfaEnabled: false })
+    const prisma = {
+      cliente: { findMany: vi.fn().mockResolvedValue([]) },
+      articulo: { findMany: vi.fn().mockResolvedValue([]) },
+      rubro: { findMany: vi.fn().mockResolvedValue([]) },
+      formaPago: { findMany: vi.fn().mockResolvedValue([]) },
+      factura: { findMany: vi.fn().mockResolvedValue([]) },
+      auditEvent: { create: vi.fn().mockResolvedValue({ id: 1 }) },
+      tenant: { findUnique: vi.fn().mockResolvedValue({ id: 1, slug: 'demo', active: true }) },
+      appSession: {
+        create: vi.fn().mockResolvedValue({ id: 1 }),
+        findFirst: vi.fn().mockResolvedValue(null),
+        updateMany: vi.fn().mockResolvedValue({ count: 0 }),
+        update: vi.fn().mockResolvedValue({ id: 1 }),
+      },
+      appRefreshToken: {
+        create: vi.fn().mockResolvedValue({ id: 1 }),
+        findFirst: vi.fn().mockResolvedValue(null),
+        findMany: vi.fn().mockResolvedValue([]),
+        update: vi.fn(),
+        updateMany: vi.fn().mockResolvedValue({ count: 0 }),
+      },
+      appUser: {
+        count: vi.fn().mockResolvedValue(1),
+        findMany: vi.fn().mockResolvedValue([BASE_USER]),
+        findFirst: vi.fn().mockResolvedValue({ ...BASE_USER, id: 2, mfaEnabled: true, tenantId: 1 }),
+        findUnique: vi.fn().mockResolvedValue({ mfaEnabled: false }),
+        create: vi.fn().mockResolvedValue(BASE_USER),
+        update: userUpdate,
+      },
+      appMfaBackupCode: {
+        deleteMany,
+        update: vi.fn(),
+      },
+      $transaction: vi.fn(),
+    } as unknown as PrismaClient
+    ;(prisma.$transaction as ReturnType<typeof vi.fn>).mockImplementation(
+      async (fn: (tx: PrismaClient) => Promise<unknown>) => fn(prisma),
+    )
+    const app = createApp(prisma)
+    const res = await request(app).patch('/api/users/2/mfa').send({ enabled: false }).expect(200)
+    expect(res.body).toEqual({ success: true, data: { mfaEnabled: false } })
+    expect(deleteMany).toHaveBeenCalled()
+  })
+
+  it('rejects non-owner/manager roles for admin disable', async () => {
+    process.env.BIZCODE_TEST_ROLE = 'manager'
+    const app = createApp(buildPrismaMock())
+    const res = await request(app).patch('/api/users/2/mfa').send({ enabled: false }).expect(403)
+    expect(res.body.success).toBe(false)
+  })
+})

@@ -6,6 +6,7 @@ import { requirePermission, revokeAllUserAuthTokens, type AuthenticatedRequest }
 import { writeAuditEvent } from './audit'
 import { planErrorBody, TenantPlanService } from './services/TenantPlanService'
 import { clearUserMfa, verifyUserMfaCode } from './lib/mfaUser'
+import { authRouterHttpRateLimiter } from './middleware/routeRateLimit'
 
 /**
  * @en Role hierarchy index — a user may only assign roles with an equal or lower index than their own.
@@ -304,6 +305,7 @@ export function registerUserRoutes(app: Application, prisma: PrismaClient): void
 
   app.patch(
     '/api/users/:id/mfa',
+    authRouterHttpRateLimiter,
     requirePermission('users.manage'),
     async (req: Request, res: Response) => {
       const authReq = req as AuthenticatedRequest
