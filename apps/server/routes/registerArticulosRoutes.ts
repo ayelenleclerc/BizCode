@@ -1,6 +1,7 @@
 import type { Application, Request, Response } from 'express'
 import { requirePermission, type AuthenticatedRequest } from '../auth'
 import { validateBody } from '../middleware/validateBody'
+import { verifyOwnership } from '../middleware/verifyOwnership'
 import { articuloBodySchema, stockAjusteBodySchema } from '../schemas/domain'
 import type { ArticuloInput, StockAjusteInput } from '@bizcode/types'
 import { hasPermission } from '@bizcode/types'
@@ -21,8 +22,9 @@ import {
  * @en Product (articulo) REST routes and CSV import.
  */
 export function registerArticulosRoutes(app: Application, ctx: RestRouteContext): void {
-  const { services, writeAudit } = ctx
+  const { prisma, services, writeAudit } = ctx
   const { articulo, stockAjuste, import: importService } = services
+  const ownership = verifyOwnership(prisma, 'articulo')
 
   function canViewStockHistorial(role: string): boolean {
     return (
@@ -45,15 +47,20 @@ export function registerArticulosRoutes(app: Application, ctx: RestRouteContext)
     }
   })
 
-  app.get('/api/articulos/:id', requirePermission('products.read'), async (req: Request, res: Response) => {
-    try {
-      const tenantId = getTenantId(req)
-      const data = await articulo.getById(tenantId, parseInt(String(req.params.id), 10))
-      res.json({ success: true, data })
-    } catch (err: unknown) {
-      res.status(500).json({ success: false, error: errorMessage(err) })
-    }
-  })
+  app.get(
+    '/api/articulos/:id',
+    requirePermission('products.read'),
+    ownership,
+    async (req: Request, res: Response) => {
+      try {
+        const tenantId = getTenantId(req)
+        const data = await articulo.getById(tenantId, parseInt(String(req.params.id), 10))
+        res.json({ success: true, data })
+      } catch (err: unknown) {
+        res.status(500).json({ success: false, error: errorMessage(err) })
+      }
+    },
+  )
 
   app.post(
     '/api/articulos',
@@ -80,6 +87,7 @@ export function registerArticulosRoutes(app: Application, ctx: RestRouteContext)
     '/api/articulos/:id',
     requirePermission('products.manage'),
     validateBody(articuloBodySchema),
+    ownership,
     async (req: Request, res: Response) => {
       try {
         const tenantId = getTenantId(req)
@@ -100,6 +108,7 @@ export function registerArticulosRoutes(app: Application, ctx: RestRouteContext)
   app.get(
     '/api/articulos/:id/stock-historial',
     requirePermission('products.read'),
+    ownership,
     async (req: Request, res: Response) => {
       const authReq = req as AuthenticatedRequest
       if (!canViewStockHistorial(authReq.auth!.claims.role)) {
@@ -126,6 +135,7 @@ export function registerArticulosRoutes(app: Application, ctx: RestRouteContext)
     '/api/articulos/:id/stock-ajuste',
     requirePermission('inventory.adjust'),
     validateBody(stockAjusteBodySchema),
+    ownership,
     async (req: Request, res: Response) => {
       try {
         const authReq = req as AuthenticatedRequest

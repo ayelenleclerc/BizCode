@@ -1586,10 +1586,12 @@ describe('API — contrato OpenAPI', () => {
   it('POST /api/articulos/:id/stock-ajuste', async () => {
     process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
     process.env.BIZCODE_TEST_ROLE = 'owner'
-    ;(prisma.articulo.findFirst as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+    // Ownership middleware + StockAjusteService both call findFirst (#215).
+    ;(prisma.articulo.findFirst as ReturnType<typeof vi.fn>).mockResolvedValue({
       ...articuloRow,
       stock: 10,
       minimo: 0,
+      controlLote: false,
     })
     const articuloUpdate = vi.fn().mockResolvedValue({ ...articuloRow, stock: 9 })
     prisma.$transaction = vi.fn(async (arg: unknown) => {

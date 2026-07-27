@@ -156,8 +156,9 @@ describe('API — integración PostgreSQL (Prisma real)', () => {
     expect(typeof listRes.body.total).toBe('number')
     expect((listRes.body.data as { id: number }[]).some((c) => c.id === otherCliente.id)).toBe(false)
 
-    const getRes = await request(app).get(`/api/clientes/${otherCliente.id}`).expect(200)
-    expect(getRes.body.success).toBe(true)
-    expect(getRes.body.data).toBeNull()
+    // verifyOwnership (#215): cross-tenant id → 404 (no existence leak as null-200)
+    const getRes = await request(app).get(`/api/clientes/${otherCliente.id}`).expect(404)
+    expect(getRes.body.success).toBe(false)
+    expect(getRes.body.error).toBe('Not found')
   })
 })

@@ -2,6 +2,7 @@ import { PrismaClient } from '@prisma/client'
 import type { Application } from 'express'
 import type { Server } from 'node:http'
 import { createApp } from './createApp'
+import { createTenantRlsPrisma } from './lib/tenantRls'
 import { logger } from './logger'
 import { initializeAppConfig } from './config/env'
 
@@ -12,7 +13,9 @@ export const PORT = 3001
  * @es Crea la app Express y el cliente Prisma para la API (pruebas y {@link startServer}).
  * @pt-BR Cria o app Express e o cliente Prisma para a API (testes e {@link startServer}).
  */
-export function createServerInstance(prisma: PrismaClient = new PrismaClient()): {
+export function createServerInstance(
+  prisma: PrismaClient = createTenantRlsPrisma(new PrismaClient()),
+): {
   app: Application
   prisma: PrismaClient
 } {
