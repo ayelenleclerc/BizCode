@@ -107,6 +107,6 @@ describe('POST /api/facturas/:id/print', () => {
     const app = createApp(prisma)
 
     const res = await request(app).post('/api/facturas/999/print').send({ device: 'pdf' }).expect(404)
-    expect(res.body).toEqual({ success: false, error: 'Factura not found' })
+    expect(res.body).toEqual({ success: false, error: 'Not found' })
   })
 })

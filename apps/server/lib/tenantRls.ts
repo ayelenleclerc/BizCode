@@ -104,6 +104,10 @@ export async function runWithTenantRls<T>(
  * @pt-BR Envolve um cliente Prisma para que modelos RLS definam `app.current_tenant_id` (LOCAL) na mesma conexão.
  */
 export function createTenantRlsPrisma(base: PrismaClient): PrismaClient {
+  // Unit tests often pass a plain mock without `$extends` (PrismaClient mock / stub).
+  if (typeof (base as { $extends?: unknown }).$extends !== 'function') {
+    return base
+  }
   const extended = base.$extends({
     query: {
       $allModels: {

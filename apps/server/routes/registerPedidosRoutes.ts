@@ -109,8 +109,8 @@ export function registerPedidosRoutes(app: Application, ctx: RestRouteContext): 
     '/api/pedidos/:id',
     ordersModule,
     requirePermission('orders.create'),
-    ownership,
     validateBody(pedidoBodySchema),
+    ownership,
     async (req: Request, res: Response) => {
       try {
         const tenantId = getTenantId(req)
@@ -155,8 +155,8 @@ export function registerPedidosRoutes(app: Application, ctx: RestRouteContext): 
     '/api/pedidos/:id/invoice',
     ordersModule,
     requirePermission('sales.create'),
-    ownership,
     validateBody(pedidoInvoiceBodySchema),
+    ownership,
     async (req: Request, res: Response) => {
       const authReq = req as AuthenticatedRequest
       try {

@@ -193,8 +193,8 @@ export function registerProveedoresRoutes(app: Application, ctx: RestRouteContex
   app.put(
     '/api/proveedores/:id',
     requirePermission('suppliers.manage'),
-    ownership,
     validateBody(proveedorBodySchema),
+    ownership,
     async (req: Request, res: Response) => {
     try {
       const tenantId = getTenantId(req)

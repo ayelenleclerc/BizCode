@@ -86,8 +86,8 @@ export function registerArticulosRoutes(app: Application, ctx: RestRouteContext)
   app.put(
     '/api/articulos/:id',
     requirePermission('products.manage'),
-    ownership,
     validateBody(articuloBodySchema),
+    ownership,
     async (req: Request, res: Response) => {
       try {
         const tenantId = getTenantId(req)
@@ -134,8 +134,8 @@ export function registerArticulosRoutes(app: Application, ctx: RestRouteContext)
   app.post(
     '/api/articulos/:id/stock-ajuste',
     requirePermission('inventory.adjust'),
-    ownership,
     validateBody(stockAjusteBodySchema),
+    ownership,
     async (req: Request, res: Response) => {
       try {
         const authReq = req as AuthenticatedRequest

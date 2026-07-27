@@ -111,8 +111,8 @@ export function registerClientesRoutes(app: Application, ctx: RestRouteContext):
   app.put(
     '/api/clientes/:id',
     requirePermission('customers.manage'),
-    ownership,
     validateBody(clienteBodySchema),
+    ownership,
     async (req: Request, res: Response) => {
       try {
         const tenantId = getTenantId(req)

@@ -123,8 +123,8 @@ export function registerFacturasRoutes(app: Application, ctx: RestRouteContext):
   app.post(
     '/api/facturas/:id/print',
     requirePermission('reports.operational.read'),
-    ownership,
     validateBody(facturaPrintBodySchema),
+    ownership,
     async (req: Request, res: Response) => {
       try {
         const tenantId = getTenantId(req)
@@ -216,8 +216,8 @@ export function registerFacturasRoutes(app: Application, ctx: RestRouteContext):
     '/api/facturas/:id/void',
     creditNotesModule,
     requirePermission('sales.cancel'),
-    ownership,
     validateBody(facturaVoidBodySchema),
+    ownership,
     async (req: Request, res: Response) => {
       try {
         const authReq = req as AuthenticatedRequest
