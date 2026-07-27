@@ -74,8 +74,8 @@ describe('ArticuloStockDepositosPanel (#236)', () => {
 
     await waitFor(() => {
       expect(screen.getByTestId('stock-depositos-panel')).toBeInTheDocument()
+      expect(screen.getByTestId('stock-total')).toHaveTextContent('12')
     })
-    expect(screen.getByTestId('stock-total')).toHaveTextContent('12')
     expect(screen.getByTestId('stock-en-transito')).toHaveTextContent('2')
     expect(screen.getByTestId('stock-dep-1')).toHaveTextContent('DEFAULT')
     expect(screen.getByTestId('stock-dep-2')).toHaveTextContent('NORTE')
