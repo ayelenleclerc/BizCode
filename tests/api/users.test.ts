@@ -8,6 +8,11 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import request from 'supertest'
 import type { PrismaClient } from '@prisma/client'
 import { createApp } from '../../apps/server/createApp'
+import { hashPassword } from '../../apps/server/passwordHash'
+import {
+  createMemoryRefreshTokenBlacklist,
+  setRefreshTokenBlacklistForTests,
+} from '../../apps/server/lib/refreshTokenBlacklist'
 
 /** Generate a random password-length token that won't match any real credential pattern. */
 function rndPass(): string {
@@ -57,8 +62,16 @@ function buildPrismaMock(overrides: Partial<Record<string, unknown>> = {}): Pris
       updateMany: vi.fn().mockResolvedValue({ count: 1 }),
       update: vi.fn().mockResolvedValue({ id: 1 }),
     },
+    appRefreshToken: {
+      create: vi.fn().mockResolvedValue({ id: 1 }),
+      findFirst: vi.fn().mockResolvedValue(null),
+      findMany: vi.fn().mockResolvedValue([]),
+      update: vi.fn(),
+      updateMany: vi.fn().mockResolvedValue({ count: 0 }),
+    },
     $transaction: vi.fn(async (arg: unknown) => {
-      if (typeof arg === 'function') return arg(buildPrismaMock())
+      if (typeof arg === 'function') return (arg as (tx: PrismaClient) => unknown)(buildPrismaMock())
+      if (Array.isArray(arg)) return Promise.all(arg)
       return arg
     }),
     ...overrides,
@@ -251,5 +264,51 @@ describe('POST /api/auth/change-password', () => {
       .send({ currentPassword: rndPass(), newPassword: 'abc' })
       .expect(400)
     expect(res.body.success).toBe(false)
+  })
+
+  it('changes password and revokes all sessions/refresh tokens (#212)', async () => {
+    setRefreshTokenBlacklistForTests(createMemoryRefreshTokenBlacklist())
+    process.env.BIZCODE_TEST_USER_ID = '0'
+    const current = rndPass()
+    const next = rndPass()
+    const refreshUpdateMany = vi.fn().mockResolvedValue({ count: 1 })
+    const sessionUpdateMany = vi.fn().mockResolvedValue({ count: 1 })
+    const prisma = buildPrismaMock({
+      appUser: {
+        count: vi.fn().mockResolvedValue(1),
+        findMany: vi.fn().mockResolvedValue([BASE_USER]),
+        findFirst: vi.fn().mockResolvedValue(BASE_USER),
+        findUnique: vi.fn().mockResolvedValue({
+          ...BASE_USER,
+          id: 0,
+          passwordHash: hashPassword(current),
+        }),
+        create: vi.fn().mockResolvedValue(BASE_USER),
+        update: vi.fn().mockResolvedValue({ ...BASE_USER, id: 0 }),
+      },
+      appSession: {
+        create: vi.fn().mockResolvedValue({ id: 1 }),
+        findFirst: vi.fn().mockResolvedValue(null),
+        updateMany: sessionUpdateMany,
+        update: vi.fn().mockResolvedValue({ id: 1 }),
+      },
+      appRefreshToken: {
+        create: vi.fn().mockResolvedValue({ id: 1 }),
+        findFirst: vi.fn().mockResolvedValue(null),
+        findMany: vi.fn().mockResolvedValue([
+          { tokenHash: 'deadbeef'.repeat(8), expiresAt: new Date(Date.now() + 60_000) },
+        ]),
+        update: vi.fn(),
+        updateMany: refreshUpdateMany,
+      },
+    })
+    const app = createApp(prisma)
+    const res = await request(app)
+      .post('/api/auth/change-password')
+      .send({ currentPassword: current, newPassword: next })
+      .expect(200)
+    expect(res.body).toEqual({ success: true, data: { changed: true } })
+    expect(sessionUpdateMany).toHaveBeenCalled()
+    expect(refreshUpdateMany).toHaveBeenCalled()
   })
 })

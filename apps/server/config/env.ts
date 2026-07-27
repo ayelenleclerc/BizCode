@@ -36,6 +36,7 @@ const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production'], {
     errorMap: () => ({ message: 'NODE_ENV must be development, test, or production' }),
   }),
+  REDIS_URL: optionalNonEmptyString,
   SMTP_URL: z.preprocess(
     (value) => {
       if (value === undefined || value === null) {

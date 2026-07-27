@@ -134,7 +134,7 @@ One-time endpoint to create initial tenant and owner user.
 }
 ```
 
-### Create authenticated session
+### Create authenticated session (access 15m + refresh 7d/30d cookies)
 
 - **Method:** `POST`
 - **Path:** `/api/auth/login`
@@ -156,19 +156,24 @@ One-time endpoint to create initial tenant and owner user.
 
   `string`
 
+- **`rememberMe`**
+
+  `boolean` — When true, refresh cookie TTL is 30 days; otherwise 7 days (#212).
+
 **Example:**
 
 ```json
 {
   "tenantSlug": "",
   "username": "",
-  "password": ""
+  "password": "",
+  "rememberMe": true
 }
 ```
 
 #### Responses
 
-##### Status: 200 Session created
+##### Status: 200 Session created (Set-Cookie bizcode\_session + bizcode\_refresh)
 
 ###### Content-Type: application/json
 
@@ -253,6 +258,64 @@ One-time endpoint to create initial tenant and owner user.
 ```
 
 ##### Status: 429 Account locked after too many failed login attempts
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Rotate refresh token and issue a new access+refresh cookie pair (#212)
+
+- **Method:** `POST`
+- **Path:** `/api/auth/refresh`
+- **Tags:** auth
+
+Requires bizcode\_refresh cookie. Reuse of a revoked refresh token invalidates the whole token family.
+
+#### Responses
+
+##### Status: 200 New access and refresh cookies issued
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`refreshed` (required)**
+
+    `boolean`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "refreshed": true
+  }
+}
+```
+
+##### Status: 401 Refresh missing, expired, or reuse detected (SESSION\_EXPIRED)
 
 ###### Content-Type: application/json
 
@@ -74324,13 +74387,61 @@ Rate-limited mutation; requires products.manage. USD only.
 
   `string`
 
+* **`rememberMe`**
+
+  `boolean` — When true, refresh cookie TTL is 30 days; otherwise 7 days (#212).
+
 **Example:**
 
 ```json
 {
   "tenantSlug": "",
   "username": "",
-  "password": ""
+  "password": "",
+  "rememberMe": true
+}
+```
+
+### RefreshResult
+
+- **Type:**`object`
+
+* **`refreshed` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "refreshed": true
+}
+```
+
+### RefreshEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`refreshed` (required)**
+
+    `boolean`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "refreshed": true
+  }
 }
 ```
 

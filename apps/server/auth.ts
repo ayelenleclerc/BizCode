@@ -1,4 +1,3 @@
-import { createHmac, randomBytes } from 'node:crypto'
 import express from 'express'
 import type { NextFunction, Request, Response } from 'express'
 import { authRouterHttpRateLimiter } from './middleware/routeRateLimit'
@@ -18,11 +17,22 @@ import {
 } from '@bizcode/types'
 import { hashPassword, verifyPassword } from './passwordHash'
 import { writeAuditEvent } from './audit'
-import { getAppConfig } from './config/env'
 import { NEW_TENANT_MODULES } from '@bizcode/types'
+import {
+  ACCESS_COOKIE_NAME,
+  REFRESH_COOKIE_NAME,
+  SESSION_EXPIRED_ERROR,
+  blacklistRefreshHash,
+  clearAuthCookies,
+  getCookieValue,
+  hashOpaqueToken,
+  issueTokenPair,
+  revokeTokenFamily,
+  setAuthCookies,
+} from './lib/sessionTokens'
+import { getRefreshTokenBlacklist } from './lib/refreshTokenBlacklist'
 
-const SESSION_COOKIE_NAME = 'bizcode_session'
-const SESSION_DURATION_MS = 1000 * 60 * 60 * 8
+export { revokeAllUserAuthTokens } from './lib/sessionTokens'
 
 const LOGIN_WINDOW_MS = 15 * 60 * 1000 // 15 minutes
 const LOGIN_MAX_FAILURES = 5 // consecutive failures before lockout
@@ -37,28 +47,6 @@ export type AuthenticatedRequest = Request & {
   tenantId?: number
   tenantModules?: readonly ModuleKey[]
   tenantPlan?: TenantPlanSnapshot
-}
-
-function getCookieValue(rawCookieHeader: string | undefined, key: string): string | null {
-  if (!rawCookieHeader) {
-    return null
-  }
-  const pairs = rawCookieHeader.split(';')
-  for (const pair of pairs) {
-    const [left, ...rest] = pair.trim().split('=')
-    if (left === key) {
-      return decodeURIComponent(rest.join('='))
-    }
-  }
-  return null
-}
-
-function createSessionToken(): string {
-  return randomBytes(32).toString('hex')
-}
-
-function hashToken(token: string): string {
-  return createHmac('sha256', getAppConfig().JWT_SECRET).update(token).digest('hex')
 }
 
 function normalizeRole(value: string): UserRole | null {
@@ -125,26 +113,6 @@ function buildClaims(input: {
   }
 }
 
-/**
- * @en Session cookies use SameSite=None so the SPA on another origin (e.g. Vite :5173) can send them with credentialed XHR.
- * @es Las cookies de sesión usan SameSite=None para que el SPA en otro origen (p. ej. Vite :5173) las envíe con XHR con credenciales.
- * @pt-BR Cookies de sessão com SameSite=None para o SPA em outra origem (ex.: Vite :5173) enviá-las em XHR com credenciais.
- */
-function setSessionCookie(res: Response, token: string): void {
-  const maxAge = SESSION_DURATION_MS / 1000
-  res.setHeader(
-    'Set-Cookie',
-    `${SESSION_COOKIE_NAME}=${encodeURIComponent(token)}; Path=/; HttpOnly; SameSite=None; Secure; Max-Age=${maxAge}`,
-  )
-}
-
-function clearSessionCookie(res: Response): void {
-  res.setHeader(
-    'Set-Cookie',
-    `${SESSION_COOKIE_NAME}=; Path=/; HttpOnly; SameSite=None; Secure; Max-Age=0`,
-  )
-}
-
 export function resolveSession(prisma: PrismaClient) {
   return async (req: AuthenticatedRequest, _res: Response, next: NextFunction): Promise<void> => {
     const bypassEnabled = process.env.NODE_ENV === 'test' && process.env.BIZCODE_TEST_AUTH_BYPASS !== 'false'
@@ -170,12 +138,12 @@ export function resolveSession(prisma: PrismaClient) {
       return
     }
 
-    const token = getCookieValue(req.headers.cookie, SESSION_COOKIE_NAME)
+    const token = getCookieValue(req.headers.cookie, ACCESS_COOKIE_NAME)
     if (!token) {
       next()
       return
     }
-    const tokenHash = hashToken(token)
+    const tokenHash = hashOpaqueToken(token)
     const session = await prisma.appSession.findFirst({
       where: {
         tokenHash,
@@ -303,6 +271,7 @@ type LoginBody = {
   tenantSlug?: string
   username?: string
   password?: string
+  rememberMe?: boolean
 }
 
 function isNonEmptyString(value: unknown): value is string {
@@ -505,26 +474,23 @@ export function registerAuthRoutes(app: import('express').Application, prisma: P
     // Successful login — record it and clear the failure streak.
     await recordLoginAttempt(prisma, tenant.id, username, true, req.ip)
 
-    const token = createSessionToken()
-    const tokenHash = hashToken(token)
-    const session = await prisma.appSession.create({
-      data: {
-        userId: user.id,
-        tokenHash,
-        expiresAt: new Date(Date.now() + SESSION_DURATION_MS),
-        userAgent: req.headers['user-agent']?.toString(),
-        ipAddress: req.ip,
-      },
+    const rememberMe = body.rememberMe === true
+    const pair = await issueTokenPair(prisma, {
+      userId: user.id,
+      rememberMe,
+      userAgent: req.headers['user-agent']?.toString(),
+      ipAddress: req.ip,
     })
-    setSessionCookie(res, token)
+    setAuthCookies(res, pair.accessToken, pair.refreshToken, pair.refreshTtlMs)
     await writeAuditEvent({
       prisma,
       tenantId: user.tenantId,
       userId: user.id,
       action: 'login',
       resource: 'session',
-      resourceId: String(session.id),
+      resourceId: String(pair.accessSessionId),
       ipAddress: req.ip,
+      metadata: { tokenFamily: pair.tokenFamily, rememberMe },
     })
     const role = normalizeRole(String(user.role))
     if (!role) {
@@ -542,20 +508,143 @@ export function registerAuthRoutes(app: import('express').Application, prisma: P
     })
   })
 
+  authRouter.post('/refresh', async (req: Request, res: Response) => {
+    const rawRefresh = getCookieValue(req.headers.cookie, REFRESH_COOKIE_NAME)
+    // Missing cookie: reject without mutating cookies (CodeQL js/user-controlled-bypass).
+    if (typeof rawRefresh !== 'string' || rawRefresh.length === 0) {
+      res.status(401).json({ success: false, error: SESSION_EXPIRED_ERROR })
+      return
+    }
+
+    const refreshHash = hashOpaqueToken(rawRefresh)
+    const blacklist = getRefreshTokenBlacklist()
+    if (await blacklist.has(refreshHash)) {
+      const blacklistedRow = await prisma.appRefreshToken.findFirst({
+        where: { tokenHash: refreshHash },
+        select: { userId: true, tokenFamily: true },
+      })
+      if (blacklistedRow) {
+        await revokeTokenFamily(prisma, blacklistedRow.userId, blacklistedRow.tokenFamily)
+        const user = await prisma.appUser.findUnique({ where: { id: blacklistedRow.userId } })
+        if (user) {
+          await writeAuditEvent({
+            prisma,
+            tenantId: user.tenantId,
+            userId: user.id,
+            action: 'session_reuse_detected',
+            resource: 'refresh_token',
+            resourceId: blacklistedRow.tokenFamily,
+            ipAddress: req.ip,
+          })
+        }
+      }
+      clearAuthCookies(res)
+      res.status(401).json({ success: false, error: SESSION_EXPIRED_ERROR })
+      return
+    }
+
+    const existing = await prisma.appRefreshToken.findFirst({
+      where: { tokenHash: refreshHash },
+      include: { user: true },
+    })
+
+    if (!existing) {
+      clearAuthCookies(res)
+      res.status(401).json({ success: false, error: SESSION_EXPIRED_ERROR })
+      return
+    }
+
+    if (existing.revokedAt != null || existing.expiresAt <= new Date() || !existing.user.active) {
+      // Reuse of a revoked refresh token → kill the whole family.
+      if (existing.revokedAt != null) {
+        await revokeTokenFamily(prisma, existing.userId, existing.tokenFamily)
+        await writeAuditEvent({
+          prisma,
+          tenantId: existing.user.tenantId,
+          userId: existing.userId,
+          action: 'session_reuse_detected',
+          resource: 'refresh_token',
+          resourceId: existing.tokenFamily,
+          ipAddress: req.ip,
+        })
+      }
+      clearAuthCookies(res)
+      res.status(401).json({ success: false, error: SESSION_EXPIRED_ERROR })
+      return
+    }
+
+    const rememberMe =
+      existing.expiresAt.getTime() - existing.createdAt.getTime() > 8 * 24 * 60 * 60 * 1000
+
+    await prisma.appRefreshToken.update({
+      where: { id: existing.id },
+      data: { revokedAt: new Date() },
+    })
+    await blacklistRefreshHash(existing.tokenHash, existing.expiresAt)
+    await prisma.appSession.updateMany({
+      where: { userId: existing.userId, tokenFamily: existing.tokenFamily, revokedAt: null },
+      data: { revokedAt: new Date() },
+    })
+
+    const pair = await issueTokenPair(prisma, {
+      userId: existing.userId,
+      tokenFamily: existing.tokenFamily,
+      rememberMe,
+      userAgent: req.headers['user-agent']?.toString(),
+      ipAddress: req.ip,
+    })
+    setAuthCookies(res, pair.accessToken, pair.refreshToken, pair.refreshTtlMs)
+    await writeAuditEvent({
+      prisma,
+      tenantId: existing.user.tenantId,
+      userId: existing.userId,
+      action: 'refresh',
+      resource: 'session',
+      resourceId: String(pair.accessSessionId),
+      ipAddress: req.ip,
+      metadata: { tokenFamily: pair.tokenFamily },
+    })
+    res.json({ success: true, data: { refreshed: true } })
+  })
+
   authRouter.post('/logout', async (req: AuthenticatedRequest, res: Response) => {
-    const token = getCookieValue(req.headers.cookie, SESSION_COOKIE_NAME)
-    if (token) {
+    const accessToken = getCookieValue(req.headers.cookie, ACCESS_COOKIE_NAME)
+    const refreshToken = getCookieValue(req.headers.cookie, REFRESH_COOKIE_NAME)
+    const now = new Date()
+
+    if (refreshToken) {
+      const refreshHash = hashOpaqueToken(refreshToken)
+      const refreshRow = await prisma.appRefreshToken.findFirst({
+        where: { tokenHash: refreshHash },
+      })
+      if (refreshRow) {
+        await prisma.appRefreshToken.updateMany({
+          where: { id: refreshRow.id, revokedAt: null },
+          data: { revokedAt: now },
+        })
+        if (refreshRow.expiresAt > now) {
+          await blacklistRefreshHash(refreshRow.tokenHash, refreshRow.expiresAt)
+        }
+        await prisma.appSession.updateMany({
+          where: {
+            userId: refreshRow.userId,
+            tokenFamily: refreshRow.tokenFamily,
+            revokedAt: null,
+          },
+          data: { revokedAt: now },
+        })
+      }
+    } else if (accessToken) {
       await prisma.appSession.updateMany({
         where: {
-          tokenHash: hashToken(token),
+          tokenHash: hashOpaqueToken(accessToken),
           revokedAt: null,
         },
-        data: {
-          revokedAt: new Date(),
-        },
+        data: { revokedAt: now },
       })
     }
-    clearSessionCookie(res)
+
+    clearAuthCookies(res)
     if (req.auth) {
       await writeAuditEvent({
         prisma,
