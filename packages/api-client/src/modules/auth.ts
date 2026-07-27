@@ -10,11 +10,33 @@ export type LoginBody = {
   rememberMe?: boolean
 }
 
-export type LoginResponseData = {
+export type LoginSuccessData = {
   userId: number
   tenantId: number
   username: string
   role: string
+}
+
+export type LoginMfaChallengeData = {
+  mfaRequired: true
+  mfaToken: string
+}
+
+export type LoginResponseData = LoginSuccessData | LoginMfaChallengeData
+
+export function isLoginMfaChallenge(data: LoginResponseData): data is LoginMfaChallengeData {
+  return 'mfaRequired' in data && data.mfaRequired === true
+}
+
+export type MfaSetupStartData = {
+  otpauthUrl: string
+  qrDataUrl: string
+  secret: string
+}
+
+export type MfaSetupConfirmData = {
+  mfaEnabled: true
+  backupCodes: string[]
 }
 
 export function createAuthAPI(http: AxiosInstance) {
@@ -22,6 +44,63 @@ export function createAuthAPI(http: AxiosInstance) {
     login: async (body: LoginBody): Promise<LoginResponseData> => {
       try {
         const response = await http.post<{ success: boolean; data: LoginResponseData }>('/auth/login', body)
+        return response.data.data
+      } catch (error) {
+        return handleError(error as AxiosError<ApiErrorPayload>)
+      }
+    },
+
+    verifyMfa: async (body: { mfaToken: string; code: string }): Promise<LoginSuccessData> => {
+      try {
+        const response = await http.post<{ success: boolean; data: LoginSuccessData }>('/auth/mfa/verify', body)
+        return response.data.data
+      } catch (error) {
+        return handleError(error as AxiosError<ApiErrorPayload>)
+      }
+    },
+
+    mfaSetupStart: async (): Promise<MfaSetupStartData> => {
+      try {
+        const response = await http.post<{ success: boolean; data: MfaSetupStartData }>('/auth/mfa/setup/start')
+        return response.data.data
+      } catch (error) {
+        return handleError(error as AxiosError<ApiErrorPayload>)
+      }
+    },
+
+    mfaSetupConfirm: async (body: { code: string }): Promise<MfaSetupConfirmData> => {
+      try {
+        const response = await http.post<{ success: boolean; data: MfaSetupConfirmData }>(
+          '/auth/mfa/setup/confirm',
+          body,
+        )
+        return response.data.data
+      } catch (error) {
+        return handleError(error as AxiosError<ApiErrorPayload>)
+      }
+    },
+
+    mfaDisable: async (body: { code: string }): Promise<{ mfaEnabled: false }> => {
+      try {
+        const response = await http.post<{ success: boolean; data: { mfaEnabled: false } }>(
+          '/auth/mfa/disable',
+          body,
+        )
+        return response.data.data
+      } catch (error) {
+        return handleError(error as AxiosError<ApiErrorPayload>)
+      }
+    },
+
+    adminDisableMfa: async (
+      userId: number,
+      body: { enabled: false; code?: string },
+    ): Promise<{ mfaEnabled: false }> => {
+      try {
+        const response = await http.patch<{ success: boolean; data: { mfaEnabled: false } }>(
+          `/users/${userId}/mfa`,
+          body,
+        )
         return response.data.data
       } catch (error) {
         return handleError(error as AxiosError<ApiErrorPayload>)

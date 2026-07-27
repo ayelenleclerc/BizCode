@@ -21,6 +21,25 @@ export const USER_ROLES = [
 
 export type UserRole = (typeof USER_ROLES)[number]
 
+/**
+ * @en Roles that must enroll MFA (#213); others may enable optionally.
+ * @es Roles que deben activar MFA (#213); el resto puede activarlo de forma opcional.
+ * @pt-BR Papéis que devem ativar MFA (#213); os demais podem ativar opcionalmente.
+ */
+export const MFA_REQUIRED_ROLES = [
+  'super_admin',
+  'owner',
+  'manager',
+  'finance',
+  'auditor',
+] as const satisfies ReadonlyArray<UserRole>
+
+export type MfaRequiredRole = (typeof MFA_REQUIRED_ROLES)[number]
+
+export function isMfaRequiredRole(role: UserRole): boolean {
+  return (MFA_REQUIRED_ROLES as readonly string[]).includes(role)
+}
+
 export const PERMISSIONS = [
   'users.manage',
   'roles.assign',
@@ -72,6 +91,10 @@ export type AuthClaims = {
   role: UserRole
   permissions: Permission[]
   scope: AuthScope
+  /** MFA enabled for this user (#213). */
+  mfaEnabled: boolean
+  /** True when role is MFA-required and MFA is not yet enabled (#213). */
+  mfaSetupRequired: boolean
 }
 
 /** ERP-wide permissions for tenant owner (single source of truth for owner / super_admin ERP slice). */

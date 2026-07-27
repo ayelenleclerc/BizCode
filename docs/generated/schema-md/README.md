@@ -472,7 +472,11 @@
 
 * [LoginInput](./logininput.md) – `-`
 
+* [LoginMfaChallenge](./loginmfachallenge.md) – `-`
+
 * [LoginResult](./loginresult.md) – `-`
+
+* [LoginSuccessEnvelope](./loginsuccessenvelope.md) – `-`
 
 * [LogisticaChoferRow](./logisticachoferrow.md) – `-`
 
@@ -569,6 +573,24 @@
 * [MetricsEnvelope](./metricsenvelope.md) – `-`
 
 * [MetricsSnapshot](./metricssnapshot.md) – `-`
+
+* [MfaAdminDisableInput](./mfaadmindisableinput.md) – `-`
+
+* [MfaCodeInput](./mfacodeinput.md) – `-`
+
+* [MfaSetupConfirmEnvelope](./mfasetupconfirmenvelope.md) – `-`
+
+* [MfaSetupConfirmResult](./mfasetupconfirmresult.md) – `-`
+
+* [MfaSetupStartEnvelope](./mfasetupstartenvelope.md) – `-`
+
+* [MfaSetupStartResult](./mfasetupstartresult.md) – `-`
+
+* [MfaStatusEnvelope](./mfastatusenvelope.md) – `-`
+
+* [MfaStatusResult](./mfastatusresult.md) – `-`
+
+* [MfaVerifyInput](./mfaverifyinput.md) – `-`
 
 * [MisComisionesResponse](./miscomisionesresponse.md) – `-`
 
@@ -1553,6 +1575,8 @@
 * [Untitled array in MercadoPagoReconciliationListEnvelope](./mercadopagoreconciliationlistenvelope-properties-data.md) – `undefined#/properties/data`
 
 * [Untitled array in MercadoPagoRefundStatus](./mercadopagorefundstatus-properties-refunds.md) – `undefined#/properties/refunds`
+
+* [Untitled array in MfaSetupConfirmResult](./mfasetupconfirmresult-properties-backupcodes.md) – `undefined#/properties/backupCodes`
 
 * [Untitled array in MisComisionesResponse](./miscomisionesresponse-properties-estimacion-properties-lineas.md) – `undefined#/properties/estimacion/properties/lineas`
 

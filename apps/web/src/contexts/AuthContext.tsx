@@ -7,15 +7,25 @@ import {
   useState,
   type ReactNode,
 } from 'react'
-import { authAPI } from '@/lib/api'
+import { authAPI, isLoginMfaChallenge } from '@/lib/api'
 import type { AuthClaims } from '@/lib/rbac'
 
 export type AuthStatus = 'loading' | 'unauthenticated' | 'authenticated'
 
+export type LoginOutcome =
+  | { status: 'authenticated' }
+  | { status: 'mfa_required'; mfaToken: string }
+
 type AuthContextValue = {
   status: AuthStatus
   claims: AuthClaims | null
-  login: (credentials: { tenantSlug: string; username: string; password: string }) => Promise<void>
+  login: (credentials: {
+    tenantSlug: string
+    username: string
+    password: string
+    rememberMe?: boolean
+  }) => Promise<LoginOutcome>
+  verifyMfa: (mfaToken: string, code: string) => Promise<void>
   logout: () => Promise<void>
   refresh: () => Promise<void>
 }
@@ -51,8 +61,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [refresh])
 
   const login = useCallback(
-    async (credentials: { tenantSlug: string; username: string; password: string }) => {
-      await authAPI.login(credentials)
+    async (credentials: {
+      tenantSlug: string
+      username: string
+      password: string
+      rememberMe?: boolean
+    }): Promise<LoginOutcome> => {
+      const result = await authAPI.login(credentials)
+      if (isLoginMfaChallenge(result)) {
+        return { status: 'mfa_required', mfaToken: result.mfaToken }
+      }
+      await refresh()
+      return { status: 'authenticated' }
+    },
+    [refresh],
+  )
+
+  const verifyMfa = useCallback(
+    async (mfaToken: string, code: string) => {
+      await authAPI.verifyMfa({ mfaToken, code })
       await refresh()
     },
     [refresh],
@@ -69,8 +96,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const value = useMemo(
-    () => ({ status, claims, login, logout, refresh }),
-    [status, claims, login, logout, refresh],
+    () => ({ status, claims, login, verifyMfa, logout, refresh }),
+    [status, claims, login, verifyMfa, logout, refresh],
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

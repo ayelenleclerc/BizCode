@@ -43,6 +43,8 @@ describe('FeatureFlagsContext', () => {
       role: 'owner',
       permissions: [],
       scope: { tenantId: 1, branchIds: [], warehouseIds: [], routeIds: [], channels: [] },
+      mfaEnabled: false,
+      mfaSetupRequired: true,
     })
     vi.mocked(featuresAPI.get).mockResolvedValue({
       modules: [...DEFAULT_MODULES, 'billing.orders'],
@@ -72,6 +74,8 @@ describe('FeatureFlagsContext', () => {
       role: 'owner',
       permissions: [],
       scope: { tenantId: 1, branchIds: [], warehouseIds: [], routeIds: [], channels: [] },
+      mfaEnabled: false,
+      mfaSetupRequired: true,
     })
     vi.mocked(featuresAPI.get).mockRejectedValue(new Error('network'))
 
@@ -98,6 +102,8 @@ describe('FeatureFlagsContext', () => {
       role: 'super_admin',
       permissions: [],
       scope: { tenantId: 1, branchIds: [], warehouseIds: [], routeIds: [], channels: [] },
+      mfaEnabled: false,
+      mfaSetupRequired: true,
     })
     vi.mocked(featuresAPI.get).mockResolvedValue({ modules: [], integrations: [] })
 

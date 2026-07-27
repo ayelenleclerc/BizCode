@@ -2,7 +2,14 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "properties": {
     "data": {
-      "$ref": "./LoginResult.schema.json"
+      "oneOf": [
+        {
+          "$ref": "./LoginResult.schema.json"
+        },
+        {
+          "$ref": "./LoginMfaChallenge.schema.json"
+        }
+      ]
     },
     "success": {
       "const": true,

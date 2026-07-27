@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "mfaRequired": {
+      "const": true,
+      "type": "boolean"
+    },
+    "mfaToken": {
+      "description": "Opaque single-use challenge token (TTL 5 minutes, Redis)",
+      "type": "string"
+    }
+  },
+  "required": [
+    "mfaRequired",
+    "mfaToken"
+  ],
+  "title": "LoginMfaChallenge",
+  "type": "object"
+}

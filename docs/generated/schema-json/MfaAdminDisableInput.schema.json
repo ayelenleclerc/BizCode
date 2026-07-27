@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "code": {
+      "description": "Required when the caller has MFA enabled",
+      "type": "string"
+    },
+    "enabled": {
+      "const": false,
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "enabled"
+  ],
+  "title": "MfaAdminDisableInput",
+  "type": "object"
+}

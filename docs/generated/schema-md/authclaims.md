@@ -16,14 +16,52 @@ undefined#/properties/data
 
 # data Properties
 
-| Property                    | Type      | Required | Nullable       | Defined by                                                                             |
-| :-------------------------- | :-------- | :------- | :------------- | :------------------------------------------------------------------------------------- |
-| [permissions](#permissions) | `array`   | Required | cannot be null | [AuthClaims](authclaims-properties-permissions.md "undefined#/properties/permissions") |
-| [role](#role)               | `string`  | Required | cannot be null | [AuthClaims](authclaims-properties-role.md "undefined#/properties/role")               |
-| [scope](#scope)             | `object`  | Required | cannot be null | [AuthClaims](authscope.md "undefined#/properties/scope")                               |
-| [tenantId](#tenantid)       | `integer` | Required | cannot be null | [AuthClaims](authclaims-properties-tenantid.md "undefined#/properties/tenantId")       |
-| [userId](#userid)           | `integer` | Required | cannot be null | [AuthClaims](authclaims-properties-userid.md "undefined#/properties/userId")           |
-| [username](#username)       | `string`  | Required | cannot be null | [AuthClaims](authclaims-properties-username.md "undefined#/properties/username")       |
+| Property                              | Type      | Required | Nullable       | Defined by                                                                                       |
+| :------------------------------------ | :-------- | :------- | :------------- | :----------------------------------------------------------------------------------------------- |
+| [mfaEnabled](#mfaenabled)             | `boolean` | Required | cannot be null | [AuthClaims](authclaims-properties-mfaenabled.md "undefined#/properties/mfaEnabled")             |
+| [mfaSetupRequired](#mfasetuprequired) | `boolean` | Required | cannot be null | [AuthClaims](authclaims-properties-mfasetuprequired.md "undefined#/properties/mfaSetupRequired") |
+| [permissions](#permissions)           | `array`   | Required | cannot be null | [AuthClaims](authclaims-properties-permissions.md "undefined#/properties/permissions")           |
+| [role](#role)                         | `string`  | Required | cannot be null | [AuthClaims](authclaims-properties-role.md "undefined#/properties/role")                         |
+| [scope](#scope)                       | `object`  | Required | cannot be null | [AuthClaims](authscope.md "undefined#/properties/scope")                                         |
+| [tenantId](#tenantid)                 | `integer` | Required | cannot be null | [AuthClaims](authclaims-properties-tenantid.md "undefined#/properties/tenantId")                 |
+| [userId](#userid)                     | `integer` | Required | cannot be null | [AuthClaims](authclaims-properties-userid.md "undefined#/properties/userId")                     |
+| [username](#username)                 | `string`  | Required | cannot be null | [AuthClaims](authclaims-properties-username.md "undefined#/properties/username")                 |
+
+## mfaEnabled
+
+
+
+`mfaEnabled`
+
+* is required
+
+* Type: `boolean`
+
+* cannot be null
+
+* defined in: [AuthClaims](authclaims-properties-mfaenabled.md "undefined#/properties/mfaEnabled")
+
+### mfaEnabled Type
+
+`boolean`
+
+## mfaSetupRequired
+
+True when role requires MFA and MFA is not yet enabled (#213)
+
+`mfaSetupRequired`
+
+* is required
+
+* Type: `boolean`
+
+* cannot be null
+
+* defined in: [AuthClaims](authclaims-properties-mfasetuprequired.md "undefined#/properties/mfaSetupRequired")
+
+### mfaSetupRequired Type
+
+`boolean`
 
 ## permissions
 

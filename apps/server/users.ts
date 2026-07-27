@@ -5,6 +5,8 @@ import { hashPassword, verifyPassword } from './passwordHash'
 import { requirePermission, revokeAllUserAuthTokens, type AuthenticatedRequest } from './auth'
 import { writeAuditEvent } from './audit'
 import { planErrorBody, TenantPlanService } from './services/TenantPlanService'
+import { clearUserMfa, verifyUserMfaCode } from './lib/mfaUser'
+import { authRouterHttpRateLimiter } from './middleware/routeRateLimit'
 
 /**
  * @en Role hierarchy index — a user may only assign roles with an equal or lower index than their own.
@@ -298,4 +300,87 @@ export function registerUserRoutes(app: Application, prisma: PrismaClient): void
       res.status(500).json({ success: false, error: err instanceof Error ? err.message : String(err) })
     }
   })
+
+  // ── PATCH /api/users/:id/mfa — admin disable MFA (#213) ─────────────────────
+
+  app.patch(
+    '/api/users/:id/mfa',
+    authRouterHttpRateLimiter,
+    requirePermission('users.manage'),
+    async (req: Request, res: Response) => {
+      const authReq = req as AuthenticatedRequest
+      const callerRole = authReq.auth!.claims.role
+      if (callerRole !== 'owner' && callerRole !== 'super_admin') {
+        res.status(403).json({ success: false, error: 'Only owner or super_admin can disable MFA for users' })
+        return
+      }
+
+      const rawId = req.params.id
+      const targetId = parseInt(Array.isArray(rawId) ? rawId[0] : rawId, 10)
+      if (!Number.isInteger(targetId) || targetId <= 0) {
+        res.status(400).json({ success: false, error: 'Invalid user id' })
+        return
+      }
+
+      const body = (req.body ?? {}) as { enabled?: boolean; code?: string }
+      if (body.enabled !== false) {
+        res.status(400).json({ success: false, error: 'Only enabled=false (admin disable) is supported' })
+        return
+      }
+
+      const caller = await prisma.appUser.findUnique({
+        where: { id: authReq.auth!.claims.userId },
+        select: { mfaEnabled: true },
+      })
+      let usedBackupCodeId: number | null = null
+      if (caller?.mfaEnabled) {
+        if (!isNonEmptyString(body.code)) {
+          res.status(400).json({ success: false, error: 'code is required when caller has MFA enabled' })
+          return
+        }
+        const verified = await verifyUserMfaCode(prisma, authReq.auth!.claims.userId, body.code)
+        if (!verified.ok) {
+          res.status(401).json({ success: false, error: 'Invalid MFA code' })
+          return
+        }
+        usedBackupCodeId = verified.usedBackupCodeId
+      }
+
+      const target = await prisma.appUser.findFirst({
+        where: {
+          id: targetId,
+          tenantId: authReq.auth!.claims.tenantId,
+        },
+      })
+      if (!target) {
+        res.status(404).json({ success: false, error: 'User not found' })
+        return
+      }
+      if (!target.mfaEnabled) {
+        res.json({ success: true, data: { mfaEnabled: false } })
+        return
+      }
+
+      // Mark caller backup used before clearing target (caller and target may differ).
+      if (usedBackupCodeId != null && authReq.auth!.claims.userId !== targetId) {
+        await prisma.appMfaBackupCode.update({
+          where: { id: usedBackupCodeId },
+          data: { usedAt: new Date() },
+        })
+        usedBackupCodeId = null
+      }
+
+      await clearUserMfa(prisma, targetId, usedBackupCodeId)
+      await writeAuditEvent({
+        prisma,
+        tenantId: authReq.auth!.claims.tenantId,
+        userId: authReq.auth!.claims.userId,
+        action: 'mfa_admin_disable',
+        resource: 'user',
+        resourceId: String(targetId),
+        ipAddress: authReq.ip,
+      })
+      res.json({ success: true, data: { mfaEnabled: false } })
+    },
+  )
 }

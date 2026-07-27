@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "otpauthUrl": {
+      "type": "string"
+    },
+    "qrDataUrl": {
+      "description": "PNG data URL for QR",
+      "type": "string"
+    },
+    "secret": {
+      "description": "Base32 secret for manual entry",
+      "type": "string"
+    }
+  },
+  "required": [
+    "otpauthUrl",
+    "qrDataUrl",
+    "secret"
+  ],
+  "title": "MfaSetupStartResult",
+  "type": "object"
+}

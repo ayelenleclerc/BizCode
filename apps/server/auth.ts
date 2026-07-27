@@ -9,6 +9,7 @@ import {
   USER_CHANNELS,
   USER_ROLES,
   hasPermission,
+  isMfaRequiredRole,
   type AuthClaims,
   type AuthScope,
   type Permission,
@@ -24,6 +25,7 @@ import {
   SESSION_EXPIRED_ERROR,
   blacklistRefreshHash,
   clearAuthCookies,
+  createOpaqueToken,
   getCookieValue,
   hashOpaqueToken,
   issueTokenPair,
@@ -31,6 +33,18 @@ import {
   setAuthCookies,
 } from './lib/sessionTokens'
 import { getRefreshTokenBlacklist } from './lib/refreshTokenBlacklist'
+import {
+  MFA_CHALLENGE_TTL_SECONDS,
+  getMfaChallengeStore,
+} from './lib/mfaChallengeStore'
+import { decryptMfaSecret, encryptMfaSecret } from './lib/mfaSecrets'
+import {
+  buildTotpEnrollmentQr,
+  generateBackupCodes,
+  generateTotpSecret,
+  matchBackupCode,
+  verifyTotpCode,
+} from './lib/mfaTotp'
 
 export { revokeAllUserAuthTokens } from './lib/sessionTokens'
 
@@ -102,6 +116,7 @@ function buildClaims(input: {
   tenantId: number
   role: UserRole
   scope: AuthScope
+  mfaEnabled: boolean
 }): AuthClaims {
   return {
     userId: input.userId,
@@ -110,6 +125,8 @@ function buildClaims(input: {
     role: input.role,
     permissions: [...ROLE_PERMISSIONS[input.role]],
     scope: input.scope,
+    mfaEnabled: input.mfaEnabled,
+    mfaSetupRequired: isMfaRequiredRole(input.role) && !input.mfaEnabled,
   }
 }
 
@@ -132,6 +149,7 @@ export function resolveSession(prisma: PrismaClient) {
             routeIds: [],
             channels: [...USER_CHANNELS],
           },
+          mfaEnabled: false,
         }),
       }
       next()
@@ -176,6 +194,7 @@ export function resolveSession(prisma: PrismaClient) {
         tenantId: session.user.tenantId,
         role,
         scope,
+        mfaEnabled: session.user.mfaEnabled === true,
       }),
     }
     await prisma.appSession.update({
@@ -471,10 +490,33 @@ export function registerAuthRoutes(app: import('express').Application, prisma: P
       return
     }
 
-    // Successful login — record it and clear the failure streak.
+    // Successful password — record it and clear the failure streak.
     await recordLoginAttempt(prisma, tenant.id, username, true, req.ip)
 
     const rememberMe = body.rememberMe === true
+    const role = normalizeRole(String(user.role))
+    if (!role) {
+      res.status(500).json({ success: false, error: 'Unsupported role configuration' })
+      return
+    }
+
+    if (user.mfaEnabled === true) {
+      const mfaToken = createOpaqueToken()
+      await getMfaChallengeStore().set(
+        hashOpaqueToken(mfaToken),
+        { userId: user.id, tenantId: user.tenantId, rememberMe },
+        MFA_CHALLENGE_TTL_SECONDS,
+      )
+      res.json({
+        success: true,
+        data: {
+          mfaRequired: true as const,
+          mfaToken,
+        },
+      })
+      return
+    }
+
     const pair = await issueTokenPair(prisma, {
       userId: user.id,
       rememberMe,
@@ -492,11 +534,6 @@ export function registerAuthRoutes(app: import('express').Application, prisma: P
       ipAddress: req.ip,
       metadata: { tokenFamily: pair.tokenFamily, rememberMe },
     })
-    const role = normalizeRole(String(user.role))
-    if (!role) {
-      res.status(500).json({ success: false, error: 'Unsupported role configuration' })
-      return
-    }
     res.json({
       success: true,
       data: {
@@ -506,6 +543,287 @@ export function registerAuthRoutes(app: import('express').Application, prisma: P
         role,
       },
     })
+  })
+
+  authRouter.post('/mfa/verify', async (req: Request, res: Response) => {
+    const body = (req.body ?? {}) as { mfaToken?: string; code?: string }
+    if (!isNonEmptyString(body.mfaToken) || !isNonEmptyString(body.code)) {
+      res.status(400).json({ success: false, error: 'mfaToken and code are required' })
+      return
+    }
+
+    const challenge = await getMfaChallengeStore().take(hashOpaqueToken(body.mfaToken.trim()))
+    if (!challenge) {
+      res.status(401).json({ success: false, error: 'Invalid or expired MFA challenge' })
+      return
+    }
+
+    const user = await prisma.appUser.findUnique({
+      where: { id: challenge.userId },
+      include: { mfaBackupCodes: { where: { usedAt: null } } },
+    })
+    if (!user || !user.active || !user.mfaEnabled || !user.totpSecretEncrypted) {
+      res.status(401).json({ success: false, error: 'Invalid or expired MFA challenge' })
+      return
+    }
+
+    let verified = false
+    let usedBackupCodeId: number | null = null
+    try {
+      const secret = decryptMfaSecret(user.totpSecretEncrypted)
+      if (verifyTotpCode(secret, body.code, user.username)) {
+        verified = true
+      }
+    } catch {
+      verified = false
+    }
+
+    if (!verified) {
+      const backupId = matchBackupCode(body.code, user.mfaBackupCodes)
+      if (backupId != null) {
+        verified = true
+        usedBackupCodeId = backupId
+      }
+    }
+
+    if (!verified) {
+      res.status(401).json({ success: false, error: 'Invalid MFA code' })
+      return
+    }
+
+    if (usedBackupCodeId != null) {
+      await prisma.appMfaBackupCode.update({
+        where: { id: usedBackupCodeId },
+        data: { usedAt: new Date() },
+      })
+    }
+
+    const role = normalizeRole(String(user.role))
+    if (!role) {
+      res.status(500).json({ success: false, error: 'Unsupported role configuration' })
+      return
+    }
+
+    const pair = await issueTokenPair(prisma, {
+      userId: user.id,
+      rememberMe: challenge.rememberMe,
+      userAgent: req.headers['user-agent']?.toString(),
+      ipAddress: req.ip,
+    })
+    setAuthCookies(res, pair.accessToken, pair.refreshToken, pair.refreshTtlMs)
+    await writeAuditEvent({
+      prisma,
+      tenantId: user.tenantId,
+      userId: user.id,
+      action: 'mfa_verify',
+      resource: 'session',
+      resourceId: String(pair.accessSessionId),
+      ipAddress: req.ip,
+      metadata: {
+        tokenFamily: pair.tokenFamily,
+        rememberMe: challenge.rememberMe,
+        method: usedBackupCodeId != null ? 'backup' : 'totp',
+      },
+    })
+    res.json({
+      success: true,
+      data: {
+        userId: user.id,
+        tenantId: user.tenantId,
+        username: user.username,
+        role,
+      },
+    })
+  })
+
+  authRouter.post('/mfa/setup/start', async (req: AuthenticatedRequest, res: Response) => {
+    if (!req.auth) {
+      res.status(401).json({ success: false, error: 'Authentication required' })
+      return
+    }
+
+    const user = await prisma.appUser.findUnique({ where: { id: req.auth.claims.userId } })
+    if (!user || !user.active) {
+      res.status(401).json({ success: false, error: 'Authentication required' })
+      return
+    }
+    if (user.mfaEnabled) {
+      res.status(409).json({ success: false, error: 'MFA already enabled' })
+      return
+    }
+
+    let secret: string
+    let encrypted: string
+    try {
+      secret = generateTotpSecret()
+      encrypted = encryptMfaSecret(secret)
+    } catch (err: unknown) {
+      res.status(500).json({
+        success: false,
+        error: err instanceof Error ? err.message : 'MFA encryption unavailable',
+      })
+      return
+    }
+
+    await prisma.appUser.update({
+      where: { id: user.id },
+      data: { totpSecretEncrypted: encrypted, mfaVerifiedAt: null, mfaEnabled: false },
+    })
+
+    const label = `${user.username}@tenant-${user.tenantId}`
+    const { otpauthUrl, qrDataUrl } = await buildTotpEnrollmentQr(secret, label)
+    res.json({
+      success: true,
+      data: {
+        otpauthUrl,
+        qrDataUrl,
+        secret,
+      },
+    })
+  })
+
+  authRouter.post('/mfa/setup/confirm', async (req: AuthenticatedRequest, res: Response) => {
+    if (!req.auth) {
+      res.status(401).json({ success: false, error: 'Authentication required' })
+      return
+    }
+
+    const body = (req.body ?? {}) as { code?: string }
+    if (!isNonEmptyString(body.code)) {
+      res.status(400).json({ success: false, error: 'code is required' })
+      return
+    }
+
+    const user = await prisma.appUser.findUnique({ where: { id: req.auth.claims.userId } })
+    if (!user || !user.active || !user.totpSecretEncrypted) {
+      res.status(400).json({ success: false, error: 'MFA setup not started' })
+      return
+    }
+    if (user.mfaEnabled) {
+      res.status(409).json({ success: false, error: 'MFA already enabled' })
+      return
+    }
+
+    let secret: string
+    try {
+      secret = decryptMfaSecret(user.totpSecretEncrypted)
+    } catch {
+      res.status(500).json({ success: false, error: 'MFA secret unavailable' })
+      return
+    }
+
+    if (!verifyTotpCode(secret, body.code, user.username)) {
+      res.status(401).json({ success: false, error: 'Invalid MFA code' })
+      return
+    }
+
+    const { plainCodes, hashes } = generateBackupCodes()
+    await prisma.$transaction(async (tx) => {
+      await tx.appMfaBackupCode.deleteMany({ where: { userId: user.id } })
+      await tx.appMfaBackupCode.createMany({
+        data: hashes.map((codeHash) => ({ userId: user.id, codeHash })),
+      })
+      await tx.appUser.update({
+        where: { id: user.id },
+        data: { mfaEnabled: true, mfaVerifiedAt: new Date() },
+      })
+    })
+
+    await writeAuditEvent({
+      prisma,
+      tenantId: user.tenantId,
+      userId: user.id,
+      action: 'mfa_enroll',
+      resource: 'user',
+      resourceId: String(user.id),
+      ipAddress: req.ip,
+    })
+
+    res.json({
+      success: true,
+      data: {
+        mfaEnabled: true,
+        backupCodes: plainCodes,
+      },
+    })
+  })
+
+  authRouter.post('/mfa/disable', async (req: AuthenticatedRequest, res: Response) => {
+    if (!req.auth) {
+      res.status(401).json({ success: false, error: 'Authentication required' })
+      return
+    }
+
+    const body = (req.body ?? {}) as { code?: string }
+    if (!isNonEmptyString(body.code)) {
+      res.status(400).json({ success: false, error: 'code is required' })
+      return
+    }
+
+    const user = await prisma.appUser.findUnique({
+      where: { id: req.auth.claims.userId },
+      include: { mfaBackupCodes: { where: { usedAt: null } } },
+    })
+    if (!user || !user.active) {
+      res.status(401).json({ success: false, error: 'Authentication required' })
+      return
+    }
+    if (!user.mfaEnabled || !user.totpSecretEncrypted) {
+      res.status(400).json({ success: false, error: 'MFA is not enabled' })
+      return
+    }
+
+    let verified = false
+    let usedBackupCodeId: number | null = null
+    try {
+      const secret = decryptMfaSecret(user.totpSecretEncrypted)
+      if (verifyTotpCode(secret, body.code, user.username)) {
+        verified = true
+      }
+    } catch {
+      verified = false
+    }
+    if (!verified) {
+      const backupId = matchBackupCode(body.code, user.mfaBackupCodes)
+      if (backupId != null) {
+        verified = true
+        usedBackupCodeId = backupId
+      }
+    }
+    if (!verified) {
+      res.status(401).json({ success: false, error: 'Invalid MFA code' })
+      return
+    }
+
+    await prisma.$transaction(async (tx) => {
+      if (usedBackupCodeId != null) {
+        await tx.appMfaBackupCode.update({
+          where: { id: usedBackupCodeId },
+          data: { usedAt: new Date() },
+        })
+      }
+      await tx.appMfaBackupCode.deleteMany({ where: { userId: user.id } })
+      await tx.appUser.update({
+        where: { id: user.id },
+        data: {
+          mfaEnabled: false,
+          totpSecretEncrypted: null,
+          mfaVerifiedAt: null,
+        },
+      })
+    })
+
+    await writeAuditEvent({
+      prisma,
+      tenantId: user.tenantId,
+      userId: user.id,
+      action: 'mfa_disable',
+      resource: 'user',
+      resourceId: String(user.id),
+      ipAddress: req.ip,
+    })
+
+    res.json({ success: true, data: { mfaEnabled: false } })
   })
 
   authRouter.post('/refresh', async (req: Request, res: Response) => {
@@ -659,12 +977,30 @@ export function registerAuthRoutes(app: import('express').Application, prisma: P
     res.json({ success: true, data: { loggedOut: true } })
   })
 
-  authRouter.get('/me', (req: AuthenticatedRequest, res: Response) => {
+  authRouter.get('/me', async (req: AuthenticatedRequest, res: Response) => {
     if (!req.auth) {
       res.status(401).json({ success: false, error: 'Authentication required' })
       return
     }
-    res.json({ success: true, data: req.auth.claims })
+    const user = await prisma.appUser.findUnique({
+      where: { id: req.auth.claims.userId },
+      select: { mfaEnabled: true, role: true, active: true },
+    })
+    if (!user || !user.active) {
+      res.status(401).json({ success: false, error: 'Authentication required' })
+      return
+    }
+    const role = normalizeRole(String(user.role)) ?? req.auth.claims.role
+    const mfaEnabled = user.mfaEnabled === true
+    res.json({
+      success: true,
+      data: {
+        ...req.auth.claims,
+        role,
+        mfaEnabled,
+        mfaSetupRequired: isMfaRequiredRole(role) && !mfaEnabled,
+      },
+    })
   })
 
   app.use('/api/auth', authRouter)

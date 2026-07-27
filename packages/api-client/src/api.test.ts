@@ -1,12 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 // Crear los mocks hoisted para que estén disponibles en la factory de vi.mock
-const { mockGet, mockPost, mockPut, mockCreate } = vi.hoisted(() => {
+const { mockGet, mockPost, mockPut, mockPatch, mockCreate } = vi.hoisted(() => {
   const mockGet = vi.fn()
   const mockPost = vi.fn()
   const mockPut = vi.fn()
-  const mockCreate = vi.fn(() => ({ get: mockGet, post: mockPost, put: mockPut }))
-  return { mockGet, mockPost, mockPut, mockCreate }
+  const mockPatch = vi.fn()
+  const mockCreate = vi.fn(() => ({ get: mockGet, post: mockPost, put: mockPut, patch: mockPatch }))
+  return { mockGet, mockPost, mockPut, mockPatch, mockCreate }
 })
 
 vi.mock('axios', () => ({
@@ -26,6 +27,7 @@ import {
   facturasAPI,
   formasPagoAPI,
   getAuthErrorI18nKey,
+  isLoginMfaChallenge,
   notasCreditoAPI,
   notifChannelsAPI,
   proveedoresAPI,
@@ -39,6 +41,7 @@ beforeEach(() => {
   mockGet.mockClear()
   mockPost.mockClear()
   mockPut.mockClear()
+  mockPatch.mockClear()
 })
 
 describe('getAuthErrorI18nKey', () => {
@@ -217,6 +220,8 @@ describe('authAPI', () => {
           routeIds: [],
           channels: ['counter'],
         },
+  mfaEnabled: false,
+  mfaSetupRequired: false,
       }
       mockGet.mockResolvedValueOnce({ data: { data: claims } })
       expect(await authAPI.me()).toEqual(claims)
@@ -226,6 +231,61 @@ describe('authAPI', () => {
     it('lanza error cuando no hay sesión', async () => {
       mockGet.mockRejectedValueOnce(axiosErrorWithResponse('Authentication required'))
       await expect(authAPI.me()).rejects.toThrow('Authentication required')
+    })
+  })
+
+  describe('MFA (#213)', () => {
+    it('detecta challenge MFA en login', async () => {
+      const challenge = { mfaRequired: true as const, mfaToken: 'tok' }
+      mockPost.mockResolvedValueOnce({ data: { data: challenge } })
+      const result = await authAPI.login({ tenantSlug: 'demo', username: 'a', password: 'x' })
+      expect(isLoginMfaChallenge(result)).toBe(true)
+      if (isLoginMfaChallenge(result)) expect(result.mfaToken).toBe('tok')
+    })
+
+    it('verifyMfa retorna sesión', async () => {
+      const payload = { userId: 1, tenantId: 2, username: 'a', role: 'owner' }
+      mockPost.mockResolvedValueOnce({ data: { data: payload } })
+      expect(await authAPI.verifyMfa({ mfaToken: 't', code: '123456' })).toEqual(payload)
+      expect(mockPost).toHaveBeenCalledWith('/auth/mfa/verify', { mfaToken: 't', code: '123456' })
+    })
+
+    it('verifyMfa propaga error', async () => {
+      mockPost.mockRejectedValueOnce(axiosErrorWithResponse('Invalid MFA code'))
+      await expect(authAPI.verifyMfa({ mfaToken: 't', code: '000000' })).rejects.toThrow('Invalid MFA code')
+    })
+
+    it('mfaSetupStart retorna QR', async () => {
+      const data = { otpauthUrl: 'otpauth://', qrDataUrl: 'data:image/png;base64,x', secret: 'SECRET' }
+      mockPost.mockResolvedValueOnce({ data: { data } })
+      expect(await authAPI.mfaSetupStart()).toEqual(data)
+      expect(mockPost).toHaveBeenCalledWith('/auth/mfa/setup/start')
+    })
+
+    it('mfaSetupConfirm retorna backup codes', async () => {
+      const data = { mfaEnabled: true as const, backupCodes: Array.from({ length: 8 }, (_, i) => `c${i}`) }
+      mockPost.mockResolvedValueOnce({ data: { data } })
+      expect(await authAPI.mfaSetupConfirm({ code: '123456' })).toEqual(data)
+      expect(mockPost).toHaveBeenCalledWith('/auth/mfa/setup/confirm', { code: '123456' })
+    })
+
+    it('mfaDisable desactiva MFA', async () => {
+      mockPost.mockResolvedValueOnce({ data: { data: { mfaEnabled: false } } })
+      expect(await authAPI.mfaDisable({ code: '123456' })).toEqual({ mfaEnabled: false })
+      expect(mockPost).toHaveBeenCalledWith('/auth/mfa/disable', { code: '123456' })
+    })
+
+    it('adminDisableMfa llama PATCH', async () => {
+      mockPatch.mockResolvedValueOnce({ data: { data: { mfaEnabled: false } } })
+      expect(await authAPI.adminDisableMfa(9, { enabled: false, code: '123456' })).toEqual({
+        mfaEnabled: false,
+      })
+      expect(mockPatch).toHaveBeenCalledWith('/users/9/mfa', { enabled: false, code: '123456' })
+    })
+
+    it('adminDisableMfa propaga error', async () => {
+      mockPatch.mockRejectedValueOnce(axiosErrorWithResponse('Forbidden'))
+      await expect(authAPI.adminDisableMfa(9, { enabled: false })).rejects.toThrow('Forbidden')
     })
   })
 })

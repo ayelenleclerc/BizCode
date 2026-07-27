@@ -43,6 +43,7 @@
     "users": "Users",
     "zonasEntrega": "Delivery zones",
     "empresa": "Company",
+    "seguridad": "Security",
     "auditLog": "Audit log",
     "superadmin": "SuperAdmin"
   },
@@ -89,6 +90,40 @@
     },
     "lockout": {
       "retryIn": "You can try again in {{time}}"
+    },
+    "mfa": {
+      "subtitle": "Enter your authenticator or backup code",
+      "formTitle": "Two-factor authentication",
+      "codeLabel": "Verification code",
+      "codeHint": "6-digit code from your authenticator app, or a one-time backup code",
+      "submit": "Verify",
+      "submitting": "Verifying…",
+      "back": "Back to sign in"
+    }
+  },
+  "security": {
+    "title": "Account security",
+    "subtitle": "Manage two-factor authentication for your account",
+    "mfa": {
+      "title": "Two-factor authentication (TOTP)",
+      "statusOn": "MFA is enabled on your account.",
+      "statusOff": "MFA is not enabled yet.",
+      "enable": "Enable MFA",
+      "scanQr": "Scan this QR code with your authenticator app, then enter the 6-digit code to confirm.",
+      "qrAlt": "QR code for MFA enrollment",
+      "manualSecret": "Manual secret",
+      "confirmCode": "Confirmation code",
+      "confirm": "Confirm and enable",
+      "backupTitle": "Backup codes",
+      "backupWarning": "Save these backup codes now. They are shown only once and each can be used once.",
+      "backupDone": "I have saved my backup codes",
+      "disableTitle": "Disable MFA",
+      "disableCode": "Enter a TOTP or backup code to disable MFA",
+      "disable": "Disable MFA",
+      "enabledSuccess": "MFA enabled successfully.",
+      "disabledSuccess": "MFA disabled.",
+      "setupRequiredBanner": "Your role requires two-factor authentication.",
+      "setupRequiredCta": "Set up MFA now"
     }
   },
   "session": {

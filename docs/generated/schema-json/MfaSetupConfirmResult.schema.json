@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "backupCodes": {
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 8,
+      "minItems": 8,
+      "type": "array"
+    },
+    "mfaEnabled": {
+      "const": true,
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "mfaEnabled",
+    "backupCodes"
+  ],
+  "title": "MfaSetupConfirmResult",
+  "type": "object"
+}

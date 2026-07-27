@@ -18,7 +18,7 @@ undefined
 
 | Property            | Type      | Required | Nullable       | Defined by                                                                           |
 | :------------------ | :-------- | :------- | :------------- | :----------------------------------------------------------------------------------- |
-| [data](#data)       | `object`  | Required | cannot be null | [LoginEnvelope](loginresult.md "undefined#/properties/data")                         |
+| [data](#data)       | Merged    | Required | cannot be null | [LoginEnvelope](loginenvelope-properties-data.md "undefined#/properties/data")       |
 | [success](#success) | `boolean` | Required | cannot be null | [LoginEnvelope](loginenvelope-properties-success.md "undefined#/properties/success") |
 
 ## data
@@ -29,15 +29,21 @@ undefined
 
 * is required
 
-* Type: `object` ([LoginResult](loginresult.md))
+* Type: merged type ([Details](loginenvelope-properties-data.md))
 
 * cannot be null
 
-* defined in: [LoginEnvelope](loginresult.md "undefined#/properties/data")
+* defined in: [LoginEnvelope](loginenvelope-properties-data.md "undefined#/properties/data")
 
 ### data Type
 
-`object` ([LoginResult](loginresult.md))
+merged type ([Details](loginenvelope-properties-data.md))
+
+one (and only one) of
+
+* [LoginResult](loginresult.md "check type definition")
+
+* [LoginMfaChallenge](loginmfachallenge.md "check type definition")
 
 ## success
 

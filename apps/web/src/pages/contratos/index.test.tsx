@@ -20,6 +20,8 @@ const baseClaims: AuthClaims = {
     routeIds: [],
     channels: ['backoffice'],
   },
+  mfaEnabled: false,
+  mfaSetupRequired: false,
 }
 
 const sampleContrato: ContratoRow = {
@@ -72,6 +74,7 @@ function mockAuth(permissions: Permission[]) {
     status: 'authenticated',
     claims: { ...baseClaims, permissions },
     login: vi.fn(),
+    verifyMfa: vi.fn(),
     logout: vi.fn(),
     refresh: vi.fn(),
   })

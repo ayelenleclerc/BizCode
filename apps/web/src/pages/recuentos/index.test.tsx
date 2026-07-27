@@ -22,6 +22,8 @@ const baseClaims: AuthClaims = {
     routeIds: [],
     channels: ['warehouse'],
   },
+  mfaEnabled: false,
+  mfaSetupRequired: false,
 }
 
 const inProgressRecuento: Recuento = {
@@ -65,6 +67,7 @@ function mockAuth(permissions: Permission[]) {
     status: 'authenticated',
     claims: { ...baseClaims, permissions },
     login: vi.fn(),
+    verifyMfa: vi.fn(),
     logout: vi.fn(),
     refresh: vi.fn(),
   })

@@ -20,6 +20,8 @@ const baseClaims: AuthClaims = {
     routeIds: [],
     channels: ['backoffice'],
   },
+  mfaEnabled: false,
+  mfaSetupRequired: false,
 }
 
 const sampleOt: OrdenTrabajoRow = {
@@ -76,7 +78,8 @@ describe('OrdenesTrabajoPage', () => {
       claims: baseClaims,
       token: 't',
       login: vi.fn(),
-      logout: vi.fn(),
+    verifyMfa: vi.fn(),
+    logout: vi.fn(),
       loading: false,
     } as never)
     vi.mocked(ordenesTrabajoAPI.list).mockResolvedValue({
