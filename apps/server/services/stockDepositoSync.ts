@@ -1,4 +1,5 @@
 import type { Prisma, PrismaClient } from '@prisma/client'
+import { roundQty } from '../lib/uom'
 
 type TxClient = Prisma.TransactionClient | PrismaClient
 
@@ -16,7 +17,7 @@ export async function syncArticuloStockFromDepositos(
     where: { tenantId, articuloId },
     _sum: { cantidad: true },
   })
-  const total = agg._sum.cantidad ?? 0
+  const total = roundQty(Number(agg._sum.cantidad ?? 0))
   await tx.articulo.update({
     where: { id: articuloId },
     data: { stock: total },
@@ -42,7 +43,7 @@ export async function applyStockDepositoDelta(
   const existing = await tx.stockDeposito.findUnique({
     where: { articuloId_depositoId: { articuloId, depositoId } },
   })
-  const next = (existing?.cantidad ?? 0) + delta
+  const next = roundQty(Number(existing?.cantidad ?? 0) + delta)
   if (next < 0) {
     throw new Error('INSUFFICIENT_DEPOSIT_STOCK')
   }

@@ -14304,6 +14304,32 @@ components:
           nullable: true
           minimum: 1
           description: Warranty months for physical articles; null = no warranty (#251).
+        controlLote:
+          type: boolean
+          description: When true, stock movements require lot tracking / FEFO (#202).
+        unidadBase:
+          type: string
+          enum: [unidad, kg, gramo, litro, metro, m2, m3, rollo, caja]
+          description: Base stock/sale unit catalog (#203). Default unidad.
+        unidadCompra:
+          type: string
+          nullable: true
+          description: Purchase unit when different from base (#203).
+        factorConversion:
+          type: number
+          description: 1 purchase unit equals factorConversion base units (#203). Default 1.
+        multiploVenta:
+          type: number
+          nullable: true
+          description: Optional sale multiple for cut-to-size items (#203).
+        pesoKg:
+          type: number
+          nullable: true
+          description: Unit weight in kg for logistics (#203).
+        volumenM3:
+          type: number
+          nullable: true
+          description: Unit volume in m3 for logistics (#203).
         precioLista1:
           type: number
         precioLista2:
@@ -14311,9 +14337,11 @@ components:
         costo:
           type: number
         stock:
-          type: integer
+          type: number
+          description: Stock quantity in base units; Decimal(14,4) (#203).
         minimo:
-          type: integer
+          type: number
+          description: Minimum stock in base units; Decimal(14,4) (#203).
         activo:
           type: boolean
         monedaPrecio:
@@ -14357,6 +14385,34 @@ components:
           nullable: true
           minimum: 1
           description: Warranty months; ignored for servicio (#251).
+        controlLote:
+          type: boolean
+          description: Lot control opt-in (#202).
+        unidadBase:
+          type: string
+          enum: [unidad, kg, gramo, litro, metro, m2, m3, rollo, caja]
+          description: Base UoM; when set, umedida is derived (#203).
+        unidadCompra:
+          type: string
+          nullable: true
+          description: Purchase unit label (#203).
+        factorConversion:
+          type: number
+          exclusiveMinimum: 0
+          description: Purchase-to-base conversion factor (#203). Default 1.
+        multiploVenta:
+          type: number
+          exclusiveMinimum: 0
+          nullable: true
+          description: Sale multiple/step for cut-to-size (#203).
+        pesoKg:
+          type: number
+          minimum: 0
+          nullable: true
+        volumenM3:
+          type: number
+          minimum: 0
+          nullable: true
         precioLista1:
           type: number
           minimum: 0.01
@@ -14367,13 +14423,13 @@ components:
           type: number
           minimum: 0.01
         stock:
-          type: integer
+          type: number
           minimum: 0
-          description: Must be 0 when tipo is servicio (#244).
+          description: Must be 0 when tipo is servicio (#244). Decimal base units (#203).
         minimo:
-          type: integer
+          type: number
           minimum: 0
-          description: Must be 0 when tipo is servicio (#244).
+          description: Must be 0 when tipo is servicio (#244). Decimal base units (#203).
         activo:
           type: boolean
         monedaPrecio:
@@ -15429,6 +15485,16 @@ components:
           $ref: '#/components/schemas/Articulo'
         cantidad:
           type: number
+          description: Quantity in article base units; may be decimal for cut-to-size UoM (#203).
+        unidadMedida:
+          type: string
+          nullable: true
+          description: Base UoM snapshot at invoice time (#203).
+        codigoAfipUnidad:
+          type: string
+          nullable: true
+          maxLength: 2
+          description: AFIP WSFE UniMedida code snapshot (#203). Mock CAE has no line XML yet.
         precio:
           type: number
         dscto:
@@ -15445,8 +15511,9 @@ components:
         descripcion:
           type: string
         cantidad:
-          type: integer
-          minimum: 1
+          type: number
+          exclusiveMinimum: 0
+          description: Quantity; may be decimal when article UoM allows (#203).
         unidad:
           type: string
 

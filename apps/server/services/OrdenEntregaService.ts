@@ -79,7 +79,7 @@ function mapLineItems(row: OrdenEntregaRow): OrdenEntregaLineItem[] {
     .filter((item): item is typeof item & { articulo: NonNullable<typeof item.articulo> } => item.articulo != null)
     .map((item) => ({
       id: item.id,
-      cantidad: item.cantidad,
+      cantidad: Number(item.cantidad),
       articulo: item.articulo,
     }))
 }

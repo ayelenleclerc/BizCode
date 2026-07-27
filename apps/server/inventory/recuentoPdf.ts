@@ -24,10 +24,10 @@ export function buildRecuentoPdfBuffer(recuento: RecuentoPdfRow): Promise<Buffer
     doc.moveDown()
 
     const withDiff = recuento.items.filter(
-      (i) => i.cantFisica !== null && i.cantFisica - i.cantSistema !== 0,
+      (i) => i.cantFisica !== null && Number(i.cantFisica) - Number(i.cantSistema) !== 0,
     )
     const matched = recuento.items.filter(
-      (i) => i.cantFisica !== null && i.cantFisica - i.cantSistema === 0,
+      (i) => i.cantFisica !== null && Number(i.cantFisica) - Number(i.cantSistema) === 0,
     )
 
     doc.fontSize(12).text(`Lines with difference: ${withDiff.length}`)
@@ -39,7 +39,7 @@ export function buildRecuentoPdfBuffer(recuento: RecuentoPdfRow): Promise<Buffer
     } else {
       doc.fontSize(10)
       for (const item of withDiff) {
-        const diff = item.cantFisica! - item.cantSistema
+        const diff = Number(item.cantFisica!) - Number(item.cantSistema)
         doc.text(
           `${item.articulo.codigo} — ${item.articulo.descripcion}: system ${item.cantSistema}, physical ${item.cantFisica}, diff ${diff > 0 ? '+' : ''}${diff}`,
         )

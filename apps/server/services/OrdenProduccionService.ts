@@ -728,7 +728,9 @@ export class OrdenProduccionService {
         select: { articuloId: true, cantidad: true },
       }),
     ])
-    const fisicoByArticulo = new Map(stockRows.map((row) => [row.articuloId, row.cantidad]))
+    const fisicoByArticulo = new Map(
+      stockRows.map((row) => [row.articuloId, toRequiredNumber(row.cantidad)]),
+    )
     const reservadoByArticulo = new Map<number, number>()
     for (const reserva of reservas) {
       const current = reservadoByArticulo.get(reserva.articuloId) ?? 0

@@ -1,10 +1,10 @@
-# Untitled integer in RemitoItemInput Schema
+# Untitled number in RemitoItemInput Schema
 
 ```txt
 undefined#/properties/cantidad
 ```
 
-
+Quantity; may be decimal when article UoM allows (#203).
 
 | Abstract            | Extensible | Status         | Identifiable            | Custom Properties | Additional Properties | Access Restrictions | Defined In                                                                                         |
 | :------------------ | :--------- | :------------- | :---------------------- | :---------------- | :-------------------- | :------------------ | :------------------------------------------------------------------------------------------------- |
@@ -12,8 +12,8 @@ undefined#/properties/cantidad
 
 ## cantidad Type
 
-`integer`
+`number`
 
 ## cantidad Constraints
 
-**minimum**: the value of this number must greater than or equal to: `1`
+**minimum (exclusive)**: the value of this number must be greater than: `0`

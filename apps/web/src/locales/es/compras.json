@@ -49,6 +49,7 @@
     "item": "Ítem",
     "pending": "Pendiente",
     "cantidad": "Cantidad a recibir",
+    "unidadCompraHint": "La cantidad se recibe en unidad de compra (factor de conversión a unidad base: {{factor}}).",
     "nroLote": "Nº de lote",
     "fechaVencimiento": "Fecha de vencimiento"
   }

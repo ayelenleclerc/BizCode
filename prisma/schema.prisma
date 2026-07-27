@@ -283,6 +283,30 @@ model Articulo {
   /// @es Si es true, los movimientos de stock requieren lote / FEFO (#202).
   /// @pt-BR Se true, os movimentos de estoque exigem lote / FEFO (#202).
   controlLote  Boolean @default(false)
+  /// @en Base stock/sale unit catalog (#203).
+  /// @es Unidad base de stock/venta del catálogo (#203).
+  /// @pt-BR Unidade base de estoque/venda do catálogo (#203).
+  unidadBase   String  @default("unidad") @db.VarChar(12) // unidad|kg|gramo|litro|metro|m2|m3|rollo|caja
+  /// @en Purchase unit when different from base (#203).
+  /// @es Unidad de compra si difiere de la base (#203).
+  /// @pt-BR Unidade de compra se diferente da base (#203).
+  unidadCompra String? @db.VarChar(12)
+  /// @en 1 purchase unit = factorConversion base units (#203).
+  /// @es 1 unidad de compra = factorConversion unidades base (#203).
+  /// @pt-BR 1 unidade de compra = factorConversion unidades base (#203).
+  factorConversion Decimal @default(1) @db.Decimal(14, 6)
+  /// @en Optional sale multiple (e.g. 0.5 m); null = any allowed step (#203).
+  /// @es Múltiplo de venta opcional (ej. 0.5 m); null = cualquier paso (#203).
+  /// @pt-BR Múltiplo de venda opcional (ex. 0.5 m); null = qualquer passo (#203).
+  multiploVenta Decimal? @db.Decimal(14, 4)
+  /// @en Unit weight kg for logistics (#203).
+  /// @es Peso unitario en kg para logística (#203).
+  /// @pt-BR Peso unitário em kg para logística (#203).
+  pesoKg    Decimal? @db.Decimal(14, 4)
+  /// @en Unit volume m3 for logistics (#203).
+  /// @es Volumen unitario en m3 para logística (#203).
+  /// @pt-BR Volume unitário em m3 para logística (#203).
+  volumenM3 Decimal? @db.Decimal(14, 6)
   precioLista1 Decimal @db.Decimal(14, 2)
   precioLista2 Decimal @db.Decimal(14, 2)
   costo        Decimal @db.Decimal(13, 2)
@@ -294,8 +318,8 @@ model Articulo {
   /// @es Precio en moneda extranjera si monedaPrecio es USD/EUR; null para ARS (#243).
   /// @pt-BR Preço em moeda estrangeira se monedaPrecio for USD/EUR; null para ARS (#243).
   precioEnMonedaOrigen Decimal? @db.Decimal(14, 4)
-  stock        Int    @default(0) // DB: Articulo_stock_nonneg_check
-  minimo       Int    @default(0) // DB: Articulo_minimo_nonneg_check
+  stock        Decimal @default(0) @db.Decimal(14, 4) // DB: Articulo_stock_nonneg_check
+  minimo       Decimal @default(0) @db.Decimal(14, 4) // DB: Articulo_minimo_nonneg_check
   activo       Boolean @default(true)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
@@ -382,9 +406,9 @@ model StockDeposito {
   articulo   Articulo @relation(fields: [articuloId], references: [id], onDelete: Cascade)
   depositoId Int
   deposito   Deposito @relation(fields: [depositoId], references: [id], onDelete: Restrict)
-  cantidad   Int      @default(0)
-  stockMin   Int      @default(0)
-  stockMax   Int?
+  cantidad   Decimal  @default(0) @db.Decimal(14, 4)
+  stockMin   Decimal  @default(0) @db.Decimal(14, 4)
+  stockMax   Decimal? @db.Decimal(14, 4)
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
@@ -435,8 +459,8 @@ model TransferenciaDepositoItem {
   transferencia     TransferenciaDeposito @relation(fields: [transferenciaId], references: [id], onDelete: Cascade)
   articuloId        Int
   articulo          Articulo              @relation(fields: [articuloId], references: [id], onDelete: Restrict)
-  cantidadEnviada   Int
-  cantidadRecibida  Int?
+  cantidadEnviada   Decimal               @db.Decimal(14, 4)
+  cantidadRecibida  Decimal?              @db.Decimal(14, 4)
 
   @@unique([transferenciaId, articuloId])
   @@index([transferenciaId])
@@ -695,8 +719,8 @@ model OrdenCompraItem {
   codigoProveedor      String?     @db.VarChar(50)
   /// Supplier catalog description snapshot at PO create/update (#323).
   descripcionProveedor String?     @db.VarChar(120)
-  cantidad             Int
-  cantidadRecibida     Int         @default(0)
+  cantidad             Decimal     @db.Decimal(14, 4)
+  cantidadRecibida     Decimal     @default(0) @db.Decimal(14, 4)
   costoUnitario        Decimal     @db.Decimal(14, 2)
   subtotal             Decimal     @db.Decimal(14, 2)
 
@@ -734,8 +758,8 @@ model RecuentoItem {
   recuento    Recuento @relation(fields: [recuentoId], references: [id], onDelete: Cascade)
   articuloId  Int
   articulo    Articulo @relation(fields: [articuloId], references: [id])
-  cantSistema Int
-  cantFisica  Int?
+  cantSistema Decimal  @db.Decimal(14, 4)
+  cantFisica  Decimal? @db.Decimal(14, 4)
 
   @@unique([recuentoId, articuloId])
   @@index([recuentoId])
@@ -918,7 +942,7 @@ model ContratoItem {
   descripcion    String    @db.VarChar(120)
   condIva        String    @default("1") @db.VarChar(1)
   unidadServicio String?   @db.VarChar(12)
-  cantidad       Int       @default(1)
+  cantidad       Decimal   @default(1) @db.Decimal(14, 4)
   precioUnit     Decimal   @db.Decimal(14, 2)
   dscto          Decimal   @db.Decimal(5, 2) @default(0)
   createdAt      DateTime  @default(now())
@@ -1252,7 +1276,7 @@ model RemitoItem {
   articuloId  Int
   articulo    Articulo @relation(fields: [articuloId], references: [id])
   descripcion String   @db.VarChar(120)
-  cantidad    Int      @default(1)
+  cantidad    Decimal  @default(1) @db.Decimal(14, 4)
   unidad      String   @db.VarChar(6)
   createdAt   DateTime @default(now())
 }
@@ -1325,7 +1349,7 @@ model PedidoItem {
   descripcion String @default("") @db.VarChar(120)
   condIva     String @default("1") @db.VarChar(1)
   unidadServicio String? @db.VarChar(12)
-  cantidad   Int     @default(1)
+  cantidad   Decimal @default(1) @db.Decimal(14, 4)
   precio     Decimal @db.Decimal(14, 2)
   dscto      Decimal @db.Decimal(5, 2) @default(0)
   subtotal   Decimal @db.Decimal(14, 2)
@@ -1354,7 +1378,7 @@ model FacturaItem {
   condIva     String @default("1") @db.VarChar(1)
   unidadServicio String? @db.VarChar(12)
 
-  cantidad  Int       @default(1)
+  cantidad  Decimal   @default(1) @db.Decimal(14, 4)
   precio    Decimal   @db.Decimal(14, 2)
   dscto     Decimal   @db.Decimal(5, 2) @default(0)
   subtotal  Decimal   @db.Decimal(14, 2)
@@ -1365,6 +1389,15 @@ model FacturaItem {
   monedaOrigen     String?  @db.VarChar(3)
   precioOrigen     Decimal? @db.Decimal(14, 4)
   tipoCambioValor  Decimal? @db.Decimal(14, 4)
+
+  /// @en Base UoM snapshot at invoice time (#203).
+  /// @es Snapshot de la unidad base al momento de facturar (#203).
+  /// @pt-BR Snapshot da unidade base no momento da fatura (#203).
+  unidadMedida     String?  @db.VarChar(12)
+  /// @en AFIP UniMedida code snapshot (#203).
+  /// @es Código UniMedida de AFIP snapshot (#203).
+  /// @pt-BR Código UniMedida da AFIP snapshot (#203).
+  codigoAfipUnidad String?  @db.VarChar(2)
 
   /// @en Lot consumed for FEFO-tracked articles (#202).
   /// @es Lote consumido para artículos con FEFO (#202).
@@ -2446,8 +2479,8 @@ model Lote {
   nroLote          String    @db.VarChar(60)
   fechaVencimiento DateTime  @db.Date
   fechaIngreso     DateTime  @default(now())
-  stockInicial     Int
-  stockActual      Int
+  stockInicial     Decimal   @db.Decimal(14, 4)
+  stockActual      Decimal   @db.Decimal(14, 4)
   activo           Boolean   @default(true)
   preavisoEnviadoAt DateTime?
   createdAt        DateTime  @default(now())
@@ -2523,7 +2556,7 @@ model StockAjuste {
   tenant     Tenant   @relation(fields: [tenantId], references: [id])
   articuloId Int
   articulo   Articulo @relation(fields: [articuloId], references: [id])
-  cantidad   Int
+  cantidad   Decimal  @db.Decimal(14, 4)
   motivo     String   @db.VarChar(100)
   userId     Int
   user       AppUser  @relation(fields: [userId], references: [id])

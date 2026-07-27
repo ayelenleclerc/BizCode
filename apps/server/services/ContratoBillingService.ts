@@ -167,11 +167,11 @@ export class ContratoBillingService {
       descripcion: item.descripcion,
       condIva: item.condIva as '1' | '2' | '3',
       unidadServicio: item.unidadServicio as ContratoInput['items'][number]['unidadServicio'],
-      cantidad: item.cantidad,
+      cantidad: Number(item.cantidad),
       precio: item.precioUnit.toNumber(),
       dscto: item.dscto.toNumber(),
       subtotal: calculateItemSubtotal(
-        item.cantidad,
+        Number(item.cantidad),
         item.precioUnit.toNumber(),
         item.dscto.toNumber(),
       ),

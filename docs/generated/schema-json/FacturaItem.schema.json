@@ -11,7 +11,14 @@
       "type": "integer"
     },
     "cantidad": {
+      "description": "Quantity in article base units; may be decimal for cut-to-size UoM (#203).",
       "type": "number"
+    },
+    "codigoAfipUnidad": {
+      "description": "AFIP WSFE UniMedida code snapshot (#203). Mock CAE has no line XML yet.",
+      "maxLength": 2,
+      "nullable": true,
+      "type": "string"
     },
     "condIva": {
       "enum": [
@@ -37,6 +44,11 @@
     },
     "subtotal": {
       "type": "number"
+    },
+    "unidadMedida": {
+      "description": "Base UoM snapshot at invoice time (#203).",
+      "nullable": true,
+      "type": "string"
     },
     "unidadServicio": {
       "enum": [

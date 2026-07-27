@@ -4,7 +4,7 @@
 undefined#/properties/cantidad
 ```
 
-
+Quantity in article base units; may be decimal for cut-to-size UoM (#203).
 
 | Abstract            | Extensible | Status         | Identifiable            | Custom Properties | Additional Properties | Access Restrictions | Defined In                                                                                 |
 | :------------------ | :--------- | :------------- | :---------------------- | :---------------- | :-------------------- | :------------------ | :----------------------------------------------------------------------------------------- |

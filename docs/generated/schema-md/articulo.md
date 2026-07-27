@@ -21,21 +21,28 @@ undefined#/properties/articulo
 | [activo](#activo)                             | `boolean` | Optional | cannot be null | [Articulo](articulo-properties-activo.md "undefined#/properties/activo")                             |
 | [codigo](#codigo)                             | `integer` | Optional | cannot be null | [Articulo](articulo-properties-codigo.md "undefined#/properties/codigo")                             |
 | [condIva](#condiva)                           | `string`  | Optional | cannot be null | [Articulo](articulo-properties-condiva.md "undefined#/properties/condIva")                           |
+| [controlLote](#controllote)                   | `boolean` | Optional | cannot be null | [Articulo](articulo-properties-controllote.md "undefined#/properties/controlLote")                   |
 | [costo](#costo)                               | `number`  | Optional | cannot be null | [Articulo](articulo-properties-costo.md "undefined#/properties/costo")                               |
 | [descripcion](#descripcion)                   | `string`  | Optional | cannot be null | [Articulo](articulo-properties-descripcion.md "undefined#/properties/descripcion")                   |
+| [factorConversion](#factorconversion)         | `number`  | Optional | cannot be null | [Articulo](articulo-properties-factorconversion.md "undefined#/properties/factorConversion")         |
 | [id](#id)                                     | `integer` | Optional | cannot be null | [Articulo](articulo-properties-id.md "undefined#/properties/id")                                     |
 | [mesesGarantia](#mesesgarantia)               | `integer` | Optional | cannot be null | [Articulo](articulo-properties-mesesgarantia.md "undefined#/properties/mesesGarantia")               |
-| [minimo](#minimo)                             | `integer` | Optional | cannot be null | [Articulo](articulo-properties-minimo.md "undefined#/properties/minimo")                             |
+| [minimo](#minimo)                             | `number`  | Optional | cannot be null | [Articulo](articulo-properties-minimo.md "undefined#/properties/minimo")                             |
 | [monedaPrecio](#monedaprecio)                 | `string`  | Optional | cannot be null | [Articulo](articulo-properties-monedaprecio.md "undefined#/properties/monedaPrecio")                 |
+| [multiploVenta](#multiploventa)               | `number`  | Optional | cannot be null | [Articulo](articulo-properties-multiploventa.md "undefined#/properties/multiploVenta")               |
+| [pesoKg](#pesokg)                             | `number`  | Optional | cannot be null | [Articulo](articulo-properties-pesokg.md "undefined#/properties/pesoKg")                             |
 | [precioEnMonedaOrigen](#precioenmonedaorigen) | `number`  | Optional | cannot be null | [Articulo](articulo-properties-precioenmonedaorigen.md "undefined#/properties/precioEnMonedaOrigen") |
 | [precioLista1](#preciolista1)                 | `number`  | Optional | cannot be null | [Articulo](articulo-properties-preciolista1.md "undefined#/properties/precioLista1")                 |
 | [precioLista2](#preciolista2)                 | `number`  | Optional | cannot be null | [Articulo](articulo-properties-preciolista2.md "undefined#/properties/precioLista2")                 |
 | [rubro](#rubro)                               | `object`  | Optional | cannot be null | [Articulo](rubro.md "undefined#/properties/rubro")                                                   |
 | [rubroId](#rubroid)                           | `integer` | Optional | cannot be null | [Articulo](articulo-properties-rubroid.md "undefined#/properties/rubroId")                           |
-| [stock](#stock)                               | `integer` | Optional | cannot be null | [Articulo](articulo-properties-stock.md "undefined#/properties/stock")                               |
+| [stock](#stock)                               | `number`  | Optional | cannot be null | [Articulo](articulo-properties-stock.md "undefined#/properties/stock")                               |
 | [tipo](#tipo)                                 | `string`  | Optional | cannot be null | [Articulo](articulo-properties-tipo.md "undefined#/properties/tipo")                                 |
 | [umedida](#umedida)                           | `string`  | Optional | cannot be null | [Articulo](articulo-properties-umedida.md "undefined#/properties/umedida")                           |
+| [unidadBase](#unidadbase)                     | `string`  | Optional | cannot be null | [Articulo](articulo-properties-unidadbase.md "undefined#/properties/unidadBase")                     |
+| [unidadCompra](#unidadcompra)                 | `string`  | Optional | cannot be null | [Articulo](articulo-properties-unidadcompra.md "undefined#/properties/unidadCompra")                 |
 | [unidadServicio](#unidadservicio)             | `string`  | Optional | cannot be null | [Articulo](articulo-properties-unidadservicio.md "undefined#/properties/unidadServicio")             |
+| [volumenM3](#volumenm3)                       | `number`  | Optional | cannot be null | [Articulo](articulo-properties-volumenm3.md "undefined#/properties/volumenM3")                       |
 | Additional Properties                         | Any       | Optional | can be null    |                                                                                                      |
 
 ## activo
@@ -92,6 +99,24 @@ undefined#/properties/articulo
 
 `string`
 
+## controlLote
+
+When true, stock movements require lot tracking / FEFO (#202).
+
+`controlLote`
+
+* is optional
+
+* Type: `boolean`
+
+* cannot be null
+
+* defined in: [Articulo](articulo-properties-controllote.md "undefined#/properties/controlLote")
+
+### controlLote Type
+
+`boolean`
+
 ## costo
 
 
@@ -127,6 +152,24 @@ undefined#/properties/articulo
 ### descripcion Type
 
 `string`
+
+## factorConversion
+
+1 purchase unit equals factorConversion base units (#203). Default 1.
+
+`factorConversion`
+
+* is optional
+
+* Type: `number`
+
+* cannot be null
+
+* defined in: [Articulo](articulo-properties-factorconversion.md "undefined#/properties/factorConversion")
+
+### factorConversion Type
+
+`number`
 
 ## id
 
@@ -170,13 +213,13 @@ Warranty months for physical articles; null = no warranty (#251).
 
 ## minimo
 
-
+Minimum stock in base units; Decimal(14,4) (#203).
 
 `minimo`
 
 * is optional
 
-* Type: `integer`
+* Type: `number`
 
 * cannot be null
 
@@ -184,7 +227,7 @@ Warranty months for physical articles; null = no warranty (#251).
 
 ### minimo Type
 
-`integer`
+`number`
 
 ## monedaPrecio
 
@@ -221,6 +264,42 @@ The default value is:
 ```json
 "ARS"
 ```
+
+## multiploVenta
+
+Optional sale multiple for cut-to-size items (#203).
+
+`multiploVenta`
+
+* is optional
+
+* Type: `number`
+
+* cannot be null
+
+* defined in: [Articulo](articulo-properties-multiploventa.md "undefined#/properties/multiploVenta")
+
+### multiploVenta Type
+
+`number`
+
+## pesoKg
+
+Unit weight in kg for logistics (#203).
+
+`pesoKg`
+
+* is optional
+
+* Type: `number`
+
+* cannot be null
+
+* defined in: [Articulo](articulo-properties-pesokg.md "undefined#/properties/pesoKg")
+
+### pesoKg Type
+
+`number`
 
 ## precioEnMonedaOrigen
 
@@ -314,13 +393,13 @@ The default value is:
 
 ## stock
 
-
+Stock quantity in base units; Decimal(14,4) (#203).
 
 `stock`
 
 * is optional
 
-* Type: `integer`
+* Type: `number`
 
 * cannot be null
 
@@ -328,7 +407,7 @@ The default value is:
 
 ### stock Type
 
-`integer`
+`number`
 
 ## tipo
 
@@ -375,6 +454,58 @@ Catalog item kind (#244). Default articulo.
 
 `string`
 
+## unidadBase
+
+Base stock/sale unit catalog (#203). Default unidad.
+
+`unidadBase`
+
+* is optional
+
+* Type: `string`
+
+* cannot be null
+
+* defined in: [Articulo](articulo-properties-unidadbase.md "undefined#/properties/unidadBase")
+
+### unidadBase Type
+
+`string`
+
+### unidadBase Constraints
+
+**enum**: the value of this property must be equal to one of the following values:
+
+| Value      | Explanation |
+| :--------- | :---------- |
+| `"unidad"` |             |
+| `"kg"`     |             |
+| `"gramo"`  |             |
+| `"litro"`  |             |
+| `"metro"`  |             |
+| `"m2"`     |             |
+| `"m3"`     |             |
+| `"rollo"`  |             |
+| `"caja"`   |             |
+
+## unidadCompra
+
+Purchase unit when different from base (#203).
+
+`unidadCompra`
+
+* is optional
+
+* Type: `string`
+
+* cannot be null
+
+* defined in: [Articulo](articulo-properties-unidadcompra.md "undefined#/properties/unidadCompra")
+
+### unidadCompra Type
+
+`string`
+
 ## unidadServicio
 
 Required when tipo is servicio (#244).
@@ -406,6 +537,24 @@ Required when tipo is servicio (#244).
 | `"km"`       |             |
 | `"unidad"`   |             |
 | `"otro"`     |             |
+
+## volumenM3
+
+Unit volume in m3 for logistics (#203).
+
+`volumenM3`
+
+* is optional
+
+* Type: `number`
+
+* cannot be null
+
+* defined in: [Articulo](articulo-properties-volumenm3.md "undefined#/properties/volumenM3")
+
+### volumenM3 Type
+
+`number`
 
 ## Additional Properties
 

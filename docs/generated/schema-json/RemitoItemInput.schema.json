@@ -5,8 +5,9 @@
       "type": "integer"
     },
     "cantidad": {
-      "minimum": 1,
-      "type": "integer"
+      "description": "Quantity; may be decimal when article UoM allows (#203).",
+      "exclusiveMinimum": 0,
+      "type": "number"
     },
     "descripcion": {
       "type": "string"

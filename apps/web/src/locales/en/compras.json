@@ -49,6 +49,7 @@
     "item": "Line",
     "pending": "Pending",
     "cantidad": "Quantity to receive",
+    "unidadCompraHint": "Quantity is received in the purchase unit (conversion factor to base unit: {{factor}}).",
     "nroLote": "Lot number",
     "fechaVencimiento": "Expiry date"
   }

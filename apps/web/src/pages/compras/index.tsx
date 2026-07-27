@@ -6,10 +6,37 @@ import ErrorBoundary from '@/components/ErrorBoundary'
 import AsyncWrapper from '@/components/shared/AsyncWrapper'
 import KeyboardHint, { useGlobalListShortcuts } from '@/components/shared/KeyboardHint'
 import { useListKeyboardNav, useListPageHotkeys } from '@/hooks/useListPageKeyboard'
-import { comprasAPI, proveedoresAPI, type OrdenCompra, type OrdenCompraItemRow } from '@/lib/api'
+import { articulosAPI, comprasAPI, proveedoresAPI, type OrdenCompra, type OrdenCompraItemRow } from '@/lib/api'
 import type { ComprasOcPrefillState } from '@/lib/comprasOcPrefill'
+import { useFeatureFlags } from '@/contexts/FeatureFlagsContext'
+import { allowsDecimalQuantity, type Articulo, type UnidadBase } from '@bizcode/types'
 
 const ESTADOS = ['draft', 'sent', 'received', 'cancelled'] as const
+
+type ReceiveQuantityConfig = {
+  decimalAllowed: boolean
+  step: string
+  factorConversion: number
+}
+
+/**
+ * @en Resolves the receive-quantity input rules for an OC line from its catalog article's UoM data (#203); defaults to integer-only when the module is disabled or the article isn't loaded yet.
+ * @es Resuelve las reglas del input de cantidad a recibir para una línea de OC según los datos UoM del artículo de catálogo (#203); usa enteros por defecto si el módulo está deshabilitado o el artículo aún no cargó.
+ * @pt-BR Resolve as regras do input de quantidade a receber para uma linha de OC a partir dos dados UoM do artigo de catálogo (#203); usa somente inteiros por padrão quando o módulo está desabilitado ou o artigo ainda não carregou.
+ */
+function resolveReceiveQuantityConfig(articulo: Articulo | undefined, uomEnabled: boolean): ReceiveQuantityConfig {
+  if (!uomEnabled || !articulo) {
+    return { decimalAllowed: false, step: '1', factorConversion: 1 }
+  }
+  const unidadBase = (articulo.unidadBase ?? 'unidad') as UnidadBase
+  const multiploVenta = articulo.multiploVenta != null ? Number(articulo.multiploVenta) : null
+  const factorConversion = articulo.factorConversion != null ? Number(articulo.factorConversion) : 1
+  return {
+    decimalAllowed: allowsDecimalQuantity(unidadBase, multiploVenta),
+    step: allowsDecimalQuantity(unidadBase, multiploVenta) ? '0.0001' : '1',
+    factorConversion,
+  }
+}
 
 function formatMoney(value: string): string {
   const n = Number.parseFloat(value)
@@ -48,6 +75,9 @@ function ComprasPageContent() {
   const { t } = useTranslation('compras')
   const location = useLocation()
   const navigate = useNavigate()
+  const { hasModule } = useFeatureFlags()
+  const uomModule = hasModule('inventory.uom')
+  const [articulosById, setArticulosById] = useState<Record<number, Articulo>>({})
   const [ordenes, setOrdenes] = useState<OrdenCompra[]>([])
   const [loading, setLoading] = useState(false)
   const [loadError, setLoadError] = useState<Error | null>(null)
@@ -87,6 +117,32 @@ function ComprasPageContent() {
   useEffect(() => {
     void loadList()
   }, [loadList])
+
+  // UoM (#203): OC item rows only carry id/codigo/descripcion/controlLote for the article;
+  // load the catalog once to resolve unidadBase/factorConversion/multiploVenta for the receive dialog.
+  useEffect(() => {
+    if (!uomModule) {
+      setArticulosById({})
+      return
+    }
+    let cancelled = false
+    void articulosAPI
+      .list()
+      .then((list: Articulo[] | undefined) => {
+        if (cancelled || !list) return
+        const map: Record<number, Articulo> = {}
+        for (const articulo of list) {
+          map[articulo.id] = articulo
+        }
+        setArticulosById(map)
+      })
+      .catch(() => {
+        if (!cancelled) setArticulosById({})
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [uomModule])
 
   useEffect(() => {
     const prefill = (location.state as ComprasOcPrefillState | null)?.ocPrefill
@@ -221,8 +277,10 @@ function ComprasPageContent() {
     if (!selected) return
     const lines = selected.items
       .map((item) => {
-        const cantidad = Number.parseInt(receiveQty[item.id] ?? '', 10)
-        if (!Number.isFinite(cantidad) || cantidad < 1) return null
+        const qtyConfig = resolveReceiveQuantityConfig(articulosById[item.articuloId], uomModule)
+        const raw = receiveQty[item.id] ?? ''
+        const cantidad = qtyConfig.decimalAllowed ? Number.parseFloat(raw) : Number.parseInt(raw, 10)
+        if (!Number.isFinite(cantidad) || cantidad <= 0) return null
         const needsLot = item.articulo?.controlLote === true
         const nroLote = (receiveLote[item.id] ?? '').trim()
         const fechaVencimiento = (receiveVenc[item.id] ?? '').trim()
@@ -560,6 +618,10 @@ function ComprasPageContent() {
                 {selected.items.map((item) => {
                   const pending = item.cantidad - item.cantidadRecibida
                   if (pending <= 0) return null
+                  const articulo = articulosById[item.articuloId]
+                  const qtyConfig = resolveReceiveQuantityConfig(articulo, uomModule)
+                  const showUnidadCompraHint = uomModule && qtyConfig.factorConversion !== 1
+                  const unidadHintId = `compras-receive-unidad-hint-${item.id}`
                   return (
                     <li key={item.id} className="border-b pb-2">
                       <p className="text-sm font-medium">
@@ -574,14 +636,27 @@ function ComprasPageContent() {
                       <input
                         id={`compras-receive-${item.id}`}
                         type="number"
-                        min={1}
+                        min={qtyConfig.decimalAllowed ? undefined : 1}
+                        step={qtyConfig.step}
+                        inputMode={qtyConfig.decimalAllowed ? 'decimal' : 'numeric'}
                         max={pending}
+                        data-testid={`compras-receive-cantidad-${item.id}`}
+                        aria-describedby={showUnidadCompraHint ? unidadHintId : undefined}
                         className="mt-1 w-24 border rounded px-2 py-1 dark:bg-slate-800"
                         value={receiveQty[item.id] ?? ''}
                         onChange={(e) =>
                           setReceiveQty((prev) => ({ ...prev, [item.id]: e.target.value }))
                         }
                       />
+                      {showUnidadCompraHint ? (
+                        <p
+                          id={unidadHintId}
+                          data-testid={unidadHintId}
+                          className="mt-1 text-xs text-amber-700 dark:text-amber-400"
+                        >
+                          {t('receive.unidadCompraHint', { factor: qtyConfig.factorConversion })}
+                        </p>
+                      ) : null}
                       {item.articulo?.controlLote ? (
                         <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-2">
                           <div>

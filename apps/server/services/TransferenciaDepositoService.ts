@@ -44,8 +44,8 @@ function mapTransferencia(row: TransferenciaDb): TransferenciaDepositoRow {
       id: it.id,
       transferenciaId: it.transferenciaId,
       articuloId: it.articuloId,
-      cantidadEnviada: it.cantidadEnviada,
-      cantidadRecibida: it.cantidadRecibida,
+      cantidadEnviada: Number(it.cantidadEnviada),
+      cantidadRecibida: it.cantidadRecibida != null ? Number(it.cantidadRecibida) : null,
       articuloCodigo: it.articulo.codigo,
       articuloDescripcion: it.articulo.descripcion,
     })),
@@ -178,7 +178,7 @@ export class TransferenciaDepositoService {
             tenantId,
             articuloId: item.articuloId,
             depositoId: existing.origenId,
-            delta: -item.cantidadEnviada,
+            delta: -Number(item.cantidadEnviada),
           })
         }
         await tx.transferenciaDeposito.update({
@@ -219,7 +219,7 @@ export class TransferenciaDepositoService {
     for (const line of input.items) {
       const item = byArt.get(line.articuloId)
       if (!item) return { ok: false, status: 400, error: 'Invalid articuloId in receive items' }
-      if (line.cantidadRecibida > item.cantidadEnviada) {
+      if (line.cantidadRecibida > Number(item.cantidadEnviada)) {
         return { ok: false, status: 422, error: 'RECEIVE_EXCEEDS_SENT' }
       }
     }
@@ -254,7 +254,7 @@ export class TransferenciaDepositoService {
             delta: line.cantidadRecibida,
           })
         }
-        const faltante = item.cantidadEnviada - line.cantidadRecibida
+        const faltante = Number(item.cantidadEnviada) - line.cantidadRecibida
         if (faltante > 0) {
           await tx.stockAjuste.create({
             data: {
@@ -296,7 +296,7 @@ export class TransferenciaDepositoService {
             tenantId,
             articuloId: item.articuloId,
             depositoId: existing.origenId,
-            delta: item.cantidadEnviada,
+            delta: Number(item.cantidadEnviada),
           })
         }
       }

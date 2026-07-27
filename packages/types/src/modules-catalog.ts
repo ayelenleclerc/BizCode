@@ -217,6 +217,14 @@ export const MODULE_CATALOG = {
     plan: 'enterprise',
     price: 3000,
   },
+  'inventory.uom': {
+    label: 'Unidades de medida / corte',
+    required: false,
+    requiredInProd: false,
+    dependencies: ['inventory.stock', 'core.catalog'],
+    plan: 'pro',
+    price: 2000,
+  },
   'apps.driver': {
     label: 'App Repartidor',
     required: false,

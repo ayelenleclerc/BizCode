@@ -102,9 +102,39 @@
       "sourcePrice": "Preço na moeda de origem",
       "sourcePriceHint": "Valor expresso em {{currency}}."
     },
+    "uom": {
+      "title": "Unidades de medida",
+      "unidadBase": "Unidade base",
+      "unidadBaseOptions": {
+        "unidad": "Unidade",
+        "kg": "Quilograma",
+        "gramo": "Grama",
+        "litro": "Litro",
+        "metro": "Metro",
+        "m2": "Metro quadrado",
+        "m3": "Metro cúbico",
+        "rollo": "Rolo",
+        "caja": "Caixa"
+      },
+      "unidadCompra": "Unidade de compra",
+      "unidadCompraPlaceholder": "Ex.: caixa x12, rolo 50m",
+      "unidadCompraHint": "Rótulo livre para a unidade de compra; pode diferir da unidade base.",
+      "factorConversion": "Fator de conversão",
+      "factorConversionHint": "Quantas unidades base equivalem a 1 unidade de compra.",
+      "multiploVenta": "Múltiplo de venda",
+      "multiploVentaHint": "Passo/múltiplo permitido na venda (para itens sob medida).",
+      "pesoKg": "Peso (kg)",
+      "volumenM3": "Volume (m³)",
+      "decimalAllowedHint": "Esta unidade permite quantidades decimais (sob medida).",
+      "decimalNotAllowedHint": "Esta unidade exige quantidades inteiras."
+    },
     "errors": {
       "generic": "Erro ao salvar produto",
-      "foreignPriceRequired": "Informe um preço na moeda de origem."
+      "foreignPriceRequired": "Informe um preço na moeda de origem.",
+      "factorConversionPositive": "O fator de conversão deve ser maior que 0.",
+      "multiploVentaPositive": "O múltiplo de venda deve ser maior que 0.",
+      "pesoKgNonNegative": "O peso não pode ser negativo.",
+      "volumenM3NonNegative": "O volume não pode ser negativo."
     }
   },
   "stockAdjust": {

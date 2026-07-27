@@ -102,9 +102,39 @@
       "sourcePrice": "Price in source currency",
       "sourcePriceHint": "Amount expressed in {{currency}}."
     },
+    "uom": {
+      "title": "Units of measure",
+      "unidadBase": "Base unit",
+      "unidadBaseOptions": {
+        "unidad": "Unit",
+        "kg": "Kilogram",
+        "gramo": "Gram",
+        "litro": "Liter",
+        "metro": "Meter",
+        "m2": "Square meter",
+        "m3": "Cubic meter",
+        "rollo": "Roll",
+        "caja": "Box"
+      },
+      "unidadCompra": "Purchase unit",
+      "unidadCompraPlaceholder": "E.g.: box x12, 50m roll",
+      "unidadCompraHint": "Free-text label for the unit purchased; may differ from the base unit.",
+      "factorConversion": "Conversion factor",
+      "factorConversionHint": "How many base units equal 1 purchase unit.",
+      "multiploVenta": "Sale multiple",
+      "multiploVentaHint": "Allowed step/multiple when selling (for cut-to-size items).",
+      "pesoKg": "Weight (kg)",
+      "volumenM3": "Volume (m³)",
+      "decimalAllowedHint": "This unit allows decimal quantities (cut-to-size).",
+      "decimalNotAllowedHint": "This unit requires whole-number quantities."
+    },
     "errors": {
       "generic": "Error saving product",
-      "foreignPriceRequired": "Enter a price in the source currency."
+      "foreignPriceRequired": "Enter a price in the source currency.",
+      "factorConversionPositive": "Conversion factor must be greater than 0.",
+      "multiploVentaPositive": "Sale multiple must be greater than 0.",
+      "pesoKgNonNegative": "Weight cannot be negative.",
+      "volumenM3NonNegative": "Volume cannot be negative."
     }
   },
   "stockAdjust": {

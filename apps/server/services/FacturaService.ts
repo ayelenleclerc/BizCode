@@ -17,6 +17,7 @@ import { GarantiaService } from './GarantiaService'
 import { FidelizacionService } from './FidelizacionService'
 import { LoteService } from './LoteService'
 import { TurnoCajaService } from './TurnoCajaService'
+import { afipCodigoForUnidad, isUnidadBase, roundQty, validateQuantityForUom } from '../lib/uom'
 
 type FacturaWithRelations = Prisma.FacturaGetPayload<{ include: { cliente: true; items: true } }>
 
@@ -118,7 +119,7 @@ export class FacturaService {
           .filter((id): id is number => typeof id === 'number' && id >= 1),
       ),
     ]
-    const articulos =
+    const articulosRaw =
       catalogIds.length > 0
         ? await this.prisma.articulo.findMany({
             where: { tenantId, id: { in: catalogIds } },
@@ -136,17 +137,20 @@ export class FacturaService {
               esPadre: true,
               monedaPrecio: true,
               precioEnMonedaOrigen: true,
+              unidadBase: true,
+              multiploVenta: true,
+              factorConversion: true,
             },
           })
         : []
-    if (articulos.length !== catalogIds.length) {
+    if (articulosRaw.length !== catalogIds.length) {
       return {
         ok: false,
         status: 400,
         error: 'One or more articuloId values are not valid for this tenant',
       }
     }
-    if (articulos.some((a) => a.esPadre)) {
+    if (articulosRaw.some((a) => a.esPadre)) {
       return {
         ok: false,
         status: 400,
@@ -154,8 +158,33 @@ export class FacturaService {
       }
     }
 
+    // @en Decimal(14,4) columns arrive as Prisma Decimal; normalize to number once for downstream arithmetic (#203).
+    // @es Las columnas Decimal(14,4) llegan como Prisma Decimal; se normalizan a number una vez para la aritmética posterior (#203).
+    // @pt-BR As colunas Decimal(14,4) chegam como Prisma Decimal; normalizadas para number uma vez para a aritmética seguinte (#203).
+    const articulos = articulosRaw.map((a) => ({
+      ...a,
+      stock: Number(a.stock),
+      minimo: Number(a.minimo),
+      multiploVenta: a.multiploVenta != null ? Number(a.multiploVenta) : null,
+      factorConversion: Number(a.factorConversion),
+    }))
+
     const articuloById = new Map(articulos.map((a) => [a.id, a]))
     const tipoById = new Map(articulos.map((a) => [a.id, a.tipo]))
+
+    for (const it of items) {
+      if (it.articuloId == null) continue
+      const art = articuloById.get(it.articuloId)
+      if (!art || art.tipo === 'servicio' || !isUnidadBase(art.unidadBase)) continue
+      const qtyCheck = validateQuantityForUom({
+        cantidad: it.cantidad,
+        unidadBase: art.unidadBase,
+        multiploVenta: art.multiploVenta,
+      })
+      if (!qtyCheck.ok) {
+        return { ok: false, status: 422, error: `articuloId ${it.articuloId}: ${qtyCheck.error}` }
+      }
+    }
 
     const fxMonedas = [
       ...new Set(
@@ -213,6 +242,7 @@ export class FacturaService {
           art.precioEnMonedaOrigen != null
             ? Number(art.precioEnMonedaOrigen.toString())
             : null
+        const unidadBase = art.unidadBase
         return {
           articuloId: it.articuloId,
           descripcion: (art.descripcion ?? '').slice(0, 120),
@@ -225,6 +255,8 @@ export class FacturaService {
           monedaOrigen: fx && origen != null ? art.monedaPrecio : null,
           precioOrigen: fx && origen != null ? origen : null,
           tipoCambioValor: fx && origen != null ? fx.valor : null,
+          unidadMedida: isUnidadBase(unidadBase) ? unidadBase : null,
+          codigoAfipUnidad: isUnidadBase(unidadBase) ? afipCodigoForUnidad(unidadBase) : null,
           loteId: null as number | null,
         }
       }
@@ -240,6 +272,8 @@ export class FacturaService {
         monedaOrigen: null as string | null,
         precioOrigen: null as number | null,
         tipoCambioValor: null as number | null,
+        unidadMedida: null as string | null,
+        codigoAfipUnidad: null as string | null,
         loteId: null as number | null,
       }
     })
@@ -271,7 +305,7 @@ export class FacturaService {
         },
         select: { articuloId: true, cantidad: true },
       })
-      const qtyInDeposit = new Map(stockRows.map((r) => [r.articuloId, r.cantidad]))
+      const qtyInDeposit = new Map(stockRows.map((r) => [r.articuloId, Number(r.cantidad)]))
       const depositSnapshots = articulos.map((a) => ({
         ...a,
         stock: qtyInDeposit.get(a.id) ?? 0,
@@ -372,7 +406,7 @@ export class FacturaService {
               const share = alloc.cantidad / line.cantidad
               expanded.push({
                 ...line,
-                cantidad: alloc.cantidad,
+                cantidad: roundQty(alloc.cantidad),
                 subtotal: roundMoney(line.subtotal * share),
                 loteId: alloc.loteId,
               })
@@ -497,7 +531,7 @@ export class FacturaService {
         clienteId,
         total: Number(newFactura.total.toString()),
         items: newFactura.items.map((fi) => ({
-          cantidad: fi.cantidad,
+          cantidad: Number(fi.cantidad),
           precio: Number(fi.precio.toString()),
           dscto: Number(fi.dscto.toString()),
           subtotal: Number(fi.subtotal.toString()),

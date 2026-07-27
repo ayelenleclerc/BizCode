@@ -1,10 +1,10 @@
-# Untitled integer in ArticuloInput Schema
+# Untitled number in ArticuloInput Schema
 
 ```txt
 undefined#/properties/stock
 ```
 
-Must be 0 when tipo is servicio (#244).
+Must be 0 when tipo is servicio (#244). Decimal base units (#203).
 
 | Abstract            | Extensible | Status         | Identifiable            | Custom Properties | Additional Properties | Access Restrictions | Defined In                                                                                     |
 | :------------------ | :--------- | :------------- | :---------------------- | :---------------- | :-------------------- | :------------------ | :--------------------------------------------------------------------------------------------- |
@@ -12,7 +12,7 @@ Must be 0 when tipo is servicio (#244).
 
 ## stock Type
 
-`integer`
+`number`
 
 ## stock Constraints
 
