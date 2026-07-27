@@ -13,6 +13,7 @@ import type { ServiceResult } from './serviceResults'
 import { applyStockDepositoDelta, getDefaultDepositoId } from './stockDepositoSync'
 import { LoteService } from './LoteService'
 import { ProveedorCatalogoService } from './ProveedorCatalogoService'
+import { roundQty, toBaseQuantity } from '../lib/uom'
 
 export const ORDEN_COMPRA_ESTADOS: OrdenCompraEstado[] = ['draft', 'sent', 'received', 'cancelled']
 
@@ -338,12 +339,16 @@ export class CompraService {
     }
 
     const itemById = new Map(orden.items.map((i) => [i.id, i]))
+    // @en Decimal-safe running total of cantidadRecibida per line, tracked outside the Prisma Decimal fields (#203).
+    // @es Total acumulado Decimal-safe de cantidadRecibida por línea, fuera de los campos Decimal de Prisma (#203).
+    // @pt-BR Total acumulado Decimal-safe de cantidadRecibida por linha, fora dos campos Decimal do Prisma (#203).
+    const receivedSoFar = new Map(orden.items.map((i) => [i.id, Number(i.cantidadRecibida)]))
     for (const line of lines) {
       const item = itemById.get(line.itemId)
       if (!item) {
         return { ok: false, status: 422, error: 'INVALID_LINE_ITEM' }
       }
-      const pending = item.cantidad - item.cantidadRecibida
+      const pending = roundQty(Number(item.cantidad) - (receivedSoFar.get(line.itemId) ?? 0))
       if (line.cantidad > pending) {
         return { ok: false, status: 422, error: 'RECEIVE_QUANTITY_EXCEEDS_PENDING' }
       }
@@ -373,7 +378,8 @@ export class CompraService {
       const row = await this.prisma.$transaction(async (tx) => {
         for (const line of lines) {
           const item = itemById.get(line.itemId)!
-          const newRecibida = item.cantidadRecibida + line.cantidad
+          const prevRecibida = receivedSoFar.get(line.itemId) ?? 0
+          const newRecibida = roundQty(prevRecibida + line.cantidad)
 
           await tx.ordenCompraItem.update({
             where: { id: item.id },
@@ -382,21 +388,34 @@ export class CompraService {
 
           const articulo = await tx.articulo.findFirst({
             where: { id: item.articuloId, tenantId },
-            select: { id: true, stock: true, controlLote: true, tipo: true },
+            select: {
+              id: true,
+              stock: true,
+              controlLote: true,
+              tipo: true,
+              unidadBase: true,
+              factorConversion: true,
+            },
           })
           if (!articulo) {
             throw new Error('Articulo not found')
           }
+
+          // @en Purchase quantity is expressed in unidadCompra; convert to unidadBase before touching stock (#203).
+          // @es La cantidad de compra está en unidadCompra; se convierte a unidadBase antes de tocar el stock (#203).
+          // @pt-BR A quantidade de compra está em unidadCompra; converte para unidadBase antes de alterar o estoque (#203).
+          const factorConversion = Number(articulo.factorConversion ?? 1)
+          const qtyBase = roundQty(toBaseQuantity(line.cantidad, factorConversion))
 
           if (depositoId != null) {
             await applyStockDepositoDelta(tx, {
               tenantId,
               articuloId: articulo.id,
               depositoId,
-              delta: line.cantidad,
+              delta: qtyBase,
             })
           } else {
-            const stockAfter = articulo.stock + line.cantidad
+            const stockAfter = roundQty(Number(articulo.stock) + qtyBase)
             await tx.articulo.update({
               where: { id: articulo.id },
               data: { stock: stockAfter },
@@ -417,7 +436,7 @@ export class CompraService {
               depositoId,
               nroLote: line.nroLote,
               fechaVencimiento: line.fechaVencimiento,
-              cantidad: line.cantidad,
+              cantidad: qtyBase,
               proveedorId: orden.proveedorId,
             })
             if (!inbound.ok) {
@@ -430,7 +449,7 @@ export class CompraService {
             data: {
               tenantId,
               articuloId: articulo.id,
-              cantidad: line.cantidad,
+              cantidad: qtyBase,
               motivo: PURCHASE_STOCK_MOTIVO,
               userId,
               ...(depositoId != null ? { depositoId } : {}),
@@ -438,10 +457,13 @@ export class CompraService {
             },
           })
 
-          item.cantidadRecibida = newRecibida
+          receivedSoFar.set(line.itemId, newRecibida)
         }
 
-        const updatedItems = orden.items.map((i) => itemById.get(i.id)!)
+        const updatedItems = orden.items.map((i) => ({
+          cantidad: Number(i.cantidad),
+          cantidadRecibida: receivedSoFar.get(i.id) ?? Number(i.cantidadRecibida),
+        }))
         const nextEstado: OrdenCompraEstado = allItemsFullyReceived(updatedItems)
           ? 'received'
           : 'sent'
@@ -461,7 +483,7 @@ export class CompraService {
           'DEPOSITO_REQUIRED_FOR_LOTE',
           'fechaVencimiento must be a valid date',
           'nroLote is required',
-          'cantidad must be a positive integer',
+          'cantidad must be a positive finite number',
         ]
         if (known.includes(err.message) || err.message.startsWith('fechaVencimiento')) {
           return { ok: false, status: 422, error: err.message }

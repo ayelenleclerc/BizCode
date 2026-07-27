@@ -76,7 +76,7 @@ function mapFacturaToPdfInput(
       condIva: string
     } | null
     items: Array<{
-      cantidad: number
+      cantidad: { toString: () => string }
       precio: { toString: () => string }
       dscto: { toString: () => string }
       subtotal: { toString: () => string }
@@ -118,7 +118,7 @@ function mapFacturaToPdfInput(
       caeVto: factura.caeVto,
       cliente: factura.cliente,
       items: factura.items.map((item) => ({
-        cantidad: item.cantidad,
+        cantidad: Number(item.cantidad),
         precio: Number(item.precio),
         dscto: Number(item.dscto),
         subtotal: Number(item.subtotal),

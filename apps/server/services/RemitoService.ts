@@ -309,7 +309,7 @@ export class RemitoService {
       .map((it) => ({
         articuloId: it.articuloId as number,
         descripcion: it.descripcion || it.articulo!.descripcion,
-        cantidad: it.cantidad,
+        cantidad: Number(it.cantidad),
         unidad: it.articulo!.umedida,
       }))
     if (items.length === 0) {
@@ -346,7 +346,7 @@ export class RemitoService {
       .map((it) => ({
         articuloId: it.articuloId as number,
         descripcion: it.descripcion || it.articulo!.descripcion,
-        cantidad: it.cantidad,
+        cantidad: Number(it.cantidad),
         unidad: it.articulo!.umedida,
       }))
     if (items.length === 0) {

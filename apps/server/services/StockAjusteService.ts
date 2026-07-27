@@ -4,6 +4,7 @@ import { assertNoOpenRecuento } from '../lib/recuentoStockGuard'
 import type { ServiceResult } from './serviceResults'
 import { applyStockDepositoDelta, getDefaultDepositoId } from './stockDepositoSync'
 import { LoteService } from './LoteService'
+import { isUnidadBase, roundQty, validateQuantityForUom } from '../lib/uom'
 
 export type StockAjusteRow = Prisma.StockAjusteGetPayload<{
   include: { user: { select: { id: true; username: true } } }
@@ -49,6 +50,8 @@ export class StockAjusteService {
         minimo: true,
         tipo: true,
         controlLote: true,
+        unidadBase: true,
+        multiploVenta: true,
       },
     })
     if (!articulo) {
@@ -56,6 +59,16 @@ export class StockAjusteService {
     }
     if (articulo.tipo === 'servicio') {
       return { ok: false, status: 422, error: 'SERVICE_NO_STOCK' }
+    }
+    if (isUnidadBase(articulo.unidadBase)) {
+      const qtyCheck = validateQuantityForUom({
+        cantidad: Math.abs(input.cantidad),
+        unidadBase: articulo.unidadBase,
+        multiploVenta: articulo.multiploVenta != null ? Number(articulo.multiploVenta) : null,
+      })
+      if (!qtyCheck.ok) {
+        return { ok: false, status: 422, error: qtyCheck.error }
+      }
     }
 
     const depositoId =
@@ -89,8 +102,8 @@ export class StockAjusteService {
       return recuentoBlock
     }
 
-    const stockBefore = articulo.stock
-    const stockAfter = stockBefore + input.cantidad
+    const stockBefore = Number(articulo.stock)
+    const stockAfter = roundQty(stockBefore + input.cantidad)
     if (stockAfter < 0) {
       return { ok: false, status: 422, error: 'INSUFFICIENT_STOCK' }
     }
@@ -145,7 +158,7 @@ export class StockAjusteService {
           ajuste,
           articulo: updated,
           stockBefore,
-          stockAfter: updated.stock,
+          stockAfter: Number(updated.stock),
         }
       })
       return { ok: true, data: result }

@@ -47,6 +47,18 @@ export interface Articulo {
   mesesGarantia?: number | null
   /** @en Lot tracking / FEFO (#202). @es Control de lotes / FEFO (#202). @pt-BR Controle de lotes / FEFO (#202). */
   controlLote?: boolean
+  /** @en Base unit of measure for stock/quantity rules (#203). @es Unidad de medida base para reglas de stock/cantidad (#203). @pt-BR Unidade de medida base para regras de estoque/quantidade (#203). */
+  unidadBase?: 'unidad' | 'kg' | 'gramo' | 'litro' | 'metro' | 'm2' | 'm3' | 'rollo' | 'caja'
+  /** @en Purchase unit label, may differ from unidadBase (#203). @es Etiqueta de unidad de compra, puede diferir de unidadBase (#203). @pt-BR Rótulo da unidade de compra, pode diferir de unidadBase (#203). */
+  unidadCompra?: string | null
+  /** @en Purchase-to-base conversion factor (#203). @es Factor de conversión compra a base (#203). @pt-BR Fator de conversão compra para base (#203). */
+  factorConversion?: number | string
+  /** @en Sale multiple/step for cut-to-size items (#203). @es Múltiplo/paso de venta para artículos a medida (#203). @pt-BR Múltiplo/passo de venda para itens sob medida (#203). */
+  multiploVenta?: number | string | null
+  /** @en Weight in kg per base unit, for shipping/costing (#203). @es Peso en kg por unidad base, para envío/costeo (#203). @pt-BR Peso em kg por unidade base, para envio/custeio (#203). */
+  pesoKg?: number | string | null
+  /** @en Volume in m3 per base unit, for shipping/costing (#203). @es Volumen en m3 por unidad base, para envío/costeo (#203). @pt-BR Volume em m3 por unidade base, para envio/custeio (#203). */
+  volumenM3?: number | string | null
   precioLista1: number | string
   precioLista2: number | string
   costo: number | string

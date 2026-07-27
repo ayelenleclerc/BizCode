@@ -1,4 +1,5 @@
 import type { Prisma, PrismaClient } from '@prisma/client'
+import type { Decimal } from '@prisma/client/runtime/library'
 import type {
   ArticuloStockPorDepositoResponse,
   DepositoCreateInput,
@@ -43,9 +44,9 @@ function mapStockRow(
     tenantId: number
     articuloId: number
     depositoId: number
-    cantidad: number
-    stockMin: number
-    stockMax: number | null
+    cantidad: Decimal
+    stockMin: Decimal
+    stockMax: Decimal | null
     createdAt: Date
     updatedAt: Date
     deposito?: { codigo: string; nombre: string }
@@ -58,9 +59,9 @@ function mapStockRow(
     depositoId: row.depositoId,
     depositoCodigo: row.deposito?.codigo,
     depositoNombre: row.deposito?.nombre,
-    cantidad: row.cantidad,
-    stockMin: row.stockMin,
-    stockMax: row.stockMax,
+    cantidad: Number(row.cantidad),
+    stockMin: Number(row.stockMin),
+    stockMax: row.stockMax != null ? Number(row.stockMax) : null,
     createdAt: row.createdAt.toISOString(),
     updatedAt: row.updatedAt.toISOString(),
   }
@@ -191,7 +192,7 @@ export class DepositoService {
       where: { tenantId, depositoId: id },
       _sum: { cantidad: true },
     })
-    if ((stock._sum.cantidad ?? 0) > 0) {
+    if (Number(stock._sum.cantidad ?? 0) > 0) {
       return { ok: false, status: 422, error: 'DEPOSITO_HAS_STOCK' }
     }
     const openTransfers = await this.prisma.transferenciaDeposito.count({
@@ -231,14 +232,14 @@ export class DepositoService {
       },
       select: { cantidadEnviada: true },
     })
-    const enTransito = enTransitoAgg.reduce((s, i) => s + i.cantidadEnviada, 0)
+    const enTransito = enTransitoAgg.reduce((s, i) => s + Number(i.cantidadEnviada), 0)
 
     return {
       ok: true,
       data: {
         success: true,
         articuloId,
-        stockTotal: art.stock,
+        stockTotal: Number(art.stock),
         enTransito,
         depositos: rows.map(mapStockRow),
       },

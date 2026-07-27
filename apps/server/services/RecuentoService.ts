@@ -91,7 +91,7 @@ export class RecuentoService {
       orderBy: { codigo: 'asc' },
     })
 
-    let cantSistemaByArt = new Map(articulos.map((a) => [a.id, a.stock]))
+    let cantSistemaByArt = new Map(articulos.map((a) => [a.id, Number(a.stock)]))
     if (resolvedDepositoId != null) {
       const rows = await this.prisma.stockDeposito.findMany({
         where: {
@@ -102,7 +102,7 @@ export class RecuentoService {
         select: { articuloId: true, cantidad: true },
       })
       cantSistemaByArt = new Map(articulos.map((a) => [a.id, 0]))
-      for (const r of rows) cantSistemaByArt.set(r.articuloId, r.cantidad)
+      for (const r of rows) cantSistemaByArt.set(r.articuloId, Number(r.cantidad))
     }
 
     const row = await this.prisma.recuento.create({
@@ -200,8 +200,8 @@ export class RecuentoService {
     try {
       await this.prisma.$transaction(async (tx) => {
         for (const item of recuento.items) {
-          const cantFisica = item.cantFisica!
-          const diff = cantFisica - item.cantSistema
+          const cantFisica = Number(item.cantFisica!)
+          const diff = cantFisica - Number(item.cantSistema)
           if (diff === 0) {
             continue
           }
@@ -221,7 +221,7 @@ export class RecuentoService {
             if (!articulo) {
               throw new Error('Articulo not found')
             }
-            const stockAfter = articulo.stock + diff
+            const stockAfter = Number(articulo.stock) + diff
             if (stockAfter < 0) {
               throw new Error('INSUFFICIENT_STOCK')
             }

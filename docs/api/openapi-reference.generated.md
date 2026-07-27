@@ -7265,6 +7265,10 @@ Returns PDF with amount in words (#233). Requires module `finance.receipts`.
 
     `string`
 
+  - **`controlLote`**
+
+    `boolean` — When true, stock movements require lot tracking / FEFO (#202).
+
   - **`costo`**
 
     `number`
@@ -7272,6 +7276,10 @@ Returns PDF with amount in words (#233). Requires module `finance.receipts`.
   - **`descripcion`**
 
     `string`
+
+  - **`factorConversion`**
+
+    `number` — 1 purchase unit equals factorConversion base units (#203). Default 1.
 
   - **`id`**
 
@@ -7283,11 +7291,19 @@ Returns PDF with amount in words (#233). Requires module `finance.receipts`.
 
   - **`minimo`**
 
-    `integer`
+    `number` — Minimum stock in base units; Decimal(14,4) (#203).
 
   - **`monedaPrecio`**
 
     `string`, possible values: `"ARS", "USD", "EUR"`, default: `"ARS"`
+
+  - **`multiploVenta`**
+
+    `number` — Optional sale multiple for cut-to-size items (#203).
+
+  - **`pesoKg`**
+
+    `number` — Unit weight in kg for logistics (#203).
 
   - **`precioEnMonedaOrigen`**
 
@@ -7323,7 +7339,7 @@ Returns PDF with amount in words (#233). Requires module `finance.receipts`.
 
   - **`stock`**
 
-    `integer`
+    `number` — Stock quantity in base units; Decimal(14,4) (#203).
 
   - **`tipo`**
 
@@ -7333,9 +7349,21 @@ Returns PDF with amount in words (#233). Requires module `finance.receipts`.
 
     `string`
 
+  - **`unidadBase`**
+
+    `string`, possible values: `"unidad", "kg", "gramo", "litro", "metro", "m2", "m3", "rollo", "caja"` — Base stock/sale unit catalog (#203). Default unidad.
+
+  - **`unidadCompra`**
+
+    `string` — Purchase unit when different from base (#203).
+
   - **`unidadServicio`**
 
     `string`, possible values: `"hora", "dia", "mes", "proyecto", "km", "unidad", "otro"` — Required when tipo is servicio (#244).
+
+  - **`volumenM3`**
+
+    `number` — Unit volume in m3 for logistics (#203).
 
 - **`success` (required)**
 
@@ -7375,6 +7403,13 @@ Returns PDF with amount in words (#233). Requires module `finance.receipts`.
       "tipo": "articulo",
       "unidadServicio": "hora",
       "mesesGarantia": 1,
+      "controlLote": true,
+      "unidadBase": "unidad",
+      "unidadCompra": "",
+      "factorConversion": 1,
+      "multiploVenta": 1,
+      "pesoKg": 1,
+      "volumenM3": 1,
       "precioLista1": 1,
       "precioLista2": 1,
       "costo": 1,
@@ -7487,7 +7522,7 @@ Returns PDF with amount in words (#233). Requires module `finance.receipts`.
 
 - **`minimo` (required)**
 
-  `integer` — Must be 0 when tipo is servicio (#244).
+  `number` — Must be 0 when tipo is servicio (#244). Decimal base units (#203).
 
 - **`precioLista1` (required)**
 
@@ -7503,11 +7538,19 @@ Returns PDF with amount in words (#233). Requires module `finance.receipts`.
 
 - **`stock` (required)**
 
-  `integer` — Must be 0 when tipo is servicio (#244).
+  `number` — Must be 0 when tipo is servicio (#244). Decimal base units (#203).
 
 - **`umedida` (required)**
 
   `string`
+
+- **`controlLote`**
+
+  `boolean` — Lot control opt-in (#202).
+
+- **`factorConversion`**
+
+  `number` — Purchase-to-base conversion factor (#203). Default 1.
 
 - **`mesesGarantia`**
 
@@ -7517,6 +7560,14 @@ Returns PDF with amount in words (#233). Requires module `finance.receipts`.
 
   `string`, possible values: `"ARS", "USD", "EUR"`, default: `"ARS"` — Catalog price currency; ARS materializes precioLista1 directly (#243).
 
+- **`multiploVenta`**
+
+  `number` — Sale multiple/step for cut-to-size (#203).
+
+- **`pesoKg`**
+
+  `number`
+
 - **`precioEnMonedaOrigen`**
 
   `number` — Required when monedaPrecio is USD or EUR; drives ARS precioLista1 via current TC (#243).
@@ -7525,9 +7576,21 @@ Returns PDF with amount in words (#233). Requires module `finance.receipts`.
 
   `string`, possible values: `"articulo", "servicio"`, default: `"articulo"`
 
+- **`unidadBase`**
+
+  `string`, possible values: `"unidad", "kg", "gramo", "litro", "metro", "m2", "m3", "rollo", "caja"` — Base UoM; when set, umedida is derived (#203).
+
+- **`unidadCompra`**
+
+  `string` — Purchase unit label (#203).
+
 - **`unidadServicio`**
 
   `string`, possible values: `"hora", "dia", "mes", "proyecto", "km", "unidad", "otro"`
+
+- **`volumenM3`**
+
+  `number`
 
 **Example:**
 
@@ -7541,6 +7604,13 @@ Returns PDF with amount in words (#233). Requires module `finance.receipts`.
   "tipo": "articulo",
   "unidadServicio": "hora",
   "mesesGarantia": 1,
+  "controlLote": true,
+  "unidadBase": "unidad",
+  "unidadCompra": "",
+  "factorConversion": 1,
+  "multiploVenta": 1,
+  "pesoKg": 0,
+  "volumenM3": 0,
   "precioLista1": 0.01,
   "precioLista2": 0.01,
   "costo": 0.01,
@@ -7574,6 +7644,10 @@ Returns PDF with amount in words (#233). Requires module `finance.receipts`.
 
     `string`
 
+  - **`controlLote`**
+
+    `boolean` — When true, stock movements require lot tracking / FEFO (#202).
+
   - **`costo`**
 
     `number`
@@ -7581,6 +7655,10 @@ Returns PDF with amount in words (#233). Requires module `finance.receipts`.
   - **`descripcion`**
 
     `string`
+
+  - **`factorConversion`**
+
+    `number` — 1 purchase unit equals factorConversion base units (#203). Default 1.
 
   - **`id`**
 
@@ -7592,11 +7670,19 @@ Returns PDF with amount in words (#233). Requires module `finance.receipts`.
 
   - **`minimo`**
 
-    `integer`
+    `number` — Minimum stock in base units; Decimal(14,4) (#203).
 
   - **`monedaPrecio`**
 
     `string`, possible values: `"ARS", "USD", "EUR"`, default: `"ARS"`
+
+  - **`multiploVenta`**
+
+    `number` — Optional sale multiple for cut-to-size items (#203).
+
+  - **`pesoKg`**
+
+    `number` — Unit weight in kg for logistics (#203).
 
   - **`precioEnMonedaOrigen`**
 
@@ -7632,7 +7718,7 @@ Returns PDF with amount in words (#233). Requires module `finance.receipts`.
 
   - **`stock`**
 
-    `integer`
+    `number` — Stock quantity in base units; Decimal(14,4) (#203).
 
   - **`tipo`**
 
@@ -7642,9 +7728,21 @@ Returns PDF with amount in words (#233). Requires module `finance.receipts`.
 
     `string`
 
+  - **`unidadBase`**
+
+    `string`, possible values: `"unidad", "kg", "gramo", "litro", "metro", "m2", "m3", "rollo", "caja"` — Base stock/sale unit catalog (#203). Default unidad.
+
+  - **`unidadCompra`**
+
+    `string` — Purchase unit when different from base (#203).
+
   - **`unidadServicio`**
 
     `string`, possible values: `"hora", "dia", "mes", "proyecto", "km", "unidad", "otro"` — Required when tipo is servicio (#244).
+
+  - **`volumenM3`**
+
+    `number` — Unit volume in m3 for logistics (#203).
 
 - **`success` (required)**
 
@@ -7671,6 +7769,13 @@ Returns PDF with amount in words (#233). Requires module `finance.receipts`.
     "tipo": "articulo",
     "unidadServicio": "hora",
     "mesesGarantia": 1,
+    "controlLote": true,
+    "unidadBase": "unidad",
+    "unidadCompra": "",
+    "factorConversion": 1,
+    "multiploVenta": 1,
+    "pesoKg": 1,
+    "volumenM3": 1,
     "precioLista1": 1,
     "precioLista2": 1,
     "costo": 1,
@@ -7814,6 +7919,13 @@ Returns PDF with amount in words (#233). Requires module `finance.receipts`.
     "tipo": "articulo",
     "unidadServicio": "hora",
     "mesesGarantia": 1,
+    "controlLote": true,
+    "unidadBase": "unidad",
+    "unidadCompra": "",
+    "factorConversion": 1,
+    "multiploVenta": 1,
+    "pesoKg": 1,
+    "volumenM3": 1,
     "precioLista1": 1,
     "precioLista2": 1,
     "costo": 1,
@@ -7922,7 +8034,7 @@ Returns PDF with amount in words (#233). Requires module `finance.receipts`.
 
 - **`minimo` (required)**
 
-  `integer` — Must be 0 when tipo is servicio (#244).
+  `number` — Must be 0 when tipo is servicio (#244). Decimal base units (#203).
 
 - **`precioLista1` (required)**
 
@@ -7938,11 +8050,19 @@ Returns PDF with amount in words (#233). Requires module `finance.receipts`.
 
 - **`stock` (required)**
 
-  `integer` — Must be 0 when tipo is servicio (#244).
+  `number` — Must be 0 when tipo is servicio (#244). Decimal base units (#203).
 
 - **`umedida` (required)**
 
   `string`
+
+- **`controlLote`**
+
+  `boolean` — Lot control opt-in (#202).
+
+- **`factorConversion`**
+
+  `number` — Purchase-to-base conversion factor (#203). Default 1.
 
 - **`mesesGarantia`**
 
@@ -7952,6 +8072,14 @@ Returns PDF with amount in words (#233). Requires module `finance.receipts`.
 
   `string`, possible values: `"ARS", "USD", "EUR"`, default: `"ARS"` — Catalog price currency; ARS materializes precioLista1 directly (#243).
 
+- **`multiploVenta`**
+
+  `number` — Sale multiple/step for cut-to-size (#203).
+
+- **`pesoKg`**
+
+  `number`
+
 - **`precioEnMonedaOrigen`**
 
   `number` — Required when monedaPrecio is USD or EUR; drives ARS precioLista1 via current TC (#243).
@@ -7960,9 +8088,21 @@ Returns PDF with amount in words (#233). Requires module `finance.receipts`.
 
   `string`, possible values: `"articulo", "servicio"`, default: `"articulo"`
 
+- **`unidadBase`**
+
+  `string`, possible values: `"unidad", "kg", "gramo", "litro", "metro", "m2", "m3", "rollo", "caja"` — Base UoM; when set, umedida is derived (#203).
+
+- **`unidadCompra`**
+
+  `string` — Purchase unit label (#203).
+
 - **`unidadServicio`**
 
   `string`, possible values: `"hora", "dia", "mes", "proyecto", "km", "unidad", "otro"`
+
+- **`volumenM3`**
+
+  `number`
 
 **Example:**
 
@@ -7976,6 +8116,13 @@ Returns PDF with amount in words (#233). Requires module `finance.receipts`.
   "tipo": "articulo",
   "unidadServicio": "hora",
   "mesesGarantia": 1,
+  "controlLote": true,
+  "unidadBase": "unidad",
+  "unidadCompra": "",
+  "factorConversion": 1,
+  "multiploVenta": 1,
+  "pesoKg": 0,
+  "volumenM3": 0,
   "precioLista1": 0.01,
   "precioLista2": 0.01,
   "costo": 0.01,
@@ -8009,6 +8156,10 @@ Returns PDF with amount in words (#233). Requires module `finance.receipts`.
 
     `string`
 
+  - **`controlLote`**
+
+    `boolean` — When true, stock movements require lot tracking / FEFO (#202).
+
   - **`costo`**
 
     `number`
@@ -8016,6 +8167,10 @@ Returns PDF with amount in words (#233). Requires module `finance.receipts`.
   - **`descripcion`**
 
     `string`
+
+  - **`factorConversion`**
+
+    `number` — 1 purchase unit equals factorConversion base units (#203). Default 1.
 
   - **`id`**
 
@@ -8027,11 +8182,19 @@ Returns PDF with amount in words (#233). Requires module `finance.receipts`.
 
   - **`minimo`**
 
-    `integer`
+    `number` — Minimum stock in base units; Decimal(14,4) (#203).
 
   - **`monedaPrecio`**
 
     `string`, possible values: `"ARS", "USD", "EUR"`, default: `"ARS"`
+
+  - **`multiploVenta`**
+
+    `number` — Optional sale multiple for cut-to-size items (#203).
+
+  - **`pesoKg`**
+
+    `number` — Unit weight in kg for logistics (#203).
 
   - **`precioEnMonedaOrigen`**
 
@@ -8067,7 +8230,7 @@ Returns PDF with amount in words (#233). Requires module `finance.receipts`.
 
   - **`stock`**
 
-    `integer`
+    `number` — Stock quantity in base units; Decimal(14,4) (#203).
 
   - **`tipo`**
 
@@ -8077,9 +8240,21 @@ Returns PDF with amount in words (#233). Requires module `finance.receipts`.
 
     `string`
 
+  - **`unidadBase`**
+
+    `string`, possible values: `"unidad", "kg", "gramo", "litro", "metro", "m2", "m3", "rollo", "caja"` — Base stock/sale unit catalog (#203). Default unidad.
+
+  - **`unidadCompra`**
+
+    `string` — Purchase unit when different from base (#203).
+
   - **`unidadServicio`**
 
     `string`, possible values: `"hora", "dia", "mes", "proyecto", "km", "unidad", "otro"` — Required when tipo is servicio (#244).
+
+  - **`volumenM3`**
+
+    `number` — Unit volume in m3 for logistics (#203).
 
 - **`success` (required)**
 
@@ -8106,6 +8281,13 @@ Returns PDF with amount in words (#233). Requires module `finance.receipts`.
     "tipo": "articulo",
     "unidadServicio": "hora",
     "mesesGarantia": 1,
+    "controlLote": true,
+    "unidadBase": "unidad",
+    "unidadCompra": "",
+    "factorConversion": 1,
+    "multiploVenta": 1,
+    "pesoKg": 1,
+    "volumenM3": 1,
     "precioLista1": 1,
     "precioLista2": 1,
     "costo": 1,
@@ -19457,6 +19639,10 @@ Requires all items to have `cantFisica`. For each line with non-zero variance, u
 
         `string`
 
+      - **`controlLote`**
+
+        `boolean` — When true, stock movements require lot tracking / FEFO (#202).
+
       - **`costo`**
 
         `number`
@@ -19464,6 +19650,10 @@ Requires all items to have `cantFisica`. For each line with non-zero variance, u
       - **`descripcion`**
 
         `string`
+
+      - **`factorConversion`**
+
+        `number` — 1 purchase unit equals factorConversion base units (#203). Default 1.
 
       - **`id`**
 
@@ -19475,11 +19665,19 @@ Requires all items to have `cantFisica`. For each line with non-zero variance, u
 
       - **`minimo`**
 
-        `integer`
+        `number` — Minimum stock in base units; Decimal(14,4) (#203).
 
       - **`monedaPrecio`**
 
         `string`, possible values: `"ARS", "USD", "EUR"`, default: `"ARS"`
+
+      - **`multiploVenta`**
+
+        `number` — Optional sale multiple for cut-to-size items (#203).
+
+      - **`pesoKg`**
+
+        `number` — Unit weight in kg for logistics (#203).
 
       - **`precioEnMonedaOrigen`**
 
@@ -19515,7 +19713,7 @@ Requires all items to have `cantFisica`. For each line with non-zero variance, u
 
       - **`stock`**
 
-        `integer`
+        `number` — Stock quantity in base units; Decimal(14,4) (#203).
 
       - **`tipo`**
 
@@ -19525,9 +19723,21 @@ Requires all items to have `cantFisica`. For each line with non-zero variance, u
 
         `string`
 
+      - **`unidadBase`**
+
+        `string`, possible values: `"unidad", "kg", "gramo", "litro", "metro", "m2", "m3", "rollo", "caja"` — Base stock/sale unit catalog (#203). Default unidad.
+
+      - **`unidadCompra`**
+
+        `string` — Purchase unit when different from base (#203).
+
       - **`unidadServicio`**
 
         `string`, possible values: `"hora", "dia", "mes", "proyecto", "km", "unidad", "otro"` — Required when tipo is servicio (#244).
+
+      - **`volumenM3`**
+
+        `number` — Unit volume in m3 for logistics (#203).
 
     - **`articuloId`**
 
@@ -19535,7 +19745,11 @@ Requires all items to have `cantFisica`. For each line with non-zero variance, u
 
     - **`cantidad`**
 
-      `number`
+      `number` — Quantity in article base units; may be decimal for cut-to-size UoM (#203).
+
+    - **`codigoAfipUnidad`**
+
+      `string` — AFIP WSFE UniMedida code snapshot (#203). Mock CAE has no line XML yet.
 
     - **`condIva`**
 
@@ -19560,6 +19774,10 @@ Requires all items to have `cantFisica`. For each line with non-zero variance, u
     - **`subtotal`**
 
       `number`
+
+    - **`unidadMedida`**
+
+      `string` — Base UoM snapshot at invoice time (#203).
 
     - **`unidadServicio`**
 
@@ -19664,6 +19882,13 @@ Requires all items to have `cantFisica`. For each line with non-zero variance, u
             "tipo": "articulo",
             "unidadServicio": "hora",
             "mesesGarantia": 1,
+            "controlLote": true,
+            "unidadBase": "unidad",
+            "unidadCompra": "",
+            "factorConversion": 1,
+            "multiploVenta": 1,
+            "pesoKg": 1,
+            "volumenM3": 1,
             "precioLista1": 1,
             "precioLista2": 1,
             "costo": 1,
@@ -19675,6 +19900,8 @@ Requires all items to have `cantFisica`. For each line with non-zero variance, u
             "additionalProperty": "anything"
           },
           "cantidad": 1,
+          "unidadMedida": "",
+          "codigoAfipUnidad": "",
           "precio": 1,
           "dscto": 1,
           "subtotal": 1,
@@ -19979,6 +20206,10 @@ Requires all items to have `cantFisica`. For each line with non-zero variance, u
 
         `string`
 
+      - **`controlLote`**
+
+        `boolean` — When true, stock movements require lot tracking / FEFO (#202).
+
       - **`costo`**
 
         `number`
@@ -19986,6 +20217,10 @@ Requires all items to have `cantFisica`. For each line with non-zero variance, u
       - **`descripcion`**
 
         `string`
+
+      - **`factorConversion`**
+
+        `number` — 1 purchase unit equals factorConversion base units (#203). Default 1.
 
       - **`id`**
 
@@ -19997,11 +20232,19 @@ Requires all items to have `cantFisica`. For each line with non-zero variance, u
 
       - **`minimo`**
 
-        `integer`
+        `number` — Minimum stock in base units; Decimal(14,4) (#203).
 
       - **`monedaPrecio`**
 
         `string`, possible values: `"ARS", "USD", "EUR"`, default: `"ARS"`
+
+      - **`multiploVenta`**
+
+        `number` — Optional sale multiple for cut-to-size items (#203).
+
+      - **`pesoKg`**
+
+        `number` — Unit weight in kg for logistics (#203).
 
       - **`precioEnMonedaOrigen`**
 
@@ -20037,7 +20280,7 @@ Requires all items to have `cantFisica`. For each line with non-zero variance, u
 
       - **`stock`**
 
-        `integer`
+        `number` — Stock quantity in base units; Decimal(14,4) (#203).
 
       - **`tipo`**
 
@@ -20047,9 +20290,21 @@ Requires all items to have `cantFisica`. For each line with non-zero variance, u
 
         `string`
 
+      - **`unidadBase`**
+
+        `string`, possible values: `"unidad", "kg", "gramo", "litro", "metro", "m2", "m3", "rollo", "caja"` — Base stock/sale unit catalog (#203). Default unidad.
+
+      - **`unidadCompra`**
+
+        `string` — Purchase unit when different from base (#203).
+
       - **`unidadServicio`**
 
         `string`, possible values: `"hora", "dia", "mes", "proyecto", "km", "unidad", "otro"` — Required when tipo is servicio (#244).
+
+      - **`volumenM3`**
+
+        `number` — Unit volume in m3 for logistics (#203).
 
     - **`articuloId`**
 
@@ -20057,7 +20312,11 @@ Requires all items to have `cantFisica`. For each line with non-zero variance, u
 
     - **`cantidad`**
 
-      `number`
+      `number` — Quantity in article base units; may be decimal for cut-to-size UoM (#203).
+
+    - **`codigoAfipUnidad`**
+
+      `string` — AFIP WSFE UniMedida code snapshot (#203). Mock CAE has no line XML yet.
 
     - **`condIva`**
 
@@ -20082,6 +20341,10 @@ Requires all items to have `cantFisica`. For each line with non-zero variance, u
     - **`subtotal`**
 
       `number`
+
+    - **`unidadMedida`**
+
+      `string` — Base UoM snapshot at invoice time (#203).
 
     - **`unidadServicio`**
 
@@ -20173,6 +20436,13 @@ Requires all items to have `cantFisica`. For each line with non-zero variance, u
           "tipo": "articulo",
           "unidadServicio": "hora",
           "mesesGarantia": 1,
+          "controlLote": true,
+          "unidadBase": "unidad",
+          "unidadCompra": "",
+          "factorConversion": 1,
+          "multiploVenta": 1,
+          "pesoKg": 1,
+          "volumenM3": 1,
           "precioLista1": 1,
           "precioLista2": 1,
           "costo": 1,
@@ -20184,6 +20454,8 @@ Requires all items to have `cantFisica`. For each line with non-zero variance, u
           "additionalProperty": "anything"
         },
         "cantidad": 1,
+        "unidadMedida": "",
+        "codigoAfipUnidad": "",
         "precio": 1,
         "dscto": 1,
         "subtotal": 1,
@@ -41301,6 +41573,10 @@ Sets `estado` to `N` (anulada), reverses the customer balance by the invoice tot
 
           `string`
 
+        - **`controlLote`**
+
+          `boolean` — When true, stock movements require lot tracking / FEFO (#202).
+
         - **`costo`**
 
           `number`
@@ -41308,6 +41584,10 @@ Sets `estado` to `N` (anulada), reverses the customer balance by the invoice tot
         - **`descripcion`**
 
           `string`
+
+        - **`factorConversion`**
+
+          `number` — 1 purchase unit equals factorConversion base units (#203). Default 1.
 
         - **`id`**
 
@@ -41319,11 +41599,19 @@ Sets `estado` to `N` (anulada), reverses the customer balance by the invoice tot
 
         - **`minimo`**
 
-          `integer`
+          `number` — Minimum stock in base units; Decimal(14,4) (#203).
 
         - **`monedaPrecio`**
 
           `string`, possible values: `"ARS", "USD", "EUR"`, default: `"ARS"`
+
+        - **`multiploVenta`**
+
+          `number` — Optional sale multiple for cut-to-size items (#203).
+
+        - **`pesoKg`**
+
+          `number` — Unit weight in kg for logistics (#203).
 
         - **`precioEnMonedaOrigen`**
 
@@ -41359,7 +41647,7 @@ Sets `estado` to `N` (anulada), reverses the customer balance by the invoice tot
 
         - **`stock`**
 
-          `integer`
+          `number` — Stock quantity in base units; Decimal(14,4) (#203).
 
         - **`tipo`**
 
@@ -41369,9 +41657,21 @@ Sets `estado` to `N` (anulada), reverses the customer balance by the invoice tot
 
           `string`
 
+        - **`unidadBase`**
+
+          `string`, possible values: `"unidad", "kg", "gramo", "litro", "metro", "m2", "m3", "rollo", "caja"` — Base stock/sale unit catalog (#203). Default unidad.
+
+        - **`unidadCompra`**
+
+          `string` — Purchase unit when different from base (#203).
+
         - **`unidadServicio`**
 
           `string`, possible values: `"hora", "dia", "mes", "proyecto", "km", "unidad", "otro"` — Required when tipo is servicio (#244).
+
+        - **`volumenM3`**
+
+          `number` — Unit volume in m3 for logistics (#203).
 
       - **`articuloId`**
 
@@ -41379,7 +41679,11 @@ Sets `estado` to `N` (anulada), reverses the customer balance by the invoice tot
 
       - **`cantidad`**
 
-        `number`
+        `number` — Quantity in article base units; may be decimal for cut-to-size UoM (#203).
+
+      - **`codigoAfipUnidad`**
+
+        `string` — AFIP WSFE UniMedida code snapshot (#203). Mock CAE has no line XML yet.
 
       - **`condIva`**
 
@@ -41404,6 +41708,10 @@ Sets `estado` to `N` (anulada), reverses the customer balance by the invoice tot
       - **`subtotal`**
 
         `number`
+
+      - **`unidadMedida`**
+
+        `string` — Base UoM snapshot at invoice time (#203).
 
       - **`unidadServicio`**
 
@@ -41560,6 +41868,13 @@ Sets `estado` to `N` (anulada), reverses the customer balance by the invoice tot
             "tipo": "articulo",
             "unidadServicio": "hora",
             "mesesGarantia": 1,
+            "controlLote": true,
+            "unidadBase": "unidad",
+            "unidadCompra": "",
+            "factorConversion": 1,
+            "multiploVenta": 1,
+            "pesoKg": 1,
+            "volumenM3": 1,
             "precioLista1": 1,
             "precioLista2": 1,
             "costo": 1,
@@ -41571,6 +41886,8 @@ Sets `estado` to `N` (anulada), reverses the customer balance by the invoice tot
             "additionalProperty": "anything"
           },
           "cantidad": 1,
+          "unidadMedida": "",
+          "codigoAfipUnidad": "",
           "precio": 1,
           "dscto": 1,
           "subtotal": 1,
@@ -42907,7 +43224,7 @@ Paginated list. Requires module `fiscal.remito`.
 
   - **`cantidad` (required)**
 
-    `integer`
+    `number` — Quantity; may be decimal when article UoM allows (#203).
 
   - **`descripcion` (required)**
 
@@ -43295,7 +43612,7 @@ Paginated list. Requires module `fiscal.remito`.
 
   - **`cantidad` (required)**
 
-    `integer`
+    `number` — Quantity; may be decimal when article UoM allows (#203).
 
   - **`descripcion` (required)**
 
@@ -81586,6 +81903,10 @@ Rate-limited mutation; requires products.manage. USD only.
 
   `string`
 
+* **`controlLote`**
+
+  `boolean` — When true, stock movements require lot tracking / FEFO (#202).
+
 * **`costo`**
 
   `number`
@@ -81593,6 +81914,10 @@ Rate-limited mutation; requires products.manage. USD only.
 * **`descripcion`**
 
   `string`
+
+* **`factorConversion`**
+
+  `number` — 1 purchase unit equals factorConversion base units (#203). Default 1.
 
 * **`id`**
 
@@ -81604,11 +81929,19 @@ Rate-limited mutation; requires products.manage. USD only.
 
 * **`minimo`**
 
-  `integer`
+  `number` — Minimum stock in base units; Decimal(14,4) (#203).
 
 * **`monedaPrecio`**
 
   `string`, possible values: `"ARS", "USD", "EUR"`, default: `"ARS"`
+
+* **`multiploVenta`**
+
+  `number` — Optional sale multiple for cut-to-size items (#203).
+
+* **`pesoKg`**
+
+  `number` — Unit weight in kg for logistics (#203).
 
 * **`precioEnMonedaOrigen`**
 
@@ -81644,7 +81977,7 @@ Rate-limited mutation; requires products.manage. USD only.
 
 * **`stock`**
 
-  `integer`
+  `number` — Stock quantity in base units; Decimal(14,4) (#203).
 
 * **`tipo`**
 
@@ -81654,9 +81987,21 @@ Rate-limited mutation; requires products.manage. USD only.
 
   `string`
 
+* **`unidadBase`**
+
+  `string`, possible values: `"unidad", "kg", "gramo", "litro", "metro", "m2", "m3", "rollo", "caja"` — Base stock/sale unit catalog (#203). Default unidad.
+
+* **`unidadCompra`**
+
+  `string` — Purchase unit when different from base (#203).
+
 * **`unidadServicio`**
 
   `string`, possible values: `"hora", "dia", "mes", "proyecto", "km", "unidad", "otro"` — Required when tipo is servicio (#244).
+
+* **`volumenM3`**
+
+  `number` — Unit volume in m3 for logistics (#203).
 
 **Example:**
 
@@ -81677,6 +82022,13 @@ Rate-limited mutation; requires products.manage. USD only.
   "tipo": "articulo",
   "unidadServicio": "hora",
   "mesesGarantia": 1,
+  "controlLote": true,
+  "unidadBase": "unidad",
+  "unidadCompra": "",
+  "factorConversion": 1,
+  "multiploVenta": 1,
+  "pesoKg": 1,
+  "volumenM3": 1,
   "precioLista1": 1,
   "precioLista2": 1,
   "costo": 1,
@@ -81715,7 +82067,7 @@ Rate-limited mutation; requires products.manage. USD only.
 
 * **`minimo` (required)**
 
-  `integer` — Must be 0 when tipo is servicio (#244).
+  `number` — Must be 0 when tipo is servicio (#244). Decimal base units (#203).
 
 * **`precioLista1` (required)**
 
@@ -81731,11 +82083,19 @@ Rate-limited mutation; requires products.manage. USD only.
 
 * **`stock` (required)**
 
-  `integer` — Must be 0 when tipo is servicio (#244).
+  `number` — Must be 0 when tipo is servicio (#244). Decimal base units (#203).
 
 * **`umedida` (required)**
 
   `string`
+
+* **`controlLote`**
+
+  `boolean` — Lot control opt-in (#202).
+
+* **`factorConversion`**
+
+  `number` — Purchase-to-base conversion factor (#203). Default 1.
 
 * **`mesesGarantia`**
 
@@ -81745,6 +82105,14 @@ Rate-limited mutation; requires products.manage. USD only.
 
   `string`, possible values: `"ARS", "USD", "EUR"`, default: `"ARS"` — Catalog price currency; ARS materializes precioLista1 directly (#243).
 
+* **`multiploVenta`**
+
+  `number` — Sale multiple/step for cut-to-size (#203).
+
+* **`pesoKg`**
+
+  `number`
+
 * **`precioEnMonedaOrigen`**
 
   `number` — Required when monedaPrecio is USD or EUR; drives ARS precioLista1 via current TC (#243).
@@ -81753,9 +82121,21 @@ Rate-limited mutation; requires products.manage. USD only.
 
   `string`, possible values: `"articulo", "servicio"`, default: `"articulo"`
 
+* **`unidadBase`**
+
+  `string`, possible values: `"unidad", "kg", "gramo", "litro", "metro", "m2", "m3", "rollo", "caja"` — Base UoM; when set, umedida is derived (#203).
+
+* **`unidadCompra`**
+
+  `string` — Purchase unit label (#203).
+
 * **`unidadServicio`**
 
   `string`, possible values: `"hora", "dia", "mes", "proyecto", "km", "unidad", "otro"`
+
+* **`volumenM3`**
+
+  `number`
 
 **Example:**
 
@@ -81769,6 +82149,13 @@ Rate-limited mutation; requires products.manage. USD only.
   "tipo": "articulo",
   "unidadServicio": "hora",
   "mesesGarantia": 1,
+  "controlLote": true,
+  "unidadBase": "unidad",
+  "unidadCompra": "",
+  "factorConversion": 1,
+  "multiploVenta": 1,
+  "pesoKg": 0,
+  "volumenM3": 0,
   "precioLista1": 0.01,
   "precioLista2": 0.01,
   "costo": 0.01,
@@ -81806,6 +82193,10 @@ Rate-limited mutation; requires products.manage. USD only.
 
     `string`
 
+  - **`controlLote`**
+
+    `boolean` — When true, stock movements require lot tracking / FEFO (#202).
+
   - **`costo`**
 
     `number`
@@ -81813,6 +82204,10 @@ Rate-limited mutation; requires products.manage. USD only.
   - **`descripcion`**
 
     `string`
+
+  - **`factorConversion`**
+
+    `number` — 1 purchase unit equals factorConversion base units (#203). Default 1.
 
   - **`id`**
 
@@ -81824,11 +82219,19 @@ Rate-limited mutation; requires products.manage. USD only.
 
   - **`minimo`**
 
-    `integer`
+    `number` — Minimum stock in base units; Decimal(14,4) (#203).
 
   - **`monedaPrecio`**
 
     `string`, possible values: `"ARS", "USD", "EUR"`, default: `"ARS"`
+
+  - **`multiploVenta`**
+
+    `number` — Optional sale multiple for cut-to-size items (#203).
+
+  - **`pesoKg`**
+
+    `number` — Unit weight in kg for logistics (#203).
 
   - **`precioEnMonedaOrigen`**
 
@@ -81864,7 +82267,7 @@ Rate-limited mutation; requires products.manage. USD only.
 
   - **`stock`**
 
-    `integer`
+    `number` — Stock quantity in base units; Decimal(14,4) (#203).
 
   - **`tipo`**
 
@@ -81874,9 +82277,21 @@ Rate-limited mutation; requires products.manage. USD only.
 
     `string`
 
+  - **`unidadBase`**
+
+    `string`, possible values: `"unidad", "kg", "gramo", "litro", "metro", "m2", "m3", "rollo", "caja"` — Base stock/sale unit catalog (#203). Default unidad.
+
+  - **`unidadCompra`**
+
+    `string` — Purchase unit when different from base (#203).
+
   - **`unidadServicio`**
 
     `string`, possible values: `"hora", "dia", "mes", "proyecto", "km", "unidad", "otro"` — Required when tipo is servicio (#244).
+
+  - **`volumenM3`**
+
+    `number` — Unit volume in m3 for logistics (#203).
 
 * **`success` (required)**
 
@@ -81903,6 +82318,13 @@ Rate-limited mutation; requires products.manage. USD only.
     "tipo": "articulo",
     "unidadServicio": "hora",
     "mesesGarantia": 1,
+    "controlLote": true,
+    "unidadBase": "unidad",
+    "unidadCompra": "",
+    "factorConversion": 1,
+    "multiploVenta": 1,
+    "pesoKg": 1,
+    "volumenM3": 1,
     "precioLista1": 1,
     "precioLista2": 1,
     "costo": 1,
@@ -81949,6 +82371,13 @@ Rate-limited mutation; requires products.manage. USD only.
     "tipo": "articulo",
     "unidadServicio": "hora",
     "mesesGarantia": 1,
+    "controlLote": true,
+    "unidadBase": "unidad",
+    "unidadCompra": "",
+    "factorConversion": 1,
+    "multiploVenta": 1,
+    "pesoKg": 1,
+    "volumenM3": 1,
     "precioLista1": 1,
     "precioLista2": 1,
     "costo": 1,
@@ -85733,6 +86162,10 @@ Rate-limited mutation; requires products.manage. USD only.
 
       `string`
 
+    - **`controlLote`**
+
+      `boolean` — When true, stock movements require lot tracking / FEFO (#202).
+
     - **`costo`**
 
       `number`
@@ -85740,6 +86173,10 @@ Rate-limited mutation; requires products.manage. USD only.
     - **`descripcion`**
 
       `string`
+
+    - **`factorConversion`**
+
+      `number` — 1 purchase unit equals factorConversion base units (#203). Default 1.
 
     - **`id`**
 
@@ -85751,11 +86188,19 @@ Rate-limited mutation; requires products.manage. USD only.
 
     - **`minimo`**
 
-      `integer`
+      `number` — Minimum stock in base units; Decimal(14,4) (#203).
 
     - **`monedaPrecio`**
 
       `string`, possible values: `"ARS", "USD", "EUR"`, default: `"ARS"`
+
+    - **`multiploVenta`**
+
+      `number` — Optional sale multiple for cut-to-size items (#203).
+
+    - **`pesoKg`**
+
+      `number` — Unit weight in kg for logistics (#203).
 
     - **`precioEnMonedaOrigen`**
 
@@ -85791,7 +86236,7 @@ Rate-limited mutation; requires products.manage. USD only.
 
     - **`stock`**
 
-      `integer`
+      `number` — Stock quantity in base units; Decimal(14,4) (#203).
 
     - **`tipo`**
 
@@ -85801,9 +86246,21 @@ Rate-limited mutation; requires products.manage. USD only.
 
       `string`
 
+    - **`unidadBase`**
+
+      `string`, possible values: `"unidad", "kg", "gramo", "litro", "metro", "m2", "m3", "rollo", "caja"` — Base stock/sale unit catalog (#203). Default unidad.
+
+    - **`unidadCompra`**
+
+      `string` — Purchase unit when different from base (#203).
+
     - **`unidadServicio`**
 
       `string`, possible values: `"hora", "dia", "mes", "proyecto", "km", "unidad", "otro"` — Required when tipo is servicio (#244).
+
+    - **`volumenM3`**
+
+      `number` — Unit volume in m3 for logistics (#203).
 
   - **`articuloId`**
 
@@ -85811,7 +86268,11 @@ Rate-limited mutation; requires products.manage. USD only.
 
   - **`cantidad`**
 
-    `number`
+    `number` — Quantity in article base units; may be decimal for cut-to-size UoM (#203).
+
+  - **`codigoAfipUnidad`**
+
+    `string` — AFIP WSFE UniMedida code snapshot (#203). Mock CAE has no line XML yet.
 
   - **`condIva`**
 
@@ -85836,6 +86297,10 @@ Rate-limited mutation; requires products.manage. USD only.
   - **`subtotal`**
 
     `number`
+
+  - **`unidadMedida`**
+
+    `string` — Base UoM snapshot at invoice time (#203).
 
   - **`unidadServicio`**
 
@@ -85921,6 +86386,13 @@ Rate-limited mutation; requires products.manage. USD only.
         "tipo": "articulo",
         "unidadServicio": "hora",
         "mesesGarantia": 1,
+        "controlLote": true,
+        "unidadBase": "unidad",
+        "unidadCompra": "",
+        "factorConversion": 1,
+        "multiploVenta": 1,
+        "pesoKg": 1,
+        "volumenM3": 1,
         "precioLista1": 1,
         "precioLista2": 1,
         "costo": 1,
@@ -85932,6 +86404,8 @@ Rate-limited mutation; requires products.manage. USD only.
         "additionalProperty": "anything"
       },
       "cantidad": 1,
+      "unidadMedida": "",
+      "codigoAfipUnidad": "",
       "precio": 1,
       "dscto": 1,
       "subtotal": 1,
@@ -85962,6 +86436,10 @@ Rate-limited mutation; requires products.manage. USD only.
 
     `string`
 
+  - **`controlLote`**
+
+    `boolean` — When true, stock movements require lot tracking / FEFO (#202).
+
   - **`costo`**
 
     `number`
@@ -85969,6 +86447,10 @@ Rate-limited mutation; requires products.manage. USD only.
   - **`descripcion`**
 
     `string`
+
+  - **`factorConversion`**
+
+    `number` — 1 purchase unit equals factorConversion base units (#203). Default 1.
 
   - **`id`**
 
@@ -85980,11 +86462,19 @@ Rate-limited mutation; requires products.manage. USD only.
 
   - **`minimo`**
 
-    `integer`
+    `number` — Minimum stock in base units; Decimal(14,4) (#203).
 
   - **`monedaPrecio`**
 
     `string`, possible values: `"ARS", "USD", "EUR"`, default: `"ARS"`
+
+  - **`multiploVenta`**
+
+    `number` — Optional sale multiple for cut-to-size items (#203).
+
+  - **`pesoKg`**
+
+    `number` — Unit weight in kg for logistics (#203).
 
   - **`precioEnMonedaOrigen`**
 
@@ -86020,7 +86510,7 @@ Rate-limited mutation; requires products.manage. USD only.
 
   - **`stock`**
 
-    `integer`
+    `number` — Stock quantity in base units; Decimal(14,4) (#203).
 
   - **`tipo`**
 
@@ -86030,9 +86520,21 @@ Rate-limited mutation; requires products.manage. USD only.
 
     `string`
 
+  - **`unidadBase`**
+
+    `string`, possible values: `"unidad", "kg", "gramo", "litro", "metro", "m2", "m3", "rollo", "caja"` — Base stock/sale unit catalog (#203). Default unidad.
+
+  - **`unidadCompra`**
+
+    `string` — Purchase unit when different from base (#203).
+
   - **`unidadServicio`**
 
     `string`, possible values: `"hora", "dia", "mes", "proyecto", "km", "unidad", "otro"` — Required when tipo is servicio (#244).
+
+  - **`volumenM3`**
+
+    `number` — Unit volume in m3 for logistics (#203).
 
 * **`articuloId`**
 
@@ -86040,7 +86542,11 @@ Rate-limited mutation; requires products.manage. USD only.
 
 * **`cantidad`**
 
-  `number`
+  `number` — Quantity in article base units; may be decimal for cut-to-size UoM (#203).
+
+* **`codigoAfipUnidad`**
+
+  `string` — AFIP WSFE UniMedida code snapshot (#203). Mock CAE has no line XML yet.
 
 * **`condIva`**
 
@@ -86065,6 +86571,10 @@ Rate-limited mutation; requires products.manage. USD only.
 * **`subtotal`**
 
   `number`
+
+* **`unidadMedida`**
+
+  `string` — Base UoM snapshot at invoice time (#203).
 
 * **`unidadServicio`**
 
@@ -86095,6 +86605,13 @@ Rate-limited mutation; requires products.manage. USD only.
     "tipo": "articulo",
     "unidadServicio": "hora",
     "mesesGarantia": 1,
+    "controlLote": true,
+    "unidadBase": "unidad",
+    "unidadCompra": "",
+    "factorConversion": 1,
+    "multiploVenta": 1,
+    "pesoKg": 1,
+    "volumenM3": 1,
     "precioLista1": 1,
     "precioLista2": 1,
     "costo": 1,
@@ -86106,6 +86623,8 @@ Rate-limited mutation; requires products.manage. USD only.
     "additionalProperty": "anything"
   },
   "cantidad": 1,
+  "unidadMedida": "",
+  "codigoAfipUnidad": "",
   "precio": 1,
   "dscto": 1,
   "subtotal": 1,
@@ -86123,7 +86642,7 @@ Rate-limited mutation; requires products.manage. USD only.
 
 * **`cantidad` (required)**
 
-  `integer`
+  `number` — Quantity; may be decimal when article UoM allows (#203).
 
 * **`descripcion` (required)**
 
@@ -86160,7 +86679,7 @@ Rate-limited mutation; requires products.manage. USD only.
 
   - **`cantidad` (required)**
 
-    `integer`
+    `number` — Quantity; may be decimal when article UoM allows (#203).
 
   - **`descripcion` (required)**
 
@@ -86245,7 +86764,7 @@ Rate-limited mutation; requires products.manage. USD only.
 
   - **`cantidad` (required)**
 
-    `integer`
+    `number` — Quantity; may be decimal when article UoM allows (#203).
 
   - **`descripcion` (required)**
 
@@ -87409,6 +87928,10 @@ Rate-limited mutation; requires products.manage. USD only.
 
         `string`
 
+      - **`controlLote`**
+
+        `boolean` — When true, stock movements require lot tracking / FEFO (#202).
+
       - **`costo`**
 
         `number`
@@ -87416,6 +87939,10 @@ Rate-limited mutation; requires products.manage. USD only.
       - **`descripcion`**
 
         `string`
+
+      - **`factorConversion`**
+
+        `number` — 1 purchase unit equals factorConversion base units (#203). Default 1.
 
       - **`id`**
 
@@ -87427,11 +87954,19 @@ Rate-limited mutation; requires products.manage. USD only.
 
       - **`minimo`**
 
-        `integer`
+        `number` — Minimum stock in base units; Decimal(14,4) (#203).
 
       - **`monedaPrecio`**
 
         `string`, possible values: `"ARS", "USD", "EUR"`, default: `"ARS"`
+
+      - **`multiploVenta`**
+
+        `number` — Optional sale multiple for cut-to-size items (#203).
+
+      - **`pesoKg`**
+
+        `number` — Unit weight in kg for logistics (#203).
 
       - **`precioEnMonedaOrigen`**
 
@@ -87467,7 +88002,7 @@ Rate-limited mutation; requires products.manage. USD only.
 
       - **`stock`**
 
-        `integer`
+        `number` — Stock quantity in base units; Decimal(14,4) (#203).
 
       - **`tipo`**
 
@@ -87477,9 +88012,21 @@ Rate-limited mutation; requires products.manage. USD only.
 
         `string`
 
+      - **`unidadBase`**
+
+        `string`, possible values: `"unidad", "kg", "gramo", "litro", "metro", "m2", "m3", "rollo", "caja"` — Base stock/sale unit catalog (#203). Default unidad.
+
+      - **`unidadCompra`**
+
+        `string` — Purchase unit when different from base (#203).
+
       - **`unidadServicio`**
 
         `string`, possible values: `"hora", "dia", "mes", "proyecto", "km", "unidad", "otro"` — Required when tipo is servicio (#244).
+
+      - **`volumenM3`**
+
+        `number` — Unit volume in m3 for logistics (#203).
 
     - **`articuloId`**
 
@@ -87487,7 +88034,11 @@ Rate-limited mutation; requires products.manage. USD only.
 
     - **`cantidad`**
 
-      `number`
+      `number` — Quantity in article base units; may be decimal for cut-to-size UoM (#203).
+
+    - **`codigoAfipUnidad`**
+
+      `string` — AFIP WSFE UniMedida code snapshot (#203). Mock CAE has no line XML yet.
 
     - **`condIva`**
 
@@ -87512,6 +88063,10 @@ Rate-limited mutation; requires products.manage. USD only.
     - **`subtotal`**
 
       `number`
+
+    - **`unidadMedida`**
+
+      `string` — Base UoM snapshot at invoice time (#203).
 
     - **`unidadServicio`**
 
@@ -87603,6 +88158,13 @@ Rate-limited mutation; requires products.manage. USD only.
           "tipo": "articulo",
           "unidadServicio": "hora",
           "mesesGarantia": 1,
+          "controlLote": true,
+          "unidadBase": "unidad",
+          "unidadCompra": "",
+          "factorConversion": 1,
+          "multiploVenta": 1,
+          "pesoKg": 1,
+          "volumenM3": 1,
           "precioLista1": 1,
           "precioLista2": 1,
           "costo": 1,
@@ -87614,6 +88176,8 @@ Rate-limited mutation; requires products.manage. USD only.
           "additionalProperty": "anything"
         },
         "cantidad": 1,
+        "unidadMedida": "",
+        "codigoAfipUnidad": "",
         "precio": 1,
         "dscto": 1,
         "subtotal": 1,
@@ -92183,6 +92747,10 @@ Originating invoice header (selected columns)
 
         `string`
 
+      - **`controlLote`**
+
+        `boolean` — When true, stock movements require lot tracking / FEFO (#202).
+
       - **`costo`**
 
         `number`
@@ -92190,6 +92758,10 @@ Originating invoice header (selected columns)
       - **`descripcion`**
 
         `string`
+
+      - **`factorConversion`**
+
+        `number` — 1 purchase unit equals factorConversion base units (#203). Default 1.
 
       - **`id`**
 
@@ -92201,11 +92773,19 @@ Originating invoice header (selected columns)
 
       - **`minimo`**
 
-        `integer`
+        `number` — Minimum stock in base units; Decimal(14,4) (#203).
 
       - **`monedaPrecio`**
 
         `string`, possible values: `"ARS", "USD", "EUR"`, default: `"ARS"`
+
+      - **`multiploVenta`**
+
+        `number` — Optional sale multiple for cut-to-size items (#203).
+
+      - **`pesoKg`**
+
+        `number` — Unit weight in kg for logistics (#203).
 
       - **`precioEnMonedaOrigen`**
 
@@ -92241,7 +92821,7 @@ Originating invoice header (selected columns)
 
       - **`stock`**
 
-        `integer`
+        `number` — Stock quantity in base units; Decimal(14,4) (#203).
 
       - **`tipo`**
 
@@ -92251,9 +92831,21 @@ Originating invoice header (selected columns)
 
         `string`
 
+      - **`unidadBase`**
+
+        `string`, possible values: `"unidad", "kg", "gramo", "litro", "metro", "m2", "m3", "rollo", "caja"` — Base stock/sale unit catalog (#203). Default unidad.
+
+      - **`unidadCompra`**
+
+        `string` — Purchase unit when different from base (#203).
+
       - **`unidadServicio`**
 
         `string`, possible values: `"hora", "dia", "mes", "proyecto", "km", "unidad", "otro"` — Required when tipo is servicio (#244).
+
+      - **`volumenM3`**
+
+        `number` — Unit volume in m3 for logistics (#203).
 
     - **`articuloId`**
 
@@ -92261,7 +92853,11 @@ Originating invoice header (selected columns)
 
     - **`cantidad`**
 
-      `number`
+      `number` — Quantity in article base units; may be decimal for cut-to-size UoM (#203).
+
+    - **`codigoAfipUnidad`**
+
+      `string` — AFIP WSFE UniMedida code snapshot (#203). Mock CAE has no line XML yet.
 
     - **`condIva`**
 
@@ -92286,6 +92882,10 @@ Originating invoice header (selected columns)
     - **`subtotal`**
 
       `number`
+
+    - **`unidadMedida`**
+
+      `string` — Base UoM snapshot at invoice time (#203).
 
     - **`unidadServicio`**
 
@@ -92436,6 +93036,13 @@ Originating invoice header (selected columns)
           "tipo": "articulo",
           "unidadServicio": "hora",
           "mesesGarantia": 1,
+          "controlLote": true,
+          "unidadBase": "unidad",
+          "unidadCompra": "",
+          "factorConversion": 1,
+          "multiploVenta": 1,
+          "pesoKg": 1,
+          "volumenM3": 1,
           "precioLista1": 1,
           "precioLista2": 1,
           "costo": 1,
@@ -92447,6 +93054,8 @@ Originating invoice header (selected columns)
           "additionalProperty": "anything"
         },
         "cantidad": 1,
+        "unidadMedida": "",
+        "codigoAfipUnidad": "",
         "precio": 1,
         "dscto": 1,
         "subtotal": 1,
@@ -92543,6 +93152,10 @@ Originating invoice header (selected columns)
 
           `string`
 
+        - **`controlLote`**
+
+          `boolean` — When true, stock movements require lot tracking / FEFO (#202).
+
         - **`costo`**
 
           `number`
@@ -92550,6 +93163,10 @@ Originating invoice header (selected columns)
         - **`descripcion`**
 
           `string`
+
+        - **`factorConversion`**
+
+          `number` — 1 purchase unit equals factorConversion base units (#203). Default 1.
 
         - **`id`**
 
@@ -92561,11 +93178,19 @@ Originating invoice header (selected columns)
 
         - **`minimo`**
 
-          `integer`
+          `number` — Minimum stock in base units; Decimal(14,4) (#203).
 
         - **`monedaPrecio`**
 
           `string`, possible values: `"ARS", "USD", "EUR"`, default: `"ARS"`
+
+        - **`multiploVenta`**
+
+          `number` — Optional sale multiple for cut-to-size items (#203).
+
+        - **`pesoKg`**
+
+          `number` — Unit weight in kg for logistics (#203).
 
         - **`precioEnMonedaOrigen`**
 
@@ -92601,7 +93226,7 @@ Originating invoice header (selected columns)
 
         - **`stock`**
 
-          `integer`
+          `number` — Stock quantity in base units; Decimal(14,4) (#203).
 
         - **`tipo`**
 
@@ -92611,9 +93236,21 @@ Originating invoice header (selected columns)
 
           `string`
 
+        - **`unidadBase`**
+
+          `string`, possible values: `"unidad", "kg", "gramo", "litro", "metro", "m2", "m3", "rollo", "caja"` — Base stock/sale unit catalog (#203). Default unidad.
+
+        - **`unidadCompra`**
+
+          `string` — Purchase unit when different from base (#203).
+
         - **`unidadServicio`**
 
           `string`, possible values: `"hora", "dia", "mes", "proyecto", "km", "unidad", "otro"` — Required when tipo is servicio (#244).
+
+        - **`volumenM3`**
+
+          `number` — Unit volume in m3 for logistics (#203).
 
       - **`articuloId`**
 
@@ -92621,7 +93258,11 @@ Originating invoice header (selected columns)
 
       - **`cantidad`**
 
-        `number`
+        `number` — Quantity in article base units; may be decimal for cut-to-size UoM (#203).
+
+      - **`codigoAfipUnidad`**
+
+        `string` — AFIP WSFE UniMedida code snapshot (#203). Mock CAE has no line XML yet.
 
       - **`condIva`**
 
@@ -92646,6 +93287,10 @@ Originating invoice header (selected columns)
       - **`subtotal`**
 
         `number`
+
+      - **`unidadMedida`**
+
+        `string` — Base UoM snapshot at invoice time (#203).
 
       - **`unidadServicio`**
 
@@ -92802,6 +93447,13 @@ Originating invoice header (selected columns)
             "tipo": "articulo",
             "unidadServicio": "hora",
             "mesesGarantia": 1,
+            "controlLote": true,
+            "unidadBase": "unidad",
+            "unidadCompra": "",
+            "factorConversion": 1,
+            "multiploVenta": 1,
+            "pesoKg": 1,
+            "volumenM3": 1,
             "precioLista1": 1,
             "precioLista2": 1,
             "costo": 1,
@@ -92813,6 +93465,8 @@ Originating invoice header (selected columns)
             "additionalProperty": "anything"
           },
           "cantidad": 1,
+          "unidadMedida": "",
+          "codigoAfipUnidad": "",
           "precio": 1,
           "dscto": 1,
           "subtotal": 1,

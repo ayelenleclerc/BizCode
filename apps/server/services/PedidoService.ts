@@ -355,7 +355,7 @@ export class PedidoService {
       descripcion: it.descripcion,
       condIva: it.condIva as '1' | '2' | '3',
       unidadServicio: it.unidadServicio as PedidoInput['items'][number]['unidadServicio'],
-      cantidad: it.cantidad,
+      cantidad: Number(it.cantidad),
       precio: Number(it.precio),
       dscto: Number(it.dscto),
       subtotal: Number(it.subtotal),
@@ -363,7 +363,7 @@ export class PedidoService {
 
     const totals = calculateInvoice(
       pedido.items.map((it) => ({
-        cantidad: it.cantidad,
+        cantidad: Number(it.cantidad),
         precio: Number(it.precio),
         dscto: Number(it.dscto),
         articuloIva: it.condIva as '1' | '2' | '3',

@@ -19,7 +19,7 @@ undefined#/properties/items/items
 | Property                    | Type      | Required | Nullable       | Defined by                                                                                       |
 | :-------------------------- | :-------- | :------- | :------------- | :----------------------------------------------------------------------------------------------- |
 | [articuloId](#articuloid)   | `integer` | Required | cannot be null | [RemitoItemInput](remitoiteminput-properties-articuloid.md "undefined#/properties/articuloId")   |
-| [cantidad](#cantidad)       | `integer` | Required | cannot be null | [RemitoItemInput](remitoiteminput-properties-cantidad.md "undefined#/properties/cantidad")       |
+| [cantidad](#cantidad)       | `number`  | Required | cannot be null | [RemitoItemInput](remitoiteminput-properties-cantidad.md "undefined#/properties/cantidad")       |
 | [descripcion](#descripcion) | `string`  | Required | cannot be null | [RemitoItemInput](remitoiteminput-properties-descripcion.md "undefined#/properties/descripcion") |
 | [unidad](#unidad)           | `string`  | Required | cannot be null | [RemitoItemInput](remitoiteminput-properties-unidad.md "undefined#/properties/unidad")           |
 
@@ -43,13 +43,13 @@ undefined#/properties/items/items
 
 ## cantidad
 
-
+Quantity; may be decimal when article UoM allows (#203).
 
 `cantidad`
 
 * is required
 
-* Type: `integer`
+* Type: `number`
 
 * cannot be null
 
@@ -57,11 +57,11 @@ undefined#/properties/items/items
 
 ### cantidad Type
 
-`integer`
+`number`
 
 ### cantidad Constraints
 
-**minimum**: the value of this number must greater than or equal to: `1`
+**minimum (exclusive)**: the value of this number must be greater than: `0`
 
 ## descripcion
 

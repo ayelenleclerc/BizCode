@@ -5,9 +5,12 @@ import { MemoryRouter } from 'react-router-dom'
 import '@/i18n/config'
 import ComprasPage from './index'
 import type { ComprasOcPrefillState } from '@/lib/comprasOcPrefill'
-import { comprasAPI, type OrdenCompra } from '@/lib/api'
+import { articulosAPI, comprasAPI, type OrdenCompra } from '@/lib/api'
 import { useAuth } from '@/contexts/AuthContext'
 import type { AuthClaims, Permission } from '@/lib/rbac'
+import type { Articulo } from '@bizcode/types'
+
+const { mockHasModule } = vi.hoisted(() => ({ mockHasModule: vi.fn().mockReturnValue(false) }))
 
 const basePermissions = [
   'suppliers.read',
@@ -59,6 +62,17 @@ vi.mock('@/contexts/AuthContext', () => ({
   useAuth: vi.fn(),
 }))
 
+vi.mock('@/contexts/FeatureFlagsContext', () => ({
+  useFeatureFlags: () => ({
+    status: 'ready',
+    modules: [],
+    integrations: [],
+    hasModule: mockHasModule,
+    hasIntegration: () => false,
+    refreshFeatures: vi.fn(),
+  }),
+}))
+
 vi.mock('@/lib/api', async () => {
   const actual = await vi.importActual<typeof import('@/lib/api')>('@/lib/api')
   return {
@@ -70,6 +84,9 @@ vi.mock('@/lib/api', async () => {
       send: vi.fn(),
       cancel: vi.fn(),
       receive: vi.fn(),
+    },
+    articulosAPI: {
+      list: vi.fn().mockResolvedValue([]),
     },
   }
 })
@@ -96,6 +113,8 @@ describe('ComprasPage', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     localStorage.setItem('lang', 'es')
+    mockHasModule.mockReturnValue(false)
+    vi.mocked(articulosAPI.list).mockResolvedValue([])
     mockAuth(baseClaims.permissions)
     vi.mocked(comprasAPI.list).mockResolvedValue({
       success: true,
@@ -229,5 +248,40 @@ describe('ComprasPage', () => {
       expect(comprasAPI.receive).toHaveBeenCalledWith(1, [{ itemId: 10, cantidad: 3 }])
     })
     expect(screen.queryByTestId('compras-receive-dialog')).not.toBeInTheDocument()
+  })
+
+  it('recibe stock con cantidad decimal cuando el módulo UoM lo permite (#203)', async () => {
+    mockHasModule.mockImplementation((key: string) => key === 'inventory.uom')
+    const articuloKg: Articulo = {
+      id: 3,
+      codigo: 100,
+      descripcion: 'Artículo A',
+      rubroId: 1,
+      condIva: '1',
+      umedida: 'KG',
+      unidadBase: 'kg',
+      factorConversion: 2,
+      multiploVenta: null,
+      precioLista1: 1,
+      precioLista2: 1,
+      costo: 1,
+      stock: 0,
+      minimo: 0,
+      activo: true,
+    }
+    vi.mocked(articulosAPI.list).mockResolvedValue([articuloKg])
+    vi.mocked(comprasAPI.get).mockResolvedValue(sentOrden)
+    const user = userEvent.setup()
+    renderCompras()
+    await user.click(await screen.findByTestId('compras-row-1'))
+    await user.click(await screen.findByTestId('compras-btn-receive'))
+    expect(await screen.findByTestId('compras-receive-unidad-hint-10')).toHaveTextContent('2')
+    const qtyInput = await screen.findByLabelText(/cantidad/i)
+    await user.clear(qtyInput)
+    await user.type(qtyInput, '2.5')
+    await user.click(screen.getByTestId('compras-receive-confirm'))
+    await waitFor(() => {
+      expect(comprasAPI.receive).toHaveBeenCalledWith(1, [{ itemId: 10, cantidad: 2.5 }])
+    })
   })
 })

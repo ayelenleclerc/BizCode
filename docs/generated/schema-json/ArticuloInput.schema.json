@@ -16,6 +16,10 @@
       ],
       "type": "string"
     },
+    "controlLote": {
+      "description": "Lot control opt-in (#202).",
+      "type": "boolean"
+    },
     "costo": {
       "minimum": 0.01,
       "type": "number"
@@ -25,6 +29,11 @@
       "minLength": 3,
       "type": "string"
     },
+    "factorConversion": {
+      "description": "Purchase-to-base conversion factor (#203). Default 1.",
+      "exclusiveMinimum": 0,
+      "type": "number"
+    },
     "mesesGarantia": {
       "description": "Warranty months; ignored for servicio (#251).",
       "minimum": 1,
@@ -32,9 +41,9 @@
       "type": "integer"
     },
     "minimo": {
-      "description": "Must be 0 when tipo is servicio (#244).",
+      "description": "Must be 0 when tipo is servicio (#244). Decimal base units (#203).",
       "minimum": 0,
-      "type": "integer"
+      "type": "number"
     },
     "monedaPrecio": {
       "default": "ARS",
@@ -45,6 +54,17 @@
         "EUR"
       ],
       "type": "string"
+    },
+    "multiploVenta": {
+      "description": "Sale multiple/step for cut-to-size (#203).",
+      "exclusiveMinimum": 0,
+      "nullable": true,
+      "type": "number"
+    },
+    "pesoKg": {
+      "minimum": 0,
+      "nullable": true,
+      "type": "number"
     },
     "precioEnMonedaOrigen": {
       "description": "Required when monedaPrecio is USD or EUR; drives ARS precioLista1 via current TC (#243).",
@@ -64,9 +84,9 @@
       "type": "integer"
     },
     "stock": {
-      "description": "Must be 0 when tipo is servicio (#244).",
+      "description": "Must be 0 when tipo is servicio (#244). Decimal base units (#203).",
       "minimum": 0,
-      "type": "integer"
+      "type": "number"
     },
     "tipo": {
       "default": "articulo",
@@ -81,6 +101,26 @@
       "minLength": 2,
       "type": "string"
     },
+    "unidadBase": {
+      "description": "Base UoM; when set, umedida is derived (#203).",
+      "enum": [
+        "unidad",
+        "kg",
+        "gramo",
+        "litro",
+        "metro",
+        "m2",
+        "m3",
+        "rollo",
+        "caja"
+      ],
+      "type": "string"
+    },
+    "unidadCompra": {
+      "description": "Purchase unit label (#203).",
+      "nullable": true,
+      "type": "string"
+    },
     "unidadServicio": {
       "enum": [
         "hora",
@@ -93,6 +133,11 @@
       ],
       "nullable": true,
       "type": "string"
+    },
+    "volumenM3": {
+      "minimum": 0,
+      "nullable": true,
+      "type": "number"
     }
   },
   "required": [

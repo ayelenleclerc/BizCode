@@ -3,7 +3,7 @@ import { useHotkeys } from 'react-hotkeys-hook'
 import { useTranslation } from 'react-i18next'
 import { depositosAPI, empresaAPI, facturasAPI, fidelizacionAPI, fiscalRetencionesAPI, listasPreciosAPI, type RetencionPreviewLineDTO } from '@/lib/api'
 import { calculateInvoice, calculateItemSubtotal } from '@/lib/invoice'
-import { Cliente, Articulo, FormaPago } from '@bizcode/types'
+import { Cliente, Articulo, FormaPago, allowsDecimalQuantity, type UnidadBase } from '@bizcode/types'
 import KeyboardHint, { useInvoiceShortcuts } from '@/components/shared/KeyboardHint'
 import { useFeatureFlags } from '@/contexts/FeatureFlagsContext'
 import FefoPreviewBadge from './FefoPreviewBadge'
@@ -22,6 +22,32 @@ interface LineaFactura {
   subtotal: number
 }
 
+type LineaQuantityConfig = {
+  step: string
+  inputMode: 'decimal' | 'numeric'
+  decimalAllowed: boolean
+}
+
+/**
+ * @en For catalog lines, resolves the cantidad input step/inputMode from the article's UoM rules (#203); ad-hoc/service lines and tenants without `inventory.uom` always stay integer-only.
+ * @es Para líneas de catálogo, resuelve step/inputMode del input de cantidad según las reglas UoM del artículo (#203); las líneas ad-hoc/servicio y tenants sin `inventory.uom` siempre quedan enteras.
+ * @pt-BR Para linhas de catálogo, resolve step/inputMode do input de quantidade conforme as regras UoM do artigo (#203); linhas ad-hoc/serviço e tenants sem `inventory.uom` permanecem sempre inteiras.
+ */
+function resolveLineQuantityConfig(linea: LineaFactura, uomEnabled: boolean): LineaQuantityConfig {
+  if (!uomEnabled || linea.mode !== 'catalog' || !linea.articulo || linea.articulo.tipo === 'servicio') {
+    return { step: '1', inputMode: 'numeric', decimalAllowed: false }
+  }
+  const unidadBase = (linea.articulo.unidadBase ?? 'unidad') as UnidadBase
+  const multiploVenta =
+    linea.articulo.multiploVenta != null ? Number(linea.articulo.multiploVenta) : null
+  const decimalAllowed = allowsDecimalQuantity(unidadBase, multiploVenta)
+  return {
+    step: decimalAllowed ? '0.0001' : '1',
+    inputMode: decimalAllowed ? 'decimal' : 'numeric',
+    decimalAllowed,
+  }
+}
+
 interface NuevaFacturaFormProps {
   clientes: Cliente[]
   articulos: Articulo[]
@@ -38,6 +64,7 @@ export default function NuevaFacturaForm({
 }: NuevaFacturaFormProps) {
   const { t } = useTranslation('facturacion')
   const { t: tc } = useTranslation('common')
+  const { t: ta } = useTranslation('articulos')
   const invoiceShortcuts = useInvoiceShortcuts()
 
   const [tipo, setTipo] = useState<'A' | 'B'>('A')
@@ -61,6 +88,7 @@ export default function NuevaFacturaForm({
   const loyaltyModule = hasModule('clients.loyalty')
   const fefoModule = hasModule('inventory.fefo')
   const warehousesModule = hasModule('inventory.warehouses')
+  const uomModule = hasModule('inventory.uom')
   const [fefoDefaultDepositoId, setFefoDefaultDepositoId] = useState<number | null>(null)
   const [puntosCanje, setPuntosCanje] = useState('')
   const [loyaltySaldo, setLoyaltySaldo] = useState<{
@@ -685,15 +713,42 @@ export default function NuevaFacturaForm({
                     ) : null}
                   </td>
                   <td className="px-3 py-2">
-                    <input
-                      type="number"
-                      value={linea.cantidad}
-                      onChange={(e) =>
-                        updateLinea(idx, 'cantidad', parseInt(e.target.value) || 0)
-                      }
-                      aria-label={`${t('items.cantidad')} ${idx + 1}`}
-                      className="w-full bg-white dark:bg-slate-600 text-slate-900 dark:text-slate-100 rounded border border-slate-300 dark:border-slate-500 px-2 py-1 text-sm text-center"
-                    />
+                    {(() => {
+                      const qtyConfig = resolveLineQuantityConfig(linea, uomModule)
+                      const unidadBase = linea.articulo?.unidadBase
+                      const showUnidad =
+                        uomModule && linea.mode === 'catalog' && linea.articulo?.tipo !== 'servicio' && !!unidadBase
+                      const unidadHintId = `factura-line-${idx}-unidad`
+                      return (
+                        <>
+                          <input
+                            type="number"
+                            step={qtyConfig.step}
+                            inputMode={qtyConfig.inputMode}
+                            value={linea.cantidad}
+                            onChange={(e) => {
+                              const parsed = qtyConfig.decimalAllowed
+                                ? parseFloat(e.target.value)
+                                : parseInt(e.target.value, 10)
+                              updateLinea(idx, 'cantidad', Number.isFinite(parsed) ? parsed : 0)
+                            }}
+                            aria-label={`${t('items.cantidad')} ${idx + 1}`}
+                            aria-describedby={showUnidad ? unidadHintId : undefined}
+                            data-testid={`factura-line-${idx}-cantidad`}
+                            className="w-full bg-white dark:bg-slate-600 text-slate-900 dark:text-slate-100 rounded border border-slate-300 dark:border-slate-500 px-2 py-1 text-sm text-center"
+                          />
+                          {showUnidad ? (
+                            <p
+                              id={unidadHintId}
+                              data-testid={unidadHintId}
+                              className="mt-0.5 text-center text-xs text-slate-500 dark:text-slate-300"
+                            >
+                              {ta(`form.uom.unidadBaseOptions.${unidadBase}`)}
+                            </p>
+                          ) : null}
+                        </>
+                      )
+                    })()}
                   </td>
                   <td className="px-3 py-2">
                     <input

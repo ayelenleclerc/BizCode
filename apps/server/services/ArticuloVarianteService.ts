@@ -63,7 +63,7 @@ function mapVariante(row: VarianteDb): ArticuloVarianteRow {
     costoOverride: toNumber(row.costoOverride),
     precioLista1: Number(row.precioLista1.toString()),
     costo: Number(row.costo.toString()),
-    stock: row.stock,
+    stock: Number(row.stock),
     activo: row.activo,
     atributoValores: row.atributoValores.map((av) => ({
       id: av.id,
@@ -172,14 +172,14 @@ export class ArticuloVarianteService {
       select: { id: true, codigo: true, descripcion: true, stock: true, activo: true },
       orderBy: { codigo: 'asc' },
     })
-    const stockFamilia = variantes.reduce((sum, v) => sum + (v.activo ? v.stock : 0), 0)
+    const stockFamilia = variantes.reduce((sum, v) => sum + (v.activo ? Number(v.stock) : 0), 0)
     return {
       ok: true,
       data: {
         success: true,
         padreId,
         stockFamilia,
-        variantes,
+        variantes: variantes.map((v) => ({ ...v, stock: Number(v.stock) })),
       },
     }
   }

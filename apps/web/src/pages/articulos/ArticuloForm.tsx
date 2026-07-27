@@ -15,9 +15,13 @@ import {
   Articulo,
   MONEDAS_PRECIO,
   Rubro,
+  UNIDAD_BASE_VALUES,
+  allowsDecimalQuantity,
+  umedidaFromUnidadBase,
   type ArticuloInput,
   type CategoriaArticuloRow,
   type MonedaPrecio,
+  type UnidadBase,
 } from '@bizcode/types'
 import ArticuloProveedoresComparadorSection from './ArticuloProveedoresComparadorSection'
 import ArticuloVariantesPanel from './ArticuloVariantesPanel'
@@ -65,6 +69,36 @@ const articuloSchema = z
       return Math.trunc(n)
     }, z.number().int().positive().nullable()),
     controlLote: z.boolean().optional().default(false),
+    // UoM fields (#203): optional at the schema level so they stay a no-op for tenants
+    // without the `inventory.uom` module (submit strips them entirely, see onSubmit).
+    unidadBase: z.preprocess((val) => {
+      if (val === '' || val === null || val === undefined) return undefined
+      return val
+    }, z.enum(UNIDAD_BASE_VALUES).optional()),
+    unidadCompra: z.preprocess((val) => {
+      if (val === '' || val === null || val === undefined) return null
+      return String(val).trim()
+    }, z.string().max(20).nullable().optional()),
+    factorConversion: z.preprocess((val) => {
+      if (val === '' || val === null || val === undefined) return undefined
+      const n = typeof val === 'number' ? val : Number(val)
+      return Number.isFinite(n) ? n : undefined
+    }, z.number().positive('form.errors.factorConversionPositive').optional()),
+    multiploVenta: z.preprocess((val) => {
+      if (val === '' || val === null || val === undefined) return null
+      const n = typeof val === 'number' ? val : Number(val)
+      return Number.isFinite(n) ? n : null
+    }, z.number().positive('form.errors.multiploVentaPositive').nullable().optional()),
+    pesoKg: z.preprocess((val) => {
+      if (val === '' || val === null || val === undefined) return null
+      const n = typeof val === 'number' ? val : Number(val)
+      return Number.isFinite(n) ? n : null
+    }, z.number().nonnegative('form.errors.pesoKgNonNegative').nullable().optional()),
+    volumenM3: z.preprocess((val) => {
+      if (val === '' || val === null || val === undefined) return null
+      const n = typeof val === 'number' ? val : Number(val)
+      return Number.isFinite(n) ? n : null
+    }, z.number().nonnegative('form.errors.volumenM3NonNegative').nullable().optional()),
     activo: z.boolean(),
   })
   .superRefine((data, ctx) => {
@@ -111,6 +145,7 @@ export default function ArticuloForm({ articulo, rubros, onClose, onGuardado }: 
   const { hasModule } = useFeatureFlags()
   const multicurrencyEnabled = hasModule('catalog.multicurrency')
   const fefoEnabled = hasModule('inventory.fefo')
+  const uomEnabled = hasModule('inventory.uom')
   const [loading, setLoading] = useState(false)
   const [categorias, setCategorias] = useState<CategoriaArticuloRow[]>([])
   const [error, setError] = useState<string | null>(null)
@@ -158,6 +193,12 @@ export default function ArticuloForm({ articulo, rubros, onClose, onGuardado }: 
       categoriaId: null,
       monedaPrecio: 'ARS',
       precioEnMonedaOrigen: null,
+      unidadBase: 'unidad',
+      unidadCompra: null,
+      factorConversion: 1,
+      multiploVenta: null,
+      pesoKg: null,
+      volumenM3: null,
       activo: true,
     }) as ArticuloFormData,
   })
@@ -165,6 +206,9 @@ export default function ArticuloForm({ articulo, rubros, onClose, onGuardado }: 
   const tipoWatch = watch('tipo')
   const categoriaWatch = watch('categoriaId')
   const monedaPrecioWatch = watch('monedaPrecio')
+  const unidadBaseWatch = watch('unidadBase')
+  const multiploVentaWatch = watch('multiploVenta')
+  const unidadBaseField = register('unidadBase')
 
   useEffect(() => {
     catalogVariantsAPI
@@ -203,6 +247,20 @@ export default function ArticuloForm({ articulo, rubros, onClose, onGuardado }: 
       setValue('minimo', articulo.minimo)
       setValue('mesesGarantia', articulo.mesesGarantia ?? null)
       setValue('controlLote', articulo.controlLote ?? false)
+      // UoM (#203): reflect stored values even when the module is currently disabled, so
+      // re-enabling it later doesn't lose data already persisted for this articulo.
+      setValue('unidadBase', (articulo.unidadBase as UnidadBase | undefined) ?? 'unidad')
+      setValue('unidadCompra', articulo.unidadCompra ?? null)
+      setValue(
+        'factorConversion',
+        articulo.factorConversion != null ? Number(articulo.factorConversion) : 1,
+      )
+      setValue(
+        'multiploVenta',
+        articulo.multiploVenta != null ? Number(articulo.multiploVenta) : null,
+      )
+      setValue('pesoKg', articulo.pesoKg != null ? Number(articulo.pesoKg) : null)
+      setValue('volumenM3', articulo.volumenM3 != null ? Number(articulo.volumenM3) : null)
       setValue('activo', articulo.activo)
       setStockDisplay(articulo.stock)
     }
@@ -266,13 +324,44 @@ export default function ArticuloForm({ articulo, rubros, onClose, onGuardado }: 
       } = normalizedBase
       void _omitMonedaPrecio
       void _omitPrecioOrigen
-      const normalized = multicurrencyEnabled
+      const normalizedWithFx = multicurrencyEnabled
         ? {
             ...normalizedBase,
             precioEnMonedaOrigen:
               data.monedaPrecio === 'ARS' ? null : data.precioEnMonedaOrigen,
           }
         : normalizedWithoutFx
+
+      // @en UoM fields (#203) only apply to physical articles; omit them entirely when the module is disabled or the item is a service, so saves never clobber stored values.
+      // @es Los campos UoM (#203) solo aplican a artículos físicos; se omiten por completo cuando el módulo está deshabilitado o el ítem es un servicio, para que el guardado nunca sobrescriba valores almacenados.
+      // @pt-BR Os campos UoM (#203) só se aplicam a artigos físicos; são omitidos por completo quando o módulo está desabilitado ou o item é um serviço, para que o salvamento nunca sobrescreva valores armazenados.
+      const {
+        unidadBase: _omitUnidadBase,
+        unidadCompra: _omitUnidadCompra,
+        factorConversion: _omitFactorConversion,
+        multiploVenta: _omitMultiploVenta,
+        pesoKg: _omitPesoKg,
+        volumenM3: _omitVolumenM3,
+        ...normalizedWithoutUom
+      } = normalizedWithFx
+      void _omitUnidadBase
+      void _omitUnidadCompra
+      void _omitFactorConversion
+      void _omitMultiploVenta
+      void _omitPesoKg
+      void _omitVolumenM3
+      const normalized =
+        uomEnabled && data.tipo !== 'servicio'
+          ? {
+              ...normalizedWithoutUom,
+              unidadBase: data.unidadBase ?? 'unidad',
+              unidadCompra: data.unidadCompra ?? null,
+              factorConversion: data.factorConversion ?? 1,
+              multiploVenta: data.multiploVenta ?? null,
+              pesoKg: data.pesoKg ?? null,
+              volumenM3: data.volumenM3 ?? null,
+            }
+          : normalizedWithoutUom
       let result: Articulo
       if (articulo) {
         const { stock: _omitStock, ...payload } = normalized
@@ -633,6 +722,156 @@ export default function ArticuloForm({ articulo, rubros, onClose, onGuardado }: 
                   ) : null}
                 </div>
               ) : null}
+            </section>
+          ) : null}
+
+          {uomEnabled && tipoWatch !== 'servicio' ? (
+            <section
+              className="grid grid-cols-2 gap-4 rounded border border-slate-200 p-4 dark:border-slate-600"
+              aria-labelledby="articulo-uom-title"
+              data-testid="articulo-form-uom"
+            >
+              <h3 id="articulo-uom-title" className="col-span-2 font-semibold text-slate-900 dark:text-slate-100">
+                {t('form.uom.title')}
+              </h3>
+              <div>
+                <label htmlFor="articulo-unidadBase" className="block text-slate-700 dark:text-slate-300 font-semibold mb-1">
+                  {t('form.uom.unidadBase')}
+                </label>
+                <select
+                  id="articulo-unidadBase"
+                  data-testid="articulo-form-unidad-base"
+                  {...unidadBaseField}
+                  onChange={(e) => {
+                    // Keep the legacy `umedida` code (DBF/import compat) in sync with unidadBase (#203).
+                    unidadBaseField.onChange(e)
+                    setValue('umedida', umedidaFromUnidadBase(e.target.value as UnidadBase))
+                  }}
+                  className="w-full px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 rounded border border-slate-300 dark:border-slate-600 focus:border-blue-500 focus:outline-none"
+                >
+                  {UNIDAD_BASE_VALUES.map((u) => (
+                    <option key={u} value={u}>
+                      {t(`form.uom.unidadBaseOptions.${u}`)}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label htmlFor="articulo-unidadCompra" className="block text-slate-700 dark:text-slate-300 font-semibold mb-1">
+                  {t('form.uom.unidadCompra')}
+                </label>
+                <input
+                  id="articulo-unidadCompra"
+                  type="text"
+                  data-testid="articulo-form-unidad-compra"
+                  {...register('unidadCompra')}
+                  maxLength={20}
+                  placeholder={t('form.uom.unidadCompraPlaceholder')}
+                  aria-describedby="articulo-unidadCompra-hint"
+                  className="w-full px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 rounded border border-slate-300 dark:border-slate-600 focus:border-blue-500 focus:outline-none"
+                />
+                <p id="articulo-unidadCompra-hint" className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                  {t('form.uom.unidadCompraHint')}
+                </p>
+              </div>
+              <div>
+                <label htmlFor="articulo-factorConversion" className="block text-slate-700 dark:text-slate-300 font-semibold mb-1">
+                  {t('form.uom.factorConversion')}
+                </label>
+                <input
+                  id="articulo-factorConversion"
+                  type="number"
+                  min="0.0001"
+                  step="0.0001"
+                  data-testid="articulo-form-factor-conversion"
+                  {...register('factorConversion')}
+                  aria-describedby={
+                    errors.factorConversion ? 'articulo-factorConversion-error' : 'articulo-factorConversion-hint'
+                  }
+                  className="w-full px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 rounded border border-slate-300 dark:border-slate-600 focus:border-blue-500 focus:outline-none"
+                />
+                <p id="articulo-factorConversion-hint" className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                  {t('form.uom.factorConversionHint')}
+                </p>
+                {errors.factorConversion ? (
+                  <p id="articulo-factorConversion-error" className="mt-1 text-sm text-red-600 dark:text-red-400">
+                    {t(errors.factorConversion.message ?? 'form.errors.factorConversionPositive')}
+                  </p>
+                ) : null}
+              </div>
+              <div>
+                <label htmlFor="articulo-multiploVenta" className="block text-slate-700 dark:text-slate-300 font-semibold mb-1">
+                  {t('form.uom.multiploVenta')}
+                </label>
+                <input
+                  id="articulo-multiploVenta"
+                  type="number"
+                  min="0.0001"
+                  step="0.0001"
+                  data-testid="articulo-form-multiplo-venta"
+                  {...register('multiploVenta')}
+                  aria-describedby={
+                    errors.multiploVenta ? 'articulo-multiploVenta-error' : 'articulo-multiploVenta-hint'
+                  }
+                  className="w-full px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 rounded border border-slate-300 dark:border-slate-600 focus:border-blue-500 focus:outline-none"
+                />
+                <p id="articulo-multiploVenta-hint" className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                  {t('form.uom.multiploVentaHint')}
+                </p>
+                {errors.multiploVenta ? (
+                  <p id="articulo-multiploVenta-error" className="mt-1 text-sm text-red-600 dark:text-red-400">
+                    {t(errors.multiploVenta.message ?? 'form.errors.multiploVentaPositive')}
+                  </p>
+                ) : null}
+              </div>
+              <div>
+                <label htmlFor="articulo-pesoKg" className="block text-slate-700 dark:text-slate-300 font-semibold mb-1">
+                  {t('form.uom.pesoKg')}
+                </label>
+                <input
+                  id="articulo-pesoKg"
+                  type="number"
+                  min="0"
+                  step="0.001"
+                  data-testid="articulo-form-peso-kg"
+                  {...register('pesoKg')}
+                  aria-describedby={errors.pesoKg ? 'articulo-pesoKg-error' : undefined}
+                  className="w-full px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 rounded border border-slate-300 dark:border-slate-600 focus:border-blue-500 focus:outline-none"
+                />
+                {errors.pesoKg ? (
+                  <p id="articulo-pesoKg-error" className="mt-1 text-sm text-red-600 dark:text-red-400">
+                    {t(errors.pesoKg.message ?? 'form.errors.pesoKgNonNegative')}
+                  </p>
+                ) : null}
+              </div>
+              <div>
+                <label htmlFor="articulo-volumenM3" className="block text-slate-700 dark:text-slate-300 font-semibold mb-1">
+                  {t('form.uom.volumenM3')}
+                </label>
+                <input
+                  id="articulo-volumenM3"
+                  type="number"
+                  min="0"
+                  step="0.0001"
+                  data-testid="articulo-form-volumen-m3"
+                  {...register('volumenM3')}
+                  aria-describedby={errors.volumenM3 ? 'articulo-volumenM3-error' : undefined}
+                  className="w-full px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 rounded border border-slate-300 dark:border-slate-600 focus:border-blue-500 focus:outline-none"
+                />
+                {errors.volumenM3 ? (
+                  <p id="articulo-volumenM3-error" className="mt-1 text-sm text-red-600 dark:text-red-400">
+                    {t(errors.volumenM3.message ?? 'form.errors.volumenM3NonNegative')}
+                  </p>
+                ) : null}
+              </div>
+              <p
+                className="col-span-2 text-xs text-slate-500 dark:text-slate-400"
+                data-testid="articulo-form-uom-decimal-hint"
+              >
+                {allowsDecimalQuantity((unidadBaseWatch as UnidadBase) ?? 'unidad', multiploVentaWatch)
+                  ? t('form.uom.decimalAllowedHint')
+                  : t('form.uom.decimalNotAllowedHint')}
+              </p>
             </section>
           ) : null}
 

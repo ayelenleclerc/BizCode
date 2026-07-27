@@ -46,6 +46,7 @@ export const MODULE_PRESETS: Record<ModulePresetKey, readonly ModuleKey[]> = {
     'logistics.dispatches',
     'inventory.stock',
     'inventory.warehouses',
+    'inventory.uom',
     'finance.bank_reconcile',
     'logistics.purchases',
     'finance.commissions',
@@ -73,6 +74,7 @@ export const MODULE_PRESETS: Record<ModulePresetKey, readonly ModuleKey[]> = {
     'inventory.stock',
     'inventory.warehouses',
     'inventory.count',
+    'inventory.uom',
     'clients.loyalty',
   ]),
 }

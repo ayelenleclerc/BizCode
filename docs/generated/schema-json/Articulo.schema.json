@@ -11,11 +11,19 @@
     "condIva": {
       "type": "string"
     },
+    "controlLote": {
+      "description": "When true, stock movements require lot tracking / FEFO (#202).",
+      "type": "boolean"
+    },
     "costo": {
       "type": "number"
     },
     "descripcion": {
       "type": "string"
+    },
+    "factorConversion": {
+      "description": "1 purchase unit equals factorConversion base units (#203). Default 1.",
+      "type": "number"
     },
     "id": {
       "type": "integer"
@@ -27,7 +35,8 @@
       "type": "integer"
     },
     "minimo": {
-      "type": "integer"
+      "description": "Minimum stock in base units; Decimal(14,4) (#203).",
+      "type": "number"
     },
     "monedaPrecio": {
       "default": "ARS",
@@ -37,6 +46,16 @@
         "EUR"
       ],
       "type": "string"
+    },
+    "multiploVenta": {
+      "description": "Optional sale multiple for cut-to-size items (#203).",
+      "nullable": true,
+      "type": "number"
+    },
+    "pesoKg": {
+      "description": "Unit weight in kg for logistics (#203).",
+      "nullable": true,
+      "type": "number"
     },
     "precioEnMonedaOrigen": {
       "nullable": true,
@@ -55,7 +74,8 @@
       "type": "integer"
     },
     "stock": {
-      "type": "integer"
+      "description": "Stock quantity in base units; Decimal(14,4) (#203).",
+      "type": "number"
     },
     "tipo": {
       "description": "Catalog item kind (#244). Default articulo.",
@@ -66,6 +86,26 @@
       "type": "string"
     },
     "umedida": {
+      "type": "string"
+    },
+    "unidadBase": {
+      "description": "Base stock/sale unit catalog (#203). Default unidad.",
+      "enum": [
+        "unidad",
+        "kg",
+        "gramo",
+        "litro",
+        "metro",
+        "m2",
+        "m3",
+        "rollo",
+        "caja"
+      ],
+      "type": "string"
+    },
+    "unidadCompra": {
+      "description": "Purchase unit when different from base (#203).",
+      "nullable": true,
       "type": "string"
     },
     "unidadServicio": {
@@ -81,6 +121,11 @@
       ],
       "nullable": true,
       "type": "string"
+    },
+    "volumenM3": {
+      "description": "Unit volume in m3 for logistics (#203).",
+      "nullable": true,
+      "type": "number"
     }
   },
   "title": "Articulo",

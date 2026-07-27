@@ -9,6 +9,7 @@ import type {
 import { notifyManagers } from '../notifications'
 import { modulesInclude, TenantConfigService } from './TenantConfigService'
 import type { ServiceResult } from './serviceResults'
+import { roundQty } from '../lib/uom'
 
 type TxClient = Prisma.TransactionClient | PrismaClient
 
@@ -75,8 +76,8 @@ function mapLote(row: Prisma.LoteGetPayload<{ include: typeof LOTE_INCLUDE }>): 
     nroLote: row.nroLote,
     fechaVencimiento: row.fechaVencimiento.toISOString().slice(0, 10),
     fechaIngreso: row.fechaIngreso.toISOString(),
-    stockInicial: row.stockInicial,
-    stockActual: row.stockActual,
+    stockInicial: Number(row.stockInicial),
+    stockActual: Number(row.stockActual),
     activo: row.activo,
     preavisoEnviadoAt: row.preavisoEnviadoAt ? row.preavisoEnviadoAt.toISOString() : null,
     createdAt: row.createdAt.toISOString(),
@@ -95,22 +96,22 @@ export function allocateFefoFromLots(
   lots: Array<{ id: number; nroLote: string; fechaVencimiento: Date; stockActual: number }>,
   quantity: number,
 ): ServiceResult<FefoAllocation[]> {
-  if (!(quantity > 0) || !Number.isInteger(quantity)) {
-    return { ok: false, status: 400, error: 'quantity must be a positive integer' }
+  if (!Number.isFinite(quantity) || quantity <= 0) {
+    return { ok: false, status: 400, error: 'quantity must be a positive finite number' }
   }
-  let remaining = quantity
+  let remaining = roundQty(quantity)
   const allocations: FefoAllocation[] = []
   for (const lot of lots) {
     if (remaining <= 0) break
     if (lot.stockActual <= 0) continue
-    const take = Math.min(lot.stockActual, remaining)
+    const take = roundQty(Math.min(lot.stockActual, remaining))
     allocations.push({
       loteId: lot.id,
       nroLote: lot.nroLote,
       fechaVencimiento: lot.fechaVencimiento.toISOString().slice(0, 10),
       cantidad: take,
     })
-    remaining -= take
+    remaining = roundQty(remaining - take)
   }
   if (remaining > 0) {
     return { ok: false, status: 422, error: 'INSUFFICIENT_LOT_STOCK' }
@@ -229,8 +230,8 @@ export class LoteService {
       return { ok: false, status: 400, error: 'depositoId is not valid for this tenant' }
     }
     const stockInicial = input.stockInicial ?? 0
-    if (!Number.isInteger(stockInicial) || stockInicial < 0) {
-      return { ok: false, status: 400, error: 'stockInicial must be a non-negative integer' }
+    if (!Number.isFinite(stockInicial) || stockInicial < 0) {
+      return { ok: false, status: 400, error: 'stockInicial must be a non-negative finite number' }
     }
     try {
       const created = await this.prisma.lote.create({
@@ -274,8 +275,8 @@ export class LoteService {
     if (!nroLote) {
       return { ok: false, status: 400, error: 'nroLote is required' }
     }
-    if (!Number.isInteger(input.cantidad) || input.cantidad < 1) {
-      return { ok: false, status: 400, error: 'cantidad must be a positive integer' }
+    if (!Number.isFinite(input.cantidad) || input.cantidad <= 0) {
+      return { ok: false, status: 400, error: 'cantidad must be a positive finite number' }
     }
 
     const existing = await tx.lote.findUnique({
@@ -332,7 +333,8 @@ export class LoteService {
       orderBy: [{ fechaVencimiento: 'asc' }, { id: 'asc' }],
       select: { id: true, nroLote: true, fechaVencimiento: true, stockActual: true },
     })
-    return allocateFefoFromLots(lots, quantity)
+    const normalizedLots = lots.map((l) => ({ ...l, stockActual: Number(l.stockActual) }))
+    return allocateFefoFromLots(normalizedLots, quantity)
   }
 
   async previewFefo(
@@ -355,7 +357,7 @@ export class LoteService {
         where: { id: alloc.loteId, tenantId },
         select: { id: true, stockActual: true },
       })
-      if (!lot || lot.stockActual < alloc.cantidad) {
+      if (!lot || Number(lot.stockActual) < alloc.cantidad) {
         return { ok: false, status: 422, error: 'INSUFFICIENT_LOT_STOCK' }
       }
       await tx.lote.update({
@@ -393,7 +395,7 @@ export class LoteService {
     if (!lot.activo) {
       return { ok: false, status: 422, error: 'LOTE_INACTIVE' }
     }
-    const next = lot.stockActual + params.cantidad
+    const next = roundQty(Number(lot.stockActual) + params.cantidad)
     if (next < 0) {
       return { ok: false, status: 422, error: 'INSUFFICIENT_LOT_STOCK' }
     }
@@ -444,7 +446,7 @@ export class LoteService {
           prefijo: it.factura.prefijo,
           numero: it.factura.numero,
           fecha: it.factura.fecha.toISOString().slice(0, 10),
-          cantidad: it.cantidad,
+          cantidad: Number(it.cantidad),
           clienteId: it.factura.clienteId,
           clienteRsocial: it.factura.cliente?.rsocial ?? null,
         })),
@@ -499,7 +501,7 @@ export class LoteService {
         nroLote: lot.nroLote,
         expiresAt,
         daysRemaining,
-        stock: lot.stockActual,
+        stock: Number(lot.stockActual),
       })
       await this.prisma.lote.update({
         where: { id: lot.id },

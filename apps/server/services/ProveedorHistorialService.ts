@@ -160,7 +160,7 @@ export class ProveedorHistorialService {
           articuloId: item.articulo.id,
           codigo: String(item.articulo.codigo),
           descripcion: item.articulo.descripcion,
-          cantidad: item.cantidadRecibida,
+          cantidad: Number(item.cantidadRecibida),
           costoUnitario: item.costoUnitario,
           fecha: oc.updatedAt,
         })

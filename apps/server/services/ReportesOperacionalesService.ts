@@ -97,11 +97,13 @@ export class ReportesOperacionalesService {
     const rows: StockCriticoRow[] = []
     for (const a of articulos) {
       if (a.stock > a.minimo) continue
+      const stock = Number(a.stock)
+      const minimo = Number(a.minimo)
       rows.push({
         articulo: { id: a.id, codigo: a.codigo, descripcion: a.descripcion },
-        stock: a.stock,
-        minimo: a.minimo,
-        deficit: a.minimo - a.stock,
+        stock,
+        minimo,
+        deficit: minimo - stock,
       })
     }
 

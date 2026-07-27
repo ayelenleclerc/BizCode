@@ -53,7 +53,7 @@ export async function buildRemitoPdfBuffer(
       proveedor: remito.proveedor,
       items: remito.items.map((it) => ({
         descripcion: it.descripcion,
-        cantidad: it.cantidad,
+        cantidad: Number(it.cantidad),
         unidad: it.unidad,
       })),
     },

@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import { validateCBU, validateCUIT } from '../../web/src/lib/validators'
 import { isValidIanaTimeZone } from '../lib/tenantLocalTime'
+import { UNIDAD_BASE_VALUES, umedidaFromUnidadBase } from '../lib/uom'
 import type {
   ArticuloInput,
   ClienteInput,
@@ -218,6 +219,13 @@ export const articuloBodySchema = z
       .optional(),
     mesesGarantia: z.union([z.number(), z.null()]).optional(),
     controlLote: z.boolean().optional(),
+    /** @en Base unit of measure for stock/quantity rules (#203). @es Unidad base de stock/cantidad (#203). @pt-BR Unidade base de estoque/quantidade (#203). */
+    unidadBase: z.enum(UNIDAD_BASE_VALUES).optional(),
+    unidadCompra: z.union([z.string(), z.null()]).optional(),
+    factorConversion: z.number().optional(),
+    multiploVenta: z.union([z.number(), z.null()]).optional(),
+    pesoKg: z.union([z.number(), z.null()]).optional(),
+    volumenM3: z.union([z.number(), z.null()]).optional(),
     precioLista1: z.number(),
     precioLista2: z.number(),
     costo: z.number(),
@@ -257,6 +265,28 @@ export const articuloBodySchema = z
     if (typeof data.costo !== 'number' || data.costo < 0.01) {
       ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'costo must be >= 0.01', path: ['costo'] })
     }
+    const factorConversion = data.factorConversion ?? 1
+    if (!Number.isFinite(factorConversion) || factorConversion <= 0) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'factorConversion must be a finite number > 0', path: ['factorConversion'] })
+    }
+    if (data.unidadCompra != null && data.unidadCompra.trim().length > 0 && !(factorConversion > 0)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'factorConversion is required (> 0) when unidadCompra is set',
+        path: ['factorConversion'],
+      })
+    }
+    if (data.multiploVenta !== undefined && data.multiploVenta !== null) {
+      if (!Number.isFinite(data.multiploVenta) || data.multiploVenta <= 0) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'multiploVenta must be a finite number > 0', path: ['multiploVenta'] })
+      }
+    }
+    if (data.pesoKg !== undefined && data.pesoKg !== null && (!Number.isFinite(data.pesoKg) || data.pesoKg < 0)) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'pesoKg must be a finite number >= 0', path: ['pesoKg'] })
+    }
+    if (data.volumenM3 !== undefined && data.volumenM3 !== null && (!Number.isFinite(data.volumenM3) || data.volumenM3 < 0)) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'volumenM3 must be a finite number >= 0', path: ['volumenM3'] })
+    }
     const monedaPrecio = data.monedaPrecio ?? 'ARS'
     if (monedaPrecio !== 'ARS') {
       if (data.precioEnMonedaOrigen == null || data.precioEnMonedaOrigen < 0.0001) {
@@ -276,10 +306,10 @@ export const articuloBodySchema = z
           path: ['unidadServicio'],
         })
       }
-      if (!Number.isInteger(data.stock) || data.stock !== 0) {
+      if (typeof data.stock !== 'number' || !Number.isFinite(data.stock) || data.stock !== 0) {
         ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'stock must be 0 for servicio', path: ['stock'] })
       }
-      if (!Number.isInteger(data.minimo) || data.minimo !== 0) {
+      if (typeof data.minimo !== 'number' || !Number.isFinite(data.minimo) || data.minimo !== 0) {
         ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'minimo must be 0 for servicio', path: ['minimo'] })
       }
     } else {
@@ -290,13 +320,11 @@ export const articuloBodySchema = z
           path: ['unidadServicio'],
         })
       }
-      if (!Number.isInteger(data.stock) || data.stock < 0) {
-        ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'stock must be an integer', path: ['stock'] })
-        ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'stock must be >= 0', path: ['stock'] })
+      if (typeof data.stock !== 'number' || !Number.isFinite(data.stock) || data.stock < 0) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'stock must be a finite number >= 0', path: ['stock'] })
       }
-      if (!Number.isInteger(data.minimo) || data.minimo < 0) {
-        ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'minimo must be an integer', path: ['minimo'] })
-        ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'minimo must be >= 0', path: ['minimo'] })
+      if (typeof data.minimo !== 'number' || !Number.isFinite(data.minimo) || data.minimo < 0) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'minimo must be a finite number >= 0', path: ['minimo'] })
       }
       if (
         data.mesesGarantia !== undefined &&
@@ -314,16 +342,27 @@ export const articuloBodySchema = z
   .transform(
     (data): ArticuloInput => {
       const tipo = data.tipo ?? 'articulo'
+      // @en When unidadBase is provided, the legacy umedida is derived from it (single source of truth) (#203).
+      // @es Cuando se envía unidadBase, el umedida legacy se deriva de ella (fuente única de verdad) (#203).
+      // @pt-BR Quando unidadBase é enviado, o umedida legado é derivado dela (fonte única de verdade) (#203).
+      const umedida =
+        data.unidadBase !== undefined ? umedidaFromUnidadBase(data.unidadBase) : data.umedida.trim()
       return {
         codigo: data.codigo,
         descripcion: data.descripcion.trim(),
         rubroId: data.rubroId,
         condIva: data.condIva,
-        umedida: data.umedida.trim(),
+        umedida,
         tipo,
         unidadServicio: tipo === 'servicio' ? (data.unidadServicio ?? null) : null,
         mesesGarantia: tipo === 'servicio' ? null : (data.mesesGarantia ?? null),
         controlLote: tipo === 'servicio' ? false : (data.controlLote ?? false),
+        unidadBase: data.unidadBase,
+        unidadCompra: data.unidadCompra ?? null,
+        factorConversion: data.factorConversion ?? 1,
+        multiploVenta: data.multiploVenta ?? null,
+        pesoKg: data.pesoKg ?? null,
+        volumenM3: data.volumenM3 ?? null,
         precioLista1: data.precioLista1,
         precioLista2: data.precioLista2,
         costo: data.costo,
@@ -1103,10 +1142,10 @@ export const stockAjusteBodySchema = z
     loteId: z.union([z.number().int().min(1), z.null()]).optional(),
   })
   .superRefine((data, ctx) => {
-    if (!Number.isInteger(data.cantidad) || data.cantidad === 0) {
+    if (!Number.isFinite(data.cantidad) || data.cantidad === 0) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: 'cantidad must be a non-zero integer',
+        message: 'cantidad must be a non-zero finite number',
         path: ['cantidad'],
       })
     }
@@ -1348,8 +1387,8 @@ const pedidoItemLineSchema = z
         })
       }
     }
-    if (!Number.isInteger(data.cantidad) || data.cantidad < 1) {
-      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'cantidad must be >= 1', path: ['cantidad'] })
+    if (!Number.isFinite(data.cantidad) || data.cantidad <= 0) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'cantidad must be a finite number > 0', path: ['cantidad'] })
     }
     if (typeof data.precio !== 'number' || Number.isNaN(data.precio) || data.precio < 0) {
       ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'precio must be >= 0', path: ['precio'] })
@@ -2075,10 +2114,10 @@ export const ordenCompraReceiveBodySchema = z
                 path: ['itemId'],
               })
             }
-            if (!Number.isInteger(line.cantidad) || line.cantidad < 1) {
+            if (!Number.isFinite(line.cantidad) || line.cantidad <= 0) {
               ctx.addIssue({
                 code: z.ZodIssueCode.custom,
-                message: 'cantidad must be a positive integer',
+                message: 'cantidad must be a positive finite number',
                 path: ['cantidad'],
               })
             }

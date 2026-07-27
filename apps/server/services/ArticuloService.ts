@@ -2,6 +2,7 @@ import { Prisma, type Articulo, type PrismaClient } from '@prisma/client'
 import type { ArticuloInput } from '@bizcode/types'
 import type { ServiceResult } from './serviceResults'
 import { arsFromFx, TipoCambioService } from './TipoCambioService'
+import { umedidaFromUnidadBase } from '../lib/uom'
 
 type ArticuloWithRubro = Prisma.ArticuloGetPayload<{ include: { rubro: true } }>
 
@@ -55,7 +56,8 @@ export class ArticuloService {
     if (!rubroCheck.ok) {
       return rubroCheck
     }
-    const priced = await this.applyFxPricing(tenantId, body)
+    const normalized = ArticuloService.applyUomDefaultsForCreate(body)
+    const priced = await this.applyFxPricing(tenantId, normalized)
     if (!priced.ok) return priced
     const articulo = await this.prisma.articulo.create({
       data: { ...priced.data, tenantId },
@@ -72,13 +74,40 @@ export class ArticuloService {
     if (!existing) {
       return { ok: false, status: 404, error: 'Articulo not found' }
     }
-    const priced = await this.applyFxPricing(tenantId, body)
+    const normalized = ArticuloService.syncUmedidaFromUnidadBase(body)
+    const priced = await this.applyFxPricing(tenantId, normalized)
     if (!priced.ok) return priced
     const articulo = await this.prisma.articulo.update({
       where: { id },
       data: priced.data,
     })
     return { ok: true, data: articulo }
+  }
+
+  /**
+   * @en On create, defaults unidadBase to 'unidad' and factorConversion to 1 when omitted; derives umedida from unidadBase when explicitly provided (#203).
+   * @es En alta, por defecto unidadBase 'unidad' y factorConversion 1 si se omiten; deriva umedida de unidadBase cuando se envía explícitamente (#203).
+   * @pt-BR Na criação, padrão unidadBase 'unidad' e factorConversion 1 quando omitidos; deriva umedida de unidadBase quando enviado explicitamente (#203).
+   */
+  private static applyUomDefaultsForCreate(body: ArticuloInput): ArticuloInput {
+    const unidadBase = body.unidadBase ?? 'unidad'
+    const factorConversion = body.factorConversion ?? 1
+    return {
+      ...body,
+      unidadBase,
+      factorConversion,
+      umedida: body.unidadBase !== undefined ? umedidaFromUnidadBase(body.unidadBase) : body.umedida,
+    }
+  }
+
+  /**
+   * @en On update, only re-derives umedida when unidadBase is explicitly present in the body; never resets existing unidadBase/factorConversion when omitted (#203).
+   * @es En edición, sólo re-deriva umedida cuando unidadBase viene explícito; nunca resetea unidadBase/factorConversion existentes si se omiten (#203).
+   * @pt-BR Na edição, só re-deriva umedida quando unidadBase vem explícito; nunca reseta unidadBase/factorConversion existentes se omitidos (#203).
+   */
+  private static syncUmedidaFromUnidadBase(body: ArticuloInput): ArticuloInput {
+    if (body.unidadBase === undefined) return body
+    return { ...body, umedida: umedidaFromUnidadBase(body.unidadBase) }
   }
 
   private async applyFxPricing(

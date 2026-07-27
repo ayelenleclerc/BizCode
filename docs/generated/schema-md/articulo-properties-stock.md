@@ -1,10 +1,10 @@
-# Untitled integer in Articulo Schema
+# Untitled number in Articulo Schema
 
 ```txt
 undefined#/properties/stock
 ```
 
-
+Stock quantity in base units; Decimal(14,4) (#203).
 
 | Abstract            | Extensible | Status         | Identifiable            | Custom Properties | Additional Properties | Access Restrictions | Defined In                                                                           |
 | :------------------ | :--------- | :------------- | :---------------------- | :---------------- | :-------------------- | :------------------ | :----------------------------------------------------------------------------------- |
@@ -12,4 +12,4 @@ undefined#/properties/stock
 
 ## stock Type
 
-`integer`
+`number`
