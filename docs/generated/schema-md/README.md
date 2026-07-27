@@ -864,6 +864,10 @@
 
 * [RecuentoListEnvelope](./recuentolistenvelope.md) – `-`
 
+* [RefreshEnvelope](./refreshenvelope.md) – `-`
+
+* [RefreshResult](./refreshresult.md) – `-`
+
 * [RegimenRetencion](./regimenretencion.md) – `-`
 
 * [RegimenRetencionEnvelope](./regimenretencionenvelope.md) – `-`

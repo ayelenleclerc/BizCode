@@ -1,0 +1,12 @@
+# Optional Redis 7 for local auth refresh-token blacklist (#212).
+# Usage: docker compose -f docker-compose.redis.yml up -d
+services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - '6379:6379'
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 3s
+      retries: 5

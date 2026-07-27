@@ -70,6 +70,9 @@ export function getAuthErrorI18nKey(error: unknown): string {
     if (error.message === 'ACCOUNT_LOCKED') {
       return 'auth.errors.accountLocked'
     }
+    if (error.message === 'SESSION_EXPIRED') {
+      return 'auth.errors.sessionExpired'
+    }
     if (error.httpStatus === 429 || error.message === 'Too many requests') {
       return 'auth.errors.tooManyRequests'
     }

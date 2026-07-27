@@ -132,7 +132,7 @@ paths:
   /api/auth/login:
     post:
       tags: [auth]
-      summary: Create authenticated session
+      summary: Create authenticated session (access 15m + refresh 7d/30d cookies)
       requestBody:
         required: true
         content:
@@ -141,7 +141,12 @@ paths:
               $ref: '#/components/schemas/LoginInput'
       responses:
         '200':
-          description: Session created
+          description: Session created (Set-Cookie bizcode_session + bizcode_refresh)
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+              description: Access and refresh HttpOnly cookies (#212)
           content:
             application/json:
               schema:
@@ -181,6 +186,26 @@ paths:
               schema:
                 type: string
                 format: date-time
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+
+  /api/auth/refresh:
+    post:
+      tags: [auth]
+      summary: Rotate refresh token and issue a new access+refresh cookie pair (#212)
+      description: >
+        Requires bizcode_refresh cookie. Reuse of a revoked refresh token invalidates the whole token family.
+      responses:
+        '200':
+          description: New access and refresh cookies issued
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RefreshEnvelope'
+        '401':
+          description: Refresh missing, expired, or reuse detected (SESSION_EXPIRED)
           content:
             application/json:
               schema:
@@ -12091,6 +12116,27 @@ components:
           type: string
         password:
           type: string
+        rememberMe:
+          type: boolean
+          description: When true, refresh cookie TTL is 30 days; otherwise 7 days (#212).
+
+    RefreshResult:
+      type: object
+      required: [refreshed]
+      properties:
+        refreshed:
+          type: boolean
+          const: true
+
+    RefreshEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/RefreshResult'
 
     LoginResult:
       type: object

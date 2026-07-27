@@ -4,6 +4,10 @@ import request from 'supertest'
 import type { PrismaClient } from '@prisma/client'
 import { createApp } from '../../apps/server/createApp'
 import { initializeAppConfig, resetAppConfigCache } from '../../apps/server/config/env'
+import {
+  createMemoryRefreshTokenBlacklist,
+  setRefreshTokenBlacklistForTests,
+} from '../../apps/server/lib/refreshTokenBlacklist'
 
 function hashPassword(password: string): string {
   const salt = randomBytes(16).toString('hex')
@@ -22,7 +26,8 @@ function hashToken(token: string, jwtSecret: string): string {
  */
 function buildPrismaMock(loginName: string, loginSecret: string): PrismaClient {
   const storedPassword = hashPassword(loginSecret)
-  const sessionStore = new Map<string, { id: number; userId: number; expiresAt: Date }>()
+  const sessionStore = new Map<string, { id: number; userId: number; expiresAt: Date; tokenFamily: string }>()
+  const refreshStore = new Map<string, { id: number }>()
 
   return {
     cliente: { findMany: vi.fn().mockResolvedValue([]) },
@@ -55,11 +60,12 @@ function buildPrismaMock(loginName: string, loginSecret: string): PrismaClient {
       findUnique: vi.fn().mockResolvedValue({ id: 11, slug: 'platform', active: true }),
     },
     appSession: {
-      create: vi.fn(async (args: { data: { userId: number; tokenHash: string; expiresAt: Date } }) => {
+      create: vi.fn(async (args: { data: { userId: number; tokenHash: string; expiresAt: Date; tokenFamily: string } }) => {
         sessionStore.set(args.data.tokenHash, {
           id: 100,
           userId: args.data.userId,
           expiresAt: args.data.expiresAt,
+          tokenFamily: args.data.tokenFamily,
         })
         return { id: 100 }
       }),
@@ -86,11 +92,24 @@ function buildPrismaMock(loginName: string, loginSecret: string): PrismaClient {
       updateMany: vi.fn().mockResolvedValue({ count: 1 }),
       update: vi.fn().mockResolvedValue({ id: 100 }),
     },
+    appRefreshToken: {
+      create: vi.fn(async (args: { data: { tokenHash: string } }) => {
+        refreshStore.set(args.data.tokenHash, { id: 200 })
+        return { id: 200 }
+      }),
+      findFirst: vi.fn().mockResolvedValue(null),
+      findMany: vi.fn().mockResolvedValue([]),
+      update: vi.fn(),
+      updateMany: vi.fn().mockResolvedValue({ count: 0 }),
+    },
     loginAttempt: {
       create: vi.fn().mockResolvedValue({ id: 1 }),
-      findMany: vi.fn().mockResolvedValue([]), // no prior failures
+      findMany: vi.fn().mockResolvedValue([]),
     },
-    $transaction: vi.fn(),
+    $transaction: vi.fn(async (arg: unknown) => {
+      if (Array.isArray(arg)) return Promise.all(arg)
+      throw new Error('unexpected transaction')
+    }),
   } as unknown as PrismaClient
 }
 
@@ -105,7 +124,9 @@ describe('Auth session endpoints', () => {
     process.env.JWT_SECRET = jwtSecret
     process.env.BIZCODE_TEST_AUTH_BYPASS = 'false'
     delete process.env.BIZCODE_TEST_ROLE
+    delete process.env.REDIS_URL
     initializeAppConfig()
+    setRefreshTokenBlacklistForTests(createMemoryRefreshTokenBlacklist())
     loginName = `u${randomBytes(8).toString('hex')}`
     loginSecret = randomBytes(16).toString('hex')
   })
@@ -122,10 +143,14 @@ describe('Auth session endpoints', () => {
     expect(login.status).toBe(200)
     expect(login.body.success).toBe(true)
     expect(login.body.data.username).toBe(loginName)
-    const cookie = login.headers['set-cookie']?.[0]
-    expect(cookie).toContain('bizcode_session=')
+    const cookiesRaw = login.headers['set-cookie']
+    const cookies = !cookiesRaw ? [] : Array.isArray(cookiesRaw) ? cookiesRaw : [cookiesRaw]
+    const sessionCookie = cookies.find((c) => c.startsWith('bizcode_session='))
+    const refreshCookie = cookies.find((c) => c.startsWith('bizcode_refresh='))
+    expect(sessionCookie).toBeTruthy()
+    expect(refreshCookie).toBeTruthy()
 
-    const token = decodeURIComponent(cookie!.split(';')[0].split('=')[1])
+    const token = decodeURIComponent(sessionCookie!.split(';')[0].split('=')[1])
     expect(typeof token).toBe('string')
     expect(token.length).toBeGreaterThan(20)
 
@@ -150,8 +175,10 @@ describe('Auth session endpoints', () => {
     })
 
     expect(login.status).toBe(200)
-    const cookie = login.headers['set-cookie']?.[0]
-    const token = decodeURIComponent(cookie!.split(';')[0].split('=')[1])
+    const cookiesRaw = login.headers['set-cookie']
+    const cookies = !cookiesRaw ? [] : Array.isArray(cookiesRaw) ? cookiesRaw : [cookiesRaw]
+    const sessionCookie = cookies.find((c) => c.startsWith('bizcode_session='))
+    const token = decodeURIComponent(sessionCookie!.split(';')[0].split('=')[1])
 
     resetAppConfigCache()
     process.env.JWT_SECRET = 'different-jwt-secret'

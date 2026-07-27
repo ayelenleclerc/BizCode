@@ -3,9 +3,9 @@
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
   "version": 1,
-  "serialNumber": "urn:uuid:f486e06e-8d46-43b4-8c42-70040893bc28",
+  "serialNumber": "urn:uuid:5312f340-450c-4b1b-a522-c7ec8195a964",
   "metadata": {
-    "timestamp": "2026-07-27T12:09:43.317Z",
+    "timestamp": "2026-07-27T16:53:02.208Z",
     "tools": {
       "components": [
         {
@@ -2821,6 +2821,46 @@
         {
           "name": "cdx:npm:package:path",
           "value": "node_modules/iconv-lite"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "ioredis",
+      "version": "5.11.1",
+      "bom-ref": "bizcode@0.1.0|ioredis@5.11.1",
+      "author": "Zihua Li",
+      "description": "A robust, performance-focused and full-featured Redis client for Node.js.",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/ioredis@5.11.1",
+      "externalReferences": [
+        {
+          "url": "git://github.com/luin/ioredis.git",
+          "type": "vcs",
+          "comment": "as detected from PackageJson property \"repository.url\""
+        },
+        {
+          "url": "https://github.com/luin/ioredis#readme",
+          "type": "website",
+          "comment": "as detected from PackageJson property \"homepage\""
+        },
+        {
+          "url": "https://github.com/luin/ioredis/issues",
+          "type": "issue-tracker",
+          "comment": "as detected from PackageJson property \"bugs.url\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/ioredis"
         }
       ]
     },
@@ -9364,6 +9404,247 @@
         {
           "name": "cdx:npm:package:path",
           "value": "node_modules/safer-buffer"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "commands",
+      "group": "@ioredis",
+      "version": "1.10.0",
+      "bom-ref": "bizcode@0.1.0|@ioredis/commands@1.10.0",
+      "author": "Zihua Li",
+      "description": "Redis commands",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/%40ioredis/commands@1.10.0",
+      "externalReferences": [
+        {
+          "url": "git+https://github.com/ioredis/commands.git",
+          "type": "vcs",
+          "comment": "as detected from PackageJson property \"repository.url\""
+        },
+        {
+          "url": "https://github.com/ioredis/commands",
+          "type": "website",
+          "comment": "as detected from PackageJson property \"homepage\""
+        },
+        {
+          "url": "https://github.com/ioredis/commands/issues",
+          "type": "issue-tracker",
+          "comment": "as detected from PackageJson property \"bugs.url\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/@ioredis/commands"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "cluster-key-slot",
+      "version": "1.1.1",
+      "bom-ref": "bizcode@0.1.0|cluster-key-slot@1.1.1",
+      "author": "Mike Diarmid",
+      "description": "Generates CRC hashes for strings - for use by node redis clients to determine key slots.",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/cluster-key-slot@1.1.1",
+      "externalReferences": [
+        {
+          "url": "git+https://github.com/Salakar/cluster-key-slot.git",
+          "type": "vcs",
+          "comment": "as detected from PackageJson property \"repository.url\""
+        },
+        {
+          "url": "https://github.com/Salakar/cluster-key-slot#readme",
+          "type": "website",
+          "comment": "as detected from PackageJson property \"homepage\""
+        },
+        {
+          "url": "https://github.com/Salakar/cluster-key-slot/issues",
+          "type": "issue-tracker",
+          "comment": "as detected from PackageJson property \"bugs.url\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/cluster-key-slot"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "denque",
+      "version": "2.1.0",
+      "bom-ref": "bizcode@0.1.0|denque@2.1.0",
+      "author": "Invertase",
+      "description": "The fastest javascript implementation of a double-ended queue. Used by the official Redis, MongoDB, MariaDB & MySQL libraries for Node.js and many other libraries. Maintains compatability with deque.",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/denque@2.1.0",
+      "externalReferences": [
+        {
+          "url": "git+https://github.com/invertase/denque.git",
+          "type": "vcs",
+          "comment": "as detected from PackageJson property \"repository.url\""
+        },
+        {
+          "url": "https://docs.page/invertase/denque",
+          "type": "website",
+          "comment": "as detected from PackageJson property \"homepage\""
+        },
+        {
+          "url": "https://github.com/invertase/denque/issues",
+          "type": "issue-tracker",
+          "comment": "as detected from PackageJson property \"bugs.url\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/denque"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "redis-errors",
+      "version": "1.2.0",
+      "bom-ref": "bizcode@0.1.0|redis-errors@1.2.0",
+      "author": "Ruben Bridgewater",
+      "description": "Error classes used in node_redis",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/redis-errors@1.2.0",
+      "externalReferences": [
+        {
+          "url": "git+https://github.com/NodeRedis/redis-errors.git",
+          "type": "vcs",
+          "comment": "as detected from PackageJson property \"repository.url\""
+        },
+        {
+          "url": "https://github.com/NodeRedis/redis-errors#readme",
+          "type": "website",
+          "comment": "as detected from PackageJson property \"homepage\""
+        },
+        {
+          "url": "https://github.com/NodeRedis/redis-errors/issues",
+          "type": "issue-tracker",
+          "comment": "as detected from PackageJson property \"bugs.url\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/redis-errors"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "redis-parser",
+      "version": "3.0.0",
+      "bom-ref": "bizcode@0.1.0|redis-parser@3.0.0",
+      "author": "Ruben Bridgewater",
+      "description": "Javascript Redis protocol (RESP) parser",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/redis-parser@3.0.0",
+      "externalReferences": [
+        {
+          "url": "git+https://github.com/NodeRedis/node-redis-parser.git",
+          "type": "vcs",
+          "comment": "as detected from PackageJson property \"repository.url\""
+        },
+        {
+          "url": "https://github.com/NodeRedis/node-redis-parser#readme",
+          "type": "website",
+          "comment": "as detected from PackageJson property \"homepage\""
+        },
+        {
+          "url": "https://github.com/NodeRedis/node-redis-parser/issues",
+          "type": "issue-tracker",
+          "comment": "as detected from PackageJson property \"bugs.url\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/redis-parser"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "standard-as-callback",
+      "version": "2.1.0",
+      "bom-ref": "bizcode@0.1.0|standard-as-callback@2.1.0",
+      "author": "luin",
+      "description": "A performant and standard (Bluebird) library that registers a node-style callback on a promise",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/standard-as-callback@2.1.0",
+      "externalReferences": [
+        {
+          "url": "git+https://github.com/luin/asCallback.git",
+          "type": "vcs",
+          "comment": "as detected from PackageJson property \"repository.url\""
+        },
+        {
+          "url": "https://github.com/luin/asCallback#readme",
+          "type": "website",
+          "comment": "as detected from PackageJson property \"homepage\""
+        },
+        {
+          "url": "https://github.com/luin/asCallback/issues",
+          "type": "issue-tracker",
+          "comment": "as detected from PackageJson property \"bugs.url\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/standard-as-callback"
         }
       ]
     },
@@ -43555,6 +43836,7 @@
         "bizcode@0.1.0|helmet@8.2.0",
         "bizcode@0.1.0|i18next@26.3.1",
         "bizcode@0.1.0|iconv-lite@0.7.3",
+        "bizcode@0.1.0|ioredis@5.11.1",
         "bizcode@0.1.0|jsqr@1.4.0",
         "bizcode@0.1.0|leaflet@1.9.4",
         "bizcode@0.1.0|multer@2.2.0",
@@ -44077,6 +44359,18 @@
       "ref": "bizcode@0.1.0|iconv-lite@0.7.3",
       "dependsOn": [
         "bizcode@0.1.0|safer-buffer@2.1.2"
+      ]
+    },
+    {
+      "ref": "bizcode@0.1.0|ioredis@5.11.1",
+      "dependsOn": [
+        "bizcode@0.1.0|@ioredis/commands@1.10.0",
+        "bizcode@0.1.0|cluster-key-slot@1.1.1",
+        "bizcode@0.1.0|debug@4.4.3",
+        "bizcode@0.1.0|denque@2.1.0",
+        "bizcode@0.1.0|redis-errors@1.2.0",
+        "bizcode@0.1.0|redis-parser@3.0.0",
+        "bizcode@0.1.0|standard-as-callback@2.1.0"
       ]
     },
     {
@@ -45090,6 +45384,27 @@
     },
     {
       "ref": "bizcode@0.1.0|safer-buffer@2.1.2"
+    },
+    {
+      "ref": "bizcode@0.1.0|@ioredis/commands@1.10.0"
+    },
+    {
+      "ref": "bizcode@0.1.0|cluster-key-slot@1.1.1"
+    },
+    {
+      "ref": "bizcode@0.1.0|denque@2.1.0"
+    },
+    {
+      "ref": "bizcode@0.1.0|redis-errors@1.2.0"
+    },
+    {
+      "ref": "bizcode@0.1.0|redis-parser@3.0.0",
+      "dependsOn": [
+        "bizcode@0.1.0|redis-errors@1.2.0"
+      ]
+    },
+    {
+      "ref": "bizcode@0.1.0|standard-as-callback@2.1.0"
     },
     {
       "ref": "bizcode@0.1.0|append-field@1.0.0"

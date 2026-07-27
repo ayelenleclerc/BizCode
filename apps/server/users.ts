@@ -2,7 +2,7 @@ import type { Application, Request, Response } from 'express'
 import type { PrismaClient } from '@prisma/client'
 import { USER_ROLES, USER_CHANNELS, hasPermission, type UserRole, type UserChannel } from '@bizcode/types'
 import { hashPassword, verifyPassword } from './passwordHash'
-import { requirePermission, type AuthenticatedRequest } from './auth'
+import { requirePermission, revokeAllUserAuthTokens, type AuthenticatedRequest } from './auth'
 import { writeAuditEvent } from './audit'
 import { planErrorBody, TenantPlanService } from './services/TenantPlanService'
 
@@ -283,6 +283,7 @@ export function registerUserRoutes(app: Application, prisma: PrismaClient): void
         where: { id: user.id },
         data: { passwordHash: hashPassword(body.newPassword as string) },
       })
+      await revokeAllUserAuthTokens(prisma, user.id)
       await writeAuditEvent({
         prisma,
         tenantId: authReq.auth!.claims.tenantId,

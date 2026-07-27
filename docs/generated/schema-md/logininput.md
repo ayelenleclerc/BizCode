@@ -16,11 +16,12 @@ undefined
 
 # LoginInput Properties
 
-| Property                  | Type     | Required | Nullable       | Defined by                                                                           |
-| :------------------------ | :------- | :------- | :------------- | :----------------------------------------------------------------------------------- |
-| [password](#password)     | `string` | Required | cannot be null | [LoginInput](logininput-properties-password.md "undefined#/properties/password")     |
-| [tenantSlug](#tenantslug) | `string` | Required | cannot be null | [LoginInput](logininput-properties-tenantslug.md "undefined#/properties/tenantSlug") |
-| [username](#username)     | `string` | Required | cannot be null | [LoginInput](logininput-properties-username.md "undefined#/properties/username")     |
+| Property                  | Type      | Required | Nullable       | Defined by                                                                           |
+| :------------------------ | :-------- | :------- | :------------- | :----------------------------------------------------------------------------------- |
+| [password](#password)     | `string`  | Required | cannot be null | [LoginInput](logininput-properties-password.md "undefined#/properties/password")     |
+| [rememberMe](#rememberme) | `boolean` | Optional | cannot be null | [LoginInput](logininput-properties-rememberme.md "undefined#/properties/rememberMe") |
+| [tenantSlug](#tenantslug) | `string`  | Required | cannot be null | [LoginInput](logininput-properties-tenantslug.md "undefined#/properties/tenantSlug") |
+| [username](#username)     | `string`  | Required | cannot be null | [LoginInput](logininput-properties-username.md "undefined#/properties/username")     |
 
 ## password
 
@@ -39,6 +40,24 @@ undefined
 ### password Type
 
 `string`
+
+## rememberMe
+
+When true, refresh cookie TTL is 30 days; otherwise 7 days (#212).
+
+`rememberMe`
+
+* is optional
+
+* Type: `boolean`
+
+* cannot be null
+
+* defined in: [LoginInput](logininput-properties-rememberme.md "undefined#/properties/rememberMe")
+
+### rememberMe Type
+
+`boolean`
 
 ## tenantSlug
 

@@ -7,6 +7,7 @@ export type LoginBody = {
   tenantSlug: string
   username: string
   password: string
+  rememberMe?: boolean
 }
 
 export type LoginResponseData = {
@@ -21,6 +22,15 @@ export function createAuthAPI(http: AxiosInstance) {
     login: async (body: LoginBody): Promise<LoginResponseData> => {
       try {
         const response = await http.post<{ success: boolean; data: LoginResponseData }>('/auth/login', body)
+        return response.data.data
+      } catch (error) {
+        return handleError(error as AxiosError<ApiErrorPayload>)
+      }
+    },
+
+    refresh: async (): Promise<{ refreshed: boolean }> => {
+      try {
+        const response = await http.post<{ success: boolean; data: { refreshed: boolean } }>('/auth/refresh')
         return response.data.data
       } catch (error) {
         return handleError(error as AxiosError<ApiErrorPayload>)

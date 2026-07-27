@@ -4,6 +4,10 @@
     "password": {
       "type": "string"
     },
+    "rememberMe": {
+      "description": "When true, refresh cookie TTL is 30 days; otherwise 7 days (#212).",
+      "type": "boolean"
+    },
     "tenantSlug": {
       "type": "string"
     },

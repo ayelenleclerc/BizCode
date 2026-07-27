@@ -81,6 +81,13 @@ function buildPrismaMock(opts: {
       updateMany: vi.fn().mockResolvedValue({ count: 1 }),
       update: vi.fn().mockResolvedValue({ id: 99 }),
     },
+    appRefreshToken: {
+      create: vi.fn().mockResolvedValue({ id: 200 }),
+      findFirst: vi.fn().mockResolvedValue(null),
+      findMany: vi.fn().mockResolvedValue([]),
+      update: vi.fn(),
+      updateMany: vi.fn().mockResolvedValue({ count: 0 }),
+    },
     loginAttempt: {
       create: vi.fn().mockImplementation(
         async (args: { data: { success: boolean } }) => {
@@ -90,9 +97,10 @@ function buildPrismaMock(opts: {
       ),
       findMany: vi.fn().mockImplementation(async () => [...attempts]),
     },
-    $transaction: vi.fn(async (fn: unknown) => {
-      if (typeof fn === 'function') return fn({} as PrismaClient)
-      return fn
+    $transaction: vi.fn(async (arg: unknown) => {
+      if (typeof arg === 'function') return (arg as (tx: PrismaClient) => unknown)({} as PrismaClient)
+      if (Array.isArray(arg)) return Promise.all(arg)
+      return arg
     }),
   } as unknown as PrismaClient
 }
