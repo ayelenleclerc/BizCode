@@ -89,7 +89,8 @@ describe('DBF migration integration', () => {
     })
     expect(imported).toHaveLength(1)
     expect(imported[0]?.descripcion).toBe('Detergente 1L')
-    expect(imported[0]?.stock).toBe(15)
+    // stock is Decimal(14,4) after #203 — compare numeric value, not Object.is identity
+    expect(Number(imported[0]?.stock)).toBe(15)
 
     const rejected = await prisma.articulo.count({ where: { tenantId, codigo: 2002 } })
     expect(rejected).toBe(0)
