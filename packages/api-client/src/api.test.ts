@@ -217,6 +217,8 @@ describe('authAPI', () => {
           routeIds: [],
           channels: ['counter'],
         },
+  mfaEnabled: false,
+  mfaSetupRequired: false,
       }
       mockGet.mockResolvedValueOnce({ data: { data: claims } })
       expect(await authAPI.me()).toEqual(claims)

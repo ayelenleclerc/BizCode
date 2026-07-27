@@ -134,7 +134,7 @@ One-time endpoint to create initial tenant and owner user.
 }
 ```
 
-### Create authenticated session (access 15m + refresh 7d/30d cookies)
+### Create authenticated session (access 15m + refresh 7d/30d cookies) or MFA challenge (#213)
 
 - **Method:** `POST`
 - **Path:** `/api/auth/login`
@@ -173,29 +173,13 @@ One-time endpoint to create initial tenant and owner user.
 
 #### Responses
 
-##### Status: 200 Session created (Set-Cookie bizcode\_session + bizcode\_refresh)
+##### Status: 200 Session created (Set-Cookie) when MFA is off; or MFA challenge payload without cookies when mfaEnabled.
 
 ###### Content-Type: application/json
 
 - **`data` (required)**
 
   `object`
-
-  - **`role` (required)**
-
-    `string`
-
-  - **`tenantId` (required)**
-
-    `integer`
-
-  - **`userId` (required)**
-
-    `integer`
-
-  - **`username` (required)**
-
-    `string`
 
 - **`success` (required)**
 
@@ -258,6 +242,424 @@ One-time endpoint to create initial tenant and owner user.
 ```
 
 ##### Status: 429 Account locked after too many failed login attempts
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Complete MFA login challenge with TOTP or backup code (#213)
+
+- **Method:** `POST`
+- **Path:** `/api/auth/mfa/verify`
+- **Tags:** auth
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`code` (required)**
+
+  `string` — 6-digit TOTP or single-use backup code
+
+- **`mfaToken` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "mfaToken": "",
+  "code": ""
+}
+```
+
+#### Responses
+
+##### Status: 200 Session cookies issued after successful MFA
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`role` (required)**
+
+    `string`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`userId` (required)**
+
+    `integer`
+
+  - **`username` (required)**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "userId": 1,
+    "tenantId": 1,
+    "username": "",
+    "role": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Invalid or expired challenge / invalid code
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Start MFA enrollment (returns otpauth URI, QR, secret) (#213)
+
+- **Method:** `POST`
+- **Path:** `/api/auth/mfa/setup/start`
+- **Tags:** auth
+
+#### Responses
+
+##### Status: 200 Enrollment material for authenticator app
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`otpauthUrl` (required)**
+
+    `string`
+
+  - **`qrDataUrl` (required)**
+
+    `string` — PNG data URL for QR
+
+  - **`secret` (required)**
+
+    `string` — Base32 secret for manual entry
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "otpauthUrl": "",
+    "qrDataUrl": "",
+    "secret": ""
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 409 Resource conflict
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Confirm MFA enrollment with first TOTP code; returns backup codes once (#213)
+
+- **Method:** `POST`
+- **Path:** `/api/auth/mfa/setup/confirm`
+- **Tags:** auth
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`code` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "code": ""
+}
+```
+
+#### Responses
+
+##### Status: 200 MFA enabled; backup codes shown once
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`backupCodes` (required)**
+
+    `array`
+
+    **Items:**
+
+    `string`
+
+  - **`mfaEnabled` (required)**
+
+    `boolean`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "mfaEnabled": true,
+    "backupCodes": [
+      ""
+    ]
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 409 Resource conflict
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Disable own MFA with TOTP or backup code (#213)
+
+- **Method:** `POST`
+- **Path:** `/api/auth/mfa/disable`
+- **Tags:** auth
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`code` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "code": ""
+}
+```
+
+#### Responses
+
+##### Status: 200 MFA disabled
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`mfaEnabled` (required)**
+
+    `boolean`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "mfaEnabled": true
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
 
 ###### Content-Type: application/json
 
@@ -387,6 +789,14 @@ Requires bizcode\_refresh cookie. Reuse of a revoked refresh token invalidates t
 
   `object`
 
+  - **`mfaEnabled` (required)**
+
+    `boolean`
+
+  - **`mfaSetupRequired` (required)**
+
+    `boolean` — True when role requires MFA and MFA is not yet enabled (#213)
+
   - **`permissions` (required)**
 
     `array`
@@ -482,7 +892,9 @@ Requires bizcode\_refresh cookie. Reuse of a revoked refresh token invalidates t
       "channels": [
         ""
       ]
-    }
+    },
+    "mfaEnabled": true,
+    "mfaSetupRequired": true
   }
 }
 ```
@@ -50642,6 +51054,153 @@ Updates role, active flag, or scope for a user in the current tenant. Requires `
 }
 ```
 
+### PARAMETERS /api/users/{id}/mfa
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/users/{id}/mfa`
+
+### Admin disable MFA for a user (#213)
+
+- **Method:** `PATCH`
+- **Path:** `/api/users/{id}/mfa`
+- **Tags:** users
+
+Owner or super\_admin with users.manage may set enabled=false. When the caller has MFA enabled, their own TOTP/backup code is required.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`enabled` (required)**
+
+  `boolean`
+
+- **`code`**
+
+  `string` — Required when the caller has MFA enabled
+
+**Example:**
+
+```json
+{
+  "enabled": false,
+  "code": ""
+}
+```
+
+#### Responses
+
+##### Status: 200 MFA disabled for target user
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`mfaEnabled` (required)**
+
+    `boolean`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "mfaEnabled": true
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ### PARAMETERS /api/auth/change-password
 
 - **Method:** `PARAMETERS`
@@ -74476,7 +75035,54 @@ Rate-limited mutation; requires products.manage. USD only.
 }
 ```
 
+### LoginMfaChallenge
+
+- **Type:**`object`
+
+* **`mfaRequired` (required)**
+
+  `boolean`
+
+* **`mfaToken` (required)**
+
+  `string` — Opaque single-use challenge token (TTL 5 minutes, Redis)
+
+**Example:**
+
+```json
+{
+  "mfaRequired": true,
+  "mfaToken": ""
+}
+```
+
 ### LoginEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "userId": 1,
+    "tenantId": 1,
+    "username": "",
+    "role": ""
+  }
+}
+```
+
+### LoginSuccessEnvelope
 
 - **Type:**`object`
 
@@ -74515,6 +75121,235 @@ Rate-limited mutation; requires products.manage. USD only.
     "username": "",
     "role": ""
   }
+}
+```
+
+### MfaVerifyInput
+
+- **Type:**`object`
+
+* **`code` (required)**
+
+  `string` — 6-digit TOTP or single-use backup code
+
+* **`mfaToken` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "mfaToken": "",
+  "code": ""
+}
+```
+
+### MfaCodeInput
+
+- **Type:**`object`
+
+* **`code` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "code": ""
+}
+```
+
+### MfaSetupStartResult
+
+- **Type:**`object`
+
+* **`otpauthUrl` (required)**
+
+  `string`
+
+* **`qrDataUrl` (required)**
+
+  `string` — PNG data URL for QR
+
+* **`secret` (required)**
+
+  `string` — Base32 secret for manual entry
+
+**Example:**
+
+```json
+{
+  "otpauthUrl": "",
+  "qrDataUrl": "",
+  "secret": ""
+}
+```
+
+### MfaSetupStartEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`otpauthUrl` (required)**
+
+    `string`
+
+  - **`qrDataUrl` (required)**
+
+    `string` — PNG data URL for QR
+
+  - **`secret` (required)**
+
+    `string` — Base32 secret for manual entry
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "otpauthUrl": "",
+    "qrDataUrl": "",
+    "secret": ""
+  }
+}
+```
+
+### MfaSetupConfirmResult
+
+- **Type:**`object`
+
+* **`backupCodes` (required)**
+
+  `array`
+
+  **Items:**
+
+  `string`
+
+* **`mfaEnabled` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "mfaEnabled": true,
+  "backupCodes": [
+    ""
+  ]
+}
+```
+
+### MfaSetupConfirmEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`backupCodes` (required)**
+
+    `array`
+
+    **Items:**
+
+    `string`
+
+  - **`mfaEnabled` (required)**
+
+    `boolean`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "mfaEnabled": true,
+    "backupCodes": [
+      ""
+    ]
+  }
+}
+```
+
+### MfaStatusResult
+
+- **Type:**`object`
+
+* **`mfaEnabled` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "mfaEnabled": true
+}
+```
+
+### MfaStatusEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`mfaEnabled` (required)**
+
+    `boolean`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "mfaEnabled": true
+  }
+}
+```
+
+### MfaAdminDisableInput
+
+- **Type:**`object`
+
+* **`enabled` (required)**
+
+  `boolean`
+
+* **`code`**
+
+  `string` — Required when the caller has MFA enabled
+
+**Example:**
+
+```json
+{
+  "enabled": false,
+  "code": ""
 }
 ```
 
@@ -74625,6 +75460,14 @@ Rate-limited mutation; requires products.manage. USD only.
 
 - **Type:**`object`
 
+* **`mfaEnabled` (required)**
+
+  `boolean`
+
+* **`mfaSetupRequired` (required)**
+
+  `boolean` — True when role requires MFA and MFA is not yet enabled (#213)
+
 * **`permissions` (required)**
 
   `array`
@@ -74714,7 +75557,9 @@ Rate-limited mutation; requires products.manage. USD only.
     "channels": [
       ""
     ]
-  }
+  },
+  "mfaEnabled": true,
+  "mfaSetupRequired": true
 }
 ```
 
@@ -74725,6 +75570,14 @@ Rate-limited mutation; requires products.manage. USD only.
 * **`data` (required)**
 
   `object`
+
+  - **`mfaEnabled` (required)**
+
+    `boolean`
+
+  - **`mfaSetupRequired` (required)**
+
+    `boolean` — True when role requires MFA and MFA is not yet enabled (#213)
 
   - **`permissions` (required)**
 
@@ -74821,7 +75674,9 @@ Rate-limited mutation; requires products.manage. USD only.
       "channels": [
         ""
       ]
-    }
+    },
+    "mfaEnabled": true,
+    "mfaSetupRequired": true
   }
 }
 ```

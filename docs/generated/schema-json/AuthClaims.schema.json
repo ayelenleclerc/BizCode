@@ -1,6 +1,13 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "properties": {
+    "mfaEnabled": {
+      "type": "boolean"
+    },
+    "mfaSetupRequired": {
+      "description": "True when role requires MFA and MFA is not yet enabled (#213)",
+      "type": "boolean"
+    },
     "permissions": {
       "items": {
         "type": "string"
@@ -29,7 +36,9 @@
     "username",
     "role",
     "permissions",
-    "scope"
+    "scope",
+    "mfaEnabled",
+    "mfaSetupRequired"
   ],
   "title": "AuthClaims",
   "type": "object"

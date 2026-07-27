@@ -1,20 +1,20 @@
 # LoginResult Schema
 
 ```txt
-undefined
+undefined#/properties/data
 ```
 
 
 
-| Abstract            | Extensible | Status         | Identifiable | Custom Properties | Additional Properties | Access Restrictions | Defined In                                                                               |
-| :------------------ | :--------- | :------------- | :----------- | :---------------- | :-------------------- | :------------------ | :--------------------------------------------------------------------------------------- |
-| Can be instantiated | No         | Unknown status | No           | Forbidden         | Allowed               | none                | [LoginResult.schema.json](../schema-json/LoginResult.schema.json "open original schema") |
+| Abstract            | Extensible | Status         | Identifiable | Custom Properties | Additional Properties | Access Restrictions | Defined In                                                                                                   |
+| :------------------ | :--------- | :------------- | :----------- | :---------------- | :-------------------- | :------------------ | :----------------------------------------------------------------------------------------------------------- |
+| Can be instantiated | No         | Unknown status | No           | Forbidden         | Allowed               | none                | [LoginSuccessEnvelope.schema.json\*](../schema-json/LoginSuccessEnvelope.schema.json "open original schema") |
 
-## LoginResult Type
+## data Type
 
 `object` ([LoginResult](loginresult.md))
 
-# LoginResult Properties
+# data Properties
 
 | Property              | Type      | Required | Nullable       | Defined by                                                                         |
 | :-------------------- | :-------- | :------- | :------------- | :--------------------------------------------------------------------------------- |

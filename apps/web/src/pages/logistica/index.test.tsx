@@ -39,11 +39,14 @@ function mockAuth(permissions: Permission[], role: AuthClaims['role'] = 'logisti
     role,
     permissions,
     scope: { tenantId: 1, branchIds: [], warehouseIds: [], routeIds: [], channels: ['backoffice'] },
+  mfaEnabled: false,
+  mfaSetupRequired: false,
   }
   vi.mocked(useAuth).mockReturnValue({
     claims,
     status: 'authenticated',
     login: vi.fn(),
+    verifyMfa: vi.fn(),
     logout: vi.fn(),
     refresh: vi.fn(),
   })

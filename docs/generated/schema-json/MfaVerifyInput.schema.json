@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "code": {
+      "description": "6-digit TOTP or single-use backup code",
+      "type": "string"
+    },
+    "mfaToken": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "mfaToken",
+    "code"
+  ],
+  "title": "MfaVerifyInput",
+  "type": "object"
+}

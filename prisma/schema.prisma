@@ -1897,11 +1897,17 @@ model AppUser {
   scopeWarehouseIds Int[]  @default([])
   scopeRouteIds  Int[]     @default([])
   scopeChannels  String[]  @default([])
+  /// MFA/TOTP (#213): when true, login requires TOTP or backup code after password.
+  mfaEnabled           Boolean   @default(false)
+  /// AES-GCM ciphertext of the TOTP shared secret (BIZCODE_MFA_ENCRYPTION_KEY).
+  totpSecretEncrypted  String?   @db.Text
+  mfaVerifiedAt        DateTime?
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
 
   sessions      AppSession[]
   refreshTokens AppRefreshToken[]
+  mfaBackupCodes AppMfaBackupCode[]
   auditEvents   AuditEvent[]
   notifications Notification[]
   chatMessagesSent     ChatMessage[] @relation("ChatMessageSender")
@@ -2613,6 +2619,18 @@ model AppRefreshToken {
   @@index([userId, tokenFamily])
   @@index([tokenFamily])
   @@index([expiresAt])
+}
+
+/// Single-use MFA backup codes (#213); plaintext shown once at enroll; stored as scrypt via hashPassword.
+model AppMfaBackupCode {
+  id        Int       @id @default(autoincrement())
+  userId    Int
+  user      AppUser   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  codeHash  String    @db.VarChar(255)
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId])
 }
 
 model AuditEvent {

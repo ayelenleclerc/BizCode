@@ -38,8 +38,29 @@ function buildPrismaMock(loginName: string, loginSecret: string): PrismaClient {
     auditEvent: { create: vi.fn().mockResolvedValue({ id: 1 }) },
     appUser: {
       count: vi.fn().mockResolvedValue(1),
-      findUnique: vi.fn(async (args: { where: { tenantId_username: { tenantId: number; username: string } } }) => {
-        if (args.where.tenantId_username.username !== loginName) {
+      findUnique: vi.fn(async (args: {
+        where: { tenantId_username?: { tenantId: number; username: string }; id?: number }
+        select?: { mfaEnabled?: boolean; role?: boolean; active?: boolean }
+      }) => {
+        if (args.where.id === 7) {
+          if (args.select) {
+            return { mfaEnabled: false, role: 'super_admin', active: true }
+          }
+          return {
+            id: 7,
+            tenantId: 11,
+            username: loginName,
+            passwordHash: storedPassword,
+            role: 'super_admin',
+            active: true,
+            mfaEnabled: false,
+            scopeBranchIds: [],
+            scopeWarehouseIds: [],
+            scopeRouteIds: [],
+            scopeChannels: ['backoffice'],
+          }
+        }
+        if (args.where.tenantId_username?.username !== loginName) {
           return null
         }
         return {
@@ -49,6 +70,7 @@ function buildPrismaMock(loginName: string, loginSecret: string): PrismaClient {
           passwordHash: storedPassword,
           role: 'super_admin',
           active: true,
+          mfaEnabled: false,
           scopeBranchIds: [],
           scopeWarehouseIds: [],
           scopeRouteIds: [],
@@ -82,6 +104,7 @@ function buildPrismaMock(loginName: string, loginSecret: string): PrismaClient {
             username: loginName,
             role: 'super_admin',
             active: true,
+            mfaEnabled: false,
             scopeBranchIds: [],
             scopeWarehouseIds: [],
             scopeRouteIds: [],

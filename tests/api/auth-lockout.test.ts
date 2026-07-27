@@ -65,7 +65,8 @@ function buildPrismaMock(opts: {
           const u = args.where.tenantId_username?.username
           if (u !== username) return null
           return { id: 7, tenantId: 1, username, passwordHash: storedPassword, role: 'seller', active: userActive,
-                   scopeBranchIds: [], scopeWarehouseIds: [], scopeRouteIds: [], scopeChannels: [] }
+                   scopeBranchIds: [], scopeWarehouseIds: [], scopeRouteIds: [], scopeChannels: [],
+                   mfaEnabled: false }
         },
       ),
       update: vi.fn().mockResolvedValue(null),

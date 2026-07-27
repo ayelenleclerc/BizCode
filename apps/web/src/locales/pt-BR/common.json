@@ -43,6 +43,7 @@
     "users": "Usuários",
     "zonasEntrega": "Zonas de entrega",
     "empresa": "Empresa",
+    "seguridad": "Segurança",
     "auditLog": "Registro de auditoria",
     "superadmin": "SuperAdmin"
   },
@@ -89,6 +90,40 @@
     },
     "lockout": {
       "retryIn": "Você poderá tentar novamente em {{time}}"
+    },
+    "mfa": {
+      "subtitle": "Digite o código do autenticador ou de backup",
+      "formTitle": "Autenticação em duas etapas",
+      "codeLabel": "Código de verificação",
+      "codeHint": "Código de 6 dígitos do seu app autenticador, ou um código de backup de uso único",
+      "submit": "Verificar",
+      "submitting": "Verificando…",
+      "back": "Voltar ao login"
+    }
+  },
+  "security": {
+    "title": "Segurança da conta",
+    "subtitle": "Gerencie a autenticação em duas etapas da sua conta",
+    "mfa": {
+      "title": "Autenticação em duas etapas (TOTP)",
+      "statusOn": "MFA está ativado na sua conta.",
+      "statusOff": "MFA ainda não está ativado.",
+      "enable": "Ativar MFA",
+      "scanQr": "Escaneie este QR code com seu app autenticador e depois digite o código de 6 dígitos para confirmar.",
+      "qrAlt": "QR code para ativar MFA",
+      "manualSecret": "Segredo manual",
+      "confirmCode": "Código de confirmação",
+      "confirm": "Confirmar e ativar",
+      "backupTitle": "Códigos de backup",
+      "backupWarning": "Salve estes códigos de backup agora. Eles são exibidos apenas uma vez e cada um pode ser usado uma vez.",
+      "backupDone": "Já salvei meus códigos de backup",
+      "disableTitle": "Desativar MFA",
+      "disableCode": "Digite um código TOTP ou de backup para desativar MFA",
+      "disable": "Desativar MFA",
+      "enabledSuccess": "MFA ativado com sucesso.",
+      "disabledSuccess": "MFA desativado.",
+      "setupRequiredBanner": "Seu papel exige autenticação em duas etapas.",
+      "setupRequiredCta": "Configurar MFA agora"
     }
   },
   "session": {

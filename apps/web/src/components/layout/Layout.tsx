@@ -302,6 +302,25 @@ export default function Layout({ children }: LayoutProps) {
           {status === 'authenticated' && <NotificationBell />}
         </header>
 
+        {status === 'authenticated' && claims?.mfaSetupRequired ? (
+          <div
+            role="status"
+            data-testid="mfa-setup-banner"
+            className="border-b border-amber-300 bg-amber-50 px-8 py-3 text-sm text-amber-950 dark:border-amber-700 dark:bg-amber-950 dark:text-amber-100"
+          >
+            <p>
+              {t('security.mfa.setupRequiredBanner')}{' '}
+              <Link
+                to="/configuracion/seguridad"
+                className="font-medium underline"
+                data-testid="mfa-setup-banner-link"
+              >
+                {t('security.mfa.setupRequiredCta')}
+              </Link>
+            </p>
+          </div>
+        ) : null}
+
         {/* Content Area */}
         <div className="flex-1 overflow-auto bg-slate-50 dark:bg-slate-900">
           {children}

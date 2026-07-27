@@ -43,6 +43,7 @@
     "users": "Usuarios",
     "zonasEntrega": "Zonas de entrega",
     "empresa": "Empresa",
+    "seguridad": "Seguridad",
     "auditLog": "Registro de auditoría",
     "superadmin": "SuperAdmin"
   },
@@ -89,6 +90,40 @@
     },
     "lockout": {
       "retryIn": "Podrá intentarlo de nuevo en {{time}}"
+    },
+    "mfa": {
+      "subtitle": "Ingrese el código del autenticador o de respaldo",
+      "formTitle": "Autenticación en dos pasos",
+      "codeLabel": "Código de verificación",
+      "codeHint": "Código de 6 dígitos de su app autenticadora, o un código de respaldo de un solo uso",
+      "submit": "Verificar",
+      "submitting": "Verificando…",
+      "back": "Volver al inicio de sesión"
+    }
+  },
+  "security": {
+    "title": "Seguridad de la cuenta",
+    "subtitle": "Administre la autenticación en dos pasos de su cuenta",
+    "mfa": {
+      "title": "Autenticación en dos pasos (TOTP)",
+      "statusOn": "MFA está activado en su cuenta.",
+      "statusOff": "MFA aún no está activado.",
+      "enable": "Activar MFA",
+      "scanQr": "Escanee este código QR con su app autenticadora y luego ingrese el código de 6 dígitos para confirmar.",
+      "qrAlt": "Código QR para activar MFA",
+      "manualSecret": "Secreto manual",
+      "confirmCode": "Código de confirmación",
+      "confirm": "Confirmar y activar",
+      "backupTitle": "Códigos de respaldo",
+      "backupWarning": "Guarde estos códigos de respaldo ahora. Se muestran una sola vez y cada uno se puede usar una vez.",
+      "backupDone": "Ya guardé mis códigos de respaldo",
+      "disableTitle": "Desactivar MFA",
+      "disableCode": "Ingrese un código TOTP o de respaldo para desactivar MFA",
+      "disable": "Desactivar MFA",
+      "enabledSuccess": "MFA activado correctamente.",
+      "disabledSuccess": "MFA desactivado.",
+      "setupRequiredBanner": "Su rol requiere autenticación en dos pasos.",
+      "setupRequiredCta": "Configurar MFA ahora"
     }
   },
   "session": {

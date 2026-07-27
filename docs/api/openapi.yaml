@@ -132,7 +132,7 @@ paths:
   /api/auth/login:
     post:
       tags: [auth]
-      summary: Create authenticated session (access 15m + refresh 7d/30d cookies)
+      summary: Create authenticated session (access 15m + refresh 7d/30d cookies) or MFA challenge (#213)
       requestBody:
         required: true
         content:
@@ -141,12 +141,13 @@ paths:
               $ref: '#/components/schemas/LoginInput'
       responses:
         '200':
-          description: Session created (Set-Cookie bizcode_session + bizcode_refresh)
+          description: >
+            Session created (Set-Cookie) when MFA is off; or MFA challenge payload without cookies when mfaEnabled.
           headers:
             Set-Cookie:
               schema:
                 type: string
-              description: Access and refresh HttpOnly cookies (#212)
+              description: Access and refresh HttpOnly cookies (#212) — omitted when mfaRequired
           content:
             application/json:
               schema:
@@ -190,6 +191,100 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiErrorEnvelope'
+
+  /api/auth/mfa/verify:
+    post:
+      tags: [auth]
+      summary: Complete MFA login challenge with TOTP or backup code (#213)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MfaVerifyInput'
+      responses:
+        '200':
+          description: Session cookies issued after successful MFA
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginSuccessEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          description: Invalid or expired challenge / invalid code
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+
+  /api/auth/mfa/setup/start:
+    post:
+      tags: [auth]
+      summary: Start MFA enrollment (returns otpauth URI, QR, secret) (#213)
+      security:
+        - cookieSession: []
+      responses:
+        '200':
+          description: Enrollment material for authenticator app
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MfaSetupStartEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '409':
+          $ref: '#/components/responses/ConflictError'
+
+  /api/auth/mfa/setup/confirm:
+    post:
+      tags: [auth]
+      summary: Confirm MFA enrollment with first TOTP code; returns backup codes once (#213)
+      security:
+        - cookieSession: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MfaCodeInput'
+      responses:
+        '200':
+          description: MFA enabled; backup codes shown once
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MfaSetupConfirmEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '409':
+          $ref: '#/components/responses/ConflictError'
+
+  /api/auth/mfa/disable:
+    post:
+      tags: [auth]
+      summary: Disable own MFA with TOTP or backup code (#213)
+      security:
+        - cookieSession: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MfaCodeInput'
+      responses:
+        '200':
+          description: MFA disabled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MfaStatusEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
 
   /api/auth/refresh:
     post:
@@ -8157,6 +8252,45 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
 
+  /api/users/{id}/mfa:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    patch:
+      tags: [users]
+      summary: Admin disable MFA for a user (#213)
+      description: >
+        Owner or super_admin with users.manage may set enabled=false.
+        When the caller has MFA enabled, their own TOTP/backup code is required.
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MfaAdminDisableInput'
+      responses:
+        '200':
+          description: MFA disabled for target user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MfaStatusEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
   /api/auth/change-password:
     parameters:
       - $ref: '#/components/parameters/BizcodeChannelHeader'
@@ -12151,6 +12285,17 @@ components:
         role:
           type: string
 
+    LoginMfaChallenge:
+      type: object
+      required: [mfaRequired, mfaToken]
+      properties:
+        mfaRequired:
+          type: boolean
+          const: true
+        mfaToken:
+          type: string
+          description: Opaque single-use challenge token (TTL 5 minutes, Redis)
+
     LoginEnvelope:
       type: object
       required: [success, data]
@@ -12159,7 +12304,111 @@ components:
           type: boolean
           const: true
         data:
+          oneOf:
+            - $ref: '#/components/schemas/LoginResult'
+            - $ref: '#/components/schemas/LoginMfaChallenge'
+
+    LoginSuccessEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
           $ref: '#/components/schemas/LoginResult'
+
+    MfaVerifyInput:
+      type: object
+      required: [mfaToken, code]
+      properties:
+        mfaToken:
+          type: string
+        code:
+          type: string
+          description: 6-digit TOTP or single-use backup code
+
+    MfaCodeInput:
+      type: object
+      required: [code]
+      properties:
+        code:
+          type: string
+
+    MfaSetupStartResult:
+      type: object
+      required: [otpauthUrl, qrDataUrl, secret]
+      properties:
+        otpauthUrl:
+          type: string
+        qrDataUrl:
+          type: string
+          description: PNG data URL for QR
+        secret:
+          type: string
+          description: Base32 secret for manual entry
+
+    MfaSetupStartEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/MfaSetupStartResult'
+
+    MfaSetupConfirmResult:
+      type: object
+      required: [mfaEnabled, backupCodes]
+      properties:
+        mfaEnabled:
+          type: boolean
+          const: true
+        backupCodes:
+          type: array
+          items:
+            type: string
+          minItems: 8
+          maxItems: 8
+
+    MfaSetupConfirmEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/MfaSetupConfirmResult'
+
+    MfaStatusResult:
+      type: object
+      required: [mfaEnabled]
+      properties:
+        mfaEnabled:
+          type: boolean
+
+    MfaStatusEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/MfaStatusResult'
+
+    MfaAdminDisableInput:
+      type: object
+      required: [enabled]
+      properties:
+        enabled:
+          type: boolean
+          const: false
+        code:
+          type: string
+          description: Required when the caller has MFA enabled
 
     LogoutResult:
       type: object
@@ -12204,7 +12453,7 @@ components:
 
     AuthClaims:
       type: object
-      required: [userId, tenantId, username, role, permissions, scope]
+      required: [userId, tenantId, username, role, permissions, scope, mfaEnabled, mfaSetupRequired]
       properties:
         userId:
           type: integer
@@ -12220,6 +12469,11 @@ components:
             type: string
         scope:
           $ref: '#/components/schemas/AuthScope'
+        mfaEnabled:
+          type: boolean
+        mfaSetupRequired:
+          type: boolean
+          description: True when role requires MFA and MFA is not yet enabled (#213)
 
     AuthClaimsEnvelope:
       type: object

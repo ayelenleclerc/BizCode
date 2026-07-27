@@ -47,6 +47,8 @@ const driverClaims: AuthClaims = {
     routeIds: [],
     channels: ['delivery'],
   },
+  mfaEnabled: false,
+  mfaSetupRequired: false,
 }
 
 const pendingItem: RepartoItemRow = {
@@ -101,7 +103,7 @@ describe('ChoferRepartosPage', () => {
     vi.mocked(useAuth).mockReturnValue({
       status: 'authenticated',
       claims: driverClaims,
-      login: vi.fn(),
+      verifyMfa: vi.fn(), login: vi.fn(),
       logout: vi.fn(),
       refresh: vi.fn(),
     })
@@ -128,6 +130,7 @@ describe('ChoferRepartosPage', () => {
       status: 'authenticated',
       claims: { ...driverClaims, permissions: [] },
       login: vi.fn(),
+      verifyMfa: vi.fn(),
       logout: vi.fn(),
       refresh: vi.fn(),
     })

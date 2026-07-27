@@ -65,6 +65,7 @@ function buildPrismaMock(loginName: string, loginSecret: string): PrismaClient {
     passwordHash: storedPassword,
     role: 'super_admin',
     active: true,
+    mfaEnabled: false,
     scopeBranchIds: [] as number[],
     scopeWarehouseIds: [] as number[],
     scopeRouteIds: [] as number[],
@@ -160,7 +161,7 @@ function buildPrismaMock(loginName: string, loginSecret: string): PrismaClient {
     }),
   }
 
-  return {
+  const prisma = {
     cliente: { findMany: vi.fn().mockResolvedValue([]) },
     articulo: { findMany: vi.fn().mockResolvedValue([]) },
     rubro: { findMany: vi.fn().mockResolvedValue([]) },
@@ -188,9 +189,13 @@ function buildPrismaMock(loginName: string, loginSecret: string): PrismaClient {
       if (Array.isArray(arg)) {
         return Promise.all(arg)
       }
+      if (typeof arg === 'function') {
+        return (arg as (tx: unknown) => Promise<unknown>)(prisma)
+      }
       throw new Error('unexpected transaction callback')
     }),
-  } as unknown as PrismaClient
+  }
+  return prisma as unknown as PrismaClient
 }
 
 describe('Auth refresh token rotation (#212)', () => {
