@@ -329,6 +329,39 @@ describe('auth MFA TOTP (#213)', () => {
     expect(res.body.data.mfaEnabled).toBe(false)
     expect(res.body.data.mfaSetupRequired).toBe(true)
   })
+
+  it('setup/start rejects when MFA already enabled', async () => {
+    process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
+    process.env.BIZCODE_TEST_USER_ID = '7'
+    process.env.BIZCODE_TEST_ROLE = 'owner'
+    mfaEnabled = true
+    totpEncrypted = encryptMfaSecret(totpSecret)
+    const app = createApp(buildPrisma())
+    const res = await request(app).post('/api/auth/mfa/setup/start')
+    expect(res.status).toBe(409)
+  })
+
+  it('disable rejects when MFA is off', async () => {
+    process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
+    process.env.BIZCODE_TEST_USER_ID = '7'
+    process.env.BIZCODE_TEST_ROLE = 'owner'
+    mfaEnabled = false
+    totpEncrypted = null
+    const app = createApp(buildPrisma())
+    const res = await request(app).post('/api/auth/mfa/disable').send({ code: '123456' })
+    expect(res.status).toBe(400)
+  })
+
+  it('setup/confirm rejects invalid TOTP', async () => {
+    process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
+    process.env.BIZCODE_TEST_USER_ID = '7'
+    process.env.BIZCODE_TEST_ROLE = 'owner'
+    mfaEnabled = false
+    totpEncrypted = encryptMfaSecret(totpSecret)
+    const app = createApp(buildPrisma())
+    const res = await request(app).post('/api/auth/mfa/setup/confirm').send({ code: '000000' })
+    expect(res.status).toBe(401)
+  })
 })
 
 // silence unused hashToken if needed for future assertions
