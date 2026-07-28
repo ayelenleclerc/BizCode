@@ -1,5 +1,6 @@
 import type { Application, Request, Response } from 'express'
 import { mercadopagoWebhookHttpRateLimiter } from '../middleware/routeRateLimit'
+import { webhookIpAllowlist } from '../middleware/webhookIpAllowlist'
 import { validateBody } from '../middleware/validateBody'
 import { mercadoPagoWebhookBodySchema } from '../schemas/mercadopago'
 import {
@@ -31,6 +32,7 @@ export function registerMercadoPagoWebhookRoutes(app: Application, ctx: RestRout
 
   app.post(
     '/api/webhooks/mercadopago',
+    webhookIpAllowlist,
     mercadopagoWebhookHttpRateLimiter,
     validateBody(mercadoPagoWebhookBodySchema),
     (req: Request, res: Response) => {

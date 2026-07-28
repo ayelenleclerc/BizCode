@@ -26,6 +26,26 @@ import { tenantPlan } from './middleware/tenantPlan'
 import { registerRestDomainRoutes } from './registerRestDomainRoutes'
 import { registerMetricsRoute } from './routes/registerMetricsRoute'
 
+/**
+ * @en Applies Express `trust proxy` from `TRUST_PROXY` hop count when set (#217).
+ * @es Aplica Express `trust proxy` desde hops `TRUST_PROXY` si está seteado (#217).
+ * @pt-BR Aplica Express `trust proxy` a partir de hops `TRUST_PROXY` se definido (#217).
+ */
+export function applyTrustProxyFromEnv(app: Application): void {
+  const raw = process.env.TRUST_PROXY?.trim()
+  if (!raw) {
+    return
+  }
+  if (raw === 'true') {
+    app.set('trust proxy', 1)
+    return
+  }
+  const hops = Number.parseInt(raw, 10)
+  if (Number.isFinite(hops) && hops >= 1) {
+    app.set('trust proxy', hops)
+  }
+}
+
 const DEFAULT_CORS_ORIGINS = [
   'http://localhost:5173',
   'http://127.0.0.1:5173',
@@ -81,9 +101,9 @@ function getOpenApiDocument(): Record<string, unknown> {
  */
 export function createApp(prisma: PrismaClient): Application {
   const app = express()
+  applyTrustProxyFromEnv(app)
   app.use(getSecurityHeadersMiddleware())
   app.use(correlationId)
-  app.use(routeHttpRateLimiter)
 
   const allowedOrigins = getCorsAllowedOrigins()
   app.use(
@@ -106,6 +126,8 @@ export function createApp(prisma: PrismaClient): Application {
     ),
   )
   app.use(resolveSession(prisma))
+  // After session so authenticated vs anonymous keys work (#217).
+  app.use(routeHttpRateLimiter)
   app.use(tenantContext)
   app.use(tenantRlsContext)
   app.use(tenantModules(prisma))

@@ -10,6 +10,8 @@ Versionamento: [Semantic Versioning](https://semver.org/).
 
 ### Adicionado
 
+- **Contrato WAF Cloudflare + rate limiting avançado (#217):** store Redis para `express-rate-limit` (`rate-limit-redis`); produção exige `REDIS_URL`; `TRUST_PROXY` para IP do cliente atrás de CDN; login 5/15 min por IP e 10/hora por tenant+username; API não autenticada 20/min por IP e autenticada 100/min por usuário; relatórios/exports 10/hora por tenant; `WEBHOOK_IP_ALLOWLIST` opcional; 429 com `Retry-After`; ADR-0016 + guia Cloudflare trilingue. Fora de escopo: API/SDK Cloudflare, `express-slow-down`, scanning de dependências (#219).
+
 - **Gestão de segredos (#216):** segredos de produção via injeção Doppler (ou equivalente) no env (sem SDK AWS/Vault no app); `JWT_SECRET_PREVIOUS` opcional para rotação HMAC de tokens opacos de sessão/portal/challenge MFA; produção exige `BIZCODE_FISCAL_ENCRYPTION_KEY` e `BIZCODE_MFA_ENCRYPTION_KEY`; workflow Gitleaks no CI; ADR-0015 + guia Doppler trilingue; inventário em `.env.example`. Fora de escopo: SDK AWS Secrets Manager, Vault, re-cifragem AES automática, WAF (#217).
 
 - **RLS PostgreSQL + anti-IDOR (#215):** `ENABLE`+`FORCE ROW LEVEL SECURITY` e policies fail-safe em `Factura`, `Cliente`, `Proveedor`, `Articulo`, `Pedido`, `OrdenCompra`, `StockAjuste`, `Notification`, `AuditEvent` (GUC `app.current_tenant_id`); ALS Prisma + `createTenantRlsPrisma` / `runWithTenantRls` (`SET LOCAL`); Express `verifyOwnership` nas rotas `:id` de clientes/artigos/faturas/fornecedores/pedidos; ADR-0010 emendado (EN/ES/PT-BR); role opcional `bizcode_app` (sem `BYPASSRLS`). Fora de escopo: demais tabelas com tenant, schema-per-tenant, `/uploads` estáticos, secrets (#216), WAF (#217).
