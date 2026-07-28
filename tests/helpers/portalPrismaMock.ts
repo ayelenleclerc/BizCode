@@ -1,6 +1,7 @@
 import { createHmac, randomBytes } from 'node:crypto'
 import { vi } from 'vitest'
 import type { PrismaClient } from '@prisma/client'
+import { getByTokenHashFilter, type TokenHashWhere } from './tokenHashFilter'
 
 export const PORTAL_TEST_JWT_SECRET = 'portal-test-jwt-secret'
 export const PORTAL_TEST_TENANT_SLUG = 'demo'
@@ -107,17 +108,20 @@ export function createPortalPrismaMock(options: PortalMockOptions = {}): PrismaC
         })
         return { id, ...args.data, usedAt: null, createdAt: new Date() }
       }),
-      findFirst: vi.fn(async (args: { where: { tenantId: number; tokenHash: string; usedAt: null; expiresAt: { gt: Date } } }) => {
-        const row = magicLinkStore.get(args.where.tokenHash)
-        if (!row || row.usedAt || row.expiresAt <= new Date()) {
+      findFirst: vi.fn(async (args: {
+        where: { tenantId: number; tokenHash: TokenHashWhere; usedAt: null; expiresAt: { gt: Date } }
+      }) => {
+        const hit = getByTokenHashFilter(magicLinkStore, args.where.tokenHash)
+        if (!hit || hit.value.usedAt || hit.value.expiresAt <= new Date()) {
           return null
         }
+        const row = hit.value
         const cliente = row.clienteId === PORTAL_TEST_CLIENTE_A_ID ? clienteA : clienteB
         return {
           id: row.id,
           tenantId: PORTAL_TEST_TENANT_ID,
           clienteId: row.clienteId,
-          tokenHash: args.where.tokenHash,
+          tokenHash: hit.hash,
           expiresAt: row.expiresAt,
           usedAt: row.usedAt,
           cliente,
@@ -142,11 +146,14 @@ export function createPortalPrismaMock(options: PortalMockOptions = {}): PrismaC
         })
         return { id, ...args.data, revokedAt: null, createdAt: new Date(), lastSeenAt: new Date() }
       }),
-      findFirst: vi.fn(async (args: { where: { tokenHash: string; tenantId: number; revokedAt: null; expiresAt: { gt: Date } } }) => {
-        const row = sessionStore.get(args.where.tokenHash)
-        if (!row || row.expiresAt <= new Date()) {
+      findFirst: vi.fn(async (args: {
+        where: { tokenHash: TokenHashWhere; tenantId: number; revokedAt: null; expiresAt: { gt: Date } }
+      }) => {
+        const hit = getByTokenHashFilter(sessionStore, args.where.tokenHash)
+        if (!hit || hit.value.expiresAt <= new Date()) {
           return null
         }
+        const row = hit.value
         const cliente = row.clienteId === PORTAL_TEST_CLIENTE_A_ID ? clienteA : clienteB
         return {
           id: row.id,
