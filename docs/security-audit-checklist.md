@@ -24,7 +24,7 @@
 - [x] Secret management (env vars, Doppler inject / vault-equivalent; Gitleaks CI) — #216 / ADR-0015
 
 ### API Security
-- [ ] Rate limiting
+- [x] Rate limiting
 - [ ] API key rotation
 - [ ] CORS configuration
 - [ ] Request size limits

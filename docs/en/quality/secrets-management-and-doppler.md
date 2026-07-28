@@ -25,7 +25,7 @@ The API always reads validated environment variables via `apps/server/config/env
 | `JWT_SECRET_PREVIOUS` | Optional previous HMAC key during rolling rotation |
 | `BIZCODE_FISCAL_ENCRYPTION_KEY` | AES-256-GCM master key for AFIP/MP secrets at rest (**required in production**) |
 | `BIZCODE_MFA_ENCRYPTION_KEY` | AES-256-GCM master key for TOTP secrets (**required in production**; never reuse fiscal key) |
-| `REDIS_URL` | Optional Redis (refresh blacklist, MFA challenges) |
+| `REDIS_URL` | Redis (refresh blacklist, MFA challenges, **HTTP rate-limit store** — **required in production**, #217) |
 | `SMTP_*` / `TWILIO_*` | Optional outbound channels |
 
 Seed/bootstrap passwords (`BIZCODE_SEED_*`, `BIZCODE_BOOTSTRAP_*`) are local/ops only — never production app runtime secrets.

@@ -1,18 +1,26 @@
-import rateLimit from 'express-rate-limit'
+import rateLimit, { type Options, type RateLimitRequestHandler } from 'express-rate-limit'
 import type { NextFunction, Request, RequestHandler, Response } from 'express'
+import { createRateLimitStore } from '../lib/rateLimitStore'
+
+type AuthClaimsLite = { userId: number; tenantId: number }
+type RequestWithAuth = Request & { auth?: { claims: AuthClaimsLite } }
 
 const MINUTE_MS = 60_000
 const HOUR_MS = 60 * MINUTE_MS
+const FIFTEEN_MINUTES_MS = 15 * MINUTE_MS
 
-const API_GENERAL_DEFAULT = 100
+const API_AUTHENTICATED_DEFAULT = 100
+const API_UNAUTH_DEFAULT = 20
 const AUTH_DEFAULT = 20
+const LOGIN_IP_DEFAULT = 5
+const LOGIN_USERNAME_DEFAULT = 10
+const REPORTS_DEFAULT = 10
 const IMPORT_DEFAULT = 5
 const PORTAL_MAGIC_LINK_DEFAULT = 5
 const PORTAL_VERIFY_DEFAULT = 30
 const MERCADOPAGO_TEST_DEFAULT = 10
 const MERCADOPAGO_PREFERENCE_DEFAULT = 20
 const MERCADOPAGO_WEBHOOK_DEFAULT = 120
-const FIFTEEN_MINUTES_MS = 15 * MINUTE_MS
 
 function parsePositiveInt(raw: string | undefined, defaultValue: number): number {
   if (!raw?.trim()) {
@@ -38,11 +46,33 @@ function isImportPost(req: Request): boolean {
   )
 }
 
-function isGeneralApiPath(req: Request): boolean {
-  return req.path.startsWith('/api') && !isAuthPath(req.path) && !isImportPost(req)
+function isReportOrExportPath(req: Request): boolean {
+  if (req.path.startsWith('/api/reportes')) return true
+  if (req.path.startsWith('/api/logistica/reporte')) return true
+  if (req.path === '/api/logistica/kpis') return true
+  if (req.path === '/api/fiscal/retenciones/export') return true
+  return false
 }
 
-function rateLimitHandler(_req: Request, res: Response): void {
+function isGeneralApiPath(req: Request): boolean {
+  return (
+    req.path.startsWith('/api') &&
+    !isAuthPath(req.path) &&
+    !isImportPost(req) &&
+    !isReportOrExportPath(req)
+  )
+}
+
+function hasAuth(req: Request): boolean {
+  return Boolean((req as RequestWithAuth).auth)
+}
+
+function rateLimitHandler(req: Request, res: Response, _next: NextFunction, _optionsUsed: Options): void {
+  const resetTime = req.rateLimit?.resetTime
+  if (resetTime instanceof Date) {
+    const sec = Math.max(1, Math.ceil((resetTime.getTime() - Date.now()) / 1000))
+    res.setHeader('Retry-After', String(sec))
+  }
   res.status(429).json({ success: false, error: 'Too many requests' })
 }
 
@@ -50,14 +80,24 @@ function createRouteLimiter(options: {
   windowMs: number
   limit: number
   skipUnless: (req: Request) => boolean
-}): RequestHandler {
+  storePrefix: string
+  keyGenerator?: Options['keyGenerator']
+}): RateLimitRequestHandler {
+  const store = createRateLimitStore(options.storePrefix)
   return rateLimit({
     windowMs: options.windowMs,
     limit: options.limit,
     standardHeaders: true,
     legacyHeaders: false,
+    ...(store ? { store } : {}),
     skip: (req) => skipInTest() || !options.skipUnless(req),
     handler: rateLimitHandler,
+    ...(options.keyGenerator
+      ? {
+          keyGenerator: options.keyGenerator,
+          validate: { keyGeneratorIpFallback: false },
+        }
+      : {}),
   })
 }
 
@@ -70,6 +110,44 @@ export const authRouterHttpRateLimiter = createRouteLimiter({
   windowMs: MINUTE_MS,
   limit: parsePositiveInt(process.env.HTTP_RATE_LIMIT_AUTH_PER_MINUTE, AUTH_DEFAULT),
   skipUnless: () => true,
+  storePrefix: 'auth-router',
+})
+
+/**
+ * @en Login POST per-IP limit (default 5 / 15 min; `HTTP_RATE_LIMIT_LOGIN_PER_15_MIN`) (#217).
+ * @es Límite POST login por IP (5 / 15 min por defecto; `HTTP_RATE_LIMIT_LOGIN_PER_15_MIN`) (#217).
+ * @pt-BR Limite POST login por IP (5 / 15 min padrão; `HTTP_RATE_LIMIT_LOGIN_PER_15_MIN`) (#217).
+ */
+export const loginIpHttpRateLimiter = createRouteLimiter({
+  windowMs: FIFTEEN_MINUTES_MS,
+  limit: parsePositiveInt(process.env.HTTP_RATE_LIMIT_LOGIN_PER_15_MIN, LOGIN_IP_DEFAULT),
+  skipUnless: () => true,
+  storePrefix: 'login-ip',
+})
+
+/**
+ * @en Login POST per tenant+username limit (default 10 / hour; `HTTP_RATE_LIMIT_LOGIN_USERNAME_PER_HOUR`) (#217).
+ * @es Límite POST login por tenant+username (10 / hora por defecto; `HTTP_RATE_LIMIT_LOGIN_USERNAME_PER_HOUR`) (#217).
+ * @pt-BR Limite POST login por tenant+username (10 / hora padrão; `HTTP_RATE_LIMIT_LOGIN_USERNAME_PER_HOUR`) (#217).
+ */
+export const loginUsernameHttpRateLimiter = createRouteLimiter({
+  windowMs: HOUR_MS,
+  limit: parsePositiveInt(
+    process.env.HTTP_RATE_LIMIT_LOGIN_USERNAME_PER_HOUR,
+    LOGIN_USERNAME_DEFAULT,
+  ),
+  skipUnless: () => true,
+  storePrefix: 'login-username',
+  keyGenerator: (req) => {
+    const body = req.body as { username?: unknown; tenantSlug?: unknown; tenant?: unknown }
+    const username = String(body?.username ?? '')
+      .trim()
+      .toLowerCase()
+    const tenant = String(body?.tenantSlug ?? body?.tenant ?? 'default')
+      .trim()
+      .toLowerCase()
+    return `login-user:${tenant}:${username || 'unknown'}`
+  },
 })
 
 /**
@@ -81,6 +159,7 @@ export const portalMagicLinkHttpRateLimiter = createRouteLimiter({
   windowMs: FIFTEEN_MINUTES_MS,
   limit: parsePositiveInt(process.env.HTTP_RATE_LIMIT_PORTAL_MAGIC_LINK, PORTAL_MAGIC_LINK_DEFAULT),
   skipUnless: () => true,
+  storePrefix: 'portal-magic',
 })
 
 /**
@@ -92,6 +171,7 @@ export const portalVerifyHttpRateLimiter = createRouteLimiter({
   windowMs: FIFTEEN_MINUTES_MS,
   limit: parsePositiveInt(process.env.HTTP_RATE_LIMIT_PORTAL_VERIFY, PORTAL_VERIFY_DEFAULT),
   skipUnless: () => true,
+  storePrefix: 'portal-verify',
 })
 
 /**
@@ -103,6 +183,7 @@ export const mercadopagoTestHttpRateLimiter = createRouteLimiter({
   windowMs: FIFTEEN_MINUTES_MS,
   limit: parsePositiveInt(process.env.HTTP_RATE_LIMIT_MERCADOPAGO_TEST, MERCADOPAGO_TEST_DEFAULT),
   skipUnless: () => true,
+  storePrefix: 'mp-test',
 })
 
 /**
@@ -117,6 +198,7 @@ export const mercadopagoPreferenceHttpRateLimiter = createRouteLimiter({
     MERCADOPAGO_PREFERENCE_DEFAULT,
   ),
   skipUnless: () => true,
+  storePrefix: 'mp-pref',
 })
 
 /**
@@ -131,6 +213,7 @@ export const mercadopagoWebhookHttpRateLimiter = createRouteLimiter({
     MERCADOPAGO_WEBHOOK_DEFAULT,
   ),
   skipUnless: () => true,
+  storePrefix: 'mp-webhook',
 })
 
 /**
@@ -142,17 +225,58 @@ export const importHttpRateLimiter = createRouteLimiter({
   windowMs: HOUR_MS,
   limit: parsePositiveInt(process.env.HTTP_RATE_LIMIT_IMPORT_PER_HOUR, IMPORT_DEFAULT),
   skipUnless: (req) => isImportPost(req),
+  storePrefix: 'import',
 })
 
 /**
- * @en Per-IP rate limit for other `/api/*` routes (default 100 req/min; `HTTP_RATE_LIMIT_PER_MINUTE`).
- * @es Límite por IP para el resto de `/api/*` (100 req/min por defecto; `HTTP_RATE_LIMIT_PER_MINUTE`).
- * @pt-BR Limite por IP para demais rotas `/api/*` (100 req/min padrão; `HTTP_RATE_LIMIT_PER_MINUTE`).
+ * @en Unauthenticated `/api/*` limit per IP (default 20/min; `HTTP_RATE_LIMIT_UNAUTH_PER_MINUTE`) (#217).
+ * @es Límite `/api/*` no autenticado por IP (20/min por defecto; `HTTP_RATE_LIMIT_UNAUTH_PER_MINUTE`) (#217).
+ * @pt-BR Limite `/api/*` não autenticado por IP (20/min padrão; `HTTP_RATE_LIMIT_UNAUTH_PER_MINUTE`) (#217).
  */
-export const apiHttpRateLimiter = createRouteLimiter({
+export const unauthenticatedApiHttpRateLimiter = createRouteLimiter({
   windowMs: MINUTE_MS,
-  limit: parsePositiveInt(process.env.HTTP_RATE_LIMIT_PER_MINUTE, API_GENERAL_DEFAULT),
-  skipUnless: (req) => isGeneralApiPath(req),
+  limit: parsePositiveInt(process.env.HTTP_RATE_LIMIT_UNAUTH_PER_MINUTE, API_UNAUTH_DEFAULT),
+  skipUnless: (req) => isGeneralApiPath(req) && !hasAuth(req),
+  storePrefix: 'api-unauth',
+})
+
+/**
+ * @en Authenticated `/api/*` limit per user (default 100/min; `HTTP_RATE_LIMIT_PER_MINUTE`) (#217).
+ * @es Límite `/api/*` autenticado por usuario (100/min por defecto; `HTTP_RATE_LIMIT_PER_MINUTE`) (#217).
+ * @pt-BR Limite `/api/*` autenticado por usuário (100/min padrão; `HTTP_RATE_LIMIT_PER_MINUTE`) (#217).
+ */
+export const authenticatedApiHttpRateLimiter = createRouteLimiter({
+  windowMs: MINUTE_MS,
+  limit: parsePositiveInt(process.env.HTTP_RATE_LIMIT_PER_MINUTE, API_AUTHENTICATED_DEFAULT),
+  skipUnless: (req) => isGeneralApiPath(req) && hasAuth(req),
+  storePrefix: 'api-auth',
+  keyGenerator: (req) => {
+    const userId = (req as RequestWithAuth).auth?.claims.userId
+    return `user:${userId ?? 'unknown'}`
+  },
+})
+
+/**
+ * @en Alias of {@link unauthenticatedApiHttpRateLimiter} for #87 test compatibility.
+ * @es Alias de {@link unauthenticatedApiHttpRateLimiter} para compatibilidad de tests #87.
+ * @pt-BR Alias de {@link unauthenticatedApiHttpRateLimiter} para compatibilidade de testes #87.
+ */
+export const apiHttpRateLimiter = unauthenticatedApiHttpRateLimiter
+
+/**
+ * @en Costly reports/exports per tenant (default 10/hour; `HTTP_RATE_LIMIT_REPORTS_PER_HOUR`) (#217).
+ * @es Reportes/exports costosos por tenant (10/hora por defecto; `HTTP_RATE_LIMIT_REPORTS_PER_HOUR`) (#217).
+ * @pt-BR Relatórios/exports caros por tenant (10/hora padrão; `HTTP_RATE_LIMIT_REPORTS_PER_HOUR`) (#217).
+ */
+export const reportsTenantHttpRateLimiter = createRouteLimiter({
+  windowMs: HOUR_MS,
+  limit: parsePositiveInt(process.env.HTTP_RATE_LIMIT_REPORTS_PER_HOUR, REPORTS_DEFAULT),
+  skipUnless: (req) => isReportOrExportPath(req),
+  storePrefix: 'reports-tenant',
+  keyGenerator: (req) => {
+    const tenantId = (req as RequestWithAuth).auth?.claims.tenantId
+    return `tenant:${tenantId ?? 'anon'}:${req.ip ?? 'unknown'}`
+  },
 })
 
 /**
@@ -162,8 +286,9 @@ export const apiHttpRateLimiter = createRouteLimiter({
  */
 export const depositosMutationHttpRateLimiter = createRouteLimiter({
   windowMs: MINUTE_MS,
-  limit: parsePositiveInt(process.env.HTTP_RATE_LIMIT_PER_MINUTE, API_GENERAL_DEFAULT),
+  limit: parsePositiveInt(process.env.HTTP_RATE_LIMIT_PER_MINUTE, API_AUTHENTICATED_DEFAULT),
   skipUnless: () => true,
+  storePrefix: 'mut-depositos',
 })
 
 /**
@@ -173,8 +298,9 @@ export const depositosMutationHttpRateLimiter = createRouteLimiter({
  */
 export const comisionesMutationHttpRateLimiter = createRouteLimiter({
   windowMs: MINUTE_MS,
-  limit: parsePositiveInt(process.env.HTTP_RATE_LIMIT_PER_MINUTE, API_GENERAL_DEFAULT),
+  limit: parsePositiveInt(process.env.HTTP_RATE_LIMIT_PER_MINUTE, API_AUTHENTICATED_DEFAULT),
   skipUnless: () => true,
+  storePrefix: 'mut-comisiones',
 })
 
 /**
@@ -184,8 +310,9 @@ export const comisionesMutationHttpRateLimiter = createRouteLimiter({
  */
 export const importacionesMutationHttpRateLimiter = createRouteLimiter({
   windowMs: MINUTE_MS,
-  limit: parsePositiveInt(process.env.HTTP_RATE_LIMIT_PER_MINUTE, API_GENERAL_DEFAULT),
+  limit: parsePositiveInt(process.env.HTTP_RATE_LIMIT_PER_MINUTE, API_AUTHENTICATED_DEFAULT),
   skipUnless: () => true,
+  storePrefix: 'mut-importaciones',
 })
 
 /**
@@ -195,8 +322,9 @@ export const importacionesMutationHttpRateLimiter = createRouteLimiter({
  */
 export const tiposCambioMutationHttpRateLimiter = createRouteLimiter({
   windowMs: MINUTE_MS,
-  limit: parsePositiveInt(process.env.HTTP_RATE_LIMIT_PER_MINUTE, API_GENERAL_DEFAULT),
+  limit: parsePositiveInt(process.env.HTTP_RATE_LIMIT_PER_MINUTE, API_AUTHENTICATED_DEFAULT),
   skipUnless: () => true,
+  storePrefix: 'mut-tipos-cambio',
 })
 
 /**
@@ -206,8 +334,9 @@ export const tiposCambioMutationHttpRateLimiter = createRouteLimiter({
  */
 export const formulasProduccionMutationHttpRateLimiter = createRouteLimiter({
   windowMs: MINUTE_MS,
-  limit: parsePositiveInt(process.env.HTTP_RATE_LIMIT_PER_MINUTE, API_GENERAL_DEFAULT),
+  limit: parsePositiveInt(process.env.HTTP_RATE_LIMIT_PER_MINUTE, API_AUTHENTICATED_DEFAULT),
   skipUnless: () => true,
+  storePrefix: 'mut-formulas',
 })
 
 /**
@@ -217,8 +346,9 @@ export const formulasProduccionMutationHttpRateLimiter = createRouteLimiter({
  */
 export const ordenesProduccionMutationHttpRateLimiter = createRouteLimiter({
   windowMs: MINUTE_MS,
-  limit: parsePositiveInt(process.env.HTTP_RATE_LIMIT_PER_MINUTE, API_GENERAL_DEFAULT),
+  limit: parsePositiveInt(process.env.HTTP_RATE_LIMIT_PER_MINUTE, API_AUTHENTICATED_DEFAULT),
   skipUnless: () => true,
+  storePrefix: 'mut-ordenes-prod',
 })
 
 /**
@@ -228,8 +358,9 @@ export const ordenesProduccionMutationHttpRateLimiter = createRouteLimiter({
  */
 export const fidelizacionMutationHttpRateLimiter = createRouteLimiter({
   windowMs: MINUTE_MS,
-  limit: parsePositiveInt(process.env.HTTP_RATE_LIMIT_PER_MINUTE, API_GENERAL_DEFAULT),
+  limit: parsePositiveInt(process.env.HTTP_RATE_LIMIT_PER_MINUTE, API_AUTHENTICATED_DEFAULT),
   skipUnless: () => true,
+  storePrefix: 'mut-fidelizacion',
 })
 
 /**
@@ -239,8 +370,9 @@ export const fidelizacionMutationHttpRateLimiter = createRouteLimiter({
  */
 export const fefoMutationHttpRateLimiter = createRouteLimiter({
   windowMs: MINUTE_MS,
-  limit: parsePositiveInt(process.env.HTTP_RATE_LIMIT_PER_MINUTE, API_GENERAL_DEFAULT),
+  limit: parsePositiveInt(process.env.HTTP_RATE_LIMIT_PER_MINUTE, API_AUTHENTICATED_DEFAULT),
   skipUnless: () => true,
+  storePrefix: 'mut-fefo',
 })
 
 function runLimiterChain(
@@ -254,7 +386,7 @@ function runLimiterChain(
     next()
     return
   }
-  limiters[index](req, res, (err: unknown) => {
+  limiters[index](req, res, (err?: unknown) => {
     if (err) {
       next(err)
       return
@@ -267,11 +399,22 @@ function runLimiterChain(
 }
 
 /**
- * @en Applies auth, import, and general API rate limits without double-counting a request.
- * @es Aplica límites auth, import y API general sin contar dos veces la misma petición.
- * @pt-BR Aplica limites auth, import e API geral sem contar a mesma requisição duas vezes.
+ * @en Applies import, report, unauth-IP and auth-user API rate limits without double-counting (#217).
+ * @es Aplica límites import, reportes, IP no auth y user auth sin doble conteo (#217).
+ * @pt-BR Aplica limites import, relatórios, IP não auth e user auth sem contagem dupla (#217).
  */
 export function routeHttpRateLimiter(req: Request, res: Response, next: NextFunction): void {
   // `/api/auth/*` is rate-limited on the auth router (`registerAuthRoutes`) so CodeQL can see it.
-  runLimiterChain(req, res, next, [importHttpRateLimiter, apiHttpRateLimiter], 0)
+  runLimiterChain(
+    req,
+    res,
+    next,
+    [
+      importHttpRateLimiter,
+      reportsTenantHttpRateLimiter,
+      unauthenticatedApiHttpRateLimiter,
+      authenticatedApiHttpRateLimiter,
+    ],
+    0,
+  )
 }

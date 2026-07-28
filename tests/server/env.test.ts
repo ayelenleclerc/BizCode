@@ -110,9 +110,22 @@ describe('server/config/env', () => {
       NODE_ENV: 'production',
       BIZCODE_FISCAL_ENCRYPTION_KEY: 'fiscal-prod-key',
       BIZCODE_MFA_ENCRYPTION_KEY: 'mfa-prod-key',
+      REDIS_URL: 'redis://127.0.0.1:6379',
     })
     expect(parsed.BIZCODE_FISCAL_ENCRYPTION_KEY).toBe('fiscal-prod-key')
     expect(parsed.BIZCODE_MFA_ENCRYPTION_KEY).toBe('mfa-prod-key')
+    expect(parsed.REDIS_URL).toBe('redis://127.0.0.1:6379')
+  })
+
+  it('requires REDIS_URL in production (#217)', () => {
+    expect(() =>
+      loadAppConfig({
+        ...validEnv,
+        NODE_ENV: 'production',
+        BIZCODE_FISCAL_ENCRYPTION_KEY: 'fiscal-prod-key',
+        BIZCODE_MFA_ENCRYPTION_KEY: 'mfa-prod-key',
+      }),
+    ).toThrow(/REDIS_URL is required in production/)
   })
 
   it('caches config via initializeAppConfig', () => {

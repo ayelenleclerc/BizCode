@@ -1,6 +1,6 @@
 import express from 'express'
 import type { NextFunction, Request, Response } from 'express'
-import { authRouterHttpRateLimiter } from './middleware/routeRateLimit'
+import { authRouterHttpRateLimiter, loginIpHttpRateLimiter, loginUsernameHttpRateLimiter } from './middleware/routeRateLimit'
 import type { PrismaClient } from '@prisma/client'
 import type { ModuleKey } from '@bizcode/types'
 import type { TenantPlanSnapshot } from '@bizcode/types'
@@ -448,7 +448,11 @@ export function registerAuthRoutes(app: import('express').Application, prisma: P
     })
   })
 
-  authRouter.post('/login', async (req: Request, res: Response) => {
+  authRouter.post(
+    '/login',
+    loginIpHttpRateLimiter,
+    loginUsernameHttpRateLimiter,
+    async (req: Request, res: Response) => {
     const body = (req.body ?? {}) as LoginBody
     if (!isNonEmptyString(body.tenantSlug) || !isNonEmptyString(body.username) || !isNonEmptyString(body.password)) {
       res.status(400).json({ success: false, error: 'tenantSlug, username and password are required' })
@@ -546,7 +550,7 @@ export function registerAuthRoutes(app: import('express').Application, prisma: P
     })
   })
 
-  authRouter.post('/mfa/verify', async (req: Request, res: Response) => {
+  authRouter.post('/mfa/verify', loginIpHttpRateLimiter, async (req: Request, res: Response) => {
     const body = (req.body ?? {}) as { mfaToken?: string; code?: string }
     if (!isNonEmptyString(body.mfaToken) || !isNonEmptyString(body.code)) {
       res.status(400).json({ success: false, error: 'mfaToken and code are required' })

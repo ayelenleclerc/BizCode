@@ -25,7 +25,7 @@ La API siempre lee variables validadas en `apps/server/config/env.ts`.
 | `JWT_SECRET_PREVIOUS` | Clave HMAC previa opcional en rotación |
 | `BIZCODE_FISCAL_ENCRYPTION_KEY` | Clave maestra AES-256-GCM AFIP/MP (**obligatoria en production**) |
 | `BIZCODE_MFA_ENCRYPTION_KEY` | Clave AES-256-GCM TOTP (**obligatoria en production**; no reutilizar la fiscal) |
-| `REDIS_URL` | Redis opcional |
+| `REDIS_URL` | Redis (blacklist refresh, desafíos MFA, **store de rate-limit HTTP** — **obligatorio en producción**, #217) |
 | `SMTP_*` / `TWILIO_*` | Canales salientes opcionales |
 
 ## Rotación de `JWT_SECRET`

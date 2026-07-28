@@ -63,8 +63,14 @@ const envSchema = z.object({
   LOG_LEVEL: optionalNonEmptyString,
   CORS_ORIGINS: optionalNonEmptyString,
   HTTP_RATE_LIMIT_PER_MINUTE: optionalPositiveInt,
+  HTTP_RATE_LIMIT_UNAUTH_PER_MINUTE: optionalPositiveInt,
   HTTP_RATE_LIMIT_AUTH_PER_MINUTE: optionalPositiveInt,
+  HTTP_RATE_LIMIT_LOGIN_PER_15_MIN: optionalPositiveInt,
+  HTTP_RATE_LIMIT_LOGIN_USERNAME_PER_HOUR: optionalPositiveInt,
+  HTTP_RATE_LIMIT_REPORTS_PER_HOUR: optionalPositiveInt,
   HTTP_RATE_LIMIT_IMPORT_PER_HOUR: optionalPositiveInt,
+  TRUST_PROXY: optionalNonEmptyString,
+  WEBHOOK_IP_ALLOWLIST: optionalNonEmptyString,
 })
 
 export type AppConfig = z.infer<typeof envSchema>
@@ -125,6 +131,9 @@ export function loadAppConfig(
     }
     if (!data.BIZCODE_MFA_ENCRYPTION_KEY) {
       missing.push('BIZCODE_MFA_ENCRYPTION_KEY is required in production')
+    }
+    if (!data.REDIS_URL) {
+      missing.push('REDIS_URL is required in production')
     }
     if (missing.length > 0) {
       throw new Error(`Error: ${missing.join('; ')}`)
