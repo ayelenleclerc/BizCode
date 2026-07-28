@@ -81,6 +81,40 @@ describe('server/config/env', () => {
     expect(parsed.CORS_ORIGINS).toBe('https://app.example')
   })
 
+  it('accepts optional JWT_SECRET_PREVIOUS', () => {
+    const parsed = loadAppConfig({
+      ...validEnv,
+      JWT_SECRET_PREVIOUS: 'previous-hmac-secret',
+    })
+    expect(parsed.JWT_SECRET_PREVIOUS).toBe('previous-hmac-secret')
+  })
+
+  it('requires fiscal and MFA encryption keys in production', () => {
+    expect(() =>
+      loadAppConfig({
+        ...validEnv,
+        NODE_ENV: 'production',
+      }),
+    ).toThrow(/BIZCODE_FISCAL_ENCRYPTION_KEY is required in production/)
+
+    expect(() =>
+      loadAppConfig({
+        ...validEnv,
+        NODE_ENV: 'production',
+        BIZCODE_FISCAL_ENCRYPTION_KEY: 'fiscal-prod-key',
+      }),
+    ).toThrow(/BIZCODE_MFA_ENCRYPTION_KEY is required in production/)
+
+    const parsed = loadAppConfig({
+      ...validEnv,
+      NODE_ENV: 'production',
+      BIZCODE_FISCAL_ENCRYPTION_KEY: 'fiscal-prod-key',
+      BIZCODE_MFA_ENCRYPTION_KEY: 'mfa-prod-key',
+    })
+    expect(parsed.BIZCODE_FISCAL_ENCRYPTION_KEY).toBe('fiscal-prod-key')
+    expect(parsed.BIZCODE_MFA_ENCRYPTION_KEY).toBe('mfa-prod-key')
+  })
+
   it('caches config via initializeAppConfig', () => {
     const parsed = initializeAppConfig({
       ...validEnv,

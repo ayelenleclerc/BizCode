@@ -2,9 +2,16 @@ import { createCipheriv, createDecipheriv, createHash, randomBytes } from 'node:
 
 const ALGO = 'aes-256-gcm'
 const IV_LEN = 12
+const DEV_FALLBACK_KEY = 'bizcode-dev-fiscal-key-not-for-production'
 
 function deriveKey(): Buffer {
-  const raw = process.env.BIZCODE_FISCAL_ENCRYPTION_KEY ?? 'bizcode-dev-fiscal-key-not-for-production'
+  const raw = process.env.BIZCODE_FISCAL_ENCRYPTION_KEY?.trim()
+  if (!raw) {
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error('BIZCODE_FISCAL_ENCRYPTION_KEY is required in production')
+    }
+    return createHash('sha256').update(DEV_FALLBACK_KEY).digest()
+  }
   return createHash('sha256').update(raw).digest()
 }
 

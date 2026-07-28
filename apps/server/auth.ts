@@ -28,6 +28,7 @@ import {
   createOpaqueToken,
   getCookieValue,
   hashOpaqueToken,
+  opaqueTokenHashCandidates,
   issueTokenPair,
   revokeTokenFamily,
   setAuthCookies,
@@ -36,6 +37,7 @@ import { getRefreshTokenBlacklist } from './lib/refreshTokenBlacklist'
 import {
   MFA_CHALLENGE_TTL_SECONDS,
   getMfaChallengeStore,
+  type MfaChallengePayload,
 } from './lib/mfaChallengeStore'
 import { decryptMfaSecret, encryptMfaSecret } from './lib/mfaSecrets'
 import {
@@ -161,10 +163,9 @@ export function resolveSession(prisma: PrismaClient) {
       next()
       return
     }
-    const tokenHash = hashOpaqueToken(token)
     const session = await prisma.appSession.findFirst({
       where: {
-        tokenHash,
+        tokenHash: { in: opaqueTokenHashCandidates(token) },
         revokedAt: null,
         expiresAt: { gt: new Date() },
       },
@@ -552,7 +553,14 @@ export function registerAuthRoutes(app: import('express').Application, prisma: P
       return
     }
 
-    const challenge = await getMfaChallengeStore().take(hashOpaqueToken(body.mfaToken.trim()))
+    const challengeToken = body.mfaToken.trim()
+    let challenge: MfaChallengePayload | null = null
+    for (const candidateHash of opaqueTokenHashCandidates(challengeToken)) {
+      challenge = await getMfaChallengeStore().take(candidateHash)
+      if (challenge) {
+        break
+      }
+    }
     if (!challenge) {
       res.status(401).json({ success: false, error: 'Invalid or expired MFA challenge' })
       return
@@ -834,11 +842,18 @@ export function registerAuthRoutes(app: import('express').Application, prisma: P
       return
     }
 
-    const refreshHash = hashOpaqueToken(rawRefresh)
+    const refreshCandidates = opaqueTokenHashCandidates(rawRefresh)
     const blacklist = getRefreshTokenBlacklist()
-    if (await blacklist.has(refreshHash)) {
+    let blacklisted = false
+    for (const candidateHash of refreshCandidates) {
+      if (await blacklist.has(candidateHash)) {
+        blacklisted = true
+        break
+      }
+    }
+    if (blacklisted) {
       const blacklistedRow = await prisma.appRefreshToken.findFirst({
-        where: { tokenHash: refreshHash },
+        where: { tokenHash: { in: refreshCandidates } },
         select: { userId: true, tokenFamily: true },
       })
       if (blacklistedRow) {
@@ -862,7 +877,7 @@ export function registerAuthRoutes(app: import('express').Application, prisma: P
     }
 
     const existing = await prisma.appRefreshToken.findFirst({
-      where: { tokenHash: refreshHash },
+      where: { tokenHash: { in: refreshCandidates } },
       include: { user: true },
     })
 
@@ -931,9 +946,9 @@ export function registerAuthRoutes(app: import('express').Application, prisma: P
     const now = new Date()
 
     if (refreshToken) {
-      const refreshHash = hashOpaqueToken(refreshToken)
+      const refreshCandidates = opaqueTokenHashCandidates(refreshToken)
       const refreshRow = await prisma.appRefreshToken.findFirst({
-        where: { tokenHash: refreshHash },
+        where: { tokenHash: { in: refreshCandidates } },
       })
       if (refreshRow) {
         await prisma.appRefreshToken.updateMany({
@@ -955,7 +970,7 @@ export function registerAuthRoutes(app: import('express').Application, prisma: P
     } else if (accessToken) {
       await prisma.appSession.updateMany({
         where: {
-          tokenHash: hashOpaqueToken(accessToken),
+          tokenHash: { in: opaqueTokenHashCandidates(accessToken) },
           revokedAt: null,
         },
         data: { revokedAt: now },

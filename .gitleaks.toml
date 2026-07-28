@@ -1,0 +1,12 @@
+# Gitleaks configuration for BizCode (#216).
+# Keep allowlists minimal; prefer fixing fixtures over silencing detections.
+
+title = "BizCode gitleaks"
+
+[allowlist]
+  description = "Paths that may contain intentional non-secret placeholders"
+  paths = [
+    '''^\.env\.example$''',
+    '''^docs/evidence/secrets-env-history-audit\.md$''',
+    '''^docs/.*/quality/.*secrets.*\.md$''',
+  ]

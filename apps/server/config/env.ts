@@ -33,10 +33,13 @@ const optionalPositiveInt = z.preprocess(
 const envSchema = z.object({
   DATABASE_URL: z.string().trim().min(1, 'DATABASE_URL is required'),
   JWT_SECRET: z.string().trim().min(1, 'JWT_SECRET is required'),
+  JWT_SECRET_PREVIOUS: optionalNonEmptyString,
   NODE_ENV: z.enum(['development', 'test', 'production'], {
     errorMap: () => ({ message: 'NODE_ENV must be development, test, or production' }),
   }),
   REDIS_URL: optionalNonEmptyString,
+  BIZCODE_FISCAL_ENCRYPTION_KEY: optionalNonEmptyString,
+  BIZCODE_MFA_ENCRYPTION_KEY: optionalNonEmptyString,
   SMTP_URL: z.preprocess(
     (value) => {
       if (value === undefined || value === null) {
@@ -114,7 +117,20 @@ export function loadAppConfig(
   if (!result.success) {
     throw new Error(formatEnvValidationError(result.error))
   }
-  return result.data
+  const data = result.data
+  if (data.NODE_ENV === 'production') {
+    const missing: string[] = []
+    if (!data.BIZCODE_FISCAL_ENCRYPTION_KEY) {
+      missing.push('BIZCODE_FISCAL_ENCRYPTION_KEY is required in production')
+    }
+    if (!data.BIZCODE_MFA_ENCRYPTION_KEY) {
+      missing.push('BIZCODE_MFA_ENCRYPTION_KEY is required in production')
+    }
+    if (missing.length > 0) {
+      throw new Error(`Error: ${missing.join('; ')}`)
+    }
+  }
+  return data
 }
 
 /**

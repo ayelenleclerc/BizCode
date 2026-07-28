@@ -1,8 +1,8 @@
-import { createHmac, randomBytes, randomUUID } from 'node:crypto'
+import { randomBytes, randomUUID } from 'node:crypto'
 import type { PrismaClient } from '@prisma/client'
 import type { Response } from 'express'
-import { getAppConfig } from '../config/env'
 import { getRefreshTokenBlacklist } from './refreshTokenBlacklist'
+import { hashWithCurrentJwtSecret, jwtSecretHashCandidates } from './secretHmac'
 
 export const ACCESS_COOKIE_NAME = 'bizcode_session'
 export const REFRESH_COOKIE_NAME = 'bizcode_refresh'
@@ -20,8 +20,22 @@ export function createOpaqueToken(): string {
   return randomBytes(32).toString('hex')
 }
 
+/**
+ * @en Hashes an opaque session/refresh/MFA challenge token with the current JWT_SECRET (#216).
+ * @es Hashea un token opaco de sesión/refresh/challenge MFA con el JWT_SECRET actual (#216).
+ * @pt-BR Faz hash de um token opaco de sessão/refresh/challenge MFA com o JWT_SECRET atual (#216).
+ */
 export function hashOpaqueToken(token: string): string {
-  return createHmac('sha256', getAppConfig().JWT_SECRET).update(token).digest('hex')
+  return hashWithCurrentJwtSecret(token)
+}
+
+/**
+ * @en HMAC digests to try when looking up a stored token hash during secret rotation (#216).
+ * @es Digests HMAC a probar al buscar un hash almacenado durante rotación de secreto (#216).
+ * @pt-BR Digests HMAC a tentar ao buscar um hash armazenado durante rotação de segredo (#216).
+ */
+export function opaqueTokenHashCandidates(token: string): string[] {
+  return jwtSecretHashCandidates(token)
 }
 
 export function getCookieValue(rawCookieHeader: string | undefined, key: string): string | null {

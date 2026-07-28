@@ -2,7 +2,7 @@ import type { NextFunction, Response } from 'express'
 import type { PrismaClient } from '@prisma/client'
 import {
   getCookieValue,
-  hashPortalToken,
+  portalTokenHashCandidates,
   PORTAL_SESSION_COOKIE_NAME,
 } from '../portal/portalTokens'
 import type { PortalRequest } from '../portal/portalTypes'
@@ -41,10 +41,9 @@ export function resolvePortalSession(prisma: PrismaClient) {
       return
     }
 
-    const tokenHash = hashPortalToken(token)
     const session = await prisma.portalSession.findFirst({
       where: {
-        tokenHash,
+        tokenHash: { in: portalTokenHashCandidates(token) },
         tenantId: req.portalTenant.tenantId,
         revokedAt: null,
         expiresAt: { gt: new Date() },

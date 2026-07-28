@@ -3,6 +3,7 @@ import type { ServiceResult } from './serviceResults'
 import {
   createPortalToken,
   hashPortalToken,
+  portalTokenHashCandidates,
   PORTAL_MAGIC_LINK_TTL_MS,
   PORTAL_SESSION_DURATION_MS,
   resolvePortalPublicBaseUrl,
@@ -88,11 +89,11 @@ export class PortalAuthService {
       return { ok: false, status: 404, error: 'Portal not available' }
     }
 
-    const tokenHash = hashPortalToken(token.trim())
+    const tokenHashCandidates = portalTokenHashCandidates(token.trim())
     const link = await this.prisma.portalMagicLink.findFirst({
       where: {
         tenantId: brandingResult.tenantId,
-        tokenHash,
+        tokenHash: { in: tokenHashCandidates },
         usedAt: null,
         expiresAt: { gt: new Date() },
       },
