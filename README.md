@@ -1,5 +1,7 @@
 # BizCode
 
+[![Snyk](https://snyk.io/test/github/ayelenleclerc/BizCode/badge.svg)](https://snyk.io/test/github/ayelenleclerc/BizCode)
+
 **BizCode** is a cross-platform desktop application for commercial management (customers, products, invoicing). It is built with Tauri 1.5 + React 18 + Express 5 + Prisma 5 + PostgreSQL, and developed to meet ISO 9001:2015, ISO/IEC 12207, and ISO/IEC 25010 quality standards.
 
 ---

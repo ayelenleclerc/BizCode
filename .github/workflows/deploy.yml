@@ -112,6 +112,26 @@ jobs:
       - name: Build frontend image
         run: docker build -f Dockerfile.frontend --build-arg VITE_API_URL=/api -t bizcode-frontend:${{ github.sha }} .
 
+      - name: Trivy scan backend image (fail on CRITICAL)
+        uses: aquasecurity/trivy-action@v0.35.0
+        with:
+          scan-type: image
+          image-ref: bizcode-server:${{ github.sha }}
+          severity: CRITICAL
+          exit-code: '1'
+          ignore-unfixed: true
+          format: table
+
+      - name: Trivy scan frontend image (fail on CRITICAL)
+        uses: aquasecurity/trivy-action@v0.35.0
+        with:
+          scan-type: image
+          image-ref: bizcode-frontend:${{ github.sha }}
+          severity: CRITICAL
+          exit-code: '1'
+          ignore-unfixed: true
+          format: table
+
   publish_images:
     name: Publish GHCR Images
     runs-on: ubuntu-latest
