@@ -15,6 +15,7 @@ import {
 } from '../../apps/server/lib/mfaChallengeStore'
 import { encryptMfaSecret } from '../../apps/server/lib/mfaSecrets'
 import { hashPassword } from '../../apps/server/passwordHash'
+import { getByTokenHashFilter, type TokenHashWhere } from '../helpers/tokenHashFilter'
 
 function hashPw(password: string): string {
   const salt = randomBytes(16).toString('hex')
@@ -141,11 +142,11 @@ describe('auth MFA TOTP (#213)', () => {
           })
           return { id: 100 }
         }),
-        findFirst: vi.fn(async (args: { where: { tokenHash: string } }) => {
-          const session = sessionStore.get(args.where.tokenHash)
-          if (!session) return null
+        findFirst: vi.fn(async (args: { where: { tokenHash: TokenHashWhere } }) => {
+          const hit = getByTokenHashFilter(sessionStore, args.where.tokenHash)
+          if (!hit) return null
           return {
-            id: session.id,
+            id: hit.value.id,
             user: userRow(),
           }
         }),

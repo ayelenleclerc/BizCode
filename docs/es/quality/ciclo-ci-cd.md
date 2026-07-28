@@ -41,6 +41,10 @@ push / pull_request → job quality (ubuntu-latest):
 | `push` | `main`, `develop` |
 | `pull_request` | hacia `main` o `develop` |
 
+## Escaneo de secretos (#216)
+
+El workflow [`.github/workflows/gitleaks.yml`](../../../.github/workflows/gitleaks.yml) ejecuta Gitleaks en push/PR a `main`/`develop` y falla si hay hallazgos. Config: [`.gitleaks.toml`](../../../.gitleaks.toml). Ver [gestión de secretos / Doppler](gestion-secretos-y-doppler.md).
+
 ## Condiciones de bloqueo
 
 Un paso bloquea el pipeline (código de salida ≠ 0) cuando:

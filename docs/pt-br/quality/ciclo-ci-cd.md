@@ -41,6 +41,10 @@ push / pull_request → job quality (ubuntu-latest):
 | `push` | `main`, `develop` |
 | `pull_request` | para `main` ou `develop` |
 
+## Varredura de segredos (#216)
+
+O workflow [`.github/workflows/gitleaks.yml`](../../../.github/workflows/gitleaks.yml) executa Gitleaks em push/PR para `main`/`develop` e falha se houver achados. Config: [`.gitleaks.toml`](../../../.gitleaks.toml). Ver [gestão de segredos / Doppler](gestao-segredos-e-doppler.md).
+
 ## Bloqueios
 
 | Etapa | Condição |

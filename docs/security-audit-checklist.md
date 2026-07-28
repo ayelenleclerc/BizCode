@@ -21,7 +21,7 @@
 - [ ] Encryption in transit (TLS 1.3)
 - [ ] PII handling compliance
 - [ ] Database access controls
-- [ ] Secret management (env vars, vault)
+- [x] Secret management (env vars, Doppler inject / vault-equivalent; Gitleaks CI) — #216 / ADR-0015
 
 ### API Security
 - [ ] Rate limiting

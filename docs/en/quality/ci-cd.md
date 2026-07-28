@@ -63,6 +63,10 @@ push / pull_request
 | `push` | `main`, `develop` |
 | `pull_request` | targeting `main` or `develop` |
 
+## Secret scanning (#216)
+
+Workflow [`.github/workflows/gitleaks.yml`](../../../.github/workflows/gitleaks.yml) runs Gitleaks on push/PR to `main`/`develop` and fails on findings. Config: [`.gitleaks.toml`](../../../.gitleaks.toml). See [secrets management / Doppler](secrets-management-and-doppler.md).
+
 ## Blocking Conditions
 
 | Step | Blocking condition |

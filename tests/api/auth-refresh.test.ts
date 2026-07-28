@@ -8,6 +8,11 @@ import {
   createMemoryRefreshTokenBlacklist,
   setRefreshTokenBlacklistForTests,
 } from '../../apps/server/lib/refreshTokenBlacklist'
+import {
+  getByTokenHashFilter,
+  matchesTokenHashFilter,
+  type TokenHashWhere,
+} from '../helpers/tokenHashFilter'
 
 function hashPassword(password: string): string {
   const salt = randomBytes(16).toString('hex')
@@ -86,18 +91,25 @@ function buildPrismaMock(loginName: string, loginSecret: string): PrismaClient {
       sessions.set(row.tokenHash, row)
       return { id }
     }),
-    findFirst: vi.fn(async (args: { where: { tokenHash?: string; revokedAt?: null; expiresAt?: { gt: Date } } }) => {
-      const hash = args.where.tokenHash
-      if (!hash) return null
-      const session = sessions.get(hash)
-      if (!session || session.revokedAt) return null
+    findFirst: vi.fn(async (args: {
+      where: { tokenHash?: TokenHashWhere; revokedAt?: null; expiresAt?: { gt: Date } }
+    }) => {
+      const hit = getByTokenHashFilter(sessions, args.where.tokenHash)
+      if (!hit) return null
+      const session = hit.value
+      if (session.revokedAt) return null
       if (args.where.expiresAt?.gt && session.expiresAt <= args.where.expiresAt.gt) return null
       return { ...session, user: userRow }
     }),
     updateMany: vi.fn(async (args: { where: Record<string, unknown>; data: { revokedAt: Date } }) => {
       let count = 0
       for (const row of sessions.values()) {
-        if (args.where.tokenHash && row.tokenHash !== args.where.tokenHash) continue
+        if (
+          args.where.tokenHash != null
+          && !matchesTokenHashFilter(row.tokenHash, args.where.tokenHash as TokenHashWhere)
+        ) {
+          continue
+        }
         if (args.where.userId && row.userId !== args.where.userId) continue
         if (args.where.tokenFamily && row.tokenFamily !== args.where.tokenFamily) continue
         if (args.where.revokedAt === null && row.revokedAt != null) continue
@@ -124,9 +136,10 @@ function buildPrismaMock(loginName: string, loginSecret: string): PrismaClient {
       refreshes.set(row.tokenHash, row)
       return { id }
     }),
-    findFirst: vi.fn(async (args: { where: { tokenHash: string }; include?: { user: boolean } }) => {
-      const row = refreshes.get(args.where.tokenHash)
-      if (!row) return null
+    findFirst: vi.fn(async (args: { where: { tokenHash: TokenHashWhere }; include?: { user: boolean } }) => {
+      const hit = getByTokenHashFilter(refreshes, args.where.tokenHash)
+      if (!hit) return null
+      const row = hit.value
       if (args.include?.user) return { ...row, user: userRow }
       return row
     }),

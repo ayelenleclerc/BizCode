@@ -8,6 +8,7 @@ import {
   createMemoryRefreshTokenBlacklist,
   setRefreshTokenBlacklistForTests,
 } from '../../apps/server/lib/refreshTokenBlacklist'
+import { getByTokenHashFilter, type TokenHashWhere } from '../helpers/tokenHashFilter'
 
 function hashPassword(password: string): string {
   const salt = randomBytes(16).toString('hex')
@@ -91,13 +92,13 @@ function buildPrismaMock(loginName: string, loginSecret: string): PrismaClient {
         })
         return { id: 100 }
       }),
-      findFirst: vi.fn(async (args: { where: { tokenHash: string } }) => {
-        const session = sessionStore.get(args.where.tokenHash)
-        if (!session) {
+      findFirst: vi.fn(async (args: { where: { tokenHash: TokenHashWhere } }) => {
+        const hit = getByTokenHashFilter(sessionStore, args.where.tokenHash)
+        if (!hit) {
           return null
         }
         return {
-          id: session.id,
+          id: hit.value.id,
           user: {
             id: 7,
             tenantId: 11,
