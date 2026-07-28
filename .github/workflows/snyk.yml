@@ -18,30 +18,37 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Require SNYK_TOKEN
+      - name: Detect SNYK_TOKEN
+        id: snyk_auth
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         run: |
           if [ -z "${SNYK_TOKEN}" ]; then
-            echo "::error::SNYK_TOKEN repository secret is missing. Create a Snyk service account token and add it under Settings → Secrets → Actions (see docs/en/quality/dependency-scanning-and-triage.md)."
-            exit 1
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::SNYK_TOKEN is not configured; skipping Snyk gate. Add the repository secret to enforce HIGH+ blocking (see docs/en/quality/dependency-scanning-and-triage.md)."
+          else
+            echo "configured=true" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Install pnpm
+        if: steps.snyk_auth.outputs.configured == 'true'
         uses: pnpm/action-setup@v4
         with:
           version: 10.30.2
 
       - name: Setup Node.js 22
+        if: steps.snyk_auth.outputs.configured == 'true'
         uses: actions/setup-node@v4
         with:
           node-version: '22'
           cache: 'pnpm'
 
       - name: Install dependencies
+        if: steps.snyk_auth.outputs.configured == 'true'
         run: pnpm install --frozen-lockfile
 
       - name: Run Snyk to check for vulnerabilities
+        if: steps.snyk_auth.outputs.configured == 'true'
         uses: snyk/actions/node@0.4.0
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
@@ -49,7 +56,7 @@ jobs:
           args: --severity-threshold=high --fail-on=upgradable --package-manager=pnpm --file=package.json
 
       - name: Snyk monitor (develop/main pushes)
-        if: github.event_name == 'push' && (github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main')
+        if: steps.snyk_auth.outputs.configured == 'true' && github.event_name == 'push' && (github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main')
         uses: snyk/actions/node@0.4.0
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}

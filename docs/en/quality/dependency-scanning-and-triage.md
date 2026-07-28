@@ -12,7 +12,7 @@ Normative decision: [ADR-0017](../adr/ADR-0017-dependency-scanning.md).
 |------|--------|------|
 | Dependabot | `.github/dependabot.yml` | Opens weekly PRs (npm workspace + GitHub Actions); review and merge |
 | `pnpm audit --audit-level=high` | Quality Gate (`ci.yml`), weekly `dependency-maintenance.yml` | **Blocks** on HIGH+ (see ADR for accepted `ignoreCves`) |
-| Snyk `test` / `monitor` | `.github/workflows/snyk.yml` | **Blocks** HIGH+ with fix (`--fail-on=upgradable`); needs `SNYK_TOKEN` |
+| Snyk `test` / `monitor` | `.github/workflows/snyk.yml` | **Blocks** HIGH+ with fix (`--fail-on=upgradable`) when `SNYK_TOKEN` is set; skips with warning if missing |
 | Trivy image | `deploy.yml` after `docker build` | **Blocks** CRITICAL before GHCR push |
 | Trivy IaC | `infrastructure-validation.yml` | Terraform config (existing) |
 | CycloneDX SBOM | `docs/evidence/sbom-cyclonedx.json` | Regenerated via `pnpm run sbom:generate` (`pnpm dlx @cyclonedx/cdxgen`) / `docs:generate` |
@@ -22,7 +22,7 @@ Normative decision: [ADR-0017](../adr/ADR-0017-dependency-scanning.md).
 1. Create a Snyk account and link GitHub repo `ayelenleclerc/BizCode`.
 2. Create a service account / API token with project access.
 3. Add repository secret **`SNYK_TOKEN`** (Settings → Secrets and variables → Actions).
-4. Without this secret, the Snyk workflow fails with an actionable error (by design).
+4. Without this secret, the Snyk workflow skips the scan and emits a warning (Quality Gate `pnpm audit` remains blocking). Add the secret to enforce Snyk.
 
 ## Setup: Snyk README badge
 
@@ -33,7 +33,7 @@ The README badge reports Snyk status for this GitHub repo. After linking the pro
 1. **Identify source:** Dependabot PR, CI audit log, Snyk UI/CLI, or Trivy image step.
 2. **Severity:** CRITICAL/HIGH with a published fix → remediate before merge. Moderate → schedule.
 3. **Prefer:** bump direct dependency or add a targeted `pnpm.overrides` entry; re-run `pnpm install` and `pnpm audit --audit-level=high`.
-4. **Containers:** bump `FROM` tags in `Dockerfile` / `Dockerfile.frontend` when Trivy CRITICAL is in the base image; rebuild and re-scan.
+4. **Containers:** bump `FROM` tags in `Dockerfile` / `Dockerfile.frontend` when Trivy CRITICAL is in the base image; rebuild and re-scan. API runtime removes Node-bundled `npm` (vulnerable `tar`). Force `esbuild` ≥ 0.28.1 via `pnpm.overrides` so the gobinary is built with a patched Go stdlib (CVE-2025-68121).
 5. **Exceptions:** only via `pnpm.auditConfig.ignoreCves` (or ADR amendment) with reason and review date — never silent `continue-on-error` on the Quality Gate audit step.
 6. **Verify:** local audit exit 0; push and confirm Snyk + Trivy jobs green.
 

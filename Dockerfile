@@ -14,7 +14,12 @@ FROM node:22-alpine AS runtime
 WORKDIR /app
 ENV NODE_ENV=production
 
-RUN corepack enable && corepack prepare pnpm@10.30.2 --activate
+# @en Runtime uses Corepack/pnpm only; remove Node-bundled npm (ships vulnerable node-tar).
+# @es El runtime usa solo Corepack/pnpm; se elimina el npm embebido (incluye node-tar vulnerable).
+# @pt-BR O runtime usa apenas Corepack/pnpm; remove o npm embutido (traz node-tar vulnerável).
+RUN corepack enable && corepack prepare pnpm@10.30.2 --activate \
+  && rm -rf /usr/local/lib/node_modules/npm \
+  && rm -f /usr/local/bin/npm /usr/local/bin/npx
 
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
