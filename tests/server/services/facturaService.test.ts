@@ -226,7 +226,7 @@ describe('FacturaService', () => {
       1,
       1,
       new Decimal(25),
-      'Devolución parcial',
+      'DevoluciÃ³n parcial',
       { userId: 1, ipAddress: '127.0.0.1' },
     )
 
@@ -260,7 +260,7 @@ describe('FacturaService', () => {
       1,
       1,
       new Decimal(30),
-      'Devolución parcial',
+      'DevoluciÃ³n parcial',
       { userId: 1, ipAddress: '127.0.0.1' },
     )
 
