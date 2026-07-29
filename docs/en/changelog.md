@@ -10,6 +10,8 @@ Versioning: [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **Security incident response (#222):** Trilingual operational runbook (`docs/*/quality/` incident-response); SEC-008 stubs link to it; Prisma `Tenant.maintenanceMode`; super-admin APIs `POST .../revoke-all-sessions`, `POST .../disable`, `POST .../maintenance`, `GET .../audit-events`; UI incident tools on tenant detail; session resolve blocks inactive/maintenance tenants; login returns `503 TENANT_MAINTENANCE`.
+
 - **Dependency scanning (#219):** Dependabot (weekly npm + GitHub Actions); blocking `pnpm audit --audit-level=high`; Snyk CI (`SNYK_TOKEN`, fail on HIGH+ with fix); Trivy CRITICAL scan on Docker images before GHCR push; ADR-0017 + trilingual triage guide; Snyk README badge; dependency bumps/`pnpm.overrides` for HIGH/CRITICAL with documented `CVE-2026-14257` audit ignore (review 2026-10-28). Out of scope: Socket.dev, Renovate, mobile hardening (#220).
 
 - **Cloudflare edge WAF contract + advanced rate limiting (#217):** Redis-backed `express-rate-limit` store (`rate-limit-redis`); production requires `REDIS_URL`; `TRUST_PROXY` for client IP behind CDN; login limits 5/15 min per IP and 10/hour per tenant+username; unauthenticated API 20/min per IP and authenticated 100/min per user; reports/exports 10/hour per tenant; optional `WEBHOOK_IP_ALLOWLIST`; 429 includes `Retry-After`; ADR-0016 + trilingual Cloudflare operator guide. Out of scope: Cloudflare API/SDK, `express-slow-down`, dependency scanning (#219).

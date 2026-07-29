@@ -41,6 +41,7 @@ export type SuperadminTenantDetail = {
   name: string
   slug: string
   active: boolean
+  maintenanceMode: boolean
   createdAt: string
   updatedAt: string
   plan: string | null

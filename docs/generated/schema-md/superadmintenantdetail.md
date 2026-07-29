@@ -23,6 +23,7 @@ undefined#/properties/data
 | [createdAt](#createdat)             | `string`  | Required | cannot be null | [SuperadminTenantDetail](superadmintenantdetail-properties-createdat.md "undefined#/properties/createdAt")             |
 | [id](#id)                           | `integer` | Required | cannot be null | [SuperadminTenantDetail](superadmintenantdetail-properties-id.md "undefined#/properties/id")                           |
 | [lastActivityAt](#lastactivityat)   | `string`  | Required | cannot be null | [SuperadminTenantDetail](superadmintenantdetail-properties-lastactivityat.md "undefined#/properties/lastActivityAt")   |
+| [maintenanceMode](#maintenancemode) | `boolean` | Required | cannot be null | [SuperadminTenantDetail](superadmintenantdetail-properties-maintenancemode.md "undefined#/properties/maintenanceMode") |
 | [modulesCount](#modulescount)       | `integer` | Required | cannot be null | [SuperadminTenantDetail](superadmintenantdetail-properties-modulescount.md "undefined#/properties/modulesCount")       |
 | [name](#name)                       | `string`  | Required | cannot be null | [SuperadminTenantDetail](superadmintenantdetail-properties-name.md "undefined#/properties/name")                       |
 | [plan](#plan)                       | `string`  | Required | cannot be null | [SuperadminTenantDetail](superadmintenantdetail-properties-plan.md "undefined#/properties/plan")                       |
@@ -131,6 +132,24 @@ undefined#/properties/data
 ### lastActivityAt Constraints
 
 **date time**: the string must be a date time string, according to [RFC 3339, section 5.6](https://tools.ietf.org/html/rfc3339 "check the specification")
+
+## maintenanceMode
+
+When true, tenant users cannot authenticate or use the API (#222)
+
+`maintenanceMode`
+
+* is required
+
+* Type: `boolean`
+
+* cannot be null
+
+* defined in: [SuperadminTenantDetail](superadmintenantdetail-properties-maintenancemode.md "undefined#/properties/maintenanceMode")
+
+### maintenanceMode Type
+
+`boolean`
 
 ## modulesCount
 

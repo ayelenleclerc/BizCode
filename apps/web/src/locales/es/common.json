@@ -314,7 +314,9 @@
     },
     "status": {
       "active": "Activo",
-      "suspended": "Suspendido"
+      "suspended": "Suspendido",
+      "maintenanceOn": "Mantenimiento activo",
+      "maintenanceOff": "Mantenimiento inactivo"
     },
     "stats": {
       "activeTenants": "Tenants activos",
@@ -333,6 +335,7 @@
     },
     "detail": {
       "status": "Estado",
+      "maintenance": "Modo mantenimiento",
       "plan": "Plan",
       "modulesCount": "Módulos habilitados",
       "lastActivity": "Última actividad",
@@ -343,6 +346,31 @@
       "statInvoices": "{{count}} facturas",
       "statOrders": "{{count}} pedidos",
       "statClients": "{{count}} clientes"
+    },
+    "incident": {
+      "sectionTitle": "Respuesta a incidentes",
+      "sectionHelp": "Use estas acciones durante un incidente de seguridad. Quedan auditadas.",
+      "revokeSessions": "Revocar todas las sesiones",
+      "disable": "Deshabilitar tenant",
+      "maintenanceOn": "Activar mantenimiento",
+      "maintenanceOff": "Desactivar mantenimiento",
+      "auditStart": "Inicio export auditoría",
+      "auditEnd": "Fin export auditoría",
+      "exportAudit": "Exportar eventos de auditoría (JSON)",
+      "confirmRevokeSessions": "¿Revocar todas las sesiones activas de todos los usuarios de este tenant?",
+      "confirmDisable": "¿Deshabilitar este tenant y revocar todas las sesiones?",
+      "confirmMaintenanceOn": "¿Activar modo mantenimiento? Los usuarios del tenant perderán acceso API y se revocarán sesiones.",
+      "revokeSuccess": "Sesiones revocadas para {{count}} usuario(s).",
+      "disableSuccess": "Tenant deshabilitado y sesiones revocadas.",
+      "maintenanceOnSuccess": "Modo mantenimiento activado; sesiones revocadas.",
+      "maintenanceOffSuccess": "Modo mantenimiento desactivado.",
+      "exportSuccess": "Exportación de auditoría lista (total {{count}} eventos coincidentes).",
+      "errors": {
+        "revokeFailed": "No se pudieron revocar las sesiones.",
+        "disableFailed": "No se pudo deshabilitar el tenant.",
+        "maintenanceFailed": "No se pudo actualizar el modo mantenimiento.",
+        "exportFailed": "No se pudo exportar la auditoría."
+      }
     },
     "errors": {
       "loadFailed": "No se pudieron cargar los datos de plataforma.",

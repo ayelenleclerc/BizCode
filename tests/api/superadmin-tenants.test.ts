@@ -10,6 +10,7 @@ const tenantRow = {
   name: 'Demo',
   slug: 'demo',
   active: true,
+  maintenanceMode: false,
   createdAt: new Date('2025-01-01T00:00:00.000Z'),
   updatedAt: new Date('2025-01-02T00:00:00.000Z'),
 }
@@ -68,12 +69,34 @@ function buildPrismaMock(): PrismaClient {
     appUser: {
       count: vi.fn().mockResolvedValue(4),
       create: vi.fn().mockResolvedValue({ id: 10 }),
+      findMany: vi.fn().mockResolvedValue([{ id: 10 }, { id: 11 }]),
     },
     auditEvent: {
       findFirst: vi.fn().mockResolvedValue({ createdAt: new Date('2025-01-03T00:00:00.000Z') }),
+      create: vi.fn().mockResolvedValue({ id: 1 }),
+      count: vi.fn().mockResolvedValue(1),
+      findMany: vi.fn().mockResolvedValue([
+        {
+          id: 1,
+          tenantId: 1,
+          userId: 10,
+          action: 'login',
+          resource: 'auth',
+          resourceId: null,
+          ipAddress: '127.0.0.1',
+          metadata: null,
+          createdAt: new Date('2025-01-03T00:00:00.000Z'),
+          user: { username: 'owner' },
+        },
+      ]),
     },
     appSession: {
       findFirst: vi.fn().mockResolvedValue({ lastSeenAt: new Date('2025-01-04T00:00:00.000Z') }),
+      updateMany: vi.fn().mockResolvedValue({ count: 2 }),
+    },
+    appRefreshToken: {
+      findMany: vi.fn().mockResolvedValue([]),
+      updateMany: vi.fn().mockResolvedValue({ count: 0 }),
     },
     plan: {
       findUnique: vi.fn().mockResolvedValue({ id: 1, key: 'starter' }),
@@ -81,7 +104,11 @@ function buildPrismaMock(): PrismaClient {
     tenantPlan: {
       create: vi.fn().mockResolvedValue({ id: 1, tenantId: 2, planId: 1, status: 'active' }),
     },
-    $transaction: vi.fn().mockImplementation(async (fn: (tx: PrismaClient) => Promise<unknown>) => {
+    $transaction: vi.fn().mockImplementation(async (arg: unknown) => {
+      if (Array.isArray(arg)) {
+        return Promise.all(arg)
+      }
+      const fn = arg as (tx: PrismaClient) => Promise<unknown>
       const tx = {
         tenant: {
           create: vi.fn().mockResolvedValue({ id: 2, name: 'New', slug: 'new' }),
@@ -185,5 +212,66 @@ describe('Superadmin tenants API (#137)', () => {
     expect(res.status).toBe(200)
     expect(res.body.data.id).toBe(1)
     await assertMatchesOpenApi('/api/superadmin/tenants/{tenantId}', 'patch', '200', res.body)
+  })
+
+  it('POST /api/superadmin/tenants/:id/revoke-all-sessions (#222)', async () => {
+    const app = createApp(buildPrismaMock())
+    const res = await request(app).post('/api/superadmin/tenants/1/revoke-all-sessions')
+    expect(res.status).toBe(200)
+    expect(res.body.data.revokedUserCount).toBe(2)
+    await assertMatchesOpenApi(
+      '/api/superadmin/tenants/{tenantId}/revoke-all-sessions',
+      'post',
+      '200',
+      res.body,
+    )
+  })
+
+  it('POST /api/superadmin/tenants/:id/disable (#222)', async () => {
+    const prisma = buildPrismaMock()
+    vi.mocked(prisma.tenant.update).mockResolvedValue({ ...tenantRow, active: false })
+    const app = createApp(prisma)
+    const res = await request(app).post('/api/superadmin/tenants/1/disable')
+    expect(res.status).toBe(200)
+    expect(res.body.success).toBe(true)
+    expect(prisma.tenant.update).toHaveBeenCalled()
+    await assertMatchesOpenApi('/api/superadmin/tenants/{tenantId}/disable', 'post', '200', res.body)
+  })
+
+  it('POST /api/superadmin/tenants/:id/maintenance enables mode (#222)', async () => {
+    const prisma = buildPrismaMock()
+    vi.mocked(prisma.tenant.update).mockResolvedValue({ ...tenantRow, maintenanceMode: true })
+    const app = createApp(prisma)
+    const res = await request(app)
+      .post('/api/superadmin/tenants/1/maintenance')
+      .send({ enabled: true })
+    expect(res.status).toBe(200)
+    expect(res.body.success).toBe(true)
+    await assertMatchesOpenApi(
+      '/api/superadmin/tenants/{tenantId}/maintenance',
+      'post',
+      '200',
+      res.body,
+    )
+  })
+
+  it('POST maintenance returns 400 without enabled', async () => {
+    const app = createApp(buildPrismaMock())
+    const res = await request(app).post('/api/superadmin/tenants/1/maintenance').send({})
+    expect(res.status).toBe(400)
+  })
+
+  it('GET /api/superadmin/tenants/:id/audit-events (#222)', async () => {
+    const app = createApp(buildPrismaMock())
+    const res = await request(app).get('/api/superadmin/tenants/1/audit-events?limit=50')
+    expect(res.status).toBe(200)
+    expect(res.body.data).toHaveLength(1)
+    expect(res.body.total).toBe(1)
+    await assertMatchesOpenApi(
+      '/api/superadmin/tenants/{tenantId}/audit-events',
+      'get',
+      '200',
+      res.body,
+    )
   })
 })

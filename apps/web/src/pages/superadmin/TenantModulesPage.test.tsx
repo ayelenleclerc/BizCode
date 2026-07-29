@@ -95,6 +95,7 @@ describe('TenantModulesPage', () => {
       name: 'Demo Co',
       slug: 'demo',
       active: true,
+      maintenanceMode: false,
       createdAt: configRow.updatedAt,
       updatedAt: configRow.updatedAt,
       plan: 'starter',

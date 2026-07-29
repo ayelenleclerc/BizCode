@@ -179,6 +179,43 @@ export async function revokeAllUserAuthTokens(prisma: PrismaClient, userId: numb
 }
 
 /**
+ * @en Revokes all access sessions and refresh tokens for every user of a tenant (#222).
+ * @es Revoca todas las sesiones access y refresh de todos los usuarios de un tenant (#222).
+ * @pt-BR Revoga todas as sessões access e refresh de todos os usuários de um tenant (#222).
+ */
+export async function revokeAllTenantAuthTokens(prisma: PrismaClient, tenantId: number): Promise<number> {
+  const users = await prisma.appUser.findMany({
+    where: { tenantId },
+    select: { id: true },
+  })
+  if (users.length === 0) {
+    return 0
+  }
+  const userIds = users.map((u) => u.id)
+  const now = new Date()
+  const activeRefresh = await prisma.appRefreshToken.findMany({
+    where: { userId: { in: userIds }, revokedAt: null },
+    select: { tokenHash: true, expiresAt: true },
+  })
+  await prisma.$transaction([
+    prisma.appSession.updateMany({
+      where: { userId: { in: userIds }, revokedAt: null },
+      data: { revokedAt: now },
+    }),
+    prisma.appRefreshToken.updateMany({
+      where: { userId: { in: userIds }, revokedAt: null },
+      data: { revokedAt: now },
+    }),
+  ])
+  await Promise.all(
+    activeRefresh.map((row) =>
+      row.expiresAt > now ? blacklistRefreshHash(row.tokenHash, row.expiresAt) : Promise.resolve(),
+    ),
+  )
+  return userIds.length
+}
+
+/**
  * @en Revokes every token in a family after refresh reuse is detected (#212).
  * @es Revoca todos los tokens de una familia tras detectar reuso de refresh (#212).
  * @pt-BR Revoga todos os tokens de uma família após detectar reuso de refresh (#212).

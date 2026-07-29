@@ -2,6 +2,8 @@ import type { PrismaClient } from '@prisma/client'
 import { NEW_TENANT_MODULES } from '@bizcode/types'
 import { USER_CHANNELS } from '@bizcode/types'
 import { hashPassword } from '../passwordHash'
+import { revokeAllTenantAuthTokens } from '../lib/sessionTokens'
+import { writeAuditEvent } from '../audit'
 
 export type SuperadminTenantListRow = {
   id: number
@@ -19,6 +21,7 @@ export type SuperadminTenantDetail = {
   name: string
   slug: string
   active: boolean
+  maintenanceMode: boolean
   createdAt: string
   updatedAt: string
   plan: string | null
@@ -139,6 +142,7 @@ export class SuperadminTenantService {
       name: tenant.name,
       slug: tenant.slug,
       active: tenant.active,
+      maintenanceMode: tenant.maintenanceMode,
       createdAt: tenant.createdAt.toISOString(),
       updatedAt: tenant.updatedAt.toISOString(),
       plan: tenant.tenantConfig?.plan ?? null,
@@ -233,7 +237,154 @@ export class SuperadminTenantService {
     } catch {
       return null
     }
+    if (!active) {
+      await revokeAllTenantAuthTokens(this.prisma, tenantId)
+    }
     return this.getTenantDetail(tenantId)
+  }
+
+  /**
+   * @en Disables a tenant (`active=false`) and revokes all of its sessions (#222).
+   * @es Deshabilita un tenant (`active=false`) y revoca todas sus sesiones (#222).
+   * @pt-BR Desabilita um tenant (`active=false`) e revoga todas as suas sessões (#222).
+   */
+  async disableTenant(
+    tenantId: number,
+    actor: { userId: number; ipAddress?: string | null },
+  ): Promise<SuperadminTenantDetail | null> {
+    const detail = await this.patchTenantActive(tenantId, false)
+    if (!detail) {
+      return null
+    }
+    await writeAuditEvent({
+      prisma: this.prisma,
+      tenantId,
+      userId: actor.userId,
+      action: 'incident_disable_tenant',
+      resource: 'tenant',
+      resourceId: String(tenantId),
+      ipAddress: actor.ipAddress ?? null,
+      metadata: { active: false },
+    })
+    return detail
+  }
+
+  /**
+   * @en Sets maintenance mode and revokes sessions when enabling (#222).
+   * @es Activa/desactiva modo mantenimiento y revoca sesiones al activarlo (#222).
+   * @pt-BR Define modo manutenção e revoga sessões ao ativar (#222).
+   */
+  async setMaintenanceMode(
+    tenantId: number,
+    enabled: boolean,
+    actor: { userId: number; ipAddress?: string | null },
+  ): Promise<SuperadminTenantDetail | null> {
+    try {
+      await this.prisma.tenant.update({
+        where: { id: tenantId },
+        data: { maintenanceMode: enabled },
+      })
+    } catch {
+      return null
+    }
+    if (enabled) {
+      await revokeAllTenantAuthTokens(this.prisma, tenantId)
+    }
+    await writeAuditEvent({
+      prisma: this.prisma,
+      tenantId,
+      userId: actor.userId,
+      action: enabled ? 'incident_maintenance_on' : 'incident_maintenance_off',
+      resource: 'tenant',
+      resourceId: String(tenantId),
+      ipAddress: actor.ipAddress ?? null,
+      metadata: { maintenanceMode: enabled },
+    })
+    return this.getTenantDetail(tenantId)
+  }
+
+  /**
+   * @en Revokes all auth tokens for users of a tenant (#222).
+   * @es Revoca todos los tokens de auth de los usuarios de un tenant (#222).
+   * @pt-BR Revoga todos os tokens de auth dos usuários de um tenant (#222).
+   */
+  async revokeAllSessions(
+    tenantId: number,
+    actor: { userId: number; ipAddress?: string | null },
+  ): Promise<{ revokedUserCount: number } | null> {
+    const exists = await this.prisma.tenant.findUnique({
+      where: { id: tenantId },
+      select: { id: true },
+    })
+    if (!exists) {
+      return null
+    }
+    const revokedUserCount = await revokeAllTenantAuthTokens(this.prisma, tenantId)
+    await writeAuditEvent({
+      prisma: this.prisma,
+      tenantId,
+      userId: actor.userId,
+      action: 'incident_revoke_sessions',
+      resource: 'tenant',
+      resourceId: String(tenantId),
+      ipAddress: actor.ipAddress ?? null,
+      metadata: { revokedUserCount },
+    })
+    return { revokedUserCount }
+  }
+
+  /**
+   * @en Forensic audit listing for a tenant with optional date range (#222).
+   * @es Listado forense de auditoría de un tenant con rango de fechas opcional (#222).
+   * @pt-BR Listagem forense de auditoria de um tenant com intervalo de datas opcional (#222).
+   */
+  async listAuditEvents(
+    tenantId: number,
+    opts: { startDate?: Date; endDate?: Date; take: number; skip: number },
+  ): Promise<{ total: number; events: Array<Record<string, unknown>> } | null> {
+    const exists = await this.prisma.tenant.findUnique({
+      where: { id: tenantId },
+      select: { id: true },
+    })
+    if (!exists) {
+      return null
+    }
+    const where = {
+      tenantId,
+      ...(opts.startDate || opts.endDate
+        ? {
+            createdAt: {
+              ...(opts.startDate ? { gte: opts.startDate } : {}),
+              ...(opts.endDate ? { lte: opts.endDate } : {}),
+            },
+          }
+        : {}),
+    }
+    const [total, rows] = await Promise.all([
+      this.prisma.auditEvent.count({ where }),
+      this.prisma.auditEvent.findMany({
+        where,
+        orderBy: { createdAt: 'desc' },
+        take: opts.take,
+        skip: opts.skip,
+        include: { user: { select: { username: true } } },
+      }),
+    ])
+    return {
+      total,
+      events: rows.map((event) => ({
+        id: event.id,
+        tenantId: event.tenantId,
+        userId: event.userId,
+        username: event.user?.username ?? null,
+        action: event.action,
+        resource: event.resource,
+        resourceId: event.resourceId,
+        ipAddress: event.ipAddress,
+        metadata: event.metadata,
+        createdAt: event.createdAt.toISOString(),
+      })),
+    }
   }
 
   async slugExists(slug: string): Promise<boolean> {

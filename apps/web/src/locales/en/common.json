@@ -314,7 +314,9 @@
     },
     "status": {
       "active": "Active",
-      "suspended": "Suspended"
+      "suspended": "Suspended",
+      "maintenanceOn": "Maintenance on",
+      "maintenanceOff": "Maintenance off"
     },
     "stats": {
       "activeTenants": "Active tenants",
@@ -333,6 +335,7 @@
     },
     "detail": {
       "status": "Status",
+      "maintenance": "Maintenance mode",
       "plan": "Plan",
       "modulesCount": "Enabled modules",
       "lastActivity": "Last activity",
@@ -343,6 +346,31 @@
       "statInvoices": "{{count}} invoices",
       "statOrders": "{{count}} orders",
       "statClients": "{{count}} customers"
+    },
+    "incident": {
+      "sectionTitle": "Incident response",
+      "sectionHelp": "Use these actions during a security incident. They are audited.",
+      "revokeSessions": "Revoke all sessions",
+      "disable": "Disable tenant",
+      "maintenanceOn": "Enable maintenance",
+      "maintenanceOff": "Disable maintenance",
+      "auditStart": "Audit export start",
+      "auditEnd": "Audit export end",
+      "exportAudit": "Export audit events (JSON)",
+      "confirmRevokeSessions": "Revoke all active sessions for every user of this tenant?",
+      "confirmDisable": "Disable this tenant and revoke all sessions?",
+      "confirmMaintenanceOn": "Enable maintenance mode? Tenant users will lose API access and sessions will be revoked.",
+      "revokeSuccess": "Sessions revoked for {{count}} user(s).",
+      "disableSuccess": "Tenant disabled and sessions revoked.",
+      "maintenanceOnSuccess": "Maintenance mode enabled; sessions revoked.",
+      "maintenanceOffSuccess": "Maintenance mode disabled.",
+      "exportSuccess": "Exported audit listing (total {{count}} matching events).",
+      "errors": {
+        "revokeFailed": "Could not revoke sessions.",
+        "disableFailed": "Could not disable tenant.",
+        "maintenanceFailed": "Could not update maintenance mode.",
+        "exportFailed": "Could not export audit events."
+      }
     },
     "errors": {
       "loadFailed": "Could not load platform data.",

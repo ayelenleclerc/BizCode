@@ -10,6 +10,8 @@ Versionamento: [Semantic Versioning](https://semver.org/).
 
 ### Adicionado
 
+- **Resposta a incidentes de segurança (#222):** Runbook operacional trilingue; stubs SEC-008 apontam para o runbook; `Tenant.maintenanceMode`; APIs super-admin de revogar sessões, disable, maintenance e audit forense; UI no detalhe do tenant; bloqueio de auth em tenants inativos/manutenção.
+
 - **Varredura de dependências (#219):** Dependabot (npm + GitHub Actions semanal); `pnpm audit --audit-level=high` bloqueante; Snyk no CI (`SNYK_TOKEN`, falha HIGH+ com fix); Trivy CRITICAL em imagens Docker antes do GHCR; ADR-0017 + guia de triagem trilingue; badge Snyk no README; bumps/`pnpm.overrides` e ignore documentado de `CVE-2026-14257` (revisão 2026-10-28). Fora de escopo: Socket.dev, Renovate, hardening mobile (#220).
 
 - **Contrato WAF Cloudflare + rate limiting avançado (#217):** store Redis para `express-rate-limit` (`rate-limit-redis`); produção exige `REDIS_URL`; `TRUST_PROXY` para IP do cliente atrás de CDN; login 5/15 min por IP e 10/hora por tenant+username; API não autenticada 20/min por IP e autenticada 100/min por usuário; relatórios/exports 10/hora por tenant; `WEBHOOK_IP_ALLOWLIST` opcional; 429 com `Retry-After`; ADR-0016 + guia Cloudflare trilingue. Fora de escopo: API/SDK Cloudflare, `express-slow-down`, scanning de dependências (#219).
