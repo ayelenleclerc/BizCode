@@ -33,7 +33,7 @@ The README badge reports Snyk status for this GitHub repo. After linking the pro
 1. **Identify source:** Dependabot PR, CI audit log, Snyk UI/CLI, or Trivy image step.
 2. **Severity:** CRITICAL/HIGH with a published fix → remediate before merge. Moderate → schedule.
 3. **Prefer:** bump direct dependency or add a targeted `pnpm.overrides` entry; re-run `pnpm install` and `pnpm audit --audit-level=high`.
-4. **Containers:** bump `FROM` tags in `Dockerfile` / `Dockerfile.frontend` when Trivy CRITICAL is in the base image; rebuild and re-scan. API runtime drops Node-bundled/`semantic-release` `npm` and does **not** install Corepack/pnpm (both ship vulnerable `tar`); starts via `tsx` from `node_modules/.bin`. Force `esbuild` ≥ 0.28.1 via `pnpm.overrides` (CVE-2025-68121) with Vite `supported.destructuring`.
+4. **Containers:** bump `FROM` tags in `Dockerfile` / `Dockerfile.frontend` when Trivy CRITICAL is in the base image; rebuild and re-scan. Frontend uses `nginx:1.30.3-alpine` plus `apk upgrade`. API runtime drops Node-bundled/`semantic-release` `npm` and does **not** install Corepack/pnpm (both ship vulnerable `tar`); starts via `tsx` from `node_modules/.bin`. Force `esbuild` ≥ 0.28.1 via `pnpm.overrides` (CVE-2025-68121) with Vite `supported.destructuring`.
 5. **Exceptions:** only via `pnpm.auditConfig.ignoreCves` (or ADR amendment) with reason and review date — never silent `continue-on-error` on the Quality Gate audit step.
 6. **Verify:** local audit exit 0; push and confirm Snyk + Trivy jobs green.
 
