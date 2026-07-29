@@ -33,7 +33,7 @@ El badge del README refleja el estado Snyk del repo. Tras enlazar el proyecto en
 1. **Origen:** PR de Dependabot, log de audit en CI, UI/CLI Snyk o paso Trivy image.
 2. **Severidad:** CRITICAL/HIGH con fix publicado → remediar antes del merge. Moderate → planificar.
 3. **Preferir:** bump de dependencia directa o `pnpm.overrides` puntual; `pnpm install` y `pnpm audit --audit-level=high`.
-4. **Contenedores:** subir tags `FROM` en Dockerfiles si CRITICAL está en la imagen base; rebuild y re-scan. El runtime de API elimina el `npm` embebido de Node (`tar` vulnerable). Forzar `esbuild` ≥ 0.28.1 vía `pnpm.overrides` para gobinary con Go stdlib parcheado (CVE-2025-68121).
+4. **Contenedores:** subir tags `FROM` en Dockerfiles si CRITICAL está en la imagen base; rebuild y re-scan. El runtime de API elimina `npm` (Node / `semantic-release`) y **no** instala Corepack/pnpm (`tar` vulnerable); arranca con `tsx` desde `node_modules/.bin`. Forzar `esbuild` ≥ 0.28.1 vía `pnpm.overrides` (CVE-2025-68121) con Vite `supported.destructuring`.
 5. **Excepciones:** solo vía `pnpm.auditConfig.ignoreCves` (o enmienda al ADR) con motivo y fecha de revisión — nunca `continue-on-error` silencioso en el audit del Quality Gate.
 6. **Verificar:** audit local exit 0; push y confirmar jobs Snyk + Trivy en verde.
 
