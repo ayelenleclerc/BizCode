@@ -35,7 +35,7 @@ push / pull_request
 │  1. Checkout                                                 │
 │  2. Setup Node.js 22 (cache: npm)                           │
 │  3. npm ci (uses `.npmrc` `legacy-peer-deps` for ESLint peers) │
-│  3b. npm audit (informational, continue-on-error)          │
+│  3b. pnpm audit --audit-level=high (blocking HIGH+)       │
 │  4. npx prisma generate                                     │
 │  5. npx prisma validate       ← schema syntax / metadata (no DB write) │
 │  6. npx prisma migrate deploy  ← schema on PostgreSQL       │
@@ -66,6 +66,14 @@ push / pull_request
 ## Secret scanning (#216)
 
 Workflow [`.github/workflows/gitleaks.yml`](../../../.github/workflows/gitleaks.yml) runs Gitleaks on push/PR to `main`/`develop` and fails on findings. Config: [`.gitleaks.toml`](../../../.gitleaks.toml). See [secrets management / Doppler](secrets-management-and-doppler.md).
+
+## Dependency and image scanning (#219)
+
+- **Dependabot:** [`.github/dependabot.yml`](../../../.github/dependabot.yml) (weekly npm + GitHub Actions, patch groups).
+- **pnpm audit:** blocking HIGH+ on the Quality Gate (see [ADR-0017](../adr/ADR-0017-dependency-scanning.md)).
+- **Snyk:** [`.github/workflows/snyk.yml`](../../../.github/workflows/snyk.yml) — requires `SNYK_TOKEN`; fails on HIGH+ with available fix.
+- **Trivy images:** after Docker build in [`.github/workflows/deploy.yml`](../../../.github/workflows/deploy.yml), fail on CRITICAL before GHCR publish.
+- Triage: [dependency scanning and triage](dependency-scanning-and-triage.md).
 
 ## Blocking Conditions
 
@@ -205,7 +213,7 @@ Workflow file: `.github/workflows/deploy.yml`.
 ## Optional / follow-up automation
 
 - [x] **Sync `documentacion` orphan branch** from `main` — `.github/workflows/sync-documentacion.yml` (see *Documentation branch* above)
-- [x] **`npm audit --audit-level=high`** after `npm ci` with `continue-on-error: true` (visibility without blocking the gate) — see [ADR-0006](../adr/ADR-0006-release-and-tauri-ci-workflows.md)
+- [x] **`pnpm audit --audit-level=high`** after install (**blocking** HIGH+; #219 / ADR-0017) — previously informational under ADR-0006
 - [x] PostgreSQL-backed integration tests (Phase B, ADR-0004) — `tests/integration/`, `npm run test:integration`
 - [x] **Tauri build on self-hosted runner** — `.github/workflows/tauri-selfhosted.yml` (`workflow_dispatch` only) — [ADR-0006](../adr/ADR-0006-release-and-tauri-ci-workflows.md)
 - [x] **semantic-release** — `release.config.cjs`, `.github/workflows/release.yml` (`workflow_dispatch` on `main`) — [ADR-0006](../adr/ADR-0006-release-and-tauri-ci-workflows.md)

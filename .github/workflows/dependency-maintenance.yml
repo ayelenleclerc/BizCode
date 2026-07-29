@@ -13,7 +13,7 @@ permissions:
 
 jobs:
   check:
-    name: npm audit & outdated
+    name: pnpm audit & outdated
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -33,10 +33,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: npm audit (informational)
-        continue-on-error: true
+      - name: pnpm audit (blocking HIGH+)
         run: pnpm audit --audit-level=high
 
-      - name: npm outdated (informational)
+      - name: pnpm outdated (informational)
         continue-on-error: true
         run: pnpm outdated || true

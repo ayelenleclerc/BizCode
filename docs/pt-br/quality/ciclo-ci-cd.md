@@ -27,7 +27,7 @@ BizCode é um **workspace pnpm** (`apps/web`, `apps/server`, `packages/types`, `
 
 ```
 push / pull_request → job quality (ubuntu-latest):
-  checkout → Node 22 → npm ci → npm audit (informativo) → prisma generate → prisma validate → prisma migrate deploy →
+  checkout → Node 22 → npm ci → pnpm audit HIGH+ (bloqueante) → prisma generate → prisma validate → prisma migrate deploy →
   type-check → docs:validate → docs:generate → verificação pós-processo TypeDoc → git diff (docs gerados / SBOM) → lint →
   contract tests (OpenAPI/Ajv) → test:coverage → check:i18n →
   playwright install chromium → test:e2e → test:integration → check:docs-map →
@@ -44,6 +44,14 @@ push / pull_request → job quality (ubuntu-latest):
 ## Varredura de segredos (#216)
 
 O workflow [`.github/workflows/gitleaks.yml`](../../../.github/workflows/gitleaks.yml) executa Gitleaks em push/PR para `main`/`develop` e falha se houver achados. Config: [`.gitleaks.toml`](../../../.gitleaks.toml). Ver [gestão de segredos / Doppler](gestao-segredos-e-doppler.md).
+
+## Varredura de dependências e imagens (#219)
+
+- **Dependabot:** [`.github/dependabot.yml`](../../../.github/dependabot.yml) (npm + GitHub Actions semanal, grupos patch).
+- **pnpm audit:** bloqueante HIGH+ no Quality Gate ([ADR-0017](../adr/ADR-0017-varredura-dependencias.md)).
+- **Snyk:** [`.github/workflows/snyk.yml`](../../../.github/workflows/snyk.yml) — requer `SNYK_TOKEN`.
+- **Trivy imagens:** após build Docker em [`.github/workflows/deploy.yml`](../../../.github/workflows/deploy.yml), falha em CRITICAL antes do GHCR.
+- Triagem: [varredura de dependências e triagem](varredura-dependencias-e-triagem.md).
 
 ## Bloqueios
 
@@ -181,7 +189,7 @@ Arquivo: `.github/workflows/deploy.yml`.
 ## Automação opcional
 
 - [x] Sincronização do branch órfão `documentacion` a partir de `main` — `.github/workflows/sync-documentacion.yml` (ver *Branch órfão documentacion* acima)
-- [x] `npm audit --audit-level=high` após `npm ci` com `continue-on-error: true` — [ADR-0006](../adr/ADR-0006-release-and-tauri-ci-workflows.md)
+- [x] `pnpm audit --audit-level=high` após install (**bloqueante** HIGH+; #219 / ADR-0017)
 - [x] Testes de integração com PostgreSQL (fase B, ADR-0004) — `tests/integration/`, `npm run test:integration`
 - [x] Build Tauri em runner self-hosted — `.github/workflows/tauri-selfhosted.yml` (`workflow_dispatch`) — [ADR-0006](../adr/ADR-0006-release-and-tauri-ci-workflows.md)
 - [x] semantic-release — `release.config.cjs`, `.github/workflows/release.yml` — [ADR-0006](../adr/ADR-0006-release-and-tauri-ci-workflows.md)

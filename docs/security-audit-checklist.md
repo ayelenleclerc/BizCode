@@ -31,8 +31,8 @@
 - [ ] Error message sanitization
 
 ### Infrastructure
-- [ ] Container security scanning
-- [ ] Dependency vulnerability scanning
+- [x] Container security scanning
+- [x] Dependency vulnerability scanning
 - [ ] Network segmentation
 - [ ] Logging & monitoring
 - [ ] Backup & recovery procedures

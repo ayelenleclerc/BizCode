@@ -64,8 +64,7 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: pnpm audit (informational, non-blocking)
-        continue-on-error: true
+      - name: pnpm audit (blocking HIGH+)
         run: pnpm audit --audit-level=high
 
       - name: Generate Prisma client

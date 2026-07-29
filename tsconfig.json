@@ -17,16 +17,15 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-    "baseUrl": ".",
     "paths": {
-      "@/*": ["apps/web/src/*"],
-      "@components/*": ["apps/web/src/components/*"],
-      "@pages/*": ["apps/web/src/pages/*"],
-      "@lib/*": ["apps/web/src/lib/*"],
-      "@hooks/*": ["apps/web/src/hooks/*"],
-      "@store/*": ["apps/web/src/store/*"],
-      "@bizcode/types": ["packages/types/src/index.ts"],
-      "@bizcode/api-client": ["packages/api-client/src/index.ts"]
+      "@/*": ["./apps/web/src/*"],
+      "@components/*": ["./apps/web/src/components/*"],
+      "@pages/*": ["./apps/web/src/pages/*"],
+      "@lib/*": ["./apps/web/src/lib/*"],
+      "@hooks/*": ["./apps/web/src/hooks/*"],
+      "@store/*": ["./apps/web/src/store/*"],
+      "@bizcode/types": ["./packages/types/src/index.ts"],
+      "@bizcode/api-client": ["./packages/api-client/src/index.ts"]
     }
   },
   "include": [

@@ -10,6 +10,8 @@ Versionado: [Semantic Versioning](https://semver.org/lang/es/).
 
 ### Agregado
 
+- **Escaneo de dependencias (#219):** Dependabot (npm + GitHub Actions semanal); `pnpm audit --audit-level=high` bloqueante; Snyk en CI (`SNYK_TOKEN`, falla HIGH+ con fix); Trivy CRITICAL en imágenes Docker antes de GHCR; ADR-0017 + guía de triage trilingüe; badge Snyk en README; bumps/`pnpm.overrides` y ignore documentado de `CVE-2026-14257` (revisión 2026-10-28). Fuera de alcance: Socket.dev, Renovate, hardening mobile (#220).
+
 - **Contrato WAF Cloudflare + rate limiting avanzado (#217):** store Redis para `express-rate-limit` (`rate-limit-redis`); producción exige `REDIS_URL`; `TRUST_PROXY` para IP de cliente detrás de CDN; login 5/15 min por IP y 10/hora por tenant+username; API no autenticada 20/min por IP y autenticada 100/min por usuario; reportes/exports 10/hora por tenant; `WEBHOOK_IP_ALLOWLIST` opcional; 429 con `Retry-After`; ADR-0016 + guía Cloudflare trilingüe. Fuera de alcance: API/SDK Cloudflare, `express-slow-down`, scanning de dependencias (#219).
 
 - **Gestión de secretos (#216):** secretos de producción vía inyección Doppler (o equivalente) a env (sin SDK AWS/Vault en la app); `JWT_SECRET_PREVIOUS` opcional para rotación HMAC de tokens opacos de sesión/portal/challenge MFA; producción exige `BIZCODE_FISCAL_ENCRYPTION_KEY` y `BIZCODE_MFA_ENCRYPTION_KEY`; workflow Gitleaks en CI; ADR-0015 + guía Doppler trilingüe; inventario en `.env.example`. Fuera de alcance: SDK AWS Secrets Manager, Vault, re-cifrado AES automático, WAF (#217).

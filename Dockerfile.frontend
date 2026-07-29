@@ -16,7 +16,12 @@ ENV VITE_API_URL=$VITE_API_URL
 COPY . .
 RUN pnpm run build:web
 
-FROM nginx:1.27-alpine AS nginx_runtime
+# @en Pin stable Alpine nginx; apk upgrade picks OpenSSL fixes (e.g. CVE-2026-31789).
+# @es Pin nginx Alpine estable; apk upgrade aplica parches OpenSSL (p. ej. CVE-2026-31789).
+# @pt-BR Pin nginx Alpine estável; apk upgrade aplica patches OpenSSL (ex. CVE-2026-31789).
+FROM nginx:1.30.3-alpine AS nginx_runtime
+RUN apk upgrade --no-cache
+
 WORKDIR /usr/share/nginx/html
 
 COPY deploy/nginx/default.conf /etc/nginx/conf.d/default.conf
