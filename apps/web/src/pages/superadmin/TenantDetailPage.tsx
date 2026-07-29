@@ -12,12 +12,19 @@ export default function TenantDetailPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [patching, setPatching] = useState(false)
+  const [incidentBusy, setIncidentBusy] = useState(false)
+  const [incidentMessage, setIncidentMessage] = useState<string | null>(null)
+  const [auditStart, setAuditStart] = useState('')
+  const [auditEnd, setAuditEnd] = useState('')
+  const [auditExporting, setAuditExporting] = useState(false)
   const [plans, setPlans] = useState<PublicPlanDTO[]>([])
   const [selectedPlanKey, setSelectedPlanKey] = useState('')
   const [planReason, setPlanReason] = useState('')
   const [planSaving, setPlanSaving] = useState(false)
   const [planMessage, setPlanMessage] = useState<string | null>(null)
   const planReasonId = useId()
+  const auditStartId = useId()
+  const auditEndId = useId()
 
   const load = useCallback(async () => {
     if (!Number.isInteger(tenantId) || tenantId <= 0) {
@@ -78,6 +85,7 @@ export default function TenantDetailPage() {
   const handleToggleActive = async () => {
     if (!tenant) return
     setPatching(true)
+    setIncidentMessage(null)
     try {
       const updated = await superadminAPI.patchTenant(tenant.id, !tenant.active)
       setTenant(updated)
@@ -85,6 +93,82 @@ export default function TenantDetailPage() {
       setError(t('superadmin.errors.patchFailed'))
     } finally {
       setPatching(false)
+    }
+  }
+
+  const handleRevokeSessions = async () => {
+    if (!tenant) return
+    if (!window.confirm(t('superadmin.incident.confirmRevokeSessions'))) return
+    setIncidentBusy(true)
+    setIncidentMessage(null)
+    try {
+      const result = await superadminAPI.revokeAllSessions(tenant.id)
+      setIncidentMessage(t('superadmin.incident.revokeSuccess', { count: result.revokedUserCount }))
+    } catch {
+      setIncidentMessage(t('superadmin.incident.errors.revokeFailed'))
+    } finally {
+      setIncidentBusy(false)
+    }
+  }
+
+  const handleDisable = async () => {
+    if (!tenant) return
+    if (!window.confirm(t('superadmin.incident.confirmDisable'))) return
+    setIncidentBusy(true)
+    setIncidentMessage(null)
+    try {
+      const updated = await superadminAPI.disableTenant(tenant.id)
+      setTenant(updated)
+      setIncidentMessage(t('superadmin.incident.disableSuccess'))
+    } catch {
+      setIncidentMessage(t('superadmin.incident.errors.disableFailed'))
+    } finally {
+      setIncidentBusy(false)
+    }
+  }
+
+  const handleToggleMaintenance = async () => {
+    if (!tenant) return
+    const next = !tenant.maintenanceMode
+    if (next && !window.confirm(t('superadmin.incident.confirmMaintenanceOn'))) return
+    setIncidentBusy(true)
+    setIncidentMessage(null)
+    try {
+      const updated = await superadminAPI.setMaintenanceMode(tenant.id, next)
+      setTenant(updated)
+      setIncidentMessage(
+        next ? t('superadmin.incident.maintenanceOnSuccess') : t('superadmin.incident.maintenanceOffSuccess'),
+      )
+    } catch {
+      setIncidentMessage(t('superadmin.incident.errors.maintenanceFailed'))
+    } finally {
+      setIncidentBusy(false)
+    }
+  }
+
+  const handleExportAudit = async () => {
+    if (!tenant) return
+    setAuditExporting(true)
+    setIncidentMessage(null)
+    try {
+      const result = await superadminAPI.listTenantAuditEvents(tenant.id, {
+        startDate: auditStart ? new Date(auditStart).toISOString() : undefined,
+        endDate: auditEnd ? new Date(auditEnd).toISOString() : undefined,
+        limit: 1000,
+        offset: 0,
+      })
+      const blob = new Blob([JSON.stringify(result.data, null, 2)], { type: 'application/json' })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `tenant-${tenant.id}-audit-events.json`
+      a.click()
+      URL.revokeObjectURL(url)
+      setIncidentMessage(t('superadmin.incident.exportSuccess', { count: result.total }))
+    } catch {
+      setIncidentMessage(t('superadmin.incident.errors.exportFailed'))
+    } finally {
+      setAuditExporting(false)
     }
   }
 
@@ -129,7 +213,7 @@ export default function TenantDetailPage() {
         <div className="flex flex-wrap gap-2">
           <button
             type="button"
-            disabled={patching}
+            disabled={patching || incidentBusy}
             onClick={() => void handleToggleActive()}
             className={`rounded px-4 py-2 text-white disabled:opacity-50 ${
               tenant.active ? 'bg-amber-600 hover:bg-amber-700' : 'bg-green-600 hover:bg-green-700'
@@ -152,6 +236,13 @@ export default function TenantDetailPage() {
         {(
           [
             { key: 'status', label: t('superadmin.detail.status'), value: tenant.active ? t('superadmin.status.active') : t('superadmin.status.suspended') },
+            {
+              key: 'maintenance',
+              label: t('superadmin.detail.maintenance'),
+              value: tenant.maintenanceMode
+                ? t('superadmin.status.maintenanceOn')
+                : t('superadmin.status.maintenanceOff'),
+            },
             { key: 'plan', label: t('superadmin.detail.plan'), value: tenant.plan ?? '—' },
             { key: 'modulesCount', label: t('superadmin.detail.modulesCount'), value: String(tenant.modulesCount) },
             { key: 'lastActivity', label: t('superadmin.detail.lastActivity'), value: formatDate(tenant.lastActivityAt) },
@@ -165,6 +256,90 @@ export default function TenantDetailPage() {
           </div>
         ))}
       </dl>
+
+      <section
+        className="mt-8 max-w-3xl rounded border border-red-200 bg-red-50 p-4 dark:border-red-900 dark:bg-red-950/40"
+        aria-labelledby="superadmin-incident-heading"
+        data-testid="superadmin-incident-tools"
+      >
+        <h2 id="superadmin-incident-heading" className="text-lg font-semibold text-red-900 dark:text-red-100">
+          {t('superadmin.incident.sectionTitle')}
+        </h2>
+        <p className="mt-1 text-sm text-red-800 dark:text-red-200">{t('superadmin.incident.sectionHelp')}</p>
+        {incidentMessage ? (
+          <p role="status" className="mt-3 text-sm" data-testid="superadmin-incident-message">
+            {incidentMessage}
+          </p>
+        ) : null}
+        <div className="mt-4 flex flex-wrap gap-2">
+          <button
+            type="button"
+            disabled={incidentBusy}
+            onClick={() => void handleRevokeSessions()}
+            className="rounded bg-slate-800 px-3 py-2 text-sm text-white disabled:opacity-50 dark:bg-slate-200 dark:text-slate-900"
+            data-testid="superadmin-revoke-sessions"
+          >
+            {t('superadmin.incident.revokeSessions')}
+          </button>
+          <button
+            type="button"
+            disabled={incidentBusy || !tenant.active}
+            onClick={() => void handleDisable()}
+            className="rounded bg-red-700 px-3 py-2 text-sm text-white disabled:opacity-50"
+            data-testid="superadmin-disable-tenant"
+          >
+            {t('superadmin.incident.disable')}
+          </button>
+          <button
+            type="button"
+            disabled={incidentBusy}
+            onClick={() => void handleToggleMaintenance()}
+            className="rounded bg-amber-700 px-3 py-2 text-sm text-white disabled:opacity-50"
+            data-testid="superadmin-toggle-maintenance"
+          >
+            {tenant.maintenanceMode
+              ? t('superadmin.incident.maintenanceOff')
+              : t('superadmin.incident.maintenanceOn')}
+          </button>
+        </div>
+        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+          <div>
+            <label htmlFor={auditStartId} className="block text-sm font-medium">
+              {t('superadmin.incident.auditStart')}
+            </label>
+            <input
+              id={auditStartId}
+              type="datetime-local"
+              value={auditStart}
+              onChange={(e) => setAuditStart(e.target.value)}
+              className="mt-1 w-full rounded border border-slate-300 px-2 py-1 dark:border-slate-600 dark:bg-slate-900"
+              data-testid="superadmin-audit-start"
+            />
+          </div>
+          <div>
+            <label htmlFor={auditEndId} className="block text-sm font-medium">
+              {t('superadmin.incident.auditEnd')}
+            </label>
+            <input
+              id={auditEndId}
+              type="datetime-local"
+              value={auditEnd}
+              onChange={(e) => setAuditEnd(e.target.value)}
+              className="mt-1 w-full rounded border border-slate-300 px-2 py-1 dark:border-slate-600 dark:bg-slate-900"
+              data-testid="superadmin-audit-end"
+            />
+          </div>
+        </div>
+        <button
+          type="button"
+          disabled={auditExporting}
+          onClick={() => void handleExportAudit()}
+          className="mt-3 rounded border border-slate-400 px-3 py-2 text-sm disabled:opacity-50"
+          data-testid="superadmin-export-audit"
+        >
+          {auditExporting ? t('status.loading') : t('superadmin.incident.exportAudit')}
+        </button>
+      </section>
 
       <section className="mt-8 max-w-lg" aria-labelledby="superadmin-plan-heading">
         <h2 id="superadmin-plan-heading" className="text-lg font-semibold mb-3">

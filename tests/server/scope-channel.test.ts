@@ -31,7 +31,12 @@ function buildPrismaMock(channelScopes: string[]): PrismaClient {
       count: vi.fn().mockResolvedValue(1),
     },
     tenant: {
-      findUnique: vi.fn().mockResolvedValue({ id: 1, slug: 'demo', active: true }),
+      findUnique: vi.fn().mockResolvedValue({
+        id: 1,
+        slug: 'demo',
+        active: true,
+        maintenanceMode: false,
+      }),
     },
     appSession: {
       create: vi.fn().mockResolvedValue({ id: 1 }),
@@ -47,6 +52,7 @@ function buildPrismaMock(channelScopes: string[]): PrismaClient {
           scopeWarehouseIds: [],
           scopeRouteIds: [],
           scopeChannels: channelScopes,
+          tenant: { id: 1, slug: 'demo', active: true, maintenanceMode: false },
         },
       }),
       updateMany: vi.fn().mockResolvedValue({ count: 1 }),

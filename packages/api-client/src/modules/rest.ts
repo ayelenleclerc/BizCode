@@ -154,6 +154,61 @@ export const superadminAPI = {
     }
   },
 
+  revokeAllSessions: async (
+    tenantId: number,
+  ): Promise<{ revokedUserCount: number }> => {
+    try {
+      const response = await api.post<{ success: boolean; data: { revokedUserCount: number } }>(
+        `/superadmin/tenants/${tenantId}/revoke-all-sessions`,
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  disableTenant: async (tenantId: number): Promise<SuperadminTenantDetail> => {
+    try {
+      const response = await api.post<{ success: boolean; data: SuperadminTenantDetail }>(
+        `/superadmin/tenants/${tenantId}/disable`,
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  setMaintenanceMode: async (
+    tenantId: number,
+    enabled: boolean,
+  ): Promise<SuperadminTenantDetail> => {
+    try {
+      const response = await api.post<{ success: boolean; data: SuperadminTenantDetail }>(
+        `/superadmin/tenants/${tenantId}/maintenance`,
+        { enabled },
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  listTenantAuditEvents: async (
+    tenantId: number,
+    params?: { startDate?: string; endDate?: string; limit?: number; offset?: number },
+  ): Promise<{ data: unknown[]; total: number }> => {
+    try {
+      const response = await api.get<{
+        success: boolean
+        data: unknown[]
+        total: number
+      }>(`/superadmin/tenants/${tenantId}/audit-events`, { params })
+      return { data: response.data.data, total: response.data.total }
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
   changeTenantPlan: async (
     tenantId: number,
     body: { planKey: string; reason: string },

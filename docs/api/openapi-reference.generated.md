@@ -1964,6 +1964,10 @@ Returns plan limits, enabled plan features, and current usage for the authentica
 
     `string`, format: `date-time`
 
+  - **`maintenanceMode` (required)**
+
+    `boolean` — When true, tenant users cannot authenticate or use the API (#222)
+
   - **`modulesCount` (required)**
 
     `integer`
@@ -2018,6 +2022,7 @@ Returns plan limits, enabled plan features, and current usage for the authentica
     "name": "",
     "slug": "",
     "active": true,
+    "maintenanceMode": true,
     "createdAt": "",
     "updatedAt": "",
     "plan": "",
@@ -2170,6 +2175,10 @@ Returns plan limits, enabled plan features, and current usage for the authentica
 
     `string`, format: `date-time`
 
+  - **`maintenanceMode` (required)**
+
+    `boolean` — When true, tenant users cannot authenticate or use the API (#222)
+
   - **`modulesCount` (required)**
 
     `integer`
@@ -2224,6 +2233,7 @@ Returns plan limits, enabled plan features, and current usage for the authentica
     "name": "",
     "slug": "",
     "active": true,
+    "maintenanceMode": true,
     "createdAt": "",
     "updatedAt": "",
     "plan": "",
@@ -2237,6 +2247,685 @@ Returns plan limits, enabled plan features, and current usage for the authentica
     },
     "lastActivityAt": ""
   }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Tenant not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/superadmin/tenants/{tenantId}/revoke-all-sessions
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/superadmin/tenants/{tenantId}/revoke-all-sessions`
+
+### Revoke all sessions for every user of a tenant (incident response
+
+- **Method:** `POST`
+- **Path:** `/api/superadmin/tenants/{tenantId}/revoke-all-sessions`
+- **Tags:** platform
+
+#### Responses
+
+##### Status: 200 Sessions revoked
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`revokedUserCount` (required)**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`, possible values: `true`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "revokedUserCount": 0
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Tenant not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/superadmin/tenants/{tenantId}/disable
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/superadmin/tenants/{tenantId}/disable`
+
+### Disable tenant and revoke sessions (incident response
+
+- **Method:** `POST`
+- **Path:** `/api/superadmin/tenants/{tenantId}/disable`
+- **Tags:** platform
+
+#### Responses
+
+##### Status: 200 Tenant disabled
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`active` (required)**
+
+    `boolean`
+
+  - **`configUpdatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`lastActivityAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`maintenanceMode` (required)**
+
+    `boolean` — When true, tenant users cannot authenticate or use the API (#222)
+
+  - **`modulesCount` (required)**
+
+    `integer`
+
+  - **`name` (required)**
+
+    `string`
+
+  - **`plan` (required)**
+
+    `string`
+
+  - **`slug` (required)**
+
+    `string`
+
+  - **`stats` (required)**
+
+    `object`
+
+    - **`clienteCount` (required)**
+
+      `integer`
+
+    - **`facturaCount` (required)**
+
+      `integer`
+
+    - **`pedidoCount` (required)**
+
+      `integer`
+
+    - **`userCount` (required)**
+
+      `integer`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "name": "",
+    "slug": "",
+    "active": true,
+    "maintenanceMode": true,
+    "createdAt": "",
+    "updatedAt": "",
+    "plan": "",
+    "modulesCount": 0,
+    "configUpdatedAt": "",
+    "stats": {
+      "userCount": 0,
+      "facturaCount": 0,
+      "pedidoCount": 0,
+      "clienteCount": 0
+    },
+    "lastActivityAt": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Tenant not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/superadmin/tenants/{tenantId}/maintenance
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/superadmin/tenants/{tenantId}/maintenance`
+
+### Enable or disable tenant maintenance mode (incident response
+
+- **Method:** `POST`
+- **Path:** `/api/superadmin/tenants/{tenantId}/maintenance`
+- **Tags:** platform
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`enabled` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "enabled": true
+}
+```
+
+#### Responses
+
+##### Status: 200 Maintenance mode updated
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`active` (required)**
+
+    `boolean`
+
+  - **`configUpdatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`lastActivityAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`maintenanceMode` (required)**
+
+    `boolean` — When true, tenant users cannot authenticate or use the API (#222)
+
+  - **`modulesCount` (required)**
+
+    `integer`
+
+  - **`name` (required)**
+
+    `string`
+
+  - **`plan` (required)**
+
+    `string`
+
+  - **`slug` (required)**
+
+    `string`
+
+  - **`stats` (required)**
+
+    `object`
+
+    - **`clienteCount` (required)**
+
+      `integer`
+
+    - **`facturaCount` (required)**
+
+      `integer`
+
+    - **`pedidoCount` (required)**
+
+      `integer`
+
+    - **`userCount` (required)**
+
+      `integer`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "name": "",
+    "slug": "",
+    "active": true,
+    "maintenanceMode": true,
+    "createdAt": "",
+    "updatedAt": "",
+    "plan": "",
+    "modulesCount": 0,
+    "configUpdatedAt": "",
+    "stats": {
+      "userCount": 0,
+      "facturaCount": 0,
+      "pedidoCount": 0,
+      "clienteCount": 0
+    },
+    "lastActivityAt": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Tenant not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/superadmin/tenants/{tenantId}/audit-events
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/superadmin/tenants/{tenantId}/audit-events`
+
+### Forensic audit event listing for a tenant (incident response
+
+- **Method:** `GET`
+- **Path:** `/api/superadmin/tenants/{tenantId}/audit-events`
+- **Tags:** platform
+
+#### Responses
+
+##### Status: 200 Paginated audit events
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+- **`limit` (required)**
+
+  `integer`
+
+- **`offset` (required)**
+
+  `integer`
+
+- **`success` (required)**
+
+  `boolean`, possible values: `true`
+
+- **`total` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "additionalProperty": "anything"
+    }
+  ],
+  "total": 0,
+  "limit": 1,
+  "offset": 0
 }
 ```
 
@@ -109810,6 +110499,10 @@ Originating invoice header (selected columns)
 
   `string`, format: `date-time`
 
+* **`maintenanceMode` (required)**
+
+  `boolean` — When true, tenant users cannot authenticate or use the API (#222)
+
 * **`modulesCount` (required)**
 
   `integer`
@@ -109858,6 +110551,7 @@ Originating invoice header (selected columns)
   "name": "",
   "slug": "",
   "active": true,
+  "maintenanceMode": true,
   "createdAt": "",
   "updatedAt": "",
   "plan": "",
@@ -109900,6 +110594,10 @@ Originating invoice header (selected columns)
   - **`lastActivityAt` (required)**
 
     `string`, format: `date-time`
+
+  - **`maintenanceMode` (required)**
+
+    `boolean` — When true, tenant users cannot authenticate or use the API (#222)
 
   - **`modulesCount` (required)**
 
@@ -109955,6 +110653,7 @@ Originating invoice header (selected columns)
     "name": "",
     "slug": "",
     "active": true,
+    "maintenanceMode": true,
     "createdAt": "",
     "updatedAt": "",
     "plan": "",

@@ -1450,12 +1450,16 @@ model TenantFiscalConfig {
 }
 
 model Tenant {
-  id        Int       @id @default(autoincrement())
-  name      String    @db.VarChar(80)
-  slug      String    @unique @db.VarChar(80)
-  active    Boolean   @default(true)
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  id               Int       @id @default(autoincrement())
+  name             String    @db.VarChar(80)
+  slug             String    @unique @db.VarChar(80)
+  active           Boolean   @default(true)
+  /// @en When true, tenant users cannot login or use API; platform super_admin can still manage (#222).
+  /// @es Si es true, usuarios del tenant no pueden login ni usar API; el super_admin de plataforma sí gestiona (#222).
+  /// @pt-BR Se true, usuários do tenant não fazem login nem usam API; o super_admin da plataforma ainda gerencia (#222).
+  maintenanceMode  Boolean   @default(false)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
 
   users          AppUser[]
   auditEvents    AuditEvent[]

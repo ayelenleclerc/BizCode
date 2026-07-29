@@ -571,6 +571,163 @@ paths:
               schema:
                 $ref: '#/components/schemas/ApiErrorEnvelope'
 
+  /api/superadmin/tenants/{tenantId}/revoke-all-sessions:
+    parameters:
+      - $ref: '#/components/parameters/TenantIdPath'
+    post:
+      tags: [platform]
+      summary: Revoke all sessions for every user of a tenant (incident response #222)
+      responses:
+        '200':
+          description: Sessions revoked
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [success, data]
+                properties:
+                  success:
+                    type: boolean
+                    enum: [true]
+                  data:
+                    type: object
+                    required: [revokedUserCount]
+                    properties:
+                      revokedUserCount:
+                        type: integer
+                        minimum: 0
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Tenant not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+
+  /api/superadmin/tenants/{tenantId}/disable:
+    parameters:
+      - $ref: '#/components/parameters/TenantIdPath'
+    post:
+      tags: [platform]
+      summary: Disable tenant and revoke sessions (incident response #222)
+      responses:
+        '200':
+          description: Tenant disabled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuperadminTenantDetailEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Tenant not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+
+  /api/superadmin/tenants/{tenantId}/maintenance:
+    parameters:
+      - $ref: '#/components/parameters/TenantIdPath'
+    post:
+      tags: [platform]
+      summary: Enable or disable tenant maintenance mode (incident response #222)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [enabled]
+              properties:
+                enabled:
+                  type: boolean
+      responses:
+        '200':
+          description: Maintenance mode updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuperadminTenantDetailEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Tenant not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+
+  /api/superadmin/tenants/{tenantId}/audit-events:
+    parameters:
+      - $ref: '#/components/parameters/TenantIdPath'
+      - $ref: '#/components/parameters/ListLimit'
+      - $ref: '#/components/parameters/ListOffset'
+      - name: startDate
+        in: query
+        schema:
+          type: string
+          format: date-time
+      - name: endDate
+        in: query
+        schema:
+          type: string
+          format: date-time
+    get:
+      tags: [platform]
+      summary: Forensic audit event listing for a tenant (incident response #222)
+      responses:
+        '200':
+          description: Paginated audit events
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [success, data, total, limit, offset]
+                properties:
+                  success:
+                    type: boolean
+                    enum: [true]
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      additionalProperties: true
+                  total:
+                    type: integer
+                    minimum: 0
+                  limit:
+                    type: integer
+                    minimum: 1
+                  offset:
+                    type: integer
+                    minimum: 0
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Tenant not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+
   /api/superadmin/tenants/{tenantId}/config:
     parameters:
       - $ref: '#/components/parameters/TenantIdPath'
@@ -22541,6 +22698,7 @@ components:
         - name
         - slug
         - active
+        - maintenanceMode
         - createdAt
         - updatedAt
         - plan
@@ -22557,6 +22715,9 @@ components:
           type: string
         active:
           type: boolean
+        maintenanceMode:
+          type: boolean
+          description: When true, tenant users cannot authenticate or use the API (#222)
         createdAt:
           type: string
           format: date-time

@@ -21,6 +21,10 @@
       "nullable": true,
       "type": "string"
     },
+    "maintenanceMode": {
+      "description": "When true, tenant users cannot authenticate or use the API (#222)",
+      "type": "boolean"
+    },
     "modulesCount": {
       "minimum": 0,
       "type": "integer"
@@ -48,6 +52,7 @@
     "name",
     "slug",
     "active",
+    "maintenanceMode",
     "createdAt",
     "updatedAt",
     "plan",

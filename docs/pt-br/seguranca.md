@@ -51,4 +51,8 @@ O app Express usa **`cors`** com **`credentials: true`** para o navegador enviar
 - `npm audit --audit-level=high` no CI.
 - Críticas/Altas devem ser corrigidas antes do merge em `main`.
 
+## Resposta a incidentes (#222)
+
+Runbook operacional (classificação, runbooks, notas legais, post-mortem): [Resposta a incidentes](quality/resposta-a-incidentes.md). Ferramentas super-admin: revogar sessões do tenant, desabilitar tenant, modo manutenção, listagem forense de auditoria.
+
 **Outros idiomas:** [English](../en/security.md) · [Español](../es/seguridad.md)

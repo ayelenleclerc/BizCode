@@ -52,3 +52,7 @@ The Express app enables **`cors`** with **`credentials: true`** so the browser c
 - `npm audit --audit-level=high` is run in CI.
 - Critical/High vulnerabilities must be resolved before merging to `main`.
 - Moderate vulnerabilities are tracked in the issue tracker with a 30-day SLA.
+
+## Incident response (#222)
+
+Operational runbook (classification, runbooks, legal notes, post-mortem): [Incident response](quality/incident-response.md). Super-admin tools: revoke tenant sessions, disable tenant, maintenance mode, forensic audit listing.

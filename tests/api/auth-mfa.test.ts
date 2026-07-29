@@ -66,6 +66,7 @@ describe('auth MFA TOTP (#213)', () => {
       scopeWarehouseIds: [] as number[],
       scopeRouteIds: [] as number[],
       scopeChannels: ['backoffice'],
+      tenant: { id: 11, slug: 'platform', active: true, maintenanceMode: false },
     }
   }
 
@@ -130,7 +131,12 @@ describe('auth MFA TOTP (#213)', () => {
         }),
       },
       tenant: {
-        findUnique: vi.fn().mockResolvedValue({ id: 11, slug: 'platform', active: true }),
+        findUnique: vi.fn().mockResolvedValue({
+          id: 11,
+          slug: 'platform',
+          active: true,
+          maintenanceMode: false,
+        }),
       },
       appSession: {
         create: vi.fn(async (args: { data: { userId: number; tokenHash: string; expiresAt: Date; tokenFamily: string } }) => {

@@ -314,7 +314,9 @@
     },
     "status": {
       "active": "Ativo",
-      "suspended": "Suspenso"
+      "suspended": "Suspenso",
+      "maintenanceOn": "Manutenção ativa",
+      "maintenanceOff": "Manutenção inativa"
     },
     "stats": {
       "activeTenants": "Tenants ativos",
@@ -333,6 +335,7 @@
     },
     "detail": {
       "status": "Status",
+      "maintenance": "Modo manutenção",
       "plan": "Plano",
       "modulesCount": "Módulos habilitados",
       "lastActivity": "Última atividade",
@@ -343,6 +346,31 @@
       "statInvoices": "{{count}} faturas",
       "statOrders": "{{count}} pedidos",
       "statClients": "{{count}} clientes"
+    },
+    "incident": {
+      "sectionTitle": "Resposta a incidentes",
+      "sectionHelp": "Use estas ações durante um incidente de segurança. Elas são auditadas.",
+      "revokeSessions": "Revogar todas as sessões",
+      "disable": "Desabilitar tenant",
+      "maintenanceOn": "Ativar manutenção",
+      "maintenanceOff": "Desativar manutenção",
+      "auditStart": "Início export auditoria",
+      "auditEnd": "Fim export auditoria",
+      "exportAudit": "Exportar eventos de auditoria (JSON)",
+      "confirmRevokeSessions": "Revogar todas as sessões ativas de todos os usuários deste tenant?",
+      "confirmDisable": "Desabilitar este tenant e revogar todas as sessões?",
+      "confirmMaintenanceOn": "Ativar modo manutenção? Os usuários do tenant perderão acesso à API e as sessões serão revogadas.",
+      "revokeSuccess": "Sessões revogadas para {{count}} usuário(s).",
+      "disableSuccess": "Tenant desabilitado e sessões revogadas.",
+      "maintenanceOnSuccess": "Modo manutenção ativado; sessões revogadas.",
+      "maintenanceOffSuccess": "Modo manutenção desativado.",
+      "exportSuccess": "Exportação de auditoria pronta (total {{count}} eventos correspondentes).",
+      "errors": {
+        "revokeFailed": "Não foi possível revogar as sessões.",
+        "disableFailed": "Não foi possível desabilitar o tenant.",
+        "maintenanceFailed": "Não foi possível atualizar o modo manutenção.",
+        "exportFailed": "Não foi possível exportar a auditoria."
+      }
     },
     "errors": {
       "loadFailed": "Não foi possível carregar os dados da plataforma.",

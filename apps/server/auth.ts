@@ -169,9 +169,17 @@ export function resolveSession(prisma: PrismaClient) {
         revokedAt: null,
         expiresAt: { gt: new Date() },
       },
-      include: { user: true },
+      include: { user: { include: { tenant: true } } },
     })
     if (!session || !session.user.active) {
+      next()
+      return
+    }
+    // @en Inactive or maintenance tenants lose interactive API auth (#222).
+    // @es Tenants inactivos o en mantenimiento pierden auth interactiva de API (#222).
+    // @pt-BR Tenants inativos ou em manutenção perdem auth interativa da API (#222).
+    const tenant = session.user.tenant
+    if (!tenant?.active || tenant.maintenanceMode) {
       next()
       return
     }
@@ -465,6 +473,14 @@ export function registerAuthRoutes(app: import('express').Application, prisma: P
     const tenant = await prisma.tenant.findUnique({ where: { slug: tenantSlug } })
     if (!tenant || !tenant.active) {
       res.status(401).json({ success: false, error: 'Invalid credentials' })
+      return
+    }
+    if (tenant.maintenanceMode) {
+      res.status(503).json({
+        success: false,
+        error: 'Tenant is in maintenance mode',
+        code: 'TENANT_MAINTENANCE',
+      })
       return
     }
 

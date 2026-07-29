@@ -80,7 +80,12 @@ function buildPrismaMock(loginName: string, loginSecret: string): PrismaClient {
       }),
     },
     tenant: {
-      findUnique: vi.fn().mockResolvedValue({ id: 11, slug: 'platform', active: true }),
+      findUnique: vi.fn().mockResolvedValue({
+        id: 11,
+        slug: 'platform',
+        active: true,
+        maintenanceMode: false,
+      }),
     },
     appSession: {
       create: vi.fn(async (args: { data: { userId: number; tokenHash: string; expiresAt: Date; tokenFamily: string } }) => {
@@ -110,6 +115,7 @@ function buildPrismaMock(loginName: string, loginSecret: string): PrismaClient {
             scopeWarehouseIds: [],
             scopeRouteIds: [],
             scopeChannels: ['backoffice'],
+            tenant: { id: 11, slug: 'platform', active: true, maintenanceMode: false },
           },
         }
       }),
