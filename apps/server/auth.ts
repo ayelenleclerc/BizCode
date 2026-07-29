@@ -178,7 +178,8 @@ export function resolveSession(prisma: PrismaClient) {
     // @en Inactive or maintenance tenants lose interactive API auth (#222).
     // @es Tenants inactivos o en mantenimiento pierden auth interactiva de API (#222).
     // @pt-BR Tenants inativos ou em manutenção perdem auth interativa da API (#222).
-    if (!session.user.tenant.active || session.user.tenant.maintenanceMode) {
+    const tenant = session.user.tenant
+    if (!tenant?.active || tenant.maintenanceMode) {
       next()
       return
     }

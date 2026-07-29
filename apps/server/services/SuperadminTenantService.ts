@@ -229,15 +229,20 @@ export class SuperadminTenantService {
   }
 
   async patchTenantActive(tenantId: number, active: boolean): Promise<SuperadminTenantDetail | null> {
+    let persisted: { active: boolean }
     try {
-      await this.prisma.tenant.update({
+      persisted = await this.prisma.tenant.update({
         where: { id: tenantId },
         data: { active },
+        select: { active: true },
       })
     } catch {
       return null
     }
-    if (!active) {
+    // @en Revoke using persisted DB state (not raw request body) for session teardown (#222).
+    // @es Revocar según estado persistido en DB (no el body crudo) al cortar sesiones (#222).
+    // @pt-BR Revogar com estado persistido no DB (não o body cru) ao encerrar sessões (#222).
+    if (persisted.active === false) {
       await revokeAllTenantAuthTokens(this.prisma, tenantId)
     }
     return this.getTenantDetail(tenantId)
@@ -279,26 +284,31 @@ export class SuperadminTenantService {
     enabled: boolean,
     actor: { userId: number; ipAddress?: string | null },
   ): Promise<SuperadminTenantDetail | null> {
+    let persisted: { maintenanceMode: boolean }
     try {
-      await this.prisma.tenant.update({
+      persisted = await this.prisma.tenant.update({
         where: { id: tenantId },
         data: { maintenanceMode: enabled },
+        select: { maintenanceMode: true },
       })
     } catch {
       return null
     }
-    if (enabled) {
+    // @en Revoke using persisted DB state when maintenance is on (#222).
+    // @es Revocar según estado persistido cuando el mantenimiento está activo (#222).
+    // @pt-BR Revogar com estado persistido quando a manutenção está ativa (#222).
+    if (persisted.maintenanceMode === true) {
       await revokeAllTenantAuthTokens(this.prisma, tenantId)
     }
     await writeAuditEvent({
       prisma: this.prisma,
       tenantId,
       userId: actor.userId,
-      action: enabled ? 'incident_maintenance_on' : 'incident_maintenance_off',
+      action: persisted.maintenanceMode ? 'incident_maintenance_on' : 'incident_maintenance_off',
       resource: 'tenant',
       resourceId: String(tenantId),
       ipAddress: actor.ipAddress ?? null,
-      metadata: { maintenanceMode: enabled },
+      metadata: { maintenanceMode: persisted.maintenanceMode },
     })
     return this.getTenantDetail(tenantId)
   }
