@@ -5,6 +5,12 @@
     "activo": {
       "type": "boolean"
     },
+    "anonymizedAt": {
+      "description": "Set when customer PII was irreversibly anonymized (#195)",
+      "format": "date-time",
+      "nullable": true,
+      "type": "string"
+    },
     "balance": {
       "default": 0,
       "description": "Accumulated balance (incremented on each new factura).",

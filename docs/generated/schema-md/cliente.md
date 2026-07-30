@@ -19,6 +19,7 @@ undefined#/properties/data/anyOf/0
 | Property                          | Type      | Required | Nullable       | Defined by                                                                             |
 | :-------------------------------- | :-------- | :------- | :------------- | :------------------------------------------------------------------------------------- |
 | [activo](#activo)                 | `boolean` | Optional | cannot be null | [Cliente](cliente-properties-activo.md "undefined#/properties/activo")                 |
+| [anonymizedAt](#anonymizedat)     | `string`  | Optional | cannot be null | [Cliente](cliente-properties-anonymizedat.md "undefined#/properties/anonymizedAt")     |
 | [balance](#balance)               | `number`  | Optional | cannot be null | [Cliente](cliente-properties-balance.md "undefined#/properties/balance")               |
 | [balanceInicial](#balanceinicial) | `number`  | Optional | cannot be null | [Cliente](cliente-properties-balanceinicial.md "undefined#/properties/balanceInicial") |
 | [codigo](#codigo)                 | `integer` | Optional | cannot be null | [Cliente](cliente-properties-codigo.md "undefined#/properties/codigo")                 |
@@ -56,6 +57,28 @@ undefined#/properties/data/anyOf/0
 ### activo Type
 
 `boolean`
+
+## anonymizedAt
+
+Set when customer PII was irreversibly anonymized (#195)
+
+`anonymizedAt`
+
+* is optional
+
+* Type: `string`
+
+* cannot be null
+
+* defined in: [Cliente](cliente-properties-anonymizedat.md "undefined#/properties/anonymizedAt")
+
+### anonymizedAt Type
+
+`string`
+
+### anonymizedAt Constraints
+
+**date time**: the string must be a date time string, according to [RFC 3339, section 5.6](https://tools.ietf.org/html/rfc3339 "check the specification")
 
 ## balance
 

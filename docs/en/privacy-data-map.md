@@ -37,11 +37,14 @@ Core business tables remain in **PostgreSQL** under operator control. Enabling `
 
 Under Argentine Law 25.326 (Personal Data Protection), data subjects have the right to:
 
-- **Access:** Obtain information about stored data.
-- **Rectification:** Correct inaccurate data.
-- **Erasure:** Request deletion of data not required for legal obligations.
+- **Access:** Obtain information about stored data — via `GET /api/clientes/:id/exportar-datos` (owner / super_admin) or operator contact.
+- **Rectification:** Correct inaccurate data — via customer update (`PUT /api/clientes/:id`).
+- **Erasure:** Request deletion of data not required for legal obligations — via irreversible anonymization (`POST /api/clientes/:id/anonimizar`); fiscal documents are retained.
+- **Objection (marketing):** BizCode has no marketing engine; operators must not use customer data for campaigns without their own legal basis.
 
-To exercise these rights, the application operator must provide a contact mechanism.
+Public policy page: `/privacidad`. Operational detail: [privacy-and-data-subject-rights.md](quality/privacy-and-data-subject-rights.md).
+
+Commercial contact fields (email/phone) may be retained for up to **5 years** when no longer needed, or until anonymization. Fiscal records: **10 years**.
 
 ## Data Security
 

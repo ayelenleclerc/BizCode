@@ -100,10 +100,17 @@ export default function ClienteForm({ cliente, onClose, onGuardado }: ClienteFor
   const { t: tc } = useTranslation('common')
   const { claims } = useAuth()
   const canManageFinancials = claims?.role === 'owner' || claims?.role === 'manager'
+  const canPrivacyActions = claims?.role === 'owner' || claims?.role === 'super_admin'
+  const isAnonymized = Boolean(cliente?.anonymizedAt)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [zones, setZones] = useState<DeliveryZone[]>([])
   const [listasPrecios, setListasPrecios] = useState<ListaPrecioRow[]>([])
+  const [privacyConsent, setPrivacyConsent] = useState(false)
+  const [privacyBusy, setPrivacyBusy] = useState(false)
+  const [showAnonymizePanel, setShowAnonymizePanel] = useState(false)
+  const [anonymizeConfirm, setAnonymizeConfirm] = useState('')
+  const [privacyNotice, setPrivacyNotice] = useState<string | null>(null)
 
   const {
     register,
@@ -160,6 +167,12 @@ export default function ClienteForm({ cliente, onClose, onGuardado }: ClienteFor
     setError(null)
 
     try {
+      if (!cliente && !privacyConsent) {
+        setError(t('privacy.consentRequired'))
+        setLoading(false)
+        return
+      }
+
       if (data.cuit) {
         data.cuit = formatCUIT(data.cuit)
       }
@@ -176,6 +189,45 @@ export default function ClienteForm({ cliente, onClose, onGuardado }: ClienteFor
       setError((err as Error).message || t('form.errors.generic'))
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleExportDatos = async () => {
+    if (!cliente) return
+    setPrivacyBusy(true)
+    setPrivacyNotice(null)
+    setError(null)
+    try {
+      const blob = (await clientesAPI.exportarDatos(cliente.id, 'csv')) as Blob
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `cliente-${cliente.id}-datos.csv`
+      a.rel = 'noopener'
+      a.click()
+      URL.revokeObjectURL(url)
+      setPrivacyNotice(t('privacy.exportOk'))
+    } catch (err: unknown) {
+      setError((err as Error).message || t('form.errors.generic'))
+    } finally {
+      setPrivacyBusy(false)
+    }
+  }
+
+  const handleAnonymize = async () => {
+    if (!cliente) return
+    setPrivacyBusy(true)
+    setError(null)
+    try {
+      const result = await clientesAPI.anonimizar(cliente.id, anonymizeConfirm)
+      setShowAnonymizePanel(false)
+      setAnonymizeConfirm('')
+      setPrivacyNotice(t('privacy.anonymizeOk'))
+      onGuardado(result as Cliente)
+    } catch (err: unknown) {
+      setError((err as Error).message || t('form.errors.generic'))
+    } finally {
+      setPrivacyBusy(false)
     }
   }
 
@@ -206,6 +258,18 @@ export default function ClienteForm({ cliente, onClose, onGuardado }: ClienteFor
           {error && (
             <div role="alert" className="p-3 bg-red-100 dark:bg-red-900 text-red-900 dark:text-red-100 rounded border border-red-300 dark:border-red-700">
               {error}
+            </div>
+          )}
+
+          {privacyNotice && (
+            <div role="status" className="p-3 bg-green-100 dark:bg-green-900 text-green-900 dark:text-green-100 rounded border border-green-300 dark:border-green-700" data-testid="cliente-privacy-notice">
+              {privacyNotice}
+            </div>
+          )}
+
+          {isAnonymized && (
+            <div role="status" className="p-3 bg-amber-100 dark:bg-amber-900 text-amber-900 dark:text-amber-100 rounded border border-amber-300 dark:border-amber-700" data-testid="cliente-anonymized-banner">
+              {t('privacy.anonymizedBanner')}
             </div>
           )}
 
@@ -537,11 +601,95 @@ export default function ClienteForm({ cliente, onClose, onGuardado }: ClienteFor
             </div>
           )}
 
+          {!cliente && (
+            <div className="flex items-start gap-3 rounded border border-slate-200 p-3 dark:border-slate-600" data-testid="cliente-privacy-consent">
+              <input
+                id="cliente-privacy-consent"
+                type="checkbox"
+                checked={privacyConsent}
+                onChange={(e) => setPrivacyConsent(e.target.checked)}
+                className="mt-1 h-4 w-4 accent-blue-600"
+                data-testid="cliente-privacy-consent-input"
+              />
+              <label htmlFor="cliente-privacy-consent" className="text-sm text-slate-700 dark:text-slate-300">
+                {t('privacy.consentLabel')}{' '}
+                <a href="/privacidad" className="text-blue-700 underline dark:text-blue-400" target="_blank" rel="noreferrer">
+                  {t('privacy.privacyPageLink')}
+                </a>
+              </label>
+            </div>
+          )}
+
+          {cliente && canPrivacyActions && !isAnonymized && (
+            <div className="space-y-3 rounded border border-slate-200 p-4 dark:border-slate-600" data-testid="cliente-privacy-actions">
+              <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">{t('privacy.sectionTitle')}</h3>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  data-testid="cliente-privacy-export"
+                  disabled={privacyBusy}
+                  onClick={() => void handleExportDatos()}
+                  className="rounded bg-slate-700 px-3 py-2 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-60"
+                >
+                  {privacyBusy ? t('privacy.exporting') : t('privacy.export')}
+                </button>
+                <button
+                  type="button"
+                  data-testid="cliente-privacy-anonymize-open"
+                  disabled={privacyBusy}
+                  onClick={() => setShowAnonymizePanel(true)}
+                  className="rounded bg-red-700 px-3 py-2 text-sm font-medium text-white hover:bg-red-800 disabled:opacity-60"
+                >
+                  {t('privacy.anonymize')}
+                </button>
+              </div>
+              {showAnonymizePanel && (
+                <div className="space-y-2 rounded border border-red-300 bg-red-50 p-3 dark:border-red-700 dark:bg-red-950" data-testid="cliente-privacy-anonymize-panel">
+                  <p className="text-sm font-semibold text-red-900 dark:text-red-100">{t('privacy.anonymizeTitle')}</p>
+                  <p className="text-xs text-red-800 dark:text-red-200">{t('privacy.anonymizeHint')}</p>
+                  <label htmlFor="cliente-anonymize-confirm" className="block text-sm text-red-900 dark:text-red-100">
+                    {t('privacy.anonymizeConfirmLabel')}
+                  </label>
+                  <input
+                    id="cliente-anonymize-confirm"
+                    data-testid="cliente-anonymize-confirm"
+                    value={anonymizeConfirm}
+                    onChange={(e) => setAnonymizeConfirm(e.target.value)}
+                    className="w-full rounded border border-red-300 px-2 py-1 font-mono text-sm dark:border-red-700 dark:bg-slate-900"
+                    autoComplete="off"
+                  />
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      data-testid="cliente-anonymize-submit"
+                      disabled={privacyBusy || anonymizeConfirm !== 'ANONYMIZE'}
+                      onClick={() => void handleAnonymize()}
+                      className="rounded bg-red-700 px-3 py-2 text-sm font-medium text-white disabled:opacity-60"
+                    >
+                      {t('privacy.anonymizeSubmit')}
+                    </button>
+                    <button
+                      type="button"
+                      data-testid="cliente-anonymize-cancel"
+                      onClick={() => {
+                        setShowAnonymizePanel(false)
+                        setAnonymizeConfirm('')
+                      }}
+                      className="rounded border border-slate-300 px-3 py-2 text-sm dark:border-slate-600"
+                    >
+                      {t('privacy.anonymizeCancel')}
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
           <div className="flex gap-3 pt-6 border-t border-slate-200 dark:border-slate-600">
             <button
               type="submit"
               data-testid="btn-save-cliente"
-              disabled={loading}
+              disabled={loading || isAnonymized}
               className="flex-1 px-4 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-400 dark:disabled:bg-slate-600 text-white font-semibold rounded transition"
             >
               {loading ? tc('actions.saving') : `${tc('actions.save')} (F5)`}

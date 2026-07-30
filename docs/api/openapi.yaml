@@ -1180,6 +1180,100 @@ paths:
         '403':
           $ref: '#/components/responses/ForbiddenError'
 
+  /api/clientes/{id}/exportar-datos:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: format
+        in: query
+        required: false
+        description: Response format (`json` default, or `csv`)
+        schema:
+          type: string
+          enum: [json, csv]
+          default: json
+    get:
+      tags: [clientes]
+      summary: Export customer personal data package (Ley 25.326 / #195)
+      description: |
+        Returns the customer master record plus related invoice, collection, order, and receipt summaries.
+        Restricted to `owner` or `super_admin` with `customers.manage`.
+      responses:
+        '200':
+          description: JSON package or CSV attachment when format=csv
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [success, data]
+                properties:
+                  success:
+                    type: boolean
+                    enum: [true]
+                  data:
+                    type: object
+                    additionalProperties: true
+            text/csv:
+              schema:
+                type: string
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/clientes/{id}/anonimizar:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    post:
+      tags: [clientes]
+      summary: Irreversibly anonymize customer PII (#195)
+      description: |
+        Requires body `{ "confirm": "ANONYMIZE" }`. Scrubs PII on Cliente, sets activo=false, revokes portal sessions.
+        Fiscal documents remain. Restricted to `owner` or `super_admin` with `customers.manage`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [confirm]
+              properties:
+                confirm:
+                  type: string
+                  enum: [ANONYMIZE]
+      responses:
+        '200':
+          description: Anonymized customer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClienteEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '409':
+          $ref: '#/components/responses/ConflictError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
   /api/clientes/{id}/cuenta-corriente:
     parameters:
       - $ref: '#/components/parameters/BizcodeChannelHeader'
@@ -12726,6 +12820,11 @@ components:
           nullable: true
         activo:
           type: boolean
+        anonymizedAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: Set when customer PII was irreversibly anonymized (#195)
         creditLimit:
           type: number
           nullable: true

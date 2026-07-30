@@ -10,6 +10,8 @@ Versionamento: [Semantic Versioning](https://semver.org/).
 
 ### Adicionado
 
+- **Privacidade / direitos do titular (#195):** exportar e anonimizar cliente (owner/super_admin); `anonymizedAt`; `/privacidad` pública; consent UI na criação; evidência parcial PRV-001; docs quality trilingues. Registro AAIP a cargo do operador. Fora de escopo: consent onboarding SaaS (#180).
+
 - **Backup automático PostgreSQL (#150):** `pg_dump` (Docker exec ou CLI) → gzip → AES-256-GCM (`BACKUP_ENCRYPTION_KEY`); dir local `.bizcode-backups` com prune GFS 7/4/3; `aws s3 cp` opcional soft-fail; restore exige `--yes`; wrappers cron; evidência parcial SEC-007; docs quality trilingues. Fora de escopo: Restic, `@aws-sdk`, drill staging (#152).
 
 - **Monitoramento de segurança e alertas (#221):** taxonomia em `AuditEvent`; baseline geo; monitor 60s (força bruta, rajadas 403, eventos classificados); alertas in-app a `super_admin` + `SECURITY_ALERT_*`; API/UI timeline; evidência parcial SEC-011; docs trilingues.
