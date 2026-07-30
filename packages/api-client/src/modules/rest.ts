@@ -20,6 +20,7 @@ import type {
   SuperadminTenantCreateInput,
   SuperadminTenantDetail,
   SuperadminTenantListRow,
+  SuperadminSecurityEvent,
   TenantConfigApplyTemplateInput,
   TenantConfigDTO,
   TenantConfigHistoryData,
@@ -44,6 +45,7 @@ export type {
   SuperadminTenantDetail,
   SuperadminGlobalStats,
   SuperadminTenantCreateInput,
+  SuperadminSecurityEvent,
   TenantPricingData,
   TenantModuleTrialDTO,
   TenantModuleTrialActivateInput,
@@ -203,6 +205,24 @@ export const superadminAPI = {
         data: unknown[]
         total: number
       }>(`/superadmin/tenants/${tenantId}/audit-events`, { params })
+      return { data: response.data.data, total: response.data.total }
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  listSecurityEvents: async (params?: {
+    hours?: number
+    severity?: string
+    limit?: number
+    offset?: number
+  }): Promise<{ data: SuperadminSecurityEvent[]; total: number }> => {
+    try {
+      const response = await api.get<{
+        success: boolean
+        data: SuperadminSecurityEvent[]
+        total: number
+      }>('/superadmin/security-events', { params })
       return { data: response.data.data, total: response.data.total }
     } catch (error) {
       return handleError(error as AxiosError<ApiErrorPayload>)

@@ -26,6 +26,8 @@ export const NOTIFICATION_TYPES = [
   'precios_fx_actualizados',
   'loyalty_points_expiring',
   'lot_expiring',
+  'security_alert_critical',
+  'security_alert_high',
 ] as const
 
 export type NotificationType = (typeof NOTIFICATION_TYPES)[number]
@@ -64,6 +66,16 @@ export type NotificationPayload = {
   otNumero?: number
   loteId?: number
   nroLote?: string
+  /** @en Security alert fields (#221). @es Campos de alerta de seguridad (#221). @pt-BR Campos de alerta de segurança (#221). */
+  securityEventType?: string
+  severity?: string
+  sourceTenantId?: number
+  action?: string
+  resource?: string
+  resourceId?: string
+  ipAddress?: string
+  detail?: string
+  username?: string
 }
 
 /**

@@ -1906,6 +1906,10 @@ model AppUser {
   /// AES-GCM ciphertext of the TOTP shared secret (BIZCODE_MFA_ENCRYPTION_KEY).
   totpSecretEncrypted  String?   @db.Text
   mfaVerifiedAt        DateTime?
+  /// @en ISO country code from last successful login IP (security baseline #221).
+  /// @es Código ISO de país del último login exitoso (baseline de seguridad #221).
+  /// @pt-BR Código ISO do país do último login bem-sucedido (baseline de segurança #221).
+  lastLoginCountry     String?   @db.VarChar(8)
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
 
@@ -2648,9 +2652,41 @@ model AuditEvent {
   resourceId String?  @db.VarChar(120)
   ipAddress  String?  @db.VarChar(64)
   metadata   Json?
+  /// @en Security taxonomy label for monitoring rules (#221).
+  /// @es Etiqueta de taxonomía de seguridad para reglas de monitoreo (#221).
+  /// @pt-BR Rótulo de taxonomia de segurança para regras de monitoramento (#221).
+  securityEventType String? @db.VarChar(60)
+  /// @en Alert severity: critical | high | info (#221).
+  /// @es Severidad de alerta: critical | high | info (#221).
+  /// @pt-BR Severidade do alerta: critical | high | info (#221).
+  severity          String? @db.VarChar(20)
   createdAt  DateTime @default(now())
 
   @@index([tenantId, createdAt])
+  @@index([securityEventType, createdAt])
+  @@index([severity, createdAt])
+}
+
+/// @en Watermark for the security monitor poller (#221).
+/// @es Marca de agua del poller de monitoreo de seguridad (#221).
+/// @pt-BR Marca d'água do poller de monitoramento de segurança (#221).
+model SecurityMonitorCursor {
+  id               String   @id @db.VarChar(40)
+  lastAuditEventId Int      @default(0)
+  updatedAt        DateTime @updatedAt
+}
+
+/// @en Dedupes security alert firings by rule + subject (#221).
+/// @es Evita alertas duplicadas por regla + sujeto (#221).
+/// @pt-BR Evita alertas duplicadas por regra + sujeito (#221).
+model SecurityAlertDedupe {
+  id         Int      @id @default(autoincrement())
+  ruleKey    String   @db.VarChar(80)
+  subjectKey String   @db.VarChar(160)
+  firedAt    DateTime @default(now())
+
+  @@unique([ruleKey, subjectKey])
+  @@index([firedAt])
 }
 
 model Notification {

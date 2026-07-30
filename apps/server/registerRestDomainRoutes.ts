@@ -24,6 +24,7 @@ import { registerModulesCatalogRoute } from './routes/registerModulesCatalogRout
 import { registerSuperadminTenantConfigRoutes } from './routes/registerSuperadminTenantConfigRoutes'
 import { registerSuperadminTenantPricingTrialsRoutes } from './routes/registerSuperadminTenantPricingTrialsRoutes'
 import { registerSuperadminTenantsRoutes } from './routes/registerSuperadminTenantsRoutes'
+import { registerSuperadminSecurityRoutes } from './routes/registerSuperadminSecurityRoutes'
 import { registerProveedoresRoutes } from './routes/registerProveedoresRoutes'
 import { registerProveedorCuentaCorrienteRoutes } from './routes/registerProveedorCuentaCorrienteRoutes'
 import { registerClienteCuentaCorrienteRoutes } from './routes/registerClienteCuentaCorrienteRoutes'
@@ -155,6 +156,7 @@ export function registerRestDomainRoutes(app: Application, prisma: PrismaClient)
   registerMeFeaturesRoute(app, prisma)
   registerPlanRoutes(app, prisma)
   registerSuperadminTenantsRoutes(app, prisma)
+  registerSuperadminSecurityRoutes(app, prisma)
   registerSuperadminTenantConfigRoutes(app, prisma)
   registerSuperadminTenantPricingTrialsRoutes(app, prisma)
   registerSuperadminTenantPlanRoutes(app, prisma, ctx)

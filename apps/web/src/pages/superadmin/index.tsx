@@ -58,6 +58,15 @@ export default function SuperadminHomePage() {
       <header className="mb-6">
         <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100">{t('superadmin.title')}</h1>
         <p className="mt-1 text-slate-600 dark:text-slate-400">{t('superadmin.subtitle')}</p>
+        <p className="mt-3">
+          <Link
+            to="/superadmin/security"
+            className="text-blue-700 underline dark:text-blue-300"
+            data-testid="superadmin-security-link"
+          >
+            {t('superadmin.security.openTimeline')}
+          </Link>
+        </p>
       </header>
 
       {loading ? (

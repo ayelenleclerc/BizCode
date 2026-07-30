@@ -5,6 +5,7 @@ import { createApp } from './createApp'
 import { createTenantRlsPrisma } from './lib/tenantRls'
 import { logger } from './logger'
 import { initializeAppConfig } from './config/env'
+import { startSecurityMonitor, stopSecurityMonitor } from './security/securityMonitor'
 
 export const PORT = 3001
 
@@ -26,6 +27,8 @@ export function createServerInstance(
 export type BindHttpServerOptions = {
   /** When false, skips SIGINT handling (unit tests). Default: register listener. */
   registerSigint?: boolean
+  /** When false, skips security monitor (#221). Default: start monitor. */
+  startSecurityMonitor?: boolean
 }
 
 /**
@@ -42,8 +45,12 @@ export function bindHttpServer(
   const server = app.listen(port, () => {
     logger.info({ port }, 'API server listening')
   })
+  if (options?.startSecurityMonitor !== false) {
+    startSecurityMonitor(prisma)
+  }
   if (options?.registerSigint !== false) {
     process.once('SIGINT', async () => {
+      stopSecurityMonitor()
       await prisma.$disconnect()
       process.exit(0)
     })

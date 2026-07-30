@@ -152,7 +152,8 @@
     "saving": "Saving...",
     "new": "New",
     "search": "Search",
-    "retry": "Retry"
+    "retry": "Retry",
+    "refresh": "Refresh"
   },
   "status": {
     "loading": "Loading...",
@@ -370,6 +371,23 @@
         "disableFailed": "Could not disable tenant.",
         "maintenanceFailed": "Could not update maintenance mode.",
         "exportFailed": "Could not export audit events."
+      }
+    },
+    "security": {
+      "openTimeline": "Security events (last 24h)",
+      "title": "Security monitoring",
+      "subtitle": "Classified security events from the last 24 hours across tenants.",
+      "filterSeverity": "Severity filter",
+      "severityAll": "All severities",
+      "severityCritical": "Critical",
+      "severityHigh": "High",
+      "severityInfo": "Info",
+      "timelineLabel": "Security event timeline",
+      "empty": "No security events in the selected window.",
+      "total": "{{count}} event(s)",
+      "rowMeta": "Tenant {{tenant}} · {{action}} on {{resource}} · IP {{ip}}",
+      "errors": {
+        "loadFailed": "Could not load security events."
       }
     },
     "errors": {

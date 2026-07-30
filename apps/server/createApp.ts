@@ -19,6 +19,7 @@ import { errorHandler } from './middleware/errorHandler'
 import { observabilityMiddleware } from './middleware/observability'
 import { getSecurityHeadersMiddleware } from './middleware/securityHeaders'
 import { routeHttpRateLimiter } from './middleware/routeRateLimit'
+import { forbiddenBurstMiddleware } from './security/forbiddenBurstMiddleware'
 import { tenantContext } from './middleware/tenantContext'
 import { tenantRlsContext } from './middleware/tenantRlsContext'
 import { tenantModules } from './middleware/tenantModules'
@@ -128,6 +129,7 @@ export function createApp(prisma: PrismaClient): Application {
   app.use(resolveSession(prisma))
   // After session so authenticated vs anonymous keys work (#217).
   app.use(routeHttpRateLimiter)
+  app.use(forbiddenBurstMiddleware())
   app.use(tenantContext)
   app.use(tenantRlsContext)
   app.use(tenantModules(prisma))

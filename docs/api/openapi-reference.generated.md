@@ -1647,6 +1647,149 @@ Returns plan limits, enabled plan features, and current usage for the authentica
 }
 ```
 
+### Security events timeline for the last 24h (super admin) (#221)
+
+- **Method:** `GET`
+- **Path:** `/api/superadmin/security-events`
+- **Tags:** platform
+
+#### Responses
+
+##### Status: 200 Classified security audit events
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`action` (required)**
+
+    `string`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`ipAddress` (required)**
+
+    `string`
+
+  - **`resource` (required)**
+
+    `string`
+
+  - **`resourceId` (required)**
+
+    `string`
+
+  - **`securityEventType` (required)**
+
+    `string`
+
+  - **`severity` (required)**
+
+    `string`, possible values: `"critical", "high", "info"`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`tenantSlug` (required)**
+
+    `string`
+
+  - **`userId` (required)**
+
+    `integer`
+
+  - **`metadata`**
+
+    `object`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`total` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "tenantSlug": "",
+      "userId": 1,
+      "action": "",
+      "resource": "",
+      "resourceId": "",
+      "ipAddress": "",
+      "securityEventType": "",
+      "severity": "critical",
+      "metadata": {
+        "additionalProperty": "anything"
+      },
+      "createdAt": ""
+    }
+  ],
+  "total": 0
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ### List tenants (super admin)
 
 - **Method:** `GET`
@@ -110277,6 +110420,172 @@ Originating invoice header (selected columns)
   "inactiveTenants": 0,
   "facturasToday": 0,
   "totalUsers": 0
+}
+```
+
+### SuperadminSecurityEvent
+
+- **Type:**`object`
+
+* **`action` (required)**
+
+  `string`
+
+* **`createdAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`ipAddress` (required)**
+
+  `string`
+
+* **`resource` (required)**
+
+  `string`
+
+* **`resourceId` (required)**
+
+  `string`
+
+* **`securityEventType` (required)**
+
+  `string`
+
+* **`severity` (required)**
+
+  `string`, possible values: `"critical", "high", "info"`
+
+* **`tenantId` (required)**
+
+  `integer`
+
+* **`tenantSlug` (required)**
+
+  `string`
+
+* **`userId` (required)**
+
+  `integer`
+
+* **`metadata`**
+
+  `object`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "tenantId": 1,
+  "tenantSlug": "",
+  "userId": 1,
+  "action": "",
+  "resource": "",
+  "resourceId": "",
+  "ipAddress": "",
+  "securityEventType": "",
+  "severity": "critical",
+  "metadata": {
+    "additionalProperty": "anything"
+  },
+  "createdAt": ""
+}
+```
+
+### SuperadminSecurityEventsEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`action` (required)**
+
+    `string`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`ipAddress` (required)**
+
+    `string`
+
+  - **`resource` (required)**
+
+    `string`
+
+  - **`resourceId` (required)**
+
+    `string`
+
+  - **`securityEventType` (required)**
+
+    `string`
+
+  - **`severity` (required)**
+
+    `string`, possible values: `"critical", "high", "info"`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`tenantSlug` (required)**
+
+    `string`
+
+  - **`userId` (required)**
+
+    `integer`
+
+  - **`metadata`**
+
+    `object`
+
+* **`success` (required)**
+
+  `boolean`
+
+* **`total` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "tenantSlug": "",
+      "userId": 1,
+      "action": "",
+      "resource": "",
+      "resourceId": "",
+      "ipAddress": "",
+      "securityEventType": "",
+      "severity": "critical",
+      "metadata": {
+        "additionalProperty": "anything"
+      },
+      "createdAt": ""
+    }
+  ],
+  "total": 0
 }
 ```
 
