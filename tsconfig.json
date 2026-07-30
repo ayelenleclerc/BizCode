@@ -36,6 +36,10 @@
     "tests",
     "e2e",
     "playwright.config.ts",
-    "scripts/github/**/*.ts"
+    "scripts/github/**/*.ts",
+    "scripts/backup-postgres.ts",
+    "scripts/restore-postgres.ts",
+    "scripts/prune-postgres-backups.ts",
+    "scripts/lib/postgres-backup/**/*.ts"
   ]
 }

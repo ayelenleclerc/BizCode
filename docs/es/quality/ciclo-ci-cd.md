@@ -255,6 +255,7 @@ No forman parte del pipeline por defecto de GitHub Actions; prográmelos en el s
 | `*/5 * * * *` | `npm run arca:retry-pending-job` | Reintenta facturas con `estadoCae: pending` vía mock WSFE de homologación (`ArcaService.retryPending`) para cada tenant con `TenantFiscalConfig`. |
 | `0 * * * *` (cada hora) | `npm run cobranzas:recordatorios` | Recordatorios de mora para cada tenant con `ParamEmpresa`; envío a las **08:00 hora local** (minuto &lt; 15) dentro del horario comercial configurado. Usar `0 8 * * *` solo en despliegues mono-zona. |
 | `0 * * * *` (cada hora) | `npm run mercadopago:reconciliacion` | Reconciliación de pagos Mercado Pago para cada tenant con `MercadoPagoConfig` activo; ejecución a las **02:00 hora local** (minuto &lt; 15). Usar `0 2 * * *` solo en despliegues mono-zona. |
+| `0 2 * * *` (UTC) | `npm run backup:postgres` y luego `npm run backup:postgres:prune` | Backup PostgreSQL cifrado a `BIZCODE_BACKUP_DIR` (+ S3 CLI opcional). Requiere `BACKUP_ENCRYPTION_KEY`. Ver [backup-y-restauracion.md](backup-y-restauracion.md). |
 
 Variable opcional para un solo tenant en dev/staging: `BIZCODE_TENANT_ID=<id>` (aplica a `arca:retry-pending-job`, `arca:retry-pending`, `cobranzas:recordatorios` y `mercadopago:reconciliacion`). Opcional `BIZCODE_RECORDATORIO_CANAL` (por defecto `email`).
 

@@ -10,6 +10,8 @@ Versionamento: [Semantic Versioning](https://semver.org/).
 
 ### Adicionado
 
+- **Backup automático PostgreSQL (#150):** `pg_dump` (Docker exec ou CLI) → gzip → AES-256-GCM (`BACKUP_ENCRYPTION_KEY`); dir local `.bizcode-backups` com prune GFS 7/4/3; `aws s3 cp` opcional soft-fail; restore exige `--yes`; wrappers cron; evidência parcial SEC-007; docs quality trilingues. Fora de escopo: Restic, `@aws-sdk`, drill staging (#152).
+
 - **Monitoramento de segurança e alertas (#221):** taxonomia em `AuditEvent`; baseline geo; monitor 60s (força bruta, rajadas 403, eventos classificados); alertas in-app a `super_admin` + `SECURITY_ALERT_*`; API/UI timeline; evidência parcial SEC-011; docs trilingues.
 
 - **Resposta a incidentes de segurança (#222):** Runbook operacional trilingue; stubs SEC-008 apontam para o runbook; `Tenant.maintenanceMode`; APIs super-admin de revogar sessões, disable, maintenance e audit forense; UI no detalhe do tenant; bloqueio de auth em tenants inativos/manutenção.
