@@ -9,6 +9,7 @@ import ComprasPage from './pages/compras'
 import RecuentosPage from './pages/recuentos'
 import FacturacionPage from './pages/facturacion'
 import LoginPage from './pages/login'
+import PrivacyPage from './pages/privacidad'
 import UsersPage from './pages/users'
 import InicioPage from './pages/inicio'
 import LogisticaPage from './pages/logistica'
@@ -136,6 +137,7 @@ function AppRoutes() {
   return (
     <Routes>
       <Route path="/login" element={<LoginRoute />} />
+      <Route path="/privacidad" element={<PrivacyPage />} />
       <Route
         path="/portal/:tenantSlug"
         element={

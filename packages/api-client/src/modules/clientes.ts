@@ -197,6 +197,36 @@ export function createClientesAPI(http: AxiosInstance) {
         return handleError(error as AxiosError<ApiErrorPayload>)
       }
     },
+
+    /** @en Export customer personal-data package (#195). JSON object or CSV blob. */
+    exportarDatos: async (
+      id: number,
+      format: 'json' | 'csv' = 'json',
+    ): Promise<JsonRecord | Blob> => {
+      try {
+        if (format === 'csv') {
+          const response = await http.get<Blob>(`/clientes/${id}/exportar-datos`, {
+            params: { format: 'csv' },
+            responseType: 'blob',
+          })
+          return response.data
+        }
+        const response = await http.get(`/clientes/${id}/exportar-datos`)
+        return response.data.data as JsonRecord
+      } catch (error) {
+        return handleError(error as AxiosError<ApiErrorPayload>)
+      }
+    },
+
+    /** @en Irreversibly anonymize customer PII; confirm must be ANONYMIZE (#195). */
+    anonimizar: async (id: number, confirm: string = 'ANONYMIZE') => {
+      try {
+        const response = await http.post(`/clientes/${id}/anonimizar`, { confirm })
+        return response.data.data
+      } catch (error) {
+        handleError(error as AxiosError<ApiErrorPayload>)
+      }
+    },
   }
 }
 

@@ -21,6 +21,8 @@ export interface Cliente {
   suspended?: boolean
   deliveryZoneId?: number | null
   listaPrecioId?: number | null
+  /** @en Set when PII was irreversibly anonymized (#195). */
+  anonymizedAt?: string | Date | null
   createdAt: Date
   updatedAt: Date
 }

@@ -327,6 +327,16 @@ export default function LoginPage() {
               >
                 {isSubmitting ? t('auth.submitting') : t('auth.submit')}
               </button>
+
+              <p className="mt-4 text-center text-sm">
+                <a
+                  href="/privacidad"
+                  className="text-blue-700 underline dark:text-blue-400"
+                  data-testid="login-privacy-link"
+                >
+                  {t('auth.privacyLink')}
+                </a>
+              </p>
             </form>
           </>
         )}

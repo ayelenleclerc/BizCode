@@ -14,6 +14,7 @@ import {
   getTenantId,
   singleCsvUpload,
 } from './restDomainShared'
+import { exportDatosToCsv } from '../services/ClientePrivacyService'
 
 /**
  * @en Customer REST routes (`/api/clientes`, CSV import).
@@ -131,6 +132,81 @@ export function registerClientesRoutes(app: Application, ctx: RestRouteContext):
           return
         }
         await writeAudit(authReq, 'cliente_update', 'cliente', String(result.data.id))
+        res.json({ success: true, data: result.data })
+      } catch (err: unknown) {
+        res.status(500).json({ success: false, error: errorMessage(err) })
+      }
+    },
+  )
+
+  app.get(
+    '/api/clientes/:id/exportar-datos',
+    requirePermission('customers.manage'),
+    ownership,
+    async (req: Request, res: Response) => {
+      try {
+        const authReq = req as AuthenticatedRequest
+        const role = authReq.auth?.claims.role
+        if (role !== 'owner' && role !== 'super_admin') {
+          res.status(403).json({
+            success: false,
+            error: 'Only owner or super_admin can export customer personal data',
+          })
+          return
+        }
+        const tenantId = getTenantId(req)
+        const clienteId = parseInt(String(req.params.id), 10)
+        const result = await services.clientePrivacy.exportDatos(tenantId, clienteId)
+        if (!result.ok) {
+          res.status(result.status).json({ success: false, error: result.error })
+          return
+        }
+        await writeAudit(authReq, 'cliente_export_datos', 'cliente', String(clienteId))
+        const format = String(req.query.format ?? 'json').toLowerCase()
+        if (format === 'csv') {
+          const csv = exportDatosToCsv(result.data)
+          res.setHeader('Content-Type', 'text/csv; charset=utf-8')
+          res.setHeader(
+            'Content-Disposition',
+            `attachment; filename="cliente-${clienteId}-datos.csv"`,
+          )
+          res.status(200).send(csv)
+          return
+        }
+        res.json({ success: true, data: result.data })
+      } catch (err: unknown) {
+        res.status(500).json({ success: false, error: errorMessage(err) })
+      }
+    },
+  )
+
+  app.post(
+    '/api/clientes/:id/anonimizar',
+    requirePermission('customers.manage'),
+    ownership,
+    async (req: Request, res: Response) => {
+      try {
+        const authReq = req as AuthenticatedRequest
+        const role = authReq.auth?.claims.role
+        if (role !== 'owner' && role !== 'super_admin') {
+          res.status(403).json({
+            success: false,
+            error: 'Only owner or super_admin can anonymize customer personal data',
+          })
+          return
+        }
+        const tenantId = getTenantId(req)
+        const clienteId = parseInt(String(req.params.id), 10)
+        const confirm =
+          typeof req.body?.confirm === 'string' ? req.body.confirm : String(req.body?.confirm ?? '')
+        const result = await services.clientePrivacy.anonymize(tenantId, clienteId, confirm)
+        if (!result.ok) {
+          res.status(result.status).json({ success: false, error: result.error })
+          return
+        }
+        await writeAudit(authReq, 'cliente_anonymize', 'cliente', String(clienteId), {
+          anonymizedAt: result.data.anonymizedAt,
+        })
         res.json({ success: true, data: result.data })
       } catch (err: unknown) {
         res.status(500).json({ success: false, error: errorMessage(err) })

@@ -1,0 +1,18 @@
+{
+  "title": "Política de privacidad",
+  "intro": "BizCode procesa datos personales de clientes en el entorno del operador (escritorio o SaaS). Esta página resume el inventario documentado en el producto; no sustituye el registro ante la AAIP ni el asesoramiento legal del operador.",
+  "inventoryTitle": "Datos personales típicos",
+  "inventoryBody": "Razón social, CUIT, domicilio, teléfono y email del cliente; datos de entrega (POD) y muestras GPS del chofer cuando los módulos correspondientes están activos.",
+  "rightsTitle": "Derechos del titular (Ley 25.326)",
+  "rightsAccess": "Acceso: el owner o super_admin puede exportar el paquete de datos del cliente desde la ficha.",
+  "rightsRectification": "Rectificación: actualizar la ficha del cliente con permiso customers.manage.",
+  "rightsErasure": "Supresión / olvido: anonimización irreversible de PII en el maestro (conservando comprobantes fiscales).",
+  "rightsOpposition": "Oposición a usos de marketing: BizCode no incluye motor de marketing; el operador no debe usar estos datos para campañas sin base legal propia.",
+  "retentionTitle": "Retención",
+  "retentionBody": "Documentos fiscales: 10 años. Datos comerciales opcionales (email/teléfono): hasta solicitud de eliminación o anonimización. GPS: 7 días.",
+  "aaipTitle": "Registro AAIP",
+  "aaipBody": "La inscripción de bases de datos ante la Agencia de Acceso a la Información Pública es responsabilidad del operador. BizCode documenta el procedimiento; no inventa un número de registro.",
+  "contactTitle": "Ejercicio de derechos",
+  "contactBody": "Contactá al operador de tu instancia BizCode. En la aplicación, owner/super_admin usan Exportar datos y Anonimizar en la ficha del cliente.",
+  "backToLogin": "Volver al inicio de sesión"
+}

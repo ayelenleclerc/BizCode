@@ -81,6 +81,10 @@ model Cliente {
   listaPrecioId  Int?
   listaPrecio    ListaPrecio? @relation(fields: [listaPrecioId], references: [id])
   // ──────────────────────────────────────────────────────────────────────────
+  /// @en When set, customer PII was irreversibly anonymized (#195); fiscal rows remain.
+  /// @es Si está set, la PII del cliente fue anonimizada de forma irreversible (#195); filas fiscales permanecen.
+  /// @pt-BR Se definido, a PII do cliente foi anonimizada de forma irreversível (#195); linhas fiscais permanecem.
+  anonymizedAt   DateTime?
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 

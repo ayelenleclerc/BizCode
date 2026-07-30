@@ -164,5 +164,22 @@
       "tarjeta": "Cartão",
       "otro": "Outro"
     }
+  },
+  "privacy": {
+    "sectionTitle": "Privacidade e dados pessoais",
+    "consentLabel": "Confirmo que tenho base legal / consentimento para armazenar dados pessoais deste cliente (Lei 25.326).",
+    "consentRequired": "É necessário aceitar o tratamento de dados pessoais para criar o cliente.",
+    "anonymizedBanner": "Este cliente foi anonimizado; a PII não está mais disponível.",
+    "export": "Exportar dados",
+    "exporting": "Exportando…",
+    "exportOk": "Exportação baixada.",
+    "anonymize": "Anonimizar",
+    "anonymizeTitle": "Anonimizar dados pessoais",
+    "anonymizeHint": "Ação irreversível. Comprovantes fiscais são mantidos. Digite ANONYMIZE para confirmar.",
+    "anonymizeConfirmLabel": "Confirmação",
+    "anonymizeSubmit": "Confirmar anonimização",
+    "anonymizeCancel": "Cancelar",
+    "anonymizeOk": "Cliente anonimizado.",
+    "privacyPageLink": "Ver política de privacidade"
   }
 }

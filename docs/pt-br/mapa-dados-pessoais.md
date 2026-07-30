@@ -31,7 +31,14 @@ Códigos de produto, preços, totais de fatura e metadados operacionais de repar
 
 ## Direitos do titular (Lei 25.326 — Argentina)
 
-Acesso, retificação e exclusão quando não houver obrigação legal de manter os dados. O operador deve fornecer canal de contato.
+- **Acesso:** `GET /api/clientes/:id/exportar-datos` (owner / super_admin) ou contato do operador.
+- **Retificação:** `PUT /api/clientes/:id`.
+- **Exclusão:** anonimização irreversível `POST /api/clientes/:id/anonimizar` (comprovantes fiscais mantidos).
+- **Oposição (marketing):** o BizCode não inclui motor de marketing.
+
+Página pública: `/privacidad`. Detalhe: [privacidade-e-direitos-do-titular.md](quality/privacidade-e-direitos-do-titular.md).
+
+Contato comercial opcional: até **5 anos** ou anonimização. Registros fiscais: **10 anos**.
 
 ## Segurança
 

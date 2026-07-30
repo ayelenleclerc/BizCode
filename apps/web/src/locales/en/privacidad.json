@@ -1,0 +1,18 @@
+{
+  "title": "Privacy policy",
+  "intro": "BizCode processes customer personal data in the operator environment (desktop or SaaS). This page summarizes the product data inventory; it does not replace AAIP registration or the operator’s legal advice.",
+  "inventoryTitle": "Typical personal data",
+  "inventoryBody": "Customer legal name, tax ID, address, phone and email; delivery proof (POD) and driver GPS samples when the related modules are enabled.",
+  "rightsTitle": "Data subject rights (Ley 25.326 / GDPR-aligned)",
+  "rightsAccess": "Access: owner or super_admin can export the customer data package from the customer form.",
+  "rightsRectification": "Rectification: update the customer form with customers.manage.",
+  "rightsErasure": "Erasure: irreversible PII anonymization on the master record (fiscal documents are kept).",
+  "rightsOpposition": "Objection to marketing uses: BizCode has no marketing engine; operators must not use this data for campaigns without their own legal basis.",
+  "retentionTitle": "Retention",
+  "retentionBody": "Fiscal documents: 10 years. Optional commercial data (email/phone): until deletion request or anonymization. GPS: 7 days.",
+  "aaipTitle": "AAIP registration",
+  "aaipBody": "Database registration with Argentina’s AAIP is the operator’s responsibility. BizCode documents the procedure and does not invent a registration number.",
+  "contactTitle": "Exercising rights",
+  "contactBody": "Contact your BizCode instance operator. In the app, owner/super_admin use Export data and Anonymize on the customer form.",
+  "backToLogin": "Back to login"
+}

@@ -164,5 +164,22 @@
       "tarjeta": "Card",
       "otro": "Other"
     }
+  },
+  "privacy": {
+    "sectionTitle": "Privacy and personal data",
+    "consentLabel": "I confirm I have a lawful basis / consent to store this customer’s personal data (Ley 25.326).",
+    "consentRequired": "You must accept personal-data processing to create the customer.",
+    "anonymizedBanner": "This customer was anonymized; PII is no longer available.",
+    "export": "Export data",
+    "exporting": "Exporting…",
+    "exportOk": "Export downloaded.",
+    "anonymize": "Anonymize",
+    "anonymizeTitle": "Anonymize personal data",
+    "anonymizeHint": "Irreversible. Fiscal documents are kept. Type ANONYMIZE to confirm.",
+    "anonymizeConfirmLabel": "Confirmation",
+    "anonymizeSubmit": "Confirm anonymization",
+    "anonymizeCancel": "Cancel",
+    "anonymizeOk": "Customer anonymized.",
+    "privacyPageLink": "View privacy policy"
   }
 }

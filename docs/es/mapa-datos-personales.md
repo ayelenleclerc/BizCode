@@ -35,13 +35,16 @@ Los datos maestros permanecen en **PostgreSQL** bajo control del operador. `logi
 
 ## Derechos del Titular
 
-De conformidad con la Ley 25.326 (Protección de Datos Personales, Argentina), los titulares tienen derecho a:
+De conformidad con la Ley 25.326, los titulares tienen derecho a:
 
-- **Acceso**: Obtener información sobre los datos almacenados.
-- **Rectificación**: Corregir datos inexactos.
-- **Supresión**: Solicitar la eliminación de datos no necesarios para el cumplimiento de obligaciones legales.
+- **Acceso:** Obtener información sobre los datos almacenados — vía `GET /api/clientes/:id/exportar-datos` (owner / super_admin) o contacto del operador.
+- **Rectificación:** Corregir datos inexactos — vía actualización de ficha (`PUT /api/clientes/:id`).
+- **Supresión:** Solicitar eliminación de datos no necesarios — vía anonimización irreversible (`POST /api/clientes/:id/anonimizar`); se conservan comprobantes fiscales.
+- **Oposición (marketing):** BizCode no incluye motor de marketing; el operador no debe usar estos datos para campañas sin base legal propia.
 
-Para ejercer estos derechos, el operador de la aplicación debe proporcionar un mecanismo de contacto.
+Página pública: `/privacidad`. Detalle operativo: [privacidad-y-derechos-del-titular.md](quality/privacidad-y-derechos-del-titular.md).
+
+Contacto comercial opcional: hasta **5 años** o anonimización. Registros fiscales: **10 años**.
 
 ## Seguridad de los Datos
 

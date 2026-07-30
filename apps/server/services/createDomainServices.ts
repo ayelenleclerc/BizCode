@@ -48,6 +48,7 @@ import { FormulaProduccionService } from './FormulaProduccionService'
 import { OrdenProduccionService } from './OrdenProduccionService'
 import { FidelizacionService } from './FidelizacionService'
 import { LoteService } from './LoteService'
+import { ClientePrivacyService } from './ClientePrivacyService'
 
 export type DomainServices = {
   cliente: ClienteService
@@ -99,6 +100,7 @@ export type DomainServices = {
   ordenProduccion: OrdenProduccionService
   fidelizacion: FidelizacionService
   lotes: LoteService
+  clientePrivacy: ClientePrivacyService
 }
 
 /**
@@ -157,5 +159,6 @@ export function createDomainServices(prisma: PrismaClient): DomainServices {
     ordenProduccion: new OrdenProduccionService(prisma),
     fidelizacion: new FidelizacionService(prisma),
     lotes: new LoteService(prisma),
+    clientePrivacy: new ClientePrivacyService(prisma),
   }
 }

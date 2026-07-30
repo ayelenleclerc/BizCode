@@ -4682,6 +4682,10 @@ Returns plan limits, enabled plan features, and current usage for the authentica
 
     `boolean`
 
+  - **`anonymizedAt`**
+
+    `string`, format: `date-time` — Set when customer PII was irreversibly anonymized (#195)
+
   - **`balance`**
 
     `number`, default: `0` — Accumulated balance (incremented on each new factura).
@@ -4789,6 +4793,7 @@ Returns plan limits, enabled plan features, and current usage for the authentica
       "telef": "",
       "email": "",
       "activo": true,
+      "anonymizedAt": "",
       "creditLimit": 1,
       "creditDays": 0,
       "balance": 0,
@@ -4974,6 +4979,10 @@ Returns plan limits, enabled plan features, and current usage for the authentica
 
     `boolean`
 
+  - **`anonymizedAt`**
+
+    `string`, format: `date-time` — Set when customer PII was irreversibly anonymized (#195)
+
   - **`balance`**
 
     `number`, default: `0` — Accumulated balance (incremented on each new factura).
@@ -5068,6 +5077,7 @@ Returns plan limits, enabled plan features, and current usage for the authentica
     "telef": "",
     "email": "",
     "activo": true,
+    "anonymizedAt": "",
     "creditLimit": 1,
     "creditDays": 0,
     "balance": 0,
@@ -5444,6 +5454,7 @@ Returns plan limits, enabled plan features, and current usage for the authentica
     "telef": "",
     "email": "",
     "activo": true,
+    "anonymizedAt": "",
     "creditLimit": 1,
     "creditDays": 0,
     "balance": 0,
@@ -5625,6 +5636,10 @@ Returns plan limits, enabled plan features, and current usage for the authentica
 
     `boolean`
 
+  - **`anonymizedAt`**
+
+    `string`, format: `date-time` — Set when customer PII was irreversibly anonymized (#195)
+
   - **`balance`**
 
     `number`, default: `0` — Accumulated balance (incremented on each new factura).
@@ -5719,6 +5734,7 @@ Returns plan limits, enabled plan features, and current usage for the authentica
     "telef": "",
     "email": "",
     "activo": true,
+    "anonymizedAt": "",
     "creditLimit": 1,
     "creditDays": 0,
     "balance": 0,
@@ -5774,6 +5790,418 @@ Returns plan limits, enabled plan features, and current usage for the authentica
 ```
 
 ##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/clientes/{id}/exportar-datos
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/clientes/{id}/exportar-datos`
+
+### Export customer personal data package (Ley 25.326 /
+
+- **Method:** `GET`
+- **Path:** `/api/clientes/{id}/exportar-datos`
+- **Tags:** clientes
+
+Returns the customer master record plus related invoice, collection, order, and receipt summaries. Restricted to `owner` or `super_admin` with `customers.manage`.
+
+#### Responses
+
+##### Status: 200 JSON package or CSV attachment when format=csv
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+- **`success` (required)**
+
+  `boolean`, possible values: `true`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "additionalProperty": "anything"
+  }
+}
+```
+
+###### Content-Type: text/csv
+
+`string`
+
+**Example:**
+
+```json
+true
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/clientes/{id}/anonimizar
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/clientes/{id}/anonimizar`
+
+### Irreversibly anonymize customer PII (#195)
+
+- **Method:** `POST`
+- **Path:** `/api/clientes/{id}/anonimizar`
+- **Tags:** clientes
+
+Requires body `{ "confirm": "ANONYMIZE" }`. Scrubs PII on Cliente, sets activo=false, revokes portal sessions. Fiscal documents remain. Restricted to `owner` or `super_admin` with `customers.manage`.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`confirm` (required)**
+
+  `string`, possible values: `"ANONYMIZE"`
+
+**Example:**
+
+```json
+{
+  "confirm": "ANONYMIZE"
+}
+```
+
+#### Responses
+
+##### Status: 200 Anonymized customer
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`activo`**
+
+    `boolean`
+
+  - **`anonymizedAt`**
+
+    `string`, format: `date-time` — Set when customer PII was irreversibly anonymized (#195)
+
+  - **`balance`**
+
+    `number`, default: `0` — Accumulated balance (incremented on each new factura).
+
+  - **`balanceInicial`**
+
+    `number`, default: `0` — Opening balance at migration time.
+
+  - **`codigo`**
+
+    `integer`
+
+  - **`condIva`**
+
+    `string`
+
+  - **`cpost`**
+
+    `string`
+
+  - **`creditDays`**
+
+    `integer`, default: `0` — Usual credit days for this customer.
+
+  - **`creditLimit`**
+
+    `number` — Credit limit in ARS. null = no limit.
+
+  - **`cuit`**
+
+    `string`
+
+  - **`deliveryZoneId`**
+
+    `integer` — FK to DeliveryZone. Assign a delivery zone to this customer.
+
+  - **`domicilio`**
+
+    `string`
+
+  - **`email`**
+
+    `string`
+
+  - **`fantasia`**
+
+    `string`
+
+  - **`id`**
+
+    `integer`
+
+  - **`localidad`**
+
+    `string`
+
+  - **`rsocial`**
+
+    `string`
+
+  - **`score`**
+
+    `integer`, default: `50` — Payment score 0-100 (50=neutral, 0=high risk, 100=perfect).
+
+  - **`suspended`**
+
+    `boolean`, default: `false` — When true, POST /api/facturas returns 422 CLIENT\_SUSPENDED.
+
+  - **`telef`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "codigo": 1,
+    "rsocial": "",
+    "fantasia": "",
+    "cuit": "",
+    "condIva": "",
+    "domicilio": "",
+    "localidad": "",
+    "cpost": "",
+    "telef": "",
+    "email": "",
+    "activo": true,
+    "anonymizedAt": "",
+    "creditLimit": 1,
+    "creditDays": 0,
+    "balance": 0,
+    "balanceInicial": 0,
+    "score": 50,
+    "suspended": false,
+    "deliveryZoneId": 1,
+    "additionalProperty": "anything"
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 409 Resource conflict
 
 ###### Content-Type: application/json
 
@@ -76521,6 +76949,10 @@ Rate-limited mutation; requires products.manage. USD only.
 
   `boolean`
 
+* **`anonymizedAt`**
+
+  `string`, format: `date-time` — Set when customer PII was irreversibly anonymized (#195)
+
 * **`balance`**
 
   `number`, default: `0` — Accumulated balance (incremented on each new factura).
@@ -76609,6 +77041,7 @@ Rate-limited mutation; requires products.manage. USD only.
   "telef": "",
   "email": "",
   "activo": true,
+  "anonymizedAt": "",
   "creditLimit": 1,
   "creditDays": 0,
   "balance": 0,
@@ -76874,6 +77307,10 @@ Rate-limited mutation; requires products.manage. USD only.
 
     `boolean`
 
+  - **`anonymizedAt`**
+
+    `string`, format: `date-time` — Set when customer PII was irreversibly anonymized (#195)
+
   - **`balance`**
 
     `number`, default: `0` — Accumulated balance (incremented on each new factura).
@@ -76968,6 +77405,7 @@ Rate-limited mutation; requires products.manage. USD only.
     "telef": "",
     "email": "",
     "activo": true,
+    "anonymizedAt": "",
     "creditLimit": 1,
     "creditDays": 0,
     "balance": 0,
@@ -77010,6 +77448,7 @@ Rate-limited mutation; requires products.manage. USD only.
     "telef": "",
     "email": "",
     "activo": true,
+    "anonymizedAt": "",
     "creditLimit": 1,
     "creditDays": 0,
     "balance": 0,
