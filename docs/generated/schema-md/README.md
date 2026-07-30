@@ -1008,6 +1008,10 @@
 
 * [SuperadminGlobalStatsEnvelope](./superadminglobalstatsenvelope.md) – `-`
 
+* [SuperadminSecurityEvent](./superadminsecurityevent.md) – `-`
+
+* [SuperadminSecurityEventsEnvelope](./superadminsecurityeventsenvelope.md) – `-`
+
 * [SuperadminTenantCreateEnvelope](./superadmintenantcreateenvelope.md) – `-`
 
 * [SuperadminTenantCreateInput](./superadmintenantcreateinput.md) – `-`
@@ -1368,6 +1372,8 @@
 
 * [Untitled object in StockAjusteListEnvelope](./stockajustelistenvelope-allof-0.md) – `undefined#/allOf/0`
 
+* [Untitled object in SuperadminSecurityEvent](./superadminsecurityevent-properties-metadata.md) – `undefined#/properties/metadata`
+
 * [Untitled object in TenantConfigHistoryEntry](./tenantconfighistoryentry-properties-after.md) – `undefined#/properties/after`
 
 * [Untitled object in TenantConfigHistoryEntry](./tenantconfighistoryentry-properties-before.md) – `undefined#/properties/before`
@@ -1727,6 +1733,8 @@
 * [Untitled array in StockAjusteListEnvelope](./stockajustelistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
 
 * [Untitled array in StockCriticoListEnvelope](./stockcriticolistenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled array in SuperadminSecurityEventsEnvelope](./superadminsecurityeventsenvelope-properties-data.md) – `undefined#/properties/data`
 
 * [Untitled array in SuperadminTenantListEnvelope](./superadmintenantlistenvelope-properties-data.md) – `undefined#/properties/data`
 

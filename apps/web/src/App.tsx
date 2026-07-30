@@ -59,6 +59,7 @@ import SuperAdminRoute from './components/SuperAdminRoute'
 import SuperadminHomePage from './pages/superadmin'
 import TenantDetailPage from './pages/superadmin/TenantDetailPage'
 import TenantModulesPage from './pages/superadmin/TenantModulesPage'
+import SecurityEventsPage from './pages/superadmin/SecurityEventsPage'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
 import { FeatureFlagsProvider, FeatureFlagsGate } from './contexts/FeatureFlagsContext'
 import { PlanProvider } from './contexts/PlanContext'
@@ -430,6 +431,7 @@ function AppRoutes() {
           />
           <Route element={<SuperAdminRoute />}>
             <Route path="superadmin" element={<SuperadminHomePage />} />
+            <Route path="superadmin/security" element={<SecurityEventsPage />} />
             <Route path="superadmin/tenants/:tenantId" element={<TenantDetailPage />} />
             <Route path="superadmin/tenants/:tenantId/modules" element={<TenantModulesPage />} />
           </Route>

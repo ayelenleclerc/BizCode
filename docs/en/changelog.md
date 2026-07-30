@@ -10,6 +10,8 @@ Versioning: [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **Security monitoring and alerts (#221):** `AuditEvent.securityEventType`/`severity`; geo baseline `AppUser.lastLoginCountry`; 60s security monitor (brute force, 403 bursts, classified events); in-app alerts to `super_admin` + `SECURITY_ALERT_EMAILS`/`PHONES` (+ optional Slack); `GET /api/superadmin/security-events` and UI `/superadmin/security`; SEC-011 partial evidence; trilingual quality docs.
+
 - **Security incident response (#222):** Trilingual operational runbook (`docs/*/quality/` incident-response); SEC-008 stubs link to it; Prisma `Tenant.maintenanceMode`; super-admin APIs `POST .../revoke-all-sessions`, `POST .../disable`, `POST .../maintenance`, `GET .../audit-events`; UI incident tools on tenant detail; session resolve blocks inactive/maintenance tenants; login returns `503 TENANT_MAINTENANCE`.
 
 - **Dependency scanning (#219):** Dependabot (weekly npm + GitHub Actions); blocking `pnpm audit --audit-level=high`; Snyk CI (`SNYK_TOKEN`, fail on HIGH+ with fix); Trivy CRITICAL scan on Docker images before GHCR push; ADR-0017 + trilingual triage guide; Snyk README badge; dependency bumps/`pnpm.overrides` for HIGH/CRITICAL with documented `CVE-2026-14257` audit ignore (review 2026-10-28). Out of scope: Socket.dev, Renovate, mobile hardening (#220).

@@ -55,4 +55,8 @@ O app Express usa **`cors`** com **`credentials: true`** para o navegador enviar
 
 Runbook operacional (classificação, runbooks, notas legais, post-mortem): [Resposta a incidentes](quality/resposta-a-incidentes.md). Ferramentas super-admin: revogar sessões do tenant, desabilitar tenant, modo manutenção, listagem forense de auditoria.
 
+## Monitoramento de segurança (#221)
+
+Classificação assíncrona e alertas para operadores da plataforma: [Monitoramento de segurança](quality/monitoramento-de-seguranca.md). Timeline UI `/superadmin/security`; API `GET /api/superadmin/security-events`. Stub ISO: [SEC-011](certificacion-iso/sec/sec-011-logs-alertas.md).
+
 **Outros idiomas:** [English](../en/security.md) · [Español](../es/seguridad.md)

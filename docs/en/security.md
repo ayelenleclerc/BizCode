@@ -56,3 +56,7 @@ The Express app enables **`cors`** with **`credentials: true`** so the browser c
 ## Incident response (#222)
 
 Operational runbook (classification, runbooks, legal notes, post-mortem): [Incident response](quality/incident-response.md). Super-admin tools: revoke tenant sessions, disable tenant, maintenance mode, forensic audit listing.
+
+## Security monitoring (#221)
+
+Async classification and alerts for platform operators: [Security monitoring](quality/security-monitoring.md). Timeline UI `/superadmin/security`; API `GET /api/superadmin/security-events`. Related ISO stub: [SEC-011](certificacion-iso/sec/sec-011-log-monitoring-alerting-procedure.md).

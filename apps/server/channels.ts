@@ -212,6 +212,20 @@ function buildMessage(type: NotificationType, payload: NotificationPayload): Mes
         text: `Lote ${nro} de ${art} vence en ${days} días${payload.expiresAt ? ` (${payload.expiresAt})` : ''}${stockPart}.`,
       }
     }
+    case 'security_alert_critical':
+    case 'security_alert_high': {
+      const sev = payload.severity ?? (type === 'security_alert_critical' ? 'critical' : 'high')
+      const evt = payload.securityEventType ?? 'security_event'
+      const tenantPart =
+        payload.sourceTenantId != null ? ` tenant=${payload.sourceTenantId}` : ''
+      const userPart = payload.username ? ` user=${payload.username}` : ''
+      const ipPart = payload.ipAddress ? ` ip=${payload.ipAddress}` : ''
+      const detail = payload.detail ? `\n${payload.detail}` : ''
+      return {
+        subject: `[BizCode][${sev.toUpperCase()}] Security alert — ${evt}`,
+        text: `Security event ${evt} (${sev})${tenantPart}${userPart}${ipPart}.${detail}`,
+      }
+    }
   }
 }
 
@@ -298,6 +312,47 @@ async function sendWhatsApp(
       { err: err instanceof Error ? { name: err.name, message: err.message } : String(err) },
       '[channels] Twilio send failed',
     )
+  }
+}
+
+function parseCsvEnv(name: string): string[] {
+  const raw = process.env[name]?.trim()
+  if (!raw) return []
+  return raw
+    .split(',')
+    .map((s) => s.trim())
+    .filter((s) => s.length > 0)
+}
+
+/**
+ * @en Sends security alert email/WhatsApp using SECURITY_ALERT_* env recipients (#221). Soft-fails without config.
+ * @es Envía alerta de seguridad por email/WhatsApp con destinatarios SECURITY_ALERT_* (#221). Soft-fail sin config.
+ * @pt-BR Envia alerta de segurança por email/WhatsApp com destinatários SECURITY_ALERT_* (#221). Soft-fail sem config.
+ */
+export async function dispatchSecurityAlertChannels(
+  type: NotificationType,
+  payload: NotificationPayload,
+): Promise<void> {
+  const msg = buildMessage(type, payload)
+  const emails = parseCsvEnv('SECURITY_ALERT_EMAILS')
+  const phones = parseCsvEnv('SECURITY_ALERT_PHONES')
+  void sendEmail(emails, msg.subject, msg.text)
+  void sendWhatsApp(phones, `${msg.subject}\n\n${msg.text}`)
+
+  const slackWebhook = process.env.SECURITY_ALERT_SLACK_WEBHOOK?.trim()
+  if (slackWebhook) {
+    try {
+      await fetch(slackWebhook, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ text: `${msg.subject}\n${msg.text}` }),
+      })
+    } catch (err) {
+      logger.warn(
+        { err: err instanceof Error ? { name: err.name, message: err.message } : String(err) },
+        '[channels] Slack security webhook failed',
+      )
+    }
   }
 }
 

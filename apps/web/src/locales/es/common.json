@@ -152,7 +152,8 @@
     "saving": "Guardando...",
     "new": "Nuevo",
     "search": "Buscar",
-    "retry": "Reintentar"
+    "retry": "Reintentar",
+    "refresh": "Actualizar"
   },
   "status": {
     "loading": "Cargando...",
@@ -370,6 +371,23 @@
         "disableFailed": "No se pudo deshabilitar el tenant.",
         "maintenanceFailed": "No se pudo actualizar el modo mantenimiento.",
         "exportFailed": "No se pudo exportar la auditoría."
+      }
+    },
+    "security": {
+      "openTimeline": "Eventos de seguridad (últimas 24h)",
+      "title": "Monitoreo de seguridad",
+      "subtitle": "Eventos de seguridad clasificados de las últimas 24 horas en todos los tenants.",
+      "filterSeverity": "Filtro de severidad",
+      "severityAll": "Todas las severidades",
+      "severityCritical": "Crítica",
+      "severityHigh": "Alta",
+      "severityInfo": "Informativa",
+      "timelineLabel": "Línea de tiempo de eventos de seguridad",
+      "empty": "No hay eventos de seguridad en la ventana seleccionada.",
+      "total": "{{count}} evento(s)",
+      "rowMeta": "Tenant {{tenant}} · {{action}} en {{resource}} · IP {{ip}}",
+      "errors": {
+        "loadFailed": "No se pudieron cargar los eventos de seguridad."
       }
     },
     "errors": {

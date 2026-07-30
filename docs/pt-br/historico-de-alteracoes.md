@@ -10,6 +10,8 @@ Versionamento: [Semantic Versioning](https://semver.org/).
 
 ### Adicionado
 
+- **Monitoramento de segurança e alertas (#221):** taxonomia em `AuditEvent`; baseline geo; monitor 60s (força bruta, rajadas 403, eventos classificados); alertas in-app a `super_admin` + `SECURITY_ALERT_*`; API/UI timeline; evidência parcial SEC-011; docs trilingues.
+
 - **Resposta a incidentes de segurança (#222):** Runbook operacional trilingue; stubs SEC-008 apontam para o runbook; `Tenant.maintenanceMode`; APIs super-admin de revogar sessões, disable, maintenance e audit forense; UI no detalhe do tenant; bloqueio de auth em tenants inativos/manutenção.
 
 - **Varredura de dependências (#219):** Dependabot (npm + GitHub Actions semanal); `pnpm audit --audit-level=high` bloqueante; Snyk no CI (`SNYK_TOKEN`, falha HIGH+ com fix); Trivy CRITICAL em imagens Docker antes do GHCR; ADR-0017 + guia de triagem trilingue; badge Snyk no README; bumps/`pnpm.overrides` e ignore documentado de `CVE-2026-14257` (revisão 2026-10-28). Fora de escopo: Socket.dev, Renovate, hardening mobile (#220).

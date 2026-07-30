@@ -463,6 +463,55 @@ paths:
         '403':
           $ref: '#/components/responses/ForbiddenError'
 
+  /api/superadmin/security-events:
+    get:
+      tags: [platform]
+      summary: Security events timeline for the last 24h (super admin) (#221)
+      parameters:
+        - $ref: '#/components/parameters/XRequestId'
+        - name: hours
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 168
+            default: 24
+          description: Lookback window in hours (default 24, max 168)
+        - name: severity
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [critical, high, info]
+          description: Optional severity filter
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 500
+            default: 100
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+      responses:
+        '200':
+          description: Classified security audit events
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuperadminSecurityEventsEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
   /api/superadmin/tenants:
     get:
       tags: [platform]
@@ -22624,6 +22673,69 @@ components:
           type: integer
           minimum: 0
         totalUsers:
+          type: integer
+          minimum: 0
+
+    SuperadminSecurityEvent:
+      type: object
+      required:
+        - id
+        - tenantId
+        - tenantSlug
+        - userId
+        - action
+        - resource
+        - resourceId
+        - ipAddress
+        - securityEventType
+        - severity
+        - createdAt
+      properties:
+        id:
+          type: integer
+        tenantId:
+          type: integer
+        tenantSlug:
+          type: string
+          nullable: true
+        userId:
+          type: integer
+          nullable: true
+        action:
+          type: string
+        resource:
+          type: string
+        resourceId:
+          type: string
+          nullable: true
+        ipAddress:
+          type: string
+          nullable: true
+        securityEventType:
+          type: string
+        severity:
+          type: string
+          enum: [critical, high, info]
+        metadata:
+          type: object
+          additionalProperties: true
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+
+    SuperadminSecurityEventsEnvelope:
+      type: object
+      required: [success, data, total]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/SuperadminSecurityEvent'
+        total:
           type: integer
           minimum: 0
 

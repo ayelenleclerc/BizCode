@@ -18,6 +18,7 @@ import {
 } from '@bizcode/types'
 import { hashPassword, verifyPassword } from './passwordHash'
 import { writeAuditEvent } from './audit'
+import { applyLoginGeoBaseline } from './security/loginGeoBaseline'
 import { NEW_TENANT_MODULES } from '@bizcode/types'
 import {
   ACCESS_COOKIE_NAME,
@@ -51,7 +52,7 @@ import {
 export { revokeAllUserAuthTokens } from './lib/sessionTokens'
 
 const LOGIN_WINDOW_MS = 15 * 60 * 1000 // 15 minutes
-const LOGIN_MAX_FAILURES = 5 // consecutive failures before lockout
+export const LOGIN_MAX_FAILURES = 5 // consecutive failures before lockout
 
 export type RequestAuthContext = {
   claims: AuthClaims
@@ -545,6 +546,12 @@ export function registerAuthRoutes(app: import('express').Application, prisma: P
       ipAddress: req.ip,
     })
     setAuthCookies(res, pair.accessToken, pair.refreshToken, pair.refreshTtlMs)
+    const geo = await applyLoginGeoBaseline(
+      prisma,
+      user.id,
+      req.ip,
+      user.lastLoginCountry ?? null,
+    )
     await writeAuditEvent({
       prisma,
       tenantId: user.tenantId,
@@ -553,7 +560,13 @@ export function registerAuthRoutes(app: import('express').Application, prisma: P
       resource: 'session',
       resourceId: String(pair.accessSessionId),
       ipAddress: req.ip,
-      metadata: { tokenFamily: pair.tokenFamily, rememberMe },
+      metadata: {
+        tokenFamily: pair.tokenFamily,
+        rememberMe,
+        country: geo.country,
+        previousCountry: geo.previousCountry,
+        geoAnomaly: geo.geoAnomaly,
+      },
     })
     res.json({
       success: true,
@@ -639,6 +652,12 @@ export function registerAuthRoutes(app: import('express').Application, prisma: P
       ipAddress: req.ip,
     })
     setAuthCookies(res, pair.accessToken, pair.refreshToken, pair.refreshTtlMs)
+    const geo = await applyLoginGeoBaseline(
+      prisma,
+      user.id,
+      req.ip,
+      user.lastLoginCountry ?? null,
+    )
     await writeAuditEvent({
       prisma,
       tenantId: user.tenantId,
@@ -651,6 +670,9 @@ export function registerAuthRoutes(app: import('express').Application, prisma: P
         tokenFamily: pair.tokenFamily,
         rememberMe: challenge.rememberMe,
         method: usedBackupCodeId != null ? 'backup' : 'totp',
+        country: geo.country,
+        previousCountry: geo.previousCountry,
+        geoAnomaly: geo.geoAnomaly,
       },
     })
     res.json({
@@ -849,6 +871,7 @@ export function registerAuthRoutes(app: import('express').Application, prisma: P
       resource: 'user',
       resourceId: String(user.id),
       ipAddress: req.ip,
+      metadata: { role: String(user.role) },
     })
 
     res.json({ success: true, data: { mfaEnabled: false } })

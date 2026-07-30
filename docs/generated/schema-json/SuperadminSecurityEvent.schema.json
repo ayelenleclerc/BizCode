@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "action": {
+      "type": "string"
+    },
+    "createdAt": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "id": {
+      "type": "integer"
+    },
+    "ipAddress": {
+      "nullable": true,
+      "type": "string"
+    },
+    "metadata": {
+      "additionalProperties": true,
+      "nullable": true,
+      "type": "object"
+    },
+    "resource": {
+      "type": "string"
+    },
+    "resourceId": {
+      "nullable": true,
+      "type": "string"
+    },
+    "securityEventType": {
+      "type": "string"
+    },
+    "severity": {
+      "enum": [
+        "critical",
+        "high",
+        "info"
+      ],
+      "type": "string"
+    },
+    "tenantId": {
+      "type": "integer"
+    },
+    "tenantSlug": {
+      "nullable": true,
+      "type": "string"
+    },
+    "userId": {
+      "nullable": true,
+      "type": "integer"
+    }
+  },
+  "required": [
+    "id",
+    "tenantId",
+    "tenantSlug",
+    "userId",
+    "action",
+    "resource",
+    "resourceId",
+    "ipAddress",
+    "securityEventType",
+    "severity",
+    "createdAt"
+  ],
+  "title": "SuperadminSecurityEvent",
+  "type": "object"
+}

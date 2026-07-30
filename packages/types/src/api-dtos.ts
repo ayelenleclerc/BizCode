@@ -64,6 +64,22 @@ export type SuperadminGlobalStats = {
   totalUsers: number
 }
 
+/** Security monitoring timeline row for super_admin (#221). */
+export type SuperadminSecurityEvent = {
+  id: number
+  tenantId: number
+  tenantSlug: string | null
+  userId: number | null
+  action: string
+  resource: string
+  resourceId: string | null
+  ipAddress: string | null
+  securityEventType: string
+  severity: string
+  metadata: unknown
+  createdAt: string
+}
+
 export type SuperadminTenantCreateInput = {
   name: string
   slug: string

@@ -163,6 +163,10 @@ export function registerUserRoutes(app: Application, prisma: PrismaClient): void
         resource: 'user',
         resourceId: String(user.id),
         ipAddress: authReq.ip,
+        metadata: {
+          role: user.role,
+          username: user.username,
+        },
       })
       res.status(201).json({ success: true, data: user })
     } catch (err: unknown) {
@@ -248,6 +252,12 @@ export function registerUserRoutes(app: Application, prisma: PrismaClient): void
         resource: 'user',
         resourceId: String(user.id),
         ipAddress: authReq.ip,
+        metadata: {
+          previousRole: existing.role,
+          role: user.role,
+          active: user.active,
+          roleChanged: updateData.role !== undefined && updateData.role !== existing.role,
+        },
       })
       res.json({ success: true, data: user })
     } catch (err: unknown) {
@@ -379,6 +389,7 @@ export function registerUserRoutes(app: Application, prisma: PrismaClient): void
         resource: 'user',
         resourceId: String(targetId),
         ipAddress: authReq.ip,
+        metadata: { role: String(target.role), targetUserId: targetId },
       })
       res.json({ success: true, data: { mfaEnabled: false } })
     },
