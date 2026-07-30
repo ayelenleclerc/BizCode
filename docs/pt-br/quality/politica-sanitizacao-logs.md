@@ -36,7 +36,7 @@ Objetos aninhados e headers HTTP usam caminhos wildcard (`*.password`, `req.head
 |----------|---------|---------------------|-------------|
 | Dev local | stdout / terminal | Só sessão; sem coleta central | Estação do desenvolvedor |
 | CI | Logs do GitHub Actions | Padrão da plataforma (~90 dias conforme política GitHub) | Mantenedores com acesso ao repositório |
-| Produção (futuro) | Sink no host/orquestrador (não definido no repo) | **TBD** ao escolher destino — alinhar com [#150](https://github.com/ayelenleclerc/BizCode/issues/150) | `audit.read` para **métricas**; logs brutos restritos a ops de plataforma |
+| Produção (futuro) | Sink no host/orquestrador (não definido no repo) | **TBD** ao escolher destino — alinhar com retenção ops; backups de DB cobertos por [#150](https://github.com/ayelenleclerc/BizCode/issues/150) | `audit.read` para **métricas**; logs brutos restritos a ops de plataforma |
 
 `GET /api/metrics` permanece apenas agregado e exige `audit.read` quando habilitado ([#151](observabilidade.md)). Não expor logs brutos via API.
 
@@ -54,7 +54,7 @@ A CI executa via `npm run docs:validate` (junto com checks OpenAPI).
 
 | Issue | Decisão |
 |-------|---------|
-| [#150](https://github.com/ayelenleclerc/BizCode/issues/150) backup automático PostgreSQL | Adiado até política de destino/armazenamento |
+| [#150](https://github.com/ayelenleclerc/BizCode/issues/150) backup automático PostgreSQL | **Entregue** no repo (#150): backups locais cifrados + S3 CLI opcional; ver [backup-e-restauracao.md](backup-e-restauracao.md). Destino centralizado de **logs** continua TBD. |
 | [#152](https://github.com/ayelenleclerc/BizCode/issues/152) pipelines staging/produção | Adiado até servidor, domínio e alvos de deploy |
 | [#153](https://github.com/ayelenleclerc/BizCode/issues/153) hardware fiscal/térmico | Fase 1 (mock) entregue; drivers RS-232/ESC/POS reais pendentes |
 

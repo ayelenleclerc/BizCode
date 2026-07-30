@@ -3,6 +3,7 @@ node_modules/
 .turbo/
 package-lock.json
 uploads/
+.bizcode-backups/
 data/documentos-compra/
 data/documentos-compra-templates/
 dist/

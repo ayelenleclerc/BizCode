@@ -10,6 +10,8 @@ Versioning: [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **PostgreSQL automated backup (#150):** `pg_dump` (Docker exec or host CLI) → gzip → AES-256-GCM (`BACKUP_ENCRYPTION_KEY`); local dir `.bizcode-backups` with GFS prune 7/4/3; optional `aws s3 cp` soft-fail; restore requires `--yes`; cron wrappers; SEC-007 partial evidence; trilingual quality docs. Out of scope: Restic, `@aws-sdk`, staging drill (#152).
+
 - **Security monitoring and alerts (#221):** `AuditEvent.securityEventType`/`severity`; geo baseline `AppUser.lastLoginCountry`; 60s security monitor (brute force, 403 bursts, classified events); in-app alerts to `super_admin` + `SECURITY_ALERT_EMAILS`/`PHONES` (+ optional Slack); `GET /api/superadmin/security-events` and UI `/superadmin/security`; SEC-011 partial evidence; trilingual quality docs.
 
 - **Security incident response (#222):** Trilingual operational runbook (`docs/*/quality/` incident-response); SEC-008 stubs link to it; Prisma `Tenant.maintenanceMode`; super-admin APIs `POST .../revoke-all-sessions`, `POST .../disable`, `POST .../maintenance`, `GET .../audit-events`; UI incident tools on tenant detail; session resolve blocks inactive/maintenance tenants; login returns `503 TENANT_MAINTENANCE`.

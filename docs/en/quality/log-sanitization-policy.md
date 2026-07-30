@@ -36,7 +36,7 @@ Nested objects and HTTP headers use wildcard paths (`*.password`, `req.headers.a
 |-------------|---------------|--------------------|----------------|
 | Local dev | Process stdout / terminal | Session only; not collected centrally | Developer workstation |
 | CI | GitHub Actions job logs | Platform default (~90 days per GitHub policy) | Maintainers with repo access |
-| Production (future) | Host/orchestrator log sink (not defined in repo) | **TBD** when destination is chosen — align with [#150](https://github.com/ayelenleclerc/BizCode/issues/150) backup/ops plan | Roles with `audit.read` for **metrics**; raw logs restricted to platform ops |
+| Production (future) | Host/orchestrator log sink (not defined in repo) | **TBD** when destination is chosen — align with ops retention; database backups are covered by [#150](https://github.com/ayelenleclerc/BizCode/issues/150) | Roles with `audit.read` for **metrics**; raw logs restricted to platform ops |
 
 `GET /api/metrics` remains aggregate-only and requires `audit.read` when enabled ([#151](observability.md)). Raw request logs must not be exposed via API.
 
@@ -54,7 +54,7 @@ CI runs this check via `npm run docs:validate` (together with OpenAPI checks).
 
 | Issue | Decision |
 |-------|----------|
-| [#150](https://github.com/ayelenleclerc/BizCode/issues/150) automated PostgreSQL backup | Deferred until backup destination/storage policy exists |
+| [#150](https://github.com/ayelenleclerc/BizCode/issues/150) automated PostgreSQL backup | **Delivered** in-repo (#150): local encrypted backups + optional S3 CLI; see [backup-and-restore.md](backup-and-restore.md). Centralized **log** sink destination remains TBD. |
 | [#152](https://github.com/ayelenleclerc/BizCode/issues/152) staging/production pipelines | Deferred until server, domain, and deploy targets exist |
 | [#153](https://github.com/ayelenleclerc/BizCode/issues/153) hardware fiscal/thermal | Fase 1 (mock) delivered; RS-232/ESC/POS real drivers remain open |
 
