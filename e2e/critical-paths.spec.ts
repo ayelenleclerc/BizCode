@@ -59,6 +59,7 @@ test.describe('Critical Paths — Core Business Workflows', () => {
 
     await page.getByTestId('cliente-form-codigo').fill(String(codigo))
     await page.getByTestId('cliente-form-rsocial').fill(razonSocial)
+    await page.getByTestId('cliente-privacy-consent-input').check()
 
     await page.getByTestId('btn-save-cliente').click()
 

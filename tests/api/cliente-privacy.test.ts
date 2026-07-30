@@ -148,4 +148,22 @@ describe('cliente privacy endpoints (#195)', () => {
       .expect(409)
     expect(res.body.error).toMatch(/already anonymized/i)
   })
+
+  it('exports CSV when format=csv', async () => {
+    const prisma = buildPrisma()
+    const app = createApp(prisma)
+    const res = await request(app).get('/api/clientes/7/exportar-datos?format=csv').expect(200)
+    expect(res.headers['content-type']).toMatch(/text\/csv/)
+    expect(res.text).toContain('cliente,')
+  })
+
+  it('forbids manager from anonymize', async () => {
+    process.env.BIZCODE_TEST_ROLE = 'manager'
+    const app = createApp(buildPrisma())
+    const res = await request(app)
+      .post('/api/clientes/7/anonimizar')
+      .send({ confirm: 'ANONYMIZE' })
+      .expect(403)
+    expect(res.body.success).toBe(false)
+  })
 })

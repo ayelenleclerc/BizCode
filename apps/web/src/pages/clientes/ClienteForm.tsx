@@ -256,7 +256,7 @@ export default function ClienteForm({ cliente, onClose, onGuardado }: ClienteFor
 
         <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-4" data-testid="cliente-form">
           {error && (
-            <div role="alert" className="p-3 bg-red-100 dark:bg-red-900 text-red-900 dark:text-red-100 rounded border border-red-300 dark:border-red-700">
+            <div role="alert" data-testid="cliente-form-error" className="p-3 bg-red-100 dark:bg-red-900 text-red-900 dark:text-red-100 rounded border border-red-300 dark:border-red-700">
               {error}
             </div>
           )}
