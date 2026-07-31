@@ -140,6 +140,17 @@ Configure tenant regimes and agent flags under **Settings → Company → Withho
 
 **Checks (#231):** module `fiscal.cheques`; portfolio on **Finance** (`GET /api/cheques`, `GET /api/cheques/resumen`, transition endpoints). Register on collection (`chequeNuevo` on `POST /api/cobros`) or endorse on supplier payment (`chequeId` on `POST /api/proveedores/{id}/pagos` with `cheque`/`echeq`). Due-soon alerts via `POST /api/cheques/alertas/run`; rejection notifies `cheque_rechazado`. No bank reconciliation or automatic ECHEQ status in this release.
 
+## Bank statements (#190)
+
+Module `finance.bank_reconcile`. On **Finance** you can:
+
+1. Register accounts (`POST /api/bancos/cuentas`) with a 22-digit CBU.
+2. Import CSV, OFX, or MT940 statements (`POST /api/bancos/cuentas/{id}/importar`).
+3. Configure CSV mappings by bank code (`GET/POST/PATCH /api/bancos/csv-mappings`) — seeds for Galicia, Santander, BBVA, Macro, and Nación; new banks can be added without redeploy.
+4. List imported movements (`GET /api/bancos/cuentas/{id}/movimientos`).
+
+Deduplication uses date+amount+type+reference+description. Semi-automatic matching to collections is issue **#191** (out of scope here).
+
 **Tax filings SICORE/SIFERE (#242):** on **Finance → Tax filings** (`finance.retenciones`, `reports.financial.read`): select period and format (SICORE national or SIFERE IIBB), preview operations with regime totals and CUIT warnings, download TXT (`POST /api/fiscal/presentaciones` + `GET .../{id}/archivo`), review history, and mark as filed after AFIP/COMARB upload. APIs: `GET /api/fiscal/presentaciones/preview?formato=sicore|sifere&periodo=YYYY-MM`, `POST/GET /api/fiscal/presentaciones`, `PATCH /api/fiscal/presentaciones/{id}/presentado`. Legacy direct export: `GET /api/fiscal/retenciones/export`. Validate generated files against official homologation tools manually.
 
 Customer/supplier VAT condition uses existing `condIva` on master records; AFIP registry lookup (#192) is not implemented in this release.

@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "activo": {
+      "type": "boolean"
+    },
+    "alias": {
+      "nullable": true,
+      "type": "string"
+    },
+    "banco": {
+      "type": "string"
+    },
+    "cbu": {
+      "type": "string"
+    },
+    "createdAt": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "id": {
+      "type": "integer"
+    },
+    "moneda": {
+      "type": "string"
+    },
+    "tenantId": {
+      "type": "integer"
+    },
+    "tipoCuenta": {
+      "type": "string"
+    },
+    "updatedAt": {
+      "format": "date-time",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "tenantId",
+    "banco",
+    "tipoCuenta",
+    "cbu",
+    "moneda",
+    "activo",
+    "createdAt",
+    "updatedAt"
+  ],
+  "title": "CuentaBancaria",
+  "type": "object"
+}

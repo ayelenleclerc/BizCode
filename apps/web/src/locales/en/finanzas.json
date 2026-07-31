@@ -405,5 +405,49 @@
       "ignoreSuccess": "Chargeback #{{id}} ignored.",
       "actionError": "Could not update chargeback."
     }
+  },
+  "bancos": {
+    "title": "Bank statements",
+    "intro": "Register tenant bank accounts and import CSV, OFX, or MT940 statements. Automatic collection matching is issue #191.",
+    "cuentasTitle": "Bank accounts",
+    "cuentasEmpty": "No accounts yet. Create one with a 22-digit CBU.",
+    "importTitle": "Import statement",
+    "movimientosTitle": "Imported movements",
+    "movimientosEmpty": "No movements for this account.",
+    "mappingsTitle": "CSV mappings by bank",
+    "mappingsHint": "Add a new bank without redeploying: define the CSV column names.",
+    "cuentaCreated": "Bank account created.",
+    "mappingCreated": "CSV mapping created.",
+    "importOk": "Import {{format}}: {{imported}} new, {{skipped}} duplicates skipped.",
+    "selectAccountFirst": "Select an account before importing.",
+    "retry": "Retry",
+    "form": {
+      "banco": "Bank",
+      "tipoCuenta": "Account type",
+      "cbu": "CBU (22 digits)",
+      "alias": "Alias",
+      "create": "Create account",
+      "bancoCode": "Bank code / CSV mapping",
+      "file": "Statement file",
+      "colFecha": "Date column",
+      "colDesc": "Description column",
+      "colImporte": "Amount column",
+      "createMapping": "Create mapping"
+    },
+    "tipo": {
+      "corriente": "Checking",
+      "caja_ahorro": "Savings",
+      "otra": "Other"
+    },
+    "col": {
+      "fecha": "Date",
+      "descripcion": "Description",
+      "tipo": "Type",
+      "importe": "Amount"
+    },
+    "movTipo": {
+      "debito": "Debit",
+      "credito": "Credit"
+    }
   }
 }

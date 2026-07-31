@@ -45887,6 +45887,1541 @@ Paginated list. Requires module `fiscal.remito`.
 {}
 ```
 
+### PARAMETERS /api/bancos/cuentas
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/bancos/cuentas`
+
+### List bank accounts
+
+- **Method:** `GET`
+- **Path:** `/api/bancos/cuentas`
+- **Tags:** bancos
+
+Requires module `finance.bank_reconcile`.
+
+#### Responses
+
+##### Status: 200 Bank accounts
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`activo` (required)**
+
+    `boolean`
+
+  - **`banco` (required)**
+
+    `string`
+
+  - **`cbu` (required)**
+
+    `string`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`moneda` (required)**
+
+    `string`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`tipoCuenta` (required)**
+
+    `string`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`alias`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "banco": "",
+      "tipoCuenta": "",
+      "cbu": "",
+      "alias": "",
+      "moneda": "",
+      "activo": true,
+      "createdAt": "",
+      "updatedAt": ""
+    }
+  ]
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Create bank account
+
+- **Method:** `POST`
+- **Path:** `/api/bancos/cuentas`
+- **Tags:** bancos
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`banco` (required)**
+
+  `string`
+
+- **`cbu` (required)**
+
+  `string`
+
+- **`tipoCuenta` (required)**
+
+  `string`
+
+- **`activo`**
+
+  `boolean`
+
+- **`alias`**
+
+  `string`
+
+- **`moneda`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "banco": "",
+  "tipoCuenta": "",
+  "cbu": "",
+  "alias": "",
+  "moneda": "",
+  "activo": true
+}
+```
+
+#### Responses
+
+##### Status: 201 Created
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`activo` (required)**
+
+    `boolean`
+
+  - **`banco` (required)**
+
+    `string`
+
+  - **`cbu` (required)**
+
+    `string`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`moneda` (required)**
+
+    `string`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`tipoCuenta` (required)**
+
+    `string`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`alias`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "banco": "",
+    "tipoCuenta": "",
+    "cbu": "",
+    "alias": "",
+    "moneda": "",
+    "activo": true,
+    "createdAt": "",
+    "updatedAt": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 409 Duplicate CBU
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/bancos/cuentas/{id}
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/bancos/cuentas/{id}`
+
+### Update bank account
+
+- **Method:** `PATCH`
+- **Path:** `/api/bancos/cuentas/{id}`
+- **Tags:** bancos
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`activo`**
+
+  `boolean`
+
+- **`alias`**
+
+  `string`
+
+- **`banco`**
+
+  `string`
+
+- **`cbu`**
+
+  `string`
+
+- **`moneda`**
+
+  `string`
+
+- **`tipoCuenta`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "banco": "",
+  "tipoCuenta": "",
+  "cbu": "",
+  "alias": "",
+  "moneda": "",
+  "activo": true
+}
+```
+
+#### Responses
+
+##### Status: 200 Updated
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`activo` (required)**
+
+    `boolean`
+
+  - **`banco` (required)**
+
+    `string`
+
+  - **`cbu` (required)**
+
+    `string`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`moneda` (required)**
+
+    `string`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`tipoCuenta` (required)**
+
+    `string`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`alias`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "banco": "",
+    "tipoCuenta": "",
+    "cbu": "",
+    "alias": "",
+    "moneda": "",
+    "activo": true,
+    "createdAt": "",
+    "updatedAt": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/bancos/cuentas/{id}/movimientos
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/bancos/cuentas/{id}/movimientos`
+
+### List imported bank movements
+
+- **Method:** `GET`
+- **Path:** `/api/bancos/cuentas/{id}/movimientos`
+- **Tags:** bancos
+
+#### Responses
+
+##### Status: 200 Paginated movements
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`cuentaId` (required)**
+
+    `integer`
+
+  - **`dedupeKey` (required)**
+
+    `string`
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`formatoOrigen` (required)**
+
+    `string`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`importe` (required)**
+
+    `string`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"debito", "credito"`
+
+  - **`conciliadoAt`**
+
+    `string`, format: `date-time`
+
+  - **`conciliadoId`**
+
+    `integer`
+
+  - **`referencia`**
+
+    `string`
+
+  - **`saldo`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`total` (required)**
+
+  `integer`
+
+- **`skip`**
+
+  `integer`
+
+- **`take`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "cuentaId": 1,
+      "fecha": "",
+      "descripcion": "",
+      "importe": "",
+      "tipo": "debito",
+      "saldo": "",
+      "referencia": "",
+      "formatoOrigen": "",
+      "dedupeKey": "",
+      "conciliadoId": 1,
+      "conciliadoAt": "",
+      "createdAt": ""
+    }
+  ],
+  "total": 1,
+  "take": 1,
+  "skip": 1
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/bancos/cuentas/{id}/importar
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/bancos/cuentas/{id}/importar`
+
+### Import bank statement file (CSV, OFX, MT940)
+
+- **Method:** `POST`
+- **Path:** `/api/bancos/cuentas/{id}/importar`
+- **Tags:** bancos
+
+#### Request Body
+
+##### Content-Type: multipart/form-data
+
+- **`file` (required)**
+
+  `string`, format: `binary`
+
+- **`bancoCode`**
+
+  `string`
+
+- **`mappingId`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "file": {},
+  "bancoCode": "",
+  "mappingId": 1
+}
+```
+
+#### Responses
+
+##### Status: 200 Import summary
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`errors` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`message` (required)**
+
+      `string`
+
+    - **`row` (required)**
+
+      `integer`
+
+  - **`format` (required)**
+
+    `string`
+
+  - **`imported` (required)**
+
+    `integer`
+
+  - **`skippedDuplicates` (required)**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "imported": 1,
+    "skippedDuplicates": 1,
+    "errors": [
+      {
+        "row": 1,
+        "message": ""
+      }
+    ],
+    "format": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/bancos/csv-mappings
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/bancos/csv-mappings`
+
+### List CSV column mappings (seeds defaults)
+
+- **Method:** `GET`
+- **Path:** `/api/bancos/csv-mappings`
+- **Tags:** bancos
+
+#### Responses
+
+##### Status: 200 Mappings
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`bancoCode` (required)**
+
+    `string`
+
+  - **`columnaDescripcion` (required)**
+
+    `string`
+
+  - **`columnaFecha` (required)**
+
+    `string`
+
+  - **`columnaImporte` (required)**
+
+    `string`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`delimiter` (required)**
+
+    `string`
+
+  - **`formatoFecha` (required)**
+
+    `string`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`separadorDecimal` (required)**
+
+    `string`
+
+  - **`signoDebitoCredito` (required)**
+
+    `string`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`columnaReferencia`**
+
+    `string`
+
+  - **`columnaSaldo`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "bancoCode": "",
+      "columnaFecha": "",
+      "columnaDescripcion": "",
+      "columnaImporte": "",
+      "columnaReferencia": "",
+      "columnaSaldo": "",
+      "separadorDecimal": "",
+      "formatoFecha": "",
+      "delimiter": "",
+      "signoDebitoCredito": "",
+      "createdAt": "",
+      "updatedAt": ""
+    }
+  ]
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Create CSV mapping
+
+- **Method:** `POST`
+- **Path:** `/api/bancos/csv-mappings`
+- **Tags:** bancos
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`bancoCode`**
+
+  `string`
+
+- **`columnaDescripcion`**
+
+  `string`
+
+- **`columnaFecha`**
+
+  `string`
+
+- **`columnaImporte`**
+
+  `string`
+
+- **`columnaReferencia`**
+
+  `string`
+
+- **`columnaSaldo`**
+
+  `string`
+
+- **`delimiter`**
+
+  `string`
+
+- **`formatoFecha`**
+
+  `string`
+
+- **`separadorDecimal`**
+
+  `string`
+
+- **`signoDebitoCredito`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "bancoCode": "",
+  "columnaFecha": "",
+  "columnaDescripcion": "",
+  "columnaImporte": "",
+  "columnaReferencia": "",
+  "columnaSaldo": "",
+  "separadorDecimal": "",
+  "formatoFecha": "",
+  "delimiter": "",
+  "signoDebitoCredito": ""
+}
+```
+
+#### Responses
+
+##### Status: 201 Created
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`bancoCode` (required)**
+
+    `string`
+
+  - **`columnaDescripcion` (required)**
+
+    `string`
+
+  - **`columnaFecha` (required)**
+
+    `string`
+
+  - **`columnaImporte` (required)**
+
+    `string`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`delimiter` (required)**
+
+    `string`
+
+  - **`formatoFecha` (required)**
+
+    `string`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`separadorDecimal` (required)**
+
+    `string`
+
+  - **`signoDebitoCredito` (required)**
+
+    `string`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`columnaReferencia`**
+
+    `string`
+
+  - **`columnaSaldo`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "bancoCode": "",
+    "columnaFecha": "",
+    "columnaDescripcion": "",
+    "columnaImporte": "",
+    "columnaReferencia": "",
+    "columnaSaldo": "",
+    "separadorDecimal": "",
+    "formatoFecha": "",
+    "delimiter": "",
+    "signoDebitoCredito": "",
+    "createdAt": "",
+    "updatedAt": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 409 Duplicate bancoCode
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/bancos/csv-mappings/{id}
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/bancos/csv-mappings/{id}`
+
+### Update CSV mapping
+
+- **Method:** `PATCH`
+- **Path:** `/api/bancos/csv-mappings/{id}`
+- **Tags:** bancos
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`bancoCode`**
+
+  `string`
+
+- **`columnaDescripcion`**
+
+  `string`
+
+- **`columnaFecha`**
+
+  `string`
+
+- **`columnaImporte`**
+
+  `string`
+
+- **`columnaReferencia`**
+
+  `string`
+
+- **`columnaSaldo`**
+
+  `string`
+
+- **`delimiter`**
+
+  `string`
+
+- **`formatoFecha`**
+
+  `string`
+
+- **`separadorDecimal`**
+
+  `string`
+
+- **`signoDebitoCredito`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "bancoCode": "",
+  "columnaFecha": "",
+  "columnaDescripcion": "",
+  "columnaImporte": "",
+  "columnaReferencia": "",
+  "columnaSaldo": "",
+  "separadorDecimal": "",
+  "formatoFecha": "",
+  "delimiter": "",
+  "signoDebitoCredito": ""
+}
+```
+
+#### Responses
+
+##### Status: 200 Updated
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`bancoCode` (required)**
+
+    `string`
+
+  - **`columnaDescripcion` (required)**
+
+    `string`
+
+  - **`columnaFecha` (required)**
+
+    `string`
+
+  - **`columnaImporte` (required)**
+
+    `string`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`delimiter` (required)**
+
+    `string`
+
+  - **`formatoFecha` (required)**
+
+    `string`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`separadorDecimal` (required)**
+
+    `string`
+
+  - **`signoDebitoCredito` (required)**
+
+    `string`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`columnaReferencia`**
+
+    `string`
+
+  - **`columnaSaldo`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "bancoCode": "",
+    "columnaFecha": "",
+    "columnaDescripcion": "",
+    "columnaImporte": "",
+    "columnaReferencia": "",
+    "columnaSaldo": "",
+    "separadorDecimal": "",
+    "formatoFecha": "",
+    "delimiter": "",
+    "signoDebitoCredito": "",
+    "createdAt": "",
+    "updatedAt": ""
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ### PARAMETERS /api/cheques/resumen
 
 - **Method:** `PARAMETERS`
@@ -89360,6 +90895,552 @@ Rate-limited mutation; requires products.manage. USD only.
   "total": 1,
   "limit": 1,
   "offset": 1
+}
+```
+
+### CuentaBancaria
+
+- **Type:**`object`
+
+* **`activo` (required)**
+
+  `boolean`
+
+* **`banco` (required)**
+
+  `string`
+
+* **`cbu` (required)**
+
+  `string`
+
+* **`createdAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`moneda` (required)**
+
+  `string`
+
+* **`tenantId` (required)**
+
+  `integer`
+
+* **`tipoCuenta` (required)**
+
+  `string`
+
+* **`updatedAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`alias`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "tenantId": 1,
+  "banco": "",
+  "tipoCuenta": "",
+  "cbu": "",
+  "alias": "",
+  "moneda": "",
+  "activo": true,
+  "createdAt": "",
+  "updatedAt": ""
+}
+```
+
+### CuentaBancariaEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`activo` (required)**
+
+    `boolean`
+
+  - **`banco` (required)**
+
+    `string`
+
+  - **`cbu` (required)**
+
+    `string`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`moneda` (required)**
+
+    `string`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`tipoCuenta` (required)**
+
+    `string`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`alias`**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "banco": "",
+    "tipoCuenta": "",
+    "cbu": "",
+    "alias": "",
+    "moneda": "",
+    "activo": true,
+    "createdAt": "",
+    "updatedAt": ""
+  }
+}
+```
+
+### MovimientoBancario
+
+- **Type:**`object`
+
+* **`createdAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`cuentaId` (required)**
+
+  `integer`
+
+* **`dedupeKey` (required)**
+
+  `string`
+
+* **`descripcion` (required)**
+
+  `string`
+
+* **`fecha` (required)**
+
+  `string`, format: `date-time`
+
+* **`formatoOrigen` (required)**
+
+  `string`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`importe` (required)**
+
+  `string`
+
+* **`tipo` (required)**
+
+  `string`, possible values: `"debito", "credito"`
+
+* **`conciliadoAt`**
+
+  `string`, format: `date-time`
+
+* **`conciliadoId`**
+
+  `integer`
+
+* **`referencia`**
+
+  `string`
+
+* **`saldo`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "cuentaId": 1,
+  "fecha": "",
+  "descripcion": "",
+  "importe": "",
+  "tipo": "debito",
+  "saldo": "",
+  "referencia": "",
+  "formatoOrigen": "",
+  "dedupeKey": "",
+  "conciliadoId": 1,
+  "conciliadoAt": "",
+  "createdAt": ""
+}
+```
+
+### BancoCsvMapping
+
+- **Type:**`object`
+
+* **`bancoCode` (required)**
+
+  `string`
+
+* **`columnaDescripcion` (required)**
+
+  `string`
+
+* **`columnaFecha` (required)**
+
+  `string`
+
+* **`columnaImporte` (required)**
+
+  `string`
+
+* **`createdAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`delimiter` (required)**
+
+  `string`
+
+* **`formatoFecha` (required)**
+
+  `string`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`separadorDecimal` (required)**
+
+  `string`
+
+* **`signoDebitoCredito` (required)**
+
+  `string`
+
+* **`tenantId` (required)**
+
+  `integer`
+
+* **`updatedAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`columnaReferencia`**
+
+  `string`
+
+* **`columnaSaldo`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "tenantId": 1,
+  "bancoCode": "",
+  "columnaFecha": "",
+  "columnaDescripcion": "",
+  "columnaImporte": "",
+  "columnaReferencia": "",
+  "columnaSaldo": "",
+  "separadorDecimal": "",
+  "formatoFecha": "",
+  "delimiter": "",
+  "signoDebitoCredito": "",
+  "createdAt": "",
+  "updatedAt": ""
+}
+```
+
+### BancoCsvMappingInput
+
+- **Type:**`object`
+
+* **`bancoCode`**
+
+  `string`
+
+* **`columnaDescripcion`**
+
+  `string`
+
+* **`columnaFecha`**
+
+  `string`
+
+* **`columnaImporte`**
+
+  `string`
+
+* **`columnaReferencia`**
+
+  `string`
+
+* **`columnaSaldo`**
+
+  `string`
+
+* **`delimiter`**
+
+  `string`
+
+* **`formatoFecha`**
+
+  `string`
+
+* **`separadorDecimal`**
+
+  `string`
+
+* **`signoDebitoCredito`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "bancoCode": "",
+  "columnaFecha": "",
+  "columnaDescripcion": "",
+  "columnaImporte": "",
+  "columnaReferencia": "",
+  "columnaSaldo": "",
+  "separadorDecimal": "",
+  "formatoFecha": "",
+  "delimiter": "",
+  "signoDebitoCredito": ""
+}
+```
+
+### BancoCsvMappingEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`bancoCode` (required)**
+
+    `string`
+
+  - **`columnaDescripcion` (required)**
+
+    `string`
+
+  - **`columnaFecha` (required)**
+
+    `string`
+
+  - **`columnaImporte` (required)**
+
+    `string`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`delimiter` (required)**
+
+    `string`
+
+  - **`formatoFecha` (required)**
+
+    `string`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`separadorDecimal` (required)**
+
+    `string`
+
+  - **`signoDebitoCredito` (required)**
+
+    `string`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`columnaReferencia`**
+
+    `string`
+
+  - **`columnaSaldo`**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "bancoCode": "",
+    "columnaFecha": "",
+    "columnaDescripcion": "",
+    "columnaImporte": "",
+    "columnaReferencia": "",
+    "columnaSaldo": "",
+    "separadorDecimal": "",
+    "formatoFecha": "",
+    "delimiter": "",
+    "signoDebitoCredito": "",
+    "createdAt": "",
+    "updatedAt": ""
+  }
+}
+```
+
+### BancoImportResult
+
+- **Type:**`object`
+
+* **`errors` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`message` (required)**
+
+    `string`
+
+  - **`row` (required)**
+
+    `integer`
+
+* **`format` (required)**
+
+  `string`
+
+* **`imported` (required)**
+
+  `integer`
+
+* **`skippedDuplicates` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "imported": 1,
+  "skippedDuplicates": 1,
+  "errors": [
+    {
+      "row": 1,
+      "message": ""
+    }
+  ],
+  "format": ""
+}
+```
+
+### BancoImportEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`errors` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`message` (required)**
+
+      `string`
+
+    - **`row` (required)**
+
+      `integer`
+
+  - **`format` (required)**
+
+    `string`
+
+  - **`imported` (required)**
+
+    `integer`
+
+  - **`skippedDuplicates` (required)**
+
+    `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "imported": 1,
+    "skippedDuplicates": 1,
+    "errors": [
+      {
+        "row": 1,
+        "message": ""
+      }
+    ],
+    "format": ""
+  }
 }
 ```
 

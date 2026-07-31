@@ -12,6 +12,7 @@ import IfIntegration from '@/components/IfIntegration'
 import ComprobanteCompraRegisterForm from '@/pages/finanzas/ComprobanteCompraRegisterForm'
 import DocumentoCompraImportSection from '@/pages/finanzas/DocumentoCompraImportSection'
 import ChequesSection from '@/pages/finanzas/ChequesSection'
+import ExtractosBancariosSection from '@/pages/finanzas/ExtractosBancariosSection'
 import PresentacionesRetencionesSection from '@/pages/finanzas/PresentacionesRetencionesSection'
 import {
   ApiRequestFailedError,
@@ -332,6 +333,10 @@ function FinanzasPageContent() {
 
         <IfModule flag="fiscal.cheques">
           <ChequesSection />
+        </IfModule>
+
+        <IfModule flag="finance.bank_reconcile">
+          <ExtractosBancariosSection />
         </IfModule>
 
         <IfModule flag="finance.retenciones">

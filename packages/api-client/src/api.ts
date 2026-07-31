@@ -3,6 +3,7 @@ export { ApiRequestFailedError, getAuthErrorI18nKey, handleError } from './error
 export * from './modules/auth'
 export * from './modules/clientes'
 export * from './modules/cobros'
+export * from './modules/bancos'
 export * from './modules/pedidos'
 export * from './modules/contratos'
 export * from './modules/ordenesTrabajo'

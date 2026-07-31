@@ -84,6 +84,8 @@ tags:
     description: Overdue invoice reminders (#134)
   - name: cheques
     description: Check portfolio — physical and ECHEQ (#231, module fiscal.cheques)
+  - name: bancos
+    description: Bank accounts and statement import (#190, module finance.bank_reconcile)
   - name: formasPago
     description: Payment methods
   - name: users
@@ -7567,6 +7569,303 @@ paths:
               schema:
                 type: string
                 format: binary
+
+  /api/bancos/cuentas:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [bancos]
+      summary: List bank accounts
+      description: Requires module `finance.bank_reconcile`.
+      responses:
+        '200':
+          description: Bank accounts
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [success, data]
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CuentaBancaria'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+    post:
+      tags: [bancos]
+      summary: Create bank account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [banco, tipoCuenta, cbu]
+              properties:
+                banco:
+                  type: string
+                tipoCuenta:
+                  type: string
+                cbu:
+                  type: string
+                  pattern: '^[0-9]{22}$'
+                alias:
+                  type: string
+                  nullable: true
+                moneda:
+                  type: string
+                activo:
+                  type: boolean
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CuentaBancariaEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '409':
+          description: Duplicate CBU
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+
+  /api/bancos/cuentas/{id}:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    patch:
+      tags: [bancos]
+      summary: Update bank account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                banco:
+                  type: string
+                tipoCuenta:
+                  type: string
+                cbu:
+                  type: string
+                alias:
+                  type: string
+                  nullable: true
+                moneda:
+                  type: string
+                activo:
+                  type: boolean
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CuentaBancariaEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+  /api/bancos/cuentas/{id}/movimientos:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    get:
+      tags: [bancos]
+      summary: List imported bank movements
+      parameters:
+        - $ref: '#/components/parameters/ListLimit'
+        - $ref: '#/components/parameters/ListOffset'
+        - name: from
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: to
+          in: query
+          schema:
+            type: string
+            format: date-time
+      responses:
+        '200':
+          description: Paginated movements
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [success, data, total]
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/MovimientoBancario'
+                  total:
+                    type: integer
+                  take:
+                    type: integer
+                  skip:
+                    type: integer
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+  /api/bancos/cuentas/{id}/importar:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    post:
+      tags: [bancos]
+      summary: Import bank statement file (CSV, OFX, MT940)
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file:
+                  type: string
+                  format: binary
+                bancoCode:
+                  type: string
+                mappingId:
+                  type: integer
+      responses:
+        '200':
+          description: Import summary
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BancoImportEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+  /api/bancos/csv-mappings:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [bancos]
+      summary: List CSV column mappings (seeds defaults)
+      responses:
+        '200':
+          description: Mappings
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [success, data]
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/BancoCsvMapping'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+    post:
+      tags: [bancos]
+      summary: Create CSV mapping
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BancoCsvMappingInput'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BancoCsvMappingEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '409':
+          description: Duplicate bancoCode
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+
+  /api/bancos/csv-mappings/{id}:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    patch:
+      tags: [bancos]
+      summary: Update CSV mapping
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BancoCsvMappingInput'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BancoCsvMappingEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
 
   /api/cheques/resumen:
     parameters:
@@ -16258,6 +16557,124 @@ components:
           type: integer
         offset:
           type: integer
+
+    CuentaBancaria:
+      type: object
+      required: [id, tenantId, banco, tipoCuenta, cbu, moneda, activo, createdAt, updatedAt]
+      properties:
+        id: { type: integer }
+        tenantId: { type: integer }
+        banco: { type: string }
+        tipoCuenta: { type: string }
+        cbu: { type: string }
+        alias: { type: string, nullable: true }
+        moneda: { type: string }
+        activo: { type: boolean }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+
+    CuentaBancariaEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success: { type: boolean }
+        data:
+          $ref: '#/components/schemas/CuentaBancaria'
+
+    MovimientoBancario:
+      type: object
+      required: [id, cuentaId, fecha, descripcion, importe, tipo, formatoOrigen, dedupeKey, createdAt]
+      properties:
+        id: { type: integer }
+        cuentaId: { type: integer }
+        fecha: { type: string, format: date-time }
+        descripcion: { type: string }
+        importe: { type: string }
+        tipo: { type: string, enum: [debito, credito] }
+        saldo: { type: string, nullable: true }
+        referencia: { type: string, nullable: true }
+        formatoOrigen: { type: string }
+        dedupeKey: { type: string }
+        conciliadoId: { type: integer, nullable: true }
+        conciliadoAt: { type: string, format: date-time, nullable: true }
+        createdAt: { type: string, format: date-time }
+
+    BancoCsvMapping:
+      type: object
+      required:
+        - id
+        - tenantId
+        - bancoCode
+        - columnaFecha
+        - columnaDescripcion
+        - columnaImporte
+        - separadorDecimal
+        - formatoFecha
+        - delimiter
+        - signoDebitoCredito
+        - createdAt
+        - updatedAt
+      properties:
+        id: { type: integer }
+        tenantId: { type: integer }
+        bancoCode: { type: string }
+        columnaFecha: { type: string }
+        columnaDescripcion: { type: string }
+        columnaImporte: { type: string }
+        columnaReferencia: { type: string, nullable: true }
+        columnaSaldo: { type: string, nullable: true }
+        separadorDecimal: { type: string }
+        formatoFecha: { type: string }
+        delimiter: { type: string }
+        signoDebitoCredito: { type: string }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+
+    BancoCsvMappingInput:
+      type: object
+      properties:
+        bancoCode: { type: string }
+        columnaFecha: { type: string }
+        columnaDescripcion: { type: string }
+        columnaImporte: { type: string }
+        columnaReferencia: { type: string, nullable: true }
+        columnaSaldo: { type: string, nullable: true }
+        separadorDecimal: { type: string }
+        formatoFecha: { type: string }
+        delimiter: { type: string }
+        signoDebitoCredito: { type: string }
+
+    BancoCsvMappingEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success: { type: boolean }
+        data:
+          $ref: '#/components/schemas/BancoCsvMapping'
+
+    BancoImportResult:
+      type: object
+      required: [imported, skippedDuplicates, errors, format]
+      properties:
+        imported: { type: integer }
+        skippedDuplicates: { type: integer }
+        errors:
+          type: array
+          items:
+            type: object
+            required: [row, message]
+            properties:
+              row: { type: integer }
+              message: { type: string }
+        format: { type: string }
+
+    BancoImportEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success: { type: boolean }
+        data:
+          $ref: '#/components/schemas/BancoImportResult'
 
     Cheque:
       type: object

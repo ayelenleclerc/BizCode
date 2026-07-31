@@ -10,6 +10,8 @@ Versionado: [Semantic Versioning](https://semver.org/lang/es/).
 
 ### Agregado
 
+- **Importación de extracto bancario (#190):** modelos Prisma, parsers CSV/OFX/MT940, API `/api/bancos`, UI Finanzas (`finance.bank_reconcile`), mapeos CSV configurables. Fuera de alcance: matching con cobros (#191).
+
 - **Privacidad / derechos del titular (#195):** exportar y anonimizar cliente (owner/super_admin); `anonymizedAt`; `/privacidad` pública; consent UI en alta; evidencia parcial PRV-001; docs quality trilingües. Registro AAIP a cargo del operador. Fuera de alcance: consent onboarding SaaS (#180).
 
 - **Backup automático PostgreSQL (#150):** `pg_dump` (Docker exec o CLI) → gzip → AES-256-GCM (`BACKUP_ENCRYPTION_KEY`); dir local `.bizcode-backups` con prune GFS 7/4/3; `aws s3 cp` opcional soft-fail; restore exige `--yes`; wrappers cron; evidencia parcial SEC-007; docs quality trilingües. Fuera de alcance: Restic, `@aws-sdk`, drill staging (#152).

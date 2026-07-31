@@ -1499,6 +1499,8 @@ model Tenant {
   ordenesEntrega OrdenEntrega[]
   remitos        Remito[]
   cheques        Cheque[]
+  cuentasBancarias CuentaBancaria[]
+  bancoCsvMappings BancoCsvMapping[]
   repartos       Reparto[]
   paramEmpresa   ParamEmpresa?
   fiscalConfig   TenantFiscalConfig?
@@ -2825,6 +2827,77 @@ model PresentacionRetencion {
   createdBy        AppUser?  @relation("PresentacionRetencionCreatedBy", fields: [createdById], references: [id])
 
   @@index([tenantId, formato, periodo])
+}
+
+/// Tenant bank account for statement import (#190).
+model CuentaBancaria {
+  id         Int      @id @default(autoincrement())
+  tenantId   Int
+  tenant     Tenant   @relation(fields: [tenantId], references: [id])
+  /// Display bank name (e.g. Galicia, Santander).
+  banco      String   @db.VarChar(50)
+  /// corriente | caja_ahorro | otra
+  tipoCuenta String   @db.VarChar(20)
+  cbu        String   @db.VarChar(22)
+  alias      String?  @db.VarChar(60)
+  moneda     String   @default("ARS") @db.VarChar(3)
+  activo     Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  movimientos MovimientoBancario[]
+
+  @@unique([tenantId, cbu])
+  @@index([tenantId, activo])
+}
+
+/// Imported bank movement; conciliado* reserved for #191 matching.
+model MovimientoBancario {
+  id            Int           @id @default(autoincrement())
+  cuentaId      Int
+  cuenta        CuentaBancaria @relation(fields: [cuentaId], references: [id], onDelete: Cascade)
+  fecha         DateTime
+  descripcion   String        @db.VarChar(255)
+  importe       Decimal       @db.Decimal(14, 2)
+  /// debito | credito
+  tipo          String        @db.VarChar(10)
+  saldo         Decimal?      @db.Decimal(14, 2)
+  referencia    String?       @db.VarChar(80)
+  /// csv | ofx | mt940
+  formatoOrigen String        @db.VarChar(10)
+  dedupeKey     String        @db.VarChar(64)
+  conciliadoId  Int?
+  conciliadoAt  DateTime?
+  createdAt     DateTime      @default(now())
+
+  @@unique([cuentaId, dedupeKey])
+  @@index([cuentaId, fecha])
+  @@index([cuentaId, conciliadoAt])
+}
+
+/// Configurable CSV column mapping per bank code (#190).
+model BancoCsvMapping {
+  id                 Int      @id @default(autoincrement())
+  tenantId           Int
+  tenant             Tenant   @relation(fields: [tenantId], references: [id])
+  /// galicia | santander | bbva | macro | nacion | custom code
+  bancoCode          String   @db.VarChar(30)
+  columnaFecha       String   @db.VarChar(60)
+  columnaDescripcion String   @db.VarChar(60)
+  columnaImporte     String   @db.VarChar(60)
+  columnaReferencia  String?  @db.VarChar(60)
+  columnaSaldo       String?  @db.VarChar(60)
+  /// . | ,
+  separadorDecimal   String   @default(",") @db.VarChar(1)
+  /// dd/MM/yyyy | yyyy-MM-dd | dd-MM-yyyy
+  formatoFecha       String   @default("dd/MM/yyyy") @db.VarChar(20)
+  delimiter          String   @default(";") @db.VarChar(1)
+  /// signed_importe | tipo_column | credit_positive
+  signoDebitoCredito String   @default("signed_importe") @db.VarChar(30)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@unique([tenantId, bancoCode])
+  @@index([tenantId])
 }
 
 model LoginAttempt {

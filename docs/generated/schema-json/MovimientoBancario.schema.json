@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "conciliadoAt": {
+      "format": "date-time",
+      "nullable": true,
+      "type": "string"
+    },
+    "conciliadoId": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "createdAt": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "cuentaId": {
+      "type": "integer"
+    },
+    "dedupeKey": {
+      "type": "string"
+    },
+    "descripcion": {
+      "type": "string"
+    },
+    "fecha": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "formatoOrigen": {
+      "type": "string"
+    },
+    "id": {
+      "type": "integer"
+    },
+    "importe": {
+      "type": "string"
+    },
+    "referencia": {
+      "nullable": true,
+      "type": "string"
+    },
+    "saldo": {
+      "nullable": true,
+      "type": "string"
+    },
+    "tipo": {
+      "enum": [
+        "debito",
+        "credito"
+      ],
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "cuentaId",
+    "fecha",
+    "descripcion",
+    "importe",
+    "tipo",
+    "formatoOrigen",
+    "dedupeKey",
+    "createdAt"
+  ],
+  "title": "MovimientoBancario",
+  "type": "object"
+}
