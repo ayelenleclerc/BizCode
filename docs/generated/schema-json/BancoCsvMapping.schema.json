@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "bancoCode": {
+      "type": "string"
+    },
+    "columnaDescripcion": {
+      "type": "string"
+    },
+    "columnaFecha": {
+      "type": "string"
+    },
+    "columnaImporte": {
+      "type": "string"
+    },
+    "columnaReferencia": {
+      "nullable": true,
+      "type": "string"
+    },
+    "columnaSaldo": {
+      "nullable": true,
+      "type": "string"
+    },
+    "createdAt": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "delimiter": {
+      "type": "string"
+    },
+    "formatoFecha": {
+      "type": "string"
+    },
+    "id": {
+      "type": "integer"
+    },
+    "separadorDecimal": {
+      "type": "string"
+    },
+    "signoDebitoCredito": {
+      "type": "string"
+    },
+    "tenantId": {
+      "type": "integer"
+    },
+    "updatedAt": {
+      "format": "date-time",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "tenantId",
+    "bancoCode",
+    "columnaFecha",
+    "columnaDescripcion",
+    "columnaImporte",
+    "separadorDecimal",
+    "formatoFecha",
+    "delimiter",
+    "signoDebitoCredito",
+    "createdAt",
+    "updatedAt"
+  ],
+  "title": "BancoCsvMapping",
+  "type": "object"
+}

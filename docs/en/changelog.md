@@ -10,6 +10,8 @@ Versioning: [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **Bank statement import (#190):** Prisma `CuentaBancaria` / `MovimientoBancario` / `BancoCsvMapping`; parsers CSV (configurable mappings), OFX, MT940; `POST /api/bancos/cuentas/:id/importar` with dedupe; Finance UI under module `finance.bank_reconcile`; fixtures Galicia/Santander. Out of scope: matching to cobros (#191).
+
 - **Privacy / data subject rights (#195):** `GET /api/clientes/:id/exportar-datos` and `POST .../anonimizar` (owner/super_admin); `Cliente.anonymizedAt`; public `/privacidad`; create-form consent checkbox (UI gate); PRV-001 partial evidence; trilingual quality docs. AAIP registration remains operator-owned. Out of scope: SaaS onboarding consent (#180), marketing preference center.
 
 - **PostgreSQL automated backup (#150):** `pg_dump` (Docker exec or host CLI) → gzip → AES-256-GCM (`BACKUP_ENCRYPTION_KEY`); local dir `.bizcode-backups` with GFS prune 7/4/3; optional `aws s3 cp` soft-fail; restore requires `--yes`; cron wrappers; SEC-007 partial evidence; trilingual quality docs. Out of scope: Restic, `@aws-sdk`, staging drill (#152).

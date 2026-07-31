@@ -70,6 +70,16 @@
 
 * [AuthScope](./authscope.md) – `-`
 
+* [BancoCsvMapping](./bancocsvmapping.md) – `-`
+
+* [BancoCsvMappingEnvelope](./bancocsvmappingenvelope.md) – `-`
+
+* [BancoCsvMappingInput](./bancocsvmappinginput.md) – `-`
+
+* [BancoImportEnvelope](./bancoimportenvelope.md) – `-`
+
+* [BancoImportResult](./bancoimportresult.md) – `-`
+
 * [BulkImportValidateEnvelope](./bulkimportvalidateenvelope.md) – `-`
 
 * [BulkImportValidateSummary](./bulkimportvalidatesummary.md) – `-`
@@ -245,6 +255,10 @@
 * [ContratoListEnvelope](./contratolistenvelope.md) – `-`
 
 * [ContratoUpdateInput](./contratoupdateinput.md) – `-`
+
+* [CuentaBancaria](./cuentabancaria.md) – `-`
+
+* [CuentaBancariaEnvelope](./cuentabancariaenvelope.md) – `-`
 
 * [CuentaCorriente](./cuentacorriente.md) – `-`
 
@@ -603,6 +617,8 @@
 * [ModuleCatalogPreset](./modulecatalogpreset.md) – `-`
 
 * [ModuleNotEnabledEnvelope](./modulenotenabledenvelope.md) – `-`
+
+* [MovimientoBancario](./movimientobancario.md) – `-`
 
 * [MovimientoCajaManualInput](./movimientocajamanualinput.md) – `-`
 
@@ -1124,6 +1140,8 @@
 
 * [Untitled object in AuditEventListEnvelope](./auditeventlistenvelope-allof-0.md) – `undefined#/allOf/0`
 
+* [Untitled object in BancoImportResult](./bancoimportresult-properties-errors-items.md) – `undefined#/properties/errors/items`
+
 * [Untitled object in BulkImportValidateSummary](./bulkimportvalidatesummary-properties-issues-items.md) – `undefined#/properties/issues/items`
 
 * [Untitled object in CategoriaArticuloListEnvelope](./categoriaarticulolistenvelope-allof-0.md) – `undefined#/allOf/0`
@@ -1439,6 +1457,8 @@
 * [Untitled array in AuthScope](./authscope-properties-routeids.md) – `undefined#/properties/routeIds`
 
 * [Untitled array in AuthScope](./authscope-properties-warehouseids.md) – `undefined#/properties/warehouseIds`
+
+* [Untitled array in BancoImportResult](./bancoimportresult-properties-errors.md) – `undefined#/properties/errors`
 
 * [Untitled array in BulkImportValidateSummary](./bulkimportvalidatesummary-properties-issues.md) – `undefined#/properties/issues`
 

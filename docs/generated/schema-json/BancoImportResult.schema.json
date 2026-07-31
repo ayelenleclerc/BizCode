@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "errors": {
+      "items": {
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "row": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "row",
+          "message"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "format": {
+      "type": "string"
+    },
+    "imported": {
+      "type": "integer"
+    },
+    "skippedDuplicates": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "imported",
+    "skippedDuplicates",
+    "errors",
+    "format"
+  ],
+  "title": "BancoImportResult",
+  "type": "object"
+}

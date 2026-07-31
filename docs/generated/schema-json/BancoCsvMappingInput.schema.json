@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "bancoCode": {
+      "type": "string"
+    },
+    "columnaDescripcion": {
+      "type": "string"
+    },
+    "columnaFecha": {
+      "type": "string"
+    },
+    "columnaImporte": {
+      "type": "string"
+    },
+    "columnaReferencia": {
+      "nullable": true,
+      "type": "string"
+    },
+    "columnaSaldo": {
+      "nullable": true,
+      "type": "string"
+    },
+    "delimiter": {
+      "type": "string"
+    },
+    "formatoFecha": {
+      "type": "string"
+    },
+    "separadorDecimal": {
+      "type": "string"
+    },
+    "signoDebitoCredito": {
+      "type": "string"
+    }
+  },
+  "title": "BancoCsvMappingInput",
+  "type": "object"
+}

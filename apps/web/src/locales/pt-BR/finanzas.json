@@ -405,5 +405,49 @@
       "ignoreSuccess": "Chargeback #{{id}} ignorado.",
       "actionError": "Não foi possível atualizar o chargeback."
     }
+  },
+  "bancos": {
+    "title": "Extratos bancários",
+    "intro": "Cadastre contas do tenant e importe extratos CSV, OFX ou MT940. A conciliação automática de cobranças é a issue #191.",
+    "cuentasTitle": "Contas bancárias",
+    "cuentasEmpty": "Ainda não há contas. Crie uma com CBU de 22 dígitos.",
+    "importTitle": "Importar extrato",
+    "movimientosTitle": "Movimentos importados",
+    "movimientosEmpty": "Sem movimentos para esta conta.",
+    "mappingsTitle": "Mapeamentos CSV por banco",
+    "mappingsHint": "Você pode adicionar um banco novo sem redeploy: defina os nomes das colunas do CSV.",
+    "cuentaCreated": "Conta bancária criada.",
+    "mappingCreated": "Mapeamento CSV criado.",
+    "importOk": "Importação {{format}}: {{imported}} novos, {{skipped}} duplicados omitidos.",
+    "selectAccountFirst": "Selecione uma conta antes de importar.",
+    "retry": "Tentar de novo",
+    "form": {
+      "banco": "Banco",
+      "tipoCuenta": "Tipo de conta",
+      "cbu": "CBU (22 dígitos)",
+      "alias": "Alias",
+      "create": "Criar conta",
+      "bancoCode": "Código do banco / mapeamento CSV",
+      "file": "Arquivo de extrato",
+      "colFecha": "Coluna data",
+      "colDesc": "Coluna descrição",
+      "colImporte": "Coluna valor",
+      "createMapping": "Criar mapeamento"
+    },
+    "tipo": {
+      "corriente": "Conta corrente",
+      "caja_ahorro": "Poupança",
+      "otra": "Outra"
+    },
+    "col": {
+      "fecha": "Data",
+      "descripcion": "Descrição",
+      "tipo": "Tipo",
+      "importe": "Valor"
+    },
+    "movTipo": {
+      "debito": "Débito",
+      "credito": "Crédito"
+    }
   }
 }
