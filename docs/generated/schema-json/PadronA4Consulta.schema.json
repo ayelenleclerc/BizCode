@@ -1,0 +1,98 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "available": {
+      "type": "boolean"
+    },
+    "categoriaMonotributo": {
+      "nullable": true,
+      "type": "string"
+    },
+    "condIva": {
+      "enum": [
+        "RI",
+        "Mono",
+        "CF",
+        "Exento",
+        null
+      ],
+      "nullable": true,
+      "type": "string"
+    },
+    "cpost": {
+      "nullable": true,
+      "type": "string"
+    },
+    "cuit": {
+      "type": "string"
+    },
+    "domicilio": {
+      "nullable": true,
+      "type": "string"
+    },
+    "estado": {
+      "enum": [
+        "activo",
+        "inactivo",
+        null
+      ],
+      "nullable": true,
+      "type": "string"
+    },
+    "fetchedAt": {
+      "format": "date-time",
+      "nullable": true,
+      "type": "string"
+    },
+    "fromCache": {
+      "type": "boolean"
+    },
+    "localidad": {
+      "nullable": true,
+      "type": "string"
+    },
+    "razonSocial": {
+      "nullable": true,
+      "type": "string"
+    },
+    "razonSocialTruncada": {
+      "nullable": true,
+      "type": "string"
+    },
+    "razonSocialTruncadaFlag": {
+      "type": "boolean"
+    },
+    "reason": {
+      "enum": [
+        "ok",
+        "invalid_cuit",
+        "not_found",
+        "unavailable",
+        "timeout"
+      ],
+      "type": "string"
+    },
+    "verificado": {
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "cuit",
+    "verificado",
+    "available",
+    "reason",
+    "fromCache",
+    "fetchedAt",
+    "razonSocial",
+    "razonSocialTruncada",
+    "razonSocialTruncadaFlag",
+    "domicilio",
+    "localidad",
+    "cpost",
+    "condIva",
+    "estado",
+    "categoriaMonotributo"
+  ],
+  "title": "PadronA4Consulta",
+  "type": "object"
+}

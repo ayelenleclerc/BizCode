@@ -22741,6 +22741,176 @@ Requires `settings.fiscal.manage`. Homologación mock when AFIP network is not c
 }
 ```
 
+### Consult AFIP Padrón A4 by CUIT
+
+- **Method:** `GET`
+- **Path:** `/api/arca/padron/{cuit}`
+- **Tags:** afip
+
+Requires `customers.manage`. Module `billing.arca_cae` recommended; when missing or fiscal cert absent, returns HTTP 200 with `verificado: false` and `reason: unavailable` (graceful degradation, #192). Homologación uses mock ws\_sr\_padron\_a4. Results cached 24h per tenant+CUIT.
+
+#### Responses
+
+##### Status: 200 Padrón lookup result (may be unverified)
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`available` (required)**
+
+    `boolean`
+
+  - **`categoriaMonotributo` (required)**
+
+    `string`
+
+  - **`condIva` (required)**
+
+    `string`, possible values: `"RI", "Mono", "CF", "Exento", null`
+
+  - **`cpost` (required)**
+
+    `string`
+
+  - **`cuit` (required)**
+
+    `string`
+
+  - **`domicilio` (required)**
+
+    `string`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"activo", "inactivo", null`
+
+  - **`fetchedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`fromCache` (required)**
+
+    `boolean`
+
+  - **`localidad` (required)**
+
+    `string`
+
+  - **`razonSocial` (required)**
+
+    `string`
+
+  - **`razonSocialTruncada` (required)**
+
+    `string`
+
+  - **`razonSocialTruncadaFlag` (required)**
+
+    `boolean`
+
+  - **`reason` (required)**
+
+    `string`, possible values: `"ok", "invalid_cuit", "not_found", "unavailable", "timeout"`
+
+  - **`verificado` (required)**
+
+    `boolean`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "cuit": "",
+    "verificado": true,
+    "available": true,
+    "reason": "ok",
+    "fromCache": true,
+    "fetchedAt": "",
+    "razonSocial": "",
+    "razonSocialTruncada": "",
+    "razonSocialTruncadaFlag": true,
+    "domicilio": "",
+    "localidad": "",
+    "cpost": "",
+    "condIva": "RI",
+    "estado": "activo",
+    "categoriaMonotributo": ""
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ### Request CAE for a factura
 
 - **Method:** `POST`
@@ -101021,6 +101191,189 @@ Originating invoice header (selected columns)
   "success": true,
   "data": {
     "configured": true
+  }
+}
+```
+
+### PadronA4Consulta
+
+- **Type:**`object`
+
+* **`available` (required)**
+
+  `boolean`
+
+* **`categoriaMonotributo` (required)**
+
+  `string`
+
+* **`condIva` (required)**
+
+  `string`, possible values: `"RI", "Mono", "CF", "Exento", null`
+
+* **`cpost` (required)**
+
+  `string`
+
+* **`cuit` (required)**
+
+  `string`
+
+* **`domicilio` (required)**
+
+  `string`
+
+* **`estado` (required)**
+
+  `string`, possible values: `"activo", "inactivo", null`
+
+* **`fetchedAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`fromCache` (required)**
+
+  `boolean`
+
+* **`localidad` (required)**
+
+  `string`
+
+* **`razonSocial` (required)**
+
+  `string`
+
+* **`razonSocialTruncada` (required)**
+
+  `string`
+
+* **`razonSocialTruncadaFlag` (required)**
+
+  `boolean`
+
+* **`reason` (required)**
+
+  `string`, possible values: `"ok", "invalid_cuit", "not_found", "unavailable", "timeout"`
+
+* **`verificado` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "cuit": "",
+  "verificado": true,
+  "available": true,
+  "reason": "ok",
+  "fromCache": true,
+  "fetchedAt": "",
+  "razonSocial": "",
+  "razonSocialTruncada": "",
+  "razonSocialTruncadaFlag": true,
+  "domicilio": "",
+  "localidad": "",
+  "cpost": "",
+  "condIva": "RI",
+  "estado": "activo",
+  "categoriaMonotributo": ""
+}
+```
+
+### PadronA4Envelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`available` (required)**
+
+    `boolean`
+
+  - **`categoriaMonotributo` (required)**
+
+    `string`
+
+  - **`condIva` (required)**
+
+    `string`, possible values: `"RI", "Mono", "CF", "Exento", null`
+
+  - **`cpost` (required)**
+
+    `string`
+
+  - **`cuit` (required)**
+
+    `string`
+
+  - **`domicilio` (required)**
+
+    `string`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"activo", "inactivo", null`
+
+  - **`fetchedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`fromCache` (required)**
+
+    `boolean`
+
+  - **`localidad` (required)**
+
+    `string`
+
+  - **`razonSocial` (required)**
+
+    `string`
+
+  - **`razonSocialTruncada` (required)**
+
+    `string`
+
+  - **`razonSocialTruncadaFlag` (required)**
+
+    `boolean`
+
+  - **`reason` (required)**
+
+    `string`, possible values: `"ok", "invalid_cuit", "not_found", "unavailable", "timeout"`
+
+  - **`verificado` (required)**
+
+    `boolean`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "cuit": "",
+    "verificado": true,
+    "available": true,
+    "reason": "ok",
+    "fromCache": true,
+    "fetchedAt": "",
+    "razonSocial": "",
+    "razonSocialTruncada": "",
+    "razonSocialTruncadaFlag": true,
+    "domicilio": "",
+    "localidad": "",
+    "cpost": "",
+    "condIva": "RI",
+    "estado": "activo",
+    "categoriaMonotributo": ""
   }
 }
 ```

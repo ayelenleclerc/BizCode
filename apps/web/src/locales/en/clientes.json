@@ -58,6 +58,18 @@
       "rsocial": "Company name must be at least 3 characters",
       "generic": "Error saving customer"
     },
+    "padron": {
+      "status": {
+        "idle": "",
+        "loading": "Checking AFIP Padrón…",
+        "verified": "CUIT verified against AFIP Padrón.",
+        "not_found": "CUIT not found in AFIP Padrón.",
+        "unavailable": "AFIP Padrón lookup unavailable. Please fill in the fields manually.",
+        "timeout": "AFIP Padrón did not respond in time. Please fill in the fields manually.",
+        "invalid": "Invalid CUIT; AFIP Padrón lookup was not performed."
+      },
+      "truncatedWarning": "The AFIP Padrón business name exceeds 30 characters and was truncated."
+    },
     "deliveryZone": "Delivery zone",
     "deliveryZoneNone": "No zone assigned",
     "listaPrecio": "Price list",

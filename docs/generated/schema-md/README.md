@@ -730,6 +730,10 @@
 
 * [OrdenTrabajoUpdateInput](./ordentrabajoupdateinput.md) – `-`
 
+* [PadronA4Consulta](./padrona4consulta.md) – `-`
+
+* [PadronA4Envelope](./padrona4envelope.md) – `-`
+
 * [Pedido](./pedido.md) – `-`
 
 * [PedidoEnvelope](./pedidoenvelope.md) – `-`

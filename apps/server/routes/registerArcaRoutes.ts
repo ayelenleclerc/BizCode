@@ -3,6 +3,8 @@ import { z } from 'zod'
 import { requirePermission, type AuthenticatedRequest } from '../auth'
 import { validateBody } from '../middleware/validateBody'
 import { ArcaService, type FiscalConfigInput } from '../fiscal/ar/ArcaService'
+import { PadronA4Service } from '../fiscal/ar/PadronA4Service'
+import { modulesInclude } from '../services/TenantConfigService'
 import type { RestRouteContext } from './restRouteTypes'
 import { errorMessage, getTenantId } from './restDomainShared'
 
@@ -27,6 +29,7 @@ const caeBodySchema = z.object({ facturaId: z.number().int().min(1) })
 export function registerArcaRoutes(app: Application, ctx: RestRouteContext): void {
   const { prisma, writeAudit } = ctx
   const arca = new ArcaService(prisma)
+  const padron = new PadronA4Service(prisma)
 
   app.get('/api/arca/config', requirePermission('settings.fiscal.manage'), async (req: Request, res: Response) => {
     try {
@@ -93,6 +96,27 @@ export function registerArcaRoutes(app: Application, ctx: RestRouteContext): voi
           cae: result.data.cae,
         })
         res.json({ success: true, data: { cae: result.data.cae, caeVto: result.data.caeVto } })
+      } catch (err: unknown) {
+        res.status(500).json({ success: false, error: errorMessage(err) })
+      }
+    },
+  )
+
+  app.get(
+    '/api/arca/padron/:cuit',
+    requirePermission('customers.manage'),
+    async (req: Request, res: Response) => {
+      try {
+        const authReq = req as AuthenticatedRequest
+        const moduleEnabled = modulesInclude(authReq.tenantModules, 'billing.arca_cae')
+        const result = await padron.consulta(getTenantId(req), String(req.params.cuit ?? ''), {
+          moduleEnabled,
+        })
+        if (!result.ok) {
+          res.status(result.status).json({ success: false, error: result.error })
+          return
+        }
+        res.json({ success: true, data: result.data })
       } catch (err: unknown) {
         res.status(500).json({ success: false, error: errorMessage(err) })
       }
