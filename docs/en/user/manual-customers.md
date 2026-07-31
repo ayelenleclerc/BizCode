@@ -51,6 +51,21 @@ When you open the section you will see the customer table with: Code, Business N
 
 The system automatically verifies the CUIT. If the check digit does not match, you will see **"CUIT inválido"**. You may enter the CUIT with or without hyphens (`20123456786` or `20-12345678-6`).
 
+### AFIP Padrón A4 lookup (#192)
+
+When you leave the CUIT field (tab away or click elsewhere) with a valid check digit, the form automatically queries the AFIP Padrón A4 registry (`GET /api/arca/padron/{cuit}`, cached 24h per company) and shows a status message next to the field:
+
+| Status | Meaning |
+|---|---|
+| Checking AFIP Padrón… | Lookup in progress. |
+| CUIT verified against AFIP Padrón. | Found — **Razón Social**, **Condición IVA**, **Domicilio**, **Localidad** and **Código Postal** are autofilled from AFIP data. |
+| CUIT not found in AFIP Padrón. | The CUIT is valid but not registered in AFIP's records; fill in the fields manually. |
+| AFIP Padrón lookup unavailable. | The `billing.arca_cae` module is disabled or the company has no AFIP certificate configured; fill in the fields manually. |
+| AFIP Padrón did not respond in time. | Timeout; fill in the fields manually. |
+| Invalid CUIT; AFIP Padrón lookup was not performed. | The CUIT check digit is invalid. |
+
+If the AFIP business name (`razonSocial`) is longer than 30 characters, **Razón Social** is autofilled truncated to 30 characters and a warning is shown so you can review it. This lookup **never blocks saving the customer** — you can always fill in or correct the fields manually and save. Homologación uses a mock registry (`ws_sr_padron_a4`); live production AFIP integration is out of scope for this release.
+
 ## Edit a Customer
 
 1. Select the customer in the table.

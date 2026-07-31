@@ -1462,6 +1462,21 @@ model TenantFiscalConfig {
   updatedAt     DateTime @updatedAt
 }
 
+/// Cached AFIP Padrón A4 lookup per tenant CUIT (#192). TTL typically 24h.
+model PadronA4Cache {
+  id        Int      @id @default(autoincrement())
+  tenantId  Int
+  tenant    Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  /// Digits-only CUIT/CUIL (11 chars).
+  cuit      String   @db.VarChar(11)
+  payload   Json
+  fetchedAt DateTime @default(now())
+  expiresAt DateTime
+
+  @@unique([tenantId, cuit])
+  @@index([tenantId, expiresAt])
+}
+
 model Tenant {
   id               Int       @id @default(autoincrement())
   name             String    @db.VarChar(80)
@@ -1514,6 +1529,7 @@ model Tenant {
   repartos       Reparto[]
   paramEmpresa   ParamEmpresa?
   fiscalConfig   TenantFiscalConfig?
+  padronA4Caches PadronA4Cache[]
   stockAjustes   StockAjuste[]
   depositos      Deposito[]
   stockDepositos StockDeposito[]

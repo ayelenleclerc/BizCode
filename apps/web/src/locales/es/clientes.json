@@ -58,6 +58,18 @@
       "rsocial": "Razón social mínimo 3 caracteres",
       "generic": "Error al guardar cliente"
     },
+    "padron": {
+      "status": {
+        "idle": "",
+        "loading": "Consultando Padrón AFIP…",
+        "verified": "CUIT verificado en Padrón AFIP.",
+        "not_found": "CUIT no encontrado en Padrón AFIP.",
+        "unavailable": "Consulta a Padrón AFIP no disponible. Complete los datos manualmente.",
+        "timeout": "Padrón AFIP no respondió a tiempo. Complete los datos manualmente.",
+        "invalid": "CUIT inválido; no se realizó la consulta a Padrón AFIP."
+      },
+      "truncatedWarning": "La razón social del Padrón AFIP supera los 30 caracteres y fue truncada."
+    },
     "deliveryZone": "Zona de entrega",
     "deliveryZoneNone": "Sin zona asignada",
     "listaPrecio": "Lista de precios",

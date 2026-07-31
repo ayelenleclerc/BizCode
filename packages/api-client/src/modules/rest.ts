@@ -1960,6 +1960,40 @@ export const arcaAPI = {
       return handleError(error as AxiosError<ApiErrorPayload>)
     }
   },
+
+  /**
+   * @en Padrón A4 CUIT lookup (#192).
+   * @es Consulta CUIT Padrón A4 (#192).
+   * @pt-BR Consulta CUIT Padrón A4 (#192).
+   */
+  consultaPadron: async (cuit: string): Promise<PadronA4ConsultaDto> => {
+    try {
+      const response = await api.get<{ success: boolean; data: PadronA4ConsultaDto }>(
+        `/arca/padron/${encodeURIComponent(cuit)}`,
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+}
+
+export type PadronA4ConsultaDto = {
+  cuit: string
+  verificado: boolean
+  available: boolean
+  reason: 'ok' | 'invalid_cuit' | 'not_found' | 'unavailable' | 'timeout'
+  fromCache: boolean
+  fetchedAt: string | null
+  razonSocial: string | null
+  razonSocialTruncada: string | null
+  razonSocialTruncadaFlag: boolean
+  domicilio: string | null
+  localidad: string | null
+  cpost: string | null
+  condIva: 'RI' | 'Mono' | 'CF' | 'Exento' | null
+  estado: 'activo' | 'inactivo' | null
+  categoriaMonotributo: string | null
 }
 
 export type MercadoPagoConfigStatus = {

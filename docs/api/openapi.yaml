@@ -3633,6 +3633,36 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
 
+  /api/arca/padron/{cuit}:
+    get:
+      tags: [afip]
+      summary: Consult AFIP Padrón A4 by CUIT
+      description: |
+        Requires `customers.manage`. Module `billing.arca_cae` recommended; when missing or fiscal cert absent,
+        returns HTTP 200 with `verificado: false` and `reason: unavailable` (graceful degradation, #192).
+        Homologación uses mock ws_sr_padron_a4. Results cached 24h per tenant+CUIT.
+      parameters:
+        - name: cuit
+          in: path
+          required: true
+          schema:
+            type: string
+            minLength: 11
+            maxLength: 14
+      responses:
+        '200':
+          description: Padrón lookup result (may be unverified)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PadronA4Envelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
   /api/arca/cae:
     post:
       tags: [afip]
@@ -18753,6 +18783,57 @@ components:
           type: object
           properties:
             configured: { type: boolean }
+
+    PadronA4Consulta:
+      type: object
+      required:
+        - cuit
+        - verificado
+        - available
+        - reason
+        - fromCache
+        - fetchedAt
+        - razonSocial
+        - razonSocialTruncada
+        - razonSocialTruncadaFlag
+        - domicilio
+        - localidad
+        - cpost
+        - condIva
+        - estado
+        - categoriaMonotributo
+      properties:
+        cuit: { type: string }
+        verificado: { type: boolean }
+        available: { type: boolean }
+        reason:
+          type: string
+          enum: [ok, invalid_cuit, not_found, unavailable, timeout]
+        fromCache: { type: boolean }
+        fetchedAt: { type: string, format: date-time, nullable: true }
+        razonSocial: { type: string, nullable: true }
+        razonSocialTruncada: { type: string, nullable: true }
+        razonSocialTruncadaFlag: { type: boolean }
+        domicilio: { type: string, nullable: true }
+        localidad: { type: string, nullable: true }
+        cpost: { type: string, nullable: true }
+        condIva:
+          type: string
+          nullable: true
+          enum: [RI, Mono, CF, Exento, null]
+        estado:
+          type: string
+          nullable: true
+          enum: [activo, inactivo, null]
+        categoriaMonotributo: { type: string, nullable: true }
+
+    PadronA4Envelope:
+      type: object
+      required: [success, data]
+      properties:
+        success: { type: boolean, const: true }
+        data:
+          $ref: '#/components/schemas/PadronA4Consulta'
 
     MercadoPagoConfigStatus:
       type: object

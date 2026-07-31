@@ -169,6 +169,6 @@ Customer `cbu`/`alias` (optional, editable on the customer form) improve auto-ma
 
 **Tax filings SICORE/SIFERE (#242):** on **Finance → Tax filings** (`finance.retenciones`, `reports.financial.read`): select period and format (SICORE national or SIFERE IIBB), preview operations with regime totals and CUIT warnings, download TXT (`POST /api/fiscal/presentaciones` + `GET .../{id}/archivo`), review history, and mark as filed after AFIP/COMARB upload. APIs: `GET /api/fiscal/presentaciones/preview?formato=sicore|sifere&periodo=YYYY-MM`, `POST/GET /api/fiscal/presentaciones`, `PATCH /api/fiscal/presentaciones/{id}/presentado`. Legacy direct export: `GET /api/fiscal/retenciones/export`. Validate generated files against official homologation tools manually.
 
-Customer/supplier VAT condition uses existing `condIva` on master records; AFIP registry lookup (#192) is not implemented in this release.
+Customer/supplier VAT condition uses existing `condIva` on master records. AFIP Padrón A4 CUIT lookup (#192) is available on the customer form — see [Customers manual](manual-customers.md#afip-padrón-a4-lookup-192).
 
 **Other languages:** [Español](../../es/user/manual-finanzas.md) · [Português](../../pt-br/user/manual-financas.md)

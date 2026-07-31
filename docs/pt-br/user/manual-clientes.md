@@ -51,6 +51,21 @@ Tabela com: **Código**, **Razão Social**, **CNPJ/CPF**, **Regime Fiscal**, **T
 
 O sistema valida o dígito verificador. Em caso de erro, a mensagem é **«CNPJ/CPF inválido»**. Pode informar com ou sem hífens.
 
+### Consulta Padrón A4 AFIP (#192)
+
+Ao sair do campo CUIT (com Tab ou clicando em outro campo) com um dígito verificador válido, o formulário consulta automaticamente o Padrón A4 da AFIP (`GET /api/arca/padron/{cuit}`, com cache de 24h por empresa) e exibe uma mensagem de status ao lado do campo:
+
+| Status | Significado |
+|---|---|
+| Consultando Padrón AFIP… | Consulta em andamento. |
+| CUIT verificado no Padrón AFIP. | Encontrado — **Razão Social**, **Regime Fiscal**, **Endereço**, **Cidade** e **CEP** são preenchidos automaticamente com os dados da AFIP. |
+| CUIT não encontrado no Padrón AFIP. | O CUIT é válido, mas não consta nos registros da AFIP; preencha os campos manualmente. |
+| Consulta ao Padrón AFIP indisponível. | O módulo `billing.arca_cae` está desabilitado ou a empresa não tem certificado AFIP configurado; preencha os campos manualmente. |
+| O Padrón AFIP não respondeu a tempo. | Timeout; preencha os campos manualmente. |
+| CUIT inválido; a consulta ao Padrón AFIP não foi realizada. | O dígito verificador do CUIT é inválido. |
+
+Se a razão social da AFIP (`razonSocial`) tiver mais de 30 caracteres, **Razão Social** é preenchida truncada em 30 caracteres e um aviso é exibido para revisão. Essa consulta **nunca bloqueia o salvamento do cliente** — você sempre pode preencher ou corrigir os campos manualmente e salvar. A homologação usa um mock (`ws_sr_padron_a4`); a integração SOAP AFIP ao vivo em produção fica fora de escopo nesta entrega.
+
 ## Editar cliente
 
 1. Selecione o cliente na tabela.

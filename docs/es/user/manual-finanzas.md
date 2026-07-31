@@ -169,6 +169,6 @@ El `cbu`/`alias` del cliente (opcionales, editables en el formulario de cliente)
 
 **Presentaciones SICORE/SIFERE (#242):** en **Finanzas → Presentaciones impositivas** (`finance.retenciones`, `reports.financial.read`): elegí período y formato (SICORE nacional o SIFERE IIBB), vista previa con totales por régimen y advertencias de CUIT, descarga TXT (`POST /api/fiscal/presentaciones` + `GET .../{id}/archivo`), historial y marca «presentado» tras subir a AFIP/COMARB. APIs: `GET /api/fiscal/presentaciones/preview?formato=sicore|sifere&periodo=YYYY-MM`, `POST/GET /api/fiscal/presentaciones`, `PATCH /api/fiscal/presentaciones/{id}/presentado`. Export directo legacy: `GET /api/fiscal/retenciones/export`. Validá los archivos en homologación oficial manualmente.
 
-La condición IVA de clientes/proveedores usa `condIva` del maestro; consulta Padrón AFIP (#192) no implementada en esta entrega.
+La condición IVA de clientes/proveedores usa `condIva` del maestro. La consulta al Padrón A4 AFIP por CUIT (#192) está disponible en el formulario de cliente — ver [Manual de Clientes](manual-clientes.md#consulta-padrón-a4-afip-192).
 
 **Otros idiomas:** [English](../../en/user/manual-finance.md) · [Português](../../pt-br/user/manual-financas.md)

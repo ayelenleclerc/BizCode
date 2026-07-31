@@ -1,11 +1,11 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, type FocusEvent } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useHotkeys } from 'react-hotkeys-hook'
 import KeyboardHint, { useFormShortcuts } from '@/components/shared/KeyboardHint'
 import { useTranslation } from 'react-i18next'
-import { clientesAPI, listasPreciosAPI, zonasEntregaAPI } from '@/lib/api'
+import { arcaAPI, clientesAPI, listasPreciosAPI, zonasEntregaAPI } from '@/lib/api'
 import { validateCUIT, formatCUIT, validateCBU } from '@/lib/validators'
 import { useAuth } from '@/contexts/AuthContext'
 import { Cliente, DeliveryZone, type ListaPrecioRow } from '@bizcode/types'
@@ -13,6 +13,9 @@ import ClienteCobrosRecientes from './ClienteCobrosRecientes'
 import ClienteCuentaCorrienteSection from './ClienteCuentaCorrienteSection'
 import ClienteFidelizacionSection from './ClienteFidelizacionSection'
 import IfModule from '@/components/IfModule'
+
+/** AFIP Padrón A4 CUIT lookup status shown next to the CUIT field (#192). */
+type PadronStatus = 'idle' | 'loading' | 'verified' | 'not_found' | 'unavailable' | 'timeout' | 'invalid'
 
 const clienteSchema = z.object({
   codigo: z.coerce.number().int().positive('Código debe ser positivo'),
@@ -117,6 +120,9 @@ export default function ClienteForm({ cliente, onClose, onGuardado }: ClienteFor
   const [showAnonymizePanel, setShowAnonymizePanel] = useState(false)
   const [anonymizeConfirm, setAnonymizeConfirm] = useState('')
   const [privacyNotice, setPrivacyNotice] = useState<string | null>(null)
+  // AFIP Padrón A4 lookup (#192) — never blocks submit; degrades gracefully.
+  const [padronStatus, setPadronStatus] = useState<PadronStatus>('idle')
+  const [padronTruncatedWarning, setPadronTruncatedWarning] = useState(false)
 
   const {
     register,
@@ -162,6 +168,59 @@ export default function ClienteForm({ cliente, onClose, onGuardado }: ClienteFor
       setValue('listaPrecioId', cliente.listaPrecioId ?? null)
     }
   }, [cliente, setValue])
+
+  /**
+   * @en Looks up the CUIT in AFIP Padrón A4 on blur and autofills verified fields (#192). Never blocks the form.
+   * @es Consulta el CUIT en Padrón A4 AFIP al perder foco y autocompleta campos verificados (#192). Nunca bloquea el formulario.
+   * @pt-BR Consulta o CUIT no Padrón A4 AFIP ao perder foco e autopreenche campos verificados (#192). Nunca bloqueia o formulário.
+   */
+  const handleCuitBlur = async (rawValue: string) => {
+    const value = rawValue.trim()
+    if (!value) {
+      setPadronStatus('idle')
+      setPadronTruncatedWarning(false)
+      return
+    }
+    if (!validateCUIT(value)) {
+      setPadronStatus('invalid')
+      setPadronTruncatedWarning(false)
+      return
+    }
+
+    setPadronStatus('loading')
+    try {
+      const result = await arcaAPI.consultaPadron(value)
+      setPadronTruncatedWarning(result.razonSocialTruncadaFlag)
+
+      if (result.verificado) {
+        setPadronStatus('verified')
+        if (result.razonSocialTruncada) setValue('rsocial', result.razonSocialTruncada)
+        if (result.condIva) setValue('condIva', result.condIva)
+        if (result.domicilio) setValue('domicilio', result.domicilio)
+        if (result.localidad) setValue('localidad', result.localidad)
+        if (result.cpost) setValue('cpost', result.cpost)
+        return
+      }
+
+      if (result.reason === 'not_found') {
+        setPadronStatus('not_found')
+        return
+      }
+      if (result.reason === 'timeout') {
+        setPadronStatus('timeout')
+        return
+      }
+      if (result.reason === 'invalid_cuit') {
+        setPadronStatus('invalid')
+        return
+      }
+      setPadronStatus('unavailable')
+    } catch {
+      // Network/server errors must never block the customer form (#192).
+      setPadronTruncatedWarning(false)
+      setPadronStatus('unavailable')
+    }
+  }
 
   useHotkeys('f5', () => {
     const form = document.querySelector('form') as HTMLFormElement
@@ -339,13 +398,47 @@ export default function ClienteForm({ cliente, onClose, onGuardado }: ClienteFor
             <input
               id="cliente-cuit"
               type="text"
-              {...register('cuit')}
+              data-testid="cliente-form-cuit"
+              {...register('cuit', {
+                onBlur: (e: FocusEvent<HTMLInputElement>) => {
+                  void handleCuitBlur(e.target.value)
+                },
+              })}
               placeholder="20-12345678-9"
-              aria-describedby={errors.cuit ? 'cliente-cuit-error' : undefined}
+              aria-describedby={errors.cuit ? 'cliente-cuit-error' : 'cliente-padron-status'}
               className="w-full px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 rounded border border-slate-300 dark:border-slate-600 focus:border-blue-500 focus:outline-none font-mono"
             />
             {errors.cuit && (
               <p id="cliente-cuit-error" className="text-red-400 text-sm mt-1">{errors.cuit.message}</p>
+            )}
+            {padronStatus !== 'idle' && (
+              <p
+                id="cliente-padron-status"
+                data-testid="cliente-padron-status"
+                data-status={padronStatus}
+                role="status"
+                aria-live="polite"
+                className={
+                  padronStatus === 'verified'
+                    ? 'text-sm mt-1 text-green-700 dark:text-green-400'
+                    : padronStatus === 'invalid' || padronStatus === 'unavailable'
+                      ? 'text-sm mt-1 text-slate-500 dark:text-slate-400'
+                      : padronStatus === 'timeout'
+                        ? 'text-sm mt-1 text-amber-600 dark:text-amber-400'
+                        : 'text-sm mt-1 text-slate-500 dark:text-slate-400'
+                }
+              >
+                {t(`form.padron.status.${padronStatus}`)}
+              </p>
+            )}
+            {padronStatus === 'verified' && padronTruncatedWarning && (
+              <p
+                data-testid="cliente-padron-truncated-warning"
+                role="alert"
+                className="text-sm mt-1 text-amber-600 dark:text-amber-400"
+              >
+                {t('form.padron.truncatedWarning')}
+              </p>
             )}
           </div>
 
