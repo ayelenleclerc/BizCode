@@ -10,7 +10,9 @@ Versioning: [Semantic Versioning](https://semver.org/).
 
 ### Added
 
-- **Bank statement import (#190):** Prisma `CuentaBancaria` / `MovimientoBancario` / `BancoCsvMapping`; parsers CSV (configurable mappings), OFX, MT940; `POST /api/bancos/cuentas/:id/importar` with dedupe; Finance UI under module `finance.bank_reconcile`; fixtures Galicia/Santander. Out of scope: matching to cobros (#191).
+- **Bank statement import (#190):** Prisma `CuentaBancaria` / `MovimientoBancario` / `BancoCsvMapping`; parsers CSV (configurable mappings), OFX, MT940; `POST /api/bancos/cuentas/:id/importar` with dedupe; Finance UI under module `finance.bank_reconcile`; fixtures Galicia/Santander.
+
+- **Bank reconciliation and auto-matching (#191):** pure `matchEngine` scoring bank movements against `ReciboCobroForma`/`Cobro` candidates by amount, date tolerance and CBU/alias (new `Cliente.cbu`/`Cliente.alias` fields); `BancoConciliacionService` computes `MovimientoBancario.matchEstado` (`matched_auto` / `suggested` / `unmatched`), `matchScore`, `matchSugerencias` and `conciliadoTipo`; Prisma `PeriodoBancarioLock` blocks edits to a closed `YYYY-MM` period; API `GET /api/bancos/cuentas/:id/conciliacion`, `POST .../conciliacion/run`, `GET .../conciliacion/export.xlsx`, `POST /api/bancos/movimientos/:movId/conciliar` (manual `recibo_forma`/`cobro` assignment), `.../sugerencia/confirmar`, `.../ignorar`, `.../gasto-bancario`, `POST`/`DELETE /api/bancos/cuentas/:id/periodos/:periodo/lock` (write actions restricted to owner/manager/super_admin); staff UI `/finanzas/conciliacion-bancaria` (`ConciliacionBancariaPage`) under module `finance.bank_reconcile`; OpenAPI, API-client, contract and unit/UI tests, trilingual finance manual.
 
 - **Privacy / data subject rights (#195):** `GET /api/clientes/:id/exportar-datos` and `POST .../anonimizar` (owner/super_admin); `Cliente.anonymizedAt`; public `/privacidad`; create-form consent checkbox (UI gate); PRV-001 partial evidence; trilingual quality docs. AAIP registration remains operator-owned. Out of scope: SaaS onboarding consent (#180), marketing preference center.
 

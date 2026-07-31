@@ -214,6 +214,18 @@
 
 * [ComprobantePendienteListEnvelope](./comprobantependientelistenvelope.md) – `-`
 
+* [ConciliacionData](./conciliaciondata.md) – `-`
+
+* [ConciliacionEnvelope](./conciliacionenvelope.md) – `-`
+
+* [ConciliacionMovimiento](./conciliacionmovimiento.md "Reconciliation view of a bank movement (#191)") – `-`
+
+* [ConciliacionMovimientoEnvelope](./conciliacionmovimientoenvelope.md) – `-`
+
+* [ConciliacionSummary](./conciliacionsummary.md) – `-`
+
+* [ConciliarManualBody](./conciliarmanualbody.md) – `-`
+
 * [ConfigComision](./configcomision.md) – `-`
 
 * [ConfigComisionCreateInput](./configcomisioncreateinput.md) – `-`
@@ -522,6 +534,8 @@
 
 * [LoteTrazabilidadEnvelope](./lotetrazabilidadenvelope.md) – `-`
 
+* [MatchSugerencia](./matchsugerencia.md) – `-`
+
 * [MercadoPagoChargeback](./mercadopagochargeback.md) – `-`
 
 * [MercadoPagoChargebackEnvelope](./mercadopagochargebackenvelope.md) – `-`
@@ -727,6 +741,10 @@
 * [PedidoItem](./pedidoitem.md) – `-`
 
 * [PedidoListEnvelope](./pedidolistenvelope.md) – `-`
+
+* [PeriodoLockEnvelope](./periodolockenvelope.md) – `-`
+
+* [PeriodoLockResult](./periodolockresult.md) – `-`
 
 * [PlanCatalogEnvelope](./plancatalogenvelope.md) – `-`
 
@@ -994,6 +1012,10 @@
 
 * [RubroListEnvelope](./rubrolistenvelope.md) – `-`
 
+* [RunMatchingEnvelope](./runmatchingenvelope.md) – `-`
+
+* [RunMatchingSummary](./runmatchingsummary.md) – `-`
+
 * [SetupOwnerEnvelope](./setupownerenvelope.md) – `-`
 
 * [SetupOwnerInput](./setupownerinput.md) – `-`
@@ -1169,6 +1191,8 @@
 * [Untitled object in CobroCreateData](./cobrocreatedata-properties-updatedcliente.md) – `undefined#/properties/updatedCliente`
 
 * [Untitled object in CobroListEnvelope](./cobrolistenvelope-allof-0.md) – `undefined#/allOf/0`
+
+* [Untitled object in ConciliacionSummary](./conciliacionsummary-properties-opencandidates.md) – `undefined#/properties/openCandidates`
 
 * [Untitled object in ConfigComisionListEnvelope](./configcomisionlistenvelope-allof-0.md) – `undefined#/allOf/0`
 
@@ -1496,6 +1520,10 @@
 
 * [Untitled array in ComprobantePendienteListEnvelope](./comprobantependientelistenvelope-properties-data.md) – `undefined#/properties/data`
 
+* [Untitled array in ConciliacionData](./conciliaciondata-properties-movimientos.md) – `undefined#/properties/movimientos`
+
+* [Untitled array in ConciliacionMovimiento](./conciliacionmovimiento-properties-matchsugerencias.md) – `undefined#/properties/matchSugerencias`
+
 * [Untitled array in ConfigComisionListEnvelope](./configcomisionlistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
 
 * [Untitled array in Contrato](./contrato-properties-items.md) – `undefined#/properties/items`
@@ -1613,6 +1641,8 @@
 * [Untitled array in ModuleCatalogEntry](./modulecatalogentry-properties-dependencies.md) – `undefined#/properties/dependencies`
 
 * [Untitled array in ModuleCatalogPreset](./modulecatalogpreset-properties-modules.md) – `undefined#/properties/modules`
+
+* [Untitled array in MovimientoBancario](./movimientobancario-properties-matchsugerencias.md "Ranked candidate suggestions when matchEstado is suggested (#191)") – `undefined#/properties/matchSugerencias`
 
 * [Untitled array in NotaCreditoListEnvelope](./notacreditolistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
 

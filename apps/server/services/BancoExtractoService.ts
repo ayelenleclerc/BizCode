@@ -76,6 +76,12 @@ function serializeMovimiento(row: MovimientoBancario) {
     dedupeKey: row.dedupeKey,
     conciliadoId: row.conciliadoId,
     conciliadoAt: row.conciliadoAt?.toISOString() ?? null,
+    /** @en Reconciliation target kind, set once conciliadoId is assigned (#191). @es Tipo de destino de conciliación, asignado junto con conciliadoId (#191). @pt-BR Tipo de destino de conciliação, atribuído junto com conciliadoId (#191). */
+    conciliadoTipo: row.conciliadoTipo,
+    /** @en Matching engine lifecycle state (#191). @es Estado del ciclo de vida del motor de matching (#191). @pt-BR Estado do ciclo de vida do motor de matching (#191). */
+    matchEstado: row.matchEstado,
+    matchScore: row.matchScore != null ? Number(row.matchScore.toString()) : null,
+    matchSugerencias: row.matchSugerencias,
     createdAt: row.createdAt.toISOString(),
   }
 }

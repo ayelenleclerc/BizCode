@@ -21,6 +21,10 @@ export interface Cliente {
   suspended?: boolean
   deliveryZoneId?: number | null
   listaPrecioId?: number | null
+  /** @en Bank CBU used for transfer matching in reconciliation (#191). @es CBU bancario usado para matching de transferencias en conciliación (#191). @pt-BR CBU bancário usado para matching de transferências na conciliação (#191). */
+  cbu?: string | null
+  /** @en Bank alias (CVU/CBU) used for transfer matching in reconciliation (#191). @es Alias bancario (CVU/CBU) usado para matching de transferencias en conciliación (#191). @pt-BR Alias bancário (CVU/CBU) usado para matching de transferências na conciliação (#191). */
+  alias?: string | null
   /** @en Set when PII was irreversibly anonymized (#195). */
   anonymizedAt?: string | Date | null
   createdAt: Date

@@ -19,6 +19,8 @@ undefined
 | Property                          | Type      | Required | Nullable       | Defined by                                                                                       |
 | :-------------------------------- | :-------- | :------- | :------------- | :----------------------------------------------------------------------------------------------- |
 | [activo](#activo)                 | `boolean` | Required | cannot be null | [ClienteInput](clienteinput-properties-activo.md "undefined#/properties/activo")                 |
+| [alias](#alias)                   | `string`  | Optional | cannot be null | [ClienteInput](clienteinput-properties-alias.md "undefined#/properties/alias")                   |
+| [cbu](#cbu)                       | `string`  | Optional | cannot be null | [ClienteInput](clienteinput-properties-cbu.md "undefined#/properties/cbu")                       |
 | [codigo](#codigo)                 | `integer` | Required | cannot be null | [ClienteInput](clienteinput-properties-codigo.md "undefined#/properties/codigo")                 |
 | [condIva](#condiva)               | `string`  | Required | cannot be null | [ClienteInput](clienteinput-properties-condiva.md "undefined#/properties/condIva")               |
 | [cpost](#cpost)                   | `string`  | Optional | cannot be null | [ClienteInput](clienteinput-properties-cpost.md "undefined#/properties/cpost")                   |
@@ -51,6 +53,56 @@ undefined
 ### activo Type
 
 `boolean`
+
+## alias
+
+
+
+`alias`
+
+* is optional
+
+* Type: `string`
+
+* cannot be null
+
+* defined in: [ClienteInput](clienteinput-properties-alias.md "undefined#/properties/alias")
+
+### alias Type
+
+`string`
+
+### alias Constraints
+
+**maximum length**: the maximum number of characters for this string is: `60`
+
+## cbu
+
+
+
+`cbu`
+
+* is optional
+
+* Type: `string`
+
+* cannot be null
+
+* defined in: [ClienteInput](clienteinput-properties-cbu.md "undefined#/properties/cbu")
+
+### cbu Type
+
+`string`
+
+### cbu Constraints
+
+**pattern**: the string must match the following regular expression:&#x20;
+
+```regexp
+^[0-9]{22}$
+```
+
+[try pattern](https://regexr.com/?expression=%5E%5B0-9%5D%7B22%7D%24 "try regular expression with regexr.com")
 
 ## codigo
 

@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "movimientos": {
+      "items": {
+        "$ref": "./ConciliacionMovimiento.schema.json"
+      },
+      "type": "array"
+    },
+    "summary": {
+      "$ref": "./ConciliacionSummary.schema.json"
+    }
+  },
+  "required": [
+    "movimientos",
+    "summary"
+  ],
+  "title": "ConciliacionData",
+  "type": "object"
+}

@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "lockedAt": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "periodo": {
+      "pattern": "^\\d{4}-\\d{2}$",
+      "type": "string"
+    }
+  },
+  "required": [
+    "periodo",
+    "lockedAt"
+  ],
+  "title": "PeriodoLockResult",
+  "type": "object"
+}

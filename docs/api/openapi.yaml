@@ -7867,6 +7867,322 @@ paths:
         '404':
           $ref: '#/components/responses/NotFoundError'
 
+  /api/bancos/cuentas/{id}/conciliacion:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    get:
+      tags: [bancos]
+      summary: Get bank reconciliation state for an account (#191)
+      description: Requires module `finance.bank_reconcile` and permission `reports.financial.read`.
+      parameters:
+        - name: desde
+          in: query
+          schema:
+            type: string
+            format: date-time
+          description: Defaults to the first day of the current month (UTC).
+        - name: hasta
+          in: query
+          schema:
+            type: string
+            format: date-time
+          description: Defaults to the current instant (UTC).
+      responses:
+        '200':
+          description: Movements with reconciliation status plus a summary
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConciliacionEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+  /api/bancos/cuentas/{id}/conciliacion/run:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    post:
+      tags: [bancos]
+      summary: Run the reconciliation matching engine over unlocked movements (#191)
+      description: Requires module `finance.bank_reconcile`, permission `reports.financial.read`, and role owner/manager/super_admin.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                desde:
+                  type: string
+                  format: date-time
+                hasta:
+                  type: string
+                  format: date-time
+      responses:
+        '200':
+          description: Matching run summary
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RunMatchingEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+  /api/bancos/cuentas/{id}/conciliacion/export.xlsx:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    get:
+      tags: [bancos]
+      summary: Export reconciliation state as an Excel workbook (#191)
+      description: Requires module `finance.bank_reconcile` and permission `reports.financial.read`.
+      parameters:
+        - name: desde
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: hasta
+          in: query
+          schema:
+            type: string
+            format: date-time
+      responses:
+        '200':
+          description: XLSX workbook
+          content:
+            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+              schema:
+                type: string
+                format: binary
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+  /api/bancos/movimientos/{movId}/conciliar:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: movId
+        in: path
+        required: true
+        schema:
+          type: integer
+    post:
+      tags: [bancos]
+      summary: Manually reconcile a movement against a ReciboCobroForma or legacy Cobro (#191)
+      description: Requires module `finance.bank_reconcile`, permission `reports.financial.read`, and role owner/manager/super_admin.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConciliarManualBody'
+      responses:
+        '200':
+          description: Updated movement
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConciliacionMovimientoEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '409':
+          description: Candidate already reconciled or period locked
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+
+  /api/bancos/movimientos/{movId}/sugerencia/confirmar:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: movId
+        in: path
+        required: true
+        schema:
+          type: integer
+    post:
+      tags: [bancos]
+      summary: Confirm the primary suggestion of a `suggested` movement as a manual match (#191)
+      description: Requires module `finance.bank_reconcile`, permission `reports.financial.read`, and role owner/manager/super_admin.
+      responses:
+        '200':
+          description: Updated movement
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConciliacionMovimientoEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '409':
+          description: Candidate already reconciled or period locked
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+
+  /api/bancos/movimientos/{movId}/ignorar:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: movId
+        in: path
+        required: true
+        schema:
+          type: integer
+    post:
+      tags: [bancos]
+      summary: Mark a movement as ignored, excluding it from reconciliation (#191)
+      description: Requires module `finance.bank_reconcile`, permission `reports.financial.read`, and role owner/manager/super_admin.
+      responses:
+        '200':
+          description: Updated movement
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConciliacionMovimientoEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '409':
+          description: Period locked
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+
+  /api/bancos/movimientos/{movId}/gasto-bancario:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: movId
+        in: path
+        required: true
+        schema:
+          type: integer
+    post:
+      tags: [bancos]
+      summary: Manually reclassify a movement as a bank fee/charge (#191)
+      description: Requires module `finance.bank_reconcile`, permission `reports.financial.read`, and role owner/manager/super_admin.
+      responses:
+        '200':
+          description: Updated movement
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConciliacionMovimientoEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '409':
+          description: Period locked
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+
+  /api/bancos/cuentas/{id}/periodos/{periodo}/lock:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: periodo
+        in: path
+        required: true
+        schema:
+          type: string
+          pattern: '^\d{4}-\d{2}$'
+        description: Reconciliation period formatted YYYY-MM.
+    post:
+      tags: [bancos]
+      summary: Lock a YYYY-MM reconciliation period for an account (#191)
+      description: Requires module `finance.bank_reconcile`, permission `reports.financial.read`, and role owner/manager/super_admin.
+      responses:
+        '201':
+          description: Period locked
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PeriodoLockEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '409':
+          description: Period already locked
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+    delete:
+      tags: [bancos]
+      summary: Unlock a previously locked YYYY-MM reconciliation period (#191)
+      description: Requires module `finance.bank_reconcile`, permission `reports.financial.read`, and role owner/manager/super_admin.
+      responses:
+        '200':
+          description: Period unlocked
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [success, data]
+                properties:
+                  success: { type: boolean }
+                  data: { type: 'null' }
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
   /api/cheques/resumen:
     parameters:
       - $ref: '#/components/parameters/BizcodeChannelHeader'
@@ -13154,6 +13470,14 @@ components:
           type: integer
           nullable: true
           description: FK to DeliveryZone. Assign a delivery zone to this customer.
+        cbu:
+          type: string
+          nullable: true
+          description: Argentine CBU (22 digits) used to match Mercado Pago/bank collections against this customer (#191).
+        alias:
+          type: string
+          nullable: true
+          description: Bank alias used to match Mercado Pago/bank collections against this customer (#191).
 
     ClienteInput:
       type: object
@@ -13202,6 +13526,14 @@ components:
         deliveryZoneId:
           type: integer
           nullable: true
+        cbu:
+          type: string
+          nullable: true
+          pattern: '^[0-9]{22}$'
+        alias:
+          type: string
+          nullable: true
+          maxLength: 60
 
     ClienteImportRowError:
       type: object
@@ -16598,6 +16930,178 @@ components:
         conciliadoId: { type: integer, nullable: true }
         conciliadoAt: { type: string, format: date-time, nullable: true }
         createdAt: { type: string, format: date-time }
+        conciliadoTipo:
+          type: string
+          nullable: true
+          enum: [recibo_forma, cobro, null]
+          description: Kind of internal record this movement was reconciled against (#191).
+        matchEstado:
+          type: string
+          enum: [unmatched, suggested, matched_auto, matched_manual, ignored, bank_fee]
+          description: Reconciliation lifecycle state of this movement (#191).
+        matchScore:
+          type: number
+          nullable: true
+          description: Matching engine score of the winning/suggested candidate (#191).
+        matchSugerencias:
+          type: array
+          nullable: true
+          description: Ranked candidate suggestions when matchEstado is `suggested` (#191).
+          items:
+            $ref: '#/components/schemas/MatchSugerencia'
+
+    MatchSugerencia:
+      type: object
+      required: [tipo, id, clienteId, importe, fecha, referencia]
+      properties:
+        tipo:
+          type: string
+          enum: [recibo_forma, cobro]
+        id: { type: integer }
+        clienteId: { type: integer }
+        importe: { type: number }
+        fecha: { type: string, format: date-time }
+        referencia: { type: string, nullable: true }
+
+    ConciliacionMovimiento:
+      type: object
+      description: >-
+        Reconciliation view of a bank movement (#191). This is a narrower projection than
+        `MovimientoBancario` — it omits `saldo`, `formatoOrigen`, `dedupeKey`, and `createdAt`,
+        and adds `periodoLocked`.
+      required:
+        - id
+        - cuentaId
+        - fecha
+        - descripcion
+        - importe
+        - tipo
+        - referencia
+        - matchEstado
+        - conciliadoTipo
+        - conciliadoId
+        - conciliadoAt
+        - matchScore
+        - matchSugerencias
+        - periodoLocked
+      properties:
+        id: { type: integer }
+        cuentaId: { type: integer }
+        fecha: { type: string, format: date-time }
+        descripcion: { type: string }
+        importe: { type: string }
+        tipo: { type: string, enum: [debito, credito] }
+        referencia: { type: string, nullable: true }
+        matchEstado:
+          type: string
+          enum: [unmatched, suggested, matched_auto, matched_manual, ignored, bank_fee]
+        conciliadoTipo:
+          type: string
+          nullable: true
+          enum: [recibo_forma, cobro, null]
+        conciliadoId: { type: integer, nullable: true }
+        conciliadoAt: { type: string, format: date-time, nullable: true }
+        matchScore: { type: number, nullable: true }
+        matchSugerencias:
+          type: array
+          nullable: true
+          items:
+            $ref: '#/components/schemas/MatchSugerencia'
+        periodoLocked:
+          type: boolean
+          description: True when the movement's YYYY-MM period is locked for reconciliation (#191).
+
+    ConciliacionSummary:
+      type: object
+      required: [total, unmatched, suggested, matchedAuto, matchedManual, ignored, bankFees, openCandidates]
+      properties:
+        total: { type: integer }
+        unmatched: { type: integer }
+        suggested: { type: integer }
+        matchedAuto: { type: integer }
+        matchedManual: { type: integer }
+        ignored: { type: integer }
+        bankFees: { type: integer }
+        openCandidates:
+          type: object
+          required: [recibosForma, cobros]
+          properties:
+            recibosForma: { type: integer }
+            cobros: { type: integer }
+
+    ConciliacionData:
+      type: object
+      required: [movimientos, summary]
+      properties:
+        movimientos:
+          type: array
+          items:
+            $ref: '#/components/schemas/ConciliacionMovimiento'
+        summary:
+          $ref: '#/components/schemas/ConciliacionSummary'
+
+    ConciliacionEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success: { type: boolean }
+        data:
+          $ref: '#/components/schemas/ConciliacionData'
+
+    RunMatchingSummary:
+      type: object
+      required: [processed, autoMatched, suggested, unmatched, bankFees]
+      properties:
+        processed: { type: integer }
+        autoMatched: { type: integer }
+        suggested: { type: integer }
+        unmatched: { type: integer }
+        bankFees: { type: integer }
+
+    RunMatchingEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success: { type: boolean }
+        data:
+          $ref: '#/components/schemas/RunMatchingSummary'
+
+    ConciliacionMovimientoEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success: { type: boolean }
+        data:
+          $ref: '#/components/schemas/ConciliacionMovimiento'
+
+    ConciliarManualBody:
+      type: object
+      required: [tipo, id]
+      properties:
+        tipo:
+          type: string
+          enum: [recibo_forma, cobro]
+        id:
+          type: integer
+
+    PeriodoLockResult:
+      type: object
+      required: [periodo, lockedAt]
+      properties:
+        periodo:
+          type: string
+          pattern: '^\d{4}-\d{2}$'
+        lockedAt:
+          type: string
+          format: date-time
+
+    PeriodoLockEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success: { type: boolean }
+        data:
+          $ref: '#/components/schemas/PeriodoLockResult'
 
     BancoCsvMapping:
       type: object

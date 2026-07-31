@@ -33,6 +33,8 @@ const baseCliente = {
   deliveryZoneId: null,
   listaPrecioId: null,
   anonymizedAt: null as Date | null,
+  cbu: null as string | null,
+  alias: null as string | null,
   createdAt: new Date('2026-01-01T00:00:00.000Z'),
   updatedAt: new Date('2026-01-01T00:00:00.000Z'),
 }

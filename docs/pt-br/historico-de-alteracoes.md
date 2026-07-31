@@ -10,7 +10,9 @@ Versionamento: [Semantic Versioning](https://semver.org/).
 
 ### Adicionado
 
-- **Importação de extrato bancário (#190):** modelos Prisma, parsers CSV/OFX/MT940, API `/api/bancos`, UI Finanças (`finance.bank_reconcile`), mapeamentos CSV configuráveis. Fora de escopo: matching com cobranças (#191).
+- **Importação de extrato bancário (#190):** modelos Prisma, parsers CSV/OFX/MT940, API `/api/bancos`, UI Finanças (`finance.bank_reconcile`), mapeamentos CSV configuráveis.
+
+- **Conciliação bancária e matching automático (#191):** motor puro `matchEngine` que pontua movimentos bancários contra candidatos de `ReciboCobroForma`/`Cobro` por valor, tolerância de data e CBU/alias (novos campos `Cliente.cbu`/`Cliente.alias`); `BancoConciliacionService` calcula `MovimientoBancario.matchEstado` (`matched_auto` / `suggested` / `unmatched`), `matchScore`, `matchSugerencias` e `conciliadoTipo`; novo modelo Prisma `PeriodoBancarioLock` bloqueia edições em um período `YYYY-MM` fechado; API `GET /api/bancos/cuentas/:id/conciliacion`, `POST .../conciliacion/run`, `GET .../conciliacion/export.xlsx`, `POST /api/bancos/movimientos/:movId/conciliar` (atribuição manual `recibo_forma`/`cobro`), `.../sugerencia/confirmar`, `.../ignorar`, `.../gasto-bancario`, `POST`/`DELETE /api/bancos/cuentas/:id/periodos/:periodo/lock` (ações de escrita restritas a owner/manager/super_admin); UI `/finanzas/conciliacion-bancaria` (`ConciliacionBancariaPage`) sob o módulo `finance.bank_reconcile`; OpenAPI, api-client, testes de contrato e unitários/UI, manual de finanças trilíngue.
 
 - **Privacidade / direitos do titular (#195):** exportar e anonimizar cliente (owner/super_admin); `anonymizedAt`; `/privacidad` pública; consent UI na criação; evidência parcial PRV-001; docs quality trilingues. Registro AAIP a cargo do operador. Fora de escopo: consent onboarding SaaS (#180).
 

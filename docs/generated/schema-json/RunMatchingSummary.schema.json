@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "autoMatched": {
+      "type": "integer"
+    },
+    "bankFees": {
+      "type": "integer"
+    },
+    "processed": {
+      "type": "integer"
+    },
+    "suggested": {
+      "type": "integer"
+    },
+    "unmatched": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "processed",
+    "autoMatched",
+    "suggested",
+    "unmatched",
+    "bankFees"
+  ],
+  "title": "RunMatchingSummary",
+  "type": "object"
+}

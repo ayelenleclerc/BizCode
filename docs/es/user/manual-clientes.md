@@ -34,6 +34,8 @@ Al abrir la sección verá la tabla de clientes con: Código, Razón Social, CUI
 | Código Postal | No | Código postal (hasta 8 caracteres). |
 | Teléfono | No | Número de teléfono. |
 | Email | No | Dirección de correo electrónico válida. |
+| CBU | No | CBU bancario de 22 dígitos, usado para el matching de conciliación bancaria (#191). El sistema valida los dígitos verificadores. |
+| Alias | No | Alias bancario (CVU/CBU), hasta 60 caracteres; también usado para el matching de conciliación bancaria (#191). |
 | Activo | Sí | Desmarcar para dar de baja al cliente sin eliminarlo. |
 
 ### Condición IVA

@@ -34,6 +34,8 @@ When you open the section you will see the customer table with: Code, Business N
 | Código Postal | No | Postal code (up to 8 characters). |
 | Teléfono | No | Phone number. |
 | Email | No | Valid email address. |
+| CBU | No | 22-digit Argentine bank account (CBU) used for bank reconciliation matching (#191). The system validates the check digits. |
+| Alias | No | Bank alias (CVU/CBU), up to 60 characters; also used for bank reconciliation matching (#191). |
 | Activo | Yes | Uncheck to deactivate the customer without deleting records. |
 
 ### VAT Condition

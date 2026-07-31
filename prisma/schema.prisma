@@ -85,6 +85,14 @@ model Cliente {
   /// @es Si está set, la PII del cliente fue anonimizada de forma irreversible (#195); filas fiscales permanecen.
   /// @pt-BR Se definido, a PII do cliente foi anonimizada de forma irreversível (#195); linhas fiscais permanecem.
   anonymizedAt   DateTime?
+  /// @en Customer bank CBU for transfer matching (#191).
+  /// @es CBU bancario del cliente para matching de transferencias (#191).
+  /// @pt-BR CBU bancário do cliente para matching de transferências (#191).
+  cbu            String?  @db.VarChar(22)
+  /// @en Customer bank alias (CVU/CBU alias) for transfer matching (#191).
+  /// @es Alias bancario del cliente (CVU/CBU) para matching de transferencias (#191).
+  /// @pt-BR Alias bancário do cliente (CVU/CBU) para matching de transferências (#191).
+  alias          String?  @db.VarChar(60)
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
@@ -108,6 +116,7 @@ model Cliente {
   @@unique([tenantId, codigo])
   @@index([tenantId])
   @@index([tenantId, codigo])
+  @@index([tenantId, cbu])
 }
 
 model Rubro {
@@ -1501,6 +1510,7 @@ model Tenant {
   cheques        Cheque[]
   cuentasBancarias CuentaBancaria[]
   bancoCsvMappings BancoCsvMapping[]
+  periodosBancariosLock PeriodoBancarioLock[]
   repartos       Reparto[]
   paramEmpresa   ParamEmpresa?
   fiscalConfig   TenantFiscalConfig?
@@ -1956,6 +1966,7 @@ model AppUser {
   liquidacionesComision  LiquidacionComision[] @relation("LiquidacionComisionVendedor")
   liquidacionesComisionAprobadas LiquidacionComision[] @relation("LiquidacionComisionAprobadoPor")
   importJobs             ImportJob[] @relation("ImportJobCreatedBy")
+  periodosBancariosLock  PeriodoBancarioLock[]
   tiposCambio            TipoCambio[] @relation("TipoCambioCreatedBy")
   ordenesProduccion      OrdenProduccion[] @relation("OrdenProduccionOperador")
   movimientosPuntos      MovimientoPuntos[] @relation("MovimientoPuntosUser")
@@ -2845,12 +2856,13 @@ model CuentaBancaria {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
   movimientos MovimientoBancario[]
+  periodosLock PeriodoBancarioLock[]
 
   @@unique([tenantId, cbu])
   @@index([tenantId, activo])
 }
 
-/// Imported bank movement; conciliado* reserved for #191 matching.
+/// Imported bank movement with optional collection match (#190/#191).
 model MovimientoBancario {
   id            Int           @id @default(autoincrement())
   cuentaId      Int
@@ -2865,13 +2877,39 @@ model MovimientoBancario {
   /// csv | ofx | mt940
   formatoOrigen String        @db.VarChar(10)
   dedupeKey     String        @db.VarChar(64)
+  /// Logical FK to ReciboCobroForma.id or Cobro.id when matched (#191).
   conciliadoId  Int?
   conciliadoAt  DateTime?
+  /// recibo_forma | cobro
+  conciliadoTipo String?      @db.VarChar(20)
+  /// unmatched | suggested | matched_auto | matched_manual | ignored | bank_fee
+  matchEstado   String        @default("unmatched") @db.VarChar(20)
+  matchScore    Decimal?      @db.Decimal(5, 2)
+  /// JSON array of suggested candidate ids (tipo+id) when matchEstado=suggested.
+  matchSugerencias Json?
   createdAt     DateTime      @default(now())
 
   @@unique([cuentaId, dedupeKey])
   @@index([cuentaId, fecha])
   @@index([cuentaId, conciliadoAt])
+  @@index([cuentaId, matchEstado])
+}
+
+/// Locked bank reconciliation period YYYY-MM (#191).
+model PeriodoBancarioLock {
+  id              Int            @id @default(autoincrement())
+  tenantId        Int
+  tenant          Tenant         @relation(fields: [tenantId], references: [id])
+  cuentaId        Int
+  cuenta          CuentaBancaria @relation(fields: [cuentaId], references: [id], onDelete: Cascade)
+  /// YYYY-MM
+  periodo         String         @db.VarChar(7)
+  lockedAt        DateTime       @default(now())
+  lockedByUserId  Int
+  lockedByUser    AppUser        @relation(fields: [lockedByUserId], references: [id])
+
+  @@unique([cuentaId, periodo])
+  @@index([tenantId, periodo])
 }
 
 /// Configurable CSV column mapping per bank code (#190).

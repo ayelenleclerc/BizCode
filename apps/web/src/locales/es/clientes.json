@@ -44,6 +44,8 @@
     "telef": "Teléfono",
     "email": "Email",
     "activo": "Activo",
+    "cbu": "CBU (para conciliación bancaria)",
+    "alias": "Alias bancario (CVU/CBU)",
     "condIvaOptions": {
       "RI": "RI - Responsable Inscrito",
       "Mono": "Monotributista",
@@ -52,6 +54,7 @@
     },
     "errors": {
       "cuit": "CUIT inválido",
+      "cbu": "CBU inválido",
       "rsocial": "Razón social mínimo 3 caracteres",
       "generic": "Error al guardar cliente"
     },

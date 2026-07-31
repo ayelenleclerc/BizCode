@@ -50,6 +50,10 @@ export type ClienteInput = {
   suspended?: boolean
   deliveryZoneId?: number | null
   listaPrecioId?: number | null
+  /** @en Customer bank CBU (#191). @es CBU bancario del cliente (#191). @pt-BR CBU bancário do cliente (#191). */
+  cbu?: string | null
+  /** @en Customer bank alias (#191). @es Alias bancario del cliente (#191). @pt-BR Alias bancário do cliente (#191). */
+  alias?: string | null
 }
 
 /** @en Catalog item kind (#244). @es Tipo de ítem de catálogo (#244). @pt-BR Tipo de item de catálogo (#244). */

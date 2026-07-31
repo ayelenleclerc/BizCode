@@ -408,7 +408,7 @@
   },
   "bancos": {
     "title": "Extractos bancarios",
-    "intro": "Registrá cuentas del tenant e importá extractos CSV, OFX o MT940. La conciliación automática de cobros es el issue #191.",
+    "intro": "Registrá cuentas del tenant e importá extractos CSV, OFX o MT940. Conciliá los cobros automáticamente desde \"Conciliación bancaria\" (#191).",
     "cuentasTitle": "Cuentas bancarias",
     "cuentasEmpty": "Todavía no hay cuentas. Creá una con CBU de 22 dígitos.",
     "importTitle": "Importar extracto",
@@ -448,6 +448,64 @@
     "movTipo": {
       "debito": "Débito",
       "credito": "Crédito"
+    },
+    "conciliacion": {
+      "linkTitle": "Conciliación bancaria",
+      "linkHint": "Cruzá automáticamente los movimientos del extracto con recibos de cobro y cobros registrados.",
+      "openPage": "Abrir conciliación bancaria",
+      "title": "Conciliación bancaria",
+      "subtitle": "Revisá el estado de conciliación de los movimientos importados, ejecutá el matching automático y resolvé casos manualmente.",
+      "backToFinance": "Volver a Finanzas",
+      "cuenta": "Cuenta bancaria",
+      "noCuentas": "Todavía no hay cuentas bancarias. Creá una en la sección de extractos bancarios.",
+      "desde": "Desde",
+      "hasta": "Hasta",
+      "periodo": "Período (lock)",
+      "run": "Ejecutar matching",
+      "running": "Ejecutando…",
+      "runSuccess": "Matching ejecutado: {{processed}} procesados, {{autoMatched}} auto-conciliados, {{suggested}} sugeridos.",
+      "runError": "No se pudo ejecutar el matching.",
+      "export": "Exportar Excel",
+      "exporting": "Exportando…",
+      "exportError": "No se pudo exportar el Excel.",
+      "lock": "Bloquear período",
+      "unlock": "Desbloquear período",
+      "lockSuccess": "Período {{periodo}} bloqueado.",
+      "unlockSuccess": "Período {{periodo}} desbloqueado.",
+      "actionError": "No se pudo completar la acción.",
+      "periodoLockedBadge": "Período bloqueado",
+      "empty": "No hay movimientos para el rango seleccionado.",
+      "colExtracto": "Extracto",
+      "colEstado": "Estado",
+      "colAcciones": "Acciones",
+      "score": "Puntaje",
+      "suggestions": "Sugerencias",
+      "confirmSuggestion": "Confirmar sugerencia",
+      "ignore": "Ignorar",
+      "bankFee": "Gasto bancario",
+      "manualTipo": "Tipo",
+      "manualTipoCobro": "Cobro",
+      "manualTipoReciboForma": "Recibo (forma de pago)",
+      "manualId": "ID",
+      "manualAssign": "Asignar",
+      "manualIdInvalid": "Ingresá un ID válido.",
+      "estado": {
+        "unmatched": "Sin conciliar",
+        "suggested": "Sugerido",
+        "matched_auto": "Auto-conciliado",
+        "matched_manual": "Conciliado manual",
+        "ignored": "Ignorado",
+        "bank_fee": "Gasto bancario"
+      },
+      "summary": {
+        "total": "Total",
+        "unmatched": "Sin conciliar",
+        "suggested": "Sugeridos",
+        "matchedAuto": "Auto-conciliados",
+        "matchedManual": "Conciliados manual",
+        "ignored": "Ignorados",
+        "bankFees": "Gastos bancarios"
+      }
     }
   }
 }

@@ -34,6 +34,8 @@ Tabela com: **Código**, **Razão Social**, **CNPJ/CPF**, **Regime Fiscal**, **T
 | CEP | Não | Até 8 caracteres. |
 | Telefone | Não | |
 | E-mail | Não | |
+| CBU | Não | CBU bancário de 22 dígitos, usado no matching de conciliação bancária (#191). O sistema valida os dígitos verificadores. |
+| Alias | Não | Alias bancário (CVU/CBU), até 60 caracteres; também usado no matching de conciliação bancária (#191). |
 | Ativo | Sim | Desmarque para inativar sem apagar histórico. |
 
 ### Regime fiscal (condição de IVA)

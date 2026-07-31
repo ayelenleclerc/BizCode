@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Reconciliation view of a bank movement (#191). This is a narrower projection than `MovimientoBancario` — it omits `saldo`, `formatoOrigen`, `dedupeKey`, and `createdAt`, and adds `periodoLocked`.",
+  "properties": {
+    "conciliadoAt": {
+      "format": "date-time",
+      "nullable": true,
+      "type": "string"
+    },
+    "conciliadoId": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "conciliadoTipo": {
+      "enum": [
+        "recibo_forma",
+        "cobro",
+        null
+      ],
+      "nullable": true,
+      "type": "string"
+    },
+    "cuentaId": {
+      "type": "integer"
+    },
+    "descripcion": {
+      "type": "string"
+    },
+    "fecha": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "id": {
+      "type": "integer"
+    },
+    "importe": {
+      "type": "string"
+    },
+    "matchEstado": {
+      "enum": [
+        "unmatched",
+        "suggested",
+        "matched_auto",
+        "matched_manual",
+        "ignored",
+        "bank_fee"
+      ],
+      "type": "string"
+    },
+    "matchScore": {
+      "nullable": true,
+      "type": "number"
+    },
+    "matchSugerencias": {
+      "items": {
+        "$ref": "./MatchSugerencia.schema.json"
+      },
+      "nullable": true,
+      "type": "array"
+    },
+    "periodoLocked": {
+      "description": "True when the movement's YYYY-MM period is locked for reconciliation (#191).",
+      "type": "boolean"
+    },
+    "referencia": {
+      "nullable": true,
+      "type": "string"
+    },
+    "tipo": {
+      "enum": [
+        "debito",
+        "credito"
+      ],
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "cuentaId",
+    "fecha",
+    "descripcion",
+    "importe",
+    "tipo",
+    "referencia",
+    "matchEstado",
+    "conciliadoTipo",
+    "conciliadoId",
+    "conciliadoAt",
+    "matchScore",
+    "matchSugerencias",
+    "periodoLocked"
+  ],
+  "title": "ConciliacionMovimiento",
+  "type": "object"
+}

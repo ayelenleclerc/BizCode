@@ -88,6 +88,8 @@ export const clienteBodySchema = z
     suspended: z.boolean().optional(),
     deliveryZoneId: z.union([z.number(), z.null(), z.undefined()]).optional(),
     listaPrecioId: z.union([z.number(), z.null(), z.undefined()]).optional(),
+    cbu: z.union([z.string(), z.null(), z.undefined()]).optional(),
+    alias: z.union([z.string(), z.null(), z.undefined()]).optional(),
   })
   .superRefine((data, ctx) => {
     if (typeof data.codigo !== 'number' || !Number.isInteger(data.codigo)) {
@@ -106,9 +108,15 @@ export const clienteBodySchema = z
     normalizeOptStr(data.telef === undefined ? undefined : data.telef, 25, 'telef', ctx)
     normalizeOptStr(data.email === undefined ? undefined : data.email, 50, 'email', ctx)
     normalizeOptStr(data.cuit === undefined ? undefined : data.cuit, 14, 'cuit', ctx)
+    normalizeOptStr(data.alias === undefined ? undefined : data.alias, 60, 'alias', ctx)
+    normalizeOptStr(data.cbu === undefined ? undefined : data.cbu, 22, 'cbu', ctx)
     const ci = typeof data.cuit === 'string' ? data.cuit.trim() : data.cuit
     if (ci != null && typeof ci === 'string' && ci !== '' && !validateCUIT(ci)) {
       ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'cuit must be a valid Argentine CUIT', path: ['cuit'] })
+    }
+    const cbuRaw = typeof data.cbu === 'string' ? data.cbu.trim() : data.cbu
+    if (cbuRaw != null && typeof cbuRaw === 'string' && cbuRaw !== '' && !validateCBU(cbuRaw)) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'cbu must be a valid Argentine CBU', path: ['cbu'] })
     }
     if (data.creditLimit !== undefined && data.creditLimit !== null && (typeof data.creditLimit !== 'number' || data.creditLimit < 0)) {
       ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'creditLimit must be a number', path: ['creditLimit'] })
@@ -195,6 +203,14 @@ export const clienteBodySchema = z
     }
     if (data.listaPrecioId !== undefined) {
       out.listaPrecioId = data.listaPrecioId
+    }
+    const cbuTrim = trimOrUndef('cbu')
+    if (cbuTrim !== undefined) {
+      out.cbu = cbuTrim === null ? null : cbuTrim.replace(/\D/g, '')
+    }
+    const aliasTrim = trimOrUndef('alias')
+    if (aliasTrim !== undefined) {
+      out.alias = aliasTrim
     }
     return out
   })

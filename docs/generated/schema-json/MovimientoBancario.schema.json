@@ -10,6 +10,16 @@
       "nullable": true,
       "type": "integer"
     },
+    "conciliadoTipo": {
+      "description": "Kind of internal record this movement was reconciled against (#191).",
+      "enum": [
+        "recibo_forma",
+        "cobro",
+        null
+      ],
+      "nullable": true,
+      "type": "string"
+    },
     "createdAt": {
       "format": "date-time",
       "type": "string"
@@ -35,6 +45,31 @@
     },
     "importe": {
       "type": "string"
+    },
+    "matchEstado": {
+      "description": "Reconciliation lifecycle state of this movement (#191).",
+      "enum": [
+        "unmatched",
+        "suggested",
+        "matched_auto",
+        "matched_manual",
+        "ignored",
+        "bank_fee"
+      ],
+      "type": "string"
+    },
+    "matchScore": {
+      "description": "Matching engine score of the winning/suggested candidate (#191).",
+      "nullable": true,
+      "type": "number"
+    },
+    "matchSugerencias": {
+      "description": "Ranked candidate suggestions when matchEstado is `suggested` (#191).",
+      "items": {
+        "$ref": "./MatchSugerencia.schema.json"
+      },
+      "nullable": true,
+      "type": "array"
     },
     "referencia": {
       "nullable": true,
