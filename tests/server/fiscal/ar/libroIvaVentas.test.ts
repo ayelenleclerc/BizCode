@@ -79,6 +79,8 @@ describe('libroIvaVentasMapper', () => {
     deliveryZoneId: null,
     listaPrecioId: null,
     anonymizedAt: null,
+    cbu: null,
+    alias: null,
     createdAt: new Date(),
     updatedAt: new Date(),
   }

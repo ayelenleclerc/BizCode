@@ -19,9 +19,11 @@ undefined#/properties/data/anyOf/0
 | Property                          | Type      | Required | Nullable       | Defined by                                                                             |
 | :-------------------------------- | :-------- | :------- | :------------- | :------------------------------------------------------------------------------------- |
 | [activo](#activo)                 | `boolean` | Optional | cannot be null | [Cliente](cliente-properties-activo.md "undefined#/properties/activo")                 |
+| [alias](#alias)                   | `string`  | Optional | cannot be null | [Cliente](cliente-properties-alias.md "undefined#/properties/alias")                   |
 | [anonymizedAt](#anonymizedat)     | `string`  | Optional | cannot be null | [Cliente](cliente-properties-anonymizedat.md "undefined#/properties/anonymizedAt")     |
 | [balance](#balance)               | `number`  | Optional | cannot be null | [Cliente](cliente-properties-balance.md "undefined#/properties/balance")               |
 | [balanceInicial](#balanceinicial) | `number`  | Optional | cannot be null | [Cliente](cliente-properties-balanceinicial.md "undefined#/properties/balanceInicial") |
+| [cbu](#cbu)                       | `string`  | Optional | cannot be null | [Cliente](cliente-properties-cbu.md "undefined#/properties/cbu")                       |
 | [codigo](#codigo)                 | `integer` | Optional | cannot be null | [Cliente](cliente-properties-codigo.md "undefined#/properties/codigo")                 |
 | [condIva](#condiva)               | `string`  | Optional | cannot be null | [Cliente](cliente-properties-condiva.md "undefined#/properties/condIva")               |
 | [cpost](#cpost)                   | `string`  | Optional | cannot be null | [Cliente](cliente-properties-cpost.md "undefined#/properties/cpost")                   |
@@ -57,6 +59,24 @@ undefined#/properties/data/anyOf/0
 ### activo Type
 
 `boolean`
+
+## alias
+
+Bank alias used to match Mercado Pago/bank collections against this customer (#191).
+
+`alias`
+
+* is optional
+
+* Type: `string`
+
+* cannot be null
+
+* defined in: [Cliente](cliente-properties-alias.md "undefined#/properties/alias")
+
+### alias Type
+
+`string`
 
 ## anonymizedAt
 
@@ -131,6 +151,24 @@ The default value is:
 ```json
 0
 ```
+
+## cbu
+
+Argentine CBU (22 digits) used to match Mercado Pago/bank collections against this customer (#191).
+
+`cbu`
+
+* is optional
+
+* Type: `string`
+
+* cannot be null
+
+* defined in: [Cliente](cliente-properties-cbu.md "undefined#/properties/cbu")
+
+### cbu Type
+
+`string`
 
 ## codigo
 

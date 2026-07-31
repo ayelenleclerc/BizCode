@@ -60,6 +60,9 @@ export function buildAnonymizedClienteData(
     cpost: null,
     telef: null,
     email: null,
+    /** @en Bank CBU/alias are PII used for transfer matching; scrubbed on anonymization (#191). @es CBU/alias bancario son PII usados para matching de transferencias; se borran al anonimizar (#191). @pt-BR CBU/alias bancário são PII usados para matching de transferências; apagados na anonimização (#191). */
+    cbu: null,
+    alias: null,
     activo: false,
     suspended: true,
     anonymizedAt: now,

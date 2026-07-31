@@ -5,6 +5,11 @@
     "activo": {
       "type": "boolean"
     },
+    "alias": {
+      "description": "Bank alias used to match Mercado Pago/bank collections against this customer (#191).",
+      "nullable": true,
+      "type": "string"
+    },
     "anonymizedAt": {
       "description": "Set when customer PII was irreversibly anonymized (#195)",
       "format": "date-time",
@@ -20,6 +25,11 @@
       "default": 0,
       "description": "Opening balance at migration time.",
       "type": "number"
+    },
+    "cbu": {
+      "description": "Argentine CBU (22 digits) used to match Mercado Pago/bank collections against this customer (#191).",
+      "nullable": true,
+      "type": "string"
     },
     "codigo": {
       "type": "integer"

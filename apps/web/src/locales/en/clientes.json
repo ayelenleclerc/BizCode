@@ -44,6 +44,8 @@
     "telef": "Phone",
     "email": "Email",
     "activo": "Active",
+    "cbu": "CBU (for bank reconciliation)",
+    "alias": "Bank alias (CVU/CBU)",
     "condIvaOptions": {
       "RI": "RI - VAT Registered",
       "Mono": "Small Taxpayer",
@@ -52,6 +54,7 @@
     },
     "errors": {
       "cuit": "Invalid Tax ID",
+      "cbu": "Invalid CBU",
       "rsocial": "Company name must be at least 3 characters",
       "generic": "Error saving customer"
     },

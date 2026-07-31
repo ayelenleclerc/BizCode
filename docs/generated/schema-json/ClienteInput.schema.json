@@ -4,6 +4,16 @@
     "activo": {
       "type": "boolean"
     },
+    "alias": {
+      "maxLength": 60,
+      "nullable": true,
+      "type": "string"
+    },
+    "cbu": {
+      "nullable": true,
+      "pattern": "^[0-9]{22}$",
+      "type": "string"
+    },
     "codigo": {
       "minimum": 1,
       "type": "integer"

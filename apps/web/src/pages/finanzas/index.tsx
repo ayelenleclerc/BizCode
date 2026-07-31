@@ -336,6 +336,24 @@ function FinanzasPageContent() {
         </IfModule>
 
         <IfModule flag="finance.bank_reconcile">
+          <section className="mb-6" aria-labelledby="finanzas-bank-reconciliation-heading">
+            <h2
+              id="finanzas-bank-reconciliation-heading"
+              className="text-lg font-semibold mb-2 text-slate-900 dark:text-slate-100"
+            >
+              {t('bancos.conciliacion.linkTitle')}
+            </h2>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mb-2">
+              {t('bancos.conciliacion.linkHint')}
+            </p>
+            <Link
+              to="/finanzas/conciliacion-bancaria"
+              className="inline-flex px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700 text-sm"
+              data-testid="finanzas-conciliacion-bancaria-link"
+            >
+              {t('bancos.conciliacion.openPage')}
+            </Link>
+          </section>
           <ExtractosBancariosSection />
         </IfModule>
 

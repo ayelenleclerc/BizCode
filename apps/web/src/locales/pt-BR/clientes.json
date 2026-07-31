@@ -44,6 +44,8 @@
     "telef": "Telefone",
     "email": "E-mail",
     "activo": "Ativo",
+    "cbu": "CBU (para conciliação bancária)",
+    "alias": "Alias bancário (CVU/CBU)",
     "condIvaOptions": {
       "RI": "RI - Contribuinte ICMS",
       "Mono": "MEI / Simples",
@@ -52,6 +54,7 @@
     },
     "errors": {
       "cuit": "CNPJ/CPF inválido",
+      "cbu": "CBU inválido",
       "rsocial": "Razão social deve ter pelo menos 3 caracteres",
       "generic": "Erro ao salvar cliente"
     },

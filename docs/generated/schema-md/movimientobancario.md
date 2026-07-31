@@ -16,21 +16,25 @@ undefined
 
 # MovimientoBancario Properties
 
-| Property                        | Type      | Required | Nullable       | Defined by                                                                                                 |
-| :------------------------------ | :-------- | :------- | :------------- | :--------------------------------------------------------------------------------------------------------- |
-| [conciliadoAt](#conciliadoat)   | `string`  | Optional | cannot be null | [MovimientoBancario](movimientobancario-properties-conciliadoat.md "undefined#/properties/conciliadoAt")   |
-| [conciliadoId](#conciliadoid)   | `integer` | Optional | cannot be null | [MovimientoBancario](movimientobancario-properties-conciliadoid.md "undefined#/properties/conciliadoId")   |
-| [createdAt](#createdat)         | `string`  | Required | cannot be null | [MovimientoBancario](movimientobancario-properties-createdat.md "undefined#/properties/createdAt")         |
-| [cuentaId](#cuentaid)           | `integer` | Required | cannot be null | [MovimientoBancario](movimientobancario-properties-cuentaid.md "undefined#/properties/cuentaId")           |
-| [dedupeKey](#dedupekey)         | `string`  | Required | cannot be null | [MovimientoBancario](movimientobancario-properties-dedupekey.md "undefined#/properties/dedupeKey")         |
-| [descripcion](#descripcion)     | `string`  | Required | cannot be null | [MovimientoBancario](movimientobancario-properties-descripcion.md "undefined#/properties/descripcion")     |
-| [fecha](#fecha)                 | `string`  | Required | cannot be null | [MovimientoBancario](movimientobancario-properties-fecha.md "undefined#/properties/fecha")                 |
-| [formatoOrigen](#formatoorigen) | `string`  | Required | cannot be null | [MovimientoBancario](movimientobancario-properties-formatoorigen.md "undefined#/properties/formatoOrigen") |
-| [id](#id)                       | `integer` | Required | cannot be null | [MovimientoBancario](movimientobancario-properties-id.md "undefined#/properties/id")                       |
-| [importe](#importe)             | `string`  | Required | cannot be null | [MovimientoBancario](movimientobancario-properties-importe.md "undefined#/properties/importe")             |
-| [referencia](#referencia)       | `string`  | Optional | cannot be null | [MovimientoBancario](movimientobancario-properties-referencia.md "undefined#/properties/referencia")       |
-| [saldo](#saldo)                 | `string`  | Optional | cannot be null | [MovimientoBancario](movimientobancario-properties-saldo.md "undefined#/properties/saldo")                 |
-| [tipo](#tipo)                   | `string`  | Required | cannot be null | [MovimientoBancario](movimientobancario-properties-tipo.md "undefined#/properties/tipo")                   |
+| Property                              | Type      | Required | Nullable       | Defined by                                                                                                       |
+| :------------------------------------ | :-------- | :------- | :------------- | :--------------------------------------------------------------------------------------------------------------- |
+| [conciliadoAt](#conciliadoat)         | `string`  | Optional | cannot be null | [MovimientoBancario](movimientobancario-properties-conciliadoat.md "undefined#/properties/conciliadoAt")         |
+| [conciliadoId](#conciliadoid)         | `integer` | Optional | cannot be null | [MovimientoBancario](movimientobancario-properties-conciliadoid.md "undefined#/properties/conciliadoId")         |
+| [conciliadoTipo](#conciliadotipo)     | `string`  | Optional | cannot be null | [MovimientoBancario](movimientobancario-properties-conciliadotipo.md "undefined#/properties/conciliadoTipo")     |
+| [createdAt](#createdat)               | `string`  | Required | cannot be null | [MovimientoBancario](movimientobancario-properties-createdat.md "undefined#/properties/createdAt")               |
+| [cuentaId](#cuentaid)                 | `integer` | Required | cannot be null | [MovimientoBancario](movimientobancario-properties-cuentaid.md "undefined#/properties/cuentaId")                 |
+| [dedupeKey](#dedupekey)               | `string`  | Required | cannot be null | [MovimientoBancario](movimientobancario-properties-dedupekey.md "undefined#/properties/dedupeKey")               |
+| [descripcion](#descripcion)           | `string`  | Required | cannot be null | [MovimientoBancario](movimientobancario-properties-descripcion.md "undefined#/properties/descripcion")           |
+| [fecha](#fecha)                       | `string`  | Required | cannot be null | [MovimientoBancario](movimientobancario-properties-fecha.md "undefined#/properties/fecha")                       |
+| [formatoOrigen](#formatoorigen)       | `string`  | Required | cannot be null | [MovimientoBancario](movimientobancario-properties-formatoorigen.md "undefined#/properties/formatoOrigen")       |
+| [id](#id)                             | `integer` | Required | cannot be null | [MovimientoBancario](movimientobancario-properties-id.md "undefined#/properties/id")                             |
+| [importe](#importe)                   | `string`  | Required | cannot be null | [MovimientoBancario](movimientobancario-properties-importe.md "undefined#/properties/importe")                   |
+| [matchEstado](#matchestado)           | `string`  | Optional | cannot be null | [MovimientoBancario](movimientobancario-properties-matchestado.md "undefined#/properties/matchEstado")           |
+| [matchScore](#matchscore)             | `number`  | Optional | cannot be null | [MovimientoBancario](movimientobancario-properties-matchscore.md "undefined#/properties/matchScore")             |
+| [matchSugerencias](#matchsugerencias) | `array`   | Optional | cannot be null | [MovimientoBancario](movimientobancario-properties-matchsugerencias.md "undefined#/properties/matchSugerencias") |
+| [referencia](#referencia)             | `string`  | Optional | cannot be null | [MovimientoBancario](movimientobancario-properties-referencia.md "undefined#/properties/referencia")             |
+| [saldo](#saldo)                       | `string`  | Optional | cannot be null | [MovimientoBancario](movimientobancario-properties-saldo.md "undefined#/properties/saldo")                       |
+| [tipo](#tipo)                         | `string`  | Required | cannot be null | [MovimientoBancario](movimientobancario-properties-tipo.md "undefined#/properties/tipo")                         |
 
 ## conciliadoAt
 
@@ -71,6 +75,34 @@ undefined
 ### conciliadoId Type
 
 `integer`
+
+## conciliadoTipo
+
+Kind of internal record this movement was reconciled against (#191).
+
+`conciliadoTipo`
+
+* is optional
+
+* Type: `string`
+
+* cannot be null
+
+* defined in: [MovimientoBancario](movimientobancario-properties-conciliadotipo.md "undefined#/properties/conciliadoTipo")
+
+### conciliadoTipo Type
+
+`string`
+
+### conciliadoTipo Constraints
+
+**enum**: the value of this property must be equal to one of the following values:
+
+| Value            | Explanation |
+| :--------------- | :---------- |
+| `"recibo_forma"` |             |
+| `"cobro"`        |             |
+| `null`           |             |
 
 ## createdAt
 
@@ -223,6 +255,73 @@ undefined
 ### importe Type
 
 `string`
+
+## matchEstado
+
+Reconciliation lifecycle state of this movement (#191).
+
+`matchEstado`
+
+* is optional
+
+* Type: `string`
+
+* cannot be null
+
+* defined in: [MovimientoBancario](movimientobancario-properties-matchestado.md "undefined#/properties/matchEstado")
+
+### matchEstado Type
+
+`string`
+
+### matchEstado Constraints
+
+**enum**: the value of this property must be equal to one of the following values:
+
+| Value              | Explanation |
+| :----------------- | :---------- |
+| `"unmatched"`      |             |
+| `"suggested"`      |             |
+| `"matched_auto"`   |             |
+| `"matched_manual"` |             |
+| `"ignored"`        |             |
+| `"bank_fee"`       |             |
+
+## matchScore
+
+Matching engine score of the winning/suggested candidate (#191).
+
+`matchScore`
+
+* is optional
+
+* Type: `number`
+
+* cannot be null
+
+* defined in: [MovimientoBancario](movimientobancario-properties-matchscore.md "undefined#/properties/matchScore")
+
+### matchScore Type
+
+`number`
+
+## matchSugerencias
+
+Ranked candidate suggestions when matchEstado is `suggested` (#191).
+
+`matchSugerencias`
+
+* is optional
+
+* Type: `object[]` ([MatchSugerencia](matchsugerencia.md))
+
+* cannot be null
+
+* defined in: [MovimientoBancario](movimientobancario-properties-matchsugerencias.md "undefined#/properties/matchSugerencias")
+
+### matchSugerencias Type
+
+`object[]` ([MatchSugerencia](matchsugerencia.md))
 
 ## referencia
 

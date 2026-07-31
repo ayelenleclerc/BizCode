@@ -290,6 +290,7 @@ export const ROUTE_MODULE_GUARDS: ReadonlyArray<{ path: string; moduleKey: Modul
   { path: 'finanzas', moduleKey: 'finance.collections' },
   { path: 'finanzas/reconciliacion-mp', moduleKey: 'finance.collections' },
   { path: 'finanzas/contracargos-mp', moduleKey: 'finance.collections' },
+  { path: 'finanzas/conciliacion-bancaria', moduleKey: 'finance.bank_reconcile' },
   { path: 'admin/audit-log', moduleKey: 'admin.audit_log' },
   { path: 'compras', moduleKey: 'logistics.purchases' },
   { path: 'recuentos', moduleKey: 'inventory.count' },

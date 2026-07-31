@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "bankFees": {
+      "type": "integer"
+    },
+    "ignored": {
+      "type": "integer"
+    },
+    "matchedAuto": {
+      "type": "integer"
+    },
+    "matchedManual": {
+      "type": "integer"
+    },
+    "openCandidates": {
+      "properties": {
+        "cobros": {
+          "type": "integer"
+        },
+        "recibosForma": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "recibosForma",
+        "cobros"
+      ],
+      "type": "object"
+    },
+    "suggested": {
+      "type": "integer"
+    },
+    "total": {
+      "type": "integer"
+    },
+    "unmatched": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "total",
+    "unmatched",
+    "suggested",
+    "matchedAuto",
+    "matchedManual",
+    "ignored",
+    "bankFees",
+    "openCandidates"
+  ],
+  "title": "ConciliacionSummary",
+  "type": "object"
+}

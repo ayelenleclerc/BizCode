@@ -4682,6 +4682,10 @@ Returns plan limits, enabled plan features, and current usage for the authentica
 
     `boolean`
 
+  - **`alias`**
+
+    `string` — Bank alias used to match Mercado Pago/bank collections against this customer (#191).
+
   - **`anonymizedAt`**
 
     `string`, format: `date-time` — Set when customer PII was irreversibly anonymized (#195)
@@ -4693,6 +4697,10 @@ Returns plan limits, enabled plan features, and current usage for the authentica
   - **`balanceInicial`**
 
     `number`, default: `0` — Opening balance at migration time.
+
+  - **`cbu`**
+
+    `string` — Argentine CBU (22 digits) used to match Mercado Pago/bank collections against this customer (#191).
 
   - **`codigo`**
 
@@ -4801,6 +4809,8 @@ Returns plan limits, enabled plan features, and current usage for the authentica
       "score": 50,
       "suspended": false,
       "deliveryZoneId": 1,
+      "cbu": "",
+      "alias": "",
       "additionalProperty": "anything"
     }
   ],
@@ -4899,6 +4909,14 @@ Returns plan limits, enabled plan features, and current usage for the authentica
 
   `string`
 
+- **`alias`**
+
+  `string`
+
+- **`cbu`**
+
+  `string`
+
 - **`cpost`**
 
   `string`
@@ -4961,7 +4979,9 @@ Returns plan limits, enabled plan features, and current usage for the authentica
   "creditLimit": 1,
   "creditDays": 0,
   "suspended": true,
-  "deliveryZoneId": 1
+  "deliveryZoneId": 1,
+  "cbu": "",
+  "alias": ""
 }
 ```
 
@@ -4979,6 +4999,10 @@ Returns plan limits, enabled plan features, and current usage for the authentica
 
     `boolean`
 
+  - **`alias`**
+
+    `string` — Bank alias used to match Mercado Pago/bank collections against this customer (#191).
+
   - **`anonymizedAt`**
 
     `string`, format: `date-time` — Set when customer PII was irreversibly anonymized (#195)
@@ -4990,6 +5014,10 @@ Returns plan limits, enabled plan features, and current usage for the authentica
   - **`balanceInicial`**
 
     `number`, default: `0` — Opening balance at migration time.
+
+  - **`cbu`**
+
+    `string` — Argentine CBU (22 digits) used to match Mercado Pago/bank collections against this customer (#191).
 
   - **`codigo`**
 
@@ -5085,6 +5113,8 @@ Returns plan limits, enabled plan features, and current usage for the authentica
     "score": 50,
     "suspended": false,
     "deliveryZoneId": 1,
+    "cbu": "",
+    "alias": "",
     "additionalProperty": "anything"
   }
 }
@@ -5462,6 +5492,8 @@ Returns plan limits, enabled plan features, and current usage for the authentica
     "score": 50,
     "suspended": false,
     "deliveryZoneId": 1,
+    "cbu": "",
+    "alias": "",
     "additionalProperty": "anything"
   }
 }
@@ -5556,6 +5588,14 @@ Returns plan limits, enabled plan features, and current usage for the authentica
 
   `string`
 
+- **`alias`**
+
+  `string`
+
+- **`cbu`**
+
+  `string`
+
 - **`cpost`**
 
   `string`
@@ -5618,7 +5658,9 @@ Returns plan limits, enabled plan features, and current usage for the authentica
   "creditLimit": 1,
   "creditDays": 0,
   "suspended": true,
-  "deliveryZoneId": 1
+  "deliveryZoneId": 1,
+  "cbu": "",
+  "alias": ""
 }
 ```
 
@@ -5636,6 +5678,10 @@ Returns plan limits, enabled plan features, and current usage for the authentica
 
     `boolean`
 
+  - **`alias`**
+
+    `string` — Bank alias used to match Mercado Pago/bank collections against this customer (#191).
+
   - **`anonymizedAt`**
 
     `string`, format: `date-time` — Set when customer PII was irreversibly anonymized (#195)
@@ -5647,6 +5693,10 @@ Returns plan limits, enabled plan features, and current usage for the authentica
   - **`balanceInicial`**
 
     `number`, default: `0` — Opening balance at migration time.
+
+  - **`cbu`**
+
+    `string` — Argentine CBU (22 digits) used to match Mercado Pago/bank collections against this customer (#191).
 
   - **`codigo`**
 
@@ -5742,6 +5792,8 @@ Returns plan limits, enabled plan features, and current usage for the authentica
     "score": 50,
     "suspended": false,
     "deliveryZoneId": 1,
+    "cbu": "",
+    "alias": "",
     "additionalProperty": "anything"
   }
 }
@@ -6006,6 +6058,10 @@ Requires body `{ "confirm": "ANONYMIZE" }`. Scrubs PII on Cliente, sets activo=f
 
     `boolean`
 
+  - **`alias`**
+
+    `string` — Bank alias used to match Mercado Pago/bank collections against this customer (#191).
+
   - **`anonymizedAt`**
 
     `string`, format: `date-time` — Set when customer PII was irreversibly anonymized (#195)
@@ -6017,6 +6073,10 @@ Requires body `{ "confirm": "ANONYMIZE" }`. Scrubs PII on Cliente, sets activo=f
   - **`balanceInicial`**
 
     `number`, default: `0` — Opening balance at migration time.
+
+  - **`cbu`**
+
+    `string` — Argentine CBU (22 digits) used to match Mercado Pago/bank collections against this customer (#191).
 
   - **`codigo`**
 
@@ -6112,6 +6172,8 @@ Requires body `{ "confirm": "ANONYMIZE" }`. Scrubs PII on Cliente, sets activo=f
     "score": 50,
     "suspended": false,
     "deliveryZoneId": 1,
+    "cbu": "",
+    "alias": "",
     "additionalProperty": "anything"
   }
 }
@@ -46502,6 +46564,48 @@ Requires module `finance.bank_reconcile`.
 
     `integer`
 
+  - **`conciliadoTipo`**
+
+    `string`, possible values: `"recibo_forma", "cobro", null` — Kind of internal record this movement was reconciled against (#191).
+
+  - **`matchEstado`**
+
+    `string`, possible values: `"unmatched", "suggested", "matched_auto", "matched_manual", "ignored", "bank_fee"` — Reconciliation lifecycle state of this movement (#191).
+
+  - **`matchScore`**
+
+    `number` — Matching engine score of the winning/suggested candidate (#191).
+
+  - **`matchSugerencias`**
+
+    `array` — Ranked candidate suggestions when matchEstado is \`suggested\` (#191).
+
+    **Items:**
+
+    - **`clienteId` (required)**
+
+      `integer`
+
+    - **`fecha` (required)**
+
+      `string`, format: `date-time`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`importe` (required)**
+
+      `number`
+
+    - **`referencia` (required)**
+
+      `string`
+
+    - **`tipo` (required)**
+
+      `string`, possible values: `"recibo_forma", "cobro"`
+
   - **`referencia`**
 
     `string`
@@ -46545,7 +46649,20 @@ Requires module `finance.bank_reconcile`.
       "dedupeKey": "",
       "conciliadoId": 1,
       "conciliadoAt": "",
-      "createdAt": ""
+      "createdAt": "",
+      "conciliadoTipo": "recibo_forma",
+      "matchEstado": "unmatched",
+      "matchScore": 1,
+      "matchSugerencias": [
+        {
+          "tipo": "recibo_forma",
+          "id": 1,
+          "clienteId": 1,
+          "importe": 1,
+          "fecha": "",
+          "referencia": ""
+        }
+      ]
     }
   ],
   "total": 1,
@@ -47356,6 +47473,1727 @@ Requires module `finance.bank_reconcile`.
     "createdAt": "",
     "updatedAt": ""
   }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/bancos/cuentas/{id}/conciliacion
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/bancos/cuentas/{id}/conciliacion`
+
+### Get bank reconciliation state for an account (#191)
+
+- **Method:** `GET`
+- **Path:** `/api/bancos/cuentas/{id}/conciliacion`
+- **Tags:** bancos
+
+Requires module `finance.bank_reconcile` and permission `reports.financial.read`.
+
+#### Responses
+
+##### Status: 200 Movements with reconciliation status plus a summary
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`movimientos` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`conciliadoAt` (required)**
+
+      `string`, format: `date-time`
+
+    - **`conciliadoId` (required)**
+
+      `integer`
+
+    - **`conciliadoTipo` (required)**
+
+      `string`, possible values: `"recibo_forma", "cobro", null`
+
+    - **`cuentaId` (required)**
+
+      `integer`
+
+    - **`descripcion` (required)**
+
+      `string`
+
+    - **`fecha` (required)**
+
+      `string`, format: `date-time`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`importe` (required)**
+
+      `string`
+
+    - **`matchEstado` (required)**
+
+      `string`, possible values: `"unmatched", "suggested", "matched_auto", "matched_manual", "ignored", "bank_fee"`
+
+    - **`matchScore` (required)**
+
+      `number`
+
+    - **`matchSugerencias` (required)**
+
+      `array`
+
+      **Items:**
+
+      - **`clienteId` (required)**
+
+        `integer`
+
+      - **`fecha` (required)**
+
+        `string`, format: `date-time`
+
+      - **`id` (required)**
+
+        `integer`
+
+      - **`importe` (required)**
+
+        `number`
+
+      - **`referencia` (required)**
+
+        `string`
+
+      - **`tipo` (required)**
+
+        `string`, possible values: `"recibo_forma", "cobro"`
+
+    - **`periodoLocked` (required)**
+
+      `boolean` — True when the movement's YYYY-MM period is locked for reconciliation (#191).
+
+    - **`referencia` (required)**
+
+      `string`
+
+    - **`tipo` (required)**
+
+      `string`, possible values: `"debito", "credito"`
+
+  - **`summary` (required)**
+
+    `object`
+
+    - **`bankFees` (required)**
+
+      `integer`
+
+    - **`ignored` (required)**
+
+      `integer`
+
+    - **`matchedAuto` (required)**
+
+      `integer`
+
+    - **`matchedManual` (required)**
+
+      `integer`
+
+    - **`openCandidates` (required)**
+
+      `object`
+
+      - **`cobros` (required)**
+
+        `integer`
+
+      - **`recibosForma` (required)**
+
+        `integer`
+
+    - **`suggested` (required)**
+
+      `integer`
+
+    - **`total` (required)**
+
+      `integer`
+
+    - **`unmatched` (required)**
+
+      `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "movimientos": [
+      {
+        "id": 1,
+        "cuentaId": 1,
+        "fecha": "",
+        "descripcion": "",
+        "importe": "",
+        "tipo": "debito",
+        "referencia": "",
+        "matchEstado": "unmatched",
+        "conciliadoTipo": "recibo_forma",
+        "conciliadoId": 1,
+        "conciliadoAt": "",
+        "matchScore": 1,
+        "matchSugerencias": [
+          {
+            "tipo": "recibo_forma",
+            "id": 1,
+            "clienteId": 1,
+            "importe": 1,
+            "fecha": "",
+            "referencia": ""
+          }
+        ],
+        "periodoLocked": true
+      }
+    ],
+    "summary": {
+      "total": 1,
+      "unmatched": 1,
+      "suggested": 1,
+      "matchedAuto": 1,
+      "matchedManual": 1,
+      "ignored": 1,
+      "bankFees": 1,
+      "openCandidates": {
+        "recibosForma": 1,
+        "cobros": 1
+      }
+    }
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/bancos/cuentas/{id}/conciliacion/run
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/bancos/cuentas/{id}/conciliacion/run`
+
+### Run the reconciliation matching engine over unlocked movements (#191)
+
+- **Method:** `POST`
+- **Path:** `/api/bancos/cuentas/{id}/conciliacion/run`
+- **Tags:** bancos
+
+Requires module `finance.bank_reconcile`, permission `reports.financial.read`, and role owner/manager/super\_admin.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`desde`**
+
+  `string`, format: `date-time`
+
+- **`hasta`**
+
+  `string`, format: `date-time`
+
+**Example:**
+
+```json
+{
+  "desde": "",
+  "hasta": ""
+}
+```
+
+#### Responses
+
+##### Status: 200 Matching run summary
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`autoMatched` (required)**
+
+    `integer`
+
+  - **`bankFees` (required)**
+
+    `integer`
+
+  - **`processed` (required)**
+
+    `integer`
+
+  - **`suggested` (required)**
+
+    `integer`
+
+  - **`unmatched` (required)**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "processed": 1,
+    "autoMatched": 1,
+    "suggested": 1,
+    "unmatched": 1,
+    "bankFees": 1
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/bancos/cuentas/{id}/conciliacion/export.xlsx
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/bancos/cuentas/{id}/conciliacion/export.xlsx`
+
+### Export reconciliation state as an Excel workbook (#191)
+
+- **Method:** `GET`
+- **Path:** `/api/bancos/cuentas/{id}/conciliacion/export.xlsx`
+- **Tags:** bancos
+
+Requires module `finance.bank_reconcile` and permission `reports.financial.read`.
+
+#### Responses
+
+##### Status: 200 XLSX workbook
+
+###### Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+
+`string`, format: `binary`
+
+**Example:**
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/bancos/movimientos/{movId}/conciliar
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/bancos/movimientos/{movId}/conciliar`
+
+### Manually reconcile a movement against a ReciboCobroForma or legacy Cobro (#191)
+
+- **Method:** `POST`
+- **Path:** `/api/bancos/movimientos/{movId}/conciliar`
+- **Tags:** bancos
+
+Requires module `finance.bank_reconcile`, permission `reports.financial.read`, and role owner/manager/super\_admin.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`id` (required)**
+
+  `integer`
+
+- **`tipo` (required)**
+
+  `string`, possible values: `"recibo_forma", "cobro"`
+
+**Example:**
+
+```json
+{
+  "tipo": "recibo_forma",
+  "id": 1
+}
+```
+
+#### Responses
+
+##### Status: 200 Updated movement
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object` — Reconciliation view of a bank movement (#191). This is a narrower projection than \`MovimientoBancario\` — it omits \`saldo\`, \`formatoOrigen\`, \`dedupeKey\`, and \`createdAt\`, and adds \`periodoLocked\`.
+
+  - **`conciliadoAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`conciliadoId` (required)**
+
+    `integer`
+
+  - **`conciliadoTipo` (required)**
+
+    `string`, possible values: `"recibo_forma", "cobro", null`
+
+  - **`cuentaId` (required)**
+
+    `integer`
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`importe` (required)**
+
+    `string`
+
+  - **`matchEstado` (required)**
+
+    `string`, possible values: `"unmatched", "suggested", "matched_auto", "matched_manual", "ignored", "bank_fee"`
+
+  - **`matchScore` (required)**
+
+    `number`
+
+  - **`matchSugerencias` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`clienteId` (required)**
+
+      `integer`
+
+    - **`fecha` (required)**
+
+      `string`, format: `date-time`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`importe` (required)**
+
+      `number`
+
+    - **`referencia` (required)**
+
+      `string`
+
+    - **`tipo` (required)**
+
+      `string`, possible values: `"recibo_forma", "cobro"`
+
+  - **`periodoLocked` (required)**
+
+    `boolean` — True when the movement's YYYY-MM period is locked for reconciliation (#191).
+
+  - **`referencia` (required)**
+
+    `string`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"debito", "credito"`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "cuentaId": 1,
+    "fecha": "",
+    "descripcion": "",
+    "importe": "",
+    "tipo": "debito",
+    "referencia": "",
+    "matchEstado": "unmatched",
+    "conciliadoTipo": "recibo_forma",
+    "conciliadoId": 1,
+    "conciliadoAt": "",
+    "matchScore": 1,
+    "matchSugerencias": [
+      {
+        "tipo": "recibo_forma",
+        "id": 1,
+        "clienteId": 1,
+        "importe": 1,
+        "fecha": "",
+        "referencia": ""
+      }
+    ],
+    "periodoLocked": true
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 409 Candidate already reconciled or period locked
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/bancos/movimientos/{movId}/sugerencia/confirmar
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/bancos/movimientos/{movId}/sugerencia/confirmar`
+
+### Confirm the primary suggestion of a \`suggested\` movement as a manual match (#191)
+
+- **Method:** `POST`
+- **Path:** `/api/bancos/movimientos/{movId}/sugerencia/confirmar`
+- **Tags:** bancos
+
+Requires module `finance.bank_reconcile`, permission `reports.financial.read`, and role owner/manager/super\_admin.
+
+#### Responses
+
+##### Status: 200 Updated movement
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object` — Reconciliation view of a bank movement (#191). This is a narrower projection than \`MovimientoBancario\` — it omits \`saldo\`, \`formatoOrigen\`, \`dedupeKey\`, and \`createdAt\`, and adds \`periodoLocked\`.
+
+  - **`conciliadoAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`conciliadoId` (required)**
+
+    `integer`
+
+  - **`conciliadoTipo` (required)**
+
+    `string`, possible values: `"recibo_forma", "cobro", null`
+
+  - **`cuentaId` (required)**
+
+    `integer`
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`importe` (required)**
+
+    `string`
+
+  - **`matchEstado` (required)**
+
+    `string`, possible values: `"unmatched", "suggested", "matched_auto", "matched_manual", "ignored", "bank_fee"`
+
+  - **`matchScore` (required)**
+
+    `number`
+
+  - **`matchSugerencias` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`clienteId` (required)**
+
+      `integer`
+
+    - **`fecha` (required)**
+
+      `string`, format: `date-time`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`importe` (required)**
+
+      `number`
+
+    - **`referencia` (required)**
+
+      `string`
+
+    - **`tipo` (required)**
+
+      `string`, possible values: `"recibo_forma", "cobro"`
+
+  - **`periodoLocked` (required)**
+
+    `boolean` — True when the movement's YYYY-MM period is locked for reconciliation (#191).
+
+  - **`referencia` (required)**
+
+    `string`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"debito", "credito"`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "cuentaId": 1,
+    "fecha": "",
+    "descripcion": "",
+    "importe": "",
+    "tipo": "debito",
+    "referencia": "",
+    "matchEstado": "unmatched",
+    "conciliadoTipo": "recibo_forma",
+    "conciliadoId": 1,
+    "conciliadoAt": "",
+    "matchScore": 1,
+    "matchSugerencias": [
+      {
+        "tipo": "recibo_forma",
+        "id": 1,
+        "clienteId": 1,
+        "importe": 1,
+        "fecha": "",
+        "referencia": ""
+      }
+    ],
+    "periodoLocked": true
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 409 Candidate already reconciled or period locked
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/bancos/movimientos/{movId}/ignorar
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/bancos/movimientos/{movId}/ignorar`
+
+### Mark a movement as ignored, excluding it from reconciliation (#191)
+
+- **Method:** `POST`
+- **Path:** `/api/bancos/movimientos/{movId}/ignorar`
+- **Tags:** bancos
+
+Requires module `finance.bank_reconcile`, permission `reports.financial.read`, and role owner/manager/super\_admin.
+
+#### Responses
+
+##### Status: 200 Updated movement
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object` — Reconciliation view of a bank movement (#191). This is a narrower projection than \`MovimientoBancario\` — it omits \`saldo\`, \`formatoOrigen\`, \`dedupeKey\`, and \`createdAt\`, and adds \`periodoLocked\`.
+
+  - **`conciliadoAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`conciliadoId` (required)**
+
+    `integer`
+
+  - **`conciliadoTipo` (required)**
+
+    `string`, possible values: `"recibo_forma", "cobro", null`
+
+  - **`cuentaId` (required)**
+
+    `integer`
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`importe` (required)**
+
+    `string`
+
+  - **`matchEstado` (required)**
+
+    `string`, possible values: `"unmatched", "suggested", "matched_auto", "matched_manual", "ignored", "bank_fee"`
+
+  - **`matchScore` (required)**
+
+    `number`
+
+  - **`matchSugerencias` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`clienteId` (required)**
+
+      `integer`
+
+    - **`fecha` (required)**
+
+      `string`, format: `date-time`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`importe` (required)**
+
+      `number`
+
+    - **`referencia` (required)**
+
+      `string`
+
+    - **`tipo` (required)**
+
+      `string`, possible values: `"recibo_forma", "cobro"`
+
+  - **`periodoLocked` (required)**
+
+    `boolean` — True when the movement's YYYY-MM period is locked for reconciliation (#191).
+
+  - **`referencia` (required)**
+
+    `string`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"debito", "credito"`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "cuentaId": 1,
+    "fecha": "",
+    "descripcion": "",
+    "importe": "",
+    "tipo": "debito",
+    "referencia": "",
+    "matchEstado": "unmatched",
+    "conciliadoTipo": "recibo_forma",
+    "conciliadoId": 1,
+    "conciliadoAt": "",
+    "matchScore": 1,
+    "matchSugerencias": [
+      {
+        "tipo": "recibo_forma",
+        "id": 1,
+        "clienteId": 1,
+        "importe": 1,
+        "fecha": "",
+        "referencia": ""
+      }
+    ],
+    "periodoLocked": true
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 409 Period locked
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/bancos/movimientos/{movId}/gasto-bancario
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/bancos/movimientos/{movId}/gasto-bancario`
+
+### Manually reclassify a movement as a bank fee/charge (#191)
+
+- **Method:** `POST`
+- **Path:** `/api/bancos/movimientos/{movId}/gasto-bancario`
+- **Tags:** bancos
+
+Requires module `finance.bank_reconcile`, permission `reports.financial.read`, and role owner/manager/super\_admin.
+
+#### Responses
+
+##### Status: 200 Updated movement
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object` — Reconciliation view of a bank movement (#191). This is a narrower projection than \`MovimientoBancario\` — it omits \`saldo\`, \`formatoOrigen\`, \`dedupeKey\`, and \`createdAt\`, and adds \`periodoLocked\`.
+
+  - **`conciliadoAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`conciliadoId` (required)**
+
+    `integer`
+
+  - **`conciliadoTipo` (required)**
+
+    `string`, possible values: `"recibo_forma", "cobro", null`
+
+  - **`cuentaId` (required)**
+
+    `integer`
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`importe` (required)**
+
+    `string`
+
+  - **`matchEstado` (required)**
+
+    `string`, possible values: `"unmatched", "suggested", "matched_auto", "matched_manual", "ignored", "bank_fee"`
+
+  - **`matchScore` (required)**
+
+    `number`
+
+  - **`matchSugerencias` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`clienteId` (required)**
+
+      `integer`
+
+    - **`fecha` (required)**
+
+      `string`, format: `date-time`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`importe` (required)**
+
+      `number`
+
+    - **`referencia` (required)**
+
+      `string`
+
+    - **`tipo` (required)**
+
+      `string`, possible values: `"recibo_forma", "cobro"`
+
+  - **`periodoLocked` (required)**
+
+    `boolean` — True when the movement's YYYY-MM period is locked for reconciliation (#191).
+
+  - **`referencia` (required)**
+
+    `string`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"debito", "credito"`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "cuentaId": 1,
+    "fecha": "",
+    "descripcion": "",
+    "importe": "",
+    "tipo": "debito",
+    "referencia": "",
+    "matchEstado": "unmatched",
+    "conciliadoTipo": "recibo_forma",
+    "conciliadoId": 1,
+    "conciliadoAt": "",
+    "matchScore": 1,
+    "matchSugerencias": [
+      {
+        "tipo": "recibo_forma",
+        "id": 1,
+        "clienteId": 1,
+        "importe": 1,
+        "fecha": "",
+        "referencia": ""
+      }
+    ],
+    "periodoLocked": true
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 409 Period locked
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/bancos/cuentas/{id}/periodos/{periodo}/lock
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/bancos/cuentas/{id}/periodos/{periodo}/lock`
+
+### Lock a YYYY-MM reconciliation period for an account (#191)
+
+- **Method:** `POST`
+- **Path:** `/api/bancos/cuentas/{id}/periodos/{periodo}/lock`
+- **Tags:** bancos
+
+Requires module `finance.bank_reconcile`, permission `reports.financial.read`, and role owner/manager/super\_admin.
+
+#### Responses
+
+##### Status: 201 Period locked
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`lockedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`periodo` (required)**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "periodo": "",
+    "lockedAt": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 409 Period already locked
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Unlock a previously locked YYYY-MM reconciliation period (#191)
+
+- **Method:** `DELETE`
+- **Path:** `/api/bancos/cuentas/{id}/periodos/{periodo}/lock`
+- **Tags:** bancos
+
+Requires module `finance.bank_reconcile`, permission `reports.financial.read`, and role owner/manager/super\_admin.
+
+#### Responses
+
+##### Status: 200 Period unlocked
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `null`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": null
 }
 ```
 
@@ -78484,6 +80322,10 @@ Rate-limited mutation; requires products.manage. USD only.
 
   `boolean`
 
+* **`alias`**
+
+  `string` — Bank alias used to match Mercado Pago/bank collections against this customer (#191).
+
 * **`anonymizedAt`**
 
   `string`, format: `date-time` — Set when customer PII was irreversibly anonymized (#195)
@@ -78495,6 +80337,10 @@ Rate-limited mutation; requires products.manage. USD only.
 * **`balanceInicial`**
 
   `number`, default: `0` — Opening balance at migration time.
+
+* **`cbu`**
+
+  `string` — Argentine CBU (22 digits) used to match Mercado Pago/bank collections against this customer (#191).
 
 * **`codigo`**
 
@@ -78584,6 +80430,8 @@ Rate-limited mutation; requires products.manage. USD only.
   "score": 50,
   "suspended": false,
   "deliveryZoneId": 1,
+  "cbu": "",
+  "alias": "",
   "additionalProperty": "anything"
 }
 ```
@@ -78605,6 +80453,14 @@ Rate-limited mutation; requires products.manage. USD only.
   `string`, possible values: `"RI", "Mono", "CF", "Exento"`
 
 * **`rsocial` (required)**
+
+  `string`
+
+* **`alias`**
+
+  `string`
+
+* **`cbu`**
 
   `string`
 
@@ -78670,7 +80526,9 @@ Rate-limited mutation; requires products.manage. USD only.
   "creditLimit": 1,
   "creditDays": 0,
   "suspended": true,
-  "deliveryZoneId": 1
+  "deliveryZoneId": 1,
+  "cbu": "",
+  "alias": ""
 }
 ```
 
@@ -78842,6 +80700,10 @@ Rate-limited mutation; requires products.manage. USD only.
 
     `boolean`
 
+  - **`alias`**
+
+    `string` — Bank alias used to match Mercado Pago/bank collections against this customer (#191).
+
   - **`anonymizedAt`**
 
     `string`, format: `date-time` — Set when customer PII was irreversibly anonymized (#195)
@@ -78853,6 +80715,10 @@ Rate-limited mutation; requires products.manage. USD only.
   - **`balanceInicial`**
 
     `number`, default: `0` — Opening balance at migration time.
+
+  - **`cbu`**
+
+    `string` — Argentine CBU (22 digits) used to match Mercado Pago/bank collections against this customer (#191).
 
   - **`codigo`**
 
@@ -78948,6 +80814,8 @@ Rate-limited mutation; requires products.manage. USD only.
     "score": 50,
     "suspended": false,
     "deliveryZoneId": 1,
+    "cbu": "",
+    "alias": "",
     "additionalProperty": "anything"
   }
 }
@@ -78991,6 +80859,8 @@ Rate-limited mutation; requires products.manage. USD only.
     "score": 50,
     "suspended": false,
     "deliveryZoneId": 1,
+    "cbu": "",
+    "alias": "",
     "additionalProperty": "anything"
   }
 }
@@ -91079,6 +92949,48 @@ Rate-limited mutation; requires products.manage. USD only.
 
   `integer`
 
+* **`conciliadoTipo`**
+
+  `string`, possible values: `"recibo_forma", "cobro", null` — Kind of internal record this movement was reconciled against (#191).
+
+* **`matchEstado`**
+
+  `string`, possible values: `"unmatched", "suggested", "matched_auto", "matched_manual", "ignored", "bank_fee"` — Reconciliation lifecycle state of this movement (#191).
+
+* **`matchScore`**
+
+  `number` — Matching engine score of the winning/suggested candidate (#191).
+
+* **`matchSugerencias`**
+
+  `array` — Ranked candidate suggestions when matchEstado is \`suggested\` (#191).
+
+  **Items:**
+
+  - **`clienteId` (required)**
+
+    `integer`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`importe` (required)**
+
+    `number`
+
+  - **`referencia` (required)**
+
+    `string`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"recibo_forma", "cobro"`
+
 * **`referencia`**
 
   `string`
@@ -91103,7 +93015,902 @@ Rate-limited mutation; requires products.manage. USD only.
   "dedupeKey": "",
   "conciliadoId": 1,
   "conciliadoAt": "",
-  "createdAt": ""
+  "createdAt": "",
+  "conciliadoTipo": "recibo_forma",
+  "matchEstado": "unmatched",
+  "matchScore": 1,
+  "matchSugerencias": [
+    {
+      "tipo": "recibo_forma",
+      "id": 1,
+      "clienteId": 1,
+      "importe": 1,
+      "fecha": "",
+      "referencia": ""
+    }
+  ]
+}
+```
+
+### MatchSugerencia
+
+- **Type:**`object`
+
+* **`clienteId` (required)**
+
+  `integer`
+
+* **`fecha` (required)**
+
+  `string`, format: `date-time`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`importe` (required)**
+
+  `number`
+
+* **`referencia` (required)**
+
+  `string`
+
+* **`tipo` (required)**
+
+  `string`, possible values: `"recibo_forma", "cobro"`
+
+**Example:**
+
+```json
+{
+  "tipo": "recibo_forma",
+  "id": 1,
+  "clienteId": 1,
+  "importe": 1,
+  "fecha": "",
+  "referencia": ""
+}
+```
+
+### ConciliacionMovimiento
+
+- **Type:**`object`
+
+Reconciliation view of a bank movement (#191). This is a narrower projection than `MovimientoBancario` — it omits `saldo`, `formatoOrigen`, `dedupeKey`, and `createdAt`, and adds `periodoLocked`.
+
+- **`conciliadoAt` (required)**
+
+  `string`, format: `date-time`
+
+- **`conciliadoId` (required)**
+
+  `integer`
+
+- **`conciliadoTipo` (required)**
+
+  `string`, possible values: `"recibo_forma", "cobro", null`
+
+- **`cuentaId` (required)**
+
+  `integer`
+
+- **`descripcion` (required)**
+
+  `string`
+
+- **`fecha` (required)**
+
+  `string`, format: `date-time`
+
+- **`id` (required)**
+
+  `integer`
+
+- **`importe` (required)**
+
+  `string`
+
+- **`matchEstado` (required)**
+
+  `string`, possible values: `"unmatched", "suggested", "matched_auto", "matched_manual", "ignored", "bank_fee"`
+
+- **`matchScore` (required)**
+
+  `number`
+
+- **`matchSugerencias` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`clienteId` (required)**
+
+    `integer`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`importe` (required)**
+
+    `number`
+
+  - **`referencia` (required)**
+
+    `string`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"recibo_forma", "cobro"`
+
+- **`periodoLocked` (required)**
+
+  `boolean` — True when the movement's YYYY-MM period is locked for reconciliation (#191).
+
+- **`referencia` (required)**
+
+  `string`
+
+- **`tipo` (required)**
+
+  `string`, possible values: `"debito", "credito"`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "cuentaId": 1,
+  "fecha": "",
+  "descripcion": "",
+  "importe": "",
+  "tipo": "debito",
+  "referencia": "",
+  "matchEstado": "unmatched",
+  "conciliadoTipo": "recibo_forma",
+  "conciliadoId": 1,
+  "conciliadoAt": "",
+  "matchScore": 1,
+  "matchSugerencias": [
+    {
+      "tipo": "recibo_forma",
+      "id": 1,
+      "clienteId": 1,
+      "importe": 1,
+      "fecha": "",
+      "referencia": ""
+    }
+  ],
+  "periodoLocked": true
+}
+```
+
+### ConciliacionSummary
+
+- **Type:**`object`
+
+* **`bankFees` (required)**
+
+  `integer`
+
+* **`ignored` (required)**
+
+  `integer`
+
+* **`matchedAuto` (required)**
+
+  `integer`
+
+* **`matchedManual` (required)**
+
+  `integer`
+
+* **`openCandidates` (required)**
+
+  `object`
+
+  - **`cobros` (required)**
+
+    `integer`
+
+  - **`recibosForma` (required)**
+
+    `integer`
+
+* **`suggested` (required)**
+
+  `integer`
+
+* **`total` (required)**
+
+  `integer`
+
+* **`unmatched` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "total": 1,
+  "unmatched": 1,
+  "suggested": 1,
+  "matchedAuto": 1,
+  "matchedManual": 1,
+  "ignored": 1,
+  "bankFees": 1,
+  "openCandidates": {
+    "recibosForma": 1,
+    "cobros": 1
+  }
+}
+```
+
+### ConciliacionData
+
+- **Type:**`object`
+
+* **`movimientos` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`conciliadoAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`conciliadoId` (required)**
+
+    `integer`
+
+  - **`conciliadoTipo` (required)**
+
+    `string`, possible values: `"recibo_forma", "cobro", null`
+
+  - **`cuentaId` (required)**
+
+    `integer`
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`importe` (required)**
+
+    `string`
+
+  - **`matchEstado` (required)**
+
+    `string`, possible values: `"unmatched", "suggested", "matched_auto", "matched_manual", "ignored", "bank_fee"`
+
+  - **`matchScore` (required)**
+
+    `number`
+
+  - **`matchSugerencias` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`clienteId` (required)**
+
+      `integer`
+
+    - **`fecha` (required)**
+
+      `string`, format: `date-time`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`importe` (required)**
+
+      `number`
+
+    - **`referencia` (required)**
+
+      `string`
+
+    - **`tipo` (required)**
+
+      `string`, possible values: `"recibo_forma", "cobro"`
+
+  - **`periodoLocked` (required)**
+
+    `boolean` — True when the movement's YYYY-MM period is locked for reconciliation (#191).
+
+  - **`referencia` (required)**
+
+    `string`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"debito", "credito"`
+
+* **`summary` (required)**
+
+  `object`
+
+  - **`bankFees` (required)**
+
+    `integer`
+
+  - **`ignored` (required)**
+
+    `integer`
+
+  - **`matchedAuto` (required)**
+
+    `integer`
+
+  - **`matchedManual` (required)**
+
+    `integer`
+
+  - **`openCandidates` (required)**
+
+    `object`
+
+    - **`cobros` (required)**
+
+      `integer`
+
+    - **`recibosForma` (required)**
+
+      `integer`
+
+  - **`suggested` (required)**
+
+    `integer`
+
+  - **`total` (required)**
+
+    `integer`
+
+  - **`unmatched` (required)**
+
+    `integer`
+
+**Example:**
+
+```json
+{
+  "movimientos": [
+    {
+      "id": 1,
+      "cuentaId": 1,
+      "fecha": "",
+      "descripcion": "",
+      "importe": "",
+      "tipo": "debito",
+      "referencia": "",
+      "matchEstado": "unmatched",
+      "conciliadoTipo": "recibo_forma",
+      "conciliadoId": 1,
+      "conciliadoAt": "",
+      "matchScore": 1,
+      "matchSugerencias": [
+        {
+          "tipo": "recibo_forma",
+          "id": 1,
+          "clienteId": 1,
+          "importe": 1,
+          "fecha": "",
+          "referencia": ""
+        }
+      ],
+      "periodoLocked": true
+    }
+  ],
+  "summary": {
+    "total": 1,
+    "unmatched": 1,
+    "suggested": 1,
+    "matchedAuto": 1,
+    "matchedManual": 1,
+    "ignored": 1,
+    "bankFees": 1,
+    "openCandidates": {
+      "recibosForma": 1,
+      "cobros": 1
+    }
+  }
+}
+```
+
+### ConciliacionEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`movimientos` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`conciliadoAt` (required)**
+
+      `string`, format: `date-time`
+
+    - **`conciliadoId` (required)**
+
+      `integer`
+
+    - **`conciliadoTipo` (required)**
+
+      `string`, possible values: `"recibo_forma", "cobro", null`
+
+    - **`cuentaId` (required)**
+
+      `integer`
+
+    - **`descripcion` (required)**
+
+      `string`
+
+    - **`fecha` (required)**
+
+      `string`, format: `date-time`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`importe` (required)**
+
+      `string`
+
+    - **`matchEstado` (required)**
+
+      `string`, possible values: `"unmatched", "suggested", "matched_auto", "matched_manual", "ignored", "bank_fee"`
+
+    - **`matchScore` (required)**
+
+      `number`
+
+    - **`matchSugerencias` (required)**
+
+      `array`
+
+      **Items:**
+
+      - **`clienteId` (required)**
+
+        `integer`
+
+      - **`fecha` (required)**
+
+        `string`, format: `date-time`
+
+      - **`id` (required)**
+
+        `integer`
+
+      - **`importe` (required)**
+
+        `number`
+
+      - **`referencia` (required)**
+
+        `string`
+
+      - **`tipo` (required)**
+
+        `string`, possible values: `"recibo_forma", "cobro"`
+
+    - **`periodoLocked` (required)**
+
+      `boolean` — True when the movement's YYYY-MM period is locked for reconciliation (#191).
+
+    - **`referencia` (required)**
+
+      `string`
+
+    - **`tipo` (required)**
+
+      `string`, possible values: `"debito", "credito"`
+
+  - **`summary` (required)**
+
+    `object`
+
+    - **`bankFees` (required)**
+
+      `integer`
+
+    - **`ignored` (required)**
+
+      `integer`
+
+    - **`matchedAuto` (required)**
+
+      `integer`
+
+    - **`matchedManual` (required)**
+
+      `integer`
+
+    - **`openCandidates` (required)**
+
+      `object`
+
+      - **`cobros` (required)**
+
+        `integer`
+
+      - **`recibosForma` (required)**
+
+        `integer`
+
+    - **`suggested` (required)**
+
+      `integer`
+
+    - **`total` (required)**
+
+      `integer`
+
+    - **`unmatched` (required)**
+
+      `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "movimientos": [
+      {
+        "id": 1,
+        "cuentaId": 1,
+        "fecha": "",
+        "descripcion": "",
+        "importe": "",
+        "tipo": "debito",
+        "referencia": "",
+        "matchEstado": "unmatched",
+        "conciliadoTipo": "recibo_forma",
+        "conciliadoId": 1,
+        "conciliadoAt": "",
+        "matchScore": 1,
+        "matchSugerencias": [
+          {
+            "tipo": "recibo_forma",
+            "id": 1,
+            "clienteId": 1,
+            "importe": 1,
+            "fecha": "",
+            "referencia": ""
+          }
+        ],
+        "periodoLocked": true
+      }
+    ],
+    "summary": {
+      "total": 1,
+      "unmatched": 1,
+      "suggested": 1,
+      "matchedAuto": 1,
+      "matchedManual": 1,
+      "ignored": 1,
+      "bankFees": 1,
+      "openCandidates": {
+        "recibosForma": 1,
+        "cobros": 1
+      }
+    }
+  }
+}
+```
+
+### RunMatchingSummary
+
+- **Type:**`object`
+
+* **`autoMatched` (required)**
+
+  `integer`
+
+* **`bankFees` (required)**
+
+  `integer`
+
+* **`processed` (required)**
+
+  `integer`
+
+* **`suggested` (required)**
+
+  `integer`
+
+* **`unmatched` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "processed": 1,
+  "autoMatched": 1,
+  "suggested": 1,
+  "unmatched": 1,
+  "bankFees": 1
+}
+```
+
+### RunMatchingEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`autoMatched` (required)**
+
+    `integer`
+
+  - **`bankFees` (required)**
+
+    `integer`
+
+  - **`processed` (required)**
+
+    `integer`
+
+  - **`suggested` (required)**
+
+    `integer`
+
+  - **`unmatched` (required)**
+
+    `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "processed": 1,
+    "autoMatched": 1,
+    "suggested": 1,
+    "unmatched": 1,
+    "bankFees": 1
+  }
+}
+```
+
+### ConciliacionMovimientoEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object` — Reconciliation view of a bank movement (#191). This is a narrower projection than \`MovimientoBancario\` — it omits \`saldo\`, \`formatoOrigen\`, \`dedupeKey\`, and \`createdAt\`, and adds \`periodoLocked\`.
+
+  - **`conciliadoAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`conciliadoId` (required)**
+
+    `integer`
+
+  - **`conciliadoTipo` (required)**
+
+    `string`, possible values: `"recibo_forma", "cobro", null`
+
+  - **`cuentaId` (required)**
+
+    `integer`
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`importe` (required)**
+
+    `string`
+
+  - **`matchEstado` (required)**
+
+    `string`, possible values: `"unmatched", "suggested", "matched_auto", "matched_manual", "ignored", "bank_fee"`
+
+  - **`matchScore` (required)**
+
+    `number`
+
+  - **`matchSugerencias` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`clienteId` (required)**
+
+      `integer`
+
+    - **`fecha` (required)**
+
+      `string`, format: `date-time`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`importe` (required)**
+
+      `number`
+
+    - **`referencia` (required)**
+
+      `string`
+
+    - **`tipo` (required)**
+
+      `string`, possible values: `"recibo_forma", "cobro"`
+
+  - **`periodoLocked` (required)**
+
+    `boolean` — True when the movement's YYYY-MM period is locked for reconciliation (#191).
+
+  - **`referencia` (required)**
+
+    `string`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"debito", "credito"`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "cuentaId": 1,
+    "fecha": "",
+    "descripcion": "",
+    "importe": "",
+    "tipo": "debito",
+    "referencia": "",
+    "matchEstado": "unmatched",
+    "conciliadoTipo": "recibo_forma",
+    "conciliadoId": 1,
+    "conciliadoAt": "",
+    "matchScore": 1,
+    "matchSugerencias": [
+      {
+        "tipo": "recibo_forma",
+        "id": 1,
+        "clienteId": 1,
+        "importe": 1,
+        "fecha": "",
+        "referencia": ""
+      }
+    ],
+    "periodoLocked": true
+  }
+}
+```
+
+### ConciliarManualBody
+
+- **Type:**`object`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`tipo` (required)**
+
+  `string`, possible values: `"recibo_forma", "cobro"`
+
+**Example:**
+
+```json
+{
+  "tipo": "recibo_forma",
+  "id": 1
+}
+```
+
+### PeriodoLockResult
+
+- **Type:**`object`
+
+* **`lockedAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`periodo` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "periodo": "",
+  "lockedAt": ""
+}
+```
+
+### PeriodoLockEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`lockedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`periodo` (required)**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "periodo": "",
+    "lockedAt": ""
+  }
 }
 ```
 

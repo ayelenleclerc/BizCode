@@ -149,7 +149,23 @@ Module `finance.bank_reconcile`. On **Finance** you can:
 3. Configure CSV mappings by bank code (`GET/POST/PATCH /api/bancos/csv-mappings`) — seeds for Galicia, Santander, BBVA, Macro, and Nación; new banks can be added without redeploy.
 4. List imported movements (`GET /api/bancos/cuentas/{id}/movimientos`).
 
-Deduplication uses date+amount+type+reference+description. Semi-automatic matching to collections is issue **#191** (out of scope here).
+Deduplication uses date+amount+type+reference+description.
+
+## Bank reconciliation and matching (#191)
+
+Module `finance.bank_reconcile`, `reports.financial.read`; write actions (run matching, confirm/ignore, manual assignment, lock/unlock) require owner/manager/super_admin. On **Finance → Bank reconciliation** (`/finanzas/conciliacion-bancaria`):
+
+1. **Select account and date range** (`desde`/`hasta`) to load movements and a summary of matched/suggested/unmatched counts (`GET /api/bancos/cuentas/{id}/conciliacion`).
+2. **Run matching** (`POST .../conciliacion/run`): the pure `matchEngine` scores each unmatched/suggested movement against open `ReciboCobroForma` (transfer/check formas) and `Cobro` candidates by amount, a date tolerance window, and — when available — the customer's `cbu`/`alias` (set on the customer form, **Clientes**). Movements are set to `matched_auto` when a single high-confidence candidate is found, `suggested` when multiple/lower-confidence candidates exist, or stay `unmatched`.
+3. **Review the table:** each row shows the extract movement, a color-coded status (green = matched automatically, yellow = suggested, red = unmatched), and actions:
+   - **Confirm suggestion** (`POST /api/bancos/movimientos/{movId}/sugerencia/confirmar`) accepts the top-ranked suggestion as the manual match.
+   - **Manual assign** (`POST .../conciliar` with `{ tipo: 'recibo_forma' | 'cobro', id }`) links the movement to a specific receipt form or collection by ID.
+   - **Ignore** (`POST .../ignorar`) marks the movement as reviewed with no match (e.g. transfers between own accounts).
+   - **Bank fee** (`POST .../gasto-bancario`) marks a debit movement as a bank expense/commission, excluding it from pending reconciliation.
+4. **Export** the current view to Excel (`GET .../conciliacion/export.xlsx`).
+5. **Lock/unlock a period** (`YYYY-MM`) with `POST`/`DELETE /api/bancos/cuentas/{id}/periodos/{periodo}/lock` to prevent further reconciliation edits once a month is closed.
+
+Customer `cbu`/`alias` (optional, editable on the customer form) improve auto-match confidence for bank transfers; both fields are cleared on customer anonymization (#195).
 
 **Tax filings SICORE/SIFERE (#242):** on **Finance → Tax filings** (`finance.retenciones`, `reports.financial.read`): select period and format (SICORE national or SIFERE IIBB), preview operations with regime totals and CUIT warnings, download TXT (`POST /api/fiscal/presentaciones` + `GET .../{id}/archivo`), review history, and mark as filed after AFIP/COMARB upload. APIs: `GET /api/fiscal/presentaciones/preview?formato=sicore|sifere&periodo=YYYY-MM`, `POST/GET /api/fiscal/presentaciones`, `PATCH /api/fiscal/presentaciones/{id}/presentado`. Legacy direct export: `GET /api/fiscal/retenciones/export`. Validate generated files against official homologation tools manually.
 

@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "clienteId": {
+      "type": "integer"
+    },
+    "fecha": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "id": {
+      "type": "integer"
+    },
+    "importe": {
+      "type": "number"
+    },
+    "referencia": {
+      "nullable": true,
+      "type": "string"
+    },
+    "tipo": {
+      "enum": [
+        "recibo_forma",
+        "cobro"
+      ],
+      "type": "string"
+    }
+  },
+  "required": [
+    "tipo",
+    "id",
+    "clienteId",
+    "importe",
+    "fecha",
+    "referencia"
+  ],
+  "title": "MatchSugerencia",
+  "type": "object"
+}

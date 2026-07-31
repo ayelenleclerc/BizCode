@@ -6,7 +6,7 @@ import { useHotkeys } from 'react-hotkeys-hook'
 import KeyboardHint, { useFormShortcuts } from '@/components/shared/KeyboardHint'
 import { useTranslation } from 'react-i18next'
 import { clientesAPI, listasPreciosAPI, zonasEntregaAPI } from '@/lib/api'
-import { validateCUIT, formatCUIT } from '@/lib/validators'
+import { validateCUIT, formatCUIT, validateCBU } from '@/lib/validators'
 import { useAuth } from '@/contexts/AuthContext'
 import { Cliente, DeliveryZone, type ListaPrecioRow } from '@bizcode/types'
 import ClienteCobrosRecientes from './ClienteCobrosRecientes'
@@ -29,6 +29,12 @@ const clienteSchema = z.object({
   telef: z.string().max(25).optional(),
   email: z.string().email('Email inválido').max(50).optional().or(z.literal('')),
   activo: z.boolean(),
+  // Bank reconciliation matching (#191) — optional CBU/alias used to auto-match bank transfers.
+  cbu: z.string().max(22).optional().refine(
+    (val) => !val || validateCBU(val),
+    'CBU inválido'
+  ),
+  alias: z.string().max(60).optional(),
   // Financial fields — only sent when the user has manager/owner role
   creditLimit: z.coerce.number().positive().optional().nullable(),
   creditDays: z.coerce.number().int().min(0).optional(),
@@ -147,6 +153,8 @@ export default function ClienteForm({ cliente, onClose, onGuardado }: ClienteFor
       setValue('telef', cliente.telef)
       setValue('email', cliente.email)
       setValue('activo', cliente.activo)
+      setValue('cbu', cliente.cbu ?? '')
+      setValue('alias', cliente.alias ?? '')
       setValue('creditLimit', cliente.creditLimit != null ? Number(cliente.creditLimit) : null)
       setValue('creditDays', cliente.creditDays ?? 0)
       setValue('suspended', cliente.suspended ?? false)
@@ -426,6 +434,41 @@ export default function ClienteForm({ cliente, onClose, onGuardado }: ClienteFor
               {errors.email && (
                 <p id="cliente-email-error" className="text-red-400 text-sm mt-1">{errors.email.message}</p>
               )}
+            </div>
+          </div>
+
+          {/* ── Bank data for reconciliation matching (Issue #191) ─────────── */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label htmlFor="cliente-cbu" className="block text-slate-700 dark:text-slate-300 font-semibold mb-1">
+                {t('form.cbu')}
+              </label>
+              <input
+                id="cliente-cbu"
+                type="text"
+                data-testid="cliente-form-cbu"
+                {...register('cbu')}
+                maxLength={22}
+                placeholder="0000000000000000000000"
+                aria-describedby={errors.cbu ? 'cliente-cbu-error' : undefined}
+                className="w-full px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 rounded border border-slate-300 dark:border-slate-600 focus:border-blue-500 focus:outline-none font-mono"
+              />
+              {errors.cbu && (
+                <p id="cliente-cbu-error" className="text-red-400 text-sm mt-1">{errors.cbu.message}</p>
+              )}
+            </div>
+            <div>
+              <label htmlFor="cliente-alias" className="block text-slate-700 dark:text-slate-300 font-semibold mb-1">
+                {t('form.alias')}
+              </label>
+              <input
+                id="cliente-alias"
+                type="text"
+                data-testid="cliente-form-alias"
+                {...register('alias')}
+                maxLength={60}
+                className="w-full px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 rounded border border-slate-300 dark:border-slate-600 focus:border-blue-500 focus:outline-none"
+              />
             </div>
           </div>
 

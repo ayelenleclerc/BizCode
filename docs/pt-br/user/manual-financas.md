@@ -140,7 +140,23 @@ Módulo `finance.bank_reconcile`. Em **Finanças** você pode:
 3. Configurar mapeamentos CSV por código de banco (`GET/POST/PATCH /api/bancos/csv-mappings`) — seeds para Galicia, Santander, BBVA, Macro e Nación; novos bancos sem redeploy.
 4. Listar movimentos importados (`GET /api/bancos/cuentas/{id}/movimientos`).
 
-A deduplicação usa data+valor+tipo+referência+descrição. O matching semi-automático com cobranças é a issue **#191** (fora de escopo desta versão).
+A deduplicação usa data+valor+tipo+referência+descrição.
+
+## Conciliação bancária e matching (#191)
+
+Módulo `finance.bank_reconcile`, `reports.financial.read`; ações de escrita (executar matching, confirmar/ignorar, atribuição manual, bloquear/desbloquear) exigem papel owner/manager/super_admin. Em **Finanças → Conciliação bancária** (`/finanzas/conciliacion-bancaria`):
+
+1. **Selecione conta e período** (`desde`/`hasta`) para carregar os movimentos e um resumo de status conciliado/sugerido/sem conciliar (`GET /api/bancos/cuentas/{id}/conciliacion`).
+2. **Executar matching** (`POST .../conciliacion/run`): o motor puro `matchEngine` pontua cada movimento sem conciliar ou sugerido contra candidatos abertos de `ReciboCobroForma` (formas transferência/cheque) e `Cobro`, por valor, uma janela de tolerância de data e — quando disponível — o `cbu`/`alias` do cliente (configurável no formulário de **Clientes**). Os movimentos ficam `matched_auto` quando há um único candidato de alta confiança, `suggested` quando há vários candidatos ou de menor confiança, ou permanecem `unmatched`.
+3. **Revise a tabela:** cada linha mostra o movimento do extrato, um status colorido (verde = conciliado automático, amarelo = sugerido, vermelho = sem conciliar) e ações:
+   - **Confirmar sugestão** (`POST /api/bancos/movimientos/{movId}/sugerencia/confirmar`) aceita a sugestão de maior pontuação como match manual.
+   - **Atribuição manual** (`POST .../conciliar` com `{ tipo: 'recibo_forma' | 'cobro', id }`) vincula o movimento a uma forma de recibo ou cobrança específica por ID.
+   - **Ignorar** (`POST .../ignorar`) marca o movimento como revisado sem match (por exemplo, transferências entre contas próprias).
+   - **Despesa bancária** (`POST .../gasto-bancario`) marca um movimento de débito como despesa/tarifa bancária, excluindo-o da conciliação pendente.
+4. **Exporte** a visão atual para Excel (`GET .../conciliacion/export.xlsx`).
+5. **Bloqueie/desbloqueie um período** (`YYYY-MM`) com `POST`/`DELETE /api/bancos/cuentas/{id}/periodos/{periodo}/lock` para impedir novas edições de conciliação após o fechamento do mês.
+
+O `cbu`/`alias` do cliente (opcionais, editáveis no formulário de cliente) melhoram a confiança do matching automático de transferências; ambos os campos são apagados na anonimização do cliente (#195).
 
 **Apresentações SICORE/SIFERE (#242):** em **Finanças → Apresentações fiscais** (`finance.retenciones`, `reports.financial.read`): selecione período e formato (SICORE nacional ou SIFERE IIBB), pré-visualização com totais por regime e avisos de CUIT, download TXT (`POST /api/fiscal/presentaciones` + `GET .../{id}/archivo`), histórico e marca «apresentado» após envio à AFIP/COMARB. APIs: `GET /api/fiscal/presentaciones/preview?formato=sicore|sifere&periodo=YYYY-MM`, `POST/GET /api/fiscal/presentaciones`, `PATCH /api/fiscal/presentaciones/{id}/presentado`. Exportação direta legada: `GET /api/fiscal/retenciones/export`. Valide os arquivos em homologação oficial manualmente.
 

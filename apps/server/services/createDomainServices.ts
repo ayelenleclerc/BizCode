@@ -50,6 +50,7 @@ import { FidelizacionService } from './FidelizacionService'
 import { LoteService } from './LoteService'
 import { ClientePrivacyService } from './ClientePrivacyService'
 import { BancoExtractoService } from './BancoExtractoService'
+import { BancoConciliacionService } from './BancoConciliacionService'
 
 export type DomainServices = {
   cliente: ClienteService
@@ -103,6 +104,7 @@ export type DomainServices = {
   lotes: LoteService
   clientePrivacy: ClientePrivacyService
   bancoExtracto: BancoExtractoService
+  bancoConciliacion: BancoConciliacionService
 }
 
 /**
@@ -163,5 +165,6 @@ export function createDomainServices(prisma: PrismaClient): DomainServices {
     lotes: new LoteService(prisma),
     clientePrivacy: new ClientePrivacyService(prisma),
     bancoExtracto: new BancoExtractoService(prisma),
+    bancoConciliacion: new BancoConciliacionService(prisma),
   }
 }

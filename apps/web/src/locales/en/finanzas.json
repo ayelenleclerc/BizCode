@@ -408,7 +408,7 @@
   },
   "bancos": {
     "title": "Bank statements",
-    "intro": "Register tenant bank accounts and import CSV, OFX, or MT940 statements. Automatic collection matching is issue #191.",
+    "intro": "Register tenant bank accounts and import CSV, OFX, or MT940 statements. Reconcile collections automatically from \"Bank reconciliation\" (#191).",
     "cuentasTitle": "Bank accounts",
     "cuentasEmpty": "No accounts yet. Create one with a 22-digit CBU.",
     "importTitle": "Import statement",
@@ -448,6 +448,64 @@
     "movTipo": {
       "debito": "Debit",
       "credito": "Credit"
+    },
+    "conciliacion": {
+      "linkTitle": "Bank reconciliation",
+      "linkHint": "Automatically match statement movements against collection receipts and legacy collections.",
+      "openPage": "Open bank reconciliation",
+      "title": "Bank reconciliation",
+      "subtitle": "Review the reconciliation status of imported movements, run automatic matching, and resolve cases manually.",
+      "backToFinance": "Back to Finance",
+      "cuenta": "Bank account",
+      "noCuentas": "No bank accounts yet. Create one in the bank statements section.",
+      "desde": "From",
+      "hasta": "To",
+      "periodo": "Period (lock)",
+      "run": "Run matching",
+      "running": "Running…",
+      "runSuccess": "Matching run: {{processed}} processed, {{autoMatched}} auto-matched, {{suggested}} suggested.",
+      "runError": "Could not run the matching engine.",
+      "export": "Export Excel",
+      "exporting": "Exporting…",
+      "exportError": "Could not export the Excel file.",
+      "lock": "Lock period",
+      "unlock": "Unlock period",
+      "lockSuccess": "Period {{periodo}} locked.",
+      "unlockSuccess": "Period {{periodo}} unlocked.",
+      "actionError": "Could not complete the action.",
+      "periodoLockedBadge": "Period locked",
+      "empty": "No movements for the selected range.",
+      "colExtracto": "Statement",
+      "colEstado": "Status",
+      "colAcciones": "Actions",
+      "score": "Score",
+      "suggestions": "Suggestions",
+      "confirmSuggestion": "Confirm suggestion",
+      "ignore": "Ignore",
+      "bankFee": "Bank fee",
+      "manualTipo": "Type",
+      "manualTipoCobro": "Collection",
+      "manualTipoReciboForma": "Receipt (payment form)",
+      "manualId": "ID",
+      "manualAssign": "Assign",
+      "manualIdInvalid": "Enter a valid ID.",
+      "estado": {
+        "unmatched": "Unmatched",
+        "suggested": "Suggested",
+        "matched_auto": "Auto-matched",
+        "matched_manual": "Manually matched",
+        "ignored": "Ignored",
+        "bank_fee": "Bank fee"
+      },
+      "summary": {
+        "total": "Total",
+        "unmatched": "Unmatched",
+        "suggested": "Suggested",
+        "matchedAuto": "Auto-matched",
+        "matchedManual": "Manually matched",
+        "ignored": "Ignored",
+        "bankFees": "Bank fees"
+      }
     }
   }
 }
