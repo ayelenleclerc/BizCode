@@ -46,6 +46,17 @@
       ],
       "type": "string"
     },
+    "estadoEnvio": {
+      "description": "Carrier shipment status (#193), independent of OE estado.",
+      "enum": [
+        "pending",
+        "in_transit",
+        "delivered",
+        "returned"
+      ],
+      "nullable": true,
+      "type": "string"
+    },
     "factura": {
       "additionalProperties": true,
       "nullable": true,
@@ -72,6 +83,11 @@
       "nullable": true,
       "type": "string"
     },
+    "nroSeguimiento": {
+      "description": "Carrier tracking number (#193).",
+      "nullable": true,
+      "type": "string"
+    },
     "picker": {
       "additionalProperties": true,
       "nullable": true,
@@ -93,6 +109,29 @@
     },
     "tenantId": {
       "type": "integer"
+    },
+    "trackingEventos": {
+      "items": {
+        "$ref": "./ShippingTrackingEvent.schema.json"
+      },
+      "nullable": true,
+      "type": "array"
+    },
+    "transportista": {
+      "description": "Carrier for parcel shipping (#193).",
+      "enum": [
+        "correo_argentino",
+        "andreani",
+        "propio",
+        "meli_full"
+      ],
+      "nullable": true,
+      "type": "string"
+    },
+    "ultimoEventoAt": {
+      "format": "date-time",
+      "nullable": true,
+      "type": "string"
     },
     "zona": {
       "additionalProperties": true,

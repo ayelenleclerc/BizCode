@@ -186,7 +186,8 @@
       "invoice_due_soon": "Fatura a vencer",
       "chat_message": "Nova mensagem",
       "contract_invoice_generated": "Fatura gerada por contrato",
-      "contract_adjustment_due": "Reajuste de preço do contrato aplicado"
+      "contract_adjustment_due": "Reajuste de preço do contrato aplicado",
+      "shipment_delivered": "Envio entregue"
     }
   },
   "notifChannels": {

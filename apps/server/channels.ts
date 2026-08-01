@@ -226,6 +226,16 @@ function buildMessage(type: NotificationType, payload: NotificationPayload): Mes
         text: `Security event ${evt} (${sev})${tenantPart}${userPart}${ipPart}.${detail}`,
       }
     }
+    case 'shipment_delivered': {
+      const nro = payload.nroSeguimiento ? ` ${payload.nroSeguimiento}` : ''
+      const carrier = payload.transportista ? ` (${payload.transportista})` : ''
+      const oe =
+        payload.ordenEntregaId != null ? ` OE #${payload.ordenEntregaId}` : ''
+      return {
+        subject: `[BizCode] Envío entregado${nro} — ${rsocial}`,
+        text: `El envío${nro}${carrier} del cliente ${rsocial}${oe} fue marcado como entregado por el transportista.`,
+      }
+    }
   }
 }
 

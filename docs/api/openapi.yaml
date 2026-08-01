@@ -10798,6 +10798,168 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
 
+    get:
+      tags: [logistics]
+      summary: Get delivery order by id
+      description: Requires `logistics.read`, `orders.deliver.confirm`, or `orders.pick`.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '200':
+          description: Delivery order
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrdenEntregaEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Order not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/ordenes-entrega/{id}/tracking:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    get:
+      tags: [logistics]
+      summary: Get carrier tracking for a delivery order (#193)
+      description: |
+        Returns cached tracking (30 min TTL). With active carrier credentials, refreshes from
+        Andreani / Correo Argentino when cache is stale. Without credentials, returns manual fields + portal URL.
+      parameters:
+        - name: refresh
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: ['1']
+      responses:
+        '200':
+          description: Tracking view
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrdenEntregaTrackingEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Order not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    post:
+      tags: [logistics]
+      summary: Assign carrier tracking number (#193)
+      description: Requires `logistics.manage`. Persists transportista + nroSeguimiento (manual mode works without credentials).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrdenEntregaTrackingAssignInput'
+      responses:
+        '200':
+          description: Tracking assigned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrdenEntregaTrackingEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Order not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/shipping-carriers/{carrier}/config:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: carrier
+        in: path
+        required: true
+        schema:
+          type: string
+          enum: [andreani, correo_argentino]
+    get:
+      tags: [logistics]
+      summary: Get shipping carrier credential metadata (#193)
+      description: Requires `logistics.manage`. Never returns decrypted secrets.
+      responses:
+        '200':
+          description: Public config
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShippingCarrierConfigEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Config not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    put:
+      tags: [logistics]
+      summary: Upsert shipping carrier credentials (#193)
+      description: Requires `logistics.manage`. Secrets stored encrypted at rest.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ShippingCarrierConfigUpsertInput'
+      responses:
+        '200':
+          description: Config saved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShippingCarrierConfigEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
   /api/ordenes-entrega/{id}/iniciar-picking:
     parameters:
       - $ref: '#/components/parameters/BizcodeChannelHeader'
@@ -13913,6 +14075,29 @@ components:
         nota:
           type: string
           nullable: true
+        transportista:
+          type: string
+          nullable: true
+          enum: [correo_argentino, andreani, propio, meli_full]
+          description: Carrier for parcel shipping (#193).
+        nroSeguimiento:
+          type: string
+          nullable: true
+          description: Carrier tracking number (#193).
+        estadoEnvio:
+          type: string
+          nullable: true
+          enum: [pending, in_transit, delivered, returned]
+          description: Carrier shipment status (#193), independent of OE estado.
+        ultimoEventoAt:
+          type: string
+          format: date-time
+          nullable: true
+        trackingEventos:
+          type: array
+          nullable: true
+          items:
+            $ref: '#/components/schemas/ShippingTrackingEvent'
         dispatchedAt:
           type: string
           format: date-time
@@ -14027,6 +14212,121 @@ components:
           const: true
         data:
           $ref: '#/components/schemas/OrdenEntrega'
+
+    ShippingTrackingEvent:
+      type: object
+      required: [at, status]
+      properties:
+        at:
+          type: string
+        status:
+          type: string
+        description:
+          type: string
+        location:
+          type: string
+
+    OrdenEntregaTrackingAssignInput:
+      type: object
+      required: [transportista, nroSeguimiento]
+      properties:
+        transportista:
+          type: string
+          enum: [correo_argentino, andreani, propio, meli_full]
+        nroSeguimiento:
+          type: string
+          minLength: 1
+          maxLength: 80
+        estadoEnvio:
+          type: string
+          enum: [pending, in_transit, delivered, returned]
+
+    OrdenEntregaTrackingView:
+      type: object
+      required: [ordenEntregaId, trackingEventos, fromCache, refreshed]
+      properties:
+        ordenEntregaId:
+          type: integer
+        transportista:
+          type: string
+          nullable: true
+          enum: [correo_argentino, andreani, propio, meli_full]
+        nroSeguimiento:
+          type: string
+          nullable: true
+        estadoEnvio:
+          type: string
+          nullable: true
+          enum: [pending, in_transit, delivered, returned]
+        ultimoEventoAt:
+          type: string
+          format: date-time
+          nullable: true
+        trackingEventos:
+          type: array
+          items:
+            $ref: '#/components/schemas/ShippingTrackingEvent'
+        portalUrl:
+          type: string
+          nullable: true
+        fromCache:
+          type: boolean
+        refreshed:
+          type: boolean
+
+    OrdenEntregaTrackingEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/OrdenEntregaTrackingView'
+
+    ShippingCarrierConfigUpsertInput:
+      type: object
+      required: [username, password]
+      properties:
+        username:
+          type: string
+          minLength: 1
+          maxLength: 120
+        password:
+          type: string
+          minLength: 1
+          maxLength: 200
+        sandboxMode:
+          type: boolean
+        activo:
+          type: boolean
+
+    ShippingCarrierConfigPublic:
+      type: object
+      required: [carrier, usernameLast4, sandboxMode, activo, updatedAt]
+      properties:
+        carrier:
+          type: string
+          enum: [andreani, correo_argentino]
+        usernameLast4:
+          type: string
+        sandboxMode:
+          type: boolean
+        activo:
+          type: boolean
+        updatedAt:
+          type: string
+          format: date-time
+
+    ShippingCarrierConfigEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/ShippingCarrierConfigPublic'
 
     AgingBucket:
       type: object

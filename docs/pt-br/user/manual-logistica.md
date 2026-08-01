@@ -22,6 +22,18 @@ Com **`orders.create`**, abra o formulário de nova ordem, informe id do cliente
 
 Usuários com **`orders.dispatch`** ou **`orders.deliver.confirm`** podem alterar o estado da ordem pelos controles da UI (`PUT /api/ordenes-entrega/:id`).
 
+## Rastreio de envio por transportadora (#193)
+
+Selecione uma ordem em `/logistica` para abrir o painel **Envio**.
+
+| Ação | Quem | Notas |
+|------|------|--------|
+| Atribuir transportadora + nº rastreio | `logistics.manage` | `POST /api/ordenes-entrega/:id/tracking` — funciona sem credenciais de API (manual + link do portal). |
+| Ver / atualizar status | `logistics.read` / `logistics.manage` | `GET /api/ordenes-entrega/:id/tracking` — cache 30 min; atualiza Andreani / Correo Argentino se houver credenciais. |
+| Guardar credenciais | `logistics.manage` | `PUT /api/shipping-carriers/{andreani\|correo_argentino}/config` (criptografadas em repouso). |
+
+Cron no host a cada 2 h: `npm run shipping:tracking-refresh`. Managers recebem a notificação in-app `shipment_delivered` ao passar a entregue.
+
 ## Picking no depósito
 
 Abra **Picking** (`/logistica/picking`) pela barra lateral ou pelo link na página de logística. Requer o módulo **`logistics.picking`**, permissão **`orders.pick`** e papéis como **`warehouse_op`** ou **`warehouse_lead`**.

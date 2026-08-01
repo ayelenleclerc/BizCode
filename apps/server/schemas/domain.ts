@@ -1150,6 +1150,38 @@ export const ordenEntregaUpdateBodySchema = z
     }
   })
 
+const SHIPPING_TRANSPORTISTAS = ['correo_argentino', 'andreani', 'propio', 'meli_full'] as const
+const ESTADO_ENVIO_VALUES = ['pending', 'in_transit', 'delivered', 'returned'] as const
+const SHIPPING_API_CARRIERS = ['andreani', 'correo_argentino'] as const
+
+export const ordenEntregaTrackingAssignBodySchema = z
+  .object({
+    transportista: z.enum(SHIPPING_TRANSPORTISTAS),
+    nroSeguimiento: z.string().min(1).max(80),
+    estadoEnvio: z.enum(ESTADO_ENVIO_VALUES).optional(),
+  })
+  .transform((data) => ({
+    transportista: data.transportista,
+    nroSeguimiento: data.nroSeguimiento.trim(),
+    estadoEnvio: data.estadoEnvio,
+  }))
+
+export const shippingCarrierConfigUpsertBodySchema = z
+  .object({
+    username: z.string().min(1).max(120),
+    password: z.string().min(1).max(200),
+    sandboxMode: z.boolean().optional(),
+    activo: z.boolean().optional(),
+  })
+  .transform((data) => ({
+    username: data.username.trim(),
+    password: data.password,
+    sandboxMode: data.sandboxMode,
+    activo: data.activo,
+  }))
+
+export const shippingApiCarrierParamSchema = z.enum(SHIPPING_API_CARRIERS)
+
 export const stockAjusteBodySchema = z
   .object({
     cantidad: z.number({ invalid_type_error: 'cantidad must be a number' }),

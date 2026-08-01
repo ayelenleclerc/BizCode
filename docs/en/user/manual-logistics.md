@@ -22,6 +22,18 @@ With **`orders.create`**, open the new-order form, enter customer id, date, opti
 
 Users with **`orders.dispatch`** or **`orders.deliver.confirm`** can change order state per UI controls (`PUT /api/ordenes-entrega/:id`).
 
+## Carrier shipment tracking (#193)
+
+Select a delivery order on `/logistica` to open the **Shipment** panel.
+
+| Action | Who | Notes |
+|--------|-----|--------|
+| Assign carrier + tracking number | `logistics.manage` | `POST /api/ordenes-entrega/:id/tracking` — works without courier API credentials (manual + portal link). |
+| View / refresh status | `logistics.read` / `logistics.manage` | `GET /api/ordenes-entrega/:id/tracking` — 30‑minute cache; refreshes from Andreani / Correo Argentino when credentials are configured. |
+| Store carrier credentials | `logistics.manage` | `PUT /api/shipping-carriers/{andreani\|correo_argentino}/config` (encrypted at rest). |
+
+Host cron every 2 hours: `npm run shipping:tracking-refresh`. Managers receive in-app notification `shipment_delivered` when carrier status becomes delivered.
+
 ## Warehouse picking
 
 Open **Picking** (`/logistica/picking`) from the sidebar or the logistics page link. Requires module **`logistics.picking`**, permission **`orders.pick`**, and roles such as **`warehouse_op`** or **`warehouse_lead`**.

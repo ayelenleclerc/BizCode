@@ -4,6 +4,10 @@ import type {
   OrdenEntrega,
   OrdenEntregaEstado,
   OrdenEntregaListParams,
+  OrdenEntregaTrackingAssignInput,
+  OrdenEntregaTrackingView,
+  ShippingCarrierConfigPublic,
+  ShippingCarrierConfigUpsertInput,
 } from '@bizcode/types'
 import { api } from '../default-client'
 import { handleError } from '../errors'
@@ -20,6 +24,15 @@ export function createOrdenesEntregaAPI(http: AxiosInstance) {
           limit: number
           offset: number
         }
+      } catch (error) {
+        handleError(error as AxiosError<ApiErrorPayload>)
+      }
+    },
+
+    getById: async (id: number) => {
+      try {
+        const response = await http.get(`/ordenes-entrega/${id}`)
+        return response.data.data as OrdenEntrega
       } catch (error) {
         handleError(error as AxiosError<ApiErrorPayload>)
       }
@@ -75,7 +88,52 @@ export function createOrdenesEntregaAPI(http: AxiosInstance) {
         handleError(error as AxiosError<ApiErrorPayload>)
       }
     },
+
+    assignTracking: async (id: number, body: OrdenEntregaTrackingAssignInput) => {
+      try {
+        const response = await http.post(`/ordenes-entrega/${id}/tracking`, body)
+        return response.data.data as OrdenEntregaTrackingView
+      } catch (error) {
+        handleError(error as AxiosError<ApiErrorPayload>)
+      }
+    },
+
+    getTracking: async (id: number, params?: { refresh?: boolean }) => {
+      try {
+        const response = await http.get(`/ordenes-entrega/${id}/tracking`, {
+          params: params?.refresh ? { refresh: '1' } : undefined,
+        })
+        return response.data.data as OrdenEntregaTrackingView
+      } catch (error) {
+        handleError(error as AxiosError<ApiErrorPayload>)
+      }
+    },
+  }
+}
+
+export function createShippingCarriersAPI(http: AxiosInstance) {
+  return {
+    getConfig: async (carrier: 'andreani' | 'correo_argentino') => {
+      try {
+        const response = await http.get(`/shipping-carriers/${carrier}/config`)
+        return response.data.data as ShippingCarrierConfigPublic
+      } catch (error) {
+        handleError(error as AxiosError<ApiErrorPayload>)
+      }
+    },
+    upsertConfig: async (
+      carrier: 'andreani' | 'correo_argentino',
+      body: ShippingCarrierConfigUpsertInput,
+    ) => {
+      try {
+        const response = await http.put(`/shipping-carriers/${carrier}/config`, body)
+        return response.data.data as ShippingCarrierConfigPublic
+      } catch (error) {
+        handleError(error as AxiosError<ApiErrorPayload>)
+      }
+    },
   }
 }
 
 export const ordenesEntregaAPI = createOrdenesEntregaAPI(api)
+export const shippingCarriersAPI = createShippingCarriersAPI(api)

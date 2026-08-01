@@ -186,7 +186,8 @@
       "invoice_due_soon": "Invoice due soon",
       "chat_message": "New message",
       "contract_invoice_generated": "Invoice generated from contract",
-      "contract_adjustment_due": "Contract price adjustment applied"
+      "contract_adjustment_due": "Contract price adjustment applied",
+      "shipment_delivered": "Shipment delivered"
     }
   },
   "notifChannels": {

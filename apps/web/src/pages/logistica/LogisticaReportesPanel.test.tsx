@@ -3,6 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import '@/i18n/config'
 import LogisticaReportesPanel from './LogisticaReportesPanel'
+import { resolvePresetRange } from '@/pages/reportes/reportesDatePresets'
 import {
   logisticaReportesAPI,
   type LogisticaChoferRow,
@@ -190,11 +191,13 @@ describe('LogisticaReportesPanel', () => {
     const user = userEvent.setup()
     render(<LogisticaReportesPanel />)
     await screen.findByTestId('logistica-reportes-kpis')
-    const fromBefore = (screen.getByTestId('logistica-reportes-from') as HTMLInputElement).value
+    const expected = resolvePresetRange('today')
     await user.click(screen.getByRole('button', { name: /today|hoy|hoje/i }))
     await waitFor(() => {
       const fromAfter = (screen.getByTestId('logistica-reportes-from') as HTMLInputElement).value
-      expect(fromAfter).not.toBe(fromBefore)
+      const toAfter = (screen.getByTestId('logistica-reportes-to') as HTMLInputElement).value
+      expect(fromAfter).toBe(expected.from)
+      expect(toAfter).toBe(expected.to)
     })
   })
 
