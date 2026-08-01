@@ -1126,6 +1126,12 @@ function buildPrisma(): PrismaClient {
       findUnique: vi.fn().mockResolvedValue(null),
       findMany: vi.fn().mockResolvedValue([]),
     },
+    meliConfig: {
+      findUnique: vi.fn().mockResolvedValue(null),
+      upsert: vi.fn().mockResolvedValue({}),
+      deleteMany: vi.fn().mockResolvedValue({ count: 0 }),
+      findMany: vi.fn().mockResolvedValue([]),
+    },
     mercadoPagoProcessedPayment: {
       findUnique: vi.fn().mockResolvedValue(null),
       create: vi.fn().mockResolvedValue({ id: 1 }),
@@ -2711,6 +2717,48 @@ describe('API — contrato OpenAPI', () => {
       .send({ type: 'payment', data: { id: paymentId } })
       .expect(200)
     await assertMatchesOpenApi('/api/webhooks/mercadopago', 'post', '200', res.body)
+  })
+
+  it('GET /api/configuracion/meli', async () => {
+    process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
+    process.env.BIZCODE_TEST_ROLE = 'owner'
+    process.env.MELI_CLIENT_ID = 'meli-app'
+    process.env.MELI_CLIENT_SECRET = 'meli-secret'
+    clearTenantFeaturesCache()
+    const p = buildPrisma()
+    vi.mocked(p.tenantConfig.findUnique).mockResolvedValue({
+      tenantId: 1,
+      businessType: 'mayorista',
+      rubros: [],
+      plan: 'pro',
+      modules: [],
+      integrations: ['meli'],
+      updatedAt: new Date(),
+    } as never)
+    const app = createApp(p)
+    const res = await request(app).get('/api/configuracion/meli').expect(200)
+    await assertMatchesOpenApi('/api/configuracion/meli', 'get', '200', res.body)
+  })
+
+  it('GET /api/oauth/meli/authorize', async () => {
+    process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
+    process.env.BIZCODE_TEST_ROLE = 'owner'
+    process.env.MELI_CLIENT_ID = 'meli-app'
+    process.env.MELI_CLIENT_SECRET = 'meli-secret'
+    clearTenantFeaturesCache()
+    const p = buildPrisma()
+    vi.mocked(p.tenantConfig.findUnique).mockResolvedValue({
+      tenantId: 1,
+      businessType: 'mayorista',
+      rubros: [],
+      plan: 'pro',
+      modules: [],
+      integrations: ['meli'],
+      updatedAt: new Date(),
+    } as never)
+    const app = createApp(p)
+    const res = await request(app).get('/api/oauth/meli/authorize').expect(200)
+    await assertMatchesOpenApi('/api/oauth/meli/authorize', 'get', '200', res.body)
   })
 
   it('GET /api/printing/status', async () => {

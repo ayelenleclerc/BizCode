@@ -80,6 +80,8 @@ tags:
     description: B2B customer self-service portal (#240)
   - name: mercadopago
     description: Mercado Pago online payments integration (#174+)
+  - name: meli
+    description: Mercado Libre OAuth connection per tenant (#183)
   - name: cobranzas
     description: Overdue invoice reminders (#134)
   - name: cheques
@@ -10016,6 +10018,111 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
 
+  /api/configuracion/meli:
+    get:
+      tags: [meli]
+      summary: Mercado Libre connection status (no tokens) (#183)
+      description: Requires `settings.business.manage` and tenant integration `meli`. Never returns access or refresh tokens.
+      security:
+        - cookieSession: []
+      responses:
+        '200':
+          description: Mercado Libre connection status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MeliConfigStatusEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/oauth/meli/authorize:
+    get:
+      tags: [meli]
+      summary: Build Mercado Libre OAuth authorization URL (#183)
+      description: Requires `settings.business.manage` and tenant integration `meli`. Returns a URL for the browser to redirect; includes a signed CSRF `state`.
+      security:
+        - cookieSession: []
+      responses:
+        '200':
+          description: Authorization URL
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MeliAuthorizeEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '503':
+          description: Platform MELI_CLIENT_ID / MELI_CLIENT_SECRET missing
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/oauth/meli/callback:
+    get:
+      tags: [meli]
+      summary: Mercado Libre OAuth callback (#183)
+      description: Public callback. Validates signed `state`, exchanges `code` for tokens, stores encrypted credentials, then redirects to the web app.
+      parameters:
+        - name: code
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: state
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '302':
+          description: Redirect to `/configuracion?meli=connected`
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '422':
+          description: Token exchange failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/oauth/meli/disconnect:
+    post:
+      tags: [meli]
+      summary: Disconnect Mercado Libre and revoke app access (#183)
+      description: Requires `settings.business.manage` and tenant integration `meli`. Attempts remote revoke then deletes local encrypted tokens.
+      security:
+        - cookieSession: []
+      responses:
+        '200':
+          description: Disconnected
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MeliDisconnectEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Not connected
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
   /api/configuracion/mercadopago/qr-estatico:
     get:
       tags: [mercadopago]
@@ -19169,6 +19276,50 @@ components:
         success: { type: boolean, const: true }
         data:
           $ref: '#/components/schemas/MercadoPagoConfigStatus'
+
+    MeliConfigStatus:
+      type: object
+      required: [connected]
+      properties:
+        connected: { type: boolean }
+        meliUserId: { type: string }
+        sellerId: { type: string }
+        sitio: { type: string }
+        nickname: { type: string }
+        tokenExpiresAt: { type: string, format: date-time }
+        accessTokenLast4: { type: string }
+        activo: { type: boolean }
+        conectadoAt: { type: string, format: date-time }
+
+    MeliConfigStatusEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success: { type: boolean, const: true }
+        data:
+          $ref: '#/components/schemas/MeliConfigStatus'
+
+    MeliAuthorizeEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success: { type: boolean, const: true }
+        data:
+          type: object
+          required: [authorizationUrl]
+          properties:
+            authorizationUrl: { type: string, format: uri }
+
+    MeliDisconnectEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success: { type: boolean, const: true }
+        data:
+          type: object
+          required: [disconnected]
+          properties:
+            disconnected: { type: boolean, const: true }
 
     MercadoPagoConfigEnvelope:
       type: object

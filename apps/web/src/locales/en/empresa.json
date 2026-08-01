@@ -110,6 +110,29 @@
       "testFailed": "Could not verify MercadoPago credentials"
     }
   },
+  "meli": {
+    "title": "Mercado Libre",
+    "subtitle": "Connect the tenant seller account via OAuth. Tokens are encrypted and never displayed.",
+    "loading": "Loading Mercado Libre status…",
+    "connectedBadge": "Connected: {{nickname}} ({{sitio}}) · token ••••{{last4}}",
+    "notConnectedBadge": "Not connected",
+    "readOnlyHint": "You can view status; only roles with company settings permission can connect or disconnect.",
+    "account": "ML account",
+    "site": "Site",
+    "connectedAt": "Connected since",
+    "tokenExpiresAt": "Token expires",
+    "connect": "Connect with Mercado Libre",
+    "connecting": "Redirecting…",
+    "disconnect": "Disconnect",
+    "disconnecting": "Disconnecting…",
+    "connectSuccess": "Mercado Libre account connected",
+    "disconnectSuccess": "Mercado Libre account disconnected",
+    "errors": {
+      "loadFailed": "Could not load Mercado Libre status",
+      "connectFailed": "Could not start Mercado Libre connection",
+      "disconnectFailed": "Could not disconnect Mercado Libre"
+    }
+  },
   "printDevices": {
     "title": "Print devices",
     "subtitle": "Optional per customer: enable only if you use POS hardware. PDF and electronic invoicing work without any printer.",

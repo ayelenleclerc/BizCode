@@ -110,6 +110,29 @@
       "testFailed": "No se pudieron verificar las credenciales MercadoPago"
     }
   },
+  "meli": {
+    "title": "MercadoLibre",
+    "subtitle": "Conectá la cuenta vendedor del tenant vía OAuth. Los tokens se cifran y nunca se muestran.",
+    "loading": "Cargando estado MercadoLibre…",
+    "connectedBadge": "Conectado: {{nickname}} ({{sitio}}) · token ••••{{last4}}",
+    "notConnectedBadge": "No conectado",
+    "readOnlyHint": "Puede ver el estado; solo roles con permiso de configuración de empresa pueden conectar o desconectar.",
+    "account": "Cuenta ML",
+    "site": "Sitio",
+    "connectedAt": "Conectado desde",
+    "tokenExpiresAt": "Token vence",
+    "connect": "Conectar con MercadoLibre",
+    "connecting": "Redirigiendo…",
+    "disconnect": "Desconectar",
+    "disconnecting": "Desconectando…",
+    "connectSuccess": "Cuenta MercadoLibre conectada",
+    "disconnectSuccess": "Cuenta MercadoLibre desconectada",
+    "errors": {
+      "loadFailed": "No se pudo cargar el estado MercadoLibre",
+      "connectFailed": "No se pudo iniciar la conexión MercadoLibre",
+      "disconnectFailed": "No se pudo desconectar MercadoLibre"
+    }
+  },
   "printDevices": {
     "title": "Dispositivos de impresión",
     "subtitle": "Opcional por cliente: habilitá solo si usás hardware de punto de venta. PDF y facturación electrónica funcionan sin impresora.",

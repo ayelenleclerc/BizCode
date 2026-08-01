@@ -54,6 +54,18 @@ Quando o tenant tem a integração **`mercadopago`** habilitada (config do super
 
 Requer **`settings.business.manage`**.
 
+## OAuth Mercado Livre (#183)
+
+Conexão base do conector marketplace Mercado Livre (sync de catálogo/estoque/pedidos são issues posteriores). Habilite a integração **`meli`** do tenant (super-admin) e abra **Configurações → Empresa → Mercado Livre**:
+
+1. **Conectar com Mercado Livre** — o BizCode devolve a URL de autorização (`GET /api/oauth/meli/authorize`) e o navegador redireciona para o ML.
+2. Após autorizar, o ML chama `GET /api/oauth/meli/callback` (público). O BizCode valida o `state` CSRF assinado, troca o `code` por tokens, cifra em `MeliConfig` (mesma chave AES-GCM dos segredos fiscais/MP) e redireciona para `/configuracion?meli=connected`.
+3. O status (`GET /api/configuracion/meli`) mostra nickname, site (`MLA`/`MLM`/…), data de conexão e last4 do token — **nunca** access nem refresh tokens.
+4. **Desconectar** (`POST /api/oauth/meli/disconnect`) tenta revogar o app no ML e apaga tokens locais.
+5. Env da plataforma: `MELI_CLIENT_ID`, `MELI_CLIENT_SECRET`, opcional `MELI_REDIRECT_URI` (padrão `{API_PUBLIC_URL}/api/oauth/meli/callback`). Agendar `npm run meli:token-refresh` a cada 5 horas (access tokens expiram ~6 h).
+
+Em local, o smoke OAuth pode exigir um túnel público para o ML alcançar o callback.
+
 ## Links de pagamento Mercado Pago (#175)
 
 Com Mercado Pago configurado (#174) e ativo, a equipe pode gerar um **link de pagamento** no detalhe da fatura (**Cobrar com Mercado Pago**):

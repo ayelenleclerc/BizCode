@@ -110,6 +110,29 @@
       "testFailed": "Não foi possível verificar as credenciais MercadoPago"
     }
   },
+  "meli": {
+    "title": "Mercado Livre",
+    "subtitle": "Conecte a conta de vendedor do tenant via OAuth. Os tokens são criptografados e nunca são exibidos.",
+    "loading": "Carregando status Mercado Livre…",
+    "connectedBadge": "Conectado: {{nickname}} ({{sitio}}) · token ••••{{last4}}",
+    "notConnectedBadge": "Não conectado",
+    "readOnlyHint": "Você pode ver o status; apenas funções com permissão de configuração da empresa podem conectar ou desconectar.",
+    "account": "Conta ML",
+    "site": "Site",
+    "connectedAt": "Conectado desde",
+    "tokenExpiresAt": "Token expira",
+    "connect": "Conectar com Mercado Livre",
+    "connecting": "Redirecionando…",
+    "disconnect": "Desconectar",
+    "disconnecting": "Desconectando…",
+    "connectSuccess": "Conta Mercado Livre conectada",
+    "disconnectSuccess": "Conta Mercado Livre desconectada",
+    "errors": {
+      "loadFailed": "Não foi possível carregar o status Mercado Livre",
+      "connectFailed": "Não foi possível iniciar a conexão Mercado Livre",
+      "disconnectFailed": "Não foi possível desconectar o Mercado Livre"
+    }
+  },
   "printDevices": {
     "title": "Dispositivos de impressão",
     "subtitle": "Opcional por cliente: habilite apenas se usar hardware de PDV. PDF e faturação eletrônica funcionam sem impressora.",

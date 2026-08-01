@@ -1551,6 +1551,7 @@ model Tenant {
   mercadoPagoReconciliationEntries MercadoPagoReconciliationEntry[]
   mercadoPagoRefunds            MercadoPagoRefund[]
   mercadoPagoChargebacks        MercadoPagoChargeback[]
+  meliConfig                    MeliConfig?
   shippingCarrierConfigs        ShippingCarrierConfig[]
   configsComision               ConfigComision[]
   liquidacionesComision         LiquidacionComision[]
@@ -1685,6 +1686,31 @@ model MercadoPagoConfig {
   staticQrData           String?  @db.Text
   createdAt              DateTime @default(now())
   updatedAt              DateTime @updatedAt
+}
+
+/// MercadoLibre OAuth tokens per tenant (#183); access/refresh encrypted at rest.
+model MeliConfig {
+  id                     Int      @id @default(autoincrement())
+  tenantId               Int      @unique
+  tenant                 Tenant   @relation(fields: [tenantId], references: [id])
+  /// Mercado Libre user id (seller).
+  meliUserId             String   @db.VarChar(40)
+  /// Seller id when distinct; defaults to meliUserId for marketplace sellers.
+  sellerId               String   @db.VarChar(40)
+  /// Site id: MLA (AR), MLM (MX), MLC (CL), etc.
+  sitio                  String   @db.VarChar(10)
+  nickname               String?  @db.VarChar(120)
+  accessTokenEncrypted   String   @db.Text
+  refreshTokenEncrypted  String   @db.Text
+  accessTokenLast4       String   @db.VarChar(4)
+  tokenExpiresAt         DateTime
+  conectadoAt            DateTime @default(now())
+  activo                 Boolean  @default(true)
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+
+  @@index([tokenExpiresAt])
+  @@index([activo])
 }
 
 /// B2B customer portal branding and feature toggles per tenant (#240).

@@ -59685,6 +59685,463 @@ Requires `settings.business.manage` and tenant integration `mercadopago`. Calls 
 }
 ```
 
+### Mercado Libre connection status (no tokens) (#183)
+
+- **Method:** `GET`
+- **Path:** `/api/configuracion/meli`
+- **Tags:** meli
+
+Requires `settings.business.manage` and tenant integration `meli`. Never returns access or refresh tokens.
+
+#### Responses
+
+##### Status: 200 Mercado Libre connection status
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`connected` (required)**
+
+    `boolean`
+
+  - **`accessTokenLast4`**
+
+    `string`
+
+  - **`activo`**
+
+    `boolean`
+
+  - **`conectadoAt`**
+
+    `string`, format: `date-time`
+
+  - **`meliUserId`**
+
+    `string`
+
+  - **`nickname`**
+
+    `string`
+
+  - **`sellerId`**
+
+    `string`
+
+  - **`sitio`**
+
+    `string`
+
+  - **`tokenExpiresAt`**
+
+    `string`, format: `date-time`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "connected": true,
+    "meliUserId": "",
+    "sellerId": "",
+    "sitio": "",
+    "nickname": "",
+    "tokenExpiresAt": "",
+    "accessTokenLast4": "",
+    "activo": true,
+    "conectadoAt": ""
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Build Mercado Libre OAuth authorization URL (#183)
+
+- **Method:** `GET`
+- **Path:** `/api/oauth/meli/authorize`
+- **Tags:** meli
+
+Requires `settings.business.manage` and tenant integration `meli`. Returns a URL for the browser to redirect; includes a signed CSRF `state`.
+
+#### Responses
+
+##### Status: 200 Authorization URL
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`authorizationUrl` (required)**
+
+    `string`, format: `uri`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "authorizationUrl": ""
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 503 Platform MELI\_CLIENT\_ID / MELI\_CLIENT\_SECRET missing
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Mercado Libre OAuth callback (#183)
+
+- **Method:** `GET`
+- **Path:** `/api/oauth/meli/callback`
+- **Tags:** meli
+
+Public callback. Validates signed `state`, exchanges `code` for tokens, stores encrypted credentials, then redirects to the web app.
+
+#### Responses
+
+##### Status: 302 Redirect to \`/configuracion?meli=connected\`
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 422 Token exchange failed
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Disconnect Mercado Libre and revoke app access (#183)
+
+- **Method:** `POST`
+- **Path:** `/api/oauth/meli/disconnect`
+- **Tags:** meli
+
+Requires `settings.business.manage` and tenant integration `meli`. Attempts remote revoke then deletes local encrypted tokens.
+
+#### Responses
+
+##### Status: 200 Disconnected
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`disconnected` (required)**
+
+    `boolean`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "disconnected": true
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Not connected
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ### Tenant static Mercado Pago QR (#177)
 
 - **Method:** `GET`
@@ -103871,6 +104328,183 @@ Originating invoice header (selected columns)
     "collectorId": "",
     "externalPosId": "",
     "staticQrConfigured": true
+  }
+}
+```
+
+### MeliConfigStatus
+
+- **Type:**`object`
+
+* **`connected` (required)**
+
+  `boolean`
+
+* **`accessTokenLast4`**
+
+  `string`
+
+* **`activo`**
+
+  `boolean`
+
+* **`conectadoAt`**
+
+  `string`, format: `date-time`
+
+* **`meliUserId`**
+
+  `string`
+
+* **`nickname`**
+
+  `string`
+
+* **`sellerId`**
+
+  `string`
+
+* **`sitio`**
+
+  `string`
+
+* **`tokenExpiresAt`**
+
+  `string`, format: `date-time`
+
+**Example:**
+
+```json
+{
+  "connected": true,
+  "meliUserId": "",
+  "sellerId": "",
+  "sitio": "",
+  "nickname": "",
+  "tokenExpiresAt": "",
+  "accessTokenLast4": "",
+  "activo": true,
+  "conectadoAt": ""
+}
+```
+
+### MeliConfigStatusEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`connected` (required)**
+
+    `boolean`
+
+  - **`accessTokenLast4`**
+
+    `string`
+
+  - **`activo`**
+
+    `boolean`
+
+  - **`conectadoAt`**
+
+    `string`, format: `date-time`
+
+  - **`meliUserId`**
+
+    `string`
+
+  - **`nickname`**
+
+    `string`
+
+  - **`sellerId`**
+
+    `string`
+
+  - **`sitio`**
+
+    `string`
+
+  - **`tokenExpiresAt`**
+
+    `string`, format: `date-time`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "connected": true,
+    "meliUserId": "",
+    "sellerId": "",
+    "sitio": "",
+    "nickname": "",
+    "tokenExpiresAt": "",
+    "accessTokenLast4": "",
+    "activo": true,
+    "conectadoAt": ""
+  }
+}
+```
+
+### MeliAuthorizeEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`authorizationUrl` (required)**
+
+    `string`, format: `uri`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "authorizationUrl": ""
+  }
+}
+```
+
+### MeliDisconnectEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`disconnected` (required)**
+
+    `boolean`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "disconnected": true
   }
 }
 ```

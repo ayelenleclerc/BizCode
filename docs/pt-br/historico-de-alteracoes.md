@@ -10,6 +10,8 @@ Versionamento: [Semantic Versioning](https://semver.org/).
 
 ### Adicionado
 
+- **OAuth Mercado Livre por tenant (#183):** Prisma `MeliConfig` (tokens cifrados); `GET /api/oauth/meli/authorize`, callback público, `POST /api/oauth/meli/disconnect`, `GET /api/configuracion/meli` (sem segredos); job `npm run meli:token-refresh` (a cada 5 h); UI em Configurações com integração `meli`; OpenAPI, api-client, testes com mock OAuth, manual financeiro e cron trilíngues. Sync de catálogo/estoque/pedidos fica em #184–#186.
+
 - **Consulta de CUIT no Padrón A4 AFIP (#192):** `PadronA4Service` (`GET /api/arca/padron/{cuit}`, `customers.manage`) valida o dígito verificador do CUIT e resolve via cache Prisma de 24h (`PadronA4Cache`, única por tenant+CUIT) ou o mock de homologação `ws_sr_padron_a4` (`arcaPadronMock`); degradação controlada: HTTP 200 com `verificado: false` e `reason` (`invalid_cuit`/`not_found`/`unavailable`/`timeout`) quando o módulo `billing.arca_cae` está desabilitado, não há certificado fiscal configurado ou a consulta excede o timeout — o formulário de cliente nunca é bloqueado. `ClienteForm` consulta ao perder o foco do campo CUIT e autopreenche `rsocial` (truncada em 30 caracteres com aviso se for maior), `condIva`, `domicilio`, `localidad` e `cpost` quando o CUIT é verificado, com indicador acessível `role="status"` (`cliente-padron-status`). OpenAPI (`PadronA4Consulta`/`PadronA4Envelope`), cliente API, testes unitários/API/UI, manuais trilíngues. A integração SOAP AFIP ao vivo para produção permanece fora de escopo.
 
 - **Importação de extrato bancário (#190):** modelos Prisma, parsers CSV/OFX/MT940, API `/api/bancos`, UI Finanças (`finance.bank_reconcile`), mapeamentos CSV configuráveis.

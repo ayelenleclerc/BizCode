@@ -21,6 +21,7 @@ const PORTAL_VERIFY_DEFAULT = 30
 const MERCADOPAGO_TEST_DEFAULT = 10
 const MERCADOPAGO_PREFERENCE_DEFAULT = 20
 const MERCADOPAGO_WEBHOOK_DEFAULT = 120
+const MELI_OAUTH_DEFAULT = 10
 
 function parsePositiveInt(raw: string | undefined, defaultValue: number): number {
   if (!raw?.trim()) {
@@ -214,6 +215,18 @@ export const mercadopagoWebhookHttpRateLimiter = createRouteLimiter({
   ),
   skipUnless: () => true,
   storePrefix: 'mp-webhook',
+})
+
+/**
+ * @en Per-IP rate limit for Mercado Libre OAuth authorize/callback/disconnect (default 10 req/15 min; `HTTP_RATE_LIMIT_MELI_OAUTH`).
+ * @es Límite por IP para OAuth Mercado Libre authorize/callback/disconnect (10 req/15 min; `HTTP_RATE_LIMIT_MELI_OAUTH`).
+ * @pt-BR Limite por IP para OAuth Mercado Livre authorize/callback/disconnect (10 req/15 min; `HTTP_RATE_LIMIT_MELI_OAUTH`).
+ */
+export const meliOAuthHttpRateLimiter = createRouteLimiter({
+  windowMs: FIFTEEN_MINUTES_MS,
+  limit: parsePositiveInt(process.env.HTTP_RATE_LIMIT_MELI_OAUTH, MELI_OAUTH_DEFAULT),
+  skipUnless: () => true,
+  storePrefix: 'meli-oauth',
 })
 
 /**
