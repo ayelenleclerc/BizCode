@@ -2008,6 +2008,18 @@ export type MercadoPagoConfigStatus = {
   staticQrConfigured?: boolean
 }
 
+export type MeliConfigStatus = {
+  connected: boolean
+  meliUserId?: string
+  sellerId?: string
+  sitio?: string
+  nickname?: string
+  tokenExpiresAt?: string
+  accessTokenLast4?: string
+  activo?: boolean
+  conectadoAt?: string
+}
+
 export type MercadoPagoConfigInput = {
   accessToken?: string
   publicKey: string
@@ -2158,6 +2170,39 @@ export const mercadopagoAPI = {
         success: boolean
         data: MercadoPagoChargebackEntry
       }>(`/mercadopago/contracargos/${id}`, { estado })
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+}
+
+export const meliAPI = {
+  getConfig: async (): Promise<MeliConfigStatus> => {
+    try {
+      const response = await api.get<{ success: boolean; data: MeliConfigStatus }>('/configuracion/meli')
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  getAuthorizeUrl: async (): Promise<{ authorizationUrl: string }> => {
+    try {
+      const response = await api.get<{ success: boolean; data: { authorizationUrl: string } }>(
+        '/oauth/meli/authorize',
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  disconnect: async (): Promise<{ disconnected: true }> => {
+    try {
+      const response = await api.post<{ success: boolean; data: { disconnected: true } }>(
+        '/oauth/meli/disconnect',
+      )
       return response.data.data
     } catch (error) {
       return handleError(error as AxiosError<ApiErrorPayload>)

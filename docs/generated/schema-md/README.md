@@ -536,6 +536,14 @@
 
 * [MatchSugerencia](./matchsugerencia.md) – `-`
 
+* [MeliAuthorizeEnvelope](./meliauthorizeenvelope.md) – `-`
+
+* [MeliConfigStatus](./meliconfigstatus.md) – `-`
+
+* [MeliConfigStatusEnvelope](./meliconfigstatusenvelope.md) – `-`
+
+* [MeliDisconnectEnvelope](./melidisconnectenvelope.md) – `-`
+
 * [MercadoPagoChargeback](./mercadopagochargeback.md) – `-`
 
 * [MercadoPagoChargebackEnvelope](./mercadopagochargebackenvelope.md) – `-`
@@ -1285,6 +1293,10 @@
 * [Untitled object in ListaPrecioListEnvelope](./listapreciolistenvelope-allof-0.md) – `undefined#/allOf/0`
 
 * [Untitled object in LoteTrazabilidad](./lotetrazabilidad-properties-facturas-items.md) – `undefined#/properties/facturas/items`
+
+* [Untitled object in MeliAuthorizeEnvelope](./meliauthorizeenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled object in MeliDisconnectEnvelope](./melidisconnectenvelope-properties-data.md) – `undefined#/properties/data`
 
 * [Untitled object in MercadoPagoConfigEnvelope](./mercadopagoconfigenvelope-properties-data.md) – `undefined#/properties/data`
 

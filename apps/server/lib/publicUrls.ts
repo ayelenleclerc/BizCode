@@ -40,3 +40,16 @@ export function resolveMercadoPagoBackUrls(tenantSlug: string): {
 export function resolveMercadoPagoNotificationUrl(): string {
   return `${resolveApiPublicBaseUrl()}/api/webhooks/mercadopago`
 }
+
+/**
+ * @en Mercado Libre OAuth redirect URI (#183).
+ * @es URI de redirección OAuth Mercado Libre (#183).
+ * @pt-BR URI de redirecionamento OAuth Mercado Livre (#183).
+ */
+export function resolveMeliOAuthRedirectUri(): string {
+  const fromEnv = process.env.MELI_REDIRECT_URI?.trim()
+  if (fromEnv) {
+    return fromEnv.replace(/\/$/, '')
+  }
+  return `${resolveApiPublicBaseUrl()}/api/oauth/meli/callback`
+}

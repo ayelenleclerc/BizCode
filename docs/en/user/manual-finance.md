@@ -54,6 +54,18 @@ When the tenant has the **`mercadopago`** integration enabled (superadmin tenant
 
 Requires **`settings.business.manage`**.
 
+## Mercado Libre OAuth (#183)
+
+Base connection for the Mercado Libre marketplace connector (catalog/stock/orders sync are later issues). Enable tenant integration id **`meli`** (super-admin), then open **Settings → Company → Mercado Libre**:
+
+1. Click **Connect with Mercado Libre** — BizCode returns an authorization URL (`GET /api/oauth/meli/authorize`) and the browser redirects to Mercado Libre.
+2. After the seller authorizes, Mercado Libre calls `GET /api/oauth/meli/callback` (public). BizCode validates a signed CSRF `state`, exchanges the `code` for tokens, encrypts them in `MeliConfig` (same AES-GCM key as fiscal/MP secrets), and redirects to `/configuracion?meli=connected`.
+3. Status (`GET /api/configuracion/meli`) shows nickname, site (`MLA`/`MLM`/…), connection date and token last4 — **never** access or refresh tokens.
+4. **Disconnect** (`POST /api/oauth/meli/disconnect`) attempts remote revoke of the app on Mercado Libre, then deletes local tokens.
+5. Platform env: `MELI_CLIENT_ID`, `MELI_CLIENT_SECRET`, optional `MELI_REDIRECT_URI` (defaults to `{API_PUBLIC_URL}/api/oauth/meli/callback`). Schedule `npm run meli:token-refresh` every 5 hours (access tokens expire ~6h).
+
+Local OAuth smoke may require a public tunnel so Mercado Libre can reach the callback URL.
+
 ## Mercado Pago payment links (#175)
 
 When Mercado Pago is configured (#174) and active, staff can generate a **payment link** from the invoice detail (**Collect with Mercado Pago**):
