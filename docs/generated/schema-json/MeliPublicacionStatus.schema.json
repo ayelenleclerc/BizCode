@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "atributos": {
+      "items": {
+        "$ref": "./MeliAttributeInput.schema.json"
+      },
+      "type": "array"
+    },
+    "estado": {
+      "type": "string"
+    },
+    "hasPhotos": {
+      "type": "boolean"
+    },
+    "linked": {
+      "type": "boolean"
+    },
+    "meliCategoryId": {
+      "type": "string"
+    },
+    "meliItemId": {
+      "type": "string"
+    },
+    "permalink": {
+      "nullable": true,
+      "type": "string"
+    },
+    "photoWarning": {
+      "type": "boolean"
+    },
+    "syncError": {
+      "nullable": true,
+      "type": "string"
+    },
+    "syncStatus": {
+      "type": "string"
+    },
+    "ultimaSyncAt": {
+      "format": "date-time",
+      "nullable": true,
+      "type": "string"
+    }
+  },
+  "required": [
+    "linked",
+    "hasPhotos",
+    "photoWarning"
+  ],
+  "title": "MeliPublicacionStatus",
+  "type": "object"
+}

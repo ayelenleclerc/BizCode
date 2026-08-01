@@ -56,7 +56,7 @@ Requiere **`settings.business.manage`**.
 
 ## OAuth Mercado Libre (#183)
 
-Conexión base del conector marketplace Mercado Libre (sync de catálogo/stock/órdenes son issues posteriores). Habilitá la integración **`meli`** del tenant (super-admin) y abrí **Configuración → Empresa → MercadoLibre**:
+Conexión base del conector marketplace Mercado Libre. Habilitá la integración **`meli`** del tenant (super-admin) y abrí **Configuración → Empresa → MercadoLibre**:
 
 1. **Conectar con MercadoLibre** — BizCode devuelve la URL de autorización (`GET /api/oauth/meli/authorize`) y el navegador redirige a ML.
 2. Tras autorizar, ML llama `GET /api/oauth/meli/callback` (público). BizCode valida el `state` CSRF firmado, intercambia el `code` por tokens, los cifra en `MeliConfig` (misma clave AES-GCM que secretos fiscales/MP) y redirige a `/configuracion?meli=connected`.
@@ -65,6 +65,17 @@ Conexión base del conector marketplace Mercado Libre (sync de catálogo/stock/�
 5. Env de plataforma: `MELI_CLIENT_ID`, `MELI_CLIENT_SECRET`, opcional `MELI_REDIRECT_URI` (por defecto `{API_PUBLIC_URL}/api/oauth/meli/callback`). Programar `npm run meli:token-refresh` cada 5 horas (los access tokens vencen ~6 h).
 
 En local, el smoke OAuth puede requerir un túnel público para que ML alcance el callback.
+
+## Sync de catálogo Mercado Libre (#184)
+
+Con OAuth conectado, el vendedor puede optar por artículo desde **Artículos → editar → Mercado Libre**:
+
+1. Agregar al menos una foto (ML las exige; BizCode envía URLs absolutas con `API_PUBLIC_URL` + `/uploads/articulos/...`).
+2. Buscar categoría ML (`GET /api/meli/categories/search?q=`) y publicar (`PUT /api/articulos/{id}/meli`). Se guarda `MeliPublicacion` y se llama a ML `POST /items` (o `PUT /items/{id}` si ya está vinculada).
+3. Cambios posteriores de precio/descripción/activo se empujan a ML de inmediato; filas `pending`/`error` se reintentan con `npm run meli:catalog-sync` cada 5 minutos.
+4. **Desvincular** (`DELETE /api/articulos/{id}/meli`) pausa la publicación remota si es posible y borra el mapping local.
+
+Sync bidireccional de stock e importación de órdenes quedan en #185–#186. Artículos padre y servicios no se publican.
 
 ## Links de pago Mercado Pago (#175)
 

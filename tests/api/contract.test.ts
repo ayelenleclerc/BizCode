@@ -1132,6 +1132,13 @@ function buildPrisma(): PrismaClient {
       deleteMany: vi.fn().mockResolvedValue({ count: 0 }),
       findMany: vi.fn().mockResolvedValue([]),
     },
+    meliPublicacion: {
+      findFirst: vi.fn().mockResolvedValue(null),
+      findMany: vi.fn().mockResolvedValue([]),
+      upsert: vi.fn().mockResolvedValue({}),
+      update: vi.fn().mockResolvedValue({}),
+      delete: vi.fn().mockResolvedValue({}),
+    },
     mercadoPagoProcessedPayment: {
       findUnique: vi.fn().mockResolvedValue(null),
       create: vi.fn().mockResolvedValue({ id: 1 }),
@@ -2759,6 +2766,31 @@ describe('API — contrato OpenAPI', () => {
     const app = createApp(p)
     const res = await request(app).get('/api/oauth/meli/authorize').expect(200)
     await assertMatchesOpenApi('/api/oauth/meli/authorize', 'get', '200', res.body)
+  })
+
+  it('GET /api/articulos/:id/meli', async () => {
+    process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
+    process.env.BIZCODE_TEST_ROLE = 'owner'
+    clearTenantFeaturesCache()
+    const p = buildPrisma()
+    vi.mocked(p.tenantConfig.findUnique).mockResolvedValue({
+      tenantId: 1,
+      businessType: 'mayorista',
+      rubros: [],
+      plan: 'pro',
+      modules: [],
+      integrations: ['meli'],
+      updatedAt: new Date(),
+    } as never)
+    vi.mocked(p.articulo.findFirst).mockResolvedValue({
+      id: 1,
+      tenantId: 1,
+      imagenes: [],
+      meliPublicacion: null,
+    } as never)
+    const app = createApp(p)
+    const res = await request(app).get('/api/articulos/1/meli').expect(200)
+    await assertMatchesOpenApi('/api/articulos/{id}/meli', 'get', '200', res.body)
   })
 
   it('GET /api/printing/status', async () => {

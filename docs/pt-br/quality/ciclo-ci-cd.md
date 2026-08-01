@@ -245,11 +245,12 @@ Não fazem parte do pipeline padrão do GitHub Actions; agende no servidor de im
 | `*/5 * * * *` | `npm run arca:retry-pending-job` | Reprocessa faturas com `estadoCae: pending` via mock WSFE de homologação (`ArcaService.retryPending`) para cada tenant com `TenantFiscalConfig`. |
 | `0 */2 * * *` | `npm run shipping:tracking-refresh` | Atualiza rastreio de envios em trânsito (`ShippingTrackingService`) para tenants com `ShippingCarrierConfig` ativo; notifica managers ao passar a entregue (#193). |
 | `0 */5 * * *` | `npm run meli:token-refresh` | Renova access tokens OAuth do Mercado Livre (~6 h de validade) para tenants com `MeliConfig` ativo próximo do vencimento (#183). |
+| `*/5 * * * *` | `npm run meli:catalog-sync` | Retenta anúncios de catálogo Mercado Livre (`MeliPublicacion`) em pending/error após mudanças de artigo (#184). |
 | `0 * * * *` (a cada hora) | `npm run cobranzas:recordatorios` | Lembretes de inadimplência para cada tenant com `ParamEmpresa`; envio às **08:00 horário local** (minuto &lt; 15) dentro do horário comercial configurado. Use `0 8 * * *` apenas em implantações mono-fuso. |
 | `0 * * * *` (a cada hora) | `npm run mercadopago:reconciliacion` | Reconciliação de pagamentos Mercado Pago para cada tenant com `MercadoPagoConfig` ativo; execução às **02:00 horário local** (minuto &lt; 15). Use `0 2 * * *` apenas em implantações mono-fuso. |
 | `0 2 * * *` (UTC) | `npm run backup:postgres` e depois `npm run backup:postgres:prune` | Backup PostgreSQL cifrado em `BIZCODE_BACKUP_DIR` (+ S3 CLI opcional). Exige `BACKUP_ENCRYPTION_KEY`. Ver [backup-e-restauracao.md](backup-e-restauracao.md). |
 
-Variável opcional para um único tenant em dev/staging: `BIZCODE_TENANT_ID=<id>` (vale para `arca:retry-pending-job`, `arca:retry-pending`, `cobranzas:recordatorios`, `mercadopago:reconciliacion`, `shipping:tracking-refresh` e `meli:token-refresh`). Opcional `BIZCODE_RECORDATORIO_CANAL` (padrão `email`).
+Variável opcional para um único tenant em dev/staging: `BIZCODE_TENANT_ID=<id>` (vale para `arca:retry-pending-job`, `arca:retry-pending`, `cobranzas:recordatorios`, `mercadopago:reconciliacion`, `shipping:tracking-refresh`, `meli:token-refresh` e `meli:catalog-sync`). Opcional `BIZCODE_RECORDATORIO_CANAL` (padrão `email`).
 
 Governança documental (Wiki vs documentação controlada):
 

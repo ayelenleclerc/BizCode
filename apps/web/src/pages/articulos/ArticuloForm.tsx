@@ -26,6 +26,7 @@ import {
 import ArticuloProveedoresComparadorSection from './ArticuloProveedoresComparadorSection'
 import ArticuloVariantesPanel from './ArticuloVariantesPanel'
 import ArticuloStockDepositosPanel from './ArticuloStockDepositosPanel'
+import ArticuloMeliSection from './ArticuloMeliSection'
 
 const articuloSchema = z
   .object({
@@ -998,6 +999,8 @@ export default function ArticuloForm({ articulo, rubros, onClose, onGuardado }: 
           {showComparador && articulo && showComparadorAccess && (
             <ArticuloProveedoresComparadorSection articuloId={articulo.id} />
           )}
+
+          {articulo && tipoWatch !== 'servicio' ? <ArticuloMeliSection articuloId={articulo.id} /> : null}
 
           {showHistorial && (
             <section

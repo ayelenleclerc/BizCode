@@ -353,6 +353,7 @@ model Articulo {
   atributoValores      ArticuloAtributoValor[]
   imagenes             ArticuloImagen[]
   ofertas              ArticuloOferta[]
+  meliPublicacion      MeliPublicacion?
   formulasComoProducto FormulaProduccion[] @relation("FormulaProducto")
   formulasComoInsumo   FormulaInsumo[]     @relation("FormulaInsumoArticulo")
   ordenesProduccion    OrdenProduccion[]   @relation("OrdenProduccionProducto")
@@ -1711,6 +1712,35 @@ model MeliConfig {
 
   @@index([tokenExpiresAt])
   @@index([activo])
+}
+
+/// @en Opt-in Mercado Libre listing mapping for a catalog article (#184).
+/// @es Mapping opt-in de publicación Mercado Libre para un artículo (#184).
+/// @pt-BR Mapeamento opt-in de anúncio Mercado Livre para um artigo (#184).
+model MeliPublicacion {
+  id             Int       @id @default(autoincrement())
+  tenantId       Int
+  articuloId     Int       @unique
+  articulo       Articulo  @relation(fields: [articuloId], references: [id], onDelete: Cascade)
+  /// Null until the first successful POST /items.
+  meliItemId     String?   @db.VarChar(40)
+  meliCategoryId String    @db.VarChar(40)
+  /// active | paused | closed | pending
+  estado         String    @default("pending") @db.VarChar(20)
+  /// Extra ML category attributes not mapped from BizCode fields (JSON array of {id, value_name|value_id}).
+  atributosJson  Json?
+  permalink      String?   @db.VarChar(500)
+  /// synced | pending | error
+  syncStatus     String    @default("pending") @db.VarChar(20)
+  syncError      String?   @db.Text
+  ultimaSyncAt   DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@unique([tenantId, articuloId])
+  @@unique([tenantId, meliItemId])
+  @@index([tenantId, syncStatus])
+  @@index([articuloId])
 }
 
 /// B2B customer portal branding and feature toggles per tenant (#240).

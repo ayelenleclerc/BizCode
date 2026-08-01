@@ -189,5 +189,23 @@
     "sortUltimaCompra": "Última compra",
     "sortAsc": "Ascendente",
     "sortDesc": "Descendente"
+  },
+  "meli": {
+    "title": "Mercado Livre",
+    "subtitle": "Publique este artigo no Mercado Livre (opt-in). Requer fotos e categoria ML.",
+    "loading": "Carregando status do anúncio…",
+    "errorLoad": "Não foi possível carregar o status do Mercado Livre.",
+    "errorSave": "Não foi possível publicar no Mercado Livre.",
+    "errorUnlink": "Não foi possível desvincular do Mercado Livre.",
+    "errorCategoryRequired": "Selecione uma categoria do Mercado Livre.",
+    "photoWarning": "Adicione pelo menos uma foto do artigo antes de publicar no Mercado Livre.",
+    "status": "Status",
+    "openListing": "Abrir anúncio no Mercado Livre",
+    "unlink": "Desvincular",
+    "categorySearch": "Buscar categoria ML",
+    "searching": "Buscando…",
+    "selectedCategory": "Categoria selecionada",
+    "publish": "Publicar no Mercado Livre",
+    "resync": "Sincronizar agora"
   }
 }

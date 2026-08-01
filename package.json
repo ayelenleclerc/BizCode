@@ -72,6 +72,7 @@
     "tipos-cambio:bcra": "tsx scripts/tipos-cambio-bcra-job.ts",
     "mercadopago:reconciliacion": "tsx scripts/mercadopago-reconciliacion-job.ts",
     "meli:token-refresh": "tsx scripts/meli-token-refresh-job.ts",
+    "meli:catalog-sync": "tsx scripts/meli-catalog-sync-job.ts",
     "modules:trial-expire": "tsx scripts/module-trial-expire-job.ts",
     "reparto-ubicacion:purge": "tsx scripts/reparto-ubicacion-purge-job.ts",
     "backup:postgres": "tsx scripts/backup-postgres.ts",

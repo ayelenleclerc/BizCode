@@ -60142,6 +60142,711 @@ Requires `settings.business.manage` and tenant integration `meli`. Attempts remo
 }
 ```
 
+### Search Mercado Libre categories (#184)
+
+- **Method:** `GET`
+- **Path:** `/api/meli/categories/search`
+- **Tags:** meli
+
+Requires `products.read` and tenant integration `meli`. Proxies ML domain discovery search for category autocomplete.
+
+#### Responses
+
+##### Status: 200 Category hits
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`category_id` (required)**
+
+    `string`
+
+  - **`category_name` (required)**
+
+    `string`
+
+  - **`domain_id`**
+
+    `string`
+
+  - **`domain_name`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "category_id": "",
+      "category_name": "",
+      "domain_id": "",
+      "domain_name": ""
+    }
+  ]
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Mercado Libre not connected
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Mercado Libre listing status for an article (#184)
+
+- **Method:** `GET`
+- **Path:** `/api/articulos/{id}/meli`
+- **Tags:** meli
+
+Requires `products.read`, tenant integration `meli`, and article ownership.
+
+#### Responses
+
+##### Status: 200 Listing mapping status
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`hasPhotos` (required)**
+
+    `boolean`
+
+  - **`linked` (required)**
+
+    `boolean`
+
+  - **`photoWarning` (required)**
+
+    `boolean`
+
+  - **`atributos`**
+
+    `array`
+
+    **Items:**
+
+    - **`id` (required)**
+
+      `string`
+
+    - **`value_id`**
+
+      `string`
+
+    - **`value_name`**
+
+      `string`
+
+  - **`estado`**
+
+    `string`
+
+  - **`meliCategoryId`**
+
+    `string`
+
+  - **`meliItemId`**
+
+    `string`
+
+  - **`permalink`**
+
+    `string`
+
+  - **`syncError`**
+
+    `string`
+
+  - **`syncStatus`**
+
+    `string`
+
+  - **`ultimaSyncAt`**
+
+    `string`, format: `date-time`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "linked": true,
+    "meliItemId": "",
+    "meliCategoryId": "",
+    "estado": "",
+    "syncStatus": "",
+    "syncError": "",
+    "permalink": "",
+    "ultimaSyncAt": "",
+    "hasPhotos": true,
+    "photoWarning": true,
+    "atributos": [
+      {
+        "id": "",
+        "value_name": "",
+        "value_id": ""
+      }
+    ]
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Article not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Opt-in publish or update article on Mercado Libre (#184)
+
+- **Method:** `PUT`
+- **Path:** `/api/articulos/{id}/meli`
+- **Tags:** meli
+
+Requires `products.manage`, tenant integration `meli`, and article ownership. Creates or updates `MeliPublicacion` and syncs to ML `POST/PUT /items`.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`meliCategoryId` (required)**
+
+  `string`
+
+- **`atributos`**
+
+  `array`
+
+  **Items:**
+
+  - **`id` (required)**
+
+    `string`
+
+  - **`value_id`**
+
+    `string`
+
+  - **`value_name`**
+
+    `string`
+
+**Example:**
+
+```json
+{
+  "meliCategoryId": "",
+  "atributos": [
+    {
+      "id": "",
+      "value_name": "",
+      "value_id": ""
+    }
+  ]
+}
+```
+
+#### Responses
+
+##### Status: 200 Listing synced
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`hasPhotos` (required)**
+
+    `boolean`
+
+  - **`linked` (required)**
+
+    `boolean`
+
+  - **`photoWarning` (required)**
+
+    `boolean`
+
+  - **`atributos`**
+
+    `array`
+
+    **Items:**
+
+    - **`id` (required)**
+
+      `string`
+
+    - **`value_id`**
+
+      `string`
+
+    - **`value_name`**
+
+      `string`
+
+  - **`estado`**
+
+    `string`
+
+  - **`meliCategoryId`**
+
+    `string`
+
+  - **`meliItemId`**
+
+    `string`
+
+  - **`permalink`**
+
+    `string`
+
+  - **`syncError`**
+
+    `string`
+
+  - **`syncStatus`**
+
+    `string`
+
+  - **`ultimaSyncAt`**
+
+    `string`, format: `date-time`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "linked": true,
+    "meliItemId": "",
+    "meliCategoryId": "",
+    "estado": "",
+    "syncStatus": "",
+    "syncError": "",
+    "permalink": "",
+    "ultimaSyncAt": "",
+    "hasPhotos": true,
+    "photoWarning": true,
+    "atributos": [
+      {
+        "id": "",
+        "value_name": "",
+        "value_id": ""
+      }
+    ]
+  }
+}
+```
+
+##### Status: 400 Validation error (photos, category, attributes)
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Article or MeLi connection not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Unlink article from Mercado Libre (#184)
+
+- **Method:** `DELETE`
+- **Path:** `/api/articulos/{id}/meli`
+- **Tags:** meli
+
+Requires `products.manage`, tenant integration `meli`, and article ownership. Pauses remote listing when possible and deletes local mapping.
+
+#### Responses
+
+##### Status: 200 Unlinked
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`unlinked` (required)**
+
+    `boolean`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "unlinked": true
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Listing not linked
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ### Tenant static Mercado Pago QR (#177)
 
 - **Method:** `GET`
@@ -104506,6 +105211,360 @@ Originating invoice header (selected columns)
   "data": {
     "disconnected": true
   }
+}
+```
+
+### MeliAttributeInput
+
+- **Type:**`object`
+
+* **`id` (required)**
+
+  `string`
+
+* **`value_id`**
+
+  `string`
+
+* **`value_name`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "id": "",
+  "value_name": "",
+  "value_id": ""
+}
+```
+
+### MeliPublicacionStatus
+
+- **Type:**`object`
+
+* **`hasPhotos` (required)**
+
+  `boolean`
+
+* **`linked` (required)**
+
+  `boolean`
+
+* **`photoWarning` (required)**
+
+  `boolean`
+
+* **`atributos`**
+
+  `array`
+
+  **Items:**
+
+  - **`id` (required)**
+
+    `string`
+
+  - **`value_id`**
+
+    `string`
+
+  - **`value_name`**
+
+    `string`
+
+* **`estado`**
+
+  `string`
+
+* **`meliCategoryId`**
+
+  `string`
+
+* **`meliItemId`**
+
+  `string`
+
+* **`permalink`**
+
+  `string`
+
+* **`syncError`**
+
+  `string`
+
+* **`syncStatus`**
+
+  `string`
+
+* **`ultimaSyncAt`**
+
+  `string`, format: `date-time`
+
+**Example:**
+
+```json
+{
+  "linked": true,
+  "meliItemId": "",
+  "meliCategoryId": "",
+  "estado": "",
+  "syncStatus": "",
+  "syncError": "",
+  "permalink": "",
+  "ultimaSyncAt": "",
+  "hasPhotos": true,
+  "photoWarning": true,
+  "atributos": [
+    {
+      "id": "",
+      "value_name": "",
+      "value_id": ""
+    }
+  ]
+}
+```
+
+### MeliPublicacionStatusEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`hasPhotos` (required)**
+
+    `boolean`
+
+  - **`linked` (required)**
+
+    `boolean`
+
+  - **`photoWarning` (required)**
+
+    `boolean`
+
+  - **`atributos`**
+
+    `array`
+
+    **Items:**
+
+    - **`id` (required)**
+
+      `string`
+
+    - **`value_id`**
+
+      `string`
+
+    - **`value_name`**
+
+      `string`
+
+  - **`estado`**
+
+    `string`
+
+  - **`meliCategoryId`**
+
+    `string`
+
+  - **`meliItemId`**
+
+    `string`
+
+  - **`permalink`**
+
+    `string`
+
+  - **`syncError`**
+
+    `string`
+
+  - **`syncStatus`**
+
+    `string`
+
+  - **`ultimaSyncAt`**
+
+    `string`, format: `date-time`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "linked": true,
+    "meliItemId": "",
+    "meliCategoryId": "",
+    "estado": "",
+    "syncStatus": "",
+    "syncError": "",
+    "permalink": "",
+    "ultimaSyncAt": "",
+    "hasPhotos": true,
+    "photoWarning": true,
+    "atributos": [
+      {
+        "id": "",
+        "value_name": "",
+        "value_id": ""
+      }
+    ]
+  }
+}
+```
+
+### MeliPublicacionUpsertBody
+
+- **Type:**`object`
+
+* **`meliCategoryId` (required)**
+
+  `string`
+
+* **`atributos`**
+
+  `array`
+
+  **Items:**
+
+  - **`id` (required)**
+
+    `string`
+
+  - **`value_id`**
+
+    `string`
+
+  - **`value_name`**
+
+    `string`
+
+**Example:**
+
+```json
+{
+  "meliCategoryId": "",
+  "atributos": [
+    {
+      "id": "",
+      "value_name": "",
+      "value_id": ""
+    }
+  ]
+}
+```
+
+### MeliPublicacionUnlinkEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`unlinked` (required)**
+
+    `boolean`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "unlinked": true
+  }
+}
+```
+
+### MeliCategorySearchHit
+
+- **Type:**`object`
+
+* **`category_id` (required)**
+
+  `string`
+
+* **`category_name` (required)**
+
+  `string`
+
+* **`domain_id`**
+
+  `string`
+
+* **`domain_name`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "category_id": "",
+  "category_name": "",
+  "domain_id": "",
+  "domain_name": ""
+}
+```
+
+### MeliCategorySearchEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`category_id` (required)**
+
+    `string`
+
+  - **`category_name` (required)**
+
+    `string`
+
+  - **`domain_id`**
+
+    `string`
+
+  - **`domain_name`**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "category_id": "",
+      "category_name": "",
+      "domain_id": "",
+      "domain_name": ""
+    }
+  ]
 }
 ```
 

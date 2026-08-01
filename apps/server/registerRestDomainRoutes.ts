@@ -56,6 +56,7 @@ import { registerMercadoPagoFacturaRoutes } from './routes/registerMercadoPagoFa
 import { registerMercadoPagoRefundRoutes } from './routes/registerMercadoPagoRefundRoutes'
 import { registerMercadoPagoWebhookRoutes } from './routes/registerMercadoPagoWebhookRoutes'
 import { registerMeliOAuthRoutes } from './routes/registerMeliOAuthRoutes'
+import { registerMeliCatalogRoutes } from './routes/registerMeliCatalogRoutes'
 import { registerPrintingRoutes } from './routes/registerPrintingRoutes'
 import { registerContratosRoutes } from './routes/registerContratosRoutes'
 import { registerOrdenTrabajoRoutes } from './routes/registerOrdenTrabajoRoutes'
@@ -101,6 +102,7 @@ export function registerRestDomainRoutes(app: Application, prisma: PrismaClient)
 
   registerMercadoPagoWebhookRoutes(app, ctx)
   registerMeliOAuthRoutes(app, ctx)
+  registerMeliCatalogRoutes(app, ctx)
   registerClientesRoutes(app, ctx)
   registerClienteCuentaCorrienteRoutes(app, ctx)
   registerArticuloVariantesRoutes(app, ctx)

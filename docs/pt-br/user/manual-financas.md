@@ -56,7 +56,7 @@ Requer **`settings.business.manage`**.
 
 ## OAuth Mercado Livre (#183)
 
-Conexão base do conector marketplace Mercado Livre (sync de catálogo/estoque/pedidos são issues posteriores). Habilite a integração **`meli`** do tenant (super-admin) e abra **Configurações → Empresa → Mercado Livre**:
+Conexão base do conector marketplace Mercado Livre. Habilite a integração **`meli`** do tenant (super-admin) e abra **Configurações → Empresa → Mercado Livre**:
 
 1. **Conectar com Mercado Livre** — o BizCode devolve a URL de autorização (`GET /api/oauth/meli/authorize`) e o navegador redireciona para o ML.
 2. Após autorizar, o ML chama `GET /api/oauth/meli/callback` (público). O BizCode valida o `state` CSRF assinado, troca o `code` por tokens, cifra em `MeliConfig` (mesma chave AES-GCM dos segredos fiscais/MP) e redireciona para `/configuracion?meli=connected`.
@@ -65,6 +65,17 @@ Conexão base do conector marketplace Mercado Livre (sync de catálogo/estoque/p
 5. Env da plataforma: `MELI_CLIENT_ID`, `MELI_CLIENT_SECRET`, opcional `MELI_REDIRECT_URI` (padrão `{API_PUBLIC_URL}/api/oauth/meli/callback`). Agendar `npm run meli:token-refresh` a cada 5 horas (access tokens expiram ~6 h).
 
 Em local, o smoke OAuth pode exigir um túnel público para o ML alcançar o callback.
+
+## Sync de catálogo Mercado Livre (#184)
+
+Com OAuth conectado, o vendedor pode optar por artigo em **Artigos → editar → Mercado Livre**:
+
+1. Adicionar pelo menos uma foto (o ML exige; o BizCode envia URLs absolutas com `API_PUBLIC_URL` + `/uploads/articulos/...`).
+2. Buscar categoria ML (`GET /api/meli/categories/search?q=`) e publicar (`PUT /api/articulos/{id}/meli`). Grava `MeliPublicacion` e chama ML `POST /items` (ou `PUT /items/{id}` se já vinculado).
+3. Mudanças posteriores de preço/descrição/ativo são enviadas ao ML imediatamente; linhas `pending`/`error` são retentadas com `npm run meli:catalog-sync` a cada 5 minutos.
+4. **Desvincular** (`DELETE /api/articulos/{id}/meli`) pausa o anúncio remoto quando possível e apaga o mapeamento local.
+
+Sync bidirecional de estoque e importação de pedidos ficam em #185–#186. Artigos pai e serviços não são publicados.
 
 ## Links de pagamento Mercado Pago (#175)
 

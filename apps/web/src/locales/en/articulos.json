@@ -189,5 +189,23 @@
     "sortUltimaCompra": "Last purchase",
     "sortAsc": "Ascending",
     "sortDesc": "Descending"
+  },
+  "meli": {
+    "title": "Mercado Libre",
+    "subtitle": "Publish this product on Mercado Libre (opt-in). Requires photos and an ML category.",
+    "loading": "Loading listing status…",
+    "errorLoad": "Could not load Mercado Libre status.",
+    "errorSave": "Could not publish to Mercado Libre.",
+    "errorUnlink": "Could not unlink from Mercado Libre.",
+    "errorCategoryRequired": "Select a Mercado Libre category.",
+    "photoWarning": "Add at least one product photo before publishing to Mercado Libre.",
+    "status": "Status",
+    "openListing": "Open listing on Mercado Libre",
+    "unlink": "Unlink",
+    "categorySearch": "Search ML category",
+    "searching": "Searching…",
+    "selectedCategory": "Selected category",
+    "publish": "Publish to Mercado Libre",
+    "resync": "Sync now"
   }
 }
