@@ -51,6 +51,8 @@ import { LoteService } from './LoteService'
 import { ClientePrivacyService } from './ClientePrivacyService'
 import { BancoExtractoService } from './BancoExtractoService'
 import { BancoConciliacionService } from './BancoConciliacionService'
+import { ShippingTrackingService } from './ShippingTrackingService'
+import { ShippingCarrierConfigService } from './ShippingCarrierConfigService'
 
 export type DomainServices = {
   cliente: ClienteService
@@ -60,6 +62,8 @@ export type DomainServices = {
   cobranzas: CobranzasService
   compras: CompraService
   ordenEntrega: OrdenEntregaService
+  shippingTracking: ShippingTrackingService
+  shippingCarrierConfig: ShippingCarrierConfigService
   pedido: PedidoService
   empresa: EmpresaService
   stockAjuste: StockAjusteService
@@ -121,6 +125,8 @@ export function createDomainServices(prisma: PrismaClient): DomainServices {
     cobranzas: new CobranzasService(prisma),
     compras: new CompraService(prisma),
     ordenEntrega: new OrdenEntregaService(prisma),
+    shippingTracking: new ShippingTrackingService(prisma),
+    shippingCarrierConfig: new ShippingCarrierConfigService(prisma),
     pedido: new PedidoService(prisma),
     empresa: new EmpresaService(prisma),
     stockAjuste: new StockAjusteService(prisma),

@@ -38,6 +38,7 @@ import { registerRubrosRoutes } from './routes/registerRubrosRoutes'
 import type { RestRouteContext } from './routes/restRouteTypes'
 import { registerZonasEntregaRoutes } from './routes/registerZonasEntregaRoutes'
 import { registerOrdenesEntregaRoutes } from './routes/registerOrdenesEntregaRoutes'
+import { registerShippingCarrierRoutes } from './routes/registerShippingCarrierRoutes'
 import { registerLogisticaReportesRoutes } from './routes/registerLogisticaReportesRoutes'
 import { registerRepartosRoutes } from './routes/registerRepartosRoutes'
 import { registerArcaRoutes } from './routes/registerArcaRoutes'
@@ -146,6 +147,7 @@ export function registerRestDomainRoutes(app: Application, prisma: PrismaClient)
   registerContabilidadRoutes(app, ctx)
   registerZonasEntregaRoutes(app, ctx)
   registerOrdenesEntregaRoutes(app, ctx)
+  registerShippingCarrierRoutes(app, ctx)
   registerRepartosRoutes(app, ctx)
   registerLogisticaReportesRoutes(app, ctx)
   registerEmpresaRoutes(app, ctx)

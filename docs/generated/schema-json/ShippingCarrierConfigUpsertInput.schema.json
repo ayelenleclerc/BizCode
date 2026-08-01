@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "activo": {
+      "type": "boolean"
+    },
+    "password": {
+      "maxLength": 200,
+      "minLength": 1,
+      "type": "string"
+    },
+    "sandboxMode": {
+      "type": "boolean"
+    },
+    "username": {
+      "maxLength": 120,
+      "minLength": 1,
+      "type": "string"
+    }
+  },
+  "required": [
+    "username",
+    "password"
+  ],
+  "title": "ShippingCarrierConfigUpsertInput",
+  "type": "object"
+}

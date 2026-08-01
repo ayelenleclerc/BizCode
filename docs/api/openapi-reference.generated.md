@@ -63699,6 +63699,10 @@ Requires `logistics.read`, `orders.deliver.confirm`, or `orders.pick`. Drivers o
 
     `string`, possible values: `"pending", "picking", "ready", "assigned", "in_transit", "delivered", "failed", "cancelled"`
 
+  - **`estadoEnvio`**
+
+    `string`, possible values: `"pending", "in_transit", "delivered", "returned"` — Carrier shipment status (#193), independent of OE estado.
+
   - **`factura`**
 
     `object`
@@ -63749,6 +63753,10 @@ Requires `logistics.read`, `orders.deliver.confirm`, or `orders.pick`. Drivers o
 
     `string`
 
+  - **`nroSeguimiento`**
+
+    `string` — Carrier tracking number (#193).
+
   - **`picker`**
 
     `object`
@@ -63768,6 +63776,36 @@ Requires `logistics.read`, `orders.deliver.confirm`, or `orders.pick`. Drivers o
   - **`tenantId`**
 
     `integer`
+
+  - **`trackingEventos`**
+
+    `array`
+
+    **Items:**
+
+    - **`at` (required)**
+
+      `string`
+
+    - **`status` (required)**
+
+      `string`
+
+    - **`description`**
+
+      `string`
+
+    - **`location`**
+
+      `string`
+
+  - **`transportista`**
+
+    `string`, possible values: `"correo_argentino", "andreani", "propio", "meli_full"` — Carrier for parcel shipping (#193).
+
+  - **`ultimoEventoAt`**
+
+    `string`, format: `date-time`
 
   - **`zona`**
 
@@ -63800,6 +63838,18 @@ Requires `logistics.read`, `orders.deliver.confirm`, or `orders.pick`. Drivers o
       "fecha": "",
       "estado": "pending",
       "nota": "",
+      "transportista": "correo_argentino",
+      "nroSeguimiento": "",
+      "estadoEnvio": "pending",
+      "ultimoEventoAt": "",
+      "trackingEventos": [
+        {
+          "at": "",
+          "status": "",
+          "description": "",
+          "location": ""
+        }
+      ],
       "dispatchedAt": "",
       "dispatchTimestampSource": "event",
       "items": [
@@ -64005,6 +64055,10 @@ Requires `orders.create`. Initial estado is `pending`, or `assigned` when `drive
 
     `string`, possible values: `"pending", "picking", "ready", "assigned", "in_transit", "delivered", "failed", "cancelled"`
 
+  - **`estadoEnvio`**
+
+    `string`, possible values: `"pending", "in_transit", "delivered", "returned"` — Carrier shipment status (#193), independent of OE estado.
+
   - **`factura`**
 
     `object`
@@ -64055,6 +64109,10 @@ Requires `orders.create`. Initial estado is `pending`, or `assigned` when `drive
 
     `string`
 
+  - **`nroSeguimiento`**
+
+    `string` — Carrier tracking number (#193).
+
   - **`picker`**
 
     `object`
@@ -64074,6 +64132,36 @@ Requires `orders.create`. Initial estado is `pending`, or `assigned` when `drive
   - **`tenantId`**
 
     `integer`
+
+  - **`trackingEventos`**
+
+    `array`
+
+    **Items:**
+
+    - **`at` (required)**
+
+      `string`
+
+    - **`status` (required)**
+
+      `string`
+
+    - **`description`**
+
+      `string`
+
+    - **`location`**
+
+      `string`
+
+  - **`transportista`**
+
+    `string`, possible values: `"correo_argentino", "andreani", "propio", "meli_full"` — Carrier for parcel shipping (#193).
+
+  - **`ultimoEventoAt`**
+
+    `string`, format: `date-time`
 
   - **`zona`**
 
@@ -64105,6 +64193,18 @@ Requires `orders.create`. Initial estado is `pending`, or `assigned` when `drive
     "fecha": "",
     "estado": "pending",
     "nota": "",
+    "transportista": "correo_argentino",
+    "nroSeguimiento": "",
+    "estadoEnvio": "pending",
+    "ultimoEventoAt": "",
+    "trackingEventos": [
+      {
+        "at": "",
+        "status": "",
+        "description": "",
+        "location": ""
+      }
+    ],
     "dispatchedAt": "",
     "dispatchTimestampSource": "event",
     "items": [
@@ -64304,6 +64404,10 @@ Requires `orders.dispatch` for transitions to `assigned`, `in_transit`, or `fail
 
     `string`, possible values: `"pending", "picking", "ready", "assigned", "in_transit", "delivered", "failed", "cancelled"`
 
+  - **`estadoEnvio`**
+
+    `string`, possible values: `"pending", "in_transit", "delivered", "returned"` — Carrier shipment status (#193), independent of OE estado.
+
   - **`factura`**
 
     `object`
@@ -64354,6 +64458,10 @@ Requires `orders.dispatch` for transitions to `assigned`, `in_transit`, or `fail
 
     `string`
 
+  - **`nroSeguimiento`**
+
+    `string` — Carrier tracking number (#193).
+
   - **`picker`**
 
     `object`
@@ -64373,6 +64481,36 @@ Requires `orders.dispatch` for transitions to `assigned`, `in_transit`, or `fail
   - **`tenantId`**
 
     `integer`
+
+  - **`trackingEventos`**
+
+    `array`
+
+    **Items:**
+
+    - **`at` (required)**
+
+      `string`
+
+    - **`status` (required)**
+
+      `string`
+
+    - **`description`**
+
+      `string`
+
+    - **`location`**
+
+      `string`
+
+  - **`transportista`**
+
+    `string`, possible values: `"correo_argentino", "andreani", "propio", "meli_full"` — Carrier for parcel shipping (#193).
+
+  - **`ultimoEventoAt`**
+
+    `string`, format: `date-time`
 
   - **`zona`**
 
@@ -64404,6 +64542,18 @@ Requires `orders.dispatch` for transitions to `assigned`, `in_transit`, or `fail
     "fecha": "",
     "estado": "pending",
     "nota": "",
+    "transportista": "correo_argentino",
+    "nroSeguimiento": "",
+    "estadoEnvio": "pending",
+    "ultimoEventoAt": "",
+    "trackingEventos": [
+      {
+        "at": "",
+        "status": "",
+        "description": "",
+        "location": ""
+      }
+    ],
     "dispatchedAt": "",
     "dispatchTimestampSource": "event",
     "items": [
@@ -64563,22 +64713,17 @@ Requires `orders.dispatch` for transitions to `assigned`, `in_transit`, or `fail
 }
 ```
 
-### PARAMETERS /api/ordenes-entrega/{id}/iniciar-picking
+### Get delivery order by id
 
-- **Method:** `PARAMETERS`
-- **Path:** `/api/ordenes-entrega/{id}/iniciar-picking`
-
-### Start warehouse picking for a delivery order
-
-- **Method:** `POST`
-- **Path:** `/api/ordenes-entrega/{id}/iniciar-picking`
+- **Method:** `GET`
+- **Path:** `/api/ordenes-entrega/{id}`
 - **Tags:** logistics
 
-Requires `orders.pick` and tenant module `logistics.picking`. Transitions `pending` → `picking` and assigns the session user as picker. Returns 409 when another user already holds the order in picking.
+Requires `logistics.read`, `orders.deliver.confirm`, or `orders.pick`.
 
 #### Responses
 
-##### Status: 200 Picking started (or idempotent for same picker)
+##### Status: 200 Delivery order
 
 ###### Content-Type: application/json
 
@@ -64613,6 +64758,10 @@ Requires `orders.pick` and tenant module `logistics.picking`. Transitions `pendi
   - **`estado`**
 
     `string`, possible values: `"pending", "picking", "ready", "assigned", "in_transit", "delivered", "failed", "cancelled"`
+
+  - **`estadoEnvio`**
+
+    `string`, possible values: `"pending", "in_transit", "delivered", "returned"` — Carrier shipment status (#193), independent of OE estado.
 
   - **`factura`**
 
@@ -64664,6 +64813,10 @@ Requires `orders.pick` and tenant module `logistics.picking`. Transitions `pendi
 
     `string`
 
+  - **`nroSeguimiento`**
+
+    `string` — Carrier tracking number (#193).
+
   - **`picker`**
 
     `object`
@@ -64683,6 +64836,36 @@ Requires `orders.pick` and tenant module `logistics.picking`. Transitions `pendi
   - **`tenantId`**
 
     `integer`
+
+  - **`trackingEventos`**
+
+    `array`
+
+    **Items:**
+
+    - **`at` (required)**
+
+      `string`
+
+    - **`status` (required)**
+
+      `string`
+
+    - **`description`**
+
+      `string`
+
+    - **`location`**
+
+      `string`
+
+  - **`transportista`**
+
+    `string`, possible values: `"correo_argentino", "andreani", "propio", "meli_full"` — Carrier for parcel shipping (#193).
+
+  - **`ultimoEventoAt`**
+
+    `string`, format: `date-time`
 
   - **`zona`**
 
@@ -64714,6 +64897,1078 @@ Requires `orders.pick` and tenant module `logistics.picking`. Transitions `pendi
     "fecha": "",
     "estado": "pending",
     "nota": "",
+    "transportista": "correo_argentino",
+    "nroSeguimiento": "",
+    "estadoEnvio": "pending",
+    "ultimoEventoAt": "",
+    "trackingEventos": [
+      {
+        "at": "",
+        "status": "",
+        "description": "",
+        "location": ""
+      }
+    ],
+    "dispatchedAt": "",
+    "dispatchTimestampSource": "event",
+    "items": [
+      {
+        "id": 1,
+        "cantidad": 1,
+        "articulo": {
+          "id": 1,
+          "codigo": 1,
+          "descripcion": ""
+        }
+      }
+    ],
+    "cliente": {
+      "additionalProperty": "anything"
+    },
+    "zona": {
+      "additionalProperty": "anything"
+    },
+    "driver": {
+      "additionalProperty": "anything"
+    },
+    "factura": {
+      "additionalProperty": "anything"
+    },
+    "picker": {
+      "additionalProperty": "anything"
+    },
+    "additionalProperty": "anything"
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Order not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/ordenes-entrega/{id}/tracking
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/ordenes-entrega/{id}/tracking`
+
+### Get carrier tracking for a delivery order (#193)
+
+- **Method:** `GET`
+- **Path:** `/api/ordenes-entrega/{id}/tracking`
+- **Tags:** logistics
+
+Returns cached tracking (30 min TTL). With active carrier credentials, refreshes from Andreani / Correo Argentino when cache is stale. Without credentials, returns manual fields + portal URL.
+
+#### Responses
+
+##### Status: 200 Tracking view
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`fromCache` (required)**
+
+    `boolean`
+
+  - **`ordenEntregaId` (required)**
+
+    `integer`
+
+  - **`refreshed` (required)**
+
+    `boolean`
+
+  - **`trackingEventos` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`at` (required)**
+
+      `string`
+
+    - **`status` (required)**
+
+      `string`
+
+    - **`description`**
+
+      `string`
+
+    - **`location`**
+
+      `string`
+
+  - **`estadoEnvio`**
+
+    `string`, possible values: `"pending", "in_transit", "delivered", "returned"`
+
+  - **`nroSeguimiento`**
+
+    `string`
+
+  - **`portalUrl`**
+
+    `string`
+
+  - **`transportista`**
+
+    `string`, possible values: `"correo_argentino", "andreani", "propio", "meli_full"`
+
+  - **`ultimoEventoAt`**
+
+    `string`, format: `date-time`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "ordenEntregaId": 1,
+    "transportista": "correo_argentino",
+    "nroSeguimiento": "",
+    "estadoEnvio": "pending",
+    "ultimoEventoAt": "",
+    "trackingEventos": [
+      {
+        "at": "",
+        "status": "",
+        "description": "",
+        "location": ""
+      }
+    ],
+    "portalUrl": "",
+    "fromCache": true,
+    "refreshed": true
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Order not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Assign carrier tracking number (#193)
+
+- **Method:** `POST`
+- **Path:** `/api/ordenes-entrega/{id}/tracking`
+- **Tags:** logistics
+
+Requires `logistics.manage`. Persists transportista + nroSeguimiento (manual mode works without credentials).
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`nroSeguimiento` (required)**
+
+  `string`
+
+- **`transportista` (required)**
+
+  `string`, possible values: `"correo_argentino", "andreani", "propio", "meli_full"`
+
+- **`estadoEnvio`**
+
+  `string`, possible values: `"pending", "in_transit", "delivered", "returned"`
+
+**Example:**
+
+```json
+{
+  "transportista": "correo_argentino",
+  "nroSeguimiento": "",
+  "estadoEnvio": "pending"
+}
+```
+
+#### Responses
+
+##### Status: 200 Tracking assigned
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`fromCache` (required)**
+
+    `boolean`
+
+  - **`ordenEntregaId` (required)**
+
+    `integer`
+
+  - **`refreshed` (required)**
+
+    `boolean`
+
+  - **`trackingEventos` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`at` (required)**
+
+      `string`
+
+    - **`status` (required)**
+
+      `string`
+
+    - **`description`**
+
+      `string`
+
+    - **`location`**
+
+      `string`
+
+  - **`estadoEnvio`**
+
+    `string`, possible values: `"pending", "in_transit", "delivered", "returned"`
+
+  - **`nroSeguimiento`**
+
+    `string`
+
+  - **`portalUrl`**
+
+    `string`
+
+  - **`transportista`**
+
+    `string`, possible values: `"correo_argentino", "andreani", "propio", "meli_full"`
+
+  - **`ultimoEventoAt`**
+
+    `string`, format: `date-time`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "ordenEntregaId": 1,
+    "transportista": "correo_argentino",
+    "nroSeguimiento": "",
+    "estadoEnvio": "pending",
+    "ultimoEventoAt": "",
+    "trackingEventos": [
+      {
+        "at": "",
+        "status": "",
+        "description": "",
+        "location": ""
+      }
+    ],
+    "portalUrl": "",
+    "fromCache": true,
+    "refreshed": true
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Order not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/shipping-carriers/{carrier}/config
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/shipping-carriers/{carrier}/config`
+
+### Get shipping carrier credential metadata (#193)
+
+- **Method:** `GET`
+- **Path:** `/api/shipping-carriers/{carrier}/config`
+- **Tags:** logistics
+
+Requires `logistics.manage`. Never returns decrypted secrets.
+
+#### Responses
+
+##### Status: 200 Public config
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`activo` (required)**
+
+    `boolean`
+
+  - **`carrier` (required)**
+
+    `string`, possible values: `"andreani", "correo_argentino"`
+
+  - **`sandboxMode` (required)**
+
+    `boolean`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`usernameLast4` (required)**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "carrier": "andreani",
+    "usernameLast4": "",
+    "sandboxMode": true,
+    "activo": true,
+    "updatedAt": ""
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Config not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Upsert shipping carrier credentials (#193)
+
+- **Method:** `PUT`
+- **Path:** `/api/shipping-carriers/{carrier}/config`
+- **Tags:** logistics
+
+Requires `logistics.manage`. Secrets stored encrypted at rest.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`password` (required)**
+
+  `string`
+
+- **`username` (required)**
+
+  `string`
+
+- **`activo`**
+
+  `boolean`
+
+- **`sandboxMode`**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "username": "",
+  "password": "",
+  "sandboxMode": true,
+  "activo": true
+}
+```
+
+#### Responses
+
+##### Status: 200 Config saved
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`activo` (required)**
+
+    `boolean`
+
+  - **`carrier` (required)**
+
+    `string`, possible values: `"andreani", "correo_argentino"`
+
+  - **`sandboxMode` (required)**
+
+    `boolean`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`usernameLast4` (required)**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "carrier": "andreani",
+    "usernameLast4": "",
+    "sandboxMode": true,
+    "activo": true,
+    "updatedAt": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/ordenes-entrega/{id}/iniciar-picking
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/ordenes-entrega/{id}/iniciar-picking`
+
+### Start warehouse picking for a delivery order
+
+- **Method:** `POST`
+- **Path:** `/api/ordenes-entrega/{id}/iniciar-picking`
+- **Tags:** logistics
+
+Requires `orders.pick` and tenant module `logistics.picking`. Transitions `pending` → `picking` and assigns the session user as picker. Returns 409 when another user already holds the order in picking.
+
+#### Responses
+
+##### Status: 200 Picking started (or idempotent for same picker)
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`cliente`**
+
+    `object`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`dispatchedAt`**
+
+    `string`, format: `date-time` — When the order entered in\_transit (ADR-0011).
+
+  - **`dispatchTimestampSource`**
+
+    `string`, possible values: `"event", "estimated"` — How dispatchedAt was derived (audit event vs estimated from updatedAt).
+
+  - **`driver`**
+
+    `object`
+
+  - **`driverId`**
+
+    `integer`
+
+  - **`estado`**
+
+    `string`, possible values: `"pending", "picking", "ready", "assigned", "in_transit", "delivered", "failed", "cancelled"`
+
+  - **`estadoEnvio`**
+
+    `string`, possible values: `"pending", "in_transit", "delivered", "returned"` — Carrier shipment status (#193), independent of OE estado.
+
+  - **`factura`**
+
+    `object`
+
+  - **`facturaId`**
+
+    `integer`
+
+  - **`fecha`**
+
+    `string`, format: `date-time`
+
+  - **`id`**
+
+    `integer`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+    - **`articulo` (required)**
+
+      `object`
+
+      - **`codigo` (required)**
+
+        `integer`
+
+      - **`descripcion` (required)**
+
+        `string`
+
+      - **`id` (required)**
+
+        `integer`
+
+    - **`cantidad` (required)**
+
+      `integer`
+
+    - **`id` (required)**
+
+      `integer`
+
+  - **`nota`**
+
+    `string`
+
+  - **`nroSeguimiento`**
+
+    `string` — Carrier tracking number (#193).
+
+  - **`picker`**
+
+    `object`
+
+  - **`pickerUserId`**
+
+    `integer`
+
+  - **`pickingIniciadoAt`**
+
+    `string`, format: `date-time`
+
+  - **`pickingListoAt`**
+
+    `string`, format: `date-time`
+
+  - **`tenantId`**
+
+    `integer`
+
+  - **`trackingEventos`**
+
+    `array`
+
+    **Items:**
+
+    - **`at` (required)**
+
+      `string`
+
+    - **`status` (required)**
+
+      `string`
+
+    - **`description`**
+
+      `string`
+
+    - **`location`**
+
+      `string`
+
+  - **`transportista`**
+
+    `string`, possible values: `"correo_argentino", "andreani", "propio", "meli_full"` — Carrier for parcel shipping (#193).
+
+  - **`ultimoEventoAt`**
+
+    `string`, format: `date-time`
+
+  - **`zona`**
+
+    `object`
+
+  - **`zonaId`**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "facturaId": 1,
+    "clienteId": 1,
+    "zonaId": 1,
+    "driverId": 1,
+    "pickerUserId": 1,
+    "pickingIniciadoAt": "",
+    "pickingListoAt": "",
+    "fecha": "",
+    "estado": "pending",
+    "nota": "",
+    "transportista": "correo_argentino",
+    "nroSeguimiento": "",
+    "estadoEnvio": "pending",
+    "ultimoEventoAt": "",
+    "trackingEventos": [
+      {
+        "at": "",
+        "status": "",
+        "description": "",
+        "location": ""
+      }
+    ],
     "dispatchedAt": "",
     "dispatchTimestampSource": "event",
     "items": [
@@ -64924,6 +66179,10 @@ Requires `orders.pick` and tenant module `logistics.picking`. Transitions `picki
 
     `string`, possible values: `"pending", "picking", "ready", "assigned", "in_transit", "delivered", "failed", "cancelled"`
 
+  - **`estadoEnvio`**
+
+    `string`, possible values: `"pending", "in_transit", "delivered", "returned"` — Carrier shipment status (#193), independent of OE estado.
+
   - **`factura`**
 
     `object`
@@ -64974,6 +66233,10 @@ Requires `orders.pick` and tenant module `logistics.picking`. Transitions `picki
 
     `string`
 
+  - **`nroSeguimiento`**
+
+    `string` — Carrier tracking number (#193).
+
   - **`picker`**
 
     `object`
@@ -64993,6 +66256,36 @@ Requires `orders.pick` and tenant module `logistics.picking`. Transitions `picki
   - **`tenantId`**
 
     `integer`
+
+  - **`trackingEventos`**
+
+    `array`
+
+    **Items:**
+
+    - **`at` (required)**
+
+      `string`
+
+    - **`status` (required)**
+
+      `string`
+
+    - **`description`**
+
+      `string`
+
+    - **`location`**
+
+      `string`
+
+  - **`transportista`**
+
+    `string`, possible values: `"correo_argentino", "andreani", "propio", "meli_full"` — Carrier for parcel shipping (#193).
+
+  - **`ultimoEventoAt`**
+
+    `string`, format: `date-time`
 
   - **`zona`**
 
@@ -65024,6 +66317,18 @@ Requires `orders.pick` and tenant module `logistics.picking`. Transitions `picki
     "fecha": "",
     "estado": "pending",
     "nota": "",
+    "transportista": "correo_argentino",
+    "nroSeguimiento": "",
+    "estadoEnvio": "pending",
+    "ultimoEventoAt": "",
+    "trackingEventos": [
+      {
+        "at": "",
+        "status": "",
+        "description": "",
+        "location": ""
+      }
+    ],
     "dispatchedAt": "",
     "dispatchTimestampSource": "event",
     "items": [
@@ -65288,6 +66593,10 @@ Requires `logistics.read`. Filter by `fecha`, `choferId`, `estado`.
 
         `string`, possible values: `"pending", "picking", "ready", "assigned", "in_transit", "delivered", "failed", "cancelled"`
 
+      - **`estadoEnvio`**
+
+        `string`, possible values: `"pending", "in_transit", "delivered", "returned"` — Carrier shipment status (#193), independent of OE estado.
+
       - **`factura`**
 
         `object`
@@ -65338,6 +66647,10 @@ Requires `logistics.read`. Filter by `fecha`, `choferId`, `estado`.
 
         `string`
 
+      - **`nroSeguimiento`**
+
+        `string` — Carrier tracking number (#193).
+
       - **`picker`**
 
         `object`
@@ -65357,6 +66670,36 @@ Requires `logistics.read`. Filter by `fecha`, `choferId`, `estado`.
       - **`tenantId`**
 
         `integer`
+
+      - **`trackingEventos`**
+
+        `array`
+
+        **Items:**
+
+        - **`at` (required)**
+
+          `string`
+
+        - **`status` (required)**
+
+          `string`
+
+        - **`description`**
+
+          `string`
+
+        - **`location`**
+
+          `string`
+
+      - **`transportista`**
+
+        `string`, possible values: `"correo_argentino", "andreani", "propio", "meli_full"` — Carrier for parcel shipping (#193).
+
+      - **`ultimoEventoAt`**
+
+        `string`, format: `date-time`
 
       - **`zona`**
 
@@ -65494,6 +66837,18 @@ Requires `logistics.read`. Filter by `fecha`, `choferId`, `estado`.
             "fecha": "",
             "estado": "pending",
             "nota": "",
+            "transportista": "correo_argentino",
+            "nroSeguimiento": "",
+            "estadoEnvio": "pending",
+            "ultimoEventoAt": "",
+            "trackingEventos": [
+              {
+                "at": "",
+                "status": "",
+                "description": "",
+                "location": ""
+              }
+            ],
             "dispatchedAt": "",
             "dispatchTimestampSource": "event",
             "items": [
@@ -65746,6 +67101,10 @@ Requires `orders.dispatch`. Groups delivery orders in estado `ready`; assigns dr
 
         `string`, possible values: `"pending", "picking", "ready", "assigned", "in_transit", "delivered", "failed", "cancelled"`
 
+      - **`estadoEnvio`**
+
+        `string`, possible values: `"pending", "in_transit", "delivered", "returned"` — Carrier shipment status (#193), independent of OE estado.
+
       - **`factura`**
 
         `object`
@@ -65796,6 +67155,10 @@ Requires `orders.dispatch`. Groups delivery orders in estado `ready`; assigns dr
 
         `string`
 
+      - **`nroSeguimiento`**
+
+        `string` — Carrier tracking number (#193).
+
       - **`picker`**
 
         `object`
@@ -65815,6 +67178,36 @@ Requires `orders.dispatch`. Groups delivery orders in estado `ready`; assigns dr
       - **`tenantId`**
 
         `integer`
+
+      - **`trackingEventos`**
+
+        `array`
+
+        **Items:**
+
+        - **`at` (required)**
+
+          `string`
+
+        - **`status` (required)**
+
+          `string`
+
+        - **`description`**
+
+          `string`
+
+        - **`location`**
+
+          `string`
+
+      - **`transportista`**
+
+        `string`, possible values: `"correo_argentino", "andreani", "propio", "meli_full"` — Carrier for parcel shipping (#193).
+
+      - **`ultimoEventoAt`**
+
+        `string`, format: `date-time`
 
       - **`zona`**
 
@@ -65948,6 +67341,18 @@ Requires `orders.dispatch`. Groups delivery orders in estado `ready`; assigns dr
           "fecha": "",
           "estado": "pending",
           "nota": "",
+          "transportista": "correo_argentino",
+          "nroSeguimiento": "",
+          "estadoEnvio": "pending",
+          "ultimoEventoAt": "",
+          "trackingEventos": [
+            {
+              "at": "",
+              "status": "",
+              "description": "",
+              "location": ""
+            }
+          ],
           "dispatchedAt": "",
           "dispatchTimestampSource": "event",
           "items": [
@@ -66390,6 +67795,10 @@ Requires `logistics.read`.
 
         `string`, possible values: `"pending", "picking", "ready", "assigned", "in_transit", "delivered", "failed", "cancelled"`
 
+      - **`estadoEnvio`**
+
+        `string`, possible values: `"pending", "in_transit", "delivered", "returned"` — Carrier shipment status (#193), independent of OE estado.
+
       - **`factura`**
 
         `object`
@@ -66440,6 +67849,10 @@ Requires `logistics.read`.
 
         `string`
 
+      - **`nroSeguimiento`**
+
+        `string` — Carrier tracking number (#193).
+
       - **`picker`**
 
         `object`
@@ -66459,6 +67872,36 @@ Requires `logistics.read`.
       - **`tenantId`**
 
         `integer`
+
+      - **`trackingEventos`**
+
+        `array`
+
+        **Items:**
+
+        - **`at` (required)**
+
+          `string`
+
+        - **`status` (required)**
+
+          `string`
+
+        - **`description`**
+
+          `string`
+
+        - **`location`**
+
+          `string`
+
+      - **`transportista`**
+
+        `string`, possible values: `"correo_argentino", "andreani", "propio", "meli_full"` — Carrier for parcel shipping (#193).
+
+      - **`ultimoEventoAt`**
+
+        `string`, format: `date-time`
 
       - **`zona`**
 
@@ -66592,6 +68035,18 @@ Requires `logistics.read`.
           "fecha": "",
           "estado": "pending",
           "nota": "",
+          "transportista": "correo_argentino",
+          "nroSeguimiento": "",
+          "estadoEnvio": "pending",
+          "ultimoEventoAt": "",
+          "trackingEventos": [
+            {
+              "at": "",
+              "status": "",
+              "description": "",
+              "location": ""
+            }
+          ],
           "dispatchedAt": "",
           "dispatchTimestampSource": "event",
           "items": [
@@ -66827,6 +68282,10 @@ Requires `orders.dispatch`. `planned` → `on_route`; pending items' OEs → `in
 
         `string`, possible values: `"pending", "picking", "ready", "assigned", "in_transit", "delivered", "failed", "cancelled"`
 
+      - **`estadoEnvio`**
+
+        `string`, possible values: `"pending", "in_transit", "delivered", "returned"` — Carrier shipment status (#193), independent of OE estado.
+
       - **`factura`**
 
         `object`
@@ -66877,6 +68336,10 @@ Requires `orders.dispatch`. `planned` → `on_route`; pending items' OEs → `in
 
         `string`
 
+      - **`nroSeguimiento`**
+
+        `string` — Carrier tracking number (#193).
+
       - **`picker`**
 
         `object`
@@ -66896,6 +68359,36 @@ Requires `orders.dispatch`. `planned` → `on_route`; pending items' OEs → `in
       - **`tenantId`**
 
         `integer`
+
+      - **`trackingEventos`**
+
+        `array`
+
+        **Items:**
+
+        - **`at` (required)**
+
+          `string`
+
+        - **`status` (required)**
+
+          `string`
+
+        - **`description`**
+
+          `string`
+
+        - **`location`**
+
+          `string`
+
+      - **`transportista`**
+
+        `string`, possible values: `"correo_argentino", "andreani", "propio", "meli_full"` — Carrier for parcel shipping (#193).
+
+      - **`ultimoEventoAt`**
+
+        `string`, format: `date-time`
 
       - **`zona`**
 
@@ -67029,6 +68522,18 @@ Requires `orders.dispatch`. `planned` → `on_route`; pending items' OEs → `in
           "fecha": "",
           "estado": "pending",
           "nota": "",
+          "transportista": "correo_argentino",
+          "nroSeguimiento": "",
+          "estadoEnvio": "pending",
+          "ultimoEventoAt": "",
+          "trackingEventos": [
+            {
+              "at": "",
+              "status": "",
+              "description": "",
+              "location": ""
+            }
+          ],
           "dispatchedAt": "",
           "dispatchTimestampSource": "event",
           "items": [
@@ -67629,6 +69134,10 @@ Requires `orders.dispatch`. `on_route` → `completed`; pending items → `not_d
 
         `string`, possible values: `"pending", "picking", "ready", "assigned", "in_transit", "delivered", "failed", "cancelled"`
 
+      - **`estadoEnvio`**
+
+        `string`, possible values: `"pending", "in_transit", "delivered", "returned"` — Carrier shipment status (#193), independent of OE estado.
+
       - **`factura`**
 
         `object`
@@ -67679,6 +69188,10 @@ Requires `orders.dispatch`. `on_route` → `completed`; pending items → `not_d
 
         `string`
 
+      - **`nroSeguimiento`**
+
+        `string` — Carrier tracking number (#193).
+
       - **`picker`**
 
         `object`
@@ -67698,6 +69211,36 @@ Requires `orders.dispatch`. `on_route` → `completed`; pending items → `not_d
       - **`tenantId`**
 
         `integer`
+
+      - **`trackingEventos`**
+
+        `array`
+
+        **Items:**
+
+        - **`at` (required)**
+
+          `string`
+
+        - **`status` (required)**
+
+          `string`
+
+        - **`description`**
+
+          `string`
+
+        - **`location`**
+
+          `string`
+
+      - **`transportista`**
+
+        `string`, possible values: `"correo_argentino", "andreani", "propio", "meli_full"` — Carrier for parcel shipping (#193).
+
+      - **`ultimoEventoAt`**
+
+        `string`, format: `date-time`
 
       - **`zona`**
 
@@ -67851,6 +69394,18 @@ Requires `orders.dispatch`. `on_route` → `completed`; pending items → `not_d
           "fecha": "",
           "estado": "pending",
           "nota": "",
+          "transportista": "correo_argentino",
+          "nroSeguimiento": "",
+          "estadoEnvio": "pending",
+          "ultimoEventoAt": "",
+          "trackingEventos": [
+            {
+              "at": "",
+              "status": "",
+              "description": "",
+              "location": ""
+            }
+          ],
           "dispatchedAt": "",
           "dispatchTimestampSource": "event",
           "items": [
@@ -68137,6 +69692,10 @@ Requires `orders.deliver.confirm`. Route must be `on_route`; item `pending`. Dri
 
       `string`, possible values: `"pending", "picking", "ready", "assigned", "in_transit", "delivered", "failed", "cancelled"`
 
+    - **`estadoEnvio`**
+
+      `string`, possible values: `"pending", "in_transit", "delivered", "returned"` — Carrier shipment status (#193), independent of OE estado.
+
     - **`factura`**
 
       `object`
@@ -68187,6 +69746,10 @@ Requires `orders.deliver.confirm`. Route must be `on_route`; item `pending`. Dri
 
       `string`
 
+    - **`nroSeguimiento`**
+
+      `string` — Carrier tracking number (#193).
+
     - **`picker`**
 
       `object`
@@ -68206,6 +69769,36 @@ Requires `orders.deliver.confirm`. Route must be `on_route`; item `pending`. Dri
     - **`tenantId`**
 
       `integer`
+
+    - **`trackingEventos`**
+
+      `array`
+
+      **Items:**
+
+      - **`at` (required)**
+
+        `string`
+
+      - **`status` (required)**
+
+        `string`
+
+      - **`description`**
+
+        `string`
+
+      - **`location`**
+
+        `string`
+
+    - **`transportista`**
+
+      `string`, possible values: `"correo_argentino", "andreani", "propio", "meli_full"` — Carrier for parcel shipping (#193).
+
+    - **`ultimoEventoAt`**
+
+      `string`, format: `date-time`
 
     - **`zona`**
 
@@ -68276,6 +69869,18 @@ Requires `orders.deliver.confirm`. Route must be `on_route`; item `pending`. Dri
       "fecha": "",
       "estado": "pending",
       "nota": "",
+      "transportista": "correo_argentino",
+      "nroSeguimiento": "",
+      "estadoEnvio": "pending",
+      "ultimoEventoAt": "",
+      "trackingEventos": [
+        {
+          "at": "",
+          "status": "",
+          "description": "",
+          "location": ""
+        }
+      ],
       "dispatchedAt": "",
       "dispatchTimestampSource": "event",
       "items": [
@@ -68492,6 +70097,18 @@ Requires `logistics.read` and role `owner`, `manager`, or `logistics_planner` (n
       "fecha": "",
       "estado": "pending",
       "nota": "",
+      "transportista": "correo_argentino",
+      "nroSeguimiento": "",
+      "estadoEnvio": "pending",
+      "ultimoEventoAt": "",
+      "trackingEventos": [
+        {
+          "at": "",
+          "status": "",
+          "description": "",
+          "location": ""
+        }
+      ],
       "dispatchedAt": "",
       "dispatchTimestampSource": "event",
       "items": [
@@ -81931,6 +83548,10 @@ Rate-limited mutation; requires products.manage. USD only.
 
   `string`, possible values: `"pending", "picking", "ready", "assigned", "in_transit", "delivered", "failed", "cancelled"`
 
+* **`estadoEnvio`**
+
+  `string`, possible values: `"pending", "in_transit", "delivered", "returned"` — Carrier shipment status (#193), independent of OE estado.
+
 * **`factura`**
 
   `object`
@@ -81981,6 +83602,10 @@ Rate-limited mutation; requires products.manage. USD only.
 
   `string`
 
+* **`nroSeguimiento`**
+
+  `string` — Carrier tracking number (#193).
+
 * **`picker`**
 
   `object`
@@ -82000,6 +83625,36 @@ Rate-limited mutation; requires products.manage. USD only.
 * **`tenantId`**
 
   `integer`
+
+* **`trackingEventos`**
+
+  `array`
+
+  **Items:**
+
+  - **`at` (required)**
+
+    `string`
+
+  - **`status` (required)**
+
+    `string`
+
+  - **`description`**
+
+    `string`
+
+  - **`location`**
+
+    `string`
+
+* **`transportista`**
+
+  `string`, possible values: `"correo_argentino", "andreani", "propio", "meli_full"` — Carrier for parcel shipping (#193).
+
+* **`ultimoEventoAt`**
+
+  `string`, format: `date-time`
 
 * **`zona`**
 
@@ -82025,6 +83680,18 @@ Rate-limited mutation; requires products.manage. USD only.
   "fecha": "",
   "estado": "pending",
   "nota": "",
+  "transportista": "correo_argentino",
+  "nroSeguimiento": "",
+  "estadoEnvio": "pending",
+  "ultimoEventoAt": "",
+  "trackingEventos": [
+    {
+      "at": "",
+      "status": "",
+      "description": "",
+      "location": ""
+    }
+  ],
   "dispatchedAt": "",
   "dispatchTimestampSource": "event",
   "items": [
@@ -82213,6 +83880,10 @@ Rate-limited mutation; requires products.manage. USD only.
 
     `string`, possible values: `"pending", "picking", "ready", "assigned", "in_transit", "delivered", "failed", "cancelled"`
 
+  - **`estadoEnvio`**
+
+    `string`, possible values: `"pending", "in_transit", "delivered", "returned"` — Carrier shipment status (#193), independent of OE estado.
+
   - **`factura`**
 
     `object`
@@ -82263,6 +83934,10 @@ Rate-limited mutation; requires products.manage. USD only.
 
     `string`
 
+  - **`nroSeguimiento`**
+
+    `string` — Carrier tracking number (#193).
+
   - **`picker`**
 
     `object`
@@ -82282,6 +83957,36 @@ Rate-limited mutation; requires products.manage. USD only.
   - **`tenantId`**
 
     `integer`
+
+  - **`trackingEventos`**
+
+    `array`
+
+    **Items:**
+
+    - **`at` (required)**
+
+      `string`
+
+    - **`status` (required)**
+
+      `string`
+
+    - **`description`**
+
+      `string`
+
+    - **`location`**
+
+      `string`
+
+  - **`transportista`**
+
+    `string`, possible values: `"correo_argentino", "andreani", "propio", "meli_full"` — Carrier for parcel shipping (#193).
+
+  - **`ultimoEventoAt`**
+
+    `string`, format: `date-time`
 
   - **`zona`**
 
@@ -82313,6 +84018,18 @@ Rate-limited mutation; requires products.manage. USD only.
     "fecha": "",
     "estado": "pending",
     "nota": "",
+    "transportista": "correo_argentino",
+    "nroSeguimiento": "",
+    "estadoEnvio": "pending",
+    "ultimoEventoAt": "",
+    "trackingEventos": [
+      {
+        "at": "",
+        "status": "",
+        "description": "",
+        "location": ""
+      }
+    ],
     "dispatchedAt": "",
     "dispatchTimestampSource": "event",
     "items": [
@@ -82342,6 +84059,350 @@ Rate-limited mutation; requires products.manage. USD only.
       "additionalProperty": "anything"
     },
     "additionalProperty": "anything"
+  }
+}
+```
+
+### ShippingTrackingEvent
+
+- **Type:**`object`
+
+* **`at` (required)**
+
+  `string`
+
+* **`status` (required)**
+
+  `string`
+
+* **`description`**
+
+  `string`
+
+* **`location`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "at": "",
+  "status": "",
+  "description": "",
+  "location": ""
+}
+```
+
+### OrdenEntregaTrackingAssignInput
+
+- **Type:**`object`
+
+* **`nroSeguimiento` (required)**
+
+  `string`
+
+* **`transportista` (required)**
+
+  `string`, possible values: `"correo_argentino", "andreani", "propio", "meli_full"`
+
+* **`estadoEnvio`**
+
+  `string`, possible values: `"pending", "in_transit", "delivered", "returned"`
+
+**Example:**
+
+```json
+{
+  "transportista": "correo_argentino",
+  "nroSeguimiento": "",
+  "estadoEnvio": "pending"
+}
+```
+
+### OrdenEntregaTrackingView
+
+- **Type:**`object`
+
+* **`fromCache` (required)**
+
+  `boolean`
+
+* **`ordenEntregaId` (required)**
+
+  `integer`
+
+* **`refreshed` (required)**
+
+  `boolean`
+
+* **`trackingEventos` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`at` (required)**
+
+    `string`
+
+  - **`status` (required)**
+
+    `string`
+
+  - **`description`**
+
+    `string`
+
+  - **`location`**
+
+    `string`
+
+* **`estadoEnvio`**
+
+  `string`, possible values: `"pending", "in_transit", "delivered", "returned"`
+
+* **`nroSeguimiento`**
+
+  `string`
+
+* **`portalUrl`**
+
+  `string`
+
+* **`transportista`**
+
+  `string`, possible values: `"correo_argentino", "andreani", "propio", "meli_full"`
+
+* **`ultimoEventoAt`**
+
+  `string`, format: `date-time`
+
+**Example:**
+
+```json
+{
+  "ordenEntregaId": 1,
+  "transportista": "correo_argentino",
+  "nroSeguimiento": "",
+  "estadoEnvio": "pending",
+  "ultimoEventoAt": "",
+  "trackingEventos": [
+    {
+      "at": "",
+      "status": "",
+      "description": "",
+      "location": ""
+    }
+  ],
+  "portalUrl": "",
+  "fromCache": true,
+  "refreshed": true
+}
+```
+
+### OrdenEntregaTrackingEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`fromCache` (required)**
+
+    `boolean`
+
+  - **`ordenEntregaId` (required)**
+
+    `integer`
+
+  - **`refreshed` (required)**
+
+    `boolean`
+
+  - **`trackingEventos` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`at` (required)**
+
+      `string`
+
+    - **`status` (required)**
+
+      `string`
+
+    - **`description`**
+
+      `string`
+
+    - **`location`**
+
+      `string`
+
+  - **`estadoEnvio`**
+
+    `string`, possible values: `"pending", "in_transit", "delivered", "returned"`
+
+  - **`nroSeguimiento`**
+
+    `string`
+
+  - **`portalUrl`**
+
+    `string`
+
+  - **`transportista`**
+
+    `string`, possible values: `"correo_argentino", "andreani", "propio", "meli_full"`
+
+  - **`ultimoEventoAt`**
+
+    `string`, format: `date-time`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "ordenEntregaId": 1,
+    "transportista": "correo_argentino",
+    "nroSeguimiento": "",
+    "estadoEnvio": "pending",
+    "ultimoEventoAt": "",
+    "trackingEventos": [
+      {
+        "at": "",
+        "status": "",
+        "description": "",
+        "location": ""
+      }
+    ],
+    "portalUrl": "",
+    "fromCache": true,
+    "refreshed": true
+  }
+}
+```
+
+### ShippingCarrierConfigUpsertInput
+
+- **Type:**`object`
+
+* **`password` (required)**
+
+  `string`
+
+* **`username` (required)**
+
+  `string`
+
+* **`activo`**
+
+  `boolean`
+
+* **`sandboxMode`**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "username": "",
+  "password": "",
+  "sandboxMode": true,
+  "activo": true
+}
+```
+
+### ShippingCarrierConfigPublic
+
+- **Type:**`object`
+
+* **`activo` (required)**
+
+  `boolean`
+
+* **`carrier` (required)**
+
+  `string`, possible values: `"andreani", "correo_argentino"`
+
+* **`sandboxMode` (required)**
+
+  `boolean`
+
+* **`updatedAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`usernameLast4` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "carrier": "andreani",
+  "usernameLast4": "",
+  "sandboxMode": true,
+  "activo": true,
+  "updatedAt": ""
+}
+```
+
+### ShippingCarrierConfigEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`activo` (required)**
+
+    `boolean`
+
+  - **`carrier` (required)**
+
+    `string`, possible values: `"andreani", "correo_argentino"`
+
+  - **`sandboxMode` (required)**
+
+    `boolean`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`usernameLast4` (required)**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "carrier": "andreani",
+    "usernameLast4": "",
+    "sandboxMode": true,
+    "activo": true,
+    "updatedAt": ""
   }
 }
 ```
@@ -89734,6 +91795,10 @@ Rate-limited mutation; requires products.manage. USD only.
 
     `string`, possible values: `"pending", "picking", "ready", "assigned", "in_transit", "delivered", "failed", "cancelled"`
 
+  - **`estadoEnvio`**
+
+    `string`, possible values: `"pending", "in_transit", "delivered", "returned"` — Carrier shipment status (#193), independent of OE estado.
+
   - **`factura`**
 
     `object`
@@ -89784,6 +91849,10 @@ Rate-limited mutation; requires products.manage. USD only.
 
     `string`
 
+  - **`nroSeguimiento`**
+
+    `string` — Carrier tracking number (#193).
+
   - **`picker`**
 
     `object`
@@ -89803,6 +91872,36 @@ Rate-limited mutation; requires products.manage. USD only.
   - **`tenantId`**
 
     `integer`
+
+  - **`trackingEventos`**
+
+    `array`
+
+    **Items:**
+
+    - **`at` (required)**
+
+      `string`
+
+    - **`status` (required)**
+
+      `string`
+
+    - **`description`**
+
+      `string`
+
+    - **`location`**
+
+      `string`
+
+  - **`transportista`**
+
+    `string`, possible values: `"correo_argentino", "andreani", "propio", "meli_full"` — Carrier for parcel shipping (#193).
+
+  - **`ultimoEventoAt`**
+
+    `string`, format: `date-time`
 
   - **`zona`**
 
@@ -89867,6 +91966,18 @@ Rate-limited mutation; requires products.manage. USD only.
     "fecha": "",
     "estado": "pending",
     "nota": "",
+    "transportista": "correo_argentino",
+    "nroSeguimiento": "",
+    "estadoEnvio": "pending",
+    "ultimoEventoAt": "",
+    "trackingEventos": [
+      {
+        "at": "",
+        "status": "",
+        "description": "",
+        "location": ""
+      }
+    ],
     "dispatchedAt": "",
     "dispatchTimestampSource": "event",
     "items": [
@@ -90014,6 +92125,18 @@ Rate-limited mutation; requires products.manage. USD only.
       "fecha": "",
       "estado": "pending",
       "nota": "",
+      "transportista": "correo_argentino",
+      "nroSeguimiento": "",
+      "estadoEnvio": "pending",
+      "ultimoEventoAt": "",
+      "trackingEventos": [
+        {
+          "at": "",
+          "status": "",
+          "description": "",
+          "location": ""
+        }
+      ],
       "dispatchedAt": "",
       "dispatchTimestampSource": "event",
       "items": [
@@ -90104,6 +92227,10 @@ Rate-limited mutation; requires products.manage. USD only.
 
       `string`, possible values: `"pending", "picking", "ready", "assigned", "in_transit", "delivered", "failed", "cancelled"`
 
+    - **`estadoEnvio`**
+
+      `string`, possible values: `"pending", "in_transit", "delivered", "returned"` — Carrier shipment status (#193), independent of OE estado.
+
     - **`factura`**
 
       `object`
@@ -90154,6 +92281,10 @@ Rate-limited mutation; requires products.manage. USD only.
 
       `string`
 
+    - **`nroSeguimiento`**
+
+      `string` — Carrier tracking number (#193).
+
     - **`picker`**
 
       `object`
@@ -90173,6 +92304,36 @@ Rate-limited mutation; requires products.manage. USD only.
     - **`tenantId`**
 
       `integer`
+
+    - **`trackingEventos`**
+
+      `array`
+
+      **Items:**
+
+      - **`at` (required)**
+
+        `string`
+
+      - **`status` (required)**
+
+        `string`
+
+      - **`description`**
+
+        `string`
+
+      - **`location`**
+
+        `string`
+
+    - **`transportista`**
+
+      `string`, possible values: `"correo_argentino", "andreani", "propio", "meli_full"` — Carrier for parcel shipping (#193).
+
+    - **`ultimoEventoAt`**
+
+      `string`, format: `date-time`
 
     - **`zona`**
 
@@ -90243,6 +92404,18 @@ Rate-limited mutation; requires products.manage. USD only.
       "fecha": "",
       "estado": "pending",
       "nota": "",
+      "transportista": "correo_argentino",
+      "nroSeguimiento": "",
+      "estadoEnvio": "pending",
+      "ultimoEventoAt": "",
+      "trackingEventos": [
+        {
+          "at": "",
+          "status": "",
+          "description": "",
+          "location": ""
+        }
+      ],
       "dispatchedAt": "",
       "dispatchTimestampSource": "event",
       "items": [
@@ -90347,6 +92520,10 @@ Rate-limited mutation; requires products.manage. USD only.
 
       `string`, possible values: `"pending", "picking", "ready", "assigned", "in_transit", "delivered", "failed", "cancelled"`
 
+    - **`estadoEnvio`**
+
+      `string`, possible values: `"pending", "in_transit", "delivered", "returned"` — Carrier shipment status (#193), independent of OE estado.
+
     - **`factura`**
 
       `object`
@@ -90397,6 +92574,10 @@ Rate-limited mutation; requires products.manage. USD only.
 
       `string`
 
+    - **`nroSeguimiento`**
+
+      `string` — Carrier tracking number (#193).
+
     - **`picker`**
 
       `object`
@@ -90416,6 +92597,36 @@ Rate-limited mutation; requires products.manage. USD only.
     - **`tenantId`**
 
       `integer`
+
+    - **`trackingEventos`**
+
+      `array`
+
+      **Items:**
+
+      - **`at` (required)**
+
+        `string`
+
+      - **`status` (required)**
+
+        `string`
+
+      - **`description`**
+
+        `string`
+
+      - **`location`**
+
+        `string`
+
+    - **`transportista`**
+
+      `string`, possible values: `"correo_argentino", "andreani", "propio", "meli_full"` — Carrier for parcel shipping (#193).
+
+    - **`ultimoEventoAt`**
+
+      `string`, format: `date-time`
 
     - **`zona`**
 
@@ -90543,6 +92754,18 @@ Rate-limited mutation; requires products.manage. USD only.
         "fecha": "",
         "estado": "pending",
         "nota": "",
+        "transportista": "correo_argentino",
+        "nroSeguimiento": "",
+        "estadoEnvio": "pending",
+        "ultimoEventoAt": "",
+        "trackingEventos": [
+          {
+            "at": "",
+            "status": "",
+            "description": "",
+            "location": ""
+          }
+        ],
         "dispatchedAt": "",
         "dispatchTimestampSource": "event",
         "items": [
@@ -90705,6 +92928,10 @@ Rate-limited mutation; requires products.manage. USD only.
 
         `string`, possible values: `"pending", "picking", "ready", "assigned", "in_transit", "delivered", "failed", "cancelled"`
 
+      - **`estadoEnvio`**
+
+        `string`, possible values: `"pending", "in_transit", "delivered", "returned"` — Carrier shipment status (#193), independent of OE estado.
+
       - **`factura`**
 
         `object`
@@ -90755,6 +92982,10 @@ Rate-limited mutation; requires products.manage. USD only.
 
         `string`
 
+      - **`nroSeguimiento`**
+
+        `string` — Carrier tracking number (#193).
+
       - **`picker`**
 
         `object`
@@ -90774,6 +93005,36 @@ Rate-limited mutation; requires products.manage. USD only.
       - **`tenantId`**
 
         `integer`
+
+      - **`trackingEventos`**
+
+        `array`
+
+        **Items:**
+
+        - **`at` (required)**
+
+          `string`
+
+        - **`status` (required)**
+
+          `string`
+
+        - **`description`**
+
+          `string`
+
+        - **`location`**
+
+          `string`
+
+      - **`transportista`**
+
+        `string`, possible values: `"correo_argentino", "andreani", "propio", "meli_full"` — Carrier for parcel shipping (#193).
+
+      - **`ultimoEventoAt`**
+
+        `string`, format: `date-time`
 
       - **`zona`**
 
@@ -90907,6 +93168,18 @@ Rate-limited mutation; requires products.manage. USD only.
           "fecha": "",
           "estado": "pending",
           "nota": "",
+          "transportista": "correo_argentino",
+          "nroSeguimiento": "",
+          "estadoEnvio": "pending",
+          "ultimoEventoAt": "",
+          "trackingEventos": [
+            {
+              "at": "",
+              "status": "",
+              "description": "",
+              "location": ""
+            }
+          ],
           "dispatchedAt": "",
           "dispatchTimestampSource": "event",
           "items": [
@@ -91053,6 +93326,10 @@ Rate-limited mutation; requires products.manage. USD only.
 
         `string`, possible values: `"pending", "picking", "ready", "assigned", "in_transit", "delivered", "failed", "cancelled"`
 
+      - **`estadoEnvio`**
+
+        `string`, possible values: `"pending", "in_transit", "delivered", "returned"` — Carrier shipment status (#193), independent of OE estado.
+
       - **`factura`**
 
         `object`
@@ -91103,6 +93380,10 @@ Rate-limited mutation; requires products.manage. USD only.
 
         `string`
 
+      - **`nroSeguimiento`**
+
+        `string` — Carrier tracking number (#193).
+
       - **`picker`**
 
         `object`
@@ -91122,6 +93403,36 @@ Rate-limited mutation; requires products.manage. USD only.
       - **`tenantId`**
 
         `integer`
+
+      - **`trackingEventos`**
+
+        `array`
+
+        **Items:**
+
+        - **`at` (required)**
+
+          `string`
+
+        - **`status` (required)**
+
+          `string`
+
+        - **`description`**
+
+          `string`
+
+        - **`location`**
+
+          `string`
+
+      - **`transportista`**
+
+        `string`, possible values: `"correo_argentino", "andreani", "propio", "meli_full"` — Carrier for parcel shipping (#193).
+
+      - **`ultimoEventoAt`**
+
+        `string`, format: `date-time`
 
       - **`zona`**
 
@@ -91275,6 +93586,18 @@ Rate-limited mutation; requires products.manage. USD only.
           "fecha": "",
           "estado": "pending",
           "nota": "",
+          "transportista": "correo_argentino",
+          "nroSeguimiento": "",
+          "estadoEnvio": "pending",
+          "ultimoEventoAt": "",
+          "trackingEventos": [
+            {
+              "at": "",
+              "status": "",
+              "description": "",
+              "location": ""
+            }
+          ],
           "dispatchedAt": "",
           "dispatchTimestampSource": "event",
           "items": [

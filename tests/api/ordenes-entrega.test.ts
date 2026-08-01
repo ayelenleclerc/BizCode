@@ -19,6 +19,11 @@ const ORDEN_BASE = {
   fecha: new Date('2026-05-16T12:00:00.000Z'),
   estado: 'in_transit',
   nota: null,
+  transportista: null,
+  nroSeguimiento: null,
+  estadoEnvio: null,
+  ultimoEventoAt: null,
+  trackingEventos: null,
   createdAt: new Date(),
   updatedAt: new Date(),
   cliente: CLIENTE_REF,
@@ -69,6 +74,19 @@ function buildPrismaMock(overrides: Partial<Record<string, unknown>> = {}): Pris
       findFirst: vi.fn().mockResolvedValue(ORDEN_BASE),
       create: vi.fn().mockResolvedValue({ ...ORDEN_BASE, id: 2, estado: 'assigned' }),
       update: vi.fn().mockResolvedValue({ ...ORDEN_BASE, estado: 'delivered' }),
+    },
+    shippingCarrierConfig: {
+      findUnique: vi.fn().mockResolvedValue(null),
+      upsert: vi.fn().mockResolvedValue({
+        id: 1,
+        tenantId: 1,
+        carrier: 'andreani',
+        usernameLast4: 'demo',
+        sandboxMode: true,
+        activo: true,
+        updatedAt: new Date(),
+      }),
+      findMany: vi.fn().mockResolvedValue([]),
     },
     notification: {
       findMany: vi.fn().mockResolvedValue([]),
@@ -384,5 +402,54 @@ describe('POST /api/ordenes-entrega/:id/lista', () => {
     })
     const app = createApp(prisma)
     await request(app).post('/api/ordenes-entrega/1/lista').expect(409)
+  })
+})
+
+describe('GET/POST /api/ordenes-entrega/:id/tracking (#193)', () => {
+  beforeEach(() => {
+    process.env.NODE_ENV = 'test'
+    process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
+    process.env.BIZCODE_TEST_ROLE = 'logistics_planner'
+  })
+
+  it('assigns manual tracking without carrier credentials', async () => {
+    const updated = {
+      ...ORDEN_BASE,
+      transportista: 'andreani',
+      nroSeguimiento: 'AND123',
+      estadoEnvio: 'pending',
+      ultimoEventoAt: new Date(),
+    }
+    const prisma = buildPrismaMock({
+      ordenEntrega: {
+        count: vi.fn(),
+        findMany: vi.fn(),
+        findFirst: vi.fn().mockResolvedValue(ORDEN_BASE),
+        create: vi.fn(),
+        update: vi.fn().mockResolvedValue(updated),
+      },
+    })
+    const app = createApp(prisma)
+    const res = await request(app)
+      .post('/api/ordenes-entrega/1/tracking')
+      .send({ transportista: 'andreani', nroSeguimiento: 'AND123' })
+      .expect(200)
+    expect(res.body.data.nroSeguimiento).toBe('AND123')
+    expect(res.body.data.portalUrl).toContain('andreani.com')
+  })
+
+  it('returns empty tracking when not assigned', async () => {
+    const prisma = buildPrismaMock()
+    const app = createApp(prisma)
+    const res = await request(app).get('/api/ordenes-entrega/1/tracking').expect(200)
+    expect(res.body.data.nroSeguimiento).toBeNull()
+    expect(res.body.data.trackingEventos).toEqual([])
+  })
+
+  it('GET by id returns orden', async () => {
+    const prisma = buildPrismaMock()
+    const app = createApp(prisma)
+    const res = await request(app).get('/api/ordenes-entrega/1').expect(200)
+    expect(res.body.data.id).toBe(1)
   })
 })

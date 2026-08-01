@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "estadoEnvio": {
+      "enum": [
+        "pending",
+        "in_transit",
+        "delivered",
+        "returned"
+      ],
+      "nullable": true,
+      "type": "string"
+    },
+    "fromCache": {
+      "type": "boolean"
+    },
+    "nroSeguimiento": {
+      "nullable": true,
+      "type": "string"
+    },
+    "ordenEntregaId": {
+      "type": "integer"
+    },
+    "portalUrl": {
+      "nullable": true,
+      "type": "string"
+    },
+    "refreshed": {
+      "type": "boolean"
+    },
+    "trackingEventos": {
+      "items": {
+        "$ref": "./ShippingTrackingEvent.schema.json"
+      },
+      "type": "array"
+    },
+    "transportista": {
+      "enum": [
+        "correo_argentino",
+        "andreani",
+        "propio",
+        "meli_full"
+      ],
+      "nullable": true,
+      "type": "string"
+    },
+    "ultimoEventoAt": {
+      "format": "date-time",
+      "nullable": true,
+      "type": "string"
+    }
+  },
+  "required": [
+    "ordenEntregaId",
+    "trackingEventos",
+    "fromCache",
+    "refreshed"
+  ],
+  "title": "OrdenEntregaTrackingView",
+  "type": "object"
+}

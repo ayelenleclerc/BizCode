@@ -8,6 +8,7 @@ import { CanAccess } from '@/components/CanAccess'
 import { useAuth } from '@/contexts/AuthContext'
 import { useFeatureFlags } from '@/contexts/FeatureFlagsContext'
 import LogisticaReportesPanel from './LogisticaReportesPanel'
+import OrdenEntregaShippingPanel from './OrdenEntregaShippingPanel'
 import {
   ordenesEntregaAPI,
   zonasEntregaAPI,
@@ -77,6 +78,7 @@ function LogisticaPageContent() {
   const canDispatch = claims?.permissions.includes('orders.dispatch') ?? false
   const canDeliver = claims?.permissions.includes('orders.deliver.confirm') ?? false
   const canCreate = claims?.permissions.includes('orders.create') ?? false
+  const canManageLogistics = claims?.permissions.includes('logistics.manage') ?? false
   const canPick = claims?.permissions.includes('orders.pick') ?? false
   const showPickingLink = canPick && hasModule('logistics.picking')
   const showReportesTab =
@@ -458,6 +460,13 @@ function LogisticaPageContent() {
             </tbody>
           </table>
         </div>
+      )}
+
+      {!loading && ordenes[selectedRow] && (
+        <OrdenEntregaShippingPanel
+          orden={ordenes[selectedRow]}
+          canManage={canManageLogistics && !isDriver}
+        />
       )}
 
       {showForm && canCreate && (

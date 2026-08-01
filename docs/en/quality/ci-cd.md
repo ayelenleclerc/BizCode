@@ -267,11 +267,12 @@ These jobs are **not** run by GitHub Actions in the default pipeline; schedule t
 | Schedule | Command | Purpose |
 |---|---|---|
 | `*/5 * * * *` | `npm run arca:retry-pending-job` | Retry `estadoCae: pending` invoices via homologación WSFE mock (`ArcaService.retryPending`) for every tenant with `TenantFiscalConfig`. |
+| `0 */2 * * *` | `npm run shipping:tracking-refresh` | Refresh in-flight carrier tracking (`ShippingTrackingService`) for tenants with active `ShippingCarrierConfig`; notifies managers when status becomes delivered (#193). |
 | `0 * * * *` (hourly) | `npm run cobranzas:recordatorios` | Overdue collection reminders for every tenant with `ParamEmpresa`; sends at **08:00 tenant local** (minute &lt; 15) within configured business hours. Use `0 8 * * *` only for single–time zone deployments. |
 | `0 * * * *` (hourly) | `npm run mercadopago:reconciliacion` | Mercado Pago payment reconciliation for every tenant with `MercadoPagoConfig` active; runs at **02:00 tenant local** (minute &lt; 15). Use `0 2 * * *` only for single–time zone deployments. |
 | `0 2 * * *` (UTC) | `npm run backup:postgres` then `npm run backup:postgres:prune` | Encrypted PostgreSQL backup to `BIZCODE_BACKUP_DIR` (+ optional S3 CLI). Requires `BACKUP_ENCRYPTION_KEY`. See [backup-and-restore.md](backup-and-restore.md). |
 
-Optional env for a single tenant in dev/staging: `BIZCODE_TENANT_ID=<id>` (applies to `arca:retry-pending-job`, `arca:retry-pending`, `cobranzas:recordatorios`, and `mercadopago:reconciliacion`). Optional `BIZCODE_RECORDATORIO_CANAL` (default `email`).
+Optional env for a single tenant in dev/staging: `BIZCODE_TENANT_ID=<id>` (applies to `arca:retry-pending-job`, `arca:retry-pending`, `cobranzas:recordatorios`, `mercadopago:reconciliacion`, and `shipping:tracking-refresh`). Optional `BIZCODE_RECORDATORIO_CANAL` (default `email`).
 
 Documentation governance (Wiki vs controlled docs):
 

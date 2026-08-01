@@ -78,6 +78,7 @@
     "backup:postgres:prune": "tsx scripts/prune-postgres-backups.ts",
     "arca:retry-pending": "tsx scripts/arca-retry-pending.ts",
     "arca:retry-pending-job": "tsx scripts/arca-retry-pending-job.ts",
+    "shipping:tracking-refresh": "tsx scripts/shipping-tracking-refresh-job.ts",
     "backfill:cliente-cc": "tsx scripts/backfill-cliente-cc.ts",
     "inspect:dbf-all": "tsx scripts/inspect-dbf-all.ts",
     "release": "semantic-release"

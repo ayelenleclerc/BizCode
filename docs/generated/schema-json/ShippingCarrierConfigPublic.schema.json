@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "activo": {
+      "type": "boolean"
+    },
+    "carrier": {
+      "enum": [
+        "andreani",
+        "correo_argentino"
+      ],
+      "type": "string"
+    },
+    "sandboxMode": {
+      "type": "boolean"
+    },
+    "updatedAt": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "usernameLast4": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "carrier",
+    "usernameLast4",
+    "sandboxMode",
+    "activo",
+    "updatedAt"
+  ],
+  "title": "ShippingCarrierConfigPublic",
+  "type": "object"
+}

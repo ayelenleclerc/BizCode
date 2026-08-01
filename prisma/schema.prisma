@@ -1551,6 +1551,7 @@ model Tenant {
   mercadoPagoReconciliationEntries MercadoPagoReconciliationEntry[]
   mercadoPagoRefunds            MercadoPagoRefund[]
   mercadoPagoChargebacks        MercadoPagoChargeback[]
+  shippingCarrierConfigs        ShippingCarrierConfig[]
   configsComision               ConfigComision[]
   liquidacionesComision         LiquidacionComision[]
   importJobs                    ImportJob[]
@@ -1847,6 +1848,18 @@ model OrdenEntrega {
   /// pending | picking | ready | assigned | in_transit | delivered | failed | cancelled
   estado    String    @db.VarChar(20) @default("pending")
   nota      String?   @db.VarChar(200)
+  /// @en Carrier for parcel shipping (#193). @es Transportista del envío postal (#193). @pt-BR Transportadora do envio (#193).
+  /// correo_argentino | andreani | propio | meli_full
+  transportista String? @db.VarChar(40)
+  /// @en Carrier tracking number (#193). @es Número de seguimiento del transportista (#193). @pt-BR Número de rastreio (#193).
+  nroSeguimiento String? @db.VarChar(80)
+  /// @en Carrier shipment status (#193), independent of OE `estado`. @es Estado del envío en el carrier (#193). @pt-BR Status do envio no carrier (#193).
+  /// pending | in_transit | delivered | returned
+  estadoEnvio String? @db.VarChar(20)
+  /// @en Last carrier event / cache timestamp (#193). @es Último evento / cache del carrier (#193). @pt-BR Último evento / cache do carrier (#193).
+  ultimoEventoAt DateTime?
+  /// @en Cached tracking timeline JSON (#193). @es Timeline de tracking en caché (#193). @pt-BR Timeline de rastreio em cache (#193).
+  trackingEventos Json?
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 
@@ -1859,6 +1872,26 @@ model OrdenEntrega {
   @@index([tenantId, pickerUserId])
   @@index([tenantId, dispatchedAt])
   @@index([tenantId, depositoId])
+  @@index([tenantId, estadoEnvio])
+}
+
+/// Per-tenant courier API credentials (#193); secrets encrypted at rest.
+model ShippingCarrierConfig {
+  id                   Int      @id @default(autoincrement())
+  tenantId             Int
+  tenant               Tenant   @relation(fields: [tenantId], references: [id])
+  /// andreani | correo_argentino
+  carrier              String   @db.VarChar(40)
+  usernameEncrypted    String   @db.Text
+  passwordEncrypted    String   @db.Text
+  usernameLast4        String   @db.VarChar(4)
+  sandboxMode          Boolean  @default(true)
+  activo               Boolean  @default(true)
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  @@unique([tenantId, carrier])
+  @@index([tenantId, activo])
 }
 
 /// Delivery route grouping delivery orders (#140).

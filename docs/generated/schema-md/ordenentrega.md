@@ -25,17 +25,22 @@ undefined#/properties/ordenEntrega
 | [driver](#driver)                                   | `object`  | Optional | cannot be null | [OrdenEntrega](ordenentrega-properties-driver.md "undefined#/properties/driver")                                   |
 | [driverId](#driverid)                               | `integer` | Optional | cannot be null | [OrdenEntrega](ordenentrega-properties-driverid.md "undefined#/properties/driverId")                               |
 | [estado](#estado)                                   | `string`  | Optional | cannot be null | [OrdenEntrega](ordenentrega-properties-estado.md "undefined#/properties/estado")                                   |
+| [estadoEnvio](#estadoenvio)                         | `string`  | Optional | cannot be null | [OrdenEntrega](ordenentrega-properties-estadoenvio.md "undefined#/properties/estadoEnvio")                         |
 | [factura](#factura)                                 | `object`  | Optional | cannot be null | [OrdenEntrega](ordenentrega-properties-factura.md "undefined#/properties/factura")                                 |
 | [facturaId](#facturaid)                             | `integer` | Optional | cannot be null | [OrdenEntrega](ordenentrega-properties-facturaid.md "undefined#/properties/facturaId")                             |
 | [fecha](#fecha)                                     | `string`  | Optional | cannot be null | [OrdenEntrega](ordenentrega-properties-fecha.md "undefined#/properties/fecha")                                     |
 | [id](#id)                                           | `integer` | Optional | cannot be null | [OrdenEntrega](ordenentrega-properties-id.md "undefined#/properties/id")                                           |
 | [items](#items)                                     | `array`   | Optional | cannot be null | [OrdenEntrega](ordenentrega-properties-items.md "undefined#/properties/items")                                     |
 | [nota](#nota)                                       | `string`  | Optional | cannot be null | [OrdenEntrega](ordenentrega-properties-nota.md "undefined#/properties/nota")                                       |
+| [nroSeguimiento](#nroseguimiento)                   | `string`  | Optional | cannot be null | [OrdenEntrega](ordenentrega-properties-nroseguimiento.md "undefined#/properties/nroSeguimiento")                   |
 | [picker](#picker)                                   | `object`  | Optional | cannot be null | [OrdenEntrega](ordenentrega-properties-picker.md "undefined#/properties/picker")                                   |
 | [pickerUserId](#pickeruserid)                       | `integer` | Optional | cannot be null | [OrdenEntrega](ordenentrega-properties-pickeruserid.md "undefined#/properties/pickerUserId")                       |
 | [pickingIniciadoAt](#pickinginiciadoat)             | `string`  | Optional | cannot be null | [OrdenEntrega](ordenentrega-properties-pickinginiciadoat.md "undefined#/properties/pickingIniciadoAt")             |
 | [pickingListoAt](#pickinglistoat)                   | `string`  | Optional | cannot be null | [OrdenEntrega](ordenentrega-properties-pickinglistoat.md "undefined#/properties/pickingListoAt")                   |
 | [tenantId](#tenantid)                               | `integer` | Optional | cannot be null | [OrdenEntrega](ordenentrega-properties-tenantid.md "undefined#/properties/tenantId")                               |
+| [trackingEventos](#trackingeventos)                 | `array`   | Optional | cannot be null | [OrdenEntrega](ordenentrega-properties-trackingeventos.md "undefined#/properties/trackingEventos")                 |
+| [transportista](#transportista)                     | `string`  | Optional | cannot be null | [OrdenEntrega](ordenentrega-properties-transportista.md "undefined#/properties/transportista")                     |
+| [ultimoEventoAt](#ultimoeventoat)                   | `string`  | Optional | cannot be null | [OrdenEntrega](ordenentrega-properties-ultimoeventoat.md "undefined#/properties/ultimoEventoAt")                   |
 | [zona](#zona)                                       | `object`  | Optional | cannot be null | [OrdenEntrega](ordenentrega-properties-zona.md "undefined#/properties/zona")                                       |
 | [zonaId](#zonaid)                                   | `integer` | Optional | cannot be null | [OrdenEntrega](ordenentrega-properties-zonaid.md "undefined#/properties/zonaId")                                   |
 | Additional Properties                               | Any       | Optional | can be null    |                                                                                                                    |
@@ -194,6 +199,35 @@ When the order entered in\_transit (ADR-0011).
 | `"failed"`     |             |
 | `"cancelled"`  |             |
 
+## estadoEnvio
+
+Carrier shipment status (#193), independent of OE estado.
+
+`estadoEnvio`
+
+* is optional
+
+* Type: `string`
+
+* cannot be null
+
+* defined in: [OrdenEntrega](ordenentrega-properties-estadoenvio.md "undefined#/properties/estadoEnvio")
+
+### estadoEnvio Type
+
+`string`
+
+### estadoEnvio Constraints
+
+**enum**: the value of this property must be equal to one of the following values:
+
+| Value          | Explanation |
+| :------------- | :---------- |
+| `"pending"`    |             |
+| `"in_transit"` |             |
+| `"delivered"`  |             |
+| `"returned"`   |             |
+
 ## factura
 
 
@@ -306,6 +340,24 @@ When the order entered in\_transit (ADR-0011).
 
 `string`
 
+## nroSeguimiento
+
+Carrier tracking number (#193).
+
+`nroSeguimiento`
+
+* is optional
+
+* Type: `string`
+
+* cannot be null
+
+* defined in: [OrdenEntrega](ordenentrega-properties-nroseguimiento.md "undefined#/properties/nroSeguimiento")
+
+### nroSeguimiento Type
+
+`string`
+
 ## picker
 
 
@@ -403,6 +455,75 @@ When the order entered in\_transit (ADR-0011).
 ### tenantId Type
 
 `integer`
+
+## trackingEventos
+
+
+
+`trackingEventos`
+
+* is optional
+
+* Type: `object[]` ([ShippingTrackingEvent](shippingtrackingevent.md))
+
+* cannot be null
+
+* defined in: [OrdenEntrega](ordenentrega-properties-trackingeventos.md "undefined#/properties/trackingEventos")
+
+### trackingEventos Type
+
+`object[]` ([ShippingTrackingEvent](shippingtrackingevent.md))
+
+## transportista
+
+Carrier for parcel shipping (#193).
+
+`transportista`
+
+* is optional
+
+* Type: `string`
+
+* cannot be null
+
+* defined in: [OrdenEntrega](ordenentrega-properties-transportista.md "undefined#/properties/transportista")
+
+### transportista Type
+
+`string`
+
+### transportista Constraints
+
+**enum**: the value of this property must be equal to one of the following values:
+
+| Value                | Explanation |
+| :------------------- | :---------- |
+| `"correo_argentino"` |             |
+| `"andreani"`         |             |
+| `"propio"`           |             |
+| `"meli_full"`        |             |
+
+## ultimoEventoAt
+
+
+
+`ultimoEventoAt`
+
+* is optional
+
+* Type: `string`
+
+* cannot be null
+
+* defined in: [OrdenEntrega](ordenentrega-properties-ultimoeventoat.md "undefined#/properties/ultimoEventoAt")
+
+### ultimoEventoAt Type
+
+`string`
+
+### ultimoEventoAt Constraints
+
+**date time**: the string must be a date time string, according to [RFC 3339, section 5.6](https://tools.ietf.org/html/rfc3339 "check the specification")
 
 ## zona
 

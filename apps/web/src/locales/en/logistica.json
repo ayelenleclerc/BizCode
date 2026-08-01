@@ -59,5 +59,33 @@
     "title": "My deliveries today",
     "confirm": "Confirm delivery",
     "routeLink": "My route in progress"
+  },
+  "shipping": {
+    "title": "Shipment — order #{{id}}",
+    "carrier": "Carrier",
+    "number": "Tracking number",
+    "status": "Shipment status",
+    "openPortal": "Open carrier portal",
+    "refresh": "Refresh tracking",
+    "assign": "Assign tracking",
+    "saving": "Saving…",
+    "loading": "Loading tracking…",
+    "empty": "No tracking number yet. Assign a carrier and number to generate the portal link.",
+    "carriers": {
+      "andreani": "Andreani",
+      "correo_argentino": "Correo Argentino",
+      "propio": "Own / other",
+      "meli_full": "Mercado Libre Full"
+    },
+    "estadoEnvio": {
+      "pending": "Pending",
+      "in_transit": "In transit",
+      "delivered": "Delivered",
+      "returned": "Returned"
+    },
+    "errors": {
+      "load": "Could not load tracking.",
+      "save": "Could not save tracking."
+    }
   }
 }

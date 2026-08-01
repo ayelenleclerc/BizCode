@@ -8,6 +8,19 @@ export type OrdenEntregaEstado =
   | 'failed'
   | 'cancelled'
 
+/** @en Carrier codes for parcel shipping (#193). */
+export type ShippingTransportista = 'correo_argentino' | 'andreani' | 'propio' | 'meli_full'
+
+/** @en Carrier shipment lifecycle (#193), independent of OE `estado`. */
+export type EstadoEnvio = 'pending' | 'in_transit' | 'delivered' | 'returned'
+
+export type ShippingTrackingEvent = {
+  at: string
+  status: string
+  description?: string
+  location?: string
+}
+
 export type OrdenEntregaLineItem = {
   id: number
   cantidad: number
@@ -27,12 +40,50 @@ export type OrdenEntrega = {
   fecha: string
   estado: OrdenEntregaEstado
   nota: string | null
+  transportista: ShippingTransportista | null
+  nroSeguimiento: string | null
+  estadoEnvio: EstadoEnvio | null
+  ultimoEventoAt: string | null
+  trackingEventos: ShippingTrackingEvent[] | null
   items: OrdenEntregaLineItem[]
   cliente?: { id: number; codigo: number; rsocial: string }
   zona?: { id: number; nombre: string; horario?: string | null } | null
   driver?: { id: number; username: string; role: string } | null
   picker?: { id: number; username: string; role: string } | null
   factura?: { id: number; tipo: string; prefijo: string; numero: number } | null
+}
+
+export type OrdenEntregaTrackingAssignInput = {
+  transportista: ShippingTransportista
+  nroSeguimiento: string
+  estadoEnvio?: EstadoEnvio
+}
+
+export type OrdenEntregaTrackingView = {
+  ordenEntregaId: number
+  transportista: ShippingTransportista | null
+  nroSeguimiento: string | null
+  estadoEnvio: EstadoEnvio | null
+  ultimoEventoAt: string | null
+  trackingEventos: ShippingTrackingEvent[]
+  portalUrl: string | null
+  fromCache: boolean
+  refreshed: boolean
+}
+
+export type ShippingCarrierConfigPublic = {
+  carrier: 'andreani' | 'correo_argentino'
+  usernameLast4: string
+  sandboxMode: boolean
+  activo: boolean
+  updatedAt: string
+}
+
+export type ShippingCarrierConfigUpsertInput = {
+  username: string
+  password: string
+  sandboxMode?: boolean
+  activo?: boolean
 }
 
 export type OrdenEntregaListParams = {

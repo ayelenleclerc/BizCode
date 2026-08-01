@@ -8,7 +8,11 @@ import {
   ORDEN_ENTREGA_ESTADOS,
   type OrdenEntregaService,
 } from '../services/OrdenEntregaService'
-import { ordenEntregaCreateBodySchema, ordenEntregaUpdateBodySchema } from '../schemas/domain'
+import {
+  ordenEntregaCreateBodySchema,
+  ordenEntregaUpdateBodySchema,
+  ordenEntregaTrackingAssignBodySchema,
+} from '../schemas/domain'
 import { paginatedListJson, parseListPagination } from '../services/listPagination'
 import type { RestRouteContext } from './restRouteTypes'
 import { errorMessage, facturaFechaToPrismaDate, getTenantId } from './restDomainShared'
@@ -240,6 +244,107 @@ export function registerOrdenesEntregaRoutes(app: Application, ctx: RestRouteCon
           pickerUserId: result.data.pickerUserId,
           estado: result.data.estado,
         })
+        res.json({ success: true, data: result.data })
+      } catch (err: unknown) {
+        res.status(500).json({ success: false, error: errorMessage(err) })
+      }
+    },
+  )
+
+  app.get(
+    '/api/ordenes-entrega/:id',
+    (req: Request, res: Response, next: NextFunction) => {
+      const authReq = req as AuthenticatedRequest
+      const role = authReq.auth!.claims.role
+      if (
+        hasPermission(role, 'logistics.read' as Permission) ||
+        hasPermission(role, 'orders.deliver.confirm' as Permission) ||
+        hasPermission(role, 'orders.pick' as Permission)
+      ) {
+        next()
+        return
+      }
+      res.status(403).json({ success: false, error: 'Forbidden' })
+    },
+    async (req: Request, res: Response) => {
+      try {
+        const tenantId = getTenantId(req)
+        const id = Number.parseInt(String(req.params.id), 10)
+        if (!Number.isFinite(id) || id < 1) {
+          res.status(400).json({ success: false, error: 'Invalid orden entrega id' })
+          return
+        }
+        const row = await ordenEntrega.getById(tenantId, id)
+        if (!row) {
+          res.status(404).json({ success: false, error: 'Orden de entrega not found' })
+          return
+        }
+        res.json({ success: true, data: row })
+      } catch (err: unknown) {
+        res.status(500).json({ success: false, error: errorMessage(err) })
+      }
+    },
+  )
+
+  const shippingTracking = services.shippingTracking
+
+  app.post(
+    '/api/ordenes-entrega/:id/tracking',
+    requirePermission('logistics.manage'),
+    validateBody(ordenEntregaTrackingAssignBodySchema),
+    async (req: Request, res: Response) => {
+      try {
+        const authReq = req as AuthenticatedRequest
+        const tenantId = getTenantId(req)
+        const id = Number.parseInt(String(req.params.id), 10)
+        if (!Number.isFinite(id) || id < 1) {
+          res.status(400).json({ success: false, error: 'Invalid orden entrega id' })
+          return
+        }
+        const result = await shippingTracking.assignTracking(tenantId, id, req.body)
+        if (!result.ok) {
+          res.status(result.status).json({ success: false, error: result.error })
+          return
+        }
+        await writeAudit(authReq, 'orden_entrega_tracking_assign', 'orden_entrega', String(id), {
+          transportista: result.data.transportista,
+          nroSeguimiento: result.data.nroSeguimiento,
+        })
+        res.json({ success: true, data: result.data })
+      } catch (err: unknown) {
+        res.status(500).json({ success: false, error: errorMessage(err) })
+      }
+    },
+  )
+
+  app.get(
+    '/api/ordenes-entrega/:id/tracking',
+    (req: Request, res: Response, next: NextFunction) => {
+      const authReq = req as AuthenticatedRequest
+      const role = authReq.auth!.claims.role
+      if (
+        hasPermission(role, 'logistics.read' as Permission) ||
+        hasPermission(role, 'logistics.manage' as Permission)
+      ) {
+        next()
+        return
+      }
+      res.status(403).json({ success: false, error: 'Forbidden' })
+    },
+    async (req: Request, res: Response) => {
+      try {
+        const tenantId = getTenantId(req)
+        const id = Number.parseInt(String(req.params.id), 10)
+        if (!Number.isFinite(id) || id < 1) {
+          res.status(400).json({ success: false, error: 'Invalid orden entrega id' })
+          return
+        }
+        const forceRefresh = String(req.query.refresh ?? '') === '1'
+        const result = await shippingTracking.getTracking(tenantId, id, { forceRefresh })
+        if (!result.ok) {
+          res.status(result.status).json({ success: false, error: result.error })
+          return
+        }
         res.json({ success: true, data: result.data })
       } catch (err: unknown) {
         res.status(500).json({ success: false, error: errorMessage(err) })

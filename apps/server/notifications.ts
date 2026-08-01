@@ -28,6 +28,7 @@ export const NOTIFICATION_TYPES = [
   'lot_expiring',
   'security_alert_critical',
   'security_alert_high',
+  'shipment_delivered',
 ] as const
 
 export type NotificationType = (typeof NOTIFICATION_TYPES)[number]
@@ -76,6 +77,9 @@ export type NotificationPayload = {
   ipAddress?: string
   detail?: string
   username?: string
+  ordenEntregaId?: number
+  transportista?: string
+  nroSeguimiento?: string
 }
 
 /**
