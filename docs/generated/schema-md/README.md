@@ -536,13 +536,27 @@
 
 * [MatchSugerencia](./matchsugerencia.md) – `-`
 
+* [MeliAttributeInput](./meliattributeinput.md) – `-`
+
 * [MeliAuthorizeEnvelope](./meliauthorizeenvelope.md) – `-`
+
+* [MeliCategorySearchEnvelope](./melicategorysearchenvelope.md) – `-`
+
+* [MeliCategorySearchHit](./melicategorysearchhit.md) – `-`
 
 * [MeliConfigStatus](./meliconfigstatus.md) – `-`
 
 * [MeliConfigStatusEnvelope](./meliconfigstatusenvelope.md) – `-`
 
 * [MeliDisconnectEnvelope](./melidisconnectenvelope.md) – `-`
+
+* [MeliPublicacionStatus](./melipublicacionstatus.md) – `-`
+
+* [MeliPublicacionStatusEnvelope](./melipublicacionstatusenvelope.md) – `-`
+
+* [MeliPublicacionUnlinkEnvelope](./melipublicacionunlinkenvelope.md) – `-`
+
+* [MeliPublicacionUpsertBody](./melipublicacionupsertbody.md) – `-`
 
 * [MercadoPagoChargeback](./mercadopagochargeback.md) – `-`
 
@@ -1298,6 +1312,8 @@
 
 * [Untitled object in MeliDisconnectEnvelope](./melidisconnectenvelope-properties-data.md) – `undefined#/properties/data`
 
+* [Untitled object in MeliPublicacionUnlinkEnvelope](./melipublicacionunlinkenvelope-properties-data.md) – `undefined#/properties/data`
+
 * [Untitled object in MercadoPagoConfigEnvelope](./mercadopagoconfigenvelope-properties-data.md) – `undefined#/properties/data`
 
 * [Untitled object in MercadoPagoTestEnvelope](./mercadopagotestenvelope-properties-data.md) – `undefined#/properties/data`
@@ -1653,6 +1669,12 @@
 * [Untitled array in LoteListEnvelope](./lotelistenvelope-properties-data.md) – `undefined#/properties/data`
 
 * [Untitled array in LoteTrazabilidad](./lotetrazabilidad-properties-facturas.md) – `undefined#/properties/facturas`
+
+* [Untitled array in MeliCategorySearchEnvelope](./melicategorysearchenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled array in MeliPublicacionStatus](./melipublicacionstatus-properties-atributos.md) – `undefined#/properties/atributos`
+
+* [Untitled array in MeliPublicacionUpsertBody](./melipublicacionupsertbody-properties-atributos.md) – `undefined#/properties/atributos`
 
 * [Untitled array in MercadoPagoChargebackListEnvelope](./mercadopagochargebacklistenvelope-properties-data.md) – `undefined#/properties/data`
 

@@ -10123,6 +10123,147 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
 
+  /api/meli/categories/search:
+    get:
+      tags: [meli]
+      summary: Search Mercado Libre categories (#184)
+      description: Requires `products.read` and tenant integration `meli`. Proxies ML domain discovery search for category autocomplete.
+      security:
+        - cookieSession: []
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema:
+            type: string
+            minLength: 1
+      responses:
+        '200':
+          description: Category hits
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MeliCategorySearchEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Mercado Libre not connected
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/articulos/{id}/meli:
+    get:
+      tags: [meli]
+      summary: Mercado Libre listing status for an article (#184)
+      description: Requires `products.read`, tenant integration `meli`, and article ownership.
+      security:
+        - cookieSession: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Listing mapping status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MeliPublicacionStatusEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Article not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    put:
+      tags: [meli]
+      summary: Opt-in publish or update article on Mercado Libre (#184)
+      description: Requires `products.manage`, tenant integration `meli`, and article ownership. Creates or updates `MeliPublicacion` and syncs to ML `POST/PUT /items`.
+      security:
+        - cookieSession: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MeliPublicacionUpsertBody'
+      responses:
+        '200':
+          description: Listing synced
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MeliPublicacionStatusEnvelope'
+        '400':
+          description: Validation error (photos, category, attributes)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Article or MeLi connection not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    delete:
+      tags: [meli]
+      summary: Unlink article from Mercado Libre (#184)
+      description: Requires `products.manage`, tenant integration `meli`, and article ownership. Pauses remote listing when possible and deletes local mapping.
+      security:
+        - cookieSession: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Unlinked
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MeliPublicacionUnlinkEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Listing not linked
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
   /api/configuracion/mercadopago/qr-estatico:
     get:
       tags: [mercadopago]
@@ -19320,6 +19461,81 @@ components:
           required: [disconnected]
           properties:
             disconnected: { type: boolean, const: true }
+
+    MeliAttributeInput:
+      type: object
+      required: [id]
+      properties:
+        id: { type: string }
+        value_name: { type: string }
+        value_id: { type: string }
+
+    MeliPublicacionStatus:
+      type: object
+      required: [linked, hasPhotos, photoWarning]
+      properties:
+        linked: { type: boolean }
+        meliItemId: { type: string }
+        meliCategoryId: { type: string }
+        estado: { type: string }
+        syncStatus: { type: string }
+        syncError: { type: string, nullable: true }
+        permalink: { type: string, nullable: true }
+        ultimaSyncAt: { type: string, format: date-time, nullable: true }
+        hasPhotos: { type: boolean }
+        photoWarning: { type: boolean }
+        atributos:
+          type: array
+          items:
+            $ref: '#/components/schemas/MeliAttributeInput'
+
+    MeliPublicacionStatusEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success: { type: boolean, const: true }
+        data:
+          $ref: '#/components/schemas/MeliPublicacionStatus'
+
+    MeliPublicacionUpsertBody:
+      type: object
+      required: [meliCategoryId]
+      properties:
+        meliCategoryId: { type: string }
+        atributos:
+          type: array
+          items:
+            $ref: '#/components/schemas/MeliAttributeInput'
+
+    MeliPublicacionUnlinkEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success: { type: boolean, const: true }
+        data:
+          type: object
+          required: [unlinked]
+          properties:
+            unlinked: { type: boolean, const: true }
+
+    MeliCategorySearchHit:
+      type: object
+      required: [category_id, category_name]
+      properties:
+        category_id: { type: string }
+        category_name: { type: string }
+        domain_id: { type: string }
+        domain_name: { type: string }
+
+    MeliCategorySearchEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success: { type: boolean, const: true }
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/MeliCategorySearchHit'
 
     MercadoPagoConfigEnvelope:
       type: object

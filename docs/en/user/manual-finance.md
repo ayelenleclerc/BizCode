@@ -56,7 +56,7 @@ Requires **`settings.business.manage`**.
 
 ## Mercado Libre OAuth (#183)
 
-Base connection for the Mercado Libre marketplace connector (catalog/stock/orders sync are later issues). Enable tenant integration id **`meli`** (super-admin), then open **Settings → Company → Mercado Libre**:
+Base connection for the Mercado Libre marketplace connector. Enable tenant integration id **`meli`** (super-admin), then open **Settings → Company → Mercado Libre**:
 
 1. Click **Connect with Mercado Libre** — BizCode returns an authorization URL (`GET /api/oauth/meli/authorize`) and the browser redirects to Mercado Libre.
 2. After the seller authorizes, Mercado Libre calls `GET /api/oauth/meli/callback` (public). BizCode validates a signed CSRF `state`, exchanges the `code` for tokens, encrypts them in `MeliConfig` (same AES-GCM key as fiscal/MP secrets), and redirects to `/configuracion?meli=connected`.
@@ -65,6 +65,17 @@ Base connection for the Mercado Libre marketplace connector (catalog/stock/order
 5. Platform env: `MELI_CLIENT_ID`, `MELI_CLIENT_SECRET`, optional `MELI_REDIRECT_URI` (defaults to `{API_PUBLIC_URL}/api/oauth/meli/callback`). Schedule `npm run meli:token-refresh` every 5 hours (access tokens expire ~6h).
 
 Local OAuth smoke may require a public tunnel so Mercado Libre can reach the callback URL.
+
+## Mercado Libre catalog sync (#184)
+
+After OAuth is connected, sellers can opt-in per product from **Products → edit article → Mercado Libre**:
+
+1. Add at least one product photo (ML requires pictures; BizCode sends absolute URLs based on `API_PUBLIC_URL` + `/uploads/articulos/...`).
+2. Search an ML category (`GET /api/meli/categories/search?q=`) and publish (`PUT /api/articulos/{id}/meli`). BizCode stores `MeliPublicacion` and calls ML `POST /items` (or `PUT /items/{id}` when already linked).
+3. Later price/description/active changes on the article push to ML immediately; pending/error rows are retried by `npm run meli:catalog-sync` every 5 minutes.
+4. **Unlink** (`DELETE /api/articulos/{id}/meli`) pauses the remote listing when possible and deletes the local mapping.
+
+Stock bidirectional sync and order import remain later issues (#185–#186). Parent catalog rows and service items cannot be published.
 
 ## Mercado Pago payment links (#175)
 

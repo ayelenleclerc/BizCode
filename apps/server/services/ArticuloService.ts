@@ -3,6 +3,7 @@ import type { ArticuloInput } from '@bizcode/types'
 import type { ServiceResult } from './serviceResults'
 import { arsFromFx, TipoCambioService } from './TipoCambioService'
 import { umedidaFromUnidadBase } from '../lib/uom'
+import { MeliCatalogService } from './MeliCatalogService'
 
 type ArticuloWithRubro = Prisma.ArticuloGetPayload<{ include: { rubro: true } }>
 
@@ -81,6 +82,8 @@ export class ArticuloService {
       where: { id },
       data: priced.data,
     })
+    // Fire-and-forget MeLi catalog sync when an opt-in listing exists (#184).
+    void new MeliCatalogService(this.prisma).syncAfterArticuloChange(tenantId, id).catch(() => undefined)
     return { ok: true, data: articulo }
   }
 

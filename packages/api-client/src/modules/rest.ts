@@ -2020,6 +2020,33 @@ export type MeliConfigStatus = {
   conectadoAt?: string
 }
 
+export type MeliAttributeInput = {
+  id: string
+  value_name?: string
+  value_id?: string
+}
+
+export type MeliPublicacionStatus = {
+  linked: boolean
+  meliItemId?: string
+  meliCategoryId?: string
+  estado?: string
+  syncStatus?: string
+  syncError?: string | null
+  permalink?: string | null
+  ultimaSyncAt?: string | null
+  hasPhotos: boolean
+  photoWarning: boolean
+  atributos?: MeliAttributeInput[]
+}
+
+export type MeliCategorySearchHit = {
+  category_id: string
+  category_name: string
+  domain_id?: string
+  domain_name?: string
+}
+
 export type MercadoPagoConfigInput = {
   accessToken?: string
   publicKey: string
@@ -2202,6 +2229,55 @@ export const meliAPI = {
     try {
       const response = await api.post<{ success: boolean; data: { disconnected: true } }>(
         '/oauth/meli/disconnect',
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  getArticuloListing: async (articuloId: number): Promise<MeliPublicacionStatus> => {
+    try {
+      const response = await api.get<{ success: boolean; data: MeliPublicacionStatus }>(
+        `/articulos/${articuloId}/meli`,
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  upsertArticuloListing: async (
+    articuloId: number,
+    body: { meliCategoryId: string; atributos?: MeliAttributeInput[] },
+  ): Promise<MeliPublicacionStatus> => {
+    try {
+      const response = await api.put<{ success: boolean; data: MeliPublicacionStatus }>(
+        `/articulos/${articuloId}/meli`,
+        body,
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  unlinkArticuloListing: async (articuloId: number): Promise<{ unlinked: true }> => {
+    try {
+      const response = await api.delete<{ success: boolean; data: { unlinked: true } }>(
+        `/articulos/${articuloId}/meli`,
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  searchCategories: async (q: string): Promise<MeliCategorySearchHit[]> => {
+    try {
+      const response = await api.get<{ success: boolean; data: MeliCategorySearchHit[] }>(
+        '/meli/categories/search',
+        { params: { q } },
       )
       return response.data.data
     } catch (error) {

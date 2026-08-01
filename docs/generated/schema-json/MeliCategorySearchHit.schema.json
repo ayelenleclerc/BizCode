@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "category_id": {
+      "type": "string"
+    },
+    "category_name": {
+      "type": "string"
+    },
+    "domain_id": {
+      "type": "string"
+    },
+    "domain_name": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "category_id",
+    "category_name"
+  ],
+  "title": "MeliCategorySearchHit",
+  "type": "object"
+}
