@@ -1553,6 +1553,7 @@ model Tenant {
   mercadoPagoRefunds            MercadoPagoRefund[]
   mercadoPagoChargebacks        MercadoPagoChargeback[]
   meliConfig                    MeliConfig?
+  meliWebhookEvents             MeliWebhookEvent[]
   shippingCarrierConfigs        ShippingCarrierConfig[]
   configsComision               ConfigComision[]
   liquidacionesComision         LiquidacionComision[]
@@ -1741,6 +1742,22 @@ model MeliPublicacion {
   @@unique([tenantId, meliItemId])
   @@index([tenantId, syncStatus])
   @@index([articuloId])
+}
+
+/// @en Idempotent Mercado Libre webhook receipts for stock sync (#185).
+/// @es Recibos idempotentes de webhooks Mercado Libre para sync de stock (#185).
+/// @pt-BR Recibos idempotentes de webhooks Mercado Livre para sync de estoque (#185).
+model MeliWebhookEvent {
+  id          Int       @id @default(autoincrement())
+  tenantId    Int?
+  tenant      Tenant?   @relation(fields: [tenantId], references: [id], onDelete: SetNull)
+  topic       String    @db.VarChar(40)
+  resource    String    @db.VarChar(200)
+  meliUserId  String?   @db.VarChar(40)
+  processedAt DateTime  @default(now())
+
+  @@unique([topic, resource])
+  @@index([tenantId, processedAt])
 }
 
 /// B2B customer portal branding and feature toggles per tenant (#240).

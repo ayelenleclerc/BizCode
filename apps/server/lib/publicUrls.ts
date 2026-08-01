@@ -42,6 +42,15 @@ export function resolveMercadoPagoNotificationUrl(): string {
 }
 
 /**
+ * @en Mercado Libre notifications webhook URL (#185).
+ * @es URL del webhook de notificaciones Mercado Libre (#185).
+ * @pt-BR URL do webhook de notificações Mercado Livre (#185).
+ */
+export function resolveMeliNotificationUrl(): string {
+  return `${resolveApiPublicBaseUrl()}/api/webhooks/meli`
+}
+
+/**
  * @en Mercado Libre OAuth redirect URI (#183).
  * @es URI de redirección OAuth Mercado Libre (#183).
  * @pt-BR URI de redirecionamento OAuth Mercado Livre (#183).

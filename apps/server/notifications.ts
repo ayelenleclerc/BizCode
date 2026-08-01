@@ -19,6 +19,7 @@ export const NOTIFICATION_TYPES = [
   'mercadopago_payment_received',
   'mercadopago_payment_failed',
   'mercadopago_chargeback',
+  'meli_price_divergence',
   'contract_invoice_generated',
   'contract_adjustment_due',
   'ot_presupuestado',

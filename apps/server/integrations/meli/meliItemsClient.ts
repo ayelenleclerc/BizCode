@@ -134,6 +134,48 @@ export async function updateMeliItem(
   })
 }
 
+export type MeliOrderLineItem = {
+  item: { id: string; title?: string }
+  quantity: number
+  unit_price?: number
+}
+
+export type MeliOrderResponse = {
+  id: number | string
+  status?: string
+  order_items?: MeliOrderLineItem[]
+}
+
+/**
+ * @en Loads a Mercado Libre item by id (#185).
+ * @es Carga un ítem de Mercado Libre por id (#185).
+ * @pt-BR Carrega um item do Mercado Livre por id (#185).
+ */
+export async function getMeliItem(
+  accessToken: string,
+  itemId: string,
+): Promise<MeliItemResponse> {
+  return meliFetch<MeliItemResponse>(
+    accessToken,
+    `/items/${encodeURIComponent(itemId)}`,
+  )
+}
+
+/**
+ * @en Loads a Mercado Libre order by id (#185).
+ * @es Carga una orden de Mercado Libre por id (#185).
+ * @pt-BR Carrega um pedido do Mercado Livre por id (#185).
+ */
+export async function getMeliOrder(
+  accessToken: string,
+  orderId: string,
+): Promise<MeliOrderResponse> {
+  return meliFetch<MeliOrderResponse>(
+    accessToken,
+    `/orders/${encodeURIComponent(orderId)}`,
+  )
+}
+
 /**
  * @en Searches Mercado Libre categories by free text (#184).
  * @es Busca categorías de Mercado Libre por texto (#184).

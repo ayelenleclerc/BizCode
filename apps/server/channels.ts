@@ -152,6 +152,16 @@ function buildMessage(type: NotificationType, payload: NotificationPayload): Mes
         text: `Se registró un contracargo${payment} para la factura${ref} de ${rsocial}${amount ? ` por ${amount}` : ''}. Requiere revisión manual.`,
       }
     }
+    case 'meli_price_divergence': {
+      const code = payload.codigo != null ? ` #${payload.codigo}` : ''
+      const desc = payload.descripcion ? ` — ${payload.descripcion}` : ''
+      return {
+        subject: `[BizCode] Precio divergente en Mercado Libre${code}`,
+        text:
+          payload.detail ??
+          `El precio en Mercado Libre difiere del precio en BizCode para el artículo${code}${desc}. No se auto-corrige (#185).`,
+      }
+    }
     case 'contract_invoice_generated': {
       const numero = payload.contratoNumero != null ? ` #${payload.contratoNumero}` : ''
       const facturaRef = payload.facturaId != null ? ` (factura #${payload.facturaId})` : ''

@@ -75,7 +75,16 @@ After OAuth is connected, sellers can opt-in per product from **Products → edi
 3. Later price/description/active changes on the article push to ML immediately; pending/error rows are retried by `npm run meli:catalog-sync` every 5 minutes.
 4. **Unlink** (`DELETE /api/articulos/{id}/meli`) pauses the remote listing when possible and deletes the local mapping.
 
-Stock bidirectional sync and order import remain later issues (#185–#186). Parent catalog rows and service items cannot be published.
+## Mercado Libre stock sync (#185)
+
+Bidirectional stock sync for articles with a linked `MeliPublicacion` (`meliItemId`):
+
+1. **BizCode → ML:** after invoice stock decrement (`FacturaService`) or any `StockAjuste` (manual, purchase receipt, count, production, etc.), `MeliStockSyncService` patches only `{ available_quantity }` on ML. Stock ≤ 0 pauses the listing (`status: paused`); stock &gt; 0 and an active article reactivates it.
+2. **ML → BizCode:** register MeLi notifications to `POST /api/webhooks/meli` (public). Platform env `MELI_WEBHOOK_SECRET` validates `x-signature` (HMAC-SHA256). Topic `orders_v2` fetches the order and creates `StockAjuste` with motivo `venta_meli` (does **not** import orders as Pedido — that is #186). Topics `items` / `item_price` notify managers if the ML price diverges (no auto-correct).
+3. **Reconcile:** schedule `npm run meli:stock-reconcile` hourly — BizCode stock is source of truth; mismatches are corrected by pushing to ML without duplicating stock movements.
+4. Idempotency: `MeliWebhookEvent` unique `(topic, resource)`.
+
+Order import remains later (#186). Parent catalog rows and service items cannot be published.
 
 ## Mercado Pago payment links (#175)
 

@@ -558,6 +558,10 @@
 
 * [MeliPublicacionUpsertBody](./melipublicacionupsertbody.md) – `-`
 
+* [MeliWebhookAckEnvelope](./meliwebhookackenvelope.md) – `-`
+
+* [MeliWebhookBody](./meliwebhookbody.md) – `-`
+
 * [MercadoPagoChargeback](./mercadopagochargeback.md) – `-`
 
 * [MercadoPagoChargebackEnvelope](./mercadopagochargebackenvelope.md) – `-`
