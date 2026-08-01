@@ -33,7 +33,10 @@ describe('meliOAuthState', () => {
 
   it('rejects tampered state', () => {
     const state = signMeliOAuthState(1, 1)
-    expect(verifyMeliOAuthState(`${state}x`)).toBeNull()
+    // Node Buffer base64 decode ignores some trailing junk; flip bytes in the middle instead.
+    const mid = Math.floor(state.length / 2)
+    const tampered = `${state.slice(0, mid)}XXXX${state.slice(mid + 4)}`
+    expect(verifyMeliOAuthState(tampered)).toBeNull()
     expect(verifyMeliOAuthState('not-valid')).toBeNull()
   })
 })

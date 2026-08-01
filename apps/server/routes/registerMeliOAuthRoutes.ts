@@ -34,9 +34,9 @@ export function registerMeliOAuthRoutes(app: Application, ctx: RestRouteContext)
 
   app.get(
     '/api/oauth/meli/authorize',
+    meliOAuthHttpRateLimiter,
     requirePermission('settings.business.manage'),
     requireMeli,
-    meliOAuthHttpRateLimiter,
     async (req: Request, res: Response) => {
       try {
         const authReq = req as AuthenticatedRequest
