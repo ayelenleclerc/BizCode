@@ -7388,6 +7388,57 @@ paths:
               schema:
                 $ref: '#/components/schemas/ApiErrorEnvelope'
 
+  /api/webhooks/meli:
+    post:
+      tags: [meli]
+      summary: Mercado Libre notifications webhook (#185)
+      description: |
+        Public notifications endpoint (no JWT). Validates `x-signature` with platform env `MELI_WEBHOOK_SECRET`
+        (HMAC-SHA256 manifest `id:{dataId};request-id:{x-request-id};ts:{ts};`, same family as Mercado Pago docs).
+        Responds `200` immediately and processes asynchronously:
+        - topic `orders_v2` / `orders`: fetches the ML order and creates `StockAjuste` with motivo `venta_meli`
+          (does **not** create Pedido/Factura — order import is #186).
+        - topic `items` / `item_price`: alerts managers if remote price diverges from BizCode (no auto-correct).
+        Idempotent per `(topic, resource)` via `MeliWebhookEvent`. Rate-limited per IP.
+      security: []
+      parameters:
+        - name: data.id
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Resource id used in signature manifest (falls back to id extracted from body `resource`).
+        - name: x-signature
+          in: header
+          required: true
+          schema:
+            type: string
+          description: Mercado Libre HMAC signature (`ts=...,v1=...`).
+        - name: x-request-id
+          in: header
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MeliWebhookBody'
+      responses:
+        '200':
+          description: Notification accepted (processing may continue asynchronously)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MeliWebhookAckEnvelope'
+        '400':
+          description: Invalid signature or payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+
   /api/facturas/{id}/remito:
     parameters:
       - $ref: '#/components/parameters/BizcodeChannelHeader'
@@ -19840,6 +19891,30 @@ components:
             - type: integer
 
     MercadoPagoWebhookAckEnvelope:
+      type: object
+      required: [success]
+      properties:
+        success: { type: boolean, const: true }
+
+    MeliWebhookBody:
+      type: object
+      required: [resource, topic, user_id]
+      properties:
+        resource: { type: string, maxLength: 200, description: e.g. /orders/2000003509 }
+        topic: { type: string, maxLength: 40, description: orders_v2 | items | item_price }
+        user_id:
+          oneOf:
+            - type: string
+            - type: integer
+        application_id:
+          oneOf:
+            - type: string
+            - type: integer
+        attempts: { type: integer }
+        sent: { type: string }
+        received: { type: string }
+
+    MeliWebhookAckEnvelope:
       type: object
       required: [success]
       properties:

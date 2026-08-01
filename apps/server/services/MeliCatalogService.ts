@@ -259,7 +259,7 @@ export class MeliCatalogService {
           attributes: attributes.length ? attributes : undefined,
         })
       } else {
-        const status = articulo.activo ? 'active' : 'paused'
+        const status = articulo.activo && qty > 0 ? 'active' : 'paused'
         item = await updateMeliItem(tokens.data.accessToken, row.meliItemId, {
           title: articulo.descripcion.slice(0, 60),
           price,
@@ -274,7 +274,7 @@ export class MeliCatalogService {
         where: { id: row.id },
         data: {
           meliItemId: item.id,
-          estado: item.status ?? (articulo.activo ? 'active' : 'paused'),
+          estado: item.status ?? (articulo.activo && qty > 0 ? 'active' : 'paused'),
           permalink: item.permalink ?? row.permalink,
           syncStatus: 'synced',
           syncError: null,

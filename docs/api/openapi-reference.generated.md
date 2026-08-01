@@ -44796,6 +44796,102 @@ Public IPN endpoint (no JWT). Validates `x-signature` with the tenant `webhookSe
 }
 ```
 
+### Mercado Libre notifications webhook (#185)
+
+- **Method:** `POST`
+- **Path:** `/api/webhooks/meli`
+- **Tags:** meli
+
+Public notifications endpoint (no JWT). Validates `x-signature` with platform env `MELI_WEBHOOK_SECRET` (HMAC-SHA256 manifest `id:{dataId};request-id:{x-request-id};ts:{ts};`, same family as Mercado Pago docs). Responds `200` immediately and processes asynchronously:
+
+- topic `orders_v2` / `orders`: fetches the ML order and creates `StockAjuste` with motivo `venta_meli` (does **not** create Pedido/Factura — order import is #186).
+- topic `items` / `item_price`: alerts managers if remote price diverges from BizCode (no auto-correct). Idempotent per `(topic, resource)` via `MeliWebhookEvent`. Rate-limited per IP.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`resource` (required)**
+
+  `string` — e.g. /orders/2000003509
+
+- **`topic` (required)**
+
+  `string` — orders\_v2 | items | item\_price
+
+- **`user_id` (required)**
+
+  `object`
+
+- **`application_id`**
+
+  `object`
+
+- **`attempts`**
+
+  `integer`
+
+- **`received`**
+
+  `string`
+
+- **`sent`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "resource": "",
+  "topic": "",
+  "user_id": "",
+  "application_id": "",
+  "attempts": 1,
+  "sent": "",
+  "received": ""
+}
+```
+
+#### Responses
+
+##### Status: 200 Notification accepted (processing may continue asynchronously)
+
+###### Content-Type: application/json
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true
+}
+```
+
+##### Status: 400 Invalid signature or payload
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ### PARAMETERS /api/facturas/{id}/remito
 
 - **Method:** `PARAMETERS`
@@ -106845,6 +106941,68 @@ Originating invoice header (selected columns)
 ```
 
 ### MercadoPagoWebhookAckEnvelope
+
+- **Type:**`object`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true
+}
+```
+
+### MeliWebhookBody
+
+- **Type:**`object`
+
+* **`resource` (required)**
+
+  `string` — e.g. /orders/2000003509
+
+* **`topic` (required)**
+
+  `string` — orders\_v2 | items | item\_price
+
+* **`user_id` (required)**
+
+  `object`
+
+* **`application_id`**
+
+  `object`
+
+* **`attempts`**
+
+  `integer`
+
+* **`received`**
+
+  `string`
+
+* **`sent`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "resource": "",
+  "topic": "",
+  "user_id": "",
+  "application_id": "",
+  "attempts": 1,
+  "sent": "",
+  "received": ""
+}
+```
+
+### MeliWebhookAckEnvelope
 
 - **Type:**`object`
 

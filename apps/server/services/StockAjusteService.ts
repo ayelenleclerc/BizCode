@@ -4,6 +4,7 @@ import { assertNoOpenRecuento } from '../lib/recuentoStockGuard'
 import type { ServiceResult } from './serviceResults'
 import { applyStockDepositoDelta, getDefaultDepositoId } from './stockDepositoSync'
 import { LoteService } from './LoteService'
+import { MeliStockSyncService } from './MeliStockSyncService'
 import { isUnidadBase, roundQty, validateQuantityForUom } from '../lib/uom'
 
 export type StockAjusteRow = Prisma.StockAjusteGetPayload<{
@@ -161,6 +162,9 @@ export class StockAjusteService {
           stockAfter: Number(updated.stock),
         }
       })
+      void new MeliStockSyncService(this.prisma)
+        .syncStockToMeli(tenantId, articuloId)
+        .catch(() => undefined)
       return { ok: true, data: result }
     } catch (err) {
       if (err instanceof Error && err.message === 'INSUFFICIENT_DEPOSIT_STOCK') {

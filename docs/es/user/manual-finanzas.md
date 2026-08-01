@@ -75,7 +75,16 @@ Con OAuth conectado, el vendedor puede optar por artículo desde **Artículos �
 3. Cambios posteriores de precio/descripción/activo se empujan a ML de inmediato; filas `pending`/`error` se reintentan con `npm run meli:catalog-sync` cada 5 minutos.
 4. **Desvincular** (`DELETE /api/articulos/{id}/meli`) pausa la publicación remota si es posible y borra el mapping local.
 
-Sync bidireccional de stock e importación de órdenes quedan en #185–#186. Artículos padre y servicios no se publican.
+## Sync de stock Mercado Libre (#185)
+
+Sync bidireccional de stock para artículos con `MeliPublicacion` vinculada (`meliItemId`):
+
+1. **BizCode → ML:** tras el decremento de stock en factura (`FacturaService`) o cualquier `StockAjuste` (manual, recepción de compra, recuento, producción, etc.), `MeliStockSyncService` parchea solo `{ available_quantity }` en ML. Stock ≤ 0 pausa la publicación (`status: paused`); stock &gt; 0 y artículo activo la reactiva.
+2. **ML → BizCode:** registrar notificaciones MeLi en `POST /api/webhooks/meli` (público). El env de plataforma `MELI_WEBHOOK_SECRET` valida `x-signature` (HMAC-SHA256). El topic `orders_v2` obtiene la orden y crea `StockAjuste` con motivo `venta_meli` (**no** importa órdenes como Pedido — eso es #186). Topics `items` / `item_price` alertan a managers si el precio ML diverge (sin auto-corregir).
+3. **Reconciliación:** programar `npm run meli:stock-reconcile` cada hora — el stock de BizCode es fuente de verdad; las diferencias se corrigen empujando a ML sin duplicar movimientos.
+4. Idempotencia: `MeliWebhookEvent` único `(topic, resource)`.
+
+La importación de órdenes queda en #186. Artículos padre y servicios no se publican.
 
 ## Links de pago Mercado Pago (#175)
 

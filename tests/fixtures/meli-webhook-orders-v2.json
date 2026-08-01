@@ -1,0 +1,9 @@
+{
+  "resource": "/orders/2000003509",
+  "user_id": 468834342,
+  "topic": "orders_v2",
+  "application_id": 2069392825110845,
+  "attempts": 1,
+  "sent": "2026-08-01T16:19:50.033Z",
+  "received": "2026-08-01T16:19:50.355Z"
+}

@@ -38,6 +38,10 @@ import {
   buildMercadoPagoSignatureManifest,
   computeMercadoPagoSignatureHmac,
 } from '../../apps/server/lib/mercadopagoSignature'
+import {
+  buildMeliSignatureManifest,
+  computeMeliSignatureHmac,
+} from '../../apps/server/lib/meliWebhookSignature'
 
 function isObjectRecord(value: unknown): value is Record<string, unknown> {
   if (value === undefined || value === null) return false
@@ -1131,6 +1135,7 @@ function buildPrisma(): PrismaClient {
       upsert: vi.fn().mockResolvedValue({}),
       deleteMany: vi.fn().mockResolvedValue({ count: 0 }),
       findMany: vi.fn().mockResolvedValue([]),
+      findFirst: vi.fn().mockResolvedValue(null),
     },
     meliPublicacion: {
       findFirst: vi.fn().mockResolvedValue(null),
@@ -1138,6 +1143,11 @@ function buildPrisma(): PrismaClient {
       upsert: vi.fn().mockResolvedValue({}),
       update: vi.fn().mockResolvedValue({}),
       delete: vi.fn().mockResolvedValue({}),
+    },
+    meliWebhookEvent: {
+      create: vi.fn().mockResolvedValue({ id: 1 }),
+      updateMany: vi.fn().mockResolvedValue({ count: 1 }),
+      findFirst: vi.fn().mockResolvedValue(null),
     },
     mercadoPagoProcessedPayment: {
       findUnique: vi.fn().mockResolvedValue(null),
@@ -2724,6 +2734,46 @@ describe('API — contrato OpenAPI', () => {
       .send({ type: 'payment', data: { id: paymentId } })
       .expect(200)
     await assertMatchesOpenApi('/api/webhooks/mercadopago', 'post', '200', res.body)
+  })
+
+  it('POST /api/webhooks/meli returns 400 for invalid signature', async () => {
+    process.env.MELI_WEBHOOK_SECRET = 'meli-whsec-contract'
+    const app = createApp(buildPrisma())
+    const res = await request(app)
+      .post('/api/webhooks/meli')
+      .set('x-signature', 'ts=1,v1=bad')
+      .set('x-request-id', 'req-meli-contract-1')
+      .query({ 'data.id': '2000003509' })
+      .send({
+        resource: '/orders/2000003509',
+        topic: 'orders_v2',
+        user_id: 999,
+      })
+      .expect(400)
+    await assertMatchesOpenApi('/api/webhooks/meli', 'post', '400', res.body)
+  })
+
+  it('POST /api/webhooks/meli returns 200 for valid signature', async () => {
+    const secret = 'meli-whsec-contract'
+    process.env.MELI_WEBHOOK_SECRET = secret
+    const orderId = '2000003509'
+    const requestId = 'req-meli-contract-2'
+    const ts = '1704908010'
+    const manifest = buildMeliSignatureManifest(orderId, requestId, ts)
+    const v1 = computeMeliSignatureHmac(secret, manifest)
+    const app = createApp(buildPrisma())
+    const res = await request(app)
+      .post('/api/webhooks/meli')
+      .set('x-signature', `ts=${ts},v1=${v1}`)
+      .set('x-request-id', requestId)
+      .query({ 'data.id': orderId })
+      .send({
+        resource: `/orders/${orderId}`,
+        topic: 'orders_v2',
+        user_id: 999,
+      })
+      .expect(200)
+    await assertMatchesOpenApi('/api/webhooks/meli', 'post', '200', res.body)
   })
 
   it('GET /api/configuracion/meli', async () => {

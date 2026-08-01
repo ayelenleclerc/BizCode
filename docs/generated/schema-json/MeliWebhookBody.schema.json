@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "application_id": {
+      "oneOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "integer"
+        }
+      ]
+    },
+    "attempts": {
+      "type": "integer"
+    },
+    "received": {
+      "type": "string"
+    },
+    "resource": {
+      "description": "e.g. /orders/2000003509",
+      "maxLength": 200,
+      "type": "string"
+    },
+    "sent": {
+      "type": "string"
+    },
+    "topic": {
+      "description": "orders_v2 | items | item_price",
+      "maxLength": 40,
+      "type": "string"
+    },
+    "user_id": {
+      "oneOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "integer"
+        }
+      ]
+    }
+  },
+  "required": [
+    "resource",
+    "topic",
+    "user_id"
+  ],
+  "title": "MeliWebhookBody",
+  "type": "object"
+}
