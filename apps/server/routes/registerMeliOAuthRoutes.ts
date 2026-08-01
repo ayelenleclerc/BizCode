@@ -1,6 +1,7 @@
 import type { Application, Request, Response } from 'express'
 import { requirePermission, type AuthenticatedRequest } from '../auth'
 import { requireMeliIntegration } from '../middleware/requireMeliIntegration'
+import { meliOAuthHttpRateLimiter } from '../middleware/routeRateLimit'
 import { MeliConfigService } from '../services/MeliConfigService'
 import { MeliOAuthService } from '../services/MeliOAuthService'
 import type { RestRouteContext } from './restRouteTypes'
@@ -35,6 +36,7 @@ export function registerMeliOAuthRoutes(app: Application, ctx: RestRouteContext)
     '/api/oauth/meli/authorize',
     requirePermission('settings.business.manage'),
     requireMeli,
+    meliOAuthHttpRateLimiter,
     async (req: Request, res: Response) => {
       try {
         const authReq = req as AuthenticatedRequest
@@ -55,30 +57,35 @@ export function registerMeliOAuthRoutes(app: Application, ctx: RestRouteContext)
     },
   )
 
-  app.get('/api/oauth/meli/callback', async (req: Request, res: Response) => {
-    const code = typeof req.query.code === 'string' ? req.query.code.trim() : ''
-    const state = typeof req.query.state === 'string' ? req.query.state.trim() : ''
-    if (!code || !state) {
-      res.status(400).json({ success: false, error: 'Missing OAuth code or state' })
-      return
-    }
-
-    try {
-      const result = await meliOAuth.handleCallback(code, state)
-      if (!result.ok) {
-        res.status(result.status).json({ success: false, error: result.error })
+  app.get(
+    '/api/oauth/meli/callback',
+    meliOAuthHttpRateLimiter,
+    async (req: Request, res: Response) => {
+      const code = typeof req.query.code === 'string' ? req.query.code.trim() : ''
+      const state = typeof req.query.state === 'string' ? req.query.state.trim() : ''
+      if (!code || !state) {
+        res.status(400).json({ success: false, error: 'Missing OAuth code or state' })
         return
       }
-      res.redirect(302, result.data.redirectUrl)
-    } catch (err: unknown) {
-      res.status(500).json({ success: false, error: errorMessage(err) })
-    }
-  })
+
+      try {
+        const result = await meliOAuth.handleCallback(code, state)
+        if (!result.ok) {
+          res.status(result.status).json({ success: false, error: result.error })
+          return
+        }
+        res.redirect(302, result.data.redirectUrl)
+      } catch (err: unknown) {
+        res.status(500).json({ success: false, error: errorMessage(err) })
+      }
+    },
+  )
 
   app.post(
     '/api/oauth/meli/disconnect',
     requirePermission('settings.business.manage'),
     requireMeli,
+    meliOAuthHttpRateLimiter,
     async (req: Request, res: Response) => {
       try {
         const tenantId = getTenantId(req)

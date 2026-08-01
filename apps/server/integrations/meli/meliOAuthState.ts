@@ -1,13 +1,33 @@
-import { createHmac, randomBytes, timingSafeEqual } from 'node:crypto'
+import { createHmac, randomBytes, scryptSync, timingSafeEqual } from 'node:crypto'
 import { getAppConfig } from '../../config/env'
 
 const STATE_TTL_MS = 10 * 60 * 1000
+/** @en Stable salt for scrypt-derived OAuth state MAC key (#183). */
+const STATE_MAC_SALT = 'bizcode-meli-oauth-state-v1'
 
 export type MeliOAuthStatePayload = {
   tenantId: number
   userId: number
   nonce: string
   exp: number
+}
+
+/**
+ * @en Derives a dedicated HMAC key for OAuth state (scrypt; not a password digest) (#183).
+ * @es Deriva una clave HMAC dedicada para el state OAuth (scrypt; no es digest de contraseña) (#183).
+ * @pt-BR Deriva uma chave HMAC dedicada para o state OAuth (scrypt; não é digest de senha) (#183).
+ */
+function meliOAuthStateMacKey(): Buffer {
+  return scryptSync(getAppConfig().JWT_SECRET, STATE_MAC_SALT, 32)
+}
+
+/**
+ * @en HMAC-SHA256 MAC over the OAuth state payload (#183).
+ * @es MAC HMAC-SHA256 sobre el payload del state OAuth (#183).
+ * @pt-BR MAC HMAC-SHA256 sobre o payload do state OAuth (#183).
+ */
+function macMeliOAuthState(encoded: string): string {
+  return createHmac('sha256', meliOAuthStateMacKey()).update(encoded, 'utf8').digest('base64url')
 }
 
 /**
@@ -23,7 +43,7 @@ export function signMeliOAuthState(tenantId: number, userId: number): string {
     exp: Date.now() + STATE_TTL_MS,
   }
   const encoded = Buffer.from(JSON.stringify(payload), 'utf8').toString('base64url')
-  const sig = createHmac('sha256', getAppConfig().JWT_SECRET).update(encoded).digest('base64url')
+  const sig = macMeliOAuthState(encoded)
   return `${encoded}.${sig}`
 }
 
@@ -38,7 +58,7 @@ export function verifyMeliOAuthState(state: string): MeliOAuthStatePayload | nul
   const [encoded, sig] = parts
   if (!encoded || !sig) return null
 
-  const expected = createHmac('sha256', getAppConfig().JWT_SECRET).update(encoded).digest('base64url')
+  const expected = macMeliOAuthState(encoded)
   const a = Buffer.from(sig, 'utf8')
   const b = Buffer.from(expected, 'utf8')
   if (a.length !== b.length || !timingSafeEqual(a, b)) {
