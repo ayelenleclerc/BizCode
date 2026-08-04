@@ -3,7 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import '@/i18n/config'
 import PedidosPage from './index'
-import { meliAPI, pedidosAPI, type PedidoRow } from '@/lib/api'
+import { meliAPI, pedidosAPI, tiendanubeAPI, type PedidoRow } from '@/lib/api'
 import { useAuth } from '@/contexts/AuthContext'
 import { useFeatureFlags } from '@/contexts/FeatureFlagsContext'
 import type { AuthClaims, Permission } from '@/lib/rbac'
@@ -66,6 +66,10 @@ vi.mock('@/lib/api', async () => {
       listOrdenes: vi.fn(),
       facturarOrden: vi.fn(),
     },
+    tiendanubeAPI: {
+      listOrdenes: vi.fn(),
+      facturarOrden: vi.fn(),
+    },
   }
 })
 
@@ -125,6 +129,29 @@ describe('PedidosPage', () => {
       limit: 100,
       offset: 0,
     })
+    vi.mocked(tiendanubeAPI.listOrdenes).mockResolvedValue({
+      data: [
+        {
+          id: 2,
+          tnOrderId: 'TN-100',
+          status: 'paid',
+          buyerNickname: 'BUYER_TN',
+          cuitPending: false,
+          stockAppliedAt: null,
+          lastSyncedAt: '2026-08-01T12:00:00.000Z',
+          pedidoId: 51,
+          pedidoEstado: 'confirmed',
+          pedidoTotal: '2000',
+          facturaId: null,
+          clienteId: 21,
+          clienteRsocial: 'BUYER TN',
+          clienteCuit: null,
+        },
+      ],
+      total: 1,
+      limit: 100,
+      offset: 0,
+    })
   })
 
   it('carga listado y muestra tabla', async () => {
@@ -177,5 +204,24 @@ describe('PedidosPage', () => {
     expect(await screen.findByTestId('meli-ordenes-table')).toBeInTheDocument()
     expect(screen.getByTestId('meli-orden-row-2000003509')).toBeInTheDocument()
     expect(meliAPI.listOrdenes).toHaveBeenCalledWith({ estado: 'pendiente' })
+  })
+
+  it('muestra pestaña Órdenes Tiendanube y lista órdenes', async () => {
+    vi.mocked(useFeatureFlags).mockReturnValue({
+      status: 'ready',
+      modules: ['billing.orders'],
+      integrations: ['tiendanube'],
+      hasModule: (key: string) => key === 'billing.orders',
+      hasIntegration: (id: string) => id === 'tiendanube',
+      refreshFeatures: vi.fn(),
+    } as never)
+    const user = userEvent.setup()
+    render(<PedidosPage />)
+    await screen.findByTestId('pedidos-tab-tiendanube')
+    await user.click(screen.getByTestId('pedidos-tab-tiendanube'))
+    expect(await screen.findByTestId('tiendanube-ordenes-panel')).toBeInTheDocument()
+    expect(await screen.findByTestId('tiendanube-ordenes-table')).toBeInTheDocument()
+    expect(screen.getByTestId('tiendanube-orden-row-TN-100')).toBeInTheDocument()
+    expect(tiendanubeAPI.listOrdenes).toHaveBeenCalledWith({ estado: 'pendiente' })
   })
 })
